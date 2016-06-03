@@ -26,8 +26,9 @@ module Opal
       end
 
       def extract_iter
+        super
         # TODO: Find a way to make this more elegant
-        @iter = s(:js_tmp, 'null')
+        @iter ||= s(:js_tmp, 'null')
       end
 
       def method_jsid
@@ -127,9 +128,14 @@ module Opal
       handle :zsuper
 
       def extract_iter
-        # Need to support passing block up even if it's not referenced in this method at all
-        scope.uses_block!
-        @iter = s(:js_tmp, '$iter')
+        super
+        # preserve a block if we have one already but otherwise, assume a block is coming from higher
+        # up the chain
+        unless iter.type == :iter
+          # Need to support passing block up even if it's not referenced in this method at all
+          scope.uses_block!
+          @iter = s(:js_tmp, '$iter')
+        end
       end
 
       def compile
