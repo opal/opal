@@ -80,7 +80,6 @@ module Opal
         chain, cur_defn, mid = scope.get_super_chain
         trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
         implicit = @implicit_args.to_s
-
         "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
       end
 
