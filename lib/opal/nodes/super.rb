@@ -17,6 +17,7 @@ module Opal
       private
 
       def extract_arglist
+        puts 'extract arglist'
         self.arglist = s(:arglist, *@sexp.children)
       end
 
@@ -28,7 +29,8 @@ module Opal
       def iter
         # Need to support passing block up even if it's not referenced in this method at all
         @iter ||= begin
-          if arglist # TODO: Better understand this elsif vs. the else code path
+          puts "arglist is #{arglist}"
+          if arglist.children.any? # TODO: Better understand this elsif vs. the else code path
             s(:js_tmp, 'null')
           else
             scope.uses_block!
@@ -91,6 +93,7 @@ module Opal
       end
 
       def add_method(temporary_receiver)
+        puts "add_method, scope.def? #{scope.def?} scope iter? #{scope.iter?}"
         super_call = if scope.def?
           super_method_invocation
         elsif scope.iter?
@@ -140,23 +143,25 @@ module Opal
           implicit_args = [s(:js_tmp, '$zuper')]
           # If the method we're in has a block and we're using a default super call with no args, we need to grab the block
           # If an iter (block via braces) is provided, that takes precedence
+          puts "formal_block_parameter is #{formal_block_parameter} !iter #{!iter} iter is #{iter}"
           if (block_arg = formal_block_parameter) && !iter
+            puts 'adding block in'
             block_pass = s(:block_pass, s(:lvar, block_arg[1]))
             implicit_args << expr
           end
 
           self.arglist = s(:arglist, *implicit_args)
-        else
-          @arguments_without_block = []
         end
         super
       end
 
       def formal_block_parameter
+        puts "containing_def_scope is #{containing_def_scope}"
         case containing_def_scope
           when Opal::Nodes::IterNode
             containing_def_scope.extract_block_arg
           when Opal::Nodes::DefNode
+            puts "def node block_arg is #{containing_def_scope.block_arg}"
             containing_def_scope.block_arg
           else
             raise "Don't know what to do with scope #{containing_def_scope}"
