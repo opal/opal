@@ -438,6 +438,7 @@ rule
                       result = new_sym(val[0])
                     }
                 | symbol
+                | dsym
 
       undef_list: fitem
                     {
@@ -1501,6 +1502,10 @@ xstring_contents: none
                 | tSYMBOL
                     {
                       result = new_sym(val[0])
+                    }
+                | dsym
+                    {
+                      result = val[0]
                     }
 
              sym: fname

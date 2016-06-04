@@ -18,13 +18,20 @@ module Opal
 
       def compile
         children.each do |child|
-          value = child[1]
+          value = child
           statements = []
-          if child[0] == :js_return
-             value = value[1]
-             statements << expr(s(:js_return))
+          if value[0] == :js_return
+            value = value[1]
+            statements << expr(s(:js_return))
           end
-          statements << "Opal.udef(self, '$#{value.to_s}');"
+
+          if value[0] == :dsym
+            value = "'$' + #{process(value).flatten.map(&:code).join[1..-2]}"
+          else
+            value = "'$#{value[1]}'"
+          end
+
+          statements << "Opal.udef(self, #{value});"
           if children.length > 1 && child != children.first
             line *statements
           else

@@ -43,3 +43,19 @@ describe "generated method names" do
     }
   end
 end
+
+describe 'undef with dynamic symbol (regression for https://github.com/opal/opal/pull/1128)' do
+  class UndefWithDynamicSymbol
+    def foo_bar
+    end
+  end
+
+  class UndefWithDynamicSymbol
+    bar = "bar"
+    undef :"foo_#{bar}"
+  end
+
+  it 'should work' do
+    lambda { UndefWithDynamicSymbol.new.foo_bar }.should raise_error(NoMethodError)
+  end
+end
