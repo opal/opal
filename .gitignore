@@ -15,3 +15,6 @@ build/
 
 # Ignore the location of the older (0.8 and below) rubyspec submodule location
 spec/corelib
+# Ignore the location of newer stuff
+spec/mspec
+spec/ruby
