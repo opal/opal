@@ -6,6 +6,14 @@ describe Opal::Compiler do
     it 'calls #require' do
       expect_compiled("require 'pippo'").to include('self.$require("pippo")')
     end
+
+    it 'removes leading ./ from relative requires' do
+      expect_compiled("require './pippo'").to include('self.$require("pippo")')
+    end
+
+    it 'removes leading ../ from relative requires' do
+      expect_compiled("require '../pippo'").to include('self.$require("pippo")')
+    end
   end
 
   describe 'requirable' do
@@ -16,6 +24,12 @@ describe Opal::Compiler do
 
     it 'puts the compiled into "Opal.modules"' do
       options = { :requirable => true, :file => "pippo" }
+      expect_compiled("", options).to include('Opal.modules["pippo"] = function(Opal) {')
+      expect_compiled("", options).to end_with("};\n")
+    end
+
+    it 'does not create "Opal.modules" with relative pathnames' do
+      options = { :requirable => true, :file => "../pippo" }
       expect_compiled("", options).to include('Opal.modules["pippo"] = function(Opal) {')
       expect_compiled("", options).to end_with("};\n")
     end
@@ -124,6 +138,16 @@ describe Opal::Compiler do
       it 'parses and resolve #require argument' do
         compiler = compiler_for(%Q{require "#{__FILE__}"})
         expect(compiler.requires).to eq([__FILE__])
+      end
+
+      it "parses and resolves #require argument with leading ./" do
+        compiler = compiler_for('require "./pippo"')
+        expect(compiler.requires).to eq(['./pippo'])
+      end
+
+      it "parses and resolves #require argument with leading ../" do
+        compiler = compiler_for('require "../pippo"')
+        expect(compiler.requires).to eq(['../pippo'])
       end
     end
 

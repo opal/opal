@@ -13,8 +13,10 @@ module Opal
     end
 
     def expand(path)
-      if Pathname.new(path).absolute? || path =~ %r{\A\.?\.#{File::SEPARATOR}}
+      if Pathname.new(path).absolute?
         path
+      elsif path =~ %r{\A\.?\.#{File::SEPARATOR}}
+        file_finder.find_relative_current_dir(path)
       else
         file_finder.find(path)
       end
