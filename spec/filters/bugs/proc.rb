@@ -1,5 +1,11 @@
 opal_filter "Proc" do
   fails "Proc as an implicit block pass argument remains the same object if re-vivified by the target method"
+  fails "Proc#arity for instances created with proc { || } returns zero for definition \n    @a = proc { |a=1| }\n    @b = proc { |a=1, b=2| }"
+  fails "Proc#arity for instances created with proc { || } returns zero for definition \n    @a = proc { |a: 1| }\n    @b = proc { |a: 1, b: 2| }"
+  fails "Proc#arity for instances created with proc { || } returns zero for definition \n    @a = proc { |**k, &l| }\n    @b = proc { |a: 1, b: 2, **k| }"
+  fails "Proc#arity for instances created with proc { || } returns zero for definition \n    @a = proc { |a=1, b: 2| }\n    @b = proc { |a=1, b: 2| }"
+  fails "Proc#arity for instances created with proc { || } returns positive values for definition \n    @a = proc { |a, b=1| }\n    @b = proc { |a, b, c=1, d=2| }"
+  fails "Proc#arity for instances created with proc { || } returns positive values for definition \n    @a = proc { |(a, (*b, c)), d=1| }\n    @b = proc { |a, (*b, c), d, (*e), (*), **k| }"
   fails "Proc#binding returns a Binding instance"
   fails "Proc#binding returns the binding associated with self"
   fails "Proc#curry with arity argument returns Procs with arities of -1 regardless of the value of _arity_"

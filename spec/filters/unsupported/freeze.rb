@@ -43,6 +43,7 @@ opal_filter "freezing" do
   fails "Module#undef_method on frozen instance raises a TypeError when passed a not name"
   fails "OpenStruct#method_missing when called with a method name ending in '=' raises a TypeError when self is frozen"
   fails "String#clone copies frozen state"
+  fails "String#freeze doesn't produce the same object for different instances of literals in the source"
   fails "String#initialize with no arguments does not raise an exception when frozen"
   fails "StringScanner#initialize returns an instance of StringScanner"
   fails "A singleton method definition raises RuntimeError if frozen"

@@ -15,6 +15,7 @@ opal_filter "Hash" do
   fails "Hash#compare_by_identity? returns false by default"
   fails "Hash#compare_by_identity? returns true once #compare_by_identity has been invoked on self"
   fails "Hash#compare_by_identity? returns true when called multiple times on the same ident hash"
+  fails "Hash#compare_by_identity does not call #hash on keys"
   fails "Hash#default= raises a RuntimeError if called on a frozen instance"
   fails "Hash#default_proc= raises a RuntimeError if self is frozen"
   fails "Hash#delete raises a RuntimeError if called on a frozen instance"

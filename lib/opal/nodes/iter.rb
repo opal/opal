@@ -82,6 +82,7 @@ module Opal
 
       def compile_block_arg
         if block_arg
+          block_arg = variable(self.block_arg.to_s)
           scope.block_name = block_arg
           scope.add_temp block_arg
           scope_name = scope.identify!

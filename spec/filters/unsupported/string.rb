@@ -206,6 +206,7 @@ opal_filter "String" do
   fails "String#gsub! with pattern and replacement returns nil if no modifications were made"
   fails "String#gsub! with pattern and replacement taints self if replacement is tainted"
   fails "String#gsub! with pattern and replacement untrusts self if replacement is untrusted"
+  fails "String#gsub! with pattern and replacement modifies self in place with multi-byte characters and returns self"
   fails "String#gsub! with pattern and without replacement and block returned Enumerator size should return nil"
   fails "String#gsub! with pattern and without replacement and block returns an enumerator"
   fails "String#index raises a TypeError if passed a Symbol"
