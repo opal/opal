@@ -105,6 +105,7 @@ opal_filter "language" do
   fails "The defined? keyword for a scoped constant does not call .const_missing if the constant is not defined"
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the module"
   fails "The defined? keyword for a scoped constant returns nil when an undefined constant is scoped to a defined constant"
+  fails "The defined? keyword for a scoped constant returns nil when a constant is scoped to an undefined constant"
   fails "The defined? keyword for a simple constant does not call Object.const_missing if the constant is not defined"
   fails "The defined? keyword for a simple constant returns 'constant' for a constant defined in an included module"
   fails "The defined? keyword for a simple constant returns 'constant' for an included module"

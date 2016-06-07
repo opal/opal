@@ -283,6 +283,7 @@ opal_filter "Kernel" do
   fails "Kernel.printf calls write on the first argument when it is not a string"
   fails "Kernel.printf writes to stdout when a string is the first argument"
   fails "Kernel.proc is a private method"
+  fails "Kernel.rand returns nil when range is backwards"
   fails "Kernel.rand is a private method"
   fails "Kernel.srand accepts a Bignum as a seed"
   fails "Kernel.srand accepts a negative seed"

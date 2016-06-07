@@ -17,6 +17,8 @@ opal_filter "private" do
   fails "Module#attr_reader is a private method"
   fails "Module#attr_writer is a private method"
   fails "Module#define_method when name is not a special private name given an UnboundMethod sets the visibility of the method to the current visibility"
+  fails "Module#define_method when name is not a special private name given an UnboundMethod and called from the target module sets the visibility of the method to the current visibility"
+  fails "Module#define_method when name is not a special private name passed a block and called from the target module sets the visibility of the method to the current visibility"
   fails "Module#extend_object is a private method"
   fails "Module#extend_object is called even when private"
   fails "Module#extended is private in its default implementation"
