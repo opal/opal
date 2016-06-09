@@ -1,5 +1,6 @@
 require 'ast'
 require 'parser/ruby22'
+require 'opal/rewriter'
 
 ::Parser::AST::Node.class_eval do
   attr_reader :meta
@@ -55,7 +56,13 @@ module Opal
         diagnostics.consumer = ->(diag){}
       end
 
-      super(buffer)
+      parsed = super(buffer)
+      rewriten = rewrite(parsed)
+      rewriten
+    end
+
+    def rewrite(node)
+      Opal::Rewriter.new(node).process
     end
   end
 end
