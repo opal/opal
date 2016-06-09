@@ -156,7 +156,7 @@ module Opal
       # Used to generate the code to use this sexp as an ivar var reference
       def compile_irb_var
         with_temp do |tmp|
-          lvar = variable(meth)
+          lvar = meth
           call = s(:send, s(:self), meth.intern, s(:arglist))
           push "((#{tmp} = Opal.irb_vars.#{lvar}) == null ? ", expr(call), " : #{tmp})"
         end

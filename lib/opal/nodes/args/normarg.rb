@@ -12,16 +12,14 @@ module Opal
       children :name
 
       def compile
-        var_name = variable(name)
-
         if @sexp.meta[:post]
-          add_temp var_name
-          line "#{var_name} = #{scope.working_arguments}.splice(0,1)[0];"
+          add_temp name
+          line "#{name} = #{scope.working_arguments}.splice(0,1)[0];"
         end
 
         if scope.in_mlhs?
-          line "if (#{var_name} == null) {"
-          line "  #{var_name} = nil;"
+          line "if (#{name} == null) {"
+          line "  #{name} = nil;"
           line "}"
         end
       end

@@ -3,52 +3,12 @@ require 'opal/regexp_anchors'
 module Opal
   module Nodes
     module Helpers
-
-      # Reserved javascript keywords - we cannot create variables with the
-      # same name (ref: http://stackoverflow.com/a/9337272/601782)
-      ES51_RESERVED_WORD = /#{REGEXP_START}(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)#{REGEXP_END}/
-
-      # ES3 reserved words that aren’t ES5.1 reserved words
-      ES3_RESERVED_WORD_EXCLUSIVE = /#{REGEXP_START}(?:int|byte|char|goto|long|final|float|short|double|native|throws|boolean|abstract|volatile|transient|synchronized)#{REGEXP_END}/
-
-      # Prototype special properties.
-      PROTO_SPECIAL_PROPS = /#{REGEXP_START}(?:constructor|displayName|__proto__|__parent__|__noSuchMethod__|__count__)#{REGEXP_END}/
-
-      # Prototype special methods.
-      PROTO_SPECIAL_METHODS = /#{REGEXP_START}(?:hasOwnProperty|valueOf)#{REGEXP_END}/
-
-      # Immutable properties of the global object
-      IMMUTABLE_PROPS = /#{REGEXP_START}(?:NaN|Infinity|undefined)#{REGEXP_END}/
-
-      # Doesn't take in account utf8
-      BASIC_IDENTIFIER_RULES = /#{REGEXP_START}[$_a-z][$_a-z\d]*#{REGEXP_END}/i
-
-      # Defining a local function like Array may break everything
-      RESERVED_FUNCTION_NAMES = /#{REGEXP_START}(?:Array)#{REGEXP_END}/
-
-
       def property(name)
         valid_name?(name) ? ".#{name}" : "[#{name.inspect}]"
       end
 
       def valid_name?(name)
-        BASIC_IDENTIFIER_RULES =~ name and not(
-          ES51_RESERVED_WORD          =~ name or
-          ES3_RESERVED_WORD_EXCLUSIVE =~ name or
-          IMMUTABLE_PROPS             =~ name
-        )
-      end
-
-      def variable(name)
-        valid_name?(name.to_s) ? name : "#{name}$"
-      end
-
-      def valid_ivar_name?(name)
-        not (PROTO_SPECIAL_PROPS =~ name or PROTO_SPECIAL_METHODS =~ name)
-      end
-
-      def ivar(name)
-        valid_ivar_name?(name.to_s) ? name : "#{name}$"
+        Opal::Rewriters::JsReservedWords.valid_name?(name)
       end
 
       # Converts a ruby method name into its javascript equivalent for

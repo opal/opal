@@ -1,11 +1,13 @@
 require 'opal/rewriters/opal_engine_check'
 require 'opal/rewriters/explicit_writer_return'
+require 'opal/rewriters/js_reserved_words'
 
 module Opal
   class Rewriter
     LIST = [
       Rewriters::OpalEngineCheck,
       Rewriters::ExplicitWriterReturn,
+      Rewriters::JsReservedWords,
     ]
 
     def initialize(sexp)

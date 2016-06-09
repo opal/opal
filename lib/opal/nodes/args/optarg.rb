@@ -12,12 +12,10 @@ module Opal
       children :name, :default_value
 
       def compile
-        var_name = variable(name)
-
         return if default_value.children[1] == :undefined
 
-        line "if (#{var_name} == null) {"
-        line "  #{var_name} = ", expr(default_value)
+        line "if (#{name} == null) {"
+        line "  #{name} = ", expr(default_value)
         push ";"
         line "}"
       end
