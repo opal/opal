@@ -1,6 +1,7 @@
 require 'opal/rewriters/opal_engine_check'
 require 'opal/rewriters/explicit_writer_return'
 require 'opal/rewriters/js_reserved_words'
+require 'opal/rewriters/block_to_iter'
 
 module Opal
   class Rewriter
@@ -8,6 +9,7 @@ module Opal
       Rewriters::OpalEngineCheck,
       Rewriters::ExplicitWriterReturn,
       Rewriters::JsReservedWords,
+      Rewriters::BlockToIter,
     ]
 
     def initialize(sexp)

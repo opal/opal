@@ -12,6 +12,7 @@ module Opal
       end
 
       alias on_iter process_regular_node
+      alias on_top  process_regular_node
 
       # TODO: remove patches above after releasing
       # https://github.com/whitequark/parser/commit/cd8d5db

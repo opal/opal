@@ -32,10 +32,8 @@ module Opal
 
           # block_sexp is a sexp of our for loop
           # converted to "value.each { |arg| body_sexp }"
-          block_sexp = s(:block,
-            s(:send, value, :each),
-            s(:args, s(:arg, loop_var)),
-            assign
+          block_sexp = s(:send, value, :each,
+            s(:iter, s(:args, s(:arg, loop_var)), assign)
           )
           push expr(block_sexp)
         end
