@@ -188,41 +188,6 @@ module Opal
         elsif RuntimeHelpers.compatible?(recvr, meth, arglist)
           @compile_default = false
           push(RuntimeHelpers.new(sexp_with_arglist, @level, @compiler).compile)
-        elsif dot_js_call?
-          @compile_default = false
-          push process(to_js_call, @level)
-        end
-      end
-
-      def dot_js_call?
-        # .JS
-        recvr && recvr.type == :send && recvr.children.last == :JS
-      end
-
-      def to_js_call
-        js_call_type = meth
-        js_call_recvr = recvr.children[0]
-
-        case js_call_type
-        when :[]
-          # a.JS[property]
-          # => s(:jsattr, s(:lvar, :a), property)
-          property, *rest = *arglist.children
-          if rest.any?
-            raise SyntaxError, ".JS[:property] syntax supports only one argument"
-          end
-          s(:jsattr, js_call_recvr, property)
-        when :[]=
-          # a.JS[property] = value
-          # => s(:jsattrasgn, s(:lvar, :a), property, value)
-          property, value, *rest = *arglist.children
-          s(:jsattrasgn, js_call_recvr, property, value)
-        else
-          # a.JS.native_method(param1, param2)
-          # => s(:jscall, s(:lvar, :a), :native_method, s(:arglist, param1, param2))
-          args = arglist.children
-          args += [iter] if iter
-          s(:jscall, js_call_recvr, js_call_type, *args)
         end
       end
 
