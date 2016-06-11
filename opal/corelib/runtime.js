@@ -1321,7 +1321,7 @@
       // A splatted array must be copied
       return value.slice();
     }
-    else if (value['$respond_to?']('to_a', true)) {
+    else if (typeof(value.$to_a) === 'function' && !value.$to_a.$$stub) {
       var ary = value.$to_a();
       if (ary === nil) {
         return [value];
