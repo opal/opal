@@ -44,7 +44,7 @@ module Opal
       end
 
       def valid_ivar_name?(name)
-        not (PROTO_SPECIAL_PROPS =~ name or PROTO_SPECIAL_METHODS =~ name)
+        not (PROTO_SPECIAL_PROPS =~ name or PROTO_SPECIAL_METHODS =~ name or /^length$/ =~ name)
       end
 
       def ivar(name)

@@ -12,6 +12,7 @@
   //
   //   The way the code is digested before going through Yardoc is a secret kept
   //   in the docs repo (https://github.com/opal/docs/tree/master).
+  "use strict"
 
   if (typeof(this.Opal) !== 'undefined') {
     console.warn('Opal already loaded. Loading twice can cause troubles, please fix your setup.');
@@ -621,6 +622,14 @@
   // @param object [Object]
   // @return [Class]
   Opal.build_object_singleton_class = function(object) {
+    if (object.$$is_number) {
+      throw Opal.TypeError.$new("can't define singleton");
+    }
+
+    if (object.$$is_string) {
+      throw Opal.RuntimeError.$new("can't modify frozen object");
+    }
+
     var superclass = object.$$class,
         name = "#<Class:#<" + superclass.$$name + ":" + superclass.$$id + ">>";
 

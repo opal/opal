@@ -8,7 +8,7 @@ module Opal
       def compile
         push type.to_s
       end
-      
+
       def self.truthy_optimize?
         true
       end
@@ -23,7 +23,7 @@ module Opal
         push value.to_s
         wrap '(', ')' if recv?
       end
-      
+
       def self.truthy_optimize?
         true
       end
@@ -79,7 +79,15 @@ module Opal
           message = "named captures are not supported in javascript: #{value.inspect}"
           push "self.$raise(new SyntaxError('#{message}'))"
         else
-          push "#{Regexp.new(value).inspect}#{flags}"
+          regexp = Regexp.new(value)
+          flags = self.flags
+
+          if flags && flags !~ /^[gim]*$/
+            compiler.warning "Ignoring unsupported flags #{flags.inspect} found for regexp #{regexp.inspect}"
+            flags = flags.gsub(/[^gim]/, '')
+          end
+
+          push "#{regexp.inspect}#{flags}"
         end
       end
     end
