@@ -1,3 +1,5 @@
+require 'open3'
+
 module Opal
   module Util
     extend self
@@ -57,11 +59,8 @@ module Opal
 
     class DigestSourceCommand < Command
       def digest(source)
-        IO.popen("#{command} #{options} #{hide_stderr}", 'r+') do |i|
-          i.puts source
-          i.close_write
-          i.read
-        end
+        out, _, _ = Open3.capture3("#{command} #{options} #{hide_stderr}", stdin_data: source)
+        out
       end
     end
 

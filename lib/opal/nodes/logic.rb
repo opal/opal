@@ -5,13 +5,24 @@ module Opal
     class NextNode < Base
       handle :next
 
-      children :value
-
       def compile
-        return push "continue;" if in_while?
+        if in_while?
+          push "continue;"
+        else
+          push expr_or_nil(value)
+          wrap "return ", ";"
+        end
+      end
 
-        push expr_or_nil(value)
-        wrap "return ", ";"
+      def value
+        case children.size
+        when 0
+          s(:nil)
+        when 1
+          children.first
+        else
+          s(:array, *children)
+        end
       end
     end
 
@@ -47,8 +58,6 @@ module Opal
       def break_val
         if value.nil?
           expr(s(:nil))
-        elsif children.size > 1
-          expr(s(:array, *children))
         else
           expr(value)
         end
@@ -78,33 +87,18 @@ module Opal
       end
     end
 
-    class NotNode < Base
-      handle :not
-
-      children :value
-
-      def compile
-        with_temp do |tmp|
-          push expr(value)
-          wrap "(#{tmp} = ", ", (#{tmp} === nil || #{tmp} === false || #{tmp} == null))"
-        end
-      end
-    end
-
     class SplatNode < Base
       handle :splat
 
       children :value
 
       def empty_splat?
-        value == [:nil] or value == [:paren, [:nil]]
+        value == s(:array)
       end
 
       def compile
         if empty_splat?
           push '[]'
-        elsif value.type == :sym
-          push '[', expr(value), ']'
         else
           push "Opal.to_a(", recv(value), ")"
         end
@@ -270,7 +264,7 @@ module Opal
       children :value
 
       def compile
-        push expr(s(:call, value, :to_proc, s(:arglist)))
+        push expr(s(:send, value, :to_proc, s(:arglist)))
       end
     end
   end

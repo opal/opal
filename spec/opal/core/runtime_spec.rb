@@ -9,12 +9,12 @@ end
 describe 'javascript access using .JS' do
   it 'should call javascript methods via .JS.method()' do
     "a1234b5678c".JS.indexOf('c').should == 10
-    "a1234b5678c".JS.replace(/[0-9]/g, '').should == 'abc'
+    "a1234b5678c".JS.replace(`/[0-9]/g`, '').should == 'abc'
   end
 
   it 'should call javascript methods via .JS.method arg' do
     ("a1234b5678c".JS.indexOf 'c').should == 10
-    ("a1234b5678c".JS.replace /[0-9]/g, '').should == 'abc'
+    ("a1234b5678c".JS.replace `/[0-9]/g`, '').should == 'abc'
   end
 
   it 'should call javascript methods with blocks via .JS.method' do
@@ -41,8 +41,8 @@ describe 'javascript access using .JS' do
   end
 
   it 'should be chainable' do
-    "a1234b5678c".JS.replace(/[0-9]/g, '').JS.toUpperCase.should == 'ABC'
-    "a1234b5678c".JS.replace(/[0-9]/g, '').JS[:length].should == 3
+    "a1234b5678c".JS.replace(`/[0-9]/g`, '').JS.toUpperCase.should == 'ABC'
+    "a1234b5678c".JS.replace(`/[0-9]/g`, '').JS[:length].should == 3
     "a1234b5678c".JS[:length].JS.toString.should == "11"
     `{a:{b:1}}`.JS[:a].JS[:b].JS.toString.should == '1'
     f = `{a:function(f){return {b: function(f2){return f(f2(1)) + f(f2(2))}}}}`

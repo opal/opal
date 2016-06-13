@@ -22,7 +22,7 @@ module Opal
     end
 
     class LocalAssignNode < Base
-      handle :lasgn
+      handle :lvasgn
 
       children :var_name, :value
 
@@ -41,7 +41,7 @@ module Opal
 
         push expr(value)
 
-        wrap '(', ')' if recv?
+        wrap '(', ')' if (recv? || expr?) && value
       end
     end
 
@@ -62,7 +62,7 @@ module Opal
     end
 
     class InstanceAssignNode < Base
-      handle :iasgn
+      handle :ivasgn
 
       children :name, :value
 
@@ -74,6 +74,8 @@ module Opal
         name = property ivar(var_name)
         push "self#{name} = "
         push expr(value)
+
+        wrap '(', ')'  if (recv? || expr?) && value
       end
     end
 
@@ -89,17 +91,36 @@ module Opal
       def compile
         helper :gvars
 
-        if var_name == '&'
-          return handle_global_match
-        elsif var_name == "'"
-          return handle_post_match
-        elsif var_name == '`'
-          return handle_pre_match
-        end
-
         name = property var_name
         add_gvar name
         push "$gvars#{name}"
+      end
+
+    end
+
+    # back_ref can be:
+    # $`
+    # $'
+    # $&
+    # $+ (currently unsupported)
+    class BackRefNode < GlobalVariableNode
+      handle :back_ref
+
+      def compile
+        helper :gvars
+
+        case var_name
+        when '&'
+          handle_global_match
+        when "'"
+          handle_post_match
+        when '`'
+          handle_pre_match
+        when '+'
+          super
+        else
+          raise NotImplementedError
+        end
       end
 
       def handle_global_match
@@ -122,7 +143,7 @@ module Opal
     end
 
     class GlobalAssignNode < Base
-      handle :gasgn
+      handle :gvasgn
 
       children :name, :value
 
@@ -135,6 +156,8 @@ module Opal
         name = property var_name
         push "$gvars#{name} = "
         push expr(value)
+
+        wrap '(', ')'  if (recv? || expr?) && value
       end
     end
 
@@ -165,7 +188,7 @@ module Opal
     end
 
     class ClassVarAssignNode < Base
-      handle :casgn
+      handle :cvasgn
 
       children :name, :value
 
@@ -173,18 +196,8 @@ module Opal
         push "(Opal.cvars['#{name}'] = "
         push expr(value)
         push ")"
-      end
-    end
 
-    class ClassVarDeclNode < Base
-      handle :cvdecl
-
-      children :name, :value
-
-      def compile
-        push "(Opal.cvars['#{name}'] = "
-        push expr(value)
-        push ")"
+        wrap '(', ')'  if (recv? || expr?) && value
       end
     end
   end

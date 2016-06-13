@@ -5,25 +5,38 @@ module Opal
     class ConstNode < Base
       handle :const
 
-      children :name
+      children :const_scope, :name
 
       def compile
-        if name == :DATA and compiler.eof_content
+        if magical_data_const?
           push("$__END__")
+        elsif const_scope && const_scope.type == :cbase
+          push "Opal.get('#{name}')"
+        elsif const_scope
+          push expr(const_scope), ".$$scope.get('#{name}')"
         else
           push "$scope.get('#{name}')"
         end
       end
+
+      # Ruby has a magical const DATA
+      # that should be processed in a different way:
+      # 1. When current file contains __END__ in the end of the file
+      #    DATA const should be resolved to the string located after __END__
+      # 2. When current file doesn't have __END__ section
+      #    DATA const should be resolved to a regular ::DATA constant
+      def magical_data_const?
+        const_scope.nil? && name == :DATA and compiler.eof_content
+      end
     end
 
-    class ConstDeclarationNode < Base
-      handle :cdecl
-
-      children :name, :base
+    # ::CONST
+    # s(:const, s(:cbase), :CONST)
+    class CbaseNode < Base
+      handle :cbase
 
       def compile
-        push expr(base)
-        wrap "Opal.cdecl($scope, '#{name}', ", ")"
+        push "Opal.Object"
       end
     end
 
@@ -33,45 +46,11 @@ module Opal
       children :base, :name, :value
 
       def compile
-        push "Opal.casgn("
-        push expr(base)
-        push ", '#{name}', "
-        push expr(value)
-        push ")"
-      end
-    end
-
-    class ConstGetNode < Base
-      handle :colon2
-
-      children :base, :name
-
-      def compile
-        push "(("
-        push expr(base)
-        push ").$$scope.get('#{name}'))"
-      end
-    end
-
-    class TopConstNode < Base
-      handle :colon3
-
-      children :name
-
-      def compile
-        push "Opal.get('#{name}')"
-      end
-    end
-
-    class TopConstAssignNode < Base
-      handle :casgn3
-
-      children :name, :value
-
-      def compile
-        push "Opal.casgn(Opal.Object, '#{name}', "
-        push expr(value)
-        push ")"
+        if base
+          push "Opal.casgn(", expr(base), ", '#{name}', ", expr(value), ")"
+        else
+          push "Opal.cdecl($scope, '#{name}', ", expr(value), ")"
+        end
       end
     end
   end

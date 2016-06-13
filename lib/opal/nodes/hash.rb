@@ -12,39 +12,16 @@ module Opal
         @has_kwsplat = false
         @keys = []
         @values = []
-      end
 
-      # Splits keys/values/kwsplats
-      #
-      # hash like { **{ nested: 1 }, d: 2 }
-      # is represetned by sexp:
-      # (:hash,
-      #   (:kwsplat,
-      #     (:hash,
-      #       (:sym, :nested),
-      #       (:int, 1)
-      #     )
-      #   ),
-      #   (:sym, :d),
-      #   (:int, 2),
-      # )
-      # So k/v pairs and kwsplats can be mixed in any order.
-      def extract_kv_pairs_and_kwsplats
-        found_key = false
-
-        children.each do |obj|
-          if obj.type == :kwsplat
-            self.has_kwsplat = true
-          elsif found_key
-            values << obj
-            found_key = false
-          else
-            keys << obj
-            found_key = true
+        children.each do |child|
+          case child.type
+          when :kwsplat
+            @has_kwsplat = true
+          when :pair
+            @keys << child.children[0]
+            @values << child.children[1]
           end
         end
-
-        [keys, values]
       end
 
       def simple_keys?
@@ -52,8 +29,6 @@ module Opal
       end
 
       def compile
-        extract_kv_pairs_and_kwsplats
-
         if has_kwsplat
           compile_merge
         elsif simple_keys?
@@ -103,9 +78,10 @@ module Opal
       def compile_hash
         helper :hash
 
-        children.each_with_index do |child, idx|
+        children.each_with_index do |pair, idx|
+          key, value = pair.children
           push ', ' unless idx == 0
-          push expr(child)
+          push expr(key), ', ', expr(value)
         end
 
         wrap '$hash(', ')'
@@ -118,7 +94,7 @@ module Opal
         helper :hash2
 
         keys.size.times do |idx|
-          key = keys[idx][1].to_s.inspect
+          key = keys[idx].children[0].to_s.inspect
           hash_keys << key unless hash_obj.include? key
           hash_obj[key] = expr(values[idx])
         end

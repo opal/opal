@@ -8,7 +8,7 @@ module Opal
       def compile
         push type.to_s
       end
-      
+
       def self.truthy_optimize?
         true
       end
@@ -23,7 +23,7 @@ module Opal
         push value.to_s
         wrap '(', ')' if recv?
       end
-      
+
       def self.truthy_optimize?
         true
       end
@@ -52,7 +52,23 @@ module Opal
       end
 
       def compile
-        push translate_escape_chars(value.inspect)
+        push translate_escape_chars(trimmed_value.inspect)
+      end
+
+      # Some unicode characters are too big,
+      # MRI uses "\u{hex}" to display them
+      # (which is invalid for JS)
+      # There's no way to display them,
+      # so we can simply trim them
+      def trimmed_value
+        value.each_char.map do |char|
+          if char.valid_encoding? && char.ord > 65535
+            @compiler.warning("Ignoring unsupported character #{char}", @sexp.line)
+            ""
+          else
+            char
+          end
+        end.join
       end
     end
 
@@ -69,9 +85,32 @@ module Opal
     class RegexpNode < Base
       handle :regexp
 
-      children :value, :flags
+      attr_accessor :value, :flags
+
+      def initialize(*)
+        super
+        extract_flags_and_value
+      end
 
       def compile
+        case value.type
+        when :dstr, :begin
+          compile_dynamic_regexp
+        when :str
+          compile_static_regexp
+        end
+      end
+
+      def compile_dynamic_regexp
+        if flags.any?
+          push "new RegExp(", expr(value), ", '#{flags.join}')"
+        else
+          push "new RegExp(", expr(value), ')'
+        end
+      end
+
+      def compile_static_regexp
+        value = self.value.children[0]
         case value
         when ''
           push('/(?:)/')
@@ -79,50 +118,97 @@ module Opal
           message = "named captures are not supported in javascript: #{value.inspect}"
           push "self.$raise(new SyntaxError('#{message}'))"
         else
-          push "#{Regexp.new(value).inspect}#{flags}"
+          push "#{Regexp.new(value).inspect}#{flags.join}"
         end
+      end
+
+      def extract_flags_and_value
+        *values, flags_sexp = *children
+        self.flags = flags_sexp.children.map(&:to_s)
+
+        case values.length
+        when 0
+          # empty regexp, we can process it inline
+          self.value = s(:str, '')
+        when 1
+          # simple plain regexp, we can put it inline
+          self.value = values[0]
+        else
+          self.value = s(:dstr, *values)
+        end
+
+        # trimming when //x provided
+        # required by parser gem, but JS doesn't support 'x' flag
+        if flags.include?('x')
+          parts = value.children.map do |part|
+            if part.is_a?(::Parser::AST::Node) && part.type == :str
+              trimmed_value = part.children[0].gsub(/\A\s*\#.*/, '').gsub(/\s/, '')
+              s(:str, trimmed_value)
+            else
+              part
+            end
+          end
+
+          self.value = value.updated(nil, parts)
+          flags.delete('x')
+        end
+
+        if value.type == :str
+          # Replacing \A -> ^, \z -> $, required for the parser gem
+          self.value = s(:str, value.children[0].gsub("\\A", "^").gsub("\\z", "$"))
+        end
+      end
+
+      def raw_value
+        self.value = @sexp.loc.expression.source
       end
     end
 
-    module XStringLineSplitter
-      def compile_split_lines(value, sexp)
-        idx = 0
-        value.each_line do |line|
-          if idx == 0
-            push line
-          else
-            line_sexp = s()
-            line_sexp.source = [sexp.line + idx, 0]
-            frag = Fragment.new(line, line_sexp)
-            push frag
-          end
+    # $_ = 'foo'; call if /foo/
+    # s(:if, s(:match_current_line, /foo/, true))
+    class MatchCurrentLineNode < Base
+      handle :match_current_line
 
-          idx += 1
-        end
+      children :regexp
+
+      # Here we just convert it to
+      # ($_ =~ regexp)
+      # and let :send node to handle it
+      def compile
+        gvar_sexp = s(:gvar, :$_)
+        send_node = s(:send, gvar_sexp, :=~, regexp)
+        push expr(send_node)
       end
     end
 
     class XStringNode < Base
-      include XStringLineSplitter
-
       handle :xstr
 
-      children :value
-
-      def needs_semicolon?
-        stmt? and !value.to_s.include?(';')
-      end
-
       def compile
-        compile_split_lines(value.to_s, @sexp)
-
-        push ';' if needs_semicolon?
+        children.each do |child|
+          case child.type
+          when :str
+            value = child.loc.expression.source
+            push Fragment.new(value, nil)
+          when :begin
+            push expr(child)
+          when :gvar, :ivar
+            push expr(child)
+          when :js_return
+            # A case for manually created :js_return statement in Compiler#returns
+            # Since we need to take original source of :str
+            # we have to use raw source
+            # so we need to combine "return" with "raw_source"
+            push "return "
+            str = child.children.first
+            value = str.loc.expression.source
+            push Fragment.new(value, nil)
+          else
+            raise "Unsupported xstr part: #{child.type}"
+          end
+        end
 
         wrap '(', ')' if recv?
-      end
-
-      def start_line
-        @sexp.line
       end
     end
 
@@ -130,23 +216,15 @@ module Opal
       handle :dstr
 
       def compile
-        children.each_with_index do |part, idx|
-          push " + " unless idx == 0
+        push '""'
 
-          if String === part
-            push part.inspect
-          elsif part.type == :evstr
-            push "("
-            push part[1] ? expr(part[1]) : '""'
-            push ")"
-          elsif part.type == :str
-            push part[1].inspect
-          elsif part.type == :dstr
-            push "("
-            push expr(part)
-            push ")"
+        children.each_with_index do |part, idx|
+          push " + "
+
+          if part.type == :str
+            push part.children[0].inspect
           else
-            raise "Bad dstr part #{part.inspect}"
+            push "(", expr(part), ")"
           end
 
           wrap '(', ')' if recv?
@@ -154,78 +232,8 @@ module Opal
       end
     end
 
-    class DynamicSymbolNode < Base
+    class DynamicSymbolNode < DynamicStringNode
       handle :dsym
-
-      def compile
-        children.each_with_index do |part, idx|
-          push " + " unless idx == 0
-
-          if String === part
-            push part.inspect
-          elsif part.type == :evstr
-            push expr(s(:call, part.last, :to_s, s(:arglist)))
-          elsif part.type == :str
-            push part.last.inspect
-          else
-            raise "Bad dsym part"
-          end
-        end
-
-        wrap '(', ')'
-      end
-    end
-
-    class DynamicXStringNode < Base
-      include XStringLineSplitter
-
-      handle :dxstr
-
-      def requires_semicolon(code)
-        stmt? and !code.include?(';')
-      end
-
-      def compile
-        needs_semicolon = false
-
-        children.each do |part|
-          if String === part
-            compile_split_lines(part.to_s, @sexp)
-
-            needs_semicolon = true if requires_semicolon(part.to_s)
-          elsif part.type == :evstr
-            push expr(part[1])
-          elsif part.type == :str
-            compile_split_lines(part.last.to_s, part)
-            needs_semicolon = true if requires_semicolon(part.last.to_s)
-          else
-            raise "Bad dxstr part"
-          end
-        end
-
-        push ';' if needs_semicolon
-        wrap '(', ')' if recv?
-      end
-    end
-
-    class DynamicRegexpNode < Base
-      handle :dregx
-
-      def compile
-        children.each_with_index do |part, idx|
-          push " + " unless idx == 0
-
-          if String === part
-            push part.inspect
-          elsif part.type == :str
-            push part[1].inspect
-          else
-            push expr(part[1])
-          end
-        end
-
-        wrap '(new RegExp(', '))'
-      end
     end
 
     class InclusiveRangeNode < Base

@@ -10,17 +10,17 @@ module Opal
     #
     class KwrestArgNode < InitializeKwargsNode
       handle :kwrestarg
+      children :name
 
       def compile
         initialize_kw_args_if_needed
 
-        kwrestarg_name = @sexp[1]
         extract_code = "Opal.kwrestargs($kwargs, #{used_kwargs});"
 
         # kwrestarg can be blank def m(**) end
         # we need to perform assignment only for named kwrestarg
-        if kwrestarg_name
-          var_name = variable(kwrestarg_name.to_sym)
+        if name
+          var_name = variable(name.to_sym)
           add_temp var_name
 
           line "#{var_name} = #{extract_code}"

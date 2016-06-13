@@ -146,23 +146,22 @@ module Opal
     #
     # @return [String] javascript code
     def compile
-      @parser = Parser.new
+      @buffer = ::Parser::Source::Buffer.new(file)
+      @buffer.source = @source
+      @parser = Opal::Parser.default_parser
 
       parsed = begin
-        @parser.parse(@source, self.file)
-      rescue => error
-        raise SyntaxError, error.message, error.backtrace
+        @parser.parse(@buffer)
+      rescue ::Parser::SyntaxError => error
+        raise ::SyntaxError, error.message, error.backtrace
       end
 
       @sexp = s(:top, parsed || s(:nil))
-      @eof_content = @parser.lexer.eof_content
+      @eof_content = extract_eof_content
 
       @fragments = process(@sexp).flatten
 
       @result = @fragments.map(&:code).join('')
-    rescue Exception => error
-      message = "An error occurred while compiling: #{self.file}\n#{error.message}"
-      raise error.class, message, error.backtrace
     end
 
     # Returns a source map that can be used in the browser to map back to
@@ -217,8 +216,8 @@ module Opal
     # Create a new sexp using the given parts. Even though this just
     # returns an array, it must be used incase the internal structure
     # of sexps does change.
-    def s(*parts)
-      Sexp.new(parts)
+    def s(type, *children)
+      ::Parser::AST::Node.new(type, children)
     end
 
     def fragment(str, scope, sexp = nil)
@@ -368,66 +367,95 @@ module Opal
       # Undefs go from 1 ruby undef a,b,c to multiple JS Opal.udef() calls, so need to treat them as individual statements
       # and put the return on the last one
       when :undef
-        last = sexp.pop
-        sexp << returns(last)
+        sexp.updated(nil,
+          sexp.children[0..-2] + [returns(sexp.children.last)]
+        )
       when :break, :next, :redo
         sexp
       when :yield
-        sexp[0] = :returnable_yield
-        sexp
-      when :scope
-        sexp[1] = returns sexp[1]
-        sexp
-      when :block
-        if sexp.length > 1
-          sexp[-1] = returns sexp[-1]
-        else
-          sexp << returns(s(:nil))
-        end
-        sexp
+        sexp.updated(:returnable_yield, nil)
       when :when
-        sexp[2] = returns(sexp[2])
-        sexp
+        *when_sexp, then_sexp = sexp.children
+        sexp.updated(nil,
+          [*when_sexp, returns(then_sexp)]
+        )
       when :rescue
-        sexp[1] = returns sexp[1]
+        body_sexp, *resbodies, else_sexp = sexp.children
 
-        if sexp[2] and sexp[2][0] == :resbody
-          if sexp[2][2]
-            sexp[2][2] = returns sexp[2][2]
-          else
-            sexp[2][2] = returns s(:nil)
-          end
+        resbodies = resbodies.map do |resbody|
+          returns(resbody)
         end
-        sexp
+
+        sexp.updated(nil, [
+          returns(body_sexp),
+          *resbodies,
+          else_sexp
+        ])
+      when :resbody
+        klass, lvar, body = sexp.children
+        sexp.updated(nil, [klass, lvar, returns(body)])
       when :ensure
-        sexp[1] = returns sexp[1]
+        rescue_sexp, ensure_body = sexp.children
+        sexp.updated(nil,
+          [returns(rescue_sexp), ensure_body]
+        )
+      when :begin, :kwbegin
+        # Wrapping last expression with s(:js_return, ...)
+        sexp.updated(
+          nil,
+          sexp.children[0..-2] + [returns(sexp.children.last)]
+        )
+      when :while, :until, :while_post, :until_post
         sexp
-      when :begin
-        sexp[1] = returns sexp[1]
-        sexp
-      when :rescue_mod
-        sexp[1] = returns sexp[1]
-        sexp[2] = returns sexp[2]
-        sexp
-      when :while
-        # sexp[2] = returns(sexp[2])
-        sexp
-      when :return, :js_return
+      when :return, :js_return, :returnable_yield
         sexp
       when :xstr
-        sexp[1] = "return #{sexp[1]};" unless /return|;/ =~ sexp[1]
-        sexp
-      when :dxstr
-        sexp[1] = "return #{sexp[1]}" unless /return|;|\n/ =~ sexp[1]
-        sexp
+        if sexp.children.any?
+          strs = sexp.
+            children.
+            select { |child| child.type == :str }.
+            map { |child| child.children[0] }
+
+          multiline = strs.any? { |str| str.end_with?(";\n") }
+
+          first_child, *rest_children = *sexp.children
+
+          if multiline
+            # xstr starts with interpolation
+            # then it must contain js_return inside
+            sexp
+          else
+            if first_child.type == :str
+              old_value = first_child.children[0]
+              if old_value.include?('return')
+                # 'return' is already there
+                sexp
+              else
+                first_child = s(:js_return, first_child)
+                sexp.updated(nil, [first_child] + rest_children)
+              end
+            else
+              s(:js_return, sexp)
+            end
+          end
+        else
+          returns s(:str, '')
+        end
       when :if
-        sexp[2] = returns(sexp[2] || s(:nil))
-        sexp[3] = returns(sexp[3] || s(:nil))
-        sexp
+        cond, true_body, false_body = sexp.children
+        sexp.updated(
+          nil, [
+            cond,
+            returns(true_body),
+            returns(false_body)
+          ]
+        )
       else
-        return_sexp = s(:js_return, sexp)
-        return_sexp.source = sexp.source
-        return_sexp
+        s(:js_return, sexp).updated(
+          nil,
+          nil,
+          location: sexp.loc
+        )
       end
     end
 
@@ -440,6 +468,14 @@ module Opal
       else
         fragment("false", scope, sexp)
       end
+    end
+
+    # Extracts all the content after __END__ directive
+    #
+    # @return [String, nil]
+    def extract_eof_content
+      matches = @source.match(/\n__END__\n?([\w\d\s]*)/)
+      matches && matches[1]
     end
   end
 end

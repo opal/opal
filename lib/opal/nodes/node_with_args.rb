@@ -29,7 +29,7 @@ module Opal
       end
 
       def split_args
-        args = self.args[1..-1]
+        args = self.args.children
         args.each_with_index do |arg, idx|
           last_argument = (idx == args.length - 1)
           case arg.type
@@ -59,29 +59,29 @@ module Opal
           end
         end
 
-        inline_args.each do |inline_arg|
-          inline_arg.meta[:inline] = true
+        inline_args.map! do |inline_arg|
+          inline_arg.updated(nil, nil, meta: { inline: true })
         end
 
         optimize_args!
       end
 
       def opt_args
-        @opt_args ||= args[1..-1].select { |arg| arg.first == :optarg }
+        @opt_args ||= args.children.select { |arg| arg.type == :optarg }
       end
 
       def rest_arg
-        @rest_arg ||= args[1..-1].find { |arg| arg.first == :restarg }
+        @rest_arg ||= args.children.find { |arg| arg.type == :restarg }
       end
 
       def keyword_args
-        @keyword_args ||= args[1..-1].select do |arg|
-          [:kwarg, :kwoptarg, :kwrestarg].include? arg.first
+        @keyword_args ||= args.children.select do |arg|
+          [:kwarg, :kwoptarg, :kwrestarg].include? arg.type
         end
       end
 
       def inline_args_sexp
-        s(:inline_args, *args[1..-1])
+        s(:inline_args, *args.children)
       end
 
       def post_args_sexp
@@ -170,7 +170,7 @@ module Opal
       end
 
       def positive_arity
-        result = args.size - 1
+        result = args.children.size
 
         result -= keyword_args.size
         result += 1 if keyword_args.any?
@@ -198,7 +198,7 @@ module Opal
 
       def parameters_code
         stringified_parameters = args.children.map do |arg|
-          value = arg.type == :mlhs ? nil : arg[1]
+          value = arg.type == :mlhs ? nil : arg.children[0]
           build_parameter(SEXP_TO_PARAMETERS[arg.type], value)
         end
 
@@ -214,7 +214,7 @@ module Opal
       def arity_checks
         return @arity_checks if @arity_checks
 
-        arity = args.size - 1
+        arity = args.children.size
         arity -= (opt_args.size)
 
         arity -= 1 if rest_arg
@@ -230,7 +230,7 @@ module Opal
 
         if arity < 0 # splat or opt args
           min_arity = -(arity + 1)
-          max_arity = args.size - 1
+          max_arity = args.children.size
           @arity_checks << "$arity < #{min_arity}" if min_arity > 0
           @arity_checks << "$arity > #{max_arity}" if max_arity and not(rest_arg)
         else

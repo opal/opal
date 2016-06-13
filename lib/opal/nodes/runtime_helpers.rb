@@ -8,8 +8,12 @@ module Opal
 
       children :recvr, :meth, :arglist
 
+      def self.s(type, *children)
+        ::Parser::AST::Node.new(type, children)
+      end
+
       def self.compatible?(recvr, meth, arglist)
-        recvr == [:const, :Opal] and HELPERS.include?(meth.to_sym)
+        recvr == s(:const, nil, :Opal) and HELPERS.include?(meth.to_sym)
       end
 
       def self.helper(name, &block)
@@ -26,7 +30,7 @@ module Opal
       end
 
       helper :truthy? do
-        unless sexp = arglist[1]
+        unless sexp = arglist.children[0]
           raise "truthy? requires an object"
         end
 
@@ -34,7 +38,7 @@ module Opal
       end
 
       helper :falsy? do
-        unless sexp = arglist[1]
+        unless sexp = arglist.children[0]
           raise "falsy? requires an object"
         end
 

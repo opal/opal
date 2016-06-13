@@ -50,6 +50,10 @@ module Opal
       end
     end
 
+    class WhilePostNode < WhileNode
+      handle :while_post
+    end
+
     class UntilNode < WhileNode
       handle :until
 
@@ -60,6 +64,10 @@ module Opal
       def while_close
         ")) {"
       end
+    end
+
+    class UntilPostNode < UntilNode
+      handle :until_post
     end
   end
 end

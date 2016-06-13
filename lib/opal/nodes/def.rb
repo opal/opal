@@ -6,13 +6,19 @@ module Opal
     class DefNode < NodeWithArgs
       handle :def
 
-      children :recvr, :mid, :args, :stmts
+      children :mid, :args, :stmts
 
       attr_accessor :block_arg
 
       def extract_block_arg
-        if args.last.is_a?(Sexp) && args.last.type == :blockarg
-          @block_arg = args.pop[1]
+        *regular_args, last_arg = args.children
+        if last_arg && last_arg.type == :blockarg
+          @block_arg = last_arg.children[0]
+          @sexp = @sexp.updated(nil, [
+            mid,
+            s(:args, *regular_args),
+            stmts
+          ])
         end
       end
 
@@ -30,7 +36,7 @@ module Opal
 
         in_scope do
           scope.mid = mid
-          scope.defs = true if recvr
+          scope.defs = true if @sexp.type == :defs
 
           if block_name
             scope.uses_block!
@@ -40,6 +46,7 @@ module Opal
           scope.block_name = block_name || '$yield'
 
           inline_params = process(inline_args_sexp)
+
           stmt_code = stmt(compiler.returns(stmts))
 
           add_temp 'self = this'
@@ -94,16 +101,19 @@ module Opal
           push ", #{scope_name}.$$parameters = #{parameters_code}"
         end
 
-        if    recvr                         then unshift 'Opal.defs(', recv(recvr), ", '$#{mid}', "
-        elsif scope.iter?                   then unshift "Opal.def(self, '$#{mid}', "
+        wrap_with_definition
+      end
+
+      def wrap_with_definition
+        if    scope.iter?                   then unshift "Opal.def(self, '$#{mid}', "
         elsif scope.module? || scope.class? then unshift "Opal.defn(self, '$#{mid}', "
-        elsif scope.sclass? && scope.defs   then unshift "Opal.defs(self, '$#{mid}', "
         elsif scope.sclass?                 then unshift "Opal.defn(self, '$#{mid}', "
         elsif compiler.eval?                then unshift "Opal.def(self, '$#{mid}', "
         elsif scope.top?                    then unshift "Opal.defn(Opal.Object, '$#{mid}', "
         elsif scope.def?                    then unshift "Opal.def(self, '$#{mid}', "
         else raise "Unsupported use of `def`; please file a bug at https://github.com/opal/opal/issues/new reporting this message."
         end
+
         push ')'
 
         wrap '(', ", nil) && '#{mid}'" if expr?
