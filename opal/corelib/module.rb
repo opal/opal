@@ -198,22 +198,44 @@ class Module
     }
   end
 
+  def class_variables
+    `Object.keys(Opal.class_variables(self))`
+  end
+
   def class_variable_get(name)
-    name = Opal.coerce_to!(name, String, :to_str)
-    raise NameError.new('class vars should start with @@', name) if `name.length < 3 || name.slice(0,2) !== '@@'`
+    name = Opal.class_variable_name!(name)
     %x{
-      var value = Opal.cvars[name.slice(2)];
-      #{raise NameError.new('uninitialized class variable @@a in', name) if `value == null`}
+      var value = Opal.class_variables(self)[name];
+      if (value == null) {
+        #{raise NameError.new("uninitialized class variable #{name} in #{self}", name)}
+      }
       return value;
     }
   end
 
   def class_variable_set(name, value)
-    name = Opal.coerce_to!(name, String, :to_str)
-    raise NameError if `name.length < 3 || name.slice(0,2) !== '@@'`
+    name = Opal.class_variable_name!(name)
+
+    `Opal.class_variable_set(self, name, value)`
+  end
+
+  def class_variable_defined?(name)
+    name = Opal.class_variable_name!(name)
+
+    `Opal.class_variables(self).hasOwnProperty(name)`
+  end
+
+  def remove_class_variable(name)
+    name = Opal.class_variable_name!(name)
+
     %x{
-      Opal.cvars[name.slice(2)] = value;
-      return value;
+      if (self.$$cvars.hasOwnProperty(name)) {
+        var value = self.$$cvars[name];
+        delete self.$$cvars[name];
+        return value;
+      } else {
+        #{raise NameError.new("cannot remove #{name} for #{self}")}
+      }
     }
   end
 
@@ -606,9 +628,6 @@ class Module
     }
   end
 
-  def remove_class_variable(*)
-  end
-
   def remove_const(name)
     %x{
       var old = self.$$scope[name];
@@ -643,6 +662,20 @@ class Module
       }
 
       return result;
+    }
+  end
+
+  def dup
+    copy = super
+    copy.copy_class_variables(self)
+    copy
+  end
+
+  def copy_class_variables(other)
+    %x{
+      for (var name in other.$$cvars) {
+        self.$$cvars[name] = other.$$cvars[name];
+      }
     }
   end
 end

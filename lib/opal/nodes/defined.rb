@@ -99,7 +99,7 @@ module Opal
       end
 
       def compile_cvar
-        push "(Opal.cvars['#{value.children[0]}'] != null ? 'class variable' : nil)"
+        push "(#{class_variable_owner}.$$cvars['#{value.children[0]}'] != null ? 'class variable' : nil)"
       end
 
       def compile_gvar
