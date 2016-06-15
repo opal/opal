@@ -89,6 +89,8 @@ This command will execute tests marked as "bugs" from every file in the `spec/ru
 
 Note: Opal has some bugs that may cause a shared state between tests. Sometimes green specs are green only in the inverted test suite, so after removing them from `/bugs`, run a regular test suite one more time to verify that everything is fine.
 
+Also there are some specs in `spec/ruby/language/while_spec.rb` and `spec/ruby/core/numeric/step_spec.rb` that cause an infinite loop. Make sure to comment them before running a whole inverted test suite.
+
 ## Benchmarking
 
 There are two ways to benchmark Opal's performance: one way is to write a program (or a set of programs) that takes sufficently long time to execute, then measure the execution time, and the other is to execute a specific Ruby Spec Suite example (or a set of examples) multiple times, then measure the execution time. Let's call the former "Traditional Benchmarking", and the latter "The Ruby Spec Suite Benchmarking".
