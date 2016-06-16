@@ -1,3 +1,7 @@
+## 0.9.3 2016-06-06
+
+* `Hash#initialize` now accepts JS `null` as well as `undefined`, restoring its 0.8 behavior
+
 ## 0.9.2 2016-01-10
 
 * Rebuilt the gem with Ruby 2.2 as building with 2.3 would make the gem un-installable
