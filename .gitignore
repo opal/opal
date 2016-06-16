@@ -15,5 +15,6 @@ build/
 .rspec-local
 /coverage
 
-# Ignore the location of the older (0.8 and below) rubyspec submodule location
+# Ignore old submodules, useful when switching branches
 spec/corelib
+spec/rubyspec
