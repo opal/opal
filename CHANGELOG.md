@@ -24,6 +24,11 @@ Whitespace conventions:
 ## [0.11.0] - Unreleased
 
 
+### Changed
+
+- Removed self-written lexer/parser. Now uses parser/ast gems to convert source code to AST. (#1465)
+
+
 ### Fixed
 
 - Newly compliant with the Ruby Spec Suite:
