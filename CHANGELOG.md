@@ -133,10 +133,21 @@ Whitespace conventions:
 
 
 
+## [0.9.3] 2016-06-06
+
+
+### Fixed
+
+- `Hash#initialize` now accepts JS `null` as well as `undefined`, restoring its 0.8 behavior
+
+
+
+
 ## [0.9.2] - 2016-01-10
 
 
 ### Fixed
+
 - Rebuilt the gem with Ruby 2.2 as building with 2.3 would make the gem un-installable
 
 
@@ -146,6 +157,7 @@ Whitespace conventions:
 
 
 ### Fixed
+
 - Backport rack2 compatibility (#1260)
 - Fixed issue with JS nil return paths being treated as true (#1274)
 - Fix using more than two `rescue` in sequence (#1269)
@@ -825,6 +837,7 @@ Whitespace conventions:
 
 
 [0.10.0]: https://github.com/opal/opal/compare/v0.9.2...HEAD
+[0.9.3]: https://github.com/opal/opal/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/opal/opal/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/opal/opal/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/opal/opal/compare/v0.8.1...v0.9.0
