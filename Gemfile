@@ -24,3 +24,4 @@ unless ENV['CI']
 end
 
 gem 'mspec', github: 'ruby/mspec', ref: '7cb4c8310677e41e48a78bc0b0029faf7a74c3c8'
+gem 'listen', '< 3.1'
