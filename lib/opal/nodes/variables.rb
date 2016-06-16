@@ -182,7 +182,7 @@ module Opal
 
       def compile
         with_temp do |tmp|
-          push "((#{tmp} = Opal.cvars['#{name}']) == null ? nil : #{tmp})"
+          push "((#{tmp} = #{class_variable_owner}.$$cvars['#{name}']) == null ? nil : #{tmp})"
         end
       end
     end
@@ -193,11 +193,7 @@ module Opal
       children :name, :value
 
       def compile
-        push "(Opal.cvars['#{name}'] = "
-        push expr(value)
-        push ")"
-
-        wrap '(', ')'  if (recv? || expr?) && value
+        push "(Opal.class_variable_set(#{class_variable_owner}, '#{name}', ", expr(value), "))"
       end
     end
   end

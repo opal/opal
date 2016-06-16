@@ -435,6 +435,9 @@
     // @property $$inc included modules
     klass.$$inc = [];
 
+    // @property $$cvars class variables defined in the current class
+    klass.$$cvars = {};
+
     return klass;
   };
 
@@ -552,6 +555,9 @@
     // initialize the name with nil
     module.$$name = nil;
 
+    // @property $$cvars class variables defined in the current module
+    module.$$cvars = {};
+
     return module;
   };
 
@@ -638,6 +644,52 @@
 
     return object.$$meta = klass;
   };
+
+  // Returns an object containing all pairs of names/values
+  // for all class variables defined in provided +module+
+  // and its ancestors.
+  //
+  // @param module [Module]
+  // @return [Object]
+  Opal.class_variables = function(module) {
+    var ancestors = Opal.ancestors(module),
+        i, length = ancestors.length,
+        result = {};
+
+    for (i = length - 1; i >= 0; i--) {
+      var ancestor = ancestors[i];
+
+      for (var cvar in ancestor.$$cvars) {
+        result[cvar] = ancestor.$$cvars[cvar];
+      }
+    }
+
+    return result;
+  }
+
+  // Sets class variable with specified +name+ to +value+
+  // in provided +module+
+  //
+  // @param module [Module]
+  // @param name [String]
+  // @param value [Object]
+  Opal.class_variable_set = function(module, name, value) {
+    var ancestors = Opal.ancestors(module),
+        i, length = ancestors.length;
+
+    for (i = length - 2; i >= 0; i--) {
+      var ancestor = ancestors[i];
+
+      if (ancestor.$$cvars.hasOwnProperty(name)) {
+        ancestor.$$cvars[name] = value;
+        return value;
+      }
+    }
+
+    module.$$cvars[name] = value;
+
+    return value;
+  }
 
   // Bridges a single method.
   Opal.bridge_method = function(target, from, name, body) {

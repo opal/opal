@@ -117,6 +117,16 @@ module Opal
     name
   end
 
+  def self.class_variable_name!(name)
+    name = Opal.coerce_to!(name, String, :to_str)
+
+    if `name.length < 3 || name.slice(0,2) !== '@@'`
+      raise NameError.new("`#{name}' is not allowed as a class variable name", name)
+    end
+
+    name
+  end
+
   def self.const_name!(const_name)
     const_name = Opal.coerce_to!(const_name, String, :to_str)
 

@@ -24,6 +24,15 @@ Whitespace conventions:
 ## [0.11.0] - Unreleased
 
 
+### Fixed
+
+- Newly compliant with the Ruby Spec Suite:
+    * `Module#class_variables`
+    * `Module#class_variable_get`
+    * `Module#class_variable_set`
+    * `Module#remove_class_variable`
+
+
 
 
 ## [0.10.0] - RC

@@ -162,6 +162,22 @@ module Opal
       def in_ensure?
         scope.in_ensure?
       end
+
+      def closest_module_node
+        current = scope
+        while current && !current.class_scope?
+          current = current.parent
+        end
+        current
+      end
+
+      def class_variable_owner
+        if closest_module_node
+          "$#{closest_module_node.name}"
+        else
+          "Opal.Object"
+        end
+      end
     end
   end
 end
