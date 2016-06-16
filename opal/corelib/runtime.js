@@ -242,6 +242,27 @@
     return base_scope[name] = value;
   };
 
+  Opal.const_get = function(scope, const_name, inherit) {
+    var scopes = [scope],
+        module = scope.base;
+
+    if (inherit || module == Opal.Object) {
+      var parent = module.$$super;
+
+      while (parent !== Opal.BasicObject) {
+        scopes.push(parent.$$scope);
+
+        parent = parent.$$super;
+      }
+    }
+
+    for (var i = 0, length = scopes.length; i < length; i++) {
+      if (scopes[i].hasOwnProperty(const_name)) {
+        return scopes[i][const_name];
+      }
+    }
+  }
+
 
   // Modules & Classes
   // -----------------

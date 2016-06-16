@@ -31,6 +31,7 @@ Whitespace conventions:
     * `Module#class_variable_get`
     * `Module#class_variable_set`
     * `Module#remove_class_variable`
+- Fixed `defined?` for methods raising exceptions
 
 
 
