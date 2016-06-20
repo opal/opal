@@ -1,7 +1,8 @@
 require 'native'
+require_relative './js-yaml-3-6-1'
 
 module YAML
-  @__yaml__ = node_require 'js-yaml'
+  @__yaml__ = `jsyaml`
   `var __yaml__ = #{@__yaml__}`
 
   def self.load_path path
