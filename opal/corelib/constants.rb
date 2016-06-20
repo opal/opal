@@ -1,8 +1,8 @@
 RUBY_PLATFORM       = 'opal'
 RUBY_ENGINE         = 'opal'
 RUBY_VERSION        = '2.2.3'
-RUBY_ENGINE_VERSION = '0.10.0.rc1'
-RUBY_RELEASE_DATE   = '2016-06-07'
+RUBY_ENGINE_VERSION = '0.11.0.dev'
+RUBY_RELEASE_DATE   = '2016-06-20'
 RUBY_PATCHLEVEL     = 0
 RUBY_REVISION       = 0
 RUBY_COPYRIGHT      = 'opal - Copyright (C) 2013-2015 Adam Beynon'
