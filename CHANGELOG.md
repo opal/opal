@@ -1,3 +1,9 @@
+## 0.9.4 2016-06-21
+
+* Rebuilt the gem with Rubygems 2.4.8 as building with 2.5.1+ would make the gem un-installable
+
+* Removed all symlinks from `node_module` directories to avoid further issues building the gem
+
 ## 0.9.3 2016-06-06
 
 * `Hash#initialize` now accepts JS `null` as well as `undefined`, restoring its 0.8 behavior
