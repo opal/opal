@@ -192,7 +192,19 @@ Whitespace conventions:
 
 
 
-## [0.9.3] 2016-06-06
+## [0.9.4] - 2016-06-21
+
+
+### Fixed
+
+- Rebuilt the gem with Rubygems 2.4.8 as building with 2.5.1+ would make the gem un-installable
+
+- Removed all symlinks from `node_module` directories to avoid further issues building the gem
+
+
+
+
+## [0.9.3] - 2016-06-06
 
 
 ### Fixed
@@ -895,7 +907,8 @@ Whitespace conventions:
 
 
 
-[0.10.0]: https://github.com/opal/opal/compare/v0.9.2...HEAD
+[0.10.0]: https://github.com/opal/opal/compare/v0.9.4...HEAD
+[0.9.4]: https://github.com/opal/opal/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/opal/opal/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/opal/opal/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/opal/opal/compare/v0.9.0...v0.9.1
