@@ -289,25 +289,13 @@ class Module
     raise NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
 
     %x{
-      var scopes = [self.$$scope];
+      var constant = Opal.const_get(self.$$scope, name, inherit);
 
-      if (inherit || self == Opal.Object) {
-        var parent = self.$$super;
-
-        while (parent !== Opal.BasicObject) {
-          scopes.push(parent.$$scope);
-
-          parent = parent.$$super;
-        }
+      if (constant != null) {
+        return constant;
+      } else {
+        return #{const_missing name};
       }
-
-      for (var i = 0, length = scopes.length; i < length; i++) {
-        if (scopes[i].hasOwnProperty(name)) {
-          return scopes[i][name];
-        }
-      }
-
-      return #{const_missing name};
     }
   end
 

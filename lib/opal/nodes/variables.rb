@@ -161,7 +161,8 @@ module Opal
       end
     end
 
-    class BackrefNode < Base
+    # $1 => s(:nth_ref, 1)
+    class NthrefNode < Base
       handle :nth_ref
 
       children :index
