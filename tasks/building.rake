@@ -43,9 +43,9 @@ task :dist do
     File.open("#{build_dir}/#{lib}.min.js.gz", 'w+') { |f| f << gzp } if gzp
 
     print "done. ("
-    print "development: #{('%.2f' % (src.size/1000.0)).rjust(6)}KB"
-    print  ", minified: #{('%.2f' % (min.size/1000.0)).rjust(6)}KB" if min
-    print   ", gzipped: #{('%.2f' % (gzp.size/1000.0)).rjust(6)}KB" if gzp
+    print "development: #{('%.2f' % (src.size/1000.0)).rjust(7)}KB"
+    print  ", minified: #{('%.2f' % (min.size/1000.0)).rjust(7)}KB" if min
+    print   ", gzipped: #{('%.2f' % (gzp.size/1000.0)).rjust(7)}KB" if gzp
     puts  ")."
   end
 end
