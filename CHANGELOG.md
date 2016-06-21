@@ -36,6 +36,19 @@ Whitespace conventions:
     * `Module#class_variable_get`
     * `Module#class_variable_set`
     * `Module#remove_class_variable`
+
+- Improvements for Range class (#1486)
+    * Moved private/tainted/untrusted specs to not supported
+    * Conforming `Range#to_s` and `Range#inspect`
+    * Starting `Range#bsearch` implementation
+    * Simple `Range#step` implementation
+    * Fixing `Range#min` for empty Ranges
+    * Fixing `Range#last(n)` `Range#first(n)` and one edge case of `Range#each`
+    * Fixing some `Range#step` issues on String ranges
+    * Simple `Range#bsearch` implementation, passes about half the specs
+    * Minor styling improvements. Fixed size of `Range#step`.
+    * Compile complex ranges to "Range.new" so there will be a check for begin and end to be comparable.
+
 - Fixed `defined?` for methods raising exceptions
 
 
