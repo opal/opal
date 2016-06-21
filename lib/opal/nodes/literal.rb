@@ -236,27 +236,56 @@ module Opal
       handle :dsym
     end
 
-    class InclusiveRangeNode < Base
-      handle :irange
-
+    class RangeNode < Base
       children :start, :finish
 
-      def compile
-        helper :range
+      SIMPLE_CHILDREN_TYPES = [:int, :float, :str, :sym]
 
-        push '$range(', expr(start), ', ', expr(finish), ', false)'
+      def compile
+        if compile_inline?
+          helper :range
+          compile_inline
+        else
+          compile_range_initialize
+        end
+      end
+
+      def compile_inline?
+        start.type == finish.type &&
+          SIMPLE_CHILDREN_TYPES.include?(start.type) &&
+          SIMPLE_CHILDREN_TYPES.include?(finish.type)
+      end
+
+      def compile_inline
+        raise NotImplementedError
+      end
+
+      def compile_range_initialize
+        raise NotImplementedError
       end
     end
 
-    class ExclusiveRangeNode < Base
+    class InclusiveRangeNode < RangeNode
+      handle :irange
+
+      def compile_inline
+        push '$range(', expr(start), ', ', expr(finish), ', false)'
+      end
+
+      def compile_range_initialize
+        push 'Opal.Range.$new(', expr(start), ', ', expr(finish), ', false)'
+      end
+    end
+
+    class ExclusiveRangeNode < RangeNode
       handle :erange
 
-      children :start, :finish
-
-      def compile
-        helper :range
-
+      def compile_inline
         push '$range(', expr(start), ', ', expr(finish), ', true)'
+      end
+
+      def compile_range_initialize
+        push 'Opal.Range.$new(', expr(start), ',' , expr(finish), ', true)'
       end
     end
   end
