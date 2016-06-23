@@ -288,5 +288,29 @@ module Opal
         push 'Opal.Range.$new(', expr(start), ',' , expr(finish), ', true)'
       end
     end
+
+    # 0b1111r -> s(:rational, (15/1))
+    # -0b1111r -> s(:rational, (-15/1))
+    class RationalNode < Base
+      handle :rational
+
+      children :value
+
+      def compile
+        push "Opal.Rational.$new(#{value.numerator}, #{value.denominator})"
+      end
+    end
+
+    # 0b1110i -> s(:complex, (0+14i))
+    # -0b1110i -> s(:complex, (0-14i))
+    class ComplexNode < Base
+      handle :complex
+
+      children :value
+
+      def compile
+        push "Opal.Complex.$new(#{value.real}, #{value.imag})"
+      end
+    end
   end
 end
