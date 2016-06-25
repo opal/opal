@@ -2,7 +2,7 @@
 
 ### Why does Opal exist?
 
-To try and keep ruby relevant in a world where client-side apps are making javascript the primary development platform.
+To try and keep ruby relevant in a world where client-side applications are making javascript the primary development platform.
 
 ### How compatible is Opal?
 
@@ -14,4 +14,4 @@ We are running tests under ruby 2.0.0 conditions, but are mostly compatible with
 
 ### Why doesn't Opal support mutable strings?
 
-All strings in Opal are immutable because ruby strings just get compiled direclty into javascript strings, which are immutable. Wrapping ruby strings as a custom JavaScript object would add a lot of overhead as well as making interaction between ruby and javascript libraries more difficult.
+All strings in Opal are immutable because ruby strings just get compiled directly into javascript strings, which are immutable. Wrapping ruby strings as a custom JavaScript object would add a lot of overhead as well as making interaction between ruby and javascript libraries more difficult.
