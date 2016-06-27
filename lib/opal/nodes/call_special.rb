@@ -29,13 +29,18 @@ module Opal
     class JsCallNode < CallNode
       handle :jscall
 
-      children :recvr, :meth
+      def initialize(*)
+        super
+
+        # For .JS. call we pass a block
+        # as a plain JS callback
+        if @iter
+          @arglist = @arglist << @iter
+        end
+        @iter = nil
+      end
 
       def compile
-        if iter
-          self.arglist = arglist.updated(nil, arglist.children + [iter])
-          self.iter = nil
-        end
         default_compile
       end
 

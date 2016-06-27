@@ -2,14 +2,14 @@ require 'set'
 require 'pathname'
 require 'opal/nodes/base'
 require 'opal/nodes/runtime_helpers'
+require 'opal/rewriters/break_finder'
 
 module Opal
   module Nodes
     class CallNode < Base
       handle :send
 
-      children :recvr, :meth
-      attr_accessor :arglist, :iter
+      attr_reader :recvr, :meth, :arglist, :iter
 
       SPECIALS = {}
 
@@ -24,8 +24,16 @@ module Opal
 
       def initialize(*)
         super
-        extract_iter
-        extract_arglist
+        @recvr, @meth, *args = *@sexp
+
+        *rest, last_arg = *args
+
+        if last_arg && [:iter, :block_pass].include?(last_arg.type)
+          @iter = last_arg
+          args = rest
+        end
+
+        @arglist = s(:arglist, *args)
       end
 
       def compile
@@ -45,15 +53,20 @@ module Opal
 
       private
 
+      def iter_has_break?
+        return false unless iter
+
+        finder = Opal::Rewriters::BreakFinder.new
+        finder.process(iter)
+        finder.found_break?
+      end
+
       def default_compile
         # blocks need to be assigned to temp variables in order to pass them
-        block_temp = scope.new_temp if block_being_passed
+        block_temp = scope.new_temp if iter
 
         # can't use self for splats or blocks
         temporary_receiver = scope.new_temp if splat? || block_temp
-
-        # must do this after assigning temp variables
-        has_break = compiler.has_break? { @block_being_passed = expr(@block_being_passed) } if block_being_passed
 
         add_method temporary_receiver
 
@@ -61,26 +74,13 @@ module Opal
 
         add_invocation temporary_receiver
 
-        if has_break
+        if iter_has_break?
           unshift 'return '
           unshift '(function(){var $brk = Opal.new_brk(); try {'
           line '} catch (err) { if (err === $brk) { return err.$v } else { throw err } }})()'
         end
 
         scope.queue_temp block_temp if block_temp
-      end
-
-      def extract_iter
-        last_child = @sexp.children.last
-        if AST::Node === last_child && last_child.type == :iter
-          @iter = last_child
-          @sexp = @sexp.updated(nil, @sexp.children[0..-2])
-        end
-      end
-
-      def extract_arglist
-        self.arglist = s(:arglist, *@sexp.children[2..-1])
-        @sexp = @sexp.updated(nil, @sexp.children[0..1])
       end
 
       def redefine_this?(temporary_receiver)
@@ -126,7 +126,7 @@ module Opal
 
       def add_block(block_temp)
         unshift "(#{block_temp} = "
-        push ", #{block_temp}.$$p = ", block_being_passed, ", #{block_temp})"
+        push ", #{block_temp}.$$p = ", expr(iter), ", #{block_temp})"
       end
 
       def splat?
@@ -143,18 +143,6 @@ module Opal
 
       def arguments_fragment
         expr arglist
-      end
-
-      def block_being_passed
-        @block_being_passed ||= begin
-          last_arg = arglist.children.last
-          if last_arg && last_arg.type == :block_pass
-            self.arglist = arglist.updated(nil, arglist.children[0..-2])
-            last_arg
-          else
-            iter
-          end
-        end
       end
 
       def method_jsid
@@ -181,7 +169,7 @@ module Opal
       end
 
       def sexp_with_arglist
-        @sexp.updated(nil, @sexp.children + [arglist])
+        @sexp.updated(nil, [recvr, meth, arglist])
       end
 
       # Handle "special" method calls, e.g. require(). Subclasses can override
@@ -229,7 +217,7 @@ module Opal
           # a.JS.native_method(param1, param2)
           # => s(:jscall, s(:lvar, :a), :native_method, s(:arglist, param1, param2))
           args = arglist.children
-          args += [block_being_passed] if block_being_passed
+          args += [iter] if iter
           s(:jscall, js_call_recvr, js_call_type, *args)
         end
       end
@@ -298,7 +286,7 @@ module Opal
           full_path = Pathname(dir).join(relative_path).cleanpath.to_s
           first_arg = first_arg.updated(nil, [full_path])
         end
-        self.arglist = arglist.updated(nil, [first_arg] + rest)
+        @arglist = arglist.updated(nil, [first_arg] + rest)
         compile_default!
         push fragment('')
       end

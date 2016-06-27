@@ -1,4 +1,5 @@
 require 'opal/nodes/node_with_args'
+require 'opal/rewriters/break_finder'
 
 module Opal
   module Nodes
@@ -44,7 +45,7 @@ module Opal
 
         unshift "(#{identity} = function(", inline_params, "){"
         push "}, #{identity}.$$s = self,"
-        push " #{identity}.$$brk = $brk," if compiler.has_break?
+        push " #{identity}.$$brk = $brk," if contains_break?
         push " #{identity}.$$arity = #{arity},"
 
         if compiler.arity_check?
@@ -196,6 +197,12 @@ module Opal
           line "  if (#{arity_checks.join(' || ')}) { Opal.block_ac($arity, #{arity}, #{context}); }"
           line "}"
         end
+      end
+
+      def contains_break?
+        finder = Opal::Rewriters::BreakFinder.new
+        finder.process(@sexp)
+        finder.found_break?
       end
     end
   end
