@@ -36,6 +36,7 @@ module Opal
       @compile     = !!options.delete(:compile)
       @sexp        = options.delete(:sexp)
       @file        = options.delete(:file)
+      @map         = options.delete(:map)
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       || []
