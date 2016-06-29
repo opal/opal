@@ -55,4 +55,11 @@ opal_filter "Exception" do
   fails "SystemCallError.new requires at least one argument"
   fails "SystemStackError is a subclass of Exception"
   fails "rescueing SignalException raises a SignalException when sent a signal"
+  fails "NameError#receiver returns a class when an undefined class variable is called in a subclass' namespace"
+  fails "NameError#receiver returns a class when an undefined constant is called"
+  fails "NameError#receiver returns the Object class when an undefined class variable is called"
+  fails "NameError#receiver returns the Object class when an undefined constant is called without namespace"
+  fails "NameError#receiver returns the object that raised the exception"
+  fails "NameError#receiver returns the receiver when raised from #class_variable_get"
+  fails "NameError#receiver returns the receiver when raised from #instance_variable_get"
 end

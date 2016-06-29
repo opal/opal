@@ -27,11 +27,31 @@ Whitespace conventions:
 ### Added
 
 - Added support for complex (`0b1110i`) and rational (`0b1111r`) number literals. (#1487)
+- Added 2.3.0 methods:
+    * `Array#bsearch_index`
+    * `Array#dig`
+    * `Enumerable#chunk_while`
+    * `Enumerable#grep_v`
+    * `Enumerable#slice_after`
+    * `Enumerable#slice_when`
+    * `Hash#>`
+    * `Hash#<`
+    * `Hash#>=`
+    * `Hash#>=`
+    * `Hash#dig`
+    * `Hash#fetch_values`
+    * `Hash#to_proc`
+    * `Struct#dig`
 
 
 ### Changed
 
 - Removed self-written lexer/parser. Now uses parser/ast gems to convert source code to AST. (#1465)
+- Migrated parser to 2.3. Bump RUBY_VERSION to 2.3.0.
+- Changed to be 2.3 compliant:
+    * `Enumerable#chunk` (to take only a a block)
+    * `Enumerable#slice_before` (to raise proper argument errors)
+    * `Number#positive?` (to return false for 0)
 
 
 ### Fixed
@@ -55,6 +75,7 @@ Whitespace conventions:
     * Compile complex ranges to "Range.new" so there will be a check for begin and end to be comparable.
 
 - Fixed `defined?` for methods raising exceptions
+- Fixed `Kernel#loop` (to catch StopIteration error)
 
 
 

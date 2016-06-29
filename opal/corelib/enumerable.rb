@@ -43,18 +43,12 @@ module Enumerable
     false
   end
 
-  def chunk(state = undefined, &original_block)
-    Kernel.raise ArgumentError, "no block given" unless original_block
+  def chunk(&block)
+    Kernel.raise ArgumentError, "no block given" unless block_given?
 
     ::Enumerator.new do |yielder|
       %x{
-        var block, previous = nil, accumulate = [];
-
-        if (state == undefined || state === nil) {
-          block = original_block;
-        } else {
-          block = #{Proc.new { |val| original_block.yield(val, state.dup)}}
-        }
+        var previous = nil, accumulate = [];
 
         function releaseAccumulate() {
           if (accumulate.length > 0) {
@@ -86,6 +80,12 @@ module Enumerable
         releaseAccumulate();
       }
     end
+  end
+
+  def chunk_while(&block)
+    raise ArgumentError, "no block given" unless block_given?
+
+    slice_when { |before, after| !(yield before, after) }
   end
 
   def collect(&block)
@@ -539,6 +539,39 @@ module Enumerable
     }
   end
 
+  def grep_v(pattern, &block)
+    %x{
+      var result = [];
+
+      if (block !== nil) {
+        self.$each.$$p = function() {
+          var param = #{Opal.destructure(`arguments`)},
+              value = #{pattern === `param`};
+
+          if (#{Opal.falsy?(`value`)}) {
+            value = Opal.yield1(block, param);
+
+            result.push(value);
+          }
+        };
+      }
+      else {
+        self.$each.$$p = function() {
+          var param = #{Opal.destructure(`arguments`)},
+              value = #{pattern === `param`};
+
+          if (#{Opal.falsy?(`value`)}) {
+            result.push(param);
+          }
+        };
+      }
+
+      self.$each();
+
+      return result;
+    }
+  end
+
   def group_by(&block)
     return enum_for(:group_by){self.enumerator_size} unless block_given?
 
@@ -940,8 +973,12 @@ module Enumerable
   alias select find_all
 
   def slice_before(pattern = undefined, &block)
-    if `pattern === undefined && block === nil || arguments.length > 1`
-      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 1)"
+    if `pattern === undefined && block === nil`
+      raise ArgumentError, "both pattern and block are given"
+    end
+
+    if `pattern !== undefined && block !== nil || arguments.length > 1`
+      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} expected 1)"
     end
 
     Enumerator.new {|e|
@@ -997,6 +1034,87 @@ module Enumerable
         }
       }
     }
+  end
+
+  def slice_after(pattern = undefined, &block)
+    if `pattern === undefined && block === nil`
+      raise ArgumentError, "both pattern and block are given"
+    end
+
+    if `pattern !== undefined && block !== nil || arguments.length > 1`
+      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} expected 1)"
+    end
+
+    if `pattern !== undefined`
+      block = proc { |e| pattern === e }
+    end
+
+    Enumerator.new do |yielder|
+      %x{
+        var accumulate;
+
+        self.$each.$$p = function() {
+          var element = #{Opal.destructure(`arguments`)},
+              end_chunk = Opal.yield1(block, element);
+
+          if (accumulate == null) {
+            accumulate = [];
+          }
+
+          if (#{Opal.truthy?(`end_chunk`)}) {
+            accumulate.push(element);
+            #{yielder.yield(`accumulate`)};
+            accumulate = null;
+          } else {
+            accumulate.push(element)
+          }
+        }
+
+        self.$each();
+
+        if (accumulate != null) {
+          #{yielder.yield(`accumulate`)};
+        }
+      }
+    end
+  end
+
+  def slice_when(&block)
+    raise ArgumentError, "wrong number of arguments (0 for 1)" unless block_given?
+
+    Enumerator.new do |yielder|
+      %x{
+        var slice = nil, last_after = nil;
+
+        self.$each_cons.$$p = function() {
+          var params = #{Opal.destructure(`arguments`)},
+              before = params[0],
+              after = params[1],
+              match = Opal.yieldX(block, [before, after]);
+
+          last_after = after;
+
+          if (slice === nil) {
+            slice = [];
+          }
+
+          if (#{Opal.truthy?(`match`)}) {
+            slice.push(before);
+            #{yielder.yield(`slice`)};
+            slice = [];
+          } else {
+            slice.push(before);
+          }
+        }
+
+        self.$each_cons(2);
+
+        if (slice !== nil) {
+          slice.push(last_after);
+          #{yielder.yield(`slice`)};
+        }
+      }
+    end
   end
 
   def sort(&block)
