@@ -271,9 +271,7 @@ opal_filter "Kernel" do
   fails "Kernel.lambda raises an ArgumentError when no block is given"
   fails "Kernel.lambda returns from the lambda itself, not the creation site of the lambda"
   fails "Kernel.loop is a private method"
-  fails "Kernel.loop rescues StopIteration"
-  fails "Kernel.loop rescues StopIteration's subclasses"
-  fails "Kernel.loop when no block is given returned Enumerator size returns Float::INFINITY"
+  fails "Kernel.loop returns StopIteration#result, the result value of a finished iterator" # requires changes in enumerator.rb
   fails "Kernel.printf calls write on the first argument when it is not a string"
   fails "Kernel.printf writes to stdout when a string is the first argument"
   fails "Kernel.proc is a private method"

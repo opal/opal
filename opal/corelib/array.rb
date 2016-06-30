@@ -468,8 +468,8 @@ class Array < `Array`
     }
   end
 
-  def bsearch(&block)
-    return enum_for :bsearch unless block_given?
+  def bsearch_index(&block)
+    return enum_for :bsearch_index unless block_given?
 
     %x{
       var min = 0,
@@ -486,14 +486,14 @@ class Array < `Array`
         ret = Opal.yield1(block, val);
 
         if (ret === true) {
-          satisfied = val;
+          satisfied = mid;
           smaller = true;
         }
         else if (ret === false || ret === nil) {
           smaller = false;
         }
         else if (ret.$$is_number) {
-          if (ret === 0) { return val; }
+          if (ret === 0) { return mid; }
           smaller = (ret < 0);
         }
         else {
@@ -504,6 +504,20 @@ class Array < `Array`
       }
 
       return satisfied;
+    }
+  end
+
+  def bsearch(&block)
+    return enum_for :bsearch unless block_given?
+
+    index = bsearch_index(&block)
+
+    %x{
+      if (index != null && index.$$is_number) {
+        return self[index];
+      } else {
+        return index;
+      }
     }
   end
 
@@ -791,6 +805,22 @@ class Array < `Array`
     }
 
     self
+  end
+
+  def dig(idx, *idxs)
+    item = self[idx]
+
+    %x{
+      if (item === nil || idxs.length === 0) {
+        return item;
+      }
+    }
+
+    unless item.respond_to?(:dig)
+      raise TypeError, "#{item.class} does not have #dig method"
+    end
+
+    item.dig(*idxs)
   end
 
   def drop(number)

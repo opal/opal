@@ -50,4 +50,8 @@ opal_filter "freezing" do
   fails "A method definition inside a metaclass scope raises RuntimeError if frozen"
   fails "Hash literal does not change encoding of literal string keys during creation"
   fails "Hash literal freezes string keys on initialization"
+  fails "String#-@ returns a frozen copy if the String is not frozen"
+  fails "String#+@ returns an unfrozen copy of a frozen String"
+  fails "String#-@ returns self if the String is frozen"
+  fails "String#+@ returns self if the String is not frozen"
 end

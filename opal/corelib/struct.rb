@@ -261,6 +261,26 @@ class Struct
     }
   end
 
+  def dig(key, *keys)
+    if `key.$$is_string && self.$$data.hasOwnProperty(key)`
+      item = `self.$$data[key] || nil`
+    else
+      item = nil
+    end
+
+    %x{
+      if (item === nil || keys.length === 0) {
+        return item;
+      }
+    }
+
+    unless item.respond_to?(:dig)
+      raise TypeError, "#{item.class} does not have #dig method"
+    end
+
+    item.dig(*keys)
+  end
+
   def self._load(args)
     attributes = args.values_at(*members)
     self.new(*attributes)

@@ -13,7 +13,7 @@ class Exception < `Error`
       return err;
     }
   end
-  
+
   def self.exception(*args)
     new(*args)
   end
@@ -37,19 +37,19 @@ class Exception < `Error`
       return [];
     }
   end
-  
+
   def exception(str=nil)
     %x{
       if (str === nil || self === str) {
         return self;
       }
-      
+
       var cloned = #{self.clone};
       cloned.message = str;
       return cloned;
     }
   end
-  
+
   # not using alias message to_s because you need to be able to override to_s and have message use overridden method, won't work with alias
   def message
     to_s
@@ -59,7 +59,7 @@ class Exception < `Error`
     as_str = to_s
     as_str.empty? ? self.class.to_s : "#<#{self.class.to_s}: #{to_s}>"
   end
-  
+
   def to_s
     # using self.message aka @message to retain compatibility with native exception's message property
     (@message && @message.to_s) || self.class.to_s
@@ -115,7 +115,7 @@ end
 
 class NameError
   attr_reader :name
-  
+
   def initialize(message, name=nil)
     super message
     @name = name
@@ -124,9 +124,13 @@ end
 
 class NoMethodError
   attr_reader :args
-  
+
   def initialize(message, name=nil, args=[])
     super message, name
     @args = args
   end
+end
+
+class StopIteration
+  attr_reader :result
 end
