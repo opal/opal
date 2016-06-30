@@ -30,7 +30,7 @@ matrix:
       env: RUN=minitest
 
     - rvm: 2.3.1
-      env: RUN=rspec RACK_VERSION='2.0.0.alpha' CHECK_COVERAGE=true
+      env: RUN=rspec RACK_VERSION='~> 2.0.0' CHECK_COVERAGE=true
 
     - rvm: ruby-head
       env: RUN=rspec
@@ -39,10 +39,10 @@ matrix:
       env: RUN=rspec TILT_VERSION=2.0.1
 
     - rvm: 2.1.10
-      env: RUN=rspec
+      env: RUN=rspec RACK_VERSION='< 2.0'
 
     - rvm: 2.0.0
-      env: RUN="rspec mspec_opal_nodejs"
+      env: RUN="rspec mspec_opal_nodejs" RACK_VERSION='< 2.0'
 
     - rvm: rbx
       env: RUN=rspec
