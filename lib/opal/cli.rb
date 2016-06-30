@@ -1,6 +1,7 @@
 require 'opal'
 require 'rack'
 require 'opal/builder'
+require 'opal/compiler'
 require 'opal/cli_runners'
 
 module Opal
@@ -36,7 +37,11 @@ module Opal
       @compile     = !!options.delete(:compile)
       @sexp        = options.delete(:sexp)
       @file        = options.delete(:file)
+      #print options;
       @map         = options.delete(:map)
+      if (@map)
+        map()
+      end
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       || []
@@ -134,9 +139,9 @@ module Opal
     end
 
     def map
-      compiler = Opal::Compiler.compile(file.read, options.merge(:file => file.path))
+      compiler = Compiler.new(file.read, options.merge(:file => file.path))
       compiler.compile
-      compiler.source_map
+      print compiler.source_map
     end
 
     def compiler_option_names
