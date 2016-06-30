@@ -1,3 +1,5 @@
+require 'parser'
+
 module Opal
   module Rewriters
     class Base < ::Parser::AST::Processor
@@ -8,6 +10,8 @@ module Opal
       def self.s(type, *children)
         ::Parser::AST::Node.new(type, children)
       end
+
+      alias on_iter process_regular_node
 
       # TODO: remove patches above after releasing
       # https://github.com/whitequark/parser/commit/cd8d5db

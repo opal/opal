@@ -172,7 +172,6 @@ opal_filter "language" do
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from a method"
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from a block"
   fails "The break statement in a lambda from a scope that has returned raises a LocalJumpError when yielding to a lambda passed as a block argument"
-  fails "Break inside a while loop with a value passes the value returned by a method with omitted parenthesis and passed block"
   fails "Executing break from within a block returns from the original invoking method even in case of chained calls"
   fails "A singleton method definition can be declared for a global variable"
   fails "A nested method definition creates an instance method when evaluated in an instance method"
