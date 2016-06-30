@@ -39,9 +39,6 @@ module Opal
       @file        = options.delete(:file)
       #print options;
       @map         = options.delete(:map)
-      if (@map)
-        map()
-      end
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       || []
@@ -76,6 +73,7 @@ module Opal
       when compile?; show_compiled_source
       else           run_code
       end
+
     end
 
     def runner
@@ -119,6 +117,10 @@ module Opal
       end
 
       builder.build_str 'Kernel.exit', '(exit)' unless no_exit
+
+      if (@map)
+        print builder.source_map
+      end
 
       builder
     end
