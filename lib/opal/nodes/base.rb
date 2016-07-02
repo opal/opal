@@ -39,7 +39,7 @@ module Opal
       def onbegin(x)
         #print x + "\n"
         if not x.nil?
-          @source_line="#{x}"
+          @source_line="b|#{@sexp.loc.class}|#{@type}|#{x}"
         end
       end
 
@@ -49,14 +49,14 @@ module Opal
 
       def position(n,x)
         if not x.nil?
-          @source_line= "#{x}"
+          @source_line= "p|#{@sexp.loc.class}|#{@type}|#{x}"
         end
       end
 
-      def setline(n)
+      def setline(x)
         #print n+ "\n"
         if not x.nil?
-          @source_line= "#{x}"
+          @source_line= "l|#{@sexp.loc.class}|#{@type}|#{x}"
         end
       end
 
@@ -65,9 +65,9 @@ module Opal
         @type = sexp.type
         @level = level
         @compiler = compiler
-        @source_line = "/tmp/unknown:0" # TODO
+        @source_line = "NONE" # TODO
 
-        #        print "Loc: #{sexp.loc} CLS: #{sexp.loc.class} Type: #{@type}\n"
+        #        print "Loc: #{@sexp.loc} CLS: #{sexp.loc.class} Type: #{@type}\n"
 
         t = "#{sexp.loc.class}"
         
@@ -85,36 +85,36 @@ module Opal
           when 'NilClass'
           # nothing
           when 'Parser::Source::Map'
-            position("expression",sexp.loc.expression)
-            onnode(sexp.loc.node)
-
+            #position("expression",sexp.loc.expression)
+            #onnode(sexp.loc.node)
+            
           when 'Parser::Source::Map::Condition'
-            position("keyword",sexp.loc.keyword)
-            position("end",sexp.loc.end)
-            position("else",sexp.loc.else)
-            onbegin(sexp.loc.begin)
-            position("expression",sexp.loc.expression)
-            onnode(sexp.loc.node)
+            # position("keyword",sexp.loc.keyword)
+            # position("end",sexp.loc.end)
+            # position("else",sexp.loc.else)
+            # onbegin(sexp.loc.begin)
+            # position("expression",sexp.loc.expression)
+            # onnode(sexp.loc.node)
           when 'Parser::Source::Map::Operator'
-            position("operator",sexp.loc.operator)
-            position("expression",sexp.loc.expression)
-            onnode(sexp.loc.node)
+            #position("operator",sexp.loc.operator)
+            #position("expression",sexp.loc.expression)
+            #onnode(sexp.loc.node)
           when 'Parser::Source::Map::Constant'
-            position("name",sexp.loc.name)
-            position("::",sexp.loc.double_colon)
-            position("expression",sexp.loc.expression)
-            onnode(sexp.loc.node)
+            #position("name",sexp.loc.name)
+            #position("::",sexp.loc.double_colon)
+            #position("expression",sexp.loc.expression)
+            #onnode(sexp.loc.node)
           when 'Parser::Source::Map::Ternary'
-            position(":",sexp.loc.colon)
-            position("?",sexp.loc.question)
-            position("expression",sexp.loc.expression)
-            onnode(sexp.loc.node)
+            #position(":",sexp.loc.colon)
+            #position("?",sexp.loc.question)
+            #position("expression",sexp.loc.expression)
+            #onnode(sexp.loc.node)
           when 'Parser::Source::Map::Keyword'
-            position("keyword",sexp.loc.keyword)
-            position("end",sexp.loc.end)
-            onbegin(sexp.loc.begin)
-            position("expression",sexp.loc.expression)
-            onnode(sexp.loc.node)
+            #position("keyword",sexp.loc.keyword)
+            #position("end",sexp.loc.end)
+            #onbegin(sexp.loc.begin)
+            #position("expression",sexp.loc.expression)
+            #onnode(sexp.loc.node)
           when 'Parser::Source::Map::RescueBody'
             position("keyword",sexp.loc.keyword)
             position("assoc",sexp.loc.assoc)
@@ -122,29 +122,36 @@ module Opal
             position("expression",sexp.loc.expression)
             onnode(sexp.loc.node)
           when 'Parser::Source::Map::Collection'
-            position("end",sexp.loc.end)
-            position("begin",sexp.loc.begin)
-            position("expression",sexp.loc.expression)
-            onnode(sexp.loc.node)
+            #array
+            # position("end",sexp.loc.end)
+            # position("begin",sexp.loc.begin)
+            # position("expression",sexp.loc.expression)
+            # onnode(sexp.loc.node)
             
           when 'Parser::Source::Map::Send'
-            position("dot",sexp.loc.dot)
-            position("selector",sexp.loc.selector)
-            position("end",sexp.loc.end)
-            onbegin(sexp.loc.begin)
-            position("expression",sexp.loc.expression)
-            onnode(sexp.loc.node)
+            #position("dot",sexp.loc.dot)
+            #position("selector",sexp.loc.selector)
+            #position("end",sexp.loc.end)
+            #onbegin(sexp.loc.begin)
+            #position("expression",sexp.loc.expression)
+            #onnode(sexp.loc.node)
 
           when 'Parser::Source::Map::Definition'
-            position("keyword",sexp.loc.keyword)
-            position("operator",sexp.loc.operator)
-            position("name",sexp.loc.name)
-            position("end",sexp.loc.end)
-            position("expression",sexp.loc.expression)
-            onnode(sexp.loc.node)
+            # useful!
+            # position("keyword",sexp.loc.keyword)
+            # position("operator",sexp.loc.operator)
+            # position("name",sexp.loc.name)
+            # position("end",sexp.loc.end)
+            # position("expression",sexp.loc.expression)
+            # onnode(sexp.loc.node)
 
           when 'Parser::Source::Map::Variable'
-            position("name",sexp.loc.name)
+            #position("name",sexp.loc.name)
+            #position("expression",sexp.loc.expression)
+            #onnode(sexp.loc.node)
+          when 'Parser::Source::Map::Heredoc'
+            position("body",sexp.loc.heredoc_body)
+            position("end",sexp.loc.heredoc_end)
             position("expression",sexp.loc.expression)
             onnode(sexp.loc.node)
             

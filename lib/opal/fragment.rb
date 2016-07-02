@@ -17,7 +17,17 @@ module Opal
     # @param sexp [Opal::Sexp] sexp used for creating fragment
     def initialize(code, scope, sexp = nil, source_line=nil)
       @code2 = code.to_s
-      @code = "\n/*\n DEBUG: #{source_line}: at src\n*/\n#{@code2}"
+      if source_line == 'NONE'
+        @code = @code2
+      else
+        if source_line == ''
+          @code = @code2
+        elsif source_line.nil?
+          @code = @code2
+        else
+          @code = "\n/*\n DEBUG: #{source_line}: at src\n*/\n#{@code2}"
+        end
+      end
       #@source_line=source_line
       @sexp = sexp
       @scope = scope
