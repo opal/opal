@@ -1,4 +1,17 @@
 class File < IO
+
+  # constants used
+  WRONLY =1
+  CREAT= 2
+  APPEND=3
+  RDWR=4
+  TRUNC=5
+  RDONLY=6
+  EXCL=7
+  NOCTTY=8
+  NONBLOCK=9
+
+  
   Separator = SEPARATOR = '/'
   ALT_SEPARATOR = nil
   PATH_SEPARATOR = ':'
