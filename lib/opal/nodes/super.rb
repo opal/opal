@@ -6,6 +6,22 @@ module Opal
     # body. This is then used by actual super calls, or a defined?(super) style
     # call.
     class BaseSuperNode < CallNode
+      def initialize(*)
+        super
+        args = *@sexp
+        *rest, last_child = *args
+
+        if last_child && [:iter, :block_pass].include?(last_child.type)
+          @iter = last_child
+          args = rest
+        else
+          @iter = s(:js_tmp, 'null')
+        end
+
+        @arglist = s(:arglist, *args)
+        @recvr = s(:self)
+      end
+
       def compile
         if scope.def?
           scope.uses_block!
@@ -15,20 +31,6 @@ module Opal
       end
 
       private
-
-      def extract_arglist
-        self.arglist = s(:arglist, *@sexp.children)
-      end
-
-      # always on self
-      def recvr
-        s(:self)
-      end
-
-      def extract_iter
-        super
-        @iter ||= s(:js_tmp, 'null')
-      end
 
       def method_jsid
         raise 'Not implemented, see #add_method'
@@ -125,8 +127,9 @@ module Opal
     class ZsuperNode < SuperNode
       handle :zsuper
 
-      def extract_iter
+      def initialize(*)
         super
+
         # preserve a block if we have one already but otherwise, assume a block is coming from higher
         # up the chain
         unless iter.type == :iter
@@ -145,10 +148,10 @@ module Opal
           # If an iter (block via braces) is provided, that takes precedence
           if (block_arg = formal_block_parameter) && !iter
             block_pass = s(:block_pass, s(:lvar, block_arg[1]))
-            implicit_args << expr
+            implicit_args << block_pass
           end
 
-          self.arglist = s(:arglist, *implicit_args)
+          @arglist = s(:arglist, *implicit_args)
         end
         super
       end

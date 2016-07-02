@@ -117,6 +117,53 @@ class Hash
     }
   end
 
+  def >=(other)
+    other = Opal.coerce_to!(other, Hash, :to_hash)
+
+    %x{
+      if (self.$$keys.length < other.$$keys.length) {
+        return false
+      }
+    }
+
+    result = true
+
+    other.each do |other_key, other_val|
+      val = fetch(other_key, `null`)
+
+      %x{
+        if (val == null || val !== other_val) {
+          result = false;
+          return;
+        }
+      }
+    end
+
+    result
+  end
+
+  def >(other)
+    other = Opal.coerce_to!(other, Hash, :to_hash)
+
+    %x{
+      if (self.$$keys.length <= other.$$keys.length) {
+        return false
+      }
+    }
+
+    self >= other
+  end
+
+  def <(other)
+    other = Opal.coerce_to!(other, Hash, :to_hash)
+    other > self
+  end
+
+  def <=(other)
+    other = Opal.coerce_to!(other, Hash, :to_hash)
+    other >= self
+  end
+
   def [](key)
     %x{
       var value = Opal.hash_get(self, key);
@@ -269,6 +316,22 @@ class Hash
 
   alias dup clone
 
+  def dig(key, *keys)
+    item = self[key]
+
+    %x{
+      if (item === nil || keys.length === 0) {
+        return item;
+      }
+    }
+
+    unless item.respond_to?(:dig)
+      raise TypeError, "#{item.class} does not have #dig method"
+    end
+
+    item.dig(*keys)
+  end
+
   def each(&block)
     return enum_for(:each){self.size} unless block
 
@@ -344,6 +407,10 @@ class Hash
     }
 
     raise KeyError, "key not found: #{key.inspect}"
+  end
+
+  def fetch_values(*keys, &block)
+    keys.map { |key| fetch(key, &block) }
   end
 
   def flatten(level = 1)
@@ -895,6 +962,18 @@ class Hash
 
   def to_hash
     self
+  end
+
+  def to_proc
+    proc do |key = undefined|
+      %x{
+        if (key == null) {
+          #{raise ArgumentError, "no key given"}
+        }
+      }
+
+      self[key]
+    end
   end
 
   alias to_s inspect

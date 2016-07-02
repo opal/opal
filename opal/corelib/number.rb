@@ -705,7 +705,11 @@ class Number < Numeric
   end
 
   def positive?
-    `self == Infinity || 1 / self > 0`
+    if self == 0
+      false
+    else
+      `self == Infinity || 1 / self > 0`
+    end
   end
 
   def negative?

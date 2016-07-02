@@ -13,4 +13,6 @@ opal_filter "BasicObject" do
   fails "BasicObject#instance_exec raises a TypeError when defining methods on an immediate"
   fails "BasicObject#instance_exec raises a TypeError when defining methods on numerics"
   fails "BasicObject#instance_exec sets class variables in the receiver"
+  fails "BasicObject#method_missing for an instance sets the receiver of the raised NoMethodError"
+  fails "BasicObject#method_missing for an instance sets the receiver of the raised NoMethodError"
 end

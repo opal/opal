@@ -98,4 +98,5 @@ opal_filter "String" do
   fails "String#unicode_normalized? returns true if string does not contain any unicode codepoints"
   fails "String#unicode_normalized? returns true if string is empty"
   fails "String#unicode_normalized? returns true if string is in the specified normalization form"
+  fails "String.new accepts an encoding argument"
 end

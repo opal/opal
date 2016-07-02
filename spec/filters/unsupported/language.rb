@@ -14,4 +14,9 @@ opal_filter "language" do
   fails "The private keyword changes visiblity of previously called methods with same send/call site"
   fails "The private keyword is overridden when a new class is opened"
   fails "The private keyword marks following methods as being private"
+  fails "Ruby String literals with a magic frozen comment produce different objects for literals with the same content in different files if the other file doesn't have the comment"
+  fails "Ruby String literals with a magic frozen comment produce different objects for literals with the same content in different files if they have different encodings"
+  fails "Ruby String literals with a magic frozen comment produce the same object each time"
+  fails "Ruby String literals with a magic frozen comment produce the same object for literals with the same content"
+  fails "Ruby String literals with a magic frozen comment produce the same object for literals with the same content in different files"
 end

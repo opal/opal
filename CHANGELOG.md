@@ -27,11 +27,31 @@ Whitespace conventions:
 ### Added
 
 - Added support for complex (`0b1110i`) and rational (`0b1111r`) number literals. (#1487)
+- Added 2.3.0 methods:
+    * `Array#bsearch_index`
+    * `Array#dig`
+    * `Enumerable#chunk_while`
+    * `Enumerable#grep_v`
+    * `Enumerable#slice_after`
+    * `Enumerable#slice_when`
+    * `Hash#>`
+    * `Hash#<`
+    * `Hash#>=`
+    * `Hash#>=`
+    * `Hash#dig`
+    * `Hash#fetch_values`
+    * `Hash#to_proc`
+    * `Struct#dig`
 
 
 ### Changed
 
 - Removed self-written lexer/parser. Now uses parser/ast gems to convert source code to AST. (#1465)
+- Migrated parser to 2.3. Bump RUBY_VERSION to 2.3.0.
+- Changed to be 2.3 compliant:
+    * `Enumerable#chunk` (to take only a a block)
+    * `Enumerable#slice_before` (to raise proper argument errors)
+    * `Number#positive?` (to return false for 0)
 
 
 ### Fixed
@@ -55,6 +75,7 @@ Whitespace conventions:
     * Compile complex ranges to "Range.new" so there will be a check for begin and end to be comparable.
 
 - Fixed `defined?` for methods raising exceptions
+- Fixed `Kernel#loop` (to catch StopIteration error)
 
 
 
@@ -171,7 +192,19 @@ Whitespace conventions:
 
 
 
-## [0.9.3] 2016-06-06
+## [0.9.4] - 2016-06-21
+
+
+### Fixed
+
+- Rebuilt the gem with Rubygems 2.4.8 as building with 2.5.1+ would make the gem un-installable
+
+- Removed all symlinks from `node_module` directories to avoid further issues building the gem
+
+
+
+
+## [0.9.3] - 2016-06-06
 
 
 ### Fixed
@@ -874,7 +907,8 @@ Whitespace conventions:
 
 
 
-[0.10.0]: https://github.com/opal/opal/compare/v0.9.2...HEAD
+[0.10.0]: https://github.com/opal/opal/compare/v0.9.4...HEAD
+[0.9.4]: https://github.com/opal/opal/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/opal/opal/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/opal/opal/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/opal/opal/compare/v0.9.0...v0.9.1

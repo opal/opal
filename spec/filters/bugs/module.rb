@@ -174,4 +174,9 @@ opal_filter "Module" do
   fails "Module.new creates a new Module and passes it to the provided block"
   fails "Module::Nesting returns the list of Modules nested at the point of call"
   fails "Module::Nesting returns the nesting for module/class declaring the called method"
+  fails "Module#deprecate_constant accepts multiple symbols and strings as constant names"
+  fails "Module#deprecate_constant raises a NameError when given an undefined name"
+  fails "Module#deprecate_constant returns self"
+  fails "Module#deprecate_constant when accessing the deprecated module passes the accessing"
+  fails "Module#deprecate_constant when accessing the deprecated module warns with a message"
 end

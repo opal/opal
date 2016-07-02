@@ -1,5 +1,5 @@
 require 'ast'
-require 'parser/ruby22'
+require 'parser/ruby23'
 require 'opal/rewriter'
 
 ::Parser::AST::Node.class_eval do
@@ -41,7 +41,7 @@ if RUBY_ENGINE == 'opal'
 end
 
 module Opal
-  class Parser < ::Parser::Ruby22
+  class Parser < ::Parser::Ruby23
     def parse(source, file = '(string)')
       # Legacy support
       if String === source

@@ -970,13 +970,15 @@ module Kernel
   end
 
   def loop
-    return enum_for :loop unless block_given?
+    return enum_for(:loop) { Float::INFINITY } unless block_given?
 
-    %x{
-      while (true) {
-        #{yield}
-      }
-    }
+    while true do
+      begin
+        yield
+      rescue StopIteration => e
+        return e.result
+      end
+    end
 
     self
   end
