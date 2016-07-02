@@ -110,15 +110,18 @@ module Opal
     def processor_for(source, filename, path, options)
       processor   = processors.find { |p| p.match? path }
       processor ||= default_processor
-      return processor.new(source, filename, compiler_options.merge(options))
+      o = processor.new(source, filename, compiler_options.merge(options))
+      o.path=path
+      return o
     end
 
     def read(path)
-      path_reader.read(path) or
-        raise MissingRequire, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+      path_reader.read(path) or ""
+        #raise MissingRequire, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
     end
 
     def process_require(filename, options)
+      #puts "process_require\t"+ filename + "\n"
       filename = filename.gsub(/\.(rb|js|opal)#{REGEXP_END}/, '')
       return if prerequired.include?(filename)
       return if already_processed.include?(filename)
@@ -135,7 +138,10 @@ module Opal
       end
 
       path = path_reader.expand(filename).to_s unless stub?(filename)
+      #puts "/*process_require\t"+ filename  + "\t"+ path + "*/\n"
+
       asset = processor_for(source, filename, path, options.merge(requirable: true))
+
       process_requires(filename, asset.requires+tree_requires(asset, path), options)
       processed << asset
     end
