@@ -60,6 +60,10 @@ module Opal
       map.as_json
     end
 
+    def to_json
+      map.as_json
+    end
+
     def to_s
       map.to_s
     end
