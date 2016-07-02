@@ -36,6 +36,7 @@ module Opal
       @compile     = !!options.delete(:compile)
       @sexp        = options.delete(:sexp)
       @file        = options.delete(:file)
+      @map         = options.delete(:map)
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       || []
@@ -66,6 +67,7 @@ module Opal
 
     def run
       case
+      when @map;     show_source_map
       when sexp?;    show_sexp
       when compile?; show_compiled_source
       else           run_code
@@ -132,10 +134,12 @@ module Opal
       end
     end
 
-    def map
-      compiler = Opal::Compiler.compile(file.read, options.merge(:file => file.path))
-      compiler.compile
-      compiler.source_map
+    def show_source_map
+      evals_or_file do |contents, filename|
+        compiler = Opal::Compiler.new(contents, options.merge(file: filename))
+        compiler.compile
+        puts compiler.source_map.to_json
+      end
     end
 
     def compiler_option_names

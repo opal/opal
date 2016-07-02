@@ -180,6 +180,16 @@ describe Opal::CLI do
     end
   end
 
+  describe ':map option' do
+    let(:options)  { {:map => true, :evals => ['foo']} }
+
+    it 'sets the verbose flag (currently unused)' do
+      expect_output_of{ subject.run }.to include(%{"version"=>3})
+    end
+  end
+
+
+
 
 
   private

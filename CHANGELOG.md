@@ -123,6 +123,7 @@ Whitespace conventions:
 - Fixed method definition in method body.
 - Partially implemented `Marshal.load`/`Marshal.dump`. In order to use it require `opal/full`.
 - Fixed docs for Compiled Ruby - Native section. Rename opal variable to win since window was causing error
+- Fixed the `--map` option, now correclty outputs the sourcemap as json
 
 
 ### Removed
