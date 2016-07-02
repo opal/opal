@@ -133,7 +133,7 @@
   Opal.get = function(name) {
     var constant = this[name];
 
-    if (constant == null) {
+    if (constant === null) {
       return this.base.$const_get(name);
     }
 
@@ -181,11 +181,11 @@
     function update(klass, name) {
       klass.$$name = name;
 
-      for (name in klass.$$scope) {
-        var value = klass.$$scope[name];
+      for (var name2 in klass.$$scope) {
+        var value2 = klass.$$scope[name2];
 
-        if (value.$$name === nil && (value.$$is_class || value.$$is_module)) {
-          update(value, name)
+        if (value2.$$name === nil && (value2.$$is_class || value2.$$is_module)) {
+          update(value2, name2)
         }
       }
     }
@@ -229,7 +229,7 @@
   // @param name       [String] the name of the constant
   // @param value      [Object] the value of the constant
   Opal.cdecl = function(base_scope, name, value) {
-    if ((value.$$is_class || value.$$is_module) && value.$$orig_scope == null) {
+    if ((value.$$is_class || value.$$is_module) && value.$$orig_scope === null) {
       value.$$name = name;
       value.$$orig_scope = base_scope;
       // Here we should explicitly set a base module
@@ -246,7 +246,7 @@
     var scopes = [scope],
         module = scope.base;
 
-    if (inherit || module == Opal.Object) {
+    if (inherit || module === Opal.Object) {
       var parent = module.$$super;
 
       while (parent !== Opal.BasicObject) {
@@ -327,7 +327,7 @@
     // Class doesnt exist, create a new one with given superclass...
 
     // Not specifying a superclass means we can assume it to be Object
-    if (superclass == null) {
+    if (superclass === null) {
       superclass = _Object;
     }
 
@@ -1421,7 +1421,7 @@
   //
   Opal.extract_kwargs = function(parameters) {
     var kwargs = parameters[parameters.length - 1];
-    if (kwargs != null && kwargs['$respond_to?']('to_hash', true)) {
+    if (kwargs !== null && kwargs['$respond_to?']('to_hash', true)) {
       Array.prototype.splice.call(parameters, parameters.length - 1, 1);
       return kwargs.$to_hash();
     }
@@ -1447,10 +1447,10 @@
         key       = null,
         given_map = given_args.$$smap;
 
-    for (key in given_map) {
-      if (!used_args[key]) {
-        keys.push(key);
-        map[key] = given_map[key];
+    for (var key2 in given_map) {
+      if (!used_args[key2]) {
+        keys.push(key2);
+        map[key2] = given_map[key2];
       }
     }
 
@@ -1904,11 +1904,11 @@
 
     if (arguments_length === 1) {
       args = arguments[0];
-      for (key in args) {
-        if (args.hasOwnProperty(key)) {
-          value = args[key];
+      for (var key2 in args) {
+        if (args.hasOwnProperty(key2)) {
+          value = args[key2];
 
-          Opal.hash_put(hash, key, value);
+          Opal.hash_put(hash, key2, value);
         }
       }
 
