@@ -87,7 +87,7 @@ module Opal
         end
 
         #     This is a special utf8 char ---v
-        function_name = valid_name?(mid) ? " ː#{mid}" : ''
+        function_name = valid_name?(mid) ? " _#{mid}" : ''
 
         unshift ") {"
         unshift(inline_params)
