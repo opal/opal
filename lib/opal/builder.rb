@@ -116,9 +116,18 @@ module Opal
     end
 
     def read(path)
-      path_reader.read(path) or ""
+
+      r = path_reader.read(path)
+      if ! r 
+        warn "can't find file: #{path.inspect} in #{path_reader.paths.inspect}\n";
+        return "";
         #raise MissingRequire, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+      else
+        return r
+      end
+
     end
+      
 
     def process_require(filename, options)
       #puts "process_require\t"+ filename + "\n"
