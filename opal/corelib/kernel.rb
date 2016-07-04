@@ -1183,14 +1183,21 @@ module Kernel
   end
 
   # basic implementation of open, delegate to File.open
+
   def open(*args, &block)
     print "kernel open #{args} block #{block}\n"
     print "args #{args}\n"
     print "block #{block}\n"
-    File.open(*args, &block)
-  end
-end
+#    File.open(*args, &block)
+    print "Going to do_open: #{args}\n"
+    %x{
+        Opal.open_file(#{args[0]},#{args[1]});
+      }
 
+  end
+  
+end
+                               
 class Object
   include Kernel
 end
