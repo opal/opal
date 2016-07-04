@@ -92,6 +92,16 @@
     return unique_id;
   };
 
+  Opal.file_error = function (err, fd) {
+    console.log( "open failed" + err);
+  }
+
+  Opal.open_file = function(filename, flags) {
+    fs = require('fs');
+    console.log( "going to open " + filename);
+    return fs.open(filename, flags, Opal.file_error);
+  };
+
   // Table holds all class variables
   Opal.cvars = {};
 
