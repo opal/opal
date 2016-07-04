@@ -21,7 +21,7 @@ Whitespace conventions:
 
 
 
-## [0.10.0] - Unreleased
+## [0.10.0] - 2016-07-04
 
 
 ### Added
