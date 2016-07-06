@@ -332,6 +332,8 @@ module Opal
         def handle_part(sexp)
           type = sexp.type
 
+
+          
           if type == :str
             return sexp.children[0]
           elsif type == :send
@@ -339,6 +341,8 @@ module Opal
 
             parts = args.map { |s| handle_part s }
 
+            print "dynamic require send type:#{type} meth:#{meth} args:#{args} recv:#{recv}\n"
+            
             if ::Parser::AST::Node === recv && recv.type == :const && recv.children.last == :File
               if meth == :expand_path
                 return expand_path(*parts)
@@ -349,8 +353,8 @@ module Opal
               end
             end
           end
-
-          msg = "Cannot handle dynamic require"
+          #print "dynamic require type:#{type} meth:#{sexp}\n"
+          msg = "Cannot handle dynamic require type:#{type} sexp:#{sexp}"
           case @compiler.dynamic_require_severity
           when :error
             @compiler.error msg, @sexp.line
