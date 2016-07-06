@@ -81,6 +81,16 @@ Whitespace conventions:
 
 
 
+## [0.10.1] - 2016-07-06
+
+
+### Fixed
+
+- Fixed `-L` option for compiling requires as modules (#1510)
+
+
+
+
 ## [0.10.0] - 2016-07-04
 
 

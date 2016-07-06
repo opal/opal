@@ -97,10 +97,6 @@ module Opal
         options[:no_exit] = true
       end
 
-      on('-L', '--library', 'Generate only the code of the library. Omit [programfile] and [-e]') do |no_exit|
-        options[:lib_only] = true
-      end
-
       section 'Compilation Options:'
 
       on('-M', '--no-method-missing', 'Enable/Disable method missing') do
@@ -133,6 +129,13 @@ module Opal
 
       on('-F', '--file FILE', 'Set filename for compiled code') do |file|
         options[:file] = file
+      end
+
+      on('-L', '--library', 'Compile only required libraries. Omit [programfile] and [-e]. Assumed [-cOE].') do
+        options[:lib_only] = true
+        options[:no_exit] = true
+        options[:compile] = true
+        options[:skip_opal_require] = true
       end
 
       on("--irb", "Enable IRB var mode") do
