@@ -40,4 +40,7 @@ opal_filter "Float" do
   fails "Rational#coerce returns the passed argument, self as Float, when given a Float"
   fails "Rational#divmod when passed an Integer returns the quotient as Integer and the remainder as Rational"
   fails "Struct#eql? returns false if any corresponding elements are not #eql?" # Rubyspec uses 1.eql?(1.0) which always returns true in compiled JS
+  fails "Numeric#step with positional args when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
+  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
+  fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
 end

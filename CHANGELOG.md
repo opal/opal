@@ -61,6 +61,7 @@ Whitespace conventions:
     * `Module#class_variable_get`
     * `Module#class_variable_set`
     * `Module#remove_class_variable`
+    * `Numeric#step` (#1512)
 
 - Improvements for Range class (#1486)
     * Moved private/tainted/untrusted specs to not supported
