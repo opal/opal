@@ -1,3 +1,5 @@
+var XRegExp = require('xregexp');
+
 (function(undefined) {
   // @note
   //   A few conventions for the documentation of this file:
