@@ -683,7 +683,7 @@ class Hash
 
   def merge!(other, &block)
     %x{
-      if (!#{Hash === other}) {
+      if (!other.$$is_hash) {
         other = #{Opal.coerce_to!(other, Hash, :to_hash)};
       }
 
