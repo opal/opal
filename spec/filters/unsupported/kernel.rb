@@ -28,4 +28,5 @@ opal_filter "Kernel" do
   fails "Kernel#dup raises a TypeError for Symbol"
   fails "Kernel.fail is a private method"
   fails "Kernel#raise is a private method"
+  fails "Kernel#inspect returns an untrusted string if self is untrusted"
 end

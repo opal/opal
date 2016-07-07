@@ -26,7 +26,6 @@ opal_filter "StringScanner" do
   fails "StringScanner#getch is multi-byte character sensitive"
   fails "StringScanner#getch returns an instance of String when passed a String subclass"
   fails "StringScanner#initialize converts the argument into a string using #to_str"
-  fails "StringScanner#initialize is a private method"
   fails "StringScanner#inspect returns a string that represents the StringScanner object"
   fails "StringScanner#matched returns an instance of String when passed a String subclass"
   fails "StringScanner#matched returns the last matched string"

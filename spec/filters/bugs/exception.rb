@@ -33,8 +33,6 @@ opal_filter "Exception" do
   fails "Exception#set_backtrace raises a TypeError when the array contains nil"
   fails "IOError is a superclass of EOFError"
   fails "NameError#name returns a class variable name as a symbol"
-  fails "NoMethodError#message for an protected method match /protected method/"
-  fails "NoMethodError#message for private method match /private method/"
   fails "SignalException.new raises an exception for an optional argument with a signal name"
   fails "SignalException.new raises an exception with an invalid signal name"
   fails "SignalException.new raises an exception with an invalid signal number"
