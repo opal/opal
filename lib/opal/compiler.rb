@@ -340,23 +340,20 @@ module Opal
       return returns s(:nil) unless sexp
 
       case sexp.type
-      # Undefs go from 1 ruby undef a,b,c to multiple JS Opal.udef() calls, so need to treat them as individual statements
-      # and put the return on the last one
       when :undef
-        sexp.updated(nil,
-          sexp.children[0..-2] + [returns(sexp.children.last)]
-        )
+        # undef :method_name always returns nil
+        returns s(:begin, sexp, s(:nil))
       when :break, :next, :redo
         sexp
       when :yield
         sexp.updated(:returnable_yield, nil)
       when :when
-        *when_sexp, then_sexp = sexp.children
+        *when_sexp, then_sexp = *sexp
         sexp.updated(nil,
           [*when_sexp, returns(then_sexp)]
         )
       when :rescue
-        body_sexp, *resbodies, else_sexp = sexp.children
+        body_sexp, *resbodies, else_sexp = *sexp
 
         resbodies = resbodies.map do |resbody|
           returns(resbody)
@@ -368,18 +365,19 @@ module Opal
           else_sexp
         ])
       when :resbody
-        klass, lvar, body = sexp.children
+        klass, lvar, body = *sexp
         sexp.updated(nil, [klass, lvar, returns(body)])
       when :ensure
-        rescue_sexp, ensure_body = sexp.children
+        rescue_sexp, ensure_body = *sexp
         sexp.updated(nil,
           [returns(rescue_sexp), ensure_body]
         )
       when :begin, :kwbegin
         # Wrapping last expression with s(:js_return, ...)
+        *rest, last = *sexp
         sexp.updated(
           nil,
-          sexp.children[0..-2] + [returns(sexp.children.last)]
+          [*rest, returns(last)]
         )
       when :while, :until, :while_post, :until_post
         sexp
@@ -394,7 +392,7 @@ module Opal
 
           multiline = strs.any? { |str| str.end_with?(";\n") }
 
-          first_child, *rest_children = *sexp.children
+          first_child, *rest_children = *sexp
 
           if multiline
             # xstr starts with interpolation
@@ -408,7 +406,7 @@ module Opal
                 sexp
               else
                 first_child = s(:js_return, first_child)
-                sexp.updated(nil, [first_child] + rest_children)
+                sexp.updated(nil, [first_child, *rest_children])
               end
             else
               s(:js_return, sexp)
@@ -418,7 +416,7 @@ module Opal
           returns s(:str, '')
         end
       when :if
-        cond, true_body, false_body = sexp.children
+        cond, true_body, false_body = *sexp
         sexp.updated(
           nil, [
             cond,
