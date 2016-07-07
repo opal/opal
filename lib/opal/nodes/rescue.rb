@@ -68,7 +68,7 @@ module Opal
 
       def rescue_else_code
         rescue_else_code = scope.rescue_else_sexp
-        rescue_else_code = compiler.returns(rescue_else_code) unless stmt?
+        rescue_else_code = compiler.returns(rescue_else_code)
         rescue_else_code
       end
     end
@@ -140,7 +140,7 @@ module Opal
 
       def rescue_else_code
         rescue_else_code = scope.rescue_else_sexp
-        rescue_else_code = compiler.returns(rescue_else_code) unless stmt?
+        rescue_else_code = compiler.returns(rescue_else_code)
         rescue_else_code
       end
 
