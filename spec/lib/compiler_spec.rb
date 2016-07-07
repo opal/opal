@@ -54,8 +54,8 @@ describe Opal::Compiler do
   end
 
   it "should compile undef calls" do
-    expect_compiled("undef a").to include("Opal.udef(self, '$a')")
-    expect_compiled("undef a,b").to match(/Opal.udef\(self, '\$a'\);.*return Opal.udef\(self, '\$b'\);/m)
+    expect_compiled("undef a").to include("Opal.udef(self, '$' + \"a\")")
+    expect_compiled("undef a,b").to match(/Opal.udef\(self, '\$' \+ "a"\);.*Opal.udef\(self, '\$' \+ "b"\);/m)
   end
 
   describe "class names" do

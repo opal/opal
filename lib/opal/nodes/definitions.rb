@@ -5,20 +5,11 @@ module Opal
     class UndefNode < Base
       handle :undef
 
+      children :value
+
       def compile
         children.each do |child|
-          value = child.children[0]
-          statements = []
-          if child.type == :js_return
-             value = value.children[0]
-             statements << expr(s(:js_return))
-          end
-          statements << "Opal.udef(self, '$#{value.to_s}');"
-          if children.length > 1 && child != children.first
-            line *statements
-          else
-            push *statements
-          end
+          line "Opal.udef(self, '$' + ", expr(child), ");"
         end
       end
     end
@@ -26,22 +17,10 @@ module Opal
     class AliasNode < Base
       handle :alias
 
-      children :new_name_sexp, :old_name_sexp
-
-      def new_name
-        new_name_sexp.children[0].to_s
-      end
-
-      def old_name
-        old_name_sexp.children[0].to_s
-      end
+      children :new_name, :old_name
 
       def compile
-        if scope.class? or scope.module?
-          scope.methods << "$#{new_name}"
-        end
-
-        push "Opal.alias(self, '#{new_name}', '#{old_name}')"
+        push "Opal.alias(self, ", expr(new_name), ", ", expr(old_name), ")"
       end
     end
 
