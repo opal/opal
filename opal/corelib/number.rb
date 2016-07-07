@@ -567,34 +567,136 @@ class Number < Numeric
     end
   end
 
-  def step(limit, step = 1, &block)
-    return enum_for :step, limit, step unless block
-
-    raise ArgumentError, 'step cannot be 0' if `step == 0`
-
+  def step(limit = nil, step = nil, to: nil, by: nil, &block)
     %x{
-      var value = self;
-
-      if (limit === Infinity || limit === -Infinity) {
-        block(value);
-        return self;
+      if (limit !== nil && to !== nil) {
+        #{raise ArgumentError, "to is given twice"}
       }
 
-      if (step > 0) {
-        while (value <= limit) {
-          block(value);
-          value += step;
+      if (step !== nil && by !== nil) {
+        #{raise ArgumentError, "step is given twice"}
+      }
+
+      function validateParameters() {
+        if (step === 0) {
+          #{raise ArgumentError, "step cannot be 0"}
+        }
+
+        #{limit ||= to};
+        #{step ||= by || 1};
+
+        if (!limit.$$is_number) {
+          #{raise ArgumentError, "limit must be a number"}
+        }
+
+        if (!step.$$is_number) {
+          #{raise ArgumentError, "step must be a number"}
         }
       }
-      else {
-        while (value >= limit) {
-          block(value);
-          value += step;
+
+      function stepFloatSize() {
+        if ((step > 0 && self > limit) || (step < 0 && self < limit)) {
+          return 0;
+        } else if (step === Infinity || step === -Infinity) {
+          return 1;
+        } else {
+          var abs = Math.abs, floor = Math.floor,
+              err = (abs(self) + abs(limit) + abs(limit - self)) / abs(step) * #{Float::EPSILON};
+
+          if (err === Infinity || err === -Infinity) {
+            return 0;
+          } else {
+            if (err > 0.5) {
+              err = 0.5;
+            }
+
+            return floor((limit - self) / step + err) + 1
+          }
+        }
+      }
+
+      function stepSize() {
+        validateParameters();
+
+        if (step === 0) {
+          return Infinity;
+        }
+
+        if (step % 1 !== 0) {
+          return stepFloatSize();
+        } else if ((step > 0 && self > limit) || (step < 0 && self < limit)) {
+          return 0;
+        } else {
+          var ceil = Math.ceil, abs = Math.abs,
+              lhs = abs(self - limit) + 1,
+              rhs = abs(step);
+
+          return ceil(lhs / rhs);
         }
       }
     }
 
-    self
+    unless block_given?
+      return enum_for(:step, limit, step, to: to, by: by) { `stepSize()` }
+    end
+
+    %x{
+      validateParameters();
+
+      if (step === 0) {
+        while (true) {
+          block(self);
+        }
+      }
+
+      if (self % 1 !== 0 || limit % 1 !== 0 || step % 1 !== 0) {
+        var n = stepFloatSize();
+
+        if (n > 0) {
+          if (step === Infinity || step === -Infinity) {
+            block(self);
+          } else {
+            var i = 0, d;
+
+            if (step > 0) {
+              while (i < n) {
+                d = i * step + self;
+                if (limit < d) {
+                  d = limit;
+                }
+                block(d);
+                i += 1;
+              }
+            } else {
+              while (i < n) {
+                d = i * step + self;
+                if (limit > d) {
+                  d = limit;
+                }
+                block(d);
+                i += 1
+              }
+            }
+          }
+        }
+      } else {
+        var value = self;
+
+        if (step > 0) {
+          while (value <= limit) {
+            block(value);
+            value += step;
+          }
+        } else {
+          while (value >= limit) {
+            block(value);
+            value += step
+          }
+        }
+      }
+
+      return self;
+    }
   end
 
   alias succ next
