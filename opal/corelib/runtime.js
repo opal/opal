@@ -1007,8 +1007,9 @@
   // Donate methods for a module.
   Opal.donate = function(module, jsid) {
     var included_in = module.$$dep,
-        body = module.$$proto[jsid],
-        i, length, includee, dest, current,
+        body        = module.$$proto[jsid];
+
+    var i, length, includee, dest, current,
         klass_includees, j, jj, current_owner_index, module_index;
 
     if (!included_in) {
