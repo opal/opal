@@ -440,6 +440,14 @@ class Array < `Array`
     end
   end
 
+  def any?
+    if empty?
+      false
+    else
+      super
+    end
+  end
+
   def assoc(object)
     %x{
       for (var i = 0, length = self.length, item; i < length; i++) {
