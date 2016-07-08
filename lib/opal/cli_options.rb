@@ -78,6 +78,7 @@ module Opal
 
       on('-m', '--map', 'Show sourcemap') do
         options[:map] = true
+        #puts "going to map\n"
       end
 
       on('-c', '--compile', 'Compile to JavaScript') do

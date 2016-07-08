@@ -160,8 +160,11 @@ module Opal
       @eof_content = extract_eof_content
 
       @fragments = process(@sexp).flatten
-
+      
       @result = @fragments.map(&:code).join('')
+#      print @result
+      @result
+      
     end
 
     # Returns a source map that can be used in the browser to map back to

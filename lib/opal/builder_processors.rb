@@ -18,8 +18,14 @@ module Opal
       end
       attr_reader :source, :filename, :options, :requires, :required_trees
 
+      def path=(path)
+        @path=path
+      end
       def to_s
-        source.to_s
+        "/* SOURCE MODULE:" + @filename + "\n" + 
+          " from " + @path + ":1:in source\n" +
+          " */\n" +
+          source.to_s
       end
 
       def self.handles(*extensions)

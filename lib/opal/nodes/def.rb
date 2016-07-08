@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'opal/nodes/node_with_args'
 
 module Opal
@@ -23,6 +24,7 @@ module Opal
       end
 
       def compile
+
         extract_block_arg
         split_args
 
@@ -91,6 +93,7 @@ module Opal
 
         unshift ") {"
         unshift(inline_params)
+        unshift "/*\n DEBUG: #{source_line}:at define #{name} #{scope_name} #{block_name} #{function_name}\n*/"
         unshift "function#{function_name}("
         unshift "#{scope_name} = " if scope_name
         line "}"

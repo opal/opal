@@ -15,8 +15,20 @@ module Opal
     #
     # @param code [String] javascript code
     # @param sexp [Opal::Sexp] sexp used for creating fragment
-    def initialize(code, scope, sexp = nil)
-      @code = code.to_s
+    def initialize(code, scope, sexp = nil, source_line=nil)
+      @code2 = code.to_s
+      if source_line == 'NONE'
+        @code = @code2
+      else
+        if source_line == ''
+          @code = @code2
+        elsif source_line.nil?
+          @code = @code2
+        else
+          @code = "/*DEBUG: #{source_line}: at src*/#{@code2}"
+        end
+      end
+      #@source_line=source_line
       @sexp = sexp
       @scope = scope
     end
@@ -24,6 +36,16 @@ module Opal
     # Inspect the contents of this fragment, f("fooo")
     def inspect
       "f(#{@code.inspect})"
+    end
+
+    def source_line
+      @source_line
+    end
+
+    def source_line=(sl)
+      @source_line=sl
+      @code = "/* #{@source_line}*/\n#{@code}"
+#//      print @code
     end
 
     def source_map_name

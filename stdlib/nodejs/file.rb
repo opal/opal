@@ -78,6 +78,7 @@ class File < IO
   end
 
   def self.open path, flags
+    print "open file #{path} with flags #{flags}\n"
     file = new(path, flags)
     if block_given?
       begin
@@ -102,6 +103,7 @@ class File < IO
   # Instance Methods
 
   def initialize(path, flags)
+    print "new file #{path} with flags #{flags}\n"
     binary_flag_regexp = /b/
     encoding_flag_regexp = /:(.*)/
     # binary flag is unsupported
@@ -112,6 +114,7 @@ class File < IO
     flags = flags.gsub(encoding_flag_regexp, '')
     @path = path
     @flags = flags
+    print "going to open #{path} with flags #{flags}\n"
     @fd = `__fs__.openSync(path, flags)`
   end
 
