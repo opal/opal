@@ -118,7 +118,8 @@ module Opal
           message = "named captures are not supported in javascript: #{value.inspect}"
           push "self.$raise(new SyntaxError('#{message}'))"
         else
-          print "regex value #{value} with flags #{flags.join}\n"
+          print "/*regex value #{value} with flags #{flags.join} Source line : #{self.source_line}*/"
+
           push "#{Regexp.new(value).inspect}#{flags.join}"
         end
       end

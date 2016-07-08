@@ -25,7 +25,7 @@ module Opal
         elsif source_line.nil?
           @code = @code2
         else
-          @code = "\n/*\n DEBUG: #{source_line}: at src\n*/\n#{@code2}"
+          @code = "/*DEBUG: #{source_line}: at src*/#{@code2}"
         end
       end
       #@source_line=source_line
