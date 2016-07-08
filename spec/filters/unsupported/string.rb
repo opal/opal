@@ -156,6 +156,7 @@ opal_filter "String" do
   fails "String#downcase! modifies self in place"
   fails "String#downcase! raises a RuntimeError when self is frozen"
   fails "String#downcase! returns nil if no modifications were made"
+  fails "String#dump untrusts the result if self is untrusted"
   fails "String#dup does not modify the original string when changing dupped string"
   fails "String#each_char is unicode aware"
   fails "String#each_line does not care if the string is modified while substituting"

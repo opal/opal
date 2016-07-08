@@ -16,7 +16,6 @@ opal_filter "Set" do
   fails "Set#flatten! returns nil when self was not modified"
   fails "Set#flatten! returns self when self was modified"
   fails "Set#flatten_merge flattens the passed Set and merges it into self"
-  fails "Set#flatten_merge is protected"
   fails "Set#flatten_merge raises an ArgumentError when trying to flatten a recursive Set"
   fails "Set#hash is static"
   fails "Set#inspect correctly handles self-references"

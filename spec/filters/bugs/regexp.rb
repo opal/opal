@@ -21,7 +21,6 @@ opal_filter "regular_expressions" do
   fails "Regexp#fixed_encoding? returns true if the Regexp was created with the Regexp::FIXEDENCODING option"
   fails "Regexp#hash is based on the text and options of Regexp"
   fails "Regexp#hash returns the same value for two Regexps differing only in the /n option"
-  fails "Regexp#initialize is a private method"
   fails "Regexp#initialize raises a SecurityError on a Regexp literal"
   fails "Regexp#initialize raises a TypeError on an initialized non-literal Regexp"
   fails "Regexp#inspect correctly escapes forward slashes /"

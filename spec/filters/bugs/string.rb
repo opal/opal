@@ -17,8 +17,6 @@ opal_filter "String" do
   fails "String#dump returns a string with special characters replaced with \\<char> notation"
   fails "String#dump returns a string with upper-case alpha characters unescaped"
   fails "String#dump returns a subclass instance"
-  fails "String#dump taints the result if self is tainted"
-  fails "String#dump untrusts the result if self is untrusted"
   fails "String#dup does not copy constants defined in the singleton class"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
   fails "String#each_byte passes each byte in self to the given block"

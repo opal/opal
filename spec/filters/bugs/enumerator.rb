@@ -8,8 +8,6 @@ opal_filter "Enumerator" do
   fails "Enumerator#feed returns nil"
   fails "Enumerator#feed sets the future return value of yield if called before advancing the iterator"
   fails "Enumerator#feed sets the return value of Yielder#yield"
-  fails "Enumerator#initialize is a private method"
-  fails "Enumerator#initialize on frozen instance raises a RuntimeError"
   fails "Enumerator#initialize returns self when given a block"
   fails "Enumerator#initialize returns self when given an object"
   fails "Enumerator#initialize sets size to nil if size is not given"
