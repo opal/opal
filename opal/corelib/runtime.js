@@ -566,9 +566,6 @@
     // @property $$inc included modules
     module.$$inc = [];
 
-    // mark the object as a module
-    module.$$is_module = true;
-
     // initialize dependency tracking
     module.$$dep = [];
 
