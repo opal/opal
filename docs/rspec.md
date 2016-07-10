@@ -51,7 +51,8 @@ $ bundle exec rake
 require 'bundler'
 Bundler.require
 
-run Opal::Server.new { |s|
+sprockets_env = Opal::RSpec::SprocketsEnvironment.new
+run Opal::Server.new(sprockets: sprockets_env) { |s|
   s.main = 'opal/rspec/sprockets_runner'
   s.append_path 'spec'
   s.debug = false
