@@ -263,6 +263,32 @@ task :test_nodejs do
   sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
 end
 
+desc 'Runs opal-rspec tests to augment unit testing/rubyspecs'
+task :smoke_test do
+  opal_rspec_dir = 'smoke_test_opal_rspec'
+  # Travis caching might be creating this, manage the state idempotently
+  unless File.exist?(File.join(opal_rspec_dir, '.git'))
+    rm_rf opal_rspec_dir
+    sh "git clone https://github.com/opal/opal-rspec.git #{opal_rspec_dir}"
+  end
+  # Don't want conflicts with opal-rspec's Gemfile
+  gemfile_name = 'opal_rspec_smoketest.Gemfile'
+  cp File.join('tasks/testing', gemfile_name), opal_rspec_dir
+  Dir.chdir opal_rspec_dir do
+    sh 'git checkout releases/0-6-stable'
+    sh 'git pull'
+    # RSpec source itself
+    sh 'git submodule update --init'
+    Bundler.with_clean_env do
+      # Force new dependencies each time
+      rm_rf "#{gemfile_name}.lock"
+      with_gemfile = lambda {|command| sh "BUNDLE_GEMFILE=#{gemfile_name} RUNNER=node bundle #{command}"}
+      with_gemfile['install']
+      with_gemfile['exec rake rake_only']
+    end
+  end
+end
+
 task :mspec    => [:mspec_phantomjs, :mspec_nodejs, :mspec_sprockets_phantomjs]
 task :minitest => [:cruby_tests, :test_nodejs]
 task :test_all => [:rspec, :mspec, :minitest]
