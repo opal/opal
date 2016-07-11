@@ -18,8 +18,13 @@ module Opal
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
 
-          add_temp 'self = Opal.top' unless compiler.eval?
-          add_temp compiler.eval? ? '$scope = (self.$$scope || self.$$class.$$scope)' : '$scope = Opal'
+          if compiler.eval?
+            add_temp '$scope = (self.$$scope || self.$$class.$$scope)'
+          else
+            add_temp 'self = Opal.top'
+            add_temp '$scope = Opal'
+            add_temp '$scopes = [Opal]'
+          end
           add_temp 'nil = Opal.nil'
 
           add_used_helpers

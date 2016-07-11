@@ -75,7 +75,7 @@ module Opal
         push "(#{returning_tmp} = (function() { try {"
         push "  return #{code};"
         push "} catch ($err) {"
-        push "  if (Opal.rescue($err, [$scope.get('Exception')])) {"
+        push "  if (Opal.rescue($err, [Opal.Exception])) {"
         push "    try {"
         push "      return false;"
         push "    } finally { Opal.pop_exception() }"
@@ -164,13 +164,13 @@ module Opal
         const_tmp = scope.new_temp
 
         if const_scope.nil?
-          push "(#{const_tmp} = Opal.const_get($scope, '#{const_name}', true))"
+          push "(#{const_tmp} = Opal.const_get([$scope], '#{const_name}', true, false))"
         elsif const_scope == s(:cbase)
-          push "(#{const_tmp} = Opal.const_get(Opal.Object.$$scope, '#{const_name}', true))"
+          push "(#{const_tmp} = Opal.const_get([Opal.Object.$$scope], '#{const_name}', true, false))"
         else
           const_scope_tmp = compile_defined(const_scope)
           push " && #{const_scope_tmp}.$$scope"
-          push " && (#{const_tmp} = Opal.const_get(#{const_scope_tmp}.$$scope, '#{const_name}', true))"
+          push " && (#{const_tmp} = Opal.const_get([#{const_scope_tmp}.$$scope], '#{const_name}', true, false))"
         end
         const_tmp
       end

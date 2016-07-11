@@ -2,7 +2,7 @@ require 'lib/spec_helper'
 
 describe Opal::Rewriters::OpalEngineCheck do
   def s(type, *children)
-    ::Parser::AST::Node.new(type, children)
+    ::Opal::AST::Node.new(type, children)
   end
 
   let(:rewriter) { Opal::Rewriters::OpalEngineCheck.new }

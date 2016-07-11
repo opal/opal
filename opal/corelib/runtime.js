@@ -124,21 +124,139 @@
   //     Opal.Object.$$scope.get("Array")
   //
   // If a constant with the given name cannot be found, then a dispatch to the
-  // class/module's `#const_method` is called, which by default will raise an
+  // class/module's `#const_missing` is called, which by default will raise an
   // error.
   //
   // @param name [String] the name of the constant to lookup
   // @return [Object]
   //
-  Opal.get = function(name) {
-    var constant = this[name];
+  Opal.get = function(const_name) {
+    return Opal.const_get([this], const_name, true, true);
+  }
 
-    if (constant == null) {
-      return this.base.$const_get(name);
+  function constGetSingle(scope, const_name, inherit) {
+    var scopes = [scope],
+        module = scope.base;
+
+    if (inherit || module == Opal.Object) {
+      var parent = module.$$super;
+
+      while (parent !== Opal.BasicObject && parent !== Opal.Object) {
+        scopes.push(parent.$$scope);
+
+        parent = parent.$$super;
+      }
     }
 
-    return constant;
-  };
+    for (var i = 0, length = scopes.length; i < length; i++) {
+      if (scopes[i].hasOwnProperty(const_name)) {
+        return scopes[i][const_name];
+      }
+    }
+  }
+
+  function constGetTopLevel(const_name) {
+    var global_scope = Opal.Object.$$scope;
+
+    if (global_scope.hasOwnProperty(const_name)) {
+      return global_scope[const_name];
+    }
+  }
+
+  function constGetMultiple(scopes, const_name, inherit) {
+    var length = scopes.length,
+        last_scope = scopes[length - 1],
+        i, scope, result;
+
+    for (i = length - 1; i >= 0; i--) {
+      var scope_or_singleton_class = scopes[i];
+
+      if (scope_or_singleton_class.$$is_singleton) {
+        scope = scope_or_singleton_class.$$scope;
+
+        if (scope_or_singleton_class === last_scope) {
+          // If we perform a constant lookup directly in the metaclass
+          // then we should look into its ancestors (inherit = true)
+          inherit = true;
+        } else {
+          // Otherwise we are looking for a constant declared in the
+          // normal scope (class/module) which was declared in the metaclass
+          // @example
+          //   class << obj
+          //     module M
+          //       CONST
+          //     end
+          //   end
+          // In this case we shouldn't look into metaclass ancestors
+          inherit = false;
+        }
+      } else {
+        // We are in the regular class/module scope
+        scope = scope_or_singleton_class;
+        // Leaving requested inherit value from parameters
+      }
+
+      if (scope.hasOwnProperty(const_name)) {
+        result = scope[const_name];
+      }
+
+      if (result != null) {
+        return result;
+      }
+
+      result = constGetSingle(scope, const_name, inherit);
+
+      if (result != null) {
+        return result;
+      }
+    }
+  }
+
+  // Finds and returns a constant in the provided list of scopes.
+  // When you open a class/module/singleton class, Opal collects
+  // scopes in the $scopes array. When you try to resolve
+  // a constant Opal.const_get is used to get it.
+  //
+  // To simply find a constant directly in the single scope:
+  //
+  //     Opal.const_get([scope], const_name)
+  //
+  // To search in parents:
+  //
+  //     Opal.const_get(scopes, const_name, true)
+  //
+  // To throw an error if nothing was found:
+  //
+  //     Opal.const_get(scopes, const_name, inherit, true)
+  //
+  // @param scopes [Array<$$scope>] a list of scopes
+  // @param const_name [String] the name of the constant
+  // @param inherit [Boolean] flag to perform a search in the parents
+  // @param raise [Boolean] flag to trigger "const_missing" if nothing was found
+  // @return [Object]
+  Opal.const_get = function(scopes, const_name, inherit, raise) {
+    var result = constGetMultiple(scopes, const_name, inherit);
+
+    if (result != null) {
+      return result;
+    }
+
+    if (inherit) {
+      result = constGetTopLevel(const_name);
+    }
+
+    if (result != null) {
+      return result;
+    }
+
+    if (raise) {
+      var last_scope_base = scopes[scopes.length - 1].base;
+
+      if (last_scope_base.$$is_a_module) {
+        return last_scope_base.$const_missing(const_name);
+      }
+    }
+  }
 
   // Create a new constants scope for the given class with the given
   // base. Constants are looked up through their parents, so the base
@@ -241,27 +359,6 @@
     base_scope.constants.push(name);
     return base_scope[name] = value;
   };
-
-  Opal.const_get = function(scope, const_name, inherit) {
-    var scopes = [scope],
-        module = scope.base;
-
-    if (inherit || module == Opal.Object) {
-      var parent = module.$$super;
-
-      while (parent !== Opal.BasicObject) {
-        scopes.push(parent.$$scope);
-
-        parent = parent.$$super;
-      }
-    }
-
-    for (var i = 0, length = scopes.length; i < length; i++) {
-      if (scopes[i].hasOwnProperty(const_name)) {
-        return scopes[i][const_name];
-      }
-    }
-  }
 
 
   // Modules & Classes

@@ -148,7 +148,7 @@ module Opal
     def compile
       @buffer = ::Parser::Source::Buffer.new(file)
       @buffer.source = @source
-      @parser = Opal::Parser.default_parser
+      @parser = Opal::Parser.new(Opal::AST::Builder.new)
 
       parsed = begin
         @parser.parse(@buffer)
@@ -217,7 +217,7 @@ module Opal
     # returns an array, it must be used incase the internal structure
     # of sexps does change.
     def s(type, *children)
-      ::Parser::AST::Node.new(type, children)
+      ::Opal::AST::Node.new(type, children)
     end
 
     def fragment(str, scope, sexp = nil)

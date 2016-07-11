@@ -10,12 +10,12 @@ module Opal
       def compile
         if magical_data_const?
           push("$__END__")
-        elsif const_scope && const_scope.type == :cbase
-          push "Opal.get('#{name}')"
         elsif const_scope
-          push expr(const_scope), ".$$scope.get('#{name}')"
+          push "Opal.const_get([", recv(const_scope), ".$$scope], '#{name}', true, true)"
+        elsif compiler.eval?
+          push "Opal.const_get([$scope], '#{name}', true, true)"
         else
-          push "$scope.get('#{name}')"
+          push "Opal.const_get($scopes, '#{name}', true, true)"
         end
       end
 

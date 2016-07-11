@@ -99,7 +99,6 @@ ruby/core/true
 ruby/core/unboundmethod
 
 ruby/language
-!ruby/language/constants_spec
 !ruby/language/execution_spec
 
 ruby/library/base64

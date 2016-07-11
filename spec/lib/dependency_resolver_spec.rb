@@ -31,7 +31,7 @@ describe Opal::Nodes::CallNode::DependencyResolver do
   end
 
   def s(type, *children)
-    ::Parser::AST::Node.new(type, children)
+    ::Opal::AST::Node.new(type, children)
   end
 
   def resolve(sexp)

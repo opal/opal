@@ -308,7 +308,7 @@ module Opal
 
             parts = args.map { |s| handle_part s }
 
-            if ::Parser::AST::Node === recv && recv.type == :const && recv.children.last == :File
+            if ::Opal::AST::Node === recv && recv.type == :const && recv.children.last == :File
               if meth == :expand_path
                 return expand_path(*parts)
               elsif meth == :join

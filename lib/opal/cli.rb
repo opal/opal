@@ -130,7 +130,9 @@ module Opal
 
     def show_sexp
       evals_or_file do |contents, filename|
-        sexp = Opal::Parser.new.parse(contents, filename)
+        buffer = ::Parser::Source::Buffer.new(filename)
+        buffer.source = contents
+        sexp = Opal::Parser.new(Opal::AST::Builder.new).parse(buffer)
         puts sexp.inspect
       end
     end

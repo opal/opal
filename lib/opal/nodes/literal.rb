@@ -153,7 +153,7 @@ module Opal
         # required by parser gem, but JS doesn't support 'x' flag
         if flags.include?('x')
           parts = value.children.map do |part|
-            if part.is_a?(::Parser::AST::Node) && part.type == :str
+            if part.is_a?(::Opal::AST::Node) && part.type == :str
               trimmed_value = part.children[0].gsub(/\A\s*\#.*/, '').gsub(/\s/, '')
               s(:str, trimmed_value)
             else
