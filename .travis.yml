@@ -6,6 +6,7 @@ cache:
   bundler: true
   directories:
     - /home/travis/.nvm/
+    - smoke_test_opal_rspec
 
 matrix:
   fast_finish: true
@@ -53,10 +54,14 @@ matrix:
     - rvm: jruby-head
       env: RUN=rspec
 
+    - rvm: 2.3.1
+      env: RUN=smoke_test
+
   allow_failures:
     - rvm: ruby-head
     - rvm: rbx
     - rvm: jruby-head
+    - env: RUN=smoke_test
 
 
 before_install:
