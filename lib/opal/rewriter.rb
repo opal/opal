@@ -1,9 +1,11 @@
 require 'opal/rewriters/opal_engine_check'
+require 'opal/rewriters/explicit_writer_return'
 
 module Opal
   class Rewriter
     LIST = [
-      Rewriters::OpalEngineCheck
+      Rewriters::OpalEngineCheck,
+      Rewriters::ExplicitWriterReturn,
     ]
 
     def initialize(sexp)
