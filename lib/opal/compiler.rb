@@ -359,6 +359,10 @@ module Opal
           returns(resbody)
         end
 
+        if else_sexp
+          else_sexp = returns(else_sexp)
+        end
+
         sexp.updated(nil, [
           returns(body_sexp),
           *resbodies,
@@ -369,9 +373,10 @@ module Opal
         sexp.updated(nil, [klass, lvar, returns(body)])
       when :ensure
         rescue_sexp, ensure_body = *sexp
-        sexp.updated(nil,
+        sexp = sexp.updated(nil,
           [returns(rescue_sexp), ensure_body]
         )
+        s(:js_return, sexp)
       when :begin, :kwbegin
         # Wrapping last expression with s(:js_return, ...)
         *rest, last = *sexp

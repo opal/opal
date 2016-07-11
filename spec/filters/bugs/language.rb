@@ -132,6 +132,7 @@ opal_filter "language" do
   fails "Global variable $-v is an alias of $VERBOSE"
   fails "Global variable $-w is an alias of $VERBOSE"
   fails "Global variable $0 raises a TypeError when not given an object that can be coerced to a String"
+  fails "Global variable $0 is the path given as the main script and the same as __FILE__"
   fails "Global variable $? is thread-local"
   fails "Predefined global $~ is set at the method-scoped level rather than block-scoped"
   fails "Predefined global $~ raises an error if assigned an object not nil or instanceof MatchData"
