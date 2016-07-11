@@ -1,4 +1,5 @@
 opal_filter "language" do
+  fails "Global variable $0 is the path given as the main script and the same as __FILE__"
   fails "Magic comment can be after the shebang"
   fails "Magic comment can take Emacs style"
   fails "Magic comment can take vim style"

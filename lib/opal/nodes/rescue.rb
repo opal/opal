@@ -2,7 +2,13 @@ require 'opal/nodes/base'
 
 module Opal
   module Nodes
-    class EnsureNode < Base
+    class BaseRescueEnsure < Base
+      def rescue_else_code
+        compiler.returns(scope.rescue_else_sexp)
+      end
+    end
+
+    class EnsureNode < BaseRescueEnsure
       handle :ensure
 
       children :begn, :ensr
@@ -65,15 +71,9 @@ module Opal
       def wrap_in_closure?
         recv? or expr? or has_rescue_else?
       end
-
-      def rescue_else_code
-        rescue_else_code = scope.rescue_else_sexp
-        rescue_else_code = compiler.returns(rescue_else_code) unless stmt?
-        rescue_else_code
-      end
     end
 
-    class RescueNode < Base
+    class RescueNode < BaseRescueEnsure
       handle :rescue
 
       children :body
@@ -136,12 +136,6 @@ module Opal
         body_code = (body.type == :resbody ? s(:nil) : body)
         body_code = compiler.returns(body_code) unless stmt?
         body_code
-      end
-
-      def rescue_else_code
-        rescue_else_code = scope.rescue_else_sexp
-        rescue_else_code = compiler.returns(rescue_else_code) unless stmt?
-        rescue_else_code
       end
 
       # Returns true when there's no 'ensure' statement
