@@ -266,7 +266,11 @@ end
 desc 'Runs opal-rspec tests to augment unit testing/rubyspecs'
 task :smoke_test do
   opal_rspec_dir = 'smoke_test_opal_rspec'
-  sh "git clone https://github.com/opal/opal-rspec.git #{opal_rspec_dir}" unless File.exist?(File.join(opal_rspec_dir, '.git'))
+  # Travis caching might be creating this, manage the state idempotently
+  unless File.exist?(File.join(opal_rspec_dir, '.git'))
+    rm_rf opal_rspec_dir
+    sh "git clone https://github.com/opal/opal-rspec.git #{opal_rspec_dir}"
+  end
   # Don't want conflicts with opal-rspec's Gemfile
   gemfile_name = 'opal_rspec_smoketest.Gemfile'
   cp File.join('tasks/testing', gemfile_name), opal_rspec_dir
