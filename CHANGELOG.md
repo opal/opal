@@ -77,6 +77,7 @@ Whitespace conventions:
 
 - Fixed `defined?` for methods raising exceptions
 - Fixed `Kernel#loop` (to catch StopIteration error)
+- Fixed inheritance from the `Module` class.
 
 
 
