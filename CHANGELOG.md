@@ -42,6 +42,7 @@ Whitespace conventions:
     * `Hash#fetch_values`
     * `Hash#to_proc`
     * `Struct#dig`
+- Added safe navigator (`&.`) support. (#1532)
 
 
 ### Changed

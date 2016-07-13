@@ -1498,6 +1498,11 @@
     return recv.$method_missing.apply(recv, [mid].concat(args_ary));
   };
 
+  // Used by safe navigator (&.) when receiver is nil
+  Opal.nil_returner = function() {
+    return nil;
+  }
+
   // Used to define methods on an object. This is a helper method, used by the
   // compiled source to define methods on special case objects when the compiler
   // can not determine the destination object, or the object is a Module
