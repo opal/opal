@@ -9,4 +9,8 @@ opal_filter "Array" do
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#zip fills nil when the given enumereator is shorter than self"
   fails "Array.[] can unpack 2 or more nested referenced array"
+  fails "Array#delete_if updates the receiver after all blocks"
+  fails "Array#select! updates the receiver after all blocks"
+  fails "Array#reject! updates the receiver after all blocks"
+  fails "Array#keep_if updates the receiver after all blocks"
 end
