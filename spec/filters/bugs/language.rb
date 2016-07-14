@@ -191,6 +191,5 @@ opal_filter "language" do
   fails "Invoking a method does not expand final array arguments after a splat expansion"
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
   fails "The next statement in a method is invalid and raises a SyntaxError"
-  fails "Invoking []= methods returns the set value"
   fails "Safe navigator allows attribute assignment"
 end

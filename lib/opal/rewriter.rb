@@ -8,10 +8,10 @@ module Opal
   class Rewriter
     LIST = [
       Rewriters::OpalEngineCheck,
-      Rewriters::ExplicitWriterReturn,
-      Rewriters::JsReservedWords,
       Rewriters::BlockToIter,
       Rewriters::DotJsSyntax,
+      Rewriters::ExplicitWriterReturn,
+      Rewriters::JsReservedWords,
     ]
 
     def initialize(sexp)

@@ -7,28 +7,32 @@ module Opal
         @in_masgn = false
       end
 
+      TMP_NAME = '$writer'
+      GET_ARGS_NODE = s(:lvar, TMP_NAME)
+      RETURN_ARGS_NODE = s(:jsattr,
+        GET_ARGS_NODE,
+        s(:send, s(:jsattr, GET_ARGS_NODE, s(:str, 'length')), :-, s(:int, 1))
+      )
+
       def on_send(node)
         return super if @in_masgn
 
         recv, method_name, *args = *node
 
-        if method_name.to_s =~ /#{REGEXP_START}\w+=#{REGEXP_END}/
-          args_tmp = "$writer_args"
-          set_args_node = s(:lvasgn, args_tmp, s(:array, *process_all(args)))
-          get_args_node = s(:lvar, args_tmp)
-          return_args_node = s(:jsattr, get_args_node, s(:int, 0))
+        if method_name.to_s =~ /#{REGEXP_START}\w+=#{REGEXP_END}/ || method_name.to_s == "[]="
+          set_args_node = s(:lvasgn, TMP_NAME, s(:array, *process_all(args)))
 
           s(:begin,
             set_args_node,
-            node.updated(nil, [recv, method_name, s(:splat, get_args_node)]),
-            return_args_node
+            node.updated(nil, [recv, method_name, s(:splat, GET_ARGS_NODE)]),
+            RETURN_ARGS_NODE
           )
         else
           super
         end
       end
 
-      # Multiple assignment is quite complex
+      # Multiple assignment is handled by Opal::Nodes::MassAssignNode
       #
       # For example, "self.a, self.b = 1, 2" parses to:
       # s(:masgn,
@@ -41,7 +45,7 @@ module Opal
       #     s(:int, 1),
       #     s(:int, 2)))
       #
-      # For now we just ignore its returning value
+      # And this AST rewriter skips this node.
       def on_masgn(node)
         @in_masgn = true
         result = super
