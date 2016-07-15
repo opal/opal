@@ -496,7 +496,7 @@
       }
     }
     else {
-      module = Opal.module_allocate();
+      module = Opal.module_allocate(Module);
       Opal.create_scope(base.$$scope, module, name);
     }
 
@@ -520,16 +520,15 @@
   // Internal function to create a new module instance. This simply sets up
   // the prototype hierarchy and method tables.
   //
-  Opal.module_allocate = function() {
+  Opal.module_allocate = function(superclass) {
     var mtor = function() {};
-    mtor.prototype = Module_alloc.prototype;
+    mtor.prototype = superclass.$$alloc.prototype;
 
     function module_constructor() {}
     module_constructor.prototype = new mtor();
 
     var module = new module_constructor();
     var module_prototype = {};
-    var superclass = Module;
 
     // @property $$id Each class is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`

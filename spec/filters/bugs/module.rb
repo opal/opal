@@ -65,7 +65,6 @@ opal_filter "Module" do
   fails "Module#class_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
   fails "Module#class_eval raises a TypeError when the given filename can't be converted to string using to_str"
   fails "Module#class_eval uses the optional filename and lineno parameters for error messages"
-  fails "Module#class_exec defines method in the receiver's scope"
   fails "Module#const_get raises a NameError if the constant is defined in the receiver's supperclass and the inherit flag is false" # requires to not copy the whole $$scope on inheriting
   fails "Module#constants doesn't returns inherited constants when passed false"
   fails "Module#constants doesn't returns inherited constants when passed nil"
@@ -85,7 +84,6 @@ opal_filter "Module" do
   fails "Module#include doesn't include module if it is included in a super class"
   fails "Module#include? raises a TypeError when no module was given"
   fails "Module#include? returns true if the given module is included by self or one of it's ancestors"
-  fails "Module#initialize is called on subclasses"
   fails "Module#instance_method gives UnboundMethod method name, Module defined in and Module extracted from"
   fails "Module#instance_method raises a NameError if the method has been undefined"
   fails "Module#instance_method raises a TypeError if not passed a symbol"
@@ -105,7 +103,6 @@ opal_filter "Module" do
   fails "Module#module_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
   fails "Module#module_eval raises a TypeError when the given filename can't be converted to string using to_str"
   fails "Module#module_eval uses the optional filename and lineno parameters for error messages"
-  fails "Module#module_exec defines method in the receiver's scope"
   fails "Module#module_function as a toggle (no arguments) in a Module body does not affect module_evaled method definitions also if outside the eval itself"
   fails "Module#module_function as a toggle (no arguments) in a Module body doesn't affect definitions when inside an eval even if the definitions are outside of it"
   fails "Module#module_function as a toggle (no arguments) in a Module body has no effect if inside a module_eval if the definitions are outside of it"

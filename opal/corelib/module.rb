@@ -3,7 +3,7 @@ class Module
     %x{
       var module;
 
-      module = Opal.module_allocate();
+      module = Opal.module_allocate(self);
       Opal.create_scope(Opal.Module.$$scope, module, null);
       return module;
     }
