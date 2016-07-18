@@ -77,14 +77,13 @@ module Opal
 
       def compile_norm_args
         norm_args.each do |arg|
-          arg = variable(arg.children[0])
-          push "if (#{arg} == null) #{arg} = nil;"
+          arg_name, _ = *arg
+          push "if (#{arg_name} == null) #{arg_name} = nil;"
         end
       end
 
       def compile_block_arg
         if block_arg
-          block_arg = variable(self.block_arg.to_s)
           scope.block_name = block_arg
           scope.add_temp block_arg
           scope_name = scope.identify!

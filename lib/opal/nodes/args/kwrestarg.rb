@@ -20,10 +20,9 @@ module Opal
         # kwrestarg can be blank def m(**) end
         # we need to perform assignment only for named kwrestarg
         if name
-          var_name = variable(name.to_sym)
-          add_temp var_name
+          add_temp name
 
-          line "#{var_name} = #{extract_code}"
+          line "#{name} = #{extract_code}"
         end
       end
 

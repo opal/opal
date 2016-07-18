@@ -14,11 +14,10 @@ module Opal
       def compile
         initialize_kw_args_if_needed
 
-        var_name = variable(name)
-        add_temp var_name
+        add_temp name
 
-        line "if ((#{var_name} = $kwargs.$$smap['#{name}']) == null) {"
-        line "  #{var_name} = ", expr(default_value)
+        line "if ((#{name} = $kwargs.$$smap['#{name}']) == null) {"
+        line "  #{name} = ", expr(default_value)
         line "}"
 
         scope.used_kwargs << name

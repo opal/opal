@@ -26,7 +26,7 @@ module Opal
             result << tmp
             scope.mlhs_mapping[arg] = tmp
           when :arg, :optarg
-            arg_name = variable(arg.children[0]).to_s
+            arg_name, _ = *arg
             if !arg.meta[:inline] && arg_name[0] != '$'
               arg_name = "$#{arg_name}"
             end
@@ -51,10 +51,8 @@ module Opal
       # Otherwise, these args will be interpreted
       # in the child scope as local variables
       def add_arg(arg)
-        if arg.children[0]
-          arg_name = variable(arg.children[0].to_sym)
-          scope.add_arg(arg_name)
-        end
+        arg_name, _ = *arg
+        scope.add_arg(arg_name) if arg_name
       end
     end
   end

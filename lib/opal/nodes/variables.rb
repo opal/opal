@@ -12,7 +12,7 @@ module Opal
       end
 
       def compile
-        return push(variable(var_name.to_s)) unless using_irb?
+        return push(var_name.to_s) unless using_irb?
 
         with_temp do |tmp|
           push property(var_name.to_s)
@@ -34,9 +34,9 @@ module Opal
         if using_irb?
           push "Opal.irb_vars#{property var_name.to_s} = "
         else
-          add_local variable(var_name.to_s)
+          add_local var_name.to_s
 
-          push "#{variable(var_name.to_s)} = "
+          push "#{var_name} = "
         end
 
         push expr(value)
@@ -55,7 +55,7 @@ module Opal
       end
 
       def compile
-        name = property ivar(var_name)
+        name = property(var_name)
         add_ivar name
         push "self#{name}"
       end
@@ -71,7 +71,7 @@ module Opal
       end
 
       def compile
-        name = property ivar(var_name)
+        name = property(var_name)
         push "self#{name} = "
         push expr(value)
 

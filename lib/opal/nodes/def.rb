@@ -31,7 +31,7 @@ module Opal
 
         # block name (&block)
         if block_arg
-          block_name = variable(block_arg).to_sym
+          block_name = block_arg
         end
 
         in_scope do

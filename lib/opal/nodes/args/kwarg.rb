@@ -14,13 +14,12 @@ module Opal
       def compile
         initialize_kw_args_if_needed
 
-        var_name = variable(name)
-        add_temp var_name
+        add_temp name
 
         line "if (!$kwargs.$$smap.hasOwnProperty('#{name}')) {"
         line "  throw Opal.ArgumentError.$new('missing keyword: #{name}');"
         line "}"
-        line "#{var_name} = $kwargs.$$smap['#{name}'];"
+        line "#{name} = $kwargs.$$smap['#{name}'];"
 
         scope.used_kwargs << name
       end
