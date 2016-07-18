@@ -66,7 +66,7 @@ module Opal
         block_temp = scope.new_temp if iter
 
         # can't use self for splats or blocks
-        temporary_receiver = scope.new_temp if splat? || block_temp
+        temporary_receiver = scope.new_temp if needs_temporary_receiver?
 
         add_method temporary_receiver
 
@@ -93,6 +93,10 @@ module Opal
 
       def arguments_array?
         splat?
+      end
+
+      def needs_temporary_receiver?
+        splat? || iter
       end
 
       def add_invocation(temporary_receiver)

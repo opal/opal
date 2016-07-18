@@ -192,12 +192,5 @@ opal_filter "language" do
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
   fails "The next statement in a method is invalid and raises a SyntaxError"
   fails "Invoking []= methods returns the set value"
-  fails "Safe navigator takes a list of arguments"
-  fails "Safe navigator takes a block"
   fails "Safe navigator allows attribute assignment"
-  fails "Safe navigator when context is nil always returns nil"
-  fails "Safe navigator when context is nil can be chained"
-  fails "Safe navigator when context is nil doesn't evaluate arguments"
-  fails "Safe navigator when context is false calls the method"
-  fails "Safe navigator when context is truthy calls the method"
 end
