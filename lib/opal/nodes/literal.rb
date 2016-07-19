@@ -87,12 +87,24 @@ module Opal
 
       attr_accessor :value, :flags
 
+      # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+      SUPPORTED_FLAGS = /[gimuy]/
+
       def initialize(*)
         super
         extract_flags_and_value
       end
 
       def compile
+        flags.select! do |flag|
+          if SUPPORTED_FLAGS =~ flag
+            true
+          else
+            compiler.warning "Skipping the '#{flag}' Regexp flag as it's not widely supported by JavaScript vendors."
+            false
+          end
+        end
+
         case value.type
         when :dstr, :begin
           compile_dynamic_regexp

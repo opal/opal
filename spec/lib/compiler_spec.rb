@@ -271,6 +271,12 @@ describe Opal::Compiler do
     end
   end
 
+  describe 'Regexp flags' do
+    it 'skips the unsupported ones' do
+      expect_compiled("/foobar/nix").to include("/foobar/i")
+    end
+  end
+
   def expect_compiled(*args)
     expect(Opal::Compiler.new(*args).compile)
   end
