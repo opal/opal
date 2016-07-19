@@ -391,6 +391,27 @@
     return constructor;
   };
 
+  Opal.setup_module_or_class = function(module) {
+    // @property $$id Each class/module is assigned a unique `id` that helps
+    //                comparation and implementation of `#object_id`
+    module.$$id = Opal.uid();
+
+    // @property $$is_a_module Will be true for Module and its subclasses
+    //                         instances (namely: Class).
+    module.$$is_a_module = true;
+
+    // @property $$inc included modules
+    module.$$inc = [];
+
+    // initialize the name with nil
+    module.$$name = nil;
+
+    // @property $$cvars class variables defined in the current module
+    module.$$cvars = {};
+  }
+
+
+
   // Adds common/required properties to class object (as in `Class.new`)
   //
   // @param name  [String,null] The name of the class
@@ -419,15 +440,13 @@
     // The built class is the only instance of its singleton_class
     var klass = new singleton_class_alloc();
 
+    Opal.setup_module_or_class(klass);
+
     // @property $$alloc This is the constructor of instances of the current
     //                   class. Its prototype will be used for method lookup
     klass.$$alloc = alloc;
 
     klass.$$name = name || nil;
-
-    // @property $$id Each class is assigned a unique `id` that helps
-    //                comparation and implementation of `#object_id`
-    klass.$$id = Opal.uid();
 
     // Set a displayName for the singleton_class
     singleton_class_alloc.displayName = "#<Class:"+(name || ("#<Class:"+klass.$$id+">"))+">";
@@ -452,12 +471,6 @@
 
     // @property $$class Classes are instances of the class Class
     klass.$$class    = Class;
-
-    // @property $$inc included modules
-    klass.$$inc = [];
-
-    // @property $$cvars class variables defined in the current class
-    klass.$$cvars = {};
 
     return klass;
   };
@@ -530,9 +543,10 @@
     var module = new module_constructor();
     var module_prototype = {};
 
-    // @property $$id Each class is assigned a unique `id` that helps
-    //                comparation and implementation of `#object_id`
-    module.$$id = Opal.uid();
+    Opal.setup_module_or_class(module);
+
+    // initialize dependency tracking
+    module.$$dep = [];
 
     // Set the display name of the singleton prototype holder
     module_constructor.displayName = "#<Class:#<Module:"+module.$$id+">>"
@@ -562,18 +576,6 @@
     //   starts with the superclass, after module inclusion is
     //   the last included module
     module.$$parent = superclass;
-
-    // @property $$inc included modules
-    module.$$inc = [];
-
-    // initialize dependency tracking
-    module.$$dep = [];
-
-    // initialize the name with nil
-    module.$$name = nil;
-
-    // @property $$cvars class variables defined in the current module
-    module.$$cvars = {};
 
     return module;
   };
