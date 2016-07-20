@@ -40,25 +40,11 @@ module MSpecSuite
     userspecs = Dir[pattern] if pattern
     userspecs &= rubyspecs if whitelist_pattern
 
-    opalspec_filters = Dir['spec/filters/**/*_opal.rb']
-
-    if ENV['INVERT_RUNNING_MODE']
-      # When we run an inverted test suite we should run only 'bugs'.
-      # Unsupported features are not supported anyway
-      rubyspec_filters = Dir['spec/filters/bugs/*.rb'] - opalspec_filters
-    else
-      rubyspec_filters = Dir['spec/filters/**/*.rb'] - opalspec_filters
-    end
-
     specs = []
     add_specs = ->(name, new_specs) do
       puts "Adding #{new_specs.size.to_s.rjust(3)} files (#{name})"
       specs += new_specs
     end
-
-    # Filters must be added first
-    suite_filters = suite == 'opal' ? opalspec_filters : rubyspec_filters
-    add_specs["#{suite} filters", suite_filters.sort]
 
     if pattern
       add_specs["PATTERN=#{pattern}", userspecs.sort]
@@ -76,22 +62,56 @@ module MSpecSuite
     specs
   end
 
-  def write_file(filename, specs, bm_filepath = nil)
-    requires = specs.map{|s| "require '#{s.sub(/^spec\//,'')}'"}
+  def filters(suite)
+    opalspec_filters = Dir['spec/filters/**/*_opal.rb']
 
-    if bm_filepath
-      enter_benchmarking_mode = "OSpecRunner.main.bm!(#{Integer(ENV['BM'])}, '#{bm_filepath}')"
+    if ENV['INVERT_RUNNING_MODE']
+      # When we run an inverted test suite we should run only 'bugs'.
+      # Unsupported features are not supported anyway
+      rubyspec_filters = Dir['spec/filters/bugs/*.rb'] - opalspec_filters
+    else
+      rubyspec_filters = Dir['spec/filters/**/*.rb'] - opalspec_filters
     end
 
+    suite == 'opal' ? opalspec_filters : rubyspec_filters
+  end
+
+  def write_file(filename, filters, specs, bm_filepath = nil)
+    [filters, specs].each do |files|
+      files.map! { |s| "'#{s.sub(/^spec\//,'')}'" }
+    end
+
+    filter_requires = filters.map { |s| "require #{s}" }.join("\n")
+    spec_requires = specs.map { |s| "requirable_spec_file #{s}" }.join("\n")
+    spec_registration = specs.join(",\n  ")
+
+    if bm_filepath
+      enter_benchmarking_mode = "OpalBM.main.register(#{Integer(ENV['BM'])}, '#{bm_filepath}')"
+    end
+
+    random_seed = ENV['RANDOM_SEED'] ? ENV['RANDOM_SEED'] : rand(100_000)
+
+    puts "Randomizing with RANDOM_SEED=#{random_seed}"
+
     File.write filename, <<-RUBY
-      require 'spec_helper'
-      require 'opal/full'
-      OSpecRunner.main.will_start
-      #{enter_benchmarking_mode}
-      #{requires.join("\n    ")}
-      OSpecFilter.main.unused_filters_message(list: #{!!ENV['LIST_UNUSED_FILTERS']})
-      OSpecRunner.main.did_finish
-      exit MSpec.exit_code
+require 'spec_helper'
+require 'opal/full'
+#{enter_benchmarking_mode}
+
+#{filter_requires}
+
+#{spec_requires}
+
+MSpec.register_files [
+  #{spec_registration}
+]
+
+srand(#{random_seed})
+MSpec.randomize(true)
+
+MSpec.process
+OSpecFilter.main.unused_filters_message(list: #{!!ENV['LIST_UNUSED_FILTERS']})
+exit MSpec.exit_code
     RUBY
   end
 
@@ -124,7 +144,7 @@ DESC
     url      = "http://localhost:#{port}/"
 
     mkdir_p File.dirname(filename)
-    MSpecSuite.write_file filename, MSpecSuite.specs(ENV.to_hash.merge 'SUITE' => suite)
+    MSpecSuite.write_file filename, MSpecSuite.filters(suite), MSpecSuite.specs(ENV.to_hash.merge 'SUITE' => suite)
 
     MSpecSuite.stubs.each {|s| ::Opal::Config.stubbed_files << s }
 
@@ -157,7 +177,7 @@ DESC
       filename = "tmp/mspec_#{platform}.rb"
       mkdir_p File.dirname(filename)
       bm_filepath = MSpecSuite.bm_filepath if ENV['BM']
-      MSpecSuite.write_file filename, MSpecSuite.specs(ENV.to_hash.merge 'SUITE' => suite), bm_filepath
+      MSpecSuite.write_file filename, MSpecSuite.filters(suite), MSpecSuite.specs(ENV.to_hash.merge 'SUITE' => suite), bm_filepath
 
       stubs = MSpecSuite.stubs.map{|s| "-s#{s}"}.join(' ')
 

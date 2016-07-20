@@ -12,6 +12,9 @@ class RespondToSpecs
   def some_method
     :foo
   end
+
+  def foo
+  end
 end
 
 describe "Kernel.respond_to?" do
@@ -35,7 +38,7 @@ describe "Kernel#respond_to?" do
   end
 
   it "returns false if a method exists, but is marked with a '$$stub' property" do
-    `#{@a}.$some_method.$$stub = true`
-    @a.respond_to?(:some_method).should be_false
+    `#{@a}.$foo.$$stub = true`
+    @a.respond_to?(:foo).should be_false
   end
 end
