@@ -12,10 +12,6 @@ describe "Kernel.rand" do
     r.to_a.include?(rand(r)).should == true
   end
 
-  it "should convert negative number and convert to integer" do
-    rand(-0.1).should == 0
-  end
-
   it "returns a numeric in opal" do
     rand.should be_kind_of(Numeric)
     rand(77).should be_kind_of(Numeric)

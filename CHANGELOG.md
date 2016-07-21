@@ -43,6 +43,12 @@ Whitespace conventions:
     * `Hash#to_proc`
     * `Struct#dig`
 - Added safe navigator (`&.`) support. (#1532)
+- Added Random class with seed support. The following methods were reworked to use it:
+    * `Kernel.rand`
+    * `Kernel.srand`
+    * `Array#shuffle`
+    * `Array#shuffle!`
+    * `Array#sample`
 
 
 ### Changed

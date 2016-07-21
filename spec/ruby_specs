@@ -82,6 +82,7 @@ ruby/core/proc
 ruby/core/range
 ruby/core/rational
 ruby/core/regexp
+ruby/core/random
 
 ruby/core/string
 !ruby/core/string/crypt_spec
