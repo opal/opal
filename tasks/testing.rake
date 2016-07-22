@@ -58,14 +58,14 @@ module MSpecSuite
 
     # Filters must be added first
     suite_filters = suite == 'opal' ? opalspec_filters : rubyspec_filters
-    add_specs["#{suite} filters", suite_filters]
+    add_specs["#{suite} filters", suite_filters.sort]
 
     if pattern
-      add_specs["PATTERN=#{pattern}", userspecs]
+      add_specs["PATTERN=#{pattern}", userspecs.sort]
     elsif suite == 'opal'
-      add_specs['spec/opal', opalspecs]
+      add_specs['spec/opal', opalspecs.sort]
     elsif suite == 'ruby'
-      add_specs['spec/ruby', rubyspecs]
+      add_specs['spec/ruby', rubyspecs.sort]
     else
       warn 'Please provide at lease one of the following environment variables:'
       warn 'PATTERN # e.g. PATTERN=spec/ruby/core/numeric/**_spec.rb'
