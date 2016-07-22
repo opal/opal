@@ -1901,7 +1901,7 @@ class Array < `Array`
           }
         }
         else {
-          j = Math.floor(Math.random() * i);
+          j = #{rand(`i`)};
         }
 
         tmp = self[--i];

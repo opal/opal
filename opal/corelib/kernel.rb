@@ -1061,19 +1061,24 @@ module Kernel
   def rand(max = undefined)
     %x{
       if (max === undefined) {
-        return Math.random();
+        return #{Random::DEFAULT.rand};
       }
-      else if (max.$$is_range) {
-        var min = max.begin, range = max.end - min;
-        if(!max.exclude) range++;
 
-        return self.$rand(range) + min;
-      }
-      else {
-        return Math.floor(Math.random() *
-          Math.abs(#{Opal.coerce_to max, Integer, :to_int}));
+      if (max.$$is_number) {
+        if (max < 0) {
+          max = Math.abs(max);
+        }
+
+        if (max % 1 !== 0) {
+          max = max.$to_i();
+        }
+
+        if (max === 0) {
+          max = undefined;
+        }
       }
     }
+    Random::DEFAULT.rand(max)
   end
 
   def respond_to?(name, include_all = false)
@@ -1148,7 +1153,9 @@ module Kernel
 
   alias sprintf format
 
-  alias srand rand
+  def srand(seed = Random.new_seed)
+    Random.srand(seed)
+  end
 
   def String(str)
     Opal.coerce_to?(str, String, :to_str) ||

@@ -49,4 +49,7 @@ opal_filter "Bignum" do
   fails "Marshal.load for a Integer loads an Integer -2361183241434822606847"
   fails "Marshal.dump with a Bignum dumps a Bignum"
   fails "Marshal.dump with a Bignum dumps a Bignum"
+  fails "Random.new_seed returns a Bignum"
+  fails "Random.new uses a random seed value if none is supplied"
+  fails "Random#rand with Bignum typically returns a Bignum"
 end
