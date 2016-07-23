@@ -24,8 +24,8 @@ matrix:
     - rvm: 2.3.1
       env: RUN=mspec_ruby_nodejs TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
-    - rvm: 2.3.1
-      env: RUN=mspec_ruby_sprockets_phantomjs
+    # - rvm: 2.3.1
+    #   env: RUN=mspec_ruby_sprockets_phantomjs
 
     - rvm: 2.3.1
       env: RUN=minitest
