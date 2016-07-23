@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email        = 'adam.beynon@gmail.com'
   s.homepage     = 'http://opalrb.org'
   s.summary      = 'Ruby runtime and core library for JavaScript'
-  s.description  = 'Ruby runtime and core library for JavaScript.'
+  s.description  = %{Opal is a Ruby to JavaScript compiler. It is source-to-source, making it fast as a runtime. Opal includes a compiler (which can be run in any browser), a corelib and runtime implementation. The corelib/runtime is also very small.}
   s.license      = 'MIT'
 
   s.files         = `git ls-files`.split("\n")
