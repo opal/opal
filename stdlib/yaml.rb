@@ -1,1 +1,1 @@
-require 'nodejs/yaml' if defined? NodeJS
+warn "REMOVED: use `require 'nodejs/yaml'` instead"

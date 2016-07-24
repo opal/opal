@@ -61,6 +61,11 @@ Whitespace conventions:
     * `Number#positive?` (to return false for 0)
 
 
+### Removed
+
+- Removed `yaml` from stdlib, the older implementation was only available for NodeJS and not tested. Replace with `require 'nodejs/yaml'`
+
+
 ### Fixed
 
 - Newly compliant with the Ruby Spec Suite:
