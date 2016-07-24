@@ -14,7 +14,7 @@ module Opal
           true_body = s(:nil)
         end
 
-        node.updated(nil, [test, true_body, false_body])
+        node.updated(nil, process_all([test, true_body, false_body]))
       end
 
       def skip_check_present?(test)
