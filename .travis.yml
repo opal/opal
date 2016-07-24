@@ -74,6 +74,7 @@ before_install:
   - git submodule update --init
   - npm install -g jshint
   - npm install -g uglify-js
+  - type bundle || gem install bundler
 
 script:
   - "bundle exec rake $RUN"
