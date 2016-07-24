@@ -48,7 +48,7 @@ matrix:
     - rvm: rbx
       env: RUN=rspec
 
-    - rvm: jruby-9.0.5.0
+    - rvm: jruby-9.1.2.0
       env: RUN=rspec
 
     - rvm: jruby-head
