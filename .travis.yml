@@ -33,7 +33,13 @@ matrix:
     - rvm: 2.3.1
       env: RUN=rspec RACK_VERSION='~> 2.0.0' CHECK_COVERAGE=true
 
+    - rvm: 2.3.1
+      env: RUN=smoke_test
+
     - rvm: ruby-head
+      env: RUN=rspec
+
+    - rvm: 2.4.0-preview1
       env: RUN=rspec
 
     - rvm: 2.2.5
@@ -53,9 +59,6 @@ matrix:
 
     - rvm: jruby-head
       env: RUN=rspec
-
-    - rvm: 2.3.1
-      env: RUN=smoke_test
 
   allow_failures:
     - rvm: ruby-head
