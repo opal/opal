@@ -2,6 +2,13 @@ require 'lib/spec_helper'
 require 'support/match_helpers'
 
 describe Opal::Compiler do
+  describe 'regexp' do
+    it 'should escape regexp' do
+      expect_compiled("%r{^/{4,}$}").to include('/^\/{4,}$/')
+      expect_compiled('/\\\\"/').to include('/\\\\"/')
+    end
+  end
+
   describe 'requiring' do
     it 'calls #require' do
       expect_compiled("require 'pippo'").to include('self.$require("pippo")')
