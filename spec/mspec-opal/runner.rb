@@ -82,13 +82,6 @@ class Object
   end
 end
 
-module MSpec
-  def self.opal_runner
-    @env = Object.new
-    @env.extend MSpec
-  end
-end
-
 class OSpecFormatter
   def self.main
     @main ||= self.new
@@ -112,35 +105,18 @@ class OSpecFormatter
   end
 end
 
-class OSpecRunner
+class OpalBM
   def self.main
     @main ||= self.new
   end
 
-  def initialize
-    register
-    run
-  end
-
-  def register
-    OSpecFormatter.main.register
-    OSpecFilter.main.register
-  end
-
-  def run
-    MSpec.opal_runner
-  end
-
-  def will_start
-    MSpec.actions :start
-  end
-
-  def bm!(repeat, bm_filepath)
+  def register(repeat, bm_filepath)
     `self.bm = {}`
     `self.bm_filepath = bm_filepath`
     MSpec.repeat = repeat
     MSpec.register :before, self
     MSpec.register :after,  self
+    MSpec.register :finish, self
   end
 
   def before(state = nil)
@@ -159,7 +135,7 @@ class OSpecRunner
     }
   end
 
-  def did_finish
+  def finish
     %x{
       var obj = self.bm, key, val, report = '';
       if (obj) {
@@ -172,7 +148,6 @@ class OSpecRunner
         require('fs').writeFileSync(self.bm_filepath, report);
       }
     }
-    MSpec.actions :finish
   end
 end
 
@@ -191,3 +166,6 @@ module OutputSilencer
     end
   end
 end
+
+OSpecFormatter.main.register
+OSpecFilter.main.register
