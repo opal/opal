@@ -1,36 +1,5 @@
-require 'ast'
-require 'parser/ruby23'
+require 'opal/ast/builder'
 require 'opal/rewriter'
-
-::Parser::AST::Node.class_eval do
-  attr_reader :meta
-
-  alias_method :old_assign_properties, :assign_properties
-  def assign_properties(properties)
-    if meta = properties[:meta]
-      meta = meta.dup if meta.frozen?
-      @meta.merge!(meta)
-    else
-      @meta ||= {}
-    end
-
-    old_assign_properties(properties)
-  end
-
-  def line
-    loc.line if loc
-  end
-
-  def column
-    loc.column if loc
-  end
-end
-
-::Parser::Builders::Default.class_eval do
-  def string_value(token)
-    token[0]
-  end
-end
 
 if RUBY_ENGINE == 'opal'
   class << Parser::Source::Buffer
@@ -52,8 +21,15 @@ module Opal
         buffer = source
       end
 
+      diagnostics.all_errors_are_fatal = true
+      diagnostics.ignore_warnings      = true
+
       if RUBY_ENGINE == 'opal'
         diagnostics.consumer = ->(diag){}
+      else
+        diagnostics.consumer = lambda do |diagnostic|
+          $stderr.puts(diagnostic.render)
+        end
       end
 
       parsed = super(buffer)

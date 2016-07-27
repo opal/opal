@@ -1,14 +1,15 @@
 require 'parser'
+require 'opal/ast/node'
 
 module Opal
   module Rewriters
     class Base < ::Parser::AST::Processor
       def s(type, *children)
-        ::Parser::AST::Node.new(type, children)
+        ::Opal::AST::Node.new(type, children)
       end
 
       def self.s(type, *children)
-        ::Parser::AST::Node.new(type, children)
+        ::Opal::AST::Node.new(type, children)
       end
 
       alias on_iter process_regular_node

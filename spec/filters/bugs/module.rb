@@ -167,4 +167,8 @@ opal_filter "Module" do
   fails "Module#deprecate_constant returns self"
   fails "Module#deprecate_constant when accessing the deprecated module passes the accessing"
   fails "Module#deprecate_constant when accessing the deprecated module warns with a message"
+  fails "Module#class_eval resolves constants in the caller scope" # fails because of the difference between module_eval("Const") and module_eval { Const } (only the second one is supported by Opal)
+  fails "Module#class_eval resolves constants in the caller scope ignoring send"
+  fails "Module#module_eval resolves constants in the caller scope"
+  fails "Module#module_eval resolves constants in the caller scope ignoring send"
 end

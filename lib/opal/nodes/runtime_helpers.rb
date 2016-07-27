@@ -9,7 +9,7 @@ module Opal
       children :recvr, :meth, :arglist
 
       def self.s(type, *children)
-        ::Parser::AST::Node.new(type, children)
+        ::Opal::AST::Node.new(type, children)
       end
 
       def self.compatible?(recvr, meth, arglist)

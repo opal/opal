@@ -289,13 +289,7 @@ class Module
     raise NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
 
     %x{
-      var constant = Opal.const_get(self.$$scope, name, inherit);
-
-      if (constant != null) {
-        return constant;
-      } else {
-        return #{const_missing name};
-      }
+      return Opal.const_get([self.$$scope], name, inherit, true);
     }
   end
 
@@ -327,6 +321,9 @@ class Module
     `Opal.casgn(self, name, value)`
 
     value
+  end
+
+  def public_constant(const_name)
   end
 
   def define_method(name, method = undefined, &block)
@@ -656,6 +653,7 @@ class Module
   def dup
     copy = super
     copy.copy_class_variables(self)
+    copy.copy_constants(self)
     copy
   end
 
@@ -663,6 +661,18 @@ class Module
     %x{
       for (var name in other.$$cvars) {
         self.$$cvars[name] = other.$$cvars[name];
+      }
+    }
+  end
+
+  def copy_constants(other)
+    %x{
+      var other_constants = other.$$scope.constants,
+          length = other_constants.length;
+
+      for (var i = 0; i < length; i++) {
+        var name = other_constants[i];
+        Opal.casgn(self, name, other.$$scope[name]);
       }
     }
   end
