@@ -1010,55 +1010,63 @@
   };
 
   // Update `jsid` method cache of all classes / modules including `module`.
-  Opal.update_includers = function(module, jsid) {
-    var included_in = module.$$included_in,
-        body        = module.$$proto[jsid];
-
-    var i, length, includee, dest, current,
+  Opal.update_includer = function(module, includer, jsid) {
+    var dest, current, body,
         klass_includees, j, jj, current_owner_index, module_index;
+
+    body    = module.$$proto[jsid];
+    dest    = includer.$$proto;
+    current = dest[jsid];
+
+    if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
+      // target class has already defined the same method name - do nothing
+    }
+    else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
+      // target class includes another module that has defined this method
+      klass_includees = includer.$$inc;
+
+      for (j = 0, jj = klass_includees.length; j < jj; j++) {
+        if (klass_includees[j] === current.$$donated) {
+          current_owner_index = j;
+        }
+        if (klass_includees[j] === module) {
+          module_index = j;
+        }
+      }
+
+      // only redefine method on class if the module was included AFTER
+      // the module which defined the current method body. Also make sure
+      // a module can overwrite a method it defined before
+      if (current_owner_index <= module_index) {
+        dest[jsid] = body;
+        dest[jsid].$$donated = module;
+      }
+    }
+    else {
+      // neither a class, or module included by class, has defined method
+      dest[jsid] = body;
+      dest[jsid].$$donated = module;
+    }
+
+    // if the includer is a module, recursively update all of its includres.
+    if (includer.$$included_in) {
+      Opal.update_includers(includer, jsid);
+    }
+  };
+
+  // Update `jsid` method cache of all classes / modules including `module`.
+  Opal.update_includers = function(module, jsid) {
+    var i, ii, includee, included_in;
+
+    included_in = module.$$included_in;
 
     if (!included_in) {
       return;
     }
 
-    for (i = 0, length = included_in.length; i < length; i++) {
+    for (i = 0, ii = included_in.length; i < ii; i++) {
       includee = included_in[i];
-      dest = includee.$$proto;
-      current = dest[jsid];
-
-      if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
-        // target class has already defined the same method name - do nothing
-      }
-      else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
-        // target class includes another module that has defined this method
-        klass_includees = includee.$$inc;
-
-        for (j = 0, jj = klass_includees.length; j < jj; j++) {
-          if (klass_includees[j] === current.$$donated) {
-            current_owner_index = j;
-          }
-          if (klass_includees[j] === module) {
-            module_index = j;
-          }
-        }
-
-        // only redefine method on class if the module was included AFTER
-        // the module which defined the current method body. Also make sure
-        // a module can overwrite a method it defined before
-        if (current_owner_index <= module_index) {
-          dest[jsid] = body;
-          dest[jsid].$$donated = module;
-        }
-      }
-      else {
-        // neither a class, or module included by class, has defined method
-        dest[jsid] = body;
-        dest[jsid].$$donated = module;
-      }
-
-      if (includee.$$included_in) {
-        Opal.update_includers(includee, jsid);
-      }
+      Opal.update_includer(module, includee, jsid);
     }
   };
 
