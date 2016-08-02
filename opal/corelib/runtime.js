@@ -524,6 +524,9 @@
     // @property $$inc included modules
     module.$$inc = [];
 
+    // @property $$pre prepended modules
+    module.$$pre = [];
+
     // initialize the name with nil
     module.$$name = nil;
 
