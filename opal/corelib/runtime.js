@@ -1648,13 +1648,11 @@
       }
     }
 
-    if (obj.$__id__ && !obj.$__id__.$$stub) {
-      var bridged = bridges[obj.$__id__()];
-
-      if (bridged) {
-        for (var i = bridged.length - 1; i >= 0; i--) {
-          Opal.bridge_method(bridged[i], obj, jsid, body);
-        }
+    // is it a bridged class?
+    var bridged = obj.$__id__ && !obj.$__id__.$$stub && bridges[obj.$__id__()];
+    if (bridged) {
+      for (var i = bridged.length - 1; i >= 0; i--) {
+        Opal.bridge_method(bridged[i], obj, jsid, body);
       }
     }
 
