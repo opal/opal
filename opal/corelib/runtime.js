@@ -333,9 +333,9 @@
     // If we dynamically declare a constant in a module,
     // we should populate all the classes that include this module
     // with the same constant
-    if (base_module.$$is_module && base_module.$$dep) {
-      for (var i = 0; i < base_module.$$dep.length; i++) {
-        var dep = base_module.$$dep[i];
+    if (base_module.$$is_module && base_module.$$included_in) {
+      for (var i = 0; i < base_module.$$included_in.length; i++) {
+        var dep = base_module.$$included_in[i];
         Opal.casgn(dep, name, value);
       }
     }
@@ -648,7 +648,7 @@
     Opal.setup_module_or_class(module);
 
     // initialize dependency tracking
-    module.$$dep = [];
+    module.$$included_in = [];
 
     // Set the display name of the singleton prototype holder
     module_constructor.displayName = "#<Class:#<Module:"+module.$$id+">>"
@@ -901,7 +901,7 @@
     }
 
     klass.$$inc.push(module);
-    module.$$dep.push(klass);
+    module.$$included_in.push(klass);
     Opal._bridge(klass, module);
 
     // iclass
@@ -1011,7 +1011,7 @@
 
   // Donate methods for a module.
   Opal.donate = function(module, jsid) {
-    var included_in = module.$$dep,
+    var included_in = module.$$included_in,
         body        = module.$$proto[jsid];
 
     var i, length, includee, dest, current,
@@ -1056,7 +1056,7 @@
         dest[jsid].$$donated = module;
       }
 
-      if (includee.$$dep) {
+      if (includee.$$included_in) {
         Opal.donate(includee, jsid);
       }
     }
