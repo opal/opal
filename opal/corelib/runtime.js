@@ -1635,11 +1635,23 @@
   // @param body [JS.Function] the literal JavaScript function used as method
   // @return [null]
   //
+  Opal.def = function(obj, jsid, body) {
+    // if instance_eval is invoked on a module/class, it sets inst_eval_mod
+    if (!obj.$$eval && (obj.$$is_class || obj.$$is_module)) {
+      Opal.defn(obj, jsid, body);
+    }
+    else {
+      Opal.defs(obj, jsid, body);
+    }
+  };
+
+  // Define method on a module or class (see Opal.def).
   Opal.defn = function(obj, jsid, body) {
     obj.$$proto[jsid] = body;
     // for super dispatcher, etc.
     body.$$owner = obj;
 
+    // is it a module?
     if (obj.$$is_module) {
       Opal.donate(obj, jsid);
 
@@ -1656,6 +1668,7 @@
       }
     }
 
+    // method_added/singleton_method_added hooks
     var singleton_of = obj.$$singleton_of;
     if (obj.$method_added && !obj.$method_added.$$stub && !singleton_of) {
       obj.$method_added(jsid.substr(1));
@@ -1667,19 +1680,9 @@
     return nil;
   };
 
-  // Define a singleton method on the given object.
+  // Define a singleton method on the given object (see Opal.def).
   Opal.defs = function(obj, jsid, body) {
     Opal.defn(Opal.get_singleton_class(obj), jsid, body)
-  };
-
-  Opal.def = function(obj, jsid, body) {
-    // if instance_eval is invoked on a module/class, it sets inst_eval_mod
-    if (!obj.$$eval && (obj.$$is_class || obj.$$is_module)) {
-      Opal.defn(obj, jsid, body);
-    }
-    else {
-      Opal.defs(obj, jsid, body);
-    }
   };
 
   // Called from #remove_method.
