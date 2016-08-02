@@ -1009,8 +1009,8 @@
     }
   };
 
-  // Donate methods for a module.
-  Opal.donate = function(module, jsid) {
+  // Update `jsid` method cache of all classes / modules including `module`.
+  Opal.update_includers = function(module, jsid) {
     var included_in = module.$$included_in,
         body        = module.$$proto[jsid];
 
@@ -1057,7 +1057,7 @@
       }
 
       if (includee.$$included_in) {
-        Opal.donate(includee, jsid);
+        Opal.update_includers(includee, jsid);
       }
     }
   };
@@ -1652,7 +1652,7 @@
 
     // is it a module?
     if (obj.$$is_module) {
-      Opal.donate(obj, jsid);
+      Opal.update_includers(obj, jsid);
 
       if (obj.$$module_function) {
         Opal.defs(obj, jsid, body);
