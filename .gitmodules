@@ -1,4 +1,4 @@
-[submodule "spec/rubyspec"]
+[submodule "spec/ruby"]
 	path = spec/ruby
 	url = https://github.com/ruby/spec.git
 [submodule "test/cruby"]
