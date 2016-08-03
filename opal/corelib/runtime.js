@@ -915,24 +915,10 @@
 
     klass.$$parent = iclass;
 
-    donator   = module.$$proto;
-    prototype = klass.$$proto;
-    methods   = module.$instance_methods();
+    methods = module.$instance_methods();
 
     for (i = methods.length - 1; i >= 0; i--) {
-      id = '$' + methods[i];
-
-      // if the target class already has a method of the same name defined
-      // and that method was NOT donated, then it must be a method defined
-      // by the class so we do not want to override it
-      if ( prototype.hasOwnProperty(id) &&
-          !prototype[id].$$donated &&
-          !prototype[id].$$stub) {
-        continue;
-      }
-
-      prototype[id] = donator[id];
-      prototype[id].$$donated = module;
+      Opal.update_includer(module, klass, '$' + methods[i])
     }
 
     Opal.donate_constants(module, klass);
