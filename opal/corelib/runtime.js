@@ -1070,8 +1070,39 @@
     }
   };
 
+  Opal.find_method_body = function(module_or_class, jsid) {
+    var chain, owner, body, i, ii;
+
+    chain = module_or_class.$$pre.concat([module_or_class]).concat(module_or_class.$$inc);
+
+    var bridged = module_or_class.$__id__ && !module_or_class.$__id__.$$stub && bridges[module_or_class.$__id__()];
+    if (bridged) {
+      chain = chain.concat(module_or_class.$$super);
+    }
+
+    for (i = 0, ii = chain.length; i < ii; i++) {
+      owner = chain[i]; // reverse order
+      body = owner === module_or_class ? owner.$$methods[jsid] : owner.$$proto[jsid];
+      if (body) {
+        return body;
+      }
+    };
+    return null;
+  };
+
   // Update `jsid` method cache of all classes / modules including `module`.
   Opal.update_includer = function(module, includer, jsid) {
+    // var dest    = includer.$$proto;
+    var found_body = Opal.find_method_body(includer, jsid);
+
+    // if (found_body) {
+    //   dest[jsid] = found_body;
+    //   dest[jsid].$$donated = module;
+    // }
+    // else {
+    //   delete dest[jsid];
+    // }
+
     var dest, current, body,
         klass_includees, j, jj, current_owner_index, module_index;
 
@@ -1081,6 +1112,9 @@
 
     if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
       // target class has already defined the same method name - do nothing
+      if (current !== found_body && found_body != null) {
+        console.log('DELTA1', includer.$$name, jsid);
+      }
     }
     else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
       // target class includes another module that has defined this method
@@ -1101,12 +1135,23 @@
       if (current_owner_index <= module_index) {
         dest[jsid] = body;
         dest[jsid].$$donated = module;
+        if (body !== found_body) {
+          console.log('DELTA2', includer.$$name, jsid);
+        }
+      }
+      else {
+        if (current !== found_body && found_body != null) {
+          console.log('DELTA3', includer.$$name, jsid);
+        }
       }
     }
     else {
       // neither a class, or module included by class, has defined method
       dest[jsid] = body;
       dest[jsid].$$donated = module;
+      if (body !== found_body) {
+        console.log('DELTA2', includer.$$name, jsid);
+      }
     }
 
     // if the includer is a module, recursively update all of its includres.
@@ -1722,6 +1767,10 @@
     // for super dispatcher, etc.
     body.$$owner = obj;
 
+    if (Opal.find_method_body(obj, jsid) !== body) {
+      console.log('DELTA-defn1', obj.$$name, jsid);
+    }
+
     // is it a module?
     if (obj.$$is_module) {
       Opal.update_includers(obj, jsid);
@@ -2314,7 +2363,7 @@
 
   // Make Kernel#require immediately available as it's needed to require all the
   // other corelib files.
-  _Object.$$proto.$require = Opal.require;
+  _Object.$$methods.$require = _Object.$$proto.$require = Opal.require;
 
   // Instantiate the top object
   Opal.top = new _Object.$$alloc();
