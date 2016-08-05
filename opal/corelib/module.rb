@@ -98,8 +98,8 @@ class Module
     `Opal.ancestors(self)`
   end
 
-  def append_features(klass)
-    `Opal.append_features(self, klass)`
+  def append_features(includer)
+    `Opal.append_features(self, includer)`
     self
   end
 
