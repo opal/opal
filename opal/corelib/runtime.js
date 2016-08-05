@@ -978,7 +978,6 @@
     module.$$included_in.push(includer);
     Opal.bridge_methods(includer, module);
 
-    // iclass
     iclass = {
       $$name:   module.$$name,
       $$proto:  module.$$proto,
@@ -1071,17 +1070,22 @@
   };
 
   Opal.find_method_body = function(module_or_class, jsid) {
+    // If no modules are included/prepended just return the base if the method is there
+    if (!module_or_class.$$inc && !module_or_class.$$pre) {
+      return module_or_class[jsid] ? module_or_class : null;
+    }
+
     var chain, owner, body, i, ii;
 
-    chain = module_or_class.$$pre.concat([module_or_class]).concat(module_or_class.$$inc);
+    chain = module_or_class.$$inc.concat([module_or_class]).concat(module_or_class.$$pre);
 
     var bridged = module_or_class.$__id__ && !module_or_class.$__id__.$$stub && bridges[module_or_class.$__id__()];
     if (bridged) {
-      chain = chain.concat(module_or_class.$$super);
+      chain = [module_or_class.$$super].concat(chain);
     }
 
     for (i = 0, ii = chain.length; i < ii; i++) {
-      owner = chain[i]; // reverse order
+      owner = chain[ii - (i+1)]; // reverse order
       body = owner === module_or_class ? owner.$$methods[jsid] : owner.$$proto[jsid];
       if (body) {
         return body;
@@ -1136,12 +1140,12 @@
         dest[jsid] = body;
         dest[jsid].$$donated = module;
         if (body !== found_body) {
-          console.log('DELTA2', includer.$$name, jsid);
+          console.log('DELTA2', includer.$$name, jsid, 'current:', body.$$owner.$$name, 'found:', found_body.$$owner.$$name);
         }
       }
       else {
         if (current !== found_body && found_body != null) {
-          console.log('DELTA3', includer.$$name, jsid);
+          console.log('DELTA3', includer.$$name, jsid, 'current:', current.$$owner.$$name, 'found:', found_body.$$owner.$$name);
         }
       }
     }
@@ -1153,6 +1157,15 @@
         console.log('DELTA2', includer.$$name, jsid);
       }
     }
+
+    if (found_body) {
+      dest[jsid] = found_body;
+      dest[jsid].$$donated = module;
+    }
+    else {
+      delete dest[jsid];
+    }
+
 
     // if the includer is a module, recursively update all of its includres.
     if (includer.$$included_in) {
@@ -1759,8 +1772,6 @@
 
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(obj, jsid, body) {
-    obj.$$proto[jsid] = body;
-
     // add it to the bag of methods
     obj.$$methods[jsid] = body;
 
@@ -1770,6 +1781,8 @@
     if (Opal.find_method_body(obj, jsid) !== body) {
       console.log('DELTA-defn1', obj.$$name, jsid);
     }
+    // Update the cached method body
+    obj.$$proto[jsid] = Opal.find_method_body(obj, jsid);
 
     // is it a module?
     if (obj.$$is_module) {
