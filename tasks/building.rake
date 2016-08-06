@@ -12,16 +12,14 @@ Example: rake dist DIR=cdn/opal/master
 DESC
 task :dist do
   require 'opal/util'
-  require 'opal/sprockets/environment'
+  require 'opal/config'
 
   Opal::Config.arity_check_enabled = false
   Opal::Config.const_missing_enabled = false
   Opal::Config.dynamic_require_severity = :warning
-  env = Opal::Environment.new
 
   # Hike gem is required to build opal-builder
-  # Without this linen the build throws an exception: "Sprockets::FileNotFound: couldn't find file 'hike' with type 'application/javascript'"
-  env.use_gem 'hike'
+  Opal.use_gem 'hike'
 
   build_dir = ENV['DIR'] || 'build'
   files     = ENV['FILES'] ? ENV['FILES'].split(',') :
@@ -34,7 +32,7 @@ task :dist do
     print "* building #{lib}...".ljust(width+'* building ... '.size)
     $stdout.flush
 
-    src = env[lib].to_s
+    src = Opal::Builder.build(lib).to_s
     min = Opal::Util.uglify src
     gzp = Opal::Util.gzip min
 

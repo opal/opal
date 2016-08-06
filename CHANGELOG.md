@@ -61,9 +61,15 @@ Whitespace conventions:
     * `Number#positive?` (to return false for 0)
 
 
+### Deprecated
+
+- `require 'opal/server` and `Opal::Server` are deprecated in favor of `require 'opal/sprockets/server'` and `Opal::Sprockets::Server` (now part of the opal-sprockets gem).
+
+
 ### Removed
 
 - Removed `yaml` from stdlib, the older implementation was only available for NodeJS and not tested. Replace with `require 'nodejs/yaml'`
+- Extracted sprockets support to `opal-sprockets` which should allow for wider support and less coupling (e.g. the `opal` gem will now be able to improve the compiler without worrying about `sprockets` updates). All the old behavior is preserved except for `Opal::Server` that has become `Opal::Sprockets::Server` (see Deprecated section above).
 
 
 ### Fixed
