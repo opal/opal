@@ -79,7 +79,6 @@ opal_filter "Module" do
   fails "Module#extend_object extends the given object with its constants and methods by default"
   fails "Module#extend_object is called when #extend is called on an object"
   fails "Module#extend_object on Class raises a TypeError if calling after rebinded to Class"
-  fails "Module#include detects cyclic includes"
   fails "Module#include does not override existing constants in modules and classes"
   fails "Module#include doesn't include module if it is included in a super class"
   fails "Module#include recursively includes new mixins"
