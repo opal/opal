@@ -1013,6 +1013,10 @@
       }
     }
 
+    if ( Opal.has_cyclic_dep(prepender.$$id, [module], '$$pre', {}) ) {
+      throw Opal.ArgumentError.$new('cyclic prepend detected')
+    }
+
     prepender.$$pre.push(module);
     module.$$prepended_to.push(prepender);
     Opal._bridge(prepender, module);

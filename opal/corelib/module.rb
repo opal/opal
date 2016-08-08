@@ -622,10 +622,6 @@ class Module
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
-        if (mod === self) {
-          continue;
-        }
-
         if (!mod.$$is_module) {
           #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
