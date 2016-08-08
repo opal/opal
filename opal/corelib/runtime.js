@@ -1135,67 +1135,8 @@
 
   // Update `jsid` method cache of all classes / modules including `module`.
   Opal.update_method_cache = function(module, includer, jsid) {
-    // var dest    = includer.$$proto;
+    var dest    = includer.$$proto;
     var found_body = Opal.find_method_body(includer, jsid);
-
-    // if (found_body) {
-    //   dest[jsid] = found_body;
-    //   dest[jsid].$$donated = module;
-    // }
-    // else {
-    //   delete dest[jsid];
-    // }
-
-    var dest, current, body,
-        klass_includees, j, jj, current_owner_index, module_index;
-
-    body    = module.$$proto[jsid];
-    dest    = includer.$$proto;
-    current = dest[jsid];
-
-    if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
-      // target class has already defined the same method name - do nothing
-      if (current !== found_body && found_body != null) {
-        console.log('DELTA1', includer.$$name, jsid);
-      }
-    }
-    else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
-      // target class includes another module that has defined this method
-      klass_includees = includer.$$inc;
-
-      for (j = 0, jj = klass_includees.length; j < jj; j++) {
-        if (klass_includees[j] === current.$$donated) {
-          current_owner_index = j;
-        }
-        if (klass_includees[j] === module) {
-          module_index = j;
-        }
-      }
-
-      // only redefine method on class if the module was included AFTER
-      // the module which defined the current method body. Also make sure
-      // a module can overwrite a method it defined before
-      if (current_owner_index <= module_index) {
-        dest[jsid] = body;
-        dest[jsid].$$donated = module;
-        if (body !== found_body) {
-          console.log('DELTA2', includer.$$name, jsid, 'current:', body.$$owner.$$name, 'found:', found_body.$$owner.$$name);
-        }
-      }
-      else {
-        if (current !== found_body && found_body != null) {
-          console.log('DELTA3', includer.$$name, jsid, 'current:', current.$$owner.$$name, 'found:', found_body.$$owner.$$name);
-        }
-      }
-    }
-    else {
-      // neither a class, or module included by class, has defined method
-      dest[jsid] = body;
-      dest[jsid].$$donated = module;
-      if (body !== found_body) {
-        console.log('DELTA2', includer.$$name, jsid);
-      }
-    }
 
     if (found_body) {
       dest[jsid] = found_body;
@@ -1205,8 +1146,7 @@
       delete dest[jsid];
     }
 
-
-    // if the includer is a module, recursively update all of its includres.
+    // if the includer is a module, recursively update all of its includers.
     if (includer.$$included_in) {
       Opal.update_method_caches(includer, jsid);
     }
