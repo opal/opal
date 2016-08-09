@@ -25,6 +25,7 @@ end
 unless ENV['CI']
   gem 'rb-fsevent'
   gem 'guard', require: false
+  gem 'therubyracer', require: false
 
   if RUBY_PLATFORM =~ /darwin/
     gem 'terminal-notifier-guard'
