@@ -120,7 +120,6 @@ opal_filter "Module" do
   fails "Module#prepend allows wrapping methods"
   fails "Module#prepend also prepends included modules"
   fails "Module#prepend does not interfere with a define_method super in the original class"
-  fails "Module#prepend includes prepended modules in ancestors"
   fails "Module#prepend inserts a later prepended module into the chain"
   fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
   fails "Module#prepend keeps the module in the chain when dupping the class"

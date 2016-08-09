@@ -1176,15 +1176,34 @@
   Opal.ancestors = function(module_or_class) {
     var parent = module_or_class,
         result = [],
-        modules;
+        seen   = {},
+        modules, module, i, ii, j, jj;
 
     while (parent) {
-      result.push(parent);
-      for (var i=0; i < parent.$$inc.length; i++) {
-        modules = Opal.ancestors(parent.$$inc[i]);
 
-        for(var j = 0; j < modules.length; j++) {
-          result.push(modules[j]);
+      for (i = 0, ii = parent.$$pre.length; i < ii; i++) {
+        modules = Opal.ancestors(parent.$$pre[i]);
+
+        for(j = 0, jj = modules.length; j < jj; j++) {
+          module = modules[j];
+          if (!seen[module.$$id]) {
+            result.push(module);
+            seen[module.$$id] = true;
+          }
+        }
+      }
+
+      result.push(parent);
+
+      for (i = 1, ii = parent.$$inc.length; i <= ii; i++) {
+        modules = Opal.ancestors(parent.$$inc[ii - i]);
+
+        for(j = 0, jj = modules.length; j < jj; j++) {
+          module = modules[j];
+          if (!seen[module.$$id]) {
+            result.push(module);
+            seen[module.$$id] = true;
+          }
         }
       }
 
@@ -1200,7 +1219,6 @@
 
     return result;
   };
-
 
   // Method Missing
   // --------------
