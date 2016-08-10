@@ -94,27 +94,36 @@ module Opal
     def build
       builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options
       builder.append_paths(*load_paths)
+
+      # --gem
       gems.each { |gem_name| builder.use_gem gem_name }
 
+      # --no-opal
       builder.build 'opal' unless skip_opal_require?
 
-      preload.each { |path| builder.build_require(path) }
-
-      # FLAGS
-      builder.build_str '$VERBOSE = true', '(flags)' if verbose
-      builder.build_str '$DEBUG = true', '(flags)' if debug
-
-      # REQUIRES: -r
+      # --require
       requires.each do |local_require|
         builder.build(local_require)
       end
 
+      # --preload
+      preload.each { |path| builder.build_require(path) }
+
+      # --verbose
+      builder.build_str '$VERBOSE = true', '(flags)' if verbose
+
+      # --debug
+      builder.build_str '$DEBUG = true', '(flags)' if debug
+
+      # --library
       unless lib_only
+        # --eval
         evals_or_file do |contents, filename|
           builder.build_str(contents, filename)
         end
       end
 
+      # --no-exit
       builder.build_str 'Kernel.exit', '(exit)' unless no_exit
 
       builder
