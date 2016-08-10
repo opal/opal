@@ -228,14 +228,14 @@ module Opal
           @parent.uses_block!
         else
           @uses_block = true
-          identify!
+          identify!(:block)
         end
       end
 
-      def identify!
+      def identify!(name = nil)
         return @identity if @identity
 
-        @identity = @compiler.unique_temp
+        @identity = @compiler.unique_temp(name)
         @parent.add_scope_temp @identity if @parent
 
         @identity
@@ -261,11 +261,11 @@ module Opal
 
         while scope
           if scope.type == :iter
-            chain << scope.identify!
+            chain << scope.identify!(:iter)
             scope = scope.parent if scope.parent
 
           elsif [:def, :defs].include?(scope.type)
-            defn = scope.identify!
+            defn = scope.identify!(scope.mid)
             mid  = "'#{scope.mid}'"
             break
           else

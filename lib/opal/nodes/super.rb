@@ -67,7 +67,7 @@ module Opal
       def super_method_invocation
         def_scope = containing_def_scope
         method_jsid = def_scope.mid.to_s
-        current_func = def_scope.identify!
+        current_func = def_scope.identify!(def_scope.mid)
 
         if def_scope.defs
           class_name = def_scope.parent.name ? "$#{def_scope.parent.name}" : 'self.$$class.$$proto'
