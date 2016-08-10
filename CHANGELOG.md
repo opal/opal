@@ -59,6 +59,7 @@ Whitespace conventions:
     * `Enumerable#chunk` (to take only a a block)
     * `Enumerable#slice_before` (to raise proper argument errors)
     * `Number#positive?` (to return false for 0)
+- Use meaningful names for temporary variables in compiled JavaScript (e.g. for `def foo` was `TMP_123`, now `TMP_foo_123`)
 
 
 ### Deprecated
@@ -94,8 +95,9 @@ Whitespace conventions:
     * Compile complex ranges to "Range.new" so there will be a check for begin and end to be comparable.
 
 - Fixed `defined?` for methods raising exceptions
-- Fixed `Kernel#loop` (to catch StopIteration error)
+- Fixed `Kernel#loop` (to catch `StopIteration` error)
 - Fixed inheritance from the `Module` class.
+- Fixed using `--preload` along with `--no-opal` for CLI
 
 
 
