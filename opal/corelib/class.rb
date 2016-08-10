@@ -57,7 +57,7 @@ class Class
       }
       else if (singleton_of) {
         // a singleton class created from an object
-        return #{"#<Class:#<#{`singleton_of.$$class`.name}:0x#{`singleton_of.$$id`.to_s(16)}>>"};
+        return #{"#<Class:#<#{`singleton_of.$$class`.name}:0x#{`Opal.id(singleton_of)`.to_s(16)}>>"};
       }
       return #{super()};
     }

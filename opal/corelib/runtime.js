@@ -92,6 +92,11 @@
     return unique_id;
   };
 
+  // Retrieve or assign the id of an object
+  Opal.id = function(obj) {
+    return obj.$$id || (obj.$$id = Opal.uid());
+  };
+
   // Table holds all class variables
   Opal.cvars = {};
 
