@@ -1,3 +1,5 @@
+require 'mspec-opal/formatters'
+
 class OSpecFilter
   def self.main
     @main ||= self.new
