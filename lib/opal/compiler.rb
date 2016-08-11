@@ -226,8 +226,19 @@ module Opal
 
     # Used to generate a unique id name per file. These are used
     # mainly to name method bodies for methods that use blocks.
-    def unique_temp
-      "TMP_#{@unique += 1}"
+    def unique_temp(name)
+      name = name.to_s
+      if name && !name.empty?
+        name = "_#{name}"
+          .gsub('?', '$q')
+          .gsub('!', '$B')
+          .gsub('=', '$eq')
+          .gsub('<', '$lt')
+          .gsub('>', '$gt')
+          .gsub(/[^\w\$]/, '$')
+      end
+      unique = (@unique += 1)
+      "TMP#{name}_#{unique}"
     end
 
     # Use the given helper

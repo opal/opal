@@ -232,10 +232,12 @@ module Opal
         end
       end
 
-      def identify!
+      def identify!(name = nil)
         return @identity if @identity
 
-        @identity = @compiler.unique_temp
+        # Parent scope is the defining module/class
+        name ||= [(parent && (parent.name || parent.scope_name)), self.mid].compact.join('_')
+        @identity = @compiler.unique_temp(name)
         @parent.add_scope_temp @identity if @parent
 
         @identity

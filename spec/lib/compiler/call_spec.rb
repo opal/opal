@@ -16,13 +16,13 @@ describe Opal::Compiler do
 
     context 'outside block' do
       context 'method missing on' do
-        it { is_expected.to include "return (!(Opal.find_super_dispatcher(self, 'some_method', TMP_1, true).$$stub) ? \"super\" : nil)" }
+        it { is_expected.to include "return (!(Opal.find_super_dispatcher(self, 'some_method', TMP_some_method_1, true).$$stub) ? \"super\" : nil)" }
       end
 
       context 'method missing off' do
         let(:compiler) { Opal::Compiler.new(method, method_missing: false) }
 
-        it { is_expected.to include "return ((Opal.find_super_dispatcher(self, 'some_method', TMP_1, true)) != null ? \"super\" : nil)" }
+        it { is_expected.to include "return ((Opal.find_super_dispatcher(self, 'some_method', TMP_some_method_1, true)) != null ? \"super\" : nil)" }
       end
     end
 
@@ -223,14 +223,14 @@ if (a == null) a = nil;
             context 'no arguments' do
               let(:invocation) { 'super()' }
 
-              it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $a.$$p = null, $a).call($b)" }
+              it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $a.$$p = null, $a).call($b)" }
             end
 
             context 'implicit arguments' do
               let(:invocation) { 'super' }
 
               context 'no block' do
-                it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $a.$$p = $iter, $a).apply($b, $zuper)" }
+                it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $a.$$p = $iter, $a).apply($b, $zuper)" }
               end
 
               context 'block' do
@@ -244,7 +244,7 @@ if (a == null) a = nil;
                   CODE
                 end
 
-                it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $a.$$p = $iter, $a).apply($b, $zuper)" }
+                it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $a.$$p = $iter, $a).apply($b, $zuper)" }
               end
             end
           end
@@ -268,7 +268,7 @@ if (a == null) a = nil;
 
                     it do
                       is_expected.to include <<-CODE
-    return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = (TMP_2 = function(a){var self = TMP_2.$$s || this;
+    return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = (TMP_2 = function(a){var self = TMP_2.$$s || this;
 if (a == null) a = nil;
       return self.$foobar()}, TMP_2.$$s = self, TMP_2.$$arity = 1, TMP_2), $b).apply($c, Opal.to_a(stuff))
                       CODE
@@ -278,7 +278,7 @@ if (a == null) a = nil;
                   context 'via reference' do
                     let(:invocation) { 'super *stuff, &block2' }
 
-                    it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = block2.$to_proc(), $b).apply($c, Opal.to_a(stuff))" }
+                    it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = block2.$to_proc(), $b).apply($c, Opal.to_a(stuff))" }
                   end
                 end
               end
@@ -290,7 +290,7 @@ if (a == null) a = nil;
 
                     it do
                       is_expected.to include <<-CODE
-    return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = (TMP_2 = function(a){var self = TMP_2.$$s || this;
+    return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = (TMP_2 = function(a){var self = TMP_2.$$s || this;
 if (a == null) a = nil;
       return self.$foobar()}, TMP_2.$$s = self, TMP_2.$$arity = 1, TMP_2), $b).apply($c, $zuper)
                       CODE
@@ -300,7 +300,7 @@ if (a == null) a = nil;
                   context 'via reference' do
                     let(:invocation) { 'super &block2' }
 
-                    it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = block2.$to_proc(), $b).call($c)" }
+                    it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = block2.$to_proc(), $b).call($c)" }
                   end
                 end
               end
@@ -308,7 +308,7 @@ if (a == null) a = nil;
               context 'no arguments' do
                 let(:invocation) { 'super()' }
 
-                it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = null, $b).call($c)" }
+                it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = null, $b).call($c)" }
               end
             end
 
@@ -330,7 +330,7 @@ if (a == null) a = nil;
 
                     it do
                       is_expected.to include <<-CODE
-      return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = (TMP_2 = function(a){var self = TMP_2.$$s || this;
+      return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = (TMP_2 = function(a){var self = TMP_2.$$s || this;
 if (a == null) a = nil;
       return self.$foobar()}, TMP_2.$$s = self, TMP_2.$$arity = 1, TMP_2), $b).apply($c, Opal.to_a(stuff))
                       CODE
@@ -340,7 +340,7 @@ if (a == null) a = nil;
                   context 'via reference' do
                     let(:invocation) { 'super *stuff, &block2' }
 
-                    it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = self.$block2().$to_proc(), $b).apply($c, Opal.to_a(stuff))" }
+                    it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = self.$block2().$to_proc(), $b).apply($c, Opal.to_a(stuff))" }
                   end
                 end
               end
@@ -352,7 +352,7 @@ if (a == null) a = nil;
 
                     it do
                       is_expected.to include <<-CODE
-      return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = (TMP_2 = function(a){var self = TMP_2.$$s || this;
+      return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = (TMP_2 = function(a){var self = TMP_2.$$s || this;
 if (a == null) a = nil;
       return self.$foobar()}, TMP_2.$$s = self, TMP_2.$$arity = 1, TMP_2), $b).apply($c, $zuper)
       CODE
@@ -362,7 +362,7 @@ if (a == null) a = nil;
                   context 'via reference' do
                     let(:invocation) { 'super &block2' }
 
-                    it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = self.$block2().$to_proc(), $b).call($c)" }
+                    it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = self.$block2().$to_proc(), $b).call($c)" }
                   end
                 end
               end
@@ -370,7 +370,7 @@ if (a == null) a = nil;
               context 'no arguments' do
                 let(:invocation) { 'super()' }
 
-                it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false)), $b.$$p = null, $b).call($c)" }
+                it { is_expected.to include "return ($b = ($c = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false)), $b.$$p = null, $b).call($c)" }
               end
             end
           end
@@ -390,14 +390,14 @@ if (a == null) a = nil;
           context 'no splat' do
             let(:invocation) { 'super(42)' }
 
-            it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_1, false)), $a.$$p = null, $a).call($b, 42)" }
+            it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_Foobar_regular_method_1, false)), $a.$$p = null, $a).call($b, 42)" }
           end
 
           context 'splat' do
             context 'with no block' do
               let(:invocation) { "args=[1,2,3]\nsuper(*args)" }
 
-              it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_1, false)), $a.$$p = null, $a).apply($b, Opal.to_a(args))" }
+              it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_Foobar_regular_method_1, false)), $a.$$p = null, $a).apply($b, Opal.to_a(args))" }
             end
 
             context 'with block' do
@@ -406,7 +406,7 @@ if (a == null) a = nil;
 
                 it do
                   is_expected.to include <<-CODE
-      return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_1, false)), $a.$$p = (TMP_2 = function(b){var self = TMP_2.$$s || this;
+      return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_Foobar_regular_method_1, false)), $a.$$p = (TMP_2 = function(b){var self = TMP_2.$$s || this;
 if (b == null) b = nil;
       return self.$foobar()}, TMP_2.$$s = self, TMP_2.$$arity = 1, TMP_2), $a).apply($b, Opal.to_a(self.$args()))
                   CODE
@@ -416,7 +416,7 @@ if (b == null) b = nil;
               context 'via reference' do
                 let(:invocation) { 'super(*args, &block2)' }
 
-                it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_1, false)), $a.$$p = self.$block2().$to_proc(), $a).apply($b, Opal.to_a(self.$args()))" }
+                it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_Foobar_regular_method_1, false)), $a.$$p = self.$block2().$to_proc(), $a).apply($b, Opal.to_a(self.$args()))" }
               end
             end
           end
@@ -427,7 +427,7 @@ if (b == null) b = nil;
 
               it do
                 is_expected.to include <<-CODE
-      return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_1, false)), $a.$$p = (TMP_2 = function(b){var self = TMP_2.$$s || this;
+      return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_Foobar_regular_method_1, false)), $a.$$p = (TMP_2 = function(b){var self = TMP_2.$$s || this;
 if (b == null) b = nil;
       return self.$foobar()}, TMP_2.$$s = self, TMP_2.$$arity = 1, TMP_2), $a).apply($b, $zuper)
                 CODE
@@ -437,14 +437,14 @@ if (b == null) b = nil;
             context 'via reference' do
               let(:invocation) { 'super(&block)' }
 
-              it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_1, false)), $a.$$p = self.$block().$to_proc(), $a).call($b)" }
+              it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_Foobar_regular_method_1, false)), $a.$$p = self.$block().$to_proc(), $a).call($b)" }
             end
           end
 
           context 'no arguments' do
             let(:invocation) { 'super()' }
 
-            it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_1, false)), $a.$$p = null, $a).call($b)" }
+            it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'regular_method', TMP_Foobar_regular_method_1, false)), $a.$$p = null, $a).call($b)" }
           end
         end
       end
@@ -465,7 +465,7 @@ if (b == null) b = nil;
             CODE
           end
 
-          it { is_expected.to include "return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, 'in_method', (TMP_1.$$def || TMP_2), false, true)), $c.$$p = $iter, $c).apply($d, $zuper)}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1), $a).call($b)" }
+          it { is_expected.to include "return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, 'in_method', (TMP_1.$$def || TMP_in_method_2), false, true)), $c.$$p = $iter, $c).apply($d, $zuper)}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1), $a).call($b)" }
         end
 
         context 'not first node' do
@@ -480,7 +480,7 @@ if (b == null) b = nil;
             CODE
           end
 
-          it { is_expected.to include "Opal.ret(($c = ($d = self, Opal.find_iter_super_dispatcher(self, 'foo', (TMP_1.$$def || TMP_2), false, true)), $c.$$p = $iter, $c).apply($d, $zuper))}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1), $a).call($b)" }
+          it { is_expected.to include "Opal.ret(($c = ($d = self, Opal.find_iter_super_dispatcher(self, 'foo', (TMP_1.$$def || TMP_Foo_foo_2), false, true)), $c.$$p = $iter, $c).apply($d, $zuper))}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1), $a).call($b)" }
         end
 
         context 'right method is called, IS THIS A NEW CASE??' do
@@ -505,7 +505,7 @@ if (b == null) b = nil;
           end
 
           # runtime if (current_func.$$def) code should take care of locating the correct method here
-          it { is_expected.to include "return ($d = ($e = self, Opal.find_iter_super_dispatcher(self, 'setup', (TMP_3.$$def || TMP_4), false, false)), $d.$$p = null, $d).apply($e, Opal.to_a(args))}, TMP_3.$$s = self, TMP_3.$$arity = -1, TMP_3), $a).call($b, \"m\")" }
+          it { is_expected.to include "return ($d = ($e = self, Opal.find_iter_super_dispatcher(self, 'setup', (TMP_3.$$def || TMP_Foo_setup_4), false, false)), $d.$$p = null, $d).apply($e, Opal.to_a(args))}, TMP_3.$$s = self, TMP_3.$$arity = -1, TMP_3), $a).call($b, \"m\")" }
         end
       end
 
@@ -521,7 +521,7 @@ if (b == null) b = nil;
         context 'implicit' do
           let(:invocation) { 'define_method(:wilma) { super }' }
 
-          it { is_expected.to include "return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, null, (TMP_1.$$def || null), false, true)), $c.$$p = $iter, $c).apply($d)}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1), $a).call($b, \"wilma\")" }
+          it { is_expected.to include "return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, null, (TMP_Foobar_1.$$def || null), false, true)), $c.$$p = $iter, $c).apply($d)}, TMP_Foobar_1.$$s = self, TMP_Foobar_1.$$arity = 0, TMP_Foobar_1), $a).call($b, \"wilma\")" }
         end
 
         context 'module' do
@@ -535,9 +535,9 @@ if (b == null) b = nil;
 
           it do
             is_expected.to include <<-CODE
-    ($a = ($b = self).$define_method, $a.$$p = (TMP_1 = function(){var self = TMP_1.$$s || this, $c, $d;
+    ($a = ($b = self).$define_method, $a.$$p = (TMP_Foobar_1 = function(){var self = TMP_Foobar_1.$$s || this, $c, $d;
 
-    return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, null, (TMP_1.$$def || null), false, false)), $c.$$p = null, $c).call($d)}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1), $a).call($b, "wilma")
+    return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, null, (TMP_Foobar_1.$$def || null), false, false)), $c.$$p = null, $c).call($d)}, TMP_Foobar_1.$$s = self, TMP_Foobar_1.$$arity = 0, TMP_Foobar_1), $a).call($b, "wilma")
             CODE
           end
         end
@@ -645,8 +645,8 @@ if (b == null) b = nil;
             CODE
           end
 
-          it { is_expected.to include "return ($f = ($g = self, Opal.find_iter_super_dispatcher(self, 'foo', (TMP_4.$$def || TMP_3.$$def || TMP_5), false, false)), $f.$$p = block2.$to_proc(), $f).call($g, self.$some_arg())}, TMP_4.$$s = self, TMP_4.$$arity = 0, TMP_4), $d).call($e)}, TMP_3.$$s = self, TMP_3.$$arity = 0, TMP_3), $a).call($c, \"a\")" }
-          it { is_expected.to include "return ($g = ($h = self, Opal.find_iter_super_dispatcher(self, 'foo', (TMP_7.$$def || TMP_6.$$def || TMP_5), false, false)), $g.$$p = nil.$to_proc(), $g).call($h)}, TMP_7.$$s = self, TMP_7.$$arity = 0, TMP_7), $e).call($f)}, TMP_6.$$s = self, TMP_6.$$arity = 0, TMP_6), $a).call($d, \"a\")" }
+          it { is_expected.to include "return ($f = ($g = self, Opal.find_iter_super_dispatcher(self, 'foo', (TMP_4.$$def || TMP_3.$$def || TMP_Bar_foo_5), false, false)), $f.$$p = block2.$to_proc(), $f).call($g, self.$some_arg())}, TMP_4.$$s = self, TMP_4.$$arity = 0, TMP_4), $d).call($e)}, TMP_3.$$s = self, TMP_3.$$arity = 0, TMP_3), $a).call($c, \"a\")" }
+          it { is_expected.to include "return ($g = ($h = self, Opal.find_iter_super_dispatcher(self, 'foo', (TMP_7.$$def || TMP_6.$$def || TMP_Bar_foo_5), false, false)), $g.$$p = nil.$to_proc(), $g).call($h)}, TMP_7.$$s = self, TMP_7.$$arity = 0, TMP_7), $e).call($f)}, TMP_6.$$s = self, TMP_6.$$arity = 0, TMP_6), $a).call($d, \"a\")" }
         end
 
         context 'explicit' do
@@ -654,9 +654,9 @@ if (b == null) b = nil;
 
           it do
             is_expected.to include <<-CODE
-    return ($a = ($b = self).$define_method, $a.$$p = (TMP_1 = function(){var self = TMP_1.$$s || this, $c, $d;
+    return ($a = ($b = self).$define_method, $a.$$p = (TMP_Foobar_1 = function(){var self = TMP_Foobar_1.$$s || this, $c, $d;
 
-    return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, null, (TMP_1.$$def || null), false, false)), $c.$$p = null, $c).call($d)}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1), $a).call($b, "wilma")
+    return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, null, (TMP_Foobar_1.$$def || null), false, false)), $c.$$p = null, $c).call($d)}, TMP_Foobar_1.$$s = self, TMP_Foobar_1.$$arity = 0, TMP_Foobar_1), $a).call($b, "wilma")
             CODE
           end
         end
@@ -678,7 +678,7 @@ if (b == null) b = nil;
 
           it { is_expected.to include "return ($e = ($f = self, Opal.find_iter_super_dispatcher(self, null, (TMP_2.$$def || TMP_1.$$def || null), false, true)), $e.$$p = $iter, $e).apply($f)}, TMP_2.$$s = self, TMP_2.$$arity = 0, TMP_2), $c).call($d, \"foo\")" }
 
-          it { is_expected.to include "return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, 'm', (TMP_5.$$def || TMP_6), false, true)), $c.$$p = $iter, $c).apply($d, $zuper)}, TMP_5.$$s = self, TMP_5.$$arity = 0, TMP_5), $a).call($b)" }
+          it { is_expected.to include "return ($c = ($d = self, Opal.find_iter_super_dispatcher(self, 'm', (TMP_5.$$def || TMP_m_6), false, true)), $c.$$p = $iter, $c).apply($d, $zuper)}, TMP_5.$$s = self, TMP_5.$$arity = 0, TMP_5), $a).call($b)" }
         end
       end
 
@@ -693,7 +693,7 @@ if (b == null) b = nil;
           CODE
         end
 
-        it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'some_method', TMP_1, false, $Foobar)), $a.$$p = $iter, $a).apply($b, $zuper)" }
+        it { is_expected.to include "return ($a = ($b = self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false, $Foobar)), $a.$$p = $iter, $a).apply($b, $zuper)" }
       end
     end
   end
