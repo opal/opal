@@ -22,7 +22,7 @@ module Opal
         in_scope do
           inline_params = process(inline_args_sexp)
 
-          identity = scope.identify!(:iter)
+          identity = scope.identify!
           add_temp "self = #{identity}.$$s || this"
 
           compile_block_arg
@@ -86,7 +86,7 @@ module Opal
         if block_arg
           scope.block_name = block_arg
           scope.add_temp block_arg
-          scope_name = scope.identify!(:block)
+          scope_name = scope.identify!
 
           line "#{block_arg} = #{scope_name}.$$p || nil, #{scope_name}.$$p = null;"
         end

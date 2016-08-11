@@ -54,7 +54,7 @@ module Opal
           compile_inline_args
           compile_post_args
 
-          scope.identify!(mid)
+          scope.identify!
           scope_name = scope.identity
 
           compile_block_arg
