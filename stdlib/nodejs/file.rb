@@ -101,7 +101,7 @@ class File < IO
 
   # Instance Methods
 
-  def initialize(path, flags)
+  def initialize(path, flags = 'r')
     binary_flag_regexp = /b/
     encoding_flag_regexp = /:(.*)/
     # binary flag is unsupported

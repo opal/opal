@@ -4,6 +4,21 @@ require 'nodejs'
 require 'nodejs/file'
 
 class TestNodejsFile < Test::Unit::TestCase
+
+  def test_instantiate_without_open_mode
+    # By default the open mode is 'r' (read only)
+    File.write('tmp/quz', "world")
+    file = File.new('tmp/quz')
+    assert_equal('tmp/quz', file.path)
+  end
+
+  def test_mtime
+    File.write('tmp/qix', "hello")
+    file = File.new('tmp/qix', 'r')
+    file_mtime = file.mtime
+    assert(Time.now >= file_mtime, 'File modification time should be before now')
+  end
+
   def test_write_read
     path = "/tmp/testing_nodejs_file_implementation_#{Time.now.to_i}"
     contents = 'foobar'
