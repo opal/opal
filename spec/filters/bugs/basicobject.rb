@@ -6,13 +6,11 @@ opal_filter "BasicObject" do
   fails "BasicObject#initialize does not accept arguments"
   fails "BasicObject#instance_eval raises a TypeError when defining methods on an immediate"
   fails "BasicObject#instance_eval raises a TypeError when defining methods on numerics"
-  fails "BasicObject#instance_eval sets class variables in the receiver"
   fails "BasicObject#instance_eval evaluates string with given filename and linenumber"
   fails "BasicObject#instance_exec binds the block's binding self to the receiver"
   fails "BasicObject#instance_exec raises a LocalJumpError unless given a block"
   fails "BasicObject#instance_exec raises a TypeError when defining methods on an immediate"
   fails "BasicObject#instance_exec raises a TypeError when defining methods on numerics"
-  fails "BasicObject#instance_exec sets class variables in the receiver"
   fails "BasicObject#method_missing for an instance sets the receiver of the raised NoMethodError"
   fails "BasicObject#method_missing for an instance sets the receiver of the raised NoMethodError"
 end

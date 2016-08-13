@@ -173,13 +173,6 @@ opal_filter "Kernel" do
   fails "Kernel.loop returns StopIteration#result, the result value of a finished iterator" # requires changes in enumerator.rb
   fails "Kernel.printf calls write on the first argument when it is not a string"
   fails "Kernel.printf writes to stdout when a string is the first argument"
-  fails "Kernel.rand returns nil when range is backwards"
-  fails "Kernel.srand accepts a Bignum as a seed"
-  fails "Kernel.srand accepts a negative seed"
-  fails "Kernel.srand accepts and uses a seed of 0"
-  fails "Kernel.srand calls #to_int on seed"
-  fails "Kernel.srand returns the previous seed value"
-  fails "Kernel.srand seeds the RNG correctly and repeatably"
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block"
   fails "self.send(:block_given?) returns true if and only if a block is supplied"
 end

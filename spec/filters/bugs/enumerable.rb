@@ -36,7 +36,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#zip converts arguments to enums using #to_enum"
   fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
-  fails "when an iterator method yields more than one value processes all yielded values"
   fails "Enumerable#grep_v with block calls the block with gathered array when yielded with multiple arguments"
   fails "Enumerable#grep_v without block compares pattern with gathered array when yielded with multiple arguments"
 end
