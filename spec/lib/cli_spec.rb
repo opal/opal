@@ -31,7 +31,7 @@ describe Opal::CLI do
       end
 
       context 'with lib_only: true and opal require' do
-        let(:options) { super().merge lib_only: true, requires: ['opal'] }
+        let(:options) { super().merge lib_only: true }
 
         it 'does not raise an error' do
           expect{subject.run}.not_to raise_error
@@ -89,7 +89,7 @@ describe Opal::CLI do
     end
 
     context 'when true' do
-      let(:options) { {lib_only: true, compile: true, requires: ['opal'], no_exit: true} }
+      let(:options) { {lib_only: true, compile: true, no_exit: true} }
       it 'appends code block at the end of the source' do
         expect_output_of{ subject.run }.not_to eq("\n")
       end

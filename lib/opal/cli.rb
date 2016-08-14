@@ -17,10 +17,6 @@ module Opal
       @sexp
     end
 
-    def skip_opal_require?
-      @skip_opal_require
-    end
-
     class << self
       attr_accessor :stdout
     end
@@ -29,8 +25,8 @@ module Opal
       options ||= {}
 
       # Runner
-      @runner_type = options.delete(:runner)    || :nodejs
-      @port       = options.delete(:port)       || 3000
+      @runner_type = options.delete(:runner)     || :nodejs
+      @port        = options.delete(:port)       || 3000
 
       @options     = options
       @compile     = !!options.delete(:compile)
@@ -41,7 +37,6 @@ module Opal
       @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       || []
       @evals       = options.delete(:evals)      || []
-      @requires    = options.delete(:requires)   || []
       @load_paths  = options.delete(:load_paths) || []
       @gems        = options.delete(:gems)       || []
       @stubs       = options.delete(:stubs)      || []
@@ -50,7 +45,10 @@ module Opal
       @verbose     = options.fetch(:verbose, false); options.delete(:verbose)
       @debug       = options.fetch(:debug, false);   options.delete(:debug)
       @filename    = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
-      @skip_opal_require = options.delete(:skip_opal_require)
+
+      @requires    = options.delete(:requires)   || []
+      @requires.unshift('opal') unless options.delete(:skip_opal_require)
+
       @compiler_options = Hash[
         *compiler_option_names.map do |option|
           key = option.to_sym
@@ -93,18 +91,15 @@ module Opal
 
     def build
       builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options
+
+      # --include
       builder.append_paths(*load_paths)
 
       # --gem
       gems.each { |gem_name| builder.use_gem gem_name }
 
-      # --no-opal
-      builder.build 'opal' unless skip_opal_require?
-
       # --require
-      requires.each do |local_require|
-        builder.build(local_require)
-      end
+      requires.each { |required| builder.build(required) }
 
       # --preload
       preload.each { |path| builder.build_require(path) }
@@ -115,13 +110,8 @@ module Opal
       # --debug
       builder.build_str '$DEBUG = true', '(flags)' if debug
 
-      # --library
-      unless lib_only
-        # --eval
-        evals_or_file do |contents, filename|
-          builder.build_str(contents, filename)
-        end
-      end
+      # --eval / stdin / file
+      evals_or_file { |source, filename| builder.build_str(source, filename) }
 
       # --no-exit
       builder.build_str 'Kernel.exit', '(exit)' unless no_exit
@@ -168,6 +158,9 @@ module Opal
     # Internal: Yelds a string of source code and the proper filename for either
     #           evals, stdin or a filepath.
     def evals_or_file
+      # --library
+      return if lib_only
+
       if evals.any?
         yield evals.join("\n"), '-e'
       else
