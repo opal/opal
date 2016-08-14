@@ -417,9 +417,9 @@ class Module
 
       // need superclass's modules
       if (self.$$is_class) {
-          for (var cls = self; cls; cls = cls.$$super) {
-            results = results.concat(module_chain(cls));
-          }
+        for (var cls = self; cls; cls = cls.$$super) {
+          results = results.concat(module_chain(cls));
+        }
       }
 
       return results;
