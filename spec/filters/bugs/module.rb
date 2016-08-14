@@ -82,8 +82,6 @@ opal_filter "Module" do
   fails "Module#include does not override existing constants in modules and classes"
   fails "Module#include doesn't include module if it is included in a super class"
   fails "Module#include recursively includes new mixins"
-  fails "Module#include? raises a TypeError when no module was given"
-  fails "Module#include? returns true if the given module is included by self or one of it's ancestors"
   fails "Module#instance_method gives UnboundMethod method name, Module defined in and Module extracted from"
   fails "Module#instance_method raises a NameError if the method has been undefined"
   fails "Module#instance_method raises a TypeError if not passed a symbol"

@@ -91,6 +91,7 @@ Whitespace conventions:
     * `Module#class_variable_get`
     * `Module#class_variable_set`
     * `Module#remove_class_variable`
+    * `Module#include?`
     * `Numeric#step` (#1512)
 
 - Improvements for Range class (#1486)

@@ -424,14 +424,19 @@ class Module
 
   def include?(mod)
     %x{
-      for (var cls = self; cls; cls = cls.$$super) {
-        for (var i = 0; i != cls.$$inc.length; i++) {
-          var mod2 = cls.$$inc[i];
-          if (mod === mod2) {
-            return true;
-          }
+      if (!mod.$$is_module) {
+        #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+      }
+
+      var i, ii, mod2, ancestors = Opal.ancestors(self);
+
+      for (i = 0, ii = ancestors.length; i < ii; i++) {
+        mod2 = ancestors[i];
+        if (mod2 === mod && mod2 !== self) {
+          return true;
         }
       }
+
       return false;
     }
   end
