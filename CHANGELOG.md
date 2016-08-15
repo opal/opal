@@ -49,6 +49,7 @@ Whitespace conventions:
     * `Array#shuffle`
     * `Array#shuffle!`
     * `Array#sample`
+- Added rudimental history support to `opal-repl`, just create the history file (`~/.opal-repl-history`) and it record the last 1000 lines
 
 
 ### Changed

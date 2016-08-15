@@ -6,6 +6,8 @@ module Opal
   class V8Context
     def initialize
       @builder = Opal::Builder.new
+      @history_path = File.expand_path('~/.opal-repl-history')
+      @history = File.exist?(@history_path)
     end
 
     def run(filename = nil)
@@ -45,6 +47,7 @@ module Opal
 
     def run_repl
       require 'readline'
+      load_history
 
       loop do
         # on SIGINT lets just return from the loop..
@@ -70,7 +73,19 @@ module Opal
       puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end
 
+    def load_history
+      return unless @history
+      File.read(@history_path).lines.each { |line| Readline::HISTORY.push line.strip }
+    end
+
+    def dump_history
+      return unless @history
+      length = (Readline::HISTORY.size > 1000) ? 1000 : Readline::HISTORY.size
+      File.write(@history_path, Readline::HISTORY.to_a[-length..-1].join("\n"))
+    end
+
     def finish
+      dump_history
       @v8 = nil
     end
   end
