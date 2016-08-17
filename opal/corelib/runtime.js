@@ -530,6 +530,9 @@
     // @property $$methods the methods defined in the module/class
     module.$$methods = {};
 
+    // @property $$lan the cached list of ancestors
+    module.$$lan = [module];
+
     // initialize the name with nil
     module.$$name = nil;
 
@@ -965,6 +968,9 @@
     // check if this module is already included in the class
     for (i = includer.$$inc.length - 1; i >= 0; i--) {
       if (includer.$$inc[i] === module) {
+        // MRI just updates the cache for the re-included module.
+        // For now we'll just update everything.
+        Opal.update_ancestors_cache(includer);
         return;
       }
     }
@@ -976,6 +982,7 @@
     }
 
     includer.$$inc.push(module);
+    Opal.update_ancestors_cache(includer);
     module.$$included_in.push(includer);
     Opal.bridge_methods(includer, module);
 
@@ -998,6 +1005,10 @@
     Opal.donate_constants(module, includer);
   };
 
+  Opal.update_ancestors_cache = function(class_or_module) {
+    class_or_module.$$lan = Opal.local_ancestors(class_or_module);
+  }
+
   // The actual "prepension" of a module to a class.
   //
   // @param module [Module] the module to prepend
@@ -1009,6 +1020,7 @@
     // check if this module is already included in the class
     for (i = prepender.$$pre.length - 1; i >= 0; i--) {
       if (prepender.$$pre[i] === module) {
+        Opal.update_ancestors_cache(prepender);
         return;
       }
     }
@@ -1018,6 +1030,7 @@
     }
 
     prepender.$$pre.push(module);
+    Opal.update_ancestors_cache(prepender);
     module.$$prepended_to.push(prepender);
     Opal._bridge(prepender, module);
 
@@ -1175,37 +1188,10 @@
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module_or_class) {
     var parent = module_or_class,
-        result = [],
-        seen   = {},
-        modules, module, i, ii, j, jj;
+        result = [];
 
     while (parent) {
-
-      for (i = 0, ii = parent.$$pre.length; i < ii; i++) {
-        modules = Opal.ancestors(parent.$$pre[i]);
-
-        for(j = 0, jj = modules.length; j < jj; j++) {
-          module = modules[j];
-          if (!seen[module.$$id]) {
-            result.push(module);
-            seen[module.$$id] = true;
-          }
-        }
-      }
-
-      result.push(parent);
-
-      for (i = 1, ii = parent.$$inc.length; i <= ii; i++) {
-        modules = Opal.ancestors(parent.$$inc[ii - i]);
-
-        for(j = 0, jj = modules.length; j < jj; j++) {
-          module = modules[j];
-          if (!seen[module.$$id]) {
-            result.push(module);
-            seen[module.$$id] = true;
-          }
-        }
-      }
+      result = result.concat(parent.$$lan);
 
       // only the actual singleton class gets included in its ancestry
       // after that, traverse the normal class hierarchy
@@ -1214,6 +1200,41 @@
       }
       else {
         parent = parent.$$is_class ? parent.$$super : null;
+      }
+    }
+
+    return result;
+  };
+
+  // The Array of ancestors for a given module/class
+  Opal.local_ancestors = function(module_or_class) {
+    var result = [],
+        seen   = {},
+        modules, module, i, ii, j, jj;
+
+    for (i = 0, ii = module_or_class.$$pre.length; i < ii; i++) {
+      modules = module_or_class.$$pre[i].$$lan || [];
+
+      for(j = 0, jj = modules.length; j < jj; j++) {
+        module = modules[j];
+        if (!seen[module.$$id]) {
+          result.push(module);
+          seen[module.$$id] = true;
+        }
+      }
+    }
+
+    result.push(module_or_class);
+
+    for (i = module_or_class.$$inc.length - 1; i >= 0; i--) {
+      modules = module_or_class.$$inc[i].$$lan || [];
+
+      for(j = 0, jj = modules.length; j < jj; j++) {
+        module = modules[j];
+        if (!seen[module.$$id]) {
+          result.push(module);
+          seen[module.$$id] = true;
+        }
       }
     }
 
