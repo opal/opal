@@ -480,7 +480,7 @@
   Opal.boot_class_alloc = function(name, constructor, superclass) {
     if (superclass) {
       var alloc_proxy = function() {};
-      alloc_proxy.prototype  = superclass.$$proto || superclass.prototype;
+      alloc_proxy.prototype = superclass.$$proto || superclass.prototype;
       constructor.prototype = new alloc_proxy();
     }
 
@@ -731,7 +731,7 @@
     superclass = object === BasicObject ? Class : Opal.build_class_singleton_class(object.$$super);
 
     klass = Opal.setup_class_object(null, alloc, superclass.$$name, superclass.constructor);
-    klass.$$super = superclass;
+    klass.$$super  = superclass;
     klass.$$parent = superclass;
 
     // The singleton_class retains the same scope as the original class

@@ -10,7 +10,7 @@ class Class
       var alloc = Opal.boot_class_alloc(null, function(){}, superclass)
       var klass = Opal.setup_class_object(null, alloc, superclass.$$name, superclass.constructor);
 
-      klass.$$super = superclass;
+      klass.$$super  = superclass;
       klass.$$parent = superclass;
 
       // inherit scope from parent
