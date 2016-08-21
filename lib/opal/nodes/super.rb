@@ -35,7 +35,7 @@ module Opal
 
       private
 
-      def method_jsid
+      def method_id
         raise 'Not implemented, see #add_method'
       end
 
@@ -65,7 +65,7 @@ module Opal
         implicit_args? ? 'true' : 'false'
       end
 
-      def method_jsid
+      def method_id
         def_scope.mid.to_s
       end
 
@@ -76,9 +76,9 @@ module Opal
       def super_method_invocation
         if def_scope.defs
           class_name = def_scope.parent.name ? "$#{def_scope.parent.name}" : 'self.$$class.$$proto'
-          "Opal.find_super_dispatcher(self, '#{method_jsid}', #{def_scope_identity}, #{defined_check_param}, #{class_name})"
+          "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, #{class_name})"
         else
-          "Opal.find_super_dispatcher(self, '#{method_jsid}', #{def_scope_identity}, #{defined_check_param})"
+          "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param})"
         end
       end
 

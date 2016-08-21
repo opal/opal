@@ -1222,8 +1222,8 @@
   }
 
   // Super dispatcher
-  Opal.find_super_dispatcher = function(obj, jsid, current_func, defcheck, defs) {
-    var dispatcher;
+  Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, defs) {
+    var dispatcher, super_method;
 
     if (defs) {
       if (obj.$$is_class || obj.$$is_module) {
@@ -1234,17 +1234,17 @@
       }
     }
     else {
-      dispatcher = Opal.find_obj_super_dispatcher(obj, jsid, current_func);
+      dispatcher = Opal.find_obj_super_dispatcher(obj, mid, current_func);
     }
 
-    dispatcher = dispatcher['$' + jsid];
+    super_method = dispatcher['$' + mid];
 
-    if (!defcheck && dispatcher.$$stub && Opal.Kernel.$method_missing === obj.$method_missing) {
+    if (!defcheck && super_method.$$stub && Opal.Kernel.$method_missing === obj.$method_missing) {
       // method_missing hasn't been explicitly defined
-      throw Opal.NoMethodError.$new('super: no superclass method `'+jsid+"' for "+obj, jsid);
+      throw Opal.NoMethodError.$new('super: no superclass method `'+mid+"' for "+obj, mid);
     }
 
-    return dispatcher;
+    return super_method;
   };
 
   // Iter dispatcher for super in a block
@@ -1266,7 +1266,7 @@
     return Opal.find_super_dispatcher(obj, call_jsid, current_func, defcheck);
   };
 
-  Opal.find_obj_super_dispatcher = function(obj, jsid, current_func) {
+  Opal.find_obj_super_dispatcher = function(obj, mid, current_func) {
     var klass = obj.$$meta || obj.$$class;
 
     // first we need to find the class/module current_func is located on
@@ -1276,8 +1276,7 @@
       throw new Error("could not find current class for super()");
     }
 
-    jsid = '$' + jsid;
-    return Opal.find_super_func(klass, jsid, current_func);
+    return Opal.find_super_func(klass, '$' + mid, current_func);
   };
 
   Opal.find_owning_class = function(klass, current_func) {
