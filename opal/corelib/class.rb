@@ -12,6 +12,7 @@ class Class
 
       klass.$$super  = superclass;
       klass.$$parent = superclass;
+      klass.$$entry  = klass;
 
       // inherit scope from parent
       Opal.create_scope(superclass.$$scope, klass);
