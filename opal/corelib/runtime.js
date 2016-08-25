@@ -969,15 +969,16 @@
   // @param includer [Module] the target class to include module into
   // @return [null]
   Opal.append_features = function(module, includer) {
-    var iclass, methods, id, i;
+    var iclass, methods, id, i, already_included = false;
 
     // check if this module is already included in the class
     for (i = includer.$$inc.length - 1; i >= 0; i--) {
       if (includer.$$inc[i] === module) {
-        // MRI just updates the cache for the re-included module.
-        // For now we'll just update everything.
-        Opal.update_ancestors_cache(includer);
-        return;
+        // // MRI just updates the cache for the re-included module.
+        // // For now we'll just update everything.
+        // Opal.update_ancestors_cache(includer);
+        // return;
+        already_included = true;
       }
     }
 
@@ -987,26 +988,28 @@
       throw Opal.ArgumentError.$new('cyclic include detected')
     }
 
-    includer.$$inc.push(module);
+    if (!already_included) {
+      includer.$$inc.push(module);
+      module.$$included_in.push(includer);
+      iclass = {
+        $$name:   module.$$name,
+        $$proto:  module.$$proto,
+        $$methods: module.$$methods,
+        $$parent: includer.$$parent,
+        $$module: module,
+        $$iclass: true
+      };
+      includer.$$parent = iclass;
+    }
+
     Opal.update_ancestors_cache(includer);
-    module.$$included_in.push(includer);
     Opal.bridge_methods(includer, module);
 
-    iclass = {
-      $$name:   module.$$name,
-      $$proto:  module.$$proto,
-      $$methods: module.$$methods,
-      $$parent: includer.$$parent,
-      $$module: module,
-      $$iclass: true
-    };
-
-    includer.$$parent = iclass;
-
-    methods = module.$instance_methods();
+    // methods = module.$instance_methods();
+    methods = Object.keys(module.$$methods);
 
     for (i = methods.length - 1; i >= 0; i--) {
-      Opal.update_method_cache(module, includer, '$' + methods[i])
+      Opal.update_method_cache(module, includer, methods[i])
     }
 
     Opal.donate_constants(module, includer);
@@ -1143,7 +1146,7 @@
 
     chain = module_or_class.$$inc.concat([module_or_class]).concat(module_or_class.$$pre);
 
-    var bridged = module_or_class.$__id__ && !module_or_class.$__id__.$$stub && bridges[module_or_class.$__id__()];
+    var bridged = module_or_class.$__id__ && !module_or_class.$__id__.$$stub && BridgedClasses[module_or_class.$__id__()];
     if (bridged) {
       chain = [module_or_class.$$super].concat(chain);
     }
@@ -1381,20 +1384,10 @@
   // Super dispatcher
   Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, defs) {
     var dispatcher, super_method;
-
-    if (defs) {
-      if (obj.$$is_class || obj.$$is_module) {
-        dispatcher = defs.$$super;
-      }
-      else {
-        dispatcher = obj.$$class.$$proto;
-      }
-    }
-    else {
-      dispatcher = Opal.find_obj_super_dispatcher(obj, mid, current_func);
-    }
-
-    super_method = dispatcher ? dispatcher['$' + mid] : Opal.stub_for('$' + mid);
+    // if (defs) {
+    //   obj = obj.
+    // }
+    super_method = Opal.find_obj_super_dispatcher(obj, mid, current_func) || Opal.stub_for('$' + mid);
 
     if (!defcheck && super_method.$$stub && Opal.Kernel.$method_missing === obj.$method_missing) {
       // method_missing hasn't been explicitly defined
@@ -1427,62 +1420,90 @@
     var klass = obj.$$meta || obj.$$class;
 
     // first we need to find the class/module current_func is located on
-    klass = Opal.find_owning_class(klass, current_func);
+    // //console.log('>>find_owning_class for', mid);
+    // klass = Opal.find_owning_class(klass, current_func);
 
-    if (!klass) {
-      throw new Error("could not find current class for super()");
-    }
-
+    // if (!klass) {
+    //   throw new Error("could not find current class for super()");
+    // }
+    //console.log('>>find_super_func for',mid);
     return Opal.find_super_func(klass, '$' + mid, current_func);
   };
 
-  Opal.find_owning_class = function(klass, current_func) {
-    var owner = current_func.$$owner;
-    klass = klass.$$entry || klass;
+  // Opal.find_owning_class = function(klass, current_func) {
+  //   var owner = current_func.$$owner;
+  //   console.log('find_owning_class>>', klass.$$name, 'entry', klass.$$entry && klass.$$entry.$$name);
+  //   klass = klass.$$entry || klass;
+  //
+  //   while (klass) {
+  //     // repeating for readability
+  //
+  //     if (klass.$$iclass && klass.$$module === current_func.$$donated) {
+  //       // this klass was the last one the module donated to
+  //       // case is also hit with multiple module includes
+  //       break;
+  //     }
+  //     else if (klass.$$iclass && klass.$$module === owner) {
+  //       // module has donated to other classes but klass isn't one of those
+  //       break;
+  //     }
+  //     else if (owner.$$is_singleton && klass === owner.$$singleton_of.$$class) {
+  //       // cases like stdlib `Singleton::included` that use a singleton of a singleton
+  //       break;
+  //     }
+  //     else if (klass === owner) {
+  //       // no modules, pure class inheritance
+  //       break;
+  //     }
+  //
+  //     klass = klass.$$parent;
+  //   }
+  //
+  //   return klass;
+  // };
 
-    while (klass) {
-      // repeating for readability
+  Opal.find_super_func = function(klass, jsid, current_method) {
+    var ancestors, ancestor, method, i = 0, ii, seen = false, super_called_from = current_method.$$super_called_from;
 
-      if (klass.$$iclass && klass.$$module === current_func.$$donated) {
-        // this klass was the last one the module donated to
-        // case is also hit with multiple module includes
-        break;
-      }
-      else if (klass.$$iclass && klass.$$module === owner) {
-        // module has donated to other classes but klass isn't one of those
-        break;
-      }
-      else if (owner.$$is_singleton && klass === owner.$$singleton_of.$$class) {
-        // cases like stdlib `Singleton::included` that use a singleton of a singleton
-        break;
-      }
-      else if (klass === owner) {
-        // no modules, pure class inheritance
-        break;
-      }
+    //console.log('find_super_func>>', jsid, 'of', klass.$$name);
 
-      klass = klass.$$parent;
+    if (super_called_from) {
+      klass = super_called_from[0];
+      i     = super_called_from[1];
+      //console.log('find_super_func>> >> super_called_from', klass.$$name, i);
+      delete current_method.$$super_called_from;
     }
 
-    return klass;
-  };
-
-  Opal.find_super_func = function(owning_klass, jsid, current_func) {
-    var klass = (owning_klass.$$entry || owning_klass).$$parent;
+    //console.log('find_super_func>> >> starting', klass.$$name, 'parent', klass.$$parent && klass.$$parent.$$name);
 
     // now we can find the super
     while (klass) {
-      var working = klass.$$methods[jsid];
+      ancestors = klass.$$lan;
 
-      if (working && working !== current_func) {
-        // ok
-        break;
+      for (ii = ancestors.length; i < ii; i++) {
+        ancestor = ancestors[i];
+
+        //console.log('find_super_func>> >> searching', ancestor.$$name, '[', i, '] of class', klass.$$name);
+        method = ancestor.$$methods[jsid]
+
+        // if the method is refedined or undefined fallback to $$owner
+        if (method === current_method || ancestor === current_method.$$owner) {
+          //console.log('find_super_func>> >> SEEN', ancestor.$$name, ' of class', klass.$$name);
+          seen = true
+        } else if (seen && method && method !== current_method) {
+          // ok
+          //console.log('find_super_func>> >> FOUND', ancestor.$$name, ' of class', klass.$$name);
+          method.$$super_called_from = [klass, i]
+          return method;
+        }
       }
 
-      klass = klass.$$parent;
-    }
 
-    return (klass && klass.$$methods);
+      klass = klass.$$super;
+      i = 0;
+    }
+    //console.log('find_super_func>> >> NOTHING FOUND');
+    return null;
   };
 
   // Used to return as an expression. Sometimes, we can't simply return from

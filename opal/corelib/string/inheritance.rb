@@ -10,8 +10,9 @@ class String
       klass.$$alloc         = replace.$$alloc;
       klass.$$parent        = #{String::Wrapper};
 
-      klass.$allocate = replace.$allocate;
-      klass.$new      = replace.$new;
+      Opal.get_singleton_class(klass);
+      klass.$$meta.$$methods.$allocate = klass.$allocate = replace.$allocate;
+      klass.$$meta.$$methods.$new      = klass.$new      = replace.$new;
     }
   end
 end
