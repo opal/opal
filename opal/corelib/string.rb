@@ -1696,23 +1696,108 @@ class String < `String`
   def unpack(pattern)
     %x{
       function stringToBytes(string) {
-        var i,
-            singleByte,
-            l = string.length,
-            result = [];
+        var result = [];
 
-        for (i = 0; i < l; i++) {
-          singleByte = string.charCodeAt(i);
-          result.push(singleByte);
+        for (var i = 0; i < string.length; i ++) {
+          var chr = string.charCodeAt(i);
+          var byteArray = [];
+
+          while (chr > 0) {
+            byteArray.push(chr & 0xFF);
+            chr >>= 8;
+          }
+
+          // all utf-16 characters are two bytes
+          if (byteArray.length == 1) {
+            byteArray.push(0);
+          }
+
+          // assume big-endian
+          result = result.concat(byteArray.reverse());
         }
+
         return result;
       }
+
+      function stringToCodePoints(string) {
+        var result = [];
+
+        for (var i = 0; i < string.length; i ++) {
+          codePoint = charCodeAt(string, i);
+
+          if (!codePoint) {
+            break;
+          }
+
+          result.push(codePoint);
+        }
+
+        return result;
+      }
+
+      function codePointsToString(arr) {
+        var chars = [];
+
+        for (var i = 0; i < arr.length; i ++) {
+          var codePoint = arr[i];
+
+          if (codePoint > 0xFFFF) {
+            codePoint -= 0x10000;
+
+            chars.push(
+              String.fromCharCode(
+                0xD800 + (codePoint >> 10), 0xDC00 + (codePoint & 0x3FF)
+              )
+            );
+          } else {
+            chars.push(
+              String.fromCharCode(codePoint)
+            );
+          }
+        }
+
+        return chars.join('');
+      }
+
+      function charCodeAt(string, index) {
+        var length = string.length,
+            surrogatePairs = new RegExp(
+              '[' + codePointsToString([0xD800]) + '-' + codePointsToString([0xDBFF]) + '][' + codePointsToString([0xDC00]) + '-' + codePointsToString([0xDFFF]) + ']'
+            );
+
+        while (surrogatePairs.exec(string) != null) {
+          var li = surrogatePairs.lastIndex;
+
+          if (li - 2 < index) {
+            index += 1;
+          } else {
+            break;
+          }
+        }
+
+        if ((index >= length) || (index < 0)) {
+          return NaN;
+        }
+
+        var code = string.charCodeAt(index);
+
+        if ((0xD800 <= code) && (code <= 0xDBFF)) {
+          var hi = code;
+          var low = string.charCodeAt(index + 1);
+          return ((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000;
+        }
+
+        return code;
+      }
     }
+
     case pattern
-    when "U*", "C*"
-      `stringToBytes(self);`
-    else
-      raise NotImplementedError
+      when "U*"
+        `return stringToCodePoints(self);`
+      when "C*"
+        `return stringToBytes(self);`
+      else
+        raise NotImplementedError
     end
   end
 end

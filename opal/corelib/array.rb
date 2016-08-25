@@ -2281,6 +2281,56 @@ class Array < `Array`
     }
   end
 
+  def pack(pattern)
+    %x{
+      function bytesToString(arr) {
+        var result = [];
+
+        for (var i = 0; i < arr.length; i += 2) {
+          var hi = arr[i];
+          var low = arr[i + 1];
+          var combined = (hi << 8) | low;
+          result.push(String.fromCharCode(combined));
+        }
+
+        return result.join('')
+      }
+
+      function codePointsToString(arr) {
+        var chars = [];
+
+        for (var i = 0; i < arr.length; i ++) {
+          var codePoint = arr[i];
+
+          if (codePoint > 0xFFFF) {
+            codePoint -= 0x10000;
+
+            chars.push(
+              String.fromCharCode(
+                0xD800 + (codePoint >> 10), 0xDC00 + (codePoint & 0x3FF)
+              )
+            );
+          } else {
+            chars.push(
+              String.fromCharCode(codePoint)
+            );
+          }
+        }
+
+        return chars.join('');
+      }
+    }
+
+    case pattern
+      when "U*"
+        `return codePointsToString(self)`
+      when "C*"
+        `return bytesToString(self)`
+      else
+        raise NotImplementedError
+    end
+  end
+
   def self.inherited(klass)
     %x{
       klass.$$proto.$to_a = function() {
@@ -2295,4 +2345,3 @@ class Array < `Array`
 
   Opal.pristine self, :allocate, :copy_instance_variables, :initialize_dup
 end
-
