@@ -1,4 +1,14 @@
 opal_filter "String" do
+  fails "String#clone calls #initialize_copy on the new instance"
+  fails "String#clone copies modules included in the singleton class"
+  fails "String#clone copies instance variables"
+  fails "String#clone copies singleton methods"
+  fails "String#clone copies constants defined in the singleton class"
+  fails "String#dup does not copy singleton methods"
+  fails "String#dup calls #initialize_copy on the new instance"
+  fails "String#dup copies instance variables"
+  fails "String#dup does not copy modules included in the singleton class"
+
   fails "String#bytes agrees with #unpack('C*')"
   fails "String#bytes returns #bytesize bytes"
   fails "String#bytes yields each byte to a block if one is given, returning self"
