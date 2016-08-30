@@ -61,92 +61,97 @@ module Opal
         finder.found_break?
       end
 
+      # Opal has a runtime helper 'Opal.send_method_name' that assigns
+      # provided block to a '$$p' property of the method body
+      # and invokes a method using 'apply'.
+      #
+      # We have to compile a method call using this 'Opal.send_method_name' when a method:
+      # 1. takes a splat
+      # 2. takes a block
+      #
+      # Arguments that contain splat must be handled in a different way.
+      # @see #compile_arguments
+      #
+      # When a method takes a block we have to calculate all arguments
+      # **before** asigning '$$p' property (that stores a passed block)
+      # to a method body. This is some kind of protection from method calls
+      # like 'a(a {}) { 1 }'.
+      def invoke_using_send?
+        iter || splat?
+      end
+
       def default_compile
-        # blocks need to be assigned to temp variables in order to pass them
-        block_temp = scope.new_temp if iter
+        if invoke_using_send?
+          compile_using_send
+        else
+          compile_simple_call_chain
+        end
 
-        # can't use self for splats or blocks
-        temporary_receiver = scope.new_temp if needs_temporary_receiver?
+        compile_break_catcher
+      end
 
-        add_method temporary_receiver
+      # Compiles method call using `Opal.send`
+      #
+      # @example
+      #   a.b(c, &block)
+      #
+      #   Opal.send(a, 'b', [c], block)
+      #
+      def compile_using_send
+        helper :send
 
-        add_block block_temp if block_temp
+        push '$send('
+        compile_receiver
+        compile_method_name
+        compile_arguments
+        compile_block_pass
+        push ')'
+      end
 
-        add_invocation temporary_receiver
+      def compile_receiver
+        push recv(receiver_sexp)
+      end
 
+      def compile_method_name
+        push ", '#{meth}'"
+      end
+
+      def compile_arguments
+        push ", "
+
+        if splat?
+          push expr(arglist)
+        elsif arglist.children.empty?
+          push '[]'
+        else
+          push '[', expr(arglist), ']'
+        end
+      end
+
+      def compile_block_pass
+        if iter
+          push ", ", expr(iter)
+        end
+      end
+
+      def compile_break_catcher
         if iter_has_break?
           unshift 'return '
           unshift '(function(){var $brk = Opal.new_brk(); try {'
           line '} catch (err) { if (err === $brk) { return err.$v } else { throw err } }})()'
         end
-
-        scope.queue_temp block_temp if block_temp
       end
 
-      def redefine_this?(temporary_receiver)
-        temporary_receiver != nil
-      end
-
-      def apply_call_target(temporary_receiver)
-        temporary_receiver || receiver_fragment
-      end
-
-      def arguments_array?
-        splat?
-      end
-
-      def needs_temporary_receiver?
-        splat? || iter
-      end
-
-      def add_invocation(temporary_receiver)
-        args = arguments_fragment
-        if redefine_this?(temporary_receiver) || arguments_array?
-          if arguments_array?
-            push ".apply("
-          else
-            push ".call("
-          end
-
-          push apply_call_target(temporary_receiver)
-
-          if args.any?
-            push ", ", args
-          end
-
-          push ")"
-        else
-          push "(", args, ")"
-        end
-      end
-
-      def add_method(temporary_receiver)
-        if temporary_receiver
-          push "(#{temporary_receiver} = ", receiver_fragment, ")#{method_jsid}"
-        else
-          push receiver_fragment, method_jsid
-        end
-      end
-
-      def add_block(block_temp)
-        unshift "(#{block_temp} = "
-        push ", #{block_temp}.$$p = ", expr(iter), ", #{block_temp})"
+      def compile_simple_call_chain
+        push recv(receiver_sexp), method_jsid, "(", expr(arglist), ")"
       end
 
       def splat?
         arglist.children.any? { |a| a.type == :splat }
       end
 
-      def recv_sexp
+      def receiver_sexp
         recvr || s(:self)
-      end
-
-      def receiver_fragment
-        recv recv_sexp
-      end
-
-      def arguments_fragment
-        expr arglist
       end
 
       def method_jsid

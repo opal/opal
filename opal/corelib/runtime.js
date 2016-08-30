@@ -1558,51 +1558,45 @@
     return Opal.hash2(keys, map);
   };
 
-  // Call a ruby method on a ruby object with some arguments:
+  // Calls passed method on a ruby object with arguments and block:
+  //
+  // Can take a method or a method name.
+  //
+  // 1. When method name gets passed it invokes it by its name
+  //    and calls 'method_missing' when object doesn't have this method.
+  //    Used internally by Opal to invoke method that takes a block or a splat.
+  // 2. When method (i.e. method body) gets passed, it doesn't trigger 'method_missing'
+  //    because it doesn't know the name of the actual method.
+  //    Used internally by Opal to invoke 'super'.
   //
   // @example
   //   var my_array = [1, 2, 3, 4]
-  //   Opal.send(my_array, 'length')     # => 4
-  //   Opal.send(my_array, 'reverse!')   # => [4, 3, 2, 1]
+  //   Opal.send(my_array, 'length')                    # => 4
+  //   Opal.send(my_array, my_array.$length)            # => 4
   //
-  // A missing method will be forwarded to the object via
-  // method_missing.
+  //   Opal.send(my_array, 'reverse!')                  # => [4, 3, 2, 1]
+  //   Opal.send(my_array, my_array['$reverse!']')      # => [4, 3, 2, 1]
   //
-  // The result of either call with be returned.
-  //
-  // @param recv [Object] the ruby object
-  // @param mid  [String] ruby method to call
-  // @return [Object] forwards the return value of the method (or of method_missing)
-  Opal.send = function(recv, mid) {
-    var args_ary = new Array(Math.max(arguments.length - 2, 0));
-    for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = arguments[i + 2]; }
+  // @param recv [Object] ruby object
+  // @param method [Function, String] method body or name of the method
+  // @param args [Array] arguments that will be passed to the method call
+  // @param block [Function] ruby block
+  // @return [Object] returning value of the method call
+  Opal.send = function(recv, method, args, block) {
+    if (typeof(method) === 'string') {
+      var method_name = method;
+      method = recv['$' + method_name];
 
-    var func = recv['$' + mid];
+      if (method) {
+        method.$$p = block;
+        return method.apply(recv, args);
+      }
 
-    if (func) {
-      return func.apply(recv, args_ary);
+      return recv.$method_missing.apply(recv, [method_name].concat(args));
+    } else if (typeof(method) === 'function') {
+      method.$$p = block;
+      return method.apply(recv, args);
     }
-
-    return recv.$method_missing.apply(recv, [mid].concat(args_ary));
-  };
-
-  Opal.block_send = function(recv, mid, block) {
-    var args_ary = new Array(Math.max(arguments.length - 3, 0));
-    for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = arguments[i + 3]; }
-
-    var func = recv['$' + mid];
-
-    if (func) {
-      func.$$p = block;
-      return func.apply(recv, args_ary);
-    }
-
-    return recv.$method_missing.apply(recv, [mid].concat(args_ary));
-  };
-
-  // Used by safe navigator (&.) when receiver is nil
-  Opal.nil_returner = function() {
-    return nil;
   }
 
   // Used to define methods on an object. This is a helper method, used by the

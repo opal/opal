@@ -24,7 +24,6 @@ opal_filter "language" do
   fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing local with the same name as the argument"
   fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing method with the same name as the argument"
   fails "A lambda literal -> () { } returns a Proc object when used in a BasicObject method"
-  fails "A method call evaluates block pass after arguments"
   fails "A number literal can be a decimal literal with trailing 'r' to represent a Rational" # requires String#to_r
   fails "A singleton class doesn't have singleton class"
   fails "A singleton class is a subclass of Class's singleton class"
