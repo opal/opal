@@ -382,7 +382,9 @@ class Module
         var mod = mods[i];
 
         if (!mod.$$is_module) {
-          #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+          console.log(mod);
+          console.log('======', mod.$new().$foo());
+          #{raise TypeError, "wrong argument type #{`mod`.class} #{`mod.$$name`}(expected Module)"};
         }
 
         #{`mod`.append_features self};
