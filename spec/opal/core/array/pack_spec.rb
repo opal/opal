@@ -11,7 +11,8 @@ describe 'Array#pack' do
     end
 
     it "packs astral plane characters (UTF-16 surrogate pairs)" do
-      [216, 81, 221, 35].pack('C*').should == '𤔣'
+      char = %x{String.fromCharCode(55377, 56611)}
+      [216, 81, 221, 35].pack('C*').should == char
     end
   end
 
@@ -25,7 +26,8 @@ describe 'Array#pack' do
     end
 
     it 'packs astral plane characters' do
-      [148771].pack('U*').should == '𤔣'
+      char = %x{String.fromCharCode(55377, 56611)}
+      [148771].pack('U*').should == char
     end
   end
 end

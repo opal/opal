@@ -2293,7 +2293,7 @@ class Array < `Array`
           result.push(String.fromCharCode(combined));
         }
 
-        return result.join('')
+        return result.join('');
       }
 
       function codePointsToString(arr) {

@@ -1760,10 +1760,15 @@ class String < `String`
       }
 
       function charCodeAt(string, index) {
-        var length = string.length,
-            surrogatePairs = new RegExp(
-              '[' + codePointsToString([0xD800]) + '-' + codePointsToString([0xDBFF]) + '][' + codePointsToString([0xDC00]) + '-' + codePointsToString([0xDFFF]) + ']'
-            );
+        var length = string.length;
+
+        var surrogatePairs = new RegExp(
+          '[' +
+            codePointsToString([0xD800]) + '-' + codePointsToString([0xDBFF]) +
+          '][' +
+            codePointsToString([0xDC00]) + '-' + codePointsToString([0xDFFF]) +
+          ']', 'g'
+        );
 
         while (surrogatePairs.exec(string) != null) {
           var li = surrogatePairs.lastIndex;

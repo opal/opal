@@ -11,7 +11,8 @@ describe 'String#unpack' do
     end
 
     it "unpacks astral plane characters (UTF-16 surrogate pairs)" do
-      '𤔣'.unpack('C*').should == [216, 81, 221, 35]
+      char = %x{String.fromCharCode(55377, 56611)}
+      char.unpack('C*').should == [216, 81, 221, 35]
     end
   end
 
@@ -25,7 +26,8 @@ describe 'String#unpack' do
     end
 
     it 'unpacks astral plane characters' do
-      '𤔣'.unpack('U*').should == [148771]
+      char = %x{String.fromCharCode(55377, 56611)}
+      char.unpack('U*').should == [148771]
     end
   end
 end
