@@ -1695,63 +1695,63 @@ class String < `String`
 
   def unpack(pattern)
     %x{
-      function stringToBytes(string) {
+      function string_to_bytes(string) {
         var result = [];
 
         for (var i = 0; i < string.length; i ++) {
           var chr = string.charCodeAt(i);
-          var byteArray = [];
+          var byte_array = [];
 
           while (chr > 0) {
-            byteArray.push(chr & 0xFF);
+            byte_array.push(chr & 0xFF);
             chr >>= 8;
           }
 
           // all utf-16 characters are two bytes
-          if (byteArray.length == 1) {
-            byteArray.push(0);
+          if (byte_array.length == 1) {
+            byte_array.push(0);
           }
 
           // assume big-endian
-          result = result.concat(byteArray.reverse());
+          result = result.concat(byte_array.reverse());
         }
 
         return result;
       }
 
-      function stringToCodePoints(string) {
+      function string_to_code_points(string) {
         var result = [];
 
         for (var i = 0; i < string.length; i ++) {
-          var codePoint = charCodeAt(string, i);
+          var code_point = char_code_at(string, i);
 
-          if (!codePoint) {
+          if (!code_point) {
             break;
           }
 
-          result.push(codePoint);
+          result.push(code_point);
         }
 
         return result;
       }
 
-      function codePointsToString(arr) {
+      function code_points_to_string(arr) {
         var chars = [];
 
         for (var i = 0; i < arr.length; i ++) {
-          var codePoint = arr[i];
+          var code_point = arr[i];
 
-          if (codePoint > 0xFFFF) {
-            codePoint -= 0x10000;
+          if (code_point > 0xFFFF) {
+            code_point -= 0x10000;
 
             chars.push(
               String.fromCharCode(
-                0xD800 + (codePoint >> 10), 0xDC00 + (codePoint & 0x3FF)
+                0xD800 + (code_point >> 10), 0xDC00 + (code_point & 0x3FF)
               )
             );
           } else {
             chars.push(
-              String.fromCharCode(codePoint)
+              String.fromCharCode(code_point)
             );
           }
         }
@@ -1759,19 +1759,19 @@ class String < `String`
         return chars.join('');
       }
 
-      function charCodeAt(string, index) {
+      function char_code_at(string, index) {
         var length = string.length;
 
-        var surrogatePairs = new RegExp(
+        var surrogate_pairs = new RegExp(
           '[' +
-            codePointsToString([0xD800]) + '-' + codePointsToString([0xDBFF]) +
+            code_points_to_string([0xD800]) + '-' + code_points_to_string([0xDBFF]) +
           '][' +
-            codePointsToString([0xDC00]) + '-' + codePointsToString([0xDFFF]) +
+            code_points_to_string([0xDC00]) + '-' + code_points_to_string([0xDFFF]) +
           ']', 'g'
         );
 
-        while (surrogatePairs.exec(string) != null) {
-          var li = surrogatePairs.lastIndex;
+        while (surrogate_pairs.exec(string) != null) {
+          var li = surrogate_pairs.lastIndex;
 
           if (li - 2 < index) {
             index += 1;
@@ -1798,9 +1798,9 @@ class String < `String`
 
     case pattern
       when "U*"
-        `return stringToCodePoints(self);`
+        `return string_to_code_points(self);`
       when "C*"
-        `return stringToBytes(self);`
+        `return string_to_bytes(self);`
       else
         raise NotImplementedError
     end

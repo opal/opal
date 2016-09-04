@@ -2283,7 +2283,7 @@ class Array < `Array`
 
   def pack(pattern)
     %x{
-      function bytesToString(arr) {
+      function bytes_to_string(arr) {
         var result = [];
 
         for (var i = 0; i < arr.length; i += 2) {
@@ -2296,23 +2296,23 @@ class Array < `Array`
         return result.join('');
       }
 
-      function codePointsToString(arr) {
+      function code_points_to_string(arr) {
         var chars = [];
 
         for (var i = 0; i < arr.length; i ++) {
-          var codePoint = arr[i];
+          var code_point = arr[i];
 
-          if (codePoint > 0xFFFF) {
-            codePoint -= 0x10000;
+          if (code_point > 0xFFFF) {
+            code_point -= 0x10000;
 
             chars.push(
               String.fromCharCode(
-                0xD800 + (codePoint >> 10), 0xDC00 + (codePoint & 0x3FF)
+                0xD800 + (code_point >> 10), 0xDC00 + (code_point & 0x3FF)
               )
             );
           } else {
             chars.push(
-              String.fromCharCode(codePoint)
+              String.fromCharCode(code_point)
             );
           }
         }
@@ -2323,9 +2323,9 @@ class Array < `Array`
 
     case pattern
       when "U*"
-        `return codePointsToString(self)`
+        `return code_points_to_string(self)`
       when "C*"
-        `return bytesToString(self)`
+        `return bytes_to_string(self)`
       else
         raise NotImplementedError
     end
