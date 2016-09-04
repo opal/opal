@@ -1723,7 +1723,7 @@ class String < `String`
         var result = [];
 
         for (var i = 0; i < string.length; i ++) {
-          codePoint = charCodeAt(string, i);
+          var codePoint = charCodeAt(string, i);
 
           if (!codePoint) {
             break;
