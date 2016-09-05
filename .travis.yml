@@ -36,7 +36,7 @@ matrix:
       env: RUN=rspec
 
     - rvm: 2.2.4
-      env: RUN=rspec TILT_VERSION=2.0.1
+      env: RUN=rspec TILT_VERSION=2.0.1 SPROCKETS_VERSION='~> 2.12.4'
 
     - rvm: 2.1.10
       env: RUN=rspec RACK_VERSION='< 2.0'

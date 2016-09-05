@@ -23,7 +23,13 @@ describe Opal::Processor do
 
     describe %Q{with extension "#{ext}"} do
       it "is registered for '#{ext}' files" do
-        expect(Sprockets.engines[ext]).to eq(described_class)
+        if ::Sprockets.respond_to?(:register_transformer)
+          from_mime = Sprockets.mime_exts[ext]
+          to_mime   = Sprockets.mime_exts['.js']
+          expect(Sprockets.config[:registered_transformers][from_mime][to_mime]).to eq(described_class)
+        else
+          expect(Sprockets.engines[ext]).to eq(described_class)
+        end
       end
 
       it "compiles and evaluates the template on #render" do

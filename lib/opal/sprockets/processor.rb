@@ -21,16 +21,47 @@ module Opal
       @@cache_key = nil
     end
 
-    def evaluate(context, locals, &block)
+    def self.call(input)
+      output = new(input[:filename]) { input[:data] }.call(input)
+
+      content_type = input[:content_type]
+      dirname      = input[:dirname]
+      environment  = input[:environment]
+      resolver     = -> path { environment.resolve!(path, base_path: dirname, accept: content_type).first }
+      required     = Set.new(input[:metadata][:required    ]).merge output[:required    ].map(&resolver)
+      dependencies = Set.new(input[:metadata][:dependencies]).merge output[:dependencies].map(&resolver)
+
+      output.merge(required: required, dependencies: dependencies)
+    end
+
+    def evaluate(context, _locals, &_block)
       return super unless context.is_a? ::Sprockets::Context
 
-      @sprockets = sprockets = context.environment
+      @sprockets = environment = context.environment
 
       # In Sprockets 3 logical_path has an odd behavior when the filename is "index"
       # thus we need to bake our own logical_path
       filename = context.respond_to?(:filename) ? context.filename : context.pathname.to_s
       root_path_regexp = Regexp.escape(context.root_path)
       logical_path = filename.gsub(%r{^#{root_path_regexp}/?(.*?)#{sprockets_extnames_regexp}}, '\1')
+
+      output = call(
+        environment: environment,
+        name: logical_path,
+        metadata: {}
+      )
+
+      output[:required].each { |required| context.require_asset required }
+      output[:dependencies].each { |dependency| context.depend_on dependency }
+
+      output[:data]
+    end
+
+    def call(input)
+      @sprockets    = sprockets    = input[:environment]
+      @logical_path = logical_path = input[:name]
+      @required     = Set.new
+      @dependencies = Set.new
 
       compiler_options = self.compiler_options.merge(file: logical_path)
 
@@ -45,19 +76,27 @@ module Opal
       compiler = Compiler.new(data, compiler_options)
       result = compiler.compile
 
-      process_requires(compiler.requires, context)
-      process_required_trees(compiler.required_trees, context)
+      process_requires(compiler.requires)
+      process_required_trees(compiler.required_trees)
 
       if Opal::Config.source_map_enabled
         map_contents = compiler.source_map.as_json.to_json
         ::Opal::SourceMapServer.set_map_cache(sprockets, logical_path, map_contents)
       end
 
-      result.to_s
+      {
+        data: result.to_s,
+        required: @required,
+        dependencies: @dependencies,
+      }
+    end
+
+    def self.sprockets_extnames(sprockets)
+      ['.js']+sprockets.engines.keys
     end
 
     def self.sprockets_extnames_regexp(sprockets)
-      joined_extnames = (['.js']+sprockets.engines.keys).map { |ext| Regexp.escape(ext) }.join('|')
+      joined_extnames = sprockets_extnames(sprockets).map { |ext| Regexp.escape(ext) }.join('|')
       Regexp.new("(#{joined_extnames})*$")
     end
 
@@ -65,22 +104,22 @@ module Opal
       @sprockets_extnames_regexp ||= self.class.sprockets_extnames_regexp(@sprockets)
     end
 
-    def process_requires(requires, context)
+    def process_requires(requires)
       requires.each do |required|
         required = required.to_s.sub(sprockets_extnames_regexp, '')
-        context.require_asset required unless ::Opal::Config.stubbed_files.include? required
+        @required << required unless ::Opal::Config.stubbed_files.include? required
       end
     end
 
     # Internal: Add files required with `require_tree` as asset dependencies.
     #
     # Mimics (v2) Sprockets::DirectiveProcessor#process_require_tree_directive
-    def process_required_trees(required_trees, context)
+    def process_required_trees(required_trees)
       return if required_trees.empty?
 
       # This is the root dir of the logical path, we need this because
       # the compiler gives us the path relative to the file's logical path.
-      dirname = File.dirname(file).gsub(/#{Regexp.escape File.dirname(context.logical_path)}#{REGEXP_END}/, '')
+      dirname = File.dirname(file).gsub(/#{Regexp.escape File.dirname(@logical_path)}#{REGEXP_END}/, '')
       dirname = Pathname(dirname)
 
       required_trees.each do |original_required_tree|
@@ -96,9 +135,8 @@ module Opal
           raise ArgumentError, "require_tree argument must be a directory: #{{source: original_required_tree, pathname: required_tree}.inspect}"
         end
 
-        context.depend_on required_tree.to_s
-
-        environment = context.environment
+        @dependencies << required_tree.to_s
+        environment = @environment
 
         processor = ::Sprockets::DirectiveProcessor.new
         processor.instance_variable_set('@dirname', File.dirname(file))
@@ -110,9 +148,13 @@ module Opal
           path = Pathname(path)
           pathname = path.relative_path_from(dirname).to_s
 
-          if name.to_s == file  then next
-          elsif path.directory? then context.depend_on(path.to_s)
-          else context.require_asset(pathname)
+          case
+          when name.to_s == file
+            next
+          when path.directory?
+            @dependencies << path.to_s
+          else
+            @required << pathname
           end
         end
       end
@@ -141,5 +183,14 @@ module Opal
   end
 end
 
-Sprockets.register_engine '.rb',  Opal::Processor
-Sprockets.register_engine '.opal',  Opal::Processor
+
+case
+when Sprockets.respond_to?(:register_transformer)
+  Sprockets.register_mime_type 'application/ruby', extensions: %w[.rb .js.rb .opal .js.opal], charset: :unicode
+  Sprockets.register_transformer 'application/ruby', 'application/javascript', Opal::Processor
+  Sprockets.register_preprocessor 'application/ruby', Sprockets::DirectiveProcessor.new(comments: ['#'])
+
+when Sprockets.respond_to?(:register_engine)
+  Sprockets.register_engine '.rb',    Opal::Processor
+  Sprockets.register_engine '.opal',  Opal::Processor
+end
