@@ -22,6 +22,10 @@ Whitespace conventions:
 
 ## [0.10.2] - Unreleased
 - Fixed inheritance from the `Module` class (#1476)
+- Fixed source map server with url-encoded paths
+
+
+
 
 ## [0.10.1] - 2016-07-06
 

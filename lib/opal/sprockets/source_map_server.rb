@@ -1,3 +1,5 @@
+require 'cgi'
+
 module Opal
   class SourceMapServer
     # Carelessly taken from Sprockets::Caching (Sprockets v2)
@@ -79,7 +81,7 @@ module Opal
 
     def call(env)
       prefix_regex = %r{^(?:#{prefix}/|/)}
-      path_info = env['PATH_INFO'].to_s.sub(prefix_regex, '')
+      path_info = CGI.unescape(env['PATH_INFO'].to_s).sub(prefix_regex, '')
 
       case path_info
       when %r{^(.*)\.self\.map$}
