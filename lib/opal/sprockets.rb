@@ -27,9 +27,9 @@ module Opal
       asset = sprockets[name.sub(/(\.(js|rb|opal))*#{REGEXP_END}/, '.js')]
       return '' if asset.nil?
 
-      opal_extnames = sprockets.engines.map do |ext, engine|
+      opal_extnames = (%w[.rb .opal .js.rb .js.opal] + sprockets.engines.map do |ext, engine|
         ext if engine <= ::Opal::Processor
-      end.compact
+      end).uniq.compact
 
       module_name       = -> asset { asset.logical_path.sub(/\.js#{REGEXP_END}/, '') }
       path_extnames     = -> path  { File.basename(path).scan(/\.[^.]+/) }

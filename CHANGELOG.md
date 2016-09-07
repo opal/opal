@@ -20,9 +20,23 @@ Whitespace conventions:
 
 
 
+
 ## [0.10.2] - Unreleased
+
+
+### Added
+
+- Support for Sprockets 3+ processor / transformer API. (No more deprecations on Sprockets 3.7+)
+
+
+### Fixed
+
 - Fixed inheritance from the `Module` class (#1476)
 - Fixed source map server with url-encoded paths
+
+
+
+
 
 
 
