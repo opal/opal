@@ -100,6 +100,14 @@ module Opal
           push ", #{scope_name}.$$parameters = #{parameters_code}"
         end
 
+        if compiler.parse_comments?
+          push ", #{scope_name}.$$comments = #{comments_code}"
+        end
+
+        if compiler.enable_source_location?
+          push ", #{scope_name}.$$source_location = #{source_location}"
+        end
+
         wrap_with_definition
       end
 
@@ -125,6 +133,17 @@ module Opal
           line "var $arity = arguments.length;"
           push " if (#{arity_checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
         end
+      end
+
+      def source_location
+        file = @sexp.loc.expression.source_buffer.name
+        line = @sexp.loc.line
+
+        "['#{file}.rb', #{line}]"
+      end
+
+      def comments_code
+        '[' + comments.map { |comment| comment.text.inspect }.join(', ') + ']'
       end
     end
   end

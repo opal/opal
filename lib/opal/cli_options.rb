@@ -142,6 +142,14 @@ module Opal
         options[:irb] = true
       end
 
+      on('--enable-source-location', 'Compiles source location for each method definition.') do
+        options[:enable_source_location] = true
+      end
+
+      on('--parse-comments', 'Compiles comments for each method definition.') do
+        options[:parse_comments] = true
+      end
+
       separator ''
     end
 

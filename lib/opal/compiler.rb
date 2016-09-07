@@ -120,6 +120,16 @@ module Opal
 
     compiler_option :eval, false, as: :eval?
 
+    # @!method enable_source_location?
+    #
+    # Adds source_location for every method definition
+    compiler_option :enable_source_location, false, :as => :enable_source_location?
+
+    # @!method parse_comments?
+    #
+    # Adds comments for every method definition
+    compiler_option :parse_comments, false, :as => :parse_comments?
+
     # @return [String] The compiled ruby code
     attr_reader :result
 
@@ -135,33 +145,47 @@ module Opal
     # Any content in __END__ special construct
     attr_reader :eof_content
 
+    # Comments from the source code
+    attr_reader :comments
+
     def initialize(source, options = {})
       @source = source
       @indent = ''
       @unique = 0
       @options = options
+      @comments = Hash.new([])
     end
 
     # Compile some ruby code to a string.
     #
     # @return [String] javascript code
     def compile
-      @buffer = ::Parser::Source::Buffer.new(file)
-      @buffer.source = @source
-      @parser = Opal::Parser.new(Opal::AST::Builder.new)
-
-      parsed = begin
-        @parser.parse(@buffer)
-      rescue ::Parser::SyntaxError => error
-        raise ::SyntaxError, error.message, error.backtrace
-      end
-
-      @sexp = s(:top, parsed || s(:nil))
-      @eof_content = extract_eof_content
+      parse
 
       @fragments = process(@sexp).flatten
 
       @result = @fragments.map(&:code).join('')
+    end
+
+    def parse
+      buffer = ::Parser::Source::Buffer.new(file)
+      buffer.source = @source
+
+      @parser = Opal::Parser.default_parser
+
+      begin
+        if parse_comments?
+          sexp, comments = @parser.parse_with_comments(buffer)
+          @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
+        else
+          sexp = @parser.parse(buffer)
+        end
+      rescue ::Parser::SyntaxError => error
+        raise ::SyntaxError, error.message, error.backtrace
+      end
+
+      @sexp = s(:top, sexp || s(:nil))
+      @eof_content = extract_eof_content
     end
 
     # Returns a source map that can be used in the browser to map back to

@@ -202,11 +202,30 @@ describe Opal::CLI do
     end
   end
 
+  describe ':parse_comments option' do
+    let(:code) do
+      <<-CODE
+        # multiline
+        # comment
+        def m
+        end
+      CODE
+    end
+    let(:options) { { parse_comments: true, evals: [code], compile: true } }
 
+    it 'sets $$comment prop for compiled methods' do
+      expect_output_of { subject.run }.to include('$$comments = ["# multiline", "# comment"]')
+    end
+  end
 
+  describe ':enable_source_location' do
+    let(:file) { File.expand_path('../fixtures/source_location_test.rb', __FILE__) }
+    let(:options) { { enable_source_location: true, compile: true, file: File.open(file) } }
 
-
-
+    it 'sets $$source_location prop for compiled methods' do
+      expect_output_of { subject.run }.to include("source_location_test.rb', 6]")
+    end
+  end
 
   private
 

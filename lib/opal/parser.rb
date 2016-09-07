@@ -11,28 +11,28 @@ end
 
 module Opal
   class Parser < ::Parser::Ruby23
-    def parse(source, file = '(string)')
-      # Legacy support
-      if String === source
-        warn 'this method is deprecated from the public API'
-        buffer        = ::Parser::Source::Buffer.new(file)
-        buffer.source = source
-      else
-        buffer = source
-      end
+    def initialize(*)
+      super(Opal::AST::Builder.new)
+    end
 
-      diagnostics.all_errors_are_fatal = true
-      diagnostics.ignore_warnings      = true
+    def self.default_parser
+      parser = super
+
+      parser.diagnostics.all_errors_are_fatal = true
+      parser.diagnostics.ignore_warnings      = true
 
       if RUBY_ENGINE == 'opal'
-        diagnostics.consumer = ->(diag){}
+        parser.diagnostics.consumer = ->(diag){}
       else
-        diagnostics.consumer = lambda do |diagnostic|
+        parser.diagnostics.consumer = lambda do |diagnostic|
           $stderr.puts(diagnostic.render)
         end
       end
+      parser
+    end
 
-      parsed = super(buffer)
+    def parse(source_buffer)
+      parsed = super
       rewriten = rewrite(parsed)
       rewriten
     end
