@@ -143,7 +143,7 @@ module Opal
       end
 
       def compile_defined_super(node)
-        push expr s(:defined_super, node)
+        push expr s(:defined_super)
       end
 
       def compile_defined_yield(node)
