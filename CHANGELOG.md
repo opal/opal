@@ -20,9 +20,15 @@ Whitespace conventions:
 
 
 
+
 ## [0.10.2] - Unreleased
+
+
+### Fixed
+
 - Fixed inheritance from the `Module` class (#1476)
 - Fixed source map server with url-encoded paths
+- Silence Sprockets 3.7 deprecations, full support for Sprockets 4 will be available in Opal 0.11
 
 
 

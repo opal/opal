@@ -19,5 +19,10 @@ module Opal
   end
 end
 
-Tilt.register 'opalerb',               Opal::ERB::Processor
-Sprockets.register_engine '.opalerb',  Opal::ERB::Processor
+Tilt.register 'opalerb', Opal::ERB::Processor
+
+if Sprockets.respond_to? :register_transformer
+  Sprockets.register_engine '.opalerb', Opal::ERB::Processor, mime_type: 'application/javascript', silence_deprecation: true
+else
+  Sprockets.register_engine '.opalerb', Opal::ERB::Processor
+end

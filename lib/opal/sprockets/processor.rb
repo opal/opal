@@ -141,5 +141,10 @@ module Opal
   end
 end
 
-Sprockets.register_engine '.rb',  Opal::Processor
-Sprockets.register_engine '.opal',  Opal::Processor
+if Sprockets.respond_to? :register_transformer
+  Sprockets.register_engine '.rb',  Opal::Processor, mime_type: 'application/javascript', silence_deprecation: true
+  Sprockets.register_engine '.opal',  Opal::Processor, mime_type: 'application/javascript', silence_deprecation: true
+else
+  Sprockets.register_engine '.rb',  Opal::Processor
+  Sprockets.register_engine '.opal',  Opal::Processor
+end

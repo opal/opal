@@ -3,6 +3,7 @@ gemspec
 
 tilt_version = ENV['TILT_VERSION']
 rack_version = ENV['RACK_VERSION']
+sprockets_version = ENV['SPROCKETS_VERSION']
 
 # Stick with older racc until
 # https://github.com/tenderlove/racc/issues/22
@@ -16,6 +17,7 @@ gem 'thin', platform: :mri if !rack_version || (rack_version < '2')
 
 gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
+gem 'sprockets', sprockets_version if sprockets_version
 
 group :repl do
   gem 'therubyracer', platform: :mri, require: 'v8'
