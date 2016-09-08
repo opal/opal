@@ -1401,6 +1401,9 @@
           return result;
         }
       }
+      else if (candidate === Opal.JS.Error) {
+        return candidate;
+      }
       else if (candidate['$==='](exception)) {
         return candidate;
       }
