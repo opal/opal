@@ -102,6 +102,19 @@ Whitespace conventions:
 
 
 
+## [0.10.2] - 2016-09-09
+
+
+## Fixed
+
+- Fixed inheritance from the `Module` class (#1476)
+- Fixed source map server with url-encoded paths
+- Silence Sprockets 3.7 deprecations, full support for Sprockets 4 will be available in Opal 0.11
+- Don't print the full stack trace with deprecation messages
+
+
+
+
 ## [0.10.1] - 2016-07-06
 
 
@@ -941,8 +954,9 @@ Whitespace conventions:
 
 
 [0.11.0]: https://github.com/opal/opal/compare/v0.10.1...HEAD
-[0.10.1]: https://github.com/opal/opal/compare/v0.10.0...0.10.1
-[0.10.0]: https://github.com/opal/opal/compare/v0.9.4...0.10.0
+[0.10.2]: https://github.com/opal/opal/compare/v0.10.1...v0.10.2
+[0.10.1]: https://github.com/opal/opal/compare/v0.10.0...v0.10.1
+[0.10.0]: https://github.com/opal/opal/compare/v0.9.4...v0.10.0
 [0.9.4]: https://github.com/opal/opal/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/opal/opal/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/opal/opal/compare/v0.9.1...v0.9.2
