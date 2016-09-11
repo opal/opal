@@ -65,13 +65,12 @@ module Opal
 
           if scope.uses_zuper
             add_local '$zuper'
-            add_local '$zuper_index'
-            add_local '$zuper_length'
+            add_local '$zuper_i'
+            add_local '$zuper_ii'
 
-            line "$zuper = [];"
-            line
-            line "for($zuper_index = 0; $zuper_index < arguments.length; $zuper_index++) {"
-            line "  $zuper[$zuper_index] = arguments[$zuper_index];"
+            line "// Prepare super implicit arguments"
+            line "for($zuper_i = 0, $zuper_ii = arguments.length, $zuper = new Array($zuper_ii); $zuper_i < $zuper_ii; $zuper_i++) {"
+            line "  $zuper[$zuper_i] = arguments[$zuper_i];"
             line "}"
           end
 
