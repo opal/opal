@@ -13,10 +13,7 @@ matrix:
 
   include:
     - rvm: 2.3.1
-      env: RUN=jshint SUITE=core
-
-    - rvm: 2.3.1
-      env: RUN=jshint SUITE=stdlib
+      env: RUN=jshint
 
     - rvm: 2.3.1
       env: RUN=mspec_opal_nodejs

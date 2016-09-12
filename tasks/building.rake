@@ -25,7 +25,7 @@ task :dist do
   files     = ENV['FILES'] ? ENV['FILES'].split(',') :
               Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }
 
-  Dir.mkdir build_dir unless File.directory? build_dir
+  mkdir_p build_dir unless File.directory? build_dir
   width = files.map(&:size).max
 
   files.each do |lib|

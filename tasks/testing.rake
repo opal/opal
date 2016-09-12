@@ -198,29 +198,6 @@ task :mspec_phantomjs           => [:mspec_opal_phantomjs,           :mspec_ruby
 task :mspec_nodejs              => [:mspec_opal_nodejs,              :mspec_ruby_nodejs]
 task :mspec_sprockets_phantomjs => [:mspec_opal_sprockets_phantomjs, :mspec_ruby_sprockets_phantomjs]
 
-task :jshint do
-  js_filename = 'tmp/jshint.js'
-  mkdir_p 'tmp'
-
-  if ENV['SUITE'] == 'core'
-    sh "ruby -rbundler/setup bin/opal -ce '23' > #{js_filename}"
-    sh "jshint --verbose #{js_filename}"
-  elsif ENV['SUITE'] == 'stdlib'
-    sh "rake dist"
-
-    Dir["build/*.js"].each {|path|
-      unless path =~ /(opal.*js)|.min.js/
-        sh "jshint --verbose #{path}"
-      end
-    }
-  else
-    warn 'Please provide at lease one of the following ENV vars:'
-    warn 'SUITE   # can be either SUITE=core or SUITE=stdlib'
-    exit 1
-  end
-end
-
-
 module MinitestSuite
   extend self
 

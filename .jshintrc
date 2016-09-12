@@ -28,7 +28,6 @@
   "-W030": false, // Expected an assignment or function call and instead saw an expression
   "-W032": false, // Unnecessary semicolon
   "-W033": false, // Missing semicolon
-  "-W067": false, // Bad invocation
   "-W083": false, // Don't make functions within a loop
   "-W093": false, // Did you mean to return a conditional instead of an assignment?
   "-W098": false, // 'variable' is defined but never used

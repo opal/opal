@@ -1,18 +1,16 @@
-directory 'tmp/lint'
-
 desc "Build *corelib* and *stdlib* and lint the result"
-task :lint => 'tmp/lint' do
-  require 'opal/sprockets/environment'
+task :jshint do
+  dir = 'tmp/lint'
 
-  env = Opal::Environment.new
-
-  files = Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }
-
-  files.each do |lib|
-    next if lib == 'minitest'
-    File.binwrite("tmp/lint/#{lib}.js", env[lib].to_s)
+  unless ENV['SKIP_BUILD']
+    rm_rf dir if File.exist? dir
+    sh "rake dist DIR=#{dir}"
   end
 
-  sh "jshint --verbose tmp/lint/*.js"
-end
+  Dir["#{dir}/*.js"].each {|path|
+    # opal-builder and opal-parser take so long travis stalls
+    next if path =~ /.min.js\z|opal-builder|opal-parser/
 
+    sh "jshint --verbose #{path}"
+  }
+end
