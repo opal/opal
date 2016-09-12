@@ -85,8 +85,17 @@ module Opal
           end
         end
 
-        #     This is a special utf8 char ---v
-        function_name = valid_name?(mid) ? " ː#{mid}" : ''
+        # There are some special utf8 chars that can be used as valid JS
+        # identifiers, some examples:
+        #
+        # utf8_pond = 'ⵌ'
+        # utf8_question = 'ʔ̣'
+        # utf8_exclamation 'ǃ'
+        #
+        # For now we're just using pond, but maybe in the future we can find
+        # counterparts for most of those allowed in a Ruby method id
+
+        function_name = valid_name?(mid) ? " ⵌ#{mid}" : ''
 
         unshift ") {"
         unshift(inline_params)
