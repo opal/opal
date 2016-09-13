@@ -12,4 +12,5 @@ require 'opal/deprecations'
 # in any JavaScript environment.
 module Opal
   autoload :Server, 'opal/server'
+  autoload :SimpleServer, 'opal/simple_server'
 end
