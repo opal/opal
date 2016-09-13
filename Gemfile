@@ -20,14 +20,13 @@ gem 'tilt', tilt_version if tilt_version
 gem 'sprockets', sprockets_version if sprockets_version
 
 group :repl do
-  gem 'therubyracer', platform: :mri, require: 'v8'
-  gem 'therubyrhino', platform: :jruby
+  gem 'therubyracer', platform: :mri, require: false
+  gem 'therubyrhino', platform: :jruby, require: false
 end
 
 unless ENV['CI']
   gem 'rb-fsevent'
   gem 'guard', require: false
-  gem 'therubyracer', require: false
 
   if RUBY_PLATFORM =~ /darwin/
     gem 'terminal-notifier-guard'
