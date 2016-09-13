@@ -134,3 +134,8 @@ end
 class StopIteration
   attr_reader :result
 end
+
+module JS
+  class Error
+  end
+end
