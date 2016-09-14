@@ -16,6 +16,14 @@ class Method
     `#{@method}.$$parameters`
   end
 
+  def source_location
+    `#{@method}.$$source_location` || ['(eval)', 0]
+  end
+
+  def comments
+    `#{@method}.$$comments` || []
+  end
+
   def call(*args, &block)
     %x{
       #@method.$$p = block;
@@ -59,6 +67,14 @@ class UnboundMethod
 
   def parameters
     `#{@method}.$$parameters`
+  end
+
+  def source_location
+    `#{@method}.$$source_location` || ['(eval)', 0]
+  end
+
+  def comments
+    `#{@method}.$$comments` || []
   end
 
   def bind(object)

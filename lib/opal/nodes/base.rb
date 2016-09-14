@@ -178,6 +178,10 @@ module Opal
           "Opal.Object"
         end
       end
+
+      def comments
+        compiler.comments[@sexp.loc]
+      end
     end
   end
 end

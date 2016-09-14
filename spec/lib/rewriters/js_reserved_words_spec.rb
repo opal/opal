@@ -2,7 +2,7 @@ require 'lib/spec_helper'
 
 describe Opal::Rewriters::JsReservedWords do
   def s(type, *children)
-    ::Parser::AST::Node.new(type, children)
+    ::Opal::AST::Node.new(type, children)
   end
 
   def expect_rewritten(sexp)

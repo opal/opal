@@ -131,7 +131,7 @@ module Opal
       evals_or_file do |contents, filename|
         buffer = ::Parser::Source::Buffer.new(filename)
         buffer.source = contents
-        sexp = Opal::Parser.new(Opal::AST::Builder.new).parse(buffer)
+        sexp = Opal::Parser.default_parser.parse(buffer)
         puts sexp.inspect
       end
     end
@@ -152,10 +152,12 @@ module Opal
         source_map_enabled
         irb_enabled
         inline_operators
+        enable_source_location
+        parse_comments
       ]
     end
 
-    # Internal: Yelds a string of source code and the proper filename for either
+    # Internal: Yields a string of source code and the proper filename for either
     #           evals, stdin or a filepath.
     def evals_or_file
       # --library
