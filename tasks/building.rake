@@ -28,24 +28,28 @@ task :dist do
   mkdir_p build_dir unless File.directory? build_dir
   width = files.map(&:size).max
 
-  files.each do |lib|
-    print "* building #{lib}...".ljust(width+'* building ... '.size)
-    $stdout.flush
+  files.map do |lib|
+    Thread.new {
+      log = ''
+      log << "* building #{lib}...".ljust(width+'* building ... '.size)
+      $stdout.flush
 
-    src = Opal::Builder.build(lib).to_s
-    min = Opal::Util.uglify src
-    gzp = Opal::Util.gzip min
+      src = Opal::Builder.build(lib).to_s
+      min = Opal::Util.uglify src
+      gzp = Opal::Util.gzip min
 
-    File.open("#{build_dir}/#{lib}.js", 'w+')        { |f| f << src }
-    File.open("#{build_dir}/#{lib}.min.js", 'w+')    { |f| f << min } if min
-    File.open("#{build_dir}/#{lib}.min.js.gz", 'w+') { |f| f << gzp } if gzp
+      File.open("#{build_dir}/#{lib}.js", 'w+')        { |f| f << src }
+      File.open("#{build_dir}/#{lib}.min.js", 'w+')    { |f| f << min } if min
+      File.open("#{build_dir}/#{lib}.min.js.gz", 'w+') { |f| f << gzp } if gzp
 
-    print "done. ("
-    print "development: #{('%.2f' % (src.size/1000.0)).rjust(7)}KB"
-    print  ", minified: #{('%.2f' % (min.size/1000.0)).rjust(7)}KB" if min
-    print   ", gzipped: #{('%.2f' % (gzp.size/1000.0)).rjust(7)}KB" if gzp
-    puts  ")."
-  end
+      log << "done. ("
+      log << "development: #{('%.2f' % (src.size/1000.0)).rjust(7)}KB"
+      log <<  ", minified: #{('%.2f' % (min.size/1000.0)).rjust(7)}KB" if min
+      log <<   ", gzipped: #{('%.2f' % (gzp.size/1000.0)).rjust(7)}KB" if gzp
+      log << ")."
+      log
+    }
+  end.map(&:value).map(&method(:puts))
 end
 
 desc 'Rebuild grammar.rb for opal parser'
