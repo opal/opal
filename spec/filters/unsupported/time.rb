@@ -1,4 +1,4 @@
-opal_filter "Time" do
+opal_unsupported_filter "Time" do
   fails "Time#+ accepts arguments that can be coerced into Rational"
   fails "Time#+ adds a negative Float"
   fails "Time#+ increments the time by the specified amount as rational numbers"

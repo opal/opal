@@ -1,4 +1,4 @@
-opal_filter "taint" do
+opal_unsupported_filter "taint" do
   fails "Hash#reject with extra state does not taint the resulting hash"
 
   fails "String#% doesn't taint the result for %e when argument is tainted"
@@ -8,6 +8,10 @@ opal_filter "taint" do
   fails "String#% doesn't taint the result for %G when argument is tainted"
   fails "String#byteslice with index, length always taints resulting strings when self is tainted"
   fails "String#byteslice with Range always taints resulting strings when self is tainted"
+  fails "String#slice with Regexp always taints resulting strings when self or regexp is tainted"
+  fails "String#slice with Regexp returns an untrusted string if the regexp is untrusted"
+  fails "String#[] with Regexp always taints resulting strings when self or regexp is tainted"
+  fails "String#[] with Regexp returns an untrusted string if the regexp is untrusted"
 
   fails "StringScanner#pre_match taints the returned String if the input was tainted"
   fails "StringScanner#post_match taints the returned String if the input was tainted"

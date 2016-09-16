@@ -1,4 +1,4 @@
-opal_filter "Module" do
+opal_unsupported_filter "Module" do
   fails "Module#class_variable_set raises a RuntimeError when self is frozen"
   fails "Module#define_method is private"
   fails "Module#define_method raises a RuntimeError if frozen"

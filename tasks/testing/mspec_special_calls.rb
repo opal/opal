@@ -46,4 +46,28 @@ class Opal::Nodes::CallNode
   end
 end
 
+require 'opal/rewriters/rubyspec/filters_rewriter'
 
+Opal::Rewriter.use Opal::Rubyspec::FiltersRewriter
+
+# When a spec is marked as filtered (most probably non-implemented functionality)
+# we need to exclude it from the test suite
+# (except of the case with inverted suite specified using INVERT_RUNNING_MODE=true)
+#
+def opal_filter(filter_name, &block)
+  unless ENV['INVERT_RUNNING_MODE']
+    Opal::Rubyspec::FiltersRewriter.instance_eval(&block)
+  end
+end
+
+# When a spec is marked as unsupported we need to exclude it from the test suite.
+#
+# This filter ignores ENV['INVERT_RUNNING_MODE'],
+# unsupported feature is always unsupported.
+#
+def opal_unsupported_filter(filter_name, &block)
+  Opal::Rubyspec::FiltersRewriter.instance_eval(&block)
+end
+
+Dir[File.expand_path('../../../spec/filters/unsupported/**/*.rb', __FILE__)].each { |f| require f }
+Dir[File.expand_path('../../../spec/filters/bugs/**/*.rb', __FILE__)].each { |f| require f }

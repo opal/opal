@@ -1,4 +1,4 @@
-opal_filter "Kernel" do
+opal_unsupported_filter "Kernel" do
   fails "Kernel has private instance method Array()"
   fails "Kernel has private instance method Hash()"
   fails "Kernel#Float is a private method"

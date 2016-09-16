@@ -1,4 +1,4 @@
-opal_filter "Enumerator" do
+opal_unsupported_filter "Enumerator" do
   fails "Enumerator#next cannot be called again until the enumerator is rewound"
   fails "Enumerator#next raises a StopIteration exception at the end of the stream"
   fails "Enumerator#next returns the next element of the enumeration"

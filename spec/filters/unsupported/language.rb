@@ -1,4 +1,4 @@
-opal_filter "language" do
+opal_unsupported_filter "language" do
   fails "Magic comment can be after the shebang"
   fails "Magic comment can take Emacs style"
   fails "Magic comment can take vim style"

@@ -1,4 +1,4 @@
-opal_filter "Regexp" do
+opal_unsupported_filter "Regexp" do
   fails "Regexp#options does not include Regexp::FIXEDENCODING for a Regexp literal with the 'n' option"
   fails "Regexp#options includes Regexp::FIXEDENCODING for a Regexp literal with the 'e' option"
   fails "Regexp#options includes Regexp::FIXEDENCODING for a Regexp literal with the 's' option"
@@ -56,4 +56,13 @@ opal_filter "Regexp" do
   fails "Regexp.union returns a Regexp with the encoding of multiple non-conflicting Strings containing non-ASCII-compatible characters"
   fails "Regexp.union returns a Regexp with US-ASCII encoding if all arguments are ASCII-only"
   fails "Regexp.union returns a Regexp with UTF-8 if one part is UTF-8"
+  fails "Regexp#source has US-ASCII encoding when created from an ASCII-only \\u{} literal"
+  fails "Regexp#source has UTF-8 encoding when created from a non-ASCII-only \\u{} literal"
+  fails "Regexp#to_s displays options if included"
+  fails "Regexp#to_s displays groups with options"
+  fails "Regexp#to_s displays single group with same options as main regex as the main regex"
+  fails "Regexp#to_s deals properly with uncaptured groups"
+  fails "Regexp#to_s handles abusive option groups"
+  fails "Regexp.try_convert returns the argument if given a Regexp"
+  fails "Regexp with character classes doesn't match non-ASCII characters with [[:ascii:]]"
 end

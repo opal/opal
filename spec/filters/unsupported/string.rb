@@ -1,4 +1,4 @@
-opal_filter "String" do
+opal_unsupported_filter "String" do
   fails "BasicObject#__id__ returns a different value for two String literals"
   fails "String#% always taints the result when the format string is tainted"
   fails "String#% supports negative bignums with %u or %d"
@@ -535,4 +535,8 @@ opal_filter "String" do
   fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces an ASCII string when escaping ASCII characters via \\u{}"
   fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u"
   fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u{}"
+  fails "String#gsub with pattern and block raises an ArgumentError if encoding is not valid"
+  fails "String#gsub! with pattern and block raises an ArgumentError if encoding is not valid"
+  fails "String#rindex with Regexp supports \\G which matches at the given start offset"
+  fails "String#sub with pattern, replacement raises a TypeError when pattern is a Symbol"
 end

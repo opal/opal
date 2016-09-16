@@ -1,4 +1,4 @@
-opal_filter "Hash" do
+opal_unsupported_filter "Hash" do
   fails "Hash#assoc only returns the first matching key-value pair for identity hashes"
   fails "Hash#clear raises a RuntimeError if called on a frozen instance"
   fails "Hash#compare_by_identity causes future comparisons on the receiver to be made by identity"

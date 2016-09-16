@@ -1,4 +1,4 @@
-opal_filter "private" do
+opal_unsupported_filter "private" do
   fails "BasicObject#initialize is a private instance method"
   fails "BasicObject#method_missing for a Class raises a NoMethodError when an undefined method is called"
   fails "BasicObject#method_missing is a private method"

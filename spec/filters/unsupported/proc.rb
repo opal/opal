@@ -1,3 +1,3 @@
-opal_filter "Proc" do
+opal_unsupported_filter "Proc" do
   fails "Proc#hash returns an Integer"
 end
