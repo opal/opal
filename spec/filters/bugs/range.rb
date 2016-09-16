@@ -31,10 +31,7 @@ opal_filter "Range" do
   fails "Range#step with exclusive end and String values raises a TypeError when passed a Float step" # requires Fixnum != Float
   fails "Range#step with inclusive end and String values raises a TypeError when passed a Float step" # requires Fixnum != Float
   fails "Range#== returns true if other has same begin, end, and exclude_end? values"
-  fails "Range#== returns false if one of the attributes differs"
   fails "Range#== returns true for subclasses of Range"
-  fails "Range#eql? returns true if other has same begin, end, and exclude_end? values"
-  fails "Range#eql? returns false if one of the attributes differs"
   fails "Range#eql? returns true for subclasses of Range"
   fails "Range#eql? returns false if the endpoints are not eql?"
 end

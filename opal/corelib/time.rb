@@ -694,7 +694,7 @@ class Time < `Date`
     `#{wday} == 2`
   end
 
-  alias tv_sec sec
+  alias tv_sec to_i
 
   alias tv_usec usec
 

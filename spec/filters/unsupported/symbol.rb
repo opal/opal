@@ -16,4 +16,5 @@ opal_filter "Symbol" do
   fails "Marshal.dump with a Symbol dumps an encoded Symbol"
   fails "Marshal.dump with a Symbol dumps a binary encoded Symbol"
   fails "Marshal.dump with an Array dumps a non-empty Array" # this particular spec dumps a Symbol, spec with String instead of Symbol is in spec/opal/
+  fails "Hash literal raises a TypeError if any splatted elements keys are not symbols"
 end

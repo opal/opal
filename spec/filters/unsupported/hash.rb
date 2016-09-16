@@ -41,6 +41,8 @@ opal_filter "Hash" do
   fails "Hash#store raises a RuntimeError if called on a frozen instance"
   fails "Hash#to_a returns a tainted array if self is tainted"
   fails "Hash#to_a returns an untrusted array if self is untrusted"
+  fails "Hash#to_proc the returned proc raises ArgumentError if not passed exactly one argument"
+  fails "Hash#to_proc the returned proc passed as a block to instance_exec always retrieves the original hash's values"
   fails "Hash#to_s returns a tainted string if self is tainted and not empty"
   fails "Hash#to_s returns an untrusted string if self is untrusted and not empty"
   fails "Hash#update checks frozen status before coercing an object with #to_hash"

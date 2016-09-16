@@ -265,4 +265,6 @@ opal_filter "private" do
   fails "Kernel#respond_to? returns false if obj responds to the given protected method"
   fails "Module#protected without arguments within a closure sets the visibility outside the closure"
   fails "Set#flatten_merge is protected"
+  fails "Kernel#public_send called from own public method raises a NoMethodError if the method is private"
+  fails "Kernel#public_send called from own public method raises a NoMethodError if the method is protected"
 end
