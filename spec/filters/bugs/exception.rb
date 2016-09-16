@@ -22,6 +22,7 @@ opal_filter "Exception" do
   fails "Exception#backtrace includes the line number of the location where self raised in the first element"
   fails "Exception#backtrace includes the name of the method from where self raised in the first element"
   fails "Exception#backtrace returns nil if no backtrace was set"
+  fails "Exception#cause returns the active exception when an exception is raised"
   fails "Exception#set_backtrace accepts a String"
   fails "Exception#set_backtrace accepts an Array of Strings"
   fails "Exception#set_backtrace accepts an empty Array"
