@@ -10,7 +10,7 @@ Bundler.require
 
 # with gems like opal-jquery or opal-browser you could manipulate the dom directly
 
-run Opal::Server.new { |s|
+run Opal::SimpleServer.new { |s|
   # the name of the ruby file to load. To use more files they must be required from here (see app)
   s.main = 'application'
   # the directory where the code is (add to opal load path )

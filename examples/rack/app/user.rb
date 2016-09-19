@@ -4,6 +4,8 @@ class User
     @name = name
   end
 
+  attr_reader :name
+
   def authenticated?
     if admin? or special_permission?
       true

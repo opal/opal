@@ -1,13 +1,24 @@
 require 'opal'
 require 'user'
+require 'opal/platform'
 
 module MyApp
   class Application
     def initialize
-      @user = User.new('Bill')
-      @user.authenticated?
+      @user = User.new('Bob')
+    end
+
+    def title
+      "#{@user.name} is #{:not unless @user.authenticated?} authenticated"
     end
   end
 end
 
-MyApp::Application.new
+$app = MyApp::Application.new
+
+require 'native'
+
+$$[:document][:title] = "#{$app.title}"
+
+bill = User.new('Bill')
+bill.authenticated?

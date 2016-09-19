@@ -1,24 +1,28 @@
 PATH
   remote: ../../
   specs:
-    opal (0.8.0.dev)
+    opal (0.11.0.dev)
+      ast (>= 2.3.0)
       hike (~> 1.2)
+      parser (>= 2.3.1.2)
       sourcemap (~> 0.1.0)
-      sprockets (>= 2.2.3, < 4.0.0)
-      tilt (~> 1.4)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    ast (2.3.0)
     hike (1.2.3)
-    rack (1.6.0)
+    parser (2.3.1.2)
+      ast (~> 2.2)
+    rack (2.0.1)
     sourcemap (0.1.1)
-    sprockets (3.0.3)
-      rack (~> 1.0)
-    tilt (1.4.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   opal!
+  rack
+
+BUNDLED WITH
+   1.12.5
