@@ -35,3 +35,5 @@ unless ENV['CI']
 end
 
 gem 'mspec', path: 'spec/mspec'
+
+gem 'selenium-webdriver', '>= 3.0.0.beta3.1'
