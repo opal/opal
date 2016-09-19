@@ -79,8 +79,15 @@ module Opal
           end
         end
 
-        #     This is a special utf8 char ---v
-        function_name = valid_name?(mid) ? " ː#{mid}" : ''
+        # There are some special utf8 chars that can be used as valid JS
+        # identifiers, some examples:
+        #
+        # utf8_pond = 'ⵌ'
+        # utf8_question = 'ʔ̣'
+        # utf8_exclamation 'ǃ'
+        #
+        # For now we're just using $, to maintain compatibility with older IEs.
+        function_name = valid_name?(mid) ? " $$#{mid}" : ''
 
         unshift ") {"
         unshift(inline_params)
