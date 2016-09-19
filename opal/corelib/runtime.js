@@ -13,6 +13,24 @@
   //   The way the code is digested before going through Yardoc is a secret kept
   //   in the docs repo (https://github.com/opal/docs/tree/master).
 
+  var global_object = this, console;
+
+  // Detect the global object
+  if (typeof(global) !== 'undefined') { global_object = global; }
+  if (typeof(window) !== 'undefined') { global_object = window; }
+
+  // Setup a dummy console object if missing
+  if (typeof(global_object.console) === 'object') {
+    console = global_object.console;
+  } else if (global_object.console == null) {
+    console = global_object.console = {};
+  } else {
+    console = {};
+  }
+
+  if (!('log' in console)) { console.log = function () {}; }
+  if (!('warn' in console)) { console.warn = console.log; }
+
   if (typeof(this.Opal) !== 'undefined') {
     console.warn('Opal already loaded. Loading twice can cause troubles, please fix your setup.');
     return this.Opal;
@@ -67,7 +85,8 @@
   Opal.constants = [];
 
   // This is a useful reference to global object inside ruby files
-  Opal.global = this;
+  Opal.global = global_object;
+  global_object.Opal = Opal;
 
   // Configure runtime behavior with regards to require and unsupported fearures
   Opal.config = {
@@ -2221,13 +2240,3 @@
 
   TypeError.$$super = Error;
 }).call(this);
-
-if (typeof(global) !== 'undefined') {
-  global.Opal = this.Opal;
-  Opal.global = global;
-}
-
-if (typeof(window) !== 'undefined') {
-  window.Opal = this.Opal;
-  Opal.global = window;
-}
