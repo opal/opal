@@ -69,7 +69,7 @@ module Opal
       code = Opal::Builder.new.build_str(str, '(irb)', :irb => true, :const_missing => true)
       code.processed[0...-1].each { |c| @v8.eval(c.to_s) }
       @v8.eval "var $_result = #{code.processed.last.to_s} ($_result == null ? 'nil' : $_result.$inspect());"
-    rescue => e
+    rescue Exception => e
       puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end
 
