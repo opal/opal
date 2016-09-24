@@ -119,11 +119,12 @@ end
 This would be compiled into:
 
 ```javascript
-var val = 42;
-
-if (val !== false && val !== nil) {
-  return 3.142;
-}
+val = 42;
+if (val !== false && val !== nil && val != null) {
+  return 3.142
+} else {
+  return nil
+};
 ```
 
 This makes the generated truthy tests (`if` statements, `and` checks and
@@ -162,9 +163,10 @@ of JavaScript code that is wrapped inside an anonymous function. This
 looks similar to the following:
 
 ```javascript
-(function($opal) {
-  var $klass = $opal.klass, self = $opal.top;
+(function(Opal) {
+  var self = Opal.top, $scope = Opal, nil = Opal.nil, $breaker = Opal.breaker, $slice = Opal.slice;
   // generated code
+  return self.$puts("foo")
 })(Opal);
 ```
 
@@ -177,9 +179,11 @@ puts "foo"
 This would compile directly into:
 
 ```javascript
-(function($opal) {
-  var $klass = $opal.klass, self = $opal.top;
-  self.$puts("foo");
+(function(Opal) {
+  var self = Opal.top, $scope = Opal, nil = Opal.nil, $breaker = Opal.breaker, $slice = Opal.slice;
+
+  Opal.add_stubs(['$puts']);
+  return self.$puts("foo")
 })(Opal);
 ```
 
