@@ -38,7 +38,7 @@ and `FalseClass` classes from ruby.
 ```ruby
 "hello world!"    # => "hello world!"
 :foo              # => "foo"
-<<-EOS            # => "\nHello there.\n"
+<<-EOS            # => "Hello there.\n"
 Hello there.
 EOS
 ```
