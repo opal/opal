@@ -259,7 +259,7 @@ end
 
 desc 'Runs opal-rspec tests to augment unit testing/rubyspecs'
 task :smoke_test do
-  opal_rspec_dir = 'smoke_test_opal_rspec'
+  opal_rspec_dir = 'tmp/smoke_test_opal_rspec'
   # Travis caching might be creating this, manage the state idempotently
   unless File.exist?(File.join(opal_rspec_dir, '.git'))
     rm_rf opal_rspec_dir
