@@ -1,4 +1,4 @@
-opal_filter "MatchData" do
+opal_unsupported_filter "MatchData" do
   fails "MatchData#begin returns nil when the nth match isn't found"
   fails "MatchData#begin returns the offset for multi byte strings"
   fails "MatchData#begin returns the offset of the start of the nth element"
@@ -27,4 +27,7 @@ opal_filter "MatchData" do
   fails "MatchData#[Symbol] returns the corresponding named match when given a Symbol"
   fails "MatchData#[Symbol] returns the last match when multiple named matches exist with the same name"
   fails "MatchData#[Symbol] returns the matching version of multiple corresponding named match"
+  fails "MatchData#begin returns the offset for multi byte strings with unicode regexp"
+  fails "MatchData#end returns the offset for multi byte strings with unicode regexp"
+  fails "MatchData#offset returns the offset for multi byte strings with unicode regexp"
 end

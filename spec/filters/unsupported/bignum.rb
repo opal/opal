@@ -1,4 +1,4 @@
-opal_filter "Bignum" do
+opal_unsupported_filter "Bignum" do
   fails "BasicObject#__id__ returns a different value for two Bignum literals"
   fails "Complex#== with Numeric returns true when self's imaginary part is 0 and the real part and other have numerical equality"
   fails "Complex#fdiv with an imaginary part sets the real part to self's real part fdiv'd with the argument"

@@ -1,4 +1,4 @@
-opal_filter "Marshal" do
+opal_unsupported_filter "Marshal" do
   # Marshal.load
   fails "Marshal.load loads a Random" # depends on the reading from the filesystem
   fails "Marshal.load when source is tainted returns a tainted object"

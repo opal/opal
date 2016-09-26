@@ -51,6 +51,8 @@ class Object
     OSpecFilter.main.register_filters(description, block)
   end
 
+  alias opal_unsupported_filter opal_filter
+
   # Copyed from MSpec, with changes.
   def with_timezone(name, offset = nil, daylight_saving_zone = "")
     zone = name.dup

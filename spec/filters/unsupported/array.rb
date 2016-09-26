@@ -1,4 +1,4 @@
-opal_filter "Array" do
+opal_unsupported_filter "Array" do
   fails "Array#* with a string with a tainted separator does not taint the result if the array has only one element"
   fails "Array#* with a string with a tainted separator does not taint the result if the array is empty"
   fails "Array#* with a string with a tainted separator taints the result if the array has two or more elements"
@@ -58,6 +58,7 @@ opal_filter "Array" do
   fails "Array#fill does not replicate the filler"
   fails "Array#fill raises a RuntimeError on a frozen array"
   fails "Array#fill raises a RuntimeError on an empty frozen array"
+  fails "Array#fill with (filler, index, length) raises an ArgumentError or RangeError for too-large sizes"
   fails "Array#first raises a RangeError when count is a Bignum"
   fails "Array#flatten returns a tainted array if self is tainted"
   fails "Array#flatten returns an untrusted array if self is untrusted"
@@ -66,6 +67,7 @@ opal_filter "Array" do
   fails "Array#frozen? returns false for an array being sorted by #sort"
   fails "Array#frozen? returns true if array is frozen"
   fails "Array#hash returns the same fixnum for arrays with the same content"
+  fails "Array#hash calls to_int on result of calling hash on each element"
   fails "Array#initialize is private"
   fails "Array#initialize raises a RuntimeError on frozen arrays"
   fails "Array#insert raises a RuntimeError on frozen arrays when the array is modified"

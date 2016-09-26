@@ -1,4 +1,4 @@
-opal_filter "freezing" do
+opal_unsupported_filter "freezing" do
   fails "Array#delete returns nil on a frozen array if a modification does not take place"
   fails "Array#dup does not copy frozen status from the original"
   fails "Array#rotate does not mutate the receiver"

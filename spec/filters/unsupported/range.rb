@@ -1,4 +1,4 @@
-opal_filter "Range" do
+opal_unsupported_filter "Range" do
   fails "Range#initialize is private"
   fails "Range#inspect returns a tainted string if either end is tainted"
   fails "Range#inspect returns a untrusted string if either end is untrusted"

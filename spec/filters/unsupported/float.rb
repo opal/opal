@@ -1,4 +1,4 @@
-opal_filter "Float" do
+opal_unsupported_filter "Float" do
   fails "BasicObject#__id__ returns a different value for two Float literals"
   fails "Complex#/ with Fixnum raises a ZeroDivisionError when given zero"
   fails "Complex#eql? returns false when the imaginary parts are of different classes"

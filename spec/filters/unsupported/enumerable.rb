@@ -1,4 +1,4 @@
-opal_filter "Enumerable" do
+opal_unsupported_filter "Enumerable" do
   fails "Enumerable#chunk does not return elements for which the block returns :_separator"
   fails "Enumerable#chunk raises a RuntimeError if the block returns a Symbol starting with an underscore other than :_alone or :_separator"
   fails "Enumerable#chunk with [initial_state] yields an element and an object value-equal but not identical to the object passed to #chunk"
