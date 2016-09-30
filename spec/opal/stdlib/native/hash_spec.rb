@@ -12,6 +12,7 @@ describe Hash do
         e: [
           {
             f: 'g',
+            h: [null],
           },
         ],
       }
@@ -27,6 +28,7 @@ describe Hash do
       e: [
         {
           f: 'g',
+          h: [nil],
         },
       ],
     }
