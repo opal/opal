@@ -52,6 +52,7 @@ Whitespace conventions:
 - Added rudimental history support to `opal-repl`, just create the history file (`~/.opal-repl-history`) and it record the last 1000 lines
 - Added `JS::Error` error class that can be used to catch any JS error.
 - Added `Method#source_location` and `Method#comments`.
+- Added a deprecation API that can be set to raise on deprecation with: `Opal.raise_on_deprecation = true`
 
 
 ### Changed
