@@ -542,7 +542,7 @@ class Hash
                 return #{Hash.new(`item`)};
               }
 
-              return item;
+              return #{Native(`item`)};
             });
             smap[key] = value
           } else {
