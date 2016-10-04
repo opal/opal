@@ -102,7 +102,7 @@ Whitespace conventions:
 - Fixed `Kernel#loop` (to catch `StopIteration` error)
 - Fixed inheritance from the `Module` class.
 - Fixed using `--preload` along with `--no-opal` for CLI
-
+- Fixed `Integer("0")` raising `ArgumentError` instead of parsing as 0
 
 
 

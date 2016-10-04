@@ -853,6 +853,10 @@ module Kernel
         return #{Opal.coerce_to!(value, Integer, :to_i)};
       }
 
+      if (value === "0") {
+        return 0;
+      }
+
       if (base === undefined) {
         base = 0;
       } else {
