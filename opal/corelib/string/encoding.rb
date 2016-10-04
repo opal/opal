@@ -93,8 +93,8 @@ Encoding.register "UTF-8", aliases: ["CP65001"], ascii: true do
     }
   end
 
-  def bytesize
-    bytes.length
+  def bytesize(string)
+    string.bytes.length
   end
 end
 
@@ -110,8 +110,8 @@ Encoding.register "UTF-16LE" do
     }
   end
 
-  def bytesize
-    bytes.length
+  def bytesize(string)
+    string.bytes.length
   end
 end
 
@@ -127,8 +127,8 @@ Encoding.register "UTF-32LE" do
     }
   end
 
-  def bytesize
-    bytes.length
+  def bytesize(string)
+    string.bytes.length
   end
 end
 
@@ -141,8 +141,8 @@ Encoding.register "ASCII-8BIT", aliases: ["BINARY"], ascii: true do
     }
   end
 
-  def bytesize
-    bytes.length
+  def bytesize(string)
+    string.bytes.length
   end
 end
 
