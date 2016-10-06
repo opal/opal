@@ -103,6 +103,7 @@ Whitespace conventions:
 - Fixed inheritance from the `Module` class.
 - Fixed using `--preload` along with `--no-opal` for CLI
 - Fixed `Integer("0")` raising `ArgumentError` instead of parsing as 0
+- Fixed `JSON#parse` to raise `JSON::ParserError` for invalid input
 
 
 
