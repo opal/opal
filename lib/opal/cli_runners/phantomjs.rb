@@ -11,13 +11,13 @@ module Opal
       attr_reader :output, :exit_status
 
       def run(code, argv)
-        command = [
+        phantomjs_command = [
           'phantomjs',
           SCRIPT_PATH.shellescape,
           *argv.map(&:shellescape)
         ].join(' ')
 
-        phantomjs = IO.popen(command, 'w', out: output) do |io|
+        IO.popen(phantomjs_command, 'w', out: output) do |io|
           io.write(code)
         end
 

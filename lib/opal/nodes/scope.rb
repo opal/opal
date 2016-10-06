@@ -292,6 +292,8 @@ module Opal
         @in_ensure = true
         result = yield
         @in_ensure = false
+
+        result
       end
 
       def in_ensure?

@@ -308,6 +308,7 @@ module Opal
 
     def in_ensure
       return unless block_given?
+
       @in_ensure = true
       result = yield
       @in_ensure = false
@@ -316,7 +317,7 @@ module Opal
     end
 
     def in_ensure?
-      @in_ensure
+      !!@in_ensure
     end
 
     def in_case
@@ -488,7 +489,7 @@ module Opal
     #
     # @return [String, nil]
     def extract_eof_content
-      matches = @source.match(/\n__END__\n?([\w\d\s]*)/)
+      matches = @source.match(/\n__END__\n?([\w\s]*)/)
       matches && matches[1]
     end
   end
