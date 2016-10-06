@@ -129,7 +129,7 @@ describe Opal::CLI do
       let(:options)  { {:gems => [gem_name], :evals => ['']} }
 
       it "adds the gem's lib paths to Opal.path" do
-        builder = cli.build
+        builder = cli.builder
 
         spec = Gem::Specification.find_by_name(gem_name)
         spec.require_paths.each do |require_path|
@@ -187,18 +187,12 @@ describe Opal::CLI do
   end
 
   describe ':map option' do
-    let(:options)  { {:map => true, :evals => ['foo']} }
+    let(:map_path) { "#{Dir.mktmpdir 'opal-map'}/file.map" }
+    let(:options)  { {map: map_path, evals: ['123']} }
 
     it 'sets the verbose flag (currently unused)' do
-      expect_output_of{ subject.run }.to include(%{"version"=>3})
-    end
-  end
-
-  describe ':map option' do
-    let(:options)  { {:map => true, :evals => ['foo']} }
-
-    it 'sets the verbose flag (currently unused)' do
-      expect_output_of{ subject.run }.to include(%{"version"=>3})
+      expect_output_of{ subject.run }.to eq('')
+      expect(File.read(map_path)).to include(%{"version":3})
     end
   end
 
