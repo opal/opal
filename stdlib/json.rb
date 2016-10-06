@@ -1,7 +1,20 @@
 module JSON
+  class JSONError < StandardError
+  end
+
+  class ParserError < JSONError
+  end
+
   %x{
-    var $parse  = JSON.parse,
-        $hasOwn = Opal.hasOwnProperty;
+    var $hasOwn = Opal.hasOwnProperty;
+
+    function $parse(source) {
+      try {
+        return JSON.parse(source);
+      } catch (e) {
+        #{raise JSON::ParserError, `e.message`};
+      }
+    };
 
     function to_opal(value, options) {
       var klass, arr, hash, i, ii, k;
