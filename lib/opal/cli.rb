@@ -9,14 +9,6 @@ module Opal
                 :output, :requires, :gems, :stubs, :verbose, :port, :preload,
                 :filename, :debug, :no_exit, :lib_only
 
-    def compile?
-      @compile
-    end
-
-    def sexp?
-      @sexp
-    end
-
     class << self
       attr_accessor :stdout
     end
@@ -65,12 +57,16 @@ module Opal
     end
 
     def run
-      case
-      when @map;     show_source_map
-      when sexp?;    show_sexp
-      when compile?; show_compiled_source
-      else           run_code
-      end
+      return show_sexp if @sexp
+
+      compiled_source = builder.to_s
+
+      File.write @map, builder.source_map if @map
+
+      return puts compiled_source if @compile
+
+      runner.run(compiled_source, argv)
+      @exit_status = runner.exit_status
     end
 
     def runner
@@ -82,14 +78,13 @@ module Opal
       end
     end
 
-    def run_code
-      runner.run(compiled_source, argv)
-      @exit_status = runner.exit_status
-    end
-
     attr_reader :exit_status
 
-    def build
+    def builder
+      @builder ||= create_builder
+    end
+
+    def create_builder
       builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options
 
       # --include
@@ -119,28 +114,12 @@ module Opal
       builder
     end
 
-    def compiled_source
-      build.to_s
-    end
-
-    def show_compiled_source
-      puts compiled_source
-    end
-
     def show_sexp
       evals_or_file do |contents, filename|
         buffer = ::Parser::Source::Buffer.new(filename)
         buffer.source = contents
         sexp = Opal::Parser.default_parser.parse(buffer)
         puts sexp.inspect
-      end
-    end
-
-    def show_source_map
-      evals_or_file do |contents, filename|
-        compiler = Opal::Compiler.new(contents, options.merge(file: filename))
-        compiler.compile
-        puts compiler.source_map.to_json
       end
     end
 

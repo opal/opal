@@ -76,10 +76,6 @@ module Opal
         options[:sexp] = true
       end
 
-      on('-m', '--map', 'Show sourcemap') do
-        options[:map] = true
-      end
-
       on('-c', '--compile', 'Compile to JavaScript') do
         options[:compile] = true
       end
@@ -122,9 +118,8 @@ module Opal
         options[:dynamic_require_severity] = level.to_sym
       end
 
-      on('-P', '--source-map [FILE]', 'Enable/Disable source map') do |file|
-        options[:source_map_enabled] = true
-        options[:source_map_file] = file if file
+      on('-P', '--map FILE', 'Enable/Disable source map') do |file|
+        options[:map] = file
       end
 
       on('-F', '--file FILE', 'Set filename for compiled code') do |file|
