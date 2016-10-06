@@ -30,7 +30,7 @@ module Opal
       RUBYSPEC_DSL = [:describe, :it, :context]
 
       def on_send(node)
-        recvr, method_name, *args = *node
+        _recvr, method_name, *args = *node
 
         if rubyspec_dsl?(method_name)
           spec_name, _ = *args.first

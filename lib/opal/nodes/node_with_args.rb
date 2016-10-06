@@ -31,7 +31,6 @@ module Opal
       def split_args
         args = self.args.children
         args.each_with_index do |arg, idx|
-          last_argument = (idx == args.length - 1)
           case arg.type
           when :arg, :mlhs, :kwarg, :kwoptarg, :kwrestarg
             if @post_args_started
@@ -222,9 +221,6 @@ module Opal
         arity -= (keyword_args.size)
 
         arity = -arity - 1 if !opt_args.empty? or !keyword_args.empty? or rest_arg
-
-        # $arity will point to our received arguments count
-        aritycode = "var $arity = arguments.length;"
 
         @arity_checks = []
 

@@ -147,7 +147,6 @@ module Opal
       end
 
       def compile_defined_yield(node)
-        yield_temp = scope.new_temp
         scope.uses_block!
         block_name = scope.block_name || (parent = scope.find_parent_def && parent.block_name)
         push "(#{block_name} != null && #{block_name} !== nil)"
@@ -200,7 +199,6 @@ module Opal
 
       def compile_defined_back_ref(node)
         helper :gvars
-        name = node.children[0].to_s[1..-1]
         back_ref_temp = scope.new_temp
         push "(#{back_ref_temp} = $gvars['~'], #{back_ref_temp} != null && #{back_ref_temp} !== nil)"
         back_ref_temp
