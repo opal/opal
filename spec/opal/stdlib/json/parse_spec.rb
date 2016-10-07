@@ -30,4 +30,8 @@ describe "JSON.parse" do
     JSON.parse('{"a": "b"}').should == {"a" => "b"}
     JSON.parse('{"a": null, "b": 10, "c": [true, false]}').should == {"a" => nil, "b" => 10, "c" => [true, false]}
   end
+
+  it "raises ParserError for invalid JSON" do
+    lambda { JSON.parse("invalid_json") }.should raise_error(JSON::ParserError)
+  end
 end
