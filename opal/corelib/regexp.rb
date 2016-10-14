@@ -2,7 +2,10 @@ class RegexpError < StandardError; end
 
 class Regexp < `RegExp`
   IGNORECASE = 1
+  EXTENDED = 2
   MULTILINE = 4
+  FIXEDENCODING = 16
+  NOENCODING = 32
 
   `def.$$is_regexp = true`
 
@@ -33,72 +36,213 @@ class Regexp < `RegExp`
 
     alias quote escape
 
-    def union(*parts)
+    def convert(pattern)
       %x{
-        var is_first_part_array, quoted_validated, part, options, each_part_options;
-        if (parts.length == 0) {
-          return /(?!)/;
-        }
-        // cover the 2 arrays passed as arguments case
-        is_first_part_array = parts[0].$$is_array;
-        if (parts.length > 1 && is_first_part_array) {
-          #{raise TypeError, 'no implicit conversion of Array into String'}
-        }        
-        // deal with splat issues (related to https://github.com/opal/opal/issues/858)
-        if (is_first_part_array) {
-          parts = parts[0];
-        }
-        options = undefined;
-        quoted_validated = [];
-        for (var i=0; i < parts.length; i++) {
-          part = parts[i];
-          if (part.$$is_string) {
-            quoted_validated.push(#{escape(`part`)});
-          }
-          else if (part.$$is_regexp) {
-            each_part_options = #{`part`.options};
-            if (options != undefined && options != each_part_options) {
-              #{raise TypeError, 'All expressions must use the same options'}
-            }
-            options = each_part_options;
-            quoted_validated.push('('+part.source+')');
-          }
-          else {
-            quoted_validated.push(#{escape(`part`.to_str)});
-          }
+        if (pattern.$$is_regexp) {
+          return pattern;
+        } else if (pattern.$$is_array) {
+          return #{union(*pattern)};
+        } else {
+          return #{escape(pattern)};
         }
       }
-      # Take advantage of logic that can parse options from JS Regex
-      new(`quoted_validated`.join('|'), `options`)
     end
 
-    def new(regexp, options = undefined)
+    def union(*parts)
       %x{
-        if (regexp.$$is_regexp) {
-          return new RegExp(regexp);
+        var part;
+
+        switch (parts.length) {
+          case 0:
+            return /(?!)/;
+          case 1:
+            part = parts[0];
+            if (part.$$is_array) {
+              return #{union(*`part`)};
+            } else if (part.$$is_regexp) {
+              return part;
+            } else {
+              part = #{Opal.coerce_to!(`part`, String, :to_str)};
+              return #{new(escape(`part`))};
+            }
+          default:
+            var result = [];
+
+            for (var i = 0; i < parts.length; i++) {
+              part = parts[i];
+
+              if (part.$$is_regexp) {
+                part = #{`part`.to_s}
+              } else {
+                part = #{escape(Opal.coerce_to!(`part`, String, :to_str))}
+              }
+
+              result.push(part);
+            }
+
+            result = result.join("|");
+            return #{Regexp.new(`result`)};
+        }
+      }
+    end
+
+    %x{
+      function generateNativeRegexp(ruby_source, options) {
+        var captureRegexp = /(\(\?P?<([\w$]+)>|\((?!\?))/g;
+
+        var ignorecase = options & #{IGNORECASE},
+            extended = options & #{EXTENDED},
+            multiline = options & #{MULTILINE},
+            fixed_encoding = options & #{FIXEDENCODING},
+            source = ruby_source,
+            flags = [];
+
+        if (ignorecase) {
+          flags.push('i');
         }
 
-        regexp = #{Opal.coerce_to!(regexp, String, :to_str)};
+        if (extended) {
+          source = source.replace(/\s*(\\)?#.*/g, function($0, $1) {
+            return $1 ? $0 : '';
+          }).replace(/\s/g, '');
+        }
 
-        if (regexp.charAt(regexp.length - 1) === '\\' && regexp.charAt(regexp.length - 2) !== '\\') {
+        source = source.replace("\\A", "^").replace("\\z", "$").replace("\\z", "$");
+
+        var captures = [], named_capture_idx = 1;
+
+        while (true) {
+          var md = captureRegexp.exec(source);
+
+          if (md === null) {
+            break;
+          }
+
+          var capture_name = md[2];
+
+          if (capture_name) {
+            captures.push({ capture_name: capture_name, position: md.index });
+            source = source.replace(md[0], '(');
+            captureRegexp.lastIndex = md.index + 1;
+          } else {
+            captures.push({ position: md.index });
+          }
+        }
+
+        try {
+          var result = new RegExp(source, flags.join(''));
+
+          result.$$source = ruby_source;
+          result.$$multiline = (multiline > 0);
+          result.$$ignorecase = (ignorecase > 0);
+          result.$$extended = (extended > 0);
+          result.$$options = options;
+          result.$$fixed_encoding = (fixed_encoding > 0);
+          result.$$captures = captures;
+
+          return result;
+        } catch(e) {
+          #{raise RegexpError, `e.message`}
+        }
+      }
+
+      function validateRegexpSource(source) {
+        var error;
+
+        if (source.match(/\?<=/)) {
+          error = "Positive lookbehind is not supported in regular expressions";
+        }
+
+        if (source.match(/\?<!/)) {
+          error = "Negative lookbehind is not supported in regular expressions";
+        }
+
+        if (error) {
+          error = error + ": " + source;
+          Opal.Kernel.$raise(Opal.SyntaxError, error);
+        }
+      }
+    }
+
+    def new(regexp, options = 0, kcode = undefined)
+      %x{
+        if (regexp.$$is_regexp) {
+          return #{new(regexp.source, regexp.options)};
+        }
+
+        if (kcode != null && kcode.$$is_string) {
+          code = kcode[0];
+          if (code == 'n' || code == 'N') {
+            options |= #{NOENCODING};
+          }
+        }
+
+        var source = #{Opal.coerce_to!(regexp, String, :to_str)};
+
+        if (source.charAt(source.length - 1) === '\\' && source.charAt(source.length - 2) !== '\\') {
           #{raise RegexpError, "too short escape sequence: /#{regexp}/"}
         }
 
-        if (options === undefined || #{!options}) {
-          return new RegExp(regexp);
+        validateRegexpSource(source);
+        return generateNativeRegexp(source, options);
+      }
+    end
+
+    alias compile new
+
+    def create(string, regopts)
+      %x{
+        var options = 0,
+            encoding = 'US-ASCII',
+            fixed_encoding = false,
+            encoding_mapping = { e: 'EUC-JP', s: 'Windows-31J', u: 'UTF-8' },
+            regexp;
+
+        for (var i = 0; i < regopts.length; i++) {
+          var opt = regopts[i];
+          switch(opt) {
+            case 'i':
+              options |= #{IGNORECASE};
+              break;
+            case 'x':
+              options |= #{EXTENDED};
+              break;
+            case 'm':
+              options |= #{MULTILINE};
+              break;
+            case 'n':
+              if (options & #{FIXEDENCODING}) {
+                options ^= #{FIXEDENCODING};
+              }
+              options |= #{NOENCODING};
+              fixed_encoding = false;
+              encoding = 'US-ASCII';
+              break;
+            case 'e':
+            case 's':
+            case 'u':
+              if (options & #{NOENCODING}) {
+                options ^= #{NOENCODING};
+              }
+              options |= #{FIXEDENCODING};
+              fixed_encoding = true;
+              encoding = encoding_mapping[opt];
+              break;
+            case 'o':
+              // This option can't be handled in runtime but it's still valid.
+              break;
+          }
         }
 
-        if (options.$$is_number) {
-          var temp = '';
-          if (#{IGNORECASE} & options) { temp += 'i'; }
-          if (#{MULTILINE}  & options) { temp += 'm'; }
-          options = temp;
-        }
-        else {
-          options = 'i';
+        if (fixed_encoding) {
+          string = #{string.force_encoding(Encoding.find(`encoding`))};
         }
 
-        return new RegExp(regexp, options);
+        regexp = #{new(string, `options`)};
+        regexp.$$encoding = encoding;
+        regexp.$$fixed_encoding = fixed_encoding;
+
+        return regexp;
       }
     end
   end
@@ -117,41 +261,46 @@ class Regexp < `RegExp`
 
   alias eql? ==
 
+  %x{
+    function definedVisibleFlags(regexp) {
+      var result = "";
+      if (regexp.$$multiline)  { result += "m"; }
+      if (regexp.$$ignorecase) { result += "i"; }
+      if (regexp.$$extended)   { result += "x"; }
+      return result;
+    }
+
+    function undefinedVisibleFlags(regexp) {
+      var result = "";
+      if (!regexp.$$multiline)  { result += "m"; }
+      if (!regexp.$$ignorecase) { result += "i"; }
+      if (!regexp.$$extended)   { result += "x"; }
+      return result;
+    }
+  }
+
   def inspect
-    # Use a regexp to extract the regular expression and the optional mode modifiers from the string.
-    # In the regular expression, escape any front slash (not already escaped) with a backslash.
     %x{
-      var regexp_format = /^\/(.*)\/([^\/]*)$/;
-      var value = self.toString();
-      var matches = regexp_format.exec(value);
-      if (matches) {
-        var regexp_pattern = matches[1];
-        var regexp_flags = matches[2];
-        var chars = regexp_pattern.split('');
-        var chars_length = chars.length;
-        var char_escaped = false;
-        var regexp_pattern_escaped = '';
-        for (var i = 0; i < chars_length; i++) {
-          var current_char = chars[i];
-          if (!char_escaped && current_char == '/') {
-            regexp_pattern_escaped = regexp_pattern_escaped.concat('\\');
-          }
-          regexp_pattern_escaped = regexp_pattern_escaped.concat(current_char);
-          if (current_char == '\\') {
-            if (char_escaped) {
-              // does not over escape
-              char_escaped = false;
-            } else {
-              char_escaped = true;
-            }
-          } else {
-            char_escaped = false;
-          }
-        }
-        return '/' + regexp_pattern_escaped + '/' + regexp_flags;
-      } else {
-        return value;
+      var escaped = #{source}.replace(/(\\.)|\//g, function($1, $2) {
+        return $2 || "\\/";
+      });
+      var result = "/" + escaped + "/" + definedVisibleFlags(self);
+      if (self.$$options & #{NOENCODING}) {
+        result += 'n';
       }
+      return result;
+    }
+  end
+
+  def to_s
+    %x{
+      var undefined_flags = undefinedVisibleFlags(self);
+
+      if (undefined_flags.length > 0) {
+        undefined_flags = "-" + undefined_flags;
+      }
+
+      return "(?" + definedVisibleFlags(self) + undefined_flags + ":" + #{source} + ")";
     }
   end
 
@@ -197,7 +346,7 @@ class Regexp < `RegExp`
           return #{$~ = nil};
         }
         if (md.index >= pos) {
-          #{$~ = MatchData.new(`re`, `md`)}
+          #{$~ = MatchData.new(`self`, `md`)}
           return block === nil ? #{$~} : #{block.call($~)};
         }
         re.lastIndex = md.index + 1;
@@ -210,24 +359,24 @@ class Regexp < `RegExp`
   end
 
   def source
-    `self.source`
+    %x{
+      if (self.hasOwnProperty('$$source')) {
+        return self.$$source;
+      } else {
+        return self.source;
+      }
+    }
   end
 
   def options
-    # Flags would be nice to use with this, but still experimental - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/flags
     %x{
       if (self.uninitialized) {
         #{raise TypeError, 'uninitialized Regexp'}
+      } else if (self.hasOwnProperty('$$options')) {
+        return self.$$options;
+      } else {
+        return 0;
       }
-      var result = 0;
-      // should be supported in IE6 according to https://msdn.microsoft.com/en-us/library/7f5z26w4(v=vs.94).aspx
-      if (self.multiline) {
-        result |= #{MULTILINE};
-      }
-      if (self.ignoreCase) {
-        result |= #{IGNORECASE};
-      }
-      return result;
     }
   end
 
@@ -235,7 +384,45 @@ class Regexp < `RegExp`
     `self.ignoreCase`
   end
 
-  alias to_s source
+  def fixed_encoding?
+    `!!self.$$fixed_encoding`
+  end
+
+  def encoding
+    source.encoding
+  end
+
+  def named_captures
+    %x{
+      var result = {},
+          capture_idx = 1;
+
+      if (!self.hasOwnProperty('$$captures')) {
+        return #{{}};
+      }
+
+      for (var i = 0; i < self.$$captures.length; i++) {
+        var capture = self.$$captures[i];
+
+        if (capture.hasOwnProperty('capture_name')) {
+          var capture_name = capture.capture_name;
+
+          if (result.hasOwnProperty(capture_name)) {
+            result[capture_name].push(capture_idx);
+          } else {
+            result[capture_name] = [capture_idx];
+          }
+          capture_idx++;
+        }
+      }
+
+      return Opal.hash2(Object.keys(result), result);
+    }
+  end
+
+  def names
+    named_captures.keys
+  end
 
   def self._load(args)
     self.new(*args)
@@ -253,10 +440,23 @@ class MatchData
     @pre_match  = `match_groups.input.slice(0, match_groups.index)`
     @post_match = `match_groups.input.slice(match_groups.index + match_groups[0].length)`
     @matches    = []
+    @named_captures = []
+    @named_captures_mapping = {}
 
     %x{
       for (var i = 0, length = match_groups.length; i < length; i++) {
-        var group = match_groups[i];
+        var group = match_groups[i],
+            capture_idx = i - 1,
+            capture_data;
+
+        if (capture_idx >= 0) {
+          capture_data = #@regexp.$$captures[capture_idx];
+        }
+
+        if (capture_data && capture_data.hasOwnProperty('capture_name')) {
+          #@named_captures.push({ capture_name: capture_data.capture_name, matched: group });
+          #{@named_captures_mapping[`capture_data.capture_name`] = `group`}
+        }
 
         if (group == null) {
           #@matches.push(nil);
@@ -268,8 +468,18 @@ class MatchData
     }
   end
 
-  def [](*args)
-    @matches[*args]
+  def [](start, length = undefined)
+    %x{
+      if (length == null && start.$$is_string) {
+        if (#{@named_captures_mapping.has_key?(start)}) {
+          return #{@named_captures_mapping[start]};
+        } else {
+          #{raise IndexError, "undefined group name reference: #{start}"}
+        }
+      } else {
+        return #{@matches[start, length]}
+      }
+    }
   end
 
   def offset(n)
@@ -317,10 +527,18 @@ class MatchData
 
   def inspect
     %x{
-      var str = "#<MatchData " + #{`#@matches[0]`.inspect};
+      var i, str = "#<MatchData " + #{`#@matches[0]`.inspect};
 
-      for (var i = 1, length = #@matches.length; i < length; i++) {
-        str += " " + i + ":" + #{`#@matches[i]`.inspect};
+      if (#@named_captures.length > 0) {
+        for (i = 0, length = #@named_captures.length; i < length; i++) {
+          var capture = #@named_captures[i];
+
+          str += " " + capture.capture_name + ":" + #{`capture.matched`.inspect};
+        }
+      } else {
+        for (i = 1, length = #@matches.length; i < length; i++) {
+          str += " " + i + ":" + #{`#@matches[i]`.inspect};
+        }
       }
 
       return str + ">";

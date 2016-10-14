@@ -1,6 +1,5 @@
 opal_filter "String" do
   fails "String#bytes agrees with #unpack('C*')"
-  fails "String#bytes returns #bytesize bytes"
   fails "String#bytes yields each byte to a block if one is given, returning self"
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible"
   fails "String#dump returns a string with # not escaped when followed by any other character"

@@ -284,7 +284,7 @@ module Marshal
     end
 
     def write_regexp(regexp)
-      write_string(regexp.to_s)
+      write_string(regexp.source)
       append(`String.fromCharCode(#{regexp.options})`)
     end
 

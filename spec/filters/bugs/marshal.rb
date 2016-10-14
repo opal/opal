@@ -22,7 +22,6 @@ opal_filter "Marshal" do
   fails "Marshal.load for a user Class loads an object having ivar"
   fails "Marshal.load for a user Class that extends a core type other than Object or BasicObject raises ArgumentError if the resulting class does not extend the same type"
   fails "Marshal.load for a Regexp loads a extended_user_regexp having ivar"
-  fails "Marshal.load loads a Regexp" # anchors difference
   fails "Marshal.load for a Hash loads an extended_user_hash with a parameter to initialize"
   fails "Marshal.load for a Time loads"
   fails "Marshal.load for a Time loads nanoseconds"

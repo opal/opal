@@ -73,7 +73,7 @@ class Encoding
   class CompatibilityError < EncodingError; end
 end
 
-Encoding.register "UTF-8", aliases: ["CP65001"], ascii: true do
+Encoding.register "UTF-8", aliases: ["CP65001", "US-ASCII", "WINDOWS-31J", "EUC-JP"], ascii: true do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {

@@ -87,51 +87,13 @@ module Opal
 
       attr_accessor :value, :flags
 
-      # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-      SUPPORTED_FLAGS = /[gimuy]/
-
       def initialize(*)
         super
         extract_flags_and_value
       end
 
       def compile
-        flags.select! do |flag|
-          if SUPPORTED_FLAGS =~ flag
-            true
-          else
-            compiler.warning "Skipping the '#{flag}' Regexp flag as it's not widely supported by JavaScript vendors."
-            false
-          end
-        end
-
-        case value.type
-        when :dstr, :begin
-          compile_dynamic_regexp
-        when :str
-          compile_static_regexp
-        end
-      end
-
-      def compile_dynamic_regexp
-        if flags.any?
-          push "new RegExp(", expr(value), ", '#{flags.join}')"
-        else
-          push "new RegExp(", expr(value), ')'
-        end
-      end
-
-      def compile_static_regexp
-        value = self.value.children[0]
-        case value
-        when ''
-          push('/(?:)/')
-        when %r{\?<\w+\>}
-          message = "named captures are not supported in javascript: #{value.inspect}"
-          push "self.$raise(new SyntaxError('#{message}'))"
-        else
-          push "#{Regexp.new(value).inspect}#{flags.join}"
-        end
+        push "Opal.Regexp.$create(", expr(value), ", ", flags.join.inspect, ")"
       end
 
       def extract_flags_and_value
@@ -140,34 +102,11 @@ module Opal
 
         case values.length
         when 0
-          # empty regexp, we can process it inline
           self.value = s(:str, '')
         when 1
-          # simple plain regexp, we can put it inline
           self.value = values[0]
         else
           self.value = s(:dstr, *values)
-        end
-
-        # trimming when //x provided
-        # required by parser gem, but JS doesn't support 'x' flag
-        if flags.include?('x')
-          parts = value.children.map do |part|
-            if part.is_a?(::Opal::AST::Node) && part.type == :str
-              trimmed_value = part.children[0].gsub(/\A\s*\#.*/, '').gsub(/\s/, '')
-              s(:str, trimmed_value)
-            else
-              part
-            end
-          end
-
-          self.value = value.updated(nil, parts)
-          flags.delete('x')
-        end
-
-        if value.type == :str
-          # Replacing \A -> ^, \z -> $, required for the parser gem
-          self.value = s(:str, value.children[0].gsub("\\A", "^").gsub("\\z", "$"))
         end
       end
 

@@ -41,7 +41,6 @@ opal_filter "language" do
   fails "Literal Regexps supports \\g (named backreference)"
   fails "Literal Regexps supports character class composition"
   fails "Literal Regexps supports possessive quantifiers"
-  fails "Literal Regexps throws SyntaxError for malformed literals"
   fails "Magic comment is optional"
   fails "Operators * / % are left-associative"
   fails "Optional variable assignments using compunded constants with ||= assignments"

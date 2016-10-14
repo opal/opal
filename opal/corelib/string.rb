@@ -170,7 +170,8 @@ class String < `String`
 
 
       if (index.$$is_regexp) {
-        var match = self.match(index);
+        var _index = new RegExp(index.source),
+            match = self.match(_index);
 
         if (match === null) {
           #{$~ = nil}
@@ -435,17 +436,17 @@ class String < `String`
         return #{enum_for :gsub, pattern};
       }
 
-      var result = '', match_data = nil, index = 0, match, _replacement;
+      var result = '', match_data = nil, index = 0, match, _replacement, _pattern;
 
       if (pattern.$$is_regexp) {
-        pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+        _pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
       } else {
-        pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
-        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
+        _pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
+        _pattern = new RegExp(_pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
       }
 
       while (true) {
-        match = pattern.exec(self);
+        match = _pattern.exec(self);
 
         if (match === null) {
           #{$~ = nil}
@@ -485,14 +486,14 @@ class String < `String`
           }).replace(/\\\\/g, '\\');
         }
 
-        if (pattern.lastIndex === match.index) {
+        if (_pattern.lastIndex === match.index) {
           result += (_replacement + self.slice(index, match.index + 1))
-          pattern.lastIndex += 1;
+          _pattern.lastIndex += 1;
         }
         else {
           result += (self.slice(index, match.index) + _replacement)
         }
-        index = pattern.lastIndex;
+        index = _pattern.lastIndex;
       }
 
       #{$~ = `match_data`}
@@ -545,7 +546,7 @@ class String < `String`
             break;
           }
           if (match.index >= offset) {
-            #{$~ = MatchData.new(`regex`, `match`)}
+            #{$~ = MatchData.new(`search`, `match`)}
             index = match.index;
             break;
           }
@@ -821,7 +822,7 @@ class String < `String`
           #{$~ = nil}
           i = -1;
         } else {
-          #{MatchData.new `r`, `m`};
+          #{MatchData.new `search`, `m`};
           i = m.index;
         }
       } else {
@@ -873,7 +874,7 @@ class String < `String`
         if (m === null) {
           i = -1;
         } else {
-          #{MatchData.new `r`, `m`};
+          #{MatchData.new `sep`, `m`};
           sep = m[0];
           i = m.index;
         }
@@ -903,24 +904,25 @@ class String < `String`
     %x{
       var result = [],
           match_data = nil,
-          match;
+          match,
+          _pattern;
 
       if (pattern.$$is_regexp) {
-        pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+        _pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
       } else {
-        pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
-        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
+        _pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
+        _pattern = new RegExp(_pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
       }
 
-      while ((match = pattern.exec(self)) != null) {
+      while ((match = _pattern.exec(self)) != null) {
         match_data = #{MatchData.new `pattern`, `match`};
         if (block === nil) {
           match.length == 1 ? result.push(match[0]) : result.push(#{`match_data`.captures});
         } else {
           match.length == 1 ? block(match[0]) : block.call(self, #{`match_data`.captures});
         }
-        if (pattern.lastIndex === match.index) {
-          pattern.lastIndex += 1;
+        if (_pattern.lastIndex === match.index) {
+          _pattern.lastIndex += 1;
         }
       }
 
@@ -1055,12 +1057,16 @@ class String < `String`
 
   def sub(pattern, replacement = undefined, &block)
     %x{
-      if (!pattern.$$is_regexp) {
-        pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
-        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      var _pattern;
+
+      if (pattern.$$is_regexp) {
+        _pattern = #{Regexp.new(pattern)};
+      } else {
+        _pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
+        _pattern = new RegExp(_pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       }
 
-      var result = pattern.exec(self);
+      var result = _pattern.exec(self);
 
       if (result === null) {
         #{$~ = nil}
