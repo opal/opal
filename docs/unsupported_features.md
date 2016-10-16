@@ -6,6 +6,10 @@ Opal does not support some language/runtime features of ruby. These are document
 
 For performance and ease of runtime features, all strings in Opal are immutable, i.e. `#<<`, `#gsub!`, etc. do not exist. Also, symbols are just strings. There is no class, runtime or feature difference between Symbols and Strings. Their syntaxes can be used interchangeably.
 
+#### Numbers ####
+
+Opal uses JavaScript native (floating-point) numbers, so `1 / 4` is `0.25` (not `0`) and `4.0 / 2` is `2` (not `2.0`).
+
 #### Encodings ####
 
 Encodings only have a very small implementation inside Opal.
