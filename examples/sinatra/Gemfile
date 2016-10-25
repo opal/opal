@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
 
 gem 'opal', :path => '../..'
-gem 'thin' # webrick has a bug with safari
+gem 'puma' # webrick has a bug with safari
 gem 'sinatra'
