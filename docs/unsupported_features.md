@@ -18,10 +18,6 @@ JavaScript does not have a native `Thread` implementation, so they are not prese
 
 Opal does not currently support frozen objects, but has placeholder methods to prevent other libraries breaking when expecting these methods. Opal could support frozen objects in the future once a similar implementation becomes available across JavaScript runtimes.
 
-#### `method_added` and `method_removed` hooks ####
-
-These are not *currently* supported by Opal, but this is considered a bug and will be implemented soon.
-
 #### Private, Public and Protected methods ####
 
 All methods in Opal are defined as `public` to avoid additional runtime overhead. `Module#private` and `Module#protected` exist as just placeholder methods and are no-op methods.
