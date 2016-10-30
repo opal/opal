@@ -915,9 +915,9 @@ class String < `String`
       while ((match = pattern.exec(self)) != null) {
         match_data = #{MatchData.new `pattern`, `match`};
         if (block === nil) {
-          match.length == 1 ? result.push(match[0]) : result.push(#{`match_data`.captures});
+          match.length == 1 ? result.push(match[0]) : result.push(match_data.captures);
         } else {
-          match.length == 1 ? block(match[0]) : block.call(self, #{`match_data`.captures});
+          block.length == 1 ? Opal.yield1(block, match[0]) : Opal.yieldX(block, match_data)
         }
         if (pattern.lastIndex === match.index) {
           pattern.lastIndex += 1;
