@@ -21,7 +21,7 @@ Whitespace conventions:
 
 
 
-## [0.10.2] - 2016-09-09
+## [0.10.3] - 2016-09-09
 
 
 ### Fixed
@@ -30,6 +30,16 @@ Whitespace conventions:
 - Fixed source map server with url-encoded paths
 - Silence Sprockets 3.7 deprecations, full support for Sprockets 4 will be available in Opal 0.11
 - Don't print the full stack trace with deprecation messages
+
+
+
+## [0.10.2] - 2016-10-31
+
+
+### Changed
+
+- Avoid special utf-8 chars in method names, now they start with `$$`
+
 
 
 
@@ -871,6 +881,7 @@ Whitespace conventions:
 
 
 
+[0.10.3]: https://github.com/opal/opal/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/opal/opal/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/opal/opal/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/opal/opal/compare/v0.9.4...v0.10.0
