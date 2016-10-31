@@ -92,10 +92,8 @@ module Opal
         # utf8_question = 'ʔ̣'
         # utf8_exclamation 'ǃ'
         #
-        # For now we're just using pond, but maybe in the future we can find
-        # counterparts for most of those allowed in a Ruby method id
-
-        function_name = valid_name?(mid) ? " ⵌ#{mid}" : ''
+        # For now we're just using $$, to maintain compatibility with older IEs.
+        function_name = valid_name?(mid) ? " $$#{mid}" : ''
 
         unshift ") {"
         unshift(inline_params)

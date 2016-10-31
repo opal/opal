@@ -76,6 +76,7 @@ Whitespace conventions:
 
 - Removed `yaml` from stdlib, the older implementation was only available for NodeJS and not tested. Replace with `require 'nodejs/yaml'`
 - Extracted sprockets support to `opal-sprockets` which should allow for wider support and less coupling (e.g. the `opal` gem will now be able to improve the compiler without worrying about `sprockets` updates). All the old behavior is preserved except for `Opal::Server` that has become `Opal::Sprockets::Server` (see Deprecated section above).
+## [0.10.3] - 2016-09-09
 
 
 ### Fixed
@@ -105,6 +106,16 @@ Whitespace conventions:
 - Fixed using `--preload` along with `--no-opal` for CLI
 - Fixed `Integer("0")` raising `ArgumentError` instead of parsing as 0
 - Fixed `JSON#parse` to raise `JSON::ParserError` for invalid input
+
+
+
+## [0.10.3] - 2016-10-31
+
+
+### Changed
+
+- Avoid special utf-8 chars in method names, now they start with `$$`
+
 
 
 
@@ -959,7 +970,8 @@ Whitespace conventions:
 
 
 
-[0.11.0]: https://github.com/opal/opal/compare/v0.10.1...HEAD
+[0.11.0]: https://github.com/opal/opal/compare/v0.10.3...HEAD
+[0.10.3]: https://github.com/opal/opal/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/opal/opal/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/opal/opal/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/opal/opal/compare/v0.9.4...v0.10.0
