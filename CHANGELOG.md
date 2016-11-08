@@ -56,6 +56,11 @@ Whitespace conventions:
 - Added `Opal::SimpleServer` as the quickest way to get up and running with Opal: `rackup -ropal -ropal/simple_server -b 'Opal.append_path("app"); run Opal::SimpleServer.new'`
 
 
+### Removed
+
+- Dropped support for IE8 and below, and restricted Safari and Opera support to the last two versions
+
+
 ### Changed
 
 - Removed self-written lexer/parser. Now uses parser/ast gems to convert source code to AST. (#1465)

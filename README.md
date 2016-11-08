@@ -187,11 +187,11 @@ Holds the **stdlib currently supported by Opal**. This includes `Observable`,
 
 ## Browser support
 
-* Internet Explorer 6+
+* Internet Explorer 9+
 * Firefox (Current - 1) or Current
 * Chrome (Current - 1) or Current
-* Safari 5.1+
-* Opera 12.1x or (Current - 1) or Current
+* Safari (Current - 1) or Current
+* Opera (Current - 1) or Current
 
 Any problems encountered using the browsers listed above should be reported as bugs.
 

@@ -361,8 +361,7 @@ task :browser_test do
   }
 
   SauceLabs.new(credentials).with_server do |session|
-    session.run(browser: 'Internet Explorer', version: '6')
-    session.run(browser: 'Internet Explorer', version: '8')
+    session.run(browser: 'Internet Explorer', version: '9')
     session.run(browser: 'Internet Explorer', version: '10')
     session.run(browser: 'Internet Explorer', version: '11')
     # session.run(browser: 'Edge', version: '13') # something goes wrong
@@ -372,6 +371,7 @@ task :browser_test do
     # session.run(browser: 'Chrome', version: '53') # chrome webdriver is broken
     session.run(browser: 'Safari', version: '8')
     session.run(browser: 'Safari', version: '9')
+    session.run(browser: 'Safari', version: '10')
   end
 end
 
