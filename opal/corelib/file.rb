@@ -255,7 +255,36 @@ class File < IO
     end
 
     def join(*paths)
-      paths.join(SEPARATOR).gsub(%r{#{SEPARATOR}+}, SEPARATOR)
+      if paths.length == 0
+        return ''
+      end
+      result = ''
+      paths = paths.flatten.each_with_index.map do |item, index|
+        if index == 0 && item.empty?
+          SEPARATOR
+        elsif paths.length == index + 1 && item.empty?
+          SEPARATOR
+        else
+          item
+        end
+      end
+      paths = paths.reject { |path| path.empty? }
+      paths.each_with_index do |item, index|
+        next_item = paths[index + 1]
+        if next_item.nil?
+          result = "#{result}#{item}"
+        else
+          if item.end_with?(SEPARATOR) && next_item.start_with?(SEPARATOR)
+            item = item.sub(%r{#{SEPARATOR}+$}, '')
+          end
+          if item.end_with?(SEPARATOR) || next_item.start_with?(SEPARATOR)
+            result = "#{result}#{item}"
+          else
+            result = "#{result}#{item}#{SEPARATOR}"
+          end
+        end
+      end
+      result
     end
 
     def split(path)
