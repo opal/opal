@@ -21,7 +21,8 @@ shared_examples :path_reader do
 
   describe '#read' do
     it 'responds to #path' do
-      expect(path_reader.read(path)).to eq(contents)
+      # Normalizing line endings
+      expect(path_reader.read(path).gsub(/\r\n/, "\n")).to eq(contents)
     end
 
     it 'returns nil if the file is missing' do
