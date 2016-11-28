@@ -196,9 +196,4 @@ class String
   def valid_encoding?
     true
   end
-
-  # stub
-  def ascii_only?
-    false
-  end
 end

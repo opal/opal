@@ -627,6 +627,10 @@ class String < `String`
     `self.replace(/^\s*/, '')`
   end
 
+  def ascii_only?
+    `self.match(/[ -~\n]*/)[0] === self`
+  end
+
   def match(pattern, pos = undefined, &block)
     if String === pattern || pattern.respond_to?(:to_str)
       pattern = Regexp.new(pattern.to_str)
