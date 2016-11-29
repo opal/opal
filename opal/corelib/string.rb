@@ -436,6 +436,7 @@ class String < `String`
       }
 
       var result = '', match_data = nil, index = 0, match, _replacement;
+      var onlyAnchor = /^((\^|\$)|(\(((\^|\$)\|(\^|\$))\)))$/.test(pattern.source)
 
       if (pattern.$$is_regexp) {
         pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
@@ -485,8 +486,12 @@ class String < `String`
           }).replace(/\\\\/g, '\\');
         }
 
-        if (pattern.lastIndex === match.index) {
+        if (pattern.lastIndex === match.index && !onlyAnchor) {
           result += (_replacement + self.slice(index, match.index + 1))
+          pattern.lastIndex += 1;
+        }
+        else if (onlyAnchor) {
+          result += (self.slice(index, match.index) + _replacement) + self.slice(match.index, match.index + 1)
           pattern.lastIndex += 1;
         }
         else {
