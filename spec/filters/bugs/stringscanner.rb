@@ -31,8 +31,6 @@ opal_filter "StringScanner" do
   fails "StringScanner#matched returns the last matched string"
   fails "StringScanner#matched? returns false if there's no match"
   fails "StringScanner#matched? returns true if the last match was successful"
-  fails "StringScanner#matched_size returns nil if there was no recent match"
-  fails "StringScanner#matched_size returns the size of the most recent match"
   fails "StringScanner#peek raises a ArgumentError when the passed argument is negative"
   fails "StringScanner#peek raises a RangeError when the passed argument is a Bignum"
   fails "StringScanner#peek returns an instance of String when passed a String subclass"

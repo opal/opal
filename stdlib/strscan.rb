@@ -244,6 +244,16 @@ class StringScanner
     @working = `#{@string}.slice(pos)`
   end
 
+  def matched_size
+    %x{
+      if (#@matched === nil) {
+        return nil;
+      }
+
+      return #@matched.length
+    }
+  end
+
   def post_match
     %x{
       if (#@matched === nil) {
