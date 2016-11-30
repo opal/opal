@@ -48,10 +48,8 @@ module Opal
       process_requires(compiler.requires, context)
       process_required_trees(compiler.required_trees, context)
 
-      if Opal::Config.source_map_enabled
-        map_contents = compiler.source_map.as_json.to_json
-        ::Opal::SourceMapServer.set_map_cache(sprockets, logical_path, map_contents)
-      end
+      map_contents = compiler.source_map.as_json.to_json
+      ::Opal::SourceMapServer.set_map_cache(sprockets, logical_path, map_contents)
 
       result.to_s
     end
