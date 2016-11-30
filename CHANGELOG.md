@@ -55,6 +55,7 @@ Whitespace conventions:
 - Added a deprecation API that can be set to raise on deprecation with: `Opal.raise_on_deprecation = true`
 - Added `Opal::SimpleServer` as the quickest way to get up and running with Opal: `rackup -ropal -ropal/simple_server -b 'Opal.append_path("app"); run Opal::SimpleServer.new'`
 - Added `String#ascii_only?` (#1592)
+- Added `StringScanner#matched_size` (#1595)
 
 
 ### Removed
