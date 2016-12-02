@@ -45,13 +45,13 @@ describe Opal::Processor do
     let(:config) { Opal::Config }
 
     it 'usually require files' do
-      sprockets_context.should_receive(:require_asset).with(stubbed_file)
+      expect(sprockets_context).to receive(:require_asset).with(stubbed_file)
       template.render(sprockets_context)
     end
 
     it 'skips require of stubbed file' do
       config.stubbed_files << stubbed_file.to_s
-      sprockets_context.should_not_receive(:require_asset).with(stubbed_file)
+      expect(sprockets_context).not_to receive(:require_asset).with(stubbed_file)
       template.render(sprockets_context)
     end
 

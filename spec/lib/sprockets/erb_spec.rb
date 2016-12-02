@@ -19,7 +19,7 @@ describe Opal::ERB::Processor do
   ) }
   let(:required_assets) { [] }
   let(:template) { described_class.new { |t| %Q{<% print("") %><a href="<%= url %>"><%= name %></a>} } }
-  before { sprockets_context.stub(:require_asset) {|asset| required_assets << asset } }
+  before { allow(sprockets_context).to receive(:require_asset) {|asset| required_assets << asset } }
 
   let(:ext) { 'opalerb' }
 
