@@ -99,10 +99,6 @@ describe Opal::Parser do
   end
 
   describe 'parsing unicode' do
-    if RUBY_ENGINE == 'jruby'
-      before { pending 'Until https://github.com/jruby/jruby/issues/3719 is fixed' }
-    end
-
     it "works for constants" do
       parsed("FOOλ = 1").should == [:cdecl, :FOOλ, [:int, 1]]
     end
