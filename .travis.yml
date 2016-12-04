@@ -44,9 +44,6 @@ matrix:
     - rvm: 2.0.0
       env: RUN="rspec mspec_opal_nodejs" RACK_VERSION='< 2.0'
 
-    - rvm: rbx
-      env: RUN=rspec
-
     - rvm: jruby-9.1.6.0
       env: RUN=rspec
 
@@ -55,7 +52,6 @@ matrix:
 
   allow_failures:
     - rvm: ruby-head
-    - rvm: rbx
     - rvm: jruby-head
 
 
