@@ -3,9 +3,9 @@ require 'opal/cli_runners/phantomjs'
 require 'stringio'
 
 describe Opal::CliRunners::Phantomjs do
-  # FIXME: Unfotunately there are some issues on jruby and 1.9.3, probably
+  # FIXME: Unfotunately there are some issues on 1.9.3, probably
   #        related to IO.pipe and process spawning in general.
-  before { pending if RUBY_PLATFORM == 'java' or RUBY_VERSION == '1.9.3' }
+  before { pending if RUBY_VERSION == '1.9.3' }
 
   it 'accepts arguments' do
     expect(output_of(%{
