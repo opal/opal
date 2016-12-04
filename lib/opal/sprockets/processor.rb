@@ -14,7 +14,13 @@ module Opal
   class Processor < TiltTemplate
     @@cache_key = nil
     def self.cache_key
-      @@cache_key ||= ['Opal', Opal::VERSION, Opal::Config.config].to_json.freeze
+      @@cache_key ||= [
+        'Opal',
+        Opal::VERSION,
+        Opal::Config.config,
+        Opal::Sprockets.collapsed.to_a,
+        Opal::Sprockets.main.to_a,
+      ].to_json.freeze
     end
 
     def self.reset_cache_key!
@@ -36,6 +42,7 @@ module Opal
 
       # Some files are required right away,
       compiler_options.merge!(requirable: false) if self.class.main_file?(logical_path)
+
 
       compiler = Compiler.new(data, compiler_options)
       result = compiler.compile
@@ -136,6 +143,21 @@ module Opal
       ::Opal::Config.stubbed_files
     end
   end
+
+  Sprockets::MainFilePostProcessor = proc do |input|
+    logical_path = input[:name]
+    sprockets    = input[:environment]
+    data         = input[:data]
+    opal_exts    = /(\.rb|\.opal)\z/
+
+    if Opal::Sprockets.main.include? logical_path
+      data + "; if (typeof(Opal) !== 'undefined') { Opal.load(#{logical_path.inspect}); }"
+    elsif input.fetch(:filename) !~ opal_exts
+      data + "; if (typeof(Opal) !== 'undefined') { Opal.loaded(#{logical_path.inspect}); }"
+    else
+      data
+    end
+  end
 end
 
 if Sprockets.respond_to? :register_transformer
@@ -145,3 +167,5 @@ else
   Sprockets.register_engine '.rb',  Opal::Processor
   Sprockets.register_engine '.opal',  Opal::Processor
 end
+
+Sprockets.register_postprocessor 'application/javascript', Opal::Sprockets::MainFilePostProcessor

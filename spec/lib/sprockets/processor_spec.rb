@@ -76,4 +76,33 @@ describe Opal::Processor do
       expect(described_class.cache_key).not_to eq(old_cache_key)
     end
   end
+
+  describe 'main files' do
+    fit 'does not need loading code' do
+      Opal::Sprockets.main << 'sprockets_main_file'
+      Opal::Sprockets.main << 'required_tree_test/required_file1'
+
+      Opal::Processor.reset_cache_key!
+      env = ::Sprockets::Environment.new
+      (Opal.paths + ["#{__dir__}/../fixtures"]).each {|path| env.append_path path}
+
+
+      result = env['sprockets_main_file'].to_s
+      expect(result).to include('Opal.load("sprockets_main_file");')
+      expect(result).to include('Opal.loaded("required_file");')
+      expect(result).not_to include('Opal.loaded("no_requires");')
+
+      result = env['no_requires'].to_s
+      expect(result).not_to include('Opal.loaded("no_requires");')
+      expect(result).not_to include('Opal.load("sprockets_main_file");')
+      expect(result).not_to include('Opal.loaded("required_file");')
+
+      result = env['complex_sprockets'].to_s
+      expect(result).to include('Opal.load("required_tree_test/required_file1");')
+      expect(result).to include('Opal.loaded("no_requires");')
+      expect(result).not_to include('Opal.loaded("required_file");')
+
+      expect(Opal::Sprockets.javascript_include_tag('sprockets_main_file', env)).not_to include('Opal.load')
+    end
+  end
 end

@@ -24,6 +24,8 @@ module Opal
       Opal.paths.each { |p| @sprockets.append_path(p) }
 
       yield self if block_given?
+
+      ::Opal::Sprockets.main << main if main
       create_app
     end
 

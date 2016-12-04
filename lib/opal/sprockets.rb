@@ -23,8 +23,8 @@ module Opal
     # @param sprockets [Sprockets::Environment]
     #
     # @return [String] JavaScript code
-    def self.load_asset(name, sprockets)
-      asset = sprockets[name.sub(/(\.(js|rb|opal))*#{REGEXP_END}/, '.js')]
+    def self.load_asset(name, sprockets, asset = nil)
+      asset ||= sprockets[name.sub(/(\.(js|rb|opal))*#{REGEXP_END}/, '.js')]
       return '' if asset.nil?
 
       opal_extnames = sprockets.engines.map do |ext, engine|
@@ -83,9 +83,37 @@ module Opal
         scripts << %{<script src="#{prefix}/#{name}.js"></script>}
       end
 
-      scripts << %{<script>#{::Opal::Sprockets.load_asset(name, sprockets)}</script>}
+      unless main.include? name.to_s
+        scripts << %{<script>#{::Opal::Sprockets.load_asset(name, sprockets)}</script>}
+      end
 
       scripts.join "\n"
+    end
+
+    # Mark an opal asset to collapse all of its dependencies to avoid bloat.
+    #
+    # @example Treat opal internals as a black-box
+    #
+    #   Opal::Sprockets.collapsed << 'opal' # won't show individual corelib files
+    #
+    # @return [Set<String>] A modifiable Set of logical paths (without extension)
+    def self.collapsed
+      @collapsed ||= Set.new
+    end
+
+    # Mark an opal asset as a main file, thus not needing loading code.
+    # The loading code will be automatically appended at the end of the file.
+    #
+    # Once an asset is marked as such it's not expected to be required by other
+    # assets, in a typical Rails application the manifest will be `application`.
+    #
+    # @example Mark "app/assets/application.js.rb" as a main file
+    #
+    # Opal::Sprockets.main  << 'application' # won't need loading code
+    #
+    # @return [Set<String>] A modifiable Set of logical paths (without extension)
+    def self.main
+      @main ||= Set.new
     end
   end
 end
