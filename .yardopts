@@ -1,6 +1,8 @@
 lib/opal.rb
 lib/opal/**/*.rb
---markup markdown
+--markup=markdown
+--markup-provider=redcarpet
+--hide-void-return
 -
 CHANGELOG.md
 docs/compiler_directives.md

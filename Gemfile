@@ -35,3 +35,5 @@ unless ENV['CI']
 end
 
 gem 'mspec', path: 'spec/mspec'
+
+gem 'redcarpet', group: :doc
