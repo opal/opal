@@ -355,10 +355,13 @@ end
 
 task :browser_test do
   credentials = {
-    username: ENV['SAUCE_USERNAME'] || raise('missing SAUCE_USERNAME env var'),
-    access_key: ENV['SAUCE_ACCESS_KEY'] || raise('missing SAUCE_ACCESS_KEY env var'),
+    username: ENV['SAUCE_USERNAME'] || warn('missing SAUCE_USERNAME env var'),
+    access_key: ENV['SAUCE_ACCESS_KEY'] || warn('missing SAUCE_ACCESS_KEY env var'),
     tunnel: ENV['TRAVIS_JOB_NUMBER'],
   }
+
+  # Exit if we're missing credentials.
+  exit unless credentials[:username] && credentials[:access_key]
 
   SauceLabs.new(credentials).with_server do |session|
     session.run(browser: 'Internet Explorer', version: '9')
