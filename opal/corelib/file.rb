@@ -1,6 +1,6 @@
 class File < IO
   Separator = SEPARATOR = '/'
-  ALT_SEPARATOR = nil
+  ALT_SEPARATOR = '\\'
   PATH_SEPARATOR = ':'
   # Assuming case insenstive filesystem
   FNM_SYSCASE = 0
@@ -79,7 +79,7 @@ class File < IO
       }
 
       function isDirSep(sep) {
-        return sep.charAt(0) === #{SEPARATOR};
+        return sep.charAt(0) === #{SEPARATOR} || sep.charAt(0) === #{ALT_SEPARATOR};
       }
 
       function skipRoot(path) {
