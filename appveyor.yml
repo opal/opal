@@ -1,0 +1,20 @@
+version: '{build}'
+skip_tags: true
+# AppVeyor automatically skips the build if the commit contains [ci skip] or [skip ci]
+#skip_commits:
+#  message: /\[ci skip\]/
+clone_depth: 10
+environment:
+  matrix:
+    - ruby_version: '231'
+install:
+  - git submodule update --init --recursive
+  - ruby --version
+  - gem --version
+  - gem install bundler --quiet --no-ri --no-rdoc
+  - bundler --version
+  - bundle
+build_script:
+  - bundle exec rake build
+test_script:
+  - bundle exec rake rspec
