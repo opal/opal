@@ -6,9 +6,13 @@ skip_tags: true
 clone_depth: 10
 environment:
   matrix:
-    - ruby_version: '231'
+    - ruby_version: '23'
 install:
   - git submodule update --init --recursive
+  # Take default Ruby out of path
+  - SET PATH=%PATH:C:\Ruby193\bin;=%
+  # Add Ruby to path from build matrix
+  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
   - ruby --version
   - gem --version
   - gem install bundler --quiet --no-ri --no-rdoc
