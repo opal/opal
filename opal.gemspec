@@ -6,8 +6,8 @@ require 'opal/version'
 Gem::Specification.new do |s|
   s.name         = 'opal'
   s.version      = Opal::VERSION
-  s.author       = 'Adam Beynon'
-  s.email        = 'adam.beynon@gmail.com'
+  s.author       = ['Elia Schito', 'meh.', 'Adam Beynon']
+  s.email        = ['elia@schito.me', 'meh@schizofreni.co']
   s.homepage     = 'http://opalrb.org'
   s.summary      = 'Ruby runtime and core library for JavaScript'
   s.description  = %{Opal is a Ruby to JavaScript compiler. It is source-to-source, making it fast as a runtime. Opal includes a compiler (which can be run in any browser), a corelib and runtime implementation. The corelib/runtime is also very small.}
