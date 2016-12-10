@@ -1,6 +1,7 @@
 # Opal
 
-[![Build Status](http://img.shields.io/travis/opal/opal/master.svg?style=flat)](http://travis-ci.org/opal/opal)
+[![Build Status (Linux)](http://img.shields.io/travis/opal/opal/master.svg?style=flat)](http://travis-ci.org/opal/opal)
+[![Build Status (Windows)](https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true)](https://ci.appveyor.com/project/elia/opal/branch/master)
 [![Gem Version](http://img.shields.io/gem/v/opal.svg?style=flat)](http://badge.fury.io/rb/opal)
 [![Code Climate](http://img.shields.io/codeclimate/github/opal/opal.svg?style=flat)](https://codeclimate.com/github/opal/opal)
 [![Coverage Status](https://coveralls.io/repos/opal/opal/badge.svg?branch=master&service=github)](https://coveralls.io/github/opal/opal?branch=elia%2Fcoveralls)
