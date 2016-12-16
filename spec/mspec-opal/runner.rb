@@ -86,6 +86,13 @@ class Object
   end
 end
 
+# MSpec relies on File.readable? to do method detection on backtraces
+class File
+  def self.readable?(path)
+    false
+  end
+end
+
 class OSpecFormatter
   def self.main
     @main ||= self.new
