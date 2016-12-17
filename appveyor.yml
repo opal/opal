@@ -8,8 +8,7 @@ skip_tags: true
 clone_depth: 10
 
 environment:
-  matrix:
-    - ruby_version: '23'
+  ruby_version: '23'
 
 install:
   - git submodule update --init --recursive
@@ -19,6 +18,7 @@ install:
   - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
   - ruby --version
   - gem --version
+  - node --version
   - gem install bundler --quiet --no-ri --no-rdoc
   - bundler --version
   - bundle
@@ -27,4 +27,4 @@ install:
 build: off
 
 test_script:
-  - bundle exec rake rspec
+  - bundle exec rake
