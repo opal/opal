@@ -239,7 +239,9 @@ task :cruby_tests do
     js_filename: js_filename,
   )
   sh build_js_command
-  sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
+  env = {'NODE_PATH' => 'stdlib/nodejs/node_modules'}
+  cmd = "node #{js_filename}"
+  system(env, cmd)
 end
 
 task :test_nodejs do
@@ -254,7 +256,9 @@ task :test_nodejs do
     js_filename: js_filename,
   )
   sh build_js_command
-  sh "NODE_PATH=stdlib/nodejs/node_modules node #{js_filename}"
+  env = {'NODE_PATH' => 'stdlib/nodejs/node_modules'}
+  cmd = "node #{js_filename}"
+  system(env, cmd)
 end
 
 desc 'Runs opal-rspec tests to augment unit testing/rubyspecs'
