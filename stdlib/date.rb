@@ -1,4 +1,6 @@
 class Date
+  include Comparable
+
   class Infinity < Numeric
     include Comparable
 
@@ -419,26 +421,23 @@ class Date
         return #{self.jd <=> other}
       }
 
-      var a = #@date, b = #{other}.date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
+      if (#{Date === other}) {
+        var a = #@date, b = #{other}.date;
+        a.setHours(0, 0, 0, 0);
+        b.setHours(0, 0, 0, 0);
 
-      if (a < b) {
-        return -1;
+        if (a < b) {
+          return -1;
+        }
+        else if (a > b) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
+      } else {
+        return nil;
       }
-      else if (a > b) {
-        return 1;
-      }
-      else {
-        return 0;
-      }
-    }
-  end
-
-  def ==(other)
-    %x{
-      var a = #@date, b = other.date;
-      return (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate());
     }
   end
 

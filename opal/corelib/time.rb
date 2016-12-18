@@ -279,7 +279,7 @@ class Time < `Date`
   end
 
   def ==(other)
-    `#{to_f} === #{other.to_f}`
+    Time === other && (`#{to_f} === #{other.to_f}`)
   end
 
   def asctime

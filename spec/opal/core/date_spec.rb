@@ -46,6 +46,10 @@ describe Date do
     it 'returns 1 when self is greater than other' do
       (Date.new(2015, 1, 2) <=> Date.new(2015, 1, 1)).should == 1
     end
+
+    it 'returns nil when compared to non-Date objects' do
+      (Date.new <=> nil).should == nil
+    end
   end
 
   describe "#==" do
@@ -55,6 +59,11 @@ describe Date do
 
     it "returns false if self is not equal to other date" do
       (Date.new(2013, 10, 2) == Date.new(2013, 10, 11)).should == false
+    end
+
+    it 'returns false when compared to non-Date objects' do
+      (Date.new == nil).should == false
+      (Date.new == Object.new).should == false
     end
   end
 
