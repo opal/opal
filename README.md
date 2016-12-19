@@ -155,7 +155,7 @@ Alternatively, you can just load up a rack instance using `rackup`, and
 visit `http://localhost:9292/` in any web browser.
 
 
-### Rspec
+### RSpec
 
 [RSpec][] tests can be run with:
 
