@@ -132,12 +132,12 @@ describe Opal::Compiler do
 
     describe '#autoload' do
       it 'ignores autoload outside of context class' do
-        compiler = compiler_for(%Q{autoload Whatever, "#{__FILE__}"})
+        compiler = compiler_for(%Q{autoload :Whatever, "#{__FILE__}"})
         expect(compiler.requires).to eq([])
       end
 
       it 'parses and resolve second #autoload arguments' do
-        compiler = compiler_for(%Q{class Foo; autoload Whatever, "#{__FILE__}"; end})
+        compiler = compiler_for(%Q{class Foo; autoload :Whatever, "#{__FILE__}"; end})
         expect(compiler.requires).to eq([__FILE__])
       end
     end
