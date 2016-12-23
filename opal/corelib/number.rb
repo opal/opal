@@ -807,11 +807,7 @@ class Number < Numeric
   end
 
   def positive?
-    if self == 0
-      false
-    else
-      `self == Infinity || 1 / self > 0`
-    end
+    `self != 0 && (self == Infinity || 1 / self > 0)`
   end
 
   def negative?
