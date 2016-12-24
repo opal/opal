@@ -14,13 +14,7 @@ class Regexp < `RegExp`
     end
 
     def escape(string)
-      %x{
-        return string.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1')
-                     .replace(/[\n]/g, '\\n')
-                     .replace(/[\r]/g, '\\r')
-                     .replace(/[\f]/g, '\\f')
-                     .replace(/[\t]/g, '\\t');
-      }
+      `Opal.escape_regexp(string)`
     end
 
     def last_match(n=nil)
@@ -43,7 +37,7 @@ class Regexp < `RegExp`
         is_first_part_array = parts[0].$$is_array;
         if (parts.length > 1 && is_first_part_array) {
           #{raise TypeError, 'no implicit conversion of Array into String'}
-        }        
+        }
         // deal with splat issues (related to https://github.com/opal/opal/issues/858)
         if (is_first_part_array) {
           parts = parts[0];

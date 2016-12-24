@@ -2132,6 +2132,18 @@
   };
 
 
+  // Regexps
+  // -------
+
+  Opal.escape_regexp = function(str) {
+    return str.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1')
+              .replace(/[\n]/g, '\\n')
+              .replace(/[\r]/g, '\\r')
+              .replace(/[\f]/g, '\\f')
+              .replace(/[\t]/g, '\\t');
+  }
+
+
   // Require system
   // --------------
 
