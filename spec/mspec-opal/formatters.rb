@@ -18,12 +18,16 @@ class BrowserFormatter
     MSpec.register :enter,     self
   end
 
+  def red(str)
+    `console.error(str)`
+  end
+
   def green(str)
     `console.info(str)`
   end
 
-  def red(str)
-    `console.error(str)`
+  def cyan(str)
+    `console.info(str)`
   end
 
   def log(str)
@@ -66,7 +70,7 @@ class BrowserFormatter
 
     if @exceptions.empty?
       log "\nFinished"
-      green "#{@examples} examples, #{@count} failures (time taken: #{time})"
+      green "#{@examples} examples, #{@count} failures (time taken: #{time})\n"
 
       finish_with_code 0
     else
@@ -81,6 +85,15 @@ class BrowserFormatter
       log "\nFinished"
       red "#{@examples} examples, #{@count} failures (time taken: #{time})"
 
+      log "\n\nFilters for failed examples:\n\n"
+      @exceptions.map do |exception|
+        ["#{exception.describe} #{exception.it}", exception.message.tr("\n", " ")]
+      end.sort.each do |(description, message)|
+        red "fails #{description.inspect}"
+        cyan " # #{message}\n"
+      end
+      log "\n"
+
       finish_with_code(1)
     end
   end
@@ -91,12 +104,16 @@ class BrowserFormatter
 end
 
 class PhantomFormatter < BrowserFormatter
+  def red(str)
+    `console.log('\u001b[31m' + str + '\u001b[0m')`
+  end
+
   def green(str)
     `console.log('\u001b[32m' + str + '\u001b[0m')`
   end
 
-  def red(str)
-    `console.log('\u001b[31m' + str + '\u001b[0m')`
+  def cyan(str)
+    `console.log('\u001b[36m' + str + '\u001b[0m')`
   end
 
   def log(str)
@@ -114,12 +131,16 @@ class PhantomFormatter < BrowserFormatter
 end
 
 class NodeJSFormatter < BrowserFormatter
+  def red(str)
+    `process.stdout.write("\u001b[31m"+#{str}+"\u001b[0m")`
+  end
+
   def green(str)
     `process.stdout.write("\u001b[32m"+#{str}+"\u001b[0m")`
   end
 
-  def red(str)
-    `process.stdout.write("\u001b[31m"+#{str}+"\u001b[0m")`
+  def cyan(str)
+    `process.stdout.write("\u001b[36m"+#{str}+"\u001b[0m")`
   end
 
   def log(str)
