@@ -115,6 +115,23 @@ Encoding.register "UTF-16LE" do
   end
 end
 
+Encoding.register "UTF-16BE" do
+  def each_byte(string, &block)
+    %x{
+      for (var i = 0, length = string.length; i < length; i++) {
+        var code = string.charCodeAt(i);
+
+        #{yield `code >> 8`};
+        #{yield `code & 0xff`};
+      }
+    }
+  end
+
+  def bytesize(string)
+    string.bytes.length
+  end
+end
+
 Encoding.register "UTF-32LE" do
   def each_byte(string, &block)
     %x{
