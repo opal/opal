@@ -25,33 +25,18 @@ class File < IO
     alias realpath expand_path
 
     %x{
-      function chompdirsep(path) {
-        var last;
-
-        while (path.length > 0) {
-          if (isDirSep(path)) {
-            last = path;
-            path = path.substring(1, path.length);
-            while (path.length > 0 && isDirSep(path)) {
-              path = inc(path);
-            }
-            if (path.length == 0) {
-              return last;
-            }
-          }
-          else {
-            path = inc(path);
-          }
+      function $coerce_to_path(path) {
+        if (#{Opal.truthy?(`path`.respond_to?(:to_path))}) {
+          path = path.$to_path();
         }
+
+        path = #{Opal.coerce_to!(`path`, String, :to_str)};
+
         return path;
       }
 
       function inc(a) {
         return a.substring(1, a.length);
-      }
-
-      function skipprefix(path) {
-        return path;
       }
 
       function lastSeparator(path) {
@@ -79,7 +64,8 @@ class File < IO
       }
 
       function isDirSep(sep) {
-        return sep.charAt(0) === #{SEPARATOR} || sep.charAt(0) === #{ALT_SEPARATOR};
+        var sep = #{SEPARATOR}, alt_sep = #{ALT_SEPARATOR}
+        return sep.charAt(0) === sep || (alt_sep !== nil && sep.charAt(0) === alt_sep);
       }
 
       function skipRoot(path) {
@@ -87,39 +73,6 @@ class File < IO
           path = inc(path);
         }
         return path;
-      }
-
-      function pointerSubtract(a, b) {
-        if (a.length == 0) {
-          return b.length;
-        }
-        return b.indexOf(a);
-      }
-
-      function handleSuffix(n, f, p, suffix, name, origName) {
-        var suffixMatch;
-
-        if (n >= 0) {
-          if (suffix === nil) {
-            f = n;
-          }
-          else {
-            suffixMatch = suffix === '.*' ? '\\.\\w+' : suffix.replace(/\?/g, '\\?');
-            suffixMatch = new RegExp(suffixMatch + #{Separator} + '*$').exec(p);
-            if (suffixMatch) {
-              f = suffixMatch.index;
-            }
-            else {
-              f = n;
-            }
-          }
-
-          if (f === origName.length) {
-            return name;
-          }
-        }
-
-        return p.substring(0, f);
       }
     }
 
@@ -159,68 +112,38 @@ class File < IO
     end
 
     def basename(name, suffix=nil)
+      sep_chars = nil
       %x{
-        var p, q, e, f = 0, n = -1, tmp, pointerMath, origName;
+        if (#{ALT_SEPARATOR} === nil) {
+          sep_chars = #{SEPARATOR}
+        } else {
+          sep_chars = #{SEPARATOR+ALT_SEPARATOR}
+        }
 
-        if (name === nil) {
-          #{raise TypeError, 'no implicit conversion of nil into String'}
-        }
-        if (#{name.respond_to?(:to_path)}) {
-          name = #{name.to_path};
-        }
-        if (!name.$$is_string) {
-          #{raise TypeError, "no implicit conversion of #{name.class} into String"}
-        }
-        if (suffix !== nil && !suffix.$$is_string) {
-          #{raise TypeError, "no implicit conversion of #{suffix.class} into String"}
-        }
+        sep_chars = Opal.escape_regexp(sep_chars);
+        name = $coerce_to_path(name);
 
         if (name.length == 0) {
           return name;
         }
 
-        origName = name;
-        name = skipprefix(name);
-
-        while (isDirSep(name)) {
-          tmp = name;
-          name = inc(name);
+        if (suffix !== nil) {
+          suffix = #{Opal.coerce_to!(suffix, String, :to_str)}
+        } else {
+          suffix = null;
         }
 
-        if (!name) {
-          p = tmp;
-          f = 1;
-        }
-        else {
-          if (!(p = lastSeparator(name))) {
-            p = name;
-          }
-          else {
-            while (isDirSep(p)) {
-              p = inc(p);
-            }
-          }
+        name = name.replace(new RegExp(#{"(.)[#{sep_chars}]*$"}), '$1');
+        name = name.replace(new RegExp(#{"^(?:.*[#{sep_chars}])?([^#{sep_chars}]+)$"}), '$1');
 
-          n = pointerSubtract(chompdirsep(p), p);
-
-          for (q = p; pointerSubtract(q, p) < n && q.charAt(0) === '.'; q = inc(q)) {
-          }
-
-          for (e = null; pointerSubtract(q, p) < n; q = inc(q)) {
-            if (q.charAt(0) === '.') {
-              e = q;
-            }
-          }
-
-          if (e) {
-            f = pointerSubtract(e, p);
-          }
-          else {
-            f = n;
-          }
+        if (suffix === ".*") {
+          name = name.replace(/\.[^\.]+$/, '');
+        } else if(suffix !== null) {
+          suffix = Opal.escape_regexp(suffix);
+          name = name.replace(new RegExp(#{"#{suffix}$"}), '');
         }
 
-        return handleSuffix(n, f, p, suffix, name, origName);
+        return name;
       }
     end
 
