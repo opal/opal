@@ -22,34 +22,36 @@ class Array < `Array`
   end
 
   def initialize(size = nil, obj = nil, &block)
-    if `arguments.length > 2`
-      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..2)"
-    end
-
     %x{
+      if (size > #{Integer::MAX}) {
+        #{raise ArgumentError, "array size too big"}
+      }
+
+      if (arguments.length > 2) {
+        #{raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..2)"}
+      }
+
       if (arguments.length === 0) {
         self.splice(0, self.length);
         return self;
       }
-    }
 
-    if `arguments.length === 1`
-      if Array === size
-        replace(size.to_a)
-        return self
-      elsif size.respond_to? :to_ary
-        replace(size.to_ary)
-        return self
-      end
-    end
+      if (arguments.length === 1) {
+        if (size.$$is_array) {
+          #{replace(size.to_a)}
+          return self;
+        } else if (#{size.respond_to? :to_ary}) {
+          #{replace(size.to_ary)}
+          return self;
+        }
+      }
 
-    size = Opal.coerce_to size, Integer, :to_int
+      size = #{Opal.coerce_to size, Integer, :to_int}
 
-    if `size < 0`
-      raise ArgumentError, "negative array size"
-    end
+      if (size < 0) {
+        #{raise ArgumentError, "negative array size"}
+      }
 
-    %x{
       self.splice(0, self.length);
       var i, value;
 
