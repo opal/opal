@@ -76,7 +76,9 @@ module Base64
     `decode(string.replace(/\-/g, '+').replace(/_/g, '/'))`
   end
 
-  def self.urlsafe_encode64(string)
-    `encode(string).replace(/\+/g, '-').replace(/\//g, '_')`
+  def self.urlsafe_encode64(string, padding: true)
+    str = `encode(string).replace(/\+/g, '-').replace(/\//g, '_')`
+    str = str.delete("=") unless padding
+    str
   end
 end
