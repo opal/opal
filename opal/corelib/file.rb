@@ -25,6 +25,7 @@ class File < IO
     alias realpath expand_path
 
     %x{
+      // Coerce a given path to a path string using #to_path and #to_str
       function $coerce_to_path(path) {
         if (#{Opal.truthy?(`path`.respond_to?(:to_path))}) {
           path = path.$to_path();
@@ -35,94 +36,38 @@ class File < IO
         return path;
       }
 
-      function inc(a) {
-        return a.substring(1, a.length);
-      }
-
-      function lastSeparator(path) {
-        var tmp, last;
-
-        while (path.length > 0) {
-          if (isDirSep(path)) {
-            tmp = path;
-            path = inc(path);
-
-            while (path.length > 0 && isDirSep(path)) {
-              path = inc(path);
-            }
-            if (!path) {
-              break;
-            }
-            last = tmp;
-          }
-          else {
-            path = inc(path);
-          }
+      // Return a RegExp compatible char class
+      function $sep_chars() {
+        if (#{ALT_SEPARATOR} === nil) {
+          return Opal.escape_regexp(#{SEPARATOR});
+        } else {
+          return Opal.escape_regexp(#{SEPARATOR+ALT_SEPARATOR});
         }
-
-        return last;
-      }
-
-      function isDirSep(sep) {
-        var sep = #{SEPARATOR}, alt_sep = #{ALT_SEPARATOR}
-        return sep.charAt(0) === sep || (alt_sep !== nil && sep.charAt(0) === alt_sep);
-      }
-
-      function skipRoot(path) {
-        while (path.length > 0 && isDirSep(path)) {
-          path = inc(path);
-        }
-        return path;
       }
     }
 
     def dirname(path)
+      sep_chars = `$sep_chars()`
+      path = `$coerce_to_path(path)`
       %x{
-        if (path === nil) {
-          #{raise TypeError, 'no implicit conversion of nil into String'}
-        }
-        if (#{path.respond_to?(:to_path)}) {
-          path = #{path.to_path};
-        }
-        if (!path.$$is_string) {
-          #{raise TypeError, "no implicit conversion of #{path.class} into String"}
+        var absolute = path.match(new RegExp(#{"^[#{sep_chars}]"}));
+
+        path = path.replace(new RegExp(#{"[#{sep_chars}]+$"}), ''); // remove trailing separators
+        path = path.replace(new RegExp(#{"[^#{sep_chars}]+$"}), ''); // remove trailing basename
+        path = path.replace(new RegExp(#{"[#{sep_chars}]+$"}), ''); // remove final trailing separators
+
+        if (path === '') {
+          return absolute ? '/' : '.';
         }
 
-        var root, p;
-
-        root = skipRoot(path);
-
-        // if (root > name + 1) in the C code
-        if (root.length == 0) {
-          path = path.substring(path.length - 1, path.length);
-        }
-        else if (root.length - path.length < 0) {
-          path = path.substring(path.indexOf(root)-1, path.length);
-        }
-
-        p = lastSeparator(root);
-        if (!p) {
-          p = root;
-        }
-        if (p === path) {
-          return '.';
-        }
-        return path.substring(0, path.length - p.length);
+        return path;
       }
     end
 
     def basename(name, suffix=nil)
-      sep_chars = nil
+      sep_chars = `$sep_chars()`
+      name = `$coerce_to_path(name)`
       %x{
-        if (#{ALT_SEPARATOR} === nil) {
-          sep_chars = #{SEPARATOR}
-        } else {
-          sep_chars = #{SEPARATOR+ALT_SEPARATOR}
-        }
-
-        sep_chars = Opal.escape_regexp(sep_chars);
-        name = $coerce_to_path(name);
-
         if (name.length == 0) {
           return name;
         }
@@ -148,9 +93,7 @@ class File < IO
     end
 
     def extname(path)
-      raise TypeError, 'no implicit conversion of nil into String' if path.nil?
-      path = path.to_path if path.respond_to?(:to_path)
-      raise TypeError, "no implicit conversion of #{path.class} into String" unless path.is_a?(String)
+      `path = $coerce_to_path(path);`
       filename = basename(path)
       return '' if filename.empty?
       last_dot_idx = filename[1..-1].rindex('.')
