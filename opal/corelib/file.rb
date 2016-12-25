@@ -1,6 +1,6 @@
 class File < IO
   Separator = SEPARATOR = '/'
-  ALT_SEPARATOR = '\\'
+  ALT_SEPARATOR = nil
   PATH_SEPARATOR = ':'
   # Assuming case insenstive filesystem
   FNM_SYSCASE = 0

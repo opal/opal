@@ -42,4 +42,23 @@ class TestNodejsFile < Test::Unit::TestCase
     end
     assert_equal(lines.length, 2)
   end
+
+  def test_linux_separators
+    assert_equal('/', File::SEPARATOR)
+    assert_equal('/', File::Separator)
+    assert_equal(nil, File::ALT_SEPARATOR)
+  end unless windows_platform?
+
+  def test_windows_separators
+    assert_equal('\\', File::SEPARATOR)
+    assert_equal('\\', File::Separator)
+    assert_equal('/', File::ALT_SEPARATOR)
+  end if windows_platform?
+
+
+  private
+
+  def self.windows_platform?
+    `process.platform`.start_with?('win')
+  end
 end

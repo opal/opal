@@ -30,6 +30,11 @@ class File < IO
   `var __fs__ = #{@__fs__}`
   `var __path__ = #{@__path__}`
 
+  if `__path__.sep !== #{Separator}`
+    ALT_SEPARATOR = Separator
+    Separator = SEPARATOR = `__path__.sep`
+  end
+
   def self.read path
     `__fs__.readFileSync(#{path}).toString()`
   end
