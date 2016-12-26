@@ -178,7 +178,7 @@ class NodeJSDocFormatter < NodeJSFormatter
   end
 end
 
-class InvertedFormatter < DottedFormatter
+module InvertedFormatter
   def initialize(out=nil)
     super
     @actually_passing = []

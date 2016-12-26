@@ -99,8 +99,6 @@ class OSpecFormatter
   end
 
   def default_formatter
-    return InvertedFormatter if ENV['INVERT_RUNNING_MODE']
-
     formatters = {
       'browser'    => BrowserFormatter,
       'node'       => NodeJSFormatter,
@@ -110,10 +108,16 @@ class OSpecFormatter
       'dotted'     => DottedFormatter,
     }
 
-    formatters.fetch(ENV['FORMATTER']) do
+    formatter = formatters.fetch(ENV['FORMATTER']) do
       warn "Using the default 'dotted' formatter, set the FORMATTER env var to select a different formatter (options: #{formatters.keys.join(", ")})"
       DottedFormatter
     end
+
+    if ENV['INVERT_RUNNING_MODE']
+      formatter.include InvertedFormatter
+    end
+
+    formatter
   end
 
   def register(formatter_class = default_formatter)
