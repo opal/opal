@@ -1,10 +1,11 @@
 desc "Build *corelib* and *stdlib* and lint the result"
 task :jshint do
   dir = 'tmp/lint'
-
+  puts
+  puts "= Checking distributed files..."
   unless ENV['SKIP_BUILD']
     rm_rf dir if File.exist? dir
-    sh "rake dist DIR=#{dir}"
+    sh "bundle exec rake dist DIR=#{dir}"
   end
 
   Dir["#{dir}/*.js"].each {|path|
@@ -13,4 +14,16 @@ task :jshint do
 
     sh "jshint --verbose #{path}"
   }
+  puts
+  puts "= Checking corelib files separately..."
+  js_paths = []
+  Dir['opal/{opal,corelib}/*.rb'].each do |path|
+    js_path = "#{dir}/#{path.tr('/', '-')}.js"
+    sh "bundle exec opal -Dignore -cEO #{path} > #{js_path}"
+    js_paths << js_path
+  end
+  js_paths.each do |js_path|
+    sh "jshint --verbose #{js_path}"
+  end
+  sh "jshint --verbose opal/corelib/runtime.js"
 end
