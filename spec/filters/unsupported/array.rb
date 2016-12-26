@@ -162,4 +162,6 @@ opal_unsupported_filter "Array" do
   fails "Array#[] raises a RangeError when the start index is out of range of Fixnum"
   fails "Array#[]= checks frozen before attempting to coerce arguments"
   fails "Array#[]= raises a RuntimeError on a frozen array"
+  fails "Array#inspect with encoding does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
+  fails "Array#to_s with encoding does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
 end

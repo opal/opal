@@ -1,21 +1,9 @@
 opal_filter "Kernel" do
   fails "Kernel#=~ returns nil matching any object"
-  fails "Kernel#Float for hexadecimal literals with binary exponent allows embedded _ in a number on either side of the P"
-  fails "Kernel#Float for hexadecimal literals with binary exponent allows embedded _ in a number on either side of the p"
-  fails "Kernel#Float for hexadecimal literals with binary exponent allows hexadecimal points on the left side of the 'P'"
-  fails "Kernel#Float for hexadecimal literals with binary exponent allows hexadecimal points on the left side of the 'p'"
-  fails "Kernel#Float for hexadecimal literals with binary exponent interprets the exponent (on the right of 'P') in decimal"
-  fails "Kernel#Float for hexadecimal literals with binary exponent interprets the exponent (on the right of 'p') in decimal"
-  fails "Kernel#Float for hexadecimal literals with binary exponent interprets the fractional part (on the left side of 'P') in hexadecimal"
-  fails "Kernel#Float for hexadecimal literals with binary exponent interprets the fractional part (on the left side of 'p') in hexadecimal"
-  fails "Kernel#Float for hexadecimal literals with binary exponent returns 0 for '0x1P-10000'"
-  fails "Kernel#Float for hexadecimal literals with binary exponent returns 0 for '0x1p-10000'"
-  fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1P10000'"
-  fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'"
-  fails "Kernel#String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true"
   fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file"
   fails "Kernel#__dir__ when used in eval with top level binding returns the real name of the directory containing the currently-executing file"
   fails "Kernel#class returns the class of the object"
+  fails "Kernel#clone replaces a singleton object's metaclass with a new copy with the same superclass" # NoMethodError: undefined method `singleton_methods' for #<#<Class:0x2df8e>:0x2df90>
   fails "Kernel#define_singleton_method when given an UnboundMethod will raise when attempting to define an object's singleton method from another object's singleton method"
   fails "Kernel#dup does not copy constants defined in the singleton class"
   fails "Kernel#eval allows a binding to be captured inside an eval"
@@ -130,6 +118,7 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with a module"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with two modules"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object"
+  fails "Kernel#warn writes each array element on a line when passes an array" # Expected:   $stderr: "line 1\nline 2\n"      got:   $stderr: "[\"line 1\", \"line 2\"]\n"
   fails "Kernel.Complex() when passed Numerics n1 and n2 and at least one responds to #real? with false returns n1 + n2 * Complex(0, 1)"
   fails "Kernel.Complex() when passed [Complex, Complex] returns a new Complex number based on the two given numbers"
   fails "Kernel.Complex() when passed [Complex] returns the passed Complex number"
@@ -169,10 +158,12 @@ opal_filter "Kernel" do
   fails "Kernel.__method__ returns the caller from define_method too"
   fails "Kernel.global_variables finds subset starting with std"
   fails "Kernel.lambda raises an ArgumentError when no block is given"
+  fails "Kernel.lambda returned the passed Proc if given an existing Proc" # Expected true to be false
   fails "Kernel.lambda returns from the lambda itself, not the creation site of the lambda"
   fails "Kernel.loop returns StopIteration#result, the result value of a finished iterator" # requires changes in enumerator.rb
   fails "Kernel.printf calls write on the first argument when it is not a string"
   fails "Kernel.printf writes to stdout when a string is the first argument"
+  fails "Kernel.proc returned the passed Proc if given an existing Proc" # Expected false to be true
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block"
   fails "self.send(:block_given?) returns true if and only if a block is supplied"
 end

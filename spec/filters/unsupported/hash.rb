@@ -50,4 +50,11 @@ opal_unsupported_filter "Hash" do
   fails "Hash#update raises a RuntimeError on a frozen instance that would not be modified"
   fails "Hash#[]= duplicates and freezes string keys"
   fails "Hash#[]= raises a RuntimeError if called on a frozen instance"
+  fails "Hash#inspect does not raise if inspected result is not default external encoding" # Mock 'utf_16be' expected to receive 'inspect' exactly 1 times but received it 0 times
+  fails "Hash#inspect does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
+  fails "Hash#to_s does not raise if inspected result is not default external encoding" # Mock 'utf_16be' expected to receive 'inspect' exactly 1 times but received it 0 times
+  fails "Hash#to_s does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
+  fails "Hash#compare_by_identity has no effect on an already compare_by_identity hash" # NoMethodError: undefined method `compare_by_identity' for {}
+  fails "Hash#compare_by_identity persists over #dups" # NoMethodError: undefined method `compare_by_identity' for {}
+  fails "Hash#compare_by_identity rehashes internally so that old keys can be looked up" # NoMethodError: undefined method `compare_by_identity' for {}
 end

@@ -1,4 +1,5 @@
 opal_filter "Array" do
+  fails "Array#flatten does not call #to_ary on elements beyond the given level"
   fails "Array#flatten performs respond_to? and method_missing-aware checks when coercing elements to array"
   fails "Array#flatten with a non-Array object in the Array calls #method_missing if defined"
   fails "Array#join raises a NoMethodError if an element does not respond to #to_str, #to_ary, or #to_s"

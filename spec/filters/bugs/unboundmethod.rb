@@ -13,7 +13,6 @@ opal_filter "UnboundMethod" do
   fails "UnboundMethod#inspect the String shows the method name, Module defined in and Module extracted from"
   fails "UnboundMethod#owner returns the class/module it was defined in"
   fails "UnboundMethod#owner returns the new owner for aliased methods on singleton classes"
-  fails "UnboundMethod#owner returns the new owner for aliased methods"
   fails "UnboundMethod#source_location works for define_method methods"
   fails "UnboundMethod#source_location works for define_singleton_method methods"
   fails "UnboundMethod#super_method returns nil when the parent's method is removed"

@@ -17,6 +17,7 @@ opal_filter "Float" do
   fails "Float#prev_float steps directly between 1.0 and 1.0 - EPSILON/2"
   fails "Float#prev_float steps directly between MAX and INFINITY"
   fails "Float#rationalize returns self as a simplified Rational with no argument" # precision errors caused by Math.frexp and Math.ldexp
+  fails "Float#round returns big values rounded to nearest" # Expected 0 to have same value and type as 300000000000000000000
   fails "Float#to_i returns self truncated to an Integer"
   fails "Float#to_int returns self truncated to an Integer"
   fails "Float#to_s uses e format for a negative value with fractional part having 6 significant figures"

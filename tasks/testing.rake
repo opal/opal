@@ -14,6 +14,7 @@ module MSpecSuite
       mspec/guards/endian
       a_file
       lib/spec_helper
+      mspec/commands/mspec-run
     ]
   end
 

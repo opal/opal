@@ -191,6 +191,10 @@ module InvertedFormatter
     MSpec.register :finish, self
   end
 
+  def before(example)
+    puts "==> Running #{example.description.inspect}"
+  end
+
   def after(state=nil)
     unless exception?
       @actually_passing << @current_state

@@ -37,7 +37,6 @@ opal_filter "Marshal" do
   fails "Marshal.dump with a Regexp dumps a Regexp with instance variables" # //.source.should == ''
   fails "Marshal.dump with a Regexp dumps a Regexp subclass" # requires Class.new(Regexp).new("").class != Regexp
   fails "Marshal.dump with an Object dumps a BasicObject subclass if it defines respond_to?"
-  fails "Marshal.dump with a Time dumps the zone, but not the offset if zone is UTC"
   fails "Marshal.dump with an Exception dumps an empty Exception"
   fails "Marshal.dump with an Exception dumps the message for the exception"
   fails "Marshal.dump with an Exception contains the filename in the backtrace"

@@ -24,6 +24,7 @@ opal_unsupported_filter "freezing" do
   fails "Hash#select! returns an Enumerator if called on a frozen instance"
   fails "Hash#store doesn't duplicate and freeze already frozen string keys"
   fails "Kernel#clone copies frozen state from the original"
+  fails "Kernel#clone copies frozen? and tainted?" # Expected false to be true
   fails "Kernel#extend on frozen instance raises a RuntimeError"
   fails "Kernel#extend on frozen instance raises an ArgumentError when no arguments given"
   fails "Kernel#freeze on a Symbol has no effect since it is already frozen"

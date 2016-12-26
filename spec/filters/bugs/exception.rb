@@ -5,6 +5,10 @@ opal_filter "Exception" do
   fails "Errno::EINVAL.new can be called with no arguments"
   fails "Errno::EMFILE can be subclassed"
   fails "Exception is a superclass of EncodingError"
+  fails "Interrupt is a subclass of SignalException" # Expected Exception to equal SignalException
+  fails "Interrupt.new returns an instance of interrupt with no message given" # NoMethodError: undefined method `signo' for #<Interrupt: Interrupt>:Interrupt
+  fails "Interrupt.new takes an optional message argument" # NoMethodError: undefined method `signo' for #<Interrupt: message>:Interrupt
+
   fails "Exception is a superclass of Interrupt"
   fails "Exception is a superclass of SystemStackError"
   fails "Exception#== returns false if the two exceptions differ only in their backtrace"
@@ -21,6 +25,7 @@ opal_filter "Exception" do
   fails "Exception#backtrace includes the line number of the location immediately prior to where self raised in the second element"
   fails "Exception#backtrace includes the line number of the location where self raised in the first element"
   fails "Exception#backtrace includes the name of the method from where self raised in the first element"
+  fails "Exception#backtrace produces a backtrace for an exception captured using $!" # Expected "RuntimeError" to match /backtrace_spec/
   fails "Exception#backtrace returns nil if no backtrace was set"
   fails "Exception#cause returns the active exception when an exception is raised"
   fails "Exception#set_backtrace accepts a String"
@@ -54,6 +59,8 @@ opal_filter "Exception" do
   fails "SystemCallError.new requires at least one argument"
   fails "SystemStackError is a subclass of Exception"
   fails "rescueing SignalException raises a SignalException when sent a signal"
+  fails "rescueing Interrupt raises an Interrupt when sent a signal SIGINT" # NoMethodError: undefined method `kill' for Process
+
   fails "NameError#receiver returns a class when an undefined class variable is called in a subclass' namespace"
   fails "NameError#receiver returns a class when an undefined constant is called"
   fails "NameError#receiver returns the Object class when an undefined class variable is called"
