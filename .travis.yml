@@ -20,10 +20,7 @@ matrix:
         - secure: GT13SjzU8vmqKIyY2LAXje+ndqevTsX/w71JkZHRLTrDUl0qcIod7xsfahbzGt2gOZPYZUkKiVaPoUenhc/YeJ2jTJVHeHY9UEl2II+3tOtuvp2jLadA//aBbsB6/09d7lIZMzpa93TL2R/SncPxugYW9v2o8o8Lwd2iIzowT/g=
 
     - rvm: 2.3.3
-      env: RUN=jshint SUITE=core
-
-    - rvm: 2.3.3
-      env: RUN=jshint SUITE=stdlib
+      env: RUN=jshint
 
     - rvm: 2.3.3
       env: RUN=mspec_opal_nodejs
