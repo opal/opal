@@ -459,7 +459,7 @@ class Module
           proto   = self.$$proto;
 
       for (var prop in proto) {
-        if (prop.charAt(0) !== '$') {
+        if (prop.charAt(0) !== '$' || prop.charAt(1) === '$') {
           continue;
         }
 
