@@ -190,6 +190,8 @@ class Complex < Numeric
 
   alias magnitude abs
 
+  undef negative?
+
   def numerator
     d = denominator
 
@@ -202,6 +204,8 @@ class Complex < Numeric
   def polar
     [abs, arg]
   end
+
+  undef positive?
 
   alias quo /
 
