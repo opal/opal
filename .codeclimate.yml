@@ -8,3 +8,12 @@ ratings:
  paths:
  - "**.rb"
 exclude_paths:
+- "benchmark/*"
+- "build/*"
+- "coverage/*"
+- "docs/*"
+- "examples/*"
+- "tasks/*"
+- "spec/*"
+- "test/*"
+- "vendored-minitest/*"
