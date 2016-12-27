@@ -939,46 +939,46 @@
   // the required method.
   //
   // @param module [Module] the module to include
-  // @param klass  [Class] the target class to include module into
+  // @param includer  [Class] the target class to include module into
   // @return [null]
-  Opal.append_features = function(module, klass) {
+  Opal.append_features = function(module, includer) {
     var iclass, donator, prototype, methods, id, i;
 
     // check if this module is already included in the class
-    for (i = klass.$$inc.length - 1; i >= 0; i--) {
-      if (klass.$$inc[i] === module) {
+    for (i = includer.$$inc.length - 1; i >= 0; i--) {
+      if (includer.$$inc[i] === module) {
         return;
       }
     }
 
     // Check that the base module is not also a dependency, classes can't be
     // dependencies so we have a special case for them.
-    if (!klass.$$is_class && Opal.has_cyclic_dep(klass.$$id, [module], '$$inc', {})) {
+    if (!includer.$$is_class && Opal.has_cyclic_dep(includer.$$id, [module], '$$inc', {})) {
       throw Opal.ArgumentError.$new('cyclic include detected')
     }
 
-    klass.$$inc.push(module);
-    module.$$included_in.push(klass);
-    Opal._bridge(klass, module);
+    includer.$$inc.push(module);
+    module.$$included_in.push(includer);
+    Opal._bridge(includer, module);
 
     // iclass
     iclass = {
       $$name:   module.$$name,
       $$proto:  module.$$proto,
-      $$parent: klass.$$parent,
+      $$parent: includer.$$parent,
       $$module: module,
       $$iclass: true
     };
 
-    klass.$$parent = iclass;
+    includer.$$parent = iclass;
 
     methods = module.$instance_methods();
 
     for (i = methods.length - 1; i >= 0; i--) {
-      Opal.update_includer(module, klass, '$' + methods[i])
+      Opal.update_includer(module, includer, '$' + methods[i])
     }
 
-    Opal.donate_constants(module, klass);
+    Opal.donate_constants(module, includer);
   };
 
   // Table that holds all methods that have been defined on all objects
