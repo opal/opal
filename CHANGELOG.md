@@ -115,6 +115,7 @@ Whitespace conventions:
 - Fixed `Integer("0")` raising `ArgumentError` instead of parsing as 0
 - Fixed `JSON#parse` to raise `JSON::ParserError` for invalid input
 - `Module#append_features` now detects cyclic includes
+- Fixed `Array#zip` to properly handle blocks (#1612)
 
 
 

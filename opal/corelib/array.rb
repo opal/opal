@@ -2273,7 +2273,7 @@ class Array < `Array`
 
       if (block !== nil) {
         for (i = 0; i < size; i++) {
-          block(result[i]);
+          Opal.yieldX(block, result[i]);
         }
 
         return nil;
