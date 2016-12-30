@@ -52,23 +52,7 @@ module Opal
       end
 
       def compile
-        push translate_escape_chars(trimmed_value.inspect)
-      end
-
-      # Some unicode characters are too big,
-      # MRI uses "\u{hex}" to display them
-      # (which is invalid for JS)
-      # There's no way to display them,
-      # so we can simply trim them
-      def trimmed_value
-        value.each_char.map do |char|
-          if char.valid_encoding? && char.ord > 65535
-            @compiler.warning("Ignoring unsupported character #{char}", @sexp.line)
-            ""
-          else
-            char
-          end
-        end.join
+        push translate_escape_chars(value.inspect)
       end
     end
 
