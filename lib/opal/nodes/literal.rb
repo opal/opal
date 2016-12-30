@@ -52,7 +52,12 @@ module Opal
       end
 
       def compile
-        push translate_escape_chars(value.inspect)
+        sanitized_value = value.inspect
+        sanitized_value.gsub! /\\u\{[0-9a-f]+\}/ do |char|
+          @compiler.warning("Ignoring unsupported character #{char}", @sexp.line)
+          ''
+        end
+        push translate_escape_chars(sanitized_value)
       end
     end
 
