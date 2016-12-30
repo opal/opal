@@ -52,8 +52,7 @@ module Opal
       end
 
       def compile
-        sanitized_value = value.inspect
-        sanitized_value.gsub! /\\u\{[0-9a-f]+\}/ do |char|
+        sanitized_value = value.inspect.gsub /\\u\{[0-9a-f]+\}/ do |char|
           @compiler.warning("Ignoring unsupported character #{char}", @sexp.line)
           ''
         end
