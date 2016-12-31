@@ -229,7 +229,7 @@ class Module
     name = Opal.class_variable_name!(name)
 
     %x{
-      if (self.$$cvars.hasOwnProperty(name)) {
+      if (Opal.hasOwnProperty.call(self.$$cvars, name)) {
         var value = self.$$cvars[name];
         delete self.$$cvars[name];
         return value;

@@ -188,11 +188,11 @@ describe 'Hash' do
         @obj1  => 'xyz'
       }
 
-      `#@hash.$$map.hasOwnProperty('hhh')`.should == true
-      `#@hash.$$map.hasOwnProperty(#{@obj1.hash})`.should == true
-      `#@hash.$$smap.hasOwnProperty('a')`.should == true
-      `#@hash.$$smap.hasOwnProperty('b')`.should == true
-      `#@hash.$$smap.hasOwnProperty('c')`.should == true
+      `Opal.hasOwnProperty.call(#@hash.$$map, 'hhh')`.should == true
+      `Opal.hasOwnProperty.call(#@hash.$$map, #{@obj1.hash})`.should == true
+      `Opal.hasOwnProperty.call(#@hash.$$smap, 'a')`.should == true
+      `Opal.hasOwnProperty.call(#@hash.$$smap, 'b')`.should == true
+      `Opal.hasOwnProperty.call(#@hash.$$smap, 'c')`.should == true
 
       `#@hash.$$keys.length`.should == 8
       `Object.keys(#@hash.$$map).length`.should == 2
@@ -322,11 +322,11 @@ describe 'Hash' do
       `#@hash.$$smap['b'] === undefined`.should == true
       `#@hash.$$smap['c'] === undefined`.should == true
 
-      `#@hash.$$map.hasOwnProperty('hhh')`.should == false
-      `#@hash.$$map.hasOwnProperty(#{@obj1.hash})`.should == false
-      `#@hash.$$smap.hasOwnProperty('a')`.should == false
-      `#@hash.$$smap.hasOwnProperty('b')`.should == false
-      `#@hash.$$smap.hasOwnProperty('c')`.should == false
+      `Opal.hasOwnProperty.call(#@hash.$$map, 'hhh')`.should == false
+      `Opal.hasOwnProperty.call(#@hash.$$map, #{@obj1.hash})`.should == false
+      `Opal.hasOwnProperty.call(#@hash.$$smap, 'a')`.should == false
+      `Opal.hasOwnProperty.call(#@hash.$$smap, 'b')`.should == false
+      `Opal.hasOwnProperty.call(#@hash.$$smap, 'c')`.should == false
     end
   end
 end
