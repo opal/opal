@@ -1134,11 +1134,14 @@
   Opal.donate_constants = function(source_mod, target_mod) {
     var source_constants = source_mod.$$scope.constants,
         target_scope     = target_mod.$$scope,
-        target_constants = target_scope.constants;
+        target_constants = target_scope.constants,
+        source_constant;
 
-    for (var i = 0, length = source_constants.length; i < length; i++) {
-      target_constants.push(source_constants[i]);
-      target_scope[source_constants[i]] = source_mod.$$scope[source_constants[i]];
+    for (var i = 0, ii = source_constants.length; i < ii; i++) {
+      source_constant = source_constants[i];
+
+      target_constants.push(source_constant);
+      target_scope[source_constant] = source_mod.$$scope[source_constant];
     }
   };
 
