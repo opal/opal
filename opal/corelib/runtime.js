@@ -970,16 +970,23 @@
   // @return [null]
   Opal.append_features = function(module, includer) {
     var iclass, methods, id, i, already_included = false;
+    // console.log('includer', includer);
 
-    // check if this module is already included in the class
-    for (i = includer.$$inc.length - 1; i >= 0; i--) {
-      if (includer.$$inc[i] === module) {
-        // // MRI just updates the cache for the re-included module.
-        // // For now we'll just update everything.
-        // Opal.update_ancestors_cache(includer);
-        // return;
-        already_included = true;
+    // check if this module is already included in the class or in a superclass
+    var existing_includer = includer;
+    existing: while (existing_includer) {
+      for (i = existing_includer.$$inc.length - 1; i >= 0; i--) {
+        if (existing_includer.$$inc[i] === module) {
+          if (existing_includer === includer) {
+            already_included = true;
+            break existing;
+          }
+          else {
+            return;
+          }
+        }
       }
+      existing_includer = existing_includer.$$super;
     }
 
     // Check that the base module is not also a dependency, classes can't be
@@ -1018,50 +1025,50 @@
     class_or_module.$$lan = Opal.local_ancestors(class_or_module);
   }
 
-  // The actual "prepension" of a module to a class.
+  // // The actual "prepension" of a module to a class.
+  // //
+  // // @param module [Module] the module to prepend
+  // // @param prepender [Module] the target class/module to prepend module to
+  // // @return [null]
+  // Opal.prepend_features = function(module, prepender) {
+  //   var iclass, methods, id, i;
   //
-  // @param module [Module] the module to prepend
-  // @param prepender [Module] the target class/module to prepend module to
-  // @return [null]
-  Opal.prepend_features = function(module, prepender) {
-    var iclass, methods, id, i;
-
-    // check if this module is already included in the class
-    for (i = prepender.$$pre.length - 1; i >= 0; i--) {
-      if (prepender.$$pre[i] === module) {
-        Opal.update_ancestors_cache(prepender);
-        return;
-      }
-    }
-
-    if ( Opal.has_cyclic_dep(prepender.$$id, [module], '$$pre', {}) ) {
-      throw Opal.ArgumentError.$new('cyclic prepend detected')
-    }
-
-    prepender.$$pre.push(module);
-    Opal.update_ancestors_cache(prepender);
-    module.$$prepended_to.push(prepender);
-    Opal._bridge(prepender, module);
-
-    iclass = {
-      $$name:   module.$$name,
-      $$proto:  module.$$proto,
-      $$methods: module.$$methods,
-      $$parent: prepender.$$entry,
-      $$module: module,
-      $$iclass: true
-    };
-
-    prepender.$$entry = iclass;
-
-    methods = Object.keys(module.$$methods);
-
-    for (i = methods.length - 1; i >= 0; i--) {
-      Opal.update_method_cache(module, prepender, methods[i])
-    }
-
-    Opal.donate_constants(module, prepender);
-  };
+  //   // check if this module is already included in the class
+  //   for (i = prepender.$$pre.length - 1; i >= 0; i--) {
+  //     if (prepender.$$pre[i] === module) {
+  //       Opal.update_ancestors_cache(prepender);
+  //       return;
+  //     }
+  //   }
+  //
+  //   if ( Opal.has_cyclic_dep(prepender.$$id, [module], '$$pre', {}) ) {
+  //     throw Opal.ArgumentError.$new('cyclic prepend detected')
+  //   }
+  //
+  //   prepender.$$pre.push(module);
+  //   Opal.update_ancestors_cache(prepender);
+  //   module.$$prepended_to.push(prepender);
+  //   Opal._bridge(prepender, module);
+  //
+  //   iclass = {
+  //     $$name:   module.$$name,
+  //     $$proto:  module.$$proto,
+  //     $$methods: module.$$methods,
+  //     $$parent: prepender.$$entry,
+  //     $$module: module,
+  //     $$iclass: true
+  //   };
+  //
+  //   prepender.$$entry = iclass;
+  //
+  //   methods = Object.keys(module.$$methods);
+  //
+  //   for (i = methods.length - 1; i >= 0; i--) {
+  //     Opal.update_method_cache(module, prepender, methods[i])
+  //   }
+  //
+  //   Opal.donate_constants(module, prepender);
+  // };
 
   // Table that holds all methods that have been defined on all objects
   // It is used for defining method stubs for new coming native classes
