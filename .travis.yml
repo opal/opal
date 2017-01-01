@@ -12,38 +12,38 @@ matrix:
   fast_finish: true
 
   include:
-    - rvm: 2.3.3
+    - rvm: 2.4.0
       env:
         - RUN=browser_test
         - SAUCE_USERNAME=elia
         # SAUCE_ACCESS_KEY:
         - secure: GT13SjzU8vmqKIyY2LAXje+ndqevTsX/w71JkZHRLTrDUl0qcIod7xsfahbzGt2gOZPYZUkKiVaPoUenhc/YeJ2jTJVHeHY9UEl2II+3tOtuvp2jLadA//aBbsB6/09d7lIZMzpa93TL2R/SncPxugYW9v2o8o8Lwd2iIzowT/g=
 
-    - rvm: 2.3.3
+    - rvm: 2.4.0
       env: RUN=jshint
 
-    - rvm: 2.3.3
+    - rvm: 2.4.0
       env: RUN=mspec_opal_nodejs
 
-    - rvm: 2.3.3
+    - rvm: 2.4.0
       env: RUN=mspec_ruby_nodejs TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
-    # - rvm: 2.3.3
+    # - rvm: 2.4.0
     #   env: RUN=mspec_ruby_sprockets_phantomjs
 
-    - rvm: 2.3.3
+    - rvm: 2.4.0
       env: RUN=minitest
 
-    - rvm: 2.3.3
+    - rvm: 2.4.0
       env: RUN=rspec RACK_VERSION='~> 2.0.0' CHECK_COVERAGE=true
 
-    - rvm: 2.3.3
+    - rvm: 2.4.0
       env: RUN=smoke_test
 
     - rvm: ruby-head
       env: RUN=rspec
 
-    - rvm: 2.4.0-preview1
+    - rvm: 2.3.3
       env: RUN=rspec
 
     - rvm: 2.2.5

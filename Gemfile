@@ -12,8 +12,7 @@ gem 'racc', '< 1.4.10', platform: :jruby
 gem 'json', '< 1.8.1',  platform: :ruby if RUBY_VERSION.to_f == 2.1
 gem 'rubysl', platform: :rbx
 
-# thin requires rack < 2
-gem 'thin', platform: :mri if !rack_version || (rack_version < '2')
+gem 'puma' # Some browsers have problems with WEBrick
 
 gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
