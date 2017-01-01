@@ -939,7 +939,7 @@
   // the required method.
   //
   // @param module [Module] the module to include
-  // @param includer  [Class] the target class to include module into
+  // @param includer [Module] the target class to include module into
   // @return [null]
   Opal.append_features = function(module, includer) {
     var iclass, donator, prototype, methods, id, i;
