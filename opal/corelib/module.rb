@@ -455,7 +455,8 @@ class Module
 
   def instance_methods(include_super = true)
     %x{
-      var methods = [],
+      var value,
+          methods = [],
           proto   = self.$$proto;
 
       for (var prop in proto) {
@@ -463,16 +464,18 @@ class Module
           continue;
         }
 
-        if (typeof(proto[prop]) !== "function") {
+        value = proto[prop];
+
+        if (typeof(value) !== "function") {
           continue;
         }
 
-        if (proto[prop].$$stub) {
+        if (value.$$stub) {
           continue;
         }
 
         if (!self.$$is_module) {
-          if (self !== Opal.BasicObject && proto[prop] === Opal.BasicObject.$$proto[prop]) {
+          if (self !== Opal.BasicObject && value === Opal.BasicObject.$$proto[prop]) {
             continue;
           }
 
@@ -480,7 +483,7 @@ class Module
             continue;
           }
 
-          if (!include_super && proto[prop].$$donated) {
+          if (!include_super && value.$$donated) {
             continue;
           }
         }
