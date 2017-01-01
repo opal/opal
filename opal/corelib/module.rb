@@ -619,31 +619,6 @@ class Module
     }
   end
 
-  def prepend(*mods)
-    %x{
-      for (var i = mods.length - 1; i >= 0; i--) {
-        var mod = mods[i];
-
-        if (!mod.$$is_module) {
-          #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
-        }
-
-        #{`mod`.prepend_features self};
-        #{`mod`.prepended self};
-      }
-    }
-
-    self
-  end
-
-  def prepended(*modules)
-  end
-
-  def prepend_features(klass)
-    `Opal.prepend_features(self, klass)`
-    self
-  end
-
   def remove_const(name)
     %x{
       var old = self.$$scope[name];
