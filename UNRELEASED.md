@@ -32,6 +32,7 @@
 - ISO-8859-1 and US-ASCII encodings are now separated as in MRI (#2235)
 - `String#b` no longer modifies object strings in-place (#2235)
 - Parser::Builder::Default.check_lvar_name patch (#2195)
+- Fixed multiple line Regexp literal to not generate invalid syntax as JavaScript (#1616)
 
 ### Changed
 
