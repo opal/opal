@@ -83,7 +83,6 @@ Whitespace conventions:
 
 - Removed `yaml` from stdlib, the older implementation was only available for NodeJS and not tested. Replace with `require 'nodejs/yaml'`
 - Extracted sprockets support to `opal-sprockets` which should allow for wider support and less coupling (e.g. the `opal` gem will now be able to improve the compiler without worrying about `sprockets` updates). All the old behavior is preserved except for `Opal::Server` that has become `Opal::Sprockets::Server` (see Deprecated section above).
-## [0.10.3] - 2016-09-09
 
 
 ### Fixed
