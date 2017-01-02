@@ -242,7 +242,7 @@ task :cruby_tests do
   sh build_js_command
   env = {'NODE_PATH' => 'stdlib/nodejs/node_modules'}
   cmd = "node #{js_filename}"
-  system(env, cmd)
+  system(env, cmd) or fail("Program exited with an error")
 end
 
 task :test_nodejs do
@@ -259,7 +259,7 @@ task :test_nodejs do
   sh build_js_command
   env = {'NODE_PATH' => 'stdlib/nodejs/node_modules'}
   cmd = "node #{js_filename}"
-  system(env, cmd)
+  system(env, cmd) or fail("Program exited with an error")
 end
 
 desc 'Runs opal-rspec tests to augment unit testing/rubyspecs'
