@@ -16,7 +16,7 @@ module Opal
 
         add_temp name
 
-        line "if (!$kwargs.$$smap.hasOwnProperty('#{name}')) {"
+        line "if (!Opal.hasOwnProperty.call($kwargs.$$smap, '#{name}')) {"
         line "  throw Opal.ArgumentError.$new('missing keyword: #{name}');"
         line "}"
         line "#{name} = $kwargs.$$smap['#{name}'];"
