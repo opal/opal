@@ -4,6 +4,9 @@ require 'nodejs'
 require 'nodejs/file'
 
 class TestNodejsFile < Test::Unit::TestCase
+  def self.windows_platform?
+    `process.platform`.start_with?('win')
+  end
 
   def test_instantiate_without_open_mode
     # By default the open mode is 'r' (read only)
@@ -54,11 +57,4 @@ class TestNodejsFile < Test::Unit::TestCase
     assert_equal('\\', File::Separator)
     assert_equal('/', File::ALT_SEPARATOR)
   end if windows_platform?
-
-
-  private
-
-  def self.windows_platform?
-    `process.platform`.start_with?('win')
-  end
 end
