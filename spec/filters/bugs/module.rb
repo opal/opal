@@ -109,42 +109,14 @@ opal_filter "Module" do
   fails "Module#name is set with a conditional assignment to a constant"
   fails "Module#name is set with a conditional assignment to a nested constant"
   fails "Module#name preserves the encoding in which the class was defined"
-  fails "Module#prepend accepts no-arguments"
-  fails "Module#prepend adds the module in the subclass chains"
-  fails "Module#prepend allows wrapping methods"
-  fails "Module#prepend also prepends included modules"
-  fails "Module#prepend calls #prepend_features(self) in reversed order on each module"
-  fails "Module#prepend calls prepended after prepend_features"
-  fails "Module#prepend causes the prepended module's method to be aliased by alias_method"
-  fails "Module#prepend clears any caches"
-  fails "Module#prepend depends on prepend_features to add the module"
-  fails "Module#prepend detects cyclic prepends"
-  fails "Module#prepend does not affect the superclass"
-  fails "Module#prepend does not import methods to modules and classes"
-  fails "Module#prepend does not interfere with a define_method super in the original class"
-  fails "Module#prepend does not raise a TypeError when the argument is an instance of a subclass of Module"
-  fails "Module#prepend imports constants" # NoMethodError: undefined method `prepend' for #<Module:0x481be>
-  fails "Module#prepend imports instance methods"
-  fails "Module#prepend includes prepended modules in ancestors"
-  fails "Module#prepend inserts a later prepended module into the chain"
-  fails "Module#prepend is a public method"
-  fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
-  fails "Module#prepend keeps the module in the chain when dupping the class"
-  fails "Module#prepend prepends multiple modules in the right order"
-  fails "Module#prepend raises a TypeError when the argument is not a Module"
-  fails "Module#prepend reports the prepended module as the method owner"
-  fails "Module#prepend reports the prepended module as the unbound method owner"
-  fails "Module#prepend returns the class it's included into"
-  fails "Module#prepend sees an instance of a prepended class as kind of the prepended module"
-  fails "Module#prepend supports super when the module is prepended into a singleton class with a class super"
-  fails "Module#prepend supports super when the module is prepended into a singleton class"
-  fails "Module#prepend throws a NoMethodError when there is no more superclass"
-  fails "Module#prepend works with subclasses"
-  fails "Module#prepend_features clears caches of the given module"
-  fails "Module#prepend_features gets called when self is included in another module/class"
-  fails "Module#prepend_features on Class raises a TypeError if calling after rebinded to Class"
-  fails "Module#prepend_features raises an ArgumentError on a cyclic prepend"
-  fails "Module#prepended is invoked when self is prepended to another module or class"
+
+  fails "Module#prepend also prepends included modules" # NoMethodError: undefined method `calc' for #<#<Class:0x6e2>:0x6e4>
+  fails "Module#prepend inserts a later prepended module into the chain" # Expected ["c1", "m2", "m1", "c2"] to equal ["c1", "m1", "m2", "c2"]
+  fails "Module#prepend keeps the module in the chain when dupping an intermediate module" # Expected [#<Module:0x6ee>] to equal [#<Module:0x6ee>, #<Module:0x6e8>, #<Module:0x6ea>]
+  fails "Module#prepend keeps the module in the chain when dupping the class" # Exception: self.$$alloc is not a constructor
+  fails "Module#prepend reports the prepended module as the method owner" # Expected #<Class:0x69e> to equal #<Module:0x69c>
+  fails "Module#prepend reports the prepended module as the unbound method owner" # Expected #<Class:0x6ce> to equal #<Module:0x6cc>
+
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a NameError and does not call #const_missing if the constant is not defined directly in the module"
   fails "Module#remove_const raises a NameError and does not call #const_missing if the constant is not defined"

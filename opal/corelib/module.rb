@@ -329,6 +329,37 @@ class Module
     value
   end
 
+  def prepend(*mods)
+    %x{
+      for (var i = mods.length - 1; i >= 0; i--) {
+        var mod = mods[i];
+
+        if (!mod.$$is_module) {
+          #{raise TypeError, "wrong argument type #{`mod`.class} #{`mod.$$name`}(expected Module)"};
+        }
+
+        #{`mod`.prepend_features self};
+        #{`mod`.prepended self};
+      }
+    }
+
+    self
+  end
+
+  def prepend_features(includer)
+    %x{
+      if (!self.$$is_module) {
+        #{raise TypeError, "wrong argument type #{self.class} (expected Module)"};
+      }
+
+      Opal.prepend_features(self, includer)
+    }
+    self
+  end
+
+  def prepended(mod)
+  end
+
   def public_constant(const_name)
   end
 
