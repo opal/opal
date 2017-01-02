@@ -8,11 +8,18 @@ class String
       klass.$$proto         = replace.$$proto;
       klass.$$proto.$$class = klass;
       klass.$$alloc         = replace.$$alloc;
+      klass.$$methods       = replace.$$methods;
       klass.$$parent        = #{String::Wrapper};
+      replace.$$parent      = #{String};
+
+      // Consider the wrapper an included module
+      klass.$$inc.push(#{String::Wrapper});
+      klass.$$lan.push(#{String::Wrapper});
 
       Opal.get_singleton_class(klass);
-      klass.$$meta.$$methods.$allocate = klass.$allocate = replace.$allocate;
-      klass.$$meta.$$methods.$new      = klass.$new      = replace.$new;
+      klass.$$meta.$$methods.$allocate   = klass.$allocate   = replace.$allocate;
+      klass.$$meta.$$methods.$new        = klass.$new        = replace.$new;
+      klass.$$meta.$$methods.$initialize = klass.$initialize = replace.$initialize;
     }
   end
 end
