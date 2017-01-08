@@ -837,10 +837,10 @@
   // @param from [Module] the module/class we are importing the method from
   // @param name [String] the method name in JS land (i.e. starting with $)
   // @param body [JS::Function] the body of the method
-  Opal.bridge_method = function(target, from, name, body) {
+  Opal.bridge_method = function(target_constructor, from, name, body) {
     var ancestors, i, ancestor, length;
 
-    ancestors = target.$$bridge.$ancestors();
+    ancestors = target_constructor.$$bridge.$ancestors();
 
     // order important here, we have to check for method presence in
     // ancestors from the bridged class to the last ancestor
@@ -856,45 +856,51 @@
       }
 
       if (ancestor === from) {
-        target.prototype[name] = body
+        target_constructor.prototype[name] = body
         break;
       }
     }
-
   };
 
   // Bridges from *donator* to a *target*.
+  //
+  // @param target [Module] the potentially associated with bridged classes module
+  // @param donator [Module] the module/class source of the methods that should be bridged
   Opal.bridge_methods = function(target, donator) {
-    var id, methods, method, i, bridged;
+    var i,
+        bridged = BridgedClasses[target.$__id__()],
+        donator_id = donator.$__id__();
 
-    if (typeof(target) === "function") {
-      id      = donator.$__id__();
-      methods = donator.$instance_methods();
+    if (bridged) {
+      BridgedClasses[donator_id] = bridged.slice();
 
-      for (i = methods.length - 1; i >= 0; i--) {
-        method = '$' + methods[i];
-
-        Opal.bridge_method(target, donator, method, donator.$$proto[method]);
-      }
-
-      if (!BridgedClasses[id]) {
-        BridgedClasses[id] = [];
-      }
-
-      BridgedClasses[id].push(target);
-    }
-    else {
-      bridged = BridgedClasses[target.$__id__()];
-
-      if (bridged) {
-        for (i = bridged.length - 1; i >= 0; i--) {
-          Opal.bridge_methods(bridged[i], donator);
-        }
-
-        BridgedClasses[donator.$__id__()] = bridged.slice();
+      for (i = bridged.length - 1; i >= 0; i--) {
+        Opal_bridge_methods_to_constructor(bridged[i], donator)
       }
     }
   };
+
+  // Actually bridge methods to the bridged (shared) prototype.
+  function Opal_bridge_methods_to_constructor(target_constructor, donator) {
+    var i,
+        method,
+        methods = donator.$instance_methods();
+
+    for (i = methods.length - 1; i >= 0; i--) {
+      method = '$' + methods[i];
+      Opal.bridge_method(target_constructor, donator, method, donator.$$proto[method]);
+    }
+  }
+
+  // Associate the target as a bridged class for the current "donator"
+  function Opal_add_bridged_constructor(target_constructor, donator) {
+    var donator_id = donator.$__id__();
+
+    if (!BridgedClasses[donator_id]) {
+      BridgedClasses[donator_id] = [];
+    }
+    BridgedClasses[donator_id].push(target_constructor);
+  }
 
   // Walks the dependency tree detecting the presence of the base among its
   // own dependencies.
@@ -1029,7 +1035,8 @@
     // order important here, we have to bridge from the last ancestor to the
     // bridged class
     for (var i = ancestors.length - 1; i >= 0; i--) {
-      Opal.bridge_methods(constructor, ancestors[i]);
+      Opal_add_bridged_constructor(constructor, ancestors[i]);
+      Opal_bridge_methods_to_constructor(constructor, ancestors[i]);
     }
 
     for (var name in BasicObject_alloc.prototype) {
@@ -2088,10 +2095,10 @@
     return hash;
   };
 
-  // hash2 is a faster creator for hashes that just use symbols and
+  // A faster Hash creator for hashes that just use symbols and
   // strings as keys. The map and keys array can be constructed at
   // compile time, so they are just added here by the constructor
-  // function
+  // function.
   //
   Opal.hash2 = function(keys, smap) {
     var hash = new Opal.Hash.$$alloc();
@@ -2115,6 +2122,9 @@
     return range;
   };
 
+  // Get the ivar name for a given name.
+  // Mostly adds a trailing $ to reserved names.
+  //
   Opal.ivar = function(name) {
     if (
         // properties
@@ -2140,6 +2150,9 @@
   // Regexps
   // -------
 
+  // Escape Regexp special chars letting the resulting string be used to build
+  // a new Regexp.
+  //
   Opal.escape_regexp = function(str) {
     return str.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1')
               .replace(/[\n]/g, '\\n')
