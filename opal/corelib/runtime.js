@@ -70,7 +70,7 @@
   var Opal = this.Opal = {};
 
   // All bridged classes - keep track to donate methods from Object
-  var bridges = {};
+  var BridgedClasses = {};
 
   // TopScope is used for inheriting constants from the top scope
   var TopScope = function(){};
@@ -832,6 +832,11 @@
   }
 
   // Bridges a single method.
+  //
+  // @param target [JS::Function] the constructor of the bridged class
+  // @param from [Module] the module/class we are importing the method from
+  // @param name [String] the method name in JS land (i.e. starting with $)
+  // @param body [JS::Function] the body of the method
   Opal.bridge_method = function(target, from, name, body) {
     var ancestors, i, ancestor, length;
 
@@ -859,7 +864,7 @@
   };
 
   // Bridges from *donator* to a *target*.
-  Opal._bridge = function(target, donator) {
+  Opal.bridge_methods = function(target, donator) {
     var id, methods, method, i, bridged;
 
     if (typeof(target) === "function") {
@@ -872,21 +877,21 @@
         Opal.bridge_method(target, donator, method, donator.$$proto[method]);
       }
 
-      if (!bridges[id]) {
-        bridges[id] = [];
+      if (!BridgedClasses[id]) {
+        BridgedClasses[id] = [];
       }
 
-      bridges[id].push(target);
+      BridgedClasses[id].push(target);
     }
     else {
-      bridged = bridges[target.$__id__()];
+      bridged = BridgedClasses[target.$__id__()];
 
       if (bridged) {
         for (i = bridged.length - 1; i >= 0; i--) {
-          Opal._bridge(bridged[i], donator);
+          Opal.bridge_methods(bridged[i], donator);
         }
 
-        bridges[donator.$__id__()] = bridged.slice();
+        BridgedClasses[donator.$__id__()] = bridged.slice();
       }
     }
   };
@@ -959,7 +964,7 @@
 
     includer.$$inc.push(module);
     module.$$included_in.push(includer);
-    Opal._bridge(includer, module);
+    Opal.bridge_methods(includer, module);
 
     // iclass
     iclass = {
@@ -1024,7 +1029,7 @@
     // order important here, we have to bridge from the last ancestor to the
     // bridged class
     for (var i = ancestors.length - 1; i >= 0; i--) {
-      Opal._bridge(constructor, ancestors[i]);
+      Opal.bridge_methods(constructor, ancestors[i]);
     }
 
     for (var name in BasicObject_alloc.prototype) {
@@ -1714,7 +1719,7 @@
     }
 
     // is it a bridged class?
-    var bridged = obj.$__id__ && !obj.$__id__.$$stub && bridges[obj.$__id__()];
+    var bridged = obj.$__id__ && !obj.$__id__.$$stub && BridgedClasses[obj.$__id__()];
     if (bridged) {
       for (var i = bridged.length - 1; i >= 0; i--) {
         Opal.bridge_method(bridged[i], obj, jsid, body);
@@ -1740,7 +1745,7 @@
 
   // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
-    // TODO: remove from bridges as well
+    // TODO: remove from BridgedClasses as well
 
     if (!$hasOwn.call(obj.$$proto, jsid)) {
       throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
