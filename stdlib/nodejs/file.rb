@@ -19,6 +19,20 @@
     warnings[string] = true;
     #{warn(`string`)};
   }
+  function executeIOAction(action) {
+    try {
+      return action();
+    } catch (error) {
+      if (error.code === 'EACCES' ||
+          error.code === 'EISDIR' ||
+          error.code === 'EMFILE' ||
+          error.code === 'ENOENT' ||
+          error.code === 'EPERM') {
+        throw Opal.IOError.$new(error.message)
+      }
+      throw error;
+    }
+  }
 }
 
 class File < IO
@@ -36,17 +50,17 @@ class File < IO
   end
 
   def self.read path
-    `__fs__.readFileSync(#{path}).toString()`
+    `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString()})`
   end
 
   def self.write path, data
-    `__fs__.writeFileSync(#{path}, #{data})`
+    `executeIOAction(function(){return __fs__.writeFileSync(#{path}, #{data})})`
     data.size
   end
 
   def self.exist? path
     path = path.path if path.respond_to? :path
-    `__fs__.existsSync(#{path})`
+    `return executeIOAction(function(){return __fs__.existsSync(#{path})})`
   end
 
   def self.realpath(pathname, dir_string = nil, cache = nil, &block)
@@ -54,12 +68,12 @@ class File < IO
     if block_given?
       `
       __fs__.realpath(#{pathname}, #{cache}, function(error, realpath){
-        if (error) #{raise error.message}
+        if (error) Opal.IOError.$new(error.message)
         else #{block.call(`realpath`)}
       })
       `
     else
-      `__fs__.realpathSync(#{pathname}, #{cache})`
+      `return executeIOAction(function(){return __fs__.realpathSync(#{pathname}, #{cache})})`
     end
   end
 
@@ -69,17 +83,17 @@ class File < IO
 
   def self.directory? path
     return nil unless exist? path
-    `!!__fs__.lstatSync(path).isDirectory()`
+    `!!executeIOAction(function(){return __fs__.lstatSync(path).isDirectory()})`
   end
 
   def self.file? path
     return nil unless exist? path
-    `!!__fs__.lstatSync(path).isFile()`
+    `!!executeIOAction(function(){return __fs__.lstatSync(path).isFile()})`
   end
 
   def self.size path
     return nil unless exist? path
-    `__fs__.lstatSync(path).size`
+    `return executeIOAction(function(){return __fs__.lstatSync(path).size})`
   end
 
   def self.open path, flags
@@ -101,7 +115,7 @@ class File < IO
   end
 
   def self.mtime path
-    `__fs__.statSync(#{path}).mtime`
+    `return executeIOAction(function(){return __fs__.statSync(#{path}).mtime})`
   end
 
   # Instance Methods
@@ -117,25 +131,25 @@ class File < IO
     flags = flags.gsub(encoding_flag_regexp, '')
     @path = path
     @flags = flags
-    @fd = `__fs__.openSync(path, flags)`
+    @fd = `executeIOAction(function(){return __fs__.openSync(path, flags)})`
   end
 
   attr_reader :path
 
   def write string
-    `__fs__.writeSync(#{@fd}, #{string})`
+    `executeIOAction(function(){return __fs__.writeSync(#{@fd}, #{string})})`
   end
 
   def flush
-    `__fs__.fsyncSync(#@fd)`
+    `executeIOAction(function(){return __fs__.fsyncSync(#@fd)})`
   end
 
   def close
-    `__fs__.closeSync(#{@fd})`
+    `executeIOAction(function(){return __fs__.closeSync(#{@fd})})`
   end
 
   def mtime
-    `__fs__.statSync(#{@path}).mtime`
+    `return executeIOAction(function(){return __fs__.statSync(#{@path}).mtime})`
   end
 end
 
@@ -149,10 +163,10 @@ class File::Stat
   end
 
   def file?
-    `__fs__.statSync(#{@path}).isFile()`
+    `return executeIOAction(function(){return __fs__.statSync(#{@path}).isFile()})`
   end
 
   def mtime
-    `__fs__.statSync(#{@path}).mtime`
+    `return executeIOAction(function(){return __fs__.statSync(#{@path}).mtime})`
   end
 end

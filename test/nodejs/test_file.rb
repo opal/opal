@@ -46,6 +46,18 @@ class TestNodejsFile < Test::Unit::TestCase
     assert_equal(lines.length, 2)
   end
 
+  def test_read_noexistent_should_raise_io_error
+    assert_raise IOError do
+      File.read('tmp/nonexistent')
+    end
+  end
+
+  def test_mtime_noexistent_should_raise_io_error
+    assert_raise IOError do
+      File.mtime('tmp/nonexistent')
+    end
+  end
+
   def test_linux_separators
     assert_equal('/', File::SEPARATOR)
     assert_equal('/', File::Separator)
