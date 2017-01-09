@@ -332,7 +332,7 @@
       }
     }
 
-    var scope = base_module.$$scope;
+    var scope = base_module.$$scope, i, ii, dep;
 
     if (value.$$is_class || value.$$is_module) {
       // Only checking _Object prevents setting a const on an anonymous class
@@ -350,12 +350,20 @@
     scope[name] = value;
 
     // If we dynamically declare a constant in a module,
-    // we should populate all the classes that include this module
+    // we should populate all the classes that include/prepend this module
     // with the same constant
-    if (base_module.$$is_module && base_module.$$included_in) {
-      for (var i = 0; i < base_module.$$included_in.length; i++) {
-        var dep = base_module.$$included_in[i];
-        Opal.casgn(dep, name, value);
+    if (base_module.$$is_module) {
+      if (base_module.$$included_in) {
+        for (i = 0, ii = base_module.$$included_in.length; i < ii; i++) {
+          dep = base_module.$$included_in[i];
+          Opal.casgn(dep, name, value);
+        }
+      }
+      if (base_module.$$prepended_to) {
+        for (i = 0, ii = base_module.$$prepended_to.length; i < ii; i++) {
+          dep = base_module.$$prepended_to[i];
+          Opal.casgn(dep, name, value);
+        }
       }
     }
 
@@ -970,7 +978,6 @@
   // @return [null]
   Opal.append_features = function(module, includer) {
     var iclass, methods, id, i, already_included = false;
-    // console.log('includer', includer);
 
     // check if this module is already included in the class or in a superclass
     var existing_includer = includer;
@@ -1171,9 +1178,9 @@
   };
 
   // Update `jsid` method cache of all classes / modules including `module`.
-  Opal.update_method_cache = function(module, includer, jsid) {
-    var dest       = includer.$$proto;
-    var found_body = Opal.find_method_body(includer, jsid);
+  Opal.update_method_cache = function(module, module_receiver, jsid) {
+    var dest       = module_receiver.$$proto;
+    var found_body = Opal.find_method_body(module_receiver, jsid);
 
     if (found_body) {
       dest[jsid] = found_body;
@@ -1183,25 +1190,30 @@
       delete dest[jsid];
     }
 
-    // if the includer is a module, recursively update all of its includers.
-    if (includer.$$included_in) {
-      Opal.update_method_caches(includer, jsid);
+    // if the includer is a module, recursively update
+    // all of its includers/prependers.
+    if (module_receiver.$$is_module &&
+        (module_receiver.$$included_in || module_receiver.$$prepended_to)) {
+      Opal.update_method_caches(module_receiver, jsid);
     }
   };
 
-  // Update `jsid` method cache of all classes / modules including `module`.
+  // Update `jsid` method cache of all classes / modules including/prepending `module`.
   Opal.update_method_caches = function(module, jsid) {
-    var i, ii, includee, included_in;
+    var i, ii, module_receiver, included_in, prepended_to;
 
-    included_in = module.$$included_in;
-
-    if (!included_in) {
-      return;
+    if ( (included_in = module.$$included_in) ) {
+      for (i = 0, ii = included_in.length; i < ii; i++) {
+        module_receiver = included_in[i];
+        Opal.update_method_cache(module, module_receiver, jsid);
+      }
     }
 
-    for (i = 0, ii = included_in.length; i < ii; i++) {
-      includee = included_in[i];
-      Opal.update_method_cache(module, includee, jsid);
+    if ( (prepended_to = module.$$prepended_to) ) {
+      for (i = 0, ii = prepended_to.length; i < ii; i++) {
+        module_receiver = prepended_to[i];
+        Opal.update_method_cache(module, module_receiver, jsid);
+      }
     }
   };
 
@@ -1393,9 +1405,6 @@
   // Super dispatcher
   Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, defs) {
     var dispatcher, super_method;
-    // if (defs) {
-    //   obj = obj.
-    // }
     super_method = Opal.find_obj_super_dispatcher(obj, mid, current_func) || Opal.stub_for('$' + mid);
 
     if (!defcheck && super_method.$$stub && Opal.Kernel.$method_missing === obj.$method_missing) {
@@ -1427,49 +1436,8 @@
 
   Opal.find_obj_super_dispatcher = function(obj, mid, current_func) {
     var klass = obj.$$meta || obj.$$class;
-
-    // first we need to find the class/module current_func is located on
-    // //console.log('>>find_owning_class for', mid);
-    // klass = Opal.find_owning_class(klass, current_func);
-
-    // if (!klass) {
-    //   throw new Error("could not find current class for super()");
-    // }
-    //console.log('>>find_super_func for',mid);
     return Opal.find_super_func(klass, '$' + mid, current_func);
   };
-
-  // Opal.find_owning_class = function(klass, current_func) {
-  //   var owner = current_func.$$owner;
-  //   console.log('find_owning_class>>', klass.$$name, 'entry', klass.$$entry && klass.$$entry.$$name);
-  //   klass = klass.$$entry || klass;
-  //
-  //   while (klass) {
-  //     // repeating for readability
-  //
-  //     if (klass.$$iclass && klass.$$module === current_func.$$donated) {
-  //       // this klass was the last one the module donated to
-  //       // case is also hit with multiple module includes
-  //       break;
-  //     }
-  //     else if (klass.$$iclass && klass.$$module === owner) {
-  //       // module has donated to other classes but klass isn't one of those
-  //       break;
-  //     }
-  //     else if (owner.$$is_singleton && klass === owner.$$singleton_of.$$class) {
-  //       // cases like stdlib `Singleton::included` that use a singleton of a singleton
-  //       break;
-  //     }
-  //     else if (klass === owner) {
-  //       // no modules, pure class inheritance
-  //       break;
-  //     }
-  //
-  //     klass = klass.$$parent;
-  //   }
-  //
-  //   return klass;
-  // };
 
   Opal.find_super_func = function(klass, jsid, current_method) {
     var ancestors, ancestor, method, i = 0, ii, seen = false, super_called_from = current_method.$$super_called_from;

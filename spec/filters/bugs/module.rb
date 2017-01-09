@@ -110,12 +110,12 @@ opal_filter "Module" do
   fails "Module#name is set with a conditional assignment to a nested constant"
   fails "Module#name preserves the encoding in which the class was defined"
 
-  fails "Module#prepend also prepends included modules" # NoMethodError: undefined method `calc' for #<#<Class:0x6e2>:0x6e4>
-  fails "Module#prepend inserts a later prepended module into the chain" # Expected ["c1", "m2", "m1", "c2"] to equal ["c1", "m1", "m2", "c2"]
-  fails "Module#prepend keeps the module in the chain when dupping an intermediate module" # Expected [#<Module:0x6ee>] to equal [#<Module:0x6ee>, #<Module:0x6e8>, #<Module:0x6ea>]
-  fails "Module#prepend keeps the module in the chain when dupping the class" # Exception: self.$$alloc is not a constructor
-  fails "Module#prepend reports the prepended module as the method owner" # Expected #<Class:0x69e> to equal #<Module:0x69c>
-  fails "Module#prepend reports the prepended module as the unbound method owner" # Expected #<Class:0x6ce> to equal #<Module:0x6cc>
+  # fails "Module#prepend also prepends included modules" # NoMethodError: undefined method `calc' for #<#<Class:0x6e2>:0x6e4>
+  # fails "Module#prepend inserts a later prepended module into the chain" # Expected ["c1", "m2", "m1", "c2"] to equal ["c1", "m1", "m2", "c2"]
+  # fails "Module#prepend keeps the module in the chain when dupping an intermediate module" # Expected [#<Module:0x6ee>] to equal [#<Module:0x6ee>, #<Module:0x6e8>, #<Module:0x6ea>]
+  # fails "Module#prepend keeps the module in the chain when dupping the class" # Exception: self.$$alloc is not a constructor
+  # fails "Module#prepend reports the prepended module as the method owner" # Expected #<Class:0x69e> to equal #<Module:0x69c>
+  # fails "Module#prepend reports the prepended module as the unbound method owner" # Expected #<Class:0x6ce> to equal #<Module:0x6cc>
 
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a NameError and does not call #const_missing if the constant is not defined directly in the module"
