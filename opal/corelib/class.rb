@@ -54,7 +54,7 @@ class Class
       var singleton_of = self.$$singleton_of;
 
       if (singleton_of && (singleton_of.$$is_class || singleton_of.$$is_module)) {
-        return #{"#<Class:#{`singleton_of`.name}>"};
+        return #{"#<Class:#{`singleton_of`.name || `singleton_of`.to_s}>"};
       }
       else if (singleton_of) {
         // a singleton class created from an object
