@@ -1039,41 +1039,50 @@
   // @return [null]
   Opal.prepend_features = function(module, prepender) {
     var iclass, methods, id, i;
+    if (Opal.gvars.debugz) console.log('prepend_features: ', prepender.$inspect(), 'prepend', module.$inspect());
 
-    // check if this module is already included in the class
+    // check if this module is already prepended to the prepender
     for (i = prepender.$$pre.length - 1; i >= 0; i--) {
+      if (Opal.gvars.debugz) console.log('prepend_features: check if this module is already prepended to the prepender', [prepender.$$pre[i].$inspect(), 'prepend', module.$inspect()]);
       if (prepender.$$pre[i] === module) {
+        if (Opal.gvars.debugz) console.log('prepend_features: already prepended update_ancestors_cache and return', prepender.$inspect());
         Opal.update_ancestors_cache(prepender);
         return;
       }
     }
 
+    if (Opal.gvars.debugz) console.log('prepend_features: check has_cyclic_dep');
     if ( Opal.has_cyclic_dep(prepender.$$id, [module], '$$pre', {}) ) {
       throw Opal.ArgumentError.$new('cyclic prepend detected')
     }
 
     prepender.$$pre.push(module);
-    Opal.update_ancestors_cache(prepender);
     module.$$prepended_to.push(prepender);
-    Opal.bridge_methods(prepender, module);
 
     iclass = {
-      $$name:   module.$$name,
-      $$proto:  module.$$proto,
+      $$name:    module.$$name,
+      $$proto:   module.$$proto,
       $$methods: module.$$methods,
-      $$parent: prepender.$$entry,
-      $$module: module,
-      $$iclass: true
+      $$parent:  prepender.$$entry,
+      $$module:  module,
+      $$iclass:  true
     };
 
     prepender.$$entry = iclass;
 
-    methods = Object.keys(module.$$methods);
+    if (Opal.gvars.debugz) console.log('prepend_features: update_ancestors_cache');
+    Opal.update_ancestors_cache(prepender);
+    if (Opal.gvars.debugz) console.log('prepend_features: bridge_methods');
+    Opal.bridge_methods(prepender, module);
+
+    methods = module.$instance_methods();
+    if (Opal.gvars.debugz) console.log('prepend_features: instance_methods', methods.$inspect());
 
     for (i = methods.length - 1; i >= 0; i--) {
-      Opal.update_method_cache(module, prepender, methods[i])
+      Opal.update_method_cache(module, prepender, '$'+methods[i])
     }
 
+    if (Opal.gvars.debugz) console.log('prepend_features: donate_constants');
     Opal.donate_constants(module, prepender);
   };
 
@@ -1152,41 +1161,67 @@
     }
   };
 
+  // Searches module_or_class and its included & prepended modules for the given
+  // method jsid
+  //
+  // @param module_or_class [Module] the module/class that should be searched
+  // @param jsid [String] the JS id of the method (e.g. "$puts")
+  //
+  // @return [JS::Function, null] the found body of the methods
   Opal.find_method_body = function(module_or_class, jsid) {
+    if (Opal.gvars.debugz) console.log('find_method_body: ', module_or_class.$inspect(), jsid);
+
     // If no modules are included/prepended just return the base if the method is there
     if (!module_or_class.$$inc && !module_or_class.$$pre) {
-      return module_or_class[jsid] ? module_or_class : null;
+      if (Opal.gvars.debugz) console.log('find_method_body: no inc or pre, returning');
+      return module_or_class.$$methods[jsid] ? module_or_class : null;
     }
 
     var chain, owner, body, i, ii;
 
     chain = module_or_class.$$inc.concat([module_or_class]).concat(module_or_class.$$pre);
+    if (Opal.gvars.debugz) console.log('find_method_body: chain', chain.$inspect());
 
+
+    // If this module_or_class is donating or linked to bridged classes let's include the superclass (if any) in the search
     var bridged = module_or_class.$__id__ && !module_or_class.$__id__.$$stub && BridgedClasses[module_or_class.$__id__()];
-    if (bridged) {
+    if (bridged && module_or_class.$$super) {
+      if (Opal.gvars.debugz) console.log('find_method_body: bridged, adding super', chain.$inspect());
       chain = [module_or_class.$$super].concat(chain);
     }
 
     for (i = 0, ii = chain.length; i < ii; i++) {
       owner = chain[ii - (i+1)]; // reverse order
-      body = owner === module_or_class ? owner.$$methods[jsid] : owner.$$proto[jsid];
+      if (Opal.gvars.debugz) console.log('find_method_body: checking ', owner.$inspect(), owner === module_or_class ? 'module_or_class.$$methods[jsid]' : 'owner.$$proto[jsid]');
+      body = owner === module_or_class ? module_or_class.$$methods[jsid] : owner.$$proto[jsid];
+      if (Opal.gvars.debugz) console.log('find_method_body: body ', owner.$inspect(), jsid, String(body).toString().replace(/[\n ]+/g, ' '));
+
       if (body) {
+        if (Opal.gvars.debugz) console.log('find_method_body: found ', owner.$inspect(), jsid, body.toString().replace(/[\n ]+/g, ' '));
+
         return body;
       }
     };
+    if (Opal.gvars.debugz) console.log('find_method_body: not found ', module_or_class.$inspect(), jsid);
+
     return null;
   };
 
   // Update `jsid` method cache of all classes / modules including `module`.
   Opal.update_method_cache = function(module, module_receiver, jsid) {
     var dest       = module_receiver.$$proto;
+    if (Opal.gvars.debugz) console.log('update_method_cache: module', module.$inspect(), 'module_receiver', module_receiver.$inspect(), 'jsid', jsid);
+
     var found_body = Opal.find_method_body(module_receiver, jsid);
 
     if (found_body) {
+      if (Opal.gvars.debugz) console.log('update_method_cache: found_body test1', jsid, found_body.toString().replace(/[\n ]+/g, ' '));
       dest[jsid] = found_body;
       dest[jsid].$$donated = module;
     }
     else {
+      if (Opal.gvars.debugz) console.log('update_method_cache: delete', jsid);
+
       delete dest[jsid];
     }
 
@@ -1801,17 +1836,24 @@
 
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(obj, jsid, body) {
+    if (Opal.gvars.debugz) console.log('defn: ', jsid, obj.$inspect());
+
     // add it to the bag of methods
     obj.$$methods[jsid] = body;
 
     // for super dispatcher, etc.
     body.$$owner = obj;
 
-    if (Opal.find_method_body(obj, jsid) !== body) {
+    var found_body = Opal.find_method_body(obj, jsid);
+
+    if (found_body !== body) {
       console.log('DELTA-defn1', obj.$$name, jsid);
     }
+
+    if (Opal.gvars.debugz) console.log('defn: updating $$proto with', obj.$inspect(), jsid, found_body.toString().replace(/[\n ]+/g, ' '));
+
     // Update the cached method body
-    obj.$$proto[jsid] = Opal.find_method_body(obj, jsid);
+    obj.$$proto[jsid] = found_body;
 
     // is it a module?
     if (obj.$$is_module) {
