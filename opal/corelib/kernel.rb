@@ -38,7 +38,7 @@ module Kernel
         #{raise NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
       }
 
-      return #{Method.new(self, `meth`, name)};
+      return #{Method.new(self, `meth.$$owner || #{self.class}`, `meth`, name)};
     }
   end
 

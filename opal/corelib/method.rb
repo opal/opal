@@ -1,9 +1,9 @@
 class Method
   attr_reader :owner, :receiver, :name
 
-  def initialize(receiver, method, name)
+  def initialize(receiver, owner, method, name)
     @receiver = receiver
-    @owner    = receiver.class
+    @owner    = owner
     @name     = name
     @method   = method
   end
@@ -35,7 +35,7 @@ class Method
   alias [] call
 
   def unbind
-    UnboundMethod.new(@owner, @method, @name)
+    UnboundMethod.new(@receiver.class, @owner, @method, @name)
   end
 
   def to_proc
@@ -48,14 +48,15 @@ class Method
   end
 
   def inspect
-    "#<Method: #{@receiver.class}##@name>"
+    "#<#{self.class}: #{@receiver.class}##{@name} (defined in #{@owner} in #{source_location.join(':')})>"
   end
 end
 
 class UnboundMethod
-  attr_reader :owner, :name
+  attr_reader :source, :owner, :name
 
-  def initialize(owner, method, name)
+  def initialize(source, owner, method, name)
+    @source = source
     @owner  = owner
     @method = method
     @name   = name
@@ -78,14 +79,17 @@ class UnboundMethod
   end
 
   def bind(object)
-    # TODO: re-enable when Module#< is fixed
-    # unless object.class <= @owner
-    #   raise TypeError, "can't bind singleton method to a different class"
-    # end
-    Method.new(object, @method, @name)
+    %x{
+      if (#{@owner}.$$is_module || Opal.is_a(#{object}, #{@owner})) {
+        return #{Method.new(object, @owner, @method, @name)};
+      }
+      else {
+        #{raise TypeError, "can't bind singleton method to a different class (expected #{object}.kind_of?(#{@owner} to be true)"};
+      }
+    }
   end
 
   def inspect
-    "#<UnboundMethod: #{@owner.name}##@name>"
+    "#<#{self.class}: #{@source}##{@name} (defined in #{@owner} in #{source_location.join(':')})>"
   end
 end

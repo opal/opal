@@ -449,7 +449,7 @@ class Module
         #{raise NameError.new("undefined method `#{name}' for class `#{self.name}'", name)};
       }
 
-      return #{UnboundMethod.new(self, `meth`, name)};
+      return #{UnboundMethod.new(self, `meth.$$owner || #{self}`, `meth`, name)};
     }
   end
 

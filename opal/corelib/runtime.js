@@ -1482,19 +1482,11 @@
   };
 
   Opal.is_a = function(object, klass) {
-    if (object.$$meta === klass) {
+    if (object.$$meta === klass || object.$$class === klass) {
       return true;
     }
 
-    var i, length, ancestors = Opal.ancestors(object.$$class);
-
-    for (i = 0, length = ancestors.length; i < length; i++) {
-      if (ancestors[i] === klass) {
-        return true;
-      }
-    }
-
-    ancestors = Opal.ancestors(object.$$meta);
+    var i, length, ancestors = Opal.ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
 
     for (i = 0, length = ancestors.length; i < length; i++) {
       if (ancestors[i] === klass) {
