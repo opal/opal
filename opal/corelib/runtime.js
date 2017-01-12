@@ -1795,7 +1795,8 @@
   Opal.alias = function(obj, name, old) {
     var id     = '$' + name,
         old_id = '$' + old,
-        body   = obj.$$proto['$' + old];
+        body   = obj.$$proto['$' + old],
+        new_body;
 
     // instance_eval is being run on a class/module, so that need to alias class methods
     if (obj.$$eval) {
@@ -1815,7 +1816,20 @@
       }
     }
 
-    Opal.defn(obj, id, body);
+    new_body = function() {
+      body.$$p = new_body.$$p;
+      new_body.$$p = null;
+      return body.apply(this, arguments);
+    };
+
+    new_body.length = body.length;
+    new_body.$$arity = body.$$arity;
+    new_body.$$parameters = body.$$parameters;
+    new_body.$$source_location = body.$$source_location;
+    new_body.$$alias_of = body;
+    new_body.$$alias_name = name;
+
+    Opal.defn(obj, id, new_body);
 
     return obj;
   };
