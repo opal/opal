@@ -13,6 +13,7 @@ module Opal
         end
 
         alias fails filter
+        alias fails_badly filter
 
         def filtered?(spec_name)
           filters.include?(spec_name)

@@ -31,6 +31,14 @@ class OSpecFilter
     @filters << description
   end
 
+  def fails_badly(description)
+    if ENV['INVERT_RUNNING_MODE']
+      warn "WARNING: FAILS BADLY: Ignoring filter to avoid blocking the suite: #{description.inspect}"
+    else
+      @filters << description
+    end
+  end
+
   def unused_filters_message(list: false)
     unused = @filters - @seen
     return if unused.size == 0
