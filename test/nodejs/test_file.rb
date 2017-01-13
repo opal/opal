@@ -58,6 +58,15 @@ class TestNodejsFile < Test::Unit::TestCase
     end
   end
 
+  def test_current_directory_should_be_a_directory
+    assert(File.directory?('.'))
+  end
+
+  def test_current_directory_should_be_a_directory_using_pathname
+    current_dir = Pathname.new('.');
+    assert(current_dir.directory?)
+  end
+
   def test_linux_separators
     assert_equal('/', File::SEPARATOR)
     assert_equal('/', File::Separator)
