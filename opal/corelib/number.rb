@@ -850,9 +850,5 @@ class Float < Numeric
   MANT_DIG = 53
   RADIX    = 2
 
-  if defined?(`Number.EPSILON`)
-    EPSILON = `Number.EPSILON`
-  else
-    EPSILON = `2.2204460492503130808472633361816E-16`
-  end
+  EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
 end
