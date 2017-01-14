@@ -32,6 +32,8 @@ opal_unsupported_filter "Float" do
   fails "Float#to_s emits a trailing '.0' for a whole number"
   fails "Float#to_s emits a trailing '.0' for the mantissa in e format"
   fails "Float#to_s returns '0.0' for 0.0"
+  fails "Marshal.dump Float -Infinity returns a binary string" # TypeError: can't bind singleton method to a different class (expected -Infinity.kind_of?(Float to be true)
+  fails "Marshal.dump Float Infinity returns a binary string" # TypeError: can't bind singleton method to a different class (expected Infinity.kind_of?(Float to be true)
   fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30" # precision error
   fails "Rational#% returns a Float value when the argument is Float"
   fails "Rational#** raises ZeroDivisionError for Rational(0, 1) passed a negative Integer"
