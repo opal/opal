@@ -2,8 +2,8 @@ require 'corelib/numeric'
 
 class Number < Numeric
   Opal.bridge(self, `Number`)
-
   `Number.prototype.$$is_number = true`
+  `self.$$is_number_class = true`
 
   def coerce(other)
     %x{
@@ -818,6 +818,8 @@ end
 Fixnum = Number
 
 class Integer < Numeric
+  `self.$$is_number_class = true`
+
   def self.===(other)
     %x{
       if (!other.$$is_number) {
@@ -833,6 +835,8 @@ class Integer < Numeric
 end
 
 class Float < Numeric
+  `self.$$is_number_class = true`
+
   def self.===(other)
     `!!other.$$is_number`
   end
