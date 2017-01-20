@@ -1486,7 +1486,7 @@
       return true;
     }
 
-    if (object.$$is_number && klass.$$is_number_class ) {
+    if (object.$$is_number && klass.$$is_number_class) {
       return true;
     }
 
