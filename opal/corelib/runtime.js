@@ -1189,19 +1189,23 @@
     var subscriber, subscribers = Opal.stub_subscribers,
         i, ilength = stubs.length,
         j, jlength = subscribers.length,
-        method_name, stub;
+        method_name, stub,
+        opal_stubs = Opal.stubs;
 
     for (i = 0; i < ilength; i++) {
       method_name = stubs[i];
-      // Save method name to populate other subscribers with this stub
-      Opal.stubs[method_name] = true;
-      stub = Opal.stub_for(method_name);
 
-      for (j = 0; j < jlength; j++) {
-        subscriber = subscribers[j];
+      if(!opal_stubs.hasOwnProperty(method_name)) {
+        // Save method name to populate other subscribers with this stub
+        opal_stubs[method_name] = true;
+        stub = Opal.stub_for(method_name);
 
-        if (!(method_name in subscriber)) {
-          subscriber[method_name] = stub;
+        for (j = 0; j < jlength; j++) {
+          subscriber = subscribers[j];
+
+          if (!(method_name in subscriber)) {
+            subscriber[method_name] = stub;
+          }
         }
       }
     }
