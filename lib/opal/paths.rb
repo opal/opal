@@ -70,8 +70,10 @@ module Opal
   # (includes `corelib`, `stdlib`, `opal/lib`, `ast` gem and `parser` gem)
   def self.reset_paths!
     @paths = [core_dir.untaint, std_dir.untaint, gem_dir.untaint]
-    use_gem 'ast'
-    use_gem 'parser'
+    if RUBY_ENGINE != 'opal'
+      use_gem 'ast'
+      use_gem 'parser'
+    end
     nil
   end
 

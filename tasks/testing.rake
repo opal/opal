@@ -211,7 +211,7 @@ module MinitestSuite
 
     stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
 
-    "ruby -rbundler/setup bin/opal #{include_paths} #{stubs} -Dwarning -A #{rb_filename} -c > #{js_filename}"
+    "ruby -rbundler/setup bin/opal -g hike #{include_paths} #{stubs} -Dwarning -A #{rb_filename} -c > #{js_filename}"
   end
 end
 
@@ -246,12 +246,14 @@ task :cruby_tests do
 end
 
 task :test_nodejs do
+  Opal.use_gem 'hike'
   js_filename = 'tmp/test_nodejs.js'
   build_js_command = MinitestSuite.build_js_command(
     %w[
       opal-parser.rb
       test_file.rb
       test_dir.rb
+      test_opal_builder.rb
     ],
     includes: %w[test/nodejs],
     js_filename: js_filename,
