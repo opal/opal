@@ -244,7 +244,6 @@ opal_unsupported_filter "String" do
   fails "String#gsub with pattern and block replaces the incompatible part properly even if the encodings are not compatible"
   fails "String#gsub with pattern and block untrusts the result if the original string or replacement is untrusted"
   fails "String#gsub with pattern and block uses the compatible encoding if they are compatible"
-  fails "String#gsub with pattern and replacement doesn't freak out when replacing ^" #Only fails "Text\nFoo".gsub(/^/, ' ').should == " Text\n Foo"
   fails "String#gsub with pattern and replacement replaces \\k named backreferences with the regexp's corresponding capture"
   fails "String#gsub with pattern and replacement returns a copy of self with all occurrences of pattern replaced with replacement" #Only fails str.gsub(/\Ah\S+\s*/, "huh? ").should == "huh? homely world. hah!"
   fails "String#gsub with pattern and replacement supports \\G which matches at the beginning of the remaining (non-matched) string"

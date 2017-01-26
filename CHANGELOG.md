@@ -113,6 +113,7 @@ Whitespace conventions:
 - Fixed using `--preload` along with `--no-opal` for CLI
 - Fixed `Integer("0")` raising `ArgumentError` instead of parsing as 0
 - Fixed `JSON#parse` to raise `JSON::ParserError` for invalid input
+- Fixed `String#gsub` to react properly when only line anchors are used
 - `Module#append_features` now detects cyclic includes
 
 
