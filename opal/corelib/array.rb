@@ -21,7 +21,13 @@ class Array < `Array`
     `toArraySubclass(objects, self)`
   end
 
-  def initialize(size = nil, obj = nil, &block)
+  def initialize(*args, &block)
+    # Don't take these in as method args because they were getting reassigned
+    # in the compiled JS (to nil if they weren't passed in). Reassigning
+    # function arguments while also referencing the arguments object in the JS
+    # function results in a deoptimization.
+    size, obj = args[0], args[1]
+
     %x{
       if (size > #{Integer::MAX}) {
         #{raise ArgumentError, "array size too big"}
@@ -161,7 +167,7 @@ class Array < `Array`
     end
 
     return [] if `self.length === 0`
-    return clone.to_a if `other.length === 0`
+    return `self.slice()` if `other.length === 0`
 
     %x{
       var result = [], hash = #{{}}, i, length, item;
