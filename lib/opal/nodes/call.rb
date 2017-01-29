@@ -17,6 +17,9 @@ module Opal
       OPERATORS = { :+ => :plus, :- => :minus, :* => :times, :/ => :divide,
                     :< => :lt, :<= => :le, :> => :gt, :>= => :ge }
 
+      # JavaScript comparisons operators that get optimized
+      COMPARISON_OPERATORS = [ '==', '!=', '>', '<', '>=', '<=']
+
       def self.add_special(name, options = {}, &handler)
         SPECIALS[name] = options
         define_method("handle_#{name}", &handler)
@@ -143,7 +146,15 @@ module Opal
       end
 
       def compile_simple_call_chain
-        push recv(receiver_sexp), method_jsid, "(", expr(arglist), ")"
+        if is_literal_type(receiver_sexp) && COMPARISON_OPERATORS.include?(meth.to_s)
+          push recv(receiver_sexp), meth.to_s, "(", expr(arglist), ")"
+        else
+          push recv(receiver_sexp), method_jsid, "(", expr(arglist), ")"
+        end
+      end
+
+      def is_literal_type(sexp)
+        sexp.type == 'int' || sexp.type == 'str' || sexp.type == 'float'
       end
 
       def splat?
