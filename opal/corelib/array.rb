@@ -22,11 +22,12 @@ class Array < `Array`
   end
 
   def initialize(*args, &block)
-    # Don't take these in as method args because they were getting reassigned
-    # in the compiled JS (to nil if they weren't passed in). Reassigning
-    # function arguments while also referencing the arguments object in the JS
-    # function results in a deoptimization.
-    size, obj = args[0], args[1]
+    # Don't take these in as optional method args because they were getting
+    # reassigned in the compiled JS (to nil if they weren't passed in).
+    # Reassigning function arguments while also referencing the arguments object
+    # in the JS function results in a deoptimization.
+    size = `typeof args[0] === 'undefined' ? nil : args[0]`
+    obj = `typeof args[1] === 'undefined' ? nil : args[1]`
 
     %x{
       if (size > #{Integer::MAX}) {
