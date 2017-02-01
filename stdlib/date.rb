@@ -124,7 +124,7 @@ class Date
         // Converts month abbr (nov) to a month number
         function fromMonthAbbr(fn) {
           return function(match) {
-            var abbr = fn(match);
+            var abbr = fn(match).toLowerCase();
             return #{ABBR_MONTHNAMES}.indexOf(abbr) + 1;
           }
         }

@@ -8,6 +8,11 @@ describe Date do
       Date.parse('2013-10-4').should == Date.new(2013, 10, 4)
       Date.parse('2013-06-02').should == Date.new(2013, 6, 2)
     end
+
+    it "parses date string with month name into a Date instance" do
+      Date.parse("2013 Jun 02").should == Date.new(2013, 6, 2)
+      Date.parse("2013 jun 02").should == Date.new(2013, 6, 2)
+    end
   end
 
   describe "#<" do
