@@ -21,14 +21,7 @@ class Array < `Array`
     `toArraySubclass(objects, self)`
   end
 
-  def initialize(*args, &block)
-    # Don't take these in as optional method args because they were getting
-    # reassigned in the compiled JS (to nil if they weren't passed in).
-    # Reassigning function arguments while also referencing the arguments object
-    # in the JS function results in a deoptimization.
-    size = `typeof args[0] === 'undefined' ? nil : args[0]`
-    obj = `typeof args[1] === 'undefined' ? nil : args[1]`
-
+  def initialize(size = nil, obj = nil, &block)
     %x{
       if (size > #{Integer::MAX}) {
         #{raise ArgumentError, "array size too big"}
