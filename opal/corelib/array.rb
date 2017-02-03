@@ -161,7 +161,7 @@ class Array < `Array`
     end
 
     return [] if `self.length === 0`
-    return clone.to_a if `other.length === 0`
+    return `self.slice()` if `other.length === 0`
 
     %x{
       var result = [], hash = #{{}}, i, length, item;
