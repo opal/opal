@@ -1,7 +1,10 @@
+require 'opal/regexp_anchors'
 require 'opal/hike_path_finder'
 
 module Opal
   class PathReader
+    RELATIVE_PATH_REGEXP = %r{#{Opal::REGEXP_START}\.?\.#{File::SEPARATOR}}
+
     def initialize(file_finder = HikePathFinder.new)
       @file_finder = file_finder
     end
@@ -13,7 +16,7 @@ module Opal
     end
 
     def expand(path)
-      if Pathname.new(path).absolute? || path =~ %r{\A\.?\.#{File::SEPARATOR}}
+      if Pathname.new(path).absolute? || path =~ RELATIVE_PATH_REGEXP
         path
       else
         file_finder.find(path)
