@@ -52,11 +52,29 @@ module Opal
       end
 
       def compile
-        sanitized_value = value.inspect.gsub /\\u\{[0-9a-f]+\}/ do |char|
-          @compiler.warning("Ignoring unsupported character #{char}", @sexp.line)
-          ''
+        sanitized_value = value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do |match|
+          code_point = $1.to_i(16)
+          to_utf16(code_point)
         end
         push translate_escape_chars(sanitized_value)
+      end
+
+      # http://www.2ality.com/2013/09/javascript-unicode.html
+      def to_utf16(code_point)
+        ten_bits = 0b1111111111
+        u = -> (code_unit) { '\\u'+code_unit.to_s(16).upcase }
+
+        return u.(code_point) if code_point <= 0xFFFF
+
+        code_point -= 0x10000
+
+        # Shift right to get to most significant 10 bits
+        lead_surrogate = 0xD800 + (code_point >> 10)
+
+        # Mask to get least significant 10 bits
+        tail_surrogate = 0xDC00 + (code_point & ten_bits)
+
+        p(u.(lead_surrogate) + u.(tail_surrogate))
       end
     end
 
