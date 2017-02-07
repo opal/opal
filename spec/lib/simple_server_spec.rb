@@ -42,4 +42,13 @@ describe Opal::SimpleServer do
     self.app = described_class.new(main: 'foo')
     expect(get('/').body).to include('src="/assets/foo.js')
   end
+
+  it 'respects config set in Opal::Config' do
+    Opal::Config.arity_check_enabled = false
+    expect(get('/assets/console.js').body).not_to include('TMP_Console_clear_1.$$parameters = []')
+
+    Opal::Config.arity_check_enabled = true
+    self.app = described_class.new(main: 'console')
+    expect(get('/assets/console.js').body).to include('TMP_Console_clear_1.$$parameters = []')
+  end
 end

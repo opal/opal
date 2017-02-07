@@ -69,4 +69,21 @@ describe Opal::Builder do
       expect(builder.to_s).to start_with('(function(undefined)')
     end
   end
+
+  it 'defaults config from Opal::Config' do
+    Opal::Config.arity_check_enabled = false
+    expect(Opal::Config.arity_check_enabled).to eq(false)
+    expect(Opal::Config.compiler_options[:arity_check]).to eq(false)
+    builder = described_class.new
+    builder.build_str('def foo; end', 'foo')
+    expect(builder.to_s).not_to include('TMP_foo_1.$$parameters = []')
+
+    Opal::Config.arity_check_enabled = true
+    expect(Opal::Config.arity_check_enabled).to eq(true)
+    expect(Opal::Config.compiler_options[:arity_check]).to eq(true)
+    builder = described_class.new
+    builder.build_str('def foo; end', 'foo')
+    expect(builder.to_s).to include('TMP_foo_1.$$parameters = []')
+  end
+
 end

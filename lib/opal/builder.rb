@@ -1,6 +1,7 @@
 require 'opal/path_reader'
 require 'opal/builder_processors'
 require 'opal/paths'
+require 'opal/config'
 require 'set'
 
 module Opal
@@ -20,7 +21,7 @@ module Opal
       @processors        ||= DEFAULT_PROCESSORS
       @path_reader       ||= PathReader.new
       @prerequired       ||= []
-      @compiler_options  ||= {}
+      @compiler_options  ||= Opal::Config.compiler_options
       @default_processor ||= RubyProcessor
 
       @processed = []
