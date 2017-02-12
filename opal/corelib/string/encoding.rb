@@ -191,6 +191,11 @@ class String
   end
 
   def force_encoding(encoding)
+    %x{
+      if (encoding === self.encoding) {
+        return self;
+      }
+    }
     encoding = Opal.coerce_to!(encoding, String, :to_s)
     encoding = Encoding.find(encoding)
 
