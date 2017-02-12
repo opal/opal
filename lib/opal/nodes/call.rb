@@ -18,7 +18,7 @@ module Opal
                     :< => :lt, :<= => :le, :> => :gt, :>= => :ge }
 
       # JavaScript comparisons operators that get optimized
-      COMPARISON_OPERATORS = [ '==', '!=', '>', '<', '>=', '<=']
+      COMPARISON_OPERATORS = [ '==', '!=', '>', '<', '>=', '<=', '===']
 
       def self.add_special(name, options = {}, &handler)
         SPECIALS[name] = options
@@ -154,7 +154,7 @@ module Opal
       end
 
       def is_literal_type(sexp)
-        sexp.type == 'int' || sexp.type == 'str' || sexp.type == 'float'
+        sexp.type == :int || sexp.type == :str || sexp.type == :float
       end
 
       def splat?
