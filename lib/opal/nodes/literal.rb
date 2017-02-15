@@ -52,23 +52,29 @@ module Opal
       end
 
       def compile
-        push translate_escape_chars(trimmed_value.inspect)
+        sanitized_value = value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do |match|
+          code_point = $1.to_i(16)
+          to_utf16(code_point)
+        end
+        push translate_escape_chars(sanitized_value)
       end
 
-      # Some unicode characters are too big,
-      # MRI uses "\u{hex}" to display them
-      # (which is invalid for JS)
-      # There's no way to display them,
-      # so we can simply trim them
-      def trimmed_value
-        value.each_char.map do |char|
-          if char.valid_encoding? && char.ord > 65535
-            @compiler.warning("Ignoring unsupported character #{char}", @sexp.line)
-            ""
-          else
-            char
-          end
-        end.join
+      # http://www.2ality.com/2013/09/javascript-unicode.html
+      def to_utf16(code_point)
+        ten_bits = 0b1111111111
+        u = -> (code_unit) { '\\u'+code_unit.to_s(16).upcase }
+
+        return u.(code_point) if code_point <= 0xFFFF
+
+        code_point -= 0x10000
+
+        # Shift right to get to most significant 10 bits
+        lead_surrogate = 0xD800 + (code_point >> 10)
+
+        # Mask to get least significant 10 bits
+        tail_surrogate = 0xDC00 + (code_point & ten_bits)
+
+        p(u.(lead_surrogate) + u.(tail_surrogate))
       end
     end
 
