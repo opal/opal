@@ -36,6 +36,20 @@ describe Hash do
     expect(h).to eq(expected_hash)
   end
 
+  it 'turns Object.create(null) JS objects into a hash' do
+    %x{
+      var obj = Object.create(null);
+      var foo = Object.create(null);
+      var bar = Object.create(null);
+      obj.foo = foo;
+      foo.bar = bar;
+      bar.baz = 'baz';
+    }
+    hash = Hash.new(`obj`)
+
+    expect(hash).to eq({ foo: { bar: { baz: 'baz' } } })
+  end
+
   describe '#to_n' do
     it 'converts a hash with native objects as values' do
       obj = { 'a_key' => `{ key: 1 }` }

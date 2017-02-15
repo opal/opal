@@ -529,7 +529,9 @@ class Hash
 
   def initialize(defaults = undefined, &block)
     %x{
-      if (defaults != null && defaults.constructor === Object) {
+      if (defaults != null &&
+           (defaults.constructor === undefined ||
+             defaults.constructor === Object)) {
         var smap = self.$$smap,
             keys = self.$$keys,
             key, value;
@@ -537,11 +539,15 @@ class Hash
         for (key in defaults) {
           value = defaults[key];
 
-          if (value && value.constructor === Object) {
+          if (value &&
+               (value.constructor === undefined ||
+                 value.constructor === Object)) {
             smap[key] = #{Hash.new(`value`)};
           } else if (value && value.$$is_array) {
             value = value.map(function(item) {
-              if (item && item.constructor === Object) {
+              if (item &&
+                   (item.constructor === undefined ||
+                     item.constructor === Object)) {
                 return #{Hash.new(`item`)};
               }
 
