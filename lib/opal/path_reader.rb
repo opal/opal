@@ -3,7 +3,7 @@ require 'opal/hike_path_finder'
 
 module Opal
   class PathReader
-    RELATIVE_PATH_REGEXP = %r{#{Opal::REGEXP_START}\.?\.#{File::SEPARATOR}}
+    RELATIVE_PATH_REGEXP = %r{#{Opal::REGEXP_START}\.?\.#{Regexp.quote File::SEPARATOR}}
 
     def initialize(file_finder = HikePathFinder.new)
       @file_finder = file_finder
