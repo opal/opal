@@ -326,7 +326,7 @@
       for (name in klass.$$scope) {
         var value = klass.$$scope[name];
 
-        if (value.$$name === nil && (value.$$is_class || value.$$is_module)) {
+        if (value && value.$$name === nil && (value.$$is_class || value.$$is_module)) {
           update(value, name)
         }
       }

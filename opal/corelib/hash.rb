@@ -507,7 +507,7 @@ class Hash
 
       } finally {
         if (top) {
-          delete Opal.hash_ids;
+          Opal.hash_ids = undefined;
         }
       }
     }

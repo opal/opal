@@ -1136,7 +1136,7 @@ class Array < `Array`
 
   def hash
     %x{
-      var top = (Opal.hash_ids == undefined),
+      var top = (Opal.hash_ids === undefined),
           result = ['A'],
           hash_id = self.$object_id(),
           item, i, key;
@@ -1169,7 +1169,7 @@ class Array < `Array`
         return result.join(',');
       } finally {
         if (top) {
-          delete Opal.hash_ids;
+          Opal.hash_ids = undefined;
         }
       }
     }
