@@ -1817,9 +1817,16 @@
     }
 
     new_body = function() {
-      body.$$p = new_body.$$p;
-      new_body.$$p = null;
-      return body.apply(this, arguments);
+      var block = new_body.$$p;
+      var args = new Array(arguments.length);
+
+      for(var index = 0; index < arguments.length; index++) {
+        args[index] = arguments[index];
+      }
+
+      if(block) { new_body.$$p = null }
+
+      return Opal.send(this, body, args, block);
     };
 
     new_body.length = body.length;

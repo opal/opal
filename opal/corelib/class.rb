@@ -34,15 +34,28 @@ class Class
   def inherited(cls)
   end
 
-  def new(*args, &block)
-    %x{
-      var obj = #{allocate};
+  %x{
+    Opal.defn(self, '$new', function Class$new() {
+      var self = this;
+      var object = #{allocate};
+      var block = Class$new.$$p;
+      var args = new Array(arguments.length);
+      for(var index = 0; index < arguments.length; index++) {
+        args[index] = arguments[index];
+      }
 
-      obj.$initialize.$$p = block;
-      obj.$initialize.apply(obj, args);
-      return obj;
-    }
-  end
+      if(block) { Class$new.$$p = null }
+
+      Opal.send(object, object.$initialize, args, block);
+
+      return object;
+    });
+  }
+  # def new(*args, &block)
+  #   object = allocate
+  #   `Opal.send(#{object}, #{object}.$initialize, args, block)`
+  #   object
+  # end
 
   def superclass
     `self.$$super || nil`
