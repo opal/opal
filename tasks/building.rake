@@ -34,7 +34,9 @@ task :dist do
       log << "* building #{lib}...".ljust(width+'* building ... '.size)
       $stdout.flush
 
-      src = Opal::Builder.build(lib).to_s
+      # Set requirable to true to be consistent with previous builds, generated
+      # with sprockets.
+      src = Opal::Builder.build(lib, requirable: true).to_s
       min = Opal::Util.uglify src
       gzp = Opal::Util.gzip min
 
