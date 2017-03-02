@@ -261,10 +261,6 @@ class Number < Numeric
     end
   end
 
-  def ===(other)
-    `self === other`
-  end
-
   def ==(other)
     %x{
       if (other.$$is_number) {
