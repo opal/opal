@@ -74,7 +74,7 @@ module Opal
         # Mask to get least significant 10 bits
         tail_surrogate = 0xDC00 + (code_point & ten_bits)
 
-        p(u.(lead_surrogate) + u.(tail_surrogate))
+        u.(lead_surrogate) + u.(tail_surrogate)
       end
     end
 
