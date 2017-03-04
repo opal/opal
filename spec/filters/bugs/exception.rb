@@ -37,6 +37,7 @@ opal_filter "Exception" do
   fails "Exception#set_backtrace raises a TypeError when the Array contains a Symbol"
   fails "Exception#set_backtrace raises a TypeError when the argument is a nested array"
   fails "Exception#set_backtrace raises a TypeError when the array contains nil"
+  fails "Exception#to_s calls #to_s on the message" # Mock 'message' expected to receive 'to_s' exactly 1 times but received it 2 times
   fails "IOError is a superclass of EOFError"
   fails "NameError#name returns a class variable name as a symbol"
   fails "SignalException.new raises an exception for an optional argument with a signal name"

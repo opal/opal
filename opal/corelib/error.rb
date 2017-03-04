@@ -1,16 +1,23 @@
 class Exception < `Error`
+  `var Kernel$raise = #{Kernel}.$raise`
   def self.new(*args)
     %x{
-      var message = (args.length > 0) ? args[0] : nil;
-      var err = new self.$$alloc(message);
+      var message   = (args.length > 0) ? args[0] : nil;
+      var error     = new self.$$alloc(message);
+      error.name    = self.$$name;
+      error.message = message;
+      Opal.send(error, error.$initialize, args);
 
+      // Error.captureStackTrace() will use .name and .toString to build the
+      // first line of the stack trace so it must be called after the error
+      // has been initialized.
+      // https://nodejs.org/dist/latest-v6.x/docs/api/errors.html
       if (Error.captureStackTrace) {
-        Error.captureStackTrace(err);
+        // Passing Kernel.raise will cut the stack trace from that point above
+        Error.captureStackTrace(error, Kernel$raise);
       }
 
-      err.name = self.$$name;
-      err.$initialize.apply(err, args);
-      return err;
+      return error;
     }
   end
 

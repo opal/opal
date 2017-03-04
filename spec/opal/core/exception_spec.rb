@@ -18,3 +18,13 @@ describe "Native exception" do
     exception.message.should == "native message"
   end
 end
+
+# TODO: Delete when this code is added to the ruby spec
+describe "Exception#to_s" do
+  it "calls #to_s on the message" do
+    message = mock("message")
+    message.should_receive(:to_s).and_return("message").any_number_of_times
+    ExceptionSpecs::Exceptional.new(message).to_s.should == "message"
+  end
+end
+
