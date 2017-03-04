@@ -125,6 +125,7 @@ opal_filter "Kernel" do
   fails "Kernel.Complex() when passed a Numeric which responds to #real? with false returns the passed argument"
   fails "Kernel.Complex() when passed a non-Numeric second argument raises TypeError"
   fails "Kernel.Complex() when passed a single non-Numeric coerces the passed argument using #to_c"
+  fails "Kernel.Complex() when passed an Objectc which responds to #to_c returns the passed argument" # Expected (#<Object:0x46fa6>+0i) to equal (0+1i)
   fails "Kernel.Float for hexadecimal literals with binary exponent allows embedded _ in a number on either side of the P"
   fails "Kernel.Float for hexadecimal literals with binary exponent allows embedded _ in a number on either side of the p"
   fails "Kernel.Float for hexadecimal literals with binary exponent allows hexadecimal points on the left side of the 'P'"

@@ -1,4 +1,5 @@
 opal_filter "String" do
+  fails "String#% supports inspect formats using %p" # Expected "{\"capture\"=>1}" to equal "{:capture=>1}"
   fails "String#bytes agrees with #unpack('C*')"
   fails "String#bytes returns #bytesize bytes"
   fails "String#bytes yields each byte to a block if one is given, returning self"
@@ -30,6 +31,8 @@ opal_filter "String" do
   fails "String#getbyte returns an Integer if given a valid index"
   fails "String#getbyte returns nil for out-of-bound indexes"
   fails "String#getbyte starts indexing at 0"
+  fails "String#prepend raises a RuntimeError when self is frozen" # NoMethodError: undefined method `prepend' for "hello":String
+  fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
   fails "String#split with Regexp includes all captures in the result array" # fails on phantomjs
   fails "String#sub with pattern, replacement returns a copy of self when no modification is made"
   fails "String#to_c returns a Complex object"

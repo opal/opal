@@ -73,6 +73,7 @@ opal_filter "language" do
   fails "Global variable $? is thread-local"
   fails "Global variable $FILENAME is read-only"
   fails "Global variable $\" is read-only"
+  fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for BasicObject
   fails "Instantiating a singleton class raises a TypeError when allocate is called"
   fails "Instantiating a singleton class raises a TypeError when new is called"
   fails "Invoking a method does not expand final array arguments after a splat expansion"
@@ -143,6 +144,8 @@ opal_filter "language" do
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from a method"
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from the toplevel"
   fails "The break statement in a lambda from a scope that has returned raises a LocalJumpError when yielding to a lambda passed as a block argument"
+  fails "The break statement in a lambda returns from the call site if the lambda is passed as a block" # Expected ["before", "unreachable1", "unreachable2", "after"] to equal ["before", "after"]
+  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns from the lambda" # Exception: unexpected break
   fails "The def keyword within a closure looks outside the closure for the visibility"
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the module"
   fails "The defined? keyword for a scoped constant returns nil when an undefined constant is scoped to a defined constant"
@@ -168,6 +171,8 @@ opal_filter "language" do
   fails "The predefined global constants includes TOPLEVEL_BINDING"
   fails "The redo statement in a method is invalid and raises a SyntaxError"
   fails "The redo statement triggers ensure block when re-executing a block"
+  fails "The rescue keyword only accepts Module or Class in rescue clauses" # RuntimeError: error
+  fails "The rescue keyword only accepts Module or Class in splatted rescue clauses" # RuntimeError: error
   fails "The retry keyword inside a begin block's rescue block causes the begin block to be executed again"
   fails "The retry statement raises a SyntaxError when used outside of a begin statement"
   fails "The retry statement re-executes the closest block"
@@ -181,27 +186,25 @@ opal_filter "language" do
   fails "The super keyword without explicit arguments passes optional arguments that have a default value"
   fails "The super keyword without explicit arguments passes optional arguments that have a non-default value but were modified"
   fails "The super keyword without explicit arguments passes rest arguments including any modifications"
+  fails "The super keyword without explicit arguments that are '_' including any modifications" # Expected [1, 2] to equal [14, 2]
+  fails "The unpacking splat operator (*) when applied to a BasicObject coerces it to Array if it respond_to?(:to_a)" # NoMethodError: undefined method `respond_to?' for BasicObject
   fails "The until expression restarts the current iteration without reevaluating condition with redo"
   fails "The until modifier restarts the current iteration without reevaluating condition with redo"
   fails "The until modifier with begin .. end block evaluates condition after block execution"
   fails "The until modifier with begin .. end block restart the current iteration without reevaluting condition with redo"
   fails "The until modifier with begin .. end block runs block at least once (even if the expression is true)"
   fails "The until modifier with begin .. end block skips to end of body with next"
-  fails_badly "The while expression stops running body if interrupted by break in a begin ... end attribute op-assign-or value"
   fails "The while expression stops running body if interrupted by break in a begin ... end element op-assign value"
   fails "The while expression stops running body if interrupted by break in a begin ... end element op-assign-or value"
-  fails_badly "The while expression stops running body if interrupted by break in a parenthesized attribute op-assign-or value"
   fails "The while expression stops running body if interrupted by break in a parenthesized element op-assign value"
   fails "The while modifier with begin .. end block evaluates condition after block execution"
   fails "The while modifier with begin .. end block restarts the current iteration without reevaluting condition with redo"
   fails "The while modifier with begin .. end block runs block at least once (even if the expression is false)"
   fails "The while modifier with begin .. end block skips to end of body with next"
+  fails "The yield call taking a single argument yielding to a lambda should not destructure an Array into multiple arguments" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
   fails "self in a metaclass body (class << obj) raises a TypeError for numbers"
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols"
-  fails "The yield call taking a single argument yielding to a lambda should not destructure an Array into multiple arguments" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
-  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns from the lambda" # Exception: unexpected break
-  fails "The super keyword without explicit arguments that are '_' including any modifications" # Expected [1, 2] to equal [14, 2]
-  fails "The unpacking splat operator (*) when applied to a BasicObject coerces it to Array if it respond_to?(:to_a)" # NoMethodError: undefined method `respond_to?' for BasicObject
-  fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for BasicObject
+  fails_badly "The while expression stops running body if interrupted by break in a begin ... end attribute op-assign-or value"
+  fails_badly "The while expression stops running body if interrupted by break in a parenthesized attribute op-assign-or value"
 end
