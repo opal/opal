@@ -261,6 +261,16 @@ class Number < Numeric
     end
   end
 
+  def ===(other)
+    %x{
+      if (other.$$is_number) {
+        return self.valueOf() === other.valueOf();
+      } else {
+        return #{self == other};
+      }
+    }
+  end
+
   def ==(other)
     %x{
       if (other.$$is_number) {
