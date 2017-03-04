@@ -264,10 +264,7 @@ class Number < Numeric
   def ===(other)
     %x{
       if (other.$$is_number) {
-        if (typeof other === 'number') {
-          return self.valueOf() === other;
-        }
-        return self.valueOf() === Number(other);
+        return self.valueOf() === other.valueOf();
       } else {
         return #{self == other};
       }
