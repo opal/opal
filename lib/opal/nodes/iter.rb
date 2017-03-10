@@ -88,7 +88,8 @@ module Opal
           scope.add_temp block_arg
           scope_name = scope.identify!
 
-          line "#{block_arg} = #{scope_name}.$$p || nil, #{scope_name}.$$p = null;"
+          line "#{block_arg} = #{scope_name}.$$p || nil;"
+          line "if (#{block_arg}) #{scope_name}.$$p = null;"
         end
       end
 
