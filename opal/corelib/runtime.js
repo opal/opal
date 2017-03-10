@@ -1816,6 +1816,10 @@
       }
     }
 
+    // If the body is itself an alias use the original body
+    // to keep the max depth at 1.
+    if (body.$$alias_of) body = body.$$alias_of;
+
     // We need a wrapper because otherwise method $$owner and other properties
     // would be ovrewritten on the original body.
     alias = function() {
