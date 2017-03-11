@@ -26,8 +26,9 @@ module Opal
             end
 
             push "#{redo_var} = false;" if uses_redo?
-            line body_code, "}"
+            line body_code
           end
+          line "}"
         end
 
         wrap '(function() {', '; return nil; })()' if wrap_in_closure?
