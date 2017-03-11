@@ -105,7 +105,7 @@ module Opal
           add_temp "$iter = #{scope_name}.$$p"
           add_temp "#{yielder} = $iter || nil"
 
-          line "#{scope_name}.$$p = null;"
+          line "if ($iter) #{scope_name}.$$p = null;"
         end
       end
 

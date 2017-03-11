@@ -1796,9 +1796,9 @@
     var id     = '$' + name,
         old_id = '$' + old,
         body   = obj.$$proto['$' + old],
-        new_body;
+        alias;
 
-    // instance_eval is being run on a class/module, so that need to alias class methods
+    // When running inside #instance_eval the alias refers to class methods.
     if (obj.$$eval) {
       return Opal.alias(Opal.get_singleton_class(obj), name, old);
     }
@@ -1816,20 +1816,33 @@
       }
     }
 
-    new_body = function() {
-      body.$$p = new_body.$$p;
-      new_body.$$p = null;
-      return body.apply(this, arguments);
+    // If the body is itself an alias use the original body
+    // to keep the max depth at 1.
+    if (body.$$alias_of) body = body.$$alias_of;
+
+    // We need a wrapper because otherwise method $$owner and other properties
+    // would be ovrewritten on the original body.
+    alias = function() {
+      var block = alias.$$p;
+      var args = new Array(arguments.length);
+
+      for(var index = 0; index < arguments.length; index++) {
+        args[index] = arguments[index];
+      }
+
+      if(block) { alias.$$p = null }
+
+      return Opal.send(this, body, args, block);
     };
 
-    new_body.length = body.length;
-    new_body.$$arity = body.$$arity;
-    new_body.$$parameters = body.$$parameters;
-    new_body.$$source_location = body.$$source_location;
-    new_body.$$alias_of = body;
-    new_body.$$alias_name = name;
+    alias.length = body.length;
+    alias.$$arity = body.$$arity;
+    alias.$$parameters = body.$$parameters;
+    alias.$$source_location = body.$$source_location;
+    alias.$$alias_of = body;
+    alias.$$alias_name = name;
 
-    Opal.defn(obj, id, new_body);
+    Opal.defn(obj, id, alias);
 
     return obj;
   };
