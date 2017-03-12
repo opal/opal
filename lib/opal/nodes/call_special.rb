@@ -180,65 +180,55 @@ module Opal
       children :lhs, :op, :rhs
 
       def compile
-        if lhs.type == :send
-          compile_temporary_assignments
+        case lhs.type
+        when :lvasgn then compile_get_and_set(:lvar)
+        when :ivasgn then compile_get_and_set(:ivar)
+        when :casgn  then compile_get_and_set(:const)
+        when :cvasgn then compile_get_and_set(:cvar)
+        when :gvasgn then compile_get_and_set(:gvar)
+        when :send   then compile_send
+        when :csend  then compile_csend
+        else raise NotImplementedError
+        end
+      end
+
+      def compile_send
+        send_lhs, send_op, *send_args = lhs.children
+        compile_generic_send(send_lhs, send_op, send_args)
+      end
+
+      def compile_csend
+        send_lhs, send_op, *send_args = lhs.children
+        conditional_send(recv(send_lhs)) do |send_lhs_temp|
+          send_lhs_temp = s(:js_tmp, send_lhs_temp)
+          compile_generic_send(send_lhs_temp, send_op, send_args)
+        end
+      end
+
+      def compile_generic_send(send_lhs, send_op, send_args)
+        send_evaluates_to = op
+
+        if send_op == :[] # foo[bar] ||= baz
+          # Here we should build a pseudo-node
+          # s(:op_asgn1, lhs, args, :||, rhs)
+          sexp = s(:op_asgn1, send_lhs, s(:array, *send_args), send_evaluates_to, rhs)
+        else # foo.bar ||= baz
+          # Otherwise we have a.b ||= 1
+          # which doesn't have send_args,
+          # so we should build a pseudo-node
+          # s(:op_asgn2, lhs, :b=, :+, rhs)
+          send_op = (send_op.to_s + '=').to_sym
+          sexp = s(:op_asgn2, send_lhs, send_op, send_evaluates_to, rhs)
         end
 
+        push expr(sexp)
+      end
+
+
+      def compile_get_and_set(lhs_updated_type)
+        get_sexp = lhs.updated(lhs_updated_type)
+        set_sexp = lhs.updated(nil, lhs.children + [s(:send, get_sexp, op, rhs)])
         push expr(set_sexp)
-      end
-
-      def compile_temporary_assignments
-        with_temp do |lhs_recv_tmp|
-          with_temp do |lhs_arg_tmp|
-            lhs_recv, lhs_op, lhs_arg = *lhs
-
-            lhs_recv_asgn = s(:lvasgn, lhs_recv_tmp, lhs_recv)
-            new_lhs_recv = s(:lvar, lhs_recv_tmp)
-            push stmt(lhs_recv_asgn), ','
-
-            if lhs_arg
-              lhs_arg_asgn = s(:lvasgn, lhs_arg_tmp, lhs_arg)
-              new_lhs_arg = s(:lvar, lhs_arg_tmp)
-              push stmt(lhs_arg_asgn), ','
-            end
-
-            new_lhs = lhs.updated(nil, [new_lhs_recv, lhs_op, new_lhs_arg].compact)
-            @sexp = @sexp.updated(nil, [new_lhs, op, rhs])
-          end
-        end
-      end
-
-      def get_sexp
-        case lhs.type
-        when :lvasgn then lhs.updated(:lvar)
-        when :ivasgn then lhs.updated(:ivar)
-        when :casgn  then lhs.updated(:const)
-        when :cvasgn then lhs.updated(:cvar)
-        when :gvasgn then lhs.updated(:gvar)
-        when :send   then lhs
-        else
-          raise NotImplementedError
-        end
-      end
-
-      def get_and_update_sexp
-        case lhs.type
-        when :lvasgn, :ivasgn, :casgn, :cvasgn, :gvasgn, :send
-          s(:send, get_sexp, op, rhs)
-        else
-          raise NotImplementedError
-        end
-      end
-
-      def set_sexp
-        case lhs.type
-        when :lvasgn, :ivasgn, :casgn, :cvasgn, :gvasgn
-          lhs.updated(nil, lhs.children + [get_and_update_sexp])
-        when :send
-          recvr, meth, *rest = *lhs.children
-          meth = (meth.to_s + "=").to_sym
-          lhs.updated(nil, [recvr, meth, *rest, get_and_update_sexp])
-        end
       end
     end
 
