@@ -66,21 +66,16 @@ module Opal
       children :lhs
 
       def compile
-        get_node = case lhs.type
-        when :lvasgn then lhs.updated(:lvar)
-        when :ivasgn then lhs.updated(:ivar)
-        when :casgn then lhs.updated(:const)
-        when :cvasgn then lhs.updated(:cvar)
-        when :gvasgn then lhs.updated(:gvar)
-        when :send
-          compile_send
-          return
-        else
-          raise "Unsupported node in LogicalOpAssignNode #{lhs.type}"
+        case lhs.type
+        when :lvasgn then compile_get_and_set(:lvar)
+        when :ivasgn then compile_get_and_set(:ivar)
+        when :casgn  then compile_get_and_set(:const)
+        when :cvasgn then compile_get_and_set(:cvar)
+        when :gvasgn then compile_get_and_set(:gvar)
+        when :send   then compile_send
+        when :csend  then compile_csend
+        else raise "Unsupported node in LogicalOpAssignNode #{lhs.type} (#{lhs.class}) #{lhs.inspect} #{compiler.file}"
         end
-        set_node = lhs.updated(nil, lhs.children + [rhs])
-        sexp = s(evaluates_to, get_node, set_node)
-        push expr(sexp)
       end
 
       # RHS can be begin..end
@@ -89,13 +84,36 @@ module Opal
         children.last
       end
 
+      def compile_get_and_set(lhs_updated_type)
+        get_node = lhs.updated(lhs_updated_type)
+        set_node = lhs.updated(nil, lhs.children + [rhs])
+        sexp = s(evaluates_to, get_node, set_node)
+        push expr(sexp)
+      end
+
+      # lhs.meth ||= rhs
+      # => lhs.meth = lhs.meth || rhs
       def compile_send
         send_lhs, send_op, *send_args = lhs.children
-        if send_op == :[]
+        compile_generic_send(send_lhs, send_op, send_args)
+      end
+
+      # lhs&.meth ||= rhs
+      # => lhs.nil? ? lhs : (lhs.meth ||= rhs)
+      def compile_csend
+        send_lhs, send_op, *send_args = lhs.children
+        conditional_send(recv(send_lhs)) do |send_lhs_temp|
+          send_lhs_temp = s(:js_tmp, send_lhs_temp)
+          compile_generic_send(send_lhs_temp, send_op, send_args)
+        end
+      end
+
+      def compile_generic_send(send_lhs, send_op, send_args)
+        if send_op == :[] # foo[bar] ||= baz
           # Here we should build a pseudo-node
           # s(:op_asgn1, lhs, args, :||, rhs)
           sexp = s(:op_asgn1, send_lhs, s(:array, *send_args), send_evaluates_to, rhs)
-        else
+        else # foo.bar ||= baz
           # Otherwise we have a.b ||= 1
           # which doesn't have send_args,
           # so we should build a pseudo-node

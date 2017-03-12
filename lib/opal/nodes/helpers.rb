@@ -86,6 +86,26 @@ module Opal
           [expr(sexp.dup), fragment(" !== false && "), expr(sexp.dup), fragment(" !== nil && "), expr(sexp.dup), fragment(" != null")]
         end
       end
+
+      # Usefule for safe-operator calls: foo&.bar / foo&.bar ||= baz / ...
+      #
+      # @param recvr [sexp_pushable] The receiver of the call that will be
+      #        stored in a temporary variable
+      # @yields receiver_temp [String] the name of the temporary variable
+      #         holding the ref to the original receiver, inside the block
+      #         an expr() should be pushed.
+      #
+      def conditional_send(recvr)
+        # temporary variable that stores method receiver
+        receiver_temp = scope.new_temp
+        push "#{receiver_temp} = ", recvr
+
+        # execute the sexp only if the receiver isn't nil
+        push ", (#{receiver_temp} === nil || #{receiver_temp} == null) ? nil : "
+        yield receiver_temp
+        wrap '(', ')'
+      end
+
     end
   end
 end
