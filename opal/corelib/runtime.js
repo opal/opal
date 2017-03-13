@@ -320,11 +320,18 @@
   //   Foo.const_set :BAR, 123
   //
   Opal.casgn = function(base_module, name, value) {
+    // Assign the name to a class and all of its subscopes, eg:
+    //
+    //   c = Class.new
+    //   c::Foo = Class.new
+    //   Bar = c # => c::Foo should now become Bar::Foo
+    //
     function update(klass, name) {
       klass.$$name = name;
+      var scope = klass.$$scope
 
-      for (name in klass.$$scope) {
-        var value = klass.$$scope[name];
+      for (name in scope) {
+        var value = scope[name];
 
         if (value && value.$$name === nil && (value.$$is_class || value.$$is_module)) {
           update(value, name)
