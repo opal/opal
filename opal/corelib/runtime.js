@@ -1823,26 +1823,26 @@
     // We need a wrapper because otherwise method $$owner and other properties
     // would be ovrewritten on the original body.
     alias = function() {
-      var block = alias.$$p;
-      var args = new Array(arguments.length);
+      var block = alias.$$p, args, i, ii;
 
-      for(var index = 0; index < arguments.length; index++) {
-        args[index] = arguments[index];
+      args = new Array(arguments.length);
+      for(i = 0, ii = arguments.length; i < ii; i++) {
+        args[i] = arguments[i];
       }
 
-      if(block) { alias.$$p = null }
+      if (block != null) { alias.$$p = null }
 
       return Opal.send(this, body, args, block);
     };
 
     // Try to make the browser pick the right name
-    alias.displayName = name;
-    alias.length = body.length;
-    alias.$$arity = body.$$arity;
-    alias.$$parameters = body.$$parameters;
+    alias.displayName       = name;
+    alias.length            = body.length;
+    alias.$$arity           = body.$$arity;
+    alias.$$parameters      = body.$$parameters;
     alias.$$source_location = body.$$source_location;
-    alias.$$alias_of = body;
-    alias.$$alias_name = name;
+    alias.$$alias_of        = body;
+    alias.$$alias_name      = name;
 
     Opal.defn(obj, id, alias);
 
