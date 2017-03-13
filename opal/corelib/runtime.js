@@ -1835,6 +1835,8 @@
       return Opal.send(this, body, args, block);
     };
 
+    // Try to make the browser pick the right name
+    alias.displayName = name;
     alias.length = body.length;
     alias.$$arity = body.$$arity;
     alias.$$parameters = body.$$parameters;
