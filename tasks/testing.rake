@@ -215,7 +215,7 @@ module MinitestSuite
   end
 end
 
-task :cruby_tests do
+task :test_cruby do
   if ENV.key? 'FILES'
     files = Dir[ENV['FILES']]
     includes = %w[test . tmp lib]
@@ -230,7 +230,7 @@ task :cruby_tests do
     ]
   end
 
-  js_filename = 'tmp/cruby_tests.js'
+  js_filename = 'tmp/test_cruby.js'
   build_js_command = MinitestSuite.build_js_command(
     %w[
       opal/platform
@@ -243,6 +243,12 @@ task :cruby_tests do
   env = {'NODE_PATH' => 'stdlib/nodejs/node_modules'}
   cmd = "node #{js_filename}"
   system(env, cmd) or fail("Program exited with an error")
+end
+
+# deprecated, can be removed after 0.11
+task :cruby_tests do
+  warn "The task 'cruby_tests' has been renamed to 'test_cruby'."
+  exit 1
 end
 
 task :test_nodejs do
@@ -386,6 +392,6 @@ task :browser_test do
 end
 
 task :mspec    => [:mspec_phantomjs, :mspec_nodejs]
-task :minitest => [:cruby_tests, :test_nodejs]
+task :minitest => [:test_cruby, :test_nodejs]
 task :test_all => [:rspec, :mspec, :minitest]
 
