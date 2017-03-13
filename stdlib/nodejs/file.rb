@@ -45,8 +45,7 @@ class File < IO
   `var __path__ = #{@__path__}`
 
   if `__path__.sep !== #{Separator}`
-    ALT_SEPARATOR = Separator
-    Separator = SEPARATOR = `__path__.sep`
+    ALT_SEPARATOR = `__path__.sep`
   end
 
   def self.read path
