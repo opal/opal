@@ -475,19 +475,17 @@ class Hash
 
       try {
         if (top) {
-          Opal.hash_ids = {};
+          Opal.hash_ids = Object.create(null);
         }
 
-        if (Opal.hash_ids.hasOwnProperty(hash_id)) {
+        if (Opal[hash_id]) {
           return 'self';
         }
 
         for (key in Opal.hash_ids) {
-          if (Opal.hash_ids.hasOwnProperty(key)) {
-            item = Opal.hash_ids[key];
-            if (#{eql?(`item`)}) {
-              return 'self';
-            }
+          item = Opal.hash_ids[key];
+          if (#{eql?(`item`)}) {
+            return 'self';
           }
         }
 
@@ -507,7 +505,7 @@ class Hash
 
       } finally {
         if (top) {
-          delete Opal.hash_ids;
+          Opal.hash_ids = undefined;
         }
       }
     }

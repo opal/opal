@@ -1136,26 +1136,25 @@ class Array < `Array`
 
   def hash
     %x{
-      var top = (Opal.hash_ids == undefined),
+      var top = (Opal.hash_ids === undefined),
           result = ['A'],
           hash_id = self.$object_id(),
           item, i, key;
 
       try {
         if (top) {
-          Opal.hash_ids = {};
+          Opal.hash_ids = Object.create(null);
         }
 
-        if (Opal.hash_ids.hasOwnProperty(hash_id)) {
+        // return early for recursive structures
+        if (Opal.hash_ids[hash_id]) {
           return 'self';
         }
 
         for (key in Opal.hash_ids) {
-          if (Opal.hash_ids.hasOwnProperty(key)) {
-            item = Opal.hash_ids[key];
-            if (#{eql?(`item`)}) {
-              return 'self';
-            }
+          item = Opal.hash_ids[key];
+          if (#{eql?(`item`)}) {
+            return 'self';
           }
         }
 
@@ -1169,7 +1168,7 @@ class Array < `Array`
         return result.join(',');
       } finally {
         if (top) {
-          delete Opal.hash_ids;
+          Opal.hash_ids = undefined;
         }
       }
     }
