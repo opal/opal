@@ -81,17 +81,16 @@ class File < IO
   end
 
   def self.directory? path
-    return nil unless exist? path
+    return false unless exist? path
     `return executeIOAction(function(){return !!__fs__.lstatSync(path).isDirectory()})`
   end
 
   def self.file? path
-    return nil unless exist? path
+    return false unless exist? path
     `return executeIOAction(function(){return !!__fs__.lstatSync(path).isFile()})`
   end
 
   def self.size path
-    return nil unless exist? path
     `return executeIOAction(function(){return __fs__.lstatSync(path).size})`
   end
 
