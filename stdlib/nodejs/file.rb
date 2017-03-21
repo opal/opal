@@ -90,6 +90,18 @@ class File < IO
     `return executeIOAction(function(){return !!__fs__.lstatSync(path).isFile()})`
   end
 
+  def self.readable? path
+    return false unless exist? path
+    %{
+      try {
+        __fs__.accessSync(path, __fs__.R_OK);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+  end
+
   def self.size path
     `return executeIOAction(function(){return __fs__.lstatSync(path).size})`
   end
