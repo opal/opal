@@ -67,6 +67,12 @@ class TestNodejsFile < Test::Unit::TestCase
     assert(current_dir.directory?)
   end
 
+  def test_file_readable
+    assert !File.readable?('tmp/nonexistent')
+    File.write('tmp/fuz', "hello")
+    assert File.readable?('tmp/fuz')
+  end
+
   def test_linux_separators
     assert_equal('/', File::SEPARATOR)
     assert_equal('/', File::Separator)
