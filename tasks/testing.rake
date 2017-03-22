@@ -259,6 +259,7 @@ task :test_nodejs do
       opal-parser.rb
       test_file.rb
       test_dir.rb
+      test_io.rb
       test_opal_builder.rb
     ],
     includes: %w[test/nodejs],
