@@ -1,3 +1,20 @@
+%x{
+  function executeIOAction(action) {
+    try {
+      return action();
+    } catch (error) {
+      if (error.code === 'EACCES' ||
+          error.code === 'EISDIR' ||
+          error.code === 'EMFILE' ||
+          error.code === 'ENOENT' ||
+          error.code === 'EPERM') {
+        throw Opal.IOError.$new(error.message)
+      }
+      throw error;
+    }
+  }
+}
+
 class IO
 
   @__fs__ = node_require :fs
@@ -15,7 +32,7 @@ class IO
     if @eof
       ''
     else
-      res = `__fs__.readFileSync(#{@path}).toString()`
+      res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString()})`
       @eof = true
       @lineno = res.size
       res
@@ -50,6 +67,10 @@ class IO
     else
       read.each_line
     end
+  end
+
+  def self.binread(path)
+    `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString('binary')})`
   end
 end
 
