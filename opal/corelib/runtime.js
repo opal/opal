@@ -238,7 +238,7 @@
 
   // Finds and returns a constant in the provided list of scopes.
   // When you open a class/module/singleton class, Opal collects
-  // scopes in the $scopes array. When you try to resolve
+  // scopes in the $nesting array. When you try to resolve
   // a constant Opal.const_get is used to get it.
   //
   // To simply find a constant directly in the single scope:
@@ -258,8 +258,8 @@
   // @param inherit [Boolean] flag to perform a search in the parents
   // @param raise [Boolean] flag to trigger "const_missing" if nothing was found
   // @return [Object]
-  Opal.const_get = function(scopes, const_name, inherit, raise) {
-    var result = constGetMultiple(scopes, const_name, inherit);
+  Opal.const_get = function(nesting, const_name, inherit, raise) {
+    var result = constGetMultiple(nesting, const_name, inherit);
 
     if (result != null) {
       return result;
@@ -274,7 +274,7 @@
     }
 
     if (raise) {
-      var last_scope_base = scopes[scopes.length - 1].base;
+      var last_scope_base = nesting[nesting.length - 1].base;
 
       if (last_scope_base.$$is_a_module) {
         return last_scope_base.$const_missing(const_name);

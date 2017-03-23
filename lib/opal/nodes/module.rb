@@ -11,14 +11,14 @@ module Opal
         name, base = name_and_base
         helper :module
 
-        push "(function($base, $visibility_scopes) {"
+        push "(function($base, $parent_nesting) {"
         line "  var $#{name}, self = $#{name} = $module($base, '#{name}');"
 
         in_scope do
           scope.name = name
           add_temp "#{scope.proto} = self.$$proto"
           add_temp '$scope = self.$$scope'
-          add_temp '$scopes = $visibility_scopes.slice().concat($scope)'
+          add_temp '$nesting = $parent_nesting.slice().concat($scope)'
 
           body_code = stmt(body || s(:nil))
           empty_line
@@ -27,7 +27,7 @@ module Opal
           line body_code
         end
 
-        line "})(", base, ", $scopes)"
+        line "})(", base, ", $nesting)"
       end
 
       # cid is always s(:const, scope_sexp_or_nil, :ConstName)

@@ -15,7 +15,7 @@ module Opal
         elsif compiler.eval?
           push "Opal.const_get([$scope], '#{name}', true, true)"
         else
-          push "Opal.const_get($scopes, '#{name}', true, true)"
+          push "Opal.const_get($nesting, '#{name}', true, true)"
         end
       end
 

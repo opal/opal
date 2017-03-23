@@ -23,7 +23,7 @@ module Opal
           else
             add_temp 'self = Opal.top'
             add_temp '$scope = Opal'
-            add_temp '$scopes = [Opal]'
+            add_temp '$nesting = [Opal]'
           end
           add_temp 'nil = Opal.nil'
 

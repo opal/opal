@@ -11,7 +11,7 @@ module Opal
         name, base = name_and_base
         helper :klass
 
-        push "(function($base, $super, $visibility_scopes) {"
+        push "(function($base, $super, $parent_nesting) {"
         line "  function $#{name}(){};"
         line "  var self = $#{name} = $klass($base, $super, '#{name}', $#{name});"
 
@@ -19,7 +19,7 @@ module Opal
           scope.name = name
           add_temp "#{scope.proto} = self.$$proto"
           add_temp "$scope = self.$$scope"
-          add_temp "$scopes = $visibility_scopes.slice().concat($scope)"
+          add_temp "$nesting = $parent_nesting.slice().concat($scope)"
 
           body_code = self.body_code
           empty_line
@@ -28,7 +28,7 @@ module Opal
           line body_code
         end
 
-        line "})(", base, ", ", self.super_code, ", $scopes)"
+        line "})(", base, ", ", self.super_code, ", $nesting)"
       end
 
       def super_code

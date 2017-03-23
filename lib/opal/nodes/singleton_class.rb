@@ -8,19 +8,19 @@ module Opal
       children :object, :body
 
       def compile
-        push "(function(self, $visibility_scopes) {"
+        push "(function(self, $parent_nesting) {"
 
         in_scope do
           add_temp 'def = self.$$proto'
           add_temp '$scope = self.$$scope'
-          add_temp '$scopes = $visibility_scopes.slice().concat(self)'
+          add_temp '$nesting = $parent_nesting.slice().concat(self)'
 
           body_stmt = stmt(compiler.returns(body))
           line scope.to_vars
           line body_stmt
         end
 
-        line "})(Opal.get_singleton_class(", recv(object), "), $scopes)"
+        line "})(Opal.get_singleton_class(", recv(object), "), $nesting)"
       end
     end
   end

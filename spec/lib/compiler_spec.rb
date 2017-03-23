@@ -191,11 +191,11 @@ describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if Test > 4").to include("if ((($a = $rb_gt(Opal.const_get($scopes, 'Test', true, true), 4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true))) ")
+          expect_compiled("foo = 42 if Test > 4").to include("if ((($a = $rb_gt(Opal.const_get($nesting, 'Test', true, true), 4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true))) ")
         end
 
         it 'specifically == excludes nil check for constants' do
-          expect_compiled("foo = 42 if Test == 4").to include("if (Opal.const_get($scopes, 'Test', true, true)['$=='](4))")
+          expect_compiled("foo = 42 if Test == 4").to include("if (Opal.const_get($nesting, 'Test', true, true)['$=='](4))")
         end
       end
 
@@ -219,7 +219,7 @@ describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if Test").to include("if ((($a = Opal.const_get($scopes, 'Test', true, true)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if Test").to include("if ((($a = Opal.const_get($nesting, 'Test', true, true)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
         end
       end
     end
@@ -247,8 +247,8 @@ describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test > 4)").to include("if ((($a = $rb_gt(Opal.const_get($scopes, 'Test', true, true), 4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
-          expect_compiled("foo = 42 if (Test == 4)").to include("if ((($a = Opal.const_get($scopes, 'Test', true, true)['$=='](4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if (Test > 4)").to include("if ((($a = $rb_gt(Opal.const_get($nesting, 'Test', true, true), 4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if (Test == 4)").to include("if ((($a = Opal.const_get($nesting, 'Test', true, true)['$=='](4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
         end
       end
 
@@ -272,7 +272,7 @@ describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test)").to include("if ((($a = Opal.const_get($scopes, 'Test', true, true)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if (Test)").to include("if ((($a = Opal.const_get($nesting, 'Test', true, true)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
         end
       end
     end
