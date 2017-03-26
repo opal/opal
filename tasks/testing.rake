@@ -131,7 +131,10 @@ Use PATTERN environment variable to manually set the glob for specs:
   bundle exec rake mspec_node PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
 
-%w[ruby opal].each do |suite|
+platforms = %w[nodejs phantomjs server]
+suites = %w[ruby opal]
+
+suites.each do |suite|
 =begin
   desc "Run the MSpec/#{suite} test suite on Opal::Sprockets/phantomjs" + pattern_usage
   task :"mspec_#{suite}_sprockets_phantomjs" do
@@ -166,8 +169,9 @@ DESC
     end
   end
 =end
+  # task :mspec_sprockets_phantomjs => [:mspec_opal_sprockets_phantomjs, :mspec_ruby_sprockets_phantomjs]
 
-  %w[nodejs phantomjs].each do |platform|
+  platforms.each do |platform|
     desc "Run the MSpec test suite on Opal::Builder/#{platform}" + pattern_usage
     task :"mspec_#{suite}_#{platform}" do
       include_paths = '-Ispec -Ilib'
@@ -190,9 +194,12 @@ DESC
   end
 end
 
-task :mspec_phantomjs           => [:mspec_opal_phantomjs,           :mspec_ruby_phantomjs]
-task :mspec_nodejs              => [:mspec_opal_nodejs,              :mspec_ruby_nodejs]
-task :mspec_sprockets_phantomjs => [:mspec_opal_sprockets_phantomjs, :mspec_ruby_sprockets_phantomjs]
+platforms.each do |platform|
+  task :"mspec_#{platform}" => suites.map{|suite| :"mspec_#{suite}_#{platform}"}
+end
+
+
+
 
 module MinitestSuite
   extend self
