@@ -1883,11 +1883,11 @@
     to_hash.$$none = from_hash.$$none;
     to_hash.$$proc = from_hash.$$proc;
 
-    for (var i = 0, keys = from_hash.$$keys, length = keys.length, key, value; i < length; i++) {
-      key = from_hash.$$keys[i];
+    for (var i = 0, keys = from_hash.$$keys, smap = from_hash.$$smap, len = keys.length, key, value; i < len; i++) {
+      key = keys[i];
 
       if (key.$$is_string) {
-        value = from_hash.$$smap[key];
+        value = smap[key];
       } else {
         value = key.value;
         key = key.key;
