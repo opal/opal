@@ -187,13 +187,8 @@ class Module
 
   def autoload(const, path)
     %x{
-      var autoloaders;
-
-      if (!(autoloaders = self.$$autoload)) {
-        autoloaders = self.$$autoload = {};
-      }
-
-      autoloaders[#{const}] = #{path};
+      if (self.$$autoload == null) self.$$autoload = {};
+      self.$$autoload[#{const}] = #{path};
       return nil;
     }
   end
