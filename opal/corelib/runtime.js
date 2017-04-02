@@ -116,9 +116,6 @@
     return obj.$$id || (obj.$$id = Opal.uid());
   };
 
-  // Table holds all class variables
-  Opal.cvars = {};
-
   // Globals table
   Opal.gvars = {};
 
