@@ -108,16 +108,21 @@ class OSpecFormatter
 
   def default_formatter
     formatters = {
-      'browser'    => BrowserFormatter,
-      'node'       => NodeJSFormatter,
-      'nodedoc'    => NodeJSDocFormatter,
-      'phantom'    => PhantomFormatter,
-      'phantomdoc' => PhantomDocFormatter,
-      'dotted'     => DottedFormatter,
+      'browser'      => BrowserFormatter,
+      'server'       => BrowserFormatter,
+      'node'         => NodeJSFormatter,
+      'nodejs'       => NodeJSFormatter,
+      'nodedoc'      => NodeJSDocFormatter,
+      'nodejsdoc'    => NodeJSDocFormatter,
+      'phantom'      => PhantomFormatter,
+      'phantomjs'    => PhantomFormatter,
+      'phantomdoc'   => PhantomDocFormatter,
+      'phantomjsdoc' => PhantomDocFormatter,
+      'dotted'       => DottedFormatter,
     }
 
     formatter = formatters.fetch(ENV['FORMATTER']) do
-      warn "Using the default 'dotted' formatter, set the FORMATTER env var to select a different formatter (options: #{formatters.keys.join(", ")})"
+      warn "Using the default 'dotted' formatter, set the FORMATTER env var to select a different formatter (was: #{ENV['FORMATTER'].inspect}, options: #{formatters.keys.join(", ")})"
       DottedFormatter
     end
 
