@@ -1,4 +1,4 @@
-class BrowserFormatter
+class BaseOpalFormatter
   def initialize(out=nil)
     @exception = @failure = false
     @exceptions = []
@@ -103,7 +103,28 @@ class BrowserFormatter
   end
 end
 
-class PhantomFormatter < BrowserFormatter
+class BrowserFormatter < BaseOpalFormatter
+  def initialize(*args, &block)
+    $passed = 0
+    $failed = 0
+    $errored = 0
+    super
+  end
+
+  def print_example(state)
+    unless exception?
+      $passed += 1
+    else
+      if failure?
+        $failed += 1
+      else
+        $errored += 1
+      end
+    end
+  end
+end
+
+class PhantomFormatter < BaseOpalFormatter
   def red(str)
     `console.log('\u001b[31m' + str + '\u001b[0m')`
   end
@@ -130,7 +151,7 @@ class PhantomFormatter < BrowserFormatter
   end
 end
 
-class NodeJSFormatter < BrowserFormatter
+class NodeJSFormatter < BaseOpalFormatter
   def initialize(*args, &block)
     require 'nodejs/stacktrace'
     super
