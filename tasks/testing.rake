@@ -72,7 +72,9 @@ module MSpecSuite
     suite == 'opal' ? opalspec_filters : rubyspec_filters
   end
 
-  def write_file(filename, filters, specs, bm_filepath = nil)
+  def write_file(filename, filters, specs, env)
+    bm_filepath = env['BM_FILEPATH']
+
     [filters, specs].each do |files|
       files.map! { |s| "'#{s.sub(/^spec\//,'')}'" }
     end
@@ -82,14 +84,18 @@ module MSpecSuite
     spec_registration = specs.join(",\n  ")
 
     if bm_filepath
-      enter_benchmarking_mode = "OpalBM.main.register(#{Integer(ENV['BM'])}, '#{bm_filepath}')"
+      enter_benchmarking_mode = "OpalBM.main.register(#{Integer(env['BM'])}, '#{bm_filepath}')"
     end
 
-    random_seed = ENV['RANDOM_SEED'] ? ENV['RANDOM_SEED'] : rand(100_000)
+    random_seed = env['RANDOM_SEED'] ? env['RANDOM_SEED'] : rand(100_000)
 
     puts "Randomizing with RANDOM_SEED=#{random_seed}"
 
+    env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
+
     File.write filename, <<-RUBY
+#{env_data}
+
 require 'spec_helper'
 require 'opal/full'
 #{enter_benchmarking_mode}
@@ -144,7 +150,9 @@ suites.each do |suite|
     url      = "http://localhost:#{port}/"
 
     mkdir_p File.dirname(filename)
-    MSpecSuite.write_file filename, MSpecSuite.filters(suite), MSpecSuite.specs(ENV.to_hash.merge 'SUITE' => suite)
+    specs_env = ENV.to_hash.merge('SUITE' => suite)
+
+    MSpecSuite.write_file filename, MSpecSuite.filters(suite), MSpecSuite.specs(specs_env), specs_env
 
     MSpecSuite.stubs.each {|s| ::Opal::Config.stubbed_files << s }
 
@@ -179,7 +187,13 @@ suites.each do |suite|
       filename = "tmp/mspec_#{platform}.rb"
       mkdir_p File.dirname(filename)
       bm_filepath = MSpecSuite.bm_filepath if ENV['BM']
-      MSpecSuite.write_file filename, MSpecSuite.filters(suite), MSpecSuite.specs(ENV.to_hash.merge 'SUITE' => suite), bm_filepath
+      specs_env = {
+        'SUITE' => suite,
+        'FORMATTER' => platform, # Use the current platform as the default formatter
+        'BM_FILEPATH' => bm_filepath,
+      }.merge(ENV.to_hash)
+
+      MSpecSuite.write_file filename, MSpecSuite.filters(suite), MSpecSuite.specs(specs_env), specs_env
 
       stubs = MSpecSuite.stubs.map{|s| "-s#{s}"}.join(' ')
 
