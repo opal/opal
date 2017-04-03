@@ -196,20 +196,13 @@ module InvertedFormatter
     MSpec.register :finish, self
   end
 
-  def before(example)
-    puts "==> Running #{example.description.inspect}"
-  end
-
   def after(state=nil)
-    unless exception?
-      @actually_passing << @current_state
-    end
-
+    @actually_passing << @current_state unless exception?
     super
   end
 
   def finish
-    puts "\n\nExpected to fail:\n"
+    puts "\n\nExpected #{@actually_passing.size} examples to fail:\n"
     @actually_passing.each_with_index do |example, idx|
       puts "  #{idx + 1}) #{example.description.inspect}"
     end
