@@ -1,19 +1,11 @@
-phantomjs = `typeof(callPhantom) !== "undefined"`
-browser   = `typeof(document) !== "undefined"`
-node      = `typeof(process) !== "undefined" && process.versions && process.versions.node`
-nashorn   = `typeof(Java) !== "undefined" && Java.type`
+require 'opal-platform'
 
-case
-when nashorn
-  OPAL_PLATFORM = 'nashorn'
+case OPAL_PLATFORM
+when 'nashorn'
   require 'nashorn'
-when phantomjs
-  OPAL_PLATFORM = 'phantomjs'
+when 'phantomjs'
   require 'phantomjs'
-when node
-  OPAL_PLATFORM = 'nodejs'
+when 'nodejs'
   require 'nodejs/kernel'
   require 'nodejs/io'
-else # browser, which is the primary target
-  # noop
 end
