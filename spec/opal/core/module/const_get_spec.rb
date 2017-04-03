@@ -4,7 +4,7 @@ CS_CONST1 = :const1
 
 module ConstGetSpecs
   FOO = 100
-  
+
   module Bar
     BAR = 200
 
