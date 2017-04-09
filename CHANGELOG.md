@@ -72,6 +72,7 @@ Whitespace conventions:
     * `Enumerable#slice_before` (to raise proper argument errors)
     * `Number#positive?` (to return false for 0)
 - Use meaningful names for temporary variables in compiled JavaScript (e.g. for `def foo` was `TMP_123`, now `TMP_foo_123`)
+- Dynamic require severity now defaults to `:ignore` meaning that by default a `LoadError` will be raised at runtime instead of compile time.
 
 
 ### Deprecated
@@ -115,6 +116,7 @@ Whitespace conventions:
 - Fixed `JSON#parse` to raise `JSON::ParserError` for invalid input
 - `Module#append_features` now detects cyclic includes
 - `Process.clock_gettime(Process::CLOCK_MONOTONIC)` will now return true monotonic values or raise `Errno::EINVAL` if no monotonic clock is available
+- Opal::Builder no longer always raises an error when a dependency isn't found and instead respects `dynamic_require_severity` value
 
 
 

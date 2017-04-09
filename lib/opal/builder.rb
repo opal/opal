@@ -115,8 +115,17 @@ module Opal
     end
 
     def read(path)
-      path_reader.read(path) or
-        raise MissingRequire, "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+      path_reader.read(path) or begin
+        message = "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+
+        case compiler_options[:dynamic_require_severity]
+        when :raise   then raise MissingRequire, message
+        when :warning then warn message
+        else # noop
+        end
+
+        return "raise LoadError, #{message.inspect}"
+      end
     end
 
     def process_require(filename, options)
