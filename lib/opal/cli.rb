@@ -1,5 +1,4 @@
 require 'opal'
-require 'rack'
 require 'opal/builder'
 require 'opal/cli_runners'
 
