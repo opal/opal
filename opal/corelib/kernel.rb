@@ -94,7 +94,7 @@ module Kernel
 
   # Opal does not support #caller, but we stub it as an empty array to not
   # break dependant libs
-  def caller
+  def caller(*args)
     []
   end
 

@@ -3,7 +3,7 @@
 module Kernel
   NODE_REQUIRE = `require`
 
-  def caller
+  def caller(*args)
     %x{
       var stack;
       try {
