@@ -140,16 +140,15 @@
 
   // Walk up the nesting array looking for the constant
   function const_lookup_nesting(nesting, name) {
-    var i, ii, result;
+    var i, ii, result, constant;
 
     if (nesting.length === 0) return;
 
     // If the nesting is not empty the constant is looked up in its elements
     // and in order. The ancestors of those elements are ignored.
     for (i = 0, ii = nesting.length; i < ii; i++) {
-      if (nesting[i].$$const && $hasOwn.call(nesting[i].$$const, name)) {
-        return nesting[i].$$const[name];
-      }
+      constant = nesting[i].$$const[name];
+      if (constant != null) return constant;
     }
   }
 
@@ -202,7 +201,7 @@
   // Look for the constant relative to a cref or call `#const_missing` (when the
   // constant is prefixed by `::`).
   Opal.const_get_qualified = function(cref, name, skip_missing) {
-    var result;
+    var result, cache, cached, current_version = Opal.const_cache_version;
 
     if (cref == null) return;
 
@@ -213,22 +212,55 @@
       throw new Opal.TypeError("cref is not a class/module");
     }
 
-    result = const_get_name(cref, name);              if (result != null) return result;
-    result = const_lookup_ancestors(cref, name);      if (result != null) return result;
-    result = const_lookup_Object(cref, name);         if (result != null) return result;
-    result = const_missing(cref, name, skip_missing); if (result != null) return result;
+    if (cref != null) {
+      cache = (cref.$$const_cache = cref.$$const_cache || Object.create(null));
+      cached = cache[name]
+    } else {
+      cache = Opal.const_cache
+    }
+
+    if (cached != null && cached[0] === current_version) {
+      return cached[1];
+    } else {
+      ((result = const_get_name(cref, name))              != null) ||
+      ((result = const_lookup_ancestors(cref, name))      != null) ||
+      ((result = const_lookup_Object(cref, name))         != null) ||
+      ((result = const_missing(cref, name, skip_missing)) != null);
+
+      cache[name] = [current_version, result];
+      return result;
+    }
   };
+
+  // Initialize the top level constant cache
+  Opal.const_cache_version = 1;
+  Opal.const_cache = Object.create(null);
 
   // Look for the constant in the open using the current nesting and the nearest
   // cref ancestors or call `#const_missing` (when the constant has no :: prefix).
   Opal.const_get_relative = function(nesting, name, skip_missing) {
-    var cref = nesting[0], result;
+    var cref = nesting[0], result, current_version = Opal.const_cache_version, cache, cached;
 
-    result = const_get_name(cref, name);              if (result != null) return result;
-    result = const_lookup_nesting(nesting, name);     if (result != null) return result;
-    result = const_lookup_ancestors(cref, name);      if (result != null) return result;
-    result = const_lookup_Object(cref, name);         if (result != null) return result;
-    result = const_missing(cref, name, skip_missing); if (result != null) return result;
+    if (cref != null) {
+      cache = (nesting.$$const_cache = nesting.$$const_cache || Object.create(null));
+      cached = cache[name]
+    } else {
+      cache = Opal.const_cache
+    }
+
+
+    if (cached != null && cached[0] === current_version) {
+      return cached[1];
+    } else {
+      ((result = const_get_name(cref, name))              != null) ||
+      ((result = const_lookup_nesting(nesting, name))     != null) ||
+      ((result = const_lookup_ancestors(cref, name))      != null) ||
+      ((result = const_lookup_Object(cref, name))         != null) ||
+      ((result = const_missing(cref, name, skip_missing)) != null);
+
+      cache[name] = [current_version, result];
+      return result;
+    }
   };
 
   // Register the constant on a cref and opportunistically set the name of
@@ -243,6 +275,8 @@
 
     cref.$$const = (cref.$$const || Object.create(null));
     cref.$$const[name] = value;
+
+    Opal.const_cache_version++;
 
     // Expose top level constants onto the Opal object
     if (cref === _Object) Opal[name] = value;
@@ -860,6 +894,7 @@
       throw Opal.ArgumentError.$new('cyclic include detected')
     }
 
+    Opal.const_cache_version++;
     includer.$$inc.push(module);
     module.$$included_in.push(includer);
     Opal.bridge_methods(includer, module);

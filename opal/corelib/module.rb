@@ -187,6 +187,7 @@ class Module
   def autoload(const, path)
     %x{
       if (self.$$autoload == null) self.$$autoload = {};
+      Opal.const_cache_version++;
       self.$$autoload[#{const}] = #{path};
       return nil;
     }
@@ -641,6 +642,8 @@ class Module
 
   def remove_const(name)
     %x{
+      Opal.const_cache_version++;
+
       if (self.$$const[name] != null) {
         var old = self.$$const[name];
         delete self.$$const[name];
