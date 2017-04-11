@@ -187,6 +187,7 @@ class Module
   def autoload(const, path)
     %x{
       if (self.$$autoload == null) self.$$autoload = {};
+      Opal.const_cache_version++;
       self.$$autoload[#{const}] = #{path};
       return nil;
     }
