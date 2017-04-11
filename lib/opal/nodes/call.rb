@@ -279,6 +279,33 @@ module Opal
         push fragment "Opal.hash({ arity_check: #{compiler.arity_check?} })"
       end
 
+      add_special :nesting do |compile_default|
+        recv, method, *args = children
+        push_nesting = push_nesting?(children)
+        push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
+        compile_default.call
+        push ')' if push_nesting
+      end
+
+      add_special :constants do |compile_default|
+        recv, method, *args = children
+        push_nesting = push_nesting?(children)
+        push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
+        compile_default.call
+        push ')' if push_nesting
+      end
+
+      def push_nesting?(recv)
+        recv = children.first
+
+        children.size == 2 && (           # only receiver and method
+          recv.nil? || (                  # and no receiver
+            recv.type == :const &&        # or receiver
+            recv.children.last == :Module # is Module
+          )
+        )
+      end
+
       class DependencyResolver
         def initialize(compiler, sexp)
           @compiler = compiler

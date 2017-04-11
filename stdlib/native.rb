@@ -84,7 +84,7 @@ module Native
   def self.proc(&block)
     raise LocalJumpError, "no block given" unless block
 
-    Kernel.proc {|*args|
+    ::Kernel.proc {|*args|
       args.map! { |arg| Native(arg) }
       instance = Native(`this`)
 
@@ -192,8 +192,8 @@ module Native
   end
 
   def initialize(native)
-    unless Kernel.native?(native)
-      Kernel.raise ArgumentError, "#{native.inspect} isn't native"
+    unless ::Kernel.native?(native)
+      ::Kernel.raise ArgumentError, "#{native.inspect} isn't native"
     end
 
     @native = native
@@ -248,7 +248,7 @@ class Native::Object < BasicObject
   include ::Native
 
   def ==(other)
-    `#@native === #{Native.try_convert(other)}`
+    `#@native === #{::Native.try_convert(other)}`
   end
 
   def has_key?(name)
@@ -287,7 +287,7 @@ class Native::Object < BasicObject
   end
 
   def []=(key, value)
-    native = Native.try_convert(value)
+    native = ::Native.try_convert(value)
 
     if `#{native} === nil`
       `#@native[key] = #{value}`
@@ -298,7 +298,7 @@ class Native::Object < BasicObject
 
   def merge!(other)
     %x{
-      other = #{Native.convert(other)};
+      other = #{::Native.convert(other)};
 
       for (var prop in other) {
         #@native[prop] = other[prop];
@@ -309,7 +309,7 @@ class Native::Object < BasicObject
   end
 
   def respond_to?(name, include_all = false)
-    Kernel.instance_method(:respond_to?).bind(self).call(name, include_all)
+    ::Kernel.instance_method(:respond_to?).bind(self).call(name, include_all)
   end
 
   def respond_to_missing?(name, include_all = false)
@@ -346,7 +346,7 @@ class Native::Object < BasicObject
   end
 
   def to_a(options = {}, &block)
-    Native::Array.new(@native, options, &block).to_a
+    ::Native::Array.new(@native, options, &block).to_a
   end
 
   def inspect

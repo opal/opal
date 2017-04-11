@@ -356,7 +356,7 @@ module Marshal
     #  on the passed object
     #
     def apply_extends(object)
-      @extended.each do |e|
+      @extended.reverse_each do |e|
         mod = safe_const_get(e)
         object.extend(mod)
       end

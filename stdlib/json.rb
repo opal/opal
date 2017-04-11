@@ -54,8 +54,7 @@ module JSON
             }
 
             if (!options.parse && (klass = #{`hash`[JSON.create_id]}) != nil) {
-              klass = Opal.get(klass);
-              return #{`klass`.json_create(`hash`)};
+              return #{::Object.const_get(`klass`).json_create(`hash`)};
             }
             else {
               return hash;

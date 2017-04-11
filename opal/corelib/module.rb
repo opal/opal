@@ -4,7 +4,6 @@ class Module
       var module;
 
       module = Opal.module_allocate(self);
-      Opal.create_scope(Opal.Module.$$scope, module, null);
       return module;
     }
   end
@@ -234,8 +233,31 @@ class Module
     }
   end
 
-  def constants
-    `self.$$scope.constants.slice(0)`
+  def constants(inherit=true)
+    `Opal.constants(self, inherit)`
+  end
+
+  def self.constants(inherit=undefined)
+    %x{
+      if (inherit == null) {
+        var nesting = (self.$$nesting || []).concat(Opal.Object),
+            constant, constants = {},
+            i, ii;
+
+        for(i = 0, ii = nesting.length; i < ii; i++) {
+          for (constant in nesting[i].$$const) {
+            constants[constant] = true;
+          }
+        }
+        return Object.keys(constants);
+      } else {
+        return Opal.constants(self, inherit)
+      }
+    }
+  end
+
+  def self.nesting
+    `self.$$nesting || []`
   end
 
   # check for constant within current scope
@@ -246,20 +268,21 @@ class Module
     raise NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
 
     %x{
-      var scopes = [self.$$scope];
+      var module, modules = [self], module_constants, i, ii;
 
-      if (inherit || self === Opal.Object) {
-        var parent = self.$$super;
+      // Add up ancestors if inherit is true
+      if (inherit) {
+        modules = modules.concat(Opal.ancestors(self));
 
-        while (parent !== Opal.BasicObject) {
-          scopes.push(parent.$$scope);
-
-          parent = parent.$$super;
+        // Add Object's ancestors if it's a module – modules have no ancestors otherwise
+        if (self.$$is_module) {
+          modules = modules.concat([Opal.Object]).concat(Opal.ancestors(Opal.Object));
         }
       }
 
-      for (var i = 0, length = scopes.length; i < length; i++) {
-        if (scopes[i].hasOwnProperty(name)) {
+      for (i = 0, ii = modules.length; i < ii; i++) {
+        module = modules[i];
+        if (module.$$const[name] != null) {
           return true;
         }
       }
@@ -284,7 +307,11 @@ class Module
     raise NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
 
     %x{
-      return Opal.const_get([self.$$scope], name, inherit, true);
+      if (inherit) {
+        return Opal.const_get_qualified(self, name);
+      } else {
+        return Opal.const_get_local(self, name);
+      }
     }
   end
 
@@ -313,7 +340,7 @@ class Module
       raise NameError.new("wrong constant name #{name}", name)
     end
 
-    `Opal.casgn(self, name, value)`
+    `Opal.const_set(self, name, value)`
 
     value
   end
@@ -592,9 +619,8 @@ class Module
       var result = [], base = self;
 
       while (base) {
-        if (base.$$name === nil) {
-          return result.length === 0 ? nil : result.join('::');
-        }
+        // Give up if any of the ancestors is unnamed
+        if (base.$$name === nil) return nil;
 
         result.unshift(base.$$name);
 
@@ -615,9 +641,18 @@ class Module
 
   def remove_const(name)
     %x{
-      var old = self.$$scope[name];
-      delete self.$$scope[name];
-      return old;
+      if (self.$$const[name] != null) {
+        var old = self.$$const[name];
+        delete self.$$const[name];
+        return old;
+      }
+
+      if (self.$$autoload != null && self.$$autoload[name] != null) {
+        delete self.$$autoload[name];
+        return nil;
+      }
+
+      #{raise NameError, "constant #{self}::#{name} not defined"}
     }
   end
 
@@ -667,12 +702,10 @@ class Module
 
   def copy_constants(other)
     %x{
-      var other_constants = other.$$scope.constants,
-          length = other_constants.length;
+      var name, other_constants = other.$$const;
 
-      for (var i = 0; i < length; i++) {
-        var name = other_constants[i];
-        Opal.casgn(self, name, other.$$scope[name]);
+      for (name in other_constants) {
+        Opal.const_set(self, name, other_constants[name]);
       }
     }
   end

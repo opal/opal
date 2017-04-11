@@ -19,11 +19,11 @@ module Opal
           body_code = [body_code] unless body_code.is_a?(Array)
 
           if compiler.eval?
-            add_temp '$scope = (self.$$scope || self.$$class.$$scope)'
+            add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]'
           else
             add_temp 'self = Opal.top'
             add_temp '$scope = Opal'
-            add_temp '$nesting = [Opal]'
+            add_temp '$nesting = []'
           end
           add_temp 'nil = Opal.nil'
 
