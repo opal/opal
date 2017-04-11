@@ -99,7 +99,13 @@ class Module
   end
 
   def append_features(includer)
-    `Opal.append_features(self, includer)`
+    %x{
+      if (!self.$$is_module) {
+        #{raise TypeError, "wrong argument type #{self.class} (expected Module)"};
+      }
+
+      Opal.append_features(self, includer)
+    }
     self
   end
 
@@ -318,6 +324,37 @@ class Module
     value
   end
 
+  def prepend(*mods)
+    %x{
+      for (var i = mods.length - 1; i >= 0; i--) {
+        var mod = mods[i];
+
+        if (!mod.$$is_module) {
+          #{raise TypeError, "wrong argument type #{`mod`.class} #{`mod.$$name`}(expected Module)"};
+        }
+
+        #{`mod`.prepend_features self};
+        #{`mod`.prepended self};
+      }
+    }
+
+    self
+  end
+
+  def prepend_features(includer)
+    %x{
+      if (!self.$$is_module) {
+        #{raise TypeError, "wrong argument type #{self.class} (expected Module)"};
+      }
+
+      Opal.prepend_features(self, includer)
+    }
+    self
+  end
+
+  def prepended(mod)
+  end
+
   def public_constant(const_name)
   end
 
@@ -377,7 +414,7 @@ class Module
         var mod = mods[i];
 
         if (!mod.$$is_module) {
-          #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+          #{raise TypeError, "wrong argument type #{`mod`.class} #{`mod.$$name`}(expected Module)"};
         }
 
         #{`mod`.append_features self};
@@ -493,6 +530,17 @@ class Module
   def included(mod)
   end
 
+  def extend_object(obj)
+    %x{
+      if (!self.$$is_module) {
+        #{raise TypeError, "wrong argument type #{self.class} (expected Module)"};
+      }
+      Opal.append_features(self, Opal.get_singleton_class(obj));
+    }
+
+    self
+  end
+
   def extended(mod)
   end
 
@@ -566,6 +614,10 @@ class Module
 
   def module_function(*methods)
     %x{
+      if (!self.$$is_module) {
+        #{raise TypeError, "wrong argument type #{self.class} (expected Module)"};
+      }
+
       if (methods.length === 0) {
         self.$$module_function = true;
       }

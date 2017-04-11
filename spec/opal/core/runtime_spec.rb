@@ -6,6 +6,28 @@ describe '`Opal.hash`' do
   end
 end
 
+# describe 'Opal.ancestors' do
+#   M1 = Module.new
+#   M2 = Module.new
+#   M3 = Module.new
+#   M4 = Module.new
+#   M5 = Module.new
+#   M1.send :include, M2
+#   M1.send :prepend, M5
+#   C1 = Class.new
+#   C1.prepend M1
+#   C1.prepend M2
+#   C1.include M5
+#   C2 = Class.new(C1)
+#   C2.include M3
+#   C2.include M4
+#   it 'returns a list of ancestors' do
+#     `Opal.ancestors(#{M1})`.should == [M5, M1, M2]
+#     `Opal.ancestors(#{C1})`.should == [M5, M1, M2, C1, Object, MSpecRSpecAdapter, Kernel, BasicObject]
+#     `Opal.ancestors(#{C2})`.should == [C2, M4, M3, M5, M1, M2, C1, Object, MSpecRSpecAdapter, Kernel, BasicObject]
+#   end
+# end
+
 describe 'javascript access using .JS' do
   it 'should call javascript methods via .JS.method()' do
     "a1234b5678c".JS.indexOf('c').should == 10

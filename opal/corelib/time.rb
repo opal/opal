@@ -1,7 +1,6 @@
 require 'corelib/comparable'
 
 class Time < `Date`
-  include Comparable
 
   %x{
     var days_of_week = #{%w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday Sunday]},
@@ -747,4 +746,6 @@ class Time < `Date`
     [week, year]
 
   end
+
+  include Comparable
 end

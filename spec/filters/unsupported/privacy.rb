@@ -247,6 +247,8 @@ opal_unsupported_filter "private" do
   fails "Module#public_constant marked constants in a class can be accessed from outside the class"
   fails "Module#public_constant marked constants in a module can be accessed from outside the module"
   fails "Module#public_instance_method is a public method"
+  fails "Module#public_instance_method raises a NameError if the method is private" # Expected NameError but no exception was raised (#<UnboundMethod: ModuleSpecs::Basic#private_module> was returned)
+  fails "Module#public_instance_method raises a NameError when given a protected method name" # Expected NameError but no exception was raised (#<UnboundMethod: ModuleSpecs::Basic#protected_module> was returned)
   fails "Module#public_instance_method raises a TypeError when given a name is not Symbol or String"
   fails "Module#public_instance_method requires an argument"
   fails "Module#public_instance_method sets the NameError#name attribute to the name of the missing method"

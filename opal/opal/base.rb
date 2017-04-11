@@ -5,5 +5,4 @@ require 'corelib/class'
 require 'corelib/basic_object'
 require 'corelib/kernel'
 require 'corelib/error'
-
 require 'corelib/constants'

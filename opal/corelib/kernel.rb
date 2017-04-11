@@ -191,8 +191,6 @@ module Kernel
 
   def extend(*mods)
     %x{
-      var singleton = #{singleton_class};
-
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
@@ -200,7 +198,7 @@ module Kernel
           #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
 
-        #{`mod`.append_features `singleton`};
+        #{`mod`.extend_object self};
         #{`mod`.extended self};
       }
     }
