@@ -1,8 +1,6 @@
 opal_filter "BigDecimal" do
-  fails "BigDecimal#% raises TypeError if the argument cannot be coerced to BigDecimal"
   fails "BigDecimal#% returns NaN if NaN is involved"
   fails "BigDecimal#% returns NaN if the dividend is Infinity"
-  fails "BigDecimal#% returns a [Float value] when the argument is Float"
   fails "BigDecimal#% returns self modulo other"
   fails "BigDecimal#% returns the dividend if the divisor is Infinity"
   fails "BigDecimal#** 0 to power of 0 is 1"
@@ -21,7 +19,6 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#<=> returns 1 if a > b" #fails only with mock object
   fails "BigDecimal#> properly handles infinity values" #fails only with mock object
   fails "BigDecimal#>= properly handles infinity values" #fails only with mock object
-  fails "BigDecimal#ceil returns n digits right of the decimal point if given n > 0"
   fails "BigDecimal#ceil returns the smallest integer greater or equal to self, if n is unspecified"
   fails "BigDecimal#ceil sets n digits left of the decimal point to 0, if given n < 0"
   fails "BigDecimal#coerce returns [other, self] both as BigDecimal"
@@ -29,8 +26,6 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#div with precision set to 0 returns a / b" #fails a single assertion: @one.send(@method, BigDecimal('-2E5555'), *@object).should == BigDecimal('-0.5E-5555')
   fails "BigDecimal#divmod Can be reversed with * and +"
   fails "BigDecimal#divmod array contains quotient and modulus as BigDecimal"
-  fails "BigDecimal#divmod divides value, returns an array"
-  fails "BigDecimal#divmod raises TypeError if the argument cannot be coerced to BigDecimal"
   fails "BigDecimal#divmod returns an array of Infinity and NaN if the dividend is Infinity"
   fails "BigDecimal#divmod returns an array of two NaNs if NaN is involved"
   fails "BigDecimal#divmod returns an array of zero and the dividend if the divisor is Infinity"
@@ -57,10 +52,8 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#inspect looks like this"
   fails "BigDecimal#inspect returns String starting with #"
   fails "BigDecimal#inspect value after first comma is value as string"
-  fails "BigDecimal#mod_part_of_divmod raises TypeError if the argument cannot be coerced to BigDecimal"
   fails "BigDecimal#mod_part_of_divmod returns NaN if NaN is involved"
   fails "BigDecimal#mod_part_of_divmod returns NaN if the dividend is Infinity"
-  fails "BigDecimal#mod_part_of_divmod returns a [Float value] when the argument is Float"
   fails "BigDecimal#mod_part_of_divmod returns self modulo other"
   fails "BigDecimal#mod_part_of_divmod returns the dividend if the divisor is Infinity"
   fails "BigDecimal#power 0 to power of 0 is 1"
@@ -146,7 +139,6 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.new allows for underscores in all parts"
   fails "BigDecimal.new creates a new object of class BigDecimal"
   fails "BigDecimal.new determines precision from initial value"
-  fails "BigDecimal.new ignores leading whitespace"
   fails "BigDecimal.new ignores trailing garbage"
   fails "BigDecimal.new raises ArgumentError when Float is used without precision"
   fails "BigDecimal.new treats invalid strings as 0.0"

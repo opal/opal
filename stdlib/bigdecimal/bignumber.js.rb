@@ -1,6 +1,6 @@
 class BigDecimal
   %x{
-    var define = function (f) { Opal.casgn(self, 'BigNumber', f()); };
+    var define = function (f) { Opal.const_set(self, 'BigNumber', f()); };
     define.amd = true;
 
     /* jshint ignore:start */

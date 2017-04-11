@@ -130,7 +130,11 @@ module Opal
 
         push ')'
 
-        wrap '(', ", nil) && '#{mid}'" if expr?
+        if expr?
+          wrap '(', ", nil) && '#{mid}'"
+        else
+          unshift "\n#{current_indent}"
+        end
       end
 
       # Returns code used in debug mode to check arity of method call

@@ -1,7 +1,6 @@
 opal_filter "String" do
   fails "String#% supports inspect formats using %p" # Expected "{\"capture\"=>1}" to equal "{:capture=>1}"
   fails "String#bytes agrees with #unpack('C*')"
-  fails "String#bytes returns #bytesize bytes"
   fails "String#bytes yields each byte to a block if one is given, returning self"
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible"
   fails "String#dump returns a string with # not escaped when followed by any other character"
@@ -16,7 +15,6 @@ opal_filter "String" do
   fails "String#dump returns a string with special characters replaced with \\<char> notation"
   fails "String#dump returns a string with upper-case alpha characters unescaped"
   fails "String#dump returns a subclass instance"
-  fails "String#dup does not copy constants defined in the singleton class"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
   fails "String#each_byte passes each byte in self to the given block"
   fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string"
@@ -33,7 +31,7 @@ opal_filter "String" do
   fails "String#getbyte starts indexing at 0"
   fails "String#prepend raises a RuntimeError when self is frozen" # NoMethodError: undefined method `prepend' for "hello":String
   fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
-  fails "String#split with Regexp includes all captures in the result array" # fails on phantomjs
+  fails "String#split with Regexp includes all captures in the result array" # if OPAL_PLATFORM == 'phantomjs'
   fails "String#sub with pattern, replacement returns a copy of self when no modification is made"
   fails "String#to_c returns a Complex object"
   fails "String#to_c returns a complex number with 0 as the real part, 0 as the imaginary part for unrecognised Strings"

@@ -72,18 +72,6 @@
   // All bridged classes - keep track to donate methods from Object
   var BridgedClasses = {};
 
-  // TopScope is used for inheriting constants from the top scope
-  var TopScope = function(){};
-
-  // Opal just acts as the top scope
-  TopScope.prototype = Opal;
-
-  // To inherit scopes
-  Opal.constructor = TopScope;
-
-  // List top scope constants
-  Opal.constants = [];
-
   // This is a useful reference to global object inside ruby files
   Opal.global = global_object;
   global_object.Opal = Opal;
@@ -95,7 +83,7 @@
   }
 
   // Minify common function calls
-  var $hasOwn = Opal.hasOwnProperty;
+  var $hasOwn = Object.hasOwnProperty;
   var $slice  = Opal.slice = Array.prototype.slice;
 
   // Nil object id is always 4
@@ -135,257 +123,170 @@
 
   // Constants
   // ---------
+  //
+  // For future reference:
+  // - The Rails autoloading guide (http://guides.rubyonrails.org/v5.0/autoloading_and_reloading_constants.html)
+  // - @ConradIrwin's 2012 post on “Everything you ever wanted to know about constant lookup in Ruby” (http://cirw.in/blog/constant-lookup.html)
+  //
+  // Legend of MRI concepts/names:
+  // - constant reference (cref): the module/class that acts as a namespace
+  // - nesting: the namespaces wrapping the current scope, e.g. nesting inside
+  //            `module A; module B::C; end; end` is `[B::C, A]`
 
-  // Get a constant on the given scope. Every class and module in Opal has a
-  // scope used to store, and inherit, constants. For example, the top level
-  // `Object` in ruby has a scope accessible as `Opal.Object.$$scope`.
-  //
-  // To get the `Array` class using this scope, you could use:
-  //
-  //     Opal.Object.$$scope.get("Array")
-  //
-  // If a constant with the given name cannot be found, then a dispatch to the
-  // class/module's `#const_missing` is called, which by default will raise an
-  // error.
-  //
-  // @param name [String] the name of the constant to lookup
-  // @return [Object]
-  //
-  Opal.get = function(const_name) {
-    return Opal.const_get([this], const_name, true, true);
+  // Get the cosntant in the scope of the current cref
+  function const_get_name(cref, name) {
+    if (cref) return cref.$$const[name];
   }
 
-  function constGetSingle(scope, const_name, inherit) {
-    var scopes = [scope],
-        module = scope.base;
+  // Walk up the nesting array looking for the constant
+  function const_lookup_nesting(nesting, name) {
+    var i, ii, result;
 
-    if (inherit || module == Opal.Object) {
-      var parent = module.$$super;
+    if (nesting.length === 0) return;
 
-      while (parent !== Opal.BasicObject && parent !== Opal.Object) {
-        scopes.push(parent.$$scope);
-
-        parent = parent.$$super;
-      }
-    }
-
-    for (var i = 0, length = scopes.length; i < length; i++) {
-      if (scopes[i].hasOwnProperty(const_name)) {
-        return scopes[i][const_name];
+    // If the nesting is not empty the constant is looked up in its elements
+    // and in order. The ancestors of those elements are ignored.
+    for (i = 0, ii = nesting.length; i < ii; i++) {
+      if (nesting[i].$$const && $hasOwn.call(nesting[i].$$const, name)) {
+        return nesting[i].$$const[name];
       }
     }
   }
 
-  function constGetTopLevel(const_name) {
-    var global_scope = Opal.Object.$$scope;
+  // Walk up the ancestors chain looking for the constant
+  function const_lookup_ancestors(cref, name) {
+    var i, ii, result, ancestors;
 
-    if (global_scope.hasOwnProperty(const_name)) {
-      return global_scope[const_name];
-    }
-  }
+    if (cref == null) return;
 
-  function constGetMultiple(scopes, const_name, inherit) {
-    var length = scopes.length,
-        last_scope = scopes[length - 1],
-        i, scope, result;
+    ancestors = Opal.ancestors(cref);
 
-    for (i = length - 1; i >= 0; i--) {
-      var scope_or_singleton_class = scopes[i];
-
-      if (scope_or_singleton_class.$$is_singleton) {
-        scope = scope_or_singleton_class.$$scope;
-
-        if (scope_or_singleton_class === last_scope) {
-          // If we perform a constant lookup directly in the metaclass
-          // then we should look into its ancestors (inherit = true)
-          inherit = true;
-        } else {
-          // Otherwise we are looking for a constant declared in the
-          // normal scope (class/module) which was declared in the metaclass
-          // @example
-          //   class << obj
-          //     module M
-          //       CONST
-          //     end
-          //   end
-          // In this case we shouldn't look into metaclass ancestors
-          inherit = false;
-        }
-      } else {
-        // We are in the regular class/module scope
-        scope = scope_or_singleton_class;
-        // Leaving requested inherit value from parameters
-      }
-
-      if (scope.hasOwnProperty(const_name)) {
-        result = scope[const_name];
-      }
-
-      if (result != null) {
-        return result;
-      }
-
-      result = constGetSingle(scope, const_name, inherit);
-
-      if (result != null) {
-        return result;
+    for (i = 0, ii = ancestors.length; i < ii; i++) {
+      if (ancestors[i].$$const && $hasOwn.call(ancestors[i].$$const, name)) {
+        return ancestors[i].$$const[name];
       }
     }
   }
 
-  // Finds and returns a constant in the provided list of scopes.
-  // When you open a class/module/singleton class, Opal collects
-  // scopes in the $nesting array. When you try to resolve
-  // a constant Opal.const_get is used to get it.
-  //
-  // To simply find a constant directly in the single scope:
-  //
-  //     Opal.const_get([scope], const_name)
-  //
-  // To search in parents:
-  //
-  //     Opal.const_get(scopes, const_name, true)
-  //
-  // To throw an error if nothing was found:
-  //
-  //     Opal.const_get(scopes, const_name, inherit, true)
-  //
-  // @param scopes [Array<$$scope>] a list of scopes
-  // @param const_name [String] the name of the constant
-  // @param inherit [Boolean] flag to perform a search in the parents
-  // @param raise [Boolean] flag to trigger "const_missing" if nothing was found
-  // @return [Object]
-  Opal.const_get = function(nesting, const_name, inherit, raise) {
-    var result = constGetMultiple(nesting, const_name, inherit);
-
-    if (result != null) {
-      return result;
-    }
-
-    if (inherit) {
-      result = constGetTopLevel(const_name);
-    }
-
-    if (result != null) {
-      return result;
-    }
-
-    if (raise) {
-      var last_scope_base = nesting[nesting.length - 1].base;
-
-      if (last_scope_base.$$is_a_module) {
-        return last_scope_base.$const_missing(const_name);
-      }
+  // Walk up Object's ancestors chain looking for the constant,
+  // but only if cref is missing or a module.
+  function const_lookup_Object(cref, name) {
+    if (cref == null || cref.$$is_module) {
+      return const_lookup_ancestors(_Object, name);
     }
   }
 
-  // Create a new constants scope for the given class with the given
-  // base. Constants are looked up through their parents, so the base
-  // scope will be the outer scope of the new klass.
-  //
-  // @param base_scope [$$scope] the scope in which the new scope should be created
-  // @param klass      [Class]
-  // @param id         [String, null] the name of the newly created scope
-  //
-  Opal.create_scope = function(base_scope, klass, id) {
-    var const_alloc = function() {};
-    var const_scope = const_alloc.prototype = new base_scope.constructor();
-
-    klass.$$scope       = const_scope;
-    klass.$$base_module = base_scope.base;
-
-    const_scope.base        = klass;
-    const_scope.constructor = const_alloc;
-    const_scope.constants   = [];
-
-    if (id) {
-      Opal.cdecl(base_scope, id, klass);
-      const_alloc.displayName = id+"_scope_alloc";
+  // Call const_missing if nothing else worked
+  function const_missing(cref, name, skip_missing) {
+    if (!skip_missing) {
+      return (cref || _Object).$const_missing(name);
     }
+  }
+
+  // Look for the constant just in the current cref or call `#const_missing`
+  Opal.const_get_local = function(cref, name, skip_missing) {
+    var result;
+
+    if (cref == null) return;
+
+    if (cref === '::') cref = _Object;
+
+    if (!cref.$$is_a_module) {
+      throw new Opal.TypeError(cref.toString() + " is not a class/module");
+    }
+
+    result = const_get_name(cref, name);              if (result != null) return result;
+    result = const_missing(cref, name, skip_missing); if (result != null) return result;
+  }
+
+  // Look for the constant relative to a cref or call `#const_missing` (when the
+  // constant is prefixed by `::`).
+  Opal.const_get_qualified = function(cref, name, skip_missing) {
+    var result;
+
+    if (cref == null) return;
+
+    if (cref === '::') cref = _Object;
+
+    if (!cref.$$is_a_module) {
+      throw new Opal.TypeError(cref.toString() + " is not a class/module");
+    }
+
+    result = const_get_name(cref, name);              if (result != null) return result;
+    result = const_lookup_ancestors(cref, name);      if (result != null) return result;
+    result = const_lookup_Object(cref, name);         if (result != null) return result;
+    result = const_missing(cref, name, skip_missing); if (result != null) return result;
   };
 
-  // Constant assignment, see also `Opal.cdecl`
-  //
-  // @param base_module [Module, Class] the constant namespace
-  // @param name        [String] the name of the constant
-  // @param value       [Object] the value of the constant
-  //
-  // @example Assigning a namespaced constant
-  //   self::FOO = 'bar'
-  //
-  // @example Assigning with Module#const_set
-  //   Foo.const_set :BAR, 123
-  //
-  Opal.casgn = function(base_module, name, value) {
-    // Assign the name to a class and all of its subscopes, eg:
-    //
-    //   c = Class.new
-    //   c::Foo = Class.new
-    //   Bar = c # => c::Foo should now become Bar::Foo
-    //
-    function update(klass, name) {
-      klass.$$name = name;
-      var scope = klass.$$scope
+  // Look for the constant in the open using the current nesting and the nearest
+  // cref ancestors or call `#const_missing` (when the constant has no :: prefix).
+  Opal.const_get_relative = function(nesting, name, skip_missing) {
+    var cref = nesting[0], result;
 
-      for (name in scope) {
-        var value = scope[name];
+    result = const_get_name(cref, name);              if (result != null) return result;
+    result = const_lookup_nesting(nesting, name);     if (result != null) return result;
+    result = const_lookup_ancestors(cref, name);      if (result != null) return result;
+    result = const_lookup_Object(cref, name);         if (result != null) return result;
+    result = const_missing(cref, name, skip_missing); if (result != null) return result;
+  };
 
-        if (value && value.$$name === nil && (value.$$is_class || value.$$is_module)) {
-          update(value, name)
-        }
-      }
+  // Register the constant on a cref and opportunistically set the name of
+  // unnamed classes/modules.
+  Opal.const_set = function(cref, name, value) {
+    if (cref == null || cref === '::') cref = _Object;
+
+    if (value.$$is_a_module) {
+      if (value.$$name == null || value.$$name === nil) value.$$name = name;
+      if (value.$$base_module == null) value.$$base_module = cref;
     }
 
-    var scope = base_module.$$scope;
+    cref.$$const = (cref.$$const || Object.create(null));
+    cref.$$const[name] = value;
 
-    if (value.$$is_class || value.$$is_module) {
-      // Only checking _Object prevents setting a const on an anonymous class
-      // that has a superclass that's not Object
-      if (value.$$is_class || value.$$base_module === _Object) {
-        value.$$base_module = base_module;
-      }
-
-      if (value.$$name === nil && value.$$base_module.$$name !== nil) {
-        update(value, name);
-      }
-    }
-
-    scope.constants.push(name);
-    scope[name] = value;
-
-    // If we dynamically declare a constant in a module,
-    // we should populate all the classes that include this module
-    // with the same constant
-    if (base_module.$$is_module && base_module.$$included_in) {
-      for (var i = 0; i < base_module.$$included_in.length; i++) {
-        var dep = base_module.$$included_in[i];
-        Opal.casgn(dep, name, value);
-      }
-    }
+    // Expose top level constants onto the Opal object
+    if (cref === _Object) Opal[name] = value;
 
     return value;
   };
 
-  // Constant declaration
-  //
-  // @example
-  //   FOO = :bar
-  //
-  // @param base_scope [$$scope] the current scope
-  // @param name       [String] the name of the constant
-  // @param value      [Object] the value of the constant
-  Opal.cdecl = function(base_scope, name, value) {
-    if ((value.$$is_class || value.$$is_module) && value.$$orig_scope == null) {
-      value.$$name = name;
-      value.$$orig_scope = base_scope;
-      // Here we should explicitly set a base module
-      // (a module where the constant was initially defined)
-      value.$$base_module = base_scope.base;
-      base_scope.constructor[name] = value;
+  // Get all the constants reachable from a given cref, by default will include
+  // inherited constants.
+  Opal.constants = function(cref, inherit) {
+    if (inherit == null) inherit = true;
+
+    var module, modules = [cref], module_constants, i, ii, constants = {}, constant;
+
+    if (inherit) modules = modules.concat(Opal.ancestors(cref));
+    if (inherit && cref.$$is_module) modules = modules.concat([Opal.Object]).concat(Opal.ancestors(Opal.Object));
+
+    for (i = 0, ii = modules.length; i < ii; i++) {
+      module = modules[i];
+
+      // Don not show Objects constants unless we're querying Object itself
+      if (cref !== _Object && module == _Object) break;
+
+      for (constant in module.$$const) {
+        constants[constant] = true;
+      }
     }
 
-    base_scope.constants.push(name);
-    return base_scope[name] = value;
+    return Object.keys(constants);
+  };
+
+  // Remove a constant from a cref.
+  Opal.const_remove = function(cref, name) {
+    if (cref.$$const[name] != null) {
+      var old = cref.$$const[name];
+      delete cref.$$const[name];
+      return old;
+    }
+
+    if (cref.$$autoload != null && cref.$$autoload[name] != null) {
+      delete cref.$$autoload[name];
+      return nil;
+    }
+
+    throw Opal.NameError.$new("constant "+cref+"::"+cref.$name()+" not defined");
   };
 
 
@@ -420,6 +321,10 @@
   Opal.klass = function(base, superclass, name, constructor) {
     var klass, bridged, alloc;
 
+    if (base == null) {
+      base = _Object;
+    }
+
     // If base is an object, use its class
     if (!base.$$is_class && !base.$$is_module) {
       base = base.$$class;
@@ -432,10 +337,10 @@
     }
 
     // Try to find the class in the current scope
-    klass = base.$$scope[name];
+    klass = const_get_name(base, name);
 
     // If the class exists in the scope, then we must use that
-    if (klass && klass.$$orig_scope === base.$$scope) {
+    if (klass) {
       // Make sure the existing constant is a class, or raise error
       if (!klass.$$is_class) {
         throw Opal.TypeError.$new(name + " is not a class");
@@ -470,8 +375,7 @@
     //                    the last included klass
     klass.$$parent = superclass;
 
-    // Every class gets its own constant scope, inherited from current scope
-    Opal.create_scope(base.$$scope, klass, name);
+    Opal.const_set(base, name, klass);
 
     // Name new class directly onto current scope (Opal.Foo.Baz = klass)
     base[name] = klass;
@@ -480,11 +384,6 @@
       Opal.bridge(klass, alloc);
     }
     else {
-      // Copy all parent constants to child, unless parent is Object
-      if (superclass !== _Object && superclass !== BasicObject) {
-        Opal.donate_constants(superclass, klass);
-      }
-
       // Call .inherited() hook with new class on the superclass
       if (superclass.$inherited) {
         superclass.$inherited(klass);
@@ -530,6 +429,9 @@
 
     // initialize the name with nil
     module.$$name = nil;
+
+    // Initialize the constants table
+    module.$$const = Object.create(null);
 
     // @property $$cvars class variables defined in the current module
     module.$$cvars = Object.create(null);
@@ -622,20 +524,25 @@
   Opal.module = function(base, name) {
     var module;
 
+    if (base == null) {
+      base = _Object;
+    }
+
     if (!base.$$is_class && !base.$$is_module) {
       base = base.$$class;
     }
 
-    if ($hasOwn.call(base.$$scope, name)) {
-      module = base.$$scope[name];
+    module = const_get_name(base, name);
+    if (module == null && base === _Object) module = const_lookup_ancestors(_Object, name);
 
+    if (module) {
       if (!module.$$is_module && module !== _Object) {
         throw Opal.TypeError.$new(name + " is not a module");
       }
     }
     else {
       module = Opal.module_allocate(Module);
-      Opal.create_scope(base.$$scope, module, name);
+      Opal.const_set(base, name, module);
     }
 
     return module;
@@ -662,7 +569,7 @@
     var mtor = function() {};
     mtor.prototype = superclass.$$alloc.prototype;
 
-    function module_constructor() {}
+    var module_constructor = function() {};
     module_constructor.prototype = new mtor();
 
     var module = new module_constructor();
@@ -757,9 +664,6 @@
     klass.$$super  = superclass;
     klass.$$parent = superclass;
 
-    // The singleton_class retains the same scope as the original class
-    Opal.create_scope(object.$$scope, klass);
-
     klass.$$is_singleton = true;
     klass.$$singleton_of = object;
 
@@ -780,7 +684,6 @@
     klass.$$super  = superclass;
     klass.$$parent = superclass;
     klass.$$class  = superclass.$$class;
-    klass.$$scope  = superclass.$$scope;
     klass.$$proto  = object;
 
     klass.$$is_singleton = true;
@@ -992,8 +895,6 @@
     for (i = methods.length - 1; i >= 0; i--) {
       Opal.update_includer(module, includer, '$' + methods[i])
     }
-
-    Opal.donate_constants(module, includer);
   };
 
   // Table that holds all methods that have been defined on all objects
@@ -1052,20 +953,6 @@
     }
 
     return klass;
-  };
-
-  // When a source module is included into the target module, we must also copy
-  // its constants to the target.
-  //
-  Opal.donate_constants = function(source_mod, target_mod) {
-    var source_constants = source_mod.$$scope.constants,
-        target_scope     = target_mod.$$scope,
-        target_constants = target_scope.constants;
-
-    for (var i = 0, length = source_constants.length; i < length; i++) {
-      target_constants.push(source_constants[i]);
-      target_scope[source_constants[i]] = source_mod.$$scope[source_constants[i]];
-    }
   };
 
   // Update `jsid` method cache of all classes / modules including `module`.
@@ -1133,14 +1020,14 @@
   Opal.ancestors = function(module_or_class) {
     var parent = module_or_class,
         result = [],
-        modules;
+        modules, i, ii, j, jj;
 
     while (parent) {
       result.push(parent);
-      for (var i=0; i < parent.$$inc.length; i++) {
+      for (i = parent.$$inc.length-1; i >= 0; i--) {
         modules = Opal.ancestors(parent.$$inc[i]);
 
-        for(var j = 0; j < modules.length; j++) {
+        for(j = 0, jj = modules.length; j < jj; j++) {
           result.push(modules[j]);
         }
       }
@@ -2288,10 +2175,15 @@
   Opal.Module      = Module      = Opal.setup_class_object('Module',      Module_alloc,      'Object',      _Object.constructor);
   Opal.Class       = Class       = Opal.setup_class_object('Class',       Class_alloc,       'Module',      Module.constructor);
 
-  Opal.constants.push("BasicObject");
-  Opal.constants.push("Object");
-  Opal.constants.push("Module");
-  Opal.constants.push("Class");
+  // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
+  BasicObject.$$const["BasicObject"] = BasicObject;
+
+  // Assign basic constants
+  Opal.const_set(_Object, "BasicObject",  BasicObject);
+  Opal.const_set(_Object, "Object",       _Object);
+  Opal.const_set(_Object, "Module",       Module);
+  Opal.const_set(_Object, "Class",        Class);
+
 
   // Fix booted classes to use their metaclass
   BasicObject.$$class = Class;
@@ -2309,15 +2201,6 @@
   _Object.$$parent     = BasicObject;
   Module.$$parent      = _Object;
   Class.$$parent       = Module;
-
-  Opal.base                = _Object;
-  BasicObject.$$scope      = _Object.$$scope = Opal;
-  BasicObject.$$orig_scope = _Object.$$orig_scope = Opal;
-
-  Module.$$scope      = _Object.$$scope;
-  Module.$$orig_scope = _Object.$$orig_scope;
-  Class.$$scope       = _Object.$$scope;
-  Class.$$orig_scope  = _Object.$$orig_scope;
 
   // Forward .toString() to #to_s
   _Object.$$proto.toString = function() {

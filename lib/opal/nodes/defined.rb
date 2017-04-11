@@ -163,13 +163,12 @@ module Opal
         const_tmp = scope.new_temp
 
         if const_scope.nil?
-          push "(#{const_tmp} = Opal.const_get([$scope], '#{const_name}', true, false))"
+          push "(#{const_tmp} = Opal.const_get_relative($nesting, '#{const_name}', 'skip_raise'))"
         elsif const_scope == s(:cbase)
-          push "(#{const_tmp} = Opal.const_get([Opal.Object.$$scope], '#{const_name}', true, false))"
+          push "(#{const_tmp} = Opal.const_get_qualified('::', '#{const_name}', 'skip_raise'))"
         else
           const_scope_tmp = compile_defined(const_scope)
-          push " && #{const_scope_tmp}.$$scope"
-          push " && (#{const_tmp} = Opal.const_get([#{const_scope_tmp}.$$scope], '#{const_name}', true, false))"
+          push " && (#{const_tmp} = Opal.const_get_qualified(#{const_scope_tmp}, '#{const_name}', 'skip_raise'))"
         end
         const_tmp
       end

@@ -17,8 +17,7 @@ module Opal
         in_scope do
           scope.name = name
           add_temp "#{scope.proto} = self.$$proto"
-          add_temp '$scope = self.$$scope'
-          add_temp '$nesting = $parent_nesting.slice().concat($scope)'
+          add_temp '$nesting = [self].concat($parent_nesting)'
 
           body_code = stmt(body || s(:nil))
           empty_line
@@ -35,7 +34,7 @@ module Opal
         base, name = cid.children
 
         if base.nil?
-          [name, '$scope.base']
+          [name, '$nesting[0]']
         else
           [name, expr(base)]
         end

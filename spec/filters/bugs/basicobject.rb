@@ -1,7 +1,4 @@
 opal_filter "BasicObject" do
-  fails "BasicObject does not define built-in constants (according to const_defined?)"
-  fails "BasicObject does not define built-in constants (according to defined?)"
-  fails "BasicObject raises NameError when referencing built-in constants"
   fails "BasicObject raises NoMethodError for nonexistent methods after #method_missing is removed"
   fails "BasicObject#initialize does not accept arguments"
   fails "BasicObject#instance_eval raises a TypeError when defining methods on an immediate"

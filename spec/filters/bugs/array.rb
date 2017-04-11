@@ -9,10 +9,8 @@ opal_filter "Array" do
   fails "Array#rassoc calls elem == obj on the second element of each contained array"
   fails "Array#rassoc does not check the last element in each contained but speficically the second"
   fails "Array#reject! updates the receiver after all blocks"
-  fails "Array#sample samples evenly" # Expected 800..1200 to include 1320
   fails "Array#select returns a new array of elements for which block is true"
   fails "Array#select! updates the receiver after all blocks"
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#zip fills nil when the given enumereator is shorter than self"
-  fails "Array.[] can unpack 2 or more nested referenced array"
 end
