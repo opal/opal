@@ -220,8 +220,7 @@
 
     if (cached == null || cached[0] !== current_version) {
       ((result = const_get_name(cref, name))              != null) ||
-      ((result = const_lookup_ancestors(cref, name))      != null) ||
-      ((result = const_lookup_Object(cref, name))         != null);
+      ((result = const_lookup_ancestors(cref, name))      != null);
       cache[name] = [current_version, result];
     } else {
       result = cached[1];
