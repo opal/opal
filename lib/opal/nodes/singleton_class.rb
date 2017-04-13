@@ -12,8 +12,7 @@ module Opal
 
         in_scope do
           add_temp 'def = self.$$proto'
-          add_temp '$scope = self.$$scope'
-          add_temp '$nesting = $parent_nesting.slice().concat(self)'
+          add_temp '$nesting = [self].concat($parent_nesting)'
 
           body_stmt = stmt(compiler.returns(body))
           line scope.to_vars

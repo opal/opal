@@ -199,8 +199,12 @@ class PhantomDocFormatter < PhantomFormatter
 end
 
 class NodeJSDocFormatter < NodeJSFormatter
+  def before(example)
+    print example.description
+  end
+
   def print_example(state)
-    (@exception && state) ? red(state.description+"\n") : green(state.description+"\n")
+    (@exception && state) ? red(" ✗\n") : green(" ✓\n")
   end
 end
 

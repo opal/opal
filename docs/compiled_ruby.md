@@ -164,8 +164,7 @@ looks similar to the following:
 
 ```javascript
 (function(Opal) {
-  var self = Opal.top, $scope = Opal, nil = Opal.nil, $breaker = Opal.breaker, $slice = Opal.slice;
-  // generated code
+  // some setup code code
   return self.$puts("foo")
 })(Opal);
 ```
@@ -180,15 +179,14 @@ This would compile directly into:
 
 ```javascript
 (function(Opal) {
-  var self = Opal.top, $scope = Opal, nil = Opal.nil, $breaker = Opal.breaker, $slice = Opal.slice;
+  var self = Opal.top, $nesting = [], nil = Opal.nil, $breaker = Opal.breaker, $slice = Opal.slice;
 
   Opal.add_stubs(['$puts']);
   return self.$puts("foo")
 })(Opal);
 ```
 
-Most of the helpers are no longer present as they are not used in this
-example.
+**TIP:** you can see the compiled code with this command: `opal --compile --no-exit --no-opal --eval 'puts "foo"'`
 
 ### Using compiled sources
 

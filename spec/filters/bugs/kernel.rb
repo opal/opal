@@ -5,7 +5,6 @@ opal_filter "Kernel" do
   fails "Kernel#class returns the class of the object"
   fails "Kernel#clone replaces a singleton object's metaclass with a new copy with the same superclass" # NoMethodError: undefined method `singleton_methods' for #<#<Class:0x2df8e>:0x2df90>
   fails "Kernel#define_singleton_method when given an UnboundMethod will raise when attempting to define an object's singleton method from another object's singleton method"
-  fails "Kernel#dup does not copy constants defined in the singleton class"
   fails "Kernel#eval allows a binding to be captured inside an eval"
   fails "Kernel#eval allows creating a new class in a binding created by #eval"
   fails "Kernel#eval allows creating a new class in a binding"
@@ -57,7 +56,6 @@ opal_filter "Kernel" do
   fails "Kernel#public_methods when passed false returns a list of public methods in without its ancestors"
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors"
   fails "Kernel#puts delegates to $stdout.puts"
-  fails "Kernel#respond_to? is only an instance method"
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning false"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"
@@ -68,7 +66,6 @@ opal_filter "Kernel" do
   fails "Kernel#respond_to_missing? is called with a 2nd argument of false when #respond_to? is"
   fails "Kernel#respond_to_missing? is called with true as the second argument when #respond_to? is"
   fails "Kernel#respond_to_missing? is not called when #respond_to? would return true"
-  fails "Kernel#respond_to_missing? is only an instance method"
   fails "Kernel#respond_to_missing? isn't called when obj responds to the given public method"
   fails "Kernel#singleton_class raises TypeError for Fixnum"
   fails "Kernel#singleton_class raises TypeError for Symbol"
