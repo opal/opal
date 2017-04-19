@@ -78,8 +78,9 @@
 
   // Configure runtime behavior with regards to require and unsupported fearures
   Opal.config = {
-    missing_require_severity: 'error', // error, warning, ignore
-    unsupported_features_severity: 'warning' // error, warning, ignore
+    missing_require_severity: 'error',        // error, warning, ignore
+    unsupported_features_severity: 'warning', // error, warning, ignore
+    enable_stack_trace: true                  // true, false
   }
 
   // Minify common function calls

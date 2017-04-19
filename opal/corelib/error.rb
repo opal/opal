@@ -12,7 +12,7 @@ class Exception < `Error`
       // first line of the stack trace so it must be called after the error
       // has been initialized.
       // https://nodejs.org/dist/latest-v6.x/docs/api/errors.html
-      if (Error.captureStackTrace) {
+      if (Opal.config.enable_stack_trace && Error.captureStackTrace) {
         // Passing Kernel.raise will cut the stack trace from that point above
         Error.captureStackTrace(error, Kernel$raise);
       }
