@@ -1573,20 +1573,14 @@
   // @param block [Function] ruby block
   // @return [Object] returning value of the method call
   Opal.send = function(recv, method, args, block) {
-    if (typeof(method) === 'string') {
-      var method_name = method;
-      method = recv['$' + method_name];
+    var body = (typeof(method) === 'string') ? recv['$'+method] : method;
 
-      if (method) {
-        method.$$p = block;
-        return method.apply(recv, args);
-      }
-
-      return recv.$method_missing.apply(recv, [method_name].concat(args));
-    } else if (typeof(method) === 'function') {
-      method.$$p = block;
-      return method.apply(recv, args);
+    if (body != null) {
+      body.$$p = block;
+      return body.apply(recv, args);
     }
+
+    return recv.$method_missing.apply(recv, [method].concat(args));
   }
 
   // Used to define methods on an object. This is a helper method, used by the
