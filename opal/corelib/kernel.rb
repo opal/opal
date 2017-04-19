@@ -104,8 +104,10 @@ module Kernel
 
   def copy_instance_variables(other)
     %x{
-      for (var name in other) {
-        if (other.hasOwnProperty(name) && name.charAt(0) !== '$') {
+      var keys = Object.keys(other), i, ii, name;
+      for (i = 0, ii = keys.length; i < ii; i++) {
+        name = keys[i];
+        if (name.charAt(0) !== '$' && other.hasOwnProperty(name)) {
           self[name] = other[name];
         }
       }
