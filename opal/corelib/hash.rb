@@ -1,5 +1,13 @@
 require 'corelib/enumerable'
 
+# ---
+# Internal properties:
+#
+# - $$map         [JS::Object<String => hash-bucket>] the hash table for ordinary keys
+# - $$smap        [JS::Object<String => hash-bucket>] the hash table for string keys
+# - $$keys        [Array<hash-bucket>] the list of all keys
+# - $$proc        [Proc,null,nil] the default proc used for missing keys
+# - hash-bucket   [JS::Object] an element of a linked list that holds hash values, keys are `{key:,key_hash:,value:,next:}`
 class Hash
   include Enumerable
 
