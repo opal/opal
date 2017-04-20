@@ -1,5 +1,5 @@
 task :default do
-  Dir["#{__dir__}/bm_*.rb"].each do |bm_path|
+  Dir[ENV['FILE'] || "#{__dir__}/bm_*.rb"].each do |bm_path|
     sh "bundle exec opal -ropal/platform -gbenchmark-ips -rbenchmark/ips -A #{bm_path}"
   end
 end
