@@ -23,11 +23,11 @@ module Opal
           add_local '$case'
 
           push "$case = ", expr(condition), ";"
-          empty_line
         end
 
         case_parts.each_with_index do |wen, idx|
           if wen
+            line
             case wen.type
             when :when
               wen = compiler.returns(wen) if needs_closure?
@@ -43,6 +43,7 @@ module Opal
 
         # if we are having a closure, we must return a usable value
         if needs_closure? and !handled_else
+          line
           push "else { return nil }"
         end
       end
@@ -73,7 +74,11 @@ module Opal
 
           if check.type == :splat
             push "(function($splt) { for (var i = 0, ii = $splt.length; i < ii; i++) {"
-            push "if ($splt[i]['$===']($case)) { return true; }"
+            if case_stmt[:cond]
+              push "if ($splt[i]['$===']($case)) { return true; }"
+            else
+              push "if (", js_truthy(check), ")) { return true; }"
+            end
             push "} return false; })(", expr(check.children[0]), ")"
           else
             if case_stmt[:cond]
