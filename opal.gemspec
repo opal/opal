@@ -35,4 +35,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rack-test'
   s.add_development_dependency 'opal-minitest'
   s.add_development_dependency 'selenium-webdriver'
+  s.add_development_dependency 'benchmark-ips'
 end

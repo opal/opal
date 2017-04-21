@@ -85,4 +85,13 @@ namespace :bench do
       printf fmt, *row
     end
   end
+
+  task :ips do
+    files = Dir[ENV['FILE'] || "#{__dir__}/benchmark-ips/bm_*.rb"]
+    raise ArgumentError, "no files provided" if files.empty?
+    puts "=== Files: #{files.join ', '}"
+    files.each do |bm_path|
+      sh "bundle exec opal -ropal/platform -gbenchmark-ips -rbenchmark/ips -A #{bm_path}"
+    end
+  end
 end
