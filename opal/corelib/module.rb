@@ -423,7 +423,7 @@ class Module
       var module_chain = function(klass) {
         var included = [];
 
-        for (var i = 0; i != klass.$$inc.length; i++) {
+        for (var i = 0, ii = klass.$$inc.length; i < ii; i++) {
           var mod_or_class = klass.$$inc[i];
           included.push(mod_or_class);
           included = included.concat(module_chain(mod_or_class));

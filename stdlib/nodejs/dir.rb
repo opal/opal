@@ -21,7 +21,7 @@ class Dir
       %x{
         var result = [];
         var entries = __fs__.readdirSync(#{dirname});
-        for (var i = 0; i < entries.length; i++) {
+        for (var i = 0, ii = entries.length; i < ii; i++) {
           result.push(entries[i]);
         }
         return result;

@@ -961,7 +961,7 @@ class String < `String`
           string = self.toString(),
           index = 0,
           match,
-          i;
+          i, ii;
 
       if (pattern.$$is_regexp) {
         pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
@@ -996,7 +996,7 @@ class String < `String`
 
       if (limit < 0) {
         if (match !== null && match[0] === '' && pattern.source.indexOf('(?=') === -1) {
-          for (i = 0; i < match.length; i++) {
+          for (i = 0, ii = match.length; i < ii; i++) {
             result.push('');
           }
         }

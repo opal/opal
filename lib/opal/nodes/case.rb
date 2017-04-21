@@ -72,7 +72,7 @@ module Opal
           push ' || ' unless idx == 0
 
           if check.type == :splat
-            push "(function($splt) { for (var i = 0; i < $splt.length; i++) {"
+            push "(function($splt) { for (var i = 0, ii = $splt.length; i < ii; i++) {"
             push "if ($splt[i]['$===']($case)) { return true; }"
             push "} return false; })(", expr(check.children[0]), ")"
           else
