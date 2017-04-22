@@ -94,6 +94,7 @@ module MSpecSuite
     env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
 
     File.write filename, <<-RUBY
+require 'opal/platform' # in node ENV is replaced
 #{env_data}
 
 require 'spec_helper'
@@ -182,8 +183,6 @@ suites.each do |suite|
   platforms.each do |platform|
     desc "Run the MSpec test suite on Opal::Builder/#{platform}" + pattern_usage
     task :"mspec_#{suite}_#{platform}" do
-      include_paths = '-Ispec -Ilib'
-
       filename = "tmp/mspec_#{platform}.rb"
       mkdir_p File.dirname(filename)
       bm_filepath = MSpecSuite.bm_filepath if ENV['BM']
@@ -198,7 +197,7 @@ suites.each do |suite|
       stubs = MSpecSuite.stubs.map{|s| "-s#{s}"}.join(' ')
 
       sh "ruby -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-         "bin/opal -gmspec #{include_paths} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+         "bin/opal -gmspec -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 
       if bm_filepath
         puts "Benchmark results have been written to #{bm_filepath}"
