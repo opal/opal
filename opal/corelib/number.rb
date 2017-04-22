@@ -265,8 +265,12 @@ class Number < Numeric
     %x{
       if (other.$$is_number) {
         return self.valueOf() === other.valueOf();
-      } else {
-        return #{self == other};
+      }
+      else if (#{other.respond_to? :==}) {
+        return #{other == self};
+      }
+      else {
+        return false;
       }
     }
   end
@@ -274,7 +278,7 @@ class Number < Numeric
   def ==(other)
     %x{
       if (other.$$is_number) {
-        return self == Number(other);
+        return self.valueOf() === other.valueOf();
       }
       else if (#{other.respond_to? :==}) {
         return #{other == self};
