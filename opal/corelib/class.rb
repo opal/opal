@@ -7,7 +7,7 @@ class Class
         throw Opal.TypeError.$new("superclass must be a Class");
       }
 
-      var alloc = Opal.boot_class_alloc(null, function(){}, superclass)
+      var alloc = Opal.boot_class_alloc(null, function(){}, superclass);
       var klass = Opal.setup_class_object(null, alloc, superclass.$$name, superclass.constructor);
 
       klass.$$super  = superclass;
@@ -31,10 +31,18 @@ class Class
   def inherited(cls)
   end
 
+  def initialize_dup(original)
+    initialize_copy(original)
+    %x{
+      self.$$name = null;
+      self.$$full_name = null;
+    }
+  end
+
   def new(*args, &block)
     %x{
       var object = #{allocate};
-      Opal.send(object, object.$initialize, args, block)
+      Opal.send(object, object.$initialize, args, block);
       return object;
     }
   end

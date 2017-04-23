@@ -621,7 +621,7 @@ class Module
 
       while (base) {
         // Give up if any of the ancestors is unnamed
-        if (base.$$name === nil) return nil;
+        if (base.$$name === nil || base.$$name == null) return nil;
 
         result.unshift(base.$$name);
 

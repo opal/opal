@@ -12,9 +12,9 @@ opal_filter "Enumerator" do
   fails "Enumerator#initialize returns self when given an object"
   fails "Enumerator#initialize sets size to nil if size is not given"
   fails "Enumerator#initialize sets size to nil if the given size is nil"
+  fails "Enumerator#initialize sets size to the given size if the given size is Float::INFINITY"
   fails "Enumerator#initialize sets size to the given size if the given size is a Fixnum"
   fails "Enumerator#initialize sets size to the given size if the given size is a Proc"
-  fails "Enumerator#initialize sets size to the given size if the given size is Float::INFINITY"
   fails "Enumerator#next_values advances the position of the current element"
   fails "Enumerator#next_values advances the position of the enumerator each time when called multiple times"
   fails "Enumerator#next_values raises StopIteration if called on a finished enumerator"
@@ -36,5 +36,5 @@ opal_filter "Enumerator" do
   fails "Enumerator#peek_values works in concert with #rewind"
   fails "Enumerator#size returns returning value from size.call if set size is a Proc"
   fails "Enumerator#size returns the result from size.call if the size respond to call"
-  fails "Enumerator#to_enum exposes multi-arg yields as an array"
+  fails "Enumerator#to_enum exposes multi-arg yields as an array" # NoMethodError: undefined method `next' for #<Enumerator: #<Object:0x53e80>:each>
 end

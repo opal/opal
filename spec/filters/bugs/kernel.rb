@@ -4,7 +4,9 @@ opal_filter "Kernel" do
   fails "Kernel#__dir__ when used in eval with top level binding returns the real name of the directory containing the currently-executing file"
   fails "Kernel#class returns the class of the object"
   fails "Kernel#clone replaces a singleton object's metaclass with a new copy with the same superclass" # NoMethodError: undefined method `singleton_methods' for #<#<Class:0x2df8e>:0x2df90>
+  fails "Kernel#clone uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
   fails "Kernel#define_singleton_method when given an UnboundMethod will raise when attempting to define an object's singleton method from another object's singleton method"
+  fails "Kernel#dup uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
   fails "Kernel#eval allows a binding to be captured inside an eval"
   fails "Kernel#eval allows creating a new class in a binding created by #eval"
   fails "Kernel#eval allows creating a new class in a binding"
@@ -41,7 +43,6 @@ opal_filter "Kernel" do
   fails "Kernel#methods returns the publicly accessible methods in the object, its ancestors and mixed-in modules"
   fails "Kernel#methods returns the publicly accessible methods of the object"
   fails "Kernel#object_id returns a different value for two Bignum literals"
-  fails "Kernel#object_id returns a different value for two Float literals"
   fails "Kernel#object_id returns a different value for two String literals"
   fails "Kernel#p flushes output if receiver is a File"
   fails "Kernel#p is not affected by setting $\\, $/ or $,"
@@ -115,6 +116,7 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with a module"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with two modules"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object"
+  fails "Kernel#sprintf with format string that contains %<> sections raises ArgumentError if missing second named argument" # KeyError: key not found: "foo"
   fails "Kernel#warn writes each array element on a line when passes an array" # Expected:   $stderr: "line 1\nline 2\n"      got:   $stderr: "[\"line 1\", \"line 2\"]\n"
   fails "Kernel.Complex() when passed Numerics n1 and n2 and at least one responds to #real? with false returns n1 + n2 * Complex(0, 1)"
   fails "Kernel.Complex() when passed [Complex, Complex] returns a new Complex number based on the two given numbers"

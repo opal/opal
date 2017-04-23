@@ -63,6 +63,8 @@ opal_filter "Module" do
   fails "Module#class_eval converts non string eval-string to string using to_str"
   fails "Module#class_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
   fails "Module#class_eval raises a TypeError when the given filename can't be converted to string using to_str"
+  fails "Module#class_eval resolves constants in the caller scope ignoring send"
+  fails "Module#class_eval resolves constants in the caller scope" # fails because of the difference between module_eval("Const") and module_eval { Const } (only the second one is supported by Opal)
   fails "Module#class_eval uses the optional filename and lineno parameters for error messages"
   fails "Module#const_defined? returns true for toplevel constant when the name begins with '::'"
   fails "Module#const_defined? returns true or false for the nested name"
@@ -85,6 +87,7 @@ opal_filter "Module" do
   fails "Module#extend_object is called when #extend is called on an object"
   fails "Module#extend_object on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#include doesn't include module if it is included in a super class"
+  fails "Module#initialize_copy should retain singleton methods when duped" # Expected [] to equal ["hello"]
   fails "Module#instance_method raises a NameError if the method has been undefined"
   fails "Module#instance_method raises a TypeError if not passed a symbol"
   fails "Module#instance_method raises a TypeError if the given name is not a string/symbol"
@@ -95,6 +98,8 @@ opal_filter "Module" do
   fails "Module#module_eval converts non string eval-string to string using to_str"
   fails "Module#module_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
   fails "Module#module_eval raises a TypeError when the given filename can't be converted to string using to_str"
+  fails "Module#module_eval resolves constants in the caller scope ignoring send"
+  fails "Module#module_eval resolves constants in the caller scope"
   fails "Module#module_eval uses the optional filename and lineno parameters for error messages"
   fails "Module#module_function as a toggle (no arguments) in a Module body does not affect module_evaled method definitions also if outside the eval itself"
   fails "Module#module_function as a toggle (no arguments) in a Module body doesn't affect definitions when inside an eval even if the definitions are outside of it"
@@ -142,14 +147,12 @@ opal_filter "Module" do
   fails "Module#prepend_features on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#prepend_features raises an ArgumentError on a cyclic prepend"
   fails "Module#prepended is invoked when self is prepended to another module or class"
+  fails "Module#remove_class_variable removes class variable" # Exception: Cannot set property '@@mvar' of undefined
+  fails "Module#remove_class_variable returns the value of removing class variable" # Exception: Cannot set property '@@mvar' of undefined
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#remove_const returns nil when removing autoloaded constant"
   fails "Module.constants returns an array of Symbol names" # requires Bignum
   fails "Module.new creates a new Module and passes it to the provided block"
   fails "Module::Nesting returns the list of Modules nested at the point of call"
-  fails "Module#class_eval resolves constants in the caller scope" # fails because of the difference between module_eval("Const") and module_eval { Const } (only the second one is supported by Opal)
-  fails "Module#class_eval resolves constants in the caller scope ignoring send"
-  fails "Module#module_eval resolves constants in the caller scope"
-  fails "Module#module_eval resolves constants in the caller scope ignoring send"
 end

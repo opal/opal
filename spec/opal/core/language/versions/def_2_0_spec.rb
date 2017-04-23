@@ -17,10 +17,6 @@ describe "An instance method with keyword arguments" do
       foo(a: nil).should be_nil
     end
 
-    it "raises an argument error when an unknown keyword argument is provided" do
-      lambda { foo(b: 20) }.should raise_error(ArgumentError)
-    end
-
     it "raises an argument error when a non-keyword argument is provided" do
       lambda { foo(1) }.should raise_error(ArgumentError)
     end

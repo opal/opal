@@ -5,8 +5,8 @@ opal_filter "Date" do
   fails "Date#civil creates a Date for different calendar reform dates"
   fails "Date#civil doesn't create dates for invalid arguments"
   fails "Date#commercial creates a Date for Julian Day Number day 0 by default"
-  fails "Date#commercial Creates a Date for the correct day given the year, week and day number"
-  fails "Date#commercial Creates a Date for the monday in the year and week given"
+  fails "Date#commercial creates a Date for the correct day given the year, week and day number" # NoMethodError: undefined method `commercial' for Date
+  fails "Date#commercial creates a Date for the monday in the year and week given" # NoMethodError: undefined method `commercial' for Date
   fails "Date#commercial creates only Date objects for valid weeks"
   fails "Date#cwyear determines the commercial year"
   fails "Date#day_fraction determines the day fraction"
@@ -47,9 +47,9 @@ opal_filter "Date" do
   fails "Date#strptime parses a commercial week"
   fails "Date#strptime parses a commercial year with leading zeroes"
   fails "Date#strptime parses a commercial year with only two digits"
+  fails "Date#strptime parses a date given MM/DD/YY"
   fails "Date#strptime parses a date given as YYYY-MM-DD"
   fails "Date#strptime parses a date given in full notation"
-  fails "Date#strptime parses a date given MM/DD/YY"
   fails "Date#strptime parses a date with slashes"
   fails "Date#strptime parses a full date"
   fails "Date#strptime parses a full day name"

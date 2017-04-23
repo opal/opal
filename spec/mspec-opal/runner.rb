@@ -60,38 +60,6 @@ class Object
   end
 
   alias opal_unsupported_filter opal_filter
-
-  # Copyed from MSpec, with changes.
-  def with_timezone(name, offset = nil, daylight_saving_zone = "")
-    zone = name.dup
-
-    if offset
-      # TZ convention is backwards
-      offset = -offset
-
-      zone += offset.to_s
-      zone += ":00:00"
-    end
-    zone += daylight_saving_zone
-
-    # WAS:
-    #
-    #   old = ENV["TZ"]
-    #   ENV["TZ"] = zone
-    #
-    #   begin
-    #     yield
-    #   ensure
-    #     ENV["TZ"] = old
-    #   end
-    #
-    if ENV["TZ"] == zone
-      yield
-    else
-      1.should == 1 # MSpec will get mad if the example has no expectations.
-      warn "Skipped spec for TZ=#{zone} as it's not supported"
-    end
-  end
 end
 
 # MSpec relies on File.readable? to do method detection on backtraces

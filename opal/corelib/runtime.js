@@ -2019,7 +2019,7 @@
     if (arguments_length === 1) {
       args = arguments[0];
       for (key in args) {
-        if (args.hasOwnProperty(key)) {
+        if ($hasOwn.call(args, key)) {
           value = args[key];
 
           Opal.hash_put(hash, key, value);

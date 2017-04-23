@@ -245,7 +245,9 @@ opal_unsupported_filter "private" do
   fails "Module#public_constant accepts strings as constant names"
   fails "Module#public_constant can only be passed constant names defined in the target (self) module"
   fails "Module#public_constant marked constants in a class can be accessed from outside the class"
+  fails "Module#public_constant marked constants in a class is defined? with A::B form" # Exception: Opal.TypeError is not a constructor
   fails "Module#public_constant marked constants in a module can be accessed from outside the module"
+  fails "Module#public_constant marked constants in a module is defined? with A::B form" # Exception: Opal.TypeError is not a constructor
   fails "Module#public_instance_method is a public method"
   fails "Module#public_instance_method raises a TypeError when given a name is not Symbol or String"
   fails "Module#public_instance_method requires an argument"

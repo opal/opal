@@ -73,7 +73,7 @@ describe "Invoking a method" do
         specs.fooM1O1(1,2,3)
       }.should raise_error(ArgumentError)
     end
-    
+
     it "keeps the block if supplied" do
       block = lambda {}
       specs.fooM1O2(1, foo: :bar, &block).should == [1, {foo: :bar}, block]
@@ -100,14 +100,6 @@ describe "Invoking a method" do
     prc = specs.makeproc { "hello" }
     prc.should be_kind_of(Proc)
     prc.call.should == "hello"
-  end
-
-  it "with an object as a block uses 'to_proc' for coercion" do
-    o = LangSendSpecs::ToProc.new(:from_to_proc)
-
-    specs.makeproc(&o).call.should == :from_to_proc
-
-    specs.yield_now(&o).should == :from_to_proc
   end
 
   it "raises a SyntaxError with both a literal block and an object as block" do

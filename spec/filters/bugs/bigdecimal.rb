@@ -24,8 +24,8 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#coerce returns [other, self] both as BigDecimal"
   fails "BigDecimal#div returns a / b with optional precision" #fails the case of > 20 decimal places for to_s('F')
   fails "BigDecimal#div with precision set to 0 returns a / b" #fails a single assertion: @one.send(@method, BigDecimal('-2E5555'), *@object).should == BigDecimal('-0.5E-5555')
-  fails "BigDecimal#divmod Can be reversed with * and +"
   fails "BigDecimal#divmod array contains quotient and modulus as BigDecimal"
+  fails "BigDecimal#divmod can be reversed with * and +" # Expected 0 to equal -1
   fails "BigDecimal#divmod returns an array of Infinity and NaN if the dividend is Infinity"
   fails "BigDecimal#divmod returns an array of two NaNs if NaN is involved"
   fails "BigDecimal#divmod returns an array of zero and the dividend if the divisor is Infinity"
@@ -87,13 +87,13 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#round uses default rounding method unless given"
   fails "BigDecimal#sign returns negative value if BigDecimal less than 0"
   fails "BigDecimal#sign returns positive value if BigDecimal greater than 0"
-  fails "BigDecimal#split First value: -1 for numbers < 0"
-  fails "BigDecimal#split First value: 0 if BigDecimal is NaN"
-  fails "BigDecimal#split First value: 1 for numbers > 0"
-  fails "BigDecimal#split Fourth value: The exponent"
-  fails "BigDecimal#split Second value: a string with the significant digits"
-  fails "BigDecimal#split Third value: the base (currently always ten)"
+  fails "BigDecimal#split first value: -1 for numbers < 0" # NoMethodError: undefined method `split' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
+  fails "BigDecimal#split first value: 0 if BigDecimal is NaN" # NoMethodError: undefined method `split' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
+  fails "BigDecimal#split first value: 1 for numbers > 0" # NoMethodError: undefined method `split' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
+  fails "BigDecimal#split fourth value: the exponent" # NoMethodError: undefined method `split' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
+  fails "BigDecimal#split second value: a string with the significant digits" # NoMethodError: undefined method `split' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
   fails "BigDecimal#split splits BigDecimal in an array with four values"
+  fails "BigDecimal#split third value: the base (currently always ten)" # NoMethodError: undefined method `split' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
   fails "BigDecimal#sqrt raises ArgumentError if 2 arguments are given"
   fails "BigDecimal#sqrt raises ArgumentError if a negative number is given"
   fails "BigDecimal#sqrt raises ArgumentError when no argument is given"
@@ -134,7 +134,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.mode raise an exception if the flag is true"
   fails "BigDecimal.mode returns Infinity when too big"
   fails "BigDecimal.mode returns the appropriate value and continue the computation if the flag is false"
-  fails "BigDecimal.new Number of significant digits >= given precision"
+  fails "BigDecimal.new accepts significant digits >= given precision" # NoMethodError: undefined method `precs' for 3.1415923
   fails "BigDecimal.new allows for [eEdD] as exponent separator"
   fails "BigDecimal.new allows for underscores in all parts"
   fails "BigDecimal.new creates a new object of class BigDecimal"

@@ -27,6 +27,7 @@ opal_filter "Enumerable" do
   fails "Enumerable#minmax_by uses min/max.<=>(current) to determine order"
   fails "Enumerable#reverse_each gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#slice_when when an iterator method yields more than one value processes all yielded values"
+  fails "Enumerable#slice_when when given a block doesn't yield an empty array on a small enumerable" # Expected [] to equal [[42]]
   fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable"
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
   fails "Enumerable#to_h calls #to_ary on contents"
