@@ -1,21 +1,7 @@
 opal_unsupported_filter "Hash" do
   fails "Hash#assoc only returns the first matching key-value pair for identity hashes"
   fails "Hash#clear raises a RuntimeError if called on a frozen instance"
-  fails "Hash#compare_by_identity causes future comparisons on the receiver to be made by identity"
-  fails "Hash#compare_by_identity does not copy string keys"
-  fails "Hash#compare_by_identity perists over #dups"
-  fails "Hash#compare_by_identity persists over #clones"
   fails "Hash#compare_by_identity raises a RuntimeError on frozen hashes"
-  fails "Hash#compare_by_identity regards #clone'd objects as having different identities"
-  fails "Hash#compare_by_identity regards #dup'd objects as having different identities"
-  fails "Hash#compare_by_identity regards references to the same object as having the same identity"
-  fails "Hash#compare_by_identity returns self"
-  fails "Hash#compare_by_identity uses #equal? semantics, but doesn't actually call #equal? to determine identity"
-  fails "Hash#compare_by_identity uses the semantics of BasicObject#equal? to determine key identity"
-  fails "Hash#compare_by_identity? returns false by default"
-  fails "Hash#compare_by_identity? returns true once #compare_by_identity has been invoked on self"
-  fails "Hash#compare_by_identity? returns true when called multiple times on the same ident hash"
-  fails "Hash#compare_by_identity does not call #hash on keys"
   fails "Hash#default= raises a RuntimeError if called on a frozen instance"
   fails "Hash#default_proc= raises a RuntimeError if self is frozen"
   fails "Hash#delete raises a RuntimeError if called on a frozen instance"
@@ -54,7 +40,4 @@ opal_unsupported_filter "Hash" do
   fails "Hash#inspect does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
   fails "Hash#to_s does not raise if inspected result is not default external encoding" # Mock 'utf_16be' expected to receive 'inspect' exactly 1 times but received it 0 times
   fails "Hash#to_s does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
-  fails "Hash#compare_by_identity has no effect on an already compare_by_identity hash" # NoMethodError: undefined method `compare_by_identity' for {}
-  fails "Hash#compare_by_identity persists over #dups" # NoMethodError: undefined method `compare_by_identity' for {}
-  fails "Hash#compare_by_identity rehashes internally so that old keys can be looked up" # NoMethodError: undefined method `compare_by_identity' for {}
 end

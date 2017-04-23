@@ -229,6 +229,34 @@ class Hash
     }
   end
 
+  def compare_by_identity
+    %x{
+      var i, ii, key, keys = self.$$keys, identity_hash;
+
+      if (self.$$by_identity) return self;
+      if (self.$$keys.length === 0) {
+        self.$$by_identity = true
+        return self;
+      }
+
+      identity_hash = #{ {}.compare_by_identity };
+      for(i = 0, ii = keys.length; i < ii; i++) {
+        key = keys[i];
+        if (!key.$$is_string) key = key.key;
+        Opal.hash_put(identity_hash, key, Opal.hash_get(self, key));
+      }
+
+      self.$$by_identity = true;
+      self.$$map = identity_hash.$$map;
+      self.$$smap = identity_hash.$$smap;
+      return self;
+    }
+  end
+
+  def compare_by_identity?
+    `self.$$by_identity === true`
+  end
+
   def default(key = undefined)
     %x{
       if (key !== undefined && self.$$proc !== nil && self.$$proc !== undefined) {
