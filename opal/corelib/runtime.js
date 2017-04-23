@@ -102,6 +102,7 @@
 
   // Retrieve or assign the id of an object
   Opal.id = function(obj) {
+    if (obj.$$is_number) return (obj * 2)+1;
     return obj.$$id || (obj.$$id = Opal.uid());
   };
 
@@ -1834,7 +1835,8 @@
       return;
     }
 
-    var key_hash = key.$hash(), bucket, last_bucket;
+    var key_hash, bucket, last_bucket;
+    key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
     if (!$hasOwn.call(hash.$$map, key_hash)) {
       bucket = {key: key, key_hash: key_hash, value: value};
@@ -1870,7 +1872,8 @@
       return;
     }
 
-    var key_hash = key.$hash(), bucket;
+    var key_hash, bucket;
+    key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
     if ($hasOwn.call(hash.$$map, key_hash)) {
       bucket = hash.$$map[key_hash];
