@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'opal/deprecations'
 
 # Opal::SimpleServer is a very basic Rack server for Opal assets, it relies on

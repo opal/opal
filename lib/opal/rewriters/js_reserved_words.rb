@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'opal/rewriters/base'
 require 'opal/regexp_anchors'
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Opal
   # `Opal::CliRunners` is the namespace in which JavaScript runners can be
   # defined for use by `Opal::CLI`. The API for classes defined under

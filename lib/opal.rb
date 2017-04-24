@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'opal/config'
 require 'opal/compiler'
 require 'opal/builder'

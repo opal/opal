@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'opal/regexp_anchors'
 
 module Opal

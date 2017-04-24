@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'opal/nodes/node_with_args'
 
 module Opal

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'opal/compiler'
 require 'opal/erb'
 require 'source_map'

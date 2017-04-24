@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'opal/path_reader'
 require 'opal/builder_processors'
 require 'opal/paths'

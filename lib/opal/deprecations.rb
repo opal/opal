@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Opal
   module Deprecations
     attr_accessor :raise_on_deprecation
