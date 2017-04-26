@@ -121,6 +121,22 @@
     Opal.gvars["!"] = Opal.exceptions.pop() || nil;
   }
 
+  // Inspect any kind of object, including non Ruby ones
+  Opal.inspect = function(obj) {
+    if (obj === undefined) {
+      return "undefined";
+    }
+    else if (obj === null) {
+      return "null";
+    }
+    else if (!obj.$$class) {
+      return obj.toString();
+    }
+    else {
+      return obj.$inspect();
+    }
+  }
+
 
   // Constants
   // ---------

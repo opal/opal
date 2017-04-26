@@ -90,21 +90,8 @@ module Opal
     obj.respond_to? method
   end
 
-  def self.inspect(obj)
-    %x{
-      if (obj === undefined) {
-        return "undefined";
-      }
-      else if (obj === null) {
-        return "null";
-      }
-      else if (!obj.$$class) {
-        return obj.toString();
-      }
-      else {
-        return #{obj.inspect};
-      }
-    }
+  def self.inspect_obj(obj)
+    `Opal.inspect(obj)`
   end
 
   def self.instance_variable_name!(name)
