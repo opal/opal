@@ -139,47 +139,10 @@ Use PATTERN environment variable to manually set the glob for specs:
 DESC
 
 platforms = %w[nodejs phantomjs server]
-suites = %w[ruby opal]
+mspec_suites = %w[ruby opal]
+minitest_suites = %w[cruby]
 
-suites.each do |suite|
-=begin
-  desc "Run the MSpec/#{suite} test suite on Opal::Sprockets/phantomjs" + pattern_usage
-  task :"mspec_#{suite}_sprockets_phantomjs" do
-    filename = File.expand_path('tmp/mspec_sprockets_phantomjs.rb')
-    runner   = "#{__dir__}/testing/sprockets-phantomjs.js"
-    port     = 9999
-    url      = "http://localhost:#{port}/"
-
-    mkdir_p File.dirname(filename)
-    specs_env = ENV.to_hash.merge('SUITE' => suite)
-
-    MSpecSuite.write_file filename, MSpecSuite.filters(suite), MSpecSuite.specs(specs_env), specs_env
-
-    MSpecSuite.stubs.each {|s| ::Opal::Config.stubbed_files << s }
-
-    Opal::Config.arity_check_enabled = true
-    Opal::Config.freezing_stubs_enabled = true
-    Opal::Config.tainting_stubs_enabled = false
-    Opal::Config.dynamic_require_severity = :warning
-
-    Opal.use_gem 'mspec'
-    Opal.append_path 'spec'
-    Opal.append_path 'lib'
-    Opal.append_path File.dirname(filename)
-
-    app = Opal::Server.new { |s| s.main = File.basename(filename) }
-    server = Thread.new { Rack::Server.start(app: app, Port: port) }
-    sleep 1
-
-    begin
-      sh 'phantomjs', runner, url
-    ensure
-      server.kill if server.alive?
-    end
-  end
-=end
-  # task :mspec_sprockets_phantomjs => [:mspec_opal_sprockets_phantomjs, :mspec_ruby_sprockets_phantomjs]
-
+mspec_suites.each do |suite|
   platforms.each do |platform|
     desc "Run the MSpec test suite on Opal::Builder/#{platform}" + pattern_usage
     task :"mspec_#{suite}_#{platform}" do
@@ -207,88 +170,80 @@ suites.each do |suite|
   end
 end
 
-platforms.each do |platform|
-  task :"mspec_#{platform}" => suites.map{|suite| :"mspec_#{suite}_#{platform}"}
-end
-
-
-
-
 module MinitestSuite
   extend self
 
-  def build_js_command(files, options = {})
-    includes = options.fetch(:includes, [])
-    js_filename = options.fetch(:js_filename, [])
-
-    includes << 'vendored-minitest'
-    include_paths = includes.map {|i| " -I#{i}"}.join
-
+  def write_file(filename, files = [], env = {})
+    env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
     requires = files.map{|f| "require '#{f}'"}
-    rb_filename = js_filename.sub(/\.js$/, '.rb')
-    mkdir_p File.dirname(rb_filename)
-    File.write rb_filename, requires.join("\n")
+    mkdir_p File.dirname(filename)
 
-    stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+    random_seed = env['RANDOM_SEED'] ? env['RANDOM_SEED'] : rand(100_000)
+    puts "Randomizing with RANDOM_SEED=#{random_seed}"
 
-    "ruby -rbundler/setup bin/opal -g hike #{include_paths} #{stubs} -Dwarning -A #{rb_filename} -c > #{js_filename}"
+    File.write filename, <<-RUBY
+require 'opal/platform' # in node ENV is replaced
+require 'opal-parser'
+#{env_data}
+srand(#{random_seed})
+
+#{requires.join("\n")}
+    RUBY
   end
 end
 
-task :test_cruby do
-  if ENV.key? 'FILES'
-    files = Dir[ENV['FILES']]
-    includes = %w[test . tmp lib]
-  else
-    includes = %w[test test/cruby/test]
-    files = %w[
-      benchmark/test_benchmark.rb
-      ruby/test_call.rb
-      opal/test_keyword.rb
-      base64/test_base64.rb
-      opal/unsupported_and_bugs.rb
-    ]
+platforms.each do |platform|
+  minitest_suites.each do |suite|
+    task :"minitest_#{suite}_#{platform}" do
+      if ENV.key? 'FILES'
+        files = Dir[ENV['FILES']]
+        includes = "-Itmp"
+      else
+        includes = "-Itest/cruby/test"
+        files = %w[
+          benchmark/test_benchmark.rb
+          ruby/test_call.rb
+          opal/test_keyword.rb
+          base64/test_base64.rb
+          opal/unsupported_and_bugs.rb
+        ]
+      end
+
+      filename = "tmp/minitest_#{suite}_#{platform}.rb"
+      MinitestSuite.write_file(filename, files, ENV)
+
+      stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+      includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
+
+      sh "ruby -rbundler/setup "\
+         "bin/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+    end
   end
-
-  js_filename = 'tmp/test_cruby.js'
-  build_js_command = MinitestSuite.build_js_command(
-    %w[
-      opal/platform
-      opal-parser
-    ] + files,
-    includes: includes,
-    js_filename: js_filename,
-  )
-  sh build_js_command
-  env = {'NODE_PATH' => 'stdlib/nodejs/node_modules'}
-  cmd = "node #{js_filename}"
-  system(env, cmd) or fail("Program exited with an error")
 end
 
-# deprecated, can be removed after 0.11
-task :cruby_tests do
-  warn "The task 'cruby_tests' has been renamed to 'test_cruby'."
-  exit 1
-end
-
-task :test_nodejs do
+# The name ends with the platform, which is of course mandated in this case
+task :minitest_node_nodejs do
   Opal.use_gem 'hike'
-  js_filename = 'tmp/test_nodejs.js'
-  build_js_command = MinitestSuite.build_js_command(
-    %w[
-      opal-parser.rb
-      test_file.rb
-      test_dir.rb
-      test_io.rb
-      test_opal_builder.rb
-    ],
-    includes: %w[test/nodejs],
-    js_filename: js_filename,
-  )
-  sh build_js_command
-  env = {'NODE_PATH' => 'stdlib/nodejs/node_modules'}
-  cmd = "node #{js_filename}"
-  system(env, cmd) or fail("Program exited with an error")
+
+  platform = 'nodejs'
+  suite = 'node'
+  files = %w[
+    nodejs
+    opal-parser
+    nodejs/test_file.rb
+    nodejs/test_dir.rb
+    nodejs/test_io.rb
+    nodejs/test_opal_builder.rb
+  ]
+
+  filename = "tmp/minitest_node_nodejs.rb"
+  MinitestSuite.write_file(filename, files, ENV)
+
+  stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+  includes = "-Itest -Ilib -Ivendored-minitest"
+
+  sh "ruby -rbundler/setup "\
+     "bin/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 end
 
 desc 'Runs opal-rspec tests to augment unit testing/rubyspecs'
@@ -412,7 +367,15 @@ task :browser_test do
   end
 end
 
+platforms.each { |platform| task(:"mspec_#{platform}"    => mspec_suites.map    { |suite| :"mspec_#{suite}_#{platform}"    }) }
+platforms.each { |platform| task(:"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }) }
+
 task :mspec    => [:mspec_phantomjs, :mspec_nodejs]
-task :minitest => [:test_cruby, :test_nodejs]
+task :minitest => [:minitest_phantomjs, :minitest_nodejs, :minitest_nodejs]
 task :test_all => [:rspec, :mspec, :minitest]
+
+# deprecated, can be removed after 0.11
+task(:cruby_tests) { warn "The task 'cruby_tests' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
+task(:test_cruby)  { warn "The task 'test_cruby' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
+task(:test_nodejs) { warn "The task 'test_nodejs' has been renamed to 'minitest_node_nodejs'."; exit 1 }
 
