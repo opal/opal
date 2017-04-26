@@ -31,7 +31,6 @@ opal_filter "Kernel" do
   fails "Kernel#extend raises an ArgumentError when no arguments given"
   fails "Kernel#inspect does not call #to_s if it is defined"
   fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
-  fails "Kernel#itself returns the receiver itself"
   fails "Kernel#local_variables contains locals as they are added"
   fails "Kernel#local_variables is accessible from bindings"
   fails "Kernel#local_variables is accessible in eval"

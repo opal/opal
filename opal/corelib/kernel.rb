@@ -962,6 +962,10 @@ module Kernel
     }
   end
 
+  def itself
+    self
+  end
+
   alias kind_of? is_a?
 
   def lambda(&block)
