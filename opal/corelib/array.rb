@@ -270,72 +270,85 @@ class Array < `Array`
     }
   end
 
-  def [](index, length = undefined)
-    %x{
+  %x{
+    function $array_slice_range(self, index) {
       var size = self.length,
           exclude, from, to, result;
 
-      if (index.$$is_range) {
-        exclude = index.exclude;
-        from    = #{Opal.coerce_to `index.begin`, Integer, :to_int};
-        to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
+      exclude = index.exclude;
+      from    = Opal.Opal.$coerce_to(index.begin, Opal.Integer, 'to_int');
+      to      = Opal.Opal.$coerce_to(index.end, Opal.Integer, 'to_int');
+
+      if (from < 0) {
+        from += size;
 
         if (from < 0) {
-          from += size;
-
-          if (from < 0) {
-            return nil;
-          }
+          return nil;
         }
+      }
 
-        if (from > size) {
+      if (from > size) {
+        return nil;
+      }
+
+      if (to < 0) {
+        to += size;
+
+        if (to < 0) {
+          return [];
+        }
+      }
+
+      if (!exclude) {
+        to += 1;
+      }
+
+      result = self.slice(from, to);
+      return toArraySubclass(result, self.$class());
+    }
+
+    function $array_slice_index_length(self, index, length) {
+      var size = self.length,
+          exclude, from, to, result;
+
+      index = Opal.Opal.$coerce_to(index, Opal.Integer, 'to_int');
+
+      if (index < 0) {
+        index += size;
+
+        if (index < 0) {
+          return nil;
+        }
+      }
+
+      if (length === undefined) {
+        if (index >= size || index < 0) {
           return nil;
         }
 
-        if (to < 0) {
-          to += size;
-
-          if (to < 0) {
-            return [];
-          }
-        }
-
-        if (!exclude) {
-          to += 1;
-        }
-
-        result = self.slice(from, to)
+        return self[index];
       }
       else {
-        index = #{Opal.coerce_to(index, Integer, :to_int)};
+        length = Opal.Opal.$coerce_to(length, Opal.Integer, 'to_int');
 
-        if (index < 0) {
-          index += size;
-
-          if (index < 0) {
-            return nil;
-          }
+        if (length < 0 || index > size || index < 0) {
+          return nil;
         }
 
-        if (length === undefined) {
-          if (index >= size || index < 0) {
-            return nil;
-          }
-
-          return self[index];
-        }
-        else {
-          length = #{Opal.coerce_to length, Integer, :to_int};
-
-          if (length < 0 || index > size || index < 0) {
-            return nil;
-          }
-
-          result = self.slice(index, index + length);
-        }
+        result = self.slice(index, index + length);
       }
+      return toArraySubclass(result, self.$class());
+    }
+  }
 
-      return toArraySubclass(result, #{self.class})
+  def [](index, length = undefined)
+    %x{
+      if (index.$$is_range) {
+        return $array_slice_range(self, index);
+      }
+      else {
+        return $array_slice_index_length(self, index, length);
+      }
     }
   end
 
