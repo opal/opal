@@ -3,6 +3,16 @@ RSpec::Core::RakeTask.new(:rspec) do |t|
   t.pattern = 'spec/lib/**/*_spec.rb'
 end
 
+module Testing
+  extend self
+
+  def get_random_seed(env)
+    random_seed = env['RANDOM_SEED'] ? env['RANDOM_SEED'] : rand(100_000)
+    puts "export RANDOM_SEED=#{random_seed} # to re-use the same randomization"
+    random_seed
+  end
+end
+
 module MSpecSuite
   extend self
 
@@ -87,9 +97,7 @@ module MSpecSuite
       enter_benchmarking_mode = "OpalBM.main.register(#{Integer(env['BM'])}, '#{bm_filepath}')"
     end
 
-    random_seed = env['RANDOM_SEED'] ? env['RANDOM_SEED'] : rand(100_000)
-
-    puts "Randomizing with RANDOM_SEED=#{random_seed}"
+    random_seed = Testing.get_random_seed(env)
 
     env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
 
@@ -178,8 +186,7 @@ module MinitestSuite
     requires = files.map{|f| "require '#{f}'"}
     mkdir_p File.dirname(filename)
 
-    random_seed = env['RANDOM_SEED'] ? env['RANDOM_SEED'] : rand(100_000)
-    puts "Randomizing with RANDOM_SEED=#{random_seed}"
+    random_seed = Testing.get_random_seed(env)
 
     File.write filename, <<-RUBY
 require 'opal/platform' # in node ENV is replaced
