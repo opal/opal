@@ -371,7 +371,7 @@ platforms.each { |platform| task(:"mspec_#{platform}"    => mspec_suites.map    
 platforms.each { |platform| task(:"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }) }
 
 task :mspec    => [:mspec_phantomjs, :mspec_nodejs]
-task :minitest => [:minitest_phantomjs, :minitest_nodejs, :minitest_nodejs]
+task :minitest => [:minitest_phantomjs, :minitest_nodejs, :minitest_node_nodejs]
 task :test_all => [:rspec, :mspec, :minitest]
 
 # deprecated, can be removed after 0.11

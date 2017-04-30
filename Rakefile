@@ -11,4 +11,4 @@ import 'tasks/building.rake'
 import 'tasks/linting.rake'
 import 'tasks/benchmarking.rake'
 
-task :default => [:rspec, :mspec_nodejs, :test_cruby]
+task :default => [:rspec, :mspec, :minitest]
