@@ -1222,13 +1222,17 @@ class String < `String`
   end
 
   def to_proc
-    # Give name to self in case this proc is passed to instance_eval
-    sym = self
+    sym = `self.valueOf()`
 
     proc do |*args, &block|
-      raise ArgumentError, "no receiver given" if args.empty?
-      obj = args.shift
-      obj.__send__(sym, *args, &block)
+      %x{
+        if (args.length === 0) {
+          #{raise ArgumentError, "no receiver given"}
+        }
+        var obj = args.shift();
+        if (obj == null) obj = nil;
+        return Opal.send(obj, sym, args, block);
+      }
     end
   end
 
