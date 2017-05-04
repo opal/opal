@@ -61,7 +61,7 @@ module Opal
         end
       end
 
-      COMPLEX_CHILDREN = [:while, :while_post, :until, :until_post, :until, :js_return]
+      COMPLEX_CHILDREN = [:while, :while_post, :until, :until_post, :js_return]
 
       def simple_children?
         children.none? do |child|
@@ -70,9 +70,11 @@ module Opal
       end
 
       def compile_inline_children(children, level)
-        children.each_with_index do |child, idx|
+        children.map do |child|
+          process(child, level)
+        end.reject(&:empty?).each_with_index do |child, idx|
           push ', ' unless idx == 0
-          push process(child, level)
+          push child
         end
       end
     end

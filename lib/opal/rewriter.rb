@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'opal/rewriters/opal_engine_check'
+require 'opal/rewriters/for_rewriter'
 require 'opal/rewriters/explicit_writer_return'
 require 'opal/rewriters/js_reserved_words'
 require 'opal/rewriters/block_to_iter'
@@ -35,6 +36,7 @@ module Opal
     end
 
     use Rewriters::OpalEngineCheck
+    use Rewriters::ForRewriter
     use Rewriters::BlockToIter
     use Rewriters::DotJsSyntax
     use Rewriters::JsReservedWords

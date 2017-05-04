@@ -22,3 +22,22 @@ module RewritersHelper
     parser.parse(buffer)
   end
 end
+
+RSpec.shared_examples 'it rewrites source-to-source' do |from_source, to_source|
+  it "rewrites source #{from_source} to source #{to_source}" do
+    initial = ast_of(from_source)
+    rewritten = self.rewritten(initial)
+    expected = ast_of(to_source)
+
+    expect(rewritten).to eq(expected)
+  end
+end
+
+RSpec.shared_examples 'it rewrites source-to-AST' do |from_source, to_ast|
+  it "rewrites source #{from_source} to AST #{to_ast}" do
+    initial = ast_of(from_source)
+    rewritten = self.rewritten(initial)
+
+    expect(rewritten).to eq(to_ast)
+  end
+end
