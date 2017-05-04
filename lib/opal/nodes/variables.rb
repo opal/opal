@@ -46,6 +46,17 @@ module Opal
       end
     end
 
+    class LocalDeclareNode < Base
+      handle :lvdeclare
+
+      children :var_name
+
+      def compile
+        add_local(var_name.to_s)
+        nil
+      end
+    end
+
     class InstanceVariableNode < Base
       handle :ivar
 
