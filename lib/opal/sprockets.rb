@@ -9,7 +9,7 @@ module Opal
     #
     # @example
     #
-    #   Opal::Sprockets.load_asset(Rails.application.assets, 'application')
+    #   Opal::Sprockets.load_asset('application')
     #
     # @example Will output the following JavaScript:
     #
@@ -19,38 +19,24 @@ module Opal
     #     Opal.load("application");
     #   }
     #
-    # @param name      [String] The logical name of the main asset to be loaded (without extension)
-    # @param sprockets [Sprockets::Environment]
+    # @param name [String] The logical name of the main asset to be loaded (without extension)
     #
     # @return [String] JavaScript code
-    def self.load_asset(name, sprockets)
-      asset = sprockets[name.sub(/(\.(js|rb|opal))*#{REGEXP_END}/, '.js')]
-      return '' if asset.nil?
-
-      opal_extnames = sprockets.engines.map do |ext, engine|
-        ext if engine <= ::Opal::Processor
-      end.compact
-
-      module_name       = -> asset { asset.logical_path.sub(/\.js#{REGEXP_END}/, '') }
-      path_extnames     = -> path  { File.basename(path).scan(/\.[^.]+/) }
-      mark_loaded       = -> paths { "Opal.loaded([#{paths.map(&:inspect).join(',')}]);" }
-      processed_by_opal = -> asset { (path_extnames[asset.pathname] & opal_extnames).any? }
-      stubbed_files     = ::Opal::Config.stubbed_files
-
-      non_opal_assets = ([asset]+asset.dependencies)
-        .select { |asset| not(processed_by_opal[asset]) }
-        .map { |asset| module_name[asset] }
-
-      loaded = ['opal'] + non_opal_assets + stubbed_files.to_a
-
-      if processed_by_opal[asset]
-        load_asset_code = "Opal.load(#{module_name[asset].inspect});"
+    def self.load_asset(name, _sprockets = :deprecated)
+      if _sprockets != :deprecated && !@load_asset_warning_displayed
+        @load_asset_warning_displayed = true
+        warn "Passing a sprockets environment to Opal::Sprockets.load_asset no more needed.\n  #{caller(1, 3).join("\n  ")}"
       end
 
+      name = name.sub(/(\.(js|rb|opal))*\z/, '')
+      stubbed_files     = ::Opal::Config.stubbed_files
+
+      loaded = ['opal', 'corelib/runtime'] + stubbed_files.to_a
 
       "if (typeof(Opal) !== 'undefined') { "\
-        "#{mark_loaded[loaded]} "\
-        "#{load_asset_code} "\
+        "Opal.loaded(#{loaded.to_json}); "\
+        "if (typeof(OpalLoaded) === 'undefined') Opal.loaded(OpalLoaded); "\
+        "if (Opal.modules[#{name.to_json}]) Opal.load(#{name.to_json}); "\
       "}"
     end
 
@@ -83,7 +69,7 @@ module Opal
         scripts << %{<script src="#{prefix}/#{name}.js"></script>}
       end
 
-      scripts << %{<script>#{::Opal::Sprockets.load_asset(name, sprockets)}</script>}
+      scripts << %{<script>#{::Opal::Sprockets.load_asset(name)}</script>}
 
       scripts.join "\n"
     end

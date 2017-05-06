@@ -137,10 +137,37 @@ module Opal
   end
 end
 
-if Sprockets.respond_to? :register_transformer
-  Sprockets.register_engine '.rb',  Opal::Processor, mime_type: 'application/javascript', silence_deprecation: true
-  Sprockets.register_engine '.opal',  Opal::Processor, mime_type: 'application/javascript', silence_deprecation: true
-else
-  Sprockets.register_engine '.rb',  Opal::Processor
-  Sprockets.register_engine '.opal',  Opal::Processor
+module Opal::Sprockets::Processor
+  module PlainJavaScriptLoader
+    def self.call(input)
+      sprockets = input[:environment]
+      asset = OpenStruct.new(input)
+
+      opal_extnames = sprockets.engines.map do |ext, engine|
+        ext if engine <= ::Opal::Processor
+      end.compact
+
+      path_extnames     = -> path  { File.basename(path).scan(/\.[^.]+/) }
+      processed_by_opal = -> asset { (path_extnames[asset.filename] & opal_extnames).any? }
+
+      unless processed_by_opal[asset]
+        [
+          input[:data],
+          %{if (typeof(OpalLoaded) === 'undefined') OpalLoaded = []; OpalLoaded.push(#{input[:name].to_json});}
+        ].join(";\n")
+      end
+    end
+  end
 end
+
+
+if Sprockets.respond_to? :register_transformer
+  extra_args = [{mime_type: 'application/javascript', silence_deprecation: true}]
+else
+  extra_args = []
+end
+
+Sprockets.register_engine '.rb',  Opal::Processor, *extra_args
+Sprockets.register_engine '.opal',  Opal::Processor, *extra_args
+Sprockets.register_postprocessor 'application/javascript', Opal::Sprockets::Processor::PlainJavaScriptLoader
+
