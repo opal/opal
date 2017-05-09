@@ -47,9 +47,8 @@ module Opal
           return optimize
         end
 
-        with_temp do |tmp|
-          [fragment("((#{tmp} = "), expr(sexp), fragment(") !== nil && #{tmp} != null && (!#{tmp}.$$is_boolean || #{tmp} == true))")]
-        end
+        helper :truthy
+        [fragment("$truthy("),expr(sexp),fragment(")")]
       end
 
       def js_falsy(sexp)
@@ -61,9 +60,8 @@ module Opal
           end
         end
 
-        with_temp do |tmp|
-          [fragment("((#{tmp} = "), expr(sexp), fragment(") === nil || #{tmp} == null || (#{tmp}.$$is_boolean && #{tmp} == false))")]
-        end
+        helper :falsy
+        [fragment("$falsy("),expr(sexp),fragment(")")]
       end
 
       def js_truthy_optimize(sexp)
@@ -83,8 +81,6 @@ module Opal
             mid == :"=="
             expr(sexp)
           end
-        elsif [:lvar, :self].include? sexp.type
-          [expr(sexp.dup), fragment(" !== false && "), expr(sexp.dup), fragment(" !== nil && "), expr(sexp.dup), fragment(" != null")]
         end
       end
 
