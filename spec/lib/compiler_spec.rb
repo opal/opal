@@ -175,7 +175,7 @@ describe Opal::Compiler do
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if "test" > "bar"').to include('if ((($a = $rb_gt("test", "bar")) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if "test" > "bar"').to include('if ($truthy($rb_gt("test", "bar")))')
         end
 
         it 'specifically == excludes nil check for strings' do
@@ -183,7 +183,7 @@ describe Opal::Compiler do
         end
 
         it 'adds nil check for lvars' do
-          expect_compiled("bar = 4\nfoo = 42 if bar > 5").to include('if ((($a = $rb_gt(bar, 5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled("bar = 4\nfoo = 42 if bar > 5").to include('if ($truthy($rb_gt(bar, 5)))')
         end
 
         it 'specifically == excludes nil check for lvars' do
@@ -191,7 +191,7 @@ describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if Test > 4").to include("if ((($a = $rb_gt(Opal.const_get_relative($nesting, 'Test'), 4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true))) ")
+          expect_compiled("foo = 42 if Test > 4").to include("if ($truthy($rb_gt(Opal.const_get_relative($nesting, 'Test'), 4))) ")
         end
 
         it 'specifically == excludes nil check for constants' do
@@ -201,25 +201,25 @@ describe Opal::Compiler do
 
       context 'without operators' do
         it 'adds nil check for primitives' do
-          expect_compiled('foo = 42 if 2').to include('if ((($a = 2) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if 2.5').to include('if ((($a = 2.5) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if true').to include('if ((($a = true) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if 2').to include('if ($truthy(2))')
+          expect_compiled('foo = 42 if 2.5').to include('if ($truthy(2.5))')
+          expect_compiled('foo = 42 if true').to include('if ($truthy(true))')
         end
 
         it 'adds nil check for boolean method calls' do
-          expect_compiled('foo = 42 if true.something').to include('if ((($a = true.$something()) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if true.something').to include('if ($truthy(true.$something()))')
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if "test"').to include('if ((($a = "test") !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if "test"').to include('if ($truthy("test"))')
         end
 
         it 'adds nil check for lvars' do
-          expect_compiled("bar = 4\nfoo = 42 if bar").to include('if (bar !== false && bar !== nil && bar != null)')
+          expect_compiled("bar = 4\nfoo = 42 if bar").to include('if ($truthy(bar))')
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if Test").to include("if ((($a = Opal.const_get_relative($nesting, 'Test')) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if Test").to include("if ($truthy(Opal.const_get_relative($nesting, 'Test')))")
         end
       end
     end
@@ -227,52 +227,52 @@ describe Opal::Compiler do
     context 'parentheses' do
       context 'with operators' do
         it 'adds nil check for primitives' do
-          expect_compiled('foo = 42 if (2 > 3)').to include('if ((($a = $rb_gt(2, 3)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if (2.5 > 3.5)').to include('if ((($a = $rb_gt(2.5, 3.5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if (true > false)').to include('if ((($a = $rb_gt(true, false)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (2 > 3)').to include('if ($truthy($rb_gt(2, 3))')
+          expect_compiled('foo = 42 if (2.5 > 3.5)').to include('if ($truthy($rb_gt(2.5, 3.5))')
+          expect_compiled('foo = 42 if (true > false)').to include('if ($truthy($rb_gt(true, false))')
 
-          expect_compiled('foo = 42 if (2 == 3)').to include("if ((($a = (2)['$=='](3)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
-          expect_compiled('foo = 42 if (2.5 == 3.5)').to include("if ((($a = (2.5)['$=='](3.5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
-          expect_compiled('foo = 42 if (true == false)').to include("if ((($a = true['$=='](false)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled('foo = 42 if (2 == 3)').to include("if ($truthy((2)['$=='](3))")
+          expect_compiled('foo = 42 if (2.5 == 3.5)').to include("if ($truthy((2.5)['$=='](3.5))")
+          expect_compiled('foo = 42 if (true == false)').to include("if ($truthy(true['$=='](false)))")
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if ("test" > "bar")').to include('if ((($a = $rb_gt("test", "bar")) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ((($a = \"test\"['$=='](\"bar\")) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled('foo = 42 if ("test" > "bar")').to include('if ($truthy($rb_gt("test", "bar"))')
+          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ($truthy(\"test\"['$=='](\"bar\"))")
         end
 
         it 'adds nil check for lvars' do
-          expect_compiled("bar = 4\nfoo = 42 if (bar > 5)").to include('if ((($a = $rb_gt(bar, 5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled("bar = 4\nfoo = 42 if (bar == 5)").to include("if ((($a = bar['$=='](5)) !== nil && $a != null && (!$a.$$is_boolean || $a == true))) ")
+          expect_compiled("bar = 4\nfoo = 42 if (bar > 5)").to include('if ($truthy($rb_gt(bar, 5))')
+          expect_compiled("bar = 4\nfoo = 42 if (bar == 5)").to include("if ($truthy(bar['$=='](5))) ")
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test > 4)").to include("if ((($a = $rb_gt(Opal.const_get_relative($nesting, 'Test'), 4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
-          expect_compiled("foo = 42 if (Test == 4)").to include("if ((($a = Opal.const_get_relative($nesting, 'Test')['$=='](4)) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if (Test > 4)").to include("if ($truthy($rb_gt(Opal.const_get_relative($nesting, 'Test'), 4))")
+          expect_compiled("foo = 42 if (Test == 4)").to include("if ($truthy(Opal.const_get_relative($nesting, 'Test')['$=='](4))")
         end
       end
 
       context 'without operators' do
         it 'adds nil check for primitives' do
-          expect_compiled('foo = 42 if (2)').to include('if ((($a = 2) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if (2.5)').to include('if ((($a = 2.5) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
-          expect_compiled('foo = 42 if (true)').to include('if ((($a = true) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (2)').to include('if ($truthy(2)')
+          expect_compiled('foo = 42 if (2.5)').to include('if ($truthy(2.5)')
+          expect_compiled('foo = 42 if (true)').to include('if ($truthy(true)')
         end
 
         it 'adds nil check for boolean method calls' do
-          expect_compiled('foo = 42 if (true.something)').to include('if ((($a = true.$something()) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if (true.something)').to include('if ($truthy(true.$something())')
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if ("test")').to include('if ((($a = "test") !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled('foo = 42 if ("test")').to include('if ($truthy("test")')
         end
 
         it 'adds nil check for lvars' do
-          expect_compiled("bar = 4\nfoo = 42 if (bar)").to include('if ((($a = bar) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))')
+          expect_compiled("bar = 4\nfoo = 42 if (bar)").to include('if ($truthy(bar)')
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test)").to include("if ((($a = Opal.const_get_relative($nesting, 'Test')) !== nil && $a != null && (!$a.$$is_boolean || $a == true)))")
+          expect_compiled("foo = 42 if (Test)").to include("if ($truthy(Opal.const_get_relative($nesting, 'Test'))")
         end
       end
     end

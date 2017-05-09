@@ -130,25 +130,21 @@ module Opal
       children :lhs, :rhs
 
       def compile_ternary
+        helper :truthy
+
         with_temp do |tmp|
-          push "(((#{tmp} = "
-          push expr(lhs)
-          push ") !== false && #{tmp} !== nil && #{tmp} != null) ? #{tmp} : "
-          push expr(rhs)
-          push ")"
+          push "($truthy(#{tmp} = ", expr(lhs), ") ? #{tmp} : ", expr(rhs), ")"
         end
       end
 
       def compile_if
+        helper :truthy
+
         with_temp do |tmp|
-          push "if (#{tmp} = ", expr(lhs), ", #{tmp} !== false && #{tmp} !== nil && #{tmp} != null) {"
-          indent do
-            line tmp
-          end
+          push "if ($truthy(#{tmp} = ", expr(lhs), ")) {"
+          indent { line tmp }
           line "} else {"
-            indent do
-              line expr(rhs)
-            end
+          indent { line expr(rhs) }
           line "}"
         end
       end
@@ -169,31 +165,22 @@ module Opal
             push expr(rhs)
             push " : ", expr(lhs), ")"
           else
-            push "(#{tmp} = "
-            push expr(lhs)
-            push ", #{tmp} !== false && #{tmp} !== nil && #{tmp} != null ?"
-            push expr(rhs)
-            push " : #{tmp})"
+            helper :truthy
+
+            push "($truthy(#{tmp} = ", expr(lhs), ") ? ", expr(rhs), " : #{tmp})"
           end
         end
       end
 
       def compile_if
-        with_temp do |tmp|
-          if truthy_opt = js_truthy_optimize(lhs)
-            push "if (#{tmp} = ", truthy_opt, ") {"
-          else
-            push "if (#{tmp} = ", expr(lhs), ", #{tmp} !== false && #{tmp} !== nil && #{tmp} != null) {"
-          end
-          indent do
-            line expr(rhs)
-          end
-          line "} else {"
-          indent do
-            line expr(lhs)
-          end
-          line "}"
-        end
+        helper :truthy
+        condition = js_truthy_optimize(lhs) || expr(lhs)
+
+        line "if ($truthy(", condition, ")) {"
+        indent { line expr(rhs) }
+        line "} else {"
+        indent { line expr(lhs) }
+        line "}"
       end
     end
 
