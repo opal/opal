@@ -70,8 +70,8 @@ STDIN  = $stdin  = IO.new
 STDOUT = $stdout = IO.new
 
 `var console = Opal.global.console`
-STDOUT.write_proc = `typeof(process) === 'object' ? function(s){process.stdout.write(s)} : function(s){console.log(s)}`
-STDERR.write_proc = `typeof(process) === 'object' ? function(s){process.stderr.write(s)} : function(s){console.warn(s)}`
+STDOUT.write_proc = `typeof(process) === 'object' && typeof(process.stdout) === 'object' ? function(s){process.stdout.write(s)} : function(s){console.log(s)}`
+STDERR.write_proc = `typeof(process) === 'object' && typeof(process.stderr) === 'object' ? function(s){process.stderr.write(s)} : function(s){console.warn(s)}`
 
 STDOUT.extend(IO::Writable)
 STDERR.extend(IO::Writable)
