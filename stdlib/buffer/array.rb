@@ -1,6 +1,8 @@
-class Buffer < Native
+class Buffer
 
-class Array < Native
+class Array
+  include Native
+
   def self.for(bits, type)
     $$["#{Buffer.name_for bits, type}Array"]
   end
