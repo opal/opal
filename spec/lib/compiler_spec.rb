@@ -96,9 +96,32 @@ describe Opal::Compiler do
     end
   end
 
+  describe "extracting __END__ content" do
+    shared_examples "it extracts __END__" do |source, expected_eof_content|
+      it "extracts #{expected_eof_content.inspect} from #{source.inspect}" do
+        compiler = Opal::Compiler.new(source)
+        compiler.parse
+        expect(compiler.eof_content).to eq(expected_eof_content)
+      end
+    end
+
+    include_examples "it extracts __END__", "code", nil
+    include_examples "it extracts __END__", "code\n__END_", nil
+    include_examples "it extracts __END__", "code\n__END__", ""
+    include_examples "it extracts __END__", "code\n\n\n__END__", ""
+    include_examples "it extracts __END__", "code\n__END__data", nil
+    include_examples "it extracts __END__", "code\n__END__\ndata", "data"
+    include_examples "it extracts __END__", "code\n__END__\nline1\nline2", "line1\nline2"
+    include_examples "it extracts __END__", "code\n__END__\nline1\nline2\n", "line1\nline2\n"
+    include_examples "it extracts __END__", "code\n__END__\nline1\nline2\n", "line1\nline2\n"
+    include_examples "it extracts __END__", "code\n __END__\ndata", nil
+    include_examples "it extracts __END__", "\"multiline string\n__END__\nwith data separator\"\n__END__\ndata", "data"
+  end
+
   describe "DATA special variable" do
     it "is not a special case unless __END__ part present in source" do
       expect_compiled("DATA").to include("DATA")
+      expect_compiled("DATA\nMALFORMED__END__").to include("DATA")
       expect_compiled("DATA\n__END__").to_not include("DATA")
     end
 
