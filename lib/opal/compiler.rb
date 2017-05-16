@@ -3,6 +3,7 @@ require 'set'
 require 'opal/parser'
 require 'opal/fragment'
 require 'opal/nodes'
+require 'opal/eof_content'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -169,24 +170,20 @@ module Opal
     end
 
     def parse
-      buffer = ::Parser::Source::Buffer.new(file)
-      buffer.source = @source
+      @buffer = ::Parser::Source::Buffer.new(file, 1)
+      @buffer.source = @source
 
       @parser = Opal::Parser.default_parser
 
       begin
-        if parse_comments?
-          sexp, comments = @parser.parse_with_comments(buffer)
-          @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
-        else
-          sexp = @parser.parse(buffer)
-        end
+        sexp, comments, tokens = @parser.tokenize(@buffer)
       rescue ::Parser::SyntaxError => error
         raise ::SyntaxError, error.message, error.backtrace
       end
 
       @sexp = s(:top, sexp || s(:nil))
-      @eof_content = extract_eof_content
+      @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
+      @eof_content = EofContent.new(tokens, @source).eof
     end
 
     # Returns a source map that can be used in the browser to map back to
@@ -483,14 +480,6 @@ module Opal
       else
         fragment("false", scope, sexp)
       end
-    end
-
-    # Extracts all the content after __END__ directive
-    #
-    # @return [String, nil]
-    def extract_eof_content
-      matches = @source.match(/\n__END__\n?([\w\s]*)/)
-      matches && matches[1]
     end
   end
 end
