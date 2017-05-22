@@ -456,11 +456,8 @@ class Array < `Array`
   end
 
   def any?
-    if empty?
-      false
-    else
-      super
-    end
+    `if (self.length === 0) return false;`
+    super
   end
 
   def assoc(object)
