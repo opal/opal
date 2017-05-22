@@ -12,7 +12,7 @@ module Opal
     # @param str [String] string to minify
     # @return [String]
     def uglify(str)
-      uglifyjs = DigestSourceCommand.new(:uglifyjs, nil, ' (install with: "npm install -g uglify-js")')
+      uglifyjs = DigestSourceCommand.new(:uglifyjs, '-c', ' (install with: "npm install -g uglify-js")')
       uglifyjs.digest(str)
     end
 
