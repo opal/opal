@@ -242,6 +242,44 @@ module Kernel
     end
     return _Array(object)
   end
+  
+  # allows to pass a proc that runs in context of `this`
+  #
+  # @example
+  #   options = {
+  #     persist: false,
+  #     render: function { |item, escape|
+  #       '<div>' + escape.call(item.name) + '</div>'
+  #     }
+  #   }
+  #
+  def function *args, &block
+    args.any? && raise(ArgumentError, '`function` does not accept arguments')
+    block || raise(ArgumentError, 'block required')
+    proc do |*a| # no way to expect a block here as this is always called from JavaScript
+      a.map! {|x| Native(`x`)}
+      instance = Native(`this`)
+      %x{
+        // if window is current scope, run the block in the scope it was defined
+        if(this.toString() === '[object Window]') {
+          return block.apply(self, a);
+        }
+        // otherwise run the block in the current scope
+        return (function() {
+          var s = block.$$s;
+          block.$$s = null;
+          try {
+            var r = block.apply(instance, a);
+            block.$$s = s;
+            return r;
+          } catch (e) {
+            block.$$s = s;
+            throw e;
+          }
+        })();
+      }
+    end
+  end
 end
 
 class Native::Object < BasicObject
