@@ -7,6 +7,10 @@ module Singleton
     raise TypeError, "can't dup instance of singleton #{self.class}"
   end
 
+  def _dump
+    ""
+  end
+
   module SingletonClassMethods
 
     def clone
