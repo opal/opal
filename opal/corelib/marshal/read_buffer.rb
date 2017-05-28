@@ -317,10 +317,10 @@ module Marshal
         load_object(klass, data)
       else
         object = klass.allocate
+        @object_cache << object
         set_ivars(object)
         object
       end
-      @object_cache << result
       result
     end
 
