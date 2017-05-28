@@ -50,4 +50,22 @@ describe 'Marshal.dump' do
   it 'dumps object#marshal_dump when object responds to #marshal_dump' do
     Marshal.dump(UserMarshal.new).should == "\u0004\bU:\u0010UserMarshal\"\tdata"
   end
+
+  it 'saves a link to an object before processing its instance variables' do
+    top = Object.new
+    ref = Object.new
+    a = Object.new
+    b = Object.new
+    c = Object.new
+
+    top.instance_variable_set(:@a, a)
+    top.instance_variable_set(:@b, b)
+    top.instance_variable_set(:@a, c)
+    top.instance_variable_set(:@ref, ref)
+
+    expected = "\u0004\b[\ao:\vObject\b:\a@ao:\vObject\u0000:\a@bo:\vObject\u0000:\t@refo:\vObject\u0000@\t"
+    Marshal.dump([top, ref]).should == expected
+    loaded = Marshal.load(expected)
+    loaded[0].instance_variable_get(:@ref).object_id.should == loaded[1].object_id
+  end
 end
