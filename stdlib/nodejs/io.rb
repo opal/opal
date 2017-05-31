@@ -27,6 +27,14 @@ class IO
     @eof = false
     @lineno = 0
   end
+  
+  def self.write(path, data)
+    File.write(path, data)
+  end
+
+  def self.read(path)
+    File.read(path)
+  end
 
   def read
     if @eof
