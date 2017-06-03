@@ -77,7 +77,7 @@ module Marshal
       when '{'
         read_hash
       when '}'
-        raise NotImplementedError, 'Hashdef type cannot be demarshaled yet' # read_hashdef
+        read_hashdef
       when 'S'
         read_struct
       when 'M'
@@ -255,6 +255,15 @@ module Marshal
         }
         return result;
       }
+    end
+
+    def read_hashdef(cache: true)
+      hash = read_hash
+      object_cache << hash
+      default_value = read
+      object_cache << default_value
+      hash.default = default_value
+      hash
     end
 
     # Returns a constant by passed const_name,
