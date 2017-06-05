@@ -12,8 +12,8 @@
 #   do_later = $$[:setTimeout] # Accessing the "setTimeout" property
 #   do_later.call(->{ puts :hello}, 500)
 #
-# `$$` and `$global` wrap `Opal.global`, which the Opal JS runtime
-# sets to the global `this` object.
+# `$$`, `$global`, `$PID` and `$PROCESS_ID` wrap `Opal.global`,
+# which the Opal JS runtime sets to the global `this` object.
 #
 module Native
   def self.is_a?(object, klass)
@@ -621,4 +621,4 @@ class Class
 end
 
 # Exposes the global value (would be `window` inside a browser)
-$$ = $global = Native(`Opal.global`)
+$$ = $global = $PID = $PROCESS_ID = Native(`Opal.global`)

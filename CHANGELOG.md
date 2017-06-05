@@ -26,6 +26,7 @@ Whitespace conventions:
 
 ### Added
 
+- Added aliases for `$$` from [`stdlib/English`](https://ruby-doc.org/stdlib/libdoc/English/rdoc/English.html)
 - Added support for complex (`0b1110i`) and rational (`0b1111r`) number literals. (#1487)
 - Added 2.3.0 methods:
     * `Array#bsearch_index`
