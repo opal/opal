@@ -57,7 +57,7 @@ class BaseOpalFormatter
   end
 
   def after(state = nil)
-    @current_state = nil
+    @current_state = state
     @examples += 1
   end
 
