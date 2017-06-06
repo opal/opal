@@ -1,3 +1,6 @@
+# https://github.com/ruby/ruby/blob/trunk/doc/marshal.rdoc
+# https://github.com/ruby/ruby/blob/trunk/marshal.c
+
 module Marshal
   class ReadBuffer
     %x{
@@ -15,7 +18,7 @@ module Marshal
       }
     }
 
-    attr_reader :version, :buffer, :index, :user_class, :extended, :object_cache, :symbols_cache
+    attr_reader :version, :buffer, :index, :object_cache, :symbols_cache
 
     def initialize(input)
       @buffer = `stringToBytes(#{input.to_s})`
@@ -28,7 +31,6 @@ module Marshal
       @version = "#{major}.#{minor}"
       @object_cache = []
       @symbols_cache = []
-      # @extended = []
       @ivars = []
     end
 
@@ -146,6 +148,11 @@ module Marshal
 
     # Reads and returns Float from an input stream
     #
+    # @example
+    #   123.456
+    # Is encoded as
+    #   'f', '123.456'
+    #
     def read_float
       s = read_string(cache: false)
       result = if s == "nan"
@@ -216,11 +223,23 @@ module Marshal
       }
     end
 
+    # Reads a symbol that was previously cache by its link
+    #
+    # @example
+    #   [:a, :a, :b, :b, :c, :c]
+    # Is encoded as
+    #   '[', 6, :a, @0, :b, @1, :c, @2
+    #
     def read_cached_symbol
       symbols_cache[read_fixnum]
     end
 
     # Reads and returns an array from an input stream
+    #
+    # @example
+    #   [100, 200, 300]
+    # is encoded as
+    #   '[', 3, 100, 200, 300
     #
     def read_array
       result = []
@@ -243,6 +262,11 @@ module Marshal
     #  + hash of instance variables
     #  + hash of struct attributes
     #
+    # @example
+    #   {100 => 200, 300 => 400}
+    # is encoded as
+    #   '{', 2, 100, 200, 300, 400
+    #
     def read_hash(cache: true)
       result = {}
 
@@ -264,6 +288,13 @@ module Marshal
       }
     end
 
+    # Reads and returns a hash with default value
+    #
+    # @example
+    #   Hash.new(:default).merge(100 => 200)
+    # is encoded as
+    #   '}', 1, 100, 200, :default
+    #
     def read_hashdef
       hash = read_hash
       default_value = read
@@ -272,6 +303,11 @@ module Marshal
     end
 
     # Reads and returns Regexp from an input stream
+    #
+    # @example
+    #   r = /regexp/mix
+    # is encoded as
+    #   '/', 'regexp', r.options.chr
     #
     def read_regexp
       string = read_string(cache: false)
@@ -283,6 +319,12 @@ module Marshal
     end
 
     # Reads and returns a Struct from an input stream
+    #
+    # @example
+    #   Point = Struct.new(:x, :y)
+    #   Point.new(100, 200)
+    # is encoded as
+    #   'S', :Point, {:x => 100, :y => 200}
     #
     def read_struct
       klass_name = read(cache: false)
@@ -296,6 +338,11 @@ module Marshal
 
     # Reads and returns a Class from an input stream
     #
+    # @example
+    #   String
+    # is encoded as
+    #   'c', 'String'
+    #
     def read_class
       klass_name = read_string(cache: false)
       result = safe_const_get(klass_name)
@@ -308,6 +355,11 @@ module Marshal
 
     # Reads and returns a Module from an input stream
     #
+    # @example
+    #   Kernel
+    # is encoded as
+    #   'm', 'Kernel'
+    #
     def read_module
       mod_name = read_string(cache: false)
       result = safe_const_get(mod_name)
@@ -319,6 +371,20 @@ module Marshal
     end
 
     # Reads and returns an abstract object from an input stream
+    #
+    # @example
+    #   obj = Object.new
+    #   obj.instance_variable_set(:@ivar, 100)
+    #   obj
+    # is encoded as
+    #   'o', :Object, {:@ivar => 100}
+    #
+    # The only exception is a Range class (and its subclasses)
+    # For some reason in MRI isntances of this class have instance variables
+    # - begin
+    # - end
+    # - excl
+    # without '@' perfix.
     #
     def read_object
       klass_name = read(cache: false)
@@ -341,10 +407,34 @@ module Marshal
       object
     end
 
+    # Reads an object that was cached previously by its link
+    #
+    # @example
+    #   obj1 = Object.new
+    #   obj2 = Object.new
+    #   obj3 = Object.new
+    #   [obj1, obj1, obj2, obj2, obj3, obj3]
+    # is encoded as
+    #   [obj1, @1, obj2, @2, obj3, @3]
+    #
+    # NOTE: array itself is cached as @0, that's why obj1 is cached a @1, obj2 is @2, etc.
+    #
     def read_cached_object
       object_cache[read_fixnum]
     end
 
+    # Reads an object that was dynamically extended before marshaling like
+    #
+    # @example
+    #   M1 = Module.new
+    #   M2 = Module.new
+    #   obj = Object.new
+    #   obj.extend(M1)
+    #   obj.extend(M2)
+    #   obj
+    # is encoded as
+    #   'e', :M2, :M1, obj
+    #
     def read_extended_object
       mod = safe_const_get(read)
       object = read
@@ -352,6 +442,16 @@ module Marshal
       object
     end
 
+    # Reads a primitive object with instance variables
+    # (classes that have their own marshalling rules, like Array/Hash/Regexp/etc)
+    #
+    # @example
+    #   arr = [100, 200, 300]
+    #   arr.instance_variable_set(:@ivar, :value)
+    #   arr
+    # is encoded as
+    #   'I', [100, 200, 300], {:@ivar => value}
+    #
     def read_primitive_with_ivars
       object = read
 
@@ -366,6 +466,12 @@ module Marshal
     end
 
     # Reads and User Class (instance of String/Regexp/Array/Hash subclass)
+    #
+    # @example
+    #   UserArray = Class.new(Array)
+    #   UserArray[100, 200, 300]
+    # is encoded as
+    #   'C', :UserArray, [100, 200, 300]
     #
     def read_user_class
       klass_name = read(cache: false)
@@ -383,6 +489,21 @@ module Marshal
       result
     end
 
+    # Reads a 'User Defined' object that has '_dump/self._load' methods
+    #
+    # @example
+    #   class UserDefined
+    #     def _dump(level)
+    #       '_dumped'
+    #     end
+    #   end
+    #
+    #   UserDefined.new
+    # is encoded as
+    #   'u', :UserDefined, '_dumped'
+    #
+    # To load it back UserDefined._load' must be used.
+    #
     def read_user_defined
       klass_name = read(cache: false)
       klass = safe_const_get(klass_name)
@@ -394,6 +515,25 @@ module Marshal
       result
     end
 
+    # Reads a 'User Marshal' object that has 'marshal_dump/marshal_load' methods
+    #
+    # @example
+    #   class UserMarshal < Struct.new(:a, :b)
+    #     def marshal_dump
+    #       [a, b]
+    #     end
+    #
+    #     def marshal_load(data)
+    #       self.a, self.b = data
+    #     end
+    #   end
+    #
+    #   UserMarshal.new(100, 200)
+    # is encoded as
+    #   'U', :UserMarshal, [100, 200]
+    #
+    # To load it back `UserMarshal.allocate` and `UserMarshal#marshal_load` must be called
+    #
     def read_user_marshal
       klass_name = read(cache: false)
       klass = safe_const_get(klass_name)
