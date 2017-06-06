@@ -11,9 +11,9 @@ class Range
     raise NameError, "'initialize' called twice" if @begin
     raise ArgumentError, "bad value for range" unless first <=> last
 
-    @begin   = first
-    @end     = last
-    @exclude = exclude
+    @begin = first
+    @end   = last
+    @excl  = exclude
   end
 
   def ==(other)
@@ -22,9 +22,9 @@ class Range
         return false;
       }
 
-      return self.exclude === other.exclude &&
-             self.begin   ==  other.begin &&
-             self.end     ==  other.end;
+      return self.excl  === other.excl &&
+             self.begin ==  other.begin &&
+             self.end   ==  other.end;
     }
   end
 
@@ -36,7 +36,7 @@ class Range
     beg_cmp = (@begin <=> value)
     return false unless beg_cmp && beg_cmp <= 0
     end_cmp = (value <=> @end)
-    if @exclude
+    if @excl
       end_cmp && end_cmp < 0
     else
       end_cmp && end_cmp <= 0
@@ -54,7 +54,7 @@ class Range
           #{raise TypeError, "can't iterate from Float"}
         }
 
-        for (i = #@begin, limit = #@end + #{@exclude ? 0 : 1}; i < limit; i++) {
+        for (i = #@begin, limit = #@end + #{@excl ? 0 : 1}; i < limit; i++) {
           block(i);
         }
 
@@ -62,7 +62,7 @@ class Range
       }
 
       if (#@begin.$$is_string && #@end.$$is_string) {
-        #{@begin.upto(@end, @exclude, &block)}
+        #{@begin.upto(@end, @excl, &block)}
         return self;
       }
     }
@@ -80,7 +80,7 @@ class Range
       current = current.succ
     end
 
-    yield current if !@exclude && current == last
+    yield current if !@excl && current == last
 
     self
   end
@@ -88,13 +88,13 @@ class Range
   def eql?(other)
     return false unless Range === other
 
-    @exclude === other.exclude_end? &&
+    @excl === other.exclude_end? &&
     @begin.eql?(other.begin) &&
     @end.eql?(other.end)
   end
 
   def exclude_end?
-    @exclude
+    @excl
   end
 
   def first(n = undefined)
@@ -115,10 +115,10 @@ class Range
       super
     elsif @begin > @end
       nil
-    elsif @exclude && @begin == @end
+    elsif @excl && @begin == @end
       nil
     else
-      `#@exclude ? #@end - 1 : #@end`
+      `#@excl ? #@end - 1 : #@end`
     end
   end
 
@@ -129,7 +129,7 @@ class Range
       super
     elsif @begin > @end
       nil
-    elsif @exclude && @begin == @end
+    elsif @excl && @begin == @end
       nil
     else
       @begin
@@ -139,7 +139,7 @@ class Range
   def size
     _begin = @begin
     _end   = @end
-    _end  -= 1 if @exclude
+    _end  -= 1 if @excl
 
     return nil unless Numeric === _begin && Numeric === _end
     return 0 if _end < _begin
@@ -185,7 +185,7 @@ class Range
             err = 0.5;
           }
 
-          if (self.exclude) {
+          if (self.excl) {
             size = floor((end - begin) / n - err);
             if (size * n + begin < end) {
               size++;
@@ -215,7 +215,7 @@ class Range
       i = 0
       loop do
         current = @begin + i * n
-        if @exclude
+        if @excl
           break if current >= @end
         else
           break if current > @end
@@ -247,20 +247,20 @@ class Range
   end
 
   def to_s
-    "#{@begin}#{ @exclude ? '...' : '..' }#{@end}"
+    "#{@begin}#{ @excl ? '...' : '..' }#{@end}"
   end
 
   def inspect
-    "#{@begin.inspect}#{ @exclude ? '...' : '..' }#{@end.inspect}"
+    "#{@begin.inspect}#{ @excl ? '...' : '..' }#{@end.inspect}"
   end
 
   def marshal_load(args)
     @begin = args[:begin]
     @end = args[:end]
-    @exclude = args[:excl]
+    @excl = args[:excl]
   end
 
   def hash
-    [@begin, @end, @exclude].hash
+    [@begin, @end, @excl].hash
   end
 end

@@ -275,7 +275,7 @@ class Array < `Array`
       var size = self.length,
           exclude, from, to, result;
 
-      exclude = index.exclude;
+      exclude = index.excl;
       from    = Opal.Opal.$coerce_to(index.begin, Opal.Integer, 'to_int');
       to      = Opal.Opal.$coerce_to(index.end, Opal.Integer, 'to_int');
 
@@ -367,7 +367,7 @@ class Array < `Array`
       end
 
       %x{
-        var exclude = index.exclude,
+        var exclude = index.excl,
             from    = #{Opal.coerce_to `index.begin`, Integer, :to_int},
             to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
 
@@ -1946,13 +1946,13 @@ class Array < `Array`
             range_end += self.length;
           } else if (range_end >= self.length) {
             range_end = self.length - 1;
-            if (range.exclude) {
+            if (range.excl) {
               range_end += 1;
             }
           }
 
           var range_length = range_end - range_start;
-          if (range.exclude) {
+          if (range.excl) {
             range_end -= 1;
           } else {
             range_length += 1;

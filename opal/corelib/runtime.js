@@ -2096,7 +2096,7 @@
     var range         = new Opal.Range.$$alloc();
         range.begin   = first;
         range.end     = last;
-        range.exclude = exc;
+        range.excl    = exc;
 
     return range;
   };
