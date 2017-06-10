@@ -81,7 +81,7 @@ class Random
           return min;
         }
 
-        if (max % 1 === 0 && min % 1 === 0 && !limit.exclude) {
+        if (max % 1 === 0 && min % 1 === 0 && !limit.excl) {
           length++;
         }
 

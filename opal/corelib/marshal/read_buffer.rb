@@ -1,3 +1,6 @@
+# https://github.com/ruby/ruby/blob/trunk/doc/marshal.rdoc
+# https://github.com/ruby/ruby/blob/trunk/marshal.c
+
 module Marshal
   class ReadBuffer
     %x{
@@ -15,7 +18,7 @@ module Marshal
       }
     }
 
-    attr_reader :version, :buffer, :index, :user_class, :extended, :object_cache, :symbols_cache
+    attr_reader :version, :buffer, :index, :object_cache, :symbols_cache
 
     def initialize(input)
       @buffer = `stringToBytes(#{input.to_s})`
@@ -28,7 +31,6 @@ module Marshal
       @version = "#{major}.#{minor}"
       @object_cache = []
       @symbols_cache = []
-      @extended = []
       @ivars = []
     end
 
@@ -36,7 +38,7 @@ module Marshal
       @buffer.length
     end
 
-    def read(cache: true, ivar_index: nil)
+    def read(cache: true)
       code = read_char
       # The first character indicates the type of the object
       result = case code
@@ -48,56 +50,48 @@ module Marshal
         false
       when 'i'
         read_fixnum
-      when 'e'
-        read_extended
-        object = read
-        apply_extends(object)
-        object
-      when 'C'
-        read_user_class
-        read
-      when 'o'
-        read_object
-      when 'd'
-        raise NotImplementedError, 'Data type cannot be demarshaled'
-      when 'u'
-        raise NotImplementedError, 'UserDef type cannot be demarshaled yet' # read_userdef
-      when 'U'
-        read_usrmarshal
       when 'f'
         read_float
       when 'l'
         read_bignum
       when '"'
-        read_string(cache: cache)
-      when '/'
-        read_regexp
+        read_string
+      when ':'
+        read_symbol
+      when ';'
+        read_cached_symbol
       when '['
         read_array
       when '{'
         read_hash
       when '}'
-        raise NotImplementedError, 'Hashdef type cannot be demarshaled yet' # read_hashdef
+        read_hashdef
+      when '/'
+        read_regexp
       when 'S'
         read_struct
-      when 'M'
-        raise NotImplementedError, 'ModuleOld type cannot be demarshaled yet' # read_module_old
       when 'c'
         read_class
       when 'm'
         read_module
-      when ':'
-        read_symbol
-      when ';'
-        symbols_cache[read_fixnum]
-      when 'I'
-        ivar_index = @ivars.length
-        @ivars << true
-        object = read(cache: cache, ivar_index: ivar_index)
-        set_ivars(object) if @ivars.pop
-        object
+      when 'o'
+        read_object
       when '@'
-        object_cache[read_fixnum]
+        read_cached_object
+      when 'e'
+        read_extended_object
+      when 'I'
+        read_primitive_with_ivars
+      when 'C'
+        read_user_class
+      when 'u'
+        read_user_defined
+      when 'U'
+        read_user_marshal
+      when 'M'
+        raise NotImplementedError, 'ModuleOld type cannot be demarshaled yet' # read_module_old
+      when 'd'
+        raise NotImplementedError, 'Data type cannot be demarshaled'
       else
         raise ArgumentError, "dump format error"
       end
@@ -115,25 +109,6 @@ module Marshal
 
     def read_char
       `String.fromCharCode(#{read_byte})`
-    end
-
-    def set_ivars(obj)
-      data = read_hash(cache: false)
-
-      data.each do |ivar, value|
-        case ivar
-        when :E then # encodings are not supported
-        when :encoding # encodings are not supported
-        else
-          if ivar.start_with?('@')
-            obj.instance_variable_set(ivar, value)
-          end
-        end
-      end
-
-      if obj.respond_to?(:marshal_load)
-        obj.marshal_load(data)
-      end
     end
 
     # Reads and returns a fixnum from an input stream
@@ -171,12 +146,48 @@ module Marshal
       }
     end
 
+    # Reads and returns Float from an input stream
+    #
+    # @example
+    #   123.456
+    # Is encoded as
+    #   'f', '123.456'
+    #
+    def read_float
+      s = read_string(cache: false)
+      result = if s == "nan"
+        0.0 / 0
+      elsif s == "inf"
+        1.0 / 0
+      elsif s == "-inf"
+        -1.0 / 0
+      else
+        s.to_f
+      end
+      @object_cache << result
+      result
+    end
+
+    # Reads and returns Bignum from an input stream
+    #
+    def read_bignum
+      sign = read_char == '-' ? -1 : 1
+      size = read_fixnum * 2
+      result = 0
+      (0...size).each do |exp|
+        result += (read_char.ord) * 2 ** (exp * 8)
+      end
+      result = result.to_i * sign
+      @object_cache << result
+      result
+    end
+
     # Reads and returns a string from an input stream
     # Sometimes string shouldn't be cached using
     # an internal object cache, for a:
     #  + class/module name
-    #  + float
-    #  + regexp
+    #  + string representation of float
+    #  + string representation of regexp
     #
     def read_string(cache: true)
       length = read_fixnum
@@ -212,7 +223,23 @@ module Marshal
       }
     end
 
+    # Reads a symbol that was previously cache by its link
+    #
+    # @example
+    #   [:a, :a, :b, :b, :c, :c]
+    # Is encoded as
+    #   '[', 6, :a, @0, :b, @1, :c, @2
+    #
+    def read_cached_symbol
+      symbols_cache[read_fixnum]
+    end
+
     # Reads and returns an array from an input stream
+    #
+    # @example
+    #   [100, 200, 300]
+    # is encoded as
+    #   '[', 3, 100, 200, 300
     #
     def read_array
       result = []
@@ -220,7 +247,6 @@ module Marshal
       length = read_fixnum
       %x{
         if (length > 0) {
-
           while (result.length < length) {
             result.push(#{read});
           }
@@ -235,6 +261,11 @@ module Marshal
     # an internal object cache, for a:
     #  + hash of instance variables
     #  + hash of struct attributes
+    #
+    # @example
+    #   {100 => 200, 300 => 400}
+    # is encoded as
+    #   '{', 2, 100, 200, 300, 400
     #
     def read_hash(cache: true)
       result = {}
@@ -257,33 +288,60 @@ module Marshal
       }
     end
 
-    # Returns a constant by passed const_name,
-    #  re-raises Marshal-specific error when it's missing
+    # Reads and returns a hash with default value
     #
-    def safe_const_get(const_name)
-      begin
-        Object.const_get(const_name)
-      rescue NameError
-        raise ArgumentError, "undefined class/module #{const_name}"
-      end
+    # @example
+    #   Hash.new(:default).merge(100 => 200)
+    # is encoded as
+    #   '}', 1, 100, 200, :default
+    #
+    def read_hashdef
+      hash = read_hash
+      default_value = read
+      hash.default = default_value
+      hash
     end
 
-    # Reads and saves a user class from an input stream
-    #  Used for cases like String/Array subclasses
+    # Reads and returns Regexp from an input stream
     #
-    def read_user_class
-      @user_class = read(cache: false)
+    # @example
+    #   r = /regexp/mix
+    # is encoded as
+    #   '/', 'regexp', r.options.chr
+    #
+    def read_regexp
+      string = read_string(cache: false)
+      options = read_byte
+
+      result = Regexp.new(string, options)
+      @object_cache << result
+      result
     end
 
-    # Constantizes and resets saved user class
+    # Reads and returns a Struct from an input stream
     #
-    def get_user_class
-      klass = safe_const_get(@user_class)
-      @user_class = nil
-      klass
+    # @example
+    #   Point = Struct.new(:x, :y)
+    #   Point.new(100, 200)
+    # is encoded as
+    #   'S', :Point, {:x => 100, :y => 200}
+    #
+    def read_struct
+      klass_name = read(cache: false)
+      klass = safe_const_get(klass_name)
+      attributes = read_hash(cache: false)
+      args = attributes.values_at(*klass.members)
+      result = klass.new(*args)
+      @object_cache << result
+      result
     end
 
     # Reads and returns a Class from an input stream
+    #
+    # @example
+    #   String
+    # is encoded as
+    #   'c', 'String'
     #
     def read_class
       klass_name = read_string(cache: false)
@@ -297,6 +355,11 @@ module Marshal
 
     # Reads and returns a Module from an input stream
     #
+    # @example
+    #   Kernel
+    # is encoded as
+    #   'm', 'Kernel'
+    #
     def read_module
       mod_name = read_string(cache: false)
       result = safe_const_get(mod_name)
@@ -309,119 +372,189 @@ module Marshal
 
     # Reads and returns an abstract object from an input stream
     #
+    # @example
+    #   obj = Object.new
+    #   obj.instance_variable_set(:@ivar, 100)
+    #   obj
+    # is encoded as
+    #   'o', :Object, {:@ivar => 100}
+    #
+    # The only exception is a Range class (and its subclasses)
+    # For some reason in MRI isntances of this class have instance variables
+    # - begin
+    # - end
+    # - excl
+    # without '@' perfix.
+    #
     def read_object
       klass_name = read(cache: false)
       klass = safe_const_get(klass_name)
-      result = if @ivars.last
-        data = read_hash(cache: false)
-        load_object(klass, data)
-      else
-        object = klass.allocate
-        @object_cache << object
-        set_ivars(object)
-        object
+
+      object = klass.allocate
+      @object_cache << object
+
+      ivars = read_hash(cache: false)
+      ivars.each do |name, value|
+        if name[0] == '@'
+          object.instance_variable_set(name, value)
+        else
+          # MRI allows an object to have ivars that do not start from '@'
+          # https://github.com/ruby/ruby/blob/ab3a40c1031ff3a0535f6bcf26de40de37dbb1db/range.c#L1225
+          `object[name] = value`
+        end
       end
-      result
+
+      object
     end
 
-    # Loads an instance of passed klass using
-    #  default marshal hooks
+    # Reads an object that was cached previously by its link
     #
-    def load_object(klass, args)
-      return klass._load(args) if klass.respond_to?(:_load)
-      instance = klass.allocate
-      instance.marshal_load(args) if instance.respond_to?(:marshal_load)
-      instance
+    # @example
+    #   obj1 = Object.new
+    #   obj2 = Object.new
+    #   obj3 = Object.new
+    #   [obj1, obj1, obj2, obj2, obj3, obj3]
+    # is encoded as
+    #   [obj1, @1, obj2, @2, obj3, @3]
+    #
+    # NOTE: array itself is cached as @0, that's why obj1 is cached a @1, obj2 is @2, etc.
+    #
+    def read_cached_object
+      object_cache[read_fixnum]
     end
 
-    # Reads and returns a Struct from an input stream
+    # Reads an object that was dynamically extended before marshaling like
     #
-    def read_struct
+    # @example
+    #   M1 = Module.new
+    #   M2 = Module.new
+    #   obj = Object.new
+    #   obj.extend(M1)
+    #   obj.extend(M2)
+    #   obj
+    # is encoded as
+    #   'e', :M2, :M1, obj
+    #
+    def read_extended_object
+      mod = safe_const_get(read)
+      object = read
+      object.extend(mod)
+      object
+    end
+
+    # Reads a primitive object with instance variables
+    # (classes that have their own marshalling rules, like Array/Hash/Regexp/etc)
+    #
+    # @example
+    #   arr = [100, 200, 300]
+    #   arr.instance_variable_set(:@ivar, :value)
+    #   arr
+    # is encoded as
+    #   'I', [100, 200, 300], {:@ivar => value}
+    #
+    def read_primitive_with_ivars
+      object = read
+
+      primitive_ivars = read_hash(cache: false)
+      primitive_ivars.each do |name, value|
+        if name != 'E'
+          object.instance_variable_set(name, value)
+        end
+      end
+
+      object
+    end
+
+    # Reads and User Class (instance of String/Regexp/Array/Hash subclass)
+    #
+    # @example
+    #   UserArray = Class.new(Array)
+    #   UserArray[100, 200, 300]
+    # is encoded as
+    #   'C', :UserArray, [100, 200, 300]
+    #
+    def read_user_class
       klass_name = read(cache: false)
       klass = safe_const_get(klass_name)
-      args = read_hash(cache: false)
-      result = load_object(klass, args)
-      @object_cache << result
-      result
-    end
+      value = read(cache: false)
 
-    # Reads and saves a Module from an input stream
-    #  that was extending marshalled object
-    #
-    def read_extended
-      @extended << read
-    end
-
-    # Applies all saved extending modules
-    #  on the passed object
-    #
-    def apply_extends(object)
-      @extended.reverse_each do |e|
-        mod = safe_const_get(e)
-        object.extend(mod)
-      end
-      @extended = []
-    end
-
-    # Reads and returns Bignum from an input stream
-    #
-    def read_bignum
-      sign = read_char == '-' ? -1 : 1
-      size = read_fixnum * 2
-      result = 0
-      (0...size).each do |exp|
-        result += (read_char.ord) * 2 ** (exp * 8)
-      end
-      result = result.to_i * sign
-      @object_cache << result
-      result
-    end
-
-    # Reads and returns Float from an input stream
-    #
-    def read_float
-      s = read_string(cache: false)
-      result = if s == "nan"
-        0.0 / 0
-      elsif s == "inf"
-        1.0 / 0
-      elsif s == "-inf"
-        -1.0 / 0
+      result = if klass < Hash
+        klass[value]
       else
-        s.to_f
+        klass.new(value)
       end
+
       @object_cache << result
+
       result
     end
 
-    # Reads and returns Regexp from an input stream
+    # Reads a 'User Defined' object that has '_dump/self._load' methods
     #
-    def read_regexp
-      args = [read_string(cache: false), read_byte]
-
-      result = if @user_class
-        load_object(get_user_class, args)
-      else
-        load_object(Regexp, args)
-      end
-      @object_cache << result
-      result
-    end
-
-    # Reads and returns an abstract object from an input stream
-    #  when the class of this object has custom marshalling rules
+    # @example
+    #   class UserDefined
+    #     def _dump(level)
+    #       '_dumped'
+    #     end
+    #   end
     #
-    def read_usrmarshal
-      klass_name = read
+    #   UserDefined.new
+    # is encoded as
+    #   'u', :UserDefined, '_dumped'
+    #
+    # To load it back UserDefined._load' must be used.
+    #
+    def read_user_defined
+      klass_name = read(cache: false)
       klass = safe_const_get(klass_name)
+      data = read_string(cache: false)
+      result = klass._load(data)
+
+      @object_cache << result
+
+      result
+    end
+
+    # Reads a 'User Marshal' object that has 'marshal_dump/marshal_load' methods
+    #
+    # @example
+    #   class UserMarshal < Struct.new(:a, :b)
+    #     def marshal_dump
+    #       [a, b]
+    #     end
+    #
+    #     def marshal_load(data)
+    #       self.a, self.b = data
+    #     end
+    #   end
+    #
+    #   UserMarshal.new(100, 200)
+    # is encoded as
+    #   'U', :UserMarshal, [100, 200]
+    #
+    # To load it back `UserMarshal.allocate` and `UserMarshal#marshal_load` must be called
+    #
+    def read_user_marshal
+      klass_name = read(cache: false)
+      klass = safe_const_get(klass_name)
+
       result = klass.allocate
       @object_cache << result
-      data = read
-      unless result.respond_to?(:marshal_load)
-        raise TypeError, "instance of #{klass} needs to have method `marshal_load'"
-      end
+
+      data = read(cache: false)
       result.marshal_load(data)
       result
+    end
+
+    # Returns a constant by passed const_name,
+    #  re-raises Marshal-specific error when it's missing
+    #
+    def safe_const_get(const_name)
+      begin
+        Object.const_get(const_name)
+      rescue NameError
+        raise ArgumentError, "undefined class/module #{const_name}"
+      end
     end
   end
 end

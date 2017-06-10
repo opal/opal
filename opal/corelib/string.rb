@@ -131,7 +131,7 @@ class String < `String`
       var size = self.length, exclude;
 
       if (index.$$is_range) {
-        exclude = index.exclude;
+        exclude = index.excl;
         length  = #{Opal.coerce_to(`index.end`, Integer, :to_int)};
         index   = #{Opal.coerce_to(`index.begin`, Integer, :to_int)};
 
