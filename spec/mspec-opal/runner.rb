@@ -82,10 +82,6 @@ class OSpecFormatter
       'nodejs'       => NodeJSFormatter,
       'nodedoc'      => NodeJSDocFormatter,
       'nodejsdoc'    => NodeJSDocFormatter,
-      'phantom'      => PhantomFormatter,
-      'phantomjs'    => PhantomFormatter,
-      'phantomdoc'   => PhantomDocFormatter,
-      'phantomjsdoc' => PhantomDocFormatter,
       'dotted'       => DottedFormatter,
     }
 

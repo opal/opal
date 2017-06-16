@@ -22,8 +22,7 @@ install:
   - gem install bundler --quiet --no-ri --no-rdoc
   - bundler --version
   - bundle
-  - choco install phantomjs --version 2.0.0 -y
-  
+
 build: off
 
 test_script:

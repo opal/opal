@@ -1,8 +1,8 @@
 # RSpec
 
 `opal-rspec` allows opal to use rspec for running specs in javascript
-environments. It comes with built-in support for running rspec with custom
-`phantomjs` and standard web browser formatters. Also, async spec examples
+environments. It comes with built-in support for running rspec with
+standard web browser formatters. Also, async spec examples
 are supported to reflect browser usage of ruby applications.
 
 ```ruby
@@ -24,23 +24,6 @@ gem 'opal-rspec'
 ```
 
 ## Running specs
-
-### phantomjs
-
-To run specs, a rake task can be added which will load all spec files
-from `spec/`:
-
-```ruby
-# Rakefile
-require 'opal/rspec/rake_task'
-Opal::RSpec::RakeTask.new(:default)
-```
-
-Then, to run your specs inside phantomjs, just run the rake task:
-
-```sh
-$ bundle exec rake
-```
 
 ### In a Browser
 

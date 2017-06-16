@@ -133,7 +133,7 @@ Then, install dependencies:
     $ bundle install
     $ npm install -g jshint
 
-The test suite can be run using (requires [phantomjs][]):
+The test suite can be run using:
 
     $ bundle exec rake
 
@@ -231,6 +231,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-[phantomjs]: http://phantomjs.org
 [MSpec]: https://github.com/ruby/mspec#readme
 [RSpec]: https://github.com/rspec/rspec#readme

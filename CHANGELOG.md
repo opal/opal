@@ -63,6 +63,7 @@ Whitespace conventions:
 ### Removed
 
 - Dropped support for IE8 and below, and restricted Safari and Opera support to the last two versions
+- Dropped support for PhantomJS as it was [abandoned](https://groups.google.com/forum/#!topic/phantomjs/9aI5d-LDuNE).
 
 
 ### Changed

@@ -238,7 +238,7 @@ Use PATTERN environment variable to manually set the glob for specs:
   bundle exec rake mspec_node PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
 
-platforms = %w[nodejs phantomjs server]
+platforms = %w[nodejs server]
 mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
 
@@ -376,8 +376,8 @@ end
 platforms.each { |platform| task(:"mspec_#{platform}"    => mspec_suites.map    { |suite| :"mspec_#{suite}_#{platform}"    }) }
 platforms.each { |platform| task(:"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }) }
 
-task :mspec    => [:mspec_phantomjs, :mspec_nodejs]
-task :minitest => [:minitest_phantomjs, :minitest_nodejs, :minitest_node_nodejs]
+task :mspec    => [:mspec_nodejs]
+task :minitest => [:minitest_nodejs, :minitest_node_nodejs]
 task :test_all => [:rspec, :mspec, :minitest]
 
 # deprecated, can be removed after 0.11

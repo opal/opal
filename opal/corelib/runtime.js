@@ -110,7 +110,7 @@
   Opal.gvars = {};
 
   // Exit function, this should be replaced by platform specific implementation
-  // (See nodejs and phantom for examples)
+  // (See nodejs for examples)
   Opal.exit = function(status) { if (Opal.gvars.DEBUG) console.log('Exited with status '+status); };
 
   // keeps track of exceptions for $!

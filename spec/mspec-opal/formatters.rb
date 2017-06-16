@@ -124,33 +124,6 @@ class BrowserFormatter < BaseOpalFormatter
   end
 end
 
-class PhantomFormatter < BaseOpalFormatter
-  def red(str)
-    `console.log('\u001b[31m' + str + '\u001b[0m')`
-  end
-
-  def green(str)
-    `console.log('\u001b[32m' + str + '\u001b[0m')`
-  end
-
-  def cyan(str)
-    `console.log('\u001b[36m' + str + '\u001b[0m')`
-  end
-
-  def log(str)
-    `console.log(str)`
-  end
-
-  def after(state)
-    super
-    unless exception?
-      print '.'
-    else
-      print failure? ? 'F' : 'E'
-    end
-  end
-end
-
 class NodeJSFormatter < BaseOpalFormatter
   def initialize(*args, &block)
     require 'nodejs/stacktrace'
@@ -191,13 +164,6 @@ class NodeJSFormatter < BaseOpalFormatter
   end
 end
 
-class PhantomDocFormatter < PhantomFormatter
-  def after(state = nil)
-    (@exception && state) ? red(state.description) : green(state.description)
-    super
-  end
-end
-
 class NodeJSDocFormatter < NodeJSFormatter
   def before(example)
     print example.description
@@ -222,8 +188,8 @@ module InvertedFormatter
   end
 
   def after(state=nil)
-    @actually_passing << @current_state unless exception?
     super
+    @actually_passing << @current_state unless exception?
   end
 
   def finish
