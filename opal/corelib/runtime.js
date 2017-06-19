@@ -241,10 +241,8 @@
       throw new Opal.TypeError(cref.toString() + " is not a class/module");
     }
 
-    if (cref.$$const_cache == null) {
+    if ((cache = cref.$$const_cache) == null) {
       cache = cref.$$const_cache = Object.create(null);
-    } else {
-      cache = cref.$$const_cache;
     }
     cached = cache[name];
 
@@ -267,10 +265,8 @@
   Opal.const_get_relative = function(nesting, name, skip_missing) {
     var cref = nesting[0], result, current_version = Opal.const_cache_version, cache, cached;
 
-    if (nesting.$$const_cache == null) {
+    if ((cache = nesting.$$const_cache) == null) {
       cache = nesting.$$const_cache = Object.create(null);
-    } else {
-      cache = nesting.$$const_cache;
     }
     cached = cache[name];
 
