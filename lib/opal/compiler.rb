@@ -339,7 +339,7 @@ module Opal
       if handler = handlers[sexp.type]
         return handler.new(sexp, level, self).compile_to_fragments
       else
-        raise "Unsupported sexp: #{sexp.type}"
+        error "Unsupported sexp: #{sexp.type}"
       end
     end
 
