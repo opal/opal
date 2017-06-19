@@ -26,8 +26,6 @@ module Opal
       private
 
       def with_chrome_server
-        return yield
-
         chrome_server_cmd = "#{chrome_executable} --headless --disable-gpu --remote-debugging-port=9222"
         puts chrome_server_cmd
         chrome_pid = Process.spawn(chrome_server_cmd)
@@ -52,13 +50,13 @@ module Opal
       end
 
       def chrome_executable
-        case RbConfig::CONFIG['host_os']
+        ENV['GOOGLE_CHROME_BINARY'] || case RbConfig::CONFIG['host_os']
         when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
           raise "Headless chrome is supported only by Mac OS and Linux"
         when /darwin|mac os/
           "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome"
         when /linux/
-          'chrome'
+          'google-chrome-stable'
         when /solaris|bsd/
           raise "Headless chrome is supported only by Mac OS and Linux"
         end

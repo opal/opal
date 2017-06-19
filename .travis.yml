@@ -2,6 +2,7 @@ language: ruby
 
 sudo: false
 
+dist: trusty
 addons:
   chrome: stable
 
@@ -15,6 +16,12 @@ matrix:
   fast_finish: true
 
   include:
+    - rvm: 2.4.0
+      env: RUN=mspec_opal_chrome
+
+    - rvm: 2.4.0
+      env: RUN=mspec_ruby_chrome
+
     # - rvm: 2.4.0
     #   env:
     #     - RUN=browser_test
@@ -39,12 +46,6 @@ matrix:
 
     - rvm: 2.4.0
       env: RUN=smoke_test
-
-    - rvm: 2.4.0
-      env: RUN=mspec_opal_chrome
-
-    - rvm: 2.4.0
-      env: RUN=mspec_ruby_chrome
 
     - rvm: ruby-head
       env: RUN=rspec
@@ -83,9 +84,7 @@ before_install:
   - bundle config without doc
   - npm install chrome-remote-interface
   - which google-chrome-stable
-  - which chrome
-  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222
-  - chrome --headless --disable-gpu --remote-debugging-port=9222
+  - google-chrome-stable --version
 
 script:
   - "bundle exec rake $RUN"
