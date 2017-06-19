@@ -82,6 +82,10 @@ before_install:
   - type bundle || gem install bundler
   - bundle config without doc
   - npm install chrome-remote-interface
+  - which google-chrome-stable
+  - which chrome
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222
+  - chrome --headless --disable-gpu --remote-debugging-port=9222
 
 script:
   - "bundle exec rake $RUN"

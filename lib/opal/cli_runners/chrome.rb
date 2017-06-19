@@ -26,6 +26,8 @@ module Opal
       private
 
       def with_chrome_server
+        return yield
+
         chrome_server_cmd = "#{chrome_executable} --headless --disable-gpu --remote-debugging-port=9222"
         puts chrome_server_cmd
         chrome_pid = Process.spawn(chrome_server_cmd)
