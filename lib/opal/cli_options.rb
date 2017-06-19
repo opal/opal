@@ -81,7 +81,7 @@ module Opal
         options[:compile] = true
       end
 
-      on('-R', '--runner RUNNER', %w[nodejs server applescript nashorn], 'Choose the runner: nodejs (default), server') do |runner|
+      on('-R', '--runner RUNNER', %w[nodejs server applescript nashorn chrome], 'Choose the runner: nodejs (default), server') do |runner|
         options[:runner] = runner.to_sym
       end
 

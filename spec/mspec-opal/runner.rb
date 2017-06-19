@@ -78,11 +78,12 @@ class OSpecFormatter
     formatters = {
       'browser'      => BrowserFormatter,
       'server'       => BrowserFormatter,
+      'chrome'       => DottedFormatter,
       'node'         => NodeJSFormatter,
       'nodejs'       => NodeJSFormatter,
       'nodedoc'      => NodeJSDocFormatter,
       'nodejsdoc'    => NodeJSDocFormatter,
-      'dotted'       => DottedFormatter,
+      'dotted'       => DottedFormatter
     }
 
     formatter = formatters.fetch(ENV['FORMATTER']) do

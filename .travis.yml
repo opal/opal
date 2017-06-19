@@ -2,6 +2,9 @@ language: ruby
 
 sudo: false
 
+addons:
+  chrome: stable
+
 cache:
   bundler: true
   directories:
@@ -36,6 +39,12 @@ matrix:
 
     - rvm: 2.4.0
       env: RUN=smoke_test
+
+    - rvm: 2.4.0
+      env: RUN=mspec_opal_chrome
+
+    - rvm: 2.4.0
+      env: RUN=mspec_ruby_chrome
 
     - rvm: ruby-head
       env: RUN=rspec
@@ -72,6 +81,7 @@ before_install:
   - npm install -g uglify-js
   - type bundle || gem install bundler
   - bundle config without doc
+  - npm install chrome-remote-interface
 
 script:
   - "bundle exec rake $RUN"
