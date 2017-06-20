@@ -1,0 +1,13 @@
+version: '{build}'
+
+skip_tags: true
+# AppVeyor automatically skips the build if the commit contains [ci skip] or [skip ci]
+skip_commits:
+ message: /./
+
+clone_depth: 1
+
+build: off
+
+test_script:
+  - echo "Skipping appveyor test on 0-10-stable"
