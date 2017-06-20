@@ -391,7 +391,7 @@ class Time < `Date`
         result = string.match(/[A-Z]{3,4}/)[0];
       }
       else {
-        result = string.match(/\([^)]+\)/)[0].match(/[A-Z]/g).join('');
+        result = string.match(/\(([^)]+)\)/)[1]
       }
 
       if (result == "GMT" && /(GMT\W*\d{4})/.test(string)) {
