@@ -41,17 +41,21 @@ describe Time do
       it 'zone is +12' do
         time = Time.now
 
-        # export TZ="/usr/share/zoneinfo/Pacific/Fiji; node -e 'console.log(new Date().toString())'"
+        # export TZ="/usr/share/zoneinfo/Pacific/Fiji"; node -e 'console.log(new Date().toString())'
         time.JS[:toString] = -> { 'Wed Jun 21 2017 08:42:01 GMT+1200 (+12)' }
         time.zone.should == '+12'
 
-        # export TZ="/usr/share/zoneinfo/Europe/Rome; node -e 'console.log(new Date().toString())'"
+        # export TZ="/usr/share/zoneinfo/Europe/Rome"; node -e 'console.log(new Date().toString())'
         time.JS[:toString] = -> { 'Tue Jun 20 2017 22:52:57 GMT+0200 (CEST)' }
         time.zone.should == 'CEST'
 
-        # export TZ="/usr/share/zoneinfo/Europe/Rome; node -e 'console.log(new Date().toString())'"
+        # export TZ="/usr/share/zoneinfo/Europe/Rome"; node -e 'console.log(new Date().toString())'
         time.JS[:toString] = -> { 'Tue Jun 20 2017 23:56:54 GMT+0300 (MSK)' }
         time.zone.should == 'MSK'
+
+        # https://github.com/opal/opal/issues/403
+        time.JS[:toString] = -> { 'Wed May 07 2014 11:59:05 GMT+0300 (Финляндия (лето))' }
+        time.zone.should == 'Финляндия (лето)'
       end
     end
   end
