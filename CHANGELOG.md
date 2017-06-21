@@ -21,12 +21,22 @@ Whitespace conventions:
 
 
 
-## [0.10.4] - 2017-06-21
+## [0.10.5] - 2017-06-21
 
 
 ### Fixed
 
 - Fix `Time#zone` for zones expressed numerically
+
+
+
+## [0.10.4] - 2017-05-07
+
+
+### Changed
+
+- Better `Opal::Config` options documentation and organization
+- Always cache source-maps at build-time so they're available once enabled
 
 
 
@@ -891,6 +901,7 @@ Whitespace conventions:
 
 
 
+[0.10.5]: https://github.com/opal/opal/compare/v0.10.4...v0.10.5
 [0.10.4]: https://github.com/opal/opal/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/opal/opal/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/opal/opal/compare/v0.10.1...v0.10.2
