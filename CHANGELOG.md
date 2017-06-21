@@ -30,6 +30,7 @@ Whitespace conventions:
 
 
 
+
 ## [0.10.4] - 2017-05-07
 
 
@@ -41,7 +42,7 @@ Whitespace conventions:
 
 
 
-## [0.10.3] - 2016-09-09
+## [0.10.3] - 2016-10-31
 
 
 ### Fixed
@@ -53,7 +54,7 @@ Whitespace conventions:
 
 
 
-## [0.10.2] - 2016-10-31
+## [0.10.2] - 2016-09-09
 
 
 ### Changed
