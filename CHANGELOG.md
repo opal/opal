@@ -122,12 +122,37 @@ Whitespace conventions:
 
 
 
-## [0.10.3] - 2016-10-31
+
+## [0.10.5] - 2017-06-21
+
+
+### Fixed
+
+- Fix `Time#zone` for zones expressed numerically
+
+
+
+
+## [0.10.4] - 2017-05-07
 
 
 ### Changed
 
-- Avoid special utf-8 chars in method names, now they start with `$$`
+- Better `Opal::Config` options documentation and organization
+- Always cache source-maps at build-time so they're available once enabled
+
+
+
+
+## [0.10.3] - 2016-10-31
+
+
+### Fixed
+
+- Fixed inheritance from the `Module` class (#1476)
+- Fixed source map server with url-encoded paths
+- Silence Sprockets 3.7 deprecations, full support for Sprockets 4 will be available in Opal 0.11
+- Don't print the full stack trace with deprecation messages
 
 
 
@@ -135,12 +160,9 @@ Whitespace conventions:
 ## [0.10.2] - 2016-09-09
 
 
-## Fixed
+### Changed
 
-- Fixed inheritance from the `Module` class (#1476)
-- Fixed source map server with url-encoded paths
-- Silence Sprockets 3.7 deprecations, full support for Sprockets 4 will be available in Opal 0.11
-- Don't print the full stack trace with deprecation messages
+- Avoid special utf-8 chars in method names, now they start with `$$`
 
 
 
@@ -983,7 +1005,9 @@ Whitespace conventions:
 
 
 
-[0.11.0]: https://github.com/opal/opal/compare/v0.10.3...HEAD
+[0.11.0]: https://github.com/opal/opal/compare/v0.10.5...HEAD
+[0.10.5]: https://github.com/opal/opal/compare/v0.10.4...v0.10.5
+[0.10.4]: https://github.com/opal/opal/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/opal/opal/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/opal/opal/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/opal/opal/compare/v0.10.0...v0.10.1
