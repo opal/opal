@@ -1,5 +1,5 @@
 module Opal
   # WHEN RELEASING:
   # Remember to update RUBY_ENGINE_VERSION in opal/corelib/constants.rb too!
-  VERSION = '0.10.4'
+  VERSION = '0.10.5'
 end
