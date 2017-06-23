@@ -6,7 +6,8 @@ require 'timeout'
 module Opal
   module CliRunners
     class Chrome
-      SCRIPT_PATH = File.expand_path('../chrome.js', __FILE__)
+      SCRIPT_PATH = File.expand_path('../chrome.js', __FILE__).freeze
+      CHROME_REMOTE_PORT = 9222
 
       def initialize(options)
         @output = options.fetch(:output, $stdout)
@@ -26,17 +27,22 @@ module Opal
       private
 
       def with_chrome_server
-        chrome_server_cmd = "#{chrome_executable} --headless --disable-gpu --remote-debugging-port=9222"
+        if chrome_server_running?
+          yield
+        else
+          run_chrome_server { yield }
+        end
+      end
+
+      def run_chrome_server
+        chrome_server_cmd = "#{chrome_executable} --headless --disable-gpu --remote-debugging-port=#{CHROME_REMOTE_PORT}"
         puts chrome_server_cmd
+
         chrome_pid = Process.spawn(chrome_server_cmd)
 
         Timeout.timeout(1) do
-          begin
-            loop do
-              puts "Connecting to localhost:9222..."
-              TCPSocket.new('127.0.0.1', 9222).close
-            end
-          rescue Errno::ECONNREFUSED
+          loop do
+            break if chrome_server_running?
             sleep 0.1
           end
         end
@@ -46,7 +52,15 @@ module Opal
         puts 'Failed to start chrome server'
         puts 'Make sure that you have it installed and that its version is > 59'
       ensure
-        Process.kill('HUP', chrome_pid)
+        Process.kill('HUP', chrome_pid) if chrome_pid
+      end
+
+      def chrome_server_running?
+        puts "Connecting to localhost:9222..."
+        TCPSocket.new('127.0.0.1', 9222).close
+        true
+      rescue Errno::ECONNREFUSED
+        false
       end
 
       def chrome_executable
