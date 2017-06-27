@@ -376,8 +376,8 @@ end
 platforms.each { |platform| task(:"mspec_#{platform}"    => mspec_suites.map    { |suite| :"mspec_#{suite}_#{platform}"    }) }
 platforms.each { |platform| task(:"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }) }
 
-task :mspec    => [:mspec_nodejs]
-task :minitest => [:minitest_nodejs, :minitest_node_nodejs]
+task :mspec    => [:mspec_chrome, :mspec_nodejs]
+task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs]
 task :test_all => [:rspec, :mspec, :minitest]
 
 # deprecated, can be removed after 0.11
