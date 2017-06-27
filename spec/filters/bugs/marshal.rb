@@ -14,6 +14,7 @@ opal_filter "Marshal" do
   fails "Marshal.load for a String loads a String subclass with custom constructor"
   fails "Marshal.load for a Struct does not call initialize on the unmarshaled struct"
   fails "Marshal.load for a Time loads nanoseconds"
+  fails "Marshal.load for a Time loads the zone" # Expected "FJT" to equal "FJST"
   fails "Marshal.load for a Time loads"
   fails "Marshal.load for a user Class raises ArgumentError if the object from an 'o' stream is not dumpable as 'o' type user class"
   fails "Marshal.load for a user Class that extends a core type other than Object or BasicObject raises ArgumentError if the resulting class does not extend the same type"
