@@ -7,7 +7,9 @@ module Opal
   module CliRunners
     class Chrome
       SCRIPT_PATH = File.expand_path('../chrome.js', __FILE__).freeze
-      CHROME_REMOTE_PORT = 9222
+
+      DEFAULT_CHROME_HOST = 'localhost'.freeze
+      DEFAULT_CHROME_PORT = 9222.freeze
 
       def initialize(options)
         @output = options.fetch(:output, $stdout)
@@ -16,7 +18,15 @@ module Opal
 
       def run(code, argv)
         with_chrome_server do
-          IO.popen(['node', SCRIPT_PATH], 'w', out: output) do |io|
+          cmd = [
+            'env',
+            "CHROME_HOST=#{chrome_host}",
+            "CHROME_PORT=#{chrome_port}",
+            'node',
+            SCRIPT_PATH,
+          ]
+
+          IO.popen(cmd, 'w', out: output) do |io|
             io.write(code)
           end
 
@@ -25,6 +35,14 @@ module Opal
       end
 
       private
+
+      def chrome_host
+        ENV['CHROME_HOST'] || DEFAULT_CHROME_HOST
+      end
+
+      def chrome_port
+        ENV['CHROME_PORT'] || DEFAULT_CHROME_PORT
+      end
 
       def with_chrome_server
         if chrome_server_running?
@@ -35,7 +53,9 @@ module Opal
       end
 
       def run_chrome_server
-        chrome_server_cmd = "#{chrome_executable} --headless --disable-gpu --remote-debugging-port=#{CHROME_REMOTE_PORT}"
+        raise "Chrome server can be started only on localhost" if chrome_host != DEFAULT_CHROME_HOST
+
+        chrome_server_cmd = "#{chrome_executable} --headless --disable-gpu --remote-debugging-port=#{chrome_port}"
         puts chrome_server_cmd
 
         chrome_pid = Process.spawn(chrome_server_cmd)
@@ -56,8 +76,8 @@ module Opal
       end
 
       def chrome_server_running?
-        puts "Connecting to localhost:9222..."
-        TCPSocket.new('127.0.0.1', 9222).close
+        puts "Connecting to #{chrome_host}:#{chrome_port}..."
+        TCPSocket.new(chrome_host, chrome_port).close
         true
       rescue Errno::ECONNREFUSED
         false

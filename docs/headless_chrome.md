@@ -30,7 +30,7 @@ The runner also listens for any exceptions and prints formatted stracktraces bac
 
 ## Using exit codes
 
-By default headless chrome runner explicitely sets exit code to 1 when there was any error in the code.
+By default headless chrome runner explicitly sets exit code to 1 when there was any error in the code.
 
     $ opal -Rchrome -e "42"; echo $?
     0
@@ -82,3 +82,14 @@ Moreover, you can actually call any js using headless chrome by running
 NOTE: to run it you need to have a chrome server running on `localhost:9222` (usually `chrome.rb` does it for you)
 
       $ chrome --disable-gpu --headless --remote-debugging-port=9222
+
+## Using a remote chrome server
+
+If you want to change a default chrome port or your chrome server is running on a different host:port
+you can override default values by specifying `CHROME_HOST` and `CHROME_PORT` environment variables:
+
+      $ CHROME_HOST=10.10.10.10 CHROME_PORT=8080 opal -Rchrome -e "puts 42"
+      Connecting to 10.10.10.10:8080...
+      42
+
+NOTE: `CHROME_HOST` requires a chrome server to be started. You can't start remotely a server on a different host.
