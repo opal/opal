@@ -82,7 +82,6 @@ before_install:
   - npm install -g uglify-js
   - type bundle || gem install bundler
   - bundle config without doc
-  - npm install chrome-remote-interface
   - which google-chrome-stable
   - google-chrome-stable --version
 
