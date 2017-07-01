@@ -2,6 +2,10 @@ language: ruby
 
 sudo: false
 
+dist: trusty
+addons:
+  chrome: stable
+
 cache:
   bundler: true
   directories:
@@ -12,6 +16,12 @@ matrix:
   fast_finish: true
 
   include:
+    - rvm: 2.4.0
+      env: RUN=mspec_opal_chrome
+
+    - rvm: 2.4.0
+      env: RUN=mspec_ruby_chrome
+
     # - rvm: 2.4.0
     #   env:
     #     - RUN=browser_test
@@ -65,14 +75,15 @@ matrix:
 
 
 before_install:
-  # Keep track of which version of node and phantomjs we're running the specs against
+  # Keep track of which version of node we're running the specs against
   - node -v
-  - phantomjs -v
   - git submodule update --init
   - npm install -g jshint
   - npm install -g uglify-js
   - type bundle || gem install bundler
   - bundle config without doc
+  - which google-chrome-stable
+  - google-chrome-stable --version
 
 script:
   - "bundle exec rake $RUN"

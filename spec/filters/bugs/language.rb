@@ -21,7 +21,6 @@ opal_filter "language" do
   fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing local with the same name as the argument"
   fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing method with the same name as the argument"
   fails "A lambda literal -> () { } returns a Proc object when used in a BasicObject method"
-  fails "A method defined with extreme default arguments may use an fcall as a default" # if OPAL_PLATFORM == 'phantomjs'
   fails "A method definition in an eval creates a class method"
   fails "A method definition in an eval creates a singleton method"
   fails "A method definition in an eval creates an instance method"

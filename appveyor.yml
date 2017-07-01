@@ -22,9 +22,9 @@ install:
   - gem install bundler --quiet --no-ri --no-rdoc
   - bundler --version
   - bundle
-  - choco install phantomjs --version 2.0.0 -y
-  
+
 build: off
 
+# TODO: add mspec_chrome and minitest_chrome once Chrome 60 will be released
 test_script:
-  - bundle exec rake
+  - bundle exec rake rspec mspec_nodejs minitest_nodejs minitest_node_nodejs

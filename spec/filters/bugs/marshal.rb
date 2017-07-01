@@ -15,6 +15,7 @@ opal_filter "Marshal" do
   fails "Marshal.load for a Struct does not call initialize on the unmarshaled struct"
   fails "Marshal.load for a Time loads nanoseconds"
   fails "Marshal.load for a Time loads"
+  fails "Marshal.load for a Time loads the zone"
   fails "Marshal.load for a user Class raises ArgumentError if the object from an 'o' stream is not dumpable as 'o' type user class"
   fails "Marshal.load for a user Class that extends a core type other than Object or BasicObject raises ArgumentError if the resulting class does not extend the same type"
   fails "Marshal.load for an Exception loads a marshalled exception with a backtrace"
