@@ -39,6 +39,14 @@ describe 'Marshal.dump' do
     Marshal.dump(Float::NAN).should == "\004\bf\bnan"
   end
 
+  it "dumps a Integer" do
+    Marshal.dump(0).should == "\x04\bi\x00"
+    Marshal.dump(123).should == "\x04\bi\x01{"
+    Marshal.dump(-123).should == "\x04\bi\x80"
+    Marshal.dump(1234567890).should == "\x04\bl+\a\xD2\x02\x96I"
+    Marshal.dump(-1234567890).should == "\x04\bl-\a\xD2\x02\x96I"
+  end
+
   it "dumps a Regexp with flags" do
     Marshal.dump(/\w/im).should == "\x04\b/\a\\w\u0005"
   end

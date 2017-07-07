@@ -16,8 +16,13 @@ end
 
 class Fixnum
   def __marshal__(buffer)
-    buffer.append('i')
-    buffer.write_fixnum(self)
+    if self >= -0x40000000 && self < 0x40000000
+      buffer.append('i')
+      buffer.write_fixnum(self)
+    else
+      buffer.append('l')
+      buffer.write_bignum(self)
+    end
   end
 end
 
@@ -242,6 +247,26 @@ module Marshal
         }
         #{append(`s`)}
       }
+    end
+
+    def write_bignum(n)
+      sign = n > 0 ? '+' : '-'
+      append(sign)
+
+      num = n > 0 ? n : -n
+
+      arr = []
+      while num > 0
+        arr << (num & 0xffff)
+        num = (num / 0x10000).floor
+      end
+
+      write_fixnum(arr.size)
+
+      arr.each do |x|
+        append(`String.fromCharCode(x & 0xff)`)
+        append(`String.fromCharCode(#{(x/0x100).floor})`)
+      end
     end
 
     def write_string(s)
