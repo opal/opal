@@ -23,6 +23,10 @@ class Array < `Array`
 
   def initialize(size = nil, obj = nil, &block)
     %x{
+      if (obj !== nil && block !== nil) {
+        #{warn('warning: block supersedes default value argument')}
+      }
+
       if (size > #{Integer::MAX}) {
         #{raise ArgumentError, "array size too big"}
       }

@@ -16,7 +16,6 @@ opal_filter "2.4" do
   fails "The predefined global constants includes TRUE" # Expected warning to match: /constant ::TRUE is deprecated/
   fails_badly "The while expression stops running body if interrupted by break with unless in a parenthesized attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break with unless in a begin ... end attribute op-assign-or value"
-  fails "Array#initialize with (size, object=nil) uses the block value instead of using the default value" # Expected warning to match: /block supersedes default value argument/
   fails "Array#inspect does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#rindex ignores the block if there is an argument" # Expected warning to match: /given block not used/
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
