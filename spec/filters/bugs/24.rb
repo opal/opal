@@ -16,8 +16,6 @@ opal_filter "2.4" do
   fails "The predefined global constants includes TRUE" # Expected warning to match: /constant ::TRUE is deprecated/
   fails_badly "The while expression stops running body if interrupted by break with unless in a parenthesized attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break with unless in a begin ... end attribute op-assign-or value"
-  fails "Array#concat concatenates the initial value when given arguments contain 2 self" # ArgumentError: [Array#concat] wrong number of arguments(2 for 1)
-  fails "Array#concat returns self when given no arguments" # ArgumentError: [Array#concat] wrong number of arguments(0 for 1)
   fails "Array#fetch gives precedence to the default block over the default argument" # Expected warning to match: /block supersedes default value argument/
   fails "Array#find_index ignores the block if there is an argument" # Expected warning to match: /given block not used/
   fails "Array#index ignores the block if there is an argument" # Expected warning to match: /given block not used/

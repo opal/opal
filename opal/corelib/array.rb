@@ -749,18 +749,28 @@ class Array < `Array`
     }
   end
 
-  def concat(other)
-    if Array === other
-      other = other.to_a
-    else
-      other = Opal.coerce_to(other, Array, :to_ary).to_a
+  def concat(*others)
+    others = others.map do |other|
+      if Array === other
+        other = other.to_a
+      else
+        other = Opal.coerce_to(other, Array, :to_ary).to_a
+      end
+
+      if other.equal?(self)
+        other = other.dup
+      end
+
+      other
     end
 
-    %x{
-      for (var i = 0, length = other.length; i < length; i++) {
-        self.push(other[i]);
+    others.each do |other|
+      %x{
+        for (var i = 0, length = other.length; i < length; i++) {
+          self.push(other[i]);
+        }
       }
-    }
+    end
 
     self
   end
