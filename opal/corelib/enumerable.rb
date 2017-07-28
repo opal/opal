@@ -450,6 +450,12 @@ module Enumerable
   def find_index(object = undefined, &block)
     return enum_for :find_index if `object === undefined && block === nil`
 
+    %x{
+      if (object != null && block !== nil) {
+        #{warn('warning: given block not used')}
+      }
+    }
+
     index = 0
 
     if `object != null`
