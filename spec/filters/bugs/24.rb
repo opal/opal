@@ -7,9 +7,6 @@ opal_filter "2.4" do
   fails "The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an unset class variable" # Expected warning to match: /class variable access from toplevel/
   fails "The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an unset class variable" # Expected warning to match: /class variable access from toplevel/
   fails "The for expression allows a constant as an iterator name" # Expected warning to match: /already initialized constant/
-  fails "Hash literal checks duplicated keys on initialization" # Expected warning to match: /key :foo is duplicated|duplicated key/
-  fails "Hash literal expands an '**{}' element with the last key/value pair taking precedence" # Expected warning to match: /key :a is duplicated|duplicated key/
-  fails "Hash literal merges multiple nested '**obj' in Hash literals" # Expected warning to match: /key :a is duplicated|duplicated key/
   fails "Literal Regexps matches against $_ (last input) in a conditional if no explicit matchee provided" # Expected warning to match: /regex literal in condition/
   fails "Literal Regexps supports conditional regular expressions with named capture groups" # Exception: named captures are not supported in javascript: "^(?<word>foo)?(?(<word>)(T)|(F))$"
   fails "Optional variable assignments using compunded constants with &&= assignments" # Expected warning to match: /already initialized constant/
