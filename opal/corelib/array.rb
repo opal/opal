@@ -963,6 +963,10 @@ class Array < `Array`
         return self[index];
       }
 
+      if (block !== nil && defaults != null) {
+        #{warn('warning: block supersedes default value argument')}
+      }
+
       if (block !== nil) {
         return block(original);
       }

@@ -16,7 +16,6 @@ opal_filter "2.4" do
   fails "The predefined global constants includes TRUE" # Expected warning to match: /constant ::TRUE is deprecated/
   fails_badly "The while expression stops running body if interrupted by break with unless in a parenthesized attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break with unless in a begin ... end attribute op-assign-or value"
-  fails "Array#fetch gives precedence to the default block over the default argument" # Expected warning to match: /block supersedes default value argument/
   fails "Array#find_index ignores the block if there is an argument" # Expected warning to match: /given block not used/
   fails "Array#index ignores the block if there is an argument" # Expected warning to match: /given block not used/
   fails "Array#initialize with (size, object=nil) uses the block value instead of using the default value" # Expected warning to match: /block supersedes default value argument/
