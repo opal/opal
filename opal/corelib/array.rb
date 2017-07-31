@@ -1664,6 +1664,10 @@ class Array < `Array`
     %x{
       var i, value;
 
+      if (object != null && block !== nil) {
+        #{warn('warning: given block not used')}
+      }
+
       if (object != null) {
         for (i = self.length - 1; i >= 0; i--) {
           if (i >= self.length) {
