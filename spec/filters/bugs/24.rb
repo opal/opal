@@ -18,7 +18,6 @@ opal_filter "2.4" do
   fails_badly "The while expression stops running body if interrupted by break with unless in a begin ... end attribute op-assign-or value"
   fails "Array#inspect does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
-  fails "Array.new with (size, object=nil) uses the block value instead of using the default value" # Expected warning to match: /block supersedes default value argument/
   fails "BasicObject#instance_eval evaluates string with given filename and negative linenumber" # Expected ["RuntimeError"] to equal ["b_file", "-98"]
   fails "Comparable#clamp raises an Argument error unless given 2 parameters" # NoMethodError: undefined method `clamp' for #<ComparableSpecs::Weird:0x1c0e6>
   fails "Comparable#clamp raises an Argument error unless the 2 parameters are correctly ordered" # NoMethodError: undefined method `clamp' for #<ComparableSpecs::Weird:0x1c0e0>
