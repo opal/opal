@@ -1181,6 +1181,26 @@ module Enumerable
     end
   end
 
+  def uniq(&block)
+    hash = {}
+
+    each do |*args|
+      value = Opal.destructure(args)
+
+      produced = if block_given?
+        block.call(value)
+      else
+        value
+      end
+
+      unless hash.has_key?(produced)
+        hash[produced] = value
+      end
+    end
+
+    hash.values
+  end
+
   alias to_a entries
 
   def zip(*others, &block)

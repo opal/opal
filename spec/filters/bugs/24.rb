@@ -19,8 +19,6 @@ opal_filter "2.4" do
   fails "Array#inspect does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "BasicObject#instance_eval evaluates string with given filename and negative linenumber" # Expected ["RuntimeError"] to equal ["b_file", "-98"]
-  fails "Enumerable#uniq returns an array that contains only unique elements" # NoMethodError: undefined method `uniq' for #<Enumerator: [0, 1, 2, 3]:each>
-  fails "Enumerable#uniq when yielded with multiple arguments returns all yield arguments as an array" # NoMethodError: undefined method `uniq' for #<Enumerator: #<Object:0xa6fe>:each>
   fails "Exception#backtrace returns an Array that can be updated" # Expected "RuntimeError" to equal "backtrace first"
   fails "FalseClass .allocate raises a TypeError" # Expected TypeError but no exception was raised (false was returned)
   fails "FalseClass .new is undefined" # Expected NoMethodError but no exception was raised (false was returned)
