@@ -82,6 +82,8 @@ describe Opal::Rewriters::BinaryOperatorAssignment do
               s(:send, cached, :b),
               :+,
               parse('rhs'))))
+
+        expect(rewritten).to eq(expected)
       end
     end
 

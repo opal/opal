@@ -1,3 +1,5 @@
+$VERBOSE = true
+
 if ENV['CHECK_COVERAGE']
   require 'coveralls'
   Coveralls.wear!

@@ -17,6 +17,7 @@ class Opal::SimpleServer
   def initialize(options = {})
     @prefix = options.fetch(:prefix, 'assets')
     @main = options.fetch(:main, 'application')
+    @index_path = nil
     yield self if block_given?
     freeze
   end

@@ -84,6 +84,7 @@ before_install:
   - bundle config without doc
   - which google-chrome-stable
   - google-chrome-stable --version
+  - export RUBYOPT=-w
 
 script:
   - "bundle exec rake $RUN"

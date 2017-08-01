@@ -5,7 +5,7 @@ module Opal
 
     def deprecation message
       message = "DEPRECATION WARNING: #{message}"
-      if @raise_on_deprecation
+      if defined?(@raise_on_deprecation) && @raise_on_deprecation
         raise message
       else
         warn message

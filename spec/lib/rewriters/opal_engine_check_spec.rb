@@ -21,60 +21,62 @@ describe Opal::Rewriters::OpalEngineCheck do
   let(:false_branch) { s(:int, 2) }
 
   [:RUBY_ENGINE, :RUBY_PLATFORM].each do |const_name|
-    let(:ruby_const_sexp) { s(:const, nil, const_name) }
+    context "for #{const_name} constant" do
+      let(:ruby_const_sexp) { s(:const, nil, const_name) }
 
-    context "#{const_name} == rhs" do
-      context "when rhs == 'opal'" do
-        let(:check) do
-          s(:send, ruby_const_sexp, :==, opal_str_sexp)
+      context "#{const_name} == rhs" do
+        context "when rhs == 'opal'" do
+          let(:check) do
+            s(:send, ruby_const_sexp, :==, opal_str_sexp)
+          end
+
+          it 'replaces true branch with s(:nil)' do
+            expect_rewritten(
+              s(:if, check, true_branch, false_branch)
+            ).to eq(
+              s(:if, check, true_branch, s(:nil))
+            )
+          end
         end
 
-        it 'replaces true branch with s(:nil)' do
-          expect_rewritten(
-            s(:if, check, true_branch, false_branch)
-          ).to eq(
-            s(:if, check, true_branch, s(:nil))
-          )
-        end
-      end
+        context "when rhs != 'opal'" do
+          let(:check) do
+            s(:send, ruby_const_sexp, :==, s(:nil))
+          end
 
-      context "when rhs != 'opal'" do
-        let(:check) do
-          s(:send, ruby_const_sexp, :==, s(:nil))
-        end
-
-        it 'does not modify sexp' do
-          expect_no_rewriting_for(
-            s(:if, check, true_branch, false_branch)
-          )
-        end
-      end
-    end
-
-    context "#{const_name} != rhs" do
-      context "when rhs == 'opal'" do
-        let(:check) do
-          s(:send, ruby_const_sexp, :!=, opal_str_sexp)
-        end
-
-        it 'replaces true branch with s(:nil)' do
-          expect_rewritten(
-            s(:if, check, true_branch, false_branch)
-          ).to eq(
-            s(:if, check, s(:nil), false_branch)
-          )
+          it 'does not modify sexp' do
+            expect_no_rewriting_for(
+              s(:if, check, true_branch, false_branch)
+            )
+          end
         end
       end
 
-      context "when rhs != 'opal'" do
-        let(:check) do
-          s(:send, ruby_const_sexp, :!=, s(:nil))
+      context "#{const_name} != rhs" do
+        context "when rhs == 'opal'" do
+          let(:check) do
+            s(:send, ruby_const_sexp, :!=, opal_str_sexp)
+          end
+
+          it 'replaces true branch with s(:nil)' do
+            expect_rewritten(
+              s(:if, check, true_branch, false_branch)
+            ).to eq(
+              s(:if, check, s(:nil), false_branch)
+            )
+          end
         end
 
-        it 'does not modify sexp' do
-          expect_no_rewriting_for(
-            s(:if, check, true_branch, false_branch)
-          )
+        context "when rhs != 'opal'" do
+          let(:check) do
+            s(:send, ruby_const_sexp, :!=, s(:nil))
+          end
+
+          it 'does not modify sexp' do
+            expect_no_rewriting_for(
+              s(:if, check, true_branch, false_branch)
+            )
+          end
         end
       end
     end

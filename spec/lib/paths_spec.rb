@@ -11,7 +11,7 @@ describe 'Opal.use_gem' do
       skip %(Will fail if GEM_HOME has "rake" in the path, that's ok)
     end
 
-    added_rake_paths = Opal.paths.grep /rake/
+    added_rake_paths = Opal.paths.grep(/rake/)
     expect(added_rake_paths.size).to eq(1)
     expect(added_rake_paths.first).to match(%r{/rake-[\d\.]+/lib$})
   end
