@@ -19,11 +19,6 @@ opal_filter "2.4" do
   fails "Array#inspect does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "BasicObject#instance_eval evaluates string with given filename and negative linenumber" # Expected ["RuntimeError"] to equal ["b_file", "-98"]
-  fails "Comparable#clamp raises an Argument error unless given 2 parameters" # NoMethodError: undefined method `clamp' for #<ComparableSpecs::Weird:0x1c0e6>
-  fails "Comparable#clamp raises an Argument error unless the 2 parameters are correctly ordered" # NoMethodError: undefined method `clamp' for #<ComparableSpecs::Weird:0x1c0e0>
-  fails "Comparable#clamp returns self if within the given parameters" # NoMethodError: undefined method `clamp' for #<ComparableSpecs::Weird:0x1c0d8>
-  fails "Comparable#clamp returns the max parameter if greater than it" # NoMethodError: undefined method `clamp' for #<ComparableSpecs::Weird:0x1c0ce>
-  fails "Comparable#clamp returns the min parameter if smaller than it" # NoMethodError: undefined method `clamp' for #<ComparableSpecs::Weird:0x1c0f0>
   fails "Enumerable#chunk returns an Enumerator if called without a block" # ArgumentError: no block given
   fails "Enumerable#count ignores the block when given an argument" # Expected warning to match: /given block not used/
   fails "Enumerable#find_index ignores the block if an argument is given" # Expected warning to match: /given block not used/

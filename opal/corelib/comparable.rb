@@ -66,4 +66,20 @@ module Comparable
     return false if self > max
     return true
   end
+
+  def clamp(min, max)
+    cmp = min <=> max
+
+    unless cmp
+      raise ArgumentError, "comparison of #{min.class} with #{max.class} failed"
+    end
+
+    if Comparable.normalize(cmp) > 0
+      raise ArgumentError, 'min argument must be smaller than max argument'
+    end
+
+    return min if Comparable.normalize(self <=> min) < 0
+    return max if Comparable.normalize(self <=> max) > 0
+    return self
+  end
 end
