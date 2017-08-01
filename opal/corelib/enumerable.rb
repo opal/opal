@@ -44,7 +44,7 @@ module Enumerable
   end
 
   def chunk(&block)
-    Kernel.raise ArgumentError, "no block given" unless block_given?
+    return to_enum(:chunk) { self.enumerator_size } unless block_given?
 
     ::Enumerator.new do |yielder|
       %x{
