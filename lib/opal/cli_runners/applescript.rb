@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'opal/cli_runners'
 
 module Opal
   module CliRunners

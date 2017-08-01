@@ -53,6 +53,7 @@ module Opal
         @methods = []
 
         @uses_block = false
+        @in_ensure = false
 
         # used by classes to store all ivars used in direct def methods
         @proto_ivars = []

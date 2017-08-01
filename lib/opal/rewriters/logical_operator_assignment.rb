@@ -89,7 +89,6 @@ module Opal
           recvr = s(:js_tmp, recvr_tmp)
 
           recvr_is_nil = s(:send, recvr, :nil?)                 # recvr.nil?
-          nil_node = s(:nil)                                    # nil
           plain_send = lhs.updated(:send, [recvr, meth, *args]) # recvr.meth
           plain_or_asgn = s(root_type, plain_send, rhs)         # recvr.meth ||= rhs
 

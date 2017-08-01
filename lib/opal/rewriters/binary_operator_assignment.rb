@@ -80,8 +80,6 @@ module Opal
       #   using SendHandler to `recvr.nil? ? nil : (recvr.meth = recvr.meth + rhs)`
       class ConditionalSendHandler < self
         def self.call(lhs, op, rhs)
-          root_type = :op_asgn
-
           recvr, meth, *args = *lhs
 
           recvr_tmp = new_temp
@@ -89,7 +87,6 @@ module Opal
           recvr = s(:js_tmp, recvr_tmp)
 
           recvr_is_nil = s(:send, recvr, :nil?)                 # recvr.nil?
-          nil_node = s(:nil)                                    # nil
           plain_send = lhs.updated(:send, [recvr, meth, *args]) # recvr.meth
           plain_op_asgn = s(:op_asgn, plain_send, op, rhs)      # recvr.meth += rhs
 

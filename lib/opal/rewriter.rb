@@ -31,7 +31,7 @@ module Opal
       end
 
       def disabled?
-        @disabled
+        @disabled if defined?(@disabled)
       end
     end
 

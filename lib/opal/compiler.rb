@@ -156,6 +156,7 @@ module Opal
       @unique = 0
       @options = options
       @comments = Hash.new([])
+      @case_stmt = nil
     end
 
     # Compile some ruby code to a string.
