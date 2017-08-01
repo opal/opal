@@ -19,9 +19,6 @@ opal_filter "2.4" do
   fails "Array#inspect does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "BasicObject#instance_eval evaluates string with given filename and negative linenumber" # Expected ["RuntimeError"] to equal ["b_file", "-98"]
-  fails "Enumerable#sum gives 0 as a default argument" # NoMethodError: undefined method `sum' for #<Enumerator: #<Object:0x3f120>:each>
-  fails "Enumerable#sum returns amount of the elements with taking an argument as the initial value" # NoMethodError: undefined method `sum' for #<Enumerator: #<Object:0x3f118>:each>
-  fails "Enumerable#sum takes a block to transform the elements" # NoMethodError: undefined method `sum' for #<Enumerator: #<Object:0x3f110>:each>
   fails "Enumerable#uniq returns an array that contains only unique elements" # NoMethodError: undefined method `uniq' for #<Enumerator: [0, 1, 2, 3]:each>
   fails "Enumerable#uniq when yielded with multiple arguments returns all yield arguments as an array" # NoMethodError: undefined method `uniq' for #<Enumerator: #<Object:0xa6fe>:each>
   fails "Exception#backtrace returns an Array that can be updated" # Expected "RuntimeError" to equal "backtrace first"

@@ -1146,6 +1146,21 @@ module Enumerable
     dup.map! { |i| `i[1]` }
   end
 
+  def sum(initial = 0, &block)
+    result = initial
+
+    each do |*args|
+      if block_given?
+        item = block.call(*args)
+      else
+        item = Opal.destructure(args)
+      end
+      result += item
+    end
+
+    result
+  end
+
   def take(num)
     first(num)
   end
