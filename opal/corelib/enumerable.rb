@@ -114,6 +114,12 @@ module Enumerable
   def count(object = undefined, &block)
     result = 0
 
+    %x{
+      if (object != null && block !== nil) {
+        #{warn('warning: given block not used')}
+      }
+    }
+
     if `object != null`
       block = proc do |*args|
         Opal.destructure(args) == object

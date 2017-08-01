@@ -19,8 +19,6 @@ opal_filter "2.4" do
   fails "Array#inspect does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "BasicObject#instance_eval evaluates string with given filename and negative linenumber" # Expected ["RuntimeError"] to equal ["b_file", "-98"]
-  fails "Enumerable#count ignores the block when given an argument" # Expected warning to match: /given block not used/
-  fails "Enumerable#find_index ignores the block if an argument is given" # Expected warning to match: /given block not used/
   fails "Enumerable#sum gives 0 as a default argument" # NoMethodError: undefined method `sum' for #<Enumerator: #<Object:0x3f120>:each>
   fails "Enumerable#sum returns amount of the elements with taking an argument as the initial value" # NoMethodError: undefined method `sum' for #<Enumerator: #<Object:0x3f118>:each>
   fails "Enumerable#sum takes a block to transform the elements" # NoMethodError: undefined method `sum' for #<Enumerator: #<Object:0x3f110>:each>
