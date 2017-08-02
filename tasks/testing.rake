@@ -259,7 +259,7 @@ platforms.each do |platform|
 
       stubs = Testing::MSpec.stubs.map{|s| "-s#{s}"}.join(' ')
 
-      sh "ruby -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
+      sh "ruby -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
          "bin/opal -gmspec -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 
       if bm_filepath

@@ -53,7 +53,6 @@ module Opal
           # i, j = __jstmp
           s(:masgn, loop_variable, get_tmp_loop_variable)
         else # single argument like "for i in (0..3)"
-          loop_variable_name, _ = *loop_variable
           # i = __jstmp
           loop_variable << get_tmp_loop_variable
         end

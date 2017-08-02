@@ -36,10 +36,6 @@ module Opal
 
       private
 
-      def method_id
-        raise 'Not implemented, see #add_method'
-      end
-
       # Using super in a block inside a method is allowed, e.g.
       # def a
       #  { super }

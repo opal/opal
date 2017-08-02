@@ -32,6 +32,8 @@ module Opal
         if last_arg && [:iter, :block_pass].include?(last_arg.type)
           @iter = last_arg
           args = rest
+        else
+          @iter = nil
         end
 
         @arglist = s(:arglist, *args)
@@ -281,7 +283,6 @@ module Opal
       end
 
       add_special :nesting do |compile_default|
-        recv, method, *args = children
         push_nesting = push_nesting?(children)
         push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
         compile_default.call
@@ -289,7 +290,6 @@ module Opal
       end
 
       add_special :constants do |compile_default|
-        recv, method, *args = children
         push_nesting = push_nesting?(children)
         push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
         compile_default.call

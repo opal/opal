@@ -212,7 +212,7 @@ module Opal
       # Returns an array of JS conditions for raising and argument
       # error caused by arity check
       def arity_checks
-        return @arity_checks if @arity_checks
+        return @arity_checks if defined?(@arity_checks)
 
         arity = args.children.size
         arity -= (opt_args.size)
