@@ -53,15 +53,11 @@ opal_filter "2.4" do
   fails "Module#const_get with dynamically assigned constants returns the updated value of a constant" # Expected warning to match: /already initialized constant/
   fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0x4fbac> was returned)
   fails "Module#prepend doesn't accept no-arguments" # NoMethodError: undefined method `prepend' for #<Module:0x4eda0>
-  fails "Regexp#match? returns false when does not match the given value" # NoMethodError: undefined method `match?' for /STRING/:Regexp
-  fails "Regexp#match? returns false when given nil" # NoMethodError: undefined method `match?' for /./:Regexp
-  fails "Regexp#match? takes matching position as the 2nd argument" # NoMethodError: undefined method `match?' for /str/i:Regexp
-  fails "Regexp#match? when matches the given value returns true but does not set Regexp.last_match" # NoMethodError: undefined method `match?' for /string/i:Regexp
   fails "Regexp.new given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/
   fails "Regexp.new given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/
-  fails "String#concat concatenates the initial value when given arguments contain 2 self" # NoMethodError: undefined method `concat' for "hello":String
-  fails "String#concat returns self when given no arguments" # NoMethodError: undefined method `concat' for "hello":String
-  fails "String#concat takes multiple arguments" # NoMethodError: undefined method `concat' for "hello ":String
+  fails "String#concat concatenates the initial value when given arguments contain 2 self" # TODO: move to unsupported
+  fails "String#concat returns self when given no arguments" # TODO: move to unsupported
+  fails "String#concat takes multiple arguments" # TODO: move to unsupported
   fails "String#match? returns false when does not match the given regex" # NoMethodError: undefined method `match?' for "string":String
   fails "String#match? takes matching position as the 2nd argument" # NoMethodError: undefined method `match?' for "string":String
   fails "String#match? when matches the given regex returns true but does not set Regexp.last_match" # NoMethodError: undefined method `match?' for "string":String

@@ -199,6 +199,51 @@ class Regexp < `RegExp`
     }
   end
 
+  def match?(string, pos = undefined)
+    %x{
+      if (self.uninitialized) {
+        #{raise TypeError, 'uninitialized Regexp'}
+      }
+
+      if (pos === undefined) {
+        pos = 0;
+      } else {
+        pos = #{Opal.coerce_to(pos, Integer, :to_int)};
+      }
+
+      if (string === nil) {
+        return false;
+      }
+
+      string = #{Opal.coerce_to(string, String, :to_str)};
+
+      if (pos < 0) {
+        pos += string.length;
+        if (pos < 0) {
+          return false;
+        }
+      }
+
+      var source = self.source;
+      var flags = 'g';
+      // m flag + a . in Ruby will match white space, but in JS, it only matches beginning/ending of lines, so we get the equivalent here
+      if (self.multiline) {
+        source = source.replace('.', "[\\s\\S]");
+        flags += 'm';
+      }
+
+      // global RegExp maintains state, so not using self/this
+      var md, re = new RegExp(source, flags + (self.ignoreCase ? 'i' : ''));
+
+      md = re.exec(string);
+      if (md === null || md.index < pos) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  end
+
   def ~
     self =~ $_
   end
