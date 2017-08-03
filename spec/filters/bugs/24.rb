@@ -53,37 +53,6 @@ opal_filter "2.4" do
   fails "Module#const_get with dynamically assigned constants returns the updated value of a constant" # Expected warning to match: /already initialized constant/
   fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0x4fbac> was returned)
   fails "Module#prepend doesn't accept no-arguments" # NoMethodError: undefined method `prepend' for #<Module:0x4eda0>
-  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size should return infinity_value when limit is nil" # ArgumentError: limit must be a number
-  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when stop is nil returns infinity_value" # ArgumentError: limit must be a number
-  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when stop is not passed returns infinity_value" # ArgumentError: limit must be a number
-  fails "Numeric#step with keyword arguments when step is a String with self and stop as Fixnums raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with keyword arguments when step is a String with self and stop as Fixnums raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with keyword arguments when step is a String with self and stop as Floats raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with keyword arguments when step is a String with self and stop as Floats raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when stop is nil returns infinity_value" # ArgumentError: limit must be a number
-  fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when stop is not passed returns infinity_value" # ArgumentError: limit must be a number
-  fails "Numeric#step with mixed arguments when step is a String with self and stop as Fixnums raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with mixed arguments when step is a String with self and stop as Fixnums raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with mixed arguments when step is a String with self and stop as Floats raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with mixed arguments when step is a String with self and stop as Floats raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with positional args when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with positional args when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with positional args when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with positional args when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with positional args when no block is given returned Enumerator size when stop is nil returns infinity_value" # ArgumentError: limit must be a number
-  fails "Numeric#step with positional args when no block is given returned Enumerator size when stop is not passed returns infinity_value" # ArgumentError: limit must be a number
-  fails "Numeric#step with positional args when step is a String with self and stop as Fixnums raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with positional args when step is a String with self and stop as Fixnums raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
-  fails "Numeric#step with positional args when step is a String with self and stop as Floats raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
-  fails "Numeric#step with positional args when step is a String with self and stop as Floats raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
   fails "Regexp#match? returns false when does not match the given value" # NoMethodError: undefined method `match?' for /STRING/:Regexp
   fails "Regexp#match? returns false when given nil" # NoMethodError: undefined method `match?' for /./:Regexp
   fails "Regexp#match? takes matching position as the 2nd argument" # NoMethodError: undefined method `match?' for /str/i:Regexp

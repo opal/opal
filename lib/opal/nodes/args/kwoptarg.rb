@@ -17,11 +17,15 @@ module Opal
 
         add_temp name
 
-        line "if ((#{name} = $kwargs.$$smap['#{name}']) == null) {"
-        line "  #{name} = ", expr(default_value)
-        line "}"
+        line "#{name} = $kwargs.$$smap['#{name}'];"
 
         scope.used_kwargs << name
+
+        return if default_value.children[1] == :undefined
+
+        line "if (#{name} == null) {"
+        line "  #{name} = ", expr(default_value)
+        line "}"
       end
     end
   end
