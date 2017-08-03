@@ -1,6 +1,8 @@
 opal_filter "Time" do
+  fails "Time#- tracks microseconds from a Rational" # Expected 0 to equal 123456
   fails "Time#dup returns a clone of Time instance"
   fails "Time#getlocal raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
+  fails "Time#gmtime converts self to UTC, modifying the receiver" # Expected 2007-01-09 03:00:00 UTC to equal 2007-01-09 12:00:00 UTC
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'" # Expected "2000-01-01 20:15:01 +1200" to equal "2000-01-01 20:15:01 +0100"
   fails "Time#localtime raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
@@ -27,6 +29,7 @@ opal_filter "Time" do
   fails "Time#to_f returns the float number of seconds + usecs since the epoch"
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'" # Expected "2000-01-01 20:15:01 +1200" to equal "2000-01-01 20:15:01 +0100"
+  fails "Time#utc converts self to UTC, modifying the receiver" # Expected 2007-01-09 03:00:00 UTC to equal 2007-01-09 12:00:00 UTC
   fails "Time#yday returns an integer representing the day of the year, 1..366" # Expected 117 to equal 116
   fails "Time#zone Encoding.default_internal is set returns an ASCII string"
   fails "Time#zone defaults to UTC when bad zones given" # Expected 3600 to equal 0

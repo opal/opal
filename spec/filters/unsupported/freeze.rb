@@ -72,4 +72,12 @@ opal_unsupported_filter "freezing" do
   fails "String#freeze doesn't produce the same object for different instances of literals in the source"
   fails "String#initialize with no arguments does not raise an exception when frozen"
   fails "StringScanner#initialize returns an instance of StringScanner"
+  fails "Hash#compact! on frozen instance keeps pairs and raises a RuntimeError"
+  fails "Hash#transform_values! on frozen instance keeps pairs and raises a RuntimeError"
+  fails "Hash#transform_values! on frozen instance when no block is given does not raise an exception"
+  fails "Time#gmtime on a frozen time raises a RuntimeError if the time is not UTC"
+  fails "Time#localtime on a frozen time does not raise an error if already in the right time zone"
+  fails "Time#localtime on a frozen time raises a RuntimeError if the time has a different time zone"
+  fails "Time#utc on a frozen time raises a RuntimeError if the time is not UTC"
+  fails "Kernel#clone takes an option to copy freeze state or not" # TODO: move to unsupported/freeze
 end

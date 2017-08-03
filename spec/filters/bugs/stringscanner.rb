@@ -34,10 +34,12 @@ opal_filter "StringScanner" do
   fails "StringScanner#peek raises a ArgumentError when the passed argument is negative"
   fails "StringScanner#peek raises a RangeError when the passed argument is a Bignum"
   fails "StringScanner#peek returns an instance of String when passed a String subclass"
+  fails "StringScanner#peek returns at most the specified number of bytes from the current position" # Expected "ét" to equal "é"
   fails "StringScanner#peep raises a ArgumentError when the passed argument is negative"
   fails "StringScanner#peep raises a RangeError when the passed argument is a Bignum"
   fails "StringScanner#peep returns an empty string when the passed argument is zero"
   fails "StringScanner#peep returns an instance of String when passed a String subclass"
+  fails "StringScanner#peep returns at most the specified number of bytes from the current position" # NoMethodError: undefined method `peep' for #<StringScanner:0x590>
   fails "StringScanner#peep returns at most the specified number of characters from the current position"
   fails "StringScanner#peep warns in verbose mode that the method is obsolete"
   fails "StringScanner#pointer returns 0 in the reset position"

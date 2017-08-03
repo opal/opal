@@ -1,7 +1,13 @@
 opal_filter "String" do
   fails "String#% supports inspect formats using %p" # Expected "{\"capture\"=>1}" to equal "{:capture=>1}"
+  fails "String#[] raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#[] with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#[] with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
   fails "String#bytes agrees with #unpack('C*')"
   fails "String#bytes yields each byte to a block if one is given, returning self"
+  fails "String#byteslice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#byteslice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#byteslice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible"
   fails "String#dump returns a string with # not escaped when followed by any other character"
   fails "String#dump returns a string with \" and \\ escaped with a backslash"
@@ -29,9 +35,17 @@ opal_filter "String" do
   fails "String#getbyte returns an Integer if given a valid index"
   fails "String#getbyte returns nil for out-of-bound indexes"
   fails "String#getbyte starts indexing at 0"
+  fails "String#match? returns false when does not match the given regex" # NoMethodError: undefined method `match?' for "string":String
+  fails "String#match? takes matching position as the 2nd argument" # NoMethodError: undefined method `match?' for "string":String
+  fails "String#match? when matches the given regex returns true but does not set Regexp.last_match" # NoMethodError: undefined method `match?' for "string":String
   fails "String#prepend raises a RuntimeError when self is frozen" # NoMethodError: undefined method `prepend' for "hello":String
   fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
+  fails "String#slice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#slice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#slice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
+  fails "String#split with Regexp applies the limit to the number of split substrings, without counting captures" # Expected ["a", "aBa"] to equal ["a", "B", "", "", "aBa"]
   fails "String#sub with pattern, replacement returns a copy of self when no modification is made"
+  fails "String#swapcase works for all of Unicode" # Expected "äÖü" to equal "ÄöÜ"
   fails "String#to_c returns a Complex object"
   fails "String#to_c returns a complex number with 0 as the real part, 0 as the imaginary part for unrecognised Strings"
   fails "String#to_c understands 'a+bi' to mean a complex number with 'a' as the real part, 'b' as the imaginary"

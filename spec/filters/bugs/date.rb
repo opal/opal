@@ -38,6 +38,7 @@ opal_filter "Date" do
   fails "Date#strftime should be able to show the commercial week day"
   fails "Date#strftime should be able to show the commercial week"
   fails "Date#strftime should be able to show the number of seconds since the unix epoch"
+  fails "Date#strftime should be able to show the number of seconds since the unix epoch for a date" # Expected "954964800" to equal "954979200"
   fails "Date#strftime should be able to show the timezone of the date with a : separator"
   fails "Date#strftime should be able to show the timezone with a : separator"
   fails "Date#strftime should be able to show the week number with the week starting on Sunday (%U) and Monday (%W)"

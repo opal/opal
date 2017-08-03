@@ -26,6 +26,7 @@ opal_filter "Exception" do
   fails "Exception#backtrace includes the line number of the location where self raised in the first element"
   fails "Exception#backtrace includes the name of the method from where self raised in the first element"
   fails "Exception#backtrace produces a backtrace for an exception captured using $!" # Expected "RuntimeError" to match /backtrace_spec/
+  fails "Exception#backtrace returns an Array that can be updated" # Expected "RuntimeError" to equal "backtrace first"
   fails "Exception#backtrace returns nil if no backtrace was set"
   fails "Exception#cause returns the active exception when an exception is raised"
   fails "Exception#set_backtrace accepts a String"
@@ -69,4 +70,6 @@ opal_filter "Exception" do
   fails "NameError#receiver returns the object that raised the exception"
   fails "NameError#receiver returns the receiver when raised from #class_variable_get"
   fails "NameError#receiver returns the receiver when raised from #instance_variable_get"
+
+  fails "UncaughtThrowError#tag returns the object thrown" # NoMethodError: undefined method `tag' for #<UncaughtThrowError: uncaught throw "abc">:UncaughtThrowError
 end
