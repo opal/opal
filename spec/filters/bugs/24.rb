@@ -31,14 +31,8 @@ opal_filter "2.4" do
   fails "Hash#to_s does not call #to_s on a String returned from #inspect" # Expected "{\"a\"=>\"abc\"}" to equal "{:a=>\"abc\"}"
   fails "Hash#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0x1b948>}" to match /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/
   fails "Hash#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
-  fails "Hash#transform_values returns new hash" # NoMethodError: undefined method `transform_values' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#transform_values sets the result as transformed values with the given block" # NoMethodError: undefined method `transform_values' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#transform_values when no block is given returns a sized Enumerator" # NoMethodError: undefined method `transform_values' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#transform_values! on frozen instance keeps pairs and raises a RuntimeError" # NoMethodError: undefined method `transform_values!' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#transform_values! on frozen instance when no block is given does not raise an exception" # NoMethodError: undefined method `transform_values!' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#transform_values! returns self" # NoMethodError: undefined method `transform_values!' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#transform_values! updates self as transformed values with the given block" # NoMethodError: undefined method `transform_values!' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#transform_values! when no block is given returns a sized Enumerator" # NoMethodError: undefined method `transform_values!' for {"a"=>1, "b"=>2, "c"=>3}
+  fails "Hash#transform_values! on frozen instance keeps pairs and raises a RuntimeError" # TODO: move to unsupported/freeze
+  fails "Hash#transform_values! on frozen instance when no block is given does not raise an exception" # TODO: move to unsupported/freeze
   fails "Hash.[] ignores elements that are not arrays" # Expected warning to match: /ignoring wrong elements/
   fails "Kernel#=== does not call #object_id nor #equal? but still returns true for #== or #=== on the same object" # Mock '#<Object:0x37dd4>' expected to receive 'object_id' exactly 0 times but received it 2 times
   fails "Kernel#clone returns false for FalseClass" # TypeError: can't clone Boolean
