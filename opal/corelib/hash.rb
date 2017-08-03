@@ -229,6 +229,56 @@ class Hash
     }
   end
 
+  def compact
+    %x{
+      var hash = Opal.hash();
+
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+        key = keys[i];
+
+        if (key.$$is_string) {
+          value = self.$$smap[key];
+        } else {
+          value = key.value;
+          key = key.key;
+        }
+
+        if (value !== nil) {
+          Opal.hash_put(hash, key, value);
+        }
+      }
+
+      return hash;
+    }
+  end
+
+  def compact!
+    %x{
+      var changes_were_made = false;
+
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+        key = keys[i];
+
+        if (key.$$is_string) {
+          value = self.$$smap[key];
+        } else {
+          value = key.value;
+          key = key.key;
+        }
+
+        if (value === nil) {
+          if (Opal.hash_delete(self, key) !== undefined) {
+            changes_were_made = true;
+            length--;
+            i--;
+          }
+        }
+      }
+
+      return changes_were_made ? self : nil;
+    }
+  end
+
   def compare_by_identity
     %x{
       var i, ii, key, keys = self.$$keys, identity_hash;

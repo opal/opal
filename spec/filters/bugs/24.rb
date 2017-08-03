@@ -20,12 +20,7 @@ opal_filter "2.4" do
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "BasicObject#instance_eval evaluates string with given filename and negative linenumber" # Expected ["RuntimeError"] to equal ["b_file", "-98"]
   fails "Exception#backtrace returns an Array that can be updated" # Expected "RuntimeError" to equal "backtrace first"
-  fails "Hash#compact keeps own pairs" # NoMethodError: undefined method `compact' for {"truthy"=>true, "false"=>false, "nil"=>nil, nil=>true}
-  fails "Hash#compact returns new object that rejects pair has nil value" # NoMethodError: undefined method `compact' for {"truthy"=>true, "false"=>false, "nil"=>nil, nil=>true}
-  fails "Hash#compact! on frozen instance keeps pairs and raises a RuntimeError" # NoMethodError: undefined method `compact!' for {"truthy"=>true, "false"=>false, "nil"=>nil, nil=>true}
-  fails "Hash#compact! rejects own pair has nil value" # NoMethodError: undefined method `compact!' for {"truthy"=>true, "false"=>false, "nil"=>nil, nil=>true}
-  fails "Hash#compact! returns self" # NoMethodError: undefined method `compact!' for {"truthy"=>true, "false"=>false, "nil"=>nil, nil=>true}
-  fails "Hash#compact! when each pair does not have nil value returns nil" # NoMethodError: undefined method `compact!' for {"truthy"=>true, "false"=>false, "nil"=>nil, nil=>true}
+  fails "Hash#compact! on frozen instance keeps pairs and raises a RuntimeError" # TODO: move to unsupported/freeze
   fails "Hash#compare_by_identity gives different identity for string literals" # Expected [2] to equal [1, 2]
   fails "Hash#fetch gives precedence to the default block over the default argument when passed both" # Expected warning to match: /block supersedes default value argument/
   fails "Hash#inspect calls #to_s on the object returned from #inspect if the Object isn't a String" # Expected "{\"a\"=>abc}" to equal "{:a=>abc}"
