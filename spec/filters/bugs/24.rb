@@ -35,15 +35,7 @@ opal_filter "2.4" do
   fails "Hash#transform_values! on frozen instance when no block is given does not raise an exception" # TODO: move to unsupported/freeze
   fails "Hash.[] ignores elements that are not arrays" # Expected warning to match: /ignoring wrong elements/
   fails "Kernel#=== does not call #object_id nor #equal? but still returns true for #== or #=== on the same object" # Mock '#<Object:0x37dd4>' expected to receive 'object_id' exactly 0 times but received it 2 times
-  fails "Kernel#clone returns false for FalseClass" # TypeError: can't clone Boolean
-  fails "Kernel#clone returns nil for NilClass" # TypeError: can't clone NilClass
-  fails "Kernel#clone returns the same Integer for Integer" # TypeError: can't clone Number
-  fails "Kernel#clone returns true for TrueClass" # TypeError: can't clone Boolean
-  fails "Kernel#clone takes an option to copy freeze state or not" # ArgumentError: [Duplicate#clone] wrong number of arguments(1 for 0)
-  fails "Kernel#dup returns false for FalseClass" # TypeError: can't dup Boolean
-  fails "Kernel#dup returns nil for NilClass" # TypeError: can't dup NilClass
-  fails "Kernel#dup returns the same Integer for Integer" # TypeError: can't dup Number
-  fails "Kernel#dup returns true for TrueClass" # TypeError: can't dup Boolean
+  fails "Kernel#clone takes an option to copy freeze state or not" # TODO: move to unsupported/freeze
   fails "Kernel#eval evaluates string with given filename and negative linenumber" # NameError: uninitialized constant TOPLEVEL_BINDING
   fails "Kernel#singleton_method find a method defined on the singleton class" # NoMethodError: undefined method `singleton_method' for #<Object:0x39d20>
   fails "Kernel#singleton_method only looks at singleton methods and not at methods in the class" # Expected NoMethodError to equal NameError

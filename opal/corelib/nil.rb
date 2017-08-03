@@ -30,11 +30,11 @@ class NilClass
   end
 
   def dup
-    raise TypeError, "can't dup #{self.class}"
+    nil
   end
 
-  def clone
-    raise TypeError, "can't clone #{self.class}"
+  def clone(freeze: true)
+    nil
   end
 
   def inspect

@@ -137,7 +137,7 @@ module Kernel
     }
   end
 
-  def clone
+  def clone(freeze: true)
     copy = self.class.allocate
 
     copy.copy_instance_variables(self)

@@ -48,11 +48,11 @@ class Boolean < `Boolean`
   end
 
   def dup
-    raise TypeError, "can't dup #{self.class}"
+    self
   end
 
-  def clone
-    raise TypeError, "can't clone #{self.class}"
+  def clone(freeze: true)
+    self
   end
 end
 
