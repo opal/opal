@@ -20,12 +20,6 @@ opal_filter "2.4" do
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "BasicObject#instance_eval evaluates string with given filename and negative linenumber" # Expected ["RuntimeError"] to equal ["b_file", "-98"]
   fails "Exception#backtrace returns an Array that can be updated" # Expected "RuntimeError" to equal "backtrace first"
-  fails "FalseClass .allocate raises a TypeError" # Expected TypeError but no exception was raised (false was returned)
-  fails "FalseClass .new is undefined" # Expected NoMethodError but no exception was raised (false was returned)
-  fails "Fixnum .allocate raises a TypeError" # Exception: Maximum call stack size exceeded
-  fails "Fixnum .new is undefined" # Exception: Maximum call stack size exceeded
-  fails "Float .allocate raises a TypeError" # Expected TypeError but no exception was raised (#<Float:0x38f36> was returned)
-  fails "Float .new is undefined" # Expected NoMethodError but no exception was raised (#<Float:0x38f2e> was returned)
   fails "Hash#compact keeps own pairs" # NoMethodError: undefined method `compact' for {"truthy"=>true, "false"=>false, "nil"=>nil, nil=>true}
   fails "Hash#compact returns new object that rejects pair has nil value" # NoMethodError: undefined method `compact' for {"truthy"=>true, "false"=>false, "nil"=>nil, nil=>true}
   fails "Hash#compact! on frozen instance keeps pairs and raises a RuntimeError" # NoMethodError: undefined method `compact!' for {"truthy"=>true, "false"=>false, "nil"=>nil, nil=>true}
@@ -78,8 +72,6 @@ opal_filter "2.4" do
   fails "Module#const_get with dynamically assigned constants returns the updated value of a constant" # Expected warning to match: /already initialized constant/
   fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0x4fbac> was returned)
   fails "Module#prepend doesn't accept no-arguments" # NoMethodError: undefined method `prepend' for #<Module:0x4eda0>
-  fails "NilClass .allocate raises a TypeError" # Expected TypeError but no exception was raised (nil was returned)
-  fails "NilClass .new is undefined" # Expected NoMethodError but no exception was raised (nil was returned)
   fails "Numeric#step with keyword arguments when no block is given returned Enumerator size should return infinity_value when limit is nil" # ArgumentError: limit must be a number
   fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an TypeError when step is a numeric representation" # ArgumentError: step must be a number
   fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an TypeError with step as an alphanumeric string" # ArgumentError: step must be a number
@@ -139,8 +131,6 @@ opal_filter "2.4" do
   fails "Time#localtime on a frozen time raises a RuntimeError if the time has a different time zone" # NoMethodError: undefined method `localtime' for 2007-01-09 12:00:00 UTC:Time
   fails "Time#succ returns a new instance" # Expected warning to match: /Time#succ is obsolete/
   fails "Time#succ returns a new time one second later than time" # Expected warning to match: /Time#succ is obsolete/
-  fails "TrueClass .allocate raises a TypeError" # Expected TypeError but no exception was raised (false was returned)
-  fails "TrueClass .new is undefined" # Expected NoMethodError but no exception was raised (false was returned)
   fails "UncaughtThrowError#tag returns the object thrown" # NoMethodError: undefined method `tag' for #<UncaughtThrowError: uncaught throw "abc">:UncaughtThrowError
   fails "BigDecimal#to_r returns a Rational" # NoMethodError: undefined method `to_r' for 3.14159
   fails "BigDecimal#to_r returns a Rational with bignum values" # NoMethodError: undefined method `to_r' for 3.141592653589793238462643

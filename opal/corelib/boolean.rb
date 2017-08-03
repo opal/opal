@@ -2,6 +2,14 @@ class Boolean < `Boolean`
   `def.$$is_boolean = true`
   `def.$$meta = #{self}`
 
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
+
+    undef :new
+  end
+
   def __id__
     `self.valueOf() ? 2 : 0`
   end

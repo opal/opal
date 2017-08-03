@@ -5,6 +5,14 @@ class Number < Numeric
   `Number.prototype.$$is_number = true`
   `self.$$is_number_class = true`
 
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
+
+    undef :new
+  end
+
   def coerce(other)
     %x{
       if (other === nil) {
@@ -834,14 +842,22 @@ Fixnum = Number
 class Integer < Numeric
   `self.$$is_number_class = true`
 
-  def self.===(other)
-    %x{
-      if (!other.$$is_number) {
-        return false;
-      }
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
 
-      return (other % 1) === 0;
-    }
+    undef :new
+
+    def ===(other)
+      %x{
+        if (!other.$$is_number) {
+          return false;
+        }
+
+        return (other % 1) === 0;
+      }
+    end
   end
 
   MAX = `Math.pow(2, 30) - 1`
@@ -851,8 +867,16 @@ end
 class Float < Numeric
   `self.$$is_number_class = true`
 
-  def self.===(other)
-    `!!other.$$is_number`
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
+
+    undef :new
+
+    def ===(other)
+      `!!other.$$is_number`
+    end
   end
 
   INFINITY = `Infinity`

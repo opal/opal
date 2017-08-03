@@ -1,6 +1,14 @@
 class NilClass
   `def.$$meta = #{self}`
 
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
+
+    undef :new
+  end
+
   def !
     true
   end
