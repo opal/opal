@@ -44,7 +44,7 @@ module Enumerable
   end
 
   def chunk(&block)
-    Kernel.raise ArgumentError, "no block given" unless block_given?
+    return to_enum(:chunk) { self.enumerator_size } unless block_given?
 
     ::Enumerator.new do |yielder|
       %x{
@@ -113,6 +113,12 @@ module Enumerable
 
   def count(object = undefined, &block)
     result = 0
+
+    %x{
+      if (object != null && block !== nil) {
+        #{warn('warning: given block not used')}
+      }
+    }
 
     if `object != null`
       block = proc do |*args|
@@ -449,6 +455,12 @@ module Enumerable
 
   def find_index(object = undefined, &block)
     return enum_for :find_index if `object === undefined && block === nil`
+
+    %x{
+      if (object != null && block !== nil) {
+        #{warn('warning: given block not used')}
+      }
+    }
 
     index = 0
 
@@ -1134,6 +1146,21 @@ module Enumerable
     dup.map! { |i| `i[1]` }
   end
 
+  def sum(initial = 0, &block)
+    result = initial
+
+    each do |*args|
+      if block_given?
+        item = block.call(*args)
+      else
+        item = Opal.destructure(args)
+      end
+      result += item
+    end
+
+    result
+  end
+
   def take(num)
     first(num)
   end
@@ -1152,6 +1179,26 @@ module Enumerable
 
       `result.push(value)`
     end
+  end
+
+  def uniq(&block)
+    hash = {}
+
+    each do |*args|
+      value = Opal.destructure(args)
+
+      produced = if block_given?
+        block.call(value)
+      else
+        value
+      end
+
+      unless hash.has_key?(produced)
+        hash[produced] = value
+      end
+    end
+
+    hash.values
   end
 
   alias to_a entries

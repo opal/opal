@@ -1,5 +1,6 @@
 opal_filter "Module" do
   fails "Module#alias_method can call a method with super aliased twice"
+  fails "Module#alias_method creates methods that are == to eachother" # Expected #<Method: #<Class:0x3ee54>#uno (defined in #<Class:0x3ee54> in ruby/core/module/fixtures/classes.rb:203)> to equal #<Method: #<Class:0x3ee54>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:203)>
   fails "Module#alias_method raises a TypeError when the given name can't be converted using to_str"
   fails "Module#alias_method retains method visibility"
   fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class"
@@ -86,6 +87,7 @@ opal_filter "Module" do
   fails "Module#extend_object extends the given object with its constants and methods by default"
   fails "Module#extend_object is called when #extend is called on an object"
   fails "Module#extend_object on Class raises a TypeError if calling after rebinded to Class"
+  fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0x4fbac> was returned)
   fails "Module#include doesn't include module if it is included in a super class"
   fails "Module#initialize_copy should retain singleton methods when duped" # Expected [] to equal ["hello"]
   fails "Module#instance_method raises a NameError if the method has been undefined"
@@ -125,6 +127,7 @@ opal_filter "Module" do
   fails "Module#prepend does not import methods to modules and classes"
   fails "Module#prepend does not interfere with a define_method super in the original class"
   fails "Module#prepend does not raise a TypeError when the argument is an instance of a subclass of Module"
+  fails "Module#prepend doesn't accept no-arguments" # NoMethodError: undefined method `prepend' for #<Module:0x4eda0>
   fails "Module#prepend imports constants" # NoMethodError: undefined method `prepend' for #<Module:0x481be>
   fails "Module#prepend imports instance methods"
   fails "Module#prepend includes prepended modules in ancestors"

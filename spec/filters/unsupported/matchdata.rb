@@ -30,4 +30,8 @@ opal_unsupported_filter "MatchData" do
   fails "MatchData#begin returns the offset for multi byte strings with unicode regexp"
   fails "MatchData#end returns the offset for multi byte strings with unicode regexp"
   fails "MatchData#offset returns the offset for multi byte strings with unicode regexp"
+  fails "MatchData#named_captures prefers later captures" # Exception: named captures are not supported in javascript: "^(?<a>.)(?<b>.)(?<b>.)(?<a>.)$"
+  fails "MatchData#named_captures returns a Hash that has captured name and the matched string pairs" # Exception: named captures are not supported in javascript: "(?<a>.)(?<b>.)?"
+  fails "MatchData#values_at slices captures with the given names" # Exception: named captures are not supported in javascript: "(?<a>.)(?<b>.)(?<c>.)"
+  fails "MatchData#values_at takes names and indices" # Exception: named captures are not supported in javascript: "^(?<a>.)(?<b>.)$"
 end

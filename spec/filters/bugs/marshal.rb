@@ -1,5 +1,6 @@
 opal_filter "Marshal" do
   fails "Marshal.dump ignores the recursion limit if the limit is negative" # no support yet
+  fails "Marshal.dump with a Range dumps a Range with extra instance variables" # Expected nil to equal 42
   fails "Marshal.dump with a Regexp dumps a Regexp subclass" # requires Class.new(Regexp).new("").class != Regexp
   fails "Marshal.dump with a Regexp dumps a Regexp with instance variables" # //.source.should == ''
   fails "Marshal.dump with a Time dumps the zone and the offset"

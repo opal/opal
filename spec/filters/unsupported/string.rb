@@ -543,4 +543,10 @@ opal_unsupported_filter "String" do
   fails "String.new returns a binary String"
   fails "String.new returns a fully-formed String"
   fails "String.new returns a new string given a string argument"
+  fails "String#concat concatenates the initial value when given arguments contain 2 self"
+  fails "String#concat returns self when given no arguments"
+  fails "String#concat takes multiple arguments"
+  fails "String#prepend prepends the initial value when given arguments contain 2 self"
+  fails "String#prepend returns self when given no arguments"
+  fails "String#prepend takes multiple arguments"
 end

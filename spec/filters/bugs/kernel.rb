@@ -1,4 +1,5 @@
 opal_filter "Kernel" do
+  fails "Kernel#=== does not call #object_id nor #equal? but still returns true for #== or #=== on the same object" # Mock '#<Object:0x37dd4>' expected to receive 'object_id' exactly 0 times but received it 2 times
   fails "Kernel#=~ returns nil matching any object"
   fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file"
   fails "Kernel#__dir__ when used in eval with top level binding returns the real name of the directory containing the currently-executing file"
@@ -15,6 +16,7 @@ opal_filter "Kernel" do
   fails "Kernel#eval does not make Proc locals visible to evaluated code"
   fails "Kernel#eval does not share locals across eval scopes"
   fails "Kernel#eval doesn't accept a Proc object as a binding"
+  fails "Kernel#eval evaluates string with given filename and negative linenumber" # NameError: uninitialized constant TOPLEVEL_BINDING
   fails "Kernel#eval finds a local in an enclosing scope"
   fails "Kernel#eval finds locals in a nested eval"
   fails "Kernel#eval includes file and line information in syntax error"
@@ -69,6 +71,10 @@ opal_filter "Kernel" do
   fails "Kernel#respond_to_missing? isn't called when obj responds to the given public method"
   fails "Kernel#singleton_class raises TypeError for Fixnum"
   fails "Kernel#singleton_class raises TypeError for Symbol"
+  fails "Kernel#singleton_method find a method defined on the singleton class" # NoMethodError: undefined method `singleton_method' for #<Object:0x39d20>
+  fails "Kernel#singleton_method only looks at singleton methods and not at methods in the class" # Expected NoMethodError to equal NameError
+  fails "Kernel#singleton_method raises a NameError if there is no such method" # Expected NoMethodError to equal NameError
+  fails "Kernel#singleton_method returns a Method which can be called" # NoMethodError: undefined method `singleton_method' for #<Object:0x39d1a>
   fails "Kernel#singleton_methods when not passed an argument does not return any included methods for a class including a module"
   fails "Kernel#singleton_methods when not passed an argument does not return any included methods for a module including a module"
   fails "Kernel#singleton_methods when not passed an argument returns a unique list for a subclass including a module"
@@ -142,6 +148,7 @@ opal_filter "Kernel" do
   fails "Kernel.Rational when passed a String raises a TypeError if the second argument is a Symbol"
   fails "Kernel.Rational when passed a String scales the Rational value of the first argument by the Rational value of the second"
   fails "Kernel.Rational when passed a String when passed a Numeric calls #to_r to convert the first argument to a Rational"
+  fails "Kernel.String calls #to_s if #respond_to?(:to_s) returns true" # TypeError: no implicit conversion of MockObject into String
   fails "Kernel.String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true"
   fails "Kernel.__callee__ returns method name even from eval"
   fails "Kernel.__callee__ returns method name even from send"

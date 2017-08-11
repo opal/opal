@@ -116,6 +116,8 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_i returns Integer or Bignum otherwise"
   fails "BigDecimal#to_int raises FloatDomainError if BigDecimal is infinity or NaN"
   fails "BigDecimal#to_int returns Integer or Bignum otherwise"
+  fails "BigDecimal#to_r returns a Rational" # NoMethodError: undefined method `to_r' for 3.14159
+  fails "BigDecimal#to_r returns a Rational with bignum values" # NoMethodError: undefined method `to_r' for 3.141592653589793238462643
   fails "BigDecimal#to_s can return a leading space for values > 0"
   fails "BigDecimal#to_s can use conventional floating point notation"
   fails "BigDecimal#to_s can use engineering notation"
@@ -140,6 +142,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.new creates a new object of class BigDecimal"
   fails "BigDecimal.new determines precision from initial value"
   fails "BigDecimal.new ignores trailing garbage"
+  fails "BigDecimal.new raises ArgumentError for invalid strings" # Exception: new BigNumber() not a number: ruby
   fails "BigDecimal.new raises ArgumentError when Float is used without precision"
   fails "BigDecimal.new treats invalid strings as 0.0"
   fails "BigDecimal.ver returns the Version number"

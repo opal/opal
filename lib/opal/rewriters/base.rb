@@ -13,12 +13,13 @@ module Opal
         ::Opal::AST::Node.new(type, children)
       end
 
-      alias on_iter    process_regular_node
-      alias on_top     process_regular_node
-      alias on_zsuper  process_regular_node
-      alias on_jscall  on_send
-      alias jsattr     process_regular_node
-      alias jsattrasgn process_regular_node
+      alias on_iter       process_regular_node
+      alias on_top        process_regular_node
+      alias on_zsuper     process_regular_node
+      alias on_jscall     on_send
+      alias on_jsattr     process_regular_node
+      alias on_jsattrasgn process_regular_node
+      alias on_kwsplat    process_regular_node
 
       # Prepends given +node+ to +body+ node.
       #

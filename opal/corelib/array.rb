@@ -23,6 +23,10 @@ class Array < `Array`
 
   def initialize(size = nil, obj = nil, &block)
     %x{
+      if (obj !== nil && block !== nil) {
+        #{warn('warning: block supersedes default value argument')}
+      }
+
       if (size > #{Integer::MAX}) {
         #{raise ArgumentError, "array size too big"}
       }
@@ -749,18 +753,28 @@ class Array < `Array`
     }
   end
 
-  def concat(other)
-    if Array === other
-      other = other.to_a
-    else
-      other = Opal.coerce_to(other, Array, :to_ary).to_a
+  def concat(*others)
+    others = others.map do |other|
+      if Array === other
+        other = other.to_a
+      else
+        other = Opal.coerce_to(other, Array, :to_ary).to_a
+      end
+
+      if other.equal?(self)
+        other = other.dup
+      end
+
+      other
     end
 
-    %x{
-      for (var i = 0, length = other.length; i < length; i++) {
-        self.push(other[i]);
+    others.each do |other|
+      %x{
+        for (var i = 0, length = other.length; i < length; i++) {
+          self.push(other[i]);
+        }
       }
-    }
+    end
 
     self
   end
@@ -951,6 +965,10 @@ class Array < `Array`
 
       if (index >= 0 && index < self.length) {
         return self[index];
+      }
+
+      if (block !== nil && defaults != null) {
+        #{warn('warning: block supersedes default value argument')}
       }
 
       if (block !== nil) {
@@ -1199,6 +1217,10 @@ class Array < `Array`
   def index(object=undefined, &block)
     %x{
       var i, length, value;
+
+      if (object != null && block !== nil) {
+        #{warn('warning: given block not used')}
+      }
 
       if (object != null) {
         for (i = 0, length = self.length; i < length; i++) {
@@ -1641,6 +1663,10 @@ class Array < `Array`
   def rindex(object = undefined, &block)
     %x{
       var i, value;
+
+      if (object != null && block !== nil) {
+        #{warn('warning: given block not used')}
+      }
 
       if (object != null) {
         for (i = self.length - 1; i >= 0; i--) {

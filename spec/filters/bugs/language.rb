@@ -67,6 +67,7 @@ opal_filter "language" do
   fails "Literal Regexps supports (?> ) (embedded subexpression)"
   fails "Literal Regexps supports \\g (named backreference)"
   fails "Literal Regexps supports character class composition"
+  fails "Literal Regexps supports conditional regular expressions with named capture groups" # Exception: named captures are not supported in javascript: "^(?<word>foo)?(?(<word>)(T)|(F))$"
   fails "Literal Regexps supports conditional regular expressions with positional capture groups" # Exception: Invalid regular expression: /^(foo)?(?(1)(T)|(F))$/: Invalid group
   fails "Literal Regexps supports conditional regular expressions with positional capture groups" # Exception: named captures are not supported in javascript: "^(?<word>foo)?(?(<word>)(T)|(F))$"
   fails "Literal Regexps supports possessive quantifiers"
@@ -118,6 +119,7 @@ opal_filter "language" do
   fails "The alias keyword operates on the object's metaclass when used in instance_eval"
   fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when calling the block from a method"
   fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when yielding to the block"
+  fails "The break statement in a captured block from another thread raises a LocalJumpError when getting the value from another thread" # NameError: uninitialized constant Thread
   fails "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when invoking the block from a method"
   fails "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when invoking the block from the scope creating the block"
   fails "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when yielding to the block"
@@ -186,4 +188,6 @@ opal_filter "language" do
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols"
   fails_badly "The while expression stops running body if interrupted by break in a begin ... end attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break in a parenthesized attribute op-assign-or value"
+  fails_badly "The while expression stops running body if interrupted by break with unless in a parenthesized attribute op-assign-or value"
+  fails_badly "The while expression stops running body if interrupted by break with unless in a begin ... end attribute op-assign-or value"
 end

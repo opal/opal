@@ -7,6 +7,7 @@ require 'opal/rewriters/block_to_iter'
 require 'opal/rewriters/dot_js_syntax'
 require 'opal/rewriters/logical_operator_assignment'
 require 'opal/rewriters/binary_operator_assignment'
+require 'opal/rewriters/hashes/key_duplicates_rewriter'
 
 module Opal
   class Rewriter
@@ -43,6 +44,7 @@ module Opal
     use Rewriters::LogicalOperatorAssignment
     use Rewriters::BinaryOperatorAssignment
     use Rewriters::ExplicitWriterReturn
+    use Rewriters::Hashes::KeyDuplicatesRewriter
 
     def initialize(sexp)
       @sexp = sexp

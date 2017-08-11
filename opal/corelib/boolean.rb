@@ -2,6 +2,14 @@ class Boolean < `Boolean`
   `def.$$is_boolean = true`
   `def.$$meta = #{self}`
 
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
+
+    undef :new
+  end
+
   def __id__
     `self.valueOf() ? 2 : 0`
   end
@@ -40,11 +48,11 @@ class Boolean < `Boolean`
   end
 
   def dup
-    raise TypeError, "can't dup #{self.class}"
+    self
   end
 
-  def clone
-    raise TypeError, "can't clone #{self.class}"
+  def clone(freeze: true)
+    self
   end
 end
 

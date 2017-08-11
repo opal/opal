@@ -5,6 +5,14 @@ class Number < Numeric
   `Number.prototype.$$is_number = true`
   `self.$$is_number_class = true`
 
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
+
+    undef :new
+  end
+
   def coerce(other)
     %x{
       if (other === nil) {
@@ -581,31 +589,52 @@ class Number < Numeric
     end
   end
 
-  def step(limit = nil, step = nil, to: nil, by: nil, &block)
+  def step(limit = undefined, step = undefined, to: undefined, by: undefined, &block)
     %x{
-      if (limit !== nil && to !== nil) {
+      if (limit !== undefined && to !== undefined) {
         #{raise ArgumentError, "to is given twice"}
       }
 
-      if (step !== nil && by !== nil) {
+      if (step !== undefined && by !== undefined) {
         #{raise ArgumentError, "step is given twice"}
       }
 
       function validateParameters() {
+        if (to !== undefined) {
+          limit = to;
+        }
+
+        if (limit === undefined) {
+          limit = nil;
+        }
+
+        if (step === nil) {
+          #{raise TypeError, "step must be numeric"}
+        }
+
         if (step === 0) {
-          #{raise ArgumentError, "step cannot be 0"}
+          #{raise ArgumentError, "step can't be 0"}
         }
 
-        #{limit ||= to};
-        #{step ||= by || 1};
-
-        if (!limit.$$is_number) {
-          #{raise ArgumentError, "limit must be a number"}
+        if (by !== undefined) {
+          step = by;
         }
 
-        if (!step.$$is_number) {
-          #{raise ArgumentError, "step must be a number"}
+        if (step === nil || step == null) {
+          step = 1;
         }
+
+        var sign = #{step <=> 0};
+
+        if (sign === nil) {
+          #{raise TypeError, "0 can't be coerced into #{step.class}"}
+        }
+
+        if (limit === nil || limit == null) {
+          limit = sign > 0 ? #{Float::INFINITY} : #{-Float::INFINITY};
+        }
+
+        #{Opal.compare(self, limit)}
       }
 
       function stepFloatSize() {
@@ -651,7 +680,32 @@ class Number < Numeric
     }
 
     unless block_given?
-      return enum_for(:step, limit, step, to: to, by: by) { `stepSize()` }
+      positional_args = []
+      keyword_args = {}
+
+      %x{
+        if (limit !== undefined) {
+          positional_args.push(limit);
+        }
+
+        if (step !== undefined) {
+          positional_args.push(step);
+        }
+
+        if (to !== undefined) {
+          Opal.hash_put(keyword_args, "to", to);
+        }
+
+        if (by !== undefined) {
+          Opal.hash_put(keyword_args, "by", by);
+        }
+
+        if (!#{keyword_args.empty?}) {
+          positional_args.push(keyword_args);
+        }
+      }
+
+      return enum_for(:step, *positional_args) { `stepSize()` }
     end
 
     %x{
@@ -834,14 +888,22 @@ Fixnum = Number
 class Integer < Numeric
   `self.$$is_number_class = true`
 
-  def self.===(other)
-    %x{
-      if (!other.$$is_number) {
-        return false;
-      }
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
 
-      return (other % 1) === 0;
-    }
+    undef :new
+
+    def ===(other)
+      %x{
+        if (!other.$$is_number) {
+          return false;
+        }
+
+        return (other % 1) === 0;
+      }
+    end
   end
 
   MAX = `Math.pow(2, 30) - 1`
@@ -851,8 +913,16 @@ end
 class Float < Numeric
   `self.$$is_number_class = true`
 
-  def self.===(other)
-    `!!other.$$is_number`
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
+
+    undef :new
+
+    def ===(other)
+      `!!other.$$is_number`
+    end
   end
 
   INFINITY = `Infinity`

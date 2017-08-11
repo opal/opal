@@ -7,6 +7,8 @@ module RewritersHelper
     described_class.new.process(ast)
   end
 
+  alias :rewrite :rewritten
+
   def expect_rewritten(ast)
     expect(rewritten(ast))
   end
@@ -15,10 +17,19 @@ module RewritersHelper
     expect_rewritten(ast).to eq(ast)
   end
 
-  def ast_of(source)
+  def parse(source)
     buffer = Parser::Source::Buffer.new('(eval)')
     buffer.source = source
     parser = Opal::Parser.default_parser
+    parser.parse(buffer)
+  end
+
+  alias :ast_of :parse
+
+  def parse_without_rewriting(source)
+    buffer = Parser::Source::Buffer.new('(eval)')
+    buffer.source = source
+    parser = Opal::Parser.superclass.new
     parser.parse(buffer)
   end
 end

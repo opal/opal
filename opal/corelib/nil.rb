@@ -1,6 +1,14 @@
 class NilClass
   `def.$$meta = #{self}`
 
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{self.name}"
+    end
+
+    undef :new
+  end
+
   def !
     true
   end
@@ -22,11 +30,11 @@ class NilClass
   end
 
   def dup
-    raise TypeError, "can't dup #{self.class}"
+    nil
   end
 
-  def clone
-    raise TypeError, "can't clone #{self.class}"
+  def clone(freeze: true)
+    nil
   end
 
   def inspect
