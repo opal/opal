@@ -623,12 +623,12 @@ class Date
     end
   end
 
-  def upto(enddate, &block)
-    step(enddate, 1, &block)
+  def upto(max, &block)
+    step(max, 1, &block)
   end
 
-  def downto(enddate, &block)
-    step(enddate, -1, &block)
+  def downto(min, &block)
+    step(min, -1, &block)
   end
 
   def wday
