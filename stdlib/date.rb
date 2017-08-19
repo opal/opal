@@ -605,15 +605,14 @@ class Date
       steps = []
     else
       if steps_count < 0
-        puts "steps_count -: #{steps_count}"
-        steps = (0 .. -steps_count).step(step.abs).map {|i| -i}.reverse
+        steps = (0..-steps_count).step(step.abs).map { |i| -i } .reverse
       else
         puts "steps_count +: #{steps_count}"
-        steps = (0 .. steps_count).step(step.abs)
+        steps = (0..steps_count).step(step.abs)
       end
     end
 
-    result = steps.map {|i| self + i}
+    result = steps.map { |i| self + i }
 
 
     if block_given?
@@ -625,11 +624,11 @@ class Date
   end
 
   def upto(enddate, &block)
-       self.step(enddate, 1, &block)
+    step(enddate, 1, &block)
   end
 
   def downto(enddate, &block)
-    self.step(enddate, -1, &block)
+    step(enddate, -1, &block)
   end
 
   def wday
