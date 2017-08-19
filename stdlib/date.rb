@@ -607,7 +607,6 @@ class Date
       if steps_count < 0
         steps = (0..-steps_count).step(step.abs).map { |i| -i } .reverse
       else
-        puts "steps_count +: #{steps_count}"
         steps = (0..steps_count).step(step.abs)
       end
     end
