@@ -42,24 +42,26 @@ class Date
 
     def <=> (other)
       case other
-      when Infinity; return d <=> other.d
-      when Numeric; return d
-      else
-        begin
-          l, r = other.coerce(self)
-          return l <=> r
-        rescue NoMethodError
-        end
+        when Infinity;
+          return d <=> other.d
+        when Numeric;
+          return d
+        else
+          begin
+            l, r = other.coerce(self)
+            return l <=> r
+          rescue NoMethodError
+          end
       end
       nil
     end
 
     def coerce(other)
       case other
-      when Numeric
-        return -d, d
-      else
-        super
+        when Numeric
+          return -d, d
+        else
+          super
       end
     end
 
@@ -594,6 +596,40 @@ class Date
 
   def tuesday?
     wday == 2
+  end
+
+  def step(limit, step = 1, &block)
+    steps_count = (limit - self).to_i
+
+    if (steps_count * step) < 0
+      steps = []
+    else
+      if steps_count < 0
+        puts "steps_count -: #{steps_count}"
+        steps = (0 .. -steps_count).step(step.abs).map {|i| -i}.reverse
+      else
+        puts "steps_count +: #{steps_count}"
+        steps = (0 .. steps_count).step(step.abs)
+      end
+    end
+
+    result = steps.map {|i| self + i}
+
+
+    if block_given?
+      result.each {|i| yield(i)}
+      self
+    else
+      result
+    end
+  end
+
+  def upto(enddate, &block)
+       self.step(enddate, 1, &block)
+  end
+
+  def downto(enddate, &block)
+    self.step(enddate, -1, &block)
   end
 
   def wday
