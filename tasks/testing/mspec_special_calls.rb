@@ -29,14 +29,18 @@ class Opal::Nodes::CallNode
   end
 
   add_special :platform_is_not do |compile_default|
-    unless arglist.children.include?(s(:sym, :opal))
-      compile_default.call
+    if arglist.children.include?(s(:sym, :opal))
+      push 'false'
+    else
+      push 'true'
     end
   end
 
   add_special :platform_is do |compile_default|
     if arglist.children.include?(s(:sym, :opal))
-      compile_default.call
+      push 'true'
+    else
+      push 'false'
     end
   end
 

@@ -27,7 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'ast', '>= 2.3.0'
   spec.add_dependency 'parser', '= 2.3.3.1'
 
-  spec.add_development_dependency 'mspec', '1.5.20'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'racc'
   spec.add_development_dependency 'rspec', '~> 3.6.0'

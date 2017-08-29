@@ -88,6 +88,30 @@ ruby/core/random
 ruby/core/string
 !ruby/core/string/crypt_spec
 !ruby/core/string/scrub_spec
+ruby/core/string/unpack/a_spec
+# ruby/core/string/unpack/at_spec
+# ruby/core/string/unpack/b_spec
+ruby/core/string/unpack/c_spec
+# ruby/core/string/unpack/comment_spec
+# ruby/core/string/unpack/d_spec
+# ruby/core/string/unpack/e_spec
+# ruby/core/string/unpack/f_spec
+# ruby/core/string/unpack/g_spec
+# ruby/core/string/unpack/h_spec
+# ruby/core/string/unpack/i_spec
+# ruby/core/string/unpack/j_spec
+ruby/core/string/unpack/l_spec
+# ruby/core/string/unpack/m_spec
+ruby/core/string/unpack/n_spec
+# ruby/core/string/unpack/p_spec
+# ruby/core/string/unpack/percent_spec
+ruby/core/string/unpack/q_spec
+ruby/core/string/unpack/s_spec
+ruby/core/string/unpack/u_spec
+ruby/core/string/unpack/v_spec
+# ruby/core/string/unpack/w_spec
+# ruby/core/string/unpack/x_spec
+# ruby/core/string/unpack/z_spec
 
 ruby/core/struct
 ruby/core/symbol/to_proc_spec
