@@ -307,6 +307,12 @@ describe Opal::Compiler do
     end
   end
 
+  describe 'x-strings' do
+    it 'removes the trailing semicolon' do
+      expect_compiled('a = `1;`').not_to include(";)")
+    end
+  end
+
   def expect_compiled(*args)
     expect(Opal::Compiler.new(*args).compile)
   end

@@ -204,10 +204,12 @@ module Opal
       handle :xstr
 
       def compile
-        children.each do |child|
+        last_index = children.size - 1
+        children.each_with_index do |child, index|
           case child.type
           when :str
             value = child.loc.expression.source
+            value = value.gsub(/;\s*$/, '') if last_index == index
             push Fragment.new(value, nil)
           when :begin
             push expr(child)
