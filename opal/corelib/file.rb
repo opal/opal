@@ -7,20 +7,48 @@ class File < IO
 
   class << self
     def expand_path(path, basedir = nil)
-      path = [basedir, path].compact.join(SEPARATOR)
-      parts = path.split(SEPARATOR)
+      sep = SEPARATOR
       new_parts = []
-      parts[0] = Dir.home if parts.first == '~'
-      parts[0] = Dir.pwd if parts.first == '.'
+
+      if path.start_with?('~') || (basedir && basedir.start_with?('~'))
+        home = Dir.home
+        raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
+        raise(ArgumentError, "non-absolute home") unless home.start_with?(sep)
+        home += sep
+        path = path.sub(/^\~(?:#{sep}|$)/, home)
+        basedir = basedir.sub(/^\~(?:#{sep}|$)/, home) if basedir
+      end
+
+      basedir = Dir.pwd unless basedir
+      path_abs = path.start_with?(sep)
+      basedir_abs = basedir.start_with?(sep)
+
+      if path_abs
+        parts = path.split(sep)
+        leading_sep = path.sub(/^([#{sep}]+).*$/, '\1')
+        abs = true
+      else
+        parts = basedir.split(sep) + path.split(sep)
+        leading_sep = basedir.sub(/^([#{sep}]+).*$/, '\1')
+        abs = basedir_abs
+      end
 
       parts.each do |part|
+        next if part.nil?
+        next if part == ''  && (!new_parts.empty? || abs)
+        next if part == '.' && (!new_parts.empty? || abs)
         if part == '..'
           new_parts.pop
         else
           new_parts << part
         end
       end
-      new_parts.join(SEPARATOR)
+
+      new_parts.unshift '.' if !abs && parts[0] != '.'
+
+      new_path = new_parts.join(sep)
+      new_path = leading_sep+new_path if abs
+      new_path
     end
     alias realpath expand_path
 

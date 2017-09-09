@@ -2153,6 +2153,7 @@
       path = Opal.current_dir.replace(/\/*$/, '/') + path;
     }
 
+    path = path.replace(/^\.\//, '');
     path = path.replace(/\.(rb|opal|js)$/, '');
     parts = path.split(SEPARATOR);
 
