@@ -1123,18 +1123,20 @@ module Kernel
 
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
   def require_tree(path)
-    path = File.expand_path(path)
-    path = '' if path == '.'
-
     %x{
+      var result = [];
+
+      path = #{File.expand_path(path)}
+      path = Opal.normalize(path);
+      if (path === '.') path = '';
       for (var name in Opal.modules) {
         if (#{`name`.start_with?(path)}) {
-          Opal.require(name);
+          result.push([name, Opal.require(name)]);
         }
       }
-    }
 
-    nil
+      return result;
+    }
   end
 
   alias send        __send__
