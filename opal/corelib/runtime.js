@@ -1659,6 +1659,7 @@
     obj.$$proto[jsid] = body;
     // for super dispatcher, etc.
     body.$$owner = obj;
+    if (body.displayName == null) body.displayName = jsid.substr(1);
 
     // is it a module?
     if (obj.$$is_module) {
