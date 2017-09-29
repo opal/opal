@@ -4,10 +4,12 @@ class File < IO
   PATH_SEPARATOR = ':'
   # Assuming case insenstive filesystem
   FNM_SYSCASE = 0
+  WindowsRootRx = /^[a-zA-Z]:(?:\\|\/)/
 
   class << self
     def expand_path(path, basedir = nil)
       sep = SEPARATOR
+      sep_chars = `$sep_chars()`
       new_parts = []
 
       if path.start_with?('~') || (basedir && basedir.start_with?('~'))
@@ -20,16 +22,16 @@ class File < IO
       end
 
       basedir = Dir.pwd unless basedir
-      path_abs = path.start_with?(sep)
-      basedir_abs = basedir.start_with?(sep)
+      path_abs = path.start_with?(sep) || WindowsRootRx.match?(path)
+      basedir_abs = basedir.start_with?(sep) || WindowsRootRx.match?(basedir)
 
       if path_abs
-        parts = path.split(sep)
-        leading_sep = path.sub(/^([#{sep}]+).*$/, '\1')
+        parts = path.split(/[#{sep_chars}]/)
+        leading_sep = WindowsRootRx.match?(path) ? '' : path.sub(/^([#{sep_chars}]+).*$/, '\1')
         abs = true
       else
-        parts = basedir.split(sep) + path.split(sep)
-        leading_sep = basedir.sub(/^([#{sep}]+).*$/, '\1')
+        parts = basedir.split(/[#{sep_chars}]/) + path.split(/[#{sep_chars}]/)
+        leading_sep = WindowsRootRx.match?(basedir) ? '' : basedir.sub(/^([#{sep_chars}]+).*$/, '\1')
         abs = basedir_abs
       end
 

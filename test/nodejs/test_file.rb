@@ -80,8 +80,20 @@ class TestNodejsFile < Test::Unit::TestCase
   end unless windows_platform?
 
   def test_windows_separators
-    assert_equal('\\', File::SEPARATOR)
-    assert_equal('\\', File::Separator)
-    assert_equal('/', File::ALT_SEPARATOR)
+    assert_equal('/', File::SEPARATOR)
+    assert_equal('/', File::Separator)
+    assert_equal('\\', File::ALT_SEPARATOR)
+  end if windows_platform?
+
+  def test_windows_file_expand_path
+    assert_equal(Dir.pwd.gsub(/\\/, '/') + '/foo/bar.js', File.expand_path('./foo/bar.js'))
+    assert_equal('/foo/bar.js', File.expand_path('/foo/bar.js'))
+    assert_equal('c:/foo/bar.js', File.expand_path('c:/foo/bar.js'))
+    assert_equal('c:/foo/bar.js', File.expand_path('c:\\foo\\bar.js'))
+    assert_equal('c:/foo/bar.js', File.expand_path( 'bar.js', 'c:\\foo'))
+    assert_equal('c:/foo/baz/bar.js', File.expand_path('\\baz\\bar.js', 'c:\\foo'))
+    assert_equal('c:/baz/bar.js', File.expand_path( '\\baz\\bar.js', 'c:\\foo\\..'))
+    assert_equal('c:/foo/bar.js', File.expand_path( '\\..\\bar.js', 'c:\\foo\\baz'))
+    assert_equal('c:/foo/bar.js', File.expand_path( '\\..\\bar.js', 'c:\\foo\\baz\\'))
   end if windows_platform?
 end
