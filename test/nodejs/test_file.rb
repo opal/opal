@@ -4,6 +4,10 @@ require 'nodejs'
 require 'nodejs/file'
 
 class TestNodejsFile < Test::Unit::TestCase
+  def tmpdir
+    `require('os').tmpdir()`
+  end
+
   def self.windows_platform?
     `process.platform`.start_with?('win')
   end
@@ -23,7 +27,7 @@ class TestNodejsFile < Test::Unit::TestCase
   end
 
   def test_write_read
-    path = "/tmp/testing_nodejs_file_implementation_#{Time.now.to_i}"
+    path = tmpdir + "/testing_nodejs_file_implementation_#{Time.now.to_i}"
     contents = 'foobar'
     assert !File.exist?(path)
     File.write path, contents
