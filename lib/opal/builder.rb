@@ -117,7 +117,13 @@ module Opal
 
     def read(path)
       path_reader.read(path) or begin
-        message = "can't find file: #{path.inspect} in #{path_reader.paths.inspect}"
+        print_list = lambda { |list| "- #{list.join("\n- ")}\n" }
+        message = "can't find file: #{path.inspect} in:\n"+
+                  print_list[path_reader.paths]+
+                  "\nWith the following extensions:\n"+
+                  print_list[path_reader.extensions]+
+                  "\nAnd the following processors:\n"+
+                  print_list[processors]
 
         case compiler_options[:dynamic_require_severity]
         when :raise   then raise MissingRequire, message
