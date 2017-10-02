@@ -20,7 +20,7 @@ module Opal
       @stubs             ||= []
       @preload           ||= []
       @processors        ||= DEFAULT_PROCESSORS
-      @path_reader       ||= PathReader.new
+      @path_reader       ||= PathReader.new(Opal.paths, extensions.map{|e| [".#{e}", ".js.#{e}"]}.flatten)
       @prerequired       ||= []
       @compiler_options  ||= Opal::Config.compiler_options
       @default_processor ||= RubyProcessor
