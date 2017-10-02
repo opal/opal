@@ -1,6 +1,5 @@
 require 'lib/spec_helper'
 require 'opal/builder'
-require 'lib/shared/path_reader_shared'
 
 describe Opal::Builder do
   subject(:builder) { described_class.new(options) }

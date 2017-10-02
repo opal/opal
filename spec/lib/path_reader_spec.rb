@@ -1,36 +1,47 @@
 require 'lib/spec_helper'
-require 'lib/shared/path_reader_shared'
-require 'lib/shared/path_finder_shared'
 require 'opal/path_reader'
 
-
-describe Opal::PathReader do
-  subject(:file_reader) { described_class.new(path_finder) }
-  let(:path_finder) { double('path_finder') }
+RSpec.describe Opal::PathReader do
+  subject(:path_reader) { described_class.new }
   let(:path) { 'opal_file' }
   let(:full_path) { File.expand_path('../fixtures/opal_file.rb', __FILE__) }
   let(:contents) { File.read(full_path) }
 
   before do
-    allow(path_finder).to receive(:find) {|path| nil}
-    allow(path_finder).to receive(:find).with(path).and_return(full_path)
-    allow(path_finder).to receive(:paths).and_return(Opal.paths)
+    allow_any_instance_of(Hike::Trail).to receive(:find) {|path| nil}
+    allow_any_instance_of(Hike::Trail).to receive(:find).with(path).and_return(full_path)
   end
 
-  include_examples :path_finder
-  include_examples :path_reader do
-    let(:path_reader) { file_reader }
-
-    it 'works with absolute paths' do
-      expect(path_reader.read(File.expand_path(__FILE__))).not_to be_nil
+  describe '#paths' do
+    it 'is an Enumberable' do
+      expect(path_reader.paths).to be_an(Enumerable)
     end
 
-    it 'works with relative paths starting with ./' do
-      expect(path_reader.read('./spec/lib/shared/path_reader_shared.rb')).not_to be_nil
+    it 'includes Opal.paths' do
+      paths = path_reader.paths.to_a
+      Opal.paths.each { |path| expect(paths).to include(path) }
+    end
+  end
+
+  describe '#read' do
+    it 'reads the contents from the path' do
+      expect(path_reader.read(path)).to eq(contents)
     end
 
-    it 'works with absolute paths' do
-      expect(path_reader.read("../#{File.basename(Dir.pwd)}/spec/lib/shared/path_reader_shared.rb")).not_to be_nil
+    it 'returns nil if the file is missing' do
+      expect(path_reader.read('unexpected-path!')).to be_nil
     end
+  end
+
+  it 'works with absolute paths' do
+    expect(path_reader.read(File.expand_path(__FILE__))).not_to be_nil
+  end
+
+  it 'works with relative paths starting with ./' do
+    expect(path_reader.read('./spec/lib/spec_helper.rb')).not_to be_nil
+  end
+
+  it 'works with absolute paths' do
+    expect(path_reader.read("../#{File.basename(Dir.pwd)}/spec/lib/spec_helper.rb")).not_to be_nil
   end
 end
