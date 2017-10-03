@@ -1,15 +1,60 @@
 # frozen_string_literal: true
 require 'opal/path_reader'
-require 'opal/builder_processors'
 require 'opal/paths'
 require 'opal/config'
 require 'set'
 
 module Opal
   class Builder
-    include BuilderProcessors
+    # The registered processors
+    def self.processors
+      @processors ||= []
+    end
+
+    # All the extensions supported by registered processors
+    def self.extensions
+      @extensions ||= []
+    end
+
+    # @public
+    # Register a builder processor and the supported extensions.
+    # A processor will respond to:
+    #
+    # ## `#requires`
+    # An array of string containing the logic paths of required assets
+    #
+    # ## `#required_trees`
+    # An array of string containing the logic paths of required directories
+    #
+    # ## `#to_s`
+    # The processed source
+    #
+    # ## `#source_map`
+    # An instance of `::SourceMap::Map` representing the processd asset's source
+    # map.
+    #
+    # ## `.new(source, filename, compiler_options)`
+    # The processor will be instantiated passing:
+    # - the unprocessed source
+    # - the asset's filename
+    # - Opal's compiler options
+    #
+    # ## `.match?(path)`
+    # The processor is able to recognize paths suitable for its type of
+    # processing.
+    #
+    def self.register_processor(processor, processor_extensions)
+      return if processors.include?(processor)
+      processors << processor
+      processor_extensions.each { |ext| extensions << ext }
+    end
+
+
 
     class MissingRequire < LoadError
+    end
+
+    class ProcessorNotFound < LoadError
     end
 
     def initialize(options = nil)
@@ -19,11 +64,10 @@ module Opal
 
       @stubs             ||= []
       @preload           ||= []
-      @processors        ||= DEFAULT_PROCESSORS
+      @processors        ||= ::Opal::Builder.processors
       @path_reader       ||= PathReader.new(Opal.paths, extensions.map{|e| [".#{e}", ".js.#{e}"]}.flatten)
       @prerequired       ||= []
       @compiler_options  ||= Opal::Config.compiler_options
-      @default_processor ||= RubyProcessor
 
       @processed = []
     end
@@ -38,7 +82,7 @@ module Opal
     end
 
     def build_str source, filename, options = {}
-      path = path_reader.expand(filename).to_s unless stub?(filename)
+      path = path_from_filename(filename)
       asset = processor_for(source, filename, path, options)
       requires = preload + asset.requires + tree_requires(asset, path)
       requires.map { |r| process_require(r, options) }
@@ -79,9 +123,8 @@ module Opal
 
     attr_reader :processed
 
-    attr_accessor :processors, :default_processor, :path_reader,
-                  :compiler_options, :stubs, :prerequired, :preload
-
+    attr_accessor :processors, :path_reader, :compiler_options,
+                  :stubs, :prerequired, :preload
 
 
 
@@ -110,9 +153,9 @@ module Opal
     end
 
     def processor_for(source, filename, path, options)
-      processor   = processors.find { |p| p.match? path }
-      processor ||= default_processor
-      return processor.new(source, filename, compiler_options.merge(options))
+      processor = processors.find { |p| p.match? path } or
+        raise ProcessorNotFound, "can't find processor for filename: #{filename.inspect}, path: #{path.inspect}, source: #{source.inspect}"
+      processor.new(source, filename, compiler_options.merge(options))
     end
 
     def read(path)
@@ -151,10 +194,15 @@ module Opal
         end
       end
 
-      path = path_reader.expand(filename).to_s unless stub?(filename)
+      path = path_from_filename(filename)
       asset = processor_for(source, filename, path, options.merge(requirable: true))
       process_requires(filename, asset.requires+tree_requires(asset, path), options)
       processed << asset
+    end
+
+    def path_from_filename(filename)
+      return if stub?(filename)
+      (path_reader.expand(filename) || File.expand_path(filename)).to_s
     end
 
     def process_requires(filename, requires, options)
@@ -172,7 +220,7 @@ module Opal
     end
 
     def extensions
-      @extensions ||= DEFAULT_PROCESSORS.flat_map(&:extensions).compact
+      ::Opal::Builder.extensions
     end
   end
 end

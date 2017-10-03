@@ -5,13 +5,7 @@ require 'source_map'
 
 module Opal
   module BuilderProcessors
-    DEFAULT_PROCESSORS = []
-
     class Processor
-      def self.inherited(processor)
-        DEFAULT_PROCESSORS << processor
-      end
-
       def initialize(source, filename, options = {})
         @source, @filename, @options = source, filename, options
         @requires = []
@@ -27,8 +21,10 @@ module Opal
         @extensions = extensions
         matches = extensions.join('|')
         matches = "(#{matches})" if extensions.size == 1
-
         @match_regexp = Regexp.new "\\.#{matches}#{REGEXP_END}"
+
+        ::Opal::Builder.register_processor(self, extensions)
+        nil
       end
 
       def self.extensions
@@ -111,6 +107,11 @@ module Opal
 
       def compiler_class
         ::Opal::Compiler
+      end
+
+      # Also catch a files with missing extensions and nil.
+      def self.match? other
+        super or File.extname(other.to_s) == ''
       end
     end
 
