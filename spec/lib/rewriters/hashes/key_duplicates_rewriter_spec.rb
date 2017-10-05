@@ -2,7 +2,7 @@ require 'lib/spec_helper'
 require 'support/rewriters_helper'
 require 'opal/rewriters/hashes/key_duplicates_rewriter'
 
-describe Opal::Rewriters::Hashes::KeyDuplicatesRewriter do
+RSpec.describe Opal::Rewriters::Hashes::KeyDuplicatesRewriter do
   include RewritersHelper
 
   shared_examples 'it warns' do |code, key_to_warn|

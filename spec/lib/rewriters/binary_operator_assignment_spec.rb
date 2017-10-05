@@ -1,6 +1,6 @@
 require 'lib/spec_helper'
 
-describe Opal::Rewriters::BinaryOperatorAssignment do
+RSpec.describe Opal::Rewriters::BinaryOperatorAssignment do
   def s(type, *children)
     ::Opal::AST::Node.new(type, children)
   end

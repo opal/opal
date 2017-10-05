@@ -1,6 +1,6 @@
 require 'lib/spec_helper'
 
-describe Opal::Rewriters::DotJsSyntax do
+RSpec.describe Opal::Rewriters::DotJsSyntax do
   def s(type, *children)
     ::Opal::AST::Node.new(type, children)
   end

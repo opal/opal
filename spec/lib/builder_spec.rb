@@ -1,7 +1,7 @@
 require 'lib/spec_helper'
 require 'opal/builder'
 
-describe Opal::Builder do
+RSpec.describe Opal::Builder do
   subject(:builder) { described_class.new(options) }
   let(:options) { {} }
   let(:ruby_processor) { Opal::BuilderProcessors::RubyProcessor }

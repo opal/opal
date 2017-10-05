@@ -2,7 +2,7 @@ require 'lib/spec_helper'
 require 'opal/rewriters/rubyspec/filters_rewriter'
 require 'support/rewriters_helper'
 
-describe Opal::Rubyspec::FiltersRewriter do
+RSpec.describe Opal::Rubyspec::FiltersRewriter do
   include RewritersHelper
 
   let(:source) do

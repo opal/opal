@@ -1,7 +1,7 @@
 require 'lib/spec_helper'
 require 'opal/config'
 
-describe Opal::Config do
+RSpec.describe Opal::Config do
   before { described_class.reset! }
   after { described_class.reset! }
 

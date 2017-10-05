@@ -1,7 +1,7 @@
 require 'lib/spec_helper'
 require 'support/match_helpers'
 
-describe Opal::Compiler do
+RSpec.describe Opal::Compiler do
   describe 'regexp' do
     it 'should escape regexp' do
       expect_compiled("%r{^/{4,}$}").to include('/^\/{4,}$/')

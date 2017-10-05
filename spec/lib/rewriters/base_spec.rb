@@ -2,7 +2,7 @@ require 'lib/spec_helper'
 require 'support/rewriters_helper'
 require 'opal/rewriters/base'
 
-describe Opal::Rewriters::Base do
+RSpec.describe Opal::Rewriters::Base do
   include RewritersHelper
 
   def body_ast_of(method_source)

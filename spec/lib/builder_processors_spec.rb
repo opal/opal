@@ -1,7 +1,7 @@
 require 'lib/spec_helper'
 require 'opal/builder_processors'
 
-describe Opal::BuilderProcessors::RubyProcessor do
+RSpec.describe Opal::BuilderProcessors::RubyProcessor do
   it 'compiles ruby to js' do
     processor = described_class.new('puts 5', '-e')
     expect(processor.to_s).to include('$puts(5)')

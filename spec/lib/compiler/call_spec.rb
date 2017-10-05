@@ -1,6 +1,6 @@
 require 'lib/spec_helper'
 
-describe Opal::Compiler do
+RSpec.describe Opal::Compiler do
   let(:compiler) { Opal::Compiler.new(method) }
 
   subject(:compiled) { compiler.compile }
