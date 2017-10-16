@@ -1,5 +1,12 @@
 %x{
-  var warnings = {};
+  var warnings = {}, errno_code, errno_codes = [
+    'EACCES',
+    'EISDIR',
+    'EMFILE',
+    'ENOENT',
+    'EPERM'
+  ];
+
   function handle_unsupported_feature(message) {
     switch (Opal.config.unsupported_features_severity) {
     case 'error':
@@ -23,17 +30,18 @@
     try {
       return action();
     } catch (error) {
-      if (error.code === 'EACCES' ||
-          error.code === 'EISDIR' ||
-          error.code === 'EMFILE' ||
-          error.code === 'ENOENT' ||
-          error.code === 'EPERM') {
-        var error_class = #{Errno.const_defined?(`error.code`)} ||
-                          #{Errno.const_set(`error.code`, Class.new(SystemCallError))}
-
+      if (errno_codes.indexOf(error.code) >= 0) {
+        var error_class = #{Errno.const_get(`error.code`)}
         throw #{`error_class`.new(`error.message`)};
       }
       throw error;
+    }
+  }
+
+  for(var i = 0, ii = errno_codes.length; i < ii; i++) {
+    errno_code = errno_codes[i];
+    if (!#{Errno.const_defined?(`errno_code`)}) {
+      #{Errno.const_set(`errno_code`, Class.new(SystemCallError))}
     }
   }
 }

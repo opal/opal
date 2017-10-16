@@ -29,7 +29,7 @@ class TestNodejsFile < Test::Unit::TestCase
     assert_kind_of(Time, t1)
     assert_kind_of(Time, t2)
     assert_equal(t1, t2)
-    File.mtime('nofile')
+    assert_raise(Errno::ENOENT) { File.mtime('nofile') }
   end
 
   def test_write_read
@@ -57,15 +57,13 @@ class TestNodejsFile < Test::Unit::TestCase
   end
 
   def test_read_noexistent_should_raise_io_error
-    assert_raise IOError do
+    assert_raise Errno::ENOENT do
       File.read('tmp/nonexistent')
     end
   end
 
   def test_mtime_noexistent_should_raise_io_error
-    assert_raise IOError do
-      File.mtime('tmp/nonexistent')
-    end
+    assert_raise(Errno::ENOENT) { File.mtime('tmp/nonexistent') }
   end
 
   def test_current_directory_should_be_a_directory
