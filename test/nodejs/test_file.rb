@@ -4,6 +4,10 @@ require 'nodejs'
 require 'nodejs/file'
 
 class TestNodejsFile < Test::Unit::TestCase
+  def tmpdir
+    `require('os').tmpdir()`
+  end
+
   def self.windows_platform?
     `process.platform`.start_with?('win')
   end
@@ -23,7 +27,7 @@ class TestNodejsFile < Test::Unit::TestCase
   end
 
   def test_write_read
-    path = "/tmp/testing_nodejs_file_implementation_#{Time.now.to_i}"
+    path = tmpdir + "/testing_nodejs_file_implementation_#{Time.now.to_i}"
     contents = 'foobar'
     assert !File.exist?(path)
     File.write path, contents
@@ -80,8 +84,20 @@ class TestNodejsFile < Test::Unit::TestCase
   end unless windows_platform?
 
   def test_windows_separators
-    assert_equal('\\', File::SEPARATOR)
-    assert_equal('\\', File::Separator)
-    assert_equal('/', File::ALT_SEPARATOR)
+    assert_equal('/', File::SEPARATOR)
+    assert_equal('/', File::Separator)
+    assert_equal('\\', File::ALT_SEPARATOR)
+  end if windows_platform?
+
+  def test_windows_file_expand_path
+    assert_equal(Dir.pwd.gsub(/\\/, '/') + '/foo/bar.js', File.expand_path('./foo/bar.js'))
+    assert_equal('/foo/bar.js', File.expand_path('/foo/bar.js'))
+    assert_equal('c:/foo/bar.js', File.expand_path('c:/foo/bar.js'))
+    assert_equal('c:/foo/bar.js', File.expand_path('c:\\foo\\bar.js'))
+    assert_equal('c:/foo/bar.js', File.expand_path( 'bar.js', 'c:\\foo'))
+    assert_equal('c:/foo/baz/bar.js', File.expand_path('\\baz\\bar.js', 'c:\\foo'))
+    assert_equal('c:/baz/bar.js', File.expand_path( '\\baz\\bar.js', 'c:\\foo\\..'))
+    assert_equal('c:/foo/bar.js', File.expand_path( '\\..\\bar.js', 'c:\\foo\\baz'))
+    assert_equal('c:/foo/bar.js', File.expand_path( '\\..\\bar.js', 'c:\\foo\\baz\\'))
   end if windows_platform?
 end
