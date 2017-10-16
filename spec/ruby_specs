@@ -88,6 +88,7 @@ ruby/core/random
 ruby/core/string
 !ruby/core/string/crypt_spec
 !ruby/core/string/scrub_spec
+
 ruby/core/string/unpack/a_spec
 # ruby/core/string/unpack/at_spec
 # ruby/core/string/unpack/b_spec
