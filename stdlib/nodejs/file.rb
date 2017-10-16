@@ -106,8 +106,8 @@ class File < IO
     `return executeIOAction(function(){return __fs__.lstatSync(path).size})`
   end
 
-  def self.open path, flags
-    file = new(path, flags)
+  def self.open(path, mode = 'r')
+    file = new(path, mode)
     if block_given?
       begin
         yield(file)
