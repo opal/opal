@@ -28,7 +28,10 @@
           error.code === 'EMFILE' ||
           error.code === 'ENOENT' ||
           error.code === 'EPERM') {
-        throw Opal.IOError.$new(error.message)
+        var error_class = #{Errno.const_defined?(`error.code`)} ||
+                          #{Errno.const_set(`error.code`, Class.new(SystemCallError))}
+
+        throw #{`error_class`.new(`error.message`)};
       }
       throw error;
     }
