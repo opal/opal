@@ -21,7 +21,7 @@ class String
       'v', // supported
       'V', // supported
 
-      'U',
+      'U', // supported
       'w',
 
       // Float
@@ -42,7 +42,7 @@ class String
       'b',
       'H',
       'h',
-      'u',
+      'u', // supported
       'M',
       'm',
 
@@ -278,6 +278,67 @@ class String
       }
     }
 
+    function uudecode(callback) {
+      return function(data) {
+        var bytes = callback(data);
+
+        console.log(bytes);
+
+        var stop = false;
+        var i = 0, length = 0;
+
+        var result = [];
+
+        do {
+          if (i < bytes.length) {
+            var n = bytes[i] - 32 & 0x3F;
+
+            ++i;
+
+            if (bytes[i] === 10) {
+              continue;
+            }
+
+            console.log("Reading n =", n);
+
+            if (n > 45) {
+              return '';
+            }
+
+            length += n;
+
+            while (n > 0) {
+              var c1 = bytes[i];
+              var c2 = bytes[i + 1];
+              var c3 = bytes[i + 2];
+              var c4 = bytes[i + 3];
+
+              var b1 = (c1 - 32 & 0x3F) << 2 | (c2 - 32 & 0x3F) >> 4;
+              var b2 = (c2 - 32 & 0x3F) << 4 | (c3 - 32 & 0x3F) >> 2;
+              var b3 = (c3 - 32 & 0x3F) << 6 | c4 - 32 & 0x3F;
+
+              result.push(b1 & 0xFF);
+              result.push(b2 & 0xFF);
+              result.push(b3 & 0xFF);
+
+              i += 4;
+              n -= 3;
+            }
+
+            ++i;
+          } else {
+            break;
+          }
+        } while (true);
+
+        result = result.slice(0, length);
+
+        console.log(result);
+
+        return result;
+      }
+    }
+
     function identityFunction(value) { return value; }
 
     var handlers = {
@@ -303,6 +364,8 @@ class String
 
       'A': wrapIntoArray(joinChars(bytesToAsciiChars(filterTrailingZerosAndSpaces(identityFunction)))),
       'a': wrapIntoArray(joinChars(bytesToAsciiChars(identityFunction))),
+
+      'u': joinChars(bytesToAsciiChars(uudecode(identityFunction))),
     };
 
     function readBytes(n) {
@@ -384,6 +447,17 @@ class String
       }
     }
 
+    function readUuencodingChunk(buffer) {
+      var length = buffer.indexOf(32); // 32 = space
+
+      if (length === -1) {
+        return { chunk: buffer, rest: [] };
+      } else {
+        return { chunk: buffer.slice(0, length), rest: buffer.slice(length, buffer.length) };
+      }
+
+    }
+
     var readChunk = {
       'C': readBytes(1),
       'S': readBytes(2),
@@ -406,7 +480,9 @@ class String
       'U': readUnicodeCharChunk,
 
       'A': readBytes(1),
-      'a': readBytes(1)
+      'a': readBytes(1),
+
+      'u': readUuencodingChunk,
     }
 
     var autocompletion = {
@@ -431,7 +507,9 @@ class String
       'U': false,
 
       'A': false,
-      'a': false
+      'a': false,
+
+      'u': false,
     }
 
     function alias(existingDirective, newDirective) {
@@ -471,6 +549,10 @@ class String
         var chunk = [],
             chunkReader = readChunk[directive];
 
+        if (chunkReader == null) {
+          #{raise "Unsupported unpack directive #{`directive`.inspect} (no chunk reader defined)"}
+        }
+
         if (count === Infinity) {
           while (buffer.length > 0) {
             var chunkData = chunkReader(buffer);
@@ -492,7 +574,7 @@ class String
         var handler = handlers[directive];
 
         if (handler == null) {
-          #{raise "Unsupported unpack directive #{`directive`.inspect}"}
+          #{raise "Unsupported unpack directive #{`directive`.inspect} (no handler defined)"}
         }
 
         return handler(chunk);

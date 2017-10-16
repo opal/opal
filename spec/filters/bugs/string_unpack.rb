@@ -43,4 +43,5 @@ opal_filter "String#unpack" do
   fails "String#unpack with format 'q' with modifier '>' decodes two longs for two format characters" # Expected [7233738012216484000, 7233733596956420000] to equal [7233738012216485000, 7233733596956420000]
   fails "String#unpack with format 'q' with modifier '>' ignores NULL bytes between directives" # Expected [7523094288207667000, 7233738012216484000] to equal [7523094288207668000, 7233738012216485000]
   fails "String#unpack with format 'q' with modifier '>' ignores spaces between directives" # Expected [7523094288207667000, 7233738012216484000] to equal [7523094288207668000, 7233738012216485000]
+  fails "String#unpack with format 'u' decodes into raw (ascii) string values"
 end
