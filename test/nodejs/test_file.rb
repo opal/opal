@@ -21,9 +21,15 @@ class TestNodejsFile < Test::Unit::TestCase
 
   def test_mtime
     File.write('tmp/qix', "hello")
-    file = File.new('tmp/qix', 'r')
-    file_mtime = file.mtime
-    assert(Time.now >= file_mtime, 'File modification time should be before now')
+    file = 'tmp/qix'
+    File.new(file, 'r')
+
+    t1 = File.mtime(file)
+    t2 = File.open(file) {|f| f.mtime}
+    assert_kind_of(Time, t1)
+    assert_kind_of(Time, t2)
+    assert_equal(t1, t2)
+    File.mtime('nofile')
   end
 
   def test_write_read
