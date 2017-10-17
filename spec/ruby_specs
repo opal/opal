@@ -91,7 +91,7 @@ ruby/core/string
 
 ruby/core/string/unpack/a_spec
 # ruby/core/string/unpack/at_spec
-# ruby/core/string/unpack/b_spec
+ruby/core/string/unpack/b_spec
 ruby/core/string/unpack/c_spec
 # ruby/core/string/unpack/comment_spec
 # ruby/core/string/unpack/d_spec

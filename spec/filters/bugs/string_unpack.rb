@@ -24,6 +24,7 @@ opal_filter "String#unpack" do
   fails "String#unpack with format 'U' does not decode any items for directives exceeding the input string size" # ArgumentError: malformed UTF-8 character
   fails "String#unpack with format 'U' implicitly has a count of one when no count modifier is passed" # ArgumentError: malformed UTF-8 character
   fails "String#unpack with format 'a' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
+  fails "String#unpack with format 'b' decodes into US-ASCII string values" # Expected "UTF-16LE" to equal "US-ASCII"
   fails "String#unpack with format 'q' adds nil for each element requested beyond the end of the String" # Expected [7523094288207668000, nil, nil] to be computed by "abcdefgh".unpack from "q3" (computed [7523094288207667000, nil, nil] instead)
   fails "String#unpack with format 'q' decodes a long with most significant bit set as a negative number" # Expected [-71870673923813380] to equal [-71870673923814400]
   fails "String#unpack with format 'q' decodes one long for a single format character" # Expected [7523094288207667000] to equal [7523094288207668000]
@@ -43,5 +44,5 @@ opal_filter "String#unpack" do
   fails "String#unpack with format 'q' with modifier '>' decodes two longs for two format characters" # Expected [7233738012216484000, 7233733596956420000] to equal [7233738012216485000, 7233733596956420000]
   fails "String#unpack with format 'q' with modifier '>' ignores NULL bytes between directives" # Expected [7523094288207667000, 7233738012216484000] to equal [7523094288207668000, 7233738012216485000]
   fails "String#unpack with format 'q' with modifier '>' ignores spaces between directives" # Expected [7523094288207667000, 7233738012216484000] to equal [7523094288207668000, 7233738012216485000]
-  fails "String#unpack with format 'u' decodes into raw (ascii) string values"
+  fails "String#unpack with format 'u' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
 end

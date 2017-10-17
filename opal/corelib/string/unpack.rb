@@ -39,7 +39,7 @@ class String
       'a', // supported
       'Z',
       'B',
-      'b',
+      'b', // supported
       'H',
       'h',
       'u', // supported
@@ -57,7 +57,7 @@ class String
 
     var modifiers = [
       '!', // ignored
-      '_', // ignores
+      '_', // ignored
       '>', // big endian
       '<'  // little endian
     ];
@@ -339,6 +339,18 @@ class String
       }
     }
 
+    function toBits(callback) {
+      return function(data) {
+        var bytes = callback(data);
+
+        var bits = bytes.map(function(byte) {
+          return byte.toString(2);
+        });
+
+        return bits;
+      }
+    }
+
     function identityFunction(value) { return value; }
 
     var handlers = {
@@ -366,6 +378,8 @@ class String
       'a': wrapIntoArray(joinChars(bytesToAsciiChars(identityFunction))),
 
       'u': joinChars(bytesToAsciiChars(uudecode(identityFunction))),
+
+      'b': joinChars(identityFunction),
     };
 
     function readBytes(n) {
@@ -455,34 +469,85 @@ class String
       } else {
         return { chunk: buffer.slice(0, length), rest: buffer.slice(length, buffer.length) };
       }
+    }
 
+    function readNBitsLSBFirst(buffer, count) {
+      var result = '';
+
+      while (count > 0 && buffer.length > 0) {
+        var byte = buffer[0],
+            bitsToTake = Math.min(count, 8),
+            bytesToTake = Math.ceil(bitsToTake / 8);
+
+        console.log('bitsToTake', bitsToTake);
+        console.log('bytesToTake', bytesToTake);
+
+        buffer = buffer.slice(1, buffer.length);
+
+        if (byte != null) {
+          var bits = byte.toString(2).split('').reverse();
+
+          for (var j = 0; j < bitsToTake; j++) {
+            result += bits[j] || '0';
+            count--;
+          }
+        }
+      }
+
+      return { chunk: [result], buffer: buffer };
+    }
+
+    function readNTimesAndMerge(callback) {
+      return function(buffer, count) {
+        var chunk = [];
+
+        if (count === Infinity) {
+          while (buffer.length > 0) {
+            var chunkData = callback(buffer);
+            console.log('Sub-chunk data', chunkData);
+            buffer = chunkData.rest;
+            chunk = chunk.concat(chunkData.chunk);
+          }
+        } else {
+          for (var i = 0; i < count; i++) {
+            var chunkData = callback(buffer);
+            console.log('Sub-chunk data', chunkData);
+            buffer = chunkData.rest;
+            chunk = chunk.concat(chunkData.chunk);
+          }
+        }
+
+        return { buffer: buffer, chunk: chunk };
+      }
     }
 
     var readChunk = {
-      'C': readBytes(1),
-      'S': readBytes(2),
-      'L': readBytes(4),
-      'Q': readBytes(8),
+      'C': readNTimesAndMerge(readBytes(1)),
+      'S': readNTimesAndMerge(readBytes(2)),
+      'L': readNTimesAndMerge(readBytes(4)),
+      'Q': readNTimesAndMerge(readBytes(8)),
 
-      'S>': readBytes(2),
-      'L>': readBytes(4),
-      'Q>': readBytes(8),
+      'S>': readNTimesAndMerge(readBytes(2)),
+      'L>': readNTimesAndMerge(readBytes(4)),
+      'Q>': readNTimesAndMerge(readBytes(8)),
 
-      'c': readBytes(1),
-      's': readBytes(2),
-      'l': readBytes(4),
-      'q': readBytes(8),
+      'c': readNTimesAndMerge(readBytes(1)),
+      's': readNTimesAndMerge(readBytes(2)),
+      'l': readNTimesAndMerge(readBytes(4)),
+      'q': readNTimesAndMerge(readBytes(8)),
 
-      's>': readBytes(2),
-      'l>': readBytes(4),
-      'q>': readBytes(8),
+      's>': readNTimesAndMerge(readBytes(2)),
+      'l>': readNTimesAndMerge(readBytes(4)),
+      'q>': readNTimesAndMerge(readBytes(8)),
 
-      'U': readUnicodeCharChunk,
+      'U': readNTimesAndMerge(readUnicodeCharChunk),
 
-      'A': readBytes(1),
-      'a': readBytes(1),
+      'A': readNTimesAndMerge(readBytes(1)),
+      'a': readNTimesAndMerge(readBytes(1)),
 
-      'u': readUuencodingChunk,
+      'u': readNTimesAndMerge(readUuencodingChunk),
+
+      'b': readNBitsLSBFirst,
     }
 
     var autocompletion = {
@@ -510,6 +575,8 @@ class String
       'a': false,
 
       'u': false,
+
+      'b': false,
     }
 
     function alias(existingDirective, newDirective) {
@@ -546,30 +613,18 @@ class String
       function processChunk(directive, count) {
         console.log("Cuting", directive, count, 'from', buffer);
 
-        var chunk = [],
+        var chunk,
             chunkReader = readChunk[directive];
 
         if (chunkReader == null) {
           #{raise "Unsupported unpack directive #{`directive`.inspect} (no chunk reader defined)"}
         }
 
-        if (count === Infinity) {
-          while (buffer.length > 0) {
-            var chunkData = chunkReader(buffer);
-            console.log('Sub-chunk data', chunkData);
-            buffer = chunkData.rest;
-            chunk = chunk.concat(chunkData.chunk);
-          }
-        } else {
-          for (var i = 0; i < count; i++) {
-            var chunkData = chunkReader(buffer);
-            console.log('Sub-chunk data', chunkData);
-            buffer = chunkData.rest;
-            chunk = chunk.concat(chunkData.chunk);
-          }
-        }
+        var chunkData = chunkReader(buffer, count);
+        chunk = chunkData.chunk;
+        buffer = chunkData.buffer;
 
-        console.log('Processing chunk', chunk);
+        console.log('Processing chunk', chunkData);
 
         var handler = handlers[directive];
 
@@ -579,8 +634,6 @@ class String
 
         return handler(chunk);
       }
-
-      // console.log("parsing", format);
 
       eachDirectiveAndCount(format, function(directive, count) {
         console.log(directive, '->', count);
