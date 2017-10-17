@@ -38,7 +38,7 @@ class String
       'A', // supported
       'a', // supported
       'Z',
-      'B',
+      'B', // WIP
       'b', // supported
       'H',
       'h',
@@ -380,6 +380,7 @@ class String
       'u': joinChars(bytesToAsciiChars(uudecode(identityFunction))),
 
       'b': joinChars(identityFunction),
+      'B': joinChars(identityFunction),
     };
 
     function readBytes(n) {
@@ -479,13 +480,35 @@ class String
             bitsToTake = Math.min(count, 8),
             bytesToTake = Math.ceil(bitsToTake / 8);
 
-        console.log('bitsToTake', bitsToTake);
-        console.log('bytesToTake', bytesToTake);
+        buffer = buffer.slice(1, buffer.length);
+
+        if (byte != null) {
+          var bits = byte.toString(2).split('');
+          bits = Array(8 - bits.length).concat(bits).reverse();
+
+          for (var j = 0; j < bitsToTake; j++) {
+            result += bits[j] || '0';
+            count--;
+          }
+        }
+      }
+
+      return { chunk: [result], buffer: buffer };
+    }
+
+    function readNBitsMSBFirst(buffer, count) {
+      var result = '';
+
+      while (count > 0 && buffer.length > 0) {
+        var byte = buffer[0],
+            bitsToTake = Math.min(count, 8),
+            bytesToTake = Math.ceil(bitsToTake / 8);
 
         buffer = buffer.slice(1, buffer.length);
 
         if (byte != null) {
-          var bits = byte.toString(2).split('').reverse();
+          var bits = byte.toString(2).split('');
+          bits = Array(8 - bits.length).concat(bits);
 
           for (var j = 0; j < bitsToTake; j++) {
             result += bits[j] || '0';
@@ -548,6 +571,7 @@ class String
       'u': readNTimesAndMerge(readUuencodingChunk),
 
       'b': readNBitsLSBFirst,
+      'B': readNBitsMSBFirst,
     }
 
     var autocompletion = {
@@ -577,6 +601,7 @@ class String
       'u': false,
 
       'b': false,
+      'B': false,
     }
 
     function alias(existingDirective, newDirective) {
