@@ -110,7 +110,7 @@ ruby/core/string/unpack/q_spec
 ruby/core/string/unpack/s_spec
 ruby/core/string/unpack/u_spec
 ruby/core/string/unpack/v_spec
-# ruby/core/string/unpack/w_spec
+ruby/core/string/unpack/w_spec
 # ruby/core/string/unpack/x_spec
 # ruby/core/string/unpack/z_spec
 

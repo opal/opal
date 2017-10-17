@@ -22,7 +22,7 @@ class String
       'V', // supported
 
       'U', // supported
-      'w',
+      'w', // supported
 
       // Float
       'D',
@@ -351,6 +351,32 @@ class String
       }
     }
 
+    function decodeBERCompressedIntegers(callback) {
+      return function(data) {
+        var bytes = callback(data), result = [], buffer = '';
+
+        for (var i = 0; i < bytes.length; i++) {
+          var byte = bytes[i],
+              bits = byte.toString(2);
+
+          bits = Array(8 - bits.length + 1).join('0').concat(bits);
+
+          var firstBit = bits[0];
+          bits = bits.slice(1, bits.length);
+
+          buffer = buffer.concat(bits);
+
+          if (firstBit === '0') {
+            var decoded = parseInt(buffer, 2);
+            result.push(decoded);
+            buffer = ''
+          }
+        }
+
+        return result;
+      }
+    }
+
     function identityFunction(value) { return value; }
 
     var handlers = {
@@ -373,6 +399,7 @@ class String
       'q>': toNByteSigned(8, mapChunksToWords(invertChunks(chunkBy(8, identityFunction)))),
 
       'U': identityFunction,
+      'w': decodeBERCompressedIntegers(identityFunction),
 
       'A': wrapIntoArray(joinChars(bytesToAsciiChars(filterTrailingZerosAndSpaces(identityFunction)))),
       'a': wrapIntoArray(joinChars(bytesToAsciiChars(identityFunction))),
@@ -520,6 +547,22 @@ class String
       return { chunk: [result], buffer: buffer };
     }
 
+    function readWhileFirstBitIsOne(buffer) {
+      var result = [];
+
+      for (var i = 0; i < buffer.length; i++) {
+        var byte = buffer[i];
+
+        result.push(byte);
+
+        if ((byte & 128) === 0) {
+          break;
+        }
+      }
+
+      return { chunk: result, rest: buffer.slice(result.length, buffer.length) };
+    }
+
     function readNTimesAndMerge(callback) {
       return function(buffer, count) {
         var chunk = [];
@@ -564,6 +607,7 @@ class String
       'q>': readNTimesAndMerge(readBytes(8)),
 
       'U': readNTimesAndMerge(readUnicodeCharChunk),
+      'w': readNTimesAndMerge(readWhileFirstBitIsOne),
 
       'A': readNTimesAndMerge(readBytes(1)),
       'a': readNTimesAndMerge(readBytes(1)),
@@ -594,6 +638,7 @@ class String
       'q>': true,
 
       'U': false,
+      'w': false,
 
       'A': false,
       'a': false,
