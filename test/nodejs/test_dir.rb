@@ -4,8 +4,13 @@ require 'nodejs'
 require 'nodejs/dir'
 
 class TestNodejsDir < Test::Unit::TestCase
+
+  def tmpdir
+    `require('os').tmpdir()`
+  end
+
   def test_dir_entries
-    path = "/tmp/testing_nodejs_dir_implementation_#{Time.now.to_i}"
+    path = tmpdir + "/testing_nodejs_dir_implementation_#{Time.now.to_i}"
     Dir.mkdir(path)
     result = Dir.entries(path)
     assert_equal(result.length, 0)

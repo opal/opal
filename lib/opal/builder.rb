@@ -154,7 +154,7 @@ module Opal
 
     def processor_for(source, filename, path, options)
       processor = processors.find { |p| p.match? path } or
-        raise ProcessorNotFound, "can't find processor for filename: #{filename.inspect}, path: #{path.inspect}, source: #{source.inspect}"
+        raise ProcessorNotFound, "can't find processor for filename: #{filename.inspect}, path: #{path.inspect}, source: #{source.inspect}, processors: #{processors.inspect}"
       processor.new(source, filename, compiler_options.merge(options))
     end
 

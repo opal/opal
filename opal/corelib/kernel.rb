@@ -186,8 +186,19 @@ module Kernel
       block.call
     end
 
-    status = 0 if `status === true` # it's in JS because it can be null/undef
-    `Opal.exit(status);`
+    %x{
+      if (status == null) {
+        status = 0
+      } else if (status.$$is_boolean) {
+        status = status ? 0 : 1;
+      } else if (status.$$is_numeric) {
+        status = status.$to_i();
+      } else {
+        status = 0
+      }
+
+      Opal.exit(status);
+    }
     nil
   end
 
