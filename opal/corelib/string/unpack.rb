@@ -38,7 +38,7 @@ class String
       'A', // supported
       'a', // supported
       'Z',
-      'B', // WIP
+      'B', // supported
       'b', // supported
       'H',
       'h',
@@ -510,8 +510,8 @@ class String
         buffer = buffer.slice(1, buffer.length);
 
         if (byte != null) {
-          var bits = byte.toString(2).split('');
-          bits = Array(8 - bits.length).concat(bits).reverse();
+          var bits = byte.toString(2);
+          bits = Array(8 - bits.length + 1).join('0').concat(bits).split('').reverse().join('');
 
           for (var j = 0; j < bitsToTake; j++) {
             result += bits[j] || '0';
@@ -534,8 +534,8 @@ class String
         buffer = buffer.slice(1, buffer.length);
 
         if (byte != null) {
-          var bits = byte.toString(2).split('');
-          bits = Array(8 - bits.length).concat(bits);
+          var bits = byte.toString(2);
+          bits = Array(8 - bits.length + 1).join('0').concat(bits);
 
           for (var j = 0; j < bitsToTake; j++) {
             result += bits[j] || '0';
