@@ -37,7 +37,7 @@ class String
       // String
       'A', // supported
       'a', // supported
-      'Z',
+      'Z', // supported
       'B', // supported
       'b', // supported
       'H',
@@ -404,6 +404,8 @@ class String
       'A': wrapIntoArray(joinChars(bytesToAsciiChars(filterTrailingZerosAndSpaces(identityFunction)))),
       'a': wrapIntoArray(joinChars(bytesToAsciiChars(identityFunction))),
 
+      'Z': joinChars(bytesToAsciiChars(identityFunction)),
+
       'u': joinChars(bytesToAsciiChars(uudecode(identityFunction))),
 
       'b': joinChars(identityFunction),
@@ -520,7 +522,7 @@ class String
         }
       }
 
-      return { chunk: [result], buffer: buffer };
+      return { chunk: [result], rest: buffer };
     }
 
     function readNBitsMSBFirst(buffer, count) {
@@ -544,7 +546,7 @@ class String
         }
       }
 
-      return { chunk: [result], buffer: buffer };
+      return { chunk: [result], rest: buffer };
     }
 
     function readWhileFirstBitIsOne(buffer) {
@@ -561,6 +563,32 @@ class String
       }
 
       return { chunk: result, rest: buffer.slice(result.length, buffer.length) };
+    }
+
+    function readTillNullCharacter(buffer, count) {
+      var result = [];
+
+      for (var i = 0; i < count && i < buffer.length; i++) {
+        var byte = buffer[i];
+
+        if (byte === 0) {
+          break;
+        } else {
+          result.push(byte);
+        }
+      }
+
+      if (count === Infinity) {
+        count = result.length;
+      }
+
+      if (buffer[count] === 0) {
+        count++;
+      }
+
+      buffer = buffer.slice(count, buffer.length);
+
+      return { chunk: result, rest: buffer };
     }
 
     function readNTimesAndMerge(callback) {
@@ -583,7 +611,7 @@ class String
           }
         }
 
-        return { buffer: buffer, chunk: chunk };
+        return { chunk: chunk, rest: buffer };
       }
     }
 
@@ -611,6 +639,8 @@ class String
 
       'A': readNTimesAndMerge(readBytes(1)),
       'a': readNTimesAndMerge(readBytes(1)),
+
+      'Z': readTillNullCharacter,
 
       'u': readNTimesAndMerge(readUuencodingChunk),
 
@@ -642,6 +672,8 @@ class String
 
       'A': false,
       'a': false,
+
+      'Z': false,
 
       'u': false,
 
@@ -692,7 +724,7 @@ class String
 
         var chunkData = chunkReader(buffer, count);
         chunk = chunkData.chunk;
-        buffer = chunkData.buffer;
+        buffer = chunkData.rest;
 
         console.log('Processing chunk', chunkData);
 

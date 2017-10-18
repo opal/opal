@@ -112,7 +112,7 @@ ruby/core/string/unpack/u_spec
 ruby/core/string/unpack/v_spec
 ruby/core/string/unpack/w_spec
 # ruby/core/string/unpack/x_spec
-# ruby/core/string/unpack/z_spec
+ruby/core/string/unpack/z_spec
 
 ruby/core/struct
 ruby/core/symbol/to_proc_spec
