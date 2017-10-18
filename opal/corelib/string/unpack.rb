@@ -40,7 +40,7 @@ class String
       'Z', // supported
       'B', // supported
       'b', // supported
-      'H',
+      'H', // WIP
       'h',
       'u', // supported
       'M',
@@ -380,10 +380,12 @@ class String
     function identityFunction(value) { return value; }
 
     var handlers = {
+      // Integer
       'C': identityFunction,
       'S': mapChunksToWords(chunkBy(2, identityFunction)),
       'L': mapChunksToWords(chunkBy(4, identityFunction)),
       'Q': mapChunksToWords(chunkBy(8, identityFunction)),
+      'J': null,
 
       'S>': mapChunksToWords(invertChunks(chunkBy(2, identityFunction))),
       'L>': mapChunksToWords(invertChunks(chunkBy(4, identityFunction))),
@@ -393,23 +395,44 @@ class String
       's': toNByteSigned(2, mapChunksToWords(chunkBy(2, identityFunction))),
       'l': toNByteSigned(4, mapChunksToWords(chunkBy(4, identityFunction))),
       'q': toNByteSigned(8, mapChunksToWords(chunkBy(8, identityFunction))),
+      'j': null,
 
       's>': toNByteSigned(2, mapChunksToWords(invertChunks(chunkBy(2, identityFunction)))),
       'l>': toNByteSigned(4, mapChunksToWords(invertChunks(chunkBy(4, identityFunction)))),
       'q>': toNByteSigned(8, mapChunksToWords(invertChunks(chunkBy(8, identityFunction)))),
 
+      'n': null, // aliased later
+      'N': null, // aliased later
+      'v': null, // aliased later
+      'V': null, // aliased later
+
       'U': identityFunction,
       'w': decodeBERCompressedIntegers(identityFunction),
 
+      // Float
+      'D': null,
+      'd': null,
+      'F': null,
+      'f': null,
+      'E': null,
+      'e': null,
+      'G': null,
+      'g': null,
+
+      // String
       'A': wrapIntoArray(joinChars(bytesToAsciiChars(filterTrailingZerosAndSpaces(identityFunction)))),
       'a': wrapIntoArray(joinChars(bytesToAsciiChars(identityFunction))),
-
       'Z': joinChars(bytesToAsciiChars(identityFunction)),
-
-      'u': joinChars(bytesToAsciiChars(uudecode(identityFunction))),
-
-      'b': joinChars(identityFunction),
       'B': joinChars(identityFunction),
+      'b': joinChars(identityFunction),
+      'H': null, // WIP
+      'h': null,
+      'u': joinChars(bytesToAsciiChars(uudecode(identityFunction))),
+      'M': null,
+      'm': null,
+
+      'P': null,
+      'p': null,
     };
 
     function readBytes(n) {
@@ -616,10 +639,12 @@ class String
     }
 
     var readChunk = {
+      // Integer
       'C': readNTimesAndMerge(readBytes(1)),
       'S': readNTimesAndMerge(readBytes(2)),
       'L': readNTimesAndMerge(readBytes(4)),
       'Q': readNTimesAndMerge(readBytes(8)),
+      'J': null,
 
       'S>': readNTimesAndMerge(readBytes(2)),
       'L>': readNTimesAndMerge(readBytes(4)),
@@ -629,30 +654,53 @@ class String
       's': readNTimesAndMerge(readBytes(2)),
       'l': readNTimesAndMerge(readBytes(4)),
       'q': readNTimesAndMerge(readBytes(8)),
+      'j': null,
 
       's>': readNTimesAndMerge(readBytes(2)),
       'l>': readNTimesAndMerge(readBytes(4)),
       'q>': readNTimesAndMerge(readBytes(8)),
 
+      'n': null, // aliased later
+      'N': null, // aliased later
+      'v': null, // aliased later
+      'V': null, // aliased later
+
       'U': readNTimesAndMerge(readUnicodeCharChunk),
       'w': readNTimesAndMerge(readWhileFirstBitIsOne),
 
+      // Float
+      'D': null,
+      'd': null,
+      'F': null,
+      'f': null,
+      'E': null,
+      'e': null,
+      'G': null,
+      'g': null,
+
+      // String
       'A': readNTimesAndMerge(readBytes(1)),
       'a': readNTimesAndMerge(readBytes(1)),
-
       'Z': readTillNullCharacter,
-
-      'u': readNTimesAndMerge(readUuencodingChunk),
-
-      'b': readNBitsLSBFirst,
       'B': readNBitsMSBFirst,
+      'b': readNBitsLSBFirst,
+      'H': null, // WIP
+      'h': null,
+      'u': readNTimesAndMerge(readUuencodingChunk),
+      'M': null,
+      'm': null,
+
+      'P': null,
+      'p': null,
     }
 
     var autocompletion = {
+      // Integer
       'C': true,
       'S': true,
       'L': true,
       'Q': true,
+      'J': null,
 
       'S>': true,
       'L>': true,
@@ -662,23 +710,44 @@ class String
       's': true,
       'l': true,
       'q': true,
+      'j': null,
 
       's>': true,
       'l>': true,
       'q>': true,
 
+      'n': null, // aliased later
+      'N': null, // aliased later
+      'v': null, // aliased later
+      'V': null, // aliased later
+
       'U': false,
       'w': false,
 
+      // Float
+      'D': null,
+      'd': null,
+      'F': null,
+      'f': null,
+      'E': null,
+      'e': null,
+      'G': null,
+      'g': null,
+
+      // String
       'A': false,
       'a': false,
-
       'Z': false,
-
-      'u': false,
-
-      'b': false,
       'B': false,
+      'b': false,
+      'H': null, // WIP
+      'h': null,
+      'u': false,
+      'M': null,
+      'm': null,
+
+      'P': null,
+      'p': null,
     }
 
     function alias(existingDirective, newDirective) {
@@ -743,8 +812,16 @@ class String
         var part = processChunk(directive, count);
         console.log("part = ", part, typeof(part));
 
-        if (count !== Infinity && autocompletion[directive]) {
-          autocomplete(part, count);
+        if (count !== Infinity) {
+          var shouldAutocomplete = autocompletion[directive]
+
+          if (shouldAutocomplete == null) {
+            #{raise "Unsupported unpack directive #{`directive`.inspect} (no autocompletion rule defined)"}
+          }
+
+          if (shouldAutocomplete) {
+            autocomplete(part, count);
+          }
         }
 
         output = output.concat(part);
