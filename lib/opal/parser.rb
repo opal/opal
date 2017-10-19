@@ -2,34 +2,31 @@
 require 'opal/ast/builder'
 require 'opal/rewriter'
 
-if RUBY_ENGINE == 'opal'
-  class << Parser::Source::Buffer
-    def recognize_encoding(s)
-      Encoding::UTF_8
-    end
-  end
-end
-
 module Opal
   class Parser < ::Parser::Ruby23
-    def initialize(*)
-      super(Opal::AST::Builder.new)
+    class << self
+      attr_accessor :diagnostics_consumer
+
+      def default_parser
+        parser = super
+
+        parser.diagnostics.all_errors_are_fatal = true
+        parser.diagnostics.ignore_warnings      = false
+
+        if RUBY_ENGINE == 'opal'
+          parser.diagnostics.consumer = ->(diag){}
+        else
+          parser.diagnostics.consumer = diagnostics_consumer
+        end
+
+        parser
+      end
     end
 
-    def self.default_parser
-      parser = super
+    self.diagnostics_consumer = ->(diagnostic) { $stderr.puts(diagnostic.render) }
 
-      parser.diagnostics.all_errors_are_fatal = true
-      parser.diagnostics.ignore_warnings      = true
-
-      if RUBY_ENGINE == 'opal'
-        parser.diagnostics.consumer = ->(diag){}
-      else
-        parser.diagnostics.consumer = lambda do |diagnostic|
-          $stderr.puts(diagnostic.render)
-        end
-      end
-      parser
+    def initialize(*)
+      super(Opal::AST::Builder.new)
     end
 
     def parse(source_buffer)

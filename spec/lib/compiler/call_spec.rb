@@ -68,7 +68,7 @@ if (a == null) a = nil;
               end
 
               context 'via reference' do
-                let(:invocation) { 'call_method *stuff, &block2' }
+                let(:invocation) { 'call_method(*stuff, &block2)' }
 
                 it { is_expected.to include "return $send(self, 'call_method', Opal.to_a(stuff), block2.$to_proc())" }
               end
@@ -90,7 +90,7 @@ if (a == null) a = nil;
               end
 
               context 'via reference' do
-                let(:invocation) { 'call_method &block2' }
+                let(:invocation) { 'call_method(&block2)' }
 
                 it { is_expected.to include "return $send(self, 'call_method', [], block2.$to_proc())" }
               end
@@ -122,7 +122,7 @@ if (a == null) a = nil;
               end
 
               context 'via reference' do
-                let(:invocation) { 'call_method *stuff, &block2' }
+                let(:invocation) { 'call_method(*stuff, &block2)' }
 
                 it { is_expected.to include "return $send(self, 'call_method', Opal.to_a(stuff), self.$block2().$to_proc())" }
               end
@@ -144,7 +144,7 @@ if (a == null) a = nil;
               end
 
               context 'via reference' do
-                let(:invocation) { 'call_method &block2' }
+                let(:invocation) { 'call_method(&block2)' }
 
                 it { is_expected.to include "return $send(self, 'call_method', [], self.$block2().$to_proc())" }
               end
@@ -288,7 +288,7 @@ if (a == null) a = nil;
                   end
 
                   context 'via reference' do
-                    let(:invocation) { 'super *stuff, &block2' }
+                    let(:invocation) { 'super(*stuff, &block2)' }
 
                     it { is_expected.to include "return $send(self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false), Opal.to_a(stuff), block2.$to_proc())" }
                   end
@@ -310,7 +310,7 @@ if (a == null) a = nil;
                   end
 
                   context 'via reference' do
-                    let(:invocation) { 'super &block2' }
+                    let(:invocation) { 'super(&block2)' }
 
                     it { is_expected.to include "return $send(self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false), [], block2.$to_proc())" }
                   end
@@ -350,7 +350,7 @@ if (a == null) a = nil;
                   end
 
                   context 'via reference' do
-                    let(:invocation) { 'super *stuff, &block2' }
+                    let(:invocation) { 'super(*stuff, &block2)' }
 
                     it { is_expected.to include "return $send(self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false), Opal.to_a(stuff), self.$block2().$to_proc())" }
                   end
@@ -372,7 +372,7 @@ if (a == null) a = nil;
                   end
 
                   context 'via reference' do
-                    let(:invocation) { 'super &block2' }
+                    let(:invocation) { 'super(&block2)' }
 
                     it { is_expected.to include "return $send(self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false), [], self.$block2().$to_proc())" }
                   end

@@ -2261,7 +2261,13 @@
 
   // Forward .toString() to #to_s
   _Object.$$proto.toString = function() {
-    return this.$to_s();
+    var to_s = this.$to_s();
+    if (to_s.$$is_string && typeof(to_s) === 'object') {
+      // a string created using new String('string')
+      return to_s.valueOf();
+    } else {
+      return to_s;
+    }
   };
 
   // Make Kernel#require immediately available as it's needed to require all the
