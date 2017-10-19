@@ -61,13 +61,13 @@ module Opal
           string_value = string_value.force_encoding('UTF-8')
         end
 
-        sanitized_value = value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do |match|
+        sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do |match|
           code_point = $1.to_i(16)
           to_utf16(code_point)
         end
         push translate_escape_chars(sanitized_value)
 
-        if should_encode
+        if should_encode && RUBY_ENGINE != 'opal'
           push '.$force_encoding("', encoding.name, '")'
         end
       end
