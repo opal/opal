@@ -280,7 +280,7 @@ platforms.each do |platform|
           benchmark/test_benchmark.rb
           ruby/test_call.rb
           opal/test_keyword.rb
-          base64/test_base64.rb
+          opal/test_base64.rb
           opal/unsupported_and_bugs.rb
         ]
       end
