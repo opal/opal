@@ -3,6 +3,14 @@ require 'opal/ast/builder'
 require 'opal/rewriter'
 
 module Opal
+  module Source
+    class Buffer < Parser::Source::Buffer
+      def self.recognize_encoding(string)
+        super || Encoding::UTF_8
+      end
+    end
+  end
+
   class Parser < ::Parser::Ruby23
     class << self
       attr_accessor :diagnostics_consumer

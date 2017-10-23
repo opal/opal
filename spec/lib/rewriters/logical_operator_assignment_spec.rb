@@ -9,7 +9,7 @@ RSpec.describe Opal::Rewriters::LogicalOperatorAssignment do
 
   def parse(source)
     parser = Opal::Parser.default_parser
-    buffer = ::Parser::Source::Buffer.new('(eval)')
+    buffer = ::Opal::Source::Buffer.new('(eval)')
     buffer.source = source
     parser.parse(buffer)
   end
