@@ -70,7 +70,7 @@ string of JavaScript code.
 Opal.compile("puts 'wow'")  # => "(function() { ... self.$puts("wow"); ... })()"
 ```
 
-Running this by itself is not enough, you need the opal runtime/corelib.
+Running this by itself is not enough; you need the opal runtime/corelib.
 
 #### Using Opal::Builder
 
@@ -119,8 +119,8 @@ your web applications.
 Just open this page and check the JavaScript console.
 
 **NOTE**: Although this is possible, this is not really recommended for
-production and should only be used as a quick way to getting you hands
-on opal
+production and should only be used as a quick way to get your hands
+on opal.
 
 ## Running tests
 
