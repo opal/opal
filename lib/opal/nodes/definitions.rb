@@ -40,7 +40,7 @@ module Opal
           compile_inline_children(returned_children, @level)
         else
           compile_children(returned_children, @level)
-          wrap '(function() {', '})()'
+          wrap "(#{'async' if in_async?} function() {", '})()'
         end
       end
 

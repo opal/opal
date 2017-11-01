@@ -98,6 +98,7 @@ module Opal
 
         unshift ") {"
         unshift(inline_params)
+        unshift " async " if scope.in_async?
         unshift "function#{function_name}("
         unshift "#{scope_name} = " if scope_name
         line "}"

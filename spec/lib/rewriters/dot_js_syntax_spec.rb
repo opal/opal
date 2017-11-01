@@ -105,4 +105,27 @@ RSpec.describe Opal::Rewriters::DotJsSyntax do
       end
     end
   end
+
+  context '.JS.async syntax' do
+    context 'when passed a block call' do
+      let(:js_async_block_node) do
+        # self.JS.async block.call
+        s(:send,
+          s(:send,
+            s(:self), :JS), :async,
+          s(:send,
+            s(:lvar, :block), :call))
+      end
+
+      let(:async_node) do
+        s(:async,
+          s(:send,
+            s(:lvar, :block), :call), nil)
+      end
+
+      it 'converts js async node to async wrapper' do
+        expect(rewriter.process(js_async_block_node)).to eq(async_node)
+      end
+    end
+  end
 end
