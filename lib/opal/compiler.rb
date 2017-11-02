@@ -171,7 +171,7 @@ module Opal
     end
 
     def parse
-      @buffer = ::Parser::Source::Buffer.new(file, 1)
+      @buffer = ::Opal::Source::Buffer.new(file, 1)
       @buffer.source = @source
 
       @parser = Opal::Parser.default_parser

@@ -1881,7 +1881,7 @@ class Array < `Array`
 
     %x{
       var original = self.length;
-      #{ keep_if &block };
+      #{ keep_if(&block) };
       return self.length === original ? nil : self;
     }
   end

@@ -69,7 +69,7 @@ class String::Wrapper
   alias === ==
 
   def to_s
-    @literal
+    @literal.to_s
   end
 
   alias to_str to_s

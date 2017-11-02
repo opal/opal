@@ -307,8 +307,100 @@ RSpec.describe Opal::Compiler do
     end
   end
 
+  describe 'magic encoding comment' do
+    let(:diagnostics) { [] }
+
+    around(:each) do |e|
+      original_diagnostics_consumer = Opal::Parser.diagnostics_consumer
+      Opal::Parser.diagnostics_consumer = ->(diagnostic) { diagnostics << diagnostic }
+      e.run
+      Opal::Parser.diagnostics_consumer = original_diagnostics_consumer
+    end
+
+    let(:encoding_comment) { '' }
+    let(:string) { '' }
+
+    let(:file) do
+      <<-RUBY
+        # encoding: #{encoding_comment}
+        "#{string}"
+      RUBY
+    end
+
+    shared_examples 'it compiles the string as' do |expected|
+      it "compiles the string as #{expected}" do
+        expect_compiled(file).to include(expected)
+      end
+    end
+
+    shared_examples 'it re-encodes the string using $force_encoding' do
+      it 'it re-encodes the string using $force_encoding' do
+        expect_compiled(file).to include("$force_encoding")
+      end
+    end
+
+    shared_examples 'it does not re-encode the string using $force_encoding' do
+      it 'it does not re-encode the string using $force_encoding' do
+        expect_compiled(file).to_not include("$force_encoding")
+      end
+    end
+
+    shared_examples 'it does not print any warnings' do
+      it 'does not print any warnings' do
+        compile(file)
+        expect(diagnostics).to eq([])
+      end
+    end
+
+    context 'utf-8 comment' do
+      let(:encoding_comment) { 'utf-8' }
+
+      context 'valid sequence' do
+        let(:string) { 'λ' }
+
+        include_examples 'it compiles the string as', 'λ'.inspect
+        include_examples 'it does not re-encode the string using $force_encoding'
+        include_examples 'it does not print any warnings'
+      end
+
+      context 'invalid sequence' do
+        let(:string) { "\xFF" }
+
+        it 'raises an error' do
+          expect {
+            compiled(file)
+          }.to raise_error(EncodingError, 'invalid byte sequence in UTF-8')
+        end
+      end
+    end
+
+    context 'ascii-8bit comment' do
+      let(:encoding_comment) { 'ascii-8bit' }
+
+      context 'valid sequence' do
+        let(:string) { "\xFF" }
+
+        include_examples 'it compiles the string as', '"\xFF".$force_encoding("ASCII-8BIT")'
+        include_examples 'it does not print any warnings'
+      end
+
+      context 'unicode sequence' do
+        let(:string) { 'λ' }
+
+        include_examples 'it compiles the string as', 'λ'.inspect + '.$force_encoding("ASCII-8BIT")'
+        include_examples 'it does not print any warnings'
+      end
+    end
+  end
+
+  def compiled(*args)
+    Opal::Compiler.new(*args).compile
+  end
+
+  alias compile compiled
+
   def expect_compiled(*args)
-    expect(Opal::Compiler.new(*args).compile)
+    expect(compiled(*args))
   end
 
   def compiler_for(*args)
