@@ -79,7 +79,7 @@ module Opal
         puts "Connecting to #{chrome_host}:#{chrome_port}..."
         TCPSocket.new(chrome_host, chrome_port).close
         true
-      rescue Errno::ECONNREFUSED
+      rescue Errno::ECONNREFUSED, Errno::EADDRNOTAVAIL
         false
       end
 
