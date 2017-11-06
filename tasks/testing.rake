@@ -324,28 +324,45 @@ end
 
 desc 'Runs opal-rspec tests to augment unit testing/rubyspecs'
 task :smoke_test do
-  opal_rspec_dir = 'tmp/smoke_test_opal_rspec'
+  opal_rspec_dir = File.expand_path('tmp/smoke_test_opal_rspec')
+  gemfile_name = 'opal_rspec_smoketest.Gemfile'
+  actual_output_path = "#{opal_rspec_dir}/output.txt"
+
   # Travis caching might be creating this, manage the state idempotently
   unless File.exist?(File.join(opal_rspec_dir, '.git'))
     rm_rf opal_rspec_dir
     sh "git clone https://github.com/opal/opal-rspec.git #{opal_rspec_dir}"
   end
-  # Don't want conflicts with opal-rspec's Gemfile
-  gemfile_name = 'opal_rspec_smoketest.Gemfile'
-  cp File.join('tasks/testing', gemfile_name), opal_rspec_dir
-  Dir.chdir opal_rspec_dir do
-    sh 'git checkout releases/0-6-stable'
-    sh 'git pull'
-    # RSpec source itself
-    sh 'git submodule update --init'
+
+  cp "tasks/testing/#{gemfile_name}", "#{opal_rspec_dir}/Gemfile"
+
+  cd opal_rspec_dir do
     Bundler.with_clean_env do
-      # Force new dependencies each time
-      rm_rf "#{gemfile_name}.lock"
-      with_gemfile = lambda {|command| sh "BUNDLE_GEMFILE=#{gemfile_name} RUNNER=node bundle #{command}"}
-      with_gemfile['install']
-      with_gemfile['exec rake rake_only']
+      sh 'bundle install'
+      sh %{bundle exec opal-rspec --color --default-path=../../spec ../../spec/lib/deprecations_spec.rb > #{actual_output_path}}
+
+      actual_output = File.read(actual_output_path)
+      begin
+        require 'rspec/expectations'
+        extend RSpec::Matchers
+        expect(actual_output.lines[0+1]).to    eq("[32m.[0m[32m.[0m\n")
+        expect(actual_output.lines[1+1]).to    eq("\n")
+        expect(actual_output.lines[2+1]).to match(%r{^Finished in \d+\.\d+ seconds \(files took \d+\.\d+ seconds to load\)\n$})
+        expect(actual_output.lines[3+1]).to    eq("[32m2 examples, 0 failures[0m\n")
+        expect(actual_output.lines[4+1]).to    eq("\n")
+        expect(actual_output.lines[5+1]).to match(%r{Top 2 slowest examples \(\d+\.\d+ seconds, \d+\.\d+% of total time\):\n})
+        expect(actual_output.lines[6+1]).to    eq("  Opal::Deprecations defaults to warn\n")
+        expect(actual_output.lines[7+1]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m \n})
+        expect(actual_output.lines[8+1]).to    eq("  Opal::Deprecations can be set to raise\n")
+      rescue RSpec::Expectations::ExpectationNotMetError
+        warn $!.message
+        warn "\n\n== Full output:\n#{actual_output}"
+        exit 1
+      end
     end
   end
+
+  puts "Smoke test was successful!"
 end
 
 task :browser_test do

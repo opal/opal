@@ -1,4 +1,5 @@
 require 'lib/spec_helper'
+require 'opal/deprecations'
 
 RSpec.describe Opal::Deprecations do
   subject { Object.new.extend described_class }
