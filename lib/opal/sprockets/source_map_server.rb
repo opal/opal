@@ -101,7 +101,7 @@ module Opal
       when %r{^(.*)\.rb$}
         begin
           asset = sprockets.resolve(path_info.sub(/\.rb#{REGEXP_END}/,''))
-        rescue Sprockets::FileNotFound
+        rescue ::Sprockets::FileNotFound
           return not_found(path_info)
         end
         return [200, {"Content-Type" => "text/ruby"}, [Pathname(asset).read]]
