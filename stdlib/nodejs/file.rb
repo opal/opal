@@ -93,12 +93,26 @@ class File < IO
 
   def self.directory? path
     return false unless exist? path
-    `return executeIOAction(function(){return !!__fs__.lstatSync(path).isDirectory()})`
+    result = `executeIOAction(function(){return !!__fs__.lstatSync(path).isDirectory()})`
+    unless result
+      realpath = realpath(path)
+      if realpath != path
+        result = `executeIOAction(function(){return !!__fs__.lstatSync(realpath).isDirectory()})`
+      end
+    end
+    result
   end
 
   def self.file? path
     return false unless exist? path
-    `return executeIOAction(function(){return !!__fs__.lstatSync(path).isFile()})`
+    result = `executeIOAction(function(){return !!__fs__.lstatSync(path).isFile()})`
+    unless result
+      realpath = realpath(path)
+      if realpath != path
+        result = `executeIOAction(function(){return !!__fs__.lstatSync(realpath).isFile()})`
+      end
+    end
+    result
   end
 
   def self.readable? path
