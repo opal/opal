@@ -98,9 +98,12 @@ module Opal
 
         unshift ") {"
         unshift(inline_params)
-        unshift " async " if scope.in_async?
         unshift "function#{function_name}("
+
+        unshift "async " if @compiler.in_async?
+
         unshift "#{scope_name} = " if scope_name
+
         line "}"
 
         push ", #{scope_name}.$$arity = #{arity}"

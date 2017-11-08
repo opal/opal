@@ -9,7 +9,9 @@ module Opal
       children :body
 
       def compile
-        push process(body)
+        compiler.in_await do
+          push process(body)
+        end
       end
     end
   end

@@ -44,7 +44,7 @@ module Opal
 
         unshift to_vars
 
-        unshift "(#{identity} = #{'async' if in_async?} function(", inline_params, "){"
+        unshift "(#{identity} = #{'async' if compiler.in_async?}#{'await' if compiler.in_await?} function(", inline_params, "){"
         push "}, #{identity}.$$s = self,"
         push " #{identity}.$$brk = $brk," if contains_break?
         push " #{identity}.$$arity = #{arity},"
