@@ -98,7 +98,7 @@ ruby/core/string/unpack/c_spec
 # ruby/core/string/unpack/e_spec
 # ruby/core/string/unpack/f_spec
 # ruby/core/string/unpack/g_spec
-# ruby/core/string/unpack/h_spec
+ruby/core/string/unpack/h_spec
 # ruby/core/string/unpack/i_spec
 # ruby/core/string/unpack/j_spec
 ruby/core/string/unpack/l_spec

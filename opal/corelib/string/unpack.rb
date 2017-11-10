@@ -40,8 +40,8 @@ class String
       'Z', // supported
       'B', // supported
       'b', // supported
-      'H', // WIP
-      'h',
+      'H', // supported
+      'h', // supported
       'u', // supported
       'M',
       'm',
@@ -425,8 +425,8 @@ class String
       'Z': joinChars(bytesToAsciiChars(identityFunction)),
       'B': joinChars(identityFunction),
       'b': joinChars(identityFunction),
-      'H': null, // WIP
-      'h': null,
+      'H': joinChars(identityFunction),
+      'h': joinChars(identityFunction),
       'u': joinChars(bytesToAsciiChars(uudecode(identityFunction))),
       'M': null,
       'm': null,
@@ -614,6 +614,50 @@ class String
       return { chunk: result, rest: buffer };
     }
 
+    function readHexCharsHighNibbleFirst(buffer, count) {
+      var result = [];
+
+      while (count > 0 && buffer.length > 0) {
+        var byte = buffer[0],
+            hex = byte.toString(16);
+
+        buffer = buffer.slice(1, buffer.length);
+        hex = Array(2 - hex.length + 1).join('0').concat(hex);
+
+        if (count === 1) {
+          result.push(hex[0]);
+          count--;
+        } else {
+          result.push(hex[0], hex[1]);
+          count -= 2;
+        }
+      }
+
+      return { chunk: result, rest: buffer };
+    }
+
+    function readHexCharsLowNibbleFirst(buffer, count) {
+      var result = [];
+
+      while (count > 0 && buffer.length > 0) {
+        var byte = buffer[0],
+            hex = byte.toString(16);
+
+        buffer = buffer.slice(1, buffer.length);
+        hex = Array(2 - hex.length + 1).join('0').concat(hex);
+
+        if (count === 1) {
+          result.push(hex[1]);
+          count--;
+        } else {
+          result.push(hex[1], hex[0]);
+          count -= 2;
+        }
+      }
+
+      return { chunk: result, rest: buffer };
+    }
+
     function readNTimesAndMerge(callback) {
       return function(buffer, count) {
         var chunk = [];
@@ -684,8 +728,8 @@ class String
       'Z': readTillNullCharacter,
       'B': readNBitsMSBFirst,
       'b': readNBitsLSBFirst,
-      'H': null, // WIP
-      'h': null,
+      'H': readHexCharsHighNibbleFirst,
+      'h': readHexCharsLowNibbleFirst,
       'u': readNTimesAndMerge(readUuencodingChunk),
       'M': null,
       'm': null,
@@ -740,8 +784,8 @@ class String
       'Z': false,
       'B': false,
       'b': false,
-      'H': null, // WIP
-      'h': null,
+      'H': false,
+      'h': false,
       'u': false,
       'M': null,
       'm': null,
