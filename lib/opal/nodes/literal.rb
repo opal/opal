@@ -57,10 +57,6 @@ module Opal
         encoding = string_value.encoding
         should_encode = encoding != Encoding::UTF_8
 
-        if should_encode
-          string_value = string_value.force_encoding('UTF-8')
-        end
-
         sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do |match|
           code_point = $1.to_i(16)
           to_utf16(code_point)
