@@ -728,5 +728,16 @@ if (b == null) b = nil;
         it { is_expected.to include "return $send(self, Opal.find_super_dispatcher(self, 'some_method', TMP_Foobar_some_method_1, false, $Foobar), $zuper, $iter)" }
       end
     end
+
+    context 'special' do
+      describe '#require_tree' do
+        let(:method) { 'require_tree "./foo/bar"' }
+        it 'does not change the encoding of the passed string (regression)' do
+          # MRI was producing strings encoded as US-ASCII discarding the
+          # original encoding and thus compiling with calls to #force_encoding.
+          is_expected.not_to include('force_encoding')
+        end
+      end
+    end
   end
 end
