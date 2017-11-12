@@ -153,7 +153,9 @@ Encoding.register "ASCII-8BIT", aliases: ["BINARY"], ascii: true do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
-        #{yield `string.charCodeAt(i) & 0xff`};
+        var code = string.charCodeAt(i);
+        #{yield `code & 0xff`};
+        #{yield `code >> 8`};
       }
     }
   end
