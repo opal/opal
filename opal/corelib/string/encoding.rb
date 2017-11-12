@@ -149,7 +149,7 @@ Encoding.register "UTF-32LE" do
   end
 end
 
-Encoding.register "ASCII-8BIT", aliases: ["BINARY"], ascii: true do
+Encoding.register "ASCII-8BIT", aliases: ["BINARY", "US-ASCII", "ASCII"], ascii: true, dummy: true do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
