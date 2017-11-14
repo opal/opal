@@ -24,6 +24,7 @@ module Testing
         a_file
         lib/spec_helper
         mspec/commands/mspec-run
+        etc
       ]
     end
 
