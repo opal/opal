@@ -271,6 +271,7 @@ platforms.each do |platform|
   end
 
   minitest_suites.each do |suite|
+    desc "Run the Minitest suite on Opal::Builder/#{platform}" + pattern_usage
     task :"minitest_#{suite}_#{platform}" do
       if ENV.key? 'FILES'
         files = Dir[ENV['FILES']]
@@ -299,11 +300,11 @@ platforms.each do |platform|
 end
 
 # The name ends with the platform, which is of course mandated in this case
+desc "Run the Node.js Minitest suite on Node.js"
 task :minitest_node_nodejs do
   Opal.use_gem 'hike'
 
   platform = 'nodejs'
-  suite = 'node'
   files = %w[
     nodejs
     opal-parser
@@ -323,7 +324,7 @@ task :minitest_node_nodejs do
      "bin/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 end
 
-desc 'Runs opal-rspec tests to augment unit testing/rubyspecs'
+desc 'Run smoke tests with opal-rspec to see if something is broken'
 task :smoke_test do
   opal_rspec_dir = File.expand_path('tmp/smoke_test_opal_rspec')
   gemfile_name = 'opal_rspec_smoketest.Gemfile'
@@ -366,6 +367,7 @@ task :smoke_test do
   puts "Smoke test was successful!"
 end
 
+desc 'Run browser tests with SauceLabs'
 task :browser_test do
   credentials = {
     username: ENV['SAUCE_USERNAME'] || warn('missing SAUCE_USERNAME env var'),
@@ -391,11 +393,23 @@ task :browser_test do
   end
 end
 
-platforms.each { |platform| task(:"mspec_#{platform}"    => mspec_suites.map    { |suite| :"mspec_#{suite}_#{platform}"    }) }
-platforms.each { |platform| task(:"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }) }
+platforms.each do |platform|
+  desc "Run the whole MSpec suite on #{platform}"
+  task :"mspec_#{platform}" => mspec_suites.map { |suite| :"mspec_#{suite}_#{platform}" }
+end
 
+platforms.each do |platform|
+  desc "Run the whole Minitest suite on #{platform}"
+  task :"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }
+end
+
+desc "Run the whole MSpec suite on all platforms"
 task :mspec    => [:mspec_chrome, :mspec_nodejs]
+
+desc "Run the whole Minitest suite on all platforms"
 task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs]
+
+desc "Run all tests"
 task :test_all => [:rspec, :mspec, :minitest]
 
 # deprecated, can be removed after 0.11
