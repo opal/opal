@@ -59,7 +59,7 @@ invocation and persists it in `window.OPAL_EXIT_CODE`. Later headless chrome run
 2. When you call `console.log(one, two, three)` from your code headless chrome prints only the first passed object.
    The reason behind it is the format of the message that chrome sends to the runner.
    Opal intentionally uses a simplified method from Chrome API (`Console.messageAdded`) to catch `console.log` invocations.
-   (Check lib/opal/cli_runners/chrome.js do get more information)
+   (Check `lib/opal/cli_runners/chrome.js` do get more information)
 
 ## Internals
 
@@ -93,3 +93,13 @@ you can override default values by specifying `CHROME_HOST` and `CHROME_PORT` en
       42
 
 NOTE: `CHROME_HOST` requires a chrome server to be started. You can't start remotely a server on a different host.
+
+
+## Additional options
+
+If you need to pass additional CLI options to the Chrome executable you can do so by setting the `CHROME_OPTS` environment variable:
+
+      $ CHROME_OPS="--window-size=412,732" opal -Rchrome -e "puts 42"
+      42
+
+_For a list of additional options see https://developers.google.com/web/updates/2017/04/headless-chrome_
