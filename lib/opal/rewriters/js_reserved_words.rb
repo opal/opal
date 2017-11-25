@@ -97,12 +97,13 @@ module Opal
 
       def on_argument(node)
         name, value = *node
+        fixed_name = fix_var_name(name)
 
-        if value
-          node = node.updated(nil, [fix_var_name(name), value])
-        else
-          node = node.updated(nil, [fix_var_name(name)])
+        if node.type == :kwarg || node.type == :kwoptarg
+          fixed_name = [fixed_name, name]
         end
+
+        node = node.updated(nil, value ? [fixed_name, value] : [fixed_name])
 
         super(node)
       end

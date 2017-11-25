@@ -13,18 +13,20 @@ module Opal
       children :name, :default_value
 
       def compile
+        lvar_name, key_name = *name
+
         initialize_kw_args_if_needed
 
-        add_temp name
+        add_temp lvar_name
 
-        line "#{name} = $kwargs.$$smap['#{name}'];"
+        line "#{lvar_name} = $kwargs.$$smap[#{key_name.to_s.inspect}];"
 
-        scope.used_kwargs << name
+        scope.used_kwargs << key_name
 
         return if default_value.children[1] == :undefined
 
-        line "if (#{name} == null) {"
-        line "  #{name} = ", expr(default_value)
+        line "if (#{lvar_name} == null) {"
+        line "  #{lvar_name} = ", expr(default_value)
         line "}"
       end
     end

@@ -13,16 +13,18 @@ module Opal
       children :name
 
       def compile
+        lvar_name, key_name = *name
+
         initialize_kw_args_if_needed
 
-        add_temp name
+        add_temp lvar_name
 
-        line "if (!Opal.hasOwnProperty.call($kwargs.$$smap, '#{name}')) {"
-        line "  throw Opal.ArgumentError.$new('missing keyword: #{name}');"
+        line "if (!Opal.hasOwnProperty.call($kwargs.$$smap, '#{key_name}')) {"
+        line "  throw Opal.ArgumentError.$new('missing keyword: #{key_name}');"
         line "}"
-        line "#{name} = $kwargs.$$smap['#{name}'];"
+        line "#{lvar_name} = $kwargs.$$smap[#{key_name.to_s.inspect}];"
 
-        scope.used_kwargs << name
+        scope.used_kwargs << key_name
       end
     end
   end

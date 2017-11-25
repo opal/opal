@@ -55,7 +55,7 @@ RSpec.describe Opal::Rewriters::JsReservedWords do
 
       context 'as arguments' do
         it "appends '$'" do
-          [:arg, :restarg, :blockarg, :shadowarg, :kwarg, :kwrestarg].each do |type|
+          [:arg, :restarg, :blockarg, :shadowarg, :kwrestarg].each do |type|
             expect_rewritten(
               s(type, lvar_name)
             ).to eq(
@@ -63,7 +63,19 @@ RSpec.describe Opal::Rewriters::JsReservedWords do
             )
           end
 
-          [:optarg, :kwoptarg].each do |type|
+          expect_rewritten(
+            s(:kwarg, lvar_name)
+          ).to eq(
+            s(:kwarg, [:"#{lvar_name}$", lvar_name])
+          )
+
+          expect_rewritten(
+            s(:kwoptarg, lvar_name, s(:nil))
+          ).to eq(
+            s(:kwoptarg, [:"#{lvar_name}$", lvar_name], s(:nil))
+          )
+
+          [:optarg].each do |type|
             expect_rewritten(
               s(type, lvar_name, s(:nil))
             ).to eq(
@@ -104,13 +116,23 @@ RSpec.describe Opal::Rewriters::JsReservedWords do
 
   context 'normal ivar name' do
     it 'does not modify AST' do
-      [:arg, :restarg, :blockarg, :shadowarg, :kwarg, :kwrestarg].each do |type|
+      [:arg, :restarg, :blockarg, :shadowarg, :kwrestarg].each do |type|
         expect_no_rewriting_for(s(type, :a))
       end
 
-      [:optarg, :kwoptarg].each do |type|
-        expect_no_rewriting_for(s(type, :a, s(:nil)))
-      end
+      expect_rewritten(
+        s(:kwarg, :a)
+      ).to eq(
+        s(:kwarg, [:a, :a])
+      )
+
+      expect_rewritten(
+        s(:kwoptarg, :a, s(:nil))
+      ).to eq(
+        s(:kwoptarg, [:a, :a], s(:nil))
+      )
+
+      expect_no_rewriting_for(s(:optarg, :a, s(:nil)))
     end
   end
 end
