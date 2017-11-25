@@ -5,9 +5,12 @@ RSpec.describe Opal::Rewriters::JsReservedWords do
     ::Opal::AST::Node.new(type, children)
   end
 
+  def rewrite(sexp)
+    Opal::Rewriters::JsReservedWords.new.process(sexp)
+  end
+
   def expect_rewritten(sexp)
-    processed = Opal::Rewriters::JsReservedWords.new.process(sexp)
-    expect(processed)
+    expect(rewrite(sexp))
   end
 
   def expect_no_rewriting_for(sexp)
@@ -55,32 +58,16 @@ RSpec.describe Opal::Rewriters::JsReservedWords do
 
       context 'as arguments' do
         it "appends '$'" do
-          [:arg, :restarg, :blockarg, :shadowarg, :kwrestarg].each do |type|
-            expect_rewritten(
-              s(type, lvar_name)
-            ).to eq(
-              s(type, :"#{lvar_name}$")
-            )
+          [:arg, :restarg, :blockarg, :shadowarg, :kwrestarg, :kwarg].each do |type|
+            rewritten = rewrite(s(type, lvar_name))
+            expect(rewritten).to eq(s(type, :"#{lvar_name}$"))
+            expect(rewritten.meta[:arg_name]).to eq(lvar_name)
           end
 
-          expect_rewritten(
-            s(:kwarg, lvar_name)
-          ).to eq(
-            s(:kwarg, [:"#{lvar_name}$", lvar_name])
-          )
-
-          expect_rewritten(
-            s(:kwoptarg, lvar_name, s(:nil))
-          ).to eq(
-            s(:kwoptarg, [:"#{lvar_name}$", lvar_name], s(:nil))
-          )
-
-          [:optarg].each do |type|
-            expect_rewritten(
-              s(type, lvar_name, s(:nil))
-            ).to eq(
-              s(type, :"#{lvar_name}$", s(:nil))
-            )
+          [:optarg, :kwoptarg].each do |type|
+            rewritten = rewrite(s(type, lvar_name, s(:nil)))
+            expect(rewritten).to eq(s(type, :"#{lvar_name}$", s(:nil)))
+            expect(rewritten.meta[:arg_name]).to eq(lvar_name)
           end
         end
       end
@@ -116,23 +103,17 @@ RSpec.describe Opal::Rewriters::JsReservedWords do
 
   context 'normal ivar name' do
     it 'does not modify AST' do
-      [:arg, :restarg, :blockarg, :shadowarg, :kwrestarg].each do |type|
-        expect_no_rewriting_for(s(type, :a))
+      [:arg, :restarg, :blockarg, :shadowarg, :kwarg, :kwrestarg].each do |type|
+        rewritten = rewrite(s(type, :a))
+        expect(rewritten).to eq(s(type, :a))
+        expect(rewritten.meta[:arg_name]).to eq(:a)
       end
 
-      expect_rewritten(
-        s(:kwarg, :a)
-      ).to eq(
-        s(:kwarg, [:a, :a])
-      )
-
-      expect_rewritten(
-        s(:kwoptarg, :a, s(:nil))
-      ).to eq(
-        s(:kwoptarg, [:a, :a], s(:nil))
-      )
-
-      expect_no_rewriting_for(s(:optarg, :a, s(:nil)))
+      [:optarg, :kwoptarg].each do |type|
+        rewritten = rewrite(s(type, :a, s(:nil)))
+        expect(rewritten).to eq(s(type, :a, s(:nil)))
+        expect(rewritten.meta[:arg_name]).to eq(:a)
+      end
     end
   end
 end

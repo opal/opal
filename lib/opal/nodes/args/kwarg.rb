@@ -10,10 +10,10 @@ module Opal
     #
     class KwargNode < InitializeKwargsNode
       handle :kwarg
-      children :name
+      children :lvar_name
 
       def compile
-        lvar_name, key_name = *name
+        key_name = @sexp.meta[:arg_name]
 
         initialize_kw_args_if_needed
 
