@@ -89,22 +89,19 @@ module Opal
         name, _ = *node
 
         if name
-          node = node.updated(nil, [fix_var_name(name)])
+          node = node.updated(nil, [fix_var_name(name)], meta: {arg_name: name})
         end
 
         node
       end
 
       def on_argument(node)
+        node = super(node)
         name, value = *node
+        fixed_name = fix_var_name(name)
+        new_children = value ? [fixed_name, value] : [fixed_name]
 
-        if value
-          node = node.updated(nil, [fix_var_name(name), value])
-        else
-          node = node.updated(nil, [fix_var_name(name)])
-        end
-
-        super(node)
+        node.updated(nil, new_children, meta: {arg_name: name})
       end
     end
   end
