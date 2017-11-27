@@ -46,7 +46,16 @@ module Opal
       end
 
       def method_jsid
-        "." + meth.to_s
+        ".#{meth}"
+      end
+
+      def compile_using_send
+        push recv(receiver_sexp), method_jsid, ".apply(null"
+        compile_arguments
+        if iter
+          push ".concat(", expr(iter), ")"
+        end
+        push ")"
       end
     end
 
