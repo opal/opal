@@ -1168,8 +1168,12 @@ module Kernel
       if (seconds < 0) {
         #{raise ArgumentError, "time interval must be positive"}
       }
-      var t = new Date();
-      while (new Date() - t <= seconds * 1000);
+      var get_time = Opal.global.performance ?
+        function() {return performance.now()} :
+        function() {return new Date()}
+
+      var t = get_time();
+      while (get_time() - t <= seconds * 1000);
       return seconds;
     }
   end
