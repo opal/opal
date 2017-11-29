@@ -1,5 +1,12 @@
 %x{
-  var warnings = {};
+  var warnings = {}, errno_code, errno_codes = [
+    'EACCES',
+    'EISDIR',
+    'EMFILE',
+    'ENOENT',
+    'EPERM'
+  ];
+
   function handle_unsupported_feature(message) {
     switch (Opal.config.unsupported_features_severity) {
     case 'error':
@@ -23,14 +30,18 @@
     try {
       return action();
     } catch (error) {
-      if (error.code === 'EACCES' ||
-          error.code === 'EISDIR' ||
-          error.code === 'EMFILE' ||
-          error.code === 'ENOENT' ||
-          error.code === 'EPERM') {
-        throw Opal.IOError.$new(error.message)
+      if (errno_codes.indexOf(error.code) >= 0) {
+        var error_class = #{Errno.const_get(`error.code`)}
+        throw #{`error_class`.new(`error.message`)};
       }
       throw error;
+    }
+  }
+
+  for(var i = 0, ii = errno_codes.length; i < ii; i++) {
+    errno_code = errno_codes[i];
+    if (!#{Errno.const_defined?(`errno_code`)}) {
+      #{Errno.const_set(`errno_code`, Class.new(SystemCallError))}
     }
   }
 }
@@ -82,12 +93,26 @@ class File < IO
 
   def self.directory? path
     return false unless exist? path
-    `return executeIOAction(function(){return !!__fs__.lstatSync(path).isDirectory()})`
+    result = `executeIOAction(function(){return !!__fs__.lstatSync(path).isDirectory()})`
+    unless result
+      realpath = realpath(path)
+      if realpath != path
+        result = `executeIOAction(function(){return !!__fs__.lstatSync(realpath).isDirectory()})`
+      end
+    end
+    result
   end
 
   def self.file? path
     return false unless exist? path
-    `return executeIOAction(function(){return !!__fs__.lstatSync(path).isFile()})`
+    result = `executeIOAction(function(){return !!__fs__.lstatSync(path).isFile()})`
+    unless result
+      realpath = realpath(path)
+      if realpath != path
+        result = `executeIOAction(function(){return !!__fs__.lstatSync(realpath).isFile()})`
+      end
+    end
+    result
   end
 
   def self.readable? path
@@ -106,8 +131,8 @@ class File < IO
     `return executeIOAction(function(){return __fs__.lstatSync(path).size})`
   end
 
-  def self.open path, flags
-    file = new(path, flags)
+  def self.open(path, mode = 'r')
+    file = new(path, mode)
     if block_given?
       begin
         yield(file)

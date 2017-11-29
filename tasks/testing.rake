@@ -24,6 +24,7 @@ module Testing
         a_file
         lib/spec_helper
         mspec/commands/mspec-run
+        etc
       ]
     end
 
@@ -270,6 +271,7 @@ platforms.each do |platform|
   end
 
   minitest_suites.each do |suite|
+    desc "Run the Minitest suite on Opal::Builder/#{platform}" + pattern_usage
     task :"minitest_#{suite}_#{platform}" do
       if ENV.key? 'FILES'
         files = Dir[ENV['FILES']]
@@ -280,7 +282,7 @@ platforms.each do |platform|
           benchmark/test_benchmark.rb
           ruby/test_call.rb
           opal/test_keyword.rb
-          base64/test_base64.rb
+          opal/test_base64.rb
           opal/unsupported_and_bugs.rb
         ]
       end
@@ -298,11 +300,11 @@ platforms.each do |platform|
 end
 
 # The name ends with the platform, which is of course mandated in this case
+desc "Run the Node.js Minitest suite on Node.js"
 task :minitest_node_nodejs do
   Opal.use_gem 'hike'
 
   platform = 'nodejs'
-  suite = 'node'
   files = %w[
     nodejs
     opal-parser
@@ -322,32 +324,50 @@ task :minitest_node_nodejs do
      "bin/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 end
 
-desc 'Runs opal-rspec tests to augment unit testing/rubyspecs'
+desc 'Run smoke tests with opal-rspec to see if something is broken'
 task :smoke_test do
-  opal_rspec_dir = 'tmp/smoke_test_opal_rspec'
+  opal_rspec_dir = File.expand_path('tmp/smoke_test_opal_rspec')
+  gemfile_name = 'opal_rspec_smoketest.Gemfile'
+  actual_output_path = "#{opal_rspec_dir}/output.txt"
+
   # Travis caching might be creating this, manage the state idempotently
   unless File.exist?(File.join(opal_rspec_dir, '.git'))
     rm_rf opal_rspec_dir
     sh "git clone https://github.com/opal/opal-rspec.git #{opal_rspec_dir}"
   end
-  # Don't want conflicts with opal-rspec's Gemfile
-  gemfile_name = 'opal_rspec_smoketest.Gemfile'
-  cp File.join('tasks/testing', gemfile_name), opal_rspec_dir
-  Dir.chdir opal_rspec_dir do
-    sh 'git checkout releases/0-6-stable'
-    sh 'git pull'
-    # RSpec source itself
-    sh 'git submodule update --init'
+
+  cp "tasks/testing/#{gemfile_name}", "#{opal_rspec_dir}/Gemfile"
+
+  cd opal_rspec_dir do
     Bundler.with_clean_env do
-      # Force new dependencies each time
-      rm_rf "#{gemfile_name}.lock"
-      with_gemfile = lambda {|command| sh "BUNDLE_GEMFILE=#{gemfile_name} RUNNER=node bundle #{command}"}
-      with_gemfile['install']
-      with_gemfile['exec rake rake_only']
+      sh 'bundle install'
+      sh %{bundle exec opal-rspec --color --default-path=../../spec ../../spec/lib/deprecations_spec.rb > #{actual_output_path}}
+
+      actual_output = File.read(actual_output_path)
+      begin
+        require 'rspec/expectations'
+        extend RSpec::Matchers
+        expect(actual_output.lines[0]).to    eq("[32m.[0m[32m.[0m\n")
+        expect(actual_output.lines[1]).to    eq("\n")
+        expect(actual_output.lines[2]).to match(%r{^Finished in \d+\.\d+ seconds \(files took \d+\.\d+ seconds to load\)\n$})
+        expect(actual_output.lines[3]).to    eq("[32m2 examples, 0 failures[0m\n")
+        expect(actual_output.lines[4]).to    eq("\n")
+        expect(actual_output.lines[5]).to match(%r{Top 2 slowest examples \(\d+\.\d+ seconds, \d+\.\d+% of total time\):\n})
+        expect(actual_output.lines[6]).to    eq("  Opal::Deprecations defaults to warn\n")
+        expect(actual_output.lines[7]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m \n})
+        expect(actual_output.lines[8]).to    eq("  Opal::Deprecations can be set to raise\n")
+      rescue RSpec::Expectations::ExpectationNotMetError
+        warn $!.message
+        warn "\n\n== Full output:\n#{actual_output}"
+        exit 1
+      end
     end
   end
+
+  puts "Smoke test was successful!"
 end
 
+desc 'Run browser tests with SauceLabs'
 task :browser_test do
   credentials = {
     username: ENV['SAUCE_USERNAME'] || warn('missing SAUCE_USERNAME env var'),
@@ -373,11 +393,23 @@ task :browser_test do
   end
 end
 
-platforms.each { |platform| task(:"mspec_#{platform}"    => mspec_suites.map    { |suite| :"mspec_#{suite}_#{platform}"    }) }
-platforms.each { |platform| task(:"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }) }
+platforms.each do |platform|
+  desc "Run the whole MSpec suite on #{platform}"
+  task :"mspec_#{platform}" => mspec_suites.map { |suite| :"mspec_#{suite}_#{platform}" }
+end
 
+platforms.each do |platform|
+  desc "Run the whole Minitest suite on #{platform}"
+  task :"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }
+end
+
+desc "Run the whole MSpec suite on all platforms"
 task :mspec    => [:mspec_chrome, :mspec_nodejs]
+
+desc "Run the whole Minitest suite on all platforms"
 task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs]
+
+desc "Run all tests"
 task :test_all => [:rspec, :mspec, :minitest]
 
 # deprecated, can be removed after 0.11

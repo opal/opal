@@ -4,23 +4,66 @@ class File < IO
   PATH_SEPARATOR = ':'
   # Assuming case insenstive filesystem
   FNM_SYSCASE = 0
+  windows_root_rx = /^[a-zA-Z]:(?:\\|\/)/
 
   class << self
     def expand_path(path, basedir = nil)
-      path = [basedir, path].compact.join(SEPARATOR)
-      parts = path.split(SEPARATOR)
+      sep = SEPARATOR
+      sep_chars = `$sep_chars()`
       new_parts = []
-      parts[0] = Dir.home if parts.first == '~'
-      parts[0] = Dir.pwd if parts.first == '.'
 
-      parts.each do |part|
-        if part == '..'
-          new_parts.pop
-        else
-          new_parts << part
-        end
+      if `path[0] === '~' || (basedir && basedir[0] === '~')`
+        home = Dir.home
+        raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
+        raise(ArgumentError, "non-absolute home") unless home.start_with?(sep)
+
+        home            += sep
+        home_path_regexp = /^\~(?:#{sep}|$)/
+        path             = path.sub(home_path_regexp, home)
+        basedir          = basedir.sub(home_path_regexp, home) if basedir
       end
-      new_parts.join(SEPARATOR)
+
+      basedir     = Dir.pwd unless basedir
+      path_abs    = `path.substr(0, sep.length) === sep || windows_root_rx.test(path)`
+      basedir_abs = `basedir.substr(0, sep.length) === sep || windows_root_rx.test(basedir)`
+
+      if path_abs
+        parts       = path.split(/[#{sep_chars}]/)
+        leading_sep = `windows_root_rx.test(path) ? '' : #{path.sub(/^([#{sep_chars}]+).*$/, '\1')}`
+        abs         = true
+      else
+        parts       = basedir.split(/[#{sep_chars}]/) + path.split(/[#{sep_chars}]/)
+        leading_sep = `windows_root_rx.test(basedir) ? '' : #{basedir.sub(/^([#{sep_chars}]+).*$/, '\1')}`
+        abs         = basedir_abs
+      end
+
+      %x{
+        var part;
+        for (var i = 0, ii = parts.length; i < ii; i++) {
+          part = parts[i];
+
+          if (
+            (part === nil) ||
+            (part === ''  && ((new_parts.length === 0) || abs)) ||
+            (part === '.' && ((new_parts.length === 0) || abs))
+          ) {
+            continue;
+          }
+          if (part === '..') {
+            new_parts.pop();
+          } else {
+            new_parts.push(part);
+          }
+        }
+
+        if (!abs && parts[0] !== '.') {
+          #{new_parts.unshift '.'}
+        }
+      }
+
+      new_path = new_parts.join(sep)
+      new_path = leading_sep+new_path if abs
+      new_path
     end
     alias realpath expand_path
 

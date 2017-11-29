@@ -2,7 +2,7 @@ require 'lib/spec_helper'
 require 'opal/cli'
 require 'stringio'
 
-describe Opal::CLI do
+RSpec.describe Opal::CLI do
   let(:fake_stdout) { StringIO.new }
   let(:file)    { File.expand_path('../fixtures/opal_file.rb', __FILE__) }
   let(:options) { {} }

@@ -1,6 +1,7 @@
 require 'lib/spec_helper'
+require 'opal/deprecations'
 
-describe Opal::Deprecations do
+RSpec.describe Opal::Deprecations do
   subject { Object.new.extend described_class }
 
   it 'defaults to warn' do

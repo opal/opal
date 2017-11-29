@@ -9,7 +9,7 @@ require 'opal'
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
-  config.before { Opal.reset_paths! }
+  config.before { Opal.reset_paths! unless RUBY_PLATFORM == 'opal' }
   config.before { Opal::Config.reset! if defined? Opal::Config }
   config.before { Opal::Processor.reset_cache_key! if defined? Opal::Processor }
 
@@ -45,19 +45,19 @@ RSpec.configure do |config|
   # compatibility in RSpec 3). It causes shared context metadata to be
   # inherited by the metadata hash of host groups and examples, rather than
   # triggering implicit auto-inclusion in groups with matching metadata.
-  config.shared_context_metadata_behavior = :apply_to_host_groups
+  config.shared_context_metadata_behavior = :apply_to_host_groups if config.respond_to? :shared_context_metadata_behavior
 
   # This allows you to limit a spec run to individual examples or groups
   # you care about by tagging them with `:focus` metadata. When nothing
   # is tagged with `:focus`, all examples get run. RSpec also provides
   # aliases for `it`, `||\describe`, and `context` that include `:focus`
   # metadata: `fit`, `fdescribe` and `fcontext`, respectively.
-  config.filter_run_when_matching :focus
+  config.filter_run_when_matching :focus if config.respond_to? :filter_run_when_matching
 
   # Allows RSpec to persist some state between runs in order to support
   # the `--only-failures` and `--next-failure` CLI options. We recommend
   # you configure your source control system to ignore this file.
-  config.example_status_persistence_file_path = "tmp/examples.txt"
+  config.example_status_persistence_file_path = "tmp/examples.txt" if config.respond_to? :example_status_persistence_file_path
 
   # Limits the available syntax to the non-monkey patched syntax that is
   # recommended. For more details, see:

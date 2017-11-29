@@ -1659,6 +1659,7 @@
     obj.$$proto[jsid] = body;
     // for super dispatcher, etc.
     body.$$owner = obj;
+    if (body.displayName == null) body.displayName = jsid.substr(1);
 
     // is it a module?
     if (obj.$$is_module) {
@@ -2152,6 +2153,7 @@
       path = Opal.current_dir.replace(/\/*$/, '/') + path;
     }
 
+    path = path.replace(/^\.\//, '');
     path = path.replace(/\.(rb|opal|js)$/, '');
     parts = path.split(SEPARATOR);
 
@@ -2259,7 +2261,13 @@
 
   // Forward .toString() to #to_s
   _Object.$$proto.toString = function() {
-    return this.$to_s();
+    var to_s = this.$to_s();
+    if (to_s.$$is_string && typeof(to_s) === 'object') {
+      // a string created using new String('string')
+      return to_s.valueOf();
+    } else {
+      return to_s;
+    }
   };
 
   // Make Kernel#require immediately available as it's needed to require all the

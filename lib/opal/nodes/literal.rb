@@ -53,11 +53,23 @@ module Opal
       end
 
       def compile
-        sanitized_value = value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do |match|
+        string_value = value
+        encoding = string_value.encoding
+        should_encode = encoding != Encoding::UTF_8
+
+        if should_encode
+          string_value = string_value.force_encoding('UTF-8')
+        end
+
+        sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do |match|
           code_point = $1.to_i(16)
           to_utf16(code_point)
         end
         push translate_escape_chars(sanitized_value)
+
+        if should_encode && RUBY_ENGINE != 'opal'
+          push '.$force_encoding("', encoding.name, '")'
+        end
       end
 
       # http://www.2ality.com/2013/09/javascript-unicode.html

@@ -1,7 +1,7 @@
 require 'lib/spec_helper'
 require 'rack/test'
 
-describe Opal::SimpleServer do
+RSpec.describe Opal::SimpleServer do
   include Rack::Test::Methods
 
   attr_accessor :app

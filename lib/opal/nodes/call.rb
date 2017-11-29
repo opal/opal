@@ -248,6 +248,7 @@ module Opal
 
           dir = File.dirname(compiler.file)
           full_path = Pathname(dir).join(relative_path).cleanpath.to_s
+          full_path.force_encoding(relative_path.encoding)
           first_arg = first_arg.updated(nil, [full_path])
         end
         @arglist = arglist.updated(nil, [first_arg] + rest)

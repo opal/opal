@@ -2,7 +2,7 @@ require 'lib/spec_helper'
 require 'support/rewriters_helper'
 require 'opal/rewriters/for_rewriter'
 
-describe Opal::Rewriters::ForRewriter do
+RSpec.describe Opal::Rewriters::ForRewriter do
   include RewritersHelper
   extend  RewritersHelper
 

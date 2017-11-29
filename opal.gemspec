@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'mspec', '1.5.20'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'racc'
-  s.add_development_dependency 'rspec', '~> 3.5.0'
+  s.add_development_dependency 'rspec', '~> 3.6.0'
   s.add_development_dependency 'octokit', '~> 2.4.0'
   s.add_development_dependency 'bundler', '~> 1.5'
   s.add_development_dependency 'yard', '~> 0.8.7'

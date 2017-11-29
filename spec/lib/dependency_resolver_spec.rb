@@ -1,6 +1,6 @@
 require 'lib/spec_helper'
 
-describe Opal::Nodes::CallNode::DependencyResolver do
+RSpec.describe Opal::Nodes::CallNode::DependencyResolver do
   let(:compiler) { double(:compiler, :dynamic_require_severity => :none) }
 
   it "resolves simple strings to themselves" do

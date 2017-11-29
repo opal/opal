@@ -2,6 +2,7 @@
 require 'opal/config'
 require 'opal/compiler'
 require 'opal/builder'
+require 'opal/builder_processors'
 require 'opal/erb'
 require 'opal/paths'
 require 'opal/version'

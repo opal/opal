@@ -1,3 +1,5 @@
+# encoding: binary
+
 require 'spec_helper'
 
 module MarshalExtension

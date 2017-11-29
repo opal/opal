@@ -1,6 +1,6 @@
 require 'lib/spec_helper'
 
-describe 'Opal.use_gem' do
+RSpec.describe 'Opal.use_gem' do
   # Coverage probably should be improved
 
   it 'adds require_paths of a gem to Opal paths' do

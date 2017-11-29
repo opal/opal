@@ -168,3 +168,5 @@ end
 
 OSpecFormatter.main.register
 OSpecFilter.main.register
+
+MSpec.enable_feature :encoding

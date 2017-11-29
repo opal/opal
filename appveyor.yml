@@ -19,7 +19,6 @@ install:
   - ruby --version
   - gem --version
   - node --version
-  - gem install bundler --quiet --no-ri --no-rdoc
   - bundler --version
   - bundle
 

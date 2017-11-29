@@ -186,8 +186,19 @@ module Kernel
       block.call
     end
 
-    status = 0 if `status === true` # it's in JS because it can be null/undef
-    `Opal.exit(status);`
+    %x{
+      if (status == null) {
+        status = 0
+      } else if (status.$$is_boolean) {
+        status = status ? 0 : 1;
+      } else if (status.$$is_numeric) {
+        status = status.$to_i();
+      } else {
+        status = 0
+      }
+
+      Opal.exit(status);
+    }
     nil
   end
 
@@ -1123,18 +1134,20 @@ module Kernel
 
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
   def require_tree(path)
-    path = File.expand_path(path)
-    path = '' if path == '.'
-
     %x{
+      var result = [];
+
+      path = #{File.expand_path(path)}
+      path = Opal.normalize(path);
+      if (path === '.') path = '';
       for (var name in Opal.modules) {
         if (#{`name`.start_with?(path)}) {
-          Opal.require(name);
+          result.push([name, Opal.require(name)]);
         }
       }
-    }
 
-    nil
+      return result;
+    }
   end
 
   alias send        __send__
@@ -1155,8 +1168,12 @@ module Kernel
       if (seconds < 0) {
         #{raise ArgumentError, "time interval must be positive"}
       }
-      var t = new Date();
-      while (new Date() - t <= seconds * 1000);
+      var get_time = Opal.global.performance ?
+        function() {return performance.now()} :
+        function() {return new Date()}
+
+      var t = get_time();
+      while (get_time() - t <= seconds * 1000);
       return seconds;
     }
   end

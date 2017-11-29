@@ -1013,17 +1013,17 @@ class Array < `Array`
       raise TypeError, "length invalid with range" if two
 
       left   = Opal.coerce_to one.begin, Integer, :to_int
-      `left += #@length` if `left < 0`
+      `left += this.length` if `left < 0`
       raise RangeError, "#{one.inspect} out of range" if `left < 0`
 
       right  = Opal.coerce_to one.end, Integer, :to_int
-      `right += #@length` if `right < 0`
+      `right += this.length` if `right < 0`
       `right += 1` unless one.exclude_end?
 
       return self if `right <= left`
     elsif one
       left   = Opal.coerce_to one, Integer, :to_int
-      `left += #@length` if `left < 0`
+      `left += this.length` if `left < 0`
       left   = 0 if `left < 0`
 
       if two
@@ -1033,35 +1033,35 @@ class Array < `Array`
 
         `right += left`
       else
-        right = @length
+        right = `this.length`
       end
     else
       left  = 0
-      right = @length
+      right = `this.length`
     end
 
-    if `left > #@length`
+    if `left > this.length`
       %x{
-        for (i = #@length; i < right; i++) {
+        for (i = this.length; i < right; i++) {
           self[i] = nil;
         }
       }
     end
 
-    if `right > #@length`
-      @length = right
+    if `right > this.length`
+      `this.length = right`
     end
 
     if block
       %x{
-        for (length = #@length; left < right; left++) {
+        for (length = this.length; left < right; left++) {
           value = block(left);
           self[left] = value;
         }
       }
     else
       %x{
-        for (length = #@length; left < right; left++) {
+        for (length = this.length; left < right; left++) {
           self[left] = #{obj};
         }
       }
@@ -1881,7 +1881,7 @@ class Array < `Array`
 
     %x{
       var original = self.length;
-      #{ keep_if &block };
+      #{ keep_if(&block) };
       return self.length === original ? nil : self;
     }
   end

@@ -55,7 +55,7 @@ module Opal
       def run_chrome_server
         raise "Chrome server can be started only on localhost" if chrome_host != DEFAULT_CHROME_HOST
 
-        chrome_server_cmd = "#{chrome_executable} --headless --disable-gpu --remote-debugging-port=#{chrome_port}"
+        chrome_server_cmd = "#{chrome_executable} --headless --disable-gpu --remote-debugging-port=#{chrome_port} #{ENV['CHROME_OPTS']}"
         puts chrome_server_cmd
 
         chrome_pid = Process.spawn(chrome_server_cmd)
@@ -79,7 +79,7 @@ module Opal
         puts "Connecting to #{chrome_host}:#{chrome_port}..."
         TCPSocket.new(chrome_host, chrome_port).close
         true
-      rescue Errno::ECONNREFUSED
+      rescue Errno::ECONNREFUSED, Errno::EADDRNOTAVAIL
         false
       end
 

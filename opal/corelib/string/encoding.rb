@@ -1,30 +1,26 @@
 require 'corelib/string'
 
 class Encoding
+  self.JS['$$register'] = `{}`
+
   def self.register(name, options = {}, &block)
     names    = [name] + (options[:aliases] || [])
     encoding = Class.new(self, &block).
       new(name, names, options[:ascii] || false, options[:dummy] || false)
 
-    names.each {|name|
+    register = self.JS['$$register']
+    names.each do |name|
       const_set name.sub('-', '_'), encoding
-    }
+      register.JS["$$#{name}"] = encoding
+    end
   end
 
   def self.find(name)
-    upcase = name.upcase
-
-    constants.each {|const|
-      encoding = const_get(const)
-
-      next unless Encoding === encoding
-
-      if encoding.name == upcase || encoding.names.include?(upcase)
-        return encoding
-      end
-    }
-
-    raise ArgumentError, "unknown encoding name - #{name}"
+    return default_external if name == :default_external
+    register = self.JS['$$register']
+    encoding = register.JS["$$#{name}"] || register.JS["$$#{name.upcase}"]
+    raise ArgumentError, "unknown encoding name - #{name}" unless encoding
+    encoding
   end
 
   class << self
@@ -149,11 +145,13 @@ Encoding.register "UTF-32LE" do
   end
 end
 
-Encoding.register "ASCII-8BIT", aliases: ["BINARY"], ascii: true do
+Encoding.register "ASCII-8BIT", aliases: ["BINARY", "US-ASCII", "ASCII"], ascii: true, dummy: true do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
-        #{yield `string.charCodeAt(i) & 0xff`};
+        var code = string.charCodeAt(i);
+        #{yield `code & 0xff`};
+        #{yield `code >> 8`};
       }
     }
   end
@@ -192,21 +190,15 @@ class String
 
   def force_encoding(encoding)
     %x{
-      if (encoding === self.encoding) {
-        return self;
-      }
-    }
-    encoding = Opal.coerce_to!(encoding, String, :to_s)
-    encoding = Encoding.find(encoding)
+      if (encoding === self.encoding) { return self; }
 
-    return self if encoding == @encoding
-    raise ArgumentError, "unknown encoding name - #{encoding}" if encoding.nil?
+      encoding = #{Opal.coerce_to!(encoding, String, :to_s)};
+      encoding = #{Encoding.find(encoding)};
 
-    %x{
-      var result = new String(self);
-      result.encoding = encoding;
+      if (encoding === self.encoding) { return self; }
 
-      return result;
+      self.encoding = encoding;
+      return self;
     }
   end
 

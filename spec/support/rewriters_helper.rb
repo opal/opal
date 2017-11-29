@@ -18,7 +18,7 @@ module RewritersHelper
   end
 
   def parse(source)
-    buffer = Parser::Source::Buffer.new('(eval)')
+    buffer = Opal::Source::Buffer.new('(eval)')
     buffer.source = source
     parser = Opal::Parser.default_parser
     parser.parse(buffer)
@@ -27,7 +27,7 @@ module RewritersHelper
   alias :ast_of :parse
 
   def parse_without_rewriting(source)
-    buffer = Parser::Source::Buffer.new('(eval)')
+    buffer = Opal::Source::Buffer.new('(eval)')
     buffer.source = source
     parser = Opal::Parser.superclass.new
     parser.parse(buffer)

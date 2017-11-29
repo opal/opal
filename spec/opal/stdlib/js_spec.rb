@@ -63,4 +63,10 @@ describe 'javascript operations using JS module' do
       JS.delete(JS.global, :_test_global_function)
     end
   end
+
+  it 'JS.<METHOD> supports complex method calls' do
+    obj = `{ foo: function(){return "foo"} }`
+    args = [1,2,3]
+    obj.JS.foo(*args).should == :foo
+  end
 end
