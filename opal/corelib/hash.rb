@@ -642,7 +642,7 @@ class Hash
 
   alias indices indexes
 
-  `var inspect_ids;`
+  `var inspect_ids`
 
   def inspect
     %x{

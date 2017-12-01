@@ -25,7 +25,7 @@
 }
 
 class String
-  `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal.";`
+  `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal."`
 
   def <<(*)
     raise NotImplementedError, `ERROR` % '<<'
@@ -101,7 +101,7 @@ class String
 end
 
 module Kernel
-  `var ERROR = "Object freezing is not supported by Opal";`
+  `var ERROR = "Object freezing is not supported by Opal"`
 
   def freeze
     `handle_unsupported_feature(ERROR)`
@@ -115,7 +115,7 @@ module Kernel
 end
 
 module Kernel
-  `var ERROR = "Object tainting is not supported by Opal";`
+  `var ERROR = "Object tainting is not supported by Opal"`
 
   def taint
     `handle_unsupported_feature(ERROR)`

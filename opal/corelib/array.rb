@@ -186,7 +186,7 @@ class Array < `Array`
   end
 
   def <<(object)
-    `self.push(object);`
+    `self.push(object)`
 
     self
   end
@@ -460,7 +460,7 @@ class Array < `Array`
   end
 
   def any?
-    `if (self.length === 0) return false;`
+    `if (self.length === 0) return false`
     super
   end
 

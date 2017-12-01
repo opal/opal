@@ -221,7 +221,9 @@ module Opal
           case child.type
           when :str
             value = child.loc.expression.source
-            value = value.gsub(/;\s*$/, '') if last_index == index
+            if last_index == index
+              value = detect_and_remove_trailing_semicolon(value, child)
+            end
             push Fragment.new(value, nil)
           when :begin
             push expr(child)
@@ -242,6 +244,15 @@ module Opal
         end
 
         wrap '(', ')' if recv?
+      end
+
+      def detect_and_remove_trailing_semicolon value, node
+        if value.match(/;\s*$/)
+          compiler.warning 'Xstr ends with semicolon', node.line
+          value.gsub(/;\s*$/, '')
+        else
+          value
+        end
       end
     end
 

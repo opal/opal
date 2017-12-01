@@ -309,7 +309,9 @@ RSpec.describe Opal::Compiler do
 
   describe 'x-strings' do
     it 'removes the trailing semicolon' do
-      expect_compiled('a = `1;`').not_to include(";)")
+      compiler = Opal::Compiler.new('a = `1;`')
+      expect(compiler).to receive(:warning).once
+      expect(compiler.compile).not_to include(";)")
     end
   end
 

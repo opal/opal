@@ -14,7 +14,7 @@ class Random
     `self.$rng = new Math.seedrandom(seed);`
   end
 
-  `var $seed_generator = new Math.seedrandom('opal', { entropy: true });`
+  `var $seed_generator = new Math.seedrandom('opal', { entropy: true })`
 
   def self.new_seed
     %x{
