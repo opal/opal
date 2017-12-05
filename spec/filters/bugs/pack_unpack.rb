@@ -1,4 +1,4 @@
-opal_filter "String#unpack" do
+opal_filter "Array#pack / String#unpack" do
   fails "String#unpack with format 'A' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
   fails "String#unpack with format 'Q' adds nil for each element requested beyond the end of the String" # Expected [7523094288207668000, nil, nil] to be computed by "abcdefgh".unpack from "Q3" (computed [7523094288207667000, nil, nil] instead)
   fails "String#unpack with format 'Q' decodes one long for a single format character" # Expected [7523094288207667000] to equal [7523094288207668000]
@@ -45,4 +45,6 @@ opal_filter "String#unpack" do
   fails "String#unpack with format 'q' with modifier '>' ignores NULL bytes between directives" # Expected [7523094288207667000, 7233738012216484000] to equal [7523094288207668000, 7233738012216485000]
   fails "String#unpack with format 'q' with modifier '>' ignores spaces between directives" # Expected [7523094288207667000, 7233738012216484000] to equal [7523094288207668000, 7233738012216485000]
   fails "String#unpack with format 'u' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
+  fails "String#unpack with format 'm' decodes all pre-encoded ascii byte values" # Expected ["\u007FÂ\u0080Â\u0081Â\u0082Â\u0083"] to be computed by "f8KAwoHCgsKD\n".unpack from "m" (computed ["\u007F\u0080\u0081\u0082\u0083"] instead)
+  fails "String#unpack with format 'm' produces binary strings" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
 end

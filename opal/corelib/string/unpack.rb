@@ -1,146 +1,9 @@
-require 'strscan'
+require 'corelib/pack_unpack/format_string_parser'
 
 class String
   %x{
-    var directives = [
-      // Integer
-      'C', // supported
-      'S', // supported
-      'L', // supported
-      'Q', // supported
-      'J',
-
-      'c', // supported
-      's', // supported
-      'l', // supported
-      'q', // supported
-      'j',
-
-      'n', // supported
-      'N', // supported
-      'v', // supported
-      'V', // supported
-
-      'U', // supported
-      'w', // supported
-
-      // Float
-      'D',
-      'd',
-      'F',
-      'f',
-      'E',
-      'e',
-      'G',
-      'g',
-
-      // String
-      'A', // supported
-      'a', // supported
-      'Z', // supported
-      'B', // supported
-      'b', // supported
-      'H', // supported
-      'h', // supported
-      'u', // supported
-      'M',
-      'm',
-
-      'P',
-      'p',
-
-      // Misc
-      '@',
-      'X',
-      'x',
-    ];
-
-    var modifiers = [
-      '!', // ignored
-      '_', // ignored
-      '>', // big endian
-      '<'  // little endian
-    ];
-
     // Format Parser
-    function eachDirectiveAndCount(format, callback) {
-      var currentDirective,
-          currentCount,
-          currentModifiers,
-          countSpecified;
-
-      function reset() {
-        currentDirective = null;
-        currentCount = 0;
-        currentModifiers = [];
-        countSpecified = false;
-      }
-
-      reset();
-
-      function yieldAndReset() {
-        if (currentDirective == null) {
-          reset();
-          return;
-        }
-
-        var directiveSupportsModifiers = /[sSiIlLqQjJ]/.test(currentDirective);
-
-        if (!directiveSupportsModifiers && currentModifiers.length > 0) {
-          #{raise ArgumentError, "'#{`currentModifiers[0]`}' allowed only after types sSiIlLqQjJ"}
-        }
-
-        if (currentModifiers.indexOf('<') !== -1 && currentModifiers.indexOf('>') !== -1) {
-          #{raise RangeError, "Can't use both '<' and '>'"}
-        }
-
-        if (!countSpecified) {
-          currentCount = 1;
-        }
-
-        if (currentModifiers.indexOf('>') !== -1) {
-          currentDirective = currentDirective + '>';
-        }
-
-        callback(currentDirective, currentCount);
-
-        reset();
-      }
-
-      for (var i = 0; i < format.length; i++) {
-        var currentChar = format[i];
-
-        console.log("Got", currentChar,
-          "currentDirective is", currentDirective,
-          "currentCount is", currentCount,
-          "currentModifiers are", currentModifiers,
-          "countSpecified is", countSpecified
-        )
-
-        if (directives.indexOf(currentChar) !== -1) {
-          // Directive char always resets current state
-          yieldAndReset();
-          currentDirective = currentChar;
-        } else if (currentDirective) {
-          if (/\d/.test(currentChar)) {
-            // Count can be represented as a sequence of digits
-            currentCount = currentCount * 10 + parseInt(currentChar, 10);
-            countSpecified = true;
-          } else if (currentChar === '*' && countSpecified === false) {
-            // Count can be represented by a star character
-            currentCount = Infinity;
-            countSpecified = true;
-          } else if (modifiers.indexOf(currentChar) !== -1 && countSpecified === false) {
-            // Directives can be specified only after directive and before count
-            currentModifiers.push(currentChar);
-          } else {
-            yieldAndReset();
-          }
-        }
-      }
-
-      yieldAndReset();
-    }
+    var eachDirectiveAndCount = Opal.PackUnpack.eachDirectiveAndCount;
 
     function flattenArray(callback) {
       return function(data) {
@@ -377,6 +240,28 @@ class String
       }
     }
 
+    function base64Decode(callback) {
+      return function(data) {
+        var string = callback(data);
+        if (typeof(atob) === 'function') {
+          // Browser
+          return atob(string);
+        } else if (typeof(Buffer) === 'function') {
+          // Node
+          if (typeof(Buffer.from) === 'function') {
+            // Node 5.10+
+            return Buffer.from(string, 'base64').toString();
+          } else {
+            return new Buffer(string, 'base64').toString();
+          }
+        } else if (#{defined?(Base64)}) {
+          return #{Base64.decode64(`string`)};
+        } else {
+          #{raise "To use String#unpack('m'), you must first require 'base64'."}
+        }
+      }
+    }
+
     function identityFunction(value) { return value; }
 
     var handlers = {
@@ -429,7 +314,7 @@ class String
       'h': joinChars(identityFunction),
       'u': joinChars(bytesToAsciiChars(uudecode(identityFunction))),
       'M': null,
-      'm': null,
+      'm': base64Decode(joinChars(bytesToAsciiChars(identityFunction))),
 
       'P': null,
       'p': null,
@@ -682,6 +567,10 @@ class String
       }
     }
 
+    function readAll(buffer, count) {
+      return { chunk: buffer, rest: [] };
+    }
+
     var readChunk = {
       // Integer
       'C': readNTimesAndMerge(readBytes(1)),
@@ -732,7 +621,7 @@ class String
       'h': readHexCharsLowNibbleFirst,
       'u': readNTimesAndMerge(readUuencodingChunk),
       'M': null,
-      'm': null,
+      'm': readAll,
 
       'P': null,
       'p': null,
@@ -788,7 +677,7 @@ class String
       'h': false,
       'u': false,
       'M': null,
-      'm': null,
+      'm': false,
 
       'P': null,
       'p': null,

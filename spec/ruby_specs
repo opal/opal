@@ -102,7 +102,7 @@ ruby/core/string/unpack/h_spec
 # ruby/core/string/unpack/i_spec
 # ruby/core/string/unpack/j_spec
 ruby/core/string/unpack/l_spec
-# ruby/core/string/unpack/m_spec
+ruby/core/string/unpack/m_spec
 ruby/core/string/unpack/n_spec
 # ruby/core/string/unpack/p_spec
 # ruby/core/string/unpack/percent_spec
