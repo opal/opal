@@ -262,6 +262,23 @@ class String
       }
     }
 
+    // quoted-printable decode
+    function qpdecode(callback) {
+      return function(data) {
+        var string = callback(data);
+
+        var result = string
+          .replace(/[\t\x20]$/gm, '')
+          .replace(/=(?:\r\n?|\n|$)/g, '')
+          .replace(/=([a-fA-F0-9]{2})/g, function($0, $1) {
+            var codePoint = parseInt($1, 16);
+            return String.fromCharCode(codePoint);
+          });
+
+        return result;
+      }
+    }
+
     function identityFunction(value) { return value; }
 
     var handlers = {
@@ -313,7 +330,7 @@ class String
       'H': joinChars(identityFunction),
       'h': joinChars(identityFunction),
       'u': joinChars(bytesToAsciiChars(uudecode(identityFunction))),
-      'M': null,
+      'M': qpdecode(joinChars(bytesToAsciiChars(identityFunction))),
       'm': base64Decode(joinChars(bytesToAsciiChars(identityFunction))),
 
       'P': null,
@@ -620,7 +637,7 @@ class String
       'H': readHexCharsHighNibbleFirst,
       'h': readHexCharsLowNibbleFirst,
       'u': readNTimesAndMerge(readUuencodingChunk),
-      'M': null,
+      'M': readAll,
       'm': readAll,
 
       'P': null,
@@ -676,7 +693,7 @@ class String
       'H': false,
       'h': false,
       'u': false,
-      'M': null,
+      'M': false,
       'm': false,
 
       'P': null,
