@@ -216,12 +216,11 @@ module Opal
       handle :xstr
 
       def compile
-        last_index = children.size - 1
-        children.each_with_index do |child, index|
+        children.each do |child|
           case child.type
           when :str
             value = child.loc.expression.source
-            if last_index == index
+            if expr? && children.size == 1
               value = detect_and_remove_trailing_semicolon(value, child)
             end
             push Fragment.new(value, nil)
@@ -247,9 +246,9 @@ module Opal
       end
 
       def detect_and_remove_trailing_semicolon value, node
-        if value.match(/;\s*$/)
-          compiler.warning 'Xstr ends with semicolon', node.line
-          value.gsub(/;\s*$/, '')
+        if value.match(/;\s*#{REGEXP_END}/)
+          compiler.warning 'Do not terminate one-line xstr expression with semicolon', node.line
+          value.sub(/;\s*#{REGEXP_END}/, '')
         else
           value
         end
