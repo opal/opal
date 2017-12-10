@@ -1,25 +1,23 @@
 namespace :bench do
   directory "tmp/bench"
 
+  report_file_for = -> name {
+    index = Dir['tmp/bench/*'].map{|f| File.basename(f).to_i}.sort.last.to_i + 1
+    "tmp/bench/#{index}_#{name.gsub('.', '-')}.txt"
+  }
+
   desc "Benchmark Opal"
   task :opal => "tmp/bench" do |t, args|
+    require 'opal/version'
     files = Array(args[:files]) + args.extras
-    index = 0
-    begin
-      index += 1
-      report = "tmp/bench/Opal#{index}"
-    end while File.exist?(report)
+    report = report_file_for["opal-#{Opal::VERSION}"]
     sh "bundle exec opal benchmark/run.rb #{files.join(" ")} | tee #{report}"
   end
 
   desc "Benchmark Ruby"
   task :ruby => "tmp/bench" do |t, args|
     files = Array(args[:files]) + args.extras
-    index = 0
-    begin
-      index += 1
-      report = "tmp/bench/Ruby#{index}"
-    end while File.exist?(report)
+    report = report_file_for["ruby-#{RUBY_VERSION}"]
     sh "bundle exec ruby benchmark/run.rb #{files.join(" ")} | tee #{report}"
   end
 
