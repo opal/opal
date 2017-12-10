@@ -25,14 +25,19 @@ files.each do |file|
   times = []
 
   if RUBY_ENGINE == 'opal'
-    code = Opal.compile(File.read(file))
+    code = File.read(file)
+    code = "Benchmark.measure { #{code} }"
+    code = Opal.compile(code, file: file)
+
     BEST_OF_N.times do
-      times << Benchmark.measure { `eval(code)` }
+      times << `eval(code)`
     end
   else
     code = File.read(file)
+    code = "Benchmark.measure { #{code} }"
+
     BEST_OF_N.times do
-      times << Benchmark.measure { eval(code) }
+      times << eval(code)
     end
   end
 
