@@ -8,7 +8,7 @@ module Opal
       def compile
         push type.to_s
       end
-      
+
       def self.truthy_optimize?
         true
       end
@@ -23,7 +23,7 @@ module Opal
         push value.to_s
         wrap '(', ')' if recv?
       end
-      
+
       def self.truthy_optimize?
         true
       end
@@ -72,6 +72,13 @@ module Opal
       children :value, :flags
 
       def compile
+        flags = self.flags
+        flags = flags.gsub(/[^gimuy]/, '') if flags
+
+        if flags != self.flags
+          warn "invalid js flags found #{self.flags.inspect}, replaced with #{flags.inspect}"
+        end
+
         case value
         when ''
           push('/(?:)/')
