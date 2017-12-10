@@ -6,7 +6,7 @@ describe 'rescue' do
     end.should == 2
   end
 
-  it 'explicitely adds return to the rescue part when there is ensure statement' do
+  it 'explicitly adds return to the rescue part when there is ensure statement' do
     begin
       1 + 1
     rescue
