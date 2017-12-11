@@ -134,7 +134,7 @@ module Opal
       end
 
       def body_code
-        body_code = (body.type == :resbody ? s(:nil) : body)
+        body_code = ((body.nil? || body.type == :resbody) ? s(:nil) : body)
         body_code = compiler.returns(body_code) unless stmt?
         body_code
       end

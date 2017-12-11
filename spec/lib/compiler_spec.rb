@@ -393,6 +393,22 @@ RSpec.describe Opal::Compiler do
     end
   end
 
+  describe '[regressions]' do
+    it 'accepts empty rescue within while loop' do
+      # found running bm_vm1_rescue.rb
+      # was raising: NoMethodError: undefined method `type' for nil:NilClass
+      expect{
+        compiled <<-RUBY
+          while foo
+            begin
+            rescue
+            end
+          end
+        RUBY
+      }.not_to raise_error
+    end
+  end
+
   def compiled(*args)
     Opal::Compiler.new(*args).compile
   end
