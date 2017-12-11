@@ -145,7 +145,7 @@ RSpec.describe Opal::Compiler do
     end
   end
 
-    describe 'pre-processing require-ish methods' do
+  describe 'pre-processing require-ish methods' do
     describe '#require' do
       it 'parses and resolve #require argument' do
         compiler = compiler_for(%Q{require "#{__FILE__}"})
