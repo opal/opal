@@ -407,6 +407,16 @@ RSpec.describe Opal::Compiler do
         RUBY
       }.not_to raise_error
     end
+
+    it 'accepts a comment as the sole body of a for loop' do
+      expect{
+        compiled <<-RUBY
+          for foo in bar
+            #
+          end
+        RUBY
+      }.not_to raise_error
+    end
   end
 
   def compiled(*args)
