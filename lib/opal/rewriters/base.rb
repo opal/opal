@@ -5,12 +5,46 @@ require 'opal/ast/node'
 module Opal
   module Rewriters
     class Base < ::Parser::AST::Processor
+      class DummyLocation
+        def node=(*)
+        end
+
+        def expression
+          self
+        end
+
+        def begin_pos
+          0
+        end
+
+        def end_pos
+          0
+        end
+
+        def source
+          ''
+        end
+
+        def line
+          0
+        end
+
+        def column
+          0
+        end
+
+        def last_line
+          Float::INFINITY
+        end
+      end
+      DUMMY_LOCATION = DummyLocation.new
+
       def s(type, *children)
-        ::Opal::AST::Node.new(type, children)
+        ::Opal::AST::Node.new(type, children, location: DUMMY_LOCATION)
       end
 
       def self.s(type, *children)
-        ::Opal::AST::Node.new(type, children)
+        ::Opal::AST::Node.new(type, children, location: DUMMY_LOCATION)
       end
 
       alias on_iter       process_regular_node
