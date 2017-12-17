@@ -52,21 +52,39 @@ namespace :bench do
 
     header = ["Benchmark"]
     reports.each do |report_name, _|
-      header << report_name
+      header << (report_name+' | ')
     end
 
+    base_report_name, base_report_results = reports.to_a.first
+    puts "Base: #{base_report_name}"
+
     table = [header]
+    result_rows = []
     benchmark_names.each do |benchmark_name|
       row = [benchmark_name]
-      reports.each do |_, report_results|
+      reports.each do |report_name, report_results|
+        results_string = ""
+
         if report_results[benchmark_name]
-          row << format("%0.3f", report_results[benchmark_name])
-        else
-          row << ""
+          sec = report_results[benchmark_name].to_f
+
+          if report_name != base_report_name && base_report_results[benchmark_name]
+            base_sec = base_report_results[benchmark_name].to_f
+            delta_percent = -((1 - sec/base_sec)*100)
+            results_string << format("%+0.2f%%", delta_percent).rjust(10).ljust(12)
+          else
+            results_string << (" "*14)
+          end
+
+          results_string << format("%0.3fms", sec).rjust(9)
         end
+        results_string << ' | '
+        row << results_string
       end
-      table << row
+      result_rows << row
     end
+
+    table += result_rows.sort_by{|row| row[2].scan(/([\+|\-]\d+\.\d+)%/).flatten.first.to_f}
 
     fmt = ""
     table.transpose.each_with_index do |column, index|

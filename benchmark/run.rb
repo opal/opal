@@ -15,6 +15,8 @@ if files.empty?
   end
 end
 
+files = files.shuffle
+
 maxlen = files.max_by{|file| file.length}.length + 1
 
 total_time = 0
