@@ -6,7 +6,7 @@ test/cruby/benchmark/bm_app_fib.rb
 #[too long] test/cruby/benchmark/bm_app_lc_fizzbuzz.rb
 #[error] test/cruby/benchmark/bm_app_mandelbrot.rb
 #[too long] test/cruby/benchmark/bm_app_pentomino.rb
-test/cruby/benchmark/bm_app_raise.rb
+#[longish] test/cruby/benchmark/bm_app_raise.rb
 test/cruby/benchmark/bm_app_strconcat.rb
 test/cruby/benchmark/bm_app_tak.rb
 test/cruby/benchmark/bm_app_tarai.rb
@@ -32,12 +32,12 @@ test/cruby/benchmark/bm_loop_whileloop2.rb
 test/cruby/benchmark/bm_loop_whileloop.rb
 #[error] test/cruby/benchmark/bm_securerandom.rb
 test/cruby/benchmark/bm_so_ackermann.rb
-test/cruby/benchmark/bm_so_array.rb
+#[<30] test/cruby/benchmark/bm_so_array.rb
 #[error] test/cruby/benchmark/bm_so_binary_trees.rb
 #[error] test/cruby/benchmark/bm_so_concatenate.rb
 #[error] test/cruby/benchmark/bm_so_count_words.rb
-test/cruby/benchmark/bm_so_exception.rb
-test/cruby/benchmark/bm_so_fannkuch.rb
+#[longish] test/cruby/benchmark/bm_so_exception.rb
+#[longish] test/cruby/benchmark/bm_so_fannkuch.rb
 #[error] test/cruby/benchmark/bm_so_fasta.rb
 #[error] test/cruby/benchmark/bm_so_k_nucleotide.rb
 test/cruby/benchmark/bm_so_lists.rb
@@ -53,7 +53,7 @@ test/cruby/benchmark/bm_so_object.rb
 #[error] test/cruby/benchmark/bm_so_pidigits.rb
 test/cruby/benchmark/bm_so_random.rb
 #[error] test/cruby/benchmark/bm_so_reverse_complement.rb
-test/cruby/benchmark/bm_so_sieve.rb
+#[<30] test/cruby/benchmark/bm_so_sieve.rb
 #[error] test/cruby/benchmark/bm_so_spectralnorm.rb
 test/cruby/benchmark/bm_vm1_attr_ivar.rb
 test/cruby/benchmark/bm_vm1_attr_ivar_set.rb
@@ -87,9 +87,9 @@ test/cruby/benchmark/bm_vm2_newlambda.rb
 test/cruby/benchmark/bm_vm2_poly_method_ov.rb
 test/cruby/benchmark/bm_vm2_poly_method.rb
 test/cruby/benchmark/bm_vm2_proc.rb
-test/cruby/benchmark/bm_vm2_raise1.rb
-test/cruby/benchmark/bm_vm2_raise2.rb
-test/cruby/benchmark/bm_vm2_regexp.rb
+#[longish] test/cruby/benchmark/bm_vm2_raise1.rb
+#[longish] test/cruby/benchmark/bm_vm2_raise2.rb
+#[error] test/cruby/benchmark/bm_vm2_regexp.rb
 test/cruby/benchmark/bm_vm2_send.rb
 test/cruby/benchmark/bm_vm2_struct_big_aref_hi.rb
 test/cruby/benchmark/bm_vm2_struct_big_aref_lo.rb
