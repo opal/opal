@@ -1,5 +1,6 @@
 {
   "dependencies": {
     "glob": "latest",
+    "xmlhttprequest": "^1.8.0"
   }
 }
