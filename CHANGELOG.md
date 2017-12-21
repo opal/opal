@@ -24,6 +24,13 @@ Whitespace conventions:
 ## [0.11.1] - Unreleased
 
 
+### Added
+
+- Added support for a static folder in the "server" CLI runner via the `OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER` env var
+- Added ability to pass the port to the "server" CLI runner using the `OPAL_CLI_RUNNERS_SERVER_PORT` (explicit option passed via CLI is still working but depreted)
+
+
+
 
 ## [0.11.0] - 2017-12-08
 

@@ -5,9 +5,14 @@ module Opal
     class Server
       def initialize(options)
         @output = options.fetch(:output, $stdout)
-        @port = options.fetch(:port, 3000).to_int
+
+        @port = options.fetch(:port, ENV['OPAL_CLI_RUNNERS_SERVER_PORT'] || 3000).to_i
+
+        @static_folder = options[:static_folder] || ENV['OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER']
+        @static_folder = @static_folder == true ? 'public' : @static_folder
+        @static_folder = File.expand_path(@static_folder) if @static_folder
       end
-      attr_reader :output, :port, :server
+      attr_reader :output, :port, :server, :static_folder
 
       def run(source, argv)
         unless argv.empty?
@@ -18,8 +23,10 @@ module Opal
         require 'webrick'
         require 'logger'
 
+        app = build_app(source)
+
         @server = Rack::Server.start(
-          :app       => app(source),
+          :app       => app,
           :Port      => port,
           :AccessLog => [],
           :Logger    => Logger.new(output)
@@ -30,8 +37,8 @@ module Opal
         nil
       end
 
-      def app(source)
-        lambda do |env|
+      def build_app(source)
+        app = lambda do |env|
           case env['PATH_INFO']
           when '/'
             body = <<-HTML
@@ -43,13 +50,22 @@ module Opal
               </head>
             </html>
             HTML
-            [200, {}, [body]]
+            [200, {'Content-Type' => 'text/html'}, [body]]
           when '/cli_runner.js'
             [200, {'Content-Type' => 'text/javascript'}, [source]]
           else
             [404, {}, [body]]
           end
         end
+
+        if static_folder
+          app = Rack::Cascade.new(
+            Rack::Static.new(:urls => [''], root: static_folder),
+            app,
+          )
+        end
+
+        app
       end
     end
   end
