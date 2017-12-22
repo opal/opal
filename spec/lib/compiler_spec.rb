@@ -387,7 +387,7 @@ RSpec.describe Opal::Compiler do
       context 'unicode sequence' do
         let(:string) { 'λ' }
 
-        include_examples 'it compiles the string as', 'λ'.inspect + '.$force_encoding("ASCII-8BIT")'
+        include_examples 'it compiles the string as', 'λ'.force_encoding("ascii-8bit").inspect + '.$force_encoding("ASCII-8BIT")'
         include_examples 'it does not print any warnings'
       end
     end

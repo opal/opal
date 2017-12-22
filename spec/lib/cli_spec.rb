@@ -125,7 +125,7 @@ RSpec.describe Opal::CLI do
     context 'with a Gem name' do
       let(:dir)      { File.dirname(file) }
       let(:filename) { File.basename(file) }
-      let(:gem_name) { 'mspec' }
+      let(:gem_name) { 'ast' }
       let(:options)  { {:gems => [gem_name], :evals => ['']} }
 
       it "adds the gem's lib paths to Opal.path" do
