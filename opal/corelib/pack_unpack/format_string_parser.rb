@@ -2,25 +2,25 @@ module PackUnpack
   %x{
     var directives = [
       // Integer
-      'C', // supported
-      'S', // supported
-      'L', // supported
-      'Q', // supported
+      'C',
+      'S',
+      'L',
+      'Q',
       'J',
 
-      'c', // supported
-      's', // supported
-      'l', // supported
-      'q', // supported
+      'c',
+      's',
+      'l',
+      'q',
       'j',
 
-      'n', // supported
-      'N', // supported
-      'v', // supported
-      'V', // supported
+      'n',
+      'N',
+      'v',
+      'V',
 
-      'U', // supported
-      'w', // supported
+      'U',
+      'w',
 
       // Float
       'D',
@@ -33,16 +33,16 @@ module PackUnpack
       'g',
 
       // String
-      'A', // supported
-      'a', // supported
-      'Z', // supported
-      'B', // supported
-      'b', // supported
-      'H', // supported
-      'h', // supported
-      'u', // supported
+      'A',
+      'a',
+      'Z',
+      'B',
+      'b',
+      'H',
+      'h',
+      'u',
       'M',
-      'm', // supported
+      'm',
 
       'P',
       'p',
