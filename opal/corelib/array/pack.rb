@@ -72,7 +72,6 @@ class Array
           if (item < 0) {
             item += limit;
           }
-          console.log(item);
 
           var result = [];
 
@@ -81,8 +80,6 @@ class Array
             result.push(bit);
             item = item >> 8;
           };
-
-          console.log(result);
 
           return asciiBytesToUtf16LEString(result);
         });
@@ -179,7 +176,6 @@ class Array
         if (count === Infinity) {
           while (buffer.length > 0) {
             var chunkData = callback(buffer);
-            console.log('Sub-chunk data', chunkData);
             buffer = chunkData.rest;
             chunk = chunk.concat(chunkData.chunk);
           }
@@ -189,7 +185,6 @@ class Array
           }
           for (var i = 0; i < count; i++) {
             var chunkData = callback(buffer);
-            console.log('Sub-chunk data', chunkData);
             buffer = chunkData.rest;
             chunk = chunk.concat(chunkData.chunk);
           }
@@ -229,12 +224,9 @@ class Array
           }
 
           chunk = chunk.concat(subChunk);
-
-          console.log('Sub-chunk data', { chunk: subChunk, rest: source });
         }
 
         function finiteReeder() {
-          console.log("finiteReeder on", source);
           var chunkData = callback(source);
           source = chunkData.rest;
           var subChunk = chunkData.chunk;
@@ -248,7 +240,6 @@ class Array
           }
 
           chunk = chunk.concat(subChunk);
-          console.log('Sub-chunk data', { chunk: subChunk, rest: source });
         }
 
         if (count === Infinity) {
@@ -259,9 +250,6 @@ class Array
           for (var i = 0; i < count; i++) {
             finiteReeder();
           }
-          // if (chunk.length < count) {
-          //   chunk = chunk.concat(Array(2 - chunk.length + 1).join(fallback));
-          // }
         }
 
         return { chunk: chunk, rest: buffer };
@@ -383,13 +371,11 @@ class Array
 
   def pack(format)
     format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').gsub("\000", '')
-    p [self, format]
 
     %x{
       var output = '';
 
       var buffer = self.slice();
-      // console.log('buffer = ', buffer);
 
       function autocomplete(array, size) {
         while (array.length < size) {
@@ -400,8 +386,6 @@ class Array
       }
 
       function processChunk(directive, count) {
-        // console.log("Cuting", directive, count, 'from', buffer);
-
         var chunk,
             chunkReader = readChunk[directive];
 
@@ -413,8 +397,6 @@ class Array
         chunk = chunkData.chunk;
         buffer = chunkData.rest;
 
-        console.log('Processing chunk', chunkData);
-
         var handler = handlers[directive];
 
         if (handler == null) {
@@ -425,10 +407,7 @@ class Array
       }
 
       eachDirectiveAndCount(format, function(directive, count) {
-        // console.log(directive, '->', count);
-
         var part = processChunk(directive, count);
-        // console.log("part = ", part, typeof(part));
 
         if (count !== Infinity) {
           var shouldAutocomplete = autocompletion[directive]

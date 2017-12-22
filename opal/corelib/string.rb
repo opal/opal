@@ -1704,29 +1704,6 @@ class String < `String`
   def unpack(format)
     raise "To use String#unpack, you must first require 'corelib/string/unpack'."
   end
-
-  # def unpack(pattern)
-  #   %x{
-  #     function stringToBytes(string) {
-  #       var i,
-  #           singleByte,
-  #           l = string.length,
-  #           result = [];
-
-  #       for (i = 0; i < l; i++) {
-  #         singleByte = string.charCodeAt(i);
-  #         result.push(singleByte);
-  #       }
-  #       return result;
-  #     }
-  #   }
-  #   case pattern
-  #   when "U*", "C*"
-  #     `stringToBytes(self);`
-  #   else
-  #     raise NotImplementedError
-  #   end
-  # end
 end
 
 Symbol = String

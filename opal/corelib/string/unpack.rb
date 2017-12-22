@@ -145,8 +145,6 @@ class String
       return function(data) {
         var bytes = callback(data);
 
-        console.log(bytes);
-
         var stop = false;
         var i = 0, length = 0;
 
@@ -161,8 +159,6 @@ class String
             if (bytes[i] === 10) {
               continue;
             }
-
-            console.log("Reading n =", n);
 
             if (n > 45) {
               return '';
@@ -194,11 +190,7 @@ class String
           }
         } while (true);
 
-        result = result.slice(0, length);
-
-        console.log(result);
-
-        return result;
+        return result.slice(0, length);
       }
     }
 
@@ -267,15 +259,13 @@ class String
       return function(data) {
         var string = callback(data);
 
-        var result = string
+        return string
           .replace(/[\t\x20]$/gm, '')
           .replace(/=(?:\r\n?|\n|$)/g, '')
           .replace(/=([a-fA-F0-9]{2})/g, function($0, $1) {
             var codePoint = parseInt($1, 16);
             return String.fromCharCode(codePoint);
           });
-
-        return result;
       }
     }
 
@@ -346,8 +336,6 @@ class String
     }
 
     function readUnicodeCharChunk(bytes) {
-      console.log("readUnicodeCharChunk", bytes);
-
       function readByte() {
         var result = bytes[0];
         bytes = bytes.slice(1, bytes.length);
@@ -567,14 +555,12 @@ class String
         if (count === Infinity) {
           while (buffer.length > 0) {
             var chunkData = callback(buffer);
-            console.log('Sub-chunk data', chunkData);
             buffer = chunkData.rest;
             chunk = chunk.concat(chunkData.chunk);
           }
         } else {
           for (var i = 0; i < count; i++) {
             var chunkData = callback(buffer);
-            console.log('Sub-chunk data', chunkData);
             buffer = chunkData.rest;
             chunk = chunk.concat(chunkData.chunk);
           }
@@ -715,13 +701,11 @@ class String
 
   def unpack(format)
     format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').gsub("\000", '')
-    p [self, format]
 
     %x{
       var output = [];
 
       var buffer = utf16LEToBytes(self);
-      console.log('buffer = ', buffer);
 
       function autocomplete(array, size) {
         while (array.length < size) {
@@ -732,8 +716,6 @@ class String
       }
 
       function processChunk(directive, count) {
-        console.log("Cuting", directive, count, 'from', buffer);
-
         var chunk,
             chunkReader = readChunk[directive];
 
@@ -745,8 +727,6 @@ class String
         chunk = chunkData.chunk;
         buffer = chunkData.rest;
 
-        console.log('Processing chunk', chunkData);
-
         var handler = handlers[directive];
 
         if (handler == null) {
@@ -757,10 +737,7 @@ class String
       }
 
       eachDirectiveAndCount(format, function(directive, count) {
-        console.log(directive, '->', count);
-
         var part = processChunk(directive, count);
-        console.log("part = ", part, typeof(part));
 
         if (count !== Infinity) {
           var shouldAutocomplete = autocompletion[directive]
