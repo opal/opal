@@ -166,16 +166,16 @@ class Array
       'm': null,
 
       'P': null,
-      'p': null,
+      'p': null
     };
 
     function readNTimesFromBufferAndMerge(callback) {
       return function(buffer, count) {
-        var chunk = [];
+        var chunk = [], chunkData;
 
         if (count === Infinity) {
           while (buffer.length > 0) {
-            var chunkData = callback(buffer);
+            chunkData = callback(buffer);
             buffer = chunkData.rest;
             chunk = chunk.concat(chunkData.chunk);
           }
@@ -184,7 +184,7 @@ class Array
             #{raise ArgumentError, 'too few arguments'};
           }
           for (var i = 0; i < count; i++) {
-            var chunkData = callback(buffer);
+            chunkData = callback(buffer);
             buffer = chunkData.rest;
             chunk = chunk.concat(chunkData.chunk);
           }
@@ -309,7 +309,7 @@ class Array
       'm': null,
 
       'P': null,
-      'p': null,
+      'p': null
     };
 
     var autocompletion = {
@@ -365,7 +365,7 @@ class Array
       'm': null,
 
       'P': null,
-      'p': null,
+      'p': null
     };
   }
 

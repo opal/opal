@@ -50,7 +50,7 @@ module PackUnpack
       // Misc
       '@',
       'X',
-      'x',
+      'x'
     ];
 
     var modifiers = [

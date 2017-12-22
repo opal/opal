@@ -17,8 +17,8 @@ class String
         var chunks = callback(data);
 
         return chunks.map(function(chunk) {
-          return chunk.reverse().reduce(function(result, byte) {
-            return result * 256 + byte;
+          return chunk.reverse().reduce(function(result, singleByte) {
+            return result * 256 + singleByte;
           }, 0);
         });
       }
@@ -93,8 +93,8 @@ class String
       return function(data) {
         var bytes = callback(data);
 
-        return bytes.map(function(byte) {
-          return String.fromCharCode(byte);
+        return bytes.map(function(singleByte) {
+          return String.fromCharCode(singleByte);
         });
       }
     }
@@ -198,8 +198,8 @@ class String
       return function(data) {
         var bytes = callback(data);
 
-        var bits = bytes.map(function(byte) {
-          return byte.toString(2);
+        var bits = bytes.map(function(singleByte) {
+          return singleByte.toString(2);
         });
 
         return bits;
@@ -211,8 +211,8 @@ class String
         var bytes = callback(data), result = [], buffer = '';
 
         for (var i = 0; i < bytes.length; i++) {
-          var byte = bytes[i],
-              bits = byte.toString(2);
+          var singleByte = bytes[i],
+              bits = singleByte.toString(2);
 
           bits = Array(8 - bits.length + 1).join('0').concat(bits);
 
@@ -324,7 +324,7 @@ class String
       'm': base64Decode(joinChars(bytesToAsciiChars(identityFunction))),
 
       'P': null,
-      'p': null,
+      'p': null
     };
 
     function readBytes(n) {
@@ -342,7 +342,7 @@ class String
         return result;
       }
 
-      var c = readByte(), result = '', extraLength;
+      var c = readByte(), extraLength;
 
       if (c >> 7 == 0) {
         // 0xxx xxxx
@@ -418,14 +418,14 @@ class String
       var result = '';
 
       while (count > 0 && buffer.length > 0) {
-        var byte = buffer[0],
+        var singleByte = buffer[0],
             bitsToTake = Math.min(count, 8),
             bytesToTake = Math.ceil(bitsToTake / 8);
 
         buffer = buffer.slice(1, buffer.length);
 
-        if (byte != null) {
-          var bits = byte.toString(2);
+        if (singleByte != null) {
+          var bits = singleByte.toString(2);
           bits = Array(8 - bits.length + 1).join('0').concat(bits).split('').reverse().join('');
 
           for (var j = 0; j < bitsToTake; j++) {
@@ -442,14 +442,14 @@ class String
       var result = '';
 
       while (count > 0 && buffer.length > 0) {
-        var byte = buffer[0],
+        var singleByte = buffer[0],
             bitsToTake = Math.min(count, 8),
             bytesToTake = Math.ceil(bitsToTake / 8);
 
         buffer = buffer.slice(1, buffer.length);
 
-        if (byte != null) {
-          var bits = byte.toString(2);
+        if (singleByte != null) {
+          var bits = singleByte.toString(2);
           bits = Array(8 - bits.length + 1).join('0').concat(bits);
 
           for (var j = 0; j < bitsToTake; j++) {
@@ -466,11 +466,11 @@ class String
       var result = [];
 
       for (var i = 0; i < buffer.length; i++) {
-        var byte = buffer[i];
+        var singleByte = buffer[i];
 
-        result.push(byte);
+        result.push(singleByte);
 
-        if ((byte & 128) === 0) {
+        if ((singleByte & 128) === 0) {
           break;
         }
       }
@@ -482,12 +482,12 @@ class String
       var result = [];
 
       for (var i = 0; i < count && i < buffer.length; i++) {
-        var byte = buffer[i];
+        var singleByte = buffer[i];
 
-        if (byte === 0) {
+        if (singleByte === 0) {
           break;
         } else {
-          result.push(byte);
+          result.push(singleByte);
         }
       }
 
@@ -508,8 +508,8 @@ class String
       var result = [];
 
       while (count > 0 && buffer.length > 0) {
-        var byte = buffer[0],
-            hex = byte.toString(16);
+        var singleByte = buffer[0],
+            hex = singleByte.toString(16);
 
         buffer = buffer.slice(1, buffer.length);
         hex = Array(2 - hex.length + 1).join('0').concat(hex);
@@ -530,8 +530,8 @@ class String
       var result = [];
 
       while (count > 0 && buffer.length > 0) {
-        var byte = buffer[0],
-            hex = byte.toString(16);
+        var singleByte = buffer[0],
+            hex = singleByte.toString(16);
 
         buffer = buffer.slice(1, buffer.length);
         hex = Array(2 - hex.length + 1).join('0').concat(hex);
@@ -550,17 +550,17 @@ class String
 
     function readNTimesAndMerge(callback) {
       return function(buffer, count) {
-        var chunk = [];
+        var chunk = [], chunkData;
 
         if (count === Infinity) {
           while (buffer.length > 0) {
-            var chunkData = callback(buffer);
+            chunkData = callback(buffer);
             buffer = chunkData.rest;
             chunk = chunk.concat(chunkData.chunk);
           }
         } else {
           for (var i = 0; i < count; i++) {
-            var chunkData = callback(buffer);
+            chunkData = callback(buffer);
             buffer = chunkData.rest;
             chunk = chunk.concat(chunkData.chunk);
           }
@@ -627,7 +627,7 @@ class String
       'm': readAll,
 
       'P': null,
-      'p': null,
+      'p': null
     }
 
     var autocompletion = {
@@ -683,7 +683,7 @@ class String
       'm': false,
 
       'P': null,
-      'p': null,
+      'p': null
     }
 
     function alias(existingDirective, newDirective) {
