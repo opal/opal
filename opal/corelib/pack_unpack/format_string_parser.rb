@@ -107,13 +107,6 @@ module PackUnpack
       for (var i = 0; i < format.length; i++) {
         var currentChar = format[i];
 
-        console.log("Got", currentChar,
-          "currentDirective is", currentDirective,
-          "currentCount is", currentCount,
-          "currentModifiers are", currentModifiers,
-          "countSpecified is", countSpecified
-        )
-
         if (directives.indexOf(currentChar) !== -1) {
           // Directive char always resets current state
           yieldAndReset();

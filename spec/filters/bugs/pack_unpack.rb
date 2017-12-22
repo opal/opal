@@ -47,4 +47,59 @@ opal_filter "Array#pack / String#unpack" do
   fails "String#unpack with format 'u' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
   fails "String#unpack with format 'm' decodes all pre-encoded ascii byte values" # Expected ["\u007FÂ\u0080Â\u0081Â\u0082Â\u0083"] to be computed by "f8KAwoHCgsKD\n".unpack from "m" (computed ["\u007F\u0080\u0081\u0082\u0083"] instead)
   fails "String#unpack with format 'm' produces binary strings" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
+
+
+  # TODO: move to unsupported taint/trust
+  fails "Array#pack with format 'a' returns a tainted string when a pack argument is tainted" # Expected false to be true
+  fails "Array#pack with format 'a' returns a tainted string when an empty format is tainted" # Expected false to be true
+  fails "Array#pack with format 'a' returns a tainted string when the format is tainted" # Expected false to be true
+  fails "Array#pack with format 'a' returns a trusted string when the array is untrusted" # NoMethodError: undefined method `untrust' for ["abcd", 32]:Array
+  fails "Array#pack with format 'a' returns a untrusted string when a pack argument is untrusted" # NoMethodError: undefined method `untrust' for "abcd":String
+  fails "Array#pack with format 'a' returns a untrusted string when the empty format is untrusted" # NoMethodError: undefined method `untrust' for "":String
+  fails "Array#pack with format 'a' returns a untrusted string when the format is untrusted" # NoMethodError: undefined method `untrust' for "a3C":String
+  fails "Array#pack with format 'a' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'A' returns a tainted string when a pack argument is tainted" # Expected false to be true
+  fails "Array#pack with format 'A' returns a tainted string when an empty format is tainted" # Expected false to be true
+  fails "Array#pack with format 'A' returns a tainted string when the format is tainted" # Expected false to be true
+  fails "Array#pack with format 'A' returns a trusted string when the array is untrusted" # NoMethodError: undefined method `untrust' for ["abcd", 32]:Array
+  fails "Array#pack with format 'A' returns a untrusted string when a pack argument is untrusted" # NoMethodError: undefined method `untrust' for "abcd":String
+  fails "Array#pack with format 'A' returns a untrusted string when the empty format is untrusted" # NoMethodError: undefined method `untrust' for "":String
+  fails "Array#pack with format 'A' returns a untrusted string when the format is untrusted" # NoMethodError: undefined method `untrust' for "A3C":String
+  fails "Array#pack with format 'A' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'C' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'c' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  # // TODO
+
+  fails "Array#pack with format 'C' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'C' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
+  fails "Array#pack with format 'c' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'c' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
+  fails "Array#pack with format 'A' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'A' returns a string in encoding of common to the concatenated results" # RuntimeError: Unsupported pack directive "U" (no chunk reader defined)
+  fails "Array#pack with format 'L' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'L' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
+  fails "Array#pack with format 'L' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'L' with modifier '>' calls #to_int to convert the pack argument to an Integer" # Mock 'to_int' expected to receive 'to_int' exactly 1 times but received it 0 times
+  fails "Array#pack with format 'L' with modifier '>' calls #to_int to convert the pack argument to an Integer" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
+  fails "Array#pack with format 'L' with modifier '>' encodes a Float truncated as an Integer" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
+  fails "Array#pack with format 'L' with modifier '>' encodes all remaining elements when passed the '*' modifier" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
+  fails "Array#pack with format 'L' with modifier '>' encodes the least significant 32 bits of a negative number" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
+  fails "Array#pack with format 'L' with modifier '>' encodes the least significant 32 bits of a positive number" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
+  fails "Array#pack with format 'L' with modifier '>' encodes the number of array elements specified by the count modifier" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
+  fails "Array#pack with format 'L' with modifier '>' ignores NULL bytes between directives" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
+  fails "Array#pack with format 'L' with modifier '>' ignores spaces between directives" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
+  fails "Array#pack with format 'a' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'a' returns a string in encoding of common to the concatenated results" # RuntimeError: Unsupported pack directive "U" (no chunk reader defined)
+  fails "Array#pack with format 'l' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'l' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
+  fails "Array#pack with format 'l' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'l' with modifier '>' calls #to_int to convert the pack argument to an Integer" # Mock 'to_int' expected to receive 'to_int' exactly 1 times but received it 0 times
+  fails "Array#pack with format 'l' with modifier '>' calls #to_int to convert the pack argument to an Integer" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
+  fails "Array#pack with format 'l' with modifier '>' encodes a Float truncated as an Integer" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
+  fails "Array#pack with format 'l' with modifier '>' encodes all remaining elements when passed the '*' modifier" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
+  fails "Array#pack with format 'l' with modifier '>' encodes the least significant 32 bits of a negative number" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
+  fails "Array#pack with format 'l' with modifier '>' encodes the least significant 32 bits of a positive number" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
+  fails "Array#pack with format 'l' with modifier '>' encodes the number of array elements specified by the count modifier" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
+  fails "Array#pack with format 'l' with modifier '>' ignores NULL bytes between directives" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
+  fails "Array#pack with format 'l' with modifier '>' ignores spaces between directives" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
 end
