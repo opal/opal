@@ -1,4 +1,4 @@
-opal_filter "Array#pack / String#unpack" do
+opal_filter "String#unpack" do
   fails "String#unpack with format 'A' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
   fails "String#unpack with format 'Q' adds nil for each element requested beyond the end of the String" # Expected [7523094288207668000, nil, nil] to be computed by "abcdefgh".unpack from "Q3" (computed [7523094288207667000, nil, nil] instead)
   fails "String#unpack with format 'Q' decodes one long for a single format character" # Expected [7523094288207667000] to equal [7523094288207668000]
@@ -47,29 +47,9 @@ opal_filter "Array#pack / String#unpack" do
   fails "String#unpack with format 'u' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
   fails "String#unpack with format 'm' decodes all pre-encoded ascii byte values" # Expected ["\u007FÂ\u0080Â\u0081Â\u0082Â\u0083"] to be computed by "f8KAwoHCgsKD\n".unpack from "m" (computed ["\u007F\u0080\u0081\u0082\u0083"] instead)
   fails "String#unpack with format 'm' produces binary strings" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
+end
 
-
-  # TODO: move to unsupported taint/trust
-  fails "Array#pack with format 'a' returns a tainted string when a pack argument is tainted" # Expected false to be true
-  fails "Array#pack with format 'a' returns a tainted string when an empty format is tainted" # Expected false to be true
-  fails "Array#pack with format 'a' returns a tainted string when the format is tainted" # Expected false to be true
-  fails "Array#pack with format 'a' returns a trusted string when the array is untrusted" # NoMethodError: undefined method `untrust' for ["abcd", 32]:Array
-  fails "Array#pack with format 'a' returns a untrusted string when a pack argument is untrusted" # NoMethodError: undefined method `untrust' for "abcd":String
-  fails "Array#pack with format 'a' returns a untrusted string when the empty format is untrusted" # NoMethodError: undefined method `untrust' for "":String
-  fails "Array#pack with format 'a' returns a untrusted string when the format is untrusted" # NoMethodError: undefined method `untrust' for "a3C":String
-  fails "Array#pack with format 'a' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
-  fails "Array#pack with format 'A' returns a tainted string when a pack argument is tainted" # Expected false to be true
-  fails "Array#pack with format 'A' returns a tainted string when an empty format is tainted" # Expected false to be true
-  fails "Array#pack with format 'A' returns a tainted string when the format is tainted" # Expected false to be true
-  fails "Array#pack with format 'A' returns a trusted string when the array is untrusted" # NoMethodError: undefined method `untrust' for ["abcd", 32]:Array
-  fails "Array#pack with format 'A' returns a untrusted string when a pack argument is untrusted" # NoMethodError: undefined method `untrust' for "abcd":String
-  fails "Array#pack with format 'A' returns a untrusted string when the empty format is untrusted" # NoMethodError: undefined method `untrust' for "":String
-  fails "Array#pack with format 'A' returns a untrusted string when the format is untrusted" # NoMethodError: undefined method `untrust' for "A3C":String
-  fails "Array#pack with format 'A' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
-  fails "Array#pack with format 'C' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
-  fails "Array#pack with format 'c' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
-  # // TODO
-
+opal_filter "Array#pack" do
   fails "Array#pack with format 'C' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'C' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "Array#pack with format 'c' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)

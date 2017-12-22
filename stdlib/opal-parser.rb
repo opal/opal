@@ -1,4 +1,6 @@
+# parser uses String#unpack
 require 'corelib/string/unpack'
+
 require 'opal/compiler'
 require 'opal/erb'
 require 'opal/version'
