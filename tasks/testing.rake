@@ -138,6 +138,7 @@ module Testing
 
   module Minitest
     extend self
+    extend FileUtils
 
     def write_file(filename, files = [], env = {})
       env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
