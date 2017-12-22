@@ -129,6 +129,7 @@ opal_filter "language" do
   fails "The break statement in a lambda from a scope that has returned raises a LocalJumpError when yielding to a lambda passed as a block argument"
   fails "The break statement in a lambda returns from the call site if the lambda is passed as a block" # Expected ["before", "unreachable1", "unreachable2", "after"] to equal ["before", "after"]
   fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns from the lambda" # Exception: unexpected break
+  fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility"
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the module"
   fails "The defined? keyword for a scoped constant returns nil when an undefined constant is scoped to a defined constant"
