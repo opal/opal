@@ -38,25 +38,7 @@ module Opal
       end
 
       def build_app(source)
-        app = lambda do |env|
-          case env['PATH_INFO']
-          when '/'
-            body = <<-HTML
-            <!doctype html>
-            <html>
-              <head>
-                <meta charset="utf-8"/>
-                <script src="/cli_runner.js"></script>
-              </head>
-            </html>
-            HTML
-            [200, {'Content-Type' => 'text/html'}, [body]]
-          when '/cli_runner.js'
-            [200, {'Content-Type' => 'text/javascript'}, [source]]
-          else
-            [404, {}, [body]]
-          end
-        end
+        app = App.new(source)
 
         if static_folder
           app = Rack::Cascade.new(
@@ -67,6 +49,34 @@ module Opal
 
         app
       end
+
+      class App
+        def initialize(source)
+          @source = source
+        end
+
+        BODY = <<-HTML
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8"/>
+              <script src="/cli_runner.js"></script>
+            </head>
+          </html>
+        HTML
+
+        def call(env)
+          case env['PATH_INFO']
+          when '/'
+            [200, {'Content-Type' => 'text/html'}, [BODY]]
+          when '/cli_runner.js'
+            [200, {'Content-Type' => 'text/javascript'}, [@source]]
+          else
+            [404, {}, ['not found']]
+          end
+        end
+      end
+
     end
   end
 end
