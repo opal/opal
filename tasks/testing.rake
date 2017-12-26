@@ -20,7 +20,6 @@ module Testing
         mspec/helpers/tmp
         mspec/helpers/environment
         mspec/guards/block_device
-        mspec/guards/endian
         a_file
         lib/spec_helper
         mspec/commands/mspec-run
@@ -139,6 +138,7 @@ module Testing
 
   module Minitest
     extend self
+    extend FileUtils
 
     def write_file(filename, files = [], env = {})
       env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
@@ -261,7 +261,7 @@ platforms.each do |platform|
       stubs = Testing::MSpec.stubs.map{|s| "-s#{s}"}.join(' ')
 
       sh "ruby -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-         "exe/opal -gmspec -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+         "exe/opal -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 
       if bm_filepath
         puts "Benchmark results have been written to #{bm_filepath}"

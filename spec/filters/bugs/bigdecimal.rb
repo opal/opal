@@ -56,6 +56,10 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#mod_part_of_divmod returns NaN if the dividend is Infinity"
   fails "BigDecimal#mod_part_of_divmod returns self modulo other"
   fails "BigDecimal#mod_part_of_divmod returns the dividend if the divisor is Infinity"
+  fails "BigDecimal#modulo returns NaN if NaN is involved" # FloatDomainError: Computation results to 'NaN'(Not a Number)
+  fails "BigDecimal#modulo returns NaN if the dividend is Infinity" # FloatDomainError: Computation results to 'Infinity'
+  fails "BigDecimal#modulo returns self modulo other" # Exception: new BigNumber() number type has more than 15 significant digits: 9223372036854776000
+  fails "BigDecimal#modulo returns the dividend if the divisor is Infinity" # Expected NaN to equal 1
   fails "BigDecimal#power 0 to power of 0 is 1"
   fails "BigDecimal#power 0 to powers < 0 is Infinity"
   fails "BigDecimal#power other powers of 0 are 0"

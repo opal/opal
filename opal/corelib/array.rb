@@ -2331,5 +2331,9 @@ class Array < `Array`
   end
 
   Opal.pristine self, :allocate, :copy_instance_variables, :initialize_dup
+
+  def pack(*args)
+    raise "To use Array#pack, you must first require 'corelib/array/pack'."
+  end
 end
 

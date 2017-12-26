@@ -5,7 +5,7 @@ module Opal
 
   def self.type_error(object, type, method = nil, coerced = nil)
     if method && coerced
-      TypeError.new "can't convert #{object.class} into #{type} (#{object.class}##{method} gives #{coerced.class}"
+      TypeError.new "can't convert #{object.class} into #{type} (#{object.class}##{method} gives #{coerced.class})"
     else
       TypeError.new "no implicit conversion of #{object.class} into #{type}"
     end
