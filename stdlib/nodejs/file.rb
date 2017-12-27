@@ -153,6 +153,10 @@ class File < IO
     `return executeIOAction(function(){return __fs__.statSync(#{path}).mtime})`
   end
 
+  def self.symlink? path
+    `return executeIOAction(function(){return __fs__.lstatSync(#{path}).isSymbolicLink()})`
+  end
+
   # Instance Methods
 
   def initialize(path, flags = 'r')
