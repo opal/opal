@@ -101,6 +101,13 @@ class TestNodejsFile < Test::Unit::TestCase
     assert(File.file?('test/nodejs/fixtures/symlink-to-file'),       'test/nodejs/fixtures/symlink-to-file should be a file')
   end unless windows_platform?
 
+  def test_file_symlink?
+    assert(File.symlink?('test/nodejs/fixtures/symlink-to-file'))
+    assert(File.symlink?('test/nodejs/fixtures/symlink-to-directory'))
+    refute(File.symlink?('test/nodejs/fixtures'))
+    refute(File.symlink?('test/nodejs/fixtures/hello.rb'))
+  end unless windows_platform?
+
   def test_file_readable
     assert !File.readable?('tmp/nonexistent')
     File.write('tmp/fuz', "hello")
