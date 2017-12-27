@@ -136,7 +136,7 @@ class File < IO
     end
 
     def extname(path)
-      `path = $coerce_to_path(path);`
+      `path = $coerce_to_path(path)`
       filename = basename(path)
       return '' if filename.empty?
       last_dot_idx = filename[1..-1].rindex('.')

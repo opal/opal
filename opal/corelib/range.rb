@@ -3,7 +3,7 @@ require 'corelib/enumerable'
 class Range
   include Enumerable
 
-  `def.$$is_range = true;`
+  `def.$$is_range = true`
 
   attr_reader :begin, :end
 

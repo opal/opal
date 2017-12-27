@@ -23,7 +23,7 @@ class Struct
       class << self
         def new(*args)
           instance = allocate
-          `#{instance}.$$data = {};`
+          `#{instance}.$$data = {}`
           instance.initialize(*args)
           instance
         end
