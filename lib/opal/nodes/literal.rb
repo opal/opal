@@ -245,7 +245,7 @@ module Opal
         wrap '(', ')' if recv?
       end
 
-      def detect_and_remove_trailing_semicolon value, node
+      def detect_and_remove_trailing_semicolon(value, node)
         if value.match(/;\s*#{REGEXP_END}/)
           compiler.warning 'Do not terminate one-line xstr expression with semicolon', node.line
           value.sub(/;\s*#{REGEXP_END}/, '')

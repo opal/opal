@@ -313,14 +313,14 @@ RSpec.describe Opal::Compiler do
       expect(compiler).to receive(:warning).once
       expect(compiler.compile).not_to include(";)")
 
-      compiler = Opal::Compiler.new <<-EOF
+      compiler = Opal::Compiler.new(<<-EOF)
         a = `1;
         2;`
       EOF
       expect(compiler).not_to receive(:warning)
       compiler.compile
 
-      compiler = Opal::Compiler.new '`1;`'
+      compiler = Opal::Compiler.new('`1;`')
       expect(compiler).not_to receive(:warning)
       compiler.compile
     end
