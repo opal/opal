@@ -28,6 +28,15 @@ class Dir
       }
     end
 
+    def glob(pattern)
+      pattern = [pattern] unless pattern.respond_to? :each
+      pattern.flat_map do |subpattern|
+        subpattern = subpattern.to_path if subpattern.respond_to? :to_path
+        subpattern = Opal.coerce_to!(subpattern, String, :to_str)
+        `__glob__.sync(subpattern)`
+      end
+    end
+
     alias getwd pwd
   end
 end
