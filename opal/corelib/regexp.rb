@@ -2,6 +2,7 @@ class RegexpError < StandardError; end
 
 class Regexp < `RegExp`
   IGNORECASE = 1
+  EXTENDED = 2
   MULTILINE = 4
 
   `def.$$is_regexp = true`
