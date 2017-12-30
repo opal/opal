@@ -106,6 +106,15 @@ class Array
       }
     }
 
+    function fromCodePoint(callback) {
+      return function(data) {
+        var buffer = callback(data);
+        return buffer.map(function(item) {
+          return String.fromCodePoint(item);
+        });
+      }
+    }
+
     function joinChars(callback) {
       return function(data) {
         var buffer = callback(data);
@@ -140,7 +149,7 @@ class Array
       'v': null,
       'V': null,
 
-      'U': null,
+      'U': joinChars(fromCodePoint(identityFunction)),
       'w': null,
 
       // Float
@@ -283,7 +292,7 @@ class Array
       'v': null,
       'V': null,
 
-      'U': null,
+      'U': readNTimesFromBufferAndMerge(readItem),
       'w': null,
 
       // Float
