@@ -41,10 +41,11 @@ module Opal
         app = App.new(source)
 
         if static_folder
-          app = Rack::Cascade.new(
-            Rack::Static.new(:urls => [''], root: static_folder),
+          not_found = [404, {}, []]
+          app = Rack::Cascade.new([
+            Rack::Static.new(->_{not_found}, urls: [''], root: static_folder),
             app,
-          )
+          ])
         end
 
         app
