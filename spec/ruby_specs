@@ -20,7 +20,7 @@ ruby/core/array/pack/l_spec
 !ruby/core/array/pack/percent_spec
 !ruby/core/array/pack/q_spec
 !ruby/core/array/pack/s_spec
-!ruby/core/array/pack/u_spec
+ruby/core/array/pack/u_spec
 !ruby/core/array/pack/v_spec
 !ruby/core/array/pack/w_spec
 !ruby/core/array/pack/x_spec

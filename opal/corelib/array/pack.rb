@@ -149,7 +149,7 @@ class Array
       'v': null,
       'V': null,
 
-      'U': joinChars(fromCodePoint(identityFunction)),
+      'U': joinChars(fromCodePoint(toInt(identityFunction))),
       'w': null,
 
       // Float
@@ -348,7 +348,7 @@ class Array
       'v': null,
       'V': null,
 
-      'U': null,
+      'U': false,
       'w': null,
 
       // Float
@@ -369,7 +369,7 @@ class Array
       'b': null,
       'H': null,
       'h': null,
-      'u': null,
+      'u': false,
       'M': null,
       'm': null,
 
