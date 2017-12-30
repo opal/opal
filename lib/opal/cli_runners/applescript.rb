@@ -20,7 +20,8 @@ module Opal
         require 'tempfile'
         tempfile = Tempfile.new('opal-applescript-runner-')
         # tempfile = File.new('opal-applescript-runner.js', 'w') # for debugging
-        tempfile.write code
+        tempfile.puts code
+        tempfile.puts "'';" # OSAScript will output the last thing
         tempfile.close
         _successful = system_with_output('osascript', '-l', 'JavaScript', tempfile.path , *argv)
       rescue Errno::ENOENT
