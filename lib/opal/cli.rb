@@ -6,8 +6,8 @@ require 'opal/cli_runners'
 module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
-                :output, :requires, :gems, :stubs, :verbose, :port, :preload,
-                :filename, :debug, :no_exit, :lib_only
+                :output, :requires, :gems, :stubs, :verbose, :runner_options,
+                :preload, :filename, :debug, :no_exit, :lib_only
 
     class << self
       attr_accessor :stdout
@@ -17,14 +17,12 @@ module Opal
       options ||= {}
 
       # Runner
-      @runner_type = options.delete(:runner)     || :nodejs
-      @port        = options.delete(:port)       || 3000
+      @runner_type    = options.delete(:runner)         || :nodejs
+      @runner_options = options.delete(:runner_options) || {}
 
       @options     = options
-      @compile     = !!options.delete(:compile)
       @sexp        = options.delete(:sexp)
       @file        = options.delete(:file)
-      @map         = options.delete(:map)
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       || []
@@ -58,24 +56,17 @@ module Opal
 
     def run
       return show_sexp if @sexp
-
-      compiled_source = builder.to_s
-
-      File.write @map, builder.source_map if @map
-
-      return puts compiled_source if @compile
-
-      runner.run(compiled_source, argv)
-      @exit_status = runner.exit_status
+      @exit_status = runner.call(
+        options: runner_options,
+        output: output,
+        argv: argv,
+        builder: builder,
+      )
     end
 
     def runner
-      @runner ||= begin
-        const_name = @runner_type.to_s.capitalize
-        CliRunners.const_defined?(const_name) or
-          raise ArgumentError, "unknown runner: #{@runner_type.inspect}"
-        CliRunners.const_get(const_name).new(output: output, port: port)
-      end
+      CliRunners[@runner_type] or
+        raise ArgumentError, "unknown runner: #{@runner_type.inspect}"
     end
 
     attr_reader :exit_status
@@ -119,7 +110,7 @@ module Opal
         buffer = ::Opal::Source::Buffer.new(filename)
         buffer.source = contents
         sexp = Opal::Parser.default_parser.parse(buffer)
-        puts sexp.inspect
+        output.puts sexp.inspect
       end
     end
 
@@ -150,10 +141,5 @@ module Opal
         end
       end
     end
-
-    def puts(*args)
-      output.puts(*args)
-    end
-
   end
 end

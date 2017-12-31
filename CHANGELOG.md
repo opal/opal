@@ -26,13 +26,24 @@ Whitespace conventions:
 
 ### Added
 
-- Added support for a static folder in the "server" CLI runner via the `OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER` env var
-- Added ability to pass the port to the "server" CLI runner using the `OPAL_CLI_RUNNERS_SERVER_PORT` (explicit option passed via CLI is still working but depreted)
 - Added `Array#pack` (supports only `C, S, L, Q, c, s, l, q, A, a` formats). (#1723)
 - Added `String#unpack` (supports only `C, S, L, Q, S>, L>, Q>, c, s, l, q, n, N, v, V, U, w, A, a, Z, B, b, H, h, u, M, m` formats). (#1723)
 - Added `File#symlink?` for Node.js. (#1725)
 - Added `Dir#glob` for Node.js (does not support flags). (#1727)
+- Added support for a static folder in the "server" CLI runner via the `OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER` env var
+- Added ability to pass the port to the "server" CLI runner using the `OPAL_CLI_RUNNERS_SERVER_PORT` (explicit option passed via CLI is still working but deprecated)
+- Added the CLI option `--runner-options` that allows passing arbitrary options to the selected runner, currently the only runner making use of them is `server` accepting `port` and `static_folder`
 
+
+### Changed
+
+- The internal API for CLI runners has changed, now it's just a callable object
+- The `--map` CLI option now works only in conjunction with `--compile` (or `--runner compiler`)
+
+
+### Deprecated
+
+- The CLI `--server-port 1234` option is now deprecated in favor of using `--runner-options='{"port": 1234}'`
 
 
 
