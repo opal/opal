@@ -10,6 +10,7 @@ sprockets_version = ENV['SPROCKETS_VERSION']
 # is solved.
 gem 'racc', '< 1.4.10', platform: :jruby
 gem 'json', '< 1.8.1',  platform: :ruby if RUBY_VERSION.to_f == 2.1
+gem 'rack-test', '< 0.8' if RUBY_VERSION.to_f <= 2.0
 gem 'rubysl', platform: :rbx
 gem 'coveralls', platform: :mri
 gem 'puma' # Some browsers have problems with WEBrick
