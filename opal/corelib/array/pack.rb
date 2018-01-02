@@ -110,7 +110,14 @@ class Array
       return function(data) {
         var buffer = callback(data);
         return buffer.map(function(item) {
-          return String.fromCodePoint(item);
+          try {
+            return String.fromCodePoint(item);
+          } catch (error) {
+            if (error instanceof RangeError) {
+              #{raise RangeError, "value out of range"};
+            }
+            throw error;
+          }
         });
       }
     }

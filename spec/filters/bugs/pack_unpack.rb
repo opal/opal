@@ -86,8 +86,6 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'U' sets the output string to UTF-8 encoding" # Expected #<Encoding:UTF-8> to be computed by "\u0000".encoding (computed #<Encoding:UTF-16LE> instead)
   fails "Array#pack with format 'U' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'U' encodes values larger than UTF-8 max codepoints" # Exception: Invalid code point 1114112
-  fails "Array#pack with format 'U' raises a RangeError if passed a negative number" # Exception: Invalid code point -1
-  fails "Array#pack with format 'U' raises a RangeError if passed a number larger than an unsigned 32-bit integer" # Exception: Invalid code point 4294967296
   fails "Array#pack with format 'U' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'u' appends a newline to the end of the encoded string" # RuntimeError: Unsupported pack directive "u" (no chunk reader defined)
   fails "Array#pack with format 'u' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
