@@ -106,6 +106,22 @@ class Array
       }
     }
 
+    function fromCodePoint(callback) {
+      return function(data) {
+        var buffer = callback(data);
+        return buffer.map(function(item) {
+          try {
+            return String.fromCodePoint(item);
+          } catch (error) {
+            if (error instanceof RangeError) {
+              #{raise RangeError, "value out of range"};
+            }
+            throw error;
+          }
+        });
+      }
+    }
+
     function joinChars(callback) {
       return function(data) {
         var buffer = callback(data);
@@ -140,7 +156,7 @@ class Array
       'v': null,
       'V': null,
 
-      'U': null,
+      'U': joinChars(fromCodePoint(toInt(identityFunction))),
       'w': null,
 
       // Float
@@ -283,7 +299,7 @@ class Array
       'v': null,
       'V': null,
 
-      'U': null,
+      'U': readNTimesFromBufferAndMerge(readItem),
       'w': null,
 
       // Float
@@ -339,7 +355,7 @@ class Array
       'v': null,
       'V': null,
 
-      'U': null,
+      'U': false,
       'w': null,
 
       // Float
@@ -360,7 +376,7 @@ class Array
       'b': null,
       'H': null,
       'h': null,
-      'u': null,
+      'u': false,
       'M': null,
       'm': null,
 
