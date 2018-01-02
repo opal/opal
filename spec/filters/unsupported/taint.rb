@@ -45,4 +45,8 @@ opal_unsupported_filter "taint" do
   fails "Array#pack with format 'A' taints the output string if the format string is tainted"
   fails "Array#pack with format 'C' taints the output string if the format string is tainted"
   fails "Array#pack with format 'c' taints the output string if the format string is tainted"
+  fails "Array#pack with format 'L' taints the output string if the format string is tainted"
+  fails "Array#pack with format 'l' taints the output string if the format string is tainted"
+  fails "Array#pack with format 'U' taints the output string if the format string is tainted"
+  fails "Array#pack with format 'u' taints the output string if the format string is tainted"
 end

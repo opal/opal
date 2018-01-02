@@ -58,7 +58,6 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'A' returns a string in encoding of common to the concatenated results" # RuntimeError: Unsupported pack directive "U" (no chunk reader defined)
   fails "Array#pack with format 'L' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'L' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
-  fails "Array#pack with format 'L' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'L' with modifier '>' calls #to_int to convert the pack argument to an Integer" # Mock 'to_int' expected to receive 'to_int' exactly 1 times but received it 0 times
   fails "Array#pack with format 'L' with modifier '>' calls #to_int to convert the pack argument to an Integer" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
   fails "Array#pack with format 'L' with modifier '>' encodes a Float truncated as an Integer" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
@@ -72,7 +71,6 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'a' returns a string in encoding of common to the concatenated results" # RuntimeError: Unsupported pack directive "U" (no chunk reader defined)
   fails "Array#pack with format 'l' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'l' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
-  fails "Array#pack with format 'l' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'l' with modifier '>' calls #to_int to convert the pack argument to an Integer" # Mock 'to_int' expected to receive 'to_int' exactly 1 times but received it 0 times
   fails "Array#pack with format 'l' with modifier '>' calls #to_int to convert the pack argument to an Integer" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
   fails "Array#pack with format 'l' with modifier '>' encodes a Float truncated as an Integer" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
@@ -86,7 +84,6 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'U' sets the output string to UTF-8 encoding" # Expected #<Encoding:UTF-8> to be computed by "\u0000".encoding (computed #<Encoding:UTF-16LE> instead)
   fails "Array#pack with format 'U' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'U' encodes values larger than UTF-8 max codepoints" # Exception: Invalid code point 1114112
-  fails "Array#pack with format 'U' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'u' appends a newline to the end of the encoded string" # RuntimeError: Unsupported pack directive "u" (no chunk reader defined)
   fails "Array#pack with format 'u' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'u' calls #to_str to convert an object to a String" # Mock 'pack m string' expected to receive 'to_str' exactly 1 times but received it 0 times
@@ -104,5 +101,4 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'u' raises a TypeError if passed nil" # RuntimeError: Unsupported pack directive "u" (no chunk reader defined)
   fails "Array#pack with format 'u' raises an ArgumentError if there are fewer elements than the format requires" # RuntimeError: Unsupported pack directive "u" (no chunk reader defined)
   fails "Array#pack with format 'u' sets the output string to US-ASCII encoding" # RuntimeError: Unsupported pack directive "u" (no chunk reader defined)
-  fails "Array#pack with format 'u' taints the output string if the format string is tainted" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
 end
