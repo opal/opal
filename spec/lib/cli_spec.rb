@@ -172,7 +172,7 @@ RSpec.describe Opal::CLI do
 
       context 'with the :map_file runner option' do
         let(:map_file) { "#{Dir.mktmpdir 'opal-map'}/file.map" }
-        let(:runner_options)  { {map_file: map_file, evals: ['123']} }
+        let(:runner_options)  { { map_file: map_file } }
         let(:options) { super().merge(runner_options: runner_options) }
 
         it 'writes the map file to the specified path' do
