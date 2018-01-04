@@ -8,7 +8,9 @@ skip_tags: true
 clone_depth: 10
 
 environment:
-  ruby_version: '23'
+  matrix:
+    - RUBY_VERSION: 23
+    - RUBY_VERSION: 24
 
 install:
   - git submodule update --init --recursive
