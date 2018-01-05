@@ -202,7 +202,7 @@ To enable debug output in the Racc grammar set the `RACC_DEBUG` env var and reco
 ```bash
 $ export RACC_DEBUG=true
 $ bundle exec rake racc               # recompile the grammar
-$ bundle exec exe/opal --sexp -e "42" # ask Opal for the SExp of some code
+$ bundle exec bin/opal --sexp -e "42" # ask Opal for the SExp of some code
 
 read    :tINTEGER(tINTEGER) [42, [1, 0]]
 
@@ -227,6 +227,6 @@ When done unset the env variable and recompile the grammar.
 ```bash
 $ unset RACC_DEBUG
 $ bundle exec rake racc               # recompile the grammar
-$ bundle exec exe/opal --sexp -e "42" # ask Opal for the SExp of some code
+$ bundle exec bin/opal --sexp -e "42" # ask Opal for the SExp of some code
 (:int, 42)
 ```
