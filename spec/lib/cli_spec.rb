@@ -1,9 +1,9 @@
 require 'lib/spec_helper'
 require 'opal/cli'
 require 'stringio'
+require 'tmpdir'
 
 RSpec.describe Opal::CLI do
-  let(:fake_stdout) { StringIO.new }
   let(:file)    { File.expand_path('../fixtures/opal_file.rb', __FILE__) }
   let(:options) { {} }
   subject(:cli) { described_class.new(options) }
@@ -66,14 +66,14 @@ RSpec.describe Opal::CLI do
 
   describe ':no_exit option' do
     context 'when false' do
-      let(:options) { {no_exit: false, compile: true, evals: ['']} }
+      let(:options) { {no_exit: false, runner: :compiler, evals: ['']} }
       it 'appends a Kernel#exit at the end of the source' do
         expect_output_of{ subject.run }.to include(".$exit()")
       end
     end
 
     context 'when true' do
-      let(:options) { {no_exit: true, compile: true, evals: ['']} }
+      let(:options) { {no_exit: true, runner: :compiler, evals: ['']} }
       it 'appends a Kernel#exit at the end of the source' do
         expect_output_of{ subject.run }.not_to include(".$exit();")
       end
@@ -82,20 +82,20 @@ RSpec.describe Opal::CLI do
 
   describe ':lib_only option' do
     context 'when false' do
-      let(:options) { {lib_only: false, compile: true, evals: [''], skip_opal_require: true, no_exit: true} }
+      let(:options) { {lib_only: false, runner: :compiler, evals: [''], skip_opal_require: true, no_exit: true} }
       it 'appends an empty code block at the end of the source' do
         expect_output_of{ subject.run }.to include("function(Opal)")
       end
     end
 
     context 'when true' do
-      let(:options) { {lib_only: true, compile: true, no_exit: true} }
+      let(:options) { {lib_only: true, runner: :compiler, no_exit: true} }
       it 'appends code block at the end of the source' do
         expect_output_of{ subject.run }.not_to eq("\n")
       end
 
       context 'without any require' do
-        let(:options) { {lib_only: true, compile: true, skip_opal_require: true, no_exit: true} }
+        let(:options) { {lib_only: true, runner: :compiler, skip_opal_require: true, no_exit: true} }
         it 'raises ArgumentError' do
           expect{subject.run}.to raise_error(ArgumentError)
         end
@@ -161,13 +161,29 @@ RSpec.describe Opal::CLI do
     end
   end
 
-  describe ':compile option' do
-    let(:options)  { {:compile => true, :evals => ['puts 2342']} }
+  describe ':runner option' do
+    context 'when :compile' do
+      let(:options)  { {runner: :compiler, evals: ['puts 2342']} }
 
-    it 'outputs the compiled javascript' do
-      expect_output_of{ subject.run }.to include(".$puts(2342)")
-      expect_output_of{ subject.run }.not_to include("2342\n")
+      it 'outputs the compiled javascript' do
+        expect_output_of{ subject.run }.to include(".$puts(2342)")
+        expect_output_of{ subject.run }.not_to include("2342\n")
+      end
+
+      context 'with the :map_file runner option' do
+        let(:map_file) { "#{Dir.mktmpdir 'opal-map'}/file.map" }
+        let(:runner_options)  { { map_file: map_file } }
+        let(:options) { super().merge(runner_options: runner_options) }
+
+        it 'writes the map file to the specified path' do
+          expect_output_of{ subject.run }.to include(".$puts(2342)")
+          expect_output_of{ subject.run }.not_to include("2342\n")
+          expect(File.read(map_file)).to include(%{"version":3})
+        end
+      end
     end
+
+    # TODO: test more runners
   end
 
   describe ':load_paths options' do
@@ -186,16 +202,6 @@ RSpec.describe Opal::CLI do
     end
   end
 
-  describe ':map option' do
-    let(:map_path) { "#{Dir.mktmpdir 'opal-map'}/file.map" }
-    let(:options)  { {map: map_path, evals: ['123']} }
-
-    it 'sets the verbose flag (currently unused)' do
-      expect_output_of{ subject.run }.to eq('')
-      expect(File.read(map_path)).to include(%{"version":3})
-    end
-  end
-
   describe ':parse_comments option' do
     let(:code) do
       <<-CODE
@@ -205,7 +211,7 @@ RSpec.describe Opal::CLI do
         end
       CODE
     end
-    let(:options) { { parse_comments: true, evals: [code], compile: true } }
+    let(:options) { { parse_comments: true, evals: [code], runner: :compiler } }
 
     it 'sets $$comment prop for compiled methods' do
       expect_output_of { subject.run }.to include('$$comments = ["# multiline", "# comment"]')
@@ -214,7 +220,7 @@ RSpec.describe Opal::CLI do
 
   describe ':enable_source_location' do
     let(:file) { File.expand_path('../fixtures/source_location_test.rb', __FILE__) }
-    let(:options) { { enable_source_location: true, compile: true, file: File.open(file) } }
+    let(:options) { { enable_source_location: true, runner: :compiler, file: File.open(file) } }
 
     it 'sets $$source_location prop for compiled methods' do
       expect_output_of { subject.run }.to include("source_location_test.rb', 6]")
@@ -229,6 +235,7 @@ RSpec.describe Opal::CLI do
   end
 
   def output_and_result_of
+    fake_stdout = StringIO.new
     stdout = described_class.stdout
     described_class.stdout = fake_stdout
     result = yield

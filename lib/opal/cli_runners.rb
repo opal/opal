@@ -1,26 +1,81 @@
 # frozen_string_literal: true
 module Opal
-  # `Opal::CliRunners` is the namespace in which JavaScript runners can be
-  # defined for use by `Opal::CLI`. The API for classes defined under
-  # `CliRunners` is the following.
+  # `Opal::CliRunners` is the register in which JavaScript runners can be
+  # defined for use by `Opal::CLI`. Runners will be called via the `#call`
+  # method and passed a Hash containing the following keys:
   #
-  # - The #initialize method takes an `Hash` containing an `output:` object.
-  #   Additional keys can be safely ignored and can be specific to a particular
-  #   runner, e.g. the `CliRunners::Server` runner will accepts a `port:`
-  #   option.
-  # - The runner instance will then be called via `#run(compiled_source, argv)`:
-  #   - `compiled_source` is a string of JavaScript code
-  #   - `argv` is the arguments vector coming from the CLI that is being
+  #
+  # - `options`: a hash of options for the runner
+  # - `output`: an IO-like object responding to `#write` and `#puts`
+  # - `argv`: is the arguments vector coming from the CLI that is being
   #     forwarded to the program
+  # - `builder`: the current instance of Opal::Builder
+  #
+  # Runners can be registered using `#register_runner(name, runner)`.
   #
   module CliRunners
     class RunnerError < StandardError
     end
+
+    @register = {}
+
+    def self.[](name)
+      @register[name.to_sym]
+    end
+
+    def self.[]=(name, runner)
+      warn "Overwriting Opal CLI runner: #{name}" if @register.key? name.to_sym
+      @register[name.to_sym] = runner
+    end
+
+    def self.to_h
+      @register
+    end
+
+    # @param name [Symbol] the name at which the runner can be reached
+    # @param runner [#call] a callable object that will act as the "runner"
+    def self.register_runner(name, runner)
+      self[name] = runner
+      nil
+    end
+
+    # The compiler runner will just output the compiled JavaScript
+    register_runner :compiler, -> data {
+      options  = data[:options] || {}
+      builder  = data.fetch(:builder)
+      map_file = options[:map_file]
+      output   = data.fetch(:output)
+
+      output.puts builder.to_s
+      File.write(map_file, builder.source_map) if map_file
+
+      0
+    }
+
+
+
+    # Legacy runners
+
+    def self.register_legacy_runner(klass_name, *names)
+      runner = -> data {
+        klass = const_get(klass_name)
+        runner = klass.new((data[:options] || {}).merge(output: data[:output]))
+        runner.run(data[:builder].to_s, data[:argv])
+        runner.exit_status
+      }
+      names.each { |name| self[name] = runner }
+    end
+
+    autoload :Applescript, 'opal/cli_runners/applescript'
+    autoload :Chrome,      'opal/cli_runners/chrome'
+    autoload :Nashorn,     'opal/cli_runners/nashorn'
+    autoload :Nodejs,      'opal/cli_runners/nodejs'
+    autoload :Server,      'opal/cli_runners/server'
+
+    register_legacy_runner :Applescript, :applescript, :osascript
+    register_legacy_runner :Chrome,      :chrome
+    register_legacy_runner :Nashorn,     :nashorn
+    register_legacy_runner :Nodejs,      :nodejs, :node
+    register_legacy_runner :Server,      :server
   end
 end
-
-require 'opal/cli_runners/applescript'
-require 'opal/cli_runners/nodejs'
-require 'opal/cli_runners/server'
-require 'opal/cli_runners/nashorn'
-require 'opal/cli_runners/chrome'

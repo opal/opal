@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'optparse'
+require 'opal/cli_runners'
 
 module Opal
   class CLIOptions < OptionParser
@@ -78,16 +79,23 @@ module Opal
       end
 
       on('-c', '--compile', 'Compile to JavaScript') do
-        options[:compile] = true
+        options[:runner] = :compiler
       end
 
-      on('-R', '--runner RUNNER', %w[nodejs server applescript nashorn chrome], 'Choose the runner: nodejs (default), server, chrome') do |runner|
+      on('-R', '--runner RUNNER', Opal::CliRunners.to_h.keys, "Choose the runner: nodejs (default), #{(Opal::CliRunners.to_h.keys - [:nodejs]).join(', ')}") do |runner|
         options[:runner] = runner.to_sym
       end
 
-      on('--server-port PORT', 'Set the port for the server runner (default port: 3000)') do |port|
-        options[:runner] = :server
-        options[:port] = port.to_i
+      on('--runner-options JSON', "Set options specific to the selected runner as a JSON string (e.g. port for server)") do |json_options|
+        require 'json'
+        runner_options = JSON.parse(json_options, symbolize_names: true)
+        options[:runner_options] ||= {}
+        options[:runner_options].merge!(runner_options)
+      end
+
+      on('--server-port PORT', '(deprecated, use --runner-options) Set the port for the server runner (default port: 3000)') do |port|
+        options[:runner_options] ||= {}
+        options[:runner_options][:port] = port.to_i
       end
 
       on('-E', '--no-exit', 'Do not append a Kernel#exit at the end of file') do |no_exit|
@@ -120,7 +128,7 @@ module Opal
       end
 
       on('-P', '--map FILE', 'Enable/Disable source map') do |file|
-        options[:map] = file
+        options[:runner_options][:map_file] = file
       end
 
       on('-F', '--file FILE', 'Set filename for compiled code') do |file|
