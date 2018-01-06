@@ -261,7 +261,7 @@ platforms.each do |platform|
       stubs = Testing::MSpec.stubs.map{|s| "-s#{s}"}.join(' ')
 
       sh "ruby -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-         "bin/opal -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+         "exe/opal -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 
       if bm_filepath
         puts "Benchmark results have been written to #{bm_filepath}"
@@ -294,7 +294,7 @@ platforms.each do |platform|
       includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
 
       sh "ruby -rbundler/setup "\
-         "bin/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+         "exe/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
     end
   end
 end
@@ -321,7 +321,7 @@ task :minitest_node_nodejs do
   includes = "-Itest -Ilib -Ivendored-minitest"
 
   sh "ruby -rbundler/setup "\
-     "bin/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+     "exe/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 end
 
 desc 'Run smoke tests with opal-rspec to see if something is broken'
@@ -416,3 +416,4 @@ task :test_all => [:rspec, :mspec, :minitest]
 task(:cruby_tests) { warn "The task 'cruby_tests' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_cruby)  { warn "The task 'test_cruby' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_nodejs) { warn "The task 'test_nodejs' has been renamed to 'minitest_node_nodejs'."; exit 1 }
+
