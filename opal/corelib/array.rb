@@ -2160,7 +2160,7 @@ class Array < `Array`
       max ||= `row.length`
 
       if `row.length` != max
-        raise IndexError, "element size differs (#{`row.length`} should be #{max}"
+        raise IndexError, "element size differs (#{`row.length`} should be #{max})"
       end
 
       `row.length`.times {|i|
