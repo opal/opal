@@ -2274,8 +2274,9 @@
   // other corelib files.
   _Object.$$proto.$require = Opal.require;
 
-  // Instantiate the top object
+  // Instantiate the main object
   Opal.top = new _Object.$$alloc();
+  Opal.top.$to_s = Opal.top.$inspect = function() { return 'main' };
 
   // Nil
   Opal.klass(_Object, _Object, 'NilClass', NilClass_alloc);
