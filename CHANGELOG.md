@@ -46,6 +46,11 @@ Whitespace conventions:
 - The CLI `--server-port 1234` option is now deprecated in favor of using `--runner-options='{"port": 1234}'`
 
 
+### Removed
+
+- The `node` CLI runner no longer supports passing extra node options via the `NODE_OPT` env var, instead Node.js natively supports the `NODE_OPTIONS` env var.
+
+
 
 ## [0.11.0] - 2017-12-08
 
