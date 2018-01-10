@@ -138,6 +138,16 @@
     }
   }
 
+  function $defineProperty(object, name, value) {
+    Object.defineProperty(object, name, {
+      value: value,
+      enumerable: false,
+      configurable: true
+    });
+  }
+
+  Opal.defineProperty = $defineProperty;
+
 
   // Truth
   // -----
@@ -463,14 +473,14 @@
   // @param superclass  [Class,null] the superclass object
   // @return [JS.Function] the consturctor holding the prototype for the class' instances
   Opal.boot_class_alloc = function(name, constructor, superclass) {
+    if (name) {
+      constructor.displayName = name+'_alloc';
+    }
+
     if (superclass) {
       var alloc_proxy = function() {};
       alloc_proxy.prototype = superclass.$$proto || superclass.prototype;
       constructor.prototype = new alloc_proxy();
-    }
-
-    if (name) {
-      constructor.displayName = name+'_alloc';
     }
 
     constructor.prototype.constructor = constructor;
@@ -543,6 +553,9 @@
 
     // @property $$proto This is the prototype on which methods will be defined
     klass.$$proto = alloc.prototype;
+    klass.$$proto.$$methods = [];
+    klass.$$proto.$$methods.push('SETUP_CLASS_OBJECT');
+    console.log("Adding method table to", klass.$$name);
 
     // @property $$proto.$$class Make available to instances a reference to the
     //                           class they belong to.
@@ -648,6 +661,8 @@
 
     // @property $$proto This is the prototype on which methods will be defined
     module.$$proto = module_prototype;
+    module.$$proto.$$methods = [];
+    module.$$proto.$$methods.push('MODULE_ALLOCATE');
 
     // @property constructor
     //   keeps a ref to the constructor, but apparently the
@@ -826,6 +841,9 @@
       }
 
       if (ancestor === from) {
+        var method_name = name.slice(1);
+        console.log("Bridging method", method_name, "to", target_constructor, "instances");
+        target_constructor.prototype.$$methods.push(method_name);
         target_constructor.prototype[name] = body
         break;
       }
@@ -989,10 +1007,17 @@
 
     Opal.stub_subscribers.push(constructor.prototype);
 
+    if (constructor.prototype.$$methods == null) {
+      console.log("Adding methods table to instances of", constructor);
+      constructor.prototype.$$methods = ["BRIDGE"];
+    }
+
     // Populate constructor with previously stored stubs
     for (var method_name in Opal.stubs) {
       if (!(method_name in constructor.prototype)) {
         constructor.prototype[method_name] = Opal.stub_for(method_name);
+        console.log("Bridging method", method_name, "to", constructor, "instances");
+        constructor.prototype.$$methods.push(method_name);
       }
     }
 
@@ -1050,12 +1075,18 @@
       if (current_owner_index <= module_index) {
         dest[jsid] = body;
         dest[jsid].$$donated = module;
+        debugger;
+        console.log("inheriting", jsid, "from", module.$$name, "to", includer.$$name);
+        dest.$$methods.push(jsid.slice(1));
       }
     }
     else {
       // neither a class, or module included by class, has defined method
       dest[jsid] = body;
       dest[jsid].$$donated = module;
+      debugger;
+      console.log("inheriting", jsid, "from", module.$$name, "to", includer.$$name);
+      dest.$$methods.push(jsid.slice(1));
     }
 
     // if the includer is a module, recursively update all of its includres.
@@ -1672,6 +1703,9 @@
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(obj, jsid, body) {
     obj.$$proto[jsid] = body;
+    console.log("Defining method", jsid.slice(1), "on", obj.$$name);
+    obj.$$proto.$$methods.push(jsid.slice(1));
+
     // for super dispatcher, etc.
     body.$$owner = obj;
     if (body.displayName == null) body.displayName = jsid.substr(1);
