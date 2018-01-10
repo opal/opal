@@ -11,7 +11,7 @@ module AttrAccessorSpec
 end
 
 class OpalAttrAccessorSpec
-  attr_accessor *%w{foo bar baz}
+  attr_accessor(*%w{foo bar baz})
 end
 
 describe "Module#attr_accessor" do

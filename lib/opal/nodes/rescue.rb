@@ -81,7 +81,7 @@ module Opal
 
       def compile
         scope.rescue_else_sexp = children[1..-1].detect { |sexp| sexp && sexp.type != :resbody }
-        has_rescue_handlers = false
+        _has_rescue_handlers = false
 
         if handle_rescue_else_manually?
           line "var $no_errors = true;"
@@ -101,7 +101,7 @@ module Opal
           children[1..-1].each_with_index do |child, idx|
             # counting only rescue, ignoring rescue-else statement
             if child && child.type == :resbody
-              has_rescue_handlers = true
+              _has_rescue_handlers = true
 
               push " else " unless idx == 0
               line process(child, @level)
