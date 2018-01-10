@@ -39,6 +39,7 @@ Whitespace conventions:
 
 - The internal API for CLI runners has changed, now it's just a callable object
 - The `--map` CLI option now works only in conjunction with `--compile` (or `--runner compiler`)
+- The `node` CLI runner now adds its `NODE_PATH` entry instead of replacing the ENV var altogether
 
 
 ### Deprecated

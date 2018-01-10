@@ -17,7 +17,9 @@ module Opal
       end
 
       def node_modules
-        NODE_PATH
+        paths = ENV['NODE_PATH'].to_s.split(':')
+        paths << NODE_PATH unless paths.include? NODE_PATH
+        paths.join(':')
       end
 
       def run(code, argv)
