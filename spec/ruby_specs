@@ -41,7 +41,7 @@ ruby/core/exception
 !ruby/core/exception/load_error_spec
 
 ruby/core/false
-ruby/core/fixnum
+ruby/core/integer
 ruby/core/file/basename_spec
 ruby/core/file/dirname_spec
 ruby/core/file/extname_spec
