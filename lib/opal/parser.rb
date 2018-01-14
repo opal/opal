@@ -2,6 +2,21 @@
 require 'opal/ast/builder'
 require 'opal/rewriter'
 
+if RUBY_ENGINE == 'opal'
+  class Parser::Lexer::Literal
+    undef :extend_string
+
+    def extend_string(string, ts, te)
+      @buffer_s ||= ts
+      @buffer_e = te
+
+      # Patch for opal-parser, original:
+      # @buffer << string
+      @buffer += string
+    end
+  end
+end
+
 module Opal
   module Source
     class Buffer < Parser::Source::Buffer
@@ -11,7 +26,7 @@ module Opal
     end
   end
 
-  class Parser < ::Parser::Ruby23
+  class Parser < ::Parser::Ruby25
     class << self
       attr_accessor :diagnostics_consumer
 

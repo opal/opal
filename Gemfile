@@ -18,6 +18,9 @@ gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
 gem 'sprockets', sprockets_version if sprockets_version
 
+# TODO: move back to the gemspec after parser release.
+gem 'parser', github: 'iliabylich/parser', branch: '25-compiled'
+
 group :repl do
   gem 'therubyracer', platform: :mri, require: false
   gem 'therubyrhino', platform: :jruby, require: false
