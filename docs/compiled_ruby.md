@@ -478,26 +478,107 @@ If you want to integrate a JavaScript library with Opal, so that you can make Ru
 ## Ruby from JavaScript
 
 Accessing classes and methods defined in Opal from the JavaScript runtime is
-possible via the `Opal` js object. The following class:
+possible via the `Opal` JS object. Consider following code:
 
 ```ruby
+module Bar
+  BAR = 123
+end
+
 class Foo
-  def bar
-    puts "called bar on class Foo defined in Ruby code"
+  include Bar
+  FOO = 456
+
+  def foo
+    puts "called #foo on class ::Foo defined in Ruby code"
   end
 end
+
+BAZ = 789
 ```
 
-Can be accessed from JavaScript like this:
+### Navigating constants
+
+Top level constants can be accessed as properties of `Opal`:
+
 
 ```javascript
-Opal.Foo.$new().$bar();
-// => "called bar on class Foo defined in Ruby code"
+Opal.Object;       // => Object
+Opal.Kernel;       // => Kernel
+Opal.Array;        // => Array
+Opal.RUBY_VERSION; // => "2.3"
+Opal.Foo;          // => Foo
+Opal.BAZ;          // => 789
 ```
 
-Remember that all Ruby methods are prefixed with a `$`.
+To reach nested constants the safest way is to call `#const_get` on `Object`:
 
-In the case that a method name can't be called directly due to a JavaScript syntax error, you will need to call the method using bracket notation. For example, you can call `foo.$merge(...)` but not `foo.$merge!(...)`, `bar.$fetch('somekey')` but not `bar.$[]('somekey')`. Instead you would write it like this: `foo['$merge!'](...)` or `bar['$[]']('somekey')`.
+```javascript
+Opal.Object.$$const_get('Bar::BAR'); // => 123
+Opal.Object.$$const_get('Foo::BAR'); // => 123
+Opal.Object.$$const_get('Foo::FOO'); // => 456
+Opal.Object.$$const_get('BAZ');      // => 789
+```
+
+Constants can also be navigated using the `$$` property, although this is limited to constants defined directly under the current object:
+
+```javascript
+Opal.Bar.$$.BAR // => 123
+Opal.Foo.$$.FOO // => 456
+Opal.Foo.$$.BAR // => undefined
+```
+
+
+### Calling methods
+
+**Methods** are always prefixed by a single `$`:
+
+```javascript
+// Equivalent to:
+//   Foo.new.foo
+Opal.Foo.$new().$foo(); // => "called #foo on class ::Foo defined in Ruby code"
+
+// Equivalent to:
+//   "hello there".sub('there', 'world')
+("hello there").$sub('there', 'world'); // => "hello world"
+```
+
+**Methods names unsupported in JS** should be called using the JS bracket notation:
+
+```javascript
+// Equivalent to:
+//   hash = Hash.new["key"] = "value"
+//   hash["key"] = "value"
+var hash = Opal.Hash.$new();  // => {}
+hash["$[]="]("key", "value"); // => "value"
+
+// Equivalent to:
+//   [1,2,3].reverse!
+[1,2,3]['$reverse!'](); // => [3,2,1]
+
+// Equivalent to:
+//   1 == 2
+(1)['$=='](2); // => false
+```
+
+**Passing blocks** from JS is a bit more tricky, so the suggested solution is to use `Opal.send(…)`:
+
+```javascript
+// Equivalent to:
+//   [1,2,3].map {|n| n * 2}
+Opal.send([1,2,3], 'map', [], function(n) {return n * 2}); // => [2,4,6]
+```
+
+Alternatively blocks can also be called *the hard way* by assigning the block-function to the property `$$p` of the method:
+
+```javascript
+// Equivalent to:
+//   [1,2,3].map {|n| n * 2}
+array = [1,2,3]
+array.$map.$$p = function(n) {return n * 2}; // "$$p" stands for "proc"
+array.$map(); // => [2,4,6]
+```
+
 
 
 ### Hash

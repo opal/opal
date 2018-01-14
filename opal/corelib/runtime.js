@@ -297,6 +297,11 @@
     cref.$$const = (cref.$$const || Object.create(null));
     cref.$$const[name] = value;
 
+    // Add a short helper to navigate constants manually.
+    // @example
+    //   Opal.$$.Regexp.$$.IGNORECASE
+    cref.$$ = cref.$$const;
+
     Opal.const_cache_version++;
 
     // Expose top level constants onto the Opal object
@@ -2274,6 +2279,11 @@
   // other corelib files.
   _Object.$$proto.$require = Opal.require;
 
+  // Add a short helper to navigate constants manually.
+  // @example
+  //   Opal.$$.Regexp.$$.IGNORECASE
+  Opal.$$ = _Object.$$;
+
   // Instantiate the main object
   Opal.top = new _Object.$$alloc();
   Opal.top.$to_s = Opal.top.$inspect = function() { return 'main' };
@@ -2283,8 +2293,9 @@
   nil = Opal.nil = new NilClass_alloc();
   nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
+
+  // Errors
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
-
   TypeError.$$super = Error;
 }).call(this);
