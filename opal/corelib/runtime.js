@@ -1661,6 +1661,12 @@
 
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(obj, jsid, body) {
+    // Special case for a method definition in the
+    // top-level namespace
+    if (obj == Opal.top.$$meta) {
+      obj = Opal.Object;
+    }
+
     obj.$$proto[jsid] = body;
     // for super dispatcher, etc.
     body.$$owner = obj;
