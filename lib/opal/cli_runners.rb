@@ -66,6 +66,8 @@ module Opal
       names.each { |name| self[name] = runner }
     end
 
+    require 'opal/cli_runners/cmd'
+
     autoload :Applescript, 'opal/cli_runners/applescript'
     autoload :Chrome,      'opal/cli_runners/chrome'
     autoload :Nashorn,     'opal/cli_runners/nashorn'
