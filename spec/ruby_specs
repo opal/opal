@@ -168,6 +168,7 @@ ruby/library/openstruct
 !ruby/library/openstruct/marshal_dump_spec
 
 ruby/library/pathname
+!ruby/library/pathname/empty_spec
 ruby/library/pp
 ruby/library/set
 ruby/library/singleton
