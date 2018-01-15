@@ -3,73 +3,19 @@ opal_filter "2.5" do
 fails "A Symbol literal inherits the encoding of the magic comment and can have a binary encoding" # NoMethodError: undefined method `tmp' for main
 fails "A Symbol literal with invalid bytes raises an EncodingError at parse time" # NameError: uninitialized constant EncodingError
 fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
-fails "A method definition inside a metaclass scope raises FrozenError if frozen" # Expected FrozenError but no exception was raised ("foo" was returned)
-fails "A singleton method definition raises FrozenError if frozen" # Expected FrozenError but no exception was raised ("foo" was returned)
 fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
 fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
-fails "Array#<< raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3, 5] was returned)
-fails "Array#[]= raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([] was returned)
 fails "Array#append appends the arguments to the array" # NoMethodError: undefined method `append' for ["a", "b", "c"]:Array
 fails "Array#append isn't confused by previous shift" # NoMethodError: undefined method `append' for ["b", "c"]:Array
 fails "Array#append properly handles recursive arrays" # NoMethodError: undefined method `append' for [[...]]:Array
-fails "Array#append raises a FrozenError on a frozen array" # NoMethodError: undefined method `append' for [1, 2, 3]:Array
-fails "Array#clear raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([] was returned)
-fails "Array#collect! when frozen raises a FrozenError" # Expected FrozenError but no exception was raised ([nil, nil, nil] was returned)
-fails "Array#collect! when frozen raises a FrozenError when calling #each on the returned Enumerator" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
-fails "Array#collect! when frozen raises a FrozenError when calling #each on the returned Enumerator when empty" # Expected FrozenError but no exception was raised ([] was returned)
-fails "Array#collect! when frozen raises a FrozenError when empty" # Expected FrozenError but no exception was raised ([] was returned)
-fails "Array#compact! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Array#concat raises a FrozenError when Array is frozen and modification occurs" # Expected FrozenError but no exception was raised ([1, 2, 3, 1] was returned)
-fails "Array#concat raises a FrozenError when Array is frozen and no modification occurs" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
-fails "Array#delete raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (1 was returned)
-fails "Array#delete_at raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (1 was returned)
-fails "Array#delete_if raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
-fails "Array#delete_if raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised ([] was returned)
-fails "Array#fill raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (["x", "x", "x"] was returned)
-fails "Array#fill raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised ([] was returned)
 fails "Array#flatten with a non-Array object in the Array calls respond_to_missing?(:to_ary, true) to try coercing" # Expected [["to_ary", false]] to equal [["to_ary", true]]
-fails "Array#flatten! raises a FrozenError on frozen arrays when the array is modified" # Expected FrozenError but no exception was raised ([1, 2] was returned)
-fails "Array#flatten! raises a FrozenError on frozen arrays when the array would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Array#initialize raises a FrozenError on frozen arrays" # Expected FrozenError but no exception was raised ([] was returned)
-fails "Array#insert raises a FrozenError on frozen arrays when the array is modified" # Expected FrozenError but no exception was raised (["x", 1, 2, 3] was returned)
-fails "Array#insert raises a FrozenError on frozen arrays when the array would not be modified" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
 fails "Array#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
-fails "Array#keep_if on frozen objects with falsy block raises a FrozenError" # Expected FrozenError but no exception was raised ([] was returned)
-fails "Array#keep_if on frozen objects with truthy block raises a FrozenError" # Expected FrozenError but no exception was raised ([true, false] was returned)
-fails "Array#map! when frozen raises a FrozenError" # Expected FrozenError but no exception was raised ([nil, nil, nil] was returned)
-fails "Array#map! when frozen raises a FrozenError when calling #each on the returned Enumerator" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
-fails "Array#map! when frozen raises a FrozenError when calling #each on the returned Enumerator when empty" # Expected FrozenError but no exception was raised ([] was returned)
-fails "Array#map! when frozen raises a FrozenError when empty" # Expected FrozenError but no exception was raised ([] was returned)
 fails "Array#max is defined on Array" # Expected Enumerable to be identical to Array
 fails "Array#min is defined on Array" # Expected Enumerable to be identical to Array
-fails "Array#pop passed a number n as an argument raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([2, 3] was returned)
-fails "Array#pop raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (3 was returned)
-fails "Array#pop raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised (nil was returned)
 fails "Array#prepend prepends object to the original array" # NoMethodError: undefined method `prepend' for [1, 2, 3]:Array
 fails "Array#prepend properly handles recursive arrays" # NoMethodError: undefined method `prepend' for [[...]]:Array
 fails "Array#prepend quietly ignores unshifting nothing" # NoMethodError: undefined method `prepend' for []:Array
-fails "Array#prepend raises a FrozenError on a frozen array when the array is modified" # NoMethodError: undefined method `prepend' for [1, 2, 3]:Array
-fails "Array#prepend raises a FrozenError on a frozen array when the array would not be modified" # NoMethodError: undefined method `prepend' for [1, 2, 3]:Array
-fails "Array#push raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3, 1] was returned)
-fails "Array#reject! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Array#reject! raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Array#replace raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
-fails "Array#reverse! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([3, 2, 1] was returned)
-fails "Array#rotate! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
-fails "Array#select! on frozen objects with falsy block raises a FrozenError" # Expected FrozenError but no exception was raised ([] was returned)
-fails "Array#select! on frozen objects with truthy block raises a FrozenError" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Array#shift raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (1 was returned)
-fails "Array#shift raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Array#shuffle! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
-fails "Array#slice! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([] was returned)
-fails "Array#sort! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
-fails "Array#sort_by! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
-fails "Array#sort_by! raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised ([] was returned)
 fails "Array#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
-fails "Array#uniq! raises a FrozenError on a frozen array when the array is modified" # Expected FrozenError but no exception was raised ([1, 2] was returned)
-fails "Array#uniq! raises a FrozenError on a frozen array when the array would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Array#unshift raises a FrozenError on a frozen array when the array is modified" # Expected FrozenError but no exception was raised ([1, 1, 2, 3] was returned)
-fails "Array#unshift raises a FrozenError on a frozen array when the array would not be modified" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
 fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89
 fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
 fails "Complex#finite? returns false for NaN" # NoMethodError: undefined method `finite?' for (NaN+NaN*i)
@@ -119,14 +65,6 @@ fails "Float#floor returns the largest number less than or equal to self with an
 fails "Float#round returns different rounded values depending on the half option" # TypeError: no implicit conversion of Hash into Integer
 fails "Float#truncate returns self truncated to an optionally given precision" # ArgumentError: [Number#to_i] wrong number of arguments(1 for 0)
 fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
-fails "Hash#[]= raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (2 was returned)
-fails "Hash#clear raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
-fails "Hash#compact! on frozen instance keeps pairs and raises a FrozenError" # Expected FrozenError but no exception was raised ({"truthy"=>true, "false"=>false, nil=>true} was returned)
-fails "Hash#compare_by_identity raises a FrozenError on frozen hashes" # Expected FrozenError but no exception was raised ({} was returned)
-fails "Hash#default= raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Hash#default_proc= raises a FrozenError if self is frozen" # Expected FrozenError but no exception was raised (main was returned)
-fails "Hash#delete raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Hash#delete_if raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({1=>2, 3=>4} was returned)
 fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
 fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
 fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
@@ -137,24 +75,11 @@ fails "Hash#fetch when the key is not found sets the unmatched key as the key of
 fails "Hash#fetch when the key is not found sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
 fails "Hash#fetch_values with unmatched keys sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
 fails "Hash#fetch_values with unmatched keys sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#initialize raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({1=>2, 3=>4} was returned)
-fails "Hash#keep_if raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
-fails "Hash#merge! raises a FrozenError on a frozen instance that is modified" # Expected FrozenError but no exception was raised ({1=>2} was returned)
-fails "Hash#merge! raises a FrozenError on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({1=>2} was returned)
-fails "Hash#rehash raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
-fails "Hash#reject! raises a FrozenError if called on a frozen instance that is modified" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Hash#reject! raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Hash#replace raises a FrozenError if called on a frozen instance that is modified" # Expected FrozenError but no exception was raised ({} was returned)
-fails "Hash#replace raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({} was returned)
-fails "Hash#select! raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Hash#select! raises a FrozenError if called on an empty frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Hash#shift raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
 fails "Hash#slice returns a Hash instance, even on subclasses" # NoMethodError: undefined method `slice' for {"foo"=>42}
 fails "Hash#slice returns a hash ordered in the order of the requested keys" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
 fails "Hash#slice returns new hash" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
 fails "Hash#slice returns only the keys of the original hash" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
 fails "Hash#slice returns the requested subset" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
-fails "Hash#store raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (2 was returned)
 fails "Hash#transform_keys keeps last pair if new keys conflict" # NoMethodError: undefined method `transform_keys' for {"a"=>1, "b"=>2, "c"=>3}
 fails "Hash#transform_keys makes both hashes to share values" # NoMethodError: undefined method `transform_keys' for {"a"=>[1, 2, 3]}
 fails "Hash#transform_keys returns a Hash instance, even on subclasses" # NoMethodError: undefined method `transform_keys' for {"foo"=>42}
@@ -163,17 +88,11 @@ fails "Hash#transform_keys sets the result as transformed keys with the given bl
 fails "Hash#transform_keys when no block is given returns a sized Enumerator" # NoMethodError: undefined method `transform_keys' for {"a"=>1, "b"=>2, "c"=>3}
 fails "Hash#transform_keys! does not prevent conflicts between new keys and old ones" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Hash#transform_keys! keeps later pair if new keys conflict" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-fails "Hash#transform_keys! on frozen instance keeps pairs and raises a FrozenError" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-fails "Hash#transform_keys! on frozen instance raises a FrozenError on an empty hash" # NoMethodError: undefined method `transform_keys!' for {}
 fails "Hash#transform_keys! on frozen instance when no block is given does not raise an exception" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Hash#transform_keys! partially modifies the contents if we broke from the block" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Hash#transform_keys! returns self" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Hash#transform_keys! updates self as transformed values with the given block" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Hash#transform_keys! when no block is given returns a sized Enumerator" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-fails "Hash#transform_values! on frozen instance keeps pairs and raises a FrozenError" # Expected FrozenError but no exception was raised ({"a"=>2, "b"=>3, "c"=>4} was returned)
-fails "Hash#transform_values! on frozen instance raises a FrozenError on an empty hash" # Expected FrozenError but no exception was raised ({} was returned)
-fails "Hash#update raises a FrozenError on a frozen instance that is modified" # Expected FrozenError but no exception was raised ({1=>2} was returned)
-fails "Hash#update raises a FrozenError on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({} was returned)
 fails "Integer is the class of both small and large integers" # Expected Number to be identical to Integer
 fails "Integer is the class of both small and large integers" # Expected Number to be identical to Integer
 fails "Integer#% bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
@@ -591,16 +510,7 @@ fails "Integer.sqrt returns an integer" # NoMethodError: undefined method `sqrt'
 fails "Integer.sqrt returns the integer square root of the argument" # NoMethodError: undefined method `sqrt' for Integer
 fails "Integer.sqrt returns the integer square root of the argument" # NoMethodError: undefined method `sqrt' for Integer
 fails "Invoking a method expands the Array elements from the splat after executing the arguments and block if no other arguments follow the splat" # Expected [[1, nil], nil] to equal [[1], nil]
-fails "Kernel#extend on frozen instance raises a FrozenError" # Expected FrozenError but no exception was raised (main was returned)
-fails "Kernel#freeze on a Complex has no effect since it is already frozen" # Expected false to be true
-fails "Kernel#freeze on a Rational has no effect since it is already frozen" # Expected false to be true
-fails "Kernel#frozen? on a Complex literal returns true" # Expected false to be true
-fails "Kernel#frozen? on a Complex returns true" # Expected false to be true
-fails "Kernel#frozen? on a Rational literal returns true" # Expected false to be true
-fails "Kernel#frozen? on a Rational returns true" # Expected false to be true
 fails "Kernel#inspect returns a String with the object class and object_id encoded" # Expected "main" to match /^#<Object:0x[0-9a-f]+>$/
-fails "Kernel#instance_variable_set on frozen objects raises a FrozenError when passed replacement is different from stored object" # Expected FrozenError but no exception was raised ("replacement" was returned)
-fails "Kernel#instance_variable_set on frozen objects raises a FrozenError when passed replacement is identical to stored object" # Expected FrozenError but no exception was raised ("origin" was returned)
 fails "Kernel#sprintf faulty key sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
 fails "Kernel#sprintf faulty key sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
 fails "Kernel#sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
@@ -1171,14 +1081,8 @@ fails "Method#=== for a Method generated by respond_to_missing? invokes method_m
 fails "Method#=== invokes the method with the specified arguments, returning the method's return value" # Expected false to equal 15
 fails "Method#=== raises an ArgumentError when given incorrect number of arguments" # Expected ArgumentError but no exception was raised (false was returned)
 fails "Method#to_s returns a String containing 'Method'" # Expected "main" to match /\bMethod\b/
-fails "Module#alias_method raises FrozenError if frozen" # Expected FrozenError but no exception was raised (#<Class:0x39d44> was returned)
-fails "Module#append_features when other is frozen raises a FrozenError before appending self" # Expected FrozenError but no exception was raised (#<Module:0x3fbfa> was returned)
 fails "Module#autoload (concurrently) raises a LoadError in each thread if the file does not exist" # NotImplementedError: Thread creation not available
 fails "Module#autoload (concurrently) raises a NameError in each thread if the constant is not set" # NotImplementedError: Thread creation not available
-fails "Module#autoload on a frozen module raises a FrozenError before setting the name" # Exception: Cannot read property '$pretty_inspect' of undefined
-fails "Module#class_variable_set raises a FrozenError when self is frozen" # Expected FrozenError but no exception was raised ("test" was returned)
-fails "Module#const_set on a frozen module raises a FrozenError before setting the name" # Expected FrozenError but no exception was raised (nil was returned)
-fails "Module#define_method raises a FrozenError if frozen" # Expected FrozenError but no exception was raised (#<Class:0x13e2> was returned)
 fails "Module#prepend called on a module does not obscure the module's methods from reflective access" # NoMethodError: undefined method `prepend' for #<Module:0x4ba4a>
 fails "Module#refine adds methods defined in its block to the anonymous module's public instance methods" # NoMethodError: undefined method `refine' for #<Module:0x3ae64>
 fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae7a>
@@ -1210,10 +1114,6 @@ fails "Module#refine uses the same anonymous module for future refines of the sa
 fails "Module#refine when super is called in a refinement looks in the included to refinery module" # NoMethodError: undefined method `refine' for #<Module:0x3aec8>
 fails "Module#refine when super is called in a refinement looks in the refined class" # NoMethodError: undefined method `refine' for #<Module:0x3aecc>
 fails "Module#refine when super is called in a refinement looks in the refined class even if there is another active refinement" # NoMethodError: undefined method `refine' for #<Module:0x3aec4>
-fails "Module#remove_method on frozen instance raises a FrozenError when passed a missing name" # NameError: method 'not_exist' not defined in
-fails "Module#remove_method on frozen instance raises a FrozenError when passed a name" # NameError: method 'method_to_remove' not defined in
-fails "Module#undef_method on frozen instance raises a FrozenError when passed a missing name" # NameError: method 'not_exist' not defined in
-fails "Module#undef_method on frozen instance raises a FrozenError when passed a name" # NameError: method 'method_to_undef' not defined in
 fails "Module#using accepts module as argument" # NoMethodError: undefined method `refine' for #<Module:0x2a040>
 fails "Module#using accepts module without refinements" # Expected to not get Exception but got NoMethodError (undefined method `using' for #<Module:0x2a02a>)
 fails "Module#using activates refinement even for existed objects" # NoMethodError: undefined method `refine' for #<Module:0x2a052>
@@ -1292,7 +1192,6 @@ fails "Set#compare_by_identity is idempotent and has no effect on an already com
 fails "Set#compare_by_identity is not equal to set what does not compare by identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {1,2}>
 fails "Set#compare_by_identity persists over #clones" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
 fails "Set#compare_by_identity persists over #dups" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-fails "Set#compare_by_identity raises a FrozenError on frozen sets" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
 fails "Set#compare_by_identity regards #clone'd objects as having different identities" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
 fails "Set#compare_by_identity regards #dup'd objects as having different identities" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
 fails "Set#compare_by_identity rehashes internally so that old members can be looked up" # NoMethodError: undefined method `compare_by_identity' for #<Set: {1,2,3,4,5,6,7,8,9,10,main}>
@@ -1349,11 +1248,7 @@ fails "String#% returns a String in the same encoding as the format String if co
 fails "String#% when key is missing from passed-in hash sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
 fails "String#% when key is missing from passed-in hash sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
 fails "String#% width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
-fails "String#<< raises a FrozenError when self is frozen" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
-fails "String#<< with Integer raises a FrozenError when self is frozen" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
-fails "String#[]= with Fixnum index raises a FrozenError when self is frozen" # NoMethodError: undefined method `[]=' for "hello":String
 fails "String#capitalize! capitalizes self in place for all of Unicode" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
-fails "String#capitalize! raises a FrozenError when self is frozen" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
 fails "String#casecmp independent of case returns nil if other can't be converted to a string" # TypeError: no implicit conversion of MockObject into String
 fails "String#casecmp? independent of case for UNICODE characters returns true when downcase(:fold) on unicode" # NoMethodError: undefined method `casecmp?' for "äöü":String
 fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns false when they are unrelated" # NoMethodError: undefined method `casecmp?' for "Ã":String
@@ -1366,26 +1261,16 @@ fails "String#casecmp? independent of case tries to convert other to string usin
 fails "String#casecmp? independent of case tries to convert other to string using to_str" # NoMethodError: undefined method `casecmp?' for "abc":String
 fails "String#casecmp? independent of case when comparing a subclass instance returns false when not equal to other" # NoMethodError: undefined method `casecmp?' for "b":String
 fails "String#casecmp? independent of case when comparing a subclass instance returns true when equal to other" # NoMethodError: undefined method `casecmp?' for "a":String
-fails "String#chomp! raises a FrozenError on a frozen instance when it is modified" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
-fails "String#chomp! raises a FrozenError on a frozen instance when it would not be modified" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
-fails "String#chop! raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
-fails "String#chop! raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
-fails "String#clear raises a FrozenError if self is frozen" # NoMethodError: undefined method `clear' for "Jolene":String
 fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
-fails "String#concat raises a FrozenError when self is frozen" # NoMethodError: undefined method `concat' for "hello":String
-fails "String#concat with Integer raises a FrozenError when self is frozen" # NoMethodError: undefined method `concat' for "hello":String
-fails "String#delete! raises a FrozenError when self is frozen" # NoMethodError: undefined method `delete!' for "hello":String
 fails "String#delete_prefix calls to_str on its argument" # Mock 'x' expected to receive to_str("any_args") exactly 1 times but received it 0 times
 fails "String#delete_prefix calls to_str on its argument" # NoMethodError: undefined method `delete_prefix' for "hello":String
 fails "String#delete_prefix doesn't set $~" # NoMethodError: undefined method `delete_prefix' for "hello":String
 fails "String#delete_prefix returns a copy of the string, when the prefix isn't found" # NoMethodError: undefined method `delete_prefix' for "hello":String
 fails "String#delete_prefix returns a copy of the string, with the given prefix removed" # NoMethodError: undefined method `delete_prefix' for "hello":String
 fails "String#delete_prefix returns a subclass instance when called on a subclass instance" # NoMethodError: undefined method `delete_prefix' for "hello":String
-fails "String#delete_prefix taints resulting strings when other is tainted" # NoMethodError: undefined method `delete_prefix' for "hello":String
 fails "String#delete_prefix! calls to_str on its argument" # Mock 'x' expected to receive to_str("any_args") exactly 1 times but received it 0 times
 fails "String#delete_prefix! calls to_str on its argument" # NoMethodError: undefined method `delete_prefix!' for "hello":String
 fails "String#delete_prefix! doesn't set $~" # NoMethodError: undefined method `delete_prefix!' for "hello":String
-fails "String#delete_prefix! raises a FrozenError when self is frozen" # NoMethodError: undefined method `delete_prefix!' for "hello":String
 fails "String#delete_prefix! removes the found prefix" # NoMethodError: undefined method `delete_prefix!' for "hello":String
 fails "String#delete_prefix! returns nil if no change is made" # NoMethodError: undefined method `delete_prefix!' for "hello":String
 fails "String#delete_suffix calls to_str on its argument" # Mock 'x' expected to receive to_str("any_args") exactly 1 times but received it 0 times
@@ -1394,28 +1279,15 @@ fails "String#delete_suffix doesn't set $~" # NoMethodError: undefined method `d
 fails "String#delete_suffix returns a copy of the string, when the suffix isn't found" # NoMethodError: undefined method `delete_suffix' for "hello":String
 fails "String#delete_suffix returns a copy of the string, with the given suffix removed" # NoMethodError: undefined method `delete_suffix' for "hello":String
 fails "String#delete_suffix returns a subclass instance when called on a subclass instance" # NoMethodError: undefined method `delete_suffix' for "hello":String
-fails "String#delete_suffix taints resulting strings when other is tainted" # NoMethodError: undefined method `delete_suffix' for "hello":String
 fails "String#delete_suffix! calls to_str on its argument" # Mock 'x' expected to receive to_str("any_args") exactly 1 times but received it 0 times
 fails "String#delete_suffix! calls to_str on its argument" # NoMethodError: undefined method `delete_suffix!' for "hello":String
 fails "String#delete_suffix! doesn't set $~" # NoMethodError: undefined method `delete_suffix!' for "hello":String
-fails "String#delete_suffix! raises a FrozenError when self is frozen" # NoMethodError: undefined method `delete_suffix!' for "hello":String
 fails "String#delete_suffix! removes the found prefix" # NoMethodError: undefined method `delete_suffix!' for "hello":String
 fails "String#delete_suffix! returns nil if no change is made" # NoMethodError: undefined method `delete_suffix!' for "hello":String
 fails "String#downcase! modifies self in place for all of Unicode" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
-fails "String#downcase! raises a FrozenError when self is frozen" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
 fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
 fails "String#each_line when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
-fails "String#encode! raises a FrozenError when called on a frozen String" # NoMethodError: undefined method `default_internal' for Encoding
-fails "String#encode! raises a FrozenError when called on a frozen String" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "String#encode! raises a FrozenError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal' for Encoding
-fails "String#encode! raises a FrozenError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "String#force_encoding raises a FrozenError if self is frozen" # Expected FrozenError but no exception was raised ("abcd" was returned)
-fails "String#gsub! with pattern and block raises a FrozenError when self is frozen" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
-fails "String#gsub! with pattern and replacement raises a FrozenError when self is frozen" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
 fails "String#include? with String raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
-fails "String#initialize with an argument raises a FrozenError on a frozen instance that is modified" # NotImplementedError: Mutable strings are not supported in Opal.
-fails "String#initialize with an argument raises a FrozenError on a frozen instance when self-replacing" # NotImplementedError: Mutable strings are not supported in Opal.
-fails "String#insert with index, other raises a FrozenError if self is frozen" # NoMethodError: undefined method `insert' for "abcd":String
 fails "String#intern raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
 fails "String#intern returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
 fails "String#intern returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # NoMethodError: undefined method `b' for "foobar":String
@@ -1423,46 +1295,17 @@ fails "String#intern returns a UTF-8 Symbol for a UTF-8 String containing non US
 fails "String#intern returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
 fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
 fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
-fails "String#lstrip! raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.
-fails "String#lstrip! raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.
-fails "String#next! raises a FrozenError if self is frozen" # NotImplementedError: String#next! not supported. Mutable String methods are not supported in Opal.
-fails "String#prepend raises a FrozenError when self is frozen" # NoMethodError: undefined method `prepend' for "hello":String
-fails "String#replace raises a FrozenError on a frozen instance that is modified" # NoMethodError: undefined method `replace' for "hello":String
-fails "String#replace raises a FrozenError on a frozen instance when self-replacing" # NoMethodError: undefined method `replace' for "hello":String
-fails "String#reverse! raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#reverse! not supported. Mutable String methods are not supported in Opal.
-fails "String#reverse! raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#reverse! not supported. Mutable String methods are not supported in Opal.
-fails "String#rstrip! raises a FrozenError on a frozen instance that is modified" # NoMethodError: undefined method `rstrip!' for "  hello  ":String
-fails "String#rstrip! raises a FrozenError on a frozen instance that would not be modified" # NoMethodError: undefined method `rstrip!' for "hello":String
-fails "String#setbyte raises a FrozenError if self is frozen" # Expected false to be true
-fails "String#slice! Range raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
-fails "String#slice! Range raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
-fails "String#slice! with Regexp raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
-fails "String#slice! with Regexp raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
-fails "String#slice! with Regexp, index raises a FrozenError if self is frozen" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
-fails "String#slice! with String raises a FrozenError if self is frozen" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
-fails "String#slice! with index raises a FrozenError if self is frozen" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
-fails "String#slice! with index, length raises a FrozenError if self is frozen" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
-fails "String#squeeze! raises a FrozenError when self is frozen" # NotImplementedError: String#squeeze! not supported. Mutable String methods are not supported in Opal.
 fails "String#start_with? sets Regexp.last_match if it returns true" # TypeError: no implicit conversion of Regexp into String
 fails "String#start_with? supports regexps" # TypeError: no implicit conversion of Regexp into String
 fails "String#start_with? supports regexps with ^ and $ modifiers" # TypeError: no implicit conversion of Regexp into String
-fails "String#strip! raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#strip! not supported. Mutable String methods are not supported in Opal.
-fails "String#strip! raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#strip! not supported. Mutable String methods are not supported in Opal.
-fails "String#sub! with pattern and block raises a FrozenError when self is frozen" # NotImplementedError: String#sub! not supported. Mutable String methods are not supported in Opal.
-fails "String#sub! with pattern, replacement raises a FrozenError when self is frozen" # NotImplementedError: String#sub! not supported. Mutable String methods are not supported in Opal.
-fails "String#succ! raises a FrozenError if self is frozen" # NotImplementedError: String#succ! not supported. Mutable String methods are not supported in Opal.
 fails "String#swapcase! modifies self in place for all of Unicode" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
-fails "String#swapcase! raises a FrozenError when self is frozen" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
 fails "String#to_sym raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
 fails "String#to_sym returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
 fails "String#to_sym returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # NoMethodError: undefined method `b' for "foobar":String
 fails "String#to_sym returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
 fails "String#to_sym returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
-fails "String#tr! raises a FrozenError if self is frozen" # NotImplementedError: String#tr! not supported. Mutable String methods are not supported in Opal.
-fails "String#tr_s! raises a FrozenError if self is frozen" # NotImplementedError: String#tr_s! not supported. Mutable String methods are not supported in Opal.
 fails "String#unpack1 returns the first value of #unpack" # NoMethodError: undefined method `unpack1' for "ABCD":String
 fails "String#upcase! modifies self in place for all of Unicode" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
-fails "String#upcase! raises a FrozenError when self is frozen" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
 fails "String.new accepts a capacity argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
 fails "Struct.new keyword_init: false option behaves like it does without :keyword_init option" # NoMethodError: undefined method `new' for nil
 fails "Struct.new raises a ArgumentError if passed a Hash with an unknown key" # TypeError: no implicit conversion of Hash into String

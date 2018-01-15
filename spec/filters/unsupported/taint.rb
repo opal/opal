@@ -49,4 +49,6 @@ opal_unsupported_filter "taint" do
   fails "Array#pack with format 'l' taints the output string if the format string is tainted"
   fails "Array#pack with format 'U' taints the output string if the format string is tainted"
   fails "Array#pack with format 'u' taints the output string if the format string is tainted"
+  fails "String#delete_prefix taints resulting strings when other is tainted" # NoMethodError: undefined method `delete_prefix' for "hello":String
+  fails "String#delete_suffix taints resulting strings when other is tainted" # NoMethodError: undefined method `delete_suffix' for "hello":String
 end
