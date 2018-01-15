@@ -7,8 +7,6 @@ fails "An ensure block inside 'do end' block is executed even when a symbol is t
 fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
 fails "Array#flatten with a non-Array object in the Array calls respond_to_missing?(:to_ary, true) to try coercing" # Expected [["to_ary", false]] to equal [["to_ary", true]]
 fails "Array#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
-fails "Array#max is defined on Array" # Expected Enumerable to be identical to Array
-fails "Array#min is defined on Array" # Expected Enumerable to be identical to Array
 fails "Array#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
 fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89
 fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9

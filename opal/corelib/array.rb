@@ -1397,6 +1397,14 @@ class Array < `Array`
 
   alias map! collect!
 
+  def max(n = undefined, &block)
+    each.max(n, &block)
+  end
+
+  def min(&block)
+    each.min(&block)
+  end
+
   %x{
     // Returns the product of from, from-1, ..., from - how_many + 1.
     function descending_factorial(from, how_many) {
