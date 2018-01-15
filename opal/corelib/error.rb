@@ -92,6 +92,7 @@ class ZeroDivisionError   < StandardError; end
 class NameError           < StandardError; end
 class NoMethodError         < NameError; end
 class RuntimeError        < StandardError; end
+class FrozenError           < RuntimeError; end
 class LocalJumpError      < StandardError; end
 class TypeError           < StandardError; end
 class ArgumentError       < StandardError; end
