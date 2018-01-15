@@ -1585,6 +1585,8 @@ class Array < `Array`
     self
   end
 
+  alias append push
+
   def rassoc(object)
     %x{
       for (var i = 0, length = self.length, item; i < length; i++) {
@@ -2228,6 +2230,8 @@ class Array < `Array`
 
     self
   end
+
+  alias prepend unshift
 
   def values_at(*args)
     out = [];
