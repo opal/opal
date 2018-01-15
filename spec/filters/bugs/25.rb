@@ -9,18 +9,6 @@ fails "Array#inspect does not call #to_str on the object returned from #inspect 
 fails "Array#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
 fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89
 fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
-fails "Complex#finite? returns false for NaN" # NoMethodError: undefined method `finite?' for (NaN+NaN*i)
-fails "Complex#finite? returns false for negative complex with infinite imaginary" # NoMethodError: undefined method `finite?' for (-1-Infinity*i)
-fails "Complex#finite? returns false for negative infinity" # NoMethodError: undefined method `finite?' for (-Infinity-42i)
-fails "Complex#finite? returns false for positive complex with infinite imaginary" # NoMethodError: undefined method `finite?' for (1+Infinity*i)
-fails "Complex#finite? returns false for positive infinity" # NoMethodError: undefined method `finite?' for (Infinity+42i)
-fails "Complex#finite? returns true if magnitude is finite" # NoMethodError: undefined method `finite?' for (1+1i)
-fails "Complex#infinite? returns -1 for negative complex with infinite imaginary" # NoMethodError: undefined method `infinite?' for (1+Infinity*i)
-fails "Complex#infinite? returns -1 for negative infinity" # NoMethodError: undefined method `infinite?' for (Infinity+42i)
-fails "Complex#infinite? returns 1 for positive complex with infinite imaginary" # NoMethodError: undefined method `infinite?' for (1+Infinity*i)
-fails "Complex#infinite? returns 1 for positive infinity" # NoMethodError: undefined method `infinite?' for (Infinity+42i)
-fails "Complex#infinite? returns nil for NaN" # NoMethodError: undefined method `infinite?' for (0+NaN*i)
-fails "Complex#infinite? returns nil if magnitude is finite" # NoMethodError: undefined method `infinite?' for (1+1i)
 fails "Constant resolution within methods with ||= assigns a global constant if previously undefined" # NameError: uninitialized constant OpAssignGlobalUndefined
 fails "Constant resolution within methods with ||= assigns a scoped constant if previously undefined" # NameError: uninitialized constant ConstantSpecs::OpAssignUndefined
 fails "Date#next_month returns last day of month two months later" # ArgumentError: [Date#next_month] wrong number of arguments(1 for 0)

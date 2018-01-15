@@ -178,11 +178,19 @@ class Complex < Numeric
     self / other
   end
 
+  def finite?
+    @real.finite? && @imag.finite?
+  end
+
   def hash
     "Complex:#@real:#@imag"
   end
 
   alias imaginary imag
+
+  def infinite?
+    @real.infinite? || @imag.infinite?
+  end
 
   def inspect
     "(#{to_s})"
