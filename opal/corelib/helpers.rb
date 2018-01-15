@@ -80,14 +80,14 @@ module Opal
     }
   end
 
-  def self.respond_to?(obj, method)
+  def self.respond_to?(obj, method, include_all = false)
     %x{
       if (obj == null || !obj.$$class) {
         return false;
       }
     }
 
-    obj.respond_to? method
+    obj.respond_to?(method, include_all)
   end
 
   def self.inspect_obj(obj)

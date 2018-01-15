@@ -5,7 +5,6 @@ fails "A Symbol literal with invalid bytes raises an EncodingError at parse time
 fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
 fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
 fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
-fails "Array#flatten with a non-Array object in the Array calls respond_to_missing?(:to_ary, true) to try coercing" # Expected [["to_ary", false]] to equal [["to_ary", true]]
 fails "Array#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
 fails "Array#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
 fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89

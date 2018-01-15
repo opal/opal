@@ -1097,7 +1097,7 @@ class Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           item = array[i];
 
-          if (!#{Opal.respond_to? `item`, :to_ary}) {
+          if (!#{Opal.respond_to? `item`, :to_ary, true}) {
             result.push(item);
             continue;
           }
