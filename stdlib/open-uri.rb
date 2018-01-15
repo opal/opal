@@ -120,18 +120,22 @@ module OpenURI
     status = `req.status`
     status_text = `req.statusText && req.statusText.errno ? req.statusText.errno : req.statusText`
     if status == 200 || (status == 0 && data)
-      buf = Buffer.new
-      buf << data
-      io = buf.io
-      #io.base_uri = uri # TODO: Generate a URI object from the uri String
-      io.status = "#{status} #{status_text}"
-      io.meta_add_field('content-type', `req.getResponseHeader("Content-Type")`)
-      last_modified = `req.getResponseHeader("Last-Modified")`
-      io.meta_add_field('last-modified', last_modified) if last_modified
-      io
+      build_response(req, data, status, status_text)
     else
       raise OpenURI::HTTPError.new("#{status} #{status_text}", '')
     end
+  end
+
+  def self.build_response(req, data, status, status_text)
+    buf = Buffer.new
+    buf << data
+    io = buf.io
+    #io.base_uri = uri # TODO: Generate a URI object from the uri String
+    io.status = "#{status} #{status_text}"
+    io.meta_add_field('content-type', `req.getResponseHeader("Content-Type")`)
+    last_modified = `req.getResponseHeader("Last-Modified")`
+    io.meta_add_field('last-modified', last_modified) if last_modified
+    io
   end
 
   def self.request(uri)
