@@ -11,7 +11,6 @@ fails "BigDecimal.limit picks the specified precision over global limit" # Expec
 fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
 fails "Constant resolution within methods with ||= assigns a global constant if previously undefined" # NameError: uninitialized constant OpAssignGlobalUndefined
 fails "Constant resolution within methods with ||= assigns a scoped constant if previously undefined" # NameError: uninitialized constant ConstantSpecs::OpAssignUndefined
-fails "Date.today sets Date object to the current date" # NoMethodError: undefined method `to_time' for 2018-01-15
 fails "Enumerable#all? with no block given a pattern argument returns true iff all match that pattern" # ArgumentError: [Numerous#all?] wrong number of arguments(1 for 0)
 fails "Enumerable#any? when given a pattern argument always returns false on empty enumeration" # ArgumentError: [Empty#any?] wrong number of arguments(1 for 0)
 fails "Enumerable#any? when given a pattern argument any? should return false if the block never returns other than false or nil" # ArgumentError: [Array#any?] wrong number of arguments(1 for 0)

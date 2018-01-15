@@ -594,6 +594,10 @@ class Date
     }
   end
 
+  def to_time
+    Time.new(year, month, day)
+  end
+
   def tuesday?
     wday == 2
   end
