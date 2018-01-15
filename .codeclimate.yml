@@ -17,3 +17,4 @@ exclude_paths:
 - "spec/*"
 - "test/*"
 - "vendored-minitest/*"
+- "**/node_modules/*"
