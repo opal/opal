@@ -270,7 +270,7 @@ as used by this example.
 
 _Reposted from: [Mikamayhem](http://dev.mikamai.com/post/79398725537/using-native-javascript-objects-from-opal)_
 
-Opal standard lib (stdlib) includes a `Native` module. To use it, you need to download and reference `native.js`. You can find the latest minified one from the CDN [here](http://cdn.opalrb.org/opal/current/native.min.js).
+Opal standard lib (stdlib) includes a `Native` module. To use it, you need to download and reference `native.js`. You can find the latest minified one from the CDN [here](http://cdn.opalrb.com/opal/current/native.min.js).
 
 Let's see how it works and wrap `window`:
 
