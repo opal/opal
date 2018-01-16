@@ -9,7 +9,7 @@ module Opal
         @port = options.fetch(:port, ENV['OPAL_CLI_RUNNERS_SERVER_PORT'] || 3000).to_i
 
         @static_folder = options[:static_folder] || ENV['OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER']
-        @static_folder = @static_folder == true ? 'public' : @static_folder
+        @static_folder = @static_folder ? 'public' : @static_folder
         @static_folder = File.expand_path(@static_folder) if @static_folder
       end
       attr_reader :output, :port, :server, :static_folder

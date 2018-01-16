@@ -4,12 +4,13 @@ require 'shellwords'
 module Opal
   module CliRunners
     class Cmd
-      def initialize(options, name, env, *cmd)
-        @output = options.fetch(:output, $stdout)
-        @name = name
-        @env = env
-        @cmd = *cmd
+      def initialize(command_options)
+        @output = (command_options[:options] || {}).fetch(:output, $stdout)
+        @name = command_options[:name]
+        @env = command_options[:env] || {}
+        @cmd = command_options[:cmd]
       end
+
       attr_reader :output, :exit_status
 
       def puts(*args)
@@ -28,7 +29,7 @@ module Opal
       # Let's support fake IO objects like StringIO
       def system_with_output(env, *cmd)
         if IO.try_convert(output)
-          system(env,*cmd)
+          system(env, *cmd)
           @exit_status = $?.exitstatus
           return
         end
@@ -39,13 +40,13 @@ module Opal
           # to ship here's a tempfile workaround.
           require 'tempfile'
           tempfile = Tempfile.new("opal-#{@name}-runner")
-          system(env,cmd.shelljoin+" > #{tempfile.path}")
+          system(env, cmd.shelljoin+" > #{tempfile.path}")
           @exit_status = $?.exitstatus
           captured_output = File.read tempfile.path
           tempfile.close
         else
           require 'open3'
-          captured_output, status = Open3.capture2(env,*cmd)
+          captured_output, status = Open3.capture2(env, *cmd)
           @exit_status = status.exitstatus
         end
 

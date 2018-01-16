@@ -52,8 +52,6 @@ module Opal
       0
     }
 
-
-
     # Legacy runners
 
     def self.register_legacy_runner(klass_name, *names)
@@ -79,5 +77,26 @@ module Opal
     register_legacy_runner :Nashorn,     :nashorn
     register_legacy_runner :Nodejs,      :nodejs, :node
     register_legacy_runner :Server,      :server
+
+    # @elia Is this what you had in mind ?
+=begin
+    node_runner = -> data {
+
+      NODE_PATH = File.expand_path('../stdlib/nodejs/node_modules', ::Opal.gem_dir)
+      paths = ENV['NODE_PATH'].to_s.split(':')
+      paths << NODE_PATH unless paths.include? NODE_PATH
+      node_modules = paths.join(':')
+
+      command_options = {:name => 'nodejs', :env => {'NODE_PATH' => node_modules}, :cmd => 'node'}
+      command_options[:options] = data[:options] || {}
+      cmd = Cmd.new(command_options)
+
+      cmd.run(data[:builder].to_s, data[:argv])
+      cmd.exit_status
+    }
+    register_runner :nodejs, node_runner
+    register_runner :node, node_runner
+=end
+
   end
 end
