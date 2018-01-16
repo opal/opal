@@ -236,9 +236,19 @@ module Testing
         puts 'Server ready.'
         yield self
       ensure
-        Process.kill(:TERM, server)
+        if windows?
+          # https://blog.simplificator.com/2016/01/18/how-to-kill-processes-on-windows-using-ruby/
+          # system("taskkill /f /pid #{pid}")
+          Process.kill("KILL", server)
+        else
+          Process.kill(:TERM, server)
+        end
         Process.wait(server)
       end
+    end
+
+    def windows?
+      (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
     end
 
     def sinatra_server_running?
