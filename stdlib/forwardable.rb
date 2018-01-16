@@ -1,16 +1,30 @@
-module Forwardable
-  def instance_delegate(hash)
-    hash.each {|methods, accessor|
-      methods = [methods] unless methods.respond_to? :each
-
-      methods.each {|method|
-        def_instance_delegator(accessor, method)
+%x{
+  function forwardToDelegator(hash, delegator) {
+    for (var i = 0, keys = hash.$$keys, smap = hash.$$smap, len = keys.length, key, value; i < len; i++) {
+      methods = keys[i];
+      if (key.$$is_string) {
+        accessor = smap[key];
+      } else {
+        accessor = key.value;
+        methods = key.key;
+      }
+      if (!methods['$respond_to?']("each")) {
+        methods = [methods];
+      }
+      for (var j = 0; j < methods.length; j++) {
+        delegator(accessor, methods[j]);
       }
     }
+  }
+}
+
+module Forwardable
+  def instance_delegate(hash)
+    `forwardToDelegator(hash, def_instance_delegator)`
   end
 
   def def_instance_delegators(accessor, *methods)
-    methods.each {|method|
+    methods.each { |method|
       next if %w[__send__ __id__].include?(method)
 
       def_instance_delegator(accessor, method)
@@ -36,17 +50,11 @@ end
 
 module SingleForwardable
   def single_delegate(hash)
-    hash.each {|methods, accessor|
-      methods = [methods] unless methods.respond_to? :each
-
-      methods.each {|method|
-        def_single_delegator(accessor, method)
-      }
-    }
+    `forwardToDelegator(hash, def_single_delegator)`
   end
 
   def def_single_delegators(accessor, *methods)
-    methods.each {|method|
+    methods.each { |method|
       next if %w[__send__ __id__].include? method
 
       def_single_delegator(accessor, method)
