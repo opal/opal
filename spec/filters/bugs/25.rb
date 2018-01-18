@@ -5,10 +5,10 @@ fails "A Symbol literal with invalid bytes raises an EncodingError at parse time
 fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
 fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
 fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
-fails "Array#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
-fails "Array#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
 fails "Array#== compares with an equivalent Array-like object using #to_ary" # Expected false to be true
 fails "Array#== compares with an equivalent Array-like object using #to_ary" # Mock 'array-like' expected to receive respond_to?("to_ary") at least 1 times but received it 0 times
+fails "Array#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
+fails "Array#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
 fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89
 fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
 fails "Constant resolution within methods with ||= assigns a global constant if previously undefined" # NameError: uninitialized constant OpAssignGlobalUndefined
@@ -39,9 +39,9 @@ fails "Hash#transform_keys! when no block is given returns a sized Enumerator" #
 fails "Integer is the class of both small and large integers" # Expected Number to be identical to Integer
 fails "Integer#% bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
 fails "Integer#& bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
-fails "Integer#& bignum returns self bitwise AND other" # Expected 0 to equal 1
 fails "Integer#& bignum returns self bitwise AND other when both operands are negative" # Expected 0 to equal -13835058055282164000
 fails "Integer#& bignum returns self bitwise AND other when one operand is negative" # Expected 0 to equal 18446744073709552000
+fails "Integer#& bignum returns self bitwise AND other" # Expected 0 to equal 1
 fails "Integer#& fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
 fails "Integer#& fixnum returns self bitwise AND a bignum" # Expected 0 to equal 18446744073709552000
 fails "Integer#& fixnum returns self bitwise AND other" # Expected 0 to equal 65535
@@ -86,8 +86,8 @@ fails "Integer#=== bignum returns true if self has the same value as the given a
 fails "Integer#> bignum returns true if self is greater than the given argument" # Expected false to equal true
 fails "Integer#>= bignum returns true if self is greater than or equal to other" # Expected true to equal false
 fails "Integer#>> (with n >> m) bignum calls #to_int to convert the argument to an Integer" # Expected 0 to equal 36893488147419103000
-fails "Integer#>> (with n >> m) bignum respects twos complement signed shifting" # Expected 101376 to equal -2621440001220703000
 fails "Integer#>> (with n >> m) bignum respects twos complement signed shifting for very large values" # Expected 0 to equal 2.2204460502842888e+66
+fails "Integer#>> (with n >> m) bignum respects twos complement signed shifting" # Expected 101376 to equal -2621440001220703000
 fails "Integer#>> (with n >> m) bignum returns n shifted left m bits when  n < 0, m < 0" # Expected 0 to equal -1.1805916207174113e+21
 fails "Integer#>> (with n >> m) bignum returns n shifted left m bits when  n > 0, m < 0" # Expected 0 to equal 590295810358705700000
 fails "Integer#>> (with n >> m) bignum returns n shifted right m bits when n < 0, m > 0" # Expected 0 to equal -36893488147419103000
@@ -102,10 +102,10 @@ fails "Integer#>> (with n >> m) fixnum returns an Bignum == fixnum_min * 2 when 
 fails "Integer#[] bignum returns the nth bit in the binary representation of self" # Expected 0 to equal 1
 fails "Integer#[] bignum tries to convert the given argument to an Integer using #to_int" # Expected 0 to equal 1
 fails "Integer#^ bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (14 was returned)
-fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other" # Expected 2 to equal 9223372036854776000
 fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other when all bits are 1 and other value is negative" # Expected -1 to equal -9.903520314283042e+27
 fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other when both operands are negative" # Expected 0 to equal 64563604257983430000
 fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other when one operand is negative" # Expected 0 to equal -64563604257983430000
+fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other" # Expected 2 to equal 9223372036854776000
 fails "Integer#^ fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
 fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR a bignum" # Expected -1 to equal -18446744073709552000
 fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 to equal 9223372041149743000
@@ -212,9 +212,9 @@ fails "Integer#to_s fixnum when given a base returns self converted to a String 
 fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal=' for Encoding
 fails "Integer#| bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (9 was returned)
-fails "Integer#| bignum returns self bitwise OR other" # Expected 2 to equal 9223372036854776000
 fails "Integer#| bignum returns self bitwise OR other when both operands are negative" # Expected 0 to equal -1
 fails "Integer#| bignum returns self bitwise OR other when one operand is negative" # Expected 0 to equal -64563604257983430000
+fails "Integer#| bignum returns self bitwise OR other" # Expected 2 to equal 9223372036854776000
 fails "Integer#| fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
 fails "Integer#| fixnum returns self bitwise OR other" # Expected 65535 to equal 9223372036854841000
 fails "Integer#~ bignum returns self with each bit flipped" # Expected -1 to equal -9223372036854776000
@@ -828,8 +828,8 @@ fails "Module#refine returns created anonymous module" # NoMethodError: undefine
 fails "Module#refine runs its block in an anonymous module" # NoMethodError: undefined method `refine' for #<Module:0x3ae76>
 fails "Module#refine uses the same anonymous module for future refines of the same class" # NoMethodError: undefined method `refine' for #<Module:0x3ae84>
 fails "Module#refine when super is called in a refinement looks in the included to refinery module" # NoMethodError: undefined method `refine' for #<Module:0x3aec8>
-fails "Module#refine when super is called in a refinement looks in the refined class" # NoMethodError: undefined method `refine' for #<Module:0x3aecc>
 fails "Module#refine when super is called in a refinement looks in the refined class even if there is another active refinement" # NoMethodError: undefined method `refine' for #<Module:0x3aec4>
+fails "Module#refine when super is called in a refinement looks in the refined class" # NoMethodError: undefined method `refine' for #<Module:0x3aecc>
 fails "Module#using accepts module as argument" # NoMethodError: undefined method `refine' for #<Module:0x2a040>
 fails "Module#using accepts module without refinements" # Expected to not get Exception but got NoMethodError (undefined method `using' for #<Module:0x2a02a>)
 fails "Module#using activates refinement even for existed objects" # NoMethodError: undefined method `refine' for #<Module:0x2a052>
@@ -883,8 +883,8 @@ fails "Proc#to_s for a proc created with proc returns a description optionally i
 fails "Random#bytes returns the same numeric output for a given huge seed across all implementations and platforms" # Expected "z­" to equal "_\u0091"
 fails "Random#bytes returns the same numeric output for a given seed across all implementations and platforms" # Expected "ÚG" to equal "\u0014\\"
 fails "Random.urandom raises an ArgumentError on a negative size" # NoMethodError: undefined method `urandom' for Random
-fails "Random.urandom returns a String" # NoMethodError: undefined method `urandom' for Random
 fails "Random.urandom returns a String of the length given as argument" # NoMethodError: undefined method `urandom' for Random
+fails "Random.urandom returns a String" # NoMethodError: undefined method `urandom' for Random
 fails "Random.urandom returns a random binary String" # NoMethodError: undefined method `urandom' for Random
 fails "Random.urandom returns an ASCII-8BIT String" # NoMethodError: undefined method `urandom' for Random
 fails "Rational#round with half option returns a Rational when the precision is greater than 0" # ArgumentError: [Rational#round] wrong number of arguments(2 for -1)
@@ -1002,8 +1002,8 @@ fails "String#intern returns a UTF-8 Symbol for a UTF-8 String containing non US
 fails "String#intern returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
 fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
 fails "String#start_with? sets Regexp.last_match if it returns true" # TypeError: no implicit conversion of Regexp into String
-fails "String#start_with? supports regexps" # TypeError: no implicit conversion of Regexp into String
 fails "String#start_with? supports regexps with ^ and $ modifiers" # TypeError: no implicit conversion of Regexp into String
+fails "String#start_with? supports regexps" # TypeError: no implicit conversion of Regexp into String
 fails "String#swapcase! modifies self in place for all of Unicode" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
 fails "String#to_sym raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
 fails "String#to_sym returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
@@ -1030,10 +1030,10 @@ fails "The return keyword at top level return with argument does not affect exit
 fails "The return keyword at top level return with argument does not affect exit status" # NoMethodError: undefined method `tmp' for main
 fails "The return keyword at top level stops file execution" # Exception: path.substr is not a function
 fails "The return keyword at top level stops file execution" # NoMethodError: undefined method `tmp' for main
-fails "The return keyword at top level within a begin fires ensure block before returning" # Exception: path.substr is not a function
-fails "The return keyword at top level within a begin fires ensure block before returning" # NoMethodError: undefined method `tmp' for main
 fails "The return keyword at top level within a begin fires ensure block before returning while loads file" # Exception: path.substr is not a function
 fails "The return keyword at top level within a begin fires ensure block before returning while loads file" # NoMethodError: undefined method `tmp' for main
+fails "The return keyword at top level within a begin fires ensure block before returning" # Exception: path.substr is not a function
+fails "The return keyword at top level within a begin fires ensure block before returning" # NoMethodError: undefined method `tmp' for main
 fails "The return keyword at top level within a begin is allowed in begin block" # Exception: path.substr is not a function
 fails "The return keyword at top level within a begin is allowed in begin block" # NoMethodError: undefined method `tmp' for main
 fails "The return keyword at top level within a begin is allowed in ensure block" # Exception: path.substr is not a function
