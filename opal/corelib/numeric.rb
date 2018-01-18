@@ -12,19 +12,17 @@ class Numeric
   end
 
   def __coerced__(method, other)
-    begin
+    if other.respond_to?(:coerce)
       a, b = other.coerce(self)
-    rescue
+      a.__send__ method, b
+    else
       case method
       when :+, :-, :*, :/, :%, :&, :|, :^, :**
-        raise TypeError, "#{other.class} can't be coerce into Numeric"
-
+        raise TypeError, "#{other.class} can't be coerced into Numeric"
       when :>, :>=, :<, :<=, :<=>
         raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
       end
     end
-
-    a.__send__ method, b
   end
 
   def <=>(other)

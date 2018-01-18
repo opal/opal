@@ -7,6 +7,8 @@ fails "An ensure block inside 'do end' block is executed even when a symbol is t
 fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
 fails "Array#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
 fails "Array#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "[main]" to match /^\[#<MockObject:0x[0-9a-f]+>\]$/
+fails "Array#== compares with an equivalent Array-like object using #to_ary" # Expected false to be true
+fails "Array#== compares with an equivalent Array-like object using #to_ary" # Mock 'array-like' expected to receive respond_to?("to_ary") at least 1 times but received it 0 times
 fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89
 fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
 fails "Constant resolution within methods with ||= assigns a global constant if previously undefined" # NameError: uninitialized constant OpAssignGlobalUndefined
@@ -14,14 +16,6 @@ fails "Constant resolution within methods with ||= assigns a scoped constant if 
 fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # Works, but depends on the difference between Integer and Float
 fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting
 fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
-fails "Float#* does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Float#+ does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Float#- does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Float#/ does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Float#< does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
-fails "Float#<= does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
-fails "Float#> does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
-fails "Float#>= does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
 fails "Float#ceil returns the smallest number greater than or equal to self with an optionally given precision" # ArgumentError: [Number#ceil] wrong number of arguments(1 for 0)
 fails "Float#floor returns the largest number less than or equal to self with an optionally given precision" # ArgumentError: [Number#floor] wrong number of arguments(1 for 0)
 fails "Float#round returns different rounded values depending on the half option" # TypeError: no implicit conversion of Hash into Integer
@@ -75,26 +69,18 @@ fails "Integer#& fixnum returns self bitwise AND other" # Expected 0 to equal 65
 fails "Integer#& fixnum returns self bitwise AND other" # Expected 0 to equal 65535
 fails "Integer#* bignum returns self multiplied by the given Integer" # Expected 8.507059173023462e+37 to equal 8.507059173023463e+37
 fails "Integer#* bignum returns self multiplied by the given Integer" # Expected 8.507059173023462e+37 to equal 8.507059173023463e+37
-fails "Integer#* does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Integer#* does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
 fails "Integer#** fixnum can raise -1 to a bignum safely" # Expected 1 to have same value and type as -1
 fails "Integer#** fixnum can raise -1 to a bignum safely" # Expected 1 to have same value and type as -1
 fails "Integer#** fixnum raises a ZeroDivisionError for 0 ** -1" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
 fails "Integer#** fixnum raises a ZeroDivisionError for 0 ** -1" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
 fails "Integer#** fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
 fails "Integer#** fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
-fails "Integer#+ does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Integer#+ does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
 fails "Integer#- bignum returns self minus the given Integer" # Expected 0 to equal 272
 fails "Integer#- bignum returns self minus the given Integer" # Expected 0 to equal 272
-fails "Integer#- does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Integer#- does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
 fails "Integer#/ bignum raises a ZeroDivisionError if other is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
 fails "Integer#/ bignum raises a ZeroDivisionError if other is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
 fails "Integer#/ bignum returns self divided by other" # Expected 10000000000 to equal 9999999999
 fails "Integer#/ bignum returns self divided by other" # Expected 10000000000 to equal 9999999999
-fails "Integer#/ does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Integer#/ does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
 fails "Integer#/ fixnum coerces fixnum and return self divided by other" # Expected 1.0842021724855044e-19 to equal 0
 fails "Integer#/ fixnum coerces fixnum and return self divided by other" # Expected 1.0842021724855044e-19 to equal 0
 fails "Integer#/ fixnum raises a ZeroDivisionError if the given argument is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
@@ -107,8 +93,6 @@ fails "Integer#/ fixnum supports dividing negative numbers" # Expected -0.1 to e
 fails "Integer#/ fixnum supports dividing negative numbers" # Expected -0.1 to equal -1
 fails "Integer#< bignum returns true if self is less than the given argument" # Expected false to equal true
 fails "Integer#< bignum returns true if self is less than the given argument" # Expected false to equal true
-fails "Integer#< does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
-fails "Integer#< does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
 fails "Integer#<< (with n << m) bignum calls #to_int to convert the argument to an Integer" # Expected 0 to equal 2.3611832414348226e+21
 fails "Integer#<< (with n << m) bignum calls #to_int to convert the argument to an Integer" # Expected 0 to equal 2.3611832414348226e+21
 fails "Integer#<< (with n << m) bignum returns n shifted left m bits when n < 0, m > 0" # Expected 0 to equal -7.555786372591432e+22
@@ -135,8 +119,6 @@ fails "Integer#<< (with n << m) fixnum returns an Bignum == fixnum_min * 2 when 
 fails "Integer#<< (with n << m) fixnum returns an Bignum == fixnum_min * 2 when fixnum_min << 1 and n < 0" # Expected -2147483648 (Number) to be an instance of Bignum
 fails "Integer#<= bignum returns false if compares with near float" # Expected true to equal false
 fails "Integer#<= bignum returns false if compares with near float" # Expected true to equal false
-fails "Integer#<= does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
-fails "Integer#<= does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
 fails "Integer#<=> bignum with a Bignum when other is negative returns -1 when self is negative and other is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with a Bignum when other is negative returns -1 when self is negative and other is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with a Bignum when other is negative returns 1 when self is negative and other is smaller" # Expected 0 to equal 1
@@ -145,8 +127,6 @@ fails "Integer#<=> bignum with a Bignum when other is positive returns -1 when s
 fails "Integer#<=> bignum with a Bignum when other is positive returns -1 when self is positive and other is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with a Bignum when other is positive returns 1 when other is smaller" # Expected 0 to equal 1
 fails "Integer#<=> bignum with a Bignum when other is positive returns 1 when other is smaller" # Expected 0 to equal 1
-fails "Integer#<=> bignum with an Object lets the exception go through if #coerce raises an exception" # Expected RuntimeError (my error) but no exception was raised (nil was returned)
-fails "Integer#<=> bignum with an Object lets the exception go through if #coerce raises an exception" # Expected RuntimeError (my error) but no exception was raised (nil was returned)
 fails "Integer#<=> bignum with an Object returns -1 if the coerced value is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with an Object returns -1 if the coerced value is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with an Object returns nil if #coerce does not return an Array" # Expected 0 to be nil
@@ -165,12 +145,8 @@ fails "Integer#=== bignum returns true if self has the same value as the given a
 fails "Integer#=== bignum returns true if self has the same value as the given argument" # Expected true to equal false
 fails "Integer#> bignum returns true if self is greater than the given argument" # Expected false to equal true
 fails "Integer#> bignum returns true if self is greater than the given argument" # Expected false to equal true
-fails "Integer#> does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
-fails "Integer#> does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
 fails "Integer#>= bignum returns true if self is greater than or equal to other" # Expected true to equal false
 fails "Integer#>= bignum returns true if self is greater than or equal to other" # Expected true to equal false
-fails "Integer#>= does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
-fails "Integer#>= does not rescue exception raised in other#coerce" # ArgumentError: comparison of Number with MockObject failed
 fails "Integer#>> (with n >> m) bignum calls #to_int to convert the argument to an Integer" # Expected 0 to equal 36893488147419103000
 fails "Integer#>> (with n >> m) bignum calls #to_int to convert the argument to an Integer" # Expected 0 to equal 36893488147419103000
 fails "Integer#>> (with n >> m) bignum respects twos complement signed shifting" # Expected 101376 to equal -2621440001220703000
@@ -1133,11 +1109,6 @@ fails "Random.urandom returns a String" # NoMethodError: undefined method `urand
 fails "Random.urandom returns a String of the length given as argument" # NoMethodError: undefined method `urandom' for Random
 fails "Random.urandom returns a random binary String" # NoMethodError: undefined method `urandom' for Random
 fails "Random.urandom returns an ASCII-8BIT String" # NoMethodError: undefined method `urandom' for Random
-fails "Rational#* does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Rational#+ does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Rational#- does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Rational#/ does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
-fails "Rational#<=> when passed an Object that responds to #coerce does not rescue exception raised in other#coerce" # ArgumentError: comparison of Rational with MockObject failed
 fails "Rational#round with half option returns a Rational when the precision is greater than 0" # ArgumentError: [Rational#round] wrong number of arguments(2 for -1)
 fails "Rational#round with half option returns an Integer when precision is not passed" # TypeError: not an Integer
 fails "Rational#to_r fails when a BasicObject's to_r does not return a Rational" # NoMethodError: undefined method `nil?' for BasicObject
