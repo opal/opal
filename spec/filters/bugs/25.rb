@@ -18,10 +18,6 @@ fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # 
 fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
 fails "Float#round returns different rounded values depending on the half option" # TypeError: no implicit conversion of Hash into Integer
 fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
-fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#fetch when the key is not found sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#fetch_values with unmatched keys sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#fetch_values with unmatched keys sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
 fails "Hash#slice returns a Hash instance, even on subclasses" # NoMethodError: undefined method `slice' for {"foo"=>42}
 fails "Hash#slice returns a hash ordered in the order of the requested keys" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
 fails "Hash#slice returns new hash" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
@@ -958,8 +954,6 @@ fails "String#% raises Encoding::CompatibilityError if both encodings are ASCII 
 fails "String#% raises an error if single % appears at the end" # Expected ArgumentError but no exception was raised ("%" was returned)
 fails "String#% returns a String in the argument's encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
 fails "String#% returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
-fails "String#% when key is missing from passed-in hash sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
-fails "String#% when key is missing from passed-in hash sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
 fails "String#% width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
 fails "String#capitalize! capitalizes self in place for all of Unicode" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
 fails "String#casecmp independent of case returns nil if other can't be converted to a string" # TypeError: no implicit conversion of MockObject into String

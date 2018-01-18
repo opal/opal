@@ -147,6 +147,22 @@ class StopIteration
   attr_reader :result
 end
 
+class KeyError
+  def initialize(message, receiver: nil, key: nil)
+    super(message)
+    @receiver = receiver
+    @key = key
+  end
+
+  def receiver
+    @receiver || raise(ArgumentError, 'no receiver is available')
+  end
+
+  def key
+    @key || raise(ArgumentError, 'no key is available')
+  end
+end
+
 module JS
   class Error
   end

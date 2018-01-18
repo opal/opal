@@ -492,7 +492,7 @@ class Hash
       }
     }
 
-    raise KeyError, "key not found: #{key.inspect}"
+    raise KeyError.new("key not found: #{key.inspect}", key: key, receiver: self)
   end
 
   def fetch_values(*keys, &block)
