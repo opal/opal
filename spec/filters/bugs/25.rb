@@ -19,12 +19,6 @@ fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between 
 fails "Float#round returns different rounded values depending on the half option" # TypeError: no implicit conversion of Hash into Integer
 fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
 fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#fetch when the key is not found sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#fetch when the key is not found sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
-fails "Hash#fetch when the key is not found sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
 fails "Hash#fetch when the key is not found sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
 fails "Hash#fetch_values with unmatched keys sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
 fails "Hash#fetch_values with unmatched keys sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
@@ -47,382 +41,193 @@ fails "Hash#transform_keys! returns self" # NoMethodError: undefined method `tra
 fails "Hash#transform_keys! updates self as transformed values with the given block" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Hash#transform_keys! when no block is given returns a sized Enumerator" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Integer is the class of both small and large integers" # Expected Number to be identical to Integer
-fails "Integer is the class of both small and large integers" # Expected Number to be identical to Integer
-fails "Integer#% bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
 fails "Integer#% bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
 fails "Integer#& bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
-fails "Integer#& bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
-fails "Integer#& bignum returns self bitwise AND other" # Expected 0 to equal 1
 fails "Integer#& bignum returns self bitwise AND other" # Expected 0 to equal 1
 fails "Integer#& bignum returns self bitwise AND other when both operands are negative" # Expected 0 to equal -13835058055282164000
-fails "Integer#& bignum returns self bitwise AND other when both operands are negative" # Expected 0 to equal -13835058055282164000
-fails "Integer#& bignum returns self bitwise AND other when one operand is negative" # Expected 0 to equal 18446744073709552000
 fails "Integer#& bignum returns self bitwise AND other when one operand is negative" # Expected 0 to equal 18446744073709552000
 fails "Integer#& fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
-fails "Integer#& fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
-fails "Integer#& fixnum returns self bitwise AND a bignum" # Expected 0 to equal 18446744073709552000
 fails "Integer#& fixnum returns self bitwise AND a bignum" # Expected 0 to equal 18446744073709552000
 fails "Integer#& fixnum returns self bitwise AND other" # Expected 0 to equal 65535
-fails "Integer#& fixnum returns self bitwise AND other" # Expected 0 to equal 65535
-fails "Integer#* bignum returns self multiplied by the given Integer" # Expected 8.507059173023462e+37 to equal 8.507059173023463e+37
 fails "Integer#* bignum returns self multiplied by the given Integer" # Expected 8.507059173023462e+37 to equal 8.507059173023463e+37
 fails "Integer#** fixnum can raise -1 to a bignum safely" # Expected 1 to have same value and type as -1
-fails "Integer#** fixnum can raise -1 to a bignum safely" # Expected 1 to have same value and type as -1
-fails "Integer#** fixnum raises a ZeroDivisionError for 0 ** -1" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
 fails "Integer#** fixnum raises a ZeroDivisionError for 0 ** -1" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
 fails "Integer#** fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
-fails "Integer#** fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
-fails "Integer#- bignum returns self minus the given Integer" # Expected 0 to equal 272
 fails "Integer#- bignum returns self minus the given Integer" # Expected 0 to equal 272
 fails "Integer#/ bignum raises a ZeroDivisionError if other is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
-fails "Integer#/ bignum raises a ZeroDivisionError if other is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
-fails "Integer#/ bignum returns self divided by other" # Expected 10000000000 to equal 9999999999
 fails "Integer#/ bignum returns self divided by other" # Expected 10000000000 to equal 9999999999
 fails "Integer#/ fixnum coerces fixnum and return self divided by other" # Expected 1.0842021724855044e-19 to equal 0
-fails "Integer#/ fixnum coerces fixnum and return self divided by other" # Expected 1.0842021724855044e-19 to equal 0
-fails "Integer#/ fixnum raises a ZeroDivisionError if the given argument is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
 fails "Integer#/ fixnum raises a ZeroDivisionError if the given argument is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
 fails "Integer#/ fixnum returns result the same class as the argument" # Expected 1.5 to equal 1
-fails "Integer#/ fixnum returns result the same class as the argument" # Expected 1.5 to equal 1
-fails "Integer#/ fixnum returns self divided by the given argument" # Expected 1.5 to equal 1
 fails "Integer#/ fixnum returns self divided by the given argument" # Expected 1.5 to equal 1
 fails "Integer#/ fixnum supports dividing negative numbers" # Expected -0.1 to equal -1
-fails "Integer#/ fixnum supports dividing negative numbers" # Expected -0.1 to equal -1
-fails "Integer#< bignum returns true if self is less than the given argument" # Expected false to equal true
 fails "Integer#< bignum returns true if self is less than the given argument" # Expected false to equal true
 fails "Integer#<< (with n << m) bignum calls #to_int to convert the argument to an Integer" # Expected 0 to equal 2.3611832414348226e+21
-fails "Integer#<< (with n << m) bignum calls #to_int to convert the argument to an Integer" # Expected 0 to equal 2.3611832414348226e+21
-fails "Integer#<< (with n << m) bignum returns n shifted left m bits when n < 0, m > 0" # Expected 0 to equal -7.555786372591432e+22
 fails "Integer#<< (with n << m) bignum returns n shifted left m bits when n < 0, m > 0" # Expected 0 to equal -7.555786372591432e+22
 fails "Integer#<< (with n << m) bignum returns n shifted left m bits when n > 0, m > 0" # Expected 0 to equal 2.3611832414348226e+21
-fails "Integer#<< (with n << m) bignum returns n shifted left m bits when n > 0, m > 0" # Expected 0 to equal 2.3611832414348226e+21
-fails "Integer#<< (with n << m) bignum returns n shifted right m bits when n < 0, m < 0" # Expected 0 to equal -36893488147419103000
 fails "Integer#<< (with n << m) bignum returns n shifted right m bits when n < 0, m < 0" # Expected 0 to equal -36893488147419103000
 fails "Integer#<< (with n << m) bignum returns n shifted right m bits when n > 0, m < 0" # Expected 0 to equal 73786976294838210000
-fails "Integer#<< (with n << m) bignum returns n shifted right m bits when n > 0, m < 0" # Expected 0 to equal 73786976294838210000
-fails "Integer#<< (with n << m) bignum returns n when n < 0, m == 0" # Expected 0 to equal -147573952589676410000
 fails "Integer#<< (with n << m) bignum returns n when n < 0, m == 0" # Expected 0 to equal -147573952589676410000
 fails "Integer#<< (with n << m) bignum returns n when n > 0, m == 0" # Expected 0 to equal 147573952589676410000
-fails "Integer#<< (with n << m) bignum returns n when n > 0, m == 0" # Expected 0 to equal 147573952589676410000
-fails "Integer#<< (with n << m) fixnum returns -1 when n < 0, m < 0 and n > -(2**-m)" # Expected -7 to equal -1
 fails "Integer#<< (with n << m) fixnum returns -1 when n < 0, m < 0 and n > -(2**-m)" # Expected -7 to equal -1
 fails "Integer#<< (with n << m) fixnum returns 0 when m < 0 and m is a Bignum" # Expected 3 to equal 0
-fails "Integer#<< (with n << m) fixnum returns 0 when m < 0 and m is a Bignum" # Expected 3 to equal 0
-fails "Integer#<< (with n << m) fixnum returns 0 when n > 0, m < 0 and n < 2**-m" # Expected 7 to equal 0
 fails "Integer#<< (with n << m) fixnum returns 0 when n > 0, m < 0 and n < 2**-m" # Expected 7 to equal 0
 fails "Integer#<< (with n << m) fixnum returns an Bignum == fixnum_max * 2 when fixnum_max << 1 and n > 0" # Expected 2147483646 (Number) to be an instance of Bignum
-fails "Integer#<< (with n << m) fixnum returns an Bignum == fixnum_max * 2 when fixnum_max << 1 and n > 0" # Expected 2147483646 (Number) to be an instance of Bignum
-fails "Integer#<< (with n << m) fixnum returns an Bignum == fixnum_min * 2 when fixnum_min << 1 and n < 0" # Expected -2147483648 (Number) to be an instance of Bignum
 fails "Integer#<< (with n << m) fixnum returns an Bignum == fixnum_min * 2 when fixnum_min << 1 and n < 0" # Expected -2147483648 (Number) to be an instance of Bignum
 fails "Integer#<= bignum returns false if compares with near float" # Expected true to equal false
-fails "Integer#<= bignum returns false if compares with near float" # Expected true to equal false
-fails "Integer#<=> bignum with a Bignum when other is negative returns -1 when self is negative and other is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with a Bignum when other is negative returns -1 when self is negative and other is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with a Bignum when other is negative returns 1 when self is negative and other is smaller" # Expected 0 to equal 1
-fails "Integer#<=> bignum with a Bignum when other is negative returns 1 when self is negative and other is smaller" # Expected 0 to equal 1
-fails "Integer#<=> bignum with a Bignum when other is positive returns -1 when self is positive and other is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with a Bignum when other is positive returns -1 when self is positive and other is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with a Bignum when other is positive returns 1 when other is smaller" # Expected 0 to equal 1
-fails "Integer#<=> bignum with a Bignum when other is positive returns 1 when other is smaller" # Expected 0 to equal 1
-fails "Integer#<=> bignum with an Object returns -1 if the coerced value is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with an Object returns -1 if the coerced value is larger" # Expected 0 to equal -1
 fails "Integer#<=> bignum with an Object returns nil if #coerce does not return an Array" # Expected 0 to be nil
-fails "Integer#<=> bignum with an Object returns nil if #coerce does not return an Array" # Expected 0 to be nil
-fails "Integer#== bignum returns the result of 'other == self' as a boolean" # Expected "woot" to equal true
 fails "Integer#== bignum returns the result of 'other == self' as a boolean" # Expected "woot" to equal true
 fails "Integer#== bignum returns the result of 'other == self' as a boolean" # Mock 'not integer' expected to receive ==("any_args") exactly 2 times but received it 1 times
-fails "Integer#== bignum returns the result of 'other == self' as a boolean" # Mock 'not integer' expected to receive ==("any_args") exactly 2 times but received it 1 times
-fails "Integer#== bignum returns true if self has the same value as the given argument" # Expected true to equal false
 fails "Integer#== bignum returns true if self has the same value as the given argument" # Expected true to equal false
 fails "Integer#=== bignum returns the result of 'other == self' as a boolean" # Expected "woot" to equal true
-fails "Integer#=== bignum returns the result of 'other == self' as a boolean" # Expected "woot" to equal true
-fails "Integer#=== bignum returns the result of 'other == self' as a boolean" # Mock 'not integer' expected to receive ==("any_args") exactly 2 times but received it 1 times
 fails "Integer#=== bignum returns the result of 'other == self' as a boolean" # Mock 'not integer' expected to receive ==("any_args") exactly 2 times but received it 1 times
 fails "Integer#=== bignum returns true if self has the same value as the given argument" # Expected true to equal false
-fails "Integer#=== bignum returns true if self has the same value as the given argument" # Expected true to equal false
-fails "Integer#> bignum returns true if self is greater than the given argument" # Expected false to equal true
 fails "Integer#> bignum returns true if self is greater than the given argument" # Expected false to equal true
 fails "Integer#>= bignum returns true if self is greater than or equal to other" # Expected true to equal false
-fails "Integer#>= bignum returns true if self is greater than or equal to other" # Expected true to equal false
-fails "Integer#>> (with n >> m) bignum calls #to_int to convert the argument to an Integer" # Expected 0 to equal 36893488147419103000
 fails "Integer#>> (with n >> m) bignum calls #to_int to convert the argument to an Integer" # Expected 0 to equal 36893488147419103000
 fails "Integer#>> (with n >> m) bignum respects twos complement signed shifting" # Expected 101376 to equal -2621440001220703000
-fails "Integer#>> (with n >> m) bignum respects twos complement signed shifting" # Expected 101376 to equal -2621440001220703000
-fails "Integer#>> (with n >> m) bignum respects twos complement signed shifting for very large values" # Expected 0 to equal 2.2204460502842888e+66
 fails "Integer#>> (with n >> m) bignum respects twos complement signed shifting for very large values" # Expected 0 to equal 2.2204460502842888e+66
 fails "Integer#>> (with n >> m) bignum returns n shifted left m bits when  n < 0, m < 0" # Expected 0 to equal -1.1805916207174113e+21
-fails "Integer#>> (with n >> m) bignum returns n shifted left m bits when  n < 0, m < 0" # Expected 0 to equal -1.1805916207174113e+21
-fails "Integer#>> (with n >> m) bignum returns n shifted left m bits when  n > 0, m < 0" # Expected 0 to equal 590295810358705700000
 fails "Integer#>> (with n >> m) bignum returns n shifted left m bits when  n > 0, m < 0" # Expected 0 to equal 590295810358705700000
 fails "Integer#>> (with n >> m) bignum returns n shifted right m bits when n < 0, m > 0" # Expected 0 to equal -36893488147419103000
-fails "Integer#>> (with n >> m) bignum returns n shifted right m bits when n < 0, m > 0" # Expected 0 to equal -36893488147419103000
-fails "Integer#>> (with n >> m) bignum returns n shifted right m bits when n > 0, m > 0" # Expected 0 to equal 73786976294838210000
 fails "Integer#>> (with n >> m) bignum returns n shifted right m bits when n > 0, m > 0" # Expected 0 to equal 73786976294838210000
 fails "Integer#>> (with n >> m) bignum returns n when n < 0, m == 0" # Expected 0 to equal -147573952589676410000
-fails "Integer#>> (with n >> m) bignum returns n when n < 0, m == 0" # Expected 0 to equal -147573952589676410000
-fails "Integer#>> (with n >> m) bignum returns n when n > 0, m == 0" # Expected 0 to equal 147573952589676410000
 fails "Integer#>> (with n >> m) bignum returns n when n > 0, m == 0" # Expected 0 to equal 147573952589676410000
 fails "Integer#>> (with n >> m) fixnum returns -1 when n < 0, m > 0 and n > -(2**m)" # Expected -7 to equal -1
-fails "Integer#>> (with n >> m) fixnum returns -1 when n < 0, m > 0 and n > -(2**m)" # Expected -7 to equal -1
-fails "Integer#>> (with n >> m) fixnum returns 0 when m is a bignum" # Expected 3 to equal 0
 fails "Integer#>> (with n >> m) fixnum returns 0 when m is a bignum" # Expected 3 to equal 0
 fails "Integer#>> (with n >> m) fixnum returns 0 when n > 0, m > 0 and n < 2**m" # Expected 7 to equal 0
-fails "Integer#>> (with n >> m) fixnum returns 0 when n > 0, m > 0 and n < 2**m" # Expected 7 to equal 0
-fails "Integer#>> (with n >> m) fixnum returns an Bignum == fixnum_max * 2 when fixnum_max >> -1 and n > 0" # NameError: uninitialized constant Bignum
 fails "Integer#>> (with n >> m) fixnum returns an Bignum == fixnum_max * 2 when fixnum_max >> -1 and n > 0" # NameError: uninitialized constant Bignum
 fails "Integer#>> (with n >> m) fixnum returns an Bignum == fixnum_min * 2 when fixnum_min >> -1 and n < 0" # NameError: uninitialized constant Bignum
-fails "Integer#>> (with n >> m) fixnum returns an Bignum == fixnum_min * 2 when fixnum_min >> -1 and n < 0" # NameError: uninitialized constant Bignum
-fails "Integer#[] bignum returns the nth bit in the binary representation of self" # Expected 0 to equal 1
 fails "Integer#[] bignum returns the nth bit in the binary representation of self" # Expected 0 to equal 1
 fails "Integer#[] bignum tries to convert the given argument to an Integer using #to_int" # Expected 0 to equal 1
-fails "Integer#[] bignum tries to convert the given argument to an Integer using #to_int" # Expected 0 to equal 1
-fails "Integer#^ bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (14 was returned)
 fails "Integer#^ bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (14 was returned)
 fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other" # Expected 2 to equal 9223372036854776000
-fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other" # Expected 2 to equal 9223372036854776000
-fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other when all bits are 1 and other value is negative" # Expected -1 to equal -9.903520314283042e+27
 fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other when all bits are 1 and other value is negative" # Expected -1 to equal -9.903520314283042e+27
 fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other when both operands are negative" # Expected 0 to equal 64563604257983430000
-fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other when both operands are negative" # Expected 0 to equal 64563604257983430000
-fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other when one operand is negative" # Expected 0 to equal -64563604257983430000
 fails "Integer#^ bignum returns self bitwise EXCLUSIVE OR other when one operand is negative" # Expected 0 to equal -64563604257983430000
 fails "Integer#^ fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
-fails "Integer#^ fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
-fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR a bignum" # Expected -1 to equal -18446744073709552000
 fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR a bignum" # Expected -1 to equal -18446744073709552000
 fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 to equal 9223372041149743000
-fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 to equal 9223372041149743000
-fails "Integer#allbits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
 fails "Integer#allbits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
 fails "Integer#allbits? coerces the rhs using to_int" # NoMethodError: undefined method `allbits?' for 6
-fails "Integer#allbits? coerces the rhs using to_int" # NoMethodError: undefined method `allbits?' for 6
-fails "Integer#allbits? handles negative values using two's complement notation" # NoMethodError: undefined method `allbits?' for -2
 fails "Integer#allbits? handles negative values using two's complement notation" # NoMethodError: undefined method `allbits?' for -2
 fails "Integer#allbits? raises a TypeError when given a non-Integer" # NoMethodError: undefined method `allbits?' for 13
-fails "Integer#allbits? raises a TypeError when given a non-Integer" # NoMethodError: undefined method `allbits?' for 13
-fails "Integer#allbits? returns true iff all the bits of the argument are set in the receiver" # NoMethodError: undefined method `allbits?' for 42
 fails "Integer#allbits? returns true iff all the bits of the argument are set in the receiver" # NoMethodError: undefined method `allbits?' for 42
 fails "Integer#anybits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
-fails "Integer#anybits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
-fails "Integer#anybits? coerces the rhs using to_int" # NoMethodError: undefined method `anybits?' for 6
 fails "Integer#anybits? coerces the rhs using to_int" # NoMethodError: undefined method `anybits?' for 6
 fails "Integer#anybits? handles negative values using two's complement notation" # NoMethodError: undefined method `anybits?' for -43
-fails "Integer#anybits? handles negative values using two's complement notation" # NoMethodError: undefined method `anybits?' for -43
-fails "Integer#anybits? raises a TypeError when given a non-Integer" # NoMethodError: undefined method `anybits?' for 13
 fails "Integer#anybits? raises a TypeError when given a non-Integer" # NoMethodError: undefined method `anybits?' for 13
 fails "Integer#anybits? returns true iff all the bits of the argument are set in the receiver" # NoMethodError: undefined method `anybits?' for 42
-fails "Integer#anybits? returns true iff all the bits of the argument are set in the receiver" # NoMethodError: undefined method `anybits?' for 42
-fails "Integer#bit_length bignum returns the position of the leftmost 0 bit of a negative number" # NoMethodError: undefined method `bit_length` for -Infinity:Float
 fails "Integer#bit_length bignum returns the position of the leftmost 0 bit of a negative number" # NoMethodError: undefined method `bit_length` for -Infinity:Float
 fails "Integer#bit_length bignum returns the position of the leftmost bit of a positive number" # Expected 1 to equal 1000
-fails "Integer#bit_length bignum returns the position of the leftmost bit of a positive number" # Expected 1 to equal 1000
-fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
 fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
 fails "Integer#coerce bignum coerces other to a Bignum and returns [other, self] when passed a Fixnum" # NameError: uninitialized constant Bignum
-fails "Integer#coerce bignum coerces other to a Bignum and returns [other, self] when passed a Fixnum" # NameError: uninitialized constant Bignum
-fails "Integer#coerce bignum raises a TypeError when not passed a Fixnum or Bignum" # ArgumentError: invalid value for Float(): "test"
 fails "Integer#coerce bignum raises a TypeError when not passed a Fixnum or Bignum" # ArgumentError: invalid value for Float(): "test"
 fails "Integer#coerce bignum returns [other, self] when passed a Bignum" # NameError: uninitialized constant Bignum
-fails "Integer#coerce bignum returns [other, self] when passed a Bignum" # NameError: uninitialized constant Bignum
-fails "Integer#coerce fixnum raises a TypeError when given an Object that does not respond to #to_f" # ArgumentError: invalid value for Float(): "test"
 fails "Integer#coerce fixnum raises a TypeError when given an Object that does not respond to #to_f" # ArgumentError: invalid value for Float(): "test"
 fails "Integer#digits converts the radix with #to_int" # NoMethodError: undefined method `arguments' for main
-fails "Integer#digits converts the radix with #to_int" # NoMethodError: undefined method `arguments' for main
-fails "Integer#digits converts the radix with #to_int" # NoMethodError: undefined method `digits' for 12345
 fails "Integer#digits converts the radix with #to_int" # NoMethodError: undefined method `digits' for 12345
 fails "Integer#digits raises ArgumentError when calling with a negative radix" # NoMethodError: undefined method `digits' for 12345
-fails "Integer#digits raises ArgumentError when calling with a negative radix" # NoMethodError: undefined method `digits' for 12345
-fails "Integer#digits raises ArgumentError when calling with a radix less than 2" # NoMethodError: undefined method `digits' for 12345
 fails "Integer#digits raises ArgumentError when calling with a radix less than 2" # NoMethodError: undefined method `digits' for 12345
 fails "Integer#digits raises Math::DomainError when calling digits on a negative number" # NoMethodError: undefined method `digits' for -12345
-fails "Integer#digits raises Math::DomainError when calling digits on a negative number" # NoMethodError: undefined method `digits' for -12345
-fails "Integer#digits returns [0] when called on 0, regardless of base" # NoMethodError: undefined method `digits' for 0
 fails "Integer#digits returns [0] when called on 0, regardless of base" # NoMethodError: undefined method `digits' for 0
 fails "Integer#digits returns an array of place values in base-10 by default" # NoMethodError: undefined method `digits' for 12345
-fails "Integer#digits returns an array of place values in base-10 by default" # NoMethodError: undefined method `digits' for 12345
-fails "Integer#digits returns digits by place value of a given radix" # NoMethodError: undefined method `digits' for 12345
 fails "Integer#digits returns digits by place value of a given radix" # NoMethodError: undefined method `digits' for 12345
 fails "Integer#div bignum calls #coerce and #div if argument responds to #coerce" # Mock 'x' expected to receive div(main) exactly 1 times but received it 0 times
-fails "Integer#div bignum calls #coerce and #div if argument responds to #coerce" # Mock 'x' expected to receive div(main) exactly 1 times but received it 0 times
-fails "Integer#div bignum calls #coerce and #div if argument responds to #coerce" # NoMethodError: undefined method `/' for main
 fails "Integer#div bignum calls #coerce and #div if argument responds to #coerce" # NoMethodError: undefined method `/' for main
 fails "Integer#div bignum looses precision if passed Float argument" # Expected 9223372036854776000 not to equal 9223372036854776000
-fails "Integer#div bignum looses precision if passed Float argument" # Expected 9223372036854776000 not to equal 9223372036854776000
-fails "Integer#div bignum returns self divided by other" # Expected 10000000000 to equal 9999999999
 fails "Integer#div bignum returns self divided by other" # Expected 10000000000 to equal 9999999999
 fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # Mock 'x' expected to receive div(main) exactly 1 times but received it 0 times
-fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # Mock 'x' expected to receive div(main) exactly 1 times but received it 0 times
-fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # NoMethodError: undefined method `/' for main
 fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # NoMethodError: undefined method `/' for main
 fails "Integer#divmod bignum raises a TypeError when the given argument is not an Integer" # NoMethodError: undefined method `nan?' for main
-fails "Integer#divmod bignum raises a TypeError when the given argument is not an Integer" # NoMethodError: undefined method `nan?' for main
-fails "Integer#divmod bignum returns an Array containing quotient and modulus obtained from dividing self by the given argument" # Expected [2305843009213694000, 0] to equal [2305843009213694000, 3]
 fails "Integer#divmod bignum returns an Array containing quotient and modulus obtained from dividing self by the given argument" # Expected [2305843009213694000, 0] to equal [2305843009213694000, 3]
 fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a < 0, b < 0 and |a| < |b|" # Expected [1, 0] to equal [0, -9223372036854776000]
-fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a < 0, b < 0 and |a| < |b|" # Expected [1, 0] to equal [0, -9223372036854776000]
-fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a < 0, b > 0 and |a| < b" # Expected [-1, 0] to equal [-1, 1]
 fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a < 0, b > 0 and |a| < b" # Expected [-1, 0] to equal [-1, 1]
 fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a > 0, b < 0 and a < |b|" # Expected [-1, 0] to equal [-1, -1]
-fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a > 0, b < 0 and a < |b|" # Expected [-1, 0] to equal [-1, -1]
-fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a > 0, b < 0 and a > |b|" # Expected [-1, 0] to equal [-2, -9223372036854776000]
 fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a > 0, b < 0 and a > |b|" # Expected [-1, 0] to equal [-2, -9223372036854776000]
 fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nan?' for main
-fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nan?' for main
-fails "Integer#even? fixnum returns true for a Bignum when it is an even number" # Expected true to be false
 fails "Integer#even? fixnum returns true for a Bignum when it is an even number" # Expected true to be false
 fails "Integer#modulo bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
-fails "Integer#modulo bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
-fails "Integer#nobits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
 fails "Integer#nobits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
 fails "Integer#nobits? coerces the rhs using to_int" # NoMethodError: undefined method `nobits?' for 6
-fails "Integer#nobits? coerces the rhs using to_int" # NoMethodError: undefined method `nobits?' for 6
-fails "Integer#nobits? handles negative values using two's complement notation" # NoMethodError: undefined method `nobits?' for -14
 fails "Integer#nobits? handles negative values using two's complement notation" # NoMethodError: undefined method `nobits?' for -14
 fails "Integer#nobits? raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nobits?' for 13
-fails "Integer#nobits? raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nobits?' for 13
-fails "Integer#nobits? returns true iff all no bits of the argument are set in the receiver" # NoMethodError: undefined method `nobits?' for 42
 fails "Integer#nobits? returns true iff all no bits of the argument are set in the receiver" # NoMethodError: undefined method `nobits?' for 42
 fails "Integer#odd? bignum returns false if self is even and negative" # Expected true to be false
-fails "Integer#odd? bignum returns false if self is even and negative" # Expected true to be false
-fails "Integer#odd? bignum returns true if self is odd and positive" # Expected false to be true
 fails "Integer#odd? bignum returns true if self is odd and positive" # Expected false to be true
 fails "Integer#odd? fixnum returns true when self is an odd number" # Expected false to be true
-fails "Integer#odd? fixnum returns true when self is an odd number" # Expected false to be true
-fails "Integer#pow one argument is passed bignum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `pow' for 9223372036854776000
 fails "Integer#pow one argument is passed bignum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `pow' for 9223372036854776000
 fails "Integer#pow one argument is passed bignum returns a complex number when negative and raised to a fractional power" # NoMethodError: undefined method `pow' for -9223372036854776000
-fails "Integer#pow one argument is passed bignum returns a complex number when negative and raised to a fractional power" # NoMethodError: undefined method `pow' for -9223372036854776000
-fails "Integer#pow one argument is passed bignum returns self raised to other power" # NoMethodError: undefined method `pow' for 9223372036854776000
 fails "Integer#pow one argument is passed bignum returns self raised to other power" # NoMethodError: undefined method `pow' for 9223372036854776000
 fails "Integer#pow one argument is passed bignum switch to a Float when the values is too big" # NoMethodError: undefined method `pow' for 9223372036854776000
-fails "Integer#pow one argument is passed bignum switch to a Float when the values is too big" # NoMethodError: undefined method `pow' for 9223372036854776000
-fails "Integer#pow one argument is passed fixnum can raise -1 to a bignum safely" # NoMethodError: undefined method `pow' for -1
 fails "Integer#pow one argument is passed fixnum can raise -1 to a bignum safely" # NoMethodError: undefined method `pow' for -1
 fails "Integer#pow one argument is passed fixnum can raise 1 to a bignum safely" # NoMethodError: undefined method `pow' for 1
-fails "Integer#pow one argument is passed fixnum can raise 1 to a bignum safely" # NoMethodError: undefined method `pow' for 1
-fails "Integer#pow one argument is passed fixnum coerces power and calls #**" # Mock '2' expected to receive coerce(13) exactly 1 times but received it 0 times
 fails "Integer#pow one argument is passed fixnum coerces power and calls #**" # Mock '2' expected to receive coerce(13) exactly 1 times but received it 0 times
 fails "Integer#pow one argument is passed fixnum coerces power and calls #**" # NoMethodError: undefined method `pow' for 13
-fails "Integer#pow one argument is passed fixnum coerces power and calls #**" # NoMethodError: undefined method `pow' for 13
-fails "Integer#pow one argument is passed fixnum overflows the answer to a bignum transparently" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow one argument is passed fixnum overflows the answer to a bignum transparently" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow one argument is passed fixnum raises a TypeError when given a non-numeric power" # NoMethodError: undefined method `pow' for 13
-fails "Integer#pow one argument is passed fixnum raises a TypeError when given a non-numeric power" # NoMethodError: undefined method `pow' for 13
-fails "Integer#pow one argument is passed fixnum raises a ZeroDivisionError for 0 ** -1" # NoMethodError: undefined method `pow' for 0
 fails "Integer#pow one argument is passed fixnum raises a ZeroDivisionError for 0 ** -1" # NoMethodError: undefined method `pow' for 0
 fails "Integer#pow one argument is passed fixnum raises negative numbers to the given power" # NoMethodError: undefined method `pow' for -2
-fails "Integer#pow one argument is passed fixnum raises negative numbers to the given power" # NoMethodError: undefined method `pow' for -2
-fails "Integer#pow one argument is passed fixnum returns Float when power is Float" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow one argument is passed fixnum returns Float when power is Float" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow one argument is passed fixnum returns Float::INFINITY for 0 ** -1.0" # NoMethodError: undefined method `pow' for 0
-fails "Integer#pow one argument is passed fixnum returns Float::INFINITY for 0 ** -1.0" # NoMethodError: undefined method `pow' for 0
-fails "Integer#pow one argument is passed fixnum returns Float::INFINITY when the number is too big" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow one argument is passed fixnum returns Float::INFINITY when the number is too big" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow one argument is passed fixnum returns Rational when power is Rational" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow one argument is passed fixnum returns Rational when power is Rational" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow one argument is passed fixnum returns a complex number when negative and raised to a fractional power" # NoMethodError: undefined method `pow' for -8
 fails "Integer#pow one argument is passed fixnum returns a complex number when negative and raised to a fractional power" # NoMethodError: undefined method `pow' for -8
 fails "Integer#pow one argument is passed fixnum returns self raised to the given power" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow one argument is passed fixnum returns self raised to the given power" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed ensures all arguments are integers" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow two arguments are passed ensures all arguments are integers" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow two arguments are passed handles sign like #divmod does" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed handles sign like #divmod does" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed raises TypeError for non-numeric value" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow two arguments are passed raises TypeError for non-numeric value" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow two arguments are passed raises a ZeroDivisionError when the given argument is 0" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed raises a ZeroDivisionError when the given argument is 0" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed returns modulo of self raised to the given power" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow two arguments are passed returns modulo of self raised to the given power" # NoMethodError: undefined method `pow' for 2
 fails "Integer#pow two arguments are passed works well with bignums" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed works well with bignums" # NoMethodError: undefined method `pow' for 2
-fails "Integer#remainder bignum does raises ZeroDivisionError if other is zero and a Float" # NoMethodError: undefined method `remainder' for 9223372036854776000
 fails "Integer#remainder bignum does raises ZeroDivisionError if other is zero and a Float" # NoMethodError: undefined method `remainder' for 9223372036854776000
 fails "Integer#remainder bignum raises a ZeroDivisionError if other is zero and not a Float" # NoMethodError: undefined method `remainder' for 9223372036854776000
-fails "Integer#remainder bignum raises a ZeroDivisionError if other is zero and not a Float" # NoMethodError: undefined method `remainder' for 9223372036854776000
-fails "Integer#remainder bignum returns the remainder of dividing self by other" # NoMethodError: undefined method `remainder' for 9223372036854776000
 fails "Integer#remainder bignum returns the remainder of dividing self by other" # NoMethodError: undefined method `remainder' for 9223372036854776000
 fails "Integer#remainder fixnum keeps sign of self" # NoMethodError: undefined method `remainder' for 5
-fails "Integer#remainder fixnum keeps sign of self" # NoMethodError: undefined method `remainder' for 5
-fails "Integer#remainder fixnum means x-y*(x/y).truncate" # NoMethodError: undefined method `remainder' for 5
 fails "Integer#remainder fixnum means x-y*(x/y).truncate" # NoMethodError: undefined method `remainder' for 5
 fails "Integer#remainder fixnum raises TypeError if passed non-numeric argument" # NoMethodError: undefined method `remainder' for 5
-fails "Integer#remainder fixnum raises TypeError if passed non-numeric argument" # NoMethodError: undefined method `remainder' for 5
-fails "Integer#remainder fixnum returns the remainder of dividing self by other" # NoMethodError: undefined method `remainder' for 5
 fails "Integer#remainder fixnum returns the remainder of dividing self by other" # NoMethodError: undefined method `remainder' for 5
 fails "Integer#round returns different rounded values depending on the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
-fails "Integer#round returns different rounded values depending on the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
-fails "Integer#round returns itself if passed a positive precision and the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
 fails "Integer#round returns itself if passed a positive precision and the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
 fails "Integer#size bignum returns the number of bytes required to hold the unsigned bignum data" # Expected 4 to equal 8
-fails "Integer#size bignum returns the number of bytes required to hold the unsigned bignum data" # Expected 4 to equal 8
-fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s bignum when given a base raises an ArgumentError if the base is less than 2 or higher than 36" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum when given a base raises an ArgumentError if the base is less than 2 or higher than 36" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum when given a base raises an ArgumentError if the base is less than 2 or higher than 36" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s bignum when given a base raises an ArgumentError if the base is less than 2 or higher than 36" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s bignum when given a base returns self converted to a String using the given base" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum when given a base returns self converted to a String using the given base" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum when given a base returns self converted to a String using the given base" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s bignum when given a base returns self converted to a String using the given base" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s bignum when given no base returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum when given no base returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s bignum when given no base returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s bignum when given no base returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum when given a base raises an ArgumentError if the base is less than 2 or higher than 36" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum when given a base raises an ArgumentError if the base is less than 2 or higher than 36" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum when given a base raises an ArgumentError if the base is less than 2 or higher than 36" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum when given a base raises an ArgumentError if the base is less than 2 or higher than 36" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum when given a base returns self converted to a String in the given base" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum when given a base returns self converted to a String in the given base" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum when given a base returns self converted to a String in the given base" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum when given a base returns self converted to a String in the given base" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#| bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (9 was returned)
 fails "Integer#| bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (9 was returned)
 fails "Integer#| bignum returns self bitwise OR other" # Expected 2 to equal 9223372036854776000
-fails "Integer#| bignum returns self bitwise OR other" # Expected 2 to equal 9223372036854776000
-fails "Integer#| bignum returns self bitwise OR other when both operands are negative" # Expected 0 to equal -1
 fails "Integer#| bignum returns self bitwise OR other when both operands are negative" # Expected 0 to equal -1
 fails "Integer#| bignum returns self bitwise OR other when one operand is negative" # Expected 0 to equal -64563604257983430000
-fails "Integer#| bignum returns self bitwise OR other when one operand is negative" # Expected 0 to equal -64563604257983430000
-fails "Integer#| fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
 fails "Integer#| fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
 fails "Integer#| fixnum returns self bitwise OR other" # Expected 65535 to equal 9223372036854841000
-fails "Integer#| fixnum returns self bitwise OR other" # Expected 65535 to equal 9223372036854841000
-fails "Integer#~ bignum returns self with each bit flipped" # Expected -1 to equal -9223372036854776000
 fails "Integer#~ bignum returns self with each bit flipped" # Expected -1 to equal -9223372036854776000
 fails "Integer.sqrt accepts any argument that can be coerced to Integer" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt accepts any argument that can be coerced to Integer" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt converts the argument with #to_int" # NoMethodError: undefined method `arguments' for main
 fails "Integer.sqrt converts the argument with #to_int" # NoMethodError: undefined method `arguments' for main
 fails "Integer.sqrt converts the argument with #to_int" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt converts the argument with #to_int" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt raises a Math::DomainError if the argument is negative" # NoMethodError: undefined method `sqrt' for Integer
 fails "Integer.sqrt raises a Math::DomainError if the argument is negative" # NoMethodError: undefined method `sqrt' for Integer
 fails "Integer.sqrt raises a TypeError if the argument cannot be coerced to Integer" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt raises a TypeError if the argument cannot be coerced to Integer" # NoMethodError: undefined method `sqrt' for Integer
 fails "Integer.sqrt returns an integer" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt returns an integer" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt returns the integer square root of the argument" # NoMethodError: undefined method `sqrt' for Integer
 fails "Integer.sqrt returns the integer square root of the argument" # NoMethodError: undefined method `sqrt' for Integer
 fails "Invoking a method expands the Array elements from the splat after executing the arguments and block if no other arguments follow the splat" # Expected [[1, nil], nil] to equal [[1], nil]
 fails "Kernel#inspect returns a String with the object class and object_id encoded" # Expected "main" to match /^#<Object:0x[0-9a-f]+>$/
@@ -1092,8 +897,6 @@ fails "Rational#to_r fails when a BasicObject's to_r does not return a Rational"
 fails "Rational#to_r works when a BasicObject has to_r" # NoMethodError: undefined method `nil?' for BasicObject
 fails "Set#=== is an alias for include?" # Expected #<Method: Set#=== (defined in Kernel in corelib/kernel.rb:14)> to equal #<Method: Set#include? (defined in Set in set.rb:125)>
 fails "Set#=== member equality is checked using both #hash and #eql?" # Expected false to equal true
-fails "Set#=== member equality is checked using both #hash and #eql?" # Expected false to equal true
-fails "Set#=== returns true when self contains the passed Object" # Expected false to be true
 fails "Set#=== returns true when self contains the passed Object" # Expected false to be true
 fails "Set#compare_by_identity causes future comparisons on the receiver to be made by identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {1}>
 fails "Set#compare_by_identity compares its members by identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
@@ -1203,7 +1006,6 @@ fails "String#intern returns a US-ASCII Symbol for a UTF-8 String containing onl
 fails "String#intern returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # NoMethodError: undefined method `b' for "foobar":String
 fails "String#intern returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
 fails "String#intern returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
-fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
 fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
 fails "String#start_with? sets Regexp.last_match if it returns true" # TypeError: no implicit conversion of Regexp into String
 fails "String#start_with? supports regexps" # TypeError: no implicit conversion of Regexp into String
