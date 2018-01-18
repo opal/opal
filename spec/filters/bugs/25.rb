@@ -12,8 +12,8 @@ fails "BigDecimal.limit uses the global limit if no precision is specified" # Ex
 fails "Constant resolution within methods with ||= assigns a global constant if previously undefined" # NameError: uninitialized constant OpAssignGlobalUndefined
 fails "Constant resolution within methods with ||= assigns a scoped constant if previously undefined" # NameError: uninitialized constant ConstantSpecs::OpAssignUndefined
 fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # Works, but depends on the difference between Integer and Float
-fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Expected false to equal true
-fails "Enumerable#uniq uses eql? semantics" # Expected [1] to equal [1, 1]
+fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting
+fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
 fails "Float#* does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
 fails "Float#+ does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
 fails "Float#- does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
