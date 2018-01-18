@@ -18,13 +18,6 @@ fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # 
 fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
 fails "Float#round returns different rounded values depending on the half option" # TypeError: no implicit conversion of Hash into Integer
 fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
-fails "Hash#transform_keys! does not prevent conflicts between new keys and old ones" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-fails "Hash#transform_keys! keeps later pair if new keys conflict" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-fails "Hash#transform_keys! on frozen instance when no block is given does not raise an exception" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-fails "Hash#transform_keys! partially modifies the contents if we broke from the block" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-fails "Hash#transform_keys! returns self" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-fails "Hash#transform_keys! updates self as transformed values with the given block" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-fails "Hash#transform_keys! when no block is given returns a sized Enumerator" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Integer is the class of both small and large integers" # Expected Number to be identical to Integer
 fails "Integer#% bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
 fails "Integer#& bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
