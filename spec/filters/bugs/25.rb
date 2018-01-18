@@ -18,12 +18,6 @@ fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # 
 fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
 fails "Float#round returns different rounded values depending on the half option" # TypeError: no implicit conversion of Hash into Integer
 fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
-fails "Hash#transform_keys keeps last pair if new keys conflict" # NoMethodError: undefined method `transform_keys' for {"a"=>1, "b"=>2, "c"=>3}
-fails "Hash#transform_keys makes both hashes to share values" # NoMethodError: undefined method `transform_keys' for {"a"=>[1, 2, 3]}
-fails "Hash#transform_keys returns a Hash instance, even on subclasses" # NoMethodError: undefined method `transform_keys' for {"foo"=>42}
-fails "Hash#transform_keys returns new hash" # NoMethodError: undefined method `transform_keys' for {"a"=>1, "b"=>2, "c"=>3}
-fails "Hash#transform_keys sets the result as transformed keys with the given block" # NoMethodError: undefined method `transform_keys' for {"a"=>1, "b"=>2, "c"=>3}
-fails "Hash#transform_keys when no block is given returns a sized Enumerator" # NoMethodError: undefined method `transform_keys' for {"a"=>1, "b"=>2, "c"=>3}
 fails "Hash#transform_keys! does not prevent conflicts between new keys and old ones" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Hash#transform_keys! keeps later pair if new keys conflict" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
 fails "Hash#transform_keys! on frozen instance when no block is given does not raise an exception" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}

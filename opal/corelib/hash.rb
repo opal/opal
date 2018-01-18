@@ -1078,6 +1078,31 @@ class Hash
 
   alias to_s inspect
 
+  def transform_keys(&block)
+    return enum_for(:transform_keys){self.size} unless block
+
+    %x{
+      var result = Opal.hash();
+
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+        key = keys[i];
+
+        if (key.$$is_string) {
+          value = self.$$smap[key];
+        } else {
+          value = key.value;
+          key = key.key;
+        }
+
+        key = Opal.yield1(block, key);
+
+        Opal.hash_put(result, key, value);
+      }
+
+      return result;
+    }
+  end
+
   def transform_values(&block)
     return enum_for(:transform_values){self.size} unless block
 
