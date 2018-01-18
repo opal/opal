@@ -59,8 +59,8 @@ class Numeric
 
   alias arg angle
 
-  def ceil
-    to_f.ceil
+  def ceil(ndigits = 0)
+    to_f.ceil(ndigits)
   end
 
   def conj
@@ -87,8 +87,8 @@ class Numeric
     self.to_f / other
   end
 
-  def floor
-    to_f.floor
+  def floor(ndigits = 0)
+    to_f.floor(ndigits)
   end
 
   def i
@@ -153,8 +153,8 @@ class Numeric
     to_i
   end
 
-  def truncate
-    to_f.truncate
+  def truncate(ndigits = 0)
+    to_f.truncate(ndigits)
   end
 
   def zero?

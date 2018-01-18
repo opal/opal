@@ -351,8 +351,23 @@ class Number < Numeric
     }
   end
 
-  def ceil
-    `Math.ceil(self)`
+  def ceil(ndigits = 0)
+    %x{
+      var f = #{to_f};
+
+      if (f % 1 === 0 && ndigits >= 0) {
+        return f;
+      }
+
+      var factor = Math.pow(10, ndigits),
+          result = Math.ceil(f * factor) / factor;
+
+      if (f % 1 === 0) {
+        result = Math.round(result);
+      }
+
+      return result;
+    }
   end
 
   def chr(encoding = undefined)
@@ -395,8 +410,23 @@ class Number < Numeric
     `self % 2 === 0`
   end
 
-  def floor
-    `Math.floor(self)`
+  def floor(ndigits = 0)
+    %x{
+      var f = #{to_f};
+
+      if (f % 1 === 0 && ndigits >= 0) {
+        return f;
+      }
+
+      var factor = Math.pow(10, ndigits),
+          result = Math.floor(f * factor) / factor;
+
+      if (f % 1 === 0) {
+        result = Math.round(result);
+      }
+
+      return result;
+    }
   end
 
   def gcd(other)
@@ -811,7 +841,24 @@ class Number < Numeric
     `self.toString(base)`
   end
 
-  alias truncate to_i
+  def truncate(ndigits = 0)
+    %x{
+      var f = #{to_f};
+
+      if (f % 1 === 0 && ndigits >= 0) {
+        return f;
+      }
+
+      var factor = Math.pow(10, ndigits),
+          result = parseInt(f * factor, 10) / factor;
+
+      if (f % 1 === 0) {
+        result = Math.round(result);
+      }
+
+      return result;
+    }
+  end
 
   alias inspect to_s
 

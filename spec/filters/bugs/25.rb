@@ -16,10 +16,7 @@ fails "Constant resolution within methods with ||= assigns a scoped constant if 
 fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # Works, but depends on the difference between Integer and Float
 fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting
 fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
-fails "Float#ceil returns the smallest number greater than or equal to self with an optionally given precision" # ArgumentError: [Number#ceil] wrong number of arguments(1 for 0)
-fails "Float#floor returns the largest number less than or equal to self with an optionally given precision" # ArgumentError: [Number#floor] wrong number of arguments(1 for 0)
 fails "Float#round returns different rounded values depending on the half option" # TypeError: no implicit conversion of Hash into Integer
-fails "Float#truncate returns self truncated to an optionally given precision" # ArgumentError: [Number#to_i] wrong number of arguments(1 for 0)
 fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
 fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
 fails "Hash#fetch when the key is not found sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
@@ -219,12 +216,6 @@ fails "Integer#bit_length bignum returns the position of the leftmost 0 bit of a
 fails "Integer#bit_length bignum returns the position of the leftmost 0 bit of a negative number" # NoMethodError: undefined method `bit_length` for -Infinity:Float
 fails "Integer#bit_length bignum returns the position of the leftmost bit of a positive number" # Expected 1 to equal 1000
 fails "Integer#bit_length bignum returns the position of the leftmost bit of a positive number" # Expected 1 to equal 1000
-fails "Integer#ceil precision argument specified as part of the ceil method is negative returns the smallest integer greater than self with at least precision.abs trailing zeros" # ArgumentError: [Number#ceil] wrong number of arguments(1 for 0)
-fails "Integer#ceil precision argument specified as part of the ceil method is negative returns the smallest integer greater than self with at least precision.abs trailing zeros" # ArgumentError: [Number#ceil] wrong number of arguments(1 for 0)
-fails "Integer#ceil returns itself if passed a positive precision" # ArgumentError: [Number#ceil] wrong number of arguments(1 for 0)
-fails "Integer#ceil returns itself if passed a positive precision" # ArgumentError: [Number#ceil] wrong number of arguments(1 for 0)
-fails "Integer#ceil returns self if passed a precision of zero" # ArgumentError: [Number#ceil] wrong number of arguments(1 for 0)
-fails "Integer#ceil returns self if passed a precision of zero" # ArgumentError: [Number#ceil] wrong number of arguments(1 for 0)
 fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
 fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
 fails "Integer#coerce bignum coerces other to a Bignum and returns [other, self] when passed a Fixnum" # NameError: uninitialized constant Bignum
@@ -279,12 +270,6 @@ fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMe
 fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nan?' for main
 fails "Integer#even? fixnum returns true for a Bignum when it is an even number" # Expected true to be false
 fails "Integer#even? fixnum returns true for a Bignum when it is an even number" # Expected true to be false
-fails "Integer#floor precision argument specified as part of the floor method is negative returns the largest integer less than self with at least precision.abs trailing zeros" # ArgumentError: [Number#floor] wrong number of arguments(1 for 0)
-fails "Integer#floor precision argument specified as part of the floor method is negative returns the largest integer less than self with at least precision.abs trailing zeros" # ArgumentError: [Number#floor] wrong number of arguments(1 for 0)
-fails "Integer#floor returns itself if passed a positive precision" # ArgumentError: [Number#floor] wrong number of arguments(1 for 0)
-fails "Integer#floor returns itself if passed a positive precision" # ArgumentError: [Number#floor] wrong number of arguments(1 for 0)
-fails "Integer#floor returns self if passed a precision of zero" # ArgumentError: [Number#floor] wrong number of arguments(1 for 0)
-fails "Integer#floor returns self if passed a precision of zero" # ArgumentError: [Number#floor] wrong number of arguments(1 for 0)
 fails "Integer#modulo bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
 fails "Integer#modulo bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
 fails "Integer#nobits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
@@ -411,14 +396,6 @@ fails "Integer#to_s fixnum when no base given returns self converted to a String
 fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal' for Encoding
 fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal=' for Encoding
 fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal=' for Encoding
-fails "Integer#truncate precision argument specified as part of the truncate method is negative returns an integer with at least precision.abs trailing zeros" # ArgumentError: [Number#to_i] wrong number of arguments(1 for 0)
-fails "Integer#truncate precision argument specified as part of the truncate method is negative returns an integer with at least precision.abs trailing zeros" # ArgumentError: [Number#to_i] wrong number of arguments(1 for 0)
-fails "Integer#truncate returns itself if passed a positive precision" # ArgumentError: [Number#to_i] wrong number of arguments(1 for 0)
-fails "Integer#truncate returns itself if passed a positive precision" # ArgumentError: [Number#to_i] wrong number of arguments(1 for 0)
-fails "Integer#truncate returns self if not passed a precision" # Expected 1 to have same value and type as 1.0000000000000002e+70
-fails "Integer#truncate returns self if not passed a precision" # Expected 1 to have same value and type as 1.0000000000000002e+70
-fails "Integer#truncate returns self if passed a precision of zero" # ArgumentError: [Number#to_i] wrong number of arguments(1 for 0)
-fails "Integer#truncate returns self if passed a precision of zero" # ArgumentError: [Number#to_i] wrong number of arguments(1 for 0)
 fails "Integer#| bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (9 was returned)
 fails "Integer#| bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (9 was returned)
 fails "Integer#| bignum returns self bitwise OR other" # Expected 2 to equal 9223372036854776000
