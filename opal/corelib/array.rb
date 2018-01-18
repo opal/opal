@@ -459,7 +459,7 @@ class Array < `Array`
     end
   end
 
-  def any?
+  def any?(pattern = undefined, &block)
     `if (self.length === 0) return false`
     super
   end

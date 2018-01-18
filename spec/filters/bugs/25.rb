@@ -11,17 +11,7 @@ fails "BigDecimal.limit picks the specified precision over global limit" # Expec
 fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
 fails "Constant resolution within methods with ||= assigns a global constant if previously undefined" # NameError: uninitialized constant OpAssignGlobalUndefined
 fails "Constant resolution within methods with ||= assigns a scoped constant if previously undefined" # NameError: uninitialized constant ConstantSpecs::OpAssignUndefined
-fails "Enumerable#all? with no block given a pattern argument returns true iff all match that pattern" # ArgumentError: [Numerous#all?] wrong number of arguments(1 for 0)
-fails "Enumerable#any? when given a pattern argument always returns false on empty enumeration" # ArgumentError: [Empty#any?] wrong number of arguments(1 for 0)
-fails "Enumerable#any? when given a pattern argument any? should return false if the block never returns other than false or nil" # ArgumentError: [Array#any?] wrong number of arguments(1 for 0)
-fails "Enumerable#any? when given a pattern argument calls `===` on the pattern the return value " # ArgumentError: [Array#any?] wrong number of arguments(1 for 0)
-fails "Enumerable#any? when given a pattern argument calls the pattern with gathered array when yielded with multiple arguments" # ArgumentError: [YieldsMixed2#any?] wrong number of arguments(1 for 0)
-fails "Enumerable#any? when given a pattern argument does not hide exceptions out of #each" # ArgumentError: [ThrowingEach#any?] wrong number of arguments(1 for 0)
-fails "Enumerable#any? when given a pattern argument does not hide exceptions out of the block" # ArgumentError: [Numerous#any?] wrong number of arguments(1 for 0)
-fails "Enumerable#any? when given a pattern argument ignores block" # ArgumentError: [Array#any?] wrong number of arguments(1 for 0)
-fails "Enumerable#any? when given a pattern argument returns true if the pattern ever returns a truthy value" # ArgumentError: [Array#any?] wrong number of arguments(1 for 0)
-fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # ArgumentError: [Numerous#none?] wrong number of arguments(1 for 0)
-fails "Enumerable#one? when passed a block given a pattern argument returns true iff none match that pattern" # ArgumentError: [Numerous#one?] wrong number of arguments(1 for 0)
+fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # Works, but depends on the difference between Integer and Float
 fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Expected false to equal true
 fails "Enumerable#uniq uses eql? semantics" # Expected [1] to equal [1, 1]
 fails "Float#* does not rescue exception raised in other#coerce" # TypeError: MockObject can't be coerce into Numeric
