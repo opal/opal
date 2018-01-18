@@ -88,6 +88,7 @@ class Interrupt         < Exception; end
 class SecurityError     < Exception; end
 
 class StandardError     < Exception; end
+class EncodingError       < StandardError; end
 class ZeroDivisionError   < StandardError; end
 class NameError           < StandardError; end
 class NoMethodError         < NameError; end
