@@ -18,11 +18,6 @@ fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # 
 fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
 fails "Float#round returns different rounded values depending on the half option" # TypeError: no implicit conversion of Hash into Integer
 fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
-fails "Hash#slice returns a Hash instance, even on subclasses" # NoMethodError: undefined method `slice' for {"foo"=>42}
-fails "Hash#slice returns a hash ordered in the order of the requested keys" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
-fails "Hash#slice returns new hash" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
-fails "Hash#slice returns only the keys of the original hash" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
-fails "Hash#slice returns the requested subset" # NoMethodError: undefined method `slice' for {"a"=>1, "b"=>2, "c"=>3}
 fails "Hash#transform_keys keeps last pair if new keys conflict" # NoMethodError: undefined method `transform_keys' for {"a"=>1, "b"=>2, "c"=>3}
 fails "Hash#transform_keys makes both hashes to share values" # NoMethodError: undefined method `transform_keys' for {"a"=>[1, 2, 3]}
 fails "Hash#transform_keys returns a Hash instance, even on subclasses" # NoMethodError: undefined method `transform_keys' for {"foo"=>42}

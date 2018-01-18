@@ -1006,6 +1006,22 @@ class Hash
 
   alias size length
 
+  def slice(*keys)
+    %x{
+      var result = Opal.hash();
+
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], value = Opal.hash_get(self, key);
+
+        if (value !== undefined) {
+          Opal.hash_put(result, key, value);
+        }
+      }
+
+      return result;
+    }
+  end
+
   alias_method :store, :[]=
 
   def to_a
