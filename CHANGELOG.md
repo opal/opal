@@ -35,6 +35,7 @@ Whitespace conventions:
 - Added the CLI option `--runner-options` that allows passing arbitrary options to the selected runner, currently the only runner making use of them is `server` accepting `port` and `static_folder`
 - Added a short helper to navigate constants manually: E.g. `Opal.$$.Regexp.$$.IGNORECASE` (see docs for "Compiled Ruby")
 - Added initial support for OpenURI module (using XMLHttpRequest on browser and [xmlhttprequest](https://www.npmjs.com/package/xmlhttprequest) on Node). (#1735)
+- Added `String#prepend` to the list of unsupported methods (because String are immutable in JavaScript)
 
 
 ### Changed
