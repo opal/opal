@@ -227,6 +227,38 @@ module Testing
     end
   end
 
+  class HTTPServer
+    def with_server
+      begin
+        server = Process.spawn 'ruby test/opal/http_server.rb'
+        puts 'Waiting for server…'
+        sleep 0.1 until sinatra_server_running?
+        puts 'Server ready.'
+        yield self
+      ensure
+        if windows?
+          # https://blog.simplificator.com/2016/01/18/how-to-kill-processes-on-windows-using-ruby/
+          # system("taskkill /f /pid #{pid}")
+          Process.kill("KILL", server)
+        else
+          Process.kill(:TERM, server)
+        end
+        Process.wait(server)
+      end
+    end
+
+    def windows?
+      (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def sinatra_server_running?
+      puts "Connecting to localhost:4567..."
+      TCPSocket.new('localhost', '4567').close
+      true
+    rescue Errno::ECONNREFUSED, Errno::EADDRNOTAVAIL
+      false
+    end
+  end
 end
 
 
@@ -283,18 +315,21 @@ platforms.each do |platform|
           ruby/test_call.rb
           opal/test_keyword.rb
           opal/test_base64.rb
+          opal/test_openuri.rb
           opal/unsupported_and_bugs.rb
         ]
       end
+      Testing::HTTPServer.new.with_server do |session|
+        filename = "tmp/minitest_#{suite}_#{platform}.rb"
+        files.push('nodejs') if platform == 'nodejs'
+        Testing::Minitest.write_file(filename, files, ENV)
 
-      filename = "tmp/minitest_#{suite}_#{platform}.rb"
-      Testing::Minitest.write_file(filename, files, ENV)
+        stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+        includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
 
-      stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
-      includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
-
-      sh "ruby -rbundler/setup "\
+        sh "ruby -rbundler/setup "\
          "exe/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+      end
     end
   end
 end
