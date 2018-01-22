@@ -34,6 +34,7 @@ Whitespace conventions:
 - Added ability to pass the port to the "server" CLI runner using the `OPAL_CLI_RUNNERS_SERVER_PORT` (explicit option passed via CLI is still working but deprecated)
 - Added the CLI option `--runner-options` that allows passing arbitrary options to the selected runner, currently the only runner making use of them is `server` accepting `port` and `static_folder`
 - Added a short helper to navigate constants manually: E.g. `Opal.$$.Regexp.$$.IGNORECASE` (see docs for "Compiled Ruby")
+- Added initial support for OpenURI module (using XMLHttpRequest on browser and [xmlhttprequest](https://www.npmjs.com/package/xmlhttprequest) on Node). (#1735)
 
 
 ### Changed
@@ -41,6 +42,7 @@ Whitespace conventions:
 - The internal API for CLI runners has changed, now it's just a callable object
 - The `--map` CLI option now works only in conjunction with `--compile` (or `--runner compiler`)
 - The `node` CLI runner now adds its `NODE_PATH` entry instead of replacing the ENV var altogether
+- Added `--disable-web-security` option flag to the Chrome headless runner to be able to do `XMLHttpRequest`
 
 
 ### Deprecated
