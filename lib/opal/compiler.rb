@@ -332,6 +332,34 @@ module Opal
       @scope.in_while?
     end
 
+    def in_async
+      return unless block_given?
+
+      @in_async = true
+      result = yield
+      @in_async = false
+
+      result
+    end
+
+    def in_async?
+      !!@in_async
+    end
+
+    def in_await
+      return unless block_given?
+
+      @in_await = true
+      result = yield
+      @in_await = false
+
+      result
+    end
+
+    def in_await?
+      !!@in_await
+    end
+
     # Process the given sexp by creating a node instance, based on its type,
     # and compiling it to fragments.
     def process(sexp, level = :expr)

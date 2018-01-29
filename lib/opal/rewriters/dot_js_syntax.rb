@@ -24,6 +24,10 @@ module Opal
 
               property, value = *args
               node = to_js_attr_assign_call(recv_of_recv, property, value)
+            when :async
+              node = s(:async, *args)
+            when :await
+              node = s(:await, *args)
             else
               node = to_native_js_call(recv_of_recv, meth, args)
             end

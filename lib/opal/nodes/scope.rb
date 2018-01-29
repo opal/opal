@@ -301,6 +301,14 @@ module Opal
       def in_ensure?
         !!@in_ensure
       end
+
+      def in_async?
+        scope.parent && scope.parent.type == :async
+      end
+
+      def in_await?
+        scope.parent && scope.parent.type == :await
+      end
     end
   end
 end
