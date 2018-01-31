@@ -176,4 +176,12 @@ class Numeric
   def clone(freeze: true)
     self
   end
+
+  def finite?
+    true
+  end
+
+  def infinite?
+    nil
+  end
 end

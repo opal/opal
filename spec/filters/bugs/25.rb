@@ -350,8 +350,6 @@ fails "Module#using scope of refinement is not active before the `using` call" #
 fails "Module#using scope of refinement is not active for code defined outside the current scope" # NoMethodError: undefined method `refine' for #<Module:0x2a072>
 fails "Module#using scope of refinement is not active when class/module reopens" # NoMethodError: undefined method `refine' for #<Module:0x2a056>
 fails "Module#using works in classes too" # NoMethodError: undefined method `refine' for #<Module:0x2a01c>
-fails "Numeric#finite? returns true by default" # NoMethodError: undefined method `finite?' for main
-fails "Numeric#infinite? returns nil by default" # NoMethodError: undefined method `infinite?' for main
 fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
 fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
 fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
@@ -545,8 +543,7 @@ fails "rescuing SignalException raises a SignalException when sent a signal" # N
 fails "top-level constant lookup on a class does not search Object after searching other scopes" # Expected NameError but no exception was raised (Hash was returned)
 
 
-# Found manually, these specs depend on some shared behavior
-# env RUBYSPECS=true RANDOM_SEED=23905 PATTERN=spec/ruby/core/**/*_spec.rb bundle exec rake mspec_ruby_nodejs
+# The following specs depend on some shared behavior
 fails "Kernel#sprintf faulty key raises a KeyError"
 fails "Kernel.sprintf faulty key raises a KeyError"
 fails "String#% faulty key raises a KeyError"
