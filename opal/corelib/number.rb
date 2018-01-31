@@ -305,6 +305,16 @@ class Number < Numeric
     `Math.abs(self * self)`
   end
 
+  def allbits?(mask)
+    mask = Opal.coerce_to! mask, Integer, :to_int
+    `(self & mask) == mask`
+  end
+
+  def anybits?(mask)
+    mask = Opal.coerce_to! mask, Integer, :to_int
+    `(self & mask) !== 0`
+  end
+
   def angle
     return self if nan?
 

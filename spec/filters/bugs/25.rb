@@ -31,16 +31,6 @@ fails "Integer#>> (with n >> m) fixnum returns -1 when n < 0, m > 0 and n > -(2*
 fails "Integer#>> (with n >> m) fixnum returns 0 when n > 0, m > 0 and n < 2**m" # Expected 7 to equal 0
 fails "Integer#^ fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
 fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 to equal 9223372041149743000
-fails "Integer#allbits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
-fails "Integer#allbits? coerces the rhs using to_int" # NoMethodError: undefined method `allbits?' for 6
-fails "Integer#allbits? handles negative values using two's complement notation" # NoMethodError: undefined method `allbits?' for -2
-fails "Integer#allbits? raises a TypeError when given a non-Integer" # NoMethodError: undefined method `allbits?' for 13
-fails "Integer#allbits? returns true iff all the bits of the argument are set in the receiver" # NoMethodError: undefined method `allbits?' for 42
-fails "Integer#anybits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
-fails "Integer#anybits? coerces the rhs using to_int" # NoMethodError: undefined method `anybits?' for 6
-fails "Integer#anybits? handles negative values using two's complement notation" # NoMethodError: undefined method `anybits?' for -43
-fails "Integer#anybits? raises a TypeError when given a non-Integer" # NoMethodError: undefined method `anybits?' for 13
-fails "Integer#anybits? returns true iff all the bits of the argument are set in the receiver" # NoMethodError: undefined method `anybits?' for 42
 fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
 fails "Integer#coerce fixnum raises a TypeError when given an Object that does not respond to #to_f" # depends on the difference between string/symbol
 fails "Integer#digits converts the radix with #to_int" # NoMethodError: undefined method `arguments' for main
