@@ -1,4 +1,4 @@
-# All these specs file because RubySpec uses temporary files.
+# All these specs fail because RubySpec uses temporary files.
 # It writes some code to tmporary file and requires it in runtime.
 # Opal doesn't support it.
 opal_filter "Specs that use temporary files" do
