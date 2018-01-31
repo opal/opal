@@ -37,22 +37,6 @@ fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce
 fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # NoMethodError: undefined method `/' for main
 fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nan?' for main
 fails "Integer#odd? fixnum returns true when self is an odd number" # Expected false to be true
-fails "Integer#pow one argument is passed fixnum coerces power and calls #**" # Mock '2' expected to receive coerce(13) exactly 1 times but received it 0 times
-fails "Integer#pow one argument is passed fixnum coerces power and calls #**" # NoMethodError: undefined method `pow' for 13
-fails "Integer#pow one argument is passed fixnum raises a TypeError when given a non-numeric power" # NoMethodError: undefined method `pow' for 13
-fails "Integer#pow one argument is passed fixnum raises a ZeroDivisionError for 0 ** -1" # NoMethodError: undefined method `pow' for 0
-fails "Integer#pow one argument is passed fixnum raises negative numbers to the given power" # NoMethodError: undefined method `pow' for -2
-fails "Integer#pow one argument is passed fixnum returns Float when power is Float" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow one argument is passed fixnum returns Float::INFINITY for 0 ** -1.0" # NoMethodError: undefined method `pow' for 0
-fails "Integer#pow one argument is passed fixnum returns Float::INFINITY when the number is too big" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow one argument is passed fixnum returns Rational when power is Rational" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow one argument is passed fixnum returns a complex number when negative and raised to a fractional power" # NoMethodError: undefined method `pow' for -8
-fails "Integer#pow one argument is passed fixnum returns self raised to the given power" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed ensures all arguments are integers" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed handles sign like #divmod does" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed raises TypeError for non-numeric value" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed raises a ZeroDivisionError when the given argument is 0" # NoMethodError: undefined method `pow' for 2
-fails "Integer#pow two arguments are passed returns modulo of self raised to the given power" # NoMethodError: undefined method `pow' for 2
 fails "Integer#remainder fixnum keeps sign of self" # NoMethodError: undefined method `remainder' for 5
 fails "Integer#remainder fixnum means x-y*(x/y).truncate" # NoMethodError: undefined method `remainder' for 5
 fails "Integer#remainder fixnum raises TypeError if passed non-numeric argument" # NoMethodError: undefined method `remainder' for 5

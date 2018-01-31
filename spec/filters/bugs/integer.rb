@@ -27,4 +27,5 @@ opal_filter "Integer" do
   fails "Integer#gcdlcm returns the least common multiple of self and argument as the last element"
   fails "Integer#round returns itself rounded to nearest if passed a negative value" # Expected NaN to have same value and type as 300
   fails "Integer#** fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
+  fails "Integer#pow one argument is passed fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
 end

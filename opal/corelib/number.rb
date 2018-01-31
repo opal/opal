@@ -533,6 +533,36 @@ class Number < Numeric
     self
   end
 
+  def pow(b, m = undefined)
+    %x{
+      if (self == 0) {
+        #{raise ZeroDivisionError, 'divided by 0'}
+      }
+
+      if (m === undefined) {
+        return #{self ** b};
+      } else {
+        if (!(#{Integer === b})) {
+          #{raise TypeError, 'Integer#pow() 2nd argument not allowed unless a 1st argument is integer'}
+        }
+
+        if (b < 0) {
+          #{raise TypeError, 'Integer#pow() 1st argument cannot be negative when 2nd argument specified'}
+        }
+
+        if (!(#{Integer === m})) {
+          #{raise TypeError, 'Integer#pow() 2nd argument not allowed unless all arguments are integers'}
+        }
+
+        if (m === 0) {
+          #{raise ZeroDivisionError, 'divided by 0'}
+        }
+
+        return #{(self ** b) % m}
+      }
+    }
+  end
+
   def pred
     `self - 1`
   end

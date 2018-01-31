@@ -94,4 +94,6 @@ opal_unsupported_filter "Integer" do
   fails "Integer#| bignum returns self bitwise OR other when one operand is negative" # Expected 0 to equal -64563604257983430000
   fails "Integer#| bignum returns self bitwise OR other" # Expected 2 to equal 9223372036854776000
   fails "Integer#~ bignum returns self with each bit flipped" # Expected -1 to equal -9223372036854776000
+  fails "Integer#pow one argument is passed fixnum returns Float::INFINITY for 0 ** -1.0" # Depends on the difference between Integer and Float
+  fails "Integer#pow two arguments are passed ensures all arguments are integers" # Depends on the difference between Integer and Float
 end
