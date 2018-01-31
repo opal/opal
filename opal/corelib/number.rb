@@ -844,8 +844,10 @@ class Number < Numeric
   end
 
   def to_s(base = 10)
+    base = Opal.coerce_to! base, Integer, :to_int
+
     if base < 2 || base > 36
-      raise ArgumentError, 'base must be between 2 and 36'
+      raise ArgumentError, "invalid radix #{base}"
     end
 
     `self.toString(base)`
@@ -871,6 +873,29 @@ class Number < Numeric
   end
 
   alias inspect to_s
+
+  def digits(base = 10)
+    if self < 0
+      raise Math::DomainError, 'out of domain'
+    end
+
+    base = Opal.coerce_to! base, Integer, :to_int
+
+    if base < 2
+      raise ArgumentError, "invalid radix #{base}"
+    end
+
+    %x{
+      var value = self, result = [];
+
+      while (value !== 0) {
+        result.push(value % base);
+        value = parseInt(value / base);
+      }
+
+      return result;
+    }
+  end
 
   def divmod(other)
     if nan? || other.nan?

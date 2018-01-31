@@ -33,14 +33,6 @@ fails "Integer#^ fixnum raises a TypeError when passed a Float" # Expected TypeE
 fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 to equal 9223372041149743000
 fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
 fails "Integer#coerce fixnum raises a TypeError when given an Object that does not respond to #to_f" # depends on the difference between string/symbol
-fails "Integer#digits converts the radix with #to_int" # NoMethodError: undefined method `arguments' for main
-fails "Integer#digits converts the radix with #to_int" # NoMethodError: undefined method `digits' for 12345
-fails "Integer#digits raises ArgumentError when calling with a negative radix" # NoMethodError: undefined method `digits' for 12345
-fails "Integer#digits raises ArgumentError when calling with a radix less than 2" # NoMethodError: undefined method `digits' for 12345
-fails "Integer#digits raises Math::DomainError when calling digits on a negative number" # NoMethodError: undefined method `digits' for -12345
-fails "Integer#digits returns [0] when called on 0, regardless of base" # NoMethodError: undefined method `digits' for 0
-fails "Integer#digits returns an array of place values in base-10 by default" # NoMethodError: undefined method `digits' for 12345
-fails "Integer#digits returns digits by place value of a given radix" # NoMethodError: undefined method `digits' for 12345
 fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # Mock 'x' expected to receive div(main) exactly 1 times but received it 0 times
 fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # NoMethodError: undefined method `/' for main
 fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nan?' for main
