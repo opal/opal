@@ -36,11 +36,6 @@ fails "Integer#coerce fixnum raises a TypeError when given an Object that does n
 fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # Mock 'x' expected to receive div(main) exactly 1 times but received it 0 times
 fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # NoMethodError: undefined method `/' for main
 fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nan?' for main
-fails "Integer#nobits? coerces the rhs using to_int" # Mock 'the int 0b10' expected to receive to_int("any_args") exactly 1 times but received it 0 times
-fails "Integer#nobits? coerces the rhs using to_int" # NoMethodError: undefined method `nobits?' for 6
-fails "Integer#nobits? handles negative values using two's complement notation" # NoMethodError: undefined method `nobits?' for -14
-fails "Integer#nobits? raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nobits?' for 13
-fails "Integer#nobits? returns true iff all no bits of the argument are set in the receiver" # NoMethodError: undefined method `nobits?' for 42
 fails "Integer#odd? fixnum returns true when self is an odd number" # Expected false to be true
 fails "Integer#pow one argument is passed fixnum coerces power and calls #**" # Mock '2' expected to receive coerce(13) exactly 1 times but received it 0 times
 fails "Integer#pow one argument is passed fixnum coerces power and calls #**" # NoMethodError: undefined method `pow' for 13

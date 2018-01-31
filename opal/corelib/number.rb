@@ -508,6 +508,11 @@ class Number < Numeric
     `self + 1`
   end
 
+  def nobits?(mask)
+    mask = Opal.coerce_to! mask, Integer, :to_int
+    `(self & mask) == 0`
+  end
+
   def nonzero?
     `self == 0 ? nil : self`
   end
