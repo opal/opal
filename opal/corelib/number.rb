@@ -657,7 +657,7 @@ class Number < Numeric
         var sign = #{step <=> 0};
 
         if (sign === nil) {
-          #{raise TypeError, "0 can't be coerced into #{step.class}"}
+          #{raise ArgumentError, "0 can't be coerced into #{step.class}"}
         }
 
         if (limit === nil || limit == null) {

@@ -106,7 +106,7 @@ fails "Integer#chr with an encoding argument raises a RangeError if self is too 
 fails "Integer#coerce bignum coerces other to a Bignum and returns [other, self] when passed a Fixnum" # NameError: uninitialized constant Bignum
 fails "Integer#coerce bignum raises a TypeError when not passed a Fixnum or Bignum" # ArgumentError: invalid value for Float(): "test"
 fails "Integer#coerce bignum returns [other, self] when passed a Bignum" # NameError: uninitialized constant Bignum
-fails "Integer#coerce fixnum raises a TypeError when given an Object that does not respond to #to_f" # ArgumentError: invalid value for Float(): "test"
+fails "Integer#coerce fixnum raises a TypeError when given an Object that does not respond to #to_f" # depends on the difference between string/symbol
 fails "Integer#digits converts the radix with #to_int" # NoMethodError: undefined method `arguments' for main
 fails "Integer#digits converts the radix with #to_int" # NoMethodError: undefined method `digits' for 12345
 fails "Integer#digits raises ArgumentError when calling with a negative radix" # NoMethodError: undefined method `digits' for 12345
@@ -350,30 +350,6 @@ fails "Module#using scope of refinement is not active before the `using` call" #
 fails "Module#using scope of refinement is not active for code defined outside the current scope" # NoMethodError: undefined method `refine' for #<Module:0x2a072>
 fails "Module#using scope of refinement is not active when class/module reopens" # NoMethodError: undefined method `refine' for #<Module:0x2a056>
 fails "Module#using works in classes too" # NoMethodError: undefined method `refine' for #<Module:0x2a01c>
-fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with keyword arguments when step is a String with self and stop as Fixnums raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with keyword arguments when step is a String with self and stop as Fixnums raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with keyword arguments when step is a String with self and stop as Floats raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with keyword arguments when step is a String with self and stop as Floats raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with mixed arguments when step is a String with self and stop as Fixnums raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with mixed arguments when step is a String with self and stop as Fixnums raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with mixed arguments when step is a String with self and stop as Floats raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with mixed arguments when step is a String with self and stop as Floats raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with positional args when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with positional args when no block is given returned Enumerator size when step is a String with self and stop as Fixnums raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with positional args when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with positional args when no block is given returned Enumerator size when step is a String with self and stop as Floats raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with positional args when step is a String with self and stop as Fixnums raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with positional args when step is a String with self and stop as Fixnums raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with positional args when step is a String with self and stop as Floats raises an ArgumentError when step is a numeric representation" # TypeError: 0 can't be coerced into String
-fails "Numeric#step with positional args when step is a String with self and stop as Floats raises an ArgumentError with step as an alphanumeric string" # TypeError: 0 can't be coerced into String
 fails "Predefined global $. can be assigned a Float" # Expected 123.5 to equal 123
 fails "Predefined global $. raises TypeError if object can't be converted to an Integer" # Expected TypeError but no exception was raised (main was returned)
 fails "Predefined global $. raises TypeError if object can't be converted to an Integer" # Mock 'bad-value' expected to receive to_int("any_args") exactly 1 times but received it 0 times
