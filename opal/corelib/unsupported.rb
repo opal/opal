@@ -98,6 +98,10 @@ class String
   def upcase!(*)
     raise NotImplementedError, `ERROR` % 'upcase!'
   end
+
+  def prepend(*)
+    raise NotImplementedError, `ERROR` % 'prepend'
+  end
 end
 
 module Kernel
