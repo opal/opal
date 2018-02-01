@@ -236,7 +236,6 @@ fails "String#to_sym returns a US-ASCII Symbol for a UTF-8 String containing onl
 fails "String#to_sym returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # NoMethodError: undefined method `b' for "foobar":String
 fails "String#to_sym returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
 fails "String#to_sym returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
-fails "String#unpack1 returns the first value of #unpack" # NoMethodError: undefined method `unpack1' for "ABCD":String
 fails "String#upcase! modifies self in place for all of Unicode" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
 fails "String.new accepts a capacity argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
 fails "Struct.new keyword_init: false option behaves like it does without :keyword_init option" # NoMethodError: undefined method `new' for nil

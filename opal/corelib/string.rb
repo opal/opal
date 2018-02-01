@@ -1744,6 +1744,10 @@ class String < `String`
   def unpack(format)
     raise "To use String#unpack, you must first require 'corelib/string/unpack'."
   end
+
+  def unpack1(format)
+    raise "To use String#unpack1, you must first require 'corelib/string/unpack'."
+  end
 end
 
 Symbol = String

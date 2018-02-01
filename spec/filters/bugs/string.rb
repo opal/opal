@@ -110,4 +110,5 @@ opal_filter "String" do
   fails "String.new accepts an encoding argument"
   fails "String#casecmp? independent of case for UNICODE characters returns true when downcase(:fold) on unicode"
   fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns true when they are the same with normalized case"
+  fails "String#unpack1 returns the first value of #unpack" # Works, but requires "x" directive
 end
