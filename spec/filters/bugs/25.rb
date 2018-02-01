@@ -150,11 +150,6 @@ fails "Proc#to_s for a proc created with Proc.new returns a description optional
 fails "Proc#to_s for a proc created with proc returns a description optionally including file and line number" # Expected "main" to match /^#<Proc:([^ ]*?)(@([^ ]*)\/to_s\.rb:16)?>$/
 fails "Random#bytes returns the same numeric output for a given huge seed across all implementations and platforms" # Expected "z­" to equal "_\u0091"
 fails "Random#bytes returns the same numeric output for a given seed across all implementations and platforms" # Expected "ÚG" to equal "\u0014\\"
-fails "Random.urandom raises an ArgumentError on a negative size" # NoMethodError: undefined method `urandom' for Random
-fails "Random.urandom returns a String of the length given as argument" # NoMethodError: undefined method `urandom' for Random
-fails "Random.urandom returns a String" # NoMethodError: undefined method `urandom' for Random
-fails "Random.urandom returns a random binary String" # NoMethodError: undefined method `urandom' for Random
-fails "Random.urandom returns an ASCII-8BIT String" # NoMethodError: undefined method `urandom' for Random
 fails "Rational#round with half option returns a Rational when the precision is greater than 0" # ArgumentError: [Rational#round] wrong number of arguments(2 for -1)
 fails "Rational#round with half option returns an Integer when precision is not passed" # TypeError: not an Integer
 fails "Rational#to_r fails when a BasicObject's to_r does not return a Rational" # NoMethodError: undefined method `nil?' for BasicObject
