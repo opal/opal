@@ -28,4 +28,5 @@ opal_filter "Integer" do
   fails "Integer#round returns itself rounded to nearest if passed a negative value" # Expected NaN to have same value and type as 300
   fails "Integer#** fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
   fails "Integer#pow one argument is passed fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
+  fails "Integer.sqrt returns the integer square root of the argument" # Number overflow, 10**400
 end

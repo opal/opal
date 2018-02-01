@@ -41,13 +41,6 @@ fails "Integer#round returns different rounded values depending on the half opti
 fails "Integer#round returns itself if passed a positive precision and the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
 fails "Integer#| fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
 fails "Integer#| fixnum returns self bitwise OR other" # Expected 65535 to equal 9223372036854841000
-fails "Integer.sqrt accepts any argument that can be coerced to Integer" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt converts the argument with #to_int" # NoMethodError: undefined method `arguments' for main
-fails "Integer.sqrt converts the argument with #to_int" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt raises a Math::DomainError if the argument is negative" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt raises a TypeError if the argument cannot be coerced to Integer" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt returns an integer" # NoMethodError: undefined method `sqrt' for Integer
-fails "Integer.sqrt returns the integer square root of the argument" # NoMethodError: undefined method `sqrt' for Integer
 fails "Invoking a method expands the Array elements from the splat after executing the arguments and block if no other arguments follow the splat" # Expected [[1, nil], nil] to equal [[1], nil]
 fails "Kernel#inspect returns a String with the object class and object_id encoded" # Expected "main" to match /^#<Object:0x[0-9a-f]+>$/
 fails "Kernel#sprintf faulty key sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError

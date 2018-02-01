@@ -1025,6 +1025,17 @@ class Integer < Numeric
         return (other % 1) === 0;
       }
     end
+
+    def sqrt(n)
+      n = Opal.coerce_to!(n, Integer, :to_int)
+      %x{
+        if (n < 0) {
+          #{raise Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
+        }
+
+        return parseInt(Math.sqrt(n));
+      }
+    end
   end
 
   MAX = `Math.pow(2, 30) - 1`
