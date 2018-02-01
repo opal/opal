@@ -85,9 +85,6 @@ fails "Kernel#sprintf raises Encoding::CompatibilityError if both encodings are 
 fails "Kernel#sprintf returns a String in the argument's encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
 fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
 fails "Kernel#to_s returns a String containing the name of self's class" # Expected "main" to match /Object/
-fails "Kernel#yield_self returns a sized Enumerator when no block given" # NoMethodError: undefined method `yield_self' for main
-fails "Kernel#yield_self returns the block return value" # NoMethodError: undefined method `yield_self' for main
-fails "Kernel#yield_self yields self" # NoMethodError: undefined method `yield_self' for main
 fails "Kernel.sprintf faulty key sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `receiver' for #<KeyError: key not found: "foo">:KeyError
 fails "Kernel.sprintf faulty key sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `key' for #<KeyError: key not found: "foo">:KeyError
 fails "Kernel.sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"

@@ -1217,6 +1217,11 @@ module Kernel
   def open(*args, &block)
     File.open(*args, &block)
   end
+
+  def yield_self
+    return enum_for(:yield_self) { 1 } unless block_given?
+    yield self
+  end
 end
 
 class Object

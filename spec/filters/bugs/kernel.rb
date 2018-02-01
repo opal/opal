@@ -186,4 +186,5 @@ opal_filter "Kernel" do
   fails "Kernel.proc returned the passed Proc if given an existing Proc" # Expected false to be true
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block"
   fails "self.send(:block_given?) returns true if and only if a block is supplied"
+  fails "Kernel#yield_self returns a sized Enumerator when no block given" # Requires Enumerator#peek
 end
