@@ -108,4 +108,6 @@ opal_filter "String" do
   fails "String#unicode_normalized? returns true if string is empty"
   fails "String#unicode_normalized? returns true if string is in the specified normalization form"
   fails "String.new accepts an encoding argument"
+  fails "String#casecmp? independent of case for UNICODE characters returns true when downcase(:fold) on unicode"
+  fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns true when they are the same with normalized case"
 end

@@ -231,6 +231,7 @@ class String < `String`
   end
 
   def casecmp(other)
+    return nil unless other.respond_to?(:to_str)
     other = Opal.coerce_to(other, String, :to_str).to_s
     %x{
       var ascii_only = /^[\x00-\x7F]*$/;
@@ -240,6 +241,17 @@ class String < `String`
       }
     }
     self <=> other
+  end
+
+  def casecmp?(other)
+    %x{
+      var cmp = #{casecmp(other)};
+      if (cmp === nil) {
+        return nil;
+      } else {
+        return cmp === 0;
+      }
+    }
   end
 
   def center(width, padstr = ' ')

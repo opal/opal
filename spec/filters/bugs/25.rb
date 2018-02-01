@@ -219,18 +219,6 @@ fails "String#% returns a String in the argument's encoding if format encoding i
 fails "String#% returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
 fails "String#% width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
 fails "String#capitalize! capitalizes self in place for all of Unicode" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
-fails "String#casecmp independent of case returns nil if other can't be converted to a string" # TypeError: no implicit conversion of MockObject into String
-fails "String#casecmp? independent of case for UNICODE characters returns true when downcase(:fold) on unicode" # NoMethodError: undefined method `casecmp?' for "äöü":String
-fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns false when they are unrelated" # NoMethodError: undefined method `casecmp?' for "Ã":String
-fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns true when they are the same with normalized case" # NoMethodError: undefined method `casecmp?' for "Ã":String
-fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns true when they have the same bytes" # NoMethodError: undefined method `casecmp?' for "Ã":String
-fails "String#casecmp? independent of case returns false when not equal to other" # NoMethodError: undefined method `casecmp?' for "abc":String
-fails "String#casecmp? independent of case returns nil if other can't be converted to a string" # NoMethodError: undefined method `casecmp?' for "abc":String
-fails "String#casecmp? independent of case returns true when equal to other" # NoMethodError: undefined method `casecmp?' for "abc":String
-fails "String#casecmp? independent of case tries to convert other to string using to_str" # Mock 'x' expected to receive to_str("any_args") exactly 1 times but received it 0 times
-fails "String#casecmp? independent of case tries to convert other to string using to_str" # NoMethodError: undefined method `casecmp?' for "abc":String
-fails "String#casecmp? independent of case when comparing a subclass instance returns false when not equal to other" # NoMethodError: undefined method `casecmp?' for "b":String
-fails "String#casecmp? independent of case when comparing a subclass instance returns true when equal to other" # NoMethodError: undefined method `casecmp?' for "a":String
 fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
 fails "String#downcase! modifies self in place for all of Unicode" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
 fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
