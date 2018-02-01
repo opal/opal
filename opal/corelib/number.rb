@@ -599,6 +599,10 @@ class Number < Numeric
     end
   end
 
+  def remainder(y)
+    self - y * (self / y).truncate
+  end
+
   def round(ndigits = undefined)
     if Integer === self
       if `ndigits == null`

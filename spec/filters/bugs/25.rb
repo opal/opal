@@ -37,10 +37,6 @@ fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce
 fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # NoMethodError: undefined method `/' for main
 fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nan?' for main
 fails "Integer#odd? fixnum returns true when self is an odd number" # Expected false to be true
-fails "Integer#remainder fixnum keeps sign of self" # NoMethodError: undefined method `remainder' for 5
-fails "Integer#remainder fixnum means x-y*(x/y).truncate" # NoMethodError: undefined method `remainder' for 5
-fails "Integer#remainder fixnum raises TypeError if passed non-numeric argument" # NoMethodError: undefined method `remainder' for 5
-fails "Integer#remainder fixnum returns the remainder of dividing self by other" # NoMethodError: undefined method `remainder' for 5
 fails "Integer#round returns different rounded values depending on the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
 fails "Integer#round returns itself if passed a positive precision and the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
 fails "Integer#| fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
