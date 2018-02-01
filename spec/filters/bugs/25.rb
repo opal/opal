@@ -232,28 +232,6 @@ fails "String#casecmp? independent of case tries to convert other to string usin
 fails "String#casecmp? independent of case when comparing a subclass instance returns false when not equal to other" # NoMethodError: undefined method `casecmp?' for "b":String
 fails "String#casecmp? independent of case when comparing a subclass instance returns true when equal to other" # NoMethodError: undefined method `casecmp?' for "a":String
 fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
-fails "String#delete_prefix calls to_str on its argument" # Mock 'x' expected to receive to_str("any_args") exactly 1 times but received it 0 times
-fails "String#delete_prefix calls to_str on its argument" # NoMethodError: undefined method `delete_prefix' for "hello":String
-fails "String#delete_prefix doesn't set $~" # NoMethodError: undefined method `delete_prefix' for "hello":String
-fails "String#delete_prefix returns a copy of the string, when the prefix isn't found" # NoMethodError: undefined method `delete_prefix' for "hello":String
-fails "String#delete_prefix returns a copy of the string, with the given prefix removed" # NoMethodError: undefined method `delete_prefix' for "hello":String
-fails "String#delete_prefix returns a subclass instance when called on a subclass instance" # NoMethodError: undefined method `delete_prefix' for "hello":String
-fails "String#delete_prefix! calls to_str on its argument" # Mock 'x' expected to receive to_str("any_args") exactly 1 times but received it 0 times
-fails "String#delete_prefix! calls to_str on its argument" # NoMethodError: undefined method `delete_prefix!' for "hello":String
-fails "String#delete_prefix! doesn't set $~" # NoMethodError: undefined method `delete_prefix!' for "hello":String
-fails "String#delete_prefix! removes the found prefix" # NoMethodError: undefined method `delete_prefix!' for "hello":String
-fails "String#delete_prefix! returns nil if no change is made" # NoMethodError: undefined method `delete_prefix!' for "hello":String
-fails "String#delete_suffix calls to_str on its argument" # Mock 'x' expected to receive to_str("any_args") exactly 1 times but received it 0 times
-fails "String#delete_suffix calls to_str on its argument" # NoMethodError: undefined method `delete_suffix' for "hello":String
-fails "String#delete_suffix doesn't set $~" # NoMethodError: undefined method `delete_suffix' for "hello":String
-fails "String#delete_suffix returns a copy of the string, when the suffix isn't found" # NoMethodError: undefined method `delete_suffix' for "hello":String
-fails "String#delete_suffix returns a copy of the string, with the given suffix removed" # NoMethodError: undefined method `delete_suffix' for "hello":String
-fails "String#delete_suffix returns a subclass instance when called on a subclass instance" # NoMethodError: undefined method `delete_suffix' for "hello":String
-fails "String#delete_suffix! calls to_str on its argument" # Mock 'x' expected to receive to_str("any_args") exactly 1 times but received it 0 times
-fails "String#delete_suffix! calls to_str on its argument" # NoMethodError: undefined method `delete_suffix!' for "hello":String
-fails "String#delete_suffix! doesn't set $~" # NoMethodError: undefined method `delete_suffix!' for "hello":String
-fails "String#delete_suffix! removes the found prefix" # NoMethodError: undefined method `delete_suffix!' for "hello":String
-fails "String#delete_suffix! returns nil if no change is made" # NoMethodError: undefined method `delete_suffix!' for "hello":String
 fails "String#downcase! modifies self in place for all of Unicode" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
 fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
 fails "String#each_line when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String

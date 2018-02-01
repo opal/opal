@@ -350,6 +350,34 @@ class String < `String`
     }
   end
 
+  def delete_prefix(prefix)
+    %x{
+      if (!prefix.$$is_string) {
+        #{prefix = Opal.coerce_to(prefix, String, :to_str)}
+      }
+
+      if (self.slice(0, prefix.length) === prefix) {
+        return self.slice(prefix.length);
+      } else {
+        return self;
+      }
+    }
+  end
+
+  def delete_suffix(suffix)
+    %x{
+      if (!suffix.$$is_string) {
+        #{suffix = Opal.coerce_to(suffix, String, :to_str)}
+      }
+
+      if (self.slice(self.length - suffix.length) === suffix) {
+        return self.slice(0, self.length - suffix.length);
+      } else {
+        return self;
+      }
+    }
+  end
+
   def downcase
     `self.toLowerCase()`
   end
