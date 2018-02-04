@@ -1,5 +1,6 @@
 class Exception < `Error`
-  `var Kernel$raise = #{Kernel}.$raise`
+  # `var Kernel$raise = #{Kernel}.$raise`
+  `var stack_trace_limit`
   def self.new(*args)
     %x{
       var message   = (args.length > 0) ? args[0] : nil;
@@ -14,12 +15,13 @@ class Exception < `Error`
       // https://nodejs.org/dist/latest-v6.x/docs/api/errors.html
       if (Opal.config.enable_stack_trace && Error.captureStackTrace) {
         // Passing Kernel.raise will cut the stack trace from that point above
-        Error.captureStackTrace(error, Kernel$raise);
+        Error.captureStackTrace(error, stack_trace_limit);
       }
 
       return error;
     }
   end
+  `stack_trace_limit = self.$new`
 
   def self.exception(*args)
     new(*args)
