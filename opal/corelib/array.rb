@@ -871,7 +871,7 @@ class Array < `Array`
     %x{
       if (
         self.$$class === Opal.Array &&
-        self.$allocate.$$pristine &&
+        self.$$class.$allocate.$$pristine &&
         self.$copy_instance_variables.$$pristine &&
         self.$initialize_dup.$$pristine
       ) return self.slice(0);
@@ -2330,7 +2330,8 @@ class Array < `Array`
     super.reject { |ivar| `/^@\d+$/.test(#{ivar})` || ivar == '@length' }
   end
 
-  Opal.pristine self, :allocate, :copy_instance_variables, :initialize_dup
+  Opal.pristine singleton_class, :allocate
+  Opal.pristine self, :copy_instance_variables, :initialize_dup
 
   def pack(*args)
     raise "To use Array#pack, you must first require 'corelib/array/pack'."
