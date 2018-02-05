@@ -1,43 +1,61 @@
 module Enumerable
-  def all?(&block)
-    if block_given?
+  %x{
+    function comparableForPattern(value) {
+      if (value.length === 0) {
+        value = [nil];
+      }
 
+      if (value.length > 1) {
+        value = [value];
+      }
+
+      return value;
+    }
+  }
+
+  def all?(pattern = undefined, &block)
+    if `pattern !== undefined`
+      each do |*value|
+        value = `comparableForPattern(value)`
+
+        return false unless pattern.public_send(:===, *value)
+      end
+    elsif block_given?
       each do |*value|
         unless yield(*value)
           return false
         end
       end
-
     else
-
       each do |*value|
         unless Opal.destructure(value)
           return false
         end
       end
-
     end
 
     true
   end
 
-  def any?(&block)
-    if block_given?
+  def any?(pattern = undefined, &block)
+    if `pattern !== undefined`
+      each do |*value|
+        value = `comparableForPattern(value)`
 
+        return true if pattern.public_send(:===, *value)
+      end
+    elsif block_given?
       each do |*value|
         if yield(*value)
           return true
         end
       end
-
     else
-
       each do |*value|
         if Opal.destructure(value)
           return true
         end
       end
-
     end
 
     false
@@ -519,69 +537,43 @@ module Enumerable
   alias flat_map collect_concat
 
   def grep(pattern, &block)
-    %x{
-      var result = [];
+    result = []
 
-      if (block !== nil) {
-        self.$each.$$p = function() {
-          var param = #{Opal.destructure(`arguments`)},
-              value = #{pattern === `param`};
+    each do |*value|
+      cmp = `comparableForPattern(value)`
+      if pattern.__send__(:===, *cmp)
+        if block_given?
+          value = [value] if value.length > 1
+          value = yield(*value)
+        else
+          value = value[0] if value.length <= 1
+        end
 
-          if (#{Opal.truthy?(`value`)}) {
-            value = Opal.yield1(block, param);
+        result.push(value)
+      end
+    end
 
-            result.push(value);
-          }
-        };
-      }
-      else {
-        self.$each.$$p = function() {
-          var param = #{Opal.destructure(`arguments`)},
-              value = #{pattern === `param`};
-
-          if (#{Opal.truthy?(`value`)}) {
-            result.push(param);
-          }
-        };
-      }
-
-      self.$each();
-
-      return result;
-    }
+    result
   end
 
   def grep_v(pattern, &block)
-    %x{
-      var result = [];
+    result = []
 
-      if (block !== nil) {
-        self.$each.$$p = function() {
-          var param = #{Opal.destructure(`arguments`)},
-              value = #{pattern === `param`};
+    each do |*value|
+      cmp = `comparableForPattern(value)`
+      unless pattern.__send__(:===, *cmp)
+        if block_given?
+          value = [value] if value.length > 1
+          value = yield(*value)
+        else
+          value = value[0] if value.length <= 1
+        end
 
-          if (#{Opal.falsy?(`value`)}) {
-            value = Opal.yield1(block, param);
+        result.push(value)
+      end
+    end
 
-            result.push(value);
-          }
-        };
-      }
-      else {
-        self.$each.$$p = function() {
-          var param = #{Opal.destructure(`arguments`)},
-              value = #{pattern === `param`};
-
-          if (#{Opal.falsy?(`value`)}) {
-            result.push(param);
-          }
-        };
-      }
-
-      self.$each();
-
-      return result;
-    }
+    result
   end
 
   def group_by(&block)
@@ -865,33 +857,43 @@ module Enumerable
     raise NotImplementedError
   end
 
-  def none?(&block)
-    if block_given?
+  def none?(pattern = undefined, &block)
+    if `pattern !== undefined`
+      each do |*value|
+        value = `comparableForPattern(value)`
 
+        return false if pattern.public_send(:===, *value)
+      end
+    elsif block_given?
       each do |*value|
         if yield(*value)
           return false
         end
       end
-
     else
-
       each do |*value|
-        if Opal.destructure(value)
-          return false
-        end
-      end
+        item = Opal.destructure(value)
 
+        return false if item
+      end
     end
 
     true
   end
 
-  def one?(&block)
+  def one?(pattern = undefined, &block)
     count = 0
 
-    if block_given?
+    if `pattern !== undefined`
+      each do |*value|
+        value = `comparableForPattern(value)`
 
+        if pattern.public_send(:===, *value)
+          count += 1
+          return false if count > 1
+        end
+      end
+    elsif block_given?
       each do |*value|
         if yield(*value)
           count += 1
@@ -899,9 +901,7 @@ module Enumerable
           return false if count > 1
         end
       end
-
     else
-
       each do |*value|
         if Opal.destructure(value)
           count += 1
@@ -909,7 +909,6 @@ module Enumerable
           return false if count > 1
         end
       end
-
     end
 
     count == 1

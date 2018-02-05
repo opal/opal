@@ -1,9 +1,6 @@
 opal_filter "Enumerable" do
   fails "Enumerable#chunk_while on a single-element array ignores the block and returns an enumerator that yields [element]" # Expected [] to equal [[1]]
   fails "Enumerable#first returns a gathered array from yield parameters"
-  fails "Enumerable#grep with a block calls the block with gathered array when yielded with multiple arguments"
-  fails "Enumerable#grep_v with block calls the block with gathered array when yielded with multiple arguments"
-  fails "Enumerable#grep_v without block compares pattern with gathered array when yielded with multiple arguments"
   fails "Enumerable#max_by when called with an argument n when n is nil returns the maximum element"
   fails "Enumerable#max_by when called with an argument n with a block on a enumerable of length x where x < n returns an array containing the maximum n elements of length n"
   fails "Enumerable#max_by when called with an argument n with a block returns an array containing the maximum n elements based on the block's value"
@@ -40,4 +37,7 @@ opal_filter "Enumerable" do
   fails "Enumerable#zip converts arguments to enums using #to_enum"
   fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
+  fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # Works, but depends on the difference between Integer and Float
+  fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting
+  fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
 end

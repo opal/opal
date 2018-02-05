@@ -231,6 +231,7 @@ class String < `String`
   end
 
   def casecmp(other)
+    return nil unless other.respond_to?(:to_str)
     other = Opal.coerce_to(other, String, :to_str).to_s
     %x{
       var ascii_only = /^[\x00-\x7F]*$/;
@@ -240,6 +241,17 @@ class String < `String`
       }
     }
     self <=> other
+  end
+
+  def casecmp?(other)
+    %x{
+      var cmp = #{casecmp(other)};
+      if (cmp === nil) {
+        return nil;
+      } else {
+        return cmp === 0;
+      }
+    }
   end
 
   def center(width, padstr = ' ')
@@ -347,6 +359,34 @@ class String < `String`
         return self;
       }
       return self.replace(new RegExp(char_class, 'g'), '');
+    }
+  end
+
+  def delete_prefix(prefix)
+    %x{
+      if (!prefix.$$is_string) {
+        #{prefix = Opal.coerce_to(prefix, String, :to_str)}
+      }
+
+      if (self.slice(0, prefix.length) === prefix) {
+        return self.slice(prefix.length);
+      } else {
+        return self;
+      }
+    }
+  end
+
+  def delete_suffix(suffix)
+    %x{
+      if (!suffix.$$is_string) {
+        #{suffix = Opal.coerce_to(suffix, String, :to_str)}
+      }
+
+      if (self.slice(self.length - suffix.length) === suffix) {
+        return self.slice(0, self.length - suffix.length);
+      } else {
+        return self;
+      }
     }
   end
 
@@ -1703,6 +1743,10 @@ class String < `String`
 
   def unpack(format)
     raise "To use String#unpack, you must first require 'corelib/string/unpack'."
+  end
+
+  def unpack1(format)
+    raise "To use String#unpack1, you must first require 'corelib/string/unpack'."
   end
 end
 

@@ -1650,8 +1650,13 @@
   // @return [null]
   //
   Opal.def = function(obj, jsid, body) {
+    // Special case for a method definition in the
+    // top-level namespace
+    if (obj === Opal.top) {
+      Opal.defn(Opal.Object, jsid, body)
+    }
     // if instance_eval is invoked on a module/class, it sets inst_eval_mod
-    if (!obj.$$eval && (obj.$$is_class || obj.$$is_module)) {
+    else if (!obj.$$eval && (obj.$$is_class || obj.$$is_module)) {
       Opal.defn(obj, jsid, body);
     }
     else {

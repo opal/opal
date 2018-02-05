@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require 'opal/ast/node'
-require 'parser/ruby23'
+require 'parser/ruby25'
 
 module Opal
   module AST

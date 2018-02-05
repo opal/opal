@@ -23,5 +23,8 @@ module Kernel
   end
 end
 
+# To make MSpec happy
+require 'thread'
+
 require 'mspec/utils/script' # Needed by DottedFormatter
 require 'mspec-opal/formatters'

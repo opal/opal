@@ -305,6 +305,16 @@ class Number < Numeric
     `Math.abs(self * self)`
   end
 
+  def allbits?(mask)
+    mask = Opal.coerce_to! mask, Integer, :to_int
+    `(self & mask) == mask`
+  end
+
+  def anybits?(mask)
+    mask = Opal.coerce_to! mask, Integer, :to_int
+    `(self & mask) !== 0`
+  end
+
   def angle
     return self if nan?
 
@@ -351,8 +361,23 @@ class Number < Numeric
     }
   end
 
-  def ceil
-    `Math.ceil(self)`
+  def ceil(ndigits = 0)
+    %x{
+      var f = #{to_f};
+
+      if (f % 1 === 0 && ndigits >= 0) {
+        return f;
+      }
+
+      var factor = Math.pow(10, ndigits),
+          result = Math.ceil(f * factor) / factor;
+
+      if (f % 1 === 0) {
+        result = Math.round(result);
+      }
+
+      return result;
+    }
   end
 
   def chr(encoding = undefined)
@@ -395,8 +420,23 @@ class Number < Numeric
     `self % 2 === 0`
   end
 
-  def floor
-    `Math.floor(self)`
+  def floor(ndigits = 0)
+    %x{
+      var f = #{to_f};
+
+      if (f % 1 === 0 && ndigits >= 0) {
+        return f;
+      }
+
+      var factor = Math.pow(10, ndigits),
+          result = Math.floor(f * factor) / factor;
+
+      if (f % 1 === 0) {
+        result = Math.round(result);
+      }
+
+      return result;
+    }
   end
 
   def gcd(other)
@@ -468,6 +508,11 @@ class Number < Numeric
     `self + 1`
   end
 
+  def nobits?(mask)
+    mask = Opal.coerce_to! mask, Integer, :to_int
+    `(self & mask) == 0`
+  end
+
   def nonzero?
     `self == 0 ? nil : self`
   end
@@ -486,6 +531,36 @@ class Number < Numeric
 
   def ord
     self
+  end
+
+  def pow(b, m = undefined)
+    %x{
+      if (self == 0) {
+        #{raise ZeroDivisionError, 'divided by 0'}
+      }
+
+      if (m === undefined) {
+        return #{self ** b};
+      } else {
+        if (!(#{Integer === b})) {
+          #{raise TypeError, 'Integer#pow() 2nd argument not allowed unless a 1st argument is integer'}
+        }
+
+        if (b < 0) {
+          #{raise TypeError, 'Integer#pow() 1st argument cannot be negative when 2nd argument specified'}
+        }
+
+        if (!(#{Integer === m})) {
+          #{raise TypeError, 'Integer#pow() 2nd argument not allowed unless all arguments are integers'}
+        }
+
+        if (m === 0) {
+          #{raise ZeroDivisionError, 'divided by 0'}
+        }
+
+        return #{(self ** b) % m}
+      }
+    }
   end
 
   def pred
@@ -522,6 +597,10 @@ class Number < Numeric
     else
       to_r.rationalize(eps)
     end
+  end
+
+  def remainder(y)
+    self - y * (self / y).truncate
   end
 
   def round(ndigits = undefined)
@@ -627,7 +706,7 @@ class Number < Numeric
         var sign = #{step <=> 0};
 
         if (sign === nil) {
-          #{raise TypeError, "0 can't be coerced into #{step.class}"}
+          #{raise ArgumentError, "0 can't be coerced into #{step.class}"}
         }
 
         if (limit === nil || limit == null) {
@@ -804,16 +883,58 @@ class Number < Numeric
   end
 
   def to_s(base = 10)
+    base = Opal.coerce_to! base, Integer, :to_int
+
     if base < 2 || base > 36
-      raise ArgumentError, 'base must be between 2 and 36'
+      raise ArgumentError, "invalid radix #{base}"
     end
 
     `self.toString(base)`
   end
 
-  alias truncate to_i
+  def truncate(ndigits = 0)
+    %x{
+      var f = #{to_f};
+
+      if (f % 1 === 0 && ndigits >= 0) {
+        return f;
+      }
+
+      var factor = Math.pow(10, ndigits),
+          result = parseInt(f * factor, 10) / factor;
+
+      if (f % 1 === 0) {
+        result = Math.round(result);
+      }
+
+      return result;
+    }
+  end
 
   alias inspect to_s
+
+  def digits(base = 10)
+    if self < 0
+      raise Math::DomainError, 'out of domain'
+    end
+
+    base = Opal.coerce_to! base, Integer, :to_int
+
+    if base < 2
+      raise ArgumentError, "invalid radix #{base}"
+    end
+
+    %x{
+      var value = self, result = [];
+
+      while (value !== 0) {
+        result.push(value % base);
+        value = parseInt(value / base, 10);
+      }
+
+      return result;
+    }
+  end
 
   def divmod(other)
     if nan? || other.nan?
@@ -902,6 +1023,17 @@ class Integer < Numeric
         }
 
         return (other % 1) === 0;
+      }
+    end
+
+    def sqrt(n)
+      n = Opal.coerce_to!(n, Integer, :to_int)
+      %x{
+        if (n < 0) {
+          #{raise Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
+        }
+
+        return parseInt(Math.sqrt(n), 10);
       }
     end
   end

@@ -117,6 +117,7 @@ opal_filter "Module" do
   fails "Module#prepend adds the module in the subclass chains"
   fails "Module#prepend allows wrapping methods"
   fails "Module#prepend also prepends included modules"
+  fails "Module#prepend called on a module does not obscure the module's methods from reflective access" # NoMethodError: undefined method `prepend' for #<Module:0x4ba4a>
   fails "Module#prepend calls #prepend_features(self) in reversed order on each module"
   fails "Module#prepend calls prepended after prepend_features"
   fails "Module#prepend causes the prepended module's method to be aliased by alias_method"
@@ -150,11 +151,56 @@ opal_filter "Module" do
   fails "Module#prepend_features on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#prepend_features raises an ArgumentError on a cyclic prepend"
   fails "Module#prepended is invoked when self is prepended to another module or class"
+  fails "Module#refine adds methods defined in its block to the anonymous module's public instance methods" # NoMethodError: undefined method `refine' for #<Module:0x3ae64>
+  fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae7a>
+  fails "Module#refine does not apply refinements to external scopes not using the module" # NoMethodError: undefined method `refine' for #<Module:0x3ae60>
+  fails "Module#refine does not make available methods from another refinement module" # NoMethodError: undefined method `refine' for #<Module:0x3ae8c>
+  fails "Module#refine does not override methods in subclasses" # NoMethodError: undefined method `refine' for #<Module:0x3ae56>
+  fails "Module#refine doesn't apply refinements outside the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae72>
+  fails "Module#refine for methods accessed indirectly is honored by BasicObject#__send__" # NoMethodError: undefined method `refine' for #<Module:0x3aeb2>
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#binding" # NoMethodError: undefined method `refine' for #<Module:0x3aeaa>
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # NoMethodError: undefined method `refine' for #<Module:0x3aeae>
+  fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # NoMethodError: undefined method `refine' for #<Module:0x3aeba>
+  fails "Module#refine for methods accessed indirectly is honored by string interpolation" # NoMethodError: undefined method `refine' for #<Module:0x3aeb6>
+  fails "Module#refine for methods accessed indirectly is not honored by Kernel#method" # NoMethodError: undefined method `refine' for #<Module:0x3aec0>
+  fails "Module#refine for methods accessed indirectly is not honored by Kernel#respond_to?" # NoMethodError: undefined method `refine' for #<Module:0x3aea6>
+  fails "Module#refine makes available all refinements from the same module" # NoMethodError: undefined method `refine' for #<Module:0x3ae88>
+  fails "Module#refine method lookup looks in included modules from the refinement then" # NoMethodError: undefined method `refine' for #<Module:0x3aea0>
+  fails "Module#refine method lookup looks in prepended modules from the refinement first" # NoMethodError: undefined method `refine' for #<Module:0x3ae98>
+  fails "Module#refine method lookup looks in refinement then" # NoMethodError: undefined method `refine' for #<Module:0x3ae94>
+  fails "Module#refine method lookup looks in the class then" # NoMethodError: undefined method `refine' for #<Module:0x3ae90>
+  fails "Module#refine method lookup looks in the object singleton class first" # NoMethodError: undefined method `refine' for #<Module:0x3ae9c>
+  fails "Module#refine module inclusion activates all refinements from all ancestors" # NoMethodError: undefined method `refine' for #<Module:0x3aed4>
+  fails "Module#refine module inclusion overrides methods of ancestors by methods in descendants" # NoMethodError: undefined method `refine' for #<Module:0x3aed0>
+  fails "Module#refine raises ArgumentError if not given a block" # NoMethodError: undefined method `refine' for #<Module:0x3ae5c>
+  fails "Module#refine raises ArgumentError if not passed an argument" # NoMethodError: undefined method `refine' for #<Module:0x3ae80>
+  fails "Module#refine raises TypeError if not passed a class" # NoMethodError: undefined method `refine' for #<Module:0x3ae6e>
+  fails "Module#refine returns created anonymous module" # NoMethodError: undefined method `refine' for #<Module:0x3ae68>
+  fails "Module#refine runs its block in an anonymous module" # NoMethodError: undefined method `refine' for #<Module:0x3ae76>
+  fails "Module#refine uses the same anonymous module for future refines of the same class" # NoMethodError: undefined method `refine' for #<Module:0x3ae84>
+  fails "Module#refine when super is called in a refinement looks in the included to refinery module" # NoMethodError: undefined method `refine' for #<Module:0x3aec8>
+  fails "Module#refine when super is called in a refinement looks in the refined class even if there is another active refinement" # NoMethodError: undefined method `refine' for #<Module:0x3aec4>
+  fails "Module#refine when super is called in a refinement looks in the refined class" # NoMethodError: undefined method `refine' for #<Module:0x3aecc>
   fails "Module#remove_class_variable removes class variable" # Exception: Cannot set property '@@mvar' of undefined
   fails "Module#remove_class_variable returns the value of removing class variable" # Exception: Cannot set property '@@mvar' of undefined
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#remove_const returns nil when removing autoloaded constant"
+  fails "Module#using accepts module as argument" # NoMethodError: undefined method `refine' for #<Module:0x2a040>
+  fails "Module#using accepts module without refinements" # Expected to not get Exception but got NoMethodError (undefined method `using' for #<Module:0x2a02a>)
+  fails "Module#using activates refinement even for existed objects" # NoMethodError: undefined method `refine' for #<Module:0x2a052>
+  fails "Module#using activates updates when refinement reopens later" # NoMethodError: undefined method `refine' for #<Module:0x2a018>
+  fails "Module#using does not accept class" # NoMethodError: undefined method `using' for #<Module:0x2a03c>
+  fails "Module#using imports class refinements from module into the current class/module" # NoMethodError: undefined method `refine' for #<Module:0x2a02e>
+  fails "Module#using raises TypeError if passed something other than module" # NoMethodError: undefined method `using' for #<Module:0x2a034>
+  fails "Module#using raises error in method scope" # NoMethodError: undefined method `using' for #<Module:0x2a044>
+  fails "Module#using returns self" # NoMethodError: undefined method `using' for #<Module:0x2a022>
+  fails "Module#using scope of refinement is active for method defined in a scope wherever it's called" # NoMethodError: undefined method `refine' for #<Module:0x2a06a>
+  fails "Module#using scope of refinement is active until the end of current class/module" # NoMethodError: undefined method `refine' for #<Module:0x2a07a>
+  fails "Module#using scope of refinement is not active before the `using` call" # NoMethodError: undefined method `refine' for #<Module:0x2a05e>
+  fails "Module#using scope of refinement is not active for code defined outside the current scope" # NoMethodError: undefined method `refine' for #<Module:0x2a072>
+  fails "Module#using scope of refinement is not active when class/module reopens" # NoMethodError: undefined method `refine' for #<Module:0x2a056>
+  fails "Module#using works in classes too" # NoMethodError: undefined method `refine' for #<Module:0x2a01c>
   fails "Module.constants returns an array of Symbol names" # requires Bignum
   fails "Module.new creates a new Module and passes it to the provided block"
   fails "Module::Nesting returns the list of Modules nested at the point of call"

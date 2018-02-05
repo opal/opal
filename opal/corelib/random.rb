@@ -35,6 +35,16 @@ class Random
     previous_seed
   end
 
+  def self.urandom(size)
+    size = Opal.coerce_to!(size, Integer, :to_int)
+
+    if size < 0
+      raise ArgumentError, 'negative string size (or size too big)'
+    end
+
+    size.times.map { rand(255).chr }.join.force_encoding('ASCII-8BIT')
+  end
+
   DEFAULT = new(new_seed)
 
   def ==(other)

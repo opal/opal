@@ -537,11 +537,11 @@ class Date
     self + n
   end
 
-  def next_month
+  def next_month(n = 1)
     %x{
       var result = #{clone}, date = result.date, cur = date.getDate();
       date.setDate(1);
-      date.setMonth(date.getMonth() + 1);
+      date.setMonth(date.getMonth() + n);
       date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
       return result;
     }
@@ -551,11 +551,11 @@ class Date
     self - n
   end
 
-  def prev_month
+  def prev_month(n = 1)
     %x{
       var result = #{clone}, date = result.date, cur = date.getDate();
       date.setDate(1);
-      date.setMonth(date.getMonth() - 1);
+      date.setMonth(date.getMonth() - n);
       date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
       return result;
     }
@@ -592,6 +592,10 @@ class Date
       if (day < 10) { day = '0' + day; }
       return year + '-' + month + '-' + day;
     }
+  end
+
+  def to_time
+    Time.new(year, month, day)
   end
 
   def tuesday?

@@ -459,7 +459,7 @@ class Array < `Array`
     end
   end
 
-  def any?
+  def any?(pattern = undefined, &block)
     `if (self.length === 0) return false`
     super
   end
@@ -869,7 +869,8 @@ class Array < `Array`
 
   def dup
     %x{
-      if (self.$$class.$allocate.$$pristine &&
+      if (self.$$class === Opal.Array &&
+          self.$$class.$allocate.$$pristine &&
           self.$copy_instance_variables.$$pristine &&
           self.$initialize_dup.$$pristine) {
         return self.slice(0);
@@ -1097,7 +1098,7 @@ class Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           item = array[i];
 
-          if (!#{Opal.respond_to? `item`, :to_ary}) {
+          if (!#{Opal.respond_to? `item`, :to_ary, true}) {
             result.push(item);
             continue;
           }
@@ -1397,6 +1398,14 @@ class Array < `Array`
 
   alias map! collect!
 
+  def max(n = undefined, &block)
+    each.max(n, &block)
+  end
+
+  def min(&block)
+    each.min(&block)
+  end
+
   %x{
     // Returns the product of from, from-1, ..., from - how_many + 1.
     function descending_factorial(from, how_many) {
@@ -1584,6 +1593,8 @@ class Array < `Array`
 
     self
   end
+
+  alias append push
 
   def rassoc(object)
     %x{
@@ -2228,6 +2239,8 @@ class Array < `Array`
 
     self
   end
+
+  alias prepend unshift
 
   def values_at(*args)
     out = [];

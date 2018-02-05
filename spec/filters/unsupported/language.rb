@@ -19,4 +19,6 @@ opal_unsupported_filter "language" do
   fails "Ruby String literals with a magic frozen comment produce the same object each time"
   fails "Ruby String literals with a magic frozen comment produce the same object for literals with the same content"
   fails "Ruby String literals with a magic frozen comment produce the same object for literals with the same content in different files"
+  fails "rescuing Interrupt raises an Interrupt when sent a signal SIGINT" # NoMethodError: undefined method `kill' for Process
+  fails "rescuing SignalException raises a SignalException when sent a signal" # NoMethodError: undefined method `kill' for Process
 end

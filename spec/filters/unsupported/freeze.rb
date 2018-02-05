@@ -80,4 +80,159 @@ opal_unsupported_filter "freezing" do
   fails "Time#localtime on a frozen time raises a RuntimeError if the time has a different time zone"
   fails "Time#utc on a frozen time raises a RuntimeError if the time is not UTC"
   fails "Kernel#clone takes an option to copy freeze state or not" # TODO: move to unsupported/freeze
+  fails "A method definition inside a metaclass scope raises FrozenError if frozen" # Expected FrozenError but no exception was raised ("foo" was returned)
+  fails "A singleton method definition raises FrozenError if frozen" # Expected FrozenError but no exception was raised ("foo" was returned)
+  fails "Array#<< raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3, 5] was returned)
+  fails "Array#[]= raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#clear raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#collect! when frozen raises a FrozenError" # Expected FrozenError but no exception was raised ([nil, nil, nil] was returned)
+  fails "Array#collect! when frozen raises a FrozenError when calling #each on the returned Enumerator" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#collect! when frozen raises a FrozenError when calling #each on the returned Enumerator when empty" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#collect! when frozen raises a FrozenError when empty" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#compact! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Array#concat raises a FrozenError when Array is frozen and modification occurs" # Expected FrozenError but no exception was raised ([1, 2, 3, 1] was returned)
+  fails "Array#concat raises a FrozenError when Array is frozen and no modification occurs" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#delete raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (1 was returned)
+  fails "Array#delete_at raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (1 was returned)
+  fails "Array#delete_if raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#delete_if raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#fill raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (["x", "x", "x"] was returned)
+  fails "Array#fill raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#flatten! raises a FrozenError on frozen arrays when the array is modified" # Expected FrozenError but no exception was raised ([1, 2] was returned)
+  fails "Array#flatten! raises a FrozenError on frozen arrays when the array would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Array#initialize raises a FrozenError on frozen arrays" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#insert raises a FrozenError on frozen arrays when the array is modified" # Expected FrozenError but no exception was raised (["x", 1, 2, 3] was returned)
+  fails "Array#insert raises a FrozenError on frozen arrays when the array would not be modified" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#keep_if on frozen objects with falsy block raises a FrozenError" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#keep_if on frozen objects with truthy block raises a FrozenError" # Expected FrozenError but no exception was raised ([true, false] was returned)
+  fails "Array#map! when frozen raises a FrozenError" # Expected FrozenError but no exception was raised ([nil, nil, nil] was returned)
+  fails "Array#map! when frozen raises a FrozenError when calling #each on the returned Enumerator" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#map! when frozen raises a FrozenError when calling #each on the returned Enumerator when empty" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#map! when frozen raises a FrozenError when empty" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#pop passed a number n as an argument raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([2, 3] was returned)
+  fails "Array#pop raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (3 was returned)
+  fails "Array#pop raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Array#push raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3, 1] was returned)
+  fails "Array#reject! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Array#reject! raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Array#replace raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#reverse! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([3, 2, 1] was returned)
+  fails "Array#rotate! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#select! on frozen objects with falsy block raises a FrozenError" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#select! on frozen objects with truthy block raises a FrozenError" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Array#shift raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (1 was returned)
+  fails "Array#shift raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Array#shuffle! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#slice! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#sort! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#sort_by! raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Array#sort_by! raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#uniq! raises a FrozenError on a frozen array when the array is modified" # Expected FrozenError but no exception was raised ([1, 2] was returned)
+  fails "Array#uniq! raises a FrozenError on a frozen array when the array would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Array#unshift raises a FrozenError on a frozen array when the array is modified" # Expected FrozenError but no exception was raised ([1, 1, 2, 3] was returned)
+  fails "Array#unshift raises a FrozenError on a frozen array when the array would not be modified" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
+  fails "Hash#[]= raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (2 was returned)
+  fails "Hash#clear raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
+  fails "Hash#compact! on frozen instance keeps pairs and raises a FrozenError" # Expected FrozenError but no exception was raised ({"truthy"=>true, "false"=>false, nil=>true} was returned)
+  fails "Hash#compare_by_identity raises a FrozenError on frozen hashes" # Expected FrozenError but no exception was raised ({} was returned)
+  fails "Hash#default= raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Hash#default_proc= raises a FrozenError if self is frozen" # Expected FrozenError but no exception was raised (main was returned)
+  fails "Hash#delete raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Hash#delete_if raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({1=>2, 3=>4} was returned)
+  fails "Hash#initialize raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({1=>2, 3=>4} was returned)
+  fails "Hash#keep_if raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
+  fails "Hash#merge! raises a FrozenError on a frozen instance that is modified" # Expected FrozenError but no exception was raised ({1=>2} was returned)
+  fails "Hash#merge! raises a FrozenError on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({1=>2} was returned)
+  fails "Hash#rehash raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
+  fails "Hash#reject! raises a FrozenError if called on a frozen instance that is modified" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Hash#reject! raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Hash#replace raises a FrozenError if called on a frozen instance that is modified" # Expected FrozenError but no exception was raised ({} was returned)
+  fails "Hash#replace raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({} was returned)
+  fails "Hash#select! raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Hash#select! raises a FrozenError if called on an empty frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Hash#shift raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Hash#store raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (2 was returned)
+  fails "Hash#transform_values! on frozen instance keeps pairs and raises a FrozenError" # Expected FrozenError but no exception was raised ({"a"=>2, "b"=>3, "c"=>4} was returned)
+  fails "Hash#transform_values! on frozen instance raises a FrozenError on an empty hash" # Expected FrozenError but no exception was raised ({} was returned)
+  fails "Hash#update raises a FrozenError on a frozen instance that is modified" # Expected FrozenError but no exception was raised ({1=>2} was returned)
+  fails "Hash#update raises a FrozenError on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({} was returned)
+  fails "Kernel#extend on frozen instance raises a FrozenError" # Expected FrozenError but no exception was raised (main was returned)
+  fails "Kernel#instance_variable_set on frozen objects raises a FrozenError when passed replacement is different from stored object" # Expected FrozenError but no exception was raised ("replacement" was returned)
+  fails "Kernel#instance_variable_set on frozen objects raises a FrozenError when passed replacement is identical to stored object" # Expected FrozenError but no exception was raised ("origin" was returned)
+  fails "Module#alias_method raises FrozenError if frozen" # Expected FrozenError but no exception was raised (#<Class:0x39d44> was returned)
+  fails "Module#append_features when other is frozen raises a FrozenError before appending self" # Expected FrozenError but no exception was raised (#<Module:0x3fbfa> was returned)
+  fails "Module#class_variable_set raises a FrozenError when self is frozen" # Expected FrozenError but no exception was raised ("test" was returned)
+  fails "Module#const_set on a frozen module raises a FrozenError before setting the name" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Module#define_method raises a FrozenError if frozen" # Expected FrozenError but no exception was raised (#<Class:0x13e2> was returned)
+  fails "String#force_encoding raises a FrozenError if self is frozen" # Expected FrozenError but no exception was raised ("abcd" was returned)
+  fails "Kernel#freeze on a Complex has no effect since it is already frozen" # Expected false to be true
+  fails "Kernel#freeze on a Rational has no effect since it is already frozen" # Expected false to be true
+  fails "Kernel#frozen? on a Complex literal returns true" # Expected false to be true
+  fails "Kernel#frozen? on a Complex returns true" # Expected false to be true
+  fails "Kernel#frozen? on a Rational literal returns true" # Expected false to be true
+  fails "Kernel#frozen? on a Rational returns true" # Expected false to be true
+  fails "Array#append raises a FrozenError on a frozen array" # NoMethodError: undefined method `append' for [1, 2, 3]:Array
+  fails "Array#prepend raises a FrozenError on a frozen array when the array is modified" # NoMethodError: undefined method `prepend' for [1, 2, 3]:Array
+  fails "Array#prepend raises a FrozenError on a frozen array when the array would not be modified" # NoMethodError: undefined method `prepend' for [1, 2, 3]:Array
+  fails "Hash#transform_keys! on frozen instance keeps pairs and raises a FrozenError" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
+  fails "Hash#transform_keys! on frozen instance raises a FrozenError on an empty hash" # NoMethodError: undefined method `transform_keys!' for {}
+  fails "Module#autoload on a frozen module raises a FrozenError before setting the name" # Exception: Cannot read property '$pretty_inspect' of undefined
+  fails "Module#remove_method on frozen instance raises a FrozenError when passed a missing name" # NameError: method 'not_exist' not defined in
+  fails "Module#remove_method on frozen instance raises a FrozenError when passed a name" # NameError: method 'method_to_remove' not defined in
+  fails "Module#undef_method on frozen instance raises a FrozenError when passed a missing name" # NameError: method 'not_exist' not defined in
+  fails "Module#undef_method on frozen instance raises a FrozenError when passed a name" # NameError: method 'method_to_undef' not defined in
+  fails "Set#compare_by_identity raises a FrozenError on frozen sets" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
+  fails "String#<< raises a FrozenError when self is frozen" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
+  fails "String#<< with Integer raises a FrozenError when self is frozen" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Fixnum index raises a FrozenError when self is frozen" # NoMethodError: undefined method `[]=' for "hello":String
+  fails "String#capitalize! raises a FrozenError when self is frozen" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#chomp! raises a FrozenError on a frozen instance when it is modified" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
+  fails "String#chomp! raises a FrozenError on a frozen instance when it would not be modified" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
+  fails "String#chop! raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
+  fails "String#chop! raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
+  fails "String#clear raises a FrozenError if self is frozen" # NoMethodError: undefined method `clear' for "Jolene":String
+  fails "String#concat raises a FrozenError when self is frozen" # NoMethodError: undefined method `concat' for "hello":String
+  fails "String#concat with Integer raises a FrozenError when self is frozen" # NoMethodError: undefined method `concat' for "hello":String
+  fails "String#delete! raises a FrozenError when self is frozen" # NoMethodError: undefined method `delete!' for "hello":String
+  fails "String#delete_prefix! raises a FrozenError when self is frozen" # NoMethodError: undefined method `delete_prefix!' for "hello":String
+  fails "String#delete_suffix! raises a FrozenError when self is frozen" # NoMethodError: undefined method `delete_suffix!' for "hello":String
+  fails "String#downcase! raises a FrozenError when self is frozen" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#encode! raises a FrozenError when called on a frozen String" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! raises a FrozenError when called on a frozen String" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! raises a FrozenError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! raises a FrozenError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#gsub! with pattern and block raises a FrozenError when self is frozen" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
+  fails "String#gsub! with pattern and replacement raises a FrozenError when self is frozen" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
+  fails "String#initialize with an argument raises a FrozenError on a frozen instance that is modified" # NotImplementedError: Mutable strings are not supported in Opal.
+  fails "String#initialize with an argument raises a FrozenError on a frozen instance when self-replacing" # NotImplementedError: Mutable strings are not supported in Opal.
+  fails "String#insert with index, other raises a FrozenError if self is frozen" # NoMethodError: undefined method `insert' for "abcd":String
+  fails "String#lstrip! raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.
+  fails "String#lstrip! raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.
+  fails "String#next! raises a FrozenError if self is frozen" # NotImplementedError: String#next! not supported. Mutable String methods are not supported in Opal.
+  fails "String#prepend raises a FrozenError when self is frozen" # NoMethodError: undefined method `prepend' for "hello":String
+  fails "String#replace raises a FrozenError on a frozen instance that is modified" # NoMethodError: undefined method `replace' for "hello":String
+  fails "String#replace raises a FrozenError on a frozen instance when self-replacing" # NoMethodError: undefined method `replace' for "hello":String
+  fails "String#reverse! raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#reverse! not supported. Mutable String methods are not supported in Opal.
+  fails "String#reverse! raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#reverse! not supported. Mutable String methods are not supported in Opal.
+  fails "String#rstrip! raises a FrozenError on a frozen instance that is modified" # NoMethodError: undefined method `rstrip!' for "  hello  ":String
+  fails "String#rstrip! raises a FrozenError on a frozen instance that would not be modified" # NoMethodError: undefined method `rstrip!' for "hello":String
+  fails "String#setbyte raises a FrozenError if self is frozen" # Expected false to be true
+  fails "String#slice! Range raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! Range raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with Regexp raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with Regexp raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with Regexp, index raises a FrozenError if self is frozen" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with String raises a FrozenError if self is frozen" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with index raises a FrozenError if self is frozen" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with index, length raises a FrozenError if self is frozen" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#squeeze! raises a FrozenError when self is frozen" # NotImplementedError: String#squeeze! not supported. Mutable String methods are not supported in Opal.
+  fails "String#strip! raises a FrozenError on a frozen instance that is modified" # NotImplementedError: String#strip! not supported. Mutable String methods are not supported in Opal.
+  fails "String#strip! raises a FrozenError on a frozen instance that would not be modified" # NotImplementedError: String#strip! not supported. Mutable String methods are not supported in Opal.
+  fails "String#sub! with pattern and block raises a FrozenError when self is frozen" # NotImplementedError: String#sub! not supported. Mutable String methods are not supported in Opal.
+  fails "String#sub! with pattern, replacement raises a FrozenError when self is frozen" # NotImplementedError: String#sub! not supported. Mutable String methods are not supported in Opal.
+  fails "String#succ! raises a FrozenError if self is frozen" # NotImplementedError: String#succ! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! raises a FrozenError when self is frozen" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#tr! raises a FrozenError if self is frozen" # NotImplementedError: String#tr! not supported. Mutable String methods are not supported in Opal.
+  fails "String#tr_s! raises a FrozenError if self is frozen" # NotImplementedError: String#tr_s! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! raises a FrozenError when self is frozen" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
 end

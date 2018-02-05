@@ -12,19 +12,17 @@ class Numeric
   end
 
   def __coerced__(method, other)
-    begin
+    if other.respond_to?(:coerce)
       a, b = other.coerce(self)
-    rescue
+      a.__send__ method, b
+    else
       case method
       when :+, :-, :*, :/, :%, :&, :|, :^, :**
-        raise TypeError, "#{other.class} can't be coerce into Numeric"
-
+        raise TypeError, "#{other.class} can't be coerced into Numeric"
       when :>, :>=, :<, :<=, :<=>
         raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
       end
     end
-
-    a.__send__ method, b
   end
 
   def <=>(other)
@@ -61,8 +59,8 @@ class Numeric
 
   alias arg angle
 
-  def ceil
-    to_f.ceil
+  def ceil(ndigits = 0)
+    to_f.ceil(ndigits)
   end
 
   def conj
@@ -89,8 +87,8 @@ class Numeric
     self.to_f / other
   end
 
-  def floor
-    to_f.floor
+  def floor(ndigits = 0)
+    to_f.floor(ndigits)
   end
 
   def i
@@ -155,8 +153,8 @@ class Numeric
     to_i
   end
 
-  def truncate
-    to_f.truncate
+  def truncate(ndigits = 0)
+    to_f.truncate(ndigits)
   end
 
   def zero?
@@ -177,5 +175,13 @@ class Numeric
 
   def clone(freeze: true)
     self
+  end
+
+  def finite?
+    true
+  end
+
+  def infinite?
+    nil
   end
 end

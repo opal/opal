@@ -492,7 +492,7 @@ class Hash
       }
     }
 
-    raise KeyError, "key not found: #{key.inspect}"
+    raise KeyError.new("key not found: #{key.inspect}", key: key, receiver: self)
   end
 
   def fetch_values(*keys, &block)
@@ -1006,6 +1006,22 @@ class Hash
 
   alias size length
 
+  def slice(*keys)
+    %x{
+      var result = Opal.hash();
+
+      for (var i = 0, length = keys.length; i < length; i++) {
+        var key = keys[i], value = Opal.hash_get(self, key);
+
+        if (value !== undefined) {
+          Opal.hash_put(result, key, value);
+        }
+      }
+
+      return result;
+    }
+  end
+
   alias_method :store, :[]=
 
   def to_a
@@ -1061,6 +1077,58 @@ class Hash
   end
 
   alias to_s inspect
+
+  def transform_keys(&block)
+    return enum_for(:transform_keys){self.size} unless block
+
+    %x{
+      var result = Opal.hash();
+
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+        key = keys[i];
+
+        if (key.$$is_string) {
+          value = self.$$smap[key];
+        } else {
+          value = key.value;
+          key = key.key;
+        }
+
+        key = Opal.yield1(block, key);
+
+        Opal.hash_put(result, key, value);
+      }
+
+      return result;
+    }
+  end
+
+  def transform_keys!(&block)
+    return enum_for(:transform_keys!){self.size} unless block
+
+    %x{
+      var keys = Opal.slice.call(self.$$keys),
+          i, length = keys.length, key, value, new_key;
+
+      for (i = 0; i < length; i++) {
+        key = keys[i];
+
+        if (key.$$is_string) {
+          value = self.$$smap[key];
+        } else {
+          value = key.value;
+          key = key.key;
+        }
+
+        new_key = Opal.yield1(block, key);
+
+        Opal.hash_delete(self, key);
+        Opal.hash_put(self, new_key, value);
+      }
+
+      return self;
+    }
+  end
 
   def transform_values(&block)
     return enum_for(:transform_values){self.size} unless block

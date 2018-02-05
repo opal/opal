@@ -549,4 +549,16 @@ opal_unsupported_filter "String" do
   fails "String#prepend prepends the initial value when given arguments contain 2 self"
   fails "String#prepend returns self when given no arguments"
   fails "String#prepend takes multiple arguments"
+  fails "String#delete_prefix! calls to_str on its argument"
+  fails "String#delete_prefix! calls to_str on its argument"
+  fails "String#delete_prefix! doesn't set $~"
+  fails "String#delete_prefix! removes the found prefix"
+  fails "String#delete_prefix! returns nil if no change is made"
+  fails "String#delete_suffix! calls to_str on its argument"
+  fails "String#delete_suffix! calls to_str on its argument"
+  fails "String#delete_suffix! doesn't set $~"
+  fails "String#delete_suffix! removes the found prefix"
+  fails "String#delete_suffix! returns nil if no change is made"
+  fails "String#delete_prefix returns a copy of the string, when the prefix isn't found" # Fails because "string".equal?("string") is always true
+  fails "String#delete_suffix returns a copy of the string, when the suffix isn't found" # Fails because "string".equal?("string") is always true
 end
