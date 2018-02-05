@@ -191,4 +191,38 @@ opal_filter "language" do
   fails_badly "The while expression stops running body if interrupted by break in a parenthesized attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break with unless in a parenthesized attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break with unless in a begin ... end attribute op-assign-or value"
+  fails "A Symbol literal with invalid bytes raises an EncodingError at parse time" # Actually passes, the error comes from the difference between MRI's opal and compiled opal-parser
+  fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
+  fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
+  fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
+  fails "Constant resolution within methods with ||= assigns a global constant if previously undefined" # NameError: uninitialized constant OpAssignGlobalUndefined
+  fails "Constant resolution within methods with ||= assigns a scoped constant if previously undefined" # NameError: uninitialized constant ConstantSpecs::OpAssignUndefined
+  fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
+  fails "Invoking a method expands the Array elements from the splat after executing the arguments and block if no other arguments follow the splat" # Expected [[1, nil], nil] to equal [[1], nil]
+  fails "A method assigns local variables from method parameters for definition 'def m(a:) a end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(a=1, b:) [a, b] end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(a=1, b: 2) [a, b] end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(a=1, **) a end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(*a, b:) [a, b] end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(*a, b: 1) [a, b] end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(*a, **) a end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(a = nil, **k) [a, k] end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(*a, **k) [a, k] end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(a:, b:) [a, b] end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(a:, b: 1) [a, b] end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(a:, **) a end'"
+  fails "A method assigns local variables from method parameters for definition 'def m(a:, **k) [a, k] end'"
+  fails "Predefined global $. can be assigned a Float" # Expected 123.5 to equal 123
+  fails "Predefined global $. raises TypeError if object can't be converted to an Integer" # Expected TypeError but no exception was raised (#<MockObject:0x518b4> was returned)
+  fails "Predefined global $. should call #to_int to convert the object to an Integer" # Expected #<MockObject:0x518c2> to equal 321
+  fails "The 'case'-construct tests with a string interpolated in a regexp" # Failed: This example is a failure
+  fails "The if expression accepts multiple assignments in conditional expression with nil values" # NoMethodError: undefined method `ary' for #<MSpecEnv:0x50754>
+  fails "The if expression accepts multiple assignments in conditional expression with non-nil values" # NoMethodError: undefined method `ary' for #<MSpecEnv:0x50754>
+  fails "The rescue keyword inline form can be inlined" # Expected Infinity to equal 1
+  fails "The rescue keyword will execute an else block even without rescue and ensure" # Expected warning to match: /else without rescue is useless/ but got: ""
+  fails "The rescue keyword without rescue expression will not rescue exceptions except StandardError" # NameError: uninitialized constant SystemStackError
+  fails "The super keyword when using keyword arguments passes default argument values to the parent" # Expected {} to equal {"b"=>"b"}
+  fails "The super keyword when using regular and keyword arguments passes default argument values to the parent" # Expected ["a", {}] to equal ["a", {"c"=>"c"}]
+  fails "The throw keyword raises an UncaughtThrowError if used to exit a thread" # NotImplementedError: Thread creation not available
+  fails "top-level constant lookup on a class does not search Object after searching other scopes" # Expected NameError but no exception was raised (Hash was returned)
 end

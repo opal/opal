@@ -150,4 +150,6 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.new raises ArgumentError when Float is used without precision"
   fails "BigDecimal.new treats invalid strings as 0.0"
   fails "BigDecimal.ver returns the Version number"
+  fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89
+  fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
 end

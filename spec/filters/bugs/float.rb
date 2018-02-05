@@ -36,4 +36,5 @@ opal_filter "Float" do
   fails "Float#to_s uses non-e format for a positive value with whole part having 16 significant figures"
   fails "Float#to_s uses non-e format for a positive value with whole part having 17 significant figures"
   fails "Float#truncate returns self truncated to an Integer"
+  fails "Float#round returns different rounded values depending on the half option" # TypeError: no implicit conversion of Hash into Integer
 end

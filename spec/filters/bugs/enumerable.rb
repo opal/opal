@@ -37,4 +37,7 @@ opal_filter "Enumerable" do
   fails "Enumerable#zip converts arguments to enums using #to_enum"
   fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
+  fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # Works, but depends on the difference between Integer and Float
+  fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting
+  fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
 end

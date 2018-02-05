@@ -29,4 +29,27 @@ opal_filter "Integer" do
   fails "Integer#** fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
   fails "Integer#pow one argument is passed fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
   fails "Integer.sqrt returns the integer square root of the argument" # Number overflow, 10**400
+  fails "Integer is the class of both small and large integers" # Expected Number to be identical to Integer
+  fails "Integer#& fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
+  fails "Integer#** fixnum raises a ZeroDivisionError for 0 ** -1" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
+  fails "Integer#/ fixnum coerces fixnum and return self divided by other" # Expected 1.0842021724855044e-19 to equal 0
+  fails "Integer#/ fixnum raises a ZeroDivisionError if the given argument is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
+  fails "Integer#/ fixnum returns result the same class as the argument" # Expected 1.5 to equal 1
+  fails "Integer#/ fixnum returns self divided by the given argument" # Expected 1.5 to equal 1
+  fails "Integer#/ fixnum supports dividing negative numbers" # Expected -0.1 to equal -1
+  fails "Integer#<< (with n << m) fixnum returns -1 when n < 0, m < 0 and n > -(2**-m)" # Expected -7 to equal -1
+  fails "Integer#<< (with n << m) fixnum returns 0 when n > 0, m < 0 and n < 2**-m" # Expected 7 to equal 0
+  fails "Integer#>> (with n >> m) fixnum returns -1 when n < 0, m > 0 and n > -(2**m)" # Expected -7 to equal -1
+  fails "Integer#>> (with n >> m) fixnum returns 0 when n > 0, m > 0 and n < 2**m" # Expected 7 to equal 0
+  fails "Integer#^ fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
+  fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 to equal 9223372041149743000
+  fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
+  fails "Integer#coerce fixnum raises a TypeError when given an Object that does not respond to #to_f" # depends on the difference between string/symbol
+  fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # Mock 'x' expected to receive div(#<MockObject:0x16c22>) exactly 1 times but received it 0 times
+  fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nan?' for #<MockObject:0x1df78>
+  fails "Integer#odd? fixnum returns true when self is an odd number" # Expected false to be true
+  fails "Integer#round returns different rounded values depending on the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
+  fails "Integer#round returns itself if passed a positive precision and the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
+  fails "Integer#| fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
+  fails "Integer#| fixnum returns self bitwise OR other" # Expected 65535 to equal 9223372036854841000
 end

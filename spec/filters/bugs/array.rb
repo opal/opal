@@ -15,4 +15,5 @@ opal_filter "Array" do
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#zip fills nil when the given enumereator is shorter than self"
+  fails "Array#== compares with an equivalent Array-like object using #to_ary" # Expected false to be true
 end
