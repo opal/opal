@@ -929,7 +929,7 @@ class Number < Numeric
 
       while (value !== 0) {
         result.push(value % base);
-        value = parseInt(value / base);
+        value = parseInt(value / base, 10);
       }
 
       return result;
@@ -1033,7 +1033,7 @@ class Integer < Numeric
           #{raise Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
         }
 
-        return parseInt(Math.sqrt(n));
+        return parseInt(Math.sqrt(n), 10);
       }
     end
   end

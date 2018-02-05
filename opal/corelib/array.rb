@@ -869,7 +869,8 @@ class Array < `Array`
 
   def dup
     %x{
-      if (self.$$class.$allocate.$$pristine &&
+      if (self.$$class === Opal.Array &&
+          self.$$class.$allocate.$$pristine &&
           self.$copy_instance_variables.$$pristine &&
           self.$initialize_dup.$$pristine) {
         return self.slice(0);
