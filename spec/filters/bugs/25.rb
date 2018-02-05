@@ -238,8 +238,6 @@ fails "String#to_sym returns a UTF-8 Symbol for a UTF-8 String containing non US
 fails "String#to_sym returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
 fails "String#upcase! modifies self in place for all of Unicode" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
 fails "String.new accepts a capacity argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
-fails "Struct.new keyword_init: false option behaves like it does without :keyword_init option" # NoMethodError: undefined method `new' for nil
-fails "Struct.new raises a ArgumentError if passed a Hash with an unknown key" # TypeError: no implicit conversion of Hash into String
 fails "The 'case'-construct tests with a string interpolated in a regexp" # Failed: This example is a failure
 fails "The if expression accepts multiple assignments in conditional expression with nil values" # NoMethodError: undefined method `ary' for main
 fails "The if expression accepts multiple assignments in conditional expression with non-nil values" # NoMethodError: undefined method `ary' for main

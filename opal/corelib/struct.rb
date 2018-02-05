@@ -3,7 +3,7 @@ require 'corelib/enumerable'
 class Struct
   include Enumerable
 
-  def self.new(const_name, *args, &block)
+  def self.new(const_name, *args, keyword_init: false, &block)
     if const_name
       begin
         const_name = Opal.const_name!(const_name)
@@ -33,6 +33,7 @@ class Struct
     end
 
     klass.module_eval(&block) if block
+    `klass.$$keyword_init = keyword_init`
 
     if const_name
       Struct.const_set(const_name, klass)
@@ -74,13 +75,30 @@ class Struct
   end
 
   def initialize(*args)
-    if args.length > self.class.members.length
-      raise ArgumentError, "struct size differs"
-    end
+    if `#{self.class}.$$keyword_init`
+      kwargs = args.last || {}
 
-    self.class.members.each_with_index {|name, index|
-      self[name] = args[index]
-    }
+      if args.length > 1 || `(args.length === 1 && !kwargs.$$is_hash)`
+        raise ArgumentError, "wrong number of arguments (given #{args.length}, expected 0)"
+      end
+
+      extra = kwargs.keys - self.class.members
+      if extra.length > 0
+        raise ArgumentError, "unknown keywords: #{extra.join(', ')}"
+      end
+
+      self.class.members.each do |name|
+        self[name] = kwargs[name]
+      end
+    else
+      if args.length > self.class.members.length
+        raise ArgumentError, "struct size differs"
+      end
+
+      self.class.members.each_with_index {|name, index|
+        self[name] = args[index]
+      }
+    end
   end
 
   def members
