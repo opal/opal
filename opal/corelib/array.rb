@@ -548,7 +548,7 @@ class Array < `Array`
   def cycle(n = nil, &block)
     unless block_given?
       return enum_for(:cycle, n) do
-        if n == nil
+        if n.nil?
           Float::INFINITY
         else
           n = Opal.coerce_to!(n, Integer, :to_int)

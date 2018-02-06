@@ -322,7 +322,7 @@ module Opal
     # Process the given sexp by creating a node instance, based on its type,
     # and compiling it to fragments.
     def process(sexp, level = :expr)
-      return fragment('', scope) if sexp == nil
+      return fragment('', scope) if sexp.nil?
 
       if handler = handlers[sexp.type]
         return handler.new(sexp, level, self).compile_to_fragments
