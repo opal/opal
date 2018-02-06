@@ -95,7 +95,7 @@ class Struct
         raise ArgumentError, "struct size differs"
       end
 
-      self.class.members.each_with_index {|name, index|
+      self.class.members.each_with_index { |name, index|
         self[name] = args[index]
       }
     end
@@ -218,14 +218,14 @@ class Struct
   end
 
   def each
-    return enum_for(:each) {self.size} unless block_given?
+    return enum_for(:each) { self.size } unless block_given?
 
     self.class.members.each { |name| yield self[name] }
     self
   end
 
   def each_pair
-    return enum_for(:each_pair) {self.size} unless block_given?
+    return enum_for(:each_pair) { self.size } unless block_given?
 
     self.class.members.each { |name| yield [name, self[name]] }
     self
@@ -250,7 +250,7 @@ class Struct
       result += "#{self.class} "
     end
 
-    result += each_pair.map {|name, value|
+    result += each_pair.map { |name, value|
       "#{name}=#{value.inspect}"
     }.join ", "
 
@@ -262,11 +262,11 @@ class Struct
   alias to_s inspect
 
   def to_h
-    self.class.members.inject({}) {|h, name| h[name] = self[name]; h}
+    self.class.members.inject({}) { |h, name| h[name] = self[name]; h }
   end
 
   def values_at(*args)
-    args = args.map {|arg| `arg.$$is_range ? #{arg.to_a} : arg`}.flatten
+    args = args.map { |arg| `arg.$$is_range ? #{arg.to_a} : arg` }.flatten
     %x{
       var result = [];
       for (var i = 0, len = args.length; i < len; i++) {

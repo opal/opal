@@ -26,26 +26,6 @@ Layout/IndentationWidth:
     - 'opal/corelib/marshal.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 121
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
-# SupportedStyles: space, no_space
-# SupportedStylesForEmptyBraces: space, no_space
-Layout/SpaceInsideBlockBraces:
-  Exclude:
-    - 'lib/opal/builder.rb'
-    - 'lib/opal/cli_runners/server.rb'
-    - 'lib/opal/nodes/scope.rb'
-    - 'lib/opal/path_reader.rb'
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/enumerable.rb'
-    - 'opal/corelib/enumerator.rb'
-    - 'opal/corelib/hash.rb'
-    - 'opal/corelib/module.rb'
-    - 'opal/corelib/string.rb'
-    - 'opal/corelib/string/inheritance.rb'
-    - 'opal/corelib/struct.rb'
-
 # Offense count: 12
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces.

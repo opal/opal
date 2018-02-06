@@ -107,7 +107,7 @@ module Enumerable
   end
 
   def collect(&block)
-    return enum_for(:collect) {self.enumerator_size} unless block_given?
+    return enum_for(:collect) { self.enumerator_size } unless block_given?
 
     %x{
       var result = [];
@@ -125,7 +125,7 @@ module Enumerable
   end
 
   def collect_concat(&block)
-    return enum_for(:collect_concat) {self.enumerator_size} unless block_given?
+    return enum_for(:collect_concat) { self.enumerator_size } unless block_given?
     map { |item| yield item }.flatten(1)
   end
 
@@ -355,7 +355,7 @@ module Enumerable
       raise ArgumentError, 'invalid slice size'
     end
 
-    return enum_for(:each_slice, n) {respond_to?(:size) ? (size / n).ceil : nil} unless block_given?
+    return enum_for(:each_slice, n) { respond_to?(:size) ? (size / n).ceil : nil } unless block_given?
 
     %x{
       var result,
@@ -388,7 +388,7 @@ module Enumerable
   end
 
   def each_with_index(*args, &block)
-    return enum_for(:each_with_index, *args) {self.enumerator_size} unless block_given?
+    return enum_for(:each_with_index, *args) { self.enumerator_size } unless block_given?
 
     %x{
       var result,
@@ -413,7 +413,7 @@ module Enumerable
   end
 
   def each_with_object(object, &block)
-    return enum_for(:each_with_object, object) {self.enumerator_size} unless block_given?
+    return enum_for(:each_with_object, object) { self.enumerator_size } unless block_given?
 
     %x{
       var result;
@@ -451,7 +451,7 @@ module Enumerable
   alias find detect
 
   def find_all(&block)
-    return enum_for(:find_all) {self.enumerator_size} unless block_given?
+    return enum_for(:find_all) { self.enumerator_size } unless block_given?
 
     %x{
       var result = [];
@@ -577,7 +577,7 @@ module Enumerable
   end
 
   def group_by(&block)
-    return enum_for(:group_by) {self.enumerator_size} unless block_given?
+    return enum_for(:group_by) { self.enumerator_size } unless block_given?
 
     hash = Hash.new
 
@@ -658,7 +658,7 @@ module Enumerable
   end
 
   def lazy
-    Enumerator::Lazy.new(self, enumerator_size) {|enum, *args|
+    Enumerator::Lazy.new(self, enumerator_size) { |enum, *args|
       enum.yield(*args)
     }
   end
@@ -713,7 +713,7 @@ module Enumerable
   end
 
   def max_by(&block)
-    return enum_for(:max_by) {self.enumerator_size} unless block
+    return enum_for(:max_by) { self.enumerator_size } unless block
 
     %x{
       var result,
@@ -789,7 +789,7 @@ module Enumerable
   end
 
   def min_by(&block)
-    return enum_for(:min_by) {self.enumerator_size} unless block
+    return enum_for(:min_by) { self.enumerator_size } unless block
 
     %x{
       var result,
@@ -915,7 +915,7 @@ module Enumerable
   end
 
   def partition(&block)
-    return enum_for(:partition) {self.enumerator_size} unless block_given?
+    return enum_for(:partition) { self.enumerator_size } unless block_given?
 
     %x{
       var truthy = [], falsy = [], result;
@@ -941,7 +941,7 @@ module Enumerable
   alias reduce inject
 
   def reject(&block)
-    return enum_for(:reject) {self.enumerator_size} unless block_given?
+    return enum_for(:reject) { self.enumerator_size } unless block_given?
 
     %x{
       var result = [];
@@ -962,7 +962,7 @@ module Enumerable
   end
 
   def reverse_each(&block)
-    return enum_for(:reverse_each) {self.enumerator_size} unless block_given?
+    return enum_for(:reverse_each) { self.enumerator_size } unless block_given?
 
     %x{
       var result = [];
@@ -992,7 +992,7 @@ module Enumerable
       raise ArgumentError, "wrong number of arguments (#{`arguments.length`} expected 1)"
     end
 
-    Enumerator.new {|e|
+    Enumerator.new { |e|
       %x{
         var slice = [];
 
@@ -1130,12 +1130,12 @@ module Enumerable
 
   def sort(&block)
     ary = to_a
-    block = ->a, b {a <=> b} unless block_given?
+    block = ->a, b { a <=> b } unless block_given?
     return ary.sort(&block)
   end
 
   def sort_by(&block)
-    return enum_for(:sort_by) {self.enumerator_size} unless block_given?
+    return enum_for(:sort_by) { self.enumerator_size } unless block_given?
 
     dup = map {
       arg = Opal.destructure(`arguments`)
