@@ -23,7 +23,7 @@ class File < IO
         basedir          = basedir.sub(home_path_regexp, home) if basedir
       end
 
-      basedir     = Dir.pwd unless basedir
+      basedir ||= Dir.pwd
       path_abs    = `path.substr(0, sep.length) === sep || windows_root_rx.test(path)`
       basedir_abs = `basedir.substr(0, sep.length) === sep || windows_root_rx.test(basedir)`
 
