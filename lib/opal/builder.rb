@@ -168,7 +168,6 @@ module Opal
         case compiler_options[:dynamic_require_severity]
         when :raise   then raise MissingRequire, message
         when :warning then warn message
-        else # noop
         end
 
         return "raise LoadError, #{message.inspect}"

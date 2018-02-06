@@ -25,14 +25,6 @@ Lint/AssignmentInCondition:
 
 # Offense count: 1
 # Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: empty, nil, both
-Style/EmptyElse:
-  Exclude:
-    - 'lib/opal/builder.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
 Style/EmptyLiteral:
   Exclude:
     - 'opal/corelib/enumerable.rb'
