@@ -18,7 +18,7 @@ module Marshal
   end
 
   class << self
-  def dump(object)
+    def dump(object)
       WriteBuffer.new(object).write
     end
 

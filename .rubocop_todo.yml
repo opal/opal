@@ -15,15 +15,6 @@ Layout/ElseAlignment:
     - 'opal/corelib/enumerator.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: normal, rails
-Layout/IndentationConsistency:
-  Exclude:
-    - 'lib/opal/nodes/args/post_args.rb'
-    - 'opal/corelib/marshal.rb'
-
 # Offense count: 7
 # Cop supports --auto-correct.
 # Configuration parameters: Width, IgnoredPatterns.

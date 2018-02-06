@@ -163,15 +163,15 @@ module Opal
         return unless restarg
 
         line "if (#{required_right_args.size} < #{scope.working_arguments}.length) {"
-          indent do
-            # there are some items coming to the splat, extracting them
-            extract_restarg
-          end
+        indent do
+          # there are some items coming to the splat, extracting them
+          extract_restarg
+        end
         line "} else {"
-          indent do
-            # splat is empty
-            extract_blank_restarg
-          end
+        indent do
+          # splat is empty
+          extract_blank_restarg
+        end
         line "}"
       end
 
