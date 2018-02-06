@@ -173,3 +173,9 @@ Style/InfiniteLoop:
   Exclude:
     # That's actually a definition of Kernel#loop
     - 'opal/corelib/kernel.rb'
+
+Style/InverseMethods:
+  # That's what MRI does
+  Exclude:
+    - 'opal/corelib/basic_object.rb'
+    - 'opal/corelib/kernel.rb'

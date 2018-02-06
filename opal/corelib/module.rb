@@ -337,7 +337,7 @@ class Module
   def const_set(name, value)
     name = Opal.const_name!(name)
 
-    if !(name =~ Opal::CONST_NAME_REGEXP) || name.start_with?('::')
+    if name !~ Opal::CONST_NAME_REGEXP || name.start_with?('::')
       raise NameError.new("wrong constant name #{name}", name)
     end
 
