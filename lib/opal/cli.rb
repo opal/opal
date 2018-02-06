@@ -14,7 +14,7 @@ module Opal
       attr_accessor :stdout
     end
 
-    def initialize options = nil
+    def initialize(options = nil)
       options ||= {}
 
       # Runner

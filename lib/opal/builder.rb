@@ -80,7 +80,7 @@ module Opal
       build_str(source, path, options)
     end
 
-    def build_str source, filename, options = {}
+    def build_str(source, filename, options = {})
       path = path_from_filename(filename)
       asset = processor_for(source, filename, path, options)
       requires = preload + asset.requires + tree_requires(asset, path)
@@ -211,7 +211,7 @@ module Opal
       @already_processed ||= Set.new
     end
 
-    def stub? filename
+    def stub?(filename)
       stubs.include?(filename)
     end
 

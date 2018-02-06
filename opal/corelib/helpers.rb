@@ -150,7 +150,7 @@ module Opal
   # @param owner_class [Class] the class owning the methods
   # @param method_names [Array<Symbol>] the list of methods names to mark
   # @return [nil]
-  def self.pristine owner_class, *method_names
+  def self.pristine(owner_class, *method_names)
     %x{
       var method_name, method;
       for (var i = method_names.length - 1; i >= 0; i--) {

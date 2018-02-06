@@ -144,7 +144,7 @@ class File < IO
       (last_dot_idx.nil? || last_dot_idx + 1 == filename.length - 1) ? '' : filename[(last_dot_idx + 1)..-1]
     end
 
-    def exist? path
+    def exist?(path)
       `Opal.modules[#{path}] != null`
     end
     alias exists? exist?

@@ -32,7 +32,7 @@ module Opal
         @extensions
       end
 
-      def self.match? other
+      def self.match?(other)
         other.is_a?(String) && other.match(match_regexp)
       end
 
@@ -111,7 +111,7 @@ module Opal
       end
 
       # Also catch a files with missing extensions and nil.
-      def self.match? other
+      def self.match?(other)
         super || File.extname(other.to_s) == ''
       end
     end

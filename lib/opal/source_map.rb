@@ -69,7 +69,7 @@ module Opal
       map.to_s
     end
 
-    def magic_comment map_path
+    def magic_comment(map_path)
       "\n//# sourceMappingURL=file://#{map_path}"
     end
   end

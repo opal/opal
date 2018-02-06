@@ -166,7 +166,7 @@ module Opal
       puts "Opal v#{Opal::VERSION}"
     end
 
-    def section title
+    def section(title)
       separator ''
       separator title
       separator ''

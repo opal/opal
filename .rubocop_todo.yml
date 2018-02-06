@@ -26,21 +26,6 @@ Lint/AssignmentInCondition:
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: require_parentheses, require_no_parentheses, require_no_parentheses_except_multiline
-Style/MethodDefParentheses:
-  Exclude:
-    - 'lib/opal/builder.rb'
-    - 'lib/opal/builder_processors.rb'
-    - 'lib/opal/cli.rb'
-    - 'lib/opal/cli_options.rb'
-    - 'lib/opal/deprecations.rb'
-    - 'lib/opal/source_map.rb'
-    - 'opal/corelib/file.rb'
-    - 'opal/corelib/helpers.rb'
-
 # Offense count: 3
 Style/MethodMissing:
   Exclude:
