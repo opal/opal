@@ -41,7 +41,7 @@ class Random
       raise ArgumentError, 'negative string size (or size too big)'
     end
 
-    size.times.map { rand(255).chr }.join.force_encoding('ASCII-8BIT')
+    Array.new(size) { rand(255).chr }.join.encode('ASCII-8BIT')
   end
 
   DEFAULT = new(new_seed)
@@ -54,11 +54,8 @@ class Random
 
   def bytes(length)
     length = Opal.coerce_to!(length, Integer, :to_int)
-    length
-      .times
-      .map { rand(255).chr }
-      .join
-      .encode(Encoding::ASCII_8BIT)
+
+    Array.new(length) { rand(255).chr }.join.encode('ASCII-8BIT')
   end
 
   def rand(limit = undefined)
