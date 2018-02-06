@@ -39,7 +39,7 @@ module Opal
       ESCAPE_CHARS = {
         'a' => '\\u0007',
         'e' => '\\u001b'
-      }
+      }.freeze
 
       ESCAPE_REGEX = /(\\+)([#{ ESCAPE_CHARS.keys.join('') }])/
 
@@ -279,7 +279,7 @@ module Opal
     class RangeNode < Base
       children :start, :finish
 
-      SIMPLE_CHILDREN_TYPES = [:int, :float, :str, :sym]
+      SIMPLE_CHILDREN_TYPES = [:int, :float, :str, :sym].freeze
 
       def compile
         if compile_inline?

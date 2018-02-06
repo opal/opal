@@ -6,8 +6,7 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 21
-# Configuration parameters: AllowSafeAssignment.
+# Requires fixing
 Lint/AssignmentInCondition:
   Exclude:
     - 'lib/opal/ast/node.rb'
@@ -23,21 +22,24 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
+# Requires fixing
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 2
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: module_function, extend_self
+# Requires fixing
 Style/ModuleFunction:
   Exclude:
     - 'lib/opal/config.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 33
-# Cop supports --auto-correct.
+# Requires fixing
+# TODO: move opal/**/*.rb to .rubocop.yml
+# after fixing other cases. Opal doesn't support freezing
 Style/MutableConstant:
-  Enabled: false
+  Exclude:
+    - 'opal/**/*.rb'
+    - 'lib/opal/nodes/call.rb'
+    - 'lib/opal/util.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.

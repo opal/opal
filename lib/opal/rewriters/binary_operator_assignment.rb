@@ -107,7 +107,7 @@ module Opal
         cvasgn: ClassVariableHandler,
         send:   SendHandler,
         csend:  ConditionalSendHandler
-      }
+      }.freeze
 
       # lhs += rhs
       def on_op_asgn(node)

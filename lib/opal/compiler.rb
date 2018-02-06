@@ -49,7 +49,7 @@ module Opal
 
     # All compare method nodes - used to optimize performance of
     # math comparisons
-    COMPARE = %w[< > <= >=]
+    COMPARE = %w[< > <= >=].freeze
 
     # defines a compiler option, also creating method of form 'name?'
     def self.compiler_option(name, default_value, options = {})

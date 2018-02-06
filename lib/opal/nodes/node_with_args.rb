@@ -195,7 +195,7 @@ module Opal
         kwarg: :keyreq,
         kwoptarg: :key,
         kwrestarg: :keyrest
-      }
+      }.freeze
 
       def parameters_code
         stringified_parameters = args.children.map do |arg|
