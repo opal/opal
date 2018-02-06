@@ -136,3 +136,6 @@ Performance/RegexpMatch:
   # This cop converts =~ to match?
   # But this method was introduced only in 2.4
   Enabled: false
+
+Performance/UnfreezeString:
+  Enabled: false
