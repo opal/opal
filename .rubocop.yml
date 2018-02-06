@@ -147,3 +147,6 @@ Style/CaseEquality:
   Exclude:
     - 'opal/**/*.rb'
     - 'lib/opal/config.rb'
+
+Style/ClassAndModuleChildren:
+  Enabled: false
