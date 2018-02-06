@@ -10,3 +10,6 @@ Naming/MethodName:
 
 Layout/CaseIndentation:
   EnforcedStyle: end
+
+Layout/ClosingParenthesisIndentation:
+  Enabled: false
