@@ -23,21 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: format, sprintf, percent
-Style/FormatString:
-  Exclude:
-    - 'lib/opal/nodes/scope.rb'
-
-# Offense count: 3
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: annotated, template, unannotated
-Style/FormatStringToken:
-  Exclude:
-    - 'lib/opal/nodes/scope.rb'
-
 # Offense count: 43
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:

@@ -137,7 +137,7 @@ module Opal
         if class? && !@proto_ivars.empty?
           # raise "FIXME to_vars"
           pvars = @proto_ivars.map { |i| "#{proto}#{i}" }.join(' = ')
-          result = "%s\n%s%s = nil;" % [str, indent, pvars]
+          result = "#{str}\n#{indent}#{pvars} = nil;"
         else
           result = str
         end
