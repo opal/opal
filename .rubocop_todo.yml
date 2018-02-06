@@ -26,11 +26,6 @@ Lint/AssignmentInCondition:
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 174
-# Cop supports --auto-correct.
-Style/IfUnlessModifier:
-  Enabled: false
-
 # Offense count: 2
 # Cop supports --auto-correct.
 Style/InfiniteLoop:

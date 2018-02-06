@@ -148,7 +148,6 @@ Style/CaseEquality:
 Style/ClassAndModuleChildren:
   Enabled: false
 
-
 Style/ClassVars:
   Exclude:
     # These classes use class variables on purpose
@@ -166,3 +165,6 @@ Style/EmptyMethod:
   # There are a lot of empty methods are required to make MSpec working
   Exclude:
     - 'opal/**/*.rb'
+
+Style/IfUnlessModifier:
+  Enabled: false
