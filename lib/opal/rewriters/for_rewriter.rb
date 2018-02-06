@@ -67,8 +67,6 @@ module Opal
         s(:begin, *outer_assigns, node)
       end
 
-      private
-
       class LocalVariableAssigns < Base
         attr_reader :result
 
