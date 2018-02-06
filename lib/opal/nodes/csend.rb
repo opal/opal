@@ -4,7 +4,6 @@ require 'opal/nodes/call'
 
 module Opal
   module Nodes
-
     # Safe navigator recv&.meth(arglist, &block)
     class CSendNode < CallNode
       handle :csend
@@ -21,6 +20,5 @@ module Opal
         end
       end
     end
-
   end
 end

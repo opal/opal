@@ -103,7 +103,6 @@ module Opal
         yield receiver_temp
         wrap '(', ')'
       end
-
     end
   end
 end

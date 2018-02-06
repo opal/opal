@@ -65,6 +65,5 @@ module Opal
         out
       end
     end
-
   end
 end

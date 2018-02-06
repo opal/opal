@@ -15,23 +15,6 @@ Layout/ElseAlignment:
     - 'opal/corelib/enumerator.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Layout/EmptyLinesAroundMethodBody:
-  Exclude:
-    - 'opal/corelib/enumerator.rb'
-    - 'opal/corelib/time.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: empty_lines, empty_lines_except_namespace, empty_lines_special, no_empty_lines
-Layout/EmptyLinesAroundModuleBody:
-  Exclude:
-    - 'lib/opal/nodes/csend.rb'
-    - 'lib/opal/nodes/helpers.rb'
-    - 'lib/opal/util.rb'
-
 # Offense count: 10
 # Cop supports --auto-correct.
 # Configuration parameters: AllowForAlignment, ForceEqualSignAlignment.

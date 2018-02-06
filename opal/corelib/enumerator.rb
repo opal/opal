@@ -16,7 +16,6 @@ class Enumerator
 
       return obj;
     }
-
   end
 
   def initialize(*, &block)

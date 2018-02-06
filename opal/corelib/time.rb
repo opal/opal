@@ -745,6 +745,5 @@ class Time < `Date`
     end
 
     [week, year]
-
   end
 end
