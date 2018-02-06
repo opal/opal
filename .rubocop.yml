@@ -150,3 +150,10 @@ Style/CaseEquality:
 
 Style/ClassAndModuleChildren:
   Enabled: false
+
+
+Style/ClassVars:
+  Exclude:
+    # These classes use class variables on purpose
+    - 'lib/opal/rewriters/binary_operator_assignment.rb'
+    - 'lib/opal/rewriters/logical_operator_assignment.rb'

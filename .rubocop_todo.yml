@@ -23,12 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 6
-Style/ClassVars:
-  Exclude:
-    - 'lib/opal/rewriters/binary_operator_assignment.rb'
-    - 'lib/opal/rewriters/logical_operator_assignment.rb'
-
 # Offense count: 283
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, AllowInnerBackticks.
