@@ -6,4 +6,7 @@ Metrics/LineLength:
 
 Naming/MethodName:
   Exclude:
-    - 'opal/**/*.rb'
+    - 'opal/**/*.rb' # Ruby has methods like Integer/Float/Array
+
+Layout/CaseIndentation:
+  EnforcedStyle: end

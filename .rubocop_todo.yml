@@ -6,17 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 33
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentOneStep, IndentationWidth.
-# SupportedStyles: case, end
-Layout/CaseIndentation:
-  Exclude:
-    - 'lib/opal/cli_runners/chrome.rb'
-    - 'lib/opal/rewriters/for_rewriter.rb'
-    - 'opal/corelib/marshal/read_buffer.rb'
-    - 'opal/corelib/module.rb'
-
 # Offense count: 6
 # Cop supports --auto-correct.
 Layout/ClosingParenthesisIndentation:
