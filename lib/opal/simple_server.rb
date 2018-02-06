@@ -99,4 +99,3 @@ class Opal::SimpleServer
     [200, { 'Content-Type' => 'text/html' }, [html]]
   end
 end
-

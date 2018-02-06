@@ -2349,4 +2349,3 @@ class Array < `Array`
     raise "To use Array#pack, you must first require 'corelib/array/pack'."
   end
 end
-

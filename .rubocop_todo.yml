@@ -26,15 +26,6 @@ Layout/IndentationWidth:
     - 'opal/corelib/marshal.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: final_newline, final_blank_line
-Layout/TrailingBlankLines:
-  Exclude:
-    - 'lib/opal/simple_server.rb'
-    - 'opal/corelib/array.rb'
-
 # Offense count: 21
 # Configuration parameters: AllowSafeAssignment.
 Lint/AssignmentInCondition:
