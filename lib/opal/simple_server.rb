@@ -96,7 +96,7 @@ class Opal::SimpleServer
       </html>
       HTML
     end
-    [200, {'Content-Type' => 'text/html'}, [html]]
+    [200, { 'Content-Type' => 'text/html' }, [html]]
   end
 end
 

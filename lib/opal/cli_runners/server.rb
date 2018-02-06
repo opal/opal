@@ -69,9 +69,9 @@ module Opal
         def call(env)
           case env['PATH_INFO']
           when '/'
-            [200, {'Content-Type' => 'text/html'}, [BODY]]
+            [200, { 'Content-Type' => 'text/html' }, [BODY]]
           when '/cli_runner.js'
-            [200, {'Content-Type' => 'text/javascript'}, [@source]]
+            [200, { 'Content-Type' => 'text/javascript' }, [@source]]
           else
             [404, {}, ['not found']]
           end

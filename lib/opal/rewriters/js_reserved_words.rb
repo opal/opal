@@ -90,7 +90,7 @@ module Opal
         name, _ = *node
 
         if name
-          node = node.updated(nil, [fix_var_name(name)], meta: {arg_name: name})
+          node = node.updated(nil, [fix_var_name(name)], meta: { arg_name: name })
         end
 
         node
@@ -102,7 +102,7 @@ module Opal
         fixed_name = fix_var_name(name)
         new_children = value ? [fixed_name, value] : [fixed_name]
 
-        node.updated(nil, new_children, meta: {arg_name: name})
+        node.updated(nil, new_children, meta: { arg_name: name })
       end
     end
   end
