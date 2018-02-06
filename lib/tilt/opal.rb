@@ -30,6 +30,7 @@ module Opal
     end
 
     def prepare
+      # stub
     end
 
     def evaluate(_, _)

@@ -23,22 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 18
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: compact, expanded
-Style/EmptyMethod:
-  Exclude:
-    - 'lib/opal/rewriters/base.rb'
-    - 'lib/opal/rewriters/break_finder.rb'
-    - 'lib/tilt/opal.rb'
-    - 'opal/corelib/basic_object.rb'
-    - 'opal/corelib/class.rb'
-    - 'opal/corelib/kernel.rb'
-    - 'opal/corelib/module.rb'
-    - 'opal/corelib/process.rb'
-    - 'opal/corelib/unsupported.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.

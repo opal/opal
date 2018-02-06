@@ -8,6 +8,7 @@ module Opal
     class Base < ::Parser::AST::Processor
       class DummyLocation
         def node=(*)
+          # stub
         end
 
         def expression

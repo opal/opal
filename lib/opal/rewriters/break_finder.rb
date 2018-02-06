@@ -19,6 +19,7 @@ module Opal
       end
 
       def stop_lookup(node)
+        # noop
       end
 
       # regular loops
