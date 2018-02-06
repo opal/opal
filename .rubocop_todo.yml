@@ -26,19 +26,6 @@ Layout/IndentationWidth:
     - 'opal/corelib/marshal.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 22
-# Cop supports --auto-correct.
-Layout/SpaceAfterComma:
-  Exclude:
-    - 'lib/opal/builder.rb'
-    - 'lib/opal/builder_processors.rb'
-    - 'lib/opal/cli_runners/applescript.rb'
-    - 'lib/opal/cli_runners/nashorn.rb'
-    - 'lib/opal/cli_runners/nodejs.rb'
-    - 'lib/opal/nodes/helpers.rb'
-    - 'lib/opal/source_map.rb'
-    - 'opal/corelib/enumerable.rb'
-
 # Offense count: 11
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.

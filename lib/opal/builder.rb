@@ -57,7 +57,7 @@ module Opal
     end
 
     def initialize(options = nil)
-      (options || {}).each_pair do |k,v|
+      (options || {}).each_pair do |k, v|
         public_send("#{k}=", v)
       end
 
