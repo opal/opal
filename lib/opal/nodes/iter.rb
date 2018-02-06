@@ -178,7 +178,7 @@ module Opal
       def compile_arity_check
         if arity_checks.size > 0
           parent_scope = scope
-          while !(parent_scope.top? || parent_scope.def? || parent_scope.class_scope?)
+          until parent_scope.top? || parent_scope.def? || parent_scope.class_scope?
             parent_scope = parent_scope.parent
           end
 

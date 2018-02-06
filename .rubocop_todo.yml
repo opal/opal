@@ -41,12 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/NegatedWhile:
-  Exclude:
-    - 'lib/opal/nodes/iter.rb'
-
 # Offense count: 6
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, MinBodyLength.
