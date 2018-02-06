@@ -139,3 +139,6 @@ Performance/RegexpMatch:
 
 Performance/UnfreezeString:
   Enabled: false
+
+Style/AsciiComments:
+  Enabled: false
