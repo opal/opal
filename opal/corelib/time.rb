@@ -721,21 +721,21 @@ class Time < `Date`
     first_monday = 0
     year = self.year
     if jan01_wday <= 4 && jan01_wday != 0
-      #Jan 01 is in the first week of the year
+      # Jan 01 is in the first week of the year
       offset = jan01_wday-1
     else
-      #Jan 01 is in the last week of the previous year
+      # Jan 01 is in the last week of the previous year
       offset = jan01_wday-7-1
-      offset = -1 if offset == -8 #Adjust if Jan 01 is a Sunday
+      offset = -1 if offset == -8 # Adjust if Jan 01 is a Sunday
     end
 
     week = ((self.yday+offset)/7.00).ceil
 
     if week <= 0
-      #Get the last week of the previous year
+      # Get the last week of the previous year
       return Time.new(self.year-1, 12, 31).cweek_cyear
     elsif week == 53
-      #Find out whether this is actually week 53 or already week 01 of the following year
+      # Find out whether this is actually week 53 or already week 01 of the following year
       dec31 = Time.new(self.year, 12, 31)
       dec31_wday = dec31.wday
       if dec31_wday <= 3 && dec31_wday != 0
