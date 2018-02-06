@@ -723,13 +723,6 @@ Style/FormatStringToken:
   Exclude:
     - 'lib/opal/nodes/scope.rb'
 
-# Offense count: 6
-# Configuration parameters: AllowedVariables.
-Style/GlobalVars:
-  Exclude:
-    - 'lib/tilt/opal.rb'
-    - 'opal/corelib/kernel.rb'
-
 # Offense count: 43
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:

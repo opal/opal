@@ -27,3 +27,7 @@ Style/FrozenStringLiteralComment:
 Layout/EmptyLineAfterMagicComment:
   Exclude:
     - 'opal/**/*.rb'
+
+Style/GlobalVars:
+  Exclude:
+    - 'opal/corelib/kernel.rb'

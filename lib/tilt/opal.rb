@@ -5,8 +5,6 @@ require 'opal/builder'
 require 'opal/config'
 require 'opal/version'
 
-$OPAL_SOURCE_MAPS = {}
-
 module Opal
   class TiltTemplate < Tilt::Template
     self.default_mime_type = 'application/javascript'
