@@ -168,3 +168,8 @@ Style/EmptyMethod:
 
 Style/IfUnlessModifier:
   Enabled: false
+
+Style/InfiniteLoop:
+  Exclude:
+    # That's actually a definition of Kernel#loop
+    - 'opal/corelib/kernel.rb'

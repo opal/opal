@@ -26,13 +26,6 @@ Lint/AssignmentInCondition:
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/InfiniteLoop:
-  Exclude:
-    - 'lib/opal/nodes/scope.rb'
-    - 'opal/corelib/kernel.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 # Configuration parameters: InverseMethods, InverseBlocks.
