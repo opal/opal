@@ -16,14 +16,12 @@ module Opal
       end
 
       GET_SET = ->(get_type, set_type) {
-
         ->(lhs, rhs, root_type) {
           get_node = lhs.updated(get_type) # lhs
           condition_node = s(root_type, get_node, rhs) # lhs || rhs
 
           lhs.updated(set_type, [*lhs, condition_node]) # lhs = lhs || rhs
         }
-
       }
 
       # Takes    `lhs ||= rhs`
