@@ -189,3 +189,6 @@ Style/MethodMissing:
 
 Style/NumericPredicate:
   Enabled: false
+
+Style/ParallelAssignment:
+  Enabled: false

@@ -41,22 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 12
-# Cop supports --auto-correct.
-Style/ParallelAssignment:
-  Exclude:
-    - 'lib/opal/builder_processors.rb'
-    - 'lib/opal/erb.rb'
-    - 'lib/opal/nodes/arglist.rb'
-    - 'lib/opal/nodes/array.rb'
-    - 'lib/opal/nodes/call.rb'
-    - 'lib/opal/nodes/hash.rb'
-    - 'lib/opal/nodes/if.rb'
-    - 'lib/opal/nodes/scope.rb'
-    - 'lib/opal/rewriters/hashes/key_duplicates_rewriter.rb'
-    - 'lib/opal/source_map.rb'
-    - 'lib/opal/util.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: AllowSafeAssignment.
