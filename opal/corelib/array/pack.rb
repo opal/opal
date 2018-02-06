@@ -386,7 +386,7 @@ class Array
   }
 
   def pack(format)
-    format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').gsub("\000", '')
+    format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').delete("\000")
 
     %x{
       var output = '';

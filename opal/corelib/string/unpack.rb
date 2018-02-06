@@ -700,7 +700,7 @@ class String
   }
 
   def unpack(format)
-    format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').gsub("\000", '')
+    format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').delete("\000")
 
     %x{
       var output = [];
@@ -759,7 +759,7 @@ class String
   end
 
   def unpack1(format)
-    format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').gsub("\000", '')
+    format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').delete("\000")
 
     unpack(format[0])[0]
   end
