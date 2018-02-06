@@ -26,10 +26,10 @@ module Opal
         app = build_app(source)
 
         @server = Rack::Server.start(
-          :app       => app,
-          :Port      => port,
-          :AccessLog => [],
-          :Logger    => Logger.new(output)
+          app: app,
+          Port: port,
+          AccessLog: [],
+          Logger: Logger.new(output)
         )
       end
 
