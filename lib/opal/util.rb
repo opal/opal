@@ -44,10 +44,10 @@ module Opal
       def which(cmd)
         exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
         ENV['PATH'].split(File::PATH_SEPARATOR).find do |path|
-          exts.find { |ext|
+          exts.find do |ext|
             exe = File.join(path, "#{cmd}#{ext}")
             exe if File.executable? exe
-          }
+          end
         end
       end
 

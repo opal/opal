@@ -69,9 +69,9 @@ class Struct
   def self.inherited(klass)
     members = @members
 
-    klass.instance_eval {
+    klass.instance_eval do
       @members = members
-    }
+    end
   end
 
   def initialize(*args)
@@ -95,9 +95,9 @@ class Struct
         raise ArgumentError, "struct size differs"
       end
 
-      self.class.members.each_with_index { |name, index|
+      self.class.members.each_with_index do |name, index|
         self[name] = args[index]
-      }
+      end
     end
   end
 
@@ -250,9 +250,9 @@ class Struct
       result += "#{self.class} "
     end
 
-    result += each_pair.map { |name, value|
+    result += each_pair.map do |name, value|
       "#{name}=#{value.inspect}"
-    }.join ", "
+    end.join ", "
 
     result += ">"
 

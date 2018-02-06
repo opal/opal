@@ -200,12 +200,12 @@ class Range
     }
 
     unless block_given?
-      return enum_for(:step, n) {
+      return enum_for(:step, n) do
         %x{
           coerceStepSize();
           return enumeratorSize();
         }
-      }
+      end
     end
 
     `coerceStepSize()`

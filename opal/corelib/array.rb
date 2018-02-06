@@ -546,14 +546,14 @@ class Array < `Array`
   end
 
   def cycle(n = nil, &block)
-    return enum_for(:cycle, n) {
+    return enum_for(:cycle, n) do
       if n == nil
         Float::INFINITY
       else
         n = Opal.coerce_to!(n, Integer, :to_int)
         n > 0 ? self.enumerator_size * n : 0
       end
-    } unless block_given?
+    end unless block_given?
 
     return if empty? || n == 0
 
@@ -1421,9 +1421,9 @@ class Array < `Array`
 
   def permutation(num = undefined, &block)
     unless block_given?
-      return enum_for(:permutation, num) {
+      return enum_for(:permutation, num) do
         `descending_factorial(self.length, num === undefined ? self.length : num)`
-      }
+      end
     end
 
     %x{
@@ -2160,7 +2160,7 @@ class Array < `Array`
     result = []
     max    = nil
 
-    each { |row|
+    each do |row|
       if Array === row
         row = row.to_a
       else
@@ -2173,11 +2173,11 @@ class Array < `Array`
         raise IndexError, "element size differs (#{`row.length`} should be #{max})"
       end
 
-      `row.length`.times { |i|
+      `row.length`.times do |i|
         entry = (result[i] ||= [])
         entry << row.at(i)
-      }
-    }
+      end
+    end
 
     result
   end

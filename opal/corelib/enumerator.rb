@@ -177,13 +177,13 @@ class Enumerator
         raise ArgumentError, 'tried to call lazy map without a block'
       end
 
-      Lazy.new(self, enumerator_size) { |enum, *args|
+      Lazy.new(self, enumerator_size) do |enum, *args|
         %x{
           var value = Opal.yieldX(block, args);
 
           #{enum.yield `value`};
         }
-      }
+      end
     end
 
     def collect_concat(&block)
@@ -191,7 +191,7 @@ class Enumerator
         raise ArgumentError, 'tried to call lazy map without a block'
       end
 
-      Lazy.new(self, nil) { |enum, *args|
+      Lazy.new(self, nil) do |enum, *args|
         %x{
           var value = Opal.yieldX(block, args);
 
@@ -209,7 +209,7 @@ class Enumerator
             }
           }
         }
-      }
+      end
     end
 
     def drop(n)
@@ -227,13 +227,13 @@ class Enumerator
                      end
 
       dropped = 0
-      Lazy.new(self, set_size) { |enum, *args|
+      Lazy.new(self, set_size) do |enum, *args|
         if dropped < n
           dropped += 1
         else
           enum.yield(*args)
         end
-      }
+      end
     end
 
     def drop_while(&block)
@@ -242,7 +242,7 @@ class Enumerator
       end
 
       succeeding = true
-      Lazy.new(self, nil) { |enum, *args|
+      Lazy.new(self, nil) do |enum, *args|
         if succeeding
           %x{
             var value = Opal.yieldX(block, args);
@@ -256,7 +256,7 @@ class Enumerator
         else
           enum.yield(*args)
         end
-      }
+      end
     end
 
     def enum_for(method = :each, *args, &block)
@@ -268,7 +268,7 @@ class Enumerator
         raise ArgumentError, 'tried to call lazy select without a block'
       end
 
-      Lazy.new(self, nil) { |enum, *args|
+      Lazy.new(self, nil) do |enum, *args|
         %x{
           var value = Opal.yieldX(block, args);
 
@@ -276,14 +276,14 @@ class Enumerator
             #{enum.yield(*args)};
           }
         }
-      }
+      end
     end
 
     alias flat_map collect_concat
 
     def grep(pattern, &block)
       if block
-        Lazy.new(self, nil) { |enum, *args|
+        Lazy.new(self, nil) do |enum, *args|
           %x{
             var param = #{Opal.destructure(args)},
                 value = #{pattern === `param`};
@@ -294,9 +294,9 @@ class Enumerator
               #{enum.yield `Opal.yield1(block, param)`};
             }
           }
-        }
+        end
       else
-        Lazy.new(self, nil) { |enum, *args|
+        Lazy.new(self, nil) do |enum, *args|
           %x{
             var param = #{Opal.destructure(args)},
                 value = #{pattern === `param`};
@@ -305,7 +305,7 @@ class Enumerator
               #{enum.yield `param`};
             }
           }
-        }
+        end
       end
     end
 
@@ -318,7 +318,7 @@ class Enumerator
         raise ArgumentError, 'tried to call lazy reject without a block'
       end
 
-      Lazy.new(self, nil) { |enum, *args|
+      Lazy.new(self, nil) do |enum, *args|
         %x{
           var value = Opal.yieldX(block, args);
 
@@ -326,7 +326,7 @@ class Enumerator
             #{enum.yield(*args)};
           }
         }
-      }
+      end
     end
 
     def take(n)
@@ -344,14 +344,14 @@ class Enumerator
                      end
 
       taken = 0
-      Lazy.new(self, set_size) { |enum, *args|
+      Lazy.new(self, set_size) do |enum, *args|
         if taken < n
           enum.yield(*args)
           taken += 1
         else
           raise StopLazyError
         end
-      }
+      end
     end
 
     def take_while(&block)
@@ -359,7 +359,7 @@ class Enumerator
         raise ArgumentError, 'tried to call lazy take_while without a block'
       end
 
-      Lazy.new(self, nil) { |enum, *args|
+      Lazy.new(self, nil) do |enum, *args|
         %x{
           var value = Opal.yieldX(block, args);
 
@@ -370,7 +370,7 @@ class Enumerator
             #{raise StopLazyError};
           }
         }
-      }
+      end
     end
 
     alias to_enum enum_for

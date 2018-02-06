@@ -23,23 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 27
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, ProceduralMethods, FunctionalMethods, IgnoredMethods.
-# SupportedStyles: line_count_based, semantic, braces_for_chaining
-# ProceduralMethods: benchmark, bm, bmbm, create, each_with_object, measure, new, realtime, tap, with_object
-# FunctionalMethods: let, let!, subject, watch
-# IgnoredMethods: lambda, proc, it
-Style/BlockDelimiters:
-  Exclude:
-    - 'lib/opal/util.rb'
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/enumerable.rb'
-    - 'opal/corelib/enumerator.rb'
-    - 'opal/corelib/number.rb'
-    - 'opal/corelib/range.rb'
-    - 'opal/corelib/struct.rb'
-
 # Offense count: 121
 Style/CaseEquality:
   Enabled: false

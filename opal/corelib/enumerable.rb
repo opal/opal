@@ -154,14 +154,14 @@ module Enumerable
   end
 
   def cycle(n = nil, &block)
-    return enum_for(:cycle, n) {
+    return enum_for(:cycle, n) do
       if n == nil
         respond_to?(:size) ? Float::INFINITY : nil
       else
         n = Opal.coerce_to!(n, Integer, :to_int)
         n > 0 ? self.enumerator_size * n : 0
       end
-    } unless block_given?
+    end unless block_given?
 
     unless n.nil?
       n = Opal.coerce_to! n, Integer, :to_int
@@ -298,7 +298,7 @@ module Enumerable
     end
 
     unless block_given?
-      return enum_for(:each_cons, n) {
+      return enum_for(:each_cons, n) do
         enum_size = self.enumerator_size
         if enum_size.nil?
           nil
@@ -307,7 +307,7 @@ module Enumerable
         else
           enum_size - n + 1
         end
-      }
+      end
     end
 
     %x{
@@ -658,9 +658,9 @@ module Enumerable
   end
 
   def lazy
-    Enumerator::Lazy.new(self, enumerator_size) { |enum, *args|
+    Enumerator::Lazy.new(self, enumerator_size) do |enum, *args|
       enum.yield(*args)
-    }
+    end
   end
 
   def enumerator_size
@@ -992,7 +992,7 @@ module Enumerable
       raise ArgumentError, "wrong number of arguments (#{`arguments.length`} expected 1)"
     end
 
-    Enumerator.new { |e|
+    Enumerator.new do |e|
       %x{
         var slice = [];
 
@@ -1044,7 +1044,7 @@ module Enumerable
           #{e << `slice`};
         }
       }
-    }
+    end
   end
 
   def slice_after(pattern = undefined, &block)
@@ -1137,10 +1137,10 @@ module Enumerable
   def sort_by(&block)
     return enum_for(:sort_by) { self.enumerator_size } unless block_given?
 
-    dup = map {
+    dup = map do
       arg = Opal.destructure(`arguments`)
       [yield(arg), arg]
-    }
+    end
     dup.sort! { |a, b| `a[0]` <=> `b[0]` }
     dup.map! { |i| `i[1]` }
   end

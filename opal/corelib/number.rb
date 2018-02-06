@@ -393,10 +393,10 @@ class Number < Numeric
   end
 
   def downto(stop, &block)
-    return enum_for(:downto, stop) {
+    return enum_for(:downto, stop) do
       raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
       stop > self ? 0 : self - stop + 1
-    } unless block_given?
+    end unless block_given?
 
     %x{
       if (!stop.$$is_number) {
@@ -947,10 +947,10 @@ class Number < Numeric
   end
 
   def upto(stop, &block)
-    return enum_for(:upto, stop) {
+    return enum_for(:upto, stop) do
       raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
       stop < self ? 0 : stop - self + 1
-    } unless block_given?
+    end unless block_given?
 
     %x{
       if (!stop.$$is_number) {
