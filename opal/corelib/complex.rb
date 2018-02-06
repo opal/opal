@@ -118,9 +118,11 @@ class Complex < Numeric
         n = other - 1
 
         while n != 0
-          while (div, mod = n.divmod(2); mod == 0)
+          div, mod = n.divmod(2)
+          while mod == 0
             x = Complex(x.real * x.real - x.imag * x.imag, 2 * x.real * x.imag)
             n = div
+            div, mod = n.divmod(2)
           end
 
           z *= x
