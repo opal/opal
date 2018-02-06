@@ -48,3 +48,8 @@ Lint/BooleanSymbol:
   Exclude:
     # There are AST nodes with types :true and :false
     - 'lib/opal/nodes/**/*.rb'
+
+Lint/InheritException:
+  Exclude:
+    - 'lib/opal/builder.rb'
+    - 'opal/**/*.rb'
