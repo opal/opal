@@ -56,7 +56,7 @@ module Opal
     # Legacy runners
 
     def self.register_legacy_runner(klass_name, *names)
-      runner = ->data {
+      runner = lambda { |data|
         klass = const_get(klass_name)
         runner = klass.new((data[:options] || {}).merge(output: data[:output]))
         runner.run(data[:builder].to_s, data[:argv])

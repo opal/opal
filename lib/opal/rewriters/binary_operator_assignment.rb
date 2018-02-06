@@ -15,8 +15,8 @@ module Opal
         :"$binary_op_recvr_tmp_#{@@counter}"
       end
 
-      GET_SET = ->(get_type, set_type) {
-        ->(lhs, op, rhs) {
+      GET_SET = lambda { |get_type, set_type|
+        lambda { |lhs, op, rhs|
           get_node = lhs.updated(get_type)        # lhs
           set_node = s(:send, get_node, op, rhs)  # lhs + rhs
 

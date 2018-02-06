@@ -157,7 +157,7 @@ module Opal
 
     def read(path)
       path_reader.read(path) || begin
-        print_list = lambda { |list| "- #{list.join("\n- ")}\n" }
+        print_list = ->(list) { "- #{list.join("\n- ")}\n" }
         message = "can't find file: #{path.inspect} in:\n" +
                   print_list[path_reader.paths] +
                   "\nWith the following extensions:\n" +
