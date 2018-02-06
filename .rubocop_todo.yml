@@ -23,11 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 1
-Naming/AccessorMethodName:
-  Exclude:
-    - 'lib/opal/nodes/scope.rb'
-
 # Offense count: 10
 Naming/BinaryOperatorParameterName:
   Exclude:

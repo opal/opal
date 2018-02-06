@@ -259,7 +259,7 @@ module Opal
         nil
       end
 
-      def get_super_chain
+      def super_chain
         chain, scope, defn, mid = [], self, 'null', 'null'
 
         while scope
