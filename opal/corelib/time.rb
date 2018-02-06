@@ -298,7 +298,7 @@ class Time < `Date`
 
     start_of_year = Time.new(year).to_i
     start_of_day  = Time.new(year, month, day).to_i
-    one_day       = 86400
+    one_day       = 86_400
 
     ((start_of_day - start_of_year) / one_day).round + 1
   end
