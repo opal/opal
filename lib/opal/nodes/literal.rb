@@ -72,7 +72,7 @@ module Opal
       # http://www.2ality.com/2013/09/javascript-unicode.html
       def to_utf16(code_point)
         ten_bits = 0b1111111111
-        u = -> (code_unit) { '\\u' + code_unit.to_s(16).upcase }
+        u = ->(code_unit) { '\\u' + code_unit.to_s(16).upcase }
 
         return u.(code_point) if code_point <= 0xFFFF
 
