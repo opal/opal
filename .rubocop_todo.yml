@@ -23,14 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleAlignWith, AutoCorrect.
-# SupportedStylesAlignWith: start_of_line, def
-Lint/DefEndAlignment:
-  Exclude:
-    - 'opal/corelib/marshal.rb'
-
 # Offense count: 4
 Lint/DuplicateMethods:
   Exclude:
