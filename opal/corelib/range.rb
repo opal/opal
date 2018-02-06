@@ -146,7 +146,7 @@ class Range
     infinity = Float::INFINITY
     return infinity if infinity == range_begin.abs || range_end.abs == infinity
 
-    (`Math.abs(range_end - range_begin) + 1`).to_i
+    `Math.abs(range_end - range_begin) + 1`.to_i
   end
 
   def step(n = 1)

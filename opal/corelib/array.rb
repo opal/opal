@@ -1771,12 +1771,12 @@ class Array < `Array`
       options = Opal.coerce_to options, Hash, :to_hash
     end
 
-    if count and `count < 0`
+    if count && `count < 0`
       raise ArgumentError, "count must be greater than 0"
     end
 
     rng = options[:random] if options
-    if rng and rng.respond_to? :rand
+    if rng && rng.respond_to?(:rand)
       rng = SampleRandom.new rng
     else
       rng = Kernel

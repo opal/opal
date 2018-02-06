@@ -70,7 +70,7 @@ module Opal
 
       # Returns true if this scope is a class/module body scope
       def class_scope?
-        @type == :class or @type == :module
+        @type == :class || @type == :module
       end
 
       # Returns true if this is strictly a class scope
@@ -134,7 +134,7 @@ module Opal
         str += "#{indent}#{iv.join indent}" unless ivars.empty?
         str += "#{indent}#{gv.join indent}" unless gvars.empty?
 
-        if class? and !@proto_ivars.empty?
+        if class? && !@proto_ivars.empty?
           # raise "FIXME to_vars"
           pvars = @proto_ivars.map { |i| "#{proto}#{i}" }.join(' = ')
           result = "%s\n%s%s = nil;" % [str, indent, pvars]
@@ -173,8 +173,8 @@ module Opal
       end
 
       def has_local?(local)
-        return true if @locals.include? local or @args.include? local or @temps.include? local
-        return @parent.has_local?(local) if @parent and @type == :iter
+        return true if @locals.include?(local) || @args.include?(local) || @temps.include?(local)
+        return @parent.has_local?(local) if @parent && @type == :iter
         false
       end
 

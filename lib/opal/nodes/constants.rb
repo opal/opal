@@ -28,7 +28,7 @@ module Opal
       # 2. When current file doesn't have __END__ section
       #    DATA const should be resolved to a regular ::DATA constant
       def magical_data_const?
-        const_scope.nil? && name == :DATA and compiler.eof_content
+        const_scope.nil? && name == :DATA && compiler.eof_content
       end
     end
 

@@ -8,7 +8,7 @@ module Kernel
   end
 
   def !~(obj)
-    not(self =~ obj)
+    !(self =~ obj)
   end
 
   def ===(other)

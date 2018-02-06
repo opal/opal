@@ -49,7 +49,7 @@ module Opal
       end
 
       def wrap_in_closure?
-        expr? or recv?
+        expr? || recv?
       end
     end
 

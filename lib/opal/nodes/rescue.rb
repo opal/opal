@@ -65,7 +65,7 @@ module Opal
       end
 
       def wrap_in_closure?
-        recv? or expr? or has_rescue_else?
+        recv? || expr? || has_rescue_else?
       end
 
       def rescue_else_code
@@ -131,7 +131,7 @@ module Opal
         # Wrap a try{} catch{} into a function
         # when it's an expression
         # or when there's a method call after begin;rescue;end
-        wrap '(function() { ', '})()' if expr? or recv?
+        wrap '(function() { ', '})()' if expr? || recv?
       end
 
       def body_code

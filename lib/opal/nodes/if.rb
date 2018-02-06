@@ -44,7 +44,7 @@ module Opal
       end
 
       def needs_wrapper?
-        expr? or recv?
+        expr? || recv?
       end
     end
 

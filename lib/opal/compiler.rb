@@ -57,7 +57,7 @@ module Opal
       valid_values = options[:valid_values]
       define_method(mid || name) do
         value = @options.fetch(name) { default_value }
-        if valid_values and not(valid_values.include?(value))
+        if valid_values && !valid_values.include?(value)
           raise ArgumentError, "invalid value #{value.inspect} for option #{name.inspect} " +
                                "(valid values: #{valid_values.inspect})"
         end
@@ -475,7 +475,7 @@ module Opal
       @scope.uses_block!
       if @scope.block_name
         fragment("(#{@scope.block_name} !== nil)", scope, sexp)
-      elsif scope = @scope.find_parent_def and scope.block_name
+      elsif (scope = @scope.find_parent_def) && scope.block_name
         fragment("(#{scope.block_name} !== nil)", scope, sexp)
       else
         fragment("false", scope, sexp)

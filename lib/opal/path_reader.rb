@@ -44,7 +44,7 @@ module Opal
 
     def find_path(path)
       pathname = Pathname(path)
-      return path if pathname.absolute? and pathname.exist?
+      return path if pathname.absolute? && pathname.exist?
       file_finder.find(path)
     end
 

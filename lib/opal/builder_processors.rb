@@ -33,11 +33,11 @@ module Opal
       end
 
       def self.match? other
-        (other.is_a?(String) and other.match(match_regexp))
+        other.is_a?(String) && other.match(match_regexp)
       end
 
       def self.match_regexp
-        @match_regexp or raise NotImplementedError
+        @match_regexp || raise(NotImplementedError)
       end
 
       def source_map
@@ -112,7 +112,7 @@ module Opal
 
       # Also catch a files with missing extensions and nil.
       def self.match? other
-        super or File.extname(other.to_s) == ''
+        super || File.extname(other.to_s) == ''
       end
     end
 

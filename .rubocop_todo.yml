@@ -23,13 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 54
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, conditionals
-Style/AndOr:
-  Enabled: false
-
 # Offense count: 4
 # Configuration parameters: AllowedChars.
 Style/AsciiComments:
@@ -339,16 +332,6 @@ Style/NilComparison:
     - 'opal/corelib/array.rb'
     - 'opal/corelib/enumerable.rb'
 
-# Offense count: 6
-# Cop supports --auto-correct.
-Style/Not:
-  Exclude:
-    - 'lib/opal/cli.rb'
-    - 'lib/opal/compiler.rb'
-    - 'lib/opal/nodes/node_with_args.rb'
-    - 'lib/opal/rewriters/js_reserved_words.rb'
-    - 'opal/corelib/kernel.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: Strict.
@@ -431,30 +414,6 @@ Style/RaiseArgs:
   Exclude:
     - 'opal/corelib/kernel.rb'
     - 'opal/corelib/module.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/RedundantBegin:
-  Exclude:
-    - 'opal/corelib/enumerator.rb'
-    - 'opal/corelib/marshal/read_buffer.rb'
-    - 'opal/corelib/math.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/RedundantFreeze:
-  Exclude:
-    - 'lib/opal/cli_runners/chrome.rb'
-    - 'lib/opal/regexp_anchors.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-Style/RedundantParentheses:
-  Exclude:
-    - 'lib/opal/nodes/node_with_args.rb'
-    - 'opal/corelib/marshal/read_buffer.rb'
-    - 'opal/corelib/range.rb'
-    - 'opal/corelib/time.rb'
 
 # Offense count: 7
 # Cop supports --auto-correct.

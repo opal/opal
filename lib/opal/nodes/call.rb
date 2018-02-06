@@ -176,7 +176,7 @@ module Opal
       # a variable reference in irb mode in top scope might be a var ref,
       # or it might be a method call
       def using_irb?
-        @compiler.irb? and scope.top? and arglist == s(:arglist) and recvr.nil? and iter.nil?
+        @compiler.irb? && scope.top? && arglist == s(:arglist) && recvr.nil? && iter.nil?
       end
 
       def sexp_with_arglist

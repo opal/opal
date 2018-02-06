@@ -44,7 +44,7 @@ module Opal
         end
 
         # if we are having a closure, we must return a usable value
-        if needs_closure? and !handled_else
+        if needs_closure? && !handled_else
           line
           push "else { return nil }"
         end

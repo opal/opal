@@ -9,8 +9,8 @@ module Opal
     class Chrome
       SCRIPT_PATH = File.expand_path('../chrome.js', __FILE__).freeze
 
-      DEFAULT_CHROME_HOST = 'localhost'.freeze
-      DEFAULT_CHROME_PORT = 9222.freeze
+      DEFAULT_CHROME_HOST = 'localhost'
+      DEFAULT_CHROME_PORT = 9222
 
       def initialize(options)
         @output = options.fetch(:output, $stdout)

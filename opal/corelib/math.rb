@@ -21,19 +21,15 @@ module Math
   end
 
   def self.float!(value)
-    begin
-      Float(value)
-    rescue ArgumentError
-      raise Opal.type_error(value, Float)
-    end
+    Float(value)
+  rescue ArgumentError
+    raise Opal.type_error(value, Float)
   end
 
   def self.integer!(value)
-    begin
-      Integer(value)
-    rescue ArgumentError
-      raise Opal.type_error(value, Integer)
-    end
+    Integer(value)
+  rescue ArgumentError
+    raise Opal.type_error(value, Integer)
   end
 
   module_function

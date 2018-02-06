@@ -174,7 +174,7 @@ module Marshal
       size = read_fixnum * 2
       result = 0
       (0...size).each do |exp|
-        result += (read_char.ord) * 2**(exp * 8)
+        result += read_char.ord * 2**(exp * 8)
       end
       result = result.to_i * sign
       @object_cache << result
@@ -554,11 +554,9 @@ module Marshal
     #  re-raises Marshal-specific error when it's missing
     #
     def safe_const_get(const_name)
-      begin
-        Object.const_get(const_name)
-      rescue NameError
-        raise ArgumentError, "undefined class/module #{const_name}"
-      end
+      Object.const_get(const_name)
+    rescue NameError
+      raise ArgumentError, "undefined class/module #{const_name}"
     end
   end
 end

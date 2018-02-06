@@ -20,11 +20,11 @@ module Opal
       end
 
       def skip_check_present?(test)
-        test == RUBY_ENGINE_CHECK or test == RUBY_PLATFORM_CHECK
+        test == RUBY_ENGINE_CHECK || test == RUBY_PLATFORM_CHECK
       end
 
       def skip_check_present_not?(test)
-        test == RUBY_ENGINE_CHECK_NOT or test == RUBY_PLATFORM_CHECK_NOT
+        test == RUBY_ENGINE_CHECK_NOT || test == RUBY_PLATFORM_CHECK_NOT
       end
 
       RUBY_ENGINE_CHECK = s(:send, s(:const, nil, :RUBY_ENGINE),

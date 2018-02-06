@@ -29,15 +29,15 @@ module Opal
       RESERVED_FUNCTION_NAMES = /#{REGEXP_START}(?:Array)#{REGEXP_END}/
 
       def self.valid_name?(name)
-        BASIC_IDENTIFIER_RULES =~ name and not(
-          ES51_RESERVED_WORD          =~ name or
-          ES3_RESERVED_WORD_EXCLUSIVE =~ name or
-          IMMUTABLE_PROPS             =~ name
+        BASIC_IDENTIFIER_RULES =~ name && !(
+          ES51_RESERVED_WORD =~ name ||
+          ES3_RESERVED_WORD_EXCLUSIVE =~ name ||
+          IMMUTABLE_PROPS =~ name
         )
       end
 
       def self.valid_ivar_name?(name)
-        not (PROTO_SPECIAL_PROPS =~ name or PROTO_SPECIAL_METHODS =~ name)
+        !(PROTO_SPECIAL_PROPS =~ name || PROTO_SPECIAL_METHODS =~ name)
       end
 
       def fix_var_name(name)

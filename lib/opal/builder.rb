@@ -128,7 +128,7 @@ module Opal
     private
 
     def tree_requires(asset, path)
-      if path.nil? or path.empty?
+      if path.nil? || path.empty?
         dirname = Dir.pwd
       else
         dirname = File.dirname(File.expand_path(path))
@@ -150,13 +150,13 @@ module Opal
     end
 
     def processor_for(source, filename, path, options)
-      processor = processors.find { |p| p.match? path } or
-        raise ProcessorNotFound, "can't find processor for filename: #{filename.inspect}, path: #{path.inspect}, source: #{source.inspect}, processors: #{processors.inspect}"
+      (processor = processors.find { |p| p.match? path }) ||
+        raise(ProcessorNotFound, "can't find processor for filename: #{filename.inspect}, path: #{path.inspect}, source: #{source.inspect}, processors: #{processors.inspect}")
       processor.new(source, filename, compiler_options.merge(options))
     end
 
     def read(path)
-      path_reader.read(path) or begin
+      path_reader.read(path) || begin
         print_list = lambda { |list| "- #{list.join("\n- ")}\n" }
         message = "can't find file: #{path.inspect} in:\n" +
                   print_list[path_reader.paths] +

@@ -23,7 +23,7 @@ module Opal
           source_column = fragment.column
           source_code   = fragment.code
 
-          if source_line and source_column
+          if source_line && source_column
             source_offset    = ::SourceMap::Offset.new(source_line, source_column)
             generated_offset = ::SourceMap::Offset.new(generated_line, generated_column)
 

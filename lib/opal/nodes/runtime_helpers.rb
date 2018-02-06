@@ -15,7 +15,7 @@ module Opal
       end
 
       def self.compatible?(recvr, meth)
-        recvr == s(:const, nil, :Opal) and HELPERS.include?(meth.to_sym)
+        recvr == s(:const, nil, :Opal) && HELPERS.include?(meth.to_sym)
       end
 
       def self.helper(name, &block)

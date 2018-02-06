@@ -201,17 +201,17 @@ module Opal
       end
 
       def return_in_iter?
-        if scope.iter? and parent_def = scope.find_parent_def
+        if scope.iter? && parent_def = scope.find_parent_def
           parent_def
         end
       end
 
       def return_expr_in_def?
-        return scope if expr? and scope.def?
+        return scope if expr? && scope.def?
       end
 
       def scope_to_catch_return
-        return_in_iter? or return_expr_in_def?
+        return_in_iter? || return_expr_in_def?
       end
 
       def compile
