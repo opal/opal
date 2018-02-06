@@ -34,11 +34,6 @@ Style/ModuleFunction:
     - 'lib/opal/config.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 1
-Style/MultipleComparison:
-  Exclude:
-    - 'opal/corelib/range.rb'
-
 # Offense count: 33
 # Cop supports --auto-correct.
 Style/MutableConstant:

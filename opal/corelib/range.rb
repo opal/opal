@@ -144,7 +144,7 @@ class Range
     return nil unless Numeric === range_begin && Numeric === range_end
     return 0 if range_end < range_begin
     infinity = Float::INFINITY
-    return infinity if infinity == range_begin.abs || range_end.abs == infinity
+    return infinity if [range_begin.abs, range_end.abs].include?(infinity)
 
     `Math.abs(range_end - range_begin) + 1`.to_i
   end
