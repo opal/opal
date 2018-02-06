@@ -74,12 +74,12 @@ module Opal
           # Monkey patch method calls might return 'self'/aka a bridged instance and need
           # the nil check - see discussion at https://github.com/opal/opal/pull/1097
           allow_optimization_on_type = Compiler::COMPARE.include?(mid.to_s) &&
-            receiver_handler_class &&
-            receiver_handler_class.truthy_optimize?
+                                       receiver_handler_class &&
+                                       receiver_handler_class.truthy_optimize?
 
           if allow_optimization_on_type ||
-            mid == :block_given? ||
-            mid == :"=="
+             mid == :block_given? ||
+             mid == :"=="
             expr(sexp)
           end
         end

@@ -59,7 +59,7 @@ module Opal
         value = @options.fetch(name) { default_value }
         if valid_values and not(valid_values.include?(value))
           raise ArgumentError, "invalid value #{value.inspect} for option #{name.inspect} "+
-                                "(valid values: #{valid_values.inspect})"
+                               "(valid values: #{valid_values.inspect})"
         end
         value
       end

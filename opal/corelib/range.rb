@@ -89,8 +89,8 @@ class Range
     return false unless Range === other
 
     @excl === other.exclude_end? &&
-    @begin.eql?(other.begin) &&
-    @end.eql?(other.end)
+      @begin.eql?(other.begin) &&
+      @end.eql?(other.end)
   end
 
   def exclude_end?

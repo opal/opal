@@ -321,10 +321,10 @@ class MatchData
     return false unless MatchData === other
 
     `self.string == other.string` &&
-    `self.regexp.toString() == other.regexp.toString()` &&
-    `self.pre_match == other.pre_match` &&
-    `self.post_match == other.post_match` &&
-    `self.begin == other.begin`
+      `self.regexp.toString() == other.regexp.toString()` &&
+      `self.pre_match == other.pre_match` &&
+      `self.post_match == other.post_match` &&
+      `self.begin == other.begin`
   end
 
   alias eql? ==

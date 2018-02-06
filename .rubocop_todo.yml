@@ -26,18 +26,6 @@ Layout/IndentationWidth:
     - 'opal/corelib/marshal.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 12
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentationWidth.
-# SupportedStyles: aligned, indented
-Layout/MultilineOperationIndentation:
-  Exclude:
-    - 'lib/opal/compiler.rb'
-    - 'lib/opal/nodes/helpers.rb'
-    - 'opal/corelib/module.rb'
-    - 'opal/corelib/range.rb'
-    - 'opal/corelib/regexp.rb'
-
 # Offense count: 22
 # Cop supports --auto-correct.
 Layout/SpaceAfterComma:
