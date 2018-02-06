@@ -77,7 +77,6 @@ module Opal
           end
         end
       end
-
     end
   end
 end

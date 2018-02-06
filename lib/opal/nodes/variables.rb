@@ -108,7 +108,6 @@ module Opal
         add_gvar name
         push "$gvars#{name}"
       end
-
     end
 
     # back_ref can be:

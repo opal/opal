@@ -170,5 +170,4 @@ class Proc < `Function`
   end
 
   alias clone dup
-
 end
