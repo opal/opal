@@ -74,7 +74,7 @@ module Opal
         ten_bits = 0b1111111111
         u = ->(code_unit) { '\\u' + code_unit.to_s(16).upcase }
 
-        return u.(code_point) if code_point <= 0xFFFF
+        return u.call(code_point) if code_point <= 0xFFFF
 
         code_point -= 0x10000
 
@@ -84,7 +84,7 @@ module Opal
         # Mask to get least significant 10 bits
         tail_surrogate = 0xDC00 + (code_point & ten_bits)
 
-        u.(lead_surrogate) + u.(tail_surrogate)
+        u.call(lead_surrogate) + u.call(tail_surrogate)
       end
     end
 
