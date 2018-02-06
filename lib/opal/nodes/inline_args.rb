@@ -15,7 +15,7 @@ module Opal
       def arg_names
         done_kwargs = false
 
-        children.inject([]) do |result, arg|
+        children.each_with_object([]) do |arg, result|
           case arg.type
           when :kwarg, :kwoptarg, :kwrestarg
             unless done_kwargs
@@ -43,8 +43,6 @@ module Opal
           else
             raise "Unknown argument type #{arg.inspect}"
           end
-
-          result
         end
       end
 

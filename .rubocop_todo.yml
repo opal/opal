@@ -23,20 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 3
-# Style/DoubleNegation:
-#   Exclude:
-#     - 'lib/opal/compiler.rb'
-#     - 'lib/opal/nodes/scope.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/EachWithObject:
-  Exclude:
-    - 'lib/opal/nodes/call.rb'
-    - 'lib/opal/nodes/inline_args.rb'
-    - 'opal/corelib/struct.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.

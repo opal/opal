@@ -262,7 +262,7 @@ class Struct
   alias to_s inspect
 
   def to_h
-    self.class.members.inject({}) { |h, name| h[name] = self[name]; h }
+    self.class.members.each_with_object({}) { |name, h| h[name] = self[name] }
   end
 
   def values_at(*args)

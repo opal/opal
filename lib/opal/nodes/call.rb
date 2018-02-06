@@ -350,7 +350,7 @@ module Opal
         end
 
         def expand_path(path, base = '')
-          "#{base}/#{path}".split("/").inject([]) do |p, part|
+          "#{base}/#{path}".split("/").each_with_object([]) do |part, p|
             if part == ''
               # we had '//', so ignore
             elsif part == '..'
@@ -358,8 +358,6 @@ module Opal
             else
               p << part
             end
-
-            p
           end.join "/"
         end
       end
