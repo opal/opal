@@ -254,12 +254,12 @@ module Opal
       name = name.to_s
       if name && !name.empty?
         name = "_#{name}"
-          .gsub('?', '$q')
-          .gsub('!', '$B')
-          .gsub('=', '$eq')
-          .gsub('<', '$lt')
-          .gsub('>', '$gt')
-          .gsub(/[^\w\$]/, '$')
+               .gsub('?', '$q')
+               .gsub('!', '$B')
+               .gsub('=', '$eq')
+               .gsub('<', '$lt')
+               .gsub('>', '$gt')
+               .gsub(/[^\w\$]/, '$')
       end
       unique = (@unique += 1)
       "TMP#{name}_#{unique}"
@@ -424,9 +424,9 @@ module Opal
       when :xstr
         if sexp.children.any?
           strs = sexp
-            .children
-            .select { |child| child.type == :str }
-            .map { |child| child.children[0] }
+                 .children
+                 .select { |child| child.type == :str }
+                 .map { |child| child.children[0] }
 
           multiline = strs.any? { |str| str.end_with?(";\n") }
 

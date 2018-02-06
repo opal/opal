@@ -114,8 +114,8 @@ module Opal
         lhs, op, rhs = *node
 
         result = HANDLERS
-          .fetch(lhs.type) { raise NotImplementedError }
-          .call(lhs, op, rhs)
+                 .fetch(lhs.type) { raise NotImplementedError }
+                 .call(lhs, op, rhs)
 
         process(result)
       end
