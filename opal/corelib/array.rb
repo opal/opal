@@ -1214,7 +1214,7 @@ class Array < `Array`
     }
   end
 
-  def index(object=undefined, &block)
+  def index(object = undefined, &block)
     %x{
       var i, length, value;
 
@@ -1709,7 +1709,7 @@ class Array < `Array`
     }
   end
 
-  def rotate(n=1)
+  def rotate(n = 1)
     n = Opal.coerce_to n, Integer, :to_int
     %x{
       var ary, idx, firstPart, lastPart;
@@ -1730,7 +1730,7 @@ class Array < `Array`
     }
   end
 
-  def rotate!(cnt=1)
+  def rotate!(cnt = 1)
     %x{
       if (self.length === 0 || self.length === 1) {
         return self;

@@ -18,7 +18,7 @@ class Regexp < `RegExp`
       `Opal.escape_regexp(string)`
     end
 
-    def last_match(n=nil)
+    def last_match(n = nil)
       if n.nil?
         $~
       else

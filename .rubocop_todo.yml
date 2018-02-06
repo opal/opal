@@ -26,18 +26,6 @@ Layout/IndentationWidth:
     - 'opal/corelib/marshal.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 11
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: space, no_space
-Layout/SpaceAroundEqualsInParameterDefault:
-  Exclude:
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/error.rb'
-    - 'opal/corelib/file.rb'
-    - 'opal/corelib/module.rb'
-    - 'opal/corelib/regexp.rb'
-
 # Offense count: 54
 # Cop supports --auto-correct.
 # Configuration parameters: AllowForAlignment.

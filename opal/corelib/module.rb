@@ -234,11 +234,11 @@ class Module
     }
   end
 
-  def constants(inherit=true)
+  def constants(inherit = true)
     `Opal.constants(self, inherit)`
   end
 
-  def self.constants(inherit=undefined)
+  def self.constants(inherit = undefined)
     %x{
       if (inherit == null) {
         var nesting = (self.$$nesting || []).concat(Opal.Object),

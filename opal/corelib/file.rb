@@ -107,7 +107,7 @@ class File < IO
       }
     end
 
-    def basename(name, suffix=nil)
+    def basename(name, suffix = nil)
       sep_chars = `$sep_chars()`
       name = `$coerce_to_path(name)`
       %x{

@@ -47,7 +47,7 @@ class Exception < `Error`
     }
   end
 
-  def exception(str=nil)
+  def exception(str = nil)
     %x{
       if (str === nil || self === str) {
         return self;
@@ -129,7 +129,7 @@ end
 class NameError
   attr_reader :name
 
-  def initialize(message, name=nil)
+  def initialize(message, name = nil)
     super message
     @name = name
   end
@@ -138,7 +138,7 @@ end
 class NoMethodError
   attr_reader :args
 
-  def initialize(message, name=nil, args=[])
+  def initialize(message, name = nil, args = [])
     super message, name
     @args = args
   end
