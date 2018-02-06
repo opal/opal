@@ -23,17 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 10
-Naming/BinaryOperatorParameterName:
-  Exclude:
-    - 'opal/corelib/kernel.rb'
-    - 'opal/corelib/module.rb'
-    - 'opal/corelib/number.rb'
-    - 'opal/corelib/range.rb'
-    - 'opal/corelib/regexp.rb'
-    - 'opal/corelib/string.rb'
-    - 'opal/corelib/string/inheritance.rb'
-
 # Offense count: 7
 # Configuration parameters: .
 # SupportedStyles: snake_case, camelCase

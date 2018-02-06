@@ -112,3 +112,8 @@ Metrics/ParameterLists:
   Exclude:
     # Some Ruby methods take 10 arguments
     - 'opal/**/*.rb'
+
+Naming/BinaryOperatorParameterName:
+  Exclude:
+    # Opal follows MRI argument namings
+    - 'opal/**/*.rb'
