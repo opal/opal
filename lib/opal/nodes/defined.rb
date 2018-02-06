@@ -147,7 +147,7 @@ module Opal
 
       def compile_defined_yield
         scope.uses_block!
-        block_name = scope.block_name || (parent = scope.find_parent_def && parent.block_name)
+        block_name = scope.block_name || scope.find_parent_def.block_name
         push "(#{block_name} != null && #{block_name} !== nil)"
         block_name
       end
