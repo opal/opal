@@ -34,6 +34,10 @@ class Regexp < `RegExp`
         if (parts.length == 0) {
           return /(?!)/;
         }
+        // return fast if there's only one element
+        if (parts.length == 1 && parts[0].$$is_regexp) {
+          return parts[0];
+        }
         // cover the 2 arrays passed as arguments case
         is_first_part_array = parts[0].$$is_array;
         if (parts.length > 1 && is_first_part_array) {
