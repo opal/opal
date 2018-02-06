@@ -32,7 +32,7 @@ module Opal
     def prepare
     end
 
-    def evaluate(_, _, &block)
+    def evaluate(_, _)
       if builder = @options[:builder]
         builder.dup.build(file).to_s
       elsif @options[:build]

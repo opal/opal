@@ -5,7 +5,7 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class BaseYieldNode < Base
-      def compile_call(children, level)
+      def compile_call
         yielding_scope = find_yielding_scope
 
         yielding_scope.uses_block!
@@ -50,7 +50,7 @@ module Opal
       handle :yield
 
       def compile
-        compile_call(children, @level)
+        compile_call
       end
     end
 
@@ -60,7 +60,7 @@ module Opal
       handle :returnable_yield
 
       def compile
-        compile_call children, @level
+        compile_call
 
         wrap "return ", ";"
       end

@@ -14,7 +14,7 @@ module Opal
         ::Opal::AST::Node.new(type, children)
       end
 
-      def self.compatible?(recvr, meth, arglist)
+      def self.compatible?(recvr, meth)
         recvr == s(:const, nil, :Opal) and HELPERS.include?(meth.to_sym)
       end
 

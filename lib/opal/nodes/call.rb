@@ -190,7 +190,7 @@ module Opal
         if SPECIALS.include? meth
           method = method("handle_#{meth}")
           method.arity == 1 ? method[compile_default] : method[]
-        elsif RuntimeHelpers.compatible?(recvr, meth, arglist)
+        elsif RuntimeHelpers.compatible?(recvr, meth)
           push(RuntimeHelpers.new(sexp_with_arglist, @level, @compiler).compile)
         else
           compile_default.call

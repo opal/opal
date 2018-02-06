@@ -273,7 +273,7 @@ module Opal
     # To keep code blocks nicely indented, this will yield a block after
     # adding an extra layer of indent, and then returning the resulting
     # code after reverting the indent.
-    def indent(&block)
+    def indent
       indent = @indent
       @indent += INDENT
       @space = "\n#@indent"
@@ -288,7 +288,7 @@ module Opal
     # while the block is yielding, and queue it back up once it is
     # finished. Variables are queued once finished with to save the
     # numbers of variables needed at runtime.
-    def with_temp(&block)
+    def with_temp
       tmp = @scope.new_temp
       res = yield tmp
       @scope.queue_temp tmp

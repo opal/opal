@@ -30,9 +30,9 @@ module Opal
           compile_defined_ivar(value)
           wrap "(", " ? 'instance-variable' : nil)"
         when :zsuper, :super
-          compile_defined_super(value)
+          compile_defined_super
         when :yield
-          compile_defined_yield(value)
+          compile_defined_yield
           wrap "(", " ? 'yield' : nil)"
         when :xstr
           compile_defined_xstr(value)
@@ -46,10 +46,10 @@ module Opal
           compile_defined_gvar(value)
           wrap "(", " ? 'global-variable' : nil)"
         when :back_ref
-          compile_defined_back_ref(value)
+          compile_defined_back_ref
           wrap "(", " ? 'global-variable' : nil)"
         when :nth_ref
-          compile_defined_nth_ref(value)
+          compile_defined_nth_ref
           wrap "(", " ? 'global-variable' : nil)"
         when :array
           compile_defined_array(value)
@@ -141,11 +141,11 @@ module Opal
         tmp
       end
 
-      def compile_defined_super(node)
+      def compile_defined_super
         push expr s(:defined_super)
       end
 
-      def compile_defined_yield(node)
+      def compile_defined_yield
         scope.uses_block!
         block_name = scope.block_name || (parent = scope.find_parent_def && parent.block_name)
         push "(#{block_name} != null && #{block_name} !== nil)"
@@ -194,14 +194,14 @@ module Opal
         gvar_temp
       end
 
-      def compile_defined_back_ref(node)
+      def compile_defined_back_ref
         helper :gvars
         back_ref_temp = scope.new_temp
         push "(#{back_ref_temp} = $gvars['~'], #{back_ref_temp} != null && #{back_ref_temp} !== nil)"
         back_ref_temp
       end
 
-      def compile_defined_nth_ref(node)
+      def compile_defined_nth_ref
         helper :gvars
 
         nth_ref_tmp = scope.new_temp
