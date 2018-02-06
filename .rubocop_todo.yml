@@ -23,48 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 92
-Metrics/AbcSize:
-  Max: 119
-
-# Offense count: 3
-# Configuration parameters: CountComments, ExcludedMethods.
-Metrics/BlockLength:
-  Max: 38
-
-# Offense count: 4
-# Configuration parameters: CountBlocks.
-Metrics/BlockNesting:
-  Max: 5
-
-# Offense count: 31
-# Configuration parameters: CountComments.
-Metrics/ClassLength:
-  Max: 1822
-
-# Offense count: 44
-Metrics/CyclomaticComplexity:
-  Max: 26
-
-# Offense count: 356
-# Configuration parameters: CountComments.
-Metrics/MethodLength:
-  Max: 480
-
-# Offense count: 5
-# Configuration parameters: CountComments.
-Metrics/ModuleLength:
-  Max: 997
-
-# Offense count: 3
-# Configuration parameters: CountKeywordArgs.
-Metrics/ParameterLists:
-  Max: 10
-
-# Offense count: 36
-Metrics/PerceivedComplexity:
-  Max: 25
-
 # Offense count: 1
 Naming/AccessorMethodName:
   Exclude:

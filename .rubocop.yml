@@ -83,3 +83,32 @@ Lint/UselessAssignment:
   Exclude:
     # Variable from Ruby can be accessed in JS, rubocop can't catch it (but JSHint can)
     - 'opal/**/*.rb'
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/BlockNesting:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Exclude:
+    # Some Ruby methods take 10 arguments
+    - 'opal/**/*.rb'
