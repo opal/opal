@@ -102,7 +102,7 @@ class Range
     super
   end
 
-  alias :include? :cover?
+  alias include? cover?
 
   def last(n = undefined)
     return @end if `n == null`
@@ -122,7 +122,7 @@ class Range
     end
   end
 
-  alias :member? :cover?
+  alias member? cover?
 
   def min
     if block_given?

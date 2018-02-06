@@ -1023,7 +1023,7 @@ class Hash
     }
   end
 
-  alias_method :store, :[]=
+  alias store []=
 
   def to_a
     %x{

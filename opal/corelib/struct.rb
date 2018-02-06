@@ -28,7 +28,7 @@ class Struct
           instance
         end
 
-        alias [] new
+        alias_method :[], :new
       end
     end
 
