@@ -385,8 +385,7 @@ module Opal
       when :when
         *when_sexp, then_sexp = *sexp
         sexp.updated(nil,
-                     [*when_sexp, returns(then_sexp)]
-        )
+                     [*when_sexp, returns(then_sexp)])
       when :rescue
         body_sexp, *resbodies, else_sexp = *sexp
 
@@ -409,8 +408,7 @@ module Opal
       when :ensure
         rescue_sexp, ensure_body = *sexp
         sexp = sexp.updated(nil,
-                            [returns(rescue_sexp), ensure_body]
-        )
+                            [returns(rescue_sexp), ensure_body])
         s(:js_return, sexp)
       when :begin, :kwbegin
         # Wrapping last expression with s(:js_return, ...)

@@ -62,8 +62,7 @@ module Opal
 
         node = s(:send, iterating_value, :each,                 # (0..3).each {
                  s(:iter, s(:args, s(:arg, tmp_loop_variable)), #                |__jstmp|
-                   loop_body)                                   #                          i = __jstmp; j = i + 1 }
-        )
+                   loop_body))                                  #                          i = __jstmp; j = i + 1 }
 
         s(:begin, *outer_assigns, node)
       end

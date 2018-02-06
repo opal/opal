@@ -26,16 +26,6 @@ Layout/IndentationWidth:
     - 'opal/corelib/marshal.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: symmetrical, new_line, same_line
-Layout/MultilineMethodCallBraceLayout:
-  Exclude:
-    - 'lib/opal/compiler.rb'
-    - 'lib/opal/rewriters/explicit_writer_return.rb'
-    - 'lib/opal/rewriters/for_rewriter.rb'
-
 # Offense count: 16
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, IndentationWidth.

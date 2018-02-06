@@ -13,8 +13,7 @@ module Opal
       GET_ARGS_NODE = s(:lvar, TMP_NAME)
       RETURN_ARGS_NODE = s(:jsattr,
                            GET_ARGS_NODE,
-                           s(:send, s(:jsattr, GET_ARGS_NODE, s(:str, 'length')), :-, s(:int, 1))
-      )
+                           s(:send, s(:jsattr, GET_ARGS_NODE, s(:str, 'length')), :-, s(:int, 1)))
 
       def on_send(node)
         return super if @in_masgn
@@ -27,8 +26,7 @@ module Opal
           s(:begin,
             set_args_node,
             node.updated(nil, [recv, method_name, s(:splat, GET_ARGS_NODE)]),
-            RETURN_ARGS_NODE
-          )
+            RETURN_ARGS_NODE)
         else
           super
         end
