@@ -129,8 +129,12 @@ class BasicObject
   end
 
   def method_missing(symbol, *args, &block)
-    ::Kernel.raise ::NoMethodError.new(`self.$inspect && !self.$inspect.$$stub` ?
-      "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}" :
-      "undefined method `#{symbol}' for #{`self.$$class`}", symbol)
+    message = if `self.$inspect && !self.$inspect.$$stub`
+                "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}"
+              else
+                "undefined method `#{symbol}' for #{`self.$$class`}"
+              end
+
+    ::Kernel.raise ::NoMethodError.new(message, symbol)
   end
 end

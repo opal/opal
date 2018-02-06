@@ -35,11 +35,6 @@ Style/ModuleFunction:
     - 'lib/opal/util.rb'
 
 # Offense count: 1
-Style/MultilineTernaryOperator:
-  Exclude:
-    - 'opal/corelib/basic_object.rb'
-
-# Offense count: 1
 Style/MultipleComparison:
   Exclude:
     - 'opal/corelib/range.rb'
