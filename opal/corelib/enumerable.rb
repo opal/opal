@@ -16,9 +16,9 @@ module Enumerable
   def all?(pattern = undefined, &block)
     if `pattern !== undefined`
       each do |*value|
-        value = `comparableForPattern(value)`
+        comparable = `comparableForPattern(value)`
 
-        return false unless pattern.public_send(:===, *value)
+        return false unless pattern.public_send(:===, *comparable)
       end
     elsif block_given?
       each do |*value|
@@ -40,9 +40,9 @@ module Enumerable
   def any?(pattern = undefined, &block)
     if `pattern !== undefined`
       each do |*value|
-        value = `comparableForPattern(value)`
+        comparable = `comparableForPattern(value)`
 
-        return true if pattern.public_send(:===, *value)
+        return true if pattern.public_send(:===, *comparable)
       end
     elsif block_given?
       each do |*value|
@@ -860,9 +860,9 @@ module Enumerable
   def none?(pattern = undefined, &block)
     if `pattern !== undefined`
       each do |*value|
-        value = `comparableForPattern(value)`
+        comparable = `comparableForPattern(value)`
 
-        return false if pattern.public_send(:===, *value)
+        return false if pattern.public_send(:===, *comparable)
       end
     elsif block_given?
       each do |*value|
@@ -886,9 +886,9 @@ module Enumerable
 
     if `pattern !== undefined`
       each do |*value|
-        value = `comparableForPattern(value)`
+        comparable = `comparableForPattern(value)`
 
-        if pattern.public_send(:===, *value)
+        if pattern.public_send(:===, *comparable)
           count += 1
           return false if count > 1
         end

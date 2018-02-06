@@ -285,20 +285,20 @@ module Opal
       end
 
       add_special :nesting do |compile_default|
-        push_nesting = push_nesting?(children)
+        push_nesting = push_nesting?
         push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
         compile_default.call
         push ')' if push_nesting
       end
 
       add_special :constants do |compile_default|
-        push_nesting = push_nesting?(children)
+        push_nesting = push_nesting?
         push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
         compile_default.call
         push ')' if push_nesting
       end
 
-      def push_nesting?(recv)
+      def push_nesting?
         recv = children.first
 
         children.size == 2 && (           # only receiver and method

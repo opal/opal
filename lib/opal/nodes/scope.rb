@@ -197,12 +197,11 @@ module Opal
       end
 
       def next_temp
+        tmp = nil
         loop do
           tmp = "$#{@unique}"
           @unique = @unique.succ
-          unless has_local?(tmp)
-            break
-          end
+          break unless has_local?(tmp)
         end
         tmp
       end
