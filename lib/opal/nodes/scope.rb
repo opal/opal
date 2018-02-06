@@ -197,7 +197,7 @@ module Opal
       end
 
       def next_temp
-        while true
+        loop do
           tmp = "$#{@unique}"
           @unique = @unique.succ
           unless has_local?(tmp)

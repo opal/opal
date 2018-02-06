@@ -23,25 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 88
-Lint/LiteralAsCondition:
-  Exclude:
-    - 'lib/opal/nodes/scope.rb'
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/basic_object.rb'
-    - 'opal/corelib/enumerable.rb'
-    - 'opal/corelib/file.rb'
-    - 'opal/corelib/helpers.rb'
-    - 'opal/corelib/kernel.rb'
-    - 'opal/corelib/marshal/write_buffer.rb'
-    - 'opal/corelib/math.rb'
-    - 'opal/corelib/module.rb'
-    - 'opal/corelib/number.rb'
-    - 'opal/corelib/range.rb'
-    - 'opal/corelib/string.rb'
-    - 'opal/corelib/string/inheritance.rb'
-    - 'opal/corelib/struct.rb'
-
 # Offense count: 1
 Lint/RescueException:
   Exclude:

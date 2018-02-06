@@ -53,3 +53,8 @@ Lint/InheritException:
   Exclude:
     - 'lib/opal/builder.rb'
     - 'opal/**/*.rb'
+
+Lint/LiteralAsCondition:
+  Exclude:
+    # Opal support if `...js...`
+    - 'opal/**/*.rb'
