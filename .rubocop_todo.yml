@@ -23,6 +23,9 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
+Style/GuardClause:
+  Enabled: false
+
 # Offense count: 174
 # Cop supports --auto-correct.
 Style/IfUnlessModifier:
