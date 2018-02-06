@@ -137,16 +137,16 @@ class Range
   end
 
   def size
-    _begin = @begin
-    _end   = @end
-    _end  -= 1 if @excl
+    range_begin = @begin
+    range_end   = @end
+    range_end  -= 1 if @excl
 
-    return nil unless Numeric === _begin && Numeric === _end
-    return 0 if _end < _begin
+    return nil unless Numeric === range_begin && Numeric === range_end
+    return 0 if range_end < range_begin
     infinity = Float::INFINITY
-    return infinity if infinity == _begin.abs || _end.abs == infinity
+    return infinity if infinity == range_begin.abs || range_end.abs == infinity
 
-    (`Math.abs(_end - _begin) + 1`).to_i
+    (`Math.abs(range_end - range_begin) + 1`).to_i
   end
 
   def step(n = 1)
