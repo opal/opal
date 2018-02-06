@@ -54,7 +54,7 @@ module Opal
       INSTALLED = {}
       def command_installed?(cmd, install_comment)
         command_installed = Command::INSTALLED[cmd.to_s] ||= which(cmd)
-        $stderr.puts %Q("#{cmd}" command not found#{install_comment}) unless command_installed
+        $stderr.puts %("#{cmd}" command not found#{install_comment}) unless command_installed
         command_installed
       end
     end
