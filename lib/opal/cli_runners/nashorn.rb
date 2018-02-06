@@ -19,7 +19,7 @@ module Opal
         tempfile = Tempfile.new('opal-nashorn-runner-')
         tempfile.write code
         tempfile.close
-        system_with_output({}, 'jjs', tempfile.path , *argv)
+        system_with_output({}, 'jjs', tempfile.path, *argv)
       rescue Errno::ENOENT
         raise MissingNashorn, 'Please install JDK to be able to run Opal scripts.'
       end

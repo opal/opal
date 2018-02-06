@@ -325,7 +325,7 @@ module Opal
       end
 
       def compile_range_initialize
-        push 'Opal.Range.$new(', expr(start), ',' , expr(finish), ', true)'
+        push 'Opal.Range.$new(', expr(start), ',', expr(finish), ', true)'
       end
     end
 

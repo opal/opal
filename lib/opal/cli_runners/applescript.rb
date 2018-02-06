@@ -23,7 +23,7 @@ module Opal
         tempfile.puts code
         tempfile.puts "'';" # OSAScript will output the last thing
         tempfile.close
-        _successful = system_with_output('osascript', '-l', 'JavaScript', tempfile.path , *argv)
+        _successful = system_with_output('osascript', '-l', 'JavaScript', tempfile.path, *argv)
       rescue Errno::ENOENT
         raise MissingAppleScript, 'AppleScript is only available on Mac OS X.'
       end

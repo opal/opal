@@ -28,15 +28,6 @@ Layout/IndentationWidth:
 
 # Offense count: 4
 # Cop supports --auto-correct.
-Layout/SpaceBeforeComma:
-  Exclude:
-    - 'lib/opal/cli_runners/applescript.rb'
-    - 'lib/opal/cli_runners/nashorn.rb'
-    - 'lib/opal/config.rb'
-    - 'lib/opal/nodes/literal.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
 # SupportedStyles: require_no_space, require_space
 Layout/SpaceInLambdaLiteral:

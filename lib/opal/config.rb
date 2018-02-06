@@ -20,7 +20,7 @@ module Opal
     #   @!attribute [rw] $1
     def config_option(name, default_value, options = {})
       compiler      = options.fetch(:compiler_option, nil)
-      valid_values  = options.fetch(:valid_values , [true, false])
+      valid_values  = options.fetch(:valid_values, [true, false])
 
       config_options[name] = {
         default: default_value,
