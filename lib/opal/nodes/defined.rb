@@ -175,7 +175,6 @@ module Opal
         const_tmp
       end
 
-
       def compile_defined_cvar(node)
         cvar_name, _ = *node
         cvar_tmp = scope.new_temp

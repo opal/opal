@@ -26,7 +26,6 @@ class Random
     DEFAULT.rand(limit)
   end
 
-
   def self.srand(n = Random.new_seed)
     n = Opal.coerce_to!(n, Integer, :to_int)
 

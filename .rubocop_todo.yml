@@ -15,14 +15,6 @@ Layout/ElseAlignment:
     - 'opal/corelib/enumerator.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: AllowAdjacentOneLineDefs, NumberOfEmptyLines.
-Layout/EmptyLineBetweenDefs:
-  Exclude:
-    - 'lib/opal/nodes/defined.rb'
-    - 'opal/corelib/random.rb'
-
 # Offense count: 12
 # Cop supports --auto-correct.
 Layout/EmptyLines:
