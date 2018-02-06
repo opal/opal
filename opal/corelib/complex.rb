@@ -193,7 +193,7 @@ class Complex < Numeric
   end
 
   def inspect
-    "(#{to_s})"
+    "(#{self})"
   end
 
   alias magnitude abs

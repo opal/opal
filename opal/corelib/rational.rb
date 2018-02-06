@@ -246,7 +246,7 @@ class Rational < Numeric
   end
 
   def inspect
-    "(#{to_s})"
+    "(#{self})"
   end
 
   alias quo /

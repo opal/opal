@@ -23,14 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-Lint/StringConversionInInterpolation:
-  Exclude:
-    - 'opal/corelib/complex.rb'
-    - 'opal/corelib/error.rb'
-    - 'opal/corelib/rational.rb'
-
 # Offense count: 2
 Lint/UnderscorePrefixedVariableName:
   Exclude:

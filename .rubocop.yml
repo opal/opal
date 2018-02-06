@@ -63,3 +63,8 @@ Lint/RescueException:
   Exclude:
     # That's what MRI does
     - 'opal/corelib/enumerator.rb'
+
+Lint/StringConversionInInterpolation:
+  Exclude:
+    # That's what MRI does
+    - 'opal/corelib/error.rb'
