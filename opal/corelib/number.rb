@@ -258,10 +258,10 @@ class Number < Numeric
       if !(Integer === self) || other > 0
         `Math.pow(self, other)`
       else
-        Rational.new(self, 1) ** other
+        Rational.new(self, 1)**other
       end
     elsif self < 0 && (Float === other || Rational === other)
-      Complex.new(self, 0) ** other.to_f
+      Complex.new(self, 0)**other.to_f
     elsif `other.$$is_number != null`
       `Math.pow(self, other)`
     else
@@ -540,7 +540,7 @@ class Number < Numeric
       }
 
       if (m === undefined) {
-        return #{self ** b};
+        return #{self**b};
       } else {
         if (!(#{Integer === b})) {
           #{raise TypeError, 'Integer#pow() 2nd argument not allowed unless a 1st argument is integer'}
@@ -558,7 +558,7 @@ class Number < Numeric
           #{raise ZeroDivisionError, 'divided by 0'}
         }
 
-        return #{(self ** b) % m}
+        return #{(self**b) % m}
       }
     }
   end
@@ -878,7 +878,7 @@ class Number < Numeric
       f     = Math.ldexp(f, Float::MANT_DIG).to_i
       e    -= Float::MANT_DIG
 
-      (f * (Float::RADIX ** e)).to_r
+      (f * (Float::RADIX**e)).to_r
     end
   end
 

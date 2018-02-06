@@ -158,11 +158,11 @@ module Opal
     def read(path)
       path_reader.read(path) or begin
         print_list = lambda { |list| "- #{list.join("\n- ")}\n" }
-        message = "can't find file: #{path.inspect} in:\n"+
-                  print_list[path_reader.paths]+
-                  "\nWith the following extensions:\n"+
-                  print_list[path_reader.extensions]+
-                  "\nAnd the following processors:\n"+
+        message = "can't find file: #{path.inspect} in:\n" +
+                  print_list[path_reader.paths] +
+                  "\nWith the following extensions:\n" +
+                  print_list[path_reader.extensions] +
+                  "\nAnd the following processors:\n" +
                   print_list[processors]
 
         case compiler_options[:dynamic_require_severity]
@@ -193,7 +193,7 @@ module Opal
 
       path = path_from_filename(filename)
       asset = processor_for(source, filename, path, options.merge(requirable: true))
-      process_requires(filename, asset.requires+tree_requires(asset, path), options)
+      process_requires(filename, asset.requires + tree_requires(asset, path), options)
       processed << asset
     end
 

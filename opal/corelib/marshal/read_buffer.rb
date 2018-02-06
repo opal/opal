@@ -175,7 +175,7 @@ module Marshal
       size = read_fixnum * 2
       result = 0
       (0...size).each do |exp|
-        result += (read_char.ord) * 2 ** (exp * 8)
+        result += (read_char.ord) * 2**(exp * 8)
       end
       result = result.to_i * sign
       @object_cache << result

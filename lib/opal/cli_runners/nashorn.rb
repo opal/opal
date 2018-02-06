@@ -39,7 +39,7 @@ module Opal
           require 'tempfile'
           require 'shellwords'
           tempfile = Tempfile.new('opal-nashorn-output')
-          system(env, cmd.shelljoin+" > #{tempfile.path}")
+          system(env, cmd.shelljoin + " > #{tempfile.path}")
           @exit_status = $?.exitstatus
           captured_output = File.read tempfile.path
           tempfile.close

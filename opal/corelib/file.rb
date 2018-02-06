@@ -62,7 +62,7 @@ class File < IO
       }
 
       new_path = new_parts.join(sep)
-      new_path = leading_sep+new_path if abs
+      new_path = leading_sep + new_path if abs
       new_path
     end
     alias realpath expand_path
@@ -84,7 +84,7 @@ class File < IO
         if (#{ALT_SEPARATOR} === nil) {
           return Opal.escape_regexp(#{SEPARATOR});
         } else {
-          return Opal.escape_regexp(#{SEPARATOR+ALT_SEPARATOR});
+          return Opal.escape_regexp(#{SEPARATOR + ALT_SEPARATOR});
         }
       }
     }

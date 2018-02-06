@@ -191,29 +191,29 @@ class Rational < Numeric
       if self == 0 && other < 0
         return Float::INFINITY
       elsif other > 0
-        Rational(@num ** other, @den ** other)
+        Rational(@num**other, @den**other)
       elsif other < 0
-        Rational(@den ** -other, @num ** -other)
+        Rational(@den**-other, @num**-other)
       else
         Rational(1, 1)
       end
 
     when Float
-      to_f ** other
+      to_f**other
 
     when Rational
       if other == 0
         Rational(1, 1)
       elsif other.denominator == 1
         if other < 0
-          Rational(@den ** other.numerator.abs, @num ** other.numerator.abs)
+          Rational(@den**other.numerator.abs, @num**other.numerator.abs)
         else
-          Rational(@num ** other.numerator, @den ** other.numerator)
+          Rational(@num**other.numerator, @den**other.numerator)
         end
       elsif self == 0 && other < 0
         raise ZeroDivisionError, "divided by 0"
       else
-        to_f ** other
+        to_f**other
       end
 
     else
@@ -343,7 +343,7 @@ class Rational < Numeric
   def with_precision(method, precision)
     raise TypeError, "not an Integer" unless Integer === precision
 
-    p = 10 ** precision
+    p = 10**precision
     s = self * p
 
     if precision < 1

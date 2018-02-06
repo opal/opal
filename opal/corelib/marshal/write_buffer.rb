@@ -265,7 +265,7 @@ module Marshal
 
       arr.each do |x|
         append(`String.fromCharCode(x & 0xff)`)
-        append(`String.fromCharCode(#{(x/0x100).floor})`)
+        append(`String.fromCharCode(#{(x / 0x100).floor})`)
       end
     end
 

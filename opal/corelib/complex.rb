@@ -129,12 +129,12 @@ class Complex < Numeric
 
         z
       else
-        (Rational.new(1, 1) / self) ** -other
+        (Rational.new(1, 1) / self)**-other
       end
     elsif Float === other || Rational === other
       r, theta = polar
 
-      Complex.polar(r ** other, theta * other)
+      Complex.polar(r**other, theta * other)
     else
       __coerced__ :**, other
     end

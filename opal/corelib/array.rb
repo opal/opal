@@ -1016,7 +1016,7 @@ class Array < `Array`
       `left += this.length` if `left < 0`
       raise RangeError, "#{one.inspect} out of range" if `left < 0`
 
-      right  = Opal.coerce_to one.end, Integer, :to_int
+      right = Opal.coerce_to one.end, Integer, :to_int
       `right += this.length` if `right < 0`
       `right += 1` unless one.exclude_end?
 
@@ -1491,7 +1491,7 @@ class Array < `Array`
 
   def repeated_permutation(n)
     num = Opal.coerce_to! n, Integer, :to_int
-    return enum_for(:repeated_permutation, num) { num >= 0 ? self.size ** num : 0 } unless block_given?
+    return enum_for(:repeated_permutation, num) { num >= 0 ? self.size**num : 0 } unless block_given?
 
     %x{
       function iterate(max, buffer, self) {

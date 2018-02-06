@@ -56,7 +56,7 @@ module Opal
       end
 
       def require_erb(result)
-        'require "erb";'+result
+        'require "erb";' + result
       end
 
       def find_contents(result)

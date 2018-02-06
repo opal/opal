@@ -39,3 +39,7 @@ Layout/ExtraSpacing:
 
 Layout/IndentArray:
   EnforcedStyle: consistent
+
+Layout/SpaceAroundOperators:
+  Exclude:
+    - 'opal/corelib/error.rb'
