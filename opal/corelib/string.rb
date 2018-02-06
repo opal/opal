@@ -466,7 +466,6 @@ class String < `String`
     false
   end
 
-  alias eql? ==
   alias equal? ===
 
   def gsub(pattern, replacement = undefined, &block)

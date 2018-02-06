@@ -23,13 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 4
-Lint/DuplicateMethods:
-  Exclude:
-    - 'opal/corelib/basic_object.rb'
-    - 'opal/corelib/rational.rb'
-    - 'opal/corelib/string.rb'
-
 # Offense count: 1
 Lint/EmptyWhen:
   Exclude:

@@ -45,8 +45,6 @@ class Rational < Numeric
     end
   end
 
-  attr_reader :numerator, :denominator
-
   def initialize(num, den)
     @num = num
     @den = den
