@@ -58,7 +58,7 @@ module Opal
         encoding = string_value.encoding
         should_encode = encoding != Encoding::UTF_8
 
-        sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do |match|
+        sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do
           code_point = $1.to_i(16)
           to_utf16(code_point)
         end
@@ -258,7 +258,7 @@ module Opal
       def compile
         push '""'
 
-        children.each_with_index do |part, idx|
+        children.each do |part|
           push " + "
 
           if part.type == :str

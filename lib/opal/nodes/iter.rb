@@ -119,7 +119,7 @@ module Opal
         valid_args = []
         return unless args
 
-        args.children.each_with_index do |arg, idx|
+        args.children.each do |arg|
           if arg.type == :shadowarg
             @shadow_args << arg
           else

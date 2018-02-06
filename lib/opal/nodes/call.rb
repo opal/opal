@@ -221,7 +221,7 @@ module Opal
         compile_default.call
       end
 
-      add_special :require_relative do |_compile_default|
+      add_special :require_relative do
         arg = arglist.children[0]
         file = compiler.file
         if arg.type == :str
@@ -256,11 +256,11 @@ module Opal
         compile_default.call
       end
 
-      add_special :block_given? do |compile_default|
+      add_special :block_given? do
         push compiler.handle_block_given_call @sexp
       end
 
-      add_special :__callee__ do |compile_default|
+      add_special :__callee__ do
         if scope.def?
           push fragment scope.mid.to_s.inspect
         else
@@ -268,7 +268,7 @@ module Opal
         end
       end
 
-      add_special :__method__ do |compile_default|
+      add_special :__method__ do
         if scope.def?
           push fragment scope.mid.to_s.inspect
         else
@@ -276,11 +276,11 @@ module Opal
         end
       end
 
-      add_special :debugger do |compile_default|
+      add_special :debugger do
         push fragment 'debugger'
       end
 
-      add_special :__OPAL_COMPILER_CONFIG__ do |compile_default|
+      add_special :__OPAL_COMPILER_CONFIG__ do
         push fragment "Opal.hash({ arity_check: #{compiler.arity_check?} })"
       end
 

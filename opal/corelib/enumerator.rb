@@ -155,13 +155,13 @@ class Enumerator
 
       super size do |yielder, *each_args|
         begin
-          object.each(*each_args) { |*args|
+          object.each(*each_args) do |*args|
             %x{
               args.unshift(#{yielder});
 
               Opal.yieldX(block, args);
             }
-          }
+          end
         rescue Exception
           nil
         end

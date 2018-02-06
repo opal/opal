@@ -23,22 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 21
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoreEmptyBlocks, AllowUnusedKeywordArguments.
-Lint/UnusedBlockArgument:
-  Exclude:
-    - 'lib/opal/cli_options.rb'
-    - 'lib/opal/nodes/call.rb'
-    - 'lib/opal/nodes/iter.rb'
-    - 'lib/opal/nodes/literal.rb'
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/enumerable.rb'
-    - 'opal/corelib/enumerator.rb'
-    - 'opal/corelib/hash.rb'
-    - 'opal/corelib/string.rb'
-    - 'opal/corelib/struct.rb'
-
 # Offense count: 289
 # Cop supports --auto-correct.
 # Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
