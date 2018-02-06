@@ -424,10 +424,10 @@ module Opal
         sexp
       when :xstr
         if sexp.children.any?
-          strs = sexp.
-            children.
-            select { |child| child.type == :str }.
-            map { |child| child.children[0] }
+          strs = sexp
+            .children
+            .select { |child| child.type == :str }
+            .map { |child| child.children[0] }
 
           multiline = strs.any? { |str| str.end_with?(";\n") }
 

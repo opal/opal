@@ -5,8 +5,8 @@ class Encoding
 
   def self.register(name, options = {}, &block)
     names    = [name] + (options[:aliases] || [])
-    encoding = Class.new(self, &block).
-      new(name, names, options[:ascii] || false, options[:dummy] || false)
+    encoding = Class.new(self, &block)
+      .new(name, names, options[:ascii] || false, options[:dummy] || false)
 
     register = self.JS['$$register']
     names.each do |name|

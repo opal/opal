@@ -6,15 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: leading, trailing
-Layout/DotPosition:
-  Exclude:
-    - 'lib/opal/compiler.rb'
-    - 'opal/corelib/string/encoding.rb'
-
 # Offense count: 10
 # Cop supports --auto-correct.
 Layout/ElseAlignment:
