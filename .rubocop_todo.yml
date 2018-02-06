@@ -6,18 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 14
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentationWidth.
-# SupportedStyles: with_first_parameter, with_fixed_indentation
-Layout/AlignParameters:
-  Exclude:
-    - 'lib/opal/cli_options.rb'
-    - 'lib/opal/compiler.rb'
-    - 'lib/opal/rewriters/explicit_writer_return.rb'
-    - 'lib/opal/rewriters/for_rewriter.rb'
-    - 'lib/opal/rewriters/opal_engine_check.rb'
-
 # Offense count: 33
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, IndentOneStep, IndentationWidth.

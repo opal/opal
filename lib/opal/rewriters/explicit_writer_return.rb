@@ -11,8 +11,8 @@ module Opal
       TMP_NAME = '$writer'
       GET_ARGS_NODE = s(:lvar, TMP_NAME)
       RETURN_ARGS_NODE = s(:jsattr,
-        GET_ARGS_NODE,
-        s(:send, s(:jsattr, GET_ARGS_NODE, s(:str, 'length')), :-, s(:int, 1))
+                           GET_ARGS_NODE,
+                           s(:send, s(:jsattr, GET_ARGS_NODE, s(:str, 'length')), :-, s(:int, 1))
       )
 
       def on_send(node)
