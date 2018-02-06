@@ -9,9 +9,9 @@ class Encoding
                     .new(name, names, options[:ascii] || false, options[:dummy] || false)
 
     register = self.JS['$$register']
-    names.each do |name|
-      const_set name.sub('-', '_'), encoding
-      register.JS["$$#{name}"] = encoding
+    names.each do |encoding_name|
+      const_set encoding_name.sub('-', '_'), encoding
+      register.JS["$$#{encoding_name}"] = encoding
     end
   end
 

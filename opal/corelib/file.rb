@@ -157,9 +157,7 @@ class File < IO
         }
       }
       path = path.gsub(%r{(^.#{SEPARATOR}+|#{SEPARATOR}+$)})
-      file = files.find do |file|
-        file =~ /^#{path}/
-      end
+      file = files.find { |f| f =~ /^#{path}/ }
       file
     end
 
