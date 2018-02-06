@@ -49,9 +49,11 @@ module Opal
       spec = Gem::Specification.find_by_name(gem_name)
       raise GemNotFound, gem_name unless spec
 
-      spec.runtime_dependencies.each do |dependency|
-        paths += require_paths_for_gem(dependency.name, include_dependencies)
-      end if include_dependencies
+      if include_dependencies
+        spec.runtime_dependencies.each do |dependency|
+          paths += require_paths_for_gem(dependency.name, include_dependencies)
+        end
+      end
 
       gem_dir = spec.gem_dir
       spec.require_paths.map do |path|

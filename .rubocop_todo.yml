@@ -34,15 +34,6 @@ Style/ModuleFunction:
     - 'lib/opal/config.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 5
-# Cop supports --auto-correct.
-Style/MultilineIfModifier:
-  Exclude:
-    - 'lib/opal/paths.rb'
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/enumerable.rb'
-    - 'opal/corelib/number.rb'
-
 # Offense count: 1
 Style/MultilineTernaryOperator:
   Exclude:
