@@ -373,7 +373,7 @@ class Hash
   end
 
   def delete_if(&block)
-    return enum_for(:delete_if){self.size} unless block
+    return enum_for(:delete_if) {self.size} unless block
 
     %x{
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
@@ -419,7 +419,7 @@ class Hash
   end
 
   def each(&block)
-    return enum_for(:each){self.size} unless block
+    return enum_for(:each) {self.size} unless block
 
     %x{
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
@@ -440,7 +440,7 @@ class Hash
   end
 
   def each_key(&block)
-    return enum_for(:each_key){self.size} unless block
+    return enum_for(:each_key) {self.size} unless block
 
     %x{
       for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
@@ -456,7 +456,7 @@ class Hash
   alias each_pair each
 
   def each_value(&block)
-    return enum_for(:each_value){self.size} unless block
+    return enum_for(:each_value) {self.size} unless block
 
     %x{
       for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
@@ -706,7 +706,7 @@ class Hash
   end
 
   def keep_if(&block)
-    return enum_for(:keep_if){self.size} unless block
+    return enum_for(:keep_if) {self.size} unless block
 
     %x{
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
@@ -843,7 +843,7 @@ class Hash
   end
 
   def reject(&block)
-    return enum_for(:reject){self.size} unless block
+    return enum_for(:reject) {self.size} unless block
 
     %x{
       var hash = Opal.hash();
@@ -870,7 +870,7 @@ class Hash
   end
 
   def reject!(&block)
-    return enum_for(:reject!){self.size} unless block
+    return enum_for(:reject!) {self.size} unless block
 
     %x{
       var changes_were_made = false;
@@ -930,7 +930,7 @@ class Hash
   end
 
   def select(&block)
-    return enum_for(:select){self.size} unless block
+    return enum_for(:select) {self.size} unless block
 
     %x{
       var hash = Opal.hash();
@@ -957,7 +957,7 @@ class Hash
   end
 
   def select!(&block)
-    return enum_for(:select!){self.size} unless block
+    return enum_for(:select!) {self.size} unless block
 
     %x{
       var result = nil;
@@ -1079,7 +1079,7 @@ class Hash
   alias to_s inspect
 
   def transform_keys(&block)
-    return enum_for(:transform_keys){self.size} unless block
+    return enum_for(:transform_keys) {self.size} unless block
 
     %x{
       var result = Opal.hash();
@@ -1104,7 +1104,7 @@ class Hash
   end
 
   def transform_keys!(&block)
-    return enum_for(:transform_keys!){self.size} unless block
+    return enum_for(:transform_keys!) {self.size} unless block
 
     %x{
       var keys = Opal.slice.call(self.$$keys),
@@ -1131,7 +1131,7 @@ class Hash
   end
 
   def transform_values(&block)
-    return enum_for(:transform_values){self.size} unless block
+    return enum_for(:transform_values) {self.size} unless block
 
     %x{
       var result = Opal.hash();
@@ -1156,7 +1156,7 @@ class Hash
   end
 
   def transform_values!(&block)
-    return enum_for(:transform_values!){self.size} unless block
+    return enum_for(:transform_values!) {self.size} unless block
 
     %x{
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {

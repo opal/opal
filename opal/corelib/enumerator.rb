@@ -58,7 +58,7 @@ class Enumerator
       offset = 0
     end
 
-    return enum_for(:with_index, offset){self.size} unless block
+    return enum_for(:with_index, offset) {self.size} unless block
 
     %x{
       var result, index = offset;

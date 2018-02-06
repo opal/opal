@@ -218,14 +218,14 @@ class Struct
   end
 
   def each
-    return enum_for(:each){self.size} unless block_given?
+    return enum_for(:each) {self.size} unless block_given?
 
     self.class.members.each { |name| yield self[name] }
     self
   end
 
   def each_pair
-    return enum_for(:each_pair){self.size} unless block_given?
+    return enum_for(:each_pair) {self.size} unless block_given?
 
     self.class.members.each { |name| yield [name, self[name]] }
     self
@@ -266,7 +266,7 @@ class Struct
   end
 
   def values_at(*args)
-    args = args.map{|arg| `arg.$$is_range ? #{arg.to_a} : arg`}.flatten
+    args = args.map {|arg| `arg.$$is_range ? #{arg.to_a} : arg`}.flatten
     %x{
       var result = [];
       for (var i = 0, len = args.length; i < len; i++) {

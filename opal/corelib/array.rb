@@ -605,7 +605,7 @@ class Array < `Array`
   end
 
   def collect(&block)
-    return enum_for(:collect){self.size} unless block_given?
+    return enum_for(:collect) {self.size} unless block_given?
 
     %x{
       var result = [];
@@ -620,7 +620,7 @@ class Array < `Array`
   end
 
   def collect!(&block)
-    return enum_for(:collect!){self.size} unless block_given?
+    return enum_for(:collect!) {self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -648,7 +648,7 @@ class Array < `Array`
 
   def combination(n)
     num = Opal.coerce_to! n, Integer, :to_int
-    return enum_for(:combination, num){ `binomial_coefficient(#{self}.length, num)` } unless block_given?
+    return enum_for(:combination, num) { `binomial_coefficient(#{self}.length, num)` } unless block_given?
 
     %x{
       var i, length, stack, chosen, lev, done, next;
@@ -698,7 +698,7 @@ class Array < `Array`
     num = Opal.coerce_to! n, Integer, :to_int
 
     unless block_given?
-      return enum_for(:repeated_combination, num){ `binomial_coefficient(self.length + num - 1, num)` }
+      return enum_for(:repeated_combination, num) { `binomial_coefficient(self.length + num - 1, num)` }
     end
 
     %x{
@@ -823,7 +823,7 @@ class Array < `Array`
   end
 
   def delete_if(&block)
-    return enum_for(:delete_if){self.size} unless block_given?
+    return enum_for(:delete_if) {self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -881,7 +881,7 @@ class Array < `Array`
   end
 
   def each(&block)
-    return enum_for(:each){self.size} unless block_given?
+    return enum_for(:each) {self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -893,7 +893,7 @@ class Array < `Array`
   end
 
   def each_index(&block)
-    return enum_for(:each_index){self.size} unless block_given?
+    return enum_for(:each_index) {self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -1352,7 +1352,7 @@ class Array < `Array`
   end
 
   def keep_if(&block)
-    return enum_for(:keep_if){self.size} unless block_given?
+    return enum_for(:keep_if) {self.size} unless block_given?
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -1491,7 +1491,7 @@ class Array < `Array`
 
   def repeated_permutation(n)
     num = Opal.coerce_to! n, Integer, :to_int
-    return enum_for(:repeated_permutation, num){ num >= 0 ? self.size ** num : 0 } unless block_given?
+    return enum_for(:repeated_permutation, num) { num >= 0 ? self.size ** num : 0 } unless block_given?
 
     %x{
       function iterate(max, buffer, self) {
@@ -1613,7 +1613,7 @@ class Array < `Array`
   end
 
   def reject(&block)
-    return enum_for(:reject){self.size} unless block_given?
+    return enum_for(:reject) {self.size} unless block_given?
 
     %x{
       var result = [];
@@ -1630,7 +1630,7 @@ class Array < `Array`
   end
 
   def reject!(&block)
-    return enum_for(:reject!){self.size} unless block_given?
+    return enum_for(:reject!) {self.size} unless block_given?
 
     original = length
     delete_if(&block)
@@ -1664,7 +1664,7 @@ class Array < `Array`
   end
 
   def reverse_each(&block)
-    return enum_for(:reverse_each){self.size} unless block_given?
+    return enum_for(:reverse_each) {self.size} unless block_given?
 
     reverse.each(&block)
     self
@@ -1867,7 +1867,7 @@ class Array < `Array`
   end
 
   def select(&block)
-    return enum_for(:select){self.size} unless block_given?
+    return enum_for(:select) {self.size} unless block_given?
 
     %x{
       var result = [];
@@ -1887,7 +1887,7 @@ class Array < `Array`
   end
 
   def select!(&block)
-    return enum_for(:select!){self.size} unless block_given?
+    return enum_for(:select!) {self.size} unless block_given?
 
     %x{
       var original = self.length;
@@ -2090,7 +2090,7 @@ class Array < `Array`
   end
 
   def sort_by!(&block)
-    return enum_for(:sort_by!){self.size} unless block_given?
+    return enum_for(:sort_by!) {self.size} unless block_given?
 
     replace sort_by(&block)
   end

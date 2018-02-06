@@ -1,3 +1,5 @@
+require 'rubocop/rake_task'
+
 desc "Build *corelib* and *stdlib* and lint the result"
 task :jshint do
   dir = 'tmp/lint'
@@ -26,4 +28,9 @@ task :jshint do
     sh "jshint --verbose #{js_path}"
   end
   sh "jshint --verbose opal/corelib/runtime.js"
+end
+
+desc 'Run RuboCop on lib/ and opal/ directories'
+RuboCop::RakeTask.new(:rubocop) do |task|
+  task.patterns = %w(opal lib)
 end

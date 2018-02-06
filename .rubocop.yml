@@ -1,0 +1,9 @@
+inherit_from: .rubocop_todo.yml
+
+Metrics/LineLength:
+  Enabled: false
+  # Max: 120
+
+Naming/MethodName:
+  Exclude:
+    - 'opal/**/*.rb'

@@ -65,7 +65,7 @@ module Opal
       @stubs             ||= []
       @preload           ||= []
       @processors        ||= ::Opal::Builder.processors
-      @path_reader       ||= PathReader.new(Opal.paths, extensions.map{|e| [".#{e}", ".js.#{e}"]}.flatten)
+      @path_reader       ||= PathReader.new(Opal.paths, extensions.map {|e| [".#{e}", ".js.#{e}"]}.flatten)
       @prerequired       ||= []
       @compiler_options  ||= Opal::Config.compiler_options
 
@@ -137,7 +137,7 @@ module Opal
         dirname = File.dirname(File.expand_path(path))
       end
 
-      paths = path_reader.paths.map{|p| File.expand_path(p)}
+      paths = path_reader.paths.map {|p| File.expand_path(p)}
 
       asset.required_trees.flat_map do |tree|
         expanded = File.expand_path(tree, dirname)
