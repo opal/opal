@@ -546,6 +546,10 @@ class Date
     }
   end
 
+  def next_year(years=1)
+    self.class.new(year + years, month, day)
+  end
+
   def prev_day(n=1)
     self - n
   end
@@ -558,6 +562,10 @@ class Date
       date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
       return result;
     }
+  end
+
+  def prev_year(years=1)
+    self.class.new(year - years, month, day)
   end
 
   def saturday?
