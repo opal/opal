@@ -305,20 +305,6 @@ module Opal
       result
     end
 
-    def in_ensure
-      return unless block_given?
-
-      @in_ensure = true
-      result = yield
-      @in_ensure = false
-
-      result
-    end
-
-    def in_ensure?
-      !!@in_ensure
-    end
-
     def in_case
       return unless block_given?
       old = @case_stmt

@@ -23,15 +23,11 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 206
-Style/Documentation:
-  Enabled: false
-
 # Offense count: 3
-Style/DoubleNegation:
-  Exclude:
-    - 'lib/opal/compiler.rb'
-    - 'lib/opal/nodes/scope.rb'
+# Style/DoubleNegation:
+#   Exclude:
+#     - 'lib/opal/compiler.rb'
+#     - 'lib/opal/nodes/scope.rb'
 
 # Offense count: 3
 # Cop supports --auto-correct.

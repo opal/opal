@@ -158,3 +158,6 @@ Style/ClassVars:
 Style/CommandLiteral:
   # This cop converts `` to %x{}
   Enabled: false
+
+Style/Documentation:
+  Enabled: false

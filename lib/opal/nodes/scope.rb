@@ -284,7 +284,7 @@ module Opal
       end
 
       def has_rescue_else?
-        !!rescue_else_sexp
+        !rescue_else_sexp.nil?
       end
 
       def in_ensure
@@ -298,7 +298,7 @@ module Opal
       end
 
       def in_ensure?
-        !!@in_ensure
+        @in_ensure
       end
     end
   end
