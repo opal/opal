@@ -23,13 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-Lint/UnifiedInteger:
-  Exclude:
-    - 'opal/corelib/marshal/write_buffer.rb'
-    - 'opal/corelib/number.rb'
-
 # Offense count: 21
 # Cop supports --auto-correct.
 # Configuration parameters: IgnoreEmptyBlocks, AllowUnusedKeywordArguments.

@@ -14,7 +14,7 @@ class Boolean
   end
 end
 
-class Fixnum
+class Integer
   def __marshal__(buffer)
     if self >= -0x40000000 && self < 0x40000000
       buffer.append('i')
@@ -202,7 +202,7 @@ module Marshal
         when nil, true, false, Proc, Method, MatchData, Range, Struct, Array, Class, Module, Hash, Regexp
           object.__marshal__(self)
         when Integer
-          Fixnum.instance_method(:__marshal__).bind(object).call(self)
+          Integer.instance_method(:__marshal__).bind(object).call(self)
         when Float
           Float.instance_method(:__marshal__).bind(object).call(self)
         when String
