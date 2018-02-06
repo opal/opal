@@ -183,14 +183,14 @@ module Opal
           end
 
           context = if parent_scope.top?
-            "'<main>'"
-          elsif parent_scope.def?
-            "'#{parent_scope.mid}'"
-          elsif parent_scope.class?
-            "'<class:#{parent_scope.name}>'"
-          elsif parent_scope.module?
-            "'<module:#{parent_scope.name}>'"
-          end
+                      "'<main>'"
+                    elsif parent_scope.def?
+                      "'#{parent_scope.mid}'"
+                    elsif parent_scope.class?
+                      "'<class:#{parent_scope.name}>'"
+                    elsif parent_scope.module?
+                      "'<module:#{parent_scope.name}>'"
+                    end
 
           identity = scope.identity
 

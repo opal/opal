@@ -1187,10 +1187,10 @@ module Enumerable
       value = Opal.destructure(args)
 
       produced = if block_given?
-        block.call(value)
-      else
-        value
-      end
+                   block.call(value)
+                 else
+                   value
+                 end
 
       unless hash.has_key?(produced)
         hash[produced] = value

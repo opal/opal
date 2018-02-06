@@ -223,10 +223,10 @@ class Enumerator
 
       current_size = enumerator_size
       set_size     = if Integer === current_size
-        n < current_size ? n : current_size
-      else
-        current_size
-      end
+                       n < current_size ? n : current_size
+                     else
+                       current_size
+                     end
 
       dropped = 0
       Lazy.new(self, set_size) { |enum, *args|
@@ -340,10 +340,10 @@ class Enumerator
 
       current_size = enumerator_size
       set_size     = if Integer === current_size
-        n < current_size ? n : current_size
-      else
-        current_size
-      end
+                       n < current_size ? n : current_size
+                     else
+                       current_size
+                     end
 
       taken = 0
       Lazy.new(self, set_size) { |enum, *args|

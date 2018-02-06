@@ -156,14 +156,14 @@ module Marshal
     def read_float
       s = read_string(cache: false)
       result = if s == "nan"
-        0.0 / 0
-      elsif s == "inf"
-        1.0 / 0
-      elsif s == "-inf"
-        -1.0 / 0
-      else
-        s.to_f
-      end
+                 0.0 / 0
+               elsif s == "inf"
+                 1.0 / 0
+               elsif s == "-inf"
+                 -1.0 / 0
+               else
+                 s.to_f
+               end
       @object_cache << result
       result
     end
@@ -484,10 +484,10 @@ module Marshal
       value = read(cache: false)
 
       result = if klass < Hash
-        klass[value]
-      else
-        klass.new(value)
-      end
+                 klass[value]
+               else
+                 klass.new(value)
+               end
 
       @object_cache << result
 
