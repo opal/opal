@@ -13,3 +13,9 @@ Layout/CaseIndentation:
 
 Layout/ClosingParenthesisIndentation:
   Enabled: false
+
+Layout/CommentIndentation:
+  # The following files use comments to show generated ruby code
+  Exclude:
+    - 'lib/opal/rewriters/binary_operator_assignment.rb'
+    - 'lib/opal/rewriters/logical_operator_assignment.rb'

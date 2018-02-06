@@ -8,13 +8,6 @@
 
 # Offense count: 4
 # Cop supports --auto-correct.
-Layout/CommentIndentation:
-  Exclude:
-    - 'lib/opal/rewriters/binary_operator_assignment.rb'
-    - 'lib/opal/rewriters/logical_operator_assignment.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
 # SupportedStyles: leading, trailing
 Layout/DotPosition:
