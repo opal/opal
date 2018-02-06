@@ -157,3 +157,7 @@ Style/ClassVars:
     # These classes use class variables on purpose
     - 'lib/opal/rewriters/binary_operator_assignment.rb'
     - 'lib/opal/rewriters/logical_operator_assignment.rb'
+
+Style/CommandLiteral:
+  # This cop converts `` to %x{}
+  Enabled: false
