@@ -186,3 +186,6 @@ Style/MethodMissing:
     - 'opal/corelib/basic_object.rb'
     - 'opal/corelib/kernel.rb'
     - 'opal/corelib/string/inheritance.rb'
+
+Style/NumericPredicate:
+  Enabled: false
