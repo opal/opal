@@ -26,13 +26,6 @@ Lint/AssignmentInCondition:
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 3
-Style/MethodMissing:
-  Exclude:
-    - 'opal/corelib/basic_object.rb'
-    - 'opal/corelib/kernel.rb'
-    - 'opal/corelib/string/inheritance.rb'
-
 # Offense count: 2
 # Configuration parameters: EnforcedStyle.
 # SupportedStyles: module_function, extend_self
