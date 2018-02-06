@@ -23,15 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 6
-# Cop supports --auto-correct.
-Performance/RegexpMatch:
-  Exclude:
-    - 'lib/opal/erb.rb'
-    - 'lib/opal/nodes/helpers.rb'
-    - 'lib/opal/nodes/literal.rb'
-    - 'opal/corelib/module.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 Performance/StringReplacement:

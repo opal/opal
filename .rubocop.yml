@@ -131,3 +131,8 @@ Performance/HashEachMethods:
   Exclude:
     # Rubocop doesn't understand that 'value' is used in JS.
     - 'opal/corelib/hash.rb'
+
+Performance/RegexpMatch:
+  # This cop converts =~ to match?
+  # But this method was introduced only in 2.4
+  Enabled: false
