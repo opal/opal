@@ -579,7 +579,7 @@ module Enumerable
   def group_by(&block)
     return enum_for(:group_by) { self.enumerator_size } unless block_given?
 
-    hash = Hash.new
+    hash = {}
 
     %x{
       var result;
