@@ -58,3 +58,8 @@ Lint/LiteralAsCondition:
   Exclude:
     # Opal support if `...js...`
     - 'opal/**/*.rb'
+
+Lint/RescueException:
+  Exclude:
+    # That's what MRI does
+    - 'opal/corelib/enumerator.rb'
