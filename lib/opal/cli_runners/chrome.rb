@@ -86,7 +86,9 @@ module Opal
       end
 
       def chrome_executable
-        ENV['GOOGLE_CHROME_BINARY'] || case RbConfig::CONFIG['host_os']
+        return ENV['GOOGLE_CHROME_BINARY'] if ENV['GOOGLE_CHROME_BINARY']
+
+        case RbConfig::CONFIG['host_os']
         when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
           raise "Headless chrome is supported only by Mac OS and Linux"
         when /darwin|mac os/

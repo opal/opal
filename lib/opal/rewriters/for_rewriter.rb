@@ -50,13 +50,13 @@ module Opal
         get_tmp_loop_variable = s(:js_tmp, tmp_loop_variable)
 
         loop_variable_assignment = case loop_variable.type
-        when :mlhs # multiple left-hand statement like in "for i,j in [[1, 2], [3, 4]]"
-          # i, j = __jstmp
-          s(:masgn, loop_variable, get_tmp_loop_variable)
-        else # single argument like "for i in (0..3)"
-          # i = __jstmp
-          loop_variable << get_tmp_loop_variable
-        end
+                                   when :mlhs # multiple left-hand statement like in "for i,j in [[1, 2], [3, 4]]"
+                                     # i, j = __jstmp
+                                     s(:masgn, loop_variable, get_tmp_loop_variable)
+                                   else # single argument like "for i in (0..3)"
+                                     # i = __jstmp
+                                     loop_variable << get_tmp_loop_variable
+                                   end
 
         loop_body = prepend_to_body(loop_body, loop_variable_assignment)
 

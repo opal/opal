@@ -23,20 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleAlignWith, AutoCorrect.
-# SupportedStylesAlignWith: keyword, variable, start_of_line
-Lint/EndAlignment:
-  Exclude:
-    - 'lib/opal/cli_runners/chrome.rb'
-    - 'lib/opal/nodes/iter.rb'
-    - 'lib/opal/rewriters/for_rewriter.rb'
-    - 'opal/corelib/enumerable.rb'
-    - 'opal/corelib/enumerator.rb'
-    - 'opal/corelib/marshal/read_buffer.rb'
-    - 'opal/corelib/module.rb'
-
 # Offense count: 13
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.

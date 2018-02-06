@@ -355,21 +355,21 @@ class Module
     end
 
     block ||= case method
-    when Proc
-      method
+              when Proc
+                method
 
-    when Method
-      `#{method.to_proc}.$$unbound`
+              when Method
+                `#{method.to_proc}.$$unbound`
 
-    when UnboundMethod
-      lambda { |*args|
-        bound = method.bind(self)
-        bound.call(*args)
-      }
+              when UnboundMethod
+                lambda { |*args|
+                  bound = method.bind(self)
+                  bound.call(*args)
+                }
 
-    else
-      raise TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
-    end
+              else
+                raise TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
+              end
 
     %x{
       var id = '$' + name;

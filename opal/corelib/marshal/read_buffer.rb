@@ -41,7 +41,7 @@ module Marshal
     def read(cache: true)
       code = read_char
       # The first character indicates the type of the object
-      result = case code
+      case code
       when '0'
         nil
       when 'T'
@@ -95,7 +95,6 @@ module Marshal
       else
         raise ArgumentError, "dump format error"
       end
-      result
     end
 
     def read_byte
