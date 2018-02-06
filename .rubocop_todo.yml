@@ -23,11 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 43
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Enabled: false
-
 # Offense count: 14
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, UseHashRocketsWithSymbolValues, PreferHashRocketsForNonAlnumEndingSymbols.

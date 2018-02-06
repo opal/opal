@@ -166,3 +166,6 @@ Style/EmptyMethod:
   # There are a lot of empty methods are required to make MSpec working
   Exclude:
     - 'opal/**/*.rb'
+
+Style/GuardClause:
+  Enabled: false
