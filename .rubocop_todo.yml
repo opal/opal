@@ -15,18 +15,6 @@ Layout/ElseAlignment:
     - 'opal/corelib/enumerator.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: AllowForAlignment, ForceEqualSignAlignment.
-Layout/ExtraSpacing:
-  Exclude:
-    - 'lib/opal/cli.rb'
-    - 'lib/opal/nodes/variables.rb'
-    - 'lib/opal/rewriters/binary_operator_assignment.rb'
-    - 'lib/opal/rewriters/logical_operator_assignment.rb'
-    - 'opal/corelib/comparable.rb'
-    - 'opal/corelib/error.rb'
-
 # Offense count: 14
 # Cop supports --auto-correct.
 # Configuration parameters: IndentationWidth.

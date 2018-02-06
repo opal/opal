@@ -17,8 +17,8 @@ module Opal
 
       GET_SET = ->(get_type, set_type) {
         ->(lhs, op, rhs) {
-          get_node = lhs.updated(get_type) # lhs
-          set_node = s(:send, get_node, op, rhs) # lhs + rhs
+          get_node = lhs.updated(get_type)        # lhs
+          set_node = s(:send, get_node, op, rhs)  # lhs + rhs
 
           lhs.updated(set_type, [*lhs, set_node]) # lhs = lhs + rhs
         }
@@ -55,14 +55,14 @@ module Opal
           # MRI calls recvr in `recvr.meth ||= rhs` only once.
           if recvr && recvr.type == :send
             recvr_tmp = new_temp
-            cache_recvr = s(:lvasgn, recvr_tmp, recvr)                         # $tmp = recvr
+            cache_recvr = s(:lvasgn, recvr_tmp, recvr) # $tmp = recvr
             recvr = s(:js_tmp, recvr_tmp)
           end
 
           writer_method = :"#{reader_method}="
 
-          call_reader = lhs.updated(:send, [recvr, reader_method, *args])      # $tmp.meth
-          call_op = s(:send, call_reader, op, rhs) # $tmp.meth + rhs
+          call_reader = lhs.updated(:send, [recvr, reader_method, *args])          # $tmp.meth
+          call_op = s(:send, call_reader, op, rhs)                                 # $tmp.meth + rhs
           call_writer = lhs.updated(:send, [recvr, writer_method, *args, call_op]) # $tmp.meth = $tmp.meth + rhs
 
           if cache_recvr
@@ -82,7 +82,7 @@ module Opal
           recvr, meth, *args = *lhs
 
           recvr_tmp = new_temp
-          cache_recvr = s(:lvasgn, recvr_tmp, recvr)          # $tmp = recvr
+          cache_recvr = s(:lvasgn, recvr_tmp, recvr) # $tmp = recvr
           recvr = s(:js_tmp, recvr_tmp)
 
           recvr_is_nil = s(:send, recvr, :nil?)                 # recvr.nil?

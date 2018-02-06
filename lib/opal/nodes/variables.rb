@@ -88,7 +88,7 @@ module Opal
         push "self#{name} = "
         push expr(value)
 
-        wrap '(', ')'  if (recv? || expr?) && value
+        wrap '(', ')' if (recv? || expr?) && value
       end
     end
 
@@ -169,7 +169,7 @@ module Opal
         push "$gvars#{name} = "
         push expr(value)
 
-        wrap '(', ')'  if (recv? || expr?) && value
+        wrap '(', ')' if (recv? || expr?) && value
       end
     end
 

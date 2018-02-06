@@ -37,7 +37,7 @@ module Opal
       @debug       = options.fetch(:debug, false);   options.delete(:debug)
       @filename    = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
 
-      @requires    = options.delete(:requires)   || []
+      @requires    = options.delete(:requires) || []
       @requires.unshift('opal') unless options.delete(:skip_opal_require)
 
       @compiler_options = Hash[

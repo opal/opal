@@ -4,7 +4,7 @@ module Comparable
 
     return  1 if what > 0
     return -1 if what < 0
-    return  0
+    return 0
   end
 
   def ==(other)

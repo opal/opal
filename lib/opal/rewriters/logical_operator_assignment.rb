@@ -17,8 +17,8 @@ module Opal
 
       GET_SET = ->(get_type, set_type) {
         ->(lhs, rhs, root_type) {
-          get_node = lhs.updated(get_type) # lhs
-          condition_node = s(root_type, get_node, rhs) # lhs || rhs
+          get_node = lhs.updated(get_type)              # lhs
+          condition_node = s(root_type, get_node, rhs)  # lhs || rhs
 
           lhs.updated(set_type, [*lhs, condition_node]) # lhs = lhs || rhs
         }
@@ -84,7 +84,7 @@ module Opal
           recvr, meth, *args = *lhs
 
           recvr_tmp = new_temp
-          cache_recvr = s(:lvasgn, recvr_tmp, recvr)          # $tmp = recvr
+          cache_recvr = s(:lvasgn, recvr_tmp, recvr) # $tmp = recvr
           recvr = s(:js_tmp, recvr_tmp)
 
           recvr_is_nil = s(:send, recvr, :nil?)                 # recvr.nil?

@@ -31,3 +31,8 @@ Layout/EmptyLineAfterMagicComment:
 Style/GlobalVars:
   Exclude:
     - 'opal/corelib/kernel.rb'
+
+Layout/ExtraSpacing:
+  Exclude:
+    # This files uses extra spaces to show an inheritance tree of error classes
+    - 'opal/corelib/error.rb'
