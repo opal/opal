@@ -23,11 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 1
-Lint/Void:
-  Exclude:
-    - 'opal/corelib/hash.rb'
-
 # Offense count: 92
 Metrics/AbcSize:
   Max: 119

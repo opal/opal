@@ -87,8 +87,9 @@ class Hash
       }
       self.$$none = (defaults === undefined ? nil : defaults);
       self.$$proc = block;
+
+      return self;
     }
-    self
   end
 
   def ==(other)
