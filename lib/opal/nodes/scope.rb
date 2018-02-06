@@ -59,11 +59,11 @@ module Opal
         @proto_ivars = []
       end
 
-      def in_scope(&block)
+      def in_scope
         indent do
           @parent = compiler.scope
           compiler.scope = self
-          block.call self
+          yield self
           compiler.scope = @parent
         end
       end

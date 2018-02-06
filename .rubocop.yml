@@ -121,3 +121,13 @@ Naming/BinaryOperatorParameterName:
 Naming/PredicateName:
   # Ruby has "has_key?" method
   NamePrefixBlacklist: is_, have_
+
+Performance/FlatMap:
+  Exclude:
+    # That's actually a definition of Enumerable#flat_map
+    - 'opal/corelib/enumerable.rb'
+
+Performance/HashEachMethods:
+  Exclude:
+    # Rubocop doesn't understand that 'value' is used in JS.
+    - 'opal/corelib/hash.rb'

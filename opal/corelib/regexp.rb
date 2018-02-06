@@ -193,7 +193,7 @@ class Regexp < `RegExp`
         }
         if (md.index >= pos) {
           #{$~ = MatchData.new(`re`, `md`)}
-          return block === nil ? #{$~} : #{block.call($~)};
+          return block === nil ? #{$~} : #{yield $~};
         }
         re.lastIndex = md.index + 1;
       }

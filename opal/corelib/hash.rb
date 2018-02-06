@@ -366,7 +366,7 @@ class Hash
       }
 
       if (block !== nil) {
-        return #{block.call(key)};
+        return #{yield key};
       }
 
       return nil;

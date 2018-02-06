@@ -1145,12 +1145,12 @@ module Enumerable
     dup.map! { |i| `i[1]` }
   end
 
-  def sum(initial = 0, &block)
+  def sum(initial = 0)
     result = initial
 
     each do |*args|
       if block_given?
-        item = block.call(*args)
+        item = yield(*args)
       else
         item = Opal.destructure(args)
       end
@@ -1187,7 +1187,7 @@ module Enumerable
       value = Opal.destructure(args)
 
       produced = if block_given?
-                   block.call(value)
+                   yield(value)
                  else
                    value
                  end
