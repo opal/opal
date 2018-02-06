@@ -15,11 +15,6 @@ Layout/ElseAlignment:
     - 'opal/corelib/enumerator.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 83
-# Cop supports --auto-correct.
-Layout/EmptyLineAfterMagicComment:
-  Enabled: false
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: AllowAdjacentOneLineDefs, NumberOfEmptyLines.
@@ -727,13 +722,6 @@ Style/FormatString:
 Style/FormatStringToken:
   Exclude:
     - 'lib/opal/nodes/scope.rb'
-
-# Offense count: 47
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: when_needed, always, never
-Style/FrozenStringLiteralComment:
-  Enabled: false
 
 # Offense count: 6
 # Configuration parameters: AllowedVariables.

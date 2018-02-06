@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'pathname'
 require 'opal/version'
 require 'opal/nodes/scope'

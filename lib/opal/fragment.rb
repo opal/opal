@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Opal
   # A fragment holds a string of generated javascript that will be written
   # to the destination. It also keeps hold of the original sexp from which

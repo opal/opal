@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/path_reader'
 require 'opal/paths'
 require 'opal/config'

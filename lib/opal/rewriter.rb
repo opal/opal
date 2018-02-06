@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/rewriters/opal_engine_check'
 require 'opal/rewriters/for_rewriter'
 require 'opal/rewriters/explicit_writer_return'

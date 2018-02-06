@@ -19,3 +19,11 @@ Layout/CommentIndentation:
   Exclude:
     - 'lib/opal/rewriters/binary_operator_assignment.rb'
     - 'lib/opal/rewriters/logical_operator_assignment.rb'
+
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - 'opal/**/*.rb'
+
+Layout/EmptyLineAfterMagicComment:
+  Exclude:
+    - 'opal/**/*.rb'

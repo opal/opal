@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Opal
   def self.gem_dir
     File.expand_path("../..", __FILE__.dup.untaint)

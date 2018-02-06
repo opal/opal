@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'set'
 require 'opal/parser'
 require 'opal/fragment'

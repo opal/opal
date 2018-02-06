@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'source_map'
 
 module Opal

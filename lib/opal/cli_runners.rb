@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Opal
   # `Opal::CliRunners` is the register in which JavaScript runners can be
   # defined for use by `Opal::CLI`. Runners will be called via the `#call`
