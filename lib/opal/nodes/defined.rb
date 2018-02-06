@@ -119,10 +119,7 @@ module Opal
         push " || #{recv_value_tmp}['$respond_to_missing?']('#{method_name}'))"
 
         args.each do |arg|
-          case arg.type
-          when :block_pass
-            # ignoring
-          else
+          if arg.type != :block_pass
             push " && "
             compile_defined(arg)
           end
