@@ -2246,7 +2246,7 @@ class Array < `Array`
     out = [];
 
     args.each do |elem|
-      if elem.kind_of? Range
+      if elem.is_a? Range
         finish = Opal.coerce_to elem.last, Integer, :to_int
         start = Opal.coerce_to elem.first, Integer, :to_int
 

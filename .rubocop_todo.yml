@@ -23,15 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: is_a?, kind_of?
-Style/ClassCheck:
-  Exclude:
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/kernel.rb'
-
 # Offense count: 6
 Style/ClassVars:
   Exclude:

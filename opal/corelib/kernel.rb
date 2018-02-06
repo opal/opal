@@ -1060,7 +1060,7 @@ module Kernel
       else if (exception.$$is_class && #{exception.respond_to?(:exception)}) {
         exception = #{exception.exception string};
       }
-      else if (#{exception.kind_of?(Exception)}) {
+      else if (#{exception.is_a?(Exception)}) {
         // exception is fine
       }
       else {
