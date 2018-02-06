@@ -23,24 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 21
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SingleLineConditionsOnly, IncludeTernaryExpressions.
-# SupportedStyles: assign_to_condition, assign_inside_condition
-Style/ConditionalAssignment:
-  Exclude:
-    - 'lib/opal/builder.rb'
-    - 'lib/opal/nodes/literal.rb'
-    - 'lib/opal/nodes/masgn.rb'
-    - 'lib/opal/parser.rb'
-    - 'lib/opal/rewriters/js_reserved_words.rb'
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/complex.rb'
-    - 'opal/corelib/enumerable.rb'
-    - 'opal/corelib/enumerator.rb'
-    - 'opal/corelib/file.rb'
-    - 'opal/corelib/struct.rb'
-
 # Offense count: 206
 Style/Documentation:
   Enabled: false

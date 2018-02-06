@@ -51,11 +51,11 @@ class Enumerator
   end
 
   def with_index(offset = 0, &block)
-    if offset
-      offset = Opal.coerce_to offset, Integer, :to_int
-    else
-      offset = 0
-    end
+    offset = if offset
+               Opal.coerce_to offset, Integer, :to_int
+             else
+               0
+             end
 
     return enum_for(:with_index, offset) { self.size } unless block
 

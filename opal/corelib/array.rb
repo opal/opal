@@ -80,11 +80,11 @@ class Array < `Array`
   end
 
   def &(other)
-    if Array === other
-      other = other.to_a
-    else
-      other = Opal.coerce_to(other, Array, :to_ary).to_a
-    end
+    other = if Array === other
+              other.to_a
+            else
+              Opal.coerce_to(other, Array, :to_ary).to_a
+            end
 
     %x{
       var result = [], hash = #{{}}, i, length, item;
@@ -105,11 +105,11 @@ class Array < `Array`
   end
 
   def |(other)
-    if Array === other
-      other = other.to_a
-    else
-      other = Opal.coerce_to(other, Array, :to_ary).to_a
-    end
+    other = if Array === other
+              other.to_a
+            else
+              Opal.coerce_to(other, Array, :to_ary).to_a
+            end
 
     %x{
       var hash = #{{}}, i, length, item;
@@ -148,21 +148,21 @@ class Array < `Array`
   end
 
   def +(other)
-    if Array === other
-      other = other.to_a
-    else
-      other = Opal.coerce_to(other, Array, :to_ary).to_a
-    end
+    other = if Array === other
+              other.to_a
+            else
+              Opal.coerce_to(other, Array, :to_ary).to_a
+            end
 
     `self.concat(other)`
   end
 
   def -(other)
-    if Array === other
-      other = other.to_a
-    else
-      other = Opal.coerce_to(other, Array, :to_ary).to_a
-    end
+    other = if Array === other
+              other.to_a
+            else
+              Opal.coerce_to(other, Array, :to_ary).to_a
+            end
 
     return [] if `self.length === 0`
     return `self.slice()` if `other.length === 0`
@@ -362,13 +362,13 @@ class Array < `Array`
     }
 
     if Range === index
-      if Array === value
-        data = value.to_a
-      elsif value.respond_to? :to_ary
-        data = value.to_ary.to_a
-      else
-        data = [value]
-      end
+      data = if Array === value
+               value.to_a
+             elsif value.respond_to? :to_ary
+               value.to_ary.to_a
+             else
+               [value]
+             end
 
       %x{
         var exclude = index.excl,
@@ -413,13 +413,13 @@ class Array < `Array`
         length = value
         value  = extra
 
-        if Array === value
-          data = value.to_a
-        elsif value.respond_to? :to_ary
-          data = value.to_ary.to_a
-        else
-          data = [value]
-        end
+        data = if Array === value
+                 value.to_a
+               elsif value.respond_to? :to_ary
+                 value.to_ary.to_a
+               else
+                 [value]
+               end
       end
 
       %x{
@@ -755,11 +755,11 @@ class Array < `Array`
 
   def concat(*others)
     others = others.map do |other|
-      if Array === other
-        other = other.to_a
-      else
-        other = Opal.coerce_to(other, Array, :to_ary).to_a
-      end
+      other = if Array === other
+                other.to_a
+              else
+                Opal.coerce_to(other, Array, :to_ary).to_a
+              end
 
       if other.equal?(self)
         other = other.dup
@@ -1641,11 +1641,11 @@ class Array < `Array`
   end
 
   def replace(other)
-    if Array === other
-      other = other.to_a
-    else
-      other = Opal.coerce_to(other, Array, :to_ary).to_a
-    end
+    other = if Array === other
+              other.to_a
+            else
+              Opal.coerce_to(other, Array, :to_ary).to_a
+            end
 
     %x{
       self.splice(0, self.length);
@@ -1776,11 +1776,11 @@ class Array < `Array`
     end
 
     rng = options[:random] if options
-    if rng && rng.respond_to?(:rand)
-      rng = SampleRandom.new rng
-    else
-      rng = Kernel
-    end
+    rng = if rng && rng.respond_to?(:rand)
+            SampleRandom.new rng
+          else
+            Kernel
+          end
 
     return `self[#{rng.rand(`self.length`)}]` unless count
 
@@ -2161,11 +2161,11 @@ class Array < `Array`
     max    = nil
 
     each do |row|
-      if Array === row
-        row = row.to_a
-      else
-        row = Opal.coerce_to(row, Array, :to_ary).to_a
-      end
+      row = if Array === row
+              row.to_a
+            else
+              Opal.coerce_to(row, Array, :to_ary).to_a
+            end
 
       max ||= `row.length`
 

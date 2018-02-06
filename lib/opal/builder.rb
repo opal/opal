@@ -128,11 +128,11 @@ module Opal
     private
 
     def tree_requires(asset, path)
-      if path.nil? || path.empty?
-        dirname = Dir.pwd
-      else
-        dirname = File.dirname(File.expand_path(path))
-      end
+      dirname = if path.nil? || path.empty?
+                  Dir.pwd
+                else
+                  File.dirname(File.expand_path(path))
+                end
 
       paths = path_reader.paths.map { |p| File.expand_path(p) }
 

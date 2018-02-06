@@ -57,11 +57,11 @@ module Opal
       def on_lvasgn(node)
         name, value = *node
 
-        if value
-          node = node.updated(nil, [fix_var_name(name), value])
-        else
-          node = node.updated(nil, [fix_var_name(name)])
-        end
+        node = if value
+                 node.updated(nil, [fix_var_name(name), value])
+               else
+                 node.updated(nil, [fix_var_name(name)])
+               end
 
         super(node)
       end
@@ -75,11 +75,12 @@ module Opal
       def on_ivasgn(node)
         name, value = *node
 
-        if value
-          node = node.updated(nil, [fix_ivar_name(name), value])
-        else
-          node = node.updated(nil, [fix_ivar_name(name)])
-        end
+        node = if value
+                 node.updated(nil, [fix_ivar_name(name), value])
+               else
+                 node.updated(nil, [fix_ivar_name(name)])
+               end
+
         super(node)
       end
 

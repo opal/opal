@@ -1149,11 +1149,11 @@ module Enumerable
     result = initial
 
     each do |*args|
-      if block_given?
-        item = yield(*args)
-      else
-        item = Opal.destructure(args)
-      end
+      item = if block_given?
+               yield(*args)
+             else
+               Opal.destructure(args)
+             end
       result += item
     end
 

@@ -184,11 +184,11 @@ class File < IO
           if item.end_with?(SEPARATOR) && next_item.start_with?(SEPARATOR)
             item = item.sub(%r{#{SEPARATOR}+$}, '')
           end
-          if item.end_with?(SEPARATOR) || next_item.start_with?(SEPARATOR)
-            result = "#{result}#{item}"
-          else
-            result = "#{result}#{item}#{SEPARATOR}"
-          end
+          result = if item.end_with?(SEPARATOR) || next_item.start_with?(SEPARATOR)
+                     "#{result}#{item}"
+                   else
+                     "#{result}#{item}#{SEPARATOR}"
+                   end
         end
       end
       result

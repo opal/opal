@@ -280,11 +280,9 @@ class Struct
   end
 
   def dig(key, *keys)
-    if `key.$$is_string && self.$$data.hasOwnProperty(key)`
-      item = `self.$$data[key] || nil`
-    else
-      item = nil
-    end
+    item = if `key.$$is_string && self.$$data.hasOwnProperty(key)`
+             `self.$$data[key] || nil`
+           end
 
     %x{
       if (item === nil || keys.length === 0) {

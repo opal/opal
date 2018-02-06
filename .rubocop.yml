@@ -8,9 +8,6 @@ Naming/MethodName:
   Exclude:
     - 'opal/**/*.rb' # Ruby has methods like Integer/Float/Array
 
-Layout/CaseIndentation:
-  EnforcedStyle: end
-
 Layout/ClosingParenthesisIndentation:
   Enabled: false
 

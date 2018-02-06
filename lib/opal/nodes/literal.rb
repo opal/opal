@@ -154,16 +154,16 @@ module Opal
         *values, flags_sexp = *children
         self.flags = flags_sexp.children.map(&:to_s)
 
-        case values.length
-        when 0
-          # empty regexp, we can process it inline
-          self.value = s(:str, '')
-        when 1
-          # simple plain regexp, we can put it inline
-          self.value = values[0]
-        else
-          self.value = s(:dstr, *values)
-        end
+        self.value = case values.length
+                     when 0
+                       # empty regexp, we can process it inline
+                       s(:str, '')
+                     when 1
+                       # simple plain regexp, we can put it inline
+                       values[0]
+                     else
+                       s(:dstr, *values)
+                     end
 
         # trimming when //x provided
         # required by parser gem, but JS doesn't support 'x' flag
