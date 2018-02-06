@@ -34,11 +34,6 @@ Style/ModuleFunction:
     - 'lib/opal/config.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 1
-Style/MultilineBlockChain:
-  Exclude:
-    - 'lib/opal/nodes/definitions.rb'
-
 # Offense count: 5
 # Cop supports --auto-correct.
 Style/MultilineIfModifier:

@@ -71,9 +71,11 @@ module Opal
       end
 
       def compile_inline_children(children, level)
-        children.map do |child|
+        processed_children = children.map do |child|
           process(child, level)
-        end.reject(&:empty?).each_with_index do |child, idx|
+        end
+
+        processed_children.reject(&:empty?).each_with_index do |child, idx|
           push ', ' unless idx == 0
           push child
         end

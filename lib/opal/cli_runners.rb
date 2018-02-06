@@ -41,7 +41,7 @@ module Opal
     end
 
     # The compiler runner will just output the compiled JavaScript
-    register_runner :compiler, ->data {
+    register_runner :compiler, ->(data) {
       options  = data[:options] || {}
       builder  = data.fetch(:builder)
       map_file = options[:map_file]
