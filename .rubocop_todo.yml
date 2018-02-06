@@ -23,13 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 6
-# Cop supports --auto-correct.
-Style/CharacterLiteral:
-  Exclude:
-    - 'lib/opal/nodes/literal.rb'
-    - 'opal/corelib/complex.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 # Configuration parameters: AutoCorrect, EnforcedStyle.

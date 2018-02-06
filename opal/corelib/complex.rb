@@ -269,18 +269,18 @@ class Complex < Numeric
     result = @real.inspect
 
     if (Number === @imag && @imag.nan?) || @imag.positive? || @imag.zero?
-      result += ?+
+      result += '+'
     else
-      result += ?-
+      result += '-'
     end
 
     result += @imag.abs.inspect
 
     if Number === @imag && (@imag.nan? || @imag.infinite?)
-      result += ?*
+      result += '*'
     end
 
-    result + ?i
+    result + 'i'
   end
 
   I = new(0, 1)

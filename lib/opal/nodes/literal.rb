@@ -37,8 +37,8 @@ module Opal
       children :value
 
       ESCAPE_CHARS = {
-        ?a => '\\u0007',
-        ?e => '\\u001b'
+        'a' => '\\u0007',
+        'e' => '\\u001b'
       }
 
       ESCAPE_REGEX = /(\\+)([#{ ESCAPE_CHARS.keys.join('') }])/
