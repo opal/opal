@@ -26,13 +26,6 @@ Lint/AssignmentInCondition:
 Style/GuardClause:
   Enabled: false
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/LineEndConcatenation:
-  Exclude:
-    - 'lib/opal/compiler.rb'
-    - 'opal/corelib/module.rb'
-
 # Offense count: 10
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
