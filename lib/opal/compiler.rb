@@ -422,19 +422,17 @@ module Opal
             # xstr starts with interpolation
             # then it must contain js_return inside
             sexp
-          else
-            if first_child.type == :str
-              old_value = first_child.children[0]
-              if old_value.include?('return')
-                # 'return' is already there
-                sexp
-              else
-                first_child = s(:js_return, first_child)
-                sexp.updated(nil, [first_child, *rest_children])
-              end
+          elsif first_child.type == :str
+            old_value = first_child.children[0]
+            if old_value.include?('return')
+              # 'return' is already there
+              sexp
             else
-              s(:js_return, sexp)
+              first_child = s(:js_return, first_child)
+              sexp.updated(nil, [first_child, *rest_children])
             end
+          else
+            s(:js_return, sexp)
           end
         else
           returns s(:str, '')

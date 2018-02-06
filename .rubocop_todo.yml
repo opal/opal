@@ -23,15 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 6
-Style/IfInsideElse:
-  Exclude:
-    - 'lib/opal/cli.rb'
-    - 'lib/opal/compiler.rb'
-    - 'lib/opal/nodes/case.rb'
-    - 'opal/corelib/enumerable.rb'
-    - 'opal/corelib/range.rb'
-
 # Offense count: 174
 # Cop supports --auto-correct.
 Style/IfUnlessModifier:

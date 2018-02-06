@@ -82,13 +82,11 @@ module Opal
               push "if (", js_truthy(check), ")) { return true; }"
             end
             push "} return false; })(", expr(check.children[0]), ")"
+          elsif case_stmt[:cond]
+            call = s(:send, check, :===, s(:arglist, s(:js_tmp, '$case')))
+            push expr(call)
           else
-            if case_stmt[:cond]
-              call = s(:send, check, :===, s(:arglist, s(:js_tmp, '$case')))
-              push expr(call)
-            else
-              push js_truthy(check)
-            end
+            push js_truthy(check)
           end
         end
 

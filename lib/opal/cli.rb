@@ -136,10 +136,8 @@ module Opal
 
       if evals.any?
         yield evals.join("\n"), '-e'
-      else
-        if file && (filename != '-' || evals.empty?)
-          yield file.read, filename
-        end
+      elsif file && (filename != '-' || evals.empty?)
+        yield file.read, filename
       end
     end
   end

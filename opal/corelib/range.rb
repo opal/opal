@@ -216,8 +216,8 @@ class Range
         current = @begin + i * n
         if @excl
           break if current >= @end
-        else
-          break if current > @end
+        elsif current > @end
+          break
         end
         yield(current)
         i += 1

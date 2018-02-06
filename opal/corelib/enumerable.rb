@@ -545,8 +545,8 @@ module Enumerable
         if block_given?
           value = [value] if value.length > 1
           value = yield(*value)
-        else
-          value = value[0] if value.length <= 1
+        elsif value.length <= 1
+          value = value[0]
         end
 
         result.push(value)
@@ -565,8 +565,8 @@ module Enumerable
         if block_given?
           value = [value] if value.length > 1
           value = yield(*value)
-        else
-          value = value[0] if value.length <= 1
+        elsif value.length <= 1
+          value = value[0]
         end
 
         result.push(value)
