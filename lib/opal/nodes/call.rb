@@ -329,7 +329,7 @@ module Opal
 
             parts = args.map { |s| handle_part s }
 
-            if ::Opal::AST::Node === recv && recv.type == :const && recv.children.last == :File
+            if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
               if meth == :expand_path
                 return expand_path(*parts)
               elsif meth == :join

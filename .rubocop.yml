@@ -142,3 +142,8 @@ Performance/UnfreezeString:
 
 Style/AsciiComments:
   Enabled: false
+
+Style/CaseEquality:
+  Exclude:
+    - 'opal/**/*.rb'
+    - 'lib/opal/config.rb'

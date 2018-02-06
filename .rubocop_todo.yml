@@ -23,10 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 121
-Style/CaseEquality:
-  Enabled: false
-
 # Offense count: 6
 # Cop supports --auto-correct.
 Style/CharacterLiteral:
