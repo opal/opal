@@ -15,18 +15,6 @@ Layout/ElseAlignment:
     - 'opal/corelib/enumerator.rb'
     - 'opal/corelib/marshal/read_buffer.rb'
 
-# Offense count: 12
-# Cop supports --auto-correct.
-Layout/EmptyLines:
-  Exclude:
-    - 'lib/opal/builder.rb'
-    - 'lib/opal/cli_options.rb'
-    - 'lib/opal/cli_runners.rb'
-    - 'lib/opal/config.rb'
-    - 'lib/opal/nodes/defined.rb'
-    - 'opal/corelib/random.rb'
-    - 'opal/corelib/range.rb'
-
 # Offense count: 4
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.

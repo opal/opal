@@ -53,8 +53,6 @@ module Opal
       0
     }
 
-
-
     # Legacy runners
 
     def self.register_legacy_runner(klass_name, *names)

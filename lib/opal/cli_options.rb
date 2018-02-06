@@ -37,7 +37,6 @@ module Opal
         exit
       end
 
-
       section 'Basic Options:'
 
       on('-I', '--include DIR',
@@ -159,7 +158,6 @@ module Opal
     end
 
     attr_reader :options
-
 
     private
 

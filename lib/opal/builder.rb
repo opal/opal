@@ -50,8 +50,6 @@ module Opal
       processor_extensions.each { |ext| extensions << ext }
     end
 
-
-
     class MissingRequire < LoadError
     end
 
@@ -126,8 +124,6 @@ module Opal
 
     attr_accessor :processors, :path_reader, :compiler_options,
                   :stubs, :prerequired, :preload
-
-
 
     private
 

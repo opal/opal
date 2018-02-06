@@ -199,7 +199,6 @@ class Range
       }
     }
 
-
     unless block_given?
       return enum_for(:step, n) {
         %x{

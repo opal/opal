@@ -73,7 +73,6 @@ module Opal
       @config = nil
     end
 
-
     # Enable method_missing support.
     #
     # @return [true, false]
