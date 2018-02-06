@@ -41,16 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, MinBodyLength.
-# SupportedStyles: skip_modifier_ifs, always
-Style/Next:
-  Exclude:
-    - 'lib/opal/nodes/case.rb'
-    - 'lib/opal/nodes/rescue.rb'
-    - 'opal/corelib/enumerable.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 Style/NilComparison:

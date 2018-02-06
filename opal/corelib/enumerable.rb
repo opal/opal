@@ -543,16 +543,15 @@ module Enumerable
 
     each do |*value|
       cmp = `comparableForPattern(value)`
-      if pattern.__send__(:===, *cmp)
-        if block_given?
-          value = [value] if value.length > 1
-          value = yield(*value)
-        elsif value.length <= 1
-          value = value[0]
-        end
-
-        result.push(value)
+      next unless pattern.__send__(:===, *cmp)
+      if block_given?
+        value = [value] if value.length > 1
+        value = yield(*value)
+      elsif value.length <= 1
+        value = value[0]
       end
+
+      result.push(value)
     end
 
     result
@@ -563,16 +562,15 @@ module Enumerable
 
     each do |*value|
       cmp = `comparableForPattern(value)`
-      unless pattern.__send__(:===, *cmp)
-        if block_given?
-          value = [value] if value.length > 1
-          value = yield(*value)
-        elsif value.length <= 1
-          value = value[0]
-        end
-
-        result.push(value)
+      next if pattern.__send__(:===, *cmp)
+      if block_given?
+        value = [value] if value.length > 1
+        value = yield(*value)
+      elsif value.length <= 1
+        value = value[0]
       end
+
+      result.push(value)
     end
 
     result
@@ -897,19 +895,17 @@ module Enumerable
       end
     elsif block_given?
       each do |*value|
-        if yield(*value)
-          count += 1
+        next unless yield(*value)
+        count += 1
 
-          return false if count > 1
-        end
+        return false if count > 1
       end
     else
       each do |*value|
-        if Opal.destructure(value)
-          count += 1
+        next unless Opal.destructure(value)
+        count += 1
 
-          return false if count > 1
-        end
+        return false if count > 1
       end
     end
 

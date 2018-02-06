@@ -101,12 +101,11 @@ module Opal
 
           children[1..-1].each_with_index do |child, idx|
             # counting only rescue, ignoring rescue-else statement
-            if child && child.type == :resbody
-              _has_rescue_handlers = true
+            next unless child && child.type == :resbody
+            _has_rescue_handlers = true
 
-              push " else " unless idx == 0
-              line process(child, @level)
-            end
+            push " else " unless idx == 0
+            line process(child, @level)
           end
 
           # if no resbodys capture our error, then rethrow

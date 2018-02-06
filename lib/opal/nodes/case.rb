@@ -28,18 +28,17 @@ module Opal
         end
 
         case_parts.each_with_index do |wen, idx|
-          if wen
-            line
-            case wen.type
-            when :when
-              wen = compiler.returns(wen) if needs_closure?
-              push "else " unless idx == 0
-              push stmt(wen)
-            else # s(:else)
-              handled_else = true
-              wen = compiler.returns(wen) if needs_closure?
-              push "else {", stmt(wen), "}"
-            end
+          next unless wen
+          line
+          case wen.type
+          when :when
+            wen = compiler.returns(wen) if needs_closure?
+            push "else " unless idx == 0
+            push stmt(wen)
+          else # s(:else)
+            handled_else = true
+            wen = compiler.returns(wen) if needs_closure?
+            push "else {", stmt(wen), "}"
           end
         end
 
