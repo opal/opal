@@ -23,12 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 7
-# Configuration parameters: .
-# SupportedStyles: snake_case, camelCase
-Naming/MethodName:
-  EnforcedStyle: snake_case
-
 # Offense count: 10
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist, MethodDefinitionMacros.
 # NamePrefix: is_, has_, have_
