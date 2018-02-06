@@ -117,3 +117,7 @@ Naming/BinaryOperatorParameterName:
   Exclude:
     # Opal follows MRI argument namings
     - 'opal/**/*.rb'
+
+Naming/PredicateName:
+  # Ruby has "has_key?" method
+  NamePrefixBlacklist: is_, have_

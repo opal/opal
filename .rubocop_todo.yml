@@ -23,21 +23,6 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Offense count: 10
-# Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist, MethodDefinitionMacros.
-# NamePrefix: is_, has_, have_
-# NamePrefixBlacklist: is_, has_, have_
-# NameWhitelist: is_a?
-# MethodDefinitionMacros: define_method, define_singleton_method
-Naming/PredicateName:
-  Exclude:
-    - 'spec/**/*'
-    - 'lib/opal/nodes/base.rb'
-    - 'lib/opal/nodes/iter.rb'
-    - 'lib/opal/nodes/node_with_args.rb'
-    - 'lib/opal/nodes/scope.rb'
-    - 'opal/corelib/hash.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: EnabledForFlattenWithoutParams.
