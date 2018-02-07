@@ -1210,7 +1210,7 @@ module Kernel
   end
 
   def throw(*args)
-    raise UncaughtThrowError.new(args)
+    raise UncaughtThrowError, args
   end
 
   # basic implementation of open, delegate to File.open

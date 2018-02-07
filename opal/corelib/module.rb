@@ -229,7 +229,7 @@ class Module
         delete self.$$cvars[name];
         return value;
       } else {
-        #{raise NameError.new("cannot remove #{name} for #{self}")}
+        #{raise NameError, "cannot remove #{name} for #{self}"}
       }
     }
   end

@@ -41,15 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: compact, exploded
-Style/RaiseArgs:
-  Exclude:
-    - 'opal/corelib/kernel.rb'
-    - 'opal/corelib/module.rb'
-
 # Offense count: 7
 # Cop supports --auto-correct.
 # Configuration parameters: AllowMultipleReturnValues.
