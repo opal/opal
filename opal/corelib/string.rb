@@ -395,7 +395,7 @@ class String < `String`
   end
 
   def each_char(&block)
-    return enum_for(:each_char) { self.size } unless block_given?
+    return enum_for(:each_char) { size } unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -1737,7 +1737,7 @@ class String < `String`
   end
 
   def self._load(*args)
-    self.new(*args)
+    new(*args)
   end
 
   def unpack(format)

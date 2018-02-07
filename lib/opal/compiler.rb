@@ -194,7 +194,7 @@ module Opal
     # @param source_file [String] optional source_file to reference ruby source
     # @return [Opal::SourceMap]
     def source_map(source_file = nil)
-      Opal::SourceMap.new(@fragments, source_file || self.file)
+      Opal::SourceMap.new(@fragments, source_file || file)
     end
 
     # Any helpers required by this file. Used by {Opal::Nodes::Top} to reference
@@ -267,7 +267,7 @@ module Opal
 
     # Use the given helper
     def helper(name)
-      self.helpers << name
+      helpers << name
     end
 
     # To keep code blocks nicely indented, this will yield a block after

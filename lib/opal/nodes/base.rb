@@ -46,7 +46,7 @@ module Opal
         return @fragments if defined?(@fragments)
 
         @fragments = []
-        self.compile
+        compile
         @fragments
       end
 

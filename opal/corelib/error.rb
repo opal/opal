@@ -53,7 +53,7 @@ class Exception < `Error`
         return self;
       }
 
-      var cloned = #{self.clone};
+      var cloned = #{clone};
       cloned.message = str;
       return cloned;
     }

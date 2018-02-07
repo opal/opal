@@ -10,7 +10,8 @@ module Opal
       children :test, :true_body, :false_body
 
       def compile
-        truthy, falsy = self.truthy, self.falsy
+        truthy = self.truthy
+        falsy = self.falsy
 
         push "if (", js_truthy(test), ") {"
 

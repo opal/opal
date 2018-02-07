@@ -218,14 +218,14 @@ class Struct
   end
 
   def each
-    return enum_for(:each) { self.size } unless block_given?
+    return enum_for(:each) { size } unless block_given?
 
     self.class.members.each { |name| yield self[name] }
     self
   end
 
   def each_pair
-    return enum_for(:each_pair) { self.size } unless block_given?
+    return enum_for(:each_pair) { size } unless block_given?
 
     self.class.members.each { |name| yield [name, self[name]] }
     self

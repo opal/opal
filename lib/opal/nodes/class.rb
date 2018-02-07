@@ -29,7 +29,7 @@ module Opal
           line body_code
         end
 
-        line "})(", base, ", ", self.super_code, ", $nesting)"
+        line "})(", base, ", ", super_code, ", $nesting)"
       end
 
       def super_code

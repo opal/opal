@@ -237,7 +237,7 @@ module Opal
         return @identity if @identity
 
         # Parent scope is the defining module/class
-        name ||= [(parent && (parent.name || parent.scope_name)), self.mid].compact.join('_')
+        name ||= [(parent && (parent.name || parent.scope_name)), mid].compact.join('_')
         @identity = @compiler.unique_temp(name)
         @parent.add_scope_temp @identity if @parent
 

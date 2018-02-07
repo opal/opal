@@ -169,7 +169,7 @@ class Struct
     buffer.write_extends(self)
     buffer.append('S')
     buffer.append_symbol(self.class.name)
-    buffer.write_fixnum(self.length)
+    buffer.write_fixnum(length)
     each_pair do |attr_name, value|
       buffer.append_symbol(attr_name)
       buffer.write(value)

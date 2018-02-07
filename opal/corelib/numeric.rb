@@ -42,7 +42,7 @@ class Numeric
   end
 
   def %(other)
-    self - other * self.div(other)
+    self - other * div(other)
   end
 
   def abs
@@ -84,7 +84,7 @@ class Numeric
   end
 
   def fdiv(other)
-    self.to_f / other
+    to_f / other
   end
 
   def floor(ndigits = 0)

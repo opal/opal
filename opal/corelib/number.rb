@@ -7,7 +7,7 @@ class Number < Numeric
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{self.name}"
+      raise TypeError, "allocator undefined for #{name}"
     end
 
     undef :new
@@ -1015,7 +1015,7 @@ class Integer < Numeric
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{self.name}"
+      raise TypeError, "allocator undefined for #{name}"
     end
 
     undef :new
@@ -1051,7 +1051,7 @@ class Float < Numeric
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{self.name}"
+      raise TypeError, "allocator undefined for #{name}"
     end
 
     undef :new

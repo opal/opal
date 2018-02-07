@@ -137,7 +137,7 @@ class Array < `Array`
 
     %x{
       var result = [],
-          converted = #{self.to_a};
+          converted = #{to_a};
 
       for (var i = 0; i < other; i++) {
         result = result.concat(converted);
@@ -552,7 +552,7 @@ class Array < `Array`
           Float::INFINITY
         else
           n = Opal.coerce_to!(n, Integer, :to_int)
-          n > 0 ? self.enumerator_size * n : 0
+          n > 0 ? enumerator_size * n : 0
         end
       end
     end
@@ -607,7 +607,7 @@ class Array < `Array`
   end
 
   def collect(&block)
-    return enum_for(:collect) { self.size } unless block_given?
+    return enum_for(:collect) { size } unless block_given?
 
     %x{
       var result = [];
@@ -622,7 +622,7 @@ class Array < `Array`
   end
 
   def collect!(&block)
-    return enum_for(:collect!) { self.size } unless block_given?
+    return enum_for(:collect!) { size } unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -825,7 +825,7 @@ class Array < `Array`
   end
 
   def delete_if(&block)
-    return enum_for(:delete_if) { self.size } unless block_given?
+    return enum_for(:delete_if) { size } unless block_given?
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -883,7 +883,7 @@ class Array < `Array`
   end
 
   def each(&block)
-    return enum_for(:each) { self.size } unless block_given?
+    return enum_for(:each) { size } unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -895,7 +895,7 @@ class Array < `Array`
   end
 
   def each_index(&block)
-    return enum_for(:each_index) { self.size } unless block_given?
+    return enum_for(:each_index) { size } unless block_given?
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
@@ -1354,7 +1354,7 @@ class Array < `Array`
   end
 
   def keep_if(&block)
-    return enum_for(:keep_if) { self.size } unless block_given?
+    return enum_for(:keep_if) { size } unless block_given?
 
     %x{
       for (var i = 0, length = self.length, value; i < length; i++) {
@@ -1493,7 +1493,7 @@ class Array < `Array`
 
   def repeated_permutation(n)
     num = Opal.coerce_to! n, Integer, :to_int
-    return enum_for(:repeated_permutation, num) { num >= 0 ? self.size**num : 0 } unless block_given?
+    return enum_for(:repeated_permutation, num) { num >= 0 ? size**num : 0 } unless block_given?
 
     %x{
       function iterate(max, buffer, self) {
@@ -1615,7 +1615,7 @@ class Array < `Array`
   end
 
   def reject(&block)
-    return enum_for(:reject) { self.size } unless block_given?
+    return enum_for(:reject) { size } unless block_given?
 
     %x{
       var result = [];
@@ -1632,7 +1632,7 @@ class Array < `Array`
   end
 
   def reject!(&block)
-    return enum_for(:reject!) { self.size } unless block_given?
+    return enum_for(:reject!) { size } unless block_given?
 
     original = length
     delete_if(&block)
@@ -1666,7 +1666,7 @@ class Array < `Array`
   end
 
   def reverse_each(&block)
-    return enum_for(:reverse_each) { self.size } unless block_given?
+    return enum_for(:reverse_each) { size } unless block_given?
 
     reverse.each(&block)
     self
@@ -1869,7 +1869,7 @@ class Array < `Array`
   end
 
   def select(&block)
-    return enum_for(:select) { self.size } unless block_given?
+    return enum_for(:select) { size } unless block_given?
 
     %x{
       var result = [];
@@ -1889,7 +1889,7 @@ class Array < `Array`
   end
 
   def select!(&block)
-    return enum_for(:select!) { self.size } unless block_given?
+    return enum_for(:select!) { size } unless block_given?
 
     %x{
       var original = self.length;
@@ -2092,7 +2092,7 @@ class Array < `Array`
   end
 
   def sort_by!(&block)
-    return enum_for(:sort_by!) { self.size } unless block_given?
+    return enum_for(:sort_by!) { size } unless block_given?
 
     replace sort_by(&block)
   end

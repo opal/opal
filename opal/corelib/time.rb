@@ -716,7 +716,7 @@ class Time < `Date`
   end
 
   def cweek_cyear
-    jan01 = Time.new(self.year, 1, 1)
+    jan01 = Time.new(year, 1, 1)
     jan01_wday = jan01.wday
     first_monday = 0
     year = self.year
@@ -729,7 +729,7 @@ class Time < `Date`
       offset = -1 if offset == -8 # Adjust if Jan 01 is a Sunday
     end
 
-    week = ((self.yday + offset) / 7.00).ceil
+    week = ((yday + offset) / 7.00).ceil
 
     if week <= 0
       # Get the last week of the previous year
