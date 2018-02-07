@@ -80,7 +80,7 @@ class Enumerator
   def inspect
     result = "#<#{self.class}: #{@object.inspect}:#{@method}"
 
-    unless @args.empty?
+    if @args.any?
       result += "(#{@args.inspect[Range.new(1, -2)]})"
     end
 

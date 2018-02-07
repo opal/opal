@@ -781,7 +781,7 @@ class Number < Numeric
           Opal.hash_put(keyword_args, "by", by);
         }
 
-        if (!#{keyword_args.empty?}) {
+        if (#{keyword_args.any?}) {
           positional_args.push(keyword_args);
         }
       }

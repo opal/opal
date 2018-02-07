@@ -1011,7 +1011,7 @@ module Kernel
   alias object_id __id__
 
   def printf(*args)
-    unless args.empty?
+    if args.any?
       print format(*args)
     end
 
