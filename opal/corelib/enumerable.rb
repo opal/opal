@@ -1190,7 +1190,7 @@ module Enumerable
                    value
                  end
 
-      unless hash.has_key?(produced)
+      unless hash.key?(produced)
         hash[produced] = value
       end
     end

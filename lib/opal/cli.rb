@@ -43,7 +43,7 @@ module Opal
       @compiler_options = Hash[
         *compiler_option_names.map do |option|
           key = option.to_sym
-          next unless options.has_key? key
+          next unless options.key? key
           value = options.delete(key)
           [key, value]
         end.compact.flatten
