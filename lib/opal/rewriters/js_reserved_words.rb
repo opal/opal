@@ -49,7 +49,7 @@ module Opal
       end
 
       def on_lvar(node)
-        name, _ = *node
+        name, = *node
         node = node.updated(nil, [fix_var_name(name)])
         super(node)
       end
@@ -67,7 +67,7 @@ module Opal
       end
 
       def on_ivar(node)
-        name, _ = *node
+        name, = *node
         node = node.updated(nil, [fix_ivar_name(name)])
         super(node)
       end
@@ -88,7 +88,7 @@ module Opal
       # because it may have no name
       # def m(*); end
       def on_restarg(node)
-        name, _ = *node
+        name, = *node
 
         if name
           node = node.updated(nil, [fix_var_name(name)], meta: { arg_name: name })

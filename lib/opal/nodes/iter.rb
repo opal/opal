@@ -79,7 +79,7 @@ module Opal
 
       def compile_norm_args
         norm_args.each do |arg|
-          arg_name, _ = *arg
+          arg_name, = *arg
           push "if (#{arg_name} == null) #{arg_name} = nil;"
         end
       end

@@ -29,7 +29,7 @@ module Opal
         end
 
         def on_kwsplat(node)
-          hash, _ = *node
+          hash, = *node
 
           if hash.type == :hash
             hash = process_regular_node(hash)
@@ -45,7 +45,7 @@ module Opal
 
           def <<(element)
             if @set.include?(element)
-              key, _ = *element
+              key, = *element
               key = element.type == :str ? key.inspect : ":#{key}"
               Kernel.warn "warning: key #{key} is duplicated and overwritten"
             else

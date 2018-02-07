@@ -144,7 +144,7 @@ module Opal
       end
 
       def compile_optarg(optarg)
-        var_name, _ = *optarg
+        var_name, = *optarg
         add_temp var_name
 
         line "if (#{required_right_args.size} < #{scope.working_arguments}.length) {"
@@ -177,7 +177,7 @@ module Opal
 
       def extract_restarg
         extract_code = "#{scope.working_arguments}.splice(0, #{scope.working_arguments}.length - #{required_right_args.size});"
-        var_name, _ = *restarg
+        var_name, = *restarg
         if var_name
           add_temp var_name
           line "#{var_name} = #{extract_code}"
@@ -187,7 +187,7 @@ module Opal
       end
 
       def extract_blank_restarg
-        var_name, _ = *restarg
+        var_name, = *restarg
         if var_name
           add_temp var_name
           line "#{var_name} = [];"

@@ -41,24 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 18
-# Cop supports --auto-correct.
-# Configuration parameters: AllowNamedUnderscoreVariables.
-Style/TrailingUnderscoreVariable:
-  Exclude:
-    - 'lib/opal/nodes/args/post_args.rb'
-    - 'lib/opal/nodes/defined.rb'
-    - 'lib/opal/nodes/inline_args.rb'
-    - 'lib/opal/nodes/iter.rb'
-    - 'lib/opal/rewriters/binary_operator_assignment.rb'
-    - 'lib/opal/rewriters/dot_js_syntax.rb'
-    - 'lib/opal/rewriters/for_rewriter.rb'
-    - 'lib/opal/rewriters/hashes/key_duplicates_rewriter.rb'
-    - 'lib/opal/rewriters/js_reserved_words.rb'
-    - 'lib/opal/rewriters/logical_operator_assignment.rb'
-    - 'lib/opal/rewriters/rubyspec/filters_rewriter.rb'
-    - 'lib/opal/util.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 # Configuration parameters: ExactNameMatch, AllowPredicates, AllowDSLWriters, IgnoreClassMethods, Whitelist.

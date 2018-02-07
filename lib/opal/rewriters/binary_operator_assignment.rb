@@ -128,7 +128,7 @@ module Opal
       #   `defined?(a &&= 1)`
       # to a static "assignment" string node
       def on_defined?(node)
-        inner, _ = *node
+        inner, = *node
         if inner.type == :op_asgn
           ASSIGNMENT_STRING_NODE
         else

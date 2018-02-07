@@ -173,7 +173,7 @@ module Opal
       end
 
       def compile_defined_cvar(node)
-        cvar_name, _ = *node
+        cvar_name, = *node
         cvar_tmp = scope.new_temp
         push "(#{cvar_tmp} = #{class_variable_owner}.$$cvars['#{cvar_name}'], #{cvar_tmp} != null)"
         cvar_tmp

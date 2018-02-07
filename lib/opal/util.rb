@@ -61,7 +61,7 @@ module Opal
 
     class DigestSourceCommand < Command
       def digest(source)
-        out, _, _ = Open3.capture3("#{command} #{options} #{hide_stderr}", stdin_data: source)
+        out, = Open3.capture3("#{command} #{options} #{hide_stderr}", stdin_data: source)
         out
       end
     end
