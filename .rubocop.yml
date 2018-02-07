@@ -207,3 +207,9 @@ Style/SpecialGlobalVars:
 
 Style/StderrPuts:
   Enabled: false
+
+Style/YodaCondition:
+  Exclude:
+    # In Opal there are lot of cases like
+    # if `..js..` == object
+    - 'opal/**/*.rb'
