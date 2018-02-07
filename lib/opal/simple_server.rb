@@ -35,10 +35,10 @@ class Opal::SimpleServer
   def call(env)
     case env['PATH_INFO']
     when %r{\A/#{@prefix}/(.*)\.map\z}
-      path, _cache_invalidator = $1.split('?', 2)
+      path, _cache_invalidator = Regexp.last_match(1).split('?', 2)
       call_map(path)
     when %r{\A/#{@prefix}/(.*)\z}
-      path, _cache_invalidator = $1.split('?', 2)
+      path, _cache_invalidator = Regexp.last_match(1).split('?', 2)
       call_asset(path)
     else call_index
     end

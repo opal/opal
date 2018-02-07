@@ -45,10 +45,10 @@ module Opal
 
       def translate_escape_chars(inspect_string)
         inspect_string.gsub(ESCAPE_REGEX) do |original|
-          if $1.length.even?
+          if Regexp.last_match(1).length.even?
             original
           else
-            $1.chop + ESCAPE_CHARS[$2]
+            Regexp.last_match(1).chop + ESCAPE_CHARS[Regexp.last_match(2)]
           end
         end
       end
@@ -59,7 +59,7 @@ module Opal
         should_encode = encoding != Encoding::UTF_8
 
         sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do
-          code_point = $1.to_i(16)
+          code_point = Regexp.last_match(1).to_i(16)
           to_utf16(code_point)
         end
         push translate_escape_chars(sanitized_value)

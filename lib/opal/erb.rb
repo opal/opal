@@ -61,7 +61,7 @@ module Opal
 
       def find_contents(result)
         result.gsub(/<%=([\s\S]+?)%>/) do
-          inner = $1.gsub(/\\'/, "'").gsub(/\\"/, '"')
+          inner = Regexp.last_match(1).gsub(/\\'/, "'").gsub(/\\"/, '"')
 
           if inner =~ BLOCK_EXPR
             "\")\noutput_buffer.append= #{inner}\noutput_buffer.append(\""
@@ -73,7 +73,7 @@ module Opal
 
       def find_code(result)
         result.gsub(/<%([\s\S]+?)%>/) do
-          inner = $1.gsub(/\\"/, '"')
+          inner = Regexp.last_match(1).gsub(/\\"/, '"')
           "\")\n#{inner}\noutput_buffer.append(\""
         end
       end
