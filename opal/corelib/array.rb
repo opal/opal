@@ -2245,7 +2245,7 @@ class Array < `Array`
   alias prepend unshift
 
   def values_at(*args)
-    out = [];
+    out = []
 
     args.each do |elem|
       if elem.is_a? Range

@@ -41,18 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: AllowAsExpressionSeparator.
-Style/Semicolon:
-  Exclude:
-    - 'lib/opal/cli.rb'
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/complex.rb'
-    - 'opal/corelib/number.rb'
-    - 'opal/corelib/string/unpack.rb'
-    - 'opal/corelib/struct.rb'
-
 # Offense count: 29
 # Cop supports --auto-correct.
 # Configuration parameters: .

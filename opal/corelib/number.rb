@@ -625,7 +625,7 @@ class Number < Numeric
         return self
       end
 
-      ndigits = -ndigits;
+      ndigits = -ndigits
 
       %x{
         if (0.415241 * ndigits - 0.125 > #{size}) {

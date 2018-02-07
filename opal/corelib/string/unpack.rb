@@ -374,8 +374,8 @@ class String
 
       if (extraLength > bytes.length) {
         #{
-          expected = `extraLength + 1`;
-          given = `bytes.length + 1`;
+          expected = `extraLength + 1`
+          given = `bytes.length + 1`
           raise ArgumentError, "malformed UTF-8 character (expected #{expected} bytes, given #{given} bytes)"
         }
       }
