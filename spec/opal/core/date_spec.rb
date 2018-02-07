@@ -112,11 +112,25 @@ describe Date do
     end
   end
 
+  describe "#next_year" do
+    it "returns the date with the next calendar year from self" do
+      Date.new(2013, 2, 5).next_year.should == Date.new(2014, 2, 5)
+      Date.new(2013, 2, 5).next_year(3).should == Date.new(2016, 2, 5)
+    end
+  end
+
   describe "#prev_month" do
     it "returns the date with the previous calendar month" do
       Date.new(2013, 2, 9).prev_month.should == Date.new(2013, 1, 9)
       Date.new(2013, 7, 31).prev_month.should == Date.new(2013, 6, 30)
       Date.new(2013, 1, 3).prev_month.should == Date.new(2012, 12, 3)
+    end
+  end
+
+  describe "#prev_year" do
+    it "returns the date with the previous calendar year from self" do
+      Date.new(2013, 2, 5).prev_year.should == Date.new(2012, 2, 5)
+      Date.new(2013, 2, 5).prev_year(3).should == Date.new(2010, 2, 5)
     end
   end
 
