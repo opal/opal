@@ -993,7 +993,7 @@ module Kernel
   def loop
     return enum_for(:loop) { Float::INFINITY } unless block_given?
 
-    while true do
+    while true
       begin
         yield
       rescue StopIteration => e
