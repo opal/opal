@@ -201,3 +201,6 @@ Style/PercentLiteralDelimiters:
 Style/SafeNavigation:
   # Opal supports old versions of Ruby that don't have safe navigator
   Enabled: false
+
+Style/SpecialGlobalVars:
+  Enabled: false
