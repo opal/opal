@@ -41,26 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 17
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, MinSize.
-# SupportedStyles: percent, brackets
-Style/SymbolArray:
-  Exclude:
-    - 'lib/opal/compiler.rb'
-    - 'lib/opal/config.rb'
-    - 'lib/opal/nodes/call.rb'
-    - 'lib/opal/nodes/definitions.rb'
-    - 'lib/opal/nodes/hash.rb'
-    - 'lib/opal/nodes/literal.rb'
-    - 'lib/opal/nodes/masgn.rb'
-    - 'lib/opal/nodes/node_with_args.rb'
-    - 'lib/opal/nodes/scope.rb'
-    - 'lib/opal/nodes/super.rb'
-    - 'lib/opal/rewriters/base.rb'
-    - 'lib/opal/rewriters/logical_operator_assignment.rb'
-    - 'lib/opal/rewriters/rubyspec/filters_rewriter.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: IgnoredMethods.

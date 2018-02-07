@@ -30,7 +30,7 @@ module Opal
         @specs_stack = []
       end
 
-      RUBYSPEC_DSL = [:describe, :it, :context].freeze
+      RUBYSPEC_DSL = %i[describe it context].freeze
 
       def on_send(node)
         _recvr, method_name, *args = *node

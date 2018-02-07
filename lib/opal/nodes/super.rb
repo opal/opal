@@ -13,7 +13,7 @@ module Opal
         args = *@sexp
         *rest, last_child = *args
 
-        if last_child && [:iter, :block_pass].include?(last_child.type)
+        if last_child && %i[iter block_pass].include?(last_child.type)
           @iter = last_child
           args = rest
         else

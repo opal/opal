@@ -109,7 +109,7 @@ module Opal
     # @!method dynamic_require_severity
     #
     # how to handle dynamic requires (:error, :warning, :ignore)
-    compiler_option :dynamic_require_severity, :ignore, valid_values: [:error, :warning, :ignore]
+    compiler_option :dynamic_require_severity, :ignore, valid_values: %i[error warning ignore]
 
     # @!method requirable?
     #
@@ -203,7 +203,7 @@ module Opal
     #
     # @return [Set<Symbol>]
     def helpers
-      @helpers ||= Set.new([:breaker, :slice])
+      @helpers ||= Set.new(%i[breaker slice])
     end
 
     # Operator helpers

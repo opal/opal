@@ -77,7 +77,7 @@ module Opal
 
       def keyword_args
         @keyword_args ||= args.children.select do |arg|
-          [:kwarg, :kwoptarg, :kwrestarg].include? arg.type
+          %i[kwarg kwoptarg kwrestarg].include? arg.type
         end
       end
 
@@ -139,7 +139,7 @@ module Opal
       end
 
       def has_only_optional_kwargs?
-        keyword_args.any? && keyword_args.all? { |arg| [:kwoptarg, :kwrestarg].include?(arg.type) }
+        keyword_args.any? && keyword_args.all? { |arg| %i[kwoptarg kwrestarg].include?(arg.type) }
       end
 
       def has_required_kwargs?
@@ -156,7 +156,7 @@ module Opal
 
       def negative_arity
         required_plain_args = args.children.select do |arg|
-          [:arg, :mlhs].include?(arg.type)
+          %i[arg mlhs].include?(arg.type)
         end
 
         result = required_plain_args.size

@@ -267,7 +267,7 @@ module Opal
             chain << scope.identify!
             scope = scope.parent if scope.parent
 
-          elsif [:def, :defs].include?(scope.type)
+          elsif %i[def defs].include?(scope.type)
             defn = scope.identify!
             mid  = "'#{scope.mid}'"
             break

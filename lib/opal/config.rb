@@ -105,7 +105,7 @@ module Opal
     # - `:ignore` will skip the require silently at compile time
     #
     # @return [:error, :warning, :ignore]
-    config_option :dynamic_require_severity, :warning, compiler_option: :dynamic_require_severity, valid_values: [:error, :warning, :ignore]
+    config_option :dynamic_require_severity, :warning, compiler_option: :dynamic_require_severity, valid_values: %i[error warning ignore]
 
     # Enable IRB support for making local variables across multiple compilations.
     #

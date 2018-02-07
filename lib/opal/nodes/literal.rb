@@ -279,7 +279,7 @@ module Opal
     class RangeNode < Base
       children :start, :finish
 
-      SIMPLE_CHILDREN_TYPES = [:int, :float, :str, :sym].freeze
+      SIMPLE_CHILDREN_TYPES = %i[int float str sym].freeze
 
       def compile
         if compile_inline?

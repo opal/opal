@@ -27,7 +27,7 @@ module Opal
       end
 
       def simple_keys?
-        keys.all? { |key| [:sym, :str].include?(key.type) }
+        keys.all? { |key| %i[sym str].include?(key.type) }
       end
 
       def compile

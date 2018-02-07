@@ -69,7 +69,7 @@ module Opal
       def prepend_to_body(body, node)
         if body.nil?
           node
-        elsif [:begin, :kwbegin].include?(body.type)
+        elsif %i[begin kwbegin].include?(body.type)
           body.updated(nil, [node, *body])
         else
           s(:begin, node, body)
@@ -88,7 +88,7 @@ module Opal
       def append_to_body(body, node)
         if body.nil?
           node
-        elsif [:begin, :kwbegin].include?(body.type)
+        elsif %i[begin kwbegin].include?(body.type)
           body.updated(nil, [*body, node])
         else
           s(:begin, body, node)

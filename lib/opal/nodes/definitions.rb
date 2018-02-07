@@ -62,7 +62,7 @@ module Opal
         end
       end
 
-      COMPLEX_CHILDREN = [:while, :while_post, :until, :until_post, :js_return].freeze
+      COMPLEX_CHILDREN = %i[while while_post until until_post js_return].freeze
 
       def simple_children?
         children.none? do |child|

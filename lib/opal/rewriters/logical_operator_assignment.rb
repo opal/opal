@@ -142,7 +142,7 @@ module Opal
       # to a static "assignment" string node
       def on_defined?(node)
         inner, _ = *node
-        if [:or_asgn, :and_asgn].include?(inner.type)
+        if %i[or_asgn and_asgn].include?(inner.type)
           ASSIGNMENT_STRING_NODE
         else
           super(node)

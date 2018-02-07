@@ -30,7 +30,7 @@ module Opal
 
         *rest, last_arg = *args
 
-        if last_arg && [:iter, :block_pass].include?(last_arg.type)
+        if last_arg && %i[iter block_pass].include?(last_arg.type)
           @iter = last_arg
           args = rest
         else

@@ -5,7 +5,7 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class MassAssignNode < Base
-      SIMPLE_ASSIGNMENT = [:lvasgn, :ivasgn, :lvar, :gvasgn, :cdecl, :casgn].freeze
+      SIMPLE_ASSIGNMENT = %i[lvasgn ivasgn lvar gvasgn cdecl casgn].freeze
 
       handle :masgn
       children :lhs, :rhs
