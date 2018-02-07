@@ -5,7 +5,7 @@ require 'hike'
 
 module Opal
   class PathReader
-    RELATIVE_PATH_REGEXP = %r{#{Opal::REGEXP_START}\.?\.#{Regexp.quote File::SEPARATOR}}
+    RELATIVE_PATH_REGEXP = /#{Opal::REGEXP_START}\.?\.#{Regexp.quote File::SEPARATOR}/
     DEFAULT_EXTENSIONS = ['.js', '.js.rb', '.rb', '.opalerb'].freeze
 
     def initialize(paths = Opal.paths, extensions = DEFAULT_EXTENSIONS)

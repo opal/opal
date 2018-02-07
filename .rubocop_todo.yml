@@ -41,17 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, AllowInnerSlashes.
-# SupportedStyles: slashes, percent_r, mixed
-Style/RegexpLiteral:
-  Exclude:
-    - 'lib/opal/nodes/helpers.rb'
-    - 'lib/opal/nodes/literal.rb'
-    - 'lib/opal/path_reader.rb'
-    - 'opal/corelib/file.rb'
-
 # Offense count: 8
 # Cop supports --auto-correct.
 # Configuration parameters: ConvertCodeThatCanStartToReturnNil.

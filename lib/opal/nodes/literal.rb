@@ -142,7 +142,7 @@ module Opal
         case value
         when ''
           push('/(?:)/')
-        when %r{\?<\w+\>}
+        when /\?<\w+\>/
           message = "named captures are not supported in javascript: #{value.inspect}"
           push "self.$raise(new SyntaxError('#{message}'))"
         else

@@ -156,7 +156,7 @@ class File < IO
           #{files}.push(key)
         }
       }
-      path = path.gsub(%r{(^.#{SEPARATOR}+|#{SEPARATOR}+$)})
+      path = path.gsub(/(^.#{SEPARATOR}+|#{SEPARATOR}+$)/)
       file = files.find { |f| f =~ /^#{path}/ }
       file
     end
@@ -182,7 +182,7 @@ class File < IO
           result = "#{result}#{item}"
         else
           if item.end_with?(SEPARATOR) && next_item.start_with?(SEPARATOR)
-            item = item.sub(%r{#{SEPARATOR}+$}, '')
+            item = item.sub(/#{SEPARATOR}+$/, '')
           end
           result = if item.end_with?(SEPARATOR) || next_item.start_with?(SEPARATOR)
                      "#{result}#{item}"
