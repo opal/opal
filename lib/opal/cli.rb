@@ -61,7 +61,7 @@ module Opal
         options: runner_options,
         output: output,
         argv: argv,
-        builder: builder,
+        builder: builder
       )
     end
 
