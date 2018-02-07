@@ -141,7 +141,7 @@ class File < IO
       return '' if filename.empty?
       last_dot_idx = filename[1..-1].rindex('.')
       # extension name must contains at least one character .(something)
-      (last_dot_idx.nil? || last_dot_idx + 1 == filename.length - 1) ? '' : filename[(last_dot_idx + 1)..-1]
+      last_dot_idx.nil? || last_dot_idx + 1 == filename.length - 1 ? '' : filename[(last_dot_idx + 1)..-1]
     end
 
     def exist?(path)
