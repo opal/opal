@@ -41,16 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: require_parentheses, require_no_parentheses
-Style/StabbyLambdaParentheses:
-  Exclude:
-    - 'lib/opal/cli_runners.rb'
-    - 'lib/opal/cli_runners/server.rb'
-    - 'opal/corelib/enumerable.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 Style/StderrPuts:
