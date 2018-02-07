@@ -103,7 +103,7 @@ class Enumerator
         try {
           args.unshift(#{yielder});
 
-          Opal.yieldX(#@block, args);
+          Opal.yieldX(#{@block}, args);
         }
         catch (e) {
           if (e === $breaker) {
@@ -126,7 +126,7 @@ class Enumerator
 
     def yield(*values)
       %x{
-        var value = Opal.yieldX(#@block, values);
+        var value = Opal.yieldX(#{@block}, values);
 
         if (value === $breaker) {
           throw $breaker;

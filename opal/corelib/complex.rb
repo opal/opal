@@ -185,7 +185,7 @@ class Complex < Numeric
   end
 
   def hash
-    "Complex:#@real:#@imag"
+    "Complex:#{@real}:#{@imag}"
   end
 
   alias imaginary imag

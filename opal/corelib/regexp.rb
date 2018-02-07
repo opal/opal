@@ -295,10 +295,10 @@ class MatchData
         var group = match_groups[i];
 
         if (group == null) {
-          #@matches.push(nil);
+          #{@matches}.push(nil);
         }
         else {
-          #@matches.push(group);
+          #{@matches}.push(group);
         }
       }
     }
@@ -348,15 +348,15 @@ class MatchData
   end
 
   def captures
-    `#@matches.slice(1)`
+    `#{@matches}.slice(1)`
   end
 
   def inspect
     %x{
-      var str = "#<MatchData " + #{`#@matches[0]`.inspect};
+      var str = "#<MatchData " + #{`#{@matches}[0]`.inspect};
 
-      for (var i = 1, length = #@matches.length; i < length; i++) {
-        str += " " + i + ":" + #{`#@matches[i]`.inspect};
+      for (var i = 1, length = #{@matches}.length; i < length; i++) {
+        str += " " + i + ":" + #{`#{@matches}[i]`.inspect};
       }
 
       return str + ">";
@@ -364,7 +364,7 @@ class MatchData
   end
 
   def length
-    `#@matches.length`
+    `#{@matches}.length`
   end
 
   alias size length
@@ -374,7 +374,7 @@ class MatchData
   end
 
   def to_s
-    `#@matches[0]`
+    `#{@matches}[0]`
   end
 
   def values_at(*args)
@@ -392,14 +392,14 @@ class MatchData
         index = #{Opal.coerce_to!(`args[i]`, Integer, :to_int)};
 
         if (index < 0) {
-          index += #@matches.length;
+          index += #{@matches}.length;
           if (index < 0) {
             values.push(nil);
             continue;
           }
         }
 
-        values.push(#@matches[index]);
+        values.push(#{@matches}[index]);
       }
 
       return values;

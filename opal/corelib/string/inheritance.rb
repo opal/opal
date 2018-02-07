@@ -43,7 +43,7 @@ class String::Wrapper
     result = @literal.__send__(*args, &block)
 
     if `result.$$is_string != null`
-      if `result == #@literal`
+      if `result == #{@literal}`
         self
       else
         self.class.allocate(result)

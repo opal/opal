@@ -276,10 +276,10 @@ module Opal
     def indent
       indent = @indent
       @indent += INDENT
-      @space = "\n#@indent"
+      @space = "\n#{@indent}"
       res = yield
       @indent = indent
-      @space = "\n#@indent"
+      @space = "\n#{@indent}"
       res
     end
 

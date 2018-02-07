@@ -49,19 +49,19 @@ class Range
     %x{
       var i, limit;
 
-      if (#@begin.$$is_number && #@end.$$is_number) {
-        if (#@begin % 1 !== 0 || #@end % 1 !== 0) {
+      if (#{@begin}.$$is_number && #{@end}.$$is_number) {
+        if (#{@begin} % 1 !== 0 || #{@end} % 1 !== 0) {
           #{raise TypeError, "can't iterate from Float"}
         }
 
-        for (i = #@begin, limit = #@end + #{@excl ? 0 : 1}; i < limit; i++) {
+        for (i = #{@begin}, limit = #{@end} + #{@excl ? 0 : 1}; i < limit; i++) {
           block(i);
         }
 
         return self;
       }
 
-      if (#@begin.$$is_string && #@end.$$is_string) {
+      if (#{@begin}.$$is_string && #{@end}.$$is_string) {
         #{@begin.upto(@end, @excl, &block)}
         return self;
       }
@@ -118,7 +118,7 @@ class Range
     elsif @excl && @begin == @end
       nil
     else
-      `#@excl ? #@end - 1 : #@end`
+      `#{@excl} ? #{@end} - 1 : #{@end}`
     end
   end
 

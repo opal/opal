@@ -1047,8 +1047,8 @@ module Kernel
 
   def raise(exception = undefined, string = nil, _backtrace = nil)
     %x{
-      if (exception == null && #$! !== nil) {
-        throw #$!;
+      if (exception == null && #{$!} !== nil) {
+        throw #{$!};
       }
       if (exception == null) {
         exception = #{RuntimeError.new};
@@ -1067,11 +1067,11 @@ module Kernel
         exception = #{TypeError.new 'exception class/object expected'};
       }
 
-      if (#$! !== nil) {
-        Opal.exceptions.push(#$!);
+      if (#{$!} !== nil) {
+        Opal.exceptions.push(#{$!});
       }
 
-      #$! = exception;
+      #{$!} = exception;
 
       throw exception;
     }

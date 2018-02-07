@@ -41,20 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 41
-# Cop supports --auto-correct.
-Style/VariableInterpolation:
-  Exclude:
-    - 'lib/opal/compiler.rb'
-    - 'opal/corelib/complex.rb'
-    - 'opal/corelib/enumerator.rb'
-    - 'opal/corelib/kernel.rb'
-    - 'opal/corelib/method.rb'
-    - 'opal/corelib/range.rb'
-    - 'opal/corelib/rational.rb'
-    - 'opal/corelib/regexp.rb'
-    - 'opal/corelib/string/inheritance.rb'
-
 # Offense count: 12
 # Cop supports --auto-correct.
 Style/ZeroLengthPredicate:

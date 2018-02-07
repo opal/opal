@@ -242,7 +242,7 @@ class Rational < Numeric
   end
 
   def hash
-    "Rational:#@num:#@den"
+    "Rational:#{@num}:#{@den}"
   end
 
   def inspect
@@ -327,7 +327,7 @@ class Rational < Numeric
   end
 
   def to_s
-    "#@num/#@den"
+    "#{@num}/#{@den}"
   end
 
   def truncate(precision = 0)
