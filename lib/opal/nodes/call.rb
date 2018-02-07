@@ -119,7 +119,7 @@ module Opal
       end
 
       def compile_arguments
-        push ", "
+        push ', '
 
         if splat?
           push expr(arglist)
@@ -132,7 +132,7 @@ module Opal
 
       def compile_block_pass
         if iter
-          push ", ", expr(iter)
+          push ', ', expr(iter)
         end
       end
 
@@ -145,7 +145,7 @@ module Opal
       end
 
       def compile_simple_call_chain
-        push recv(receiver_sexp), method_jsid, "(", expr(arglist), ")"
+        push recv(receiver_sexp), method_jsid, '(', expr(arglist), ')'
       end
 
       def splat?
@@ -206,9 +206,9 @@ module Opal
 
             push fragment("$rb_#{name}(")
             push lhs
-            push fragment(", ")
+            push fragment(', ')
             push rhs
-            push fragment(")")
+            push fragment(')')
           else
             compile_default.call
           end
@@ -340,7 +340,7 @@ module Opal
             end
           end
 
-          msg = "Cannot handle dynamic require"
+          msg = 'Cannot handle dynamic require'
           case @compiler.dynamic_require_severity
           when :error
             @compiler.error msg, @sexp.line
@@ -350,7 +350,7 @@ module Opal
         end
 
         def expand_path(path, base = '')
-          "#{base}/#{path}".split("/").each_with_object([]) do |part, p|
+          "#{base}/#{path}".split('/').each_with_object([]) do |part, p|
             if part == ''
               # we had '//', so ignore
             elsif part == '..'
@@ -358,7 +358,7 @@ module Opal
             else
               p << part
             end
-          end.join "/"
+          end.join '/'
         end
       end
     end

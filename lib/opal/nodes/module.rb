@@ -13,7 +13,7 @@ module Opal
         name, base = name_and_base
         helper :module
 
-        push "(function($base, $parent_nesting) {"
+        push '(function($base, $parent_nesting) {'
         line "  var $#{name}, self = $#{name} = $module($base, '#{name}');"
 
         in_scope do
@@ -28,7 +28,7 @@ module Opal
           line body_code
         end
 
-        line "})(", base, ", $nesting)"
+        line '})(', base, ', $nesting)'
       end
 
       # cid is always s(:const, scope_sexp_or_nil, :ConstName)

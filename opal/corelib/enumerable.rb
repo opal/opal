@@ -101,7 +101,7 @@ module Enumerable
   end
 
   def chunk_while(&block)
-    raise ArgumentError, "no block given" unless block_given?
+    raise ArgumentError, 'no block given' unless block_given?
 
     slice_when { |before, after| !(yield before, after) }
   end
@@ -238,7 +238,7 @@ module Enumerable
     number = Opal.coerce_to number, Integer, :to_int
 
     if `number < 0`
-      raise ArgumentError, "attempt to drop negative size"
+      raise ArgumentError, 'attempt to drop negative size'
     end
 
     %x{
@@ -689,7 +689,7 @@ module Enumerable
           }
 
           if (value === nil) {
-            #{raise ArgumentError, "comparison failed"};
+            #{raise ArgumentError, 'comparison failed'};
           }
 
           if (value > 0) {
@@ -759,7 +759,7 @@ module Enumerable
           var value = block(param, result);
 
           if (value === nil) {
-            #{raise ArgumentError, "comparison failed"};
+            #{raise ArgumentError, 'comparison failed'};
           }
 
           if (value < 0) {
@@ -983,7 +983,7 @@ module Enumerable
 
   def slice_before(pattern = undefined, &block)
     if `pattern === undefined && block === nil`
-      raise ArgumentError, "both pattern and block are given"
+      raise ArgumentError, 'both pattern and block are given'
     end
 
     if `pattern !== undefined && block !== nil || arguments.length > 1`
@@ -1047,7 +1047,7 @@ module Enumerable
 
   def slice_after(pattern = undefined, &block)
     if `pattern === undefined && block === nil`
-      raise ArgumentError, "both pattern and block are given"
+      raise ArgumentError, 'both pattern and block are given'
     end
 
     if `pattern !== undefined && block !== nil || arguments.length > 1`
@@ -1089,7 +1089,7 @@ module Enumerable
   end
 
   def slice_when(&block)
-    raise ArgumentError, "wrong number of arguments (0 for 1)" unless block_given?
+    raise ArgumentError, 'wrong number of arguments (0 for 1)' unless block_given?
 
     Enumerator.new do |yielder|
       %x{

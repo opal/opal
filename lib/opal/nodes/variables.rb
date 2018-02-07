@@ -206,7 +206,7 @@ module Opal
       children :name, :value
 
       def compile
-        push "(Opal.class_variable_set(#{class_variable_owner}, '#{name}', ", expr(value), "))"
+        push "(Opal.class_variable_set(#{class_variable_owner}, '#{name}', ", expr(value), '))'
       end
     end
   end

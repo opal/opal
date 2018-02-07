@@ -87,7 +87,7 @@ module Opal
       end
 
       def compile_method
-        push ", "
+        push ', '
         if scope.def?
           push super_method_invocation
         elsif scope.iter?
@@ -166,7 +166,7 @@ module Opal
       end
 
       def compile_arguments
-        push ", "
+        push ', '
 
         if arglist.children.empty?
           push '[]'

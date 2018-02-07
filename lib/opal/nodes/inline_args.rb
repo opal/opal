@@ -37,7 +37,7 @@ module Opal
           when :restarg
             # To make function.length working
             # in cases like def m(*rest)
-            tmp_arg_name = scope.next_temp + "_rest"
+            tmp_arg_name = scope.next_temp + '_rest'
             result << tmp_arg_name
             add_arg(arg)
           else

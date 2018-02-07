@@ -339,7 +339,7 @@ class String < `String`
   def count(*sets)
     %x{
       if (sets.length === 0) {
-        #{raise ArgumentError, "ArgumentError: wrong number of arguments (0 for 1+)"}
+        #{raise ArgumentError, 'ArgumentError: wrong number of arguments (0 for 1+)'}
       }
       var char_class = char_class_from_char_sets(sets);
       if (char_class === null) {
@@ -352,7 +352,7 @@ class String < `String`
   def delete(*sets)
     %x{
       if (sets.length === 0) {
-        #{raise ArgumentError, "ArgumentError: wrong number of arguments (0 for 1+)"}
+        #{raise ArgumentError, 'ArgumentError: wrong number of arguments (0 for 1+)'}
       }
       var char_class = char_class_from_char_sets(sets);
       if (char_class === null) {
@@ -1266,7 +1266,7 @@ class String < `String`
     proc do |*args, &block|
       %x{
         if (args.length === 0) {
-          #{raise ArgumentError, "no receiver given"}
+          #{raise ArgumentError, 'no receiver given'}
         }
         var obj = args.shift();
         if (obj == null) obj = nil;

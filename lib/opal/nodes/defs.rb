@@ -22,8 +22,8 @@ module Opal
       end
 
       def wrap_with_definition
-        unshift "Opal.defs(", expr(recvr), ", '$#{mid}', "
-        push ")"
+        unshift 'Opal.defs(', expr(recvr), ", '$#{mid}', "
+        push ')'
 
         if expr?
           wrap '(', ", nil) && '#{mid}'"

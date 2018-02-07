@@ -9,7 +9,7 @@ class Range
 
   def initialize(first, last, exclude = false)
     raise NameError, "'initialize' called twice" if @begin
-    raise ArgumentError, "bad value for range" unless first <=> last
+    raise ArgumentError, 'bad value for range' unless first <=> last
 
     @begin = first
     @end   = last
@@ -225,7 +225,7 @@ class Range
     else
       %x{
         if (#{@begin}.$$is_string && #{@end}.$$is_string && n % 1 !== 0) {
-          #{raise TypeError, "no implicit conversion to float from string"}
+          #{raise TypeError, 'no implicit conversion to float from string'}
         }
       }
       each_with_index do |value, idx|

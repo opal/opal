@@ -32,7 +32,7 @@ module Opal
         exit
       end
 
-      on("-h", "--help", "Show this message") do
+      on('-h', '--help', 'Show this message') do
         puts self
         exit
       end
@@ -86,7 +86,7 @@ module Opal
         options[:runner] = runner.to_sym
       end
 
-      on('--runner-options JSON', "Set options specific to the selected runner as a JSON string (e.g. port for server)") do |json_options|
+      on('--runner-options JSON', 'Set options specific to the selected runner as a JSON string (e.g. port for server)') do |json_options|
         require 'json'
         runner_options = JSON.parse(json_options, symbolize_names: true)
         options[:runner_options] ||= {}
@@ -142,7 +142,7 @@ module Opal
         options[:skip_opal_require] = true
       end
 
-      on("--irb", "Enable IRB var mode") do
+      on('--irb', 'Enable IRB var mode') do
         options[:irb] = true
       end
 

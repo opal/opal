@@ -115,8 +115,8 @@ module Opal
           js_source = @sexp.meta[:js_source]
           scope.working_arguments = "#{js_source}_args"
         else
-          js_source = "arguments"
-          scope.working_arguments = "$post_args"
+          js_source = 'arguments'
+          scope.working_arguments = '$post_args'
         end
 
         add_temp "#{scope.working_arguments}"
@@ -151,7 +151,7 @@ module Opal
         indent do
           line "#{var_name} = #{scope.working_arguments}.splice(0,1)[0];"
         end
-        line "}"
+        line '}'
         push process(optarg)
       end
 
@@ -167,12 +167,12 @@ module Opal
           # there are some items coming to the splat, extracting them
           extract_restarg
         end
-        line "} else {"
+        line '} else {'
         indent do
           # splat is empty
           extract_blank_restarg
         end
-        line "}"
+        line '}'
       end
 
       def extract_restarg

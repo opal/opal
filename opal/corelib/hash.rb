@@ -1069,7 +1069,7 @@ class Hash
     proc do |key = undefined|
       %x{
         if (key == null) {
-          #{raise ArgumentError, "no key given"}
+          #{raise ArgumentError, 'no key given'}
         }
       }
 

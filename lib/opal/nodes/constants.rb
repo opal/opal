@@ -11,9 +11,9 @@ module Opal
 
       def compile
         if magical_data_const?
-          push("$__END__")
+          push('$__END__')
         elsif const_scope
-          push "Opal.const_get_qualified(", recv(const_scope), ", '#{name}')"
+          push 'Opal.const_get_qualified(', recv(const_scope), ", '#{name}')"
         elsif compiler.eval?
           push "Opal.const_get_relative($nesting, '#{name}')"
         else
@@ -49,9 +49,9 @@ module Opal
 
       def compile
         if base
-          push "Opal.const_set(", expr(base), ", '#{name}', ", expr(value), ")"
+          push 'Opal.const_set(', expr(base), ", '#{name}', ", expr(value), ')'
         else
-          push "Opal.const_set($nesting[0], '#{name}', ", expr(value), ")"
+          push "Opal.const_set($nesting[0], '#{name}', ", expr(value), ')'
         end
       end
     end

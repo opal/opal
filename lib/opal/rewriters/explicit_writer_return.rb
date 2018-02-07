@@ -20,7 +20,7 @@ module Opal
 
         recv, method_name, *args = *node
 
-        if method_name.to_s =~ /#{REGEXP_START}\w+=#{REGEXP_END}/ || method_name.to_s == "[]="
+        if method_name.to_s =~ /#{REGEXP_START}\w+=#{REGEXP_END}/ || method_name.to_s == '[]='
           set_args_node = s(:lvasgn, TMP_NAME, s(:array, *process_all(args)))
 
           s(:begin,

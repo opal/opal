@@ -6,7 +6,7 @@ class Rational < Numeric
     den = den.to_i
 
     if den == 0
-      raise ZeroDivisionError, "divided by 0"
+      raise ZeroDivisionError, 'divided by 0'
     elsif den < 0
       num = -num
       den = -den
@@ -21,7 +21,7 @@ class Rational < Numeric
 
   def self.convert(num, den)
     if num.nil? || den.nil?
-      raise TypeError, "cannot convert nil into Rational"
+      raise TypeError, 'cannot convert nil into Rational'
     end
 
     if Integer === num && Integer === den
@@ -209,7 +209,7 @@ class Rational < Numeric
           Rational(@num**other.numerator, @den**other.numerator)
         end
       elsif self == 0 && other < 0
-        raise ZeroDivisionError, "divided by 0"
+        raise ZeroDivisionError, 'divided by 0'
       else
         to_f**other
       end
@@ -339,7 +339,7 @@ class Rational < Numeric
   end
 
   def with_precision(method, precision)
-    raise TypeError, "not an Integer" unless Integer === precision
+    raise TypeError, 'not an Integer' unless Integer === precision
 
     p = 10**precision
     s = self * p

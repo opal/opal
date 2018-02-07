@@ -51,7 +51,7 @@ module Opal
       end
 
       def compile
-        raise "Not Implemented"
+        raise 'Not Implemented'
       end
 
       def push(*strs)
@@ -118,7 +118,7 @@ module Opal
       end
 
       def expr_or_nil(sexp)
-        sexp ? expr(sexp) : "nil"
+        sexp ? expr(sexp) : 'nil'
       end
 
       def add_local(name)
@@ -177,7 +177,7 @@ module Opal
         if closest_module_node
           "$#{closest_module_node.name}"
         else
-          "Opal.Object"
+          'Opal.Object'
         end
       end
 

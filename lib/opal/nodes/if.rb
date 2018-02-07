@@ -13,27 +13,27 @@ module Opal
         truthy = self.truthy
         falsy = self.falsy
 
-        push "if (", js_truthy(test), ") {"
+        push 'if (', js_truthy(test), ') {'
 
         # skip if-body if no truthy sexp
         indent { line stmt(truthy) } if truthy
 
         if falsy
           if falsy.type == :if
-            line "} else ", stmt(falsy)
+            line '} else ', stmt(falsy)
           else
             indent do
-              line "} else {"
+              line '} else {'
               line stmt(falsy)
             end
 
-            line "}"
+            line '}'
           end
         else
-          push "}"
+          push '}'
         end
 
-        wrap "(function() {", "; return nil; })()" if needs_wrapper?
+        wrap '(function() {', '; return nil; })()' if needs_wrapper?
       end
 
       def truthy

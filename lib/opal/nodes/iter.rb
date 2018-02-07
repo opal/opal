@@ -45,7 +45,7 @@ module Opal
 
         unshift to_vars
 
-        unshift "(#{identity} = function(", inline_params, "){"
+        unshift "(#{identity} = function(", inline_params, '){'
         push "}, #{identity}.$$s = self,"
         push " #{identity}.$$brk = $brk," if contains_break?
         push " #{identity}.$$arity = #{arity},"
@@ -195,9 +195,9 @@ module Opal
           identity = scope.identity
 
           line "if (#{identity}.$$is_lambda || #{identity}.$$define_meth) {"
-          line "  var $arity = arguments.length;"
+          line '  var $arity = arguments.length;'
           line "  if (#{arity_checks.join(' || ')}) { Opal.block_ac($arity, #{arity}, #{context}); }"
-          line "}"
+          line '}'
         end
       end
 

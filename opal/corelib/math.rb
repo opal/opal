@@ -270,7 +270,7 @@ module Math
       }
 
       if (n === -1 || n === -Infinity) {
-        #{raise DomainError, "Numerical argument is out of domain - \"gamma\""};
+        #{raise DomainError, 'Numerical argument is out of domain - "gamma"'};
       }
 
       if (#{Integer === n}) {
@@ -348,7 +348,7 @@ module Math
 
     %x{
       if (isNaN(exponent)) {
-        #{raise RangeError, "float NaN out of range of integer"};
+        #{raise RangeError, 'float NaN out of range of integer'};
       }
 
       return mantissa * Math.pow(2, exponent);

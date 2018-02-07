@@ -22,7 +22,7 @@ module Opal
 
         line "if (!Opal.hasOwnProperty.call($kwargs.$$smap, '#{key_name}')) {"
         line "  throw Opal.ArgumentError.$new('missing keyword: #{key_name}');"
-        line "}"
+        line '}'
         line "#{lvar_name} = $kwargs.$$smap[#{key_name.to_s.inspect}];"
 
         scope.used_kwargs << key_name

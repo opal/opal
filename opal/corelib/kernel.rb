@@ -846,7 +846,7 @@ module Kernel
 
       if (!value.$$is_string) {
         if (base !== undefined) {
-          #{raise ArgumentError, "base specified for non string value"}
+          #{raise ArgumentError, 'base specified for non string value'}
         }
         if (value === nil) {
           #{raise TypeError, "can't convert nil into Integer"}
@@ -1020,7 +1020,7 @@ module Kernel
 
   def proc(&block)
     unless block
-      raise ArgumentError, "tried to create Proc object without a block"
+      raise ArgumentError, 'tried to create Proc object without a block'
     end
 
     `block.$$is_lambda = false`
@@ -1166,7 +1166,7 @@ module Kernel
         #{raise TypeError, "can't convert #{seconds.class} into time interval"}
       }
       if (seconds < 0) {
-        #{raise ArgumentError, "time interval must be positive"}
+        #{raise ArgumentError, 'time interval must be positive'}
       }
       var get_time = Opal.global.performance ?
         function() {return performance.now()} :

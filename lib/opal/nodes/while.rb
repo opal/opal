@@ -30,18 +30,18 @@ module Opal
             push "#{redo_var} = false;" if uses_redo?
             line body_code
           end
-          line "}"
+          line '}'
         end
 
         wrap '(function() {', '; return nil; })()' if wrap_in_closure?
       end
 
       def while_open
-        "while ("
+        'while ('
       end
 
       def while_close
-        ") {"
+        ') {'
       end
 
       def uses_redo?
@@ -61,11 +61,11 @@ module Opal
       handle :until
 
       def while_open
-        "while (!("
+        'while (!('
       end
 
       def while_close
-        ")) {"
+        ')) {'
       end
     end
 

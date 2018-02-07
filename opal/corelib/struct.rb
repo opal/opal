@@ -92,7 +92,7 @@ class Struct
       end
     else
       if args.length > self.class.members.length
-        raise ArgumentError, "struct size differs"
+        raise ArgumentError, 'struct size differs'
       end
 
       self.class.members.each_with_index do |name, index|
@@ -244,7 +244,7 @@ class Struct
   alias values to_a
 
   def inspect
-    result = "#<struct "
+    result = '#<struct '
 
     if Struct === self && self.class.name
       result += "#{self.class} "
@@ -252,9 +252,9 @@ class Struct
 
     result += each_pair.map do |name, value|
       "#{name}=#{value.inspect}"
-    end.join ", "
+    end.join ', '
 
-    result += ">"
+    result += '>'
 
     result
   end

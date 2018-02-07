@@ -92,7 +92,7 @@ class Number < Numeric
           return other;
         }
         else if (other == 0) {
-          #{raise ZeroDivisionError, "divided by 0"};
+          #{raise ZeroDivisionError, 'divided by 0'};
         }
         else if (other < 0 || self < 0) {
           return (self % other + other) % other;
@@ -587,9 +587,9 @@ class Number < Numeric
     if Integer === self
       Rational.new(self, 1)
     elsif infinite?
-      raise FloatDomainError, "Infinity"
+      raise FloatDomainError, 'Infinity'
     elsif nan?
-      raise FloatDomainError, "NaN"
+      raise FloatDomainError, 'NaN'
     elsif `eps == null`
       f, n  = Math.frexp self
       f     = Math.ldexp(f, Float::MANT_DIG).to_i
@@ -612,13 +612,13 @@ class Number < Numeric
       end
 
       if Float === ndigits && ndigits.infinite?
-        raise RangeError, "Infinity"
+        raise RangeError, 'Infinity'
       end
 
       ndigits = Opal.coerce_to!(ndigits, Integer, :to_int)
 
       if ndigits < Integer::MIN
-        raise RangeError, "out of bounds"
+        raise RangeError, 'out of bounds'
       end
 
       if `ndigits >= 0`
@@ -639,16 +639,16 @@ class Number < Numeric
       }
     else
       if nan? && `ndigits == null`
-        raise FloatDomainError, "NaN"
+        raise FloatDomainError, 'NaN'
       end
 
       ndigits = Opal.coerce_to!(`ndigits || 0`, Integer, :to_int)
 
       if ndigits <= 0
         if nan?
-          raise RangeError, "NaN"
+          raise RangeError, 'NaN'
         elsif infinite?
-          raise FloatDomainError, "Infinity"
+          raise FloatDomainError, 'Infinity'
         end
       elsif ndigits == 0
         return `Math.round(self)`
@@ -673,11 +673,11 @@ class Number < Numeric
   def step(limit = undefined, step = undefined, to: undefined, by: undefined, &block)
     %x{
       if (limit !== undefined && to !== undefined) {
-        #{raise ArgumentError, "to is given twice"}
+        #{raise ArgumentError, 'to is given twice'}
       }
 
       if (step !== undefined && by !== undefined) {
-        #{raise ArgumentError, "step is given twice"}
+        #{raise ArgumentError, 'step is given twice'}
       }
 
       function validateParameters() {
@@ -690,7 +690,7 @@ class Number < Numeric
         }
 
         if (step === nil) {
-          #{raise TypeError, "step must be numeric"}
+          #{raise TypeError, 'step must be numeric'}
         }
 
         if (step === 0) {
@@ -940,9 +940,9 @@ class Number < Numeric
 
   def divmod(other)
     if nan? || other.nan?
-      raise FloatDomainError, "NaN"
+      raise FloatDomainError, 'NaN'
     elsif infinite?
-      raise FloatDomainError, "Infinity"
+      raise FloatDomainError, 'Infinity'
     else
       super
     end

@@ -114,7 +114,7 @@ class Array
             return String.fromCodePoint(item);
           } catch (error) {
             if (error instanceof RangeError) {
-              #{raise RangeError, "value out of range"};
+              #{raise RangeError, 'value out of range'};
             }
             throw error;
           }

@@ -11,7 +11,7 @@ module Opal
 
       def compile
         children.each do |child|
-          line "Opal.udef(self, '$' + ", expr(child), ");"
+          line "Opal.udef(self, '$' + ", expr(child), ');'
         end
       end
     end
@@ -22,7 +22,7 @@ module Opal
       children :new_name, :old_name
 
       def compile
-        push "Opal.alias(self, ", expr(new_name), ", ", expr(old_name), ")"
+        push 'Opal.alias(self, ', expr(new_name), ', ', expr(old_name), ')'
       end
     end
 
@@ -30,7 +30,7 @@ module Opal
       handle :begin
 
       def compile
-        return push "nil" if children.empty?
+        return push 'nil' if children.empty?
 
         if stmt?
           compile_children(children, @level)
@@ -58,7 +58,7 @@ module Opal
 
       def compile_children(children, level)
         children.each do |child|
-          line process(child, level), ";"
+          line process(child, level), ';'
         end
       end
 

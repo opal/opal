@@ -12,7 +12,7 @@ module Opal
         helper :send
 
         conditional_send(recv(receiver_sexp)) do |receiver_temp|
-          push "$send(", receiver_temp
+          push '$send(', receiver_temp
           compile_method_name
           compile_arguments
           compile_block_pass

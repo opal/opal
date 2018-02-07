@@ -51,12 +51,12 @@ module Opal
       end
 
       def compile_using_send
-        push recv(receiver_sexp), method_jsid, ".apply(null"
+        push recv(receiver_sexp), method_jsid, '.apply(null'
         compile_arguments
         if iter
-          push ".concat(", expr(iter), ")"
+          push '.concat(', expr(iter), ')'
         end
-        push ")"
+        push ')'
       end
     end
 

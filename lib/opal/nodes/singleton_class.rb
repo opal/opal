@@ -10,7 +10,7 @@ module Opal
       children :object, :body
 
       def compile
-        push "(function(self, $parent_nesting) {"
+        push '(function(self, $parent_nesting) {'
 
         in_scope do
           add_temp 'def = self.$$proto'
@@ -21,7 +21,7 @@ module Opal
           line body_stmt
         end
 
-        line "})(Opal.get_singleton_class(", recv(object), "), $nesting)"
+        line '})(Opal.get_singleton_class(', recv(object), '), $nesting)'
       end
     end
   end

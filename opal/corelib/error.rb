@@ -108,7 +108,7 @@ class SystemCallError     < StandardError; end
 module Errno
   class EINVAL              < SystemCallError
     def self.new(name = nil)
-      message = "Invalid argument"
+      message = 'Invalid argument'
       message += " - #{name}" if name
       super(message)
     end

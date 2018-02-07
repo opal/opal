@@ -20,7 +20,7 @@ class Module
 
   def <(other)
     unless Module === other
-      raise TypeError, "compared with non class/module"
+      raise TypeError, 'compared with non class/module'
     end
 
     # class cannot be a descendant of itself
@@ -55,7 +55,7 @@ class Module
 
   def >(other)
     unless Module === other
-      raise TypeError, "compared with non class/module"
+      raise TypeError, 'compared with non class/module'
     end
 
     other < self
@@ -351,7 +351,7 @@ class Module
 
   def define_method(name, method = undefined, &block)
     if `method === undefined && block === nil`
-      raise ArgumentError, "tried to create a Proc object without a block"
+      raise ArgumentError, 'tried to create a Proc object without a block'
     end
 
     block ||= case method
@@ -535,7 +535,7 @@ class Module
 
   def module_eval(*args, &block)
     if block.nil? && `!!Opal.compile`
-      Kernel.raise ArgumentError, "wrong number of arguments (0 for 1..3)" unless (1..3).cover? args.size
+      Kernel.raise ArgumentError, 'wrong number of arguments (0 for 1..3)' unless (1..3).cover? args.size
 
       string, file, _lineno = *args
       default_eval_options = { file: (file || '(eval)'), eval: true }

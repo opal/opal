@@ -233,7 +233,7 @@ class Time < `Date`
 
   def +(other)
     if Time === other
-      raise TypeError, "time + time?"
+      raise TypeError, 'time + time?'
     end
 
     %x{
@@ -589,7 +589,7 @@ class Time < `Date`
             break;
 
           case 'V':
-            result += #{cweek_cyear[0].to_s.rjust(2, "0")};
+            result += #{cweek_cyear[0].to_s.rjust(2, '0')};
             break;
 
           case 'G':

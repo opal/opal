@@ -13,7 +13,7 @@ module Opal
         name, base = name_and_base
         helper :klass
 
-        push "(function($base, $super, $parent_nesting) {"
+        push '(function($base, $super, $parent_nesting) {'
         line "  function $#{name}(){};"
         line "  var self = $#{name} = $klass($base, $super, '#{name}', $#{name});"
 
@@ -29,7 +29,7 @@ module Opal
           line body_code
         end
 
-        line "})(", base, ", ", super_code, ", $nesting)"
+        line '})(', base, ', ', super_code, ', $nesting)'
       end
 
       def super_code

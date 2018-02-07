@@ -93,13 +93,13 @@ module Marshal
       when 'd'
         raise NotImplementedError, 'Data type cannot be demarshaled'
       else
-        raise ArgumentError, "dump format error"
+        raise ArgumentError, 'dump format error'
       end
     end
 
     def read_byte
       if @index >= length
-        raise ArgumentError, "marshal data too short"
+        raise ArgumentError, 'marshal data too short'
       end
       result = @buffer[@index]
       @index += 1
@@ -154,11 +154,11 @@ module Marshal
     #
     def read_float
       s = read_string(cache: false)
-      result = if s == "nan"
+      result = if s == 'nan'
                  0.0 / 0
-               elsif s == "inf"
+               elsif s == 'inf'
                  1.0 / 0
-               elsif s == "-inf"
+               elsif s == '-inf'
                  -1.0 / 0
                else
                  s.to_f

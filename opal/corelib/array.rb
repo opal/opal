@@ -28,7 +28,7 @@ class Array < `Array`
       }
 
       if (size > #{Integer::MAX}) {
-        #{raise ArgumentError, "array size too big"}
+        #{raise ArgumentError, 'array size too big'}
       }
 
       if (arguments.length > 2) {
@@ -53,7 +53,7 @@ class Array < `Array`
       size = #{Opal.coerce_to size, Integer, :to_int}
 
       if (size < 0) {
-        #{raise ArgumentError, "negative array size"}
+        #{raise ArgumentError, 'negative array size'}
       }
 
       self.splice(0, self.length);
@@ -132,7 +132,7 @@ class Array < `Array`
     other = Opal.coerce_to other, Integer, :to_int
 
     if `other < 0`
-      raise ArgumentError, "negative argument"
+      raise ArgumentError, 'negative argument'
     end
 
     %x{
@@ -1003,7 +1003,7 @@ class Array < `Array`
       one, two = args
     else
       if `args.length == 0`
-        raise ArgumentError, "wrong number of arguments (0 for 1..3)"
+        raise ArgumentError, 'wrong number of arguments (0 for 1..3)'
       elsif `args.length > 3`
         raise ArgumentError, "wrong number of arguments (#{args.length} for 1..3)"
       end
@@ -1012,7 +1012,7 @@ class Array < `Array`
     end
 
     if Range === one
-      raise TypeError, "length invalid with range" if two
+      raise TypeError, 'length invalid with range' if two
 
       left   = Opal.coerce_to one.begin, Integer, :to_int
       `left += this.length` if `left < 0`
@@ -1294,7 +1294,7 @@ class Array < `Array`
   end
 
   def join(sep = nil)
-    return "" if `self.length === 0`
+    return '' if `self.length === 0`
 
     if `sep === nil`
       sep = $,
@@ -1557,7 +1557,7 @@ class Array < `Array`
         }
         resultlen *= len;
         if (resultlen > 2147483647) {
-          #{raise RangeError, "too big to product"}
+          #{raise RangeError, 'too big to product'}
         }
         lengths[i] = len;
         counters[i] = 0;
@@ -1750,8 +1750,8 @@ class Array < `Array`
 
     def rand(size)
       random = Opal.coerce_to @rng.rand(size), Integer, :to_int
-      raise RangeError, "random value must be >= 0" if `random < 0`
-      raise RangeError, "random value must be less than Array size" unless `random < size`
+      raise RangeError, 'random value must be >= 0' if `random < 0`
+      raise RangeError, 'random value must be less than Array size' unless `random < size`
 
       random
     end
@@ -1774,7 +1774,7 @@ class Array < `Array`
     end
 
     if count && `count < 0`
-      raise ArgumentError, "count must be greater than 0"
+      raise ArgumentError, 'count must be greater than 0'
     end
 
     rng = options[:random] if options

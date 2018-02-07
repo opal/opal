@@ -70,7 +70,7 @@ module Opal
           if idx == 0
             push fragment
           else
-            push ".$merge(", fragment, ")"
+            push '.$merge(', fragment, ')'
           end
         end
       end
@@ -107,7 +107,7 @@ module Opal
           push hash_obj[key]
         end
 
-        wrap "$hash2([#{hash_keys.join ', '}], {", "})"
+        wrap "$hash2([#{hash_keys.join ', '}], {", '})'
       end
     end
 
@@ -116,7 +116,7 @@ module Opal
       children :value
 
       def compile
-        push "Opal.to_hash(", expr(value), ")"
+        push 'Opal.to_hash(', expr(value), ')'
       end
     end
   end

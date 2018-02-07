@@ -462,7 +462,7 @@ module Opal
       elsif (scope = @scope.find_parent_def) && scope.block_name
         fragment("(#{scope.block_name} !== nil)", scope, sexp)
       else
-        fragment("false", scope, sexp)
+        fragment('false', scope, sexp)
       end
     end
   end

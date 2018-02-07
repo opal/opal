@@ -54,7 +54,7 @@ module Opal
       end
 
       def run_chrome_server
-        raise "Chrome server can be started only on localhost" if chrome_host != DEFAULT_CHROME_HOST
+        raise 'Chrome server can be started only on localhost' if chrome_host != DEFAULT_CHROME_HOST
 
         # Disable web security with "--disable-web-security" flag to be able to do XMLHttpRequest (see test_openuri.rb)
         chrome_server_cmd = "#{chrome_executable} --headless --disable-web-security --disable-gpu --remote-debugging-port=#{chrome_port} #{ENV['CHROME_OPTS']}"
@@ -90,13 +90,13 @@ module Opal
 
         case RbConfig::CONFIG['host_os']
         when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-          raise "Headless chrome is supported only by Mac OS and Linux"
+          raise 'Headless chrome is supported only by Mac OS and Linux'
         when /darwin|mac os/
-          "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome"
+          '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
         when /linux/
           'google-chrome-stable'
         when /solaris|bsd/
-          raise "Headless chrome is supported only by Mac OS and Linux"
+          raise 'Headless chrome is supported only by Mac OS and Linux'
         end
       end
     end

@@ -19,7 +19,7 @@ end
 class String::Wrapper
   `def.$$is_string = true`
 
-  def self.allocate(string = "")
+  def self.allocate(string = '')
     obj = super()
     `obj.literal = string`
     obj

@@ -33,7 +33,7 @@ module Opal
 
       helper :truthy? do
         unless sexp = arglist.children[0]
-          raise "truthy? requires an object"
+          raise 'truthy? requires an object'
         end
 
         js_truthy(sexp)
@@ -41,7 +41,7 @@ module Opal
 
       helper :falsy? do
         unless sexp = arglist.children[0]
-          raise "falsy? requires an object"
+          raise 'falsy? requires an object'
         end
 
         js_falsy(sexp)

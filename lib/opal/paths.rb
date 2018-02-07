@@ -2,15 +2,15 @@
 
 module Opal
   def self.gem_dir
-    File.expand_path("../..", __FILE__.dup.untaint)
+    File.expand_path('../..', __FILE__.dup.untaint)
   end
 
   def self.core_dir
-    File.expand_path("../../../opal", __FILE__.dup.untaint)
+    File.expand_path('../../../opal', __FILE__.dup.untaint)
   end
 
   def self.std_dir
-    File.expand_path("../../../stdlib", __FILE__.dup.untaint)
+    File.expand_path('../../../stdlib', __FILE__.dup.untaint)
   end
 
   # Add a file path to opals load path. Any gem containing ruby code that Opal

@@ -74,7 +74,7 @@ class Numeric
   end
 
   def div(other)
-    raise ZeroDivisionError, "divided by o" if other == 0
+    raise ZeroDivisionError, 'divided by o' if other == 0
 
     (self / other).floor
   end

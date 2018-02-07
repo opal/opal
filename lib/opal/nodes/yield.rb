@@ -62,7 +62,7 @@ module Opal
       def compile
         compile_call
 
-        wrap "return ", ";"
+        wrap 'return ', ';'
       end
     end
   end

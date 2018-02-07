@@ -70,10 +70,10 @@ module Opal
             add_local '$zuper_i'
             add_local '$zuper_ii'
 
-            line "// Prepare super implicit arguments"
-            line "for($zuper_i = 0, $zuper_ii = arguments.length, $zuper = new Array($zuper_ii); $zuper_i < $zuper_ii; $zuper_i++) {"
-            line "  $zuper[$zuper_i] = arguments[$zuper_i];"
-            line "}"
+            line '// Prepare super implicit arguments'
+            line 'for($zuper_i = 0, $zuper_ii = arguments.length, $zuper = new Array($zuper_ii); $zuper_i < $zuper_ii; $zuper_i++) {'
+            line '  $zuper[$zuper_i] = arguments[$zuper_i];'
+            line '}'
           end
 
           unshift "\n#{current_indent}", scope.to_vars
@@ -82,8 +82,8 @@ module Opal
 
           if scope.catch_return
             unshift "try {\n"
-            line "} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }"
-            push " throw $returner; }"
+            line '} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }'
+            push ' throw $returner; }'
           end
         end
 
@@ -97,11 +97,11 @@ module Opal
         # For now we're just using $$, to maintain compatibility with older IEs.
         function_name = valid_name?(mid) ? " $$#{mid}" : ''
 
-        unshift ") {"
+        unshift ') {'
         unshift(inline_params)
         unshift "function#{function_name}("
         unshift "#{scope_name} = " if scope_name
-        line "}"
+        line '}'
 
         push ", #{scope_name}.$$arity = #{arity}"
 
@@ -127,7 +127,7 @@ module Opal
         elsif compiler.eval?                then unshift "Opal.def(self, '$#{mid}', "
         elsif scope.top?                    then unshift "Opal.def(self, '$#{mid}', "
         elsif scope.def?                    then unshift "Opal.def(self, '$#{mid}', "
-        else raise "Unsupported use of `def`; please file a bug at https://github.com/opal/opal/issues/new reporting this message."
+        else raise 'Unsupported use of `def`; please file a bug at https://github.com/opal/opal/issues/new reporting this message.'
         end
 
         push ')'
@@ -143,7 +143,7 @@ module Opal
       def compile_arity_check
         if arity_checks.size > 0
           meth = scope.mid.to_s.inspect
-          line "var $arity = arguments.length;"
+          line 'var $arity = arguments.length;'
           push " if (#{arity_checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
         end
       end

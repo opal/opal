@@ -84,7 +84,7 @@ class Enumerator
       result += "(#{@args.inspect[Range.new(1, -2)]})"
     end
 
-    result + ">"
+    result + '>'
   end
 
   class Generator
@@ -216,7 +216,7 @@ class Enumerator
       n = Opal.coerce_to n, Integer, :to_int
 
       if n < 0
-        raise ArgumentError, "attempt to drop negative size"
+        raise ArgumentError, 'attempt to drop negative size'
       end
 
       current_size = enumerator_size
@@ -333,7 +333,7 @@ class Enumerator
       n = Opal.coerce_to n, Integer, :to_int
 
       if n < 0
-        raise ArgumentError, "attempt to take negative size"
+        raise ArgumentError, 'attempt to take negative size'
       end
 
       current_size = enumerator_size

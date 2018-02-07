@@ -131,9 +131,9 @@ module Opal
 
       def compile_dynamic_regexp
         if flags.any?
-          push "new RegExp(", expr(value), ", '#{flags.join}')"
+          push 'new RegExp(', expr(value), ", '#{flags.join}')"
         else
-          push "new RegExp(", expr(value), ')'
+          push 'new RegExp(', expr(value), ')'
         end
       end
 
@@ -183,7 +183,7 @@ module Opal
 
         if value.type == :str
           # Replacing \A -> ^, \z -> $, required for the parser gem
-          self.value = s(:str, value.children[0].gsub("\\A", "^").gsub("\\z", "$"))
+          self.value = s(:str, value.children[0].gsub('\A', '^').gsub('\z', '$'))
         end
       end
 
@@ -230,7 +230,7 @@ module Opal
             # Since we need to take original source of :str
             # we have to use raw source
             # so we need to combine "return" with "raw_source"
-            push "return "
+            push 'return '
             str = child.children.first
             value = str.loc.expression.source
             push Fragment.new(value, nil)
@@ -259,12 +259,12 @@ module Opal
         push '""'
 
         children.each do |part|
-          push " + "
+          push ' + '
 
           if part.type == :str
             push part.children[0].inspect
           else
-            push "(", expr(part), ")"
+            push '(', expr(part), ')'
           end
 
           wrap '(', ')' if recv?

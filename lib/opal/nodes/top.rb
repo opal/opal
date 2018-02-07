@@ -47,9 +47,9 @@ module Opal
           path = Pathname(compiler.file).cleanpath.to_s
           line "Opal.modules[#{path.inspect}] = function(Opal) {"
         elsif compiler.eval?
-          line "(function(Opal, self) {"
+          line '(function(Opal, self) {'
         else
-          line "(function(Opal) {"
+          line '(function(Opal) {'
         end
       end
 
@@ -57,7 +57,7 @@ module Opal
         if compiler.requirable?
           line "};\n"
         elsif compiler.eval?
-          line "})(Opal, self)"
+          line '})(Opal, self)'
         else
           line "})(Opal);\n"
         end
@@ -69,7 +69,7 @@ module Opal
 
       def compile_irb_vars
         if compiler.irb?
-          line "if (!Opal.irb_vars) { Opal.irb_vars = {}; }"
+          line 'if (!Opal.irb_vars) { Opal.irb_vars = {}; }'
         end
       end
 
@@ -84,7 +84,7 @@ module Opal
           name = Nodes::CallNode::OPERATORS[op]
           line "function $rb_#{name}(lhs, rhs) {"
           line "  return (typeof(lhs) === 'number' && typeof(rhs) === 'number') ? lhs #{op} rhs : lhs['$#{op}'](rhs);"
-          line "}"
+          line '}'
         end
       end
 
@@ -99,7 +99,7 @@ module Opal
       # Any special __END__ content in code
       def compile_end_construct
         if content = compiler.eof_content
-          line "var $__END__ = Opal.Object.$new();"
+          line 'var $__END__ = Opal.Object.$new();'
           line "$__END__.$read = function() { return #{content.inspect}; };"
         end
       end

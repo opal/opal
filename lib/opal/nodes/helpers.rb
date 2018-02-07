@@ -49,7 +49,7 @@ module Opal
         end
 
         helper :truthy
-        [fragment("$truthy("), expr(sexp), fragment(")")]
+        [fragment('$truthy('), expr(sexp), fragment(')')]
       end
 
       def js_falsy(sexp)
@@ -62,7 +62,7 @@ module Opal
         end
 
         helper :falsy
-        [fragment("$falsy("), expr(sexp), fragment(")")]
+        [fragment('$falsy('), expr(sexp), fragment(')')]
       end
 
       def js_truthy_optimize(sexp)

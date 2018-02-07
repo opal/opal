@@ -15,7 +15,7 @@ class File < IO
       if `path[0] === '~' || (basedir && basedir[0] === '~')`
         home = Dir.home
         raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
-        raise(ArgumentError, "non-absolute home") unless home.start_with?(sep)
+        raise(ArgumentError, 'non-absolute home') unless home.start_with?(sep)
 
         home            += sep
         home_path_regexp = /^\~(?:#{sep}|$)/

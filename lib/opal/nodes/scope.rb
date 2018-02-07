@@ -112,7 +112,7 @@ module Opal
       # by this function points to the classes' prototype. This is the target
       # to where methods are actually added inside a class body.
       def proto
-        "def"
+        'def'
       end
 
       ##

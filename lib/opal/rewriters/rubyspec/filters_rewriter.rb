@@ -61,7 +61,7 @@ module Opal
       end
 
       def current_spec_name
-        @specs_stack.join(" ")
+        @specs_stack.join(' ')
       end
     end
   end

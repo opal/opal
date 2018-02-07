@@ -69,7 +69,7 @@ class Encoding
   class CompatibilityError < EncodingError; end
 end
 
-Encoding.register "UTF-8", aliases: ["CP65001"], ascii: true do
+Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -94,7 +94,7 @@ Encoding.register "UTF-8", aliases: ["CP65001"], ascii: true do
   end
 end
 
-Encoding.register "UTF-16LE" do
+Encoding.register 'UTF-16LE' do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -111,7 +111,7 @@ Encoding.register "UTF-16LE" do
   end
 end
 
-Encoding.register "UTF-16BE" do
+Encoding.register 'UTF-16BE' do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -128,7 +128,7 @@ Encoding.register "UTF-16BE" do
   end
 end
 
-Encoding.register "UTF-32LE" do
+Encoding.register 'UTF-32LE' do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -145,7 +145,7 @@ Encoding.register "UTF-32LE" do
   end
 end
 
-Encoding.register "ASCII-8BIT", aliases: ["BINARY", "US-ASCII", "ASCII"], ascii: true, dummy: true do
+Encoding.register 'ASCII-8BIT', aliases: ['BINARY', 'US-ASCII', 'ASCII'], ascii: true, dummy: true do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {

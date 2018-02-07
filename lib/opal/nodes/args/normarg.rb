@@ -22,7 +22,7 @@ module Opal
         if scope.in_mlhs?
           line "if (#{name} == null) {"
           line "  #{name} = nil;"
-          line "}"
+          line '}'
         end
       end
     end

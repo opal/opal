@@ -116,7 +116,7 @@ class Module
     end
 
     buffer.save_link(self)
-    buffer.append("m")
+    buffer.append('m')
     buffer.write_module(self)
   end
 end
@@ -132,7 +132,7 @@ class Class
     end
 
     buffer.save_link(self)
-    buffer.append("c")
+    buffer.append('c')
     buffer.write_class(self)
   end
 end
@@ -141,7 +141,7 @@ class BasicObject
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_extends(self)
-    buffer.append("o")
+    buffer.append('o')
     buffer.write_object(self)
   end
 end
@@ -150,7 +150,7 @@ class Range
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_extends(self)
-    buffer.append("o")
+    buffer.append('o')
     buffer.append_symbol(self.class.name)
     buffer.write_fixnum(3)
     buffer.append_symbol('excl')
@@ -382,7 +382,7 @@ module Marshal
       value = object._dump(0)
 
       unless value.is_a?(String)
-        raise TypeError, "_dump() must return string"
+        raise TypeError, '_dump() must return string'
       end
 
       write_ivars_prefix(value)

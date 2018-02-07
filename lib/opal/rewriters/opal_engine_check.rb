@@ -28,16 +28,16 @@ module Opal
       end
 
       RUBY_ENGINE_CHECK = s(:send, s(:const, nil, :RUBY_ENGINE),
-                            :==, s(:str, "opal"))
+                            :==, s(:str, 'opal'))
 
       RUBY_ENGINE_CHECK_NOT = s(:send, s(:const, nil, :RUBY_ENGINE),
-                                :!=, s(:str, "opal"))
+                                :!=, s(:str, 'opal'))
 
       RUBY_PLATFORM_CHECK = s(:send, s(:const, nil, :RUBY_PLATFORM),
-                              :==, s(:str, "opal"))
+                              :==, s(:str, 'opal'))
 
       RUBY_PLATFORM_CHECK_NOT = s(:send, s(:const, nil, :RUBY_PLATFORM),
-                                  :!=, s(:str, "opal"))
+                                  :!=, s(:str, 'opal'))
     end
   end
 end
