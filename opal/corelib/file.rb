@@ -4,7 +4,7 @@ class File < IO
   PATH_SEPARATOR = ':'
   # Assuming case insenstive filesystem
   FNM_SYSCASE = 0
-  windows_root_rx = /^[a-zA-Z]:(?:\\|\/)/
+  windows_root_rx = %r{^[a-zA-Z]:(?:\\|\/)}
 
   class << self
     def expand_path(path, basedir = nil)

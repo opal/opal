@@ -176,7 +176,7 @@ module Opal
 
       # Returns code used in debug mode to check arity of method call
       def compile_arity_check
-        if !arity_checks.empty?
+        unless arity_checks.empty?
           parent_scope = scope
           until parent_scope.top? || parent_scope.def? || parent_scope.class_scope?
             parent_scope = parent_scope.parent

@@ -17,7 +17,7 @@ module Opal
       end
       attr_reader :output, :exit_status
 
-      def run(code)
+      def run(code, _)
         with_chrome_server do
           cmd = [
             'env',

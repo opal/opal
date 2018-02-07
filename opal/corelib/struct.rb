@@ -83,7 +83,7 @@ class Struct
       end
 
       extra = kwargs.keys - self.class.members
-      if !extra.empty?
+      unless extra.empty?
         raise ArgumentError, "unknown keywords: #{extra.join(', ')}"
       end
 

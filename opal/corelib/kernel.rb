@@ -181,7 +181,7 @@ module Kernel
   def exit(status = true)
     $__at_exit__ ||= []
 
-    while !$__at_exit__.empty?
+    until $__at_exit__.empty?
       block = $__at_exit__.pop
       block.call
     end
@@ -1011,7 +1011,7 @@ module Kernel
   alias object_id __id__
 
   def printf(*args)
-    if !args.empty?
+    unless args.empty?
       print format(*args)
     end
 

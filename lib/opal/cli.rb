@@ -33,9 +33,9 @@ module Opal
       @stubs       = options.delete(:stubs)      || []
       @preload     = options.delete(:preload)    || []
       @output      = options.delete(:output)     || self.class.stdout || $stdout
-      @verbose     = options.fetch(:verbose, false); options.delete(:verbose)
-      @debug       = options.fetch(:debug, false);   options.delete(:debug)
-      @filename    = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
+      @verbose     = options.delete(:verbose)    || false
+      @debug       = options.delete(:debug)      || false
+      @filename    = options.delete(:filename)   || @file && @file.path
 
       @requires    = options.delete(:requires) || []
       @requires.unshift('opal') unless options.delete(:skip_opal_require)
