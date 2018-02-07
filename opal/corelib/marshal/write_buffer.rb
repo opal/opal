@@ -326,7 +326,7 @@ module Marshal
     end
 
     def write_ivars_suffix(object, force = false)
-      if object.instance_variables.length == 0 && !force
+      if object.instance_variables.empty? && !force
         return
       end
 
@@ -341,7 +341,7 @@ module Marshal
       singleton_mods = object.singleton_class.ancestors.reject { |mod| mod.is_a?(Class) }
       class_mods = object.class.ancestors.reject { |mod| mod.is_a?(Class) }
       own_mods = singleton_mods - class_mods
-      if own_mods.length > 0
+      if !own_mods.empty?
         own_mods.each do |mod|
           append('e')
           append_symbol(mod.name)
@@ -392,7 +392,7 @@ module Marshal
     end
 
     def write_ivars_prefix(object)
-      if object.instance_variables.length > 0
+      if !object.instance_variables.empty?
         append('I')
       end
     end

@@ -59,7 +59,7 @@ class BasicObject
           })(self)
         }
       end
-    elsif args.size > 0
+    elsif !args.empty?
       ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{args.size} for 0)"
     end
 

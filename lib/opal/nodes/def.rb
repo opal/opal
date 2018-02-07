@@ -141,7 +141,7 @@ module Opal
 
       # Returns code used in debug mode to check arity of method call
       def compile_arity_check
-        if arity_checks.size > 0
+        if !arity_checks.empty?
           meth = scope.mid.to_s.inspect
           line 'var $arity = arguments.length;'
           push " if (#{arity_checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }"

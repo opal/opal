@@ -49,7 +49,7 @@ module Opal
         end.compact.flatten
       ]
 
-      raise ArgumentError, 'no libraries to compile' if @lib_only && @requires.length == 0
+      raise ArgumentError, 'no libraries to compile' if @lib_only && @requires.empty?
       raise ArgumentError, 'no runnable code provided (evals or file)' if @evals.empty? && @file.nil? && !@lib_only
       raise ArgumentError, "can't accept evals or file in `library only` mode" if (@evals.any? || @file) && @lib_only
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?

@@ -548,7 +548,7 @@ class Module
           })(self)
         }
       end
-    elsif args.size > 0
+    elsif !args.empty?
       Kernel.raise ArgumentError, "wrong number of arguments (#{args.size} for 0)" \
                                   "\n\n  NOTE:If you want to enable passing a String argument please add \"require 'opal-parser'\" to your script\n"
     end

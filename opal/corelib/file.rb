@@ -162,7 +162,7 @@ class File < IO
     end
 
     def join(*paths)
-      if paths.length == 0
+      if paths.empty?
         return ''
       end
       result = ''
