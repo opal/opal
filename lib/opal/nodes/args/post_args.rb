@@ -119,7 +119,7 @@ module Opal
           scope.working_arguments = '$post_args'
         end
 
-        add_temp "#{scope.working_arguments}"
+        add_temp scope.working_arguments
         line "#{scope.working_arguments} = Opal.slice.call(#{js_source}, #{scope.inline_args.size}, #{js_source}.length);"
 
         extract_arguments

@@ -41,12 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/UnneededInterpolation:
-  Exclude:
-    - 'lib/opal/nodes/args/post_args.rb'
-
 # Offense count: 41
 # Cop supports --auto-correct.
 Style/VariableInterpolation:
