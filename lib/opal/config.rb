@@ -24,7 +24,7 @@ module Opal
 
       config_options[name] = {
         default: default_value,
-        compiler: compiler,
+        compiler: compiler
       }
 
       define_singleton_method(name) { config.fetch(name, default_value) }

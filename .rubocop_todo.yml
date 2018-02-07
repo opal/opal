@@ -41,16 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyleForMultiline.
-# SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInLiteral:
-  Exclude:
-    - 'lib/opal/cli_runners/chrome.rb'
-    - 'lib/opal/cli_runners/server.rb'
-    - 'lib/opal/config.rb'
-
 # Offense count: 18
 # Cop supports --auto-correct.
 # Configuration parameters: AllowNamedUnderscoreVariables.

@@ -24,7 +24,7 @@ module Opal
             "CHROME_HOST=#{chrome_host}",
             "CHROME_PORT=#{chrome_port}",
             'node',
-            SCRIPT_PATH,
+            SCRIPT_PATH
           ]
 
           IO.popen(cmd, 'w', out: output) do |io|
