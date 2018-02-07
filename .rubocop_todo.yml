@@ -55,13 +55,6 @@ Style/VariableInterpolation:
     - 'opal/corelib/regexp.rb'
     - 'opal/corelib/string/inheritance.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/WhileUntilModifier:
-  Exclude:
-    - 'lib/opal/nodes/base.rb'
-    - 'lib/opal/nodes/iter.rb'
-
 # Offense count: 11
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
