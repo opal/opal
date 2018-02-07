@@ -244,9 +244,7 @@ module Opal
         @identity
       end
 
-      def identity
-        @identity
-      end
+      attr_reader :identity
 
       def find_parent_def
         scope = self

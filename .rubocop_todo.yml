@@ -41,16 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 3
-# Cop supports --auto-correct.
-# Configuration parameters: ExactNameMatch, AllowPredicates, AllowDSLWriters, IgnoreClassMethods, Whitelist.
-# Whitelist: to_ary, to_a, to_c, to_enum, to_h, to_hash, to_i, to_int, to_io, to_open, to_path, to_proc, to_r, to_regexp, to_str, to_s, to_sym
-Style/TrivialAccessors:
-  Exclude:
-    - 'lib/opal/builder_processors.rb'
-    - 'lib/opal/nodes/scope.rb'
-    - 'opal/corelib/string/encoding.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 Style/UnneededInterpolation:

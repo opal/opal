@@ -28,8 +28,8 @@ module Opal
         nil
       end
 
-      def self.extensions
-        @extensions
+      class << self
+        attr_reader :extensions
       end
 
       def self.match?(other)

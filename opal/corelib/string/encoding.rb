@@ -162,6 +162,7 @@ Encoding.register 'ASCII-8BIT', aliases: ['BINARY', 'US-ASCII', 'ASCII'], ascii:
 end
 
 class String
+  attr_reader :encoding
   `String.prototype.encoding = #{Encoding::UTF_16LE}`
 
   def bytes
@@ -182,10 +183,6 @@ class String
 
   def encode(encoding)
     dup.force_encoding(encoding)
-  end
-
-  def encoding
-    @encoding
   end
 
   def force_encoding(encoding)
