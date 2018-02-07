@@ -49,7 +49,7 @@ class Encoding
   end
 
   def inspect
-    "#<Encoding:#{@name}#{" (dummy)" if @dummy}>"
+    "#<Encoding:#{@name}#{' (dummy)' if @dummy}>"
   end
 
   # methods to implement per encoding
