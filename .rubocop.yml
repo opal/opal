@@ -1,9 +1,5 @@
 inherit_from: .rubocop_todo.yml
 
-Metrics/LineLength:
-  Enabled: false
-  # Max: 120
-
 Naming/MethodName:
   Exclude:
     - 'opal/**/*.rb' # Ruby has methods like Integer/Float/Array
