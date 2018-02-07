@@ -175,7 +175,7 @@ class File < IO
           item
         end
       end
-      paths = paths.reject { |path| path.empty? }
+      paths = paths.reject(&:empty?)
       paths.each_with_index do |item, index|
         next_item = paths[index + 1]
         if next_item.nil?
