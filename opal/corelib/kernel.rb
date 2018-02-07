@@ -960,7 +960,7 @@ module Kernel
   def Hash(arg)
     return {} if arg.nil? || arg == []
     return arg if Hash === arg
-    return Opal.coerce_to!(arg, Hash, :to_hash)
+    Opal.coerce_to!(arg, Hash, :to_hash)
   end
 
   def is_a?(klass)

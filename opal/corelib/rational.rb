@@ -187,7 +187,7 @@ class Rational < Numeric
     case other
     when Integer
       if self == 0 && other < 0
-        return Float::INFINITY
+        Float::INFINITY
       elsif other > 0
         Rational(@num**other, @den**other)
       elsif other < 0

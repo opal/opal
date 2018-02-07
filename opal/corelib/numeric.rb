@@ -120,7 +120,7 @@ class Numeric
   alias phase arg
 
   def polar
-    return abs, arg
+    [abs, arg]
   end
 
   def quo(other)

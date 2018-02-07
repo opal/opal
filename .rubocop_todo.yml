@@ -41,17 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: AllowMultipleReturnValues.
-Style/RedundantReturn:
-  Exclude:
-    - 'opal/corelib/comparable.rb'
-    - 'opal/corelib/enumerable.rb'
-    - 'opal/corelib/kernel.rb'
-    - 'opal/corelib/numeric.rb'
-    - 'opal/corelib/rational.rb'
-
 # Offense count: 68
 # Cop supports --auto-correct.
 Style/RedundantSelf:

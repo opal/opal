@@ -1129,7 +1129,7 @@ module Enumerable
   def sort(&block)
     ary = to_a
     block = ->a, b { a <=> b } unless block_given?
-    return ary.sort(&block)
+    ary.sort(&block)
   end
 
   def sort_by(&block)
