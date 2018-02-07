@@ -28,10 +28,10 @@ describe "Opal truthyness" do
 
     called.should be_nil
   end
-  
+
   it "should evaluate to false if js `nil` is used with an operator" do
     is_falsey = JsNil.new < 2 ? false : true
-    
+
     is_falsey.should be_true
   end
 
