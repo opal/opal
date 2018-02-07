@@ -41,21 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 12
-# Cop supports --auto-correct.
-# Configuration parameters: PreferredDelimiters.
-Style/PercentLiteralDelimiters:
-  Exclude:
-    - 'lib/opal/rewriters/hashes/key_duplicates_rewriter.rb'
-    - 'lib/opal/simple_server.rb'
-    - 'opal/corelib/array.rb'
-    - 'opal/corelib/class.rb'
-    - 'opal/corelib/enumerator.rb'
-    - 'opal/corelib/hash.rb'
-    - 'opal/corelib/string/inheritance.rb'
-    - 'opal/corelib/time.rb'
-    - 'opal/corelib/variables.rb'
-
 # Offense count: 8
 # Cop supports --auto-correct.
 Style/PerlBackrefs:

@@ -73,7 +73,7 @@ class Opal::SimpleServer
   end
 
   def javascript_include_tag(path)
-    %{<script src="/#{@prefix}/#{path}.js#{cache_invalidator}"></script>}
+    %(<script src="/#{@prefix}/#{path}.js#{cache_invalidator}"></script>)
   end
 
   def cache_invalidator
