@@ -204,3 +204,6 @@ Style/SafeNavigation:
 
 Style/SpecialGlobalVars:
   Enabled: false
+
+Style/StderrPuts:
+  Enabled: false

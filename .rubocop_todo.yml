@@ -41,14 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 3
-# Cop supports --auto-correct.
-Style/StderrPuts:
-  Exclude:
-    - 'lib/opal/parser.rb'
-    - 'lib/opal/util.rb'
-    - 'opal/corelib/kernel.rb'
-
 # Offense count: 346
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, ConsistentQuotesInMultiline.
