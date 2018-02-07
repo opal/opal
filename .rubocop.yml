@@ -197,3 +197,7 @@ Style/PercentLiteralDelimiters:
   Exclude:
     # Opal has a convention of %x{}
     - 'opal/**/*.rb'
+
+Style/SafeNavigation:
+  # Opal supports old versions of Ruby that don't have safe navigator
+  Enabled: false

@@ -41,17 +41,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-# Offense count: 8
-# Cop supports --auto-correct.
-# Configuration parameters: ConvertCodeThatCanStartToReturnNil.
-Style/SafeNavigation:
-  Exclude:
-    - 'lib/opal/ast/node.rb'
-    - 'lib/opal/cli.rb'
-    - 'lib/opal/fragment.rb'
-    - 'lib/opal/nodes/iter.rb'
-    - 'lib/opal/nodes/scope.rb'
-
 # Offense count: 9
 # Cop supports --auto-correct.
 # Configuration parameters: AllowAsExpressionSeparator.
