@@ -227,3 +227,38 @@ Layout/MultilineMethodCallBraceLayout:
 
 Style/Lambda:
   EnforcedStyle: literal
+
+Layout/EmptyLines:
+  # Empty lines can be used to separate interface and implementation
+  Enabled: false
+
+Style/EmptyElse:
+  # Empty 'else' can be used to indicate a potential empty branch condition
+  EnforcedStyle: nil
+
+Lint/EmptyWhen:
+  # Empty 'when' can be used to indicate a potential empty branch condition
+  Enabled: false
+
+Style/StringLiterals:
+  Exclude:
+    # Nodes are more like DSL, so they are allowed to have any internal rules
+    # that make the code more readable
+    - 'lib/opal/nodes/**/*.rb'
+
+Style/TrailingUnderscoreVariable:
+  # We treat a, = *b construction as a potential source of bugs
+  Enabled: false
+
+Style/WhileUntilModifier:
+  Enabled: false
+
+Style/RegexpLiteral:
+  # Use the style that you like more, but if there are slashes or backslashe
+  # prefer %r{} syntax.
+  # Rubocop doesn't check for backslashes, so this rule is disabled.
+  Enabled: false
+
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    default: '{}'

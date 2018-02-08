@@ -43,7 +43,7 @@ module Opal
       def source_map
         @source_map ||= begin
           mappings = []
-          source_file = filename + '.js'
+          source_file = "#{filename}.js"
           line = source.count("\n")
           column = source.scan("\n[^\n]*$").size
           offset = ::SourceMap::Offset.new(line, column)

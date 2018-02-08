@@ -119,7 +119,10 @@ module Opal
         push " || #{recv_value_tmp}['$respond_to_missing?']('#{method_name}'))"
 
         args.each do |arg|
-          if arg.type != :block_pass
+          case arg.type
+          when :block_pass
+            # ignoring
+          else
             push ' && '
             compile_defined(arg)
           end
@@ -173,7 +176,7 @@ module Opal
       end
 
       def compile_defined_cvar(node)
-        cvar_name, = *node
+        cvar_name, _ = *node
         cvar_tmp = scope.new_temp
         push "(#{cvar_tmp} = #{class_variable_owner}.$$cvars['#{cvar_name}'], #{cvar_tmp} != null)"
         cvar_tmp

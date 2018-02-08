@@ -272,11 +272,12 @@ class Complex < Numeric
   def to_s
     result = @real.inspect
 
-    result += if (Number === @imag && @imag.nan?) || @imag.positive? || @imag.zero?
-                '+'
-              else
-                '-'
-              end
+    result +=
+      if (Number === @imag && @imag.nan?) || @imag.positive? || @imag.zero?
+        '+'
+      else
+        '-'
+      end
 
     result += @imag.abs.inspect
 

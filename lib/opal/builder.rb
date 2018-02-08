@@ -50,6 +50,8 @@ module Opal
       processor_extensions.each { |ext| extensions << ext }
     end
 
+
+
     class MissingRequire < LoadError
     end
 
@@ -128,11 +130,12 @@ module Opal
     private
 
     def tree_requires(asset, path)
-      dirname = if path.nil? || path.empty?
-                  Dir.pwd
-                else
-                  File.dirname(File.expand_path(path))
-                end
+      dirname =
+        if path.nil? || path.empty?
+          Dir.pwd
+        else
+          File.dirname(File.expand_path(path))
+        end
 
       paths = path_reader.paths.map { |p| File.expand_path(p) }
 
@@ -173,7 +176,7 @@ module Opal
         case compiler_options[:dynamic_require_severity]
         when :raise   then raise MissingRequire, message
         when :warning then warn message
-          # else noop
+        else # noop
         end
 
         return "raise LoadError, #{message.inspect}"

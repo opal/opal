@@ -54,14 +54,14 @@ module Opal
       INSTALLED = {}
       def command_installed?(cmd, install_comment)
         command_installed = Command::INSTALLED[cmd.to_s] ||= which(cmd)
-        $stderr.puts %("#{cmd}" command not found#{install_comment}) unless command_installed
+        $stderr.puts %{"#{cmd}" command not found#{install_comment}} unless command_installed
         command_installed
       end
     end
 
     class DigestSourceCommand < Command
       def digest(source)
-        out, = Open3.capture3("#{command} #{options} #{hide_stderr}", stdin_data: source)
+        out, _, _ = Open3.capture3("#{command} #{options} #{hide_stderr}", stdin_data: source)
         out
       end
     end

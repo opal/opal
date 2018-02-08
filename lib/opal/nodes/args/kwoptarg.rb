@@ -28,7 +28,7 @@ module Opal
 
         line "if (#{lvar_name} == null) {"
         line "  #{lvar_name} = ", expr(default_value)
-        line '}'
+        line "}"
       end
     end
   end

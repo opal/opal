@@ -83,7 +83,7 @@ module Opal
         end
 
         def on_lvasgn(node)
-          name, = *node
+          name, _ = *node
           result << name
           super
         end

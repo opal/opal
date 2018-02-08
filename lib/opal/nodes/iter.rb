@@ -79,7 +79,7 @@ module Opal
 
       def compile_norm_args
         norm_args.each do |arg|
-          arg_name, = *arg
+          arg_name, _ = *arg
           push "if (#{arg_name} == null) #{arg_name} = nil;"
         end
       end
@@ -188,15 +188,16 @@ module Opal
             parent_scope = parent_scope.parent
           end
 
-          context = if parent_scope.top?
-                      "'<main>'"
-                    elsif parent_scope.def?
-                      "'#{parent_scope.mid}'"
-                    elsif parent_scope.class?
-                      "'<class:#{parent_scope.name}>'"
-                    elsif parent_scope.module?
-                      "'<module:#{parent_scope.name}>'"
-                    end
+          context =
+            if parent_scope.top?
+              "'<main>'"
+            elsif parent_scope.def?
+              "'#{parent_scope.mid}'"
+            elsif parent_scope.class?
+              "'<class:#{parent_scope.name}>'"
+            elsif parent_scope.module?
+              "'<module:#{parent_scope.name}>'"
+            end
 
           identity = scope.identity
 

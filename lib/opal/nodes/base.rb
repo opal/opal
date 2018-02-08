@@ -167,7 +167,9 @@ module Opal
 
       def closest_module_node
         current = scope
-        current = current.parent while current && !current.class_scope?
+        while current && !current.class_scope?
+          current = current.parent
+        end
         current
       end
 

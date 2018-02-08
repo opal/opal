@@ -36,7 +36,7 @@ module Opal
         _recvr, method_name, *args = *node
 
         if rubyspec_dsl?(method_name)
-          spec_name, = *args.first
+          spec_name, _ = *args.first
           begin
             @specs_stack.push(spec_name)
             if skip?

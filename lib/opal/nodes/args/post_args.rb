@@ -144,7 +144,7 @@ module Opal
       end
 
       def compile_optarg(optarg)
-        var_name, = *optarg
+        var_name, _ = *optarg
         add_temp var_name
 
         line "if (#{required_right_args.size} < #{scope.working_arguments}.length) {"
@@ -159,25 +159,27 @@ module Opal
         push process(arg)
       end
 
+      # rubocop:disable Layout/IndentationConsistency
       def compile_restarg
         return unless restarg
 
         line "if (#{required_right_args.size} < #{scope.working_arguments}.length) {"
-        indent do
-          # there are some items coming to the splat, extracting them
-          extract_restarg
-        end
+          indent do
+            # there are some items coming to the splat, extracting them
+            extract_restarg
+          end
         line '} else {'
-        indent do
-          # splat is empty
-          extract_blank_restarg
-        end
+          indent do
+            # splat is empty
+            extract_blank_restarg
+          end
         line '}'
       end
+      # rubocop:enable Layout/IndentationConsistency
 
       def extract_restarg
         extract_code = "#{scope.working_arguments}.splice(0, #{scope.working_arguments}.length - #{required_right_args.size});"
-        var_name, = *restarg
+        var_name, _ = *restarg
         if var_name
           add_temp var_name
           line "#{var_name} = #{extract_code}"
@@ -187,7 +189,7 @@ module Opal
       end
 
       def extract_blank_restarg
-        var_name, = *restarg
+        var_name, _ = *restarg
         if var_name
           add_temp var_name
           line "#{var_name} = [];"

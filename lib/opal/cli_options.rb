@@ -161,6 +161,7 @@ module Opal
 
     attr_reader :options
 
+
     private
 
     def print_version

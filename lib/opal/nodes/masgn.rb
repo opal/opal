@@ -80,11 +80,12 @@ module Opal
       end
 
       def compile_assignment(child, array, idx, len = nil)
-        assign = if !len || idx >= len
-                   s(:js_tmp, "(#{array}[#{idx}] == null ? nil : #{array}[#{idx}])")
-                 else
-                   s(:js_tmp, "#{array}[#{idx}]")
-                 end
+        assign =
+          if !len || idx >= len
+            s(:js_tmp, "(#{array}[#{idx}] == null ? nil : #{array}[#{idx}])")
+          else
+            s(:js_tmp, "#{array}[#{idx}]")
+          end
 
         part = child.updated
         if SIMPLE_ASSIGNMENT.include?(child.type)

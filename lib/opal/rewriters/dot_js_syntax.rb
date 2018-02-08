@@ -8,7 +8,7 @@ module Opal
       def on_send(node)
         recv, meth, *args = *node
         if recv && recv.type == :send
-          recv_of_recv, meth_of_recv, = *recv
+          recv_of_recv, meth_of_recv, _ = *recv
           if meth_of_recv == :JS
             case meth
             when :[]

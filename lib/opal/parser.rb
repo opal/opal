@@ -37,11 +37,12 @@ module Opal
         parser.diagnostics.all_errors_are_fatal = true
         parser.diagnostics.ignore_warnings      = false
 
-        parser.diagnostics.consumer = if RUBY_ENGINE == 'opal'
-                                        ->(diag) {}
-                                      else
-                                        diagnostics_consumer
-                                      end
+        parser.diagnostics.consumer =
+          if RUBY_ENGINE == 'opal'
+            ->(diag) {}
+          else
+            diagnostics_consumer
+          end
 
         parser
       end

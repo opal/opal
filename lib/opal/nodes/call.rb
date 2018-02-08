@@ -193,7 +193,7 @@ module Opal
         elsif RuntimeHelpers.compatible?(recvr, meth)
           push(RuntimeHelpers.new(sexp_with_arglist, @level, @compiler).compile)
         else
-          yield
+          yield # i.e. compile_default.call
         end
       end
 
