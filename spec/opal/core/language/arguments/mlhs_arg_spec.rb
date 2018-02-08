@@ -1,4 +1,3 @@
-# regression test
 describe 'mlhs argument' do
   context 'when pased value is falsey in JS' do
     it 'still returns it' do
