@@ -370,8 +370,7 @@ module Opal
         sexp.updated(:returnable_yield, nil)
       when :when
         *when_sexp, then_sexp = *sexp
-        sexp.updated(nil,
-                     [*when_sexp, returns(then_sexp)])
+        sexp.updated(nil, [*when_sexp, returns(then_sexp)])
       when :rescue
         body_sexp, *resbodies, else_sexp = *sexp
 
@@ -383,26 +382,24 @@ module Opal
           else_sexp = returns(else_sexp)
         end
 
-        sexp.updated(nil, [
-          returns(body_sexp),
-          *resbodies,
-          else_sexp
-        ])
+        sexp.updated(
+          nil, [
+            returns(body_sexp),
+            *resbodies,
+            else_sexp
+          ]
+        )
       when :resbody
         klass, lvar, body = *sexp
         sexp.updated(nil, [klass, lvar, returns(body)])
       when :ensure
         rescue_sexp, ensure_body = *sexp
-        sexp = sexp.updated(nil,
-                            [returns(rescue_sexp), ensure_body])
+        sexp = sexp.updated(nil, [returns(rescue_sexp), ensure_body])
         s(:js_return, sexp)
       when :begin, :kwbegin
         # Wrapping last expression with s(:js_return, ...)
         *rest, last = *sexp
-        sexp.updated(
-          nil,
-          [*rest, returns(last)]
-        )
+        sexp.updated(nil, [*rest, returns(last)])
       when :while, :until, :while_post, :until_post
         sexp
       when :return, :js_return, :returnable_yield
@@ -450,7 +447,7 @@ module Opal
         s(:js_return, sexp).updated(
           nil,
           nil,
-          location: sexp.loc
+          location: sexp.loc,
         )
       end
     end

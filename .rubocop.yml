@@ -1,3 +1,6 @@
+AllCops:
+  TargetRubyVersion: 2.5
+
 inherit_from: .rubocop_todo.yml
 
 Naming/MethodName:
@@ -209,3 +212,18 @@ Style/YodaCondition:
     # In Opal there are lot of cases like
     # if `..js..` == object
     - 'opal/**/*.rb'
+
+Layout/MultilineAssignmentLayout:
+  EnforcedStyle: same_line
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+
+Layout/AlignParameters:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/MultilineMethodCallBraceLayout:
+  EnforcedStyle: new_line
+
+Style/Lambda:
+  EnforcedStyle: literal

@@ -15,8 +15,8 @@ module Opal
         :"$logical_op_recvr_tmp_#{@@counter}"
       end
 
-      GET_SET = lambda { |get_type, set_type|
-        lambda { |lhs, rhs, root_type|
+      GET_SET = ->(get_type, set_type) {
+        ->(lhs, rhs, root_type) {
           get_node = lhs.updated(get_type)              # lhs
           condition_node = s(root_type, get_node, rhs)  # lhs || rhs
 
@@ -96,8 +96,9 @@ module Opal
             s(:if, recvr_is_nil,                          # if recvr.nil?
               s(:nil),                                    #   nil
                                                           # else
-              plain_or_asgn))                             #   recvr.meth ||= rhs
-                                                          # end
+              plain_or_asgn                               #   recvr.meth ||= rhs
+            ),
+          )                                               # end
         end
       end
 

@@ -123,7 +123,7 @@ module Opal
     attr_reader :processed
 
     attr_accessor :processors, :path_reader, :compiler_options,
-                  :stubs, :prerequired, :preload
+      :stubs, :prerequired, :preload
 
     private
 
@@ -150,8 +150,13 @@ module Opal
     end
 
     def processor_for(source, filename, path, options)
-      (processor = processors.find { |p| p.match? path }) ||
-        raise(ProcessorNotFound, "can't find processor for filename: #{filename.inspect}, path: #{path.inspect}, source: #{source.inspect}, processors: #{processors.inspect}")
+      processor = processors.find { |p| p.match? path } ||
+                  raise(ProcessorNotFound, "can't find processor for filename: " \
+                                           "#{filename.inspect}, "\
+                                           "path: #{path.inspect}, "\
+                                           "source: #{source.inspect}, "\
+                                           "processors: #{processors.inspect}"
+                  )
       processor.new(source, filename, compiler_options.merge(options))
     end
 
@@ -168,6 +173,7 @@ module Opal
         case compiler_options[:dynamic_require_severity]
         when :raise   then raise MissingRequire, message
         when :warning then warn message
+          # else noop
         end
 
         return "raise LoadError, #{message.inspect}"

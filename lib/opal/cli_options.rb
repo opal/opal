@@ -39,20 +39,21 @@ module Opal
 
       section 'Basic Options:'
 
-      on('-I', '--include DIR',
-         'Append a load path (may be used more than once)') do |i|
+      on('-I', '--include DIR', 'Append a load path (may be used more than once)') do |i|
         options[:load_paths] ||= []
         options[:load_paths] << i
       end
 
       on('-e', '--eval SOURCE', String,
-         'One line of script. Several -e\'s allowed. Omit [programfile]') do |source|
+        'One line of script. Several -e\'s allowed. Omit [programfile]'
+      ) do |source|
         options[:evals] ||= []
         options[:evals] << source
       end
 
       on('-r', '--require LIBRARY', String,
-         'Require the library before executing your script') do |library|
+        'Require the library before executing your script'
+      ) do |library|
         options[:requires] ||= []
         options[:requires] << library
       end
@@ -122,8 +123,9 @@ module Opal
 
       dynamic_require_levels = %w[error warning ignore]
       on('-D', '--dynamic-require LEVEL', dynamic_require_levels,
-         'Set level of dynamic require severity.',
-         "(default: error, values: #{dynamic_require_levels.join(', ')})") do |level|
+        'Set level of dynamic require severity.',
+        "(default: error, values: #{dynamic_require_levels.join(', ')})"
+      ) do |level|
         options[:dynamic_require_severity] = level.to_sym
       end
 

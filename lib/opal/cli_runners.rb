@@ -41,7 +41,7 @@ module Opal
     end
 
     # The compiler runner will just output the compiled JavaScript
-    register_runner :compiler, lambda { |data|
+    register_runner :compiler, ->(data) {
       options  = data[:options] || {}
       builder  = data.fetch(:builder)
       map_file = options[:map_file]
@@ -56,7 +56,7 @@ module Opal
     # Legacy runners
 
     def self.register_legacy_runner(klass_name, *names)
-      runner = lambda { |data|
+      runner = ->(data) {
         klass = const_get(klass_name)
         runner = klass.new((data[:options] || {}).merge(output: data[:output]))
         runner.run(data[:builder].to_s, data[:argv])

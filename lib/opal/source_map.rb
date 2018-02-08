@@ -31,7 +31,7 @@ module Opal
               source_file,
               generated_offset,
               source_offset,
-              fragment.source_map_name
+              fragment.source_map_name,
             )
           end
 

@@ -18,26 +18,26 @@ module Opal
         source.to_s
       end
 
-      def self.handles(*extensions)
-        @extensions = extensions
-        matches = extensions.join('|')
-        matches = "(#{matches})" if extensions.size == 1
-        @match_regexp = Regexp.new "\\.#{matches}#{REGEXP_END}"
-
-        ::Opal::Builder.register_processor(self, extensions)
-        nil
-      end
-
       class << self
         attr_reader :extensions
-      end
 
-      def self.match?(other)
-        other.is_a?(String) && other.match(match_regexp)
-      end
+        def handles(*extensions)
+          @extensions = extensions
+          matches = extensions.join('|')
+          matches = "(#{matches})" if extensions.size == 1
+          @match_regexp = Regexp.new "\\.#{matches}#{REGEXP_END}"
 
-      def self.match_regexp
-        @match_regexp || raise(NotImplementedError)
+          ::Opal::Builder.register_processor(self, extensions)
+          nil
+        end
+
+        def match?(other)
+          other.is_a?(String) && other.match(match_regexp)
+        end
+
+        def match_regexp
+          @match_regexp || raise(NotImplementedError)
+        end
       end
 
       def source_map

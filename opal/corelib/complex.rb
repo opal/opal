@@ -75,7 +75,8 @@ class Complex < Numeric
   def *(other)
     if Complex === other
       Complex(@real * other.real - @imag * other.imag,
-              @real * other.imag + @imag * other.real)
+        @real * other.imag + @imag * other.real,
+      )
     elsif Numeric === other && other.real?
       Complex(@real * other, @imag * other)
     else
@@ -206,7 +207,8 @@ class Complex < Numeric
     d = denominator
 
     Complex(@real.numerator * (d / @real.denominator),
-            @imag.numerator * (d / @imag.denominator))
+      @imag.numerator * (d / @imag.denominator),
+    )
   end
 
   alias phase arg

@@ -26,10 +26,10 @@ module Opal
         app = build_app(source)
 
         @server = Rack::Server.start(
-          app: app,
-          Port: port,
+          app:       app,
+          Port:      port,
           AccessLog: [],
-          Logger: Logger.new(output)
+          Logger:    Logger.new(output),
         )
       end
 
@@ -42,10 +42,12 @@ module Opal
 
         if static_folder
           not_found = [404, {}, []]
-          app = Rack::Cascade.new([
-            Rack::Static.new(->(_) { not_found }, urls: [''], root: static_folder),
-            app
-          ])
+          app = Rack::Cascade.new(
+            [
+              Rack::Static.new(->(_) { not_found }, urls: [''], root: static_folder),
+              app
+            ],
+          )
         end
 
         app

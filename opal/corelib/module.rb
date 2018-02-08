@@ -362,7 +362,7 @@ class Module
                 `#{method.to_proc}.$$unbound`
 
               when UnboundMethod
-                lambda { |*args|
+                ->(*args) {
                   bound = method.bind(self)
                   bound.call(*args)
                 }

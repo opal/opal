@@ -16,11 +16,13 @@ module Opal
         *regular_args, last_arg = args.children
         if last_arg && last_arg.type == :blockarg
           @block_arg = last_arg.children[0]
-          @sexp = @sexp.updated(nil, [
-            mid,
-            s(:args, *regular_args),
-            stmts
-          ])
+          @sexp = @sexp.updated(
+            nil, [
+              mid,
+              s(:args, *regular_args),
+              stmts
+            ]
+          )
         end
       end
 

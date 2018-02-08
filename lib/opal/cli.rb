@@ -7,8 +7,8 @@ require 'opal/cli_runners'
 module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
-                :output, :requires, :gems, :stubs, :verbose, :runner_options,
-                :preload, :filename, :debug, :no_exit, :lib_only
+      :output, :requires, :gems, :stubs, :verbose, :runner_options,
+      :preload, :filename, :debug, :no_exit, :lib_only
 
     class << self
       attr_accessor :stdout
@@ -26,18 +26,18 @@ module Opal
       @file        = options.delete(:file)
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
-      @argv        = options.delete(:argv)       || []
-      @evals       = options.delete(:evals)      || []
-      @load_paths  = options.delete(:load_paths) || []
-      @gems        = options.delete(:gems)       || []
-      @stubs       = options.delete(:stubs)      || []
-      @preload     = options.delete(:preload)    || []
-      @output      = options.delete(:output)     || self.class.stdout || $stdout
-      @verbose     = options.delete(:verbose)    || false
-      @debug       = options.delete(:debug)      || false
-      @filename    = options.delete(:filename)   || @file && @file.path
+      @argv        = options.delete(:argv)       { [] }
+      @evals       = options.delete(:evals)      { [] }
+      @load_paths  = options.delete(:load_paths) { [] }
+      @gems        = options.delete(:gems)       { [] }
+      @stubs       = options.delete(:stubs)      { [] }
+      @preload     = options.delete(:preload)    { [] }
+      @output      = options.delete(:output)     { self.class.stdout || $stdout }
+      @verbose     = options.delete(:verbose)    { false }
+      @debug       = options.delete(:debug)      { false }
+      @filename    = options.delete(:filename)   { @file && @file.path }
 
-      @requires    = options.delete(:requires) || []
+      @requires    = options.delete(:requires)   { [] }
       @requires.unshift('opal') unless options.delete(:skip_opal_require)
 
       @compiler_options = Hash[
@@ -61,7 +61,7 @@ module Opal
         options: runner_options,
         output: output,
         argv: argv,
-        builder: builder
+        builder: builder,
       )
     end
 

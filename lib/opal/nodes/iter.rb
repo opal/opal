@@ -99,10 +99,12 @@ module Opal
         *regular_args, last_arg = args.children
         if last_arg && last_arg.type == :blockarg
           @block_arg = last_arg.children[0]
-          @sexp = @sexp.updated(nil, [
-            s(:args, *regular_args),
-            body
-          ])
+          @sexp = @sexp.updated(
+            nil, [
+              s(:args, *regular_args),
+              body
+            ]
+          )
         end
       end
 
@@ -127,10 +129,12 @@ module Opal
           end
         end
 
-        @sexp = @sexp.updated(nil, [
-          args.updated(nil, valid_args),
-          body
-        ])
+        @sexp = @sexp.updated(
+          nil, [
+            args.updated(nil, valid_args),
+            body
+          ]
+        )
       end
 
       def extract_underscore_args
@@ -149,10 +153,12 @@ module Opal
           end
         end
 
-        @sexp = @sexp.updated(nil, [
-          args.updated(nil, valid_args),
-          body
-        ])
+        @sexp = @sexp.updated(
+          nil, [
+            args.updated(nil, valid_args),
+            body
+          ]
+        )
       end
 
       def returned_body
