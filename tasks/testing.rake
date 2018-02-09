@@ -317,6 +317,7 @@ platforms.each do |platform|
           opal/test_base64.rb
           opal/test_openuri.rb
           opal/unsupported_and_bugs.rb
+          opal/test_matrix.rb
         ]
       end
       Testing::HTTPServer.new.with_server do |session|
