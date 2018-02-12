@@ -46,3 +46,10 @@ describe "String#to_json" do
     "bar\nbaz".to_json.should == "\"bar\\nbaz\""
   end
 end
+
+describe "Numeric#to_json" do
+  it "returns a string representing the number" do
+    42.to_json.should == "42"
+    3.142.to_json.should == "3.142"
+  end
+end
