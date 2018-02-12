@@ -120,16 +120,7 @@ module Opal
       end
 
       def wrap_with_definition
-        if    scope.iter?                   then unshift "Opal.def(self, '$#{mid}', "
-        elsif scope.module? || scope.class? then unshift "Opal.defn(self, '$#{mid}', "
-        elsif scope.sclass?                 then unshift "Opal.defn(self, '$#{mid}', "
-        elsif compiler.eval?                then unshift "Opal.def(self, '$#{mid}', "
-        elsif scope.top?                    then unshift "Opal.def(self, '$#{mid}', "
-        elsif scope.def?                    then unshift "Opal.def(self, '$#{mid}', "
-        else raise "Unsupported use of `def`; please file a bug at https://github.com/opal/opal/issues/new reporting this message."
-        end
-
-        push ')'
+        wrap "Opal.def(self, '$#{mid}', ", ')'
 
         if expr?
           wrap '(', ", nil) && '#{mid}'"
