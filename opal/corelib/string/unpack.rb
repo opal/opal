@@ -686,6 +686,15 @@ class String
       'p': null
     }
 
+    var optimized = {
+      'C*': identityFunction,
+      'c*': toNByteSigned(1, identityFunction),
+      'A*': wrapIntoArray(joinChars(bytesToAsciiChars(filterTrailingZerosAndSpaces(identityFunction)))),
+      'a*': wrapIntoArray(joinChars(bytesToAsciiChars(identityFunction))),
+      'M*': qpdecode(joinChars(bytesToAsciiChars(identityFunction))),
+      'm*': base64Decode(joinChars(bytesToAsciiChars(identityFunction)))
+    }
+
     function alias(existingDirective, newDirective) {
       readChunk[newDirective] = readChunk[existingDirective];
       handlers[newDirective] = handlers[existingDirective];
@@ -706,6 +715,12 @@ class String
       var output = [];
 
       var buffer = utf16LEToBytes(self);
+
+      // optimization
+      var optimizedHandler = optimized[format];
+      if (optimizedHandler) {
+        return optimizedHandler(buffer);
+      }
 
       function autocomplete(array, size) {
         while (array.length < size) {
@@ -740,7 +755,7 @@ class String
         var part = processChunk(directive, count);
 
         if (count !== Infinity) {
-          var shouldAutocomplete = autocompletion[directive]
+          var shouldAutocomplete = autocompletion[directive];
 
           if (shouldAutocomplete == null) {
             #{raise "Unsupported unpack directive #{`directive`.inspect} (no autocompletion rule defined)"}
