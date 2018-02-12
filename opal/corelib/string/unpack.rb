@@ -686,19 +686,13 @@ class String
       'p': null
     }
 
-    function toArray(callback) {
-      return function(data) {
-        return [callback(data)];
-      }
-    }
-
     var optimized = {
       'C*': identityFunction,
       'c*': toNByteSigned(1, identityFunction),
       'A*': wrapIntoArray(joinChars(bytesToAsciiChars(filterTrailingZerosAndSpaces(identityFunction)))),
       'a*': wrapIntoArray(joinChars(bytesToAsciiChars(identityFunction))),
-      'M*': toArray(qpdecode(joinChars(bytesToAsciiChars(identityFunction)))),
-      'm*': toArray(base64Decode(joinChars(bytesToAsciiChars(identityFunction)))),
+      'M*': wrapIntoArray(qpdecode(joinChars(bytesToAsciiChars(identityFunction)))),
+      'm*': wrapIntoArray(base64Decode(joinChars(bytesToAsciiChars(identityFunction)))),
       'S*': mapChunksToWords(chunkBy(2, identityFunction)),
       's*': toNByteSigned(2, mapChunksToWords(chunkBy(2, identityFunction))),
       'L*': mapChunksToWords(chunkBy(4, identityFunction)),
