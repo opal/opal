@@ -687,24 +687,24 @@ class String
     }
 
     var optimized = {
-      'C*': identityFunction,
-      'c*': toNByteSigned(1, identityFunction),
-      'A*': wrapIntoArray(joinChars(bytesToAsciiChars(filterTrailingZerosAndSpaces(identityFunction)))),
-      'a*': wrapIntoArray(joinChars(bytesToAsciiChars(identityFunction))),
-      'M*': wrapIntoArray(qpdecode(joinChars(bytesToAsciiChars(identityFunction)))),
-      'm*': wrapIntoArray(base64Decode(joinChars(bytesToAsciiChars(identityFunction)))),
-      'S*': mapChunksToWords(chunkBy(2, identityFunction)),
-      's*': toNByteSigned(2, mapChunksToWords(chunkBy(2, identityFunction))),
-      'L*': mapChunksToWords(chunkBy(4, identityFunction)),
-      'l*': toNByteSigned(4, mapChunksToWords(chunkBy(4, identityFunction))),
-      'Q*': mapChunksToWords(chunkBy(8, identityFunction)),
-      'q*': toNByteSigned(8, mapChunksToWords(chunkBy(8, identityFunction))),
-      'S>*': mapChunksToWords(invertChunks(chunkBy(2, identityFunction))),
-      's>*': toNByteSigned(2, mapChunksToWords(invertChunks(chunkBy(2, identityFunction)))),
-      'L>*': mapChunksToWords(invertChunks(chunkBy(4, identityFunction))),
-      'l>*': toNByteSigned(4, mapChunksToWords(invertChunks(chunkBy(4, identityFunction)))),
-      'Q>*': mapChunksToWords(invertChunks(chunkBy(8, identityFunction))),
-      'q>*': toNByteSigned(8, mapChunksToWords(invertChunks(chunkBy(8, identityFunction))))
+      'C*': handlers['C'],
+      'c*': handlers['c'],
+      'A*': handlers['A'],
+      'a*': handlers['a'],
+      'M*': wrapIntoArray(handlers['M']),
+      'm*': wrapIntoArray(handlers['m']),
+      'S*': handlers['S'],
+      's*': handlers['s'],
+      'L*': handlers['L'],
+      'l*': handlers['l'],
+      'Q*': handlers['Q'],
+      'q*': handlers['q'],
+      'S>*': handlers['S>'],
+      's>*': handlers['s>'],
+      'L>*': handlers['L>'],
+      'l>*': handlers['l>'],
+      'Q>*': handlers['Q>'],
+      'q>*': handlers['q>']
     }
 
     function alias(existingDirective, newDirective) {
