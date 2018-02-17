@@ -153,9 +153,20 @@ module Opal
     end
 
     def processor_for(source, filename, path, options)
+      if path
+        first_extname = File.extname(path)
+        second_path = path[0...(-first_extname.length)]
+        second_extname = File.extname(second_path)
+      end
       processor = processors.find { |p| p.match? path } or
         raise ProcessorNotFound, "can't find processor for filename: #{filename.inspect}, path: #{path.inspect}, source: #{source.inspect}, processors: #{processors.inspect}"
-      processor.new(source, filename, compiler_options.merge(options))
+      asset = processor.new(source, filename, compiler_options.merge(options))
+      if path && second_extname != '' && !(second_extname == '.js' && first_extname == '.rb') # *.js.rb is handled by the opal compiler
+        second_processor = processors.find { |p| p.match? second_path } or
+          raise ProcessorNotFound, "can't find processor for '#{second_extname}' part of filename: #{filename.inspect}, path: #{path.inspect}, source: #{source.inspect}, processors: #{processors.inspect}"
+        return second_processor.new(asset.to_s, filename, compiler_options.merge(options))
+      end
+      asset
     end
 
     def read(path)
