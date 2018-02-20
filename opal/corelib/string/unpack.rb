@@ -686,6 +686,27 @@ class String
       'p': null
     }
 
+    var optimized = {
+      'C*': handlers['C'],
+      'c*': handlers['c'],
+      'A*': handlers['A'],
+      'a*': handlers['a'],
+      'M*': wrapIntoArray(handlers['M']),
+      'm*': wrapIntoArray(handlers['m']),
+      'S*': handlers['S'],
+      's*': handlers['s'],
+      'L*': handlers['L'],
+      'l*': handlers['l'],
+      'Q*': handlers['Q'],
+      'q*': handlers['q'],
+      'S>*': handlers['S>'],
+      's>*': handlers['s>'],
+      'L>*': handlers['L>'],
+      'l>*': handlers['l>'],
+      'Q>*': handlers['Q>'],
+      'q>*': handlers['q>']
+    }
+
     function alias(existingDirective, newDirective) {
       readChunk[newDirective] = readChunk[existingDirective];
       handlers[newDirective] = handlers[existingDirective];
@@ -706,6 +727,12 @@ class String
       var output = [];
 
       var buffer = utf16LEToBytes(self);
+
+      // optimization
+      var optimizedHandler = optimized[format];
+      if (optimizedHandler) {
+        return optimizedHandler(buffer);
+      }
 
       function autocomplete(array, size) {
         while (array.length < size) {
@@ -740,7 +767,7 @@ class String
         var part = processChunk(directive, count);
 
         if (count !== Infinity) {
-          var shouldAutocomplete = autocompletion[directive]
+          var shouldAutocomplete = autocompletion[directive];
 
           if (shouldAutocomplete == null) {
             #{raise "Unsupported unpack directive #{`directive`.inspect} (no autocompletion rule defined)"}
