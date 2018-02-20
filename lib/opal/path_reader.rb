@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+
 require 'opal/regexp_anchors'
 require 'hike'
 
 module Opal
   class PathReader
-    RELATIVE_PATH_REGEXP = %r{#{Opal::REGEXP_START}\.?\.#{Regexp.quote File::SEPARATOR}}
-    DEFAULT_EXTENSIONS = ['.js', '.js.rb', '.rb', '.opalerb']
+    RELATIVE_PATH_REGEXP = /#{Opal::REGEXP_START}\.?\.#{Regexp.quote File::SEPARATOR}/
+    DEFAULT_EXTENSIONS = ['.js', '.js.rb', '.rb', '.opalerb'].freeze
 
     def initialize(paths = Opal.paths, extensions = DEFAULT_EXTENSIONS)
       @file_finder = Hike::Trail.new
@@ -16,7 +17,7 @@ module Opal
     def read(path)
       full_path = expand(path)
       return nil if full_path.nil?
-      File.open(full_path, 'rb:UTF-8'){|f| f.read}
+      File.open(full_path, 'rb:UTF-8', &:read)
     end
 
     def expand(path)
@@ -43,7 +44,7 @@ module Opal
 
     def find_path(path)
       pathname = Pathname(path)
-      return path if pathname.absolute? and pathname.exist?
+      return path if pathname.absolute? && pathname.exist?
       file_finder.find(path)
     end
 

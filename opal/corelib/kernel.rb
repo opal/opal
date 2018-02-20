@@ -8,11 +8,11 @@ module Kernel
   end
 
   def !~(obj)
-    not(self =~ obj)
+    !(self =~ obj)
   end
 
   def ===(other)
-    self.object_id == other.object_id || self == other
+    object_id == other.object_id || self == other
   end
 
   def <=>(other)
@@ -181,7 +181,7 @@ module Kernel
   def exit(status = true)
     $__at_exit__ ||= []
 
-    while $__at_exit__.size > 0
+    until $__at_exit__.empty?
       block = $__at_exit__.pop
       block.call
     end
@@ -846,7 +846,7 @@ module Kernel
 
       if (!value.$$is_string) {
         if (base !== undefined) {
-          #{raise ArgumentError, "base specified for non string value"}
+          #{raise ArgumentError, 'base specified for non string value'}
         }
         if (value === nil) {
           #{raise TypeError, "can't convert nil into Integer"}
@@ -960,7 +960,7 @@ module Kernel
   def Hash(arg)
     return {} if arg.nil? || arg == []
     return arg if Hash === arg
-    return Opal.coerce_to!(arg, Hash, :to_hash)
+    Opal.coerce_to!(arg, Hash, :to_hash)
   end
 
   def is_a?(klass)
@@ -993,7 +993,7 @@ module Kernel
   def loop
     return enum_for(:loop) { Float::INFINITY } unless block_given?
 
-    while true do
+    while true
       begin
         yield
       rescue StopIteration => e
@@ -1011,7 +1011,7 @@ module Kernel
   alias object_id __id__
 
   def printf(*args)
-    if args.length > 0
+    if args.any?
       print format(*args)
     end
 
@@ -1020,7 +1020,7 @@ module Kernel
 
   def proc(&block)
     unless block
-      raise ArgumentError, "tried to create Proc object without a block"
+      raise ArgumentError, 'tried to create Proc object without a block'
     end
 
     `block.$$is_lambda = false`
@@ -1047,8 +1047,8 @@ module Kernel
 
   def raise(exception = undefined, string = nil, _backtrace = nil)
     %x{
-      if (exception == null && #$! !== nil) {
-        throw #$!;
+      if (exception == null && #{$!} !== nil) {
+        throw #{$!};
       }
       if (exception == null) {
         exception = #{RuntimeError.new};
@@ -1060,18 +1060,18 @@ module Kernel
       else if (exception.$$is_class && #{exception.respond_to?(:exception)}) {
         exception = #{exception.exception string};
       }
-      else if (#{exception.kind_of?(Exception)}) {
+      else if (#{exception.is_a?(Exception)}) {
         // exception is fine
       }
       else {
         exception = #{TypeError.new 'exception class/object expected'};
       }
 
-      if (#$! !== nil) {
-        Opal.exceptions.push(#$!);
+      if (#{$!} !== nil) {
+        Opal.exceptions.push(#{$!});
       }
 
-      #$! = exception;
+      #{$!} = exception;
 
       throw exception;
     }
@@ -1166,7 +1166,7 @@ module Kernel
         #{raise TypeError, "can't convert #{seconds.class} into time interval"}
       }
       if (seconds < 0) {
-        #{raise ArgumentError, "time interval must be positive"}
+        #{raise ArgumentError, 'time interval must be positive'}
       }
       var get_time = Opal.global.performance ?
         function() {return performance.now()} :
@@ -1210,7 +1210,7 @@ module Kernel
   end
 
   def throw(*args)
-    raise UncaughtThrowError.new(args)
+    raise UncaughtThrowError, args
   end
 
   # basic implementation of open, delegate to File.open

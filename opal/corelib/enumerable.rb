@@ -16,9 +16,9 @@ module Enumerable
   def all?(pattern = undefined, &block)
     if `pattern !== undefined`
       each do |*value|
-        value = `comparableForPattern(value)`
+        comparable = `comparableForPattern(value)`
 
-        return false unless pattern.public_send(:===, *value)
+        return false unless pattern.public_send(:===, *comparable)
       end
     elsif block_given?
       each do |*value|
@@ -40,9 +40,9 @@ module Enumerable
   def any?(pattern = undefined, &block)
     if `pattern !== undefined`
       each do |*value|
-        value = `comparableForPattern(value)`
+        comparable = `comparableForPattern(value)`
 
-        return true if pattern.public_send(:===, *value)
+        return true if pattern.public_send(:===, *comparable)
       end
     elsif block_given?
       each do |*value|
@@ -62,7 +62,7 @@ module Enumerable
   end
 
   def chunk(&block)
-    return to_enum(:chunk) { self.enumerator_size } unless block_given?
+    return to_enum(:chunk) { enumerator_size } unless block_given?
 
     ::Enumerator.new do |yielder|
       %x{
@@ -101,13 +101,13 @@ module Enumerable
   end
 
   def chunk_while(&block)
-    raise ArgumentError, "no block given" unless block_given?
+    raise ArgumentError, 'no block given' unless block_given?
 
     slice_when { |before, after| !(yield before, after) }
   end
 
   def collect(&block)
-    return enum_for(:collect){self.enumerator_size} unless block_given?
+    return enum_for(:collect) { enumerator_size } unless block_given?
 
     %x{
       var result = [];
@@ -125,7 +125,7 @@ module Enumerable
   end
 
   def collect_concat(&block)
-    return enum_for(:collect_concat){self.enumerator_size} unless block_given?
+    return enum_for(:collect_concat) { enumerator_size } unless block_given?
     map { |item| yield item }.flatten(1)
   end
 
@@ -154,14 +154,16 @@ module Enumerable
   end
 
   def cycle(n = nil, &block)
-    return enum_for(:cycle, n) {
-      if n == nil
-        respond_to?(:size) ? Float::INFINITY : nil
-      else
-        n = Opal.coerce_to!(n, Integer, :to_int)
-        n > 0 ? self.enumerator_size * n : 0
+    unless block_given?
+      return enum_for(:cycle, n) do
+        if n.nil?
+          respond_to?(:size) ? Float::INFINITY : nil
+        else
+          n = Opal.coerce_to!(n, Integer, :to_int)
+          n > 0 ? enumerator_size * n : 0
+        end
       end
-    } unless block_given?
+    end
 
     unless n.nil?
       n = Opal.coerce_to! n, Integer, :to_int
@@ -236,7 +238,7 @@ module Enumerable
     number = Opal.coerce_to number, Integer, :to_int
 
     if `number < 0`
-      raise ArgumentError, "attempt to drop negative size"
+      raise ArgumentError, 'attempt to drop negative size'
     end
 
     %x{
@@ -298,8 +300,8 @@ module Enumerable
     end
 
     unless block_given?
-      return enum_for(:each_cons, n) {
-        enum_size = self.enumerator_size
+      return enum_for(:each_cons, n) do
+        enum_size = enumerator_size
         if enum_size.nil?
           nil
         elsif enum_size == 0 || enum_size < n
@@ -307,7 +309,7 @@ module Enumerable
         else
           enum_size - n + 1
         end
-      }
+      end
     end
 
     %x{
@@ -355,7 +357,7 @@ module Enumerable
       raise ArgumentError, 'invalid slice size'
     end
 
-    return enum_for(:each_slice, n){respond_to?(:size) ? (size / n).ceil : nil} unless block_given?
+    return enum_for(:each_slice, n) { respond_to?(:size) ? (size / n).ceil : nil } unless block_given?
 
     %x{
       var result,
@@ -388,7 +390,7 @@ module Enumerable
   end
 
   def each_with_index(*args, &block)
-    return enum_for(:each_with_index, *args){self.enumerator_size} unless block_given?
+    return enum_for(:each_with_index, *args) { enumerator_size } unless block_given?
 
     %x{
       var result,
@@ -413,7 +415,7 @@ module Enumerable
   end
 
   def each_with_object(object, &block)
-    return enum_for(:each_with_object, object){self.enumerator_size} unless block_given?
+    return enum_for(:each_with_object, object) { enumerator_size } unless block_given?
 
     %x{
       var result;
@@ -451,7 +453,7 @@ module Enumerable
   alias find detect
 
   def find_all(&block)
-    return enum_for(:find_all){self.enumerator_size} unless block_given?
+    return enum_for(:find_all) { enumerator_size } unless block_given?
 
     %x{
       var result = [];
@@ -541,16 +543,15 @@ module Enumerable
 
     each do |*value|
       cmp = `comparableForPattern(value)`
-      if pattern.__send__(:===, *cmp)
-        if block_given?
-          value = [value] if value.length > 1
-          value = yield(*value)
-        else
-          value = value[0] if value.length <= 1
-        end
-
-        result.push(value)
+      next unless pattern.__send__(:===, *cmp)
+      if block_given?
+        value = [value] if value.length > 1
+        value = yield(*value)
+      elsif value.length <= 1
+        value = value[0]
       end
+
+      result.push(value)
     end
 
     result
@@ -561,25 +562,24 @@ module Enumerable
 
     each do |*value|
       cmp = `comparableForPattern(value)`
-      unless pattern.__send__(:===, *cmp)
-        if block_given?
-          value = [value] if value.length > 1
-          value = yield(*value)
-        else
-          value = value[0] if value.length <= 1
-        end
-
-        result.push(value)
+      next if pattern.__send__(:===, *cmp)
+      if block_given?
+        value = [value] if value.length > 1
+        value = yield(*value)
+      elsif value.length <= 1
+        value = value[0]
       end
+
+      result.push(value)
     end
 
     result
   end
 
   def group_by(&block)
-    return enum_for(:group_by){self.enumerator_size} unless block_given?
+    return enum_for(:group_by) { enumerator_size } unless block_given?
 
-    hash = Hash.new
+    hash = {}
 
     %x{
       var result;
@@ -658,9 +658,9 @@ module Enumerable
   end
 
   def lazy
-    Enumerator::Lazy.new(self, enumerator_size) {|enum, *args|
+    Enumerator::Lazy.new(self, enumerator_size) do |enum, *args|
       enum.yield(*args)
-    }
+    end
   end
 
   def enumerator_size
@@ -689,7 +689,7 @@ module Enumerable
           }
 
           if (value === nil) {
-            #{raise ArgumentError, "comparison failed"};
+            #{raise ArgumentError, 'comparison failed'};
           }
 
           if (value > 0) {
@@ -713,7 +713,7 @@ module Enumerable
   end
 
   def max_by(&block)
-    return enum_for(:max_by){self.enumerator_size} unless block
+    return enum_for(:max_by) { enumerator_size } unless block
 
     %x{
       var result,
@@ -759,7 +759,7 @@ module Enumerable
           var value = block(param, result);
 
           if (value === nil) {
-            #{raise ArgumentError, "comparison failed"};
+            #{raise ArgumentError, 'comparison failed'};
           }
 
           if (value < 0) {
@@ -789,7 +789,7 @@ module Enumerable
   end
 
   def min_by(&block)
-    return enum_for(:min_by){self.enumerator_size} unless block
+    return enum_for(:min_by) { enumerator_size } unless block
 
     %x{
       var result,
@@ -818,7 +818,7 @@ module Enumerable
   end
 
   def minmax(&block)
-    block ||= proc { |a,b| a <=> b }
+    block ||= proc { |a, b| a <=> b }
 
     %x{
       var min = nil, max = nil, first_time = true;
@@ -860,9 +860,9 @@ module Enumerable
   def none?(pattern = undefined, &block)
     if `pattern !== undefined`
       each do |*value|
-        value = `comparableForPattern(value)`
+        comparable = `comparableForPattern(value)`
 
-        return false if pattern.public_send(:===, *value)
+        return false if pattern.public_send(:===, *comparable)
       end
     elsif block_given?
       each do |*value|
@@ -886,28 +886,26 @@ module Enumerable
 
     if `pattern !== undefined`
       each do |*value|
-        value = `comparableForPattern(value)`
+        comparable = `comparableForPattern(value)`
 
-        if pattern.public_send(:===, *value)
+        if pattern.public_send(:===, *comparable)
           count += 1
           return false if count > 1
         end
       end
     elsif block_given?
       each do |*value|
-        if yield(*value)
-          count += 1
+        next unless yield(*value)
+        count += 1
 
-          return false if count > 1
-        end
+        return false if count > 1
       end
     else
       each do |*value|
-        if Opal.destructure(value)
-          count += 1
+        next unless Opal.destructure(value)
+        count += 1
 
-          return false if count > 1
-        end
+        return false if count > 1
       end
     end
 
@@ -915,7 +913,7 @@ module Enumerable
   end
 
   def partition(&block)
-    return enum_for(:partition){self.enumerator_size} unless block_given?
+    return enum_for(:partition) { enumerator_size } unless block_given?
 
     %x{
       var truthy = [], falsy = [], result;
@@ -941,7 +939,7 @@ module Enumerable
   alias reduce inject
 
   def reject(&block)
-    return enum_for(:reject){self.enumerator_size} unless block_given?
+    return enum_for(:reject) { enumerator_size } unless block_given?
 
     %x{
       var result = [];
@@ -962,7 +960,7 @@ module Enumerable
   end
 
   def reverse_each(&block)
-    return enum_for(:reverse_each){self.enumerator_size} unless block_given?
+    return enum_for(:reverse_each) { enumerator_size } unless block_given?
 
     %x{
       var result = [];
@@ -985,14 +983,14 @@ module Enumerable
 
   def slice_before(pattern = undefined, &block)
     if `pattern === undefined && block === nil`
-      raise ArgumentError, "both pattern and block are given"
+      raise ArgumentError, 'both pattern and block are given'
     end
 
     if `pattern !== undefined && block !== nil || arguments.length > 1`
       raise ArgumentError, "wrong number of arguments (#{`arguments.length`} expected 1)"
     end
 
-    Enumerator.new {|e|
+    Enumerator.new do |e|
       %x{
         var slice = [];
 
@@ -1044,12 +1042,12 @@ module Enumerable
           #{e << `slice`};
         }
       }
-    }
+    end
   end
 
   def slice_after(pattern = undefined, &block)
     if `pattern === undefined && block === nil`
-      raise ArgumentError, "both pattern and block are given"
+      raise ArgumentError, 'both pattern and block are given'
     end
 
     if `pattern !== undefined && block !== nil || arguments.length > 1`
@@ -1091,7 +1089,7 @@ module Enumerable
   end
 
   def slice_when(&block)
-    raise ArgumentError, "wrong number of arguments (0 for 1)" unless block_given?
+    raise ArgumentError, 'wrong number of arguments (0 for 1)' unless block_given?
 
     Enumerator.new do |yielder|
       %x{
@@ -1130,30 +1128,30 @@ module Enumerable
 
   def sort(&block)
     ary = to_a
-    block = -> a,b {a <=> b} unless block_given?
-    return ary.sort(&block)
+    block = ->(a, b) { a <=> b } unless block_given?
+    ary.sort(&block)
   end
 
   def sort_by(&block)
-    return enum_for(:sort_by){self.enumerator_size} unless block_given?
+    return enum_for(:sort_by) { enumerator_size } unless block_given?
 
-    dup = map {
+    dup = map do
       arg = Opal.destructure(`arguments`)
       [yield(arg), arg]
-    }
+    end
     dup.sort! { |a, b| `a[0]` <=> `b[0]` }
     dup.map! { |i| `i[1]` }
   end
 
-  def sum(initial = 0, &block)
+  def sum(initial = 0)
     result = initial
 
     each do |*args|
-      if block_given?
-        item = block.call(*args)
-      else
-        item = Opal.destructure(args)
-      end
+      item = if block_given?
+               yield(*args)
+             else
+               Opal.destructure(args)
+             end
       result += item
     end
 
@@ -1187,12 +1185,12 @@ module Enumerable
       value = Opal.destructure(args)
 
       produced = if block_given?
-        block.call(value)
-      else
-        value
-      end
+                   yield(value)
+                 else
+                   value
+                 end
 
-      unless hash.has_key?(produced)
+      unless hash.key?(produced)
         hash[produced] = value
       end
     end

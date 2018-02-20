@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'set'
 
 module Opal
@@ -19,11 +20,11 @@ module Opal
     #   @!attribute [rw] $1
     def config_option(name, default_value, options = {})
       compiler      = options.fetch(:compiler_option, nil)
-      valid_values  = options.fetch(:valid_values , [true, false])
+      valid_values  = options.fetch(:valid_values, [true, false])
 
       config_options[name] = {
         default: default_value,
-        compiler: compiler,
+        compiler: compiler
       }
 
       define_singleton_method(name) { config.fetch(name, default_value) }
@@ -72,7 +73,6 @@ module Opal
       @config = nil
     end
 
-
     # Enable method_missing support.
     #
     # @return [true, false]
@@ -105,7 +105,7 @@ module Opal
     # - `:ignore` will skip the require silently at compile time
     #
     # @return [:error, :warning, :ignore]
-    config_option :dynamic_require_severity, :warning, compiler_option: :dynamic_require_severity, valid_values: [:error, :warning, :ignore]
+    config_option :dynamic_require_severity, :warning, compiler_option: :dynamic_require_severity, valid_values: %i[error warning ignore]
 
     # Enable IRB support for making local variables across multiple compilations.
     #

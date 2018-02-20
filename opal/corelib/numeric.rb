@@ -42,7 +42,7 @@ class Numeric
   end
 
   def %(other)
-    self - other * self.div(other)
+    self - other * div(other)
   end
 
   def abs
@@ -74,7 +74,7 @@ class Numeric
   end
 
   def div(other)
-    raise ZeroDivisionError, "divided by o" if other == 0
+    raise ZeroDivisionError, 'divided by o' if other == 0
 
     (self / other).floor
   end
@@ -84,7 +84,7 @@ class Numeric
   end
 
   def fdiv(other)
-    self.to_f / other
+    to_f / other
   end
 
   def floor(ndigits = 0)
@@ -120,7 +120,7 @@ class Numeric
   alias phase arg
 
   def polar
-    return abs, arg
+    [abs, arg]
   end
 
   def quo(other)

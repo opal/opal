@@ -26,9 +26,9 @@ class Method
 
   def call(*args, &block)
     %x{
-      #@method.$$p = block;
+      #{@method}.$$p = block;
 
-      return #@method.apply(#@receiver, args);
+      return #{@method}.apply(#{@receiver}, args);
     }
   end
 
@@ -41,7 +41,7 @@ class Method
   def to_proc
     %x{
       var proc = self.$call.bind(self);
-      proc.$$unbound = #@method;
+      proc.$$unbound = #{@method};
       proc.$$is_lambda = true;
       return proc;
     }

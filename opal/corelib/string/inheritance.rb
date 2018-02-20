@@ -19,7 +19,7 @@ end
 class String::Wrapper
   `def.$$is_string = true`
 
-  def self.allocate(string = "")
+  def self.allocate(string = '')
     obj = super()
     `obj.literal = string`
     obj
@@ -43,7 +43,7 @@ class String::Wrapper
     result = @literal.__send__(*args, &block)
 
     if `result.$$is_string != null`
-      if `result == #@literal`
+      if `result == #{@literal}`
         self
       else
         self.class.allocate(result)
@@ -96,7 +96,7 @@ class String::Wrapper
   end
 
   def split(pattern = undefined, limit = undefined)
-    @literal.split(pattern, limit).map{|str| self.class.allocate(str)}
+    @literal.split(pattern, limit).map { |str| self.class.allocate(str) }
   end
 
   def replace(string)
@@ -105,7 +105,7 @@ class String::Wrapper
 
   def each_line(separator = $/)
     return enum_for :each_line, separator unless block_given?
-    @literal.each_line(separator){|str| yield self.class.allocate(str)}
+    @literal.each_line(separator) { |str| yield self.class.allocate(str) }
   end
 
   def lines(separator = $/, &block)

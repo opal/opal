@@ -6,7 +6,7 @@ class Rational < Numeric
     den = den.to_i
 
     if den == 0
-      raise ZeroDivisionError, "divided by 0"
+      raise ZeroDivisionError, 'divided by 0'
     elsif den < 0
       num = -num
       den = -den
@@ -21,7 +21,7 @@ class Rational < Numeric
 
   def self.convert(num, den)
     if num.nil? || den.nil?
-      raise TypeError, "cannot convert nil into Rational"
+      raise TypeError, 'cannot convert nil into Rational'
     end
 
     if Integer === num && Integer === den
@@ -44,8 +44,6 @@ class Rational < Numeric
       reduce(num, den)
     end
   end
-
-  attr_reader :numerator, :denominator
 
   def initialize(num, den)
     @num = num
@@ -189,31 +187,31 @@ class Rational < Numeric
     case other
     when Integer
       if self == 0 && other < 0
-        return Float::INFINITY
+        Float::INFINITY
       elsif other > 0
-        Rational(@num ** other, @den ** other)
+        Rational(@num**other, @den**other)
       elsif other < 0
-        Rational(@den ** -other, @num ** -other)
+        Rational(@den**-other, @num**-other)
       else
         Rational(1, 1)
       end
 
     when Float
-      to_f ** other
+      to_f**other
 
     when Rational
       if other == 0
         Rational(1, 1)
       elsif other.denominator == 1
         if other < 0
-          Rational(@den ** other.numerator.abs, @num ** other.numerator.abs)
+          Rational(@den**other.numerator.abs, @num**other.numerator.abs)
         else
-          Rational(@num ** other.numerator, @den ** other.numerator)
+          Rational(@num**other.numerator, @den**other.numerator)
         end
       elsif self == 0 && other < 0
-        raise ZeroDivisionError, "divided by 0"
+        raise ZeroDivisionError, 'divided by 0'
       else
-        to_f ** other
+        to_f**other
       end
 
     else
@@ -244,11 +242,11 @@ class Rational < Numeric
   end
 
   def hash
-    "Rational:#@num:#@den"
+    "Rational:#{@num}:#{@den}"
   end
 
   def inspect
-    "(#{to_s})"
+    "(#{self})"
   end
 
   alias quo /
@@ -329,7 +327,7 @@ class Rational < Numeric
   end
 
   def to_s
-    "#@num/#@den"
+    "#{@num}/#{@den}"
   end
 
   def truncate(precision = 0)
@@ -341,9 +339,9 @@ class Rational < Numeric
   end
 
   def with_precision(method, precision)
-    raise TypeError, "not an Integer" unless Integer === precision
+    raise TypeError, 'not an Integer' unless Integer === precision
 
-    p = 10 ** precision
+    p = 10**precision
     s = self * p
 
     if precision < 1

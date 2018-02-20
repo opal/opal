@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'source_map'
 
 module Opal
@@ -13,7 +14,7 @@ module Opal
 
     def map
       @map ||= begin
-        source_file = file+'.rb'
+        source_file = file + '.rb'
         generated_line, generated_column = 1, 0
 
         mappings = @fragments.map do |fragment|
@@ -22,7 +23,7 @@ module Opal
           source_column = fragment.column
           source_code   = fragment.code
 
-          if source_line and source_column
+          if source_line && source_column
             source_offset    = ::SourceMap::Offset.new(source_line, source_column)
             generated_offset = ::SourceMap::Offset.new(generated_line, generated_column)
 
@@ -30,7 +31,7 @@ module Opal
               source_file,
               generated_offset,
               source_offset,
-              fragment.source_map_name
+              fragment.source_map_name,
             )
           end
 
@@ -48,8 +49,8 @@ module Opal
 
         # Ensure mappings isn't empty: https://github.com/maccman/sourcemap/issues/11
         unless mappings.any?
-          zero_offset = ::SourceMap::Offset.new(0,0)
-          mappings = [::SourceMap::Mapping.new(source_file,zero_offset,zero_offset)]
+          zero_offset = ::SourceMap::Offset.new(0, 0)
+          mappings = [::SourceMap::Mapping.new(source_file, zero_offset, zero_offset)]
         end
 
         ::SourceMap::Map.new(mappings.compact)
@@ -68,7 +69,7 @@ module Opal
       map.to_s
     end
 
-    def magic_comment map_path
+    def magic_comment(map_path)
       "\n//# sourceMappingURL=file://#{map_path}"
     end
   end

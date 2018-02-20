@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -26,11 +27,11 @@ module Opal
           offset = @sexp.meta[:offset]
           # restarg value should be taken directly from parameters
           line "var $args_len = arguments.length, $rest_len = $args_len - #{offset};"
-          line "if ($rest_len < 0) { $rest_len = 0; }"
+          line 'if ($rest_len < 0) { $rest_len = 0; }'
           line "#{name} = new Array($rest_len);"
           line "for (var $arg_idx = #{offset}; $arg_idx < $args_len; $arg_idx++) {"
           line "  #{name}[$arg_idx - #{offset}] = arguments[$arg_idx];"
-          line "}"
+          line '}'
         end
       end
     end

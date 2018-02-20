@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -114,11 +115,11 @@ module Opal
           js_source = @sexp.meta[:js_source]
           scope.working_arguments = "#{js_source}_args"
         else
-          js_source = "arguments"
-          scope.working_arguments = "$post_args"
+          js_source = 'arguments'
+          scope.working_arguments = '$post_args'
         end
 
-        add_temp "#{scope.working_arguments}"
+        add_temp scope.working_arguments
         line "#{scope.working_arguments} = Opal.slice.call(#{js_source}, #{scope.inline_args.size}, #{js_source}.length);"
 
         extract_arguments
@@ -150,7 +151,7 @@ module Opal
         indent do
           line "#{var_name} = #{scope.working_arguments}.splice(0,1)[0];"
         end
-        line "}"
+        line '}'
         push process(optarg)
       end
 
@@ -158,6 +159,7 @@ module Opal
         push process(arg)
       end
 
+      # rubocop:disable Layout/IndentationConsistency
       def compile_restarg
         return unless restarg
 
@@ -166,13 +168,14 @@ module Opal
             # there are some items coming to the splat, extracting them
             extract_restarg
           end
-        line "} else {"
+        line '} else {'
           indent do
             # splat is empty
             extract_blank_restarg
           end
-        line "}"
+        line '}'
       end
+      # rubocop:enable Layout/IndentationConsistency
 
       def extract_restarg
         extract_code = "#{scope.working_arguments}.splice(0, #{scope.working_arguments}.length - #{required_right_args.size});"

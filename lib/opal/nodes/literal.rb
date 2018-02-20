@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -36,18 +37,18 @@ module Opal
       children :value
 
       ESCAPE_CHARS = {
-        ?a => '\\u0007',
-        ?e => '\\u001b'
-      }
+        'a' => '\\u0007',
+        'e' => '\\u001b'
+      }.freeze
 
       ESCAPE_REGEX = /(\\+)([#{ ESCAPE_CHARS.keys.join('') }])/
 
       def translate_escape_chars(inspect_string)
         inspect_string.gsub(ESCAPE_REGEX) do |original|
-          if $1.length.even?
+          if Regexp.last_match(1).length.even?
             original
           else
-            $1.chop + ESCAPE_CHARS[$2]
+            Regexp.last_match(1).chop + ESCAPE_CHARS[Regexp.last_match(2)]
           end
         end
       end
@@ -57,8 +58,8 @@ module Opal
         encoding = string_value.encoding
         should_encode = encoding != Encoding::UTF_8
 
-        sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do |match|
-          code_point = $1.to_i(16)
+        sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do
+          code_point = Regexp.last_match(1).to_i(16)
           to_utf16(code_point)
         end
         push translate_escape_chars(sanitized_value)
@@ -71,9 +72,9 @@ module Opal
       # http://www.2ality.com/2013/09/javascript-unicode.html
       def to_utf16(code_point)
         ten_bits = 0b1111111111
-        u = -> (code_unit) { '\\u'+code_unit.to_s(16).upcase }
+        u = ->(code_unit) { '\\u' + code_unit.to_s(16).upcase }
 
-        return u.(code_point) if code_point <= 0xFFFF
+        return u.call(code_point) if code_point <= 0xFFFF
 
         code_point -= 0x10000
 
@@ -83,7 +84,7 @@ module Opal
         # Mask to get least significant 10 bits
         tail_surrogate = 0xDC00 + (code_point & ten_bits)
 
-        u.(lead_surrogate) + u.(tail_surrogate)
+        u.call(lead_surrogate) + u.call(tail_surrogate)
       end
     end
 
@@ -130,9 +131,9 @@ module Opal
 
       def compile_dynamic_regexp
         if flags.any?
-          push "new RegExp(", expr(value), ", '#{flags.join}')"
+          push 'new RegExp(', expr(value), ", '#{flags.join}')"
         else
-          push "new RegExp(", expr(value), ')'
+          push 'new RegExp(', expr(value), ')'
         end
       end
 
@@ -153,16 +154,16 @@ module Opal
         *values, flags_sexp = *children
         self.flags = flags_sexp.children.map(&:to_s)
 
-        case values.length
-        when 0
-          # empty regexp, we can process it inline
-          self.value = s(:str, '')
-        when 1
-          # simple plain regexp, we can put it inline
-          self.value = values[0]
-        else
-          self.value = s(:dstr, *values)
-        end
+        self.value = case values.length
+                     when 0
+                       # empty regexp, we can process it inline
+                       s(:str, '')
+                     when 1
+                       # simple plain regexp, we can put it inline
+                       values[0]
+                     else
+                       s(:dstr, *values)
+                     end
 
         # trimming when //x provided
         # required by parser gem, but JS doesn't support 'x' flag
@@ -182,7 +183,7 @@ module Opal
 
         if value.type == :str
           # Replacing \A -> ^, \z -> $, required for the parser gem
-          self.value = s(:str, value.children[0].gsub("\\A", "^").gsub("\\z", "$"))
+          self.value = s(:str, value.children[0].gsub('\A', '^').gsub('\z', '$'))
         end
       end
 
@@ -229,7 +230,7 @@ module Opal
             # Since we need to take original source of :str
             # we have to use raw source
             # so we need to combine "return" with "raw_source"
-            push "return "
+            push 'return '
             str = child.children.first
             value = str.loc.expression.source
             push Fragment.new(value, nil)
@@ -242,7 +243,7 @@ module Opal
       end
 
       def detect_and_remove_trailing_semicolon(value, node)
-        if value.match(/;\s*#{REGEXP_END}/)
+        if value =~ /;\s*#{REGEXP_END}/
           compiler.warning 'Do not terminate one-line xstr expression with semicolon', node.line
           value.sub(/;\s*#{REGEXP_END}/, '')
         else
@@ -257,13 +258,13 @@ module Opal
       def compile
         push '""'
 
-        children.each_with_index do |part, idx|
-          push " + "
+        children.each do |part|
+          push ' + '
 
           if part.type == :str
             push part.children[0].inspect
           else
-            push "(", expr(part), ")"
+            push '(', expr(part), ')'
           end
 
           wrap '(', ')' if recv?
@@ -278,7 +279,7 @@ module Opal
     class RangeNode < Base
       children :start, :finish
 
-      SIMPLE_CHILDREN_TYPES = [:int, :float, :str, :sym]
+      SIMPLE_CHILDREN_TYPES = %i[int float str sym].freeze
 
       def compile
         if compile_inline?
@@ -324,7 +325,7 @@ module Opal
       end
 
       def compile_range_initialize
-        push 'Opal.Range.$new(', expr(start), ',' , expr(finish), ', true)'
+        push 'Opal.Range.$new(', expr(start), ',', expr(finish), ', true)'
       end
     end
 

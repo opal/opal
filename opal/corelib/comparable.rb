@@ -4,7 +4,7 @@ module Comparable
 
     return  1 if what > 0
     return -1 if what < 0
-    return  0
+    0
   end
 
   def ==(other)
@@ -64,7 +64,7 @@ module Comparable
   def between?(min, max)
     return false if self < min
     return false if self > max
-    return true
+    true
   end
 
   def clamp(min, max)
@@ -80,6 +80,6 @@ module Comparable
 
     return min if Comparable.normalize(self <=> min) < 0
     return max if Comparable.normalize(self <=> max) > 0
-    return self
+    self
   end
 end

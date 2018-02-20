@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -38,7 +39,7 @@ module Opal
 
         line "if (#{var_name} == null) {"
         line "  #{var_name} = nil;"
-        line "}"
+        line '}'
 
         line "#{var_name} = Opal.to_ary(#{var_name});"
 
@@ -52,7 +53,7 @@ module Opal
       def mlhs_name
         @mlhs_name ||= begin
           if @sexp.meta[:post]
-            result = ["$mlhs_of"]
+            result = ['$mlhs_of']
 
             children.each do |child|
               case child.type
@@ -63,7 +64,7 @@ module Opal
               end
             end
 
-            result.join("_")
+            result.join('_')
           else
             @sexp.children[0].to_s
           end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -9,18 +10,18 @@ module Opal
       children :begn, :ensr
 
       def compile
-        push "try {"
+        push 'try {'
 
         in_ensure do
           line stmt(body_sexp)
         end
 
-        line "} finally {"
+        line '} finally {'
 
         indent do
           if has_rescue_else?
             # $no_errors indicates thate there were no error raised
-            unshift "var $no_errors = true; "
+            unshift 'var $no_errors = true; '
 
             # when there's a begin;rescue;else;ensure;end statement,
             # ruby returns a result of the 'else' branch
@@ -29,24 +30,24 @@ module Opal
             # 1. save the result of calling else to $rescue_else_result
             # 2. call ensure
             # 2. return $rescue_else_result
-            line "var $rescue_else_result;"
-            line "if ($no_errors) { "
+            line 'var $rescue_else_result;'
+            line 'if ($no_errors) { '
             indent do
-              line "$rescue_else_result = (function() {"
+              line '$rescue_else_result = (function() {'
               indent do
                 line stmt(rescue_else_code)
               end
-              line "})();"
+              line '})();'
             end
-            line "}"
+            line '}'
             line compiler.process(ensr_sexp, @level)
-            line "if ($no_errors) { return $rescue_else_result; }"
+            line 'if ($no_errors) { return $rescue_else_result; }'
           else
             line compiler.process(ensr_sexp, @level)
           end
         end
 
-        line "}"
+        line '}'
 
         wrap '(function() { ', '; })()' if wrap_in_closure?
       end
@@ -64,7 +65,7 @@ module Opal
       end
 
       def wrap_in_closure?
-        recv? or expr? or has_rescue_else?
+        recv? || expr? || has_rescue_else?
       end
 
       def rescue_else_code
@@ -84,57 +85,56 @@ module Opal
         _has_rescue_handlers = false
 
         if handle_rescue_else_manually?
-          line "var $no_errors = true;"
+          line 'var $no_errors = true;'
         end
 
-        push "try {"
+        push 'try {'
         indent do
           line stmt(body_code)
         end
-        line "} catch ($err) {"
+        line '} catch ($err) {'
 
         indent do
           if has_rescue_else?
-            line "$no_errors = false;"
+            line '$no_errors = false;'
           end
 
           children[1..-1].each_with_index do |child, idx|
             # counting only rescue, ignoring rescue-else statement
-            if child && child.type == :resbody
-              _has_rescue_handlers = true
+            next unless child && child.type == :resbody
+            _has_rescue_handlers = true
 
-              push " else " unless idx == 0
-              line process(child, @level)
-            end
+            push ' else ' unless idx == 0
+            line process(child, @level)
           end
 
           # if no resbodys capture our error, then rethrow
-          push " else { throw $err; }"
+          push ' else { throw $err; }'
         end
 
-        line "}"
+        line '}'
 
         if handle_rescue_else_manually?
           # here we must add 'finally' explicitly
-          push "finally {"
+          push 'finally {'
           indent do
-            line "if ($no_errors) { "
+            line 'if ($no_errors) { '
             indent do
               line stmt(rescue_else_code)
             end
-            line "}"
+            line '}'
           end
-          push "}"
+          push '}'
         end
 
         # Wrap a try{} catch{} into a function
         # when it's an expression
         # or when there's a method call after begin;rescue;end
-        wrap '(function() { ', '})()' if expr? or recv?
+        wrap '(function() { ', '})()' if expr? || recv?
       end
 
       def body_code
-        body_code = ((body.nil? || body.type == :resbody) ? s(:nil) : body)
+        body_code = (body.nil? || body.type == :resbody ? s(:nil) : body)
         body_code = compiler.returns(body_code) unless stmt?
         body_code
       end
@@ -159,20 +159,20 @@ module Opal
       children :klasses_sexp, :lvar, :body
 
       def compile
-        push "if (Opal.rescue($err, ", expr(klasses), ")) {"
+        push 'if (Opal.rescue($err, ', expr(klasses), ')) {'
         indent do
           if lvar
             push expr(lvar), '$err;'
           end
 
           # Need to ensure we clear the current exception out after the rescue block ends
-          line "try {"
+          line 'try {'
           indent do
             line stmt(rescue_body)
           end
           line '} finally { Opal.pop_exception() }'
         end
-        line "}"
+        line '}'
       end
 
       def klasses

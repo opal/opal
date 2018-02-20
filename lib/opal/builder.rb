@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/path_reader'
 require 'opal/paths'
 require 'opal/config'
@@ -58,14 +59,14 @@ module Opal
     end
 
     def initialize(options = nil)
-      (options || {}).each_pair do |k,v|
+      (options || {}).each_pair do |k, v|
         public_send("#{k}=", v)
       end
 
       @stubs             ||= []
       @preload           ||= []
       @processors        ||= ::Opal::Builder.processors
-      @path_reader       ||= PathReader.new(Opal.paths, extensions.map{|e| [".#{e}", ".js.#{e}"]}.flatten)
+      @path_reader       ||= PathReader.new(Opal.paths, extensions.map { |e| [".#{e}", ".js.#{e}"] }.flatten)
       @prerequired       ||= []
       @compiler_options  ||= Opal::Config.compiler_options
 
@@ -81,7 +82,7 @@ module Opal
       build_str(source, path, options)
     end
 
-    def build_str source, filename, options = {}
+    def build_str(source, filename, options = {})
       path = path_from_filename(filename)
       asset = processor_for(source, filename, path, options)
       requires = preload + asset.requires + tree_requires(asset, path)
@@ -124,20 +125,19 @@ module Opal
     attr_reader :processed
 
     attr_accessor :processors, :path_reader, :compiler_options,
-                  :stubs, :prerequired, :preload
-
-
+      :stubs, :prerequired, :preload
 
     private
 
     def tree_requires(asset, path)
-      if path.nil? or path.empty?
-        dirname = Dir.pwd
-      else
-        dirname = File.dirname(File.expand_path(path))
-      end
+      dirname =
+        if path.nil? || path.empty?
+          Dir.pwd
+        else
+          File.dirname(File.expand_path(path))
+        end
 
-      paths = path_reader.paths.map{|p| File.expand_path(p)}
+      paths = path_reader.paths.map { |p| File.expand_path(p) }
 
       asset.required_trees.flat_map do |tree|
         expanded = File.expand_path(tree, dirname)
@@ -153,19 +153,24 @@ module Opal
     end
 
     def processor_for(source, filename, path, options)
-      processor = processors.find { |p| p.match? path } or
-        raise ProcessorNotFound, "can't find processor for filename: #{filename.inspect}, path: #{path.inspect}, source: #{source.inspect}, processors: #{processors.inspect}"
+      processor = processors.find { |p| p.match? path } ||
+                  raise(ProcessorNotFound, "can't find processor for filename: " \
+                                           "#{filename.inspect}, "\
+                                           "path: #{path.inspect}, "\
+                                           "source: #{source.inspect}, "\
+                                           "processors: #{processors.inspect}"
+                  )
       processor.new(source, filename, compiler_options.merge(options))
     end
 
     def read(path)
-      path_reader.read(path) or begin
-        print_list = lambda { |list| "- #{list.join("\n- ")}\n" }
-        message = "can't find file: #{path.inspect} in:\n"+
-                  print_list[path_reader.paths]+
-                  "\nWith the following extensions:\n"+
-                  print_list[path_reader.extensions]+
-                  "\nAnd the following processors:\n"+
+      path_reader.read(path) || begin
+        print_list = ->(list) { "- #{list.join("\n- ")}\n" }
+        message = "can't find file: #{path.inspect} in:\n" +
+                  print_list[path_reader.paths] +
+                  "\nWith the following extensions:\n" +
+                  print_list[path_reader.extensions] +
+                  "\nAnd the following processors:\n" +
                   print_list[processors]
 
         case compiler_options[:dynamic_require_severity]
@@ -196,7 +201,7 @@ module Opal
 
       path = path_from_filename(filename)
       asset = processor_for(source, filename, path, options.merge(requirable: true))
-      process_requires(filename, asset.requires+tree_requires(asset, path), options)
+      process_requires(filename, asset.requires + tree_requires(asset, path), options)
       processed << asset
     end
 
@@ -215,7 +220,7 @@ module Opal
       @already_processed ||= Set.new
     end
 
-    def stub? filename
+    def stub?(filename)
       stubs.include?(filename)
     end
 

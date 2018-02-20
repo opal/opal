@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -8,10 +9,10 @@ module Opal
 
       def compile
         if in_while?
-          push "continue;"
+          push 'continue;'
         else
           push expr_or_nil(value)
-          wrap "return ", ";"
+          wrap 'return ', ';'
         end
       end
 
@@ -38,20 +39,20 @@ module Opal
         elsif scope.iter?
           compile_iter
         else
-          error "void value expression: cannot use break outside of iter/while"
+          error 'void value expression: cannot use break outside of iter/while'
         end
       end
 
       def compile_while
         if while_loop[:closure]
-          push "return ", expr_or_nil(value)
+          push 'return ', expr_or_nil(value)
         else
-          push "break;"
+          push 'break;'
         end
       end
 
       def compile_iter
-        error "break must be used as a statement" unless stmt?
+        error 'break must be used as a statement' unless stmt?
 
         line 'Opal.brk(', break_val, ', $brk)'
       end
@@ -74,7 +75,7 @@ module Opal
         elsif scope.iter?
           compile_iter
         else
-          push "REDO()"
+          push 'REDO()'
         end
       end
 
@@ -101,7 +102,7 @@ module Opal
         if empty_splat?
           push '[]'
         else
-          push "Opal.to_a(", recv(value), ")"
+          push 'Opal.to_a(', recv(value), ')'
         end
       end
     end
@@ -133,7 +134,7 @@ module Opal
         helper :truthy
 
         with_temp do |tmp|
-          push "($truthy(#{tmp} = ", expr(lhs), ") ? #{tmp} : ", expr(rhs), ")"
+          push "($truthy(#{tmp} = ", expr(lhs), ") ? #{tmp} : ", expr(rhs), ')'
         end
       end
 
@@ -141,11 +142,11 @@ module Opal
         helper :truthy
 
         with_temp do |tmp|
-          push "if ($truthy(#{tmp} = ", expr(lhs), ")) {"
+          push "if ($truthy(#{tmp} = ", expr(lhs), ')) {'
           indent { line tmp }
-          line "} else {"
+          line '} else {'
           indent { line expr(rhs) }
-          line "}"
+          line '}'
         end
       end
     end
@@ -161,13 +162,13 @@ module Opal
         with_temp do |tmp|
           if truthy_opt = js_truthy_optimize(lhs)
             push "((#{tmp} = ", truthy_opt
-            push ") ? "
+            push ') ? '
             push expr(rhs)
-            push " : ", expr(lhs), ")"
+            push ' : ', expr(lhs), ')'
           else
             helper :truthy
 
-            push "($truthy(#{tmp} = ", expr(lhs), ") ? ", expr(rhs), " : #{tmp})"
+            push "($truthy(#{tmp} = ", expr(lhs), ') ? ', expr(rhs), " : #{tmp})"
           end
         end
       end
@@ -176,11 +177,11 @@ module Opal
         helper :truthy
         condition = js_truthy_optimize(lhs) || expr(lhs)
 
-        line "if ($truthy(", condition, ")) {"
+        line 'if ($truthy(', condition, ')) {'
         indent { line expr(rhs) }
-        line "} else {"
+        line '} else {'
         indent { line expr(lhs) }
-        line "}"
+        line '}'
       end
     end
 
@@ -200,17 +201,17 @@ module Opal
       end
 
       def return_in_iter?
-        if scope.iter? and parent_def = scope.find_parent_def
+        if scope.iter? && parent_def = scope.find_parent_def
           parent_def
         end
       end
 
       def return_expr_in_def?
-        return scope if expr? and scope.def?
+        return scope if expr? && scope.def?
       end
 
       def scope_to_catch_return
-        return_in_iter? or return_expr_in_def?
+        return_in_iter? || return_expr_in_def?
       end
 
       def compile
@@ -220,7 +221,7 @@ module Opal
         elsif stmt?
           push 'return ', return_val
         else
-          raise SyntaxError, "void value expression: cannot return as an expression"
+          raise SyntaxError, 'void value expression: cannot return as an expression'
         end
       end
     end
@@ -231,7 +232,7 @@ module Opal
       children :value
 
       def compile
-        push "return "
+        push 'return '
         push expr(value)
       end
     end

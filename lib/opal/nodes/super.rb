@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -12,7 +13,7 @@ module Opal
         args = *@sexp
         *rest, last_child = *args
 
-        if last_child && [:iter, :block_pass].include?(last_child.type)
+        if last_child && %i[iter block_pass].include?(last_child.type)
           @iter = last_child
           args = rest
         else
@@ -80,13 +81,13 @@ module Opal
       end
 
       def super_block_invocation
-        chain, cur_defn, mid = scope.get_super_chain
+        chain, cur_defn, mid = scope.super_chain
         trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
         "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
       end
 
       def compile_method
-        push ", "
+        push ', '
         if scope.def?
           push super_method_invocation
         elsif scope.iter?
@@ -165,7 +166,7 @@ module Opal
       end
 
       def compile_arguments
-        push ", "
+        push ', '
 
         if arglist.children.empty?
           push '[]'

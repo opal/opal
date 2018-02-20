@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/rewriters/base'
 
 module Opal
@@ -12,7 +13,7 @@ module Opal
             case meth
             when :[]
               if args.size != 1
-                raise SyntaxError, ".JS[:property] syntax supports only one argument"
+                raise SyntaxError, '.JS[:property] syntax supports only one argument'
               end
               property = args.first
 

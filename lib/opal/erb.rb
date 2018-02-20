@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/compiler'
 
 module Opal
@@ -55,31 +56,31 @@ module Opal
       end
 
       def require_erb(result)
-        'require "erb";'+result
+        'require "erb";' + result
       end
 
       def find_contents(result)
         result.gsub(/<%=([\s\S]+?)%>/) do
-          inner = $1.gsub(/\\'/, "'").gsub(/\\"/, '"')
+          inner = Regexp.last_match(1).gsub(/\\'/, "'").gsub(/\\"/, '"')
 
           if inner =~ BLOCK_EXPR
-            "\")\noutput_buffer.append= #{ inner }\noutput_buffer.append(\""
+            "\")\noutput_buffer.append= #{inner}\noutput_buffer.append(\""
           else
-            "\")\noutput_buffer.append=(#{ inner })\noutput_buffer.append(\""
+            "\")\noutput_buffer.append=(#{inner})\noutput_buffer.append(\""
           end
         end
       end
 
       def find_code(result)
         result.gsub(/<%([\s\S]+?)%>/) do
-          inner = $1.gsub(/\\"/, '"')
-          "\")\n#{ inner }\noutput_buffer.append(\""
+          inner = Regexp.last_match(1).gsub(/\\"/, '"')
+          "\")\n#{inner}\noutput_buffer.append(\""
         end
       end
 
       def wrap_compiled(result)
         path = @file_name.sub(/\.opalerb#{REGEXP_END}/, '')
-        result = "Template.new('#{path}') do |output_buffer|\noutput_buffer.append(\"#{result}\")\noutput_buffer.join\nend\n"
+        "Template.new('#{path}') do |output_buffer|\noutput_buffer.append(\"#{result}\")\noutput_buffer.join\nend\n"
       end
     end
   end

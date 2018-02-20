@@ -47,13 +47,13 @@ class Exception < `Error`
     }
   end
 
-  def exception(str=nil)
+  def exception(str = nil)
     %x{
       if (str === nil || self === str) {
         return self;
       }
 
-      var cloned = #{self.clone};
+      var cloned = #{clone};
       cloned.message = str;
       return cloned;
     }
@@ -108,7 +108,7 @@ class SystemCallError     < StandardError; end
 module Errno
   class EINVAL              < SystemCallError
     def self.new(name = nil)
-      message = "Invalid argument"
+      message = 'Invalid argument'
       message += " - #{name}" if name
       super(message)
     end
@@ -129,7 +129,7 @@ end
 class NameError
   attr_reader :name
 
-  def initialize(message, name=nil)
+  def initialize(message, name = nil)
     super message
     @name = name
   end
@@ -138,7 +138,7 @@ end
 class NoMethodError
   attr_reader :args
 
-  def initialize(message, name=nil, args=[])
+  def initialize(message, name = nil, args = [])
     super message, name
     @args = args
   end

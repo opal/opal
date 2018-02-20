@@ -75,7 +75,8 @@ class Complex < Numeric
   def *(other)
     if Complex === other
       Complex(@real * other.real - @imag * other.imag,
-              @real * other.imag + @imag * other.real)
+        @real * other.imag + @imag * other.real,
+      )
     elsif Numeric === other && other.real?
       Complex(@real * other, @imag * other)
     else
@@ -118,9 +119,11 @@ class Complex < Numeric
         n = other - 1
 
         while n != 0
-          while (div, mod = n.divmod(2); mod == 0)
+          div, mod = n.divmod(2)
+          while mod == 0
             x = Complex(x.real * x.real - x.imag * x.imag, 2 * x.real * x.imag)
             n = div
+            div, mod = n.divmod(2)
           end
 
           z *= x
@@ -129,12 +132,12 @@ class Complex < Numeric
 
         z
       else
-        (Rational.new(1, 1) / self) ** -other
+        (Rational.new(1, 1) / self)**-other
       end
     elsif Float === other || Rational === other
       r, theta = polar
 
-      Complex.polar(r ** other, theta * other)
+      Complex.polar(r**other, theta * other)
     else
       __coerced__ :**, other
     end
@@ -183,7 +186,7 @@ class Complex < Numeric
   end
 
   def hash
-    "Complex:#@real:#@imag"
+    "Complex:#{@real}:#{@imag}"
   end
 
   alias imaginary imag
@@ -193,7 +196,7 @@ class Complex < Numeric
   end
 
   def inspect
-    "(#{to_s})"
+    "(#{self})"
   end
 
   alias magnitude abs
@@ -204,7 +207,8 @@ class Complex < Numeric
     d = denominator
 
     Complex(@real.numerator * (d / @real.denominator),
-            @imag.numerator * (d / @imag.denominator))
+      @imag.numerator * (d / @imag.denominator),
+    )
   end
 
   alias phase arg
@@ -268,19 +272,20 @@ class Complex < Numeric
   def to_s
     result = @real.inspect
 
-    if (Number === @imag && @imag.nan?) || @imag.positive? || @imag.zero?
-      result += ?+
-    else
-      result += ?-
-    end
+    result +=
+      if (Number === @imag && @imag.nan?) || @imag.positive? || @imag.zero?
+        '+'
+      else
+        '-'
+      end
 
     result += @imag.abs.inspect
 
     if Number === @imag && (@imag.nan? || @imag.infinite?)
-      result += ?*
+      result += '*'
     end
 
-    result + ?i
+    result + 'i'
   end
 
   I = new(0, 1)

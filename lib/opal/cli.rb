@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal'
 require 'opal/builder'
 require 'opal/cli_runners'
@@ -6,14 +7,14 @@ require 'opal/cli_runners'
 module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
-                :output, :requires, :gems, :stubs, :verbose, :runner_options,
-                :preload, :filename, :debug, :no_exit, :lib_only
+      :output, :requires, :gems, :stubs, :verbose, :runner_options,
+      :preload, :filename, :debug, :no_exit, :lib_only
 
     class << self
       attr_accessor :stdout
     end
 
-    def initialize options = nil
+    def initialize(options = nil)
       options ||= {}
 
       # Runner
@@ -25,32 +26,32 @@ module Opal
       @file        = options.delete(:file)
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
-      @argv        = options.delete(:argv)       || []
-      @evals       = options.delete(:evals)      || []
-      @load_paths  = options.delete(:load_paths) || []
-      @gems        = options.delete(:gems)       || []
-      @stubs       = options.delete(:stubs)      || []
-      @preload     = options.delete(:preload)    || []
-      @output      = options.delete(:output)     || self.class.stdout || $stdout
-      @verbose     = options.fetch(:verbose, false); options.delete(:verbose)
-      @debug       = options.fetch(:debug, false);   options.delete(:debug)
-      @filename    = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
+      @argv        = options.delete(:argv)       { [] }
+      @evals       = options.delete(:evals)      { [] }
+      @load_paths  = options.delete(:load_paths) { [] }
+      @gems        = options.delete(:gems)       { [] }
+      @stubs       = options.delete(:stubs)      { [] }
+      @preload     = options.delete(:preload)    { [] }
+      @output      = options.delete(:output)     { self.class.stdout || $stdout }
+      @verbose     = options.delete(:verbose)    { false }
+      @debug       = options.delete(:debug)      { false }
+      @filename    = options.delete(:filename)   { @file && @file.path }
 
-      @requires    = options.delete(:requires)   || []
+      @requires    = options.delete(:requires)   { [] }
       @requires.unshift('opal') unless options.delete(:skip_opal_require)
 
       @compiler_options = Hash[
         *compiler_option_names.map do |option|
           key = option.to_sym
-          next unless options.has_key? key
+          next unless options.key? key
           value = options.delete(key)
           [key, value]
         end.compact.flatten
       ]
 
-      raise ArgumentError, "no libraries to compile" if @lib_only and @requires.length == 0
-      raise ArgumentError, "no runnable code provided (evals or file)" if @evals.empty? and @file.nil? and not(@lib_only)
-      raise ArgumentError, "can't accept evals or file in `library only` mode" if (@evals.any? or @file) and @lib_only
+      raise ArgumentError, 'no libraries to compile' if @lib_only && @requires.empty?
+      raise ArgumentError, 'no runnable code provided (evals or file)' if @evals.empty? && @file.nil? && !@lib_only
+      raise ArgumentError, "can't accept evals or file in `library only` mode" if (@evals.any? || @file) && @lib_only
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end
 
@@ -65,8 +66,8 @@ module Opal
     end
 
     def runner
-      CliRunners[@runner_type] or
-        raise ArgumentError, "unknown runner: #{@runner_type.inspect}"
+      CliRunners[@runner_type] ||
+        raise(ArgumentError, "unknown runner: #{@runner_type.inspect}")
     end
 
     attr_reader :exit_status
@@ -135,10 +136,8 @@ module Opal
 
       if evals.any?
         yield evals.join("\n"), '-e'
-      else
-        if file and (filename != '-' or evals.empty?)
-          yield file.read, filename
-        end
+      elsif file && (filename != '-' || evals.empty?)
+        yield file.read, filename
       end
     end
   end

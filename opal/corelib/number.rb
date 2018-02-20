@@ -7,7 +7,7 @@ class Number < Numeric
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{self.name}"
+      raise TypeError, "allocator undefined for #{name}"
     end
 
     undef :new
@@ -92,7 +92,7 @@ class Number < Numeric
           return other;
         }
         else if (other == 0) {
-          #{raise ZeroDivisionError, "divided by 0"};
+          #{raise ZeroDivisionError, 'divided by 0'};
         }
         else if (other < 0 || self < 0) {
           return (self % other + other) % other;
@@ -258,10 +258,10 @@ class Number < Numeric
       if !(Integer === self) || other > 0
         `Math.pow(self, other)`
       else
-        Rational.new(self, 1) ** other
+        Rational.new(self, 1)**other
       end
     elsif self < 0 && (Float === other || Rational === other)
-      Complex.new(self, 0) ** other.to_f
+      Complex.new(self, 0)**other.to_f
     elsif `other.$$is_number != null`
       `Math.pow(self, other)`
     else
@@ -393,10 +393,12 @@ class Number < Numeric
   end
 
   def downto(stop, &block)
-    return enum_for(:downto, stop){
-      raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
-      stop > self ? 0 : self - stop + 1
-    } unless block_given?
+    unless block_given?
+      return enum_for(:downto, stop) do
+        raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
+        stop > self ? 0 : self - stop + 1
+      end
+    end
 
     %x{
       if (!stop.$$is_number) {
@@ -468,7 +470,7 @@ class Number < Numeric
   end
 
   def is_a?(klass)
-    return true if klass == Fixnum && Integer === self
+    return true if klass == Integer && Integer === self
     return true if klass == Integer && Integer === self
     return true if klass == Float && Float === self
 
@@ -478,7 +480,7 @@ class Number < Numeric
   alias kind_of? is_a?
 
   def instance_of?(klass)
-    return true if klass == Fixnum && Integer === self
+    return true if klass == Integer && Integer === self
     return true if klass == Integer && Integer === self
     return true if klass == Float && Float === self
 
@@ -540,7 +542,7 @@ class Number < Numeric
       }
 
       if (m === undefined) {
-        return #{self ** b};
+        return #{self**b};
       } else {
         if (!(#{Integer === b})) {
           #{raise TypeError, 'Integer#pow() 2nd argument not allowed unless a 1st argument is integer'}
@@ -558,7 +560,7 @@ class Number < Numeric
           #{raise ZeroDivisionError, 'divided by 0'}
         }
 
-        return #{(self ** b) % m}
+        return #{(self**b) % m}
       }
     }
   end
@@ -585,9 +587,9 @@ class Number < Numeric
     if Integer === self
       Rational.new(self, 1)
     elsif infinite?
-      raise FloatDomainError, "Infinity"
+      raise FloatDomainError, 'Infinity'
     elsif nan?
-      raise FloatDomainError, "NaN"
+      raise FloatDomainError, 'NaN'
     elsif `eps == null`
       f, n  = Math.frexp self
       f     = Math.ldexp(f, Float::MANT_DIG).to_i
@@ -610,20 +612,20 @@ class Number < Numeric
       end
 
       if Float === ndigits && ndigits.infinite?
-        raise RangeError, "Infinity"
+        raise RangeError, 'Infinity'
       end
 
       ndigits = Opal.coerce_to!(ndigits, Integer, :to_int)
 
       if ndigits < Integer::MIN
-        raise RangeError, "out of bounds"
+        raise RangeError, 'out of bounds'
       end
 
       if `ndigits >= 0`
         return self
       end
 
-      ndigits = -ndigits;
+      ndigits = -ndigits
 
       %x{
         if (0.415241 * ndigits - 0.125 > #{size}) {
@@ -637,16 +639,16 @@ class Number < Numeric
       }
     else
       if nan? && `ndigits == null`
-        raise FloatDomainError, "NaN"
+        raise FloatDomainError, 'NaN'
       end
 
       ndigits = Opal.coerce_to!(`ndigits || 0`, Integer, :to_int)
 
       if ndigits <= 0
         if nan?
-          raise RangeError, "NaN"
+          raise RangeError, 'NaN'
         elsif infinite?
-          raise FloatDomainError, "Infinity"
+          raise FloatDomainError, 'Infinity'
         end
       elsif ndigits == 0
         return `Math.round(self)`
@@ -671,11 +673,11 @@ class Number < Numeric
   def step(limit = undefined, step = undefined, to: undefined, by: undefined, &block)
     %x{
       if (limit !== undefined && to !== undefined) {
-        #{raise ArgumentError, "to is given twice"}
+        #{raise ArgumentError, 'to is given twice'}
       }
 
       if (step !== undefined && by !== undefined) {
-        #{raise ArgumentError, "step is given twice"}
+        #{raise ArgumentError, 'step is given twice'}
       }
 
       function validateParameters() {
@@ -688,7 +690,7 @@ class Number < Numeric
         }
 
         if (step === nil) {
-          #{raise TypeError, "step must be numeric"}
+          #{raise TypeError, 'step must be numeric'}
         }
 
         if (step === 0) {
@@ -779,7 +781,7 @@ class Number < Numeric
           Opal.hash_put(keyword_args, "by", by);
         }
 
-        if (!#{keyword_args.empty?}) {
+        if (#{keyword_args.any?}) {
           positional_args.push(keyword_args);
         }
       }
@@ -878,7 +880,7 @@ class Number < Numeric
       f     = Math.ldexp(f, Float::MANT_DIG).to_i
       e    -= Float::MANT_DIG
 
-      (f * (Float::RADIX ** e)).to_r
+      (f * (Float::RADIX**e)).to_r
     end
   end
 
@@ -938,19 +940,21 @@ class Number < Numeric
 
   def divmod(other)
     if nan? || other.nan?
-      raise FloatDomainError, "NaN"
+      raise FloatDomainError, 'NaN'
     elsif infinite?
-      raise FloatDomainError, "Infinity"
+      raise FloatDomainError, 'Infinity'
     else
       super
     end
   end
 
   def upto(stop, &block)
-    return enum_for(:upto, stop){
-      raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
-      stop < self ? 0 : stop - self + 1
-    } unless block_given?
+    unless block_given?
+      return enum_for(:upto, stop) do
+        raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
+        stop < self ? 0 : stop - self + 1
+      end
+    end
 
     %x{
       if (!stop.$$is_number) {
@@ -1011,7 +1015,7 @@ class Integer < Numeric
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{self.name}"
+      raise TypeError, "allocator undefined for #{name}"
     end
 
     undef :new
@@ -1047,7 +1051,7 @@ class Float < Numeric
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{self.name}"
+      raise TypeError, "allocator undefined for #{name}"
     end
 
     undef :new

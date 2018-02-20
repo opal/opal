@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/node_with_args'
 require 'opal/rewriters/break_finder'
 
@@ -44,7 +45,7 @@ module Opal
 
         unshift to_vars
 
-        unshift "(#{identity} = function(", inline_params, "){"
+        unshift "(#{identity} = function(", inline_params, '){'
         push "}, #{identity}.$$s = self,"
         push " #{identity}.$$brk = $brk," if contains_break?
         push " #{identity}.$$arity = #{arity},"
@@ -98,10 +99,12 @@ module Opal
         *regular_args, last_arg = args.children
         if last_arg && last_arg.type == :blockarg
           @block_arg = last_arg.children[0]
-          @sexp = @sexp.updated(nil, [
-            s(:args, *regular_args),
-            body
-          ])
+          @sexp = @sexp.updated(
+            nil, [
+              s(:args, *regular_args),
+              body
+            ]
+          )
         end
       end
 
@@ -118,7 +121,7 @@ module Opal
         valid_args = []
         return unless args
 
-        args.children.each_with_index do |arg, idx|
+        args.children.each do |arg|
           if arg.type == :shadowarg
             @shadow_args << arg
           else
@@ -126,10 +129,12 @@ module Opal
           end
         end
 
-        @sexp = @sexp.updated(nil, [
-          args.updated(nil, valid_args),
-          body
-        ])
+        @sexp = @sexp.updated(
+          nil, [
+            args.updated(nil, valid_args),
+            body
+          ]
+        )
       end
 
       def extract_underscore_args
@@ -148,10 +153,12 @@ module Opal
           end
         end
 
-        @sexp = @sexp.updated(nil, [
-          args.updated(nil, valid_args),
-          body
-        ])
+        @sexp = @sexp.updated(
+          nil, [
+            args.updated(nil, valid_args),
+            body
+          ]
+        )
       end
 
       def returned_body
@@ -175,28 +182,29 @@ module Opal
 
       # Returns code used in debug mode to check arity of method call
       def compile_arity_check
-        if arity_checks.size > 0
+        unless arity_checks.empty?
           parent_scope = scope
-          while !(parent_scope.top? || parent_scope.def? || parent_scope.class_scope?)
+          until parent_scope.top? || parent_scope.def? || parent_scope.class_scope?
             parent_scope = parent_scope.parent
           end
 
-          context = if parent_scope.top?
-            "'<main>'"
-          elsif parent_scope.def?
-            "'#{parent_scope.mid}'"
-          elsif parent_scope.class?
-            "'<class:#{parent_scope.name}>'"
-          elsif parent_scope.module?
-            "'<module:#{parent_scope.name}>'"
-          end
+          context =
+            if parent_scope.top?
+              "'<main>'"
+            elsif parent_scope.def?
+              "'#{parent_scope.mid}'"
+            elsif parent_scope.class?
+              "'<class:#{parent_scope.name}>'"
+            elsif parent_scope.module?
+              "'<module:#{parent_scope.name}>'"
+            end
 
           identity = scope.identity
 
           line "if (#{identity}.$$is_lambda || #{identity}.$$define_meth) {"
-          line "  var $arity = arguments.length;"
+          line '  var $arity = arguments.length;'
           line "  if (#{arity_checks.join(' || ')}) { Opal.block_ac($arity, #{arity}, #{context}); }"
-          line "}"
+          line '}'
         end
       end
 

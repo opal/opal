@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -14,7 +15,7 @@ module Opal
       def arg_names
         done_kwargs = false
 
-        children.inject([]) do |result, arg|
+        children.each_with_object([]) do |arg, result|
           case arg.type
           when :kwarg, :kwoptarg, :kwrestarg
             unless done_kwargs
@@ -36,14 +37,12 @@ module Opal
           when :restarg
             # To make function.length working
             # in cases like def m(*rest)
-            tmp_arg_name = scope.next_temp + "_rest"
+            tmp_arg_name = scope.next_temp + '_rest'
             result << tmp_arg_name
             add_arg(arg)
           else
             raise "Unknown argument type #{arg.inspect}"
           end
-
-          result
         end
       end
 

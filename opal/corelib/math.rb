@@ -21,19 +21,15 @@ module Math
   end
 
   def self.float!(value)
-    begin
-      Float(value)
-    rescue ArgumentError
-      raise Opal.type_error(value, Float)
-    end
+    Float(value)
+  rescue ArgumentError
+    raise Opal.type_error(value, Float)
   end
 
   def self.integer!(value)
-    begin
-      Integer(value)
-    rescue ArgumentError
-      raise Opal.type_error(value, Integer)
-    end
+    Integer(value)
+  rescue ArgumentError
+    raise Opal.type_error(value, Integer)
   end
 
   module_function
@@ -274,7 +270,7 @@ module Math
       }
 
       if (n === -1 || n === -Infinity) {
-        #{raise DomainError, "Numerical argument is out of domain - \"gamma\""};
+        #{raise DomainError, 'Numerical argument is out of domain - "gamma"'};
       }
 
       if (#{Integer === n}) {
@@ -352,7 +348,7 @@ module Math
 
     %x{
       if (isNaN(exponent)) {
-        #{raise RangeError, "float NaN out of range of integer"};
+        #{raise RangeError, 'float NaN out of range of integer'};
       }
 
       return mantissa * Math.pow(2, exponent);

@@ -1,10 +1,9 @@
 # frozen_string_literal: true
+
 require 'tilt'
 require 'opal/builder'
 require 'opal/config'
 require 'opal/version'
-
-$OPAL_SOURCE_MAPS = {}
 
 module Opal
   class TiltTemplate < Tilt::Template
@@ -31,9 +30,10 @@ module Opal
     end
 
     def prepare
+      # stub
     end
 
-    def evaluate(_, _, &block)
+    def evaluate(_, _)
       if builder = @options[:builder]
         builder.dup.build(file).to_s
       elsif @options[:build]

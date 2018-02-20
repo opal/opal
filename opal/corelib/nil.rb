@@ -3,7 +3,7 @@ class NilClass
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{self.name}"
+      raise TypeError, "allocator undefined for #{name}"
     end
 
     undef :new

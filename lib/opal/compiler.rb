@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'set'
 require 'opal/parser'
 require 'opal/fragment'
@@ -48,7 +49,7 @@ module Opal
 
     # All compare method nodes - used to optimize performance of
     # math comparisons
-    COMPARE = %w[< > <= >=]
+    COMPARE = %w[< > <= >=].freeze
 
     # defines a compiler option, also creating method of form 'name?'
     def self.compiler_option(name, default_value, options = {})
@@ -56,9 +57,9 @@ module Opal
       valid_values = options[:valid_values]
       define_method(mid || name) do
         value = @options.fetch(name) { default_value }
-        if valid_values and not(valid_values.include?(value))
-          raise ArgumentError, "invalid value #{value.inspect} for option #{name.inspect} "+
-                                "(valid values: #{valid_values.inspect})"
+        if valid_values && !valid_values.include?(value)
+          raise ArgumentError, "invalid value #{value.inspect} for option #{name.inspect} " \
+                               "(valid values: #{valid_values.inspect})"
         end
         value
       end
@@ -77,14 +78,14 @@ module Opal
     # adds method stubs for all used methods in file
     #
     # @return [Boolean]
-    compiler_option :method_missing, true, :as => :method_missing?
+    compiler_option :method_missing, true, as: :method_missing?
 
     # @!method arity_check?
     #
     # adds an arity check to every method definition
     #
     # @return [Boolean]
-    compiler_option :arity_check, false, :as => :arity_check?
+    compiler_option :arity_check, false, as: :arity_check?
 
     # @deprecated
     # @!method freezing?
@@ -92,45 +93,45 @@ module Opal
     # stubs out #freeze and #frozen?
     #
     # @return [Boolean]
-    compiler_option :freezing, true, :as => :freezing?
+    compiler_option :freezing, true, as: :freezing?
 
     # @deprecated
     # @!method tainting?
     #
     # stubs out #taint, #untaint and #tainted?
-    compiler_option :tainting, true, :as => :tainting?
+    compiler_option :tainting, true, as: :tainting?
 
     # @!method irb?
     #
     # compile top level local vars with support for irb style vars
-    compiler_option :irb, false, :as => :irb?
+    compiler_option :irb, false, as: :irb?
 
     # @!method dynamic_require_severity
     #
     # how to handle dynamic requires (:error, :warning, :ignore)
-    compiler_option :dynamic_require_severity, :ignore, :valid_values => [:error, :warning, :ignore]
+    compiler_option :dynamic_require_severity, :ignore, valid_values: %i[error warning ignore]
 
     # @!method requirable?
     #
     # Prepare the code for future requires
-    compiler_option :requirable, false, :as => :requirable?
+    compiler_option :requirable, false, as: :requirable?
 
     # @!method inline_operators?
     #
     # are operators compiled inline
-    compiler_option :inline_operators, true, :as => :inline_operators?
+    compiler_option :inline_operators, true, as: :inline_operators?
 
     compiler_option :eval, false, as: :eval?
 
     # @!method enable_source_location?
     #
     # Adds source_location for every method definition
-    compiler_option :enable_source_location, false, :as => :enable_source_location?
+    compiler_option :enable_source_location, false, as: :enable_source_location?
 
     # @!method parse_comments?
     #
     # Adds comments for every method definition
-    compiler_option :parse_comments, false, :as => :parse_comments?
+    compiler_option :parse_comments, false, as: :parse_comments?
 
     # @return [String] The compiled ruby code
     attr_reader :result
@@ -193,7 +194,7 @@ module Opal
     # @param source_file [String] optional source_file to reference ruby source
     # @return [Opal::SourceMap]
     def source_map(source_file = nil)
-      Opal::SourceMap.new(@fragments, source_file || self.file)
+      Opal::SourceMap.new(@fragments, source_file || file)
     end
 
     # Any helpers required by this file. Used by {Opal::Nodes::Top} to reference
@@ -202,7 +203,7 @@ module Opal
     #
     # @return [Set<Symbol>]
     def helpers
-      @helpers ||= Set.new([:breaker, :slice])
+      @helpers ||= Set.new(%i[breaker slice])
     end
 
     # Operator helpers
@@ -253,12 +254,12 @@ module Opal
       name = name.to_s
       if name && !name.empty?
         name = "_#{name}"
-          .gsub('?', '$q')
-          .gsub('!', '$B')
-          .gsub('=', '$eq')
-          .gsub('<', '$lt')
-          .gsub('>', '$gt')
-          .gsub(/[^\w\$]/, '$')
+               .gsub('?', '$q')
+               .gsub('!', '$B')
+               .gsub('=', '$eq')
+               .gsub('<', '$lt')
+               .gsub('>', '$gt')
+               .gsub(/[^\w\$]/, '$')
       end
       unique = (@unique += 1)
       "TMP#{name}_#{unique}"
@@ -266,19 +267,19 @@ module Opal
 
     # Use the given helper
     def helper(name)
-      self.helpers << name
+      helpers << name
     end
 
     # To keep code blocks nicely indented, this will yield a block after
     # adding an extra layer of indent, and then returning the resulting
     # code after reverting the indent.
-    def indent(&block)
+    def indent
       indent = @indent
       @indent += INDENT
-      @space = "\n#@indent"
+      @space = "\n#{@indent}"
       res = yield
       @indent = indent
-      @space = "\n#@indent"
+      @space = "\n#{@indent}"
       res
     end
 
@@ -287,7 +288,7 @@ module Opal
     # while the block is yielding, and queue it back up once it is
     # finished. Variables are queued once finished with to save the
     # numbers of variables needed at runtime.
-    def with_temp(&block)
+    def with_temp
       tmp = @scope.new_temp
       res = yield tmp
       @scope.queue_temp tmp
@@ -302,20 +303,6 @@ module Opal
       result = indent { yield }
       @scope.pop_while
       result
-    end
-
-    def in_ensure
-      return unless block_given?
-
-      @in_ensure = true
-      result = yield
-      @in_ensure = false
-
-      result
-    end
-
-    def in_ensure?
-      !!@in_ensure
     end
 
     def in_case
@@ -335,7 +322,7 @@ module Opal
     # Process the given sexp by creating a node instance, based on its type,
     # and compiling it to fragments.
     def process(sexp, level = :expr)
-      return fragment('', scope) if sexp == nil
+      return fragment('', scope) if sexp.nil?
 
       if handler = handlers[sexp.type]
         return handler.new(sexp, level, self).compile_to_fragments
@@ -383,9 +370,7 @@ module Opal
         sexp.updated(:returnable_yield, nil)
       when :when
         *when_sexp, then_sexp = *sexp
-        sexp.updated(nil,
-          [*when_sexp, returns(then_sexp)]
-        )
+        sexp.updated(nil, [*when_sexp, returns(then_sexp)])
       when :rescue
         body_sexp, *resbodies, else_sexp = *sexp
 
@@ -397,37 +382,34 @@ module Opal
           else_sexp = returns(else_sexp)
         end
 
-        sexp.updated(nil, [
-          returns(body_sexp),
-          *resbodies,
-          else_sexp
-        ])
+        sexp.updated(
+          nil, [
+            returns(body_sexp),
+            *resbodies,
+            else_sexp
+          ]
+        )
       when :resbody
         klass, lvar, body = *sexp
         sexp.updated(nil, [klass, lvar, returns(body)])
       when :ensure
         rescue_sexp, ensure_body = *sexp
-        sexp = sexp.updated(nil,
-          [returns(rescue_sexp), ensure_body]
-        )
+        sexp = sexp.updated(nil, [returns(rescue_sexp), ensure_body])
         s(:js_return, sexp)
       when :begin, :kwbegin
         # Wrapping last expression with s(:js_return, ...)
         *rest, last = *sexp
-        sexp.updated(
-          nil,
-          [*rest, returns(last)]
-        )
+        sexp.updated(nil, [*rest, returns(last)])
       when :while, :until, :while_post, :until_post
         sexp
       when :return, :js_return, :returnable_yield
         sexp
       when :xstr
         if sexp.children.any?
-          strs = sexp.
-            children.
-            select { |child| child.type == :str }.
-            map { |child| child.children[0] }
+          strs = sexp
+                 .children
+                 .select { |child| child.type == :str }
+                 .map { |child| child.children[0] }
 
           multiline = strs.any? { |str| str.end_with?(";\n") }
 
@@ -437,19 +419,17 @@ module Opal
             # xstr starts with interpolation
             # then it must contain js_return inside
             sexp
-          else
-            if first_child.type == :str
-              old_value = first_child.children[0]
-              if old_value.include?('return')
-                # 'return' is already there
-                sexp
-              else
-                first_child = s(:js_return, first_child)
-                sexp.updated(nil, [first_child, *rest_children])
-              end
+          elsif first_child.type == :str
+            old_value = first_child.children[0]
+            if old_value.include?('return')
+              # 'return' is already there
+              sexp
             else
-              s(:js_return, sexp)
+              first_child = s(:js_return, first_child)
+              sexp.updated(nil, [first_child, *rest_children])
             end
+          else
+            s(:js_return, sexp)
           end
         else
           returns s(:str, '')
@@ -467,7 +447,7 @@ module Opal
         s(:js_return, sexp).updated(
           nil,
           nil,
-          location: sexp.loc
+          location: sexp.loc,
         )
       end
     end
@@ -476,10 +456,10 @@ module Opal
       @scope.uses_block!
       if @scope.block_name
         fragment("(#{@scope.block_name} !== nil)", scope, sexp)
-      elsif scope = @scope.find_parent_def and scope.block_name
+      elsif (scope = @scope.find_parent_def) && scope.block_name
         fragment("(#{scope.block_name} !== nil)", scope, sexp)
       else
-        fragment("false", scope, sexp)
+        fragment('false', scope, sexp)
       end
     end
   end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -9,7 +10,7 @@ module Opal
       children :var_name
 
       def using_irb?
-        compiler.irb? and scope.top?
+        compiler.irb? && scope.top?
       end
 
       def compile
@@ -28,7 +29,7 @@ module Opal
       children :var_name, :value
 
       def using_irb?
-        compiler.irb? and scope.top?
+        compiler.irb? && scope.top?
       end
 
       def compile
@@ -87,7 +88,7 @@ module Opal
         push "self#{name} = "
         push expr(value)
 
-        wrap '(', ')'  if (recv? || expr?) && value
+        wrap '(', ')' if (recv? || expr?) && value
       end
     end
 
@@ -107,7 +108,6 @@ module Opal
         add_gvar name
         push "$gvars#{name}"
       end
-
     end
 
     # back_ref can be:
@@ -169,7 +169,7 @@ module Opal
         push "$gvars#{name} = "
         push expr(value)
 
-        wrap '(', ')'  if (recv? || expr?) && value
+        wrap '(', ')' if (recv? || expr?) && value
       end
     end
 
@@ -206,7 +206,7 @@ module Opal
       children :name, :value
 
       def compile
-        push "(Opal.class_variable_set(#{class_variable_owner}, '#{name}', ", expr(value), "))"
+        push "(Opal.class_variable_set(#{class_variable_owner}, '#{name}', ", expr(value), '))'
       end
     end
   end

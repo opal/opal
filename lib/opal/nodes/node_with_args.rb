@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/scope'
 
 module Opal
@@ -76,7 +77,7 @@ module Opal
 
       def keyword_args
         @keyword_args ||= args.children.select do |arg|
-          [:kwarg, :kwoptarg, :kwrestarg].include? arg.type
+          %i[kwarg kwoptarg kwrestarg].include? arg.type
         end
       end
 
@@ -138,7 +139,7 @@ module Opal
       end
 
       def has_only_optional_kwargs?
-        keyword_args.any? && keyword_args.all? { |arg| [:kwoptarg, :kwrestarg].include?(arg.type) }
+        keyword_args.any? && keyword_args.all? { |arg| %i[kwoptarg kwrestarg].include?(arg.type) }
       end
 
       def has_required_kwargs?
@@ -155,7 +156,7 @@ module Opal
 
       def negative_arity
         required_plain_args = args.children.select do |arg|
-          [:arg, :mlhs].include?(arg.type)
+          %i[arg mlhs].include?(arg.type)
         end
 
         result = required_plain_args.size
@@ -194,7 +195,7 @@ module Opal
         kwarg: :keyreq,
         kwoptarg: :key,
         kwrestarg: :keyrest
-      }
+      }.freeze
 
       def parameters_code
         stringified_parameters = args.children.map do |arg|
@@ -215,13 +216,13 @@ module Opal
         return @arity_checks if defined?(@arity_checks)
 
         arity = args.children.size
-        arity -= (opt_args.size)
+        arity -= opt_args.size
 
         arity -= 1 if rest_arg
 
-        arity -= (keyword_args.size)
+        arity -= keyword_args.size
 
-        arity = -arity - 1 if !opt_args.empty? or !keyword_args.empty? or rest_arg
+        arity = -arity - 1 if !opt_args.empty? || !keyword_args.empty? || rest_arg
 
         @arity_checks = []
 
@@ -229,7 +230,7 @@ module Opal
           min_arity = -(arity + 1)
           max_arity = args.children.size
           @arity_checks << "$arity < #{min_arity}" if min_arity > 0
-          @arity_checks << "$arity > #{max_arity}" if max_arity and not(rest_arg)
+          @arity_checks << "$arity > #{max_arity}" if max_arity && !rest_arg
         else
           @arity_checks << "$arity !== #{arity}"
         end

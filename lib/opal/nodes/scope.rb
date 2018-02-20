@@ -1,10 +1,10 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
   module Nodes
     class ScopeNode < Base
-
       # Every scope can have a parent scope
       attr_accessor :parent
 
@@ -59,18 +59,18 @@ module Opal
         @proto_ivars = []
       end
 
-      def in_scope(&block)
+      def in_scope
         indent do
           @parent = compiler.scope
           compiler.scope = self
-          block.call self
+          yield self
           compiler.scope = @parent
         end
       end
 
       # Returns true if this scope is a class/module body scope
       def class_scope?
-        @type == :class or @type == :module
+        @type == :class || @type == :module
       end
 
       # Returns true if this is strictly a class scope
@@ -112,7 +112,7 @@ module Opal
       # by this function points to the classes' prototype. This is the target
       # to where methods are actually added inside a class body.
       def proto
-        "def"
+        'def'
       end
 
       ##
@@ -134,10 +134,10 @@ module Opal
         str += "#{indent}#{iv.join indent}" unless ivars.empty?
         str += "#{indent}#{gv.join indent}" unless gvars.empty?
 
-        if class? and !@proto_ivars.empty?
-          #raise "FIXME to_vars"
-          pvars = @proto_ivars.map { |i| "#{proto}#{i}"}.join(' = ')
-          result = "%s\n%s%s = nil;" % [str, indent, pvars]
+        if class? && !@proto_ivars.empty?
+          # raise "FIXME to_vars"
+          pvars = @proto_ivars.map { |i| "#{proto}#{i}" }.join(' = ')
+          result = "#{str}\n#{indent}#{pvars} = nil;"
         else
           result = str
         end
@@ -173,8 +173,8 @@ module Opal
       end
 
       def has_local?(local)
-        return true if @locals.include? local or @args.include? local or @temps.include? local
-        return @parent.has_local?(local) if @parent and @type == :iter
+        return true if @locals.include?(local) || @args.include?(local) || @temps.include?(local)
+        return @parent.has_local?(local) if @parent && @type == :iter
         false
       end
 
@@ -197,12 +197,11 @@ module Opal
       end
 
       def next_temp
-        while true
+        tmp = nil
+        loop do
           tmp = "$#{@unique}"
           @unique = @unique.succ
-          unless has_local?(tmp)
-            break
-          end
+          break unless has_local?(tmp)
         end
         tmp
       end
@@ -238,16 +237,14 @@ module Opal
         return @identity if @identity
 
         # Parent scope is the defining module/class
-        name ||= [(parent && (parent.name || parent.scope_name)), self.mid].compact.join('_')
+        name ||= [(parent && (parent.name || parent.scope_name)), mid].compact.join('_')
         @identity = @compiler.unique_temp(name)
         @parent.add_scope_temp @identity if @parent
 
         @identity
       end
 
-      def identity
-        @identity
-      end
+      attr_reader :identity
 
       def find_parent_def
         scope = self
@@ -260,7 +257,7 @@ module Opal
         nil
       end
 
-      def get_super_chain
+      def super_chain
         chain, scope, defn, mid = [], self, 'null', 'null'
 
         while scope
@@ -268,7 +265,7 @@ module Opal
             chain << scope.identify!
             scope = scope.parent if scope.parent
 
-          elsif [:def, :defs].include?(scope.type)
+          elsif %i[def defs].include?(scope.type)
             defn = scope.identify!
             mid  = "'#{scope.mid}'"
             break
@@ -285,7 +282,7 @@ module Opal
       end
 
       def has_rescue_else?
-        !!rescue_else_sexp
+        !rescue_else_sexp.nil?
       end
 
       def in_ensure
@@ -299,7 +296,7 @@ module Opal
       end
 
       def in_ensure?
-        !!@in_ensure
+        @in_ensure
       end
     end
   end

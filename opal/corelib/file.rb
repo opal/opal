@@ -4,7 +4,7 @@ class File < IO
   PATH_SEPARATOR = ':'
   # Assuming case insenstive filesystem
   FNM_SYSCASE = 0
-  windows_root_rx = /^[a-zA-Z]:(?:\\|\/)/
+  windows_root_rx = %r{^[a-zA-Z]:(?:\\|\/)}
 
   class << self
     def expand_path(path, basedir = nil)
@@ -15,7 +15,7 @@ class File < IO
       if `path[0] === '~' || (basedir && basedir[0] === '~')`
         home = Dir.home
         raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
-        raise(ArgumentError, "non-absolute home") unless home.start_with?(sep)
+        raise(ArgumentError, 'non-absolute home') unless home.start_with?(sep)
 
         home            += sep
         home_path_regexp = /^\~(?:#{sep}|$)/
@@ -23,7 +23,7 @@ class File < IO
         basedir          = basedir.sub(home_path_regexp, home) if basedir
       end
 
-      basedir     = Dir.pwd unless basedir
+      basedir ||= Dir.pwd
       path_abs    = `path.substr(0, sep.length) === sep || windows_root_rx.test(path)`
       basedir_abs = `basedir.substr(0, sep.length) === sep || windows_root_rx.test(basedir)`
 
@@ -62,7 +62,7 @@ class File < IO
       }
 
       new_path = new_parts.join(sep)
-      new_path = leading_sep+new_path if abs
+      new_path = leading_sep + new_path if abs
       new_path
     end
     alias realpath expand_path
@@ -84,7 +84,7 @@ class File < IO
         if (#{ALT_SEPARATOR} === nil) {
           return Opal.escape_regexp(#{SEPARATOR});
         } else {
-          return Opal.escape_regexp(#{SEPARATOR+ALT_SEPARATOR});
+          return Opal.escape_regexp(#{SEPARATOR + ALT_SEPARATOR});
         }
       }
     }
@@ -107,7 +107,7 @@ class File < IO
       }
     end
 
-    def basename(name, suffix=nil)
+    def basename(name, suffix = nil)
       sep_chars = `$sep_chars()`
       name = `$coerce_to_path(name)`
       %x{
@@ -141,10 +141,10 @@ class File < IO
       return '' if filename.empty?
       last_dot_idx = filename[1..-1].rindex('.')
       # extension name must contains at least one character .(something)
-      (last_dot_idx.nil? || last_dot_idx + 1 == filename.length - 1) ? '' : filename[(last_dot_idx + 1)..-1]
+      last_dot_idx.nil? || last_dot_idx + 1 == filename.length - 1 ? '' : filename[(last_dot_idx + 1)..-1]
     end
 
-    def exist? path
+    def exist?(path)
       `Opal.modules[#{path}] != null`
     end
     alias exists? exist?
@@ -156,15 +156,13 @@ class File < IO
           #{files}.push(key)
         }
       }
-      path = path.gsub(%r{(^.#{SEPARATOR}+|#{SEPARATOR}+$)})
-      file = files.find do |file|
-        file =~ /^#{path}/
-      end
+      path = path.gsub(/(^.#{SEPARATOR}+|#{SEPARATOR}+$)/)
+      file = files.find { |f| f =~ /^#{path}/ }
       file
     end
 
     def join(*paths)
-      if paths.length == 0
+      if paths.empty?
         return ''
       end
       result = ''
@@ -177,20 +175,20 @@ class File < IO
           item
         end
       end
-      paths = paths.reject { |path| path.empty? }
+      paths = paths.reject(&:empty?)
       paths.each_with_index do |item, index|
         next_item = paths[index + 1]
         if next_item.nil?
           result = "#{result}#{item}"
         else
           if item.end_with?(SEPARATOR) && next_item.start_with?(SEPARATOR)
-            item = item.sub(%r{#{SEPARATOR}+$}, '')
+            item = item.sub(/#{SEPARATOR}+$/, '')
           end
-          if item.end_with?(SEPARATOR) || next_item.start_with?(SEPARATOR)
-            result = "#{result}#{item}"
-          else
-            result = "#{result}#{item}#{SEPARATOR}"
-          end
+          result = if item.end_with?(SEPARATOR) || next_item.start_with?(SEPARATOR)
+                     "#{result}#{item}"
+                   else
+                     "#{result}#{item}#{SEPARATOR}"
+                   end
         end
       end
       result

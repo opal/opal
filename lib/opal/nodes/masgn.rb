@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
   module Nodes
     class MassAssignNode < Base
-      SIMPLE_ASSIGNMENT = [:lvasgn, :ivasgn, :lvar, :gvasgn, :cdecl, :casgn]
+      SIMPLE_ASSIGNMENT = %i[lvasgn ivasgn lvar gvasgn cdecl casgn].freeze
 
       handle :masgn
       children :lhs, :rhs
@@ -79,11 +80,12 @@ module Opal
       end
 
       def compile_assignment(child, array, idx, len = nil)
-        if !len || idx >= len
-          assign = s(:js_tmp, "(#{array}[#{idx}] == null ? nil : #{array}[#{idx}])")
-        else
-          assign = s(:js_tmp, "#{array}[#{idx}]")
-        end
+        assign =
+          if !len || idx >= len
+            s(:js_tmp, "(#{array}[#{idx}] == null ? nil : #{array}[#{idx}])")
+          else
+            s(:js_tmp, "#{array}[#{idx}]")
+          end
 
         part = child.updated
         if SIMPLE_ASSIGNMENT.include?(child.type)

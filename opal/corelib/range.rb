@@ -9,7 +9,7 @@ class Range
 
   def initialize(first, last, exclude = false)
     raise NameError, "'initialize' called twice" if @begin
-    raise ArgumentError, "bad value for range" unless first <=> last
+    raise ArgumentError, 'bad value for range' unless first <=> last
 
     @begin = first
     @end   = last
@@ -49,19 +49,19 @@ class Range
     %x{
       var i, limit;
 
-      if (#@begin.$$is_number && #@end.$$is_number) {
-        if (#@begin % 1 !== 0 || #@end % 1 !== 0) {
+      if (#{@begin}.$$is_number && #{@end}.$$is_number) {
+        if (#{@begin} % 1 !== 0 || #{@end} % 1 !== 0) {
           #{raise TypeError, "can't iterate from Float"}
         }
 
-        for (i = #@begin, limit = #@end + #{@excl ? 0 : 1}; i < limit; i++) {
+        for (i = #{@begin}, limit = #{@end} + #{@excl ? 0 : 1}; i < limit; i++) {
           block(i);
         }
 
         return self;
       }
 
-      if (#@begin.$$is_string && #@end.$$is_string) {
+      if (#{@begin}.$$is_string && #{@end}.$$is_string) {
         #{@begin.upto(@end, @excl, &block)}
         return self;
       }
@@ -89,8 +89,8 @@ class Range
     return false unless Range === other
 
     @excl === other.exclude_end? &&
-    @begin.eql?(other.begin) &&
-    @end.eql?(other.end)
+      @begin.eql?(other.begin) &&
+      @end.eql?(other.end)
   end
 
   def exclude_end?
@@ -102,7 +102,7 @@ class Range
     super
   end
 
-  alias :include? :cover?
+  alias include? cover?
 
   def last(n = undefined)
     return @end if `n == null`
@@ -118,11 +118,11 @@ class Range
     elsif @excl && @begin == @end
       nil
     else
-      `#@excl ? #@end - 1 : #@end`
+      `#{@excl} ? #{@end} - 1 : #{@end}`
     end
   end
 
-  alias :member? :cover?
+  alias member? cover?
 
   def min
     if block_given?
@@ -137,16 +137,16 @@ class Range
   end
 
   def size
-    _begin = @begin
-    _end   = @end
-    _end  -= 1 if @excl
+    range_begin = @begin
+    range_end   = @end
+    range_end  -= 1 if @excl
 
-    return nil unless Numeric === _begin && Numeric === _end
-    return 0 if _end < _begin
+    return nil unless Numeric === range_begin && Numeric === range_end
+    return 0 if range_end < range_begin
     infinity = Float::INFINITY
-    return infinity if infinity == _begin.abs || _end.abs == infinity
+    return infinity if [range_begin.abs, range_end.abs].include?(infinity)
 
-    (`Math.abs(_end - _begin) + 1`).to_i
+    `Math.abs(range_end - range_begin) + 1`.to_i
   end
 
   def step(n = 1)
@@ -199,14 +199,13 @@ class Range
       }
     }
 
-
     unless block_given?
-      return enum_for(:step, n) {
+      return enum_for(:step, n) do
         %x{
           coerceStepSize();
           return enumeratorSize();
         }
-      }
+      end
     end
 
     `coerceStepSize()`
@@ -217,8 +216,8 @@ class Range
         current = @begin + i * n
         if @excl
           break if current >= @end
-        else
-          break if current > @end
+        elsif current > @end
+          break
         end
         yield(current)
         i += 1
@@ -226,7 +225,7 @@ class Range
     else
       %x{
         if (#{@begin}.$$is_string && #{@end}.$$is_string && n % 1 !== 0) {
-          #{raise TypeError, "no implicit conversion to float from string"}
+          #{raise TypeError, 'no implicit conversion to float from string'}
         }
       }
       each_with_index do |value, idx|
@@ -247,11 +246,11 @@ class Range
   end
 
   def to_s
-    "#{@begin}#{ @excl ? '...' : '..' }#{@end}"
+    "#{@begin}#{@excl ? '...' : '..'}#{@end}"
   end
 
   def inspect
-    "#{@begin.inspect}#{ @excl ? '...' : '..' }#{@end.inspect}"
+    "#{@begin.inspect}#{@excl ? '...' : '..'}#{@end.inspect}"
   end
 
   def marshal_load(args)

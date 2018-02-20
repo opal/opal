@@ -4,7 +4,7 @@ class Proc < `Function`
 
   def self.new(&block)
     unless block
-      raise ArgumentError, "tried to create a Proc object without a block"
+      raise ArgumentError, 'tried to create a Proc object without a block'
     end
 
     block
@@ -170,5 +170,4 @@ class Proc < `Function`
   end
 
   alias clone dup
-
 end

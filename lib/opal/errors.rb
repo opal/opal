@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Opal
   # raised if Gem not found in Opal#use_gem
   class GemNotFound < StandardError

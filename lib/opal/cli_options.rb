@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'optparse'
 require 'opal/cli_runners'
 
@@ -31,28 +32,28 @@ module Opal
         exit
       end
 
-      on("-h", "--help", "Show this message") do
+      on('-h', '--help', 'Show this message') do
         puts self
         exit
       end
 
-
       section 'Basic Options:'
 
-      on('-I', '--include DIR',
-              'Append a load path (may be used more than once)') do |i|
+      on('-I', '--include DIR', 'Append a load path (may be used more than once)') do |i|
         options[:load_paths] ||= []
         options[:load_paths] << i
       end
 
       on('-e', '--eval SOURCE', String,
-              'One line of script. Several -e\'s allowed. Omit [programfile]') do |source|
+        'One line of script. Several -e\'s allowed. Omit [programfile]'
+      ) do |source|
         options[:evals] ||= []
         options[:evals] << source
       end
 
       on('-r', '--require LIBRARY', String,
-              'Require the library before executing your script') do |library|
+        'Require the library before executing your script'
+      ) do |library|
         options[:requires] ||= []
         options[:requires] << library
       end
@@ -86,7 +87,7 @@ module Opal
         options[:runner] = runner.to_sym
       end
 
-      on('--runner-options JSON', "Set options specific to the selected runner as a JSON string (e.g. port for server)") do |json_options|
+      on('--runner-options JSON', 'Set options specific to the selected runner as a JSON string (e.g. port for server)') do |json_options|
         require 'json'
         runner_options = JSON.parse(json_options, symbolize_names: true)
         options[:runner_options] ||= {}
@@ -98,7 +99,7 @@ module Opal
         options[:runner_options][:port] = port.to_i
       end
 
-      on('-E', '--no-exit', 'Do not append a Kernel#exit at the end of file') do |no_exit|
+      on('-E', '--no-exit', 'Do not append a Kernel#exit at the end of file') do
         options[:no_exit] = true
       end
 
@@ -122,8 +123,9 @@ module Opal
 
       dynamic_require_levels = %w[error warning ignore]
       on('-D', '--dynamic-require LEVEL', dynamic_require_levels,
-                    'Set level of dynamic require severity.',
-                    "(default: error, values: #{dynamic_require_levels.join(', ')})") do |level|
+        'Set level of dynamic require severity.',
+        "(default: error, values: #{dynamic_require_levels.join(', ')})"
+      ) do |level|
         options[:dynamic_require_severity] = level.to_sym
       end
 
@@ -142,7 +144,7 @@ module Opal
         options[:skip_opal_require] = true
       end
 
-      on("--irb", "Enable IRB var mode") do
+      on('--irb', 'Enable IRB var mode') do
         options[:irb] = true
       end
 
@@ -167,7 +169,7 @@ module Opal
       puts "Opal v#{Opal::VERSION}"
     end
 
-    def section title
+    def section(title)
       separator ''
       separator title
       separator ''

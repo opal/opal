@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/paths'
 require 'shellwords'
 
@@ -28,7 +29,7 @@ module Opal
         # tempfile = File.new('opal-nodejs-runner.js', 'w') # for debugging
         tempfile.write code
         tempfile.close
-        system_with_output({'NODE_PATH' => node_modules}, 'node', tempfile.path, *argv)
+        system_with_output({ 'NODE_PATH' => node_modules }, 'node', tempfile.path, *argv)
       rescue Errno::ENOENT
         raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
       end
@@ -36,7 +37,7 @@ module Opal
       # Let's support fake IO objects like StringIO
       def system_with_output(env, *cmd)
         if IO.try_convert(output)
-          system(env,*cmd)
+          system(env, *cmd)
           @exit_status = $?.exitstatus
           return
         end
@@ -48,13 +49,13 @@ module Opal
           require 'tempfile'
           require 'shellwords'
           tempfile = Tempfile.new('opal-node-output')
-          system(env,cmd.shelljoin+" > #{tempfile.path}")
+          system(env, cmd.shelljoin + " > #{tempfile.path}")
           @exit_status = $?.exitstatus
           captured_output = File.read tempfile.path
           tempfile.close
         else
           require 'open3'
-          captured_output, status = Open3.capture2(env,*cmd)
+          captured_output, status = Open3.capture2(env, *cmd)
           @exit_status = status.exitstatus
         end
 

@@ -20,7 +20,7 @@ class Module
 
   def <(other)
     unless Module === other
-      raise TypeError, "compared with non class/module"
+      raise TypeError, 'compared with non class/module'
     end
 
     # class cannot be a descendant of itself
@@ -55,7 +55,7 @@ class Module
 
   def >(other)
     unless Module === other
-      raise TypeError, "compared with non class/module"
+      raise TypeError, 'compared with non class/module'
     end
 
     other < self
@@ -229,16 +229,16 @@ class Module
         delete self.$$cvars[name];
         return value;
       } else {
-        #{raise NameError.new("cannot remove #{name} for #{self}")}
+        #{raise NameError, "cannot remove #{name} for #{self}"}
       }
     }
   end
 
-  def constants(inherit=true)
+  def constants(inherit = true)
     `Opal.constants(self, inherit)`
   end
 
-  def self.constants(inherit=undefined)
+  def self.constants(inherit = undefined)
     %x{
       if (inherit == null) {
         var nesting = (self.$$nesting || []).concat(Opal.Object),
@@ -337,7 +337,7 @@ class Module
   def const_set(name, value)
     name = Opal.const_name!(name)
 
-    if !(name =~ Opal::CONST_NAME_REGEXP) || name.start_with?('::')
+    if name !~ Opal::CONST_NAME_REGEXP || name.start_with?('::')
       raise NameError.new("wrong constant name #{name}", name)
     end
 
@@ -351,25 +351,25 @@ class Module
 
   def define_method(name, method = undefined, &block)
     if `method === undefined && block === nil`
-      raise ArgumentError, "tried to create a Proc object without a block"
+      raise ArgumentError, 'tried to create a Proc object without a block'
     end
 
     block ||= case method
-      when Proc
-        method
+              when Proc
+                method
 
-      when Method
-        `#{method.to_proc}.$$unbound`
+              when Method
+                `#{method.to_proc}.$$unbound`
 
-      when UnboundMethod
-        lambda {|*args|
-          bound = method.bind(self)
-          bound.call(*args)
-        }
+              when UnboundMethod
+                ->(*args) {
+                  bound = method.bind(self)
+                  bound.call(*args)
+                }
 
-      else
-        raise TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
-    end
+              else
+                raise TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
+              end
 
     %x{
       var id = '$' + name;
@@ -535,7 +535,7 @@ class Module
 
   def module_eval(*args, &block)
     if block.nil? && `!!Opal.compile`
-      Kernel.raise ArgumentError, "wrong number of arguments (0 for 1..3)" unless (1..3).cover? args.size
+      Kernel.raise ArgumentError, 'wrong number of arguments (0 for 1..3)' unless (1..3).cover? args.size
 
       string, file, _lineno = *args
       default_eval_options = { file: (file || '(eval)'), eval: true }
@@ -548,9 +548,9 @@ class Module
           })(self)
         }
       end
-    elsif args.size > 0
-      Kernel.raise ArgumentError, "wrong number of arguments (#{args.size} for 0)"+
-        "\n\n  NOTE:If you want to enable passing a String argument please add \"require 'opal-parser'\" to your script\n"
+    elsif args.any?
+      Kernel.raise ArgumentError, "wrong number of arguments (#{args.size} for 0)" \
+                                  "\n\n  NOTE:If you want to enable passing a String argument please add \"require 'opal-parser'\" to your script\n"
     end
 
     %x{

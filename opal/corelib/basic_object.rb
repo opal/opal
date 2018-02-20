@@ -44,11 +44,9 @@ class BasicObject
     !(self == other)
   end
 
-  alias equal? ==
-
   def instance_eval(*args, &block)
     if block.nil? && `!!Opal.compile`
-      ::Kernel.raise ::ArgumentError, "wrong number of arguments (0 for 1..3)" unless (1..3).cover? args.size
+      ::Kernel.raise ::ArgumentError, 'wrong number of arguments (0 for 1..3)' unless (1..3).cover? args.size
 
       string, file, _lineno = *args
       default_eval_options = { file: (file || '(eval)'), eval: true }
@@ -61,7 +59,7 @@ class BasicObject
           })(self)
         }
       end
-    elsif args.size > 0
+    elsif args.any?
       ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{args.size} for 0)"
     end
 
@@ -94,7 +92,7 @@ class BasicObject
   end
 
   def instance_exec(*args, &block)
-    ::Kernel.raise ::ArgumentError, "no block given" unless block
+    ::Kernel.raise ::ArgumentError, 'no block given' unless block
 
     %x{
       var block_self = block.$$s,
@@ -131,8 +129,12 @@ class BasicObject
   end
 
   def method_missing(symbol, *args, &block)
-    ::Kernel.raise ::NoMethodError.new(`self.$inspect && !self.$inspect.$$stub` ?
-      "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}" :
-      "undefined method `#{symbol}' for #{`self.$$class`}", symbol)
+    message = if `self.$inspect && !self.$inspect.$$stub`
+                "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}"
+              else
+                "undefined method `#{symbol}' for #{`self.$$class`}"
+              end
+
+    ::Kernel.raise ::NoMethodError.new(message, symbol)
   end
 end

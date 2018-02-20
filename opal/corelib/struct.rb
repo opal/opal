@@ -28,7 +28,7 @@ class Struct
           instance
         end
 
-        alias [] new
+        alias_method :[], :new
       end
     end
 
@@ -69,9 +69,9 @@ class Struct
   def self.inherited(klass)
     members = @members
 
-    klass.instance_eval {
+    klass.instance_eval do
       @members = members
-    }
+    end
   end
 
   def initialize(*args)
@@ -83,7 +83,7 @@ class Struct
       end
 
       extra = kwargs.keys - self.class.members
-      if extra.length > 0
+      if extra.any?
         raise ArgumentError, "unknown keywords: #{extra.join(', ')}"
       end
 
@@ -92,12 +92,12 @@ class Struct
       end
     else
       if args.length > self.class.members.length
-        raise ArgumentError, "struct size differs"
+        raise ArgumentError, 'struct size differs'
       end
 
-      self.class.members.each_with_index {|name, index|
+      self.class.members.each_with_index do |name, index|
         self[name] = args[index]
-      }
+      end
     end
   end
 
@@ -218,14 +218,14 @@ class Struct
   end
 
   def each
-    return enum_for(:each){self.size} unless block_given?
+    return enum_for(:each) { size } unless block_given?
 
     self.class.members.each { |name| yield self[name] }
     self
   end
 
   def each_pair
-    return enum_for(:each_pair){self.size} unless block_given?
+    return enum_for(:each_pair) { size } unless block_given?
 
     self.class.members.each { |name| yield [name, self[name]] }
     self
@@ -244,17 +244,17 @@ class Struct
   alias values to_a
 
   def inspect
-    result = "#<struct "
+    result = '#<struct '
 
     if Struct === self && self.class.name
       result += "#{self.class} "
     end
 
-    result += each_pair.map {|name, value|
+    result += each_pair.map do |name, value|
       "#{name}=#{value.inspect}"
-    }.join ", "
+    end.join ', '
 
-    result += ">"
+    result += '>'
 
     result
   end
@@ -262,11 +262,11 @@ class Struct
   alias to_s inspect
 
   def to_h
-    self.class.members.inject({}) {|h, name| h[name] = self[name]; h}
+    self.class.members.each_with_object({}) { |name, h| h[name] = self[name] }
   end
 
   def values_at(*args)
-    args = args.map{|arg| `arg.$$is_range ? #{arg.to_a} : arg`}.flatten
+    args = args.map { |arg| `arg.$$is_range ? #{arg.to_a} : arg` }.flatten
     %x{
       var result = [];
       for (var i = 0, len = args.length; i < len; i++) {
@@ -280,11 +280,9 @@ class Struct
   end
 
   def dig(key, *keys)
-    if `key.$$is_string && self.$$data.hasOwnProperty(key)`
-      item = `self.$$data[key] || nil`
-    else
-      item = nil
-    end
+    item = if `key.$$is_string && self.$$data.hasOwnProperty(key)`
+             `self.$$data[key] || nil`
+           end
 
     %x{
       if (item === nil || keys.length === 0) {

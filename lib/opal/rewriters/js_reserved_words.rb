@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/rewriters/base'
 require 'opal/regexp_anchors'
 
@@ -28,15 +29,15 @@ module Opal
       RESERVED_FUNCTION_NAMES = /#{REGEXP_START}(?:Array)#{REGEXP_END}/
 
       def self.valid_name?(name)
-        BASIC_IDENTIFIER_RULES =~ name and not(
-          ES51_RESERVED_WORD          =~ name or
-          ES3_RESERVED_WORD_EXCLUSIVE =~ name or
-          IMMUTABLE_PROPS             =~ name
+        BASIC_IDENTIFIER_RULES =~ name && !(
+          ES51_RESERVED_WORD =~ name ||
+          ES3_RESERVED_WORD_EXCLUSIVE =~ name ||
+          IMMUTABLE_PROPS =~ name
         )
       end
 
       def self.valid_ivar_name?(name)
-        not (PROTO_SPECIAL_PROPS =~ name or PROTO_SPECIAL_METHODS =~ name)
+        !(PROTO_SPECIAL_PROPS =~ name || PROTO_SPECIAL_METHODS =~ name)
       end
 
       def fix_var_name(name)
@@ -56,11 +57,12 @@ module Opal
       def on_lvasgn(node)
         name, value = *node
 
-        if value
-          node = node.updated(nil, [fix_var_name(name), value])
-        else
-          node = node.updated(nil, [fix_var_name(name)])
-        end
+        node =
+          if value
+            node.updated(nil, [fix_var_name(name), value])
+          else
+            node.updated(nil, [fix_var_name(name)])
+          end
 
         super(node)
       end
@@ -74,11 +76,13 @@ module Opal
       def on_ivasgn(node)
         name, value = *node
 
-        if value
-          node = node.updated(nil, [fix_ivar_name(name), value])
-        else
-          node = node.updated(nil, [fix_ivar_name(name)])
-        end
+        node =
+          if value
+            node.updated(nil, [fix_ivar_name(name), value])
+          else
+            node.updated(nil, [fix_ivar_name(name)])
+          end
+
         super(node)
       end
 
@@ -89,7 +93,7 @@ module Opal
         name, _ = *node
 
         if name
-          node = node.updated(nil, [fix_var_name(name)], meta: {arg_name: name})
+          node = node.updated(nil, [fix_var_name(name)], meta: { arg_name: name })
         end
 
         node
@@ -101,7 +105,7 @@ module Opal
         fixed_name = fix_var_name(name)
         new_children = value ? [fixed_name, value] : [fixed_name]
 
-        node.updated(nil, new_children, meta: {arg_name: name})
+        node.updated(nil, new_children, meta: { arg_name: name })
       end
     end
   end

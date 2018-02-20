@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -17,8 +18,8 @@ module Opal
 
         line "if (#{name} == null) {"
         line "  #{name} = ", expr(default_value)
-        push ";"
-        line "}"
+        push ';'
+        line '}'
       end
     end
   end

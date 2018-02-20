@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'parser'
 require 'opal/ast/node'
 
@@ -7,6 +8,7 @@ module Opal
     class Base < ::Parser::AST::Processor
       class DummyLocation
         def node=(*)
+          # stub
         end
 
         def expression
@@ -67,7 +69,7 @@ module Opal
       def prepend_to_body(body, node)
         if body.nil?
           node
-        elsif [:begin, :kwbegin].include?(body.type)
+        elsif %i[begin kwbegin].include?(body.type)
           body.updated(nil, [node, *body])
         else
           s(:begin, node, body)
@@ -86,7 +88,7 @@ module Opal
       def append_to_body(body, node)
         if body.nil?
           node
-        elsif [:begin, :kwbegin].include?(body.type)
+        elsif %i[begin kwbegin].include?(body.type)
           body.updated(nil, [*body, node])
         else
           s(:begin, body, node)

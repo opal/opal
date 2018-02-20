@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'open3'
 
 module Opal
@@ -43,17 +44,17 @@ module Opal
       def which(cmd)
         exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
         ENV['PATH'].split(File::PATH_SEPARATOR).find do |path|
-          exts.find { |ext|
+          exts.find do |ext|
             exe = File.join(path, "#{cmd}#{ext}")
             exe if File.executable? exe
-          }
+          end
         end
       end
 
       INSTALLED = {}
       def command_installed?(cmd, install_comment)
         command_installed = Command::INSTALLED[cmd.to_s] ||= which(cmd)
-        $stderr.puts %Q("#{cmd}" command not found#{install_comment}) unless command_installed
+        $stderr.puts %{"#{cmd}" command not found#{install_comment}} unless command_installed
         command_installed
       end
     end
@@ -64,6 +65,5 @@ module Opal
         out
       end
     end
-
   end
 end

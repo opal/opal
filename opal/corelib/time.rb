@@ -233,7 +233,7 @@ class Time < `Date`
 
   def +(other)
     if Time === other
-      raise TypeError, "time + time?"
+      raise TypeError, 'time + time?'
     end
 
     %x{
@@ -279,7 +279,7 @@ class Time < `Date`
   end
 
   def ==(other)
-    Time === other && (`#{to_f} === #{other.to_f}`)
+    Time === other && `#{to_f} === #{other.to_f}`
   end
 
   def asctime
@@ -298,7 +298,7 @@ class Time < `Date`
 
     start_of_year = Time.new(year).to_i
     start_of_day  = Time.new(year, month, day).to_i
-    one_day       = 86400
+    one_day       = 86_400
 
     ((start_of_day - start_of_year) / one_day).round + 1
   end
@@ -589,7 +589,7 @@ class Time < `Date`
             break;
 
           case 'V':
-            result += #{cweek_cyear[0].to_s.rjust(2, "0")};
+            result += #{cweek_cyear[0].to_s.rjust(2, '0')};
             break;
 
           case 'G':
@@ -716,26 +716,26 @@ class Time < `Date`
   end
 
   def cweek_cyear
-    jan01 = Time.new(self.year, 1, 1)
+    jan01 = Time.new(year, 1, 1)
     jan01_wday = jan01.wday
     first_monday = 0
     year = self.year
     if jan01_wday <= 4 && jan01_wday != 0
-      #Jan 01 is in the first week of the year
-      offset = jan01_wday-1
+      # Jan 01 is in the first week of the year
+      offset = jan01_wday - 1
     else
-      #Jan 01 is in the last week of the previous year
-      offset = jan01_wday-7-1
-      offset = -1 if offset == -8 #Adjust if Jan 01 is a Sunday
+      # Jan 01 is in the last week of the previous year
+      offset = jan01_wday - 7 - 1
+      offset = -1 if offset == -8 # Adjust if Jan 01 is a Sunday
     end
 
-    week = ((self.yday+offset)/7.00).ceil
+    week = ((yday + offset) / 7.00).ceil
 
     if week <= 0
-      #Get the last week of the previous year
-      return Time.new(self.year-1, 12, 31).cweek_cyear
+      # Get the last week of the previous year
+      return Time.new(self.year - 1, 12, 31).cweek_cyear
     elsif week == 53
-      #Find out whether this is actually week 53 or already week 01 of the following year
+      # Find out whether this is actually week 53 or already week 01 of the following year
       dec31 = Time.new(self.year, 12, 31)
       dec31_wday = dec31.wday
       if dec31_wday <= 3 && dec31_wday != 0
@@ -745,6 +745,5 @@ class Time < `Date`
     end
 
     [week, year]
-
   end
 end

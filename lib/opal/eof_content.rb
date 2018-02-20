@@ -20,8 +20,8 @@ module Opal
       if eof_content[0] == "__END__\n"
         eof_content = eof_content[1..-1] || []
         eof_content.join
-      elsif eof_content == ["__END__"]
-        ""
+      elsif eof_content == ['__END__']
+        ''
       end
     end
 

@@ -26,10 +26,10 @@ module Opal
         app = build_app(source)
 
         @server = Rack::Server.start(
-          :app       => app,
-          :Port      => port,
-          :AccessLog => [],
-          :Logger    => Logger.new(output)
+          app:       app,
+          Port:      port,
+          AccessLog: [],
+          Logger:    Logger.new(output),
         )
       end
 
@@ -42,10 +42,12 @@ module Opal
 
         if static_folder
           not_found = [404, {}, []]
-          app = Rack::Cascade.new([
-            Rack::Static.new(->_{not_found}, urls: [''], root: static_folder),
-            app,
-          ])
+          app = Rack::Cascade.new(
+            [
+              Rack::Static.new(->(_) { not_found }, urls: [''], root: static_folder),
+              app
+            ],
+          )
         end
 
         app
@@ -69,15 +71,14 @@ module Opal
         def call(env)
           case env['PATH_INFO']
           when '/'
-            [200, {'Content-Type' => 'text/html'}, [BODY]]
+            [200, { 'Content-Type' => 'text/html' }, [BODY]]
           when '/cli_runner.js'
-            [200, {'Content-Type' => 'text/javascript'}, [@source]]
+            [200, { 'Content-Type' => 'text/javascript' }, [@source]]
           else
             [404, {}, ['not found']]
           end
         end
       end
-
     end
   end
 end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'set'
 require 'pathname'
 require 'opal/nodes/base'
@@ -16,7 +17,7 @@ module Opal
 
       # Operators that get optimized by compiler
       OPERATORS = { :+ => :plus, :- => :minus, :* => :times, :/ => :divide,
-                    :< => :lt, :<= => :le, :> => :gt, :>= => :ge }
+                    :< => :lt, :<= => :le, :> => :gt, :>= => :ge }.freeze
 
       def self.add_special(name, options = {}, &handler)
         SPECIALS[name] = options
@@ -29,7 +30,7 @@ module Opal
 
         *rest, last_arg = *args
 
-        if last_arg && [:iter, :block_pass].include?(last_arg.type)
+        if last_arg && %i[iter block_pass].include?(last_arg.type)
           @iter = last_arg
           args = rest
         else
@@ -118,7 +119,7 @@ module Opal
       end
 
       def compile_arguments
-        push ", "
+        push ', '
 
         if splat?
           push expr(arglist)
@@ -131,7 +132,7 @@ module Opal
 
       def compile_block_pass
         if iter
-          push ", ", expr(iter)
+          push ', ', expr(iter)
         end
       end
 
@@ -144,7 +145,7 @@ module Opal
       end
 
       def compile_simple_call_chain
-        push recv(receiver_sexp), method_jsid, "(", expr(arglist), ")"
+        push recv(receiver_sexp), method_jsid, '(', expr(arglist), ')'
       end
 
       def splat?
@@ -175,7 +176,7 @@ module Opal
       # a variable reference in irb mode in top scope might be a var ref,
       # or it might be a method call
       def using_irb?
-        @compiler.irb? and scope.top? and arglist == s(:arglist) and recvr.nil? and iter.nil?
+        @compiler.irb? && scope.top? && arglist == s(:arglist) && recvr.nil? && iter.nil?
       end
 
       def sexp_with_arglist
@@ -189,10 +190,10 @@ module Opal
         if SPECIALS.include? meth
           method = method("handle_#{meth}")
           method.arity == 1 ? method[compile_default] : method[]
-        elsif RuntimeHelpers.compatible?(recvr, meth, arglist)
+        elsif RuntimeHelpers.compatible?(recvr, meth)
           push(RuntimeHelpers.new(sexp_with_arglist, @level, @compiler).compile)
         else
-          compile_default.call
+          yield # i.e. compile_default.call
         end
       end
 
@@ -205,9 +206,9 @@ module Opal
 
             push fragment("$rb_#{name}(")
             push lhs
-            push fragment(", ")
+            push fragment(', ')
             push rhs
-            push fragment(")")
+            push fragment(')')
           else
             compile_default.call
           end
@@ -220,7 +221,7 @@ module Opal
         compile_default.call
       end
 
-      add_special :require_relative do |_compile_default|
+      add_special :require_relative do
         arg = arglist.children[0]
         file = compiler.file
         if arg.type == :str
@@ -255,11 +256,11 @@ module Opal
         compile_default.call
       end
 
-      add_special :block_given? do |compile_default|
+      add_special :block_given? do
         push compiler.handle_block_given_call @sexp
       end
 
-      add_special :__callee__ do |compile_default|
+      add_special :__callee__ do
         if scope.def?
           push fragment scope.mid.to_s.inspect
         else
@@ -267,7 +268,7 @@ module Opal
         end
       end
 
-      add_special :__method__ do |compile_default|
+      add_special :__method__ do
         if scope.def?
           push fragment scope.mid.to_s.inspect
         else
@@ -275,29 +276,29 @@ module Opal
         end
       end
 
-      add_special :debugger do |compile_default|
+      add_special :debugger do
         push fragment 'debugger'
       end
 
-      add_special :__OPAL_COMPILER_CONFIG__ do |compile_default|
+      add_special :__OPAL_COMPILER_CONFIG__ do
         push fragment "Opal.hash({ arity_check: #{compiler.arity_check?} })"
       end
 
       add_special :nesting do |compile_default|
-        push_nesting = push_nesting?(children)
+        push_nesting = push_nesting?
         push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
         compile_default.call
         push ')' if push_nesting
       end
 
       add_special :constants do |compile_default|
-        push_nesting = push_nesting?(children)
+        push_nesting = push_nesting?
         push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
         compile_default.call
         push ')' if push_nesting
       end
 
-      def push_nesting?(recv)
+      def push_nesting?
         recv = children.first
 
         children.size == 2 && (           # only receiver and method
@@ -328,7 +329,7 @@ module Opal
 
             parts = args.map { |s| handle_part s }
 
-            if ::Opal::AST::Node === recv && recv.type == :const && recv.children.last == :File
+            if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
               if meth == :expand_path
                 return expand_path(*parts)
               elsif meth == :join
@@ -339,7 +340,7 @@ module Opal
             end
           end
 
-          msg = "Cannot handle dynamic require"
+          msg = 'Cannot handle dynamic require'
           case @compiler.dynamic_require_severity
           when :error
             @compiler.error msg, @sexp.line
@@ -349,7 +350,7 @@ module Opal
         end
 
         def expand_path(path, base = '')
-          "#{base}/#{path}".split("/").inject([]) do |p, part|
+          "#{base}/#{path}".split('/').each_with_object([]) do |part, p|
             if part == ''
               # we had '//', so ignore
             elsif part == '..'
@@ -357,9 +358,7 @@ module Opal
             else
               p << part
             end
-
-            p
-          end.join "/"
+          end.join '/'
         end
       end
     end

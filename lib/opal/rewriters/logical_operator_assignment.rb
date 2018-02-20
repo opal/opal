@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/rewriters/base'
 
 module Opal
@@ -15,14 +16,12 @@ module Opal
       end
 
       GET_SET = ->(get_type, set_type) {
-
         ->(lhs, rhs, root_type) {
-          get_node = lhs.updated(get_type) # lhs
-          condition_node = s(root_type, get_node, rhs) # lhs || rhs
+          get_node = lhs.updated(get_type)              # lhs
+          condition_node = s(root_type, get_node, rhs)  # lhs || rhs
 
           lhs.updated(set_type, [*lhs, condition_node]) # lhs = lhs || rhs
         }
-
       }
 
       # Takes    `lhs ||= rhs`
@@ -85,7 +84,7 @@ module Opal
           recvr, meth, *args = *lhs
 
           recvr_tmp = new_temp
-          cache_recvr = s(:lvasgn, recvr_tmp, recvr)          # $tmp = recvr
+          cache_recvr = s(:lvasgn, recvr_tmp, recvr) # $tmp = recvr
           recvr = s(:js_tmp, recvr_tmp)
 
           recvr_is_nil = s(:send, recvr, :nil?)                 # recvr.nil?
@@ -97,8 +96,9 @@ module Opal
             s(:if, recvr_is_nil,                          # if recvr.nil?
               s(:nil),                                    #   nil
                                                           # else
-              plain_or_asgn))                             #   recvr.meth ||= rhs
-                                                          # end
+              plain_or_asgn                               #   recvr.meth ||= rhs
+            ),
+          )                                               # end
         end
       end
 
@@ -110,15 +110,15 @@ module Opal
         cvasgn: ClassVariableHandler,
         send:   SendHandler,
         csend:  ConditionalSendHandler
-      }
+      }.freeze
 
       # lhs ||= rhs
       def on_or_asgn(node)
         lhs, rhs = *node
 
         result = HANDLERS
-          .fetch(lhs.type) { raise NotImplementedError }
-          .call(lhs, rhs, :or)
+                 .fetch(lhs.type) { raise NotImplementedError }
+                 .call(lhs, rhs, :or)
 
         process(result)
       end
@@ -128,8 +128,8 @@ module Opal
         lhs, rhs = *node
 
         result = HANDLERS
-          .fetch(lhs.type) { raise NotImplementedError }
-          .call(lhs, rhs, :and)
+                 .fetch(lhs.type) { raise NotImplementedError }
+                 .call(lhs, rhs, :and)
 
         process(result)
       end
@@ -143,7 +143,7 @@ module Opal
       # to a static "assignment" string node
       def on_defined?(node)
         inner, _ = *node
-        if [:or_asgn, :and_asgn].include?(inner.type)
+        if %i[or_asgn and_asgn].include?(inner.type)
           ASSIGNMENT_STRING_NODE
         else
           super(node)

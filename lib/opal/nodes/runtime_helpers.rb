@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'set'
 require 'opal/nodes/base'
 
@@ -13,8 +14,8 @@ module Opal
         ::Opal::AST::Node.new(type, children)
       end
 
-      def self.compatible?(recvr, meth, arglist)
-        recvr == s(:const, nil, :Opal) and HELPERS.include?(meth.to_sym)
+      def self.compatible?(recvr, meth)
+        recvr == s(:const, nil, :Opal) && HELPERS.include?(meth.to_sym)
       end
 
       def self.helper(name, &block)
@@ -32,7 +33,7 @@ module Opal
 
       helper :truthy? do
         unless sexp = arglist.children[0]
-          raise "truthy? requires an object"
+          raise 'truthy? requires an object'
         end
 
         js_truthy(sexp)
@@ -40,7 +41,7 @@ module Opal
 
       helper :falsy? do
         unless sexp = arglist.children[0]
-          raise "falsy? requires an object"
+          raise 'falsy? requires an object'
         end
 
         js_falsy(sexp)

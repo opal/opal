@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/rewriters/base'
 require 'set'
 
@@ -20,7 +21,7 @@ module Opal
         def on_pair(node)
           key, _value = *node
 
-          if %i(str sym).include?(key.type)
+          if %i[str sym].include?(key.type)
             @keys << key
           end
 

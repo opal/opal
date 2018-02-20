@@ -194,5 +194,5 @@ def self.public(*)
 end
 
 def self.private(*)
-  #stub
+  # stub
 end

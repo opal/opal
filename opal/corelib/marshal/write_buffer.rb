@@ -14,7 +14,7 @@ class Boolean
   end
 end
 
-class Fixnum
+class Integer
   def __marshal__(buffer)
     if self >= -0x40000000 && self < 0x40000000
       buffer.append('i')
@@ -116,7 +116,7 @@ class Module
     end
 
     buffer.save_link(self)
-    buffer.append("m")
+    buffer.append('m')
     buffer.write_module(self)
   end
 end
@@ -132,7 +132,7 @@ class Class
     end
 
     buffer.save_link(self)
-    buffer.append("c")
+    buffer.append('c')
     buffer.write_class(self)
   end
 end
@@ -141,7 +141,7 @@ class BasicObject
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_extends(self)
-    buffer.append("o")
+    buffer.append('o')
     buffer.write_object(self)
   end
 end
@@ -150,7 +150,7 @@ class Range
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_extends(self)
-    buffer.append("o")
+    buffer.append('o')
     buffer.append_symbol(self.class.name)
     buffer.write_fixnum(3)
     buffer.append_symbol('excl')
@@ -169,7 +169,7 @@ class Struct
     buffer.write_extends(self)
     buffer.append('S')
     buffer.append_symbol(self.class.name)
-    buffer.write_fixnum(self.length)
+    buffer.write_fixnum(length)
     each_pair do |attr_name, value|
       buffer.append_symbol(attr_name)
       buffer.write(value)
@@ -202,7 +202,7 @@ module Marshal
         when nil, true, false, Proc, Method, MatchData, Range, Struct, Array, Class, Module, Hash, Regexp
           object.__marshal__(self)
         when Integer
-          Fixnum.instance_method(:__marshal__).bind(object).call(self)
+          Integer.instance_method(:__marshal__).bind(object).call(self)
         when Float
           Float.instance_method(:__marshal__).bind(object).call(self)
         when String
@@ -265,7 +265,7 @@ module Marshal
 
       arr.each do |x|
         append(`String.fromCharCode(x & 0xff)`)
-        append(`String.fromCharCode(#{(x/0x100).floor})`)
+        append(`String.fromCharCode(#{(x / 0x100).floor})`)
       end
     end
 
@@ -326,7 +326,7 @@ module Marshal
     end
 
     def write_ivars_suffix(object, force = false)
-      if object.instance_variables.length == 0 && !force
+      if object.instance_variables.empty? && !force
         return
       end
 
@@ -341,7 +341,7 @@ module Marshal
       singleton_mods = object.singleton_class.ancestors.reject { |mod| mod.is_a?(Class) }
       class_mods = object.class.ancestors.reject { |mod| mod.is_a?(Class) }
       own_mods = singleton_mods - class_mods
-      if own_mods.length > 0
+      unless own_mods.empty?
         own_mods.each do |mod|
           append('e')
           append_symbol(mod.name)
@@ -382,7 +382,7 @@ module Marshal
       value = object._dump(0)
 
       unless value.is_a?(String)
-        raise TypeError, "_dump() must return string"
+        raise TypeError, '_dump() must return string'
       end
 
       write_ivars_prefix(value)
@@ -392,7 +392,7 @@ module Marshal
     end
 
     def write_ivars_prefix(object)
-      if object.instance_variables.length > 0
+      unless object.instance_variables.empty?
         append('I')
       end
     end

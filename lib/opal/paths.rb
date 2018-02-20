@@ -1,15 +1,16 @@
 # frozen_string_literal: true
+
 module Opal
   def self.gem_dir
-    File.expand_path("../..", __FILE__.dup.untaint)
+    File.expand_path('../..', __FILE__.dup.untaint)
   end
 
   def self.core_dir
-    File.expand_path("../../../opal", __FILE__.dup.untaint)
+    File.expand_path('../../../opal', __FILE__.dup.untaint)
   end
 
   def self.std_dir
-    File.expand_path("../../../stdlib", __FILE__.dup.untaint)
+    File.expand_path('../../../stdlib', __FILE__.dup.untaint)
   end
 
   # Add a file path to opals load path. Any gem containing ruby code that Opal
@@ -48,9 +49,11 @@ module Opal
       spec = Gem::Specification.find_by_name(gem_name)
       raise GemNotFound, gem_name unless spec
 
-      spec.runtime_dependencies.each do |dependency|
-        paths += require_paths_for_gem(dependency.name, include_dependencies)
-      end if include_dependencies
+      if include_dependencies
+        spec.runtime_dependencies.each do |dependency|
+          paths += require_paths_for_gem(dependency.name, include_dependencies)
+        end
+      end
 
       gem_dir = spec.gem_dir
       spec.require_paths.map do |path|

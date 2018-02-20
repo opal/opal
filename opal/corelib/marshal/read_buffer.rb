@@ -41,7 +41,7 @@ module Marshal
     def read(cache: true)
       code = read_char
       # The first character indicates the type of the object
-      result = case code
+      case code
       when '0'
         nil
       when 'T'
@@ -93,14 +93,13 @@ module Marshal
       when 'd'
         raise NotImplementedError, 'Data type cannot be demarshaled'
       else
-        raise ArgumentError, "dump format error"
+        raise ArgumentError, 'dump format error'
       end
-      result
     end
 
     def read_byte
       if @index >= length
-        raise ArgumentError, "marshal data too short"
+        raise ArgumentError, 'marshal data too short'
       end
       result = @buffer[@index]
       @index += 1
@@ -155,15 +154,15 @@ module Marshal
     #
     def read_float
       s = read_string(cache: false)
-      result = if s == "nan"
-        0.0 / 0
-      elsif s == "inf"
-        1.0 / 0
-      elsif s == "-inf"
-        -1.0 / 0
-      else
-        s.to_f
-      end
+      result = if s == 'nan'
+                 0.0 / 0
+               elsif s == 'inf'
+                 1.0 / 0
+               elsif s == '-inf'
+                 -1.0 / 0
+               else
+                 s.to_f
+               end
       @object_cache << result
       result
     end
@@ -175,7 +174,7 @@ module Marshal
       size = read_fixnum * 2
       result = 0
       (0...size).each do |exp|
-        result += (read_char.ord) * 2 ** (exp * 8)
+        result += read_char.ord * 2**(exp * 8)
       end
       result = result.to_i * sign
       @object_cache << result
@@ -484,10 +483,10 @@ module Marshal
       value = read(cache: false)
 
       result = if klass < Hash
-        klass[value]
-      else
-        klass.new(value)
-      end
+                 klass[value]
+               else
+                 klass.new(value)
+               end
 
       @object_cache << result
 
@@ -555,11 +554,9 @@ module Marshal
     #  re-raises Marshal-specific error when it's missing
     #
     def safe_const_get(const_name)
-      begin
-        Object.const_get(const_name)
-      rescue NameError
-        raise ArgumentError, "undefined class/module #{const_name}"
-      end
+      Object.const_get(const_name)
+    rescue NameError
+      raise ArgumentError, "undefined class/module #{const_name}"
     end
   end
 end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/rewriter'
 
 module Opal
@@ -18,6 +19,7 @@ module Opal
       end
 
       def stop_lookup(node)
+        # noop
       end
 
       # regular loops

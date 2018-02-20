@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
   module Nodes
     class BaseYieldNode < Base
-      def compile_call(children, level)
+      def compile_call
         yielding_scope = find_yielding_scope
 
         yielding_scope.uses_block!
@@ -27,7 +28,7 @@ module Opal
       def find_yielding_scope
         working = scope
         while working
-          if working.block_name or working.def?
+          if working.block_name || working.def?
             break
           end
           working = working.parent
@@ -37,7 +38,7 @@ module Opal
       end
 
       def yields_single_arg?(children)
-        !uses_splat?(children) and children.size == 1
+        !uses_splat?(children) && children.size == 1
       end
 
       def uses_splat?(children)
@@ -49,7 +50,7 @@ module Opal
       handle :yield
 
       def compile
-        compile_call(children, @level)
+        compile_call
       end
     end
 
@@ -59,9 +60,9 @@ module Opal
       handle :returnable_yield
 
       def compile
-        compile_call children, @level
+        compile_call
 
-        wrap "return ", ";"
+        wrap 'return ', ';'
       end
     end
   end

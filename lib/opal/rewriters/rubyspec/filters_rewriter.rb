@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/rewriters/base'
 
 module Opal
@@ -29,7 +30,7 @@ module Opal
         @specs_stack = []
       end
 
-      RUBYSPEC_DSL = [:describe, :it, :context]
+      RUBYSPEC_DSL = %i[describe it context].freeze
 
       def on_send(node)
         _recvr, method_name, *args = *node
@@ -60,7 +61,7 @@ module Opal
       end
 
       def current_spec_name
-        @specs_stack.join(" ")
+        @specs_stack.join(' ')
       end
     end
   end

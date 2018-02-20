@@ -39,7 +39,7 @@ class Process
   end
 
   def self.clock_gettime(clock_id, unit = :float_second)
-    clock = @__clocks__[clock_id] or raise Errno::EINVAL, "clock_gettime(#{clock_id}) #{@__clocks__[clock_id]}"
+    (clock = @__clocks__[clock_id]) || raise(Errno::EINVAL, "clock_gettime(#{clock_id}) #{@__clocks__[clock_id]}")
     %x{
       var ms = clock();
       switch (unit) {

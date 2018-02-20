@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'opal/nodes/base'
 
 module Opal
@@ -10,9 +11,9 @@ module Opal
 
       def compile
         if magical_data_const?
-          push("$__END__")
+          push('$__END__')
         elsif const_scope
-          push "Opal.const_get_qualified(", recv(const_scope), ", '#{name}')"
+          push 'Opal.const_get_qualified(', recv(const_scope), ", '#{name}')"
         elsif compiler.eval?
           push "Opal.const_get_relative($nesting, '#{name}')"
         else
@@ -27,7 +28,7 @@ module Opal
       # 2. When current file doesn't have __END__ section
       #    DATA const should be resolved to a regular ::DATA constant
       def magical_data_const?
-        const_scope.nil? && name == :DATA and compiler.eof_content
+        const_scope.nil? && name == :DATA && compiler.eof_content
       end
     end
 
@@ -48,9 +49,9 @@ module Opal
 
       def compile
         if base
-          push "Opal.const_set(", expr(base), ", '#{name}', ", expr(value), ")"
+          push 'Opal.const_set(', expr(base), ", '#{name}', ", expr(value), ')'
         else
-          push "Opal.const_set($nesting[0], '#{name}', ", expr(value), ")"
+          push "Opal.const_set($nesting[0], '#{name}', ", expr(value), ')'
         end
       end
     end
