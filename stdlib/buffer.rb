@@ -3,7 +3,7 @@ require 'buffer/array'
 require 'buffer/view'
 
 class Buffer
-  include Native
+  include Native::Wrapper
 
   def self.supported?
     not $$[:ArrayBuffer].nil?

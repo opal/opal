@@ -3,7 +3,7 @@ require 'native'
 describe "Native.native_reader" do
   it "refers to an attribute on @native" do
     Class.new {
-      include Native
+      include Native::Wrapper
 
       native_reader :a
     }.new(`{ a: 2 }`).a.should == 2
@@ -11,7 +11,7 @@ describe "Native.native_reader" do
 
   it "uses multiple names" do
     n = Class.new {
-      include Native
+      include Native::Wrapper
 
       native_reader :a, :b
     }.new(`{ a: 2, b: 3 }`)

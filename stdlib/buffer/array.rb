@@ -1,7 +1,7 @@
 class Buffer
 
 class Array
-  include Native
+  include Native::Wrapper
 
   def self.for(bits, type)
     $$["#{Buffer.name_for bits, type}Array"]
