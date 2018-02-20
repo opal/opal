@@ -21,7 +21,7 @@ class Thread
 
   # Do not allow creation of new instances.
   def initialize(*args)
-    fail NotImplementedError, "Thread creation not available"
+    raise NotImplementedError, 'Thread creation not available'
   end
 
   # fiber-local attribute access.
@@ -59,6 +59,7 @@ class Thread
   end
 
   private
+
   def core_initialize!
     @thread_locals = {}
     @fiber_locals  = {}
@@ -69,6 +70,7 @@ class Thread
   end
 
   public
+
   class Queue
     def initialize
       clear
@@ -90,8 +92,8 @@ class Thread
 
     def pop(non_block = false)
       if empty?
-        fail ThreadError, "Queue empty" if non_block
-        fail ThreadError, "Deadlock"
+        raise ThreadError, 'Queue empty' if non_block
+        raise ThreadError, 'Deadlock'
       end
 
       @storage.shift
@@ -111,7 +113,6 @@ class Thread
       @storage.each(&block)
     end
   end
-
 end
 
 Queue = Thread::Queue
@@ -124,7 +125,7 @@ class Mutex
   end
 
   def lock
-    fail ThreadError, "Deadlock" if @locked
+    raise ThreadError, 'Deadlock' if @locked
     @locked = true
     self
   end
@@ -148,7 +149,7 @@ class Mutex
   end
 
   def unlock
-    fail ThreadError, "Mutex not locked" unless @locked
+    raise ThreadError, 'Mutex not locked' unless @locked
     @locked = false
     self
   end

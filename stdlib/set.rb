@@ -7,13 +7,13 @@ class Set
   end
 
   def initialize(enum = nil, &block)
-    @hash = Hash.new
+    @hash = {}
 
     return if enum.nil?
     raise ArgumentError, 'value must be enumerable' unless Enumerable === enum
 
     if block
-      enum.each { |item| add block.call(item) }
+      enum.each { |item| add yield(item) }
     else
       merge(enum)
     end
@@ -26,7 +26,7 @@ class Set
 
   def -(enum)
     unless enum.respond_to? :each
-      raise ArgumentError, "value must be enumerable"
+      raise ArgumentError, 'value must be enumerable'
     end
 
     dup.subtract(enum)
@@ -38,11 +38,11 @@ class Set
   end
 
   def ==(other)
-    if self.equal?(other)
+    if equal?(other)
       true
     elsif other.instance_of?(self.class)
       @hash == other.instance_variable_get(:@hash)
-    elsif other.is_a?(Set) && self.size == other.size
+    elsif other.is_a?(Set) && size == other.size
       other.all? { |o| @hash.include?(o) }
     else
       false
@@ -82,13 +82,11 @@ class Set
     if include?(o)
       delete(o)
       self
-    else
-      nil
     end
   end
 
   def delete_if
-    block_given? or return enum_for(__method__)
+    return enum_for(:delete_if) unless block_given?
     # @hash.delete_if should be faster, but using it breaks the order
     # of enumeration in subclasses.
     select { |o| yield o }.each { |o| @hash.delete(o) }
@@ -104,7 +102,7 @@ class Set
   end
 
   def each(&block)
-    return enum_for :each unless block_given?
+    return enum_for(:each) unless block_given?
     @hash.each_key(&block)
     self
   end
@@ -148,46 +146,46 @@ class Set
     enum.each { |item| delete item }
     self
   end
-  
+
   def |(enum)
     unless enum.respond_to? :each
-      raise ArgumentError, "value must be enumerable"
+      raise ArgumentError, 'value must be enumerable'
     end
     dup.merge(enum)
   end
-  
+
   def superset?(set)
-    set.is_a?(Set) or raise ArgumentError, "value must be a set"
+    set.is_a?(Set) || raise(ArgumentError, 'value must be a set')
     return false if size < set.size
     set.all? { |o| include?(o) }
   end
-  
+
   alias >= superset?
-  
+
   def proper_superset?(set)
-    set.is_a?(Set) or raise ArgumentError, "value must be a set"
+    set.is_a?(Set) || raise(ArgumentError, 'value must be a set')
     return false if size <= set.size
     set.all? { |o| include?(o) }
   end
-    
+
   alias > proper_superset?
-  
+
   def subset?(set)
-    set.is_a?(Set) or raise ArgumentError, "value must be a set"
+    set.is_a?(Set) || raise(ArgumentError, 'value must be a set')
     return false if set.size < size
     all? { |o| set.include?(o) }
   end
-  
+
   alias <= subset?
 
   def proper_subset?(set)
-    set.is_a?(Set) or raise ArgumentError, "value must be a set"
+    set.is_a?(Set) || raise(ArgumentError, 'value must be a set')
     return false if set.size <= size
     all? { |o| set.include?(o) }
   end
-  
+
   alias < proper_subset?
-  
+
   alias + |
   alias union |
 

@@ -18,7 +18,7 @@ module Kernel
     }
   end
 
-  def require_remote url
+  def require_remote(url)
     %x{
       var r = new XMLHttpRequest();
       r.open("GET", url, false);

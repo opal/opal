@@ -1,68 +1,66 @@
 class Buffer
+  class Array
+    include Native::Wrapper
 
-class Array
-  include Native::Wrapper
-
-  def self.for(bits, type)
-    $$["#{Buffer.name_for bits, type}Array"]
-  end
-
-  include Enumerable
-
-  attr_reader :buffer, :type
-
-  def initialize(buffer, bits = nil, type = nil)
-    if Native == buffer
-      super(buffer)
-    else
-      %x{
-        var klass = #{Array.for(bits, type)};
-
-        #{super(`new klass(#{buffer.to_n})`)}
-      }
+    def self.for(bits, type)
+      $$["#{Buffer.name_for bits, type}Array"]
     end
 
-    @buffer = buffer
-    @type   = type
-  end
+    include Enumerable
 
-  def bits
-    `#@native.BYTES_PER_ELEMENT * 8`
-  end
+    attr_reader :buffer, :type
 
-  def [](index, offset = nil)
-    offset ? `#@native.subarray(index, offset)` : `#@native[index]`
-  end
+    def initialize(buffer, bits = nil, type = nil)
+      if Native == buffer
+        super(buffer)
+      else
+        %x{
+          var klass = #{Array.for(bits, type)};
 
-  def []=(index, value)
-    `#@native[index] = value`
-  end
+          #{super(`new klass(#{buffer.to_n})`)}
+        }
+      end
 
-  def bytesize
-    `#@native.byteLength`
-  end
+      @buffer = buffer
+      @type   = type
+    end
 
-  def each
-    return enum_for :each unless block_given?
+    def bits
+      `#{@native}.BYTES_PER_ELEMENT * 8`
+    end
 
-    %x{
-      for (var i = 0, length = #@native.length; i < length; i++) {
-        #{yield `#@native[i]`}
+    def [](index, offset = nil)
+      offset ? `#{@native}.subarray(index, offset)` : `#{@native}[index]`
+    end
+
+    def []=(index, value)
+      `#{@native}[index] = value`
+    end
+
+    def bytesize
+      `#{@native}.byteLength`
+    end
+
+    def each
+      return enum_for :each unless block_given?
+
+      %x{
+        for (var i = 0, length = #{@native}.length; i < length; i++) {
+          #{yield `#{@native}[i]`}
+        }
       }
-    }
 
-    self
+      self
+    end
+
+    def length
+      `#{@native}.length`
+    end
+
+    def merge!(other, offset = undefined)
+      `#{@native}.set(#{other.to_n}, offset)`
+    end
+
+    alias size length
   end
-
-  def length
-    `#@native.length`
-  end
-
-  def merge!(other, offset = undefined)
-    `#@native.set(#{other.to_n}, offset)`
-  end
-
-  alias size length
-end
-
 end

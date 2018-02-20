@@ -58,14 +58,12 @@ class BigDecimal
   alias === ==
 
   def <=>(other)
-    case other
-    when self.class
-      result = bignumber.JS.comparedTo(other.bignumber)
-    when Number
-      result = bignumber.JS.comparedTo(other)
-    else
-      result = nil
-    end
+    result = case other
+             when self.class
+               bignumber.JS.comparedTo(other.bignumber)
+             when Number
+               bignumber.JS.comparedTo(other)
+             end
     `#{result} === null ? nil : #{result}`
   end
 
@@ -94,7 +92,7 @@ class BigDecimal
   end
 
   def add(other, digits = 0)
-    if digits == nil
+    if digits.nil?
       raise TypeError, 'wrong argument type nil (expected Fixnum)'
     end
 
@@ -120,7 +118,7 @@ class BigDecimal
       raise FloatDomainError, "Computation results to 'Infinity'"
     end
 
-    if n == nil
+    if n.nil?
       bignumber.JS.round(0, ROUND_CEILING).JS.toNumber
     elsif n >= 0
       self.class.new(bignumber.JS.round(n, ROUND_CEILING))
@@ -149,9 +147,9 @@ class BigDecimal
       raise FloatDomainError, "Computation results to 'NaN'(Not a Number)"
     end
 
-    if digits == nil
+    if digits.nil?
       if other.zero?
-        raise ZeroDivisionError, "divided by 0"
+        raise ZeroDivisionError, 'divided by 0'
       end
 
       if infinite?
@@ -183,7 +181,7 @@ class BigDecimal
   def mult(other, digits = nil)
     other, _ = coerce(other)
 
-    if digits == nil
+    if digits.nil?
       return self.class.new(bignumber.JS.times(other.bignumber))
     end
 

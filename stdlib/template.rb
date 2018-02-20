@@ -20,7 +20,7 @@ class Template
   end
 
   def inspect
-    "#<Template: '#@name'>"
+    "#<Template: '#{@name}'>"
   end
 
   def render(ctx = self)
@@ -43,4 +43,3 @@ class Template
     end
   end
 end
-

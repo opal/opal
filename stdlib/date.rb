@@ -8,9 +8,7 @@ class Date
       @d = d <=> 0
     end
 
-    def d
-      @d
-    end
+    attr_reader :d
 
     def zero?
       false
@@ -40,28 +38,28 @@ class Date
       self.class.new(+d)
     end
 
-    def <=> (other)
+    def <=>(other)
       case other
-        when Infinity;
-          return d <=> other.d
-        when Numeric;
-          return d
-        else
-          begin
-            l, r = other.coerce(self)
-            return l <=> r
-          rescue NoMethodError
-          end
+      when Infinity
+        return d <=> other.d
+      when Numeric
+        return d
+      else
+        begin
+          l, r = other.coerce(self)
+          return l <=> r
+        rescue NoMethodError
+        end
       end
       nil
     end
 
     def coerce(other)
       case other
-        when Numeric
-          return -d, d
-        else
-          super
+      when Numeric
+        [-d, d]
+      else
+        super
       end
     end
 
@@ -77,12 +75,12 @@ class Date
 
   JULIAN          = Infinity.new
   GREGORIAN       = -Infinity.new
-  ITALY           = 2299161 # 1582-10-15
-  ENGLAND         = 2361222 # 1752-09-14
-  MONTHNAMES      = [nil] + %w(January February March April May June July August September October November December)
-  ABBR_MONTHNAMES = %w(jan feb mar apr may jun jul aug sep oct nov dec)
-  DAYNAMES        = %w(Sunday Monday Tuesday Wednesday Thursday Friday Saturday)
-  ABBR_DAYNAMES   = %w(Sun Mon Tue Wed Thu Fri Sat)
+  ITALY           = 2_299_161 # 1582-10-15
+  ENGLAND         = 2_361_222 # 1752-09-14
+  MONTHNAMES      = [nil] + %w[January February March April May June July August September October November December]
+  ABBR_MONTHNAMES = %w[jan feb mar apr may jun jul aug sep oct nov dec]
+  DAYNAMES        = %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday]
+  ABBR_DAYNAMES   = %w[Sun Mon Tue Wed Thu Fri Sat]
 
   class << self
     alias civil new
@@ -101,7 +99,7 @@ class Date
             current_month = current_date.getMonth(),
             current_year = current_date.getFullYear(),
             current_wday = current_date.getDay(),
-            full_month_name_regexp = #{MONTHNAMES.compact.join("|")};
+            full_month_name_regexp = #{MONTHNAMES.compact.join('|')};
 
         function match1(match) { return match[1]; }
         function match2(match) { return match[2]; }
@@ -269,7 +267,7 @@ class Date
           },
           {
             // ddd
-            regexp: new RegExp("^(" + #{DAYNAMES.join("|")} + ")$", 'i'),
+            regexp: new RegExp("^(" + #{DAYNAMES.join('|')} + ")$", 'i'),
             year: current_year,
             month: current_month,
             day: fromDayName(match1)
@@ -356,11 +354,11 @@ class Date
     %x{
       if (date.$$is_number) {
         var result = #{clone};
-        result.date.setDate(#@date.getDate() - date);
+        result.date.setDate(#{@date}.getDate() - date);
         return result;
       }
       else if (date.date) {
-        return Math.round((#@date - #{date}.date) / (1000 * 60 * 60 * 24));
+        return Math.round((#{@date} - #{date}.date) / (1000 * 60 * 60 * 24));
       }
       else {
         #{raise TypeError};
@@ -372,7 +370,7 @@ class Date
     %x{
       if (date.$$is_number) {
         var result = #{clone};
-        result.date.setDate(#@date.getDate() + date);
+        result.date.setDate(#{@date}.getDate() + date);
         return result;
       }
       else {
@@ -383,7 +381,7 @@ class Date
 
   def <(other)
     %x{
-      var a = #@date, b = #{other}.date;
+      var a = #{@date}, b = #{other}.date;
       a.setHours(0, 0, 0, 0);
       b.setHours(0, 0, 0, 0);
       return a < b;
@@ -392,7 +390,7 @@ class Date
 
   def <=(other)
     %x{
-      var a = #@date, b = #{other}.date;
+      var a = #{@date}, b = #{other}.date;
       a.setHours(0, 0, 0, 0);
       b.setHours(0, 0, 0, 0);
       return a <= b;
@@ -401,7 +399,7 @@ class Date
 
   def >(other)
     %x{
-      var a = #@date, b = #{other}.date;
+      var a = #{@date}, b = #{other}.date;
       a.setHours(0, 0, 0, 0);
       b.setHours(0, 0, 0, 0);
       return a > b;
@@ -410,7 +408,7 @@ class Date
 
   def >=(other)
     %x{
-      var a = #@date, b = #{other}.date;
+      var a = #{@date}, b = #{other}.date;
       a.setHours(0, 0, 0, 0);
       b.setHours(0, 0, 0, 0);
       return a >= b;
@@ -420,11 +418,11 @@ class Date
   def <=>(other)
     %x{
       if (other.$$is_number) {
-        return #{self.jd <=> other}
+        return #{jd <=> other}
       }
 
       if (#{Date === other}) {
-        var a = #@date, b = #{other}.date;
+        var a = #{@date}, b = #{other}.date;
         a.setHours(0, 0, 0, 0);
         b.setHours(0, 0, 0, 0);
 
@@ -470,11 +468,11 @@ class Date
   alias eql? ==
 
   def clone
-    Date.wrap(`new Date(#@date.getTime())`)
+    Date.wrap(`new Date(#{@date}.getTime())`)
   end
 
   def day
-    `#@date.getDate()`
+    `#{@date}.getDate()`
   end
 
   def friday?
@@ -485,9 +483,9 @@ class Date
     %x{
     //Adapted from http://www.physics.sfasu.edu/astro/javascript/julianday.html
 
-    var mm = #@date.getMonth() + 1,
-        dd = #@date.getDate(),
-        yy = #@date.getFullYear(),
+    var mm = #{@date}.getMonth() + 1,
+        dd = #{@date}.getDate(),
+        yy = #{@date}.getFullYear(),
         hr = 12, mn = 0, sc = 0,
         ggg, s, a, j1, jd;
 
@@ -518,7 +516,7 @@ class Date
   end
 
   def julian?
-    `#@date < new Date(1582, 10 - 1, 15, 12)`
+    `#{@date} < new Date(1582, 10 - 1, 15, 12)`
   end
 
   def monday?
@@ -526,14 +524,14 @@ class Date
   end
 
   def month
-    `#@date.getMonth() + 1`
+    `#{@date}.getMonth() + 1`
   end
 
   def next
     self + 1
   end
 
-  def next_day(n=1)
+  def next_day(n = 1)
     self + n
   end
 
@@ -547,7 +545,7 @@ class Date
     }
   end
 
-  def prev_day(n=1)
+  def prev_day(n = 1)
     self - n
   end
 
@@ -571,11 +569,11 @@ class Date
         return #{to_s};
       }
 
-      return #@date.$strftime(#{format});
+      return #{@date}.$strftime(#{format});
     }
   end
 
-  alias_method :succ, :next
+  alias succ next
 
   def sunday?
     wday == 0
@@ -587,7 +585,7 @@ class Date
 
   def to_s
     %x{
-      var d = #@date, year = d.getFullYear(), month = d.getMonth() + 1, day = d.getDate();
+      var d = #{@date}, year = d.getFullYear(), month = d.getMonth() + 1, day = d.getDate();
       if (month < 10) { month = '0' + month; }
       if (day < 10) { day = '0' + day; }
       return year + '-' + month + '-' + day;
@@ -609,21 +607,19 @@ class Date
   def step(limit, step = 1, &block)
     steps_count = (limit - self).to_i
 
-    if (steps_count * step) < 0
-      steps = []
-    else
-      if steps_count < 0
-        steps = (0..-steps_count).step(step.abs).map { |i| -i } .reverse
-      else
-        steps = (0..steps_count).step(step.abs)
-      end
-    end
+    steps = if steps_count * step < 0
+              []
+            elsif steps_count < 0
+              (0..-steps_count).step(step.abs).map(&:-@) .reverse
+            else
+              (0..steps_count).step(step.abs)
+            end
 
     result = steps.map { |i| self + i }
 
 
     if block_given?
-      result.each {|i| yield(i)}
+      result.each { |i| yield(i) }
       self
     else
       result
@@ -639,7 +635,7 @@ class Date
   end
 
   def wday
-    `#@date.getDay()`
+    `#{@date}.getDay()`
   end
 
   def wednesday?
@@ -647,16 +643,16 @@ class Date
   end
 
   def year
-    `#@date.getFullYear()`
+    `#{@date}.getFullYear()`
   end
 
   def cwday
-    `#@date.getDay() || 7`
+    `#{@date}.getDay() || 7`
   end
 
   def cweek
     %x{
-      var d = new Date(#@date);
+      var d = new Date(#{@date});
       d.setHours(0,0,0);
       d.setDate(d.getDate()+4-(d.getDay()||7));
       return Math.ceil((((d-new Date(d.getFullYear(),0,1))/8.64e7)+1)/7);

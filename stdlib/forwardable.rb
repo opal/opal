@@ -1,24 +1,24 @@
 module Forwardable
   def instance_delegate(hash)
-    hash.each {|methods, accessor|
+    hash.each do |methods, accessor|
       methods = [methods] unless methods.respond_to? :each
 
-      methods.each {|method|
+      methods.each do |method|
         def_instance_delegator(accessor, method)
-      }
-    }
+      end
+    end
   end
 
   def def_instance_delegators(accessor, *methods)
-    methods.each {|method|
+    methods.each do |method|
       next if %w[__send__ __id__].include?(method)
 
       def_instance_delegator(accessor, method)
-    }
+    end
   end
 
   def def_instance_delegator(accessor, method, ali = method)
-    if accessor.to_s.start_with? ?@
+    if accessor.to_s.start_with? '@'
       define_method ali do |*args, &block|
         instance_variable_get(accessor).__send__(method, *args, &block)
       end
@@ -36,25 +36,25 @@ end
 
 module SingleForwardable
   def single_delegate(hash)
-    hash.each {|methods, accessor|
+    hash.each do |methods, accessor|
       methods = [methods] unless methods.respond_to? :each
 
-      methods.each {|method|
+      methods.each do |method|
         def_single_delegator(accessor, method)
-      }
-    }
+      end
+    end
   end
 
   def def_single_delegators(accessor, *methods)
-    methods.each {|method|
+    methods.each do |method|
       next if %w[__send__ __id__].include? method
 
       def_single_delegator(accessor, method)
-    }
+    end
   end
 
   def def_single_delegator(accessor, method, ali = method)
-    if accessor.to_s.start_with? ?@
+    if accessor.to_s.start_with? '@'
       define_singleton_method ali do |*args, &block|
         instance_variable_get(accessor).__send__(method, *args, &block)
       end

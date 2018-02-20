@@ -4,7 +4,7 @@ class Delegator < BasicObject
   end
 
   def method_missing(m, *args, &block)
-    target = self.__getobj__
+    target = __getobj__
 
     if target.respond_to?(m)
       target.__send__(m, *args, &block)

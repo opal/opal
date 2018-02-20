@@ -46,6 +46,7 @@ AllCops:
     - 'stdlib/observer.rb'
     - 'stdlib/open-uri.rb'
     - 'stdlib/stringio.rb'
+    - 'stdlib/source_map/*.rb'
     - 'stdlib/racc/parser.rb'
 
 Naming/MethodName:
@@ -76,6 +77,7 @@ Layout/EmptyLineAfterMagicComment:
 Style/GlobalVars:
   Exclude:
     - 'opal/corelib/kernel.rb'
+    - 'stdlib/nodejs/irb.rb'
 
 Layout/ExtraSpacing:
   Exclude:

@@ -8,7 +8,6 @@ module Singleton
   end
 
   module SingletonClassMethods
-
     def clone
       Singleton.__init__(super)
     end
@@ -21,12 +20,12 @@ module Singleton
 
   class << Singleton
     def __init__(klass)
-      klass.instance_eval {
+      klass.instance_eval do
         @singleton__instance__ = nil
-      }
+      end
       def klass.instance
         return @singleton__instance__ if @singleton__instance__
-        @singleton__instance__ = new()
+        @singleton__instance__ = new
       end
       klass
     end

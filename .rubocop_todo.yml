@@ -35,5 +35,6 @@ Style/ModuleFunction:
 Style/MutableConstant:
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'

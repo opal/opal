@@ -5,7 +5,7 @@ module YAML
   @__yaml__ = `jsyaml`
   `var __yaml__ = #{@__yaml__}`
 
-  def self.load_path path
+  def self.load_path(path)
     loaded = `__yaml__.safeLoad(#{File}.__fs__.readFileSync(#{path}, 'utf8'))`
     loaded = Hash.new(loaded) if native?(loaded)
     loaded

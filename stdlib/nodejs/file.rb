@@ -59,16 +59,16 @@ class File < IO
     ALT_SEPARATOR = `__path__.sep`
   end
 
-  def self.read path
+  def self.read(path)
     `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString()})`
   end
 
-  def self.write path, data
+  def self.write(path, data)
     `executeIOAction(function(){return __fs__.writeFileSync(#{path}, #{data})})`
     data.size
   end
 
-  def self.exist? path
+  def self.exist?(path)
     path = path.path if path.respond_to? :path
     `return executeIOAction(function(){return __fs__.existsSync(#{path})})`
   end
@@ -91,7 +91,7 @@ class File < IO
     `__path__.join.apply(__path__, #{paths})`
   end
 
-  def self.directory? path
+  def self.directory?(path)
     return false unless exist? path
     result = `executeIOAction(function(){return !!__fs__.lstatSync(path).isDirectory()})`
     unless result
@@ -103,7 +103,7 @@ class File < IO
     result
   end
 
-  def self.file? path
+  def self.file?(path)
     return false unless exist? path
     result = `executeIOAction(function(){return !!__fs__.lstatSync(path).isFile()})`
     unless result
@@ -115,7 +115,7 @@ class File < IO
     result
   end
 
-  def self.readable? path
+  def self.readable?(path)
     return false unless exist? path
     %{
       try {
@@ -127,7 +127,7 @@ class File < IO
     }
   end
 
-  def self.size path
+  def self.size(path)
     `return executeIOAction(function(){return __fs__.lstatSync(path).size})`
   end
 
@@ -144,16 +144,16 @@ class File < IO
     end
   end
 
-  def self.stat path
+  def self.stat(path)
     path = path.path if path.respond_to? :path
     File::Stat.new(path)
   end
 
-  def self.mtime path
+  def self.mtime(path)
     `return executeIOAction(function(){return __fs__.statSync(#{path}).mtime})`
   end
 
-  def self.symlink? path
+  def self.symlink?(path)
     `return executeIOAction(function(){return __fs__.lstatSync(#{path}).isSymbolicLink()})`
   end
 
@@ -175,12 +175,12 @@ class File < IO
 
   attr_reader :path
 
-  def write string
+  def write(string)
     `executeIOAction(function(){return __fs__.writeSync(#{@fd}, #{string})})`
   end
 
   def flush
-    `executeIOAction(function(){return __fs__.fsyncSync(#@fd)})`
+    `executeIOAction(function(){return __fs__.fsyncSync(#{@fd})})`
   end
 
   def close
@@ -193,7 +193,6 @@ class File < IO
 end
 
 class File::Stat
-
   @__fs__ = node_require :fs
   `var __fs__ = #{@__fs__}`
 

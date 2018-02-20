@@ -22,7 +22,7 @@ module Gem
     end
 
     def gem_home
-      ENV['HOME']+'/.opal-node/opal-gems/#{RUBY_ENGINE_VERSION}'
+      ENV['HOME'] + '/.opal-node/opal-gems/#{RUBY_ENGINE_VERSION}'
     end
 
     def gems_dir
@@ -35,18 +35,18 @@ module Gem
 
     def perform
       gem_dir = File.join(gems_dir, full_name)
-      spec_dir = File.join(specs_dir, full_name+'.yml')
+      spec_dir = File.join(specs_dir, full_name + '.yml')
       system "mkdir -p #{gem_dir} #{spec_dir}"
 
       Dir.chdir gem_dir do
         system curl("https://rubygems.org/downloads/#{name}-#{version}.gem") + '| tar -xv'
         system "gunzip metadata.gz --stdout > #{specs_dir}/#{full_name}.yml"
-        system "gunzip data.tar.gz"
-        system "tar -xvf data.tar"
+        system 'gunzip data.tar.gz'
+        system 'tar -xvf data.tar'
       end
     end
 
-    def curl url
+    def curl(url)
       "curl -L #{url}"
     end
   end
@@ -56,11 +56,9 @@ command = ARGV.shift
 case command
 when 'install'
   name = ARGV.shift
-  if ARGV.include? '-v'
-    version = ARGV[ ARGV.index('-v')+1 ]
-  else
-    version = nil
-  end
+  version = if ARGV.include? '-v'
+              ARGV[ARGV.index('-v') + 1]
+            end
   install = Gem::Install.new(name, version)
   install.perform
 else

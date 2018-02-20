@@ -3,7 +3,7 @@ require 'opal-parser'
 module Kernel
   def __prepare_require__(path)
     name = `Opal.normalize(#{path})`
-    full_path = name.end_with?('.rb') ? name : name+'.rb'
+    full_path = name.end_with?('.rb') ? name : name + '.rb'
 
     if `!Opal.modules[#{name}]`
       ruby = File.read(full_path)
@@ -16,15 +16,15 @@ module Kernel
     end
 
     name
-  rescue => e
-    raise [path, name, full_path].inspect+e.message
+  rescue StandardError => e
+    raise [path, name, full_path].inspect + e.message
   end
 
   def require(path)
     `Opal.require(#{__prepare_require__(path)})`
   end
 
-  def load path
+  def load(path)
     `Opal.load(#{__prepare_require__(path)})`
   end
 end
