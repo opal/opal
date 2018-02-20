@@ -224,7 +224,7 @@ Style/Documentation:
   Enabled: false
 
 Style/EmptyMethod:
-  # There are a lot of empty methods taht are required to make MSpec working
+  # There are a lot of empty methods that are required to make MSpec working
   Exclude:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'

@@ -2,16 +2,16 @@ require 'native'
 
 NodeRepl = Native(`OpalNode.node_require('repl')`)
 
-def NodeRepl.start(opations = {})
-  Native::Object.new(`#{@native}.start(#{opations.to_n})`)
+def NodeRepl.start(options = {})
+  Native::Object.new(`#{@native}.start(#{options.to_n})`)
 end
 
 line = 1
 prompt_interrupted = false
 
-prompt = ->(object) {
+prompt = ->(context) {
   tip = prompt_interrupted ? '*' : '>'
-  "irb(#{object}):#{line.to_s.rjust(3, '0')}#{tip} "
+  "irb(#{context}):#{line.to_s.rjust(3, '0')}#{tip} "
 }
 
 $repl = NodeRepl.start prompt: prompt.call(self),
