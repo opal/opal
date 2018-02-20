@@ -9,9 +9,9 @@ end
 line = 1
 prompt_interrupted = false
 
-prompt = ->(_self) {
+prompt = ->(object) {
   tip = prompt_interrupted ? '*' : '>'
-  "irb(#{_self}):#{line.to_s.rjust(3, '0')}#{tip} "
+  "irb(#{object}):#{line.to_s.rjust(3, '0')}#{tip} "
 }
 
 $repl = NodeRepl.start prompt: prompt.call(self),

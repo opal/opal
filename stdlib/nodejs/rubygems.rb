@@ -22,7 +22,7 @@ module Gem
     end
 
     def gem_home
-      ENV['HOME'] + '/.opal-node/opal-gems/#{RUBY_ENGINE_VERSION}'
+      ENV['HOME'] + "/.opal-node/opal-gems/#{RUBY_ENGINE_VERSION}"
     end
 
     def gems_dir

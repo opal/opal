@@ -150,17 +150,16 @@ module Native
 
           value
         end
+      elsif as
+        define_method new do |*args, &block|
+          value = Native.call(@native, old, *args, &block)
+          if value
+            as.new(value.to_n)
+          end
+        end
       else
-        if as
-          define_method new do |*args, &block|
-            if value = Native.call(@native, old, *args, &block)
-              as.new(value.to_n)
-            end
-          end
-        else
-          define_method new do |*args, &block|
-            Native.call(@native, old, *args, &block)
-          end
+        define_method new do |*args, &block|
+          Native.call(@native, old, *args, &block)
         end
       end
     end

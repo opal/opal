@@ -41,17 +41,17 @@ class Date
     def <=>(other)
       case other
       when Infinity
-        return d <=> other.d
+        d <=> other.d
       when Numeric
-        return d
+        d
       else
         begin
           l, r = other.coerce(self)
-          return l <=> r
+          l <=> r
         rescue NoMethodError
+          nil
         end
       end
-      nil
     end
 
     def coerce(other)

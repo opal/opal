@@ -69,8 +69,6 @@ class Thread
     Opal.coerce_to!(key, String, :to_s)
   end
 
-  public
-
   class Queue
     def initialize
       clear

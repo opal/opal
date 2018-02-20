@@ -32,7 +32,7 @@ class Pathname
 
   def relative?
     path = @path
-    while r = chop_basename(path)
+    while (r = chop_basename(path))
       path, = r
     end
     path == ''
@@ -87,7 +87,7 @@ class Pathname
     prefix2 = path2
     index_list2 = []
     basename_list2 = []
-    while r2 = chop_basename(prefix2)
+    while (r2 = chop_basename(prefix2))
       prefix2, basename2 = r2
       index_list2.unshift prefix2.length
       basename_list2.unshift basename2
@@ -99,7 +99,7 @@ class Pathname
         index_list2.shift
         basename_list2.shift
       end
-      break unless r1 = chop_basename(prefix1)
+      break unless (r1 = chop_basename(prefix1))
       prefix1, basename1 = r1
       next if basename1 == '.'
       if basename1 == '..' || basename_list2.empty? || basename_list2.first != '..'
@@ -179,13 +179,13 @@ class Pathname
     base_directory = base_directory.cleanpath.to_s
     dest_prefix = dest_directory
     dest_names = []
-    while r = chop_basename(dest_prefix)
+    while (r = chop_basename(dest_prefix))
       dest_prefix, basename = r
       dest_names.unshift basename if basename != '.'
     end
     base_prefix = base_directory
     base_names = []
-    while r = chop_basename(base_prefix)
+    while (r = chop_basename(base_prefix))
       base_prefix, basename = r
       base_names.unshift basename if basename != '.'
     end

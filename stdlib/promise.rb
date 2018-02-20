@@ -146,7 +146,7 @@ class Promise
   end
 
   def realized?
-    !!@realized
+    @realized != false
   end
 
   def resolved?
@@ -198,7 +198,8 @@ class Promise
     end
 
     begin
-      if block = @action[:success] || @action[:always]
+      block = @action[:success] || @action[:always]
+      if block
         value = block.call(value)
       end
 
@@ -231,7 +232,8 @@ class Promise
     end
 
     begin
-      if block = @action[:failure] || @action[:always]
+      block = @action[:failure] || @action[:always]
+      if block
         value = block.call(value)
       end
 
@@ -343,7 +345,8 @@ class Promise
         current.push(promise.value)
       end
 
-      if prev = promise.prev
+      prev = promise.prev
+      if prev
         current.concat(it(prev))
       else
         current
@@ -431,7 +434,8 @@ class Promise
 
     def try
       if @wait.all?(&:realized?)
-        if promise = @wait.find(&:rejected?)
+        promise = @wait.find(&:rejected?)
+        if promise
           reject(promise.error)
         else
           resolve(@wait.map(&:value))
