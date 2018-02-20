@@ -41,11 +41,18 @@ AllCops:
     - tmp/**/*
     - vendored-minitest/**/*
     - vendor/**/* # present in travis
-
+    # Files thate were copied from MRI as is
+    - 'stdlib/benchmark.rb'
+    - 'stdlib/observer.rb'
+    - 'stdlib/open-uri.rb'
+    - 'stdlib/stringio.rb'
+    - 'stdlib/racc/parser.rb'
 
 Naming/MethodName:
   Exclude:
-    - 'opal/**/*.rb' # Ruby has methods like Integer/Float/Array
+    # Ruby has methods like Integer/Float/Array
+    - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Layout/ClosingParenthesisIndentation:
   Enabled: false
@@ -59,10 +66,12 @@ Layout/CommentIndentation:
 Style/FrozenStringLiteralComment:
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Layout/EmptyLineAfterMagicComment:
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Style/GlobalVars:
   Exclude:
@@ -89,11 +98,13 @@ Lint/InheritException:
   Exclude:
     - 'lib/opal/builder.rb'
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Lint/LiteralAsCondition:
   Exclude:
-    # Opal support if `...js...`
+    # Opal supports if `...js...`
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Lint/RescueException:
   Exclude:
@@ -109,16 +120,19 @@ Lint/UnusedBlockArgument:
   Exclude:
     # Variable from Ruby can be accessed in JS, rubocop can't catch it (but JSHint can)
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Lint/UnusedMethodArgument:
   Exclude:
     # Variable from Ruby can be accessed in JS, rubocop can't catch it (but JSHint can)
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Lint/UselessAssignment:
   Exclude:
     # Variable from Ruby can be accessed in JS, rubocop can't catch it (but JSHint can)
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Metrics/AbcSize:
   Enabled: false
@@ -148,11 +162,13 @@ Metrics/ParameterLists:
   Exclude:
     # Some Ruby methods take 10 arguments
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Naming/BinaryOperatorParameterName:
   Exclude:
     # Opal follows MRI argument namings
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Naming/PredicateName:
   # Ruby has "has_key?" method
@@ -182,6 +198,7 @@ Style/AsciiComments:
 Style/CaseEquality:
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
     - 'lib/opal/config.rb'
 
 Style/ClassAndModuleChildren:
@@ -201,9 +218,10 @@ Style/Documentation:
   Enabled: false
 
 Style/EmptyMethod:
-  # There are a lot of empty methods are required to make MSpec working
+  # There are a lot of empty methods taht are required to make MSpec working
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Style/IfUnlessModifier:
   Enabled: false
@@ -236,6 +254,7 @@ Style/PercentLiteralDelimiters:
   Exclude:
     # Opal has a convention of %x{}
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Style/SafeNavigation:
   # Opal supports old versions of Ruby that don't have safe navigator
@@ -252,6 +271,7 @@ Style/YodaCondition:
     # In Opal there are lot of cases like
     # if `..js..` == object
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Layout/MultilineAssignmentLayout:
   EnforcedStyle: same_line
