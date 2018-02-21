@@ -1449,12 +1449,16 @@
       return true;
     }
 
-    var i, length, ancestors = Opal.ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
+    var i, inc, original_class = klass;
+    klass = object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class)
 
-    for (i = 0, length = ancestors.length; i < length; i++) {
-      if (ancestors[i] === klass) {
-        return true;
+    while(klass) {
+      if(object.$$class === original_class) { return true }
+      for(i = 0, inc = klass.$$inc; i < inc.length; i++) {
+        if(inc[i] === original_class) { return true }
       }
+
+      klass = klass.$$super;
     }
 
     return false;
