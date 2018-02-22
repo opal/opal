@@ -1440,18 +1440,7 @@
     return null;
   };
 
-  Opal.is_a = function(object, klass) {
-    if (object.$$meta === klass || object.$$class === klass) {
-      return true;
-    }
-
-    if (object.$$is_number && klass.$$is_number_class) {
-      return true;
-    }
-
-    var i, inc, original_class = klass;
-    klass = object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class)
-
+  function check_object_hierarchy(object, klass) {
     while(klass) {
       if(object.$$class === original_class) { return true }
       for(i = 0, inc = klass.$$inc; i < inc.length; i++) {
@@ -1462,6 +1451,19 @@
     }
 
     return false;
+  }
+
+  Opal.is_a = function(object, klass) {
+    if (object.$$meta === klass || object.$$class === klass) {
+      return true;
+    }
+
+    if (object.$$is_number && klass.$$is_number_class) {
+      return true;
+    }
+
+    var i, inc, original_class = klass;
+    return check_object_hierarchy(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class))
   };
 
   // Helpers for extracting kwsplats
