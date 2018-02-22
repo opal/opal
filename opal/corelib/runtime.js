@@ -1441,7 +1441,9 @@
   };
 
   function check_object_hierarchy(object, klass) {
-    var current_class = object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class)
+    var i, inc;
+    var current_class = object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class);
+
     while(current_class) {
       if(object.$$class === klass) { return true }
       for(i = 0, inc = current_class.$$inc; i < inc.length; i++) {
@@ -1463,7 +1465,6 @@
       return true;
     }
 
-    var i, inc;
     return check_object_hierarchy(object, klass);
   };
 
