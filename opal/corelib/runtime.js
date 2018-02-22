@@ -1441,13 +1441,14 @@
   };
 
   function check_object_hierarchy(object, klass) {
-    while(klass) {
-      if(object.$$class === original_class) { return true }
-      for(i = 0, inc = klass.$$inc; i < inc.length; i++) {
-        if(inc[i] === original_class) { return true }
+    var current_class = object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class)
+    while(current_class) {
+      if(object.$$class === klass) { return true }
+      for(i = 0, inc = current_class.$$inc; i < inc.length; i++) {
+        if(inc[i] === klass) { return true }
       }
 
-      klass = klass.$$super;
+      current_class = current_class.$$super;
     }
 
     return false;
@@ -1462,8 +1463,8 @@
       return true;
     }
 
-    var i, inc, original_class = klass;
-    return check_object_hierarchy(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class))
+    var i, inc;
+    return check_object_hierarchy(object, klass);
   };
 
   // Helpers for extracting kwsplats
