@@ -288,7 +288,8 @@ Layout/MultilineAssignmentLayout:
   EnforcedStyle: same_line
 
 Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: comma
+  # Any style is allowed
+  Enabled: false
 
 Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
@@ -358,4 +359,8 @@ Naming/AccessorMethodName:
     - 'stdlib/strscan.rb'
 
 Style/RescueStandardError:
+  Enabled: false
+
+Style/TrailingCommaInLiteral:
+  # Any style is allowed
   Enabled: false
