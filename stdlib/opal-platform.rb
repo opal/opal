@@ -9,4 +9,5 @@ OPAL_PLATFORM = if nashorn
                   'nodejs'
                 elsif headless_chrome
                   'headless-chrome'
+                else # possibly browser, which is the primary target
                 end

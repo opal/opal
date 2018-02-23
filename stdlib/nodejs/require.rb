@@ -16,7 +16,7 @@ module Kernel
     end
 
     name
-  rescue StandardError => e
+  rescue => e
     raise [path, name, full_path].inspect + e.message
   end
 

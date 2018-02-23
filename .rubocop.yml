@@ -253,6 +253,7 @@ Style/MethodMissing:
     # But rubocop doesn't support configs merging (unreleased version on GH has inherit_mode option)
     - 'stdlib/native.rb'
     - 'stdlib/delegate.rb'
+    - 'stdlib/ostruct.rb'
 
 Style/NumericPredicate:
   Enabled: false
@@ -355,3 +356,6 @@ Naming/AccessorMethodName:
   Exclude:
     # StringScanner has method 'get_byte'
     - 'stdlib/strscan.rb'
+
+Style/RescueStandardError:
+  Enabled: false

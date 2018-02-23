@@ -17,25 +17,18 @@ class OpenStruct
     @table[new_ostruct_member(name)] = value
   end
 
-  def method_missing(mid, *args)
+  def method_missing(name, *args)
     if args.length > 2
-      raise NoMethodError.new("undefined method `#{mid}' for #<OpenStruct>", mid)
+      raise NoMethodError.new("undefined method `#{name}' for #<OpenStruct>", name)
     end
-    if mid.end_with? '='
+    if name.end_with? '='
       if args.length != 1
         raise ArgumentError, 'wrong number of arguments (0 for 1)'
       end
-      @table[new_ostruct_member(mid[0..-2])] = args[0]
-    elsif args.empty?
-      @table[mid.to_sym]
+      @table[new_ostruct_member(name[0..-2])] = args[0]
     else
-      super
+      @table[name.to_sym]
     end
-  end
-
-  def respond_to_missing?(mid, include_private = false)
-    mname = mid.to_s.chomp('=').to_sym
-    @table&.key?(mname) || super
   end
 
   def each_pair
@@ -83,7 +76,6 @@ class OpenStruct
     begin
       singleton_class.__send__(:remove_method, sym, "#{sym}=")
     rescue NameError
-      nil
     end
     @table.delete sym
   end
