@@ -411,10 +411,10 @@ module Opal
                  .select { |child| child.type == :str }
                  .map { |child| child.children[0] }
 
-          multiline = strs.any? { |str| str.end_with?(";\n") }
+          multiline = strs.any? { |str| str.end_with?("\n") }
 
           first_child, *rest_children = *sexp
-
+          
           if multiline
             # xstr starts with interpolation
             # then it must contain js_return inside
