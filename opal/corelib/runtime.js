@@ -163,7 +163,7 @@
   // - nesting: the namespaces wrapping the current scope, e.g. nesting inside
   //            `module A; module B::C; end; end` is `[B::C, A]`
 
-  // Get the cosntant in the scope of the current cref
+  // Get the constant in the scope of the current cref
   function const_get_name(cref, name) {
     if (cref) return cref.$$const[name];
   }
