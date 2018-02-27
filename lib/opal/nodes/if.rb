@@ -22,8 +22,8 @@ module Opal
           if falsy.type == :if
             line '} else ', stmt(falsy)
           else
+            line '} else {'
             indent do
-              line '} else {'
               line stmt(falsy)
             end
 
