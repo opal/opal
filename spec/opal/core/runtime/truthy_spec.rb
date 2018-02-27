@@ -6,9 +6,7 @@ end
 
 class JsNil
   def <(other)
-    %x{
-      return nil;
-    }
+    `nil`
   end
 end
 

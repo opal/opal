@@ -208,9 +208,7 @@ class Number < Numeric
   }
 
   def <=>(other)
-    %x{
-      return spaceship_operator(self, other);
-    }
+    `spaceship_operator(self, other)`
   rescue ArgumentError
     nil
   end

@@ -651,7 +651,7 @@ class Date
   end
 
   def cwday
-    `#@date.getDay() || 7;`
+    `#@date.getDay() || 7`
   end
 
   def cweek
