@@ -6,7 +6,10 @@ require 'opal/config'
 require 'set'
 
 module Opal
-  TESTING_RUBOCOP_ON_CODECLIMATE = %w(foo bar)
+  TESTING_RUBOCOP_ON_CODECLIMATE = %w(
+              foo
+        bar
+                      )
 
   class Builder
     # The registered processors

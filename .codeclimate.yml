@@ -1,6 +1,8 @@
 plugins:
   rubocop:
     enabled: true
+
+checks:
   duplication:
     enabled: true
     config:
