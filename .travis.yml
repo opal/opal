@@ -33,9 +33,6 @@ matrix:
       env: RUN=jshint
 
     - rvm: 2.5.0
-      env: RUN=rubocop
-
-    - rvm: 2.5.0
       env: RUN=mspec_opal_nodejs
 
     - rvm: 2.5.0

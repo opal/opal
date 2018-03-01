@@ -1,12 +1,16 @@
-engines:
- duplication:
-   enabled: true
-   config:
-     languages:
-     - ruby
+plugins:
+  rubocop:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - ruby
+
 ratings:
- paths:
- - "**.rb"
+  paths:
+  - "**.rb"
+
 exclude_paths:
 - "benchmark/*"
 - "build/*"
@@ -18,3 +22,4 @@ exclude_paths:
 - "test/*"
 - "vendored-minitest/*"
 - "**/node_modules/*"
+
