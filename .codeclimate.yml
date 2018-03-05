@@ -1,13 +1,11 @@
-engines:
- duplication:
-   enabled: true
-   config:
-     languages:
-     - ruby
-ratings:
- paths:
- - "**.rb"
-exclude_paths:
+version: "2"
+
+plugins:
+  rubocop:
+    enabled: true
+    channel: rubocop-0-52
+
+exclude_patterns:
 - "benchmark/*"
 - "build/*"
 - "coverage/*"
@@ -18,3 +16,5 @@ exclude_paths:
 - "test/*"
 - "vendored-minitest/*"
 - "**/node_modules/*"
+- stdlib/nodejs/js-yaml-3-6-1.js
+

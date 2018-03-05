@@ -32,5 +32,5 @@ end
 
 desc 'Run RuboCop on lib/ and opal/ directories'
 RuboCop::RakeTask.new(:rubocop) do |task|
-  task.patterns = %w[opal lib]
+  task.options << '--fail-fast'
 end
