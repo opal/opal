@@ -82,6 +82,7 @@ Whitespace conventions:
 ### Deprecated
 
 - The CLI `--server-port 1234` option is now deprecated in favor of using `--runner-options='{"port": 1234}'`
+- Including `::Native` is now deprecated because it generates conflicts with core classes in constant lookups (both `Native::Object` and `Native::Array` exist). Instead `Native::Werapper` should be used.
 
 
 ### Removed

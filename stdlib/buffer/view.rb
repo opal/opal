@@ -1,7 +1,7 @@
 class Buffer
 
 class View
-  include Native
+  include Native::Wrapper
 
   def self.supported?
     not $$[:DataView].nil?

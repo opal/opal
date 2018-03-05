@@ -4,7 +4,7 @@ require 'native'
 #
 # @see https://developer.mozilla.org/en-US/docs/Web/API/console
 class Console
-  include Native
+  include Native::Wrapper
 
   # Clear the console.
   def clear

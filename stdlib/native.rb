@@ -187,21 +187,29 @@ module Native
     end
   end
 
-  def self.included(klass)
-    klass.extend Helpers
-  end
+  module Wrapper
+    def initialize(native)
+      unless ::Kernel.native?(native)
+        ::Kernel.raise ArgumentError, "#{native.inspect} isn't native"
+      end
 
-  def initialize(native)
-    unless ::Kernel.native?(native)
-      ::Kernel.raise ArgumentError, "#{native.inspect} isn't native"
+      @native = native
     end
 
-    @native = native
+    # Returns the internal native JavaScript value
+    def to_n
+      @native
+    end
+
+    def self.included(klass)
+      klass.extend Helpers
+    end
   end
 
-  # Returns the internal native JavaScript value
-  def to_n
-    @native
+  def self.included(base)
+    warn "Including ::Native is deprecated. Please include Native::Wrapper instead."
+    base.include Wrapper
+    base.extend Helpers
   end
 end
 
@@ -245,7 +253,7 @@ module Kernel
 end
 
 class Native::Object < BasicObject
-  include ::Native
+  include ::Native::Wrapper
 
   def ==(other)
     `#@native === #{::Native.try_convert(other)}`
@@ -355,7 +363,7 @@ class Native::Object < BasicObject
 end
 
 class Native::Array
-  include Native
+  include Native::Wrapper
   include Enumerable
 
   def initialize(native, options = {}, &block)
