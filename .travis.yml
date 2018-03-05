@@ -3,8 +3,15 @@ language: ruby
 sudo: false
 
 dist: trusty
+
 addons:
   chrome: stable
+
+branches:
+  only:
+  - master
+  - /^.*-stable$/
+  - /^.*/check-ci$/
 
 cache:
   bundler: true
