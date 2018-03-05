@@ -86,4 +86,36 @@ RSpec.describe Opal::Builder do
     expect(builder.to_s).to include('TMP_foo_1.$$parameters = []')
   end
 
+  describe '#missing_require_severity' do
+    it 'defaults to warning' do
+      expect(builder.missing_require_severity).to eq(:error)
+    end
+
+    context 'when set to :warning' do
+      let(:options) { {missing_require_severity: :warning} }
+      it 'warns the user' do
+        expect(builder.missing_require_severity).to eq(:warning)
+        expect(builder).to receive(:warn) { |message| expect(message).to start_with(%{can't find file: "non-existen-file"}) }.at_least(1)
+        builder.build_str("require 'non-existen-file'", 'foo.rb')
+      end
+    end
+
+    context 'when set to :ignore' do
+      let(:options) { {missing_require_severity: :ignore} }
+      it 'does nothing' do
+        expect(builder.missing_require_severity).to eq(:ignore)
+        expect(builder).not_to receive(:warn)
+        expect{ builder.build_str("require 'non-existen-file'", 'foo.rb') }.not_to raise_error
+      end
+    end
+
+    context 'when set to :error' do
+      let(:options) { {missing_require_severity: :error} }
+      it 'raises MissingRequire' do
+        expect(builder.missing_require_severity).to eq(:error)
+        expect(builder).not_to receive(:warn)
+        expect{ builder.build_str("require 'non-existen-file'", 'foo.rb') }.to raise_error(described_class::MissingRequire)
+      end
+    end
+  end
 end

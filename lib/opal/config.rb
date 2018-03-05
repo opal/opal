@@ -98,7 +98,11 @@ module Opal
     # @return [true, false]
     config_option :tainting_stubs_enabled, true, compiler_option: :tainting
 
-    # Set the error severity for when a require can't be solved at compile time.
+    # Set the error severity for when a require can't be parsed at compile time.
+    #
+    # @example
+    #   # Opal code
+    #   require "foo" + some_dynamic_value
     #
     # - `:error` will raise an error at compile time
     # - `:warning` will print a warning on stderr at compile time
@@ -106,6 +110,19 @@ module Opal
     #
     # @return [:error, :warning, :ignore]
     config_option :dynamic_require_severity, :warning, compiler_option: :dynamic_require_severity, valid_values: %i[error warning ignore]
+
+    # Set the error severity for when a required file can't be found at build time.
+    #
+    # @example
+    #   # Opal code
+    #   require "some_non_existen_file"
+    #
+    # - `:error` will raise an error at compile time
+    # - `:warning` will print a warning on stderr at compile time
+    # - `:ignore` will skip the require silently at compile time
+    #
+    # @return [:error, :warning, :ignore]
+    config_option :missing_require_severity, :error, valid_values: %i[error warning ignore]
 
     # Enable IRB support for making local variables across multiple compilations.
     #

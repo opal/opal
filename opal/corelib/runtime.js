@@ -2206,7 +2206,11 @@
       var message  = 'cannot load such file -- ' + path;
 
       if (severity === "error") {
-        Opal.LoadError ? Opal.LoadError.$new(message) : function(){throw message}();
+        if (Opal.LoadError) {
+          throw Opal.LoadError.$new(message)
+        } else {
+          throw message
+        }
       }
       else if (severity === "warning") {
         console.warn('WARNING: LoadError: ' + message);

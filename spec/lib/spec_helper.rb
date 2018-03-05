@@ -78,6 +78,9 @@ RSpec.configure do |config|
     # unless a formatter has already been configured
     # (e.g. via a command-line flag).
     config.default_formatter = 'doc'
+
+    # Show full backtrace
+    config.backtrace_exclusion_patterns = []
   else
     # The RSpec specs are stored in spec/lib.
     config.pattern = 'spec/lib/**/*_spec.rb'

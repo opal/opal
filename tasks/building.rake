@@ -17,6 +17,7 @@ task :dist do
   Opal::Config.arity_check_enabled = false
   Opal::Config.const_missing_enabled = false
   Opal::Config.dynamic_require_severity = :warning
+  Opal::Config.missing_require_severity = :error
 
   # Hike gem is required to build opal-builder
   Opal.use_gem 'hike'
