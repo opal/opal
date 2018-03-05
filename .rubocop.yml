@@ -1,7 +1,47 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
   TargetRubyVersion: 2.5
+  # Include:
+  #   - lib/**/*.rb
+  #   - opal/**/*.rb
+  Exclude:
+    - CHANGELOG.md
+    - CONDUCT.md
+    - CONTRIBUTING.md
+    - Gemfile/**/*
+    - Gemfile.lock
+    - Guardfile/**/*
+    - HACKING.md
+    - LICENSE/**/*
+    - README.md
+    - Rakefile/**/*
+    - '*'
+    - __*
+    - __*/**/*
+    - appveyor.yml
+    - benchmark/**/*
+    - benchmark-ips/**/*
+    - bin/**/*
+    - build/**/*
+    - config.ru
+    - coverage/**/*
+    - docs/**/*
+    - examples/**/*
+    - exe/**/*
+    # - lib/**/*
+    - node_modules/**/*
+    # - opal/**/*
+    - opal.gemspec
+    - pkg/**/*
+    - spec/**/*
+    - stdlib/**/*
+    - tasks/**/*
+    - test/**/*
+    - tmp/**/*
+    - vendored-minitest/**/*
+    - vendor/**/* # present in travis
 
-inherit_from: .rubocop_todo.yml
 
 Naming/MethodName:
   Exclude:
