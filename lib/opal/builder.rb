@@ -63,12 +63,13 @@ module Opal
         public_send("#{k}=", v)
       end
 
-      @stubs             ||= []
-      @preload           ||= []
-      @processors        ||= ::Opal::Builder.processors
-      @path_reader       ||= PathReader.new(Opal.paths, extensions.map { |e| [".#{e}", ".js.#{e}"] }.flatten)
-      @prerequired       ||= []
-      @compiler_options  ||= Opal::Config.compiler_options
+      @stubs                    ||= []
+      @preload                  ||= []
+      @processors               ||= ::Opal::Builder.processors
+      @path_reader              ||= PathReader.new(Opal.paths, extensions.map { |e| [".#{e}", ".js.#{e}"] }.flatten)
+      @prerequired              ||= []
+      @compiler_options         ||= Opal::Config.compiler_options
+      @missing_require_severity ||= Opal::Config.missing_require_severity
 
       @processed = []
     end
@@ -83,6 +84,7 @@ module Opal
     end
 
     def build_str(source, filename, options = {})
+      return if source.nil?
       path = path_from_filename(filename)
       asset = processor_for(source, filename, path, options)
       requires = preload + asset.requires + tree_requires(asset, path)
@@ -105,6 +107,7 @@ module Opal
       @path_reader = other.path_reader.dup
       @prerequired = other.prerequired.dup
       @compiler_options = other.compiler_options.dup
+      @missing_require_severity = other.missing_require_severity.to_sym
       @processed = other.processed.dup
     end
 
@@ -124,8 +127,8 @@ module Opal
 
     attr_reader :processed
 
-    attr_accessor :processors, :path_reader, :compiler_options,
-      :stubs, :prerequired, :preload
+    attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
+      :compiler_options, :missing_require_severity
 
     private
 
@@ -160,7 +163,7 @@ module Opal
                                            "source: #{source.inspect}, "\
                                            "processors: #{processors.inspect}"
                   )
-      processor.new(source, filename, compiler_options.merge(options))
+      processor.new(source, filename, @compiler_options.merge(options))
     end
 
     def read(path)
@@ -173,13 +176,13 @@ module Opal
                   "\nAnd the following processors:\n" +
                   print_list[processors]
 
-        case compiler_options[:dynamic_require_severity]
-        when :raise   then raise MissingRequire, message
+        case missing_require_severity
+        when :error   then raise MissingRequire, message
         when :warning then warn message
-        else # noop
+        when :ignore  then # noop
         end
 
-        return "raise LoadError, #{message.inspect}"
+        nil
       end
     end
 
@@ -193,10 +196,13 @@ module Opal
 
       if source.nil?
         message = "can't find file: #{filename.inspect}"
-        case @compiler_options[:dynamic_require_severity]
-        when :error then raise LoadError, message
+        case missing_require_severity
+        when :error   then raise LoadError, message
         when :warning then warn "can't find file: #{filename.inspect}"
+        when :ignore  then # noop
         end
+
+        return # the handling is delegated to the runtime
       end
 
       path = path_from_filename(filename)

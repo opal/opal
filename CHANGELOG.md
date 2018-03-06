@@ -68,6 +68,7 @@ Whitespace conventions:
 - Added `ndigits` option support to `Number#floor`, `Number#ceil`, `Number#truncate`. (#1757)
 - Added `key` and `receiver` attributes to the `KeyError`. (#1757)
 - Extended `Struct.new` to support `keyword_init` option. (#1757)
+- Added a new `Opal::Config.missing_require_severity` option and relative `--missing-require` CLI flag. This option will command how the builder will behave when a required file is missing. Previously the behavior was undefined and partly controlled by `dynamic_require_severity`. Not to be confused with the runtime config option `Opal.config.missing_require_severity;` which controls the runtime behavior.
 
 
 ### Changed
@@ -96,6 +97,7 @@ Whitespace conventions:
 - Allow passing number of months to `Date#next_month` and `Date#prev_month`. (#1757)
 - Fixed `pattern` argument handling for `Enumerable#grep` and `Enumerable#grep_v`. (#1757)
 - Raise `ArgumentError` instead of `TypeError` from `Numeric#step` when step is not a number. (#1757)
+- At run-time `LoadError` wasn't being raised even with `Opal.config.missing_require_severity;` set to `'error'`.
 
 
 ## [0.11.0] - 2017-12-08

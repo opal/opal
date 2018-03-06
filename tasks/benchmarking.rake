@@ -107,7 +107,7 @@ namespace :bench do
     raise ArgumentError, "no files provided" if files.empty?
     puts "=== Files: #{files.join ', '}"
     files.each do |bm_path|
-      sh "bundle exec opal -ropal/platform -gbenchmark-ips -rbenchmark/ips -A #{bm_path}"
+      sh "bundle exec opal --dynamic-require ignore --missing-require ignore -ropal/platform -gbenchmark-ips -rbenchmark/ips -A #{bm_path}"
     end
   end
 end

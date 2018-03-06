@@ -1,7 +1,7 @@
 require 'lib/spec_helper'
 
 RSpec.describe Opal::Nodes::CallNode::DependencyResolver do
-  let(:compiler) { double(:compiler, :dynamic_require_severity => :none) }
+  let(:compiler) { double(:compiler, dynamic_require_severity: :warning) }
 
   it "resolves simple strings to themselves" do
     expect(resolve s(:str, 'foo')).to eq('foo')
@@ -9,23 +9,26 @@ RSpec.describe Opal::Nodes::CallNode::DependencyResolver do
 
   context "using a dynamic segment not supported" do
     it "raises a compiler error when severity is :error" do
-      compiler = double(:compiler, :dynamic_require_severity => :error)
-      expect(compiler).to receive(:error).once
-      expect(compiler).to receive(:dynamic_require_severity).once
+      compiler = double(:compiler, dynamic_require_severity: :error)
+      expect(compiler).to     receive(:dynamic_require_severity).once
+      expect(compiler).not_to receive(:warning)
+      expect(compiler).to     receive(:error).once
       described_class.new(compiler, s(:self)).resolve
     end
 
     it "produces a compiler warning when severity is :warning" do
-      compiler = double(:compiler, :dynamic_require_severity => :warning)
-      expect(compiler).to receive(:warning).once
-      expect(compiler).to receive(:dynamic_require_severity).once
+      compiler = double(:compiler, dynamic_require_severity: :warning)
+      expect(compiler).to     receive(:dynamic_require_severity).once
+      expect(compiler).to     receive(:warning).once
+      expect(compiler).not_to receive(:error)
       described_class.new(compiler, s(:self)).resolve
     end
 
-    it "does not produce a warning or error for other options" do
-      compiler = double(:compiler, :dynamic_require_severity => :foo)
-      expect(compiler).to_not receive(:warning)
-      expect(compiler).to_not receive(:error)
+    it "does not produce a warning when severity is :ignore" do
+      compiler = double(:compiler, dynamic_require_severity: :ignore)
+      expect(compiler).to     receive(:dynamic_require_severity).once
+      expect(compiler).not_to receive(:warning)
+      expect(compiler).not_to receive(:error)
       described_class.new(compiler, s(:self)).resolve
     end
   end

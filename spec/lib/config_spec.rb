@@ -23,6 +23,7 @@ RSpec.describe Opal::Config do
     expect(described_class.freezing_stubs_enabled).to   eq(true)
     expect(described_class.tainting_stubs_enabled).to   eq(true)
     expect(described_class.dynamic_require_severity).to eq(:warning)
+    expect(described_class.missing_require_severity).to eq(:error)
     expect(described_class.irb_enabled).to              eq(false)
     expect(described_class.inline_operators_enabled).to eq(true)
     expect(described_class.source_map_enabled).to       eq(true)
@@ -36,6 +37,7 @@ RSpec.describe Opal::Config do
     expect{ described_class.freezing_stubs_enabled   = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.tainting_stubs_enabled   = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.dynamic_require_severity = :foobar }.to raise_error(ArgumentError)
+    expect{ described_class.missing_require_severity = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.irb_enabled              = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.inline_operators_enabled = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.source_map_enabled       = :foobar }.to raise_error(ArgumentError)
@@ -63,6 +65,15 @@ RSpec.describe Opal::Config do
 
     expect{ described_class.dynamic_require_severity = :warning }.not_to raise_error
     expect(described_class.dynamic_require_severity).to eq(:warning)
+
+    expect{ described_class.missing_require_severity = :error }.not_to raise_error
+    expect(described_class.missing_require_severity).to eq(:error)
+
+    expect{ described_class.missing_require_severity = :ignore }.not_to raise_error
+    expect(described_class.missing_require_severity).to eq(:ignore)
+
+    expect{ described_class.missing_require_severity = :warning }.not_to raise_error
+    expect(described_class.missing_require_severity).to eq(:warning)
 
     expect{ described_class.freezing_stubs_enabled   = false }.not_to raise_error
     expect(described_class.freezing_stubs_enabled).to eq(false)
