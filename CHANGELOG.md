@@ -26,6 +26,7 @@ Whitespace conventions:
 
 ### Added
 
+- Added `Date#to_n` that returns the JavaScript Date object (in native.rb). (#1779)
 - Added `Array#pack` (supports only `C, S, L, Q, c, s, l, q, A, a` formats). (#1723)
 - Added `String#unpack` (supports only `C, S, L, Q, S>, L>, Q>, c, s, l, q, n, N, v, V, U, w, A, a, Z, B, b, H, h, u, M, m` formats). (#1723)
 - Added `File#symlink?` for Node.js. (#1725)
