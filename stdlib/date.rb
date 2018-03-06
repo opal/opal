@@ -598,6 +598,10 @@ class Date
     Time.new(year, month, day)
   end
 
+  def to_n
+    @date
+  end
+
   def tuesday?
     wday == 2
   end
