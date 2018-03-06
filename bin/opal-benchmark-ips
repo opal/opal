@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+file = ARGV.shift
+if ARGV.any?
+  warn "usage example:\n\n  #{$0} benchmark-ips/bm_case.rb\n"
+  exit 1
+end
+exec 'bundle', 'exec', 'rake', 'bench:ips', "FILE=#{file}"
