@@ -94,7 +94,7 @@ class Pathname
     end
     return path2 if prefix2 != ''
     prefix1 = path1
-    loop do
+    while true
       while !basename_list2.empty? && basename_list2.first == '.'
         index_list2.shift
         basename_list2.shift

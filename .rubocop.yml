@@ -35,7 +35,7 @@ AllCops:
     - opal.gemspec
     - pkg/**/*
     - spec/**/*
-    - stdlib/**/*
+    # - stdlib/**/*
     - tasks/**/*
     - test/**/*
     - tmp/**/*
@@ -233,9 +233,8 @@ Style/IfUnlessModifier:
   Enabled: false
 
 Style/InfiniteLoop:
-  Exclude:
-    # That's actually a definition of Kernel#loop
-    - 'opal/corelib/kernel.rb'
+  # while true is faster than loop
+  Enabled: false
 
 Style/InverseMethods:
   # That's what MRI does

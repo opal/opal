@@ -19,24 +19,24 @@ $repl = NodeRepl.start(
   useGlobal: true,
   ignoreUndefined: true,
   eval: ->(cmd, context, filename, callback) {
-          line += 1
-          cmd = cmd[1...-1].chomp
-          if cmd.empty?
-            prompt_interrupted = true
-            $repl.prompt = prompt.call(self)
-            callback.call('')
-            next
-          end
-          prompt_interrupted = false
-          $repl.prompt = prompt.call(self)
-          begin
-            result = `OpalNode.run(cmd, filename)`
-            result = nil if `#{result} == nil`
-            callback.call('=> ' + result.inspect)
-          rescue => e
-            callback.call(e.backtrace.join("\n"))
-          end
-        },
+    line += 1
+    cmd = cmd[1...-1].chomp
+    if cmd.empty?
+      prompt_interrupted = true
+      $repl.prompt = prompt.call(self)
+      callback.call('')
+      next
+    end
+    prompt_interrupted = false
+    $repl.prompt = prompt.call(self)
+    begin
+      result = `OpalNode.run(cmd, filename)`
+      result = nil if `#{result} == nil`
+      callback.call('=> ' + result.inspect)
+    rescue => e
+      callback.call(e.backtrace.join("\n"))
+    end
+  },
 )
 
 # Add a newline before exiting
