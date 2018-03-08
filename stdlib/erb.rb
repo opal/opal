@@ -6,7 +6,7 @@ class ERB
     `var escape_regexp = /[&<>"']/g;`
 
     def html_escape(str)
-      `return ("" + str).replace(escape_regexp, function (m) { return escapes[m] });`
+      `("" + str).replace(escape_regexp, function (m) { return escapes[m] })`
     end
 
     alias h html_escape

@@ -11,15 +11,13 @@ class Random
 
   def reseed(seed)
     @seed = seed
-    `self.$rng = new Math.seedrandom(seed);`
+    `self.$rng = new Math.seedrandom(seed)`
   end
 
   `var $seed_generator = new Math.seedrandom('opal', { entropy: true })`
 
   def self.new_seed
-    %x{
-      return Math.abs($seed_generator.int32());
-    }
+    `Math.abs($seed_generator.int32())`
   end
 
   def self.rand(limit = undefined)

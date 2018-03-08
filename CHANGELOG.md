@@ -94,6 +94,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- Fix handling of trailing semicolons and JavaScript returns inside x-strings, the behavior is now well defined and covered by proper specs (#1776)
 - Fixed singleton method definition to return method name. (#1757)
 - Allow passing number of months to `Date#next_month` and `Date#prev_month`. (#1757)
 - Fixed `pattern` argument handling for `Enumerable#grep` and `Enumerable#grep_v`. (#1757)

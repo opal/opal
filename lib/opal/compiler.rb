@@ -405,35 +405,7 @@ module Opal
       when :return, :js_return, :returnable_yield
         sexp
       when :xstr
-        if sexp.children.any?
-          strs = sexp
-                 .children
-                 .select { |child| child.type == :str }
-                 .map { |child| child.children[0] }
-
-          multiline = strs.any? { |str| str.end_with?(";\n") }
-
-          first_child, *rest_children = *sexp
-
-          if multiline
-            # xstr starts with interpolation
-            # then it must contain js_return inside
-            sexp
-          elsif first_child.type == :str
-            old_value = first_child.children[0]
-            if old_value.include?('return')
-              # 'return' is already there
-              sexp
-            else
-              first_child = s(:js_return, first_child)
-              sexp.updated(nil, [first_child, *rest_children])
-            end
-          else
-            s(:js_return, sexp)
-          end
-        else
-          returns s(:str, '')
-        end
+        sexp.updated(nil, [s(:js_return, *sexp.children)])
       when :if
         cond, true_body, false_body = *sexp
         sexp.updated(
