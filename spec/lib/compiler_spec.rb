@@ -308,21 +308,109 @@ RSpec.describe Opal::Compiler do
   end
 
   describe 'x-strings' do
-    it 'removes the trailing semicolon for one-line expr' do
-      compiler = Opal::Compiler.new('a = `1;`')
-      expect(compiler).to receive(:warning).once
-      expect(compiler.compile).not_to include(";)")
+    describe 'semicolons handling' do
+      def compiling(code, &block)
+        compiler = Opal::Compiler.new(code)
+        yield compiler
+      end
 
-      compiler = Opal::Compiler.new(<<-EOF)
-        a = `1;
-        2;`
-      EOF
-      expect(compiler).not_to receive(:warning)
-      compiler.compile
+      it "respects JS returns not doubling the trailing semicolon" do
+        expect_compiled(%q{
+          def foo
+            `return bar(baz)`
+          end
+        }).to include("  return bar(baz);\n")
 
-      compiler = Opal::Compiler.new('`1;`')
-      expect(compiler).not_to receive(:warning)
+        expect_compiled(%q{
+          def foo
+            %x{return bar(baz)}
+          end
+        }).to include("  return bar(baz);\n")
+
+        expect_compiled(%q{
+          def foo
+            %x{return bar(baz);}
+          end
+        }).to include("  return bar(baz);\n")
+
+        expect_compiled(%q{
+          def foo
+            %x{
+              return bar(baz)
+            }
+          end
+        }).to include("  return bar(baz);\n")
+
+        expect_compiled(%q{
+          def foo
+            %x{
+              return bar(baz);
+            }
+          end
+        }).to include("  return bar(baz);\n")
+
+        expect_compiled(%q{
+          def foo
+            789
+            `#{123 + bar} * 456;`
+          end
+        }).to include("  return $rb_plus(123, self.$bar()) * 456;\n")
+
+        expect_compiled(%q{
+          def foo
+            789
+            `#$bar * 456`
+          end
+        }).to include("  return $gvars.bar * 456;\n")
+
+        expect_compiled(%q{
+          def foo
+            789
+            `#@bar * 456`
+          end
+        }).to include("  return self.bar * 456;\n")
+
+        expect_compiled(%q{
+          if `compare === nil`
+            raise ArgumentError, "comparison of #{a.class} with #{b.class} failed"
+          end
+        }).to include("  if ($truthy(compare === nil)) {\n")
+
+        expect_compiled(%q{
+          def <<(count)
+            count = Opal.coerce_to! count, Integer, :to_int
+            `#{count} > 0 ? self << #{count} : self >> -#{count}`
+          end
+        }).to include("  return count > 0 ? self << count : self >> -count;\n")
+      end
+
+      it 'warns if a semicolon is used in a single line' do
+        expect_number_of_warnings(%{a = `1;`}).to              eq(1)
+        expect_number_of_warnings(%{a = `1;`; return}).to      eq(1)
+        expect_number_of_warnings(%{a = `1;`}).to              eq(1)
+        expect_number_of_warnings(%{a = ` 1; `}).to            eq(1)
+        expect_number_of_warnings(%{a = %x{\n 1; \n}}).to      eq(1)
+        expect_number_of_warnings(%{def foo; ` 1;  `; end}).to eq(1)
+      end
+
+      it 'does not warn for statements' do
+        expect_number_of_warnings(%{`foo;`; return}).to        eq(0)
+        expect_number_of_warnings(%{`foo;`; 123}).to           eq(0)
+      end
+
+      it 'does not warn for multiline x-strings' do
+        expect_number_of_warnings(%{a = `1;\n2;`}).to          eq(0)
+        expect_number_of_warnings(%{a = `1;\n2;3; `}).to       eq(0)
+        expect_number_of_warnings(%{def foo;` 1;\n  `;end}).to eq(1)
+      end
+    end
+
+    def expect_number_of_warnings(code)
+      warnings_number = 0
+      compiler = Opal::Compiler.new(code)
+      allow(compiler).to receive(:warning) { warnings_number += 1}
       compiler.compile
+      expect(warnings_number)
     end
   end
 

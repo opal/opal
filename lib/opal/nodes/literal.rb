@@ -209,49 +209,6 @@ module Opal
       end
     end
 
-    class XStringNode < Base
-      handle :xstr
-
-      def compile
-        children.each do |child|
-          case child.type
-          when :str
-            value = child.loc.expression.source
-            if expr? && children.size == 1
-              value = detect_and_remove_trailing_semicolon(value, child)
-            end
-            push Fragment.new(value, nil)
-          when :begin
-            push expr(child)
-          when :gvar, :ivar
-            push expr(child)
-          when :js_return
-            # A case for manually created :js_return statement in Compiler#returns
-            # Since we need to take original source of :str
-            # we have to use raw source
-            # so we need to combine "return" with "raw_source"
-            push 'return '
-            str = child.children.first
-            value = str.loc.expression.source
-            push Fragment.new(value, nil)
-          else
-            raise "Unsupported xstr part: #{child.type}"
-          end
-        end
-
-        wrap '(', ')' if recv?
-      end
-
-      def detect_and_remove_trailing_semicolon(value, node)
-        if value =~ /;\s*#{REGEXP_END}/
-          compiler.warning 'Do not terminate one-line xstr expression with semicolon', node.line
-          value.sub(/;\s*#{REGEXP_END}/, '')
-        else
-          value
-        end
-      end
-    end
-
     class DynamicStringNode < Base
       handle :dstr
 
