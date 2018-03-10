@@ -11,7 +11,7 @@ branches:
   only:
   - master
   - /^.*-stable$/
-  - /^.*/check-ci$/
+  - /^.*ci-check$/
 
 cache:
   bundler: true
