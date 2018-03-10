@@ -371,6 +371,13 @@ RSpec.describe Opal::Compiler do
         }).to include("  return self.bar * 456;\n")
 
         expect_compiled(%q{
+          def foo
+            789
+            `456 * #@bar`
+          end
+        }).to include("  return 456 * self.bar;\n")
+
+        expect_compiled(%q{
           if `compare === nil`
             raise ArgumentError, "comparison of #{a.class} with #{b.class} failed"
           end
@@ -382,6 +389,34 @@ RSpec.describe Opal::Compiler do
             `#{count} > 0 ? self << #{count} : self >> -#{count}`
           end
         }).to include("  return count > 0 ? self << count : self >> -count;\n")
+
+        expect_compiled(%q{
+          def self.exist? path
+            path = path.path if path.respond_to? :path
+            `return executeIOAction(function(){return __fs__.existsSync(#{path})})`
+          end
+        }).to include("  return executeIOAction(function(){return __fs__.existsSync(path)});\n")
+
+        expect_compiled(%q{
+          def self.exist? path
+            path = path.path if path.respond_to? :path
+            `executeIOAction(function(){return __fs__.existsSync(#{path})})`
+          end
+        }).to include("  return executeIOAction(function(){return __fs__.existsSync(path)});\n")
+
+        expect_compiled(%q{
+          def self.exist? path
+            path = path.path if path.respond_to? :path
+            `return executeIOAction(function(){return __fs__.existsSync(#{path})});`
+          end
+        }).to include("  return executeIOAction(function(){return __fs__.existsSync(path)});\n")
+
+        expect_compiled(%q{
+          def self.exist? path
+            path = path.path if path.respond_to? :path
+            `executeIOAction(function(){return __fs__.existsSync(#{path})});`
+          end
+        }).to include("  return executeIOAction(function(){return __fs__.existsSync(path)});\n")
       end
 
       it 'warns if a semicolon is used in a single line' do

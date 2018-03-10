@@ -62,12 +62,13 @@ module Opal
         last_value = extract_last_value(last_child) if last_child.type == :str
 
         unless single_child
+          # assuming there's an interpolation somewhere (type != :str)
+          @should_add_semicolon = false
           compile_child(first_child)
           children.each { |c| compile_child(c) }
         end
 
         if last_child.type == :str
-          @should_add_semicolon = false if !single_child && first_child.type != :str
           push Fragment.new(last_value, scope, last_child)
         else
           compile_child(last_child)
