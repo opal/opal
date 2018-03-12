@@ -160,14 +160,14 @@ class File < IO
   # Instance Methods
 
   def initialize(path, flags = 'r')
-    binary_flag_regexp = /b/
-    encoding_flag_regexp = /:(.*)/
-    # binary flag is unsupported
-    `handle_unsupported_feature("Binary flag (b) is unsupported by Node.js openSync method, removing flag.")` if flags.match(binary_flag_regexp)
-    flags = flags.gsub(binary_flag_regexp, '')
+    # Node reads files in binary by default, but does not recognize the flag
+    flags = flags.delete('b')
     # encoding flag is unsupported
-    `handle_unsupported_feature("Encoding flag (:encoding) is unsupported by Node.js openSync method, removing flag.")` if flags.match(encoding_flag_regexp)
-    flags = flags.gsub(encoding_flag_regexp, '')
+    encoding_option_rx = /:(.*)/
+    if encoding_option_rx.match?(flags)
+      `handle_unsupported_feature("Encoding option (:encoding) is unsupported by Node.js openSync method and will be removed.")`
+      flags = flags.sub(encoding_option_rx, '')
+    end
     @path = path
     @flags = flags
     @fd = `executeIOAction(function(){return __fs__.openSync(path, flags)})`
