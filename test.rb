@@ -33,8 +33,8 @@ check = ->(object, methods_of, kind) do
   puts
 end
 
-# check.call(BasicObject.new, old_methods_of, 'old')
-# check.call(BasicObject.new, new_methods_of, 'new')
+check.call(BasicObject.new, old_methods_of, 'old')
+check.call(BasicObject.new, new_methods_of, 'new')
 
 # module M
 #   def in_module
@@ -48,8 +48,8 @@ end
 #   include M
 # end
 
-check.call(Object.new, old_methods_of, 'old')
-check.call(Object.new, new_methods_of, 'new')
+# check.call(Object.new, old_methods_of, 'old')
+# check.call(Object.new, new_methods_of, 'new')
 
 # check.call(Array.new, old_methods_of)
 # check.call(Array.new, new_methods_of)
