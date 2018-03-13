@@ -138,9 +138,9 @@
     }
   }
 
-  function $defineProperty(object, name, value) {
+  function $defineProperty(object, name, initialValue) {
     Object.defineProperty(object, name, {
-      value: value,
+      value: initialValue,
       enumerable: false,
       configurable: true
     });
@@ -448,8 +448,8 @@
     //                    the last included klass
     klass.$$parent = superclass;
 
-    klass.$$ancestors = superclass.$$ancestors.slice();
-    klass.$$ancestors.unshift(klass);
+    console.log()
+    klass.$$ancestors = [klass];
 
     Opal.const_set(base, name, klass);
 
@@ -662,8 +662,7 @@
 
     // @property $$proto This is the prototype on which methods will be defined
     module.$$proto = module_prototype;
-    module.$$proto.$$methods = [];
-    // module.$$proto.$$methods.push('MODULE_ALLOCATE');
+    module.$$proto.$$methods = {};
 
     // @property constructor
     //   keeps a ref to the constructor, but apparently the
@@ -844,8 +843,8 @@
       if (ancestor === from) {
         var method_name = name.slice(1);
         // console.log("Bridging method", method_name, "to", target_constructor, "instances");
-        target_constructor.prototype.$$methods.push(method_name);
-        target_constructor.prototype[name] = body
+        target_constructor.prototype.$$methods[method_name] = body;
+        target_constructor.prototype[name] = body;
         break;
       }
     }
@@ -1011,17 +1010,11 @@
 
     Opal.stub_subscribers.push(constructor.prototype);
 
-    if (constructor.prototype.$$methods == null) {
-      // console.log("Adding methods table to instances of", constructor);
-      constructor.prototype.$$methods = ["BRIDGE"];
-    }
-
     // Populate constructor with previously stored stubs
     for (var method_name in Opal.stubs) {
       if (!(method_name in constructor.prototype)) {
+        constructor.prototype.$$methods[method_name] = Opal.stub_for(method_name);
         constructor.prototype[method_name] = Opal.stub_for(method_name);
-        // console.log("Bridging method", method_name, "to", constructor, "instances");
-        constructor.prototype.$$methods.push(method_name);
       }
     }
 
@@ -1079,7 +1072,6 @@
       if (current_owner_index <= module_index) {
         dest[jsid] = body;
         dest[jsid].$$donated = module;
-        debugger;
         // console.log("inheriting", jsid, "from", module.$$name, "to", includer.$$name);
         dest.$$methods.push(jsid.slice(1));
       }
@@ -1088,7 +1080,6 @@
       // neither a class, or module included by class, has defined method
       dest[jsid] = body;
       dest[jsid].$$donated = module;
-      debugger;
       // console.log("inheriting", jsid, "from", module.$$name, "to", includer.$$name);
       dest.$$methods.push(jsid.slice(1));
     }
@@ -1706,10 +1697,6 @@
 
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(obj, jsid, body) {
-    if (obj === Opal.BasicObject) {
-      debugger;
-    }
-
     obj.$$proto[jsid] = body;
     // console.log("Defining method", jsid.slice(1), "on", obj.$$name);
     obj.$$proto.$$methods.push(jsid.slice(1));
@@ -2358,11 +2345,10 @@
   Module.$$parent      = _Object;
   Class.$$parent       = Module;
 
-  // Fix ancestors of booted classes
   BasicObject.$$ancestors = [BasicObject];
-  _Object.$$ancestors = [_Object, BasicObject]
-  Module.$$ancestors = [Module, _Object, BasicObject];
-  Class.$$ancestors = [Class, Module, _Object, BasicObject];
+  _Object.$$ancestors     = [_Object];
+  Module.$$ancestors     = [Module];
+  Class.$$ancestors     = [Class];
 
   // Forward .toString() to #to_s
   _Object.$$proto.toString = function() {
