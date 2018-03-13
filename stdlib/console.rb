@@ -8,66 +8,66 @@ class Console
 
   # Clear the console.
   def clear
-    `#@native.clear()`
+    `#{@native}.clear()`
   end
 
   # Print a stacktrace from the call site.
   def trace
-    `#@native.trace()`
+    `#{@native}.trace()`
   end
 
   # Log the passed objects based on an optional initial format.
   def log(*args)
-    `#@native.log.apply(#@native, args)`
+    `#{@native}.log.apply(#{@native}, args)`
   end
 
   # Log the passed objects based on an optional initial format as informational
   # log.
   def info(*args)
-    `#@native.info.apply(#@native, args)`
+    `#{@native}.info.apply(#{@native}, args)`
   end
 
   # Log the passed objects based on an optional initial format as warning.
   def warn(*args)
-    `#@native.warn.apply(#@native, args)`
+    `#{@native}.warn.apply(#{@native}, args)`
   end
 
   # Log the passed objects based on an optional initial format as error.
   def error(*args)
-    `#@native.error.apply(#@native, args)`
+    `#{@native}.error.apply(#{@native}, args)`
   end
 
   # Time the given block with the given label.
   def time(label, &block)
-    raise ArgumentError, "no block given" unless block
+    raise ArgumentError, 'no block given' unless block
 
-    `#@native.time(label)`
+    `#{@native}.time(label)`
 
     begin
       if block.arity == 0
         instance_exec(&block)
       else
-        block.call(self)
+        yield(self)
       end
     ensure
-      `#@native.timeEnd()`
+      `#{@native}.timeEnd()`
     end
   end
 
   # Group the given block.
   def group(*args, &block)
-    raise ArgumentError, "no block given" unless block
+    raise ArgumentError, 'no block given' unless block
 
-    `#@native.group.apply(#@native, args)`
+    `#{@native}.group.apply(#{@native}, args)`
 
     begin
       if block.arity == 0
         instance_exec(&block)
       else
-        block.call(self)
+        yield(self)
       end
     ensure
-      `#@native.groupEnd()`
+      `#{@native}.groupEnd()`
     end
   end
 
@@ -75,16 +75,16 @@ class Console
   def group!(*args, &block)
     return unless block_given?
 
-    `#@native.groupCollapsed.apply(#@native, args)`
+    `#{@native}.groupCollapsed.apply(#{@native}, args)`
 
     begin
       if block.arity == 0
         instance_exec(&block)
       else
-        block.call(self)
+        yield(self)
       end
     ensure
-      `#@native.groupEnd()`
+      `#{@native}.groupEnd()`
     end
   end
 end

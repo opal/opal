@@ -6,15 +6,16 @@ class Buffer
   include Native::Wrapper
 
   def self.supported?
-    not $$[:ArrayBuffer].nil?
+    !$$[:ArrayBuffer].nil?
   end
 
   def self.name_for(bits, type)
-    "#{case type
-      when :unsigned then 'Uint'
-      when :signed   then 'Int'
-      when :float    then 'Float'
-    end}#{bits}"
+    part = case type
+           when :unsigned then 'Uint'
+           when :signed   then 'Int'
+           when :float    then 'Float'
+           end
+    "#{part}#{bits}"
   end
 
   def initialize(size, bits = 8)
@@ -26,7 +27,7 @@ class Buffer
   end
 
   def length
-    `#@native.byteLength`
+    `#{@native}.byteLength`
   end
 
   alias size length

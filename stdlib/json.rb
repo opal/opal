@@ -191,7 +191,7 @@ end
 
 class Time
   def to_json
-    strftime("%FT%T%z").to_json
+    strftime('%FT%T%z').to_json
   end
 end
 
@@ -204,4 +204,3 @@ class Date
     to_s
   end
 end
-

@@ -1,6 +1,5 @@
 class File
-
-  def self.read path
+  def self.read(path)
     %x(
         var Paths = Java.type('java.nio.file.Paths');
         var Files = Java.type('java.nio.file.Files');
@@ -11,18 +10,17 @@ class File
       )
   end
 
-  def self.file? path
-    %x(
+  def self.file?(path)
+    %x{
       var Files = Java.type('java.nio.file.Files');
       return Files.exists(path) && Files.isRegularFile(path);
-    )
+    }
   end
 
-  def self.readable? path
-    %x(
+  def self.readable?(path)
+    %x{
       var Files = Java.type('java.nio.file.Files');
       return Files.exists(path) && Files.isReadable(path);
-    )
+    }
   end
-
 end

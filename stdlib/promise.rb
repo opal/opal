@@ -134,7 +134,7 @@ class Promise
   end
 
   def act?
-    @action.has_key?(:success) || @action.has_key?(:always)
+    @action.key?(:success) || @action.key?(:always)
   end
 
   def action
@@ -146,7 +146,7 @@ class Promise
   end
 
   def realized?
-    !!@realized
+    @realized != false
   end
 
   def resolved?
@@ -159,7 +159,7 @@ class Promise
 
   def ^(promise)
     promise << self
-    self    >> promise
+    self >> promise
 
     promise
   end
@@ -178,7 +178,7 @@ class Promise
     elsif resolved?
       promise.resolve(@delayed ? @delayed[0] : value)
     elsif rejected?
-      if !@action.has_key?(:failure) || Promise === (@delayed ? @delayed[0] : @error)
+      if !@action.key?(:failure) || Promise === (@delayed ? @delayed[0] : @error)
         promise.reject(@delayed ? @delayed[0] : error)
       elsif promise.action.include?(:always)
         promise.reject(@delayed ? @delayed[0] : error)
@@ -198,7 +198,8 @@ class Promise
     end
 
     begin
-      if block = @action[:success] || @action[:always]
+      block = @action[:success] || @action[:always]
+      if block
         value = block.call(value)
       end
 
@@ -231,11 +232,12 @@ class Promise
     end
 
     begin
-      if block = @action[:failure] || @action[:always]
+      block = @action[:failure] || @action[:always]
+      if block
         value = block.call(value)
       end
 
-      if @action.has_key?(:always)
+      if @action.key?(:always)
         resolve!(value)
       else
         reject!(value)
@@ -326,11 +328,11 @@ class Promise
       result += " >> #{@next.inspect}"
     end
 
-    if realized?
-      result += ": #{(@value || @error).inspect}>"
-    else
-      result += ">"
-    end
+    result += if realized?
+                ": #{(@value || @error).inspect}>"
+              else
+                '>'
+              end
 
     result
   end
@@ -343,7 +345,8 @@ class Promise
         current.push(promise.value)
       end
 
-      if prev = promise.prev
+      prev = promise.prev
+      if prev
         current.concat(it(prev))
       else
         current
@@ -372,31 +375,31 @@ class Promise
 
       @wait = []
 
-      promises.each {|promise|
+      promises.each do |promise|
         wait promise
-      }
+      end
     end
 
     def each(&block)
       raise ArgumentError, 'no block given' unless block
 
-      self.then {|values|
+      self.then do |values|
         values.each(&block)
-      }
+      end
     end
 
     def collect(&block)
       raise ArgumentError, 'no block given' unless block
 
-      self.then {|values|
+      self.then do |values|
         When.new(values.map(&block))
-      }
+      end
     end
 
     def inject(*args, &block)
-      self.then {|values|
+      self.then do |values|
         values.reduce(*args, &block)
-      }
+      end
     end
 
     alias map collect
@@ -414,9 +417,9 @@ class Promise
 
       @wait << promise
 
-      promise.always {
+      promise.always do
         try if @next.any?
-      }
+      end
 
       self
     end
@@ -424,14 +427,15 @@ class Promise
     alias and wait
 
     def >>(*)
-      super.tap {
+      super.tap do
         try
-      }
+      end
     end
 
     def try
       if @wait.all?(&:realized?)
-        if promise = @wait.find(&:rejected?)
+        promise = @wait.find(&:rejected?)
+        if promise
           reject(promise.error)
         else
           resolve(@wait.map(&:value))

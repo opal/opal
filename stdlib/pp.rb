@@ -4,9 +4,9 @@ module Kernel
   end
 
   def pp(*objs)
-    objs.each {|obj|
+    objs.each do |obj|
       PP.pp(obj)
-    }
+    end
     objs.size <= 1 ? objs.first : objs
   end
   module_function :pp
@@ -15,11 +15,11 @@ end
 class PP
   class << self
     if `(typeof(console) === "undefined" || typeof(console.log) === "undefined")`
-      def pp(obj, out=$stdout, width=79)
+      def pp(obj, out = $stdout, width = 79)
         p(*args)
       end
     else
-      def pp(obj, out=$stdout, width=79)
+      def pp(obj, out = $stdout, width = 79)
         if String === out
           out + obj.inspect + "\n"
         else
@@ -28,6 +28,6 @@ class PP
       end
     end
 
-    alias :singleline_pp :pp
+    alias singleline_pp pp
   end
 end

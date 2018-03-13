@@ -27,13 +27,27 @@ Style/ModuleFunction:
   Exclude:
     - 'lib/opal/config.rb'
     - 'lib/opal/util.rb'
+    - 'stdlib/nodejs/fileutils.rb'
+    - 'stdlib/js.rb'
 
 # Requires fixing
 # TODO: move opal/**/*.rb to .rubocop.yml
+# (unreleased version on GH has inherit_mode option)
 # after fixing other cases, rubocop doesn't support Exclude section merging.
 # Opal doesn't support freezing anyway
 Style/MutableConstant:
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
+
+Style/MethodMissing:
+  Exclude:
+    - 'stdlib/native.rb'
+    - 'stdlib/delegate.rb'
+    - 'stdlib/ostruct.rb'
+
+Lint/HandleExceptions:
+  Exclude:
+    - 'stdlib/ostruct.rb'

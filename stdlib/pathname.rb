@@ -22,7 +22,7 @@ class Pathname
 
   attr_reader :path
 
-  def == other
+  def ==(other)
     other.path == @path
   end
 
@@ -32,7 +32,7 @@ class Pathname
 
   def relative?
     path = @path
-    while r = chop_basename(path)
+    while (r = chop_basename(path))
       path, = r
     end
     path == ''
@@ -63,7 +63,7 @@ class Pathname
   end
 
   def cleanpath
-    `return Opal.normalize(#@path)`
+    `return Opal.normalize(#{@path})`
   end
 
   def to_path
@@ -87,7 +87,7 @@ class Pathname
     prefix2 = path2
     index_list2 = []
     basename_list2 = []
-    while r2 = chop_basename(prefix2)
+    while (r2 = chop_basename(prefix2))
       prefix2, basename2 = r2
       index_list2.unshift prefix2.length
       basename_list2.unshift basename2
@@ -99,11 +99,11 @@ class Pathname
         index_list2.shift
         basename_list2.shift
       end
-      break unless r1 = chop_basename(prefix1)
+      break unless (r1 = chop_basename(prefix1))
       prefix1, basename1 = r1
       next if basename1 == '.'
       if basename1 == '..' || basename_list2.empty? || basename_list2.first != '..'
-        prefix1 = prefix1 + basename1
+        prefix1 += basename1
         break
       end
       index_list2.shift
@@ -129,16 +129,16 @@ class Pathname
     result = args.pop
     result = Pathname.new(result) unless Pathname === result
     return result if result.absolute?
-    args.reverse_each {|arg|
+    args.reverse_each do |arg|
       arg = Pathname.new(arg) unless Pathname === arg
       result = arg + result
       return result if result.absolute?
-    }
+    end
     self + result
   end
 
   def split
-    [ dirname, basename ]
+    [dirname, basename]
   end
 
   def dirname
@@ -158,34 +158,34 @@ class Pathname
   end
 
   def <=>(other)
-    self.path <=> other.path
+    path <=> other.path
   end
 
   alias eql? ==
   alias === ==
 
-  alias :to_str :to_path
-  alias :to_s :to_path
+  alias to_str to_path
+  alias to_s to_path
 
   SAME_PATHS = if File::FNM_SYSCASE.nonzero?
-    # Avoid #zero? here because #casecmp can return nil.
-    proc {|a, b| a.casecmp(b) == 0}
-  else
-    proc {|a, b| a == b}
-  end
+                 # Avoid #zero? here because #casecmp can return nil.
+                 proc { |a, b| a.casecmp(b) == 0 }
+               else
+                 proc { |a, b| a == b }
+               end
 
   def relative_path_from(base_directory)
-    dest_directory = self.cleanpath.to_s
+    dest_directory = cleanpath.to_s
     base_directory = base_directory.cleanpath.to_s
     dest_prefix = dest_directory
     dest_names = []
-    while r = chop_basename(dest_prefix)
+    while (r = chop_basename(dest_prefix))
       dest_prefix, basename = r
       dest_names.unshift basename if basename != '.'
     end
     base_prefix = base_directory
     base_names = []
-    while r = chop_basename(base_prefix)
+    while (r = chop_basename(base_prefix))
       base_prefix, basename = r
       base_names.unshift basename if basename != '.'
     end
@@ -211,7 +211,7 @@ class Pathname
   end
 
   def entries
-    Dir.entries(@path).map {|f| self.class.new(f) }
+    Dir.entries(@path).map { |f| self.class.new(f) }
   end
 end
 

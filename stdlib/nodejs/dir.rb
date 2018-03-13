@@ -5,7 +5,7 @@ class Dir
   `var __fs__ = #{@__fs__}`
 
   class << self
-    def [] glob
+    def [](glob)
       `__glob__.sync(#{glob})`
     end
 

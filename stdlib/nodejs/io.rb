@@ -16,7 +16,6 @@
 }
 
 class IO
-
   @__fs__ = node_require :fs
   `var __fs__ = #{@__fs__}`
 
@@ -27,7 +26,7 @@ class IO
     @eof = false
     @lineno = 0
   end
-  
+
   def self.write(path, data)
     File.write(path, data)
   end
@@ -82,8 +81,8 @@ class IO
   end
 end
 
-STDOUT.write_proc = -> (string) {`process.stdout.write(string)`}
-STDERR.write_proc = -> (string) {`process.stderr.write(string)`}
+STDOUT.write_proc = ->(string) { `process.stdout.write(string)` }
+STDERR.write_proc = ->(string) { `process.stderr.write(string)` }
 
 STDOUT.tty = true
 STDERR.tty = true

@@ -35,17 +35,25 @@ AllCops:
     - opal.gemspec
     - pkg/**/*
     - spec/**/*
-    - stdlib/**/*
+    # - stdlib/**/*
     - tasks/**/*
     - test/**/*
     - tmp/**/*
     - vendored-minitest/**/*
     - vendor/**/* # present in travis
-
+    # Files thate were copied from MRI as is
+    - 'stdlib/benchmark.rb'
+    - 'stdlib/observer.rb'
+    - 'stdlib/open-uri.rb'
+    - 'stdlib/stringio.rb'
+    - 'stdlib/source_map/*.rb'
+    - 'stdlib/racc/parser.rb'
 
 Naming/MethodName:
   Exclude:
-    - 'opal/**/*.rb' # Ruby has methods like Integer/Float/Array
+    # Ruby has methods like Integer/Float/Array
+    - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Layout/ClosingParenthesisIndentation:
   Enabled: false
@@ -59,14 +67,19 @@ Layout/CommentIndentation:
 Style/FrozenStringLiteralComment:
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Layout/EmptyLineAfterMagicComment:
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Style/GlobalVars:
   Exclude:
     - 'opal/corelib/kernel.rb'
+    - 'stdlib/nodejs/irb.rb'
+    - 'stdlib/console.rb'
+    - 'stdlib/native.rb'
 
 Layout/ExtraSpacing:
   Exclude:
@@ -89,16 +102,20 @@ Lint/InheritException:
   Exclude:
     - 'lib/opal/builder.rb'
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Lint/LiteralAsCondition:
   Exclude:
-    # Opal support if `...js...`
+    # Opal supports if `...js...`
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Lint/RescueException:
   Exclude:
     # That's what MRI does
     - 'opal/corelib/enumerator.rb'
+    # Promises must care about all exceptions
+    - 'stdlib/promise.rb'
 
 Lint/StringConversionInInterpolation:
   Exclude:
@@ -109,16 +126,19 @@ Lint/UnusedBlockArgument:
   Exclude:
     # Variable from Ruby can be accessed in JS, rubocop can't catch it (but JSHint can)
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Lint/UnusedMethodArgument:
   Exclude:
     # Variable from Ruby can be accessed in JS, rubocop can't catch it (but JSHint can)
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Lint/UselessAssignment:
   Exclude:
     # Variable from Ruby can be accessed in JS, rubocop can't catch it (but JSHint can)
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Metrics/AbcSize:
   Enabled: false
@@ -148,11 +168,13 @@ Metrics/ParameterLists:
   Exclude:
     # Some Ruby methods take 10 arguments
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Naming/BinaryOperatorParameterName:
   Exclude:
     # Opal follows MRI argument namings
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Naming/PredicateName:
   # Ruby has "has_key?" method
@@ -182,6 +204,7 @@ Style/AsciiComments:
 Style/CaseEquality:
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
     - 'lib/opal/config.rb'
 
 Style/ClassAndModuleChildren:
@@ -201,17 +224,17 @@ Style/Documentation:
   Enabled: false
 
 Style/EmptyMethod:
-  # There are a lot of empty methods are required to make MSpec working
+  # There are a lot of empty methods that are required to make MSpec working
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Style/IfUnlessModifier:
   Enabled: false
 
 Style/InfiniteLoop:
-  Exclude:
-    # That's actually a definition of Kernel#loop
-    - 'opal/corelib/kernel.rb'
+  # while true is faster than loop
+  Enabled: false
 
 Style/InverseMethods:
   # That's what MRI does
@@ -225,6 +248,11 @@ Style/MethodMissing:
     - 'opal/corelib/basic_object.rb'
     - 'opal/corelib/kernel.rb'
     - 'opal/corelib/string/inheritance.rb'
+    # Next two items require fixing,
+    # But rubocop doesn't support configs merging (unreleased version on GH has inherit_mode option)
+    - 'stdlib/native.rb'
+    - 'stdlib/delegate.rb'
+    - 'stdlib/ostruct.rb'
 
 Style/NumericPredicate:
   Enabled: false
@@ -236,6 +264,7 @@ Style/PercentLiteralDelimiters:
   Exclude:
     # Opal has a convention of %x{}
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Style/SafeNavigation:
   # Opal supports old versions of Ruby that don't have safe navigator
@@ -252,12 +281,14 @@ Style/YodaCondition:
     # In Opal there are lot of cases like
     # if `..js..` == object
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
 
 Layout/MultilineAssignmentLayout:
   EnforcedStyle: same_line
 
 Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: comma
+  # Any style is allowed
+  Enabled: false
 
 Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
@@ -302,3 +333,33 @@ Style/RegexpLiteral:
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
     default: '{}'
+
+Naming/FileName:
+  Exclude:
+    - 'stdlib/opal-builder.rb'
+    - 'stdlib/nodejs/open-uri.rb'
+    - 'stdlib/opal-parser.rb'
+    - 'stdlib/opal-platform.rb'
+    - 'stdlib/opal-source-maps.rb'
+
+Naming/ConstantName:
+  Exclude:
+    # MRI has a constant BigDecimal::SIGN_NaN
+    - 'stdlib/bigdecimal.rb'
+
+Security/Eval:
+  Exclude:
+    # That's what parser does
+    - 'stdlib/opal-parser.rb'
+
+Naming/AccessorMethodName:
+  Exclude:
+    # StringScanner has method 'get_byte'
+    - 'stdlib/strscan.rb'
+
+Style/RescueStandardError:
+  Enabled: false
+
+Style/TrailingCommaInLiteral:
+  # Any style is allowed
+  Enabled: false

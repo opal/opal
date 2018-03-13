@@ -27,7 +27,7 @@ module Native
     }
   end
 
-  def self.try_convert(value, default=nil)
+  def self.try_convert(value, default = nil)
     %x{
       if (#{native?(value)}) {
         return #{value};
@@ -82,9 +82,9 @@ module Native
   end
 
   def self.proc(&block)
-    raise LocalJumpError, "no block given" unless block
+    raise LocalJumpError, 'no block given' unless block
 
-    ::Kernel.proc {|*args|
+    ::Kernel.proc { |*args|
       args.map! { |arg| Native(arg) }
       instance = Native(`this`)
 
@@ -144,41 +144,40 @@ module Native
     #   titles.show
     #
     def alias_native(new, old = new, as: nil)
-      if old.end_with? ?=
+      if old.end_with? '='
         define_method new do |value|
-          `#@native[#{old[0 .. -2]}] = #{Native.convert(value)}`
+          `#{@native}[#{old[0..-2]}] = #{Native.convert(value)}`
 
           value
         end
+      elsif as
+        define_method new do |*args, &block|
+          value = Native.call(@native, old, *args, &block)
+          if value
+            as.new(value.to_n)
+          end
+        end
       else
-        if as
-          define_method new do |*args, &block|
-            if value = Native.call(@native, old, *args, &block)
-              as.new(value.to_n)
-            end
-          end
-        else
-          define_method new do |*args, &block|
-            Native.call(@native, old, *args, &block)
-          end
+        define_method new do |*args, &block|
+          Native.call(@native, old, *args, &block)
         end
       end
     end
 
     def native_reader(*names)
-      names.each {|name|
+      names.each do |name|
         define_method name do
-          Native(`#@native[name]`)
+          Native(`#{@native}[name]`)
         end
-      }
+      end
     end
 
     def native_writer(*names)
-      names.each {|name|
+      names.each do |name|
         define_method "#{name}=" do |value|
-          Native(`#@native[name] = value`)
+          Native(`#{@native}[name] = value`)
         end
-      }
+      end
     end
 
     def native_accessor(*names)
@@ -207,7 +206,7 @@ module Native
   end
 
   def self.included(base)
-    warn "Including ::Native is deprecated. Please include Native::Wrapper instead."
+    warn 'Including ::Native is deprecated. Please include Native::Wrapper instead.'
     base.include Wrapper
     base.extend Helpers
   end
@@ -241,14 +240,14 @@ module Kernel
     end
   end
 
-  alias_method :_Array, :Array
+  alias _Array Array
 
   # Wraps array-like JavaScript objects in Native::Array
   def Array(object, *args, &block)
     if native?(object)
       return Native::Array.new(object, *args, &block).to_a
     end
-    return _Array(object)
+    _Array(object)
   end
 end
 
@@ -256,11 +255,11 @@ class Native::Object < BasicObject
   include ::Native::Wrapper
 
   def ==(other)
-    `#@native === #{::Native.try_convert(other)}`
+    `#{@native} === #{::Native.try_convert(other)}`
   end
 
   def has_key?(name)
-    `Opal.hasOwnProperty.call(#@native, #{name})`
+    `Opal.hasOwnProperty.call(#{@native}, #{name})`
   end
 
   alias key? has_key?
@@ -270,8 +269,8 @@ class Native::Object < BasicObject
   def each(*args)
     if block_given?
       %x{
-        for (var key in #@native) {
-          #{yield `key`, `#@native[key]`}
+        for (var key in #{@native}) {
+          #{yield `key`, `#{@native}[key]`}
         }
       }
 
@@ -283,7 +282,7 @@ class Native::Object < BasicObject
 
   def [](key)
     %x{
-      var prop = #@native[key];
+      var prop = #{@native}[key];
 
       if (prop instanceof Function) {
         return prop;
@@ -298,9 +297,9 @@ class Native::Object < BasicObject
     native = ::Native.try_convert(value)
 
     if `#{native} === nil`
-      `#@native[key] = #{value}`
+      `#{@native}[key] = #{value}`
     else
-      `#@native[key] = #{native}`
+      `#{@native}[key] = #{native}`
     end
   end
 
@@ -309,7 +308,7 @@ class Native::Object < BasicObject
       other = #{::Native.convert(other)};
 
       for (var prop in other) {
-        #@native[prop] = other[prop];
+        #{@native}[prop] = other[prop];
       }
     }
 
@@ -321,7 +320,7 @@ class Native::Object < BasicObject
   end
 
   def respond_to_missing?(name, include_all = false)
-    `Opal.hasOwnProperty.call(#@native, #{name})`
+    `Opal.hasOwnProperty.call(#{@native}, #{name})`
   end
 
   def method_missing(mid, *args, &block)
@@ -358,7 +357,7 @@ class Native::Object < BasicObject
   end
 
   def inspect
-    "#<Native:#{`String(#@native)`}>"
+    "#<Native:#{`String(#{@native})`}>"
   end
 end
 
@@ -376,7 +375,7 @@ class Native::Array
     @block  = block
 
     if `#{length} == null`
-      raise ArgumentError, "no length found on the array-like object"
+      raise ArgumentError, 'no length found on the array-like object'
     end
   end
 
@@ -394,12 +393,11 @@ class Native::Array
 
   def [](index)
     result = case index
-      when String, Symbol
-        @named ? `#@native[#@named](#{index})` : `#@native[#{index}]`
-
-      when Integer
-        @get ? `#@native[#@get](#{index})` : `#@native[#{index}]`
-    end
+             when String, Symbol
+               @named ? `#{@native}[#{@named}](#{index})` : `#{@native}[#{index}]`
+             when Integer
+               @get ? `#{@native}[#{@get}](#{index})` : `#{@native}[#{index}]`
+             end
 
     if result
       if @block
@@ -412,9 +410,9 @@ class Native::Array
 
   def []=(index, value)
     if @set
-      `#@native[#@set](#{index}, #{Native.convert(value)})`
+      `#{@native}[#{@set}](#{index}, #{Native.convert(value)})`
     else
-      `#@native[#{index}] = #{Native.convert(value)}`
+      `#{@native}[#{index}] = #{Native.convert(value)}`
     end
   end
 
@@ -435,7 +433,7 @@ class Native::Array
   end
 
   def length
-    `#@native[#@length]`
+    `#{@native}[#{@length}]`
   end
 
   alias to_ary to_a
@@ -486,9 +484,9 @@ class Struct
   def to_n
     result = `{}`
 
-    each_pair {|name, value|
+    each_pair do |name, value|
       `#{result}[#{name}] = #{Native.try_convert(value, value)}`
-    }
+    end
 
     result
   end
@@ -533,7 +531,7 @@ class NilClass
 end
 
 class Hash
-  alias_method :_initialize, :initialize
+  alias _initialize initialize
 
   def initialize(defaults = undefined, &block)
     %x{
@@ -607,7 +605,7 @@ class Module
   # Exposes the current module as a property of
   # the global object (e.g. `window`).
   def native_module
-    `Opal.global[#{self.name}] = #{self}`
+    `Opal.global[#{name}] = #{self}`
   end
 end
 
