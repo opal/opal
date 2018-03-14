@@ -56,8 +56,6 @@ module Opal
       alias on_jsattr     process_regular_node
       alias on_jsattrasgn process_regular_node
       alias on_kwsplat    process_regular_node
-      # TODO: remove after merging & releasing https://github.com/whitequark/parser/pull/469
-      alias on_lambda     process_regular_node
 
       # Prepends given +node+ to +body+ node.
       #
