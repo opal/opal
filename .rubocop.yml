@@ -355,10 +355,20 @@ Naming/AccessorMethodName:
 Style/RescueStandardError:
   Enabled: false
 
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  # Any style is allowed
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
   # Any style is allowed
   Enabled: false
 
 Naming/UncommunicativeMethodParamName:
   Exclude:
     - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'
+
+Lint/BigDecimalNew:
+  Exclude:
+    # That's the implementation of the Kernel#BigDecimal
+    - 'stdlib/bigdecimal/kernel.rb'
