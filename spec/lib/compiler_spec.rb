@@ -464,8 +464,8 @@ RSpec.describe Opal::Compiler do
 
     let(:file) do
       <<-RUBY
-        # encoding: #{encoding_comment}
-        "#{string}"
+# encoding: #{encoding_comment}
+"#{string}"
       RUBY
     end
 
