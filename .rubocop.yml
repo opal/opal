@@ -2,9 +2,6 @@ inherit_from: .rubocop_todo.yml
 
 AllCops:
   TargetRubyVersion: 2.5
-  # Include:
-  #   - lib/**/*.rb
-  #   - opal/**/*.rb
   Exclude:
     - CHANGELOG.md
     - CONDUCT.md
@@ -48,6 +45,10 @@ AllCops:
     - 'stdlib/stringio.rb'
     - 'stdlib/source_map/*.rb'
     - 'stdlib/racc/parser.rb'
+
+inherit_mode:
+  merge:
+    - Exclude
 
 Naming/MethodName:
   Exclude:
@@ -243,11 +244,6 @@ Style/MethodMissing:
     - 'opal/corelib/basic_object.rb'
     - 'opal/corelib/kernel.rb'
     - 'opal/corelib/string/inheritance.rb'
-    # Next two items require fixing,
-    # But rubocop doesn't support configs merging (unreleased version on GH has inherit_mode option)
-    - 'stdlib/native.rb'
-    - 'stdlib/delegate.rb'
-    - 'stdlib/ostruct.rb'
 
 Style/NumericPredicate:
   Enabled: false
@@ -372,3 +368,8 @@ Lint/BigDecimalNew:
   Exclude:
     # That's the implementation of the Kernel#BigDecimal
     - 'stdlib/bigdecimal/kernel.rb'
+
+Style/MutableConstant:
+  Exclude:
+    - 'opal/**/*.rb'
+    - 'stdlib/**/*.rb'

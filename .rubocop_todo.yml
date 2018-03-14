@@ -1,8 +1,8 @@
-# Requires fixing
+# All items in this file require fixing
+
 Metrics/LineLength:
   Enabled: false
 
-# Requires fixing
 Lint/AssignmentInCondition:
   Exclude:
     - 'lib/opal/ast/node.rb'
@@ -18,11 +18,9 @@ Lint/AssignmentInCondition:
     - 'opal/corelib/complex.rb'
     - 'opal/corelib/marshal/write_buffer.rb'
 
-# Requires fixing
 Style/GuardClause:
   Enabled: false
 
-# Requires fixing
 Style/ModuleFunction:
   Exclude:
     - 'lib/opal/config.rb'
@@ -30,15 +28,8 @@ Style/ModuleFunction:
     - 'stdlib/nodejs/fileutils.rb'
     - 'stdlib/js.rb'
 
-# Requires fixing
-# TODO: move opal/**/*.rb to .rubocop.yml
-# (unreleased version on GH has inherit_mode option)
-# after fixing other cases, rubocop doesn't support Exclude section merging.
-# Opal doesn't support freezing anyway
 Style/MutableConstant:
   Exclude:
-    - 'opal/**/*.rb'
-    - 'stdlib/**/*.rb'
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
