@@ -185,11 +185,6 @@ Performance/FlatMap:
     # That's actually a definition of Enumerable#flat_map
     - 'opal/corelib/enumerable.rb'
 
-Performance/HashEachMethods:
-  Exclude:
-    # Rubocop doesn't understand that 'value' is used in JS.
-    - 'opal/corelib/hash.rb'
-
 Performance/RegexpMatch:
   # This cop converts =~ to match?
   # But this method was introduced only in 2.4
@@ -363,3 +358,7 @@ Style/RescueStandardError:
 Style/TrailingCommaInLiteral:
   # Any style is allowed
   Enabled: false
+
+Naming/UncommunicativeMethodParamName:
+  Exclude:
+    - 'opal/**/*.rb'

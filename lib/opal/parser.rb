@@ -3,6 +3,7 @@
 require 'opal/ast/builder'
 require 'opal/rewriter'
 
+# rubocop:disable Naming/UncommunicativeMethodParamName
 if RUBY_ENGINE == 'opal'
   class Parser::Lexer::Literal
     undef :extend_string
@@ -17,6 +18,7 @@ if RUBY_ENGINE == 'opal'
     end
   end
 end
+# rubocop:enable Naming/UncommunicativeMethodParamName
 
 module Opal
   module Source
