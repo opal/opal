@@ -361,6 +361,8 @@ Style/TrailingCommaInHashLiteral:
 
 Naming/UncommunicativeMethodParamName:
   Exclude:
+    # This file uses parser's code that doesn't match our styling requirements
+    - 'lib/opal/parser/patch.rb'
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
 

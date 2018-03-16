@@ -2,23 +2,7 @@
 
 require 'opal/ast/builder'
 require 'opal/rewriter'
-
-# rubocop:disable Naming/UncommunicativeMethodParamName
-if RUBY_ENGINE == 'opal'
-  class Parser::Lexer::Literal
-    undef :extend_string
-
-    def extend_string(string, ts, te)
-      @buffer_s ||= ts
-      @buffer_e = te
-
-      # Patch for opal-parser, original:
-      # @buffer << string
-      @buffer += string
-    end
-  end
-end
-# rubocop:enable Naming/UncommunicativeMethodParamName
+require 'opal/parser/patch'
 
 module Opal
   module Source
