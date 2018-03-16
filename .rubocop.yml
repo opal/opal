@@ -45,6 +45,9 @@ AllCops:
     - 'stdlib/stringio.rb'
     - 'stdlib/source_map/*.rb'
     - 'stdlib/racc/parser.rb'
+    - 'stdlib/e2mmap.rb'
+    - 'stdlib/matrix.rb'
+    - 'stdlib/matrix/*.rb'
 
 inherit_mode:
   merge:
