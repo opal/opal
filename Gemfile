@@ -17,7 +17,6 @@ gem 'puma' # Some browsers have problems with WEBrick
 gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
 gem 'sprockets', sprockets_version if sprockets_version
-gem 'rubocop', require: false
 
 group :repl do
   gem 'therubyracer', platform: :mri, require: false

@@ -980,9 +980,7 @@ module Kernel
   alias kind_of? is_a?
 
   def lambda(&block)
-    `block.$$is_lambda = true`
-
-    block
+    `Opal.lambda(block)`
   end
 
   def load(file)

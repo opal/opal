@@ -16,11 +16,11 @@ module Opal
       end
 
       GET_SET = ->(get_type, set_type) {
-        ->(lhs, op, rhs) {
-          get_node = lhs.updated(get_type)        # lhs
-          set_node = s(:send, get_node, op, rhs)  # lhs + rhs
+        ->(lhs, operation, rhs) {
+          get_node = lhs.updated(get_type)               # lhs
+          set_node = s(:send, get_node, operation, rhs)  # lhs + rhs
 
-          lhs.updated(set_type, [*lhs, set_node]) # lhs = lhs + rhs
+          lhs.updated(set_type, [*lhs, set_node])        # lhs = lhs + rhs
         }
       }
 
@@ -48,7 +48,7 @@ module Opal
       # Produces `recvr.meth = recvr.meth + rhs`
       # (lhs is a recvr.meth, op is :+)
       class SendHandler < self
-        def self.call(lhs, op, rhs)
+        def self.call(lhs, operation, rhs)
           recvr, reader_method, *args = *lhs
 
           # If recvr is a complex expression it must be cached.
@@ -62,7 +62,7 @@ module Opal
           writer_method = :"#{reader_method}="
 
           call_reader = lhs.updated(:send, [recvr, reader_method, *args])          # $tmp.meth
-          call_op = s(:send, call_reader, op, rhs)                                 # $tmp.meth + rhs
+          call_op = s(:send, call_reader, operation, rhs)                          # $tmp.meth + rhs
           call_writer = lhs.updated(:send, [recvr, writer_method, *args, call_op]) # $tmp.meth = $tmp.meth + rhs
 
           if cache_recvr
@@ -78,16 +78,16 @@ module Opal
       #   NOTE: Later output of this handler gets post-processed by this rewriter again
       #   using SendHandler to `recvr.nil? ? nil : (recvr.meth = recvr.meth + rhs)`
       class ConditionalSendHandler < self
-        def self.call(lhs, op, rhs)
+        def self.call(lhs, operation, rhs)
           recvr, meth, *args = *lhs
 
           recvr_tmp = new_temp
           cache_recvr = s(:lvasgn, recvr_tmp, recvr) # $tmp = recvr
           recvr = s(:js_tmp, recvr_tmp)
 
-          recvr_is_nil = s(:send, recvr, :nil?)                 # recvr.nil?
-          plain_send = lhs.updated(:send, [recvr, meth, *args]) # recvr.meth
-          plain_op_asgn = s(:op_asgn, plain_send, op, rhs)      # recvr.meth += rhs
+          recvr_is_nil = s(:send, recvr, :nil?)                   # recvr.nil?
+          plain_send = lhs.updated(:send, [recvr, meth, *args])   # recvr.meth
+          plain_op_asgn = s(:op_asgn, plain_send, operation, rhs) # recvr.meth += rhs
 
           s(:begin,
             cache_recvr,

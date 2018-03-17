@@ -24,7 +24,7 @@ module Comparable
 
     return false unless cmp = (self <=> other)
 
-    return `#{Comparable.normalize(cmp)} == 0`
+    `#{Comparable.normalize(cmp)} == 0`
   rescue StandardError
     false
   end

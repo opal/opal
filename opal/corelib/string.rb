@@ -226,6 +226,10 @@ class String < `String`
 
   alias byteslice []
 
+  def b
+    force_encoding('binary')
+  end
+
   def capitalize
     `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
   end

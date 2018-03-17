@@ -30,7 +30,8 @@ task :jshint do
   sh "jshint --verbose opal/corelib/runtime.js"
 end
 
-desc 'Run RuboCop on lib/ and opal/ directories'
+desc 'Run RuboCop on lib/, opal/ and stdlib/ directories'
 RuboCop::RakeTask.new(:rubocop) do |task|
-  task.options << '--fail-fast'
+  # TODO: enable it back after releasing https://github.com/bbatsov/rubocop/pull/5633
+  # task.options << '--fail-fast'
 end

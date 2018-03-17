@@ -7,7 +7,7 @@ require 'timeout'
 module Opal
   module CliRunners
     class Chrome
-      SCRIPT_PATH = File.expand_path('../chrome.js', __FILE__).freeze
+      SCRIPT_PATH = File.expand_path('chrome.js', __dir__).freeze
 
       DEFAULT_CHROME_HOST = 'localhost'
       DEFAULT_CHROME_PORT = 9222
@@ -17,7 +17,7 @@ module Opal
       end
       attr_reader :output, :exit_status
 
-      def run(code, _)
+      def run(code, _argv)
         with_chrome_server do
           cmd = [
             'env',

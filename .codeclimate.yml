@@ -3,7 +3,7 @@ version: "2"
 plugins:
   rubocop:
     enabled: true
-    channel: rubocop-0-52
+    channel: rubocop-0-53
 
 exclude_patterns:
 - "benchmark/*"

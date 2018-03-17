@@ -33,7 +33,7 @@ module Opal
       # stub
     end
 
-    def evaluate(_, _)
+    def evaluate(_scope, _locals)
       if builder = @options[:builder]
         builder.dup.build(file).to_s
       elsif @options[:build]
