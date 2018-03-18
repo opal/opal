@@ -60,8 +60,10 @@ module Opal
     end
 
     class DigestSourceCommand < Command
+      ExitStatusError = Class.new(StandardError)
       def digest(source)
-        out, _, _ = Open3.capture3("#{command} #{options} #{hide_stderr}", stdin_data: source)
+        out, _, status = Open3.capture3("#{command} #{options} #{hide_stderr}", stdin_data: source)
+        raise ExitStatusError, "exited with status #{status.exitstatus}" unless status.success?
         out
       end
     end
