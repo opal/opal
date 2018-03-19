@@ -524,6 +524,9 @@ class Module
   def extended(mod)
   end
 
+  def extend_object(object)
+  end
+
   def method_added(*)
   end
 

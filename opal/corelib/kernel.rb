@@ -214,6 +214,7 @@ module Kernel
         }
 
         #{`mod`.append_features `singleton`};
+        #{`mod`.extend_object self};
         #{`mod`.extended self};
       }
     }
