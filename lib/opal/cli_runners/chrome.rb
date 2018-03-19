@@ -93,14 +93,14 @@ module Opal
           when /darwin|mac os/
             '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
           when /linux/
-            %w{
+            %w[
               google-chrome-stable
               chromium
-            }.each do |name|
+            ].each do |name|
               next unless system('sh', '-c', "command -v #{name.shellescape}", out: '/dev/null')
               return name
             end
-            raise "Cannot find chrome executable"
+            raise 'Cannot find chrome executable'
           when /solaris|bsd/
             raise 'Headless chrome is supported only by Mac OS and Linux'
           end
