@@ -71,6 +71,7 @@ Whitespace conventions:
 - Extended `Struct.new` to support `keyword_init` option. (#1757)
 - Added a new `Opal::Config.missing_require_severity` option and relative `--missing-require` CLI flag. This option will command how the builder will behave when a required file is missing. Previously the behavior was undefined and partly controlled by `dynamic_require_severity`. Not to be confused with the runtime config option `Opal.config.missing_require_severity;` which controls the runtime behavior.
 - Added `Matrix` (along with the internal MRI utility `E2MM`)
+- Use shorter helpers for constant lookups, `$$` for relative (nesting) lookups and `$$$` for absolute (qualified) lookups
 
 
 ### Changed

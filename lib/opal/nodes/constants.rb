@@ -13,11 +13,11 @@ module Opal
         if magical_data_const?
           push('$__END__')
         elsif const_scope
-          push 'Opal.const_get_qualified(', recv(const_scope), ", '#{name}')"
+          push '$$$(', recv(const_scope), ", '#{name}')"
         elsif compiler.eval?
-          push "Opal.const_get_relative($nesting, '#{name}')"
+          push "$$($nesting, '#{name}')"
         else
-          push "Opal.const_get_relative($nesting, '#{name}')"
+          push "$$($nesting, '#{name}')"
         end
       end
 
