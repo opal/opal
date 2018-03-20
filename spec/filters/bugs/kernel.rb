@@ -28,7 +28,6 @@ opal_filter "Kernel" do
   fails "Kernel#eval updates a local in an enclosing scope"
   fails "Kernel#eval uses the filename of the binding if none is provided"
   fails "Kernel#eval uses the same scope for local variables when given the same binding"
-  fails "Kernel#extend calls extend_object on argument"
   fails "Kernel#extend does not calls append_features on arguments metaclass"
   fails "Kernel#extend raises an ArgumentError when no arguments given"
   fails "Kernel#inspect does not call #to_s if it is defined"
