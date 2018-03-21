@@ -214,11 +214,11 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if Test > 4").to include("if ($truthy($rb_gt(Opal.const_get_relative($nesting, 'Test'), 4))) ")
+          expect_compiled("foo = 42 if Test > 4").to include("if ($truthy($rb_gt($$($nesting, 'Test'), 4))) ")
         end
 
         it 'specifically == excludes nil check for constants' do
-          expect_compiled("foo = 42 if Test == 4").to include("if (Opal.const_get_relative($nesting, 'Test')['$=='](4))")
+          expect_compiled("foo = 42 if Test == 4").to include("if ($$($nesting, 'Test')['$=='](4))")
         end
       end
 
@@ -242,7 +242,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if Test").to include("if ($truthy(Opal.const_get_relative($nesting, 'Test')))")
+          expect_compiled("foo = 42 if Test").to include("if ($truthy($$($nesting, 'Test')))")
         end
       end
     end
@@ -270,8 +270,8 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test > 4)").to include("if ($truthy($rb_gt(Opal.const_get_relative($nesting, 'Test'), 4))")
-          expect_compiled("foo = 42 if (Test == 4)").to include("if ($truthy(Opal.const_get_relative($nesting, 'Test')['$=='](4))")
+          expect_compiled("foo = 42 if (Test > 4)").to include("if ($truthy($rb_gt($$($nesting, 'Test'), 4))")
+          expect_compiled("foo = 42 if (Test == 4)").to include("if ($truthy($$($nesting, 'Test')['$=='](4))")
         end
       end
 
@@ -295,7 +295,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test)").to include("if ($truthy(Opal.const_get_relative($nesting, 'Test'))")
+          expect_compiled("foo = 42 if (Test)").to include("if ($truthy($$($nesting, 'Test'))")
         end
       end
     end

@@ -309,7 +309,7 @@ class Module
 
     %x{
       if (inherit) {
-        return Opal.const_get_relative([self], name);
+        return $$([self], name);
       } else {
         return Opal.const_get_local(self, name);
       }
