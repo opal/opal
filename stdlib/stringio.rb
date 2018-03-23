@@ -96,6 +96,24 @@ class StringIO < IO
     self
   end
 
+  def each(separator = $/)
+    return enum_for :each_line unless block_given?
+    check_readable
+    str = @string
+    %x{
+      var chomped = #{str.chomp}, trailing = str.length != chomped.length, splitted = chomped.split(separator);
+      for (var i = 0, len = splitted.length; i < len; i++) {
+        var line = i < len - 1 || trailing ? splitted[i] + separator : splitted[i];
+        #{yield `line`}
+        self.position += line.length
+      }
+      self.position = str.length;
+    }
+    self
+  end
+
+  alias each_line each
+
   def write(string)
     check_writable
 
