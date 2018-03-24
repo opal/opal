@@ -99,15 +99,30 @@ class StringIO < IO
   def each(separator = $/)
     return enum_for :each_line unless block_given?
     check_readable
-    str = @string
+    chomp_lines = false
+    if ::Hash === separator
+      separator = (chomp_lines = separator[:chomp]) ? /\r?\n/ : $/
+    elsif separator
+      separator = separator.to_str
+    else
+      separator = `undefined`
+    end
     %x{
-      var chomped = #{str.chomp}, trailing = str.length != chomped.length, splitted = chomped.split(separator);
-      for (var i = 0, len = splitted.length; i < len; i++) {
-        var line = i < len - 1 || trailing ? splitted[i] + separator : splitted[i];
-        #{yield `line`}
-        self.position += line.length
+      var str = self.string, stringLength = str.length;
+      if (self.position < stringLength) str = str.substr(self.position);
+      if (separator) {
+        var chomped = #{`str`.chomp}, trailing = str.length !== chomped.length, splitted = chomped.split(separator);
+        for (var i = 0, len = splitted.length; i < len; i++) {
+          var line = chomp_lines ? splitted[i] : (i < len - 1 || trailing ? splitted[i] + separator : splitted[i]);
+          #{yield `line`};
+        }
+      } else if (separator === undefined) {
+        #{yield `str`};
+      } else {
+        var m, re = /(.+(?:\n\n|$))\n*/g;
+        while ((m = re.exec(str))) #{yield `m[1]`};
       }
-      self.position = str.length;
+      self.position = stringLength;
     }
     self
   end
