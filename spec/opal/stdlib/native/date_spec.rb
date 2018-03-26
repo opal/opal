@@ -6,7 +6,7 @@ describe Date do
     it 'returns native JS date object' do
       date = Date.new(1984, 1, 24)
       native = date.to_n
-      expect(`#{native}.toISOString()`).to eq '1984-01-24T00:00:00.000Z'
+      expect(`#{native}.toDateString()`).to eq 'Tue Jan 24 1984'
     end
   end
 end
