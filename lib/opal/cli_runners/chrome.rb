@@ -96,6 +96,7 @@ module Opal
             %w[
               google-chrome-stable
               chromium
+              chromium-browser
             ].each do |name|
               next unless system('sh', '-c', "command -v #{name.shellescape}", out: '/dev/null')
               return name
