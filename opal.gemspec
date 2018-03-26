@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sourcemap', '~> 0.1.0'
   spec.add_dependency 'hike', '~> 1.2'
   spec.add_dependency 'ast', '>= 2.3.0'
-  spec.add_dependency 'parser', '= 2.5.0.4'
+  spec.add_dependency 'parser', '= 2.5.0.5'
 
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'racc'
