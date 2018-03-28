@@ -76,6 +76,8 @@ Whitespace conventions:
 
 ### Changed
 
+- **BREAKING** The dot (`.`) character is no longer replaced with [\s\S] in a multiline regexp passed to Regexp#match and Regexp#match?
+  * You're advised to always use [\s\S] instead of . in a multiline regexp, which is portable between Ruby and JavaScript
 - The internal API for CLI runners has changed, now it's just a callable object
 - The `--map` CLI option now works only in conjunction with `--compile` (or `--runner compiler`)
 - The `node` CLI runner now adds its `NODE_PATH` entry instead of replacing the ENV var altogether
