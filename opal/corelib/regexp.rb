@@ -161,10 +161,17 @@ class Regexp < `RegExp`
       }
 
       if (pos === undefined) {
-        pos = 0;
-      } else {
-        pos = #{Opal.coerce_to(pos, Integer, :to_int)};
+        if (string === nil) return #{$~ = nil};
+        var m = self.exec(#{Opal.coerce_to(string, String, :to_str)});
+        if (m) {
+          #{$~ = MatchData.new(`self`, `m`)};
+          return block === nil ? #{$~} : #{yield $~};
+        } else {
+          return #{$~ = nil};
+        }
       }
+
+      pos = #{Opal.coerce_to(pos, Integer, :to_int)};
 
       if (string === nil) {
         return #{$~ = nil};
@@ -196,7 +203,7 @@ class Regexp < `RegExp`
           return #{$~ = nil};
         }
         if (md.index >= pos) {
-          #{$~ = MatchData.new(`re`, `md`)}
+          #{$~ = MatchData.new(`re`, `md`)};
           return block === nil ? #{$~} : #{yield $~};
         }
         re.lastIndex = md.index + 1;
@@ -211,10 +218,10 @@ class Regexp < `RegExp`
       }
 
       if (pos === undefined) {
-        pos = 0;
-      } else {
-        pos = #{Opal.coerce_to(pos, Integer, :to_int)};
+        return string === nil ? false : self.test(#{Opal.coerce_to(string, String, :to_str)});
       }
+
+      pos = #{Opal.coerce_to(pos, Integer, :to_int)};
 
       if (string === nil) {
         return false;
