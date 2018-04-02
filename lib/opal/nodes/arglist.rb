@@ -45,7 +45,7 @@ module Opal
           if code.empty?
             code = join
           else
-            code << fragment('.concat(') << join << fragment(')')
+            code << fragment('.concat([') << join << fragment('])')
           end
         end
 
