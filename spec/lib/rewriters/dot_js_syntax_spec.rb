@@ -60,7 +60,7 @@ RSpec.describe Opal::Rewriters::DotJsSyntax do
       it 'raises syntax error' do
         expect {
           rewriter.process(send_node)
-        }.to raise_error(SyntaxError)
+        }.to raise_error(Opal::RewritingError)
       end
     end
   end
@@ -101,7 +101,7 @@ RSpec.describe Opal::Rewriters::DotJsSyntax do
       it 'raises syntax error' do
         expect {
           rewriter.process(send_node)
-        }.to raise_error(SyntaxError)
+        }.to raise_error(Opal::RewritingError)
       end
     end
   end

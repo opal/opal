@@ -5,6 +5,7 @@ require 'opal/parser'
 require 'opal/fragment'
 require 'opal/nodes'
 require 'opal/eof_content'
+require 'opal/errors'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -184,8 +185,16 @@ module Opal
 
       begin
         sexp, comments, tokens = @parser.tokenize(@buffer)
+      rescue ::Opal::Error => error
+        backtrace = error.backtrace
+        if error.respond_to? :location
+          line = error.location.line
+          backtrace = "#{file}:#{line}:in #{error.location}"
+        end
+        raise ::Opal::SyntaxError, error.message, backtrace
       rescue ::Parser::SyntaxError => error
-        raise ::SyntaxError, error.message, error.backtrace
+        backtrace = error.backtrace
+        raise ::Opal::SyntaxError, error.message, backtrace
       end
 
       @sexp = s(:top, sexp || s(:nil))
