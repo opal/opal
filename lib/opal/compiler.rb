@@ -234,7 +234,7 @@ module Opal
     # method simply appends the filename and curent line number onto
     # the message and raises it.
     def error(msg, line = nil)
-      raise SyntaxError, "#{msg} :#{file}:#{line}"
+      raise ::Opal::SyntaxError, "#{msg} -- #{file}:#{line}"
     end
 
     # This is called when a parsing/processing warning occurs. This
