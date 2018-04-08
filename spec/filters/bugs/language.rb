@@ -56,7 +56,6 @@ opal_filter "language" do
   fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for BasicObject
   fails "Instantiating a singleton class raises a TypeError when allocate is called"
   fails "Instantiating a singleton class raises a TypeError when new is called"
-  fails "Invoking a method does not expand final array arguments after a splat expansion"
   fails "Literal (A::X) constant resolution raises a TypeError if a non-class or non-module qualifier is given"
   fails "Literal (A::X) constant resolution with dynamically assigned constants evaluates the right hand side before evaluating a constant path"
   fails "Literal Regexps caches the Regexp object"

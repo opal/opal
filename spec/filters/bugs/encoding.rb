@@ -92,7 +92,6 @@ opal_filter "Encoding" do
   fails "String#ascii_only? with ASCII only characters returns true if the encoding is UTF-8" # Expected true to be computed by "hello".ascii_only? (computed false instead)
   fails "String#ascii_only? with non-ASCII only characters returns false if the encoding is ASCII-8BIT" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#b copies own tainted/untrusted status to the returning value" # NoMethodError: undefined method `untrust' for "こんちには":String
-  fails "String#b returns an ASCII-8BIT encoded string" # NoMethodError: undefined method `b' for "Hello":String
   fails "String#b returns new string without modifying self" # NoMethodError: undefined method `b' for "こんちには":String
   fails "String#bytes agrees with #getbyte" # NotImplementedError: NotImplementedError
   fails "String#byteslice on on non ASCII strings returns byteslice of unicode strings" # Expected nil to equal "\u0081"
