@@ -187,12 +187,7 @@ class Regexp < `RegExp`
       }
 
       var source = self.source;
-      var flags = 'g';
-      // m flag + a . in Ruby will match white space, but in JS, it only matches beginning/ending of lines, so we get the equivalent here
-      if (self.multiline) {
-        source = source.replace('.', "[\\s\\S]");
-        flags += 'm';
-      }
+      var flags = self.multiline ? 'gm' : 'g';
 
       // global RegExp maintains state, so not using self/this
       var md, re = new RegExp(source, flags + (self.ignoreCase ? 'i' : ''));
@@ -237,12 +232,7 @@ class Regexp < `RegExp`
       }
 
       var source = self.source;
-      var flags = 'g';
-      // m flag + a . in Ruby will match white space, but in JS, it only matches beginning/ending of lines, so we get the equivalent here
-      if (self.multiline) {
-        source = source.replace('.', "[\\s\\S]");
-        flags += 'm';
-      }
+      var flags = self.multiline ? 'gm' : 'g';
 
       // global RegExp maintains state, so not using self/this
       var md, re = new RegExp(source, flags + (self.ignoreCase ? 'i' : ''));
