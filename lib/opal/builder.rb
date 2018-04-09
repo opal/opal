@@ -80,19 +80,21 @@ module Opal
 
     def build(path, options = {})
       source = read(path)
+      path = path_reader.expand(path)
       build_str(source, path, options)
     end
 
-    def build_str(source, filename, options = {})
+    def build_str(source, rel_path, options = {})
       return if source.nil?
-      path = path_from_filename(filename)
-      asset = processor_for(source, filename, path, options)
-      requires = preload + asset.requires + tree_requires(asset, path)
+      abs_path = expand_path(rel_path)
+      rel_path = expand_ext(rel_path)
+      asset = processor_for(source, rel_path, abs_path, options)
+      requires = preload + asset.requires + tree_requires(asset, abs_path)
       requires.map { |r| process_require(r, options) }
       processed << asset
       self
     rescue MissingRequire => error
-      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}", error.backtrace
+      raise error, "A file required by #{rel_path.inspect} wasn't found.\n#{error.message}", error.backtrace
     end
 
     def build_require(path, options = {})
@@ -132,38 +134,35 @@ module Opal
 
     private
 
-    def tree_requires(asset, path)
-      dirname =
-        if path.nil? || path.empty?
-          Dir.pwd
-        else
-          File.dirname(File.expand_path(path))
-        end
-
-      paths = path_reader.paths.map { |p| File.expand_path(p) }
+    def tree_requires(asset, asset_path)
+      dirname = asset_path.to_s.empty? ? Pathname.pwd : Pathname(asset_path).expand_path.dirname
+      abs_base_paths = path_reader.paths.map { |p| File.expand_path(p) }
 
       asset.required_trees.flat_map do |tree|
-        expanded = File.expand_path(tree, dirname)
-        base = paths.find { |p| expanded.start_with?(p) }
-        next [] if base.nil?
+        abs_tree_path = dirname.join(tree).expand_path.to_s
+        abs_base_path = abs_base_paths.find { |p| abs_tree_path.start_with?(p) }
 
-        globs = extensions.map { |ext| File.join base, tree, '**', "*.#{ext}" }
+        if abs_base_path
+          abs_base_path = Pathname(abs_base_path)
+          entries_glob  = Pathname(abs_tree_path).join('**', "*{.js,}.{#{extensions.join ','}}")
 
-        Dir[*globs].map do |file|
-          Pathname(file).relative_path_from(Pathname(base)).to_s.gsub(/(\.js)?(\.(?:#{extensions.join '|'}))#{REGEXP_END}/, '')
+          Pathname.glob(entries_glob).map { |file| file.relative_path_from(abs_base_path).to_s }
+        else
+          [] # the tree is not part of any known base path
         end
       end
     end
 
-    def processor_for(source, filename, path, options)
-      processor = processors.find { |p| p.match? path } ||
-                  raise(ProcessorNotFound, "can't find processor for filename: " \
-                                           "#{filename.inspect}, "\
-                                           "path: #{path.inspect}, "\
+    def processor_for(source, rel_path, abs_path, options)
+      processor = processors.find { |p| p.match? abs_path } ||
+                  raise(ProcessorNotFound, "can't find processor for rel_path: " \
+                                           "#{rel_path.inspect}, "\
+                                           "abs_path: #{abs_path.inspect}, "\
                                            "source: #{source.inspect}, "\
                                            "processors: #{processors.inspect}"
                   )
-      processor.new(source, filename, @compiler_options.merge(options))
+
+      processor.new(source, rel_path, @compiler_options.merge(options))
     end
 
     def read(path)
@@ -186,48 +185,61 @@ module Opal
       end
     end
 
-    def process_require(filename, options)
-      filename = filename.gsub(/\.(rb|js|opal)#{REGEXP_END}/, '')
-      return if prerequired.include?(filename)
-      return if already_processed.include?(filename)
-      already_processed << filename
+    def process_require(rel_path, options)
+      return if prerequired.include?(rel_path)
+      return if already_processed.include?(rel_path)
+      already_processed << rel_path
 
-      source = stub?(filename) ? '' : read(filename)
+      source = stub?(rel_path) ? '' : read(rel_path)
 
       if source.nil?
-        message = "can't find file: #{filename.inspect}"
+        message = "can't find file: #{rel_path.inspect}"
         case missing_require_severity
         when :error   then raise LoadError, message
-        when :warning then warn "can't find file: #{filename.inspect}"
+        when :warning then warn "can't find file: #{rel_path.inspect}"
         when :ignore  then # noop
         end
 
         return # the handling is delegated to the runtime
       end
 
-      path = path_from_filename(filename)
-      asset = processor_for(source, filename, path, options.merge(requirable: true))
-      process_requires(filename, asset.requires + tree_requires(asset, path), options)
+      abs_path = expand_path(rel_path)
+      rel_path = expand_ext(rel_path)
+      asset = processor_for(source, rel_path, abs_path, options.merge(requirable: true))
+      process_requires(rel_path, asset.requires + tree_requires(asset, abs_path), options)
       processed << asset
     end
 
-    def path_from_filename(filename)
-      return if stub?(filename)
-      (path_reader.expand(filename) || File.expand_path(filename)).to_s
+    def expand_ext(path)
+      abs_path = path_reader.expand(path)
+
+      if abs_path
+        File.join(
+          File.dirname(path),
+          File.basename(abs_path)
+        )
+      else
+        path
+      end
     end
 
-    def process_requires(filename, requires, options)
+    def expand_path(path)
+      return if stub?(path)
+      (path_reader.expand(path) || File.expand_path(path)).to_s
+    end
+
+    def process_requires(rel_path, requires, options)
       requires.map { |r| process_require(r, options) }
     rescue MissingRequire => error
-      raise error, "A file required by #{filename.inspect} wasn't found.\n#{error.message}", error.backtrace
+      raise error, "A file required by #{rel_path.inspect} wasn't found.\n#{error.message}", error.backtrace
     end
 
     def already_processed
       @already_processed ||= Set.new
     end
 
-    def stub?(filename)
-      stubs.include?(filename)
+    def stub?(path)
+      stubs.include?(path)
     end
 
     def extensions

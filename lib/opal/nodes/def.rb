@@ -144,8 +144,7 @@ module Opal
       def source_location
         file = @sexp.loc.expression.source_buffer.name
         line = @sexp.loc.line
-
-        "['#{file}.rb', #{line}]"
+        "['#{file}', #{line}]"
       end
 
       def comments_code
