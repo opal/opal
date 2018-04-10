@@ -92,7 +92,7 @@ module Opal
       end
 
       def compiler_for(source, options = {})
-        compiler_class.new(source, @options.merge(options))
+        ::Opal::Compiler.new(source, @options.merge(options))
       end
 
       def requires
@@ -104,10 +104,6 @@ module Opal
           # Remove any leading ./ after joining to dirname
           File.join(File.dirname(@filename), tree).sub(%r{^(\./)*}, '')
         end
-      end
-
-      def compiler_class
-        ::Opal::Compiler
       end
 
       # Also catch a files with missing extensions and nil.
@@ -130,13 +126,8 @@ module Opal
 
       private
 
-      def erb_compiler_class
-        ::Opal::ERB::Compiler
-      end
-
       def prepare(source, path)
-        erb_compiler = erb_compiler_class.new(source, path)
-        erb_compiler.prepared_source
+        ::Opal::ERB::Compiler.new(source, path).prepared_source
       end
     end
 
