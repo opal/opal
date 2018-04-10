@@ -376,8 +376,7 @@ task :smoke_test do
 
   cd opal_rspec_dir do
     Bundler.with_clean_env do
-      sh 'bundle check || bundle install'
-      sh 'bundle update opal-rspec'
+      sh 'bundle check && bundle update opal-rspec || bundle install'
       sh %{bundle exec opal-rspec --color --default-path=../../spec ../../spec/lib/deprecations_spec.rb > #{actual_output_path}}
 
       actual_output = File.read(actual_output_path)
