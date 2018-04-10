@@ -51,6 +51,11 @@ module Opal
     # math comparisons
     COMPARE = %w[< > <= >=].freeze
 
+    def self.module_name(path)
+      path = File.join(File.dirname(path), File.basename(path).split('.').first)
+      Pathname(path).cleanpath.to_s
+    end
+
     # defines a compiler option, also creating method of form 'name?'
     def self.compiler_option(name, default_value, options = {})
       mid          = options[:as]

@@ -46,8 +46,7 @@ module Opal
 
       def opening
         if compiler.requirable?
-          path = Pathname(compiler.file).cleanpath.to_s
-          line "Opal.modules[#{path.inspect}] = function(Opal) {"
+          line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
         elsif compiler.eval?
           line '(function(Opal, self) {'
         else

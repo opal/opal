@@ -136,7 +136,8 @@ module Opal
 
       def source
         result = ::ERB.new(@source.to_s).result
-        "Opal.modules[#{@filename.inspect}] = function() {#{result}};"
+        module_name = ::Opal::Compiler.module_name(@filename)
+        "Opal.modules[#{module_name.inspect}] = function() {#{result}};"
       end
     end
   end
