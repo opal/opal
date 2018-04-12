@@ -189,7 +189,7 @@ module Opal
         backtrace = error.backtrace
         if error.respond_to? :location
           line = error.location.line
-          backtrace = "#{file}:#{line}:in #{error.location}"
+          backtrace << "#{file}:#{line}:in #{error.location.expression.source_line}"
         end
         raise ::Opal::SyntaxError, error.message, backtrace
       rescue ::Parser::SyntaxError => error
