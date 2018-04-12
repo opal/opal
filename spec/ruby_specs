@@ -160,6 +160,7 @@ ruby/library/date
 ruby/library/delegate/delegator/send_spec
 ruby/library/erb/util/h_spec
 ruby/library/erb/util/html_escape_spec
+ruby/library/logger/severity_spec
 ruby/library/observer
 
 ruby/library/openstruct
