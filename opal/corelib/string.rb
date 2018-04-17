@@ -579,8 +579,7 @@ class String < `String`
       }
 
       if (search.$$is_regexp) {
-        // can't use Opal.global_regexp with offset
-        regex = new RegExp(search.source, 'gm' + (search.ignoreCase ? 'i' : ''));
+        regex = Opal.global_regexp(search);
         while (true) {
           match = regex.exec(self);
           if (match === null) {
@@ -856,8 +855,7 @@ class String < `String`
 
       if (search.$$is_regexp) {
         m = null;
-        // can't use Opal.global_regexp with offset
-        r = new RegExp(search.source, 'gm' + (search.ignoreCase ? 'i' : ''))
+        r = Opal.global_regexp(search);
         while (true) {
           _m = r.exec(self);
           if (_m === null || _m.index > offset) {
@@ -1009,8 +1007,7 @@ class String < `String`
           i, ii;
 
       if (pattern.$$is_regexp) {
-        // can't use Opal.global_regexp with limit
-        pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+        pattern = Opal.global_regexp(pattern);
       } else {
         pattern = #{Opal.coerce_to(pattern, String, :to_str).to_s};
         if (pattern === ' ') {
