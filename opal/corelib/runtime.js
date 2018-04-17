@@ -2152,6 +2152,17 @@
               .replace(/[\t]/g, '\\t');
   }
 
+  // Create a global Regexp from a RegExp object and cache the result
+  // on the object itself ($$g attribute).
+  //
+  Opal.global_regexp = function(pattern) {
+    if (pattern.$$g == null) {
+      pattern.$$g = new RegExp(pattern.source, (pattern.multiline ? 'gm' : 'g') + (pattern.ignoreCase ? 'i' : ''));
+    } else {
+      pattern.$$g.lastIndex = null; // reset lastIndex property
+    }
+    return pattern.$$g;
+  }
 
   // Require system
   // --------------
