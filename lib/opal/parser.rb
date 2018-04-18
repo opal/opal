@@ -4,6 +4,14 @@ require 'opal/ast/builder'
 require 'opal/rewriter'
 require 'opal/parser/patch'
 
+if RUBY_ENGINE != 'opal'
+  begin
+    require 'c_lexer'
+  rescue LoadError
+    $stderr.puts 'Failed to load CLexer, using pure Ruby lexer'
+  end
+end
+
 module Opal
   module Source
     class Buffer < Parser::Source::Buffer
@@ -13,41 +21,70 @@ module Opal
     end
   end
 
-  class Parser < ::Parser::Ruby25
-    class << self
-      attr_accessor :diagnostics_consumer
+  module Parser
+    module OpalDefaults
+      def self.included(klass)
+        klass.extend(ClassMethods)
+        klass.diagnostics_consumer = ->(diagnostic) {
+          $stderr.puts(diagnostic.render)
+        }
+      end
 
-      def default_parser
-        parser = super
+      module ClassMethods
+        attr_accessor :diagnostics_consumer
 
-        parser.diagnostics.all_errors_are_fatal = true
-        parser.diagnostics.ignore_warnings      = false
+        def default_parser
+          parser = super
 
-        parser.diagnostics.consumer =
-          if RUBY_ENGINE == 'opal'
-            ->(diag) {}
-          else
-            diagnostics_consumer
-          end
+          parser.diagnostics.all_errors_are_fatal = true
+          parser.diagnostics.ignore_warnings      = false
 
-        parser
+          parser.diagnostics.consumer =
+            if RUBY_ENGINE == 'opal'
+              ->(diag) {}
+            else
+              diagnostics_consumer
+            end
+
+          parser
+        end
+      end
+
+      def initialize(*)
+        super(Opal::AST::Builder.new)
+      end
+
+      def parse(source_buffer)
+        parsed = super
+        rewriten = rewrite(parsed)
+        rewriten
+      end
+
+      def rewrite(node)
+        Opal::Rewriter.new(node).process
       end
     end
 
-    self.diagnostics_consumer = ->(diagnostic) { $stderr.puts(diagnostic.render) }
-
-    def initialize(*)
-      super(Opal::AST::Builder.new)
+    class WithRubyLexer < ::Parser::Ruby25
+      include OpalDefaults
     end
 
-    def parse(source_buffer)
-      parsed = super
-      rewriten = rewrite(parsed)
-      rewriten
+    if defined?(::Parser::Ruby25WithCLexer)
+      class WithCLexer < ::Parser::Ruby25WithCLexer
+        include OpalDefaults
+      end
     end
 
-    def rewrite(node)
-      Opal::Rewriter.new(node).process
+    def self.default_parser_class
+      if defined?(WithCLexer)
+        WithCLexer
+      else
+        WithRubyLexer
+      end
+    end
+
+    def self.default_parser
+      default_parser_class.default_parser
     end
   end
 end

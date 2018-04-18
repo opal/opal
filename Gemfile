@@ -40,3 +40,7 @@ end unless ENV['CI']
 group :doc do
   gem 'redcarpet'
 end
+
+platforms :ruby, :mswin, :mswin64, :mingw, :x64_mingw do
+  gem 'c_lexer', '2.5.1.0.pre2'
+end

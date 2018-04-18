@@ -453,10 +453,10 @@ RSpec.describe Opal::Compiler do
     let(:diagnostics) { [] }
 
     around(:each) do |e|
-      original_diagnostics_consumer = Opal::Parser.diagnostics_consumer
-      Opal::Parser.diagnostics_consumer = ->(diagnostic) { diagnostics << diagnostic }
+      original_diagnostics_consumer = Opal::Parser.default_parser_class.diagnostics_consumer
+      Opal::Parser.default_parser_class.diagnostics_consumer = ->(diagnostic) { diagnostics << diagnostic }
       e.run
-      Opal::Parser.diagnostics_consumer = original_diagnostics_consumer
+      Opal::Parser.default_parser_class.diagnostics_consumer = original_diagnostics_consumer
     end
 
     let(:encoding_comment) { '' }
