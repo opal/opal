@@ -4,14 +4,6 @@ require 'opal/ast/builder'
 require 'opal/rewriter'
 require 'opal/parser/patch'
 
-if RUBY_ENGINE != 'opal'
-  begin
-    require 'c_lexer'
-  rescue LoadError
-    $stderr.puts 'Failed to load CLexer, using pure Ruby lexer'
-  end
-end
-
 module Opal
   module Source
     class Buffer < Parser::Source::Buffer
@@ -22,31 +14,25 @@ module Opal
   end
 
   module Parser
-    module OpalDefaults
-      def self.included(klass)
-        klass.extend(ClassMethods)
-        klass.diagnostics_consumer = ->(diagnostic) {
-          $stderr.puts(diagnostic.render)
-        }
-      end
-
+    module DefaultConfig
       module ClassMethods
         attr_accessor :diagnostics_consumer
 
         def default_parser
           parser = super
-
           parser.diagnostics.all_errors_are_fatal = true
           parser.diagnostics.ignore_warnings      = false
-
-          parser.diagnostics.consumer =
-            if RUBY_ENGINE == 'opal'
-              ->(diag) {}
-            else
-              diagnostics_consumer
-            end
-
+          parser.diagnostics.consumer             = diagnostics_consumer
           parser
+        end
+      end
+
+      def self.included(klass)
+        klass.extend(ClassMethods)
+        klass.diagnostics_consumer = ->(diagnostic) do
+          if RUBY_ENGINE != 'opal'
+            $stderr.puts(diagnostic.render)
+          end
         end
       end
 
@@ -65,26 +51,19 @@ module Opal
       end
     end
 
-    class WithRubyLexer < ::Parser::Ruby25
-      include OpalDefaults
-    end
+    class << self
+      attr_accessor :default_parser_class
 
-    if defined?(::Parser::Ruby25WithCLexer)
-      class WithCLexer < ::Parser::Ruby25WithCLexer
-        include OpalDefaults
+      def default_parser
+        default_parser_class.default_parser
       end
-    end
-
-    def self.default_parser_class
-      if defined?(WithCLexer)
-        WithCLexer
-      else
-        WithRubyLexer
-      end
-    end
-
-    def self.default_parser
-      default_parser_class.default_parser
     end
   end
 end
+
+require 'opal/parser/with_ruby_lexer'
+
+if RUBY_ENGINE != 'opal'
+  require 'opal/parser/with_c_lexer'
+end
+
