@@ -73,6 +73,7 @@ module Opal
       rescue Timeout::Error
         puts 'Failed to start chrome server'
         puts 'Make sure that you have it installed and that its version is > 59'
+        exit(1)
       ensure
         Process.kill('HUP', chrome_pid) if chrome_pid
       end
