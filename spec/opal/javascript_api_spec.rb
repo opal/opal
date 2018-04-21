@@ -39,6 +39,10 @@ describe "JavaScript API" do
         status.should == 0
         status = nil
 
+        exit 1
+        status.should == 1
+        status = nil
+
         exit Object.new
         status.should == 0
         status = nil
