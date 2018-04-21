@@ -66,4 +66,3 @@ require 'opal/parser/with_ruby_lexer'
 if RUBY_ENGINE != 'opal'
   require 'opal/parser/with_c_lexer'
 end
-

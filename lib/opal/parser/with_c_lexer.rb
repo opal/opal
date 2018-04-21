@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 begin
   require 'c_lexer'
 rescue LoadError
