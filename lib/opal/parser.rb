@@ -13,41 +13,56 @@ module Opal
     end
   end
 
-  class Parser < ::Parser::Ruby25
-    class << self
-      attr_accessor :diagnostics_consumer
+  module Parser
+    module DefaultConfig
+      module ClassMethods
+        attr_accessor :diagnostics_consumer
 
-      def default_parser
-        parser = super
+        def default_parser
+          parser = super
+          parser.diagnostics.all_errors_are_fatal = true
+          parser.diagnostics.ignore_warnings      = false
+          parser.diagnostics.consumer             = diagnostics_consumer
+          parser
+        end
+      end
 
-        parser.diagnostics.all_errors_are_fatal = true
-        parser.diagnostics.ignore_warnings      = false
-
-        parser.diagnostics.consumer =
-          if RUBY_ENGINE == 'opal'
-            ->(diag) {}
-          else
-            diagnostics_consumer
+      def self.included(klass)
+        klass.extend(ClassMethods)
+        klass.diagnostics_consumer = ->(diagnostic) do
+          if RUBY_ENGINE != 'opal'
+            $stderr.puts(diagnostic.render)
           end
+        end
+      end
 
-        parser
+      def initialize(*)
+        super(Opal::AST::Builder.new)
+      end
+
+      def parse(source_buffer)
+        parsed = super
+        rewriten = rewrite(parsed)
+        rewriten
+      end
+
+      def rewrite(node)
+        Opal::Rewriter.new(node).process
       end
     end
 
-    self.diagnostics_consumer = ->(diagnostic) { $stderr.puts(diagnostic.render) }
+    class << self
+      attr_accessor :default_parser_class
 
-    def initialize(*)
-      super(Opal::AST::Builder.new)
-    end
-
-    def parse(source_buffer)
-      parsed = super
-      rewriten = rewrite(parsed)
-      rewriten
-    end
-
-    def rewrite(node)
-      Opal::Rewriter.new(node).process
+      def default_parser
+        default_parser_class.default_parser
+      end
     end
   end
+end
+
+require 'opal/parser/with_ruby_lexer'
+
+if RUBY_ENGINE != 'opal'
+  require 'opal/parser/with_c_lexer'
 end
