@@ -481,7 +481,7 @@ class String < `String`
       var result = '', match_data = nil, index = 0, match, _replacement;
 
       if (pattern.$$is_regexp) {
-        pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+        pattern = Opal.global_multiline_regexp(pattern);
       } else {
         pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
@@ -579,7 +579,7 @@ class String < `String`
       }
 
       if (search.$$is_regexp) {
-        regex = new RegExp(search.source, 'gm' + (search.ignoreCase ? 'i' : ''));
+        regex = Opal.global_multiline_regexp(search);
         while (true) {
           match = regex.exec(self);
           if (match === null) {
@@ -855,7 +855,7 @@ class String < `String`
 
       if (search.$$is_regexp) {
         m = null;
-        r = new RegExp(search.source, 'gm' + (search.ignoreCase ? 'i' : ''));
+        r = Opal.global_multiline_regexp(search);
         while (true) {
           _m = r.exec(self);
           if (_m === null || _m.index > offset) {
@@ -906,7 +906,7 @@ class String < `String`
 
       if (sep.$$is_regexp) {
         m = null;
-        r = new RegExp(sep.source, 'gm' + (sep.ignoreCase ? 'i' : ''));
+        r = Opal.global_multiline_regexp(sep);
 
         while (true) {
           _m = r.exec(self);
@@ -953,7 +953,7 @@ class String < `String`
           match;
 
       if (pattern.$$is_regexp) {
-        pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+        pattern = Opal.global_multiline_regexp(pattern);
       } else {
         pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
@@ -1007,7 +1007,7 @@ class String < `String`
           i, ii;
 
       if (pattern.$$is_regexp) {
-        pattern = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+        pattern = Opal.global_multiline_regexp(pattern);
       } else {
         pattern = #{Opal.coerce_to(pattern, String, :to_str).to_s};
         if (pattern === ' ') {

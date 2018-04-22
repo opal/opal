@@ -186,11 +186,8 @@ class Regexp < `RegExp`
         }
       }
 
-      var source = self.source;
-      var flags = self.multiline ? 'gm' : 'g';
-
       // global RegExp maintains state, so not using self/this
-      var md, re = new RegExp(source, flags + (self.ignoreCase ? 'i' : ''));
+      var md, re = Opal.global_regexp(self);
 
       while (true) {
         md = re.exec(string);
@@ -231,11 +228,8 @@ class Regexp < `RegExp`
         }
       }
 
-      var source = self.source;
-      var flags = self.multiline ? 'gm' : 'g';
-
       // global RegExp maintains state, so not using self/this
-      var md, re = new RegExp(source, flags + (self.ignoreCase ? 'i' : ''));
+      var md, re = Opal.global_regexp(self);
 
       md = re.exec(string);
       if (md === null || md.index < pos) {

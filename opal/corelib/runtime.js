@@ -2150,15 +2150,53 @@
               .replace(/[\r]/g, '\\r')
               .replace(/[\f]/g, '\\f')
               .replace(/[\t]/g, '\\t');
-  }
+  };
 
+  // Create a global Regexp from a RegExp object and cache the result
+  // on the object itself ($$g attribute).
+  //
+  Opal.global_regexp = function(pattern) {
+    if (pattern.global) {
+      return pattern; // RegExp already has the global flag
+    }
+    if (pattern.$$g == null) {
+      pattern.$$g = new RegExp(pattern.source, (pattern.multiline ? 'gm' : 'g') + (pattern.ignoreCase ? 'i' : ''));
+    } else {
+      pattern.$$g.lastIndex = null; // reset lastIndex property
+    }
+    return pattern.$$g;
+  };
+
+  // Create a global multiline Regexp from a RegExp object and cache the result
+  // on the object itself ($$gm or $$g attribute).
+  //
+  Opal.global_multiline_regexp = function(pattern) {
+    var result;
+    if (pattern.multiline) {
+      if (pattern.global) {
+        return pattern; // RegExp already has the global and multiline flag
+      }
+      // we are using the $$g attribute because the Regexp is already multiline
+      if (pattern.$$g != null) {
+        result = pattern.$$g;
+      } else {
+        result = pattern.$$g = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+      }
+    } else if (pattern.$$gm != null) {
+      result = pattern.$$gm;
+    } else {
+      result = pattern.$$gm = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+    }
+    result.lastIndex = null; // reset lastIndex property
+    return result;
+  };
 
   // Require system
   // --------------
 
   Opal.modules         = {};
   Opal.loaded_features = ['corelib/runtime'];
-  Opal.current_dir     = '.'
+  Opal.current_dir     = '.';
   Opal.require_table   = {'corelib/runtime': true};
 
   Opal.normalize = function(path) {
