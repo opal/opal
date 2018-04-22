@@ -1,19 +1,20 @@
 # Opal & Sprockets
 
-Opal comes with built-in sprockets support, and provides a simple `Opal::Server`
-class to make it easy to get a rack server up and running for trying out opal.
-This server will automatically recompile ruby sources when they change, meaning
-you just need to refresh your page to autorun.
+The `opal-sprockets` gem adds sprockets support to Opal, providing a simple
+`Opal::Sprockets::server` class to make it easy to get a rack server up and 
+running for trying out opal. This server will automatically recompile ruby 
+sources when they change, meaning you just need to refresh your page to autorun.
 
 ## Getting setup
 
-Add `opal` to a `Gemfile`:
+Add `rack` & `opal-sprockets` to your `Gemfile`:
 
 ```ruby
 #Gemfile
 source 'https://rubygems.org'
 
-gem 'opal', '>= 0.6.0'
+gem 'rack'
+gem 'opal-sprockets'
 ```
 
 And install with `bundle install`.
@@ -28,17 +29,21 @@ require 'opal'
 puts "hello world"
 ```
 
-Finally, we need a html page to run, so create `index.html`:
+
+If we do not provide an HTML index, sprockets will generate one automatically; 
+however, it is often useful to override the default with a custom `erb` file: 
 
 ```html
+<%# index.erb %>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <title>opal server example</title>
-    <script src="/assets/application.js"></script>
+    <%= javascript_include_tag @server.main %>
   </head>
   <body>
+    you've reached the custom index!
   </body>
 </html>
 ```
@@ -49,15 +54,15 @@ Finally, we need a html page to run, so create `index.html`:
 
 ```ruby
 # config.ru
-require 'bundler'
-Bundler.require
+require 'opal-sprockets'
 
 run Opal::Server.new { |s|
   s.append_path 'app'
 
   s.main = 'application'
 
-  s.index_path = 'index.html'
+  # override the default index with our custom index
+  s.index_path = 'index.erb'
 }
 ```
 
