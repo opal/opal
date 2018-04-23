@@ -381,3 +381,12 @@ Style/MutableConstant:
   Exclude:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
+
+Style/EmptyCaseCondition:
+  Enabled: false
+
+# Use whatever suites the situation, sometimes assign_inside_condition is
+# more readable over assign_to_condition despite the risk of repeating the
+# variable name.
+Style/ConditionalAssignment:
+  Enabled: false

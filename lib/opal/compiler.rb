@@ -185,16 +185,8 @@ module Opal
 
       begin
         sexp, comments, tokens = @parser.tokenize(@buffer)
-      rescue ::Opal::Error => error
-        backtrace = error.backtrace
-        if error.respond_to? :location
-          line = error.location.line
-          backtrace << "#{file}:#{line}:in #{error.location.expression.source_line}"
-        end
-        raise ::Opal::SyntaxError, error.message, backtrace
-      rescue ::Parser::SyntaxError => error
-        backtrace = error.backtrace
-        raise ::Opal::SyntaxError, error.message, backtrace
+      rescue ::Opal::Error, ::Parser::SyntaxError => error
+        raise ::Opal::SyntaxError.with_opal_backtrace(error, file)
       end
 
       @sexp = s(:top, sexp || s(:nil))
