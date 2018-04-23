@@ -15,6 +15,9 @@ module M1
   end
 end
 
+class A
+end
+
 if RUBY_ENGINE == 'opal'
   `console.log("Opal:")`
   `console.log(Opal.BasicObject.$$methods.sort())`

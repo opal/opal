@@ -489,7 +489,7 @@
       constructor.prototype = new alloc_proxy();
     }
 
-    constructor.prototype.constructor = constructor;
+    $defineProperty(constructor.prototype, 'constructor', constructor);
 
     return constructor;
   };
@@ -685,7 +685,7 @@
     //      `var module = new constructor` is called.
     //
     //   Maybe there are some browsers not abiding (IE6?)
-    module.constructor = module_constructor;
+    $defineProperty(module, 'constructor', module_constructor);
 
     // @property $$is_module Clearly mark this as a module
     $defineProperty(module, '$$is_module', true);
@@ -859,7 +859,7 @@
 
       if (ancestor === from) {
         var method_name = name.slice(1);
-        target_constructor.prototype[name] = body;
+        $defineProperty(target_constructor.prototype, name, body);
         break;
       }
     }
@@ -1047,7 +1047,7 @@
     // Populate constructor with previously stored stubs
     for (var method_name in Opal.stubs) {
       if (!(method_name in constructor.prototype)) {
-        constructor.prototype[method_name] = Opal.stub_for(method_name);
+        $defineProperty(constructor.prototype, method_name, Opal.stub_for(method_name));
       }
     }
 
@@ -1067,7 +1067,7 @@
       var method = BasicObject_alloc.prototype[method];
 
       if (method && method.$$stub && !(name in constructor.prototype)) {
-        constructor.prototype[name] = method;
+        $defineProperty(constructor.prototype, name, method);
       }
     }
 
@@ -1103,17 +1103,15 @@
       // the module which defined the current method body. Also make sure
       // a module can overwrite a method it defined before
       if (current_owner_index <= module_index) {
-        dest[jsid] = body;
+        $defineProperty(dest, jsid, body);
         dest[jsid].$$donated = module;
-        // console.log("inheriting", jsid, "from", module.$$name, "to", includer.$$name);
         includer.$$methods.push(jsid.slice(1));
       }
     }
     else {
       // neither a class, or module included by class, has defined method
-      dest[jsid] = body;
+      $defineProperty(dest, jsid, body);
       dest[jsid].$$donated = module;
-      // console.log("inheriting", jsid, "from", module.$$name, "to", includer.$$name);
       includer.$$methods.push(jsid.slice(1));
     }
 
@@ -1218,7 +1216,7 @@
           subscriber = subscribers[j];
 
           if (!(method_name in subscriber)) {
-            subscriber[method_name] = stub;
+            $defineProperty(subscriber, method_name, stub);
           }
         }
       }
@@ -1239,7 +1237,7 @@
   // @return [undefined]
   Opal.add_stub_for = function(prototype, stub) {
     var method_missing_stub = Opal.stub_for(stub);
-    prototype[stub] = method_missing_stub;
+    $defineProperty(prototype, stub, method_missing_stub);
   };
 
   // Generate the method_missing stub for a given method name.
@@ -2385,7 +2383,7 @@
   BasicObject.$$children = [_Object, Module, Class];
 
   // Forward .toString() to #to_s
-  _Object.$$proto.toString = function() {
+  $defineProperty(_Object.$$proto, 'toString', function() {
     var to_s = this.$to_s();
     if (to_s.$$is_string && typeof(to_s) === 'object') {
       // a string created using new String('string')
@@ -2393,11 +2391,11 @@
     } else {
       return to_s;
     }
-  };
+  });
 
   // Make Kernel#require immediately available as it's needed to require all the
   // other corelib files.
-  _Object.$$proto.$require = Opal.require;
+  $defineProperty(_Object.$$proto, '$require', Opal.require);
 
   // Add a short helper to navigate constants manually.
   // @example

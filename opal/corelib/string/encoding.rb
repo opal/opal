@@ -1,7 +1,7 @@
 require 'corelib/string'
 
 class Encoding
-  self.JS['$$register'] = `{}`
+  `Opal.defineProperty(self, '$$register', {})`
 
   def self.register(name, options = {}, &block)
     names    = [name] + (options[:aliases] || [])
@@ -163,7 +163,7 @@ end
 
 class String
   attr_reader :encoding
-  `String.prototype.encoding = #{Encoding::UTF_16LE}`
+  `Opal.defineProperty(String.prototype, 'encoding', #{Encoding::UTF_16LE})`
 
   def bytes
     each_byte.to_a

@@ -132,17 +132,12 @@ class Module
         })(ivar);
 
         // initialize the instance variable as nil
-        proto[ivar] = nil;
+        Opal.defineProperty(proto, ivar, nil);
 
         body.$$parameters = [];
         body.$$arity = 0;
 
-        if (self.$$is_singleton) {
-          proto.constructor.prototype[id] = body;
-        }
-        else {
-          Opal.defn(self, id, body);
-        }
+        Opal.defn(self, id, body);
       }
     }
 
@@ -170,14 +165,9 @@ class Module
         body.$$arity = 1;
 
         // initialize the instance variable as nil
-        proto[ivar] = nil;
+        Opal.defineProperty(proto, ivar, nil);
 
-        if (self.$$is_singleton) {
-          proto.constructor.prototype[id] = body;
-        }
-        else {
-          Opal.defn(self, id, body);
-        }
+        Opal.defn(self, id, body);
       }
     }
 

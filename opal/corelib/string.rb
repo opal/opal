@@ -4,7 +4,7 @@ require 'corelib/regexp'
 class String < `String`
   include Comparable
 
-  `def.$$is_string = true`
+  `Opal.defineProperty(String.prototype, '$$is_string', true)`
 
   def __id__
     `self.toString()`
