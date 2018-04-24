@@ -13,4 +13,14 @@ if RUBY_ENGINE == 'opal'
       @buffer += string
     end
   end
+
+  class Parser::Source::Buffer
+    def source_lines
+      @lines ||= begin
+        lines = @source.lines.to_a
+        lines << '' if @source.end_with?("\n")
+        lines.map { |line| line.chomp("\n") }
+      end
+    end
+  end
 end

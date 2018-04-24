@@ -385,8 +385,13 @@ Style/MutableConstant:
 Style/EmptyCaseCondition:
   Enabled: false
 
+
 # Use whatever suites the situation, sometimes assign_inside_condition is
 # more readable over assign_to_condition despite the risk of repeating the
 # variable name.
 Style/ConditionalAssignment:
   Enabled: false
+
+Naming/MemoizedInstanceVariableName:
+  Exclude:
+    - lib/opal/parser/patch.rb # it's a monkey-patch on the parser gem
