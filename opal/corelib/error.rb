@@ -1,6 +1,7 @@
 class Exception < `Error`
   # `var Kernel$raise = #{Kernel}.$raise`
   `var stack_trace_limit`
+
   def self.new(*args)
     %x{
       var message   = (args.length > 0) ? args[0] : nil;
@@ -34,6 +35,11 @@ class Exception < `Error`
 
   def backtrace
     %x{
+      if (self.backtrace) {
+        // nil is a valid backtrace
+        return self.backtrace;
+      }
+
       var backtrace = self.stack;
 
       if (typeof(backtrace) === 'string') {
@@ -67,6 +73,37 @@ class Exception < `Error`
   def inspect
     as_str = to_s
     as_str.empty? ? self.class.to_s : "#<#{self.class.to_s}: #{to_s}>"
+  end
+
+  def set_backtrace(backtrace)
+    %x{
+      var valid = true, i, ii;
+
+      if (backtrace === nil) {
+        self.backtrace = nil;
+      } else if (backtrace.$$is_string) {
+        self.backtrace = [backtrace];
+      } else {
+        if (backtrace.$$is_array) {
+          for (i = 0, ii = backtrace.length; i < ii; i++) {
+            if (!backtrace[i].$$is_string) {
+              valid = false;
+              break;
+            }
+          }
+        } else {
+          valid = false;
+        }
+
+        if (valid === false) {
+          #{raise TypeError, 'backtrace must be Array of String'}
+        }
+
+        self.backtrace = backtrace;
+      }
+
+      return backtrace;
+    }
   end
 
   def to_s

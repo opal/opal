@@ -350,6 +350,8 @@ Naming/AccessorMethodName:
   Exclude:
     # StringScanner has method 'get_byte'
     - 'stdlib/strscan.rb'
+    # Exception has method 'set_backtrace'
+    - 'opal/corelib/error.rb'
 
 Style/RescueStandardError:
   Enabled: false
