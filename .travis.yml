@@ -58,7 +58,7 @@ matrix:
       env: RUN=smoke_test
 
     - rvm: ruby-head
-      env: RUN=rspec
+      env: RUN=rspec REINSTALL_BUNDLER=true
 
     - rvm: 2.4.3
       env: RUN=rspec RACK_VERSION='~> 2.0.0'
@@ -90,6 +90,7 @@ before_install:
   - git submodule update --init
   - npm install -g jshint
   - npm install -g uglify-js
+  - test $REINSTALL_BUNDLER && gem install bundler || true
   - type bundle || gem install bundler
   - bundle config without doc
   - which google-chrome-stable
