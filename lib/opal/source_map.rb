@@ -14,7 +14,7 @@ module Opal
 
     def map
       @map ||= begin
-        source_file = file + '.rb'
+        source_file = file
         generated_line, generated_column = 1, 0
 
         mappings = @fragments.map do |fragment|

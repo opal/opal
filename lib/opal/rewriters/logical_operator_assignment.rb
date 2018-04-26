@@ -117,7 +117,7 @@ module Opal
         lhs, rhs = *node
 
         result = HANDLERS
-                 .fetch(lhs.type) { raise NotImplementedError }
+                 .fetch(lhs.type) { error "cannot handle LHS type: #{lhs.type}" }
                  .call(lhs, rhs, :or)
 
         process(result)
@@ -128,7 +128,7 @@ module Opal
         lhs, rhs = *node
 
         result = HANDLERS
-                 .fetch(lhs.type) { raise NotImplementedError }
+                 .fetch(lhs.type) { error "cannot handle LHS type: #{lhs.type}" }
                  .call(lhs, rhs, :and)
 
         process(result)

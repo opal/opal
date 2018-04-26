@@ -5,6 +5,7 @@ require 'opal/parser'
 require 'opal/fragment'
 require 'opal/nodes'
 require 'opal/eof_content'
+require 'opal/errors'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -177,15 +178,15 @@ module Opal
     end
 
     def parse
-      @buffer = ::Opal::Source::Buffer.new(file, 1)
+      @buffer = ::Opal::Parser::SourceBuffer.new(file, 1)
       @buffer.source = @source
 
       @parser = Opal::Parser.default_parser
 
       begin
         sexp, comments, tokens = @parser.tokenize(@buffer)
-      rescue ::Parser::SyntaxError => error
-        raise ::SyntaxError, error.message, error.backtrace
+      rescue ::Opal::Error, ::Parser::SyntaxError => error
+        raise ::Opal::SyntaxError.with_opal_backtrace(error, file)
       end
 
       @sexp = s(:top, sexp || s(:nil))
@@ -225,7 +226,7 @@ module Opal
     # method simply appends the filename and curent line number onto
     # the message and raises it.
     def error(msg, line = nil)
-      raise SyntaxError, "#{msg} :#{file}:#{line}"
+      raise ::Opal::SyntaxError, "#{msg} -- #{file}:#{line}"
     end
 
     # This is called when a parsing/processing warning occurs. This

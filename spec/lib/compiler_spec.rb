@@ -535,6 +535,19 @@ RSpec.describe Opal::Compiler do
     end
   end
 
+  describe 'a compilation error' do
+    it 'adds the file and line to the backtrace' do
+      error = nil
+      begin
+        compiled('foo.JS[:bar] += :baz', file: 'foobar.js.rb')
+      rescue Opal::SyntaxError => syntax_error
+        error = syntax_error
+      end
+      expect(error.backtrace[0]).to eq("foobar.js.rb:1:in `foo.JS[:bar] += :baz'")
+      expect(error.backtrace.size).to be > 1
+    end
+  end
+
   describe '[regressions]' do
     it 'accepts empty rescue within while loop' do
       # found running bm_vm1_rescue.rb

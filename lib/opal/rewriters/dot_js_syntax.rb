@@ -13,14 +13,14 @@ module Opal
             case meth
             when :[]
               if args.size != 1
-                raise SyntaxError, '.JS[:property] syntax supports only one argument'
+                error '.JS[:property] syntax supports only one argument'
               end
               property = args.first
 
               node = to_js_attr_call(recv_of_recv, property)
             when :[]=
               if args.size != 2
-                raise SyntaxError, '.JS[:property]= syntax supports only two arguments'
+                error '.JS[:property]= syntax supports only two arguments'
               end
 
               property, value = *args

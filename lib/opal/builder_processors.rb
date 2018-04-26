@@ -85,7 +85,7 @@ module Opal
 
       def compiled
         @compiled ||= begin
-          compiler = compiler_for(@source, file: @filename.gsub(/\.(rb|js|opal)#{REGEXP_END}/, ''))
+          compiler = compiler_for(@source, file: @filename)
           compiler.compile
           compiler
         end
@@ -100,10 +100,7 @@ module Opal
       end
 
       def required_trees
-        compiled.required_trees.map do |tree|
-          # Remove any leading ./ after joining to dirname
-          File.join(File.dirname(@filename), tree).sub(%r{^(\./)*}, '')
-        end
+        compiled.required_trees
       end
 
       # Also catch a files with missing extensions and nil.

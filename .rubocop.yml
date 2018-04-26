@@ -105,6 +105,7 @@ Lint/BooleanSymbol:
 Lint/InheritException:
   Exclude:
     - 'lib/opal/builder.rb'
+    - 'lib/opal/errors.rb'
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
 
@@ -350,6 +351,8 @@ Naming/AccessorMethodName:
   Exclude:
     # StringScanner has method 'get_byte'
     - 'stdlib/strscan.rb'
+    # Exception has method 'set_backtrace'
+    - 'opal/corelib/error.rb'
 
 Style/RescueStandardError:
   Enabled: false
@@ -378,3 +381,17 @@ Style/MutableConstant:
   Exclude:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
+
+Style/EmptyCaseCondition:
+  Enabled: false
+
+
+# Use whatever suites the situation, sometimes assign_inside_condition is
+# more readable over assign_to_condition despite the risk of repeating the
+# variable name.
+Style/ConditionalAssignment:
+  Enabled: false
+
+Naming/MemoizedInstanceVariableName:
+  Exclude:
+    - lib/opal/parser/patch.rb # it's a monkey-patch on the parser gem

@@ -75,7 +75,7 @@ class Pathname
   end
 
   def expand_path
-    File.expand_path @path
+    Pathname.new(File.expand_path(@path))
   end
 
   def +(other)

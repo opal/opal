@@ -1,3 +1,3 @@
-$ScratchPad << File.basename(__FILE__)+'pre'
+$ScratchPad << File.basename(__FILE__)+'-pre'
 require_tree '.'
-$ScratchPad << File.basename(__FILE__)+'post'
+$ScratchPad << File.basename(__FILE__)+'-post'

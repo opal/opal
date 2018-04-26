@@ -9,7 +9,7 @@ RSpec.describe Opal::Rewriters::BinaryOperatorAssignment do
 
   def parse(source)
     parser = Opal::Parser.default_parser
-    buffer = ::Opal::Source::Buffer.new('(eval)')
+    buffer = ::Opal::Parser::SourceBuffer.new('(eval)')
     buffer.source = source
     parser.parse(buffer)
   end
