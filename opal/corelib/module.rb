@@ -468,43 +468,21 @@ class Module
 
   def instance_methods(include_super = true)
     %x{
-      var value,
-          methods = [],
-          proto   = self.$$proto;
-
-      for (var prop in proto) {
-        if (prop.charAt(0) !== '$' || prop.charAt(1) === '$') {
-          continue;
-        }
-
-        value = proto[prop];
-
-        if (typeof(value) !== "function") {
-          continue;
-        }
-
-        if (value.$$stub) {
-          continue;
-        }
-
-        if (!self.$$is_module) {
-          if (self !== Opal.BasicObject && value === Opal.BasicObject.$$proto[prop]) {
-            continue;
-          }
-
-          if (!include_super && !proto.hasOwnProperty(prop)) {
-            continue;
-          }
-
-          if (!include_super && value.$$donated) {
-            continue;
-          }
-        }
-
-        methods.push(prop.substr(1));
+      if (include_super) {
+        return self.$$methods;
       }
 
-      return methods;
+      var result = [];
+
+      for (var i = 0, methods = self.$$methods, length = methods.length; i < length; i++) {
+        var method = methods[i];
+
+        if (self.$$proto['$' + method].$$owner === self) {
+          result.push(method);
+        }
+      }
+
+      return result;
     }
   end
 

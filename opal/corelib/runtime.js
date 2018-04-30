@@ -1758,8 +1758,13 @@
 
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(obj, jsid, body) {
-    $defineProperty(obj.$$proto, jsid, body)
-    obj.$$methods.push(jsid.slice(1));
+    $defineProperty(obj.$$proto, jsid, body);
+
+    var method_name = jsid.slice(1);
+
+    if (obj.$$methods.indexOf(method_name) === -1) {
+      obj.$$methods.push(method_name);
+    }
 
     // for super dispatcher, etc.
     body.$$owner = obj;
