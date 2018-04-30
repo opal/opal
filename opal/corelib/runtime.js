@@ -103,7 +103,11 @@
   // Retrieve or assign the id of an object
   Opal.id = function(obj) {
     if (obj.$$is_number) return (obj * 2)+1;
-    return obj.$$id || (obj.$$id = Opal.uid());
+    if (obj.$$id != null) {
+      return obj.$$id;
+    };
+    $defineProperty(obj, '$$id', Opal.uid());
+    return obj.$$id;
   };
 
   // Globals table
@@ -453,7 +457,8 @@
     //                    the last included klass
     $defineProperty(klass, '$$parent', superclass);
 
-    $defineProperty(klass, '$$ancestors', [klass].concat(superclass.$$ancestors))
+    $defineProperty(klass, '$$ancestors', []);
+    Opal.update_ancestors(klass);
 
     Opal.const_set(scope, name, klass);
 
@@ -634,7 +639,8 @@
       Opal.const_set(scope, name, module);
     }
 
-    module.$$ancestors = [module];
+    // module.$$ancestors = [module];
+    Opal.update_ancestors(module);
 
     return module;
   };
@@ -759,6 +765,10 @@
     $defineProperty(klass, '$$is_singleton', true);
     $defineProperty(klass, '$$singleton_of', object);
 
+    $defineProperty(klass, '$$ancestors', []);
+    Opal.update_ancestors(klass);
+    superclass.$$children.push(klass);
+
     $defineProperty(object, '$$meta', klass);
 
     return klass;
@@ -782,6 +792,9 @@
 
     $defineProperty(klass, '$$is_singleton', true);
     $defineProperty(klass, '$$singleton_of', object);
+
+    $defineProperty(klass, '$$ancestors', [klass].concat(superclass.$$ancestors));
+    superclass.$$children.push(klass);
 
     $defineProperty(object, '$$meta', klass);
     return klass;
@@ -940,18 +953,24 @@
     return false;
   }
 
-  Opal.push_ancestor_before = function(module, target, after) {
-    throw new Error("NOT IMPLEMENTED; prepend, wip");
-  }
+  Opal.update_ancestors = function(module) {
+    var parent;
 
-  Opal.push_ancestor_after = function(module, target, after) {
-    var ancestors = target.$$ancestors,
-        children = target.$$children;
+    if (module.$$is_singleton && module.$$singleton_of.$$is_module) {
+      parent = module.$$singleton_of.$$super;
+    }
+    else {
+      parent = module.$$is_class ? module.$$super : null;
+    }
 
-    ancestors.splice(ancestors.indexOf(after) + 1, 0, module);
+    module.$$ancestors = module.$$prepended_modules
+      .concat([module])
+      .concat(module.$$included_modules)
+      .concat(parent ? parent.$$ancestors : []);
 
-    for (var i = 0; i < children.length; i++) {
-      Opal.push_ancestor_after(module, children[i], after);
+    var children = module.$$children, length = children.length, i;
+    for (i = 0; i < length; i++) {
+      Opal.update_ancestors(children[0]);
     }
   }
 
@@ -990,11 +1009,10 @@
     }
 
     Opal.const_cache_version++;
-    includer.$$included_modules.push(module);
-    module.$$included_in.push(includer);
 
-    Opal.push_ancestor_after(module, includer, includer);
-    // Opal.push_ancestor_before(module, includer);
+    includer.$$included_modules = includer.$$included_modules.concat([module]).concat(module.$$included_modules);
+    module.$$included_in.push(includer);
+    Opal.update_ancestors(includer);
 
     Opal.bridge_methods(includer, module);
 
@@ -1015,6 +1033,16 @@
       Opal.update_includer(module, includer, '$' + methods[i])
     }
   };
+
+  Opal.prepend_features = function(module, prepender) {
+    Opal.const_cache_version++;
+
+    prepender.$$prepended_modules.push(module);
+    module.$$prepended_in.push(prepender);
+    Opal.update_ancestors(prepender);
+
+    // TODO: Update $$proto of module
+  }
 
   // Table that holds all methods that have been defined on all objects
   // It is used for defining method stubs for new coming native classes
@@ -1139,6 +1167,8 @@
 
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module_or_class) {
+    return module_or_class.$$ancestors;
+
     var parent = module_or_class,
         result = [],
         modules, i, ii, j, jj;
@@ -2381,6 +2411,8 @@
   Class.$$ancestors     = [Class, Module, _Object, BasicObject];
 
   BasicObject.$$children = [_Object, Module, Class];
+  _Object.$$children = [Module, Class];
+  Module.$$children = [Class];
 
   // Forward .toString() to #to_s
   $defineProperty(_Object.$$proto, 'toString', function() {
@@ -2396,6 +2428,7 @@
   // Make Kernel#require immediately available as it's needed to require all the
   // other corelib files.
   $defineProperty(_Object.$$proto, '$require', Opal.require);
+  _Object.$$methods.push('require');
 
   // Add a short helper to navigate constants manually.
   // @example

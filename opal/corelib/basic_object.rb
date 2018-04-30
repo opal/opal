@@ -13,7 +13,13 @@ class BasicObject
   alias equal? ==
 
   def __id__
-    `self.$$id || (self.$$id = Opal.uid())`
+    %x{
+      if (self.$$id != null) {
+        return self.$$id;
+      }
+      Opal.defineProperty(self, '$$id', Opal.uid());
+      return self.$$id;
+    }
   end
 
   def __send__(symbol, *args, &block)
