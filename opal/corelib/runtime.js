@@ -2226,7 +2226,7 @@
       path = Opal.normalize(paths[i]);
 
       if (Opal.require_table[path]) {
-        return;
+        continue;
       }
 
       Opal.loaded_features.push(path);
