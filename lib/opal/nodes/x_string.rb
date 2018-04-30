@@ -38,7 +38,7 @@ module Opal
         when :str
           value = child.loc.expression.source
           push Fragment.new(value, scope, child)
-        when :begin, :gvar, :ivar
+        when :begin, :gvar, :ivar, :nil
           push expr(child)
         else
           raise "Unsupported xstr part: #{child.type}"
@@ -50,6 +50,8 @@ module Opal
 
         first_child  = children.shift
         single_child = children.empty?
+
+        first_child ||= s(:nil)
 
         if first_child.type == :str
           first_value = first_child.loc.expression.source.strip
@@ -125,10 +127,10 @@ module Opal
       #   }
       def strip_empty_children(children)
         children = children.dup
-        empty_line = ->(child) { child.type == :str && child.loc.expression.source.rstrip.empty? }
+        empty_line = ->(child) { child.nil? || (child.type == :str && child.loc.expression.source.rstrip.empty?) }
 
-        children.shift while empty_line[children.first]
-        children.pop while empty_line[children.last]
+        children.shift while children.any? && empty_line[children.first]
+        children.pop while children.any? && empty_line[children.last]
 
         children
       end

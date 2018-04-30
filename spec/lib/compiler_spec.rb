@@ -440,6 +440,27 @@ RSpec.describe Opal::Compiler do
       end
     end
 
+    specify 'when empty' do
+      expect_compiled(%q{
+        %x{
+        }
+      }).to include("return nil\n")
+
+      expect_compiled(%q{
+        %x{}
+      }).to include("return nil\n")
+
+      expect_compiled(%q{
+        `
+
+        `
+      }).to include("return nil\n")
+
+      expect_compiled(%q{
+        ``
+      }).to include("return nil\n")
+    end
+
     def expect_number_of_warnings(code)
       warnings_number = 0
       compiler = Opal::Compiler.new(code)
