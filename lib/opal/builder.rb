@@ -80,7 +80,6 @@ module Opal
 
     def build(path, options = {})
       source = read(path)
-      path = path_reader.expand(path)
       build_str(source, path, options)
     end
 

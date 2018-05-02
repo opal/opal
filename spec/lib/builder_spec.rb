@@ -118,4 +118,10 @@ RSpec.describe Opal::Builder do
       end
     end
   end
+
+  describe ':requirable' do
+    it 'it uses relative paths as module names' do
+      expect(builder.build('stringio', requirable: true).to_s).to include(%{Opal.modules["stringio"]})
+    end
+  end
 end
