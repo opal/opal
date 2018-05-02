@@ -15,7 +15,7 @@ class Class
 
       superclass.$inherited(klass);
       Opal.module_initialize(klass, block);
-      Opal.update_ancestors(klass);
+      Opal.refresh_ancestors(klass);
 
       return klass;
     }

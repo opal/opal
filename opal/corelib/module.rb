@@ -408,30 +408,9 @@ class Module
 
   def included_modules
     %x{
-      var results;
-
-      var module_chain = function(klass) {
-        var included = [];
-
-        for (var i = 0, ii = klass.$$inc.length; i < ii; i++) {
-          var mod_or_class = klass.$$inc[i];
-          included.push(mod_or_class);
-          included = included.concat(module_chain(mod_or_class));
-        }
-
-        return included;
-      };
-
-      results = module_chain(self);
-
-      // need superclass's modules
-      if (self.$$is_class) {
-        for (var cls = self; cls; cls = cls.$$super) {
-          results = results.concat(module_chain(cls));
-        }
-      }
-
-      return results;
+      return self.$$ancestors.filter(function(mod) {
+        return mod !== self && mod.$$is_module;
+      });
     }
   end
 

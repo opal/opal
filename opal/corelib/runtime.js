@@ -458,7 +458,7 @@
     $defineProperty(klass, '$$parent', superclass);
 
     $defineProperty(klass, '$$ancestors', []);
-    Opal.update_ancestors(klass);
+    Opal.refresh_ancestors(klass);
 
     Opal.const_set(scope, name, klass);
 
@@ -640,7 +640,7 @@
     }
 
     // module.$$ancestors = [module];
-    Opal.update_ancestors(module);
+    Opal.refresh_ancestors(module);
 
     return module;
   };
@@ -766,7 +766,7 @@
     $defineProperty(klass, '$$singleton_of', object);
 
     $defineProperty(klass, '$$ancestors', []);
-    Opal.update_ancestors(klass);
+    Opal.refresh_ancestors(klass);
     superclass.$$children.push(klass);
 
     $defineProperty(object, '$$meta', klass);
@@ -927,9 +927,6 @@
   // @param [JS::Object] seen A JS object holding the cache of already visited objects
   // @return [Boolean] true if a cyclic dependency is present
   Opal.has_cyclic_dep = function has_cyclic_dep(base_id, deps, prop, seen) {
-    // FIXME
-    return false;
-
     var i, dep_id, dep;
 
     for (i = deps.length - 1; i >= 0; i--) {
@@ -953,8 +950,8 @@
     return false;
   }
 
-  Opal.update_ancestors = function(module) {
-    var parent;
+  Opal.refresh_ancestors = function(module) {
+    var parent, modules, module;
 
     if (module.$$is_singleton && module.$$singleton_of.$$is_module) {
       parent = module.$$singleton_of.$$super;
@@ -963,14 +960,37 @@
       parent = module.$$is_class ? module.$$super : null;
     }
 
-    module.$$ancestors = module.$$prepended_modules
-      .concat([module])
-      .concat(module.$$included_modules)
-      .concat(parent ? parent.$$ancestors : []);
+    var ancestors = parent ? parent.$$ancestors.slice() : [];
+
+    var modules = module.$$included_modules;
+    for (var i = modules.length - 1; i >= 0; i--) {
+      var included_module = modules[i];
+      if (ancestors.indexOf(included_module) === -1) {
+        ancestors.unshift(included_module);
+      }
+    }
+
+    ancestors.unshift(module);
+
+    var modules = module.$$prepended_modules;
+    for (var i = modules.length - 1; i >= 0; i--) {
+      var prepended_module = modules[i];
+      if (ancestors.indexOf(prepended_module) === -1) {
+        ancestors.unshift(prepended_module);
+      }
+    }
+
+    module.$$ancestors = ancestors;
 
     var children = module.$$children, length = children.length, i;
     for (i = 0; i < length; i++) {
-      Opal.update_ancestors(children[0]);
+      Opal.refresh_ancestors(children[0]);
+    }
+  }
+
+  function inherit_included_modules(module, includer) {
+    for (i = 0; i < module.$$included_modules.length; i++) {
+      includer.$$included_modules.push(module.$$included_modules[i]);
     }
   }
 
@@ -995,24 +1015,31 @@
   Opal.append_features = function(module, includer) {
     var iclass, donator, prototype, methods, id, i;
 
+    if (module === includer) {
+      throw Opal.ArgumentError.$new('cyclic include detected');
+    }
+
     // check if this module is already included in the class
-    for (i = includer.$$ancestors.length; i >= 0; i--) {
-      if (includer.$$included_modules[i] === module) {
-        return;
-      }
+    if (includer.$$ancestors.indexOf(module) !== -1) {
+      // The module may have new included modules
+      inherit_included_modules(module, includer);
+      Opal.refresh_ancestors(includer);
+      // But we don't need to register it again
+      return;
     }
 
     // Check that the base module is not also a dependency, classes can't be
     // dependencies so we have a special case for them.
-    if (!includer.$$is_class && Opal.has_cyclic_dep(includer.$$id, [module], '$$inc', {})) {
+    if (includer.$$is_module && Opal.has_cyclic_dep(includer.$$id, [module], '$$ancestors', {})) {
       throw Opal.ArgumentError.$new('cyclic include detected')
     }
 
     Opal.const_cache_version++;
 
-    includer.$$included_modules = includer.$$included_modules.concat([module]).concat(module.$$included_modules);
+    includer.$$included_modules.push(module);
     module.$$included_in.push(includer);
-    Opal.update_ancestors(includer);
+    inherit_included_modules(module, includer);
+    Opal.refresh_ancestors(includer);
 
     Opal.bridge_methods(includer, module);
 
@@ -1039,7 +1066,7 @@
 
     prepender.$$prepended_modules.push(module);
     module.$$prepended_in.push(prepender);
-    Opal.update_ancestors(prepender);
+    Opal.refresh_ancestors(prepender);
 
     // TODO: Update $$proto of module
   }

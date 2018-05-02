@@ -1,13 +1,25 @@
-module M1; end
-module M2; end
-module M3; include M1; end
+class Parent
+  def test_parent; end
+end
 
-p M3.ancestors
-M1.include(M2)
-p M3.ancestors
-M3.include(M1)
-`debugger;`
-p M3.ancestors
-# ModuleSpecs::MultipleIncludes.include(ModuleSpecs::MB)
-# p ModuleSpecs::MultipleIncludes.ancestors
-# p [ModuleSpecs::MA, ModuleSpecs::MB, ModuleSpecs::MC]
+class Child < Parent
+  def test_child; end
+end
+
+module M1
+  def test_m1; end
+end
+
+module M2
+  def test_m2; end
+end
+
+`window.DEBUG = true`
+
+Parent.include M1
+Child.include M2
+
+p Parent.instance_methods.grep(/\Atest_/)
+p Child.instance_methods.grep(/\Atest_/)
+p M1.instance_methods.grep(/\Atest_/)
+p M2.instance_methods.grep(/\Atest_/)
