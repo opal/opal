@@ -146,7 +146,7 @@
     Object.defineProperty(object, name, {
       value: initialValue,
       enumerable: false,
-      configurable: false,
+      configurable: true,
       writable: true
     });
   }
@@ -473,6 +473,8 @@
         superclass.$inherited(klass);
       }
     }
+
+    klass.$$methods = superclass.$$methods.slice();
 
     return klass;
   };
@@ -1129,27 +1131,37 @@
     return klass;
   };
 
+  function nameOf(mod) {
+    if (mod.$$is_singleton) {
+      return "singleton of " + nameOf(mod.$$singleton_of);
+    } else {
+      return mod.$$name;
+    }
+  }
+
   // Update `jsid` method cache of all classes / modules including `module`.
   Opal.update_includer = function(module, includer, jsid) {
     var dest, current, body,
-        klass_includees, j, jj, current_owner_index, module_index;
+        ancestors, j, jj, current_owner_index, module_index;
 
     body    = module.$$proto[jsid];
     dest    = includer.$$proto;
     current = dest[jsid];
 
+        if (module === Opal.Kernel && includer === Opal.Class && jsid === '$to_s') { debugger }
+
     if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
       // target class has already defined the same method name - do nothing
     }
-    else if (dest.hasOwnProperty(jsid) && !current.$$stub) {
+    else if (current && !current.$$stub) {
       // target class includes another module that has defined this method
-      klass_includees = includer.$$included_modules;
+      ancestors = includer.$$ancestors;
 
-      for (j = 0, jj = klass_includees.length; j < jj; j++) {
-        if (klass_includees[j] === current.$$donated) {
+      for (j = 0, jj = ancestors.length; j < jj; j++) {
+        if (ancestors[j] === current.$$owner) {
           current_owner_index = j;
         }
-        if (klass_includees[j] === module) {
+        if (ancestors[j] === module) {
           module_index = j;
         }
       }
@@ -1157,8 +1169,9 @@
       // only redefine method on class if the module was included AFTER
       // the module which defined the current method body. Also make sure
       // a module can overwrite a method it defined before
-      if (current_owner_index <= module_index) {
-        $defineProperty(dest, jsid, body);
+      if (current_owner_index >= module_index) {
+        dest[jsid] = body;
+        // $defineProperty(dest, jsid, body);
         dest[jsid].$$donated = module;
         includer.$$methods.push(jsid.slice(1));
       }
@@ -1170,25 +1183,29 @@
       includer.$$methods.push(jsid.slice(1));
     }
 
-    // if the includer is a module, recursively update all of its includres.
-    if (includer.$$included_in) {
-      Opal.update_includers(includer, jsid);
+    // if the includer is a module or a class that has children, recursively update all of its includres.
+    if (includer.$$included_in || includer.$$children) {
+      Opal.update_includers(module, includer, jsid);
     }
   };
 
   // Update `jsid` method cache of all classes / modules including `module`.
-  Opal.update_includers = function(module, jsid) {
-    var i, ii, includee, included_in;
+  Opal.update_includers = function(module, includer, jsid) {
+    var i, ii, includee, dependants;
 
-    included_in = module.$$included_in;
+    if (includer.$$is_module) {
+      dependants = includer.$$included_in;
+    } else {
+      dependants = includer.$$children;
+    }
 
-    if (!included_in) {
+    if (!dependants) {
       return;
     }
 
-    for (i = 0, ii = included_in.length; i < ii; i++) {
-      includee = included_in[i];
-      Opal.update_includer(module, includee, jsid);
+    for (i = 0, ii = dependants.length; i < ii; i++) {
+      dependant = dependants[i];
+      Opal.update_includer(module, dependant, jsid);
     }
   };
 
@@ -1799,7 +1816,7 @@
 
     // is it a module?
     if (obj.$$is_module) {
-      Opal.update_includers(obj, jsid);
+      Opal.update_includers(obj, obj, jsid);
 
       if (obj.$$module_function) {
         Opal.defs(obj, jsid, body);
@@ -1831,6 +1848,14 @@
     Opal.defn(Opal.get_singleton_class(obj), jsid, body)
   };
 
+  var delete_from_methods_list = function(obj, method_name) {
+    obj.$$methods.splice(obj.$$methods.indexOf(method_name), 1);
+    var dependants = obj.$$included_in || obj.$$children;
+    for (var i = 0, length = dependants.length; i < length; i++) {
+      delete_from_methods_list(dependants[i], method_name);
+    }
+  }
+
   // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
     // TODO: remove from BridgedClasses as well
@@ -1840,6 +1865,7 @@
     }
 
     delete obj.$$proto[jsid];
+    delete_from_methods_list(obj, jsid.slice(1));
 
     if (obj.$$is_singleton) {
       if (obj.$$proto.$singleton_method_removed && !obj.$$proto.$singleton_method_removed.$$stub) {
@@ -1860,6 +1886,7 @@
     }
 
     Opal.add_stub_for(obj.$$proto, jsid);
+    delete_from_methods_list(obj, jsid.slice(1));
 
     if (obj.$$is_singleton) {
       if (obj.$$proto.$singleton_method_undefined && !obj.$$proto.$singleton_method_undefined.$$stub) {
