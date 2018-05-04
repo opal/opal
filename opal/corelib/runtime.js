@@ -772,6 +772,7 @@
     superclass.$$children.push(klass);
 
     $defineProperty(object, '$$meta', klass);
+    klass.$$methods = superclass.$$methods.slice();
 
     return klass;
   };
@@ -1147,8 +1148,6 @@
     body    = module.$$proto[jsid];
     dest    = includer.$$proto;
     current = dest[jsid];
-
-        if (module === Opal.Kernel && includer === Opal.Class && jsid === '$to_s') { debugger }
 
     if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
       // target class has already defined the same method name - do nothing

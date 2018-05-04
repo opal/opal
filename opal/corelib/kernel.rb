@@ -44,22 +44,14 @@ module Kernel
 
   def methods(all = true)
     %x{
-      var methods = [];
+      var own_methods = self.$$meta ? self.$$meta.$$methods : [];
+      var methods = self.$$class.$$methods;
 
-      for (var key in self) {
-        if (key[0] == "$" && typeof(self[key]) === "function") {
-          if (all == false || all === nil) {
-            if (!Opal.hasOwnProperty.call(self, key)) {
-              continue;
-            }
-          }
-          if (self[key].$$stub === undefined) {
-            methods.push(key.substr(1));
-          }
-        }
+      if (#{Opal.truthy?(all)}) {
+        return methods.concat(own_methods);
+      } else {
+        return own_methods;
       }
-
-      return methods;
     }
   end
 

@@ -1,21 +1,16 @@
-`Opal.get_singleton_class(Opal.Object)`
+class A
+  def each
+    return to_enum unless block_given?
 
-module Kernel
-  def test_m
-    'm1'
+    yield 1
+    yield 2
+    yield 3
   end
 end
 
-p Object.test_m
+enum = A.new.each
+enum.map { |e| e }
 
-# `window.DEBUG = true`
-
-puts "\n" * 5
-
-module Kernel
-  def test_m
-    'm2'
-  end
-end
-
-p Object.test_m
+# a = A.new
+# enum = Enumerator.new(a, :each)
+# enum.each { |a| p a }
