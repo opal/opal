@@ -34,6 +34,9 @@ gem 'opal-jquery'
 
 ```ruby
 # app/application.rb
+
+# Remember to compile opal-jquery with your javascript application.
+# See "Compiling" below for an example on compiling dependencies.
 require 'opal/jquery'
 
 alert "Hello from jquery + opal"
@@ -41,6 +44,9 @@ alert "Hello from jquery + opal"
 
 The `#alert` method is provided by `opal-jquery`. If the message displays, then
 `jquery` support should be working.
+
+
+#### Compiling
 
 When compiling your application to javascript, you must be sure to include both
 Opal and Opal-JQuery so they'll be available to your application:
