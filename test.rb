@@ -1,16 +1,32 @@
-module M
+module Mixin
+  def test_method
+    "hello"
+  end
+  module_function :test_method
 end
 
-class A
+class BaseClass
+  include Mixin
+  def call_test_method
+    test_method
+  end
 end
 
-class B < A
+p Mixin.test_method
+p "hello"
+
+$c = BaseClass.new
+p $c.call_test_method
+p "hello"
+
+module Mixin
+  def test_method
+    "goodbye"
+  end
 end
 
-include M
+p Mixin.test_method
+p "hello"
 
-p A.ancestors
-p [A, Object, M, Kernel, BasicObject]
-
-p B.ancestors
-p [B, A, Object, M, Kernel, BasicObject]
+p $c.call_test_method
+p "goodbye"

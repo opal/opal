@@ -1168,9 +1168,8 @@
       // only redefine method on class if the module was included AFTER
       // the module which defined the current method body. Also make sure
       // a module can overwrite a method it defined before
-      if (current_owner_index >= module_index) {
+      if (current_owner_index == null || current_owner_index >= module_index) {
         dest[jsid] = body;
-        // $defineProperty(dest, jsid, body);
         dest[jsid].$$donated = module;
         includer.$$methods.push(jsid.slice(1));
       }
