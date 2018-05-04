@@ -987,7 +987,7 @@
 
     var children = module.$$children, length = children.length, i;
     for (i = 0; i < length; i++) {
-      Opal.refresh_ancestors(children[0]);
+      Opal.refresh_ancestors(children[i]);
     }
   }
 
@@ -1211,32 +1211,6 @@
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module_or_class) {
     return module_or_class.$$ancestors;
-
-    var parent = module_or_class,
-        result = [],
-        modules, i, ii, j, jj;
-
-    while (parent) {
-      result.push(parent);
-      for (i = parent.$$included_modules.length-1; i >= 0; i--) {
-        modules = Opal.ancestors(parent.$$included_modules[i]);
-
-        for(j = 0, jj = modules.length; j < jj; j++) {
-          result.push(modules[j]);
-        }
-      }
-
-      // only the actual singleton class gets included in its ancestry
-      // after that, traverse the normal class hierarchy
-      if (parent.$$is_singleton && parent.$$singleton_of.$$is_module) {
-        parent = parent.$$singleton_of.$$super;
-      }
-      else {
-        parent = parent.$$is_class ? parent.$$super : null;
-      }
-    }
-
-    return result;
   };
 
 
