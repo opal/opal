@@ -1039,7 +1039,7 @@
 
     Opal.const_cache_version++;
 
-    includer.$$included_modules.push(module);
+    includer.$$included_modules.unshift(module);
     module.$$included_in.push(includer);
     inherit_included_modules(module, includer);
     Opal.refresh_ancestors(includer);
