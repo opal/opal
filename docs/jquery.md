@@ -30,26 +30,59 @@ gem 'opal-jquery'
 
 #### Usage
 
-`opal-jquery` can now be easily added to your opal application sources using a
-standard require:
+`opal-jquery` can now be easily added to your opal application sources:
 
 ```ruby
 # app/application.rb
-require 'opal'
-require 'jquery'
-require 'opal-jquery'
+
+# Remember to compile opal-jquery with your javascript application.
+# See "Compiling" below for an example on compiling dependencies.
+require 'opal/jquery'
 
 alert "Hello from jquery + opal"
 ```
 
-NOTE: this file requires two important dependencies, `jquery` and `opal-jquery`.
-You need to bring your own `jquery.js` file as the gem does not include one. If
-you are using the asset pipeline with rails, then this should be available
-already, otherwise download a copy and place it into `app/` or whichever directory
-you are compiling assets from. You can alternatively require a zepto instance.
-
 The `#alert` method is provided by `opal-jquery`. If the message displays, then
 `jquery` support should be working.
+
+
+#### Compiling
+
+When compiling your application to javascript, you must be sure to include both
+Opal and Opal-JQuery so they'll be available to your application:
+
+```ruby
+require 'opal'
+require 'opal-jquery'
+
+builder = Opal::Builder.new
+builder.build('opal')
+builder.build('opal-jquery')
+builder.build('./app/application.rb')
+
+File.write('application.js', builder.to_s)
+```
+
+then simply load the compiled file in your html:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='https://code.jquery.com/jquery-3.3.1.min.js' integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=' crossorigin='anonymous'></script> 
+    <script type='text/javascript' src='./application.js'></script>
+  </head>
+  <body></body>
+</html>
+```
+
+NOTE: opal-jquery expects a jquery library to be loaded. This example loads it
+remotely from jquery.com, but a locally downloaded copy works just as well, or- 
+if you're using rails- jquery may be included automatically.
+
+This example builds opal, opal-jquery and the application into a single `.js` file, 
+but you may build them separately, if you so choose. Just remember to include 
+each respective script in your html!
 
 ### How does opal-jquery work
 

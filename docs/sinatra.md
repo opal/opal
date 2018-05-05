@@ -1,14 +1,14 @@
 # Using Opal with Sinatra
 
-Add Opal to your Gemfile (or install using `gem`):
+Add Opal-Sprockets to your Gemfile (or install using `gem`):
 
 ```ruby
 # Gemfile
 gem 'sinatra'
-gem 'opal', '~> 0.6.2'
+gem 'opal-sprockets'
 ```
 
-Opal uses `sprockets` as its default build system, so the asset-pipeline
+Opal-Sprockets uses `sprockets` as its default build system, so the asset-pipeline
 from rails can be mimicked here to map all ruby assets in the `/assets`
 path to be compiled using opal.
 
@@ -16,16 +16,21 @@ path to be compiled using opal.
 
 ```ruby
 # config.ru
-require 'opal'
+require 'opal-sprockets'
 require 'sinatra'
 
-opal = Opal::Server.new {|s|
+opal = Opal::Sprockets::Server.new {|s|
   s.append_path 'app'
   s.main = 'application'
 }
 
-map opal.source_maps.prefix do
-  run opal.source_maps
+maps_prefix = Opal::Sprockets::Server::SOURCE_MAPS_PREFIX_PATH
+maps_app = Opal::SourceMapServer.new(opal.sprockets, maps_prefix)
+
+map maps_prefix do
+  use Rack::ConditionalGet
+  use Rack::ETag
+  run maps_app
 end
 
 map '/assets' do
@@ -37,7 +42,9 @@ get '/' do
     <!doctype html>
     <html>
       <head>
-        <script src="/assets/application.js"></script>
+        <script src="/assets/opal.js"></script>
+        <script src="/assets/application.self.js"></script>
+        <script type="text/javascript">Opal.load("application")</script>
       </head>
     </html>
   HTML

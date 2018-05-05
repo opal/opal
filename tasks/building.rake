@@ -35,9 +35,9 @@ task :dist do
       log << "* building #{lib}...".ljust(width+'* building ... '.size)
       $stdout.flush
 
-      # Set requirable to true to be consistent with previous builds, generated
-      # with sprockets.
-      src = Opal::Builder.build(lib, requirable: true).to_s
+      # Set requirable to true, unless building opal. This allows opal to be auto-loaded.
+      requirable = (lib != 'opal')
+      src = Opal::Builder.build(lib, requirable: requirable).to_s
       min = Opal::Util.uglify src
       gzp = Opal::Util.gzip min
 

@@ -1,26 +1,30 @@
 # Opal in a Rails application
 
-Add Opal to your Gemfile:
+Add Opal to your Rails app's Gemfile:
 
 ``` ruby
 gem 'opal-rails'
 ```
 
-Or to start off with Opal when you build your new Rails app:
-
-```bash
-rails new <app-name> --javascript=opal
-```
-
 ## Basic usage through the asset pipeline
 
-```js
-// app/assets/application.js.rb
+To configure your asset pipeline to use opal-rails, make sure to `bundle install`, then rename 
+`app/assets/application.js` to `app/assets/application.js.rb` and set its contents to: 
 
-//= require opal
-//= require opal_ujs
-//= require turbolinks
-//= require_tree .
+```ruby
+# app/assets/application.js.rb
+
+# Require the opal runtime and core library
+require 'opal'
+
+# For Rails 5.1 and above, otherwise use 'opal_ujs'
+require 'rails_ujs'
+
+# Require of JS libraries will be forwarded to sprockets as is
+require 'turbolinks'
+
+# a Ruby equivalent of the require_tree Sprockets directive is available
+require_tree '.'
 ```
 
 Opal requires are forwarded to the Asset Pipeline at compile time (similarly to what happens for RubyMotion). You can use either the `.rb` or `.opal` extension:
