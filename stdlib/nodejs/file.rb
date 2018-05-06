@@ -88,7 +88,7 @@ class File < IO
   end
 
   def self.join(*paths)
-    `__path__.join.apply(__path__, #{paths})`
+    `__path__.posix.join.apply(__path__, #{paths})`
   end
 
   def self.directory?(path)
