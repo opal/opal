@@ -124,4 +124,10 @@ RSpec.describe Opal::Builder do
       expect(builder.build('stringio', requirable: true).to_s).to include(%{Opal.modules["stringio"]})
     end
   end
+
+  describe ':requirable' do
+    it 'it uses front slash as module name' do
+      expect(builder.build('nodejs/open-uri', requirable: true).to_s).to include(%{Opal.modules["nodejs/open-uri"]})
+    end
+  end
 end
