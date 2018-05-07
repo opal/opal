@@ -137,4 +137,8 @@ class TestNodejsFile < Test::Unit::TestCase
     assert_equal('c:/foo/bar.js', File.expand_path( '\\..\\bar.js', 'c:\\foo\\baz'))
     assert_equal('c:/foo/bar.js', File.expand_path( '\\..\\bar.js', 'c:\\foo\\baz\\'))
   end if windows_platform?
+
+  def test_join
+    assert_equal('usr/bin', File.join('usr', 'bin'))
+  end
 end
