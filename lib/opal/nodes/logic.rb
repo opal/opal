@@ -81,7 +81,7 @@ module Opal
 
       def compile_while
         while_loop[:use_redo] = true
-        push "#{while_loop[:redo_var]} = true"
+        push "#{while_loop[:redo_var]} = true; continue;"
       end
 
       def compile_iter
