@@ -267,8 +267,8 @@ Use PATTERN environment variable to manually set the glob for specs:
 
   # Will run all specs matching the specified pattern.
   # (Note: the ruby_specs filters will still apply)
-  bundle exec rake mspec_node PATTERN=spec/ruby/core/module/class_variable*_spec.rb
-  bundle exec rake mspec_node PATTERN=spec/ruby/core/numeric/**_spec.rb
+  bundle exec rake mspec_nodejs PATTERN=spec/ruby/core/module/class_variable*_spec.rb
+  bundle exec rake mspec_nodejs PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
 
 platforms = %w[nodejs server chrome]
