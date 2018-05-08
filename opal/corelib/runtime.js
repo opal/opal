@@ -1024,7 +1024,7 @@
   }
 
   Opal.refresh_ancestors = function(module) {
-    var parent, modules, module;
+    var parent, modules, i;
 
     if (module.$$is_singleton && module.$$singleton_of.$$is_module) {
       parent = module.$$singleton_of.$$super;
@@ -1035,8 +1035,8 @@
 
     var ancestors = parent ? parent.$$ancestors.slice() : [];
 
-    var modules = module.$$included_modules;
-    for (var i = modules.length - 1; i >= 0; i--) {
+    modules = module.$$included_modules;
+    for (i = modules.length - 1; i >= 0; i--) {
       var included_module = modules[i];
       if (ancestors.indexOf(included_module) === -1) {
         ancestors.unshift(included_module);
@@ -1045,8 +1045,8 @@
 
     ancestors.unshift(module);
 
-    var modules = module.$$prepended_modules;
-    for (var i = modules.length - 1; i >= 0; i--) {
+    modules = module.$$prepended_modules;
+    for (i = modules.length - 1; i >= 0; i--) {
       var prepended_module = modules[i];
       if (ancestors.indexOf(prepended_module) === -1) {
         ancestors.unshift(prepended_module);
@@ -1055,14 +1055,14 @@
 
     module.$$ancestors = ancestors;
 
-    var children = module.$$children, length = children.length, i;
+    var children = module.$$children, length = children.length;
     for (i = 0; i < length; i++) {
       Opal.refresh_ancestors(children[i]);
     }
   }
 
   function inherit_included_modules(module, includer) {
-    for (i = 0; i < module.$$included_modules.length; i++) {
+    for (var i = 0; i < module.$$included_modules.length; i++) {
       includer.$$included_modules.push(module.$$included_modules[i]);
     }
   }
@@ -1264,7 +1264,7 @@
     }
 
     for (i = 0, ii = dependants.length; i < ii; i++) {
-      dependant = dependants[i];
+      var dependant = dependants[i];
       Opal.update_includer(module, dependant, jsid);
     }
   };
