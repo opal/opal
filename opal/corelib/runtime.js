@@ -1198,14 +1198,6 @@
     return klass;
   };
 
-  function nameOf(mod) {
-    if (mod.$$is_singleton) {
-      return "singleton of " + nameOf(mod.$$singleton_of);
-    } else {
-      return mod.$$name;
-    }
-  }
-
   // Update `jsid` method cache of all classes / modules including `module`.
   Opal.update_includer = function(module, includer, jsid) {
     var dest, current, body,

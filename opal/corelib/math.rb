@@ -154,7 +154,7 @@ module Math
 
   unless defined?(`Math.erf`)
     %x{
-      Math.erf = function(x) {
+      Opal.defineProperty(Math, 'erf', function(x) {
         var A1 =  0.254829592,
             A2 = -0.284496736,
             A3 =  1.421413741,
@@ -174,7 +174,7 @@ module Math
         var y = 1.0 - (((((A5 * t + A4) * t) + A3) * t + A2) * t + A1) * t * Math.exp(-x * x);
 
         return sign * y;
-      }
+      });
     }
   end
 
@@ -184,7 +184,7 @@ module Math
 
   unless defined?(`Math.erfc`)
     %x{
-      Math.erfc = function(x) {
+      Opal.defineProperty(Math, 'erfc', function(x) {
         var z = Math.abs(x),
             t = 1.0 / (0.5 * z + 1.0);
 
@@ -207,7 +207,7 @@ module Math
         else {
           return a;
         }
-      }
+      });
     }
   end
 
