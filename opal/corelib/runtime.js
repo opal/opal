@@ -143,6 +143,18 @@
   }
 
   function $defineProperty(object, name, initialValue) {
+    if (typeof(object) === "string") {
+      // Special case for:
+      //   s = "string"
+      //   def s.m; end
+      // String class is the only class that:
+      // + compiles to JS primitive
+      // + allows method definition directly on instances
+      // numbers, true, false and nil do not support it.
+      object[name] = initialValue;
+      return;
+    }
+
     Object.defineProperty(object, name, {
       value: initialValue,
       enumerable: false,
