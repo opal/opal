@@ -408,9 +408,17 @@ class Module
 
   def included_modules
     %x{
-      return self.$$ancestors.filter(function(mod) {
-        return mod !== self && mod.$$is_module;
-      });
+      var results = [];
+
+      for (var i = 0, ancestors = self.$$ancestors, length = ancestors.length; i < length; i++) {
+        var ancestor = ancestors[i];
+
+        if (ancestor !== self && ancestor.$$is_module) {
+          results.push(ancestor);
+        }
+      }
+
+      return results;
     }
   end
 
