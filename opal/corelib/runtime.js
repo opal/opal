@@ -524,7 +524,7 @@
     // a list of class or module ancestors (like Object.ancestors)
     $defineProperty(module, '$$ancestors', []);
 
-    // a list of subclasses, TODO: move to klass
+    // a list of subclasses
     $defineProperty(module, '$$children', []);
 
     $defineProperty(module, '$$included_modules', []);
@@ -1133,16 +1133,6 @@
       Opal.update_includer(module, includer, '$' + methods[i])
     }
   };
-
-  Opal.prepend_features = function(module, prepender) {
-    Opal.const_cache_version++;
-
-    prepender.$$prepended_modules.push(module);
-    module.$$prepended_in.push(prepender);
-    Opal.refresh_ancestors(prepender);
-
-    // TODO: Update $$proto of module
-  }
 
   // Table that holds all methods that have been defined on all objects
   // It is used for defining method stubs for new coming native classes
