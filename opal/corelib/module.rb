@@ -447,21 +447,11 @@ class Module
 
   def instance_methods(include_super = true)
     %x{
-      if (include_super) {
-        return self.$$methods;
+      if (#{Opal.truthy?(include_super)}) {
+        return Opal.instance_methods(self);
+      } else {
+        return Opal.own_instance_methods(self);
       }
-
-      var result = [];
-
-      for (var i = 0, methods = self.$$methods, length = methods.length; i < length; i++) {
-        var method = methods[i];
-
-        if (self.$$proto['$' + method].$$owner === self) {
-          result.push(method);
-        }
-      }
-
-      return result;
     }
   end
 

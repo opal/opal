@@ -44,13 +44,10 @@ module Kernel
 
   def methods(all = true)
     %x{
-      var own_methods = self.$$meta ? self.$$meta.$$methods : [];
-      var methods = self.$$class.$$methods;
-
       if (#{Opal.truthy?(all)}) {
-        return methods.concat(own_methods);
+        return Opal.methods(self);
       } else {
-        return own_methods;
+        return Opal.own_methods(self);
       }
     }
   end

@@ -803,6 +803,44 @@
     return klass;
   };
 
+  var uniq = function(array) {
+    function taken(value, index, self) {
+      return self.indexOf(value) === index;
+    }
+
+    return array.filter(taken);
+  }
+
+  var flatten = function(arrays) {
+    return [].concat.apply([], arrays);
+  }
+
+  Opal.methodsOf = function(proto) {
+    return Object.getOwnPropertyNames(proto)
+      .filter(prop => prop[0] === '$' && prop[1] !== '$')
+      .filter(method => !proto[method].$$stub)
+      .map(jsid => jsid.slice(1));
+  }
+
+  Opal.instance_methods = function(mod) {
+    var methods = mod.$$ancestors.map(ancestor => Opal.methodsOf(ancestor.$$proto));
+    methods = flatten(methods);
+    methods = uniq(methods);
+    return methods;
+  }
+
+  Opal.own_instance_methods = function(mod) {
+    return Opal.methodsOf(mod.$$proto).filter(method => mod.$$proto['$' + method].$$owner === mod)
+  }
+
+  Opal.methods = function(obj) {
+    return Opal.instance_methods(Opal.get_singleton_class(obj));
+  }
+
+  Opal.own_methods = function(obj) {
+    return Opal.own_instance_methods(Opal.get_singleton_class(obj));
+  }
+
   // Returns an object containing all pairs of names/values
   // for all class variables defined in provided +module+
   // and its ancestors.
