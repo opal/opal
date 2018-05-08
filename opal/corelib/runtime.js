@@ -818,19 +818,35 @@
   Opal.methodsOf = function(proto) {
     return Object.getOwnPropertyNames(proto)
       .filter(prop => prop[0] === '$' && prop[1] !== '$')
-      .filter(method => !proto[method].$$stub)
       .map(jsid => jsid.slice(1));
   }
 
   Opal.instance_methods = function(mod) {
-    var methods = mod.$$ancestors.map(ancestor => Opal.methodsOf(ancestor.$$proto));
-    methods = flatten(methods);
-    methods = uniq(methods);
-    return methods;
+    var exclude = [], results = [];
+
+    for (var i = 0, ancestors = mod.$$ancestors, l = ancestors.length; i < l; i++) {
+      var ancestor = ancestors[i];
+
+      for (var j = 0, methods = Opal.methodsOf(ancestor.$$proto), ll = methods.length; j < ll; j++) {
+        var method_name = methods[j], method = ancestor.$$proto['$' + method_name];
+
+        if (method.$$stub && exclude.indexOf(method_name) === -1) {
+          exclude.push(method_name);
+        }
+
+        if (!method.$$stub && results.indexOf(method_name) === -1 && exclude.indexOf(method_name) === -1) {
+          results.push(method_name);
+        }
+      }
+    }
+
+    return results;
   }
 
   Opal.own_instance_methods = function(mod) {
-    return Opal.methodsOf(mod.$$proto).filter(method => mod.$$proto['$' + method].$$owner === mod)
+    return Opal.methodsOf(mod.$$proto)
+      .filter(method_name => !mod.$$proto['$' + method_name].$$stub)
+      .filter(method_name => mod.$$proto['$' + method_name].$$owner === mod)
   }
 
   Opal.methods = function(obj) {
