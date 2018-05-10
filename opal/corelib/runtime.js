@@ -702,6 +702,7 @@
 
     // initialize dependency tracking
     $defineProperty(module, '$$included_in', []);
+    $defineProperty(module, '$$prepended_to', []);
 
     // Set the display name of the singleton prototype holder
     module_constructor.displayName = "#<Class:#<Module:"+module.$$id+">>"
@@ -1149,6 +1150,48 @@
       Opal.update_includer(module, includer, '$' + methods[i])
     }
   };
+
+  function inherit_prepended_modules(module, prepender) {
+    for (var i = 0; i < module.$$prepended_modules.length; i++) {
+      prepender.$$prepended_modules.push(module.$$prepended_modules[i]);
+    }
+  }
+
+  Opal.prepend_features = function(module, prepender) {
+    var iclass, donator, prototype, methods, id, i;
+
+    if (module === prepender) {
+      throw Opal.ArgumentError.$new('cyclic prepend detected');
+    }
+
+    // check if this module is already included in the class
+    if (prepender.$$ancestors.indexOf(module) !== -1) {
+      // The module may have new included modules
+      inherit_prepended_modules(module, prepender);
+      Opal.refresh_ancestors(prepender);
+      // But we don't need to register it again
+      return;
+    }
+
+    if (prepender.$$is_module && Opal.has_cyclic_dep(includer.$$id, [module], '$$ancestors', {})) {
+      throw Opal.ArgumentError.$new('cyclic include detected')
+    }
+
+    Opal.const_cache_version++;
+
+    prepender.$$prepended_modules.unshift(module);
+    module.$$prepended_to.push(prepender);
+    inherit_prepended_modules(module, prepender);
+    Opal.refresh_ancestors(prepender);
+
+    Opal.bridge_methods(prepender, module);
+
+    methods = module.$$methods;
+
+    for (i = methods.length - 1; i >= 0; i--) {
+      Opal.update_includer(module, prepender, '$' + methods[i])
+    }
+  }
 
   // Table that holds all methods that have been defined on all objects
   // It is used for defining method stubs for new coming native classes
