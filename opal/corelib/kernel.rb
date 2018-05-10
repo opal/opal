@@ -114,7 +114,7 @@ module Kernel
 
         for (i = 0, length = names.length; i < length; i++) {
           name = names[i];
-          if (name.charAt(0) === '$') {
+          if (name.charAt(0) === '$' && name !== '$$id') {
             self_singleton_class_proto[name] = other_singleton_class_proto[name];
           }
         }
