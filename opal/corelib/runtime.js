@@ -461,6 +461,7 @@
     // Create the class object (instance of Class)
     klass = Opal.setup_class_object(name, alloc, superclass.$$name, superclass.constructor);
 
+    // @property $$super the superclass, doesn't get changed by module inclusions
     klass.$$super = superclass;
 
     // @property $$parent direct parent class
@@ -468,7 +469,9 @@
     //                    the last included klass
     $defineProperty(klass, '$$parent', superclass);
 
+    // @property $$ancestors a list of ancestors (used by Module#ancestors)
     $defineProperty(klass, '$$ancestors', []);
+
     Opal.refresh_ancestors(klass);
 
     Opal.const_set(scope, name, klass);
@@ -530,7 +533,10 @@
     // a list of subclasses
     $defineProperty(module, '$$children', []);
 
+    // @property $$included_modules included modules
     $defineProperty(module, '$$included_modules', []);
+
+    // @property $$prepended_modules prepended modules
     $defineProperty(module, '$$prepended_modules', []);
 
     // Initialize the constants table
@@ -539,6 +545,7 @@
     // @property $$cvars class variables defined in the current module
     $defineProperty(module, '$$cvars', Object.create(null));
 
+    // @property $$base_module a module where the module or class is defined
     $defineProperty(module, '$$base_module', null);
 
     $defineProperty(module, '$$', null);
@@ -587,6 +594,8 @@
 
     // @property $$proto This is the prototype on which methods will be defined
     $defineProperty(klass, '$$proto', alloc.prototype);
+    // @property $$methods a list of all methods defined on a class
+    //                     (including inherited methods)
     $defineProperty(klass, '$$methods', []);
 
     // @property $$proto.$$class Make available to instances a reference to the
@@ -699,6 +708,9 @@
 
     // @property $$proto This is the prototype on which methods will be defined
     $defineProperty(module, '$$proto', module_prototype);
+
+    // @property $$methods a list of all methods defined on a class
+    //                     (including inherited methods)
     $defineProperty(module, '$$methods', []);
 
     // @property constructor
@@ -949,7 +961,6 @@
       }
 
       if (ancestor === from) {
-        var method_name = name.slice(1);
         $defineProperty(target_constructor.prototype, name, body);
         break;
       }
