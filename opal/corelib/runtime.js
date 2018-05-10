@@ -317,7 +317,7 @@
   Opal.const_set = function(cref, name, value) {
     if (cref == null || cref === '::') cref = _Object;
 
-    if (value.$$is_class || value.$$is_module) {
+    if (value.$$is_a_module) {
       if (value.$$name == null || value.$$name === nil) value.$$name = name;
       if (value.$$base_module == null) value.$$base_module = cref;
     }
@@ -516,6 +516,10 @@
     // @property $$id Each class/module is assigned a unique `id` that helps
     //                comparation and implementation of `#object_id`
     $defineProperty(module, '$$id', Opal.uid());
+
+    // @property $$is_a_module Will be true for Module and its subclasses
+    //                         instances (namely: Class).
+    $defineProperty(module, '$$is_a_module', true);
 
     // initialize the name with nil
     $defineProperty(module, '$$name', nil);
@@ -739,7 +743,7 @@
       return object.$$meta;
     }
 
-    if (object.$$is_class || object.$$is_module) {
+    if (object.$$is_a_module) {
       return Opal.build_class_singleton_class(object);
     }
 
@@ -1374,7 +1378,7 @@
   // @raise [ArgumentError]
   Opal.ac = function(actual, expected, object, meth) {
     var inspect = '';
-    if (object.$$is_class || object.$$is_module) {
+    if (object.$$is_a_module) {
       inspect += object.$$name + '.';
     }
     else {
@@ -1402,7 +1406,7 @@
     var dispatcher, super_method;
 
     if (defs) {
-      if (obj.$$is_class || obj.$$is_module) {
+      if (obj.$$is_a_module) {
         dispatcher = defs.$$super;
       }
       else {
@@ -1815,7 +1819,7 @@
       Opal.defn(Opal.Object, jsid, body)
     }
     // if instance_eval is invoked on a module/class, it sets inst_eval_mod
-    else if (!obj.$$eval && (obj.$$is_class || obj.$$is_module)) {
+    else if (!obj.$$eval && obj.$$is_a_module) {
       Opal.defn(obj, jsid, body);
     }
     else {
