@@ -13,7 +13,13 @@ class BasicObject
   alias equal? ==
 
   def __id__
-    `self.$$id || (self.$$id = Opal.uid())`
+    %x{
+      if (self.$$id != null) {
+        return self.$$id;
+      }
+      Opal.defineProperty(self, '$$id', Opal.uid());
+      return self.$$id;
+    }
   end
 
   def __send__(symbol, *args, &block)
@@ -72,7 +78,7 @@ class BasicObject
       // Need to pass $$eval so that method definitions know if this is
       // being done on a class/module. Cannot be compiler driven since
       // send(:instance_eval) needs to work.
-      if (self.$$is_class || self.$$is_module) {
+      if (self.$$is_a_module) {
         self.$$eval = true;
         try {
           result = block.call(self, self);
@@ -100,7 +106,7 @@ class BasicObject
 
       block.$$s = null;
 
-      if (self.$$is_class || self.$$is_module) {
+      if (self.$$is_a_module) {
         self.$$eval = true;
         try {
           result = block.apply(self, args);
@@ -126,6 +132,10 @@ class BasicObject
   end
 
   def singleton_method_undefined(*)
+  end
+
+  def class
+    `self.$$class`
   end
 
   def method_missing(symbol, *args, &block)

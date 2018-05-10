@@ -44,22 +44,11 @@ module Kernel
 
   def methods(all = true)
     %x{
-      var methods = [];
-
-      for (var key in self) {
-        if (key[0] == "$" && typeof(self[key]) === "function") {
-          if (all == false || all === nil) {
-            if (!Opal.hasOwnProperty.call(self, key)) {
-              continue;
-            }
-          }
-          if (self[key].$$stub === undefined) {
-            methods.push(key.substr(1));
-          }
-        }
+      if (#{Opal.truthy?(all)}) {
+        return Opal.methods(self);
+      } else {
+        return Opal.own_methods(self);
       }
-
-      return methods;
     }
   end
 
@@ -116,20 +105,23 @@ module Kernel
 
   def copy_singleton_methods(other)
     %x{
-      var name;
+      var i, name, names, length;
 
       if (other.hasOwnProperty('$$meta')) {
         var other_singleton_class_proto = Opal.get_singleton_class(other).$$proto;
         var self_singleton_class_proto = Opal.get_singleton_class(self).$$proto;
+        names = Object.getOwnPropertyNames(other_singleton_class_proto);
 
-        for (name in other_singleton_class_proto) {
-          if (name.charAt(0) === '$' && other_singleton_class_proto.hasOwnProperty(name)) {
+        for (i = 0, length = names.length; i < length; i++) {
+          name = names[i];
+          if (name.charAt(0) === '$') {
             self_singleton_class_proto[name] = other_singleton_class_proto[name];
           }
         }
       }
 
-      for (name in other) {
+      for (i = 0, names = Object.getOwnPropertyNames(other), length = names.length; i < length; i++) {
+        name = names[i];
         if (name.charAt(0) === '$' && name.charAt(1) !== '$' && other.hasOwnProperty(name)) {
           self[name] = other[name];
         }

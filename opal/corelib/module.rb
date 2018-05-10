@@ -132,17 +132,12 @@ class Module
         })(ivar);
 
         // initialize the instance variable as nil
-        proto[ivar] = nil;
+        Opal.defineProperty(proto, ivar, nil);
 
         body.$$parameters = [];
         body.$$arity = 0;
 
-        if (self.$$is_singleton) {
-          proto.constructor.prototype[id] = body;
-        }
-        else {
-          Opal.defn(self, id, body);
-        }
+        Opal.defn(self, id, body);
       }
     }
 
@@ -170,14 +165,9 @@ class Module
         body.$$arity = 1;
 
         // initialize the instance variable as nil
-        proto[ivar] = nil;
+        Opal.defineProperty(proto, ivar, nil);
 
-        if (self.$$is_singleton) {
-          proto.constructor.prototype[id] = body;
-        }
-        else {
-          Opal.defn(self, id, body);
-        }
+        Opal.defn(self, id, body);
       }
     }
 
@@ -418,26 +408,13 @@ class Module
 
   def included_modules
     %x{
-      var results;
+      var results = [];
 
-      var module_chain = function(klass) {
-        var included = [];
+      for (var i = 0, ancestors = self.$$ancestors, length = ancestors.length; i < length; i++) {
+        var ancestor = ancestors[i];
 
-        for (var i = 0, ii = klass.$$inc.length; i < ii; i++) {
-          var mod_or_class = klass.$$inc[i];
-          included.push(mod_or_class);
-          included = included.concat(module_chain(mod_or_class));
-        }
-
-        return included;
-      };
-
-      results = module_chain(self);
-
-      // need superclass's modules
-      if (self.$$is_class) {
-        for (var cls = self; cls; cls = cls.$$super) {
-          results = results.concat(module_chain(cls));
+        if (ancestor !== self && ancestor.$$is_module) {
+          results.push(ancestor);
         }
       }
 
@@ -478,43 +455,11 @@ class Module
 
   def instance_methods(include_super = true)
     %x{
-      var value,
-          methods = [],
-          proto   = self.$$proto;
-
-      for (var prop in proto) {
-        if (prop.charAt(0) !== '$' || prop.charAt(1) === '$') {
-          continue;
-        }
-
-        value = proto[prop];
-
-        if (typeof(value) !== "function") {
-          continue;
-        }
-
-        if (value.$$stub) {
-          continue;
-        }
-
-        if (!self.$$is_module) {
-          if (self !== Opal.BasicObject && value === Opal.BasicObject.$$proto[prop]) {
-            continue;
-          }
-
-          if (!include_super && !proto.hasOwnProperty(prop)) {
-            continue;
-          }
-
-          if (!include_super && value.$$donated) {
-            continue;
-          }
-        }
-
-        methods.push(prop.substr(1));
+      if (#{Opal.truthy?(include_super)}) {
+        return Opal.instance_methods(self);
+      } else {
+        return Opal.own_instance_methods(self);
       }
-
-      return methods;
     }
   end
 
