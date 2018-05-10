@@ -818,35 +818,31 @@
     return klass;
   };
 
-  var methodsOf = function(proto) {
-    var results = [];
-
-    for (var i = 0, props = Object.getOwnPropertyNames(proto), length = props.length; i < length; i++) {
-      var prop = props[i];
-
-      if (prop[0] === '$' && prop[1] !== '$') {
-        results.push(prop.slice(1));
-      }
-    }
-
-    return results;
+  function is_method(prop) {
+    return (prop[0] === '$' && prop[1] !== '$');
   }
 
   Opal.instance_methods = function(mod) {
     var exclude = [], results = [];
 
     for (var i = 0, ancestors = mod.$$ancestors, l = ancestors.length; i < l; i++) {
-      var ancestor = ancestors[i];
+      var ancestor = ancestors[i],
+          props = Object.getOwnPropertyNames(ancestor.$$proto);
 
-      for (var j = 0, methods = methodsOf(ancestor.$$proto), ll = methods.length; j < ll; j++) {
-        var method_name = methods[j], method = ancestor.$$proto['$' + method_name];
+      for (var j = 0, ll = props.length; j < ll; j++) {
+        var prop = props[j];
 
-        if (method.$$stub && exclude.indexOf(method_name) === -1) {
-          exclude.push(method_name);
-        }
+        if (is_method(prop)) {
+          var method_name = prop.slice(1),
+              method = ancestor.$$proto[prop];
 
-        if (!method.$$stub && results.indexOf(method_name) === -1 && exclude.indexOf(method_name) === -1) {
-          results.push(method_name);
+          if (method.$$stub && exclude.indexOf(method_name) === -1) {
+            exclude.push(method_name);
+          }
+
+          if (!method.$$stub && results.indexOf(method_name) === -1 && exclude.indexOf(method_name) === -1) {
+            results.push(method_name);
+          }
         }
       }
     }
@@ -855,13 +851,19 @@
   }
 
   Opal.own_instance_methods = function(mod) {
-    var results = [];
+    var results = [],
+        props = Object.getOwnPropertyNames(mod.$$proto);
 
-    for (var i = 0, methods = methodsOf(mod.$$proto), length = methods.length; i < length; i++) {
-      var method_name = methods[i], method = mod.$$proto['$' + method_name];
+    for (var i = 0, length = props.length; i < length; i++) {
+      var prop = props[i];
 
-      if (!method.$$stub && method.$$owner === mod) {
-        results.push(method_name);
+      if (is_method(prop)) {
+        var method_name = prop.slice(1),
+            method = mod.$$proto[prop];
+
+        if (!method.$$stub && method.$$owner === mod) {
+          results.push(method_name);
+        }
       }
     }
 
