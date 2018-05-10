@@ -152,15 +152,14 @@
       // + allows method definition directly on instances
       // numbers, true, false and nil do not support it.
       object[name] = initialValue;
-      return;
+    } else {
+      Object.defineProperty(object, name, {
+        value: initialValue,
+        enumerable: false,
+        configurable: true,
+        writable: true
+      });
     }
-
-    Object.defineProperty(object, name, {
-      value: initialValue,
-      enumerable: false,
-      configurable: true,
-      writable: true
-    });
   }
 
   Opal.defineProperty = $defineProperty;
