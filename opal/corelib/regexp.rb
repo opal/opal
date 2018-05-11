@@ -257,6 +257,21 @@ class Regexp < `RegExp`
     `self.source`
   end
 
+  def names
+    %x{
+      var result = [];
+      var splits = self.source.split('(?<');
+      var sl = splits.length;
+      for (var i = 0; i < sl; i ++) {
+        var matchres = splits[i].match(/(\w+)>/);
+        if (matchres && matchres[1]) {
+          result.push(matchres[1];
+        }
+      }
+      return result;
+    }
+  end
+
   def options
     # Flags would be nice to use with this, but still experimental - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/flags
     %x{
