@@ -51,21 +51,6 @@
   // The actual Class class
   var Class;
 
-  // Constructor for instances of BasicObject
-  function BasicObject_alloc(){}
-
-  // Constructor for instances of Object
-  function Object_alloc(){}
-
-  // Constructor for instances of Class
-  function Class_alloc(){}
-
-  // Constructor for instances of Module
-  function Module_alloc(){}
-
-  // Constructor for instances of NilClass (nil)
-  function NilClass_alloc(){}
-
   // The Opal object that is exposed globally
   var Opal = this.Opal = {};
 
@@ -412,24 +397,40 @@
   //
   // @return new [Class]  or existing ruby class
   //
-  Opal.klass = function(scope, superclass, name, constructor) {
-    var klass, bridged, alloc;
+  Opal.allocate_class = function(name, superclass, constructor) {
+    // var klass = new Function(`return function ${name || 'anonymous_class'}() {}`)();
+    var klass = constructor;
+    // TODO: revert to
+    // var klass = function klass() {};
+    // klass.displayName = name;
 
-    if (scope == null) {
-      scope = _Object;
+    klass.$$name = name;
+    klass.$$const = {};
+    klass.$$is_class = true;
+    klass.$$is_a_module = true;
+    klass.$$children = [];
+    klass.$$methods = [];
+    klass.$$super = superclass;
+
+    klass.prototype.$$class = klass;
+
+    // By default if there are no singleton class methods
+    // __proto__ is Class.prototype
+    if (Opal.Class) {
+      klass.__proto__ = Opal.Class.prototype;
     }
 
-    // If scope is an object, use its class
-    if (!scope.$$is_class && !scope.$$is_module) {
-      scope = scope.$$class;
-    }
+    if (superclass != null) {
+      klass.prototype.__proto__ = superclass.prototype
+      superclass.$$children.push(klass);
+      klass.$$methods = superclass.$$methods.slice();
+    };
 
-    // If the superclass is a function then we're bridging a native JS class
-    if (typeof(superclass) === 'function') {
-      bridged = superclass;
-      superclass = _Object;
-    }
+    return klass;
+  }
 
+
+  function find_existing_class(scope, name) {
     // Try to find the class in the current scope
     klass = const_get_name(scope, name);
 
@@ -440,11 +441,55 @@
         throw Opal.TypeError.$new(name + " is not a class");
       }
 
-      // Make sure existing class has same superclass
-      if (superclass && klass.$$super !== superclass) {
-        throw Opal.TypeError.$new("superclass mismatch for class " + name);
+      return klass;
+    }
+  }
+
+  function superclassOf(klass) {
+    var result = klass.prototype;
+
+    while (result) {
+      if (result.$$is_class) {
+        return result;
       }
 
+      result = result.__proto__;
+    }
+
+    throw new Error('Broken prototype chain');
+  }
+
+  function ensureSuperclassMatch(klass, superclass) {
+    if (superclassOf(klass) !== superclass) {
+      throw Opal.TypeError.$new("superclass mismatch for class " + name);
+    }
+  }
+
+  Opal.klass = function(scope, superclass, name, constructor) {
+    var bridged;
+
+    if (scope == null) {
+      scope = _Object;
+    }
+
+    // If scope is an object, use its class
+    if (!scope.$$is_class && !scope.$$is_module) {
+      scope = scope.$$class;
+    }
+
+    // If the superclass is not an Opal-generated class then we're bridging a native JS class
+    if (superclass != null && !superclass.$$is_class) {
+      bridged = superclass;
+      superclass = _Object;
+    }
+
+    var klass = find_existing_class(scope, name);
+
+    if (klass) {
+      if (superclass) {
+        // Make sure existing class has same superclass
+        ensureSuperclassMatch(klass, superclass);
+      }
       return klass;
     }
 
@@ -455,172 +500,23 @@
       superclass = _Object;
     }
 
-    // If bridged the JS class will also be the alloc function
-    alloc = bridged || Opal.boot_class_alloc(name, constructor, superclass);
-
     // Create the class object (instance of Class)
-    klass = Opal.setup_class_object(name, alloc, superclass.$$name, superclass.constructor);
-
-    // @property $$super the superclass, doesn't get changed by module inclusions
-    klass.$$super = superclass;
-
-    // @property $$parent direct parent class
-    //                    starts with the superclass, after klass inclusion is
-    //                    the last included klass
-    $defineProperty(klass, '$$parent', superclass);
-
-    // @property $$ancestors a list of ancestors (used by Module#ancestors)
-    $defineProperty(klass, '$$ancestors', []);
-
-    Opal.refresh_ancestors(klass);
+    klass = Opal.allocate_class(name, superclass, constructor);
 
     Opal.const_set(scope, name, klass);
 
-    superclass.$$children.push(klass);
-
     if (bridged) {
       Opal.bridge(klass, alloc);
-    }
-    else {
+    } else {
       // Call .inherited() hook with new class on the superclass
       if (superclass.$inherited) {
         superclass.$inherited(klass);
       }
     }
 
-    klass.$$methods = superclass.$$methods.slice();
-
     return klass;
-  };
 
-  // Boot a base class (makes instances).
-  //
-  // @param name [String,null] the class name
-  // @param constructor [JS.Function] the class' instances constructor/alloc function
-  // @param superclass  [Class,null] the superclass object
-  // @return [JS.Function] the consturctor holding the prototype for the class' instances
-  Opal.boot_class_alloc = function(name, constructor, superclass) {
-    if (name) {
-      constructor.displayName = name+'_alloc';
-    }
-
-    if (superclass) {
-      var alloc_proxy = function() {};
-      alloc_proxy.prototype = superclass.$$proto || superclass.prototype;
-      constructor.prototype = new alloc_proxy();
-    }
-
-    $defineProperty(constructor.prototype, 'constructor', constructor);
-
-    return constructor;
-  };
-
-  Opal.setup_module_or_class = function(module) {
-    // @property $$id Each class/module is assigned a unique `id` that helps
-    //                comparation and implementation of `#object_id`
-    $defineProperty(module, '$$id', Opal.uid());
-
-    // @property $$is_a_module Will be true for Module and its subclasses
-    //                         instances (namely: Class).
-    $defineProperty(module, '$$is_a_module', true);
-
-    // initialize the name with nil
-    $defineProperty(module, '$$name', nil);
-
-    // a list of class or module ancestors (like Object.ancestors)
-    $defineProperty(module, '$$ancestors', []);
-
-    // a list of subclasses
-    $defineProperty(module, '$$children', []);
-
-    // @property $$included_modules included modules
-    $defineProperty(module, '$$included_modules', []);
-
-    // @property $$prepended_modules prepended modules
-    $defineProperty(module, '$$prepended_modules', []);
-
-    // Initialize the constants table
-    $defineProperty(module, '$$const', Object.create(null));
-
-    // @property $$cvars class variables defined in the current module
-    $defineProperty(module, '$$cvars', Object.create(null));
-
-    // @property $$base_module a module where the module or class is defined
-    $defineProperty(module, '$$base_module', null);
-
-    $defineProperty(module, '$$', null);
   }
-
-
-
-  // Adds common/required properties to class object (as in `Class.new`)
-  //
-  // @param name  [String,null] The name of the class
-  //
-  // @param alloc [JS.Function] The constructor of the class' instances
-  //
-  // @param superclass_name [String,null]
-  //   The name of the super class, this is
-  //   usefule to build the `.displayName` of the singleton class
-  //
-  // @param superclass_alloc [JS.Function]
-  //   The constructor of the superclass from which the singleton_class is
-  //   derived.
-  //
-  // @return [Class]
-  Opal.setup_class_object = function(name, alloc, superclass_name, superclass_alloc) {
-    // Grab the superclass prototype and use it to build an intermediary object
-    // in the prototype chain.
-    var superclass_alloc_proxy = function() {};
-        superclass_alloc_proxy.prototype = superclass_alloc.prototype;
-        superclass_alloc_proxy.displayName = superclass_name;
-
-    var singleton_class_alloc = function() {}
-        singleton_class_alloc.prototype = new superclass_alloc_proxy();
-
-    // The built class is the only instance of its singleton_class
-    var klass = new singleton_class_alloc();
-
-    Opal.setup_module_or_class(klass);
-
-    // @property $$alloc This is the constructor of instances of the current
-    //                   class. Its prototype will be used for method lookup
-    $defineProperty(klass, '$$alloc', alloc);
-
-    klass.$$name = name || nil;
-
-    // Set a displayName for the singleton_class
-    singleton_class_alloc.displayName = "#<Class:"+(name || ("#<Class:"+klass.$$id+">"))+">";
-
-    // @property $$proto This is the prototype on which methods will be defined
-    $defineProperty(klass, '$$proto', alloc.prototype);
-    // @property $$methods a list of all methods defined on a class
-    //                     (including inherited methods)
-    $defineProperty(klass, '$$methods', []);
-
-    // @property $$proto.$$class Make available to instances a reference to the
-    //                           class they belong to.
-    klass.$$proto.$$class = klass;
-
-    // @property constructor keeps a ref to the constructor, but apparently the
-    //                       constructor is already set on:
-    //
-    //                          `var klass = new constructor` is called.
-    //
-    //                       Maybe there are some browsers not abiding (IE6?)
-    klass.constructor = singleton_class_alloc;
-
-    // @property $$is_class Clearly mark this as a class
-    $defineProperty(klass, '$$is_class', true);
-
-    // @property $$class Classes are instances of the class Class
-    $defineProperty(klass, '$$class', Class);
-
-    // @property $$super the superclass, doesn't get changed by module inclusions
-    $defineProperty(klass, '$$super', nil);
-
-    return klass;
-  };
 
   // Define new module (or return existing module). The given `scope` is basically
   // the current `self` value the `module` statement was defined in. If this is
@@ -641,7 +537,35 @@
   // @param  id   [String] the name of the new (or existing) module
   //
   // @return [Module]
-  Opal.module = function(scope, name) {
+  Opal.allocate_module = function(name, constructor) {
+    var module = Opal.allocate_class(name, Opal.Module, constructor);
+    // module.displayName = `Module_${name}`;
+
+    delete module.$$is_class;
+    module.$$is_module = true;
+
+    if (Opal.Module) {
+      module.__proto__ = Opal.Module.prototype;
+    }
+
+    return module;
+  }
+
+  function find_existing_module(scope, name) {
+    var module = const_get_name(scope, name);
+    // FIXME
+    // if (module == null && scope === _Object) module = const_lookup_ancestors(_Object, name);
+
+    if (module) {
+      if (!module.$$is_module && module !== _Object) {
+        throw Opal.TypeError.$new(name + " is not a module");
+      }
+    }
+
+    return module;
+  }
+
+  Opal.module = function(scope, name, constructor) {
     var module;
 
     if (scope == null) {
@@ -652,93 +576,18 @@
       scope = scope.$$class;
     }
 
-    module = const_get_name(scope, name);
-    if (module == null && scope === _Object) module = const_lookup_ancestors(_Object, name);
+    module = find_existing_module(scope, name);
 
     if (module) {
-      if (!module.$$is_module && module !== _Object) {
-        throw Opal.TypeError.$new(name + " is not a module");
-      }
-    }
-    else {
-      module = Opal.module_allocate(Module);
-      Opal.const_set(scope, name, module);
+      return module;
     }
 
-    // module.$$ancestors = [module];
-    Opal.refresh_ancestors(module);
+    // Module doesnt exist, create a new one...
+    module = Opal.allocate_module(name, constructor);
+    Opal.const_set(scope, name, module);
 
     return module;
-  };
-
-  // The implementation for Module#initialize
-  // @param module [Module]
-  // @param block [Proc,nil]
-  // @return nil
-  Opal.module_initialize = function(module, block) {
-    if (block !== nil) {
-      var block_self = block.$$s;
-      block.$$s = null;
-      block.call(module);
-      block.$$s = block_self;
-    }
-    return nil;
-  };
-
-  // Internal function to create a new module instance. This simply sets up
-  // the prototype hierarchy and method tables.
-  //
-  Opal.module_allocate = function(superclass) {
-    var mtor = function() {};
-    mtor.prototype = superclass.$$alloc.prototype;
-
-    var module_constructor = function() {};
-    module_constructor.prototype = new mtor();
-
-    var module = new module_constructor();
-    var module_prototype = {};
-
-    Opal.setup_module_or_class(module);
-
-    // initialize dependency tracking
-    $defineProperty(module, '$$included_in', []);
-    $defineProperty(module, '$$prepended_to', []);
-
-    // Set the display name of the singleton prototype holder
-    module_constructor.displayName = "#<Class:#<Module:"+module.$$id+">>"
-
-    // @property $$proto This is the prototype on which methods will be defined
-    $defineProperty(module, '$$proto', module_prototype);
-
-    // @property $$methods a list of all methods defined on a class
-    //                     (including inherited methods)
-    $defineProperty(module, '$$methods', []);
-
-    // @property constructor
-    //   keeps a ref to the constructor, but apparently the
-    //   constructor is already set on:
-    //
-    //      `var module = new constructor` is called.
-    //
-    //   Maybe there are some browsers not abiding (IE6?)
-    $defineProperty(module, 'constructor', module_constructor);
-
-    // @property $$is_module Clearly mark this as a module
-    $defineProperty(module, '$$is_module', true);
-    $defineProperty(module, '$$class', Module);
-
-    // @property $$super
-    //   the superclass, doesn't get changed by module inclusions
-    $defineProperty(module, '$$super', superclass);
-
-    // @property $$parent
-    //   direct parent class or module
-    //   starts with the superclass, after module inclusion is
-    //   the last included module
-    $defineProperty(module, '$$parent', superclass)
-
-    return module;
-  };
+  }
 
   // Return the singleton class for the passed object.
   //
@@ -756,7 +605,7 @@
       return object.$$meta;
     }
 
-    if (object.$$is_a_module) {
+    if (object.hasOwnProperty('$$is_a_module')) {
       return Opal.build_class_singleton_class(object);
     }
 
@@ -772,37 +621,29 @@
   //
   // @param klass [Class]
   // @return [Class]
-  Opal.build_class_singleton_class = function(object) {
-    var alloc, superclass, klass;
+  Opal.build_class_singleton_class = function(klass) {
+    var superclass, meta;
 
-    if (object.$$meta) {
-      return object.$$meta;
+    if (klass.$$meta) {
+      return klass.$$meta;
     }
 
-    // The constructor and prototype of the singleton_class instances is the
-    // current class constructor and prototype.
-    alloc = object.constructor;
 
     // The singleton_class superclass is the singleton_class of its superclass;
     // but BasicObject has no superclass (its `$$super` is null), thus we
     // fallback on `Class`.
-    superclass = object === BasicObject ? Class : Opal.build_class_singleton_class(object.$$super);
+    superclass = klass === BasicObject ? Class : Opal.build_class_singleton_class(klass.$$super);
 
-    klass = Opal.setup_class_object(null, alloc, superclass.$$name, superclass.constructor);
-    $defineProperty(klass, '$$super', superclass);
-    $defineProperty(klass, '$$parent', superclass);
+    meta = Opal.allocate_class(null, superclass, function(){});
 
-    $defineProperty(klass, '$$is_singleton', true);
-    $defineProperty(klass, '$$singleton_of', object);
+    meta.$$is_singleton = true;
+    meta.$$singleton_of = klass;
+    klass.$$meta = meta;
+    klass.__proto__ = meta.prototype;
 
-    $defineProperty(klass, '$$ancestors', []);
-    Opal.refresh_ancestors(klass);
-    superclass.$$children.push(klass);
+    meta.$$methods = superclass.$$methods.slice();
 
-    $defineProperty(object, '$$meta', klass);
-    klass.$$methods = superclass.$$methods.slice();
-
-    return klass;
+    return meta;
   };
 
   // Build the singleton class for a Ruby (non class) Object.
@@ -819,7 +660,6 @@
     $defineProperty(klass, '$$super', superclass);
     $defineProperty(klass, '$$parent', superclass);
     $defineProperty(klass, '$$class', superclass.$$class);
-    $defineProperty(klass, '$$proto', object);
 
     $defineProperty(klass, '$$is_singleton', true);
     $defineProperty(klass, '$$singleton_of', object);
@@ -840,14 +680,14 @@
 
     for (var i = 0, ancestors = mod.$$ancestors, l = ancestors.length; i < l; i++) {
       var ancestor = ancestors[i],
-          props = Object.getOwnPropertyNames(ancestor.$$proto);
+          props = Object.getOwnPropertyNames(ancestor.prototype);
 
       for (var j = 0, ll = props.length; j < ll; j++) {
         var prop = props[j];
 
         if (is_method(prop)) {
           var method_name = prop.slice(1),
-              method = ancestor.$$proto[prop];
+              method = ancestor.prototype[prop];
 
           if (method.$$stub && exclude.indexOf(method_name) === -1) {
             exclude.push(method_name);
@@ -865,14 +705,14 @@
 
   Opal.own_instance_methods = function(mod) {
     var results = [],
-        props = Object.getOwnPropertyNames(mod.$$proto);
+        props = Object.getOwnPropertyNames(mod.prototype);
 
     for (var i = 0, length = props.length; i < length; i++) {
       var prop = props[i];
 
       if (is_method(prop)) {
         var method_name = prop.slice(1),
-            method = mod.$$proto[prop];
+            method = mod.prototype[prop];
 
         if (!method.$$stub && method.$$owner === mod) {
           results.push(method_name);
@@ -953,10 +793,10 @@
     for (i = 0, length = ancestors.length; i < length; i++) {
       ancestor = ancestors[i];
 
-      if ($hasOwn.call(ancestor.$$proto, name) &&
-          ancestor.$$proto[name] &&
-          !ancestor.$$proto[name].$$donated &&
-          !ancestor.$$proto[name].$$stub &&
+      if ($hasOwn.call(ancestor.prototype, name) &&
+          ancestor.prototype[name] &&
+          !ancestor.prototype[name].$$donated &&
+          !ancestor.prototype[name].$$stub &&
           ancestor !== from) {
         break;
       }
@@ -994,7 +834,7 @@
 
     for (i = methods.length - 1; i >= 0; i--) {
       method = '$' + methods[i];
-      Opal.bridge_method(target_constructor, donator, method, donator.$$proto[method]);
+      Opal.bridge_method(target_constructor, donator, method, donator.prototype[method]);
     }
   }
 
@@ -1040,50 +880,6 @@
     return false;
   }
 
-  Opal.refresh_ancestors = function(module) {
-    var parent, modules, i;
-
-    if (module.$$is_singleton && module.$$singleton_of.$$is_module) {
-      parent = module.$$singleton_of.$$super;
-    }
-    else {
-      parent = module.$$is_class ? module.$$super : null;
-    }
-
-    var ancestors = parent ? parent.$$ancestors.slice() : [];
-
-    modules = module.$$included_modules;
-    for (i = modules.length - 1; i >= 0; i--) {
-      var included_module = modules[i];
-      if (ancestors.indexOf(included_module) === -1) {
-        ancestors.unshift(included_module);
-      }
-    }
-
-    ancestors.unshift(module);
-
-    modules = module.$$prepended_modules;
-    for (i = modules.length - 1; i >= 0; i--) {
-      var prepended_module = modules[i];
-      if (ancestors.indexOf(prepended_module) === -1) {
-        ancestors.unshift(prepended_module);
-      }
-    }
-
-    module.$$ancestors = ancestors;
-
-    var children = module.$$children, length = children.length;
-    for (i = 0; i < length; i++) {
-      Opal.refresh_ancestors(children[i]);
-    }
-  }
-
-  function inherit_included_modules(module, includer) {
-    for (var i = 0; i < module.$$included_modules.length; i++) {
-      includer.$$included_modules.push(module.$$included_modules[i]);
-    }
-  }
-
   // The actual inclusion of a module into a class.
   //
   // ## Class `$$parent` and `iclass`
@@ -1103,53 +899,16 @@
   // @param includer [Module] the target class to include module into
   // @return [null]
   Opal.append_features = function(module, includer) {
-    var iclass, donator, prototype, methods, id, i;
+    var iclass = Object.assign({}, module.prototype);
+    iclass.$$iclass = true;
+    iclass.$$class = 'iclass'; // no class
+    iclass.$$module = module;
 
-    if (module === includer) {
-      throw Opal.ArgumentError.$new('cyclic include detected');
+    includer.prototype.__proto__ = {
+      ...iclass,
+      __proto__: includer.prototype.__proto__
     }
-
-    // check if this module is already included in the class
-    if (includer.$$ancestors.indexOf(module) !== -1) {
-      // The module may have new included modules
-      inherit_included_modules(module, includer);
-      Opal.refresh_ancestors(includer);
-      // But we don't need to register it again
-      return;
-    }
-
-    // Check that the base module is not also a dependency, classes can't be
-    // dependencies so we have a special case for them.
-    if (includer.$$is_module && Opal.has_cyclic_dep(includer.$$id, [module], '$$ancestors', {})) {
-      throw Opal.ArgumentError.$new('cyclic include detected')
-    }
-
-    Opal.const_cache_version++;
-
-    includer.$$included_modules.unshift(module);
-    module.$$included_in.push(includer);
-    inherit_included_modules(module, includer);
-    Opal.refresh_ancestors(includer);
-
-    Opal.bridge_methods(includer, module);
-
-    // iclass
-    iclass = {
-      $$name:   module.$$name,
-      $$proto:  module.$$proto,
-      $$parent: includer.$$parent,
-      $$module: module,
-      $$iclass: true
-    };
-
-    $defineProperty(includer, '$$parent', iclass);
-
-    methods = module.$$methods;
-
-    for (i = methods.length - 1; i >= 0; i--) {
-      Opal.update_includer(module, includer, '$' + methods[i])
-    }
-  };
+  }
 
   function inherit_prepended_modules(module, prepender) {
     for (var i = 0; i < module.$$prepended_modules.length; i++) {
@@ -1256,8 +1015,8 @@
     var dest, current, body,
         ancestors, j, jj, current_owner_index, module_index;
 
-    body    = module.$$proto[jsid];
-    dest    = includer.$$proto;
+    body    = module.prototype[jsid];
+    dest    = includer.prototype;
     current = dest[jsid];
 
     if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
@@ -1318,10 +1077,27 @@
     }
   };
 
+  function protoToModule(proto) {
+    if (proto.hasOwnProperty('$$iclass')) {
+      return proto.$$module;
+    } else if (proto.hasOwnProperty('$$class')) {
+      return proto.$$class;
+    }
+  }
+
   // The Array of ancestors for a given module/class
-  Opal.ancestors = function(module_or_class) {
-    return module_or_class.$$ancestors;
-  };
+  Opal.ancestors = function(module) {
+    var result = [module], mod = null, proto = module.prototype.__proto__;
+
+    for (; proto && proto.__proto__; proto = proto.__proto__) {
+      mod = protoToModule(proto);
+      if (mod) {
+        result.push(mod);
+      }
+    }
+
+    return result;
+  }
 
 
   // Method Missing
@@ -1384,7 +1160,8 @@
   //
   // @default [Prototype List] BasicObject_alloc.prototype
   //
-  Opal.stub_subscribers = [BasicObject_alloc.prototype];
+  // FIXME
+  Opal.stub_subscribers = [];
 
   // Add a method_missing stub function to the given prototype for the
   // given name.
@@ -1468,11 +1245,11 @@
 
     for (var i = 0, length = ancestors.length; i < length; i++) {
       var ancestor = ancestors[i],
-          method = ancestor.$$proto['$' + mid];
+          method = ancestor.prototype['$' + mid];
 
       if (method && !method.$$is_stub) {
         if (i > current_index) {
-          dispatcher = ancestor.$$proto;
+          dispatcher = ancestor.prototype;
           break;
         }
       }
@@ -1832,47 +1609,9 @@
   };
 
   // Define method on a module or class (see Opal.def).
-  Opal.defn = function(obj, jsid, body) {
-    $defineProperty(obj.$$proto, jsid, body);
-
-    var method_name = jsid.slice(1);
-
-    if (obj.$$methods.indexOf(method_name) === -1) {
-      obj.$$methods.push(method_name);
-    }
-
-    // for super dispatcher, etc.
-    body.$$owner = obj;
-    if (body.displayName == null) body.displayName = jsid.substr(1);
-
-    // is it a module?
-    if (obj.$$is_module) {
-      Opal.update_includers(obj, obj, jsid);
-
-      if (obj.$$module_function) {
-        Opal.defs(obj, jsid, body);
-      }
-    }
-
-    // is it a bridged class?
-    var bridged = obj.$__id__ && !obj.$__id__.$$stub && BridgedClasses[obj.$__id__()];
-    if (bridged) {
-      for (var i = bridged.length - 1; i >= 0; i--) {
-        Opal.bridge_method(bridged[i], obj, jsid, body);
-      }
-    }
-
-    // method_added/singleton_method_added hooks
-    var singleton_of = obj.$$singleton_of;
-    if (obj.$method_added && !obj.$method_added.$$stub && !singleton_of) {
-      obj.$method_added(jsid.substr(1));
-    }
-    else if (singleton_of && singleton_of.$singleton_method_added && !singleton_of.$singleton_method_added.$$stub) {
-      singleton_of.$singleton_method_added(jsid.substr(1));
-    }
-
-    return nil;
-  };
+  Opal.defn = function(klass, jsid, body) {
+    klass.prototype[jsid] = body;
+  }
 
   // Define a singleton method on the given object (see Opal.def).
   Opal.defs = function(obj, jsid, body) {
@@ -1891,16 +1630,16 @@
   Opal.rdef = function(obj, jsid) {
     // TODO: remove from BridgedClasses as well
 
-    if (!$hasOwn.call(obj.$$proto, jsid)) {
+    if (!$hasOwn.call(obj.prototype, jsid)) {
       throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
     }
 
-    delete obj.$$proto[jsid];
+    delete obj.prototype[jsid];
     delete_from_methods_list(obj, jsid.slice(1));
 
     if (obj.$$is_singleton) {
-      if (obj.$$proto.$singleton_method_removed && !obj.$$proto.$singleton_method_removed.$$stub) {
-        obj.$$proto.$singleton_method_removed(jsid.substr(1));
+      if (obj.prototype.$singleton_method_removed && !obj.prototype.$singleton_method_removed.$$stub) {
+        obj.prototype.$singleton_method_removed(jsid.substr(1));
       }
     }
     else {
@@ -1912,16 +1651,16 @@
 
   // Called from #undef_method.
   Opal.udef = function(obj, jsid) {
-    if (!obj.$$proto[jsid] || obj.$$proto[jsid].$$stub) {
+    if (!obj.prototype[jsid] || obj.prototype[jsid].$$stub) {
       throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
     }
 
-    Opal.add_stub_for(obj.$$proto, jsid);
+    Opal.add_stub_for(obj.prototype, jsid);
     delete_from_methods_list(obj, jsid.slice(1));
 
     if (obj.$$is_singleton) {
-      if (obj.$$proto.$singleton_method_undefined && !obj.$$proto.$singleton_method_undefined.$$stub) {
-        obj.$$proto.$singleton_method_undefined(jsid.substr(1));
+      if (obj.prototype.$singleton_method_undefined && !obj.prototype.$singleton_method_undefined.$$stub) {
+        obj.prototype.$singleton_method_undefined(jsid.substr(1));
       }
     }
     else {
@@ -1934,7 +1673,7 @@
   Opal.alias = function(obj, name, old) {
     var id     = '$' + name,
         old_id = '$' + old,
-        body   = obj.$$proto['$' + old],
+        body   = obj.prototype['$' + old],
         alias;
 
     // When running inside #instance_eval the alias refers to class methods.
@@ -1990,7 +1729,7 @@
 
   Opal.alias_native = function(obj, name, native_name) {
     var id   = '$' + name,
-        body = obj.$$proto[native_name];
+        body = obj.prototype[native_name];
 
     if (typeof(body) !== "function" || body.$$stub) {
       throw Opal.NameError.$new("undefined native method `" + native_name + "' for class `" + obj.$name() + "'")
@@ -2455,18 +2194,27 @@
 
   // Initialization
   // --------------
+  function $BasicObject() {};
+  function $Object() {};
+  function $Module() {};
+  function $Class() {};
 
-  // Constructors for *instances* of core objects
-  Opal.boot_class_alloc('BasicObject', BasicObject_alloc);
-  Opal.boot_class_alloc('Object',      Object_alloc,       BasicObject_alloc);
-  Opal.boot_class_alloc('Module',      Module_alloc,       Object_alloc);
-  Opal.boot_class_alloc('Class',       Class_alloc,        Module_alloc);
+  Opal.BasicObject = BasicObject = Opal.allocate_class('BasicObject', null, $BasicObject);
+  Opal.Object      = _Object     = Opal.allocate_class('Object', Opal.BasicObject, $Object);
+  Opal.Module      = Module      = Opal.allocate_class('Module', Opal.Object, $Module);
+  Opal.Class       = Class       = Opal.allocate_class('Class', Opal.Module, $Class);
 
-  // Constructors for *classes* of core objects
-  Opal.BasicObject = BasicObject = Opal.setup_class_object('BasicObject', BasicObject_alloc, 'Class',       Class_alloc);
-  Opal.Object      = _Object     = Opal.setup_class_object('Object',      Object_alloc,      'BasicObject', BasicObject.constructor);
-  Opal.Module      = Module      = Opal.setup_class_object('Module',      Module_alloc,      'Object',      _Object.constructor);
-  Opal.Class       = Class       = Opal.setup_class_object('Class',       Class_alloc,       'Module',      Module.constructor);
+  Opal.BasicObject.__proto__ = Opal.Class.prototype;
+  Opal.Object.__proto__      = Opal.Class.prototype;
+  Opal.Module.__proto__      = Opal.Class.prototype;
+  Opal.Class.__proto__       = Opal.Class.prototype;
+
+  klass = new Opal.Class();
+
+  Opal.BasicObject.prototype.$prop1 = 1;
+  Opal.Object.prototype.$prop2 = 2;
+  Opal.Module.prototype.$prop3 = 3;
+  Opal.Class.prototype.$prop4 = 4;
 
   // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
   BasicObject.$$const["BasicObject"] = BasicObject;
@@ -2484,41 +2232,26 @@
   Module.$$class      = Class;
   Class.$$class       = Class;
 
-  // Fix superclasses of booted classes
-  BasicObject.$$super = null;
-  _Object.$$super     = BasicObject;
-  Module.$$super      = _Object;
-  Class.$$super       = Module;
-
-  BasicObject.$$parent = null;
-  _Object.$$parent     = BasicObject;
-  Module.$$parent      = _Object;
-  Class.$$parent       = Module;
-
-  BasicObject.$$ancestors = [BasicObject];
-  _Object.$$ancestors     = [_Object, BasicObject];
-  Module.$$ancestors     = [Module, _Object, BasicObject];
-  Class.$$ancestors     = [Class, Module, _Object, BasicObject];
-
-  BasicObject.$$children = [_Object, Module, Class];
-  _Object.$$children = [Module, Class];
-  Module.$$children = [Class];
+  // BasicObject.$$children = [_Object, Module, Class];
+  // _Object.$$children = [Module, Class];
+  // Module.$$children = [Class];
 
   // Forward .toString() to #to_s
-  $defineProperty(_Object.$$proto, 'toString', function() {
-    var to_s = this.$to_s();
-    if (to_s.$$is_string && typeof(to_s) === 'object') {
-      // a string created using new String('string')
-      return to_s.valueOf();
-    } else {
-      return to_s;
-    }
-  });
+  // FIXME
+  // $defineProperty(_Object.prototype, 'toString', function() {
+  //   var to_s = this.$to_s();
+  //   if (to_s.$$is_string && typeof(to_s) === 'object') {
+  //     // a string created using new String('string')
+  //     return to_s.valueOf();
+  //   } else {
+  //     return to_s;
+  //   }
+  // });
 
   // Make Kernel#require immediately available as it's needed to require all the
   // other corelib files.
-  $defineProperty(_Object.$$proto, '$require', Opal.require);
-  _Object.$$methods.push('require');
+  $defineProperty(_Object.prototype, '$require', Opal.require);
+  // _Object.$$methods.push('require');
 
   // Add a short helper to navigate constants manually.
   // @example
@@ -2526,12 +2259,14 @@
   Opal.$$ = _Object.$$;
 
   // Instantiate the main object
-  Opal.top = new _Object.$$alloc();
+  Opal.top = new _Object();
   Opal.top.$to_s = Opal.top.$inspect = function() { return 'main' };
 
+
   // Nil
-  Opal.klass(_Object, _Object, 'NilClass', NilClass_alloc);
-  nil = Opal.nil = new NilClass_alloc();
+  function $NilClass() {};
+  Opal.NilClass = Opal.allocate_class('NilClass', Opal.Object, $NilClass);
+  nil = Opal.nil = new Opal.NilClass();
   nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
@@ -2539,4 +2274,23 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
+
+
+  //         scope, superclass, name, constructor
+  function $A() {};
+  Opal.klass(Opal.Object, Opal.Object, 'A', $A);
+  Opal.defn(Opal.A, '$a', function() { return 'a' });
+
+  function $B() {};
+  Opal.klass(Opal.Object, Opal.A, 'B', $B);
+  Opal.defn(Opal.B, '$b', function() { return 'b' });
+
+  function $C() {};
+  Opal.module(Opal.Object, 'C', $C);
+  Opal.defn(Opal.C, '$c', function() { return 'c' });
+
+  Opal.append_features(Opal.C, Opal.B);
+
+  a = new Opal.A();
+  b = new Opal.B();
 }).call(this);

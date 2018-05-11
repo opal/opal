@@ -14,11 +14,12 @@ module Opal
         helper :module
 
         push '(function($base, $parent_nesting) {'
-        line "  var $#{name}, self = $#{name} = $module($base, '#{name}');"
+        line "  function $#{name}() {};"
+        line "  var $#{name}, self = $#{name} = $module($base, '#{name}', $#{name});"
 
         in_scope do
           scope.name = name
-          add_temp "#{scope.proto} = self.$$proto"
+          add_temp "#{scope.proto} = self.prototype"
           add_temp '$nesting = [self].concat($parent_nesting)'
 
           body_code = stmt(body || s(:nil))
