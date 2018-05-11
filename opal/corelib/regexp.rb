@@ -263,9 +263,9 @@ class Regexp < `RegExp`
       var splits = self.source.split('(?<');
       var sl = splits.length;
       for (var i = 0; i < sl; i ++) {
-        var matchres = splits[i].match(/(\w+)>/);
+        var matchres = splits[i].match(/(\\w+)>/);
         if (matchres && matchres[1]) {
-          result.push(matchres[1];
+          result.push(matchres[1]);
         }
       }
       return result;
