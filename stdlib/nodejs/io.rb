@@ -13,44 +13,6 @@
       throw error;
     }
   }
-
-  var regexWhitelist = /[ -~]/;
-  var regexSingleEscape = /["'\\\b\f\n\r\t]/;
-  var singleEscapes = {
-    '"': '\\"',
-    '\'': '\\\'',
-    '\\': '\\\\',
-    '\b': '\\b',
-    '\f': '\\f',
-    '\n': '\\n',
-    '\r': '\\r',
-    '\t': '\\t'
-    // `\v` is omitted intentionally, because in IE < 9, '\v' == 'v'.
-    // '\v': '\\x0B'
-  };
- 
-  function toASCII(buffer) {
-    var array = Array.from(buffer);
-    var length = array.length;
-    var index = -1;
-    var result = '';
-    while (++index < length) {
-      var character = String.fromCharCode(array[index]);
-      if (regexWhitelist.test(character)) {
-        result += character;
-        continue;
-      }
-      if (regexSingleEscape.test(character)) {
-        result += singleEscapes[character];
-        continue;
-      }
-      var hexadecimal = array[index].toString(16).toUpperCase();
-      var longhand = hexadecimal.length > 2;
-      var escaped = '\\' + (longhand ? 'u' : 'x') + ('0000' + hexadecimal).slice(longhand ? -4 : -2);
-      result += escaped;
-    }
-    return result;
-  }
 }
 
 class IO
@@ -74,7 +36,7 @@ class IO
   end
 
   def self.binread(path)
-    `return executeIOAction(function(){return toASCII(__fs__.readFileSync(#{path}))})`
+    `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString('utf-8')})`
   end
 end
 
