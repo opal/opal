@@ -21,4 +21,9 @@ class TestNodejsIO < Test::Unit::TestCase
     assert_equal("Le fran\xC3\xA7ais c'est compliqu\xC3\xA9 :)\\n", IO.binread('tmp/foo'))
     assert_equal("Le français c'est compliqué :)\\n", IO.binread('tmp/foo'))
   end
+
+  def test_binread_image
+    assert_equal("iVBORwoaCgAAAApJSERSAAAAEQAAABEIAgAAALQP0K0AAAAaSURBVCiRY/z//z8DiYCJVAqjekb1jOqBAwCKaAMf7iyZAAAAAABJRU5ErkJggg==",
+      Base64.strict_encode64(IO.binread('test/cruby/test/cgi/testdata/small.png')))
+  end
 end
