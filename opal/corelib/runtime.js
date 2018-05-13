@@ -696,9 +696,9 @@
   }
 
   Opal.instance_methods = function(mod) {
-    var exclude = [], results = [];
+    var exclude = [], results = [], ancestors = Opal.ancestors(mod);
 
-    for (var i = 0, ancestors = mod.$$ancestors, l = ancestors.length; i < l; i++) {
+    for (var i = 0, l = ancestors.length; i < l; i++) {
       var ancestor = ancestors[i],
           props = Object.getOwnPropertyNames(ancestor.prototype);
 
@@ -731,10 +731,10 @@
       var prop = props[i];
 
       if (is_method(prop)) {
-        var method_name = prop.slice(1),
-            method = mod.prototype[prop];
+        var method = mod.prototype[prop];
 
-        if (!method.$$stub && method.$$owner === mod) {
+        if (!method.$$stub) {
+          var method_name = prop.slice(1);
           results.push(method_name);
         }
       }
@@ -1585,7 +1585,7 @@
     // to keep the max depth at 1.
     if (body.$$alias_of) body = body.$$alias_of;
 
-    // We need a wrapper because otherwise method $$owner and other properties
+    // We need a wrapper because otherwise properties
     // would be ovrewritten on the original body.
     alias = function() {
       var block = alias.$$p, args, i, ii;
@@ -2096,13 +2096,6 @@
   Opal.Module.__proto__      = Opal.Class.prototype;
   Opal.Class.__proto__       = Opal.Class.prototype;
 
-  klass = new Opal.Class();
-
-  Opal.BasicObject.prototype.$prop1 = 1;
-  Opal.Object.prototype.$prop2 = 2;
-  Opal.Module.prototype.$prop3 = 3;
-  Opal.Class.prototype.$prop4 = 4;
-
   // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
   BasicObject.$$const["BasicObject"] = BasicObject;
 
@@ -2120,16 +2113,15 @@
   Class.$$class       = Class;
 
   // Forward .toString() to #to_s
-  // FIXME
-  // $defineProperty(_Object.prototype, 'toString', function() {
-  //   var to_s = this.$to_s();
-  //   if (to_s.$$is_string && typeof(to_s) === 'object') {
-  //     // a string created using new String('string')
-  //     return to_s.valueOf();
-  //   } else {
-  //     return to_s;
-  //   }
-  // });
+  $defineProperty(_Object.prototype, 'toString', function() {
+    var to_s = this.$to_s();
+    if (to_s.$$is_string && typeof(to_s) === 'object') {
+      // a string created using new String('string')
+      return to_s.valueOf();
+    } else {
+      return to_s;
+    }
+  });
 
   // Make Kernel#require immediately available as it's needed to require all the
   // other corelib files.
