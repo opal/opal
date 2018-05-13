@@ -1,7 +1,6 @@
 require 'opal/base'
 require 'opal/mini'
 
-require 'corelib/string/inheritance'
 require 'corelib/string/encoding'
 require 'corelib/math'
 require 'corelib/complex'

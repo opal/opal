@@ -400,6 +400,19 @@
   Opal.allocate_class = function(name, superclass, constructor) {
     var klass = constructor;
 
+    if (superclass != null && superclass.$$bridge) {
+      // Inheritance from bridged classes requires
+      // calling original JS constructors
+      klass = function SubclassOfNativeClass() {
+        var args = Array.prototype.slice.call(arguments),
+            self = new (Function.prototype.bind.apply(superclass, [null].concat(args)))();
+
+        // and replacing a __proto__ manually
+        self.__proto__ = klass.prototype;
+        return self;
+      }
+    }
+
     klass.$$name = name;
     klass.$$const = {};
     klass.$$is_class = true;

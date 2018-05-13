@@ -1,15 +1,30 @@
-klass = Class.new do
-  class Howdy
-  end
+# binary_plus = Class.new(String) do
+#   alias_method :plus, :+
+#   def +(a)
+#     plus(a) + "!"
+#   end
+# end
+# s = binary_plus.new("a")
 
-  def self.get_class_name
-    Howdy.name
+
+# require 'pry'; binding.pry
+
+
+# p s + s + s
+
+
+class MyString1 < String
+  def my1
   end
 end
 
-p Howdy.name
-p klass.get_class_name
+class MyString2 < String
+  def my2
+  end
+end
 
+s1 = MyString1.new("one")
+s2 = MyString2.new("two")
 
 `debugger`
 

@@ -18,7 +18,7 @@ class String < `String`
 
   def self.new(str = '')
     str = Opal.coerce_to(str, String, :to_str)
-    `new String(str)`
+    `new self(str)`
   end
 
   def initialize(str = undefined)
