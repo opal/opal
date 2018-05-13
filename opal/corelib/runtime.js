@@ -912,11 +912,6 @@
     module.$$iclasses.push(iclass);
 
     includer.prototype.__proto__ = iclass;
-
-    // includer.prototype.__proto__ = {
-    //   ...iclass,
-    //   __proto__: includer.prototype.__proto__
-    // }
   }
 
   function inherit_prepended_modules(module, prepender) {
@@ -936,7 +931,6 @@
     if (prepender.$$ancestors.indexOf(module) !== -1) {
       // The module may have new included modules
       inherit_prepended_modules(module, prepender);
-      Opal.refresh_ancestors(prepender);
       // But we don't need to register it again
       return;
     }
@@ -950,7 +944,6 @@
     prepender.$$prepended_modules.unshift(module);
     module.$$prepended_to.push(prepender);
     inherit_prepended_modules(module, prepender);
-    Opal.refresh_ancestors(prepender);
 
     Opal.bridge_methods(prepender, module);
 

@@ -20,9 +20,6 @@ class String
       meta.$$included_modules = #{replace.singleton_class}.$$included_modules;
       meta.$$prepended_modules = #{replace.singleton_class}.$$prepended_modules;
 
-      Opal.refresh_ancestors(klass);
-      Opal.refresh_ancestors(meta);
-
       klass.$allocate = replace.$allocate;
       klass.$new      = replace.$new;
 
