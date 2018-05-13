@@ -407,11 +407,14 @@
     klass.$$children = [];
     klass.$$methods = [];
     klass.$$super = superclass;
+    klass.$$cvars = {};
 
     klass.prototype.$$class = klass;
 
     // By default if there are no singleton class methods
     // __proto__ is Class.prototype
+    // Later singleton methods generate a singleton_class
+    // and inject it into ancestors chain
     if (Opal.Class) {
       klass.__proto__ = Opal.Class.prototype;
     }
@@ -546,16 +549,19 @@
   //
   // @return [Module]
   Opal.allocate_module = function(name, constructor) {
-    var module = Opal.allocate_class(name, Opal.Module, constructor);
-    // module.displayName = `Module_${name}`;
+    var module = constructor;
 
-    delete module.$$is_class;
+    module.$$name = name;
+    module.$$const = {};
     module.$$is_module = true;
+    module.$$is_a_module = true;
+    module.$$children = [];
+    module.$$methods = [];
+    module.$$super = Opal.Module;
+    module.$$cvars = {};
     module.$$iclasses = [];
 
-    if (Opal.Module) {
-      module.__proto__ = Opal.Module.prototype;
-    }
+    module.__proto__ = Opal.Module.prototype;
 
     return module;
   }
@@ -614,11 +620,13 @@
       return object.$$meta;
     }
 
-    if (object.hasOwnProperty('$$is_a_module')) {
+    if (object.hasOwnProperty('$$is_class')) {
       return Opal.build_class_singleton_class(object);
+    } else if (object.hasOwnProperty('$$is_module')) {
+      return Opal.build_module_singletin_class(object);
+    } else {
+      return Opal.build_object_singleton_class(object);
     }
-
-    return Opal.build_object_singleton_class(object);
   };
 
   // Build the singleton class for an existing class. Class object are built
@@ -637,11 +645,13 @@
       return klass.$$meta;
     }
 
+    if (klass.$$name === 'Kernel') { debugger }
+
 
     // The singleton_class superclass is the singleton_class of its superclass;
     // but BasicObject has no superclass (its `$$super` is null), thus we
     // fallback on `Class`.
-    superclass = klass === BasicObject ? Class : Opal.build_class_singleton_class(klass.$$super);
+    superclass = klass === BasicObject ? Class : Opal.get_singleton_class(klass.$$super);
 
     meta = Opal.allocate_class(null, superclass, function(){});
 
@@ -654,6 +664,23 @@
 
     return meta;
   };
+
+  Opal.build_module_singletin_class = function(mod) {
+    if (mod.$$meta) {
+      return mod.$$meta;
+    }
+
+    var meta = Opal.allocate_class(null, Opal.Module, function(){});
+
+    meta.$$is_singleton = true;
+    meta.$$singleton_of = mod;
+    mod.$$meta = meta;
+    mod.__proto__ = meta.prototype;
+
+    meta.$$methods = Opal.Module.$$methods.slice();
+
+    return meta;
+  }
 
   // Build the singleton class for a Ruby (non class) Object.
   //
@@ -902,16 +929,49 @@
   // @param includer [Module] the target class to include module into
   // @return [null]
   Opal.append_features = function(module, includer) {
+    var ancestors = Opal.ancestors(module);
+    var iclasses = [];
+
+    for (var i = 0, length = ancestors.length; i < length; i++) {
+      var ancestor = ancestors[i], iclass = create_iclass(ancestor);
+      iclasses.push(iclass);
+    }
+
+    var chain = chain_iclasses(iclasses),
+        first = chain.first, last = chain.last;
+
+    // includer -> chain.first -> ...chain... -> chain.last -> includer.parent
+    chain.last.__proto__ = includer.prototype.__proto__;
+    includer.prototype.__proto__ = chain.first;
+  }
+
+  function create_iclass(module) {
     var iclass = Object.assign({}, module.prototype);
     iclass.$$iclass = true;
     iclass.$$class = 'iclass'; // no class
     iclass.$$module = module;
 
-    iclass.__proto__ = includer.prototype.__proto__;
-
     module.$$iclasses.push(iclass);
 
-    includer.prototype.__proto__ = iclass;
+    return iclass;
+  }
+
+  function chain_iclasses(iclasses) {
+    var length = iclasses.length, first = iclasses[0];
+
+    if (length === 1) {
+      return { first: first, last: first };
+    }
+
+    var previous = first;
+
+    for (var i = 1; i < length; i++) {
+      var current = iclasses[i];
+      previous.__proto__ = current;
+      previous = current;
+    }
+
+    return { first: iclasses[0], last: iclasses[length - 1] };
   }
 
   function inherit_prepended_modules(module, prepender) {

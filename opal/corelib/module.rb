@@ -3,13 +3,13 @@ class Module
     %x{
       var module;
 
-      module = Opal.module_allocate(self);
+      module = Opal.allocate_module(nil, function(){});
       return module;
     }
   end
 
   def initialize(&block)
-    `Opal.module_initialize(self, block)`
+    module_eval(&block) if block_given?
   end
 
   def ===(object)
