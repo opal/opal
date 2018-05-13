@@ -404,8 +404,6 @@
     klass.$$const = {};
     klass.$$is_class = true;
     klass.$$is_a_module = true;
-    klass.$$children = [];
-    klass.$$methods = [];
     klass.$$super = superclass;
     klass.$$cvars = {};
 
@@ -421,8 +419,6 @@
 
     if (superclass != null) {
       klass.prototype.__proto__ = superclass.prototype
-      superclass.$$children.push(klass);
-      klass.$$methods = superclass.$$methods.slice();
 
       if (superclass !== Opal.Module && superclass.$$meta) {
         // If superclass has metaclass then we have explicitely inherit it.
@@ -555,8 +551,6 @@
     module.$$const = {};
     module.$$is_module = true;
     module.$$is_a_module = true;
-    module.$$children = [];
-    module.$$methods = [];
     module.$$super = Opal.Module;
     module.$$cvars = {};
     module.$$iclasses = [];
@@ -660,8 +654,6 @@
     klass.$$meta = meta;
     klass.__proto__ = meta.prototype;
 
-    meta.$$methods = superclass.$$methods.slice();
-
     return meta;
   };
 
@@ -676,8 +668,6 @@
     meta.$$singleton_of = mod;
     mod.$$meta = meta;
     mod.__proto__ = meta.prototype;
-
-    meta.$$methods = Opal.Module.$$methods.slice();
 
     return meta;
   }
@@ -838,46 +828,6 @@
     }
   };
 
-  // Bridges from *donator* to a *target*.
-  //
-  // @param target [Module] the potentially associated with bridged classes module
-  // @param donator [Module] the module/class source of the methods that should be bridged
-  Opal.bridge_methods = function(target, donator) {
-    var i,
-        bridged = BridgedClasses[target.$__id__()],
-        donator_id = donator.$__id__();
-
-    if (bridged) {
-      BridgedClasses[donator_id] = bridged.slice();
-
-      for (i = bridged.length - 1; i >= 0; i--) {
-        Opal_bridge_methods_to_constructor(bridged[i], donator)
-      }
-    }
-  };
-
-  // Actually bridge methods to the bridged (shared) prototype.
-  function Opal_bridge_methods_to_constructor(target_constructor, donator) {
-    var i,
-        method,
-        methods = donator.$$methods;
-
-    for (i = methods.length - 1; i >= 0; i--) {
-      method = '$' + methods[i];
-      Opal.bridge_method(target_constructor, donator, method, donator.prototype[method]);
-    }
-  }
-
-  // Associate the target as a bridged class for the current "donator"
-  function Opal_add_bridged_constructor(target_constructor, donator) {
-    var donator_id = donator.$__id__();
-
-    if (!BridgedClasses[donator_id]) {
-      BridgedClasses[donator_id] = [];
-    }
-    BridgedClasses[donator_id].push(target_constructor);
-  }
-
   // Walks the dependency tree detecting the presence of the base among its
   // own dependencies.
   //
@@ -974,46 +924,6 @@
     return { first: iclasses[0], last: iclasses[length - 1] };
   }
 
-  function inherit_prepended_modules(module, prepender) {
-    for (var i = 0; i < module.$$prepended_modules.length; i++) {
-      prepender.$$prepended_modules.push(module.$$prepended_modules[i]);
-    }
-  }
-
-  Opal.prepend_features = function(module, prepender) {
-    var iclass, donator, prototype, methods, id, i;
-
-    if (module === prepender) {
-      throw Opal.ArgumentError.$new('cyclic prepend detected');
-    }
-
-    // check if this module is already included in the class
-    if (prepender.$$ancestors.indexOf(module) !== -1) {
-      // The module may have new included modules
-      inherit_prepended_modules(module, prepender);
-      // But we don't need to register it again
-      return;
-    }
-
-    if (prepender.$$is_module && Opal.has_cyclic_dep(includer.$$id, [module], '$$ancestors', {})) {
-      throw Opal.ArgumentError.$new('cyclic include detected')
-    }
-
-    Opal.const_cache_version++;
-
-    prepender.$$prepended_modules.unshift(module);
-    module.$$prepended_to.push(prepender);
-    inherit_prepended_modules(module, prepender);
-
-    Opal.bridge_methods(prepender, module);
-
-    methods = module.$$methods;
-
-    for (i = methods.length - 1; i >= 0; i--) {
-      Opal.update_includer(module, prepender, '$' + methods[i])
-    }
-  }
-
   // Table that holds all methods that have been defined on all objects
   // It is used for defining method stubs for new coming native classes
   Opal.stubs = {};
@@ -1058,114 +968,9 @@
     constructor.$$bridge = klass;
     constructor.$$is_class = true;
     constructor.$$is_a_module = true;
-    constructor.$$children = []
-    constructor.$$methods = klass.$$methods.slice();
     constructor.$$super = klass;
     constructor.$$const = {};
     constructor.__proto__ = Opal.Class.prototype;
-
-    klass.$$children.push(constructor);
-
-    return;
-
-
-
-    Opal.stub_subscribers.push(constructor.prototype);
-
-    // Populate constructor with previously stored stubs
-    for (var method_name in Opal.stubs) {
-      if (!(method_name in constructor.prototype)) {
-        $defineProperty(constructor.prototype, method_name, Opal.stub_for(method_name));
-      }
-    }
-
-
-
-    var ancestors = klass.$$ancestors;
-
-    // order important here, we have to bridge from the last ancestor to the
-    // bridged class
-    for (var i = ancestors.length - 1; i >= 0; i--) {
-      Opal_add_bridged_constructor(constructor, ancestors[i]);
-      Opal_bridge_methods_to_constructor(constructor, ancestors[i]);
-    }
-
-    for (var name in BasicObject_alloc.prototype) {
-      var method = BasicObject_alloc.prototype[method];
-
-      if (method && method.$$stub && !(name in constructor.prototype)) {
-        $defineProperty(constructor.prototype, name, method);
-      }
-    }
-
-    return klass;
-  };
-
-  // Update `jsid` method cache of all classes / modules including `module`.
-  Opal.update_includer = function(module, includer, jsid) {
-    var dest, current, body,
-        ancestors, j, jj, current_owner_index, module_index;
-
-    body    = module.prototype[jsid];
-    dest    = includer.prototype;
-    current = dest[jsid];
-
-    if (dest.hasOwnProperty(jsid) && !current.$$donated && !current.$$stub) {
-      // target class has already defined the same method name - do nothing
-    }
-    else if (current && !current.$$stub) {
-      // target class includes another module that has defined this method
-      ancestors = includer.$$ancestors;
-
-      for (j = 0, jj = ancestors.length; j < jj; j++) {
-        if (ancestors[j] === current.$$owner) {
-          current_owner_index = j;
-        }
-        if (ancestors[j] === module) {
-          module_index = j;
-        }
-      }
-
-      // only redefine method on class if the module was included AFTER
-      // the module which defined the current method body. Also make sure
-      // a module can overwrite a method it defined before
-      if (current_owner_index == null || current_owner_index >= module_index) {
-        dest[jsid] = body;
-        dest[jsid].$$donated = module;
-        includer.$$methods.push(jsid.slice(1));
-      }
-    }
-    else {
-      // neither a class, or module included by class, has defined method
-      $defineProperty(dest, jsid, body);
-      dest[jsid].$$donated = module;
-      includer.$$methods.push(jsid.slice(1));
-    }
-
-    // if the includer is a module or a class that has children, recursively update all of its includres.
-    if (includer.$$included_in || includer.$$children) {
-      Opal.update_includers(module, includer, jsid);
-    }
-  };
-
-  // Update `jsid` method cache of all classes / modules including `module`.
-  Opal.update_includers = function(module, includer, jsid) {
-    var i, ii, includee, dependants;
-
-    if (includer.$$is_module) {
-      dependants = includer.$$included_in;
-    } else {
-      dependants = includer.$$children;
-    }
-
-    if (!dependants) {
-      return;
-    }
-
-    for (i = 0, ii = dependants.length; i < ii; i++) {
-      var dependant = dependants[i];
-      Opal.update_includer(module, dependant, jsid);
-    }
   };
 
   function protoToModule(proto) {
@@ -1710,14 +1515,6 @@
     Opal.defn(Opal.get_singleton_class(obj), jsid, body)
   };
 
-  var delete_from_methods_list = function(obj, method_name) {
-    obj.$$methods.splice(obj.$$methods.indexOf(method_name), 1);
-    var dependants = obj.$$included_in || obj.$$children;
-    for (var i = 0, length = dependants.length; i < length; i++) {
-      delete_from_methods_list(dependants[i], method_name);
-    }
-  }
-
   // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
     // TODO: remove from BridgedClasses as well
@@ -1727,7 +1524,6 @@
     }
 
     delete obj.prototype[jsid];
-    delete_from_methods_list(obj, jsid.slice(1));
 
     if (obj.$$is_singleton) {
       if (obj.prototype.$singleton_method_removed && !obj.prototype.$singleton_method_removed.$$stub) {
@@ -1748,7 +1544,6 @@
     }
 
     Opal.add_stub_for(obj.prototype, jsid);
-    delete_from_methods_list(obj, jsid.slice(1));
 
     if (obj.$$is_singleton) {
       if (obj.prototype.$singleton_method_undefined && !obj.prototype.$singleton_method_undefined.$$stub) {
@@ -2324,10 +2119,6 @@
   Module.$$class      = Class;
   Class.$$class       = Class;
 
-  // BasicObject.$$children = [_Object, Module, Class];
-  // _Object.$$children = [Module, Class];
-  // Module.$$children = [Class];
-
   // Forward .toString() to #to_s
   // FIXME
   // $defineProperty(_Object.prototype, 'toString', function() {
@@ -2343,7 +2134,6 @@
   // Make Kernel#require immediately available as it's needed to require all the
   // other corelib files.
   $defineProperty(_Object.prototype, '$require', Opal.require);
-  // _Object.$$methods.push('require');
 
   // Add a short helper to navigate constants manually.
   // @example
