@@ -633,9 +633,6 @@
       return klass.$$meta;
     }
 
-    if (klass.$$name === 'Kernel') { debugger }
-
-
     // The singleton_class superclass is the singleton_class of its superclass;
     // but BasicObject has no superclass (its `$$super` is null), thus we
     // fallback on `Class`.
@@ -647,6 +644,8 @@
     meta.$$singleton_of = klass;
     klass.$$meta = meta;
     klass.__proto__ = meta.prototype;
+    // Restoring ClassName.class
+    klass.$$class = Opal.Class
 
     return meta;
   };
