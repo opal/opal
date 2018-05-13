@@ -2334,7 +2334,7 @@ class Array < `Array`
 
   def self.inherited(klass)
     %x{
-      klass.$$proto.$to_a = function() {
+      klass.prototype.$to_a = function() {
         return this.slice(0, this.length);
       }
     }

@@ -398,11 +398,7 @@
   // @return new [Class]  or existing ruby class
   //
   Opal.allocate_class = function(name, superclass, constructor) {
-    // var klass = new Function(`return function ${name || 'anonymous_class'}() {}`)();
     var klass = constructor;
-    // TODO: revert to
-    // var klass = function klass() {};
-    // klass.displayName = name;
 
     klass.$$name = name;
     klass.$$const = {};
@@ -446,16 +442,23 @@
   }
 
   function superclassOf(klass) {
-    var result = klass.prototype;
+    var proto = klass.prototype.__proto__;
 
-    while (result) {
-      if (result.$$is_class) {
-        return result;
+    while (proto) {
+      var mod = protoToModule(proto);
+      if (mod === null) {
+        console.log("???");
+      } else if (mod.$$is_class) {
+        console.log("Inerited", mod.$$name);
+        return mod;
+      } else if (mod.$$is_class) {
+        console.log("Included", mod.$$name);
       }
 
-      result = result.__proto__;
+      proto = proto.__proto__;
     }
 
+    debugger;
     throw new Error('Broken prototype chain');
   }
 
@@ -478,7 +481,7 @@
     }
 
     // If the superclass is not an Opal-generated class then we're bridging a native JS class
-    if (superclass != null && !superclass.$$is_class) {
+    if (superclass != null && !superclass.hasOwnProperty('$$is_class')) {
       bridged = superclass;
       superclass = _Object;
     }
@@ -500,19 +503,19 @@
       superclass = _Object;
     }
 
-    // Create the class object (instance of Class)
-    klass = Opal.allocate_class(name, superclass, constructor);
-
-    Opal.const_set(scope, name, klass);
-
     if (bridged) {
-      Opal.bridge(klass, alloc);
+      Opal.bridge(superclass, bridged);
+      klass = bridged;
     } else {
+      // Create the class object (instance of Class)
+      klass = Opal.allocate_class(name, superclass, constructor);
       // Call .inherited() hook with new class on the superclass
       if (superclass.$inherited) {
         superclass.$inherited(klass);
       }
     }
+
+    Opal.const_set(scope, name, klass);
 
     return klass;
 
@@ -543,6 +546,7 @@
 
     delete module.$$is_class;
     module.$$is_module = true;
+    module.$$iclasses = [];
 
     if (Opal.Module) {
       module.__proto__ = Opal.Module.prototype;
@@ -904,10 +908,16 @@
     iclass.$$class = 'iclass'; // no class
     iclass.$$module = module;
 
-    includer.prototype.__proto__ = {
-      ...iclass,
-      __proto__: includer.prototype.__proto__
-    }
+    iclass.__proto__ = includer.prototype.__proto__;
+
+    module.$$iclasses.push(iclass);
+
+    includer.prototype.__proto__ = iclass;
+
+    // includer.prototype.__proto__ = {
+    //   ...iclass,
+    //   __proto__: includer.prototype.__proto__
+    // }
   }
 
   function inherit_prepended_modules(module, prepender) {
@@ -974,9 +984,39 @@
   // @return [Class] returns the passed Ruby class
   //
   Opal.bridge = function(klass, constructor) {
-    if (constructor.$$bridge) {
+    if (constructor.hasOwnProperty('$$bridge')) {
       throw Opal.ArgumentError.$new("already bridged");
     }
+
+    // constructor is a JS function with a prototype chain like:
+    // - constructor
+    //   - super
+    //
+    // What we need to do is to inject our class (with its prototype chain)
+    // between constructor and super. For example, after injecting Ruby Object into JS Error we get:
+    // - constructor
+    //   - Opal.Object
+    //     - Opal.Kernel
+    //       - Opal.BasicObject
+    //         - super
+    //
+
+    constructor.prototype.__proto__ = klass.prototype;
+    constructor.prototype.$$class = constructor;
+    constructor.$$bridge = klass;
+    constructor.$$is_class = true;
+    constructor.$$is_a_module = true;
+    constructor.$$children = []
+    constructor.$$methods = klass.$$methods.slice();
+    constructor.$$super = klass;
+    constructor.$$const = {};
+    constructor.__proto__ = Opal.Class.prototype;
+
+    klass.$$children.push(constructor);
+
+    return;
+
+
 
     Opal.stub_subscribers.push(constructor.prototype);
 
@@ -987,8 +1027,7 @@
       }
     }
 
-    $defineProperty(constructor.prototype, '$$class', klass);
-    $defineProperty(constructor, '$$bridge', klass);
+
 
     var ancestors = klass.$$ancestors;
 
@@ -1611,6 +1650,13 @@
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(klass, jsid, body) {
     klass.prototype[jsid] = body;
+
+    if (klass.$$is_module) {
+      for (var i = 0, iclasses = klass.$$iclasses, length = iclasses.length; i < length; i++) {
+        var iclass = iclasses[i];
+        iclass[jsid] = body;
+      }
+    }
   }
 
   // Define a singleton method on the given object (see Opal.def).
@@ -2010,7 +2056,7 @@
   // function.
   //
   Opal.hash2 = function(keys, smap) {
-    var hash = new Opal.Hash.$$alloc();
+    var hash = new Opal.Hash();
 
     hash.$$smap = smap;
     hash.$$map  = Object.create(null);
@@ -2274,23 +2320,4 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
-
-
-  //         scope, superclass, name, constructor
-  function $A() {};
-  Opal.klass(Opal.Object, Opal.Object, 'A', $A);
-  Opal.defn(Opal.A, '$a', function() { return 'a' });
-
-  function $B() {};
-  Opal.klass(Opal.Object, Opal.A, 'B', $B);
-  Opal.defn(Opal.B, '$b', function() { return 'b' });
-
-  function $C() {};
-  Opal.module(Opal.Object, 'C', $C);
-  Opal.defn(Opal.C, '$c', function() { return 'c' });
-
-  Opal.append_features(Opal.C, Opal.B);
-
-  a = new Opal.A();
-  b = new Opal.B();
 }).call(this);

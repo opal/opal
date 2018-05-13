@@ -8,8 +8,8 @@ class String
     end
 
     %x{
-      klass.$$proto         = replace.$$proto;
-      klass.$$proto.$$class = klass;
+      klass.prototype         = replace.prototype;
+      klass.prototype.$$class = klass;
       klass.$$alloc         = replace.$$alloc;
       klass.$$parent        = #{String};
 
@@ -27,7 +27,7 @@ class String
       klass.$allocate = replace.$allocate;
       klass.$new      = replace.$new;
 
-      klass.$$proto.$$is_string = true;
+      klass.prototype.$$is_string = true;
     }
   end
 end

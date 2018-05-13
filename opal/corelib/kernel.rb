@@ -108,8 +108,8 @@ module Kernel
       var i, name, names, length;
 
       if (other.hasOwnProperty('$$meta')) {
-        var other_singleton_class_proto = Opal.get_singleton_class(other).$$proto;
-        var self_singleton_class_proto = Opal.get_singleton_class(self).$$proto;
+        var other_singleton_class_proto = Opal.get_singleton_class(other).prototype;
+        var self_singleton_class_proto = Opal.get_singleton_class(self).prototype;
         names = Object.getOwnPropertyNames(other_singleton_class_proto);
 
         for (i = 0, length = names.length; i < length; i++) {
