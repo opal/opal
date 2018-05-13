@@ -450,13 +450,8 @@
 
     while (proto) {
       var mod = protoToModule(proto);
-      if (mod === null) {
-        console.log("???");
-      } else if (mod.$$is_class) {
-        console.log("Inerited", mod.$$name);
+      if (mod.$$is_class) {
         return mod;
-      } else if (mod.$$is_class) {
-        console.log("Included", mod.$$name);
       }
 
       proto = proto.__proto__;
