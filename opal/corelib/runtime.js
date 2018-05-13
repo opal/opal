@@ -420,6 +420,11 @@
       klass.prototype.__proto__ = superclass.prototype
       superclass.$$children.push(klass);
       klass.$$methods = superclass.$$methods.slice();
+
+      if (superclass !== Opal.Module && superclass.$$meta) {
+        // If superclass has metaclass then we have explicitely inherit it.
+        Opal.build_class_singleton_class(klass);
+      }
     };
 
     return klass;
@@ -1273,7 +1278,7 @@
         jsid = '$' + mid;
 
     while (proto) {
-      var method = proto[jsid];
+      var method = proto.hasOwnProperty(jsid) ? proto[jsid] : null;
 
       if (method === current_func) {
         // found
@@ -1990,7 +1995,7 @@
       return arguments[0];
     }
 
-    hash = new Opal.Hash.$$alloc();
+    hash = new Opal.Hash();
     Opal.hash_init(hash);
 
     if (arguments_length === 1 && arguments[0].$$is_array) {
@@ -2057,7 +2062,7 @@
   // range excludes the last value.
   //
   Opal.range = function(first, last, exc) {
-    var range         = new Opal.Range.$$alloc();
+    var range         = new Opal.Range();
         range.begin   = first;
         range.end     = last;
         range.excl    = exc;

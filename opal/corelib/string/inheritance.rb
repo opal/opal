@@ -10,7 +10,6 @@ class String
     %x{
       klass.prototype         = replace.prototype;
       klass.prototype.$$class = klass;
-      klass.$$alloc         = replace.$$alloc;
       klass.$$parent        = #{String};
 
       klass.$$included_modules = replace.$$included_modules;

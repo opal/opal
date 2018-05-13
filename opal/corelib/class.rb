@@ -9,24 +9,11 @@ class Class
 
       var klass = Opal.allocate_class(nil, superclass, function(){});
       return klass;
-
-      var alloc = Opal.boot_class_alloc(null, function(){}, superclass);
-      var klass = Opal.setup_class_object(null, alloc, superclass.$$name, superclass.constructor);
-
-      klass.$$super  = superclass;
-      klass.$$parent = superclass;
-
-      superclass.$inherited(klass);
-      Opal.module_initialize(klass, block);
-      Opal.refresh_ancestors(klass);
-
-      return klass;
     }
   end
 
   def allocate
     %x{
-      // var obj = new self.$$alloc();
       var obj = new self();
       obj.$$id = Opal.uid();
       return obj;
