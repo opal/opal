@@ -1,40 +1,35 @@
 class A
-  def a1; end
+  def a
+    p 'A'
+  end
 end
 
-module M
-  def m1; end
+module M1
+  def a
+    p 'M1'
+    super
+  end
+end
+
+module M2
+  def a
+    p 'M2'
+    super
+  end
 end
 
 class B < A
-  include M
-  def b1; end
-end
+  include M1
+  include M2
 
-class A
-  def a2; end
-end
-
-class B
-  def b2; end
-end
-
-module M
-  def m2; end
+  def a
+    p 'B'
+    super
+  end
 end
 
 b = B.new
-`debugger`
-
-b.a1
-b.a2
-b.b1
-b.b2
-b.m1
-b.m2
-
-
-123
+b.a
 
 # %x{
 #   function printMap(mod) {

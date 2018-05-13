@@ -660,6 +660,7 @@
 
     klass.$$is_singleton = true;
     klass.$$singleton_of = object;
+    delete klass.prototype.$$class;
 
     object.$$meta = klass;
 
@@ -1268,28 +1269,22 @@
 
   // Super dispatcher
   Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, defs) {
-    var super_method;
+    var proto = obj.__proto__,
+        jsid = '$' + mid;
 
-    var meta = Opal.get_singleton_class(obj),
-        ancestors = meta.$$ancestors,
-        current_index = ancestors.indexOf(current_func.$$owner),
-        dispatcher;
+    while (proto) {
+      var method = proto[jsid];
 
-    for (var i = 0, length = ancestors.length; i < length; i++) {
-      var ancestor = ancestors[i],
-          method = ancestor.prototype['$' + mid];
-
-      if (method && !method.$$is_stub) {
-        if (i > current_index) {
-          dispatcher = ancestor.prototype;
-          break;
-        }
+      if (method === current_func) {
+        // found
+        break;
       }
+
+      proto = proto.__proto__;
     }
 
-    if (dispatcher == null) {
-      throw Opal.RuntimeError.$new("no " + mid + " on " + obj.$inspect() + "; ancestors are " + ancestors.$inspect());
-    }
+    // parent of the current proto
+    var dispatcher = proto.__proto__;
 
     super_method = dispatcher['$' + mid];
 
