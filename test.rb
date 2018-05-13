@@ -1,12 +1,15 @@
-class A
-  def m
+module IncludedInObject
+  module IncludedModuleSpecs
   end
 end
 
-a = A.new
-def a.mm
+class Object
+  include IncludedInObject
 end
-p a.methods(false)
 
-`debugger`
-13
+module IncludedModuleSpecs; end
+p IncludedModuleSpecs.name
+
+# `debugger`
+
+# 123

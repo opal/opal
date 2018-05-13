@@ -463,7 +463,7 @@
 
   function ensureSuperclassMatch(klass, superclass) {
     if (superclassOf(klass) !== superclass) {
-      throw Opal.TypeError.$new("superclass mismatch for class " + name);
+      throw Opal.TypeError.$new("superclass mismatch for class " + klass.$$name);
     }
   }
 
@@ -557,8 +557,7 @@
 
   function find_existing_module(scope, name) {
     var module = const_get_name(scope, name);
-    // FIXME
-    // if (module == null && scope === _Object) module = const_lookup_ancestors(_Object, name);
+    if (module == null && scope === _Object) module = const_lookup_ancestors(_Object, name);
 
     if (module) {
       if (!module.$$is_module && module !== _Object) {
@@ -1022,27 +1021,13 @@
   // @param stubs [Array] an array of method stubs to add
   // @return [undefined]
   Opal.add_stubs = function(stubs) {
-    var subscriber, subscribers = Opal.stub_subscribers,
-        i, ilength = stubs.length,
-        j, jlength = subscribers.length,
-        method_name, stub,
-        opal_stubs = Opal.stubs;
+    var proto = Opal.BasicObject.prototype;
 
-    for (i = 0; i < ilength; i++) {
-      method_name = stubs[i];
+    for (var i = 0, length = stubs.length; i < length; i++) {
+      var stub = stubs[i], existing_method = proto[stub];
 
-      if(!opal_stubs.hasOwnProperty(method_name)) {
-        // Save method name to populate other subscribers with this stub
-        opal_stubs[method_name] = true;
-        stub = Opal.stub_for(method_name);
-
-        for (j = 0; j < jlength; j++) {
-          subscriber = subscribers[j];
-
-          if (!(method_name in subscriber)) {
-            $defineProperty(subscriber, method_name, stub);
-          }
-        }
+      if (existing_method == null || existing_method.$$stub) {
+        Opal.add_stub_for(proto, stub);
       }
     }
   };
