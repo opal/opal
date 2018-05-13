@@ -656,22 +656,15 @@
   // @return [Class]
   Opal.build_object_singleton_class = function(object) {
     var superclass = object.$$class,
-        name = "#<Class:#<" + superclass.$$name + ":" + superclass.$$id + ">>";
+        klass = Opal.allocate_class(nil, superclass, function(){});
 
-    var alloc = Opal.boot_class_alloc(name, function(){}, superclass)
-    var klass = Opal.setup_class_object(name, alloc, superclass.$$name, superclass.constructor);
+    klass.$$is_singleton = true;
+    klass.$$singleton_of = object;
 
-    $defineProperty(klass, '$$super', superclass);
-    $defineProperty(klass, '$$parent', superclass);
-    $defineProperty(klass, '$$class', superclass.$$class);
+    object.$$meta = klass;
 
-    $defineProperty(klass, '$$is_singleton', true);
-    $defineProperty(klass, '$$singleton_of', object);
+    object.__proto__ = object.$$meta.prototype;
 
-    $defineProperty(klass, '$$ancestors', [klass].concat(superclass.$$ancestors));
-    superclass.$$children.push(klass);
-
-    $defineProperty(object, '$$meta', klass);
     return klass;
   };
 
@@ -2312,6 +2305,7 @@
   // Nil
   function $NilClass() {};
   Opal.NilClass = Opal.allocate_class('NilClass', Opal.Object, $NilClass);
+  Opal.const_set(_Object, 'NilClass', Opal.NilClass);
   nil = Opal.nil = new Opal.NilClass();
   nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
