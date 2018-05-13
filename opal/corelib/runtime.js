@@ -790,37 +790,6 @@
     return value;
   }
 
-  // Bridges a single method.
-  //
-  // @param target [JS::Function] the constructor of the bridged class
-  // @param from [Module] the module/class we are importing the method from
-  // @param name [String] the method name in JS land (i.e. starting with $)
-  // @param body [JS::Function] the body of the method
-  Opal.bridge_method = function(target_constructor, from, name, body) {
-    var ancestors, i, ancestor, length;
-
-    ancestors = target_constructor.$$bridge.$$ancestors;
-
-    // order important here, we have to check for method presence in
-    // ancestors from the bridged class to the last ancestor
-    for (i = 0, length = ancestors.length; i < length; i++) {
-      ancestor = ancestors[i];
-
-      if ($hasOwn.call(ancestor.prototype, name) &&
-          ancestor.prototype[name] &&
-          !ancestor.prototype[name].$$donated &&
-          !ancestor.prototype[name].$$stub &&
-          ancestor !== from) {
-        break;
-      }
-
-      if (ancestor === from) {
-        $defineProperty(target_constructor.prototype, name, body);
-        break;
-      }
-    }
-  };
-
   // Walks the dependency tree detecting the presence of the base among its
   // own dependencies.
   //
