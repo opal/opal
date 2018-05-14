@@ -105,13 +105,7 @@ module Opal
         compile_receiver
         compile_method
 
-        # will never come back null with method missing on
-        if compiler.method_missing?
-          wrap '(!(', '.$$stub) ? "super" : nil)'
-        else
-          # TODO: With method_missing support off, something breaks in runtime.js's chain
-          wrap '((', ') != null ? "super" : nil)'
-        end
+        wrap '((', ') != null ? "super" : nil)'
       end
     end
 

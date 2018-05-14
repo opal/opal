@@ -470,7 +470,6 @@
       proto = proto.__proto__;
     }
 
-    debugger;
     throw new Error('Broken prototype chain');
   }
 
@@ -1097,35 +1096,32 @@
 
   // Super dispatcher
   Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, defs) {
-    var proto = obj.__proto__,
-        jsid = '$' + mid,
-        function_for_lookup = current_func;
+    var jsid = '$' + mid, ancestors, super_method;
 
-    // special case when current function is an alias to another function
-    // then we need to find generated wrapper in the ancestors prototype
-    // and get a method with original name from its parent
-    if (current_func.$$called_as_alias) {
-      jsid = current_func.$$called_as_alias.wrapper_name;
-      function_for_lookup = current_func.$$called_as_alias.wrapper;
+    if (obj.hasOwnProperty('$$meta')) {
+      ancestors = Opal.ancestors(obj.$$meta);
+    } else {
+      ancestors = Opal.ancestors(obj.$$class);
     }
 
-    while (proto) {
-      var method = proto.hasOwnProperty(jsid) ? proto[jsid] : null;
+    var current_index = ancestors.indexOf(current_func.$$owner);
 
-      if (method === function_for_lookup) {
-        // found
+    for (var i = current_index + 1; i < ancestors.length; i++) {
+      var ancestor = ancestors[i];
+
+      if (ancestor.prototype.hasOwnProperty(jsid)) {
+        var method = ancestor.prototype[jsid];
+
+        if (!method.$$stub) {
+          super_method = method;
+        }
         break;
       }
-
-      proto = proto.__proto__;
     }
 
-    // parent of the current proto
-    var dispatcher = proto.__proto__;
+    debugger;
 
-    super_method = dispatcher['$' + mid];
-
-    if (!defcheck && super_method.$$stub && Opal.Kernel.$method_missing === obj.$method_missing) {
+    if (!defcheck && super_method == null && Opal.Kernel.$method_missing === obj.$method_missing) {
       // method_missing hasn't been explicitly defined
       throw Opal.NoMethodError.$new('super: no superclass method `'+mid+"' for "+obj, mid);
     }
@@ -1474,6 +1470,7 @@
 
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(module, jsid, body) {
+    body.$$owner = module;
     module.prototype[jsid] = body;
 
     if (module.$$is_module) {
@@ -1583,10 +1580,7 @@
 
       if (block != null) { alias.$$p = null }
 
-      body.$$called_as_alias = { wrapper: alias, wrapper_name: id };
-      var result = Opal.send(this, body, args, block)
-      delete body.$$called_as_alias;
-      return result;
+      return Opal.send(this, body, args, block);
     };
 
     // Try to make the browser pick the right name
