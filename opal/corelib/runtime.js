@@ -859,6 +859,10 @@
 
     for (var i = 0, length = ancestors.length; i < length; i++) {
       var ancestor = ancestors[i], iclass = create_iclass(ancestor);
+
+      if (ancestor === includer) {
+        throw Opal.ArgumentError.$new('cyclic include detected');
+      }
       iclasses.push(iclass);
     }
 
