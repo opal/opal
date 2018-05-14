@@ -273,4 +273,6 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf returns a String in the argument's encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "Kernel.sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
+  fails "Kernel#is_a? returns true if given a Module that object has been extended with" # Requires string mutability
+  fails "Kernel#kind_of? returns true if given a Module that object has been extended with" # Requires string mutability
 end

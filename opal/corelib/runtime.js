@@ -673,6 +673,8 @@
     meta.$$singleton_of = mod;
     mod.$$meta = meta;
     mod.__proto__ = meta.prototype;
+    // Restoring ModuleName.class
+    mod.$$class = Opal.Module;
 
     return meta;
   }
