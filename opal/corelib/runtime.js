@@ -1545,6 +1545,10 @@
 
   // Define a singleton method on the given object (see Opal.def).
   Opal.defs = function(obj, jsid, body) {
+    if (obj.$$is_string || obj.$$is_number) {
+      // That's simply impossible
+      return;
+    }
     Opal.defn(Opal.get_singleton_class(obj), jsid, body)
   };
 
