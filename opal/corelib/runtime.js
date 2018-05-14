@@ -1486,6 +1486,14 @@
         iclass[jsid] = body;
       }
     }
+
+    var singleton_of = module.$$singleton_of;
+    if (module.$method_added && !module.$method_added.$$stub && !singleton_of) {
+      module.$method_added(jsid.substr(1));
+    }
+    else if (singleton_of && singleton_of.$singleton_method_added && !singleton_of.$singleton_method_added.$$stub) {
+      singleton_of.$singleton_method_added(jsid.substr(1));
+    }
   }
 
   // Define a singleton method on the given object (see Opal.def).
