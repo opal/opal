@@ -1,27 +1,16 @@
-module Root
-  module M1; end
-  module M2; end
-  module M3; include M2; end
-
-  module M2; include M1; end
-
-  module M3; include M2; end # 2nd include
+module M
+  A = 1
 end
 
-p Root::M3.ancestors
-p [Root::M3, Root::M2, Root::M1]
+module N
+  A = 2
+end
 
-# module A; end
-# module B; end
-# module C; end
+class K; end
 
-# A.include(C)
-# B.include(C)
-
-# class D; include A; end
-
-# p D.ancestors
-
-# D.include B
-
-# p D.ancestors
+K.include M
+p K::A
+p 1
+K.include N
+p K::A
+p 2

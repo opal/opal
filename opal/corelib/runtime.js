@@ -930,6 +930,8 @@
       chain.last.__proto__ = next_ancestor;
       parent.__proto__ = chain.first;
     }
+
+    Opal.const_cache_version++;
   }
 
   function create_iclass(module) {
