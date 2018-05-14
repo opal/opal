@@ -1,7 +1,5 @@
-class Class
-  def self.new(superclass = Object, &block)
-    %x{
-      superclass.$inherited(klass)
-    }
-  end
+class MyString < String
 end
+
+`debugger`
+123

@@ -1,6 +1,6 @@
 module Opal
-  def self.bridge(klass, constructor)
-    `Opal.bridge(klass, constructor)`
+  def self.bridge(constructor, klass)
+    `Opal.bridge(constructor, klass)`
   end
 
   def self.type_error(object, type, method = nil, coerced = nil)

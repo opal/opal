@@ -515,7 +515,7 @@
     }
 
     if (bridged) {
-      Opal.bridge(superclass, bridged);
+      Opal.bridge(bridged);
       klass = bridged;
     } else {
       // Create the class object (instance of Class)
@@ -952,9 +952,19 @@
   // @param constructor [JS.Function] native JavaScript constructor to use
   // @return [Class] returns the passed Ruby class
   //
-  Opal.bridge = function(klass, constructor) {
+  Opal.bridge = function(constructor, klass) {
     if (constructor.hasOwnProperty('$$bridge')) {
       throw Opal.ArgumentError.$new("already bridged");
+    }
+
+    var klass_to_inject, klass_reference;
+
+    if (klass == null) {
+      klass_to_inject = Opal.Object;
+      klass_reference = constructor;
+    } else {
+      klass_to_inject = klass;
+      klass_reference = klass;
     }
 
     // constructor is a JS function with a prototype chain like:
@@ -970,12 +980,12 @@
     //         - super
     //
 
-    constructor.prototype.__proto__ = klass.prototype;
-    constructor.prototype.$$class = constructor;
-    constructor.$$bridge = klass;
+    constructor.prototype.__proto__ = klass_to_inject.prototype;
+    constructor.prototype.$$class = klass_reference;
+    constructor.$$bridge = true;
     constructor.$$is_class = true;
     constructor.$$is_a_module = true;
-    constructor.$$super = klass;
+    constructor.$$super = klass_to_inject;
     constructor.$$const = {};
     constructor.__proto__ = Opal.Class.prototype;
   };
@@ -1280,7 +1290,7 @@
   };
 
   Opal.is_a = function(object, klass) {
-    if (object.$$meta === klass || object.$$class === klass) {
+    if (klass != null && object.$$meta === klass || object.$$class === klass) {
       return true;
     }
 
