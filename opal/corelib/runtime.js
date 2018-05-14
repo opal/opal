@@ -862,6 +862,7 @@
       if (ancestor === includer) {
         throw Opal.ArgumentError.$new('cyclic include detected');
       }
+      iclass.$$included = true;
       iclasses.push(iclass);
     }
 
@@ -966,6 +967,19 @@
     for (; proto && proto.__proto__; proto = proto.__proto__) {
       mod = protoToModule(proto);
       if (mod) {
+        result.push(mod);
+      }
+    }
+
+    return result;
+  }
+
+  Opal.included_modules = function(module) {
+    var result = [], mod = null, proto = module.prototype.__proto__;
+
+    for (; proto && proto.__proto__; proto = proto.__proto__) {
+      mod = protoToModule(proto);
+      if (mod && mod.$$is_module && proto.$$iclass && proto.$$included) {
         result.push(mod);
       }
     }
@@ -1118,8 +1132,6 @@
         break;
       }
     }
-
-    debugger;
 
     if (!defcheck && super_method == null && Opal.Kernel.$method_missing === obj.$method_missing) {
       // method_missing hasn't been explicitly defined

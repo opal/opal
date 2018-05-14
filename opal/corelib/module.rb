@@ -415,19 +415,7 @@ class Module
   end
 
   def included_modules
-    %x{
-      var results = [];
-
-      for (var i = 0, ancestors = self.$$ancestors, length = ancestors.length; i < length; i++) {
-        var ancestor = ancestors[i];
-
-        if (ancestor !== self && ancestor.$$is_module) {
-          results.push(ancestor);
-        }
-      }
-
-      return results;
-    }
+    `Opal.included_modules(self)`
   end
 
   def include?(mod)
