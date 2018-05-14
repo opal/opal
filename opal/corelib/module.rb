@@ -1,10 +1,18 @@
 class Module
   def self.allocate
     %x{
-      var module;
-
-      module = Opal.allocate_module(nil, function(){});
+      var module = Opal.allocate_module(nil, function(){});
       return module;
+    }
+  end
+
+  def self.inherited(klass)
+    %x{
+      klass.$allocate = function() {
+        var module = Opal.allocate_module(nil, function(){});
+        module.__proto__ = klass.prototype;
+        return module;
+      }
     }
   end
 
