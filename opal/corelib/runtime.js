@@ -834,6 +834,10 @@
     return false;
   }
 
+  function isRoot(proto) {
+    return proto.hasOwnProperty('$$iclass') && proto.hasOwnProperty('$$root');
+  }
+
   // The actual inclusion of a module into a class.
   //
   // ## Class `$$parent` and `iclass`
@@ -853,15 +857,16 @@
   // @param includer [Module] the target class to include module into
   // @return [null]
   Opal.append_features = function(module, includer) {
-    var ancestors = Opal.ancestors(module);
+    var module_ancestors = Opal.ancestors(module),
+        includer_ancestors = Opal.ancestors(includer);
     var iclasses = [];
 
-    for (var i = 0, length = ancestors.length; i < length; i++) {
-      var ancestor = ancestors[i], iclass = create_iclass(ancestor);
+    if (module_ancestors.indexOf(includer) !== -1) {
+      throw Opal.ArgumentError.$new('cyclic include detected');
+    }
 
-      if (ancestor === includer) {
-        throw Opal.ArgumentError.$new('cyclic include detected');
-      }
+    for (var i = 0, length = module_ancestors.length; i < length; i++) {
+      var ancestor = module_ancestors[i], iclass = create_iclass(ancestor);
       iclass.$$included = true;
       iclasses.push(iclass);
     }
@@ -869,9 +874,62 @@
     var chain = chain_iclasses(iclasses),
         first = chain.first, last = chain.last;
 
-    // includer -> chain.first -> ...chain... -> chain.last -> includer.parent
-    chain.last.__proto__ = includer.prototype.__proto__;
-    includer.prototype.__proto__ = chain.first;
+    first.$$root = true;
+
+    if (includer_ancestors.indexOf(module) === -1) {
+      // first time include
+
+      // includer -> chain.first -> ...chain... -> chain.last -> includer.parent
+      chain.last.__proto__ = includer.prototype.__proto__;
+      includer.prototype.__proto__ = chain.first;
+    } else {
+      // The module has been already included,
+      // we don't need to put it into the ancestors chain again,
+      // but this module may have new included modules.
+      // If it's true we need to copy them.
+      //
+      // The simplest way is to replace ancestors chain from
+      //          parent
+      //            |
+      //   `module` iclass (has a $$root flag)
+      //            |
+      //   ...previos chain of module.included_modules ...
+      //            |
+      //  "next ancestor" (has a $$root flag or is a real class)
+      //
+      // to
+      //          parent
+      //            |
+      //    `module` iclass (has a $$root flag)
+      //            |
+      //   ...regenerated chain of module.included_modules
+      //            |
+      //   "next ancestor" (has a $$root flag or is a real class)
+      //
+      // because there are no intermediate classes between `parent` and `next ancestor`.
+      // It doesn't break any prototypes of other objects as we don't change class references.
+
+      var proto = includer.prototype, parent = proto, module_iclass = parent.__proto__;
+
+      while (proto != null) {
+        if (isRoot(module_iclass) && module_iclass.$$module === module) {
+          break;
+        }
+
+        parent = module_iclass;
+        module_iclass = module_iclass.__proto__;
+      }
+
+      var next_ancestor = module_iclass.__proto__;
+
+      // skip non-root iclasses (that were recursively included)
+      while (next_ancestor.hasOwnProperty('$$iclass') && !isRoot(next_ancestor)) {
+        next_ancestor = next_ancestor.__proto__;
+      }
+
+      chain.last.__proto__ = next_ancestor;
+      parent.__proto__ = chain.first;
+    }
   }
 
   function create_iclass(module) {
