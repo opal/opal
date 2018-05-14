@@ -1,31 +1,15 @@
-# binary_plus = Class.new(String) do
-#   alias_method :plus, :+
-#   def +(a)
-#     plus(a) + "!"
-#   end
-# end
-# s = binary_plus.new("a")
+object1 = Object.new
+class << object1
+  CONST = 1
 
-
-# require 'pry'; binding.pry
-
-
-# p s + s + s
-
-
-class MyString1 < String
-  def my1
-  end
+  def m; end
 end
 
-class MyString2 < String
-  def my2
-  end
+object1.m
+
+object2 = object1.clone
+
+class << object2
+  p CONST
 end
-
-s1 = MyString1.new("one")
-s2 = MyString2.new("two")
-
-`debugger`
-
-123
+object2.m

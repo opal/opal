@@ -1460,11 +1460,15 @@
   };
 
   // Define method on a module or class (see Opal.def).
-  Opal.defn = function(klass, jsid, body) {
-    klass.prototype[jsid] = body;
+  Opal.defn = function(module, jsid, body) {
+    module.prototype[jsid] = body;
 
-    if (klass.$$is_module) {
-      for (var i = 0, iclasses = klass.$$iclasses, length = iclasses.length; i < length; i++) {
+    if (module.$$is_module) {
+      if (module.$$module_function) {
+        Opal.defs(module, jsid, body)
+      }
+
+      for (var i = 0, iclasses = module.$$iclasses, length = iclasses.length; i < length; i++) {
         var iclass = iclasses[i];
         iclass[jsid] = body;
       }
