@@ -1094,12 +1094,21 @@
   // Super dispatcher
   Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, defs) {
     var proto = obj.__proto__,
-        jsid = '$' + mid;
+        jsid = '$' + mid,
+        function_for_lookup = current_func;
+
+    // special case when current function is an alias to another function
+    // then we need to find generated wrapper in the ancestors prototype
+    // and get a method with original name from its parent
+    if (current_func.$$called_as_alias) {
+      jsid = current_func.$$called_as_alias.wrapper_name;
+      function_for_lookup = current_func.$$called_as_alias.wrapper;
+    }
 
     while (proto) {
       var method = proto.hasOwnProperty(jsid) ? proto[jsid] : null;
 
-      if (method === current_func) {
+      if (method === function_for_lookup) {
         // found
         break;
       }
@@ -1562,7 +1571,10 @@
 
       if (block != null) { alias.$$p = null }
 
-      return Opal.send(this, body, args, block);
+      body.$$called_as_alias = { wrapper: alias, wrapper_name: id };
+      var result = Opal.send(this, body, args, block)
+      delete body.$$called_as_alias;
+      return result;
     };
 
     // Try to make the browser pick the right name
