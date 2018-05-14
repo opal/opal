@@ -413,14 +413,14 @@
       }
     }
 
-    klass.$$name = name;
-    klass.$$const = {};
-    klass.$$is_class = true;
-    klass.$$is_a_module = true;
-    klass.$$super = superclass;
-    klass.$$cvars = {};
+    $defineProperty(klass, '$$name', name);
+    $defineProperty(klass, '$$const', {});
+    $defineProperty(klass, '$$is_class', true);
+    $defineProperty(klass, '$$is_a_module', true);
+    $defineProperty(klass, '$$super', superclass);
+    $defineProperty(klass, '$$cvars', {});
 
-    klass.prototype.$$class = klass;
+    $defineProperty(klass.prototype, '$$class', klass);
 
     // By default if there are no singleton class methods
     // __proto__ is Class.prototype
@@ -554,13 +554,13 @@
   Opal.allocate_module = function(name, constructor) {
     var module = constructor;
 
-    module.$$name = name;
-    module.$$const = {};
-    module.$$is_module = true;
-    module.$$is_a_module = true;
-    module.$$super = Opal.Module;
-    module.$$cvars = {};
-    module.$$iclasses = [];
+    $defineProperty(module, '$$name', name);
+    $defineProperty(module, '$$const', {});
+    $defineProperty(module, '$$is_module', true);
+    $defineProperty(module, '$$is_a_module', true);
+    $defineProperty(module, '$$super', Opal.Module);
+    $defineProperty(module, '$$cvars', {});
+    $defineProperty(module, '$$iclasses', []);
 
     module.__proto__ = Opal.Module.prototype;
 
@@ -652,12 +652,12 @@
 
     meta = Opal.allocate_class(null, superclass, function(){});
 
-    meta.$$is_singleton = true;
-    meta.$$singleton_of = klass;
-    klass.$$meta = meta;
+    $defineProperty(meta, '$$is_singleton', true);
+    $defineProperty(meta, '$$singleton_of', klass);
+    $defineProperty(klass, '$$meta', meta);
     klass.__proto__ = meta.prototype;
     // Restoring ClassName.class
-    klass.$$class = Opal.Class
+    $defineProperty(klass, '$$class', Opal.Class);
 
     return meta;
   };
@@ -669,12 +669,12 @@
 
     var meta = Opal.allocate_class(null, Opal.Module, function(){});
 
-    meta.$$is_singleton = true;
-    meta.$$singleton_of = mod;
-    mod.$$meta = meta;
+    $defineProperty(meta, '$$is_singleton', true);
+    $defineProperty(meta, '$$singleton_of', mod);
+    $defineProperty(mod, '$$meta', meta);
     mod.__proto__ = meta.prototype;
     // Restoring ModuleName.class
-    mod.$$class = Opal.Module;
+    $defineProperty(mod, '$$class', Opal.Module);
 
     return meta;
   }
@@ -687,11 +687,11 @@
     var superclass = object.$$class,
         klass = Opal.allocate_class(nil, superclass, function(){});
 
-    klass.$$is_singleton = true;
-    klass.$$singleton_of = object;
+    $defineProperty(klass, '$$is_singleton', true);
+    $defineProperty(klass, '$$singleton_of', object);
     delete klass.prototype.$$class;
 
-    object.$$meta = klass;
+    $defineProperty(object, '$$meta', klass);
 
     object.__proto__ = object.$$meta.prototype;
 
@@ -837,14 +837,14 @@
 
     for (var i = 0, length = module_ancestors.length; i < length; i++) {
       var ancestor = module_ancestors[i], iclass = create_iclass(ancestor);
-      iclass.$$included = true;
+      $defineProperty(iclass, '$$included', true);
       iclasses.push(iclass);
     }
 
     var chain = chain_iclasses(iclasses),
         first = chain.first, last = chain.last;
 
-    first.$$root = true;
+    $defineProperty(first, '$$root', true);
 
     if (includer_ancestors.indexOf(module) === -1) {
       // first time include
@@ -905,9 +905,18 @@
   }
 
   function create_iclass(module) {
-    var iclass = Object.assign({}, module.prototype);
-    iclass.$$iclass = true;
-    iclass.$$module = module;
+    var iclass = {},
+        proto = module.prototype,
+        props = Object.getOwnPropertyNames(proto),
+        length = props.length, i;
+
+    for (i = 0; i < length; i++) {
+      var prop = props[i];
+      $defineProperty(iclass, prop, proto[prop]);
+    }
+
+    $defineProperty(iclass, '$$iclass', true);
+    $defineProperty(iclass, '$$module', module);
 
     module.$$iclasses.push(iclass);
 
@@ -982,12 +991,12 @@
     //
 
     constructor.prototype.__proto__ = klass_to_inject.prototype;
-    constructor.prototype.$$class = klass_reference;
-    constructor.$$bridge = true;
-    constructor.$$is_class = true;
-    constructor.$$is_a_module = true;
-    constructor.$$super = klass_to_inject;
-    constructor.$$const = {};
+    $defineProperty(constructor.prototype, '$$class', klass_reference);
+    $defineProperty(constructor, '$$bridge', true);
+    $defineProperty(constructor, '$$is_class', true);
+    $defineProperty(constructor, '$$is_a_module', true);
+    $defineProperty(constructor, '$$super', klass_to_inject);
+    $defineProperty(constructor, '$$const', {});
     constructor.__proto__ = Opal.Class.prototype;
   };
 
@@ -1522,7 +1531,7 @@
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(module, jsid, body) {
     body.$$owner = module;
-    module.prototype[jsid] = body;
+    $defineProperty(module.prototype, jsid, body);
 
     if (module.$$is_module) {
       if (module.$$module_function) {
@@ -1531,7 +1540,7 @@
 
       for (var i = 0, iclasses = module.$$iclasses, length = iclasses.length; i < length; i++) {
         var iclass = iclasses[i];
-        iclass[jsid] = body;
+        $defineProperty(iclass, jsid, body);
       }
     }
 
@@ -2143,8 +2152,7 @@
   Opal.const_set(_Object, "Module",       Module);
   Opal.const_set(_Object, "Class",        Class);
 
-
-  // Fix booted classes to use their metaclass
+  // Fix booted classes to have correct .class value
   BasicObject.$$class = Class;
   _Object.$$class     = Class;
   Module.$$class      = Class;
