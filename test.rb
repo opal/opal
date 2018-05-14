@@ -1,17 +1,20 @@
-p "foo".split("bar")
-p ["foo"]
+class SubString < String
+  attr_reader :special
 
-p "foo".split("bar", -1)
-p ["foo"]
+  def initialize(str=nil)
+    # raise 'DEAD'
+    @special = str
+  end
+end
 
-p "foo".split("bar", 0)
-p ["foo"]
+# s = SubString.new
+# p s.special
+# p nil
+# p s
+# p ""
 
-p "foo".split("bar", 1)
-p ["foo"]
-
-p "foo".split("bar", 2)
-p ["foo"]
-
-p "foo".split("bar", 3)
-p ["foo"]
+s = SubString.new "subclass"
+# p s.special
+# p "subclass"
+p s
+# p ""
