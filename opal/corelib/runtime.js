@@ -802,38 +802,6 @@
     return value;
   }
 
-  // Walks the dependency tree detecting the presence of the base among its
-  // own dependencies.
-  //
-  // @param [Integer] base_id The id of the base module (eg. the "includer")
-  // @param [Array<Module>] deps The array of dependencies (eg. the included module, included.$$deps)
-  // @param [String] prop The property that holds dependencies (eg. "$$deps")
-  // @param [JS::Object] seen A JS object holding the cache of already visited objects
-  // @return [Boolean] true if a cyclic dependency is present
-  Opal.has_cyclic_dep = function has_cyclic_dep(base_id, deps, prop, seen) {
-    var i, dep_id, dep;
-
-    for (i = deps.length - 1; i >= 0; i--) {
-      dep = deps[i];
-      dep_id = dep.$$id;
-
-      if (seen[dep_id]) {
-        continue;
-      }
-      seen[dep_id] = true;
-
-      if (dep_id === base_id) {
-        return true;
-      }
-
-      if (has_cyclic_dep(base_id, dep[prop], prop, seen)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   function isRoot(proto) {
     return proto.hasOwnProperty('$$iclass') && proto.hasOwnProperty('$$root');
   }
