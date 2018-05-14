@@ -905,7 +905,6 @@
   function create_iclass(module) {
     var iclass = Object.assign({}, module.prototype);
     iclass.$$iclass = true;
-    iclass.$$class = 'iclass'; // no class
     iclass.$$module = module;
 
     module.$$iclasses.push(iclass);
