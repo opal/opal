@@ -15,7 +15,7 @@ module Opal
 
         push '(function($base, $parent_nesting) {'
         line "  function $#{name}() {};"
-        line "  var $#{name}, self = $#{name} = $module($base, '#{name}', $#{name});"
+        line "  var self = $#{name} = $module($base, '#{name}', $#{name});"
 
         in_scope do
           scope.name = name

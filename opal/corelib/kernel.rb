@@ -120,7 +120,10 @@ module Kernel
         }
 
         self_singleton_class.$$const = Object.assign({}, other_singleton_class.$$const);
-        self_singleton_class.prototype.__proto__ = other_singleton_class.prototype.__proto__;
+        Object.setPrototypeOf(
+          self_singleton_class.prototype,
+          Object.getPrototypeOf(other_singleton_class.prototype)
+        );
       }
 
       for (i = 0, names = Object.getOwnPropertyNames(other), length = names.length; i < length; i++) {

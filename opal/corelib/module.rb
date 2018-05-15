@@ -10,7 +10,7 @@ class Module
     %x{
       klass.$allocate = function() {
         var module = Opal.allocate_module(nil, function(){});
-        module.__proto__ = klass.prototype;
+        Object.setPrototypeOf(module, klass.prototype);
         return module;
       }
     }

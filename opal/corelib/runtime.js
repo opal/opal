@@ -408,7 +408,7 @@
             self = new (Function.prototype.bind.apply(superclass, [null].concat(args)))();
 
         // and replacing a __proto__ manually
-        self.__proto__ = klass.prototype;
+        Object.setPrototypeOf(self, klass.prototype);
         return self;
       }
     }
@@ -427,11 +427,11 @@
     // Later singleton methods generate a singleton_class
     // and inject it into ancestors chain
     if (Opal.Class) {
-      klass.__proto__ = Opal.Class.prototype;
+      Object.setPrototypeOf(klass, Opal.Class.prototype);
     }
 
     if (superclass != null) {
-      klass.prototype.__proto__ = superclass.prototype
+      Object.setPrototypeOf(klass.prototype, superclass.prototype);
 
       if (superclass !== Opal.Module && superclass.$$meta) {
         // If superclass has metaclass then we have explicitely inherit it.
@@ -445,7 +445,7 @@
 
   function find_existing_class(scope, name) {
     // Try to find the class in the current scope
-    klass = const_get_name(scope, name);
+    var klass = const_get_name(scope, name);
 
     // If the class exists in the scope, then we must use that
     if (klass) {
@@ -459,7 +459,7 @@
   }
 
   function superclassOf(klass) {
-    var proto = klass.prototype.__proto__;
+    var proto = Object.getPrototypeOf(klass.prototype);
 
     while (proto) {
       var mod = protoToModule(proto);
@@ -467,7 +467,7 @@
         return mod;
       }
 
-      proto = proto.__proto__;
+      proto = Object.getPrototypeOf(proto);
     }
 
     throw new Error('Broken prototype chain');
@@ -562,7 +562,7 @@
     $defineProperty(module, '$$cvars', {});
     $defineProperty(module, '$$iclasses', []);
 
-    module.__proto__ = Opal.Module.prototype;
+    Object.setPrototypeOf(module, Opal.Module.prototype);
 
     return module;
   }
@@ -655,7 +655,7 @@
     $defineProperty(meta, '$$is_singleton', true);
     $defineProperty(meta, '$$singleton_of', klass);
     $defineProperty(klass, '$$meta', meta);
-    klass.__proto__ = meta.prototype;
+    Object.setPrototypeOf(klass, meta.prototype);
     // Restoring ClassName.class
     $defineProperty(klass, '$$class', Opal.Class);
 
@@ -672,7 +672,7 @@
     $defineProperty(meta, '$$is_singleton', true);
     $defineProperty(meta, '$$singleton_of', mod);
     $defineProperty(mod, '$$meta', meta);
-    mod.__proto__ = meta.prototype;
+    Object.setPrototypeOf(mod, meta.prototype);
     // Restoring ModuleName.class
     $defineProperty(mod, '$$class', Opal.Module);
 
@@ -693,7 +693,7 @@
 
     $defineProperty(object, '$$meta', klass);
 
-    object.__proto__ = object.$$meta.prototype;
+    Object.setPrototypeOf(object, object.$$meta.prototype);
 
     return klass;
   };
@@ -850,8 +850,8 @@
       // first time include
 
       // includer -> chain.first -> ...chain... -> chain.last -> includer.parent
-      chain.last.__proto__ = includer.prototype.__proto__;
-      includer.prototype.__proto__ = chain.first;
+      Object.setPrototypeOf(chain.last, Object.getPrototypeOf(includer.prototype));
+      Object.setPrototypeOf(includer.prototype, chain.first);
     } else {
       // The module has been already included,
       // we don't need to put it into the ancestors chain again,
@@ -879,7 +879,7 @@
       // because there are no intermediate classes between `parent` and `next ancestor`.
       // It doesn't break any prototypes of other objects as we don't change class references.
 
-      var proto = includer.prototype, parent = proto, module_iclass = parent.__proto__;
+      var proto = includer.prototype, parent = proto, module_iclass = Object.getPrototypeOf(parent);
 
       while (proto != null) {
         if (isRoot(module_iclass) && module_iclass.$$module === module) {
@@ -887,18 +887,18 @@
         }
 
         parent = module_iclass;
-        module_iclass = module_iclass.__proto__;
+        module_iclass = Object.getPrototypeOf(module_iclass);
       }
 
-      var next_ancestor = module_iclass.__proto__;
+      var next_ancestor = Object.getPrototypeOf(module_iclass);
 
       // skip non-root iclasses (that were recursively included)
       while (next_ancestor.hasOwnProperty('$$iclass') && !isRoot(next_ancestor)) {
-        next_ancestor = next_ancestor.__proto__;
+        next_ancestor = Object.getPrototypeOf(next_ancestor);
       }
 
-      chain.last.__proto__ = next_ancestor;
-      parent.__proto__ = chain.first;
+      Object.setPrototypeOf(chain.last, next_ancestor);
+      Object.setPrototypeOf(parent, chain.first);
     }
 
     Opal.const_cache_version++;
@@ -934,7 +934,7 @@
 
     for (var i = 1; i < length; i++) {
       var current = iclasses[i];
-      previous.__proto__ = current;
+      Object.setPrototypeOf(previous, current);
       previous = current;
     }
 
@@ -990,14 +990,14 @@
     //         - super
     //
 
-    constructor.prototype.__proto__ = klass_to_inject.prototype;
+    Object.setPrototypeOf(constructor.prototype, klass_to_inject.prototype);
     $defineProperty(constructor.prototype, '$$class', klass_reference);
     $defineProperty(constructor, '$$bridge', true);
     $defineProperty(constructor, '$$is_class', true);
     $defineProperty(constructor, '$$is_a_module', true);
     $defineProperty(constructor, '$$super', klass_to_inject);
     $defineProperty(constructor, '$$const', {});
-    constructor.__proto__ = Opal.Class.prototype;
+    Object.setPrototypeOf(constructor, Opal.Class.prototype);
   };
 
   function protoToModule(proto) {
@@ -1010,9 +1010,9 @@
 
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module) {
-    var result = [module], mod = null, proto = module.prototype.__proto__;
+    var result = [module], mod = null, proto = Object.getPrototypeOf(module.prototype);
 
-    for (; proto && proto.__proto__; proto = proto.__proto__) {
+    for (; proto && Object.getPrototypeOf(proto); proto = Object.getPrototypeOf(proto)) {
       mod = protoToModule(proto);
       if (mod) {
         result.push(mod);
@@ -1023,9 +1023,9 @@
   }
 
   Opal.included_modules = function(module) {
-    var result = [], mod = null, proto = module.prototype.__proto__;
+    var result = [], mod = null, proto = Object.getPrototypeOf(module.prototype);
 
-    for (; proto && proto.__proto__; proto = proto.__proto__) {
+    for (; proto && Object.getPrototypeOf(proto); proto = Object.getPrototypeOf(proto)) {
       mod = protoToModule(proto);
       if (mod && mod.$$is_module && proto.$$iclass && proto.$$included) {
         result.push(mod);
@@ -2138,10 +2138,10 @@
   Opal.Module      = Module      = Opal.allocate_class('Module', Opal.Object, $Module);
   Opal.Class       = Class       = Opal.allocate_class('Class', Opal.Module, $Class);
 
-  Opal.BasicObject.__proto__ = Opal.Class.prototype;
-  Opal.Object.__proto__      = Opal.Class.prototype;
-  Opal.Module.__proto__      = Opal.Class.prototype;
-  Opal.Class.__proto__       = Opal.Class.prototype;
+  Object.setPrototypeOf(Opal.BasicObject, Opal.Class.prototype);
+  Object.setPrototypeOf(Opal.Object, Opal.Class.prototype);
+  Object.setPrototypeOf(Opal.Module, Opal.Class.prototype);
+  Object.setPrototypeOf(Opal.Class, Opal.Class.prototype);
 
   // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
   BasicObject.$$const["BasicObject"] = BasicObject;
