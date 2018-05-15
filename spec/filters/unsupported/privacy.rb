@@ -276,4 +276,6 @@ opal_unsupported_filter "private" do
   fails "Set#flatten_merge is protected"
   fails "String#+@ returns mutable copy despite freeze-magic-comment in file" # NoMethodError: undefined method `tmp' for #<Object:0x3bdc>
   fails "StringScanner#initialize is a private method"
+  fails "Module#public_instance_method raises a NameError if the method is private"
+  fails "Module#public_instance_method raises a NameError when given a protected method name"
 end

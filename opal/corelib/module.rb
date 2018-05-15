@@ -586,6 +586,10 @@ class Module
 
   def prepend(*mods)
     %x{
+      if (mods.length === 0) {
+        #{raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'}
+      }
+
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
@@ -602,7 +606,13 @@ class Module
   end
 
   def prepend_features(prepender)
-    `Opal.prepend_features(self, prepender)`
+    %x{
+      if (!self.$$is_module) {
+        #{raise TypeError, "wrong argument type #{self.class} (expected Module)"};
+      }
+
+      Opal.prepend_features(self, prepender)
+    }
     self
   end
 

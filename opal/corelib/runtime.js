@@ -707,14 +707,20 @@
 
     for (var i = 0, l = ancestors.length; i < l; i++) {
       var ancestor = ancestors[i],
-          props = Object.getOwnPropertyNames(ancestor.prototype);
+          proto = ancestor.prototype;
+
+      if (proto.hasOwnProperty('$$dummy')) {
+        proto = proto.$$define_methods_on;
+      }
+
+      var props = Object.getOwnPropertyNames(proto);
 
       for (var j = 0, ll = props.length; j < ll; j++) {
         var prop = props[j];
 
         if (is_method(prop)) {
           var method_name = prop.slice(1),
-              method = ancestor.prototype[prop];
+              method = proto[prop];
 
           if (method.$$stub && exclude.indexOf(method_name) === -1) {
             exclude.push(method_name);
@@ -732,13 +738,19 @@
 
   Opal.own_instance_methods = function(mod) {
     var results = [],
-        props = Object.getOwnPropertyNames(mod.prototype);
+        proto = mod.prototype;
+
+    if (proto.hasOwnProperty('$$dummy')) {
+      proto = proto.$$define_methods_on;
+    }
+
+    var props = Object.getOwnPropertyNames(proto);
 
     for (var i = 0, length = props.length; i < length; i++) {
       var prop = props[i];
 
       if (is_method(prop)) {
-        var method = mod.prototype[prop];
+        var method = proto[prop];
 
         if (!method.$$stub) {
           var method_name = prop.slice(1);
@@ -827,8 +839,7 @@
   // @param includer [Module] the target class to include module into
   // @return [null]
   Opal.append_features = function(module, includer) {
-    var module_ancestors = Opal.ancestors(module),
-        includer_ancestors = Opal.ancestors(includer);
+    var module_ancestors = Opal.ancestors(module);
     var iclasses = [];
 
     if (module_ancestors.indexOf(includer) !== -1) {
@@ -841,17 +852,17 @@
       iclasses.push(iclass);
     }
 
-    var chain = chain_iclasses(iclasses),
-        first = chain.first, last = chain.last;
-
-    $defineProperty(first, '$$root', true);
+    var includer_ancestors = Opal.ancestors(includer),
+        chain = chain_iclasses(iclasses),
+        start_chain_after,
+        end_chain_on;
 
     if (includer_ancestors.indexOf(module) === -1) {
       // first time include
 
       // includer -> chain.first -> ...chain... -> chain.last -> includer.parent
-      Object.setPrototypeOf(chain.last, Object.getPrototypeOf(includer.prototype));
-      Object.setPrototypeOf(includer.prototype, chain.first);
+      start_chain_after = includer.prototype;
+      end_chain_on = Object.getPrototypeOf(includer.prototype);
     } else {
       // The module has been already included,
       // we don't need to put it into the ancestors chain again,
@@ -881,7 +892,7 @@
 
       var proto = includer.prototype, parent = proto, module_iclass = Object.getPrototypeOf(parent);
 
-      while (proto != null) {
+      while (module_iclass != null) {
         if (isRoot(module_iclass) && module_iclass.$$module === module) {
           break;
         }
@@ -897,17 +908,133 @@
         next_ancestor = Object.getPrototypeOf(next_ancestor);
       }
 
-      Object.setPrototypeOf(chain.last, next_ancestor);
-      Object.setPrototypeOf(parent, chain.first);
+      start_chain_after = parent;
+      end_chain_on = next_ancestor;
     }
+
+    Object.setPrototypeOf(start_chain_after, chain.first);
+    Object.setPrototypeOf(chain.last, end_chain_on);
 
     Opal.const_cache_version++;
   }
 
+  Opal.prepend_features = function(module, prepender) {
+    // Here we change the ancestors chain from
+    //
+    //   prepender
+    //      |
+    //    parent
+    //
+    // to:
+    //
+    // dummy(prepender)
+    //      |
+    //  iclass(module)
+    //      |
+    // iclass(prepender)
+    //      |
+    //    parent
+    var module_ancestors = Opal.ancestors(module);
+    var iclasses = [];
+
+    if (module_ancestors.indexOf(prepender) !== -1) {
+      throw Opal.ArgumentError.$new('cyclic prepend detected');
+    }
+
+    for (var i = 0, length = module_ancestors.length; i < length; i++) {
+      var ancestor = module_ancestors[i], iclass = create_iclass(ancestor);
+      $defineProperty(iclass, '$$prepended', true);
+      iclasses.push(iclass);
+    }
+
+    var chain = chain_iclasses(iclasses),
+        dummy_prepender = prepender.prototype,
+        previous_parent = Object.getPrototypeOf(dummy_prepender),
+        prepender_iclass,
+        start_chain_after,
+        end_chain_on;
+
+    if (dummy_prepender.hasOwnProperty('$$dummy')) {
+      // The module already has some prepended modules
+      // which means that we don't need to make it "dummy"
+      prepender_iclass = dummy_prepender.$$define_methods_on;
+    } else {
+      // Making the module "dummy"
+      prepender_iclass = create_dummy_iclass(prepender);
+      flush_methods_in(prepender);
+      $defineProperty(dummy_prepender, '$$dummy', true);
+      $defineProperty(dummy_prepender, '$$define_methods_on', prepender_iclass);
+
+      // Converting
+      //   dummy(prepender) -> previous_parent
+      // to
+      //   dummy(prepender) -> iclass(prepender) -> previous_parent
+      Object.setPrototypeOf(dummy_prepender, prepender_iclass);
+      Object.setPrototypeOf(prepender_iclass, previous_parent);
+    }
+
+    var prepender_ancestors = Opal.ancestors(prepender);
+
+    if (prepender_ancestors.indexOf(module) === -1) {
+      // first time prepend
+
+      start_chain_after = dummy_prepender;
+
+      // next $$root or prepender_iclass or non-$$iclass
+      end_chain_on = Object.getPrototypeOf(dummy_prepender);
+      while (end_chain_on != null) {
+        if (
+          end_chain_on.hasOwnProperty('$$root') ||
+          end_chain_on === prepender_iclass ||
+          !end_chain_on.hasOwnProperty('$$iclass')
+        ) {
+          break;
+        }
+
+        end_chain_on = Object.getPrototypeOf(end_chain_on);
+      }
+    } else {
+      throw Opal.RuntimeError.$new("Prepending a module multiple times is not supported");
+    }
+
+    Object.setPrototypeOf(start_chain_after, chain.first);
+    Object.setPrototypeOf(chain.last, end_chain_on);
+
+    Opal.const_cache_version++;
+  }
+
+  function flush_methods_in(module) {
+    var proto = module.prototype,
+        props = Object.getOwnPropertyNames(proto);
+
+    for (var i = 0; i < props.length; i++) {
+      var prop = props[i];
+      if (is_method(prop)) {
+        delete proto[prop];
+      }
+    }
+  }
+
   function create_iclass(module) {
+    var iclass = create_dummy_iclass(module);
+
+    if (module.$$is_module) {
+      module.$$iclasses.push(iclass);
+    }
+
+    return iclass;
+  }
+
+  // Dummy iclass doesn't receive updates when the module gets a new method.
+  function create_dummy_iclass(module) {
     var iclass = {},
-        proto = module.prototype,
-        props = Object.getOwnPropertyNames(proto),
+        proto = module.prototype;
+
+    if (proto.hasOwnProperty('$$dummy')) {
+      proto = proto.$$define_methods_on;
+    }
+
+    var props = Object.getOwnPropertyNames(proto),
         length = props.length, i;
 
     for (i = 0; i < length; i++) {
@@ -918,13 +1045,13 @@
     $defineProperty(iclass, '$$iclass', true);
     $defineProperty(iclass, '$$module', module);
 
-    module.$$iclasses.push(iclass);
-
     return iclass;
   }
 
   function chain_iclasses(iclasses) {
     var length = iclasses.length, first = iclasses[0];
+
+    $defineProperty(first, '$$root', true);
 
     if (length === 1) {
       return { first: first, last: first };
@@ -937,6 +1064,7 @@
       Object.setPrototypeOf(previous, current);
       previous = current;
     }
+
 
     return { first: iclasses[0], last: iclasses[length - 1] };
   }
@@ -1001,7 +1129,9 @@
   };
 
   function protoToModule(proto) {
-    if (proto.hasOwnProperty('$$iclass')) {
+    if (proto.hasOwnProperty('$$dummy')) {
+      return;
+    } else if (proto.hasOwnProperty('$$iclass')) {
       return proto.$$module;
     } else if (proto.hasOwnProperty('$$class')) {
       return proto.$$class;
@@ -1010,7 +1140,11 @@
 
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module) {
-    var result = [module], mod = null, proto = Object.getPrototypeOf(module.prototype);
+    var result = [], mod = null, proto = Object.getPrototypeOf(module.prototype);
+
+    if (!module.prototype.hasOwnProperty('$$dummy')) {
+      result.push(module)
+    }
 
     for (; proto && Object.getPrototypeOf(proto); proto = Object.getPrototypeOf(proto)) {
       mod = protoToModule(proto);
@@ -1169,10 +1303,15 @@
     var current_index = ancestors.indexOf(current_func.$$owner);
 
     for (var i = current_index + 1; i < ancestors.length; i++) {
-      var ancestor = ancestors[i];
+      var ancestor = ancestors[i],
+          proto = ancestor.prototype;
 
-      if (ancestor.prototype.hasOwnProperty(jsid)) {
-        var method = ancestor.prototype[jsid];
+      if (proto.hasOwnProperty('$$dummy')) {
+        proto = proto.$$define_methods_on;
+      }
+
+      if (proto.hasOwnProperty(jsid)) {
+        var method = proto[jsid];
 
         if (!method.$$stub) {
           super_method = method;
@@ -1531,7 +1670,12 @@
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(module, jsid, body) {
     body.$$owner = module;
-    $defineProperty(module.prototype, jsid, body);
+
+    var proto = module.prototype;
+    if (proto.hasOwnProperty('$$dummy')) {
+      proto = proto.$$define_methods_on;
+    }
+    $defineProperty(proto, jsid, body);
 
     if (module.$$is_module) {
       if (module.$$module_function) {
