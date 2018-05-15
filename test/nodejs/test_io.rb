@@ -15,10 +15,4 @@ class TestNodejsIO < Test::Unit::TestCase
       IO.binread('tmp/nonexistent')
     end
   end
-
-  def test_binread_encoding
-    File.write('tmp/foo', 'Le français c\'est compliqué :)\n')
-    assert_equal("Le fran\xC3\xA7ais c'est compliqu\xC3\xA9 :)\\n", IO.binread('tmp/foo'))
-    assert_equal("Le français c'est compliqué :)\\n", IO.binread('tmp/foo'))
-  end
 end
