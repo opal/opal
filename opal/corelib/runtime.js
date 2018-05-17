@@ -54,9 +54,6 @@
   // The Opal object that is exposed globally
   var Opal = this.Opal = {};
 
-  // All bridged classes - keep track to donate methods from Object
-  var BridgedClasses = {};
-
   // This is a useful reference to global object inside ruby files
   Opal.global = global_object;
   global_object.Opal = Opal;
@@ -1053,10 +1050,6 @@
     return { first: iclasses[0], last: iclasses[length - 1] };
   }
 
-  // Table that holds all methods that have been defined on all objects
-  // It is used for defining method stubs for new coming native classes
-  Opal.stubs = {};
-
   // For performance, some core Ruby classes are toll-free bridged to their
   // native JavaScript counterparts (e.g. a Ruby Array is a JavaScript Array).
   //
@@ -1195,13 +1188,6 @@
       }
     }
   };
-
-  // Keep a list of prototypes that want method_missing stubs to be added.
-  //
-  // @default [Prototype List] BasicObject_alloc.prototype
-  //
-  // FIXME
-  Opal.stub_subscribers = [];
 
   // Add a method_missing stub function to the given prototype for the
   // given name.
@@ -1692,8 +1678,6 @@
 
   // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
-    // TODO: remove from BridgedClasses as well
-
     if (!$hasOwn.call(obj.prototype, jsid)) {
       throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
     }
