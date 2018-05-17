@@ -114,7 +114,7 @@ module Kernel
 
         for (i = 0, length = names.length; i < length; i++) {
           name = names[i];
-          if (name.charAt(0) === '$' && name !== '$$id') {
+          if (Opal.is_method(name)) {
             self_singleton_class.prototype[name] = other_singleton_class.prototype[name];
           }
         }

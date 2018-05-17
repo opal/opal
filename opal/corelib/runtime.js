@@ -683,7 +683,7 @@
     return klass;
   };
 
-  function is_method(prop) {
+  Opal.is_method = function(prop) {
     return (prop[0] === '$' && prop[1] !== '$');
   }
 
@@ -703,7 +703,7 @@
       for (var j = 0, ll = props.length; j < ll; j++) {
         var prop = props[j];
 
-        if (is_method(prop)) {
+        if (Opal.is_method(prop)) {
           var method_name = prop.slice(1),
               method = proto[prop];
 
@@ -734,7 +734,7 @@
     for (var i = 0, length = props.length; i < length; i++) {
       var prop = props[i];
 
-      if (is_method(prop)) {
+      if (Opal.is_method(prop)) {
         var method = proto[prop];
 
         if (!method.$$stub) {
@@ -994,7 +994,7 @@
 
     for (var i = 0; i < props.length; i++) {
       var prop = props[i];
-      if (is_method(prop)) {
+      if (Opal.is_method(prop)) {
         delete proto[prop];
       }
     }
