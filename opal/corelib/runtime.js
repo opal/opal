@@ -458,23 +458,8 @@
     }
   }
 
-  function superclassOf(klass) {
-    var proto = Object.getPrototypeOf(klass.prototype);
-
-    while (proto) {
-      var mod = protoToModule(proto);
-      if (mod.$$is_class) {
-        return mod;
-      }
-
-      proto = Object.getPrototypeOf(proto);
-    }
-
-    throw new Error('Broken prototype chain');
-  }
-
   function ensureSuperclassMatch(klass, superclass) {
-    if (superclassOf(klass) !== superclass) {
+    if (klass.$$super !== superclass) {
       throw Opal.TypeError.$new("superclass mismatch for class " + klass.$$name);
     }
   }
