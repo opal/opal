@@ -468,11 +468,10 @@
     var bridged;
 
     if (scope == null) {
+      // Global scope
       scope = _Object;
-    }
-
-    // If scope is an object, use its class
-    if (!scope.$$is_class && !scope.$$is_module) {
+    } else if (!scope.$$is_class && !scope.$$is_module) {
+      // Scope is an object, use its class
       scope = scope.$$class;
     }
 
@@ -569,10 +568,10 @@
     var module;
 
     if (scope == null) {
+      // Global scope
       scope = _Object;
-    }
-
-    if (!scope.$$is_class && !scope.$$is_module) {
+    } else if (!scope.$$is_class && !scope.$$is_module) {
+      // Scope is an object, use its class
       scope = scope.$$class;
     }
 
