@@ -13,7 +13,7 @@ module Opal
       children :body
 
       def compile
-        push version_comment
+        push version_comment unless compiler.es_six_imexable?
 
         opening
         in_scope do
@@ -41,12 +41,23 @@ module Opal
           line body_code
         end
 
+        if compiler.es_six_imexable?
+          import_lines = compiler.requires.map { |module_path|
+            "import './#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
+          }
+          unshift(version_comment + "\n", *import_lines)
+        end
+
         closing
       end
 
       def opening
-        if compiler.requirable?
+        if compiler.requirable? && !compiler.es_six_imexable?
           line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
+        elsif compiler.es_six_imexable?
+          path = Pathname(compiler.file).cleanpath.to_s
+          line "export default function() {"
+          line "  Opal.modules[#{path.inspect}] = function(Opal) {"
         elsif compiler.eval?
           line '(function(Opal, self) {'
         else
@@ -55,7 +66,10 @@ module Opal
       end
 
       def closing
-        if compiler.requirable?
+        if compiler.requirable? && !compiler.es_six_imexable?
+          line "};\n"
+        elsif compiler.es_six_imexable?
+          line "  }\n"
           line "};\n"
         elsif compiler.eval?
           line '})(Opal, self)'
