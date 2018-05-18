@@ -418,6 +418,7 @@
     $defineProperty(klass, '$$cvars', {});
     $defineProperty(klass, '$$own_included_modules', []);
     $defineProperty(klass, '$$own_prepended_modules', []);
+    $defineProperty(klass, '$$own_ancestors', own_ancestors(klass));
 
     $defineProperty(klass.prototype, '$$class', klass);
 
@@ -545,6 +546,7 @@
     $defineProperty(module, '$$iclasses', []);
     $defineProperty(module, '$$own_included_modules', []);
     $defineProperty(module, '$$own_prepended_modules', []);
+    $defineProperty(module, '$$own_ancestors', [module]);
 
     Object.setPrototypeOf(module, Opal.Module.prototype);
 
@@ -875,7 +877,6 @@
       $defineProperty(iclass, '$$included', true);
       iclasses.push(iclass);
     }
-
     var includer_ancestors = Opal.ancestors(includer),
         chain = chain_iclasses(iclasses),
         start_chain_after,
@@ -941,6 +942,7 @@
 
     // recalculate own_included_modules cache
     includer.$$own_included_modules = own_included_modules(includer);
+    includer.$$own_ancestors = own_ancestors(includer);
 
     Opal.const_cache_version++;
   }
@@ -1029,6 +1031,7 @@
 
     // recalculate own_prepended_modules cache
     prepender.$$own_prepended_modules = own_prepended_modules(prepender);
+    prepender.$$own_ancestors = own_ancestors(prepender);
 
     Opal.const_cache_version++;
   }
@@ -1153,6 +1156,7 @@
     $defineProperty(constructor, '$$const', {});
     $defineProperty(constructor, '$$own_included_modules', []);
     $defineProperty(constructor, '$$own_prepended_modules', []);
+    $defineProperty(constructor, '$$own_ancestors', own_ancestors(constructor));
     Object.setPrototypeOf(constructor, Opal.Class.prototype);
   };
 
@@ -1175,7 +1179,10 @@
     var result = [];
 
     while (module) {
-      result = result.concat(own_ancestors(module));
+      for (var i = 0, mods = module.$$own_ancestors, length = mods.length; i < length; i++) {
+        result.push(mods[i]);
+      }
+
       module = module.$$super;
     }
 
