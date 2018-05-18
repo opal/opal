@@ -416,6 +416,8 @@
     $defineProperty(klass, '$$is_a_module', true);
     $defineProperty(klass, '$$super', superclass);
     $defineProperty(klass, '$$cvars', {});
+    $defineProperty(klass, '$$own_included_modules', []);
+    $defineProperty(klass, '$$own_prepended_modules', []);
 
     $defineProperty(klass.prototype, '$$class', klass);
 
@@ -539,9 +541,10 @@
     $defineProperty(module, '$$const', {});
     $defineProperty(module, '$$is_module', true);
     $defineProperty(module, '$$is_a_module', true);
-    $defineProperty(module, '$$super', Opal.Module);
     $defineProperty(module, '$$cvars', {});
     $defineProperty(module, '$$iclasses', []);
+    $defineProperty(module, '$$own_included_modules', []);
+    $defineProperty(module, '$$own_prepended_modules', []);
 
     Object.setPrototypeOf(module, Opal.Module.prototype);
 
@@ -801,6 +804,46 @@
     return proto.hasOwnProperty('$$iclass') && proto.hasOwnProperty('$$root');
   }
 
+  function own_included_modules(module) {
+    var result = [], mod, proto = module.prototype.__proto__;
+
+    while (proto) {
+      if (proto.hasOwnProperty('$$class')) {
+        // superclass
+        break;
+      }
+      mod = protoToModule(proto);
+      if (mod) {
+        result.push(mod);
+      }
+      proto = proto.__proto__;
+    }
+
+    return result;
+  }
+
+  function own_prepended_modules(module) {
+    var result = [], mod, proto = module.prototype.__proto__;
+
+    if (module.prototype.hasOwnProperty('$$dummy')) {
+      while (proto) {
+        if (proto === module.prototype.$$define_methods_on) {
+          break;
+        }
+
+        mod = protoToModule(proto);
+        if (mod) {
+          result.push(mod);
+        }
+
+        proto = proto.__proto__;
+      }
+    }
+
+    return result;
+  }
+
+
   // The actual inclusion of a module into a class.
   //
   // ## Class `$$parent` and `iclass`
@@ -896,6 +939,9 @@
     Object.setPrototypeOf(start_chain_after, chain.first);
     Object.setPrototypeOf(chain.last, end_chain_on);
 
+    // recalculate own_included_modules cache
+    includer.$$own_included_modules = own_included_modules(includer);
+
     Opal.const_cache_version++;
   }
 
@@ -980,6 +1026,9 @@
 
     Object.setPrototypeOf(start_chain_after, chain.first);
     Object.setPrototypeOf(chain.last, end_chain_on);
+
+    // recalculate own_prepended_modules cache
+    prepender.$$own_prepended_modules = own_prepended_modules(prepender);
 
     Opal.const_cache_version++;
   }
@@ -1102,6 +1151,8 @@
     $defineProperty(constructor, '$$is_a_module', true);
     $defineProperty(constructor, '$$super', klass_to_inject);
     $defineProperty(constructor, '$$const', {});
+    $defineProperty(constructor, '$$own_included_modules', []);
+    $defineProperty(constructor, '$$own_prepended_modules', []);
     Object.setPrototypeOf(constructor, Opal.Class.prototype);
   };
 
@@ -1115,19 +1166,17 @@
     }
   }
 
+  function own_ancestors(module) {
+    return module.$$own_prepended_modules.concat([module]).concat(module.$$own_included_modules);
+  }
+
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module) {
-    var result = [], mod = null, proto = Object.getPrototypeOf(module.prototype);
+    var result = [];
 
-    if (!module.prototype.hasOwnProperty('$$dummy')) {
-      result.push(module)
-    }
-
-    for (; proto && Object.getPrototypeOf(proto); proto = Object.getPrototypeOf(proto)) {
-      mod = protoToModule(proto);
-      if (mod) {
-        result.push(mod);
-      }
+    while (module) {
+      result = result.concat(own_ancestors(module));
+      module = module.$$super;
     }
 
     return result;
@@ -1716,6 +1765,10 @@
     }
   };
 
+  function is_method_body(body) {
+    return (typeof(body) === "function" && !body.$$stub);
+  }
+
   Opal.alias = function(obj, name, old) {
     var id     = '$' + name,
         old_id = '$' + old,
@@ -1727,7 +1780,7 @@
       return Opal.alias(Opal.get_singleton_class(obj), name, old);
     }
 
-    if (typeof(body) !== "function" || body.$$stub) {
+    if (!is_method_body(body)) {
       var ancestor = obj.$$super;
 
       while (typeof(body) !== "function" && ancestor) {
@@ -1735,7 +1788,12 @@
         ancestor = ancestor.$$super;
       }
 
-      if (typeof(body) !== "function" || body.$$stub) {
+      if (!is_method_body(body) && obj.$$is_module) {
+        // try to look into Object
+        body = Opal.Object.prototype[old_id]
+      }
+
+      if (!is_method_body(body)) {
         throw Opal.NameError.$new("undefined method `" + old + "' for class `" + obj.$name() + "'")
       }
     }
