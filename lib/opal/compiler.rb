@@ -122,6 +122,11 @@ module Opal
     # Prepare the code for future requires
     compiler_option :requirable, false, as: :requirable?
 
+    # @!method es_six_imeaxable?
+    #
+    # Prepare the code for future requires
+    compiler_option :es_six_imexable, false, :as => :es_six_imexable?
+
     # @!method inline_operators?
     #
     # are operators compiled inline
