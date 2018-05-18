@@ -809,7 +809,7 @@
   }
 
   function own_included_modules(module) {
-    var result = [], mod, proto = module.prototype.__proto__;
+    var result = [], mod, proto = Object.getPrototypeOf(module.prototype);
 
     while (proto) {
       if (proto.hasOwnProperty('$$class')) {
@@ -820,14 +820,14 @@
       if (mod) {
         result.push(mod);
       }
-      proto = proto.__proto__;
+      proto = Object.getPrototypeOf(proto);
     }
 
     return result;
   }
 
   function own_prepended_modules(module) {
-    var result = [], mod, proto = module.prototype.__proto__;
+    var result = [], mod, proto = Object.getPrototypeOf(module.prototype);
 
     if (module.prototype.hasOwnProperty('$$dummy')) {
       while (proto) {
@@ -840,7 +840,7 @@
           result.push(mod);
         }
 
-        proto = proto.__proto__;
+        proto = Object.getPrototypeOf(proto);
       }
     }
 
