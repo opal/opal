@@ -418,7 +418,8 @@
     $defineProperty(klass, '$$cvars', {});
     $defineProperty(klass, '$$own_included_modules', []);
     $defineProperty(klass, '$$own_prepended_modules', []);
-    $defineProperty(klass, '$$own_ancestors', own_ancestors(klass));
+    $defineProperty(klass, '$$ancestors', []);
+    $defineProperty(klass, '$$ancestors_cache_version', null);
 
     $defineProperty(klass.prototype, '$$class', klass);
 
@@ -546,7 +547,8 @@
     $defineProperty(module, '$$iclasses', []);
     $defineProperty(module, '$$own_included_modules', []);
     $defineProperty(module, '$$own_prepended_modules', []);
-    $defineProperty(module, '$$own_ancestors', [module]);
+    $defineProperty(module, '$$ancestors', [module]);
+    $defineProperty(module, '$$ancestors_cache_version', null);
 
     Object.setPrototypeOf(module, Opal.Module.prototype);
 
@@ -942,7 +944,6 @@
 
     // recalculate own_included_modules cache
     includer.$$own_included_modules = own_included_modules(includer);
-    includer.$$own_ancestors = own_ancestors(includer);
 
     Opal.const_cache_version++;
   }
@@ -1031,7 +1032,6 @@
 
     // recalculate own_prepended_modules cache
     prepender.$$own_prepended_modules = own_prepended_modules(prepender);
-    prepender.$$own_ancestors = own_ancestors(prepender);
 
     Opal.const_cache_version++;
   }
@@ -1156,7 +1156,8 @@
     $defineProperty(constructor, '$$const', {});
     $defineProperty(constructor, '$$own_included_modules', []);
     $defineProperty(constructor, '$$own_prepended_modules', []);
-    $defineProperty(constructor, '$$own_ancestors', own_ancestors(constructor));
+    $defineProperty(constructor, '$$ancestors', []);
+    $defineProperty(constructor, '$$ancestors_cache_version', null);
     Object.setPrototypeOf(constructor, Opal.Class.prototype);
   };
 
@@ -1176,15 +1177,24 @@
 
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module) {
-    var result = [];
+    if (module.$$ancestors_cache_version === Opal.const_cache_version) {
+      return module.$$ancestors;
+    }
 
-    while (module) {
-      for (var i = 0, mods = module.$$own_ancestors, length = mods.length; i < length; i++) {
+    var result = [], i, mods, length;
+
+    for (i = 0, mods = own_ancestors(module), length = mods.length; i < length; i++) {
+      result.push(mods[i]);
+    }
+
+    if (module.$$super) {
+      for (i = 0, mods = Opal.ancestors(module.$$super), length = mods.length; i < length; i++) {
         result.push(mods[i]);
       }
-
-      module = module.$$super;
     }
+
+    module.$$ancestors_cache_version = Opal.const_cache_version;
+    module.$$ancestors = result;
 
     return result;
   }
