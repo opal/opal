@@ -43,6 +43,15 @@ module Opal
 
         if compiler.es_six_imexable?
           import_lines = compiler.requires.map { |module_path|
+            # modules should have the ending .rb for imports, so that the opal-webpack-resolver-plugin
+            # or the opal-webpack-loader don't mix them up with javascript imports
+            # that is just a sensible convention for example, a require 'react', without ending:
+            # import 'react';  --> resolves to react.js in javascript space, may be resolved by webpack otherwise
+            # vs. with ending:
+            # import 'react.rb';  --> resolves to react.rb in the opal/ruby space which gets transpiled to js by the loader
+            # if a javascript file gets required by like: require 'runtime'
+            # it gets imported like so: import 'runtime.rb'
+            # the opal-webpack-resolver-plugin will then check for a runtime.rb, but also for a runtime.js if the runtime.rb is not found.
             "import './#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
           }
           unshift(version_comment + "\n", *import_lines)
