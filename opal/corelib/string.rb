@@ -269,8 +269,8 @@ class String < `String`
     return self if `width <= self.length`
 
     %x{
-      var ljustified = #{ljust ((width + @length) / 2).ceil, padstr},
-          rjustified = #{rjust ((width + @length) / 2).floor, padstr};
+      var ljustified = #{ljust ((width + `self.length`) / 2).ceil, padstr},
+          rjustified = #{rjust ((width + `self.length`) / 2).floor, padstr};
 
       return rjustified + ljustified.slice(self.length);
     }

@@ -226,11 +226,11 @@ module Opal
         file = compiler.file
         if arg.type == :str
           dir = File.dirname(file)
-          compiler.requires << Pathname(dir).join(arg.children[0]).cleanpath.to_s
+          mfn = Pathname(dir).join(arg.children[0]).cleanpath.to_s
+          compiler.requires << mfn
         end
-        push fragment("self.$require(#{file.inspect}+ '/../' + ")
-        push process(arglist)
-        push fragment(')')
+        mfn = mfn.end_with?('.rb') ? mfn : mfn + '.rb'
+        push fragment("self.$require(#{Opal::Nodes::TopNode.module_name(mfn).inspect})")
       end
 
       add_special :autoload do |compile_default|
