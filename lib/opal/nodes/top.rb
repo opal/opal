@@ -97,7 +97,7 @@ module Opal
           line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
         elsif compiler.es_six_imexable?
           line "export default function() {"
-          # line "  Opal = global.Opal;"
+          line "  Opal = global.Opal;"
           line "  global.Opal.modules[#{m_name.inspect}] = function(Opal) {"
         elsif compiler.eval?
           line '(function(Opal, self) {'
