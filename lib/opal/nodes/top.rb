@@ -64,9 +64,16 @@ module Opal
             i_name = import_name(module_path)
             i_line = "import #{i_name} from '#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
             unless module_path == 'corelib/runtime'
-              # self.$require("/Users/jan/workspace/hyperloop-repos/hyper-mesh/lib/hyper-mesh.rb"+ '/../' + "active_record_base");
-              # if (typeof Opal.modules["/Users/jan/workspace/hyperloop-repos/hyper-mesh/lib/active_record_base"] === 'undefined')
-              i_line = i_line + "if (typeof Opal.modules[#{real_m_path.inspect}] === 'undefined') { #{i_name}(); }\n"
+              # webpack replaces i_name with a function, but
+              # during bootstrapping on the client, when the imports are imported, for a circular import
+              # i_name is just a object, because the outer i_name() did not finish execution and thus
+              # the result of the webpack function looking up i_name is a object
+              # once the import returned, the result of the webpack function looking up i_name will be a function
+              # checking if i_name actually is a function will make the bootstrapping work, but code may fail later
+              # because the i_name has not been imported into local context
+              i_line = i_line + "if (typeof Opal.modules[#{real_m_path.inspect}] === 'undefined') {\n"
+              i_line = i_line + "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
+              i_line = i_line + "}\n"
             end
             i_line
           end
