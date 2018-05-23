@@ -213,16 +213,10 @@ module Opal
           elsif child_path.file?
             path_s = child_path.basename.to_s
             if path_s.end_with?('.rb') || path_s.end_with?('.js')
-              module_path = child_path.realpath.to_s[(base_dir.realpath.to_s.length+1)..-1]
-              real_m_path = if module_path.start_with?('/')
-                              t_path = module_path.end_with?('.rb') ? module_path : module_path + '.rb'
-                              self.class.module_name(t_path)
-                            else
-                              module_path
-                            end
-              i_name = import_name(module_path)
-              i_line = "import #{i_name} from '#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
-              i_line = i_line + "if (typeof Opal.modules[#{real_m_path.inspect}] === 'undefined') {\n"
+              module_path = child_path.realpath.to_s[(base_dir.realpath.to_s.length+1)..-4]
+              i_name = import_name(module_path + path_s[-3..-1])
+              i_line = "import #{i_name} from '#{module_path}#{path_s[-3..-1]}';\n"
+              i_line = i_line + "if (typeof Opal.modules[#{module_path.inspect}] === 'undefined') {\n"
               i_line = i_line + "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
               i_line = i_line + "}\n"
               import_lines << i_line # "import '#{module_path}';\n"
