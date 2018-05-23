@@ -19,6 +19,7 @@ module Opal
           m_name = self.class.module_name(compiler.file)
           opening(m_name)
         end
+
         in_scope do
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
@@ -58,6 +59,8 @@ module Opal
             real_m_path = if module_path.start_with?('/')
                             t_path = module_path.end_with?('.rb') ? module_path : module_path + '.rb'
                             self.class.module_name(t_path)
+                          elsif module_path.end_with?('.rb')
+                            self.class.module_name(module_path)
                           else
                             module_path
                           end
@@ -97,7 +100,7 @@ module Opal
           line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
         elsif compiler.es_six_imexable?
           line "export default function() {"
-          line "  Opal = global.Opal;"
+          # line "  Opal = global.Opal;"
           line "  global.Opal.modules[#{m_name.inspect}] = function(Opal) {"
         elsif compiler.eval?
           line '(function(Opal, self) {'
