@@ -59,8 +59,6 @@ module Opal
             real_m_path = if module_path.start_with?('/')
                             t_path = module_path.end_with?('.rb') ? module_path : module_path + '.rb'
                             self.class.module_name(t_path)
-                          elsif module_path.end_with?('.rb')
-                            self.class.module_name(module_path)
                           else
                             module_path
                           end
@@ -224,7 +222,9 @@ module Opal
                             end
               i_name = import_name(module_path)
               i_line = "import #{i_name} from '#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
-              i_line = i_line + "if (typeof Opal.modules[#{real_m_path.inspect}] === 'undefined') { #{i_name}(); }\n"
+              i_line = i_line + "if (typeof Opal.modules[#{real_m_path.inspect}] === 'undefined') {\n"
+              i_line = i_line + "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
+              i_line = i_line + "}\n"
               import_lines << i_line # "import '#{module_path}';\n"
             end
           end
