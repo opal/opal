@@ -70,8 +70,10 @@ module Opal
               # i_name is just a object, because the outer i_name() did not finish execution and thus
               # the result of the webpack function looking up i_name is a object
               # once the import returned, the result of the webpack function looking up i_name will be a function
-              # checking if i_name actually is a function will make the bootstrapping work, but code may fail later
-              # because the i_name has not been imported into local context
+              # checking if i_name actually is a function will make the bootstrapping work,
+              # at this the i_name has not been imported into local context, luckily the opal require happens
+              # later in time, after all the imports, then Opal.modules should be filled correctly and the opal require
+              # can be resolved
               i_line = i_line + "if (typeof Opal.modules[#{real_m_path.inspect}] === 'undefined') {\n"
               i_line = i_line + "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
               i_line = i_line + "}\n"
@@ -202,7 +204,7 @@ module Opal
       private
 
       def import_name(m_name)
-        m_name.gsub('.','o_').gsub('-','_').gsub('/','_') + rand(36**8).to_s(36)
+        m_name.gsub('.','o_').gsub('-','_').gsub('/','_').gsub('@','_at_') + rand(36**8).to_s(36)
       end
 
       def import_child_paths(import_lines, base_dir, module_path)
