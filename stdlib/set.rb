@@ -1,5 +1,4 @@
 # Portions Copyright (c) 2002-2013 Akinori MUSHA <knu@iDaemons.org>
-require 'corelib/enumerable'
 
 class Set
   include Enumerable
