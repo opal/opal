@@ -20,7 +20,6 @@ describe 'Opal.is_a' do
       [Numeric.new, Float, false],
     ].each do |(value, klass, result)|
       it "returns #{result} for Opal.is_a(#{value}, #{klass})" do
-        # p klass => `[!!klass.$$is_number_class, !!klass.$$proto.$$is_number]`
         `Opal.is_a(#{value}, #{klass})`.should == result
       end
     end

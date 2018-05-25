@@ -178,4 +178,13 @@ opal_filter "String" do
   fails "String#to_sym returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
   fails "String#upcase! modifies self in place for all of Unicode" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String.new accepts a capacity argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
+  fails "String#clone calls #initialize_copy on the new instance" # Expected nil to equal "string"
+  fails "String#clone copies constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
+  fails "String#clone copies instance variables" # NoMethodError: undefined method `ivar' for "string"
+  fails "String#clone copies modules included in the singleton class" # NoMethodError: undefined method `repr' for "string"
+  fails "String#clone copies singleton methods" # NoMethodError: undefined method `special' for "string"
+  fails "String#dup calls #initialize_copy on the new instance" # Expected nil to equal "string"
+  fails "String#dup copies instance variables" # NoMethodError: undefined method `ivar' for "string"
+  fails "String#dup does not copy constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
+  fails "String.new is called on subclasses" # Expected nil to equal "subclass"
 end

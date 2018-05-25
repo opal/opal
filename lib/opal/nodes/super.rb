@@ -73,7 +73,7 @@ module Opal
 
       def super_method_invocation
         if def_scope.defs
-          class_name = def_scope.parent.name ? "$#{def_scope.parent.name}" : 'self.$$class.$$proto'
+          class_name = def_scope.parent.name ? "$#{def_scope.parent.name}" : 'self.$$class.prototype'
           "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, #{class_name})"
         else
           "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param})"
@@ -105,13 +105,7 @@ module Opal
         compile_receiver
         compile_method
 
-        # will never come back null with method missing on
-        if compiler.method_missing?
-          wrap '(!(', '.$$stub) ? "super" : nil)'
-        else
-          # TODO: With method_missing support off, something breaks in runtime.js's chain
-          wrap '((', ') != null ? "super" : nil)'
-        end
+        wrap '((', ') != null ? "super" : nil)'
       end
     end
 
