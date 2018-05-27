@@ -164,7 +164,7 @@ module Opal
         options[:parse_comments] = true
       end
 
-      on('--es-six-imexable', 'Compiles modules so they can be imported using the ES6 "import" statement') do
+      on('--es-six-imexable', 'Compiles modules so they can be ES6 imported/exported') do
         options[:es_six_imexable] = true
       end
 

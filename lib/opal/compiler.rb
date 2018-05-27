@@ -124,7 +124,7 @@ module Opal
 
     # @!method es_six_imeaxable?
     #
-    # Prepare the code for future requires
+    # Make modules ES6 import/export-able
     compiler_option :es_six_imexable, false, :as => :es_six_imexable?
 
     # @!method inline_operators?

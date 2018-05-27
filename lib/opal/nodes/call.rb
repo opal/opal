@@ -226,11 +226,17 @@ module Opal
         file = compiler.file
         if arg.type == :str
           dir = File.dirname(file)
-          mfn = Pathname(dir).join(arg.children[0]).cleanpath.to_s
-          compiler.requires << mfn
+          mod_filename = Pathname(dir).join(arg.children[0]).cleanpath.to_s
+          compiler.requires << mod_filename
         end
-        mfn = mfn.end_with?('.rb') ? mfn : mfn + '.rb'
-        push fragment("self.$require(#{Opal::Nodes::TopNode.module_name(mfn).inspect})")
+        if compiler.es_six_imexable?
+          mod_filename = mod_filename.end_with?('.rb') ? mod_filename : mod_filename + '.rb'
+          push fragment("self.$require(#{Opal::Nodes::TopNode.module_name(mod_filename).inspect})")
+        else
+          push fragment("self.$require(#{file.inspect}+ '/../' + ")
+          push process(arglist)
+          push fragment(')')
+        end
       end
 
       add_special :autoload do |compile_default|
@@ -252,7 +258,7 @@ module Opal
           full_path.force_encoding(relative_path.encoding)
           first_arg = first_arg.updated(nil, [full_path])
         end
-        if first_arg.children[0].start_with?('/')
+        if compiler.es_six_imexable? && first_arg.children[0].start_with?('/')
           nfa = Opal::Nodes::TopNode.module_name(first_arg.children[0])
           first_arg = Opal::AST::Node.new(:str, [nfa])
         end

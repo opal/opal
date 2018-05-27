@@ -16,8 +16,10 @@ module Opal
         push version_comment unless compiler.es_six_imexable?
 
         if compiler.es_six_imexable?
-          m_name = self.class.module_name(compiler.file)
-          opening(m_name)
+          mod_name = self.class.module_name(compiler.file)
+          opening(mod_name)
+        else
+          opening
         end
 
         in_scope do
@@ -95,13 +97,12 @@ module Opal
         closing
       end
 
-      def opening(m_name = nil)
-        if compiler.requirable? && !compiler.es_six_imexable?
-          line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
-        elsif compiler.es_six_imexable?
+      def opening(mod_name = nil)
+        if compiler.es_six_imexable?
           line "export default function() {"
-          # line "  Opal = global.Opal;"
-          line "  global.Opal.modules[#{m_name.inspect}] = function(Opal) {"
+          line "  global.Opal.modules[#{mod_name.inspect}] = function(Opal) {"
+        elsif compiler.requirable?
+          line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
         elsif compiler.eval?
           line '(function(Opal, self) {'
         else
@@ -110,10 +111,10 @@ module Opal
       end
 
       def closing
-        if compiler.requirable? && !compiler.es_six_imexable?
-          line "};\n"
-        elsif compiler.es_six_imexable?
+        if compiler.es_six_imexable?
           line "  }\n"
+          line "};\n"
+        elsif compiler.requirable?
           line "};\n"
         elsif compiler.eval?
           line '})(Opal, self)'
