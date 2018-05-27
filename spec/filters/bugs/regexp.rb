@@ -37,7 +37,7 @@ opal_filter "regular_expressions" do
   # fails "Regexp#names returns an empty Array if there are no named captures"
   # fails "Regexp#names returns each capture name only once"
   # fails "Regexp#names returns each named capture as a String"
-  # fails "Regexp#names works with nested named captures"
+  fails "Regexp#names works with nested named captures"
   fails "Regexp#source will remove escape characters" # Expected "foo\\/bar" to equal "foo/bar"
   fails "Regexp#to_s deals properly with the two types of lookahead groups"
   fails "Regexp#to_s returns a string in (?xxx:yyy) notation"
