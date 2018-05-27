@@ -16,7 +16,7 @@ RSpec.describe Opal::Compiler do
 
     context 'outside block' do
       context 'method missing on' do
-        it { is_expected.to include "return (!(self, Opal.find_super_dispatcher(self, 'some_method', TMP_some_method_1, true).$$stub) ? \"super\" : nil)" }
+        it { is_expected.to include "return ((self, Opal.find_super_dispatcher(self, 'some_method', TMP_some_method_1, true)) != null ? \"super\" : nil)" }
       end
 
       context 'method missing off' do
@@ -30,13 +30,13 @@ RSpec.describe Opal::Compiler do
       context 'implicit' do
         let(:method) { 'lambda { defined? super }' }
 
-        it { is_expected.to include "return (!(self, Opal.find_iter_super_dispatcher(self, null, (TMP_1.$$def || null), true, false).$$stub) ? \"super\" : nil)}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1))" }
+        it { is_expected.to include "return ((self, Opal.find_iter_super_dispatcher(self, null, (TMP_1.$$def || null), true, false)) != null ? \"super\" : nil)}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1))" }
       end
 
       context 'explicit' do
         let(:method) { 'lambda { defined? super() }' }
 
-        it { is_expected.to include "return (!(self, Opal.find_iter_super_dispatcher(self, null, (TMP_1.$$def || null), true, false).$$stub) ? \"super\" : nil)}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1))" }
+        it { is_expected.to include "return ((self, Opal.find_iter_super_dispatcher(self, null, (TMP_1.$$def || null), true, false)) != null ? \"super\" : nil)}, TMP_1.$$s = self, TMP_1.$$arity = 0, TMP_1))" }
       end
     end
   end

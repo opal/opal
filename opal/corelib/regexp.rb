@@ -103,7 +103,7 @@ class Regexp < `RegExp`
   end
 
   def ==(other)
-    `other.constructor == RegExp && self.toString() === other.toString()`
+    `other instanceof RegExp && self.toString() === other.toString()`
   end
 
   def ===(string)

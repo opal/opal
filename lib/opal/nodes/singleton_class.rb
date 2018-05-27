@@ -13,7 +13,7 @@ module Opal
         push '(function(self, $parent_nesting) {'
 
         in_scope do
-          add_temp 'def = self.$$proto'
+          add_temp 'def = self.prototype'
           add_temp '$nesting = [self].concat($parent_nesting)'
 
           body_stmt = stmt(compiler.returns(body))

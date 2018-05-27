@@ -612,11 +612,11 @@ end
 class Class
   def native_alias(new_jsid, existing_mid)
     %x{
-      var aliased = #{self}.$$proto['$' + #{existing_mid}];
+      var aliased = #{self}.prototype['$' + #{existing_mid}];
       if (!aliased) {
         #{raise NameError.new("undefined method `#{existing_mid}' for class `#{inspect}'", exiting_mid)};
       }
-      #{self}.$$proto[#{new_jsid}] = aliased;
+      #{self}.prototype[#{new_jsid}] = aliased;
     }
   end
 

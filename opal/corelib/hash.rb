@@ -65,7 +65,7 @@ class Hash
 
   def self.allocate
     %x{
-      var hash = new self.$$alloc();
+      var hash = new self();
 
       Opal.hash_init(hash);
 
@@ -221,7 +221,7 @@ class Hash
 
   def clone
     %x{
-      var hash = new self.$$class.$$alloc();
+      var hash = new self.$$class();
 
       Opal.hash_init(hash);
       Opal.hash_clone(self, hash);
@@ -1052,7 +1052,7 @@ class Hash
         return self;
       }
 
-      var hash = new Opal.Hash.$$alloc();
+      var hash = new Opal.Hash();
 
       Opal.hash_init(hash);
       Opal.hash_clone(self, hash);

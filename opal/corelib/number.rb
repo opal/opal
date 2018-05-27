@@ -1,7 +1,7 @@
 require 'corelib/numeric'
 
 class Number < Numeric
-  Opal.bridge(self, `Number`)
+  Opal.bridge(`Number`, self)
   `Opal.defineProperty(Number.prototype, '$$is_number', true)`
   `self.$$is_number_class = true`
 

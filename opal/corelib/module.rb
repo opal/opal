@@ -1,15 +1,23 @@
 class Module
   def self.allocate
     %x{
-      var module;
-
-      module = Opal.module_allocate(self);
+      var module = Opal.allocate_module(nil, function(){});
       return module;
     }
   end
 
+  def self.inherited(klass)
+    %x{
+      klass.$allocate = function() {
+        var module = Opal.allocate_module(nil, function(){});
+        Object.setPrototypeOf(module, klass.prototype);
+        return module;
+      }
+    }
+  end
+
   def initialize(&block)
-    `Opal.module_initialize(self, block)`
+    module_eval(&block) if block_given?
   end
 
   def ===(object)
@@ -111,7 +119,7 @@ class Module
 
   def attr_reader(*names)
     %x{
-      var proto = self.$$proto;
+      var proto = self.prototype;
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
@@ -146,7 +154,7 @@ class Module
 
   def attr_writer(*names)
     %x{
-      var proto = self.$$proto;
+      var proto = self.prototype;
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
@@ -407,19 +415,7 @@ class Module
   end
 
   def included_modules
-    %x{
-      var results = [];
-
-      for (var i = 0, ancestors = self.$$ancestors, length = ancestors.length; i < length; i++) {
-        var ancestor = ancestors[i];
-
-        if (ancestor !== self && ancestor.$$is_module) {
-          results.push(ancestor);
-        }
-      }
-
-      return results;
-    }
+    `Opal.included_modules(self)`
   end
 
   def include?(mod)
@@ -443,7 +439,7 @@ class Module
 
   def instance_method(name)
     %x{
-      var meth = self.$$proto['$' + name];
+      var meth = self.prototype['$' + name];
 
       if (!meth || meth.$$stub) {
         #{raise NameError.new("undefined method `#{name}' for class `#{self.name}'", name)};
@@ -535,7 +531,7 @@ class Module
 
   def method_defined?(method)
     %x{
-      var body = self.$$proto['$' + method];
+      var body = self.prototype['$' + method];
       return (!!body) && !body.$$stub;
     }
   end
@@ -549,7 +545,7 @@ class Module
         for (var i = 0, length = methods.length; i < length; i++) {
           var meth = methods[i],
               id   = '$' + meth,
-              func = self.$$proto[id];
+              func = self.prototype[id];
 
           Opal.defs(self, id, func);
         }
@@ -586,6 +582,41 @@ class Module
 
       return self.$$full_name = result.join('::');
     }
+  end
+
+  def prepend(*mods)
+    %x{
+      if (mods.length === 0) {
+        #{raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'}
+      }
+
+      for (var i = mods.length - 1; i >= 0; i--) {
+        var mod = mods[i];
+
+        if (!mod.$$is_module) {
+          #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+        }
+
+        #{`mod`.prepend_features self};
+        #{`mod`.prepended self};
+      }
+    }
+
+    self
+  end
+
+  def prepend_features(prepender)
+    %x{
+      if (!self.$$is_module) {
+        #{raise TypeError, "wrong argument type #{self.class} (expected Module)"};
+      }
+
+      Opal.prepend_features(self, prepender)
+    }
+    self
+  end
+
+  def prepended(mod)
   end
 
   def remove_const(name)

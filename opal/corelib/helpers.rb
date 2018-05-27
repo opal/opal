@@ -1,6 +1,6 @@
 module Opal
-  def self.bridge(klass, constructor)
-    `Opal.bridge(klass, constructor)`
+  def self.bridge(constructor, klass)
+    `Opal.bridge(constructor, klass)`
   end
 
   def self.type_error(object, type, method = nil, coerced = nil)
@@ -155,7 +155,7 @@ module Opal
       var method_name, method;
       for (var i = method_names.length - 1; i >= 0; i--) {
         method_name = method_names[i];
-        method = owner_class.$$proto['$'+method_name];
+        method = owner_class.prototype['$'+method_name];
 
         if (method && !method.$$stub) {
           method.$$pristine = true;

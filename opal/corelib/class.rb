@@ -7,23 +7,16 @@ class Class
         throw Opal.TypeError.$new("superclass must be a Class");
       }
 
-      var alloc = Opal.boot_class_alloc(null, function(){}, superclass);
-      var klass = Opal.setup_class_object(null, alloc, superclass.$$name, superclass.constructor);
-
-      klass.$$super  = superclass;
-      klass.$$parent = superclass;
-
+      var klass = Opal.allocate_class(nil, superclass, function(){});
       superclass.$inherited(klass);
-      Opal.module_initialize(klass, block);
-      Opal.refresh_ancestors(klass);
-
+      #{`klass`.class_eval(&block) if block_given?}
       return klass;
     }
   end
 
   def allocate
     %x{
-      var obj = new self.$$alloc();
+      var obj = new self();
       obj.$$id = Opal.uid();
       return obj;
     }
