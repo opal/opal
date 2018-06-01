@@ -647,7 +647,7 @@ class String < `String`
   end
 
   def intern
-    self
+    `self.toString()`
   end
 
   def lines(separator = $/, &block)
