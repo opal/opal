@@ -102,6 +102,10 @@ class String
   def prepend(*)
     raise NotImplementedError, `ERROR` % 'prepend'
   end
+
+  def []=(*)
+    raise NotImplementedError, `ERROR` % '[]='
+  end
 end
 
 module Kernel
