@@ -19,7 +19,7 @@ module Opal
 
         mappings = @fragments.map do |fragment|
           mapping = nil
-          source_line   = fragment.line
+          source_line   = (fragment.line && fragment.line > 0) ? fragment.line : 1
           source_column = fragment.column
           source_code   = fragment.code
 

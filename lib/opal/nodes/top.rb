@@ -65,20 +65,21 @@ module Opal
                             module_path
                           end
             i_name = import_name(module_path)
-            i_line = "import #{i_name} from '#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
+            i_line = []
+            i_line << "import #{i_name} from '#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
             unless module_path == 'corelib/runtime'
               # webpack replaces i_name with a function, but
               # during bootstrapping on the client, when the imports are imported, for a circular import
               # i_name is just a object, because the outer i_name() did not finish execution and thus
-              # the result of the webpack function looking up i_name is a object
-              # once the import returned, the result of the webpack function looking up i_name will be a function
+              # the result of the webpack function looking up i_name is a object.
+              # once the import returned, the result of the webpack function looking up i_name will be a function.
               # checking if i_name actually is a function will make the bootstrapping work,
-              # at this the i_name has not been imported into local context, luckily the opal require happens
+              # at this time the i_name has not been imported into local context, luckily the opal require happens
               # later in time, after all the imports, then Opal.modules should be filled correctly and the opal require
               # can be resolved
-              i_line = i_line + "if (typeof Opal.modules[#{real_m_path.inspect}] === 'undefined') {\n"
-              i_line = i_line + "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
-              i_line = i_line + "}\n"
+              i_line << "if (typeof Opal.modules[#{real_m_path.inspect}] === 'undefined') {\n"
+              i_line << "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
+              i_line << "}\n"
             end
             i_line
           end
@@ -91,7 +92,11 @@ module Opal
               import_child_paths(import_lines, base_dir, module_path)
             end
           end
-          unshift(version_comment + "\n", *import_lines)
+          if import_lines.size > 0
+            unshift(*import_lines.flatten)
+          else
+            unshift(version_comment)
+          end
         end
 
         closing
@@ -112,7 +117,7 @@ module Opal
 
       def closing
         if compiler.es_six_imexable?
-          line "  }\n"
+          line "  }"
           line "};\n"
         elsif compiler.requirable?
           line "};\n"
@@ -218,11 +223,11 @@ module Opal
             if path_s.end_with?('.rb') || path_s.end_with?('.js')
               module_path = child_path.realpath.to_s[(base_dir.realpath.to_s.length+1)..-4]
               i_name = import_name(module_path + path_s[-3..-1])
-              i_line = "import #{i_name} from '#{module_path}#{path_s[-3..-1]}';\n"
-              i_line = i_line + "if (typeof Opal.modules[#{module_path.inspect}] === 'undefined') {\n"
-              i_line = i_line + "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
-              i_line = i_line + "}\n"
-              import_lines << i_line # "import '#{module_path}';\n"
+              import_lines << "import #{i_name} from '#{module_path}#{path_s[-3..-1]}';\n"
+              import_lines << "if (typeof Opal.modules[#{module_path.inspect}] === 'undefined') {\n"
+              import_lines << "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
+              import_lines << "}\n"
+              import_lines
             end
           end
         end
