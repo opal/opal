@@ -40,7 +40,8 @@ module Opal
       DUMMY_LOCATION = DummyLocation.new
 
       def s(type, *children)
-        ::Opal::AST::Node.new(type, children, location: DUMMY_LOCATION)
+        loc = current_node ? current_node.loc : DUMMY_LOCATION
+        ::Opal::AST::Node.new(type, children, location: loc)
       end
 
       def self.s(type, *children)
@@ -91,6 +92,17 @@ module Opal
         else
           s(:begin, body, node)
         end
+      end
+
+      # Store the current node for reporting.
+      attr_accessor :current_node
+
+      # Intercept the main call and assign current node.
+      def process(node)
+        self.current_node = node
+        super
+      ensure
+        self.current_node = nil
       end
     end
   end
