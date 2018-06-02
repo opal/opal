@@ -8,7 +8,13 @@ skip_tags: true
 clone_depth: 10
 
 environment:
-  ruby_version: '23'
+  ruby_version: '25'
+
+branches:
+  only:
+    - master
+    - /.*-stable/
+    - /.*/ci-check/
 
 install:
   - git submodule update --init --recursive

@@ -1,10 +1,17 @@
 language: ruby
 
-sudo: false
+sudo: required
 
 dist: trusty
+
 addons:
   chrome: stable
+
+branches:
+  only:
+  - master
+  - /^.*-stable$/
+  - /^.*ci-check$/
 
 cache:
   bundler: true
@@ -16,53 +23,53 @@ matrix:
   fast_finish: true
 
   include:
-    - rvm: 2.4.0
-      env: RUN=mspec_opal_chrome
+    - rvm: 2.5.1
+      env: RUN=mspec_opal_chrome REINSTALL_BUNDLER=true
 
-    - rvm: 2.4.0
-      env: RUN=mspec_ruby_chrome
+    - rvm: 2.5.1
+      env: RUN=mspec_ruby_chrome REINSTALL_BUNDLER=true
 
-    # - rvm: 2.4.0
+    # - rvm: 2.5.1
     #   env:
     #     - RUN=browser_test
     #     - SAUCE_USERNAME=elia
     #     # SAUCE_ACCESS_KEY:
     #     - secure: GT13SjzU8vmqKIyY2LAXje+ndqevTsX/w71JkZHRLTrDUl0qcIod7xsfahbzGt2gOZPYZUkKiVaPoUenhc/YeJ2jTJVHeHY9UEl2II+3tOtuvp2jLadA//aBbsB6/09d7lIZMzpa93TL2R/SncPxugYW9v2o8o8Lwd2iIzowT/g=
 
-    - rvm: 2.4.0
-      env: RUN=jshint
+    - rvm: 2.5.1
+      env: RUN=jshint REINSTALL_BUNDLER=true
 
-    - rvm: 2.4.0
-      env: RUN=mspec_opal_nodejs
+    - rvm: 2.5.1
+      env: RUN=mspec_opal_nodejs REINSTALL_BUNDLER=true
 
-    - rvm: 2.4.0
-      env: RUN=mspec_ruby_nodejs TZ="/usr/share/zoneinfo/Pacific/Fiji"
+    - rvm: 2.5.1
+      env: RUN=mspec_ruby_nodejs REINSTALL_BUNDLER=true TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
-    - rvm: 2.4.0
-      env: RUN=minitest
+    - rvm: 2.5.1
+      env: RUN=minitest REINSTALL_BUNDLER=true
 
-    - rvm: 2.4.0
-      env: RUN=rspec RACK_VERSION='~> 2.0.0' CHECK_COVERAGE=true
+    - rvm: 2.5.1
+      env: RUN=rspec RACK_VERSION='~> 2.0.0' CHECK_COVERAGE=true REINSTALL_BUNDLER=true
 
-    - rvm: 2.4.0
-      env: RUN=smoke_test
+    - rvm: 2.5.1
+      env: RUN=smoke_test REINSTALL_BUNDLER=true
 
     - rvm: ruby-head
+      env: RUN=rspec REINSTALL_BUNDLER=true
+
+    - rvm: 2.4.4
+      env: RUN=rspec RACK_VERSION='~> 2.0.0' REINSTALL_BUNDLER=true
+
+    - rvm: 2.3.7
       env: RUN=rspec
 
-    - rvm: 2.3.3
-      env: RUN=rspec
-
-    - rvm: 2.2.5
+    - rvm: 2.2.10
       env: RUN=rspec TILT_VERSION=2.0.1 SPROCKETS_VERSION='~> 3.7'
 
     - rvm: 2.1.10
       env: RUN=rspec RACK_VERSION='< 2.0'
 
-    - rvm: 2.0.0
-      env: RUN="rspec mspec_opal_nodejs" RACK_VERSION='< 2.0'
-
-    - rvm: jruby-9.1.7.0
+    - rvm: jruby-9.1.17.0
       env: RUN=rspec
 
     - rvm: jruby-head
@@ -80,11 +87,15 @@ before_install:
   - git submodule update --init
   - npm install -g jshint
   - npm install -g uglify-js
+  - test $REINSTALL_BUNDLER && gem install bundler || true
   - type bundle || gem install bundler
   - bundle config without doc
   - which google-chrome-stable
   - google-chrome-stable --version
   - export RUBYOPT=-w
+  # Wokraround from https://github.com/travis-ci/travis-ci/issues/9024#issuecomment-356282802
+  - sudo chown root /opt/google/chrome/chrome-sandbox
+  - sudo chmod 4755 /opt/google/chrome/chrome-sandbox
 
 script:
   - "bundle exec rake $RUN"
