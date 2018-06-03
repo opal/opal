@@ -77,7 +77,7 @@ module Opal
               # at this time the i_name has not been imported into local context, luckily the opal require happens
               # later in time, after all the imports, then Opal.modules should be filled correctly and the opal require
               # can be resolved
-              i_line << "if (typeof Opal.modules[#{real_m_path.inspect}] === 'undefined') {\n"
+              i_line << "if (typeof global.Opal.modules[#{real_m_path.inspect}] === 'undefined') {\n"
               i_line << "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
               i_line << "}\n"
             end
