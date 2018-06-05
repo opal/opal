@@ -19,7 +19,7 @@ gem 'tilt', tilt_version if tilt_version
 gem 'sprockets', sprockets_version if sprockets_version
 
 group :repl do
-  gem 'therubyracer', platform: :mri, require: false
+  gem 'mini_racer', platform: :mri, require: false
   gem 'therubyrhino', platform: :jruby, require: false
 end
 

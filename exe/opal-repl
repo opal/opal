@@ -14,20 +14,12 @@ module Opal
       return if @v8
 
       begin
-        require 'v8'
+        require 'mini_racer'
       rescue LoadError
-        abort 'opal-repl depends on therubyracer gem, which is not currently installed'
+        abort 'opal-repl depends on mini_racer gem, which is not currently installed'
       end
 
-      # Patch V8::Object#respond_to? to avoid MRI warning
-      V8::Object.class_eval do
-        def respond_to?(method, private = false)
-          super or self[method] != nil
-        end
-      end
-
-      @v8 = V8::Context.new
-      @v8['console'] = self
+      @v8 = MiniRacer::Context.new
       @v8.eval Opal::Builder.new.build('opal').to_s
 
       if filename
