@@ -664,4 +664,18 @@ opal_unsupported_filter "String" do
   fails "String#encode! when passed to, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#encode! when passed to, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode! when passed to, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#prepend raises a RuntimeError when self is frozen" # NoMethodError: undefined method `prepend' for "hello":String
+  fails "String#unicode_normalize! modifies original string (nfc)"
+  fails "String#unicode_normalize! modifies self in place (nfd)"
+  fails "String#unicode_normalize! modifies self in place (nfkc)"
+  fails "String#unicode_normalize! modifies self in place (nfkd)"
+  fails "String#unicode_normalize! normalizes code points and modifies the receiving string"
+  fails "String#unicode_normalize! raises an ArgumentError if the specified form is invalid"
+  fails "String#unicode_normalize! raises an Encoding::CompatibilityError if the string is not in an unicode encoding"
+  fails "String#capitalize! capitalizes self in place for all of Unicode" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! modifies self in place for all of Unicode" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for all of Unicode" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for all of Unicode" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#clone copies instance variables" # Strings are immutable, so they can't have ivars
+  fails "String#dup copies instance variables" # Strings are immutable, so they can't have ivars
 end
