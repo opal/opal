@@ -38,7 +38,6 @@ opal_filter "String" do
   fails "String#match? returns false when does not match the given regex" # NoMethodError: undefined method `match?' for "string":String
   fails "String#match? takes matching position as the 2nd argument" # NoMethodError: undefined method `match?' for "string":String
   fails "String#match? when matches the given regex returns true but does not set Regexp.last_match" # NoMethodError: undefined method `match?' for "string":String
-  fails "String#prepend raises a RuntimeError when self is frozen" # NoMethodError: undefined method `prepend' for "hello":String
   fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
   fails "String#slice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
@@ -89,13 +88,6 @@ opal_filter "String" do
   fails "String#unicode_normalize returns normalized form of string by default 03D3 (ϓ) GREEK UPSILON WITH ACUTE AND HOOK SYMBOL"
   fails "String#unicode_normalize returns normalized form of string by default 03D4 (ϔ) GREEK UPSILON WITH DIAERESIS AND HOOK SYMBOL"
   fails "String#unicode_normalize returns normalized form of string by default 1E9B (ẛ) LATIN SMALL LETTER LONG S WITH DOT ABOVE"
-  fails "String#unicode_normalize! modifies original string (nfc)"
-  fails "String#unicode_normalize! modifies self in place (nfd)"
-  fails "String#unicode_normalize! modifies self in place (nfkc)"
-  fails "String#unicode_normalize! modifies self in place (nfkd)"
-  fails "String#unicode_normalize! normalizes code points and modifies the receiving string"
-  fails "String#unicode_normalize! raises an ArgumentError if the specified form is invalid"
-  fails "String#unicode_normalize! raises an Encoding::CompatibilityError if the string is not in an unicode encoding"
   fails "String#unicode_normalized? defaults to the nfc normalization form if no forms are specified"
   fails "String#unicode_normalized? raises an ArgumentError if the specified form is invalid"
   fails "String#unicode_normalized? raises an Encoding::CompatibilityError if the string is not in an unicode encoding"
@@ -155,9 +147,7 @@ opal_filter "String" do
   fails "String#% returns a String in the argument's encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "String#% returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "String#% width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
-  fails "String#capitalize! capitalizes self in place for all of Unicode" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
-  fails "String#downcase! modifies self in place for all of Unicode" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
   fails "String#each_line when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
   fails "String#include? with String raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
@@ -170,21 +160,17 @@ opal_filter "String" do
   fails "String#start_with? sets Regexp.last_match if it returns true" # TypeError: no implicit conversion of Regexp into String
   fails "String#start_with? supports regexps with ^ and $ modifiers" # TypeError: no implicit conversion of Regexp into String
   fails "String#start_with? supports regexps" # TypeError: no implicit conversion of Regexp into String
-  fails "String#swapcase! modifies self in place for all of Unicode" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#to_sym raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
   fails "String#to_sym returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#to_sym returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # NoMethodError: undefined method `b' for "foobar":String
   fails "String#to_sym returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "String#to_sym returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
-  fails "String#upcase! modifies self in place for all of Unicode" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String.new accepts a capacity argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
   fails "String#clone calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#clone copies constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
-  fails "String#clone copies instance variables" # NoMethodError: undefined method `ivar' for "string"
   fails "String#clone copies modules included in the singleton class" # NoMethodError: undefined method `repr' for "string"
   fails "String#clone copies singleton methods" # NoMethodError: undefined method `special' for "string"
   fails "String#dup calls #initialize_copy on the new instance" # Expected nil to equal "string"
-  fails "String#dup copies instance variables" # NoMethodError: undefined method `ivar' for "string"
   fails "String#dup does not copy constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
   fails "String.new is called on subclasses" # Expected nil to equal "subclass"
 end
