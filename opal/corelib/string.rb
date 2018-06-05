@@ -703,6 +703,18 @@ class String < `String`
     pattern.match(self, pos, &block)
   end
 
+  def match?(pattern, pos = undefined)
+    if String === pattern || pattern.respond_to?(:to_str)
+      pattern = Regexp.new(pattern.to_str)
+    end
+
+    unless Regexp === pattern
+      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+    end
+
+    pattern.match?(self, pos)
+  end
+
   def next
     %x{
       var i = self.length;

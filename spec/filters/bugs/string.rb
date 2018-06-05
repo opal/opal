@@ -35,9 +35,6 @@ opal_filter "String" do
   fails "String#getbyte returns an Integer if given a valid index"
   fails "String#getbyte returns nil for out-of-bound indexes"
   fails "String#getbyte starts indexing at 0"
-  fails "String#match? returns false when does not match the given regex" # NoMethodError: undefined method `match?' for "string":String
-  fails "String#match? takes matching position as the 2nd argument" # NoMethodError: undefined method `match?' for "string":String
-  fails "String#match? when matches the given regex returns true but does not set Regexp.last_match" # NoMethodError: undefined method `match?' for "string":String
   fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
   fails "String#slice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
