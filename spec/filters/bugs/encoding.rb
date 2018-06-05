@@ -105,23 +105,11 @@ opal_filter "Encoding" do
   fails "String#chars works if the String's contents is invalid for its encoding" # NoMethodError: undefined method `pack' for [164]:Array
   fails "String#chomp removes the final carriage return, newline from a non-ASCII String" # ArgumentError: unknown encoding name - utf-32be
   fails "String#chomp removes the final carriage return, newline from a non-ASCII String when the record separator is changed" # ArgumentError: unknown encoding name - utf-32be
-  fails "String#chomp! removes the final carriage return, newline from a multibyte String" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
-  fails "String#chomp! removes the final carriage return, newline from a non-ASCII String" # ArgumentError: unknown encoding name - utf-32be
-  fails "String#chomp! removes the final carriage return, newline from a non-ASCII String when the record separator is changed" # ArgumentError: unknown encoding name - utf-32be
-  fails "String#chomp! returns nil when the String is not modified" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
   fails "String#chop removes the final carriage return, newline from a non-ASCII String" # ArgumentError: unknown encoding name - utf-32be
-  fails "String#chop! removes a multi-byte character" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
-  fails "String#chop! removes the final carriage return, newline from a multibyte String" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
-  fails "String#chop! removes the final carriage return, newline from a non-ASCII String" # ArgumentError: unknown encoding name - utf-32be
   fails "String#chr returns a String in the same encoding as self" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#chr returns a copy of self" # Expected "e" not to equal "e"
   fails "String#chr understands Strings that contain a mixture of character widths" # Expected 2 to equal 3
   fails "String#chr understands multi-byte characters" # Expected 2 to equal 3
-  fails "String#clear preserves its encoding" # NameError: uninitialized constant Encoding::SHIFT_JIS
-  fails "String#clear raises a RuntimeError if self is frozen" # NoMethodError: undefined method `clear' for "Jolene":String
-  fails "String#clear returns self after emptying it" # NoMethodError: undefined method `clear' for "Jolene":String
-  fails "String#clear sets self equal to the empty String" # NoMethodError: undefined method `clear' for "Jolene":String
-  fails "String#clear works with multibyte Strings" # NoMethodError: undefined method `clear' for "靥ࡶ":String
   fails "String#codepoints is synonomous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
   fails "String#codepoints raises an ArgumentError if self's encoding is invalid and a block is given" # Expected true to be false
   fails "String#codepoints raises an ArgumentError when no block is given if self has an invalid encoding" # Expected true to be false
@@ -133,7 +121,6 @@ opal_filter "Encoding" do
   fails "String#codepoints round-trips to the original String using Integer#chr" # NoMethodError: undefined method `codepoints' for "\u0013眑တ":String
   fails "String#codepoints works for multibyte characters" # Expected 2 to equal 3
   fails "String#codepoints yields each codepoint to the block if one is given" # NoMethodError: undefined method `codepoints' for "abcd":String
-  fails "String#downcase! sets the result String encoding to the source String encoding" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "String#each_char returns a different character if the String is transcoded" # ArgumentError: unknown encoding name - iso-8859-15
   fails "String#each_char returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
   fails "String#each_char taints resulting strings when self is tainted" # Expected false to equal true
@@ -248,94 +235,6 @@ opal_filter "Encoding" do
   fails "String#encode when passed to, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#encode when passed to, options returns a copy when the destination encoding is the same as the String encoding" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode when passed to, options returns a copy when the destination encoding is the same as the String encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :attr option replaces all instances of '\"' with '&quot;'" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :attr option replaces all instances of '\"' with '&quot;'" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :attr option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :attr option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :attr option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :attr option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :attr option replaces all instances of '>' with '&gt;'" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :attr option replaces all instances of '>' with '&gt;'" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :attr option replaces undefined characters with their upper-case hexadecimal numeric character references" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :attr option replaces undefined characters with their upper-case hexadecimal numeric character references" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :attr option surrounds the encoded text with double-quotes" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :attr option surrounds the encoded text with double-quotes" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :text option does not replace '\"'" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :text option does not replace '\"'" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :text option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :text option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :text option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :text option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :text option replaces all instances of '>' with '&gt;'" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :text option replaces all instances of '>' with '&gt;'" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! given the xml: :text option replaces undefined characters with their upper-case hexadecimal numeric character references" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! given the xml: :text option replaces undefined characters with their upper-case hexadecimal numeric character references" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! raises ArgumentError if the value of the :xml option is not :text or :attr" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! raises ArgumentError if the value of the :xml option is not :text or :attr" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! raises a RuntimeError when called on a frozen String" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! raises a RuntimeError when called on a frozen String" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! raises a RuntimeError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! raises a RuntimeError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed no options raises an Encoding::ConverterNotFoundError when no conversion is possible" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed no options raises an Encoding::ConverterNotFoundError when no conversion is possible" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed no options returns self for a ASCII-only String when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed no options returns self for a ASCII-only String when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed no options returns self when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed no options returns self when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed no options transcodes a 7-bit String despite no generic converting being available" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed no options transcodes a 7-bit String despite no generic converting being available" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed no options transcodes to Encoding.default_internal when set" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed no options transcodes to Encoding.default_internal when set" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed options calls #to_hash to convert the object" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed options calls #to_hash to convert the object" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed options does not process transcoding options if not transcoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed options does not process transcoding options if not transcoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed options raises an Encoding::ConverterNotFoundError when no conversion is possible despite 'invalid: :replace, undef: :replace'" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed options raises an Encoding::ConverterNotFoundError when no conversion is possible despite 'invalid: :replace, undef: :replace'" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed options replaces invalid characters when replacing Emacs-Mule encoded strings" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed options replaces invalid characters when replacing Emacs-Mule encoded strings" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed options returns self for ASCII-only String when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed options returns self for ASCII-only String when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed options transcodes to Encoding.default_internal when set" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed options transcodes to Encoding.default_internal when set" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to encoding accepts a String argument" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to encoding accepts a String argument" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to encoding calls #to_str to convert the object to an Encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to encoding calls #to_str to convert the object to an Encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to encoding raises an Encoding::ConverterNotFoundError for an invalid encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to encoding raises an Encoding::ConverterNotFoundError for an invalid encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to encoding raises an Encoding::ConverterNotFoundError when no conversion is possible" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to encoding raises an Encoding::ConverterNotFoundError when no conversion is possible" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to encoding returns self" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to encoding returns self" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to encoding transcodes Japanese multibyte characters" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to encoding transcodes Japanese multibyte characters" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to encoding transcodes a 7-bit String despite no generic converting being available" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to encoding transcodes a 7-bit String despite no generic converting being available" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to encoding transcodes to the passed encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to encoding transcodes to the passed encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, from calls #to_str to convert the from object to an Encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, from calls #to_str to convert the from object to an Encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, from returns self" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, from returns self" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, from transcodes between the encodings ignoring the String encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, from transcodes between the encodings ignoring the String encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, from, options calls #to_hash to convert the options object" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, from, options calls #to_hash to convert the options object" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, from, options calls #to_str to convert the from object to an encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, from, options calls #to_str to convert the from object to an encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, from, options calls #to_str to convert the to object to an encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, from, options calls #to_str to convert the to object to an encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, from, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, from, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, from, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, from, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, options calls #to_hash to convert the options object" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, options calls #to_hash to convert the options object" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
-  fails "String#encode! when passed to, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! when passed to, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#encoding for Strings with \\u escapes is not affected by both the default internal and external encoding being set at the same time" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encoding for Strings with \\u escapes is not affected by the default external encoding" # NameError: uninitialized constant Encoding::SHIFT_JIS
   fails "String#encoding for Strings with \\u escapes is not affected by the default internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
@@ -383,14 +282,12 @@ opal_filter "Encoding" do
   fails "String#ljust with length, padding with width, pattern returns a String in the compatible encoding" # NameError: uninitialized constant Encoding::IBM437
   fails "String#ord is equivalent to #codepoints.first" # NoMethodError: undefined method `codepoints' for "ঁং":String
   fails "String#ord raises an ArgumentError if called on an empty String" # Expected ArgumentError but no exception was raised (NaN was returned)
-  fails "String#reverse! reverses a string with multi byte characters" # NotImplementedError: String#reverse! not supported. Mutable String methods are not supported in Opal.
   fails "String#rindex with Regexp raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#rjust with length, padding with width returns a String in the same encoding as the original" # NameError: uninitialized constant Encoding::IBM437
   fails "String#rjust with length, padding with width, pattern raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#rjust with length, padding with width, pattern returns a String in the compatible encoding" # NameError: uninitialized constant Encoding::IBM437
   fails "String#size returns the length of a string in different encodings" # NameError: uninitialized constant Encoding::UTF_32BE
   fails "String#size returns the length of the new self after encoding is changed" # Expected 4 to equal 12
-  fails "String#slice! with index, length treats invalid bytes as single bytes" # NoMethodError: undefined method `pack' for [230, 203]:Array
   fails "String#split with String throws an ArgumentError if the pattern is not a valid string" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
   fails "String#tr can replace a 7-bit ASCII character with a multibyte one" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "String#tr can replace a multibyte character with a single byte one" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>

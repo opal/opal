@@ -106,6 +106,14 @@ class String
   def []=(*)
     raise NotImplementedError, `ERROR` % '[]='
   end
+
+  def clear(*)
+    raise NotImplementedError, `ERROR` % 'clear'
+  end
+
+  def encode!(*)
+    raise NotImplementedError, `ERROR` % 'clear'
+  end
 end
 
 module Kernel
