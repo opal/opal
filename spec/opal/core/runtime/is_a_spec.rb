@@ -31,5 +31,9 @@ describe 'Opal.is_a' do
       `!!#{Integer}.$$is_number_class`.should == true
       `!!#{Float}.$$is_number_class`.should == true
     end
+
+    it 'works for non-Opal objects' do
+      `Opal.is_a({}, Opal.Array)`.should == false
+    end
   end
 end
