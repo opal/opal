@@ -1177,6 +1177,8 @@
 
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module) {
+    if (!module) { return []; }
+
     if (module.$$ancestors_cache_version === Opal.const_cache_version) {
       return module.$$ancestors;
     }
