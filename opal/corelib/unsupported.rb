@@ -112,7 +112,7 @@ class String
   end
 
   def encode!(*)
-    raise NotImplementedError, `ERROR` % 'clear'
+    raise NotImplementedError, `ERROR` % 'encode!'
   end
 end
 
