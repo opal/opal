@@ -4,16 +4,12 @@ opal_filter "Exception" do
   fails "Errno::EINVAL.new accepts an optional custom message"
   fails "Errno::EINVAL.new can be called with no arguments"
   fails "Errno::EMFILE can be subclassed"
-  fails "Exception is a superclass of EncodingError"
   fails "Interrupt is a subclass of SignalException" # Expected Exception to equal SignalException
   fails "Interrupt.new returns an instance of interrupt with no message given" # NoMethodError: undefined method `signo' for #<Interrupt: Interrupt>:Interrupt
   fails "Interrupt.new takes an optional message argument" # NoMethodError: undefined method `signo' for #<Interrupt: message>:Interrupt
 
   fails "Exception is a superclass of Interrupt"
   fails "Exception is a superclass of SystemStackError"
-  fails "Exception#== returns false if the two exceptions differ only in their backtrace"
-  fails "Exception#== returns false if the two exceptions differ only in their message"
-  fails "Exception#== returns false if the two exceptions inherit from Exception but have different classes"
   fails "Exception#== returns true if both exceptions have the same class, no message, and no backtrace"
   fails "Exception#== returns true if both exceptions have the same class, the same message, and no backtrace"
   fails "Exception#== returns true if both exceptions have the same class, the same message, and the same backtrace"
