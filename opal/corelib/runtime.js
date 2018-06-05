@@ -499,21 +499,21 @@
       superclass = _Object;
     }
 
-      if (bridged) {
-          Opal.bridge(bridged);
-          klass = bridged;
-          Opal.const_set(scope, name, klass);
-      } else {
-          // Create the class object (instance of Class)
-          klass = Opal.allocate_class(name, superclass, constructor);
-          Opal.const_set(scope, name, klass);
-          // Call .inherited() hook with new class on the superclass
-          if (superclass.$inherited) {
-              superclass.$inherited(klass);
-          }
+    if (bridged) {
+      Opal.bridge(bridged);
+      klass = bridged;
+      Opal.const_set(scope, name, klass);
+    } else {
+      // Create the class object (instance of Class)
+      klass = Opal.allocate_class(name, superclass, constructor);
+      Opal.const_set(scope, name, klass);
+      // Call .inherited() hook with new class on the superclass
+      if (superclass.$inherited) {
+        superclass.$inherited(klass);
       }
+    }
 
-      return klass;
+    return klass;
 
   }
 
