@@ -300,3 +300,85 @@ module Kernel
     end
   end
 end
+
+class String
+  def to_c
+    %x{
+      var str = self,
+          re = /[+-]?[\d_]+(\.[\d_]+)?(e\d+)?/,
+          match = str.match(re),
+          real, imag, denominator;
+
+      function isFloat() {
+        return re.test(str);
+      }
+
+      function cutFloat() {
+        var match = str.match(re);
+        var number = match[0];
+        str = str.slice(number.length);
+        return number.replace(/_/g, '');
+      }
+
+      // handles both floats and rationals
+      function cutNumber() {
+        if (isFloat()) {
+          numerator = parseFloat(cutFloat());
+
+          if (str[0] === '/') {
+            // rational real part
+            str = str.slice(1);
+
+            if (isFloat()) {
+              var denominator = parseFloat(cutFloat());
+              return #{Rational(`numerator`, `denominator`)};
+            } else {
+              // reverting '/'
+              str = '/' + str;
+              return numerator;
+            }
+          } else {
+            // float real part, no denominator
+            return numerator;
+          }
+        } else {
+          return null;
+        }
+      }
+
+      real = cutNumber();
+
+      debugger;
+      if (!real) {
+        if (str[0] === 'i') {
+          // i => Complex(0, 1)
+          return #{Complex(0, 1)};
+        }
+        if (str[0] === '-' && str[1] === 'i') {
+          // -i => Complex(0, -1)
+          return #{Complex(0, -1)};
+        }
+        if (str[0] === '+' && str[1] === 'i') {
+          // +i => Complex(0, 1)
+          return #{Complex(0, 1)};
+        }
+        // anything => Complex(0, 0)
+        return #{Complex(0, 0)};
+      }
+
+      imag = cutNumber();
+      if (!imag) {
+        if (str[0] === 'i') {
+          // 3i => Complex(0, 3)
+          return #{Complex(0, `real`)};
+        } else {
+          // 3 => Complex(3, 0)
+          return #{Complex(`real`, 0)};
+        }
+      } else {
+        // 3+2i => Complex(3, 2)
+        return #{Complex(`real`, `imag`)};
+      }
+    }
+  end
+end
