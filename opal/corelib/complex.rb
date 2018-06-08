@@ -323,7 +323,7 @@ class String
       // handles both floats and rationals
       function cutNumber() {
         if (isFloat()) {
-          numerator = parseFloat(cutFloat());
+          var numerator = parseFloat(cutFloat());
 
           if (str[0] === '/') {
             // rational real part
@@ -348,7 +348,6 @@ class String
 
       real = cutNumber();
 
-      debugger;
       if (!real) {
         if (str[0] === 'i') {
           // i => Complex(0, 1)

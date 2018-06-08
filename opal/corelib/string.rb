@@ -1789,6 +1789,14 @@ class String < `String`
     new(*args)
   end
 
+  def unicode_normalize(form = undefined)
+    `self.toString()`
+  end
+
+  def unicode_normalized?(form = undefined)
+    true
+  end
+
   def unpack(format)
     raise "To use String#unpack, you must first require 'corelib/string/unpack'."
   end

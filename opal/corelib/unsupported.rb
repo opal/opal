@@ -114,6 +114,10 @@ class String
   def encode!(*)
     raise NotImplementedError, `ERROR` % 'encode!'
   end
+
+  def unicode_normalize!(*)
+    raise NotImplementedError, `ERROR` % 'unicode_normalize!'
+  end
 end
 
 module Kernel
