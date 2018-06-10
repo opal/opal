@@ -118,7 +118,7 @@ module Opal
       def closing
         if compiler.es_six_imexable?
           line "  }"
-          line "};\n"
+          line "}\n"
         elsif compiler.requirable?
           line "};\n"
         elsif compiler.eval?
