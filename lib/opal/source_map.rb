@@ -20,6 +20,9 @@ module Opal
         mappings = @fragments.map do |fragment|
           mapping = nil
           source_line   = fragment.line
+          # source map validators enforce line numbers starting with 1
+          source_line   = 1 if source_line.nil? || source_line.zero?
+
           source_column = fragment.column
           source_code   = fragment.code
 
@@ -49,7 +52,8 @@ module Opal
 
         # Ensure mappings isn't empty: https://github.com/maccman/sourcemap/issues/11
         unless mappings.any?
-          zero_offset = ::SourceMap::Offset.new(0, 0)
+          # source map validators enforce line numbers starting with 1
+          zero_offset = ::SourceMap::Offset.new(1, 0)
           mappings = [::SourceMap::Mapping.new(source_file, zero_offset, zero_offset)]
         end
 
