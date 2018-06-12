@@ -1,111 +1,7 @@
 opal_filter "String" do
-  fails "String#% supports inspect formats using %p" # Expected "{\"capture\"=>1}" to equal "{:capture=>1}"
-  fails "String#[] raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#[] with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#[] with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
-  fails "String#bytes agrees with #unpack('C*')"
-  fails "String#bytes yields each byte to a block if one is given, returning self"
-  fails "String#byteslice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#byteslice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#byteslice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
-  fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible"
-  fails "String#dump returns a string with # not escaped when followed by any other character"
-  fails "String#dump returns a string with \" and \\ escaped with a backslash"
-  fails "String#dump returns a string with \\#<char> when # is followed by $, @, {"
-  fails "String#dump returns a string with lower-case alpha characters unescaped"
-  fails "String#dump returns a string with multi-byte UTF-8 characters replaced by \\u{} notation with lower-case hex digits"
-  fails "String#dump returns a string with non-printing ASCII characters replaced by \\x notation"
-  fails "String#dump returns a string with non-printing single-byte UTF-8 characters replaced by \\x notation"
-  fails "String#dump returns a string with numeric characters unescaped"
-  fails "String#dump returns a string with printable non-alphanumeric characters unescaped"
-  fails "String#dump returns a string with special characters replaced with \\<char> notation"
-  fails "String#dump returns a string with upper-case alpha characters unescaped"
-  fails "String#dump returns a subclass instance"
-  fails "String#each_byte keeps iterating from the old position (to new string end) when self changes"
-  fails "String#each_byte passes each byte in self to the given block"
-  fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string"
-  fails "String#each_byte when no block is given returns an enumerator"
-  fails "String#getbyte counts from the end of the String if given a negative argument"
-  fails "String#getbyte interprets bytes relative to the String's encoding"
-  fails "String#getbyte mirrors the output of #bytes"
-  fails "String#getbyte raises a TypeError unless its argument can be coerced into an Integer"
-  fails "String#getbyte regards a multi-byte character as having multiple bytes"
-  fails "String#getbyte regards the empty String as containing no bytes"
-  fails "String#getbyte returns an Integer between 0 and 255"
-  fails "String#getbyte returns an Integer if given a valid index"
-  fails "String#getbyte returns nil for out-of-bound indexes"
-  fails "String#getbyte starts indexing at 0"
-  fails "String#match? returns false when does not match the given regex" # NoMethodError: undefined method `match?' for "string":String
-  fails "String#match? takes matching position as the 2nd argument" # NoMethodError: undefined method `match?' for "string":String
-  fails "String#match? when matches the given regex returns true but does not set Regexp.last_match" # NoMethodError: undefined method `match?' for "string":String
-  fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
-  fails "String#slice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#slice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#slice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
-  fails "String#split with Regexp applies the limit to the number of split substrings, without counting captures" # Expected ["a", "aBa"] to equal ["a", "B", "", "", "aBa"]
-  fails "String#sub with pattern, replacement returns a copy of self when no modification is made"
-  fails "String#swapcase works for all of Unicode" # Expected "äÖü" to equal "ÄöÜ"
-  fails "String#to_c returns a Complex object"
-  fails "String#to_c returns a complex number with 0 as the real part, 0 as the imaginary part for unrecognised Strings"
-  fails "String#to_c understands 'a+bi' to mean a complex number with 'a' as the real part, 'b' as the imaginary"
-  fails "String#to_c understands 'a-bi' to mean a complex number with 'a' as the real part, '-b' as the imaginary"
-  fails "String#to_c understands a '-i' by itself as denoting a complex number with an imaginary part of -1"
-  fails "String#to_c understands a negative integer followed by 'i' to mean that negative integer is the imaginary part"
-  fails "String#to_c understands an 'i' by itself as denoting a complex number with an imaginary part of 1"
-  fails "String#to_c understands an integer followed by 'i' to mean that integer is the imaginary part"
-  fails "String#to_c understands floats (a.b) for the imaginary part"
-  fails "String#to_c understands floats (a.b) for the real part"
-  fails "String#to_c understands fractions (numerator/denominator) for the imaginary part"
-  fails "String#to_c understands fractions (numerator/denominator) for the real part"
-  fails "String#to_c understands integers"
-  fails "String#to_c understands negative floats (-a.b) for the imaginary part"
-  fails "String#to_c understands negative floats (-a.b) for the real part"
-  fails "String#to_c understands negative fractions (-numerator/denominator) for the imaginary part"
-  fails "String#to_c understands negative fractions (-numerator/denominator) for the real part"
-  fails "String#to_c understands negative integers"
-  fails "String#to_c understands negative scientific notation for the imaginary part"
-  fails "String#to_c understands negative scientific notation for the real and imaginary part in the same String"
-  fails "String#to_c understands negative scientific notation for the real part"
-  fails "String#to_c understands scientific notation for the imaginary part"
-  fails "String#to_c understands scientific notation for the real and imaginary part in the same String"
-  fails "String#to_c understands scientific notation for the real part"
-  fails "String#to_r does not ignore arbitrary, non-numeric leading characters"
-  fails "String#to_r does not treat a leading period without a numeric prefix as a decimal point"
-  fails "String#to_r ignores leading spaces"
-  fails "String#to_r ignores trailing characters"
-  fails "String#to_r ignores underscores between numbers"
-  fails "String#to_r returns (0/1) for Strings it can't parse"
-  fails "String#to_r returns (0/1) for the empty String"
-  fails "String#to_r returns (n/1) for a String starting with a decimal _n_"
-  fails "String#to_r returns a Rational object"
-  fails "String#to_r treats leading hypens as minus signs"
-  fails "String#to_r understands a forward slash as separating the numerator from the denominator"
-  fails "String#to_r understands decimal points"
-  fails "String#unicode_normalize defaults to the nfc normalization form if no forms are specified"
-  fails "String#unicode_normalize normalizes code points in the string according to the form that is specified"
-  fails "String#unicode_normalize raises an ArgumentError if the specified form is invalid"
-  fails "String#unicode_normalize raises an Encoding::CompatibilityError if string is not in an unicode encoding"
-  fails "String#unicode_normalize returns normalized form of string by default 03D3 (ϓ) GREEK UPSILON WITH ACUTE AND HOOK SYMBOL"
-  fails "String#unicode_normalize returns normalized form of string by default 03D4 (ϔ) GREEK UPSILON WITH DIAERESIS AND HOOK SYMBOL"
-  fails "String#unicode_normalize returns normalized form of string by default 1E9B (ẛ) LATIN SMALL LETTER LONG S WITH DOT ABOVE"
-  fails "String#unicode_normalized? defaults to the nfc normalization form if no forms are specified"
-  fails "String#unicode_normalized? raises an ArgumentError if the specified form is invalid"
-  fails "String#unicode_normalized? raises an Encoding::CompatibilityError if the string is not in an unicode encoding"
-  fails "String#unicode_normalized? returns false if string is not in the supplied normalization form"
-  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfc)"
-  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfd)"
-  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfkc)"
-  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfkd)"
-  fails "String#unicode_normalized? returns true if string does not contain any unicode codepoints"
-  fails "String#unicode_normalized? returns true if string is empty"
-  fails "String#unicode_normalized? returns true if string is in the specified normalization form"
-  fails "String.new accepts an encoding argument"
-  fails "String#casecmp? independent of case for UNICODE characters returns true when downcase(:fold) on unicode"
-  fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns true when they are the same with normalized case"
-  fails "String#unpack1 returns the first value of #unpack" # Works, but requires "x" directive
-  fails "String#% faulty key raises a KeyError"
-  fails "String#% faulty key sets the Hash as the receiver of KeyError"
-  fails "String#% faulty key sets the unmatched key as the key of KeyError"
+  fails "String#% faulty key raises a KeyError" # NoMethodError: undefined method `call' for nil
+  fails "String#% faulty key sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `call' for nil
+  fails "String#% faulty key sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `call' for nil
   fails "String#% flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
   fails "String#% flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" to equal "1.e+02"
   fails "String#% flags # applies to formats aAeEfgG forces a decimal point to be added, even if no digits follow" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
@@ -146,31 +42,94 @@ opal_filter "String" do
   fails "String#% raises an error if single % appears at the end" # Expected ArgumentError but no exception was raised ("%" was returned)
   fails "String#% returns a String in the argument's encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "String#% returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
+  fails "String#% supports inspect formats using %p" # Expected "{\"capture\"=>1}" to equal "{:capture=>1}"
   fails "String#% width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
-  fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
-  fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
-  fails "String#each_line when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
-  fails "String#include? with String raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
-  fails "String#intern raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
-  fails "String#intern returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "String#intern returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # NoMethodError: undefined method `b' for "foobar":String
-  fails "String#intern returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "String#intern returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
-  fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
-  fails "String#start_with? sets Regexp.last_match if it returns true" # TypeError: no implicit conversion of Regexp into String
-  fails "String#start_with? supports regexps with ^ and $ modifiers" # TypeError: no implicit conversion of Regexp into String
-  fails "String#start_with? supports regexps" # TypeError: no implicit conversion of Regexp into String
-  fails "String#to_sym raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
-  fails "String#to_sym returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "String#to_sym returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # NoMethodError: undefined method `b' for "foobar":String
-  fails "String#to_sym returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "String#to_sym returns a binary Symbol for a binary String containing non US-ASCII characters" # NoMethodError: undefined method `b' for "binarí":String
-  fails "String.new accepts a capacity argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
+  fails "String#[] raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#[] with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#[] with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
+  fails "String#bytes agrees with #unpack('C*')" # Expected [113, 103, 172, 78, 84, 0, 111, 0, 107, 0, 121, 0, 111, 0] to equal [230, 157, 177, 228, 186, 172, 84, 111, 107, 121, 111]
+  fails "String#bytes yields each byte to a block if one is given, returning self" # Expected [113, 103, 172, 78] to equal "東京"
+  fails "String#byteslice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#byteslice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#byteslice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
+  fails "String#casecmp? independent of case for UNICODE characters returns true when downcase(:fold) on unicode" # Expected false to equal true
+  fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns true when they are the same with normalized case" # Expected false to equal true
   fails "String#clone calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#clone copies constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
   fails "String#clone copies modules included in the singleton class" # NoMethodError: undefined method `repr' for "string"
   fails "String#clone copies singleton methods" # NoMethodError: undefined method `special' for "string"
+  fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
+  fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible" # NoMethodError: undefined method `dump' for "ࡶ"
+  fails "String#dump returns a string with # not escaped when followed by any other character" # NoMethodError: undefined method `dump' for "#"
+  fails "String#dump returns a string with \" and \\ escaped with a backslash" # NoMethodError: undefined method `dump' for "\""
+  fails "String#dump returns a string with \\#<char> when # is followed by $, @, {" # NoMethodError: undefined method `dump' for "\#$"
+  fails "String#dump returns a string with lower-case alpha characters unescaped" # NoMethodError: undefined method `dump' for "a"
+  fails "String#dump returns a string with multi-byte UTF-8 characters replaced by \\u{} notation with lower-case hex digits" # NoMethodError: undefined method `dump' for "\u0080"
+  fails "String#dump returns a string with non-printing ASCII characters replaced by \\x notation" # NoMethodError: undefined method `dump' for "\u0000"
+  fails "String#dump returns a string with non-printing single-byte UTF-8 characters replaced by \\x notation" # NoMethodError: undefined method `dump' for "\u0000"
+  fails "String#dump returns a string with numeric characters unescaped" # NoMethodError: undefined method `dump' for "0"
+  fails "String#dump returns a string with printable non-alphanumeric characters unescaped" # NoMethodError: undefined method `dump' for " "
+  fails "String#dump returns a string with special characters replaced with \\<char> notation" # NoMethodError: undefined method `dump' for "\a"
+  fails "String#dump returns a string with upper-case alpha characters unescaped" # NoMethodError: undefined method `dump' for "A"
+  fails "String#dump returns a subclass instance" # NoMethodError: undefined method `dump' for ""
   fails "String#dup calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#dup does not copy constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
+  fails "String#each_byte keeps iterating from the old position (to new string end) when self changes" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
+  fails "String#each_byte passes each byte in self to the given block" # Expected [104, 0, 101, 0, 108, 0, 108, 0, 111, 0, 0, 0] to equal [104, 101, 108, 108, 111, 0]
+  fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string" # Expected nil to equal 10
+  fails "String#each_byte when no block is given returns an enumerator" # Expected [104, 0, 101, 0, 108, 0, 108, 0, 111, 0] to equal [104, 101, 108, 108, 111]
+  fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
+  fails "String#each_line when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
+  fails "String#getbyte counts from the end of the String if given a negative argument" # NotImplementedError: NotImplementedError
+  fails "String#getbyte interprets bytes relative to the String's encoding" # NotImplementedError: NotImplementedError
+  fails "String#getbyte mirrors the output of #bytes" # NotImplementedError: NotImplementedError
+  fails "String#getbyte raises a TypeError unless its argument can be coerced into an Integer" # NotImplementedError: NotImplementedError
+  fails "String#getbyte regards a multi-byte character as having multiple bytes" # Expected 2 to equal 3
+  fails "String#getbyte regards the empty String as containing no bytes" # NotImplementedError: NotImplementedError
+  fails "String#getbyte returns an Integer between 0 and 255" # NotImplementedError: NotImplementedError
+  fails "String#getbyte returns an Integer if given a valid index" # NotImplementedError: NotImplementedError
+  fails "String#getbyte returns nil for out-of-bound indexes" # NotImplementedError: NotImplementedError
+  fails "String#getbyte starts indexing at 0" # NotImplementedError: NotImplementedError
+  fails "String#include? with String raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
+  fails "String#intern raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
+  fails "String#intern returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "String#intern returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "String#intern returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
+  fails "String#intern returns a binary Symbol for a binary String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
+  fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
+  fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
+  fails "String#slice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#slice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#slice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
+  fails "String#split with Regexp applies the limit to the number of split substrings, without counting captures" # Expected ["a", "aBa"] to equal ["a", "B", "", "", "aBa"]
+  fails "String#start_with? sets Regexp.last_match if it returns true" # TypeError: no implicit conversion of Regexp into String
+  fails "String#start_with? supports regexps with ^ and $ modifiers" # TypeError: no implicit conversion of Regexp into String
+  fails "String#start_with? supports regexps" # TypeError: no implicit conversion of Regexp into String
+  fails "String#sub with pattern, replacement returns a copy of self when no modification is made" # Expected "hello" not to be identical to "hello"
+  fails "String#swapcase works for all of Unicode" # Expected "äÖü" to equal "ÄöÜ"
+  fails "String#to_sym raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
+  fails "String#to_sym returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "String#to_sym returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "String#to_sym returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
+  fails "String#to_sym returns a binary Symbol for a binary String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "String#unicode_normalize defaults to the nfc normalization form if no forms are specified" # Expected "Å" to equal "Å"
+  fails "String#unicode_normalize normalizes code points in the string according to the form that is specified" # Expected "ẛ̣" to equal "ẛ̣"
+  fails "String#unicode_normalize raises an ArgumentError if the specified form is invalid" # Expected ArgumentError but no exception was raised ("Å" was returned)
+  fails "String#unicode_normalize raises an Encoding::CompatibilityError if string is not in an unicode encoding" # ArgumentError: unknown encoding name - ISO-8859-1
+  fails "String#unicode_normalize returns normalized form of string by default 03D3 (ϓ) GREEK UPSILON WITH ACUTE AND HOOK SYMBOL" # Expected "ϓ" to equal "ϓ"
+  fails "String#unicode_normalize returns normalized form of string by default 03D4 (ϔ) GREEK UPSILON WITH DIAERESIS AND HOOK SYMBOL" # Expected "ϔ" to equal "ϔ"
+  fails "String#unicode_normalize returns normalized form of string by default 1E9B (ẛ) LATIN SMALL LETTER LONG S WITH DOT ABOVE" # Expected "ẛ" to equal "ẛ"
+  fails "String#unicode_normalized? defaults to the nfc normalization form if no forms are specified" # Expected true to equal false
+  fails "String#unicode_normalized? raises an ArgumentError if the specified form is invalid" # Expected ArgumentError but no exception was raised (true was returned)
+  fails "String#unicode_normalized? raises an Encoding::CompatibilityError if the string is not in an unicode encoding" # ArgumentError: unknown encoding name - ISO-8859-1
+  fails "String#unicode_normalized? returns false if string is not in the supplied normalization form" # Expected true to equal false
+  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfc)" # Expected true to be false
+  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfd)" # Expected true to be false
+  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfkc)" # Expected true to be false
+  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfkd)" # Expected true to be false
+  fails "String#unpack1 returns the first value of #unpack" # RuntimeError: Unsupported unpack directive "x" (no chunk reader defined)
+  fails "String.new accepts a capacity argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
+  fails "String.new accepts an encoding argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
   fails "String.new is called on subclasses" # Expected nil to equal "subclass"
 end

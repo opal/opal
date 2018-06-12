@@ -357,3 +357,45 @@ module Kernel
     Rational.convert(numerator, denominator)
   end
 end
+
+class String
+  def to_r
+    %x{
+      var str = self.trimLeft(),
+          re = /^[+-]?[\d_]+(\.[\d_]+)?/,
+          match = str.match(re),
+          numerator, denominator;
+
+      function isFloat() {
+        return re.test(str);
+      }
+
+      function cutFloat() {
+        var match = str.match(re);
+        var number = match[0];
+        str = str.slice(number.length);
+        return number.replace(/_/g, '');
+      }
+
+      if (isFloat()) {
+        numerator = parseFloat(cutFloat());
+
+        if (str[0] === '/') {
+          // rational real part
+          str = str.slice(1);
+
+          if (isFloat()) {
+            denominator = parseFloat(cutFloat());
+            return #{Rational(`numerator`, `denominator`)};
+          } else {
+            return #{Rational(`numerator`, 1)};
+          }
+        } else {
+          return #{Rational(`numerator`, 1)};
+        }
+      } else {
+        return #{Rational(0, 1)};
+      }
+    }
+  end
+end

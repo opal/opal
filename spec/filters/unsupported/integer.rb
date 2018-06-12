@@ -96,4 +96,8 @@ opal_unsupported_filter "Integer" do
   fails "Integer#~ bignum returns self with each bit flipped" # Expected -1 to equal -9223372036854776000
   fails "Integer#pow one argument is passed fixnum returns Float::INFINITY for 0 ** -1.0" # Depends on the difference between Integer and Float
   fails "Integer#pow two arguments are passed ensures all arguments are integers" # Depends on the difference between Integer and Float
+  fails "String#to_r does not treat a leading period without a numeric prefix as a decimal point" # Expected (8106479329266893/9007199254740992) not to equal (8106479329266893/9007199254740992)
+  fails "String#to_r ignores underscores between numbers" # Expected (-5228919960423629/274877906944) to equal (-190227/10)
+  fails "String#to_r understands a forward slash as separating the numerator from the denominator" # Expected (-896028675862255/140737488355328) to equal (-191/30)
+  fails "String#to_r understands decimal points" # Expected (1874623344892969/562949953421312) to equal (333/100)
 end
