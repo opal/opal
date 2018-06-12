@@ -7,44 +7,48 @@ cache:
   directories:
     - /home/travis/.nvm/
 
+
 matrix:
   fast_finish: true
 
   include:
-    - rvm: 2.3.3
+    - rvm: 2.3.7
       env: RUN=jshint SUITE=core
 
-    - rvm: 2.3.3
+    - rvm: 2.3.7
       env: RUN=jshint SUITE=stdlib
 
-    - rvm: 2.3.3
+    - rvm: 2.3.7
+      nvm: "0.10"
       env: RUN=mspec_opal_nodejs
 
-    - rvm: 2.3.3
+    - rvm: 2.3.7
+      nvm: "0.10"
       env: RUN=mspec_ruby_nodejs TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
-    - rvm: 2.3.3
+    - rvm: 2.3.7
       env: RUN=mspec_ruby_sprockets_phantomjs
 
-    - rvm: 2.3.3
+    - rvm: 2.3.7
       env: RUN=minitest
 
-    - rvm: 2.3.3
+    - rvm: 2.3.7
       env: RUN=rspec RACK_VERSION='~> 2.0.0' CHECK_COVERAGE=true
 
     - rvm: ruby-head
       env: RUN=rspec
 
-    - rvm: 2.2.6
+    - rvm: 2.2.10
       env: RUN=rspec TILT_VERSION=2.0.1 SPROCKETS_VERSION='~> 3.7'
 
     - rvm: 2.1.10
       env: RUN=rspec RACK_VERSION='< 2.0'
 
     - rvm: 2.0.0
+      nvm: "0.10"
       env: RUN="rspec mspec_opal_nodejs" RACK_VERSION='< 2.0'
 
-    - rvm: jruby-9.1.6.0
+    - rvm: jruby-9.2.0.0
       env: RUN=rspec
 
     - rvm: jruby-head
@@ -62,6 +66,7 @@ before_install:
   - git submodule update --init
   - npm install -g jshint
   - npm install -g uglify-js
+  - export PATH="/usr/local/phantomjs-1.9.8:$PATH"
   - bundle config without doc
 
 script:
