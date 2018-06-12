@@ -1,22 +1,27 @@
 source 'https://rubygems.org'
 gemspec
 
-tilt_version = ENV['TILT_VERSION']
-rack_version = ENV['RACK_VERSION']
+v = -> version { Gem::Version.new(version) if version }
+
+ruby_version      = v[RUBY_VERSION]
+
+tilt_version      = ENV['TILT_VERSION']
+rack_version      = ENV['RACK_VERSION']
 sprockets_version = ENV['SPROCKETS_VERSION']
 
 # Stick with older racc until
 # https://github.com/tenderlove/racc/issues/22
 # is solved.
 gem 'racc', '< 1.4.10', platform: :jruby
-gem 'json', '< 1.8.1',  platform: :ruby if RUBY_VERSION.to_f == 2.1
+gem 'json', '< 1.8.1',  platform: :ruby if ruby_version < v['2.2']
 gem 'rubysl', platform: :rbx
+gem 'rack-test', '< 1.0' if ruby_version < v['2.2.2']
 
 # thin requires rack < 2
-gem 'thin', platform: :mri if !rack_version || (rack_version < '2')
+gem 'puma'
 
-gem 'rack', rack_version if rack_version
-gem 'tilt', tilt_version if tilt_version
+gem 'rack',      rack_version      if rack_version
+gem 'tilt',      tilt_version      if tilt_version
 gem 'sprockets', sprockets_version if sprockets_version
 
 group :repl do
