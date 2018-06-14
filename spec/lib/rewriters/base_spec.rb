@@ -6,7 +6,7 @@ RSpec.describe Opal::Rewriters::Base do
   include RewritersHelper
 
   def body_ast_of(method_source)
-    def_ast = ast_of(method_source)
+    def_ast = parse_without_rewriting(method_source)
     _, _, body_ast = *def_ast
     body_ast
   end

@@ -9,7 +9,9 @@ module Opal
         yielding_scope = find_yielding_scope
 
         yielding_scope.uses_block!
-        block_name = yielding_scope.block_name || '$yield'
+        yielding_scope.block_name ||= '$yield'
+
+        block_name = yielding_scope.block_name
 
         if yields_single_arg?(children)
           push expr(children.first)

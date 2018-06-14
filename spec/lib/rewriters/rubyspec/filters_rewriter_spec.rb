@@ -10,6 +10,10 @@ RSpec.describe Opal::Rubyspec::FiltersRewriter do
       describe 'User#email' do
         context 'when this' do
           it 'does that'
+
+          it 'and does that' do
+            42
+          end
         end
 
         it 'also does something else'
@@ -22,6 +26,7 @@ RSpec.describe Opal::Rubyspec::FiltersRewriter do
   context 'when spec is filtered' do
     around(:each) do |e|
       Opal::Rubyspec::FiltersRewriter.filter 'User#email when this does that'
+      Opal::Rubyspec::FiltersRewriter.filter 'User#email when this and does that'
       e.run
       Opal::Rubyspec::FiltersRewriter.clear_filters!
     end
@@ -31,6 +36,7 @@ RSpec.describe Opal::Rubyspec::FiltersRewriter do
         describe 'User#email' do
           context 'when this' do
             nil # <- right here
+            nil # <- and here
           end
 
           it 'also does something else'
