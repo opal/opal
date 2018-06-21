@@ -20,8 +20,22 @@ Whitespace conventions:
 
 
 
+## [0.10.6](https://github.com/opal/opal/compare/v0.10.5...v0.10.6) - 2018-06-21
 
-## [0.10.5] - 2017-06-21
+
+### Changed
+
+- Strip Regexp flags that are unsupported by browsers (backport), previously they were ignored, lately most of them now raise an error for unknown flags.
+
+
+### Fixed
+
+- Fixed a constant reference to `Sprockets::FileNotFound` that previously pointed to `Opal::Sprockets` instead of `::Sprockets`.
+
+
+
+
+## [0.10.5](https://github.com/opal/opal/compare/v0.10.4...v0.10.5) - 2017-06-21
 
 
 ### Fixed
