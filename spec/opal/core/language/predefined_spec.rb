@@ -114,7 +114,7 @@ describe "The predefined global constants" do
 
   it "includes RUBY_VERSION" do
     Object.const_defined?(:RUBY_VERSION).should == true
-    RUBY_VERSION.should =~ /^\d\.\d\.\d$/
+    RUBY_VERSION.should =~ /^\d+\.\d+\.\d+$/
   end
 
   it "includes RUBY_RELEASE_DATE" do
