@@ -20,6 +20,7 @@ Whitespace conventions:
 
 
 
+## [0.10.6](https://github.com/opal/opal/compare/v0.10.5...v0.10.6) - 2018-06-21
 
 ## [0.11.1] - Unreleased
 
@@ -99,6 +100,10 @@ Whitespace conventions:
 - Removed `yaml` from stdlib, the older implementation was only available for NodeJS and not tested. Replace with `require 'nodejs/yaml'`
 - Extracted sprockets support to `opal-sprockets` which should allow for wider support and less coupling (e.g. the `opal` gem will now be able to improve the compiler without worrying about `sprockets` updates). All the old behavior is preserved except for `Opal::Server` that has become `Opal::Sprockets::Server` (see Deprecated section above).
 
+### Changed
+
+- Strip Regexp flags that are unsupported by browsers (backport), previously they were ignored, lately most of them now raise an error for unknown flags.
+
 
 ### Fixed
 
@@ -131,11 +136,13 @@ Whitespace conventions:
 - `Module#append_features` now detects cyclic includes
 - `Process.clock_gettime(Process::CLOCK_MONOTONIC)` will now return true monotonic values or raise `Errno::EINVAL` if no monotonic clock is available
 - Opal::Builder no longer always raises an error when a dependency isn't found and instead respects `dynamic_require_severity` value
+- Fixed a constant reference to `Sprockets::FileNotFound` that previously pointed to `Opal::Sprockets` instead of `::Sprockets`.
 
 
 
 
 ## [0.10.5] - 2017-06-21
+## [0.10.5](https://github.com/opal/opal/compare/v0.10.4...v0.10.5) - 2017-06-21
 
 
 ### Fixed

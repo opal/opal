@@ -19,6 +19,7 @@ cache:
     - /home/travis/.nvm/
     - smoke_test_opal_rspec
 
+
 matrix:
   fast_finish: true
 
@@ -69,7 +70,11 @@ matrix:
     - rvm: 2.1.10
       env: RUN=rspec RACK_VERSION='< 2.0'
 
-    - rvm: jruby-9.1.17.0
+    - rvm: 2.0.0
+      nvm: "0.10"
+      env: RUN="rspec mspec_opal_nodejs" RACK_VERSION='< 2.0'
+
+    - rvm: jruby-9.2.0.0
       env: RUN=rspec
 
     - rvm: jruby-head
