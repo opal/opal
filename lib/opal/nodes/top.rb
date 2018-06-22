@@ -176,10 +176,10 @@ module Opal
 
       def self.module_name(filenamepath, original_filepath = nil, original_filename = nil)
         original_filename = filenamepath unless original_filename
-        original_filepath = Pathname.new(filenamepath).realpath unless original_filepath
+        original_filepath = Pathname.new(filenamepath).expand_path unless original_filepath
         o_s = original_filepath.to_s
-        path, _ = Pathname.new(filenamepath).realpath.split
-        if Opal.paths.include?(path.realpath.to_s)
+        path, _ = Pathname.new(filenamepath).expand_path.split
+        if Opal.paths.include?(path.expand_path.to_s)
           e = if o_s.end_with?('.js.rb')
                 -7
               elsif o_s.end_with?('.rb') || o_s.end_with?('.js')
@@ -187,7 +187,7 @@ module Opal
               else
                 -1
               end
-          return o_s[(path.realpath.to_s.size+1)..e]
+          return o_s[(path.expand_path.to_s.size+1)..e]
         end
         if path.root?
           pwd = Dir.pwd
@@ -217,11 +217,11 @@ module Opal
         directory_path = base_dir + module_path
         directory_path.each_child do |child_path|
           if child_path.directory?
-            import_child_paths(import_lines, base_dir, child_path.realpath.to_s[(base_dir.realpath.to_s.length+1)..-1])
+            import_child_paths(import_lines, base_dir, child_path.expand_path.to_s[(base_dir.expand_path.to_s.length+1)..-1])
           elsif child_path.file?
             path_s = child_path.basename.to_s
             if path_s.end_with?('.rb') || path_s.end_with?('.js')
-              module_path = child_path.realpath.to_s[(base_dir.realpath.to_s.length+1)..-4]
+              module_path = child_path.expand_path.to_s[(base_dir.expand_path.to_s.length+1)..-4]
               i_name = import_name(module_path + path_s[-3..-1])
               import_lines << "import #{i_name} from '#{module_path}#{path_s[-3..-1]}';\n"
               import_lines << "if (typeof Opal.modules[#{module_path.inspect}] === 'undefined') {\n"
