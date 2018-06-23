@@ -1241,28 +1241,25 @@
     return null;
   };
 
+  function walk_hierarchy(klass, my_class) {
+    var i, length, ancestor;
+
+    for(ancestor = my_class; ancestor && ancestor !== Opal.BasicObject; ancestor = ancestor.$$super) {
+      if(ancestor === klass) { return true }
+      for(i = 0, length = ancestor.$$inc.length; i < length; i++) {
+        if(ancestor.$$inc[i] === klass) { return true }
+      }
+    }
+
+    return false;
+  }
+
   Opal.is_a = function(object, klass) {
     if (object.$$meta === klass) {
       return true;
     }
 
-    var i, length, ancestors = Opal.ancestors(object.$$class);
-
-    for (i = 0, length = ancestors.length; i < length; i++) {
-      if (ancestors[i] === klass) {
-        return true;
-      }
-    }
-
-    ancestors = Opal.ancestors(object.$$meta);
-
-    for (i = 0, length = ancestors.length; i < length; i++) {
-      if (ancestors[i] === klass) {
-        return true;
-      }
-    }
-
-    return false;
+    return walk_hierarchy(klass, object.$$class) || walk_hierarchy(klass, object.$$meta);
   };
 
   // Helpers for extracting kwsplats
