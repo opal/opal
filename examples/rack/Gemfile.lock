@@ -1,19 +1,19 @@
 PATH
-  remote: ../../
+  remote: ../..
   specs:
-    opal (0.11.0.dev)
+    opal (0.11.1.dev)
       ast (>= 2.3.0)
       hike (~> 1.2)
-      parser (>= 2.3.1.2)
+      parser (= 2.5.1.0)
       sourcemap (~> 0.1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    ast (2.3.0)
+    ast (2.4.0)
     hike (1.2.3)
-    parser (2.3.1.2)
-      ast (~> 2.2)
+    parser (2.5.1.0)
+      ast (~> 2.4.0)
     rack (2.0.1)
     sourcemap (0.1.1)
 
@@ -25,4 +25,4 @@ DEPENDENCIES
   rack
 
 BUNDLED WITH
-   1.12.5
+   1.16.1
