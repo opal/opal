@@ -68,6 +68,7 @@
   // Minify common function calls
   var $hasOwn = Object.hasOwnProperty;
   var $slice  = Opal.slice = Array.prototype.slice;
+  var $setPrototype = Object.setPrototypeOf;
 
   // Nil object id is always 4
   var nil_id = 4;
@@ -405,7 +406,7 @@
             self = new (Function.prototype.bind.apply(superclass, [null].concat(args)))();
 
         // and replacing a __proto__ manually
-        Object.setPrototypeOf(self, klass.prototype);
+        $setPrototype(self, klass.prototype);
         return self;
       }
     }
@@ -428,11 +429,11 @@
     // Later singleton methods generate a singleton_class
     // and inject it into ancestors chain
     if (Opal.Class) {
-      Object.setPrototypeOf(klass, Opal.Class.prototype);
+      $setPrototype(klass, Opal.Class.prototype);
     }
 
     if (superclass != null) {
-      Object.setPrototypeOf(klass.prototype, superclass.prototype);
+      $setPrototype(klass.prototype, superclass.prototype);
 
       if (superclass !== Opal.Module && superclass.$$meta) {
         // If superclass has metaclass then we have explicitely inherit it.
@@ -550,7 +551,7 @@
     $defineProperty(module, '$$ancestors', [module]);
     $defineProperty(module, '$$ancestors_cache_version', null);
 
-    Object.setPrototypeOf(module, Opal.Module.prototype);
+    $setPrototype(module, Opal.Module.prototype);
 
     return module;
   }
@@ -643,7 +644,7 @@
     $defineProperty(meta, '$$is_singleton', true);
     $defineProperty(meta, '$$singleton_of', klass);
     $defineProperty(klass, '$$meta', meta);
-    Object.setPrototypeOf(klass, meta.prototype);
+    $setPrototype(klass, meta.prototype);
     // Restoring ClassName.class
     $defineProperty(klass, '$$class', Opal.Class);
 
@@ -660,7 +661,7 @@
     $defineProperty(meta, '$$is_singleton', true);
     $defineProperty(meta, '$$singleton_of', mod);
     $defineProperty(mod, '$$meta', meta);
-    Object.setPrototypeOf(mod, meta.prototype);
+    $setPrototype(mod, meta.prototype);
     // Restoring ModuleName.class
     $defineProperty(mod, '$$class', Opal.Module);
 
@@ -681,7 +682,7 @@
 
     $defineProperty(object, '$$meta', klass);
 
-    Object.setPrototypeOf(object, object.$$meta.prototype);
+    $setPrototype(object, object.$$meta.prototype);
 
     return klass;
   };
@@ -939,8 +940,8 @@
       end_chain_on = next_ancestor;
     }
 
-    Object.setPrototypeOf(start_chain_after, chain.first);
-    Object.setPrototypeOf(chain.last, end_chain_on);
+    $setPrototype(start_chain_after, chain.first);
+    $setPrototype(chain.last, end_chain_on);
 
     // recalculate own_included_modules cache
     includer.$$own_included_modules = own_included_modules(includer);
@@ -999,8 +1000,8 @@
       //   dummy(prepender) -> previous_parent
       // to
       //   dummy(prepender) -> iclass(prepender) -> previous_parent
-      Object.setPrototypeOf(dummy_prepender, prepender_iclass);
-      Object.setPrototypeOf(prepender_iclass, previous_parent);
+      $setPrototype(dummy_prepender, prepender_iclass);
+      $setPrototype(prepender_iclass, previous_parent);
     }
 
     var prepender_ancestors = Opal.ancestors(prepender);
@@ -1027,8 +1028,8 @@
       throw Opal.RuntimeError.$new("Prepending a module multiple times is not supported");
     }
 
-    Object.setPrototypeOf(start_chain_after, chain.first);
-    Object.setPrototypeOf(chain.last, end_chain_on);
+    $setPrototype(start_chain_after, chain.first);
+    $setPrototype(chain.last, end_chain_on);
 
     // recalculate own_prepended_modules cache
     prepender.$$own_prepended_modules = own_prepended_modules(prepender);
@@ -1094,7 +1095,7 @@
 
     for (var i = 1; i < length; i++) {
       var current = iclasses[i];
-      Object.setPrototypeOf(previous, current);
+      $setPrototype(previous, current);
       previous = current;
     }
 
@@ -1147,7 +1148,7 @@
     //         - super
     //
 
-    Object.setPrototypeOf(constructor.prototype, klass_to_inject.prototype);
+    $setPrototype(constructor.prototype, klass_to_inject.prototype);
     $defineProperty(constructor.prototype, '$$class', klass_reference);
     $defineProperty(constructor, '$$bridge', true);
     $defineProperty(constructor, '$$is_class', true);
@@ -1158,7 +1159,7 @@
     $defineProperty(constructor, '$$own_prepended_modules', []);
     $defineProperty(constructor, '$$ancestors', []);
     $defineProperty(constructor, '$$ancestors_cache_version', null);
-    Object.setPrototypeOf(constructor, Opal.Class.prototype);
+    $setPrototype(constructor, Opal.Class.prototype);
   };
 
   function protoToModule(proto) {
@@ -2327,10 +2328,10 @@
   Opal.Module      = Module      = Opal.allocate_class('Module', Opal.Object, $Module);
   Opal.Class       = Class       = Opal.allocate_class('Class', Opal.Module, $Class);
 
-  Object.setPrototypeOf(Opal.BasicObject, Opal.Class.prototype);
-  Object.setPrototypeOf(Opal.Object, Opal.Class.prototype);
-  Object.setPrototypeOf(Opal.Module, Opal.Class.prototype);
-  Object.setPrototypeOf(Opal.Class, Opal.Class.prototype);
+  $setPrototype(Opal.BasicObject, Opal.Class.prototype);
+  $setPrototype(Opal.Object, Opal.Class.prototype);
+  $setPrototype(Opal.Module, Opal.Class.prototype);
+  $setPrototype(Opal.Class, Opal.Class.prototype);
 
   // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
   BasicObject.$$const["BasicObject"] = BasicObject;
