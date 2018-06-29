@@ -66,9 +66,10 @@
   }
 
   // Minify common function calls
-  var $hasOwn = Object.hasOwnProperty;
-  var $slice  = Opal.slice = Array.prototype.slice;
+  var $hasOwn       = Object.hasOwnProperty;
+  var $bind         = Function.prototype.bind;
   var $setPrototype = Object.setPrototypeOf;
+  var $slice        = Array.prototype.slice;
 
   // Nil object id is always 4
   var nil_id = 4;
@@ -146,6 +147,8 @@
   }
 
   Opal.defineProperty = $defineProperty;
+
+  Opal.slice = $slice;
 
 
   // Truth
@@ -402,8 +405,8 @@
       // Inheritance from bridged classes requires
       // calling original JS constructors
       klass = function SubclassOfNativeClass() {
-        var args = Array.prototype.slice.call(arguments),
-            self = new (Function.prototype.bind.apply(superclass, [null].concat(args)))();
+        var args = $slice.call(arguments),
+            self = new ($bind.apply(superclass, [null].concat(args)))();
 
         // and replacing a __proto__ manually
         $setPrototype(self, klass.prototype);
