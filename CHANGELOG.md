@@ -29,6 +29,8 @@ Whitespace conventions:
 
 - Added support for a static folder in the "server" CLI runner via the `OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER` env var
 - Added ability to pass the port to the "server" CLI runner using the `OPAL_CLI_RUNNERS_SERVER_PORT` (explicit option passed via CLI is still working but depreted)
+- Added a new `Opal::Config.missing_require_severity` option and relative `--missing-require` CLI flag. This option will command how the builder will behave when a required file is missing. Previously the behavior was undefined and partly controlled by `dynamic_require_severity`. Not to be confused with the runtime config option `Opal.config.missing_require_severity;` which controls the runtime behavior.
+- At run-time `LoadError` wasn't being raised even with `Opal.config.missing_require_severity;` set to `'error'`.
 
 
 

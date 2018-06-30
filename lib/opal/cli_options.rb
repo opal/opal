@@ -119,6 +119,14 @@ module Opal
         options[:dynamic_require_severity] = level.to_sym
       end
 
+      missing_require_levels = %w[error warning ignore]
+      on('--missing-require LEVEL', missing_require_levels,
+        'Set level of missing require severity.',
+        "(default: error, values: #{missing_require_levels.join(', ')})"
+      ) do |level|
+        options[:missing_require_severity] = level.to_sym
+      end
+
       on('-P', '--map FILE', 'Enable/Disable source map') do |file|
         options[:map] = file
       end

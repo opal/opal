@@ -7,7 +7,7 @@ module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
                 :output, :requires, :gems, :stubs, :verbose, :port, :preload,
-                :filename, :debug, :no_exit, :lib_only
+                :filename, :debug, :no_exit, :lib_only, :missing_require_severity
 
     class << self
       attr_accessor :stdout
@@ -39,6 +39,9 @@ module Opal
       @filename    = options.fetch(:filename) { @file && @file.path }; options.delete(:filename)
 
       @requires    = options.delete(:requires)   || []
+
+      @missing_require_severity = options.delete(:missing_require_severity) { Opal::Config.missing_require_severity }
+
       @requires.unshift('opal') unless options.delete(:skip_opal_require)
 
       @compiler_options = Hash[
@@ -85,7 +88,11 @@ module Opal
     end
 
     def create_builder
-      builder = Opal::Builder.new stubs: stubs, compiler_options: compiler_options
+      builder = Opal::Builder.new(
+        stubs: stubs,
+        compiler_options: compiler_options,
+        missing_require_severity: missing_require_severity,
+      )
 
       # --include
       builder.append_paths(*load_paths)
