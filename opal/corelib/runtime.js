@@ -763,8 +763,9 @@
   }
 
   Opal.receiver_methods = function(obj) {
-    var singleton_methods = Opal.own_instance_methods(Opal.get_singleton_class(obj));
-    var instance_methods = Opal.own_instance_methods(obj.$$class);
+    var mod = Opal.get_singleton_class(obj);
+    var singleton_methods = Opal.own_instance_methods(mod);
+    var instance_methods = Opal.own_instance_methods(mod.$$super);
     return singleton_methods.concat(instance_methods);
   }
 
