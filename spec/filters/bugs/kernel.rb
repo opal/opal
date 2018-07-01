@@ -50,7 +50,6 @@ opal_filter "Kernel" do
   fails "Kernel#public_method returns a method object for a valid method"
   fails "Kernel#public_method returns a method object for a valid singleton method"
   fails "Kernel#public_method returns a method object if we repond_to_missing? method"
-  fails "Kernel#public_methods returns a list of the names of publicly accessible methods in the object"
   fails "Kernel#public_methods when passed false returns a list of public methods in without its ancestors"
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors"
   fails "Kernel#public_methods returns a list of names without protected accessible methods in the object"
