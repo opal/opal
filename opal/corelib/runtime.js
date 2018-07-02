@@ -762,6 +762,13 @@
     return Opal.own_instance_methods(Opal.get_singleton_class(obj));
   }
 
+  Opal.receiver_methods = function(obj) {
+    var mod = Opal.get_singleton_class(obj);
+    var singleton_methods = Opal.own_instance_methods(mod);
+    var instance_methods = Opal.own_instance_methods(mod.$$super);
+    return singleton_methods.concat(instance_methods);
+  }
+
   // Returns an object containing all pairs of names/values
   // for all class variables defined in provided +module+
   // and its ancestors.

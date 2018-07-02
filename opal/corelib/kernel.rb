@@ -52,7 +52,15 @@ module Kernel
     }
   end
 
-  alias public_methods methods
+  def public_methods(all = true)
+    %x{
+      if (#{Opal.truthy?(all)}) {
+        return Opal.methods(self);
+      } else {
+        return Opal.receiver_methods(self);
+      }
+    }
+  end
 
   def Array(object)
     %x{

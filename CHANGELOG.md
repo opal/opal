@@ -104,6 +104,7 @@ Whitespace conventions:
 - Fixed `pattern` argument handling for `Enumerable#grep` and `Enumerable#grep_v`. (#1757)
 - Raise `ArgumentError` instead of `TypeError` from `Numeric#step` when step is not a number. (#1757)
 - At run-time `LoadError` wasn't being raised even with `Opal.config.missing_require_severity;` set to `'error'`.
+- Fixed `Kernel#public_methods` to return instance methods if the argument is set to false.
 
 
 ## [0.11.0] - 2017-12-08
