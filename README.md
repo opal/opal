@@ -1,25 +1,25 @@
 # Opal
 
-[![Build Status (Linux)](http://img.shields.io/travis/opal/opal/master.svg?style=flat)](http://travis-ci.org/opal/opal)
+[![Build Status (Linux)](https://img.shields.io/travis/opal/opal/master.svg?style=flat)](https://travis-ci.org/opal/opal)
 [![Build Status (Windows)](https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true)](https://ci.appveyor.com/project/elia/opal/branch/master)
-[![Gem Version](http://img.shields.io/gem/v/opal.svg?style=flat)](http://badge.fury.io/rb/opal)
-[![Code Climate](http://img.shields.io/codeclimate/github/opal/opal.svg?style=flat)](https://codeclimate.com/github/opal/opal)
+[![Gem Version](https://img.shields.io/gem/v/opal.svg?style=flat)](https://badge.fury.io/rb/opal)
+[![Code Climate](https://img.shields.io/codeclimate/github/opal/opal.svg?style=flat)](https://codeclimate.com/github/opal/opal)
 [![Coverage Status](https://coveralls.io/repos/opal/opal/badge.svg?branch=master&service=github)](https://coveralls.io/github/opal/opal?branch=elia%2Fcoveralls)
 
 
 Opal is a Ruby to JavaScript source-to-source compiler. It also has an
 implementation of the Ruby corelib.
 
-Opal is [hosted on GitHub](http://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) (also available as IRC at `irc.gitter.im`) and the Freenode IRC channel at [#opal](http://webchat.freenode.net/?channels=opal).
-Ask questions on [stackoverflow (tag #opalrb)](http://stackoverflow.com/questions/ask?tags=opalrb). Get the [Opalist newsletter](http://opalist.co) for updates and community news.
+Opal is [hosted on GitHub](https://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) (also available as IRC at `irc.gitter.im`) and the Freenode IRC channel at [#opal](https://webchat.freenode.net/?channels=opal).
+Ask questions on [stackoverflow (tag #opalrb)](https://stackoverflow.com/questions/ask?tags=opalrb). Get the [Opalist newsletter](http://opalist.co) for updates and community news.
 
-[![Inline docs](http://inch-ci.org/github/opal/opal.svg?branch=master&style=flat)](http://opalrb.com/docs)
+[![Inline docs](https://inch-ci.org/github/opal/opal.svg?branch=master&style=flat)](https://opalrb.com/docs)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/opal/opal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Stack Overflow](http://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat)](http://stackoverflow.com/questions/ask?tags=opalrb)
+[![Stack Overflow](https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat)](https://stackoverflow.com/questions/ask?tags=opalrb)
 
 ## Usage
 
-See the website for more detailed instructions and guides for Rails, jQuery, Sinatra, rack, CDN, etc. [http://opalrb.com](http://opalrb.com).
+See the website for more detailed instructions and guides for Rails, jQuery, Sinatra, rack, CDN, etc. [https://opalrb.com](https://opalrb.com).
 
 ### Compiling Ruby code with the CLI (Command Line Interface)
 
@@ -102,8 +102,8 @@ your web applications.
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="http://cdn.opalrb.com/opal/current/opal.js"></script>
-    <script src="http://cdn.opalrb.com/opal/current/opal-parser.js"></script>
+    <script src="https://cdn.opalrb.com/opal/current/opal.js"></script>
+    <script src="https://cdn.opalrb.com/opal/current/opal-parser.js"></script>
     <script type="text/javascript">Opal.load('opal-parser')</script>
 
     <script type="text/ruby">
@@ -204,7 +204,7 @@ version of a browser is 24.x, we support the 24.x and 23.x versions.
 as the last 2 versions of Opera. For example, if the current Opera version is 20.x,
 then we support Opera 12.1x, 19.x and 20.x but not Opera 15.x through 18.x.
 
-Cross-browser testing is sponsored by [SauceLabs](http://saucelabs.com).
+Cross-browser testing is sponsored by [SauceLabs](https://saucelabs.com).
 
 ## License
 
