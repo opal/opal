@@ -44,8 +44,6 @@ class BasicObject
     !(self == other)
   end
 
-  alias equal? ==
-
   def instance_eval(*args, &block)
     if block.nil? && `!!Opal.compile`
       ::Kernel.raise ::ArgumentError, "wrong number of arguments (0 for 1..3)" unless (1..3).cover? args.size
