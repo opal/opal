@@ -259,8 +259,8 @@ module Opal
           first_arg = first_arg.updated(nil, [full_path])
         end
         if compiler.es6_modules? && first_arg.children[0].start_with?('/')
-          nfa = Opal::Nodes::TopNode.module_name(first_arg.children[0])
-          first_arg = Opal::AST::Node.new(:str, [nfa])
+          real_module_name = Opal::Compiler.module_name_from_paths(first_arg.children[0])
+          first_arg = Opal::AST::Node.new(:str, [real_module_name])
         end
         @arglist = arglist.updated(nil, [first_arg] + rest)
         compile_default.call
