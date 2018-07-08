@@ -131,7 +131,7 @@ module Opal
         inline_operators
         enable_source_location
         parse_comments
-        es_six_imexable
+        es6_modules
       ]
     end
 
