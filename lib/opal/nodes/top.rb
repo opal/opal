@@ -72,8 +72,10 @@ module Opal
             # for each import. here a random inport name is generated. webpack will make sure, that the code the different imports refer to,
             # is imported only once
             module_import_name = generate_import_name(module_path)
+
             module_import_lines = []
-            module_import_lines << "import #{module_import_name} from '#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
+            has_extension = module_path.end_with?('.js') || module_path.end_with?('.rb')
+            module_import_lines << "import #{module_import_name} from '#{module_path}#{'.rb' unless has_extension}';\n"
             unless module_path == 'corelib/runtime'
               # webpack replaces module_import_name with a function, but
               # during bootstrapping on the client, when the imports are imported, for a circular import
