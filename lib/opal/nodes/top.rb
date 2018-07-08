@@ -13,11 +13,11 @@ module Opal
       children :body
 
       def compile
-        push version_comment unless compiler.es_six_imexable?
+        push version_comment unless compiler.es6_modules?
 
-        if compiler.es_six_imexable?
-          mod_name = self.class.module_name(compiler.file)
-          opening(mod_name)
+        if compiler.es6_modules?
+          module_name = self.class.module_name(compiler.file)
+          opening(module_name)
         else
           opening
         end
@@ -47,43 +47,52 @@ module Opal
           line body_code
         end
 
-        if compiler.es_six_imexable?
+        if compiler.es6_modules?
           import_lines = compiler.requires.map do |module_path|
             # modules should have the ending .rb for imports, so that the opal-webpack-resolver-plugin
             # or the opal-webpack-loader don't mix them up with javascript imports
             # that is just a sensible convention for example, a require 'react', without ending:
-            # import 'react';  --> resolves to react.js in javascript space, may be resolved by webpack otherwise
+            #   import 'react';  --> resolves to react.js in javascript space, may be resolved by webpack otherwise
             # vs. with ending:
-            # import 'react.rb';  --> resolves to react.rb in the opal/ruby space which gets transpiled to js by the loader
-            # if a javascript file gets required by like: require 'runtime'
-            # it gets imported like so: import 'runtime.rb'
+            #   import 'react.rb';  --> resolves to react.rb in the opal/ruby space which gets transpiled to js by the loader
+            # if a javascript file gets required as:
+            #   require 'runtime'
+            # it gets imported like so:
+            #   import 'runtime.rb'
             # the opal-webpack-resolver-plugin will then check for a runtime.rb, but also for a runtime.js if the runtime.rb is not found.
-            real_m_path = if module_path.start_with?('/')
-                            t_path = module_path.end_with?('.rb') ? module_path : module_path + '.rb'
-                            self.class.module_name(t_path)
-                          else
-                            module_path
-                          end
-            i_name = import_name(module_path)
-            i_line = []
-            i_line << "import #{i_name} from '#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
+            real_module_name = if module_path.start_with?('/')
+                                 module_path_rb = module_path.end_with?('.rb') ? module_path : module_path + '.rb'
+                                 module_name_from_paths(module_path_rb)
+                               else
+                                 module_path
+                               end
+            # in ruby its legal to require the same module several times, in webpack es6 importing the same module only works, if the import name
+            # is different, using the same import will result in a error.
+            # As large ruby projects tend to require the same module in a context several times, the import name must be different
+            # for each import. here a random inport name is generated. webpack will make sure, that the code the different imports refer to,
+            # is imported only once
+            module_import_name = generate_import_name(module_path)
+            module_import_lines = []
+            module_import_lines << "import #{module_import_name} from '#{module_path}#{'.rb' unless module_path.end_with?('.js') || module_path.end_with?('.rb')}';\n"
             unless module_path == 'corelib/runtime'
-              # webpack replaces i_name with a function, but
+              # webpack replaces module_import_name with a function, but
               # during bootstrapping on the client, when the imports are imported, for a circular import
-              # i_name is just a object, because the outer i_name() did not finish execution and thus
-              # the result of the webpack function looking up i_name is a object.
-              # once the import returned, the result of the webpack function looking up i_name will be a function.
-              # checking if i_name actually is a function will make the bootstrapping work,
-              # at this time the i_name has not been imported into local context, luckily the opal require happens
-              # later in time, after all the imports, then Opal.modules should be filled correctly and the opal require
+              # module_import_name is just a object, because the outer module_import_name() did not finish execution and thus
+              # the result of the webpack function looking up module_import_name is not a function yet.
+              # once the import returned, the result of the webpack function looking up module_import_name will be a function.
+              # checking if module_import_name actually is a function will make the bootstrapping work,
+              # at this time the module_import_name has not been imported into local context, luckily the opal require happens
+              # later in time, after all the imports, then Opal.modules is filled correctly and the opal require
               # can be resolved
-              i_line << "if (typeof global.Opal.modules[#{real_m_path.inspect}] === 'undefined') {\n"
-              i_line << "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
-              i_line << "}\n"
+              #
+              # This behaviour is needed for all modules, except corelib/runtime!
+              module_import_lines << "if (typeof global.Opal.modules[#{real_module_name.inspect}] === 'undefined') {\n"
+              module_import_lines << "  if (typeof #{module_import_name} === 'function') { #{module_import_name}(); }\n"
+              module_import_lines << "}\n"
             end
-            i_line
+            module_import_lines
           end
-          if compiler.required_trees.size > 0
+          if compiler.required_trees.any?
             base_dir = Pathname.new(compiler.file).dirname
 
             compiler.required_trees.each do |module_path|
@@ -92,20 +101,18 @@ module Opal
               import_child_paths(import_lines, base_dir, module_path)
             end
           end
-          if import_lines.size > 0
-            unshift(*import_lines.flatten)
-          else
-            unshift(version_comment)
-          end
+          unshift(*import_lines.flatten) if import_lines.any?
+          unshift(version_comment)
         end
 
         closing
       end
 
-      def opening(mod_name = nil)
-        if compiler.es_six_imexable?
-          line "export default function() {"
-          line "  global.Opal.modules[#{mod_name.inspect}] = function(Opal) {"
+      def opening(module_name = nil)
+        if compiler.es6_modules?
+          line 'export default function() {'
+          # global makes sure we get the webpack global context and its Opal.modules, and not a locally shielded Opal.modules
+          line "  global.Opal.modules[#{module_name.inspect}] = function(Opal) {"
         elsif compiler.requirable?
           line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
         elsif compiler.eval?
@@ -116,8 +123,8 @@ module Opal
       end
 
       def closing
-        if compiler.es_six_imexable?
-          line "  }"
+        if compiler.es6_modules?
+          line '  }'
           line "}\n"
         elsif compiler.requirable?
           line "};\n"
@@ -173,47 +180,15 @@ module Opal
         "/* Generated by Opal #{Opal::VERSION} */"
       end
 
-
-      def self.module_name(filenamepath, original_filepath = nil, original_filename = nil)
-        original_filename = filenamepath unless original_filename
-        original_filepath = Pathname.new(filenamepath).expand_path unless original_filepath
-        o_s = original_filepath.to_s
-        path, _ = Pathname.new(filenamepath).expand_path.split
-        if Opal.paths.include?(path.expand_path.to_s)
-          e = if o_s.end_with?('.js.rb')
-                -7
-              elsif o_s.end_with?('.rb') || o_s.end_with?('.js')
-                -4
-              else
-                -1
-              end
-          return o_s[(path.expand_path.to_s.size+1)..e]
-        end
-        if path.root?
-          pwd = Dir.pwd
-          if o_s.start_with?(pwd)
-            e = if o_s.end_with?('.js.rb')
-                  -7
-                elsif o_s.end_with?('.rb') || o_s.end_with?('.js')
-                  -4
-                else
-                  -1
-                end
-            return o_s[(pwd.size+1)..e]
-          else
-            return o_s
-          end
-        end
-        module_name(path, original_filepath, original_filename)
-      end
-
       private
 
-      def import_name(m_name)
-        m_name.gsub('.','o_').gsub('-','_').gsub('/','_').gsub('@','_at_') + rand(36**8).to_s(36)
+      def generate_import_name(module_name)
+        # generate random import name for a ruby module_name. Also replaces some characters that are illegal in JS import names.
+        module_name.gsub('.', 'o_').gsub('-', '_').gsub('/', '_').gsub('@', '_at_') + rand(36**8).to_s(36)
       end
 
       def import_child_paths(import_lines, base_dir, module_path)
+        # recursively walk a directory and generate import lines for all .rb/.js files
         directory_path = base_dir + module_path
         directory_path.each_child do |child_path|
           if child_path.directory?
@@ -222,10 +197,10 @@ module Opal
             path_s = child_path.basename.to_s
             if path_s.end_with?('.rb') || path_s.end_with?('.js')
               module_path = child_path.expand_path.to_s[(base_dir.expand_path.to_s.length+1)..-4]
-              i_name = import_name(module_path + path_s[-3..-1])
-              import_lines << "import #{i_name} from '#{module_path}#{path_s[-3..-1]}';\n"
+              import_name = generate_import_name(module_path + path_s[-3..-1])
+              import_lines << "import #{import_name} from '#{module_path}#{path_s[-3..-1]}';\n"
               import_lines << "if (typeof Opal.modules[#{module_path.inspect}] === 'undefined') {\n"
-              import_lines << "  if (typeof #{i_name} === 'function') { #{i_name}(); }\n"
+              import_lines << "  if (typeof #{import_name} === 'function') { #{import_name}(); }\n"
               import_lines << "}\n"
               import_lines
             end
