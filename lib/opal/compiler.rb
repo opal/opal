@@ -70,7 +70,7 @@ module Opal
       # Using Pathname.expand_path makes sure, the path gets transformed to a path the way ruby would find it.
       # Having a valid ruby path without ../.. etc., we can compare it against Opal.paths below and get a correct result.
       expanded_filename_path = filename ? Pathname.new(filename).expand_path : path
-      original_path = expanded_filename_path unless original_path
+      original_path ||= expanded_filename_path
       original_path_s = original_path.to_s
 
       # split the filename_path into path and basename, only the path is needed and compared against Opal.paths
@@ -164,7 +164,7 @@ module Opal
     # @!method es6_modules?
     #
     # Make modules ES6 import/export-able
-    compiler_option :es6_modules, false, :as => :es6_modules?
+    compiler_option :es6_modules, false, as: :es6_modules?
 
     # @!method inline_operators?
     #

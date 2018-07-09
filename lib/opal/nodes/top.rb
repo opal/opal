@@ -73,7 +73,7 @@ module Opal
             # is imported only once
             module_import_name = generate_import_name(module_path)
             module_import_lines = []
-            has_extension = module_path.end_with?('.js') || module_path.end_with?('.rb')
+            has_extension = module_path.end_with?('.js', '.rb')
             module_import_lines << "import #{module_import_name} from '#{module_path}#{'.rb' unless has_extension}';\n"
             unless module_path == 'corelib/runtime'
               # webpack replaces module_import_name with a function, but
@@ -185,7 +185,7 @@ module Opal
 
       def generate_import_name(module_name)
         # generate random import name for a ruby module_name. Also replaces some characters that are illegal in JS import names.
-        module_name.gsub('.', 'o_').gsub('-', '_').gsub('/', '_').gsub('@', '_at_') + rand(36**8).to_s(36)
+        module_name.gsub('.', 'o_').tr('-', '_').tr('/', '_').gsub('@', '_at_') + rand(36**8).to_s(36)
       end
 
       def import_child_paths(import_lines, base_dir, module_path)
@@ -193,11 +193,11 @@ module Opal
         directory_path = base_dir + module_path
         directory_path.each_child do |child_path|
           if child_path.directory?
-            import_child_paths(import_lines, base_dir, child_path.expand_path.to_s[(base_dir.expand_path.to_s.length+1)..-1])
+            import_child_paths(import_lines, base_dir, child_path.expand_path.to_s[(base_dir.expand_path.to_s.length + 1)..-1])
           elsif child_path.file?
             path_s = child_path.basename.to_s
-            if path_s.end_with?('.rb') || path_s.end_with?('.js')
-              module_path = child_path.expand_path.to_s[(base_dir.expand_path.to_s.length+1)..-4]
+            if path_s.end_with?('.rb', '.js')
+              module_path = child_path.expand_path.to_s[(base_dir.expand_path.to_s.length + 1)..-4]
               import_name = generate_import_name(module_path + path_s[-3..-1])
               import_lines << "import #{import_name} from '#{module_path}#{path_s[-3..-1]}';\n"
               import_lines << "if (typeof Opal.modules[#{module_path.inspect}] === 'undefined') {\n"
