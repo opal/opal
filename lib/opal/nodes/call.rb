@@ -231,7 +231,7 @@ module Opal
         end
         if compiler.es6_modules?
           mod_filename = mod_filename.end_with?('.rb') ? mod_filename : mod_filename + '.rb'
-          push fragment("self.$require(#{Opal::Nodes::TopNode.module_name(mod_filename).inspect})")
+          push fragment("self.$require(#{Opal::Compiler.module_name_from_paths(mod_filename).inspect})")
         else
           push fragment("self.$require(#{file.inspect}+ '/../' + ")
           push process(arglist)
