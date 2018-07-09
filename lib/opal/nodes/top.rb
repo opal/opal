@@ -62,7 +62,7 @@ module Opal
             # the opal-webpack-resolver-plugin will then check for a runtime.rb, but also for a runtime.js if the runtime.rb is not found.
             real_module_name = if module_path.start_with?('/')
                                  module_path_rb = module_path.end_with?('.rb') ? module_path : module_path + '.rb'
-                                 module_name_from_paths(module_path_rb)
+                                 Opal::Compiler.module_name_from_paths(module_path_rb)
                                else
                                  module_path
                                end
