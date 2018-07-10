@@ -166,6 +166,7 @@ module Opal
 
       on('--es6-modules', 'Compiles modules for ES6 import/export') do
         options[:es6_modules] = true
+        options[:runner] = :compiler
       end
 
       separator ''
