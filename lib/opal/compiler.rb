@@ -6,6 +6,7 @@ require 'opal/fragment'
 require 'opal/nodes'
 require 'opal/eof_content'
 require 'opal/errors'
+require 'opal/es6_modules_helpers'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -58,42 +59,18 @@ module Opal
     end
 
     # this is meant for determining the ruby module name for the es6_modules, where webpack delivers the filename as and instead of a module name
-    # to the compiler.
-    # the real ruby module name for use in Opal.modules must then be determined by checking the Opal.paths for a match
+    # to the compiler. The real ruby module name for use in Opal.modules must then be determined by checking the Opal.paths for a match
     # a filename like:                   /a/path/to/some/ruby.rb
     # and a Opal.paths entry like:       /a/path/to
     # becomes a ruby module name like:             'some/ruby'
     # if a match for the partial path is found in Opal.paths. Otherwise return the original filename.
-    def self.module_name_from_paths(filename, path = nil, original_path = nil)
+    def self.module_name_from_paths(filename)
       # The filename comes from webpack/node/js world and may be a partial or relative path and include ../.. and is the
       # path of how webpack got to the ruby file, which may be very different from how ruby would get there.
       # Using Pathname.expand_path makes sure, the path gets transformed to a path the way ruby would find it.
-      # Having a valid ruby path without ../.. etc., we can compare it against Opal.paths below and get a correct result.
+      # Having a valid ruby path without ../.. etc., we can compare it against Opal.paths and get a correct result.
       expanded_filename_path = filename ? Pathname.new(filename).expand_path : path
-      original_path ||= expanded_filename_path
-      original_path_s = original_path.to_s
-
-      # split the filename_path into path and basename, only the path is needed and compared against Opal.paths
-      path, _basename = expanded_filename_path.split # Pathname#split that is and doesn't accept args
-      path_s = path.expand_path.to_s
-      if Opal.paths.include?(path_s)
-        # got a load path match
-        # remove known load path at the beginning and the filename extension to get the module name like 'some/ruby'
-        return original_path_s[(path_s.size + 1)..-1].sub(/\.(js|rb|js\.rb)\z/, '')
-      end
-      if path.root?
-        # no match in Opal.paths
-        pwd = Dir.pwd
-        if original_path_s.start_with?(pwd)
-          # got a match in current dir
-          # remove current dir at the beginning and the filename extension to get the module name like 'some/ruby'
-          return original_path_s[(pwd.size + 1)..-1].sub(/\.(js|rb|js\.rb)\z/, '')
-        else
-          # no match at all, return original path
-          return original_path_s
-        end
-      end
-      module_name_from_paths(nil, path, original_path)
+      ES6ModuleHelpers.module_name_from_paths_helper(expanded_filename_path, expanded_filename_path.to_s)
     end
 
     # defines a compiler option, also creating method of form 'name?'
