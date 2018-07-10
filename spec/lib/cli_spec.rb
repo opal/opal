@@ -227,6 +227,19 @@ RSpec.describe Opal::CLI do
     end
   end
 
+  describe ':es6_modules' do
+    let(:file) { File.expand_path('../fixtures/opal_file.rb', __FILE__) }
+    let(:options) { { es6_modules: true, runner: :compiler, file: File.open(file) } }
+
+    it 'inserts ES6 export lines into compiled code' do
+      expect_output_of { subject.run }.to include('export default function() {')
+    end
+
+    it 'inserts ES6 import lines into compiled code' do
+      expect_output_of { subject.run }.to match(/import corelib_module[[:alnum:]]{8} from 'corelib\/module\.rb';/)
+    end
+  end
+
   private
 
   def expect_output_of

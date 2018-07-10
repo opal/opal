@@ -62,6 +62,7 @@ module Opal
             end
           end
           unshift(*import_lines.flatten) if import_lines.any?
+          unshift("\n")
           unshift(version_comment)
         end
 
