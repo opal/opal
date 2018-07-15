@@ -163,7 +163,7 @@ end
 
 class String
   attr_reader :encoding
-  `Opal.defineProperty(String.prototype, 'encoding', #{Encoding::UTF_16LE})`
+  `Opal.defineProperty(String.prototype, 'encoding', { value: #{Encoding::UTF_16LE}})`
 
   def bytes
     each_byte.to_a
@@ -187,14 +187,15 @@ class String
 
   def force_encoding(encoding)
     %x{
-      if (encoding === self.encoding) { return self; }
+      if (encoding === self.encoding.value) { return self; }
 
       encoding = #{Opal.coerce_to!(encoding, String, :to_s)};
       encoding = #{Encoding.find(encoding)};
 
-      if (encoding === self.encoding) { return self; }
+      if (encoding === self.encoding.value) { return self; }
 
-      self.encoding = encoding;
+      self.encoding.value = encoding;
+
       return self;
     }
   end
