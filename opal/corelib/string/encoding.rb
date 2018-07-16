@@ -162,7 +162,6 @@ Encoding.register 'ASCII-8BIT', aliases: ['BINARY', 'US-ASCII', 'ASCII'], ascii:
 end
 
 class String
-  attr_reader :encoding
   `Opal.defineProperty(String.prototype, 'encoding', { value: #{Encoding::UTF_16LE}})`
 
   def bytes
@@ -170,19 +169,23 @@ class String
   end
 
   def bytesize
-    @encoding.bytesize(self)
+    encoding.bytesize(self)
   end
 
   def each_byte(&block)
     return enum_for :each_byte unless block_given?
 
-    @encoding.each_byte(self, &block)
+    encoding.each_byte(self, &block)
 
     self
   end
 
   def encode(encoding)
     dup.force_encoding(encoding)
+  end
+
+  def encoding
+    `self.encoding.value`
   end
 
   def force_encoding(encoding)
@@ -201,7 +204,7 @@ class String
   end
 
   def getbyte(idx)
-    @encoding.getbyte(self, idx)
+    encoding.getbyte(self, idx)
   end
 
   # stub
