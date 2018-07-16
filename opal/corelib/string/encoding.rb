@@ -162,7 +162,8 @@ Encoding.register 'ASCII-8BIT', aliases: ['BINARY', 'US-ASCII', 'ASCII'], ascii:
 end
 
 class String
-  `Opal.defineProperty(String.prototype, 'encoding', { value: #{Encoding::UTF_16LE}})`
+  attr_reader :encoding
+  `Opal.defineProperty(String.prototype, 'encoding', #{Encoding::UTF_16LE})`
 
   def bytes
     each_byte.to_a
@@ -184,21 +185,17 @@ class String
     dup.force_encoding(encoding)
   end
 
-  def encoding
-    `self.encoding.value`
-  end
-
   def force_encoding(encoding)
     %x{
-      if (encoding === self.encoding.value) { return self; }
+      if (encoding === self.encoding) { return self; }
 
       encoding = #{Opal.coerce_to!(encoding, String, :to_s)};
       encoding = #{Encoding.find(encoding)};
 
-      if (encoding === self.encoding.value) { return self; }
+      if (encoding === self.encoding) { return self; }
 
       // doesn't work in ES5, primitive properties are read only
-      // self.encoding.value = encoding;
+      // self.encoding = encoding;
       return self;
     }
   end
