@@ -197,8 +197,8 @@ class String
 
       if (encoding === self.encoding.value) { return self; }
 
-      self.encoding.value = encoding;
-
+      // doesn't work in ES5, primitive properties are read only
+      // self.encoding.value = encoding;
       return self;
     }
   end
