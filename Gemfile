@@ -13,7 +13,10 @@ gem 'json', '< 1.8.1',  platform: :ruby if RUBY_VERSION.to_f == 2.1
 gem 'rack-test', '< 0.8' if RUBY_VERSION.to_f <= 2.0
 gem 'rubysl', platform: :rbx
 gem 'coveralls', platform: :mri
-gem 'puma' # Some browsers have problems with WEBrick
+
+# Some browsers have problems with WEBrick
+gem 'puma' unless RUBY_ENGINE == 'truffleruby'
+
 gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
 gem 'sprockets', sprockets_version if sprockets_version
@@ -38,9 +41,9 @@ group :development do
 end unless ENV['CI']
 
 group :doc do
-  gem 'redcarpet'
+  gem 'redcarpet' unless RUBY_ENGINE == 'truffleruby'
 end
 
 platforms :ruby, :mswin, :mswin64, :mingw, :x64_mingw do
-  gem 'c_lexer', '2.5.1.0.pre2'
+  gem 'c_lexer', '2.5.1.0.pre2' unless RUBY_ENGINE == 'truffleruby'
 end
