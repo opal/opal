@@ -37,10 +37,7 @@ matrix:
     #     - secure: GT13SjzU8vmqKIyY2LAXje+ndqevTsX/w71JkZHRLTrDUl0qcIod7xsfahbzGt2gOZPYZUkKiVaPoUenhc/YeJ2jTJVHeHY9UEl2II+3tOtuvp2jLadA//aBbsB6/09d7lIZMzpa93TL2R/SncPxugYW9v2o8o8Lwd2iIzowT/g=
 
     - rvm: 2.5.1
-      env: RUN=jshint REINSTALL_BUNDLER=true
-
-    - rvm: 2.5.1
-      env: RUN=rubocop REINSTALL_BUNDLER=true
+      env: RUN=lint REINSTALL_BUNDLER=true
 
     - rvm: 2.5.1
       env: RUN=mspec_opal_nodejs REINSTALL_BUNDLER=true
