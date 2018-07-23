@@ -1,7 +1,7 @@
 language: ruby
 
+# https://github.com/discourse/mini_racer#travis-ci
 sudo: required
-
 dist: trusty
 
 addons:
