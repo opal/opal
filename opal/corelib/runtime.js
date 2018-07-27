@@ -681,6 +681,7 @@
 
     $defineProperty(klass, '$$is_singleton', true);
     $defineProperty(klass, '$$singleton_of', object);
+
     delete klass.prototype.$$class;
 
     $defineProperty(object, '$$meta', klass);
