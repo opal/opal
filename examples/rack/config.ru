@@ -18,3 +18,4 @@ run Opal::SimpleServer.new { |s|
   # need to set the index explicitly for opal server to pick it up
   s.index_path = 'index.html.erb'
 }
+
