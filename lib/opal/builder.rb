@@ -79,8 +79,12 @@ module Opal
     end
 
     def build(path, options = {})
-      source = read(path)
-      build_str(source, path, options)
+      build_str(source_for(path), path, options)
+    end
+
+    # Retrieve the source for a given path the same way #build would do.
+    def source_for(path)
+      read(path)
     end
 
     def build_str(source, rel_path, options = {})
