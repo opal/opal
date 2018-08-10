@@ -30,7 +30,7 @@ class Opal::SimpleServer
   # @deprecated
   # It's here for compatibility with Opal::Sprockets::Server
   def append_path(path)
-    Opal.deprecation 'Please use `Opal.append_path(path)` instead.'
+    Opal.deprecation "`#{self.class}#append_path` is deprecated, please use `Opal.append_path(path)` instead (called from: #{caller(1, 1).first})"
     Opal.append_path path
   end
 
