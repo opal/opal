@@ -15,6 +15,8 @@ class Opal::SimpleServer
   require 'set'
   require 'erb'
 
+  NotFound = Class.new(StandardError)
+
   def initialize(options = {})
     @prefix = options.fetch(:prefix, 'assets')
     @main = options.fetch(:main, 'application')
@@ -42,6 +44,8 @@ class Opal::SimpleServer
       call_asset(path)
     else call_index
     end
+  rescue NotFound => error
+    [404, {}, [error.to_s]]
   end
 
   def call_asset(path)
