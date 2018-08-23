@@ -36,6 +36,9 @@ desc 'Run RuboCop on lib/, opal/ and stdlib/ directories'
 RuboCop::RakeTask.new(:rubocop) do |task|
   # TODO: enable it back after releasing https://github.com/bbatsov/rubocop/pull/5633
   # task.options << '--fail-fast'
+  task.options << '--extra-details'
+  task.options << '--display-style-guide'
+  task.options << '--parallel'
 end
 
 task :lint => [:jshint, :rubocop]
