@@ -31,7 +31,7 @@ module Opal
     # The processed source
     #
     # ## `#source_map`
-    # An instance of `::SourceMap::Map` representing the processd asset's source
+    # An instance of `::Opal::SourceMap::File` representing the processd asset's source
     # map.
     #
     # ## `.new(source, filename, compiler_options)`
@@ -121,7 +121,7 @@ module Opal
     end
 
     def source_map
-      processed.map(&:source_map).reduce(:+).as_json.to_json
+      ::Opal::SourceMap::Index.new(processed.map(&:source_map), join: "\n")
     end
 
     def append_paths(*paths)

@@ -13,7 +13,7 @@ RSpec.describe Opal::SimpleServer do
 
   it 'serves opal assets' do
     response = get '/assets/console.js'
-    expect(response.body).to eq(Opal::Builder.build('console').to_s)
+    expect(response.body).to start_with(Opal::Builder.build('console').to_s)
   end
 
   it 'serves index for all non opal paths' do
@@ -26,16 +26,18 @@ RSpec.describe Opal::SimpleServer do
     end
   end
 
-  it 'serves the source map for the compiled asset' do
-    response = get '/assets/console.map'
-    expect(response.body).to eq(Opal::Builder.build('console').source_map.to_json)
+  it 'serves the source map as data uri' do
+    response = get '/assets/console.js'
+    expect(response.body).to include("\n//# sourceMappingURL=data:application/json;base64,")
+    base64_map = response.body.split("\n//# sourceMappingURL=data:application/json;base64,").last
+    expect(Base64.decode64(base64_map)).to eq(Opal::Builder.build('console').source_map.to_json)
   end
 
   it 'takes a :prefix option to set the assets prefix' do
     self.app = described_class.new(main: 'opal', prefix: 'foo')
-    expect(get('/foo/console.js').body).to eq(Opal::Builder.build('console').to_s)
+    expect(get('/foo/console.js').body).to start_with(Opal::Builder.build('console').to_s)
     self.app = described_class.new(main: 'opal', prefix: '/foo')
-    expect(get('/foo/console.js').body).to eq(Opal::Builder.build('console').to_s)
+    expect(get('/foo/console.js').body).to start_with(Opal::Builder.build('console').to_s)
   end
 
   it 'takes a :main option to set the main asset' do

@@ -1,18 +1,19 @@
 PATH
   remote: ../..
   specs:
-    opal (0.10.2)
+    opal (0.11.1.dev)
+      ast (>= 2.3.0)
       hike (~> 1.2)
-      sourcemap (~> 0.1.0)
-      sprockets (~> 3.1)
-      tilt (>= 1.4)
+      parser (= 2.5.1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    concurrent-ruby (1.0.2)
+    ast (2.4.0)
     hike (1.2.3)
-    puma (3.6.0)
+    parser (2.5.1.0)
+      ast (~> 2.4.0)
+    puma (3.12.0)
     rack (1.5.2)
     rack-protection (1.5.3)
       rack
@@ -20,10 +21,6 @@ GEM
       rack (~> 1.4)
       rack-protection (~> 1.4)
       tilt (~> 1.3, >= 1.3.4)
-    sourcemap (0.1.1)
-    sprockets (3.7.0)
-      concurrent-ruby (~> 1.0)
-      rack (> 1, < 3)
     tilt (1.4.1)
 
 PLATFORMS
@@ -35,4 +32,4 @@ DEPENDENCIES
   sinatra
 
 BUNDLED WITH
-   1.13.2
+   1.16.3

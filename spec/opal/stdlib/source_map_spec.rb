@@ -1,8 +1,8 @@
 require 'spec_helper'
-require 'source_map'
+require 'opal/source_map'
 
-describe 'SourceMap::VLQ' do
+describe 'Opal::SourceMap::VLQ' do
   it 'encodes properly' do
-    SourceMap::VLQ.encode([0]).should == 'A'
+    Opal::SourceMap::VLQ.encode([0]).should == 'A'
   end
 end

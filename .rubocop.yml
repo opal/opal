@@ -27,6 +27,7 @@ AllCops:
     - examples/**/*
     - exe/**/*
     # - lib/**/*
+    - lib/opal/source_map/vlq.rb
     - node_modules/**/*
     # - opal/**/*
     - opal.gemspec
