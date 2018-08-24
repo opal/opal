@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+
+exec "#{__dir__}/../exe/#{File.basename($0)}", *ARGV
