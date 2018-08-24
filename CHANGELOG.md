@@ -21,7 +21,7 @@ Whitespace conventions:
 
 
 
-## [0.11.2](https://github.com/opal/opal/compare/v0.11.1...v0.11.2) - 2018-08-22
+## [0.11.2](https://github.com/opal/opal/compare/v0.11.1...v0.11.2) - 2018-08-24
 
 
 ### Fixed
