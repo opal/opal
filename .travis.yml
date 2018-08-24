@@ -92,7 +92,7 @@ before_install:
   - git submodule update --init
   - npm install -g jshint
   - npm install -g uglify-js
-  - test $REINSTALL_BUNDLER && gem install bundler || true
+  - test $REINSTALL_BUNDLER && gem install bundler -v 0.16.1 || true
   - type bundle || gem install bundler
   - bundle config without doc
   - which google-chrome-stable
