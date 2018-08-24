@@ -13,6 +13,17 @@ Gem::Specification.new do |spec|
   spec.homepage     = 'https://opalrb.com'
   spec.license      = 'MIT'
 
+  s.metadata = {
+    "bug_tracker_uri"       => "https://github.com/opal/opal/issues",
+    "changelog_uri"         => "https://github.com/opal/opal/blob/v#{spec.version}/CHANGELOG.md",
+    "readme_uri"            => "https://github.com/opal/opal/blob/v#{spec.version}/README.md",
+    "api_documentation_uri" => "http://opalrb.com/docs/api/v#{spec.version}/index.html",
+    "guides_uri"            => "http://opalrb.com/docs/guides/v#{spec.version}/index.html",
+    "homepage_uri"          => "https://opalrb.com/",
+    "chat_uri"              => "https://gitter.im/opal/opal",
+    "source_code_uri"       => "https://github.com/opal/opal",
+  }
+
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
     `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   end
