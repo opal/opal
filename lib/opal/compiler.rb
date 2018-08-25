@@ -173,6 +173,7 @@ module Opal
       parse
 
       @fragments = process(@sexp).flatten
+      @fragments << fragment("\n", nil, s(:newline)) unless @fragments.last.code.end_with?("\n")
 
       @result = @fragments.map(&:code).join('')
     end
@@ -199,8 +200,8 @@ module Opal
     #
     # @param source_file [String] optional source_file to reference ruby source
     # @return [Opal::SourceMap]
-    def source_map(source_file = nil)
-      Opal::SourceMap.new(@fragments, source_file || file)
+    def source_map
+      ::Opal::SourceMap::File.new(@fragments, file, @source)
     end
 
     # Any helpers required by this file. Used by {Opal::Nodes::Top} to reference

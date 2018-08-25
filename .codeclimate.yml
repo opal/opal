@@ -49,3 +49,4 @@ exclude_patterns:
 - "vendored-minitest/*"
 - "**/node_modules/*"
 - stdlib/nodejs/js-yaml-3-6-1.js
+- lib/opal/source_map/vlq.rb
