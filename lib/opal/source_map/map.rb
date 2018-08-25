@@ -12,8 +12,8 @@ module Opal::SourceMap::Map
     map.to_json
   end
 
-  def as_json
-    map.as_json
+  def as_json(*)
+    to_h
   end
 
   def to_s

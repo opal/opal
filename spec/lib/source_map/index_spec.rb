@@ -3,6 +3,14 @@ require 'support/source_map_helper'
 RSpec.describe Opal::SourceMap::Index do
   include SourceMapHelper
 
+  specify '#as_json' do
+    builder = Opal::Builder.new
+    builder.build_str('foo', 'bar.rb')
+    map = builder.source_map
+    expect(map.as_json).to be_a(Hash)
+    expect(map.as_json(ignored: :options)).to be_a(Hash)
+  end
+
   let(:builder) do
     builder = Opal::Builder.new
     builder.build_str(

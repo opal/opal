@@ -3,6 +3,12 @@ require 'support/source_map_helper'
 RSpec.describe Opal::SourceMap::File do
   include SourceMapHelper
 
+  specify '#as_json' do
+    map = described_class.new([fragment(code: "foo")], 'foo.rb', "foo")
+    expect(map.as_json).to be_a(Hash)
+    expect(map.as_json(ignored: :options)).to be_a(Hash)
+  end
+
   it 'correctly map generated code to original positions' do
     fragments = [
       # It doesn't matter too much to keep these fragments updated in terms of generated code,
