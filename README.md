@@ -209,7 +209,7 @@ Cross-browser testing is sponsored by [SauceLabs](https://saucelabs.com).
 
 (The MIT License)
 
-Copyright (C) 2013-2015 by Adam Beynon
+Copyright (C) 2013-2018 by Adam Beynon and the Opal contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
