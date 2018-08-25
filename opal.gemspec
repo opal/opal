@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage     = 'https://opalrb.com'
   spec.license      = 'MIT'
 
-  s.metadata = {
+  spec.metadata = {
     "bug_tracker_uri"       => "https://github.com/opal/opal/issues",
     "changelog_uri"         => "https://github.com/opal/opal/blob/v#{spec.version}/CHANGELOG.md",
     "readme_uri"            => "https://github.com/opal/opal/blob/v#{spec.version}/README.md",
