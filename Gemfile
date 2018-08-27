@@ -1,16 +1,20 @@
 source 'https://rubygems.org'
 gemspec
 
-tilt_version = ENV['TILT_VERSION']
-rack_version = ENV['RACK_VERSION']
+v = -> version { Gem::Version.new(version) if version }
+
+ruby_version      = v[RUBY_VERSION]
+
+tilt_version      = ENV['TILT_VERSION']
+rack_version      = ENV['RACK_VERSION']
 sprockets_version = ENV['SPROCKETS_VERSION']
 
 # Stick with older racc until
 # https://github.com/tenderlove/racc/issues/22
 # is solved.
 gem 'racc', '< 1.4.10', platform: :jruby
-gem 'json', '< 1.8.1',  platform: :ruby if RUBY_VERSION.to_f == 2.1
-gem 'rack-test', '< 0.8' if RUBY_VERSION.to_f <= 2.0
+gem 'json', '< 1.8.1',  platform: :ruby if ruby_version < v['2.2']
+gem 'rack-test', '< 0.8' if ruby_version <= v['2.0']
 gem 'rubysl', platform: :rbx
 gem 'coveralls', platform: :mri
 

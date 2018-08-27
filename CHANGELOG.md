@@ -23,7 +23,6 @@ Whitespace conventions:
 
 ## [1.0.0] - Unreleased
 
-
 ### Added
 
 - Added `Date#to_n` that returns the JavaScript Date object (in native.rb). (#1779)
@@ -32,7 +31,6 @@ Whitespace conventions:
 - Added `File#symlink?` for Node.js. (#1725)
 - Added `Dir#glob` for Node.js (does not support flags). (#1727)
 - Added support for a static folder in the "server" CLI runner via the `OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER` env var
-- Added ability to pass the port to the "server" CLI runner using the `OPAL_CLI_RUNNERS_SERVER_PORT` (explicit option passed via CLI is still working but deprecated)
 - Added the CLI option `--runner-options` that allows passing arbitrary options to the selected runner, currently the only runner making use of them is `server` accepting `port` and `static_folder`
 - Added a short helper to navigate constants manually: E.g. `Opal.$$.Regexp.$$.IGNORECASE` (see docs for "Compiled Ruby")
 - Added initial support for OpenURI module (using XMLHttpRequest on browser and [xmlhttprequest](https://www.npmjs.com/package/xmlhttprequest) on Node). (#1735)
@@ -107,6 +105,31 @@ Whitespace conventions:
 - Fixed `Kernel#public_methods` to return instance methods if the argument is set to false.
 
 
+
+
+## [0.11.2](https://github.com/opal/opal/compare/v0.11.1...v0.11.2) - 2018-08-24
+
+
+### Fixed
+
+- Remove symlink that caused problems on Windows
+
+
+
+
+## [0.11.1](https://github.com/opal/opal/compare/v0.11.0...v0.11.1) - 2018-07-17
+
+
+### Added
+
+- Added support for a static folder in the "server" CLI runner via the `OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER` env var
+- Added ability to pass the port to the "server" CLI runner using the `OPAL_CLI_RUNNERS_SERVER_PORT` (explicit option passed via CLI is still working but deprecated)
+- Added a new `Opal::Config.missing_require_severity` option and relative `--missing-require` CLI flag. This option will command how the builder will behave when a required file is missing. Previously the behavior was undefined and partly controlled by `dynamic_require_severity`. Not to be confused with the runtime config option `Opal.config.missing_require_severity;` which controls the runtime behavior.
+- At run-time `LoadError` wasn't being raised even with `Opal.config.missing_require_severity;` set to `'error'`.
+
+
+
+
 ## [0.11.0] - 2017-12-08
 
 
@@ -175,6 +198,11 @@ Whitespace conventions:
 - Extracted sprockets support to `opal-sprockets` which should allow for wider support and less coupling (e.g. the `opal` gem will now be able to improve the compiler without worrying about `sprockets` updates). All the old behavior is preserved except for `Opal::Server` that has become `Opal::Sprockets::Server` (see Deprecated section above).
 
 
+### Changed
+
+- Strip Regexp flags that are unsupported by browsers (backport), previously they were ignored, lately most of them now raise an error for unknown flags.
+
+
 ### Fixed
 
 - Newly compliant with the Ruby Spec Suite:
@@ -206,11 +234,12 @@ Whitespace conventions:
 - `Module#append_features` now detects cyclic includes
 - `Process.clock_gettime(Process::CLOCK_MONOTONIC)` will now return true monotonic values or raise `Errno::EINVAL` if no monotonic clock is available
 - Opal::Builder no longer always raises an error when a dependency isn't found and instead respects `dynamic_require_severity` value
+- Fixed a constant reference to `Sprockets::FileNotFound` that previously pointed to `Opal::Sprockets` instead of `::Sprockets`.
 
 
 
 
-## [0.10.5] - 2017-06-21
+## [0.10.5](https://github.com/opal/opal/compare/v0.10.4...v0.10.5) - 2017-06-21
 
 
 ### Fixed
@@ -220,7 +249,7 @@ Whitespace conventions:
 
 
 
-## [0.10.4] - 2017-05-07
+## [0.10.4](https://github.com/opal/opal/compare/v0.10.3...v0.10.4) - 2017-05-07
 
 
 ### Changed
@@ -231,7 +260,7 @@ Whitespace conventions:
 
 
 
-## [0.10.3] - 2016-10-31
+## [0.10.3](https://github.com/opal/opal/compare/v0.10.2...v0.10.3) - 2016-10-31
 
 
 ### Fixed
@@ -244,7 +273,7 @@ Whitespace conventions:
 
 
 
-## [0.10.2] - 2016-09-09
+## [0.10.2](https://github.com/opal/opal/compare/v0.10.1...v0.10.2) - 2016-09-09
 
 
 ### Changed
@@ -254,7 +283,7 @@ Whitespace conventions:
 
 
 
-## [0.10.1] - 2016-07-06
+## [0.10.1](https://github.com/opal/opal/compare/v0.10.0...v0.10.1) - 2016-07-06
 
 
 ### Fixed
@@ -264,7 +293,7 @@ Whitespace conventions:
 
 
 
-## [0.10.0] - 2016-07-04
+## [0.10.0](https://github.com/opal/opal/compare/v0.9.4...v0.10.0) - 2016-07-04
 
 
 ### Added
@@ -377,7 +406,7 @@ Whitespace conventions:
 
 
 
-## [0.9.4] - 2016-06-21
+## [0.9.4](https://github.com/opal/opal/compare/v0.9.3...v0.9.4) - 2016-06-21
 
 
 ### Fixed
@@ -389,7 +418,7 @@ Whitespace conventions:
 
 
 
-## [0.9.3] - 2016-06-06
+## [0.9.3](https://github.com/opal/opal/compare/v0.9.2...v0.9.3) - 2016-06-06
 
 
 ### Fixed
@@ -399,7 +428,7 @@ Whitespace conventions:
 
 
 
-## [0.9.2] - 2016-01-10
+## [0.9.2](https://github.com/opal/opal/compare/v0.9.1...v0.9.2) - 2016-01-10
 
 
 ### Fixed
@@ -409,7 +438,7 @@ Whitespace conventions:
 
 
 
-## [0.9.1] - 2016-01-09
+## [0.9.1](https://github.com/opal/opal/compare/v0.9.0...v0.9.1) - 2016-01-09
 
 
 ### Fixed
@@ -421,7 +450,7 @@ Whitespace conventions:
 
 
 
-## [0.9.0] - 2015-12-20
+## [0.9.0](https://github.com/opal/opal/compare/v0.8.1...v0.9.0) - 2015-12-20
 
 
 ### Added
@@ -493,7 +522,7 @@ Whitespace conventions:
 
 
 
-## [0.8.1] - 2015-10-12
+## [0.8.1](https://github.com/opal/opal/compare/v0.8.0...v0.8.1) - 2015-10-12
 
 
 ### Removed
@@ -510,7 +539,7 @@ Whitespace conventions:
 
 
 
-## [0.8.0] - 2015-07-16
+## [0.8.0](https://github.com/opal/opal/compare/v0.7.2...v0.8.0) - 2015-07-16
 
 
 ### Added
@@ -591,13 +620,13 @@ Whitespace conventions:
 
 
 
-## [0.7.2] - 2015-04-23
+## [0.7.2](https://github.com/opal/opal/compare/v0.7.1...v0.7.2) - 2015-04-23
 
 - Remove Sprockets 3.0 support (focus moved to upcoming 0.8)
 - Fix version number consistency.
 
 
-## [0.7.1] - 2015-02-14
+## [0.7.1](https://github.com/opal/opal/compare/v0.7.0...v0.7.1) - 2015-02-14
 
 - CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`
 - Fixed a bug that would make the `-v` CLI option wait for STDIN input
@@ -605,7 +634,7 @@ Whitespace conventions:
 - Now the CLI implicitly calls `Kernel#exit` at the end of the script, thus making `at_exit` blocks be respected.
 
 
-## [0.7.0] - 2015-02-01
+## [0.7.0](https://github.com/opal/opal/compare/v0.6.2...v0.7.0) - 2015-02-01
 
 - Stop keyword-arg variable names leaking to global javascript scope
 
@@ -689,7 +718,7 @@ Whitespace conventions:
 - Fix `Enumerator#with_index`, `Numeric#round`.
 
 
-## [0.6.2] - 2014-04-25
+## [0.6.2](https://github.com/opal/opal/compare/v0.6.1...v0.6.2) - 2014-04-25
 
 - Added Range#size
 
@@ -700,7 +729,7 @@ Whitespace conventions:
 - (Internal) improved the mspec runner
 
 
-## [0.6.1] - 2014-04-15
+## [0.6.1](https://github.com/opal/opal/compare/v0.6.0...v0.6.1) - 2014-04-15
 
 - Updated RubySpec to master and added `rubysl-*` specs. Thanks to Mike Owens (@mieko)
 
@@ -725,7 +754,7 @@ Whitespace conventions:
     parse as a key name.
 
 
-## [0.6.0] - 2014-03-05
+## [0.6.0](https://github.com/opal/opal/compare/v0.5.5...v0.6.0) - 2014-03-05
 
 - Fix parsing of escapes in single-strings ('foo\n'). Only ' and \
     characters now get escaped in single quoted strings. Also, more escape
@@ -847,7 +876,7 @@ Whitespace conventions:
 - Add `Regexp.quote` as an alias of `escape`.
 
 
-## [0.5.5] - 2013-11-25
+## [0.5.5](https://github.com/opal/opal/compare/v0.5.4...v0.5.5) - 2013-11-25
 
 - Fix regression: add `%i[foo bar]` style words back to lexer
 
@@ -855,13 +884,13 @@ Whitespace conventions:
     `core/` clashing with user files.
 
 
-## [0.5.4] - 2013-11-20
+## [0.5.4](https://github.com/opal/opal/compare/v0.5.3...v0.5.4) - 2013-11-20
 
 - Reverted `RUBY_VERSION` to `1.9.3`. Opal `0.6.0` will be the first release
     for `2.0.0`.
 
 
-## [0.5.3] - 2013-11-12
+## [0.5.3](https://github.com/opal/opal/compare/v0.5.2...v0.5.3) - 2013-11-12
 
 - Opal now targets ruby 2.0.0
 
@@ -885,12 +914,12 @@ Whitespace conventions:
 - Cleanup parser/lexer to use `t` and `k` prefixes for all tokens
 
 
-## [0.5.2] - 2013-11-11
+## [0.5.2](https://github.com/opal/opal/compare/v0.5.1...v0.5.2) - 2013-11-11
 
 - Include native into corelib for 0.5.x
 
 
-## [0.5.1] - 2013-11-10
+## [0.5.1](https://github.com/opal/opal/compare/v0.5.0...v0.5.1) - 2013-11-10
 
 - Move all corelib under `core/` directory to prevent filename clashes with
     `require`
@@ -902,12 +931,12 @@ Whitespace conventions:
 - Cleanup and fix various `Enumerable` methods
 
 
-## [0.5.0] - 2013-11-03
+## [0.5.0](https://github.com/opal/opal/compare/v0.4.2...v0.5.0) - 2013-11-03
 
 - WIP: https://gist.github.com/elia/7747460
 
 
-## [0.4.2] - 2013-07-03
+## [0.4.2](https://github.com/opal/opal/compare/v0.4.1...v0.4.2) - 2013-07-03
 
 - Added `Kernel#rand`. (fntzr)
 
@@ -921,13 +950,13 @@ Whitespace conventions:
     format: `(((tmp = lhs) !== false || !==nil) ? tmp : rhs)`.
 
 
-## [0.4.1] - 2013-06-16
+## [0.4.1](https://github.com/opal/opal/compare/v0.4.0...v0.4.1) - 2013-06-16
 
 - Move sprockets logic out to external opal-sprockets gem. That now
     handles the compiling and loading of opal files in sprockets.
 
 
-## [0.4.0] - 2013-06-15
+## [0.4.0](https://github.com/opal/opal/compare/v0.3.44...v0.4.0) - 2013-06-15
 
 - Added fragments to parser. All parser methods now generate one or
     more Fragments which store the original sexp. This allows us to

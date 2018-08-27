@@ -127,7 +127,7 @@ RSpec.describe Opal::Builder do
 
   describe ':requirable' do
     it 'it uses front slash as module name' do
-      expect(builder.build('nodejs/open-uri', requirable: true).to_s).to include(%{Opal.modules["nodejs/open-uri"]})
+      expect(builder.build('opal/platform', requirable: true).to_s).to include(%{Opal.modules["opal/platform"]})
     end
   end
 end
