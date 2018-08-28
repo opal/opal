@@ -150,12 +150,15 @@ module Opal
   # @param owner_class [Class] the class owning the methods
   # @param method_names [Array<Symbol>] the list of methods names to mark
   # @return [nil]
-  def self.pristine owner_class, *method_names
+  def self.pristine(owner_class, *method_names)
     %x{
-      var method_name;
+      var method_name, method;
       for (var i = method_names.length - 1; i >= 0; i--) {
         method_name = method_names[i];
-        owner_class.$$proto['$'+method_name].$$pristine = true
+        method = owner_class.$$proto['$'+method_name];
+        if (method && !method.$$stub) {
+          method.$$pristine = true;
+        }
       }
     }
     nil

@@ -871,7 +871,7 @@ class Array < `Array`
     %x{
       if (
         self.$$class === Opal.Array &&
-        self.$allocate.$$pristine &&
+        self.$$class.$allocate.$$pristine &&
         self.$copy_instance_variables.$$pristine &&
         self.$initialize_dup.$$pristine
       ) return self.slice(0);
