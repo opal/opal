@@ -504,6 +504,7 @@ class String < `String`
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
       }
 
+      var lastIndex;
       while (true) {
         match = pattern.exec(self);
 
@@ -516,7 +517,9 @@ class String < `String`
         match_data = #{MatchData.new `pattern`, `match`};
 
         if (replacement === undefined) {
+          lastIndex = pattern.lastIndex;
           _replacement = block(match[0]);
+          pattern.lastIndex = lastIndex; // save and restore lastIndex
         }
         else if (replacement.$$is_hash) {
           _replacement = #{`replacement`[`match[0]`].to_s};
