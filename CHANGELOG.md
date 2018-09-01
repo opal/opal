@@ -107,6 +107,16 @@ Whitespace conventions:
 
 
 
+## [0.11.3](https://github.com/opal/opal/compare/v0.11.2...v0.11.3) - 2018-08-28
+
+
+### Fixed
+
+- Fixed `Array#dup` when `method_missing` support was disabled
+
+
+
+
 ## [0.11.2](https://github.com/opal/opal/compare/v0.11.1...v0.11.2) - 2018-08-24
 
 
