@@ -55,12 +55,6 @@ task :dist do
   end.map(&:value).map(&method(:puts))
 end
 
-desc 'Rebuild grammar.rb for opal parser'
-task :racc do
-  debug_option = '--debug' if ENV['RACC_DEBUG']
-  sh "racc #{debug_option} -l -o lib/opal/parser/grammar.rb lib/opal/parser/grammar.y"
-end
-
 desc 'Remove any generated file.'
 task :clobber do
   rm_r './build'
