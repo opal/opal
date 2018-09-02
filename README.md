@@ -10,7 +10,7 @@
 Opal is a Ruby to JavaScript source-to-source compiler. It also has an
 implementation of the Ruby corelib.
 
-Opal is [hosted on GitHub](https://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) (also available as IRC at `irc.gitter.im`) and the Freenode IRC channel at [#opal](https://webchat.freenode.net/?channels=opal).
+Opal is [hosted on GitHub](https://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) (also available as IRC at `irc.gitter.im`).
 Ask questions on [stackoverflow (tag #opalrb)](https://stackoverflow.com/questions/ask?tags=opalrb). Get the [Opalist newsletter](http://opalist.co) for updates and community news.
 
 [![Inline docs](https://inch-ci.org/github/opal/opal.svg?branch=master&style=flat)](https://opalrb.com/docs)
