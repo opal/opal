@@ -19,9 +19,6 @@ task :dist do
   Opal::Config.dynamic_require_severity = :warning
   Opal::Config.missing_require_severity = :error
 
-  # Hike gem is required to build opal-builder
-  Opal.use_gem 'hike'
-
   build_dir = ENV['DIR'] || 'build'
   files     = ENV['FILES'] ? ENV['FILES'].split(',') :
               Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }

@@ -35,7 +35,6 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.add_dependency 'hike', '~> 1.2'
   spec.add_dependency 'ast', '>= 2.3.0'
   spec.add_dependency 'parser', '= 2.5.1.0'
 

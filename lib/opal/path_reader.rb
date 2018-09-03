@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/regexp_anchors'
-require 'hike'
+require 'opal/hike'
 
 module Opal
   class PathReader
