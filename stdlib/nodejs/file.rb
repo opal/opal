@@ -212,7 +212,7 @@ class File < IO
       }
       self
     else
-      read.each_line
+      read.each_line separator
     end
   end
 
