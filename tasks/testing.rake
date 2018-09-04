@@ -329,7 +329,7 @@ platforms.each do |platform|
         includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
 
         sh "ruby -rbundler/setup "\
-         "exe/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+         "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
       end
     end
   end
@@ -338,8 +338,6 @@ end
 # The name ends with the platform, which is of course mandated in this case
 desc "Run the Node.js Minitest suite on Node.js"
 task :minitest_node_nodejs do
-  Opal.use_gem 'hike'
-
   platform = 'nodejs'
   files = %w[
     nodejs
@@ -357,7 +355,7 @@ task :minitest_node_nodejs do
   includes = "-Itest -Ilib -Ivendored-minitest"
 
   sh "ruby -rbundler/setup "\
-     "exe/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+     "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 end
 
 desc 'Run smoke tests with opal-rspec to see if something is broken'

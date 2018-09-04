@@ -8,8 +8,8 @@ RSpec.describe Opal::PathReader do
   let(:contents) { File.read(full_path) }
 
   before do
-    allow_any_instance_of(Hike::Trail).to receive(:find) {|path| nil}
-    allow_any_instance_of(Hike::Trail).to receive(:find).with(path).and_return(full_path)
+    allow_any_instance_of(Opal::Hike::Trail).to receive(:find) {|path| nil}
+    allow_any_instance_of(Opal::Hike::Trail).to receive(:find).with(path).and_return(full_path)
   end
 
   describe '#paths' do
