@@ -37,7 +37,7 @@ task :changelog do
 
   heading_and_unreleased = File.read(changelog_path).split(splitter, 2).first.strip
 
-  changelog_entries.unshift heading_and_unreleased+"\n"+splitter
+  changelog_entries.unshift heading_and_unreleased+"\n\n\n"+splitter
   changelog_entries << nil # for the final newlines
 
   File.write changelog_path, changelog_entries.join("\n\n\n\n\n")

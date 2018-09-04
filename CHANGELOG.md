@@ -92,6 +92,7 @@ Whitespace conventions:
 ### Removed
 
 - The `node` CLI runner no longer supports passing extra node options via the `NODE_OPT` env var, instead Node.js natively supports the `NODE_OPTIONS` env var.
+- The gem "hike" is no longer an external dependency and is now an internal dependency available as `Opal::Hike`
 
 
 ### Fixed
@@ -103,6 +104,9 @@ Whitespace conventions:
 - Raise `ArgumentError` instead of `TypeError` from `Numeric#step` when step is not a number. (#1757)
 - At run-time `LoadError` wasn't being raised even with `Opal.config.missing_require_severity;` set to `'error'`.
 - Fixed `Kernel#public_methods` to return instance methods if the argument is set to false.
+- Fixed an issue in `String#gsub` that made it start an infinite loop when used recursively. (#1879)
+
+
 <!-- generated-content-beyond-this-comment -->
 
 
