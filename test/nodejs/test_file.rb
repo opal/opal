@@ -43,7 +43,7 @@ class TestNodejsFile < Test::Unit::TestCase
 
   def test_read_file
     File.write('tmp/foo', 'bar')
-    assert_equal("bar", File.read('tmp/foo'))
+    assert_equal('bar', File.read('tmp/foo'))
   end
 
   def test_read_each_line
@@ -53,7 +53,27 @@ class TestNodejsFile < Test::Unit::TestCase
     file.each_line do |line|
       lines << line
     end
-    assert_equal(lines.length, 2)
+    assert_equal(2, lines.length)
+    assert_equal("one\n", lines[0])
+    assert_equal('two', lines[1])
+  end
+
+  def test_readlines
+    File.write('tmp/quz', "one\ntwo")
+    file = File.new('tmp/quz', 'r')
+    lines = file.readlines
+    assert_equal(2, lines.length)
+    assert_equal("one\n", lines[0])
+    assert_equal('two', lines[1])
+  end
+
+  def test_readlines_separator
+    File.write('tmp/qux', "one-two")
+    file = File.new('tmp/qux', 'r')
+    lines = file.readlines '-'
+    assert_equal(2, lines.length)
+    assert_equal('one-', lines[0])
+    assert_equal('two', lines[1])
   end
 
   def test_read_noexistent_should_raise_io_error

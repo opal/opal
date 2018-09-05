@@ -186,6 +186,10 @@ class File < IO
     end
   end
 
+  def readlines(separator = $/)
+    each_line(separator).to_a
+  end
+
   def each_line(separator = $/, &block)
     if @eof
       return block_given? ? self : [].to_enum
@@ -212,7 +216,7 @@ class File < IO
       }
       self
     else
-      read.each_line
+      read.each_line separator
     end
   end
 
