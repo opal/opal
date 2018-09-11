@@ -81,6 +81,7 @@ Whitespace conventions:
 - The `node` CLI runner now adds its `NODE_PATH` entry instead of replacing the ENV var altogether
 - Added `--disable-web-security` option flag to the Chrome headless runner to be able to do `XMLHttpRequest`
 - Migrated parser to 2.5. Bump RUBY_VERSION to 2.5.0.
+- Exceptions raised during the compilation now add to the backtrace the current location of the opal file if available (#1814).
 
 
 ### Deprecated
