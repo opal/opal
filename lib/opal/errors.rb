@@ -29,46 +29,28 @@ module Opal
 
   class SyntaxError < ::SyntaxError
     attr_accessor :location
+  end
 
-    # Not redefining #backtrace because of https://bugs.ruby-lang.org/issues/14693
-    def self.with_opal_backtrace(error, path)
-      new_error = new(error.message)
-      backtrace = error.backtrace.to_a
-      backtrace.unshift OpalBacktraceLocation.new(error, path).to_s
-      new_error.set_backtrace backtrace
-      new_error
-    end
+  def self.opal_location_from_error(error)
+    opal_location = OpalBacktraceLocation.new
+    opal_location.location = error.location if error.respond_to?(:location)
+    opal_location.diagnostic = error.diagnostic if error.respond_to?(:diagnostic)
+    opal_location
+  end
+
+  def self.add_opal_location_to_error(opal_location, error)
+    backtrace = error.backtrace.to_a
+    backtrace.unshift opal_location.to_s
+    error.set_backtrace backtrace
+    error
   end
 
   # Loosely compatible with Thread::Backtrace::Location
   class OpalBacktraceLocation
-    attr_reader :error, :path
+    attr_accessor :path, :lineno, :label
 
-    def initialize(error, path)
-      @error = error
-      @path = path
-    end
-
-    def location
-      if error.respond_to? :location
-        error.location
-      elsif error.respond_to?(:diagnostic) && error.diagnostic.respond_to?(:location)
-        error.diagnostic.location
-      end
-    end
-
-    def lineno
-      location.line if location
-    end
-
-    # Use source code as the label
-    def label
-      case
-      when location.respond_to?(:source_line)
-        location.source_line
-      when location.respond_to?(:expression)
-        location.expression.source_line
-      end
+    def initialize(path = nil, lineno = nil, label = nil)
+      @path, @lineno, @label = path, lineno, label
     end
 
     def to_s
@@ -81,6 +63,23 @@ module Opal
         string += 'unknown'
       end
       string
+    end
+
+    alias line lineno
+
+    def diagnostic=(diagnostic)
+      return unless diagnostic
+      self.location = diagnostic.location
+    end
+
+    def location=(location)
+      return unless location
+      self.lineno = location.line
+      if location.respond_to?(:source_line)
+        self.label = location.source_line
+      elsif location.respond_to?(:expression)
+        self.label = location.expression.source_line
+      end
     end
   end
 end
