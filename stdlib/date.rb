@@ -347,6 +347,13 @@ class Date
   end
 
   def initialize(year = -4712, month = 1, day = 1, start = ITALY)
+    %x{
+      // Because of Gregorian reform calendar goes from 1582-10-04 to 1582-10-15.
+      // All days in between end up as 4 october.
+      if (year === 1582 && month === 10 && day > 4 && day < 15) {
+        day = 4;
+      }
+    }
     @date = `new Date(year, month - 1, day)`
   end
 
@@ -545,6 +552,10 @@ class Date
     }
   end
 
+  def next_year(years = 1)
+    self.class.new(year + years, month, day)
+  end
+
   def prev_day(n = 1)
     self - n
   end
@@ -557,6 +568,10 @@ class Date
       date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
       return result;
     }
+  end
+
+  def prev_year(years = 1)
+    self.class.new(year - years, month, day)
   end
 
   def saturday?
