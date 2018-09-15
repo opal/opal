@@ -16,6 +16,7 @@ module Kernel
     }
   end
 
+  # @deprecated Please use `require('module')` instead
   def node_require(path)
     `#{NODE_REQUIRE}(#{path.to_str})`
   end

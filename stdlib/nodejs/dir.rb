@@ -1,6 +1,6 @@
 class Dir
-  @__glob__ = node_require :glob
-  @__fs__ = node_require :fs
+  @__glob__ = `require('glob')`
+  @__fs__ = `require('fs')`
   `var __glob__ = #{@__glob__}`
   `var __fs__ = #{@__fs__}`
 
