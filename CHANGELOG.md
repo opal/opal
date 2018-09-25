@@ -88,6 +88,7 @@ Whitespace conventions:
 
 - The CLI `--server-port 1234` option is now deprecated in favor of using `--runner-options='{"port": 1234}'`
 - Including `::Native` is now deprecated because it generates conflicts with core classes in constant lookups (both `Native::Object` and `Native::Array` exist). Instead `Native::Werapper` should be used.
+- Using `node_require 'my_module'` to access the native `require()` function in Node.js is deprecated in favor of <code>\`require('my_module')\`</code> because static builders need to parse the call in order to function (#1886).
 
 
 ### Removed
