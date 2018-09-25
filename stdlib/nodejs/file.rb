@@ -50,8 +50,8 @@ class File < IO
   include ::IO::Writable
   include ::IO::Readable
 
-  @__fs__ = node_require :fs
-  @__path__ = node_require :path
+  @__fs__ = `require('fs')`
+  @__path__ = `require('path')`
   `var __fs__ = #{@__fs__}`
   `var __path__ = #{@__path__}`
 
@@ -238,7 +238,7 @@ class File < IO
 end
 
 class File::Stat
-  @__fs__ = node_require :fs
+  @__fs__ = `require('fs')`
   `var __fs__ = #{@__fs__}`
 
   def initialize(path)
