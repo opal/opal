@@ -1313,16 +1313,33 @@ class String < `String`
   end
 
   def to_proc
-    sym = `self.valueOf()`
+    method_name = '$' + `self.valueOf()`
 
     proc do |*args, &block|
       %x{
         if (args.length === 0) {
           #{raise ArgumentError, 'no receiver given'}
         }
-        var obj = args.shift();
-        if (obj == null) obj = nil;
-        return Opal.send(obj, sym, args, block);
+
+        var recv = args[0];
+
+        if (recv == null) recv = nil;
+
+        var body = recv[#{method_name}];
+
+        if (!body) {
+          return recv.$method_missing.apply(recv, args);
+        }
+
+        if (typeof block === 'function') {
+          body.$$p = block;
+        }
+
+        if (args.length === 1) {
+          return body.call(recv);
+        } else {
+          return body.apply(recv, args.slice(1));
+        }
       }
     end
   end
