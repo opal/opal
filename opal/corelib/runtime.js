@@ -1654,7 +1654,9 @@
     var body = (typeof(method) === 'string') ? recv['$'+method] : method;
 
     if (body != null) {
-      body.$$p = block;
+      if (typeof block === 'function') {
+        body.$$p = block;
+      }
       return body.apply(recv, args);
     }
 
