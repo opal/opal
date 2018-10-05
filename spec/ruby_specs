@@ -53,7 +53,6 @@ ruby/core/integer
 ruby/core/kernel
 !ruby/core/kernel/abort_spec
 !ruby/core/kernel/at_exit_spec
-!ruby/core/kernel/autoload_spec
 !ruby/core/kernel/backtick_spec
 !ruby/core/kernel/binding_spec
 !ruby/core/kernel/callcc_spec
@@ -96,6 +95,7 @@ ruby/core/math
 ruby/core/method
 
 ruby/core/module
+!ruby/core/module/autoload_spec
 
 ruby/core/marshal/load_spec
 ruby/core/marshal/dump_spec
@@ -153,6 +153,7 @@ ruby/core/unboundmethod
 
 ruby/language
 !ruby/language/execution_spec
+!ruby/language/safe_spec
 
 ruby/library/base64
 ruby/library/bigdecimal

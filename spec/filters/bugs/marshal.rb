@@ -1,5 +1,7 @@
 opal_filter "Marshal" do
   fails "Marshal.dump ignores the recursion limit if the limit is negative" # no support yet
+  fails "Marshal.dump raises a TypeError if dumping a Mutex instance" # Expected TypeError but no exception was raised ("\u0004\bo:\nMutex\u0006:\f@lockedF" was returned)
+  fails "Marshal.dump when passed a StringIO should raise an error" # Expected TypeError but no exception was raised ("\u0004\bo:\rStringIO\a:\f@string\"\u0000:\u000E@positioni\u0000" was returned)
   fails "Marshal.dump with a Range dumps a Range with extra instance variables" # Expected nil to equal 42
   fails "Marshal.dump with a Regexp dumps a Regexp subclass" # requires Class.new(Regexp).new("").class != Regexp
   fails "Marshal.dump with a Regexp dumps a Regexp with instance variables" # //.source.should == ''
@@ -15,8 +17,8 @@ opal_filter "Marshal" do
   fails "Marshal.load for a String loads a String subclass with custom constructor"
   fails "Marshal.load for a Struct does not call initialize on the unmarshaled struct"
   fails "Marshal.load for a Time loads nanoseconds"
-  fails "Marshal.load for a Time loads"
   fails "Marshal.load for a Time loads the zone"
+  fails "Marshal.load for a Time loads"
   fails "Marshal.load for a user Class raises ArgumentError if the object from an 'o' stream is not dumpable as 'o' type user class"
   fails "Marshal.load for a user Class that extends a core type other than Object or BasicObject raises ArgumentError if the resulting class does not extend the same type"
   fails "Marshal.load for an Exception loads a marshalled exception with a backtrace"

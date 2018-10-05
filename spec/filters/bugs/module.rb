@@ -72,6 +72,10 @@ opal_filter "Module" do
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is default"
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is true"
   fails "Module#const_defined? returns true when passed a scoped constant name"
+  fails "Module#const_get does autoload a constant with a toplevel scope qualifier" # NameError: uninitialized constant CSAutoloadB
+  fails "Module#const_get does autoload a constant" # NameError: uninitialized constant CSAutoloadA
+  fails "Module#const_get does autoload a module and resolve a constant within" # NameError: uninitialized constant CSAutoloadC
+  fails "Module#const_get does autoload a non-toplevel module" # LoadError: cannot load such file -- ruby/core/module/fixtures/constants_autoload_d
   fails "Module#constants doesn't returns inherited constants when passed nil"
   fails "Module#constants returns only public constants"
   fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class"
@@ -86,6 +90,7 @@ opal_filter "Module" do
   fails "Module#extend_object extends the given object with its constants and methods by default"
   fails "Module#extend_object on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0x4fbac> was returned)
+  fails "Module#initialize_copy should produce a duped module with inspectable class methods" # NameError: undefined method `hello' for class `Module'
   fails "Module#initialize_copy should retain singleton methods when duped" # Expected [] to equal ["hello"]
   fails "Module#instance_method raises a NameError if the method has been undefined"
   fails "Module#instance_method raises a TypeError if not passed a symbol"
@@ -113,6 +118,8 @@ opal_filter "Module" do
   fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
   fails "Module#prepend keeps the module in the chain when dupping the class"
   fails "Module#refine adds methods defined in its block to the anonymous module's public instance methods" # NoMethodError: undefined method `refine' for #<Module:0x3ae64>
+  fails "Module#refine and alias aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab4>
+  fails "Module#refine and alias_method aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab0>
   fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae7a>
   fails "Module#refine does not apply refinements to external scopes not using the module" # NoMethodError: undefined method `refine' for #<Module:0x3ae60>
   fails "Module#refine does not make available methods from another refinement module" # NoMethodError: undefined method `refine' for #<Module:0x3ae8c>

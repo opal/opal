@@ -8,6 +8,7 @@ opal_filter "UnboundMethod" do
   fails "UnboundMethod#clone returns a copy of the UnboundMethod"
   fails "UnboundMethod#hash returns the same value for builtin methods that are eql?"
   fails "UnboundMethod#hash returns the same value for user methods that are eql?"
+  fails "UnboundMethod#source_location sets the first value to the path of the file in which the method was defined" # Expected "ruby/core/unboundmethod/fixtures/classes.rb" to equal "./ruby/core/unboundmethod/fixtures/classes.rb"
   fails "UnboundMethod#source_location works for define_method methods"
   fails "UnboundMethod#source_location works for define_singleton_method methods"
   fails "UnboundMethod#super_method returns nil when the parent's method is removed"
