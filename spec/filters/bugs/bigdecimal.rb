@@ -120,8 +120,8 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_i returns Integer or Bignum otherwise"
   fails "BigDecimal#to_int raises FloatDomainError if BigDecimal is infinity or NaN"
   fails "BigDecimal#to_int returns Integer or Bignum otherwise"
-  fails "BigDecimal#to_r returns a Rational" # NoMethodError: undefined method `to_r' for 3.14159
   fails "BigDecimal#to_r returns a Rational with bignum values" # NoMethodError: undefined method `to_r' for 3.141592653589793238462643
+  fails "BigDecimal#to_r returns a Rational" # NoMethodError: undefined method `to_r' for 3.14159
   fails "BigDecimal#to_s can return a leading space for values > 0"
   fails "BigDecimal#to_s can use conventional floating point notation"
   fails "BigDecimal#to_s can use engineering notation"
@@ -135,8 +135,11 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#truncate returns value of given precision otherwise"
   fails "BigDecimal#truncate sets n digits left of the decimal point to 0, if given n < 0"
   fails "BigDecimal.double_fig returns the number of digits a Float number is allowed to have"
+  fails "BigDecimal.limit picks the global precision when limit 0 specified" # Expected 0.8888 to equal 0.889
+  fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89
   fails "BigDecimal.limit returns the value before set if the passed argument is nil or is not specified"
   fails "BigDecimal.limit use the global limit if no precision is specified"
+  fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
   fails "BigDecimal.mode raise an exception if the flag is true"
   fails "BigDecimal.mode returns Infinity when too big"
   fails "BigDecimal.mode returns the appropriate value and continue the computation if the flag is false"
@@ -150,6 +153,12 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.new raises ArgumentError when Float is used without precision"
   fails "BigDecimal.new treats invalid strings as 0.0"
   fails "BigDecimal.ver returns the Version number"
-  fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89
-  fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
+  fails "Kernel#BigDecimal accepts significant digits >= given precision" # NoMethodError: undefined method `precs' for 3.1415923
+  fails "Kernel#BigDecimal allows for [eEdD] as exponent separator" # Exception: new BigNumber() not a number: 12345.67d89
+  fails "Kernel#BigDecimal allows for underscores in all parts" # Exception: new BigNumber() not a number: 12_345.67E89
+  fails "Kernel#BigDecimal creates a new object of class BigDecimal" # Expected 1 to equal (1/1)
+  fails "Kernel#BigDecimal determines precision from initial value" # NoMethodError: undefined method `precs' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
+  fails "Kernel#BigDecimal ignores trailing garbage" # Exception: new BigNumber() not a number: 123E45ruby
+  fails "Kernel#BigDecimal raises ArgumentError for invalid strings" # Exception: new BigNumber() not a number: ruby
+  fails "Kernel#BigDecimal raises ArgumentError when Float is used without precision" # Expected ArgumentError but no exception was raised (1 was returned)
 end
