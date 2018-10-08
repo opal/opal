@@ -1,5 +1,3 @@
-require 'corelib/random/seedrandom.js'
-
 class Random
   attr_reader :seed, :state
 
@@ -11,13 +9,11 @@ class Random
 
   def reseed(seed)
     @seed = seed
-    `self.$rng = new Math.seedrandom(seed)`
+    `self.$rng = Opal.$$rand.reseed(seed)`
   end
 
-  `var $seed_generator = new Math.seedrandom('opal', { entropy: true })`
-
   def self.new_seed
-    `Math.abs($seed_generator.int32())`
+    `Opal.$$rand.new_seed()`
   end
 
   def self.rand(limit = undefined)
@@ -42,8 +38,6 @@ class Random
     Array.new(size) { rand(255).chr }.join.encode('ASCII-8BIT')
   end
 
-  DEFAULT = new(new_seed)
-
   def ==(other)
     return false unless Random === other
 
@@ -60,7 +54,7 @@ class Random
     %x{
       function randomFloat() {
         self.state++;
-        return self.$rng.quick();
+        return Opal.$$rand.rand(self.$rng);
       }
 
       function randomInt() {
@@ -117,5 +111,15 @@ class Random
         return randomInt();
       }
     }
+  end
+
+  def self.generator=(generator)
+    `Opal.$$rand = #{generator}`
+
+    if const_defined? :DEFAULT
+      DEFAULT.reseed
+    else
+      const_set :DEFAULT, new(new_seed)
+    end
   end
 end
