@@ -13,6 +13,6 @@ require 'corelib/dir'
 require 'corelib/file'
 require 'corelib/process'
 require 'corelib/random'
-require 'corelib/random/seedrandom.js'
+require 'corelib/random/mersenne_twister.js'
 
 require 'corelib/unsupported'
