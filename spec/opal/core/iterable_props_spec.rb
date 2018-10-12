@@ -48,7 +48,6 @@ describe 'Iterable props defined by Opal on core JS objects' do
   end
 
   it 'is empty for Math' do
-    # TODO: remove seedrandom.js and fix the test
-    `iterableKeysOf(Math)`.should == ['seedrandom']
+    `iterableKeysOf(Math)`.should == []
   end
 end
