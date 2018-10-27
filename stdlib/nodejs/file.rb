@@ -59,6 +59,7 @@ class File < IO
     ALT_SEPARATOR = `__path__.sep`
   end
 
+
   def self.read(path)
     `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString()})`
   end
@@ -77,11 +78,11 @@ class File < IO
     pathname = join(dir_string, pathname) if dir_string
     if block_given?
       `
-      __fs__.realpath(#{pathname}, #{cache}, function(error, realpath){
-        if (error) Opal.IOError.$new(error.message)
-        else #{block.call(`realpath`)}
-      })
-      `
+        __fs__.realpath(#{pathname}, #{cache}, function(error, realpath){
+          if (error) Opal.IOError.$new(error.message)
+          else #{block.call(`realpath`)}
+        })
+        `
     else
       `return executeIOAction(function(){return __fs__.realpathSync(#{pathname}, #{cache})})`
     end
@@ -118,13 +119,13 @@ class File < IO
   def self.readable?(path)
     return false unless exist? path
     %{
-      try {
-        __fs__.accessSync(path, __fs__.R_OK);
-        return true;
-      } catch (error) {
-        return false;
+        try {
+          __fs__.accessSync(path, __fs__.R_OK);
+          return true;
+        } catch (error) {
+          return false;
+        }
       }
-    }
   end
 
   def self.size(path)
@@ -155,6 +156,12 @@ class File < IO
 
   def self.symlink?(path)
     `return executeIOAction(function(){return __fs__.lstatSync(#{path}).isSymbolicLink()})`
+  end
+
+  def self.expand_path(path, basedir = nil)
+    path = path.to_str
+    basedir ||= Dir.pwd
+    `return __path__.normalize(__path__.resolve(#{basedir.to_str}, #{path})).split(__path__.sep).join(__path__.posix.sep)`
   end
 
   # Instance Methods
