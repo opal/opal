@@ -1879,7 +1879,7 @@ class Array < `Array`
 
         value = Opal.yield1(block, item);
 
-        if (value !== false && value !== nil) {
+        if (Opal.truthy(value)) {
           result.push(item);
         }
       }
