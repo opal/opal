@@ -398,7 +398,11 @@
   //
   // @return new [Class]  or existing ruby class
   //
-  Opal.allocate_class = function(name, superclass, constructor) {
+  Opal.allocate_class = function(name, superclass) {
+    var constructor = function(){};
+    if (name)
+      $defineProperty(constructor, 'displayName', name+'.$$constructor');
+
     var klass = constructor;
 
     if (superclass != null && superclass.$$bridge) {
@@ -415,6 +419,7 @@
     }
 
     $defineProperty(klass, '$$name', name);
+    $defineProperty(klass, '$$prototype', constructor.prototype);
     $defineProperty(klass, '$$const', {});
     $defineProperty(klass, '$$is_class', true);
     $defineProperty(klass, '$$is_a_module', true);
@@ -469,7 +474,7 @@
     }
   }
 
-  Opal.klass = function(scope, superclass, name, constructor) {
+  Opal.klass = function(scope, superclass, name) {
     var bridged;
 
     if (scope == null) {
@@ -509,7 +514,7 @@
       Opal.const_set(scope, name, klass);
     } else {
       // Create the class object (instance of Class)
-      klass = Opal.allocate_class(name, superclass, constructor);
+      klass = Opal.allocate_class(name, superclass);
       Opal.const_set(scope, name, klass);
       // Call .inherited() hook with new class on the superclass
       if (superclass.$inherited) {
@@ -540,10 +545,15 @@
   // @param  id   [String] the name of the new (or existing) module
   //
   // @return [Module]
-  Opal.allocate_module = function(name, constructor) {
+  Opal.allocate_module = function(name) {
+    var constructor = function(){};
+    if (name)
+      $defineProperty(constructor, 'displayName', name+'.$$constructor');
+
     var module = constructor;
 
     $defineProperty(module, '$$name', name);
+    $defineProperty(module, '$$prototype', constructor.prototype);
     $defineProperty(module, '$$const', {});
     $defineProperty(module, '$$is_module', true);
     $defineProperty(module, '$$is_a_module', true);
@@ -572,7 +582,7 @@
     return module;
   }
 
-  Opal.module = function(scope, name, constructor) {
+  Opal.module = function(scope, name) {
     var module;
 
     if (scope == null) {
@@ -1162,6 +1172,7 @@
     $setPrototype(constructor.prototype, klass_to_inject.prototype);
     $defineProperty(constructor.prototype, '$$class', klass_reference);
     $defineProperty(constructor, '$$bridge', true);
+    $defineProperty(constructor, '$$prototype', constructor.prototype);
     $defineProperty(constructor, '$$is_class', true);
     $defineProperty(constructor, '$$is_a_module', true);
     $defineProperty(constructor, '$$super', klass_to_inject);

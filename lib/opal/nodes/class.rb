@@ -14,12 +14,10 @@ module Opal
         helper :klass
 
         push '(function($base, $super, $parent_nesting) {'
-        line "  function $#{name}(){};"
-        line "  var self = $#{name} = $klass($base, $super, '#{name}', $#{name});"
+        line "  var self = $klass($base, $super, '#{name}');"
 
         in_scope do
           scope.name = name
-          add_temp "#{scope.proto} = self.prototype"
           add_temp '$nesting = [self].concat($parent_nesting)'
 
           body_code = self.body_code

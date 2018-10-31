@@ -165,17 +165,21 @@ module Opal
         scope.in_ensure?
       end
 
-      def closest_module_node
-        current = scope
-        while current && !current.class_scope?
-          current = current.parent
-        end
-        current
-      end
-
       def class_variable_owner
-        if closest_module_node
-          "$#{closest_module_node.name}"
+        cvar_scope = scope
+        nesting_level = 0
+
+        while cvar_scope && !(cvar_scope.class_scope?)
+          # Needs only `class << self`, `module`, and `class`
+          # can increase nesting, but `class` & `module` are
+          # covered by `class_scope?`.
+          nesting_level += 1 if cvar_scope.sclass?
+
+          cvar_scope = cvar_scope.parent
+        end
+
+        if scope
+          "$nesting[#{nesting_level}]"
         else
           'Opal.Object'
         end
