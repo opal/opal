@@ -108,13 +108,6 @@ module Opal
         !@defs && @type == :def && @parent && @parent.class?
       end
 
-      # Inside a class or module scope, the javascript variable name returned
-      # by this function points to the classes' prototype. This is the target
-      # to where methods are actually added inside a class body.
-      def proto
-        'def'
-      end
-
       ##
       # Vars to use inside each scope
       def to_vars
@@ -135,8 +128,7 @@ module Opal
         str += "#{indent}#{gv.join indent}" unless gvars.empty?
 
         if class? && !@proto_ivars.empty?
-          # raise "FIXME to_vars"
-          pvars = @proto_ivars.map { |i| "#{proto}#{i}" }.join(' = ')
+          pvars = @proto_ivars.map { |i| "self.prototype#{i}" }.join(' = ')
           result = "#{str}\n#{indent}#{pvars} = nil;"
         else
           result = str
