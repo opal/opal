@@ -1,3 +1,5 @@
 #!/usr/bin/env ruby
 
-exec "#{__dir__}/../exe/#{File.basename($0)}", *ARGV
+require 'bundler/setup'
+
+load "#{__dir__}/../exe/opal"
