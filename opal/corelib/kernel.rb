@@ -191,7 +191,7 @@ module Kernel
         status = 0
       } else if (status.$$is_boolean) {
         status = status ? 0 : 1;
-      } else if (status.$$is_numeric) {
+      } else if (status.$$is_number) {
         status = status.$to_i();
       } else {
         status = 0
