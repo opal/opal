@@ -209,7 +209,7 @@ Cross-browser testing is sponsored by [SauceLabs](https://saucelabs.com).
 
 ## Contributors
 
-This project exists thanks to all the people who contribute. <img src="https://opencollective.com/opal/contributors.svg?width=890&button=false" />
+This project exists thanks to all the people who contribute. [![contributors](https://opencollective.com/opal/contributors.svg?width=890&button=false")](https://github.com/opal/opal/graphs/contributors)
 
 
 ## Backers
@@ -233,7 +233,6 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/opal/sponsor/7/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/opal/sponsor/8/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/opal/sponsor/9/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/9/avatar.svg"></a>
-
 
 
 ## License
