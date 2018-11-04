@@ -108,6 +108,7 @@ Whitespace conventions:
 - At run-time `LoadError` wasn't being raised even with `Opal.config.missing_require_severity;` set to `'error'`.
 - Fixed `Kernel#public_methods` to return instance methods if the argument is set to false.
 - Fixed an issue in `String#gsub` that made it start an infinite loop when used recursively. (#1879)
+- `Kernel#exit` was using status 0 when a number or a generic object was provided, now accepts numbers and tries to convert objects with `#to_int` (#1898).
 
 
 <!-- generated-content-beyond-this-comment -->
