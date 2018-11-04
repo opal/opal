@@ -16,6 +16,8 @@ Ask questions on [stackoverflow (tag #opalrb)](https://stackoverflow.com/questio
 [![Inline docs](https://inch-ci.org/github/opal/opal.svg?branch=master&style=flat)](https://opalrb.com/docs)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/opal/opal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Stack Overflow](https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat)](https://stackoverflow.com/questions/ask?tags=opalrb)
+[![Backers on Open Collective](https://opencollective.com/opal/backers/badge.svg)](#backers) 
+[![Sponsors on Open Collective](https://opencollective.com/opal/sponsors/badge.svg)](#sponsors) 
 
 ## Usage
 
@@ -204,6 +206,34 @@ as the last 2 versions of Opera. For example, if the current Opera version is 20
 then we support Opera 12.1x, 19.x and 20.x but not Opera 15.x through 18.x.
 
 Cross-browser testing is sponsored by [SauceLabs](https://saucelabs.com).
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [![contributors](https://opencollective.com/opal/contributors.svg?width=890&button=false")](https://github.com/opal/opal/graphs/contributors)
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/opal#backer)]
+
+<a href="https://opencollective.com/opal#backers" target="_blank"><img src="https://opencollective.com/opal/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/opal#sponsor)]
+
+<a href="https://opencollective.com/opal/sponsor/0/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/1/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/2/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/3/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/4/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/5/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/6/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/7/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/8/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/9/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/9/avatar.svg"></a>
+
 
 ## License
 
