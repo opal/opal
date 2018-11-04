@@ -11,3 +11,17 @@ describe "Missing constants" do
     lambda { ::YetAnotherMissingConstant }.should raise_error(NameError)
   end
 end
+
+module RuntimeFixtures
+  class A
+  end
+
+  class A::B
+  end
+end
+
+describe "Constants access via .$$ with dots (regression for #1418)" do
+  it "allows to acces scopes on `Opal`" do
+    `Opal.RuntimeFixtures.A.B`.should == RuntimeFixtures::A::B
+  end
+end

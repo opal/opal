@@ -187,14 +187,10 @@ module Kernel
     end
 
     %x{
-      if (status == null) {
-        status = 0
-      } else if (status.$$is_boolean) {
+      if (status.$$is_boolean) {
         status = status ? 0 : 1;
-      } else if (status.$$is_numeric) {
-        status = status.$to_i();
       } else {
-        status = 0
+        status = #{Opal.coerce_to(status, Integer, :to_int)}
       }
 
       Opal.exit(status);

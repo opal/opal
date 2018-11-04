@@ -21,6 +21,18 @@ Whitespace conventions:
 
 
 
+## [0.11.4](https://github.com/opal/opal/compare/v0.11.3...HEAD) - unreleased
+
+
+### Fixed
+
+- `Kernel#exit` was using status 0 when a number or a generic object was provided, now accepts numbers and tries to convert objects with `#to_int`.
+
+
+
+<!-- generated-content-beyond-this-comment -->
+
+
 ## [0.11.3](https://github.com/opal/opal/compare/v0.11.2...v0.11.3) - 2018-08-28
 
 
