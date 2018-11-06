@@ -147,15 +147,21 @@ class TestNodejsFile < Test::Unit::TestCase
   end if windows_platform?
 
   def test_windows_file_expand_path
-    assert_equal(Dir.pwd.gsub(/\\/, '/') + '/foo/bar.js', File.expand_path('./foo/bar.js'))
-    assert_equal('/foo/bar.js', File.expand_path('/foo/bar.js'))
+    drive_letter = Dir.pwd.slice(0, 2)
+    assert_equal(Dir.pwd + '/foo/bar.js', File.expand_path('./foo/bar.js'))
+    assert_equal(drive_letter + '/foo/bar.js', File.expand_path('/foo/bar.js'))
     assert_equal('c:/foo/bar.js', File.expand_path('c:/foo/bar.js'))
     assert_equal('c:/foo/bar.js', File.expand_path('c:\\foo\\bar.js'))
-    assert_equal('c:/foo/bar.js', File.expand_path( 'bar.js', 'c:\\foo'))
-    assert_equal('c:/foo/baz/bar.js', File.expand_path('\\baz\\bar.js', 'c:\\foo'))
-    assert_equal('c:/baz/bar.js', File.expand_path( '\\baz\\bar.js', 'c:\\foo\\..'))
-    assert_equal('c:/foo/bar.js', File.expand_path( '\\..\\bar.js', 'c:\\foo\\baz'))
-    assert_equal('c:/foo/bar.js', File.expand_path( '\\..\\bar.js', 'c:\\foo\\baz\\'))
+    assert_equal('c:/foo/bar.js', File.expand_path('bar.js', 'c:\\foo'))
+    assert_equal('c:/baz/bar.js', File.expand_path('\\baz\\bar.js', 'c:\\foo'))
+    assert_equal('c:/bar.js', File.expand_path('\\..\\bar.js', 'c:\\foo\\baz'))
+    assert_equal('c:/bar.js', File.expand_path('\\..\\bar.js', 'c:\\foo\\baz\\'))
+    assert_equal('c:/foo/baz/bar.js', File.expand_path('baz\\bar.js', 'c:\\foo'))
+    assert_equal('c:/baz/bar.js', File.expand_path('baz\\bar.js', 'c:\\foo\\..'))
+    assert_equal('d:/', File.expand_path('d:'), 'should add a trailing slash when the path is d:')
+    assert_equal('d:/', File.expand_path('d:/'), 'should preserve the trailing slash when the path d:/')
+    assert_equal(Dir.pwd, File.expand_path(drive_letter), 'should expand to the current directory when the path is c: (and the current directory is located in the c drive)')
+    assert_equal(drive_letter + '/', drive_letter + '/', 'should return c:/ when the path is c:/ because the path is absolute')
   end if windows_platform?
 
   def test_join

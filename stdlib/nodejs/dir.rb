@@ -1,8 +1,10 @@
 class Dir
   @__glob__ = `require('glob')`
   @__fs__ = `require('fs')`
+  @__path__ = `require('path')`
   `var __glob__ = #{@__glob__}`
   `var __fs__ = #{@__fs__}`
+  `var __path__ = #{@__path__}`
 
   class << self
     def [](glob)
@@ -10,7 +12,7 @@ class Dir
     end
 
     def pwd
-      `process.cwd()`
+      `process.cwd().split(__path__.sep).join(__path__.posix.sep)`
     end
 
     def mkdir(path)
