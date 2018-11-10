@@ -543,6 +543,9 @@
   Opal.allocate_module = function(name, constructor) {
     var module = constructor;
 
+    if (name)
+      $defineProperty(constructor, 'displayName', name+'.constructor');
+
     $defineProperty(module, '$$name', name);
     $defineProperty(module, '$$const', {});
     $defineProperty(module, '$$is_module', true);
