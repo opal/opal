@@ -1732,6 +1732,7 @@
 
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(module, jsid, body) {
+    body.displayName = jsid;
     body.$$owner = module;
 
     var proto = module.prototype;
