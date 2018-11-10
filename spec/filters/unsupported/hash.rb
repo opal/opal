@@ -1,5 +1,6 @@
 opal_unsupported_filter "Hash" do
   fails "Hash#[]= duplicates and freezes string keys"
+  fails "Hash#[]= duplicates string keys using dup semantics" # TypeError: can't define singleton
   fails "Hash#[]= raises a RuntimeError if called on a frozen instance"
   fails "Hash#assoc only returns the first matching key-value pair for identity hashes"
   fails "Hash#clear raises a RuntimeError if called on a frozen instance"
@@ -28,6 +29,7 @@ opal_unsupported_filter "Hash" do
   fails "Hash#select! raises a RuntimeError if called on an empty frozen instance"
   fails "Hash#shift raises a RuntimeError if called on a frozen instance"
   fails "Hash#store duplicates and freezes string keys"
+  fails "Hash#store duplicates string keys using dup semantics" # TypeError: can't define singleton
   fails "Hash#store raises a RuntimeError if called on a frozen instance"
   fails "Hash#to_a returns a tainted array if self is tainted"
   fails "Hash#to_a returns an untrusted array if self is untrusted"
