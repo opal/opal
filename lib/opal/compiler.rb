@@ -270,16 +270,28 @@ module Opal
     def unique_temp(name)
       name = name.to_s
       if name && !name.empty?
-        name = "_#{name}"
-               .gsub('?', '$q')
-               .gsub('!', '$B')
+        name = "#{name}"
+               .gsub('<=>', '$lt_eq_gt')
+               .gsub('===', '$eq_eq_eq')
+               .gsub('==', '$eq_eq')
+               .gsub('=~', '$eq_tilde')
+               .gsub('!~', '$excl_tilde')
+               .gsub('!=', '$not_eq')
+               .gsub('<=', '$lt_eq')
+               .gsub('>=', '$gt_eq')
                .gsub('=', '$eq')
+               .gsub('?', '$ques')
+               .gsub('!', '$excl')
+               .gsub('/', '$slash')
+               .gsub('%', '$percent')
+               .gsub('+', '$plus')
+               .gsub('-', '$minus')
                .gsub('<', '$lt')
                .gsub('>', '$gt')
                .gsub(/[^\w\$]/, '$')
       end
       unique = (@unique += 1)
-      "TMP#{name}_#{unique}"
+      "#{'$' unless name.start_with?('$')}#{name}$#{unique}"
     end
 
     # Use the given helper
