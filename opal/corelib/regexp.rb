@@ -5,7 +5,7 @@ class Regexp < `RegExp`
   EXTENDED = 2
   MULTILINE = 4
 
-  `Opal.defineProperty(RegExp.prototype, '$$is_regexp', true)`
+  `Opal.defineProperty(self.$$prototype, '$$is_regexp', true)`
 
   class << self
     def allocate

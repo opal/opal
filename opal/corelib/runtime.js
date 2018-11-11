@@ -413,7 +413,7 @@
             self = new ($bind.apply(superclass, [null].concat(args)))();
 
         // and replacing a __proto__ manually
-        $setPrototype(self, klass.prototype);
+        $setPrototype(self, klass.$$prototype);
         return self;
       }
     }
@@ -430,7 +430,7 @@
     $defineProperty(klass, '$$ancestors', []);
     $defineProperty(klass, '$$ancestors_cache_version', null);
 
-    $defineProperty(klass.prototype, '$$class', klass);
+    $defineProperty(klass.$$prototype, '$$class', klass);
 
     // By default if there are no singleton class methods
     // __proto__ is Class.prototype
@@ -441,7 +441,7 @@
     }
 
     if (superclass != null) {
-      $setPrototype(klass.prototype, superclass.prototype);
+      $setPrototype(klass.$$prototype, superclass.$$prototype);
 
       if (superclass.$$meta) {
         // If superclass has metaclass then we have explicitely inherit it.
@@ -692,7 +692,7 @@
     $defineProperty(klass, '$$is_singleton', true);
     $defineProperty(klass, '$$singleton_of', object);
 
-    delete klass.prototype.$$class;
+    delete klass.$$prototype.$$class;
 
     $defineProperty(object, '$$meta', klass);
 
