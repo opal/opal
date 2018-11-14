@@ -2,17 +2,9 @@ class Module
   def self.allocate
     %x{
       var module = Opal.allocate_module(nil, function(){});
+      // Link the prototype of Module subclasses
+      if (self !== Opal.Module) Object.setPrototypeOf(module, self.prototype);
       return module;
-    }
-  end
-
-  def self.inherited(klass)
-    %x{
-      klass.$allocate = function() {
-        var module = Opal.allocate_module(nil, function(){});
-        Object.setPrototypeOf(module, klass.prototype);
-        return module;
-      }
     }
   end
 
