@@ -438,7 +438,7 @@
     if (superclass != null) {
       $setPrototype(klass.prototype, superclass.prototype);
 
-      if (superclass !== Opal.Module && superclass.$$meta) {
+      if (superclass.$$meta) {
         // If superclass has metaclass then we have explicitely inherit it.
         Opal.build_class_singleton_class(klass);
       }
