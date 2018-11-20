@@ -7,6 +7,7 @@ opal_unsupported_filter "Kernel" do
   fails "Kernel#Integer is a private method"
   fails "Kernel#Integer returns a Fixnum or Bignum object"
   fails "Kernel#String is a private method"
+  fails "Kernel#class returns the first non-singleton class" # TypeError: can't define singleton
   fails "Kernel#clone preserves tainted state from the original"
   fails "Kernel#clone preserves untrusted state from the original"
   fails "Kernel#clone raises a TypeError for Symbol"
