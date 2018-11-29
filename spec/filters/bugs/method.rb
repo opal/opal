@@ -45,7 +45,6 @@ opal_filter "Method" do
   fails "Method#super_method returns nil when the parent's method is removed"
   fails "Method#super_method returns nil when there's no super method in the parent"
   fails "Method#super_method returns the method that would be called by super in the method"
-  fails "Method#to_proc returns a Proc object with the correct arity"
   fails "Method#to_proc returns a proc that can be used by define_method"
   fails "Method#to_proc returns a proc that can receive a block"
   fails "Method#to_proc returns a proc whose binding has the same receiver as the method" # NoMethodError: undefined method `receiver' for nil
