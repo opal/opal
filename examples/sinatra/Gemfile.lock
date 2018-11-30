@@ -3,7 +3,7 @@ PATH
   specs:
     opal (0.11.99.dev)
       ast (>= 2.3.0)
-      parser (= 2.5.1.0)
+      parser (= 2.5.3.0)
 
 GEM
   remote: https://rubygems.org/
