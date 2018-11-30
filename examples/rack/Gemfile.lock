@@ -4,7 +4,7 @@ PATH
     opal (0.11.1.dev)
       ast (>= 2.3.0)
       hike (~> 1.2)
-      parser (= 2.5.3.0)
+      parser (= 2.5.1.0)
 
 GEM
   remote: https://rubygems.org/
