@@ -51,5 +51,5 @@ group :doc do
 end
 
 platforms :ruby, :mswin, :mswin64, :mingw, :x64_mingw do
-  gem 'c_lexer', '2.5.1.0.pre2' unless RUBY_ENGINE == 'truffleruby'
+  gem 'c_lexer', '2.5.3.0' unless RUBY_ENGINE == 'truffleruby'
 end

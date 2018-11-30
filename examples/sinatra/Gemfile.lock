@@ -3,7 +3,7 @@ PATH
   specs:
     opal (0.11.99.dev)
       ast (>= 2.3.0)
-      parser (= 2.5.1.0)
+      parser (= 2.5.3.0)
 
 GEM
   remote: https://rubygems.org/
@@ -14,7 +14,7 @@ GEM
       opal (~> 0.11.0)
       sprockets (~> 3.1)
       tilt (>= 1.4)
-    parser (2.5.1.0)
+    parser (2.5.3.0)
       ast (~> 2.4.0)
     puma (3.12.0)
     rack (1.5.2)
