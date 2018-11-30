@@ -1430,11 +1430,13 @@
     var has_mlhs = block.$$has_top_level_mlhs_arg,
         has_trailing_comma = block.$$has_trailing_comma_in_args;
 
-    if (block.length > 1 || ((has_mlhs || has_trailing_comma) && block.length === 1)) {
+    var block_length = (block.$$arity ? Math.abs(block.$$arity) : block.length)
+
+    if (block_length > 1 || ((has_mlhs || has_trailing_comma) && block_length === 1)) {
       arg = Opal.to_ary(arg);
     }
 
-    if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg.$$is_array) {
+    if ((block_length > 1 || (has_trailing_comma && block_length === 1)) && arg.$$is_array) {
       return block.apply(null, arg);
     }
     else {
