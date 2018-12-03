@@ -1492,13 +1492,13 @@
     var has_mlhs = block.$$has_top_level_mlhs_arg,
         has_trailing_comma = block.$$has_trailing_comma_in_args;
 
-    var block_length = (block.$$arity ? Math.abs(block.$$arity) : block.length)
+    var required_arg_count = block.$$arity ? (block.$$arity < 0 ? -block.$$arity + 1 : block.$$arity) : block.length
 
-    if (block_length > 1 || ((has_mlhs || has_trailing_comma) && block_length === 1)) {
+    if (required_arg_count > 1 || ((has_mlhs || has_trailing_comma) && required_arg_count === 1)) {
       arg = Opal.to_ary(arg);
     }
 
-    if ((block_length > 1 || (has_trailing_comma && block_length === 1)) && arg.$$is_array) {
+    if ((required_arg_count > 1 || (has_trailing_comma && required_arg_count === 1)) && arg.$$is_array) {
       return block.apply(null, arg);
     }
     else {
