@@ -501,7 +501,7 @@
       return klass;
     }
 
-    // Class doesnt exist, create a new one with given superclass...
+    // Class doesn't exist, create a new one with given superclass...
 
     // Not specifying a superclass means we can assume it to be Object
     if (superclass == null) {
