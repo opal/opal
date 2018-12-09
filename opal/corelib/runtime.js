@@ -513,30 +513,20 @@
       superclass = _Object;
     }
 
-    if (bridged) {
-      // Create the class object (instance of Class)
-      klass = Opal.allocate_class(name, superclass);
-      Opal.const_set(scope, name, klass);
-      // Call .inherited() hook with new class on the superclass
-      if (superclass.$inherited) {
-        superclass.$inherited(klass);
-      }
+    // Create the class object (instance of Class)
+    klass = Opal.allocate_class(name, superclass);
+    Opal.const_set(scope, name, klass);
 
+    // Call .inherited() hook with new class on the superclass
+    if (superclass.$inherited) {
+      superclass.$inherited(klass);
+    }
+
+    if (bridged) {
       Opal.bridge(bridged, klass);
-      // klass = bridged;
-      Opal.const_set(scope, name, klass);
-    } else {
-      // Create the class object (instance of Class)
-      klass = Opal.allocate_class(name, superclass);
-      Opal.const_set(scope, name, klass);
-      // Call .inherited() hook with new class on the superclass
-      if (superclass.$inherited) {
-        superclass.$inherited(klass);
-      }
     }
 
     return klass;
-
   }
 
   // Define new module (or return existing module). The given `scope` is basically
