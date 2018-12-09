@@ -7,7 +7,7 @@ class Class
         throw Opal.TypeError.$new("superclass must be a Class");
       }
 
-      var klass = Opal.allocate_class(nil, superclass, function(){});
+      var klass = Opal.allocate_class(nil, superclass);
       superclass.$inherited(klass);
       #{`klass`.class_eval(&block) if block_given?}
       return klass;

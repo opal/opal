@@ -325,7 +325,7 @@ platforms.each do |platform|
         files.push('nodejs') if platform == 'nodejs'
         Testing::Minitest.write_file(filename, files, ENV)
 
-        stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+        stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor -rnodejs/stacktrace"
         includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
 
         sh "ruby -rbundler/setup "\

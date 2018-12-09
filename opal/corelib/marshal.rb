@@ -13,6 +13,7 @@ module Marshal
     end
 
     def +(other)
+      super
       BinaryString.new(super)
     end
   end

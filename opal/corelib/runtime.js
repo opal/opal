@@ -403,12 +403,10 @@
     if (name)
       $defineProperty(constructor, 'displayName', name+'.$$constructor');
 
-    var klass = constructor;
-
     if (superclass != null && superclass.$$bridge) {
       // Inheritance from bridged classes requires
       // calling original JS constructors
-      klass = function SubclassOfNativeClass() {
+      constructor = function SubclassOfNativeClass() {
         var args = $slice.call(arguments),
             self = new ($bind.apply(superclass, [null].concat(args)))();
 
@@ -417,6 +415,8 @@
         return self;
       }
     }
+
+    var klass = constructor;
 
     $defineProperty(klass, '$$name', name);
     $defineProperty(klass, '$$constructor', constructor);
@@ -510,8 +510,16 @@
     }
 
     if (bridged) {
-      Opal.bridge(bridged);
-      klass = bridged;
+      // Create the class object (instance of Class)
+      klass = Opal.allocate_class(name, superclass);
+      Opal.const_set(scope, name, klass);
+      // Call .inherited() hook with new class on the superclass
+      if (superclass.$inherited) {
+        superclass.$inherited(klass);
+      }
+
+      Opal.bridge(bridged, klass);
+      // klass = bridged;
       Opal.const_set(scope, name, klass);
     } else {
       // Create the class object (instance of Class)
@@ -1163,7 +1171,7 @@
     //
     // What we need to do is to inject our class (with its prototype chain)
     // between constructor and super. For example, after injecting Ruby Object into JS Error we get:
-    // - constructor
+    // - constructor (window.Error)
     //   - Opal.Object
     //     - Opal.Kernel
     //       - Opal.BasicObject
@@ -1172,20 +1180,11 @@
 
     $setPrototype(constructor.prototype, klass_to_inject.prototype);
     $defineProperty(constructor.prototype, '$$class', klass_reference);
-    $defineProperty(constructor, '$$bridge', true);
-    $defineProperty(constructor, '$$prototype', constructor.prototype);
-    $defineProperty(constructor, '$$is_class', true);
-    $defineProperty(constructor, '$$is_a_module', true);
-    $defineProperty(constructor, '$$super', klass_to_inject);
-    $defineProperty(constructor, '$$const', {});
-    $defineProperty(constructor, '$$own_included_modules', []);
-    $defineProperty(constructor, '$$own_prepended_modules', []);
-    $defineProperty(constructor, '$$ancestors', []);
-    $defineProperty(constructor, '$$ancestors_cache_version', null);
-    $setPrototype(constructor, Opal.Class.prototype);
     $defineProperty(constructor, '$$bridge', klass);
     $defineProperty(klass, 'constructor', constructor);
     $defineProperty(klass, '$$constructor', constructor);
+    $defineProperty(klass, '$$prototype', constructor.prototype);
+    $defineProperty(klass, '$$bridge', true);
   };
 
   function protoToModule(proto) {
