@@ -419,6 +419,7 @@
     }
 
     $defineProperty(klass, '$$name', name);
+    $defineProperty(klass, '$$constructor', constructor);
     $defineProperty(klass, '$$prototype', constructor.prototype);
     $defineProperty(klass, '$$const', {});
     $defineProperty(klass, '$$is_class', true);
@@ -1182,6 +1183,9 @@
     $defineProperty(constructor, '$$ancestors', []);
     $defineProperty(constructor, '$$ancestors_cache_version', null);
     $setPrototype(constructor, Opal.Class.prototype);
+    $defineProperty(constructor, '$$bridge', klass);
+    $defineProperty(klass, 'constructor', constructor);
+    $defineProperty(klass, '$$constructor', constructor);
   };
 
   function protoToModule(proto) {

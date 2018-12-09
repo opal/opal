@@ -9,10 +9,10 @@ class String < `String`
 
     Opal.defineProperty(#{self}.$$prototype, '$$cast', function(string) {
       var klass = this.$$class;
-      if (klass === String) {
+      if (klass.$$constructor === String) {
         return string;
       } else {
-        return new klass(string);
+        return new klass.$$constructor(string);
       }
     });
   }
