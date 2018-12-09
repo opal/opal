@@ -281,6 +281,7 @@ opal_unsupported_filter "String" do
   fails "String#downcase! sets the result String encoding to the source String encoding" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "String#dump untrusts the result if self is untrusted"
   fails "String#dup copies instance variables" # Strings are immutable, so they can't have ivars
+  fails "String#dup does not copy singleton methods" # TypeError: can't define singleton
   fails "String#dup does not modify the original string when changing dupped string"
   fails "String#each_char is unicode aware"
   fails "String#each_line does not care if the string is modified while substituting"

@@ -65,7 +65,7 @@ class Hash
 
   def self.allocate
     %x{
-      var hash = new self();
+      var hash = new self.$$constructor();
 
       Opal.hash_init(hash);
 

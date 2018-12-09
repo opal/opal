@@ -29,7 +29,7 @@ class String < `String`
 
   def self.new(str = '')
     str = Opal.coerce_to(str, String, :to_str)
-    `new self(str)`
+    `new self.$$constructor(str)`
   end
 
   def initialize(str = undefined)
@@ -114,6 +114,9 @@ class String < `String`
 
   def ==(other)
     %x{
+      if (self === other) {
+        return true;
+      }
       if (other.$$is_string) {
         return self.toString() === other.toString();
       }
