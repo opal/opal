@@ -406,7 +406,7 @@
       // calling original JS constructors
       constructor = function() {
         var args = $slice.call(arguments),
-            self = new ($bind.apply(superclass, [null].concat(args)))();
+            self = new ($bind.apply(superclass.$$constructor, [null].concat(args)))();
 
         // and replacing a __proto__ manually
         $setPrototype(self, klass.$$prototype);
@@ -420,6 +420,7 @@
       $defineProperty(constructor, 'displayName', '::'+name);
 
     $defineProperty(klass, '$$name', name);
+    $defineProperty(klass, '$$constructor', constructor);
     $defineProperty(klass, '$$prototype', constructor.prototype);
     $defineProperty(klass, '$$const', {});
     $defineProperty(klass, '$$is_class', true);
@@ -1186,6 +1187,9 @@
     $defineProperty(constructor, '$$ancestors', []);
     $defineProperty(constructor, '$$ancestors_cache_version', null);
     $setPrototype(constructor, Opal.Class.prototype);
+    $defineProperty(constructor, '$$bridge', klass);
+    $defineProperty(klass, 'constructor', constructor);
+    $defineProperty(klass, '$$constructor', constructor);
   };
 
   function protoToModule(proto) {

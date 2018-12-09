@@ -237,9 +237,9 @@ class Array < `Array`
           }
         }
 
-        if (array.constructor !== Array)
+        if (array.$$constructor !== Array)
           array = #{`array`.to_a};
-        if (other.constructor !== Array)
+        if (other.$$constructor !== Array)
           other = #{`other`.to_a};
 
         if (array.length !== other.length) {
