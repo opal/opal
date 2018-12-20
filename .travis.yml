@@ -4,6 +4,8 @@ language: ruby
 sudo: required
 dist: trusty
 
+node_js: '8'
+
 addons:
   chrome: stable
 
