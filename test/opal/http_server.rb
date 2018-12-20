@@ -1,5 +1,7 @@
 require 'sinatra'
 
+cat_image = File.open(File.join(File.dirname(__FILE__), 'cat.png'), 'rb').read
+
 get '/' do
   'Ready!'
 end
@@ -16,6 +18,13 @@ get '/html' do
   headers \
     'Content-Type' => 'text/html; charset=utf-8'
   body '<body>'
+end
+
+get '/png' do
+  status 200
+  headers \
+    'Content-Type' => 'image/png'
+  body cat_image
 end
 
 get '/404' do

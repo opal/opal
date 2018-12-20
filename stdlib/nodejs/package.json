@@ -1,6 +1,6 @@
 {
   "dependencies": {
     "glob": "latest",
-    "xmlhttprequest": "^1.8.0"
+    "unxhr": "1.0.1"
   }
 }
