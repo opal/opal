@@ -479,7 +479,7 @@ exports.XMLHttpRequest = function () {
       self.dispatchEvent('loadstart')
     } else { // Synchronous
       const encoding = responseType === 'text' ? 'utf8' : 'binary'
-      const output = require('child_process').execSync(`${process.argv[0]} ${__dirname}/request.js \
+      const output = require('child_process').execSync(`"${process.argv[0]}" "${__dirname}/request.js" \
 --ssl="${ssl}" \
 --encoding="${encoding}" \
 --request-options=${JSON.stringify(JSON.stringify(options))}`, { stdio: 'pipe' })
