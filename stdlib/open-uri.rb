@@ -145,8 +145,8 @@ module OpenURI
       var byteArray = [];
       for (var i = 0, len = binStr.length; i < len; ++i) {
         var c = binStr.charCodeAt(i);
-        var byte = c & 0xff; // byte at offset i
-        byteArray.push(byte);
+        var byteCode = c & 0xff; // byte at offset i
+        byteArray.push(byteCode);
       }
       return byteArray;
     }
