@@ -70,6 +70,7 @@
   var $bind         = Function.prototype.bind;
   var $setPrototype = Object.setPrototypeOf;
   var $slice        = Array.prototype.slice;
+  var $splice       = Array.prototype.splice;
 
   // Nil object id is always 4
   var nil_id = 4;
@@ -1610,7 +1611,7 @@
   Opal.extract_kwargs = function(parameters) {
     var kwargs = parameters[parameters.length - 1];
     if (kwargs != null && kwargs['$respond_to?']('to_hash', true)) {
-      Array.prototype.splice.call(parameters, parameters.length - 1, 1);
+      $splice.call(parameters, parameters.length - 1, 1);
       return kwargs.$to_hash();
     }
     else {
