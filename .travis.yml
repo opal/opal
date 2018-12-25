@@ -63,6 +63,9 @@ matrix:
     - rvm: 2.3.8
       env: RUN=rspec
 
+    - rvm: 2.6.0
+      env: RUN=rspec
+
     - rvm: jruby-9.2.4.1
       env: RUN=rspec
 
