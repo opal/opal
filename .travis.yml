@@ -66,6 +66,9 @@ matrix:
     - rvm: 2.6.0
       env: RUN=rspec
 
+    - rvm: truffleruby
+      env: RUN=rspec
+
     - rvm: jruby-9.2.4.1
       env: RUN=rspec
 
@@ -75,6 +78,7 @@ matrix:
   allow_failures:
     - rvm: ruby-head
     - rvm: jruby-head
+    - rvm: truffleruby
     - env: RUN=smoke_test
 
 
