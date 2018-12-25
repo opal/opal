@@ -3,6 +3,11 @@ RSpec::Core::RakeTask.new(:rspec) do |t|
   t.pattern = 'spec/lib/**/*_spec.rb'
 end
 
+if ENV.key?('RUBYSPEC')
+  warn "Did you mean RUBYSPECS=...? (RUBYSPEC was found among ENV variables)"
+  exit 1
+end
+
 module Testing
   extend self
 
