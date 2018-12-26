@@ -169,7 +169,7 @@ module Opal
         cvar_scope = scope
         nesting_level = 0
 
-        while cvar_scope && !(cvar_scope.class_scope?)
+        while cvar_scope && !cvar_scope.class_scope?
           # Needs only `class << self`, `module`, and `class`
           # can increase nesting, but `class` & `module` are
           # covered by `class_scope?`.
