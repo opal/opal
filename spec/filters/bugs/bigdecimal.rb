@@ -129,6 +129,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_s removes trailing spaces in floating point notation"
   fails "BigDecimal#to_s starts with + if + is supplied and value is positive"
   fails "BigDecimal#to_s the default format looks like 0.xxxxEnn"
+  fails "BigDecimal#to_s the default format looks like 0.xxxxenn" # Expected "3.14159265358979323846264338327950288419716939937" to match /^0\.[0-9]*e[0-9]*$/
   fails "BigDecimal#truncate returns Infinity if self is infinite"
   fails "BigDecimal#truncate returns NaN if self is NaN"
   fails "BigDecimal#truncate returns the same value if self is special value"

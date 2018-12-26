@@ -51,4 +51,111 @@ opal_unsupported_filter "taint" do
   fails "Array#pack with format 'u' taints the output string if the format string is tainted"
   fails "String#delete_prefix taints resulting strings when other is tainted" # NoMethodError: undefined method `delete_prefix' for "hello":String
   fails "String#delete_suffix taints resulting strings when other is tainted" # NoMethodError: undefined method `delete_suffix' for "hello":String
+  fails "Array#pack with format 'u' returns a trusted string when the array is untrusted" # NoMethodError: undefined method `untrust' for ["abcd", 32]
+  fails "Array#pack with format 'u' returns a untrusted string when a pack argument is untrusted" # NoMethodError: undefined method `untrust' for "abcd"
+  fails "Array#pack with format 'u' returns a untrusted string when the empty format is untrusted" # NoMethodError: undefined method `untrust' for ""
+  fails "Array#pack with format 'u' returns a untrusted string when the format is untrusted" # NoMethodError: undefined method `untrust' for "u3C"
+  fails "String#unpack with format 'A' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "A2"
+  fails "String#unpack with format 'A' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'A' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'A' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'A' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "A2"
+  fails "String#unpack with format 'A' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'A' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'A' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'B' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "B2"
+  fails "String#unpack with format 'B' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'B' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'B' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'B' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "B2"
+  fails "String#unpack with format 'B' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'B' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'B' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'H' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "H2"
+  fails "String#unpack with format 'H' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'H' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'H' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'H' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "H2"
+  fails "String#unpack with format 'H' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'H' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'H' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'M' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "M2"
+  fails "String#unpack with format 'M' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'M' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'M' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'M' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "M2"
+  fails "String#unpack with format 'M' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'M' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'M' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'U' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "U2"
+  fails "String#unpack with format 'U' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'U' does not untrust returned arrays if given an trusted packed string" # Exception: Cannot read property '$__id__' of undefined
+  fails "String#unpack with format 'U' does not untrust returned arrays if given an untrusted format string" # Exception: Cannot read property '$__id__' of undefined
+  fails "String#unpack with format 'U' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "U2"
+  fails "String#unpack with format 'U' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for nil
+  fails "String#unpack with format 'U' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for nil
+  fails "String#unpack with format 'U' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'Z' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "Z2"
+  fails "String#unpack with format 'Z' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'Z' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'Z' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'Z' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "Z2"
+  fails "String#unpack with format 'Z' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'Z' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'Z' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'a' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "a2"
+  fails "String#unpack with format 'a' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'a' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'a' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'a' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "a2"
+  fails "String#unpack with format 'a' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'a' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'a' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'b' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "b2"
+  fails "String#unpack with format 'b' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'b' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'b' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'b' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "b2"
+  fails "String#unpack with format 'b' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'b' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'b' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'h' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "h2"
+  fails "String#unpack with format 'h' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'h' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'h' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'h' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "h2"
+  fails "String#unpack with format 'h' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'h' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'h' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'm' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "m2"
+  fails "String#unpack with format 'm' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'm' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'm' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'm' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "m2"
+  fails "String#unpack with format 'm' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'm' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'm' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'u' does not untrust returned arrays if given a untrusted format string" # NoMethodError: undefined method `untrust' for "u2"
+  fails "String#unpack with format 'u' does not untrust returned arrays if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "String#unpack with format 'u' does not untrust returned arrays if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'u' does not untrust returned arrays if given an untrusted format string" # NoMethodError: undefined method `untrusted?' for [""]
+  fails "String#unpack with format 'u' does not untrust returned strings if given a untrusted format string" # NoMethodError: undefined method `untrust' for "u2"
+  fails "String#unpack with format 'u' does not untrust returned strings if given an trusted packed string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'u' does not untrust returned strings if given an untainted format string" # NoMethodError: undefined method `untrusted?' for ""
+  fails "String#unpack with format 'u' untrusts returned strings if given a untrusted packed string" # NoMethodError: undefined method `untrust' for ""
+  fails "Array#pack with format 'u' does not return a tainted string when the array is tainted" # RuntimeError: Unsupported pack directive "u" (no chunk reader defined)
+  fails "Array#pack with format 'u' returns a tainted string when a pack argument is tainted" # RuntimeError: Unsupported pack directive "u" (no chunk reader defined)
+  fails "Array#pack with format 'u' returns a tainted string when an empty format is tainted" # Expected false to be true
+  fails "Array#pack with format 'u' returns a tainted string when the format is tainted" # RuntimeError: Unsupported pack directive "u" (no chunk reader defined)
+  fails "String#unpack with format 'A' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'B' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'H' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'M' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'U' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'Z' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'a' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'b' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'h' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'm' taints returned strings if given a tainted packed string" # Expected false to be true
+  fails "String#unpack with format 'u' taints returned strings if given a tainted packed string" # Expected false to be true
 end
