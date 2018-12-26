@@ -21,3 +21,9 @@ describe "generated method names" do
     }
   end
 end
+
+describe "Bridging" do
+  it "does not remove singleton methods of bridged classes" do
+    `typeof(String.call)`.should == "function"
+  end
+end
