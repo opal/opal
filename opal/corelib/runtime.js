@@ -400,7 +400,7 @@
   // @return new [Class]  or existing ruby class
   //
   Opal.allocate_class = function(name, superclass) {
-    var constructor;
+    var klass, constructor;
 
     if (superclass != null && superclass.$$bridge) {
       // Inheritance from bridged classes requires
@@ -417,10 +417,11 @@
       constructor = function(){};
     }
 
-    if (name)
+    if (name) {
       $defineProperty(constructor, 'displayName', '::'+name);
+    }
 
-    var klass = constructor;
+    klass = constructor;
 
     $defineProperty(klass, '$$name', name);
     $defineProperty(klass, '$$constructor', constructor);
@@ -550,8 +551,9 @@
   // @return [Module]
   Opal.allocate_module = function(name) {
     var constructor = function(){};
-    if (name)
+    if (name) {
       $defineProperty(constructor, 'displayName', name+'.$$constructor');
+    }
 
     var module = constructor;
 
@@ -603,7 +605,7 @@
     }
 
     // Module doesnt exist, create a new one...
-    module = Opal.allocate_module(name, constructor);
+    module = Opal.allocate_module(name);
     Opal.const_set(scope, name, module);
 
     return module;

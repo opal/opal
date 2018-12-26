@@ -270,7 +270,8 @@ module Opal
     def unique_temp(name)
       name = name.to_s
       if name && !name.empty?
-        name = "#{name}"
+        name = name
+               .to_s
                .gsub('<=>', '$lt_eq_gt')
                .gsub('===', '$eq_eq_eq')
                .gsub('==', '$eq_eq')
