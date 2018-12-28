@@ -133,7 +133,7 @@ module OpenURI
     io = buf.io
     #io.base_uri = uri # TODO: Generate a URI object from the uri String
     io.status = "#{status} #{status_text}"
-    io.meta_add_field('content-type', `req.getResponseHeader("Content-Type")`)
+    io.meta_add_field('content-type', `req.getResponseHeader("Content-Type") || ''`)
     last_modified = `req.getResponseHeader("Last-Modified")`
     io.meta_add_field('last-modified', last_modified) if last_modified
     io
