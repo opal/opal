@@ -46,6 +46,10 @@ class TestNodejsFile < Test::Unit::TestCase
     assert_equal('bar', File.read('tmp/foo'))
   end
 
+  def test_read_binary_file
+    assert_match(/^\u0089PNG\r\n\u001A\n\u0000\u0000\u0000\rIHDR.*/, File.open('./test/nodejs/fixtures/cat.png', 'rb') {|f| f.read })
+  end
+
   def test_read_each_line
     File.write('tmp/bar', "one\ntwo")
     file = File.new('tmp/bar', 'r')
@@ -91,7 +95,7 @@ class TestNodejsFile < Test::Unit::TestCase
   end
 
   def test_current_directory_should_be_a_directory_using_pathname
-    current_dir = Pathname.new('.');
+    current_dir = Pathname.new('.')
     assert(current_dir.directory?)
   end
 

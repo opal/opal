@@ -167,7 +167,8 @@ class File < IO
   # Instance Methods
 
   def initialize(path, flags = 'r')
-    # Node reads files in binary by default, but does not recognize the flag
+    @binary_flag = flags.include?('b')
+    # Node does not recognize this flag
     flags = flags.delete('b')
     # encoding flag is unsupported
     encoding_option_rx = /:(.*)/
@@ -186,7 +187,7 @@ class File < IO
     if @eof
       ''
     else
-      res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString()})`
+      res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString(#{@binary_flag ? 'binary' : 'utf8'})})`
       @eof = true
       @lineno = res.size
       res
