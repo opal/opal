@@ -398,13 +398,13 @@
   //
   // @return new [Class]  or existing ruby class
   //
-  Opal.allocate_class = function(name, superclass, constructor) {
-    var klass = constructor;
+  Opal.allocate_class = function(name, superclass) {
+    var constructor;
 
     if (superclass != null && superclass.$$bridge) {
       // Inheritance from bridged classes requires
       // calling original JS constructors
-      klass = function SubclassOfNativeClass() {
+      constructor = function() {
         var args = $slice.call(arguments),
             self = new ($bind.apply(superclass, [null].concat(args)))();
 
@@ -412,7 +412,12 @@
         $setPrototype(self, klass.prototype);
         return self;
       }
+    } else {
+      constructor = function(){};
     }
+
+    if (name)
+      $defineProperty(constructor, 'displayName', '::'+name);
 
     $defineProperty(klass, '$$name', name);
     $defineProperty(klass, '$$const', {});
@@ -469,7 +474,7 @@
     }
   }
 
-  Opal.klass = function(scope, superclass, name, constructor) {
+  Opal.klass = function(scope, superclass, name) {
     var bridged;
 
     if (scope == null) {
@@ -509,7 +514,7 @@
       Opal.const_set(scope, name, klass);
     } else {
       // Create the class object (instance of Class)
-      klass = Opal.allocate_class(name, superclass, constructor);
+      klass = Opal.allocate_class(name, superclass);
       Opal.const_set(scope, name, klass);
       // Call .inherited() hook with new class on the superclass
       if (superclass.$inherited) {
@@ -540,7 +545,11 @@
   // @param  id   [String] the name of the new (or existing) module
   //
   // @return [Module]
-  Opal.allocate_module = function(name, constructor) {
+  Opal.allocate_module = function(name) {
+    var constructor = function(){};
+    if (name)
+      $defineProperty(constructor, 'displayName', name+'.$$constructor');
+
     var module = constructor;
 
     if (name)
@@ -575,7 +584,7 @@
     return module;
   }
 
-  Opal.module = function(scope, name, constructor) {
+  Opal.module = function(scope, name) {
     var module;
 
     if (scope == null) {
