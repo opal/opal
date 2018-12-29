@@ -73,7 +73,7 @@ module Opal
 
       def super_method_invocation
         if def_scope.defs
-          "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, self.$$class.prototype)"
+          "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, self.$$class.$$prototype)"
         else
           "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param})"
         end

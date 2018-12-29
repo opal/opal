@@ -128,7 +128,7 @@ module Opal
         str += "#{indent}#{gv.join indent}" unless gvars.empty?
 
         if class? && !@proto_ivars.empty?
-          pvars = @proto_ivars.map { |i| "self.prototype#{i}" }.join(' = ')
+          pvars = @proto_ivars.map { |i| "self.$$prototype#{i}" }.join(' = ')
           result = "#{str}\n#{indent}#{pvars} = nil;"
         else
           result = str

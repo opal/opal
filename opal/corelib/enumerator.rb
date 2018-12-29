@@ -3,7 +3,7 @@ require 'corelib/enumerable'
 class Enumerator
   include Enumerable
 
-  `self.prototype.$$is_enumerator = true`
+  `self.$$prototype.$$is_enumerator = true`
 
   def self.for(object, method = :each, *args, &block)
     %x{

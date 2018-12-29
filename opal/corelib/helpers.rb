@@ -155,7 +155,7 @@ module Opal
       var method_name, method;
       for (var i = method_names.length - 1; i >= 0; i--) {
         method_name = method_names[i];
-        method = owner_class.prototype['$'+method_name];
+        method = owner_class.$$prototype['$'+method_name];
 
         if (method && !method.$$stub) {
           method.$$pristine = true;

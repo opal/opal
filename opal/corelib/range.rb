@@ -3,7 +3,7 @@ require 'corelib/enumerable'
 class Range
   include Enumerable
 
-  `self.prototype.$$is_range = true`
+  `self.$$prototype.$$is_range = true`
 
   attr_reader :begin, :end
 

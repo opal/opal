@@ -1,5 +1,5 @@
 class NilClass
-  `self.prototype.$$meta = #{self}`
+  `self.$$prototype.$$meta = #{self}`
 
   class << self
     def allocate
