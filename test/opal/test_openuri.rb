@@ -44,4 +44,10 @@ class TestOpenURI < Test::Unit::TestCase
     # No HTTP server on port 1234
     assert_raise(OpenURI::HTTPError) { open("http://localhost:1234") }
   end
+
+  def test_open_no_header
+    open("http://localhost:4567/no_header") {|f|
+      assert_equal('no header', f.read)
+    }
+  end
 end
