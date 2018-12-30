@@ -3,7 +3,7 @@ class Module
     %x{
       var module = Opal.allocate_module(nil, function(){});
       // Link the prototype of Module subclasses
-      if (self !== Opal.Module) Object.setPrototypeOf(module, self.prototype);
+      if (self !== Opal.Module) Object.setPrototypeOf(module, self.$$prototype);
       return module;
     }
   end
@@ -111,7 +111,7 @@ class Module
 
   def attr_reader(*names)
     %x{
-      var proto = self.prototype;
+      var proto = self.$$prototype;
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
@@ -146,7 +146,7 @@ class Module
 
   def attr_writer(*names)
     %x{
-      var proto = self.prototype;
+      var proto = self.$$prototype;
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
@@ -431,7 +431,7 @@ class Module
 
   def instance_method(name)
     %x{
-      var meth = self.prototype['$' + name];
+      var meth = self.$$prototype['$' + name];
 
       if (!meth || meth.$$stub) {
         #{raise NameError.new("undefined method `#{name}' for class `#{self.name}'", name)};
@@ -523,7 +523,7 @@ class Module
 
   def method_defined?(method)
     %x{
-      var body = self.prototype['$' + method];
+      var body = self.$$prototype['$' + method];
       return (!!body) && !body.$$stub;
     }
   end
@@ -537,7 +537,7 @@ class Module
         for (var i = 0, length = methods.length; i < length; i++) {
           var meth = methods[i],
               id   = '$' + meth,
-              func = self.prototype[id];
+              func = self.$$prototype[id];
 
           Opal.defs(self, id, func);
         }

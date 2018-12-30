@@ -65,12 +65,6 @@ RSpec.describe Opal::Compiler do
     expect_compiled("undef a,b").to match(/Opal.udef\(self, '\$' \+ "a"\);.*Opal.udef\(self, '\$' \+ "b"\);/m)
   end
 
-  describe "class names" do
-    it "generates a named function for class using $ prefix" do
-      expect_compiled("class Foo; end").to include("function $Foo")
-    end
-  end
-
   describe "method names" do
     it "generates a named function for method" do
       expect_compiled("def test_method; end").to include("function $$test_method()")

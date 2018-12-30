@@ -87,7 +87,7 @@
 
     var line = "";
     var func = this.getFunction();
-    var customName = func.displayName;
+    if (func) var customName = func.displayName;
     if (NODE && customName) {
       if (customName && func.$$owner) {
         var customNameOwner;

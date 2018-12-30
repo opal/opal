@@ -5,7 +5,7 @@ class Array < `Array`
   include Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays
-  `Opal.defineProperty(Array.prototype, '$$is_array', true)`
+  `Opal.defineProperty(self.$$prototype, '$$is_array', true)`
 
   %x{
     function toArraySubclass(obj, klass) {
@@ -237,9 +237,9 @@ class Array < `Array`
           }
         }
 
-        if (array.constructor !== Array)
+        if (array.$$constructor !== Array)
           array = #{`array`.to_a};
-        if (other.constructor !== Array)
+        if (other.$$constructor !== Array)
           other = #{`other`.to_a};
 
         if (array.length !== other.length) {
@@ -2334,7 +2334,7 @@ class Array < `Array`
 
   def self.inherited(klass)
     %x{
-      klass.prototype.$to_a = function() {
+      klass.$$prototype.$to_a = function() {
         return this.slice(0, this.length);
       }
     }

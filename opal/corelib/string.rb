@@ -5,14 +5,14 @@ class String < `String`
   include Comparable
 
   %x{
-    Opal.defineProperty(String.prototype, '$$is_string', true);
+    Opal.defineProperty(#{self}.$$prototype, '$$is_string', true);
 
-    Opal.defineProperty(String.prototype, '$$cast', function(string) {
+    Opal.defineProperty(#{self}.$$prototype, '$$cast', function(string) {
       var klass = this.$$class;
-      if (klass === String) {
+      if (klass.$$constructor === String) {
         return string;
       } else {
-        return new klass(string);
+        return new klass.$$constructor(string);
       }
     });
   }
@@ -29,7 +29,7 @@ class String < `String`
 
   def self.new(str = '')
     str = Opal.coerce_to(str, String, :to_str)
-    `new self(str)`
+    `new self.$$constructor(str)`
   end
 
   def initialize(str = undefined)

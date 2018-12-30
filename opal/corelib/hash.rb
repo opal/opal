@@ -12,7 +12,7 @@ class Hash
   include Enumerable
 
   # Mark all hash instances as valid hashes (used to check keyword args, etc)
-  `def.$$is_hash = true`
+  `self.$$prototype.$$is_hash = true`
 
   def self.[](*argv)
     %x{
@@ -65,7 +65,7 @@ class Hash
 
   def self.allocate
     %x{
-      var hash = new self();
+      var hash = new self.$$constructor();
 
       Opal.hash_init(hash);
 
