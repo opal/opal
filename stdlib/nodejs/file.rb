@@ -26,6 +26,13 @@
     warnings[string] = true;
     #{warn(`string`)};
   }
+  function encodeUTF8(text) {
+    try {
+      return decodeURI(escape(text));
+    } catch (e) {
+      return text;
+    }
+  }
   function executeIOAction(action) {
     try {
       return action();
@@ -187,7 +194,11 @@ class File < IO
     if @eof
       ''
     else
-      res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString(#{@binary_flag ? 'binary' : 'utf8'})})`
+      if @binary_flag
+        res = `encodeUTF8(executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString('binary')}))`
+      else
+        res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString('utf8')})`
+      end
       @eof = true
       @lineno = res.size
       res
