@@ -1,4 +1,5 @@
 %x{
+  /* global escape, decodeURI */
   var warnings = {}, errno_code, errno_codes = [
     'EACCES',
     'EISDIR',
