@@ -70,7 +70,9 @@ opal_filter "Kernel" do
   fails "Kernel#extend raises an ArgumentError when no arguments given"
   fails "Kernel#inspect does not call #to_s if it is defined"
   fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
+  fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#is_a? returns true if given a Module that object has been extended with" # Requires string mutability
+  fails "Kernel#kind_of? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#kind_of? returns true if given a Module that object has been extended with" # Requires string mutability
   fails "Kernel#local_variables contains locals as they are added"
   fails "Kernel#local_variables is accessible from bindings"
@@ -93,7 +95,9 @@ opal_filter "Kernel" do
   fails "Kernel#public_methods returns a list of names without protected accessible methods in the object"
   fails "Kernel#public_methods when passed false returns a list of public methods in without its ancestors"
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors"
+  fails "Kernel#public_send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#puts delegates to $stdout.puts"
+  fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning false"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"
@@ -105,6 +109,7 @@ opal_filter "Kernel" do
   fails "Kernel#respond_to_missing? is called with true as the second argument when #respond_to? is"
   fails "Kernel#respond_to_missing? is not called when #respond_to? would return true"
   fails "Kernel#respond_to_missing? isn't called when obj responds to the given public method"
+  fails "Kernel#send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#singleton_class raises TypeError for Fixnum"
   fails "Kernel#singleton_class raises TypeError for Symbol"
   fails "Kernel#singleton_method find a method defined on the singleton class" # NoMethodError: undefined method `singleton_method' for #<Object:0x39d20>

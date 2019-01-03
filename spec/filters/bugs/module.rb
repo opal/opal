@@ -122,6 +122,7 @@ opal_filter "Module" do
   fails "Module#refine and alias_method aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab0>
   fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae7a>
   fails "Module#refine does not apply refinements to external scopes not using the module" # NoMethodError: undefined method `refine' for #<Module:0x3ae60>
+  fails "Module#refine does not list methods defined only in refinement" # NoMethodError: undefined method `refine' for #<Module:0x1e042>
   fails "Module#refine does not make available methods from another refinement module" # NoMethodError: undefined method `refine' for #<Module:0x3ae8c>
   fails "Module#refine does not override methods in subclasses" # NoMethodError: undefined method `refine' for #<Module:0x3ae56>
   fails "Module#refine doesn't apply refinements outside the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae72>

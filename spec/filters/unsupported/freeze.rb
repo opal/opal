@@ -235,4 +235,5 @@ opal_unsupported_filter "freezing" do
   fails "String#tr! raises a FrozenError if self is frozen" # NotImplementedError: String#tr! not supported. Mutable String methods are not supported in Opal.
   fails "String#tr_s! raises a FrozenError if self is frozen" # NotImplementedError: String#tr_s! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! raises a FrozenError when self is frozen" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "Proc#[] with frozen_string_literals doesn't duplicate frozen strings" # Expected false to be true
 end
