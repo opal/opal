@@ -1,5 +1,4 @@
 %x{
-  /* global escape, decodeURI */
   var warnings = {}, errno_code, errno_codes = [
     'EACCES',
     'EISDIR',
@@ -27,12 +26,78 @@
     warnings[string] = true;
     #{warn(`string`)};
   }
-  function encodeUTF8(text) {
-    try {
-      return decodeURI(escape(text));
-    } catch (e) {
-      return text;
+  function is_utf8(bytes) {
+    var i = 0;
+    while (i < bytes.length) {
+      if ((// ASCII
+        bytes[i] === 0x09 ||
+        bytes[i] === 0x0A ||
+        bytes[i] === 0x0D ||
+        (0x20 <= bytes[i] && bytes[i] <= 0x7E)
+      )
+      ) {
+        i += 1;
+        continue;
+      }
+
+      if ((// non-overlong 2-byte
+        (0xC2 <= bytes[i] && bytes[i] <= 0xDF) &&
+        (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0xBF)
+      )
+      ) {
+        i += 2;
+        continue;
+      }
+
+      if ((// excluding overlongs
+          bytes[i] === 0xE0 &&
+          (0xA0 <= bytes[i + 1] && bytes[i + 1] <= 0xBF) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF)
+        ) ||
+        (// straight 3-byte
+          ((0xE1 <= bytes[i] && bytes[i] <= 0xEC) ||
+            bytes[i] === 0xEE ||
+            bytes[i] === 0xEF) &&
+          (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0xBF) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF)
+        ) ||
+        (// excluding surrogates
+          bytes[i] === 0xED &&
+          (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0x9F) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF)
+        )
+      ) {
+        i += 3;
+        continue;
+      }
+
+      if ((// planes 1-3
+          bytes[i] === 0xF0 &&
+          (0x90 <= bytes[i + 1] && bytes[i + 1] <= 0xBF) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF) &&
+          (0x80 <= bytes[i + 3] && bytes[i + 3] <= 0xBF)
+        ) ||
+        (// planes 4-15
+          (0xF1 <= bytes[i] && bytes[i] <= 0xF3) &&
+          (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0xBF) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF) &&
+          (0x80 <= bytes[i + 3] && bytes[i + 3] <= 0xBF)
+        ) ||
+        (// plane 16
+          bytes[i] === 0xF4 &&
+          (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0x8F) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF) &&
+          (0x80 <= bytes[i + 3] && bytes[i + 3] <= 0xBF)
+        )
+      ) {
+        i += 4;
+        continue;
+      }
+
+      return false;
     }
+
+    return true;
   }
   function executeIOAction(action) {
     try {
@@ -60,8 +125,15 @@ class File < IO
 
   @__fs__ = `require('fs')`
   @__path__ = `require('path')`
+  @__util__ = `require('util')`
   `var __fs__ = #{@__fs__}`
   `var __path__ = #{@__path__}`
+  `var __util__ = #{@__util__}`
+  # Since Node.js 11+ TextEncoder and TextDecoder are now available on the global object.
+  `var __TextEncoder__ = typeof TextEncoder !== 'undefined' ? TextEncoder : __util__.TextEncoder`
+  `var __TextDecoder__ = typeof TextDecoder !== 'undefined' ? TextDecoder : __util__.TextDecoder`
+  `var __utf8TextDecoder__ = new __TextDecoder__('utf8')`
+  `var __textEncoder__ = new __TextEncoder__()`
 
   if `__path__.sep !== #{Separator}`
     ALT_SEPARATOR = `__path__.sep`
@@ -196,7 +268,17 @@ class File < IO
       ''
     else
       if @binary_flag
-        res = `encodeUTF8(executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString('binary')}))`
+        %x{
+          var buf = executeIOAction(function(){return __fs__.readFileSync(#{@path})})
+          var content
+          if (is_utf8(buf)) {
+            content = buf.toString('utf8')
+          } else {
+            // coerce to utf8
+            content = __utf8TextDecoder__.decode(__textEncoder__.encode(buf.toString('binary')))
+          }
+        }
+        res = `content`
       else
         res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString('utf8')})`
       end
