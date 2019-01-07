@@ -164,11 +164,6 @@ class File < IO
     `return __path__.normalize(__path__.resolve(#{basedir.to_str}, #{path.to_str})).split(__path__.sep).join(__path__.posix.sep)`
   end
 
-  def self.expand_path(path, basedir = nil)
-    # we should resolve ~ before calling absolute_path! see https://github.com/opal/opal/pull/1924
-    absolute_path(path, basedir)
-  end
-
   # Instance Methods
 
   def initialize(path, flags = 'r')
@@ -247,10 +242,6 @@ class File < IO
 
   def mtime
     `return executeIOAction(function(){return __fs__.statSync(#{@path}).mtime})`
-  end
-
-  def to_path
-    @path
   end
 end
 
