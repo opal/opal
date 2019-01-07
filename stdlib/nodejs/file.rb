@@ -160,6 +160,17 @@ class File < IO
 
   def self.expand_path(path, basedir = nil)
     path = path.to_str
+    sep = SEPARATOR
+    if `path[0] === '~' || (basedir && basedir[0] === '~')`
+      home = Dir.home
+      raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
+      raise(ArgumentError, 'non-absolute home') unless home.start_with?(sep)
+
+      home            += sep
+      home_path_regexp = /^\~(?:#{sep}|$)/
+      path             = path.sub(home_path_regexp, home)
+      basedir          = basedir.sub(home_path_regexp, home) if basedir
+    end
     basedir ||= Dir.pwd
     `return __path__.normalize(__path__.resolve(#{basedir.to_str}, #{path})).split(__path__.sep).join(__path__.posix.sep)`
   end

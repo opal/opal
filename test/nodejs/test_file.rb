@@ -153,6 +153,7 @@ class TestNodejsFile < Test::Unit::TestCase
   def test_windows_file_expand_path
     drive_letter = Dir.pwd.slice(0, 2)
     assert_equal(Dir.pwd + '/foo/bar.js', File.expand_path('./foo/bar.js'))
+    assert_equal(Dir.home + '/foo/bar.js', File.expand_path('~/foo/bar.js'))
     assert_equal(drive_letter + '/foo/bar.js', File.expand_path('/foo/bar.js'))
     assert_equal('c:/foo/bar.js', File.expand_path('c:/foo/bar.js'))
     assert_equal('c:/foo/bar.js', File.expand_path('c:\\foo\\bar.js'))
@@ -167,6 +168,14 @@ class TestNodejsFile < Test::Unit::TestCase
     assert_equal(Dir.pwd, File.expand_path(drive_letter), 'should expand to the current directory when the path is c: (and the current directory is located in the c drive)')
     assert_equal(drive_letter + '/', drive_letter + '/', 'should return c:/ when the path is c:/ because the path is absolute')
   end if windows_platform?
+
+  def test_linux_file_expand_path
+    assert_equal(Dir.pwd + '/foo/bar.js', File.expand_path('./foo/bar.js'))
+    assert_equal(Dir.home + '/foo/bar.js', File.expand_path('~/foo/bar.js'))
+    assert_equal(Dir.home + '/foo/bar.js', File.expand_path('~/foo/bar.js', '/base/dir'))
+    assert_equal('/base/dir/foo/bar.js', File.expand_path('./foo/bar.js', '/base/dir'))
+    assert_equal(Dir.home + '/workspace/foo/bar.js', File.expand_path('./foo/bar.js', '~/workspace'))
+  end unless windows_platform?
 
   def test_join
     assert_equal('usr/bin', File.join('usr', 'bin'))
