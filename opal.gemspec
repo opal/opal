@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.7'
   spec.add_development_dependency 'octokit', '~> 4.9'
-  spec.add_development_dependency 'bundler', '~> 1.5'
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rack-test'
   spec.add_development_dependency 'opal-minitest'
   spec.add_development_dependency 'selenium-webdriver'
