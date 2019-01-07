@@ -13,4 +13,8 @@ class Pathname
   def relative?
     !absolute?
   end
+
+  def to_path
+    @path
+  end
 end
