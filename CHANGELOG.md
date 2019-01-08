@@ -11,17 +11,19 @@ Changes are grouped as follows:
 - **Fixed** for any bug fixes.
 - **Security** to invite users to upgrade in case of vulnerabilities.
 
+
+
+
+
+## [Unreleased](https://github.com/opal/opal/compare/v0.11.4...HEAD) - unreleased
+
+
 <!--
 Whitespace conventions:
 - 4 spaces before ## titles
 - 2 spaces before ### titles
 - 1 spaces before normal text
- -->
-
-
-
-
-## [1.0.0] - Unreleased
+-->
 
 ### Added
 
@@ -109,9 +111,6 @@ Whitespace conventions:
 - Fixed `Kernel#public_methods` to return instance methods if the argument is set to false.
 - Fixed an issue in `String#gsub` that made it start an infinite loop when used recursively. (#1879)
 - `Kernel#exit` was using status 0 when a number or a generic object was provided, now accepts numbers and tries to convert objects with `#to_int` (#1898).
-
-
-<!-- generated-content-beyond-this-comment -->
 
 
 

@@ -33,7 +33,7 @@ What follows is a quick checklist you can before sending issues or pull-requests
 
 3.  Make sure to have updated all the relevant documentation, both for API (using _yardoc_ syntax) and the Guides
 
-4.  Add a Changelog entry at the top of `CHANGELOG.md`
+4.  Add a Changelog entry at the top of `UNRELEASED.md`
 
 
 ### A note on commits in PRs

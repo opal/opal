@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bundler'
 Bundler.require
 Bundler::GemHelper.install_tasks
@@ -5,39 +7,73 @@ Bundler::GemHelper.install_tasks
 # Let the release process update the changelog from github
 task :release => :changelog
 
-desc "Update CHANGELOG.md usign info from published GitHub releases (the first unreleased section is preserved)"
-task :changelog do
-  changelog_path    = "#{__dir__}/../CHANGELOG.md"
-  splitter          = '<!-- generated-content-beyond-this-comment -->'
-  changelog_entries = []
-
+github_releases = -> do
   require 'date'
   require 'octokit'
   Octokit.auto_paginate = true
 
-  releases = Octokit.releases('opal/opal').sort_by do |r|
+  Octokit.releases('opal/opal').sort_by do |r|
     Gem::Version.new(r[:tag_name][1..-1])
   end.select do |release|
     release[:tag_name] =~ /^v(\d+)(\.\d+)*$/
   end
+end
 
+changelog_entry = -> (
+  tag_name:,
+  release_date:,
+  previous_tag_name:,
+  body:
+) do
+  compare_url = "https://github.com/opal/opal/compare/#{previous_tag_name}...#{tag_name}"
+  version_name = tag_name == 'HEAD' ? 'Unreleased' : tag_name.sub(/^v/, '')
+  [
+    "## [#{version_name}](#{compare_url}) - #{release_date}\n\n\n",
+    body.gsub("\r\n", "\n").strip,
+  ].join('')
+end
+
+CHANGELOG_HEADING = <<~MARKDOWN
+  # Change Log
+
+  All notable changes to this project will be documented in this file.
+  This project *tries* to adhere to [Semantic Versioning](http://semver.org/), even before v1.0.
+
+  Changes are grouped as follows:
+  - **Added** for new features.
+  - **Changed** for changes in existing functionality.
+  - **Deprecated** for once-stable features removed in upcoming releases.
+  - **Removed** for deprecated features removed in this release.
+  - **Fixed** for any bug fixes.
+  - **Security** to invite users to upgrade in case of vulnerabilities.
+MARKDOWN
+
+desc "Update CHANGELOG.md usign info from published GitHub releases (the first unreleased section is preserved)"
+task :changelog do
+  changelog_path    = "#{__dir__}/../CHANGELOG.md"
+  unreleased_path   = "#{__dir__}/../UNRELEASED.md"
+  changelog_entries = []
   previous_tag_name = '000000'
-  releases.each do |release|
-    tag_name = release[:tag_name]
-    release_date = release[:created_at].to_date.iso8601 # YYYY-MM-DD
-    compare_url = "https://github.com/opal/opal/compare/#{previous_tag_name}...#{tag_name}"
-    changelog_entry = [
-      "## [#{tag_name[1..-1]}](#{compare_url}) - #{release_date}\n\n\n",
-      release[:body].gsub("\r\n", "\n").strip,
-    ].join('')
 
-    changelog_entries.unshift changelog_entry
-    previous_tag_name = tag_name
+  github_releases.call.each do |release|
+    changelog_entries.unshift changelog_entry.call(
+      tag_name: release[:tag_name],
+      release_date: release[:created_at].to_date.iso8601, # YYYY-MM-DD
+      previous_tag_name: previous_tag_name,
+      body: release[:body],
+    )
+    previous_tag_name = release[:tag_name]
   end
 
-  heading_and_unreleased = File.read(changelog_path).split(splitter, 2).first.strip
+  changelog_entries.unshift changelog_entry.call(
+    tag_name: 'HEAD',
+    release_date: 'unreleased',
+    previous_tag_name: previous_tag_name,
+    body: File.read(unreleased_path),
+  )
 
-  changelog_entries.unshift heading_and_unreleased+"\n\n\n"+splitter
+  changelog_entries.unshift CHANGELOG_HEADING
+
   changelog_entries << nil # for the final newlines
 
   File.write changelog_path, changelog_entries.join("\n\n\n\n\n")
