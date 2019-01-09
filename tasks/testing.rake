@@ -350,6 +350,7 @@ task :minitest_node_nodejs do
     nodejs/test_file.rb
     nodejs/test_dir.rb
     nodejs/test_io.rb
+    nodejs/test_file_encoding.rb
     nodejs/test_opal_builder.rb
   ]
 
