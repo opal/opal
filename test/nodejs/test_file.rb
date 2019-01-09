@@ -153,7 +153,6 @@ class TestNodejsFile < Test::Unit::TestCase
   def test_windows_file_expand_path
     drive_letter = Dir.pwd.slice(0, 2)
     assert_equal(Dir.pwd + '/foo/bar.js', File.expand_path('./foo/bar.js'))
-    assert_equal(Dir.home + '/foo/bar.js', File.expand_path('~/foo/bar.js'))
     assert_equal(drive_letter + '/foo/bar.js', File.expand_path('/foo/bar.js'))
     assert_equal('c:/foo/bar.js', File.expand_path('c:/foo/bar.js'))
     assert_equal('c:/foo/bar.js', File.expand_path('c:\\foo\\bar.js'))
