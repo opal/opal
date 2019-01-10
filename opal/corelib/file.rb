@@ -58,10 +58,12 @@ class File < IO
 
     def expand_path(path, basedir = nil)
       sep = SEPARATOR
+      sep_chars = `$sep_chars()`
       if `path[0] === '~' || (basedir && basedir[0] === '~')`
         home = Dir.home
         raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
-        raise(ArgumentError, 'non-absolute home') unless home.start_with?(sep)
+        leading_sep = `windows_root_rx.test(path) ? '' : #{path.sub(/^([#{sep_chars}]+).*$/, '\1')}`
+        raise(ArgumentError, 'non-absolute home') unless home.start_with?(leading_sep)
 
         home            += sep
         home_path_regexp = /^\~(?:#{sep}|$)/
