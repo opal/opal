@@ -62,7 +62,7 @@ class File < IO
       if `path[0] === '~' || (basedir && basedir[0] === '~')`
         home = Dir.home
         raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
-        leading_sep = `windows_root_rx.test(path) ? '' : #{path.sub(/^([#{sep_chars}]+).*$/, '\1')}`
+        leading_sep = `windows_root_rx.test(home) ? '' : #{home.sub(/^([#{sep_chars}]+).*$/, '\1')}`
         raise(ArgumentError, 'non-absolute home') unless home.start_with?(leading_sep)
 
         home            += sep
