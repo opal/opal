@@ -21,6 +21,10 @@ class Dir
       `__os__.homedir()`
     end
 
+    def chdir(path)
+      `process.chdir(#{path})`
+    end
+
     def mkdir(path)
       `__fs__.mkdirSync(#{path})`
     end
