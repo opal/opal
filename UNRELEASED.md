@@ -69,6 +69,7 @@ Whitespace conventions:
 - [Nodejs] Added support for binary data in `OpenURI` (#1911, #1920)
 - [Nodejs] Added support for binary data in `File#read` (#1919, #1921)
 - [Nodejs] Added support for `File#readlines` (#1882)
+- [Nodejs] Added support for `ENV#[]`, `ENV#[]=`, `ENV#key?`, `ENV#has_key?`, `ENV#include?`, `ENV#member?`, `ENV#empty?`, `ENV#keys`, `ENV#delete` and `ENV#to_s` (#1928)
 
 
 ### Changed
