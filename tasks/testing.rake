@@ -36,6 +36,7 @@ module Testing
       suite = env['SUITE']
       pattern = env['PATTERN']
       whitelist_pattern = !!env['RUBYSPECS']
+      env['OPAL_PLATFORM_NAME'] = RbConfig::CONFIG['host_os'] unless env['OPAL_PLATFORM_NAME']
 
       excepting = []
       rubyspecs = File.read('spec/ruby_specs').lines.reject do |l|

@@ -75,6 +75,7 @@ opal_unsupported_filter "Time" do
   fails "Time#localtime with an argument that responds to #to_int coerces using #to_int"
   fails "Time#localtime with an argument that responds to #to_r coerces using #to_r"
   fails "Time#localtime with an argument that responds to #to_str coerces using #to_str"
+  fails "Time#localtime does nothing if already in a local time zone"
   fails "Time#mday returns the day of the month (1..n) for a local Time"
   fails "Time#mday returns the day of the month for a Time with a fixed offset"
   fails "Time#min returns the minute of the hour (0..59) for a local Time"

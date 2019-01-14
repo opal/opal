@@ -52,4 +52,5 @@ opal_filter "Integer" do
   fails "Integer#round returns itself if passed a positive precision and the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
   fails "Integer#| fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
   fails "Integer#| fixnum returns self bitwise OR other" # Expected 65535 to equal 9223372036854841000
+  fails "Integer#round raises a RangeError when passed a big negative value" # Expected RangeError but no exception was raised (0 was returned)
 end
