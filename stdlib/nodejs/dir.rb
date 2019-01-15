@@ -2,9 +2,11 @@ class Dir
   @__glob__ = `require('glob')`
   @__fs__ = `require('fs')`
   @__path__ = `require('path')`
+  @__os__ = `require('os')`
   `var __glob__ = #{@__glob__}`
   `var __fs__ = #{@__fs__}`
   `var __path__ = #{@__path__}`
+  `var __os__ = #{@__os__}`
 
   class << self
     def [](glob)
@@ -13,6 +15,14 @@ class Dir
 
     def pwd
       `process.cwd().split(__path__.sep).join(__path__.posix.sep)`
+    end
+
+    def home
+      `__os__.homedir()`
+    end
+
+    def chdir(path)
+      `process.chdir(#{path})`
     end
 
     def mkdir(path)

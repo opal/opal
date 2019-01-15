@@ -238,10 +238,10 @@ class File < IO
     `return executeIOAction(function(){return __fs__.lstatSync(#{path}).isSymbolicLink()})`
   end
 
-  def self.expand_path(path, basedir = nil)
-    path = path.to_str
+  def self.absolute_path(path, basedir = nil)
+    path = path.respond_to?(:to_path) ? path.to_path : path
     basedir ||= Dir.pwd
-    `return __path__.normalize(__path__.resolve(#{basedir.to_str}, #{path})).split(__path__.sep).join(__path__.posix.sep)`
+    `return __path__.normalize(__path__.resolve(#{basedir.to_str}, #{path.to_str})).split(__path__.sep).join(__path__.posix.sep)`
   end
 
   # Instance Methods
