@@ -1,6 +1,7 @@
 opal_filter "Range" do
   fails "Range#== returns true for subclasses of Range"
   fails "Range#== returns true if other has same begin, end, and exclude_end? values"
+  fails "Range#=== requires #succ method to be implemented" # Expected TypeError (/can't iterate from/) but no exception was raised (true was returned)
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers accepts (+/-)Float::INFINITY from the block"
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns an element at an index for which block returns 0"
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns nil if the block never returns zero"
