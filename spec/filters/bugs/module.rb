@@ -131,7 +131,9 @@ opal_filter "Module" do
   fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # NoMethodError: undefined method `refine' for #<Module:0x3aeae>
   fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # NoMethodError: undefined method `refine' for #<Module:0x3aeba>
   fails "Module#refine for methods accessed indirectly is honored by string interpolation" # NoMethodError: undefined method `refine' for #<Module:0x3aeb6>
+  fails "Module#refine for methods accessed indirectly is not honored by &" # NoMethodError: undefined method `refine' for #<Module:0x21e9c>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#method" # NoMethodError: undefined method `refine' for #<Module:0x3aec0>
+  fails "Module#refine for methods accessed indirectly is not honored by Kernel#public_send" # NoMethodError: undefined method `refine' for #<Module:0x21ea0>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#respond_to?" # NoMethodError: undefined method `refine' for #<Module:0x3aea6>
   fails "Module#refine makes available all refinements from the same module" # NoMethodError: undefined method `refine' for #<Module:0x3ae88>
   fails "Module#refine method lookup looks in included modules from the refinement then" # NoMethodError: undefined method `refine' for #<Module:0x3aea0>

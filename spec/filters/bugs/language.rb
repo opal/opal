@@ -49,6 +49,7 @@ opal_filter "language" do
   fails "A singleton class raises a TypeError for Fixnum's"
   fails "A singleton class raises a TypeError for symbols"
   fails "A singleton method definition can be declared for a global variable"
+  fails "Allowed characters allows not ASCII characters in the middle of a name" # NoMethodError: undefined method `mod' for #<MSpecEnv:0xa920>
   fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
   fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
@@ -102,6 +103,7 @@ opal_filter "language" do
   fails "Literal Regexps supports possessive quantifiers"
   fails "Literal Regexps throws SyntaxError for malformed literals"
   fails "Literal Regexps treats an escaped non-escapable character normally when used as a terminator" # Expected "\\$" to equal "(?-mix:\\$)"
+  fails "Local variable shadowing leads to warning in verbose mode" # Expected warning to match: /shadowing outer local variable/ but got: ""
   fails "Magic comment is optional"
   fails "Magic comments in a loaded file are case-insensitive" # LoadError: cannot load such file -- ruby/language/fixtures/case_magic_comment
   fails "Magic comments in a loaded file are optional" # LoadError: cannot load such file -- ruby/language/fixtures/no_magic_comment
@@ -249,6 +251,8 @@ opal_filter "language" do
   fails "The retry keyword inside a begin block's rescue block causes the begin block to be executed again"
   fails "The retry statement raises a SyntaxError when used outside of a begin statement"
   fails "The retry statement re-executes the closest block"
+  fails "The return keyword at top level within a block within a class is allowed" # Exception: path.substr is not a function
+  fails "The return keyword at top level within a block within a class is allowed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x77376>
   fails "The super keyword passes along modified rest args when they were originally empty"
   fails "The super keyword passes along modified rest args when they weren't originally empty"
   fails "The super keyword passes along reassigned rest args" # Expected ["bar"] to equal ["foo"]
