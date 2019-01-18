@@ -196,6 +196,104 @@ module OpenURI
 
   # Mixin for holding meta-information.
   module Meta
+    # FROM https://github.com/jshttp/content-type/blob/7792f4f41e9c31b90d97cf671e152432957c3b44/index.js
+    # Copyright(c) 2015 Douglas Christopher Wilson - MIT Licensed
+    %x{
+      var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g // eslint-disable-line no-control-regex
+      var QESC_REGEXP = /\\([\u000b\u0020-\u00ff])/g // eslint-disable-line no-control-regex
+      var TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
+
+      var parseContentType = function (string) {
+        if (!string) {
+          throw new TypeError('argument string is required')
+        }
+
+        // support req/res-like objects as argument
+        var header = typeof string === 'object' ? getContentType(string) : string
+
+        if (typeof header !== 'string') {
+          throw new TypeError('argument string is required to be a string')
+        }
+
+        var index = header.indexOf(';')
+        var type = index !== -1 ? header.substr(0, index).trim() : header.trim()
+
+        if (!TYPE_REGEXP.test(type)) {
+          throw new TypeError('invalid media type')
+        }
+
+        var obj = new ContentType(type.toLowerCase())
+
+        // parse parameters
+        if (index !== -1) {
+          var key
+          var match
+          var value
+
+          PARAM_REGEXP.lastIndex = index
+
+          while ((match = PARAM_REGEXP.exec(header))) {
+            if (match.index !== index) {
+              throw new TypeError('invalid parameter format')
+            }
+
+            index += match[0].length
+            key = match[1].toLowerCase()
+            value = match[2]
+
+            if (value[0] === '"') {
+              // remove quotes and escapes
+              value = value
+                .substr(1, value.length - 2)
+                .replace(QESC_REGEXP, '$1')
+            }
+
+            obj.parameters[key] = value
+          }
+
+          if (index !== header.length) {
+            throw new TypeError('invalid parameter format')
+          }
+        }
+
+        return obj
+      }
+
+      function getContentType(obj) {
+        var header
+
+        if (typeof obj.getHeader === 'function') {
+          // res-like
+          header = obj.getHeader('content-type')
+        } else if (typeof obj.headers === 'object') {
+          // req-like
+          header = obj.headers && obj.headers['content-type']
+        }
+
+        if (typeof header !== 'string') {
+          throw new TypeError('content-type header is missing from object')
+        }
+
+        return header
+      }
+
+      function ContentType(type) {
+        this.parameters = Object.create(null)
+        this.type = type
+      }
+
+      // adapter, can return null
+      var unsafeParseContentType = function (string) {
+        try {
+          return parseContentType(string)
+        } catch (err) {
+          if (err instanceof TypeError) {
+            return null
+          }
+          throw err
+        }
+      }
+    }
     def Meta.init(obj, src=nil) # :nodoc:
       obj.extend Meta
       obj.instance_eval {
@@ -279,9 +377,14 @@ module OpenURI
     end
 
     def content_type_parse # :nodoc:
-      content_type = @metas['content-type']
-      # FIXME Extract type, subtype and parameters
-      content_type.join(', ')
+      content_type_joined = @metas['content-type'].join(', ')
+      content_type_parsed = `unsafeParseContentType(#{content_type_joined})`
+      p content_type_joined
+      if content_type_parsed
+        [`content_type_parsed.type`, `Opal.hash2(Object.keys(content_type_parsed.parameters), content_type_parsed.parameters)`]
+      else
+        nil
+      end
     end
 
     # returns a charset parameter in Content-Type field.
@@ -295,9 +398,13 @@ module OpenURI
     # nil is returned except text type in HTTP.
     # In that case, "iso-8859-1" is returned as defined by RFC2616 3.7.1.
     def charset
-      type = content_type_parse
-      if type && %r{\Atext/} =~ type && @base_uri && /\Ahttp\z/i =~ @base_uri.scheme
-        'iso-8859-1' # RFC2616 3.7.1
+      type, parameters = content_type_parse
+      if parameters && charset_value = parameters['charset']
+        charset_value.downcase
+      elsif block_given?
+        yield
+      elsif type && %r{\Atext/} =~ type && @base_uri && /\Ahttp\z/i =~ @base_uri.scheme
+        "iso-8859-1" # RFC2616 3.7.1
       else
         nil
       end
@@ -307,7 +414,7 @@ module OpenURI
     # It is downcased for canonicalization.
     # Content-Type parameters are stripped.
     def content_type
-      type = content_type_parse
+      type, _ = content_type_parse
       type || 'application/octet-stream'
     end
   end
