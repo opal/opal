@@ -61,9 +61,6 @@ opal_filter "language" do
   fails "An instance method with a default argument shadows an existing method with the same name as the local"
   fails "Constant resolution within methods with dynamically assigned constants searches Object as a lexical scope only if Object is explicitly opened"
   fails "Constant resolution within methods with statically assigned constants searches Object as a lexical scope only if Object is explicitly opened"
-  fails "Constant resolution within methods with ||= assignes constant if previously undefined"
-  fails "Constant resolution within methods with ||= assigns a global constant if previously undefined" # NameError: uninitialized constant OpAssignGlobalUndefined
-  fails "Constant resolution within methods with ||= assigns a scoped constant if previously undefined" # NameError: uninitialized constant ConstantSpecs::OpAssignUndefined
   fails "Executing break from within a block returns from the original invoking method even in case of chained calls"
   fails "Execution variable $: is initialized to an array of strings"
   fails "Execution variable $: is read-only"

@@ -47,7 +47,7 @@ RSpec.describe Opal::Rewriters::LogicalOperatorAssignment do
     end
 
     context 'constant' do
-      include_examples 'it rewrites', 'CONST ||= 1', 'CONST = CONST || 1'
+      include_examples 'it rewrites', 'CONST ||= 1', 'CONST = defined?(CONST) ? (CONST || 1) : 1'
       include_examples 'it rewrites', 'CONST &&= 1', 'CONST = CONST && 1'
     end
 
