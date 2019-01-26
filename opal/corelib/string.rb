@@ -307,7 +307,7 @@ class String < `String`
       else if (separator === "") {
         result = self.replace(/(\r?\n)+$/, '');
       }
-      else if (self.length > separator.length) {
+      else if (self.length >= separator.length) {
         var tail = self.substr(self.length - separator.length, separator.length);
 
         if (tail === separator) {
