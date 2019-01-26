@@ -76,6 +76,8 @@ Whitespace conventions:
 
 - **BREAKING** The dot (`.`) character is no longer replaced with [\s\S] in a multiline regexp passed to Regexp#match and Regexp#match? (#1796, #1795)
   * You're advised to always use [\s\S] instead of . in a multiline regexp, which is portable between Ruby and JavaScript
+- **BREAKING** `Kernel#format` (and `sprintf` alias) are now in a dedicated module `corelib/kernel/format` and available exclusively in `opal` (#1930)
+  * Previously the methods were part of the `corelib/kernel` module and available in both `opal` and `opal/mini`
 - Filename extensions are no longer stripped from filenames internally, resulting in better error reporting (#1804)
 - The internal API for CLI runners has changed, now it's just a callable object
 - The `--map` CLI option now works only in conjunction with `--compile` (or `--runner compiler`)
