@@ -127,3 +127,5 @@ Whitespace conventions:
 - `String#center` now correctly checks length (#1833)
 - `redo` inside `while` now works properly (#1820)
 - Fixed compilation of empty/whitespace-only x-strings (#1811)
+- Fix `||=` assignments on constants when the constant is not yet defined (#1935)
+- Fix `String#chomp` to return an empty String when `arg == self` (#1936)

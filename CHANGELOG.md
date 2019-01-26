@@ -89,12 +89,15 @@ Whitespace conventions:
 - [Nodejs] Added support for binary data in `OpenURI` (#1911, #1920)
 - [Nodejs] Added support for binary data in `File#read` (#1919, #1921)
 - [Nodejs] Added support for `File#readlines` (#1882)
+- [Nodejs] Added support for `ENV#[]`, `ENV#[]=`, `ENV#key?`, `ENV#has_key?`, `ENV#include?`, `ENV#member?`, `ENV#empty?`, `ENV#keys`, `ENV#delete` and `ENV#to_s` (#1928)
 
 
 ### Changed
 
 - **BREAKING** The dot (`.`) character is no longer replaced with [\s\S] in a multiline regexp passed to Regexp#match and Regexp#match? (#1796, #1795)
   * You're advised to always use [\s\S] instead of . in a multiline regexp, which is portable between Ruby and JavaScript
+- **BREAKING** `Kernel#format` (and `sprintf` alias) are now in a dedicated module `corelib/kernel/format` and available exclusively in `opal` (#1930)
+  * Previously the methods were part of the `corelib/kernel` module and available in both `opal` and `opal/mini`
 - Filename extensions are no longer stripped from filenames internally, resulting in better error reporting (#1804)
 - The internal API for CLI runners has changed, now it's just a callable object
 - The `--map` CLI option now works only in conjunction with `--compile` (or `--runner compiler`)
@@ -144,6 +147,8 @@ Whitespace conventions:
 - `String#center` now correctly checks length (#1833)
 - `redo` inside `while` now works properly (#1820)
 - Fixed compilation of empty/whitespace-only x-strings (#1811)
+- Fix `||=` assignments on constants when the constant is not yet defined (#1935)
+- Fix `String#chomp` to return an empty String when `arg == self` (#1936)
 
 
 
