@@ -239,7 +239,7 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 
 (The MIT License)
 
-Copyright (C) 2013-2018 by Adam Beynon and the Opal contributors
+Copyright (C) 2013-2019 by Adam Beynon and the Opal contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
