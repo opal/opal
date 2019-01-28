@@ -5,5 +5,5 @@ RUBY_ENGINE_VERSION = '0.11.99.dev'
 RUBY_RELEASE_DATE   = '2018-12-25'
 RUBY_PATCHLEVEL     = 0
 RUBY_REVISION       = 0
-RUBY_COPYRIGHT      = 'opal - Copyright (C) 2013-2018 Adam Beynon and the Opal contributors'
+RUBY_COPYRIGHT      = 'opal - Copyright (C) 2013-2019 Adam Beynon and the Opal contributors'
 RUBY_DESCRIPTION    = "opal #{RUBY_ENGINE_VERSION} (#{RUBY_RELEASE_DATE} revision #{RUBY_REVISION})"
