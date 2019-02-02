@@ -19,6 +19,10 @@ github_releases = -> do
   end
 end
 
+expand_pull_request_links = -> string {
+  string.gsub(/\(#(\d+)\)/, '([#\1](https://github.com/opal/opal/pull/\1))')
+}
+
 changelog_entry = -> (
   tag_name:,
   release_date:,
@@ -29,7 +33,7 @@ changelog_entry = -> (
   version_name = tag_name == 'HEAD' ? 'Unreleased' : tag_name.sub(/^v/, '')
   [
     "## [#{version_name}](#{compare_url}) - #{release_date}\n\n\n",
-    body.gsub("\r\n", "\n").strip,
+    expand_pull_request_links[body.gsub("\r\n", "\n").strip],
   ].join('')
 end
 
