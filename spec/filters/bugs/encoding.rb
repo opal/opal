@@ -6,6 +6,18 @@ opal_filter "Encoding" do
   fails "#String#bytesize works with strings containing single UTF-8 characters" # Expected 2 to equal 3
   fails "Date#strftime passes the format string's encoding to the result string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "File.basename returns the basename with the same encoding as the original" # NameError: uninitialized constant Encoding::Windows_1250
+  fails "File.basename returns basename windows forward slash" # Expected "C:" to equal "/"
+  fails "File.basename returns basename windows unc" # Expected "\\\\foo\\bar\\baz.txt" to equal "baz.txt"
+  fails "File.basename returns basename with windows suffix" # Expected "c:\\bar" to equal "bar"
+  fails "File.basename returns the basename for windows" # Expected "C:\\foo\\bar\\baz.txt" to equal "baz.txt"
+  fails "File.basename takes into consideration the platform path separator(s)" # Expected "C:\\foo\\bar" to equal "bar"
+  fails "File.dirname returns all the components of filename except the last one (edge cases on windows)" # Expected "/" to equal "//foo"
+  fails "File.dirname returns the return all the components of filename except the last one (Windows format)" # Expected "." to equal "C:\\foo\\bar"
+  fails "File.dirname returns the return all the components of filename except the last one (forward_slash)" # Expected "." to equal "C:/"
+  fails "File.dirname returns the return all the components of filename except the last one (windows unc)" # Expected "." to equal "\\\\foo\\bar"
+  fails "File.expand_path expands C:/./dir to C:/dir" # Exception: cd is not defined
+  fails "File.join prefers the separator of the right part if both parts have separators" # Expected "C:/\\windows" to equal "C:\\windows"
+  fails "File.join respects given separator if only one part has a boundary separator" # Expected "C:\\/windows" to equal "C:\\windows"
   fails "Fixnum#to_s returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Fixnum#to_s returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "Fixnum#to_s returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
@@ -69,6 +81,7 @@ opal_filter "Encoding" do
   fails "Source files encoded in UTF-8 with a BOM can be parsed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x7a11e>
   fails "Source files encoded in UTF-8 without a BOM can be parsed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x7a11e>
   fails "String#* returns a String in the same encoding as self" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
+  fails "String#* raises an ArgumentError if the length of the resulting string doesn't fit into a long" # RangeError: multiply count must not overflow maximum string size
   fails "String#[]= with Fixnum index calls #to_int to convert the index" # Mock 'string element set' expected to receive 'to_int' exactly 1 times but received it 0 times
   fails "String#[]= with Fixnum index calls #to_int to convert the index" # NoMethodError: undefined method `[]=' for "あれ":String
   fails "String#[]= with Fixnum index encodes the String in an encoding compatible with the replacement" # NoMethodError: undefined method `pack' for [160]:Array

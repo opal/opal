@@ -147,6 +147,15 @@ opal_filter "language" do
   fails "Magic comments in the main file do not cause bytes to be mangled by passing them through the wrong encoding" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x8aa2e>
   fails "Magic comments in the main file must be at the first line" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x8aa2e>
   fails "Magic comments in the main file must be the first token of the line" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x8aa2e>
+  fails "Magic comments in an -e argument can take Emacs style" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument are optional" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument can be after the shebang" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument are case-insensitive" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument must be at the first line" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument must be the first token of the line" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument determine __ENCODING__" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument can take vim style" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument do not cause bytes to be mangled by passing them through the wrong encoding" # ArgumentError: unknown encoding name - locale
   fails "NoMethodError#message calls receiver.inspect only when calling Exception#message" # Expected ["inspect_called"] to equal []
   fails "NoMethodError#message fallbacks to a simpler representation of the receiver when receiver.inspect raises an exception" # NoMethodError: undefined method `name' for #<NoMethodErrorSpecs::InstanceException: NoMethodErrorSpecs::InstanceException>
   fails "Operators * / % are left-associative"

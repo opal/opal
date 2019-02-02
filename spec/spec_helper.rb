@@ -5,6 +5,7 @@ require 'opal-parser'
 require 'mspec'
 require 'mspec/version'
 require 'support/mspec_rspec_adapter'
+require 'support/guard_platform'
 require 'mspec-opal/runner'
 
 # Node v0.12 as well as Google Chrome/V8 42.0.2311.135 (64-bit)
