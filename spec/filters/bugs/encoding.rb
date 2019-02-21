@@ -153,13 +153,9 @@ opal_filter "Encoding" do
   fails "String#codepoints raises an ArgumentError if self's encoding is invalid and a block is given" # Expected true to be false
   fails "String#codepoints raises an ArgumentError when no block is given if self has an invalid encoding" # Expected true to be false
   fails "String#codepoints raises an ArgumentError when self has an invalid encoding and a method is called on the returned Enumerator" # Expected true to be false
-  fails "String#codepoints returns an Array when no block is given" # NoMethodError: undefined method `codepoints' for "abc":String
-  fails "String#codepoints returns codepoints as Fixnums" # NoMethodError: undefined method `codepoints' for "glark ":String
-  fails "String#codepoints returns one codepoint for each character" # NoMethodError: undefined method `codepoints' for "顶(ᦇ":String
-  fails "String#codepoints returns the codepoint corresponding to the character's position in the String's encoding" # NoMethodError: undefined method `codepoints' for "އ":String
-  fails "String#codepoints round-trips to the original String using Integer#chr" # NoMethodError: undefined method `codepoints' for "\u0013眑တ":String
+  fails "String#codepoints round-trips to the original String using Integer#chr" # Expected "\u0013眑တ" to equal ""
   fails "String#codepoints works for multibyte characters" # Expected 2 to equal 3
-  fails "String#codepoints yields each codepoint to the block if one is given" # NoMethodError: undefined method `codepoints' for "abcd":String
+  fails "String#codepoints works for multibyte characters" # Expected 2 to equal 3
   fails "String#each_char returns a different character if the String is transcoded" # ArgumentError: unknown encoding name - iso-8859-15
   fails "String#each_char returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
   fails "String#each_char taints resulting strings when self is tainted" # Expected false to equal true
@@ -168,16 +164,11 @@ opal_filter "Encoding" do
   fails "String#each_codepoint is synonomous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
   fails "String#each_codepoint raises an ArgumentError if self's encoding is invalid and a block is given" # Expected true to be false
   fails "String#each_codepoint raises an ArgumentError when self has an invalid encoding and a method is called on the returned Enumerator" # Expected true to be false
-  fails "String#each_codepoint returns codepoints as Fixnums" # NoMethodError: undefined method `each_codepoint' for "glark ":String
-  fails "String#each_codepoint returns one codepoint for each character" # NoMethodError: undefined method `each_codepoint' for "顶(ᦇ":String
-  fails "String#each_codepoint returns the codepoint corresponding to the character's position in the String's encoding" # NoMethodError: undefined method `each_codepoint' for "އ":String
-  fails "String#each_codepoint round-trips to the original String using Integer#chr" # NoMethodError: undefined method `each_codepoint' for "\u0013眑တ":String
+  fails "String#each_codepoint round-trips to the original String using Integer#chr" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#each_codepoint when no block is given returned Enumerator size should return the size of the string even when the string has an invalid encoding" # Expected true to be false
   fails "String#each_codepoint when no block is given returned Enumerator size should return the size of the string" # NoMethodError: undefined method `each_codepoint' for "hello":String
   fails "String#each_codepoint when no block is given returns an Enumerator even when self has an invalid encoding" # Expected true to be false
-  fails "String#each_codepoint when no block is given returns an Enumerator" # NoMethodError: undefined method `each_codepoint' for "":String
   fails "String#each_codepoint works for multibyte characters" # Expected 2 to equal 3
-  fails "String#each_codepoint yields each codepoint to the block if one is given" # NoMethodError: undefined method `each_codepoint' for "abcd":String
   fails "String#encode given the xml: :attr option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode given the xml: :attr option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#encode given the xml: :attr option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal' for Encoding

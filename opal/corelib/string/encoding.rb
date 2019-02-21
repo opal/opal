@@ -181,6 +181,23 @@ class String
     self
   end
 
+  def each_codepoint(&block)
+    return enum_for :each_codepoint unless block_given?
+    %x{
+      for (var i = 0, length = self.length; i < length; i++) {
+        var code = self.codePointAt(i);
+        #{yield `code`};
+      }
+    }
+    self
+  end
+
+  def codepoints(&block)
+    # If a block is given, which is a deprecated form, works the same as each_codepoint.
+    return each_codepoint(&block) if block_given?
+    each_codepoint.to_a
+  end
+
   def encode(encoding)
     dup.force_encoding(encoding)
   end
