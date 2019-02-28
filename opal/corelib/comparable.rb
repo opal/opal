@@ -1,11 +1,26 @@
 module Comparable
-  def self.normalize(what)
-    return what if Integer === what
+  %x{
+    function normalize(what) {
+      if (Opal.is_a(what, Opal.Integer)) { return what; }
 
-    return  1 if what > 0
-    return -1 if what < 0
-    0
-  end
+      if (#{`what` > 0}) { return 1; }
+      if (#{`what` < 0}) { return -1; }
+      return 0;
+    }
+
+    function fail_comparison(lhs, rhs) {
+      var class_name;
+      #{
+        case `rhs`
+        when nil, true, false, Integer, Float
+          `class_name = rhs.$inspect()`
+        else
+          `class_name = rhs.$$class`
+        end
+      }
+      #{raise ArgumentError, "comparison of #{`lhs`.class} with #{`class_name`} failed"}
+    }
+  }
 
   def ==(other)
     return true if equal?(other)
@@ -24,41 +39,39 @@ module Comparable
 
     return false unless cmp = (self <=> other)
 
-    `#{Comparable.normalize(cmp)} == 0`
-  rescue StandardError
-    false
+    `normalize(cmp) == 0`
   end
 
   def >(other)
     unless cmp = (self <=> other)
-      raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
+      `fail_comparison(self, other)`
     end
 
-    `#{Comparable.normalize(cmp)} > 0`
+    `normalize(cmp) > 0`
   end
 
   def >=(other)
     unless cmp = (self <=> other)
-      raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
+      `fail_comparison(self, other)`
     end
 
-    `#{Comparable.normalize(cmp)} >= 0`
+    `normalize(cmp) >= 0`
   end
 
   def <(other)
     unless cmp = (self <=> other)
-      raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
+      `fail_comparison(self, other)`
     end
 
-    `#{Comparable.normalize(cmp)} < 0`
+    `normalize(cmp) < 0`
   end
 
   def <=(other)
     unless cmp = (self <=> other)
-      raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
+      `fail_comparison(self, other)`
     end
 
-    `#{Comparable.normalize(cmp)} <= 0`
+    `normalize(cmp) <= 0`
   end
 
   def between?(min, max)
@@ -71,15 +84,15 @@ module Comparable
     cmp = min <=> max
 
     unless cmp
-      raise ArgumentError, "comparison of #{min.class} with #{max.class} failed"
+      `fail_comparison(min, max)`
     end
 
-    if Comparable.normalize(cmp) > 0
+    if `normalize(cmp) > 0`
       raise ArgumentError, 'min argument must be smaller than max argument'
     end
 
-    return min if Comparable.normalize(self <=> min) < 0
-    return max if Comparable.normalize(self <=> max) > 0
+    return min if `normalize(#{self <=> min}) < 0`
+    return max if `normalize(#{self <=> max}) > 0`
     self
   end
 end
