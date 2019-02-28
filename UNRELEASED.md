@@ -129,3 +129,5 @@ Whitespace conventions:
 - Fixed compilation of empty/whitespace-only x-strings (#1811)
 - Fix `||=` assignments on constants when the constant is not yet defined (#1935)
 - Fix `String#chomp` to return an empty String when `arg == self` (#1936)
+- Fix methods of `Comparable` when `<=>` does not return Numeric (#1945)
+- Fix Class#native_alias error message (#1946)
