@@ -49,7 +49,7 @@ matrix:
       env: RUN=minitest
 
     - rvm: 2.5.3
-      env: RUN=rspec RACK_VERSION='~> 2.0.0' CHECK_COVERAGE=true
+      env: RUN=rspec RACK_VERSION='~> 2.0' CHECK_COVERAGE=true
 
     - rvm: 2.5.3
       env: RUN=smoke_test
@@ -58,7 +58,7 @@ matrix:
       env: RUN=rspec
 
     - rvm: 2.4.5
-      env: RUN=rspec RACK_VERSION='~> 2.0.0'
+      env: RUN=rspec RACK_VERSION='~> 2.0'
 
     - rvm: 2.3.8
       env: RUN=rspec
