@@ -614,7 +614,7 @@ class Class
     %x{
       var aliased = #{self}.prototype['$' + #{existing_mid}];
       if (!aliased) {
-        #{raise NameError.new("undefined method `#{existing_mid}' for class `#{inspect}'", exiting_mid)};
+        #{raise NameError.new("undefined method `#{existing_mid}' for class `#{inspect}'", existing_mid)};
       }
       #{self}.prototype[#{new_jsid}] = aliased;
     }
