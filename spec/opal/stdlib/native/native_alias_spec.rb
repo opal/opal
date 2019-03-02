@@ -14,6 +14,13 @@ describe "Class#native_alias" do
   end
 
   it "raises if the aliased method isn't defined" do
-    lambda { Class.new { native_alias :a, :not_a_method } }.should raise_error(NameError)
+    Class.new do
+      lambda {
+        native_alias :a, :not_a_method
+      }.should raise_error(
+        NameError,
+        %r{undefined method `not_a_method' for class `#<Class:0x\w+>'}
+      )
+    end
   end
 end
