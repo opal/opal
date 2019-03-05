@@ -149,6 +149,8 @@ Whitespace conventions:
 - Fixed compilation of empty/whitespace-only x-strings ([#1811](https://github.com/opal/opal/pull/1811))
 - Fix `||=` assignments on constants when the constant is not yet defined ([#1935](https://github.com/opal/opal/pull/1935))
 - Fix `String#chomp` to return an empty String when `arg == self` ([#1936](https://github.com/opal/opal/pull/1936))
+- Fix methods of `Comparable` when `<=>` does not return Numeric ([#1945](https://github.com/opal/opal/pull/1945))
+- Fix Class#native_alias error message ([#1946](https://github.com/opal/opal/pull/1946))
 
 
 

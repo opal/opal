@@ -130,4 +130,5 @@ Whitespace conventions:
 - Fix `||=` assignments on constants when the constant is not yet defined (#1935)
 - Fix `String#chomp` to return an empty String when `arg == self` (#1936)
 - Fix methods of `Comparable` when `<=>` does not return Numeric (#1945)
-- Fix Class#native_alias error message (#1946)
+- Fix `Class#native_alias` error message (#1946)
+- Fix `gmt_offset` (alias `utc_offset`) should return 0 if the date is UTC (#1941)
