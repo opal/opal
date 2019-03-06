@@ -211,8 +211,12 @@ class String
 
       if (encoding === self.encoding) { return self; }
 
-      self.encoding = encoding;
-      return self;
+      var result = new String(self.toString())
+      Object.defineProperty(result, 'encoding', {
+        value: encoding,
+        writable: true
+      });
+      return result
     }
   end
 
