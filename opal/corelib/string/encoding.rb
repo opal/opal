@@ -185,8 +185,7 @@ class String
     return enum_for :each_codepoint unless block_given?
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var code = self.codePointAt(i);
-        #{yield `code`};
+        #{yield `self.codePointAt(i)`};
       }
     }
     self
