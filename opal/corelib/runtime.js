@@ -1,4 +1,6 @@
-(function(undefined) {
+'use strict';
+
+(function() {
   // @note
   //   A few conventions for the documentation of this file:
   //   1. Always use "//" (in contrast with "/**/")
@@ -31,7 +33,7 @@
   if (!('log' in console)) { console.log = function () {}; }
   if (!('warn' in console)) { console.warn = console.log; }
 
-  if (typeof(this.Opal) !== 'undefined') {
+  if (typeof(global_object.Opal) !== 'undefined') {
     console.warn('Opal already loaded. Loading twice can cause troubles, please fix your setup.');
     return this.Opal;
   }
@@ -52,7 +54,7 @@
   var Class;
 
   // The Opal object that is exposed globally
-  var Opal = this.Opal = {};
+  var Opal = global_object.Opal = {};
 
   // This is a useful reference to global object inside ruby files
   Opal.global = global_object;
@@ -128,23 +130,16 @@
   };
 
   function $defineProperty(object, name, initialValue) {
-    if (typeof(object) === "string") {
-      // Special case for:
-      //   s = "string"
-      //   def s.m; end
-      // String class is the only class that:
-      // + compiles to JS primitive
-      // + allows method definition directly on instances
-      // numbers, true, false and nil do not support it.
-      object[name] = initialValue;
-    } else {
-      Object.defineProperty(object, name, {
-        value: initialValue,
-        enumerable: false,
-        configurable: true,
-        writable: true
-      });
+    if (typeof(object) === 'string') {
+      console.trace();
+      throw new Opal.TypeError("Object.defineProperty called on non-object (primitive string)");
     }
+    Object.defineProperty(object, name, {
+      value: initialValue,
+      enumerable: false,
+      configurable: true,
+      writable: true
+    });
   }
 
   Opal.defineProperty = $defineProperty;
@@ -696,6 +691,10 @@
   Opal.build_object_singleton_class = function(object) {
     var superclass = object.$$class,
         klass = Opal.allocate_class(nil, superclass, function(){});
+
+    if (typeof object === 'string') {
+      object = new String(object);
+    }
 
     $defineProperty(klass, '$$is_singleton', true);
     $defineProperty(klass, '$$singleton_of', object);
@@ -1863,6 +1862,8 @@
 
     // Try to make the browser pick the right name
     alias.displayName       = name;
+    // Make 'length' writable, otherwise a value cannot be assigned to the read-only property 'length' in strict mode
+    Object.defineProperty(alias, 'length', { writable: true });
     alias.length            = body.length;
     alias.$$arity           = body.$$arity;
     alias.$$parameters      = body.$$parameters;
@@ -2409,4 +2410,4 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
-}).call(this);
+}).call();
