@@ -927,6 +927,10 @@ class Number < Numeric
     end
 
     %x{
+      if (self === 0) {
+        return [0];
+      }
+
       var value = self, result = [];
 
       while (value !== 0) {
