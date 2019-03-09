@@ -691,6 +691,9 @@ class String < `String`
   end
 
   def ascii_only?
+    if self == '' && (encoding == Encoding::UTF_16LE || self.encoding == Encoding::UTF_16BE)
+      return false
+    end
     `self.match(/[ -~\n]*/)[0] === self`
   end
 

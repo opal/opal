@@ -131,6 +131,18 @@
 
   function $defineProperty(object, name, initialValue) {
     if (typeof(object) === "string") {
+      if (typeof object.$$props === 'undefined') {
+        Object.defineProperty(String.prototype, '$$props', {
+          value: {},
+          writable: true
+        });
+      }
+      Object.defineProperty(String.prototype, name, {
+        get : function(){ return this.$$props[name]; },
+        set : function(newValue){
+          this.$$props[name] = newValue;
+        }
+      });
       // Special case for:
       //   s = "string"
       //   def s.m; end

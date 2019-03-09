@@ -2,8 +2,10 @@ require 'corelib/numeric'
 
 class Number < Numeric
   Opal.bridge(`Number`, self)
-  `Opal.defineProperty(self.$$prototype, '$$is_number', true)`
-  `self.$$is_number_class = true`
+
+  `Object.defineProperty(Number.prototype, '$$props', { value: { is_number: true, is_number_class: true } })`
+  `Object.defineProperty(Number.prototype, '$$is_number', { get : function() { return this.$$props.is_number; }, set : function(newValue) { this.$$props.is_number = newValue; } })`
+  `Object.defineProperty(Number.prototype, '$$is_number_class', { get : function() { return this.$$props.is_number_class; }, set : function(newValue) { this.$$props.is_number_class = newValue; } })`
 
   class << self
     def allocate

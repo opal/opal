@@ -163,7 +163,9 @@ end
 
 class String
   attr_reader :encoding
-  `Opal.defineProperty(String.prototype, 'encoding', #{Encoding::UTF_16LE})`
+
+  `Object.defineProperty(String.prototype, '$$props', { value: { encoding: #{Encoding::UTF_16LE} } })`
+  `Object.defineProperty(String.prototype, 'encoding', { get : function() { return this.$$props.encoding; }, set : function(newValue) { this.$$props.encoding = newValue; } })`
 
   def bytes
     each_byte.to_a
@@ -204,6 +206,11 @@ class String
 
   def force_encoding(encoding)
     %x{
+      console.log('self', self);
+      console.log('force_encoding', encoding);
+      console.log('encoding', encoding);
+      console.log('self.encoding', self.encoding);
+
       if (encoding === self.encoding) { return self; }
 
       encoding = #{Opal.coerce_to!(encoding, String, :to_s)};
@@ -211,12 +218,11 @@ class String
 
       if (encoding === self.encoding) { return self; }
 
-      var result = new String(self.toString())
-      Object.defineProperty(result, 'encoding', {
-        value: encoding,
-        writable: true
-      });
-      return result
+      console.log(self.encoding);
+      console.log(self);
+
+      self.encoding = encoding;
+      return self;
     }
   end
 
