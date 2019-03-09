@@ -691,10 +691,18 @@ class String < `String`
   end
 
   def ascii_only?
-    if self == '' && (encoding == Encoding::UTF_16LE || self.encoding == Encoding::UTF_16BE)
+    # non-ASCII-compatible encoding must return false
+    # NOTE: Encoding::UTF_16LE is also non-ASCII-compatible encoding,
+    # but since the default encoding in JavaScript is UTF_16LE,
+    # we cannot return false otherwise the following will (incorrectly) return false: "hello".ascii_only?
+    # In other words, we cannot tell the difference between:
+    # - "hello".force_encoding("UTF-16LE")
+    # - "hello"
+    # The problem is that "ascii_only" should return false in the first case and true in the second case.
+    if self.encoding == Encoding::UTF_16BE
       return false
     end
-    `self.match(/[ -~\n]*/)[0] === self`
+    `/^[\x00-\x7F]*$/.test(self)`
   end
 
   def match(pattern, pos = undefined, &block)
