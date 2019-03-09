@@ -206,20 +206,12 @@ class String
 
   def force_encoding(encoding)
     %x{
-      console.log('self', self);
-      console.log('force_encoding', encoding);
-      console.log('encoding', encoding);
-      console.log('self.encoding', self.encoding);
-
       if (encoding === self.encoding) { return self; }
 
       encoding = #{Opal.coerce_to!(encoding, String, :to_s)};
       encoding = #{Encoding.find(encoding)};
 
       if (encoding === self.encoding) { return self; }
-
-      console.log(self.encoding);
-      console.log(self);
 
       self.encoding = encoding;
       return self;
