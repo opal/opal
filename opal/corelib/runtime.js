@@ -63,7 +63,7 @@
     missing_require_severity: 'error',        // error, warning, ignore
     unsupported_features_severity: 'warning', // error, warning, ignore
     enable_stack_trace: true                  // true, false
-  }
+  };
 
   // Minify common function calls
   var $hasOwn       = Object.hasOwnProperty;
@@ -90,7 +90,7 @@
     if (obj.$$is_number) return (obj * 2)+1;
     if (obj.$$id != null) {
       return obj.$$id;
-    };
+    }
     $defineProperty(obj, '$$id', Opal.uid());
     return obj.$$id;
   };
@@ -109,7 +109,7 @@
   // Pops an exception from the stack and updates `$!`.
   Opal.pop_exception = function() {
     Opal.gvars["!"] = Opal.exceptions.pop() || nil;
-  }
+  };
 
   // Inspect any kind of object, including non Ruby ones
   Opal.inspect = function(obj) {
@@ -125,7 +125,7 @@
     else {
       return obj.$inspect();
     }
-  }
+  };
 
   function $defineProperty(object, name, initialValue) {
     if (typeof(object) === "string") {
@@ -239,7 +239,7 @@
 
     result = const_get_name(cref, name);              if (result != null) return result;
     result = const_missing(cref, name, skip_missing); if (result != null) return result;
-  }
+  };
 
   // Look for the constant relative to a cref or call `#const_missing` (when the
   // constant is prefixed by `::`).
@@ -453,10 +453,10 @@
         // If superclass has metaclass then we have explicitely inherit it.
         Opal.build_class_singleton_class(klass);
       }
-    };
+    }
 
     return klass;
-  }
+  };
 
 
   function find_existing_class(scope, name) {
@@ -528,7 +528,7 @@
     }
 
     return klass;
-  }
+  };
 
   // Define new module (or return existing module). The given `scope` is basically
   // the current `self` value the `module` statement was defined in. If this is
@@ -575,7 +575,7 @@
     $setPrototype(module, Opal.Module.prototype);
 
     return module;
-  }
+  };
 
   function find_existing_module(scope, name) {
     var module = const_get_name(scope, name);
@@ -612,7 +612,7 @@
     Opal.const_set(scope, name, module);
 
     return module;
-  }
+  };
 
   // Return the singleton class for the passed object.
   //
@@ -687,7 +687,7 @@
     $defineProperty(mod, '$$class', Opal.Module);
 
     return meta;
-  }
+  };
 
   // Build the singleton class for a Ruby (non class) Object.
   //
@@ -711,7 +711,7 @@
 
   Opal.is_method = function(prop) {
     return (prop[0] === '$' && prop[1] !== '$');
-  }
+  };
 
   Opal.instance_methods = function(mod) {
     var exclude = [], results = [], ancestors = Opal.ancestors(mod);
@@ -745,7 +745,7 @@
     }
 
     return results;
-  }
+  };
 
   Opal.own_instance_methods = function(mod) {
     var results = [],
@@ -771,22 +771,22 @@
     }
 
     return results;
-  }
+  };
 
   Opal.methods = function(obj) {
     return Opal.instance_methods(Opal.get_singleton_class(obj));
-  }
+  };
 
   Opal.own_methods = function(obj) {
     return Opal.own_instance_methods(Opal.get_singleton_class(obj));
-  }
+  };
 
   Opal.receiver_methods = function(obj) {
     var mod = Opal.get_singleton_class(obj);
     var singleton_methods = Opal.own_instance_methods(mod);
     var instance_methods = Opal.own_instance_methods(mod.$$super);
     return singleton_methods.concat(instance_methods);
-  }
+  };
 
   // Returns an object containing all pairs of names/values
   // for all class variables defined in provided +module+
@@ -808,7 +808,7 @@
     }
 
     return result;
-  }
+  };
 
   // Sets class variable with specified +name+ to +value+
   // in provided +module+
@@ -832,7 +832,7 @@
     module.$$cvars[name] = value;
 
     return value;
-  }
+  };
 
   function isRoot(proto) {
     return proto.hasOwnProperty('$$iclass') && proto.hasOwnProperty('$$root');
@@ -976,7 +976,7 @@
     includer.$$own_included_modules = own_included_modules(includer);
 
     Opal.const_cache_version++;
-  }
+  };
 
   Opal.prepend_features = function(module, prepender) {
     // Here we change the ancestors chain from
@@ -1064,7 +1064,7 @@
     prepender.$$own_prepended_modules = own_prepended_modules(prepender);
 
     Opal.const_cache_version++;
-  }
+  };
 
   function flush_methods_in(module) {
     var proto = module.$$prototype,
@@ -1222,7 +1222,7 @@
     module.$$ancestors = result;
 
     return result;
-  }
+  };
 
   Opal.included_modules = function(module) {
     var result = [], mod = null, proto = Object.getPrototypeOf(module.$$prototype);
@@ -1235,7 +1235,7 @@
     }
 
     return result;
-  }
+  };
 
 
   // Method Missing
@@ -1608,7 +1608,7 @@
     else {
       return Opal.hash2([], {});
     }
-  }
+  };
 
   // Used to get a list of rest keyword arguments. Method takes the given
   // keyword args, i.e. the hash literal passed to the method containing all
@@ -1624,7 +1624,7 @@
   Opal.kwrestargs = function(given_args, used_args) {
     var keys      = [],
         map       = {},
-        key       = null,
+        key           ,
         given_map = given_args.$$smap;
 
     for (key in given_map) {
@@ -1672,12 +1672,12 @@
     }
 
     return recv.$method_missing.apply(recv, [method].concat(args));
-  }
+  };
 
   Opal.lambda = function(block) {
     block.$$is_lambda = true;
     return block;
-  }
+  };
 
   // Used to define methods on an object. This is a helper method, used by the
   // compiled source to define methods on special case objects when the compiler
@@ -1759,7 +1759,7 @@
     else if (singleton_of && singleton_of.$singleton_method_added && !singleton_of.$singleton_method_added.$$stub) {
       singleton_of.$singleton_method_added(jsid.substr(1));
     }
-  }
+  };
 
   // Define a singleton method on the given object (see Opal.def).
   Opal.defs = function(obj, jsid, body) {
@@ -2342,10 +2342,10 @@
 
   // Initialization
   // --------------
-  function $BasicObject() {};
-  function $Object() {};
-  function $Module() {};
-  function $Class() {};
+  function $BasicObject() {}
+  function $Object() {}
+  function $Module() {}
+  function $Class() {}
 
   Opal.BasicObject = BasicObject = Opal.allocate_class('BasicObject', null, $BasicObject);
   Opal.Object      = _Object     = Opal.allocate_class('Object', Opal.BasicObject, $Object);
@@ -2398,7 +2398,7 @@
 
 
   // Nil
-  function $NilClass() {};
+  function $NilClass() {}
   Opal.NilClass = Opal.allocate_class('NilClass', Opal.Object, $NilClass);
   Opal.const_set(_Object, 'NilClass', Opal.NilClass);
   nil = Opal.nil = new Opal.NilClass();
