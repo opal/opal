@@ -132,3 +132,7 @@ Whitespace conventions:
 - Fix methods of `Comparable` when `<=>` does not return Numeric (#1945)
 - Fix `Class#native_alias` error message (#1946)
 - Fix `gmt_offset` (alias `utc_offset`) should return 0 if the date is UTC (#1941)
+- `exceptionDetails.stackTrace` can be undefined (#1955)
+- Implement `String#each_codepoint` and `String#codepoints` (#1944, #1947)
+- [internal] Terminate statement with semi-colon and remove unecessary semi-colon (#1948)
+- Some steps toward "strict mode" (#1953)
