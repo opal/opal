@@ -208,7 +208,6 @@ module Native
   def self.included(base)
     warn 'Including ::Native is deprecated. Please include Native::Wrapper instead.'
     base.include Wrapper
-    base.extend Helpers
   end
 end
 
