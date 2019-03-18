@@ -127,7 +127,7 @@ module Native
     # @example
     #
     #   class Element
-    #     include Native::Helpers
+    #     extend Native::Helpers
     #
     #     alias_native :add_class, :addClass
     #     alias_native :show
