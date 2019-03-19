@@ -160,6 +160,10 @@ module Opal
         options[:enable_source_location] = true
       end
 
+      on('--use-strict', 'Enable JavaScript\'s strict mode') do
+        options[:use_strict] = true
+      end
+
       on('--parse-comments', 'Compiles comments for each method definition.') do
         options[:parse_comments] = true
       end

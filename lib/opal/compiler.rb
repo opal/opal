@@ -134,6 +134,11 @@ module Opal
     # Adds source_location for every method definition
     compiler_option :enable_source_location, false, as: :enable_source_location?
 
+    # @!method use_strict?
+    #
+    # Adds source_location for every method definition
+    compiler_option :use_strict, false, as: :use_strict?
+
     # @!method parse_comments?
     #
     # Adds comments for every method definition

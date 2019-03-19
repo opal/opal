@@ -324,6 +324,7 @@ platforms.each do |platform|
           opal/test_openuri.rb
           opal/unsupported_and_bugs.rb
           opal/test_matrix.rb
+          opal/test_strict.rb
         ]
       end
       Testing::HTTPServer.new.with_server do |session|
@@ -335,7 +336,7 @@ platforms.each do |platform|
         includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
 
         sh "ruby -rbundler/setup "\
-         "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+         "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --use-strict --enable-source-location #{filename}"
       end
     end
   end

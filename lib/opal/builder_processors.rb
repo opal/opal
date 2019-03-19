@@ -41,7 +41,11 @@ module Opal
       end
 
       def mark_as_required(filename)
-        "Opal.loaded([#{filename.to_s.inspect}]);"
+        if filename != 'corelib/strict.js'
+          "Opal.loaded([#{filename.to_s.inspect}]);"
+        else
+          ''
+        end
       end
     end
 

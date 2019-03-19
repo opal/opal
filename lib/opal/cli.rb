@@ -42,6 +42,8 @@ module Opal
 
       @requires.unshift('opal') unless options.delete(:skip_opal_require)
 
+      @requires.unshift('corelib/strict') if options.delete(:use_strict)
+
       @compiler_options = Hash[
         *compiler_option_names.map do |option|
           key = option.to_sym
@@ -130,6 +132,7 @@ module Opal
         irb_enabled
         inline_operators
         enable_source_location
+        use_strict
         parse_comments
       ]
     end
