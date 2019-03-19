@@ -1861,9 +1861,13 @@
       return Opal.send(this, body, args, block);
     };
 
+    // Assign the 'length' value with defineProperty because
+    // in strict mode the property is not writable.
+    Object.defineProperty(alias, 'length', { value: body.length });
+
     // Try to make the browser pick the right name
     alias.displayName       = name;
-    alias.length            = body.length;
+
     alias.$$arity           = body.$$arity;
     alias.$$parameters      = body.$$parameters;
     alias.$$source_location = body.$$source_location;
