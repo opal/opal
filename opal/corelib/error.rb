@@ -61,6 +61,7 @@ class Exception < `Error`
 
       var cloned = #{clone};
       cloned.message = str;
+      cloned.stack = self.stack;
       return cloned;
     }
   end
@@ -81,8 +82,10 @@ class Exception < `Error`
 
       if (backtrace === nil) {
         self.backtrace = nil;
+        self.stack = '';
       } else if (backtrace.$$is_string) {
         self.backtrace = [backtrace];
+        self.stack = backtrace;
       } else {
         if (backtrace.$$is_array) {
           for (i = 0, ii = backtrace.length; i < ii; i++) {
@@ -100,6 +103,7 @@ class Exception < `Error`
         }
 
         self.backtrace = backtrace;
+        self.stack = backtrace.join('\n');
       }
 
       return backtrace;
