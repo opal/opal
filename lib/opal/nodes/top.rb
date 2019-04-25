@@ -71,7 +71,9 @@ module Opal
 
       def opening(module_name = nil)
         if compiler.es6_modules?
-          line 'export default function() {'
+          # to enable some webpack features for opal-webpack-loader it has to refer to the opal code from within webpack later on
+          # so we give it a handle 'opal_code'
+          line 'const opal_code = function() {'
           # global makes sure we get the webpack global context and its Opal.modules, and not a locally shielded Opal.modules
           line "  global.Opal.modules[#{module_name.inspect}] = function(Opal) {"
         elsif compiler.requirable?
@@ -87,6 +89,7 @@ module Opal
         if compiler.es6_modules?
           line '  }'
           line "}\n"
+          line "export default opal_code\n"
         elsif compiler.requirable?
           line "};\n"
         elsif compiler.eval?
