@@ -138,3 +138,4 @@ Whitespace conventions:
 - Some steps toward "strict mode" (#1953)
 - Preserve `Exception.stack`, in some cases the backtrace was lost (#1963)
 - Make `String#ascii_only?` a little less wrong (#1951)
+- Minor fixes to `::Native` (#1957)
