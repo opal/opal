@@ -136,4 +136,5 @@ Whitespace conventions:
 - Implement `String#each_codepoint` and `String#codepoints` (#1944, #1947)
 - [internal] Terminate statement with semi-colon and remove unecessary semi-colon (#1948)
 - Some steps toward "strict mode" (#1953)
-- Preserve Exception.stack, in some cases the backtrace was lost (#1963)
+- Preserve `Exception.stack`, in some cases the backtrace was lost (#1963)
+- Make `String#ascii_only?` a little less wrong (#1951)
