@@ -1,10 +1,10 @@
 # Opal
 
+[![Gem Version](https://img.shields.io/gem/v/opal.svg?style=flat)](https://badge.fury.io/rb/opal)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability-percentage/opal/opal.svg)](https://codeclimate.com/github/opal/opal)
+[![Coverage Status](https://coveralls.io/repos/opal/opal/badge.svg?branch=master&service=github)](https://coveralls.io/github/opal/opal?branch=elia%2Fcoveralls)
 [![Build Status (Linux)](https://img.shields.io/travis/opal/opal/master.svg?style=flat)](https://travis-ci.org/opal/opal)
 [![Build Status (Windows)](https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true)](https://ci.appveyor.com/project/elia/opal/branch/master)
-[![Gem Version](https://img.shields.io/gem/v/opal.svg?style=flat)](https://badge.fury.io/rb/opal)
-[![Code Climate](https://img.shields.io/codeclimate/github/opal/opal.svg?style=flat)](https://codeclimate.com/github/opal/opal)
-[![Coverage Status](https://coveralls.io/repos/opal/opal/badge.svg?branch=master&service=github)](https://coveralls.io/github/opal/opal?branch=elia%2Fcoveralls)
 
 
 Opal is a Ruby to JavaScript source-to-source compiler. It also has an
@@ -13,11 +13,11 @@ implementation of the Ruby corelib.
 Opal is [hosted on GitHub](https://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) (also available as IRC at `irc.gitter.im`).
 Ask questions on [stackoverflow (tag #opalrb)](https://stackoverflow.com/questions/ask?tags=opalrb). Get the [Opalist newsletter](http://opalist.co) for updates and community news.
 
-[![Inline docs](https://inch-ci.org/github/opal/opal.svg?branch=master&style=flat)](https://opalrb.com/docs)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/opal/opal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Stack Overflow](https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat)](https://stackoverflow.com/questions/ask?tags=opalrb)
 [![Backers on Open Collective](https://opencollective.com/opal/backers/badge.svg)](#backers) 
 [![Sponsors on Open Collective](https://opencollective.com/opal/sponsors/badge.svg)](#sponsors) 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/opal/opal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Documentation](https://img.shields.io/badge/docs-updated-blue.svg)](https://opalrb.com/docs)
 
 ## Usage
 
