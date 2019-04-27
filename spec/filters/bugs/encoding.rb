@@ -123,12 +123,9 @@ opal_filter "Encoding" do
   fails "String#[]= with a Regexp index replaces multibyte characters with multibyte characters" # NoMethodError: undefined method `[]=' for "ありがとう":String
   fails "String#ascii_only? returns false after appending non ASCII characters to an empty String" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#ascii_only? returns false when concatenating an ASCII and non-ASCII String" # NoMethodError: undefined method `concat' for "":String
-  fails "String#ascii_only? returns false when interpolating non ascii strings" # Expected false to be true
   fails "String#ascii_only? returns false when replacing an ASCII String with a non-ASCII String" # NoMethodError: undefined method `replace' for "":String
-  fails "String#ascii_only? returns true for the empty String with an ASCII-compatible encoding" # Expected false to be true
-  fails "String#ascii_only? with ASCII only characters returns true for all single-character UTF-8 Strings" # Expected false to be true
-  fails "String#ascii_only? with ASCII only characters returns true if the encoding is US-ASCII" # Expected false to be true
-  fails "String#ascii_only? with ASCII only characters returns true if the encoding is UTF-8" # Expected true to be computed by "hello".ascii_only? (computed false instead)
+  fails "String#ascii_only? returns false for a non-empty String with non-ASCII-compatible encoding" # Expected true to be false
+  fails "String#ascii_only? returns false for the empty String with a non-ASCII-compatible encoding" # Expected true to be false
   fails "String#ascii_only? with non-ASCII only characters returns false if the encoding is ASCII-8BIT" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#b copies own tainted/untrusted status to the returning value" # NoMethodError: undefined method `untrust' for "こんちには":String
   fails "String#b returns new string without modifying self" # NoMethodError: undefined method `b' for "こんちには":String
