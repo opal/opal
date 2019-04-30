@@ -232,7 +232,11 @@ RSpec.describe Opal::CLI do
     let(:options) { { es6_modules: true, runner: :compiler, file: File.open(file) } }
 
     it 'inserts ES6 export lines into compiled code' do
-      expect_output_of { subject.run }.to include('export default function() {')
+      expect_output_of { subject.run }.to include('export default opal_code')
+    end
+
+    it 'provides handle within module for hot module reloading' do
+      expect_output_of { subject.run }.to include('const opal_code = function() {')
     end
 
     it 'inserts ES6 import lines into compiled code' do
