@@ -427,7 +427,7 @@ class Time < `Date`
   end
 
   def gmt_offset
-    `-self.getTimezoneOffset() * 60`
+    `self.is_utc ? 0 : -self.getTimezoneOffset() * 60`
   end
 
   def strftime(format)

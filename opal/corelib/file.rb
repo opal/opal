@@ -7,22 +7,12 @@ class File < IO
   windows_root_rx = %r{^[a-zA-Z]:(?:\\|\/)}
 
   class << self
-    def expand_path(path, basedir = nil)
+    def absolute_path(path, basedir = nil)
       sep = SEPARATOR
       sep_chars = `$sep_chars()`
       new_parts = []
 
-      if `path[0] === '~' || (basedir && basedir[0] === '~')`
-        home = Dir.home
-        raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
-        raise(ArgumentError, 'non-absolute home') unless home.start_with?(sep)
-
-        home            += sep
-        home_path_regexp = /^\~(?:#{sep}|$)/
-        path             = path.sub(home_path_regexp, home)
-        basedir          = basedir.sub(home_path_regexp, home) if basedir
-      end
-
+      path = path.respond_to?(:to_path) ? path.to_path : path
       basedir ||= Dir.pwd
       path_abs    = `path.substr(0, sep.length) === sep || windows_root_rx.test(path)`
       basedir_abs = `basedir.substr(0, sep.length) === sep || windows_root_rx.test(basedir)`
@@ -64,6 +54,23 @@ class File < IO
       new_path = new_parts.join(sep)
       new_path = leading_sep + new_path if abs
       new_path
+    end
+
+    def expand_path(path, basedir = nil)
+      sep = SEPARATOR
+      sep_chars = `$sep_chars()`
+      if `path[0] === '~' || (basedir && basedir[0] === '~')`
+        home = Dir.home
+        raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
+        leading_sep = `windows_root_rx.test(home) ? '' : #{home.sub(/^([#{sep_chars}]+).*$/, '\1')}`
+        raise(ArgumentError, 'non-absolute home') unless home.start_with?(leading_sep)
+
+        home            += sep
+        home_path_regexp = /^\~(?:#{sep}|$)/
+        path             = path.sub(home_path_regexp, home)
+        basedir          = basedir.sub(home_path_regexp, home) if basedir
+      end
+      absolute_path(path, basedir)
     end
     alias realpath expand_path
 

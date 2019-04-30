@@ -5,14 +5,14 @@ class String < `String`
   include Comparable
 
   %x{
-    Opal.defineProperty(String.prototype, '$$is_string', true);
+    Opal.defineProperty(#{self}.$$prototype, '$$is_string', true);
 
-    Opal.defineProperty(String.prototype, '$$cast', function(string) {
+    Opal.defineProperty(#{self}.$$prototype, '$$cast', function(string) {
       var klass = this.$$class;
-      if (klass === String) {
+      if (klass.$$constructor === String) {
         return string;
       } else {
-        return new klass(string);
+        return new klass.$$constructor(string);
       }
     });
   }
@@ -29,7 +29,7 @@ class String < `String`
 
   def self.new(str = '')
     str = Opal.coerce_to(str, String, :to_str)
-    `new self(str)`
+    `new self.$$constructor(str)`
   end
 
   def initialize(str = undefined)
@@ -307,7 +307,7 @@ class String < `String`
       else if (separator === "") {
         result = self.replace(/(\r?\n)+$/, '');
       }
-      else if (self.length > separator.length) {
+      else if (self.length >= separator.length) {
         var tail = self.substr(self.length - separator.length, separator.length);
 
         if (tail === separator) {
@@ -504,6 +504,7 @@ class String < `String`
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
       }
 
+      var lastIndex;
       while (true) {
         match = pattern.exec(self);
 
@@ -516,7 +517,9 @@ class String < `String`
         match_data = #{MatchData.new `pattern`, `match`};
 
         if (replacement === undefined) {
+          lastIndex = pattern.lastIndex;
           _replacement = block(match[0]);
+          pattern.lastIndex = lastIndex; // save and restore lastIndex
         }
         else if (replacement.$$is_hash) {
           _replacement = #{`replacement`[`match[0]`].to_s};
@@ -688,7 +691,18 @@ class String < `String`
   end
 
   def ascii_only?
-    `self.match(/[ -~\n]*/)[0] === self`
+    # non-ASCII-compatible encoding must return false
+    # NOTE: Encoding::UTF_16LE is also non-ASCII-compatible encoding,
+    # but since the default encoding in JavaScript is UTF_16LE,
+    # we cannot return false otherwise the following will (incorrectly) return false: "hello".ascii_only?
+    # In other words, we cannot tell the difference between:
+    # - "hello".force_encoding("UTF-16LE")
+    # - "hello"
+    # The problem is that "ascii_only" should return false in the first case and true in the second case.
+    if encoding == Encoding::UTF_16BE
+      return false
+    end
+    `/^[\x00-\x7F]*$/.test(self)`
   end
 
   def match(pattern, pos = undefined, &block)
@@ -701,6 +715,18 @@ class String < `String`
     end
 
     pattern.match(self, pos, &block)
+  end
+
+  def match?(pattern, pos = undefined)
+    if String === pattern || pattern.respond_to?(:to_str)
+      pattern = Regexp.new(pattern.to_str)
+    end
+
+    unless Regexp === pattern
+      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+    end
+
+    pattern.match?(self, pos)
   end
 
   def next
@@ -1298,16 +1324,33 @@ class String < `String`
   end
 
   def to_proc
-    sym = `self.valueOf()`
+    method_name = '$' + `self.valueOf()`
 
     proc do |*args, &block|
       %x{
         if (args.length === 0) {
           #{raise ArgumentError, 'no receiver given'}
         }
-        var obj = args.shift();
-        if (obj == null) obj = nil;
-        return Opal.send(obj, sym, args, block);
+
+        var recv = args[0];
+
+        if (recv == null) recv = nil;
+
+        var body = recv[#{method_name}];
+
+        if (!body) {
+          return recv.$method_missing.apply(recv, args);
+        }
+
+        if (typeof block === 'function') {
+          body.$$p = block;
+        }
+
+        if (args.length === 1) {
+          return body.call(recv);
+        } else {
+          return body.apply(recv, args.slice(1));
+        }
       }
     end
   end
@@ -1775,6 +1818,14 @@ class String < `String`
 
   def self._load(*args)
     new(*args)
+  end
+
+  def unicode_normalize(form = undefined)
+    `self.toString()`
+  end
+
+  def unicode_normalized?(form = undefined)
+    true
   end
 
   def unpack(format)

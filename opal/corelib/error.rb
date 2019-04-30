@@ -5,7 +5,7 @@ class Exception < `Error`
   def self.new(*args)
     %x{
       var message   = (args.length > 0) ? args[0] : nil;
-      var error     = new self(message);
+      var error     = new self.$$constructor(message);
       error.name    = self.$$name;
       error.message = message;
       Opal.send(error, error.$initialize, args);
@@ -61,6 +61,7 @@ class Exception < `Error`
 
       var cloned = #{clone};
       cloned.message = str;
+      cloned.stack = self.stack;
       return cloned;
     }
   end
@@ -81,8 +82,10 @@ class Exception < `Error`
 
       if (backtrace === nil) {
         self.backtrace = nil;
+        self.stack = '';
       } else if (backtrace.$$is_string) {
         self.backtrace = [backtrace];
+        self.stack = backtrace;
       } else {
         if (backtrace.$$is_array) {
           for (i = 0, ii = backtrace.length; i < ii; i++) {
@@ -100,6 +103,7 @@ class Exception < `Error`
         }
 
         self.backtrace = backtrace;
+        self.stack = backtrace.join('\n');
       }
 
       return backtrace;

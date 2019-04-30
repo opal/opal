@@ -1,12 +1,10 @@
 # Contributing and Reporting
 
 This is the issue tracker for Opal. If you have a more general question about
-using Opal (or related libraries) then use the [stackoverflow tag (#opalrb)][SO], the
-[#opal][freenode] irc channel on *FreeNode*, or the *Gitter* chatroom at [opal/opal][gitter]
+using Opal (or related libraries) then use the [stackoverflow tag (#opalrb)][SO], or the *Gitter* chatroom at [opal/opal][gitter]
 (also available as IRC at `irc.gitter.im`).
 
 [SO]: http://stackoverflow.com/questions/ask?tags=opalrb
-[freenode]: http://webchat.freenode.net/?channels=opal
 [gitter]: https://gitter.im/opal/opal
 
 What follows is a quick checklist you can before sending issues or pull-requests, for in-depth instructions on how to hack the internals of Opal and setup the development environment please see [`HACKING.md`][hacking].
@@ -35,10 +33,10 @@ What follows is a quick checklist you can before sending issues or pull-requests
 
 3.  Make sure to have updated all the relevant documentation, both for API (using _yardoc_ syntax) and the Guides
 
-4.  Add a Changelog entry at the top of `CHANGELOG.md`
+4.  Add a Changelog entry at the top of `UNRELEASED.md`
 
 
-### A note on commits in PR
+### A note on commits in PRs
 
 You could be asked to squash your commits during a PR review. That doesn't mean there's a preference for a single commit for each PR, rather it's a request to have each commit focused on a specific group changes and avoid the sequence of changes, fixups and reverts that tell an interesting story but in the end make the use of `git blame` quite difficult.
 

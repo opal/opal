@@ -4,78 +4,37 @@ require 'opal/nodes/node_with_args'
 
 module Opal
   module Nodes
-    # FIXME: needs rewrite
     class DefNode < NodeWithArgs
       handle :def
 
-      children :mid, :args, :stmts
-
-      attr_accessor :block_arg
-
-      def extract_block_arg
-        *regular_args, last_arg = args.children
-        if last_arg && last_arg.type == :blockarg
-          @block_arg = last_arg.children[0]
-          @sexp = @sexp.updated(
-            nil, [
-              mid,
-              s(:args, *regular_args),
-              stmts
-            ]
-          )
-        end
-      end
+      children :mid, :inline_args, :stmts
 
       def compile
-        extract_block_arg
-        split_args
-
         inline_params = nil
         scope_name = nil
-
-        # block name (&block)
-        if block_arg
-          block_name = block_arg
-        end
 
         in_scope do
           scope.mid = mid
           scope.defs = true if @sexp.type == :defs
 
-          if block_name
-            scope.uses_block!
-            scope.add_arg block_name
-          end
-
-          scope.block_name = block_name || '$yield'
-
-          inline_params = process(inline_args_sexp)
-
-          stmt_code = stmt(compiler.returns(stmts))
-
-          add_temp 'self = this'
-
-          compile_inline_args
-          compile_post_args
-
           scope.identify!
           scope_name = scope.identity
 
+          # Setting a default block name (later can be overwritten by a blockarg)
+          scope.block_name = '$yield'
+
+          inline_params = process(inline_args)
+
+          stmt_code = stmt(compiler.returns(stmts))
+
           compile_block_arg
 
-          if compiler.arity_check?
-            compile_arity_check
-          end
+          add_temp 'self = this'
+
+          compile_arity_check
 
           if scope.uses_zuper
-            add_local '$zuper'
-            add_local '$zuper_i'
-            add_local '$zuper_ii'
-
-            line '// Prepare super implicit arguments'
-            line 'for($zuper_i = 0, $zuper_ii = arguments.length, $zuper = new Array($zuper_ii); $zuper_i < $zuper_ii; $zuper_i++) {'
-            line '  $zuper[$zuper_i] = arguments[$zuper_i];'
-            line '}'
+            prepare_super
           end
 
           unshift "\n#{current_indent}", scope.to_vars
@@ -132,15 +91,6 @@ module Opal
         end
       end
 
-      # Returns code used in debug mode to check arity of method call
-      def compile_arity_check
-        unless arity_checks.empty?
-          meth = scope.mid.to_s.inspect
-          line 'var $arity = arguments.length;'
-          push " if (#{arity_checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
-        end
-      end
-
       def source_location
         file = @sexp.loc.expression.source_buffer.name
         line = @sexp.loc.line
@@ -149,6 +99,17 @@ module Opal
 
       def comments_code
         '[' + comments.map { |comment| comment.text.inspect }.join(', ') + ']'
+      end
+
+      def prepare_super
+        add_local '$zuper'
+        add_local '$zuper_i'
+        add_local '$zuper_ii'
+
+        line '// Prepare super implicit arguments'
+        line 'for($zuper_i = 0, $zuper_ii = arguments.length, $zuper = new Array($zuper_ii); $zuper_i < $zuper_ii; $zuper_i++) {'
+        line '  $zuper[$zuper_i] = arguments[$zuper_i];'
+        line '}'
       end
     end
   end

@@ -38,7 +38,7 @@
 
   var ObjectToString = Object.prototype.toString;
 
-  var NODE = ObjectToString.call(this.process) === "[object process]";
+  var NODE = ObjectToString.call(process) === "[object process]";
 
   // https://github.com/v8/v8/blob/cab94bbe3d532d85705950ed049a294050fcb4c9/src/messages.js#L1112-L1124 [converted to JS]
   function GetTypeName(receiver, requireConstructor) {
@@ -87,7 +87,7 @@
 
     var line = "";
     var func = this.getFunction();
-    var customName = func.displayName;
+    if (func) var customName = func.displayName;
     if (NODE && customName) {
       if (customName && func.$$owner) {
         var customNameOwner;

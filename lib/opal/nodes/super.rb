@@ -73,8 +73,7 @@ module Opal
 
       def super_method_invocation
         if def_scope.defs
-          class_name = def_scope.parent.name ? "$#{def_scope.parent.name}" : 'self.$$class.prototype'
-          "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, #{class_name})"
+          "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, self.$$class.$$prototype)"
         else
           "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param})"
         end
@@ -148,8 +147,8 @@ module Opal
           implicit_args = [s(:js_tmp, '$zuper')]
           # If the method we're in has a block and we're using a default super call with no args, we need to grab the block
           # If an iter (block via braces) is provided, that takes precedence
-          if (block_arg = formal_block_parameter) && !iter
-            block_pass = s(:block_pass, s(:lvar, block_arg[1]))
+          if block_name && !iter
+            block_pass = s(:block_pass, s(:lvar, block_name))
             implicit_args << block_pass
           end
 
@@ -169,12 +168,12 @@ module Opal
         end
       end
 
-      def formal_block_parameter
+      def block_name
         case def_scope
         when Opal::Nodes::IterNode
-          def_scope.extract_block_arg
+          def_scope.block_name
         when Opal::Nodes::DefNode
-          def_scope.block_arg
+          def_scope.block_name
         else
           raise "Don't know what to do with super in the scope #{def_scope}"
         end

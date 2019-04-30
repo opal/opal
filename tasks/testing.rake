@@ -3,6 +3,11 @@ RSpec::Core::RakeTask.new(:rspec) do |t|
   t.pattern = 'spec/lib/**/*_spec.rb'
 end
 
+if ENV.key?('RUBYSPEC')
+  warn "Did you mean RUBYSPECS=...? (RUBYSPEC was found among ENV variables)"
+  exit 1
+end
+
 module Testing
   extend self
 
@@ -31,6 +36,7 @@ module Testing
       suite = env['SUITE']
       pattern = env['PATTERN']
       whitelist_pattern = !!env['RUBYSPECS']
+      env['OPAL_PLATFORM_NAME'] = RbConfig::CONFIG['host_os'] unless env['OPAL_PLATFORM_NAME']
 
       excepting = []
       rubyspecs = File.read('spec/ruby_specs').lines.reject do |l|
@@ -329,7 +335,7 @@ platforms.each do |platform|
         includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
 
         sh "ruby -rbundler/setup "\
-         "exe/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+         "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
       end
     end
   end
@@ -338,15 +344,16 @@ end
 # The name ends with the platform, which is of course mandated in this case
 desc "Run the Node.js Minitest suite on Node.js"
 task :minitest_node_nodejs do
-  Opal.use_gem 'hike'
-
   platform = 'nodejs'
   files = %w[
     nodejs
     opal-parser
     nodejs/test_file.rb
     nodejs/test_dir.rb
+    nodejs/test_env.rb
     nodejs/test_io.rb
+    nodejs/test_error.rb
+    nodejs/test_file_encoding.rb
     nodejs/test_opal_builder.rb
   ]
 
@@ -357,7 +364,7 @@ task :minitest_node_nodejs do
   includes = "-Itest -Ilib -Ivendored-minitest"
 
   sh "ruby -rbundler/setup "\
-     "exe/opal -ghike #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+     "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 end
 
 desc 'Run smoke tests with opal-rspec to see if something is broken'

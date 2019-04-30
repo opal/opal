@@ -1,6 +1,7 @@
 require 'opal/base'
 require 'opal/mini'
 
+require 'corelib/kernel/format'
 require 'corelib/string/encoding'
 require 'corelib/math'
 require 'corelib/complex'
@@ -13,5 +14,6 @@ require 'corelib/dir'
 require 'corelib/file'
 require 'corelib/process'
 require 'corelib/random'
+require 'corelib/random/mersenne_twister.js'
 
 require 'corelib/unsupported'

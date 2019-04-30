@@ -127,7 +127,7 @@ module Native
     # @example
     #
     #   class Element
-    #     include Native::Helpers
+    #     extend Native::Helpers
     #
     #     alias_native :add_class, :addClass
     #     alias_native :show
@@ -208,7 +208,6 @@ module Native
   def self.included(base)
     warn 'Including ::Native is deprecated. Please include Native::Wrapper instead.'
     base.include Wrapper
-    base.extend Helpers
   end
 end
 
@@ -614,7 +613,7 @@ class Class
     %x{
       var aliased = #{self}.prototype['$' + #{existing_mid}];
       if (!aliased) {
-        #{raise NameError.new("undefined method `#{existing_mid}' for class `#{inspect}'", exiting_mid)};
+        #{raise NameError.new("undefined method `#{existing_mid}' for class `#{inspect}'", existing_mid)};
       }
       #{self}.prototype[#{new_jsid}] = aliased;
     }

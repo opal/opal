@@ -68,13 +68,8 @@ module Opal
       # Returns a new body with +node+ injected as a first statement.
       #
       def prepend_to_body(body, node)
-        if body.nil?
-          node
-        elsif %i[begin kwbegin].include?(body.type)
-          body.updated(nil, [node, *body])
-        else
-          s(:begin, node, body)
-        end
+        stmts = stmts_of(node) + stmts_of(body)
+        begin_with_stmts(stmts)
       end
 
       # Appends given +node+ to +body+ node.
@@ -87,12 +82,28 @@ module Opal
       # Returns a new body with +node+ injected as a last statement.
       #
       def append_to_body(body, node)
-        if body.nil?
-          node
-        elsif %i[begin kwbegin].include?(body.type)
-          body.updated(nil, [*body, node])
+        stmts = stmts_of(body) + stmts_of(node)
+        begin_with_stmts(stmts)
+      end
+
+      def stmts_of(node)
+        if node.nil?
+          []
+        elsif %i[begin kwbegin].include?(node.type)
+          node.children
         else
-          s(:begin, body, node)
+          [node]
+        end
+      end
+
+      def begin_with_stmts(stmts)
+        case stmts.length
+        when 0
+          nil
+        when 1
+          stmts[0]
+        else
+          s(:begin, *stmts)
         end
       end
 

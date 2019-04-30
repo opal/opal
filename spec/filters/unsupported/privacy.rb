@@ -1,4 +1,6 @@
 opal_unsupported_filter "private" do
+  fails "A method definition always resets the visibility to public for nested definitions at the toplevel" # Expected NoMethodError (/private/) but no exception was raised ("nested_method_in_toplevel_method" was returned)
+  fails "A method definition always resets the visibility to public for nested definitions in Class.new" # Expected NoMethodError (/private/) but no exception was raised ("new_def" was returned)
   fails "BasicObject#initialize is a private instance method"
   fails "BasicObject#method_missing for a Class raises a NoMethodError when an undefined method is called"
   fails "BasicObject#method_missing is a private method"
@@ -141,6 +143,7 @@ opal_unsupported_filter "private" do
   fails "Module#private makes a public Object instance method private in Kernel"
   fails "Module#private makes a public Object instance method private in a new module"
   fails "Module#private makes the target method uncallable from other types"
+  fails "Module#private only makes the method private in the class it is called on" # Expected NameError but no exception was raised (2 was returned)
   fails "Module#private raises a NameError when given an undefined name"
   fails "Module#private returns self"
   fails "Module#private without arguments affects evaled method definitions when itself is outside the eval"
@@ -162,6 +165,8 @@ opal_unsupported_filter "private" do
   fails "Module#private_constant accepts multiple names"
   fails "Module#private_constant accepts strings as constant names"
   fails "Module#private_constant can only be passed constant names defined in the target (self) module"
+  fails "Module#private_constant marked constants NameError by #private_constant has :receiver and :name attributes" # Expected NameError but no exception was raised (true was returned)
+  fails "Module#private_constant marked constants NameError by #private_constant has the defined class as the :name attribute" # Expected NameError but no exception was raised (true was returned)
   fails "Module#private_constant marked constants in Object cannot be accessed using ::Const form"
   fails "Module#private_constant marked constants in Object is not defined? using ::Const form"
   fails "Module#private_constant marked constants in a class can be accessed from lexical scope"
@@ -249,6 +254,8 @@ opal_unsupported_filter "private" do
   fails "Module#public_constant marked constants in a module can be accessed from outside the module"
   fails "Module#public_constant marked constants in a module is defined? with A::B form" # Exception: Opal.TypeError is not a constructor
   fails "Module#public_instance_method is a public method"
+  fails "Module#public_instance_method raises a NameError if the method is private"
+  fails "Module#public_instance_method raises a NameError when given a protected method name"
   fails "Module#public_instance_method raises a TypeError when given a name is not Symbol or String"
   fails "Module#public_instance_method requires an argument"
   fails "Module#public_instance_method sets the NameError#name attribute to the name of the missing method"
@@ -276,6 +283,4 @@ opal_unsupported_filter "private" do
   fails "Set#flatten_merge is protected"
   fails "String#+@ returns mutable copy despite freeze-magic-comment in file" # NoMethodError: undefined method `tmp' for #<Object:0x3bdc>
   fails "StringScanner#initialize is a private method"
-  fails "Module#public_instance_method raises a NameError if the method is private"
-  fails "Module#public_instance_method raises a NameError when given a protected method name"
 end

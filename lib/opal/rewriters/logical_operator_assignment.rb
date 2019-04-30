@@ -20,6 +20,13 @@ module Opal
           get_node = lhs.updated(get_type)              # lhs
           condition_node = s(root_type, get_node, rhs)  # lhs || rhs
 
+          if get_type == :const && root_type == :or
+            # defined?(lhs)
+            defined_node = s(:defined?, get_node)
+            # LHS = defined?(LHS) ? (LHS || rhs) : rhs
+            condition_node = s(:if, defined_node, s(:begin, condition_node), rhs)
+          end
+
           lhs.updated(set_type, [*lhs, condition_node]) # lhs = lhs || rhs
         }
       }
@@ -33,7 +40,10 @@ module Opal
       InstanceVariableHandler = GET_SET[:ivar, :ivasgn]
 
       # Takes    `LHS ||= rhs`
-      # Produces `LHS = LHS || rhs`
+      # Produces `LHS = defined?(LHS) ? (LHS || rhs) : rhs`
+      #
+      # Takes    `LHS &&= rhs`
+      # Produces `LHS = LHS && rhs`
       ConstantHandler = GET_SET[:const, :casgn]
 
       # Takes    `$lhs ||= rhs`

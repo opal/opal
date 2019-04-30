@@ -13,8 +13,21 @@ Gem::Specification.new do |spec|
   spec.homepage     = 'https://opalrb.com'
   spec.license      = 'MIT'
 
+  spec.metadata = {
+    "bug_tracker_uri"       => "https://github.com/opal/opal/issues",
+    "changelog_uri"         => "https://github.com/opal/opal/blob/v#{spec.version}/CHANGELOG.md",
+    "readme_uri"            => "https://github.com/opal/opal/blob/v#{spec.version}/README.md",
+    "api_documentation_uri" => "http://opalrb.com/docs/api/v#{spec.version}/index.html",
+    "guides_uri"            => "http://opalrb.com/docs/guides/v#{spec.version}/index.html",
+    "homepage_uri"          => "https://opalrb.com/",
+    "chat_uri"              => "https://gitter.im/opal/opal",
+    "source_code_uri"       => "https://github.com/opal/opal",
+  }
+
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+    `git ls-files -z`.split("\x0")
+      .reject { |f| f.match(%r{^(test|spec|features)/}) }
+      .reject { |f| File.symlink?(f) } # Windows doesn't always support them
   end
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
@@ -22,16 +35,14 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0.0'
 
-  spec.add_dependency 'sourcemap', '~> 0.1.0'
-  spec.add_dependency 'hike', '~> 1.2'
   spec.add_dependency 'ast', '>= 2.3.0'
-  spec.add_dependency 'parser', '= 2.5.1.0'
+  spec.add_dependency 'parser', '= 2.5.3.0'
 
+  spec.add_development_dependency 'sourcemap', '~> 0.1.0'
   spec.add_development_dependency 'rake', '~> 10.0'
-  spec.add_development_dependency 'racc'
-  spec.add_development_dependency 'rspec', '~> 3.6.0'
-  spec.add_development_dependency 'octokit', '~> 2.4.0'
-  spec.add_development_dependency 'bundler', '~> 1.5'
+  spec.add_development_dependency 'rspec', '~> 3.7'
+  spec.add_development_dependency 'octokit', '~> 4.9'
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rack-test'
   spec.add_development_dependency 'opal-minitest'
   spec.add_development_dependency 'selenium-webdriver'

@@ -19,9 +19,6 @@ task :dist do
   Opal::Config.dynamic_require_severity = :warning
   Opal::Config.missing_require_severity = :error
 
-  # Hike gem is required to build opal-builder
-  Opal.use_gem 'hike'
-
   build_dir = ENV['DIR'] || 'build'
   files     = ENV['FILES'] ? ENV['FILES'].split(',') :
               Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }
@@ -53,12 +50,6 @@ task :dist do
       log
     }
   end.map(&:value).map(&method(:puts))
-end
-
-desc 'Rebuild grammar.rb for opal parser'
-task :racc do
-  debug_option = '--debug' if ENV['RACC_DEBUG']
-  sh "racc #{debug_option} -l -o lib/opal/parser/grammar.rb lib/opal/parser/grammar.y"
 end
 
 desc 'Remove any generated file.'

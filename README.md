@@ -1,25 +1,27 @@
 # Opal
 
-[![Build Status (Linux)](http://img.shields.io/travis/opal/opal/master.svg?style=flat)](http://travis-ci.org/opal/opal)
-[![Build Status (Windows)](https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true)](https://ci.appveyor.com/project/elia/opal/branch/master)
-[![Gem Version](http://img.shields.io/gem/v/opal.svg?style=flat)](http://badge.fury.io/rb/opal)
-[![Code Climate](http://img.shields.io/codeclimate/github/opal/opal.svg?style=flat)](https://codeclimate.com/github/opal/opal)
+[![Gem Version](https://img.shields.io/gem/v/opal.svg?style=flat)](https://badge.fury.io/rb/opal)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability-percentage/opal/opal.svg)](https://codeclimate.com/github/opal/opal)
 [![Coverage Status](https://coveralls.io/repos/opal/opal/badge.svg?branch=master&service=github)](https://coveralls.io/github/opal/opal?branch=elia%2Fcoveralls)
+[![Build Status (Linux)](https://img.shields.io/travis/opal/opal/master.svg?style=flat)](https://travis-ci.org/opal/opal)
+[![Build Status (Windows)](https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true)](https://ci.appveyor.com/project/elia/opal/branch/master)
 
 
 Opal is a Ruby to JavaScript source-to-source compiler. It also has an
 implementation of the Ruby corelib.
 
-Opal is [hosted on GitHub](http://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) (also available as IRC at `irc.gitter.im`) and the Freenode IRC channel at [#opal](http://webchat.freenode.net/?channels=opal).
-Ask questions on [stackoverflow (tag #opalrb)](http://stackoverflow.com/questions/ask?tags=opalrb). Get the [Opalist newsletter](http://opalist.co) for updates and community news.
+Opal is [hosted on GitHub](https://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) (also available as IRC at `irc.gitter.im`).
+Ask questions on [stackoverflow (tag #opalrb)](https://stackoverflow.com/questions/ask?tags=opalrb). Get the [Opalist newsletter](http://opalist.co) for updates and community news.
 
-[![Inline docs](http://inch-ci.org/github/opal/opal.svg?branch=master&style=flat)](http://opalrb.com/docs)
+[![Stack Overflow](https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat)](https://stackoverflow.com/questions/ask?tags=opalrb)
+[![Backers on Open Collective](https://opencollective.com/opal/backers/badge.svg)](#backers) 
+[![Sponsors on Open Collective](https://opencollective.com/opal/sponsors/badge.svg)](#sponsors) 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/opal/opal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Stack Overflow](http://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat)](http://stackoverflow.com/questions/ask?tags=opalrb)
+[![Documentation](https://img.shields.io/badge/docs-updated-blue.svg)](https://opalrb.com/docs)
 
 ## Usage
 
-See the website for more detailed instructions and guides for Rails, jQuery, Sinatra, rack, CDN, etc. [http://opalrb.com](http://opalrb.com).
+See the website for more detailed instructions and guides for Rails, jQuery, Sinatra, rack, CDN, etc. [https://opalrb.com](https://opalrb.com).
 
 ### Compiling Ruby code with the CLI (Command Line Interface)
 
@@ -102,9 +104,8 @@ your web applications.
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="http://cdn.opalrb.com/opal/current/opal.js"></script>
-    <script src="http://cdn.opalrb.com/opal/current/opal-parser.js"></script>
-    <script type="text/javascript">Opal.load('opal-parser')</script>
+    <script src="https://cdn.opalrb.com/opal/current/opal.js" onload="Opal.load('opal')"></script>
+    <script src="https://cdn.opalrb.com/opal/current/opal-parser.js" onload="Opal.load('opal-parser')"></script>
 
     <script type="text/ruby">
       puts "hi"
@@ -204,13 +205,41 @@ version of a browser is 24.x, we support the 24.x and 23.x versions.
 as the last 2 versions of Opera. For example, if the current Opera version is 20.x,
 then we support Opera 12.1x, 19.x and 20.x but not Opera 15.x through 18.x.
 
-Cross-browser testing is sponsored by [SauceLabs](http://saucelabs.com).
+Cross-browser testing is sponsored by [SauceLabs](https://saucelabs.com).
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [![contributors](https://opencollective.com/opal/contributors.svg?width=890&button=false")](https://github.com/opal/opal/graphs/contributors)
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/opal#backer)]
+
+<a href="https://opencollective.com/opal#backers" target="_blank"><img src="https://opencollective.com/opal/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/opal#sponsor)]
+
+<a href="https://opencollective.com/opal/sponsor/0/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/1/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/2/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/3/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/4/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/5/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/6/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/7/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/8/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/9/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/9/avatar.svg"></a>
+
 
 ## License
 
 (The MIT License)
 
-Copyright (C) 2013-2015 by Adam Beynon
+Copyright (C) 2013-2019 by Adam Beynon and the Opal contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

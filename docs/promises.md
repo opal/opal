@@ -38,7 +38,7 @@ A promise can only be resolved or rejected once.
 
 ### Chaining Promises
 
-Promises become useful when chained together. The prevous example could be extended to get another object from the result of the first request.
+Promises become useful when chained together. The previous example could be extended to get another object from the result of the first request.
 
 ```ruby
 get_json('/users/1.json').then do |json|

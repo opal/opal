@@ -16,7 +16,7 @@
 }
 
 class IO
-  @__fs__ = node_require :fs
+  @__fs__ = `require('fs')`
   `var __fs__ = #{@__fs__}`
 
   attr_reader :eof

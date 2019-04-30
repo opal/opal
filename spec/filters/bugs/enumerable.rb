@@ -22,9 +22,12 @@ opal_filter "Enumerable" do
   fails "Enumerable#minmax_by returns the object for whom the value returned by block is the largest"
   fails "Enumerable#minmax_by returns the object that appears first in #each in case of a tie"
   fails "Enumerable#minmax_by uses min/max.<=>(current) to determine order"
+  fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # Works, but depends on the difference between Integer and Float
   fails "Enumerable#reverse_each gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#slice_when when an iterator method yields more than one value processes all yielded values"
   fails "Enumerable#slice_when when given a block doesn't yield an empty array on a small enumerable" # Expected [] to equal [[42]]
+  fails "Enumerable#sort_by calls #each to iterate over the elements to be sorted" # Mock '#<EnumerableSpecs::Numerous:0x64116>' expected to receive each("any_args") exactly 1 times but received it 0 times
+  fails "Enumerable#sort_by calls #each to iterate over the elements to be sorted" # NoMethodError: undefined method `sort!' for nil
   fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable"
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
   fails "Enumerable#to_h calls #to_ary on contents"
@@ -34,10 +37,9 @@ opal_filter "Enumerable" do
   fails "Enumerable#to_h raises ArgumentError if an element is not a [key, value] pair"
   fails "Enumerable#to_h raises TypeError if an element is not an array"
   fails "Enumerable#to_h uses the last value of a duplicated key"
+  fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting
+  fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
   fails "Enumerable#zip converts arguments to enums using #to_enum"
   fails "Enumerable#zip gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
-  fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # Works, but depends on the difference between Integer and Float
-  fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting
-  fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
 end

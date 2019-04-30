@@ -18,6 +18,7 @@ RSpec.describe Opal::Rewriters::ForRewriter do
       s(:iter,
         s(:args, s(:arg, :$for_tmp1)),
         s(:begin,
+          s(:initialize_iter_arg, :$for_tmp1),
           s(:lvasgn, :i, s(:js_tmp, :$for_tmp1)),
           ast_of('a = 1'),
           ast_of('b = 2')
@@ -38,6 +39,7 @@ RSpec.describe Opal::Rewriters::ForRewriter do
       s(:iter,
         s(:args, s(:arg, :$for_tmp1)),
         s(:begin,
+          s(:initialize_iter_arg, :$for_tmp1),
           s(:masgn, s(:mlhs, s(:lvasgn, :i), s(:lvasgn, :j)), s(:js_tmp, :$for_tmp1)),
           ast_of('a = 1'),
           ast_of('b, c = 2, 3')

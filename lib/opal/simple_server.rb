@@ -15,6 +15,8 @@ class Opal::SimpleServer
   require 'set'
   require 'erb'
 
+  NotFound = Class.new(StandardError)
+
   def initialize(options = {})
     @prefix = options.fetch(:prefix, 'assets')
     @main = options.fetch(:main, 'application')
@@ -28,38 +30,27 @@ class Opal::SimpleServer
   # @deprecated
   # It's here for compatibility with Opal::Sprockets::Server
   def append_path(path)
-    Opal.deprecation 'Please use `Opal.append_path(path)` instead.'
+    Opal.deprecation "`#{self.class}#append_path` is deprecated, please use `Opal.append_path(path)` instead (called from: #{caller(1, 1).first})"
     Opal.append_path path
   end
 
   def call(env)
     case env['PATH_INFO']
-    when %r{\A/#{@prefix}/(.*)\.map\z}
+    when %r{\A/#{@prefix}/(.*)\.js\z}
       path, _cache_invalidator = Regexp.last_match(1).split('?', 2)
-      call_map(path)
-    when %r{\A/#{@prefix}/(.*)\z}
-      path, _cache_invalidator = Regexp.last_match(1).split('?', 2)
-      call_asset(path)
+      call_js(path)
     else call_index
     end
+  rescue NotFound => error
+    [404, {}, [error.to_s]]
   end
 
-  def call_asset(path)
+  def call_js(path)
     asset = fetch_asset(path)
     [
       200,
-      { 'Content-Type' => 'application/javascript',
-        'X-SourceMap' => "/#{@prefix}/#{path}.map#{cache_invalidator}}" },
-      [asset[:data]]
-    ]
-  end
-
-  def call_map(path)
-    asset = fetch_asset(path)
-    [
-      200,
-      { 'Content-Type' => 'application/json' },
-      [asset[:map]]
+      { 'Content-Type' => 'application/javascript' },
+      [asset[:data], "\n", asset[:map].to_data_uri_comment],
     ]
   end
 
@@ -68,7 +59,8 @@ class Opal::SimpleServer
     builder.build(path.gsub(/(\.(?:rb|js|opal))*\z/, ''))
     {
       data: builder.to_s,
-      map: builder.source_map.to_json
+      map: builder.source_map,
+      source: builder.source_for(path),
     }
   end
 

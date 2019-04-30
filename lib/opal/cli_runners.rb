@@ -47,8 +47,9 @@ module Opal
       map_file = options[:map_file]
       output   = data.fetch(:output)
 
-      output.puts builder.to_s
-      File.write(map_file, builder.source_map) if map_file
+      compiled_source = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
+      output.puts compiled_source
+      File.write(map_file, builder.source_map.to_json) if map_file
 
       0
     }
@@ -59,7 +60,9 @@ module Opal
       runner = ->(data) {
         klass = const_get(klass_name)
         runner = klass.new((data[:options] || {}).merge(output: data[:output]))
-        runner.run(data[:builder].to_s, data[:argv])
+        builder = data[:builder]
+        compiled_source = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
+        runner.run(compiled_source, data[:argv])
         runner.exit_status
       }
       names.each { |name| self[name] = runner }

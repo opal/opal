@@ -31,7 +31,7 @@ module Opal
     # The processed source
     #
     # ## `#source_map`
-    # An instance of `::SourceMap::Map` representing the processd asset's source
+    # An instance of `::Opal::SourceMap::File` representing the processd asset's source
     # map.
     #
     # ## `.new(source, filename, compiler_options)`
@@ -79,8 +79,12 @@ module Opal
     end
 
     def build(path, options = {})
-      source = read(path)
-      build_str(source, path, options)
+      build_str(source_for(path), path, options)
+    end
+
+    # Retrieve the source for a given path the same way #build would do.
+    def source_for(path)
+      read(path)
     end
 
     def build_str(source, rel_path, options = {})
@@ -117,7 +121,7 @@ module Opal
     end
 
     def source_map
-      processed.map(&:source_map).reduce(:+).as_json.to_json
+      ::Opal::SourceMap::Index.new(processed.map(&:source_map), join: "\n")
     end
 
     def append_paths(*paths)

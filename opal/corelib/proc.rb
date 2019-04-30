@@ -1,6 +1,6 @@
 class Proc < `Function`
-  `Opal.defineProperty(Function.prototype, '$$is_proc', true)`
-  `Opal.defineProperty(Function.prototype, '$$is_lambda', false)`
+  `Opal.defineProperty(self.$$prototype, '$$is_proc', true)`
+  `Opal.defineProperty(self.$$prototype, '$$is_lambda', false)`
 
   def self.new(&block)
     unless block

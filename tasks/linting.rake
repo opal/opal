@@ -1,5 +1,4 @@
-require 'rubocop/rake_task'
-
+import 'tasks/building.rake'
 desc "Build *corelib* and *stdlib* and lint the result"
 task :jshint do
   dir = 'tmp/lint'
@@ -7,7 +6,8 @@ task :jshint do
   puts "= Checking distributed files..."
   unless ENV['SKIP_BUILD']
     rm_rf dir if File.exist? dir
-    sh "bundle exec rake dist DIR=#{dir}"
+    ENV['DIR'] = dir
+    Rake::Task[:dist].invoke
   end
 
   Dir["#{dir}/*.js"].each {|path|
@@ -21,7 +21,8 @@ task :jshint do
   js_paths = []
   Dir['opal/{opal,corelib}/*.rb'].each do |path|
     js_path = "#{dir}/#{path.tr('/', '-')}.js"
-    sh "bundle exec opal -Dignore -cEO #{path} > #{js_path}"
+    Bundler::SharedHelpers.set_bundle_environment
+    File.write js_path, Opal.compile(File.read(path), file: path, dynamic_require_severity: :ignore)
     js_paths << js_path
   end
   js_paths.each do |js_path|
@@ -30,8 +31,14 @@ task :jshint do
   sh "jshint --verbose opal/corelib/runtime.js"
 end
 
+require 'rubocop/rake_task'
 desc 'Run RuboCop on lib/, opal/ and stdlib/ directories'
 RuboCop::RakeTask.new(:rubocop) do |task|
   # TODO: enable it back after releasing https://github.com/bbatsov/rubocop/pull/5633
   # task.options << '--fail-fast'
+  task.options << '--extra-details'
+  task.options << '--display-style-guide'
+  task.options << '--parallel'
 end
+
+task :lint => [:jshint, :rubocop]

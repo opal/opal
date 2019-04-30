@@ -1,5 +1,4 @@
 opal_filter "Module" do
-  fails "Module#alias_method can call a method with super aliased twice"
   fails "Module#alias_method creates methods that are == to eachother" # Expected #<Method: #<Class:0x3ee54>#uno (defined in #<Class:0x3ee54> in ruby/core/module/fixtures/classes.rb:203)> to equal #<Method: #<Class:0x3ee54>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:203)>
   fails "Module#alias_method raises a TypeError when the given name can't be converted using to_str"
   fails "Module#alias_method retains method visibility"
@@ -73,6 +72,10 @@ opal_filter "Module" do
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is default"
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is true"
   fails "Module#const_defined? returns true when passed a scoped constant name"
+  fails "Module#const_get does autoload a constant with a toplevel scope qualifier" # NameError: uninitialized constant CSAutoloadB
+  fails "Module#const_get does autoload a constant" # NameError: uninitialized constant CSAutoloadA
+  fails "Module#const_get does autoload a module and resolve a constant within" # NameError: uninitialized constant CSAutoloadC
+  fails "Module#const_get does autoload a non-toplevel module" # LoadError: cannot load such file -- ruby/core/module/fixtures/constants_autoload_d
   fails "Module#constants doesn't returns inherited constants when passed nil"
   fails "Module#constants returns only public constants"
   fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class"
@@ -85,10 +88,9 @@ opal_filter "Module" do
   fails "Module#deprecate_constant when accessing the deprecated module passes the accessing"
   fails "Module#deprecate_constant when accessing the deprecated module warns with a message"
   fails "Module#extend_object extends the given object with its constants and methods by default"
-  fails "Module#extend_object is called when #extend is called on an object"
   fails "Module#extend_object on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0x4fbac> was returned)
-  fails "Module#include doesn't include module if it is included in a super class"
+  fails "Module#initialize_copy should produce a duped module with inspectable class methods" # NameError: undefined method `hello' for class `Module'
   fails "Module#initialize_copy should retain singleton methods when duped" # Expected [] to equal ["hello"]
   fails "Module#instance_method raises a NameError if the method has been undefined"
   fails "Module#instance_method raises a TypeError if not passed a symbol"
@@ -116,8 +118,11 @@ opal_filter "Module" do
   fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
   fails "Module#prepend keeps the module in the chain when dupping the class"
   fails "Module#refine adds methods defined in its block to the anonymous module's public instance methods" # NoMethodError: undefined method `refine' for #<Module:0x3ae64>
+  fails "Module#refine and alias aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab4>
+  fails "Module#refine and alias_method aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab0>
   fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae7a>
   fails "Module#refine does not apply refinements to external scopes not using the module" # NoMethodError: undefined method `refine' for #<Module:0x3ae60>
+  fails "Module#refine does not list methods defined only in refinement" # NoMethodError: undefined method `refine' for #<Module:0x1e042>
   fails "Module#refine does not make available methods from another refinement module" # NoMethodError: undefined method `refine' for #<Module:0x3ae8c>
   fails "Module#refine does not override methods in subclasses" # NoMethodError: undefined method `refine' for #<Module:0x3ae56>
   fails "Module#refine doesn't apply refinements outside the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae72>
@@ -126,7 +131,9 @@ opal_filter "Module" do
   fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # NoMethodError: undefined method `refine' for #<Module:0x3aeae>
   fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # NoMethodError: undefined method `refine' for #<Module:0x3aeba>
   fails "Module#refine for methods accessed indirectly is honored by string interpolation" # NoMethodError: undefined method `refine' for #<Module:0x3aeb6>
+  fails "Module#refine for methods accessed indirectly is not honored by &" # NoMethodError: undefined method `refine' for #<Module:0x21e9c>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#method" # NoMethodError: undefined method `refine' for #<Module:0x3aec0>
+  fails "Module#refine for methods accessed indirectly is not honored by Kernel#public_send" # NoMethodError: undefined method `refine' for #<Module:0x21ea0>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#respond_to?" # NoMethodError: undefined method `refine' for #<Module:0x3aea6>
   fails "Module#refine makes available all refinements from the same module" # NoMethodError: undefined method `refine' for #<Module:0x3ae88>
   fails "Module#refine method lookup looks in included modules from the refinement then" # NoMethodError: undefined method `refine' for #<Module:0x3aea0>
@@ -145,8 +152,6 @@ opal_filter "Module" do
   fails "Module#refine when super is called in a refinement looks in the included to refinery module" # NoMethodError: undefined method `refine' for #<Module:0x3aec8>
   fails "Module#refine when super is called in a refinement looks in the refined class even if there is another active refinement" # NoMethodError: undefined method `refine' for #<Module:0x3aec4>
   fails "Module#refine when super is called in a refinement looks in the refined class" # NoMethodError: undefined method `refine' for #<Module:0x3aecc>
-  fails "Module#remove_class_variable removes class variable" # Exception: Cannot set property '@@mvar' of undefined
-  fails "Module#remove_class_variable returns the value of removing class variable" # Exception: Cannot set property '@@mvar' of undefined
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#remove_const returns nil when removing autoloaded constant"
@@ -166,6 +171,5 @@ opal_filter "Module" do
   fails "Module#using scope of refinement is not active when class/module reopens" # NoMethodError: undefined method `refine' for #<Module:0x2a056>
   fails "Module#using works in classes too" # NoMethodError: undefined method `refine' for #<Module:0x2a01c>
   fails "Module.constants returns an array of Symbol names" # requires Bignum
-  fails "Module.new creates a new Module and passes it to the provided block"
   fails "Module::Nesting returns the list of Modules nested at the point of call"
 end

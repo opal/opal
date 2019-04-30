@@ -9,6 +9,9 @@ require 'opal/rewriters/dot_js_syntax'
 require 'opal/rewriters/logical_operator_assignment'
 require 'opal/rewriters/binary_operator_assignment'
 require 'opal/rewriters/hashes/key_duplicates_rewriter'
+require 'opal/rewriters/dump_args'
+require 'opal/rewriters/mlhs_args'
+require 'opal/rewriters/inline_args'
 
 module Opal
   class Rewriter
@@ -46,6 +49,9 @@ module Opal
     use Rewriters::BinaryOperatorAssignment
     use Rewriters::ExplicitWriterReturn
     use Rewriters::Hashes::KeyDuplicatesRewriter
+    use Rewriters::DumpArgs
+    use Rewriters::MlhsArgs
+    use Rewriters::InlineArgs
 
     def initialize(sexp)
       @sexp = sexp

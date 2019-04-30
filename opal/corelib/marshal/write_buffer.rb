@@ -182,9 +182,17 @@ module Marshal
   class WriteBuffer
     attr_reader :buffer
 
+    %x{
+      function binaryString(s) {
+        s = new String(s);
+        s.encoding = #{Encoding::BINARY};
+        return s;
+      }
+    }
+
     def initialize(object)
       @object = object
-      @buffer = BinaryString.new
+      @buffer = ''
       @cache = []
       @extends = Hash.new { |h, k| h[k] = [] }
       append(version)
@@ -212,7 +220,7 @@ module Marshal
         end
       end
 
-      @buffer
+      `binaryString(#{@buffer})`
     end
 
     def write_fixnum(n)
@@ -398,7 +406,7 @@ module Marshal
     end
 
     def append(s)
-      @buffer += s
+      `#{@buffer} += #{s}`
     end
 
     def version

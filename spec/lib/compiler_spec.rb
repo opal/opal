@@ -65,12 +65,6 @@ RSpec.describe Opal::Compiler do
     expect_compiled("undef a,b").to match(/Opal.udef\(self, '\$' \+ "a"\);.*Opal.udef\(self, '\$' \+ "b"\);/m)
   end
 
-  describe "class names" do
-    it "generates a named function for class using $ prefix" do
-      expect_compiled("class Foo; end").to include("function $Foo")
-    end
-  end
-
   describe "method names" do
     it "generates a named function for method" do
       expect_compiled("def test_method; end").to include("function $$test_method()")
@@ -557,15 +551,39 @@ RSpec.describe Opal::Compiler do
   end
 
   describe 'a compilation error' do
-    it 'adds the file and line to the backtrace' do
-      error = nil
-      begin
-        compiled('foo.JS[:bar] += :baz', file: 'foobar.js.rb')
-      rescue Opal::SyntaxError => syntax_error
-        error = syntax_error
+    context 'at compile time' do
+      it 'adds the file and line to the backtrace' do
+        error = nil
+        begin
+          compiled('BEGIN {}', file: 'foobar.js.rb')
+        rescue Opal::SyntaxError => syntax_error
+          error = syntax_error
+        end
+
+        expect(error.backtrace[0]).to eq("foobar.js.rb:in `BEGIN {}'")
+        expect(compiler_backtrace(error)[0]).to end_with(":in `error'")
+        expect(compiler_backtrace(error)[-3]).to end_with(":in `block in compile'")
+        expect(compiler_backtrace(error)[-1]).to end_with(":in `compile'")
+        expect(error.backtrace.size).to be > 1
       end
-      expect(error.backtrace[0]).to eq("foobar.js.rb:1:in `foo.JS[:bar] += :baz'")
-      expect(error.backtrace.size).to be > 1
+    end
+
+    context 'at parse time' do
+      it 'adds the file and line to the backtrace' do
+        error = nil
+        begin
+          parsed('def foo', file: 'foobar.js.rb')
+        rescue Opal::SyntaxError => syntax_error
+          error = syntax_error
+        end
+        expect(error.backtrace[0]).to eq("foobar.js.rb:1:in `def foo'")
+        expect(compiler_backtrace(error)[0]).to end_with(":in `block in parse'")
+        expect(error.backtrace.size).to be > 1
+      end
+    end
+
+    def compiler_backtrace(error)
+      error.backtrace.grep(%r{lib/opal/compiler\.rb})
     end
   end
 
@@ -597,6 +615,10 @@ RSpec.describe Opal::Compiler do
 
   def compiled(*args)
     Opal::Compiler.new(*args).compile
+  end
+
+  def parsed(*args)
+    Opal::Compiler.new(*args).parse
   end
 
   alias compile compiled

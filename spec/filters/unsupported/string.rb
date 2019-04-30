@@ -128,7 +128,20 @@ opal_unsupported_filter "String" do
   fails "String#[]= with a Regexp index with 3 arguments when the optional capture does not match raises an IndexError before setting the replacement"
   fails "String#capitalize is locale insensitive (only upcases a-z and only downcases A-Z)"
   fails "String#capitalize taints resulting string when self is tainted"
+  fails "String#capitalize! capitalizes self in place for all of Unicode" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! capitalizes self in place"
+  fails "String#capitalize! does not allow invalid options" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! does not allow the :fold option for upcasing" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! full Unicode case mapping only capitalizes the first resulting character when upcasing a character produces a multi-character sequence" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! full Unicode case mapping updates string metadata" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for ASCII-only case mapping does not capitalize non-ASCII characters" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Lithuanian does not allow any other additional option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Turkic languages capitalizes ASCII characters according to Turkic semantics" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! raises a RuntimeError when self is frozen"
   fails "String#capitalize! returns nil when no changes are made"
   fails "String#center with length, padding taints result when self or padstr is tainted"
@@ -144,6 +157,10 @@ opal_unsupported_filter "String" do
   fails "String#chomp when passed no argument taints the result if self is tainted"
   fails "String#chomp! raises a RuntimeError on a frozen instance when it is modified"
   fails "String#chomp! raises a RuntimeError on a frozen instance when it would not be modified"
+  fails "String#chomp! removes the final carriage return, newline from a multibyte String" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
+  fails "String#chomp! removes the final carriage return, newline from a non-ASCII String when the record separator is changed" # ArgumentError: unknown encoding name - utf-32be
+  fails "String#chomp! removes the final carriage return, newline from a non-ASCII String" # ArgumentError: unknown encoding name - utf-32be
+  fails "String#chomp! returns nil when the String is not modified" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
   fails "String#chomp! when passed '' does not remove a final carriage return"
   fails "String#chomp! when passed '' removes a final carriage return, newline"
   fails "String#chomp! when passed '' removes a final newline"
@@ -180,21 +197,33 @@ opal_unsupported_filter "String" do
   fails "String#chop! does not remove more than the final carriage return, newline"
   fails "String#chop! raises a RuntimeError on a frozen instance that is modified"
   fails "String#chop! raises a RuntimeError on a frozen instance that would not be modified"
+  fails "String#chop! removes a multi-byte character" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
   fails "String#chop! removes the carrige return, newline if they are the only characters"
   fails "String#chop! removes the final carriage return"
+  fails "String#chop! removes the final carriage return, newline from a multibyte String" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
+  fails "String#chop! removes the final carriage return, newline from a non-ASCII String" # ArgumentError: unknown encoding name - utf-32be
   fails "String#chop! removes the final carriage return, newline"
   fails "String#chop! removes the final character"
   fails "String#chop! removes the final newline"
   fails "String#chop! returns nil when called on an empty string"
   fails "String#chop! returns self if modifications were made"
+  fails "String#clear preserves its encoding" # NameError: uninitialized constant Encoding::SHIFT_JIS
+  fails "String#clear raises a RuntimeError if self is frozen" # NoMethodError: undefined method `clear' for "Jolene":String
+  fails "String#clear returns self after emptying it" # NoMethodError: undefined method `clear' for "Jolene":String
+  fails "String#clear sets self equal to the empty String" # NoMethodError: undefined method `clear' for "Jolene":String
+  fails "String#clear works with multibyte Strings" # NoMethodError: undefined method `clear' for "靥ࡶ":String
+  fails "String#clone copies instance variables" # Strings are immutable, so they can't have ivars
   fails "String#clone does not modify the original string when changing cloned string" # string can't be modified
   fails "String#concat concatenates the given argument to self and returns self"
+  fails "String#concat concatenates the initial value when given arguments contain 2 self"
   fails "String#concat converts the given argument to a String using to_str"
   fails "String#concat raises a RuntimeError when self is frozen"
   fails "String#concat raises a TypeError if the given argument can't be converted to a String"
   fails "String#concat returns a String when given a subclass instance"
   fails "String#concat returns an instance of same class when called on a subclass"
+  fails "String#concat returns self when given no arguments"
   fails "String#concat taints self if other is tainted"
+  fails "String#concat takes multiple arguments"
   fails "String#concat untrusts self if other is untrusted"
   fails "String#concat when self and the argument are in different ASCII-compatible encodings raises Encoding::CompatibilityError if neither are ASCII-only"
   fails "String#concat when self and the argument are in different ASCII-compatible encodings uses self's encoding if both are ASCII-only"
@@ -220,17 +249,130 @@ opal_unsupported_filter "String" do
   fails "String#delete! modifies self in place and returns self"
   fails "String#delete! raises a RuntimeError when self is frozen"
   fails "String#delete! returns nil if no modifications were made"
+  fails "String#delete_prefix returns a copy of the string, when the prefix isn't found" # Fails because "string".equal?("string") is always true
+  fails "String#delete_prefix! calls to_str on its argument"
+  fails "String#delete_prefix! doesn't set $~"
+  fails "String#delete_prefix! removes the found prefix"
+  fails "String#delete_prefix! returns nil if no change is made"
+  fails "String#delete_suffix returns a copy of the string, when the suffix isn't found" # Fails because "string".equal?("string") is always true
+  fails "String#delete_suffix! calls to_str on its argument"
+  fails "String#delete_suffix! doesn't set $~"
+  fails "String#delete_suffix! removes the found prefix"
+  fails "String#delete_suffix! returns nil if no change is made"
   fails "String#downcase is locale insensitive (only replaces A-Z)"
   fails "String#downcase taints result when self is tainted"
+  fails "String#downcase! ASCII-only case mapping does not downcase non-ASCII characters" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! case folding case folds special characters" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! does not allow invalid options" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! full Unicode case mapping adapted for Lithuanian does not allow any other additional option" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! full Unicode case mapping adapted for Turkic languages downcases characters according to Turkic semantics" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! full Unicode case mapping updates string metadata" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! modifies self in place for all of Unicode" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! modifies self in place"
   fails "String#downcase! raises a RuntimeError when self is frozen"
   fails "String#downcase! returns nil if no modifications were made"
+  fails "String#downcase! sets the result String encoding to the source String encoding" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "String#dump untrusts the result if self is untrusted"
+  fails "String#dup copies instance variables" # Strings are immutable, so they can't have ivars
+  fails "String#dup does not copy singleton methods" # TypeError: can't define singleton
   fails "String#dup does not modify the original string when changing dupped string"
   fails "String#each_char is unicode aware"
   fails "String#each_line does not care if the string is modified while substituting"
   fails "String#each_line raises a TypeError when the separator is a symbol"
   fails "String#each_line taints substrings that are passed to the block if self is tainted"
+  fails "String#encode! given the xml: :attr option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :attr option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :attr option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :attr option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :attr option replaces all instances of '>' with '&gt;'" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :attr option replaces all instances of '>' with '&gt;'" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :attr option replaces all instances of '\"' with '&quot;'" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :attr option replaces all instances of '\"' with '&quot;'" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :attr option replaces undefined characters with their upper-case hexadecimal numeric character references" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :attr option replaces undefined characters with their upper-case hexadecimal numeric character references" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :attr option surrounds the encoded text with double-quotes" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :attr option surrounds the encoded text with double-quotes" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :text option does not replace '\"'" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :text option does not replace '\"'" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :text option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :text option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :text option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :text option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :text option replaces all instances of '>' with '&gt;'" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :text option replaces all instances of '>' with '&gt;'" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! given the xml: :text option replaces undefined characters with their upper-case hexadecimal numeric character references" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! given the xml: :text option replaces undefined characters with their upper-case hexadecimal numeric character references" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! raises ArgumentError if the value of the :xml option is not :text or :attr" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! raises ArgumentError if the value of the :xml option is not :text or :attr" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! raises a RuntimeError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! raises a RuntimeError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! raises a RuntimeError when called on a frozen String" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! raises a RuntimeError when called on a frozen String" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed no options raises an Encoding::ConverterNotFoundError when no conversion is possible" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed no options raises an Encoding::ConverterNotFoundError when no conversion is possible" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed no options returns self for a ASCII-only String when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed no options returns self for a ASCII-only String when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed no options returns self when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed no options returns self when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed no options transcodes a 7-bit String despite no generic converting being available" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed no options transcodes a 7-bit String despite no generic converting being available" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed no options transcodes to Encoding.default_internal when set" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed no options transcodes to Encoding.default_internal when set" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed options calls #to_hash to convert the object" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed options calls #to_hash to convert the object" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed options does not process transcoding options if not transcoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed options does not process transcoding options if not transcoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed options raises an Encoding::ConverterNotFoundError when no conversion is possible despite 'invalid: :replace, undef: :replace'" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed options raises an Encoding::ConverterNotFoundError when no conversion is possible despite 'invalid: :replace, undef: :replace'" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed options replaces invalid characters when replacing Emacs-Mule encoded strings" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed options replaces invalid characters when replacing Emacs-Mule encoded strings" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed options returns self for ASCII-only String when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed options returns self for ASCII-only String when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed options transcodes to Encoding.default_internal when set" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed options transcodes to Encoding.default_internal when set" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to encoding accepts a String argument" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to encoding accepts a String argument" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to encoding calls #to_str to convert the object to an Encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to encoding calls #to_str to convert the object to an Encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to encoding raises an Encoding::ConverterNotFoundError for an invalid encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to encoding raises an Encoding::ConverterNotFoundError for an invalid encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to encoding raises an Encoding::ConverterNotFoundError when no conversion is possible" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to encoding raises an Encoding::ConverterNotFoundError when no conversion is possible" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to encoding returns self" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to encoding returns self" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to encoding transcodes Japanese multibyte characters" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to encoding transcodes Japanese multibyte characters" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to encoding transcodes a 7-bit String despite no generic converting being available" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to encoding transcodes a 7-bit String despite no generic converting being available" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to encoding transcodes to the passed encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to encoding transcodes to the passed encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, from calls #to_str to convert the from object to an Encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, from calls #to_str to convert the from object to an Encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, from returns self" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, from returns self" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, from transcodes between the encodings ignoring the String encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, from transcodes between the encodings ignoring the String encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, from, options calls #to_hash to convert the options object" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, from, options calls #to_hash to convert the options object" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, from, options calls #to_str to convert the from object to an encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, from, options calls #to_str to convert the from object to an encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, from, options calls #to_str to convert the to object to an encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, from, options calls #to_str to convert the to object to an encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, from, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, from, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, from, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, from, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, options calls #to_hash to convert the options object" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, options calls #to_hash to convert the options object" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! when passed to, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode! when passed to, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#eql? considers encoding compatibility"
   fails "String#eql? considers encoding difference of incompatible string"
   fails "String#eql? ignores encoding difference of compatible string"
@@ -325,9 +467,13 @@ opal_unsupported_filter "String" do
   fails "String#next! raises a RuntimeError if self is frozen"
   fails "String#prepend converts the given argument to a String using to_str"
   fails "String#prepend prepends the given argument to self and returns self"
+  fails "String#prepend prepends the initial value when given arguments contain 2 self"
   fails "String#prepend raises a RuntimeError when self if frozen"
+  fails "String#prepend raises a RuntimeError when self is frozen" # NoMethodError: undefined method `prepend' for "hello":String
   fails "String#prepend raises a TypeError if the given argument can't be converted to a String"
+  fails "String#prepend returns self when given no arguments"
   fails "String#prepend taints self if other is tainted"
+  fails "String#prepend takes multiple arguments"
   fails "String#prepend works when given a subclass instance"
   fails "String#replace carries over the encoding invalidity"
   fails "String#replace does not trust self if other is trusted"
@@ -344,6 +490,7 @@ opal_unsupported_filter "String" do
   fails "String#reverse taints the result if self is tainted"
   fails "String#reverse! raises a RuntimeError on a frozen instance that is modified"
   fails "String#reverse! raises a RuntimeError on a frozen instance that would not be modified"
+  fails "String#reverse! reverses a string with multi byte characters" # NotImplementedError: String#reverse! not supported. Mutable String methods are not supported in Opal.
   fails "String#reverse! reverses self in place and always returns self"
   fails "String#rindex with Regexp supports \\G which matches at the given start offset"
   fails "String#rjust with length, padding taints result when self or padstr is tainted"
@@ -389,6 +536,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! Range raises a RuntimeError on a frozen instance that would not be modified"
   fails "String#slice! Range returns nil if the given range is out of self"
   fails "String#slice! Range returns subclass instances"
+  fails "String#slice! Range returns the substring given by the character offsets of the range" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! Range works with Range subclasses"
   fails "String#slice! with Regexp always taints resulting strings when self or regexp is tainted"
   fails "String#slice! with Regexp deletes and returns the first match from self"
@@ -397,6 +545,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! with Regexp raises a RuntimeError on a frozen instance that would not be modified"
   fails "String#slice! with Regexp returns nil if there was no match"
   fails "String#slice! with Regexp returns subclass instances"
+  fails "String#slice! with Regexp returns the matching portion of self with a multi byte character" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with Regexp sets $~ to MatchData when there is a match and nil when there's none"
   fails "String#slice! with Regexp, index accepts a Float for capture index"
   fails "String#slice! with Regexp, index always taints resulting strings when self or regexp is tainted"
@@ -407,6 +556,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! with Regexp, index returns nil if there is no capture for idx"
   fails "String#slice! with Regexp, index returns nil if there was no match"
   fails "String#slice! with Regexp, index returns subclass instances"
+  fails "String#slice! with Regexp, index returns the encoding aware capture for the given index" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with Regexp, index sets $~ to MatchData when there is a match and nil when there's none"
   fails "String#slice! with String doesn't call to_str on its argument"
   fails "String#slice! with String doesn't set $~"
@@ -419,12 +569,15 @@ opal_unsupported_filter "String" do
   fails "String#slice! with index deletes and return the char at the given position"
   fails "String#slice! with index raises a RuntimeError if self is frozen"
   fails "String#slice! with index returns nil if idx is outside of self"
+  fails "String#slice! with index returns the character given by the character index" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with index, length always taints resulting strings when self is tainted"
   fails "String#slice! with index, length calls to_int on idx and length"
   fails "String#slice! with index, length deletes and returns the substring at idx and the given length"
   fails "String#slice! with index, length raises a RuntimeError if self is frozen"
   fails "String#slice! with index, length returns nil if the length is negative"
   fails "String#slice! with index, length returns subclass instances"
+  fails "String#slice! with index, length returns the substring given by the character offsets" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with index, length treats invalid bytes as single bytes" # NoMethodError: undefined method `pack' for [230, 203]:Array
   fails "String#split with Regexp doesn't taints the resulting strings if the Regexp is tainted"
   fails "String#split with Regexp respects the encoding of the regexp when splitting between characters"
   fails "String#split with Regexp retains the encoding of the source string"
@@ -482,6 +635,18 @@ opal_unsupported_filter "String" do
   fails "String#succ! is equivalent to succ, but modifies self in place (still returns self)"
   fails "String#succ! raises a RuntimeError if self is frozen"
   fails "String#swapcase taints resulting string when self is tainted"
+  fails "String#swapcase! does not allow invalid options" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! does not allow the :fold option for upcasing" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! full Unicode case mapping adapted for Lithuanian does not allow any other additional option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! full Unicode case mapping updates string metadata" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for ASCII-only case mapping does not swapcase non-ASCII characters" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for all of Unicode" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for full Unicode case mapping adapted for Turkic languages swaps case of ASCII characters according to Turkic semantics" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place"
   fails "String#swapcase! raises a RuntimeError when self is frozen"
   fails "String#swapcase! returns nil if no modifications were made"
@@ -532,8 +697,27 @@ opal_unsupported_filter "String" do
   fails "String#tr_s! modifies self in place"
   fails "String#tr_s! raises a RuntimeError if self is frozen"
   fails "String#tr_s! returns nil if no modification was made"
+  fails "String#unicode_normalize! modifies original string (nfc)"
+  fails "String#unicode_normalize! modifies self in place (nfd)"
+  fails "String#unicode_normalize! modifies self in place (nfkc)"
+  fails "String#unicode_normalize! modifies self in place (nfkd)"
+  fails "String#unicode_normalize! normalizes code points and modifies the receiving string"
+  fails "String#unicode_normalize! raises an ArgumentError if the specified form is invalid"
+  fails "String#unicode_normalize! raises an Encoding::CompatibilityError if the string is not in an unicode encoding"
   fails "String#upcase is locale insensitive (only replaces a-z)"
   fails "String#upcase taints result when self is tainted"
+  fails "String#upcase! does not allow invalid options" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! does not allow the :fold option for upcasing" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! full Unicode case mapping updates string metadata for self" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for ASCII-only case mapping does not upcase non-ASCII characters" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for all of Unicode" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Lithuanian does not allow any other additional option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Turkic languages upcases ASCII characters according to Turkic semantics" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place"
   fails "String#upcase! raises a RuntimeError when self is frozen"
   fails "String#upcase! returns nil if no modifications were made"
@@ -543,22 +727,4 @@ opal_unsupported_filter "String" do
   fails "String.new returns a binary String"
   fails "String.new returns a fully-formed String"
   fails "String.new returns a new string given a string argument"
-  fails "String#concat concatenates the initial value when given arguments contain 2 self"
-  fails "String#concat returns self when given no arguments"
-  fails "String#concat takes multiple arguments"
-  fails "String#prepend prepends the initial value when given arguments contain 2 self"
-  fails "String#prepend returns self when given no arguments"
-  fails "String#prepend takes multiple arguments"
-  fails "String#delete_prefix! calls to_str on its argument"
-  fails "String#delete_prefix! calls to_str on its argument"
-  fails "String#delete_prefix! doesn't set $~"
-  fails "String#delete_prefix! removes the found prefix"
-  fails "String#delete_prefix! returns nil if no change is made"
-  fails "String#delete_suffix! calls to_str on its argument"
-  fails "String#delete_suffix! calls to_str on its argument"
-  fails "String#delete_suffix! doesn't set $~"
-  fails "String#delete_suffix! removes the found prefix"
-  fails "String#delete_suffix! returns nil if no change is made"
-  fails "String#delete_prefix returns a copy of the string, when the prefix isn't found" # Fails because "string".equal?("string") is always true
-  fails "String#delete_suffix returns a copy of the string, when the suffix isn't found" # Fails because "string".equal?("string") is always true
 end

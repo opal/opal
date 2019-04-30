@@ -49,7 +49,6 @@ class ::Guard::Opal < Plugin
     path = m[0]
     puts color("Searching specs for #{m[0]}...", :yellow)
     case path
-    when %r{grammar\.y$}  then system 'rake racc'
     when %r{^spec/lib}     then rspec path
     when %r{^spec/ruby} then mspec path
     when %r{^opal/corelib}

@@ -23,19 +23,18 @@ opal_filter "Date" do
   fails "Date#mjd determines the Modified Julian day"
   fails "Date#mon determines the month"
   fails "Date#new_start converts a date object into another with a new calendar reform"
-  fails "Date#next_year returns the day of the reform if date falls within calendar reform"
   fails "Date#parse parses a day name into a Date object"
   fails "Date#parse parses a month day into a Date object"
   fails "Date#parse parses a month name into a Date object"
-  fails "Date#prev_year returns the day of the reform if date falls within calendar reform"
+  fails "Date#parse raises a TypeError trying to parse non-String-like object" # ArgumentError: invalid date
   fails "Date#strftime should be able to print the commercial year with leading zeroes"
   fails "Date#strftime should be able to print the commercial year with only two digits"
   fails "Date#strftime should be able to print the julian day with leading zeroes"
   fails "Date#strftime should be able to show a full notation"
   fails "Date#strftime should be able to show the commercial week day"
   fails "Date#strftime should be able to show the commercial week"
-  fails "Date#strftime should be able to show the number of seconds since the unix epoch"
   fails "Date#strftime should be able to show the number of seconds since the unix epoch for a date" # Expected "954964800" to equal "954979200"
+  fails "Date#strftime should be able to show the number of seconds since the unix epoch"
   fails "Date#strftime should be able to show the timezone of the date with a : separator"
   fails "Date#strftime should be able to show the timezone with a : separator"
   fails "Date#strftime should be able to show the week number with the week starting on Sunday (%U) and Monday (%W)"
@@ -75,6 +74,13 @@ opal_filter "Date" do
   fails "Date#valid_date? returns false if it is not a valid civil date"
   fails "Date#valid_date? returns true if it is a valid civil date"
   fails "Date#yday determines the year"
+  fails "Date.iso8601 parses YYYY-MM-DD into a Date object" # NoMethodError: undefined method `iso8601' for Date
+  fails "Date.iso8601 parses YYYYMMDD into a Date object" # NoMethodError: undefined method `iso8601' for Date
+  fails "Date.iso8601 parses a StringSubclass into a Date object" # NoMethodError: undefined method `iso8601' for Date
+  fails "Date.iso8601 parses a Symbol into a Date object" # NoMethodError: undefined method `iso8601' for Date
+  fails "Date.iso8601 parses a negative Date" # NoMethodError: undefined method `iso8601' for Date
+  fails "Date.iso8601 raises a TypeError when passed an Object" # NoMethodError: undefined method `iso8601' for Date
+  fails "Date.iso8601 raises an ArgumentError when passed a Symbol without a valid Date" # NoMethodError: undefined method `iso8601' for Date
   fails "Date.jd constructs a Date object if passed a Julian day"
   fails "Date.jd constructs a Date object if passed a negative number"
   fails "Date.jd returns a Date object representing Julian day 0 (-4712-01-01) if no arguments passed"

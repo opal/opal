@@ -1,25 +1,34 @@
 source 'https://rubygems.org'
 gemspec
 
-tilt_version = ENV['TILT_VERSION']
-rack_version = ENV['RACK_VERSION']
+v = -> version { Gem::Version.new(version) if version }
+
+ruby_version      = v[RUBY_VERSION]
+
+tilt_version      = ENV['TILT_VERSION']
+rack_version      = ENV['RACK_VERSION']
 sprockets_version = ENV['SPROCKETS_VERSION']
 
-# Stick with older racc until
-# https://github.com/tenderlove/racc/issues/22
-# is solved.
-gem 'racc', '< 1.4.10', platform: :jruby
-gem 'json', '< 1.8.1',  platform: :ruby if RUBY_VERSION.to_f == 2.1
-gem 'rack-test', '< 0.8' if RUBY_VERSION.to_f <= 2.0
+gem 'json', '< 1.8.1',  platform: :ruby if ruby_version < v['2.2']
+gem 'rack-test', '< 0.8' if ruby_version <= v['2.0']
 gem 'rubysl', platform: :rbx
 gem 'coveralls', platform: :mri
-gem 'puma' # Some browsers have problems with WEBrick
+
+# Some browsers have problems with WEBrick
+gem 'puma' unless RUBY_ENGINE == 'truffleruby'
+
 gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
 gem 'sprockets', sprockets_version if sprockets_version
 
 group :repl do
-  gem 'therubyracer', platform: :mri, require: false
+  if RUBY_VERSION.to_f >= 2.3
+    gem 'mini_racer', platform: :mri, require: false
+  else
+    gem 'mini_racer', '< 0.2.0', platform: :mri, require: false
+    gem 'libv8', '~> 6.3.0', platform: :mri, require: false
+  end
+
   gem 'therubyrhino', platform: :jruby, require: false
 end
 
@@ -38,9 +47,9 @@ group :development do
 end unless ENV['CI']
 
 group :doc do
-  gem 'redcarpet'
+  gem 'redcarpet' unless RUBY_ENGINE == 'truffleruby'
 end
 
 platforms :ruby, :mswin, :mswin64, :mingw, :x64_mingw do
-  gem 'c_lexer', '2.5.1.0.pre2'
+  gem 'c_lexer', '2.5.3.0.0' unless RUBY_ENGINE == 'truffleruby'
 end

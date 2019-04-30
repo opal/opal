@@ -11,107 +11,199 @@ Changes are grouped as follows:
 - **Fixed** for any bug fixes.
 - **Security** to invite users to upgrade in case of vulnerabilities.
 
+
+
+
+
+## [Unreleased](https://github.com/opal/opal/compare/v0.11.4...HEAD) - unreleased
+
+
 <!--
 Whitespace conventions:
 - 4 spaces before ## titles
 - 2 spaces before ### titles
 - 1 spaces before normal text
- -->
-
-
-
-
-## [0.11.1] - Unreleased
-
+-->
 
 ### Added
 
-- Added `Date#to_n` that returns the JavaScript Date object (in native.rb). (#1779)
-- Added `Array#pack` (supports only `C, S, L, Q, c, s, l, q, A, a` formats). (#1723)
-- Added `String#unpack` (supports only `C, S, L, Q, S>, L>, Q>, c, s, l, q, n, N, v, V, U, w, A, a, Z, B, b, H, h, u, M, m` formats). (#1723)
-- Added `File#symlink?` for Node.js. (#1725)
-- Added `Dir#glob` for Node.js (does not support flags). (#1727)
+- Added `Module#prepend` and completely overhauled the module and class inheritance system ([#1826](https://github.com/opal/opal/pull/1826))
+- Methods and properties are now assigned with `Object.defineProperty()` as non-enumerable ([#1821](https://github.com/opal/opal/pull/1821))
+- Backtrace now includes the location inside the source file for syntax errors ([#1814](https://github.com/opal/opal/pull/1814))
+- Added support for a faster C-implemented lexer, it's enough to add `gem 'c_lexer` to the `Gemfile` ([#1806](https://github.com/opal/opal/pull/1806))
+- Added `Date#to_n` that returns the JavaScript Date object (in native.rb). (#1779, #1792)
+- Added `Array#pack` (supports only `C, S, L, Q, c, s, l, q, A, a` formats). ([#1723](https://github.com/opal/opal/pull/1723))
+- Added `String#unpack` (supports only `C, S, L, Q, S>, L>, Q>, c, s, l, q, n, N, v, V, U, w, A, a, Z, B, b, H, h, u, M, m` formats). ([#1723](https://github.com/opal/opal/pull/1723))
+- Added `File#symlink?` for Node.js. ([#1725](https://github.com/opal/opal/pull/1725))
+- Added `Dir#glob` for Node.js (does not support flags). ([#1727](https://github.com/opal/opal/pull/1727))
 - Added support for a static folder in the "server" CLI runner via the `OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER` env var
-- Added ability to pass the port to the "server" CLI runner using the `OPAL_CLI_RUNNERS_SERVER_PORT` (explicit option passed via CLI is still working but deprecated)
 - Added the CLI option `--runner-options` that allows passing arbitrary options to the selected runner, currently the only runner making use of them is `server` accepting `port` and `static_folder`
 - Added a short helper to navigate constants manually: E.g. `Opal.$$.Regexp.$$.IGNORECASE` (see docs for "Compiled Ruby")
-- Added initial support for OpenURI module (using XMLHttpRequest on browser and [xmlhttprequest](https://www.npmjs.com/package/xmlhttprequest) on Node). (#1735)
+- Added initial support for OpenURI module (using XMLHttpRequest on browser and [xmlhttprequest](https://www.npmjs.com/package/xmlhttprequest) on Node). ([#1735](https://github.com/opal/opal/pull/1735))
 - Added `String#prepend` to the list of unsupported methods (because String are immutable in JavaScript)
-- Added 2.4/2.5 methods (#1757):
-    * `Array#prepend`
-    * `Array#append`
-    * `Array#max`
-    * `Array#min`
-    * `Complex#finite?`
-    * `Complex#infinite?`
-    * `Complex#infinite?`
-    * `Date#to_time`
-    * `Hash#slice`
-    * `Hash#transform_keys`
-    * `Hash#transform_keys!`
-    * `Numeric#finite?`
-    * `Numeric#infinite?`
-    * `Numeric#infinite?`
-    * `Integer#allbits?`
-    * `Integer#anybits?`
-    * `Integer#digits`
-    * `Integer#nobits?`
-    * `Integer#pow`
-    * `Integer#remainder`
-    * `Integer.sqrt`
-    * `Random.urandom`
-    * `String#delete_prefix`
-    * `String#delete_suffix`
-    * `String#casecmp?`
-    * `Kernel#yield_self`
-    * `String#unpack1`
-- Added support of the `pattern` argument for `Enumerable#all?`, `Enumerable#any?`, `Enumerable#none?`. (#1757)
-- Added `ndigits` option support to `Number#floor`, `Number#ceil`, `Number#truncate`. (#1757)
-- Added `key` and `receiver` attributes to the `KeyError`. (#1757)
-- Extended `Struct.new` to support `keyword_init` option. (#1757)
+- Added methods (most introduced in 2.4/2.5):
+    * `Array#prepend` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Array#append` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Array#max` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Array#min` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Complex#finite?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Complex#infinite?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Complex#infinite?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Date#to_time` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Date#next_year` ([#1885](https://github.com/opal/opal/pull/1885))
+    * `Date#prev_year` ([#1885](https://github.com/opal/opal/pull/1885))
+    * `Hash#slice` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Hash#transform_keys` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Hash#transform_keys!` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Numeric#finite?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Numeric#infinite?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Numeric#infinite?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Integer#allbits?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Integer#anybits?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Integer#digits` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Integer#nobits?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Integer#pow` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Integer#remainder` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Integer.sqrt` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Random.urandom` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `String#delete_prefix` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `String#delete_suffix` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `String#casecmp?` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `Kernel#yield_self` ([#1757](https://github.com/opal/opal/pull/1757))
+    * `String#unpack1` ([#1757](https://github.com/opal/opal/pull/1757))
+	* `String#to_r` ([#1842](https://github.com/opal/opal/pull/1842))
+	* `String#to_c` ([#1842](https://github.com/opal/opal/pull/1842))
+	* `String#match?` ([#1842](https://github.com/opal/opal/pull/1842))
+	* `String#unicode_normalize` returns self ([#1842](https://github.com/opal/opal/pull/1842))
+	* `String#unicode_normalized?` returns true ([#1842](https://github.com/opal/opal/pull/1842))
+	* `String#[]=` throws `NotImplementedError`([#1836](https://github.com/opal/opal/pull/1836))
+
+- Added support of the `pattern` argument for `Enumerable#all?`, `Enumerable#any?`, `Enumerable#none?`. ([#1757](https://github.com/opal/opal/pull/1757))
+- Added `ndigits` option support to `Number#floor`, `Number#ceil`, `Number#truncate`. ([#1757](https://github.com/opal/opal/pull/1757))
+- Added `key` and `receiver` attributes to the `KeyError`. ([#1757](https://github.com/opal/opal/pull/1757))
+- Extended `Struct.new` to support `keyword_init` option. ([#1757](https://github.com/opal/opal/pull/1757))
 - Added a new `Opal::Config.missing_require_severity` option and relative `--missing-require` CLI flag. This option will command how the builder will behave when a required file is missing. Previously the behavior was undefined and partly controlled by `dynamic_require_severity`. Not to be confused with the runtime config option `Opal.config.missing_require_severity;` which controls the runtime behavior.
 - Added `Matrix` (along with the internal MRI utility `E2MM`)
 - Use shorter helpers for constant lookups, `$$` for relative (nesting) lookups and `$$$` for absolute (qualified) lookups
+- Add support for the Mersenne Twister random generator, the same used by CRuby/MRI (#657 & #1891)
+- [Nodejs] Added support for binary data in `OpenURI` (#1911, #1920)
+- [Nodejs] Added support for binary data in `File#read` (#1919, #1921)
+- [Nodejs] Added support for `File#readlines` ([#1882](https://github.com/opal/opal/pull/1882))
+- [Nodejs] Added support for `ENV#[]`, `ENV#[]=`, `ENV#key?`, `ENV#has_key?`, `ENV#include?`, `ENV#member?`, `ENV#empty?`, `ENV#keys`, `ENV#delete` and `ENV#to_s` ([#1928](https://github.com/opal/opal/pull/1928))
 
 
 ### Changed
 
-- **BREAKING** The dot (`.`) character is no longer replaced with [\s\S] in a multiline regexp passed to Regexp#match and Regexp#match?
+- **BREAKING** The dot (`.`) character is no longer replaced with [\s\S] in a multiline regexp passed to Regexp#match and Regexp#match? (#1796, #1795)
   * You're advised to always use [\s\S] instead of . in a multiline regexp, which is portable between Ruby and JavaScript
+- **BREAKING** `Kernel#format` (and `sprintf` alias) are now in a dedicated module `corelib/kernel/format` and available exclusively in `opal` ([#1930](https://github.com/opal/opal/pull/1930))
+  * Previously the methods were part of the `corelib/kernel` module and available in both `opal` and `opal/mini`
+- Filename extensions are no longer stripped from filenames internally, resulting in better error reporting ([#1804](https://github.com/opal/opal/pull/1804))
 - The internal API for CLI runners has changed, now it's just a callable object
 - The `--map` CLI option now works only in conjunction with `--compile` (or `--runner compiler`)
 - The `node` CLI runner now adds its `NODE_PATH` entry instead of replacing the ENV var altogether
 - Added `--disable-web-security` option flag to the Chrome headless runner to be able to do `XMLHttpRequest`
 - Migrated parser to 2.5. Bump RUBY_VERSION to 2.5.0.
+- Exceptions raised during the compilation now add to the backtrace the current location of the opal file if available ([#1814](https://github.com/opal/opal/pull/1814)).
+- Better use of `displayName` on functions and methods and more readable temp variable names ([#1910](https://github.com/opal/opal/pull/1910))
+- Source-maps are now inlined and already contain sources, incredibly more stable and precise ([#1856](https://github.com/opal/opal/pull/1856))
 
 
 ### Deprecated
 
 - The CLI `--server-port 1234` option is now deprecated in favor of using `--runner-options='{"port": 1234}'`
 - Including `::Native` is now deprecated because it generates conflicts with core classes in constant lookups (both `Native::Object` and `Native::Array` exist). Instead `Native::Werapper` should be used.
+- Using `node_require 'my_module'` to access the native `require()` function in Node.js is deprecated in favor of <code>\`require('my_module')\`</code> because static builders need to parse the call in order to function ([#1886](https://github.com/opal/opal/pull/1886)).
 
 
 ### Removed
 
 - The `node` CLI runner no longer supports passing extra node options via the `NODE_OPT` env var, instead Node.js natively supports the `NODE_OPTIONS` env var.
+- The gem "hike" is no longer an external dependency and is now an internal dependency available as `Opal::Hike` ([#1881](https://github.com/opal/opal/pull/1881))
+- Removed the internal Opal class `Marshal::BinaryString` ([#1914](https://github.com/opal/opal/pull/1914))
+- Removed Racc, as it's now replaced by the parser gem ([#1880](https://github.com/opal/opal/pull/1880))
+
 
 
 ### Fixed
 
-- Fix handling of trailing semicolons and JavaScript returns inside x-strings, the behavior is now well defined and covered by proper specs (#1776)
-- Fixed singleton method definition to return method name. (#1757)
-- Allow passing number of months to `Date#next_month` and `Date#prev_month`. (#1757)
-- Fixed `pattern` argument handling for `Enumerable#grep` and `Enumerable#grep_v`. (#1757)
-- Raise `ArgumentError` instead of `TypeError` from `Numeric#step` when step is not a number. (#1757)
+- Fix handling of trailing semicolons and JavaScript returns inside x-strings, the behavior is now well defined and covered by proper specs ([#1776](https://github.com/opal/opal/pull/1776))
+- Fixed singleton method definition to return method name. ([#1757](https://github.com/opal/opal/pull/1757))
+- Allow passing number of months to `Date#next_month` and `Date#prev_month`. ([#1757](https://github.com/opal/opal/pull/1757))
+- Fixed `pattern` argument handling for `Enumerable#grep` and `Enumerable#grep_v`. ([#1757](https://github.com/opal/opal/pull/1757))
+- Raise `ArgumentError` instead of `TypeError` from `Numeric#step` when step is not a number. ([#1757](https://github.com/opal/opal/pull/1757))
 - At run-time `LoadError` wasn't being raised even with `Opal.config.missing_require_severity;` set to `'error'`.
+- Fixed `Kernel#public_methods` to return instance methods if the argument is set to false. ([#1848](https://github.com/opal/opal/pull/1848))
+- Fixed an issue in `String#gsub` that made it start an infinite loop when used recursively. ([#1879](https://github.com/opal/opal/pull/1879))
+- `Kernel#exit` was using status 0 when a number or a generic object was provided, now accepts numbers and tries to convert objects with `#to_int` (#1898, #1808).
+- Fixed metaclass inheritance in subclasses of Module ([#1901](https://github.com/opal/opal/pull/1901))
+- `Method#to_proc` now correctly sets parameters and arity on the resulting Proc ([#1903](https://github.com/opal/opal/pull/1903))
+- Fixed bridged classes having their prototype removed from the original chain by separating them from the Ruby class ([#1909](https://github.com/opal/opal/pull/1909))
+- Improve `String#to_proc` performance ([#1888](https://github.com/opal/opal/pull/1888))
+- Fixed/updated the examples ([#1887](https://github.com/opal/opal/pull/1887))
+- `Opal.ancestors()` now returns false for when provided with JS-falsy objects ([#1839](https://github.com/opal/opal/pull/1839))
+- When subclassing now the constant is set before calling `::inherited` ([#1838](https://github.com/opal/opal/pull/1838))
+- `String#to_sym` now returns the string literal ([#1835](https://github.com/opal/opal/pull/1835))
+- `String#center` now correctly checks length ([#1833](https://github.com/opal/opal/pull/1833))
+- `redo` inside `while` now works properly ([#1820](https://github.com/opal/opal/pull/1820))
+- Fixed compilation of empty/whitespace-only x-strings ([#1811](https://github.com/opal/opal/pull/1811))
+- Fix `||=` assignments on constants when the constant is not yet defined ([#1935](https://github.com/opal/opal/pull/1935))
+- Fix `String#chomp` to return an empty String when `arg == self` ([#1936](https://github.com/opal/opal/pull/1936))
+- Fix methods of `Comparable` when `<=>` does not return Numeric ([#1945](https://github.com/opal/opal/pull/1945))
+- Fix Class#native_alias error message ([#1946](https://github.com/opal/opal/pull/1946))
 
 
-## [0.11.0] - 2017-12-08
+
+
+## [0.11.4](https://github.com/opal/opal/compare/v0.11.3...v0.11.4) - 2018-11-07
+
+
+### Fixed
+
+- `Kernel#exit` was using status 0 when a number or a generic object was provided, now accepts numbers and tries to convert objects with `#to_int`.
+
+
+
+
+## [0.11.3](https://github.com/opal/opal/compare/v0.11.2...v0.11.3) - 2018-08-28
+
+
+### Fixed
+
+- Fixed `Array#dup` when `method_missing` support was disabled
+
+
+
+
+## [0.11.2](https://github.com/opal/opal/compare/v0.11.1...v0.11.2) - 2018-08-24
+
+
+### Fixed
+
+- Remove symlink that caused problems on Windows
+
+
+
+
+## [0.11.1](https://github.com/opal/opal/compare/v0.11.0...v0.11.1) - 2018-07-17
 
 
 ### Added
 
-- Added support for complex (`0b1110i`) and rational (`0b1111r`) number literals. (#1487)
+- Added support for a static folder in the "server" CLI runner via the `OPAL_CLI_RUNNERS_SERVER_STATIC_FOLDER` env var
+- Added ability to pass the port to the "server" CLI runner using the `OPAL_CLI_RUNNERS_SERVER_PORT` (explicit option passed via CLI is still working but deprecated)
+- Added a new `Opal::Config.missing_require_severity` option and relative `--missing-require` CLI flag. This option will command how the builder will behave when a required file is missing. Previously the behavior was undefined and partly controlled by `dynamic_require_severity`. Not to be confused with the runtime config option `Opal.config.missing_require_severity;` which controls the runtime behavior.
+- At run-time `LoadError` wasn't being raised even with `Opal.config.missing_require_severity;` set to `'error'`.
+
+
+
+
+## [0.11.0](https://github.com/opal/opal/compare/v0.10.6...v0.11.0) - 2017-12-08
+
+
+### Added
+
+- Added support for complex (`0b1110i`) and rational (`0b1111r`) number literals. ([#1487](https://github.com/opal/opal/pull/1487))
 - Added 2.3.0 methods:
     * `Array#bsearch_index`
     * `Array#dig`
@@ -128,7 +220,7 @@ Whitespace conventions:
     * `Hash#to_proc`
     * `Struct#dig`
     * `Kernel#itself`
-- Added safe navigator (`&.`) support. (#1532)
+- Added safe navigator (`&.`) support. ([#1532](https://github.com/opal/opal/pull/1532))
 - Added Random class with seed support. The following methods were reworked to use it:
     * `Kernel.rand`
     * `Kernel.srand`
@@ -140,9 +232,9 @@ Whitespace conventions:
 - Added `Method#source_location` and `Method#comments`.
 - Added a deprecation API that can be set to raise on deprecation with: `Opal.raise_on_deprecation = true`
 - Added `Opal::SimpleServer` as the quickest way to get up and running with Opal: `rackup -ropal -ropal/simple_server -b 'Opal.append_path("app"); run Opal::SimpleServer.new'`
-- Added `String#ascii_only?` (#1592)
-- Added `StringScanner#matched_size` (#1595)
-- Added `Hash#compare_by_identity` (#1657)
+- Added `String#ascii_only?` ([#1592](https://github.com/opal/opal/pull/1592))
+- Added `StringScanner#matched_size` ([#1595](https://github.com/opal/opal/pull/1595))
+- Added `Hash#compare_by_identity` ([#1657](https://github.com/opal/opal/pull/1657))
 
 
 ### Removed
@@ -153,7 +245,7 @@ Whitespace conventions:
 
 ### Changed
 
-- Removed self-written lexer/parser. Now uses parser/ast gems to convert source code to AST. (#1465)
+- Removed self-written lexer/parser. Now uses parser/ast gems to convert source code to AST. ([#1465](https://github.com/opal/opal/pull/1465))
 - Migrated parser to 2.3. Bump RUBY_VERSION to 2.3.0.
 - Changed to be 2.3 compliant:
     * `Enumerable#chunk` (to take only a a block)
@@ -174,6 +266,11 @@ Whitespace conventions:
 - Extracted sprockets support to `opal-sprockets` which should allow for wider support and less coupling (e.g. the `opal` gem will now be able to improve the compiler without worrying about `sprockets` updates). All the old behavior is preserved except for `Opal::Server` that has become `Opal::Sprockets::Server` (see Deprecated section above).
 
 
+### Changed
+
+- Strip Regexp flags that are unsupported by browsers (backport), previously they were ignored, lately most of them now raise an error for unknown flags.
+
+
 ### Fixed
 
 - Newly compliant with the Ruby Spec Suite:
@@ -182,9 +279,9 @@ Whitespace conventions:
     * `Module#class_variable_set`
     * `Module#remove_class_variable`
     * `Module#include?`
-    * `Numeric#step` (#1512)
+    * `Numeric#step` ([#1512](https://github.com/opal/opal/pull/1512))
 
-- Improvements for Range class (#1486)
+- Improvements for Range class ([#1486](https://github.com/opal/opal/pull/1486))
     * Moved private/tainted/untrusted specs to not supported
     * Conforming `Range#to_s` and `Range#inspect`
     * Starting `Range#bsearch` implementation
@@ -205,11 +302,27 @@ Whitespace conventions:
 - `Module#append_features` now detects cyclic includes
 - `Process.clock_gettime(Process::CLOCK_MONOTONIC)` will now return true monotonic values or raise `Errno::EINVAL` if no monotonic clock is available
 - Opal::Builder no longer always raises an error when a dependency isn't found and instead respects `dynamic_require_severity` value
+- Fixed a constant reference to `Sprockets::FileNotFound` that previously pointed to `Opal::Sprockets` instead of `::Sprockets`.
 
 
 
 
-## [0.10.5] - 2017-06-21
+## [0.10.6](https://github.com/opal/opal/compare/v0.10.5...v0.10.6) - 2018-06-21
+
+
+### Changed
+
+- Strip Regexp flags that are unsupported by browsers (backport), previously they were ignored, lately most of them now raise an error for unknown flags.
+
+
+### Fixed
+
+- Fixed a constant reference to `Sprockets::FileNotFound` that previously pointed to `Opal::Sprockets` instead of `::Sprockets`.
+
+
+
+
+## [0.10.5](https://github.com/opal/opal/compare/v0.10.4...v0.10.5) - 2017-06-21
 
 
 ### Fixed
@@ -219,7 +332,7 @@ Whitespace conventions:
 
 
 
-## [0.10.4] - 2017-05-07
+## [0.10.4](https://github.com/opal/opal/compare/v0.10.3...v0.10.4) - 2017-05-06
 
 
 ### Changed
@@ -230,12 +343,12 @@ Whitespace conventions:
 
 
 
-## [0.10.3] - 2016-10-31
+## [0.10.3](https://github.com/opal/opal/compare/v0.10.2...v0.10.3) - 2016-10-31
 
 
 ### Fixed
 
-- Fixed inheritance from the `Module` class (#1476)
+- Fixed inheritance from the `Module` class ([#1476](https://github.com/opal/opal/pull/1476))
 - Fixed source map server with url-encoded paths
 - Silence Sprockets 3.7 deprecations, full support for Sprockets 4 will be available in Opal 0.11
 - Don't print the full stack trace with deprecation messages
@@ -243,7 +356,7 @@ Whitespace conventions:
 
 
 
-## [0.10.2] - 2016-09-09
+## [0.10.2](https://github.com/opal/opal/compare/v0.10.1...v0.10.2) - 2016-09-09
 
 
 ### Changed
@@ -253,17 +366,17 @@ Whitespace conventions:
 
 
 
-## [0.10.1] - 2016-07-06
+## [0.10.1](https://github.com/opal/opal/compare/v0.10.0...v0.10.1) - 2016-07-06
 
 
 ### Fixed
 
-- Fixed `-L` option for compiling requires as modules (#1510)
+- Fixed `-L` option for compiling requires as modules ([#1510](https://github.com/opal/opal/pull/1510))
 
 
 
 
-## [0.10.0] - 2016-07-04
+## [0.10.0](https://github.com/opal/opal/compare/v0.9.4...v0.10.0) - 2016-07-04
 
 
 ### Added
@@ -271,9 +384,9 @@ Whitespace conventions:
 - Pathname#relative_path_from
 - Source maps now include method names
 - `Module#included_modules` works
-- Internal runtime cleanup (#1241)
-- Make it easier to add custom runners for the CLI (#1261)
-- Add Rack v2 compatibility (#1260)
+- Internal runtime cleanup ([#1241](https://github.com/opal/opal/pull/1241))
+- Make it easier to add custom runners for the CLI ([#1261](https://github.com/opal/opal/pull/1261))
+- Add Rack v2 compatibility ([#1260](https://github.com/opal/opal/pull/1260))
 - Newly compliant with the Ruby Spec Suite:
     * `Array#slice!`
     * `Array#repeated_combination`
@@ -281,25 +394,25 @@ Whitespace conventions:
     * `Array#sort_by!`
     * `Enumerable#sort`
     * `Enumerable#max`
-    * `Enumerable#each_entry` (#1303)
+    * `Enumerable#each_entry` ([#1303](https://github.com/opal/opal/pull/1303))
     * `Module#const_set`
     * `Module#module_eval` with a string
-- Add `-L` / `--library` option to compile only the code of the library (#1281)
-- Implement `Kernel.open` method (#1218)
+- Add `-L` / `--library` option to compile only the code of the library ([#1281](https://github.com/opal/opal/pull/1281))
+- Implement `Kernel.open` method ([#1218](https://github.com/opal/opal/pull/1218))
 - Generate meaningful names for functions representing Ruby methods
-- Implement `Pathname#join` and `Pathname#+` methods (#1301)
+- Implement `Pathname#join` and `Pathname#+` methods ([#1301](https://github.com/opal/opal/pull/1301))
 - Added support for `begin;rescue;else;end`.
-- Implement `File.extname` method (#1219)
+- Implement `File.extname` method ([#1219](https://github.com/opal/opal/pull/1219))
 - Added support for keyword arguments as lambda parameters.
 - Super works with define_method blocks
 - Added support for kwsplats.
 - Added support for squiggly heredoc.
 - Implement `Method#parameters` and `Proc#parameters`.
 - Implement `File.new("path").mtime`, `File.mtime("path")`, `File.stat("path").mtime`.
-- if-conditions now support `null` and `undefined` as falsy values (#867)
-- Implement IO.read method for Node.js (#1332)
-- Implement IO.each_line method for Node.js (#1221)
-- Generate `opal-builder.js` to ease the compilation of Ruby library from JavaScript (#1290)
+- if-conditions now support `null` and `undefined` as falsy values ([#867](https://github.com/opal/opal/pull/867))
+- Implement IO.read method for Node.js ([#1332](https://github.com/opal/opal/pull/1332))
+- Implement IO.each_line method for Node.js ([#1221](https://github.com/opal/opal/pull/1221))
+- Generate `opal-builder.js` to ease the compilation of Ruby library from JavaScript ([#1290](https://github.com/opal/opal/pull/1290))
 
 
 ### Changed
@@ -326,28 +439,28 @@ Whitespace conventions:
 
 ### Fixed
 
-- `Module#ancestors` and shared code like `====` and `is_a?` deal with singleton class modules better (#1449)
+- `Module#ancestors` and shared code like `====` and `is_a?` deal with singleton class modules better ([#1449](https://github.com/opal/opal/pull/1449))
 - `Class#to_s` now shows correct names for singleton classes
 - `Pathname#absolute?` and `Pathname#relative?` now work properly
 - `File::dirname` and `File::basename` are now Rubyspec compliant
-- `SourceMap::VLQ` patch (#1075)
+- `SourceMap::VLQ` patch ([#1075](https://github.com/opal/opal/pull/1075))
 - `Regexp::new` no longer throws error when the expression ends in \\\\
-- `super` works properly with overwritten alias methods (#1384)
+- `super` works properly with overwritten alias methods ([#1384](https://github.com/opal/opal/pull/1384))
 - `NoMethodError` does not need a name to be instantiated
 - `method_added` fix for singleton class cases
-- Super now works properly with blocks (#1237)
-- Fix using more than two `rescue` in sequence (#1269)
+- Super now works properly with blocks ([#1237](https://github.com/opal/opal/pull/1237))
+- Fix using more than two `rescue` in sequence ([#1269](https://github.com/opal/opal/pull/1269))
 - Fixed inheritance for `Array` subclasses.
-- Always populate all stub_subscribers with all method stubs, as a side effect of this now `method_missing` on bridged classes now works reliably (#1273)
-- Fix `Hash#instance_variables` to not return `#default` and `#default_proc` (#1258)
-- Fix `Module#name` when constant was created using `Opal.cdecl` (constant declare) like `ChildClass = Class.new(BaseClass)` (#1259)
-- Fix issue with JavaScript `nil` return paths being treated as true (#1274)
+- Always populate all stub_subscribers with all method stubs, as a side effect of this now `method_missing` on bridged classes now works reliably ([#1273](https://github.com/opal/opal/pull/1273))
+- Fix `Hash#instance_variables` to not return `#default` and `#default_proc` ([#1258](https://github.com/opal/opal/pull/1258))
+- Fix `Module#name` when constant was created using `Opal.cdecl` (constant declare) like `ChildClass = Class.new(BaseClass)` ([#1259](https://github.com/opal/opal/pull/1259))
+- Fix issue with JavaScript `nil` return paths being treated as true ([#1274](https://github.com/opal/opal/pull/1274))
 - Fix `Array#to_n`, `Hash#to_n`, `Struct#to_n` when the object contains native objects (#1249, #1256)
-- `break` semantics are now correct, except for the case in which a lambda containing a `break` is passed to a `yield` (#1250)
+- `break` semantics are now correct, except for the case in which a lambda containing a `break` is passed to a `yield` ([#1250](https://github.com/opal/opal/pull/1250))
 - Avoid double "/" when `Opal::Sprockets.javascript_include_tag` receives a prefix with a trailing slash.
 - Fixed context of evaluation for `Kernel#eval` and `BasicObject#instance_eval`
-- Fix `Module#===` to use all ancestors of the passed object (#1284)
-- Fix `Struct.new` to be almost compatible with Rubyspec (#1251)
+- Fix `Module#===` to use all ancestors of the passed object ([#1284](https://github.com/opal/opal/pull/1284))
+- Fix `Struct.new` to be almost compatible with Rubyspec ([#1251](https://github.com/opal/opal/pull/1251))
 - Fix `Enumerator#with_index` to return the result of the previously called method.
 - Improved `Date.parse` to cover most date formatting cases.
 - Fixed `Module#const_get` for dynamically created constants.
@@ -376,7 +489,7 @@ Whitespace conventions:
 
 
 
-## [0.9.4] - 2016-06-21
+## [0.9.4](https://github.com/opal/opal/compare/v0.9.3...v0.9.4) - 2016-06-20
 
 
 ### Fixed
@@ -388,7 +501,7 @@ Whitespace conventions:
 
 
 
-## [0.9.3] - 2016-06-06
+## [0.9.3](https://github.com/opal/opal/compare/v0.9.2...v0.9.3) - 2016-06-16
 
 
 ### Fixed
@@ -398,7 +511,7 @@ Whitespace conventions:
 
 
 
-## [0.9.2] - 2016-01-10
+## [0.9.2](https://github.com/opal/opal/compare/v0.9.1...v0.9.2) - 2016-01-09
 
 
 ### Fixed
@@ -408,19 +521,19 @@ Whitespace conventions:
 
 
 
-## [0.9.1] - 2016-01-09
+## [0.9.1](https://github.com/opal/opal/compare/v0.9.0...v0.9.1) - 2016-01-09
 
 
 ### Fixed
 
-- Backport rack2 compatibility (#1260)
-- Fixed issue with JS nil return paths being treated as true (#1274)
-- Fix using more than two `rescue` in sequence (#1269)
+- Backport rack2 compatibility ([#1260](https://github.com/opal/opal/pull/1260))
+- Fixed issue with JS nil return paths being treated as true ([#1274](https://github.com/opal/opal/pull/1274))
+- Fix using more than two `rescue` in sequence ([#1269](https://github.com/opal/opal/pull/1269))
 
 
 
 
-## [0.9.0] - 2015-12-20
+## [0.9.0](https://github.com/opal/opal/compare/v0.8.1...v0.9.0) - 2015-12-20
 
 
 ### Added
@@ -445,7 +558,7 @@ Whitespace conventions:
     * `Enumerable#chunk`
     * `Enumerable#each_cons`
     * `Enumerable#minmax`
-    * `Range#to_a` (#1246)
+    * `Range#to_a` ([#1246](https://github.com/opal/opal/pull/1246))
     * `Module` comparison methods: `#<` `#<=` `#<=>` `#>` `#>=`
     - `OpenStruct#method_missing`
     - `OpenStruct#inspect`
@@ -486,13 +599,13 @@ Whitespace conventions:
 - Fix `Kernel#exit` to allow exit inside `#at_exit`
 - Fixed a number of syntax errors (e.g. #1224 #1225 #1227 #1231 #1233 #1226)
 - Fixed `Native()` when used with `Array` instances containing native objects (which weren't wrapped properly) – #1212
-- Fix `Array#to_n`, `Hash#to_n`, `Struct#to_n` when the object contains native objects (#1249)
+- Fix `Array#to_n`, `Hash#to_n`, `Struct#to_n` when the object contains native objects ([#1249](https://github.com/opal/opal/pull/1249))
 - Internal cleanup and lots of bugs!
 
 
 
 
-## [0.8.1] - 2015-10-12
+## [0.8.1](https://github.com/opal/opal/compare/v0.8.0...v0.8.1) - 2015-10-12
 
 
 ### Removed
@@ -509,7 +622,7 @@ Whitespace conventions:
 
 
 
-## [0.8.0] - 2015-07-16
+## [0.8.0](https://github.com/opal/opal/compare/v0.7.2...v0.8.0) - 2015-07-16
 
 
 ### Added
@@ -589,14 +702,17 @@ Whitespace conventions:
 
 
 
+## [0.7.2](https://github.com/opal/opal/compare/v0.7.1...v0.7.2) - 2015-04-23
 
-## [0.7.2] - 2015-04-23
 
 - Remove Sprockets 3.0 support (focus moved to upcoming 0.8)
 - Fix version number consistency.
 
 
-## [0.7.1] - 2015-02-14
+
+
+## [0.7.1](https://github.com/opal/opal/compare/v0.7.0...v0.7.1) - 2015-02-13
+
 
 - CLI options `-d` and `-v` now set respectively `$DEBUG` and `$VERBOSE`
 - Fixed a bug that would make the `-v` CLI option wait for STDIN input
@@ -604,7 +720,10 @@ Whitespace conventions:
 - Now the CLI implicitly calls `Kernel#exit` at the end of the script, thus making `at_exit` blocks be respected.
 
 
-## [0.7.0] - 2015-02-01
+
+
+## [0.7.0](https://github.com/opal/opal/compare/v0.6.3...v0.7.0) - 2015-02-01
+
 
 - Stop keyword-arg variable names leaking to global javascript scope
 
@@ -688,7 +807,18 @@ Whitespace conventions:
 - Fix `Enumerator#with_index`, `Numeric#round`.
 
 
-## [0.6.2] - 2014-04-25
+
+
+## [0.6.3](https://github.com/opal/opal/compare/v0.6.2...v0.6.3) - 2014-11-23
+
+
+- Fix `Regexp.escape` internal regexp
+
+
+
+
+## [0.6.2](https://github.com/opal/opal/compare/v0.6.1...v0.6.2) - 2014-04-24
+
 
 - Added Range#size
 
@@ -699,7 +829,10 @@ Whitespace conventions:
 - (Internal) improved the mspec runner
 
 
-## [0.6.1] - 2014-04-15
+
+
+## [0.6.1](https://github.com/opal/opal/compare/v0.6.0...v0.6.1) - 2014-04-14
+
 
 - Updated RubySpec to master and added `rubysl-*` specs. Thanks to Mike Owens (@mieko)
 
@@ -724,7 +857,10 @@ Whitespace conventions:
     parse as a key name.
 
 
-## [0.6.0] - 2014-03-05
+
+
+## [0.6.0](https://github.com/opal/opal/compare/v0.5.5...v0.6.0) - 2014-03-05
+
 
 - Fix parsing of escapes in single-strings ('foo\n'). Only ' and \
     characters now get escaped in single quoted strings. Also, more escape
@@ -846,26 +982,32 @@ Whitespace conventions:
 - Add `Regexp.quote` as an alias of `escape`.
 
 
-## [0.5.5] - 2013-11-25
+
+
+## [0.5.5](https://github.com/opal/opal/compare/v0.5.4...v0.5.5) - 2013-11-25
+
 
 - Fix regression: add `%i[foo bar]` style words back to lexer
 
-- Move corelib from `opal/core` to `opal/corelib`. This stops files in
-    `core/` clashing with user files.
+- Move corelib from `opal/core` to `opal/corelib`. This stops files in `core/` clashing with user files.
 
 
-## [0.5.4] - 2013-11-20
-
-- Reverted `RUBY_VERSION` to `1.9.3`. Opal `0.6.0` will be the first release
-    for `2.0.0`.
 
 
-## [0.5.3] - 2013-11-12
+## [0.5.4](https://github.com/opal/opal/compare/v0.5.3...v0.5.4) - 2013-11-20
+
+
+- Reverted `RUBY_VERSION` to `1.9.3`. Opal `0.6.0` will be the first release for `2.0.0`.
+
+
+
+
+## [0.5.3](https://github.com/opal/opal/compare/v0.5.2...v0.5.3) - 2013-11-20
+
 
 - Opal now targets ruby 2.0.0
 
-- Named function inside class body now generates with `$` prefix, e.g.
-    `$MyClass`. This makes it easier to wrap/bridge native functions.
+- Named function inside class body now generates with `$` prefix, e.g. `$MyClass`. This makes it easier to wrap/bridge native functions.
 
 - Support Array subclasses
 
@@ -884,15 +1026,20 @@ Whitespace conventions:
 - Cleanup parser/lexer to use `t` and `k` prefixes for all tokens
 
 
-## [0.5.2] - 2013-11-11
+
+
+## [0.5.2](https://github.com/opal/opal/compare/v0.5.1...v0.5.2) - 2013-11-11
+
 
 - Include native into corelib for 0.5.x
 
 
-## [0.5.1] - 2013-11-10
 
-- Move all corelib under `core/` directory to prevent filename clashes with
-    `require`
+
+## [0.5.1](https://github.com/opal/opal/compare/v0.5.0...v0.5.1) - 2013-11-10
+
+
+- Move all corelib under `core/` directory to prevent filename clashes with `require`
 
 - Move `native.rb` into stdlib - must now be explicitly required
 
@@ -901,12 +1048,53 @@ Whitespace conventions:
 - Cleanup and fix various `Enumerable` methods
 
 
-## [0.5.0] - 2013-11-03
-
-- WIP: https://gist.github.com/elia/7747460
 
 
-## [0.4.2] - 2013-07-03
+## [0.5.0](https://github.com/opal/opal/compare/v0.4.4...v0.5.0) - 2013-11-03
+
+
+- Optimized_operators is no longer a compiler option
+- Replace `Opal.bridge_class()` with <code>class Foo < \`bar\`</code> syntax
+- Expose `Opal.bridge_class()` for bridging native prototypes
+- Source maps improvements
+- Massive Rubyspec cleanup + passing specs
+- Massive Corelib/Stdlib cleanup + fixes
+- Massive internal cleanup + fixes
+
+*See the [full diff](https://github.com/opal/opal/compare/v0.4.4...v0.5.0) for more details (almost 800 commits)*
+
+
+
+
+## [0.4.4](https://github.com/opal/opal/compare/v0.4.3...v0.4.4) - 2013-08-13
+
+
+- Remove native object method calls
+- Add Struct class
+- Add method stubs as method_missing option, stubs enabled by default
+- Native is now used to wrap native objects directly
+- Fix Hash.new and Hash.allocate for subclasses
+- Generate sourcemaps from fragments
+- Allow blocks to be passed to zsuper (no args) calls
+- Fix yield when given 1 or multiple arguments for block destructuring
+
+
+
+
+## [0.4.3](https://github.com/opal/opal/compare/v0.4.2...v0.4.3) - 2013-07-24
+
+
+- Re-implement class system. Classes are now real objects instead of converted Procs. This allows classes to properly inherit methods from each other.
+- Fix exception hierarchy. Not all standard exception classes were subclassing the correct parent classes, this is now fixed.
+- Move ERB into stdlib. The erb compiler/parser has also been moved into lib/
+- Opal::Builder class. A simple port/clone of sprockets general building. This allows us to build projects similar to the way opal-sprockets does.
+- Move json.rb to stdlib.
+
+
+
+
+## [0.4.2](https://github.com/opal/opal/compare/v0.4.1...v0.4.2) - 2013-07-03
+
 
 - Added `Kernel#rand`. (fntzr)
 
@@ -920,13 +1108,19 @@ Whitespace conventions:
     format: `(((tmp = lhs) !== false || !==nil) ? tmp : rhs)`.
 
 
-## [0.4.1] - 2013-06-16
+
+
+## [0.4.1](https://github.com/opal/opal/compare/v0.4.0...v0.4.1) - 2013-06-16
+
 
 - Move sprockets logic out to external opal-sprockets gem. That now
     handles the compiling and loading of opal files in sprockets.
 
 
-## [0.4.0] - 2013-06-15
+
+
+## [0.4.0](https://github.com/opal/opal/compare/v0.3.44...v0.4.0) - 2013-06-15
+
 
 - Added fragments to parser. All parser methods now generate one or
     more Fragments which store the original sexp. This allows us to
@@ -979,7 +1173,10 @@ Whitespace conventions:
 - Merge Hash.from_native into Hash.new
 
 
-## [0.3.44] - 2013-05-31
+
+
+## [0.3.44](https://github.com/opal/opal/compare/v0.3.43...v0.3.44) - 2013-05-31
+
 
 - Cleanup runtime, and remove various flags and functions from opal
     objects and classes (moving them to runtime methods).
@@ -999,7 +1196,10 @@ Whitespace conventions:
     opal load paths automatically.
 
 
-## [0.3.43] - 2013-05-02
+
+
+## [0.3.43](https://github.com/opal/opal/compare/v0.3.42...v0.3.43) - 2013-05-02
+
 
 - Stop inlining respond_to? inside the parser. This now fully respects
     an object overriding respond_to?.
@@ -1029,7 +1229,10 @@ Whitespace conventions:
     Kernel#format.
 
 
-## [0.3.42] - 2013-03-21
+
+
+## [0.3.42](https://github.com/opal/opal/compare/v0.3.41...v0.3.42) - 2013-03-21
+
 
 - Fix/add lots of language specs.
 
@@ -1041,7 +1244,10 @@ Whitespace conventions:
     used, where possible to be as compliant as possible.
 
 
-## [0.3.41] - 2013-02-26
+
+
+## [0.3.41](https://github.com/opal/opal/compare/v0.3.40...v0.3.41) - 2013-02-26
+
 
 - Remove bin/opal - no longer required for building sources.
 
@@ -1050,7 +1256,10 @@ Whitespace conventions:
     load paths for generic sprockets based apps to use.
 
 
-## [0.3.40] - 2013-02-23
+
+
+## [0.3.40](https://github.com/opal/opal/compare/v0.3.39...v0.3.40) - 2013-02-23
+
 
 - Add Opal::Server as an easy to configure rack server for testing and
     running Opal based apps.
@@ -1065,7 +1274,10 @@ Whitespace conventions:
     constant will now also raise a NameError.
 
 
-## [0.3.39] - 2013-02-20
+
+
+## [0.3.39](https://github.com/opal/opal/compare/v0.3.38...v0.3.39) - 2013-02-20
+
 
 - Fix bug where methods defined on a parent class after subclass was defined
     would not given subclass access to method. Subclasses are now also tracked
@@ -1078,7 +1290,10 @@ Whitespace conventions:
 - Fix for defining methods inside metaclass, or singleton_class scopes.
 
 
-## [0.3.38] - 2013-02-13
+
+
+## [0.3.38](https://github.com/opal/opal/compare/v0.3.37...v0.3.38) - 2013-02-19
+
 
 - Add Native module used for wrapping objects to forward calls as native calls.
 
@@ -1091,75 +1306,49 @@ Whitespace conventions:
 
 
 
-[0.11.1]: https://github.com/opal/opal/compare/v0.11.0...HEAD
-[0.11.0]: https://github.com/opal/opal/compare/v0.10.5...0.11.0
-[0.10.5]: https://github.com/opal/opal/compare/v0.10.4...v0.10.5
-[0.10.4]: https://github.com/opal/opal/compare/v0.10.3...v0.10.4
-[0.10.3]: https://github.com/opal/opal/compare/v0.10.2...v0.10.3
-[0.10.2]: https://github.com/opal/opal/compare/v0.10.1...v0.10.2
-[0.10.1]: https://github.com/opal/opal/compare/v0.10.0...v0.10.1
-[0.10.0]: https://github.com/opal/opal/compare/v0.9.4...v0.10.0
-[0.9.4]: https://github.com/opal/opal/compare/v0.9.3...v0.9.4
-[0.9.3]: https://github.com/opal/opal/compare/v0.9.2...v0.9.3
-[0.9.2]: https://github.com/opal/opal/compare/v0.9.1...v0.9.2
-[0.9.1]: https://github.com/opal/opal/compare/v0.9.0...v0.9.1
-[0.9.0]: https://github.com/opal/opal/compare/v0.8.1...v0.9.0
-[0.8.1]: https://github.com/opal/opal/compare/v0.8.0...v0.8.1
-[0.8.0]: https://github.com/opal/opal/compare/v0.7.2...v0.8.0
-[0.7.2]: https://github.com/opal/opal/compare/v0.7.1...v0.7.2
-[0.7.1]: https://github.com/opal/opal/compare/v0.7.0...v0.7.1
-[0.7.0]: https://github.com/opal/opal/compare/v0.6.3...v0.7.0
-[0.6.3]: https://github.com/opal/opal/compare/v0.6.2...v0.6.3
-[0.6.2]: https://github.com/opal/opal/compare/v0.6.1...v0.6.2
-[0.6.1]: https://github.com/opal/opal/compare/v0.6.0...v0.6.1
-[0.6.0]: https://github.com/opal/opal/compare/v0.5.5...v0.6.0
-[0.5.5]: https://github.com/opal/opal/compare/v0.5.4...v0.5.5
-[0.5.4]: https://github.com/opal/opal/compare/v0.5.3...v0.5.4
-[0.5.3]: https://github.com/opal/opal/compare/v0.5.2...v0.5.3
-[0.5.2]: https://github.com/opal/opal/compare/v0.5.1...v0.5.2
-[0.5.1]: https://github.com/opal/opal/compare/v0.5.0...v0.5.1
-[0.5.0]: https://github.com/opal/opal/compare/v0.4.4...v0.5.0
-[0.4.4]: https://github.com/opal/opal/compare/v0.4.3...v0.4.4
-[0.4.3]: https://github.com/opal/opal/compare/v0.4.2...v0.4.3
-[0.4.2]: https://github.com/opal/opal/compare/v0.4.1...v0.4.2
-[0.4.1]: https://github.com/opal/opal/compare/v0.4.0...v0.4.1
-[0.4.0]: https://github.com/opal/opal/compare/v0.3.8...v0.4.0
-[0.3.8]: https://github.com/opal/opal/compare/v0.3.7...v0.3.8
-[0.3.7]: https://github.com/opal/opal/compare/v0.3.6...v0.3.7
-[0.3.6]: https://github.com/opal/opal/compare/v0.3.5...v0.3.6
-[0.3.5]: https://github.com/opal/opal/compare/v0.3.44...v0.3.5
-[0.3.44]: https://github.com/opal/opal/compare/v0.3.43...v0.3.44
-[0.3.43]: https://github.com/opal/opal/compare/v0.3.42...v0.3.43
-[0.3.42]: https://github.com/opal/opal/compare/v0.3.41...v0.3.42
-[0.3.41]: https://github.com/opal/opal/compare/v0.3.40...v0.3.41
-[0.3.40]: https://github.com/opal/opal/compare/v0.3.4...v0.3.40
-[0.3.4]: https://github.com/opal/opal/compare/v0.3.39...v0.3.4
-[0.3.39]: https://github.com/opal/opal/compare/v0.3.38...v0.3.39
-[0.3.38]: https://github.com/opal/opal/compare/v0.3.37...v0.3.38
-[0.3.37]: https://github.com/opal/opal/compare/v0.3.36...v0.3.37
-[0.3.36]: https://github.com/opal/opal/compare/v0.3.35...v0.3.36
-[0.3.35]: https://github.com/opal/opal/compare/v0.3.34...v0.3.35
-[0.3.34]: https://github.com/opal/opal/compare/v0.3.33...v0.3.34
-[0.3.33]: https://github.com/opal/opal/compare/v0.3.32...v0.3.33
-[0.3.32]: https://github.com/opal/opal/compare/v0.3.31...v0.3.32
-[0.3.31]: https://github.com/opal/opal/compare/v0.3.30...v0.3.31
-[0.3.30]: https://github.com/opal/opal/compare/v0.3.3...v0.3.30
-[0.3.3]: https://github.com/opal/opal/compare/v0.3.29...v0.3.3
-[0.3.29]: https://github.com/opal/opal/compare/v0.3.21...v0.3.29
-[0.3.21]: https://github.com/opal/opal/compare/v0.3.20...v0.3.21
-[0.3.20]: https://github.com/opal/opal/compare/v0.3.2...v0.3.20
-[0.3.2]: https://github.com/opal/opal/compare/v0.3.19...v0.3.2
-[0.3.19]: https://github.com/opal/opal/compare/v0.3.18...v0.3.19
-[0.3.18]: https://github.com/opal/opal/compare/v0.3.17...v0.3.18
-[0.3.17]: https://github.com/opal/opal/compare/v0.3.11...v0.3.17
-[0.3.11]: https://github.com/opal/opal/compare/v0.3.10...v0.3.11
-[0.3.10]: https://github.com/opal/opal/compare/v0.3.1...v0.3.10
-[0.3.1]: https://github.com/opal/opal/compare/v0.3.0...v0.3.1
-[0.3.0]: https://github.com/opal/opal/compare/v0.2.1...v0.3.0
-[0.2.1]: https://github.com/opal/opal/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/opal/opal/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/opal/opal/compare/v0.0.6...v0.1.0
-[0.0.6]: https://github.com/opal/opal/compare/v0.0.5...v0.0.6
-[0.0.5]: https://github.com/opal/opal/compare/v0.0.4...v0.0.5
-[0.0.4]: https://github.com/opal/opal/compare/v0.0.3...v0.0.4
-[0.0.3]: https://github.com/opal/opal/compare/v0.0.2...v0.0.3
+## [0.3.37](https://github.com/opal/opal/compare/v0.3.36...v0.3.37) - 2013-02-15
+
+
+- Extract the JavaScript runtime to `opal/runtime.js`
+- Add core `template.rb` for the basis of template libraries for Opal
+
+
+
+
+## [0.3.36](https://github.com/opal/opal/compare/v0.3.35...v0.3.36) - 2013-02-08
+
+
+- Use Ruby `require` directive inside Sprockets
+- Depreceate `Opal.process` in favour of `Opal::Environment`
+
+
+
+
+## [0.3.35](https://github.com/opal/opal/compare/v0.3.34...v0.3.35) - 2013-02-05
+
+
+- Internal cleanup
+
+
+
+
+## [0.3.34](https://github.com/opal/opal/compare/v0.3.33...v0.3.34) - 2013-02-05
+
+
+- Fix bug where camelcased lvars could parse as constants
+- Add `Array#shuffle`
+- Migrate to Sprockets-based building
+- Move ERB to separate gem
+
+
+
+
+## [0.3.33](https://github.com/opal/opal/compare/000000...v0.3.33) - 2013-01-18
+
+
+- Implement attr_reader/writer/accessor for dynamic uses
+- Hash internals update
+
+
+
+

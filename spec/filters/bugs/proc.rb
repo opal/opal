@@ -17,6 +17,7 @@ opal_filter "Proc" do
   fails "Proc#source_location returns an Array"
   fails "Proc#source_location returns the first line of a multi-line proc (i.e. the line containing 'proc do')"
   fails "Proc#source_location returns the location of the proc's body; not necessarily the proc itself"
+  fails "Proc#source_location returns the same value for a proc-ified method as the method reports" # Expected ["ruby/core/proc/fixtures/source_location.rb", 3] to equal nil
   fails "Proc#source_location sets the first value to the path of the file in which the proc was defined"
   fails "Proc#source_location sets the last value to a Fixnum representing the line on which the proc was defined"
   fails "Proc#source_location works even if the proc was created on the same line"

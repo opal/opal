@@ -193,7 +193,8 @@ module Opal
     def compile
       parse
 
-      @fragments = process(@sexp).flatten
+      @fragments = re_raise_with_location { process(@sexp).flatten }
+      @fragments << fragment("\n", nil, s(:newline)) unless @fragments.last.code.end_with?("\n")
 
       @result = @fragments.map(&:code).join('')
     end
@@ -204,11 +205,7 @@ module Opal
 
       @parser = Opal::Parser.default_parser
 
-      begin
-        sexp, comments, tokens = @parser.tokenize(@buffer)
-      rescue ::Opal::Error, ::Parser::SyntaxError => error
-        raise ::Opal::SyntaxError.with_opal_backtrace(error, file)
-      end
+      sexp, comments, tokens = re_raise_with_location { @parser.tokenize(@buffer) }
 
       @sexp = s(:top, sexp || s(:nil))
       @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
@@ -220,8 +217,8 @@ module Opal
     #
     # @param source_file [String] optional source_file to reference ruby source
     # @return [Opal::SourceMap]
-    def source_map(source_file = nil)
-      Opal::SourceMap.new(@fragments, source_file || file)
+    def source_map
+      ::Opal::SourceMap::File.new(@fragments, file, @source)
     end
 
     # Any helpers required by this file. Used by {Opal::Nodes::Top} to reference
@@ -247,7 +244,21 @@ module Opal
     # method simply appends the filename and curent line number onto
     # the message and raises it.
     def error(msg, line = nil)
-      raise ::Opal::SyntaxError, "#{msg} -- #{file}:#{line}"
+      error = ::Opal::SyntaxError.new(msg)
+      error.location = Opal::OpalBacktraceLocation.new(file, line)
+      raise error
+    end
+
+    def re_raise_with_location
+      yield
+    rescue StandardError, ::Opal::SyntaxError => error
+      opal_location = ::Opal.opal_location_from_error(error)
+      opal_location.path = file
+      opal_location.label ||= @source.lines[opal_location.line.to_i - 1].strip
+      new_error = ::Opal::SyntaxError.new(error.message)
+      new_error.set_backtrace error.backtrace
+      ::Opal.add_opal_location_to_error(opal_location, new_error)
+      raise new_error
     end
 
     # This is called when a parsing/processing warning occurs. This
@@ -280,16 +291,29 @@ module Opal
     def unique_temp(name)
       name = name.to_s
       if name && !name.empty?
-        name = "_#{name}"
-               .gsub('?', '$q')
-               .gsub('!', '$B')
+        name = name
+               .to_s
+               .gsub('<=>', '$lt_eq_gt')
+               .gsub('===', '$eq_eq_eq')
+               .gsub('==', '$eq_eq')
+               .gsub('=~', '$eq_tilde')
+               .gsub('!~', '$excl_tilde')
+               .gsub('!=', '$not_eq')
+               .gsub('<=', '$lt_eq')
+               .gsub('>=', '$gt_eq')
                .gsub('=', '$eq')
+               .gsub('?', '$ques')
+               .gsub('!', '$excl')
+               .gsub('/', '$slash')
+               .gsub('%', '$percent')
+               .gsub('+', '$plus')
+               .gsub('-', '$minus')
                .gsub('<', '$lt')
                .gsub('>', '$gt')
                .gsub(/[^\w\$]/, '$')
       end
       unique = (@unique += 1)
-      "TMP#{name}_#{unique}"
+      "#{'$' unless name.start_with?('$')}#{name}$#{unique}"
     end
 
     # Use the given helper

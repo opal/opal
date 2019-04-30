@@ -26,6 +26,79 @@
     warnings[string] = true;
     #{warn(`string`)};
   }
+  function is_utf8(bytes) {
+    var i = 0;
+    while (i < bytes.length) {
+      if ((// ASCII
+        bytes[i] === 0x09 ||
+        bytes[i] === 0x0A ||
+        bytes[i] === 0x0D ||
+        (0x20 <= bytes[i] && bytes[i] <= 0x7E)
+      )
+      ) {
+        i += 1;
+        continue;
+      }
+
+      if ((// non-overlong 2-byte
+        (0xC2 <= bytes[i] && bytes[i] <= 0xDF) &&
+        (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0xBF)
+      )
+      ) {
+        i += 2;
+        continue;
+      }
+
+      if ((// excluding overlongs
+          bytes[i] === 0xE0 &&
+          (0xA0 <= bytes[i + 1] && bytes[i + 1] <= 0xBF) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF)
+        ) ||
+        (// straight 3-byte
+          ((0xE1 <= bytes[i] && bytes[i] <= 0xEC) ||
+            bytes[i] === 0xEE ||
+            bytes[i] === 0xEF) &&
+          (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0xBF) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF)
+        ) ||
+        (// excluding surrogates
+          bytes[i] === 0xED &&
+          (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0x9F) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF)
+        )
+      ) {
+        i += 3;
+        continue;
+      }
+
+      if ((// planes 1-3
+          bytes[i] === 0xF0 &&
+          (0x90 <= bytes[i + 1] && bytes[i + 1] <= 0xBF) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF) &&
+          (0x80 <= bytes[i + 3] && bytes[i + 3] <= 0xBF)
+        ) ||
+        (// planes 4-15
+          (0xF1 <= bytes[i] && bytes[i] <= 0xF3) &&
+          (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0xBF) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF) &&
+          (0x80 <= bytes[i + 3] && bytes[i + 3] <= 0xBF)
+        ) ||
+        (// plane 16
+          bytes[i] === 0xF4 &&
+          (0x80 <= bytes[i + 1] && bytes[i + 1] <= 0x8F) &&
+          (0x80 <= bytes[i + 2] && bytes[i + 2] <= 0xBF) &&
+          (0x80 <= bytes[i + 3] && bytes[i + 3] <= 0xBF)
+        )
+      ) {
+        i += 4;
+        continue;
+      }
+
+      return false;
+    }
+
+    return true;
+  }
   function executeIOAction(action) {
     try {
       return action();
@@ -50,14 +123,22 @@ class File < IO
   include ::IO::Writable
   include ::IO::Readable
 
-  @__fs__ = node_require :fs
-  @__path__ = node_require :path
+  @__fs__ = `require('fs')`
+  @__path__ = `require('path')`
+  @__util__ = `require('util')`
   `var __fs__ = #{@__fs__}`
   `var __path__ = #{@__path__}`
+  `var __util__ = #{@__util__}`
+  # Since Node.js 11+ TextEncoder and TextDecoder are now available on the global object.
+  `var __TextEncoder__ = typeof TextEncoder !== 'undefined' ? TextEncoder : __util__.TextEncoder`
+  `var __TextDecoder__ = typeof TextDecoder !== 'undefined' ? TextDecoder : __util__.TextDecoder`
+  `var __utf8TextDecoder__ = new __TextDecoder__('utf8')`
+  `var __textEncoder__ = new __TextEncoder__()`
 
   if `__path__.sep !== #{Separator}`
     ALT_SEPARATOR = `__path__.sep`
   end
+
 
   def self.read(path)
     `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString()})`
@@ -77,11 +158,11 @@ class File < IO
     pathname = join(dir_string, pathname) if dir_string
     if block_given?
       `
-      __fs__.realpath(#{pathname}, #{cache}, function(error, realpath){
-        if (error) Opal.IOError.$new(error.message)
-        else #{block.call(`realpath`)}
-      })
-      `
+        __fs__.realpath(#{pathname}, #{cache}, function(error, realpath){
+          if (error) Opal.IOError.$new(error.message)
+          else #{block.call(`realpath`)}
+        })
+        `
     else
       `return executeIOAction(function(){return __fs__.realpathSync(#{pathname}, #{cache})})`
     end
@@ -118,13 +199,13 @@ class File < IO
   def self.readable?(path)
     return false unless exist? path
     %{
-      try {
-        __fs__.accessSync(path, __fs__.R_OK);
-        return true;
-      } catch (error) {
-        return false;
+        try {
+          __fs__.accessSync(path, __fs__.R_OK);
+          return true;
+        } catch (error) {
+          return false;
+        }
       }
-    }
   end
 
   def self.size(path)
@@ -157,10 +238,17 @@ class File < IO
     `return executeIOAction(function(){return __fs__.lstatSync(#{path}).isSymbolicLink()})`
   end
 
+  def self.absolute_path(path, basedir = nil)
+    path = path.respond_to?(:to_path) ? path.to_path : path
+    basedir ||= Dir.pwd
+    `return __path__.normalize(__path__.resolve(#{basedir.to_str}, #{path.to_str})).split(__path__.sep).join(__path__.posix.sep)`
+  end
+
   # Instance Methods
 
   def initialize(path, flags = 'r')
-    # Node reads files in binary by default, but does not recognize the flag
+    @binary_flag = flags.include?('b')
+    # Node does not recognize this flag
     flags = flags.delete('b')
     # encoding flag is unsupported
     encoding_option_rx = /:(.*)/
@@ -179,11 +267,29 @@ class File < IO
     if @eof
       ''
     else
-      res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString()})`
+      if @binary_flag
+        %x{
+          var buf = executeIOAction(function(){return __fs__.readFileSync(#{@path})})
+          var content
+          if (is_utf8(buf)) {
+            content = buf.toString('utf8')
+          } else {
+            // coerce to utf8
+            content = __utf8TextDecoder__.decode(__textEncoder__.encode(buf.toString('binary')))
+          }
+        }
+        res = `content`
+      else
+        res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString('utf8')})`
+      end
       @eof = true
       @lineno = res.size
       res
     end
+  end
+
+  def readlines(separator = $/)
+    each_line(separator).to_a
   end
 
   def each_line(separator = $/, &block)
@@ -212,7 +318,7 @@ class File < IO
       }
       self
     else
-      read.each_line
+      read.each_line separator
     end
   end
 
@@ -234,7 +340,7 @@ class File < IO
 end
 
 class File::Stat
-  @__fs__ = node_require :fs
+  @__fs__ = `require('fs')`
   `var __fs__ = #{@__fs__}`
 
   def initialize(path)

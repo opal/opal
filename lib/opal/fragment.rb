@@ -29,9 +29,28 @@ module Opal
     end
 
     def source_map_name
-      return nil unless @scope
-      def_node = @scope.def? ? @scope : @scope.find_parent_def
-      def_node && def_node.mid
+      case @sexp.type
+      when :top, :begin, :newline, :js_return
+        nil
+      when :self
+        'self'
+      when :module
+        'module'
+      when :class
+        'class'
+      when :int
+        @sexp.children.first
+      when :def
+        @sexp.children.first
+      when :defs
+        @sexp.children[1]
+      when :send
+        @sexp.children[1]
+      when :lvar, :lvasgn, :lvdeclare, :ivar, :ivasgn, :gvar, :cvar, :cvasgn, :gvars, :gvasgn
+        @sexp.children.first
+      else
+        # nil
+      end
     end
 
     # Original line this fragment was created from

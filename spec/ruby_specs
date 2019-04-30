@@ -46,6 +46,8 @@ ruby/core/file/basename_spec
 ruby/core/file/dirname_spec
 ruby/core/file/extname_spec
 ruby/core/file/join_spec
+ruby/core/file/expand_path_spec
+ruby/core/file/absolute_path_spec
 ruby/core/float
 ruby/core/hash
 ruby/core/integer
@@ -53,7 +55,6 @@ ruby/core/integer
 ruby/core/kernel
 !ruby/core/kernel/abort_spec
 !ruby/core/kernel/at_exit_spec
-!ruby/core/kernel/autoload_spec
 !ruby/core/kernel/backtick_spec
 !ruby/core/kernel/binding_spec
 !ruby/core/kernel/callcc_spec
@@ -96,6 +97,7 @@ ruby/core/math
 ruby/core/method
 
 ruby/core/module
+!ruby/core/module/autoload_spec
 
 ruby/core/marshal/load_spec
 ruby/core/marshal/dump_spec
@@ -153,6 +155,7 @@ ruby/core/unboundmethod
 
 ruby/language
 !ruby/language/execution_spec
+!ruby/language/safe_spec
 
 ruby/library/base64
 ruby/library/bigdecimal

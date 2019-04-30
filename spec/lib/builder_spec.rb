@@ -76,14 +76,14 @@ RSpec.describe Opal::Builder do
     expect(Opal::Config.compiler_options[:arity_check]).to eq(false)
     builder = described_class.new
     builder.build_str('def foo; end', 'foo')
-    expect(builder.to_s).not_to include('TMP_foo_1.$$parameters = []')
+    expect(builder.to_s).not_to include('$foo$1.$$parameters = []')
 
     Opal::Config.arity_check_enabled = true
     expect(Opal::Config.arity_check_enabled).to eq(true)
     expect(Opal::Config.compiler_options[:arity_check]).to eq(true)
     builder = described_class.new
     builder.build_str('def foo; end', 'foo')
-    expect(builder.to_s).to include('TMP_foo_1.$$parameters = []')
+    expect(builder.to_s).to include('$foo$1.$$parameters = []')
   end
 
   describe '#missing_require_severity' do
@@ -127,7 +127,7 @@ RSpec.describe Opal::Builder do
 
   describe ':requirable' do
     it 'it uses front slash as module name' do
-      expect(builder.build('nodejs/open-uri', requirable: true).to_s).to include(%{Opal.modules["nodejs/open-uri"]})
+      expect(builder.build('opal/platform', requirable: true).to_s).to include(%{Opal.modules["opal/platform"]})
     end
   end
 end

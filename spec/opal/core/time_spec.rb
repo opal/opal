@@ -59,4 +59,10 @@ describe Time do
       end
     end
   end
+
+  describe '#utc_offset' do
+    context 'returns 0 if the date is UTC' do
+      Time.new.utc.utc_offset.should == 0
+    end
+  end
 end

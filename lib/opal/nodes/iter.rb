@@ -8,34 +8,20 @@ module Opal
     class IterNode < NodeWithArgs
       handle :iter
 
-      children :args, :body
-
-      attr_accessor :block_arg, :shadow_args
+      children :inline_args, :body
 
       def compile
         inline_params = nil
-        extract_block_arg
-        extract_shadow_args
-        extract_underscore_args
-        split_args
 
         to_vars = identity = body_code = nil
 
         in_scope do
-          inline_params = process(inline_args_sexp)
-
           identity = scope.identify!
           add_temp "self = #{identity}.$$s || this"
 
-          compile_block_arg
-          compile_shadow_args
-          compile_inline_args
-          compile_post_args
-          compile_norm_args
+          inline_params = process(inline_args)
 
-          if compiler.arity_check?
-            compile_arity_check
-          end
+          compile_arity_check
 
           body_code = stmt(returned_body)
           to_vars = scope.to_vars
@@ -73,17 +59,6 @@ module Opal
         push " #{identity})"
       end
 
-      def norm_args
-        @norm_args ||= args.children.select { |arg| arg.type == :arg }
-      end
-
-      def compile_norm_args
-        norm_args.each do |arg|
-          arg_name, _ = *arg
-          push "if (#{arg_name} == null) #{arg_name} = nil;"
-        end
-      end
-
       def compile_block_arg
         if block_arg
           scope.block_name = block_arg
@@ -93,48 +68,6 @@ module Opal
           line "#{block_arg} = #{scope_name}.$$p || nil;"
           line "if (#{block_arg}) #{scope_name}.$$p = null;"
         end
-      end
-
-      def extract_block_arg
-        *regular_args, last_arg = args.children
-        if last_arg && last_arg.type == :blockarg
-          @block_arg = last_arg.children[0]
-          @sexp = @sexp.updated(
-            nil, [
-              s(:args, *regular_args),
-              body
-            ]
-          )
-        end
-      end
-
-      def compile_shadow_args
-        shadow_args.each do |shadow_arg|
-          arg_name = shadow_arg.children[0]
-          scope.locals << arg_name
-          scope.add_arg(arg_name)
-        end
-      end
-
-      def extract_shadow_args
-        @shadow_args = []
-        valid_args = []
-        return unless args
-
-        args.children.each do |arg|
-          if arg.type == :shadowarg
-            @shadow_args << arg
-          else
-            valid_args << arg
-          end
-        end
-
-        @sexp = @sexp.updated(
-          nil, [
-            args.updated(nil, valid_args),
-            body
-          ]
-        )
       end
 
       def extract_underscore_args
@@ -165,47 +98,19 @@ module Opal
         compiler.returns(body || s(:nil))
       end
 
-      def mlhs_args
-        scope.mlhs_mapping.keys
-      end
-
       def has_top_level_mlhs_arg?
-        args.children.any? { |arg| arg.type == :mlhs }
+        original_args.children.any? { |arg| arg.type == :mlhs }
       end
 
       def has_trailing_comma_in_args?
-        if args.loc && args.loc.expression
-          args_source = args.loc.expression.source
+        if original_args.loc && original_args.loc.expression
+          args_source = original_args.loc.expression.source
           args_source.match(/,\s*\|/)
         end
       end
 
-      # Returns code used in debug mode to check arity of method call
-      def compile_arity_check
-        unless arity_checks.empty?
-          parent_scope = scope
-          until parent_scope.top? || parent_scope.def? || parent_scope.class_scope?
-            parent_scope = parent_scope.parent
-          end
-
-          context =
-            if parent_scope.top?
-              "'<main>'"
-            elsif parent_scope.def?
-              "'#{parent_scope.mid}'"
-            elsif parent_scope.class?
-              "'<class:#{parent_scope.name}>'"
-            elsif parent_scope.module?
-              "'<module:#{parent_scope.name}>'"
-            end
-
-          identity = scope.identity
-
-          line "if (#{identity}.$$is_lambda || #{identity}.$$define_meth) {"
-          line '  var $arity = arguments.length;'
-          line "  if (#{arity_checks.join(' || ')}) { Opal.block_ac($arity, #{arity}, #{context}); }"
-          line '}'
-        end
+      def arity_check_node
+        s(:iter_arity_check, original_args)
       end
 
       def contains_break?

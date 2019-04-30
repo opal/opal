@@ -17,6 +17,14 @@ class TestOpenURI < Test::Unit::TestCase
     }
   end
 
+  def test_open_http_image_png
+    #expected = File.open(File.join(File.dirname(__FILE__), 'cat.png'), 'rb').read
+    open("http://localhost:4567/png") {|f|
+      assert_match(/^\u0089PNG\r\n\u001A\n\u0000\u0000\u0000\rIHDR.*/, f.read)
+      assert_equal('image/png', f.content_type)
+    }
+  end
+
   def test_open_last_modified
     open("http://localhost:4567/last_modified") {|f|
       assert_equal('Look Ma, I have a Last-Modified header', f.read)
@@ -35,5 +43,11 @@ class TestOpenURI < Test::Unit::TestCase
   def test_open_http_error
     # No HTTP server on port 1234
     assert_raise(OpenURI::HTTPError) { open("http://localhost:1234") }
+  end
+
+  def test_open_no_header
+    open("http://localhost:4567/no_header") {|f|
+      assert_equal('no header', f.read)
+    }
   end
 end

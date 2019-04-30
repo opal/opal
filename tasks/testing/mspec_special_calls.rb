@@ -29,19 +29,21 @@ class Opal::Nodes::CallNode
     end
   end
 
+  has_xstring = -> node {
+    next if node.nil? || !node.respond_to?(:type)
+    node.type == :xstr || (node.children && node.children.any?(&has_xstring))
+  }
+
   add_special :platform_is_not do |compile_default|
-    if arglist.children.include?(s(:sym, :opal))
-      push 'false'
-    else
-      push 'true'
-    end
+    next if arglist.children.include?(s(:sym, :opal))
+    next if children.any?(&has_xstring)
+
+    compile_default.call
   end
 
   add_special :platform_is do |compile_default|
-    if arglist.children.include?(s(:sym, :opal))
-      push 'true'
-    else
-      push 'false'
+    if arglist.children.include?(s(:sym, :opal)) || !children.any?(&has_xstring)
+      compile_default.call
     end
   end
 

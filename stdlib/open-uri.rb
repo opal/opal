@@ -1,6 +1,7 @@
 # Copied from https://raw.githubusercontent.com/ruby/ruby/373babeaac8c3e663e1ded74a9f06ac94a671ed9/lib/open-uri.rb
 # frozen_string_literal: true
 require 'stringio'
+require 'corelib/array/pack'
 
 module Kernel
   private
@@ -120,22 +121,35 @@ module OpenURI
     status = `req.status`
     status_text = `req.statusText && req.statusText.errno ? req.statusText.errno : req.statusText`
     if status == 200 || (status == 0 && data)
-      build_response(req, data, status, status_text)
+      build_response(req, status, status_text)
     else
       raise OpenURI::HTTPError.new("#{status} #{status_text}", '')
     end
   end
 
-  def self.build_response(req, data, status, status_text)
+  def self.build_response(req, status, status_text)
     buf = Buffer.new
-    buf << data
+    buf << data(req).pack('c*')
     io = buf.io
     #io.base_uri = uri # TODO: Generate a URI object from the uri String
     io.status = "#{status} #{status_text}"
-    io.meta_add_field('content-type', `req.getResponseHeader("Content-Type")`)
+    io.meta_add_field('content-type', `req.getResponseHeader("Content-Type") || ''`)
     last_modified = `req.getResponseHeader("Last-Modified")`
     io.meta_add_field('last-modified', last_modified) if last_modified
     io
+  end
+
+  def self.data(req)
+    %x{
+      var binStr = req.responseText;
+      var byteArray = [];
+      for (var i = 0, len = binStr.length; i < len; ++i) {
+        var c = binStr.charCodeAt(i);
+        var byteCode = c & 0xff; // byte at offset i
+        byteArray.push(byteCode);
+      }
+      return byteArray;
+    }
   end
 
   def self.request(uri)
@@ -143,6 +157,9 @@ module OpenURI
       try {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', uri, false);
+        // We cannot use xhr.responseType = "arraybuffer" because XMLHttpRequest is used in synchronous mode.
+        // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType#Synchronous_XHR_restrictions
+        xhr.overrideMimeType('text/plain; charset=x-user-defined');
         xhr.send();
         return xhr;
       } catch (error) {
