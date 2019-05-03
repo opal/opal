@@ -210,8 +210,11 @@ class String
 
       if (encoding === self.encoding) { return self; }
 
-      // doesn't work in ES5, primitive properties are read only
-      // self.encoding = encoding;
+      if (Opal.in_strict_mode) {
+        console.warn('Changing the String encoding is currently not supported in Javascripts "strict" mode.')
+      } else {
+        self.encoding = encoding;
+      }
       return self;
     }
   end
