@@ -49,21 +49,7 @@ module Opal
         end
 
         if compiler.es6_modules?
-          import_lines = compiler.requires.map do |module_path|
-            Opal::ES6ModulesHelpers.generate_module_imports(module_path)
-          end
-          if compiler.required_trees.any?
-            base_dir = Pathname.new(compiler.file).dirname
-
-            compiler.required_trees.each do |module_path|
-              # ES6 javascript import doesn't allow for import of directories, to support require_tree
-              # the compiler must import each file in the tree separately
-              import_lines << Opal::ES6ModulesHelpers.generate_directory_imports(base_dir, module_path)
-            end
-          end
-          unshift(*import_lines.flatten) if import_lines.any?
-          unshift("\n")
-          unshift(version_comment)
+          add_import_lines
         end
 
         closing
@@ -107,6 +93,24 @@ module Opal
         if compiler.irb?
           line 'if (!Opal.irb_vars) { Opal.irb_vars = {}; }'
         end
+      end
+
+      def add_import_lines
+        import_lines = compiler.requires.map do |module_path|
+          Opal::ES6ModulesHelpers.generate_module_imports(module_path)
+        end
+        if compiler.required_trees.any?
+          base_dir = Pathname.new(compiler.file).dirname
+
+          compiler.required_trees.each do |module_path|
+            # ES6 javascript import doesn't allow for import of directories, to support require_tree
+            # the compiler must import each file in the tree separately
+            import_lines << Opal::ES6ModulesHelpers.generate_directory_imports(base_dir, module_path)
+          end
+        end
+        unshift(*import_lines.flatten) if import_lines.any?
+        unshift("\n")
+        unshift(version_comment)
       end
 
       def add_used_helpers
