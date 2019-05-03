@@ -5,6 +5,11 @@ require 'pathname'
 module Opal
   class ES6ModulesHelpers
     def self.generate_import_name(module_name)
+      # in ruby its legal to require the same module several times, in webpack es6 importing the same module only works, if the import name
+      # is different, using the same import will result in a error.
+      # As large ruby projects tend to require the same module in a context several times, the import name must be different
+      # for each import. here a random import name is generated. webpack will make sure, that the code the different imports refer to,
+      # is imported only once
       # generate random import name for a ruby module_name. Also replaces some characters that are illegal in JS import names.
       module_name.gsub('.', 'o_').tr('-', '_').tr('/', '_').gsub('@', '_at_') + rand(36**8).to_s(36)
     end
@@ -40,28 +45,7 @@ module Opal
     end
 
     def self.generate_module_imports(module_path)
-      # modules should have the ending .rb for imports, so that the opal-webpack-resolver-plugin
-      # or the opal-webpack-loader don't mix them up with javascript imports
-      # that is just a sensible convention for example, a require 'react', without ending:
-      #   import 'react';  --> resolves to react.js in javascript space, may be resolved by webpack otherwise
-      # vs. with ending:
-      #   import 'react.rb';  --> resolves to react.rb in the opal/ruby space which gets transpiled to js by the loader
-      # if a javascript file gets required as:
-      #   require 'runtime'
-      # it gets imported like so:
-      #   import 'runtime.rb'
-      # the opal-webpack-resolver-plugin will then check for a runtime.rb, but also for a runtime.js if the runtime.rb is not found.
-      real_module_name = if module_path.start_with?('/')
-                           module_path_rb = module_path.end_with?('.rb') ? module_path : module_path + '.rb'
-                           Opal::Compiler.module_name_from_paths(module_path_rb)
-                         else
-                           module_path
-                         end
-      # in ruby its legal to require the same module several times, in webpack es6 importing the same module only works, if the import name
-      # is different, using the same import will result in a error.
-      # As large ruby projects tend to require the same module in a context several times, the import name must be different
-      # for each import. here a random inport name is generated. webpack will make sure, that the code the different imports refer to,
-      # is imported only once
+      real_module_name = determine_real_module_name(module_path)
       module_import_name = generate_import_name(module_path)
       module_import_lines = []
       has_extension = module_path.end_with?('.js', '.rb')
@@ -83,6 +67,26 @@ module Opal
         module_import_lines << "}\n"
       end
       module_import_lines
+    end
+
+    def self.determine_real_module_name(module_path)
+      # modules should have the ending .rb for imports, so that the opal-webpack-resolver-plugin
+      # or the opal-webpack-loader don't mix them up with javascript imports
+      # that is just a sensible convention for example, a require 'react', without ending:
+      #   import 'react';  --> resolves to react.js in javascript space, may be resolved by webpack otherwise
+      # vs. with ending:
+      #   import 'react.rb';  --> resolves to react.rb in the opal/ruby space which gets transpiled to js by the loader
+      # if a javascript file gets required as:
+      #   require 'runtime'
+      # it gets imported like so:
+      #   import 'runtime.rb'
+      # the opal-webpack-resolver-plugin will then check for a runtime.rb, but also for a runtime.js if the runtime.rb is not found.
+      if module_path.start_with?('/')
+        module_path_rb = module_path.end_with?('.rb') ? module_path : module_path + '.rb'
+        Opal::Compiler.module_name_from_paths(module_path_rb)
+      else
+        module_path
+      end
     end
 
     def self.module_name_for_pwd(original_path_s)
