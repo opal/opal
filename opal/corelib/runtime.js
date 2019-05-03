@@ -54,6 +54,9 @@
   // The Opal object that is exposed globally
   var Opal = this.Opal = {};
 
+  // in strict mode eval doesn't introduce a new variable into the outer context.
+  Opal.in_strict_mode = (eval("var __temp = null"), (typeof __temp === "undefined"));
+
   // This is a useful reference to global object inside ruby files
   Opal.global = global_object;
   global_object.Opal = Opal;
