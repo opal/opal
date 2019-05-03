@@ -58,7 +58,7 @@ module Opal
             compiler.required_trees.each do |module_path|
               # ES6 javascript import doesn't allow for import of directories, to support require_tree
               # the compiler must import each file in the tree separately
-              import_lines << Opal::ES6ModulesHelpers.generate_child_path_imports(base_dir, module_path)
+              import_lines << Opal::ES6ModulesHelpers.generate_directory_imports(base_dir, module_path)
             end
           end
           unshift(*import_lines.flatten) if import_lines.any?

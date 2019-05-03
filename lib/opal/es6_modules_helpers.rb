@@ -9,25 +9,31 @@ module Opal
       module_name.gsub('.', 'o_').tr('-', '_').tr('/', '_').gsub('@', '_at_') + rand(36**8).to_s(36)
     end
 
-    def self.generate_child_path_imports(base_dir, module_path)
+    def self.generate_file_import(child_path)
+      import_lines = []
+      path_s = child_path.basename.to_s
+      if path_s.end_with?('.rb', '.js')
+        module_path = child_path.expand_path.to_s[(base_dir.expand_path.to_s.length + 1)..-1].sub(/\.(js|rb)\z/, '')
+        file_ending = '.' + path_s.split('.').last
+        import_name = generate_import_name(module_path + file_ending)
+        import_lines << "import #{import_name} from '#{module_path}#{file_ending}';\n"
+        import_lines << "if (typeof Opal.modules[#{module_path.inspect}] === 'undefined') {\n"
+        import_lines << "  if (typeof #{import_name} === 'function') { #{import_name}(); }\n"
+        import_lines << "}\n"
+        import_lines
+      end
+      import_lines
+    end
+
+    def self.generate_directory_imports(base_dir, module_path)
       # recursively walk a directory and generate import lines for all .rb/.js files
       import_lines = []
       directory_path = base_dir + module_path
       directory_path.each_child do |child_path|
         if child_path.directory?
-          import_lines << generate_child_path_imports(base_dir, child_path.expand_path.to_s[(base_dir.expand_path.to_s.length + 1)..-1])
+          import_lines << generate_directory_imports(base_dir, child_path.expand_path.to_s[(base_dir.expand_path.to_s.length + 1)..-1])
         elsif child_path.file?
-          path_s = child_path.basename.to_s
-          if path_s.end_with?('.rb', '.js')
-            module_path = child_path.expand_path.to_s[(base_dir.expand_path.to_s.length + 1)..-1].sub(/\.(js|rb)\z/, '')
-            file_ending = '.' + path_s.split('.').last
-            import_name = generate_import_name(module_path + file_ending)
-            import_lines << "import #{import_name} from '#{module_path}#{file_ending}';\n"
-            import_lines << "if (typeof Opal.modules[#{module_path.inspect}] === 'undefined') {\n"
-            import_lines << "  if (typeof #{import_name} === 'function') { #{import_name}(); }\n"
-            import_lines << "}\n"
-            import_lines
-          end
+          import_lines += generate_file_import(child_path)
         end
       end
       import_lines
@@ -79,6 +85,18 @@ module Opal
       module_import_lines
     end
 
+    def self.module_name_for_pwd(original_path_s)
+      pwd = Dir.pwd
+      if original_path_s.start_with?(pwd)
+        # got a match in current dir
+        # remove current dir at the beginning and the filename extension to get the module name like 'some/ruby'
+        return original_path_s[(pwd.size + 1)..-1].sub(/\.(js|rb|js\.rb)\z/, '')
+      else
+        # no match at all, return original path
+        return original_path_s
+      end
+    end
+
     def self.module_name_from_paths_helper(path, original_path_s)
       # split the filename_path into path and basename, only the path is needed and compared against Opal.paths
       path, _basename = path.split # Pathname#split that is and doesn't accept args
@@ -89,16 +107,8 @@ module Opal
         return original_path_s[(path_s.size + 1)..-1].sub(/\.(js|rb|js\.rb)\z/, '')
       end
       if path.root?
-        # no match in Opal.paths
-        pwd = Dir.pwd
-        if original_path_s.start_with?(pwd)
-          # got a match in current dir
-          # remove current dir at the beginning and the filename extension to get the module name like 'some/ruby'
-          return original_path_s[(pwd.size + 1)..-1].sub(/\.(js|rb|js\.rb)\z/, '')
-        else
-          # no match at all, return original path
-          return original_path_s
-        end
+        # no match in Opal.paths, check pwd
+        return module_name_for_pwd(original_path_s)
       end
       module_name_from_paths_helper(path, original_path_s)
     end
