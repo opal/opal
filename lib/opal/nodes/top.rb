@@ -48,9 +48,7 @@ module Opal
           line body_code
         end
 
-        if compiler.es6_modules?
-          add_import_lines
-        end
+        prepend_import_lines if compiler.es6_modules?
 
         closing
       end
@@ -95,7 +93,7 @@ module Opal
         end
       end
 
-      def add_import_lines
+      def prepend_import_lines
         import_lines = compiler.requires.map do |module_path|
           Opal::ES6ModulesHelpers.generate_module_imports(module_path)
         end
