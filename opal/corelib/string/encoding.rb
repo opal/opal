@@ -211,7 +211,12 @@ class String
       if (encoding === self.encoding) { return self; }
 
       if (Opal.in_strict_mode) {
-        console.warn('Changing the String encoding is currently not supported in Javascripts "strict" mode.')
+        var result = new String(self.toString())
+        Object.defineProperty(result, 'encoding', {
+          value: encoding,
+          writable: true
+        })
+        return result
       } else {
         self.encoding = encoding;
       }

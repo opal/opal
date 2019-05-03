@@ -277,7 +277,7 @@ Use PATTERN environment variable to manually set the glob for specs:
   bundle exec rake mspec_nodejs PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
 
-platforms = %w[nodejs server chrome]
+platforms = %w[nodejs server chrome strictnodejs]
 mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
 
@@ -447,10 +447,10 @@ platforms.each do |platform|
 end
 
 desc "Run the whole MSpec suite on all platforms"
-task :mspec    => [:mspec_chrome, :mspec_nodejs]
+task :mspec    => [:mspec_chrome, :mspec_nodejs, :mspec_strictnodejs]
 
 desc "Run the whole Minitest suite on all platforms"
-task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs]
+task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs, :minitest_strictnodejs]
 
 desc "Run all tests"
 task :test_all => [:rspec, :mspec, :minitest]

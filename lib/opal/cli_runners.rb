@@ -72,12 +72,14 @@ module Opal
     autoload :Chrome,      'opal/cli_runners/chrome'
     autoload :Nashorn,     'opal/cli_runners/nashorn'
     autoload :Nodejs,      'opal/cli_runners/nodejs'
+    autoload :Strictnodejs,'opal/cli_runners/strictnodejs'
     autoload :Server,      'opal/cli_runners/server'
 
     register_legacy_runner :Applescript, :applescript, :osascript
     register_legacy_runner :Chrome,      :chrome
     register_legacy_runner :Nashorn,     :nashorn
     register_legacy_runner :Nodejs,      :nodejs, :node
+    register_legacy_runner :Strictnodejs,:strictnodejs
     register_legacy_runner :Server,      :server
   end
 end
