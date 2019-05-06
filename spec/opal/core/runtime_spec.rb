@@ -56,3 +56,9 @@ describe 'javascript access using .JS' do
     `a["foo"]`.should == 1
   end
 end
+
+describe 'runtime in strict mode' do
+  it 'correctly identifies strict mode or non strict mode' do
+    `(function(){return !this;})()`.should == `Opal.in_strict_mode`
+  end
+end
