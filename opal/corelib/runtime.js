@@ -180,7 +180,7 @@
 
   // Walk up the nesting array looking for the constant
   function const_lookup_nesting(nesting, name) {
-    var i, ii, result, constant;
+    var i, ii, constant;
 
     if (nesting.length === 0) return;
 
@@ -194,7 +194,7 @@
 
   // Walk up the ancestors chain looking for the constant
   function const_lookup_ancestors(cref, name) {
-    var i, ii, result, ancestors;
+    var i, ii, ancestors;
 
     if (cref == null) return;
 
