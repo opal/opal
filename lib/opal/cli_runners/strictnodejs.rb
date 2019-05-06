@@ -25,7 +25,7 @@ module Opal
 
       def run(code, argv)
         require 'tempfile'
-        tempfile = Tempfile.new('opal-nodejs-runner-')
+        tempfile = Tempfile.new('opal-strictnodejs-runner-')
         # tempfile = File.new('opal-nodejs-runner.js', 'w') # for debugging
         tempfile.write code
         tempfile.close
@@ -49,7 +49,7 @@ module Opal
           # to ship here's a tempfile workaround.
           require 'tempfile'
           require 'shellwords'
-          tempfile = Tempfile.new('opal-node-output')
+          tempfile = Tempfile.new('opal-strictnode-output')
           system(env, cmd.shelljoin + " > #{tempfile.path}")
           @exit_status = $?.exitstatus
           captured_output = File.read tempfile.path
