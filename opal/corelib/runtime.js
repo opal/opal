@@ -338,7 +338,7 @@
     for (i = 0, ii = modules.length; i < ii; i++) {
       module = modules[i];
 
-      // Don not show Objects constants unless we're querying Object itself
+      // Do not show Objects constants unless we're querying Object itself
       if (cref !== _Object && module == _Object) break;
 
       for (constant in module.$$const) {
