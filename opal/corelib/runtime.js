@@ -1155,12 +1155,6 @@
       throw Opal.ArgumentError.$new("already bridged");
     }
 
-    var klass_to_inject, klass_reference;
-
-    klass_to_inject = klass.$$super || Opal.Object;
-    klass_reference = klass;
-    var original_prototype = klass.$$prototype;
-
     // constructor is a JS function with a prototype chain like:
     // - constructor
     //   - super
