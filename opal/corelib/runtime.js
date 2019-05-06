@@ -330,7 +330,7 @@
   Opal.constants = function(cref, inherit) {
     if (inherit == null) inherit = true;
 
-    var module, modules = [cref], module_constants, i, ii, constants = {}, constant;
+    var module, modules = [cref], i, ii, constants = {}, constant;
 
     if (inherit) modules = modules.concat(Opal.ancestors(cref));
     if (inherit && cref.$$is_module) modules = modules.concat([Opal.Object]).concat(Opal.ancestors(Opal.Object));
