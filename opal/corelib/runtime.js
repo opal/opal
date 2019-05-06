@@ -1,5 +1,3 @@
-'use strict';
-
 (function() {
   // @note
   //   A few conventions for the documentation of this file:
@@ -60,12 +58,16 @@
   Opal.global = global_object;
   global_object.Opal = Opal;
 
-  // Configure runtime behavior with regards to require and unsupported fearures
+  // Configure runtime behavior with regards to require and unsupported features
   Opal.config = {
     missing_require_severity: 'error',        // error, warning, ignore
     unsupported_features_severity: 'warning', // error, warning, ignore
     enable_stack_trace: true                  // true, false
   };
+
+  // check if running in strict mode
+  // in strict mode eval doesn't introduce a new variable into the outer context.
+  Opal.in_strict_mode = (eval("var __temp = null"), (typeof __temp === "undefined"));
 
   // Minify common function calls
   var $hasOwn       = Object.hasOwnProperty;
