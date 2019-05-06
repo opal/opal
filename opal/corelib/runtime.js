@@ -33,7 +33,7 @@
 
   if (typeof(global_object.Opal) !== 'undefined') {
     console.warn('Opal already loaded. Loading twice can cause troubles, please fix your setup.');
-    return this.Opal;
+    return global_object.Opal;
   }
 
   var nil;
