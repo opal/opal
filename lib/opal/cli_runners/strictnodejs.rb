@@ -25,12 +25,11 @@ module Opal
 
       def run(code, argv)
         require 'tempfile'
+        # File.write('opal-strictnodejs-runner.js', code) # for debugging
         tempfile = Tempfile.new('opal-strictnodejs-runner-')
-        # tempfile = File.new('opal-nodejs-runner.js', 'w') # for debugging
         tempfile.write code
         tempfile.close
-        argv << '--use-strict'
-        system_with_output({ 'NODE_PATH' => node_modules }, 'node', tempfile.path, *argv)
+        system_with_output({ 'NODE_PATH' => node_modules }, 'node', '--use-strict', tempfile.path, *argv)
       rescue Errno::ENOENT
         raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
       end
