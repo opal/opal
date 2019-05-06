@@ -328,7 +328,7 @@ platforms.each do |platform|
       end
       Testing::HTTPServer.new.with_server do |session|
         filename = "tmp/minitest_#{suite}_#{platform}.rb"
-        files.push('nodejs') if platform == 'nodejs'
+        files.push('nodejs') if platform.end_with?('nodejs')
         Testing::Minitest.write_file(filename, files, ENV)
 
         stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
