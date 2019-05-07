@@ -1,4 +1,4 @@
-(function(undefined) {
+(function() {
   // @note
   //   A few conventions for the documentation of this file:
   //   1. Always use "//" (in contrast with "/**/")
@@ -2409,4 +2409,4 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
-}).call(this);
+}).call();
