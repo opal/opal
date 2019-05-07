@@ -164,6 +164,10 @@ module Opal
         options[:parse_comments] = true
       end
 
+      on('--es6-modules', 'Compiles modules for ES6 import/export (requires -c or -L)') do
+        options[:es6_modules] = true
+      end
+
       separator ''
     end
 

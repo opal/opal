@@ -226,11 +226,23 @@ module Opal
         file = compiler.file
         if arg.type == :str
           dir = File.dirname(file)
-          compiler.requires << Pathname(dir).join(arg.children[0]).cleanpath.to_s
+          mod_filename = Pathname(dir).join(arg.children[0]).cleanpath.to_s
+          compiler.requires << mod_filename
         end
-        push fragment("self.$require(#{file.inspect}+ '/../' + ")
-        push process(arglist)
-        push fragment(')')
+        if compiler.es6_modules?
+          if arg.type == :str
+            mod_filename = mod_filename.end_with?('.rb') ? mod_filename : mod_filename + '.rb'
+            push fragment("self.$require(#{Opal::Compiler.module_name_from_paths(mod_filename).inspect})")
+          else
+            push fragment("self.$require(#{Opal::Compiler.module_name_from_paths(File.dirname(file)).inspect} + '/' + ")
+            push process(arglist)
+            push fragment(')')
+          end
+        else
+          push fragment("self.$require(#{file.inspect}+ '/../' + ")
+          push process(arglist)
+          push fragment(')')
+        end
       end
 
       add_special :autoload do |compile_default|
@@ -251,6 +263,10 @@ module Opal
           full_path = Pathname(dir).join(relative_path).cleanpath.to_s
           full_path.force_encoding(relative_path.encoding)
           first_arg = first_arg.updated(nil, [full_path])
+        end
+        if compiler.es6_modules? && first_arg.children[0].start_with?('/')
+          real_module_name = Opal::Compiler.module_name_from_paths(first_arg.children[0])
+          first_arg = Opal::AST::Node.new(:str, [real_module_name])
         end
         @arglist = arglist.updated(nil, [first_arg] + rest)
         compile_default.call
