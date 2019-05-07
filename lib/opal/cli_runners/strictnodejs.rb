@@ -29,11 +29,12 @@ module Opal
 
       def run(code, argv)
         require 'tempfile'
-        # File.write('opal-strictnodejs-runner.js', code) # for debugging
+        code = "\"use strict\";\n\n" + code
+        # File.write("opal-strictnodejs-runner-#{Random.rand(10)}.js", code) # for debugging
         tempfile = Tempfile.new('opal-strictnodejs-runner-')
         tempfile.write code
         tempfile.close
-        system_with_output({ 'NODE_PATH' => node_modules }, 'node', '--use-strict', tempfile.path, *argv)
+        system_with_output({ 'NODE_PATH' => node_modules }, 'node', '--use_strict', tempfile.path, *argv)
       rescue Errno::ENOENT
         raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
       end
