@@ -1147,18 +1147,12 @@
   //
   // @param klass       [Class] the Ruby class to bridge
   // @param constructor [JS.Function] native JavaScript constructor to use
-  // @return [Class] returns the passed Ruby class
+  // @return [undefined]
   //
   Opal.bridge = function(native_klass, klass) {
     if (native_klass.hasOwnProperty('$$bridge')) {
       throw Opal.ArgumentError.$new("already bridged");
     }
-
-    var klass_to_inject, klass_reference;
-
-    klass_to_inject = klass.$$super || Opal.Object;
-    klass_reference = klass;
-    var original_prototype = klass.$$prototype;
 
     // constructor is a JS function with a prototype chain like:
     // - constructor
