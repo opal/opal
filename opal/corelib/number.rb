@@ -3,7 +3,7 @@ require 'corelib/numeric'
 class Number < Numeric
   Opal.bridge(`Number`, self)
   `Opal.defineProperty(self.$$prototype, '$$is_number', true)`
-  `self.$$is_number_class = true`
+  `Opal.defineProperty(self, '$$is_number_class', true)`
 
   class << self
     def allocate
@@ -1009,7 +1009,7 @@ end
 Fixnum = Number
 
 class Integer < Numeric
-  `self.$$is_number_class = true`
+  `Opal.defineProperty(self, '$$is_number_class', true)`
 
   class << self
     def allocate
@@ -1045,7 +1045,7 @@ class Integer < Numeric
 end
 
 class Float < Numeric
-  `self.$$is_number_class = true`
+  `Opal.defineProperty(self, '$$is_number_class', true)`
 
   class << self
     def allocate
