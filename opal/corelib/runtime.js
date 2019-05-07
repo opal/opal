@@ -1863,6 +1863,8 @@
 
     // Try to make the browser pick the right name
     alias.displayName       = name;
+    // Make 'length' writable, otherwise a value cannot be assigned to the read-only property 'length' in strict mode
+    Object.defineProperty(alias, 'length', { writable: true });
     alias.length            = body.length;
     alias.$$arity           = body.$$arity;
     alias.$$parameters      = body.$$parameters;
