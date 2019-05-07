@@ -460,7 +460,7 @@ class Number < Numeric
   end
 
   def gcdlcm(other)
-    [gcd, lcm]
+    [gcd(other), lcm(other)]
   end
 
   def integer?
