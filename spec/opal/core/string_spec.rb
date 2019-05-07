@@ -29,4 +29,18 @@ describe 'Encoding' do
       Encoding.find('binary').should == Encoding::ASCII
     end
   end
+
+  it 'is set only on a copy of the instance and not all strings' do
+    # if the .encoding property is set in the wrong way in 'use strict' it will affect all strings
+    a_string = 'è'
+    a_string_encoding_before = a_string.encoding
+    b_string = 'è'
+    c_string = b_string.force_encoding('ASCII') # copy, which is different from ruby semantics
+    a_string_encoding_after = a_string.encoding
+    d_string = 'è'
+    a_string_encoding_before.name.should == 'UTF-16LE'
+    a_string_encoding_before.should == a_string_encoding_after
+    c_string.encoding.should == Encoding::ASCII
+    d_string.encoding.name.should == 'UTF-16LE'
+  end
 end
