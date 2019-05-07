@@ -65,10 +65,6 @@
     enable_stack_trace: true                  // true, false
   };
 
-  // check if running in strict mode
-  // in strict mode eval doesn't introduce a new variable into the outer context.
-  Opal.in_strict_mode = (eval("var __temp = null"), (typeof __temp === "undefined"));
-
   // Minify common function calls
   var $hasOwn       = Object.hasOwnProperty;
   var $bind         = Function.prototype.bind;
