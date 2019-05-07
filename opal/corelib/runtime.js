@@ -129,22 +129,15 @@
 
   function $defineProperty(object, name, initialValue) {
     if (typeof(object) === "string") {
-      // Special case for:
-      //   s = "string"
-      //   def s.m; end
-      // String class is the only class that:
-      // + compiles to JS primitive
-      // + allows method definition directly on instances
-      // numbers, true, false and nil do not support it.
-      object[name] = initialValue;
-    } else {
-      Object.defineProperty(object, name, {
-        value: initialValue,
-        enumerable: false,
-        configurable: true,
-        writable: true
-      });
+      console.trace();
+      throw new Opal.TypeError("Opal.$defineProperty called on non-object (primitive string)");
     }
+    Object.defineProperty(object, name, {
+      value: initialValue,
+      enumerable: false,
+      configurable: true,
+      writable: true
+    });
   }
 
   Opal.defineProperty = $defineProperty;
@@ -696,6 +689,10 @@
   Opal.build_object_singleton_class = function(object) {
     var superclass = object.$$class,
         klass = Opal.allocate_class(nil, superclass, function(){});
+
+    if (typeof object === 'string') {
+      object = new String(object);
+    }
 
     $defineProperty(klass, '$$is_singleton', true);
     $defineProperty(klass, '$$singleton_of', object);

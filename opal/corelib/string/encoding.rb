@@ -210,6 +210,9 @@ class String
 
       if (encoding === self.encoding) { return self; }
 
+      if (typeof self === 'string') {
+        self = new String(self);
+      }
       self.encoding = encoding;
       return self;
     }
