@@ -135,7 +135,7 @@ class File < IO
   `var __utf8TextDecoder__ = new __TextDecoder__('utf8')`
   `var __textEncoder__ = new __TextEncoder__()`
 
-  if `__path__.sep !== #{Separator}`
+  if `__path__.sep.toString() !== #{Separator}.toString()`
     ALT_SEPARATOR = `__path__.sep`
   end
 
