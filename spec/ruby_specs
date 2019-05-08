@@ -154,9 +154,6 @@ ruby/core/true
 ruby/core/unboundmethod
 
 ruby/language
-# spec/ruby/language/fixtures/super.rb won't compile to strict JavaScript.
-# ZSuperWithUnderscores contains a method that has two parameters with the same name (underscore).
-!ruby/language/super_spec
 !ruby/language/execution_spec
 !ruby/language/safe_spec
 
