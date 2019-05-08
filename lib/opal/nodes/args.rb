@@ -32,8 +32,7 @@ module Opal
       # but javascript in strict mode does not allow for args with the same name
       # ruby assigns the value of the first arg given
       #   funny_method_name(1, 2) => 1
-      # 1. check for args starting with '_'
-      # 2. check if they appear multiple times
+      # 1. check for args starting with '_' and check if they appear multiple times
       # 3. leave the first appearance as it is and rename the other ones
       # compiler result:
       #   function $$funny_method_name(_, __opal_js_strict_mode_arg_2)
@@ -42,13 +41,11 @@ module Opal
         same_arg_counter = {}
         children.each_with_index do |arg, idx|
 
-          if arg.type == :arg && arg.children.count == 1 && arg.children.first.to_s.start_with?('_')
-            if children.count(arg) > 1
-              same_arg_counter[arg] = 0 unless same_arg_counter.has_key?(arg)
-              same_arg_counter[arg] += 1
-              if same_arg_counter[arg] > 1
-                arg = Opal::AST::Node.new(arg.type, [:"#{arg.children[0]}_opal_js_strict_mode_arg_#{same_arg_counter[arg]}"])
-              end
+          if arg.type == :arg && arg.children.count == 1 && arg.children.first.to_s.start_with?('_') && children.count(arg) > 1
+            same_arg_counter[arg] = 0 unless same_arg_counter.has_key?(arg)
+            same_arg_counter[arg] += 1
+            if same_arg_counter[arg] > 1
+              arg = Opal::AST::Node.new(arg.type, [:"#{arg.children[0]}_opal_js_strict_mode_arg_#{same_arg_counter[arg]}"])
             end
           end
 
