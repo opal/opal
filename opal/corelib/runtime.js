@@ -130,7 +130,7 @@
   function $defineProperty(object, name, initialValue) {
     if (typeof(object) === 'string') {
       console.trace();
-      throw new Opal.TypeError("Object.defineProperty called on non-object (primitive string)");
+      throw new Opal.TypeError("Opal.$defineProperty called on non-object (primitive string)");
     }
     Object.defineProperty(object, name, {
       value: initialValue,
@@ -1838,7 +1838,7 @@
     if (body.$$alias_of) body = body.$$alias_of;
 
     // We need a wrapper because otherwise properties
-    // would be ovrewritten on the original body.
+    // would be overwritten on the original body.
     alias = function() {
       var block = alias.$$p, args, i, ii;
 
