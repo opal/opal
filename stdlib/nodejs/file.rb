@@ -141,17 +141,17 @@ class File < IO
 
 
   def self.read(path)
-    `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString()})`
+    `return executeIOAction(function(){return __fs__.readFileSync(#{path}.toString()).toString()})`
   end
 
   def self.write(path, data)
-    `executeIOAction(function(){return __fs__.writeFileSync(#{path}, #{data}.toString())})`
+    `executeIOAction(function(){return __fs__.writeFileSync(#{path}.toString(), #{data}.toString())})`
     data.size
   end
 
   def self.exist?(path)
     path = path.path if path.respond_to? :path
-    `return executeIOAction(function(){return __fs__.existsSync(#{path})})`
+    `return executeIOAction(function(){return __fs__.existsSync(#{path}.toString())})`
   end
 
   def self.realpath(pathname, dir_string = nil, cache = nil, &block)
@@ -164,21 +164,21 @@ class File < IO
         })
         `
     else
-      `return executeIOAction(function(){return __fs__.realpathSync(#{pathname}, #{cache})})`
+      `return executeIOAction(function(){return __fs__.realpathSync(#{pathname}.toString(), #{cache})})`
     end
   end
 
   def self.join(*paths)
-    `__path__.posix.join.apply(__path__, #{paths})`
+    `__path__.posix.join.apply(__path__, #{paths.map {|p| `p.toString()`}})`
   end
 
   def self.directory?(path)
     return false unless exist? path
-    result = `executeIOAction(function(){return !!__fs__.lstatSync(path).isDirectory()})`
+    result = `executeIOAction(function(){return !!__fs__.lstatSync(path.toString()).isDirectory()})`
     unless result
       realpath = realpath(path)
       if realpath != path
-        result = `executeIOAction(function(){return !!__fs__.lstatSync(realpath).isDirectory()})`
+        result = `executeIOAction(function(){return !!__fs__.lstatSync(realpath.toString()).isDirectory()})`
       end
     end
     result
@@ -186,11 +186,11 @@ class File < IO
 
   def self.file?(path)
     return false unless exist? path
-    result = `executeIOAction(function(){return !!__fs__.lstatSync(path).isFile()})`
+    result = `executeIOAction(function(){return !!__fs__.lstatSync(path.toString()).isFile()})`
     unless result
       realpath = realpath(path)
       if realpath != path
-        result = `executeIOAction(function(){return !!__fs__.lstatSync(realpath).isFile()})`
+        result = `executeIOAction(function(){return !!__fs__.lstatSync(realpath.toString()).isFile()})`
       end
     end
     result
@@ -209,7 +209,7 @@ class File < IO
   end
 
   def self.size(path)
-    `return executeIOAction(function(){return __fs__.lstatSync(path).size})`
+    `return executeIOAction(function(){return __fs__.lstatSync(path.toString()).size})`
   end
 
   def self.open(path, mode = 'r')
@@ -231,17 +231,17 @@ class File < IO
   end
 
   def self.mtime(path)
-    `return executeIOAction(function(){return __fs__.statSync(#{path}).mtime})`
+    `return executeIOAction(function(){return __fs__.statSync(#{path}.toString()).mtime})`
   end
 
   def self.symlink?(path)
-    `return executeIOAction(function(){return __fs__.lstatSync(#{path}).isSymbolicLink()})`
+    `return executeIOAction(function(){return __fs__.lstatSync(#{path}.toString()).isSymbolicLink()})`
   end
 
   def self.absolute_path(path, basedir = nil)
     path = path.respond_to?(:to_path) ? path.to_path : path
     basedir ||= Dir.pwd
-    `return __path__.normalize(__path__.resolve(#{basedir.to_str}, #{path.to_str})).split(__path__.sep).join(__path__.posix.sep)`
+    `return __path__.normalize(__path__.resolve(#{basedir.to_str}.toString(), #{path.to_str}.toString())).split(__path__.sep).join(__path__.posix.sep)`
   end
 
   # Instance Methods
@@ -258,7 +258,7 @@ class File < IO
     end
     @path = path
     @flags = flags
-    @fd = `executeIOAction(function(){return __fs__.openSync(path, flags)})`
+    @fd = `executeIOAction(function(){return __fs__.openSync(path.toString(), flags)})`
   end
 
   attr_reader :path
@@ -269,7 +269,7 @@ class File < IO
     else
       if @binary_flag
         %x{
-          var buf = executeIOAction(function(){return __fs__.readFileSync(#{@path})})
+          var buf = executeIOAction(function(){return __fs__.readFileSync(#{@path}.toString())})
           var content
           if (is_utf8(buf)) {
             content = buf.toString('utf8')
@@ -280,7 +280,7 @@ class File < IO
         }
         res = `content`
       else
-        res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString('utf8')})`
+        res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}.toString()).toString('utf8')})`
       end
       @eof = true
       @lineno = res.size
@@ -323,7 +323,7 @@ class File < IO
   end
 
   def write(string)
-    `executeIOAction(function(){return __fs__.writeSync(#{@fd}, #{string})})`
+    `executeIOAction(function(){return __fs__.writeSync(#{@fd}, #{string}.toString())})`
   end
 
   def flush
@@ -335,7 +335,7 @@ class File < IO
   end
 
   def mtime
-    `return executeIOAction(function(){return __fs__.statSync(#{@path}).mtime})`
+    `return executeIOAction(function(){return __fs__.statSync(#{@path}.toString()).mtime})`
   end
 end
 
@@ -348,10 +348,10 @@ class File::Stat
   end
 
   def file?
-    `return executeIOAction(function(){return __fs__.statSync(#{@path}).isFile()})`
+    `return executeIOAction(function(){return __fs__.statSync(#{@path}.toString()).isFile()})`
   end
 
   def mtime
-    `return executeIOAction(function(){return __fs__.statSync(#{@path}).mtime})`
+    `return executeIOAction(function(){return __fs__.statSync(#{@path}.toString()).mtime})`
   end
 end

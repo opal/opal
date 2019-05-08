@@ -36,7 +36,7 @@ class IO
   end
 
   def self.binread(path)
-    `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString('binary')})`
+    `return executeIOAction(function(){return __fs__.readFileSync(#{path}.toString()).toString('binary')})`
   end
 end
 
