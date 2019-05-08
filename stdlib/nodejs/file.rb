@@ -169,7 +169,7 @@ class File < IO
   end
 
   def self.join(*paths)
-    `__path__.posix.join.apply(__path__, #{paths.map {|p| `p.toString()`}})`
+    `__path__.posix.join.apply(__path__, #{paths.map { |p| `p.toString()` }})`
   end
 
   def self.directory?(path)
