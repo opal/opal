@@ -11,7 +11,7 @@ RSpec.describe Opal::Compiler do
 
   describe 'requiring' do
     it 'calls #require' do
-      expect_compiled("require 'pippo'").to include('self.$require("pippo")')
+      expect_compiled("require 'pippo'").to include('self.$require(new String("pippo"))')
     end
   end
 
@@ -38,7 +38,7 @@ RSpec.describe Opal::Compiler do
   end
 
   it "should compile ruby strings" do
-    expect_compiled('"hello world"').to include('return "hello world"')
+    expect_compiled('"hello world"').to include('return new String("hello world")')
     expect_compiled('"hello #{100}"').to include('"hello "', '100')
   end
 
@@ -192,11 +192,11 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if "test" > "bar"').to include('if ($truthy($rb_gt("test", "bar")))')
+          expect_compiled('foo = 42 if "test" > "bar"').to include('if ($truthy($rb_gt(new String("test"), new String("bar"))))')
         end
 
         it 'specifically == excludes nil check for strings' do
-          expect_compiled('foo = 42 if "test" == "bar"').to include("if (\"test\"['$=='](\"bar\"))")
+          expect_compiled('foo = 42 if "test" == "bar"').to include("if (new String(\"test\")['$=='](new String(\"bar\")))")
         end
 
         it 'adds nil check for lvars' do
@@ -228,7 +228,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if "test"').to include('if ($truthy("test"))')
+          expect_compiled('foo = 42 if "test"').to include('if ($truthy(new String("test")))')
         end
 
         it 'adds nil check for lvars' do
@@ -254,8 +254,8 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if ("test" > "bar")').to include('if ($truthy($rb_gt("test", "bar"))')
-          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ($truthy(\"test\"['$=='](\"bar\"))")
+          expect_compiled('foo = 42 if ("test" > "bar")').to include('if ($truthy($rb_gt(new String("test"), new String("bar")))')
+          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ($truthy(new String(\"test\")['$=='](new String(\"bar\")))")
         end
 
         it 'adds nil check for lvars' do
@@ -281,7 +281,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for strings' do
-          expect_compiled('foo = 42 if ("test")').to include('if ($truthy("test")')
+          expect_compiled('foo = 42 if ("test")').to include('if ($truthy(new String("test"))')
         end
 
         it 'adds nil check for lvars' do
