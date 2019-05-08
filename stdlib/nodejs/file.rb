@@ -145,7 +145,7 @@ class File < IO
   end
 
   def self.write(path, data)
-    `executeIOAction(function(){return __fs__.writeFileSync(#{path}, #{data})})`
+    `executeIOAction(function(){return __fs__.writeFileSync(#{path}, #{data}.toString())})`
     data.size
   end
 

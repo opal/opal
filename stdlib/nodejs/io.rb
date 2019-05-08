@@ -40,8 +40,8 @@ class IO
   end
 end
 
-STDOUT.write_proc = ->(string) { `process.stdout.write(string)` }
-STDERR.write_proc = ->(string) { `process.stderr.write(string)` }
+STDOUT.write_proc = ->(string) { `process.stdout.write(string.toString())` }
+STDERR.write_proc = ->(string) { `process.stderr.write(string.toString())` }
 
 STDOUT.tty = true
 STDERR.tty = true
