@@ -1,5 +1,6 @@
 if RUBY_ENGINE == 'opal'
   require 'opal/compiler'
+  require_relative '../corelib/string/unpack'
   require 'nodejs'
 end
 

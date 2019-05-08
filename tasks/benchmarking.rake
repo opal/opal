@@ -14,6 +14,14 @@ namespace :bench do
     sh "bundle exec opal benchmark/run.rb #{files.join(" ")} | tee #{report}"
   end
 
+  desc "Benchmark Opal"
+  task :opal_strict => "tmp/bench" do |t, args|
+    require 'opal/version'
+    files = Array(args[:files]) + args.extras
+    report = report_file_for["opal-#{Opal::VERSION}"]
+    sh "bundle exec opal -R strictnodejs benchmark/run.rb #{files.join(" ")} | tee #{report}"
+  end
+
   desc "Benchmark Ruby"
   task :ruby => "tmp/bench" do |t, args|
     files = Array(args[:files]) + args.extras
