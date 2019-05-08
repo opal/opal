@@ -43,8 +43,7 @@ module Opal
         children.each_with_index do |arg, idx|
 
           if arg.children.count == 1 && arg.children.first.to_s.start_with?('_')
-            arg_count = children.count(arg)
-            if arg_count > 1 && arg.type == :arg
+            if children.count(arg) > 1 && arg.type == :arg
               same_arg_counter[arg] = 0 unless same_arg_counter.has_key?(arg)
               same_arg_counter[arg] += 1
               if same_arg_counter[arg] > 1
