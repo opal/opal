@@ -125,7 +125,7 @@ class Date
         function fromMonthAbbr(fn) {
           return function(match) {
             var abbr = fn(match).toLowerCase();
-            return #{ABBR_MONTHNAMES}.indexOf(abbr) + 1;
+            return #{ABBR_MONTHNAMES.index(`new String(abbr)`)} + 1;
           }
         }
 
@@ -152,7 +152,7 @@ class Date
         function fromDayName(fn) {
           return function(match) {
             var dayname = fn(match),
-                wday = #{DAYNAMES.map(&:downcase)}.indexOf(#{`dayname`.downcase});
+                wday = #{DAYNAMES.map(&:downcase).index(`new String(dayname)`.downcase)};
 
             return current_day - current_wday + wday;
           }
@@ -162,7 +162,7 @@ class Date
         function fromFullMonthName(fn) {
           return function(match) {
             var month_name = fn(match);
-            return #{MONTHNAMES.compact.map(&:downcase)}.indexOf(#{`month_name`.downcase}) + 1;
+            return #{MONTHNAMES.compact.map(&:downcase).index(`new String(month_name)`.downcase)} + 1;
           }
         }
 
@@ -306,7 +306,7 @@ class Date
 
         for (i = 0; i < rules.length; i++) {
           rule = rules[i];
-          match = rule.regexp.exec(string);
+          match = rule.regexp.exec(string.toString());
           if (match) {
             var year = rule.year;
             if (typeof(year) === 'function') {

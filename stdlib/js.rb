@@ -56,7 +56,11 @@ module JS
   def call(func, *args, &block)
     g = global
     args << block if block
-    g.JS[func].JS.apply(g, args)
+    if func == :eval
+      g.JS[func].JS.apply(g, args.map { |a| `a.$$is_string ? a.toString() : a` })
+    else
+      g.JS[func].JS.apply(g, args)
+    end
   end
   alias method_missing call
 

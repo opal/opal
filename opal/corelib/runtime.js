@@ -1979,7 +1979,7 @@
       }
 
       for (i = 0; i < length; i++) {
-        if (keys[i] === key) {
+        if (keys[i].toString() === key.toString()) {
           keys.splice(i, 1);
           break;
         }

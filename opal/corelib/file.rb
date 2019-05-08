@@ -14,8 +14,8 @@ class File < IO
 
       path = path.respond_to?(:to_path) ? path.to_path : path
       basedir ||= Dir.pwd
-      path_abs    = `path.substr(0, sep.length) === sep || windows_root_rx.test(path)`
-      basedir_abs = `basedir.substr(0, sep.length) === sep || windows_root_rx.test(basedir)`
+      path_abs    = `path.substr(0, sep.length) === sep.toString() || windows_root_rx.test(path)`
+      basedir_abs = `basedir.substr(0, sep.length) === sep.toString() || windows_root_rx.test(basedir)`
 
       if path_abs
         parts       = path.split(/[#{sep_chars}]/)
@@ -131,14 +131,14 @@ class File < IO
         name = name.replace(new RegExp(#{"(.)[#{sep_chars}]*$"}), '$1');
         name = name.replace(new RegExp(#{"^(?:.*[#{sep_chars}])?([^#{sep_chars}]+)$"}), '$1');
 
-        if (suffix === ".*") {
+        if (suffix !== null && suffix.toString() === ".*") {
           name = name.replace(/\.[^\.]+$/, '');
         } else if(suffix !== null) {
           suffix = Opal.escape_regexp(suffix);
           name = name.replace(new RegExp(#{"#{suffix}$"}), '');
         }
 
-        return name;
+        return new String(name);
       }
     end
 
