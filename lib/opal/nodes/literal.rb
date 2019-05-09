@@ -62,13 +62,13 @@ module Opal
           code_point = Regexp.last_match(1).to_i(16)
           to_utf16(code_point)
         end
-        push 'new String('
+        push '(new String('
         push translate_escape_chars(sanitized_value)
+        push '))'
 
         if should_encode && RUBY_ENGINE != 'opal'
           push '.$force_encoding("', encoding.name, '")'
         end
-        push ')'
       end
 
       # http://www.2ality.com/2013/09/javascript-unicode.html
