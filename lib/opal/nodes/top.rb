@@ -95,7 +95,7 @@ module Opal
 
       def prepend_import_lines
         import_lines = compiler.requires.map do |module_path|
-          Opal::ES6ModulesHelpers.generate_module_imports(module_path)
+          Opal::ES6ModulesHelpers.generate_module_import(module_path)
         end
         if compiler.required_trees.any?
           base_dir = Pathname.new(compiler.file).dirname
