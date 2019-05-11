@@ -15,14 +15,26 @@ module Opal
     end
 
     def self.generate_file_import(child_path)
+      # modules should have the ending .rb for imports, so that the opal-webpack-resolver-plugin
+      # or the opal-webpack-loader don't mix them up with javascript imports
+      # that is just a sensible convention for example, a require 'react', without ending:
+      #   import 'react';  --> resolves to react.js in javascript space, may be resolved by webpack otherwise
+      # vs. with ending:
+      #   import 'react.rb';  --> resolves to react.rb in the opal/ruby space which gets transpiled to js by the loader
+      # if a javascript file gets required as:
+      #   require 'runtime'
+      # it gets imported like so:
+      #   import 'runtime.rb'
+      # the opal-webpack-resolver-plugin will then check for a runtime.rb, but also for a runtime.js if the runtime.rb is not found.
       import_lines = []
       path_s = child_path.basename.to_s
       if path_s.end_with?('.rb', '.js')
         module_path = child_path.expand_path.to_s[(base_dir.expand_path.to_s.length + 1)..-1].sub(/\.(js|rb)\z/, '')
+        real_module_name = determine_real_module_name(module_path)
         file_ending = '.' + path_s.split('.').last
         import_name = generate_import_name(module_path + file_ending)
         import_lines << "import #{import_name} from '#{module_path}#{file_ending}';\n"
-        import_lines << "if (typeof Opal.modules[#{module_path.inspect}] === 'undefined') {\n"
+        import_lines << "if (typeof global.Opal.modules[#{real_module_name.inspect}] === 'undefined') {\n"
         import_lines << "  if (typeof #{import_name} === 'function') { #{import_name}(); }\n"
         import_lines << "}\n"
         import_lines
@@ -44,12 +56,12 @@ module Opal
       import_lines
     end
 
-    def self.generate_module_imports(module_path)
+    def self.generate_module_import(module_path)
+      import_lines = []
       real_module_name = determine_real_module_name(module_path)
-      module_import_name = generate_import_name(module_path)
-      module_import_lines = []
+      import_name = generate_import_name(module_path)
       has_extension = module_path.end_with?('.js', '.rb')
-      module_import_lines << "import #{module_import_name} from '#{module_path}#{'.rb' unless has_extension}';\n"
+      import_lines << "import #{import_name} from '#{module_path}#{'.rb' unless has_extension}';\n"
       unless module_path == 'corelib/runtime'
         # webpack replaces module_import_name with a function, but
         # during bootstrapping on the client, when the imports are imported, for a circular import
@@ -62,28 +74,19 @@ module Opal
         # can be resolved
         #
         # This behaviour is needed for all modules, except corelib/runtime!
-        module_import_lines << "if (typeof global.Opal.modules[#{real_module_name.inspect}] === 'undefined') {\n"
-        module_import_lines << "  if (typeof #{module_import_name} === 'function') { #{module_import_name}(); }\n"
-        module_import_lines << "}\n"
+        import_lines << "if (typeof global.Opal.modules[#{real_module_name.inspect}] === 'undefined') {\n"
+        import_lines << "  if (typeof #{import_name} === 'function') { #{import_name}(); }\n"
+        import_lines << "}\n"
       end
-      module_import_lines
+      import_lines
     end
 
     def self.determine_real_module_name(module_path)
-      # modules should have the ending .rb for imports, so that the opal-webpack-resolver-plugin
-      # or the opal-webpack-loader don't mix them up with javascript imports
-      # that is just a sensible convention for example, a require 'react', without ending:
-      #   import 'react';  --> resolves to react.js in javascript space, may be resolved by webpack otherwise
-      # vs. with ending:
-      #   import 'react.rb';  --> resolves to react.rb in the opal/ruby space which gets transpiled to js by the loader
-      # if a javascript file gets required as:
-      #   require 'runtime'
-      # it gets imported like so:
-      #   import 'runtime.rb'
-      # the opal-webpack-resolver-plugin will then check for a runtime.rb, but also for a runtime.js if the runtime.rb is not found.
       if module_path.start_with?('/')
         module_path_rb = module_path.end_with?('.rb') ? module_path : module_path + '.rb'
         Opal::Compiler.module_name_from_paths(module_path_rb)
+      elsif module_path.end_with?('.js')
+        module_path.sub(/\.js\z/, '')
       else
         module_path
       end
