@@ -14,17 +14,19 @@
 Opal is [hosted on GitHub](https://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) (also available as IRC at `irc.gitter.im`).
 Ask questions on [stackoverflow (tag #opalrb)](https://stackoverflow.com/questions/ask?tags=opalrb). Get the [Opalist newsletter](http://opalist.co) for updates and community news.
 
-[![Stack Overflow](https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat)](https://stackoverflow.com/questions/ask?tags=opalrb)
-[![Backers on Open Collective](https://opencollective.com/opal/backers/badge.svg)](#backers) 
-[![Sponsors on Open Collective](https://opencollective.com/opal/sponsors/badge.svg)](#sponsors) 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/opal/opal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Documentation](https://img.shields.io/badge/docs-updated-blue.svg)](https://opalrb.com/docs)
-
-[![Gem Version](https://img.shields.io/gem/v/opal.svg?style=flat)](https://badge.fury.io/rb/opal)
-[![Build Status (Linux)](https://img.shields.io/travis/opal/opal/master.svg?style=flat)](https://travis-ci.org/opal/opal)
-[![Build Status (Windows)](https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true)](https://ci.appveyor.com/project/elia/opal/branch/master)
-[![Code Climate](https://img.shields.io/codeclimate/maintainability-percentage/opal/opal.svg)](https://codeclimate.com/github/opal/opal)
-[![Coverage Status](https://coveralls.io/repos/opal/opal/badge.svg?branch=master&service=github)](https://coveralls.io/github/opal/opal?branch=elia%2Fcoveralls)
+<p align="center">
+  <a href="https://stackoverflow.com/questions/ask?tags=opalrb"><img src="https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat" alt="Stack Overflow" title="" /></a>
+  <a href="#backers"><img src="https://opencollective.com/opal/backers/badge.svg" alt="Backers on Open Collective" title="" /></a> 
+  <a href="#sponsors"><img src="https://opencollective.com/opal/sponsors/badge.svg" alt="Sponsors on Open Collective" title="" /></a> 
+  <a href="https://gitter.im/opal/opal?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter" title="" /></a>
+  <a href="https://opalrb.com/docs"><img src="https://img.shields.io/badge/docs-updated-blue.svg" alt="Documentation" title="" /></a>
+  <br>
+  <a href="https://badge.fury.io/rb/opal"><img src="https://img.shields.io/gem/v/opal.svg?style=flat" alt="Gem Version" title="" /></a>
+  <a href="https://travis-ci.org/opal/opal"><img src="https://img.shields.io/travis/opal/opal/master.svg?style=flat" alt="Build Status (Linux)" title="" /></a>
+  <a href="https://ci.appveyor.com/project/elia/opal/branch/master"><img src="https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true" alt="Build Status (Windows)" title="" /></a>
+  <a href="https://codeclimate.com/github/opal/opal"><img src="https://img.shields.io/codeclimate/maintainability-percentage/opal/opal.svg" alt="Code Climate" title="" /></a>
+  <a href="https://coveralls.io/github/opal/opal?branch=elia%2Fcoveralls"><img src="https://coveralls.io/repos/opal/opal/badge.svg?branch=master&amp;service=github" alt="Coverage Status" title="" /></a>
+</p>
 
 ## Usage
 
