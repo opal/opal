@@ -55,9 +55,9 @@ module Opal
 
       def multiple_underscore?(arg)
         arg.type == :arg &&
-        arg.children.count == 1 &&
-        arg.children.first.to_s.start_with?('_') &&
-        children.count(arg) > 1
+          arg.children.count == 1 &&
+          arg.children.first.to_s.start_with?('_') &&
+          children.count(arg) > 1
       end
     end
   end
