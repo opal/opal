@@ -51,4 +51,4 @@ exclude_patterns:
 - stdlib/nodejs/js-yaml-3-6-1.js
 - lib/opal/source_map/vlq.rb
 - lib/opal/es6_modules_helpers.rb
-- lib/opal/nodes/args.rb
+- "lib/opal/nodes/*"
