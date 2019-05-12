@@ -40,7 +40,7 @@ module Opal
       def compile
         same_arg_counter = {}
         children.each_with_index do |arg, idx|
-          if arg.type == :arg && arg.children.count == 1 && arg.children.first.to_s.start_with?('_') && children.count(arg) > 1
+          if multiple_underscore?(arg)
             same_arg_counter[arg] = 0 unless same_arg_counter.key?(arg)
             same_arg_counter[arg] += 1
             if same_arg_counter[arg] > 1
@@ -51,6 +51,13 @@ module Opal
           push ', ' if idx != 0
           push process(arg)
         end
+      end
+
+      def multiple_underscore?(arg)
+        arg.type == :arg &&
+        arg.children.count == 1 &&
+        arg.children.first.to_s.start_with?('_') &&
+        children.count(arg) > 1
       end
     end
   end
