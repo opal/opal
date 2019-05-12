@@ -15,8 +15,7 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v0.11.4...HEAD) - unreleased
-
+## [1.0.0](https://github.com/opal/opal/compare/v0.11.4...v1.0.0) - 2019-05-12
 
 <!--
 Whitespace conventions:
@@ -150,7 +149,15 @@ Whitespace conventions:
 - Fix `||=` assignments on constants when the constant is not yet defined ([#1935](https://github.com/opal/opal/pull/1935))
 - Fix `String#chomp` to return an empty String when `arg == self` ([#1936](https://github.com/opal/opal/pull/1936))
 - Fix methods of `Comparable` when `<=>` does not return Numeric ([#1945](https://github.com/opal/opal/pull/1945))
-- Fix Class#native_alias error message ([#1946](https://github.com/opal/opal/pull/1946))
+- Fix `Class#native_alias` error message ([#1946](https://github.com/opal/opal/pull/1946))
+- Fix `gmt_offset` (alias `utc_offset`) should return 0 if the date is UTC ([#1941](https://github.com/opal/opal/pull/1941))
+- `exceptionDetails.stackTrace` can be undefined ([#1955](https://github.com/opal/opal/pull/1955))
+- Implement `String#each_codepoint` and `String#codepoints` (#1944, #1947)
+- [internal] Terminate statement with semi-colon and remove unecessary semi-colon ([#1948](https://github.com/opal/opal/pull/1948))
+- Some steps toward "strict mode" ([#1953](https://github.com/opal/opal/pull/1953))
+- Preserve `Exception.stack`, in some cases the backtrace was lost ([#1963](https://github.com/opal/opal/pull/1963))
+- Make `String#ascii_only?` a little less wrong ([#1951](https://github.com/opal/opal/pull/1951))
+- Minor fixes to `::Native` ([#1957](https://github.com/opal/opal/pull/1957))
 
 
 
