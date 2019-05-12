@@ -41,8 +41,8 @@ module Opal
         same_arg_counter = {}
         children.each_with_index do |arg, idx|
           if multiple_underscore?(arg)
-            same_arg_counter[arg] = 0 unless same_arg_counter.key?(arg)
-            same_arg_counter[arg] += 1
+            same_arg_counter[arg] ||= 0
+            same_arg_counter[arg]  += 1
             if same_arg_counter[arg] > 1
               arg = Opal::AST::Node.new(arg.type, [:"#{arg.children[0]}_opal_js_strict_mode_arg_#{same_arg_counter[arg]}"])
             end
