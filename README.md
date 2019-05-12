@@ -1,4 +1,7 @@
 <h1 align="center">
+  <img src="https://secure.gravatar.com/avatar/88298620949a6534d403da2e356c9339?s=420" 
+  align="center" title="Opal logo by Elia Schito" width="105" height="105" />
+  <br/>
   Opal  <br/>
   <img src="https://img.shields.io/badge/Opal-Ruby%20💛%20JavaScript-yellow.svg?logo=ruby&style=social&logoColor=777"/>
 </h1>
@@ -6,21 +9,20 @@
 <div align="center">
   <em><strong>Opal</strong> is a Ruby to JavaScript source-to-source compiler.<br> 
     It also has an implementation of the Ruby <code>corelib</code> and <code>stdlib</code>.</em>
+  <p>Opal is <a href="https://github.com/opal/opal">hosted on GitHub</a>. Chat is available on <em>Gitter</em> at <a href="https://gitter.im/opal/opal">opal/opal</a> (also available as IRC at <code>irc.gitter.im</code>).<br/>
+  Ask questions on <a href="https://stackoverflow.com/questions/ask?tags=opalrb">stackoverflow (tag #opalrb)</a>. Get the <a href="http://opalist.co">Opalist newsletter</a> for updates and community news.</p>
 </div>
 
-<img src="https://secure.gravatar.com/avatar/88298620949a6534d403da2e356c9339?s=420" 
-  align="right" title="Opal logo by Elia Schito" width="105" height="105" />
-
-Opal is [hosted on GitHub](https://github.com/opal/opal). Chat is available on *Gitter* at [opal/opal](https://gitter.im/opal/opal) (also available as IRC at `irc.gitter.im`).
-Ask questions on [stackoverflow (tag #opalrb)](https://stackoverflow.com/questions/ask?tags=opalrb). Get the [Opalist newsletter](http://opalist.co) for updates and community news.
-
 <p align="center">
+  <strong>Community:</strong><br>
   <a href="https://stackoverflow.com/questions/ask?tags=opalrb"><img src="https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat" alt="Stack Overflow" title="" /></a>
   <a href="#backers"><img src="https://opencollective.com/opal/backers/badge.svg" alt="Backers on Open Collective" title="" /></a> 
   <a href="#sponsors"><img src="https://opencollective.com/opal/sponsors/badge.svg" alt="Sponsors on Open Collective" title="" /></a> 
   <a href="https://gitter.im/opal/opal?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter" title="" /></a>
   <a href="https://opalrb.com/docs"><img src="https://img.shields.io/badge/docs-updated-blue.svg" alt="Documentation" title="" /></a>
   <br>
+  <strong>Code:</strong><br>
+
   <a href="https://badge.fury.io/rb/opal"><img src="https://img.shields.io/gem/v/opal.svg?style=flat" alt="Gem Version" title="" /></a>
   <a href="https://travis-ci.org/opal/opal"><img src="https://img.shields.io/travis/opal/opal/master.svg?style=flat" alt="Build Status (Linux)" title="" /></a>
   <a href="https://ci.appveyor.com/project/elia/opal/branch/master"><img src="https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true" alt="Build Status (Windows)" title="" /></a>
