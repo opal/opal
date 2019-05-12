@@ -9,8 +9,6 @@
 <p align="center">
   <em><strong>Opal</strong> is a Ruby to JavaScript source-to-source compiler.<br> 
     It also has an implementation of the Ruby <code>corelib</code> and <code>stdlib</code>.</em>
-  <br>Opal is <a href="https://github.com/opal/opal">hosted on GitHub</a>. Chat is available on <em>Gitter</em> at <a href="https://gitter.im/opal/opal">opal/opal</a> (also available as IRC at <code>irc.gitter.im</code>).<br/>
-  Ask questions on <a href="https://stackoverflow.com/questions/ask?tags=opalrb">stackoverflow (tag #opalrb)</a>. Get the <a href="http://opalist.co">Opalist newsletter</a> for updates and community news.
 </p>
 
 <p align="center">
