@@ -83,8 +83,7 @@ module Opal
 
     def self.determine_real_module_name(module_path)
       if module_path.start_with?('/')
-        module_path = module_path + '.rb' unless module_path.end_with?('.rb')
-        Opal::Compiler.module_name_from_paths(module_path)
+        Opal::Compiler.module_name_from_paths(module_path.sub(/(?<!\.rb)\z/, '.rb'))
       elsif module_path.end_with?('.js')
         module_path.sub(/\.js\z/, '')
       else
