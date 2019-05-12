@@ -14,7 +14,7 @@ namespace :bench do
     sh "bundle exec opal benchmark/run.rb #{files.join(" ")} | tee #{report}"
   end
 
-  desc "Benchmark Opal"
+  desc "Benchmark Opal in strict mode"
   task :opal_strict => "tmp/bench" do |t, args|
     require 'opal/version'
     files = Array(args[:files]) + args.extras
