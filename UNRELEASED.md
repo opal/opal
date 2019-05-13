@@ -5,3 +5,6 @@ Whitespace conventions:
 - 1 spaces before normal text
 -->
 
+### Fixed
+
+- Integer#gcdlcm (#1972)
