@@ -138,6 +138,7 @@ module Opal
       end
 
       on('-P', '--map FILE', 'Enable/Disable source map') do |file|
+        options[:runner_options] ||= {}
         options[:runner_options][:map_file] = file
       end
 
