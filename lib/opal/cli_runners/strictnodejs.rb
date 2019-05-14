@@ -6,14 +6,14 @@ require 'opal/cli_runners/generic_system_runner'
 
 module Opal
   module CliRunners
-    class Nodejs
+    class Strictnodejs
       include GenericSystemRunner
 
       NODE_PATH = File.expand_path('../stdlib/nodejs/node_modules', ::Opal.gem_dir)
 
       def initialize(options)
         @output = options.fetch(:output, $stdout)
-        @tempfile_prefix = 'opal-node-output'
+        @tempfile_prefix = 'opal-strictnode-output'
       end
       attr_reader :output, :exit_status
 
@@ -29,11 +29,12 @@ module Opal
 
       def run(code, argv)
         require 'tempfile'
-        tempfile = Tempfile.new('opal-nodejs-runner-')
-        # tempfile = File.new('opal-nodejs-runner.js', 'w') # for debugging
+        code = "\"use strict\";\n\n" + code
+        # File.write("opal-strictnodejs-runner-#{Random.rand(10)}.js", code) # for debugging
+        tempfile = Tempfile.new('opal-strictnodejs-runner-')
         tempfile.write code
         tempfile.close
-        system_with_output({ 'NODE_PATH' => node_modules }, 'node', tempfile.path, *argv)
+        system_with_output({ 'NODE_PATH' => node_modules }, 'node', '--use_strict', tempfile.path, *argv)
       rescue Errno::ENOENT
         raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
       end
