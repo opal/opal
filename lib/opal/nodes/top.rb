@@ -3,6 +3,7 @@
 require 'pathname'
 require 'opal/version'
 require 'opal/nodes/scope'
+require 'opal/es6_modules_helpers'
 
 module Opal
   module Nodes
@@ -13,9 +14,15 @@ module Opal
       children :body
 
       def compile
-        push version_comment
+        push version_comment unless compiler.es6_modules?
 
-        opening
+        if compiler.es6_modules?
+          module_name = Opal::Compiler.module_name_from_paths(compiler.file)
+          opening(module_name)
+        else
+          opening
+        end
+
         in_scope do
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
@@ -41,11 +48,19 @@ module Opal
           line body_code
         end
 
+        prepend_import_lines if compiler.es6_modules?
+
         closing
       end
 
-      def opening
-        if compiler.requirable?
+      def opening(module_name = nil)
+        if compiler.es6_modules?
+          # to enable some webpack features for opal-webpack-loader it has to refer to the opal code from within webpack later on
+          # so we give it a handle 'opal_code'
+          line 'const opal_code = function() {'
+          # global makes sure we get the webpack global context and its Opal.modules, and not a locally shielded Opal.modules
+          line "  global.Opal.modules[#{module_name.inspect}] = function(Opal) {"
+        elsif compiler.requirable?
           line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
         elsif compiler.eval?
           line '(function(Opal, self) {'
@@ -55,7 +70,11 @@ module Opal
       end
 
       def closing
-        if compiler.requirable?
+        if compiler.es6_modules?
+          line '  }'
+          line "}\n"
+          line "export default opal_code\n"
+        elsif compiler.requirable?
           line "};\n"
         elsif compiler.eval?
           line '})(Opal, self)'
@@ -72,6 +91,24 @@ module Opal
         if compiler.irb?
           line 'if (!Opal.irb_vars) { Opal.irb_vars = {}; }'
         end
+      end
+
+      def prepend_import_lines
+        import_lines = compiler.requires.map do |module_path|
+          Opal::ES6ModulesHelpers.generate_module_import(module_path)
+        end
+        if compiler.required_trees.any?
+          base_dir = Pathname.new(compiler.file).dirname
+
+          compiler.required_trees.each do |module_path|
+            # ES6 javascript import doesn't allow for import of directories, to support require_tree
+            # the compiler must import each file in the tree separately
+            import_lines << Opal::ES6ModulesHelpers.generate_directory_imports(base_dir, module_path)
+          end
+        end
+        unshift(*import_lines.flatten) if import_lines.any?
+        unshift("\n")
+        unshift(version_comment)
       end
 
       def add_used_helpers
