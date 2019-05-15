@@ -11,7 +11,7 @@ module Opal
       # for each import. here a random import name is generated. webpack will make sure, that the code the different imports refer to,
       # is imported only once
       # generate random import name for a ruby module_name. Also replaces some characters that are illegal in JS import names.
-      module_name.gsub('.', 'o_').tr('-', '_').tr('/', '_').gsub('@', '_at_') + rand(36**8).to_s(36)
+      module_name.gsub('.', 'o_').gsub('@', '_at_').gsub(/\W/, '_') + rand(36**8).to_s(36)
     end
 
     def self.generate_file_import(base_dir, child_path)
