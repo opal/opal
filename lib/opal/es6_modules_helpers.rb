@@ -14,7 +14,7 @@ module Opal
       module_name.gsub('.', 'o_').tr('-', '_').tr('/', '_').gsub('@', '_at_') + rand(36**8).to_s(36)
     end
 
-    def self.generate_file_import(child_path)
+    def self.generate_file_import(base_dir, child_path)
       # modules should have the ending .rb for imports, so that the opal-webpack-resolver-plugin
       # or the opal-webpack-loader don't mix them up with javascript imports
       # that is just a sensible convention for example, a require 'react', without ending:
@@ -46,11 +46,12 @@ module Opal
       # recursively walk a directory and generate import lines for all .rb/.js files
       import_lines = []
       directory_path = base_dir + module_path
+      base_dir = directory_path if module_path.start_with?('..')
       directory_path.each_child do |child_path|
         if child_path.directory?
           import_lines << generate_directory_imports(base_dir, child_path.expand_path.to_s[(base_dir.expand_path.to_s.length + 1)..-1])
         elsif child_path.file?
-          import_lines += generate_file_import(child_path)
+          import_lines += generate_file_import(base_dir, child_path)
         end
       end
       import_lines
@@ -111,6 +112,7 @@ module Opal
       if Opal.paths.include?(path_s)
         # got a load path match
         # remove known load path at the beginning and the filename extension to get the module name like 'some/ruby'
+        STDERR.puts "mnfps: #{original_path_s[(path_s.size + 1)..-1].sub(/\.(js|rb|js\.rb)\z/, '')}"
         return original_path_s[(path_s.size + 1)..-1].sub(/\.(js|rb|js\.rb)\z/, '')
       end
       if path.root?
