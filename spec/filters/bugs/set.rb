@@ -7,7 +7,7 @@ opal_filter "Set" do
   fails "Set#=== member equality is checked using both #hash and #eql?" # Expected false to equal true
   fails "Set#=== returns true when self contains the passed Object" # Expected false to be true
   fails "Set#^ raises an ArgumentError when passed a non-Enumerable"
-  fails "Set#^ returns a new Set containing elements that are not in both self and the passed Enumberable"
+  fails "Set#^ returns a new Set containing elements that are not in both self and the passed Enumerable" # NoMethodError: undefined method `^' for #<Set: {1,2,3,4}>
   fails "Set#compare_by_identity causes future comparisons on the receiver to be made by identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {1}>
   fails "Set#compare_by_identity compares its members by identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
   fails "Set#compare_by_identity does not call #hash on members" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>

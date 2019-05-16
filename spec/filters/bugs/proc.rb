@@ -12,6 +12,8 @@ opal_filter "Proc" do
   fails "Proc#curry with arity argument returns a Proc if called on a lambda that requires fewer than _arity_ arguments but may take more" # ArgumentError: wrong number of arguments (4 for 5)
   fails "Proc#inspect for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#inspect for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
+  fails "Proc#inspect for a proc created with Symbol#to_proc has an ASCII-8BIT encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Proc#inspect for a proc created with Symbol#to_proc returns a description including '(&:symbol)'" # Expected "#<Proc:0x75d4e>" to match /^#<Proc:0x\h+\(&:foobar\)>$/
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword"
   fails "Proc#lambda? is preserved when passing a Proc with & to the proc keyword"
   fails "Proc#source_location returns an Array"
@@ -23,6 +25,8 @@ opal_filter "Proc" do
   fails "Proc#source_location works even if the proc was created on the same line"
   fails "Proc#to_s for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#to_s for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
+  fails "Proc#to_s for a proc created with Symbol#to_proc has an ASCII-8BIT encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Proc#to_s for a proc created with Symbol#to_proc returns a description including '(&:symbol)'" # Expected "#<Proc:0x6cd2c>" to match /^#<Proc:0x\h+\(&:foobar\)>$/
   fails "Proc.allocate raises a TypeError"
   fails "Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a block"
   fails "Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a method"

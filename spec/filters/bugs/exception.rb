@@ -26,10 +26,15 @@ opal_filter "Exception" do
   fails "Exception#backtrace_locations returns nil if no backtrace was set" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
   fails "Exception#backtrace_locations sets each element to a Thread::Backtrace::Location" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
   fails "Exception#cause returns the active exception when an exception is raised"
+  fails "Exception#cause is set for internal errors caused by user errors" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
+  fails "Exception#cause is set for user errors caused by internal errors" # Expected RuntimeError but no exception was raised (Infinity was returned)
   fails "Exception#dup does copy the backtrace" # Expected [] to equal ["InitializeException: my exception", "    at TMP_13 (...)"]
+  fails "Exception#dup does copy the cause" # NoMethodError: undefined method `cause' for #<RuntimeError: the consequence>
   fails "Exception#full_message returns formatted string of exception using the same format that is used to print an uncaught exceptions to stderr" # NoMethodError: undefined method `full_message' for #<RuntimeError: Some runtime error>
   fails "Exception#full_message supports :highlight option and adds escape sequences to highlight some strings" # NoMethodError: undefined method `full_message' for #<RuntimeError: Some runtime error>
   fails "Exception#full_message supports :order option and places the error message and the backtrace at the top or the bottom" # NoMethodError: undefined method `full_message' for #<RuntimeError: Some runtime error>
+  fails "Exception#full_message shows the caller if the exception has no backtrace"
+  fails "Exception#full_message shows the exception class at the end of the first line of the message when the message contains multiple lines" # NoMethodError: undefined method `full_message' for #<RuntimeError: first line second line>
   fails "Exception#set_backtrace raises a TypeError when passed a Symbol"
   fails "Exception#set_backtrace raises a TypeError when the Array contains a Symbol"
   fails "Exception#to_s calls #to_s on the message" # Mock 'message' expected to receive 'to_s' exactly 1 times but received it 2 times

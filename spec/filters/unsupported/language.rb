@@ -11,7 +11,7 @@ opal_unsupported_filter "language" do
   fails "The defined? keyword when called with a method name having a module as receiver returns nil if the method is protected"
   fails "The private keyword changes the visibility of the existing method in the subclass"
   fails "The private keyword changes visibility of previously called method"
-  fails "The private keyword changes visiblity of previously called methods with same send/call site"
+  fails "The private keyword changes visibility of previously called methods with same send/call site" # Expected NoMethodError but no exception was raised (2 was returned)
   fails "The private keyword is overridden when a new class is opened"
   fails "The private keyword marks following methods as being private"
   fails "Ruby String literals with a magic frozen comment produce different objects for literals with the same content in different files if the other file doesn't have the comment"

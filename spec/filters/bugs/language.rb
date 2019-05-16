@@ -13,6 +13,7 @@ opal_filter "language" do
   fails "A class definition allows using self as the superclass if self is a class"
   fails "A class definition extending an object (sclass) can use return to cause the enclosing method to return"
   fails "A class definition extending an object (sclass) raises a TypeError when trying to extend numbers"
+  fails "A class definition extending an object (sclass) allows accessing the block of the original scope" # Opal::SyntaxError: undefined method `uses_block!' for nil
   fails "A class definition raises TypeError if any constant qualifying the class is not a Module"
   fails "A class definition raises TypeError if the constant qualifying the class is nil"
   fails "A class definition raises a TypeError if inheriting from a metaclass"
@@ -80,6 +81,12 @@ opal_filter "language" do
   fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
   fails "Global variable $\" is read-only"
   fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for BasicObject
+  fails "Heredoc string allow HEREDOC with <<\"identifier\", interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Heredoc string allows HEREDOC with <<'identifier', no interpolation" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Heredoc string allows HEREDOC with <<-\"identifier\", allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Heredoc string allows HEREDOC with <<-'identifier', allowing to indent identifier, no interpolation" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Heredoc string allows HEREDOC with <<-identifier, allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Heredoc string allows HEREDOC with <<identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Instantiating a singleton class raises a TypeError when allocate is called"
   fails "Instantiating a singleton class raises a TypeError when new is called"
   fails "Invoking a method expands the Array elements from the splat after executing the arguments and block if no other arguments follow the splat" # Expected [[1, nil], nil] to equal [[1], nil]
@@ -162,6 +169,8 @@ opal_filter "language" do
   fails "Operators .. ... have higher precedence than ? :" # NoMethodError: undefined method `from' for #<MSpecEnv:0x772d6>
   fails "Operators .. ... have higher precedence than ? :" # NoMethodError: undefined method `from' for #<MSpecEnv:0x772d6>
   fails "Optional variable assignments using compunded constants with ||= assignments"
+  fails "Optional variable assignments using compounded constants with &&= assignments" # Expected warning to match: /already initialized constant/ but got: ""
+  fails "Optional variable assignments using compounded constants with operator assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Post-args with optional args with a circular argument reference shadows an existing local with the same name as the argument"
   fails "Post-args with optional args with a circular argument reference shadows an existing method with the same name as the argument"
   fails "Predefined global $+ captures the last non nil capture"
@@ -208,6 +217,8 @@ opal_filter "language" do
   fails "The alias keyword on top level defines the alias on Object"
   fails "The alias keyword operates on methods defined via attr, attr_reader, and attr_accessor"
   fails "The alias keyword operates on the object's metaclass when used in instance_eval"
+  fails "The alias keyword can create a new global variable, synonym of the original" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
+  fails "The alias keyword can override an existing global variable and make them synonyms" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
   fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when calling the block from a method"
   fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when yielding to the block"
   fails "The break statement in a captured block from another thread raises a LocalJumpError when getting the value from another thread" # NameError: uninitialized constant Thread
@@ -278,13 +289,13 @@ opal_filter "language" do
   fails "The until expression restarts the current iteration without reevaluating condition with redo"
   fails "The until modifier restarts the current iteration without reevaluating condition with redo"
   fails "The until modifier with begin .. end block evaluates condition after block execution"
-  fails "The until modifier with begin .. end block restart the current iteration without reevaluting condition with redo"
+  fails "The until modifier with begin .. end block restart the current iteration without reevaluating condition with redo" # Expected [1] to equal [0, 0, 0, 1, 2]
   fails "The until modifier with begin .. end block runs block at least once (even if the expression is true)"
   fails "The until modifier with begin .. end block skips to end of body with next"
   fails "The while expression stops running body if interrupted by break in a begin ... end element op-assign value"
   fails "The while expression stops running body if interrupted by break in a parenthesized element op-assign value"
   fails "The while modifier with begin .. end block evaluates condition after block execution"
-  fails "The while modifier with begin .. end block restarts the current iteration without reevaluting condition with redo"
+  fails "The while modifier with begin .. end block restarts the current iteration without reevaluating condition with redo" # Expected [1, 1, 1, 2] to equal [0, 0, 0, 1, 2]
   fails "The while modifier with begin .. end block runs block at least once (even if the expression is false)"
   fails "The while modifier with begin .. end block skips to end of body with next"
   fails "The yield call taking a single argument yielding to a lambda should not destructure an Array into multiple arguments" # Expected ArgumentError but no exception was raised ([1, 2] was returned)

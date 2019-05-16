@@ -73,7 +73,7 @@ opal_filter "String" do
   fails "String#clone copies constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
   fails "String#clone copies modules included in the singleton class" # NoMethodError: undefined method `repr' for "string"
   fails "String#clone copies singleton methods" # NoMethodError: undefined method `special' for "string"
-  fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
+  fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimizable" # Expected [40, 41, 123, 125] to equal [40, 0, 41, 0, 123, 0, 125, 0]
   fails "String#downcase ASCII-only case mapping does not downcase non-ASCII characters" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
   fails "String#downcase case folding case folds special characters" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
   fails "String#downcase full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#downcase] wrong number of arguments(2 for 0)
@@ -105,7 +105,7 @@ opal_filter "String" do
   fails "String#each_byte passes each byte in self to the given block" # Expected [104, 0, 101, 0, 108, 0, 108, 0, 111, 0, 0, 0] to equal [104, 101, 108, 108, 111, 0]
   fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string" # Expected nil to equal 10
   fails "String#each_byte when no block is given returns an enumerator" # Expected [104, 0, 101, 0, 108, 0, 108, 0, 111, 0] to equal [104, 101, 108, 108, 111]
-  fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
+  fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimizable" # Expected [40, 41, 123, 125] to equal [40, 0, 41, 0, 123, 0, 125, 0]
   fails "String#each_grapheme_cluster is unicode aware" # NoMethodError: undefined method `each_grapheme_cluster' for "Ç∂éƒg"
   fails "String#each_grapheme_cluster passes each char in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
   fails "String#each_grapheme_cluster passes each grapheme cluster in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "ab🏳️\u200D🌈🐾"
@@ -124,6 +124,7 @@ opal_filter "String" do
   fails "String#each_line when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
   fails "String#each_line when `chomp` keyword argument is passed removes only specified separator" # ArgumentError: [String#each_line] wrong number of arguments(2 for -1)
   fails "String#each_line yields paragraphs (broken by 2 or more successive newlines) when passed '' and replaces multiple newlines with only two ones" # Expected ["hello\nworld\n\n\n", "and\nuniverse\n\n\n\n\n"] to equal ["hello\nworld\n\n", "and\nuniverse\n\n"]
+  fails "String#end_with? raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#force_encoding with a special encoding name defaults to ASCII-8BIT if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
@@ -156,6 +157,7 @@ opal_filter "String" do
   fails "String#intern returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#intern returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "String#intern returns a binary Symbol for a binary String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "String#inspect when the string's encoding is different than the result's encoding and the string's encoding is ASCII-compatible but the characters are non-ASCII returns a string with the non-ASCII characters replaced by \\x notation" # ArgumentError: unknown encoding name - EUC-JP
   fails "String#lines when `chomp` keyword argument is passed ignores new line characters when separator is specified" # ArgumentError: [String#lines] wrong number of arguments(2 for -1)
   fails "String#lines when `chomp` keyword argument is passed removes new line characters when separator is not specified" # TypeError: no implicit conversion of Hash into String
   fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String

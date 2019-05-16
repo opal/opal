@@ -13,6 +13,7 @@ opal_filter "Marshal" do
   fails "Marshal.dump with an Object dumps an Object with a non-US-ASCII instance variable" # NameError: '@Ã©' is not allowed as an instance variable name
   fails "Marshal.dump with an Object raises if an Object has a singleton class and singleton methods" # Expected TypeError (singleton can't be dumped) but no exception was raised ("\u0004\bo:\vObject\u0000" was returned)
   fails "Marshal.dump with an object responding to #_dump dumps the object returned by #marshal_dump"
+  fails "Marshal.dump with an Exception dumps the cause for the exception" # NoMethodError: undefined method `cause' for #<RuntimeError: the consequence>
   fails "Marshal.load for a Module loads an old module"
   fails "Marshal.load for a Regexp loads a extended_user_regexp having ivar"
   fails "Marshal.load for a String loads a String subclass with custom constructor"
