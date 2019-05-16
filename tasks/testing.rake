@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:rspec) do |t|
   t.pattern = 'spec/lib/**/*_spec.rb'
@@ -87,7 +88,7 @@ module Testing
       suite == 'opal' ? opalspec_filters : rubyspec_filters
     end
 
-    def write_file(filename, filters, specs, env)
+    def write_file(filename, filters, specs, env, force_require = false)
       bm_filepath = env['BM_FILEPATH']
 
       [filters, specs].each do |files|
@@ -95,7 +96,11 @@ module Testing
       end
 
       filter_requires = filters.map { |s| "require #{s}" }.join("\n")
-      spec_requires = specs.map { |s| "requirable_spec_file #{s}" }.join("\n")
+      if force_require
+        spec_requires = specs.map { |s| "require #{s}" }.join("\n")
+      else
+        spec_requires = specs.map { |s| "requirable_spec_file #{s}" }.join("\n")
+      end
       spec_registration = specs.join(",\n  ")
 
       if bm_filepath
@@ -341,8 +346,62 @@ platforms.each do |platform|
   end
 end
 
-# The name ends with the platform, which is of course mandated in this case
+mspec_suites.each do |suite|
+  desc "Run the MSpec test suite build with opal-webpack-loader in chrome" + pattern_usage
+  task :"mspec_#{suite}_owl" do
+    # setup webpack app
+    opal_pwd = Dir.pwd
 
+    unless Dir.exist?('tmp/webpack_app')
+      FileUtils.cp_r('spec/fixtures/webpack_app', 'tmp/webpack_app')
+      Dir.chdir('tmp/webpack_app')
+      `yarn install`
+      `env -i PATH=$PATH bundle install`
+      Dir.chdir(opal_pwd)
+    end
+
+    # cleanup old entry and asset
+    FileUtils.rm_f('tmp/webpack_app/public/assets/application.js')
+    FileUtils.rm_f('tmp/webpack_app/opal/spec_owl.rb')
+    FileUtils.rm_f('tmp/webpack_app/opal/etc.rb')
+    FileUtils.rm_f('tmp/webpack_app/opal/a_file.rb')
+    FileUtils.rm_rf('tmp/webpack_app/opal/mspec')
+
+    # create new entry and asset and run tests
+    filename = "tmp/webpack_app/opal/spec_owl.rb"
+    mkdir_p File.dirname(filename)
+    bm_filepath = Testing::MSpec.bm_filepath if ENV['BM']
+    specs_env = {
+      'SUITE' => suite,
+      'FORMATTER' => 'chrome',
+      'BM_FILEPATH' => bm_filepath,
+    }.merge(ENV.to_hash)
+
+    force_require = true
+    Testing::MSpec.write_file filename, Testing::MSpec.filters(suite), Testing::MSpec.specs(specs_env), specs_env, force_require
+
+    Dir.chdir('tmp/webpack_app')
+
+    Testing::MSpec.stubs.each do |stubpath|
+      STDERR.puts "stub: #{stubpath}"
+      stubpath = stubpath.sub(/\Alib\//, '') if stubpath.start_with?('lib/')
+      stub_file = File.join('opal', stubpath + '.rb')
+      FileUtils.mkdir_p(File.dirname(stub_file))
+      File.write(stub_file, '')
+    end
+
+    sh "env -i PATH=$PATH ruby -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls runner.rb"
+    Dir.chdir(opal_pwd)
+    #     "exe/opal -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+
+    if bm_filepath
+      puts "Benchmark results have been written to #{bm_filepath}"
+      puts "To view the results, run bundle exec rake bench:report"
+    end
+  end
+end
+
+# The name ends with the platform, which is of course mandated in this case
 %w[nodejs strictnodejs].each do |platform|
   desc "Run the Node.js Minitest suite on Node.js - #{platform}"
   task :"minitest_node_#{platform}" do
