@@ -2,20 +2,8 @@ require 'opal/nodes/call'
 require 'opal/ast/builder'
 
 class Opal::Nodes::CallNode
-  # Rubyspec uses this call to load in language specific features at runtime.
+  # Rubyspec uses these calls features at runtime.
   # We can't do this at runtime, so handle it during compilation
-  add_special :language_version do |compile_default|
-    if scope.top?
-      lang_type = arglist.children[1].children[0]
-      target = "ruby/language/versions/#{lang_type}_1.9"
-
-      if File.exist?(target)
-        compiler.requires << target
-      end
-
-      push fragment("nil")
-    end
-  end
 
   add_special :not_supported_on do |compile_default|
     unless arglist.children.include?(s(:sym, :opal))
