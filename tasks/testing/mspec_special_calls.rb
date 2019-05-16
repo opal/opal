@@ -11,12 +11,6 @@ class Opal::Nodes::CallNode
     end
   end
 
-  add_special :not_compliant_on do |compile_default|
-    unless arglist.children.include?(s(:sym, :opal))
-      compile_default.call
-    end
-  end
-
   has_xstring = -> node {
     next if node.nil? || !node.respond_to?(:type)
     node.type == :xstr || (node.children && node.children.any?(&has_xstring))
