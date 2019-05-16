@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "dependencies": {
+    "opal-webpack-loader": "^0.8.1"
+  },
+  "scripts": {
+    "debug": "webpack --config=webpack/debug.js",
+    "production": "webpack --config=webpack/production.js"
+  },
+  "devDependencies": {
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.0"
+  }
+}
