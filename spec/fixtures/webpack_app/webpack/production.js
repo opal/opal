@@ -18,7 +18,22 @@ const common_config = {
     },
     resolve: {
         plugins: [
-            new OwlResolver('resolve', 'resolved', ['opal/platform.rb', "mspec-opal/runner.rb", "mspec/guards/block_device.rb", "stdlib/erb/erb_spec.rb"]) // resolve ruby files
+            new OwlResolver('resolve', 'resolved', [
+                // dont resolve these, use stubs instead
+                'opal/platform.rb',
+                "mspec-opal/runner.rb",
+                "mspec/guards/block_device.rb",
+                "stdlib/erb/erb_spec.rb",
+                "ruby/language/source_encoding_spec.rb",
+                "ruby/core/string/casecmp_spec.rb",
+                "ruby/core/string/shared/to_sym.rb",
+                "ruby/language/predefined_spec.rb",
+                "ruby/core/regexp/union_spec.rb",
+                "ruby/language/regexp_spec.rb",
+                "ruby/core/regexp/to_s_spec.rb",
+                "ruby/core/string/match_spec.rb",
+                "ruby/core/regexp/source_spec.rb"
+            ]) // resolve ruby files
         ]
     },
     module: {
