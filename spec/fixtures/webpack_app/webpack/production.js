@@ -5,7 +5,7 @@ const common_config = {
     context: path.resolve(__dirname, '../opal'),
     mode: "production",
     optimization: {
-        minimize: true, // minimize
+        minimize: false
     },
     performance: {
         maxAssetSize: 20000000,
