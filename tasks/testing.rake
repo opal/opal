@@ -88,7 +88,7 @@ module Testing
       suite == 'opal' ? opalspec_filters : rubyspec_filters
     end
 
-    def write_file(filename, filters, specs, env, force_require = false)
+    def write_file(filename, filters, specs, env)
       bm_filepath = env['BM_FILEPATH']
 
       [filters, specs].each do |files|
@@ -96,11 +96,7 @@ module Testing
       end
 
       filter_requires = filters.map { |s| "require #{s}" }.join("\n")
-      if force_require
-        spec_requires = specs.map { |s| "require #{s}" }.join("\n")
-      else
-        spec_requires = specs.map { |s| "requirable_spec_file #{s}" }.join("\n")
-      end
+      spec_requires = specs.map { |s| "requirable_spec_file #{s}" }.join("\n")
       spec_registration = specs.join(",\n  ")
 
       if bm_filepath
@@ -374,8 +370,7 @@ mspec_suites.each do |suite|
       'BM_FILEPATH' => bm_filepath,
     }.merge(ENV.to_hash)
 
-    force_require = true
-    Testing::MSpec.write_file filename, Testing::MSpec.filters(suite), Testing::MSpec.specs(specs_env), specs_env, force_require
+    Testing::MSpec.write_file filename, Testing::MSpec.filters(suite), Testing::MSpec.specs(specs_env), specs_env
 
     Dir.chdir('tmp/webpack_app')
 
@@ -387,7 +382,7 @@ mspec_suites.each do |suite|
       File.write(stub_file, '')
     end
 
-    sh "env -i PATH=$PATH ruby -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls runner.rb"
+    sh "env -i PATH=$PATH ruby -w -rbundler/setup runner.rb"
     Dir.chdir(opal_pwd)
     #     "exe/opal -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 
