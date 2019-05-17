@@ -28,18 +28,8 @@ const common_config = {
             // this makes it possible for webpack to find ruby files
             new OwlResolver('resolve', 'resolved', [
                 'opal/platform.rb',
-                "mspec-opal/runner.rb",
-                "mspec/guards/block_device.rb",
-                "stdlib/erb/erb_spec.rb",
-                "ruby/language/source_encoding_spec.rb",
-                "ruby/core/string/casecmp_spec.rb",
-                "ruby/core/string/shared/to_sym.rb",
-                "ruby/language/predefined_spec.rb",
-                "ruby/core/regexp/union_spec.rb",
-                "ruby/language/regexp_spec.rb",
-                "ruby/core/regexp/to_s_spec.rb",
-                "ruby/core/string/match_spec.rb",
-                "ruby/core/regexp/source_spec.rb"
+                'mspec-opal/runner.rb',
+                'stdlib/erb/erb_spec.rb',
             ])
         ]
     },
@@ -54,7 +44,9 @@ const common_config = {
                         options: {
                             sourceMap: true,
                             hmr: false,
-                            hmrHook: ''
+                            hmrHook: '',
+                            includePaths: [ path.resolve(__dirname, '../../../tasks/testing/') ],
+                            requireModules: [ 'mspec_special_calls' ]
                         }
                     }
                 ]

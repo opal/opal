@@ -21,18 +21,8 @@ const common_config = {
             new OwlResolver('resolve', 'resolved', [
                 // dont resolve these, use stubs instead
                 'opal/platform.rb',
-                "mspec-opal/runner.rb",
-                "mspec/guards/block_device.rb",
-                "stdlib/erb/erb_spec.rb",
-                "ruby/language/source_encoding_spec.rb",
-                "ruby/core/string/casecmp_spec.rb",
-                "ruby/core/string/shared/to_sym.rb",
-                "ruby/language/predefined_spec.rb",
-                "ruby/core/regexp/union_spec.rb",
-                "ruby/language/regexp_spec.rb",
-                "ruby/core/regexp/to_s_spec.rb",
-                "ruby/core/string/match_spec.rb",
-                "ruby/core/regexp/source_spec.rb"
+                'mspec-opal/runner.rb',
+                'stdlib/erb/erb_spec.rb',
             ]) // resolve ruby files
         ]
     },
@@ -46,7 +36,9 @@ const common_config = {
                         loader: 'opal-webpack-loader',
                         options: {
                             sourceMap: false,
-                            hmr: false
+                            hmr: false,
+                            includePaths: [ path.resolve(__dirname, '../../../tasks/testing/') ],
+                            requireModules: [ 'mspec_special_calls' ]
                         }
                     }
                 ]
