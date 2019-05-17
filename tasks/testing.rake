@@ -361,11 +361,8 @@ mspec_suites.each do |suite|
     end
 
     # cleanup old entry and asset
-    FileUtils.rm_f('tmp/webpack_app/public/assets/application.js')
     FileUtils.rm_f('tmp/webpack_app/opal/spec_owl.rb')
-    FileUtils.rm_f('tmp/webpack_app/opal/etc.rb')
-    FileUtils.rm_f('tmp/webpack_app/opal/a_file.rb')
-    FileUtils.rm_rf('tmp/webpack_app/opal/mspec')
+    FileUtils.rm_f('tmp/webpack_app/public/assets/application.js')
 
     # create new entry and asset and run tests
     filename = "tmp/webpack_app/opal/spec_owl.rb"
