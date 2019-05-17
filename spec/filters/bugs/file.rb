@@ -32,6 +32,7 @@ opal_filter "File" do
   fails "File.expand_path replaces multiple '/' with a single '/'" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
   fails "File.expand_path when HOME is not set raises an ArgumentError when passed '~' if HOME == ''" # Expected ArgumentError but no exception was raised ("/" was returned)
   fails "File.expand_path with a non-absolute HOME raises an ArgumentError" # Expected ArgumentError (non-absolute home) but no exception was raised ("non-absolute" was returned)
+  fails "File.expand_path expand_path for common unix path gives a full path" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
   fails "File.absolute_path resolves paths relative to the current working directory" # Expected "./ruby/core/file/hello.txt" to equal "ruby/core/file/hello.txt"
   fails "File.absolute_path accepts a second argument of a directory from which to resolve the path" # Expected "./ruby/core/file/ruby/core/file/absolute_path_spec.rb" to equal "ruby/core/file/absolute_path_spec.rb"
   fails "File.absolute_path does not expand '~user' to a home directory." # Expected "./ruby/core/file/~user" to equal "ruby/core/file/~user"

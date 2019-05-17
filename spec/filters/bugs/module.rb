@@ -76,6 +76,8 @@ opal_filter "Module" do
   fails "Module#const_get does autoload a constant" # NameError: uninitialized constant CSAutoloadA
   fails "Module#const_get does autoload a module and resolve a constant within" # NameError: uninitialized constant CSAutoloadC
   fails "Module#const_get does autoload a non-toplevel module" # LoadError: cannot load such file -- ruby/core/module/fixtures/constants_autoload_d
+  fails "Module#const_set when overwriting an existing constant does not warn if the previous value was undefined" # Expected #<Module:0x48fd0> to have constant 'Foo' but it does not
+  fails "Module#const_set when overwriting an existing constant warns if the previous value was a normal value" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Module#constants doesn't returns inherited constants when passed nil"
   fails "Module#constants returns only public constants"
   fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class"
@@ -152,6 +154,8 @@ opal_filter "Module" do
   fails "Module#refine when super is called in a refinement looks in the included to refinery module" # NoMethodError: undefined method `refine' for #<Module:0x3aec8>
   fails "Module#refine when super is called in a refinement looks in the refined class even if there is another active refinement" # NoMethodError: undefined method `refine' for #<Module:0x3aec4>
   fails "Module#refine when super is called in a refinement looks in the refined class" # NoMethodError: undefined method `refine' for #<Module:0x3aecc>
+  fails "Module#refine accepts a module as argument" # NoMethodError: undefined method `refine' for #<Module:0x4c172>
+  fails "Module#refine for methods accessed indirectly is not honored by Kernel#instance_method" # NoMethodError: undefined method `refine' for #<Module:0x4c176>
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#remove_const returns nil when removing autoloaded constant"

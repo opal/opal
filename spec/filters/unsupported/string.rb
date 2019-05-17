@@ -53,7 +53,7 @@ opal_unsupported_filter "String" do
   fails "String#<< when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses self's encoding if both are empty"
   fails "String#<< when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses self's encoding if the argument is empty"
   fails "String#<< when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses the argument's encoding if self is empty"
-  fails "String#<< with Integer concatencates the argument interpreted as a codepoint"
+  fails "String#<< with Integer concatenates the argument interpreted as a codepoint" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#<< with Integer doesn't call to_int on its argument"
   fails "String#<< with Integer raises RangeError if the argument is an invalid codepoint for self's encoding"
   fails "String#<< with Integer raises RangeError if the argument is negative"
@@ -169,7 +169,7 @@ opal_unsupported_filter "String" do
   fails "String#chomp! when passed '' returns nil when self is empty"
   fails "String#chomp! when passed '' taints the result if self is tainted"
   fails "String#chomp! when passed '\\n' removes one trailing carriage return"
-  fails "String#chomp! when passed '\\n' removes one trailing carrige return, newline pair"
+  fails "String#chomp! when passed '\\n' removes one trailing carriage return, newline pair" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
   fails "String#chomp! when passed '\\n' removes one trailing newline"
   fails "String#chomp! when passed '\\n' returns nil when self is empty"
   fails "String#chomp! when passed '\\n' taints the result if self is tainted"
@@ -184,7 +184,7 @@ opal_unsupported_filter "String" do
   fails "String#chomp! when passed nil returns nil"
   fails "String#chomp! when passed no argument modifies self"
   fails "String#chomp! when passed no argument removes one trailing carriage return"
-  fails "String#chomp! when passed no argument removes one trailing carrige return, newline pair"
+  fails "String#chomp! when passed no argument removes one trailing carriage return, newline pair" # NotImplementedError: String#chomp! not supported. Mutable String methods are not supported in Opal.
   fails "String#chomp! when passed no argument removes one trailing newline"
   fails "String#chomp! when passed no argument removes trailing characters that match $/ when it has been assigned a value"
   fails "String#chomp! when passed no argument returns nil if self is not modified"
@@ -198,7 +198,7 @@ opal_unsupported_filter "String" do
   fails "String#chop! raises a RuntimeError on a frozen instance that is modified"
   fails "String#chop! raises a RuntimeError on a frozen instance that would not be modified"
   fails "String#chop! removes a multi-byte character" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
-  fails "String#chop! removes the carrige return, newline if they are the only characters"
+  fails "String#chop! removes the carriage return, newline if they are the only characters" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
   fails "String#chop! removes the final carriage return"
   fails "String#chop! removes the final carriage return, newline from a multibyte String" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
   fails "String#chop! removes the final carriage return, newline from a non-ASCII String" # ArgumentError: unknown encoding name - utf-32be
@@ -238,7 +238,7 @@ opal_unsupported_filter "String" do
   fails "String#concat when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses self's encoding if both are empty"
   fails "String#concat when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses self's encoding if the argument is empty"
   fails "String#concat when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses the argument's encoding if self is empty"
-  fails "String#concat with Integer concatencates the argument interpreted as a codepoint"
+  fails "String#concat with Integer concatenates the argument interpreted as a codepoint" # NoMethodError: undefined method `concat' for ""
   fails "String#concat with Integer doesn't call to_int on its argument"
   fails "String#concat with Integer raises RangeError if the argument is an invalid codepoint for self's encoding"
   fails "String#concat with Integer raises RangeError if the argument is negative"
@@ -520,7 +520,7 @@ opal_unsupported_filter "String" do
   fails "String#setbyte raises a RuntimeError if self is frozen"
   fails "String#setbyte raises a TypeError unless the second argument is an Integer"
   fails "String#setbyte raises an IndexError if the index is greater than the String bytesize"
-  fails "String#setbyte raises an IndexError if the nexgative index is greater magnitude than the String bytesize"
+  fails "String#setbyte raises an IndexError if the negative index is greater magnitude than the String bytesize" # NoMethodError: undefined method `setbyte' for "???"
   fails "String#setbyte regards a negative index as counting from the end of the String"
   fails "String#setbyte returns an Integer"
   fails "String#setbyte sets a byte at an index greater than String size"

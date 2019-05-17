@@ -7,6 +7,8 @@ opal_filter "Hash" do
   fails "Hash#[]= keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
   fails "Hash#compare_by_identity gives different identity for string literals" # Expected [2] to equal [1, 2]
   fails "Hash#delete allows removing a key while iterating" # Exception: Cannot read property '$$is_string' of undefined
+  fails "Hash#each yields 2 values and not an Array of 2 elements when given a callable of arity 2" # ArgumentError: [Object#foo] wrong number of arguments(1 for 2)
+  fails "Hash#each_pair yields 2 values and not an Array of 2 elements when given a callable of arity 2" # ArgumentError: [Object#foo] wrong number of arguments(1 for 2)
   fails "Hash#eql? compares keys with eql? semantics" # spec relies on integer and float being different
   fails "Hash#eql? computes equality for complex recursive hashes"
   fails "Hash#eql? computes equality for recursive hashes & arrays"

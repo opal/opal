@@ -27,7 +27,7 @@ opal_filter "Kernel" do
   fails "Kernel#autoload sets the autoload constant in Object's constant table" # Expected Object to have constant 'KSAutoloadA' but it does not
   fails "Kernel#autoload when Object is frozen raises a FrozenError before defining the constant" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x7849c>
   fails "Kernel#autoload when called from included module's method setups the autoload on the included module" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethod
-  fails "Kernel#autoload when called from included module's method the autoload is reacheable from the class too" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethodIncluder
+  fails "Kernel#autoload when called from included module's method the autoload is reachable from the class too" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethodIncluder
   fails "Kernel#autoload when called from included module's method the autoload relative to the included module works" # NameError: uninitialized constant KernelSpecs::AutoloadMethod::AutoloadFromIncludedModule
   fails "Kernel#autoload? is a private method" # Expected Kernel to have private instance method 'autoload?' but it does not
   fails "Kernel#autoload? returns nil if no file has been registered for a constant" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x7849c>
@@ -68,6 +68,7 @@ opal_filter "Kernel" do
   fails "Kernel#eval with a magic encoding comment uses the magic comment encoding for the encoding of literal strings" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "Kernel#extend does not calls append_features on arguments metaclass"
   fails "Kernel#extend raises an ArgumentError when no arguments given"
+  fails "Kernel#fail accepts an Object with an exception method returning an Exception" # TypeError: exception class/object expected
   fails "Kernel#inspect does not call #to_s if it is defined"
   fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
   fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton
@@ -86,6 +87,7 @@ opal_filter "Kernel" do
   fails "Kernel#object_id returns a different value for two String literals"
   fails "Kernel#p flushes output if receiver is a File"
   fails "Kernel#p is not affected by setting $\\, $/ or $,"
+  fails "Kernel#pp lazily loads the 'pp' library and delegates the call to that library" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4f28>
   fails "Kernel#proc uses the implicit block from an enclosing method"
   fails "Kernel#public_method changes the method called for super on a target aliased method"
   fails "Kernel#public_method raises a NameError if we only repond_to_missing? method, true"
@@ -98,6 +100,7 @@ opal_filter "Kernel" do
   fails "Kernel#public_send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#puts delegates to $stdout.puts"
   fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
+  fails "Kernel#raise raises RuntimeError if no exception class is given" # RuntimeError: RuntimeError
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning false"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"
@@ -262,7 +265,7 @@ opal_filter "Kernel" do
   fails "Kernel.autoload registers a file to load the first time the toplevel constant is accessed" # NoMethodError: undefined method `autoload?' for Kernel
   fails "Kernel.autoload sets the autoload constant in Object's constant table" # Expected Object to have constant 'KSAutoloadBB' but it does not
   fails "Kernel.autoload when called from included module's method setups the autoload on the included module" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethod2
-  fails "Kernel.autoload when called from included module's method the autoload is reacheable from the class too" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethodIncluder2
+  fails "Kernel.autoload when called from included module's method the autoload is reachable from the class too" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethodIncluder2
   fails "Kernel.autoload when called from included module's method the autoload relative to the included module works" # NameError: uninitialized constant KernelSpecs::AutoloadMethod2::AutoloadFromIncludedModule2
   fails "Kernel.autoload? returns nil if no file has been registered for a constant" # NoMethodError: undefined method `autoload?' for Kernel
   fails "Kernel.autoload? returns the name of the file that will be autoloaded" # NoMethodError: undefined method `autoload?' for Kernel
