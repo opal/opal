@@ -53,6 +53,8 @@ module Opal
       #
       # This behaviour is needed for all modules, except corelib/runtime!
       def generate_module_import(ruby_module_path)
+        # module_path is empty for: require File.expand_path(o), can't generate a import, let it be resolved at runtime
+        return [''] if ruby_module_path.empty?
         import_lines = []
         ruby_module_path = determine_real_module_path(ruby_module_path)
         import_module_name, ruby_module_name = module_names_from_paths(Pathname.new(ruby_module_path), ruby_module_path)
