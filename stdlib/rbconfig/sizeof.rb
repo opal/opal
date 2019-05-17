@@ -1,6 +1,8 @@
 # This file is not intended for real checks,
 # but just to make happy libraries needing it.
 
+require_relative '../rbconfig'
+
 RbConfig::SIZEOF = {
   'clock_t'              => 8,
   'double _Complex'      => 16,

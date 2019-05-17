@@ -16,6 +16,7 @@ opal_unsupported_filter "Kernel" do
   fails "Kernel#dup preserves untrusted state from the original"
   fails "Kernel#dup raises a TypeError for Symbol"
   fails "Kernel#eql? is a public instance method"
+  fails "Kernel#fail is a private method"
   fails "Kernel#format is a private method"
   fails "Kernel#inspect returns an untrusted string if self is untrusted"
   fails "Kernel#raise is a private method"
