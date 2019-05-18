@@ -375,7 +375,6 @@ mspec_suites.each do |suite|
     Dir.chdir('tmp/webpack_app')
 
     Testing::MSpec.stubs.each do |stubpath|
-      STDERR.puts "stub: #{stubpath}"
       stubpath = stubpath.sub(/\Alib\//, '') if stubpath.start_with?('lib/')
       stub_file = File.join('opal', stubpath + '.rb')
       FileUtils.mkdir_p(File.dirname(stub_file))
@@ -384,11 +383,68 @@ mspec_suites.each do |suite|
 
     sh "env -i PATH=$PATH ruby -w -rbundler/setup runner.rb"
     Dir.chdir(opal_pwd)
-    #     "exe/opal -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
 
     if bm_filepath
       puts "Benchmark results have been written to #{bm_filepath}"
       puts "To view the results, run bundle exec rake bench:report"
+    end
+  end
+end
+
+minitest_suites.each do |suite|
+  desc "Run the Minitest suite on Opal::Builder/owl" + pattern_usage
+  task :"minitest_#{suite}_owl" do
+    # setup webpack app
+    opal_pwd = Dir.pwd
+
+    unless Dir.exist?('tmp/webpack_app')
+      FileUtils.cp_r('spec/fixtures/webpack_app', 'tmp/webpack_app')
+      Dir.chdir('tmp/webpack_app')
+      `yarn install`
+      `env -i PATH=$PATH bundle install`
+      Dir.chdir(opal_pwd)
+    end
+
+    # cleanup old entry and asset
+    FileUtils.rm_f('tmp/webpack_app/opal/spec_owl.rb')
+    FileUtils.rm_f('tmp/webpack_app/public/assets/application.js')
+
+    files = %w[
+        benchmark/test_benchmark.rb
+        ruby/test_call.rb
+        opal/test_keyword.rb
+        opal/test_base64.rb
+        opal/test_openuri.rb
+        opal/unsupported_and_bugs.rb
+        opal/test_matrix.rb
+      ]
+
+    Testing::HTTPServer.new.with_server do |session|
+      Dir.chdir('tmp/webpack_app')
+
+      # create stubs
+      stubs = %w[optparse io/console timeout mutex_m rubygems tempfile monitor]
+      Dir.mkdir('opal/io') unless Dir.exist?('opal/io')
+
+      stubs.each do |stubpath|
+        stub_file = File.join('opal', stubpath + '.rb')
+        FileUtils.mkdir_p(File.dirname(stub_file))
+        File.write(stub_file, '')
+      end
+
+      # create new entry and asset and run tests
+      filename = 'opal/spec_owl.rb'
+      Testing::Minitest.write_file(filename, files, ENV)
+
+      # owl doesn't append exit code, "manually" append and call Kernel.exit
+      spec_file = File.read(filename)
+      spec_file << "\nKernel.exit\n"
+      File.write(filename, spec_file)
+
+      # Further options: -Dwarning -A --enable-source-location
+      sh "env -i PATH=$PATH ruby -w -rbundler/setup runner.rb"
+
+      Dir.chdir(opal_pwd)
     end
   end
 end
