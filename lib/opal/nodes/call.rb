@@ -272,6 +272,28 @@ module Opal
         compile_default.call
       end
 
+      add_special :require_lazy do
+        unless compiler.es6_modules?
+          compiler.warning('require_lazy works only with webpack/opal-webpack-laoder and the es6_modules compiler option!')
+        end
+        compiler.warning('require_lazy: No block given!') unless iter
+        unless arglist.children[0].type == :str
+          compiler.warning('require_lazy: First argument must be a string, module must be known at compile time!')
+        end
+        module_name = DependencyResolver.new(compiler, arglist.children[0]).resolve
+
+        prefetch = arglist.children.include?(s(:sym, :prefetch))
+        preload =  arglist.children.include?(s(:sym, :preload))
+        push fragment 'import('
+        push fragment '/* webpackPrefetch: true */' if prefetch
+        push fragment '/* webpackPreload: true */' if preload
+        # append '.rb' to the module name so webpack passes the request to the owl resolver and loader
+        push fragment " '#{module_name}.rb'"
+        push fragment ').then(function() {'
+        push expr(iter)
+        push fragment '});'
+      end
+
       add_special :block_given? do
         push compiler.handle_block_given_call @sexp
       end
