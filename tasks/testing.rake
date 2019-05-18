@@ -381,7 +381,7 @@ mspec_suites.each do |suite|
       File.write(stub_file, '')
     end
 
-    sh "env -i PATH=$PATH ruby -w -rbundler/setup runner.rb"
+    sh "env -i PATH=$PATH ruby -w -rbundler/setup mspec_runner.rb"
     Dir.chdir(opal_pwd)
 
     if bm_filepath
@@ -442,7 +442,7 @@ minitest_suites.each do |suite|
       File.write(filename, spec_file)
 
       # Further options: -Dwarning -A --enable-source-location
-      sh "env -i PATH=$PATH ruby -w -rbundler/setup runner.rb"
+      sh "env -i PATH=$PATH ruby -w -rbundler/setup minitest_runner.rb"
 
       Dir.chdir(opal_pwd)
     end

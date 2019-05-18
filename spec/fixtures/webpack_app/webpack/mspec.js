@@ -1,29 +1,36 @@
+// require requirements used below
 const path = require('path');
-const OwlResolver = require('opal-webpack-loader/resolver');
+const OwlResolver = require('opal-webpack-loader/resolver'); // to resolve ruby files
 
 const common_config = {
     context: path.resolve(__dirname, '../opal'),
-    mode: "production",
+    mode: "development",
     optimization: {
-        minimize: false
+        minimize: false // dont minimize for debugging
     },
     performance: {
         maxAssetSize: 20000000,
         maxEntrypointSize: 20000000
     },
+    // use one of these below for source maps
+    devtool: 'source-map', // this works well, good compromise between accuracy and performance
+    // devtool: 'cheap-eval-source-map', // less accurate
+    // devtool: 'inline-source-map', // slowest
+    // devtool: 'inline-cheap-source-map',
     output: {
+        // webpack-dev-server keeps the output in memory
         filename: '[name].js',
         path: path.resolve(__dirname, '../public/assets'),
         publicPath: '/assets/'
     },
     resolve: {
         plugins: [
+            // this makes it possible for webpack to find ruby files
             new OwlResolver('resolve', 'resolved', [
-                // dont resolve these, use stubs instead
                 'opal/platform.rb',
                 'mspec-opal/runner.rb',
                 'stdlib/erb/erb_spec.rb',
-            ]) // resolve ruby files
+            ])
         ]
     },
     module: {
@@ -35,8 +42,9 @@ const common_config = {
                     {
                         loader: 'opal-webpack-loader',
                         options: {
-                            sourceMap: false,
+                            sourceMap: true,
                             hmr: false,
+                            hmrHook: '',
                             includePaths: [ path.resolve(__dirname, '../../../tasks/testing/') ],
                             requireModules: [ 'mspec_special_calls' ]
                         }
