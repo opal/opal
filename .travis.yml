@@ -98,7 +98,7 @@ before_install:
   - which google-chrome-stable
   - google-chrome-stable --version
   - export RUBYOPT=-w
-  # Wokraround from https://github.com/travis-ci/travis-ci/issues/9024#issuecomment-356282802
+  # Workaround from https://github.com/travis-ci/travis-ci/issues/9024#issuecomment-356282802
   - sudo chown root /opt/google/chrome/chrome-sandbox
   - sudo chmod 4755 /opt/google/chrome/chrome-sandbox
 
