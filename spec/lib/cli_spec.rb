@@ -240,7 +240,7 @@ RSpec.describe Opal::CLI do
     end
 
     it 'inserts ES6 import lines into compiled code' do
-      expect_output_of { subject.run }.to match(/import corelib_module[[:alnum:]]{8} from 'corelib\/module\.rb';/)
+      expect_output_of { subject.run }.to match(/import corelib_module_o_rb_[[:alnum:]]{8} from 'corelib\/module\.rb';/)
     end
   end
 
