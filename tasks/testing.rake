@@ -555,11 +555,17 @@ platforms.each do |platform|
   task :"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }
 end
 
+desc "Run the whole Minitest suite build with webpack on chrome"
+task :minitest_owl => [:minitest_cruby_owl]
+
+desc "Run the whole MSpec suite build with webpack on chrome"
+task :mspec_owl => [:mspec_ruby_owl, :mspec_opal_owl]
+
 desc "Run the whole MSpec suite on all platforms"
-task :mspec    => [:mspec_chrome, :mspec_nodejs, :mspec_strictnodejs]
+task :mspec    => [:mspec_chrome, :mspec_nodejs, :mspec_strictnodejs, :mspec_owl]
 
 desc "Run the whole Minitest suite on all platforms"
-task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs, :minitest_node_strictnodejs, :minitest_strictnodejs]
+task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs, :minitest_node_strictnodejs, :minitest_strictnodejs, :minitest_owl]
 
 desc "Run all tests"
 task :test_all => [:rspec, :mspec, :minitest]
