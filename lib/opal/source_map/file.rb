@@ -99,8 +99,7 @@ class Opal::SourceMap::File
   def segment_from_fragment(fragment, generated_column)
     source_index     = 0                          # always 0, we're dealing with a single file
     original_line    = fragment.line - 1          # fragments have 1-based lines
-    original_line    = 1 if original_line < 1     # line 0 for fragments in source maps will crash
-                                                  # browsers devtools and the webpack build process
+    original_line    = 1 if original_line < 1     # line 0 for fragments in source maps will crash browsers devtools and the webpack build process
     original_column  = fragment.column            # fragments have 0-based columns
 
     if fragment.source_map_name

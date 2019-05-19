@@ -108,8 +108,7 @@ module Opal
       def module_names_from_module_paths(original_path, current_path)
         # remove known load path at the beginning and the filename extension to get the module name like 'some/ruby'
         module_name = original_path[(current_path.size + 1)..-1]
-        [ module_name.end_with?('.rb') ? module_name : module_name + '.rb',
-          module_name.sub(/\.(js|rb|js\.rb)\z/, '') ]
+        [module_name.end_with?('.rb') ? module_name : module_name + '.rb', module_name.sub(/\.(js|rb|js\.rb)\z/, '')]
       end
 
       def module_names_for_pwd(original_path_s)
