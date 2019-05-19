@@ -3,6 +3,7 @@ const OwlResolver = require('opal-webpack-loader/resolver'); // to resolve ruby 
 
 const common_config = {
     mode: 'production',
+    devtool: 'source-map',
     performance: {
         maxAssetSize: 20000000,
         maxEntrypointSize: 20000000
