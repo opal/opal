@@ -9,6 +9,7 @@ module Opal
   module Nodes
     # Generates code for an entire file, i.e. the base sexp
     class TopNode < ScopeNode
+      include Opal::ES6ModulesHelpers::InstanceMethods
       handle :top
 
       children :body
@@ -95,7 +96,7 @@ module Opal
 
       def prepend_import_lines
         import_lines = compiler.requires.map do |module_path|
-          Opal::ES6ModulesHelpers.generate_module_import(module_path)
+          generate_module_import(module_path)
         end
         if compiler.required_trees.any?
           base_dir = Pathname.new(compiler.file).dirname
@@ -103,7 +104,7 @@ module Opal
           compiler.required_trees.each do |tree_path|
             # ES6 javascript import doesn't allow for import of directories, to support require_tree
             # the compiler must import each file in the tree separately
-            import_lines << Opal::ES6ModulesHelpers.generate_directory_imports(base_dir, tree_path)
+            import_lines << generate_directory_imports(base_dir, tree_path)
           end
         end
         unshift(*import_lines.flatten) if import_lines.any?

@@ -1,18 +1,31 @@
 # frozen_string_literal: true
-
+if RUBY_ENGINE != 'opal'
+  require 'digest'
+end
 require 'pathname'
 
 module Opal
   class ES6ModulesHelpers
-    class << self
+    module InstanceMethods
+      def import_counter
+        @import_counter ||= 0
+        @import_counter += 1
+      end
+
       def generate_import_name(module_path)
-        # in ruby its legal to require the same module several times, in webpack es6 importing the same module only works, if the import name
+        # In ruby its legal to require the same module several times, in webpack es6 importing the same module only works, if the import name
         # is different, using the same import will result in a error.
         # As large ruby projects tend to require the same module in a context several times, the import name must be different
-        # for each import. here a random import name is generated. webpack will make sure, that the code the different imports refer to,
-        # is imported only once
-        # generate random import name for a ruby module_name. Also replaces some characters that are illegal in JS import names.
-        module_path.gsub('.', '_o_').gsub('@', '_at_').gsub(/\W/, '_') + '_' + rand(36**8).to_s(36)
+        # for each import. Here the import name is generated as MD5 hash from module_path and compiler.file, plus a counter,
+        # just to make sure if a module gets imported several times from the current file, to differentiate the imports.
+        # webpack will make sure, that the code the different imports refer to, is imported only once.
+        if RUBY_ENGINE != 'opal'
+          "O_#{Digest::MD5.hexdigest("#{module_path}_#{compiler.file}")}_#{import_counter}"
+        else
+          # if running in opal, 'digest' is not available, so we don't calculate the MD5 hash, but instead just use
+          # the module_path and compiler.file and make sure it has no illegal characters in it, plus the counter.
+          "#{module_path}_#{compiler.file}".gsub('.', '_o_').gsub('@', '_at_').gsub(/\W/, '_') + '_' + import_counter.to_s
+        end
       end
 
       def generate_import_path(module_path)
@@ -57,7 +70,7 @@ module Opal
         return [''] if ruby_module_path.empty?
         import_lines = []
         ruby_module_path = determine_real_module_path(ruby_module_path)
-        import_module_name, ruby_module_name = module_names_from_paths(Pathname.new(ruby_module_path), ruby_module_path)
+        import_module_name, ruby_module_name = Opal::ES6ModulesHelpers.module_names_from_paths(Pathname.new(ruby_module_path), ruby_module_path)
         import_name = generate_import_name(import_module_name)
         import_lines << "import #{import_name} from '#{import_module_name}';\n"
         unless ruby_module_name == 'corelib/runtime'
@@ -105,6 +118,9 @@ module Opal
         end
       end
 
+    end
+
+    class << self
       def module_names_from_module_paths(original_path, current_path)
         # remove known load path at the beginning and the filename extension to get the module name like 'some/ruby'
         module_name = original_path[(current_path.size + 1)..-1]
