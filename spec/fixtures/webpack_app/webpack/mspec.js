@@ -46,7 +46,9 @@ const common_config = {
                             hmr: false,
                             hmrHook: '',
                             includePaths: [ path.resolve(__dirname, '../../../tasks/testing/') ],
-                            requireModules: [ 'mspec_special_calls' ]
+                            requireModules: [ 'mspec_special_calls' ],
+                            dynamicRequireSeverity: 'warning',
+                            compilerFlagsOn: [ 'arity_check', 'enable_source_location' ]
                         }
                     }
                 ]
