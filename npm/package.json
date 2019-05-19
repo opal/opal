@@ -1,0 +1,20 @@
+{
+  "name": "opal",
+  "version": "1.1.0",
+  "description": "Ruby runtime and core library for JavaScript",
+  "main": "opal.js",
+  "keywords": [
+    "opal",
+    "ruby"
+  ],
+  "scripts": {
+    "library_build": "webpack --config=webpack_config.js"
+  },
+  "author": "Adam Beynon and the Opal contributors",
+  "license": "MIT",
+  "devDependencies": {
+    "opal-webpack-loader": "0.8.3",
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2"
+  }
+}
