@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 if RUBY_ENGINE != 'opal'
   require 'digest'
 end
@@ -117,7 +118,6 @@ module Opal
           module_dir
         end
       end
-
     end
 
     class << self
