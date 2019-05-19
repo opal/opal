@@ -349,6 +349,7 @@ mspec_suites.each do |suite|
     opal_pwd = Dir.pwd
 
     unless Dir.exist?('tmp/webpack_app')
+      FileUtils.mkdir('tmp') unless Dir.exist?('tmp')
       FileUtils.cp_r('spec/fixtures/webpack_app', 'tmp/webpack_app')
       Dir.chdir('tmp/webpack_app')
       `yarn install`
@@ -398,6 +399,7 @@ minitest_suites.each do |suite|
     opal_pwd = Dir.pwd
 
     unless Dir.exist?('tmp/webpack_app')
+      FileUtils.mkdir('tmp') unless Dir.exist?('tmp')
       FileUtils.cp_r('spec/fixtures/webpack_app', 'tmp/webpack_app')
       Dir.chdir('tmp/webpack_app')
       `yarn install`
