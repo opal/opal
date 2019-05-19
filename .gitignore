@@ -18,6 +18,7 @@ node_modules
 npm/*.tgz
 npm/opal*.js
 npm/parser*.js
+npm/*.js.map
 package-lock.json
 
 # Ignore old submodules, useful when switching branches
