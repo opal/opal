@@ -6,7 +6,7 @@ Gemfile.lock
 build/
 /.github_access_token
 /cdn
-/node_modules
+node_modules
 /gh-pages
 /tmp
 .ruby-gemset
@@ -14,6 +14,11 @@ build/
 .rvmrc
 .rspec-local
 /coverage
+.owl_cache
+npm/*.tgz
+npm/opal*.js
+npm/parser*.js
+package-lock.json
 
 # Ignore old submodules, useful when switching branches
 spec/corelib
