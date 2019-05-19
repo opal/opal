@@ -29,6 +29,12 @@ matrix:
     - rvm: 2.5.3
       env: RUN=mspec_ruby_chrome
 
+    - rvm: 2.5.3
+      env: RUN=mspec_opal_owl
+
+    - rvm: 2.5.3
+      env: RUN=mspec_ruby_owl
+
     # - rvm: 2.5.3
     #   env:
     #     - RUN=browser_test
