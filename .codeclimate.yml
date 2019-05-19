@@ -52,3 +52,4 @@ exclude_patterns:
 - lib/opal/source_map/vlq.rb
 - lib/opal/es6_modules_helpers.rb
 - "lib/opal/nodes/*"
+- npm/webpack_config.js
