@@ -86,7 +86,7 @@ matrix:
     - rvm: jruby-head
     - rvm: truffleruby
     - env: RUN=smoke_test
-
+    - env: RUN=mspec_ruby_owl
 
 before_install:
   # Keep track of which version of node we're running the specs against
