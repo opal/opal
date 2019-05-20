@@ -306,7 +306,7 @@ module Opal
           push 'return $$promise;'
         end
         push line
-        push '})();'
+        push '})()'
       end
 
       add_special :block_given? do
