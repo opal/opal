@@ -273,25 +273,40 @@ module Opal
       end
 
       add_special :require_lazy do
+        helper :send
+
         unless compiler.es6_modules?
-          compiler.warning('require_lazy works only with webpack/opal-webpack-laoder and the es6_modules compiler option!')
+          compiler.warning('require_lazy works only with webpack/opal-webpack-loader and the es6_modules compiler option!')
         end
-        compiler.warning('require_lazy: No block given!') unless iter
         unless arglist.children[0].type == :str
           compiler.warning('require_lazy: First argument must be a string, module must be known at compile time!')
         end
         module_name = DependencyResolver.new(compiler, arglist.children[0]).resolve
 
-        prefetch = arglist.children.include?(s(:sym, :prefetch))
-        preload =  arglist.children.include?(s(:sym, :preload))
-        push fragment 'import('
-        push fragment '/* webpackPrefetch: true */' if prefetch
-        push fragment '/* webpackPreload: true */' if preload
-        # append '.rb' to the module name so webpack passes the request to the owl resolver and loader
-        push fragment " '#{module_name}.rb'"
-        push fragment ').then(function() {'
-        push expr(iter)
-        push fragment '});'
+        push fragment "(function() {"
+        indent do
+          push line
+          push "var $$promise = $send($$($nesting, 'Promise').$new(), 'then', [],"
+          if iter
+            push expr(iter)
+          else
+            push 'function(){return true;}'
+          end
+          push ');'
+          push line
+          push 'import('
+          push '/* webpackPrefetch: true */ ' if arglist.children.include?(s(:sym, :prefetch))
+          push '/* webpackPreload: true */ ' if arglist.children.include?(s(:sym, :preload))
+          # append '.rb' to the module name so webpack passes the request to the owl resolver and loader
+          push "'#{module_name}#{'.rb' unless module_name.end_with?('.rb')}'"
+          # remove'.rb' from the module name so opal can find it
+          push ").then(function(module) { module.default(); Opal.load('#{module_name.sub(/\.rb\Z/, '')}'); "
+          push '$$promise.$resolve(true); return module; });'
+          push line
+          push 'return $$promise;'
+        end
+        push line
+        push '})();'
       end
 
       add_special :block_given? do
