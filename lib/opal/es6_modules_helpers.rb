@@ -46,7 +46,7 @@ module Opal
                            base_dir.expand_path
                          end
         directory_path.each_child do |child_path|
-          next if child_path.to_s.start_with?('.')
+          next if child_path.basename.to_s.start_with?('.')
           if child_path.directory?
             import_lines << generate_directory_imports(child_path.expand_path)
           elsif child_path.file?
