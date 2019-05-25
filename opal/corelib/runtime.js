@@ -1971,6 +1971,7 @@
   };
 
   Opal.hash_delete = function(hash, key) {
+    console.log(key);
     var i, keys = hash.$$keys, length = keys.length, value;
 
     if (key.$$is_string) {
