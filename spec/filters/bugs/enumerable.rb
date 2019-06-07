@@ -30,13 +30,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#sort_by calls #each to iterate over the elements to be sorted" # NoMethodError: undefined method `sort!' for nil
   fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable"
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
-  fails "Enumerable#to_h calls #to_ary on contents"
-  fails "Enumerable#to_h converts empty enumerable to empty hash"
-  fails "Enumerable#to_h converts yielded [key, value] pairs to a hash"
-  fails "Enumerable#to_h forwards arguments to #each"
-  fails "Enumerable#to_h raises ArgumentError if an element is not a [key, value] pair"
-  fails "Enumerable#to_h raises TypeError if an element is not an array"
-  fails "Enumerable#to_h uses the last value of a duplicated key"
   fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting
   fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
   fails "Enumerable#zip converts arguments to enums using #to_enum"

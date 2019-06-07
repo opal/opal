@@ -1200,6 +1200,31 @@ module Enumerable
 
   alias to_a entries
 
+  def to_h(*args)
+    %x{
+      var hash = #{{}};
+
+      self.$each.$$p = function() {
+        var param = #{Opal.destructure(`arguments`)};
+        var ary = #{Opal.coerce_to?(`param`, Array, :to_ary)}, key, val;
+        if (!ary.$$is_array) {
+          #{raise TypeError, "wrong element type #{`ary`.class} (expected array)"}
+        }
+        if (ary.length !== 2) {
+          #{raise ArgumentError, "wrong array length (expected 2, was #{`ary`.length})"}
+        }
+        key = ary[0];
+        val = ary[1];
+
+        Opal.hash_put(hash, key, val);
+      };
+
+      self.$each.apply(self, args);
+
+      return hash;
+    }
+  end
+
   def zip(*others, &block)
     to_a.zip(*others)
   end
