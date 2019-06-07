@@ -25,7 +25,7 @@ class Enumerator
       @args   = []
       @size   = `arguments[0] || nil`
 
-      if @size
+      if @size && !@size.respond_to?(:call)
         @size = Opal.coerce_to @size, Integer, :to_int
       end
     else
@@ -47,7 +47,7 @@ class Enumerator
   end
 
   def size
-    Proc === @size ? @size.call(*@args) : @size
+    @size.respond_to?(:call) ? @size.call(*@args) : @size
   end
 
   def with_index(offset = 0, &block)

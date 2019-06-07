@@ -34,7 +34,5 @@ opal_filter "Enumerator" do
   fails "Enumerator#peek_values returns an empty array if yield is called without arguments"
   fails "Enumerator#peek_values returns the next element in self"
   fails "Enumerator#peek_values works in concert with #rewind"
-  fails "Enumerator#size returns returning value from size.call if set size is a Proc"
-  fails "Enumerator#size returns the result from size.call if the size respond to call"
   fails "Enumerator#to_enum exposes multi-arg yields as an array" # NoMethodError: undefined method `next' for #<Enumerator: #<Object:0x53e80>:each>
 end
