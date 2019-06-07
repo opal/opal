@@ -8,3 +8,4 @@ Whitespace conventions:
 ### Fixed
 
 - Integer#gcdlcm (#1972)
+- Module#alias_method (#1983)
