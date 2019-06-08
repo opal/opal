@@ -50,10 +50,6 @@ opal_filter "Set" do
   fails "Set#intersect? when comparing to a Set-like object returns true when a Set has at least one element in common with a Set-like object" # NoMethodError: undefined method `intersect?' for #<Set: {1,2}>
   fails "Set#intersection raises an ArgumentError when passed a non-Enumerable"
   fails "Set#intersection returns a new Set containing only elements shared by self and the passed Enumerable"
-  fails "Set#keep_if keeps every element from self for which the passed block returns true"
-  fails "Set#keep_if returns an Enumerator when passed no block"
-  fails "Set#keep_if returns self"
-  fails "Set#keep_if yields every element of self"
   fails "Set#merge raises an ArgumentError when passed a non-Enumerable"
   fails "Set#pretty_print passes the 'pretty print' representation of self to the pretty print writer"
   fails "Set#pretty_print_cycle passes the 'pretty print' representation of a self-referencing Set to the pretty print writer"

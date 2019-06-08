@@ -93,6 +93,12 @@ class Set
     self
   end
 
+  def keep_if
+    return enum_for(:keep_if) unless block_given?
+    reject { |o| yield o }.each { |o| @hash.delete(o) }
+    self
+  end
+
   def add?(o)
     if include?(o)
       nil
