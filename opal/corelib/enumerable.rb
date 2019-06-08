@@ -743,7 +743,15 @@ module Enumerable
 
   alias member? include?
 
-  def min(&block)
+  def min(n = nil, &block)
+    unless n.nil?
+      if block_given?
+        return sort { |a, b| yield a, b }.take n
+      else
+        return sort.take n
+      end
+    end
+
     %x{
       var result;
 

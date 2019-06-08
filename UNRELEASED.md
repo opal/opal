@@ -10,3 +10,4 @@ Whitespace conventions:
 - Integer#gcdlcm (#1972)
 - Enumerable#to_h (#1979)
 - Enumerator#size (#1980)
+- Enumerable#min (#1982)
