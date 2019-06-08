@@ -196,6 +196,10 @@ class Set
     end
   end
 
+  def disjoint?(set)
+    !intersect?(set)
+  end
+
   alias + |
   alias union |
 
