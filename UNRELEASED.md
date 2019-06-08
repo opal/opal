@@ -11,3 +11,5 @@ Whitespace conventions:
 - Enumerable#to_h (#1979)
 - Enumerator#size (#1980)
 - Enumerable#min (#1982)
+- Set#intersect? (#1988)
+- Set#disjoint? (#1988)
