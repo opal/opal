@@ -23,3 +23,4 @@ Whitespace conventions:
 - Enumerator#each_with_index (#1990)
 - Range#== (#1992)
 - Range#each (#1991)
+- Enumerable#zip (#1986)
