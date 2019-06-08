@@ -1,10 +1,6 @@
 opal_filter "Enumerable" do
   fails "Enumerable#chunk_while on a single-element array ignores the block and returns an enumerator that yields [element]" # Expected [] to equal [[1]]
   fails "Enumerable#first returns a gathered array from yield parameters"
-  fails "Enumerable#max_by when called with an argument n when n is nil returns the maximum element"
-  fails "Enumerable#max_by when called with an argument n with a block on a enumerable of length x where x < n returns an array containing the maximum n elements of length n"
-  fails "Enumerable#max_by when called with an argument n with a block returns an array containing the maximum n elements based on the block's value"
-  fails "Enumerable#max_by when called with an argument n without a block returns an enumerator"
   fails "Enumerable#minmax_by Enumerable with no size when no block is given returned Enumerator size returns nil"
   fails "Enumerable#minmax_by Enumerable with size when no block is given returned Enumerator size returns the enumerable size"
   fails "Enumerable#minmax_by gathers whole arrays as elements when each yields multiple"

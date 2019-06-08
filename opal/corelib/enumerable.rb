@@ -712,8 +712,12 @@ module Enumerable
     sort(&block).reverse.first(n)
   end
 
-  def max_by(&block)
-    return enum_for(:max_by) { enumerator_size } unless block
+  def max_by(n = nil, &block)
+    return enum_for(:max_by, n) { enumerator_size } unless block
+
+    unless n.nil?
+      return sort_by(&block).reverse.take n
+    end
 
     %x{
       var result,
