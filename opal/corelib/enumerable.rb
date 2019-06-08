@@ -796,8 +796,12 @@ module Enumerable
     }
   end
 
-  def min_by(&block)
-    return enum_for(:min_by) { enumerator_size } unless block
+  def min_by(n = nil, &block)
+    return enum_for(:min_by, n) { enumerator_size } unless block
+
+    unless n.nil?
+      return sort_by(&block).take n
+    end
 
     %x{
       var result,
