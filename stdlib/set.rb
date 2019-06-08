@@ -99,6 +99,13 @@ class Set
     self
   end
 
+  def select!(&block)
+    return enum_for(:select!) unless block_given?
+    before = size
+    keep_if(&block)
+    size == before ? nil : self
+  end
+
   def add?(o)
     if include?(o)
       nil
