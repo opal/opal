@@ -2300,7 +2300,7 @@ class Array < `Array`
         }
         others[j] = #{(
           Opal.coerce_to?(`o`, Array, :to_ary) ||
-          Opal.coerce_to!(`o`, Enumerator, :each)
+          Opal.coerce_to!(`o`, Enumerator, :to_enum, :each)
         ).to_a};
       }
 
