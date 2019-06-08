@@ -99,6 +99,13 @@ class Set
     self
   end
 
+  def reject!(&block)
+    return enum_for(:reject!) unless block_given?
+    before = size
+    delete_if(&block)
+    size == before ? nil : self
+  end
+
   def select!(&block)
     return enum_for(:select!) unless block_given?
     before = size
