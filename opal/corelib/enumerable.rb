@@ -172,8 +172,7 @@ module Enumerable
     end
 
     %x{
-      var result,
-          all = [], i, length, value;
+      var all = [], i, length, value;
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
@@ -183,10 +182,6 @@ module Enumerable
       }
 
       self.$each();
-
-      if (result !== undefined) {
-        return result;
-      }
 
       if (all.length === 0) {
         return nil;
@@ -313,7 +308,7 @@ module Enumerable
     end
 
     %x{
-      var buffer = [], result = nil;
+      var buffer = [];
 
       self.$each.$$p = function() {
         var element = #{Opal.destructure(`arguments`)};
@@ -328,7 +323,7 @@ module Enumerable
 
       self.$each();
 
-      return result;
+      return nil;
     }
   end
 
@@ -360,8 +355,7 @@ module Enumerable
     return enum_for(:each_slice, n) { respond_to?(:size) ? (size / n).ceil : nil } unless block_given?
 
     %x{
-      var result,
-          slice = []
+      var slice = []
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)};
@@ -376,10 +370,6 @@ module Enumerable
 
       self.$each();
 
-      if (result !== undefined) {
-        return result;
-      }
-
       // our "last" group, if smaller than n then won't have been yielded
       if (slice.length > 0) {
         Opal.yield1(block, slice);
@@ -393,8 +383,7 @@ module Enumerable
     return enum_for(:each_with_index, *args) { enumerator_size } unless block_given?
 
     %x{
-      var result,
-          index = 0;
+      var index = 0;
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)};
@@ -405,10 +394,6 @@ module Enumerable
       };
 
       self.$each.apply(self, args);
-
-      if (result !== undefined) {
-        return result;
-      }
     }
 
     self
@@ -418,8 +403,6 @@ module Enumerable
     return enum_for(:each_with_object, object) { enumerator_size } unless block_given?
 
     %x{
-      var result;
-
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)};
 
@@ -427,10 +410,6 @@ module Enumerable
       };
 
       self.$each();
-
-      if (result !== undefined) {
-        return result;
-      }
     }
 
     object
