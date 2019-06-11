@@ -93,6 +93,26 @@ class Set
     self
   end
 
+  def keep_if
+    return enum_for(:keep_if) unless block_given?
+    reject { |o| yield o }.each { |o| @hash.delete(o) }
+    self
+  end
+
+  def reject!(&block)
+    return enum_for(:reject!) unless block_given?
+    before = size
+    delete_if(&block)
+    size == before ? nil : self
+  end
+
+  def select!(&block)
+    return enum_for(:select!) unless block_given?
+    before = size
+    keep_if(&block)
+    size == before ? nil : self
+  end
+
   def add?(o)
     if include?(o)
       nil

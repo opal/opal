@@ -15,3 +15,6 @@ Whitespace conventions:
 - Enumerable#max_by (#1985)
 - Set#intersect? (#1988)
 - Set#disjoint? (#1988)
+- Set#keep_if (#1987)
+- Set#select! (#1987)
+- Set#reject! (#1987)
