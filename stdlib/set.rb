@@ -186,6 +186,20 @@ class Set
 
   alias < proper_subset?
 
+  def intersect?(set)
+    raise ArgumentError, 'value must be a set' unless set.is_a?(Set)
+
+    if size < set.size
+      any? { |o| set.include?(o) }
+    else
+      set.any? { |o| include?(o) }
+    end
+  end
+
+  def disjoint?(set)
+    !intersect?(set)
+  end
+
   alias + |
   alias union |
 

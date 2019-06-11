@@ -24,10 +24,6 @@ opal_filter "Set" do
   fails "Set#compare_by_identity? returns false by default" # NoMethodError: undefined method `compare_by_identity?' for #<Set: {}>
   fails "Set#compare_by_identity? returns true once #compare_by_identity has been invoked on self" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
   fails "Set#compare_by_identity? returns true when called multiple times on the same set" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#disjoint? returns false when two Sets have at least one element in common" # NoMethodError: undefined method `disjoint?' for #<Set: {1,2}>
-  fails "Set#disjoint? returns true when two Sets have no element in common" # NoMethodError: undefined method `disjoint?' for #<Set: {1,2}>
-  fails "Set#disjoint? when comparing to a Set-like object returns false when a Set has at least one element in common with a Set-like object" # NoMethodError: undefined method `disjoint?' for #<Set: {1,2}>
-  fails "Set#disjoint? when comparing to a Set-like object returns true when a Set has no element in common with a Set-like object" # NoMethodError: undefined method `disjoint?' for #<Set: {1,2}>
   fails "Set#divide divides self into a set of subsets based on the blocks return values"
   fails "Set#divide when passed a block with an arity of 2 divides self into a set of subsets based on the blocks return values"
   fails "Set#divide when passed a block with an arity of 2 yields each two Object to the block"
@@ -44,10 +40,6 @@ opal_filter "Set" do
   fails "Set#flatten_merge raises an ArgumentError when trying to flatten a recursive Set"
   fails "Set#hash is static"
   fails "Set#inspect correctly handles self-references"
-  fails "Set#intersect? returns false when two Sets have no element in common" # NoMethodError: undefined method `intersect?' for #<Set: {1,2}>
-  fails "Set#intersect? returns true when two Sets have at least one element in common" # NoMethodError: undefined method `intersect?' for #<Set: {1,2}>
-  fails "Set#intersect? when comparing to a Set-like object returns false when a Set has no element in common with a Set-like object" # NoMethodError: undefined method `intersect?' for #<Set: {1,2}>
-  fails "Set#intersect? when comparing to a Set-like object returns true when a Set has at least one element in common with a Set-like object" # NoMethodError: undefined method `intersect?' for #<Set: {1,2}>
   fails "Set#intersection raises an ArgumentError when passed a non-Enumerable"
   fails "Set#intersection returns a new Set containing only elements shared by self and the passed Enumerable"
   fails "Set#keep_if keeps every element from self for which the passed block returns true"

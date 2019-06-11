@@ -13,3 +13,5 @@ Whitespace conventions:
 - Enumerable#min (#1982)
 - Enumerable#min_by (#1985)
 - Enumerable#max_by (#1985)
+- Set#intersect? (#1988)
+- Set#disjoint? (#1988)
