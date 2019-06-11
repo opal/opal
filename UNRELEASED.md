@@ -18,3 +18,4 @@ Whitespace conventions:
 - Set#keep_if (#1987)
 - Set#select! (#1987)
 - Set#reject! (#1987)
+- Module#alias_method (#1983)

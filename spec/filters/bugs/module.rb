@@ -1,6 +1,5 @@
 opal_filter "Module" do
   fails "Module#alias_method creates methods that are == to eachother" # Expected #<Method: #<Class:0x3ee54>#uno (defined in #<Class:0x3ee54> in ruby/core/module/fixtures/classes.rb:203)> to equal #<Method: #<Class:0x3ee54>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:203)>
-  fails "Module#alias_method raises a TypeError when the given name can't be converted using to_str"
   fails "Module#alias_method retains method visibility"
   fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#attr applies current visibility to methods created"
