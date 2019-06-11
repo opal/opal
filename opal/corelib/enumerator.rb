@@ -77,6 +77,13 @@ class Enumerator
 
   alias with_object each_with_object
 
+  def each_with_index(&block)
+    return enum_for(:each_with_index) { size } unless block_given?
+
+    super
+    @object
+  end
+
   def inspect
     result = "#<#{self.class}: #{@object.inspect}:#{@method}"
 

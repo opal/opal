@@ -20,3 +20,4 @@ Whitespace conventions:
 - Set#reject! (#1987)
 - Module#alias_method (#1983)
 - Enumerable#minmax_by (#1981)
+- Enumerator#each_with_index (#1990)
