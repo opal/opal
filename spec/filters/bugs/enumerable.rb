@@ -1,15 +1,6 @@
 opal_filter "Enumerable" do
   fails "Enumerable#chunk_while on a single-element array ignores the block and returns an enumerator that yields [element]" # Expected [] to equal [[1]]
   fails "Enumerable#first returns a gathered array from yield parameters"
-  fails "Enumerable#minmax_by Enumerable with no size when no block is given returned Enumerator size returns nil"
-  fails "Enumerable#minmax_by Enumerable with size when no block is given returned Enumerator size returns the enumerable size"
-  fails "Enumerable#minmax_by gathers whole arrays as elements when each yields multiple"
-  fails "Enumerable#minmax_by is able to return the maximum for enums that contain nils"
-  fails "Enumerable#minmax_by returns an enumerator if no block"
-  fails "Enumerable#minmax_by returns nil if #each yields no objects"
-  fails "Enumerable#minmax_by returns the object for whom the value returned by block is the largest"
-  fails "Enumerable#minmax_by returns the object that appears first in #each in case of a tie"
-  fails "Enumerable#minmax_by uses min/max.<=>(current) to determine order"
   fails "Enumerable#none? given a pattern argument returns true iff none match that pattern" # Works, but depends on the difference between Integer and Float
   fails "Enumerable#reverse_each gathers whole arrays as elements when each yields multiple"
   fails "Enumerable#slice_when when an iterator method yields more than one value processes all yielded values"

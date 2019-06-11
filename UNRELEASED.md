@@ -19,3 +19,4 @@ Whitespace conventions:
 - Set#select! (#1987)
 - Set#reject! (#1987)
 - Module#alias_method (#1983)
+- Enumerable#minmax_by (#1981)

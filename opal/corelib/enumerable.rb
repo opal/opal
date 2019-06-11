@@ -870,7 +870,33 @@ module Enumerable
   end
 
   def minmax_by(&block)
-    raise NotImplementedError
+    return enum_for(:minmax_by) { enumerator_size } unless block
+
+    %x{
+      var min_result = nil,
+          max_result = nil,
+          min_by,
+          max_by;
+
+      self.$each.$$p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = Opal.yield1(block, param);
+
+        if ((min_by === undefined) || #{`value` <=> `min_by`} < 0) {
+          min_result = param;
+          min_by     = value;
+        }
+
+        if ((max_by === undefined) || #{`value` <=> `max_by`} > 0) {
+          max_result = param;
+          max_by     = value;
+        }
+      };
+
+      self.$each();
+
+      return [min_result, max_result];
+    }
   end
 
   def none?(pattern = undefined, &block)
