@@ -388,7 +388,7 @@ class String < `String`
         #{prefix = Opal.coerce_to(prefix, String, :to_str)}
       }
 
-      if (self.slice(0, prefix.length) === prefix) {
+      if (self.slice(0, prefix.length) === prefix.toString()) {
         return self.$$cast(self.slice(prefix.length));
       } else {
         return self;
@@ -402,7 +402,7 @@ class String < `String`
         #{suffix = Opal.coerce_to(suffix, String, :to_str)}
       }
 
-      if (self.slice(self.length - suffix.length) === suffix) {
+      if (self.slice(self.length - suffix.length) === suffix.toString()) {
         return self.$$cast(self.slice(0, self.length - suffix.length));
       } else {
         return self;
@@ -1677,7 +1677,7 @@ class String < `String`
     return enum_for :upto, stop, excl unless block_given?
     stop = Opal.coerce_to(stop, String, :to_str)
     %x{
-      var a, b, s = self.toString();
+      var a, b, s = self;
 
       if (s.length === 1 && stop.length === 1) {
 
@@ -1694,7 +1694,7 @@ class String < `String`
           a += 1;
         }
 
-      } else if (parseInt(s, 10).toString() === s && parseInt(stop, 10).toString() === stop) {
+      } else if (parseInt(s, 10).toString() === s.toString() && parseInt(stop, 10).toString() === stop.toString()) {
 
         a = parseInt(s, 10);
         b = parseInt(stop, 10);
@@ -1704,15 +1704,15 @@ class String < `String`
             break;
           }
 
-          block(a.toString());
+          block(new String(a));
 
           a += 1;
         }
 
       } else {
 
-        while (s.length <= stop.length && s <= stop) {
-          if (excl && s === stop) {
+        while (s.length <= stop.length && s.toString() <= stop.toString()) {
+          if (excl && s.toString() === stop.toString()) {
             break;
           }
 

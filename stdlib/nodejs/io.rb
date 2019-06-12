@@ -36,12 +36,12 @@ class IO
   end
 
   def self.binread(path)
-    `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString('binary')})`
+    `return executeIOAction(function(){return __fs__.readFileSync(#{path}.toString()).toString('binary')})`
   end
 end
 
-STDOUT.write_proc = ->(string) { `process.stdout.write(string)` }
-STDERR.write_proc = ->(string) { `process.stderr.write(string)` }
+STDOUT.write_proc = ->(string) { `process.stdout.write(string.toString())` }
+STDERR.write_proc = ->(string) { `process.stderr.write(string.toString())` }
 
 STDOUT.tty = true
 STDERR.tty = true

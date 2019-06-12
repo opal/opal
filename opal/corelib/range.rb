@@ -22,9 +22,15 @@ class Range
         return false;
       }
 
-      return self.excl  === other.excl &&
-             self.begin ==  other.begin &&
-             self.end   ==  other.end;
+      if (self.begin.$$is_string && other.begin.$$is_string) {
+        return self.excl  === other.excl &&
+               self.begin.toString() == other.begin.toString() &&
+               self.end.toString()   == other.end.toString();
+      } else {
+        return self.excl  === other.excl &&
+               self.begin ==  other.begin &&
+               self.end   ==  other.end;
+      }
     }
   end
 

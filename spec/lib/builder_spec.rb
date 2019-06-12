@@ -61,12 +61,12 @@ RSpec.describe Opal::Builder do
   describe 'requiring a native .js file' do
     it 'can be required without specifying extension' do
       builder.build_str('require "corelib/runtime"', 'foo')
-      expect(builder.to_s).to start_with('(function(undefined)')
+      expect(builder.to_s).to start_with("(function()")
     end
 
     it 'can be required specifying extension' do
       builder.build_str('require "corelib/runtime.js"', 'foo')
-      expect(builder.to_s).to start_with('(function(undefined)')
+      expect(builder.to_s).to start_with("(function()")
     end
   end
 

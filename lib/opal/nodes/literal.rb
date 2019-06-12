@@ -62,7 +62,9 @@ module Opal
           code_point = Regexp.last_match(1).to_i(16)
           to_utf16(code_point)
         end
+        push '(new String('
         push translate_escape_chars(sanitized_value)
+        push '))'
 
         if should_encode && RUBY_ENGINE != 'opal'
           push '.$force_encoding("', encoding.name, '")'

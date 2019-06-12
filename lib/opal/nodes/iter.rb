@@ -17,7 +17,7 @@ module Opal
 
         in_scope do
           identity = scope.identify!
-          add_temp "self = #{identity}.$$s || this"
+          add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s"
 
           inline_params = process(inline_args)
 

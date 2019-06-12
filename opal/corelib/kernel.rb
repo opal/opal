@@ -328,7 +328,7 @@ module Kernel
         return #{Opal.coerce_to!(value, Integer, :to_i)};
       }
 
-      if (value === "0") {
+      if (value.toString() === "0") {
         return 0;
       }
 
