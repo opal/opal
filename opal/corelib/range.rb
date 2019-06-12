@@ -44,7 +44,7 @@ class Range
   end
 
   def each(&block)
-    return enum_for :each unless block_given?
+    return enum_for(:each) { size } unless block_given?
 
     %x{
       var i, limit;
