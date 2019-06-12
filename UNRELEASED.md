@@ -21,3 +21,4 @@ Whitespace conventions:
 - Module#alias_method (#1983)
 - Enumerable#minmax_by (#1981)
 - Enumerator#each_with_index (#1990)
+- Range#each (#1991)
