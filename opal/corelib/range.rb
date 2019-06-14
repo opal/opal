@@ -16,18 +16,6 @@ class Range
     @excl  = exclude
   end
 
-  def ==(other)
-    %x{
-      if (!other.$$is_range) {
-        return false;
-      }
-
-      return self.excl  === other.excl &&
-             self.begin ==  other.begin &&
-             self.end   ==  other.end;
-    }
-  end
-
   def ===(value)
     include? value
   end
@@ -92,6 +80,8 @@ class Range
       @begin.eql?(other.begin) &&
       @end.eql?(other.end)
   end
+
+  alias == eql?
 
   def exclude_end?
     @excl
