@@ -22,3 +22,4 @@ Whitespace conventions:
 - Enumerable#minmax_by (#1981)
 - Enumerator#each_with_index (#1990)
 - Range#== (#1992)
+- Range#each (#1991)
