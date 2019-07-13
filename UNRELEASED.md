@@ -7,6 +7,7 @@ Whitespace conventions:
 
 ### Fixed
 
+- Struct#dup (#1995)
 - Integer#gcdlcm (#1972)
 - Enumerable#to_h (#1979)
 - Enumerator#size (#1980)
