@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://secure.gravatar.com/avatar/88298620949a6534d403da2e356c9339?s=420" 
+  <img src="https://secure.gravatar.com/avatar/88298620949a6534d403da2e356c9339?s=420"
   align="center" title="Opal logo by Elia Schito" width="105" height="105" />
   <br/>
   Opal  <br/>
@@ -7,15 +7,15 @@
 </h1>
 
 <p align="center">
-  <em><strong>Opal</strong> is a Ruby to JavaScript source-to-source compiler.<br> 
+  <em><strong>Opal</strong> is a Ruby to JavaScript source-to-source compiler.<br>
     It also has an implementation of the Ruby <code>corelib</code> and <code>stdlib</code>.</em>
 </p>
 
 <p align="center">
   <strong>Community:</strong><br>
   <a href="https://stackoverflow.com/questions/ask?tags=opalrb"><img src="https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat" alt="Stack Overflow" title="" /></a>
-  <a href="#backers"><img src="https://opencollective.com/opal/backers/badge.svg" alt="Backers on Open Collective" title="" /></a> 
-  <a href="#sponsors"><img src="https://opencollective.com/opal/sponsors/badge.svg" alt="Sponsors on Open Collective" title="" /></a> 
+  <a href="#backers"><img src="https://opencollective.com/opal/backers/badge.svg" alt="Backers on Open Collective" title="" /></a>
+  <a href="#sponsors"><img src="https://opencollective.com/opal/sponsors/badge.svg" alt="Sponsors on Open Collective" title="" /></a>
   <a href="https://gitter.im/opal/opal?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter" title="" /></a>
   <a href="https://opalrb.com/docs"><img src="https://img.shields.io/badge/docs-updated-blue.svg" alt="Documentation" title="" /></a>
   <br>
