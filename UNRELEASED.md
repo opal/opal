@@ -25,3 +25,4 @@ Whitespace conventions:
 - Range#== (#1992)
 - Range#each (#1991)
 - Enumerable#zip (#1986)
+- Struct#dup not copying `$$data` (#1995)
