@@ -101,6 +101,17 @@ class Struct
     end
   end
 
+  def initialize_copy(from)
+    %x{
+      self.$$data = {}
+      var keys = Object.keys(from.$$data), i, max, name;
+      for (i = 0, max = keys.length; i < max; i++) {
+        name = keys[i];
+        self.$$data[name] = from.$$data[name];
+      }
+    }
+  end
+
   def members
     self.class.members
   end
