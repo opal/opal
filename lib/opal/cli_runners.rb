@@ -54,6 +54,12 @@ module Opal
       0
     }
 
+    # Alias a runner name
+    def self.alias_runner(new_name, old_name)
+      self[new_name.to_sym] = self[old_name.to_sym]
+      nil
+    end
+
     # Legacy runners
 
     def self.register_legacy_runner(klass_name, *names)
