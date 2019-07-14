@@ -24,10 +24,13 @@ module Opal
       @register[name.to_sym]
     end
 
+    # @private
     def self.[]=(name, runner)
       warn "Overwriting Opal CLI runner: #{name}" if @register.key? name.to_sym
+
       @register[name.to_sym] = runner
     end
+    private_class_method :[]=
 
     def self.to_h
       @register
