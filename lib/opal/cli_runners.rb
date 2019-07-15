@@ -53,12 +53,14 @@ module Opal
     # Alias a runner name
     def self.alias_runner(new_name, old_name)
       self[new_name.to_sym] = self[old_name.to_sym]
+
       nil
     end
 
-    # Legacy runners
-
-    def self.register_legacy_runner(klass_name, *names)
+    # @private
+    #
+    # A wrapper to support the old runner API
+    def self.legacy_runner(klass_name)
       runner = ->(data) {
         klass = const_get(klass_name)
         runner = klass.new((data[:options] || {}).merge(output: data[:output]))
@@ -67,8 +69,8 @@ module Opal
         runner.run(compiled_source, data[:argv])
         runner.exit_status
       }
-      names.each { |name| self[name] = runner }
     end
+    private_class_method :legacy_runner
 
     autoload :Applescript, 'opal/cli_runners/applescript'
     autoload :Compiler,    'opal/cli_runners/compiler'
@@ -77,11 +79,14 @@ module Opal
     autoload :Nodejs,      'opal/cli_runners/nodejs'
     autoload :Server,      'opal/cli_runners/server'
 
-    register_legacy_runner :Applescript, :applescript, :osascript
-    register_legacy_runner :Chrome,      :chrome
-    register_legacy_runner :Nashorn,     :nashorn
-    register_legacy_runner :Nodejs,      :nodejs, :node
-    register_legacy_runner :Server,      :server
+    register_runner :applescript, legacy_runner(:Applescript)
+    register_runner :chrome,      legacy_runner(:Chrome)
+    register_runner :nashorn,     legacy_runner(:Nashorn)
+    register_runner :nodejs,      legacy_runner(:Nodejs)
+    register_runner :server,      legacy_runner(:Server)
     register_runner :compiler,    :Compiler
+
+    alias_runner :osascript, :applescript
+    alias_runner :node, :nodejs
   end
 end
