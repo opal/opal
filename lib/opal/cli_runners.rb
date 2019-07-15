@@ -50,20 +50,6 @@ module Opal
       nil
     end
 
-    # The compiler runner will just output the compiled JavaScript
-    register_runner :compiler, ->(data) {
-      options  = data[:options] || {}
-      builder  = data.fetch(:builder)
-      map_file = options[:map_file]
-      output   = data.fetch(:output)
-
-      compiled_source = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
-      output.puts compiled_source
-      File.write(map_file, builder.source_map.to_json) if map_file
-
-      0
-    }
-
     # Alias a runner name
     def self.alias_runner(new_name, old_name)
       self[new_name.to_sym] = self[old_name.to_sym]
@@ -85,6 +71,7 @@ module Opal
     end
 
     autoload :Applescript, 'opal/cli_runners/applescript'
+    autoload :Compiler,    'opal/cli_runners/compiler'
     autoload :Chrome,      'opal/cli_runners/chrome'
     autoload :Nashorn,     'opal/cli_runners/nashorn'
     autoload :Nodejs,      'opal/cli_runners/nodejs'
@@ -95,5 +82,6 @@ module Opal
     register_legacy_runner :Nashorn,     :nashorn
     register_legacy_runner :Nodejs,      :nodejs, :node
     register_legacy_runner :Server,      :server
+    register_runner :compiler,    :Compiler
   end
 end
