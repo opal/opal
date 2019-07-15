@@ -81,6 +81,7 @@ class OSpecFormatter
       'chrome'       => DottedFormatter,
       'node'         => NodeJSFormatter,
       'nodejs'       => NodeJSFormatter,
+      'strictnodejs' => NodeJSFormatter,
       'nodedoc'      => NodeJSDocFormatter,
       'nodejsdoc'    => NodeJSDocFormatter,
       'dotted'       => DottedFormatter

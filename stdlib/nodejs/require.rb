@@ -1,6 +1,10 @@
 require 'opal-parser'
 
 module Kernel
+  # check if running in strict mode
+  # in strict mode eval doesn't introduce a new variable into the outer context.
+  USE_STRICT = `(eval("var __temp = null"), (typeof __temp === "undefined"))`
+
   def __prepare_require__(path)
     name = `Opal.normalize(#{path})`
     full_path = name.end_with?('.rb') ? name : name + '.rb'
@@ -12,6 +16,7 @@ module Kernel
       compiler.requires.each do |sub_path|
         __prepare_require__(sub_path)
       end
+      js = "\"use strict\";\n\n" + js if USE_STRICT
       `eval(#{js})`
     end
 

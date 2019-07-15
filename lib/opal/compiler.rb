@@ -6,6 +6,7 @@ require 'opal/fragment'
 require 'opal/nodes'
 require 'opal/eof_content'
 require 'opal/errors'
+require 'opal/es6_modules_helpers'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -55,6 +56,21 @@ module Opal
     def self.module_name(path)
       path = File.join(File.dirname(path), File.basename(path).split('.').first)
       Pathname(path).cleanpath.to_s
+    end
+
+    # this is meant for determining the ruby module name for the es6_modules, where webpack delivers the filename as and instead of a module name
+    # to the compiler. The real ruby module name for use in Opal.modules must then be determined by checking the Opal.paths for a match
+    # a filename like:                   /a/path/to/some/ruby.rb
+    # and a Opal.paths entry like:       /a/path/to
+    # becomes a ruby module name like:             'some/ruby'
+    # if a match for the partial path is found in Opal.paths. Otherwise return the original filename.
+    def self.module_name_from_paths(filename)
+      # The filename comes from webpack/node/js world and may be a partial or relative path and include ../.. and is the
+      # path of how webpack got to the ruby file, which may be very different from how ruby would get there.
+      # Using Pathname.expand_path makes sure, the path gets transformed to a path the way ruby would find it.
+      # Having a valid ruby path without ../.. etc., we can compare it against Opal.paths and get a correct result.
+      expanded_filename_path = filename ? Pathname.new(filename).expand_path : path
+      Opal::ES6ModulesHelpers.module_name_from_paths_helper(expanded_filename_path, expanded_filename_path.to_s)
     end
 
     # defines a compiler option, also creating method of form 'name?'
@@ -121,6 +137,11 @@ module Opal
     #
     # Prepare the code for future requires
     compiler_option :requirable, false, as: :requirable?
+
+    # @!method es6_modules?
+    #
+    # Make modules ES6 import/export-able
+    compiler_option :es6_modules, false, as: :es6_modules?
 
     # @!method inline_operators?
     #

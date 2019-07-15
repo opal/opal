@@ -277,7 +277,7 @@ Use PATTERN environment variable to manually set the glob for specs:
   bundle exec rake mspec_nodejs PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
 
-platforms = %w[nodejs server chrome]
+platforms = %w[nodejs server chrome strictnodejs]
 mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
 
@@ -328,7 +328,7 @@ platforms.each do |platform|
       end
       Testing::HTTPServer.new.with_server do |session|
         filename = "tmp/minitest_#{suite}_#{platform}.rb"
-        files.push('nodejs') if platform == 'nodejs'
+        files.push('nodejs') if platform.end_with?('nodejs')
         Testing::Minitest.write_file(filename, files, ENV)
 
         stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
@@ -342,29 +342,31 @@ platforms.each do |platform|
 end
 
 # The name ends with the platform, which is of course mandated in this case
-desc "Run the Node.js Minitest suite on Node.js"
-task :minitest_node_nodejs do
-  platform = 'nodejs'
-  files = %w[
-    nodejs
-    opal-parser
-    nodejs/test_file.rb
-    nodejs/test_dir.rb
-    nodejs/test_env.rb
-    nodejs/test_io.rb
-    nodejs/test_error.rb
-    nodejs/test_file_encoding.rb
-    nodejs/test_opal_builder.rb
-  ]
 
-  filename = "tmp/minitest_node_nodejs.rb"
-  Testing::Minitest.write_file(filename, files, ENV)
+%w[nodejs strictnodejs].each do |platform|
+  desc "Run the Node.js Minitest suite on Node.js - #{platform}"
+  task :"minitest_node_#{platform}" do
+    files = %w[
+      nodejs
+      opal-parser
+      nodejs/test_file.rb
+      nodejs/test_dir.rb
+      nodejs/test_env.rb
+      nodejs/test_io.rb
+      nodejs/test_error.rb
+      nodejs/test_file_encoding.rb
+      nodejs/test_opal_builder.rb
+    ]
 
-  stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
-  includes = "-Itest -Ilib -Ivendored-minitest"
+    filename = "tmp/minitest_node_nodejs.rb"
+    Testing::Minitest.write_file(filename, files, ENV)
 
-  sh "ruby -rbundler/setup "\
-     "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+    stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+    includes = "-Itest -Ilib -Ivendored-minitest"
+
+    sh "ruby -rbundler/setup "\
+       "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+  end
 end
 
 desc 'Run smoke tests with opal-rspec to see if something is broken'
@@ -447,10 +449,10 @@ platforms.each do |platform|
 end
 
 desc "Run the whole MSpec suite on all platforms"
-task :mspec    => [:mspec_chrome, :mspec_nodejs]
+task :mspec    => [:mspec_chrome, :mspec_nodejs, :mspec_strictnodejs]
 
 desc "Run the whole Minitest suite on all platforms"
-task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs]
+task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs, :minitest_node_strictnodejs, :minitest_strictnodejs]
 
 desc "Run all tests"
 task :test_all => [:rspec, :mspec, :minitest]
