@@ -38,8 +38,15 @@ module Opal
 
     # @param name [Symbol] the name at which the runner can be reached
     # @param runner [#call] a callable object that will act as the "runner"
+    # @param runner [Symbol] a constant name that once autoloaded will point to
+    #                        a callable.
     def self.register_runner(name, runner)
-      self[name] = runner
+      if runner.respond_to?(:call)
+        self[name] = runner
+      else
+        self[name] = ->(data) { const_get(runner).call(data) }
+      end
+
       nil
     end
 
