@@ -26,3 +26,8 @@ Whitespace conventions:
 - Range#each (#1991)
 - Enumerable#zip (#1986)
 - Struct#dup not copying `$$data` (#1995)
+
+
+### Changed
+
+- Nashorn has been deprecated but GraalVM still supports it (#1997)
