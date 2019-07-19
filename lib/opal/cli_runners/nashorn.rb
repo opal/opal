@@ -15,13 +15,17 @@ module Opal
       end
 
       def run(code, argv)
+        # Allow to change path if using GraalVM, see:
+        # https://github.com/graalvm/graaljs/blob/master/docs/user/NashornMigrationGuide.md#launcher-name-js
+        exe = ENV['NASHORN_PATH'] || 'jjs'
+
         require 'tempfile'
         tempfile = Tempfile.new('opal-nashorn-runner-')
         tempfile.write code
         tempfile.close
-        system_with_output({}, 'jjs', tempfile.path, *argv)
+        system_with_output({}, exe, tempfile.path, *argv)
       rescue Errno::ENOENT
-        raise MissingNashorn, 'Please install JDK to be able to run Opal scripts.'
+        raise MissingNashorn, 'Please install JDK or GraalVM to be able to run Opal scripts.'
       end
 
       # Let's support fake IO objects like StringIO
