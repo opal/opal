@@ -109,7 +109,20 @@ class Module
     attr_writer(*names)
   end
 
-  alias attr attr_accessor
+  def attr(name, *args)
+    if args.length == 1
+      case assignable_or_name = args.first
+      when true
+        attr_accessor(name)
+      when false
+        attr_reader(name)
+      else
+        attr_reader(name, assignable_or_name)
+      end
+    else
+      attr_reader(name, *args)
+    end
+  end
 
   def attr_reader(*names)
     %x{
