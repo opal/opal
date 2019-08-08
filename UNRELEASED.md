@@ -26,6 +26,7 @@ Whitespace conventions:
 - Range#each (#1991)
 - Enumerable#zip (#1986)
 - Struct#dup not copying `$$data` (#1995)
+- Module#attr with multiple arguments (#2003)
 
 
 ### Changed
