@@ -1,6 +1,7 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Array" do
   fails "Array#== compares with an equivalent Array-like object using #to_ary" # Expected false to be true
+  fails "Array#== returns true for [NaN] == [NaN] because Array#== first checks with #equal? and NaN.equal?(NaN) is true" # Expected [NaN] to equal [NaN]
   fails "Array#delete_if updates the receiver after all blocks"
   fails "Array#each does not yield elements deleted from the end of the array" # Expected [2, 3, nil] to equal [2, 3]
   fails "Array#each yields elements added to the end of the array by the block" # Expected [2] to equal [2, 0, 0]

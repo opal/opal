@@ -7,6 +7,7 @@ opal_filter "regular_expressions" do
   fails "Regexp#encoding ignores the default_internal encoding"
   fails "Regexp#encoding ignores the encoding and uses US-ASCII if the string has only ASCII characters"
   fails "Regexp#encoding returns ASCII-8BIT if the 'n' modifier is supplied and non-US-ASCII characters are present"
+  fails "Regexp#encoding returns BINARY if the 'n' modifier is supplied and non-US-ASCII characters are present" # NoMethodError: undefined method `encoding' for /\xc2\xa1/
   fails "Regexp#encoding returns EUC_JP if the 'e' modifier is supplied"
   fails "Regexp#encoding returns US_ASCII if the 'n' modifier is supplied and only US-ASCII characters are present"
   fails "Regexp#encoding returns UTF-8 if the 'u' modifier is supplied"
@@ -151,10 +152,30 @@ opal_filter "regular_expressions" do
   fails "Regexp.compile given a String with escaped characters returns a Regexp with the input String's encoding"
   fails "Regexp.compile requires one argument and creates a new regular expression object"
   fails "Regexp.compile works by default for subclasses with overridden #initialize"
+  fails "Regexp.escape sets the encoding of the result to BINARY if any non-US-ASCII characters are present in an input String with invalid encoding" # Expected true to be false
+  fails "Regexp.new given a Regexp preserves any options given in the Regexp literal" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp uses the argument as a literal to construct a Regexp object" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\a'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\e'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\f'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\n'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\r'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\t'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\v'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\a'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\e'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\f'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\n'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\r'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\t'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\v'" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters accepts a three-digit octal value" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a Regexp with escaped characters interprets a digit following a three-digit octal value as a character" # NoMethodError: undefined method `compile' for Regexp
   fails "Regexp.new given a String raises a RegexpError when passed an incorrect regexp"
   fails "Regexp.new given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits"
   fails "Regexp.new given a String with escaped characters raises a RegexpError if more than six hexadecimal digits are given"
   fails "Regexp.new works by default for subclasses with overridden #initialize"
+  fails "Regexp.quote sets the encoding of the result to BINARY if any non-US-ASCII characters are present in an input String with invalid encoding" # Expected true to be false
   fails "Regexp.try_convert returns nil if given an argument that can't be converted to a Regexp"
   fails "Regexp.try_convert tries to coerce the argument by calling #to_regexp"
 end

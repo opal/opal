@@ -83,6 +83,7 @@ opal_filter "Module" do
   fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class"
   fails "Module#define_method raises a TypeError when a Method from one class is defined on an unrelated class"
   fails "Module#define_method raises a TypeError when an UnboundMethod from a child class is defined on a parent class"
+  fails "Module#define_method raises a TypeError when an UnboundMethod from a singleton class is defined on another class" # Expected TypeError (/can't bind singleton method to a different class/) but no exception was raised (#<Class:0x47ae6> was returned)
   fails "Module#define_method raises a TypeError when an UnboundMethod from one class is defined on an unrelated class"
   fails "Module#deprecate_constant accepts multiple symbols and strings as constant names"
   fails "Module#deprecate_constant raises a NameError when given an undefined name"
@@ -113,7 +114,9 @@ opal_filter "Module" do
   fails "Module#module_function on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#module_function with specific method names raises a TypeError when the given names can't be converted to string using to_str"
   fails "Module#module_function with specific method names tries to convert the given names to strings using to_str"
+  fails "Module#name changes when the module is reachable through a constant path" # Expected nil to match /^#<Module:0x\h+>::N$/
   fails "Module#name is not nil for a nested module created with the module keyword"
+  fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil to match /^#<Module:0x\h+>::Child$/
   fails "Module#name is set with a conditional assignment to a constant"
   fails "Module#name is set with a conditional assignment to a nested constant"
   fails "Module#name preserves the encoding in which the class was defined"
