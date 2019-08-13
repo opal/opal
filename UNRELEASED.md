@@ -31,3 +31,4 @@ Whitespace conventions:
 ### Changed
 
 - Nashorn has been deprecated but GraalVM still supports it (#1997)
+- "opal/mini" now includes "opal/io" (#2002)
