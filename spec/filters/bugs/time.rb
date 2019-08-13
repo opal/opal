@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Time" do
   fails "Time#- tracks microseconds from a Rational" # Expected 0 to equal 123456
   fails "Time#dup returns a clone of Time instance"
@@ -48,9 +49,9 @@ opal_filter "Time" do
   fails "Time.gm raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 UTC was returned)
   fails "Time.local raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 +0200 was returned)
   fails "Time.mktime raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 +0200 was returned)
+  fails "Time.new has at least microsecond precision" # NoMethodError: undefined method `nsec' for 2019-05-16 23:25:01 +0200
   fails "Time.new uses the local timezone" # Expected 10800 to equal -28800
   fails "Time.new with a utc_offset argument returns a Time with a UTC offset specified as +HH:MM:SS" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
-  fails "Time.new has at least microsecond precision" # NoMethodError: undefined method `nsec' for 2019-05-16 23:25:01 +0200
   fails "Time.now has at least microsecond precision" # NoMethodError: undefined method `nsec' for 2019-05-16 23:25:03 +0200
   fails "Time.now uses the local timezone" # Expected 10800 to equal -28800
   fails "Time.utc handles fractional usec close to rounding limit" # NoMethodError: undefined method `nsec' for 2000-01-01 12:30:00 UTC:Time

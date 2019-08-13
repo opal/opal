@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Numeric" do
   fails "Numeric#remainder returns the result of calling self#% with other - other if self is greater than 0 and other is less than 0"
   fails "Numeric#remainder returns the result of calling self#% with other - other if self is less than 0 and other is greater than 0"

@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "String" do
   fails "String#% faulty key raises a KeyError" # NoMethodError: undefined method `call' for nil
   fails "String#% faulty key sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `call' for nil
@@ -112,7 +113,6 @@ opal_filter "String" do
   fails "String#each_grapheme_cluster returns a different character if the String is transcoded" # NoMethodError: undefined method `each_grapheme_cluster' for "€"
   fails "String#each_grapheme_cluster returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
   fails "String#each_grapheme_cluster returns self" # NoMethodError: undefined method `each_grapheme_cluster' for "ab🏳️\u200D🌈🐾"
-  fails "String#each_grapheme_cluster returns self" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
   fails "String#each_grapheme_cluster taints resulting strings when self is tainted" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
   fails "String#each_grapheme_cluster uses the String's encoding to determine what characters it contains" # NoMethodError: undefined method `each_grapheme_cluster' for "𤭢"
   fails "String#each_grapheme_cluster when no block is given returned enumerator size should return the size of the string" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
@@ -126,9 +126,7 @@ opal_filter "String" do
   fails "String#each_line yields paragraphs (broken by 2 or more successive newlines) when passed '' and replaces multiple newlines with only two ones" # Expected ["hello\nworld\n\n\n", "and\nuniverse\n\n\n\n\n"] to equal ["hello\nworld\n\n", "and\nuniverse\n\n"]
   fails "String#end_with? raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#force_encoding with a special encoding name defaults to ASCII-8BIT if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#force_encoding with a special encoding name defaults to ASCII-8BIT if special encoding name is not set" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#getbyte counts from the end of the String if given a negative argument" # NotImplementedError: NotImplementedError
   fails "String#getbyte interprets bytes relative to the String's encoding" # NotImplementedError: NotImplementedError
   fails "String#getbyte mirrors the output of #bytes" # NotImplementedError: NotImplementedError
@@ -146,21 +144,19 @@ opal_filter "String" do
   fails "String#grapheme_clusters returns an array when no block given" # NoMethodError: undefined method `grapheme_clusters' for "ab🏳️\u200D🌈🐾"
   fails "String#grapheme_clusters returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
   fails "String#grapheme_clusters returns self" # NoMethodError: undefined method `grapheme_clusters' for "ab🏳️\u200D🌈🐾"
-  fails "String#grapheme_clusters returns self" # NoMethodError: undefined method `grapheme_clusters' for "hello"
   fails "String#grapheme_clusters taints resulting strings when self is tainted" # NoMethodError: undefined method `grapheme_clusters' for "hello"
   fails "String#grapheme_clusters uses the String's encoding to determine what characters it contains" # NoMethodError: undefined method `grapheme_clusters' for "𤭢"
   fails "String#grapheme_clusters works if the String's contents is invalid for its encoding" # Expected true to be false
   fails "String#grapheme_clusters works with multibyte characters" # NoMethodError: undefined method `grapheme_clusters' for "覇"
   fails "String#include? with String raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
+  fails "String#inspect when the string's encoding is different than the result's encoding and the string's encoding is ASCII-compatible but the characters are non-ASCII returns a string with the non-ASCII characters replaced by \\x notation" # ArgumentError: unknown encoding name - EUC-JP
   fails "String#intern raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
   fails "String#intern returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#intern returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#intern returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "String#intern returns a binary Symbol for a binary String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "String#inspect when the string's encoding is different than the result's encoding and the string's encoding is ASCII-compatible but the characters are non-ASCII returns a string with the non-ASCII characters replaced by \\x notation" # ArgumentError: unknown encoding name - EUC-JP
   fails "String#lines when `chomp` keyword argument is passed ignores new line characters when separator is specified" # ArgumentError: [String#lines] wrong number of arguments(2 for -1)
   fails "String#lines when `chomp` keyword argument is passed removes new line characters when separator is not specified" # TypeError: no implicit conversion of Hash into String
-  fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
   fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
   fails "String#lines when `chomp` keyword argument is passed removes only specified separator" # ArgumentError: [String#lines] wrong number of arguments(2 for -1)
   fails "String#lines yields paragraphs (broken by 2 or more successive newlines) when passed '' and replaces multiple newlines with only two ones" # Expected ["hello\nworld\n\n\n", "and\nuniverse\n\n\n\n\n"] to equal ["hello\nworld\n\n", "and\nuniverse\n\n"]

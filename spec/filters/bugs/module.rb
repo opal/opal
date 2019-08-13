@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Module" do
   fails "Module#alias_method creates methods that are == to eachother" # Expected #<Method: #<Class:0x3ee54>#uno (defined in #<Class:0x3ee54> in ruby/core/module/fixtures/classes.rb:203)> to equal #<Method: #<Class:0x3ee54>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:203)>
   fails "Module#alias_method retains method visibility"
@@ -118,6 +119,7 @@ opal_filter "Module" do
   fails "Module#name preserves the encoding in which the class was defined"
   fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
   fails "Module#prepend keeps the module in the chain when dupping the class"
+  fails "Module#refine accepts a module as argument" # NoMethodError: undefined method `refine' for #<Module:0x4c172>
   fails "Module#refine adds methods defined in its block to the anonymous module's public instance methods" # NoMethodError: undefined method `refine' for #<Module:0x3ae64>
   fails "Module#refine and alias aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab4>
   fails "Module#refine and alias_method aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab0>
@@ -133,6 +135,7 @@ opal_filter "Module" do
   fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # NoMethodError: undefined method `refine' for #<Module:0x3aeba>
   fails "Module#refine for methods accessed indirectly is honored by string interpolation" # NoMethodError: undefined method `refine' for #<Module:0x3aeb6>
   fails "Module#refine for methods accessed indirectly is not honored by &" # NoMethodError: undefined method `refine' for #<Module:0x21e9c>
+  fails "Module#refine for methods accessed indirectly is not honored by Kernel#instance_method" # NoMethodError: undefined method `refine' for #<Module:0x4c176>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#method" # NoMethodError: undefined method `refine' for #<Module:0x3aec0>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#public_send" # NoMethodError: undefined method `refine' for #<Module:0x21ea0>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#respond_to?" # NoMethodError: undefined method `refine' for #<Module:0x3aea6>
@@ -153,8 +156,6 @@ opal_filter "Module" do
   fails "Module#refine when super is called in a refinement looks in the included to refinery module" # NoMethodError: undefined method `refine' for #<Module:0x3aec8>
   fails "Module#refine when super is called in a refinement looks in the refined class even if there is another active refinement" # NoMethodError: undefined method `refine' for #<Module:0x3aec4>
   fails "Module#refine when super is called in a refinement looks in the refined class" # NoMethodError: undefined method `refine' for #<Module:0x3aecc>
-  fails "Module#refine accepts a module as argument" # NoMethodError: undefined method `refine' for #<Module:0x4c172>
-  fails "Module#refine for methods accessed indirectly is not honored by Kernel#instance_method" # NoMethodError: undefined method `refine' for #<Module:0x4c176>
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#remove_const returns nil when removing autoloaded constant"

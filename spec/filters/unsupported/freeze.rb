@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "freezing" do
   fails "A method definition inside a metaclass scope raises FrozenError if frozen" # Expected FrozenError but no exception was raised ("foo" was returned)
   fails "A method definition inside a metaclass scope raises RuntimeError if frozen"
@@ -192,9 +193,7 @@ opal_unsupported_filter "freezing" do
   fails "String#delete_suffix! raises a FrozenError when self is frozen" # NoMethodError: undefined method `delete_suffix!' for "hello":String
   fails "String#downcase! raises a FrozenError when self is frozen" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#encode! raises a FrozenError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! raises a FrozenError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#encode! raises a FrozenError when called on a frozen String" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! raises a FrozenError when called on a frozen String" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#force_encoding raises a FrozenError if self is frozen" # Expected FrozenError but no exception was raised ("abcd" was returned)
   fails "String#freeze doesn't produce the same object for different instances of literals in the source"
   fails "String#gsub! with pattern and block raises a FrozenError when self is frozen" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.

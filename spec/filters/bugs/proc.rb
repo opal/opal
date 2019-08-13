@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Proc" do
   fails "Proc as an implicit block pass argument remains the same object if re-vivified by the target method"
   fails "Proc#arity for instances created with proc { || } returns positive values for definition \n    @a = proc { |(a, (*b, c)), d=1| }\n    @b = proc { |a, (*b, c), d, (*e), (*), **k| }"
@@ -10,10 +11,10 @@ opal_filter "Proc" do
   fails "Proc#binding returns the binding associated with self"
   fails "Proc#curry with arity argument returns Procs with arities of -1 regardless of the value of _arity_"
   fails "Proc#curry with arity argument returns a Proc if called on a lambda that requires fewer than _arity_ arguments but may take more" # ArgumentError: wrong number of arguments (4 for 5)
-  fails "Proc#inspect for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
-  fails "Proc#inspect for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#inspect for a proc created with Symbol#to_proc has an ASCII-8BIT encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#inspect for a proc created with Symbol#to_proc returns a description including '(&:symbol)'" # Expected "#<Proc:0x75d4e>" to match /^#<Proc:0x\h+\(&:foobar\)>$/
+  fails "Proc#inspect for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
+  fails "Proc#inspect for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword"
   fails "Proc#lambda? is preserved when passing a Proc with & to the proc keyword"
   fails "Proc#source_location returns an Array"
@@ -23,10 +24,10 @@ opal_filter "Proc" do
   fails "Proc#source_location sets the first value to the path of the file in which the proc was defined"
   fails "Proc#source_location sets the last value to a Fixnum representing the line on which the proc was defined"
   fails "Proc#source_location works even if the proc was created on the same line"
-  fails "Proc#to_s for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
-  fails "Proc#to_s for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#to_s for a proc created with Symbol#to_proc has an ASCII-8BIT encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#to_s for a proc created with Symbol#to_proc returns a description including '(&:symbol)'" # Expected "#<Proc:0x6cd2c>" to match /^#<Proc:0x\h+\(&:foobar\)>$/
+  fails "Proc#to_s for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
+  fails "Proc#to_s for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc.allocate raises a TypeError"
   fails "Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a block"
   fails "Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a method"
