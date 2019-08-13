@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "private" do
   fails "A method definition always resets the visibility to public for nested definitions at the toplevel" # Expected NoMethodError (/private/) but no exception was raised ("nested_method_in_toplevel_method" was returned)
   fails "A method definition always resets the visibility to public for nested definitions in Class.new" # Expected NoMethodError (/private/) but no exception was raised ("new_def" was returned)

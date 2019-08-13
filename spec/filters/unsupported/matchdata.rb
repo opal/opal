@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "MatchData" do
   fails "MatchData#[Symbol] raises an IndexError if there is no named match corresponding to the String"
   fails "MatchData#[Symbol] raises an IndexError if there is no named match corresponding to the Symbol"
@@ -23,7 +24,6 @@ opal_unsupported_filter "MatchData" do
   fails "MatchData#begin when passed an integer argument returns the character offset for multi-byte strings" # ArgumentError: MatchData#begin only supports 0th element
   fails "MatchData#begin when passed an integer argument returns the character offset of the start of the nth element" # ArgumentError: MatchData#begin only supports 0th element
   fails "MatchData#begin when passed an integer argument tries to convert the passed argument to an Integer using #to_int" # ArgumentError: MatchData#begin only supports 0th element
-  fails "MatchData#begin when passed an integer argument tries to convert the passed argument to an Integer using #to_int" # Mock 'to_int' expected to receive to_int("any_args") exactly 1 times but received it 0 times
   fails "MatchData#end returns nil when the nth match isn't found"
   fails "MatchData#end returns the offset for multi byte strings with unicode regexp"
   fails "MatchData#end returns the offset for multi byte strings"
@@ -40,7 +40,6 @@ opal_unsupported_filter "MatchData" do
   fails "MatchData#end when passed an integer argument returns the character offset for multi-byte strings" # ArgumentError: MatchData#end only supports 0th element
   fails "MatchData#end when passed an integer argument returns the character offset of the end of the nth element" # ArgumentError: MatchData#end only supports 0th element
   fails "MatchData#end when passed an integer argument tries to convert the passed argument to an Integer using #to_int" # ArgumentError: MatchData#end only supports 0th element
-  fails "MatchData#end when passed an integer argument tries to convert the passed argument to an Integer using #to_int" # Mock 'to_int' expected to receive to_int("any_args") exactly 1 times but received it 0 times
   fails "MatchData#named_captures prefers later captures" # Exception: named captures are not supported in javascript: "^(?<a>.)(?<b>.)(?<b>.)(?<a>.)$"
   fails "MatchData#named_captures returns a Hash that has captured name and the matched string pairs" # Exception: named captures are not supported in javascript: "(?<a>.)(?<b>.)?"
   fails "MatchData#named_captures returns the latest matched capture, even if a later one that does not match exists" # Exception: named captures are not supported in javascript: "^(?<a>.)(?<b>.)(?<b>.)(?<a>.)?$"

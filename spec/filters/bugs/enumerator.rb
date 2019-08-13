@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Enumerator" do
   fails "Enumerator#enum_for exposes multi-arg yields as an array"
   fails "Enumerator#feed can be called for each iteration"

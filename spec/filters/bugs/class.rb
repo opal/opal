@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Class" do
   fails "Class#allocate raises TypeError for #superclass"
   fails "Class#dup duplicates both the class and the singleton class"

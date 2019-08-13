@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Enumerator" do
   fails "Enumerator#next cannot be called again until the enumerator is rewound"
   fails "Enumerator#next raises a StopIteration exception at the end of the stream"

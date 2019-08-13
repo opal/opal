@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Enumerable" do
   fails "Enumerable#chunk_while on a single-element array ignores the block and returns an enumerator that yields [element]" # Expected [] to equal [[1]]
   fails "Enumerable#first returns a gathered array from yield parameters"
@@ -6,7 +7,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#slice_when when an iterator method yields more than one value processes all yielded values"
   fails "Enumerable#slice_when when given a block doesn't yield an empty array on a small enumerable" # Expected [] to equal [[42]]
   fails "Enumerable#sort_by calls #each to iterate over the elements to be sorted" # Mock '#<EnumerableSpecs::Numerous:0x64116>' expected to receive each("any_args") exactly 1 times but received it 0 times
-  fails "Enumerable#sort_by calls #each to iterate over the elements to be sorted" # NoMethodError: undefined method `sort!' for nil
   fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable"
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
   fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting

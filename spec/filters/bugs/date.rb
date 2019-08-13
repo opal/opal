@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Date" do
   fails "Date#>> returns the day of the reform if date falls within calendar reform"
   fails "Date#ajd determines the Astronomical Julian day"

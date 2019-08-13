@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Kernel" do
   fails "Kernel#=== does not call #object_id nor #equal? but still returns true for #== or #=== on the same object" # Mock '#<Object:0x37dd4>' expected to receive 'object_id' exactly 0 times but received it 2 times
   fails "Kernel#=~ returns nil matching any object"
@@ -23,7 +24,6 @@ opal_filter "Kernel" do
   fails "Kernel#autoload is a private method" # Expected Kernel to have private instance method 'autoload' but it does not
   fails "Kernel#autoload loads the file when the constant is accessed" # NameError: uninitialized constant KSAutoloadB
   fails "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x7849c>
-  fails "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for Object
   fails "Kernel#autoload sets the autoload constant in Object's constant table" # Expected Object to have constant 'KSAutoloadA' but it does not
   fails "Kernel#autoload when Object is frozen raises a FrozenError before defining the constant" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x7849c>
   fails "Kernel#autoload when called from included module's method setups the autoload on the included module" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethod
@@ -99,8 +99,8 @@ opal_filter "Kernel" do
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors"
   fails "Kernel#public_send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#puts delegates to $stdout.puts"
-  fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#raise raises RuntimeError if no exception class is given" # RuntimeError: RuntimeError
+  fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning false"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"

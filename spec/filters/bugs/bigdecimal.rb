@@ -1,9 +1,12 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "BigDecimal" do
   fails "BigDecimal is not defined unless it is required" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xbe6e>
   fails "BigDecimal#% returns NaN if NaN is involved"
   fails "BigDecimal#% returns NaN if the dividend is Infinity"
   fails "BigDecimal#% returns self modulo other"
   fails "BigDecimal#% returns the dividend if the divisor is Infinity"
+  fails "BigDecimal#% with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(6543.21) exactly 1 times but received it 0 times
+  fails "BigDecimal#* with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(3e-20001) exactly 1 times but received it 0 times
   fails "BigDecimal#** 0 to power of 0 is 1"
   fails "BigDecimal#** 0 to powers < 0 is Infinity"
   fails "BigDecimal#** other powers of 0 are 0"
@@ -12,19 +15,25 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#** returns 0.0 if self is infinite and argument is negative"
   fails "BigDecimal#** returns NaN if self is NaN"
   fails "BigDecimal#** returns infinite if self is infinite and argument is positive"
+  fails "BigDecimal#+ with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
+  fails "BigDecimal#- with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
   fails "BigDecimal#-@ properly handles special values"
   fails "BigDecimal#/ returns a / b" #fails a single assertion: @one.send(@method, BigDecimal('-2E5555'), *@object).should == BigDecimal('-0.5E-5555')
+  fails "BigDecimal#/ with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
   fails "BigDecimal#< properly handles infinity values" #fails only with mock object
   fails "BigDecimal#<= properly handles infinity values" #fails only with mock object
   fails "BigDecimal#<=> returns -1 if a < b" #fails only with mock object
   fails "BigDecimal#<=> returns 1 if a > b" #fails only with mock object
   fails "BigDecimal#> properly handles infinity values" #fails only with mock object
   fails "BigDecimal#>= properly handles infinity values" #fails only with mock object
+  fails "BigDecimal#add with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(123450000000000) exactly 1 times but received it 0 times
   fails "BigDecimal#ceil returns the smallest integer greater or equal to self, if n is unspecified"
   fails "BigDecimal#ceil sets n digits left of the decimal point to 0, if given n < 0"
   fails "BigDecimal#coerce returns [other, self] both as BigDecimal"
   fails "BigDecimal#div returns a / b with optional precision" #fails the case of > 20 decimal places for to_s('F')
+  fails "BigDecimal#div with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
   fails "BigDecimal#div with precision set to 0 returns a / b" #fails a single assertion: @one.send(@method, BigDecimal('-2E5555'), *@object).should == BigDecimal('-0.5E-5555')
+  fails "BigDecimal#div with precision set to 0 with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
   fails "BigDecimal#divmod array contains quotient and modulus as BigDecimal"
   fails "BigDecimal#divmod can be reversed with * and +" # Expected 0 to equal -1
   fails "BigDecimal#divmod returns an array of Infinity and NaN if the dividend is Infinity"
@@ -57,10 +66,13 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#mod_part_of_divmod returns NaN if the dividend is Infinity"
   fails "BigDecimal#mod_part_of_divmod returns self modulo other"
   fails "BigDecimal#mod_part_of_divmod returns the dividend if the divisor is Infinity"
+  fails "BigDecimal#mod_part_of_divmod with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(6543.21) exactly 1 times but received it 0 times
   fails "BigDecimal#modulo returns NaN if NaN is involved" # FloatDomainError: Computation results to 'NaN'(Not a Number)
   fails "BigDecimal#modulo returns NaN if the dividend is Infinity" # FloatDomainError: Computation results to 'Infinity'
   fails "BigDecimal#modulo returns self modulo other" # Exception: new BigNumber() number type has more than 15 significant digits: 9223372036854776000
   fails "BigDecimal#modulo returns the dividend if the divisor is Infinity" # Expected NaN to equal 1
+  fails "BigDecimal#modulo with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(6543.21) exactly 1 times but received it 0 times
+  fails "BigDecimal#mult with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(3e-20001) exactly 1 times but received it 0 times
   fails "BigDecimal#power 0 to power of 0 is 1"
   fails "BigDecimal#power 0 to powers < 0 is Infinity"
   fails "BigDecimal#power other powers of 0 are 0"
@@ -74,6 +86,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#precs returns the current value of significant digits as the first value"
   fails "BigDecimal#precs returns the maximum number of significant digits as the second value"
   fails "BigDecimal#quo returns a / b" #fails a single assertion: @one.send(@method, BigDecimal('-2E5555'), *@object).should == BigDecimal('-0.5E-5555')
+  fails "BigDecimal#quo with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
   fails "BigDecimal#remainder coerces arguments to BigDecimal if possible"
   fails "BigDecimal#remainder it equals modulo, if both values are of same sign"
   fails "BigDecimal#remainder means self-arg*(self/arg).truncate"
@@ -82,13 +95,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#remainder returns NaN if NaN is involved"
   fails "BigDecimal#remainder returns NaN used with zero"
   fails "BigDecimal#remainder returns zero if used on zero"
-  fails "BigDecimal#round BigDecimal::ROUND_CEILING rounds values towards +infinity" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
-  fails "BigDecimal#round BigDecimal::ROUND_DOWN rounds values towards zero" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
-  fails "BigDecimal#round BigDecimal::ROUND_FLOOR rounds values towards -infinity" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
-  fails "BigDecimal#round BigDecimal::ROUND_HALF_DOWN rounds values > 5 up, otherwise down" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
-  fails "BigDecimal#round BigDecimal::ROUND_HALF_EVEN rounds values > 5 up, < 5 down and == 5 towards even neighbor" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
-  fails "BigDecimal#round BigDecimal::ROUND_HALF_UP rounds values >= 5 up, otherwise down" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
-  fails "BigDecimal#round BigDecimal::ROUND_UP rounds values away from zero" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
+  fails "BigDecimal#remainder with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(3) exactly 1 times but received it 0 times
   fails "BigDecimal#round :banker rounds values > 5 up, < 5 down and == 5 towards even neighbor" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
   fails "BigDecimal#round :ceil rounds values towards +infinity" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
   fails "BigDecimal#round :ceiling rounds values towards +infinity" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
@@ -100,6 +107,13 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#round :half_up rounds values >= 5 up, otherwise down" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
   fails "BigDecimal#round :truncate rounds values towards zero" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
   fails "BigDecimal#round :up rounds values away from zero" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
+  fails "BigDecimal#round BigDecimal::ROUND_CEILING rounds values towards +infinity" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
+  fails "BigDecimal#round BigDecimal::ROUND_DOWN rounds values towards zero" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
+  fails "BigDecimal#round BigDecimal::ROUND_FLOOR rounds values towards -infinity" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
+  fails "BigDecimal#round BigDecimal::ROUND_HALF_DOWN rounds values > 5 up, otherwise down" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
+  fails "BigDecimal#round BigDecimal::ROUND_HALF_EVEN rounds values > 5 up, < 5 down and == 5 towards even neighbor" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
+  fails "BigDecimal#round BigDecimal::ROUND_HALF_UP rounds values >= 5 up, otherwise down" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
+  fails "BigDecimal#round BigDecimal::ROUND_UP rounds values away from zero" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
   fails "BigDecimal#round raise for a non-existent round mode" # ArgumentError: [BigDecimal#round] wrong number of arguments(2 for -1)
   fails "BigDecimal#round uses default rounding method unless given"
   fails "BigDecimal#sign returns negative value if BigDecimal less than 0"
@@ -122,12 +136,13 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#sqrt raises TypeError if nil is given"
   fails "BigDecimal#sqrt returns 0 for 0, +0.0 and -0.0"
   fails "BigDecimal#sqrt returns 1 if precision is 0 or 1"
+  fails "BigDecimal#sqrt returns positive infinity for infinity" # NoMethodError: undefined method `sqrt' for Infinity
   fails "BigDecimal#sqrt returns positive infitinity for infinity"
   fails "BigDecimal#sqrt returns square root of 0.9E-99999 with desired precision"
   fails "BigDecimal#sqrt returns square root of 121 with desired precision"
   fails "BigDecimal#sqrt returns square root of 2 with desired precision"
   fails "BigDecimal#sqrt returns square root of 3 with desired precision"
-  fails "BigDecimal#sqrt returns positive infinity for infinity" # NoMethodError: undefined method `sqrt' for Infinity
+  fails "BigDecimal#sub with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(123450000000000) exactly 1 times but received it 0 times
   fails "BigDecimal#to_f properly handles special values"
   fails "BigDecimal#to_f remembers negative zero when converted to float"
   fails "BigDecimal#to_i raises FloatDomainError if BigDecimal is infinity or NaN"
@@ -168,34 +183,6 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.new raises ArgumentError when Float is used without precision"
   fails "BigDecimal.new treats invalid strings as 0.0"
   fails "BigDecimal.ver returns the Version number"
-  fails "BigDecimal#% with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(6543.21) exactly 1 times but received it 0 times
-  fails "BigDecimal#% with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#* with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(3e-20001) exactly 1 times but received it 0 times
-  fails "BigDecimal#* with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#+ with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
-  fails "BigDecimal#+ with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#- with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
-  fails "BigDecimal#- with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#/ with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
-  fails "BigDecimal#/ with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#add with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(123450000000000) exactly 1 times but received it 0 times
-  fails "BigDecimal#add with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#div with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
-  fails "BigDecimal#div with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#div with precision set to 0 with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
-  fails "BigDecimal#div with precision set to 0 with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#mod_part_of_divmod with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(6543.21) exactly 1 times but received it 0 times
-  fails "BigDecimal#mod_part_of_divmod with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#modulo with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(6543.21) exactly 1 times but received it 0 times
-  fails "BigDecimal#modulo with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#mult with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(3e-20001) exactly 1 times but received it 0 times
-  fails "BigDecimal#mult with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#quo with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
-  fails "BigDecimal#quo with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
-  fails "BigDecimal#remainder with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(3) exactly 1 times but received it 0 times
-  fails "BigDecimal#remainder with Object tries to coerce the other operand to self" # NoMethodError: undefined method `remainder' for 3
-  fails "BigDecimal#sub with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(123450000000000) exactly 1 times but received it 0 times
-  fails "BigDecimal#sub with Object tries to coerce the other operand to self" # TypeError: MockObject can't be coerced into BigDecimal
   fails "Kernel#BigDecimal accepts significant digits >= given precision" # NoMethodError: undefined method `precs' for 3.1415923
   fails "Kernel#BigDecimal allows for [eEdD] as exponent separator" # Exception: new BigNumber() not a number: 12345.67d89
   fails "Kernel#BigDecimal allows for underscores in all parts" # Exception: new BigNumber() not a number: 12_345.67E89

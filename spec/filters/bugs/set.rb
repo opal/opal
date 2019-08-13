@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Set" do
   fails "Set#& raises an ArgumentError when passed a non-Enumerable"
   fails "Set#& returns a new Set containing only elements shared by self and the passed Enumerable"

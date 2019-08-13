@@ -1,5 +1,5 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Integer" do
-  fails "Integer#even? returns true for a Bignum when it is an even number"
   fails "Integer#% bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
   fails "Integer#& bignum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
   fails "Integer#& bignum returns self bitwise AND other when both operands are negative" # Expected 0 to equal -13835058055282164000
@@ -31,10 +31,8 @@ opal_unsupported_filter "Integer" do
   fails "Integer#<=> bignum with an Object returns -1 if the coerced value is larger" # Expected 0 to equal -1
   fails "Integer#<=> bignum with an Object returns nil if #coerce does not return an Array" # Expected 0 to be nil
   fails "Integer#== bignum returns the result of 'other == self' as a boolean" # Expected "woot" to equal true
-  fails "Integer#== bignum returns the result of 'other == self' as a boolean" # Mock 'not integer' expected to receive ==("any_args") exactly 2 times but received it 1 times
   fails "Integer#== bignum returns true if self has the same value as the given argument" # Expected true to equal false
   fails "Integer#=== bignum returns the result of 'other == self' as a boolean" # Expected "woot" to equal true
-  fails "Integer#=== bignum returns the result of 'other == self' as a boolean" # Mock 'not integer' expected to receive ==("any_args") exactly 2 times but received it 1 times
   fails "Integer#=== bignum returns true if self has the same value as the given argument" # Expected true to equal false
   fails "Integer#> bignum returns true if self is greater than the given argument" # Expected false to equal true
   fails "Integer#>= bignum returns true if self is greater than or equal to other" # Expected true to equal false
@@ -64,7 +62,6 @@ opal_unsupported_filter "Integer" do
   fails "Integer#coerce bignum raises a TypeError when not passed a Fixnum or Bignum" # ArgumentError: invalid value for Float(): "test"
   fails "Integer#coerce bignum returns [other, self] when passed a Bignum" # NameError: uninitialized constant Bignum
   fails "Integer#div bignum calls #coerce and #div if argument responds to #coerce" # Mock 'x' expected to receive div(main) exactly 1 times but received it 0 times
-  fails "Integer#div bignum calls #coerce and #div if argument responds to #coerce" # NoMethodError: undefined method `/' for main
   fails "Integer#div bignum looses precision if passed Float argument" # Expected 9223372036854776000 not to equal 9223372036854776000
   fails "Integer#div bignum returns self divided by other" # Expected 10000000000 to equal 9999999999
   fails "Integer#divmod bignum raises a TypeError when the given argument is not an Integer" # NoMethodError: undefined method `nan?' for main
@@ -74,6 +71,7 @@ opal_unsupported_filter "Integer" do
   fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a > 0, b < 0 and a < |b|" # Expected [-1, 0] to equal [-1, -1]
   fails "Integer#divmod bignum with q = floor(x/y), a = q*b + r, returns [q,r] when a > 0, b < 0 and a > |b|" # Expected [-1, 0] to equal [-2, -9223372036854776000]
   fails "Integer#even? fixnum returns true for a Bignum when it is an even number" # Expected true to be false
+  fails "Integer#even? returns true for a Bignum when it is an even number"
   fails "Integer#modulo bignum returns the modulus obtained from dividing self by the given argument" # Expected 0 to equal 9223372036854776000
   fails "Integer#odd? bignum returns false if self is even and negative" # Expected true to be false
   fails "Integer#odd? bignum returns true if self is odd and positive" # Expected false to be true
@@ -84,6 +82,8 @@ opal_unsupported_filter "Integer" do
   fails "Integer#pow one argument is passed fixnum can raise -1 to a bignum safely" # NoMethodError: undefined method `pow' for -1
   fails "Integer#pow one argument is passed fixnum can raise 1 to a bignum safely" # NoMethodError: undefined method `pow' for 1
   fails "Integer#pow one argument is passed fixnum overflows the answer to a bignum transparently" # NoMethodError: undefined method `pow' for 2
+  fails "Integer#pow one argument is passed fixnum returns Float::INFINITY for 0 ** -1.0" # Depends on the difference between Integer and Float
+  fails "Integer#pow two arguments are passed ensures all arguments are integers" # Depends on the difference between Integer and Float
   fails "Integer#pow two arguments are passed works well with bignums" # NoMethodError: undefined method `pow' for 2
   fails "Integer#remainder bignum does raises ZeroDivisionError if other is zero and a Float" # NoMethodError: undefined method `remainder' for 9223372036854776000
   fails "Integer#remainder bignum raises a ZeroDivisionError if other is zero and not a Float" # NoMethodError: undefined method `remainder' for 9223372036854776000
@@ -94,8 +94,6 @@ opal_unsupported_filter "Integer" do
   fails "Integer#| bignum returns self bitwise OR other when one operand is negative" # Expected 0 to equal -64563604257983430000
   fails "Integer#| bignum returns self bitwise OR other" # Expected 2 to equal 9223372036854776000
   fails "Integer#~ bignum returns self with each bit flipped" # Expected -1 to equal -9223372036854776000
-  fails "Integer#pow one argument is passed fixnum returns Float::INFINITY for 0 ** -1.0" # Depends on the difference between Integer and Float
-  fails "Integer#pow two arguments are passed ensures all arguments are integers" # Depends on the difference between Integer and Float
   fails "String#to_r does not treat a leading period without a numeric prefix as a decimal point" # Expected (8106479329266893/9007199254740992) not to equal (8106479329266893/9007199254740992)
   fails "String#to_r ignores underscores between numbers" # Expected (-5228919960423629/274877906944) to equal (-190227/10)
   fails "String#to_r understands a forward slash as separating the numerator from the denominator" # Expected (-896028675862255/140737488355328) to equal (-191/30)

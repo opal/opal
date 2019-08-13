@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "UnboundMethod" do
   fails "UnboundMethod#== returns true if both are aliases for a third method"
   fails "UnboundMethod#== returns true if either is an alias for the other"

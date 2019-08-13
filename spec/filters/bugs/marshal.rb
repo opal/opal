@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Marshal" do
   fails "Marshal.dump ignores the recursion limit if the limit is negative" # no support yet
   fails "Marshal.dump raises a TypeError if dumping a Mutex instance" # Expected TypeError but no exception was raised ("\u0004\bo:\nMutex\u0006:\f@lockedF" was returned)
@@ -8,12 +9,12 @@ opal_filter "Marshal" do
   fails "Marshal.dump with a Time dumps the zone and the offset"
   fails "Marshal.dump with an Exception contains the filename in the backtrace"
   fails "Marshal.dump with an Exception dumps an empty Exception"
+  fails "Marshal.dump with an Exception dumps the cause for the exception" # NoMethodError: undefined method `cause' for #<RuntimeError: the consequence>
   fails "Marshal.dump with an Exception dumps the message for the exception"
   fails "Marshal.dump with an Object dumps a BasicObject subclass if it defines respond_to?"
   fails "Marshal.dump with an Object dumps an Object with a non-US-ASCII instance variable" # NameError: '@Ã©' is not allowed as an instance variable name
   fails "Marshal.dump with an Object raises if an Object has a singleton class and singleton methods" # Expected TypeError (singleton can't be dumped) but no exception was raised ("\u0004\bo:\vObject\u0000" was returned)
   fails "Marshal.dump with an object responding to #_dump dumps the object returned by #marshal_dump"
-  fails "Marshal.dump with an Exception dumps the cause for the exception" # NoMethodError: undefined method `cause' for #<RuntimeError: the consequence>
   fails "Marshal.load for a Module loads an old module"
   fails "Marshal.load for a Regexp loads a extended_user_regexp having ivar"
   fails "Marshal.load for a String loads a String subclass with custom constructor"
