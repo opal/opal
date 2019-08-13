@@ -11,7 +11,7 @@ module FileUtils
 
   def cp(source, target)
     target = File.join(target, File.basename(source)) if File.directory? target
-    `__fs__.writeFileSync(target, __fs__.readFileSync(source));`
+    `__fs__.writeFileSync(target, __fs__.readFileSync(source))`
   end
 
   def rm(path)
