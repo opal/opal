@@ -405,3 +405,6 @@ Naming/MemoizedInstanceVariableName:
 
 Style/AccessModifierDeclarations:
   Enabled: false
+
+Style/MultipleComparison:
+  Enabled: false
