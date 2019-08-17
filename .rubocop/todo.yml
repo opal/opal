@@ -36,3 +36,8 @@ Style/MutableConstant:
 Lint/HandleExceptions:
   Exclude:
     - 'stdlib/ostruct.rb'
+
+Lint/ToJSON:
+  Exclude:
+    - 'lib/opal/source_map/map.rb'
+    - 'stdlib/json.rb'
