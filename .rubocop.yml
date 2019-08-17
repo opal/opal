@@ -402,3 +402,6 @@ Style/ConditionalAssignment:
 Naming/MemoizedInstanceVariableName:
   Exclude:
     - lib/opal/parser/patch.rb # it's a monkey-patch on the parser gem
+
+Style/AccessModifierDeclarations:
+  Enabled: false
