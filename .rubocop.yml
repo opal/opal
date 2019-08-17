@@ -408,3 +408,6 @@ Style/AccessModifierDeclarations:
 
 Style/MultipleComparison:
   Enabled: false
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
