@@ -41,7 +41,7 @@ module Opal
         'e' => '\\u001b'
       }.freeze
 
-      ESCAPE_REGEX = /(\\+)([#{ ESCAPE_CHARS.keys.join('') }])/
+      ESCAPE_REGEX = /(\\+)([#{ ESCAPE_CHARS.keys.join('') }])/.freeze
 
       def translate_escape_chars(inspect_string)
         inspect_string.gsub(ESCAPE_REGEX) do |original|
@@ -104,7 +104,7 @@ module Opal
       attr_accessor :value, :flags
 
       # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-      SUPPORTED_FLAGS = /[gimuy]/
+      SUPPORTED_FLAGS = /[gimuy]/.freeze
 
       def initialize(*)
         super

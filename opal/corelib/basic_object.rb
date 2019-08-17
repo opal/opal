@@ -147,4 +147,8 @@ class BasicObject
 
     ::Kernel.raise ::NoMethodError.new(message, symbol)
   end
+
+  def respond_to_missing?(method_name, include_all = false)
+    false
+  end
 end
