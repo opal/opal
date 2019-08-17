@@ -1,3 +1,4 @@
+require: rubocop-performance
 inherit_from: .rubocop/todo.yml
 
 AllCops:
@@ -413,3 +414,6 @@ Layout/EmptyLineAfterGuardClause:
 Layout/AlignHash:
   Enabled: false
 
+# No way to set multiple preferred names
+Naming/RescuedExceptionsVariableName:
+  Enabled: false
