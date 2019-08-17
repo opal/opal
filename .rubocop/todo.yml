@@ -33,12 +33,6 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-Style/MethodMissing:
-  Exclude:
-    - 'stdlib/native.rb'
-    - 'stdlib/delegate.rb'
-    - 'stdlib/ostruct.rb'
-
 Lint/HandleExceptions:
   Exclude:
     - 'stdlib/ostruct.rb'

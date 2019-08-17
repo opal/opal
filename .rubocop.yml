@@ -243,12 +243,18 @@ Style/InverseMethods:
     - 'opal/corelib/basic_object.rb'
     - 'opal/corelib/kernel.rb'
 
-Style/MethodMissing:
-  # Base Opal classes simply can't call super for #method_missing
+Style/MethodMissingSuper:
+  # Base Opal classes simply can't or shouldn't call super for #method_missing
   Exclude:
     - 'opal/corelib/basic_object.rb'
     - 'opal/corelib/kernel.rb'
     - 'opal/corelib/string/inheritance.rb'
+    - 'stdlib/native.rb'
+    - 'stdlib/delegate.rb'
+    - 'stdlib/ostruct.rb'
+
+Style/MissingRespondToMissing:
+  Enabled: true
 
 Style/NumericPredicate:
   Enabled: false
