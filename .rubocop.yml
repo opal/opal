@@ -411,3 +411,9 @@ Style/MultipleComparison:
 
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
+
+Layout/AlignHash:
+  Enabled: false
+
+Style/MutableConstant:
+  Enabled: false
