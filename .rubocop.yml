@@ -263,6 +263,8 @@ Style/ParallelAssignment:
   Enabled: false
 
 Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    default: '{}'
   Exclude:
     # Opal has a convention of %x{}
     - 'opal/**/*.rb'
@@ -331,10 +333,6 @@ Style/RegexpLiteral:
   # prefer %r{} syntax.
   # Rubocop doesn't check for backslashes, so this rule is disabled.
   Enabled: false
-
-Style/PercentLiteralDelimiters:
-  PreferredDelimiters:
-    default: '{}'
 
 Naming/FileName:
   Exclude:
