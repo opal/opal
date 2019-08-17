@@ -47,12 +47,18 @@ opal_filter "String" do
   fails "String#% returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "String#% supports inspect formats using %p" # Expected "{\"capture\"=>1}" to equal "{:capture=>1}"
   fails "String#% width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
+  fails "String#+ when self is BINARY and argument is US-ASCII uses BINARY encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#-@ does not deduplicate already frozen strings" # Expected "this string is frozen" not to be identical to "this string is frozen"
+  fails "String#-@ does not deduplicate strings with additional instance variables" # NoMethodError: undefined method `-@' for "this string is frozen"
+  fails "String#-@ does not deduplicate tainted strings" # NoMethodError: undefined method `-@' for "this string is frozen"
   fails "String#-@ returns the same object for equal unfrozen strings" # Expected "this is a string" not to be identical to "this is a string"
   fails "String#-@ returns the same object when it's called on the same String literal" # NoMethodError: undefined method `-@' for "unfrozen string"
+  fails "String#<< when self is BINARY and argument is US-ASCII uses BINARY encoding" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
+  fails "String#<< with Integer returns a BINARY string if self is US-ASCII and the argument is between 128-255 (inclusive)" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#[] raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
+  fails "String#ascii_only? with non-ASCII only characters returns false if the encoding is BINARY" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#bytes agrees with #unpack('C*')" # Expected [113, 103, 172, 78, 84, 0, 111, 0, 107, 0, 121, 0, 111, 0] to equal [230, 157, 177, 228, 186, 172, 84, 111, 107, 121, 111]
   fails "String#bytes yields each byte to a block if one is given, returning self" # Expected [113, 103, 172, 78] to equal "東京"
   fails "String#byteslice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
@@ -75,6 +81,8 @@ opal_filter "String" do
   fails "String#clone copies modules included in the singleton class" # NoMethodError: undefined method `repr' for "string"
   fails "String#clone copies singleton methods" # NoMethodError: undefined method `special' for "string"
   fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimizable" # Expected [40, 41, 123, 125] to equal [40, 0, 41, 0, 123, 0, 125, 0]
+  fails "String#concat when self is BINARY and argument is US-ASCII uses BINARY encoding" # NoMethodError: undefined method `concat' for "abc"
+  fails "String#concat with Integer returns a BINARY string if self is US-ASCII and the argument is between 128-255 (inclusive)" # NoMethodError: undefined method `concat' for ""
   fails "String#downcase ASCII-only case mapping does not downcase non-ASCII characters" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
   fails "String#downcase case folding case folds special characters" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
   fails "String#downcase full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#downcase] wrong number of arguments(2 for 0)
@@ -124,9 +132,12 @@ opal_filter "String" do
   fails "String#each_line when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
   fails "String#each_line when `chomp` keyword argument is passed removes only specified separator" # ArgumentError: [String#each_line] wrong number of arguments(2 for -1)
   fails "String#each_line yields paragraphs (broken by 2 or more successive newlines) when passed '' and replaces multiple newlines with only two ones" # Expected ["hello\nworld\n\n\n", "and\nuniverse\n\n\n\n\n"] to equal ["hello\nworld\n\n", "and\nuniverse\n\n"]
+  fails "String#encode when passed options replaces invalid encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encoding for Strings with \\x escapes returns BINARY when an escape creates a byte with the 8th bit set if the source encoding is US-ASCII" # Expected #<Encoding:UTF-8> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#end_with? raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to ASCII-8BIT if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#force_encoding with a special encoding name defaults to BINARY if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#getbyte counts from the end of the String if given a negative argument" # NotImplementedError: NotImplementedError
   fails "String#getbyte interprets bytes relative to the String's encoding" # NotImplementedError: NotImplementedError
   fails "String#getbyte mirrors the output of #bytes" # NotImplementedError: NotImplementedError

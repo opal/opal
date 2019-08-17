@@ -1,5 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Rational" do
+  fails "Rational#coerce raises an error when passed a BigDecimal" # Expected TypeError (/BigDecimal can't be coerced into Rational/) but no exception was raised (nil was returned)
   fails "Rational#marshal_dump dumps numerator and denominator"
   fails "Rational#round with half option raise for a non-existent round mode" # TypeError: not an Integer
   fails "Rational#round with half option returns a Rational when the precision is greater than 0" # ArgumentError: [Rational#round] wrong number of arguments(2 for -1)

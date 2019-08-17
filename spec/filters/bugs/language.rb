@@ -228,8 +228,14 @@ opal_filter "language" do
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from a method"
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from the toplevel"
   fails "The break statement in a lambda from a scope that has returned raises a LocalJumpError when yielding to a lambda passed as a block argument"
+  fails "The break statement in a lambda from a scope that has returned returns a value to the block scope invoking the lambda in a method" # Exception: $brk is not defined
+  fails "The break statement in a lambda from a scope that has returned returns a value to the method scope invoking the lambda" # Exception: $brk is not defined
   fails "The break statement in a lambda returns from the call site if the lambda is passed as a block" # Expected ["before", "unreachable1", "unreachable2", "after"] to equal ["before", "after"]
+  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns a value to a block scope invoking the lambda in a method below" # Exception: $brk is not defined
+  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns a value to the method scope below invoking the lambda" # Exception: $brk is not defined
+  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns a value to the scope creating and calling the lambda" # Exception: $brk is not defined
   fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns from the lambda" # Exception: unexpected break
+  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns nil when not passed an argument" # Exception: $brk is not defined
   fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility"
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the class" # Expected "constant" to be nil
@@ -271,6 +277,7 @@ opal_filter "language" do
   fails "The super keyword passes along modified rest args when they were originally empty"
   fails "The super keyword passes along modified rest args when they weren't originally empty"
   fails "The super keyword passes along reassigned rest args" # Expected ["bar"] to equal ["foo"]
+  fails "The super keyword uses block argument given to method when used in a block" # LocalJumpError: no block given
   fails "The super keyword uses given block even if arguments are passed explicitly"
   fails "The super keyword when using keyword arguments passes any given keyword arguments including optional and required ones to the parent"
   fails "The super keyword when using keyword arguments passes default argument values to the parent" # Expected {} to equal {"b"=>"b"}

@@ -21,11 +21,13 @@ opal_filter "Exception" do
   fails "Exception#backtrace produces a backtrace for an exception captured using $!" # Expected "RuntimeError" to match /backtrace_spec/
   fails "Exception#backtrace returns an Array that can be updated" # Expected "RuntimeError" to equal "backtrace first"
   fails "Exception#backtrace returns nil if no backtrace was set"
+  fails "Exception#backtrace returns the same array after duping"
   fails "Exception#backtrace_locations produces a backtrace for an exception captured using $!" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
   fails "Exception#backtrace_locations returns an Array that can be updated" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
   fails "Exception#backtrace_locations returns an Array" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
   fails "Exception#backtrace_locations returns nil if no backtrace was set" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
   fails "Exception#backtrace_locations sets each element to a Thread::Backtrace::Location" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
+  fails "Exception#cause is not set to the exception itself when it is re-raised" # NoMethodError: undefined method `cause' for #<RuntimeError: RuntimeError>
   fails "Exception#cause is set for internal errors caused by user errors" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
   fails "Exception#cause is set for user errors caused by internal errors" # Expected RuntimeError but no exception was raised (Infinity was returned)
   fails "Exception#cause returns the active exception when an exception is raised"

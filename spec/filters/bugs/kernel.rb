@@ -211,13 +211,10 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf returns a String in the argument's encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel#sprintf with format string that contains %<> sections raises ArgumentError if missing second named argument" # KeyError: key not found: "foo"
-  fails "Kernel#warn :uplevel keyword argument converts value to Integer" # Expected:   $stderr: /classes.rb:416:/      got:   $stderr: "\n{\"uplevel\"=>0.1}\n"
-  fails "Kernel#warn :uplevel keyword argument does not prepend caller information if line number is too big" # Expected:   $stderr: "warning: foo\n"      got:   $stderr: "foo\n{\"uplevel\"=>100}\n"
-  fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:416: warning: foo/      got:   $stderr: "foo\n{\"uplevel\"=>0}\n"
-  fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:416: warning: \n$/      got:   $stderr: "\n{\"uplevel\"=>0}\n"
-  fails "Kernel#warn :uplevel keyword argument raises ArgumentError if passed -1" # Expected ArgumentError but no exception was raised (nil was returned)
-  fails "Kernel#warn :uplevel keyword argument raises ArgumentError if passed negative value" # Expected ArgumentError but no exception was raised (nil was returned)
-  fails "Kernel#warn :uplevel keyword argument raises TypeError if passed not Integer" # Expected TypeError but no exception was raised (nil was returned)
+  fails "Kernel#warn :uplevel keyword argument converts value to Integer"
+  fails "Kernel#warn :uplevel keyword argument does not prepend caller information if line number is too big"
+  fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace"
+  fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil"
   fails "Kernel#warn writes each array element on a line when passes an array" # Expected:   $stderr: "line 1\nline 2\n"      got:   $stderr: "[\"line 1\", \"line 2\"]\n"
   fails "Kernel#yield_self returns a sized Enumerator when no block given" # Requires Enumerator#peek
   fails "Kernel.Complex() when passed Numerics n1 and n2 and at least one responds to #real? with false returns n1 + n2 * Complex(0, 1)"
@@ -277,6 +274,7 @@ opal_filter "Kernel" do
   fails "Kernel.printf calls write on the first argument when it is not a string"
   fails "Kernel.printf writes to stdout when a string is the first argument"
   fails "Kernel.proc returned the passed Proc if given an existing Proc" # Expected false to be true
+  fails "Kernel.rand supports custom object types" # Expected "NaN#<struct KernelSpecs::CustomRangeInteger value=1>" (String) to be an instance of KernelSpecs::CustomRangeInteger
   fails "Kernel.sprintf faulty key raises a KeyError"
   fails "Kernel.sprintf faulty key sets the Hash as the receiver of KeyError"
   fails "Kernel.sprintf faulty key sets the unmatched key as the key of KeyError"

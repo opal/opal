@@ -1,6 +1,7 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "String#unpack" do
   fails "String#unpack with format 'A' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
+  fails "String#unpack with format 'H' should make strings with US_ASCII encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#unpack with format 'Q' adds nil for each element requested beyond the end of the String" # Expected [7523094288207668000, nil, nil] to be computed by "abcdefgh".unpack from "Q3" (computed [7523094288207667000, nil, nil] instead)
   fails "String#unpack with format 'Q' decodes one long for a single format character" # Expected [7523094288207667000] to equal [7523094288207668000]
   fails "String#unpack with format 'Q' decodes the number of longs requested by the count modifier" # Expected [7523094283929477000, 7378418357791582000] to equal [7523094283929478000, 7378418357791582000]
@@ -26,6 +27,7 @@ opal_filter "String#unpack" do
   fails "String#unpack with format 'U' implicitly has a count of one when no count modifier is passed" # ArgumentError: malformed UTF-8 character
   fails "String#unpack with format 'a' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
   fails "String#unpack with format 'b' decodes into US-ASCII string values" # Expected "UTF-16LE" to equal "US-ASCII"
+  fails "String#unpack with format 'h' should make strings with US_ASCII encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#unpack with format 'm' decodes all pre-encoded ascii byte values" # Expected ["\u007FÂ\u0080Â\u0081Â\u0082Â\u0083"] to be computed by "f8KAwoHCgsKD\n".unpack from "m" (computed ["\u007F\u0080\u0081\u0082\u0083"] instead)
   fails "String#unpack with format 'm' produces binary strings" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "String#unpack with format 'q' adds nil for each element requested beyond the end of the String" # Expected [7523094288207668000, nil, nil] to be computed by "abcdefgh".unpack from "q3" (computed [7523094288207667000, nil, nil] instead)
@@ -54,8 +56,10 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'A' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'A' returns a string in encoding of common to the concatenated results" # RuntimeError: Unsupported pack directive "U" (no chunk reader defined)
   fails "Array#pack with format 'C' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'C' returns a binary string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Array#pack with format 'C' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "Array#pack with format 'L' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'L' returns a binary string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Array#pack with format 'L' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "Array#pack with format 'L' with modifier '>' and '!' calls #to_int to convert the pack argument to an Integer" # Mock 'to_int' expected to receive to_int("any_args") exactly 1 times but received it 0 times
   fails "Array#pack with format 'L' with modifier '>' and '!' encodes a Float truncated as an Integer" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
@@ -88,8 +92,10 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'a' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'a' returns a string in encoding of common to the concatenated results" # RuntimeError: Unsupported pack directive "U" (no chunk reader defined)
   fails "Array#pack with format 'c' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'c' returns a binary string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Array#pack with format 'c' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "Array#pack with format 'l' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
+  fails "Array#pack with format 'l' returns a binary string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Array#pack with format 'l' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "Array#pack with format 'l' with modifier '>' and '!' calls #to_int to convert the pack argument to an Integer" # Mock 'to_int' expected to receive to_int("any_args") exactly 1 times but received it 0 times
   fails "Array#pack with format 'l' with modifier '>' and '!' encodes a Float truncated as an Integer" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)

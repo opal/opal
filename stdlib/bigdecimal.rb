@@ -1,10 +1,22 @@
 class BigDecimal < Numeric; end
 
 require 'js'
-require 'bigdecimal/kernel'
-require 'bigdecimal/bignumber.js'
+require 'bigdecimal/bignumber'
 
-class BigDecimal
+module Kernel
+  def BigDecimal(initial, digits = 0)
+    bigdecimal = BigDecimal.allocate
+    bigdecimal.initialize(initial, digits)
+    bigdecimal
+  end
+end
+
+def BigDecimal.new(*args, **kwargs)
+  warn 'BigDecimal.new is deprecated; use BigDecimal() method instead.', uplevel: 1
+  BigDecimal(*args, **kwargs)
+end
+
+class BigDecimal < Numeric
   ROUND_MODE = 256
 
   # NOTE: the numeric values of the ROUND_* constants
