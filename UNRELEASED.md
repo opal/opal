@@ -5,10 +5,10 @@ Whitespace conventions:
 - 1 spaces before normal text
 -->
 
-### Addeed
+### Added
 
 - Basic support for `uplevel:` keyword argument in `Kernel#warn` (#2006)
-
+- Added a `#respond_to_missing?` implementation for `BasicObject`, `Delegator`, `OpenStruct`, that's meant for future support in the Opal runtime, which currently ignores it (#2007)
 
 ### Fixed
 
@@ -38,3 +38,5 @@ Whitespace conventions:
 
 - Nashorn has been deprecated but GraalVM still supports it (#1997)
 - "opal/mini" now includes "opal/io" (#2002)
+- Regexps assigned to constants are now frozen (#2007)
+
