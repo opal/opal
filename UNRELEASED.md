@@ -5,6 +5,11 @@ Whitespace conventions:
 - 1 spaces before normal text
 -->
 
+### Addeed
+
+- Basic support for `uplevel:` keyword argument in `Kernel#warn` (#2006)
+
+
 ### Fixed
 
 - Struct#dup (#1995)
