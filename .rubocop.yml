@@ -415,5 +415,3 @@ Layout/EmptyLineAfterGuardClause:
 Layout/AlignHash:
   Enabled: false
 
-Style/MutableConstant:
-  Enabled: false

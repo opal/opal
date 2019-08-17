@@ -29,7 +29,7 @@ module Opal
     end
 
     class Compiler
-      BLOCK_EXPR = /\s+(do|\{)(\s*\|[^|]*\|)?\s*\Z/
+      BLOCK_EXPR = /\s+(do|\{)(\s*\|[^|]*\|)?\s*\Z/.freeze
 
       def initialize(source, file_name = '(erb)')
         @source, @file_name, @result = source, file_name, source
