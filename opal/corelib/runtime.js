@@ -949,13 +949,6 @@
 
       var proto = includer.$$prototype, parent = proto, module_iclass = Object.getPrototypeOf(parent);
 
-      var next_ancestor = Object.getPrototypeOf(module_iclass);
-
-      // skip non-root iclasses (that were recursively included)
-      while (next_ancestor.hasOwnProperty('$$iclass') && !isRoot(next_ancestor)) {
-        next_ancestor = Object.getPrototypeOf(next_ancestor);
-      }
-
       while (module_iclass != null) {
         if (isRoot(module_iclass) && module_iclass.$$module === module) {
           break;
@@ -963,6 +956,14 @@
 
         parent = module_iclass;
         module_iclass = Object.getPrototypeOf(module_iclass);
+      }
+
+      // in case module_iclass is null, use the last parent
+      var next_ancestor = Object.getPrototypeOf(module_iclass ? module_iclass : parent);
+
+      // skip non-root iclasses (that were recursively included)
+      while (next_ancestor.hasOwnProperty('$$iclass') && !isRoot(next_ancestor)) {
+        next_ancestor = Object.getPrototypeOf(next_ancestor);
       }
 
       start_chain_after = parent;
