@@ -109,7 +109,18 @@ class Module
     attr_writer(*names)
   end
 
-  alias attr attr_accessor
+  def attr(*args)
+    %x{
+      if (args.length == 2 && (args[1] === true || args[1] === false)) {
+        #{warn 'optional boolean argument is obsoleted', uplevel: 1}
+
+        args[1] ? #{attr_accessor(`args[0]`)} : #{attr_reader(`args[0]`)};
+        return nil;
+      }
+    }
+
+    attr_reader(*args)
+  end
 
   def attr_reader(*names)
     %x{

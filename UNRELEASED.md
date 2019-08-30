@@ -32,6 +32,7 @@ Whitespace conventions:
 - Enumerable#zip (#1986)
 - Struct#dup not copying `$$data` (#1995)
 - Fixed usage of semicolon in single-line backticks (#2004)
+- Module#attr with multiple arguments (#2003)
 
 
 ### Changed

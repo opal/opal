@@ -5,8 +5,6 @@ opal_filter "Module" do
   fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#attr applies current visibility to methods created"
   fails "Module#attr converts non string/symbol/fixnum names to strings using to_str"
-  fails "Module#attr creates a getter but no setter for all given attribute names"
-  fails "Module#attr creates a getter for the given attribute name"
   fails "Module#attr raises a TypeError when the given names can't be converted to strings using to_str"
   fails "Module#attr_accessor applies current visibility to methods created"
   fails "Module#attr_accessor converts non string/symbol/fixnum names to strings using to_str"
