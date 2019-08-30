@@ -109,19 +109,17 @@ class Module
     attr_writer(*names)
   end
 
-  def attr(name, *args)
-    if args.length == 1
-      case assignable_or_name = args.first
-      when true
-        attr_accessor(name)
-      when false
-        attr_reader(name)
-      else
-        attr_reader(name, assignable_or_name)
-      end
-    else
-      attr_reader(name, *args)
-    end
+  def attr(*args)
+    %x{
+      if (args.length == 2 && (args[1] === true || args[1] === false)) {
+        #{warn 'optional boolean argument is obsoleted', uplevel: 1}
+
+        args[1] ? #{attr_accessor(`args[0]`)} : #{attr_reader(`args[0]`)};
+        return nil;
+      }
+    }
+
+    attr_reader(*args)
   end
 
   def attr_reader(*names)
