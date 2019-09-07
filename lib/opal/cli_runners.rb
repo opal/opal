@@ -83,7 +83,7 @@ module Opal
     register_runner :chrome,      :Chrome
     register_runner :nashorn,     :Nashorn
     register_runner :nodejs,      :Nodejs
-    register_runner :server,      legacy_runner(:Server)
+    register_runner :server,      :Server
     register_runner :compiler,    :Compiler
 
     alias_runner :osascript, :applescript
