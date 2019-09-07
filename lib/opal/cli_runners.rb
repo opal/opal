@@ -40,7 +40,10 @@ module Opal
     # @param runner [#call] a callable object that will act as the "runner"
     # @param runner [Symbol] a constant name that once autoloaded will point to
     #                        a callable.
-    def self.register_runner(name, runner)
+    # @param path [nil,String] a path for setting up autoload on the constant
+    def self.register_runner(name, runner, path = nil)
+      autoload runner, path if path
+
       if runner.respond_to?(:call)
         self[name] = runner
       else
@@ -57,19 +60,12 @@ module Opal
       nil
     end
 
-    autoload :Applescript, 'opal/cli_runners/applescript'
-    autoload :Compiler,    'opal/cli_runners/compiler'
-    autoload :Chrome,      'opal/cli_runners/chrome'
-    autoload :Nashorn,     'opal/cli_runners/nashorn'
-    autoload :Nodejs,      'opal/cli_runners/nodejs'
-    autoload :Server,      'opal/cli_runners/server'
-
-    register_runner :applescript, :Applescript
-    register_runner :chrome,      :Chrome
-    register_runner :nashorn,     :Nashorn
-    register_runner :nodejs,      :Nodejs
-    register_runner :server,      :Server
-    register_runner :compiler,    :Compiler
+    register_runner :applescript, :Applescript, 'opal/cli_runners/applescript'
+    register_runner :chrome,      :Chrome,      'opal/cli_runners/chrome'
+    register_runner :compiler,    :Compiler,    'opal/cli_runners/compiler'
+    register_runner :nashorn,     :Nashorn,     'opal/cli_runners/nashorn'
+    register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
+    register_runner :server,      :Server,      'opal/cli_runners/server'
 
     alias_runner :osascript, :applescript
     alias_runner :node, :nodejs
