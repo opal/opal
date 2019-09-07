@@ -80,7 +80,7 @@ module Opal
     autoload :Server,      'opal/cli_runners/server'
 
     register_runner :applescript, :Applescript
-    register_runner :chrome,      legacy_runner(:Chrome)
+    register_runner :chrome,      :Chrome
     register_runner :nashorn,     :Nashorn
     register_runner :nodejs,      :Nodejs
     register_runner :server,      legacy_runner(:Server)
