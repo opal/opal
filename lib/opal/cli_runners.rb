@@ -57,21 +57,6 @@ module Opal
       nil
     end
 
-    # @private
-    #
-    # A wrapper to support the old runner API
-    def self.legacy_runner(klass_name)
-      runner = ->(data) {
-        klass = const_get(klass_name)
-        runner = klass.new((data[:options] || {}).merge(output: data[:output]))
-        builder = data[:builder]
-        compiled_source = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
-        runner.run(compiled_source, data[:argv])
-        runner.exit_status
-      }
-    end
-    private_class_method :legacy_runner
-
     autoload :Applescript, 'opal/cli_runners/applescript'
     autoload :Compiler,    'opal/cli_runners/compiler'
     autoload :Chrome,      'opal/cli_runners/chrome'
