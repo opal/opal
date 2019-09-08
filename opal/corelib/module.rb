@@ -82,6 +82,8 @@ class Module
   end
 
   def alias_method(newname, oldname)
+    newname = Opal.coerce_to newname, String, :to_str
+    oldname = Opal.coerce_to oldname, String, :to_str
     `Opal.alias(self, newname, oldname)`
 
     self
@@ -107,7 +109,18 @@ class Module
     attr_writer(*names)
   end
 
-  alias attr attr_accessor
+  def attr(*args)
+    %x{
+      if (args.length == 2 && (args[1] === true || args[1] === false)) {
+        #{warn 'optional boolean argument is obsoleted', uplevel: 1}
+
+        args[1] ? #{attr_accessor(`args[0]`)} : #{attr_reader(`args[0]`)};
+        return nil;
+      }
+    }
+
+    attr_reader(*args)
+  end
 
   def attr_reader(*names)
     %x{

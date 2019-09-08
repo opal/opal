@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Array" do
   fails "Array#* with a string with a tainted separator does not taint the result if the array has only one element"
   fails "Array#* with a string with a tainted separator does not taint the result if the array is empty"
@@ -14,6 +15,10 @@ opal_unsupported_filter "Array" do
   fails "Array#+ does not get infected even if an original array is tainted"
   fails "Array#+ does not infected even if an original array is untrusted"
   fails "Array#<< raises a RuntimeError on a frozen array"
+  fails "Array#[] raises a RangeError when the length is out of range of Fixnum"
+  fails "Array#[] raises a RangeError when the start index is out of range of Fixnum"
+  fails "Array#[]= checks frozen before attempting to coerce arguments"
+  fails "Array#[]= raises a RuntimeError on a frozen array"
   fails "Array#clear keeps tainted status"
   fails "Array#clear keeps untrusted status"
   fails "Array#clear raises a RuntimeError on a frozen array"
@@ -66,8 +71,8 @@ opal_unsupported_filter "Array" do
   fails "Array#flatten! raises a RuntimeError on frozen arrays when the array would not be modified"
   fails "Array#frozen? returns false for an array being sorted by #sort"
   fails "Array#frozen? returns true if array is frozen"
-  fails "Array#hash returns the same fixnum for arrays with the same content"
   fails "Array#hash calls to_int on result of calling hash on each element"
+  fails "Array#hash returns the same fixnum for arrays with the same content"
   fails "Array#initialize is private"
   fails "Array#initialize raises a RuntimeError on frozen arrays"
   fails "Array#insert raises a RuntimeError on frozen arrays when the array is modified"
@@ -79,10 +84,11 @@ opal_unsupported_filter "Array" do
   fails "Array#inspect taints the result if the Array is non-empty and tainted"
   fails "Array#inspect untrusts the result if an element is untrusted"
   fails "Array#inspect untrusts the result if the Array is untrusted"
+  fails "Array#inspect with encoding does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
   fails "Array#inspect with encoding raises if inspected result is not default external encoding"
   fails "Array#inspect with encoding returns a US-ASCII string for an empty Array"
-  fails "Array#inspect with encoding use the default external encoding if it is ascii compatible"
   fails "Array#inspect with encoding use US-ASCII encoding if the default external encoding is not ascii compatible"
+  fails "Array#inspect with encoding use the default external encoding if it is ascii compatible"
   fails "Array#join does not taint the result if the Array is tainted but empty"
   fails "Array#join does not untrust the result if the Array is untrusted but empty"
   fails "Array#join fails for arrays with incompatibly-encoded strings"
@@ -147,10 +153,11 @@ opal_unsupported_filter "Array" do
   fails "Array#to_s taints the result if the Array is non-empty and tainted"
   fails "Array#to_s untrusts the result if an element is untrusted"
   fails "Array#to_s untrusts the result if the Array is untrusted"
+  fails "Array#to_s with encoding does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
   fails "Array#to_s with encoding raises if inspected result is not default external encoding"
   fails "Array#to_s with encoding returns a US-ASCII string for an empty Array"
-  fails "Array#to_s with encoding use the default external encoding if it is ascii compatible"
   fails "Array#to_s with encoding use US-ASCII encoding if the default external encoding is not ascii compatible"
+  fails "Array#to_s with encoding use the default external encoding if it is ascii compatible"
   fails "Array#uniq compares elements with matching hash codes with #eql?" #RubySpec uses taint, which is not supported on Opal.
   fails "Array#uniq uses eql? semantics" #RubySpec expects 1.0 and 1 to be seen as different, which is not supported on Opal.
   fails "Array#uniq! doesn't yield to the block on a frozen array"
@@ -158,10 +165,4 @@ opal_unsupported_filter "Array" do
   fails "Array#uniq! raises a RuntimeError on a frozen array when the array would not be modified"
   fails "Array#unshift raises a RuntimeError on a frozen array when the array is modified"
   fails "Array#unshift raises a RuntimeError on a frozen array when the array would not be modified"
-  fails "Array#[] raises a RangeError when the length is out of range of Fixnum"
-  fails "Array#[] raises a RangeError when the start index is out of range of Fixnum"
-  fails "Array#[]= checks frozen before attempting to coerce arguments"
-  fails "Array#[]= raises a RuntimeError on a frozen array"
-  fails "Array#inspect with encoding does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
-  fails "Array#to_s with encoding does not raise if inspected result is not default external encoding" # NoMethodError: undefined method `encode!' for "\"utf_16be あ\"":String
 end

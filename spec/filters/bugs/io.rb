@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "IO" do
   fails "IO::EAGAINWaitReadable combines Errno::EAGAIN and IO::WaitReadable" # NameError: uninitialized constant IO::EAGAINWaitReadable
   fails "IO::EAGAINWaitReadable is the same as IO::EWOULDBLOCKWaitReadable if Errno::EAGAIN is the same as Errno::EWOULDBLOCK" # NameError: uninitialized constant Errno::EAGAIN

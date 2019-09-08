@@ -25,7 +25,7 @@ class Enumerator
       @args   = []
       @size   = `arguments[0] || nil`
 
-      if @size
+      if @size && !@size.respond_to?(:call)
         @size = Opal.coerce_to @size, Integer, :to_int
       end
     else
@@ -47,7 +47,7 @@ class Enumerator
   end
 
   def size
-    Proc === @size ? @size.call(*@args) : @size
+    @size.respond_to?(:call) ? @size.call(*@args) : @size
   end
 
   def with_index(offset = 0, &block)
@@ -76,6 +76,13 @@ class Enumerator
   end
 
   alias with_object each_with_object
+
+  def each_with_index(&block)
+    return enum_for(:each_with_index) { size } unless block_given?
+
+    super
+    @object
+  end
 
   def inspect
     result = "#<#{self.class}: #{@object.inspect}:#{@method}"

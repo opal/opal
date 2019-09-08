@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Enumerable" do
   fails "Enumerable#chunk does not return elements for which the block returns :_separator"
   fails "Enumerable#chunk raises a RuntimeError if the block returns a Symbol starting with an underscore other than :_alone or :_separator"

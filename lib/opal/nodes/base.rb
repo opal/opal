@@ -62,7 +62,7 @@ module Opal
       end
 
       def unshift(*strs)
-        strs.reverse.each do |str|
+        strs.reverse_each do |str|
           str = fragment(str) if str.is_a?(String)
           @fragments.unshift str
         end

@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "language" do
   fails "A Symbol literal with invalid bytes raises an EncodingError at parse time" # Actually passes, the error comes from the difference between MRI's opal and compiled opal-parser
   fails "A block yielded a single Array assigns elements to required arguments when a keyword rest argument is present"
@@ -11,9 +12,9 @@ opal_filter "language" do
   fails "A block yielded a single Array raises a TypeError if #to_hash does not return a Hash"
   fails "A block yielded a single Array when non-symbol keys are in a keyword arguments Hash separates non-symbol keys and symbol keys" # Expected [nil, {"a"=>10, "b"=>2}] to equal [{"a"=>10}, {"b"=>2}]
   fails "A class definition allows using self as the superclass if self is a class"
+  fails "A class definition extending an object (sclass) allows accessing the block of the original scope" # Opal::SyntaxError: undefined method `uses_block!' for nil
   fails "A class definition extending an object (sclass) can use return to cause the enclosing method to return"
   fails "A class definition extending an object (sclass) raises a TypeError when trying to extend numbers"
-  fails "A class definition extending an object (sclass) allows accessing the block of the original scope" # Opal::SyntaxError: undefined method `uses_block!' for nil
   fails "A class definition raises TypeError if any constant qualifying the class is not a Module"
   fails "A class definition raises TypeError if the constant qualifying the class is nil"
   fails "A class definition raises a TypeError if inheriting from a metaclass"
@@ -83,8 +84,8 @@ opal_filter "language" do
   fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for BasicObject
   fails "Heredoc string allow HEREDOC with <<\"identifier\", interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<'identifier', no interpolation" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "Heredoc string allows HEREDOC with <<-\"identifier\", allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<-'identifier', allowing to indent identifier, no interpolation" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Heredoc string allows HEREDOC with <<-\"identifier\", allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<-identifier, allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Instantiating a singleton class raises a TypeError when allocate is called"
@@ -102,7 +103,6 @@ opal_filter "language" do
   fails "Literal Regexps supports character class composition"
   fails "Literal Regexps supports conditional regular expressions with named capture groups" # Exception: named captures are not supported in javascript: "^(?<word>foo)?(?(<word>)(T)|(F))$"
   fails "Literal Regexps supports conditional regular expressions with positional capture groups" # Exception: Invalid regular expression: /^(foo)?(?(1)(T)|(F))$/: Invalid group
-  fails "Literal Regexps supports conditional regular expressions with positional capture groups" # Exception: named captures are not supported in javascript: "^(?<word>foo)?(?(<word>)(T)|(F))$"
   fails "Literal Regexps supports escaping characters when used as a terminator" # Expected "!" to equal "(?-mix:!)"
   fails "Literal Regexps supports possessive quantifiers"
   fails "Literal Regexps throws SyntaxError for malformed literals"
@@ -127,6 +127,15 @@ opal_filter "language" do
   fails "Magic comments in a required file do not cause bytes to be mangled by passing them through the wrong encoding" # Expected nil to equal "[167, 65, 166, 110]"
   fails "Magic comments in a required file must be at the first line" # Expected nil to equal "UTF-8"
   fails "Magic comments in a required file must be the first token of the line" # Expected nil to equal "UTF-8"
+  fails "Magic comments in an -e argument are case-insensitive" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument are optional" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument can be after the shebang" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument can take Emacs style" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument can take vim style" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument determine __ENCODING__" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument do not cause bytes to be mangled by passing them through the wrong encoding" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument must be at the first line" # ArgumentError: unknown encoding name - locale
+  fails "Magic comments in an -e argument must be the first token of the line" # ArgumentError: unknown encoding name - locale
   fails "Magic comments in an eval are case-insensitive" # ArgumentError: [File.read] wrong number of arguments(2 for 1)
   fails "Magic comments in an eval are optional" # ArgumentError: [File.read] wrong number of arguments(2 for 1)
   fails "Magic comments in an eval can be after the shebang" # ArgumentError: [File.read] wrong number of arguments(2 for 1)
@@ -154,23 +163,13 @@ opal_filter "language" do
   fails "Magic comments in the main file do not cause bytes to be mangled by passing them through the wrong encoding" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x8aa2e>
   fails "Magic comments in the main file must be at the first line" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x8aa2e>
   fails "Magic comments in the main file must be the first token of the line" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x8aa2e>
-  fails "Magic comments in an -e argument can take Emacs style" # ArgumentError: unknown encoding name - locale
-  fails "Magic comments in an -e argument are optional" # ArgumentError: unknown encoding name - locale
-  fails "Magic comments in an -e argument can be after the shebang" # ArgumentError: unknown encoding name - locale
-  fails "Magic comments in an -e argument are case-insensitive" # ArgumentError: unknown encoding name - locale
-  fails "Magic comments in an -e argument must be at the first line" # ArgumentError: unknown encoding name - locale
-  fails "Magic comments in an -e argument must be the first token of the line" # ArgumentError: unknown encoding name - locale
-  fails "Magic comments in an -e argument determine __ENCODING__" # ArgumentError: unknown encoding name - locale
-  fails "Magic comments in an -e argument can take vim style" # ArgumentError: unknown encoding name - locale
-  fails "Magic comments in an -e argument do not cause bytes to be mangled by passing them through the wrong encoding" # ArgumentError: unknown encoding name - locale
   fails "NoMethodError#message calls receiver.inspect only when calling Exception#message" # Expected ["inspect_called"] to equal []
   fails "NoMethodError#message fallbacks to a simpler representation of the receiver when receiver.inspect raises an exception" # NoMethodError: undefined method `name' for #<NoMethodErrorSpecs::InstanceException: NoMethodErrorSpecs::InstanceException>
   fails "Operators * / % are left-associative"
   fails "Operators .. ... have higher precedence than ? :" # NoMethodError: undefined method `from' for #<MSpecEnv:0x772d6>
-  fails "Operators .. ... have higher precedence than ? :" # NoMethodError: undefined method `from' for #<MSpecEnv:0x772d6>
-  fails "Optional variable assignments using compunded constants with ||= assignments"
   fails "Optional variable assignments using compounded constants with &&= assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compounded constants with operator assignments" # Expected warning to match: /already initialized constant/ but got: ""
+  fails "Optional variable assignments using compunded constants with ||= assignments"
   fails "Post-args with optional args with a circular argument reference shadows an existing local with the same name as the argument"
   fails "Post-args with optional args with a circular argument reference shadows an existing method with the same name as the argument"
   fails "Predefined global $+ captures the last non nil capture"
@@ -213,12 +212,12 @@ opal_filter "language" do
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by a relative path" # we can't clear $LOADED_FEATURES, should be treated as readonly
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by an absolute path" # we can't clear $LOADED_FEATURES, should be treated as readonly
   fails "The __LINE__ pseudo-variable equals the line number of the text in a loaded file"
+  fails "The alias keyword can create a new global variable, synonym of the original" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
+  fails "The alias keyword can override an existing global variable and make them synonyms" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
   fails "The alias keyword is not allowed against Fixnum or String instances"
   fails "The alias keyword on top level defines the alias on Object"
   fails "The alias keyword operates on methods defined via attr, attr_reader, and attr_accessor"
   fails "The alias keyword operates on the object's metaclass when used in instance_eval"
-  fails "The alias keyword can create a new global variable, synonym of the original" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
-  fails "The alias keyword can override an existing global variable and make them synonyms" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
   fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when calling the block from a method"
   fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when yielding to the block"
   fails "The break statement in a captured block from another thread raises a LocalJumpError when getting the value from another thread" # NameError: uninitialized constant Thread
@@ -229,8 +228,14 @@ opal_filter "language" do
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from a method"
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from the toplevel"
   fails "The break statement in a lambda from a scope that has returned raises a LocalJumpError when yielding to a lambda passed as a block argument"
+  fails "The break statement in a lambda from a scope that has returned returns a value to the block scope invoking the lambda in a method" # Exception: $brk is not defined
+  fails "The break statement in a lambda from a scope that has returned returns a value to the method scope invoking the lambda" # Exception: $brk is not defined
   fails "The break statement in a lambda returns from the call site if the lambda is passed as a block" # Expected ["before", "unreachable1", "unreachable2", "after"] to equal ["before", "after"]
+  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns a value to a block scope invoking the lambda in a method below" # Exception: $brk is not defined
+  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns a value to the method scope below invoking the lambda" # Exception: $brk is not defined
+  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns a value to the scope creating and calling the lambda" # Exception: $brk is not defined
   fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns from the lambda" # Exception: unexpected break
+  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns nil when not passed an argument" # Exception: $brk is not defined
   fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility"
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the class" # Expected "constant" to be nil
@@ -269,10 +274,10 @@ opal_filter "language" do
   fails "The retry statement raises a SyntaxError when used outside of a begin statement"
   fails "The retry statement re-executes the closest block"
   fails "The return keyword at top level within a block within a class is allowed" # Exception: path.substr is not a function
-  fails "The return keyword at top level within a block within a class is allowed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x77376>
   fails "The super keyword passes along modified rest args when they were originally empty"
   fails "The super keyword passes along modified rest args when they weren't originally empty"
   fails "The super keyword passes along reassigned rest args" # Expected ["bar"] to equal ["foo"]
+  fails "The super keyword uses block argument given to method when used in a block" # LocalJumpError: no block given
   fails "The super keyword uses given block even if arguments are passed explicitly"
   fails "The super keyword when using keyword arguments passes any given keyword arguments including optional and required ones to the parent"
   fails "The super keyword when using keyword arguments passes default argument values to the parent" # Expected {} to equal {"b"=>"b"}

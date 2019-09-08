@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Range" do
   fails "Range#initialize is private"
   fails "Range#inspect returns a tainted string if either end is tainted"

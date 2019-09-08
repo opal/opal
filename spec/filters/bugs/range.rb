@@ -1,6 +1,5 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Range" do
-  fails "Range#== returns true for subclasses of Range"
-  fails "Range#== returns true if other has same begin, end, and exclude_end? values"
   fails "Range#=== requires #succ method to be implemented" # Expected TypeError (/can't iterate from/) but no exception was raised (true was returned)
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers accepts (+/-)Float::INFINITY from the block"
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns an element at an index for which block returns 0"
@@ -12,7 +11,6 @@ opal_filter "Range" do
   fails "Range#bsearch with Float values with a block returning true or false returns nil if the block returns nil for every element"
   fails "Range#bsearch with Float values with a block returning true or false returns the smallest element for which block returns true"
   fails "Range#each raises a TypeError if the first element is a Time object"
-  fails "Range#each when no block is given returned Enumerator size returns the enumerable size"
   fails "Range#eql? returns false if the endpoints are not eql?"
   fails "Range#first raises a TypeError if #to_int does not return an Integer"
   fails "Range#hash generates a Fixnum for the hash value"
