@@ -3,8 +3,20 @@
 module Opal
   module CliRunners
     class Server
-      def initialize(options)
-        @output = options.fetch(:output, $stdout)
+      def self.call(data)
+        runner = new(data)
+        runner.run
+        runner.exit_status
+      end
+
+      def initialize(data)
+        options = data[:options] || {}
+        builder = data[:builder]
+
+        @code = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
+        @argv = data[:argv]
+
+        @output = data[:output] || $stdout
 
         @port = options.fetch(:port, ENV['OPAL_CLI_RUNNERS_SERVER_PORT'] || 3000).to_i
 
@@ -12,9 +24,10 @@ module Opal
         @static_folder = @static_folder == true ? 'public' : @static_folder
         @static_folder = File.expand_path(@static_folder) if @static_folder
       end
-      attr_reader :output, :port, :server, :static_folder
 
-      def run(source, argv)
+      attr_reader :output, :port, :server, :static_folder, :code, :argv
+
+      def run
         unless argv.empty?
           raise ArgumentError, 'Program arguments are not supported on the Server runner'
         end

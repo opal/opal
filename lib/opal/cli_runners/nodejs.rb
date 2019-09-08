@@ -1,52 +1,28 @@
 # frozen_string_literal: true
 
 require 'opal/paths'
-require 'shellwords'
+require 'opal/cli_runners/system_runner'
 
 module Opal
   module CliRunners
     class Nodejs
       NODE_PATH = File.expand_path('../stdlib/nodejs/node_modules', ::Opal.gem_dir)
 
-      def initialize(options)
-        @output = options.fetch(:output, $stdout)
-      end
-      attr_reader :output, :exit_status
+      def self.call(data)
+        (data[:options] ||= {})[:env] = { 'NODE_PATH' => node_modules }
 
-      def puts(*args)
-        output.puts(*args)
-      end
-
-      def node_modules
-        paths = ENV['NODE_PATH'].to_s.split(':')
-        paths << NODE_PATH unless paths.include? NODE_PATH
-        paths.join(':')
-      end
-
-      def run(code, argv)
-        require 'tempfile'
-        tempfile = Tempfile.new('opal-nodejs-runner-')
-        # tempfile = File.new('opal-nodejs-runner.js', 'w') # for debugging
-        tempfile.write code
-        tempfile.close
-        system_with_output({ 'NODE_PATH' => node_modules }, 'node', tempfile.path, *argv)
+        SystemRunner.call(data) do |tempfile|
+          ['node', tempfile.path, *data[:argv]]
+        end
       rescue Errno::ENOENT
         raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
       end
 
-      # Let's support fake IO objects like StringIO
-      def system_with_output(env, *cmd)
-        if IO.try_convert(output)
-          system(env, *cmd)
-          @exit_status = $?.exitstatus
-          return
-        end
-
-        require 'open3'
-        captured_output, status = Open3.capture2(env, *cmd)
-        @exit_status = status.exitstatus
-
-        output.write captured_output
+      # Ensure stdlib node_modules is among NODE_PATHs
+      def self.node_modules
+        ENV['NODE_PATH'].to_s.split(':').tap do |paths|
+          paths << NODE_PATH unless paths.include? NODE_PATH
+        end.join(':')
       end
 
       class MissingNodeJS < RunnerError

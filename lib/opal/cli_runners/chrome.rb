@@ -12,12 +12,28 @@ module Opal
       DEFAULT_CHROME_HOST = 'localhost'
       DEFAULT_CHROME_PORT = 9222
 
-      def initialize(options)
+      def self.call(data)
+        runner = new(data)
+        runner.run
+        runner.exit_status
+      end
+
+      def initialize(data)
+        builder = data[:builder]
+        options = data[:options]
+        argv    = data[:argv]
+
+        if argv && argv.any?
+          warn "warning: ARGV is not supported by the Chrome runner #{argv.inspect}"
+        end
+
+        @code = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
         @output = options.fetch(:output, $stdout)
       end
-      attr_reader :output, :exit_status
 
-      def run(code, _argv)
+      attr_reader :output, :exit_status, :code
+
+      def run
         with_chrome_server do
           cmd = [
             'env',

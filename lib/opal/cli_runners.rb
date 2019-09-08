@@ -40,7 +40,10 @@ module Opal
     # @param runner [#call] a callable object that will act as the "runner"
     # @param runner [Symbol] a constant name that once autoloaded will point to
     #                        a callable.
-    def self.register_runner(name, runner)
+    # @param path [nil,String] a path for setting up autoload on the constant
+    def self.register_runner(name, runner, path = nil)
+      autoload runner, path if path
+
       if runner.respond_to?(:call)
         self[name] = runner
       else
@@ -57,34 +60,12 @@ module Opal
       nil
     end
 
-    # @private
-    #
-    # A wrapper to support the old runner API
-    def self.legacy_runner(klass_name)
-      runner = ->(data) {
-        klass = const_get(klass_name)
-        runner = klass.new((data[:options] || {}).merge(output: data[:output]))
-        builder = data[:builder]
-        compiled_source = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
-        runner.run(compiled_source, data[:argv])
-        runner.exit_status
-      }
-    end
-    private_class_method :legacy_runner
-
-    autoload :Applescript, 'opal/cli_runners/applescript'
-    autoload :Compiler,    'opal/cli_runners/compiler'
-    autoload :Chrome,      'opal/cli_runners/chrome'
-    autoload :Nashorn,     'opal/cli_runners/nashorn'
-    autoload :Nodejs,      'opal/cli_runners/nodejs'
-    autoload :Server,      'opal/cli_runners/server'
-
-    register_runner :applescript, legacy_runner(:Applescript)
-    register_runner :chrome,      legacy_runner(:Chrome)
-    register_runner :nashorn,     legacy_runner(:Nashorn)
-    register_runner :nodejs,      legacy_runner(:Nodejs)
-    register_runner :server,      legacy_runner(:Server)
-    register_runner :compiler,    :Compiler
+    register_runner :applescript, :Applescript, 'opal/cli_runners/applescript'
+    register_runner :chrome,      :Chrome,      'opal/cli_runners/chrome'
+    register_runner :compiler,    :Compiler,    'opal/cli_runners/compiler'
+    register_runner :nashorn,     :Nashorn,     'opal/cli_runners/nashorn'
+    register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
+    register_runner :server,      :Server,      'opal/cli_runners/server'
 
     alias_runner :osascript, :applescript
     alias_runner :node, :nodejs
