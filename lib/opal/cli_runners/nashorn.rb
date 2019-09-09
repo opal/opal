@@ -1,31 +1,21 @@
 # frozen_string_literal: true
 
 require 'opal/paths'
-require 'opal/cli_runners/generic_system_runner'
+require 'opal/cli_runners/system_runner'
 
 module Opal
   module CliRunners
     class Nashorn
-      include GenericSystemRunner
+      def self.call(data)
+        # Allow to change path if using GraalVM, see:
+        # https://github.com/graalvm/graaljs/blob/master/docs/user/NashornMigrationGuide.md#launcher-name-js
+        exe = ENV['NASHORN_PATH'] || 'jjs'
 
-      def initialize(options)
-        @output = options.fetch(:output, $stdout)
-        @tempfile_prefix = 'opal-nashorn-output'
-      end
-      attr_reader :output, :exit_status
-
-      def puts(*args)
-        output.puts(*args)
-      end
-
-      def run(code, argv)
-        require 'tempfile'
-        tempfile = Tempfile.new('opal-nashorn-runner-')
-        tempfile.write code
-        tempfile.close
-        system_with_output({}, 'jjs', tempfile.path, *argv)
+        SystemRunner.call(data) do |tempfile|
+          [exe, tempfile.path, *data[:argv]]
+        end
       rescue Errno::ENOENT
-        raise MissingNashorn, 'Please install JDK to be able to run Opal scripts.'
+        raise MissingNashorn, 'Please install JDK or GraalVM to be able to run Opal scripts.'
       end
 
       class MissingNashorn < RunnerError

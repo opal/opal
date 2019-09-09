@@ -75,7 +75,7 @@ matrix:
     - rvm: truffleruby
       env: RUN=rspec
 
-    - rvm: jruby-9.2.4.1
+    - rvm: jruby-9.2.8.0
       env: RUN=rspec
 
     - rvm: jruby-head
