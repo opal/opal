@@ -14,14 +14,9 @@ node_modules
 .rvmrc
 .rspec-local
 /coverage
-.owl_cache
-npm/*.tgz
-npm/opal*.js
-npm/parser*.js
-npm/*.js.map
+/npm
 package-lock.json
 
 # Ignore old submodules, useful when switching branches
 spec/corelib
 spec/rubyspec
-*~
