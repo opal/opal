@@ -1,4 +1,4 @@
-(function(undefined) {
+(function() {
   // @note
   //   A few conventions for the documentation of this file:
   //   1. Always use "//" (in contrast with "/**/")
@@ -31,9 +31,9 @@
   if (!('log' in console)) { console.log = function () {}; }
   if (!('warn' in console)) { console.warn = console.log; }
 
-  if (typeof(this.Opal) !== 'undefined') {
+  if (typeof(global_object.Opal) !== 'undefined') {
     console.warn('Opal already loaded. Loading twice can cause troubles, please fix your setup.');
-    return this.Opal;
+    return global_object.Opal;
   }
 
   var nil;
@@ -52,7 +52,7 @@
   var Class;
 
   // The Opal object that is exposed globally
-  var Opal = this.Opal = {};
+  var Opal = global_object.Opal = {};
 
   // This is a useful reference to global object inside ruby files
   Opal.global = global_object;
@@ -2409,4 +2409,4 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
-}).call(this);
+}).call();
