@@ -6,6 +6,7 @@ require 'opal/fragment'
 require 'opal/nodes'
 require 'opal/eof_content'
 require 'opal/errors'
+require 'opal/magic_comments'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -157,6 +158,9 @@ module Opal
     # Comments from the source code
     attr_reader :comments
 
+    # Magic comment flags extracted from the leading comments
+    attr_reader :magic_comment_flags
+
     def initialize(source, options = {})
       @source = source
       @indent = ''
@@ -188,6 +192,7 @@ module Opal
 
       @sexp = s(:top, sexp || s(:nil))
       @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
+      @magic_comment_flags = MagicComments.parse(sexp, comments)
       @eof_content = EofContent.new(tokens, @source).eof
     end
 
