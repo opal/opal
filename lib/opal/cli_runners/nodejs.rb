@@ -9,7 +9,9 @@ module Opal
       NODE_PATH = File.expand_path('../stdlib/nodejs/node_modules', ::Opal.gem_dir)
 
       def self.call(data)
-        (data[:options] ||= {})[:env] = { 'NODE_PATH' => node_modules }
+        data[:options] ||= {}
+        data[:options][:env] ||= {}
+        data[:options][:env]['NODE_PATH'] ||= node_modules
 
         SystemRunner.call(data) do |tempfile|
           ['node', tempfile.path, *data[:argv]]

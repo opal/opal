@@ -52,6 +52,9 @@ matrix:
       env: RUN=mspec_ruby_nodejs TZ="/usr/share/zoneinfo/Pacific/Fiji"
 
     - rvm: 2.5.3
+      env: RUN=mspec_ruby_nodejs NODE_OPTIONS=" --use_strict "
+
+    - rvm: 2.5.3
       env: RUN=minitest
 
     - rvm: 2.5.3
