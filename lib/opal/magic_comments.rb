@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Opal::MagicComments
-  MAGIC_COMMENT_RE = /\A# *([\w_]+) *: *([\w_]+) *$/.freeze
-  EMACS_MAGIC_COMMENT_RE = /\A# *-\*- *([\w_]+) *: *([\w_]+) *-\*- *$/.freeze
+  MAGIC_COMMENT_RE = /\A# *(\w+) *: *(\w+) *$/.freeze
+  EMACS_MAGIC_COMMENT_RE = /\A# *-\*- *(\w+) *: *(\w+) *-\*- *$/.freeze
 
   def self.parse(sexp, comments)
     flags = {}
