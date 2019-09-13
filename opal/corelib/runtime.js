@@ -183,7 +183,7 @@
 
   // Walk up the nesting array looking for the constant
   function const_lookup_nesting(nesting, name) {
-    var i, ii, result, constant;
+    var i, ii, constant;
 
     if (nesting.length === 0) return;
 
@@ -197,7 +197,7 @@
 
   // Walk up the ancestors chain looking for the constant
   function const_lookup_ancestors(cref, name) {
-    var i, ii, result, ancestors;
+    var i, ii, ancestors;
 
     if (cref == null) return;
 
@@ -333,7 +333,7 @@
   Opal.constants = function(cref, inherit) {
     if (inherit == null) inherit = true;
 
-    var module, modules = [cref], module_constants, i, ii, constants = {}, constant;
+    var module, modules = [cref], i, ii, constants = {}, constant;
 
     if (inherit) modules = modules.concat(Opal.ancestors(cref));
     if (inherit && cref.$$is_module) modules = modules.concat([Opal.Object]).concat(Opal.ancestors(Opal.Object));
