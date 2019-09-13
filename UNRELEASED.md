@@ -9,6 +9,7 @@ Whitespace conventions:
 
 - Basic support for `uplevel:` keyword argument in `Kernel#warn` (#2006)
 - Added a `#respond_to_missing?` implementation for `BasicObject`, `Delegator`, `OpenStruct`, that's meant for future support in the Opal runtime, which currently ignores it (#2007)
+- `Opal::Compiler#magic_comment_flags` that allows to access magic-comments format and converts it to a hash
 
 ### Fixed
 

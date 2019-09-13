@@ -464,6 +464,51 @@ RSpec.describe Opal::Compiler do
     end
   end
 
+  describe '#magic_comment_flags' do
+    def expect_magic_comments_for(*lines)
+      expect(compiler_for(lines.join("\n")).magic_comment_flags)
+    end
+
+    it 'extracts them in a hash' do
+      expect_magic_comments_for("").to eq({})
+
+      expect_magic_comments_for(
+        "",
+        "#     foo:true",
+        "",
+        "",
+        "",
+        "#bar : false",
+        "#baz  :qux",
+        "#biz  :boz",
+        "baz",
+      ).to eq(
+        foo: true,
+        bar: false,
+        baz: "qux",
+        biz: "boz"
+      )
+
+      expect_magic_comments_for(
+        "#baz  :qux",
+        "#biz  :boz",
+        "",
+        "baz",
+      ).to eq(
+        baz: "qux",
+        biz: "boz"
+      )
+
+      expect_magic_comments_for(
+        "#-*- baz  :qux-*-",
+        "#   -*-biz  :boz   -*-   ",
+      ).to eq(
+        baz: "qux",
+        biz: "boz"
+      )
+    end
+  end
+
   describe 'magic encoding comment' do
     let(:diagnostics) { [] }
 
