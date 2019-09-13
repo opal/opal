@@ -117,6 +117,10 @@ Lint/LiteralAsCondition:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
 
+# Allow the use of if/unless inside blocks
+Style/Next:
+  Enabled: false
+
 Lint/RescueException:
   Exclude:
     # That's what MRI does
