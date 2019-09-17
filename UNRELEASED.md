@@ -38,6 +38,7 @@ Whitespace conventions:
 
 ### Changed
 
+- Updated outdated parser version (#2013)
 - Nashorn has been deprecated but GraalVM still supports it (#1997)
 - "opal/mini" now includes "opal/io" (#2002)
 - Regexps assigned to constants are now frozen (#2007)
