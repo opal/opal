@@ -103,7 +103,7 @@ namespace :bench do
   end
 
   task :ips do
-    files = Dir[ENV['FILE'] || "#{__dir__}/benchmark-ips/bm_*.rb"]
+    files = Dir[ENV['FILE'] || "#{__dir__}/../benchmark-ips/bm_*.rb"]
     raise ArgumentError, "no files provided" if files.empty?
     puts "=== Files: #{files.join ', '}"
     files.each do |bm_path|
