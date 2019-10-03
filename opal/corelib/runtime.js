@@ -1,4 +1,4 @@
-(function(undefined) {
+(function() {
   // @note
   //   A few conventions for the documentation of this file:
   //   1. Always use "//" (in contrast with "/**/")
@@ -31,9 +31,9 @@
   if (!('log' in console)) { console.log = function () {}; }
   if (!('warn' in console)) { console.warn = console.log; }
 
-  if (typeof(this.Opal) !== 'undefined') {
+  if (typeof(global_object.Opal) !== 'undefined') {
     console.warn('Opal already loaded. Loading twice can cause troubles, please fix your setup.');
-    return this.Opal;
+    return global_object.Opal;
   }
 
   var nil;
@@ -52,13 +52,13 @@
   var Class;
 
   // The Opal object that is exposed globally
-  var Opal = this.Opal = {};
+  var Opal = global_object.Opal = {};
 
   // This is a useful reference to global object inside ruby files
   Opal.global = global_object;
   global_object.Opal = Opal;
 
-  // Configure runtime behavior with regards to require and unsupported fearures
+  // Configure runtime behavior with regards to require and unsupported features
   Opal.config = {
     missing_require_severity: 'error',        // error, warning, ignore
     unsupported_features_severity: 'warning', // error, warning, ignore
@@ -183,7 +183,7 @@
 
   // Walk up the nesting array looking for the constant
   function const_lookup_nesting(nesting, name) {
-    var i, ii, result, constant;
+    var i, ii, constant;
 
     if (nesting.length === 0) return;
 
@@ -197,7 +197,7 @@
 
   // Walk up the ancestors chain looking for the constant
   function const_lookup_ancestors(cref, name) {
-    var i, ii, result, ancestors;
+    var i, ii, ancestors;
 
     if (cref == null) return;
 
@@ -333,7 +333,7 @@
   Opal.constants = function(cref, inherit) {
     if (inherit == null) inherit = true;
 
-    var module, modules = [cref], module_constants, i, ii, constants = {}, constant;
+    var module, modules = [cref], i, ii, constants = {}, constant;
 
     if (inherit) modules = modules.concat(Opal.ancestors(cref));
     if (inherit && cref.$$is_module) modules = modules.concat([Opal.Object]).concat(Opal.ancestors(Opal.Object));
@@ -341,7 +341,7 @@
     for (i = 0, ii = modules.length; i < ii; i++) {
       module = modules[i];
 
-      // Don not show Objects constants unless we're querying Object itself
+      // Do not show Objects constants unless we're querying Object itself
       if (cref !== _Object && module == _Object) break;
 
       for (constant in module.$$const) {
@@ -1847,7 +1847,7 @@
     if (body.$$alias_of) body = body.$$alias_of;
 
     // We need a wrapper because otherwise properties
-    // would be ovrewritten on the original body.
+    // would be overwritten on the original body.
     alias = function() {
       var block = alias.$$p, args, i, ii;
 
@@ -2409,4 +2409,4 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
-}).call(this);
+}).call();
