@@ -14,13 +14,41 @@ class Class
     }
   end
 
-  def allocate
-    %x{
-      var obj = new self.$$constructor();
-      obj.$$id = Opal.uid();
-      return obj;
+  %x{
+    if (typeof OPAL_DEVTOOLS_OBJECT_REGISTRY !== "undefined" && OPAL_DEVTOOLS_OBJECT_REGISTRY) {
+      console.warn("Using Opal Developer Tools Object Registry");
+      if (typeof Opal.opal_devtools_object_registry ==="undefined") {
+        Opal.opal_devtools_object_registry = {};
+      }
+       #{
+        def allocate
+          %x{
+            var obj = new self.$$constructor();
+            obj.$$id = Opal.uid();
+            var full_name = obj.constructor.$$full_name;
+            if (!full_name) { full_name = obj.constructor.$$name; }
+            if (full_name && full_name !== Opal.nil) {
+              if (!Opal.opal_devtools_object_registry[full_name]) {
+                Opal.opal_devtools_object_registry[full_name] = {};
+              }
+              Opal.opal_devtools_object_registry[full_name][obj.$$id.toString()] = obj;
+            }
+            return obj;
+          }
+        end
+      }
+    } else {
+      #{
+        def allocate
+          %x{
+            var obj = new self.$$constructor();
+            obj.$$id = Opal.uid();
+            return obj;
+          }
+        end
+      }
     }
-  end
+  }
 
   def inherited(cls)
   end
