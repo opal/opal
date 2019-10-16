@@ -593,21 +593,62 @@ module Kernel
   end
 
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
-  def require_tree(path)
-    %x{
-      var result = [];
+  def require_tree(path, autoload = false)
+    if !autoload
+      %x{
+        var result = [];
 
-      path = #{File.expand_path(path)}
-      path = Opal.normalize(path);
-      if (path === '.') path = '';
-      for (var name in Opal.modules) {
-        if (#{`name`.start_with?(path)}) {
-          result.push([name, Opal.require(name)]);
+        path = #{File.expand_path(path)}
+        path = Opal.normalize(path);
+        if (path === '.') path = '';
+        for (var name in Opal.modules) {
+          if (#{`name`.start_with?(path)}) {
+            result.push([name, Opal.require(name)]);
+          }
         }
-      }
 
-      return result;
-    }
+        return result;
+      }
+    else
+      dirskip = (autoload == :autoload_dirskip ? true : false)
+      %x{
+        var const_name_from_path = function(path) {
+          var path_parts = path.split('/');
+          if (#{dirskip}) { path_parts = path_parts.slice(1); }
+          var const_part = '';
+          var const_sub_parts = [];
+          for (var i = 0; i < path_parts.length; i++) {
+            const_part = path_parts[i];
+            if (const_part.includes('_')) {
+              const_sub_parts = const_part.split('_');
+            } else if (const_part.includes('-')) {
+              const_sub_parts = const_part.split('-');
+            } else {
+              const_sub_parts = [ const_part ];
+            }
+            for (var k = 0; k < const_sub_parts.length; k++) {
+              const_sub_parts[k] = const_sub_parts[k][0].toUpperCase() + const_sub_parts[k].slice(1);
+            }
+            path_parts[i] = const_sub_parts.join('');
+          }
+          return path_parts.join('::')
+        }
+        var result = [];
+        if (Opal.Object.$$autoload == null) Opal.Object.$$autoload = {};
+        path = #{File.expand_path(path)}
+        path = Opal.normalize(path);
+        if (path === '.') path = '';
+        for (var name in Opal.modules) {
+          if (#{`name`.start_with?(path)}) {
+            result.push([name, true]);
+            Opal.const_cache_version++;
+            var constant = const_name_from_path(name);
+            Opal.Object.$$autoload[constant] = name;
+          }
+        }
+        return result;
+      }
+    end
   end
 
   alias send        __send__
