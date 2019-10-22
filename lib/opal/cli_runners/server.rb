@@ -14,7 +14,7 @@ module Opal
         builder = data[:builder]
 
         @code = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
-        @argv = data[:argv]
+        @argv = data[:argv] || []
 
         @output = data[:output] || $stdout
 
@@ -36,7 +36,7 @@ module Opal
         require 'webrick'
         require 'logger'
 
-        app = build_app(source)
+        app = build_app(code)
 
         @server = Rack::Server.start(
           app:       app,
