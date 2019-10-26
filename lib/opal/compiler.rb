@@ -164,7 +164,7 @@ module Opal
     attr_reader :comments
 
     # Magic comment flags extracted from the leading comments
-    attr_reader :magic_comment_flags
+    attr_reader :magic_comments
 
     def initialize(source, options = {})
       @source = source
@@ -173,6 +173,7 @@ module Opal
       @options = options
       @comments = Hash.new([])
       @case_stmt = nil
+      @magic_comments = {}
     end
 
     # Compile some ruby code to a string.
@@ -197,7 +198,7 @@ module Opal
 
       @sexp = s(:top, sexp || s(:nil))
       @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
-      @magic_comment_flags = MagicComments.parse(sexp, comments)
+      @magic_comments = MagicComments.parse(sexp, comments)
       @eof_content = EofContent.new(tokens, @source).eof
     end
 

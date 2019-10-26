@@ -464,9 +464,9 @@ RSpec.describe Opal::Compiler do
     end
   end
 
-  describe '#magic_comment_flags' do
+  describe '#magic_comments' do
     def expect_magic_comments_for(*lines)
-      expect(compiler_for(lines.join("\n")).magic_comment_flags)
+      expect(compiler_for(lines.join("\n")).magic_comments)
     end
 
     it 'extracts them in a hash' do
