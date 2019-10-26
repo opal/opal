@@ -61,6 +61,7 @@ module Opal
     # Defines a compiler option.
     # @option as: [Symbol] uses a different method name, e.g. with a question mark for booleans
     # @option default: [Object] the default value for the option
+    # @option magic_comment: [Bool] allows magic-comments to override the option value
     def self.compiler_option(name, config = {})
       method_name = config.fetch(:as, name)
       define_method(method_name) { option_value(name, config) }
@@ -72,8 +73,13 @@ module Opal
 
       default_value = config[:default]
       valid_values  = config[:valid_values]
+      magic_comment = config[:magic_comment]
 
       value = @options.fetch(name, default_value)
+
+      if magic_comment && @magic_comments.key?(name)
+        value = @magic_comments.fetch(name)
+      end
 
       if valid_values && !valid_values.include?(value)
         raise(
@@ -152,7 +158,7 @@ module Opal
     # @!method use_strict?
     #
     # Adds source_location for every method definition
-    compiler_option :use_strict, default: false, as: :use_strict?
+    compiler_option :use_strict, default: false, as: :use_strict?, magic_comment: true
 
     # @!method parse_comments?
     #
