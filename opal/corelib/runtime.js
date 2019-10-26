@@ -135,7 +135,7 @@
       // String class is the only class that:
       // + compiles to JS primitive
       // + allows method definition directly on instances
-      // numbers, true, false and nil do not support it.
+      // numbers, true, false and null do not support it.
       object[name] = initialValue;
     } else {
       Object.defineProperty(object, name, {
