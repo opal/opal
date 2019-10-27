@@ -1,24 +1,22 @@
 require 'corelib/string'
 
 class Encoding
-  `Opal.defineProperty(self, '$$register', {})`
-
   def self.register(name, options = {}, &block)
     names    = [name] + (options[:aliases] || [])
     encoding = Class.new(self, &block)
                     .new(name, names, options[:ascii] || false, options[:dummy] || false)
 
-    register = self.JS['$$register']
+    register = `Opal.encodings`
     names.each do |encoding_name|
       const_set encoding_name.sub('-', '_'), encoding
-      register.JS["$$#{encoding_name}"] = encoding
+      register.JS[encoding_name] = encoding
     end
   end
 
   def self.find(name)
     return default_external if name == :default_external
-    register = self.JS['$$register']
-    encoding = register.JS["$$#{name}"] || register.JS["$$#{name.upcase}"]
+    register = `Opal.encodings`
+    encoding = register.JS[name] || register.JS[name.upcase]
     raise ArgumentError, "unknown encoding name - #{name}" unless encoding
     encoding
   end
@@ -208,7 +206,8 @@ class String
 
       if (encoding === self.encoding) { return self; }
 
-      self.encoding = encoding;
+      Opal.set_encoding(self, encoding);
+
       return self;
     }
   end

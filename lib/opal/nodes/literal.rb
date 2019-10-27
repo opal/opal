@@ -66,7 +66,8 @@ module Opal
           encoding = string_value.encoding
 
           unless encoding == Encoding::UTF_8
-            push '.$force_encoding("', encoding.name, '")'
+            helper :enc
+            wrap "$enc(", ", \"#{encoding.name}\")"
           end
         end
       end
