@@ -23,9 +23,7 @@ class Encoding
     encoding
   end
 
-  class << self
-    attr_accessor :default_external
-  end
+  singleton_class.attr_accessor :default_external
 
   attr_reader :name, :names
 
