@@ -2,9 +2,12 @@ require 'corelib/string'
 
 class Encoding
   def self.register(name, options = {}, &block)
-    names    = [name] + (options[:aliases] || [])
-    encoding = Class.new(self, &block)
-                    .new(name, names, options[:ascii] || false, options[:dummy] || false)
+    names = [name] + (options[:aliases] || [])
+    ascii = options[:ascii] || false
+    dummy = options[:dummy] || false
+
+    encoding = new(name, names, ascii, dummy)
+    encoding.instance_eval(&block)
 
     register = `Opal.encodings`
     names.each do |encoding_name|
