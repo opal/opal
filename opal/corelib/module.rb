@@ -183,6 +183,14 @@ class Module
     }
   end
 
+  def autoload?(const)
+    %x{
+      var path = self.$$autoload[#{const}];
+      if (path) { return path; }
+      return nil;
+    }
+  end
+
   def class_variables
     `Object.keys(Opal.class_variables(self))`
   end
