@@ -944,10 +944,10 @@
       // because there are no intermediate classes between `parent` and `next ancestor`.
       // It doesn't break any prototypes of other objects as we don't change class references.
 
-      var proto = includer.$$prototype, parent = proto, module_iclass = Object.getPrototypeOf(parent);
+      var parent = includer.$$prototype, module_iclass = Object.getPrototypeOf(parent);
 
       while (module_iclass != null) {
-        if (isRoot(module_iclass) && module_iclass.$$module === module) {
+        if (module_iclass.$$module === module && isRoot(module_iclass)) {
           break;
         }
 
@@ -955,16 +955,23 @@
         module_iclass = Object.getPrototypeOf(module_iclass);
       }
 
-      // in case module_iclass is null, use the last parent
-      var next_ancestor = Object.getPrototypeOf(module_iclass ? module_iclass : parent);
+      if (module_iclass) {
+        // module has been directly included
+        var next_ancestor = Object.getPrototypeOf(module_iclass);
 
-      // skip non-root iclasses (that were recursively included)
-      while (next_ancestor.hasOwnProperty('$$iclass') && !isRoot(next_ancestor)) {
-        next_ancestor = Object.getPrototypeOf(next_ancestor);
+        // skip non-root iclasses (that were recursively included)
+        while (next_ancestor.hasOwnProperty('$$iclass') && !isRoot(next_ancestor)) {
+          next_ancestor = Object.getPrototypeOf(next_ancestor);
+        }
+
+        start_chain_after = parent;
+        end_chain_on = next_ancestor;
+      } else {
+        // module has not been directly included but was in ancestor chain because it was included by another module
+        // include it directly
+        start_chain_after = includer.$$prototype;
+        end_chain_on = Object.getPrototypeOf(includer.$$prototype);
       }
-
-      start_chain_after = parent;
-      end_chain_on = next_ancestor;
     }
 
     $setPrototype(start_chain_after, chain.first);
