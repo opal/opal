@@ -950,7 +950,7 @@
       var proto = includer.$$prototype, parent = proto, module_iclass = Object.getPrototypeOf(parent);
 
       while (module_iclass != null) {
-        if (isRoot(module_iclass) && module_iclass.$$module === module) {
+        if (module_iclass.$$module === module && isRoot(module_iclass)) {
           break;
         }
 
