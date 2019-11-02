@@ -947,7 +947,7 @@
       // because there are no intermediate classes between `parent` and `next ancestor`.
       // It doesn't break any prototypes of other objects as we don't change class references.
 
-      var proto = includer.$$prototype, parent = proto, module_iclass = Object.getPrototypeOf(parent);
+      var parent = includer.$$prototype, module_iclass = Object.getPrototypeOf(parent);
 
       while (module_iclass != null) {
         if (module_iclass.$$module === module && isRoot(module_iclass)) {
