@@ -185,8 +185,10 @@ class Module
 
   def autoload?(const)
     %x{
-      var path = self.$$autoload[#{const}];
-      if (path) { return path; }
+      if (self.$$autoload) {
+        var path = self.$$autoload[#{const}];
+        if (path) { return path; }
+      }
       return nil;
     }
   end
