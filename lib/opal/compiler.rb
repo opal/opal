@@ -70,7 +70,7 @@ module Opal
       # path of how webpack got to the ruby file, which may be very different from how ruby would get there.
       # Using Pathname.expand_path makes sure, the path gets transformed to a path the way ruby would find it.
       # Having a valid ruby path without ../.. etc., we can compare it against Opal.paths and get a correct result.
-      expanded_filename_path = filename ? Pathname.new(filename).expand_path : path
+      expanded_filename_path = Pathname.new(filename).expand_path
       _, module_name = Opal::ES6ModulesHelpers.module_names_from_paths(expanded_filename_path, expanded_filename_path.to_s)
       module_name
     end
