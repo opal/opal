@@ -21,4 +21,7 @@ require 'native'
 $$[:document][:title] = "#{$app.title}"
 
 bill = User.new('Bill')
+
+$$.alert "The user is named #{bill.name}."
+
 bill.authenticated?

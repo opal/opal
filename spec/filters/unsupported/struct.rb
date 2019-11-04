@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Struct" do
   fails "Struct#initialize is private"
   fails "Struct.new does not create a constant with symbol as first argument"

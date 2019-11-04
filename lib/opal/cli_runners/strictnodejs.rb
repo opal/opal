@@ -1,42 +1,28 @@
 # frozen_string_literal: true
 
 require 'opal/paths'
-require 'shellwords'
-require 'opal/cli_runners/generic_system_runner'
+require 'opal/cli_runners/system_runner'
 
 module Opal
   module CliRunners
     class Strictnodejs
-      include GenericSystemRunner
-
       NODE_PATH = File.expand_path('../stdlib/nodejs/node_modules', ::Opal.gem_dir)
 
-      def initialize(options)
-        @output = options.fetch(:output, $stdout)
-        @tempfile_prefix = 'opal-strictnode-output'
-      end
-      attr_reader :output, :exit_status
+      def self.call(data)
+        (data[:options] ||= {})[:env] = { 'NODE_PATH' => node_modules }
 
-      def puts(*args)
-        output.puts(*args)
-      end
-
-      def node_modules
-        paths = ENV['NODE_PATH'].to_s.split(':')
-        paths << NODE_PATH unless paths.include? NODE_PATH
-        paths.join(':')
-      end
-
-      def run(code, argv)
-        require 'tempfile'
-        code = "\"use strict\";\n\n" + code
-        # File.write("opal-strictnodejs-runner-#{Random.rand(10)}.js", code) # for debugging
-        tempfile = Tempfile.new('opal-strictnodejs-runner-')
-        tempfile.write code
-        tempfile.close
-        system_with_output({ 'NODE_PATH' => node_modules }, 'node', '--use_strict', tempfile.path, *argv)
+        SystemRunner.call(data) do |tempfile|
+          ['node', '--use_strict', tempfile.path, *data[:argv]]
+        end
       rescue Errno::ENOENT
         raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
+      end
+
+      # Ensure stdlib node_modules is among NODE_PATHs
+      def self.node_modules
+        ENV['NODE_PATH'].to_s.split(':').tap do |paths|
+          paths << NODE_PATH unless paths.include? NODE_PATH
+        end.join(':')
       end
 
       class MissingNodeJS < RunnerError

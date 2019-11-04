@@ -12,6 +12,14 @@ class Delegator < BasicObject
       super(m, *args, &block)
     end
   end
+
+  #
+  # Checks for a method provided by this the delegate object by forwarding the
+  # call through \_\_getobj\_\_.
+  #
+  def respond_to_missing?(m, include_private)
+    __getobj__.respond_to?(m, include_private)
+  end
 end
 
 class SimpleDelegator < Delegator

@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Regexp" do
   fails "Regexp with character classes doesn't match non-ASCII characters with [[:ascii:]]"
   fails "Regexp#options does not include Regexp::FIXEDENCODING for a Regexp literal with the 'n' option"

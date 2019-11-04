@@ -1,26 +1,28 @@
 PATH
   remote: ../..
   specs:
-    opal (0.11.1.dev)
+    opal (1.0.0)
       ast (>= 2.3.0)
-      hike (~> 1.2)
-      parser (= 2.5.1.0)
+      parser (~> 2.6)
 
 GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.0)
-    hike (1.2.3)
-    parser (2.5.1.0)
+    c_lexer (2.6.4.1.1)
       ast (~> 2.4.0)
-    rack (2.0.1)
+      parser (= 2.6.4.1)
+    parser (2.6.4.1)
+      ast (~> 2.4.0)
+    rack (2.0.7)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  c_lexer
   opal!
   rack
 
 BUNDLED WITH
-   1.16.3
+   1.17.3

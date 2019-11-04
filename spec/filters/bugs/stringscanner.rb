@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "StringScanner" do
   fails "StringScanner#<< concatenates the given argument to self and returns self"
   fails "StringScanner#<< raises a TypeError if the given argument can't be converted to a String"

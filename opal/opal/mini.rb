@@ -13,6 +13,6 @@ require 'corelib/range'
 require 'corelib/proc'
 require 'corelib/method'
 require 'corelib/regexp'
-
 require 'corelib/variables'
+require 'corelib/io'
 require 'opal/regexp_anchors'

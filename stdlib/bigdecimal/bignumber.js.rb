@@ -1,4 +1,4 @@
-class BigDecimal
+class BigDecimal < Numeric
   %x{
     var define = function (f) { Opal.const_set(self, 'BigNumber', f()); };
     define.amd = true;

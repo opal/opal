@@ -1,12 +1,10 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Module" do
   fails "Module#alias_method creates methods that are == to eachother" # Expected #<Method: #<Class:0x3ee54>#uno (defined in #<Class:0x3ee54> in ruby/core/module/fixtures/classes.rb:203)> to equal #<Method: #<Class:0x3ee54>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:203)>
-  fails "Module#alias_method raises a TypeError when the given name can't be converted using to_str"
   fails "Module#alias_method retains method visibility"
   fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#attr applies current visibility to methods created"
   fails "Module#attr converts non string/symbol/fixnum names to strings using to_str"
-  fails "Module#attr creates a getter but no setter for all given attribute names"
-  fails "Module#attr creates a getter for the given attribute name"
   fails "Module#attr raises a TypeError when the given names can't be converted to strings using to_str"
   fails "Module#attr_accessor applies current visibility to methods created"
   fails "Module#attr_accessor converts non string/symbol/fixnum names to strings using to_str"
@@ -83,6 +81,7 @@ opal_filter "Module" do
   fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class"
   fails "Module#define_method raises a TypeError when a Method from one class is defined on an unrelated class"
   fails "Module#define_method raises a TypeError when an UnboundMethod from a child class is defined on a parent class"
+  fails "Module#define_method raises a TypeError when an UnboundMethod from a singleton class is defined on another class" # Expected TypeError (/can't bind singleton method to a different class/) but no exception was raised (#<Class:0x47ae6> was returned)
   fails "Module#define_method raises a TypeError when an UnboundMethod from one class is defined on an unrelated class"
   fails "Module#deprecate_constant accepts multiple symbols and strings as constant names"
   fails "Module#deprecate_constant raises a NameError when given an undefined name"
@@ -113,12 +112,15 @@ opal_filter "Module" do
   fails "Module#module_function on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#module_function with specific method names raises a TypeError when the given names can't be converted to string using to_str"
   fails "Module#module_function with specific method names tries to convert the given names to strings using to_str"
+  fails "Module#name changes when the module is reachable through a constant path" # Expected nil to match /^#<Module:0x\h+>::N$/
   fails "Module#name is not nil for a nested module created with the module keyword"
+  fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil to match /^#<Module:0x\h+>::Child$/
   fails "Module#name is set with a conditional assignment to a constant"
   fails "Module#name is set with a conditional assignment to a nested constant"
   fails "Module#name preserves the encoding in which the class was defined"
   fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
   fails "Module#prepend keeps the module in the chain when dupping the class"
+  fails "Module#refine accepts a module as argument" # NoMethodError: undefined method `refine' for #<Module:0x4c172>
   fails "Module#refine adds methods defined in its block to the anonymous module's public instance methods" # NoMethodError: undefined method `refine' for #<Module:0x3ae64>
   fails "Module#refine and alias aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab4>
   fails "Module#refine and alias_method aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab0>
@@ -134,6 +136,7 @@ opal_filter "Module" do
   fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # NoMethodError: undefined method `refine' for #<Module:0x3aeba>
   fails "Module#refine for methods accessed indirectly is honored by string interpolation" # NoMethodError: undefined method `refine' for #<Module:0x3aeb6>
   fails "Module#refine for methods accessed indirectly is not honored by &" # NoMethodError: undefined method `refine' for #<Module:0x21e9c>
+  fails "Module#refine for methods accessed indirectly is not honored by Kernel#instance_method" # NoMethodError: undefined method `refine' for #<Module:0x4c176>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#method" # NoMethodError: undefined method `refine' for #<Module:0x3aec0>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#public_send" # NoMethodError: undefined method `refine' for #<Module:0x21ea0>
   fails "Module#refine for methods accessed indirectly is not honored by Kernel#respond_to?" # NoMethodError: undefined method `refine' for #<Module:0x3aea6>
@@ -154,8 +157,6 @@ opal_filter "Module" do
   fails "Module#refine when super is called in a refinement looks in the included to refinery module" # NoMethodError: undefined method `refine' for #<Module:0x3aec8>
   fails "Module#refine when super is called in a refinement looks in the refined class even if there is another active refinement" # NoMethodError: undefined method `refine' for #<Module:0x3aec4>
   fails "Module#refine when super is called in a refinement looks in the refined class" # NoMethodError: undefined method `refine' for #<Module:0x3aecc>
-  fails "Module#refine accepts a module as argument" # NoMethodError: undefined method `refine' for #<Module:0x4c172>
-  fails "Module#refine for methods accessed indirectly is not honored by Kernel#instance_method" # NoMethodError: undefined method `refine' for #<Module:0x4c176>
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#remove_const returns nil when removing autoloaded constant"

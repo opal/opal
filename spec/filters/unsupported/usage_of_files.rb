@@ -1,6 +1,4 @@
-# All these specs fail because RubySpec uses temporary files.
-# It writes some code to tmporary file and requires it in runtime.
-# Opal doesn't support it.
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Specs that use temporary files" do
   fails "A Symbol literal inherits the encoding of the magic comment and can have a binary encoding"
   fails "Kernel.printf formatting io is not specified faulty key raises a KeyError"

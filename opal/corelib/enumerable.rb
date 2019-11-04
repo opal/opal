@@ -172,8 +172,7 @@ module Enumerable
     end
 
     %x{
-      var result,
-          all = [], i, length, value;
+      var all = [], i, length, value;
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)},
@@ -183,10 +182,6 @@ module Enumerable
       }
 
       self.$each();
-
-      if (result !== undefined) {
-        return result;
-      }
 
       if (all.length === 0) {
         return nil;
@@ -313,7 +308,7 @@ module Enumerable
     end
 
     %x{
-      var buffer = [], result = nil;
+      var buffer = [];
 
       self.$each.$$p = function() {
         var element = #{Opal.destructure(`arguments`)};
@@ -328,7 +323,7 @@ module Enumerable
 
       self.$each();
 
-      return result;
+      return nil;
     }
   end
 
@@ -360,8 +355,7 @@ module Enumerable
     return enum_for(:each_slice, n) { respond_to?(:size) ? (size / n).ceil : nil } unless block_given?
 
     %x{
-      var result,
-          slice = []
+      var slice = []
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)};
@@ -376,10 +370,6 @@ module Enumerable
 
       self.$each();
 
-      if (result !== undefined) {
-        return result;
-      }
-
       // our "last" group, if smaller than n then won't have been yielded
       if (slice.length > 0) {
         Opal.yield1(block, slice);
@@ -393,8 +383,7 @@ module Enumerable
     return enum_for(:each_with_index, *args) { enumerator_size } unless block_given?
 
     %x{
-      var result,
-          index = 0;
+      var index = 0;
 
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)};
@@ -405,10 +394,6 @@ module Enumerable
       };
 
       self.$each.apply(self, args);
-
-      if (result !== undefined) {
-        return result;
-      }
     }
 
     self
@@ -418,8 +403,6 @@ module Enumerable
     return enum_for(:each_with_object, object) { enumerator_size } unless block_given?
 
     %x{
-      var result;
-
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)};
 
@@ -427,10 +410,6 @@ module Enumerable
       };
 
       self.$each();
-
-      if (result !== undefined) {
-        return result;
-      }
     }
 
     object
@@ -712,8 +691,12 @@ module Enumerable
     sort(&block).reverse.first(n)
   end
 
-  def max_by(&block)
-    return enum_for(:max_by) { enumerator_size } unless block
+  def max_by(n = nil, &block)
+    return enum_for(:max_by, n) { enumerator_size } unless block
+
+    unless n.nil?
+      return sort_by(&block).reverse.take n
+    end
 
     %x{
       var result,
@@ -743,7 +726,15 @@ module Enumerable
 
   alias member? include?
 
-  def min(&block)
+  def min(n = nil, &block)
+    unless n.nil?
+      if block_given?
+        return sort { |a, b| yield a, b }.take n
+      else
+        return sort.take n
+      end
+    end
+
     %x{
       var result;
 
@@ -788,8 +779,12 @@ module Enumerable
     }
   end
 
-  def min_by(&block)
-    return enum_for(:min_by) { enumerator_size } unless block
+  def min_by(n = nil, &block)
+    return enum_for(:min_by, n) { enumerator_size } unless block
+
+    unless n.nil?
+      return sort_by(&block).take n
+    end
 
     %x{
       var result,
@@ -854,7 +849,33 @@ module Enumerable
   end
 
   def minmax_by(&block)
-    raise NotImplementedError
+    return enum_for(:minmax_by) { enumerator_size } unless block
+
+    %x{
+      var min_result = nil,
+          max_result = nil,
+          min_by,
+          max_by;
+
+      self.$each.$$p = function() {
+        var param = #{Opal.destructure(`arguments`)},
+            value = Opal.yield1(block, param);
+
+        if ((min_by === undefined) || #{`value` <=> `min_by`} < 0) {
+          min_result = param;
+          min_by     = value;
+        }
+
+        if ((max_by === undefined) || #{`value` <=> `max_by`} > 0) {
+          max_result = param;
+          max_by     = value;
+        }
+      };
+
+      self.$each();
+
+      return [min_result, max_result];
+    }
   end
 
   def none?(pattern = undefined, &block)
@@ -1199,6 +1220,31 @@ module Enumerable
   end
 
   alias to_a entries
+
+  def to_h(*args)
+    %x{
+      var hash = #{{}};
+
+      self.$each.$$p = function() {
+        var param = #{Opal.destructure(`arguments`)};
+        var ary = #{Opal.coerce_to?(`param`, Array, :to_ary)}, key, val;
+        if (!ary.$$is_array) {
+          #{raise TypeError, "wrong element type #{`ary`.class} (expected array)"}
+        }
+        if (ary.length !== 2) {
+          #{raise ArgumentError, "wrong array length (expected 2, was #{`ary`.length})"}
+        }
+        key = ary[0];
+        val = ary[1];
+
+        Opal.hash_put(hash, key, val);
+      };
+
+      self.$each.apply(self, args);
+
+      return hash;
+    }
+  end
 
   def zip(*others, &block)
     to_a.zip(*others)

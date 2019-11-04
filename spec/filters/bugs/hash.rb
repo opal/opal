@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Hash" do
   fails "Hash#== compares keys with eql? semantics" # spec relies on integer and float being different
   fails "Hash#== computes equality for complex recursive hashes"

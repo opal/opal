@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+sort_lines = -> lines {
+  lines.sort.uniq { |l| l.split('" # ', 2).first }
+}
+
+write_group = ->(title:, lines:, type:) {
+  %{#{type} "#{title}" do\n}+
+  sort_lines[lines].join+
+  %{end\n}
+}
+
+write_groups = -> groups {
+  %{# NOTE: run bin/format-filters after changing this file\n}+
+  groups.map.with_index do |group, index|
+    puts "- #{group[:type]} #{group[:title].inspect}..."
+    ("\n" if index > 0).to_s + write_group.call(**group)
+  end.join
+}
+
+group_lines = -> lines {
+  groups = []
+  group = nil
+  lines.each do |line|
+    case line
+    when /^(opal_(?:unsupported_)?filter) *"([^"]+)" *do *\n/
+      raise "bad group for #{line.inspect}!" if group
+
+      group = {
+        type: $1,
+        title: $2,
+        lines: []
+      }
+
+    when /^  fails/
+      group[:lines] << line
+
+    when /^end/
+      groups << group
+      group = nil
+    end
+  end
+  groups
+}
+
+format_filter = -> path {
+  File.write path, write_groups[group_lines[File.read(path).lines]]
+}
+
+Dir['spec/filters/**/*.rb'].each do |path|
+  puts
+  puts "Formatting #{path} ..."
+  format_filter[path]
+end

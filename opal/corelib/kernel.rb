@@ -501,7 +501,14 @@ module Kernel
     $stdout.print(*strs)
   end
 
-  def warn(*strs)
+  def warn(*strs, uplevel: nil)
+    if uplevel
+      uplevel = Opal.coerce_to!(uplevel, Integer, :to_str)
+      raise ArgumentError, "negative level (#{uplevel})" if uplevel < 0
+
+      strs = strs.map { |s| "warning: #{caller}" }
+    end
+
     $stderr.puts(*strs) unless $VERBOSE.nil? || strs.empty?
   end
 

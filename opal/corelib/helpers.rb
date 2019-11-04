@@ -11,18 +11,18 @@ module Opal
     end
   end
 
-  def self.coerce_to(object, type, method)
+  def self.coerce_to(object, type, method, *args)
     return object if type === object
 
     unless object.respond_to? method
       raise type_error(object, type)
     end
 
-    object.__send__ method
+    object.__send__ method, *args
   end
 
-  def self.coerce_to!(object, type, method)
-    coerced = coerce_to(object, type, method)
+  def self.coerce_to!(object, type, method, *args)
+    coerced = coerce_to(object, type, method, *args)
 
     unless type === coerced
       raise type_error(object, type, method, coerced)
@@ -31,10 +31,10 @@ module Opal
     coerced
   end
 
-  def self.coerce_to?(object, type, method)
+  def self.coerce_to?(object, type, method, *args)
     return unless object.respond_to? method
 
-    coerced = coerce_to(object, type, method)
+    coerced = coerce_to(object, type, method, *args)
 
     return if coerced.nil?
 

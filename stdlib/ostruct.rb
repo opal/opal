@@ -31,6 +31,11 @@ class OpenStruct
     end
   end
 
+  def respond_to_missing?(mid, include_private = false) # :nodoc:
+    mname = mid.to_s.chomp('=').to_sym
+    @table&.key?(mname) || super
+  end
+
   def each_pair
     return enum_for :each_pair unless block_given?
 

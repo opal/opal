@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Kernel" do
   fails "Kernel#=== does not call #object_id nor #equal? but still returns true for #== or #=== on the same object" # Mock '#<Object:0x37dd4>' expected to receive 'object_id' exactly 0 times but received it 2 times
   fails "Kernel#=~ returns nil matching any object"
@@ -23,7 +24,6 @@ opal_filter "Kernel" do
   fails "Kernel#autoload is a private method" # Expected Kernel to have private instance method 'autoload' but it does not
   fails "Kernel#autoload loads the file when the constant is accessed" # NameError: uninitialized constant KSAutoloadB
   fails "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x7849c>
-  fails "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for Object
   fails "Kernel#autoload sets the autoload constant in Object's constant table" # Expected Object to have constant 'KSAutoloadA' but it does not
   fails "Kernel#autoload when Object is frozen raises a FrozenError before defining the constant" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x7849c>
   fails "Kernel#autoload when called from included module's method setups the autoload on the included module" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethod
@@ -99,8 +99,8 @@ opal_filter "Kernel" do
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors"
   fails "Kernel#public_send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#puts delegates to $stdout.puts"
-  fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#raise raises RuntimeError if no exception class is given" # RuntimeError: RuntimeError
+  fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning false"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"
@@ -211,13 +211,10 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf returns a String in the argument's encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel#sprintf with format string that contains %<> sections raises ArgumentError if missing second named argument" # KeyError: key not found: "foo"
-  fails "Kernel#warn :uplevel keyword argument converts value to Integer" # Expected:   $stderr: /classes.rb:416:/      got:   $stderr: "\n{\"uplevel\"=>0.1}\n"
-  fails "Kernel#warn :uplevel keyword argument does not prepend caller information if line number is too big" # Expected:   $stderr: "warning: foo\n"      got:   $stderr: "foo\n{\"uplevel\"=>100}\n"
-  fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:416: warning: foo/      got:   $stderr: "foo\n{\"uplevel\"=>0}\n"
-  fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:416: warning: \n$/      got:   $stderr: "\n{\"uplevel\"=>0}\n"
-  fails "Kernel#warn :uplevel keyword argument raises ArgumentError if passed -1" # Expected ArgumentError but no exception was raised (nil was returned)
-  fails "Kernel#warn :uplevel keyword argument raises ArgumentError if passed negative value" # Expected ArgumentError but no exception was raised (nil was returned)
-  fails "Kernel#warn :uplevel keyword argument raises TypeError if passed not Integer" # Expected TypeError but no exception was raised (nil was returned)
+  fails "Kernel#warn :uplevel keyword argument converts value to Integer"
+  fails "Kernel#warn :uplevel keyword argument does not prepend caller information if line number is too big"
+  fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace"
+  fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil"
   fails "Kernel#warn writes each array element on a line when passes an array" # Expected:   $stderr: "line 1\nline 2\n"      got:   $stderr: "[\"line 1\", \"line 2\"]\n"
   fails "Kernel#yield_self returns a sized Enumerator when no block given" # Requires Enumerator#peek
   fails "Kernel.Complex() when passed Numerics n1 and n2 and at least one responds to #real? with false returns n1 + n2 * Complex(0, 1)"
@@ -277,6 +274,7 @@ opal_filter "Kernel" do
   fails "Kernel.printf calls write on the first argument when it is not a string"
   fails "Kernel.printf writes to stdout when a string is the first argument"
   fails "Kernel.proc returned the passed Proc if given an existing Proc" # Expected false to be true
+  fails "Kernel.rand supports custom object types" # Expected "NaN#<struct KernelSpecs::CustomRangeInteger value=1>" (String) to be an instance of KernelSpecs::CustomRangeInteger
   fails "Kernel.sprintf faulty key raises a KeyError"
   fails "Kernel.sprintf faulty key sets the Hash as the receiver of KeyError"
   fails "Kernel.sprintf faulty key sets the unmatched key as the key of KeyError"

@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Fixnum" do
   fails "Fixnum#+ overflows to Bignum when the result does not fit in Fixnum"
   fails "Fixnum#- returns a Bignum only if the result is too large to be a Fixnum"

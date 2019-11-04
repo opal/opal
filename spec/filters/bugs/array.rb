@@ -1,4 +1,7 @@
+# NOTE: run bin/format-filters after changing this file
 opal_filter "Array" do
+  fails "Array#== compares with an equivalent Array-like object using #to_ary" # Expected false to be true
+  fails "Array#== returns true for [NaN] == [NaN] because Array#== first checks with #equal? and NaN.equal?(NaN) is true" # Expected [NaN] to equal [NaN]
   fails "Array#delete_if updates the receiver after all blocks"
   fails "Array#each does not yield elements deleted from the end of the array" # Expected [2, 3, nil] to equal [2, 3]
   fails "Array#each yields elements added to the end of the array by the block" # Expected [2] to equal [2, 0, 0]
@@ -17,5 +20,4 @@ opal_filter "Array" do
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#zip fills nil when the given enumerator is shorter than self" # LocalJumpError: no block given
-  fails "Array#== compares with an equivalent Array-like object using #to_ary" # Expected false to be true
 end

@@ -1,3 +1,4 @@
+# NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Float" do
   fails "BasicObject#__id__ returns a different value for two Float literals"
   fails "Complex#/ with Fixnum raises a ZeroDivisionError when given zero"
@@ -16,10 +17,10 @@ opal_unsupported_filter "Float" do
   fails "Fixnum#/ raises a ZeroDivisionError if the given argument is zero and not a Float"
   fails "Fixnum#/ returns self divided by the given argument"
   fails "Fixnum#/ supports dividing negative numbers"
+  fails "Fixnum#^ raises a TypeError when passed a Float"
   fails "Fixnum#coerce when given a String returns  an array containing two Floats"
   fails "Fixnum#div coerces self and the given argument to Floats and returns self divided by other as Fixnum"
   fails "Fixnum#divmod raises a TypeError when given a non-Integer"
-  fails "Fixnum#^ raises a TypeError when passed a Float"
   fails "Fixnum#| raises a TypeError when passed a Float"
   fails "Float constant MAX_10_EXP is 308"
   fails "Float constant MAX_EXP is 1024"
@@ -33,6 +34,9 @@ opal_unsupported_filter "Float" do
   fails "Float#to_s emits a trailing '.0' for the mantissa in e format"
   fails "Float#to_s returns '0.0' for 0.0"
   fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30" # precision error
+  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
+  fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
+  fails "Numeric#step with positional args when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
   fails "Rational#% returns a Float value when the argument is Float"
   fails "Rational#** raises ZeroDivisionError for Rational(0, 1) passed a negative Integer"
   fails "Rational#** when passed Integer returns the Rational value of self raised to the passed argument"
@@ -40,7 +44,4 @@ opal_unsupported_filter "Float" do
   fails "Rational#coerce returns the passed argument, self as Float, when given a Float"
   fails "Rational#divmod when passed an Integer returns the quotient as Integer and the remainder as Rational"
   fails "Struct#eql? returns false if any corresponding elements are not #eql?" # Rubyspec uses 1.eql?(1.0) which always returns true in compiled JS
-  fails "Numeric#step with positional args when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
-  fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
-  fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
 end

@@ -1,4 +1,5 @@
-inherit_from: .rubocop_todo.yml
+require: rubocop-performance
+inherit_from: .rubocop/todo.yml
 
 AllCops:
   TargetRubyVersion: 2.5
@@ -115,6 +116,10 @@ Lint/LiteralAsCondition:
     # Opal supports if `...js...`
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
+
+# Allow the use of if/unless inside blocks
+Style/Next:
+  Enabled: false
 
 Lint/RescueException:
   Exclude:
@@ -243,12 +248,18 @@ Style/InverseMethods:
     - 'opal/corelib/basic_object.rb'
     - 'opal/corelib/kernel.rb'
 
-Style/MethodMissing:
-  # Base Opal classes simply can't call super for #method_missing
+Style/MethodMissingSuper:
+  # Base Opal classes simply can't or shouldn't call super for #method_missing
   Exclude:
     - 'opal/corelib/basic_object.rb'
     - 'opal/corelib/kernel.rb'
     - 'opal/corelib/string/inheritance.rb'
+    - 'stdlib/native.rb'
+    - 'stdlib/delegate.rb'
+    - 'stdlib/ostruct.rb'
+
+Style/MissingRespondToMissing:
+  Enabled: true
 
 Style/NumericPredicate:
   Enabled: false
@@ -257,6 +268,8 @@ Style/ParallelAssignment:
   Enabled: false
 
 Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    default: '{}'
   Exclude:
     # Opal has a convention of %x{}
     - 'opal/**/*.rb'
@@ -326,10 +339,6 @@ Style/RegexpLiteral:
   # Rubocop doesn't check for backslashes, so this rule is disabled.
   Enabled: false
 
-Style/PercentLiteralDelimiters:
-  PreferredDelimiters:
-    default: '{}'
-
 Naming/FileName:
   Exclude:
     - 'stdlib/opal-builder.rb'
@@ -396,3 +405,19 @@ Style/ConditionalAssignment:
 Naming/MemoizedInstanceVariableName:
   Exclude:
     - lib/opal/parser/patch.rb # it's a monkey-patch on the parser gem
+
+Style/AccessModifierDeclarations:
+  Enabled: false
+
+Style/MultipleComparison:
+  Enabled: false
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Layout/AlignHash:
+  Enabled: false
+
+# No way to set multiple preferred names
+Naming/RescuedExceptionsVariableName:
+  Enabled: false
