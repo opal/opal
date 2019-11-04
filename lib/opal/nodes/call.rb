@@ -277,38 +277,39 @@ module Opal
       add_special :require_lazy do
         helper :send
 
-        unless compiler.es6_modules?
-          compiler.warning('require_lazy works only with webpack/opal-webpack-loader and the es6_modules compiler option!')
-        end
-        unless arglist.children[0].type == :str
-          compiler.warning('require_lazy: First argument must be a string, module must be known at compile time!')
-        end
-        module_name = DependencyResolver.new(compiler, arglist.children[0]).resolve
-
-        push fragment "(function() {"
-        indent do
-          push line
-          push "var $$promise = $send($$($nesting, 'Promise').$new(), 'then', [],"
-          if iter
-            push expr(iter)
-          else
-            push 'function(){return true;}'
+        if compiler.es6_modules?
+          unless arglist.children[0].type == :str
+            compiler.warning('require_lazy: First argument must be a string, module must be known at compile time!')
           end
-          push ');'
+          first_arg = arglist.children[0].children[0]
+          filename = first_arg.end_with?('.rb') ? first_arg : first_arg + '.rb'
+          real_module_name = Opal::Compiler.module_name_from_paths(File.join(File.dirname(compiler.file), filename))
+
+          push fragment "(function() {"
+          indent do
+            push line
+            push "var $$promise = $send($$($nesting, 'Promise').$new(), 'then', [],"
+            if iter
+              push expr(iter)
+            else
+              push 'function(){return true;}'
+            end
+            push ');'
+            push line
+            push 'import('
+            push '/* webpackPrefetch: true */ ' if arglist.children.include?(s(:sym, :prefetch))
+            push '/* webpackPreload: true */ ' if arglist.children.include?(s(:sym, :preload))
+            push "'#{filename}'"
+            push ").then(function(module) { module.default(); Opal.load('#{real_module_name}'); "
+            push '$$promise.$resolve(true); return module; });'
+            push line
+            push 'return $$promise;'
+          end
           push line
-          push 'import('
-          push '/* webpackPrefetch: true */ ' if arglist.children.include?(s(:sym, :prefetch))
-          push '/* webpackPreload: true */ ' if arglist.children.include?(s(:sym, :preload))
-          # append '.rb' to the module name so webpack passes the request to the owl resolver and loader
-          push "'#{module_name}#{'.rb' unless module_name.end_with?('.rb')}'"
-          # remove'.rb' from the module name so opal can find it
-          push ").then(function(module) { module.default(); Opal.load('#{module_name.sub(/\.rb\Z/, '')}'); "
-          push '$$promise.$resolve(true); return module; });'
-          push line
-          push 'return $$promise;'
+          push '})()'
+        else
+          compiler.error('require_lazy only works with webpack & opal-webpack-loader and the es6_modules compiler option!')
         end
-        push line
-        push '})()'
       end
 
       add_special :block_given? do
