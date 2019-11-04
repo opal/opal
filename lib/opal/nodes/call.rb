@@ -246,11 +246,13 @@ module Opal
       end
 
       add_special :autoload do |compile_default|
+        # only add file to compiler.requires if the autoload is called from class scope
+        # otherwise autoload is used as method call for dynamic autoloads
         if scope.class_scope?
           str = DependencyResolver.new(compiler, arglist.children[1]).resolve
           compiler.requires << str unless str.nil?
-          compile_default.call
         end
+        compile_default.call
       end
 
       add_special :require_tree do |compile_default|
