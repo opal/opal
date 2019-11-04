@@ -590,8 +590,8 @@ module Kernel
   def require(file)
     # as Object.require refers to Kernel.require once Kernel has been loaded
     # the String class may not be available yet, make sure the coercion happens
-    # only if String has been loaded
-    file = Opal.coerce_to!(file, String, :to_str) if `Opal.String`
+    # only if String and Array have been loaded (Opal.Array.$respond_to('to_a') is used for passing args) 
+    file = Opal.coerce_to!(file, String, :to_str) if `Opal.String && Opal.Array`
     `Opal.require(#{file})`
   end
 
