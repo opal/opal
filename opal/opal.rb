@@ -16,4 +16,5 @@ require 'corelib/process'
 require 'corelib/random'
 require 'corelib/random/mersenne_twister.js'
 
+require 'corelib/trace_point'
 require 'corelib/unsupported'
