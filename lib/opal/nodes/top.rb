@@ -17,7 +17,7 @@ module Opal
       def compile
         push version_comment unless compiler.es6_modules?
 
-        if compiler.es6_modules?
+        if compiler.es6_modules? && compiler.file != '-e' # from: opal -e
           module_name = Opal::Compiler.module_name_from_paths(compiler.file)
           opening(module_name)
         else
