@@ -132,10 +132,10 @@ module Opal
         pwd = Dir.pwd
         if original_path_s.start_with?(pwd)
           # got a match in current dir
-          return module_names_from_module_paths(original_path_s, pwd)
+          module_names_from_module_paths(original_path_s, pwd)
         else
           # no match at all, return original path
-          return original_path_s
+          [original_path_s, original_path_s]
         end
       end
 
