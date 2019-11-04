@@ -581,7 +581,10 @@ module Kernel
   end
 
   def require(file)
-    file = Opal.coerce_to!(file, String, :to_str)
+    # as Object.require refers to Kernel.require once Kernel has been loaded
+    # the String class may not be available yet, make sure the coercion happens
+    # only if String has been loaded
+    file = Opal.coerce_to!(file, String, :to_str) if `Opal.String`
     `Opal.require(#{file})`
   end
 
@@ -594,61 +597,24 @@ module Kernel
 
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
   def require_tree(path, autoload = false)
-    if !autoload
-      %x{
-        var result = [];
+    %x{
+      var result = [];
 
-        path = #{File.expand_path(path)}
-        path = Opal.normalize(path);
-        if (path === '.') path = '';
-        for (var name in Opal.modules) {
-          if (#{`name`.start_with?(path)}) {
+      path = #{File.expand_path(path)}
+      path = Opal.normalize(path);
+      if (path === '.') path = '';
+      for (var name in Opal.modules) {
+        if (#{`name`.start_with?(path)}) {
+          if(!autoload) {
             result.push([name, Opal.require(name)]);
+          } else {
+            result.push([name, true]); // do nothing, delegated to a autoloader
           }
         }
+      }
 
-        return result;
-      }
-    else
-      dirskip = (autoload == :autoload_dirskip ? true : false)
-      %x{
-        var const_name_from_path = function(path) {
-          var path_parts = path.split('/');
-          if (#{dirskip}) { path_parts = path_parts.slice(1); }
-          var const_part = '';
-          var const_sub_parts = [];
-          for (var i = 0; i < path_parts.length; i++) {
-            const_part = path_parts[i];
-            if (const_part.includes('_')) {
-              const_sub_parts = const_part.split('_');
-            } else if (const_part.includes('-')) {
-              const_sub_parts = const_part.split('-');
-            } else {
-              const_sub_parts = [ const_part ];
-            }
-            for (var k = 0; k < const_sub_parts.length; k++) {
-              const_sub_parts[k] = const_sub_parts[k][0].toUpperCase() + const_sub_parts[k].slice(1);
-            }
-            path_parts[i] = const_sub_parts.join('');
-          }
-          return path_parts.join('::')
-        }
-        var result = [];
-        if (Opal.Object.$$autoload == null) Opal.Object.$$autoload = {};
-        path = #{File.expand_path(path)}
-        path = Opal.normalize(path);
-        if (path === '.') path = '';
-        for (var name in Opal.modules) {
-          if (#{`name`.start_with?(path)}) {
-            result.push([name, true]);
-            Opal.const_cache_version++;
-            var constant = const_name_from_path(name);
-            Opal.Object.$$autoload[constant] = name;
-          }
-        }
-        return result;
-      }
-    end
+      return result;
+    }
   end
 
   alias send        __send__
@@ -724,5 +690,9 @@ module Kernel
 end
 
 class Object
+  # Object.require has been set to runtime.js Opal.require
+  # Now we have Kernel, make sure Object.require refers to Kernel.require
+  # which is what ruby does
+  `delete Opal.Object.$$prototype.$require`
   include Kernel
 end
