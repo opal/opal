@@ -318,13 +318,18 @@ class Module
 
   def const_missing(name)
     %x{
-      if (self.$$autoload) {
-        var file = self.$$autoload[name];
+      var ancestors = self.$ancestors(),
+          file;
+      
+      for (var i = 0, length = ancestors.length; i < length; i++) {
+        if (ancestors[i].$$autoload && ancestors[i].$$autoload[name]) {
+          file = ancestors[i].$$autoload[name];
 
-        if (file) {
-          self.$require(file);
+          if (file) {
+            self.$require(file);
 
-          return #{const_get name};
+            return #{const_get name};
+          }
         }
       }
     }
