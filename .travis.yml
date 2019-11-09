@@ -69,11 +69,15 @@ matrix:
     - rvm: truffleruby
       env: RUN=rspec
 
-    - rvm: jruby-9.2.8.0
-      env: RUN=rspec
+    - rvm: jruby-9.2.9.0
+      env: 
+        - RUN=rspec
+        - JRUBY_OPTS=--dev
 
     - rvm: jruby-head
-      env: RUN=rspec
+      env:
+        - RUN=rspec
+        - JRUBY_OPTS=--dev
 
   allow_failures:
     - rvm: ruby-head
