@@ -1,5 +1,5 @@
 (function() {
-  "use_strict";
+  "use strict";
 
   // @note
   //   A few conventions for the documentation of this file:
@@ -1298,7 +1298,10 @@
   // @param method_name [String] The js-name of the method to stub (e.g. "$foo")
   // @return [undefined]
   Opal.stub_for = function(method_name) {
+
     function method_missing_stub() {
+      /* jshint validthis: true */
+
       // Copy any given block onto the method_missing dispatcher
       this.$method_missing.$$p = method_missing_stub.$$p;
 
