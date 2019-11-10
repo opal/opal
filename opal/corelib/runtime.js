@@ -1,4 +1,6 @@
 (function() {
+  "use_strict";
+
   // @note
   //   A few conventions for the documentation of this file:
   //   1. Always use "//" (in contrast with "/**/")
@@ -135,7 +137,7 @@
       // String class is the only class that:
       // + compiles to JS primitive
       // + allows method definition directly on instances
-      // numbers, true, false and nil do not support it.
+      // numbers, true, false and null do not support it.
       object[name] = initialValue;
     } else {
       Object.defineProperty(object, name, {
@@ -1861,9 +1863,13 @@
       return Opal.send(this, body, args, block);
     };
 
+    // Assign the 'length' value with defineProperty because
+    // in strict mode the property is not writable.
+    Object.defineProperty(alias, 'length', { value: body.length });
+
     // Try to make the browser pick the right name
     alias.displayName       = name;
-    alias.length            = body.length;
+
     alias.$$arity           = body.$$arity;
     alias.$$parameters      = body.$$parameters;
     alias.$$source_location = body.$$source_location;
@@ -2338,6 +2344,34 @@
 
     return Opal.load(path);
   };
+
+
+  // Strings
+  // -------
+
+  Opal.encodings = Object.create(null);
+
+  // Sets the encoding on a string, will treat string literals as frozen strings
+  // raising a FrozenError.
+  // @param str [String] the string on which the encoding should be set.
+  // @param name [String] the canonical name of the encoding
+  Opal.set_encoding = function(str, name) {
+    if (typeof str === 'string')
+      throw Opal.FrozenError.$new("can't modify frozen String");
+
+    var encoding = Opal.encodings[name];
+
+    if (encoding === str.encoding) { return str; }
+
+    str.encoding = encoding;
+
+    return str;
+  };
+
+  // @returns a String object with the encoding set from a string literal
+  Opal.enc = function(str, name) {
+    return Opal.set_encoding(new String(str), name);
+  }
 
 
   // Initialization

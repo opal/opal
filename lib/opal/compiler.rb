@@ -58,18 +58,38 @@ module Opal
       Pathname(path).cleanpath.to_s
     end
 
-    # defines a compiler option, also creating method of form 'name?'
-    def self.compiler_option(name, default_value, options = {})
-      mid          = options[:as]
-      valid_values = options[:valid_values]
-      define_method(mid || name) do
-        value = @options.fetch(name) { default_value }
-        if valid_values && !valid_values.include?(value)
-          raise ArgumentError, "invalid value #{value.inspect} for option #{name.inspect} " \
-                               "(valid values: #{valid_values.inspect})"
-        end
-        value
+    # Defines a compiler option.
+    # @option as: [Symbol] uses a different method name, e.g. with a question mark for booleans
+    # @option default: [Object] the default value for the option
+    # @option magic_comment: [Bool] allows magic-comments to override the option value
+    def self.compiler_option(name, config = {})
+      method_name = config.fetch(:as, name)
+      define_method(method_name) { option_value(name, config) }
+    end
+
+    # Fetches and memoizes the value for an option.
+    def option_value(name, config)
+      return @option_values[name] if @option_values.key? name
+
+      default_value = config[:default]
+      valid_values  = config[:valid_values]
+      magic_comment = config[:magic_comment]
+
+      value = @options.fetch(name, default_value)
+
+      if magic_comment && @magic_comments.key?(name)
+        value = @magic_comments.fetch(name)
       end
+
+      if valid_values && !valid_values.include?(value)
+        raise(
+          ArgumentError,
+          "invalid value #{value.inspect} for option #{name.inspect} " \
+          "(valid values: #{valid_values.inspect})"
+        )
+      end
+
+      @option_values[name] = value
     end
 
     # @!method file
@@ -78,21 +98,21 @@ module Opal
     # as well as finding relative require()
     #
     # @return [String]
-    compiler_option :file, '(file)'
+    compiler_option :file, default: '(file)'
 
     # @!method method_missing?
     #
     # adds method stubs for all used methods in file
     #
     # @return [Boolean]
-    compiler_option :method_missing, true, as: :method_missing?
+    compiler_option :method_missing, default: true, as: :method_missing?
 
     # @!method arity_check?
     #
     # adds an arity check to every method definition
     #
     # @return [Boolean]
-    compiler_option :arity_check, false, as: :arity_check?
+    compiler_option :arity_check, default: false, as: :arity_check?
 
     # @deprecated
     # @!method freezing?
@@ -100,45 +120,50 @@ module Opal
     # stubs out #freeze and #frozen?
     #
     # @return [Boolean]
-    compiler_option :freezing, true, as: :freezing?
+    compiler_option :freezing, default: true, as: :freezing?
 
     # @deprecated
     # @!method tainting?
     #
     # stubs out #taint, #untaint and #tainted?
-    compiler_option :tainting, true, as: :tainting?
+    compiler_option :tainting, default: true, as: :tainting?
 
     # @!method irb?
     #
     # compile top level local vars with support for irb style vars
-    compiler_option :irb, false, as: :irb?
+    compiler_option :irb, default: false, as: :irb?
 
     # @!method dynamic_require_severity
     #
     # how to handle dynamic requires (:error, :warning, :ignore)
-    compiler_option :dynamic_require_severity, :ignore, valid_values: %i[error warning ignore]
+    compiler_option :dynamic_require_severity, default: :ignore, valid_values: %i[error warning ignore]
 
     # @!method requirable?
     #
     # Prepare the code for future requires
-    compiler_option :requirable, false, as: :requirable?
+    compiler_option :requirable, default: false, as: :requirable?
 
     # @!method inline_operators?
     #
     # are operators compiled inline
-    compiler_option :inline_operators, true, as: :inline_operators?
+    compiler_option :inline_operators, default: true, as: :inline_operators?
 
-    compiler_option :eval, false, as: :eval?
+    compiler_option :eval, default: false, as: :eval?
 
     # @!method enable_source_location?
     #
     # Adds source_location for every method definition
-    compiler_option :enable_source_location, false, as: :enable_source_location?
+    compiler_option :enable_source_location, default: false, as: :enable_source_location?
+
+    # @!method use_strict?
+    #
+    # Adds source_location for every method definition
+    compiler_option :use_strict, default: false, as: :use_strict?, magic_comment: true
 
     # @!method parse_comments?
     #
     # Adds comments for every method definition
-    compiler_option :parse_comments, false, as: :parse_comments?
+    compiler_option :parse_comments, default: false, as: :parse_comments?
 
     # @return [String] The compiled ruby code
     attr_reader :result
@@ -159,7 +184,7 @@ module Opal
     attr_reader :comments
 
     # Magic comment flags extracted from the leading comments
-    attr_reader :magic_comment_flags
+    attr_reader :magic_comments
 
     def initialize(source, options = {})
       @source = source
@@ -168,6 +193,8 @@ module Opal
       @options = options
       @comments = Hash.new([])
       @case_stmt = nil
+      @option_values = {}
+      @magic_comments = {}
     end
 
     # Compile some ruby code to a string.
@@ -192,7 +219,7 @@ module Opal
 
       @sexp = s(:top, sexp || s(:nil))
       @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
-      @magic_comment_flags = MagicComments.parse(sexp, comments)
+      @magic_comments = MagicComments.parse(sexp, comments)
       @eof_content = EofContent.new(tokens, @source).eof
     end
 
