@@ -2,4 +2,4 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 gem 'opal', path: '../..'
-gem 'opal-webpack-loader', '~> 0.9.1'
+gem 'opal-webpack-loader', '~> 0.9.6'
