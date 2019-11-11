@@ -248,33 +248,48 @@ module Opal
       add_special :autoload do |compile_default|
         # only add file to compiler.requires if the autoload is called from class scope
         # otherwise autoload is used as method call for dynamic autoloads
-        f = File.open("/Users/jan/compiler.log", 'a+')
         if scope.class_scope?
-          str = DependencyResolver.new(compiler, arglist.children[1]).resolve
-          compiler.requires << str unless str.nil?
           if compiler.es6_modules?
-            filename = arglist.children[1].children[0]
-            raise "Unknown file for autoload." unless filename
-            push recv(receiver_sexp), method_jsid, '(' , expr(arglist.children[0]), ', "'
-            push Opal::Compiler.module_name_from_paths(filename)
-            push '")'
+            push recv(receiver_sexp), method_jsid, '(' , expr(arglist.children[0]), ', '
+            if arglist.children[1].type == :str
+              str = DependencyResolver.new(compiler, arglist.children[1]).resolve
+              compiler.requires << str unless str.nil?
+              filename = arglist.children[1].children[0]
+              filename = filename + '.rb' unless filename.end_with?('.rb')
+              push Opal::Compiler.module_name_from_paths(filename.inspect)
+            else
+              push expr(arglist.children[1])
+            end
+            push ')'
           else
+            str = DependencyResolver.new(compiler, arglist.children[1]).resolve
+            compiler.requires << str unless str.nil?
             compile_default.call
           end
         elsif compiler.es6_modules? && scope.top?
-          filename = arglist.children[1].children[0]
-          raise "Unknown file for autoload." unless filename
-          str = DependencyResolver.new(compiler, arglist.children[1]).resolve
-          compiler.requires << str unless str.nil?
-          push 'Opal.Object.$autoload(', expr(arglist.children[0]), ', "'
-          push Opal::Compiler.module_name_from_paths(filename)
-          push '")'
+          push 'Opal.Object.$autoload(', expr(arglist.children[0]), ', '
+          if arglist.children[1].type == :str
+            str = DependencyResolver.new(compiler, arglist.children[1]).resolve
+            compiler.requires << str unless str.nil?
+            filename = arglist.children[1].children[0]
+            filename = filename + '.rb' unless filename.end_with?('.rb')
+            push Opal::Compiler.module_name_from_paths(filename.inspect)
+          else
+            push expr(arglist.children[1])
+          end
+          push ')'
         elsif compiler.es6_modules?
-          filename = arglist.children[1].children[0]
-          raise "Unknown file for autoload." unless filename
-          push recv(receiver_sexp), method_jsid, '(', expr(arglist.children[0]), ', "'
-          push Opal::Compiler.module_name_from_paths(filename)
-          push '")'
+          push recv(receiver_sexp), method_jsid, '(', expr(arglist.children[0]), ', '
+          if arglist.children[1].type == :str
+            str = DependencyResolver.new(compiler, arglist.children[1]).resolve
+            compiler.requires << str unless str.nil?
+            filename = arglist.children[1].children[0]
+            filename = filename + '.rb' unless filename.end_with?('.rb')
+            push Opal::Compiler.module_name_from_paths(filename.inspect)
+          else
+            push expr(arglist.children[1])
+          end
+          push ')'
         end
         f.close
       end
