@@ -248,11 +248,35 @@ module Opal
       add_special :autoload do |compile_default|
         # only add file to compiler.requires if the autoload is called from class scope
         # otherwise autoload is used as method call for dynamic autoloads
+        f = File.open("/Users/jan/compiler.log", 'a+')
         if scope.class_scope?
           str = DependencyResolver.new(compiler, arglist.children[1]).resolve
           compiler.requires << str unless str.nil?
+          if compiler.es6_modules?
+            filename = arglist.children[1].children[0]
+            raise "Unknown file for autoload: '#{filename.nil? ? 'nil' : filename}'. The file must be available at compile time." unless filename && filename.is_a?(String)
+            push recv(receiver_sexp), method_jsid, '(' , expr(arglist.children[0]), ', "'
+            push Opal::Compiler.module_name_from_paths(filename)
+            push '")'
+          else
+            compile_default.call
+          end
+        elsif compiler.es6_modules? && scope.top?
+          filename = arglist.children[1].children[0]
+          raise "Unknown file for autoload: '#{filename.nil? ? 'nil' : filename}'. The file must be available at compile time." unless filename && filename.is_a?(String)
+          str = DependencyResolver.new(compiler, arglist.children[1]).resolve
+          compiler.requires << str unless str.nil?
+          push 'Opal.Object.$autoload(', expr(arglist.children[0]), ', "'
+          push Opal::Compiler.module_name_from_paths(filename)
+          push '")'
+        elsif compiler.es6_modules?
+          filename = arglist.children[1].children[0]
+          raise "Unknown file for autoload: '#{filename.nil? ? 'nil' : filename}'. The file must be available at compile time." unless filename && filename.is_a?(String)
+          push recv(receiver_sexp), method_jsid, '(', expr(arglist.children[0]), ', "'
+          push Opal::Compiler.module_name_from_paths(filename)
+          push '")'
         end
-        compile_default.call
+        f.close
       end
 
       add_special :require_tree do |compile_default|
