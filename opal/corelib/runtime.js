@@ -643,7 +643,7 @@
     if (object.hasOwnProperty('$$is_class')) {
       return Opal.build_class_singleton_class(object);
     } else if (object.hasOwnProperty('$$is_module')) {
-      return Opal.build_module_singletin_class(object);
+      return Opal.build_module_singleton_class(object);
     } else {
       return Opal.build_object_singleton_class(object);
     }
@@ -682,7 +682,7 @@
     return meta;
   };
 
-  Opal.build_module_singletin_class = function(mod) {
+  Opal.build_module_singleton_class = function(mod) {
     if (mod.$$meta) {
       return mod.$$meta;
     }
