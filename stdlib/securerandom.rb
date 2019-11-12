@@ -7,22 +7,24 @@ module SecureRandom
       count = Math.floor(count);
       var repeat = Math.floor(count / 6),
           remain = count % 6,
-          total = count * 2,
-          string = '';
-
+          remain_total = remain * 2,
+          string = '',
+          temp;
       for (var i = 0; i < repeat; i++) {
-        string = string + Math.floor(Math.random()*parseInt('ff'.repeat(6), 16)).toString(16);
+        temp = Math.floor(Math.random()*parseInt('ff'.repeat(6), 16)).toString(16);
+        if (temp.length < 12) {
+          // account for leading zeros gone missing
+          temp = '0'.repeat(12 - temp.length) + temp;
+        }
+        string = string + temp;
       }
       if (remain > 0) {
-        string = string + Math.floor(Math.random()*parseInt('ff'.repeat(remain), 16)).toString(16);
-      }
-      remain = total - string.length;
-      if (remain > 0) {
-        // account for leading zeros gone missing
-        string = '0'.repeat(remain) + string;
-      } else if (remain < 0) {
-        // account for overruns
-        string = string.slice(total - 1);
+        temp = Math.floor(Math.random()*parseInt('ff'.repeat(remain), 16)).toString(16);
+        if (temp.length < remain_total) {
+          // account for leading zeros gone missing
+          temp = '0'.repeat(remain_total - temp.length) + temp;
+        }
+        string = string + temp;
       }
       return string;
     }
