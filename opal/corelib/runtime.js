@@ -2429,6 +2429,15 @@
   // Instantiate the main object
   Opal.top = new _Object();
   Opal.top.$to_s = Opal.top.$inspect = function() { return 'main' };
+  Opal.top.$define_method = top_define_method;
+
+  // Foward calls to define_method on the top object to Object
+  function top_define_method() {
+    var args = Opal.slice.call(arguments, 0, arguments.length);
+    var block = top_define_method.$$p;
+    top_define_method.$$p = null;
+    return Opal.send(_Object, 'define_method', args, block)
+  };
 
 
   // Nil
