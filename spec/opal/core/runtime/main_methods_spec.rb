@@ -10,8 +10,13 @@ def some_top_level_method_is_defined
   42
 end
 
+define_method :some_other_main_method do
+  0.1618
+end
+
 describe "Defining normal methods at the top level" do
   it "should define them on Object, not main" do
+    $OPAL_TOP_LEVEL_OBJECT.some_top_level_method_is_defined.should == 42
     Object.new.some_top_level_method_is_defined.should == 42
   end
 end
@@ -23,5 +28,12 @@ describe "Defining singleton methods on main" do
 
   it "should not define the method for all Objects" do
     lambda { Object.new.some_main_method }.should raise_error(NoMethodError)
+  end
+end
+
+describe "Defining methods on main with define_method" do
+  it "should define it on main directly" do
+    $OPAL_TOP_LEVEL_OBJECT.some_other_main_method.should == 0.1618
+    Object.new.some_other_main_method.should == 0.1618
   end
 end
