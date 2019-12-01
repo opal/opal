@@ -238,7 +238,10 @@ module Opal
     #
     # @return [Set<Symbol>]
     def helpers
-      @helpers ||= Set.new(%i[breaker slice])
+      @helpers ||= Set.new(
+        %i[breaker slice] +
+        magic_comments[:helpers].to_s.split(',').map { |h| h.strip.to_sym }
+      )
     end
 
     # Operator helpers

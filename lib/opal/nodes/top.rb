@@ -77,8 +77,7 @@ module Opal
       end
 
       def add_used_helpers
-        helpers = compiler.helpers.to_a
-        helpers.to_a.each { |h| add_temp "$#{h} = Opal.#{h}" }
+        compiler.helpers.to_a.each { |h| add_temp "$#{h} = Opal.#{h}" }
       end
 
       def add_used_operators
