@@ -1,3 +1,5 @@
+# helpers: breaker, slice
+
 require 'corelib/enumerable'
 
 class Enumerator
