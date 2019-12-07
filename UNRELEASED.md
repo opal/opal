@@ -5,3 +5,6 @@ Whitespace conventions:
 - 1 spaces before normal text
 -->
 
+### Changed
+
+- Relaxed parser version requirement (#2013)
