@@ -15,7 +15,7 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.0.0...HEAD) - unreleased
+## [Unreleased](https://github.com/opal/opal/compare/v1.0.1...HEAD) - unreleased
 
 
 <!--
@@ -24,6 +24,16 @@ Whitespace conventions:
 - 2 spaces before ### titles
 - 1 spaces before normal text
 -->
+
+
+
+
+## [1.0.1](https://github.com/opal/opal/compare/v1.0.0...v1.0.1) - 2019-12-08
+
+
+### Changed
+
+- Relaxed parser version requirement ([#2013](https://github.com/opal/opal/pull/2013))
 
 
 
