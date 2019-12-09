@@ -8,6 +8,48 @@ RSpec.describe Opal::Rewriters::ForRewriter do
 
   before(:each) { Opal::Rewriters::ForRewriter.reset_tmp_counter! }
 
+  include_examples 'it rewrites source-to-AST', 'for i in (0..3); for j in (4..6); a = i + j; end; end', s(:begin,
+    s(:lvdeclare, :i),
+    s(:lvdeclare, :j),
+    s(:lvdeclare, :a),
+    s(:send,
+      ast_of('(0..3)'),
+      :each,
+      s(:iter,
+        s(:args,
+          s(:arg, :$for_tmp1)),
+        s(:begin,
+          s(:initialize_iter_arg, :$for_tmp1),
+          s(:lvasgn, :i,
+            s(:js_tmp, :$for_tmp1)),
+          s(:begin,
+            s(:lvdeclare, :j),
+            s(:lvdeclare, :a),
+            s(:send,
+              ast_of('(4..6)'),
+              :each,
+              s(:iter,
+                s(:args,
+                  s(:arg, :$for_tmp2)),
+                s(:begin,
+                  s(:initialize_iter_arg, :$for_tmp2),
+                  s(:lvasgn, :j,
+                    s(:js_tmp, :$for_tmp2)),
+                  s(:lvasgn, :a,
+                    s(:send,
+                      s(:lvar, :i), :+,
+                      s(:lvar, :j)
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+
   include_examples 'it rewrites source-to-AST', 'for i in (0..3); a = 1; b = 2; end', s(:begin,
     s(:lvdeclare, :i),
     s(:lvdeclare, :a),
