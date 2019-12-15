@@ -70,7 +70,7 @@ matrix:
       env: RUN=rspec
 
     - rvm: jruby-9.2.9.0
-      env: 
+      env:
         - RUN=rspec
         - JRUBY_OPTS=--dev
 
@@ -88,7 +88,9 @@ matrix:
 before_install:
   # Keep track of which version of node we're running the specs against
   - node -v
-  - git submodule update --init
+  - auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+  - git submodule sync --recursive
+  - git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
   - npm install -g jshint
   - npm install -g uglify-js
   - bundle config without doc

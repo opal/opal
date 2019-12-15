@@ -9,13 +9,13 @@ tilt_version      = ENV['TILT_VERSION']
 rack_version      = ENV['RACK_VERSION']
 sprockets_version = ENV['SPROCKETS_VERSION']
 
-gem 'json', '< 1.8.1',  platform: :ruby if ruby_version < v['2.2']
+gem 'json', '< 1.8.1', platform: :ruby if ruby_version < v['2.2']
 gem 'rack-test', '< 0.8' if ruby_version <= v['2.0']
 gem 'rubysl', platform: :rbx
 gem 'coveralls', platform: :mri
 
 # Some browsers have problems with WEBrick
-gem 'puma' unless RUBY_ENGINE == 'truffleruby'
+gem 'puma', platform: :ruby unless RUBY_ENGINE == 'truffleruby'
 
 gem 'rack', rack_version if rack_version
 gem 'tilt', tilt_version if tilt_version
@@ -46,10 +46,7 @@ group :development do
   end
 end unless ENV['CI']
 
-group :doc do
-  gem 'redcarpet' unless RUBY_ENGINE == 'truffleruby'
-end
-
-platforms :ruby, :mswin, :mswin64, :mingw, :x64_mingw do
-  gem 'c_lexer', '~> 2.6' unless RUBY_ENGINE == 'truffleruby'
-end
+gem 'redcarpet', group: :doc, platform: :ruby unless RUBY_ENGINE == 'truffleruby'
+gem 'c_lexer', '~> 2.6', platform: :mri unless RUBY_ENGINE == 'truffleruby'
+gem 'rubocop', '~> 0.67.0', platform: :ruby
+gem 'rubocop-performance', '~> 1.1', platform: :ruby

@@ -31,12 +31,16 @@ task :jshint do
   sh "jshint --verbose opal/corelib/runtime.js"
 end
 
-require 'rubocop/rake_task'
-desc 'Run RuboCop on lib/, opal/ and stdlib/ directories'
-RuboCop::RakeTask.new(:rubocop) do |task|
-  task.options << '--extra-details'
-  task.options << '--display-style-guide'
-  task.options << '--parallel'
+begin
+  require 'rubocop/rake_task'
+  desc 'Run RuboCop on lib/, opal/ and stdlib/ directories'
+  RuboCop::RakeTask.new(:rubocop) do |task|
+    task.options << '--extra-details'
+    task.options << '--display-style-guide'
+    task.options << '--parallel'
+  end
+rescue LoadError
+  # Not available on Windows
 end
 
 task :lint => [:jshint, :rubocop]
