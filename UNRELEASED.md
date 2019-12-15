@@ -1,7 +1,2 @@
-<!--
-Whitespace conventions:
-- 4 spaces before ## titles
-- 2 spaces before ### titles
-- 1 spaces before normal text
--->
-
+- Increase the timeout for starting Chrome within the Chrome runner (#2037)
+- Run the Opal code within the body inside Chrome runner, it fixes an issue in opal-rspec (#2037)
