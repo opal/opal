@@ -15,15 +15,19 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.0.1...HEAD) - unreleased
+## [Unreleased](https://github.com/opal/opal/compare/v1.0.2...HEAD) - unreleased
 
 
-<!--
-Whitespace conventions:
-- 4 spaces before ## titles
-- 2 spaces before ### titles
-- 1 spaces before normal text
--->
+
+
+
+
+
+## [1.0.2](https://github.com/opal/opal/compare/v1.0.1...v1.0.2) - 2019-12-15
+
+
+- Increase the timeout for starting Chrome within the Chrome runner ([#2037](https://github.com/opal/opal/pull/2037))
+- Run the Opal code within the body inside Chrome runner, it fixes an issue in opal-rspec ([#2037](https://github.com/opal/opal/pull/2037))
 
 
 
