@@ -258,6 +258,7 @@ module Testing
     end
 
     def sinatra_server_running?
+      require 'socket'
       puts "Connecting to localhost:4567..."
       TCPSocket.new('localhost', '4567').close
       true

@@ -1,0 +1,12 @@
+steps:
+- run: gem install bundler --conservative
+- uses: actions/cache@v1
+  with:
+    path: vendor/bundle
+    key: ruby-deps-v1-${{ runner.os }}-${{ github.ref }}
+  restore-keys: |
+    ruby-deps-v1-${{ runner.os }}-${{ github.ref }}
+    ruby-deps-v1-${{ runner.os }}-master
+    ruby-deps-v1-
+- run: bundle install
+

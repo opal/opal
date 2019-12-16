@@ -1,0 +1,17 @@
+steps:
+- uses: actions/setup-node@v1
+  with:
+    node-version: '10.x'
+- uses: actions/cache@v1
+  with:
+    path: node_modules
+    key: javascript-deps-v1-${{ runner.os }}
+- uses: actions/cache@v1
+  with:
+    path: package.json
+    key: javascript-deps-v1-package-json-${{ runner.os }}
+- uses: actions/cache@v1
+  with:
+    path: package-lock.json
+    key: javascript-deps-v1-package-lock-json-${{ runner.os }}
+- run: npm install jshint uglify-js
