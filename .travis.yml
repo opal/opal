@@ -18,6 +18,7 @@ cache:
   directories:
     - /home/travis/.nvm/
     - smoke_test_opal_rspec
+    - .git
 
 matrix:
   fast_finish: true
@@ -67,10 +68,12 @@ matrix:
       env: RUN=rspec
 
     - rvm: truffleruby
-      env: RUN=rspec
+      env:
+        - RUN=rspec
+        - TRUFFLERUBYOPT="--vm.Xmx6g"
 
     - rvm: jruby-9.2.9.0
-      env: 
+      env:
         - RUN=rspec
         - JRUBY_OPTS=--dev
 
@@ -101,12 +104,3 @@ before_install:
 
 script:
   - "bundle exec rake $RUN"
-
-notifications:
-  irc: "irc.freenode.org#opal"
-  webhooks:
-    urls:
-      - https://webhooks.gitter.im/e/2ea12333adebda0c2289
-
-# addons:
-#   sauce_connect: true
