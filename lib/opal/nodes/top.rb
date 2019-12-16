@@ -29,8 +29,8 @@ module Opal
             add_temp '$nesting = []'
           end
           add_temp 'nil = Opal.nil'
-          add_temp '$$$ = Opal.const_get_qualified'
-          add_temp '$$ = Opal.const_get_relative'
+          add_temp '$$$ = Opal.$$$'
+          add_temp '$$ = Opal.$$'
 
           add_used_helpers
           add_used_operators
