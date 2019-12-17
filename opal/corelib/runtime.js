@@ -204,6 +204,11 @@
     for (i = 0, ii = ancestors.length; i < ii; i++) {
       if (ancestors[i].$$const && $hasOwn.call(ancestors[i].$$const, name)) {
         return ancestors[i].$$const[name];
+      } else if (ancestors[i].$$autoload && $hasOwn.call(ancestors[i].$$autoload, name)) {
+        Opal.Kernel.$require(ancestors[i].$$autoload[name]);
+        if (ancestors[i].$$const && $hasOwn.call(ancestors[i].$$const, name)) {
+          return ancestors[i].$$const[name];
+        }
       }
     }
   }
