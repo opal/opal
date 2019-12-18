@@ -507,6 +507,20 @@ RSpec.describe Opal::Compiler do
         biz: "boz"
       )
     end
+
+    it 'accepts complex values' do
+      expect_magic_comments_for("").to eq({})
+
+      expect_magic_comments_for(
+        "#baz:  qux,naz!",
+        "#biz : boz?  ,bux,   []=",
+        "#buz  :<<,+,!@",
+      ).to eq(
+        baz: "qux,naz!",
+        biz: "boz?  ,bux,   []=",
+        buz: "<<,+,!@",
+      )
+    end
   end
 
   describe 'magic encoding comment' do

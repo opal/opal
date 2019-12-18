@@ -1,3 +1,5 @@
+# helpers: slice
+
 require 'corelib/comparable'
 
 class Time < `Date`

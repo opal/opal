@@ -372,6 +372,10 @@
     throw Opal.NameError.$new("constant "+cref+"::"+cref.$name()+" not defined");
   };
 
+  // Setup some shortcuts to reduce compiled size
+  Opal.$$ = Opal.const_get_relative;
+  Opal.$$$ = Opal.const_get_qualified;
+
 
   // Modules & Classes
   // -----------------
@@ -2423,11 +2427,6 @@
   // Make Kernel#require immediately available as it's needed to require all the
   // other corelib files.
   $defineProperty(_Object.$$prototype, '$require', Opal.require);
-
-  // Add a short helper to navigate constants manually.
-  // @example
-  //   Opal.$$.Regexp.$$.IGNORECASE
-  Opal.$$ = _Object.$$;
 
   // Instantiate the main object
   Opal.top = new _Object();

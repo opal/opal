@@ -10,6 +10,10 @@ Whitespace conventions:
 - Basic support for `uplevel:` keyword argument in `Kernel#warn` (#2006)
 - Added a `#respond_to_missing?` implementation for `BasicObject`, `Delegator`, `OpenStruct`, that's meant for future support in the Opal runtime, which currently ignores it (#2007)
 - `Opal::Compiler#magic_comments` that allows to access magic-comments format and converts it to a hash
+- Use magic-comments to declare helpers required by the file
+- `Opal.$$` is now a shortcut for `Opal.const_get_relative`
+- `Opal.$$$` is now a shortcut for `Opal.const_get_qualified`
+
 
 ### Fixed
 
@@ -42,4 +46,5 @@ Whitespace conventions:
 - Nashorn has been deprecated but GraalVM still supports it (#1997)
 - "opal/mini" now includes "opal/io" (#2002)
 - Regexps assigned to constants are now frozen (#2007)
-
+- `Opal.$$` changed from being the constant cache of Object to being a shortcut
+  for `Opal.const_get_relative`
