@@ -2454,4 +2454,4 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
-}).call();
+}).call(this);
