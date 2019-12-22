@@ -6,6 +6,7 @@ clone_depth: 10
 
 environment:
   ruby_version: '25'
+  nodejs_version: '12'
 
 branches:
   only:
@@ -19,6 +20,8 @@ cache:
   - '%APPDATA%\npm-cache'
 
 install:
+  # Install node
+  - ps: Install-Product node $env:nodejs_version
   # Take default Ruby out of path
   - SET PATH=%PATH:C:\Ruby193\bin;=%
   # Add Ruby to path from build matrix
