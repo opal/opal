@@ -6,3 +6,5 @@ set -vx
 bundle update
 
 git submodule update --init
+
+overcommit --install
