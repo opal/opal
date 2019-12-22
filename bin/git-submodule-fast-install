@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+
+def system(*args)
+  puts "== command: #{args.inspect}"
+  super
+end
+
+def system!(*args)
+  system(*args) or raise "== command failed: #{args.inspect}"
+end
+
+
+Dir.chdir "#{__dir__}/.."
+Dir.mkdir 'tmp' unless File.directory? 'tmp'
+
+system 'git submodule --quiet deinit --all -f 2> /dev/null'
+
+modules = {}
+`git config -f #{__dir__}/../.gitmodules --list`.lines.each do |line|
+  fullkey, value = line.split('=', 2)
+  _, name, key = fullkey.split('.', 3)
+  modules[name] ||= {}
+  modules[name][key.to_sym] = value.strip
+end
+
+`git submodule`.lines.each do |line|
+  sha1, name = line[1..-1].scan(/^(?<sha1>\w+) (?<name>\S+)/).first
+  modules[name][:sha1] = sha1
+end
+
+modules.map do |name, config|
+  puts "== installing #{name}..."
+  url, sha1, path = config.values_at(:url, :sha1, :path)
+  dir = File.dirname(path)
+  url.sub!(/\.git$/, '')
+
+  Thread.new do
+    system! "curl -L #{url}/archive/#{sha1}.zip -o #{sha1}.zip"
+
+    system! "unzip -q #{sha1}.zip -d #{dir}"
+    system! "rm #{sha1}.zip"
+
+    system! "rm -rf #{path}" if File.directory? path
+    system! "mv #{dir}/*-#{sha1} #{path}"
+    print "== completed installing #{name}.\n"
+  end
+end.each(&:join)
+
+system! 'git submodule init'

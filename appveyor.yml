@@ -14,7 +14,6 @@ branches:
     - /.*/ci-check/
 
 install:
-  - git submodule update --init --recursive
   # Take default Ruby out of path
   - SET PATH=%PATH:C:\Ruby193\bin;=%
   # Add Ruby to path from build matrix
@@ -24,6 +23,7 @@ install:
   - node --version
   - bundler --version
   - bundle
+  - ruby bin/git-submodule-fast-install
 
 build: off
 
