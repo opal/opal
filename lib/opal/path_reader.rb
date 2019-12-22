@@ -17,7 +17,7 @@ module Opal
     def read(path)
       full_path = expand(path)
       return nil if full_path.nil?
-      File.open(full_path, 'rb:UTF-8', &:read)
+      File.open(full_path, 'rb:UTF-8', &:read) if File.exist?(full_path)
     end
 
     def expand(path)
