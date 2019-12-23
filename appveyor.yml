@@ -13,6 +13,11 @@ branches:
     - /.*-stable/
     - /.*/ci-check/
 
+cache:
+  - smoke_test_opal_rspec
+  - node_modules
+  - '%APPDATA%\npm-cache'
+
 install:
   # Take default Ruby out of path
   - SET PATH=%PATH:C:\Ruby193\bin;=%
