@@ -18,6 +18,7 @@ cache:
   directories:
     - /home/travis/.nvm/
     - smoke_test_opal_rspec
+    - node_modules
 
 matrix:
   fast_finish: true
@@ -89,8 +90,7 @@ before_install:
   # Keep track of which version of node we're running the specs against
   - node -v
   - git submodule update --init
-  - npm install -g jshint
-  - npm install -g uglify-js
+  - npm install jshint uglify-js
   - bundle config without doc
   - which google-chrome-stable
   - google-chrome-stable --version
