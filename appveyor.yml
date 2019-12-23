@@ -1,9 +1,6 @@
 version: '{build}'
 
 skip_tags: true
-# AppVeyor automatically skips the build if the commit contains [ci skip] or [skip ci]
-#skip_commits:
-#  message: /\[ci skip\]/
 
 clone_depth: 10
 
@@ -16,8 +13,12 @@ branches:
     - /.*-stable/
     - /.*/ci-check/
 
+cache:
+  - smoke_test_opal_rspec
+  - node_modules
+  - '%APPDATA%\npm-cache'
+
 install:
-  - git submodule update --init --recursive
   # Take default Ruby out of path
   - SET PATH=%PATH:C:\Ruby193\bin;=%
   # Add Ruby to path from build matrix
@@ -27,6 +28,7 @@ install:
   - node --version
   - bundler --version
   - bundle
+  - ruby bin/git-submodule-fast-install
 
 build: off
 
