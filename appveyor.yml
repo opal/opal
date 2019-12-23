@@ -1,9 +1,6 @@
 version: '{build}'
 
 skip_tags: true
-# AppVeyor automatically skips the build if the commit contains [ci skip] or [skip ci]
-#skip_commits:
-#  message: /\[ci skip\]/
 
 clone_depth: 10
 
