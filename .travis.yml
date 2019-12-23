@@ -91,6 +91,7 @@ before_install:
   - node -v
   - git submodule update --init
   - npm install jshint uglify-js
+  - export PATH="node_modules/.bin:$PATH"
   - bundle config without doc
   - which google-chrome-stable
   - google-chrome-stable --version
