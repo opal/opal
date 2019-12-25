@@ -18,8 +18,9 @@
   var console;
 
   // Detect the global object
-  if (typeof(global) !== 'undefined') { global_object = global; }
-  if (typeof(window) !== 'undefined') { global_object = window; }
+  if (typeof(globalThis) !== 'undefined') { global_object = globalThis; }
+  else if (typeof(global) !== 'undefined') { global_object = global; }
+  else if (typeof(window) !== 'undefined') { global_object = window; }
 
   // Setup a dummy console object if missing
   if (typeof(global_object.console) === 'object') {
