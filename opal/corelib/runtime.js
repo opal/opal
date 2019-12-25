@@ -1,4 +1,4 @@
-(function() {
+(function(global_object) {
   "use strict";
 
   // @note
@@ -15,7 +15,7 @@
   //   The way the code is digested before going through Yardoc is a secret kept
   //   in the docs repo (https://github.com/opal/docs/tree/master).
 
-  var global_object = this, console;
+  var console;
 
   // Detect the global object
   if (typeof(global) !== 'undefined') { global_object = global; }
@@ -2454,4 +2454,4 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
-}).call();
+}).call(this);
