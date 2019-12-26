@@ -189,7 +189,13 @@
     // and in order. The ancestors of those elements are ignored.
     for (i = 0, ii = nesting.length; i < ii; i++) {
       constant = nesting[i].$$const[name];
-      if (constant != null) return constant;
+      if (nesting[i].$$const[name] != null) { return nesting[i].$$const[name]; }
+      else if (nesting[i].$$autoload && nesting[i].$$autoload[name] != null) {
+        Opal.Kernel.$require(nesting[i].$$autoload[name]);
+        if (nesting[i].$$const[name] != null) {
+          return nesting[i].$$const[name];
+        }
+      }
     }
   }
 
@@ -531,9 +537,9 @@
     }
 
     if (Opal.trace_class) {
-      Opal.tracers_for_class.forEach(function (tracer) {
-        tracer.block.$call(klass)
-      });
+      for(var i=0; i < Opal.tracers_for_class.length; i++) {
+        Opal.tracers_for_class[i].block.$call(klass);
+      }
     }
 
     return klass;
@@ -621,9 +627,9 @@
     Opal.const_set(scope, name, module);
 
     if (Opal.trace_class) {
-      Opal.tracers_for_class.forEach(function (tracer) {
-        tracer.block.$call(klass)
-      });
+      for(var i=0; i < Opal.tracers_for_class.length; i++) {
+        Opal.tracers_for_class[i].block.$call(module);
+      }
     }
 
     return module;

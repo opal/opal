@@ -7,27 +7,33 @@ class TracePoint
 
   attr_reader :event
 
-  def intialize(event, &block)
+  def initialize(event, &block)
     raise RuntimeError, "Only the :class event is supported" unless event == :class
-    @trace_evt = "trace_#{@event}"
-    @tracers_for_evt = "tracers_for_#{@event}"
     @event = event
     @block = block
+    @trace_evt = "trace_#{@event}"
+    @tracers_for_evt = "tracers_for_#{@event}"
   end
 
   def enable
-    `Opal[#@tracers_for_evt].push(self)`
+    %x{
+      Opal[#{@tracers_for_evt}].push(self);
+      Opal[#{@trace_evt}] = true;
+    }
   end
 
   def enabled?
-   `Opal[#@tracers_for_evt].includes(self)`
+   `Opal[#{@tracers_for_evt}].includes(self)`
   end
 
   def disable
     %x{
-      var idx = Opal[#@tracers_for_evt].indexOf(self)
+      var idx = Opal[#{@tracers_for_evt}].indexOf(self)
       if (idx > -1) {
-        Opal[#@tracers_for_evt].splice(idx, 1);
+        Opal[#{@tracers_for_evt}].splice(idx, 1);
+        if (Opal[#{@tracers_for_evt}].length == 0) {
+          Opal[#{@trace_evt}] = false;
+        }
         return true;
       } else {
         return false;
