@@ -7,4 +7,6 @@ bundle update
 
 git submodule update --init
 
+npm install
+
 overcommit --install

@@ -133,14 +133,9 @@ on opal.
 
 ## Running tests
 
-The Ruby Spec Suite related repos must be cloned as git submodules:
+Setup the project:
 
-    $ git submodule update --init
-
-Then, install dependencies:
-
-    $ bundle install
-    $ npm install -g jshint
+    $ bin/setup
 
 The test suite can be run using:
 

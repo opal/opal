@@ -8,17 +8,10 @@
 $ git clone git://github.com/<YOUR-GITHUB-USERNAME>/opal.git
 ```
 
-The Ruby Spec Suite related repos must be cloned as git submodules:
+Setup the project:
 
 ```
-$ git submodule update --init
-```
-
-Get dependencies:
-
-```
-$ bundle install
-$ npm install -g jshint
+$ bin/setup
 ```
 
 Run the test suite:

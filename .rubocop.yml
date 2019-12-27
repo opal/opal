@@ -70,6 +70,10 @@ Layout/CommentIndentation:
     - 'lib/opal/rewriters/binary_operator_assignment.rb'
     - 'lib/opal/rewriters/logical_operator_assignment.rb'
 
+# We need to support older rubies
+Layout/IndentHeredoc:
+  Enabled: false
+
 Style/FrozenStringLiteralComment:
   Exclude:
     - 'opal/**/*.rb'

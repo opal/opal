@@ -93,7 +93,7 @@ before_install:
   # Keep track of which version of node we're running the specs against
   - bin/git-submodule-fast-install
   - node -v
-  - npm install jshint uglify-js
+  - npm install
   - export PATH="node_modules/.bin:$PATH"
   - bundle config without doc
   - which google-chrome-stable
