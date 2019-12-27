@@ -13,6 +13,7 @@ Whitespace conventions:
 - Use magic-comments to declare helpers required by the file (#2038)
 - `Opal.$$` is now a shortcut for `Opal.const_get_relative` (#2038)
 - `Opal.$$$` is now a shortcut for `Opal.const_get_qualified` (#2038)
+- Added support for `globalThis` as the generic global object accessor (#2047)
 
 
 ### Fixed
