@@ -32,7 +32,7 @@ install:
   - bundler --version
   - bundle
   - ruby bin/git-submodule-fast-install
-  - npm install jshint uglify-js source-map
+  - npm install
 
 build: off
 

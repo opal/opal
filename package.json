@@ -1,0 +1,15 @@
+{
+  "name": "opal-dev",
+  "private": true,
+  "dependencies": {
+    "benchmark": "^2.1.4",
+    "jshint": "^2.11.0-rc1",
+    "source-map-support": "^0.5.16",
+    "uglify-js": "^3.7.2"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opal/opal.git"
+  }
+}
