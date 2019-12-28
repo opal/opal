@@ -54,6 +54,7 @@ Whitespace conventions:
 - "opal/mini" now includes "opal/io" (#2002)
 - Regexps assigned to constants are now frozen (#2007)
 - `Opal.$$` changed from being the constant cache of Object to being a shortcut for `Opal.const_get_relative` (#2038)
+- Moved REPL implementation from bin/ to its own lib/ file as `opal/repl.rb` (#2048)
 
 
 ### Deprecated
