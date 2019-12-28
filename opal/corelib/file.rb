@@ -126,18 +126,18 @@ class File < IO
           return name;
         }
 
-        if (suffix !== nil) {
-          suffix = #{Opal.coerce_to!(suffix, String, :to_str)}
-        } else {
-          suffix = null;
-        }
-
         name = name.replace(new RegExp(#{"(.)[#{sep_chars}]*$"}), '$1');
         name = name.replace(new RegExp(#{"^(?:.*[#{sep_chars}])?([^#{sep_chars}]+)$"}), '$1');
 
+        if (suffix === nil || suffix == null) {
+          return name;
+        }
+
+        suffix = #{Opal.coerce_to!(suffix, String, :to_str)}.valueOf();
+
         if (suffix === ".*") {
           name = name.replace(/\.[^\.]+$/, '');
-        } else if(suffix !== null) {
+        } else {
           suffix = Opal.escape_regexp(suffix);
           name = name.replace(new RegExp(#{"#{suffix}$"}), '');
         }
