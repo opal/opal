@@ -425,3 +425,9 @@ Layout/AlignHash:
 # No way to set multiple preferred names
 Naming/RescuedExceptionsVariableName:
   Enabled: false
+
+Style/Semicolon:
+  AllowAsExpressionSeparator: true
+
+Layout/EmptyLinesAroundExceptionHandlingKeywords:
+  Enabled: false
