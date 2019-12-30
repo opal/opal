@@ -27,6 +27,10 @@ if RUBY_ENGINE == 'opal'
       # @buffer << string
       @buffer += string
     end
+
+    def coerce_encoding(string)
+      string
+    end
   end
 
   class Parser::Source::Buffer
