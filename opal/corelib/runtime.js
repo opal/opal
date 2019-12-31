@@ -209,6 +209,11 @@
     }
   }
 
+  // TracePoint support
+  // ------------------
+  // for TracePoint.trace(:class) do ...
+  Opal.trace_class = false;
+  Opal.tracers_for_class = [];
 
   // Constants
   // ---------
@@ -577,6 +582,12 @@
       Opal.bridge(bridged, klass);
     }
 
+    if (Opal.trace_class) {
+      for(var i=0; i < Opal.tracers_for_class.length; i++) {
+        Opal.tracers_for_class[i].block.$call(klass);
+      }
+    }
+
     return klass;
   };
 
@@ -660,6 +671,12 @@
     // Module doesnt exist, create a new one...
     module = Opal.allocate_module(name);
     Opal.const_set(scope, name, module);
+
+    if (Opal.trace_class) {
+      for(var i=0; i < Opal.tracers_for_class.length; i++) {
+        Opal.tracers_for_class[i].block.$call(module);
+      }
+    }
 
     return module;
   };
