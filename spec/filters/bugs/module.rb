@@ -55,8 +55,6 @@ opal_filter "Module" do
   fails "Module#autoload sets the autoload constant in the constants table"
   fails "Module#autoload shares the autoload request across dup'ed copies of modules"
   fails "Module#autoload when changing $LOAD_PATH does not reload a file due to a different load path"
-  fails "Module#autoload? returns nil if no file has been registered for a constant"
-  fails "Module#autoload? returns the name of the file that will be autoloaded"
   fails "Module#class_eval converts a non-string filename to a string using to_str"
   fails "Module#class_eval converts non string eval-string to string using to_str"
   fails "Module#class_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
