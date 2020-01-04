@@ -1,8 +1,8 @@
 module SecureRandom
   def self.hex(count = nil)
-    count = 16 unless count
+    count ||= 16
     count = count.to_int unless `typeof count === "number"`
-    raise ArgumentError, "count of hex numbers must be positive" if count < 0
+    raise ArgumentError, 'count of hex numbers must be positive' if count < 0
     %x{
       count = Math.floor(count);
       var repeat = Math.floor(count / 6),
