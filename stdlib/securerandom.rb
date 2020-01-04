@@ -11,7 +11,8 @@ module SecureRandom
           string = '',
           temp;
       for (var i = 0; i < repeat; i++) {
-        temp = Math.floor(Math.random()*parseInt('ff'.repeat(6), 16)).toString(16);
+        // parseInt('ff'.repeat(6), 16) == 281474976710655
+        temp = Math.floor(Math.random() * 281474976710655).toString(16);
         if (temp.length < 12) {
           // account for leading zeros gone missing
           temp = '0'.repeat(12 - temp.length) + temp;
