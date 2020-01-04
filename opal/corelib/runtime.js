@@ -215,6 +215,14 @@
   Opal.trace_class = false;
   Opal.tracers_for_class = [];
 
+  function invoke_tracers_for_class(klass_or_module) {
+    for(var i=0, tracer; i < Opal.tracers_for_class.length; i++) {
+      tracer = Opal.tracers_for_class[i];
+      tracer.trace_object = klass_or_module;
+      tracer.block.$call(tracer);
+    }
+  }
+
   // Constants
   // ---------
   //
@@ -559,6 +567,9 @@
         // Make sure existing class has same superclass
         ensureSuperclassMatch(klass, superclass);
       }
+
+      if (Opal.trace_class) { invoke_tracers_for_class(klass); }
+
       return klass;
     }
 
@@ -582,11 +593,7 @@
       Opal.bridge(bridged, klass);
     }
 
-    if (Opal.trace_class) {
-      for(var i=0; i < Opal.tracers_for_class.length; i++) {
-        Opal.tracers_for_class[i].block.$call(klass);
-      }
-    }
+    if (Opal.trace_class) { invoke_tracers_for_class(klass); }
 
     return klass;
   };
@@ -665,6 +672,9 @@
     module = find_existing_module(scope, name);
 
     if (module) {
+
+      if (Opal.trace_class) { invoke_tracers_for_class(module); }
+
       return module;
     }
 
@@ -672,11 +682,7 @@
     module = Opal.allocate_module(name);
     Opal.const_set(scope, name, module);
 
-    if (Opal.trace_class) {
-      for(var i=0; i < Opal.tracers_for_class.length; i++) {
-        Opal.tracers_for_class[i].block.$call(module);
-      }
-    }
+    if (Opal.trace_class) { invoke_tracers_for_class(module); }
 
     return module;
   };
