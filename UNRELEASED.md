@@ -45,6 +45,8 @@ Whitespace conventions:
 - Fixed usage of semicolon in single-line backticks (#2004)
 - Module#attr with multiple arguments (#2003)
 - `PathReader` used to try to read missing files instead of respecting the `missing_require_severity` configuration value (#2044)
+- Removed some unused variables from the runtime (#2052)
+- Fixed a typo in the runtime (#2054)
 
 
 ### Changed
