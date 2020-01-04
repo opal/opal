@@ -152,6 +152,9 @@ ruby/core/time
 !ruby/core/time/_dump_spec
 !ruby/core/time/_load_spec
 
+ruby/core/tracepoint/inspect_spec
+ruby/core/tracepoint/self_spec
+
 ruby/core/true
 ruby/core/unboundmethod
 
