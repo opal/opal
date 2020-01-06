@@ -11,8 +11,16 @@ module Opal
       def self.call(data)
         (data[:options] ||= {})[:env] = { 'NODE_PATH' => node_modules }
 
+        argv = data[:argv].dup.to_a
+        argv.unshift('--') if argv.any?
+
         SystemRunner.call(data) do |tempfile|
-          ['node', tempfile.path, *data[:argv]]
+          [
+            'node',
+            '--require', "#{__dir__}/source-map-support",
+            tempfile.path,
+            *argv
+          ]
         end
       rescue Errno::ENOENT
         raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'

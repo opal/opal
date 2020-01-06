@@ -25,6 +25,8 @@ module Opal
         end
 
         in_scope do
+          line '"use strict";' if compiler.use_strict?
+
           body_code = stmt(stmts)
           body_code = [body_code] unless body_code.is_a?(Array)
 
@@ -35,8 +37,8 @@ module Opal
             add_temp '$nesting = []'
           end
           add_temp 'nil = Opal.nil'
-          add_temp '$$$ = Opal.const_get_qualified'
-          add_temp '$$ = Opal.const_get_relative'
+          add_temp '$$$ = Opal.$$$'
+          add_temp '$$ = Opal.$$'
 
           add_used_helpers
           add_used_operators
@@ -113,8 +115,7 @@ module Opal
       end
 
       def add_used_helpers
-        helpers = compiler.helpers.to_a
-        helpers.to_a.each { |h| add_temp "$#{h} = Opal.#{h}" }
+        compiler.helpers.to_a.each { |h| add_temp "$#{h} = Opal.#{h}" }
       end
 
       def add_used_operators

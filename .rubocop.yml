@@ -70,6 +70,10 @@ Layout/CommentIndentation:
     - 'lib/opal/rewriters/binary_operator_assignment.rb'
     - 'lib/opal/rewriters/logical_operator_assignment.rb'
 
+# We need to support older rubies
+Layout/IndentHeredoc:
+  Enabled: false
+
 Style/FrozenStringLiteralComment:
   Exclude:
     - 'opal/**/*.rb'
@@ -420,4 +424,10 @@ Layout/AlignHash:
 
 # No way to set multiple preferred names
 Naming/RescuedExceptionsVariableName:
+  Enabled: false
+
+Style/Semicolon:
+  AllowAsExpressionSeparator: true
+
+Layout/EmptyLinesAroundExceptionHandlingKeywords:
   Enabled: false

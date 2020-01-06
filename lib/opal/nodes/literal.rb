@@ -55,8 +55,6 @@ module Opal
 
       def compile
         string_value = value
-        encoding = string_value.encoding
-        should_encode = encoding != Encoding::UTF_8
 
         sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do
           code_point = Regexp.last_match(1).to_i(16)
@@ -64,8 +62,13 @@ module Opal
         end
         push translate_escape_chars(sanitized_value)
 
-        if should_encode && RUBY_ENGINE != 'opal'
-          push '.$force_encoding("', encoding.name, '")'
+        if RUBY_ENGINE != 'opal'
+          encoding = string_value.encoding
+
+          unless encoding == Encoding::UTF_8
+            helper :enc
+            wrap "$enc(", ", \"#{encoding.name}\")"
+          end
         end
       end
 

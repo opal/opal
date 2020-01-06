@@ -195,16 +195,8 @@ module Opal
 
       source = stub?(rel_path) ? '' : read(rel_path)
 
-      if source.nil?
-        message = "can't find file: #{rel_path.inspect}"
-        case missing_require_severity
-        when :error   then raise LoadError, message
-        when :warning then warn "can't find file: #{rel_path.inspect}"
-        when :ignore  then # noop
-        end
-
-        return # the handling is delegated to the runtime
-      end
+      # The handling is delegated to the runtime
+      return if source.nil?
 
       abs_path = expand_path(rel_path)
       rel_path = expand_ext(rel_path)

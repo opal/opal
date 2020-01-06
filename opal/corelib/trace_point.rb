@@ -8,22 +8,32 @@ class TracePoint
   attr_reader :event
 
   def initialize(event, &block)
-    raise RuntimeError, "Only the :class event is supported" unless event == :class
+    raise 'Only the :class event is supported' unless event == :class
     @event = event
     @block = block
+    @trace_object = nil
     @trace_evt = "trace_#{@event}"
     @tracers_for_evt = "tracers_for_#{@event}"
   end
 
-  def enable
+  def enable(*args, &enable_block)
+    previous_state = enabled?
     %x{
       Opal[#{@tracers_for_evt}].push(self);
       Opal[#{@trace_evt}] = true;
     }
+    if block_given?
+      yield
+      disable
+    end
+    previous_state
   end
 
   def enabled?
-   `Opal[#{@tracers_for_evt}].includes(self)`
+    %x{
+      if (Opal[#{@trace_evt}] && Opal[#{@tracers_for_evt}].includes(self)) { return true; }
+      else { return false; }
+    }
   end
 
   def disable
@@ -39,5 +49,9 @@ class TracePoint
         return false;
       }
     }
+  end
+
+  def self
+    @trace_object
   end
 end

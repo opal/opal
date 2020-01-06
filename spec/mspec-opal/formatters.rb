@@ -125,11 +125,6 @@ class BrowserFormatter < BaseOpalFormatter
 end
 
 class NodeJSFormatter < BaseOpalFormatter
-  def initialize(*args, &block)
-    require 'nodejs/stacktrace'
-    super
-  end
-
   def red(str)
     `process.stdout.write("\u001b[31m"+#{str}+"\u001b[0m")`
   end

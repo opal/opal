@@ -464,9 +464,9 @@ RSpec.describe Opal::Compiler do
     end
   end
 
-  describe '#magic_comment_flags' do
+  describe '#magic_comments' do
     def expect_magic_comments_for(*lines)
-      expect(compiler_for(lines.join("\n")).magic_comment_flags)
+      expect(compiler_for(lines.join("\n")).magic_comments)
     end
 
     it 'extracts them in a hash' do
@@ -505,6 +505,20 @@ RSpec.describe Opal::Compiler do
       ).to eq(
         baz: "qux",
         biz: "boz"
+      )
+    end
+
+    it 'accepts complex values' do
+      expect_magic_comments_for("").to eq({})
+
+      expect_magic_comments_for(
+        "#baz:  qux,naz!",
+        "#biz : boz?  ,bux,   []=",
+        "#buz  :<<,+,!@",
+      ).to eq(
+        baz: "qux,naz!",
+        biz: "boz?  ,bux,   []=",
+        buz: "<<,+,!@",
       )
     end
   end
@@ -582,14 +596,15 @@ RSpec.describe Opal::Compiler do
       context 'valid sequence' do
         let(:string) { "\xFF" }
 
-        include_examples 'it compiles the string as', '"\xFF".$force_encoding("ASCII-8BIT")'
+        include_examples 'it compiles the string as', '$enc("\xFF", "ASCII-8BIT")'
         include_examples 'it does not print any warnings'
       end
 
       context 'unicode sequence' do
         let(:string) { 'λ' }
+        encoded_string = 'λ'.force_encoding("ascii-8bit")
 
-        include_examples 'it compiles the string as', 'λ'.force_encoding("ascii-8bit").inspect + '.$force_encoding("ASCII-8BIT")'
+        include_examples 'it compiles the string as', "$enc(#{encoded_string.inspect}, \"ASCII-8BIT\")"
         include_examples 'it does not print any warnings'
       end
     end

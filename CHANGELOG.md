@@ -15,7 +15,7 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.0.0...HEAD) - unreleased
+## [Unreleased](https://github.com/opal/opal/compare/v1.0.2...HEAD) - unreleased
 
 
 <!--
@@ -24,6 +24,63 @@ Whitespace conventions:
 - 2 spaces before ### titles
 - 1 spaces before normal text
 -->
+
+### Added
+
+- Basic support for `uplevel:` keyword argument in `Kernel#warn` ([#2006](https://github.com/opal/opal/pull/2006))
+- Added a `#respond_to_missing?` implementation for `BasicObject`, `Delegator`, `OpenStruct`, that's meant for future support in the Opal runtime, which currently ignores it ([#2007](https://github.com/opal/opal/pull/2007))
+- `Opal::Compiler#magic_comments` that allows to access magic-comments format and converts it to a hash
+
+### Fixed
+
+- Struct#dup ([#1995](https://github.com/opal/opal/pull/1995))
+- Integer#gcdlcm ([#1972](https://github.com/opal/opal/pull/1972))
+- Enumerable#to_h ([#1979](https://github.com/opal/opal/pull/1979))
+- Enumerator#size ([#1980](https://github.com/opal/opal/pull/1980))
+- Enumerable#min ([#1982](https://github.com/opal/opal/pull/1982))
+- Enumerable#min_by ([#1985](https://github.com/opal/opal/pull/1985))
+- Enumerable#max_by ([#1985](https://github.com/opal/opal/pull/1985))
+- Set#intersect? ([#1988](https://github.com/opal/opal/pull/1988))
+- Set#disjoint? ([#1988](https://github.com/opal/opal/pull/1988))
+- Set#keep_if ([#1987](https://github.com/opal/opal/pull/1987))
+- Set#select! ([#1987](https://github.com/opal/opal/pull/1987))
+- Set#reject! ([#1987](https://github.com/opal/opal/pull/1987))
+- Module#alias_method ([#1983](https://github.com/opal/opal/pull/1983))
+- Enumerable#minmax_by ([#1981](https://github.com/opal/opal/pull/1981))
+- Enumerator#each_with_index ([#1990](https://github.com/opal/opal/pull/1990))
+- Range#== ([#1992](https://github.com/opal/opal/pull/1992))
+- Range#each ([#1991](https://github.com/opal/opal/pull/1991))
+- Enumerable#zip ([#1986](https://github.com/opal/opal/pull/1986))
+- Struct#dup not copying `$$data` ([#1995](https://github.com/opal/opal/pull/1995))
+- Fixed usage of semicolon in single-line backticks ([#2004](https://github.com/opal/opal/pull/2004))
+- Module#attr with multiple arguments ([#2003](https://github.com/opal/opal/pull/2003))
+
+
+### Changed
+
+- Updated outdated parser version ([#2013](https://github.com/opal/opal/pull/2013))
+- Nashorn has been deprecated but GraalVM still supports it ([#1997](https://github.com/opal/opal/pull/1997))
+- "opal/mini" now includes "opal/io" ([#2002](https://github.com/opal/opal/pull/2002))
+- Regexps assigned to constants are now frozen ([#2007](https://github.com/opal/opal/pull/2007))
+
+
+
+
+## [1.0.2](https://github.com/opal/opal/compare/v1.0.1...v1.0.2) - 2019-12-15
+
+
+- Increase the timeout for starting Chrome within the Chrome runner ([#2037](https://github.com/opal/opal/pull/2037))
+- Run the Opal code within the body inside Chrome runner, it fixes an issue in opal-rspec ([#2037](https://github.com/opal/opal/pull/2037))
+
+
+
+
+## [1.0.1](https://github.com/opal/opal/compare/v1.0.0...v1.0.1) - 2019-12-08
+
+
+### Changed
+
+- Relaxed parser version requirement ([#2013](https://github.com/opal/opal/pull/2013))
 
 
 

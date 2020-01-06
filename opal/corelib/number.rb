@@ -633,7 +633,7 @@ class Number < Numeric
         }
 
         var f = Math.pow(10, ndigits),
-            x = Math.floor((Math.abs(x) + f / 2) / f) * f;
+            x = Math.floor((Math.abs(self) + f / 2) / f) * f;
 
         return self < 0 ? -x : x;
       }

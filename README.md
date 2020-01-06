@@ -24,7 +24,7 @@
   <a href="https://travis-ci.org/opal/opal"><img src="https://img.shields.io/travis/opal/opal/master.svg?style=flat" alt="Build Status (Linux)" title="" /></a>
   <a href="https://ci.appveyor.com/project/elia/opal/branch/master"><img src="https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true" alt="Build Status (Windows)" title="" /></a>
   <a href="https://codeclimate.com/github/opal/opal"><img src="https://img.shields.io/codeclimate/maintainability-percentage/opal/opal.svg" alt="Code Climate" title="" /></a>
-  <a href="https://coveralls.io/github/opal/opal?branch=elia%2Fcoveralls"><img src="https://coveralls.io/repos/opal/opal/badge.svg?branch=master&amp;service=github" alt="Coverage Status" title="" /></a>
+  <a href="https://coveralls.io/github/opal/opal?branch=master"><img src="https://coveralls.io/repos/opal/opal/badge.svg?branch=master&amp;service=github" alt="Coverage Status" title="" /></a>
 </p>
 
 ## Usage
@@ -133,14 +133,9 @@ on opal.
 
 ## Running tests
 
-The Ruby Spec Suite related repos must be cloned as git submodules:
+Setup the project:
 
-    $ git submodule update --init
-
-Then, install dependencies:
-
-    $ bundle install
-    $ npm install -g jshint
+    $ bin/setup
 
 The test suite can be run using:
 

@@ -78,10 +78,10 @@ module Opal
 
         chrome_pid = Process.spawn(chrome_server_cmd)
 
-        Timeout.timeout(5) do
+        Timeout.timeout(10) do
           loop do
             break if chrome_server_running?
-            sleep 0.2
+            sleep 0.5
           end
         end
 

@@ -1,3 +1,5 @@
+# helpers: slice
+
 class Proc < `Function`
   `Opal.defineProperty(self.$$prototype, '$$is_proc', true)`
   `Opal.defineProperty(self.$$prototype, '$$is_lambda', false)`

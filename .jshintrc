@@ -10,7 +10,7 @@
   "undef"         : true, // Prohibit the use of explicitly undeclared variables
   "unused"        : true, // Warn when you define and never use your variables
 
-  "predef"        : ["Opal", "JSON", "Java", "OpalNode", "jsyaml"],
+  "predef"        : ["Opal", "JSON", "Java", "OpalNode", "jsyaml", "globalThis"],
 
   "browser": true,
   "node": true,

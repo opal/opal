@@ -9,7 +9,17 @@ Whitespace conventions:
 
 - Basic support for `uplevel:` keyword argument in `Kernel#warn` (#2006)
 - Added a `#respond_to_missing?` implementation for `BasicObject`, `Delegator`, `OpenStruct`, that's meant for future support in the Opal runtime, which currently ignores it (#2007)
-- `Opal::Compiler#magic_comment_flags` that allows to access magic-comments format and converts it to a hash
+- `Opal::Compiler#magic_comments` that allows to access magic-comments format and converts it to a hash (#2038)
+- Use magic-comments to declare helpers required by the file (#2038)
+- `Opal.$$` is now a shortcut for `Opal.const_get_relative` (#2038)
+- `Opal.$$$` is now a shortcut for `Opal.const_get_qualified` (#2038)
+- Added support for `globalThis` as the generic global object accessor (#2047)
+- `Opal::Compiler#magic_comments` that allows to access magic-comments format and converts it to a hash
+- Use magic-comments to declare helpers required by the file
+- `Opal.$$` is now a shortcut for `Opal.const_get_relative`
+- `Opal.$$$` is now a shortcut for `Opal.const_get_qualified`
+- Source-map support for Node.js in the default runner (#2045)
+
 
 ### Fixed
 
@@ -34,6 +44,7 @@ Whitespace conventions:
 - Struct#dup not copying `$$data` (#1995)
 - Fixed usage of semicolon in single-line backticks (#2004)
 - Module#attr with multiple arguments (#2003)
+- `PathReader` used to try to read missing files instead of respecting the `missing_require_severity` configuration value (#2044)
 
 
 ### Changed
@@ -42,4 +53,12 @@ Whitespace conventions:
 - Nashorn has been deprecated but GraalVM still supports it (#1997)
 - "opal/mini" now includes "opal/io" (#2002)
 - Regexps assigned to constants are now frozen (#2007)
+- `Opal.$$` changed from being the constant cache of Object to being a shortcut for `Opal.const_get_relative` (#2038)
+- Moved REPL implementation from bin/ to its own lib/ file as `opal/repl.rb` (#2048)
 
+
+### Deprecated
+
+- Requiring nodejs/stacktrace has been deprecated, source-maps are already
+  supported by the default Node.js runner or by requiring https://github.com/evanw/node-source-map-support
+  before loading code compiled by Opal (#2045)
