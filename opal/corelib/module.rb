@@ -346,54 +346,6 @@ class Module
   end
 
   def const_missing(name)
-    %x{
-      var file, constant, path;
-
-      if (self.$$prototype.$$autoload && self.$$prototype.$$autoload[#{name}]) {
-        if (!self.$$prototype.$$autoload[#{name}].loaded) {
-          self.$$prototype.$$autoload[#{name}].loaded = true;
-          try {
-            self.$require(self.$$prototype.$$autoload[#{name}].path);
-          } catch (e) {
-            self.$$prototype.$$autoload[#{name}].exception = e;
-            throw e;
-          }
-          self.$$prototype.$$autoload[#{name}].required = true;
-          constant = #{const_get name};
-          self.$$prototype.$$autoload[#{name}].success = true;
-          return constant;
-        } else if (self.$$prototype.$$autoload[#{name}].loaded && !self.$$prototype.$$autoload[#{name}].required) {
-          if (self.$$prototype.$$autoload[#{name}].exception) { throw self.$$prototype.$$autoload[#{name}].exception; }
-          path = self.$$prototype.$$autoload[#{name}].path;
-          #{raise LoadError, "Constant #{self == Object ? name : "#{self}::#{name}"} cannot be loaded from #{`path`}"};
-        }
-      }
-
-      var ancestors = self.$ancestors();
-
-      for (var i = 0, length = ancestors.length; i < length; i++) {
-        if (ancestors[i].$$prototype.$$autoload && ancestors[i].$$prototype.$$autoload[#{name}]) {
-          if (!ancestors[i].$$prototype.$$autoload[#{name}].loaded) {
-            ancestors[i].$$prototype.$$autoload[#{name}].loaded = true;
-            try {
-              self.$require(ancestors[i].$$prototype.$$autoload[#{name}].path);
-            } catch (e) {
-              ancestors[i].$$prototype.$$autoload[#{name}].exception = e;
-              throw e;
-            }
-            ancestors[i].$$prototype.$$autoload[#{name}].required = true;
-            constant = #{const_get name};
-            ancestors[i].$$prototype.$$autoload[#{name}].success = true;
-            return constant;
-          } else if (ancestors[i].$$prototype.$$autoload[#{name}].loaded && !ancestors[i].$$prototype.$$autoload[#{name}].required) {
-            if (ancestors[i].$$prototype.$$autoload[#{name}].exception) { throw ancestors[i].$$prototype.$$autoload[#{name}].exception; }
-            path = ancestors[i].$$prototype.$$autoload[#{name}].path;
-            #{raise LoadError, "Constant #{self == Object ? name : "#{self}::#{name}"} cannot be loaded from #{`path`}" };
-          }
-        }
-      }
-    }
-
     full_const_name = self == Object ? name : "#{self}::#{name}"
 
     raise NameError.new("uninitialized constant #{full_const_name}", name)

@@ -199,7 +199,6 @@
           }
         } else if (cref.$$prototype.$$autoload[name].loaded && !cref.$$prototype.$$autoload[name].required) {
           if (cref.$$prototype.$$autoload[name].exception) { throw cref.$$prototype.$$autoload[name].exception; }
-          // TODO raise LoadError
         }
       }
     }
@@ -233,7 +232,6 @@
           }
         } else if (nesting[i].$$prototype.$$autoload[name].loaded && !nesting[i].$$prototype.$$autoload[name].required) {
           if (nesting[i].$$prototype.$$autoload[name].exception) { throw nesting[i].$$prototype.$$autoload[name].exception; }
-          // TODO raise LoadError
         }
       }
     }
@@ -266,7 +264,6 @@
           }
         } else if (ancestors[i].$$prototype.$$autoload[name].loaded && !ancestors[i].$$prototype.$$autoload[name].required) {
           if (ancestors[i].$$prototype.$$autoload[name].exception) { throw ancestors[i].$$prototype.$$autoload[name].exception; }
-          // TODO raise LoadError
         }
       }
     }
