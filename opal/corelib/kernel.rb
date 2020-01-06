@@ -691,7 +691,7 @@ module Kernel
 end
 
 class Object
-  # Object.require has been set to runtime.js Opal.require
+  # Object#require has been set to runtime.js Opal.require
   # Now we have Kernel, make sure Object.require refers to Kernel#require
   # which is what ruby does and makes Kernel#require overwritable
   `delete Opal.Object.$$prototype.$require`
