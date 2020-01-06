@@ -9,7 +9,7 @@ module Opal
   module Nodes
     # Generates code for an entire file, i.e. the base sexp
     class TopNode < ScopeNode
-      include Opal::ES6ModulesHelpers::InstanceMethods
+      include Opal::ModulesHelpers::ES6ImportHelpers
       handle :top
 
       children :body

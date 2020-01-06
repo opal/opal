@@ -7,7 +7,7 @@ require 'opal/nodes'
 require 'opal/eof_content'
 require 'opal/errors'
 require 'opal/magic_comments'
-require 'opal/es6_modules_helpers'
+require 'opal/modules_helpers'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -59,7 +59,7 @@ module Opal
       Pathname(path).cleanpath.to_s
     end
 
-    # this is meant for determining the ruby module name for the es6_modules, where webpack delivers the filename as and instead of a module name
+    # This is meant for determining the ruby module name for the es6_modules, where webpack delivers the filename as and instead of a module name
     # to the compiler. The real ruby module name for use in Opal.modules must then be determined by checking the Opal.paths for a match
     # a filename like:                   /a/path/to/some/ruby.rb
     # and a Opal.paths entry like:       /a/path/to
@@ -71,7 +71,7 @@ module Opal
       # Using Pathname.expand_path makes sure, the path gets transformed to a path the way ruby would find it.
       # Having a valid ruby path without ../.. etc., we can compare it against Opal.paths and get a correct result.
       expanded_filename_path = Pathname.new(filename).expand_path
-      _, module_name = Opal::ES6ModulesHelpers.module_names_from_paths(expanded_filename_path, expanded_filename_path.to_s)
+      _, module_name = Opal::ModulesHelpers.module_names_from_paths(expanded_filename_path, expanded_filename_path.to_s)
       module_name
     end
 

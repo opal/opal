@@ -245,31 +245,29 @@ module Opal
         end
       end
 
-      add_special :autoload do |compile_default|
-        # only add file to compiler.requires if the autoload is called from class scope
-        # otherwise autoload is used as method call for dynamic autoloads
-        if compiler.es6_modules?
-          if scope.class_scope?
-            push recv(receiver_sexp), method_jsid, '(' , expr(arglist.children[0]), ', '
-          elsif scope.top?
-            push 'Opal.Object.$autoload(', expr(arglist.children[0]), ', '
-          else
-            push recv(receiver_sexp), method_jsid, '(', expr(arglist.children[0]), ', '
-          end
-          if arglist.children[1].type == :str
+      add_special :autoload do
+        unless scope.top?
+          push recv(receiver_sexp), method_jsid, '(', expr(arglist.children[0]), ', '
+          if arglist.children[1].type == :str && arglist.children[1].children[0] != ''
             str = DependencyResolver.new(compiler, arglist.children[1]).resolve
-            compiler.requires << str unless str.nil?
-            filename = arglist.children[1].children[0]
-            filename = filename + '.rb' unless filename.end_with?('.rb')
-            push Opal::Compiler.module_name_from_paths(filename.inspect)
+            if str.nil?
+              push expr(arglist.children[1])
+            else
+              file_path = Opal::ModulesHelpers.determine_real_module_path(str)
+              if file_path
+                compiler.requires << str
+                filename = arglist.children[1].children[0]
+                filename += '.rb' unless filename.end_with?('.rb')
+                push Opal::Compiler.module_name_from_paths(filename.inspect)
+              else
+                warn "Warning: File '#{arglist.children[1].children[0]}' for autoload of constant '#{arglist.children[0].children[0]}' does not exist!"
+                push expr(arglist.children[1])
+              end
+            end
           else
             push expr(arglist.children[1])
           end
           push ')'
-        elsif scope.class_scope?
-          str = DependencyResolver.new(compiler, arglist.children[1]).resolve
-          compiler.requires << str unless str.nil?
-          compile_default.call
         end
       end
 

@@ -6,8 +6,8 @@ end
 require 'pathname'
 
 module Opal
-  class ES6ModulesHelpers
-    module InstanceMethods
+  class ModulesHelpers
+    module ES6ImportHelpers
       def import_counter
         @import_counter ||= 0
         @import_counter += 1
@@ -29,17 +29,10 @@ module Opal
         end
       end
 
-      def generate_import_path(module_path)
-        # always use .rb as ending, so it goes to the owl resolver and loader
-        module_path = module_path.to_s
-        return module_path if module_path.end_with?('.rb')
-        module_path + '.rb'
-      end
-
       def generate_directory_imports(base_dir, tree_path = nil)
         # recursively walk a directory and generate import lines for all .rb/.js files
         import_lines = []
-        base_dir = determine_real_module_dir(base_dir)
+        base_dir = Opal::ModulesHelpers.determine_real_module_dir(base_dir)
         directory_path = if tree_path
                            Pathname.new(File.join(base_dir.to_s, tree_path.to_s)).expand_path
                          else
@@ -71,8 +64,8 @@ module Opal
         # module_path is empty for: require File.expand_path(o), can't generate a import, let it be resolved at runtime
         return [''] if ruby_module_path.empty?
         import_lines = []
-        ruby_module_path = determine_real_module_path(ruby_module_path)
-        import_module_name, ruby_module_name = Opal::ES6ModulesHelpers.module_names_from_paths(Pathname.new(ruby_module_path), ruby_module_path)
+        ruby_module_path = Opal::ModulesHelpers.determine_real_module_path(ruby_module_path)
+        import_module_name, ruby_module_name = Opal::ModulesHelpers.module_names_from_paths(Pathname.new(ruby_module_path), ruby_module_path)
         import_name = generate_import_name(import_module_name)
         import_lines << "import #{import_name} from '#{import_module_name}';\n"
         unless ruby_module_name == 'corelib/runtime'
@@ -82,26 +75,9 @@ module Opal
         end
         import_lines
       end
+    end
 
-      def determine_real_module_path(module_path)
-        module_path = module_path.to_s
-        module_path += '.rb' unless module_path.end_with?('.rb', '.js')
-        if module_path.start_with?('/')
-          module_path
-        elsif module_path.start_with?('.')
-          return determine_real_module_path(Pathname.new(module_path).expand_path.to_s)
-        else
-          Opal.paths.each do |path|
-            new_module_path = File.join(path, module_path)
-            if File.exist?(new_module_path)
-              module_path = new_module_path
-              break
-            end
-          end
-        end
-        Pathname.new(module_path).expand_path.to_s
-      end
-
+    class << self
       def determine_real_module_dir(module_dir)
         module_dir_s = module_dir.to_s
         return module_dir.expand_path if module_dir_s == '.'
@@ -119,9 +95,26 @@ module Opal
           module_dir
         end
       end
-    end
 
-    class << self
+      def determine_real_module_path(module_path)
+        module_path = module_path.to_s
+        module_path += '.rb' unless module_path.end_with?('.rb', '.js')
+        if module_path.start_with?('/')
+          return module_path
+        elsif module_path.start_with?('.')
+          return determine_real_module_path(Pathname.new(module_path).expand_path.to_s)
+        else
+          Opal.paths.each do |path|
+            new_module_path = File.join(path, module_path)
+            if File.exist?(new_module_path)
+              module_path = new_module_path
+              return Pathname.new(module_path).expand_path.to_s
+            end
+          end
+        end
+        nil
+      end
+
       def module_names_from_module_paths(original_path, current_path)
         # remove known load path at the beginning and the filename extension to get the module name like 'some/ruby'
         module_name = original_path[(current_path.size + 1)..-1]
