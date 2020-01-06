@@ -2299,10 +2299,6 @@
     for (i = 0, l = paths.length; i < l; i++) {
       path = Opal.normalize(paths[i]);
 
-      if (Opal.require_table[path]) {
-        continue;
-      }
-
       Opal.loaded_features.push(path);
       Opal.require_table[path] = true;
     }
