@@ -188,10 +188,35 @@ class Module
   end
 
   def autoload(const, path)
+    const = Opal.const_name!(const)
+    raise ArgumentError, 'path argument cannot be empty' if path.empty?
     %x{
-      if (self.$$autoload == null) self.$$autoload = {};
-      Opal.const_cache_version++;
-      self.$$autoload[#{const}] = #{path};
+      var first_char = #{const}[0];
+      if (first_char == first_char.toLowerCase() || #{const}.includes(' ')) { #{raise NameError} }
+      if (!self.$$const.hasOwnProperty(#{const})) {
+        if (!self.$$prototype.$$autoload) {
+          self.$$prototype.$$autoload = {};
+        }
+        Opal.const_cache_version++;
+        self.$$prototype.$$autoload[#{const}] = { path: #{path}, loaded: false, required: false, success: false, exception: false };
+      }
+      return nil;
+    }
+  end
+
+  def autoload?(const)
+    %x{
+      if (self.$$prototype.$$autoload && self.$$prototype.$$autoload[#{const}] && !self.$$prototype.$$autoload[#{const}].required && !self.$$prototype.$$autoload[#{const}].success) {
+        return self.$$prototype.$$autoload[#{const}].path;
+      }
+
+      var ancestors = self.$ancestors();
+
+      for (var i = 0, length = ancestors.length; i < length; i++) {
+        if (ancestors[i].$$prototype.$$autoload && ancestors[i].$$prototype.$$autoload[#{const}] && !ancestors[i].$$prototype.$$autoload[#{const}].required && !ancestors[i].$$prototype.$$autoload[#{const}].success) {
+          return ancestors[i].$$prototype.$$autoload[#{const}].path;
+        }
+      }
       return nil;
     }
   end
@@ -286,7 +311,8 @@ class Module
 
       for (i = 0, ii = modules.length; i < ii; i++) {
         module = modules[i];
-        if (module.$$const[name] != null) {
+        if (module.$$const[#{name}] != null) { return true; }
+        if (module.$$prototype.$$autoload && module.$$prototype.$$autoload[#{name}] && !module.$$prototype.$$autoload[#{name}].required && !module.$$prototype.$$autoload[#{name}].success) {
           return true;
         }
       }
@@ -321,13 +347,49 @@ class Module
 
   def const_missing(name)
     %x{
-      if (self.$$autoload) {
-        var file = self.$$autoload[name];
+      var file, constant, path;
 
-        if (file) {
-          self.$require(file);
+      if (self.$$prototype.$$autoload && self.$$prototype.$$autoload[#{name}]) {
+        if (!self.$$prototype.$$autoload[#{name}].loaded) {
+          self.$$prototype.$$autoload[#{name}].loaded = true;
+          try {
+            self.$require(self.$$prototype.$$autoload[#{name}].path);
+          } catch (e) {
+            self.$$prototype.$$autoload[#{name}].exception = e;
+            throw e;
+          }
+          self.$$prototype.$$autoload[#{name}].required = true;
+          constant = #{const_get name};
+          self.$$prototype.$$autoload[#{name}].success = true;
+          return constant;
+        } else if (self.$$prototype.$$autoload[#{name}].loaded && !self.$$prototype.$$autoload[#{name}].required) {
+          if (self.$$prototype.$$autoload[#{name}].exception) { throw self.$$prototype.$$autoload[#{name}].exception; }
+          path = self.$$prototype.$$autoload[#{name}].path;
+          #{raise LoadError, "Constant #{self == Object ? name : "#{self}::#{name}"} cannot be loaded from #{`path`}"};
+        }
+      }
 
-          return #{const_get name};
+      var ancestors = self.$ancestors();
+
+      for (var i = 0, length = ancestors.length; i < length; i++) {
+        if (ancestors[i].$$prototype.$$autoload && ancestors[i].$$prototype.$$autoload[#{name}]) {
+          if (!ancestors[i].$$prototype.$$autoload[#{name}].loaded) {
+            ancestors[i].$$prototype.$$autoload[#{name}].loaded = true;
+            try {
+              self.$require(ancestors[i].$$prototype.$$autoload[#{name}].path);
+            } catch (e) {
+              ancestors[i].$$prototype.$$autoload[#{name}].exception = e;
+              throw e;
+            }
+            ancestors[i].$$prototype.$$autoload[#{name}].required = true;
+            constant = #{const_get name};
+            ancestors[i].$$prototype.$$autoload[#{name}].success = true;
+            return constant;
+          } else if (ancestors[i].$$prototype.$$autoload[#{name}].loaded && !ancestors[i].$$prototype.$$autoload[#{name}].required) {
+            if (ancestors[i].$$prototype.$$autoload[#{name}].exception) { throw ancestors[i].$$prototype.$$autoload[#{name}].exception; }
+            path = ancestors[i].$$prototype.$$autoload[#{name}].path;
+            #{raise LoadError, "Constant #{self == Object ? name : "#{self}::#{name}"} cannot be loaded from #{`path`}" };
+          }
         }
       }
     }
