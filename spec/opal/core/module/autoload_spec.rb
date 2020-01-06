@@ -31,7 +31,7 @@ end
 
 describe "Module#autoload" do
   before :all do
-    @non_existent = fixture __FILE__, "no_autoload.rb"
+    @non_existent = "opal/core/module/fixtures/no_autoload.rb"
 
     # Require RubyGems eagerly, to ensure #require is already the RubyGems
     # version, before starting #autoload specs which snapshot #require, and
@@ -267,7 +267,7 @@ describe "Module#autoload" do
       @check.call.should == ["constant", @path]
       $:.push File.dirname(@path)
       begin
-        require "autoload_required_directly.rb"
+        require "opal/core/module/fixtures/autoload_required_directly.rb"
       ensure
         $:.pop
       end
@@ -377,7 +377,7 @@ describe "Module#autoload" do
   end
 
   it "does not remove the constant from Module#constants if load fails and keeps it as an autoload" do
-    ModuleSpecs::Autoload.autoload :Fail, @non_existent
+    ModuleSpecs::Autoload.autoload :Fail, "opal/core/module/fixtures/no_autoload.rb"
 
     ModuleSpecs::Autoload.const_defined?(:Fail).should == true
     ModuleSpecs::Autoload.should have_constant(:Fail)
@@ -430,19 +430,20 @@ describe "Module#autoload" do
   end
 
   it "does not try to load the file again if the loaded file did not define the constant" do
-    path = "opal/core/module/fixtures/autoload_o.rb"
+    path = "opal/core/module/fixtures/autoload_o_1.rb"
     ScratchPad.record []
-    ModuleSpecs::Autoload.autoload :NotDefinedByFile, "opal/core/module/fixtures/autoload_o.rb"
+    ModuleSpecs::Autoload.autoload :NotDefinedByFile, "opal/core/module/fixtures/autoload_o_1.rb"
 
     -> { ModuleSpecs::Autoload::NotDefinedByFile }.should raise_error(NameError)
     ScratchPad.recorded.should == [:loaded]
     -> { ModuleSpecs::Autoload::NotDefinedByFile }.should raise_error(NameError)
     ScratchPad.recorded.should == [:loaded]
 
-    Thread.new {
-      -> { ModuleSpecs::Autoload::NotDefinedByFile }.should raise_error(NameError)
-    }.join
-    ScratchPad.recorded.should == [:loaded]
+    # not supported
+    #Thread.new {
+    #  -> { ModuleSpecs::Autoload::NotDefinedByFile }.should raise_error(NameError)
+    #}.join
+    # ScratchPad.recorded.should == [:loaded]
   end
 
   it "returns 'constant' on referring the constant with defined?()" do
@@ -515,7 +516,7 @@ describe "Module#autoload" do
             DeclaredInParentDefinedInCurrent = :declared_in_parent_defined_in_current
           end
         }
-        autoload :DeclaredInParentDefinedInCurrent, "opal/core/module/fixtures/autoload_callback.rb"
+        autoload :DeclaredInParentDefinedInCurrent, "opal/core/module/fixtures/autoload_callback_1.rb"
 
         class LexicalScope
           DeclaredInParentDefinedInCurrent.should == :declared_in_parent_defined_in_current
@@ -540,7 +541,7 @@ describe "Module#autoload" do
         }
 
         class LexicalScope
-          autoload :DeclaredInCurrentDefinedInParent, "opal/core/module/fixtures/autoload_callback.rb"
+          autoload :DeclaredInCurrentDefinedInParent, "opal/core/module/fixtures/autoload_callback_2.rb"
           -> { DeclaredInCurrentDefinedInParent }.should raise_error(NameError)
           # Basically, the autoload constant remains in a "undefined" state
           self.autoload?(:DeclaredInCurrentDefinedInParent).should == nil
@@ -562,7 +563,7 @@ describe "Module#autoload" do
           end
           include DefinedInIncludedModule
         }
-        autoload :Incl, "opal/core/module/fixtures/autoload_callback.rb"
+        autoload :Incl, "opal/core/module/fixtures/autoload_callback_3.rb"
         Incl.should == :defined_in_included_module
       end
     end
@@ -583,7 +584,7 @@ describe "Module#autoload" do
         }
 
         class LookupAfterAutoloadChild
-          autoload :InclS, "opal/core/module/fixtures/autoload_callback.rb"
+          autoload :InclS, "opal/core/module/fixtures/autoload_callback_4.rb"
           InclS.should == :defined_in_superclass_included_module
         end
       end
@@ -598,7 +599,7 @@ describe "Module#autoload" do
           end
           include DefinedInPrependedModule
         }
-        autoload :Prep, "opal/core/module/fixtures/autoload_callback.rb"
+        autoload :Prep, "opal/core/module/fixtures/autoload_callback_5.rb"
         Prep.should == :defined_in_prepended_module
       end
     end
@@ -609,7 +610,7 @@ describe "Module#autoload" do
           class MetaScope
           end
         }
-        autoload :MetaScope, "opal/core/module/fixtures/autoload_callback.rb"
+        autoload :MetaScope, "opal/core/module/fixtures/autoload_callback_6.rb"
         class << self
           def r
             MetaScope.new
