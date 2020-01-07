@@ -3,7 +3,7 @@
 require 'pathname'
 require 'opal/version'
 require 'opal/nodes/scope'
-require 'opal/es6_modules_helpers'
+require 'opal/modules_helpers'
 
 module Opal
   module Nodes
