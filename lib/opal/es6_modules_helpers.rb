@@ -29,13 +29,6 @@ module Opal
         end
       end
 
-      def generate_import_path(module_path)
-        # always use .rb as ending, so it goes to the owl resolver and loader
-        module_path = module_path.to_s
-        return module_path if module_path.end_with?('.rb')
-        module_path + '.rb'
-      end
-
       def generate_directory_imports(base_dir, tree_path = nil)
         # recursively walk a directory and generate import lines for all .rb/.js files
         import_lines = []
