@@ -239,16 +239,17 @@ module Opal
           if arglist.children[1].type == :str && arglist.children[1].children[0] != ''
             str = DependencyResolver.new(compiler, arglist.children[1]).resolve
             if str.nil?
+              warn "Warning: File '#{arglist.children[1].children[0]}' for autoload of constant '#{arglist.children[0].children[0]}' could not be found!"
               push expr(arglist.children[1])
             else
-              file_path = Opal::ModulesHelpers.determine_real_module_path(str)
+              file_path = Opal::ModulesHelpers.absolute_module_path(str)
               if file_path
                 compiler.requires << str
                 filename = arglist.children[1].children[0]
                 filename += '.rb' unless filename.end_with?('.rb')
                 push Opal::Compiler.module_name_from_paths(filename.inspect)
               else
-                warn "Warning: File '#{arglist.children[1].children[0]}' for autoload of constant '#{arglist.children[0].children[0]}' does not exist!"
+                warn "Warning: File '#{arglist.children[1].children[0]}' for autoload of constant '#{arglist.children[0].children[0]}' could not be found!"
                 push expr(arglist.children[1])
               end
             end

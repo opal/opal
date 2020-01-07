@@ -64,7 +64,7 @@ module Opal
         # module_path is empty for: require File.expand_path(o), can't generate a import, let it be resolved at runtime
         return [''] if ruby_module_path.empty?
         import_lines = []
-        ruby_module_path = Opal::ModulesHelpers.determine_real_module_path(ruby_module_path)
+        ruby_module_path = Opal::ModulesHelpers.absolute_module_path(ruby_module_path)
         import_module_name, ruby_module_name = Opal::ModulesHelpers.module_names_from_paths(Pathname.new(ruby_module_path), ruby_module_path)
         import_name = generate_import_name(import_module_name)
         import_lines << "import #{import_name} from '#{import_module_name}';\n"
@@ -96,19 +96,32 @@ module Opal
         end
       end
 
-      def determine_real_module_path(module_path)
-        module_path = module_path.to_s
-        module_path += '.rb' unless module_path.end_with?('.rb', '.js')
-        if module_path.start_with?('/')
-          return module_path
-        elsif module_path.start_with?('.')
-          return determine_real_module_path(Pathname.new(module_path).expand_path.to_s)
+      def absolute_module_path(module_path)
+        original_path = module_path.to_s
+        if original_path.start_with?('/')
+          return original_path
+        elsif original_path.start_with?('.')
+          return absolute_module_path(Pathname.new(original_path).expand_path.to_s)
         else
-          Opal.paths.each do |path|
-            new_module_path = File.join(path, module_path)
-            if File.exist?(new_module_path)
-              module_path = new_module_path
-              return Pathname.new(module_path).expand_path.to_s
+          module_paths_to_check = []
+          unless original_path.end_with?('.rb', '.js')
+            module_paths_to_check << original_path + '.rb'
+            module_paths_to_check << original_path + '.js'
+            module_paths_to_check << original_path + '.js.rb'
+          end
+          if original_path.end_with?('.rb')
+            module_paths_to_check << original_path
+          end
+          if original_path.end_with?('.js')
+            module_paths_to_check << original_path
+            module_paths_to_check << original_path + '.rb'
+          end
+          module_paths_to_check.each do |module_path_to_check|
+            Opal.paths.each do |path|
+              real_module_path = File.join(path, module_path_to_check)
+              if File.exist?(real_module_path)
+                return Pathname.new(real_module_path).expand_path.to_s
+              end
             end
           end
         end
