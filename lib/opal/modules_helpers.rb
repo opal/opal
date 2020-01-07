@@ -75,7 +75,6 @@ module Opal
         unless ruby_module_name == 'corelib/runtime'
           import_lines << "if (typeof global.Opal.modules['#{ruby_module_name}'] === 'undefined') {\n"
           import_lines << "  if (typeof #{import_name} === 'function') { #{import_name}(); }\n"
-          import_lines << "  if (typeof #{import_name} === 'function') { #{import_name}(); }\n"
           import_lines << "}\n"
         end
         import_lines
