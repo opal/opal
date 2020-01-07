@@ -17,7 +17,7 @@ module Opal
     def read(path)
       full_path = expand(path)
       return nil if full_path.nil?
-      File.open(full_path, 'rb:UTF-8', &:read)
+      File.open(full_path, 'rb:UTF-8', &:read) if File.exist?(full_path)
     end
 
     def expand(path)
@@ -37,6 +37,7 @@ module Opal
     end
 
     def append_paths(*paths)
+      Opal.append_paths(*paths)
       file_finder.append_paths(*paths)
     end
 

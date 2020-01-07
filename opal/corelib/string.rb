@@ -344,14 +344,14 @@ class String < `String`
   end
 
   def clone
-    copy = `self.slice()`
+    copy = `new String(self)`
     copy.copy_singleton_methods(self)
     copy.initialize_clone(self)
     copy
   end
 
   def dup
-    copy = `self.slice()`
+    copy = `new String(self)`
     copy.initialize_dup(self)
     copy
   end

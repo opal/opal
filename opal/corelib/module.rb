@@ -188,19 +188,34 @@ class Module
   end
 
   def autoload(const, path)
+    const = Opal.const_name!(const)
+    raise ArgumentError, 'path argument cannot be empty' if path.empty?
     %x{
-      if (self.$$autoload == null) self.$$autoload = {};
-      Opal.const_cache_version++;
-      self.$$autoload[#{const}] = #{path};
+      var first_char = #{const}[0];
+      if (first_char == first_char.toLowerCase() || #{const}.includes(' ')) { #{raise NameError} }
+      if (!self.$$const.hasOwnProperty(#{const})) {
+        if (!self.$$prototype.$$autoload) {
+          self.$$prototype.$$autoload = {};
+        }
+        Opal.const_cache_version++;
+        self.$$prototype.$$autoload[#{const}] = { path: #{path}, loaded: false, required: false, success: false, exception: false };
+      }
       return nil;
     }
   end
 
   def autoload?(const)
     %x{
-      if (self.$$autoload) {
-        var path = self.$$autoload[#{const}];
-        if (path) { return path; }
+      if (self.$$prototype.$$autoload && self.$$prototype.$$autoload[#{const}] && !self.$$prototype.$$autoload[#{const}].required && !self.$$prototype.$$autoload[#{const}].success) {
+        return self.$$prototype.$$autoload[#{const}].path;
+      }
+
+      var ancestors = self.$ancestors();
+
+      for (var i = 0, length = ancestors.length; i < length; i++) {
+        if (ancestors[i].$$prototype.$$autoload && ancestors[i].$$prototype.$$autoload[#{const}] && !ancestors[i].$$prototype.$$autoload[#{const}].required && !ancestors[i].$$prototype.$$autoload[#{const}].success) {
+          return ancestors[i].$$prototype.$$autoload[#{const}].path;
+        }
       }
       return nil;
     }
@@ -296,7 +311,8 @@ class Module
 
       for (i = 0, ii = modules.length; i < ii; i++) {
         module = modules[i];
-        if (module.$$const[name] != null) {
+        if (module.$$const[#{name}] != null) { return true; }
+        if (module.$$prototype.$$autoload && module.$$prototype.$$autoload[#{name}] && !module.$$prototype.$$autoload[#{name}].required && !module.$$prototype.$$autoload[#{name}].success) {
           return true;
         }
       }
@@ -330,23 +346,6 @@ class Module
   end
 
   def const_missing(name)
-    %x{
-      var ancestors = self.$ancestors(),
-          file;
-      
-      for (var i = 0, length = ancestors.length; i < length; i++) {
-        if (ancestors[i].$$autoload && ancestors[i].$$autoload[name]) {
-          file = ancestors[i].$$autoload[name];
-
-          if (file) {
-            self.$require(file);
-
-            return #{const_get name};
-          }
-        }
-      }
-    }
-
     full_const_name = self == Object ? name : "#{self}::#{name}"
 
     raise NameError.new("uninitialized constant #{full_const_name}", name)

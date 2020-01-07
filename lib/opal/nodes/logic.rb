@@ -85,6 +85,7 @@ module Opal
       end
 
       def compile_iter
+        helper :slice
         push "return #{scope.identity}.apply(null, $slice.call(arguments))"
       end
     end

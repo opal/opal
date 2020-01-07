@@ -1,4 +1,6 @@
-(function() {
+(function(global_object) {
+  "use strict";
+
   // @note
   //   A few conventions for the documentation of this file:
   //   1. Always use "//" (in contrast with "/**/")
@@ -13,11 +15,12 @@
   //   The way the code is digested before going through Yardoc is a secret kept
   //   in the docs repo (https://github.com/opal/docs/tree/master).
 
-  var global_object = this, console;
+  var console;
 
   // Detect the global object
-  if (typeof(global) !== 'undefined') { global_object = global; }
-  if (typeof(window) !== 'undefined') { global_object = window; }
+  if (typeof(globalThis) !== 'undefined') { global_object = globalThis; }
+  else if (typeof(global) !== 'undefined') { global_object = global; }
+  else if (typeof(window) !== 'undefined') { global_object = window; }
 
   // Setup a dummy console object if missing
   if (typeof(global_object.console) === 'object') {
@@ -128,16 +131,23 @@
   };
 
   function $defineProperty(object, name, initialValue) {
-    if (typeof(object) === 'string') {
-      console.trace();
-      throw new Opal.TypeError("Opal.$defineProperty called on non-object (primitive string)");
+    if (typeof(object) === "string") {
+      // Special case for:
+      //   s = "string"
+      //   def s.m; end
+      // String class is the only class that:
+      // + compiles to JS primitive
+      // + allows method definition directly on instances
+      // numbers, true, false and null do not support it.
+      object[name] = initialValue;
+    } else {
+      Object.defineProperty(object, name, {
+        value: initialValue,
+        enumerable: false,
+        configurable: true,
+        writable: true
+      });
     }
-    Object.defineProperty(object, name, {
-      value: initialValue,
-      enumerable: false,
-      configurable: true,
-      writable: true
-    });
   }
 
   Opal.defineProperty = $defineProperty;
@@ -162,6 +172,14 @@
   Opal.trace_class = false;
   Opal.tracers_for_class = [];
 
+  function invoke_tracers_for_class(klass_or_module) {
+    for(var i=0, tracer; i < Opal.tracers_for_class.length; i++) {
+      tracer = Opal.tracers_for_class[i];
+      tracer.trace_object = klass_or_module;
+      tracer.block.$call(tracer);
+    }
+  }
+
   // Constants
   // ---------
   //
@@ -176,7 +194,27 @@
 
   // Get the constant in the scope of the current cref
   function const_get_name(cref, name) {
-    if (cref) return cref.$$const[name];
+    if (cref) {
+      if (cref.$$const[name]) { return cref.$$const[name]; }
+      if (cref.$$prototype.$$autoload && cref.$$prototype.$$autoload[name]) {
+        if (!cref.$$prototype.$$autoload[name].loaded) {
+          cref.$$prototype.$$autoload[name].loaded = true;
+          try {
+            Opal.Kernel.$require(cref.$$prototype.$$autoload[name].path);
+          } catch (e) {
+            cref.$$prototype.$$autoload[name].exception = e;
+            throw e;
+          }
+          cref.$$prototype.$$autoload[name].required = true;
+          if (cref.$$const[name]) {
+            cref.$$prototype.$$autoload[name].success = true;
+            return cref.$$const[name];
+          }
+        } else if (cref.$$prototype.$$autoload[name].loaded && !cref.$$prototype.$$autoload[name].required) {
+          if (cref.$$prototype.$$autoload[name].exception) { throw cref.$$prototype.$$autoload[name].exception; }
+        }
+      }
+    }
   }
 
   // Walk up the nesting array looking for the constant
@@ -189,11 +227,24 @@
     // and in order. The ancestors of those elements are ignored.
     for (i = 0, ii = nesting.length; i < ii; i++) {
       constant = nesting[i].$$const[name];
-      if (nesting[i].$$const[name] != null) { return nesting[i].$$const[name]; }
-      else if (nesting[i].$$autoload && nesting[i].$$autoload[name] != null) {
-        Opal.Kernel.$require(nesting[i].$$autoload[name]);
-        if (nesting[i].$$const[name] != null) {
-          return nesting[i].$$const[name];
+      if (constant != null) {
+        return constant;
+      } else if (nesting[i].$$prototype.$$autoload && nesting[i].$$prototype.$$autoload[name]) {
+        if (!nesting[i].$$prototype.$$autoload[name].loaded) {
+          nesting[i].$$prototype.$$autoload[name].loaded = true;
+          try {
+            Opal.Kernel.$require(nesting[i].$$prototype.$$autoload[name].path);
+          } catch (e) {
+            nesting[i].$$prototype.$$autoload[name].exception = e;
+            throw e;
+          }
+          nesting[i].$$prototype.$$autoload[name].required = true;
+          if (nesting[i].$$const && nesting[i].$$const[name]) {
+            nesting[i].$$prototype.$$autoload[name].success = true;
+            return nesting[i].$$const[name];
+          }
+        } else if (nesting[i].$$prototype.$$autoload[name].loaded && !nesting[i].$$prototype.$$autoload[name].required) {
+          if (nesting[i].$$prototype.$$autoload[name].exception) { throw nesting[i].$$prototype.$$autoload[name].exception; }
         }
       }
     }
@@ -210,10 +261,22 @@
     for (i = 0, ii = ancestors.length; i < ii; i++) {
       if (ancestors[i].$$const && $hasOwn.call(ancestors[i].$$const, name)) {
         return ancestors[i].$$const[name];
-      } else if (ancestors[i].$$autoload && $hasOwn.call(ancestors[i].$$autoload, name)) {
-        Opal.Kernel.$require(ancestors[i].$$autoload[name]);
-        if (ancestors[i].$$const && $hasOwn.call(ancestors[i].$$const, name)) {
-          return ancestors[i].$$const[name];
+      } else if (ancestors[i].$$prototype.$$autoload && ancestors[i].$$prototype.$$autoload[name]) {
+        if (!ancestors[i].$$prototype.$$autoload[name].loaded) {
+          ancestors[i].$$prototype.$$autoload[name].loaded = true;
+          try {
+            Opal.Kernel.$require(ancestors[i].$$prototype.$$autoload[name].path);
+          } catch (e) {
+            ancestors[i].$$prototype.$$autoload[name].exception = e;
+            throw e;
+          }
+          ancestors[i].$$prototype.$$autoload[name].required = true;
+          if (ancestors[i].$$const && ancestors[i].$$const[name]) {
+            ancestors[i].$$prototype.$$autoload[name].success = true;
+            return ancestors[i].$$const[name];
+          }
+        } else if (ancestors[i].$$prototype.$$autoload[name].loaded && !ancestors[i].$$prototype.$$autoload[name].required) {
+          if (ancestors[i].$$prototype.$$autoload[name].exception) { throw ancestors[i].$$prototype.$$autoload[name].exception; }
         }
       }
     }
@@ -356,6 +419,11 @@
       for (constant in module.$$const) {
         constants[constant] = true;
       }
+      if (module.$$prototype.$$autoload) {
+        for (constant in module.$$prototype.$$autoload) {
+          constants[constant] = true;
+        }
+      }
     }
 
     return Object.keys(constants);
@@ -371,13 +439,17 @@
       return old;
     }
 
-    if (cref.$$autoload != null && cref.$$autoload[name] != null) {
-      delete cref.$$autoload[name];
+    if (cref.$$prototype.$$autoload && cref.$$prototype.$$autoload[name]) {
+      delete cref.$$prototype.$$autoload[name];
       return nil;
     }
 
     throw Opal.NameError.$new("constant "+cref+"::"+cref.$name()+" not defined");
   };
+
+  // Setup some shortcuts to reduce compiled size
+  Opal.$$ = Opal.const_get_relative;
+  Opal.$$$ = Opal.const_get_qualified;
 
 
   // Modules & Classes
@@ -513,6 +585,9 @@
         // Make sure existing class has same superclass
         ensureSuperclassMatch(klass, superclass);
       }
+
+      if (Opal.trace_class) { invoke_tracers_for_class(klass); }
+
       return klass;
     }
 
@@ -536,11 +611,7 @@
       Opal.bridge(bridged, klass);
     }
 
-    if (Opal.trace_class) {
-      for(var i=0; i < Opal.tracers_for_class.length; i++) {
-        Opal.tracers_for_class[i].block.$call(klass);
-      }
-    }
+    if (Opal.trace_class) { invoke_tracers_for_class(klass); }
 
     return klass;
   };
@@ -619,6 +690,9 @@
     module = find_existing_module(scope, name);
 
     if (module) {
+
+      if (Opal.trace_class) { invoke_tracers_for_class(module); }
+
       return module;
     }
 
@@ -626,11 +700,7 @@
     module = Opal.allocate_module(name);
     Opal.const_set(scope, name, module);
 
-    if (Opal.trace_class) {
-      for(var i=0; i < Opal.tracers_for_class.length; i++) {
-        Opal.tracers_for_class[i].block.$call(module);
-      }
-    }
+    if (Opal.trace_class) { invoke_tracers_for_class(module); }
 
     return module;
   };
@@ -717,10 +787,6 @@
   Opal.build_object_singleton_class = function(object) {
     var superclass = object.$$class,
         klass = Opal.allocate_class(nil, superclass, function(){});
-
-    if (typeof object === 'string') {
-      object = new String(object);
-    }
 
     $defineProperty(klass, '$$is_singleton', true);
     $defineProperty(klass, '$$singleton_of', object);
@@ -1324,7 +1390,10 @@
   // @param method_name [String] The js-name of the method to stub (e.g. "$foo")
   // @return [undefined]
   Opal.stub_for = function(method_name) {
+
     function method_missing_stub() {
+      /* jshint validthis: true */
+
       // Copy any given block onto the method_missing dispatcher
       this.$method_missing.$$p = method_missing_stub.$$p;
 
@@ -1889,11 +1958,13 @@
       return Opal.send(this, body, args, block);
     };
 
+    // Assign the 'length' value with defineProperty because
+    // in strict mode the property is not writable.
+    Object.defineProperty(alias, 'length', { value: body.length });
+
     // Try to make the browser pick the right name
     alias.displayName       = name;
-    // Make 'length' writable, otherwise a value cannot be assigned to the read-only property 'length' in strict mode
-    Object.defineProperty(alias, 'length', { writable: true });
-    alias.length            = body.length;
+
     alias.$$arity           = body.$$arity;
     alias.$$parameters      = body.$$parameters;
     alias.$$source_location = body.$$source_location;
@@ -2370,6 +2441,34 @@
   };
 
 
+  // Strings
+  // -------
+
+  Opal.encodings = Object.create(null);
+
+  // Sets the encoding on a string, will treat string literals as frozen strings
+  // raising a FrozenError.
+  // @param str [String] the string on which the encoding should be set.
+  // @param name [String] the canonical name of the encoding
+  Opal.set_encoding = function(str, name) {
+    if (typeof str === 'string')
+      throw Opal.FrozenError.$new("can't modify frozen String");
+
+    var encoding = Opal.encodings[name];
+
+    if (encoding === str.encoding) { return str; }
+
+    str.encoding = encoding;
+
+    return str;
+  };
+
+  // @returns a String object with the encoding set from a string literal
+  Opal.enc = function(str, name) {
+    return Opal.set_encoding(new String(str), name);
+  }
+
+
   // Initialization
   // --------------
   function $BasicObject() {}
@@ -2417,14 +2516,18 @@
   // other corelib files.
   $defineProperty(_Object.$$prototype, '$require', Opal.require);
 
-  // Add a short helper to navigate constants manually.
-  // @example
-  //   Opal.$$.Regexp.$$.IGNORECASE
-  Opal.$$ = _Object.$$;
-
   // Instantiate the main object
   Opal.top = new _Object();
   Opal.top.$to_s = Opal.top.$inspect = function() { return 'main' };
+  Opal.top.$define_method = top_define_method;
+
+  // Foward calls to define_method on the top object to Object
+  function top_define_method() {
+    var args = Opal.slice.call(arguments, 0, arguments.length);
+    var block = top_define_method.$$p;
+    top_define_method.$$p = null;
+    return Opal.send(_Object, 'define_method', args, block)
+  };
 
 
   // Nil
@@ -2439,4 +2542,4 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
-}).call();
+}).call(this);

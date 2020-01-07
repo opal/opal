@@ -45,6 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rack-test'
   spec.add_development_dependency 'opal-minitest'
+  spec.add_development_dependency 'overcommit'
   spec.add_development_dependency 'opal-webpack-loader', '~> 0.9.6'
   spec.add_development_dependency 'selenium-webdriver'
   spec.add_development_dependency 'benchmark-ips'
