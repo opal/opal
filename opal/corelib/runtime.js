@@ -57,6 +57,8 @@
   // The Opal object that is exposed globally
   var Opal = global_object.Opal = {};
 
+  // This is a useful reference to global object inside ruby files
+  Opal.global = global_object;
 
   // In Node VMs globalThis is defined but not global, but within webpack global is used.
   // isomorfeus-speednode provides global to Node VMs.
@@ -77,9 +79,6 @@
       if (!('log' in console)) { console.log = function () {}; }
       if (!('warn' in console)) { console.warn = console.log; }
     }
-  } else {
-    // This is a useful reference to global object inside ruby files
-    Opal.global = global_object;
   }
 
   // Configure runtime behavior with regards to require and unsupported features
