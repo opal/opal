@@ -54,6 +54,7 @@ Whitespace conventions:
 - Struct#dup not copying `$$data` ([#1995](https://github.com/opal/opal/pull/1995))
 - Fixed usage of semicolon in single-line backticks ([#2004](https://github.com/opal/opal/pull/2004))
 - Module#attr with multiple arguments ([#2003](https://github.com/opal/opal/pull/2003))
+- Set match on StringScanner#skip and StringScanner#scan_until ([#2061](https://github.com/opal/opal/pull/2061))
 
 
 ### Changed
