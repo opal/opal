@@ -100,6 +100,8 @@ class Regexp < `RegExp`
         return new RegExp(regexp, options);
       }
     end
+
+    alias compile new
   end
 
   def ==(other)
