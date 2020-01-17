@@ -3,19 +3,6 @@
 module Kernel
   NODE_REQUIRE = `require`
 
-  def caller(*args)
-    %x{
-      var stack;
-      try {
-        var err = Error("my error");
-        throw err;
-      } catch(e) {
-        stack = e.stack;
-      }
-      return stack.$split("\n").slice(3);
-    }
-  end
-
   # @deprecated Please use `require('module')` instead
   def node_require(path)
     warn '[DEPRECATION] node_require is deprecated. Please use `require(\'module\')` instead.'

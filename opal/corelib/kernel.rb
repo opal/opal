@@ -90,10 +90,13 @@ module Kernel
     block
   end
 
-  # Opal does not support #caller, but we stub it as an empty array to not
-  # break dependant libs
-  def caller(*args)
-    []
+  def caller(start = 1, length = nil)
+    start += 1
+    stack = `(new Error().stack || "").split("\n")`
+    stack = length ? `stack.slice(start, start + length)` : `stack.slice(start)`
+    stack.map do |line|
+      `#{line}.replace(/^ *\w+ +/, '').split(':', 3).slice(0,2).join(':')`
+    end
   end
 
   def class

@@ -32,6 +32,11 @@ opal_filter "Kernel" do
   fails "Kernel#autoload? is a private method" # Expected Kernel to have private instance method 'autoload?' but it does not
   fails "Kernel#autoload? returns nil if no file has been registered for a constant" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x7849c>
   fails "Kernel#autoload? returns the name of the file that will be autoloaded" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x7849c>
+  fails "Kernel#caller is a private method" # Expected Kernel to have private instance method 'caller' but it does not
+  fails "Kernel#caller returns an Array of caller locations using a custom offset" # Expected "ruby/core/kernel/fixtures/caller.rb:4" to match /runner\/mspec.rb/
+  fails "Kernel#caller returns an Array of caller locations using a range" # NoMethodError: undefined method `+' for 1..1
+  fails "Kernel#caller returns an Array with the block given to #at_exit at the base of the stack" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xe208>
+  fails "Kernel#caller returns the locations as String instances" # Expected "corelib/runtime.js:1675" to include "ruby/core/kernel/caller_spec.rb:32:in"
   fails "Kernel#class returns the class of the object"
   fails "Kernel#clone replaces a singleton object's metaclass with a new copy with the same superclass" # NoMethodError: undefined method `singleton_methods' for #<#<Class:0x2df8e>:0x2df90>
   fails "Kernel#clone uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
