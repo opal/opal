@@ -2265,6 +2265,33 @@
     return result;
   };
 
+  // Combine multiple regexp parts together
+  Opal.regexp = function(parts, flags) {
+    var part;
+    var ignoreCase = flags && flags.indexOf('i') >= 0;
+
+    for (var i = 0, ii = parts.length; i < ii; i++) {
+      part = parts[i];
+      if (part instanceof RegExp) {
+        if (part.ignoreCase !== ignoreCase)
+          Opal.Kernel.$warn(
+            "ignore case doesn't match for " + part.source.$inspect(),
+            Opal.hash({uplevel: 1})
+          )
+
+        part = part.source;
+      }
+      if (part === '') part = '(?:' + part + ')';
+      parts[i] = part;
+    }
+
+    if (flags) {
+      return new RegExp(parts.join(''), flags);
+    } else {
+      return new RegExp(parts.join(''));
+    }
+  };
+
   // Require system
   // --------------
 
