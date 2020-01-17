@@ -509,8 +509,9 @@ module Kernel
     if uplevel
       uplevel = Opal.coerce_to!(uplevel, Integer, :to_str)
       raise ArgumentError, "negative level (#{uplevel})" if uplevel < 0
-
-      strs = strs.map { |s| "warning: #{caller}" }
+      location = caller(uplevel + 2, 1).first
+      location = "#{location}: " if location
+      strs = strs.map { |s| "#{location}warning: #{s}" }
     end
 
     $stderr.puts(*strs) unless $VERBOSE.nil? || strs.empty?
