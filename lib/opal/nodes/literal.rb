@@ -124,20 +124,22 @@ module Opal
           end
         end
 
-        case value.type
-        when :dstr, :begin
-          compile_dynamic_regexp
-        when :str
+        if value.type == :str
           compile_static_regexp
+        else
+          compile_dynamic_regexp
         end
       end
 
       def compile_dynamic_regexp
-        if flags.any?
-          push 'new RegExp(', expr(value), ", '#{flags.join}')"
-        else
-          push 'new RegExp(', expr(value), ')'
+        push 'Opal.regexp(['
+        value.children.each_with_index do |v, index|
+          push ', ' unless index.zero?
+          push expr(v)
         end
+        push ']'
+        push ", '#{flags.join}'" if flags.any?
+        push ")"
       end
 
       def compile_static_regexp
