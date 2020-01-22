@@ -60,12 +60,13 @@ module Opal
       nil
     end
 
-    register_runner :applescript, :Applescript, 'opal/cli_runners/applescript'
-    register_runner :chrome,      :Chrome,      'opal/cli_runners/chrome'
-    register_runner :compiler,    :Compiler,    'opal/cli_runners/compiler'
-    register_runner :nashorn,     :Nashorn,     'opal/cli_runners/nashorn'
-    register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
-    register_runner :server,      :Server,      'opal/cli_runners/server'
+    register_runner :applescript,  :Applescript,  'opal/cli_runners/applescript'
+    register_runner :chrome,       :Chrome,       'opal/cli_runners/chrome'
+    register_runner :compiler,     :Compiler,     'opal/cli_runners/compiler'
+    register_runner :nashorn,      :Nashorn,      'opal/cli_runners/nashorn'
+    register_runner :nodejs,       :Nodejs,       'opal/cli_runners/nodejs'
+    register_runner :strictnodejs, :Strictnodejs, 'opal/cli_runners/strictnodejs'
+    register_runner :server,       :Server,       'opal/cli_runners/server'
 
     alias_runner :osascript, :applescript
     alias_runner :node, :nodejs

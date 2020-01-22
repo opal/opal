@@ -64,10 +64,10 @@ RSpec.describe Opal::SourceMap::Index do
     #   end
     #
 
-    expect('jsline1(').to be_mapped_to_line_and_column(0, 4, file: 'js_file.js', map: source_map, source: compiled)
+    expect('jsline1(').to be_mapped_to_line_and_column(1, 4, file: 'js_file.js', map: source_map, source: compiled)
     expect('jsline2(').to be_mapped_to_line_and_column(1, 4, file: 'js_file.js', map: source_map, source: compiled)
     expect('jsline3(').to be_mapped_to_line_and_column(2, 4, file: 'js_file.js', map: source_map, source: compiled)
-    expect('$rbline1(').to be_mapped_to_line_and_column(0, 2, file: 'rb_file.rb', map: source_map, source: compiled)
+    expect('$rbline1(').to be_mapped_to_line_and_column(1, 2, file: 'rb_file.rb', map: source_map, source: compiled)
     expect('$rbline2(').to be_mapped_to_line_and_column(1, 2, file: 'rb_file.rb', map: source_map, source: compiled)
     expect('$rbline3(').to be_mapped_to_line_and_column(2, 2, file: 'rb_file.rb', map: source_map, source: compiled)
     expect('jsline4(').to be_mapped_to_line_and_column(3, 4, file: 'js2_file.js', map: source_map, source: compiled)

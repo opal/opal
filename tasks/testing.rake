@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:rspec) do |t|
   t.pattern = 'spec/lib/**/*_spec.rb'
@@ -277,7 +278,7 @@ Use PATTERN environment variable to manually set the glob for specs:
   bundle exec rake mspec_nodejs PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
 
-platforms = %w[nodejs server chrome]
+platforms = %w[nodejs server chrome strictnodejs]
 mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
 
@@ -328,7 +329,7 @@ platforms.each do |platform|
       end
       Testing::HTTPServer.new.with_server do |session|
         filename = "tmp/minitest_#{suite}_#{platform}.rb"
-        files.push('nodejs') if platform == 'nodejs'
+        files.push('nodejs') if platform.end_with?('nodejs')
         Testing::Minitest.write_file(filename, files, ENV)
 
         stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
@@ -341,30 +342,140 @@ platforms.each do |platform|
   end
 end
 
+mspec_suites.each do |suite|
+  desc "Run the MSpec test suite build with opal-webpack-loader in chrome" + pattern_usage
+  task :"mspec_#{suite}_owl" do
+    # setup webpack app
+    opal_pwd = Dir.pwd
+
+    unless Dir.exist?('tmp/webpack_app')
+      FileUtils.mkdir('tmp') unless Dir.exist?('tmp')
+      FileUtils.cp_r('spec/fixtures/webpack_app', 'tmp/webpack_app')
+      Dir.chdir('tmp/webpack_app')
+      `yarn install`
+      `env -i PATH=$PATH bundle install`
+      Dir.chdir(opal_pwd)
+    end
+
+    # cleanup old entry and asset
+    FileUtils.rm_f('tmp/webpack_app/opal/spec_owl.rb')
+    FileUtils.rm_f('tmp/webpack_app/public/assets/application.js')
+
+    # create new entry and asset and run tests
+    filename = "tmp/webpack_app/opal/spec_owl.rb"
+    mkdir_p File.dirname(filename)
+    bm_filepath = Testing::MSpec.bm_filepath if ENV['BM']
+    specs_env = {
+      'SUITE' => suite,
+      'FORMATTER' => 'chrome',
+      'BM_FILEPATH' => bm_filepath,
+    }.merge(ENV.to_hash)
+
+    Testing::MSpec.write_file filename, Testing::MSpec.filters(suite), Testing::MSpec.specs(specs_env), specs_env
+
+    Dir.chdir('tmp/webpack_app')
+
+    Testing::MSpec.stubs.each do |stubpath|
+      stubpath = stubpath.sub(/\Alib\//, '') if stubpath.start_with?('lib/')
+      stub_file = File.join('opal', stubpath + '.rb')
+      FileUtils.mkdir_p(File.dirname(stub_file))
+      File.write(stub_file, '')
+    end
+
+    sh "env -i PATH=$PATH ruby -w -rbundler/setup mspec_runner.rb"
+    Dir.chdir(opal_pwd)
+
+    if bm_filepath
+      puts "Benchmark results have been written to #{bm_filepath}"
+      puts "To view the results, run bundle exec rake bench:report"
+    end
+  end
+end
+
+minitest_suites.each do |suite|
+  desc "Run the Minitest suite on Opal::Builder/owl" + pattern_usage
+  task :"minitest_#{suite}_owl" do
+    # setup webpack app
+    opal_pwd = Dir.pwd
+
+    unless Dir.exist?('tmp/webpack_app')
+      FileUtils.mkdir('tmp') unless Dir.exist?('tmp')
+      FileUtils.cp_r('spec/fixtures/webpack_app', 'tmp/webpack_app')
+      Dir.chdir('tmp/webpack_app')
+      `yarn install`
+      `env -i PATH=$PATH bundle install`
+      Dir.chdir(opal_pwd)
+    end
+
+    # cleanup old entry and asset
+    FileUtils.rm_f('tmp/webpack_app/opal/spec_owl.rb')
+    FileUtils.rm_f('tmp/webpack_app/public/assets/application.js')
+
+    files = %w[
+        benchmark/test_benchmark.rb
+        ruby/test_call.rb
+        opal/test_keyword.rb
+        opal/test_base64.rb
+        opal/test_openuri.rb
+        opal/unsupported_and_bugs.rb
+        opal/test_matrix.rb
+      ]
+
+    Testing::HTTPServer.new.with_server do |session|
+      Dir.chdir('tmp/webpack_app')
+
+      # create stubs
+      stubs = %w[optparse io/console timeout mutex_m rubygems tempfile monitor]
+      Dir.mkdir('opal/io') unless Dir.exist?('opal/io')
+
+      stubs.each do |stubpath|
+        stub_file = File.join('opal', stubpath + '.rb')
+        FileUtils.mkdir_p(File.dirname(stub_file))
+        File.write(stub_file, '')
+      end
+
+      # create new entry and asset and run tests
+      filename = 'opal/spec_owl.rb'
+      Testing::Minitest.write_file(filename, files, ENV)
+
+      # owl doesn't append exit code, "manually" append and call Kernel.exit
+      spec_file = File.read(filename)
+      spec_file << "\nKernel.exit\n"
+      File.write(filename, spec_file)
+
+      # Further options: -Dwarning -A --enable-source-location
+      sh "env -i PATH=$PATH ruby -w -rbundler/setup minitest_runner.rb"
+
+      Dir.chdir(opal_pwd)
+    end
+  end
+end
+
 # The name ends with the platform, which is of course mandated in this case
-desc "Run the Node.js Minitest suite on Node.js"
-task :minitest_node_nodejs do
-  platform = 'nodejs'
-  files = %w[
-    nodejs
-    opal-parser
-    nodejs/test_file.rb
-    nodejs/test_dir.rb
-    nodejs/test_env.rb
-    nodejs/test_io.rb
-    nodejs/test_error.rb
-    nodejs/test_file_encoding.rb
-    nodejs/test_opal_builder.rb
-  ]
+%w[nodejs strictnodejs].each do |platform|
+  desc "Run the Node.js Minitest suite on Node.js - #{platform}"
+  task :"minitest_node_#{platform}" do
+    files = %w[
+      nodejs
+      opal-parser
+      nodejs/test_file.rb
+      nodejs/test_dir.rb
+      nodejs/test_env.rb
+      nodejs/test_io.rb
+      nodejs/test_error.rb
+      nodejs/test_file_encoding.rb
+      nodejs/test_opal_builder.rb
+    ]
 
-  filename = "tmp/minitest_node_nodejs.rb"
-  Testing::Minitest.write_file(filename, files, ENV)
+    filename = "tmp/minitest_node_nodejs.rb"
+    Testing::Minitest.write_file(filename, files, ENV)
 
-  stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
-  includes = "-Itest -Ilib -Ivendored-minitest"
+    stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+    includes = "-Itest -Ilib -Ivendored-minitest"
 
-  sh "ruby -rbundler/setup "\
-     "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+    sh "ruby -rbundler/setup "\
+       "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+  end
 end
 
 desc 'Run smoke tests with opal-rspec to see if something is broken'
@@ -446,11 +557,17 @@ platforms.each do |platform|
   task :"minitest_#{platform}" => minitest_suites.map { |suite| :"minitest_#{suite}_#{platform}" }
 end
 
+desc "Run the whole Minitest suite build with webpack on chrome"
+task :minitest_owl => [:minitest_cruby_owl]
+
+desc "Run the whole MSpec suite build with webpack on chrome"
+task :mspec_owl => [:mspec_ruby_owl, :mspec_opal_owl]
+
 desc "Run the whole MSpec suite on all platforms"
-task :mspec    => [:mspec_chrome, :mspec_nodejs]
+task :mspec    => [:mspec_chrome, :mspec_nodejs, :mspec_strictnodejs, :mspec_owl]
 
 desc "Run the whole Minitest suite on all platforms"
-task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs]
+task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs, :minitest_node_strictnodejs, :minitest_strictnodejs, :minitest_owl]
 
 desc "Run all tests"
 task :test_all => [:rspec, :mspec, :minitest]

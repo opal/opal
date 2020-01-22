@@ -33,6 +33,12 @@ matrix:
     - rvm: 2.5
       env: RUN=mspec_ruby_chrome
 
+    - rvm: 2.5.3
+      env: RUN=mspec_opal_owl
+
+    - rvm: 2.5.3
+      env: RUN=mspec_ruby_owl
+
     # - rvm: 2.5
     #   env:
     #     - RUN=browser_test
@@ -88,6 +94,7 @@ matrix:
     - rvm: jruby-head
     - rvm: truffleruby
     - env: RUN=smoke_test
+    - env: RUN=mspec_ruby_owl
 
 before_install:
   # Keep track of which version of node we're running the specs against

@@ -18,45 +18,21 @@ opal_filter "Module" do
   fails "Module#attr_writer converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr_writer not allows for adding an attr_writer to an immediate"
   fails "Module#attr_writer raises a TypeError when the given names can't be converted to strings using to_str"
-  fails "Module#autoload (concurrently) blocks a second thread while a first is doing the autoload"
-  fails "Module#autoload (concurrently) blocks others threads while doing an autoload"
-  fails "Module#autoload allows multiple autoload constants for a single file"
+  fails "Module#autoload after autoloading searches for the constant like the original lookup and fails when finding the undefined autoload constant in the the current scope when declared in current and defined in parent" # checked
+  fails "Module#autoload after the autoload is triggered by require the mapping feature to autoload is removed, and a new autoload with the same path is considered" # Exception: path.substr is not a function
   fails "Module#autoload calls #to_path on non-String filename arguments"
   fails "Module#autoload calls #to_path on non-string filenames"
-  fails "Module#autoload does NOT raise a NameError when the autoload file did not define the constant and a module is opened with the same name"
-  fails "Module#autoload does not load the file if the file is manually required"
-  fails "Module#autoload does not load the file when accessing the constants table of the module"
-  fails "Module#autoload does not load the file when referring to the constant in defined?"
-  fails "Module#autoload does not remove the constant from the constant table if load fails"
-  fails "Module#autoload does not remove the constant from the constant table if the loaded files does not define it"
-  fails "Module#autoload ignores the autoload request if the file is already loaded"
-  fails "Module#autoload loads a file with .rb extension when passed the name without the extension"
-  fails "Module#autoload loads the file that defines subclass XX::YY < YY and YY is a top level constant"
-  fails "Module#autoload loads the file when opening a module that is the autoloaded constant"
-  fails "Module#autoload loads the registered constant into a dynamically created class"
-  fails "Module#autoload loads the registered constant into a dynamically created module"
-  fails "Module#autoload loads the registered constant when it is accessed"
-  fails "Module#autoload loads the registered constant when it is included"
-  fails "Module#autoload loads the registered constant when it is inherited from"
-  fails "Module#autoload loads the registered constant when it is opened as a class"
-  fails "Module#autoload loads the registered constant when it is opened as a module"
-  fails "Module#autoload looks up the constant in the scope where it is referred"
-  fails "Module#autoload looks up the constant when in a meta class scope"
-  fails "Module#autoload raises a NameError when the constant name has a space in it"
-  fails "Module#autoload raises a NameError when the constant name starts with a lower case letter"
-  fails "Module#autoload raises a NameError when the constant name starts with a number"
-  fails "Module#autoload raises a TypeError if not passed a String or object respodning to #to_path for the filename"
-  fails "Module#autoload raises a TypeError if opening a class with a different superclass than the class defined in the autoload file"
-  fails "Module#autoload raises an ArgumentError when an empty filename is given"
-  fails "Module#autoload registers a file to load the first time the named constant is accessed"
-  fails "Module#autoload retains the autoload even if the request to require fails"
-  fails "Module#autoload returns 'constant' on referring the constant with defined?()"
-  fails "Module#autoload runs for an exception condition class and doesn't trample the exception"
-  fails "Module#autoload sets the autoload constant in the constants table"
-  fails "Module#autoload shares the autoload request across dup'ed copies of modules"
-  fails "Module#autoload when changing $LOAD_PATH does not reload a file due to a different load path"
-  fails "Module#autoload? returns nil if no file has been registered for a constant"
-  fails "Module#autoload? returns the name of the file that will be autoloaded"
+  fails "Module#autoload does not call #require a second time and does not warn if already loading the same feature with #require" # NameError: uninitialized constant TOPLEVEL_BINDING
+  fails "Module#autoload does not remove the constant from Module#constants if load raises a RuntimeError and keeps it as an autoload" # checked
+  fails "Module#autoload interacting with defined? does not load the file when referring to the constant in defined?" # see autoload_spec
+  fails "Module#autoload interacting with defined? returns nil when it fails to load an autoloaded parent when referencing a nested constant" # see autoload_spec
+  fails "Module#autoload raises a TypeError if not passed a String or object responding to #to_path for the filename" # checked
+  fails "Module#autoload returns 'constant' on referring the constant with defined?()" # checked
+  fails "Module#autoload shares the autoload request across dup'ed copies of modules" # checked
+  fails "Module#autoload the autoload is triggered when the same file is required directly in a nested require" # checked
+  fails "Module#autoload the autoload is triggered when the same file is required directly with a full path" # checked
+  fails "Module#autoload the autoload is triggered when the same file is required directly with a relative path" # checked
+  fails "Module#autoload when changing $LOAD_PATH does not reload a file due to a different load path" # checked
   fails "Module#class_eval converts a non-string filename to a string using to_str"
   fails "Module#class_eval converts non string eval-string to string using to_str"
   fails "Module#class_eval raises a TypeError when the given eval-string can't be converted to string using to_str"

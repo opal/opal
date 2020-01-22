@@ -59,7 +59,27 @@
 
   // This is a useful reference to global object inside ruby files
   Opal.global = global_object;
-  global_object.Opal = Opal;
+
+  // In Node VMs globalThis is defined but not global, but within webpack global is used.
+  // isomorfeus-speednode provides global to Node VMs.
+  // Make sure Opal is available for global in Node Vms and global within Opal.
+  if (typeof(global) !== 'undefined') {
+    if (!global.Opal) {
+      global.Opal = global_object.Opal;
+      // This is a useful reference to global object inside ruby files
+      Opal.global = global;
+      // Setup a dummy console object if missing
+      if (typeof(global.console) === 'object') {
+        console = global.console;
+      } else if (global.console == null) {
+        console = global.console = {};
+      } else {
+        console = {};
+      }
+      if (!('log' in console)) { console.log = function () {}; }
+      if (!('warn' in console)) { console.warn = console.log; }
+    }
+  }
 
   // Configure runtime behavior with regards to require and unsupported features
   Opal.config = {
@@ -166,6 +186,19 @@
     return (val === nil || val == null || (val.$$is_boolean && val == false))
   };
 
+  // TracePoint support
+  // ------------------
+  // for TracePoint.trace(:class) do ...
+  Opal.trace_class = false;
+  Opal.tracers_for_class = [];
+
+  function invoke_tracers_for_class(klass_or_module) {
+    for(var i=0, tracer; i < Opal.tracers_for_class.length; i++) {
+      tracer = Opal.tracers_for_class[i];
+      tracer.trace_object = klass_or_module;
+      tracer.block.$call(tracer);
+    }
+  }
 
   // Constants
   // ---------
@@ -181,7 +214,27 @@
 
   // Get the constant in the scope of the current cref
   function const_get_name(cref, name) {
-    if (cref) return cref.$$const[name];
+    if (cref) {
+      if (cref.$$const[name]) { return cref.$$const[name]; }
+      if (cref.$$prototype.$$autoload && cref.$$prototype.$$autoload[name]) {
+        if (!cref.$$prototype.$$autoload[name].loaded) {
+          cref.$$prototype.$$autoload[name].loaded = true;
+          try {
+            Opal.Kernel.$require(cref.$$prototype.$$autoload[name].path);
+          } catch (e) {
+            cref.$$prototype.$$autoload[name].exception = e;
+            throw e;
+          }
+          cref.$$prototype.$$autoload[name].required = true;
+          if (cref.$$const[name]) {
+            cref.$$prototype.$$autoload[name].success = true;
+            return cref.$$const[name];
+          }
+        } else if (cref.$$prototype.$$autoload[name].loaded && !cref.$$prototype.$$autoload[name].required) {
+          if (cref.$$prototype.$$autoload[name].exception) { throw cref.$$prototype.$$autoload[name].exception; }
+        }
+      }
+    }
   }
 
   // Walk up the nesting array looking for the constant
@@ -194,7 +247,26 @@
     // and in order. The ancestors of those elements are ignored.
     for (i = 0, ii = nesting.length; i < ii; i++) {
       constant = nesting[i].$$const[name];
-      if (constant != null) return constant;
+      if (constant != null) {
+        return constant;
+      } else if (nesting[i].$$prototype.$$autoload && nesting[i].$$prototype.$$autoload[name]) {
+        if (!nesting[i].$$prototype.$$autoload[name].loaded) {
+          nesting[i].$$prototype.$$autoload[name].loaded = true;
+          try {
+            Opal.Kernel.$require(nesting[i].$$prototype.$$autoload[name].path);
+          } catch (e) {
+            nesting[i].$$prototype.$$autoload[name].exception = e;
+            throw e;
+          }
+          nesting[i].$$prototype.$$autoload[name].required = true;
+          if (nesting[i].$$const && nesting[i].$$const[name]) {
+            nesting[i].$$prototype.$$autoload[name].success = true;
+            return nesting[i].$$const[name];
+          }
+        } else if (nesting[i].$$prototype.$$autoload[name].loaded && !nesting[i].$$prototype.$$autoload[name].required) {
+          if (nesting[i].$$prototype.$$autoload[name].exception) { throw nesting[i].$$prototype.$$autoload[name].exception; }
+        }
+      }
     }
   }
 
@@ -209,6 +281,23 @@
     for (i = 0, ii = ancestors.length; i < ii; i++) {
       if (ancestors[i].$$const && $hasOwn.call(ancestors[i].$$const, name)) {
         return ancestors[i].$$const[name];
+      } else if (ancestors[i].$$prototype.$$autoload && ancestors[i].$$prototype.$$autoload[name]) {
+        if (!ancestors[i].$$prototype.$$autoload[name].loaded) {
+          ancestors[i].$$prototype.$$autoload[name].loaded = true;
+          try {
+            Opal.Kernel.$require(ancestors[i].$$prototype.$$autoload[name].path);
+          } catch (e) {
+            ancestors[i].$$prototype.$$autoload[name].exception = e;
+            throw e;
+          }
+          ancestors[i].$$prototype.$$autoload[name].required = true;
+          if (ancestors[i].$$const && ancestors[i].$$const[name]) {
+            ancestors[i].$$prototype.$$autoload[name].success = true;
+            return ancestors[i].$$const[name];
+          }
+        } else if (ancestors[i].$$prototype.$$autoload[name].loaded && !ancestors[i].$$prototype.$$autoload[name].required) {
+          if (ancestors[i].$$prototype.$$autoload[name].exception) { throw ancestors[i].$$prototype.$$autoload[name].exception; }
+        }
       }
     }
   }
@@ -350,6 +439,11 @@
       for (constant in module.$$const) {
         constants[constant] = true;
       }
+      if (module.$$prototype.$$autoload) {
+        for (constant in module.$$prototype.$$autoload) {
+          constants[constant] = true;
+        }
+      }
     }
 
     return Object.keys(constants);
@@ -365,8 +459,8 @@
       return old;
     }
 
-    if (cref.$$autoload != null && cref.$$autoload[name] != null) {
-      delete cref.$$autoload[name];
+    if (cref.$$prototype.$$autoload && cref.$$prototype.$$autoload[name]) {
+      delete cref.$$prototype.$$autoload[name];
       return nil;
     }
 
@@ -511,6 +605,9 @@
         // Make sure existing class has same superclass
         ensureSuperclassMatch(klass, superclass);
       }
+
+      if (Opal.trace_class) { invoke_tracers_for_class(klass); }
+
       return klass;
     }
 
@@ -533,6 +630,8 @@
     if (bridged) {
       Opal.bridge(bridged, klass);
     }
+
+    if (Opal.trace_class) { invoke_tracers_for_class(klass); }
 
     return klass;
   };
@@ -611,12 +710,17 @@
     module = find_existing_module(scope, name);
 
     if (module) {
+
+      if (Opal.trace_class) { invoke_tracers_for_class(module); }
+
       return module;
     }
 
     // Module doesnt exist, create a new one...
     module = Opal.allocate_module(name);
     Opal.const_set(scope, name, module);
+
+    if (Opal.trace_class) { invoke_tracers_for_class(module); }
 
     return module;
   };
@@ -954,10 +1058,10 @@
       // because there are no intermediate classes between `parent` and `next ancestor`.
       // It doesn't break any prototypes of other objects as we don't change class references.
 
-      var proto = includer.$$prototype, parent = proto, module_iclass = Object.getPrototypeOf(parent);
+      var parent = includer.$$prototype, module_iclass = Object.getPrototypeOf(parent);
 
       while (module_iclass != null) {
-        if (isRoot(module_iclass) && module_iclass.$$module === module) {
+        if (module_iclass.$$module === module && isRoot(module_iclass)) {
           break;
         }
 
@@ -965,15 +1069,23 @@
         module_iclass = Object.getPrototypeOf(module_iclass);
       }
 
-      var next_ancestor = Object.getPrototypeOf(module_iclass);
+      if (module_iclass) {
+        // module has been directly included
+        var next_ancestor = Object.getPrototypeOf(module_iclass);
 
-      // skip non-root iclasses (that were recursively included)
-      while (next_ancestor.hasOwnProperty('$$iclass') && !isRoot(next_ancestor)) {
-        next_ancestor = Object.getPrototypeOf(next_ancestor);
+        // skip non-root iclasses (that were recursively included)
+        while (next_ancestor.hasOwnProperty('$$iclass') && !isRoot(next_ancestor)) {
+          next_ancestor = Object.getPrototypeOf(next_ancestor);
+        }
+
+        start_chain_after = parent;
+        end_chain_on = next_ancestor;
+      } else {
+        // module has not been directly included but was in ancestor chain because it was included by another module
+        // include it directly
+        start_chain_after = includer.$$prototype;
+        end_chain_on = Object.getPrototypeOf(includer.$$prototype);
       }
-
-      start_chain_after = parent;
-      end_chain_on = next_ancestor;
     }
 
     $setPrototype(start_chain_after, chain.first);
@@ -1271,9 +1383,10 @@
   // @return [undefined]
   Opal.add_stubs = function(stubs) {
     var proto = Opal.BasicObject.$$prototype;
+    var stub, existing_method;
 
     for (var i = 0, length = stubs.length; i < length; i++) {
-      var stub = stubs[i], existing_method = proto[stub];
+      stub = stubs[i], existing_method = proto[stub];
 
       if (existing_method == null || existing_method.$$stub) {
         Opal.add_stub_for(proto, stub);
@@ -1288,8 +1401,8 @@
   // @param stub [String] stub name to add (e.g. "$foo")
   // @return [undefined]
   Opal.add_stub_for = function(prototype, stub) {
-    var method_missing_stub = Opal.stub_for(stub);
-    $defineProperty(prototype, stub, method_missing_stub);
+    // Opal.stub_for(stub) is the method_missing_stub
+    $defineProperty(prototype, stub, Opal.stub_for(stub));
   };
 
   // Generate the method_missing stub for a given method name.

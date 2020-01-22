@@ -1,0 +1,32 @@
+# frozen_string_literal: true
+
+require 'opal/paths'
+require 'opal/cli_runners/system_runner'
+
+module Opal
+  module CliRunners
+    class Strictnodejs
+      NODE_PATH = File.expand_path('../stdlib/nodejs/node_modules', ::Opal.gem_dir)
+
+      def self.call(data)
+        (data[:options] ||= {})[:env] = { 'NODE_PATH' => node_modules }
+
+        SystemRunner.call(data) do |tempfile|
+          ['node', '--use_strict', tempfile.path, *data[:argv]]
+        end
+      rescue Errno::ENOENT
+        raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'
+      end
+
+      # Ensure stdlib node_modules is among NODE_PATHs
+      def self.node_modules
+        ENV['NODE_PATH'].to_s.split(':').tap do |paths|
+          paths << NODE_PATH unless paths.include? NODE_PATH
+        end.join(':')
+      end
+
+      class MissingNodeJS < RunnerError
+      end
+    end
+  end
+end

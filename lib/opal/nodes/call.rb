@@ -226,18 +226,49 @@ module Opal
         file = compiler.file
         if arg.type == :str
           dir = File.dirname(file)
-          compiler.requires << Pathname(dir).join(arg.children[0]).cleanpath.to_s
+          mod_filename = Pathname(dir).join(arg.children[0]).cleanpath.to_s
+          compiler.requires << mod_filename
         end
-        push fragment("self.$require(#{file.inspect}+ '/../' + ")
-        push process(arglist)
-        push fragment(')')
+        if compiler.es6_modules?
+          if arg.type == :str
+            mod_filename = mod_filename.end_with?('.rb') ? mod_filename : mod_filename + '.rb'
+            push fragment("self.$require(#{Opal::Compiler.module_name_from_paths(mod_filename).inspect})")
+          else
+            push fragment("self.$require(#{Opal::Compiler.module_name_from_paths(File.dirname(file)).inspect} + '/' + ")
+            push process(arglist)
+            push fragment(')')
+          end
+        else
+          push fragment("self.$require(#{file.inspect}+ '/../' + ")
+          push process(arglist)
+          push fragment(')')
+        end
       end
 
-      add_special :autoload do |compile_default|
-        if scope.class_scope?
-          str = DependencyResolver.new(compiler, arglist.children[1]).resolve
-          compiler.requires << str unless str.nil?
-          compile_default.call
+      add_special :autoload do
+        unless scope.top?
+          push recv(receiver_sexp), method_jsid, '(', expr(arglist.children[0]), ', '
+          if arglist.children[1].type == :str && arglist.children[1].children[0] != ''
+            str = DependencyResolver.new(compiler, arglist.children[1]).resolve
+            if str.nil?
+              warn "Warning: File '#{arglist.children[1].children[0]}' for autoload of constant '#{arglist.children[0].children[0]}' could not be found!"
+              push expr(arglist.children[1])
+            else
+              file_path = Opal::ModulesHelpers.absolute_module_path(str)
+              if file_path
+                compiler.requires << str
+                filename = arglist.children[1].children[0]
+                filename += '.rb' unless filename.end_with?('.rb')
+                push Opal::Compiler.module_name_from_paths(filename.inspect)
+              else
+                warn "Warning: File '#{arglist.children[1].children[0]}' for autoload of constant '#{arglist.children[0].children[0]}' could not be found!"
+                push expr(arglist.children[1])
+              end
+            end
+          else
+            push expr(arglist.children[1])
+          end
+          push ')'
         end
       end
 
@@ -252,8 +283,50 @@ module Opal
           full_path.force_encoding(relative_path.encoding)
           first_arg = first_arg.updated(nil, [full_path])
         end
+        if compiler.es6_modules? && first_arg.children[0].start_with?('/')
+          real_module_name = Opal::Compiler.module_name_from_paths(first_arg.children[0])
+          first_arg = Opal::AST::Node.new(:str, [real_module_name])
+        end
         @arglist = arglist.updated(nil, [first_arg] + rest)
         compile_default.call
+      end
+
+      add_special :require_lazy do
+        helper :send
+
+        if compiler.es6_modules?
+          unless arglist.children[0].type == :str
+            compiler.warning('require_lazy: First argument must be a string, module must be known at compile time!')
+          end
+          first_arg = arglist.children[0].children[0]
+          filename = first_arg.end_with?('.rb') ? first_arg : first_arg + '.rb'
+          real_module_name = Opal::Compiler.module_name_from_paths(File.join(File.dirname(compiler.file), filename))
+
+          push fragment "(function() {"
+          indent do
+            push line
+            push "var $$promise = $send($$($nesting, 'Promise').$new(), 'then', [],"
+            if iter
+              push expr(iter)
+            else
+              push 'function(){return true;}'
+            end
+            push ');'
+            push line
+            push 'import('
+            push '/* webpackPrefetch: true */ ' if arglist.children.include?(s(:sym, :prefetch))
+            push '/* webpackPreload: true */ ' if arglist.children.include?(s(:sym, :preload))
+            push "'#{filename}'"
+            push ").then(function(module) { module.default(); Opal.load('#{real_module_name}'); "
+            push '$$promise.$resolve(true); return module; });'
+            push line
+            push 'return $$promise;'
+          end
+          push line
+          push '})()'
+        else
+          compiler.error('require_lazy only works with webpack & opal-webpack-loader and the es6_modules compiler option!')
+        end
       end
 
       add_special :block_given? do
