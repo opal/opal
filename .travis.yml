@@ -27,6 +27,11 @@ matrix:
   fast_finish: true
 
   include:
+    - rvm: jruby-9.2
+      env:
+        - RUN=rspec
+        - JRUBY_OPTS=--dev
+
     - rvm: 2.6
       env: RUN=mspec_opal_chrome
 
@@ -72,11 +77,6 @@ matrix:
 
     - rvm: truffleruby
       env: RUN=rspec
-
-    - rvm: jruby-9.2
-      env:
-        - RUN=rspec
-        - JRUBY_OPTS=--dev
 
     - rvm: jruby-head
       env:
