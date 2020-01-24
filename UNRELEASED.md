@@ -25,6 +25,10 @@ Whitespace conventions:
 
 ### Fixed
 
+- Array#delete_if (#2069)
+- Array#keep_if (#2069)
+- Array#reject! (#2069)
+- Array#select! (#2069)
 - Struct#dup (#1995)
 - Integer#gcdlcm (#1972)
 - Enumerable#to_h (#1979)

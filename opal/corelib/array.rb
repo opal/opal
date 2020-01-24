@@ -1,3 +1,5 @@
+# helpers: truthy, falsy
+
 require 'corelib/enumerable'
 require 'corelib/numeric'
 
@@ -14,6 +16,34 @@ class Array < `Array`
       } else {
         return klass.$allocate().$replace(#{`obj`.to_a});
       }
+    }
+
+    // A helper for keep_if and delete_if, filter is either Opal.truthy
+    // or Opal.falsy.
+    function filterIf(self, filter, block) {
+      var value, raised = null, updated = new Array(self.length);
+
+      for (var i = 0, i2 = 0, length = self.length; i < length; i++) {
+        if (!raised) {
+          try {
+            value = Opal.yield1(block, self[i])
+          } catch(error) {
+            raised = error;
+          }
+        }
+
+        if (raised || filter(value)) {
+          updated[i2] = self[i]
+          i2 += 1;
+        }
+      }
+
+      if (i2 !== i) {
+        self.splice.apply(self, [0, updated.length].concat(updated));
+        self.splice(i2, updated.length);
+      }
+
+      if (raised) throw raised;
     }
   }
 
@@ -826,20 +856,7 @@ class Array < `Array`
 
   def delete_if(&block)
     return enum_for(:delete_if) { size } unless block_given?
-
-    %x{
-      for (var i = 0, length = self.length, value; i < length; i++) {
-        value = block(self[i]);
-
-        if (value !== false && value !== nil) {
-          self.splice(i, 1);
-
-          length--;
-          i--;
-        }
-      }
-    }
-
+    %x{filterIf(self, $falsy, block)}
     self
   end
 
@@ -1355,20 +1372,7 @@ class Array < `Array`
 
   def keep_if(&block)
     return enum_for(:keep_if) { size } unless block_given?
-
-    %x{
-      for (var i = 0, length = self.length, value; i < length; i++) {
-        value = block(self[i]);
-
-        if (value === false || value === nil) {
-          self.splice(i, 1);
-
-          length--;
-          i--;
-        }
-      }
-    }
-
+    %x{filterIf(self, $truthy, block)}
     self
   end
 
