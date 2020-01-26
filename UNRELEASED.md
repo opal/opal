@@ -20,6 +20,7 @@ Whitespace conventions:
 - `Opal.$$$` is now a shortcut for `Opal.const_get_qualified`
 - Source-map support for Node.js in the default runner (#2045)
 - SecureRandom#hex(n) (#2050)
+- Added a generic implementation of Kernel#caller and #warn(uplevel:) that works with sourcemaps in Node.js and Chrome (#2065)
 
 
 ### Fixed
