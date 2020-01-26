@@ -59,7 +59,6 @@ ruby/core/kernel
 !ruby/core/kernel/binding_spec
 !ruby/core/kernel/callcc_spec
 !ruby/core/kernel/caller_locations_spec
-!ruby/core/kernel/caller_spec
 !ruby/core/kernel/catch_spec
 !ruby/core/kernel/chomp_spec
 !ruby/core/kernel/chop_spec

@@ -302,7 +302,7 @@ describe Logger do
         message = e
       end
       @logger.debug(message).should == true
-      @pipe.string.should =~ / message \(ArgumentError\)\nArgumentError: message\n +at /
+      @pipe.string.should =~ / message \(ArgumentError\)\nArgumentError: message\n  from /
     end
   end
 end

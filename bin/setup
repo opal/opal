@@ -3,6 +3,8 @@ set -euo pipefail
 IFS=$'\n\t'
 set -vx
 
+gem install bundler --conservative
+
 bundle update
 
 git submodule update --init

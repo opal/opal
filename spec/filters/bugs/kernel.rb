@@ -32,6 +32,11 @@ opal_filter "Kernel" do
   fails "Kernel#autoload? is a private method" # Expected Kernel to have private instance method 'autoload?' but it does not
   fails "Kernel#autoload? returns nil if no file has been registered for a constant" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x7849c>
   fails "Kernel#autoload? returns the name of the file that will be autoloaded" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x7849c>
+  fails "Kernel#caller is a private method" # Expected Kernel to have private instance method 'caller' but it does not
+  fails "Kernel#caller returns an Array of caller locations using a custom offset" # Expected "ruby/core/kernel/fixtures/caller.rb:4" to match /runner\/mspec.rb/
+  fails "Kernel#caller returns an Array of caller locations using a range" # NoMethodError: undefined method `+' for 1..1
+  fails "Kernel#caller returns an Array with the block given to #at_exit at the base of the stack" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xe208>
+  fails "Kernel#caller returns the locations as String instances" # Expected "corelib/runtime.js:1675" to include "ruby/core/kernel/caller_spec.rb:32:in"
   fails "Kernel#class returns the class of the object"
   fails "Kernel#clone replaces a singleton object's metaclass with a new copy with the same superclass" # NoMethodError: undefined method `singleton_methods' for #<#<Class:0x2df8e>:0x2df90>
   fails "Kernel#clone uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
@@ -211,11 +216,8 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf returns a String in the argument's encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel#sprintf with format string that contains %<> sections raises ArgumentError if missing second named argument" # KeyError: key not found: "foo"
-  fails "Kernel#warn :uplevel keyword argument converts value to Integer"
-  fails "Kernel#warn :uplevel keyword argument does not prepend caller information if line number is too big"
-  fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace"
-  fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil"
-  fails "Kernel#warn writes each array element on a line when passes an array" # Expected:   $stderr: "line 1\nline 2\n"      got:   $stderr: "[\"line 1\", \"line 2\"]\n"
+  fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
+  fails "Kernel#warn writes each array element on a line when passes an array" # Expected:   $stderr: "line 1\nline 2\n"       got:   $stderr: "[\"line 1\", \"li
   fails "Kernel#yield_self returns a sized Enumerator when no block given" # Requires Enumerator#peek
   fails "Kernel.Complex() when passed Numerics n1 and n2 and at least one responds to #real? with false returns n1 + n2 * Complex(0, 1)"
   fails "Kernel.Complex() when passed [Complex, Complex] returns a new Complex number based on the two given numbers"
