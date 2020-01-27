@@ -224,3 +224,5 @@ class String
     true
   end
 end
+
+Encoding.default_external = __ENCODING__

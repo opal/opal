@@ -122,12 +122,6 @@ module Opal
     # @return [Boolean]
     compiler_option :freezing, default: true, as: :freezing?
 
-    # @deprecated
-    # @!method tainting?
-    #
-    # stubs out #taint, #untaint and #tainted?
-    compiler_option :tainting, default: true, as: :tainting?
-
     # @!method irb?
     #
     # compile top level local vars with support for irb style vars

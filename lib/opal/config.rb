@@ -93,11 +93,6 @@ module Opal
     # @return [true, false]
     config_option :freezing_stubs_enabled, true, compiler_option: :freezing
 
-    # Add stubs for methods related to tainting objects (for compatibility).
-    #
-    # @return [true, false]
-    config_option :tainting_stubs_enabled, true, compiler_option: :tainting
-
     # Set the error severity for when a require can't be parsed at compile time.
     #
     # @example
