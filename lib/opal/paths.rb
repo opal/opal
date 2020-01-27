@@ -1,17 +1,20 @@
 # frozen_string_literal: true
 
 module Opal
+  # We use this file from inside Opal as well, and __dir__ is not yet supported.
+  # rubocop:disable Style/ExpandPathArguments
   def self.gem_dir
-    File.expand_path('../..', __FILE__.dup.untaint)
+    File.expand_path('../..', __FILE__)
   end
 
   def self.core_dir
-    File.expand_path('../../../opal', __FILE__.dup.untaint)
+    File.expand_path('../../../opal', __FILE__)
   end
 
   def self.std_dir
-    File.expand_path('../../../stdlib', __FILE__.dup.untaint)
+    File.expand_path('../../../stdlib', __FILE__)
   end
+  # rubocop:enable Style/ExpandPathArguments
 
   # Add a file path to opals load path. Any gem containing ruby code that Opal
   # has access to should add a load path through this method. Load paths added
@@ -67,13 +70,13 @@ module Opal
   extend UseGem
 
   def self.paths
-    @paths.dup.freeze
+    @paths.freeze
   end
 
   # Resets Opal.paths to the default value
   # (includes `corelib`, `stdlib`, `opal/lib`, `ast` gem and `parser` gem)
   def self.reset_paths!
-    @paths = [core_dir.untaint, std_dir.untaint, gem_dir.untaint]
+    @paths = [core_dir, std_dir, gem_dir]
     if RUBY_ENGINE != 'opal'
       use_gem 'ast'
       use_gem 'parser'
