@@ -21,7 +21,6 @@ RSpec.describe Opal::Config do
     expect(described_class.const_missing_enabled).to    eq(true)
     expect(described_class.arity_check_enabled).to      eq(false)
     expect(described_class.freezing_stubs_enabled).to   eq(true)
-    expect(described_class.tainting_stubs_enabled).to   eq(true)
     expect(described_class.dynamic_require_severity).to eq(:warning)
     expect(described_class.missing_require_severity).to eq(:error)
     expect(described_class.irb_enabled).to              eq(false)
@@ -35,7 +34,6 @@ RSpec.describe Opal::Config do
     expect{ described_class.const_missing_enabled    = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.arity_check_enabled      = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.freezing_stubs_enabled   = :foobar }.to raise_error(ArgumentError)
-    expect{ described_class.tainting_stubs_enabled   = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.dynamic_require_severity = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.missing_require_severity = :foobar }.to raise_error(ArgumentError)
     expect{ described_class.irb_enabled              = :foobar }.to raise_error(ArgumentError)
@@ -110,12 +108,5 @@ RSpec.describe Opal::Config do
 
     expect{ described_class.stubbed_files            = %w[foo bar].to_set }.not_to raise_error
     expect(described_class.stubbed_files).to eq(%w[foo bar].to_set)
-
-    expect{ described_class.tainting_stubs_enabled   = false }.not_to raise_error
-    expect(described_class.tainting_stubs_enabled).to eq(false)
-
-    expect{ described_class.tainting_stubs_enabled   = true }.not_to raise_error
-    expect(described_class.tainting_stubs_enabled).to eq(true)
-
   end
 end
