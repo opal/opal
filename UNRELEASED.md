@@ -55,6 +55,7 @@ Whitespace conventions:
 - Fixed a typo in the runtime (#2054)
 - Fix Regexp interpolation, previously interpolating with other regexps was broken (#2062)
 - Set match on StringScanner#skip and StringScanner#scan_until (#2061)
+- Fix ruby 2.7 warnings (#2071)
 
 
 ### Changed
