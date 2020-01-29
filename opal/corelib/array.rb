@@ -1,3 +1,5 @@
+# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete
+
 require 'corelib/enumerable'
 require 'corelib/numeric'
 
@@ -14,6 +16,34 @@ class Array < `Array`
       } else {
         return klass.$allocate().$replace(#{`obj`.to_a});
       }
+    }
+
+    // A helper for keep_if and delete_if, filter is either Opal.truthy
+    // or Opal.falsy.
+    function filterIf(self, filter, block) {
+      var value, raised = null, updated = new Array(self.length);
+
+      for (var i = 0, i2 = 0, length = self.length; i < length; i++) {
+        if (!raised) {
+          try {
+            value = $yield1(block, self[i])
+          } catch(error) {
+            raised = error;
+          }
+        }
+
+        if (raised || filter(value)) {
+          updated[i2] = self[i]
+          i2 += 1;
+        }
+      }
+
+      if (i2 !== i) {
+        self.splice.apply(self, [0, updated.length].concat(updated));
+        self.splice(i2, updated.length);
+      }
+
+      if (raised) throw raised;
     }
   }
 
@@ -90,12 +120,12 @@ class Array < `Array`
       var result = [], hash = #{{}}, i, length, item;
 
       for (i = 0, length = other.length; i < length; i++) {
-        Opal.hash_put(hash, other[i], true);
+        $hash_put(hash, other[i], true);
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        if (Opal.hash_delete(hash, item) !== undefined) {
+        if ($hash_delete(hash, item) !== undefined) {
           result.push(item);
         }
       }
@@ -115,11 +145,11 @@ class Array < `Array`
       var hash = #{{}}, i, length, item;
 
       for (i = 0, length = self.length; i < length; i++) {
-        Opal.hash_put(hash, self[i], true);
+        $hash_put(hash, self[i], true);
       }
 
       for (i = 0, length = other.length; i < length; i++) {
-        Opal.hash_put(hash, other[i], true);
+        $hash_put(hash, other[i], true);
       }
 
       return hash.$keys();
@@ -171,12 +201,12 @@ class Array < `Array`
       var result = [], hash = #{{}}, i, length, item;
 
       for (i = 0, length = other.length; i < length; i++) {
-        Opal.hash_put(hash, other[i], true);
+        $hash_put(hash, other[i], true);
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        if (Opal.hash_get(hash, item) === undefined) {
+        if ($hash_get(hash, item) === undefined) {
           result.push(item);
         }
       }
@@ -507,7 +537,7 @@ class Array < `Array`
       while (min < max) {
         mid = min + Math.floor((max - min) / 2);
         val = self[mid];
-        ret = Opal.yield1(block, val);
+        ret = $yield1(block, val);
 
         if (ret === true) {
           satisfied = mid;
@@ -565,7 +595,7 @@ class Array < `Array`
       if (n === nil) {
         while (true) {
           for (i = 0, length = self.length; i < length; i++) {
-            value = Opal.yield1(block, self[i]);
+            value = $yield1(block, self[i]);
           }
         }
       }
@@ -577,7 +607,7 @@ class Array < `Array`
 
         while (n > 0) {
           for (i = 0, length = self.length; i < length; i++) {
-            value = Opal.yield1(block, self[i]);
+            value = $yield1(block, self[i]);
           }
 
           n--;
@@ -613,7 +643,7 @@ class Array < `Array`
       var result = [];
 
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.yield1(block, self[i]);
+        var value = $yield1(block, self[i]);
         result.push(value);
       }
 
@@ -626,7 +656,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.yield1(block, self[i]);
+        var value = $yield1(block, self[i]);
         self[i] = value;
       }
     }
@@ -826,20 +856,7 @@ class Array < `Array`
 
   def delete_if(&block)
     return enum_for(:delete_if) { size } unless block_given?
-
-    %x{
-      for (var i = 0, length = self.length, value; i < length; i++) {
-        value = block(self[i]);
-
-        if (value !== false && value !== nil) {
-          self.splice(i, 1);
-
-          length--;
-          i--;
-        }
-      }
-    }
-
+    %x{filterIf(self, $falsy, block)}
     self
   end
 
@@ -887,7 +904,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.yield1(block, self[i]);
+        var value = $yield1(block, self[i]);
       }
     }
 
@@ -899,7 +916,7 @@ class Array < `Array`
 
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        var value = Opal.yield1(block, i);
+        var value = $yield1(block, i);
       }
     }
 
@@ -1166,29 +1183,29 @@ class Array < `Array`
 
   def hash
     %x{
-      var top = (Opal.hash_ids === undefined),
+      var top = ($hash_ids === undefined),
           result = ['A'],
           hash_id = self.$object_id(),
           item, i, key;
 
       try {
         if (top) {
-          Opal.hash_ids = Object.create(null);
+          $hash_ids = Object.create(null);
         }
 
         // return early for recursive structures
-        if (Opal.hash_ids[hash_id]) {
+        if ($hash_ids[hash_id]) {
           return 'self';
         }
 
-        for (key in Opal.hash_ids) {
-          item = Opal.hash_ids[key];
+        for (key in $hash_ids) {
+          item = $hash_ids[key];
           if (#{eql?(`item`)}) {
             return 'self';
           }
         }
 
-        Opal.hash_ids[hash_id] = self;
+        $hash_ids[hash_id] = self;
 
         for (i = 0; i < self.length; i++) {
           item = self[i];
@@ -1198,7 +1215,7 @@ class Array < `Array`
         return result.join(',');
       } finally {
         if (top) {
-          Opal.hash_ids = undefined;
+          $hash_ids = undefined;
         }
       }
     }
@@ -1355,20 +1372,7 @@ class Array < `Array`
 
   def keep_if(&block)
     return enum_for(:keep_if) { size } unless block_given?
-
-    %x{
-      for (var i = 0, length = self.length, value; i < length; i++) {
-        value = block(self[i]);
-
-        if (value === false || value === nil) {
-          self.splice(i, 1);
-
-          length--;
-          i--;
-        }
-      }
-    }
-
+    %x{filterIf(self, $truthy, block)}
     self
   end
 
@@ -1471,7 +1475,7 @@ class Array < `Array`
                 for (var j = 0; j < perm.length; j++) {
                   output.push(self[perm[j]]);
                 }
-                Opal.yield1(blk, output);
+                $yield1(blk, output);
               }
             }
           }
@@ -1877,7 +1881,7 @@ class Array < `Array`
       for (var i = 0, length = self.length, item, value; i < length; i++) {
         item = self[i];
 
-        value = Opal.yield1(block, item);
+        value = $yield1(block, item);
 
         if (Opal.truthy(value)) {
           result.push(item);
@@ -2147,7 +2151,7 @@ class Array < `Array`
         }
         key = ary[0];
         val = ary[1];
-        Opal.hash_put(hash, key, val);
+        $hash_put(hash, key, val);
       }
 
       return hash;
@@ -2191,17 +2195,17 @@ class Array < `Array`
       if (block === nil) {
         for (i = 0, length = self.length; i < length; i++) {
           item = self[i];
-          if (Opal.hash_get(hash, item) === undefined) {
-            Opal.hash_put(hash, item, item);
+          if ($hash_get(hash, item) === undefined) {
+            $hash_put(hash, item, item);
           }
         }
       }
       else {
         for (i = 0, length = self.length; i < length; i++) {
           item = self[i];
-          key = Opal.yield1(block, item);
-          if (Opal.hash_get(hash, key) === undefined) {
-            Opal.hash_put(hash, key, item);
+          key = $yield1(block, item);
+          if ($hash_get(hash, key) === undefined) {
+            $hash_put(hash, key, item);
           }
         }
       }
@@ -2216,10 +2220,10 @@ class Array < `Array`
 
       for (i = 0, length = original_length; i < length; i++) {
         item = self[i];
-        key = (block === nil ? item : Opal.yield1(block, item));
+        key = (block === nil ? item : $yield1(block, item));
 
-        if (Opal.hash_get(hash, key) === undefined) {
-          Opal.hash_put(hash, key, item);
+        if ($hash_get(hash, key) === undefined) {
+          $hash_put(hash, key, item);
           continue;
         }
 
