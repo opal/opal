@@ -15,10 +15,20 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.0.2...HEAD) - unreleased
+## [Unreleased](https://github.com/opal/opal/compare/v1.0.3...HEAD) - unreleased
 
 
 
+
+
+
+
+## [1.0.3](https://github.com/opal/opal/compare/v1.0.2...v1.0.3) - 2020-02-01
+
+
+### Fixed
+
+- Fixed compiling code with Unicode chars from Opal with opal-parser ([#2074](https://github.com/opal/opal/pull/2074))
 
 
 
