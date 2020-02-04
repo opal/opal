@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 require 'corelib/comparable'
 
 # Portions from Author:: Tanaka Akira <akr@m17n.org>

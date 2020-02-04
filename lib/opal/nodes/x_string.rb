@@ -38,7 +38,7 @@ module Opal
         when :str
           value = child.loc.expression.source
           push Fragment.new(value, scope, child)
-        when :begin, :gvar, :ivar, :nil
+        when :begin, :gvar, :ivar, :nil, :lvar
           push expr(child)
         else
           raise "Unsupported xstr part: #{child.type}"

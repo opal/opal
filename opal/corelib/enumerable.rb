@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module Enumerable
   %x{
     function comparableForPattern(value) {

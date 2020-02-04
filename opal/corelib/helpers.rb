@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module Opal
   def self.bridge(constructor, klass)
     `Opal.bridge(constructor, klass)`

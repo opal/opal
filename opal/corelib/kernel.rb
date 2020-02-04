@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module Kernel
   def method_missing(symbol, *args, &block)
     raise NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args)

@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module Kernel
   def format(format_string, *args)
     if args.length == 1 && args[0].respond_to?(:to_ary)

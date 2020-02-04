@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 browser         = `typeof(document) !== "undefined"`
 node            = `typeof(process) !== "undefined" && process.versions && process.versions.node`
 nashorn         = `typeof(Java) !== "undefined" && Java.type`

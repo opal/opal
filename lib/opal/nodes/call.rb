@@ -298,6 +298,22 @@ module Opal
         push ')' if push_nesting
       end
 
+      # add_special :force_encoding do |compile_default|
+      #   if recvr && recvr.type == :str
+      #     @recvr = recvr.updated :js_fragments, [fragment("(new String("), *recv(recvr), fragment("))")]
+      #   elsif recvr
+      #     with_temp do |tmp|
+      #       @recvr = s(:js_fragments,
+      #         fragment("(typeof (#{tmp} = "),
+      #         *recv(recvr),
+      #         fragment(") == 'string' ? #{tmp}.$dup() : #{tmp})"),
+      #       )
+      #     end
+      #   end
+      #
+      #   compile_default.call
+      # end
+
       def push_nesting?
         recv = children.first
 

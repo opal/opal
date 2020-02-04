@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 require 'corelib/comparable'
 require 'corelib/regexp'
 
@@ -238,7 +241,7 @@ class String < `String`
   alias byteslice []
 
   def b
-    force_encoding('binary')
+    `new String(self)`.force_encoding('binary')
   end
 
   def capitalize

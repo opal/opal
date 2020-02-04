@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module Kernel
   def pretty_inspect
     inspect

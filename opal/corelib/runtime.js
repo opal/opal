@@ -637,6 +637,20 @@
       return object.$$meta;
     }
 
+    if (object.$$is_number) {
+      throw Opal.TypeError.$new("can't define singleton");
+    }
+
+    if (typeof object === 'string') {
+      if (Opal.$$string_meta) {
+        return Opal.$$string_meta;
+      }
+
+      Opal.$$string_meta = Opal.get_singleton_class(new String("string"));
+      Object.freeze(Opal.$$string_meta.$$prototype);
+      return Opal.$$string_meta;
+    }
+
     if (object.hasOwnProperty('$$is_class')) {
       return Opal.build_class_singleton_class(object);
     } else if (object.hasOwnProperty('$$is_module')) {
@@ -1767,9 +1781,6 @@
 
   // Define a singleton method on the given object (see Opal.def).
   Opal.defs = function(obj, jsid, body) {
-    if (obj.$$is_string || obj.$$is_number) {
-      throw Opal.TypeError.$new("can't define singleton");
-    }
     Opal.defn(Opal.get_singleton_class(obj), jsid, body)
   };
 
@@ -2386,7 +2397,10 @@
   // @param name [String] the canonical name of the encoding
   Opal.set_encoding = function(str, name) {
     if (typeof str === 'string')
-      throw Opal.FrozenError.$new("can't modify frozen String");
+      throw Opal.FrozenError.$new(
+        "can't modify frozen String, tried to set encoding of " +
+        str.$inspect() + " to "+name
+      );
 
     var encoding = Opal.encodings[name];
 
@@ -2399,7 +2413,9 @@
 
   // @returns a String object with the encoding set from a string literal
   Opal.enc = function(str, name) {
-    return Opal.set_encoding(new String(str), name);
+    if (typeof str == "string") str = new String(str)
+
+    return Opal.set_encoding(str, name);
   }
 
 

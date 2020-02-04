@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # regexp matches
 %x{$gvars['&'] = $gvars['~'] = $gvars['`'] = $gvars["'"] = nil}
 

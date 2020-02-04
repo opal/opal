@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class RegexpError < StandardError; end
 
 class Regexp < `RegExp`

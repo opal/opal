@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class Method
   attr_reader :owner, :receiver, :name
 

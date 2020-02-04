@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # Portions Copyright (c) 2002-2013 Akinori MUSHA <knu@iDaemons.org>
 class Set
   include Enumerable

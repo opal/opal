@@ -62,6 +62,10 @@ module Opal
         end
         push translate_escape_chars(sanitized_value)
 
+        unless compiler.magic_comments[:frozen_string_literal]
+          wrap "new String(", ")"
+        end
+
         if RUBY_ENGINE != 'opal'
           encoding = string_value.encoding
 

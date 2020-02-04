@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 #
 # Implementation of the _Observer_ object-oriented design pattern.  The
 # following documentation is copied, with modifications, from "Programming

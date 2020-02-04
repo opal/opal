@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class Dir
   class << self
     def chdir(dir)

@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module RbConfig
   versions = RUBY_VERSION.split('.')
   CONFIG = {

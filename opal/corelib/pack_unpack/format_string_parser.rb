@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module PackUnpack
   %x{
     var directives = [

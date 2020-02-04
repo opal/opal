@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class StringIO < IO
   include IO::Readable
   include IO::Writable

@@ -1,3 +1,5 @@
+# use_strict: true
+# frozen_string_literal: true
 # helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete
 
 require 'corelib/enumerable'

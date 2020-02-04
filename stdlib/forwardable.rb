@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module Forwardable
   def instance_delegate(hash)
     hash.each do |methods, accessor|

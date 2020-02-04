@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 require 'corelib/runtime'
 require 'corelib/helpers'
 require 'corelib/module'

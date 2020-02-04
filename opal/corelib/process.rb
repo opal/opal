@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class Process
   @__clocks__ = []
   def self.__register_clock__(name, func)

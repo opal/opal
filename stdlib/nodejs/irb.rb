@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 require 'native'
 
 NodeRepl = Native(`OpalNode.node_require('repl')`)

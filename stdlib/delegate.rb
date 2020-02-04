@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class Delegator < BasicObject
   def initialize(obj)
     __setobj__(obj)

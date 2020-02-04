@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # Opal port of racc/parser.rb.
 #
 # Original license:
