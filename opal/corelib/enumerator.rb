@@ -1,4 +1,4 @@
-# helpers: breaker, slice
+# helpers: breaker, slice, falsy
 
 require 'corelib/enumerable'
 
@@ -256,7 +256,7 @@ class Enumerator
           %x{
             var value = Opal.yieldX(block, args);
 
-            if (#{Opal.falsy?(`value`)}) {
+            if ($falsy(value)) {
               succeeding = false;
 
               #{enum.yield(*args)};
@@ -331,7 +331,7 @@ class Enumerator
         %x{
           var value = Opal.yieldX(block, args);
 
-          if (#{Opal.falsy?(`value`)}) {
+          if ($falsy(value)) {
             #{enum.yield(*args)};
           }
         }

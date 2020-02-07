@@ -1,3 +1,5 @@
+# helpers: falsy
+
 module Enumerable
   %x{
     function comparableForPattern(value) {
@@ -267,7 +269,7 @@ module Enumerable
         if (dropping) {
           var value = Opal.yield1(block, param);
 
-          if (#{Opal.falsy?(`value`)}) {
+          if ($falsy(value)) {
             dropping = false;
             result.push(param);
           }
@@ -969,7 +971,7 @@ module Enumerable
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
-        if (#{Opal.falsy?(`value`)}) {
+        if ($falsy(value)) {
           result.push(param);
         }
       };

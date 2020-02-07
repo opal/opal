@@ -38,14 +38,6 @@ module Opal
 
         js_truthy(sexp)
       end
-
-      helper :falsy? do
-        unless sexp = arglist.children[0]
-          raise 'falsy? requires an object'
-        end
-
-        js_falsy(sexp)
-      end
     end
   end
 end
