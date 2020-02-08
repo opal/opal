@@ -74,3 +74,8 @@ Whitespace conventions:
 - Requiring nodejs/stacktrace has been deprecated, source-maps are already
   supported by the default Node.js runner or by requiring https://github.com/evanw/node-source-map-support
   before loading code compiled by Opal (#2045)
+
+
+### Removed
+
+- Removed special compilation for the `Opal.truthy?` and `Opal.falsy?` helpers (#2076)
