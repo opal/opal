@@ -1883,7 +1883,7 @@ class Array < `Array`
 
         value = $yield1(block, item);
 
-        if (Opal.truthy(value)) {
+        if ($truthy(value)) {
           result.push(item);
         }
       }

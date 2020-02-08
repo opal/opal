@@ -1,4 +1,4 @@
-# helpers: breaker, slice, falsy
+# helpers: breaker, slice, falsy, truthy
 
 require 'corelib/enumerable'
 
@@ -281,7 +281,7 @@ class Enumerator
         %x{
           var value = Opal.yieldX(block, args);
 
-          if (#{Opal.truthy?(`value`)}) {
+          if ($truthy(value)) {
             #{enum.yield(*args)};
           }
         }
@@ -297,7 +297,7 @@ class Enumerator
             var param = #{Opal.destructure(args)},
                 value = #{pattern === `param`};
 
-            if (#{Opal.truthy?(`value`)}) {
+            if ($truthy(value)) {
               value = Opal.yield1(block, param);
 
               #{enum.yield `Opal.yield1(block, param)`};
@@ -310,7 +310,7 @@ class Enumerator
             var param = #{Opal.destructure(args)},
                 value = #{pattern === `param`};
 
-            if (#{Opal.truthy?(`value`)}) {
+            if ($truthy(value)) {
               #{enum.yield `param`};
             }
           }
@@ -372,7 +372,7 @@ class Enumerator
         %x{
           var value = Opal.yieldX(block, args);
 
-          if (#{Opal.truthy?(`value`)}) {
+          if ($truthy(value)) {
             #{enum.yield(*args)};
           }
           else {

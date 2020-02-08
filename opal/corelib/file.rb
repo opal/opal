@@ -1,3 +1,5 @@
+# helpers: truthy
+
 class File < IO
   Separator = SEPARATOR = '/'
   ALT_SEPARATOR = nil
@@ -77,7 +79,7 @@ class File < IO
     %x{
       // Coerce a given path to a path string using #to_path and #to_str
       function $coerce_to_path(path) {
-        if (#{Opal.truthy?(`path`.respond_to?(:to_path))}) {
+        if ($truthy(#{`path`.respond_to?(:to_path)})) {
           path = path.$to_path();
         }
 

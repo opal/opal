@@ -1,3 +1,5 @@
+# helpers: truthy
+
 module Kernel
   def method_missing(symbol, *args, &block)
     raise NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args)
@@ -44,7 +46,7 @@ module Kernel
 
   def methods(all = true)
     %x{
-      if (#{Opal.truthy?(all)}) {
+      if ($truthy(#{all})) {
         return Opal.methods(self);
       } else {
         return Opal.own_methods(self);
@@ -54,7 +56,7 @@ module Kernel
 
   def public_methods(all = true)
     %x{
-      if (#{Opal.truthy?(all)}) {
+      if ($truthy(#{all})) {
         return Opal.methods(self);
       } else {
         return Opal.receiver_methods(self);

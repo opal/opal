@@ -30,14 +30,6 @@ module Opal
           raise "Helper not supported: #{meth}"
         end
       end
-
-      helper :truthy? do
-        unless sexp = arglist.children[0]
-          raise 'truthy? requires an object'
-        end
-
-        js_truthy(sexp)
-      end
     end
   end
 end
