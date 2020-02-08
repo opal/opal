@@ -1,3 +1,5 @@
+# helpers: truthy
+
 class Module
   def self.allocate
     %x{
@@ -456,7 +458,7 @@ class Module
 
   def instance_methods(include_super = true)
     %x{
-      if (#{Opal.truthy?(include_super)}) {
+      if ($truthy(#{include_super})) {
         return Opal.instance_methods(self);
       } else {
         return Opal.own_instance_methods(self);

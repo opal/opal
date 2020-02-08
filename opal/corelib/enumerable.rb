@@ -1,3 +1,5 @@
+# helpers: falsy, truthy
+
 module Enumerable
   %x{
     function comparableForPattern(value) {
@@ -267,7 +269,7 @@ module Enumerable
         if (dropping) {
           var value = Opal.yield1(block, param);
 
-          if (#{Opal.falsy?(`value`)}) {
+          if ($falsy(value)) {
             dropping = false;
             result.push(param);
           }
@@ -441,7 +443,7 @@ module Enumerable
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
-        if (#{Opal.truthy?(`value`)}) {
+        if ($truthy(value)) {
           result.push(param);
         }
       };
@@ -943,7 +945,7 @@ module Enumerable
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
-        if (#{Opal.truthy?(`value`)}) {
+        if ($truthy(value)) {
           truthy.push(param);
         }
         else {
@@ -969,7 +971,7 @@ module Enumerable
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
-        if (#{Opal.falsy?(`value`)}) {
+        if ($falsy(value)) {
           result.push(param);
         }
       };
@@ -1021,7 +1023,7 @@ module Enumerable
               var param = #{Opal.destructure(`arguments`)},
                   value = Opal.yield1(block, param);
 
-              if (#{Opal.truthy?(`value`)} && slice.length > 0) {
+              if ($truthy(value) && slice.length > 0) {
                 #{e << `slice`};
                 slice = [];
               }
@@ -1034,7 +1036,7 @@ module Enumerable
               var param = #{Opal.destructure(`arguments`)},
                   value = block(param, #{pattern.dup});
 
-              if (#{Opal.truthy?(`value`)} && slice.length > 0) {
+              if ($truthy(value) && slice.length > 0) {
                 #{e << `slice`};
                 slice = [];
               }
@@ -1048,7 +1050,7 @@ module Enumerable
             var param = #{Opal.destructure(`arguments`)},
                 value = #{pattern === `param`};
 
-            if (#{Opal.truthy?(`value`)} && slice.length > 0) {
+            if ($truthy(value) && slice.length > 0) {
               #{e << `slice`};
               slice = [];
             }
@@ -1091,7 +1093,7 @@ module Enumerable
             accumulate = [];
           }
 
-          if (#{Opal.truthy?(`end_chunk`)}) {
+          if ($truthy(end_chunk)) {
             accumulate.push(element);
             #{yielder.yield(`accumulate`)};
             accumulate = null;
@@ -1128,7 +1130,7 @@ module Enumerable
             slice = [];
           }
 
-          if (#{Opal.truthy?(`match`)}) {
+          if ($truthy(match)) {
             slice.push(before);
             #{yielder.yield(`slice`)};
             slice = [];
