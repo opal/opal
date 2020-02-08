@@ -155,7 +155,7 @@
   Opal.slice = $slice;
 
 
-  // Truth
+  // Helpers
   // -----
 
   Opal.truthy = function(val) {
@@ -164,6 +164,22 @@
 
   Opal.falsy = function(val) {
     return (val === nil || val == null || (val.$$is_boolean && val == false))
+  };
+
+  Opal.type_error = function(object, type, method, coerced) {
+    object = object.$$class;
+
+    if (coerced && method) {
+      coerced = coerced.$$class;
+      return Opal.TypeError.$new(
+        "can't convert " + object + " into " + type +
+        " (" + object + "#" + method + " gives " + coerced + ")"
+      )
+    } else {
+      return Opal.TypeError.$new(
+        "no implicit conversion of " + object + " into " + type
+      )
+    }
   };
 
 

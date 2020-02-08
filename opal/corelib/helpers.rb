@@ -1,21 +1,15 @@
+# helpers: type_error
+
 module Opal
   def self.bridge(constructor, klass)
     `Opal.bridge(constructor, klass)`
-  end
-
-  def self.type_error(object, type, method = nil, coerced = nil)
-    if method && coerced
-      TypeError.new "can't convert #{object.class} into #{type} (#{object.class}##{method} gives #{coerced.class})"
-    else
-      TypeError.new "no implicit conversion of #{object.class} into #{type}"
-    end
   end
 
   def self.coerce_to(object, type, method, *args)
     return object if type === object
 
     unless object.respond_to? method
-      raise type_error(object, type)
+      raise `$type_error(object, type)`
     end
 
     object.__send__ method, *args
@@ -25,7 +19,7 @@ module Opal
     coerced = coerce_to(object, type, method, *args)
 
     unless type === coerced
-      raise type_error(object, type, method, coerced)
+      raise `$type_error(object, type, method, coerced)`
     end
 
     coerced
@@ -39,7 +33,7 @@ module Opal
     return if coerced.nil?
 
     unless type === coerced
-      raise type_error(object, type, method, coerced)
+      raise `$type_error(object, type, method, coerced)`
     end
 
     coerced
