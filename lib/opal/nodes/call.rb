@@ -3,7 +3,6 @@
 require 'set'
 require 'pathname'
 require 'opal/nodes/base'
-require 'opal/nodes/runtime_helpers'
 require 'opal/rewriters/break_finder'
 
 module Opal
@@ -190,8 +189,6 @@ module Opal
         if SPECIALS.include? meth
           method = method("handle_#{meth}")
           method.arity == 1 ? method[compile_default] : method[]
-        elsif RuntimeHelpers.compatible?(recvr, meth)
-          push(RuntimeHelpers.new(sexp_with_arglist, @level, @compiler).compile)
         else
           yield # i.e. compile_default.call
         end
