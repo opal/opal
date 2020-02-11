@@ -1,6 +1,4 @@
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'opal/version'
+require_relative 'lib/opal/version'
 
 Gem::Specification.new do |spec|
   spec.name         = 'opal'
@@ -13,24 +11,24 @@ Gem::Specification.new do |spec|
   spec.homepage     = 'https://opalrb.com'
   spec.license      = 'MIT'
 
-  spec.metadata = {
-    "bug_tracker_uri"       => "https://github.com/opal/opal/issues",
-    "changelog_uri"         => "https://github.com/opal/opal/blob/v#{spec.version}/CHANGELOG.md",
-    "readme_uri"            => "https://github.com/opal/opal/blob/v#{spec.version}/README.md",
-    "api_documentation_uri" => "http://opalrb.com/docs/api/v#{spec.version}/index.html",
-    "guides_uri"            => "http://opalrb.com/docs/guides/v#{spec.version}/index.html",
-    "homepage_uri"          => "https://opalrb.com/",
-    "chat_uri"              => "https://gitter.im/opal/opal",
-    "source_code_uri"       => "https://github.com/opal/opal",
-  }
+  spec.metadata["homepage_uri"]          = "https://opalrb.com/"
+  spec.metadata["bug_tracker_uri"]       = "https://github.com/opal/opal/issues"
+  spec.metadata["changelog_uri"]         = "https://github.com/opal/opal/blob/v#{spec.version}/CHANGELOG.md"
+  spec.metadata["readme_uri"]            = "https://github.com/opal/opal/blob/v#{spec.version}/README.md"
+  spec.metadata["api_documentation_uri"] = "http://opalrb.com/docs/api/v#{spec.version}/index.html"
+  spec.metadata["guides_uri"]            = "http://opalrb.com/docs/guides/v#{spec.version}/index.html"
+  spec.metadata["chat_uri"]              = "https://gitter.im/opal/opal"
+  spec.metadata["source_code_uri"]       = "https://github.com/opal/opal"
 
-  spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
-    `git ls-files -z`.split("\x0")
-      .reject { |f| f.match(%r{^(test|spec|features)/}) }
-      .reject { |f| File.symlink?(f) } # Windows doesn't always support them
-  end
+  # Specify which files should be added to the gem when it is released.
+  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
+  # Remove symlinks because Windows doesn't always support them.
+  files = Dir.chdir(__dir__) { `git ls-files -z`.split("\x0") }.reject(&File.method(:symlink?))
+
+  spec.files         = files.grep(%r{^(test|spec|features)/})
+  spec.test_files    = files.grep_v(%r{^(test|spec|features)/})
+  spec.executables   = files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.bindir        = 'exe'
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '>= 2.3'
