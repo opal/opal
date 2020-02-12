@@ -10,7 +10,7 @@ describe 'Opal.is_a' do
       [1.2, :Numeric, true],
       [1.2, :Number, true],
       [1.2, :Fixnum, true],
-      [1.2, :Integer, true],
+      [1.2, :Integer, false],
       [1.2, :Float, true],
 
       [Numeric.new, :Numeric, true],
@@ -31,6 +31,14 @@ describe 'Opal.is_a' do
       `!!#{Fixnum}.$$is_number_class`.should == true
       `!!#{Integer}.$$is_number_class`.should == true
       `!!#{Float}.$$is_number_class`.should == true
+    end
+
+    it 'can rely on Number subclasses having $$is_integer_class on their prototype' do
+      `!!#{Numeric}.$$is_integer_class`.should == false
+      `!!#{Number}.$$is_integer_class`.should == false
+      `!!#{Fixnum}.$$is_integer_class`.should == false
+      `!!#{Integer}.$$is_integer_class`.should == true
+      `!!#{Float}.$$is_integer_class`.should == false
     end
 
     it 'works for non-Opal objects' do

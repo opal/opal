@@ -648,7 +648,7 @@ module Kernel
 
       var t = get_time();
       while (get_time() - t <= seconds * 1000);
-      return seconds;
+      return Math.round(seconds);
     }
   end
 
