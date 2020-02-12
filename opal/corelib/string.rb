@@ -1,4 +1,4 @@
-# helpers: coerce_to
+# helpers: coerce_to, respond_to
 
 require 'corelib/comparable'
 require 'corelib/regexp'
@@ -119,7 +119,7 @@ class String < `String`
       if (other.$$is_string) {
         return self.toString() === other.toString();
       }
-      if (#{Opal.respond_to? `other`, :to_str}) {
+      if ($respond_to(other, '$to_str')) {
         return #{other == self};
       }
       return false;

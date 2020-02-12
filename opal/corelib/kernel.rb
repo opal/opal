@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to
+# helpers: truthy, coerce_to, respond_to
 
 module Kernel
   def method_missing(symbol, *args, &block)
@@ -577,22 +577,26 @@ module Kernel
   end
 
   def respond_to?(name, include_all = false)
-    return true if respond_to_missing?(name, include_all)
-
     %x{
       var body = self['$' + name];
 
       if (typeof(body) === "function" && !body.$$stub) {
         return true;
       }
-    }
 
-    false
+      if (self['$respond_to_missing?'].$$pristine === true) {
+        return false;
+      } else {
+        return #{respond_to_missing?(name, include_all)};
+      }
+    }
   end
 
   def respond_to_missing?(method_name, include_all = false)
     false
   end
+
+  Opal.pristine(self, :respond_to?, :respond_to_missing?)
 
   def require(file)
     file = Opal.coerce_to!(file, String, :to_str)

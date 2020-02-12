@@ -193,6 +193,22 @@
     return Opal.send(object, method, args);
   }
 
+  Opal.respond_to = function(obj, jsid, include_all) {
+    if (obj == null || !obj.$$class) return false;
+    include_all = !!include_all;
+    var body = obj[jsid];
+
+    if (obj['$respond_to?'].$$pristine) {
+      if (obj['$respond_to_missing?'].$$pristine) {
+        return typeof(body) === "function" && !body.$$stub;
+      } else {
+        return Opal.send(obj, obj['$respond_to_missing?'], [jsid.substr(1), include_all]);
+      }
+    } else {
+      return Opal.send(obj, obj['$respond_to?'], [jsid.substr(1), include_all]);
+    }
+  }
+
 
   // Constants
   // ---------
@@ -1632,7 +1648,7 @@
   //
   Opal.extract_kwargs = function(parameters) {
     var kwargs = parameters[parameters.length - 1];
-    if (kwargs != null && kwargs['$respond_to?']('to_hash', true)) {
+    if (kwargs != null && Opal.respond_to(kwargs, '$to_hash', true)) {
       $splice.call(parameters, parameters.length - 1, 1);
       return kwargs.$to_hash();
     }

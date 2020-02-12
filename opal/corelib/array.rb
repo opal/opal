@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to
+# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to
 
 require 'corelib/enumerable'
 require 'corelib/numeric'
@@ -260,7 +260,7 @@ class Array < `Array`
           return true;
 
         if (!other.$$is_array) {
-          if (#{Opal.respond_to? `other`, :to_ary}) {
+          if ($respond_to(other, '$to_ary')) {
             return #{`other` == `array`};
           } else {
             return false;
@@ -1117,7 +1117,7 @@ class Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           item = array[i];
 
-          if (!#{Opal.respond_to? `item`, :to_ary, true}) {
+          if (!$respond_to(item, '$to_ary', true)) {
             result.push(item);
             continue;
           }
@@ -1324,7 +1324,7 @@ class Array < `Array`
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
 
-        if (#{Opal.respond_to? `item`, :to_str}) {
+        if ($respond_to(item, '$to_str')) {
           tmp = #{`item`.to_str};
 
           if (tmp !== nil) {
@@ -1334,7 +1334,7 @@ class Array < `Array`
           }
         }
 
-        if (#{Opal.respond_to? `item`, :to_ary}) {
+        if ($respond_to(item, '$to_ary')) {
           tmp = #{`item`.to_ary};
 
           if (tmp === self) {
@@ -1348,7 +1348,7 @@ class Array < `Array`
           }
         }
 
-        if (#{Opal.respond_to? `item`, :to_s}) {
+        if ($respond_to(item, '$to_s')) {
           tmp = #{`item`.to_s};
 
           if (tmp !== nil) {
