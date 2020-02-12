@@ -90,10 +90,6 @@ module Opal
     obj.respond_to?(method, include_all)
   end
 
-  def self.inspect_obj(obj)
-    `Opal.inspect(obj)`
-  end
-
   def self.instance_variable_name!(name)
     name = Opal.coerce_to!(name, String, :to_str)
 
