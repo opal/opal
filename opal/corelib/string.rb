@@ -1,3 +1,5 @@
+# helpers: coerce_to
+
 require 'corelib/comparable'
 require 'corelib/regexp'
 
@@ -28,7 +30,7 @@ class String < `String`
   end
 
   def self.new(str = '')
-    str = Opal.coerce_to(str, String, :to_str)
+    str = `$coerce_to(str, #{String}, 'to_str')`
     `new self.$$constructor(str)`
   end
 
@@ -51,7 +53,7 @@ class String < `String`
 
   def *(count)
     %x{
-      count = #{Opal.coerce_to(`count`, Integer, :to_int)};
+      count = $coerce_to(count, #{Integer}, 'to_int');
 
       if (count < 0) {
         #{raise ArgumentError, 'negative argument'}
@@ -88,7 +90,7 @@ class String < `String`
   end
 
   def +(other)
-    other = Opal.coerce_to other, String, :to_str
+    other = `$coerce_to(#{other}, #{String}, 'to_str')`
 
     `self + #{other.to_s}`
   end
@@ -143,8 +145,8 @@ class String < `String`
 
       if (index.$$is_range) {
         exclude = index.excl;
-        length  = #{Opal.coerce_to(`index.end`, Integer, :to_int)};
-        index   = #{Opal.coerce_to(`index.begin`, Integer, :to_int)};
+        length  = $coerce_to(index.end, #{Integer}, 'to_int');
+        index   = $coerce_to(index.begin, #{Integer}, 'to_int');
 
         if (Math.abs(index) > size) {
           return nil;
@@ -194,7 +196,7 @@ class String < `String`
           return self.$$cast(match[0]);
         }
 
-        length = #{Opal.coerce_to(`length`, Integer, :to_int)};
+        length = $coerce_to(length, #{Integer}, 'to_int');
 
         if (length < 0 && -length < match.length) {
           return self.$$cast(match[length += match.length]);
@@ -208,7 +210,7 @@ class String < `String`
       }
 
 
-      index = #{Opal.coerce_to(`index`, Integer, :to_int)};
+      index = $coerce_to(index, #{Integer}, 'to_int');
 
       if (index < 0) {
         index += size;
@@ -221,7 +223,7 @@ class String < `String`
         return self.$$cast(self.substr(index, 1));
       }
 
-      length = #{Opal.coerce_to(`length`, Integer, :to_int)};
+      length = $coerce_to(length, #{Integer}, 'to_int');
 
       if (length < 0) {
         return nil;
@@ -247,7 +249,7 @@ class String < `String`
 
   def casecmp(other)
     return nil unless other.respond_to?(:to_str)
-    other = Opal.coerce_to(other, String, :to_str).to_s
+    other = `$coerce_to(other, #{String}, 'to_str')`.to_s
     %x{
       var ascii_only = /^[\x00-\x7F]*$/;
       if (ascii_only.test(self) && ascii_only.test(other)) {
@@ -270,8 +272,8 @@ class String < `String`
   end
 
   def center(width, padstr = ' ')
-    width  = Opal.coerce_to(width, Integer, :to_int)
-    padstr = Opal.coerce_to(padstr, String, :to_str).to_s
+    width  = `$coerce_to(#{width}, #{Integer}, 'to_int')`
+    padstr = `$coerce_to(#{padstr}, #{String}, 'to_str')`.to_s
 
     if padstr.empty?
       raise ArgumentError, 'zero width padding'
@@ -385,7 +387,7 @@ class String < `String`
   def delete_prefix(prefix)
     %x{
       if (!prefix.$$is_string) {
-        #{prefix = Opal.coerce_to(prefix, String, :to_str)}
+        prefix = $coerce_to(prefix, #{String}, 'to_str');
       }
 
       if (self.slice(0, prefix.length) === prefix) {
@@ -399,7 +401,7 @@ class String < `String`
   def delete_suffix(suffix)
     %x{
       if (!suffix.$$is_string) {
-        #{suffix = Opal.coerce_to(suffix, String, :to_str)}
+        suffix = $coerce_to(suffix, #{String}, 'to_str');
       }
 
       if (self.slice(self.length - suffix.length) === suffix) {
@@ -436,7 +438,7 @@ class String < `String`
         return self;
       }
 
-      separator = #{Opal.coerce_to(`separator`, String, :to_str)}
+      separator = $coerce_to(separator, #{String}, 'to_str')
 
       var a, i, n, length, chomped, trailing, splitted;
 
@@ -475,7 +477,7 @@ class String < `String`
   def end_with?(*suffixes)
     %x{
       for (var i = 0, length = suffixes.length; i < length; i++) {
-        var suffix = #{Opal.coerce_to(`suffixes[i]`, String, :to_str).to_s};
+        var suffix = $coerce_to(suffixes[i], #{String}, 'to_str').$to_s();
 
         if (self.length >= suffix.length &&
             self.substr(self.length - suffix.length, suffix.length) == suffix) {
@@ -500,7 +502,7 @@ class String < `String`
       if (pattern.$$is_regexp) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
-        pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
+        pattern = $coerce_to(pattern, #{String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
       }
 
@@ -526,7 +528,7 @@ class String < `String`
         }
         else {
           if (!replacement.$$is_string) {
-            replacement = #{Opal.coerce_to(`replacement`, String, :to_str)};
+            replacement = $coerce_to(replacement, #{String}, 'to_str');
           }
           _replacement = replacement.replace(/([\\]+)([0-9+&`'])/g, function (original, slashes, command) {
             if (slashes.length % 2 === 0) {
@@ -574,7 +576,7 @@ class String < `String`
   def include?(other)
     %x{
       if (!other.$$is_string) {
-        #{other = Opal.coerce_to(other, String, :to_str)}
+        other = $coerce_to(other, #{String}, 'to_str');
       }
       return self.indexOf(other) !== -1;
     }
@@ -589,7 +591,7 @@ class String < `String`
       if (offset === undefined) {
         offset = 0;
       } else {
-        offset = #{Opal.coerce_to(`offset`, Integer, :to_int)};
+        offset = $coerce_to(offset, #{Integer}, 'to_int');
         if (offset < 0) {
           offset += self.length;
           if (offset < 0) {
@@ -615,7 +617,7 @@ class String < `String`
           regex.lastIndex = match.index + 1;
         }
       } else {
-        search = #{Opal.coerce_to(`search`, String, :to_str)};
+        search = $coerce_to(search, #{String}, 'to_str');
         if (search.length === 0 && offset > self.length) {
           index = -1;
         } else {
@@ -663,8 +665,8 @@ class String < `String`
   end
 
   def ljust(width, padstr = ' ')
-    width  = Opal.coerce_to(width, Integer, :to_int)
-    padstr = Opal.coerce_to(padstr, String, :to_str).to_s
+    width  = `$coerce_to(#{width}, #{Integer}, 'to_int')`
+    padstr = `$coerce_to(#{padstr}, #{String}, 'to_str')`.to_s
 
     if padstr.empty?
       raise ArgumentError, 'zero width padding'
@@ -860,7 +862,7 @@ class String < `String`
           i = m.index;
         }
       } else {
-        sep = #{Opal.coerce_to(`sep`, String, :to_str)};
+        sep = $coerce_to(sep, #{String}, 'to_str');
         i = self.indexOf(sep);
       }
 
@@ -887,7 +889,7 @@ class String < `String`
       if (offset === undefined) {
         offset = self.length;
       } else {
-        offset = #{Opal.coerce_to(`offset`, Integer, :to_int)};
+        offset = $coerce_to(offset, #{Integer}, 'to_int');
         if (offset < 0) {
           offset += self.length;
           if (offset < 0) {
@@ -915,7 +917,7 @@ class String < `String`
           i = m.index;
         }
       } else {
-        search = #{Opal.coerce_to(`search`, String, :to_str)};
+        search = $coerce_to(search, #{String}, 'to_str');
         i = self.lastIndexOf(search, offset);
       }
 
@@ -924,8 +926,8 @@ class String < `String`
   end
 
   def rjust(width, padstr = ' ')
-    width  = Opal.coerce_to(width, Integer, :to_int)
-    padstr = Opal.coerce_to(padstr, String, :to_str).to_s
+    width  = `$coerce_to(#{width}, #{Integer}, 'to_int')`
+    padstr = `$coerce_to(#{padstr}, #{String}, 'to_str')`.to_s
 
     if padstr.empty?
       raise ArgumentError, 'zero width padding'
@@ -969,7 +971,7 @@ class String < `String`
         }
 
       } else {
-        sep = #{Opal.coerce_to(`sep`, String, :to_str)};
+        sep = $coerce_to(sep, #{String}, 'to_str');
         i = self.lastIndexOf(sep);
       }
 
@@ -998,7 +1000,7 @@ class String < `String`
       if (pattern.$$is_regexp) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
-        pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
+        pattern = $coerce_to(pattern, #{String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
       }
 
@@ -1052,7 +1054,7 @@ class String < `String`
       if (pattern.$$is_regexp) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
-        pattern = #{Opal.coerce_to(pattern, String, :to_str).to_s};
+        pattern = $coerce_to(pattern, #{String}, 'to_str').$to_s();
         if (pattern === ' ') {
           pattern = /\s+/gm;
           string = string.replace(/^\s+/, '');
@@ -1139,7 +1141,7 @@ class String < `String`
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
-        var prefix = #{Opal.coerce_to(`prefixes[i]`, String, :to_str).to_s};
+        var prefix = $coerce_to(prefixes[i], #{String}, 'to_str').$to_s();
 
         if (self.indexOf(prefix) === 0) {
           return true;
@@ -1157,7 +1159,7 @@ class String < `String`
   def sub(pattern, replacement = undefined, &block)
     %x{
       if (!pattern.$$is_regexp) {
-        pattern = #{Opal.coerce_to(`pattern`, String, :to_str)};
+        pattern = $coerce_to(pattern, #{String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       }
 
@@ -1182,7 +1184,7 @@ class String < `String`
 
         } else {
 
-          replacement = #{Opal.coerce_to(`replacement`, String, :to_str)};
+          replacement = $coerce_to(replacement, #{String}, 'to_str');
 
           replacement = replacement.replace(/([\\]+)([0-9+&`'])/g, function (original, slashes, command) {
             if (slashes.length % 2 === 0) {
@@ -1215,7 +1217,7 @@ class String < `String`
 
   def sum(n = 16)
     %x{
-      n = #{Opal.coerce_to(`n`, Integer, :to_int)};
+      n = $coerce_to(n, #{Integer}, 'to_int');
 
       var result = 0,
           length = self.length,
@@ -1268,7 +1270,7 @@ class String < `String`
     %x{
       var result,
           string = self.toLowerCase(),
-          radix = #{Opal.coerce_to(`base`, Integer, :to_int)};
+          radix = $coerce_to(base, #{Integer}, 'to_int');
 
       if (radix === 1 || radix < 0 || radix > 36) {
         #{raise ArgumentError, "invalid radix #{`radix`}"}
@@ -1364,9 +1366,10 @@ class String < `String`
   alias to_sym intern
 
   def tr(from, to)
-    from = Opal.coerce_to(from, String, :to_str).to_s
-    to = Opal.coerce_to(to, String, :to_str).to_s
     %x{
+      from = $coerce_to(from, #{String}, 'to_str').$to_s();
+      to = $coerce_to(to, #{String}, 'to_str').$to_s();
+
       if (from.length == 0 || from === to) {
         return self;
       }
@@ -1508,9 +1511,10 @@ class String < `String`
   end
 
   def tr_s(from, to)
-    from = Opal.coerce_to(from, String, :to_str).to_s
-    to = Opal.coerce_to(to, String, :to_str).to_s
     %x{
+      from = $coerce_to(from, #{String}, 'to_str').$to_s();
+      to = $coerce_to(to, #{String}, 'to_str').$to_s();
+
       if (from.length == 0) {
         return self;
       }
@@ -1675,9 +1679,10 @@ class String < `String`
 
   def upto(stop, excl = false, &block)
     return enum_for :upto, stop, excl unless block_given?
-    stop = Opal.coerce_to(stop, String, :to_str)
     %x{
       var a, b, s = self.toString();
+
+      stop = $coerce_to(stop, #{String}, 'to_str');
 
       if (s.length === 1 && stop.length === 1) {
 
@@ -1778,7 +1783,7 @@ class String < `String`
           neg_intersection = '';
 
       for (i = 0, len = sets.length; i < len; i++) {
-        set = #{Opal.coerce_to(`sets[i]`, String, :to_str)};
+        set = $coerce_to(sets[i], #{String}, 'to_str');
         neg = (set.charAt(0) === '^' && set.length > 1);
         set = explode_sequences_in_character_set(neg ? set.slice(1) : set);
         if (neg) {

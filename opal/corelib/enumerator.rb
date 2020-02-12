@@ -1,4 +1,4 @@
-# helpers: breaker, slice, falsy, truthy
+# helpers: breaker, slice, falsy, truthy, coerce_to
 
 require 'corelib/enumerable'
 
@@ -28,7 +28,7 @@ class Enumerator
       @size   = `arguments[0] || nil`
 
       if @size && !@size.respond_to?(:call)
-        @size = Opal.coerce_to @size, Integer, :to_int
+        @size = `$coerce_to(#{@size}, #{Integer}, 'to_int')`
       end
     else
       @object = `arguments[0]`
@@ -54,7 +54,7 @@ class Enumerator
 
   def with_index(offset = 0, &block)
     offset = if offset
-               Opal.coerce_to offset, Integer, :to_int
+               `$coerce_to(offset, #{Integer}, 'to_int')`
              else
                0
              end
@@ -222,7 +222,7 @@ class Enumerator
     end
 
     def drop(n)
-      n = Opal.coerce_to n, Integer, :to_int
+      n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
 
       if n < 0
         raise ArgumentError, 'attempt to drop negative size'
@@ -339,7 +339,7 @@ class Enumerator
     end
 
     def take(n)
-      n = Opal.coerce_to n, Integer, :to_int
+      n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
 
       if n < 0
         raise ArgumentError, 'attempt to take negative size'

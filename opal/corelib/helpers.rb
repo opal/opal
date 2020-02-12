@@ -1,22 +1,12 @@
-# helpers: type_error
+# helpers: type_error, coerce_to
 
 module Opal
   def self.bridge(constructor, klass)
     `Opal.bridge(constructor, klass)`
   end
 
-  def self.coerce_to(object, type, method, *args)
-    return object if type === object
-
-    unless object.respond_to? method
-      raise `$type_error(object, type)`
-    end
-
-    object.__send__ method, *args
-  end
-
   def self.coerce_to!(object, type, method, *args)
-    coerced = coerce_to(object, type, method, *args)
+    coerced = `$coerce_to(object, type, method, args)`
 
     unless type === coerced
       raise `$type_error(object, type, method, coerced)`
@@ -28,7 +18,7 @@ module Opal
   def self.coerce_to?(object, type, method, *args)
     return unless object.respond_to? method
 
-    coerced = coerce_to(object, type, method, *args)
+    coerced = `$coerce_to(object, type, method, args)`
 
     return if coerced.nil?
 

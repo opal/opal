@@ -1,4 +1,4 @@
-# helpers: falsy, truthy
+# helpers: falsy, truthy, coerce_to
 
 module Enumerable
   %x{
@@ -232,7 +232,7 @@ module Enumerable
   end
 
   def drop(number)
-    number = Opal.coerce_to number, Integer, :to_int
+    number = `$coerce_to(number, #{Integer}, 'to_int')`
 
     if `number < 0`
       raise ArgumentError, 'attempt to drop negative size'
@@ -348,7 +348,7 @@ module Enumerable
   end
 
   def each_slice(n, &block)
-    n = Opal.coerce_to n, Integer, :to_int
+    n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
 
     if `n <= 0`
       raise ArgumentError, 'invalid slice size'
@@ -493,7 +493,7 @@ module Enumerable
       end
     else
       result = []
-      number = Opal.coerce_to number, Integer, :to_int
+      number = `$coerce_to(number, #{Integer}, 'to_int')`
 
       if `number < 0`
         raise ArgumentError, 'attempt to take negative size'
@@ -686,9 +686,9 @@ module Enumerable
           return result;
         }
       }
-    }
 
-    n = Opal.coerce_to(n, Integer, :to_int)
+      n = $coerce_to(n, #{Integer}, 'to_int');
+    }
 
     sort(&block).reverse.first(n)
   end

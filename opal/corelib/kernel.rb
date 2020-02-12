@@ -1,4 +1,4 @@
-# helpers: truthy
+# helpers: truthy, coerce_to
 
 module Kernel
   def method_missing(symbol, *args, &block)
@@ -202,7 +202,7 @@ module Kernel
       if (status.$$is_boolean) {
         status = status ? 0 : 1;
       } else {
-        status = #{Opal.coerce_to(status, Integer, :to_int)}
+        status = $coerce_to(status, #{Integer}, 'to_int')
       }
 
       Opal.exit(status);
@@ -341,7 +341,7 @@ module Kernel
       if (base === undefined) {
         base = 0;
       } else {
-        base = #{Opal.coerce_to(`base`, Integer, :to_int)};
+        base = $coerce_to(base, #{Integer}, 'to_int');
         if (base === 1 || base < 0 || base > 36) {
           #{raise ArgumentError, "invalid radix #{base}"}
         }

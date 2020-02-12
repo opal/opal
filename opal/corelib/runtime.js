@@ -182,6 +182,17 @@
     }
   };
 
+  Opal.coerce_to = function(object, type, method, args) {
+    if (type['$==='](object)) return object;
+
+    if (!object['$respond_to?'](method)) {
+      throw Opal.type_error(object, type);
+    }
+
+    if (args == null) args = [];
+    return Opal.send(object, method, args);
+  }
+
 
   // Constants
   // ---------
