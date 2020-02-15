@@ -1,25 +1,26 @@
 describe 'Opal.is_a' do
   describe 'Numeric/Number special cases' do
     [
-      [1, Numeric, true],
-      [1, Number, true],
-      [1, Fixnum, true],
-      [1, Integer, true],
-      [1, Float, true],
+      [1, :Numeric, true],
+      [1, :Number, true],
+      [1, :Fixnum, true],
+      [1, :Integer, true],
+      [1, :Float, true],
 
-      [1.2, Numeric, true],
-      [1.2, Number, true],
-      [1.2, Fixnum, true],
-      [1.2, Integer, true],
-      [1.2, Float, true],
+      [1.2, :Numeric, true],
+      [1.2, :Number, true],
+      [1.2, :Fixnum, true],
+      [1.2, :Integer, true],
+      [1.2, :Float, true],
 
-      [Numeric.new, Numeric, true],
-      [Numeric.new, Number, false],
-      [Numeric.new, Fixnum, false],
-      [Numeric.new, Integer, false],
-      [Numeric.new, Float, false],
-    ].each do |(value, klass, result)|
-      it "returns #{result} for Opal.is_a(#{value}, #{klass})" do
+      [Numeric.new, :Numeric, true],
+      [Numeric.new, :Number, false],
+      [Numeric.new, :Fixnum, false],
+      [Numeric.new, :Integer, false],
+      [Numeric.new, :Float, false],
+    ].each do |(value, klass_name, result)|
+      klass = Object.const_get(klass_name)
+      it "returns #{result} for Opal.is_a(#{value}, #{klass_name})" do
         `Opal.is_a(#{value}, #{klass})`.should == result
       end
     end
