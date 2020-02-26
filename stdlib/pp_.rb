@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Opal: load stdlib/thread.rb
+require 'thread'
+
 require 'prettyprint'
 
 ##
@@ -68,7 +71,7 @@ class PP < PrettyPrint
   # If +width+ is omitted, 79 is assumed.
   #
   # PP.pp returns +out+.
-  def PP.pp(obj, out=$>, width=79)
+  def PP.pp(obj, out=$stdout, width=79)  # Opal: replace $> with $stdout
     q = PP.new(out, width)
     q.guard_inspect_key {q.pp obj}
     q.flush
@@ -80,7 +83,7 @@ class PP < PrettyPrint
   # newline.
   #
   # PP.singleline_pp returns +out+.
-  def PP.singleline_pp(obj, out=$>)
+  def PP.singleline_pp(obj, out=$stdout)  # Opal: replace $> with $stdout
     q = SingleLine.new(out)
     q.guard_inspect_key {q.pp obj}
     q.flush
@@ -407,89 +410,90 @@ class String # :nodoc:
   end
 end
 
-class File < IO # :nodoc:
-  class Stat # :nodoc:
-    def pretty_print(q) # :nodoc:
-      require 'etc.so'
-      q.object_group(self) {
-        q.breakable
-        q.text sprintf("dev=0x%x", self.dev); q.comma_breakable
-        q.text "ino="; q.pp self.ino; q.comma_breakable
-        q.group {
-          m = self.mode
-          q.text sprintf("mode=0%o", m)
-          q.breakable
-          q.text sprintf("(%s %c%c%c%c%c%c%c%c%c)",
-            self.ftype,
-            (m & 0400 == 0 ? ?- : ?r),
-            (m & 0200 == 0 ? ?- : ?w),
-            (m & 0100 == 0 ? (m & 04000 == 0 ? ?- : ?S) :
-                             (m & 04000 == 0 ? ?x : ?s)),
-            (m & 0040 == 0 ? ?- : ?r),
-            (m & 0020 == 0 ? ?- : ?w),
-            (m & 0010 == 0 ? (m & 02000 == 0 ? ?- : ?S) :
-                             (m & 02000 == 0 ? ?x : ?s)),
-            (m & 0004 == 0 ? ?- : ?r),
-            (m & 0002 == 0 ? ?- : ?w),
-            (m & 0001 == 0 ? (m & 01000 == 0 ? ?- : ?T) :
-                             (m & 01000 == 0 ? ?x : ?t)))
-        }
-        q.comma_breakable
-        q.text "nlink="; q.pp self.nlink; q.comma_breakable
-        q.group {
-          q.text "uid="; q.pp self.uid
-          begin
-            pw = Etc.getpwuid(self.uid)
-          rescue ArgumentError
-          end
-          if pw
-            q.breakable; q.text "(#{pw.name})"
-          end
-        }
-        q.comma_breakable
-        q.group {
-          q.text "gid="; q.pp self.gid
-          begin
-            gr = Etc.getgrgid(self.gid)
-          rescue ArgumentError
-          end
-          if gr
-            q.breakable; q.text "(#{gr.name})"
-          end
-        }
-        q.comma_breakable
-        q.group {
-          q.text sprintf("rdev=0x%x", self.rdev)
-          if self.rdev_major && self.rdev_minor
-            q.breakable
-            q.text sprintf('(%d, %d)', self.rdev_major, self.rdev_minor)
-          end
-        }
-        q.comma_breakable
-        q.text "size="; q.pp self.size; q.comma_breakable
-        q.text "blksize="; q.pp self.blksize; q.comma_breakable
-        q.text "blocks="; q.pp self.blocks; q.comma_breakable
-        q.group {
-          t = self.atime
-          q.text "atime="; q.pp t
-          q.breakable; q.text "(#{t.tv_sec})"
-        }
-        q.comma_breakable
-        q.group {
-          t = self.mtime
-          q.text "mtime="; q.pp t
-          q.breakable; q.text "(#{t.tv_sec})"
-        }
-        q.comma_breakable
-        q.group {
-          t = self.ctime
-          q.text "ctime="; q.pp t
-          q.breakable; q.text "(#{t.tv_sec})"
-        }
-      }
-    end
-  end
-end
+# Opal: does not have File::Stat
+#class File < IO # :nodoc:
+#  class Stat # :nodoc:
+#    def pretty_print(q) # :nodoc:
+#      require 'etc.so'
+#      q.object_group(self) {
+#        q.breakable
+#        q.text sprintf("dev=0x%x", self.dev); q.comma_breakable
+#        q.text "ino="; q.pp self.ino; q.comma_breakable
+#        q.group {
+#          m = self.mode
+#          q.text sprintf("mode=0%o", m)
+#          q.breakable
+#          q.text sprintf("(%s %c%c%c%c%c%c%c%c%c)",
+#            self.ftype,
+#            (m & 0400 == 0 ? ?- : ?r),
+#            (m & 0200 == 0 ? ?- : ?w),
+#            (m & 0100 == 0 ? (m & 04000 == 0 ? ?- : ?S) :
+#                             (m & 04000 == 0 ? ?x : ?s)),
+#            (m & 0040 == 0 ? ?- : ?r),
+#            (m & 0020 == 0 ? ?- : ?w),
+#            (m & 0010 == 0 ? (m & 02000 == 0 ? ?- : ?S) :
+#                             (m & 02000 == 0 ? ?x : ?s)),
+#            (m & 0004 == 0 ? ?- : ?r),
+#            (m & 0002 == 0 ? ?- : ?w),
+#            (m & 0001 == 0 ? (m & 01000 == 0 ? ?- : ?T) :
+#                             (m & 01000 == 0 ? ?x : ?t)))
+#        }
+#        q.comma_breakable
+#        q.text "nlink="; q.pp self.nlink; q.comma_breakable
+#        q.group {
+#          q.text "uid="; q.pp self.uid
+#          begin
+#            pw = Etc.getpwuid(self.uid)
+#          rescue ArgumentError
+#          end
+#          if pw
+#            q.breakable; q.text "(#{pw.name})"
+#          end
+#        }
+#        q.comma_breakable
+#        q.group {
+#          q.text "gid="; q.pp self.gid
+#          begin
+#            gr = Etc.getgrgid(self.gid)
+#          rescue ArgumentError
+#          end
+#          if gr
+#            q.breakable; q.text "(#{gr.name})"
+#          end
+#        }
+#        q.comma_breakable
+#        q.group {
+#          q.text sprintf("rdev=0x%x", self.rdev)
+#          if self.rdev_major && self.rdev_minor
+#            q.breakable
+#            q.text sprintf('(%d, %d)', self.rdev_major, self.rdev_minor)
+#          end
+#        }
+#        q.comma_breakable
+#        q.text "size="; q.pp self.size; q.comma_breakable
+#        q.text "blksize="; q.pp self.blksize; q.comma_breakable
+#        q.text "blocks="; q.pp self.blocks; q.comma_breakable
+#        q.group {
+#          t = self.atime
+#          q.text "atime="; q.pp t
+#          q.breakable; q.text "(#{t.tv_sec})"
+#        }
+#        q.comma_breakable
+#        q.group {
+#          t = self.mtime
+#          q.text "mtime="; q.pp t
+#          q.breakable; q.text "(#{t.tv_sec})"
+#        }
+#        q.comma_breakable
+#        q.group {
+#          t = self.ctime
+#          q.text "ctime="; q.pp t
+#          q.breakable; q.text "(#{t.tv_sec})"
+#        }
+#      }
+#    end
+#  end
+#end
 
 class MatchData # :nodoc:
   def pretty_print(q) # :nodoc:
@@ -516,39 +520,40 @@ class MatchData # :nodoc:
   end
 end
 
-class RubyVM::AbstractSyntaxTree::Node
-  def pretty_print_children(q, names = [])
-    children.zip(names) do |c, n|
-      if n
-        q.breakable
-        q.text "#{n}:"
-      end
-      q.group(2) do
-        q.breakable
-        q.pp c
-      end
-    end
-  end
-
-  def pretty_print(q)
-    q.group(1, "(#{type}@#{first_lineno}:#{first_column}-#{last_lineno}:#{last_column}", ")") {
-      case type
-      when :SCOPE
-        pretty_print_children(q, %w"tbl args body")
-      when :ARGS
-        pretty_print_children(q, %w[pre_num pre_init opt first_post post_num post_init rest kw kwrest block])
-      when :DEFN
-        pretty_print_children(q, %w[mid body])
-      when :ARYPTN
-        pretty_print_children(q, %w[const pre rest post])
-      when :HSHPTN
-        pretty_print_children(q, %w[const kw kwrest])
-      else
-        pretty_print_children(q)
-      end
-    }
-  end
-end
+# Opal: does not have RubyVM
+#class RubyVM::AbstractSyntaxTree::Node
+#  def pretty_print_children(q, names = [])
+#    children.zip(names) do |c, n|
+#      if n
+#        q.breakable
+#        q.text "#{n}:"
+#      end
+#      q.group(2) do
+#        q.breakable
+#        q.pp c
+#      end
+#    end
+#  end
+#
+#  def pretty_print(q)
+#    q.group(1, "(#{type}@#{first_lineno}:#{first_column}-#{last_lineno}:#{last_column}", ")") {
+#      case type
+#      when :SCOPE
+#        pretty_print_children(q, %w"tbl args body")
+#      when :ARGS
+#        pretty_print_children(q, %w[pre_num pre_init opt first_post post_num post_init rest kw kwrest block])
+#      when :DEFN
+#        pretty_print_children(q, %w[mid body])
+#      when :ARYPTN
+#        pretty_print_children(q, %w[const pre rest post])
+#      when :HSHPTN
+#        pretty_print_children(q, %w[const kw kwrest])
+#      else
+#        pretty_print_children(q)
+#      end
+#    }
+#  end
+#end
 
 class Object < BasicObject # :nodoc:
   include PP::ObjectMixin
