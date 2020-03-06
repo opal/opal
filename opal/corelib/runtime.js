@@ -1709,16 +1709,28 @@
   // @param block [Function] ruby block
   // @return [Object] returning value of the method call
   Opal.send = function(recv, method, args, block) {
-    var body = (typeof(method) === 'string') ? recv['$'+method] : method;
+    var body;
 
-    if (body != null) {
-      if (typeof block === 'function') {
-        body.$$p = block;
+    if (typeof(method) === 'function') {
+      body = method;
+      method = null;
+    } else if (typeof(method) === 'string') {
+      body = recv['$'+method];
+    } else {
+      throw Opal.NameError.$new("Passed method should be a string or a function");
       }
-      return body.apply(recv, args);
+
+    return Opal.send2(recv, body, method, args, block);
+  };
+
+  Opal.send2 = function(recv, body, method, args, block) {
+    if (body == null && method != null && recv.$method_missing) {
+      body = recv.$method_missing;
+      args = [method].concat(args);
     }
 
-    return recv.$method_missing.apply(recv, [method].concat(args));
+    if (typeof block === 'function') body.$$p = block;
+    return body.apply(recv, args);
   };
 
   Opal.lambda = function(block) {
