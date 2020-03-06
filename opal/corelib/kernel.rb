@@ -698,6 +698,8 @@ module Kernel
     return enum_for(:yield_self) { 1 } unless block_given?
     yield self
   end
+
+  Opal.pristine(self, :method_missing)
 end
 
 class Object

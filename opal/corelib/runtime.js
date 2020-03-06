@@ -1399,7 +1399,7 @@
   };
 
   // Super dispatcher
-  Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, defs) {
+  Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, allow_stubs) {
     var jsid = '$' + mid, ancestors, super_method;
 
     if (obj.hasOwnProperty('$$meta')) {
@@ -1419,21 +1419,17 @@
       }
 
       if (proto.hasOwnProperty(jsid)) {
-        var method = proto[jsid];
-
-        if (!method.$$stub) {
-          super_method = method;
-        }
+        super_method = proto[jsid];
         break;
       }
     }
 
-    if (!defcheck && super_method == null && Opal.Kernel.$method_missing === obj.$method_missing) {
+    if (!defcheck && super_method && super_method.$$stub && obj.$method_missing.$$pristine) {
       // method_missing hasn't been explicitly defined
       throw Opal.NoMethodError.$new('super: no superclass method `'+mid+"' for "+obj, mid);
     }
 
-    return super_method;
+    return (super_method.$$stub && !allow_stubs) ? null : super_method;
   };
 
   // Iter dispatcher for super in a block
@@ -1718,7 +1714,7 @@
       body = recv['$'+method];
     } else {
       throw Opal.NameError.$new("Passed method should be a string or a function");
-      }
+    }
 
     return Opal.send2(recv, body, method, args, block);
   };
