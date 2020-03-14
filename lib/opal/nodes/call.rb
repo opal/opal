@@ -74,7 +74,7 @@ module Opal
       # @see #compile_arguments
       #
       # When a method takes a block we have to calculate all arguments
-      # **before** asigning '$$p' property (that stores a passed block)
+      # **before** assigning '$$p' property (that stores a passed block)
       # to a method body. This is some kind of protection from method calls
       # like 'a(a {}) { 1 }'.
       def invoke_using_send?
