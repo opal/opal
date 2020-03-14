@@ -69,11 +69,11 @@
   };
 
   // Minify common function calls
-  var $hasOwn       = Object.hasOwnProperty;
-  var $bind         = Function.prototype.bind;
-  var $setPrototype = Object.setPrototypeOf;
-  var $slice        = Array.prototype.slice;
-  var $splice       = Array.prototype.splice;
+  var $has_own   = Object.hasOwnProperty;
+  var $bind      = Function.prototype.bind;
+  var $set_proto = Object.setPrototypeOf;
+  var $slice     = Array.prototype.slice;
+  var $splice    = Array.prototype.splice;
 
   // Nil object id is always 4
   var nil_id = 4;
@@ -207,7 +207,7 @@
     ancestors = Opal.ancestors(cref);
 
     for (i = 0, ii = ancestors.length; i < ii; i++) {
-      if (ancestors[i].$$const && $hasOwn.call(ancestors[i].$$const, name)) {
+      if (ancestors[i].$$const && $has_own.call(ancestors[i].$$const, name)) {
         return ancestors[i].$$const[name];
       }
     }
@@ -417,7 +417,7 @@
             self = new ($bind.apply(superclass.$$constructor, [null].concat(args)))();
 
         // and replacing a __proto__ manually
-        $setPrototype(self, klass.$$prototype);
+        $set_proto(self, klass.$$prototype);
         return self;
       }
     } else {
@@ -450,11 +450,11 @@
     // Later singleton methods generate a singleton_class
     // and inject it into ancestors chain
     if (Opal.Class) {
-      $setPrototype(klass, Opal.Class.prototype);
+      $set_proto(klass, Opal.Class.prototype);
     }
 
     if (superclass != null) {
-      $setPrototype(klass.$$prototype, superclass.$$prototype);
+      $set_proto(klass.$$prototype, superclass.$$prototype);
 
       if (superclass.$$meta) {
         // If superclass has metaclass then we have explicitely inherit it.
@@ -579,7 +579,7 @@
     $defineProperty(module, '$$ancestors', [module]);
     $defineProperty(module, '$$ancestors_cache_version', null);
 
-    $setPrototype(module, Opal.Module.prototype);
+    $set_proto(module, Opal.Module.prototype);
 
     return module;
   };
@@ -672,7 +672,7 @@
     $defineProperty(meta, '$$is_singleton', true);
     $defineProperty(meta, '$$singleton_of', klass);
     $defineProperty(klass, '$$meta', meta);
-    $setPrototype(klass, meta.$$prototype);
+    $set_proto(klass, meta.$$prototype);
     // Restoring ClassName.class
     $defineProperty(klass, '$$class', Opal.Class);
 
@@ -689,7 +689,7 @@
     $defineProperty(meta, '$$is_singleton', true);
     $defineProperty(meta, '$$singleton_of', mod);
     $defineProperty(mod, '$$meta', meta);
-    $setPrototype(mod, meta.$$prototype);
+    $set_proto(mod, meta.$$prototype);
     // Restoring ModuleName.class
     $defineProperty(mod, '$$class', Opal.Module);
 
@@ -711,7 +711,7 @@
 
     $defineProperty(object, '$$meta', klass);
 
-    $setPrototype(object, object.$$meta.$$prototype);
+    $set_proto(object, object.$$meta.$$prototype);
 
     return klass;
   };
@@ -830,7 +830,7 @@
     for (i = length - 2; i >= 0; i--) {
       var ancestor = ancestors[i];
 
-      if ($hasOwn.call(ancestor.$$cvars, name)) {
+      if ($has_own.call(ancestor.$$cvars, name)) {
         ancestor.$$cvars[name] = value;
         return value;
       }
@@ -976,8 +976,8 @@
       end_chain_on = next_ancestor;
     }
 
-    $setPrototype(start_chain_after, chain.first);
-    $setPrototype(chain.last, end_chain_on);
+    $set_proto(start_chain_after, chain.first);
+    $set_proto(chain.last, end_chain_on);
 
     // recalculate own_included_modules cache
     includer.$$own_included_modules = own_included_modules(includer);
@@ -1036,8 +1036,8 @@
       //   dummy(prepender) -> previous_parent
       // to
       //   dummy(prepender) -> iclass(prepender) -> previous_parent
-      $setPrototype(dummy_prepender, prepender_iclass);
-      $setPrototype(prepender_iclass, previous_parent);
+      $set_proto(dummy_prepender, prepender_iclass);
+      $set_proto(prepender_iclass, previous_parent);
     }
 
     var prepender_ancestors = Opal.ancestors(prepender);
@@ -1064,8 +1064,8 @@
       throw Opal.RuntimeError.$new("Prepending a module multiple times is not supported");
     }
 
-    $setPrototype(start_chain_after, chain.first);
-    $setPrototype(chain.last, end_chain_on);
+    $set_proto(start_chain_after, chain.first);
+    $set_proto(chain.last, end_chain_on);
 
     // recalculate own_prepended_modules cache
     prepender.$$own_prepended_modules = own_prepended_modules(prepender);
@@ -1131,7 +1131,7 @@
 
     for (var i = 1; i < length; i++) {
       var current = iclasses[i];
-      $setPrototype(previous, current);
+      $set_proto(previous, current);
       previous = current;
     }
 
@@ -1177,7 +1177,7 @@
     //           - null
     //
     $defineProperty(native_klass, '$$bridge', klass);
-    $setPrototype(native_klass.prototype, (klass.$$super || Opal.Object).$$prototype);
+    $set_proto(native_klass.prototype, (klass.$$super || Opal.Object).$$prototype);
     $defineProperty(klass, '$$prototype', native_klass.prototype);
 
     $defineProperty(klass.$$prototype, '$$class', klass);
@@ -1775,7 +1775,7 @@
 
   // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
-    if (!$hasOwn.call(obj.$$prototype, jsid)) {
+    if (!$has_own.call(obj.$$prototype, jsid)) {
       throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
     }
 
@@ -1926,7 +1926,7 @@
 
   Opal.hash_put = function(hash, key, value) {
     if (key.$$is_string) {
-      if (!$hasOwn.call(hash.$$smap, key)) {
+      if (!$has_own.call(hash.$$smap, key)) {
         hash.$$keys.push(key);
       }
       hash.$$smap[key] = value;
@@ -1936,7 +1936,7 @@
     var key_hash, bucket, last_bucket;
     key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
-    if (!$hasOwn.call(hash.$$map, key_hash)) {
+    if (!$has_own.call(hash.$$map, key_hash)) {
       bucket = {key: key, key_hash: key_hash, value: value};
       hash.$$keys.push(bucket);
       hash.$$map[key_hash] = bucket;
@@ -1964,7 +1964,7 @@
 
   Opal.hash_get = function(hash, key) {
     if (key.$$is_string) {
-      if ($hasOwn.call(hash.$$smap, key)) {
+      if ($has_own.call(hash.$$smap, key)) {
         return hash.$$smap[key];
       }
       return;
@@ -1973,7 +1973,7 @@
     var key_hash, bucket;
     key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
-    if ($hasOwn.call(hash.$$map, key_hash)) {
+    if ($has_own.call(hash.$$map, key_hash)) {
       bucket = hash.$$map[key_hash];
 
       while (bucket) {
@@ -1989,7 +1989,7 @@
     var i, keys = hash.$$keys, length = keys.length, value;
 
     if (key.$$is_string) {
-      if (!$hasOwn.call(hash.$$smap, key)) {
+      if (!$has_own.call(hash.$$smap, key)) {
         return;
       }
 
@@ -2007,7 +2007,7 @@
 
     var key_hash = key.$hash();
 
-    if (!$hasOwn.call(hash.$$map, key_hash)) {
+    if (!$has_own.call(hash.$$map, key_hash)) {
       return;
     }
 
@@ -2082,7 +2082,7 @@
 
       hash.$$keys[i].key_hash = key_hash;
 
-      if (!$hasOwn.call(hash.$$map, key_hash)) {
+      if (!$has_own.call(hash.$$map, key_hash)) {
         hash.$$map[key_hash] = hash.$$keys[i];
         continue;
       }
@@ -2136,7 +2136,7 @@
     if (arguments_length === 1) {
       args = arguments[0];
       for (key in args) {
-        if ($hasOwn.call(args, key)) {
+        if ($has_own.call(args, key)) {
           value = args[key];
 
           Opal.hash_put(hash, key, value);
@@ -2415,10 +2415,10 @@
   Opal.Module      = Module      = Opal.allocate_class('Module', Opal.Object, $Module);
   Opal.Class       = Class       = Opal.allocate_class('Class', Opal.Module, $Class);
 
-  $setPrototype(Opal.BasicObject, Opal.Class.$$prototype);
-  $setPrototype(Opal.Object, Opal.Class.$$prototype);
-  $setPrototype(Opal.Module, Opal.Class.$$prototype);
-  $setPrototype(Opal.Class, Opal.Class.$$prototype);
+  $set_proto(Opal.BasicObject, Opal.Class.$$prototype);
+  $set_proto(Opal.Object, Opal.Class.$$prototype);
+  $set_proto(Opal.Module, Opal.Class.$$prototype);
+  $set_proto(Opal.Class, Opal.Class.$$prototype);
 
   // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
   BasicObject.$$const["BasicObject"] = BasicObject;
