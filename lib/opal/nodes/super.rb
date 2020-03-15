@@ -48,20 +48,12 @@ module Opal
         @def_scope ||= scope.def? ? scope : scope.find_parent_def
       end
 
-      def raise_exception?
-        @sexp.type == :defined_super
-      end
-
       def defined_check_param
-        raise_exception? ? 'true' : 'false'
-      end
-
-      def implicit_args?
-        @sexp.type == :zsuper
+        'false'
       end
 
       def implicit_arguments_param
-        implicit_args? ? 'true' : 'false'
+        'false'
       end
 
       def method_id
@@ -73,7 +65,7 @@ module Opal
       end
 
       def allow_stubs
-        true
+        'true'
       end
 
       def super_method_invocation
@@ -113,7 +105,11 @@ module Opal
       handle :defined_super
 
       def allow_stubs
-        false
+        'false'
+      end
+
+      def defined_check_param
+        'true'
       end
 
       def compile
@@ -144,6 +140,10 @@ module Opal
     # super with explicit args
     class ZsuperNode < SuperNode
       handle :zsuper
+
+      def implicit_arguments_param
+        'true'
+      end
 
       def initialize(*)
         super
