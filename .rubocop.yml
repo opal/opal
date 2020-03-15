@@ -50,6 +50,8 @@ AllCops:
     - 'stdlib/e2mmap.rb'
     - 'stdlib/matrix.rb'
     - 'stdlib/matrix/*.rb'
+    - 'stdlib/pp.rb'
+    - 'stdlib/prettyprint.rb'
 
 inherit_mode:
   merge:
