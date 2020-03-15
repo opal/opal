@@ -1476,7 +1476,7 @@
   };
 
   // Super dispatcher
-  Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, allow_stubs) {
+  Opal.find_super = function(obj, mid, current_func, defcheck, allow_stubs) {
     var jsid = '$' + mid, ancestors, super_method;
 
     if (obj.hasOwnProperty('$$meta')) {
@@ -1510,7 +1510,7 @@
   };
 
   // Iter dispatcher for super in a block
-  Opal.find_iter_super_dispatcher = function(obj, jsid, current_func, defcheck, implicit) {
+  Opal.find_block_super = function(obj, jsid, current_func, defcheck, implicit) {
     var call_jsid = jsid;
 
     if (!current_func) {
@@ -1527,6 +1527,12 @@
 
     return Opal.find_super_dispatcher(obj, call_jsid, current_func, defcheck);
   };
+
+  // @deprecated
+  Opal.find_super_dispatcher = Opal.find_super;
+
+  // @deprecated
+  Opal.find_iter_super_dispatcher = Opal.find_block_super;
 
   // Used to return as an expression. Sometimes, we can't simply return from
   // a javascript function as if we were a method, as the return is used as
