@@ -1,3 +1,5 @@
+# helpers: coerce_to
+
 module Kernel
   def format(format_string, *args)
     if args.length == 1 && args[0].respond_to?(:to_ary)
@@ -487,7 +489,7 @@ module Kernel
             if (#{`arg`.respond_to?(:to_str)}) {
               str = #{`arg`.to_str};
             } else {
-              str = String.fromCharCode(#{Opal.coerce_to(`arg`, Integer, :to_int)});
+              str = String.fromCharCode($coerce_to(arg, #{Integer}, 'to_int'));
             }
             if (str.length !== 1) {
               #{raise ArgumentError, '%c requires a character'}

@@ -155,7 +155,7 @@
   Opal.slice = $slice;
 
 
-  // Truth
+  // Helpers
   // -----
 
   Opal.truthy = function(val) {
@@ -165,6 +165,49 @@
   Opal.falsy = function(val) {
     return (val === nil || val == null || (val.$$is_boolean && val == false))
   };
+
+  Opal.type_error = function(object, type, method, coerced) {
+    object = object.$$class;
+
+    if (coerced && method) {
+      coerced = coerced.$$class;
+      return Opal.TypeError.$new(
+        "can't convert " + object + " into " + type +
+        " (" + object + "#" + method + " gives " + coerced + ")"
+      )
+    } else {
+      return Opal.TypeError.$new(
+        "no implicit conversion of " + object + " into " + type
+      )
+    }
+  };
+
+  Opal.coerce_to = function(object, type, method, args) {
+    if (type['$==='](object)) return object;
+
+    if (!object['$respond_to?'](method)) {
+      throw Opal.type_error(object, type);
+    }
+
+    if (args == null) args = [];
+    return Opal.send(object, method, args);
+  }
+
+  Opal.respond_to = function(obj, jsid, include_all) {
+    if (obj == null || !obj.$$class) return false;
+    include_all = !!include_all;
+    var body = obj[jsid];
+
+    if (obj['$respond_to?'].$$pristine) {
+      if (obj['$respond_to_missing?'].$$pristine) {
+        return typeof(body) === "function" && !body.$$stub;
+      } else {
+        return Opal.send(obj, obj['$respond_to_missing?'], [jsid.substr(1), include_all]);
+      }
+    } else {
+      return Opal.send(obj, obj['$respond_to?'], [jsid.substr(1), include_all]);
+    }
+  }
 
 
   // Constants
@@ -1356,7 +1399,7 @@
   };
 
   // Super dispatcher
-  Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, defs) {
+  Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, allow_stubs) {
     var jsid = '$' + mid, ancestors, super_method;
 
     if (obj.hasOwnProperty('$$meta')) {
@@ -1376,21 +1419,17 @@
       }
 
       if (proto.hasOwnProperty(jsid)) {
-        var method = proto[jsid];
-
-        if (!method.$$stub) {
-          super_method = method;
-        }
+        super_method = proto[jsid];
         break;
       }
     }
 
-    if (!defcheck && super_method == null && Opal.Kernel.$method_missing === obj.$method_missing) {
+    if (!defcheck && super_method && super_method.$$stub && obj.$method_missing.$$pristine) {
       // method_missing hasn't been explicitly defined
       throw Opal.NoMethodError.$new('super: no superclass method `'+mid+"' for "+obj, mid);
     }
 
-    return super_method;
+    return (super_method.$$stub && !allow_stubs) ? null : super_method;
   };
 
   // Iter dispatcher for super in a block
@@ -1605,7 +1644,7 @@
   //
   Opal.extract_kwargs = function(parameters) {
     var kwargs = parameters[parameters.length - 1];
-    if (kwargs != null && kwargs['$respond_to?']('to_hash', true)) {
+    if (kwargs != null && Opal.respond_to(kwargs, '$to_hash', true)) {
       $splice.call(parameters, parameters.length - 1, 1);
       return kwargs.$to_hash();
     }
@@ -1666,16 +1705,28 @@
   // @param block [Function] ruby block
   // @return [Object] returning value of the method call
   Opal.send = function(recv, method, args, block) {
-    var body = (typeof(method) === 'string') ? recv['$'+method] : method;
+    var body;
 
-    if (body != null) {
-      if (typeof block === 'function') {
-        body.$$p = block;
-      }
-      return body.apply(recv, args);
+    if (typeof(method) === 'function') {
+      body = method;
+      method = null;
+    } else if (typeof(method) === 'string') {
+      body = recv['$'+method];
+    } else {
+      throw Opal.NameError.$new("Passed method should be a string or a function");
     }
 
-    return recv.$method_missing.apply(recv, [method].concat(args));
+    return Opal.send2(recv, body, method, args, block);
+  };
+
+  Opal.send2 = function(recv, body, method, args, block) {
+    if (body == null && method != null && recv.$method_missing) {
+      body = recv.$method_missing;
+      args = [method].concat(args);
+    }
+
+    if (typeof block === 'function') body.$$p = block;
+    return body.apply(recv, args);
   };
 
   Opal.lambda = function(block) {

@@ -1,4 +1,4 @@
-# helpers: truthy
+# helpers: truthy, coerce_to
 
 class Module
   def self.allocate
@@ -84,8 +84,8 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    newname = Opal.coerce_to newname, String, :to_str
-    oldname = Opal.coerce_to oldname, String, :to_str
+    newname = `$coerce_to(newname, #{String}, 'to_str')`
+    oldname = `$coerce_to(oldname, #{String}, 'to_str')`
     `Opal.alias(self, newname, oldname)`
 
     self

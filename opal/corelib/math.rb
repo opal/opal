@@ -1,3 +1,5 @@
+# helpers: type_error
+
 module Math
   E  = `Math.E`
   PI = `Math.PI`
@@ -23,13 +25,13 @@ module Math
   def self.float!(value)
     Float(value)
   rescue ArgumentError
-    raise Opal.type_error(value, Float)
+    raise `$type_error(value, #{Float})`
   end
 
   def self.integer!(value)
     Integer(value)
   rescue ArgumentError
-    raise Opal.type_error(value, Integer)
+    raise `$type_error(value, #{Integer})`
   end
 
   module_function
@@ -368,14 +370,14 @@ module Math
 
   def log(x, base = undefined)
     if String === x
-      raise Opal.type_error(x, Float)
+      raise `$type_error(x, #{Float})`
     end
 
     if `base == null`
       Math.checked :log, Math.float!(x)
     else
       if String === base
-        raise Opal.type_error(base, Float)
+        raise `$type_error(base, #{Float})`
       end
 
       Math.checked(:log, Math.float!(x)) / Math.checked(:log, Math.float!(base))
@@ -392,7 +394,7 @@ module Math
 
   def log10(x)
     if String === x
-      raise Opal.type_error(x, Float)
+      raise `$type_error(x, #{Float})`
     end
 
     Math.checked :log10, Math.float!(x)
@@ -408,7 +410,7 @@ module Math
 
   def log2(x)
     if String === x
-      raise Opal.type_error(x, Float)
+      raise `$type_error(x, #{Float})`
     end
 
     Math.checked :log2, Math.float!(x)

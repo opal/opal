@@ -1,3 +1,5 @@
+# helpers: coerce_to
+
 require 'corelib/pack_unpack/format_string_parser'
 
 class Array
@@ -91,7 +93,7 @@ class Array
         var buffer = callback(data);
 
         return buffer.map(function(item) {
-          return #{Opal.coerce_to `item`, Integer, :to_int}
+          return $coerce_to(item, #{Integer}, 'to_int')
         });
       }
     }
@@ -101,7 +103,7 @@ class Array
         var buffer = callback(data);
 
         return buffer.map(function(item) {
-          return #{Opal.coerce_to `item`, String, :to_str}
+          return $coerce_to(item, #{String}, 'to_str')
         });
       }
     }
@@ -225,7 +227,7 @@ class Array
         } else if (source === undefined) {
           #{raise ArgumentError, 'too few arguments'};
         } else {
-          source = #{Opal.coerce_to `source`, String, :to_str};
+          source = $coerce_to(source, #{String}, 'to_str');
         }
 
         buffer = buffer.slice(1, buffer.length);

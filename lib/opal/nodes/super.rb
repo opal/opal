@@ -25,11 +25,12 @@ module Opal
       end
 
       def compile_using_send
-        helper :send
+        helper :send2
 
-        push '$send('
+        push '$send2('
         compile_receiver
-        compile_method
+        compile_method_body
+        compile_method_name
         compile_arguments
         compile_block_pass
         push ')'
@@ -71,12 +72,12 @@ module Opal
         def_scope.identify!(def_scope.mid)
       end
 
+      def allow_stubs
+        true
+      end
+
       def super_method_invocation
-        if def_scope.defs
-          "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, self.$$class.$$prototype)"
-        else
-          "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param})"
-        end
+        "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, #{allow_stubs})"
       end
 
       def super_block_invocation
@@ -85,7 +86,7 @@ module Opal
         "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
       end
 
-      def compile_method
+      def compile_method_body
         push ', '
         if scope.def?
           push super_method_invocation
@@ -95,14 +96,27 @@ module Opal
           raise 'super must be called from method body or block'
         end
       end
+
+      def compile_method_name
+        if scope.def?
+          push ", '#{method_id}'"
+        elsif scope.iter?
+          _chain, _cur_defn, mid = scope.super_chain
+          push ", #{mid}"
+        end
+      end
     end
 
     class DefinedSuperNode < BaseSuperNode
       handle :defined_super
 
+      def allow_stubs
+        false
+      end
+
       def compile
         compile_receiver
-        compile_method
+        compile_method_body
 
         wrap '((', ') != null ? "super" : nil)'
       end

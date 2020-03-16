@@ -29,9 +29,10 @@ module Opal
         return unless compiler.arity_check?
 
         unless arity_checks.empty?
+          helper :ac
           meth = scope.mid.to_s.inspect
           line 'var $arity = arguments.length;'
-          push " if (#{arity_checks.join(' || ')}) { Opal.ac($arity, #{arity}, this, #{meth}); }"
+          push " if (#{arity_checks.join(' || ')}) { $ac($arity, #{arity}, this, #{meth}); }"
         end
       end
 

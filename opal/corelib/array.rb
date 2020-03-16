@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete
+# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to
 
 require 'corelib/enumerable'
 require 'corelib/numeric'
@@ -80,7 +80,7 @@ class Array < `Array`
         }
       }
 
-      size = #{Opal.coerce_to size, Integer, :to_int}
+      size = $coerce_to(size, #{Integer}, 'to_int');
 
       if (size < 0) {
         #{raise ArgumentError, 'negative array size'}
@@ -113,7 +113,7 @@ class Array < `Array`
     other = if Array === other
               other.to_a
             else
-              Opal.coerce_to(other, Array, :to_ary).to_a
+              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
             end
 
     %x{
@@ -138,7 +138,7 @@ class Array < `Array`
     other = if Array === other
               other.to_a
             else
-              Opal.coerce_to(other, Array, :to_ary).to_a
+              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
             end
 
     %x{
@@ -159,7 +159,7 @@ class Array < `Array`
   def *(other)
     return join(other.to_str) if other.respond_to? :to_str
 
-    other = Opal.coerce_to other, Integer, :to_int
+    other = `$coerce_to(other, #{Integer}, 'to_int')`
 
     if `other < 0`
       raise ArgumentError, 'negative argument'
@@ -181,7 +181,7 @@ class Array < `Array`
     other = if Array === other
               other.to_a
             else
-              Opal.coerce_to(other, Array, :to_ary).to_a
+              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
             end
 
     `self.concat(other)`
@@ -191,7 +191,7 @@ class Array < `Array`
     other = if Array === other
               other.to_a
             else
-              Opal.coerce_to(other, Array, :to_ary).to_a
+              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
             end
 
     return [] if `self.length === 0`
@@ -260,7 +260,7 @@ class Array < `Array`
           return true;
 
         if (!other.$$is_array) {
-          if (#{Opal.respond_to? `other`, :to_ary}) {
+          if ($respond_to(other, '$to_ary')) {
             return #{`other` == `array`};
           } else {
             return false;
@@ -310,8 +310,8 @@ class Array < `Array`
           exclude, from, to, result;
 
       exclude = index.excl;
-      from    = Opal.Opal.$coerce_to(index.begin, Opal.Integer, 'to_int');
-      to      = Opal.Opal.$coerce_to(index.end, Opal.Integer, 'to_int');
+      from    = $coerce_to(index.begin, Opal.Integer, 'to_int');
+      to      = $coerce_to(index.end, Opal.Integer, 'to_int');
 
       if (from < 0) {
         from += size;
@@ -345,7 +345,7 @@ class Array < `Array`
       var size = self.length,
           exclude, from, to, result;
 
-      index = Opal.Opal.$coerce_to(index, Opal.Integer, 'to_int');
+      index = $coerce_to(index, Opal.Integer, 'to_int');
 
       if (index < 0) {
         index += size;
@@ -363,7 +363,7 @@ class Array < `Array`
         return self[index];
       }
       else {
-        length = Opal.Opal.$coerce_to(length, Opal.Integer, 'to_int');
+        length = $coerce_to(length, Opal.Integer, 'to_int');
 
         if (length < 0 || index > size || index < 0) {
           return nil;
@@ -402,8 +402,8 @@ class Array < `Array`
 
       %x{
         var exclude = index.excl,
-            from    = #{Opal.coerce_to `index.begin`, Integer, :to_int},
-            to      = #{Opal.coerce_to `index.end`, Integer, :to_int};
+            from    = $coerce_to(index.begin, #{Integer}, 'to_int'),
+            to      = $coerce_to(index.end, #{Integer}, 'to_int');
 
         if (from < 0) {
           from += size;
@@ -455,8 +455,8 @@ class Array < `Array`
       %x{
         var old;
 
-        index  = #{Opal.coerce_to index, Integer, :to_int};
-        length = #{Opal.coerce_to length, Integer, :to_int};
+        index  = $coerce_to(index, #{Integer}, 'to_int');
+        length = $coerce_to(length, #{Integer}, 'to_int');
 
         if (index < 0) {
           old    = index;
@@ -507,9 +507,9 @@ class Array < `Array`
   end
 
   def at(index)
-    index = Opal.coerce_to index, Integer, :to_int
-
     %x{
+      index = $coerce_to(index, #{Integer}, 'to_int')
+
       if (index < 0) {
         index += self.length;
       }
@@ -790,7 +790,7 @@ class Array < `Array`
       other = if Array === other
                 other.to_a
               else
-                Opal.coerce_to(other, Array, :to_ary).to_a
+                `$coerce_to(other, #{Array}, 'to_ary')`.to_a
               end
 
       if other.equal?(self)
@@ -836,7 +836,7 @@ class Array < `Array`
 
   def delete_at(index)
     %x{
-      index = #{Opal.coerce_to `index`, Integer, :to_int};
+      index = $coerce_to(index, #{Integer}, 'to_int');
 
       if (index < 0) {
         index += self.length;
@@ -976,7 +976,7 @@ class Array < `Array`
     %x{
       var original = index;
 
-      index = #{Opal.coerce_to `index`, Integer, :to_int};
+      index = $coerce_to(index, #{Integer}, 'to_int');
 
       if (index < 0) {
         index += self.length;
@@ -1031,22 +1031,22 @@ class Array < `Array`
     if Range === one
       raise TypeError, 'length invalid with range' if two
 
-      left   = Opal.coerce_to one.begin, Integer, :to_int
+      left   = `$coerce_to(one.begin, #{Integer}, 'to_int')`
       `left += this.length` if `left < 0`
       raise RangeError, "#{one.inspect} out of range" if `left < 0`
 
-      right = Opal.coerce_to one.end, Integer, :to_int
+      right = `$coerce_to(one.end, #{Integer}, 'to_int')`
       `right += this.length` if `right < 0`
       `right += 1` unless one.exclude_end?
 
       return self if `right <= left`
     elsif one
-      left   = Opal.coerce_to one, Integer, :to_int
+      left   = `$coerce_to(one, #{Integer}, 'to_int')`
       `left += this.length` if `left < 0`
       left   = 0 if `left < 0`
 
       if two
-        right = Opal.coerce_to two, Integer, :to_int
+        right = `$coerce_to(two, #{Integer}, 'to_int')`
 
         return self if `right == 0`
 
@@ -1095,7 +1095,7 @@ class Array < `Array`
         return self.length === 0 ? nil : self[0];
       }
 
-      count = #{Opal.coerce_to `count`, Integer, :to_int};
+      count = $coerce_to(count, #{Integer}, 'to_int');
 
       if (count < 0) {
         #{raise ArgumentError, 'negative array size'};
@@ -1117,7 +1117,7 @@ class Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           item = array[i];
 
-          if (!#{Opal.respond_to? `item`, :to_ary, true}) {
+          if (!$respond_to(item, '$to_ary', true)) {
             result.push(item);
             continue;
           }
@@ -1152,7 +1152,7 @@ class Array < `Array`
       }
 
       if (level !== undefined) {
-        level = #{Opal.coerce_to(`level`, Integer, :to_int)};
+        level = $coerce_to(level, #{Integer}, 'to_int');
       }
 
       return toArraySubclass(_flatten(self, level), #{self.class});
@@ -1267,7 +1267,7 @@ class Array < `Array`
 
   def insert(index, *objects)
     %x{
-      index = #{Opal.coerce_to `index`, Integer, :to_int};
+      index = $coerce_to(index, #{Integer}, 'to_int');
 
       if (objects.length > 0) {
         if (index < 0) {
@@ -1324,7 +1324,7 @@ class Array < `Array`
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
 
-        if (#{Opal.respond_to? `item`, :to_str}) {
+        if ($respond_to(item, '$to_str')) {
           tmp = #{`item`.to_str};
 
           if (tmp !== nil) {
@@ -1334,7 +1334,7 @@ class Array < `Array`
           }
         }
 
-        if (#{Opal.respond_to? `item`, :to_ary}) {
+        if ($respond_to(item, '$to_ary')) {
           tmp = #{`item`.to_ary};
 
           if (tmp === self) {
@@ -1348,7 +1348,7 @@ class Array < `Array`
           }
         }
 
-        if (#{Opal.respond_to? `item`, :to_s}) {
+        if ($respond_to(item, '$to_s')) {
           tmp = #{`item`.to_s};
 
           if (tmp !== nil) {
@@ -1382,7 +1382,7 @@ class Array < `Array`
         return self.length === 0 ? nil : self[self.length - 1];
       }
 
-      count = #{Opal.coerce_to `count`, Integer, :to_int};
+      count = $coerce_to(count, #{Integer}, 'to_int');
 
       if (count < 0) {
         #{raise ArgumentError, 'negative array size'};
@@ -1439,7 +1439,7 @@ class Array < `Array`
         num = self.length;
       }
       else {
-        num = #{ Opal.coerce_to num, Integer, :to_int }
+        num = $coerce_to(num, #{Integer}, 'to_int');
       }
 
       if (num < 0 || self.length < num) {
@@ -1525,7 +1525,7 @@ class Array < `Array`
       return `self.pop()`
     end
 
-    count = Opal.coerce_to count, Integer, :to_int
+    count = `$coerce_to(count, #{Integer}, 'to_int')`
 
     if `count < 0`
       raise ArgumentError, 'negative array size'
@@ -1551,7 +1551,7 @@ class Array < `Array`
 
       arrays[0] = self;
       for (i = 1; i < n; i++) {
-        arrays[i] = #{Opal.coerce_to(`args[i - 1]`, Array, :to_ary)};
+        arrays[i] = $coerce_to(args[i - 1], #{Array}, 'to_ary');
       }
 
       for (i = 0; i < n; i++) {
@@ -1650,7 +1650,7 @@ class Array < `Array`
     other = if Array === other
               other.to_a
             else
-              Opal.coerce_to(other, Array, :to_ary).to_a
+              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
             end
 
     %x{
@@ -1716,9 +1716,10 @@ class Array < `Array`
   end
 
   def rotate(n = 1)
-    n = Opal.coerce_to n, Integer, :to_int
     %x{
       var ary, idx, firstPart, lastPart;
+
+      n = $coerce_to(n, #{Integer}, 'to_int')
 
       if (self.length === 1) {
         return self.slice();
@@ -1741,8 +1742,8 @@ class Array < `Array`
       if (self.length === 0 || self.length === 1) {
         return self;
       }
+      cnt = $coerce_to(cnt, #{Integer}, 'to_int');
     }
-    cnt = Opal.coerce_to cnt, Integer, :to_int
     ary = rotate(cnt)
     replace ary
   end
@@ -1753,7 +1754,7 @@ class Array < `Array`
     end
 
     def rand(size)
-      random = Opal.coerce_to @rng.rand(size), Integer, :to_int
+      random = `$coerce_to(#{@rng.rand(size)}, #{Integer}, 'to_int')`
       raise RangeError, 'random value must be >= 0' if `random < 0`
       raise RangeError, 'random value must be less than Array size' unless `random < size`
 
@@ -1770,11 +1771,11 @@ class Array < `Array`
         count = nil
       else
         options = nil
-        count = Opal.coerce_to count, Integer, :to_int
+        count = `$coerce_to(count, #{Integer}, 'to_int')`
       end
     else
-      count = Opal.coerce_to count, Integer, :to_int
-      options = Opal.coerce_to options, Hash, :to_hash
+      count = `$coerce_to(count, #{Integer}, 'to_int')`
+      options = `$coerce_to(options, #{Hash}, 'to_hash')`
     end
 
     if count && `count < 0`
@@ -1908,7 +1909,7 @@ class Array < `Array`
       return `self.shift()`
     end
 
-    count = Opal.coerce_to count, Integer, :to_int
+    count = `$coerce_to(count, #{Integer}, 'to_int')`
 
     if `count < 0`
       raise ArgumentError, 'negative array size'
@@ -1976,8 +1977,8 @@ class Array < `Array`
         range = index
         result = self[range]
 
-        range_start = Opal.coerce_to(range.begin, Integer, :to_int)
-        range_end = Opal.coerce_to(range.end, Integer, :to_int)
+        range_start = `$coerce_to(range.begin, #{Integer}, 'to_int')`
+        range_end = `$coerce_to(range.end, #{Integer}, 'to_int')`
 
         %x{
           if (range_start < 0) {
@@ -2005,7 +2006,7 @@ class Array < `Array`
           }
         }
       else
-        start = Opal.coerce_to(index, Integer, :to_int)
+        start = `$coerce_to(index, #{Integer}, 'to_int')`
         %x{
           if (start < 0) {
             start += self.length;
@@ -2025,8 +2026,8 @@ class Array < `Array`
         }
       end
     else
-      start = Opal.coerce_to(index, Integer, :to_int)
-      length = Opal.coerce_to(length, Integer, :to_int)
+      start = `$coerce_to(index, #{Integer}, 'to_int')`
+      length = `$coerce_to(length, #{Integer}, 'to_int')`
 
       %x{
         if (length < 0) {
@@ -2170,7 +2171,7 @@ class Array < `Array`
       row = if Array === row
               row.to_a
             else
-              Opal.coerce_to(row, Array, :to_ary).to_a
+              `$coerce_to(row, #{Array}, 'to_ary')`.to_a
             end
 
       max ||= `row.length`
@@ -2253,8 +2254,8 @@ class Array < `Array`
 
     args.each do |elem|
       if elem.is_a? Range
-        finish = Opal.coerce_to elem.last, Integer, :to_int
-        start = Opal.coerce_to elem.first, Integer, :to_int
+        finish = `$coerce_to(#{elem.last}, #{Integer}, 'to_int')`
+        start = `$coerce_to(#{elem.first}, #{Integer}, 'to_int')`
 
         %x{
           if (start < 0) {
@@ -2277,7 +2278,7 @@ class Array < `Array`
 
         start.upto(finish) { |i| out << at(i) }
       else
-        i = Opal.coerce_to elem, Integer, :to_int
+        i = `$coerce_to(elem, #{Integer}, 'to_int')`
         out << at(i)
       end
     end

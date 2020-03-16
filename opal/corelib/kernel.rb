@@ -1,4 +1,4 @@
-# helpers: truthy
+# helpers: truthy, coerce_to, respond_to
 
 module Kernel
   def method_missing(symbol, *args, &block)
@@ -202,7 +202,7 @@ module Kernel
       if (status.$$is_boolean) {
         status = status ? 0 : 1;
       } else {
-        status = #{Opal.coerce_to(status, Integer, :to_int)}
+        status = $coerce_to(status, #{Integer}, 'to_int')
       }
 
       Opal.exit(status);
@@ -341,7 +341,7 @@ module Kernel
       if (base === undefined) {
         base = 0;
       } else {
-        base = #{Opal.coerce_to(`base`, Integer, :to_int)};
+        base = $coerce_to(base, #{Integer}, 'to_int');
         if (base === 1 || base < 0 || base > 36) {
           #{raise ArgumentError, "invalid radix #{base}"}
         }
@@ -577,22 +577,26 @@ module Kernel
   end
 
   def respond_to?(name, include_all = false)
-    return true if respond_to_missing?(name, include_all)
-
     %x{
       var body = self['$' + name];
 
       if (typeof(body) === "function" && !body.$$stub) {
         return true;
       }
-    }
 
-    false
+      if (self['$respond_to_missing?'].$$pristine === true) {
+        return false;
+      } else {
+        return #{respond_to_missing?(name, include_all)};
+      }
+    }
   end
 
   def respond_to_missing?(method_name, include_all = false)
     false
   end
+
+  Opal.pristine(self, :respond_to?, :respond_to_missing?)
 
   def require(file)
     file = Opal.coerce_to!(file, String, :to_str)
@@ -694,6 +698,8 @@ module Kernel
     return enum_for(:yield_self) { 1 } unless block_given?
     yield self
   end
+
+  Opal.pristine(self, :method_missing)
 end
 
 class Object
