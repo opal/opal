@@ -1010,6 +1010,7 @@ Fixnum = Number
 
 class Integer < Numeric
   `self.$$is_number_class = true`
+  `self.$$is_integer_class = true`
 
   class << self
     def allocate
@@ -1017,16 +1018,6 @@ class Integer < Numeric
     end
 
     undef :new
-
-    def ===(other)
-      %x{
-        if (!other.$$is_number) {
-          return false;
-        }
-
-        return (other % 1) === 0;
-      }
-    end
 
     def sqrt(n)
       n = Opal.coerce_to!(n, Integer, :to_int)

@@ -1509,7 +1509,7 @@
     }
 
     if (object.$$is_number && klass.$$is_number_class) {
-      return true;
+      return (klass.$$is_integer_class) ? (object % 1) === 0 : true;
     }
 
     var i, length, ancestors = Opal.ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
