@@ -2396,6 +2396,10 @@
     if (module) {
       module(Opal);
     }
+    else if (typeof OpalLoaded !== "undefined" && OpalLoaded.indexOf(path) !== -1) {
+      // Compatibility for loading plain JS files via opal-sprockets
+      return false;
+    }
     else {
       var severity = Opal.config.missing_require_severity;
       var message  = 'cannot load such file -- ' + path;
