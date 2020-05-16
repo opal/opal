@@ -2319,7 +2319,7 @@
   // Combine multiple regexp parts together
   Opal.regexp = function(parts, flags) {
     var part;
-    var ignoreCase = flags && flags.indexOf('i') >= 0;
+    var ignoreCase = typeof flags !== 'undefined' && flags && flags.indexOf('i') >= 0;
 
     for (var i = 0, ii = parts.length; i < ii; i++) {
       part = parts[i];
