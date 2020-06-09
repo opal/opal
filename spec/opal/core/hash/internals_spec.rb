@@ -42,6 +42,13 @@ describe 'Hash' do
 
       `Object.keys(#@h.$$map).length`.should == 1
     end
+
+    it 'converts string objects to values when used to delete keys' do
+      h = {'a' => 'a'}
+      k = String.new(h.keys.first)
+      h.delete(k)
+      h.should == {}
+    end
   end
 
   describe 'internal implementation of object keys' do

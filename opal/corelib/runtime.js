@@ -2040,6 +2040,8 @@
     var i, keys = hash.$$keys, length = keys.length, value;
 
     if (key.$$is_string) {
+      if (typeof key !== "string") key = key.valueOf();
+
       if (!$has_own.call(hash.$$smap, key)) {
         return;
       }
