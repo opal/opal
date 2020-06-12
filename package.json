@@ -4,6 +4,7 @@
   "dependencies": {
     "benchmark": "^2.1.4",
     "jshint": "^2.11.0-rc1",
+    "lerna": "^3.22.1",
     "source-map-support": "^0.5.16",
     "uglify-js": "^3.7.2"
   },

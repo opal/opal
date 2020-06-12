@@ -1,0 +1,15 @@
+{
+  "name": "@opal/corelib",
+  "version": "1.0.0-alpha.1",
+  "description": "Precompiled corelib for Opal",
+  "main": "index.js",
+  "repository": "https://github.com/opal/opal",
+  "author": "Elia Schito <elia@schito.me>",
+  "license": "MIT",
+  "private": false,
+  "sideEffects": true,
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ]
+}
