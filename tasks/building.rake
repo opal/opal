@@ -21,7 +21,7 @@ task :dist do
 
   build_dir = ENV['DIR'] || 'build'
   files     = ENV['FILES'] ? ENV['FILES'].split(',') :
-              Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }
+              Dir['{opal,stdlib}/**/*.rb'].map { |lib| File.basename(lib, '.rb') }
 
   mkdir_p build_dir unless File.directory? build_dir
   width = files.map(&:size).max
