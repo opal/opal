@@ -14,6 +14,6 @@ require 'corelib/dir'
 require 'corelib/file'
 require 'corelib/process'
 require 'corelib/random'
-require 'corelib/random/mersenne_twister.js'
+require 'corelib/random/mersenne_twister'
 
 require 'corelib/unsupported'
