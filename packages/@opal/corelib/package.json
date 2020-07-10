@@ -12,5 +12,8 @@
     "dist/**/*",
     "README.md"
   ],
-  "gitHead": "fb2476f42084d712c765a15f799da0ad9eb761fe"
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "b6033701b4e9b81a3b166d880fa053038bd4c1da"
 }
