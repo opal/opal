@@ -33,19 +33,23 @@ task :dist do
       $stdout.flush
 
       # Set requirable to true, unless building opal. This allows opal to be auto-loaded.
-      requirable = (lib != 'opal')
-      src = Opal::Builder.build(lib, requirable: requirable).to_s
+      builder = Opal::Compiler.compile(lib, requirable: true)
+
+      src = builder.to_s
+      map = builder.source_map.to_json
       min = Opal::Util.uglify src
       gzp = Opal::Util.gzip min
 
       File.open("#{build_dir}/#{lib}.js", 'w+')        { |f| f << src }
+      File.open("#{build_dir}/#{lib}.map", 'w+')       { |f| f << map } if map
       File.open("#{build_dir}/#{lib}.min.js", 'w+')    { |f| f << min } if min
       File.open("#{build_dir}/#{lib}.min.js.gz", 'w+') { |f| f << gzp } if gzp
 
       log << "done. ("
-      log << "development: #{('%.2f' % (src.size/1000.0)).rjust(7)}KB"
-      log <<  ", minified: #{('%.2f' % (min.size/1000.0)).rjust(7)}KB" if min
-      log <<   ", gzipped: #{('%.2f' % (gzp.size/1000.0)).rjust(7)}KB" if gzp
+      log <<   "dev: #{('%.2f' % (src.size/1000.0)).rjust(7)}KB"
+      log << ", map: #{('%.2f' % (map.size/1000.0)).rjust(7)}KB" if map
+      log << ", min: #{('%.2f' % (min.size/1000.0)).rjust(7)}KB" if min
+      log << ", gzp: #{('%.2f' % (gzp.size/1000.0)).rjust(7)}KB" if gzp
       log << ")."
       log
     }
