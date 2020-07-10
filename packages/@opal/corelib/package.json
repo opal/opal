@@ -1,7 +1,7 @@
 {
   "name": "@opal/corelib",
   "version": "0.0.1-alpha.1",
-  "description": "Precompiled corelib for Opal",
+  "description": "Precompiled corelib for Opal.",
   "main": "index.js",
   "repository": "https://github.com/opal/opal",
   "author": "Elia Schito <elia@schito.me>",
