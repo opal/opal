@@ -31,7 +31,13 @@ namespace :packages do
 
           lib = lib.sub(%r{(\.js)?(\.rb)?$}, '')
           imports = asset.requires.map do |require|
-            expanded = File.join(File.dirname(lib).gsub(%r{[^/]+}, '..'), require)
+            dirname = File.dirname(lib)
+            if dirname == '.'
+              expanded = require
+            else
+              expanded = File.join(dirname.gsub(%r{[^/]+}, '..'), require)
+            end
+            p lib => {require => expanded}
             "require('#{expanded}');"
           end
 
