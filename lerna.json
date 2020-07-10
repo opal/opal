@@ -3,5 +3,8 @@
     "packages/@opal/corelib"
   ],
   "version": "0.0.1-alpha.2",
-  "tagVersionPrefix": "lerna-"
+  "tagVersionPrefix": "npm-",
+  "publishConfig": {
+    "access": "public"
+  }
 }

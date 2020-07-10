@@ -11,5 +11,6 @@
   "files": [
     "dist/**/*",
     "README.md"
-  ]
+  ],
+  "gitHead": "fb2476f42084d712c765a15f799da0ad9eb761fe"
 }
