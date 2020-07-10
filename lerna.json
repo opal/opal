@@ -3,5 +3,5 @@
     "packages/@opal/corelib"
   ],
   "version": "0.0.1-alpha.3",
-  "tagVersionPrefix": "npm-",
+  "tagVersionPrefix": "npm-"
 }
