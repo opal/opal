@@ -67,6 +67,8 @@ Whitespace conventions:
 - `Opal.$$` changed from being the constant cache of Object to being a shortcut for `Opal.const_get_relative` (#2038)
 - Moved REPL implementation from bin/ to its own lib/ file as `opal/repl.rb` (#2048)
 - `Encoding.default_external` is now initialized with `__ENCODING__` (#2072)
+- Keep the MersenneTwister implementation private (#2108)
+
 
 
 ### Deprecated
