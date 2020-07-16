@@ -45,6 +45,7 @@ namespace :packages do
 
           FileUtils.mkpath("#{build_dir}/#{File.dirname(lib)}")
           File.write("#{build_dir}/#{lib}.js", src)
+          File.write("#{build_dir}/#{lib}.map", asset.source_map.to_json)
         end
       }
     end.map(&:value)
