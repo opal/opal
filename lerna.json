@@ -1,6 +1,8 @@
 {
   "packages": [
-    "packages/@opal/corelib"
+    "packages/@opal/corelib",
+    "packages/@opal/stdlib"
+
   ],
   "version": "0.0.1-alpha.6",
   "tagVersionPrefix": "npm-"
