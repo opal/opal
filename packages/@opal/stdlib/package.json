@@ -1,0 +1,18 @@
+{
+  "name": "@opal/stdlib",
+  "version": "0.0.1-alpha.6",
+  "description": "Precompiled stdlib for Opal.",
+  "main": "index.js",
+  "repository": "https://github.com/opal/opal",
+  "author": "Elia Schito <elia@schito.me>",
+  "license": "MIT",
+  "private": false,
+  "sideEffects": true,
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+}

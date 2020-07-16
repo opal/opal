@@ -80,6 +80,26 @@ namespace :packages do
     JS
     puts
   end
+
+  task :stdlib do
+    require 'opal'
+    path = File.expand_path(Opal.std_dir)
+    files = Dir.chdir(path) do
+      Dir['**/*.rb'].map { |lib| lib.sub(%r{^(.*)\.rb$}, '\1') }
+    end.sort
+    puts files
+    precompile["packages/@opal/stdlib/dist", files]
+
+    index_requires = files.map do |file|
+      "require('./dist/#{file}')"
+    end
+    File.write "packages/@opal/stdlib/index.js", <<~JS
+      #{index_requires.join("\n")}
+
+      module.exports = Opal
+    JS
+    puts
+  end
 end
 
 task 'packages' => 'packages:build'
