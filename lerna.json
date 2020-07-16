@@ -3,6 +3,6 @@
     "packages/@opal/corelib",
     "packages/@opal/stdlib"
   ],
-  "version": "0.0.1-alpha.7",
+  "version": "0.0.1-alpha.8",
   "tagVersionPrefix": "npm-"
 }
