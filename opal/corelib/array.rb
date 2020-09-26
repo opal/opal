@@ -36,7 +36,7 @@ class Array < `Array`
     function unshiftOne(list, elem) {
       var len = list.length - 1;
       list.push(list[len]);
-      while (len) {
+      while (len > 0) {
         list[len] = list[len - 1];
         len--;
       }
