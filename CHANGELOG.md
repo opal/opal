@@ -63,7 +63,7 @@ Whitespace conventions:
 - Nashorn has been deprecated but GraalVM still supports it ([#1997](https://github.com/opal/opal/pull/1997))
 - "opal/mini" now includes "opal/io" ([#2002](https://github.com/opal/opal/pull/2002))
 - Regexps assigned to constants are now frozen ([#2007](https://github.com/opal/opal/pull/2007))
-
+- Improve `Array#shift` performance on v8 > 7.1 using a faster open-coded version ([#2115](https://github.com/opal/opal/pull/2115))
 
 
 
