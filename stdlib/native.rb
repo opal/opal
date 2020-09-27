@@ -219,12 +219,9 @@ module Kernel
   # Wraps a native JavaScript with `Native::Object.new`
   #
   # @return [Native::Object] The wrapped object if it is native
-  # @return [nil] for `null` and `undefined`
   # @return [obj] The object itself if it's not native
   def Native(obj)
-    if `#{obj} == null`
-      nil
-    elsif native?(obj)
+    if native?(obj)
       Native::Object.new(obj)
     elsif obj.is_a?(Array)
       obj.map do |o|
@@ -250,15 +247,26 @@ module Kernel
   end
 end
 
-class Native::Object < BasicObject
-  include ::Native::Wrapper
+module Native::ObjectMethods
+  def self.included(klass)
+    klass.extend Native::Helpers
+    klass.extend self
+  end
+
+  def !
+    nil?
+  end
 
   def ==(other)
-    `#{@native} === #{::Native.try_convert(other)}`
+    %x{
+      var value = #{nil?} ? null : #{native};
+      return value === #{::Native.try_convert(other)};
+    }
   end
 
   def has_key?(name)
-    `Opal.hasOwnProperty.call(#{@native}, #{name})`
+    return nil.key?(name) if nil?
+    `Opal.hasOwnProperty.call(#{native}, #{name})`
   end
 
   alias key? has_key?
@@ -266,10 +274,12 @@ class Native::Object < BasicObject
   alias member? has_key?
 
   def each(*args)
+    return nil.each(*args) if nil?
+
     if block_given?
       %x{
-        for (var key in #{@native}) {
-          #{yield `key`, `#{@native}[key]`}
+        for (var key in #{native}) {
+          #{yield `key`, `#{native}[key]`}
         }
       }
 
@@ -280,83 +290,160 @@ class Native::Object < BasicObject
   end
 
   def [](key)
+    return nil[key] if nil?
+
     %x{
-      var prop = #{@native}[key];
+      var prop = #{native}[key];
 
       if (prop instanceof Function) {
         return prop;
       }
       else {
-        return #{::Native.call(@native, key)}
+        return #{::Native.call(native, key)}
       }
     }
   end
 
   def []=(key, value)
-    native = ::Native.try_convert(value)
+    if nil?
+      nil[key] = value
+      return
+    end
 
-    if `#{native} === nil`
-      `#{@native}[key] = #{value}`
+    native_value = ::Native.try_convert(value)
+
+    if `#{native_value} === nil`
+      `#{native}[key] = #{value}`
     else
-      `#{@native}[key] = #{native}`
+      `#{native}[key] = #{native_value}`
     end
   end
 
   def merge!(other)
+    return nil.merge!(other) if nil?
+
     %x{
       other = #{::Native.convert(other)};
 
       for (var prop in other) {
-        #{@native}[prop] = other[prop];
+        #{native}[prop] = other[prop];
       }
     }
 
     self
   end
 
-  def respond_to?(name, include_all = false)
-    ::Kernel.instance_method(:respond_to?).bind(self).call(name, include_all)
+  def respond_to_missing?(name, include_all = false)
+    `Opal.hasOwnProperty.call(#{native}, #{name})`
   end
 
-  def respond_to_missing?(name, include_all = false)
-    `Opal.hasOwnProperty.call(#{@native}, #{name})`
+  def method(name)
+    %x{
+      var meth = #{nil?} ? null : #{native}[#{name}];
+      if (meth) {
+        return #{Method.new(self, self.class, `meth`, name)};
+      } else {
+        return #{::Kernel.instance_method(:method).bind(self).call(name)}
+      }
+    }
   end
 
   def method_missing(mid, *args, &block)
+    return nil.send(mid, *args, &block) if nil?
+
     %x{
       if (mid.charAt(mid.length - 1) === '=') {
         return #{self[mid.slice(0, mid.length - 1)] = args[0]};
       }
       else {
-        return #{::Native.call(@native, mid, *args, &block)};
+        return #{::Native.call(native, mid, *args, &block)};
       }
     }
   end
 
   def nil?
-    false
+    `#{native} == null`
   end
 
   def is_a?(klass)
+    return true if klass == Native::Object
     `Opal.is_a(self, klass)`
   end
 
   alias kind_of? is_a?
 
   def instance_of?(klass)
-    `self.$$class === klass`
+    `#{self.class} === klass`
   end
 
   def class
-    `self.$$class`
+    `self.$$class === #{Class} ? #{Native::Object} : self.$$class`
+  end
+
+  # Returns the internal native JavaScript value
+  def to_n
+    native
   end
 
   def to_a(options = {}, &block)
-    ::Native::Array.new(@native, options, &block).to_a
+    ::Native::Array.new(native, options, &block).to_a
   end
 
   def inspect
-    "#<Native:#{`String(#{@native})`}>"
+    %x{
+      var name = "null";
+      if (#{native}) {
+        name = #{native}.constructor.name;
+      } else if (#{native} !== null) {
+        name = typeof(#{native});
+      }
+      return "#<Native:" + name + ">";
+    }
+  end
+end
+
+class Native::Object
+  RESERVED_METHODS = BasicObject.instance_methods +
+                     Class.instance_methods(false) +
+                     %i[class class_variable_defined? class_variable_get class_variable_set class_variables
+                        included_modules inspect instance_method instance_methods instance_of? instance_variable_defined?
+                        instance_variable_get instance_variable_set instance_variables method_defined?
+                        is_a? kind_of? method methods nil? object_id public_send respond_to? send to_s]
+
+  def self.new(native)
+    unless ::Kernel.native?(native)
+      ::Kernel.raise ArgumentError, "#{native.inspect} isn't native"
+    end
+
+    remove_methods = proc do |target|
+      target.instance_methods.each do |method|
+        methods_to_keep = target.included_modules.reduce(target.instance_methods(false)) do |methods, mod|
+          mod.name == 'Kernel' ? methods : (methods + mod.instance_methods(false))
+        end
+        target.undef_method(method) unless RESERVED_METHODS.include?(method) || methods_to_keep.include?(method)
+      end
+    end
+
+    Class.new do
+      class_variable_set(:@@native, native)
+      include Native::ObjectMethods
+
+      def self.native
+        name = Opal.class_variable_name!(:@@native)
+        `Opal.class_variables(self)[#{name}]`
+      end
+
+      def native
+        self.class.native
+      end
+
+      def initialize
+        @native = native
+      end
+
+      remove_methods.call(self)
+      remove_methods.call(singleton_class)
+    end
   end
 end
 

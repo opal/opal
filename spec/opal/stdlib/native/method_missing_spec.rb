@@ -4,6 +4,12 @@ describe "Native::Object#method_missing" do
   it "should return values" do
     Native(`{ a: 23 }`).a.should == 23
     Native(`{ a: { b: 42 } }`).a.b.should == 42
+    Native(`{ a: 2 }`).b.should be_nil
+  end
+
+  it "should raise when accessing nil" do
+    lambda { Native(`null`).a }.should raise_error(NoMethodError)
+    lambda { Native(`undefined`).a }.should raise_error(NoMethodError)
   end
 
   it "should call functions" do
@@ -33,6 +39,11 @@ describe "Native::Object#method_missing" do
     Native(var).a = 42
     `#{var}.a`.should == 42
     Native(var).a.should == 42
+  end
+
+  it "should raise when assigning to nil" do
+    lambda { Native(`null`).a = 42 }.should raise_error(NoMethodError)
+    lambda { Native(`undefined`).a = 42 }.should raise_error(NoMethodError)
   end
 
   it "should pass the block as function" do

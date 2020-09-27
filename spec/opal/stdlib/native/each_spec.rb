@@ -10,4 +10,13 @@ describe "Native::Object#each" do
   it "accesses the native when no block is given" do
     Native(`{ a: 2, b: 3, each: function() { return 42; } }`).each.should == 42
   end
+
+  it "raises NoMethodError for null" do
+    lambda { Native(`null`).each { } }.should raise_error(NoMethodError)
+  end
+
+  it "works for undefined" do
+    lambda { Native(`undefined`).each { } }.should raise_error(NoMethodError)
+  end
+
 end

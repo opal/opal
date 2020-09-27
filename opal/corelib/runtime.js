@@ -159,11 +159,11 @@
   // -----
 
   Opal.truthy = function(val) {
-    return (val !== nil && val != null && (!val.$$is_boolean || val == true));
+    return (val !== nil && val != null && (!val.$$is_boolean || val == true) && (!val["$nil?"] || !val["$nil?"]()));
   };
 
   Opal.falsy = function(val) {
-    return (val === nil || val == null || (val.$$is_boolean && val == false))
+    return (val === nil || val == null || (val.$$is_boolean && val == false) || (val["$nil?"] && val["$nil?"]()));
   };
 
   Opal.type_error = function(object, type, method, coerced) {

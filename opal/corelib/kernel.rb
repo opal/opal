@@ -35,11 +35,9 @@ module Kernel
   def method(name)
     %x{
       var meth = self['$' + name];
-
       if (!meth || meth.$$stub) {
-        #{raise NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
+        #{::Kernel.raise NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
       }
-
       return #{Method.new(self, `meth.$$owner || #{self.class}`, `meth`, name)};
     }
   end

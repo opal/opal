@@ -6,6 +6,11 @@ describe "Native::Object#[]" do
     Native(`"lol"`).should === "lol"
   end
 
+  it "should raise for nil" do
+    lambda { Native(`null`)[:a] }.should raise_error(NoMethodError)
+    lambda { Native(`undefined`)[:a] }.should raise_error(NoMethodError)
+  end
+
   it "should return functions as is" do
     Native(`{ a: function(){} }`)[:a].should be_kind_of Proc
   end

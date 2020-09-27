@@ -4,6 +4,8 @@ describe "Native()" do
   it "should return nil for null or undefined" do
     Native(`null`).should be_nil
     Native(`undefined`).should be_nil
+    Native(`null`).nil?.should be_true
+    Native(`undefined`).nil?.should be_true
   end
 
   it "should return String" do
