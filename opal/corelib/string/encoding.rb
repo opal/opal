@@ -162,20 +162,22 @@ end
 
 class String
   attr_reader :encoding
-  `Opal.defineProperty(String.prototype, 'encoding', #{Encoding::UTF_16LE})`
+  attr_reader :internal_encoding
+  `Opal.defineProperty(String.prototype, 'encoding', #{Encoding::UTF_8})`
+  `Opal.defineProperty(String.prototype, 'internal_encoding', #{Encoding::UTF_8})`
 
   def bytes
     each_byte.to_a
   end
 
   def bytesize
-    @encoding.bytesize(self)
+    @internal_encoding.bytesize(self)
   end
 
   def each_byte(&block)
     return enum_for :each_byte unless block_given?
 
-    @encoding.each_byte(self, &block)
+    @internal_encoding.each_byte(self, &block)
 
     self
   end
@@ -197,7 +199,7 @@ class String
   end
 
   def encode(encoding)
-    dup.force_encoding(encoding)
+    `Opal.enc(self, encoding)`
   end
 
   def force_encoding(encoding)
@@ -216,7 +218,7 @@ class String
   end
 
   def getbyte(idx)
-    @encoding.getbyte(self, idx)
+    @internal_encoding.getbyte(self, idx)
   end
 
   # stub
