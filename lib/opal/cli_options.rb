@@ -58,6 +58,13 @@ module Opal
         options[:requires] << library
       end
 
+      on('-q', '--rbrequire LIBRARY', String,
+        'Require the library in Ruby context before compiling'
+      ) do |library|
+        options[:rbrequires] ||= []
+        options[:rbrequires] << library
+      end
+
       on('-s', '--stub FILE', String, 'Stubbed files will be compiled as empty files') do |stub|
         options[:stubs] ||= []
         options[:stubs] << stub
