@@ -7,7 +7,7 @@ require 'opal/cli_runners'
 module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
-      :output, :requires, :gems, :stubs, :verbose, :runner_options,
+      :output, :requires, :rbrequires, :gems, :stubs, :verbose, :runner_options,
       :preload, :filename, :debug, :no_exit, :lib_only, :missing_require_severity
 
     class << self
@@ -37,6 +37,7 @@ module Opal
       @debug       = options.delete(:debug)      { false }
       @filename    = options.delete(:filename)   { @file && @file.path }
       @requires    = options.delete(:requires)   { [] }
+      @rbrequires  = options.delete(:rbrequires) { [] }
 
       @missing_require_severity = options.delete(:missing_require_severity) { Opal::Config.missing_require_severity }
 
@@ -79,6 +80,8 @@ module Opal
     end
 
     def create_builder
+      rbrequires.each(&Kernel.method(:require))
+
       builder = Opal::Builder.new(
         stubs: stubs,
         compiler_options: compiler_options,

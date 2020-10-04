@@ -121,6 +121,15 @@ RSpec.describe Opal::CLI do
     end
   end
 
+  describe ':rbrequires options' do
+    context 'when set' do
+      let(:options) { {:rbrequires => ["some_nonexisting_require"], :evals => [''] } }
+      it 'requires the file before compiling' do
+        expect{ subject.run }.to raise_error(LoadError)
+      end
+    end
+  end
+
   describe ':gems options' do
     context 'with a Gem name' do
       let(:dir)      { File.dirname(file) }
