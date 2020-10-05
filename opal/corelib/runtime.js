@@ -542,9 +542,20 @@
     }
 
     // If the superclass is not an Opal-generated class then we're bridging a native JS class
-    if (superclass != null && !superclass.hasOwnProperty('$$is_class')) {
-      bridged = superclass;
-      superclass = _Object;
+    if (
+      superclass != null && (!superclass.hasOwnProperty || (
+        superclass.hasOwnProperty && !superclass.hasOwnProperty('$$is_class')
+      ))
+    ) {
+      if (superclass.constructor && superclass.constructor.name == "Function") {
+        bridged = superclass;
+        superclass = _Object;
+      } else {
+        throw Opal.TypeError.$new("superclass must be a Class (" + (
+          (superclass.constructor && (superclass.constructor.name || superclass.constructor.$$name)) ||
+          typeof(superclass)
+        ) + " given)");
+      }
     }
 
     var klass = find_existing_class(scope, name);
