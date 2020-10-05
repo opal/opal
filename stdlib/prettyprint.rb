@@ -42,10 +42,13 @@ class PrettyPrint
   #     output
   #   end
   #
-  def PrettyPrint.format(output=''.dup, maxwidth=79, newline="\n", genspace=lambda {|n| ' ' * n})
+  def PrettyPrint.format(output="".dup, maxwidth=79, newline="\n", genspace=lambda {|n| ' ' * n})
+    output = [] if output == "" # Opal: Strings are immutable in Opal, so we use an array
     q = PrettyPrint.new(output, maxwidth, newline, &genspace)
     yield q
     q.flush
+    # Opal: Make a string off an array
+    output = output.join if output.respond_to? :join
     output
   end
 
@@ -56,9 +59,12 @@ class PrettyPrint
   # The invocation of +breakable+ in the block doesn't break a line and is
   # treated as just an invocation of +text+.
   #
-  def PrettyPrint.singleline_format(output=''.dup, maxwidth=nil, newline=nil, genspace=nil)
+  def PrettyPrint.singleline_format(output="".dup, maxwidth=nil, newline=nil, genspace=nil)
+    output = [] if output == "" # Opal: Strings are immutable in Opal, so we use an array
     q = SingleLine.new(output)
     yield q
+    # Opal: Make a string off an array
+    output = output.join if output.respond_to? :join
     output
   end
 
@@ -79,7 +85,8 @@ class PrettyPrint
   # The block is used to generate spaces. {|width| ' ' * width} is used if it
   # is not given.
   #
-  def initialize(output=''.dup, maxwidth=79, newline="\n", &genspace)
+  def initialize(output="".dup, maxwidth=79, newline="\n", &genspace)
+    output = [] if output == "" # Opal: Strings are immutable in Opal, so we use an array
     @output = output
     @maxwidth = maxwidth
     @newline = newline

@@ -72,11 +72,15 @@ class PP < PrettyPrint
   #
   # PP.pp returns +out+.
   def PP.pp(obj, out=$stdout, width=79)  # Opal: replace $> with $stdout
+    out = [] if out == '' # Opal: "" is immutable. We will use an array.
     q = PP.new(out, width)
     q.guard_inspect_key {q.pp obj}
     q.flush
     #$pp = q
     out << "\n"
+    # Opal: Make a string of an array
+    out = out.join if out.respond_to? :join
+    out
   end
 
   # Outputs +obj+ to +out+ like PP.pp but with no indent and
@@ -84,9 +88,12 @@ class PP < PrettyPrint
   #
   # PP.singleline_pp returns +out+.
   def PP.singleline_pp(obj, out=$stdout)  # Opal: replace $> with $stdout
+    out = [] if out == '' # Opal: "" is immutable. We will use an array.
     q = SingleLine.new(out)
     q.guard_inspect_key {q.pp obj}
     q.flush
+    # Opal: Make a string of an array
+    out = out.join if out.respond_to? :join
     out
   end
 
