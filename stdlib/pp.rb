@@ -2,7 +2,7 @@
 
 # Opal: load stdlib/thread.rb
 require 'thread'
-
+require 'stringio'
 require 'prettyprint'
 
 ##
@@ -584,7 +584,7 @@ module Kernel
   #
   # See the PP module for more information.
   def pretty_inspect
-    PP.pp(self, ''.dup)
+    PP.pp(self, StringIO.new).string
   end
 
   # prints arguments in pretty form.
