@@ -1200,10 +1200,6 @@
   // @return [Class] returns the passed Ruby class
   //
   Opal.bridge = function(native_klass, klass) {
-    if (native_klass.hasOwnProperty('$$bridge')) {
-      throw Opal.ArgumentError.$new("already bridged");
-    }
-
     // constructor is a JS function with a prototype chain like:
     // - constructor
     //   - super
@@ -1219,10 +1215,20 @@
     //         - super (window.Object)
     //           - null
     //
-    $defineProperty(native_klass, '$$bridge', klass);
-    $set_proto(native_klass.prototype, (klass.$$super || Opal.Object).$$prototype);
-    $defineProperty(klass, '$$prototype', native_klass.prototype);
+    if (!native_klass.hasOwnProperty('$$bridge')) {
+      var ourPrototype = (klass.$$super || Opal.Object).$$prototype;
+      try {
+        $set_proto(native_klass.prototype, ourPrototype);
+      } catch(error) {
+        if (Opal.is_a(error) === Opal.TypeError) {
+          throw error;
+        }
+        throw Opal.ArgumentError.$new("Can't bridge immutable prototype");
+      }
+      $defineProperty(native_klass, '$$bridge', klass);
+    }
 
+    $defineProperty(klass, '$$prototype', native_klass.prototype);
     $defineProperty(klass.$$prototype, '$$class', klass);
     $defineProperty(klass, '$$constructor', native_klass);
     $defineProperty(klass, '$$bridge', true);
