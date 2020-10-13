@@ -289,9 +289,11 @@ class String
     }
 
     function readUnicodeCharChunk(bytes) {
+      var currentByteIndex = 0;
+      var bytesLength = bytes.length;
       function readByte() {
-        var result = bytes[0];
-        bytes = bytes.slice(1, bytes.length);
+        var result = bytes[currentByteIndex++];
+        bytesLength = bytes.length - currentByteIndex;
         return result;
       }
 
@@ -299,7 +301,7 @@ class String
 
       if (c >> 7 == 0) {
         // 0xxx xxxx
-        return { chunk: [c], rest: bytes };
+        return { chunk: [c], rest: bytes.slice(currentByteIndex) };
       }
 
       if (c >> 6 == 0x02) {
@@ -325,10 +327,10 @@ class String
         #{raise 'malformed UTF-8 character'}
       }
 
-      if (extraLength > bytes.length) {
+      if (extraLength > bytesLength) {
         #{
           expected = `extraLength + 1`
-          given = `bytes.length + 1`
+          given = `bytesLength + 1`
           raise ArgumentError, "malformed UTF-8 character (expected #{expected} bytes, given #{given} bytes)"
         }
       }
@@ -348,12 +350,12 @@ class String
       }
 
       if (result <= 0xffff) {
-        return { chunk: [result], rest: bytes };
+        return { chunk: [result], rest: bytes.slice(currentByteIndex) };
       } else {
         result -= 0x10000;
         var high = ((result >> 10) & 0x3ff) + 0xd800,
             low = (result & 0x3ff) + 0xdc00;
-        return { chunk: [high, low], rest: bytes };
+        return { chunk: [high, low], rest: bytes.slice(currentByteIndex) };
       }
     }
 
