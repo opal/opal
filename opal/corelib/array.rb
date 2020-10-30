@@ -10,6 +10,29 @@ class Array < `Array`
   `Opal.defineProperty(self.$$prototype, '$$is_array', true)`
 
   %x{
+    // Recent versions of V8 (> 7.1) only use an optimized implementation when Array.prototype is unmodified.
+    // For instance, "array-splice.tq" has a "fast path" (ExtractFastJSArray, defined in "src/codegen/code-stub-assembler.cc")
+    // but it's only enabled when "IsPrototypeInitialArrayPrototype()" is true.
+    //
+    // Older versions of V8 were using relatively fast JS-with-extensions code even when Array.prototype is modified:
+    // https://github.com/v8/v8/blob/7.0.1/src/js/array.js#L599-L642
+    //
+    // In short, Array operations are slow in recent versions of V8 when the Array.prototype has been tampered.
+    // So, when possible, we are using faster open-coded version to boost the performance.
+
+    // As of V8 8.4, depending on the size of the array, this is up to ~25x times faster than Array#shift()
+    // Implementation is heavily inspired by: https://github.com/nodejs/node/blob/ba684805b6c0eded76e5cd89ee00328ac7a59365/lib/internal/util.js#L341-L347
+    function shiftNoArg(list) {
+      var r = list[0];
+      var index = 1;
+      var length = list.length;
+      for (; index < length; index++) {
+        list[index - 1] = list[index];
+      }
+      list.pop();
+      return r;
+    }
+
     function toArraySubclass(obj, klass) {
       if (klass.$$name === Opal.Array) {
         return obj;
@@ -1906,7 +1929,7 @@ class Array < `Array`
   def shift(count = undefined)
     if `count === undefined`
       return if `self.length === 0`
-      return `self.shift()`
+      return `shiftNoArg(self)`
     end
 
     count = `$coerce_to(count, #{Integer}, 'to_int')`
