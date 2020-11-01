@@ -1556,7 +1556,9 @@ class Array < `Array`
 
     return [] if `self.length === 0`
 
-    if `count > self.length`
+    if `count === 1`
+      `[self.pop()]`
+    elsif `count > self.length`
       `self.splice(0, self.length)`
     else
       `self.splice(self.length - count, self.length)`
