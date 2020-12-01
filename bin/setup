@@ -9,6 +9,6 @@ bundle update
 
 git submodule update --init
 
-npm install
+bin/yarn install
 
 bundle exec overcommit --install
