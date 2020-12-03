@@ -18,19 +18,19 @@ jobs:
       matrix:
         combo:
           - name: current-ruby
-            task: default
+            command: bin/rake
             ruby: 2.7
           - name: previous-ruby
             ruby: 2.6
           - name: older-ruby
             ruby: 2.5
           - name: lint
-            task: lint
+            command: bin/rake lint
             ruby: 2.7
           - name: timezone
             ruby: 2.7
           - name: windows
-            task: rspec mspec_nodejs minitest_nodejs minitest_node_nodejs
+            command: bundle exec rake rspec mspec_nodejs minitest_nodejs minitest_node_nodejs
             ruby: 2.7
             os: windows-latest
           # Currently failing
@@ -59,4 +59,4 @@ jobs:
           bundle install --jobs 4 --retry 3
           bundle clean
       - run: bin/setup
-      - run: bin/rake ${{ matrix.combo.task || "rspec"}}
+      - run: ${{ matrix.combo.command || 'bin/rake rspec' }}
