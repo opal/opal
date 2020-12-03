@@ -35,8 +35,12 @@ jobs:
             ruby: jruby
           - name: ruby-head
             ruby: ruby-head
+          - name: windows
+            task: rspec mspec_nodejs minitest_nodejs minitest_node_nodejs
+            ruby: 2.7
+            os: windows-latest
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.combo.os || "ubuntu-latest" }}
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
