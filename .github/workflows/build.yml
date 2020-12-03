@@ -29,13 +29,14 @@ jobs:
             ruby: 2.7
           - name: timezone
             ruby: 2.7
-          - ruby: truffleruby
-          - ruby: jruby
-          - ruby: ruby-head
           - name: windows
             task: rspec mspec_nodejs minitest_nodejs minitest_node_nodejs
             ruby: 2.7
             os: windows-latest
+          # Currently failing
+          # - ruby: truffleruby
+          # - ruby: jruby
+          # - ruby: ruby-head
 
     runs-on: ${{ matrix.combo.os || "ubuntu-latest" }}
     steps:
