@@ -12,7 +12,7 @@ on:
 
 jobs:
   rake:
-    name: ${{ matrix.combo.name }}
+    name: ${{ matrix.combo.name || matrix.combo.ruby }}
     strategy:
       fail-fast: false
       matrix:
@@ -29,12 +29,9 @@ jobs:
             ruby: 2.7
           - name: timezone
             ruby: 2.7
-          - name: truffleruby
-            ruby: truffleruby
-          - name: jruby
-            ruby: jruby
-          - name: ruby-head
-            ruby: ruby-head
+          - ruby: truffleruby
+          - ruby: jruby
+          - ruby: ruby-head
           - name: windows
             task: rspec mspec_nodejs minitest_nodejs minitest_node_nodejs
             ruby: 2.7
