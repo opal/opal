@@ -21,25 +21,19 @@ jobs:
             task: default
             ruby: 2.7
           - name: previous-ruby
-            task: rspec
             ruby: 2.6
           - name: older-ruby
-            task: rspec
             ruby: 2.5
           - name: lint
             task: lint
             ruby: 2.7
           - name: timezone
-            task: rspec TZ="/usr/share/zoneinfo/Pacific/Fiji"
             ruby: 2.7
           - name: truffleruby
-            task: rspec
             ruby: truffleruby
           - name: jruby
-            task: rspec
             ruby: jruby
           - name: ruby-head
-            task: rspec
             ruby: ruby-head
 
     runs-on: ubuntu-latest
@@ -63,4 +57,4 @@ jobs:
           bundle install --jobs 4 --retry 3
           bundle clean
       - run: bin/setup
-      - run: bin/rake ${{ matrix.combo.task }}
+      - run: bin/rake ${{ matrix.combo.task || "rspec"}}
