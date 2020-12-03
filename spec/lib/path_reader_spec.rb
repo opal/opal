@@ -5,7 +5,7 @@ RSpec.describe Opal::PathReader do
   subject(:path_reader) { described_class.new }
   let(:path) { 'opal_file' }
   let(:full_path) { File.expand_path('../fixtures/opal_file.rb', __FILE__) }
-  let(:contents) { File.read(full_path) }
+  let(:contents) { File.read(full_path, mode: "rb:UTF-8") }
 
   before do
     allow_any_instance_of(Opal::Hike::Trail).to receive(:find) {|path| nil}
