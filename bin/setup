@@ -10,5 +10,3 @@ bundle update
 git submodule update --init
 
 bin/yarn install
-
-bundle exec overcommit --install
