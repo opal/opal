@@ -18,6 +18,7 @@
   <a href="#sponsors"><img src="https://opencollective.com/opal/sponsors/badge.svg" alt="Sponsors on Open Collective" title="" /></a>
   <a href="https://gitter.im/opal/opal?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter" title="" /></a>
   <a href="https://opalrb.com/docs"><img src="https://img.shields.io/badge/docs-updated-blue.svg" alt="Documentation" title="" /></a>
+  
   <br>
   <strong>Code:</strong><br>
   <a href="https://badge.fury.io/rb/opal"><img src="https://img.shields.io/gem/v/opal.svg?style=flat" alt="Gem Version" title="" /></a>
@@ -25,6 +26,10 @@
   <a href="https://ci.appveyor.com/project/elia/opal/branch/master"><img src="https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true" alt="Build Status (Windows)" title="" /></a>
   <a href="https://codeclimate.com/github/opal/opal"><img src="https://img.shields.io/codeclimate/maintainability-percentage/opal/opal.svg" alt="Code Climate" title="" /></a>
   <a href="https://coveralls.io/github/opal/opal?branch=master"><img src="https://coveralls.io/repos/opal/opal/badge.svg?branch=master&amp;service=github" alt="Coverage Status" title="" /></a>
+  
+  <br>
+  <strong>Sponsors:</strong>
+  <br/><a href="https://nebulab.it?utm_source=github&utm_medium=badge"><img src="https://img.shields.io/static/v1?label=Nebulab&message=Open+Source+Fridays&color=%235dbefd&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMQSURBVHgBrZZNTxNRFIbfczsgIMQiLBCRFDaGhUr9A9iiIa5EEneIwE/AlRsNv8KlIKwFl35RTUBX8rFBdiVKAgqmXSCY0M71nJl+zJTOdKh9k6Yzc8/cZ86555x7CQE0mji5hSyGlQoNaOgIPwrnhtIArWszu4EQFudjdR8rzUV+gw8/ZMZB9IwvIwimJJGafhmjWZwFOJ7QkYzWCwTdj+qUDJGKz8Rou3RAlT4YS+hHWW2u/QdM1MNzrI6+zwyXDrg8FANStIDaSXOIJ5whLgAljOIZiglRK6U4vDfz4S2ElGGJWsEaQkCTUbhtNbV+lb+xgFY2Bs9ET0h/GzBxlfAkqnCUKY5xKfVLbsi1/R126lcF6WgCYp2ES42EBp6tvQFY+alLTUlrUxizJEVNWiVwBkVagGg7oe+CDclLYOfrgMdfTBz8PfWa1lkzbsDEsH/5FyF9YUK0zQ1xwpoZtsm9pwxMRLyA9wyi0A2Jcjl1NNqeeEFEimxYPkmWd014ikIDnDTeBb53DOweaRxnvWGyhnmYfPZWGt487sNi6lsK67/lZ1oZGOtUaD3nhtU7etXXfe0VzrzCBgLKCR68rNDX6oaJlvd0xXnklbSfgSTL/QghXF8EP980cVKyVL/Ys9UDVFJa8Tdt+1lYmcmJM3Vd4UEvWeslRf32h9ubrVRl77gBrCto85OfUU+LXTMGx+JuN2Hoin3/Zkfjj6ObBAknV+KG4jpc9BqXMEpiCMz6Z9ZQ12kvJZxb6co4Zr1W83esY8F2OYsIe+eEyfTiVXczCl7uM2wliHfMEJaRc3Wa++mLUotrF4EW7h6f94Dvh6aVFM60Fy8Xkya+BfBOjh5yUWhqY0vmKi9q1GnVxZ7sHKIWSs7FQ71yUagkRTTCfymnVY1gsgHHC5z8hbUjaz0Fr8ZanXhX0pPOw5SrV8wNGjNscMrTKpXKaj05f9twVYHnMZGPHEuwTwEBNi+3NGiNt6GRcsfEIAfhp2cAV3cQLtXoOz7q8+ZJRLx3kmxn4dy7aas1SrfiBpKraV/9A+PSJLDAXLUvAAAAAElFTkSuQmCC"></a>
 </p>
 
 ## Usage
@@ -222,6 +227,8 @@ Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com
 
 ## Sponsors
 
+### Donations
+
 Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/opal#sponsor)]
 
 <a href="https://opencollective.com/opal/sponsor/0/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/0/avatar.svg"></a>
@@ -234,6 +241,10 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/opal/sponsor/7/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/opal/sponsor/8/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/opal/sponsor/9/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/9/avatar.svg"></a>
+
+### Sponsored Contributions
+
+<a href="https://nebulab.it/?utm_source=github&utm_medium=sponsors" target="_blank"><img src="https://nebulab.it/assets/images/logo-586625a4.svg"></a>
 
 
 ## License
