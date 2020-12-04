@@ -1,0 +1,73 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+      - "*-stable"
+      - "*/ci-check"
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  rake:
+    name: ${{ matrix.combo.name || matrix.combo.ruby }}
+    strategy:
+      fail-fast: false
+      matrix:
+        combo:
+          - name: current-ruby
+            command: bin/rake
+            ruby: 2.7
+          - name: previous-ruby
+            ruby: 2.6
+          - name: older-ruby
+            ruby: 2.5
+          - name: windows
+            # These two fail because of broken stacktraces on windows: minitest_node_nodejs mspec_nodejs
+            command: bundle exec rake rspec minitest_nodejs
+            ruby: 2.7
+            os: windows-latest
+          - name: lint
+            command: bin/rake lint
+            ruby: 2.7
+          - name: timezone
+            ruby: 2.7
+
+          # Currently failing:
+          # - ruby: truffleruby
+          # - ruby: jruby
+          # - ruby: ruby-head
+
+    runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.combo.ruby }}
+      - run: ruby bin/git-submodule-fast-install
+      - run: bundle lock
+      - uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-${{ github.ref }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-${{ github.ref }}
+            ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-master
+            ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-
+      - uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ github.ref }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-${{ github.ref }}
+            ${{ runner.os }}-gems-master
+            ${{ runner.os }}-gems-
+      - run: yarn install
+      - name: bundle install
+        run: |
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+          bundle clean
+      - run: ${{ matrix.combo.command || 'bin/rake rspec' }}
