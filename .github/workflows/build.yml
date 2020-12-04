@@ -49,11 +49,11 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-${{ matrix.combo.ruby }}}-gems-${{ github.ref }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-${{ github.ref }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.combo.ruby }}}-gems-${{ github.ref }}
-            ${{ runner.os }}-${{ matrix.combo.ruby }}}-gems-master
-            ${{ runner.os }}-${{ matrix.combo.ruby }}}-gems-
+            ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-${{ github.ref }}
+            ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-master
+            ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-
       - uses: actions/cache@v2
         with:
           path: node_modules
