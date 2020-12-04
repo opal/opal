@@ -22,8 +22,8 @@
   <br>
   <strong>Code:</strong><br>
   <a href="https://badge.fury.io/rb/opal"><img src="https://img.shields.io/gem/v/opal.svg?style=flat" alt="Gem Version" title="" /></a>
-  <a href="https://travis-ci.org/opal/opal"><img src="https://img.shields.io/travis/opal/opal/master.svg?style=flat" alt="Build Status (Linux)" title="" /></a>
-  <a href="https://ci.appveyor.com/project/elia/opal/branch/master"><img src="https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true" alt="Build Status (Windows)" title="" /></a>
+  
+  <a href="https://actions-badge.atrox.dev/opal/opal/goto?ref=master"><img alt="Build Status" src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fopal%2Fopal%2Fbadge%3Fref%3Dmaster&style=flat" /></a>
   <a href="https://codeclimate.com/github/opal/opal"><img src="https://img.shields.io/codeclimate/maintainability-percentage/opal/opal.svg" alt="Code Climate" title="" /></a>
   <a href="https://coveralls.io/github/opal/opal?branch=master"><img src="https://coveralls.io/repos/opal/opal/badge.svg?branch=master&amp;service=github" alt="Coverage Status" title="" /></a>
   
