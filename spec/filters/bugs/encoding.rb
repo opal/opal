@@ -1,11 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Encoding" do
-  fails "#String#bytesize returns the length of self in bytes" # Expected 10 to equal 5
-  fails "#String#bytesize works with pseudo-ASCII strings containing UTF-8 characters" # Expected 6 to equal 5
-  fails "#String#bytesize works with pseudo-ASCII strings containing single UTF-8 characters" # Expected 2 to equal 3
-  fails "#String#bytesize works with strings containing UTF-8 characters" # Expected 6 to equal 5
-  fails "#String#bytesize works with strings containing single UTF-8 characters" # Expected 2 to equal 3
-  fails "Date#strftime passes the format string's encoding to the result string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "File.basename returns basename windows forward slash" # Expected "C:" to equal "/"
   fails "File.basename returns basename windows unc" # Expected "\\\\foo\\bar\\baz.txt" to equal "baz.txt"
   fails "File.basename returns basename with windows suffix" # Expected "c:\\bar" to equal "bar"
@@ -33,7 +27,6 @@ opal_filter "Encoding" do
   fails "Integer#to_s fixnum when given a base raises an ArgumentError if the base is less than 2 or higher than 36" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Integer#to_s fixnum when given a base returns self converted to a String in the given base" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Integer#to_s fixnum when no base given returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Kernel#sprintf returns a String in the argument encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "Kernel#sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "Marshal.dump when passed an IO calls binmode when it's defined" # ArgumentError: [Marshal.dump] wrong number of arguments(2 for 1)
   fails "Marshal.dump with a String dumps a String in another encoding" # Expected "\u0004\b\"\u000Fm\u0000ö\u0000h\u0000r\u0000e\u0000" to equal "\u0004\bI\"\u000Fm\u0000ö\u0000h\u0000r\u0000e\u0000\u0006:\rencoding\"\rUTF-16LE"
@@ -76,7 +69,6 @@ opal_filter "Encoding" do
   fails "Source files encoded in UTF-8 without a BOM can be parsed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x7a11e>
   fails "String#% output's encoding negotiates a compatible encoding if necessary" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#* raises an ArgumentError if the length of the resulting string doesn't fit into a long" # RangeError: multiply count must not overflow maximum string size
-  fails "String#* returns a String in the same encoding as self" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "String#[]= with Fixnum index calls #to_int to convert the index" # Mock 'string element set' expected to receive 'to_int' exactly 1 times but received it 0 times
   fails "String#[]= with Fixnum index encodes the String in an encoding compatible with the replacement" # NoMethodError: undefined method `pack' for [160]:Array
   fails "String#[]= with Fixnum index raises a TypeError if #to_int does not return an Fixnum" # Mock 'string element set' expected to receive 'to_int' exactly 1 times but received it 0 times
@@ -209,8 +201,6 @@ opal_filter "Encoding" do
   fails "String#encoding for Strings with \\u escapes is not affected by the default external encoding" # NameError: uninitialized constant Encoding::SHIFT_JIS
   fails "String#encoding for Strings with \\u escapes is not affected by the default internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encoding for Strings with \\u escapes returns US-ASCII if self is US-ASCII only" # Expected false to be true
-  fails "String#encoding for Strings with \\u escapes returns UTF-8 if self isn't US-ASCII only" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "String#encoding for Strings with \\u escapes returns UTF-8" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "String#encoding for Strings with \\u escapes returns the given encoding if #encode!has been called" # NameError: uninitialized constant Encoding::SHIFT_JIS
   fails "String#encoding for Strings with \\u escapes returns the given encoding if #force_encoding has been called" # NameError: uninitialized constant Encoding::SHIFT_JIS
   fails "String#encoding for Strings with \\x escapes is not affected by both the default internal and external encoding being set at the same time" # NoMethodError: undefined method `default_internal' for Encoding
@@ -226,7 +216,6 @@ opal_filter "Encoding" do
   fails "String#encoding for US-ASCII Strings returns US-ASCII if self is US-ASCII only, despite the default internal and external encodings being different" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encoding for US-ASCII Strings returns US-ASCII if self is US-ASCII only, despite the default internal encoding being different" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encoding for US-ASCII Strings returns US-ASCII if self is US-ASCII" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "String#encoding is equal to the source encoding by default" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "String#encoding returns an Encoding object" # Expected #<Encoding:UTF-16LE> (#<Class:0xc2>) to be an instance of Encoding
   fails "String#encoding returns the given encoding if #encode!has been called" # NameError: uninitialized constant Encoding::SHIFT_JIS
   fails "String#encoding returns the given encoding if #force_encoding has been called" # NameError: uninitialized constant Encoding::SHIFT_JIS
@@ -257,12 +246,6 @@ opal_filter "Encoding" do
   fails "String#size returns the length of a string in different encodings" # NameError: uninitialized constant Encoding::UTF_32BE
   fails "String#size returns the length of the new self after encoding is changed" # Expected 4 to equal 12
   fails "String#split with String throws an ArgumentError if the pattern is not a valid string" # NotImplementedError: String#chop! not supported. Mutable String methods are not supported in Opal.
-  fails "String#tr can replace a 7-bit ASCII character with a multibyte one" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "String#tr can replace a multibyte character with a single byte one" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "String#tr_s can replace a 7-bit ASCII character with a multibyte one" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "String#tr_s can replace a multibyte character with a single byte one" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "String#tr_s can replace multiple 7-bit ASCII characters with a multibyte one" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "String#tr_s can replace multiple multibyte characters with a single byte one" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "String#valid_encoding? returns false if a valid String had an invalid character appended to it" # NoMethodError: undefined method `pack' for [221]:Array
   fails "String#valid_encoding? returns false if self contains a character invalid in the associated encoding" # NoMethodError: undefined method `pack' for [128]:Array
   fails "String#valid_encoding? returns false if self is valid in one encoding, but invalid in the one it's tagged with" # Expected true to be false

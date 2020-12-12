@@ -43,7 +43,6 @@ opal_filter "String" do
   fails "String#% precision string formats determines the maximum number of characters to be copied from the string" # Expected "1" to equal "["
   fails "String#% raises Encoding::CompatibilityError if both encodings are ASCII compatible and there ano not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
   fails "String#% raises an error if single % appears at the end" # Expected ArgumentError but no exception was raised ("%" was returned)
-  fails "String#% returns a String in the argument's encoding if format encoding is more restrictive" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:UTF-8>
   fails "String#% returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "String#% supports inspect formats using %p" # Expected "{\"capture\"=>1}" to equal "{:capture=>1}"
   fails "String#% width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
@@ -161,10 +160,10 @@ opal_filter "String" do
   fails "String#grapheme_clusters works with multibyte characters" # NoMethodError: undefined method `grapheme_clusters' for "覇"
   fails "String#include? with String raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#inspect when the string's encoding is different than the result's encoding and the string's encoding is ASCII-compatible but the characters are non-ASCII returns a string with the non-ASCII characters replaced by \\x notation" # ArgumentError: unknown encoding name - EUC-JP
+  fails "String#intern returns a UTF-16LE Symbol for a UTF-16LE String containing non US-ASCII characters" # Error
   fails "String#intern raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
   fails "String#intern returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#intern returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "String#intern returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "String#intern returns a binary Symbol for a binary String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#lines when `chomp` keyword argument is passed ignores new line characters when separator is specified" # ArgumentError: [String#lines] wrong number of arguments(2 for -1)
   fails "String#lines when `chomp` keyword argument is passed removes new line characters when separator is not specified" # TypeError: no implicit conversion of Hash into String
@@ -188,10 +187,10 @@ opal_filter "String" do
   fails "String#swapcase full Unicode case mapping updates string metadata" # Expected "aßET" to equal "aSSET"
   fails "String#swapcase full Unicode case mapping works for all of Unicode with no option" # Expected "äÖü" to equal "ÄöÜ"
   fails "String#swapcase works for all of Unicode" # Expected "äÖü" to equal "ÄöÜ"
+  fails "String#to_sym returns a UTF-16LE Symbol for a UTF-16LE String containing non US-ASCII characters" # ERROR
   fails "String#to_sym raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
   fails "String#to_sym returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#to_sym returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "String#to_sym returns a UTF-8 Symbol for a UTF-8 String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "String#to_sym returns a binary Symbol for a binary String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#undump Limitations cannot undump non ASCII-compatible string" # NoMethodError: undefined method `undump' for "\"foo\""
   fails "String#undump always returns String instance" # NoMethodError: undefined method `undump' for "\"foo\""
