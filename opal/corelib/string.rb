@@ -551,7 +551,7 @@ class String < `String`
         }
 
         if (pattern.lastIndex === match.index) {
-          result += (_replacement + self.slice(index, match.index + 1))
+          result += (self.slice(index, match.index) + _replacement + (self[match.index] || ""));
           pattern.lastIndex += 1;
         }
         else {
