@@ -58,7 +58,6 @@ opal_filter "String" do
   fails "String#[] with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
   fails "String#ascii_only? with non-ASCII only characters returns false if the encoding is BINARY" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "String#bytes agrees with #unpack('C*')" # Expected [113, 103, 172, 78, 84, 0, 111, 0, 107, 0, 121, 0, 111, 0] to equal [230, 157, 177, 228, 186, 172, 84, 111, 107, 121, 111]
   fails "String#bytes yields each byte to a block if one is given, returning self" # Expected [113, 103, 172, 78] to equal "東京"
   fails "String#byteslice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
@@ -110,9 +109,7 @@ opal_filter "String" do
   fails "String#dup calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#dup does not copy constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
-  fails "String#each_byte passes each byte in self to the given block" # Expected [104, 0, 101, 0, 108, 0, 108, 0, 111, 0, 0, 0] to equal [104, 101, 108, 108, 111, 0]
   fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string" # Expected nil to equal 10
-  fails "String#each_byte when no block is given returns an enumerator" # Expected [104, 0, 101, 0, 108, 0, 108, 0, 111, 0] to equal [104, 101, 108, 108, 111]
   fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimizable" # Expected [40, 41, 123, 125] to equal [40, 0, 41, 0, 123, 0, 125, 0]
   fails "String#each_grapheme_cluster is unicode aware" # NoMethodError: undefined method `each_grapheme_cluster' for "Ç∂éƒg"
   fails "String#each_grapheme_cluster passes each char in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
