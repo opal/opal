@@ -110,7 +110,6 @@ opal_filter "Encoding" do
   fails "String#ascii_only? with non-ASCII only characters returns false if the encoding is ASCII-8BIT" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#b copies own tainted/untrusted status to the returning value" # NoMethodError: undefined method `untrust' for "こんちには":String
   fails "String#b returns new string without modifying self" # NoMethodError: undefined method `b' for "こんちには":String
-  fails "String#bytes agrees with #getbyte" # NotImplementedError: NotImplementedError
   fails "String#byteslice on on non ASCII strings returns byteslice of unicode strings" # Expected nil to equal "\u0081"
   fails "String#center with length, padding with width returns a String in the same encoding as the original" # NameError: uninitialized constant Encoding::IBM437
   fails "String#center with length, padding with width, pattern raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP

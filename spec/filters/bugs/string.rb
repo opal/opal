@@ -202,16 +202,8 @@ opal_filter "String" do
   fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to ASCII-8BIT if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to BINARY if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#getbyte counts from the end of the String if given a negative argument" # NotImplementedError: NotImplementedError
   fails "String#getbyte interprets bytes relative to the String's encoding" # NotImplementedError: NotImplementedError
-  fails "String#getbyte mirrors the output of #bytes" # NotImplementedError: NotImplementedError
-  fails "String#getbyte raises a TypeError unless its argument can be coerced into an Integer" # NotImplementedError: NotImplementedError
-  fails "String#getbyte regards a multi-byte character as having multiple bytes" # Expected 2 to equal 3
-  fails "String#getbyte regards the empty String as containing no bytes" # NotImplementedError: NotImplementedError
   fails "String#getbyte returns an Integer between 0 and 255" # NotImplementedError: NotImplementedError
-  fails "String#getbyte returns an Integer if given a valid index" # NotImplementedError: NotImplementedError
-  fails "String#getbyte returns nil for out-of-bound indexes" # NotImplementedError: NotImplementedError
-  fails "String#getbyte starts indexing at 0" # NotImplementedError: NotImplementedError
   fails "String#grapheme_clusters is unicode aware" # NoMethodError: undefined method `grapheme_clusters' for "Ç∂éƒg"
   fails "String#grapheme_clusters passes each char in self to the given block" # NoMethodError: undefined method `grapheme_clusters' for "hello"
   fails "String#grapheme_clusters passes each grapheme cluster in self to the given block" # NoMethodError: undefined method `grapheme_clusters' for "ab🏳️\u200D🌈🐾"

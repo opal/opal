@@ -15,15 +15,8 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.0.4...HEAD) - unreleased
+## [Unreleased](https://github.com/opal/opal/compare/v1.0.5...HEAD) - unreleased
 
-
-<!--
-Whitespace conventions:
-- 4 spaces before ## titles
-- 2 spaces before ### titles
-- 1 spaces before normal text
--->
 
 ### Added
 
@@ -41,7 +34,8 @@ Whitespace conventions:
 - Source-map support for Node.js in the default runner ([#2045](https://github.com/opal/opal/pull/2045))
 - SecureRandom#hex(n) ([#2050](https://github.com/opal/opal/pull/2050))
 - Added a generic implementation of Kernel#caller and #warn(uplevel:) that works with sourcemaps in Node.js and Chrome ([#2065](https://github.com/opal/opal/pull/2065))
-
+- Added support for numblocks `-> { _1 + _2 }.call(3, 4) # => 7` ([#2149](https://github.com/opal/opal/pull/2149))
+- Support `<internal:…>` and `<js:…>` in stacktraces, like MRI we now distinguish internal lines from lib/app lines ([#2154](https://github.com/opal/opal/pull/2154))
 
 ### Fixed
 
@@ -67,6 +61,7 @@ Whitespace conventions:
 - Range#== ([#1992](https://github.com/opal/opal/pull/1992))
 - Range#each ([#1991](https://github.com/opal/opal/pull/1991))
 - Enumerable#zip ([#1986](https://github.com/opal/opal/pull/1986))
+- String#getbyte ([#2141](https://github.com/opal/opal/pull/2141))
 - Struct#dup not copying `$$data` ([#1995](https://github.com/opal/opal/pull/1995))
 - Fixed usage of semicolon in single-line backticks ([#2004](https://github.com/opal/opal/pull/2004))
 - Module#attr with multiple arguments ([#2003](https://github.com/opal/opal/pull/2003))
@@ -76,7 +71,7 @@ Whitespace conventions:
 - Fix Regexp interpolation, previously interpolating with other regexps was broken ([#2062](https://github.com/opal/opal/pull/2062))
 - Set match on StringScanner#skip and StringScanner#scan_until ([#2061](https://github.com/opal/opal/pull/2061))
 - Fix ruby 2.7 warnings ([#2071](https://github.com/opal/opal/pull/2071))
-
+- Improve the --help descriptions ([#2146](https://github.com/opal/opal/pull/2146))
 
 ### Changed
 
@@ -88,8 +83,9 @@ Whitespace conventions:
 - Moved REPL implementation from bin/ to its own lib/ file as `opal/repl.rb` ([#2048](https://github.com/opal/opal/pull/2048))
 - `Encoding.default_external` is now initialized with `__ENCODING__` ([#2072](https://github.com/opal/opal/pull/2072))
 - Keep the MersenneTwister implementation private ([#2108](https://github.com/opal/opal/pull/2108))
-
-
+- Change parser to 3.0 ([#2148](https://github.com/opal/opal/pull/2148))
+- Fix forwarding a rescued error to a global var: `rescue => $gvar` ([#2154](https://github.com/opal/opal/pull/2154))
+- Now using Parser v3.0 and targeting Ruby 3.0 ([#2156](https://github.com/opal/opal/pull/2156))
 
 ### Deprecated
 
@@ -97,10 +93,20 @@ Whitespace conventions:
   supported by the default Node.js runner or by requiring https://github.com/evanw/node-source-map-support
   before loading code compiled by Opal ([#2045](https://github.com/opal/opal/pull/2045))
 
-
 ### Removed
 
 - Removed special compilation for the `Opal.truthy?` and `Opal.falsy?` helpers ([#2076](https://github.com/opal/opal/pull/2076))
+
+
+
+
+## [1.0.5](https://github.com/opal/opal/compare/v1.0.4...v1.0.5) - 2020-12-23
+
+
+### Fixed
+
+- [Backported] Add --rbrequire (-q) option to opal cmdline tool ([#2120](https://github.com/opal/opal/pull/2120))
+- Improve the --help descriptions ([#2146](https://github.com/opal/opal/pull/2146))
 
 
 
