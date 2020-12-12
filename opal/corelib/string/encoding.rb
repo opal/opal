@@ -71,6 +71,7 @@ end
 Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
   def each_byte(string, &block)
     %x{
+      // Taken from: https://github.com/feross/buffer/blob/f52dffd9df0445b93c0c9065c2f8f0f46b2c729a/index.js#L1954-L2032
       var units = Infinity
       var codePoint
       var length = string.length
