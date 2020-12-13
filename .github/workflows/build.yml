@@ -17,8 +17,13 @@ jobs:
       fail-fast: false
       matrix:
         combo:
+          - name: mspec
+            ruby: 2.7
+            command: bin/rake mspec
+          - name: minitest
+            ruby: 2.7
+            command: bin/rake minitest
           - name: current-ruby
-            command: bin/rake
             ruby: 2.7
           - name: previous-ruby
             ruby: 2.6
