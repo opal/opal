@@ -15,7 +15,7 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.0.2...HEAD) - unreleased
+## [Unreleased](https://github.com/opal/opal/compare/v1.0.4...HEAD) - unreleased
 
 
 <!--
@@ -29,10 +29,26 @@ Whitespace conventions:
 
 - Basic support for `uplevel:` keyword argument in `Kernel#warn` ([#2006](https://github.com/opal/opal/pull/2006))
 - Added a `#respond_to_missing?` implementation for `BasicObject`, `Delegator`, `OpenStruct`, that's meant for future support in the Opal runtime, which currently ignores it ([#2007](https://github.com/opal/opal/pull/2007))
+- `Opal::Compiler#magic_comments` that allows to access magic-comments format and converts it to a hash ([#2038](https://github.com/opal/opal/pull/2038))
+- Use magic-comments to declare helpers required by the file ([#2038](https://github.com/opal/opal/pull/2038))
+- `Opal.$$` is now a shortcut for `Opal.const_get_relative` ([#2038](https://github.com/opal/opal/pull/2038))
+- `Opal.$$$` is now a shortcut for `Opal.const_get_qualified` ([#2038](https://github.com/opal/opal/pull/2038))
+- Added support for `globalThis` as the generic global object accessor ([#2047](https://github.com/opal/opal/pull/2047))
 - `Opal::Compiler#magic_comments` that allows to access magic-comments format and converts it to a hash
+- Use magic-comments to declare helpers required by the file
+- `Opal.$$` is now a shortcut for `Opal.const_get_relative`
+- `Opal.$$$` is now a shortcut for `Opal.const_get_qualified`
+- Source-map support for Node.js in the default runner ([#2045](https://github.com/opal/opal/pull/2045))
+- SecureRandom#hex(n) ([#2050](https://github.com/opal/opal/pull/2050))
+- Added a generic implementation of Kernel#caller and #warn(uplevel:) that works with sourcemaps in Node.js and Chrome ([#2065](https://github.com/opal/opal/pull/2065))
+
 
 ### Fixed
 
+- Array#delete_if ([#2069](https://github.com/opal/opal/pull/2069))
+- Array#keep_if ([#2069](https://github.com/opal/opal/pull/2069))
+- Array#reject! ([#2069](https://github.com/opal/opal/pull/2069))
+- Array#select! ([#2069](https://github.com/opal/opal/pull/2069))
 - Struct#dup ([#1995](https://github.com/opal/opal/pull/1995))
 - Integer#gcdlcm ([#1972](https://github.com/opal/opal/pull/1972))
 - Enumerable#to_h ([#1979](https://github.com/opal/opal/pull/1979))
@@ -54,7 +70,12 @@ Whitespace conventions:
 - Struct#dup not copying `$$data` ([#1995](https://github.com/opal/opal/pull/1995))
 - Fixed usage of semicolon in single-line backticks ([#2004](https://github.com/opal/opal/pull/2004))
 - Module#attr with multiple arguments ([#2003](https://github.com/opal/opal/pull/2003))
+- `PathReader` used to try to read missing files instead of respecting the `missing_require_severity` configuration value ([#2044](https://github.com/opal/opal/pull/2044))
+- Removed some unused variables from the runtime ([#2052](https://github.com/opal/opal/pull/2052))
+- Fixed a typo in the runtime ([#2054](https://github.com/opal/opal/pull/2054))
+- Fix Regexp interpolation, previously interpolating with other regexps was broken ([#2062](https://github.com/opal/opal/pull/2062))
 - Set match on StringScanner#skip and StringScanner#scan_until ([#2061](https://github.com/opal/opal/pull/2061))
+- Fix ruby 2.7 warnings ([#2071](https://github.com/opal/opal/pull/2071))
 
 
 ### Changed
@@ -63,7 +84,44 @@ Whitespace conventions:
 - Nashorn has been deprecated but GraalVM still supports it ([#1997](https://github.com/opal/opal/pull/1997))
 - "opal/mini" now includes "opal/io" ([#2002](https://github.com/opal/opal/pull/2002))
 - Regexps assigned to constants are now frozen ([#2007](https://github.com/opal/opal/pull/2007))
-- Improve `Array#shift` performance on v8 > 7.1 using a faster open-coded version ([#2115](https://github.com/opal/opal/pull/2115))
+- `Opal.$$` changed from being the constant cache of Object to being a shortcut for `Opal.const_get_relative` ([#2038](https://github.com/opal/opal/pull/2038))
+- Moved REPL implementation from bin/ to its own lib/ file as `opal/repl.rb` ([#2048](https://github.com/opal/opal/pull/2048))
+- `Encoding.default_external` is now initialized with `__ENCODING__` ([#2072](https://github.com/opal/opal/pull/2072))
+- Keep the MersenneTwister implementation private ([#2108](https://github.com/opal/opal/pull/2108))
+
+
+
+### Deprecated
+
+- Requiring nodejs/stacktrace has been deprecated, source-maps are already
+  supported by the default Node.js runner or by requiring https://github.com/evanw/node-source-map-support
+  before loading code compiled by Opal ([#2045](https://github.com/opal/opal/pull/2045))
+
+
+### Removed
+
+- Removed special compilation for the `Opal.truthy?` and `Opal.falsy?` helpers ([#2076](https://github.com/opal/opal/pull/2076))
+
+
+
+
+## [1.0.4](https://github.com/opal/opal/compare/v1.0.3...v1.0.4) - 2020-12-13
+
+
+### Fixed
+
+- [Backported] Using the `--map` / `-P` CLI option was only working in conjunction with other options ([#1974](https://github.com/opal/opal/pull/1974))
+
+
+
+
+## [1.0.3](https://github.com/opal/opal/compare/v1.0.2...v1.0.3) - 2020-02-01
+
+
+### Fixed
+
+- Fixed compiling code with Unicode chars from Opal with opal-parser ([#2074](https://github.com/opal/opal/pull/2074))
+
 
 
 
