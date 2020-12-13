@@ -14,7 +14,7 @@ task :jshint do
     # opal-builder and opal-parser take so long travis stalls
     next if path =~ /.min.js\z|opal-builder|opal-parser/
 
-    sh "jshint --verbose #{path}"
+    sh "yarn -s run jshint --verbose #{path}"
   }
   puts
   puts "= Checking corelib files separately..."
@@ -26,16 +26,14 @@ task :jshint do
     js_paths << js_path
   end
   js_paths.each do |js_path|
-    sh "jshint --verbose #{js_path}"
+    sh "yarn -s run jshint --verbose #{js_path}"
   end
-  sh "jshint --verbose opal/corelib/runtime.js"
+  sh 'yarn -s run jshint --verbose opal/corelib/runtime.js'
 end
 
 require 'rubocop/rake_task'
 desc 'Run RuboCop on lib/, opal/ and stdlib/ directories'
 RuboCop::RakeTask.new(:rubocop) do |task|
-  # TODO: enable it back after releasing https://github.com/bbatsov/rubocop/pull/5633
-  # task.options << '--fail-fast'
   task.options << '--extra-details'
   task.options << '--display-style-guide'
   task.options << '--parallel'
