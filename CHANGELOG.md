@@ -15,10 +15,12 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.0.3...HEAD) - unreleased
+## [1.0.4](https://github.com/opal/opal/compare/v1.0.3...1.0.4) - 2020-12-13
 
 
+### Fixed
 
+- [Backported] Using the `--map` / `-P` CLI option was only working in conjunction with other options ([#1974](https://github.com/opal/opal/pull/1974))
 
 
 
