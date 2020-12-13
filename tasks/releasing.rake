@@ -70,8 +70,8 @@ task :changelog do
   end
 
   changelog_entries.unshift changelog_entry.call(
-    tag_name: 'HEAD',
-    release_date: 'unreleased',
+    tag_name: ENV['VERSION'] || 'HEAD',
+    release_date: (ENV['VERSION'] ? Time.now.to_date.iso8601 : 'unreleased'),
     previous_tag_name: previous_tag_name,
     body: File.read(unreleased_path),
   )
