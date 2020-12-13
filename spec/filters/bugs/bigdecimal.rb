@@ -312,8 +312,10 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_f rounds correctly to Float precision" # Exception: bigdec.$to_f is not a function
   fails "BigDecimal#to_i raises FloatDomainError if BigDecimal is infinity or NaN"
   fails "BigDecimal#to_i returns Integer or Bignum otherwise"
+  fails "BigDecimal#to_i returns Integer otherwise" # NoMethodError: undefined method `to_i' for 3e-20001
   fails "BigDecimal#to_int raises FloatDomainError if BigDecimal is infinity or NaN"
   fails "BigDecimal#to_int returns Integer or Bignum otherwise"
+  fails "BigDecimal#to_int returns Integer otherwise" # NoMethodError: undefined method `to_i' for 3e-20001
   fails "BigDecimal#to_r returns a Rational with bignum values" # NoMethodError: undefined method `to_r' for 3.141592653589793238462643
   fails "BigDecimal#to_r returns a Rational" # NoMethodError: undefined method `to_r' for 3.14159
   fails "BigDecimal#to_s can return a leading space for values > 0"
@@ -356,6 +358,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.new treats invalid strings as 0.0"
   fails "BigDecimal.ver returns the Version number"
   fails "Float#to_d returns appropriate BigDecimal zero for signed zero" # NoMethodError: undefined method `to_d' for 0
+  fails "Kernel#BigDecimal BigDecimal(Rational) with bigger-than-double numerator" # Expected 1000000000000000000 > 18446744073709552000 to be truthy but was false
   fails "Kernel#BigDecimal accepts NaN and [+-]Infinity as Float values works with an explicit precision" # Exception: self.$BigDecimal(...).$nan? is not a function
   fails "Kernel#BigDecimal accepts NaN and [+-]Infinity as Float values works without an explicit precision" # Exception: self.$BigDecimal(...).$nan? is not a function
   fails "Kernel#BigDecimal accepts NaN and [+-]Infinity" # Exception: self.$BigDecimal(...).$nan? is not a function
@@ -364,11 +367,28 @@ opal_filter "BigDecimal" do
   fails "Kernel#BigDecimal allows for underscores in all parts" # Exception: new BigNumber() not a number: 12_345.67E89
   fails "Kernel#BigDecimal allows for varying signs" # Exception: self.$BigDecimal(...).$should is not a function
   fails "Kernel#BigDecimal allows omitting the integer part" # Exception: self.$BigDecimal(...).$should is not a function
+  fails "Kernel#BigDecimal coerces the value argument with #to_str" # Exception: new BigNumber() not a number: #<MockObject:0x666>
   fails "Kernel#BigDecimal creates a new object of class BigDecimal" # Expected 1 to equal (1/1)
   fails "Kernel#BigDecimal determines precision from initial value" # NoMethodError: undefined method `precs' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
+  fails "Kernel#BigDecimal does not call to_s when calling inspect" # Expected "44.44" == "0.4444e2" to be truthy but was false
   fails "Kernel#BigDecimal ignores leading whitespace" # Exception: self.$BigDecimal(...).$should is not a function
   fails "Kernel#BigDecimal ignores trailing garbage" # Exception: new BigNumber() not a number: 123E45ruby
+  fails "Kernel#BigDecimal pre-coerces long integers" # Expected 262000 == 1130000000000000 to be truthy but was false
   fails "Kernel#BigDecimal raises ArgumentError for invalid strings" # Exception: new BigNumber() not a number: ruby
   fails "Kernel#BigDecimal raises ArgumentError when Float is used without precision" # Expected ArgumentError but no exception was raised (1 was returned)
   fails "Kernel#BigDecimal returns appropriate BigDecimal zero for signed zero" # Exception: self.$BigDecimal(...).$sign is not a function
+  fails "Kernel#BigDecimal when interacting with Rational BigDecimal maximum precision is nine more than precision except for abnormals" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational BigDecimal precision is the number of digits rounded up to a multiple of nine" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational BigDecimal(Rational, 18) produces the result we expect" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational BigDecimal(Rational, BigDecimal.precs[0]) produces the result we expect" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational has the LHS print as expected" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational has the RHS print as expected" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational has the expected maximum precision on the LHS" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational has the expected precision on the LHS" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational produces a BigDecimal" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational produces the correct class for other arithmetic operators" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational produces the expected result when done via Float" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational produces the expected result when done via to_f" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal when interacting with Rational produces the expected result" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#Pathname is a private instance method" # Expected Kernel to have private instance method 'Pathname' but it does not
 end

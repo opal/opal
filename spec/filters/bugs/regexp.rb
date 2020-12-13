@@ -1,6 +1,9 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "regular_expressions" do
   fails "MatchData#inspect returns a human readable representation of named captures" # Exception: named captures are not supported in javascript: "(?<first>\w+)\s+(?<last>\w+)\s+(\w+)"
+  fails "MatchData#regexp returns a Regexp for the result of gsub(String)" # Expected /\[/gm == /\[/ to be truthy but was false
+  fails "MatchData#string returns a frozen copy of the matched string for gsub(String)" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
+  fails "Regexp#encoding allows otherwise invalid characters if NOENCODING is specified" # NameError: uninitialized constant Regexp::NOENCODING
   fails "Regexp#encoding defaults to US-ASCII if the Regexp contains only US-ASCII character"
   fails "Regexp#encoding defaults to UTF-8 if \\u escapes appear"
   fails "Regexp#encoding defaults to UTF-8 if a literal UTF-8 character appears"
@@ -49,6 +52,7 @@ opal_filter "regular_expressions" do
   fails "Regexp#to_s shows the pattern after the options"
   fails "Regexp.compile given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/ but got: ""
   fails "Regexp.compile given a String accepts a Fixnum of two or more options ORed together as the second argument" # Expected 0 not to equal 0
+  fails "Regexp.compile given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.compile given a String ignores the third argument if it is 'e' or 'euc' (case-insensitive)" # ArgumentError: [Regexp.new] wrong number of arguments(3 for -2)
   fails "Regexp.compile given a String ignores the third argument if it is 's' or 'sjis' (case-insensitive)" # ArgumentError: [Regexp.new] wrong number of arguments(3 for -2)
   fails "Regexp.compile given a String ignores the third argument if it is 'u' or 'utf8' (case-insensitive)" # ArgumentError: [Regexp.new] wrong number of arguments(3 for -2)
@@ -69,6 +73,12 @@ opal_filter "regular_expressions" do
   fails "Regexp.compile given a String with escaped characters returns a Regexp with the input String's encoding" # NameError: uninitialized constant Encoding::Shift_JIS
   fails "Regexp.compile works by default for subclasses with overridden #initialize" # Expected /hi/ (Regexp) to be kind of RegexpSpecsSubclass
   fails "Regexp.escape sets the encoding of the result to BINARY if any non-US-ASCII characters are present in an input String with invalid encoding" # Expected true to be false
+  fails "Regexp.last_match returns nil when there is no match" # NoMethodError: undefined method `[]' for nil
+  fails "Regexp.last_match when given a String returns a named capture" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
+  fails "Regexp.last_match when given a Symbol raises an IndexError when given a missing name" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
+  fails "Regexp.last_match when given a Symbol returns a named capture" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
+  fails "Regexp.last_match when given an Object coerces argument to an index using #to_int" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
+  fails "Regexp.last_match when given an Object raises a TypeError when unable to coerce" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
   fails "Regexp.new given a Regexp preserves any options given in the Regexp literal" # NoMethodError: undefined method `compile' for Regexp
   fails "Regexp.new given a Regexp uses the argument as a literal to construct a Regexp object" # NoMethodError: undefined method `compile' for Regexp
   fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\a'" # NoMethodError: undefined method `compile' for Regexp
@@ -87,6 +97,7 @@ opal_filter "regular_expressions" do
   fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\v'" # NoMethodError: undefined method `compile' for Regexp
   fails "Regexp.new given a Regexp with escaped characters accepts a three-digit octal value" # NoMethodError: undefined method `compile' for Regexp
   fails "Regexp.new given a Regexp with escaped characters interprets a digit following a three-digit octal value as a character" # NoMethodError: undefined method `compile' for Regexp
+  fails "Regexp.new given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.new given a String raises a RegexpError when passed an incorrect regexp"
   fails "Regexp.new given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits"
   fails "Regexp.new given a String with escaped characters raises a RegexpError if more than six hexadecimal digits are given"
@@ -94,4 +105,5 @@ opal_filter "regular_expressions" do
   fails "Regexp.quote sets the encoding of the result to BINARY if any non-US-ASCII characters are present in an input String with invalid encoding" # Expected true to be false
   fails "Regexp.try_convert returns nil if given an argument that can't be converted to a Regexp"
   fails "Regexp.try_convert tries to coerce the argument by calling #to_regexp"
+  fails "Regexp.union uses to_regexp to convert argument" # Mock 'pattern' expected to receive to_regexp("any_args") exactly 1 times but received it 0 times
 end

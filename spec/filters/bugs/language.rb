@@ -6,6 +6,7 @@ opal_filter "language" do
   fails "A block yielded a single Array assigns symbol keys from a Hash returned by #to_hash to keyword arguments"
   fails "A block yielded a single Array assigns symbol keys from a Hash to keyword arguments"
   fails "A block yielded a single Array assigns the last element to a non-keyword argument if #to_hash returns nil"
+  fails "A block yielded a single Array calls #to_hash on the argument and uses resulting hash as first argument when optional argument and keyword argument accepted" # Expected [nil, {"a"=>1, "b"=>2}] == [{"a"=>1, "b"=>2}, {}] to be truthy but was false
   fails "A block yielded a single Array calls #to_hash on the argument but does not use the result when no keywords are present"
   fails "A block yielded a single Array calls #to_hash on the argument" # Expected [nil, {"a"=>1, "b"=>2}] to equal [{"a"=>1, "b"=>2}, {}]
   fails "A block yielded a single Array does not treat hashes with string keys as keyword arguments"
@@ -14,6 +15,7 @@ opal_filter "language" do
   fails "A class definition allows using self as the superclass if self is a class"
   fails "A class definition extending an object (sclass) allows accessing the block of the original scope" # Opal::SyntaxError: undefined method `uses_block!' for nil
   fails "A class definition extending an object (sclass) can use return to cause the enclosing method to return"
+  fails "A class definition extending an object (sclass) raises a TypeError when trying to extend non-Class" # Expected TypeError (/superclass must be a.* Class/) but no exception was raised (nil was returned)
   fails "A class definition extending an object (sclass) raises a TypeError when trying to extend numbers"
   fails "A class definition raises TypeError if any constant qualifying the class is not a Module"
   fails "A class definition raises TypeError if the constant qualifying the class is nil"
@@ -23,6 +25,8 @@ opal_filter "language" do
   fails "A lambda expression 'lambda { ... }' with an implicit block can be created"
   fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing local with the same name as the argument"
   fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing method with the same name as the argument"
+  fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference warns and uses a nil value when there is an existing local variable with same name" # Expected warning to match: /circular argument reference/ but got: ""
+  fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference warns and uses a nil value when there is an existing method with same name" # Expected warning to match: /circular argument reference/ but got: ""
   fails "A method assigns local variables from method parameters for definition 'def m() end'" # ArgumentError: [SpecEvaluate#m] wrong number of arguments(1 for 0)
   fails "A method assigns local variables from method parameters for definition 'def m(*a) a end'" # Expected [{}] to equal []
   fails "A method assigns local variables from method parameters for definition 'def m(*a, **) a end'"
@@ -47,23 +51,30 @@ opal_filter "language" do
   fails "A nested method definition creates an instance method inside Class.new" # NoMethodError: undefined method `new_def' for #<#<Class:0x40de>:0x40dc>
   fails "A nested method definition creates an instance method when evaluated in an instance method"
   fails "A number literal can be a decimal literal with trailing 'r' to represent a Rational" # requires String#to_r
+  fails "A number literal can be a float literal with trailing 'r' to represent a Rational" # Expected (5030569068109113/288230376151711740) == (136353847812057/7812500000000000) to be truthy but was false
   fails "A singleton class doesn't have singleton class"
   fails "A singleton class raises a TypeError for Fixnum's"
   fails "A singleton class raises a TypeError for symbols"
   fails "A singleton method definition can be declared for a global variable"
+  fails "A singleton method definition raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised ("foo" was returned)
+  fails "Allowed characters allows non-ASCII lowercased characters at the beginning" # Expected nil == 1 to be truthy but was false
   fails "Allowed characters allows not ASCII characters in the middle of a name" # NoMethodError: undefined method `mod' for #<MSpecEnv:0xa920>
   fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
   fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
   fails "An instance method definition with a splat requires the presence of any arguments that precede the *" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(1 for -3)
+  fails "An instance method raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised (#<Module:0x225b4> was returned)
   fails "An instance method raises an error with too few arguments" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(1 for 2)
   fails "An instance method raises an error with too many arguments" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for 1)
   fails "An instance method with a default argument evaluates the default when required arguments precede it" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(0 for -2)
   fails "An instance method with a default argument prefers to assign to a default argument before a splat argument" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(0 for -2)
   fails "An instance method with a default argument shadows an existing method with the same name as the local"
+  fails "An instance method with a default argument warns and uses a nil value when there is an existing local method with same name" # Expected warning to match: /circular argument reference/ but got: ""
   fails "Constant resolution within methods with dynamically assigned constants searches Object as a lexical scope only if Object is explicitly opened"
   fails "Constant resolution within methods with statically assigned constants searches Object as a lexical scope only if Object is explicitly opened"
+  fails "Executing break from within a block raises LocalJumpError when converted into a proc during a a super call" # Expected LocalJumpError but no exception was raised (1 was returned)
   fails "Executing break from within a block returns from the original invoking method even in case of chained calls"
+  fails "Executing break from within a block works when passing through a super call" # Expected to not get Exception
   fails "Execution variable $: is initialized to an array of strings"
   fails "Execution variable $: is read-only"
   fails "Execution variable $: is the same object as $LOAD_PATH and $-I"
@@ -88,16 +99,15 @@ opal_filter "language" do
   fails "Heredoc string allows HEREDOC with <<-\"identifier\", allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<-identifier, allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Heredoc string prints a warning if quoted HEREDOC identifier is ending not on same line" # Opal::SyntaxError: unterminated string meets end of file
   fails "Instantiating a singleton class raises a TypeError when allocate is called"
   fails "Instantiating a singleton class raises a TypeError when new is called"
   fails "Invoking a method expands the Array elements from the splat after executing the arguments and block if no other arguments follow the splat" # Expected [[1, nil], nil] to equal [[1], nil]
-  fails "Literal (A::X) constant resolution raises a TypeError if a non-class or non-module qualifier is given"
   fails "Literal (A::X) constant resolution with dynamically assigned constants evaluates the right hand side before evaluating a constant path"
   fails "Literal Regexps caches the Regexp object"
+  fails "Literal Regexps raises a RegexpError for lookbehind with specific characters" # Expected RegexpError but no exception was raised (0 was returned)
   fails "Literal Regexps support handling unicode 9.0 characters with POSIX bracket expressions" # Expected "" to equal "𐓘"
   fails "Literal Regexps supports (?# )"
-  fails "Literal Regexps supports (?<! ) (negative lookbehind)"
-  fails "Literal Regexps supports (?<= ) (positive lookbehind)"
   fails "Literal Regexps supports (?> ) (embedded subexpression)"
   fails "Literal Regexps supports \\g (named backreference)"
   fails "Literal Regexps supports character class composition"
@@ -166,12 +176,13 @@ opal_filter "language" do
   fails "NoMethodError#message calls receiver.inspect only when calling Exception#message" # Expected ["inspect_called"] to equal []
   fails "NoMethodError#message fallbacks to a simpler representation of the receiver when receiver.inspect raises an exception" # NoMethodError: undefined method `name' for #<NoMethodErrorSpecs::InstanceException: NoMethodErrorSpecs::InstanceException>
   fails "Operators * / % are left-associative"
-  fails "Operators .. ... have higher precedence than ? :" # NoMethodError: undefined method `from' for #<MSpecEnv:0x772d6>
   fails "Optional variable assignments using compounded constants with &&= assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compounded constants with operator assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compunded constants with ||= assignments"
   fails "Post-args with optional args with a circular argument reference shadows an existing local with the same name as the argument"
   fails "Post-args with optional args with a circular argument reference shadows an existing method with the same name as the argument"
+  fails "Post-args with optional args with a circular argument reference warns and uses a nil value when there is an existing local variable with same name" # Expected warning to match: /circular argument reference/ but got: ""
+  fails "Post-args with optional args with a circular argument reference warns and uses a nil value when there is an existing method with same name" # Expected warning to match: /circular argument reference/ but got: ""
   fails "Predefined global $+ captures the last non nil capture"
   fails "Predefined global $+ is equivalent to $~.captures.last"
   fails "Predefined global $, raises TypeError if assigned a non-String"
@@ -179,6 +190,7 @@ opal_filter "language" do
   fails "Predefined global $-0 does not call #to_str to convert the object to a String"
   fails "Predefined global $-0 raises a TypeError if assigned a Fixnum"
   fails "Predefined global $-0 raises a TypeError if assigned a boolean"
+  fails "Predefined global $-0 raises a TypeError if assigned an Integer" # Expected TypeError but no exception was raised (1 was returned)
   fails "Predefined global $. can be assigned a Float" # Expected 123.5 to equal 123
   fails "Predefined global $. raises TypeError if object can't be converted to an Integer" # Expected TypeError but no exception was raised (#<MockObject:0x518b4> was returned)
   fails "Predefined global $. should call #to_int to convert the object to an Integer" # Expected #<MockObject:0x518c2> to equal 321
@@ -186,6 +198,7 @@ opal_filter "language" do
   fails "Predefined global $/ does not call #to_str to convert the object to a String"
   fails "Predefined global $/ raises a TypeError if assigned a Fixnum"
   fails "Predefined global $/ raises a TypeError if assigned a boolean"
+  fails "Predefined global $/ raises a TypeError if assigned an Integer" # Expected TypeError but no exception was raised (#<Number>(#pretty_inspect raised #<TypeError: no implicit conversion of Number into String>) was returned)
   fails "Predefined global $_ is Thread-local"
   fails "Predefined global $_ is set at the method-scoped level rather than block-scoped"
   fails "Predefined global $_ is set to the last line read by e.g. StringIO#gets"
@@ -193,10 +206,12 @@ opal_filter "language" do
   fails "Predefined global $stdout raises TypeError error if assigned to object that doesn't respond to #write"
   fails "Predefined global $~ is set at the method-scoped level rather than block-scoped"
   fails "Predefined global $~ raises an error if assigned an object not nil or instanceof MatchData"
+  fails "Ruby String interpolation returns a string with the source encoding by default" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
+  fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
   fails "Safe navigator allows assignment methods"
   fails "Safe navigator allows assignment operators"
   fails "Safe navigator does not call the operator method lazily with an assignment operator"
-  fails "The 'case'-construct tests with a string interpolated in a regexp" # Failed: This example is a failure
+  fails "The =~ operator with named captures on syntax of 'string_literal' =~ /regexp/ does not set local variables" # Exception: named captures are not supported in javascript: "(?<matched>foo)(?<unmatched>bar)?"
   fails "The =~ operator with named captures on syntax of /regexp/ =~ string_variable sets local variables by the captured pairs"
   fails "The =~ operator with named captures on syntax of regexp_variable =~ string_variable does not set local variables"
   fails "The =~ operator with named captures on syntax of string_variable =~ /regexp/ does not set local variables"
@@ -205,6 +220,10 @@ opal_filter "language" do
   fails "The BEGIN keyword runs first in a given code unit"
   fails "The BEGIN keyword runs in a shared scope"
   fails "The BEGIN keyword runs multiple begins in FIFO order"
+  fails "The BEGIN keyword uses top-level for self" # NameError: uninitialized constant TOPLEVEL_BINDING
+  fails "The END keyword runs last in a given code unit" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1e972>
+  fails "The END keyword runs multiple ends in LIFO order" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1e972>
+  fails "The END keyword runs only once for multiple calls" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1e972>
   fails "The __ENCODING__ pseudo-variable is US-ASCII by default"
   fails "The __ENCODING__ pseudo-variable is the encoding specified by a magic comment in the file"
   fails "The __ENCODING__ pseudo-variable is the encoding specified by a magic comment inside an eval"
@@ -215,9 +234,11 @@ opal_filter "language" do
   fails "The alias keyword can create a new global variable, synonym of the original" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
   fails "The alias keyword can override an existing global variable and make them synonyms" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
   fails "The alias keyword is not allowed against Fixnum or String instances"
+  fails "The alias keyword is not allowed against Integer or String instances" # Expected TypeError but got: Exception (Cannot read property '$to_s' of undefined)
   fails "The alias keyword on top level defines the alias on Object"
   fails "The alias keyword operates on methods defined via attr, attr_reader, and attr_accessor"
   fails "The alias keyword operates on the object's metaclass when used in instance_eval"
+  fails "The alias keyword supports aliasing twice the same global variables" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x22a72>
   fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when calling the block from a method"
   fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when yielding to the block"
   fails "The break statement in a captured block from another thread raises a LocalJumpError when getting the value from another thread" # NameError: uninitialized constant Thread
@@ -239,9 +260,6 @@ opal_filter "language" do
   fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility"
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the class" # Expected "constant" to be nil
-  fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the module"
-  fails "The defined? keyword for a scoped constant returns nil when an undefined constant is scoped to a defined constant"
-  fails "The defined? keyword for a top-level scoped constant returns nil when an undefined constant is scoped to a defined constant"
   fails "The defined? keyword for variables returns 'instance-variable' for an instance variable that has been assigned to nil"
   fails "The defined? keyword for variables returns nil for a global variable that has been read but not assigned to"
   fails "The defined? keyword for variables when a Regexp matches a String returns nil for non-captures"
@@ -264,6 +282,8 @@ opal_filter "language" do
   fails "The predefined global constants includes TOPLEVEL_BINDING"
   fails "The redo statement in a method is invalid and raises a SyntaxError"
   fails "The redo statement triggers ensure block when re-executing a block"
+  fails "The rescue keyword can capture the raised exception using a setter method" # NoMethodError: undefined method `message' for nil
+  fails "The rescue keyword can capture the raised exception using a square brackets setter" # ArgumentError: [SquareBracketsCaptor#[]=] wrong number of arguments(1 for 2)
   fails "The rescue keyword inline form can be inlined" # Expected Infinity to equal 1
   fails "The rescue keyword only accepts Module or Class in rescue clauses" # RuntimeError: error
   fails "The rescue keyword only accepts Module or Class in splatted rescue clauses" # RuntimeError: error
@@ -283,6 +303,7 @@ opal_filter "language" do
   fails "The super keyword when using keyword arguments passes default argument values to the parent" # Expected {} to equal {"b"=>"b"}
   fails "The super keyword when using regular and keyword arguments passes default argument values to the parent" # Expected ["a", {}] to equal ["a", {"c"=>"c"}]
   fails "The super keyword without explicit arguments passes arguments and rest arguments including any modifications"
+  fails "The super keyword without explicit arguments passes arguments, rest arguments including modifications, and post arguments" # Expected [1, 2, 3] == [1, 14, 3] to be truthy but was false
   fails "The super keyword without explicit arguments passes optional arguments that have a default value but were modified"
   fails "The super keyword without explicit arguments passes optional arguments that have a default value"
   fails "The super keyword without explicit arguments passes optional arguments that have a non-default value but were modified"
