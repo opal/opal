@@ -63,11 +63,11 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-npm-${{ github.ref }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: ${{ runner.os }}-npm-${{ github.ref }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-gems-${{ github.ref }}
-            ${{ runner.os }}-gems-master
-            ${{ runner.os }}-gems-
+            ${{ runner.os }}-npm-${{ github.ref }}
+            ${{ runner.os }}-npm-master
+            ${{ runner.os }}-npm-
       - run: yarn install
       - name: bundle install
         run: |
