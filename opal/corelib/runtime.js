@@ -68,6 +68,12 @@
     enable_stack_trace: true                  // true, false
   };
 
+  var $$id_s = Symbol('$$id')
+  Opal.$$id_s = $$id_s
+  Opal.propertySymbols = {
+    '$$id': $$id_s
+  }
+
   // Minify common function calls
   var $has_own   = Object.hasOwnProperty;
   var $bind      = Function.prototype.bind;
@@ -91,11 +97,11 @@
   // Retrieve or assign the id of an object
   Opal.id = function(obj) {
     if (obj.$$is_number) return (obj * 2)+1;
-    if (obj.$$id != null) {
-      return obj.$$id;
+    if (obj[$$id_s] != null) {
+      return obj[$$id_s];
     }
-    $defineProperty(obj, '$$id', Opal.uid());
-    return obj.$$id;
+    $defineProperty(obj, $$id_s, Opal.uid());
+    return obj[$$id_s];
   };
 
   // Globals table
@@ -2525,7 +2531,7 @@
   Opal.NilClass = Opal.allocate_class('NilClass', Opal.Object, $NilClass);
   Opal.const_set(_Object, 'NilClass', Opal.NilClass);
   nil = Opal.nil = new Opal.NilClass();
-  nil.$$id = nil_id;
+  nil[Opal.$$id_s] = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   // Errors
