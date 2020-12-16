@@ -1,3 +1,3 @@
 ### Fixed
 
-- [Backported] Using the `--map` / `-P` CLI option was only working in conjunction with other options (#1974)
+- [Backported] Add --rbrequire (-q) option to opal cmdline tool (#2120)
