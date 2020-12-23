@@ -57,12 +57,12 @@ jobs:
           # NOTE: Bundler 2.2.0 fails to install libv8
           # https://github.com/rubyjs/libv8/issues/310
           bundler: "2.1.4"
-          bundler-cache: true
+          bundler-cache: false
       - run: ruby bin/git-submodule-fast-install
       - run: bundle lock
       - uses: actions/cache@v2
         with:
-          path: vendor/bundle
+          path: ./vendor/bundle
           key: ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-${{ github.ref }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-${{ github.ref }}
@@ -70,7 +70,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.combo.ruby }}-gems-
       - uses: actions/cache@v2
         with:
-          path: node_modules
+          path: ./node_modules
           key: ${{ runner.os }}-npm-${{ github.ref }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-npm-${{ github.ref }}
@@ -79,7 +79,7 @@ jobs:
       - run: yarn install
       - name: bundle install
         run: |
-          bundle config path vendor/bundle
+          bundle config path $PWD/vendor/bundle
           bundle install --jobs 4 --retry 3
           bundle clean
       - run: ${{ matrix.combo.command || 'bin/rake rspec' }}
