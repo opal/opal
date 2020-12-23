@@ -15,7 +15,18 @@ Changes are grouped as follows:
 
 
 
-## [1.0.4](https://github.com/opal/opal/compare/v1.0.3...1.0.4) - 2020-12-13
+## [1.0.5](https://github.com/opal/opal/compare/v1.0.4...1.0.5) - 2020-12-24
+
+
+### Fixed
+
+- [Backported] Add --rbrequire (-q) option to opal cmdline tool ([#2120](https://github.com/opal/opal/pull/2120))
+- Improved the --help descriptions
+
+
+
+
+## [1.0.4](https://github.com/opal/opal/compare/v1.0.3...v1.0.4) - 2020-12-13
 
 
 ### Fixed
