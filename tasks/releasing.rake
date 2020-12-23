@@ -4,9 +4,6 @@ require 'bundler'
 Bundler.require
 Bundler::GemHelper.install_tasks
 
-# Let the release process update the changelog from github
-task :release => :changelog
-
 github_releases = -> do
   require 'date'
   require 'octokit'
