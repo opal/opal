@@ -29,6 +29,7 @@ module Testing
         lib/spec_helper
         mspec/commands/mspec-run
         etc
+        rubygems
       ]
     end
 
