@@ -125,6 +125,11 @@ module Testing
         srand(#{random_seed})
         MSpec.randomize = true
 
+        # legacy MSpec
+        def frozen_error_class
+          FrozenError
+        end
+
         MSpec.process
         OSpecFilter.main.unused_filters_message(list: #{!!ENV['LIST_UNUSED_FILTERS']})
         exit MSpec.exit_code
