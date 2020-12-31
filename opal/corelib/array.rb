@@ -1932,6 +1932,9 @@ class Array < `Array`
     }
   end
 
+  alias filter select
+  alias filter! select!
+
   def shift(count = undefined)
     if `count === undefined`
       return if `self.length === 0`
