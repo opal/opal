@@ -1,29 +1,16 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Proc" do
   fails "Proc as an implicit block pass argument remains the same object if re-vivified by the target method"
-  fails "Proc#<< accepts any callable object" # NoMethodError: undefined method `<<' for #<Proc:0x5b2b8>
-  fails "Proc#<< calls passed Proc with arguments and then calls self with result" # NoMethodError: undefined method `<<' for #<Proc:0x760d0>
-  fails "Proc#<< composition is a Proc" # NoMethodError: undefined method `<<' for #<Proc:0x760e4>
   fails "Proc#<< composition is a lambda when parameter is lambda" # NoMethodError: undefined method `<<' for #<Proc:0x760e0>
-  fails "Proc#<< composition may accept multiple arguments" # NoMethodError: undefined method `<<' for #<Proc:0x760e8>
-  fails "Proc#<< composition passes blocks to the second proc" # NoMethodError: undefined method `<<' for #<Proc:0x760dc>
   fails "Proc#<< does not try to coerce argument with #to_proc" # Expected TypeError (callable object is expected) but got: NoMethodError (undefined method `<<' for #<Proc:0x760c8>)
   fails "Proc#<< raises TypeError if passed not callable object" # Expected TypeError (callable object is expected) but got: NoMethodError (undefined method `<<' for #<Proc:0x760d8>)
-  fails "Proc#<< returns a Proc that is the composition of self and the passed Proc" # NoMethodError: undefined method `<<' for #<Proc:0x760cc>
   fails "Proc#== is a public method" # Expected Proc to have public instance method '==' but it does not
   fails "Proc#== returns true if other is a dup of the original" # Expected false to be true
   fails "Proc#=== can call its block argument declared with a block argument" # Expected 6 to equal 10
   fails "Proc#=== yields to the block given at declaration and not to the block argument" # Expected 3 to equal 7
-  fails "Proc#>> accepts any callable object" # NoMethodError: undefined method `>>' for #<Proc:0x7610e>
-  fails "Proc#>> calls passed Proc with arguments and then calls self with result" # NoMethodError: undefined method `>>' for #<Proc:0x7611a>
-  fails "Proc#>> composition is a Proc when other is lambda" # NoMethodError: undefined method `>>' for #<Proc:0x7612e>
-  fails "Proc#>> composition is a Proc" # NoMethodError: undefined method `>>' for #<Proc:0x7612a>
   fails "Proc#>> composition is a lambda when self is lambda" # NoMethodError: undefined method `>>' for #<Proc:0x76126>
-  fails "Proc#>> composition may accept multiple arguments" # NoMethodError: undefined method `>>' for #<Proc:0x76132>
-  fails "Proc#>> composition passes blocks to the first proc" # NoMethodError: undefined method `>>' for #<Proc:0x76122>
   fails "Proc#>> does not try to coerce argument with #to_proc" # Expected TypeError (callable object is expected) but got: NoMethodError (undefined method `>>' for #<Proc:0x76108>)
   fails "Proc#>> raises TypeError if passed not callable object" # Expected TypeError (callable object is expected) but got: NoMethodError (undefined method `>>' for #<Proc:0x76116>)
-  fails "Proc#>> returns a Proc that is the composition of self and the passed Proc" # NoMethodError: undefined method `>>' for #<Proc:0x7611e>
   fails "Proc#[] can call its block argument declared with a block argument" # Expected 6 to equal 10
   fails "Proc#[] yields to the block given at declaration and not to the block argument" # Expected 3 to equal 7
   fails "Proc#arity for instances created with proc { || } returns positive values for definition \n    @a = proc { |(a, (*b, c)), d=1| }\n    @b = proc { |a, (*b, c), d, (*e), (*), **k| }"

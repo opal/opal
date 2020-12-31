@@ -54,6 +54,20 @@ class Proc < `Function`
   alias === call
   alias yield call
 
+  def >>(other)
+    proc do |*args, &block|
+      out = self.call(*args, &block)
+      other.call(out)
+    end
+  end
+
+  def <<(other)
+    proc do |*args, &block|
+      out = other.call(*args, &block)
+      self.call(out)
+    end
+  end
+
   def to_proc
     self
   end
