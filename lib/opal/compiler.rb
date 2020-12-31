@@ -7,6 +7,7 @@ require 'opal/nodes'
 require 'opal/eof_content'
 require 'opal/errors'
 require 'opal/magic_comments'
+require 'opal/modules_helpers'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -58,6 +59,23 @@ module Opal
       Pathname(path).cleanpath.to_s
     end
 
+    # this is meant for determining the ruby module name for the es6_modules, where webpack delivers the filename as and instead of a module name
+    # to the compiler. The real ruby module name for use in Opal.modules must then be determined by checking the Opal.paths for a match
+    # a filename like:                   /a/path/to/some/ruby.rb
+    # and a Opal.paths entry like:       /a/path/to
+    # becomes a ruby module name like:             'some/ruby'
+    # if a match for the partial path is found in Opal.paths. Otherwise return the original filename.
+    def self.module_name_from_paths(filename)
+      # The filename comes from webpack/node/js world and may be a partial or relative path and include ../.. and is the
+      # path of how webpack got to the ruby file, which may be very different from how ruby would get there.
+      # Using Pathname.expand_path makes sure, the path gets transformed to a path the way ruby would find it.
+      # Having a valid ruby path without ../.. etc., we can compare it against Opal.paths and get a correct result.
+      expanded_filename_path = Pathname.new(filename).expand_path
+      _, module_name = Opal::ModulesHelpers.module_names_from_paths(expanded_filename_path, expanded_filename_path.to_s)
+      module_name
+    end
+
+    # defines a compiler option, also creating method of form 'name?'
     # Defines a compiler option.
     # @option as: [Symbol] uses a different method name, e.g. with a question mark for booleans
     # @option default: [Object] the default value for the option
