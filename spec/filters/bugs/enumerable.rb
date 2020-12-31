@@ -27,10 +27,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable"
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
   fails "Enumerable#tally counts values as gathered array when yielded with multiple arguments" # NoMethodError: undefined method `tally' for #<EnumerableSpecs::YieldsMixed2:0x8e6b4>
-  fails "Enumerable#tally does not call given block" # NoMethodError: undefined method `tally' for #<EnumerableSpecs::Numerous:0x8e6a4>
-  fails "Enumerable#tally returns a hash with counts according to the value" # NoMethodError: undefined method `tally' for #<EnumerableSpecs::Numerous:0x8e6a8>
-  fails "Enumerable#tally returns a hash without default" # NoMethodError: undefined method `tally' for #<EnumerableSpecs::Numerous:0x8e6ac>
-  fails "Enumerable#tally returns an empty hash for empty enumerables" # NoMethodError: undefined method `tally' for #<EnumerableSpecs::Empty:0x8e6b0>
   fails "Enumerable#to_h with block coerces returned pair to Array with #to_ary" # TypeError: wrong element type NilClass (expected array)
   fails "Enumerable#to_h with block converts [key, value] pairs returned by the block to a hash" # TypeError: wrong element type NilClass (expected array)
   fails "Enumerable#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject/) but got: TypeError (wrong element type NilClass (expected array))
