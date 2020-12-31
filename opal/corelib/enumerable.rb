@@ -460,6 +460,8 @@ module Enumerable
     }
   end
 
+  alias filter find_all
+
   def find_index(object = undefined, &block)
     return enum_for :find_index if `object === undefined && block === nil`
 

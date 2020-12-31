@@ -10,11 +10,6 @@ opal_filter "Struct" do
   fails "Struct#deconstruct_keys returns an empty hash when there are more keys than attributes" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2>
   fails "Struct#deconstruct_keys returns at first not existing attribute name" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2>
   fails "Struct#deconstruct_keys returns only specified keys" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2, z=3>
-  fails "Struct#filter raises an ArgumentError if given any non-block arguments" # Expected ArgumentError but got: NoMethodError (undefined method `filter' for #<struct StructClasses::Car make=nil, model=nil, year=nil>)
-  fails "Struct#filter returns a new array of elements for which block is true" # NoMethodError: undefined method `filter' for #<struct StructClasses::Car make="Toyota", model="Tercel", year="2000">
-  fails "Struct#filter returns an instance of Array" # NoMethodError: undefined method `filter' for #<struct StructClasses::Car make="Ford", model="Escort", year="1995">
-  fails "Struct#filter when no block is given returned Enumerator size returns the enumerable size" # NoMethodError: undefined method `filter' for #<struct foo=nil>
-  fails "Struct#filter without block returns an instance of Enumerator" # NoMethodError: undefined method `filter' for #<struct foo=nil>
   fails "Struct#hash returns different hashes for structs with different values when using keyword_init: true" # NameError: wrong constant name 1 non symbol member
   fails "Struct#hash returns different hashes for structs with different values" # Expected "Hash" == "Hash" to be falsy but was true
   fails "Struct#hash returns the same fixnum for structs with the same content"

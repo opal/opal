@@ -272,6 +272,8 @@ class Enumerator
       self.class.for(self, method, *args, &block)
     end
 
+    alias filter find_all
+
     def find_all(&block)
       unless block
         raise ArgumentError, 'tried to call lazy select without a block'

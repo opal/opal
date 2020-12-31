@@ -988,6 +988,9 @@ class Hash
     }
   end
 
+  alias filter select
+  alias filter! select!
+
   def shift
     %x{
       var keys = self.$$keys,

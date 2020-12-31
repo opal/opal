@@ -37,16 +37,7 @@ opal_filter "Array" do
   fails "Array#each yields elements added to the end of the array by the block" # Expected [2] to equal [2, 0, 0]
   fails "Array#fill with (filler, range) works with beginless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#fill with (filler, range) works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
-  fails "Array#filter does not return subclass instance on Array subclasses" # NoMethodError: undefined method `filter' for [1, 2, 3]
-  fails "Array#filter properly handles recursive arrays" # NoMethodError: undefined method `filter' for [[...]]
   fails "Array#filter returns a new array of elements for which block is true" # NoMethodError: undefined method `filter' for [1, 3, 4, 5, 6, 9]
-  fails "Array#filter returns an Enumerator if no block given" # NoMethodError: undefined method `filter' for [1, 2]
-  fails "Array#filter when no block is given returned Enumerator size returns the enumerable size" # NoMethodError: undefined method `filter' for [1, 2, 3]
-  fails "Array#filter! deletes elements for which the block returns a false value" # NoMethodError: undefined method `filter!' for [1, 2, 3, 4, 5]
-  fails "Array#filter! returns an enumerator if no block is given" # NoMethodError: undefined method `filter!' for [1, 2, 3]
-  fails "Array#filter! returns nil if no changes were made in the array" # NoMethodError: undefined method `filter!' for [1, 2, 3]
-  fails "Array#filter! updates the receiver after all blocks" # NoMethodError: undefined method `filter!' for [1, 2, 3]
-  fails "Array#filter! when no block is given returned Enumerator size returns the enumerable size" # NoMethodError: undefined method `filter!' for [1, 2, 3]
   fails "Array#flatten does not call #to_ary on elements beyond the given level"
   fails "Array#flatten performs respond_to? and method_missing-aware checks when coercing elements to array"
   fails "Array#flatten returns Array instance for Array subclasses" # Expected [] (ArraySpecs::MyArray) to be an instance of Array
