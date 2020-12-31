@@ -273,7 +273,7 @@ class Struct
   alias to_s inspect
 
   def to_h(&block)
-    return self.map(&block).to_h(*args) if block_given?
+    return map(&block).to_h(*args) if block_given?
 
     self.class.members.each_with_object({}) { |name, h| h[name] = self[name] }
   end

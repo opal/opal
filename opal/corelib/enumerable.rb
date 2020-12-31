@@ -1236,7 +1236,7 @@ module Enumerable
   alias to_a entries
 
   def to_h(*args, &block)
-    return self.map(&block).to_h(*args) if block_given?
+    return map(&block).to_h(*args) if block_given?
 
     %x{
       var hash = #{{}};

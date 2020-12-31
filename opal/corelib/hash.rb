@@ -1050,7 +1050,7 @@ class Hash
   end
 
   def to_h(&block)
-    return self.map(&block).to_h if block_given?
+    return map(&block).to_h if block_given?
 
     %x{
       if (self.$$class === Opal.Hash) {

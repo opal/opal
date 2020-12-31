@@ -56,7 +56,7 @@ class Proc < `Function`
 
   def >>(other)
     proc do |*args, &block|
-      out = self.call(*args, &block)
+      out = call(*args, &block)
       other.call(out)
     end
   end
@@ -64,7 +64,7 @@ class Proc < `Function`
   def <<(other)
     proc do |*args, &block|
       out = other.call(*args, &block)
-      self.call(out)
+      call(out)
     end
   end
 
