@@ -128,8 +128,6 @@ opal_filter "language" do
   fails "Literal (A::X) constant resolution uses the module or class #inspect to craft the error message if they are anonymous" # Expected NameError (/uninitialized constant <unusable info>::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50c0>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution uses the module or class #name to craft the error message" # Expected NameError (/uninitialized constant ModuleName::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50ba>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution with dynamically assigned constants evaluates the right hand side before evaluating a constant path"
-  fails "Literal Ranges creates beginless ranges" # Opal::SyntaxError: undefined method `type' for nil
-  fails "Literal Ranges creates endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Literal Regexps caches the Regexp object"
   fails "Literal Regexps raises a RegexpError for lookbehind with specific characters" # Expected RegexpError but no exception was raised (0 was returned)
   fails "Literal Regexps support handling unicode 9.0 characters with POSIX bracket expressions" # Expected "" to equal "𐓘"
