@@ -431,6 +431,12 @@ module Enumerable
     }
   end
 
+  def filter_map(&block)
+    return enum_for(:filter_map) { enumerator_size } unless block_given?
+
+    map(&block).select(&:itself)
+  end
+
   alias find detect
 
   def find_all(&block)
