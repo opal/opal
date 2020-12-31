@@ -21,6 +21,7 @@ Whitespace conventions:
 - Source-map support for Node.js in the default runner (#2045)
 - SecureRandom#hex(n) (#2050)
 - Added a generic implementation of Kernel#caller and #warn(uplevel:) that works with sourcemaps in Node.js and Chrome (#2065)
+- Added support for numblocks `-> { _1 + _2 }.call(3, 4) # => 7` #2149
 
 
 ### Fixed
@@ -69,6 +70,7 @@ Whitespace conventions:
 - Moved REPL implementation from bin/ to its own lib/ file as `opal/repl.rb` (#2048)
 - `Encoding.default_external` is now initialized with `__ENCODING__` (#2072)
 - Keep the MersenneTwister implementation private (#2108)
+- Change parser to 3.0 (#2148)
 
 
 
