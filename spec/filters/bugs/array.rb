@@ -63,10 +63,7 @@ opal_filter "Array" do
   fails "Array#slice with a subclass of Array returns a Array instance with [n..m]" # Expected [2, 3, 4] (ArraySpecs::MyArray) to be an instance of Array
   fails "Array#slice! works with beginless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#slice! works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
-  fails "Array#to_h with block coerces returned pair to Array with #to_ary" # TypeError: wrong element type NilClass at 0 (expected array)
-  fails "Array#to_h with block converts [key, value] pairs returned by the block to a Hash" # TypeError: wrong element type NilClass at 0 (expected array)
   fails "Array#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject at 0/) but got: TypeError (wrong element type NilClass at 0 (expected array))
-  fails "Array#to_h with block raises ArgumentError if block returns longer or shorter array" # Expected ArgumentError (/wrong array length at 0/) but got: TypeError (wrong element type NilClass at 0 (expected array))
   fails "Array#to_h with block raises TypeError if block returns something other than Array" # Expected TypeError (/wrong element type String at 0/) but got: TypeError (wrong element type NilClass at 0 (expected array))
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#union accepts multiple arguments" # NoMethodError: undefined method `union' for [1, 2, 3]
