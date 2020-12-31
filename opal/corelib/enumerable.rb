@@ -1221,6 +1221,10 @@ module Enumerable
     hash.values
   end
 
+  def tally
+    group_by(&:itself).transform_values(&:count)
+  end
+
   alias to_a entries
 
   def to_h(*args)
