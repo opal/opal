@@ -2320,12 +2320,8 @@ class Array < `Array`
         if (o.$$is_array) {
           continue;
         }
-        if (o.$$is_enumerator) {
-          if (o.$size() === Infinity) {
-            others[j] = o.$take(size);
-          } else {
-            others[j] = o.$to_a();
-          }
+        if (o.$$is_range || o.$$is_enumerator) {
+          others[j] = o.$take(size);
           continue;
         }
         others[j] = #{(

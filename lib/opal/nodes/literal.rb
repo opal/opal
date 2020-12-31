@@ -253,9 +253,11 @@ module Opal
       end
 
       def compile_inline?
-        start.type == finish.type &&
-          SIMPLE_CHILDREN_TYPES.include?(start.type) &&
-          SIMPLE_CHILDREN_TYPES.include?(finish.type)
+        (
+          !start || (start.type && SIMPLE_CHILDREN_TYPES.include?(start.type))
+        ) && (
+          !finish || (finish.type && SIMPLE_CHILDREN_TYPES.include?(finish.type))
+        )
       end
 
       def compile_inline
@@ -271,11 +273,11 @@ module Opal
       handle :irange
 
       def compile_inline
-        push '$range(', expr(start), ', ', expr(finish), ', false)'
+        push '$range(', expr_or_nil(start), ', ', expr_or_nil(finish), ', false)'
       end
 
       def compile_range_initialize
-        push 'Opal.Range.$new(', expr(start), ', ', expr(finish), ', false)'
+        push 'Opal.Range.$new(', expr_or_nil(start), ', ', expr_or_nil(finish), ', false)'
       end
     end
 
@@ -283,11 +285,11 @@ module Opal
       handle :erange
 
       def compile_inline
-        push '$range(', expr(start), ', ', expr(finish), ', true)'
+        push '$range(', expr_or_nil(start), ', ', expr_or_nil(finish), ', true)'
       end
 
       def compile_range_initialize
-        push 'Opal.Range.$new(', expr(start), ',', expr(finish), ', true)'
+        push 'Opal.Range.$new(', expr_or_nil(start), ',', expr_or_nil(finish), ', true)'
       end
     end
 
