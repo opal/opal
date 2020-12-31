@@ -883,6 +883,8 @@ class Array < `Array`
     self
   end
 
+  alias difference -
+
   def dig(idx, *idxs)
     item = self[idx]
 
@@ -1332,6 +1334,8 @@ class Array < `Array`
       return '[' + result.join(', ') + ']';
     }
   end
+
+  alias intersection &
 
   def join(sep = nil)
     return '' if `self.length === 0`
@@ -2213,6 +2217,8 @@ class Array < `Array`
 
     result
   end
+
+  alias union |
 
   def uniq(&block)
     %x{
