@@ -38,16 +38,17 @@ plugins:
     channel: rubocop-0-53
 
 exclude_patterns:
-- "benchmark/*"
-- "build/*"
-- "coverage/*"
-- "docs/*"
-- "examples/*"
-- "tasks/*"
-- "spec/*"
-- "test/*"
-- "vendored-minitest/*"
-- "**/node_modules/*"
-- stdlib/nodejs/js-yaml-3-6-1.js
-- lib/opal/source_map/vlq.rb
-- lib/opal/cli_runners/source-map-support.js
+  - "benchmark/*"
+  - "build/*"
+  - "coverage/*"
+  - "docs/*"
+  - "examples/*"
+  - "tasks/*"
+  - "spec/*"
+  - "test/*"
+  - "vendored-minitest/*"
+  - "**/node_modules/*"
+  - stdlib/nodejs/js-yaml-3-6-1.js
+  - lib/opal/source_map/vlq.rb
+  - lib/opal/cli_runners/source-map-support.js
+  - lib/opal/cli_runners/source-map-support-browser.js
