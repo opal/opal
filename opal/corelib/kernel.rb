@@ -93,12 +93,21 @@ module Kernel
   end
 
   def caller(start = 1, length = nil)
-    start += 1
-    stack = `(new Error().stack || "").split("\n")`
-    stack = length ? `stack.slice(start, start + length)` : `stack.slice(start)`
-    stack.map do |line|
-      `#{line}.replace(/^ *\w+ +/, '').split(':', 3).slice(0,2).join(':')`
-    end
+    %x{
+      var stack, result
+
+      stack = (new Error().stack || "").split("\n")
+      result = []
+
+      // Skip the initial line ("Error:") and Kernel#caller with i=3
+      for (var i = 3, ii = stack.length; i < ii; i++) {
+        if (!stack[i].match("runtime.js")) {
+          result.push(stack[i].replace(/^ *\w+ +/, ''))
+          if (length && result.length == length) break
+        }
+      }
+      return result
+    }
   end
 
   def class
