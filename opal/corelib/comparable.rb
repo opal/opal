@@ -1,3 +1,5 @@
+# helpers: falsy
+
 module Comparable
   %x{
     function normalize(what) {
@@ -19,6 +21,12 @@ module Comparable
         end
       }
       #{raise ArgumentError, "comparison of #{`lhs`.class} with #{`class_name`} failed"}
+    }
+
+    function cmp_or_fail(lhs, rhs) {
+      var cmp = #{`lhs` <=> `rhs`};
+      if ($falsy(cmp)) fail_comparison(lhs, rhs);
+      return normalize(cmp);
     }
   }
 
@@ -43,35 +51,19 @@ module Comparable
   end
 
   def >(other)
-    unless cmp = (self <=> other)
-      `fail_comparison(self, other)`
-    end
-
-    `normalize(cmp) > 0`
+    `cmp_or_fail(self, other) > 0`
   end
 
   def >=(other)
-    unless cmp = (self <=> other)
-      `fail_comparison(self, other)`
-    end
-
-    `normalize(cmp) >= 0`
+    `cmp_or_fail(self, other) >= 0`
   end
 
   def <(other)
-    unless cmp = (self <=> other)
-      `fail_comparison(self, other)`
-    end
-
-    `normalize(cmp) < 0`
+    `cmp_or_fail(self, other) < 0`
   end
 
   def <=(other)
-    unless cmp = (self <=> other)
-      `fail_comparison(self, other)`
-    end
-
-    `normalize(cmp) <= 0`
+    `cmp_or_fail(self, other) <= 0`
   end
 
   def between?(min, max)
@@ -80,19 +72,45 @@ module Comparable
     true
   end
 
-  def clamp(min, max)
-    cmp = min <=> max
+  def clamp(min, max = nil)
+    %x{
+      var c, excl;
 
-    unless cmp
-      `fail_comparison(min, max)`
-    end
+      if (max === nil) {
+        // We are dealing with a new Ruby 2.7 behaviour that we are able to
+        // provide a single Range argument instead of 2 Comparables.
 
-    if `normalize(cmp) > 0`
-      raise ArgumentError, 'min argument must be smaller than max argument'
-    end
+        if (!Opal.is_a(min, Opal.Range)) {
+          #{raise TypeError, "wrong argument type #{min.class} (expected Range)"}
+        }
 
-    return min if `normalize(#{self <=> min}) < 0`
-    return max if `normalize(#{self <=> max}) > 0`
-    self
+        excl = min.excl;
+        max = min.end;
+        min = min.begin;
+
+        if (max !== nil && excl) {
+          #{raise ArgumentError, 'cannot clamp with an exclusive range'}
+        }
+      }
+
+      if (min !== nil && max !== nil && cmp_or_fail(min, max) > 0) {
+        #{raise ArgumentError, 'min argument must be smaller than max argument'}
+      }
+
+      if (min !== nil) {
+        c = cmp_or_fail(self, min);
+
+        if (c == 0) return self;
+        if (c < 0) return min;
+      }
+
+      if (max !== nil) {
+        c = cmp_or_fail(self, max);
+
+        if (c > 0) return max;
+      }
+
+      return self;
+    }
   end
 end
