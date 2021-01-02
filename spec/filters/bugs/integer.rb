@@ -22,11 +22,24 @@ opal_filter "Integer" do
   fails "Integer#>> (with n >> m) fixnum calls #to_int to convert the argument to an Integer" # Expected 8 == 0 to be truthy but was false
   fails "Integer#>> (with n >> m) fixnum returns -1 when n < 0, m > 0 and n > -(2**m)" # Expected -7 to equal -1
   fails "Integer#>> (with n >> m) fixnum returns 0 when n > 0, m > 0 and n < 2**m" # Expected 7 to equal 0
+  fails "Integer#[] fixnum when index and length passed ensures n[i, len] equals to (n >> i) & ((1 << len) - 1)" # ArgumentError: [Number#[]] wrong number of arguments(2 for 1)
+  fails "Integer#[] fixnum when index and length passed ignores negative length" # ArgumentError: [Number#[]] wrong number of arguments(2 for 1)
+  fails "Integer#[] fixnum when index and length passed moves start position to the most significant bits when negative index passed" # ArgumentError: [Number#[]] wrong number of arguments(2 for 1)
+  fails "Integer#[] fixnum when index and length passed returns specified number of bits from specified position" # ArgumentError: [Number#[]] wrong number of arguments(2 for 1)
+  fails "Integer#[] fixnum when range passed ensures n[i..] equals to (n >> i)" # Opal::SyntaxError: undefined method `type' for nil
+  fails "Integer#[] fixnum when range passed ensures n[i..j] equals to (n >> i) & ((1 << (j - i + 1)) - 1)" # TypeError: no implicit conversion of Range into Integer
+  fails "Integer#[] fixnum when range passed ignores upper boundary smaller than lower boundary" # TypeError: no implicit conversion of Range into Integer
+  fails "Integer#[] fixnum when range passed moves lower boundary to the most significant bits when negative value passed" # ArgumentError: [Number#[]] wrong number of arguments(2 for 1)
+  fails "Integer#[] fixnum when range passed raises FloatDomainError if any boundary is infinity" # Expected FloatDomainError (/Infinity/) but got: TypeError (no implicit conversion of Range into Integer)
+  fails "Integer#[] fixnum when range passed returns bits specified by range" # TypeError: no implicit conversion of Range into Integer
+  fails "Integer#[] fixnum when range passed when passed (..i) raises ArgumentError if any of i bit equals 1" # Expected ArgumentError (/The beginless range for Integer#\[\] results in infinity/) but got: Opal::SyntaxError (undefined method `type' for nil)
+  fails "Integer#[] fixnum when range passed when passed (..i) returns 0 if all i bits equal 0" # Opal::SyntaxError: undefined method `type' for nil
   fails "Integer#^ fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
   fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 to equal 9223372041149743000
   fails "Integer#chr with an encoding argument raises RangeError if self is invalid as a codepoint in the specified encoding"
   fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
   fails "Integer#chr with an encoding argument raises a RangeError is self is less than 0"
+  fails "Integer#chr with an encoding argument returns a String encoding self interpreted as a codepoint in the CESU-8 encoding" # NameError: uninitialized constant Encoding::CESU_8
   fails "Integer#chr with an encoding argument returns a String encoding self interpreted as a codepoint in the specified encoding"
   fails "Integer#chr with an encoding argument returns a String with the specified encoding"
   fails "Integer#chr with an encoding argument returns a new String for each call"

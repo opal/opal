@@ -3,6 +3,13 @@ opal_filter "File" do
   fails "File.absolute_path accepts a second argument of a directory from which to resolve the path" # Expected "./ruby/core/file/ruby/core/file/absolute_path_spec.rb" to equal "ruby/core/file/absolute_path_spec.rb"
   fails "File.absolute_path does not expand '~user' to a home directory." # Expected "./ruby/core/file/~user" to equal "ruby/core/file/~user"
   fails "File.absolute_path resolves paths relative to the current working directory" # Expected "./ruby/core/file/hello.txt" to equal "ruby/core/file/hello.txt"
+  fails "File.absolute_path? calls #to_path on its argument" # Mock 'path' expected to receive to_path("any_args") exactly 1 times but received it 0 times
+  fails "File.absolute_path? does not expand '~' to a home directory." # NoMethodError: undefined method `absolute_path?' for File
+  fails "File.absolute_path? does not expand '~user' to a home directory." # NoMethodError: undefined method `absolute_path?' for File
+  fails "File.absolute_path? returns false if it's a relative path" # NoMethodError: undefined method `absolute_path?' for File
+  fails "File.absolute_path? returns false if it's a tricky relative path" # NoMethodError: undefined method `absolute_path?' for File
+  fails "File.absolute_path? returns true if it's an absolute pathname" # NoMethodError: undefined method `absolute_path?' for File
+  fails "File.absolute_path? takes into consideration the platform's root" # NoMethodError: undefined method `absolute_path?' for File
   fails "File.expand_path accepts objects that have a #to_path method" # Mock 'path' expected to receive 'to_path' exactly 1 times but received it 0 times
   fails "File.expand_path converts a pathname to an absolute pathname" # Expected "" to equal nil
   fails "File.expand_path converts a pathname to an absolute pathname, Ruby-Talk:18512" # NoMethodError: undefined method `empty?' for nil
@@ -30,6 +37,7 @@ opal_filter "File" do
   fails "File.expand_path returns a String when passed a String subclass" # NameError: uninitialized constant FileSpecs
   fails "File.expand_path when HOME is not set raises an ArgumentError when passed '~' if HOME == ''" # Expected ArgumentError but no exception was raised ("/" was returned)
   fails "File.expand_path with a non-absolute HOME raises an ArgumentError" # Expected ArgumentError (non-absolute home) but no exception was raised ("non-absolute" was returned)
+  fails "File.extname for a filename ending with a dot returns '.'" # Expected "" == "." to be truthy but was false
   fails "File.join calls #to_path"
   fails "File.join calls #to_str"
   fails "File.join inserts the separator in between empty strings and arrays"

@@ -93,7 +93,9 @@ opal_filter "Date" do
   fails "Date.new creates a Date for different calendar reform dates"
   fails "Date.new doesn't create dates for invalid arguments"
   fails "Date.ordinal constructs a Date object from an ordinal date"
+  fails "Date.valid_jd? returns false if passed false" # NoMethodError: undefined method `valid_jd?' for Date
   fails "Date.valid_jd? returns false if passed nil"
+  fails "Date.valid_jd? returns false if passed symbol" # NoMethodError: undefined method `valid_jd?' for Date
   fails "Date.valid_jd? returns true if passed a number value" # NoMethodError: undefined method `valid_jd?' for Date
   fails "Date.valid_jd? returns true if passed any value other than nil"
   fails "Date.valid_jd? returns true if passed false"

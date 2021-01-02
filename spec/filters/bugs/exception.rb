@@ -1,6 +1,7 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Exception" do
   fails "An Exception reaching the top level is printed on STDERR" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x590>
+  fails "An Exception reaching the top level the Exception#cause is printed to STDERR with backtraces" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x50c96>
   fails "An Exception reaching the top level with a custom backtrace is printed on STDERR" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x590>
   fails "Errno::EAGAIN is the same class as Errno::EWOULDBLOCK if they represent the same errno value"
   fails "Errno::EINVAL.new accepts an optional custom message and location"
@@ -40,6 +41,8 @@ opal_filter "Exception" do
   fails "Exception#dup does copy the backtrace" # Expected [] to equal ["InitializeException: my exception", "    at TMP_13 (...)"]
   fails "Exception#dup does copy the cause" # NoMethodError: undefined method `cause' for #<RuntimeError: the consequence>
   fails "Exception#exception captures an exception into $!" # Expected "RuntimeError" == "" to be truthy but was false
+  fails "Exception#full_message contains all the chain of exceptions" # NoMethodError: undefined method `full_message' for #<RuntimeError: last exception>
+  fails "Exception#full_message contains cause of exception" # NoMethodError: undefined method `full_message' for #<RuntimeError: main exception>
   fails "Exception#full_message returns formatted string of exception using the same format that is used to print an uncaught exceptions to stderr" # NoMethodError: undefined method `full_message' for #<RuntimeError: Some runtime error>
   fails "Exception#full_message shows the caller if the exception has no backtrace"
   fails "Exception#full_message shows the exception class at the end of the first line of the message when the message contains multiple lines" # NoMethodError: undefined method `full_message' for #<RuntimeError: first line second line>
@@ -52,6 +55,7 @@ opal_filter "Exception" do
   fails "Interrupt is a subclass of SignalException" # Expected Exception to equal SignalException
   fails "Interrupt.new returns an instance of interrupt with no message given" # NoMethodError: undefined method `signo' for #<Interrupt: Interrupt>:Interrupt
   fails "Interrupt.new takes an optional message argument" # NoMethodError: undefined method `signo' for #<Interrupt: message>:Interrupt
+  fails "KeyError accepts :receiver and :key options" # ArgumentError: no receiver is available
   fails "LocalJumpError#exit_value returns the value given to return" # Expected LocalJumpError but got: Exception (unexpected return)
   fails "LocalJumpError#reason returns 'return' for a return" # Expected LocalJumpError but got: Exception (unexpected return)
   fails "NameError#dup copies the name and receiver" # NoMethodError: undefined method `receiver' for #<NoMethodError: undefined method `foo' for #<MSpecEnv:0x262>>
@@ -64,7 +68,10 @@ opal_filter "Exception" do
   fails "NameError#receiver returns the receiver when raised from #class_variable_get"
   fails "NameError#receiver returns the receiver when raised from #instance_variable_get"
   fails "NameError#to_s raises its own message for an undefined variable" # Expected "undefined method `not_defined' for #<MSpecEnv:0x54e>" =~ /undefined local variable or method `not_defined'/ to be truthy but was nil
+  fails "NameError.new accepts a :receiver keyword argument" # ArgumentError: [NameError#initialize] wrong number of arguments(3 for -2)
   fails "NoMethodError#dup copies the name, arguments and receiver" # NoMethodError: undefined method `receiver' for #<NoMethodError: undefined method `foo' for #<Object:0x230>>
+  fails "NoMethodError#message uses #name to display the receiver if it is a class or a module" # Expected "undefined method `foo' for #<Class:0x8b870>" == "undefined method `foo' for MyClass:Class" to be truthy but was false
+  fails "NoMethodError.new accepts a :receiver keyword argument" # NoMethodError: undefined method `receiver' for #<NoMethodError: msg>
   fails "SignalException can be rescued" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x278>
   fails "SignalException cannot be trapped with Signal.trap" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x278>
   fails "SignalException runs after at_exit" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x278>
@@ -72,6 +79,7 @@ opal_filter "Exception" do
   fails "SignalException#signm returns the signal name" # Expected SignalException but got: NoMethodError (undefined method `kill' for Process)
   fails "SignalException#signo returns the signal number" # Expected SignalException but got: NoMethodError (undefined method `kill' for Process)
   fails "SignalException.new raises an exception for an optional argument with a signal name"
+  fails "SignalException.new raises an exception with an invalid first argument type" # Expected ArgumentError but no exception was raised (#<SignalException: #<Object:0x20000>> was returned)
   fails "SignalException.new raises an exception with an invalid signal name"
   fails "SignalException.new raises an exception with an invalid signal number"
   fails "SignalException.new takes a signal name with SIG prefix as the first argument"

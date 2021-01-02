@@ -57,6 +57,10 @@ opal_filter "StringScanner" do
   fails "StringScanner#scan raises a TypeError if pattern is a String" # Expected TypeError but no exception was raised (nil was returned)
   fails "StringScanner#scan raises a TypeError if pattern isn't a Regexp nor String" # Expected TypeError but no exception was raised (nil was returned)
   fails "StringScanner#scan raises a TypeError if pattern isn't a Regexp"
+  fails "StringScanner#scan treats String as the pattern itself" # Expected nil == "This" to be truthy but was false
+  fails "StringScanner#scan with fixed_anchor: true returns the matched string" # ArgumentError: [StringScanner#initialize] wrong number of arguments(2 for 1)
+  fails "StringScanner#scan with fixed_anchor: true treats \\A as matching from the beginning of string" # ArgumentError: [StringScanner#initialize] wrong number of arguments(2 for 1)
+  fails "StringScanner#scan with fixed_anchor: true treats ^ as matching from the beginning of line" # ArgumentError: [StringScanner#initialize] wrong number of arguments(2 for 1)
   fails "StringScanner#scan_full returns the matched string if the third argument is true and advances the scan pointer if the second argument is true"
   fails "StringScanner#scan_full returns the matched string if the third argument is true"
   fails "StringScanner#scan_full returns the number of bytes advanced and advances the scan pointer if the second argument is true"

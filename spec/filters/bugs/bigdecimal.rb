@@ -186,6 +186,8 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_s inserts a space every n chars, if integer n is supplied"
   fails "BigDecimal#to_s removes trailing spaces in floating point notation"
   fails "BigDecimal#to_s return type is of class String" # Exception: self.bigdec.$to_s is not a function
+  fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s starts with + if + is supplied and value is positive"
   fails "BigDecimal#to_s takes an optional argument" # Expected to not get Exception
   fails "BigDecimal#to_s the default format looks like 0.xxxxEnn"
@@ -221,9 +223,11 @@ opal_filter "BigDecimal" do
   fails "Kernel#BigDecimal creates a new object of class BigDecimal" # Expected 1 to equal (1/1)
   fails "Kernel#BigDecimal determines precision from initial value" # NoMethodError: undefined method `precs' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
   fails "Kernel#BigDecimal does not call to_s when calling inspect" # Expected "44.44" == "0.4444e2" to be truthy but was false
+  fails "Kernel#BigDecimal does not ignores trailing garbage" # Expected ArgumentError but got: Exception (new BigNumber() not a number: 123E45ruby)
   fails "Kernel#BigDecimal ignores leading whitespace" # Exception: self.$BigDecimal(...).$should is not a function
   fails "Kernel#BigDecimal ignores trailing garbage" # Exception: new BigNumber() not a number: 123E45ruby
   fails "Kernel#BigDecimal pre-coerces long integers" # Expected 262000 == 1130000000000000 to be truthy but was false
+  fails "Kernel#BigDecimal process underscores as Float()" # Exception: new BigNumber() not a number: 12_345.67E89
   fails "Kernel#BigDecimal raises ArgumentError for invalid strings" # Exception: new BigNumber() not a number: ruby
   fails "Kernel#BigDecimal raises ArgumentError when Float is used without precision" # Expected ArgumentError but no exception was raised (1 was returned)
   fails "Kernel#BigDecimal when interacting with Rational BigDecimal maximum precision is nine more than precision except for abnormals" # TypeError: Rational can't be coerced into BigDecimal
@@ -239,5 +243,6 @@ opal_filter "BigDecimal" do
   fails "Kernel#BigDecimal when interacting with Rational produces the expected result when done via Float" # TypeError: Rational can't be coerced into BigDecimal
   fails "Kernel#BigDecimal when interacting with Rational produces the expected result when done via to_f" # TypeError: Rational can't be coerced into BigDecimal
   fails "Kernel#BigDecimal when interacting with Rational produces the expected result" # TypeError: Rational can't be coerced into BigDecimal
+  fails "Kernel#BigDecimal with exception: false returns nil for invalid strings" # Exception: new BigNumber() not a number: invalid
   fails "Kernel#Pathname is a private instance method" # Expected Kernel to have private instance method 'Pathname' but it does not
 end

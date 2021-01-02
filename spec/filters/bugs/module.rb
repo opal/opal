@@ -4,27 +4,32 @@ opal_filter "Module" do
   fails "Module#alias_method creates methods that are == to eachother" # Expected #<Method: #<Class:0x3ee54>#uno (defined in #<Class:0x3ee54> in ruby/core/module/fixtures/classes.rb:203)> to equal #<Method: #<Class:0x3ee54>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:203)>
   fails "Module#alias_method handles aliasing a method only present in a refinement" # NoMethodError: undefined method `refine' for #<Module:0x90fa>
   fails "Module#alias_method retains method visibility"
+  fails "Module#alias_method returned value returns symbol of the defined method name" # Expected #<Class:0x1c94a> to be identical to "checking_return_value"
   fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#attr applies current visibility to methods created"
   fails "Module#attr converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
   fails "Module#attr converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr raises a TypeError when the given names can't be converted to strings using to_str"
+  fails "Module#attr returns an array of defined method names as symbols" # Expected nil == ["foo", "bar"] to be truthy but was false
   fails "Module#attr_accessor applies current visibility to methods created"
   fails "Module#attr_accessor converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
   fails "Module#attr_accessor converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr_accessor not allows creating an attr_accessor on an immediate class"
   fails "Module#attr_accessor on immediates can read through the accessor" # NoMethodError: undefined method `foobar' for 1
   fails "Module#attr_accessor raises a TypeError when the given names can't be converted to strings using to_str"
+  fails "Module#attr_accessor returns an array of defined method names as symbols" # Expected nil == ["foo", "foo=", "bar", "bar="] to be truthy but was false
   fails "Module#attr_reader applies current visibility to methods created"
   fails "Module#attr_reader converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
   fails "Module#attr_reader converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr_reader not allows for adding an attr_reader to an immediate"
   fails "Module#attr_reader raises a TypeError when the given names can't be converted to strings using to_str"
+  fails "Module#attr_reader returns an array of defined method names as symbols" # Expected nil == ["foo", "bar"] to be truthy but was false
   fails "Module#attr_writer applies current visibility to methods created"
   fails "Module#attr_writer converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
   fails "Module#attr_writer converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr_writer not allows for adding an attr_writer to an immediate"
   fails "Module#attr_writer raises a TypeError when the given names can't be converted to strings using to_str"
+  fails "Module#attr_writer returns an array of defined method names as symbols" # Expected nil == ["foo=", "bar="] to be truthy but was false
   fails "Module#autoload (concurrently) blocks a second thread while a first is doing the autoload"
   fails "Module#autoload (concurrently) blocks others threads while doing an autoload"
   fails "Module#autoload allows multiple autoload constants for a single file"
@@ -82,8 +87,47 @@ opal_filter "Module" do
   fails "Module#const_get does autoload a constant" # NameError: uninitialized constant CSAutoloadA
   fails "Module#const_get does autoload a module and resolve a constant within" # NameError: uninitialized constant CSAutoloadC
   fails "Module#const_get does autoload a non-toplevel module" # LoadError: cannot load such file -- ruby/core/module/fixtures/constants_autoload_d
+  fails "Module#const_set sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#const_set when overwriting an existing constant does not warn if the previous value was undefined" # Expected #<Module:0x48fd0> to have constant 'Foo' but it does not
   fails "Module#const_set when overwriting an existing constant warns if the previous value was a normal value" # Expected warning to match: /already initialized constant/ but got: ""
+  fails "Module#const_source_location accepts a String or Symbol name" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location accepts a scoped constant name" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location accepts a toplevel scope qualifier" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location autoload returns the autoload location while not resolved" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location autoload returns where the constant was resolved when resolved" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location calls #to_str to convert the given name to a String" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location does not search the containing scope" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location does not search the singleton class of a Class or Module" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location does search private constants path" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location raises a NameError if a Symbol has a toplevel scope qualifier" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location raises a NameError if a Symbol is a scoped constant name" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location raises a NameError if only '::' is passed" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location raises a NameError if the name contains non-alphabetic characters except '_'" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location raises a NameError if the name does not start with a capital letter" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location raises a NameError if the name includes two successive scope separators" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location raises a NameError if the name starts with a non-alphabetic character" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location raises a TypeError if conversion to a String by calling #to_str fails" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location return empty path if constant defined in C code" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location returns nil if no constant is defined in the search path" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location returns nil if the constant is defined in the receiver's superclass and the inherit flag is false" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location returns nil when the receiver is a Class, the constant is defined at toplevel and the inherit flag is false" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location returns nil when the receiver is a Module, the constant is defined at toplevel and the inherit flag is false" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location searches into the receiver superclasses if the inherit flag is true" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with dynamically assigned constants returns path to a toplevel constant when the receiver is a Class" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with dynamically assigned constants returns path to a toplevel constant when the receiver is a Module" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with dynamically assigned constants returns path to the updated value of a constant" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with dynamically assigned constants searches a path in a module included in the immediate class before the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with dynamically assigned constants searches a path in a module included in the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with dynamically assigned constants searches a path in the immediate class or module first" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with dynamically assigned constants searches a path in the superclass before a module included in the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with dynamically assigned constants searches a path in the superclass chain" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with statically assigned constants returns location path a toplevel constant when the receiver is a Class" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with statically assigned constants returns location path a toplevel constant when the receiver is a Module" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with statically assigned constants searches location path a module included in the immediate class before the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with statically assigned constants searches location path a module included in the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with statically assigned constants searches location path the immediate class or module first" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with statically assigned constants searches location path the superclass before a module included in the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location with statically assigned constants searches location path the superclass chain" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#constants doesn't returns inherited constants when passed nil"
   fails "Module#constants returns only public constants"
   fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class"
@@ -109,6 +153,8 @@ opal_filter "Module" do
   fails "Module#method_defined? raises a TypeError when the given object is not a string/symbol" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#method_defined? raises a TypeError when the given object is not a string/symbol/fixnum"
   fails "Module#method_defined? returns true if a public or private method with the given name is defined in self, self's ancestors or one of self's included modules"
+  fails "Module#method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.method_defined?] wrong number of arguments(2 for 1)
+  fails "Module#method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.method_defined?] wrong number of arguments(2 for 1)
   fails "Module#module_eval activates refinements from the eval scope with block" # NoMethodError: undefined method `refine' for #<Module:0x81e0>
   fails "Module#module_eval activates refinements from the eval scope" # NoMethodError: undefined method `refine' for #<Module:0x88e4>
   fails "Module#module_eval converts a non-string filename to a string using to_str"
@@ -126,15 +172,24 @@ opal_filter "Module" do
   fails "Module#module_function with specific method names tries to convert the given names to strings using to_str"
   fails "Module#name changes when the module is reachable through a constant path" # Expected nil to match /^#<Module:0x\h+>::N$/
   fails "Module#name is not nil for a nested module created with the module keyword"
+  fails "Module#name is not nil when assigned to a constant in an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil to match /^#<Module:0x\h+>::Child$/
   fails "Module#name preserves the encoding in which the class was defined"
   fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
   fails "Module#prepend keeps the module in the chain when dupping the class"
+  fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0x6c37a>] == [#<Module:0x6c38c>, #<Module:0x6c37a>] to be truthy but was false
+  fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x7b0e0> to have private instance method 'test1' but it does not
   fails "Module#private with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x2f186> to have private instance method 'test1' but it does not
+  fails "Module#private_constant marked constants sends #const_missing to the original class or module" # Expected true == "Foo" to be truthy but was false
   fails "Module#private_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#private_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
+  fails "Module#private_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
+  fails "Module#protected with argument array as a single argument sets visibility of given method names" # NoMethodError: undefined method `protected_instance_methods' for #<Module:0x6994a>
   fails "Module#protected with argument does not clone method from the ancestor when setting to the same visibility in a child" # NoMethodError: undefined method `protected_instance_methods' for #<Module:0xa2d8>
   fails "Module#protected with argument one or more arguments sets visibility of given method names" # NoMethodError: undefined method `protected_instance_methods' for #<Module:0x33d4a>
   fails "Module#protected_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#protected_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
+  fails "Module#protected_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
   fails "Module#public_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#refine accepts a module as argument" # NoMethodError: undefined method `refine' for #<Module:0x4c172>
   fails "Module#refine adds methods defined in its block to the anonymous module's public instance methods" # NoMethodError: undefined method `refine' for #<Module:0x3ae64>
@@ -148,8 +203,12 @@ opal_filter "Module" do
   fails "Module#refine does not make available methods from another refinement module" # NoMethodError: undefined method `refine' for #<Module:0x3ae8c>
   fails "Module#refine does not override methods in subclasses" # NoMethodError: undefined method `refine' for #<Module:0x3ae56>
   fails "Module#refine doesn't apply refinements outside the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae72>
+  fails "Module#refine for methods accessed indirectly is honored by &" # NoMethodError: undefined method `refine' for #<Module:0x4b006>
   fails "Module#refine for methods accessed indirectly is honored by BasicObject#__send__" # NoMethodError: undefined method `refine' for #<Module:0x3aeb2>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#binding" # NoMethodError: undefined method `refine' for #<Module:0x3aeaa>
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#method" # NoMethodError: undefined method `refine' for #<Module:0x4b00a>
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_send" # NoMethodError: undefined method `refine' for #<Module:0x4b00e>
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#respond_to?" # NoMethodError: undefined method `refine' for #<Module:0x4b016>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # NoMethodError: undefined method `refine' for #<Module:0x3aeae>
   fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # NoMethodError: undefined method `refine' for #<Module:0x3aeba>
   fails "Module#refine for methods accessed indirectly is honored by string interpolation" # NoMethodError: undefined method `refine' for #<Module:0x3aeb6>

@@ -45,6 +45,7 @@ opal_filter "String" do
   fails "String#% supports inspect formats using %p" # Expected "{\"capture\"=>1}" to equal "{:capture=>1}"
   fails "String#% width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "String#* raises a RangeError when given integer is a Bignum" # Expected RangeError but no exception was raised ("" was returned)
+  fails "String#* returns String instances" # Expected "" (MyString) to be an instance of String
   fails "String#+ when self is BINARY and argument is US-ASCII uses BINARY encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#-@ does not deduplicate already frozen strings" # Expected "this string is frozen" not to be identical to "this string is frozen"
   fails "String#-@ does not deduplicate strings with additional instance variables" # NoMethodError: undefined method `-@' for "this string is frozen"
@@ -56,7 +57,13 @@ opal_filter "String" do
   fails "String#[] raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
+  fails "String#[] with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#[] with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
+  fails "String#[] with Regexp returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#[] with Regexp, index returns String instances" # Expected "he" (StringSpecs::MyString) to be an instance of String
+  fails "String#[] with String returns a String instance when given a subclass instance" # Expected "el" (StringSpecs::MyString) to be an instance of String
   fails "String#[] with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#[] with index, length returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#[] with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
   fails "String#[]= with Integer index allows assignment to the zero'th element of an empty String" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with Integer index calls #to_int to convert the index" # Mock 'string element set' expected to receive to_int("any_args") exactly 1 times but received it 0 times
@@ -106,7 +113,10 @@ opal_filter "String" do
   fails "String#byteslice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
+  fails "String#byteslice with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#byteslice with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#byteslice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#byteslice with index, length returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#byteslice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
   fails "String#capitalize ASCII-only case mapping does not capitalize non-ASCII characters" # ArgumentError: [String#capitalize] wrong number of arguments(1 for 0)
   fails "String#capitalize full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#capitalize] wrong number of arguments(2 for 0)
@@ -115,6 +125,7 @@ opal_filter "String" do
   fails "String#capitalize full Unicode case mapping adapted for Turkic languages capitalizes ASCII characters according to Turkic semantics" # ArgumentError: [String#capitalize] wrong number of arguments(1 for 0)
   fails "String#capitalize full Unicode case mapping only capitalizes the first resulting character when upcasing a character produces a multi-character sequence" # Expected "SS" to equal "Ss"
   fails "String#capitalize full Unicode case mapping updates string metadata" # Expected "SSet" to equal "Sset"
+  fails "String#capitalize returns String instances when called on a subclass" # Expected "Hello" (StringSpecs::MyString) to be an instance of String
   fails "String#capitalize! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
@@ -123,22 +134,30 @@ opal_filter "String" do
   fails "String#casecmp? independent of case for UNICODE characters returns true when downcase(:fold) on unicode" # Expected false to equal true
   fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns true when they are the same with normalized case" # Expected false to equal true
   fails "String#casecmp? independent of case returns nil if incompatible encodings" # NameError: uninitialized constant Encoding::EUC_JP
+  fails "String#center with length, padding returns String instances when called on subclasses" # Expected "          " (StringSpecs::MyString) to be an instance of String
+  fails "String#chomp when passed no argument returns String instances when called on a subclass" # Expected "hello" (StringSpecs::MyString) to be an instance of String
+  fails "String#chop returns String instances when called on a subclass" # Expected "hello" (StringSpecs::MyString) to be an instance of String
   fails "String#clone calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#clone copies singleton methods" # NoMethodError: undefined method `special' for "string"
   fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimizable" # Expected [40, 41, 123, 125] to equal [40, 0, 41, 0, 123, 0, 125, 0]
   fails "String#concat when self is BINARY and argument is US-ASCII uses BINARY encoding" # NoMethodError: undefined method `concat' for "abc"
   fails "String#concat with Integer returns a BINARY string if self is US-ASCII and the argument is between 128-255 (inclusive)" # NoMethodError: undefined method `concat' for ""
+  fails "String#delete returns String instances when called on a subclass" # Expected "oh no" (StringSpecs::MyString) to be an instance of String
+  fails "String#delete_prefix returns a String instance when called on a subclass instance" # Expected "o" (StringSpecs::MyString) to be an instance of String
+  fails "String#delete_suffix returns a String instance when called on a subclass instance" # Expected "h" (StringSpecs::MyString) to be an instance of String
   fails "String#downcase ASCII-only case mapping does not downcase non-ASCII characters" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
   fails "String#downcase case folding case folds special characters" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
   fails "String#downcase full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#downcase] wrong number of arguments(2 for 0)
   fails "String#downcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
   fails "String#downcase full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # ArgumentError: [String#downcase] wrong number of arguments(2 for 0)
   fails "String#downcase full Unicode case mapping adapted for Turkic languages downcases characters according to Turkic semantics" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
+  fails "String#downcase returns a String instance for subclasses" # Expected "foobar" (StringSpecs::MyString) to be an instance of String
   fails "String#downcase! ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#dump does not take into account if a string is frozen" # NoMethodError: undefined method `dump' for "foo"
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible" # NoMethodError: undefined method `dump' for "ࡶ"
   fails "String#dump keeps origin encoding" # ArgumentError: unknown encoding name - ISO-8859-1
+  fails "String#dump returns a String instance" # NoMethodError: undefined method `dump' for ""
   fails "String#dump returns a string with # not escaped when followed by any other character" # NoMethodError: undefined method `dump' for "#"
   fails "String#dump returns a string with \" and \\ escaped with a backslash" # NoMethodError: undefined method `dump' for "\""
   fails "String#dump returns a string with \\#<char> when # is followed by $, @, @@, {" # NoMethodError: undefined method `dump' for "\#$PATH"
@@ -174,6 +193,7 @@ opal_filter "String" do
   fails "String#each_line when `chomp` keyword argument is passed removes new line characters when separator is not specified" # TypeError: no implicit conversion of Hash into String
   fails "String#each_line when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
   fails "String#each_line when `chomp` keyword argument is passed removes only specified separator" # ArgumentError: [String#each_line] wrong number of arguments(2 for -1)
+  fails "String#each_line yields String instances for subclasses" # Expected [StringSpecs::MyString, StringSpecs::MyString] == [String, String] to be truthy but was false
   fails "String#each_line yields paragraphs (broken by 2 or more successive newlines) when passed '' and replaces multiple newlines with only two ones" # Expected ["hello\nworld\n\n\n", "and\nuniverse\n\n\n\n\n"] to equal ["hello\nworld\n\n", "and\nuniverse\n\n"]
   fails "String#encode when passed options replaces invalid encoding" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode when passed to, from, options returns a copy in the destination encoding when both encodings are the same" # NoMethodError: undefined method `default_internal' for Encoding
@@ -204,6 +224,7 @@ opal_filter "String" do
   fails "String#grapheme_clusters works if the String's contents is invalid for its encoding" # Expected true to be false
   fails "String#grapheme_clusters works with multibyte characters" # NoMethodError: undefined method `grapheme_clusters' for "覇"
   fails "String#gsub with pattern and block does not set $~ for procs created from methods" # Expected "he<l><l>o" == "he<unset><unset>o" to be truthy but was false
+  fails "String#gsub with pattern and replacement returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#include? with String raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#inspect uses \\x notation for broken UTF-8 sequences" # Expected "\"ð\\u009F\"" == "\"\\xF0\\x9F\"" to be truthy but was false
   fails "String#inspect when the string's encoding is different than the result's encoding and the string's encoding is ASCII-compatible but the characters are non-ASCII returns a string with the non-ASCII characters replaced by \\x notation" # ArgumentError: unknown encoding name - EUC-JP
@@ -217,19 +238,47 @@ opal_filter "String" do
   fails "String#lines when `chomp` keyword argument is passed removes new line characters when separator is not specified" # TypeError: no implicit conversion of Hash into String
   fails "String#lines when `chomp` keyword argument is passed removes new line characters" # TypeError: no implicit conversion of Hash into String
   fails "String#lines when `chomp` keyword argument is passed removes only specified separator" # ArgumentError: [String#lines] wrong number of arguments(2 for -1)
+  fails "String#lines yields String instances for subclasses" # Expected [StringSpecs::MyString, StringSpecs::MyString] == [String, String] to be truthy but was false
   fails "String#lines yields paragraphs (broken by 2 or more successive newlines) when passed '' and replaces multiple newlines with only two ones" # Expected ["hello\nworld\n\n\n", "and\nuniverse\n\n\n\n\n"] to equal ["hello\nworld\n\n", "and\nuniverse\n\n"]
+  fails "String#ljust with length, padding returns String instances when called on subclasses" # Expected "          " (StringSpecs::MyString) to be an instance of String
+  fails "String#next returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#rjust with length, padding returns String instances when called on subclasses" # Expected "          " (StringSpecs::MyString) to be an instance of String
   fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
   fails "String#size returns the correct length after force_encoding(BINARY)" # Expected 2 == 4 to be truthy but was false
   fails "String#slice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
+  fails "String#slice with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#slice with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
+  fails "String#slice with Regexp returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#slice with Regexp, index returns String instances" # Expected "he" (StringSpecs::MyString) to be an instance of String
+  fails "String#slice with String returns a String instance when given a subclass instance" # Expected "el" (StringSpecs::MyString) to be an instance of String
   fails "String#slice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
+  fails "String#slice with index, length returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#slice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
+  fails "String#slice! Range returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with Regexp returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with Regexp, index returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#slice! with index, length returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#split with Regexp applies the limit to the number of split substrings, without counting captures" # Expected ["a", "aBa"] to equal ["a", "B", "", "", "aBa"]
+  fails "String#split with Regexp for a String subclass yields instances of String" # Expected nil (NilClass) to be an instance of String
+  fails "String#split with Regexp returns String instances based on self" # Expected "x" (StringSpecs::MyString) to be an instance of String
+  fails "String#split with Regexp when a block is given returns a string as is (and doesn't call block) if it is empty" # Expected [] == "" to be truthy but was false
+  fails "String#split with Regexp when a block is given yields each split letter" # Expected ["c", "h", "u", "n", "k", "y"] == "chunky" to be truthy but was false
+  fails "String#split with Regexp when a block is given yields each split substring with a pattern" # Expected ["chunky", "bacon"] == "chunky-bacon" to be truthy but was false
+  fails "String#split with Regexp when a block is given yields each split substring with a regexp pattern" # Expected ["chunky", "bacon"] == "chunky:bacon" to be truthy but was false
+  fails "String#split with Regexp when a block is given yields each split substring with default pattern" # Expected ["chunky", "bacon"] == "chunky bacon" to be truthy but was false
+  fails "String#split with Regexp when a block is given yields each split substring with empty regexp pattern and limit" # Expected ["c", "h", "unky"] == "chunky" to be truthy but was false
+  fails "String#split with Regexp when a block is given yields each split substring with empty regexp pattern" # Expected ["c", "h", "u", "n", "k", "y"] == "chunky" to be truthy but was false
+  fails "String#split with Regexp when a block is given yields the string when limit is 1" # Expected ["chunky bacon"] == "chunky bacon" to be truthy but was false
+  fails "String#split with String returns String instances based on self" # Expected "x" (StringSpecs::MyString) to be an instance of String
+  fails "String#squeeze returns String instances when called on a subclass" # Expected "oh no!" (StringSpecs::MyString) to be an instance of String
   fails "String#start_with? sets Regexp.last_match if it returns true" # TypeError: no implicit conversion of Regexp into String
   fails "String#start_with? supports regexps with ^ and $ modifiers" # TypeError: no implicit conversion of Regexp into String
   fails "String#start_with? supports regexps" # TypeError: no implicit conversion of Regexp into String
+  fails "String#sub with pattern, replacement returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#sub with pattern, replacement returns a copy of self when no modification is made" # Expected "hello" not to be identical to "hello"
+  fails "String#succ returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#swapcase ASCII-only case mapping does not swapcase non-ASCII characters" # ArgumentError: [String#swapcase] wrong number of arguments(1 for 0)
   fails "String#swapcase full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#swapcase] wrong number of arguments(2 for 0)
   fails "String#swapcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#swapcase] wrong number of arguments(1 for 0)
@@ -237,6 +286,7 @@ opal_filter "String" do
   fails "String#swapcase full Unicode case mapping adapted for Turkic languages swaps case of ASCII characters according to Turkic semantics" # ArgumentError: [String#swapcase] wrong number of arguments(1 for 0)
   fails "String#swapcase full Unicode case mapping updates string metadata" # Expected "aßET" to equal "aSSET"
   fails "String#swapcase full Unicode case mapping works for all of Unicode with no option" # Expected "äÖü" to equal "ÄöÜ"
+  fails "String#swapcase returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#swapcase works for all of Unicode" # Expected "äÖü" to equal "ÄöÜ"
   fails "String#swapcase! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
@@ -246,6 +296,8 @@ opal_filter "String" do
   fails "String#to_sym returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#to_sym returns a UTF-16LE Symbol for a UTF-16LE String containing non US-ASCII characters" # ERROR
   fails "String#to_sym returns a binary Symbol for a binary String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "String#tr returns Stringinstances when called on a subclass" # Expected "hallo" (StringSpecs::MyString) to be an instance of String
+  fails "String#tr_s returns String instances when called on a subclass" # Expected "hallo" (StringSpecs::MyString) to be an instance of String
   fails "String#undump Limitations cannot undump non ASCII-compatible string" # NoMethodError: undefined method `undump' for "\"foo\""
   fails "String#undump always returns String instance" # NoMethodError: undefined method `undump' for "\"foo\""
   fails "String#undump does not take into account if a string is frozen" # NoMethodError: undefined method `undump' for "\"foo\""
@@ -295,9 +347,11 @@ opal_filter "String" do
   fails "String#upcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#upcase] wrong number of arguments(1 for 0)
   fails "String#upcase full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # ArgumentError: [String#upcase] wrong number of arguments(2 for 0)
   fails "String#upcase full Unicode case mapping adapted for Turkic languages upcases ASCII characters according to Turkic semantics" # ArgumentError: [String#upcase] wrong number of arguments(1 for 0)
+  fails "String#upcase returns a String instance for subclasses" # Expected "FOOBAR" (StringSpecs::MyString) to be an instance of String
   fails "String#upcase! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#valid_encoding? returns true for IBM720 encoding self is valid in" # ArgumentError: unknown encoding name - IBM720
   fails "String.new accepts a capacity argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
   fails "String.new accepts an encoding argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
   fails "String.new is called on subclasses" # Expected nil to equal "subclass"
