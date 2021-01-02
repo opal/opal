@@ -38,4 +38,5 @@ opal_filter "Range" do
   fails "Range#step with exclusive end and String values raises a TypeError when passed a Float step" # requires Fixnum != Float
   fails "Range#step with inclusive end and Float values returns Float values of 'step * n + begin <= end'" # precision errors
   fails "Range#step with inclusive end and String values raises a TypeError when passed a Float step" # requires Fixnum != Float
+  fails_badly "Range#minmax on an exclusive range should return the minimum and maximum values for a numeric range without iterating the range"
 end
