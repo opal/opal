@@ -431,6 +431,12 @@ module Enumerable
     }
   end
 
+  def filter_map(&block)
+    return enum_for(:filter_map) { enumerator_size } unless block_given?
+
+    map(&block).select(&:itself)
+  end
+
   alias find detect
 
   def find_all(&block)
@@ -453,6 +459,8 @@ module Enumerable
       return result;
     }
   end
+
+  alias filter find_all
 
   def find_index(object = undefined, &block)
     return enum_for :find_index if `object === undefined && block === nil`
@@ -1221,9 +1229,15 @@ module Enumerable
     hash.values
   end
 
+  def tally
+    group_by(&:itself).transform_values(&:count)
+  end
+
   alias to_a entries
 
-  def to_h(*args)
+  def to_h(*args, &block)
+    return map(&block).to_h(*args) if block_given?
+
     %x{
       var hash = #{{}};
 

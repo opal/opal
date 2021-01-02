@@ -80,7 +80,14 @@ module Comparable
     true
   end
 
-  def clamp(min, max)
+  def clamp(min, max=nil)
+    if Range === min && max.nil?
+      max = min.end
+      max = Float::INFINITY if max.nil?
+      min = min.begin
+      min = -Float::INFINITY if min.nil?
+    end
+
     cmp = min <=> max
 
     unless cmp
