@@ -5,6 +5,8 @@ opal_filter "Hash" do
   fails "Hash#== computes equality for recursive hashes & arrays"
   fails "Hash#[] compares keys with eql? semantics" # spec relies on integer and float being different
   fails "Hash#[] does not create copies of the immediate default value" # spec uses mutable string
+  fails "Hash#[] does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
+  fails "Hash#[]= does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#[]= keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
   fails "Hash#compare_by_identity gives different identity for string literals" # Expected [2] to equal [1, 2]
   fails "Hash#delete allows removing a key while iterating" # Exception: Cannot read property '$$is_string' of undefined
@@ -20,6 +22,7 @@ opal_filter "Hash" do
   fails "Hash#invert compares new keys with eql? semantics" # spec relies on integer and float being different
   fails "Hash#rehash removes duplicate keys" # Expected 2 to equal 1
   fails "Hash#shift allows shifting entries while iterating" # Exception: Cannot read property '$$is_string' of undefined
+  fails "Hash#store does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#store keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
   fails "Hash#to_s calls #to_s on the object returned from #inspect if the Object isn't a String" # Expected "{\"a\"=>abc}" to equal "{:a=>abc}"
   fails "Hash#to_s does not call #to_s on a String returned from #inspect" # Expected "{\"a\"=>\"abc\"}" to equal "{:a=>\"abc\"}"

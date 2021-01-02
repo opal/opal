@@ -162,7 +162,7 @@ module Opal
         push 'if (Opal.rescue($err, ', expr(klasses), ')) {'
         indent do
           if lvar
-            push expr(lvar), '$err;'
+            push expr(lvar.updated(nil, [*lvar.children, s(:js_tmp, '$err')]))
           end
 
           # Need to ensure we clear the current exception out after the rescue block ends

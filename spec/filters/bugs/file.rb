@@ -35,5 +35,6 @@ opal_filter "File" do
   fails "File.join inserts the separator in between empty strings and arrays"
   fails "File.join raises a TypeError exception when args are nil"
   fails "File.join raises an ArgumentError if passed a recursive array"
+  fails "File.join raises errors for null bytes" # Expected ArgumentError but no exception was raised ("\u0000x/metadata.gz" was returned)
   fails "File.join returns a duplicate string when given a single argument"
 end

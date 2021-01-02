@@ -5,13 +5,11 @@ opal_filter "Encoding" do
   fails "File.basename returns basename with windows suffix" # Expected "c:\\bar" to equal "bar"
   fails "File.basename returns the basename for windows" # Expected "C:\\foo\\bar\\baz.txt" to equal "baz.txt"
   fails "File.basename returns the basename with the same encoding as the original" # NameError: uninitialized constant Encoding::Windows_1250
-  fails "File.basename takes into consideration the platform path separator(s)" # Expected "C:\\foo\\bar" to equal "bar"
   fails "File.dirname returns all the components of filename except the last one (edge cases on windows)" # Expected "/" to equal "//foo"
   fails "File.dirname returns the return all the components of filename except the last one (Windows format)" # Expected "." to equal "C:\\foo\\bar"
   fails "File.dirname returns the return all the components of filename except the last one (forward_slash)" # Expected "." to equal "C:/"
   fails "File.dirname returns the return all the components of filename except the last one (windows unc)" # Expected "." to equal "\\\\foo\\bar"
   fails "File.expand_path expands C:/./dir to C:/dir" # Exception: cd is not defined
-  fails "File.join prefers the separator of the right part if both parts have separators" # Expected "C:/\\windows" to equal "C:\\windows"
   fails "File.join respects given separator if only one part has a boundary separator" # Expected "C:\\/windows" to equal "C:\\windows"
   fails "Fixnum#to_s returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Fixnum#to_s returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
@@ -36,7 +34,6 @@ opal_filter "Encoding" do
   fails "Marshal.load for a String loads a String as ASCII-8BIT if no encoding is specified at the end" # ArgumentError: marshal data too short
   fails "Marshal.load for a String loads a String in another encoding" # NameError: 'encoding' is not allowed as an instance variable name
   fails "Marshal.load for a String loads a US-ASCII String" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:ASCII-8BIT (dummy)>
-  fails "Marshal.load for a String loads a UTF-8 String" # ArgumentError: dump format error
   fails "MatchData#post_match sets an empty result to the encoding of the source String" # NameError: uninitialized constant Encoding::ISO_8859_1
   fails "MatchData#post_match sets the encoding to the encoding of the source String" # NameError: uninitialized constant Encoding::EUC_JP
   fails "MatchData#pre_match sets an empty result to the encoding of the source String" # NameError: uninitialized constant Encoding::ISO_8859_1
@@ -123,32 +120,24 @@ opal_filter "Encoding" do
   fails "String#chars taints resulting strings when self is tainted" # Expected false to equal true
   fails "String#chars uses the String's encoding to determine what characters it contains" # Expected ["�", "�"] to equal ["𤭢"]
   fails "String#chars works if the String's contents is invalid for its encoding" # NoMethodError: undefined method `pack' for [164]:Array
-  fails "String#chomp removes the final carriage return, newline from a non-ASCII String when the record separator is changed" # ArgumentError: unknown encoding name - utf-32be
-  fails "String#chomp removes the final carriage return, newline from a non-ASCII String" # ArgumentError: unknown encoding name - utf-32be
-  fails "String#chop removes the final carriage return, newline from a non-ASCII String" # ArgumentError: unknown encoding name - utf-32be
   fails "String#chr returns a String in the same encoding as self" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#chr returns a copy of self" # Expected "e" not to equal "e"
-  fails "String#chr understands Strings that contain a mixture of character widths" # Expected 2 to equal 3
-  fails "String#chr understands multi-byte characters" # Expected 2 to equal 3
   fails "String#codepoints is synonomous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
   fails "String#codepoints raises an ArgumentError if self's encoding is invalid and a block is given" # Expected true to be false
   fails "String#codepoints raises an ArgumentError when no block is given if self has an invalid encoding" # Expected true to be false
   fails "String#codepoints raises an ArgumentError when self has an invalid encoding and a method is called on the returned Enumerator" # Expected true to be false
   fails "String#codepoints round-trips to the original String using Integer#chr" # Expected "\u0013眑တ" to equal ""
-  fails "String#codepoints works for multibyte characters" # Expected 2 to equal 3
   fails "String#each_char returns a different character if the String is transcoded" # ArgumentError: unknown encoding name - iso-8859-15
   fails "String#each_char returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
   fails "String#each_char taints resulting strings when self is tainted" # Expected false to equal true
   fails "String#each_char uses the String's encoding to determine what characters it contains" # Expected ["�", "�"] to equal ["𤭢"]
   fails "String#each_char works if the String's contents is invalid for its encoding" # NoMethodError: undefined method `pack' for [164]:Array
-  fails "String#each_codepoint is synonomous with #bytes for Strings which are single-byte optimisable" # Expected false to be true
   fails "String#each_codepoint raises an ArgumentError if self's encoding is invalid and a block is given" # Expected true to be false
   fails "String#each_codepoint raises an ArgumentError when self has an invalid encoding and a method is called on the returned Enumerator" # Expected true to be false
   fails "String#each_codepoint round-trips to the original String using Integer#chr" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#each_codepoint when no block is given returned Enumerator size should return the size of the string even when the string has an invalid encoding" # Expected true to be false
   fails "String#each_codepoint when no block is given returned Enumerator size should return the size of the string" # NoMethodError: undefined method `each_codepoint' for "hello":String
   fails "String#each_codepoint when no block is given returns an Enumerator even when self has an invalid encoding" # Expected true to be false
-  fails "String#each_codepoint works for multibyte characters" # Expected 2 to equal 3
   fails "String#encode given the xml: :attr option replaces all instances of '&' with '&amp;'" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode given the xml: :attr option replaces all instances of '<' with '&lt;'" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode given the xml: :attr option replaces all instances of '>' with '&gt;'" # NoMethodError: undefined method `default_internal' for Encoding
@@ -216,7 +205,6 @@ opal_filter "Encoding" do
   fails "String#encoding for US-ASCII Strings returns US-ASCII if self is US-ASCII only, despite the default internal and external encodings being different" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encoding for US-ASCII Strings returns US-ASCII if self is US-ASCII only, despite the default internal encoding being different" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encoding for US-ASCII Strings returns US-ASCII if self is US-ASCII" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "String#encoding returns an Encoding object" # Expected #<Encoding:UTF-16LE> (#<Class:0xc2>) to be an instance of Encoding
   fails "String#encoding returns the given encoding if #encode!has been called" # NameError: uninitialized constant Encoding::SHIFT_JIS
   fails "String#encoding returns the given encoding if #force_encoding has been called" # NameError: uninitialized constant Encoding::SHIFT_JIS
   fails "String#force_encoding accepts a String as the name of an Encoding" # ArgumentError: unknown encoding name - shift_jis
@@ -237,7 +225,6 @@ opal_filter "Encoding" do
   fails "String#ljust with length, padding with width returns a String in the same encoding as the original" # NameError: uninitialized constant Encoding::IBM437
   fails "String#ljust with length, padding with width, pattern raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#ljust with length, padding with width, pattern returns a String in the compatible encoding" # NameError: uninitialized constant Encoding::IBM437
-  fails "String#ord is equivalent to #codepoints.first" # NoMethodError: undefined method `codepoints' for "ঁং":String
   fails "String#ord raises an ArgumentError if called on an empty String" # Expected ArgumentError but no exception was raised (NaN was returned)
   fails "String#rindex with Regexp raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#rjust with length, padding with width returns a String in the same encoding as the original" # NameError: uninitialized constant Encoding::IBM437
@@ -269,6 +256,5 @@ opal_filter "Encoding" do
   fails "The predefined global constant STDOUT has nil for the internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
   fails "The predefined global constant STDOUT has the encodings set by #set_encoding" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Time#inspect returns a US-ASCII encoded string" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:ASCII-8BIT (dummy)>
-  fails "Time#strftime passes the format string's encoding to the result string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "Time#to_s returns a US-ASCII encoded string" # Expected #<Encoding:UTF-16LE> to be identical to #<Encoding:ASCII-8BIT (dummy)>
 end

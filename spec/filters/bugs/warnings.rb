@@ -5,7 +5,6 @@ opal_filter "warnings" do
   fails "Hash.[] ignores elements that are not arrays" # Expected warning to match: /ignoring wrong elements/
   fails "Literal (A::X) constant resolution with dynamically assigned constants returns the updated value when a constant is reassigned" # Expected warning to match: /already initialized constant/
   fails "Literal Regexps matches against $_ (last input) in a conditional if no explicit matchee provided" # Expected warning to match: /regex literal in condition/
-  fails "Module#attr with a boolean argument emits a warning when $VERBOSE is true" # Expected warning to match: /boolean argument is obsoleted/
   fails "Module#const_get with dynamically assigned constants returns the updated value of a constant" # Expected warning to match: /already initialized constant/
   fails "Optional variable assignments using compunded constants with &&= assignments" # Expected warning to match: /already initialized constant/
   fails "Optional variable assignments using compunded constants with operator assignments" # Expected warning to match: /already initialized constant/
@@ -19,6 +18,4 @@ opal_filter "warnings" do
   fails "The predefined global constants includes FALSE" # Expected warning to match: /constant ::FALSE is deprecated/
   fails "The predefined global constants includes NIL" # Expected warning to match: /constant ::NIL is deprecated/
   fails "The predefined global constants includes TRUE" # Expected warning to match: /constant ::TRUE is deprecated/
-  fails "Time#succ returns a new instance" # Expected warning to match: /Time#succ is obsolete/
-  fails "Time#succ returns a new time one second later than time" # Expected warning to match: /Time#succ is obsolete/
 end
