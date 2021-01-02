@@ -14,7 +14,8 @@
 - Source-map support for Node.js in the default runner (#2045)
 - SecureRandom#hex(n) (#2050)
 - Added a generic implementation of Kernel#caller and #warn(uplevel:) that works with sourcemaps in Node.js and Chrome (#2065)
-- Added support for numblocks `-> { _1 + _2 }.call(3, 4) # => 7` #2149
+- Added support for numblocks `-> { _1 + _2 }.call(3, 4) # => 7` (#2149)
+- Support `<internal:…>` and `<js:…>` in stacktraces, like MRI we now distinguish internal lines from lib/app lines (#2154)
 
 ### Fixed
 
@@ -62,6 +63,7 @@
 - `Encoding.default_external` is now initialized with `__ENCODING__` (#2072)
 - Keep the MersenneTwister implementation private (#2108)
 - Change parser to 3.0 (#2148)
+- Fix forwarding a rescued error to a global var: `rescue => $gvar` (#2154)
 
 ### Deprecated
 
