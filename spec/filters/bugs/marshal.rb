@@ -21,13 +21,11 @@ opal_filter "Marshal" do
   fails "Marshal.load for a Regexp loads a extended_user_regexp having ivar"
   fails "Marshal.load for a Regexp loads an extended Regexp" # Expected /[a-z]/ == /(?:)/ to be truthy but was false
   fails "Marshal.load for a String loads a String as BINARY if no encoding is specified at the end" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "Marshal.load for a String loads a String subclass with custom constructor"
   fails "Marshal.load for a Struct does not call initialize on the unmarshaled struct"
   fails "Marshal.load for a Symbol loads a Symbol" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Marshal.load for a Symbol loads a binary encoded Symbol" # Expected "â\u0086\u0092" to equal "→"
   fails "Marshal.load for a Symbol loads an encoded Symbol" # Expected "â\u0086\u0092" to equal "→"
   fails "Marshal.load for a Time loads nanoseconds"
-  fails "Marshal.load for a Time loads the zone"
   fails "Marshal.load for a Time loads"
   fails "Marshal.load for a user Class raises ArgumentError if the object from an 'o' stream is not dumpable as 'o' type user class"
   fails "Marshal.load for a user Class that extends a core type other than Object or BasicObject raises ArgumentError if the resulting class does not extend the same type"

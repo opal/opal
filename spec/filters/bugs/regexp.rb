@@ -68,7 +68,6 @@ opal_filter "regular_expressions" do
   fails "Regexp.compile given a String with escaped characters returns a Regexp with UTF-8 encoding if any UTF-8 escape sequences outside 7-bit ASCII are present" # NoMethodError: undefined method `encoding' for /ÿ/
   fails "Regexp.compile given a String with escaped characters returns a Regexp with source String having US-ASCII encoding if UTF-8 escape sequences using only 7-bit ASCII are present" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Regexp.compile given a String with escaped characters returns a Regexp with source String having US-ASCII encoding if only 7-bit ASCII characters are present regardless of the input String's encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "Regexp.compile given a String with escaped characters returns a Regexp with source String having UTF-8 encoding if any UTF-8 escape sequences outside 7-bit ASCII are present" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "Regexp.compile given a String with escaped characters returns a Regexp with source String having the input String's encoding" # NameError: uninitialized constant Encoding::Shift_JIS
   fails "Regexp.compile given a String with escaped characters returns a Regexp with the input String's encoding" # NameError: uninitialized constant Encoding::Shift_JIS
   fails "Regexp.compile works by default for subclasses with overridden #initialize" # Expected /hi/ (Regexp) to be kind of RegexpSpecsSubclass
@@ -79,24 +78,6 @@ opal_filter "regular_expressions" do
   fails "Regexp.last_match when given a Symbol returns a named capture" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
   fails "Regexp.last_match when given an Object coerces argument to an index using #to_int" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
   fails "Regexp.last_match when given an Object raises a TypeError when unable to coerce" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
-  fails "Regexp.new given a Regexp preserves any options given in the Regexp literal" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp uses the argument as a literal to construct a Regexp object" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\a'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\e'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\f'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\n'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\r'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\t'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\C-\\v'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\a'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\e'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\f'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\n'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\r'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\t'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts '\\M-\\v'" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters accepts a three-digit octal value" # NoMethodError: undefined method `compile' for Regexp
-  fails "Regexp.new given a Regexp with escaped characters interprets a digit following a three-digit octal value as a character" # NoMethodError: undefined method `compile' for Regexp
   fails "Regexp.new given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.new given a String raises a RegexpError when passed an incorrect regexp"
   fails "Regexp.new given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits"

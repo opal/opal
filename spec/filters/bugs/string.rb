@@ -1,9 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "String" do
   fails "String#% can produce a string with invalid encoding" # Expected true to be false
-  fails "String#% faulty key raises a KeyError" # NoMethodError: undefined method `call' for nil
-  fails "String#% faulty key sets the Hash as the receiver of KeyError" # NoMethodError: undefined method `call' for nil
-  fails "String#% faulty key sets the unmatched key as the key of KeyError" # NoMethodError: undefined method `call' for nil
   fails "String#% flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
   fails "String#% flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" to equal "1.e+02"
   fails "String#% flags # applies to formats aAeEfgG forces a decimal point to be added, even if no digits follow" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
@@ -127,8 +124,6 @@ opal_filter "String" do
   fails "String#casecmp? independent of case in UTF-8 mode for non-ASCII characters returns true when they are the same with normalized case" # Expected false to equal true
   fails "String#casecmp? independent of case returns nil if incompatible encodings" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#clone calls #initialize_copy on the new instance" # Expected nil to equal "string"
-  fails "String#clone copies constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
-  fails "String#clone copies modules included in the singleton class" # NoMethodError: undefined method `repr' for "string"
   fails "String#clone copies singleton methods" # NoMethodError: undefined method `special' for "string"
   fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimizable" # Expected [40, 41, 123, 125] to equal [40, 0, 41, 0, 123, 0, 125, 0]
   fails "String#concat when self is BINARY and argument is US-ASCII uses BINARY encoding" # NoMethodError: undefined method `concat' for "abc"
@@ -139,7 +134,6 @@ opal_filter "String" do
   fails "String#downcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
   fails "String#downcase full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # ArgumentError: [String#downcase] wrong number of arguments(2 for 0)
   fails "String#downcase full Unicode case mapping adapted for Turkic languages downcases characters according to Turkic semantics" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
-  fails "String#downcase full Unicode case mapping updates string metadata" # Expected 8 to equal 4
   fails "String#downcase! ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#dump does not take into account if a string is frozen" # NoMethodError: undefined method `dump' for "foo"
@@ -161,7 +155,6 @@ opal_filter "String" do
   fails "String#dump returns a subclass instance" # NoMethodError: undefined method `dump' for ""
   fails "String#dump wraps string with \"" # NoMethodError: undefined method `dump' for "foo"
   fails "String#dup calls #initialize_copy on the new instance" # Expected nil to equal "string"
-  fails "String#dup does not copy constants defined in the singleton class" # Exception: Cannot read property 'prototype' of undefined
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string" # Expected nil to equal 10
   fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimizable" # Expected [40, 41, 123, 125] to equal [40, 0, 41, 0, 123, 0, 125, 0]
@@ -302,7 +295,6 @@ opal_filter "String" do
   fails "String#upcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#upcase] wrong number of arguments(1 for 0)
   fails "String#upcase full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # ArgumentError: [String#upcase] wrong number of arguments(2 for 0)
   fails "String#upcase full Unicode case mapping adapted for Turkic languages upcases ASCII characters according to Turkic semantics" # ArgumentError: [String#upcase] wrong number of arguments(1 for 0)
-  fails "String#upcase full Unicode case mapping updates string metadata" # Expected 10 to equal 5
   fails "String#upcase! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.

@@ -19,7 +19,6 @@ opal_filter "Exception" do
   fails "Exception#== returns true if the two objects subclass Exception and have the same message and backtrace"
   fails "Exception#backtrace captures the backtrace for an exception into $!" # Expected "RuntimeError: " =~ /backtrace_spec/ to be truthy but was nil
   fails "Exception#backtrace captures the backtrace for an exception into $@" # NoMethodError: undefined method `first' for nil
-  fails "Exception#backtrace contains lines of the same format for each prior position in the stack"
   fails "Exception#backtrace includes the filename of the location immediately prior to where self raised in the second element"
   fails "Exception#backtrace includes the filename of the location where self raised in the first element"
   fails "Exception#backtrace includes the line number of the location immediately prior to where self raised in the second element"
