@@ -64,13 +64,13 @@
 - Keep the MersenneTwister implementation private (#2108)
 - Change parser to 3.0 (#2148)
 - Fix forwarding a rescued error to a global var: `rescue => $gvar` (#2154)
+- Now using Parser v3.0 and targeting Ruby 3.0 (#2156)
 
 ### Deprecated
 
 - Requiring nodejs/stacktrace has been deprecated, source-maps are already
   supported by the default Node.js runner or by requiring https://github.com/evanw/node-source-map-support
   before loading code compiled by Opal (#2045)
-
 
 ### Removed
 
