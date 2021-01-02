@@ -3,6 +3,7 @@ opal_filter "regular_expressions" do
   fails "MatchData#inspect returns a human readable representation of named captures" # Exception: named captures are not supported in javascript: "(?<first>\w+)\s+(?<last>\w+)\s+(\w+)"
   fails "MatchData#regexp returns a Regexp for the result of gsub(String)" # Expected /\[/gm == /\[/ to be truthy but was false
   fails "MatchData#string returns a frozen copy of the matched string for gsub(String)" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
+  fails "MatchData.allocate is undefined" # Expected NoMethodError but no exception was raised (#<MatchData>(#pretty_inspect raised #<NoMethodError: undefined method `named_captures' for nil>) was returned)
   fails "Regexp#encoding allows otherwise invalid characters if NOENCODING is specified" # NameError: uninitialized constant Regexp::NOENCODING
   fails "Regexp#encoding defaults to US-ASCII if the Regexp contains only US-ASCII character"
   fails "Regexp#encoding defaults to UTF-8 if \\u escapes appear"

@@ -29,6 +29,11 @@ opal_filter "Set" do
   fails "Set#divide when passed a block with an arity of 2 divides self into a set of subsets based on the blocks return values"
   fails "Set#divide when passed a block with an arity of 2 yields each two Object to the block"
   fails "Set#divide yields each Object to the block"
+  fails "Set#filter! keeps every element from self for which the passed block returns true" # NoMethodError: undefined method `filter!' for #<Set: {one,two,three}>
+  fails "Set#filter! returns an Enumerator when passed no block" # NoMethodError: undefined method `filter!' for #<Set: {one,two,three}>
+  fails "Set#filter! returns nil when self was not modified" # NoMethodError: undefined method `filter!' for #<Set: {one,two,three}>
+  fails "Set#filter! returns self when self was modified" # NoMethodError: undefined method `filter!' for #<Set: {one,two,three}>
+  fails "Set#filter! yields every element of self" # NoMethodError: undefined method `filter!' for #<Set: {one,two,three}>
   fails "Set#flatten raises an ArgumentError when self is recursive"
   fails "Set#flatten returns a copy of self with each included Set flattened"
   fails "Set#flatten when Set contains a Set-like object returns a copy of self with each included Set-like object flattened" # NoMethodError: undefined method `flatten' for #<Set: {#<SetSpecs::SetLike:0x8b30c>}>

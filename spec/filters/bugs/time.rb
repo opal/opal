@@ -1,12 +1,34 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Time" do
+  fails "Time#+ zone is a timezone object preserves time zone" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
   fails "Time#- tracks microseconds from a Rational" # Expected 0 to equal 123456
+  fails "Time#- zone is a timezone object preserves time zone" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time#ceil ceils to 0 decimal places with an explicit argument" # NoMethodError: undefined method `ceil' for 2010-03-30 05:43:25 UTC
+  fails "Time#ceil ceils to 2 decimal places with an explicit argument" # NoMethodError: undefined method `ceil' for 2010-03-30 05:43:25 UTC
+  fails "Time#ceil ceils to 4 decimal places with an explicit argument" # NoMethodError: undefined method `ceil' for 2010-03-30 05:43:25 UTC
+  fails "Time#ceil ceils to 7 decimal places with an explicit argument" # NoMethodError: undefined method `ceil' for 2010-03-30 05:43:25 UTC
+  fails "Time#ceil copies own timezone to the returning value" # NoMethodError: undefined method `ceil' for 2010-03-30 05:43:25 UTC
+  fails "Time#ceil defaults to ceiling to 0 places" # NoMethodError: undefined method `ceil' for 2010-03-30 05:43:25 UTC
+  fails "Time#ceil returns an instance of Time, even if #ceil is called on a subclass" # Expected Time to be identical to #<Class:0x38c06>
   fails "Time#dup returns a clone of Time instance"
+  fails "Time#floor copies own timezone to the returning value" # NoMethodError: undefined method `floor' for 2010-03-30 05:43:25 UTC
+  fails "Time#floor defaults to flooring to 0 places" # NoMethodError: undefined method `floor' for 2010-03-30 05:43:25 UTC
+  fails "Time#floor floors to 0 decimal places with an explicit argument" # NoMethodError: undefined method `floor' for 2010-03-30 05:43:25 UTC
+  fails "Time#floor floors to 7 decimal places with an explicit argument" # NoMethodError: undefined method `floor' for 2010-03-30 05:43:25 UTC
+  fails "Time#floor returns an instance of Time, even if #floor is called on a subclass" # Expected Time to be identical to #<Class:0x188fa>
   fails "Time#getlocal raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
+  fails "Time#getlocal with a timezone argument accepts timezone argument that must have #local_to_utc and #utc_to_local methods" # Expected to not get Exception but got: NoMethodError (undefined method `getlocal' for 2000-01-01 12:00:00 UTC)
+  fails "Time#getlocal with a timezone argument does not raise exception if timezone does not implement #local_to_utc method" # Expected to not get Exception but got: NoMethodError (undefined method `getlocal' for 2000-01-01 12:00:00 UTC)
+  fails "Time#getlocal with a timezone argument raises TypeError if timezone does not implement #utc_to_local method" # Expected TypeError (/can't convert \w+ into an exact number/) but got: NoMethodError (undefined method `getlocal' for 2000-01-01 12:00:00 UTC)
+  fails "Time#getlocal with a timezone argument returns a Time in the timezone" # NoMethodError: undefined method `getlocal' for 2000-01-01 12:00:00 UTC
+  fails "Time#getlocal with a timezone argument subject's class implements .find_timezone method calls .find_timezone to build a time object if passed zone name as a timezone argument" # NoMethodError: undefined method `getlocal' for 2000-01-01 12:00:00 UTC
+  fails "Time#getlocal with a timezone argument subject's class implements .find_timezone method does not call .find_timezone if passed any not string/numeric/timezone timezone argument" # Expected TypeError (/can't convert \w+ into an exact number/) but got: NoMethodError (undefined method `getlocal' for 2000-01-01 12:00:00 UTC)
   fails "Time#gmtime converts self to UTC, modifying the receiver" # Expected 2007-01-09 03:00:00 UTC to equal 2007-01-09 12:00:00 UTC
   fails "Time#hash returns an Integer" # Expected "Time:100000" (String) to be an instance of Integer
+  fails "Time#inspect formats nanoseconds as a Rational" # NoMethodError: undefined method `nsec' for 2007-11-01 15:25:00 UTC
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'" # Expected "2000-01-01 20:15:01 +1200" to equal "2000-01-01 20:15:01 +0100"
+  fails "Time#inspect preserves milliseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.123456 UTC" to be truthy but was false
   fails "Time#localtime raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
   fails "Time#nsec returns a positive value for dates before the epoch" # NoMethodError: undefined method `nsec' for 1969-11-12 13:18:57 UTC
   fails "Time#round copies own timezone to the returning value"
@@ -39,6 +61,9 @@ opal_filter "Time" do
   fails "Time#utc converts self to UTC, modifying the receiver" # Expected 2007-01-09 03:00:00 UTC to equal 2007-01-09 12:00:00 UTC
   fails "Time#zone Encoding.default_internal is set returns an ASCII string"
   fails "Time#zone defaults to UTC when bad zones given" # Expected 3600 to equal 0
+  fails "Time.at :in keyword argument could be UTC offset as a String in '+HH:MM or '-HH:MM' format" # TypeError: no implicit conversion of Hash into Integer
+  fails "Time.at :in keyword argument could be UTC offset as a number of seconds" # TypeError: no implicit conversion of Hash into Integer
+  fails "Time.at :in keyword argument could be a timezone object" # TypeError: no implicit conversion of Hash into Integer
   fails "Time.at passed Numeric passed BigDecimal doesn't round input value"
   fails "Time.at passed Numeric roundtrips a Rational produced by #to_r"
   fails "Time.at passed [Time, Numeric, format] :microsecond format traits second argument as microseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
@@ -59,6 +84,23 @@ opal_filter "Time" do
   fails "Time.mktime raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 +0200 was returned)
   fails "Time.new has at least microsecond precision" # NoMethodError: undefined method `nsec' for 2019-05-16 23:25:01 +0200
   fails "Time.new uses the local timezone" # Expected 10800 to equal -28800
+  fails "Time.new with a timezone argument #name method cannot marshal Time if #name method isn't implemented" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.new with a timezone argument #name method uses the optional #name method for marshaling" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.new with a timezone argument Time-like argument of #utc_to_local and #local_to_utc methods has attribute values the same as a Time object in UTC" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.new with a timezone argument Time-like argument of #utc_to_local and #local_to_utc methods implements subset of Time methods" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.new with a timezone argument accepts timezone argument that must have #local_to_utc and #utc_to_local methods" # Expected to not get Exception but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
+  fails "Time.new with a timezone argument does not raise exception if timezone does not implement #utc_to_local method" # Expected to not get Exception but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
+  fails "Time.new with a timezone argument raises TypeError if timezone does not implement #local_to_utc method" # Expected TypeError (/can't convert \w+ into an exact number/) but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
+  fails "Time.new with a timezone argument returned value by #utc_to_local and #local_to_utc methods could be Time instance" # Expected to not get Exception but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
+  fails "Time.new with a timezone argument returned value by #utc_to_local and #local_to_utc methods could be Time subclass instance" # Expected to not get Exception but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
+  fails "Time.new with a timezone argument returned value by #utc_to_local and #local_to_utc methods could be any object with #to_i method" # Expected to not get Exception but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
+  fails "Time.new with a timezone argument returned value by #utc_to_local and #local_to_utc methods could have any #zone and #utc_offset because they are ignored" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.new with a timezone argument returned value by #utc_to_local and #local_to_utc methods leads to raising Argument error if difference between argument and result is too large" # Expected ArgumentError (utc_offset out of range) but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
+  fails "Time.new with a timezone argument returns a Time in the timezone" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.new with a timezone argument subject's class implements .find_timezone method calls .find_timezone to build a time object at loading marshaled data" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.new with a timezone argument subject's class implements .find_timezone method calls .find_timezone to build a time object if passed zone name as a timezone argument" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.new with a timezone argument subject's class implements .find_timezone method does not call .find_timezone if passed any not string/numeric/timezone timezone argument" # Expected TypeError (/can't convert \w+ into an exact number/) but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
+  fails "Time.new with a timezone argument the #abbr method is used by '%Z' in #strftime" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
   fails "Time.new with a utc_offset argument raises ArgumentError if the month is greater than 12" # Expected ArgumentError (/(mon|argument) out of range/) but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
   fails "Time.new with a utc_offset argument returns a Time with a UTC offset specified as +HH:MM:SS" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
   fails "Time.now has at least microsecond precision" # NoMethodError: undefined method `nsec' for 2019-05-16 23:25:03 +0200

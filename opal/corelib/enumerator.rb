@@ -388,4 +388,8 @@ class Enumerator
       "#<#{self.class}: #{@enumerator.inspect}>"
     end
   end
+
+  class ArithmeticSequence < self
+    # We need to stub this for the time being
+  end
 end

@@ -14,11 +14,32 @@ opal_filter "Kernel" do
   fails "Kernel#Float for hexadecimal literals with binary exponent returns 0 for '0x1p-10000'"
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1P10000'"
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'"
+  fails "Kernel#Float when passed exception: false and invalid input swallows an error" # ArgumentError: [Object#Float] wrong number of arguments(2 for 1)
+  fails "Kernel#Float when passed exception: false and nil swallows it" # ArgumentError: [Object#Float] wrong number of arguments(2 for 1)
+  fails "Kernel#Float when passed exception: false and valid input returns a Float number" # ArgumentError: [Object#Float] wrong number of arguments(2 for 1)
+  fails "Kernel#Integer raises a TypeError when to_int returns not-an-Integer object and to_i returns nil" # Expected TypeError but no exception was raised ("1" was returned)
+  fails "Kernel#Integer return a result of to_i when to_int does not return an Integer" # Expected "1" == 42 to be truthy but was false
+  fails "Kernel#Integer when passed exception: false and an argument that contains a period swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel#Integer when passed exception: false and an empty string swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel#Integer when passed exception: false and invalid argument swallows an error" # ArgumentError: [MSpecEnv#Integer] wrong number of arguments(3 for -2)
+  fails "Kernel#Integer when passed exception: false and multiple leading -s swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel#Integer when passed exception: false and multiple trailing -s swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel#Integer when passed exception: false and no to_int or to_i methods exist swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel#Integer when passed exception: false and passed Infinity swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel#Integer when passed exception: false and passed NaN swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel#Integer when passed exception: false and passed a String that can't be converted to an Integer swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel#Integer when passed exception: false and passed a String that contains numbers normally parses it and returns an Integer" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel#Integer when passed exception: false and passed nil swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel#Integer when passed exception: false and to_i returns a value that is not an Integer swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel#Integer when passed exception: false and to_int returns nil and no to_i exists swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel#Integer when passed exception: false and valid argument returns an Integer number" # ArgumentError: [MSpecEnv#Integer] wrong number of arguments(3 for -2)
+  fails "Kernel#Pathname returns same argument when called with a pathname argument" # Expected foo.equal? foo to be truthy but was false
   fails "Kernel#String calls #to_s if #respond_to?(:to_s) returns true" # TypeError: no implicit conversion of MockObject into String
   fails "Kernel#String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true"
   fails "Kernel#__dir__ returns the expanded path of the directory when used in the main script" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file"
   fails "Kernel#__dir__ when used in eval with a given filename returns File.dirname(filename)" # ArgumentError: [MSpecEnv#eval] wrong number of arguments(3 for 1)
+  fails "Kernel#__dir__ when used in eval with top level binding returns nil" # NoMethodError: undefined method `binding' for #<MSpecEnv:0x5b3aa>
   fails "Kernel#__dir__ when used in eval with top level binding returns the real name of the directory containing the currently-executing file"
   fails "Kernel#autoload calls main.require(path) to load the file" # NameError: uninitialized constant TOPLEVEL_BINDING
   fails "Kernel#autoload can autoload in instance_eval" # NameError: uninitialized constant KSAutoloadD
@@ -38,6 +59,7 @@ opal_filter "Kernel" do
   fails "Kernel#caller returns an Array of caller locations using a range" # NoMethodError: undefined method `+' for 1..1
   fails "Kernel#caller returns an Array with the block given to #at_exit at the base of the stack" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xe208>
   fails "Kernel#caller returns the locations as String instances" # Expected "corelib/runtime.js:1675" to include "ruby/core/kernel/caller_spec.rb:32:in"
+  fails "Kernel#caller works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Kernel#class returns the class of the object"
   fails "Kernel#clone copies frozen?" # Expected false to be true
   fails "Kernel#clone copies tainted?" # Expected false to be true
@@ -65,6 +87,7 @@ opal_filter "Kernel" do
   fails "Kernel#eval updates a local in a scope above when modified in a nested block scope"
   fails "Kernel#eval updates a local in a surrounding block scope"
   fails "Kernel#eval updates a local in an enclosing scope"
+  fails "Kernel#eval uses (eval) filename if none is provided" # NoMethodError: undefined method `binding' for #<MSpecEnv:0x50788>
   fails "Kernel#eval uses the filename of the binding if none is provided"
   fails "Kernel#eval uses the same scope for local variables when given the same binding"
   fails "Kernel#eval with a magic encoding comment allows a magic encoding comment and a frozen_string_literal magic comment on the same line in emacs style" # Opal::SyntaxError: unexpected token $end
@@ -228,11 +251,16 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there ano not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
   fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel#sprintf with format string that contains %<> sections raises ArgumentError if missing second named argument" # KeyError: key not found: "foo"
+  fails "Kernel#then returns a sized Enumerator when no block given" # NoMethodError: undefined method `then' for #<Object:0x22882>
+  fails "Kernel#then returns the block return value" # NoMethodError: undefined method `then' for #<Object:0x22886>
+  fails "Kernel#then yields self" # NoMethodError: undefined method `then' for #<Object:0x2288a>
   fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: false/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: false\n"
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
   fails "Kernel#warn :uplevel keyword argument does not prepend caller information if the uplevel argument is too large" # Expected:   $stderr: "warning: foo\n"       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"
   fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: foo/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"
   fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: \n$/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: \n"
+  fails "Kernel#warn :uplevel keyword argument raises if :category keyword is not nil and not convertible to symbol" # Expected TypeError but no exception was raised (nil was returned)
+  fails "Kernel#warn :uplevel keyword argument shows the caller of #require and not #require itself with RubyGems loaded" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x28d18>
   fails "Kernel#warn :uplevel keyword argument shows the caller of #require and not #require itself without RubyGems" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Kernel#warn :uplevel keyword argument skips <internal: core library methods defined in Ruby" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Kernel#warn avoids recursion if Warning#warn is redefined and calls super" # NoMethodError: undefined method `insert' for "rubyexe.rb"
@@ -247,6 +275,12 @@ opal_filter "Kernel" do
   fails "Kernel.Complex() when passed a single non-Numeric coerces the passed argument using #to_c"
   fails "Kernel.Complex() when passed an Object which responds to #to_c returns the passed argument" # Expected (#<Object:0x332c0>+0i) to equal (0+1i)
   fails "Kernel.Complex() when passed an Objectc which responds to #to_c returns the passed argument" # Expected (#<Object:0x46fa6>+0i) to equal (0+1i)
+  fails "Kernel.Complex() when passed exception: false and [Numeric] returns a complex number" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for {"exception"=>false}>) == (123+0i) to be truthy but was false
+  fails "Kernel.Complex() when passed exception: false and [anything, non-Numeric] argument swallows an error" # ArgumentError: [MSpecEnv#Complex] wrong number of arguments(3 for -2)
+  fails "Kernel.Complex() when passed exception: false and [non-Numeric, Numeric] argument throws a TypeError" # Expected TypeError (not a real) but got: ArgumentError ([MSpecEnv#Complex] wrong number of arguments(3 for -2))
+  fails "Kernel.Complex() when passed exception: false and [non-Numeric] swallows an error" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for {"exception"=>false}>) == nil to be truthy but was false
+  fails "Kernel.Complex() when passed exception: false and nil arguments swallows an error" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for {"exception"=>false}>) == nil to be truthy but was false
+  fails "Kernel.Complex() when passed exception: false and non-numeric String arguments swallows an error" # ArgumentError: [MSpecEnv#Complex] wrong number of arguments(3 for -2)
   fails "Kernel.Complex() when passed nil raises TypeError" # Expected TypeError (can't convert nil into Complex) but no exception was raised ((nil+0i) was returned)
   fails "Kernel.Float for hexadecimal literals with binary exponent allows embedded _ in a number on either side of the P"
   fails "Kernel.Float for hexadecimal literals with binary exponent allows embedded _ in a number on either side of the p"
@@ -260,12 +294,36 @@ opal_filter "Kernel" do
   fails "Kernel.Float for hexadecimal literals with binary exponent returns 0 for '0x1p-10000'"
   fails "Kernel.Float for hexadecimal literals with binary exponent returns Infinity for '0x1P10000'"
   fails "Kernel.Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'"
+  fails "Kernel.Float when passed exception: false and invalid input swallows an error" # ArgumentError: [Kernel.Float] wrong number of arguments(2 for 1)
+  fails "Kernel.Float when passed exception: false and nil swallows it" # ArgumentError: [Kernel.Float] wrong number of arguments(2 for 1)
+  fails "Kernel.Float when passed exception: false and valid input returns a Float number" # ArgumentError: [Kernel.Float] wrong number of arguments(2 for 1)
+  fails "Kernel.Integer raises a TypeError when to_int returns not-an-Integer object and to_i returns nil" # Expected TypeError but no exception was raised ("1" was returned)
+  fails "Kernel.Integer return a result of to_i when to_int does not return an Integer" # Expected "1" == 42 to be truthy but was false
+  fails "Kernel.Integer when passed exception: false and an argument that contains a period swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel.Integer when passed exception: false and an empty string swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel.Integer when passed exception: false and invalid argument swallows an error" # ArgumentError: [MSpecEnv#Integer] wrong number of arguments(3 for -2)
+  fails "Kernel.Integer when passed exception: false and multiple leading -s swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel.Integer when passed exception: false and multiple trailing -s swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel.Integer when passed exception: false and no to_int or to_i methods exist swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel.Integer when passed exception: false and passed Infinity swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel.Integer when passed exception: false and passed NaN swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel.Integer when passed exception: false and passed a String that can't be converted to an Integer swallows an error" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel.Integer when passed exception: false and passed a String that contains numbers normally parses it and returns an Integer" # TypeError: no implicit conversion of Hash into Integer
+  fails "Kernel.Integer when passed exception: false and passed nil swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel.Integer when passed exception: false and to_i returns a value that is not an Integer swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel.Integer when passed exception: false and to_int returns nil and no to_i exists swallows an error" # ArgumentError: base specified for non string value
+  fails "Kernel.Integer when passed exception: false and valid argument returns an Integer number" # ArgumentError: [MSpecEnv#Integer] wrong number of arguments(3 for -2)
   fails "Kernel.Rational when passed a String converts the String to a Rational using the same method as String#to_r"
   fails "Kernel.Rational when passed a String does not use the same method as Float#to_r"
   fails "Kernel.Rational when passed a String raises a TypeError if the first argument is a Symbol"
   fails "Kernel.Rational when passed a String raises a TypeError if the second argument is a Symbol"
   fails "Kernel.Rational when passed a String scales the Rational value of the first argument by the Rational value of the second"
   fails "Kernel.Rational when passed a String when passed a Numeric calls #to_r to convert the first argument to a Rational"
+  fails "Kernel.Rational when passed exception: false and [anything, non-Numeric] swallows an error" # ArgumentError: [MSpecEnv#Rational] wrong number of arguments(3 for -2)
+  fails "Kernel.Rational when passed exception: false and [non-Numeric, Numeric] swallows an error" # ArgumentError: [MSpecEnv#Rational] wrong number of arguments(3 for -2)
+  fails "Kernel.Rational when passed exception: false and [non-Numeric] swallows an error" # NoMethodError: undefined method `to_i' for {"exception"=>false}
+  fails "Kernel.Rational when passed exception: false and nil arguments swallows an error" # TypeError: cannot convert nil into Rational
+  fails "Kernel.Rational when passed exception: false and non-Numeric String arguments swallows an error" # ArgumentError: [MSpecEnv#Rational] wrong number of arguments(3 for -2)
   fails "Kernel.String calls #to_s if #respond_to?(:to_s) returns true" # TypeError: no implicit conversion of MockObject into String
   fails "Kernel.String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true"
   fails "Kernel.__callee__ returns method name even from eval"
