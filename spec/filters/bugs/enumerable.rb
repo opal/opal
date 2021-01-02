@@ -36,7 +36,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject/) but got: TypeError (wrong element type NilClass (expected array))
   fails "Enumerable#to_h with block raises ArgumentError if block returns longer or shorter array" # Expected ArgumentError (/element has wrong array length/) but got: TypeError (wrong element type NilClass (expected array))
   fails "Enumerable#to_h with block raises TypeError if block returns something other than Array" # Expected TypeError (/wrong element type String/) but got: TypeError (wrong element type NilClass (expected array))
-  fails "Enumerable#uniq compares elements with matching hash codes with #eql?" # Depends on tainting
   fails "Enumerable#uniq uses eql? semantics" # Depends on the difference between Integer and Float
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given"
 end

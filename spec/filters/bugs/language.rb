@@ -53,11 +53,9 @@ opal_filter "language" do
   fails "A method assigns local variables from method parameters for definition 'def m(a, **nil); a end;'" # Opal::SyntaxError: Unsupported arg type kwnilarg
   fails "A method assigns local variables from method parameters for definition 'def m(a, b: 1) [a, b] end'" # Expected ArgumentError but no exception was raised ([{"a"=>1, "b"=>2}, 1] was returned)
   fails "A method assigns local variables from method parameters for definition 'def m(a:) a end'"
-  fails "A method assigns local variables from method parameters for definition 'def m(a:, **) a end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a:, **k) [a, k] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a:, b: 1) [a, b] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a:, b:) [a, b] end'"
-  fails "A method assigns local variables from method parameters for definition 'def m(a=1, **) a end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b: 2) [a, b] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b:) [a, b] end'"
   fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
