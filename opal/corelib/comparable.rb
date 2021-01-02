@@ -81,11 +81,15 @@ module Comparable
   end
 
   def clamp(min, max = nil)
-    if Range === min && max.nil?
-      max = min.end
-      max = Float::INFINITY if max.nil?
-      min = min.begin
-      min = -Float::INFINITY if min.nil?
+    if max.nil?
+      if Range === min
+        max = min.end
+        max = Float::INFINITY if max.nil?
+        min = min.begin
+        min = -Float::INFINITY if min.nil?
+      else
+        raise TypeError, "wrong argument type #{min.class} (expected Range)"
+      end
     end
 
     cmp = min <=> max
