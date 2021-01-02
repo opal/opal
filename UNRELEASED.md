@@ -1,10 +1,3 @@
-<!--
-Whitespace conventions:
-- 4 spaces before ## titles
-- 2 spaces before ### titles
-- 1 spaces before normal text
--->
-
 ### Added
 
 - Basic support for `uplevel:` keyword argument in `Kernel#warn` (#2006)
@@ -22,7 +15,6 @@ Whitespace conventions:
 - SecureRandom#hex(n) (#2050)
 - Added a generic implementation of Kernel#caller and #warn(uplevel:) that works with sourcemaps in Node.js and Chrome (#2065)
 - Added support for numblocks `-> { _1 + _2 }.call(3, 4) # => 7` #2149
-
 
 ### Fixed
 
@@ -59,7 +51,6 @@ Whitespace conventions:
 - Fix ruby 2.7 warnings (#2071)
 - Improve the --help descriptions (#2146)
 
-
 ### Changed
 
 - Updated outdated parser version (#2013)
@@ -71,8 +62,6 @@ Whitespace conventions:
 - `Encoding.default_external` is now initialized with `__ENCODING__` (#2072)
 - Keep the MersenneTwister implementation private (#2108)
 - Change parser to 3.0 (#2148)
-
-
 
 ### Deprecated
 
