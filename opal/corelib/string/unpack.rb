@@ -1,3 +1,4 @@
+require 'base64'
 require 'corelib/pack_unpack/format_string_parser'
 
 class String
@@ -234,23 +235,7 @@ class String
 
     function base64Decode(callback) {
       return function(data) {
-        var string = callback(data);
-        if (typeof(atob) === 'function') {
-          // Browser
-          return atob(string);
-        } else if (typeof(Buffer) === 'function') {
-          // Node
-          if (typeof(Buffer.from) === 'function') {
-            // Node 5.10+
-            return Buffer.from(string, 'base64').toString();
-          } else {
-            return new Buffer(string, 'base64').toString();
-          }
-        } else if (#{defined?(Base64)}) {
-          return #{Base64.decode64(`string`)};
-        } else {
-          #{raise "To use String#unpack('m'), you must first require 'base64'."}
-        }
+        return #{Base64.decode64(`callback(data)`)};
       }
     }
 

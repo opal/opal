@@ -6,7 +6,7 @@ module Base64
 
     // encoder
     // [https://gist.github.com/999166] by [https://github.com/nignag]
-    encode = Opal.global.btoa || function (input) {
+    encode = function (input) {
       var str = String(input);
       /* jshint ignore:start */
       for (
@@ -31,7 +31,7 @@ module Base64
 
     // decoder
     // [https://gist.github.com/1020396] by [https://github.com/atk]
-    decode = Opal.global.atob || function (input) {
+    decode = function (input) {
       var str = String(input).replace(/=+$/, '');
       if (str.length % 4 == 1) {
         #{raise ArgumentError, 'invalid base64 (failed: The string to be decoded is not correctly encoded.)'};

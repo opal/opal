@@ -4,6 +4,8 @@ opal_filter "StringScanner" do
   fails "StringScanner#<< raises a TypeError if the given argument can't be converted to a String"
   fails "StringScanner#<< when passed a Fixnum doesn't call to_int on the argument"
   fails "StringScanner#<< when passed a Fixnum raises a TypeError"
+  fails "StringScanner#<< when passed an Integer doesn't call to_int on the argument" # Expected TypeError but got: NoMethodError (undefined method `<<' for #<StringScanner:0x28c>)
+  fails "StringScanner#<< when passed an Integer raises a TypeError" # Expected TypeError but got: NoMethodError (undefined method `<<' for #<StringScanner:0x290>)
   fails "StringScanner#[] raises a IndexError when there's no named capture"
   fails "StringScanner#[] returns named capture"
   fails "StringScanner#clear set the scan pointer to the end of the string and clear matching data."
@@ -12,6 +14,8 @@ opal_filter "StringScanner" do
   fails "StringScanner#concat raises a TypeError if the given argument can't be converted to a String"
   fails "StringScanner#concat when passed a Fixnum doesn't call to_int on the argument"
   fails "StringScanner#concat when passed a Fixnum raises a TypeError"
+  fails "StringScanner#concat when passed an Integer doesn't call to_int on the argument" # Expected TypeError but got: NoMethodError (undefined method `concat' for #<StringScanner:0x362>)
+  fails "StringScanner#concat when passed an Integer raises a TypeError" # Expected TypeError but got: NoMethodError (undefined method `concat' for #<StringScanner:0x366>)
   fails "StringScanner#dup copies previous match state"
   fails "StringScanner#empty? returns false if the scan pointer is not at the end of the string" # NoMethodError: undefined method `empty?' for #<StringScanner:0x726>
   fails "StringScanner#empty? returns true if the scan pointer is at the end of the string" # NoMethodError: undefined method `empty?' for #<StringScanner:0x72a>
@@ -50,6 +54,8 @@ opal_filter "StringScanner" do
   fails "StringScanner#restsize is equivalent to rest.size"
   fails "StringScanner#restsize returns the length of the rest of the string" # NoMethodError: undefined method `restsize' for #<StringScanner:0x4a4>
   fails "StringScanner#restsize warns in verbose mode that the method is obsolete"
+  fails "StringScanner#scan raises a TypeError if pattern is a String" # Expected TypeError but no exception was raised (nil was returned)
+  fails "StringScanner#scan raises a TypeError if pattern isn't a Regexp nor String" # Expected TypeError but no exception was raised (nil was returned)
   fails "StringScanner#scan raises a TypeError if pattern isn't a Regexp"
   fails "StringScanner#scan_full returns the matched string if the third argument is true and advances the scan pointer if the second argument is true"
   fails "StringScanner#scan_full returns the matched string if the third argument is true"

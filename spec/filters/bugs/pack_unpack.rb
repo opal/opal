@@ -28,7 +28,6 @@ opal_filter "String#unpack" do
   fails "String#unpack with format 'a' decodes into raw (ascii) string values" # Expected "UTF-16LE" to equal "ASCII-8BIT"
   fails "String#unpack with format 'b' decodes into US-ASCII string values" # Expected "UTF-16LE" to equal "US-ASCII"
   fails "String#unpack with format 'h' should make strings with US_ASCII encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "String#unpack with format 'm' decodes all pre-encoded ascii byte values" # Expected ["\u007FÂ\u0080Â\u0081Â\u0082Â\u0083"] to be computed by "f8KAwoHCgsKD\n".unpack from "m" (computed ["\u007F\u0080\u0081\u0082\u0083"] instead)
   fails "String#unpack with format 'm' produces binary strings" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "String#unpack with format 'q' adds nil for each element requested beyond the end of the String" # Expected [7523094288207668000, nil, nil] to be computed by "abcdefgh".unpack from "q3" (computed [7523094288207667000, nil, nil] instead)
   fails "String#unpack with format 'q' decodes a long with most significant bit set as a negative number" # Expected [-71870673923813380] to equal [-71870673923814400]
@@ -88,7 +87,6 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'U' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'U' encodes values larger than UTF-8 max codepoints" # Exception: Invalid code point 1114112
   fails "Array#pack with format 'U' raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised ("\u0005" was returned)
-  fails "Array#pack with format 'U' sets the output string to UTF-8 encoding" # Expected #<Encoding:UTF-8> to be computed by "\u0000".encoding (computed #<Encoding:UTF-16LE> instead)
   fails "Array#pack with format 'a' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'a' returns a string in encoding of common to the concatenated results" # RuntimeError: Unsupported pack directive "U" (no chunk reader defined)
   fails "Array#pack with format 'c' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)

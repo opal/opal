@@ -29,6 +29,7 @@ module Testing
         lib/spec_helper
         mspec/commands/mspec-run
         etc
+        rubygems
       ]
     end
 
@@ -106,7 +107,7 @@ module Testing
 
       env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
 
-      File.write filename, <<-RUBY
+      File.write filename, <<~RUBY
         require 'opal/platform' # in node ENV is replaced
         #{env_data}
 
@@ -123,7 +124,12 @@ module Testing
         ]
 
         srand(#{random_seed})
-        MSpec.randomize(true)
+        MSpec.randomize = true
+
+        # legacy MSpec
+        def frozen_error_class
+          FrozenError
+        end
 
         MSpec.process
         OSpecFilter.main.unused_filters_message(list: #{!!ENV['LIST_UNUSED_FILTERS']})

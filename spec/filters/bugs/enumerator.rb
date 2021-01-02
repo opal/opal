@@ -14,6 +14,8 @@ opal_filter "Enumerator" do
   fails "Enumerator#initialize sets size to the given size if the given size is Float::INFINITY"
   fails "Enumerator#initialize sets size to the given size if the given size is a Fixnum"
   fails "Enumerator#initialize sets size to the given size if the given size is a Proc"
+  fails "Enumerator#initialize sets size to the given size if the given size is an Integer" # Expected 4 == 100 to be truthy but was false
+  fails "Enumerator#next restarts the enumerator if an exception terminated a previous iteration" # Expected [#<NoMethodError: undefined method `next' for #<Enumerator: #<Enumerator::Generator:0x4f2>:each>>,  #<NoMethodError: undefined method `next' for #<Enumerator: #<Enumerator::Generator:0x4f2>:each>>] == [#<StandardError: StandardError>, #<StandardError: StandardError>] to be truthy but was false
   fails "Enumerator#next_values advances the position of the current element"
   fails "Enumerator#next_values advances the position of the enumerator each time when called multiple times"
   fails "Enumerator#next_values raises StopIteration if called on a finished enumerator"
@@ -34,4 +36,5 @@ opal_filter "Enumerator" do
   fails "Enumerator#peek_values returns the next element in self"
   fails "Enumerator#peek_values works in concert with #rewind"
   fails "Enumerator#to_enum exposes multi-arg yields as an array" # NoMethodError: undefined method `next' for #<Enumerator: #<Object:0x53e80>:each>
+  fails "Enumerator.new when passed a block yielded values handles yield arguments properly" # Expected 1 == [1, 2] to be truthy but was false
 end

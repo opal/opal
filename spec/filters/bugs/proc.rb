@@ -18,14 +18,17 @@ opal_filter "Proc" do
   fails "Proc#curry with arity argument returns Procs with arities of -1 regardless of the value of _arity_"
   fails "Proc#curry with arity argument returns a Proc if called on a lambda that requires fewer than _arity_ arguments but may take more" # ArgumentError: wrong number of arguments (4 for 5)
   fails "Proc#inspect for a proc created with Proc.new has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Proc#inspect for a proc created with Proc.new returns a description including file and line number" # Expected "#<Proc:0x200>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:6>$/ to be truthy but was nil
   fails "Proc#inspect for a proc created with Symbol#to_proc has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#inspect for a proc created with Symbol#to_proc has an ASCII-8BIT encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#inspect for a proc created with Symbol#to_proc returns a description including '(&:symbol)'" # Expected "#<Proc:0x75d4e>" to match /^#<Proc:0x\h+\(&:foobar\)>$/
   fails "Proc#inspect for a proc created with UnboundMethod#to_proc has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#inspect for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#inspect for a proc created with lambda has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Proc#inspect for a proc created with lambda returns a description including '(lambda)' and including file and line number" # Expected "#<Proc:0x22e>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:16 \(lambda\)>$/ to be truthy but was nil
   fails "Proc#inspect for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#inspect for a proc created with proc has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Proc#inspect for a proc created with proc returns a description including file and line number" # Expected "#<Proc:0x25a>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:26>$/ to be truthy but was nil
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword"
   fails "Proc#lambda? is preserved when passing a Proc with & to the proc keyword"
   fails "Proc#source_location returns an Array"
@@ -34,16 +37,20 @@ opal_filter "Proc" do
   fails "Proc#source_location returns the same value for a proc-ified method as the method reports" # Expected ["ruby/core/proc/fixtures/source_location.rb", 3] to equal nil
   fails "Proc#source_location sets the first value to the path of the file in which the proc was defined"
   fails "Proc#source_location sets the last value to a Fixnum representing the line on which the proc was defined"
+  fails "Proc#source_location sets the last value to an Integer representing the line on which the proc was defined" # NoMethodError: undefined method `last' for nil
   fails "Proc#source_location works even if the proc was created on the same line"
   fails "Proc#to_s for a proc created with Proc.new has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Proc#to_s for a proc created with Proc.new returns a description including file and line number" # Expected "#<Proc:0x17cc0>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:6>$/ to be truthy but was nil
   fails "Proc#to_s for a proc created with Symbol#to_proc has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#to_s for a proc created with Symbol#to_proc has an ASCII-8BIT encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#to_s for a proc created with Symbol#to_proc returns a description including '(&:symbol)'" # Expected "#<Proc:0x6cd2c>" to match /^#<Proc:0x\h+\(&:foobar\)>$/
   fails "Proc#to_s for a proc created with UnboundMethod#to_proc has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#to_s for a proc created with UnboundMethod#to_proc returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#to_s for a proc created with lambda has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Proc#to_s for a proc created with lambda returns a description including '(lambda)' and including file and line number" # Expected "#<Proc:0x17cec>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:16 \(lambda\)>$/ to be truthy but was nil
   fails "Proc#to_s for a proc created with lambda returns a description including '(lambda)' and optionally including file and line number"
   fails "Proc#to_s for a proc created with proc has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Proc#to_s for a proc created with proc returns a description including file and line number" # Expected "#<Proc:0x17d18>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:26>$/ to be truthy but was nil
   fails "Proc#yield can call its block argument declared with a block argument" # Expected 6 to equal 10
   fails "Proc#yield yields to the block given at declaration and not to the block argument" # Expected 3 to equal 7
   fails "Proc.allocate raises a TypeError"

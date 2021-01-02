@@ -16,6 +16,7 @@ opal_filter "Kernel" do
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'"
   fails "Kernel#String calls #to_s if #respond_to?(:to_s) returns true" # TypeError: no implicit conversion of MockObject into String
   fails "Kernel#String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true"
+  fails "Kernel#__dir__ returns the expanded path of the directory when used in the main script" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file"
   fails "Kernel#__dir__ when used in eval with a given filename returns File.dirname(filename)" # ArgumentError: [MSpecEnv#eval] wrong number of arguments(3 for 1)
   fails "Kernel#__dir__ when used in eval with top level binding returns the real name of the directory containing the currently-executing file"
@@ -38,10 +39,14 @@ opal_filter "Kernel" do
   fails "Kernel#caller returns an Array with the block given to #at_exit at the base of the stack" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xe208>
   fails "Kernel#caller returns the locations as String instances" # Expected "corelib/runtime.js:1675" to include "ruby/core/kernel/caller_spec.rb:32:in"
   fails "Kernel#class returns the class of the object"
+  fails "Kernel#clone copies frozen?" # Expected false to be true
+  fails "Kernel#clone copies tainted?" # Expected false to be true
   fails "Kernel#clone replaces a singleton object's metaclass with a new copy with the same superclass" # NoMethodError: undefined method `singleton_methods' for #<#<Class:0x2df8e>:0x2df90>
   fails "Kernel#clone uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
   fails "Kernel#define_singleton_method when given an UnboundMethod will raise when attempting to define an object's singleton method from another object's singleton method"
   fails "Kernel#dup uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
+  fails "Kernel#eval activates refinements from the binding" # NoMethodError: undefined method `refine' for #<Module:0x1ad8>
+  fails "Kernel#eval activates refinements from the eval scope" # NoMethodError: undefined method `refine' for #<Module:0x20d4>
   fails "Kernel#eval allows a binding to be captured inside an eval"
   fails "Kernel#eval allows creating a new class in a binding created by #eval"
   fails "Kernel#eval allows creating a new class in a binding"
@@ -68,12 +73,17 @@ opal_filter "Kernel" do
   fails "Kernel#eval with a magic encoding comment allows a shebang line before the magic encoding comment" # Opal::SyntaxError: unexpected token $end
   fails "Kernel#eval with a magic encoding comment allows an emacs-style magic comment encoding" # Opal::SyntaxError: unexpected token $end
   fails "Kernel#eval with a magic encoding comment allows spaces before the magic encoding comment" # Opal::SyntaxError: unexpected token $end
+  fails "Kernel#eval with a magic encoding comment ignores the frozen_string_literal magic comment if it appears after a token and warns if $VERBOSE is true" # Expected warning to match: /warning: `frozen_string_literal' is ignored after any tokens/ but got: ""
   fails "Kernel#eval with a magic encoding comment ignores the magic encoding comment if it is after a frozen_string_literal magic comment" # Opal::SyntaxError: unexpected token $end
   fails "Kernel#eval with a magic encoding comment uses the magic comment encoding for parsing constants" # Opal::SyntaxError: unexpected token $end
   fails "Kernel#eval with a magic encoding comment uses the magic comment encoding for the encoding of literal strings" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "Kernel#extend does not calls append_features on arguments metaclass"
   fails "Kernel#extend raises an ArgumentError when no arguments given"
   fails "Kernel#fail accepts an Object with an exception method returning an Exception" # TypeError: exception class/object expected
+  fails "Kernel#freeze freezes an object's singleton class" # Expected false == true to be truthy but was false
+  fails "Kernel#initialize_copy does nothing if the argument is the same as the receiver" # Expected nil.equal? #<Object:0x590> to be truthy but was false
+  fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
+  fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
   fails "Kernel#inspect does not call #to_s if it is defined"
   fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
   fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton
@@ -81,13 +91,13 @@ opal_filter "Kernel" do
   fails "Kernel#kind_of? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#kind_of? returns true if given a Module that object has been extended with" # Requires string mutability
   fails "Kernel#local_variables contains locals as they are added"
+  fails "Kernel#local_variables includes only unique variable names" # NoMethodError: undefined method `local_variables' for #<MSpecEnv:0x476>
   fails "Kernel#local_variables is accessible from bindings"
   fails "Kernel#local_variables is accessible in eval"
   fails "Kernel#method can be called even if we only repond_to_missing? method, true"
   fails "Kernel#method returns a method object if we repond_to_missing? method"
   fails "Kernel#method will see an alias of the original method as == when in a derived class"
   fails "Kernel#methods does not return private singleton methods defined in 'class << self'"
-  fails "Kernel#methods returns the publicly accessible methods of the object"
   fails "Kernel#object_id returns a different value for two Bignum literals"
   fails "Kernel#object_id returns a different value for two String literals"
   fails "Kernel#p flushes output if receiver is a File"
@@ -104,21 +114,15 @@ opal_filter "Kernel" do
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors"
   fails "Kernel#public_send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#puts delegates to $stdout.puts"
+  fails "Kernel#raise passes no arguments to the constructor when given only an exception class" # Expected #<Class:0x4c8> but got: ArgumentError ([#initialize] wrong number of arguments(1 for 0))
   fails "Kernel#raise raises RuntimeError if no exception class is given" # RuntimeError: RuntimeError
   fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
-  fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning false"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"
   fails "Kernel#respond_to_missing? causes #respond_to? to return true if called and not returning false"
-  fails "Kernel#respond_to_missing? is called a 2nd argument of false when #respond_to? is called with only 1 argument"
-  fails "Kernel#respond_to_missing? is called for missing class methods"
-  fails "Kernel#respond_to_missing? is called when #respond_to? would return false"
-  fails "Kernel#respond_to_missing? is called with a 2nd argument of false when #respond_to? is"
-  fails "Kernel#respond_to_missing? is called with true as the second argument when #respond_to? is"
-  fails "Kernel#respond_to_missing? is not called when #respond_to? would return true"
-  fails "Kernel#respond_to_missing? isn't called when obj responds to the given public method"
   fails "Kernel#send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#singleton_class raises TypeError for Fixnum"
+  fails "Kernel#singleton_class raises TypeError for Integer" # Expected TypeError but no exception was raised (#<Class:#<Number:0xf7>> was returned)
   fails "Kernel#singleton_class raises TypeError for Symbol"
   fails "Kernel#singleton_method find a method defined on the singleton class" # NoMethodError: undefined method `singleton_method' for #<Object:0x39d20>
   fails "Kernel#singleton_method only looks at singleton methods and not at methods in the class" # Expected NoMethodError to equal NameError
@@ -126,6 +130,7 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_method returns a Method which can be called" # NoMethodError: undefined method `singleton_method' for #<Object:0x39d1a>
   fails "Kernel#singleton_methods when not passed an argument does not return any included methods for a class including a module"
   fails "Kernel#singleton_methods when not passed an argument does not return any included methods for a module including a module"
+  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104d6>
   fails "Kernel#singleton_methods when not passed an argument for a module does not return methods in a module prepended to Module itself" # NoMethodError: undefined method `singleton_methods' for SingletonMethodsSpecs::SelfExtending
   fails "Kernel#singleton_methods when not passed an argument returns a unique list for a subclass including a module"
   fails "Kernel#singleton_methods when not passed an argument returns a unique list for a subclass"
@@ -138,6 +143,9 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when not passed an argument returns the names of inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module"
   fails "Kernel#singleton_methods when not passed an argument returns the names of inherited singleton methods for a subclass"
   fails "Kernel#singleton_methods when not passed an argument returns the names of module methods for a module"
+  fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104da>
+  fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104e2>
+  fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104de>
   fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object extented with a module including a module"
   fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object extented with a module"
   fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object extented with two modules"
@@ -145,9 +153,12 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when passed false does not return any included methods for a class including a module"
   fails "Kernel#singleton_methods when passed false does not return any included methods for a module including a module"
   fails "Kernel#singleton_methods when passed false does not return names of inherited singleton methods for a subclass"
+  fails "Kernel#singleton_methods when passed false does not return private singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104fe>
   fails "Kernel#singleton_methods when passed false does not return the names of inherited singleton methods for a class extended with a module"
   fails "Kernel#singleton_methods when passed false for a module does not return methods in a module prepended to Module itself" # NoMethodError: undefined method `singleton_methods' for SingletonMethodsSpecs::SelfExtending
   fails "Kernel#singleton_methods when passed false returns an empty Array for an object extended with a module including a module"
+  fails "Kernel#singleton_methods when passed false returns an empty Array for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104fa>
+  fails "Kernel#singleton_methods when passed false returns an empty Array for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104f6>
   fails "Kernel#singleton_methods when passed false returns an empty Array for an object extented with a module"
   fails "Kernel#singleton_methods when passed false returns an empty Array for an object extented with two modules"
   fails "Kernel#singleton_methods when passed false returns an empty Array for an object with no singleton methods"
@@ -157,6 +168,7 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when passed false returns the names of singleton methods of the subclass"
   fails "Kernel#singleton_methods when passed true does not return any included methods for a class including a module"
   fails "Kernel#singleton_methods when passed true does not return any included methods for a module including a module"
+  fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104e6>
   fails "Kernel#singleton_methods when passed true for a module does not return methods in a module prepended to Module itself" # NoMethodError: undefined method `singleton_methods' for SingletonMethodsSpecs::SelfExtending
   fails "Kernel#singleton_methods when passed true returns a unique list for a subclass including a module"
   fails "Kernel#singleton_methods when passed true returns a unique list for a subclass"
@@ -169,13 +181,14 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when passed true returns the names of inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module"
   fails "Kernel#singleton_methods when passed true returns the names of inherited singleton methods for a subclass"
   fails "Kernel#singleton_methods when passed true returns the names of module methods for a module"
+  fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104f2>
+  fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104ee>
+  fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104ea>
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with a module including a module"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with a module"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with two modules"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object"
-  fails "Kernel#sprintf faulty key raises a KeyError"
-  fails "Kernel#sprintf faulty key sets the Hash as the receiver of KeyError"
-  fails "Kernel#sprintf faulty key sets the unmatched key as the key of KeyError"
+  fails "Kernel#sprintf can produce a string with invalid encoding" # Expected true to be false
   fails "Kernel#sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
   fails "Kernel#sprintf flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" to equal "1.e+02"
   fails "Kernel#sprintf flags # applies to formats aAeEfgG forces a decimal point to be added, even if no digits follow" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
@@ -215,7 +228,15 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there ano not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
   fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel#sprintf with format string that contains %<> sections raises ArgumentError if missing second named argument" # KeyError: key not found: "foo"
+  fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: false/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: false\n"
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
+  fails "Kernel#warn :uplevel keyword argument does not prepend caller information if the uplevel argument is too large" # Expected:   $stderr: "warning: foo\n"       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"
+  fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: foo/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"
+  fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: \n$/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: \n"
+  fails "Kernel#warn :uplevel keyword argument shows the caller of #require and not #require itself without RubyGems" # NoMethodError: undefined method `insert' for "rubyexe.rb"
+  fails "Kernel#warn :uplevel keyword argument skips <internal: core library methods defined in Ruby" # NoMethodError: undefined method `insert' for "rubyexe.rb"
+  fails "Kernel#warn avoids recursion if Warning#warn is redefined and calls super" # NoMethodError: undefined method `insert' for "rubyexe.rb"
+  fails "Kernel#warn does not call Warning.warn if self is the Warning module" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Kernel#warn writes each array element on a line when passes an array" # Expected:   $stderr: "line 1\nline 2\n"       got:   $stderr: "[\"line 1\", \"li
   fails "Kernel#yield_self returns a sized Enumerator when no block given" # Requires Enumerator#peek
   fails "Kernel.Complex() when passed Numerics n1 and n2 and at least one responds to #real? with false returns n1 + n2 * Complex(0, 1)"
@@ -268,17 +289,19 @@ opal_filter "Kernel" do
   fails "Kernel.autoload? returns nil if no file has been registered for a constant" # NoMethodError: undefined method `autoload?' for Kernel
   fails "Kernel.autoload? returns the name of the file that will be autoloaded" # NoMethodError: undefined method `autoload?' for Kernel
   fails "Kernel.global_variables finds subset starting with std"
+  fails "Kernel.lambda does not create lambda-style Procs when captured with #method" # Expected true to be false
   fails "Kernel.lambda raises an ArgumentError when no block is given"
   fails "Kernel.lambda returned the passed Proc if given an existing Proc" # Expected true to be false
   fails "Kernel.lambda returns from the lambda itself, not the creation site of the lambda"
+  fails "Kernel.lambda returns the passed Proc if given an existing Proc through super" # Expected true to be false
+  fails "Kernel.lambda returns the passed Proc if given an existing Proc" # Expected true to be false
   fails "Kernel.loop returns StopIteration#result, the result value of a finished iterator" # requires changes in enumerator.rb
   fails "Kernel.printf calls write on the first argument when it is not a string"
   fails "Kernel.printf writes to stdout when a string is the first argument"
   fails "Kernel.proc returned the passed Proc if given an existing Proc" # Expected false to be true
+  fails "Kernel.rand is random on boot" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Kernel.rand supports custom object types" # Expected "NaN#<struct KernelSpecs::CustomRangeInteger value=1>" (String) to be an instance of KernelSpecs::CustomRangeInteger
-  fails "Kernel.sprintf faulty key raises a KeyError"
-  fails "Kernel.sprintf faulty key sets the Hash as the receiver of KeyError"
-  fails "Kernel.sprintf faulty key sets the unmatched key as the key of KeyError"
+  fails "Kernel.sprintf can produce a string with invalid encoding" # Expected true to be false
   fails "Kernel.sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
   fails "Kernel.sprintf flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" to equal "1.e+02"
   fails "Kernel.sprintf flags # applies to formats aAeEfgG forces a decimal point to be added, even if no digits follow" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
@@ -318,4 +341,5 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there ano not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
   fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "Kernel.sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
+  fails "Kernel.srand returns the previous seed value on the first call" # NoMethodError: undefined method `insert' for "rubyexe.rb"
 end

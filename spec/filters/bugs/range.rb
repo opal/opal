@@ -2,18 +2,24 @@
 opal_filter "Range" do
   fails "Range#=== requires #succ method to be implemented" # Expected TypeError (/can't iterate from/) but no exception was raised (true was returned)
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers accepts (+/-)Float::INFINITY from the block"
+  fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns a boundary element if appropriate" # NoMethodError: undefined method `prev_float' for 3
+  fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns an element at an index for which block returns 0 (small numbers)" # TypeError: can't iterate from Float
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns an element at an index for which block returns 0"
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns nil if the block never returns zero"
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns nil if the block returns greater than zero for every element"
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns nil if the block returns less than zero for every element"
+  fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers works with infinity bounds" # TypeError: can't iterate from Float
+  fails "Range#bsearch with Float values with a block returning true or false returns a boundary element if appropriate" # NoMethodError: undefined method `prev_float' for 3
   fails "Range#bsearch with Float values with a block returning true or false returns minimum element if the block returns true for every element"
   fails "Range#bsearch with Float values with a block returning true or false returns nil if the block returns false for every element"
   fails "Range#bsearch with Float values with a block returning true or false returns nil if the block returns nil for every element"
   fails "Range#bsearch with Float values with a block returning true or false returns the smallest element for which block returns true"
+  fails "Range#bsearch with Float values with a block returning true or false works with infinity bounds" # TypeError: can't iterate from Float
   fails "Range#each raises a TypeError if the first element is a Time object"
   fails "Range#eql? returns false if the endpoints are not eql?"
   fails "Range#first raises a TypeError if #to_int does not return an Integer"
   fails "Range#hash generates a Fixnum for the hash value"
+  fails "Range#hash generates an Integer for the hash value" # Expected "A,1,1,0" (String) to be an instance of Integer
   fails "Range#include? on string elements returns false if other is not matched by element.succ" # Expected true to be false
   fails "Range#include? with weird succ when excluded end value returns false if other is not matched by element.succ" # Expected true to be false
   fails "Range#include? with weird succ when included end value returns false if other is equal as last element but not matched by element.succ" # Expected true to be false
