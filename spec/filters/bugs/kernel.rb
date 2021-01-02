@@ -98,7 +98,6 @@ opal_filter "Kernel" do
   fails "Kernel#method returns a method object if we repond_to_missing? method"
   fails "Kernel#method will see an alias of the original method as == when in a derived class"
   fails "Kernel#methods does not return private singleton methods defined in 'class << self'"
-  fails "Kernel#methods returns the publicly accessible methods of the object"
   fails "Kernel#object_id returns a different value for two Bignum literals"
   fails "Kernel#object_id returns a different value for two String literals"
   fails "Kernel#p flushes output if receiver is a File"
@@ -119,16 +118,8 @@ opal_filter "Kernel" do
   fails "Kernel#raise raises RuntimeError if no exception class is given" # RuntimeError: RuntimeError
   fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
-  fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning false"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"
   fails "Kernel#respond_to_missing? causes #respond_to? to return true if called and not returning false"
-  fails "Kernel#respond_to_missing? is called a 2nd argument of false when #respond_to? is called with only 1 argument"
-  fails "Kernel#respond_to_missing? is called for missing class methods"
-  fails "Kernel#respond_to_missing? is called when #respond_to? would return false"
-  fails "Kernel#respond_to_missing? is called with a 2nd argument of false when #respond_to? is"
-  fails "Kernel#respond_to_missing? is called with true as the second argument when #respond_to? is"
-  fails "Kernel#respond_to_missing? is not called when #respond_to? would return true"
-  fails "Kernel#respond_to_missing? isn't called when obj responds to the given public method"
   fails "Kernel#send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#singleton_class raises TypeError for Fixnum"
   fails "Kernel#singleton_class raises TypeError for Integer" # Expected TypeError but no exception was raised (#<Class:#<Number:0xf7>> was returned)
@@ -198,9 +189,6 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with two modules"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object"
   fails "Kernel#sprintf can produce a string with invalid encoding" # Expected true to be false
-  fails "Kernel#sprintf faulty key raises a KeyError"
-  fails "Kernel#sprintf faulty key sets the Hash as the receiver of KeyError"
-  fails "Kernel#sprintf faulty key sets the unmatched key as the key of KeyError"
   fails "Kernel#sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
   fails "Kernel#sprintf flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" to equal "1.e+02"
   fails "Kernel#sprintf flags # applies to formats aAeEfgG forces a decimal point to be added, even if no digits follow" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
@@ -314,9 +302,6 @@ opal_filter "Kernel" do
   fails "Kernel.rand is random on boot" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Kernel.rand supports custom object types" # Expected "NaN#<struct KernelSpecs::CustomRangeInteger value=1>" (String) to be an instance of KernelSpecs::CustomRangeInteger
   fails "Kernel.sprintf can produce a string with invalid encoding" # Expected true to be false
-  fails "Kernel.sprintf faulty key raises a KeyError"
-  fails "Kernel.sprintf faulty key sets the Hash as the receiver of KeyError"
-  fails "Kernel.sprintf faulty key sets the unmatched key as the key of KeyError"
   fails "Kernel.sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
   fails "Kernel.sprintf flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" to equal "1.e+02"
   fails "Kernel.sprintf flags # applies to formats aAeEfgG forces a decimal point to be added, even if no digits follow" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet

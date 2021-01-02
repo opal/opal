@@ -6,7 +6,6 @@ opal_filter "Time" do
   fails "Time#gmtime converts self to UTC, modifying the receiver" # Expected 2007-01-09 03:00:00 UTC to equal 2007-01-09 12:00:00 UTC
   fails "Time#hash returns an Integer" # Expected "Time:100000" (String) to be an instance of Integer
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
-  fails "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'" # Expected "2000-01-01 20:15:01 +1200" to equal "2000-01-01 20:15:01 +0100"
   fails "Time#localtime raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
   fails "Time#nsec returns a positive value for dates before the epoch" # NoMethodError: undefined method `nsec' for 1969-11-12 13:18:57 UTC
   fails "Time#round copies own timezone to the returning value"
@@ -14,7 +13,6 @@ opal_filter "Time" do
   fails "Time#round returns an instance of Time, even if #round is called on a subclass"
   fails "Time#round rounds to 0 decimal places with an explicit argument"
   fails "Time#round rounds to 7 decimal places with an explicit argument"
-  fails "Time#strftime returns the timezone with %Z" # Exception: Cannot read property 'join' of null
   fails "Time#strftime rounds an offset to the nearest second when formatting with %z"
   fails "Time#strftime should be able to print the commercial year with leading zeroes"
   fails "Time#strftime should be able to print the commercial year with only two digits"
@@ -34,11 +32,9 @@ opal_filter "Time" do
   fails "Time#to_f returns the float number of seconds + usecs since the epoch"
   fails "Time#to_i rounds fractional seconds toward zero" # Expected -315619200 == -315619199 to be truthy but was false
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
-  fails "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'" # Expected "2000-01-01 20:15:01 +1200" to equal "2000-01-01 20:15:01 +0100"
   fails "Time#tv_sec rounds fractional seconds toward zero" # Expected -315619200 == -315619199 to be truthy but was false
   fails "Time#usec returns a positive value for dates before the epoch" # Expected 0 to equal 404240
   fails "Time#utc converts self to UTC, modifying the receiver" # Expected 2007-01-09 03:00:00 UTC to equal 2007-01-09 12:00:00 UTC
-  fails "Time#yday returns an integer representing the day of the year, 1..366" # Expected 117 to equal 116
   fails "Time#zone Encoding.default_internal is set returns an ASCII string"
   fails "Time#zone defaults to UTC when bad zones given" # Expected 3600 to equal 0
   fails "Time.at passed Numeric passed BigDecimal doesn't round input value"

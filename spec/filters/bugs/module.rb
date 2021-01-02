@@ -75,7 +75,6 @@ opal_filter "Module" do
   fails "Module#class_eval uses the optional filename and lineno parameters for error messages"
   fails "Module#const_defined? returns true for toplevel constant when the name begins with '::'"
   fails "Module#const_defined? returns true or false for the nested name"
-  fails "Module#const_defined? returns true when passed a constant name with EUC-JP characters"
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is default"
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is true"
   fails "Module#const_defined? returns true when passed a scoped constant name"
@@ -128,8 +127,6 @@ opal_filter "Module" do
   fails "Module#name changes when the module is reachable through a constant path" # Expected nil to match /^#<Module:0x\h+>::N$/
   fails "Module#name is not nil for a nested module created with the module keyword"
   fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil to match /^#<Module:0x\h+>::Child$/
-  fails "Module#name is set with a conditional assignment to a constant"
-  fails "Module#name is set with a conditional assignment to a nested constant"
   fails "Module#name preserves the encoding in which the class was defined"
   fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
   fails "Module#prepend keeps the module in the chain when dupping the class"
@@ -221,6 +218,5 @@ opal_filter "Module" do
   fails "Module#using scope of refinement is not active for code defined outside the current scope" # NoMethodError: undefined method `refine' for #<Module:0x2a072>
   fails "Module#using scope of refinement is not active when class/module reopens" # NoMethodError: undefined method `refine' for #<Module:0x2a056>
   fails "Module#using works in classes too" # NoMethodError: undefined method `refine' for #<Module:0x2a01c>
-  fails "Module.constants returns an array of Symbol names" # requires Bignum
   fails "Module::Nesting returns the list of Modules nested at the point of call"
 end
