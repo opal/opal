@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# This is an utility to automatically remove a group of filters provided
+# to its standard input.
+#
+# This utility is to assist with removing a large group of filters spread
+# around multiple files that is being output by a command:
+#
+# rake mspec_ruby_nodejs RUBYSPECS=true INVERT_RUNNING_MODE=true
+#
+# It expects an input of format:
+#  1) "Set#filter! returns an Enumerator when passed no block"
+#  2) "Set#filter! yields every element of self"
+#  3) "Set#filter! keeps every element from self for which the passed block returns true"
+#  4) "Set#filter! returns self when self was modified"
+#  5) "Set#filter! returns nil when self was not modified"
+
+filters = $stdin.read.split("\n").map do |i|
+  # This special example should be rather moved to unsupported for now...
+  next if i =~ /formats the local time following the pattern/
+
+  i.scan(/\d+\) (".*")/).first.first
+end.compact
+filters = Regexp.union(*filters)
+
+remove_filters = -> path {
+  file = File.read(path).split("\n")
+
+  remove, good = file.partition { |i| i =~ filters }
+
+  if remove.length > 0
+    puts "Removing #{remove.length} filters from #{path}"
+
+    File.write(path, good.join("\n")+"\n")
+  end
+}
+
+Dir['spec/filters/**/*.rb'].each do |path|
+  remove_filters[path]
+end
