@@ -18,30 +18,32 @@ jobs:
       matrix:
         combo:
           - name: mspec-nodejs
-            ruby: 2.7
+            ruby: 3.0
             command: bin/rake mspec_nodejs
           - name: mspec-chrome
-            ruby: 2.7
+            ruby: 3.0
             command: bin/rake mspec_chrome
           - name: minitest
-            ruby: 2.7
+            ruby: 3.0
             command: bin/rake minitest
           - name: current-ruby
-            ruby: 2.7
+            ruby: 3.0
           - name: previous-ruby
-            ruby: 2.6
+            ruby: 2.7
           - name: older-ruby
+            ruby: 2.6
+          - name: near-eol-ruby
             ruby: 2.5
           - name: windows
             # These two fail because of broken stacktraces on windows: minitest_node_nodejs mspec_nodejs
             command: bundle exec rake rspec minitest_nodejs
-            ruby: 2.7
+            ruby: 3.0
             os: windows-latest
           - name: lint
             command: bin/rake lint
-            ruby: 2.7
+            ruby: 3.0
           - name: timezone
-            ruby: 2.7
+            ruby: 3.0
 
           # Currently failing:
           # - ruby: truffleruby
