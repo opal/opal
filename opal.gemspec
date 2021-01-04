@@ -47,4 +47,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'sinatra'
   spec.add_development_dependency 'rubocop', '~> 0.67.0'
   spec.add_development_dependency 'rubocop-performance', '~> 1.1.0'
+  spec.add_development_dependency 'rack'
+  spec.add_development_dependency 'webrick'
 end
