@@ -222,7 +222,7 @@ module Opal
         elsif stmt?
           push 'return ', return_val
         else
-          raise SyntaxError, 'void value expression: cannot return as an expression'
+          error 'void value expression: cannot return as an expression'
         end
       end
     end
