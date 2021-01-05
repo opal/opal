@@ -56,10 +56,6 @@ class Encoding
     raise NotImplementedError
   end
 
-  def getbyte(*)
-    raise NotImplementedError
-  end
-
   def bytesize(*)
     raise NotImplementedError
   end
@@ -234,11 +230,13 @@ end
 class String
   attr_reader :encoding
   attr_reader :internal_encoding
+  `Opal.defineProperty(String.prototype, 'bytes', nil)`
   `Opal.defineProperty(String.prototype, 'encoding', #{Encoding::UTF_8})`
   `Opal.defineProperty(String.prototype, 'internal_encoding', #{Encoding::UTF_8})`
 
   def bytes
-    each_byte.to_a
+    @bytes ||= each_byte.to_a
+    @bytes.dup
   end
 
   def bytesize
@@ -289,7 +287,11 @@ class String
   end
 
   def getbyte(idx)
-    @internal_encoding.getbyte(self, idx)
+    string_bytes = bytes
+    idx = Opal.coerce_to!(idx, Integer, :to_int)
+    return if string_bytes.length < idx
+
+    string_bytes[idx]
   end
 
   # stub

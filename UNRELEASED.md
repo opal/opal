@@ -41,6 +41,7 @@
 - Range#== (#1992)
 - Range#each (#1991)
 - Enumerable#zip (#1986)
+- String#getbyte (#2141)
 - Struct#dup not copying `$$data` (#1995)
 - Fixed usage of semicolon in single-line backticks (#2004)
 - Module#attr with multiple arguments (#2003)
