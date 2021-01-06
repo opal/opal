@@ -10,9 +10,10 @@ module Opal
       def compile
         if in_while?
           push 'continue;'
+        elsif scope.iter?
+          push 'return ', expr_or_nil(value), ';'
         else
-          push expr_or_nil(value)
-          wrap 'return ', ';'
+          error 'Invalid next'
         end
       end
 
