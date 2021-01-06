@@ -384,7 +384,6 @@ opal_filter "language" do
   fails "The if expression with a boolean range ('flip-flop' operator) mimics an awk conditional with a many-element inclusive-end range"
   fails "The if expression with a boolean range ('flip-flop' operator) mimics an awk conditional with a single-element inclusive-end range"
   fails "The if expression with a boolean range ('flip-flop' operator) scopes state by flip-flop"
-  fails "The next statement in a method is invalid and raises a SyntaxError"
   fails "The or operator has a lower precedence than 'next' in 'next true or false'"
   fails "The predefined global constants includes TOPLEVEL_BINDING"
   fails "The redo statement in a method is invalid and raises a SyntaxError"
