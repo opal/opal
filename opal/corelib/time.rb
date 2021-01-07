@@ -495,6 +495,8 @@ class Time < `Date`
             break;
 
           case 'j':
+            zero    = !blank;
+            width   = isNaN(width) ? 3 : width;
             result += #{yday};
             break;
 

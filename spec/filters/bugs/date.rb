@@ -31,7 +31,6 @@ opal_filter "Date" do
   fails "Date#parse raises a TypeError trying to parse non-String-like object" # ArgumentError: invalid date
   fails "Date#strftime should be able to print the commercial year with leading zeroes"
   fails "Date#strftime should be able to print the commercial year with only two digits"
-  fails "Date#strftime should be able to print the julian day with leading zeroes"
   fails "Date#strftime should be able to show a full notation"
   fails "Date#strftime should be able to show the commercial week day"
   fails "Date#strftime should be able to show the commercial week"

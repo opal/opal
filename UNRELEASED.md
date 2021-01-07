@@ -19,6 +19,7 @@
 
 ### Fixed
 
+- Time#strftime %j should be padded to width 3
 - Array#delete_if (#2069)
 - Array#keep_if (#2069)
 - Array#reject! (#2069)
