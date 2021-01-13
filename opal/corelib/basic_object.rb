@@ -134,10 +134,6 @@ class BasicObject
   def singleton_method_undefined(*)
   end
 
-  def class
-    `self.$$class`
-  end
-
   def method_missing(symbol, *args, &block)
     message = if `self.$inspect && !self.$inspect.$$stub`
                 "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}"
