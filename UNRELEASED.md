@@ -53,6 +53,8 @@
 - Set match on StringScanner#skip and StringScanner#scan_until (#2061)
 - Fix ruby 2.7 warnings (#2071)
 - Improve the --help descriptions (#2146)
+- Remove BasicObject#class (#2166)
+- Time#strftime %j leading zeros (#2161)
 
 ### Changed
 
