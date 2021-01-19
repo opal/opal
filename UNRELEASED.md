@@ -55,6 +55,7 @@
 - Improve the --help descriptions (#2146)
 - Remove BasicObject#class (#2166)
 - Time#strftime %j leading zeros (#2161)
+- Fix `call { true or next }` producing invalid code (#2160)
 
 ### Changed
 
