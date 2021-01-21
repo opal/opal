@@ -4,8 +4,11 @@ Add Opal-Sprockets to your Gemfile (or install using `gem`):
 
 ```ruby
 # Gemfile
+source 'https://rubygems.org'
+
 gem 'sinatra'
 gem 'opal-sprockets'
+gem 'puma'
 ```
 
 Opal-Sprockets uses `sprockets` as its default build system, so the asset-pipeline
@@ -22,16 +25,8 @@ require 'sinatra'
 opal = Opal::Sprockets::Server.new {|s|
   s.append_path 'app'
   s.main = 'application'
+  s.debug = ENV['RACK_ENV'] != 'production'
 }
-
-maps_prefix = Opal::Sprockets::Server::SOURCE_MAPS_PREFIX_PATH
-maps_app = Opal::SourceMapServer.new(opal.sprockets, maps_prefix)
-
-map maps_prefix do
-  use Rack::ConditionalGet
-  use Rack::ETag
-  run maps_app
-end
 
 map '/assets' do
   run opal.sprockets
@@ -42,9 +37,7 @@ get '/' do
     <!doctype html>
     <html>
       <head>
-        <script src="/assets/opal.js"></script>
-        <script src="/assets/application.self.js"></script>
-        <script type="text/javascript">Opal.load("application")</script>
+        #{ Opal::Sprockets.javascript_include_tag('application', debug: opal.debug, sprockets: opal.sprockets, prefix: 'assets/' ) }
       </head>
     </html>
   HTML
