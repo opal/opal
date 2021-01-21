@@ -708,6 +708,8 @@ module Kernel
     yield self
   end
 
+  alias then yield_self
+
   Opal.pristine(self, :method_missing)
 end
 

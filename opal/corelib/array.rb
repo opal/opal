@@ -883,6 +883,8 @@ class Array < `Array`
     self
   end
 
+  alias difference -
+
   def dig(idx, *idxs)
     item = self[idx]
 
@@ -1332,6 +1334,8 @@ class Array < `Array`
       return '[' + result.join(', ') + ']';
     }
   end
+
+  alias intersection &
 
   def join(sep = nil)
     return '' if `self.length === 0`
@@ -1928,6 +1932,9 @@ class Array < `Array`
     }
   end
 
+  alias filter select
+  alias filter! select!
+
   def shift(count = undefined)
     if `count === undefined`
       return if `self.length === 0`
@@ -2163,12 +2170,15 @@ class Array < `Array`
 
   alias to_ary to_a
 
-  def to_h
+  def to_h(&block)
+    array = self
+    array = array.map(&block) if block_given?
+
     %x{
-      var i, len = self.length, ary, key, val, hash = #{{}};
+      var i, len = array.length, ary, key, val, hash = #{{}};
 
       for (i = 0; i < len; i++) {
-        ary = #{Opal.coerce_to?(`self[i]`, Array, :to_ary)};
+        ary = #{Opal.coerce_to?(`array[i]`, Array, :to_ary)};
         if (!ary.$$is_array) {
           #{raise TypeError, "wrong element type #{`ary`.class} at #{`i`} (expected array)"}
         }
@@ -2213,6 +2223,8 @@ class Array < `Array`
 
     result
   end
+
+  alias union |
 
   def uniq(&block)
     %x{

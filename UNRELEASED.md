@@ -16,6 +16,11 @@
 - Added a generic implementation of Kernel#caller and #warn(uplevel:) that works with sourcemaps in Node.js and Chrome (#2065)
 - Added support for numblocks `-> { _1 + _2 }.call(3, 4) # => 7` (#2149)
 - Support `<internal:…>` and `<js:…>` in stacktraces, like MRI we now distinguish internal lines from lib/app lines (#2154)
+- `Array#difference`, `Array#intersection`, `Array#union` as aliases respectively to `Array#{-,&,|}` (#2151)
+- Aliases `filter{,!}` to `select{,!}` throughout the corelib classes (#2151)
+- `Enumerable#filter_map`, `Enumerable#tally` (#2151)
+- Alias `Kernel#then` for `Kernel#yield_self` (#2151)
+- Method chaining: `{Proc,Method}#{<<,>>}` (#2151)
 
 ### Fixed
 
@@ -70,6 +75,8 @@
 - Change parser to 3.0 (#2148)
 - Fix forwarding a rescued error to a global var: `rescue => $gvar` (#2154)
 - Now using Parser v3.0 and targeting Ruby 3.0 (#2156)
+- `Comparable#clamp` to support a Range argument (#2151)
+- `#to_h` method to support a block (shortform for `.map(&block).to_h`) (#2151)
 
 ### Deprecated
 

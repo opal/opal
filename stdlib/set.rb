@@ -113,6 +113,8 @@ class Set
     size == before ? nil : self
   end
 
+  alias filter! select!
+
   def add?(o)
     if include?(o)
       nil

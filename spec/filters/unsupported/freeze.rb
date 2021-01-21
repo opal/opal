@@ -24,7 +24,9 @@ opal_unsupported_filter "freezing" do
   fails "Array#fill raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (["x", "x", "x"] was returned)
   fails "Array#fill raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised ([] was returned)
   fails "Array#filter! on frozen objects returns an Enumerator if no block is given" # NoMethodError: undefined method `filter!' for [true, false]
+  fails "Array#filter! on frozen objects with falsy block keeps elements after any exception" # Expected Exception but no exception was raised ([] was returned)
   fails "Array#filter! on frozen objects with falsy block raises a FrozenError" # Expected FrozenError but got: NoMethodError (undefined method `filter!' for [true, false])
+  fails "Array#filter! on frozen objects with truthy block keeps elements after any exception" # Expected Exception but no exception was raised (nil was returned)
   fails "Array#filter! on frozen objects with truthy block raises a FrozenError" # Expected FrozenError but got: NoMethodError (undefined method `filter!' for [true, false])
   fails "Array#flatten! raises a FrozenError on frozen arrays when the array is modified" # Expected FrozenError but no exception was raised ([1, 2] was returned)
   fails "Array#flatten! raises a FrozenError on frozen arrays when the array would not be modified" # Expected FrozenError but no exception was raised (nil was returned)

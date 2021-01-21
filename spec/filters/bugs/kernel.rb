@@ -252,8 +252,6 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel#sprintf with format string that contains %<> sections raises ArgumentError if missing second named argument" # KeyError: key not found: "foo"
   fails "Kernel#then returns a sized Enumerator when no block given" # NoMethodError: undefined method `then' for #<Object:0x22882>
-  fails "Kernel#then returns the block return value" # NoMethodError: undefined method `then' for #<Object:0x22886>
-  fails "Kernel#then yields self" # NoMethodError: undefined method `then' for #<Object:0x2288a>
   fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: false/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: false\n"
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
   fails "Kernel#warn :uplevel keyword argument does not prepend caller information if the uplevel argument is too large" # Expected:   $stderr: "warning: foo\n"       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"

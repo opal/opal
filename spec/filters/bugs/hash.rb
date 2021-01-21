@@ -24,20 +24,6 @@ opal_filter "Hash" do
   fails "Hash#except ignores keys not present in the original hash" # NoMethodError: undefined method `except' for {"a"=>1, "b"=>2, "c"=>3}
   fails "Hash#except returns a hash without the requested subset" # NoMethodError: undefined method `except' for {"a"=>1, "b"=>2, "c"=>3}
   fails "Hash#except returns a new duplicate hash without arguments" # NoMethodError: undefined method `except' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#filter processes entries with the same order as reject" # NoMethodError: undefined method `filter' for {"a"=>9, "c"=>4, "b"=>5, "d"=>2}
-  fails "Hash#filter returns a Hash of entries for which block is true" # NoMethodError: undefined method `filter' for {"a"=>9, "c"=>4, "b"=>5, "d"=>2}
-  fails "Hash#filter returns an Enumerator if called on a non-empty hash without a block" # NoMethodError: undefined method `filter' for {1=>2, 3=>4, 5=>6}
-  fails "Hash#filter returns an Enumerator if called on an empty hash without a block" # NoMethodError: undefined method `filter' for {}
-  fails "Hash#filter returns an Enumerator when called on a non-empty hash without a block" # NoMethodError: undefined method `filter' for {1=>2, 3=>4, 5=>6}
-  fails "Hash#filter returns an Enumerator when called on an empty hash without a block" # NoMethodError: undefined method `filter' for {}
-  fails "Hash#filter when no block is given returned Enumerator size returns the enumerable size" # NoMethodError: undefined method `filter' for {1=>2, 3=>4, 5=>6}
-  fails "Hash#filter yields two arguments: key and value" # NoMethodError: undefined method `filter' for {1=>2, 3=>4}
-  fails "Hash#filter! is equivalent to keep_if if changes are made" # NoMethodError: undefined method `filter!' for {"a"=>2}
-  fails "Hash#filter! removes all entries if the block is false" # NoMethodError: undefined method `filter!' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#filter! returns an Enumerator if called on a non-empty hash without a block" # NoMethodError: undefined method `filter!' for {1=>2, 3=>4, 5=>6}
-  fails "Hash#filter! returns an Enumerator if called on an empty hash without a block" # NoMethodError: undefined method `filter!' for {}
-  fails "Hash#filter! returns nil if no changes were made" # NoMethodError: undefined method `filter!' for {"a"=>1}
-  fails "Hash#filter! when no block is given returned Enumerator size returns the enumerable size" # NoMethodError: undefined method `filter!' for {1=>2, 3=>4, 5=>6}
   fails "Hash#inspect calls #to_s on the object returned from #inspect if the Object isn't a String" # Expected "{\"a\"=>abc}" to equal "{:a=>abc}"
   fails "Hash#inspect does not call #to_s on a String returned from #inspect" # Expected "{\"a\"=>\"abc\"}" to equal "{:a=>\"abc\"}"
   fails "Hash#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0x30638>}" to match /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/
@@ -51,8 +37,6 @@ opal_filter "Hash" do
   fails "Hash#shift allows shifting entries while iterating" # Exception: Cannot read property '$$is_string' of undefined
   fails "Hash#store does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#store keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
-  fails "Hash#to_h with block coerces returned pair to Array with #to_ary" # Expected {"a"=>1} == {"b"=>"b"} to be truthy but was false
-  fails "Hash#to_h with block converts [key, value] pairs returned by the block to a hash" # Expected {"a"=>1, "b"=>2} == {"a"=>1, "b"=>4} to be truthy but was false
   fails "Hash#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject/) but no exception was raised ({"a"=>1} was returned)
   fails "Hash#to_h with block raises ArgumentError if block returns longer or shorter array" # Expected ArgumentError (/element has wrong array length/) but no exception was raised ({"a"=>1, "b"=>2} was returned)
   fails "Hash#to_h with block raises TypeError if block returns something other than Array" # Expected TypeError (/wrong element type String/) but no exception was raised ({"a"=>1, "b"=>2} was returned)
