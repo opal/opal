@@ -75,6 +75,7 @@
 - Array#pop(1): improve performance (#2130)
 - Object#pretty_inspect (#2139)
 - Fix conversion from UTF-8 to bytes (#2138)
+- Restore compatibility with Chrome 38, used by Cordova and many mobile browsers (#2109)
 
 ### Changed
 
