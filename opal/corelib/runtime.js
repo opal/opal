@@ -1918,7 +1918,11 @@
 
     // Assign the 'length' value with defineProperty because
     // in strict mode the property is not writable.
-    Object.defineProperty(alias, 'length', { value: body.length });
+    // It doesn't work in older browsers (like Chrome 38), where
+    // an exception is thrown breaking Opal altogether.
+    try {
+      Object.defineProperty(alias, 'length', { value: body.length });
+    } catch (e) {}
 
     // Try to make the browser pick the right name
     alias.displayName       = name;
