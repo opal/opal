@@ -317,17 +317,8 @@ opal_filter "String" do
   fails "String#undump taints the result if self is tainted" # NoMethodError: undefined method `undump' for "\"foo\""
   fails "String#undump undumps correctly string produced from non ASCII-compatible one" # NoMethodError: undefined method `dump' for "ࡶ"
   fails "String#undump untrusts the result if self is untrusted" # NoMethodError: undefined method `untrust' for "\"foo\""
-  fails "String#unicode_normalize defaults to the nfc normalization form if no forms are specified" # Expected "Å" to equal "Å"
-  fails "String#unicode_normalize normalizes code points in the string according to the form that is specified" # Expected "ẛ̣" to equal "ẛ̣"
-  fails "String#unicode_normalize raises an ArgumentError if the specified form is invalid" # Expected ArgumentError but no exception was raised ("Å" was returned)
   fails "String#unicode_normalize raises an Encoding::CompatibilityError if string is not in an unicode encoding" # ArgumentError: unknown encoding name - ISO-8859-1
-  fails "String#unicode_normalize returns normalized form of string by default 03D3 (ϓ) GREEK UPSILON WITH ACUTE AND HOOK SYMBOL" # Expected "ϓ" to equal "ϓ"
-  fails "String#unicode_normalize returns normalized form of string by default 03D4 (ϔ) GREEK UPSILON WITH DIAERESIS AND HOOK SYMBOL" # Expected "ϔ" to equal "ϔ"
-  fails "String#unicode_normalize returns normalized form of string by default 1E9B (ẛ) LATIN SMALL LETTER LONG S WITH DOT ABOVE" # Expected "ẛ" to equal "ẛ"
-  fails "String#unicode_normalized? defaults to the nfc normalization form if no forms are specified" # Expected true to equal false
-  fails "String#unicode_normalized? raises an ArgumentError if the specified form is invalid" # Expected ArgumentError but no exception was raised (true was returned)
   fails "String#unicode_normalized? raises an Encoding::CompatibilityError if the string is not in an unicode encoding" # ArgumentError: unknown encoding name - ISO-8859-1
-  fails "String#unicode_normalized? returns false if string is not in the supplied normalization form" # Expected true to equal false
   fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfc)" # Expected true to be false
   fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfd)" # Expected true to be false
   fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfkc)" # Expected true to be false
