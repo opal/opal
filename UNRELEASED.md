@@ -95,6 +95,7 @@
 - BigDecimal is now a subclass of Numeric (#2006)
 - PP to be rebased on upstream Ruby version (#2083)
 - String to report UTF-8 encoding by default, as MRI does (#2117)
+- Don't output "Failed to load WithCLexer, using pure Ruby lexer" warning unless in $DEBUG mode (#2174)
 
 ### Deprecated
 
