@@ -1825,12 +1825,13 @@ class String < `String`
     new(*args)
   end
 
-  def unicode_normalize(form = undefined)
-    `self.toString()`
+  def unicode_normalize(form = :nfc)
+    raise ArgumentError, "Invalid normalization form #{form}" unless %i[nfc nfd nfkc nfkd].include?(form)
+    `self.normalize(#{form.upcase})`
   end
 
-  def unicode_normalized?(form = undefined)
-    true
+  def unicode_normalized?(form = :nfc)
+    unicode_normalize(form) == self
   end
 
   def unpack(format)
