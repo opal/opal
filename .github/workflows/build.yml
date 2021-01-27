@@ -34,6 +34,9 @@ jobs:
             ruby: 2.6
           - name: near-eol-ruby
             ruby: 2.5
+          - name: smoke-test
+            ruby: 3.0
+            command: bin/rake smoke_test
           - name: windows
             # These two fail because of broken stacktraces on windows: minitest_node_nodejs mspec_nodejs
             command: bundle exec rake rspec minitest_nodejs
