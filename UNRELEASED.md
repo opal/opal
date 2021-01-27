@@ -43,6 +43,7 @@
 - Set#keep_if (#1987)
 - Set#select! (#1987)
 - Set#reject! (#1987)
+- String#unicode_normalize (#2175)
 - Module#alias_method (#1983)
 - Enumerable#minmax_by (#1981)
 - Enumerator#each_with_index (#1990)
