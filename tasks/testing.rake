@@ -388,7 +388,7 @@ task :smoke_test do
   cp "tasks/testing/#{gemfile_name}", "#{opal_rspec_dir}/Gemfile"
 
   cd opal_rspec_dir do
-    Bundler.with_clean_env do
+    Bundler.with_unbundled_env do
       sh 'bundle check && bundle update opal-rspec || bundle install'
       sh %{bundle exec opal-rspec --color --default-path=../../spec ../../spec/lib/deprecations_spec.rb > #{actual_output_path}}
 
