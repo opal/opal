@@ -82,7 +82,7 @@ module Opal
       end
 
       def wrap_with_definition
-        wrap "Opal.def(self, '$#{mid}', ", ')'
+        wrap "Opal.def(self, #{mid_to_name mid}, ", ')'
 
         if expr?
           wrap '(', ", nil) && '#{mid}'"

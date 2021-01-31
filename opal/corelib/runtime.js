@@ -1317,12 +1317,15 @@
 
     for (var i = 0, length = stubs.length; i < length; i++) {
       var stub = stubs[i], existing_method = proto[stub];
+      Opal.$[stub] = Symbol.for(stub);
 
       if (existing_method == null || existing_method.$$stub) {
         Opal.add_stub_for(proto, stub);
       }
     }
   };
+
+  Opal.$ = {} // Symbols repository
 
   // Add a method_missing stub function to the given prototype for the
   // given name.

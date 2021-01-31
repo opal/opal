@@ -19,10 +19,17 @@ module Opal
       # have a '.' prefix (for dot-calling), otherwise it will be
       # wrapped in brackets to use reference notation calling.
       def mid_to_jsid(mid)
+        "[#{mid_to_name mid}]"
+      end
+
+      def mid_to_name(mid)
         if %r{\=|\+|\-|\*|\/|\!|\?|<|\>|\&|\||\^|\%|\~|\[} =~ mid.to_s
-          "['$#{mid}']"
+          # "['$#{mid}']"
+          "Opal.$['#{mid}']"
+
         else
-          '.$' + mid
+          # '.$' + mid
+          "Opal.$.#{mid}"
         end
       end
 
