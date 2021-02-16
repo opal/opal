@@ -4,15 +4,20 @@ Benchmark.ips do |x|
     o[Symbol.for('foo')] = 123
     o.foo = 123
     var foo = Symbol('foo')
+    var gfoo = Symbol.for('foo')
     o[foo] = 123
     var a = 0, b = 0, c = 0
   }
 
-  x.report('global symbol') do
+  x.report('live global symbol') do
     `a += o[Symbol.for('foo')]`
   end
 
-  x.report('symbol') do
+  x.report('stored global symbol') do
+    `a += o[gfoo]`
+  end
+
+  x.report('stored symbol') do
     `a += o[foo]`
   end
 
