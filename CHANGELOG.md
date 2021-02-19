@@ -15,7 +15,19 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.0.5...HEAD) - unreleased
+## [Unreleased](https://github.com/opal/opal/compare/v1.1.0...HEAD) - unreleased
+
+
+### Added
+### Fixed
+### Changed
+### Deprecated
+### Removed
+
+
+
+
+## [1.1.0](https://github.com/opal/opal/compare/v1.0.5...v1.1.0) - 2021-02-19
 
 
 ### Added
@@ -36,6 +48,14 @@ Changes are grouped as follows:
 - Added a generic implementation of Kernel#caller and #warn(uplevel:) that works with sourcemaps in Node.js and Chrome ([#2065](https://github.com/opal/opal/pull/2065))
 - Added support for numblocks `-> { _1 + _2 }.call(3, 4) # => 7` ([#2149](https://github.com/opal/opal/pull/2149))
 - Support `<internal:…>` and `<js:…>` in stacktraces, like MRI we now distinguish internal lines from lib/app lines ([#2154](https://github.com/opal/opal/pull/2154))
+- `Array#difference`, `Array#intersection`, `Array#union` as aliases respectively to `Array#{-,&,|}` ([#2151](https://github.com/opal/opal/pull/2151))
+- Aliases `filter{,!}` to `select{,!}` throughout the corelib classes ([#2151](https://github.com/opal/opal/pull/2151))
+- `Enumerable#filter_map`, `Enumerable#tally` ([#2151](https://github.com/opal/opal/pull/2151))
+- Alias `Kernel#then` for `Kernel#yield_self` ([#2151](https://github.com/opal/opal/pull/2151))
+- Method chaining: `{Proc,Method}#{<<,>>}` ([#2151](https://github.com/opal/opal/pull/2151))
+- Added Integer#to_d ([#2006](https://github.com/opal/opal/pull/2006))
+- Added a compiler option `use_strict` which can also be set by the `use_strict` magic comment ([#1959](https://github.com/opal/opal/pull/1959))
+- Add `--rbrequire (-q)` option to `opal` command line executable ([#2120](https://github.com/opal/opal/pull/2120))
 
 ### Fixed
 
@@ -55,6 +75,7 @@ Changes are grouped as follows:
 - Set#keep_if ([#1987](https://github.com/opal/opal/pull/1987))
 - Set#select! ([#1987](https://github.com/opal/opal/pull/1987))
 - Set#reject! ([#1987](https://github.com/opal/opal/pull/1987))
+- String#unicode_normalize ([#2175](https://github.com/opal/opal/pull/2175))
 - Module#alias_method ([#1983](https://github.com/opal/opal/pull/1983))
 - Enumerable#minmax_by ([#1981](https://github.com/opal/opal/pull/1981))
 - Enumerator#each_with_index ([#1990](https://github.com/opal/opal/pull/1990))
@@ -72,6 +93,21 @@ Changes are grouped as follows:
 - Set match on StringScanner#skip and StringScanner#scan_until ([#2061](https://github.com/opal/opal/pull/2061))
 - Fix ruby 2.7 warnings ([#2071](https://github.com/opal/opal/pull/2071))
 - Improve the --help descriptions ([#2146](https://github.com/opal/opal/pull/2146))
+- Remove BasicObject#class ([#2166](https://github.com/opal/opal/pull/2166))
+- Time#strftime %j leading zeros ([#2161](https://github.com/opal/opal/pull/2161))
+- Fix `call { true or next }` producing invalid code ([#2160](https://github.com/opal/opal/pull/2160))
+- `define_method` can now be called on the main object ([#2029](https://github.com/opal/opal/pull/2029))
+- Fix nested for-loops ([#2033](https://github.com/opal/opal/pull/2033))
+- Fix Number#round for Integers ([#2030](https://github.com/opal/opal/pull/2030))
+- Fix parsing Unicode characters from Opal ([#2073](https://github.com/opal/opal/pull/2073))
+- Integer#===: improve Integer recognition ([#2089](https://github.com/opal/opal/pull/2089))
+- Regexp: ensure ignoreCase is never undefined ([#2098](https://github.com/opal/opal/pull/2098))
+- Hash#delete: ensure String keys are converted to values ([#2106](https://github.com/opal/opal/pull/2106))
+- Array#shift: improve performance on v8 >7.1 ([#2115](https://github.com/opal/opal/pull/2115))
+- Array#pop(1): improve performance ([#2130](https://github.com/opal/opal/pull/2130))
+- Object#pretty_inspect ([#2139](https://github.com/opal/opal/pull/2139))
+- Fix conversion from UTF-8 to bytes ([#2138](https://github.com/opal/opal/pull/2138))
+- Restore compatibility with Chrome 38, used by Cordova and many mobile browsers ([#2109](https://github.com/opal/opal/pull/2109))
 
 ### Changed
 
@@ -86,6 +122,12 @@ Changes are grouped as follows:
 - Change parser to 3.0 ([#2148](https://github.com/opal/opal/pull/2148))
 - Fix forwarding a rescued error to a global var: `rescue => $gvar` ([#2154](https://github.com/opal/opal/pull/2154))
 - Now using Parser v3.0 and targeting Ruby 3.0 ([#2156](https://github.com/opal/opal/pull/2156))
+- `Comparable#clamp` to support a Range argument ([#2151](https://github.com/opal/opal/pull/2151))
+- `#to_h` method to support a block (shortform for `.map(&block).to_h`) ([#2151](https://github.com/opal/opal/pull/2151))
+- BigDecimal is now a subclass of Numeric ([#2006](https://github.com/opal/opal/pull/2006))
+- PP to be rebased on upstream Ruby version ([#2083](https://github.com/opal/opal/pull/2083))
+- String to report UTF-8 encoding by default, as MRI does ([#2117](https://github.com/opal/opal/pull/2117))
+- Don't output "Failed to load WithCLexer, using pure Ruby lexer" warning unless in $DEBUG mode ([#2174](https://github.com/opal/opal/pull/2174))
 
 ### Deprecated
 
@@ -96,6 +138,7 @@ Changes are grouped as follows:
 ### Removed
 
 - Removed special compilation for the `Opal.truthy?` and `Opal.falsy?` helpers ([#2076](https://github.com/opal/opal/pull/2076))
+- Removed the deprecated `tainting` compiler config option ([#2072](https://github.com/opal/opal/pull/2072))
 
 
 
