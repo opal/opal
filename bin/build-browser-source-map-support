@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 
-yarn -s browserify -r ./lib/opal/cli_runners/source-map-support.js -o ./lib/opal/cli_runners/source-map-support-browser.js -s sourceMapSupport                ~/C/opal
-
-
+yarn -s browserify -r ./lib/opal/cli_runners/source-map-support.js -o ./lib/opal/cli_runners/source-map-support-browser.js -s sourceMapSupport
+yarn -s browserify -r ./lib/opal/cli_runners/source-map-support.js -o ./lib/opal/cli_runners/source-map-support-node.js --bare -s sourceMapSupport
