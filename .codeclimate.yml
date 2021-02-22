@@ -50,5 +50,4 @@ exclude_patterns:
   - "**/node_modules/*"
   - stdlib/nodejs/js-yaml-3-6-1.js
   - lib/opal/source_map/vlq.rb
-  - lib/opal/cli_runners/source-map-support.js
-  - lib/opal/cli_runners/source-map-support-browser.js
+  - lib/opal/cli_runners/source-map-support*.js

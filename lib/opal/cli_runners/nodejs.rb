@@ -17,7 +17,7 @@ module Opal
         SystemRunner.call(data) do |tempfile|
           [
             'node',
-            '--require', "#{__dir__}/source-map-support",
+            '--require', "#{__dir__}/source-map-support-node",
             tempfile.path,
             *argv
           ]
