@@ -5,7 +5,7 @@
     "benchmark": "^2.1.4",
     "browserify": "^17.0.0",
     "jshint": "^2.11.0-rc1",
-    "source-map-support": "^0.5.16",
+    "source-map-support": "0.5.19",
     "uglify-js": "^3.7.2"
   },
   "devDependencies": {},
