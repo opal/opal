@@ -15,14 +15,12 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.1.0...HEAD) - unreleased
+## [1.1.1](https://github.com/opal/opal/compare/v1.1.0...v1.1.1) - 2021-02-23
 
 
-### Added
 ### Fixed
-### Changed
-### Deprecated
-### Removed
+
+- The default runner (nodejs) wasn't starting to a bad require in the improved stack-traces ([#2182](https://github.com/opal/opal/pull/2182))
 
 
 
