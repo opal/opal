@@ -1,6 +1,7 @@
 # NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "String" do
   fails "BasicObject#__id__ returns a different value for two String literals"
+  fails "Module#const_defined? returns true when passed a constant name with EUC-JP characters"
   fails "Ruby character strings Unicode escaping can be done with \\u{} and one to six hex digits"
   fails "Ruby character strings Unicode escaping with ASCII_8BIT source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "Ruby character strings Unicode escaping with ASCII_8BIT source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u{}" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
@@ -148,8 +149,11 @@ opal_unsupported_filter "String" do
   fails "String#center with length, padding taints result when self or padstr is tainted"
   fails "String#center with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
   fails "String#chars is unicode aware"
+  fails "String#chomp removes the final carriage return, newline from a non-ASCII String when the record separator is changed"
+  fails "String#chomp removes the final carriage return, newline from a non-ASCII String"
   fails "String#chomp when passed '' taints the result if self is tainted"
   fails "String#chomp when passed '\\n' taints the result if self is tainted"
+  fails "String#chop removes the final carriage return, newline from a non-ASCII String"
   fails "String#chomp when passed a String does not taint the result when the argument is tainted"
   fails "String#chomp when passed a String taints the result if self is tainted"
   fails "String#chomp when passed nil returns a copy of the String"

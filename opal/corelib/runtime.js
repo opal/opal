@@ -2445,7 +2445,7 @@
     if (typeof str === 'string')
       throw Opal.FrozenError.$new("can't modify frozen String");
 
-    var encoding = Opal.encodings[name];
+    var encoding = Opal.Encoding.$find(name);
 
     if (encoding === str.encoding) { return str; }
 
