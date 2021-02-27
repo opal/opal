@@ -762,57 +762,56 @@ class Hash
 
   alias member? has_key?
 
-  def merge(other, &block)
-    dup.merge!(other, &block)
+  def merge(*others, &block)
+    dup.merge!(*others, &block)
   end
 
-  def merge!(other, &block)
-    %x{
-      if (!other.$$is_hash) {
-        other = #{Opal.coerce_to!(other, Hash, :to_hash)};
-      }
+  def merge!(*others, &block)
+    others.map! { |other| Opal.coerce_to!(other, Hash, :to_hash) }
 
-      var i, other_keys = other.$$keys, length = other_keys.length, key, value, other_value;
+    `var i, other_keys, length, key, value, other_value;`
+    others.each do |other|
+      %x{
+        other_keys = other.$$keys, length = other_keys.length;
 
-      if (block === nil) {
-        for (i = 0; i < length; i++) {
-          key = other_keys[i];
+        if (block === nil) {
+          for (i = 0; i < length; i++) {
+            key = other_keys[i];
 
-          if (key.$$is_string) {
-            other_value = other.$$smap[key];
-          } else {
-            other_value = key.value;
-            key = key.key;
+            if (key.$$is_string) {
+              other_value = other.$$smap[key];
+            } else {
+              other_value = key.value;
+              key = key.key;
+            }
+
+            Opal.hash_put(self, key, other_value);
           }
-
-          Opal.hash_put(self, key, other_value);
-        }
-
-        return self;
-      }
-
-      for (i = 0; i < length; i++) {
-        key = other_keys[i];
-
-        if (key.$$is_string) {
-          other_value = other.$$smap[key];
         } else {
-          other_value = key.value;
-          key = key.key;
+          for (i = 0; i < length; i++) {
+            key = other_keys[i];
+
+            if (key.$$is_string) {
+              other_value = other.$$smap[key];
+            } else {
+              other_value = key.value;
+              key = key.key;
+            }
+
+            value = Opal.hash_get(self, key);
+
+            if (value === undefined) {
+              Opal.hash_put(self, key, other_value);
+              continue;
+            }
+
+            Opal.hash_put(self, key, block(key, value, other_value));
+          }
         }
-
-        value = Opal.hash_get(self, key);
-
-        if (value === undefined) {
-          Opal.hash_put(self, key, other_value);
-          continue;
-        }
-
-        Opal.hash_put(self, key, block(key, value, other_value));
       }
+    end
 
-      return self;
-    }
+    self
   end
 
   def rassoc(object)
