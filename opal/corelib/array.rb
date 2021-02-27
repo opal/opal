@@ -210,32 +210,46 @@ class Array < `Array`
     `self.concat(other)`
   end
 
-  def -(other)
-    other = if Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
-            end
-
+  def difference(*others)
     return [] if `self.length === 0`
-    return `self.slice()` if `other.length === 0`
+
+    others.map! do |other|
+      if Array === other
+        other.to_a
+      else
+        `$coerce_to(other, #{Array}, 'to_ary')`.to_a
+      end
+    end
+
+    result = []
+    hash = {}
 
     %x{
-      var result = [], hash = #{{}}, i, length, item;
+      var i, length, item;
+    }
 
-      for (i = 0, length = other.length; i < length; i++) {
-        $hash_put(hash, other[i], true);
+    others.each do |other|
+      %x{
+        for (i = 0, length = other.length; i < length; i++) {
+          $hash_put(hash, other[i], true);
+        }
       }
+    end
 
+    %x{
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
         if ($hash_get(hash, item) === undefined) {
           result.push(item);
         }
       }
-
-      return result;
     }
+
+    result
+  end
+
+  def -(other)
+    difference(other)
   end
 
   def <<(object)
@@ -882,8 +896,6 @@ class Array < `Array`
     %x{filterIf(self, $falsy, block)}
     self
   end
-
-  alias difference -
 
   def dig(idx, *idxs)
     item = self[idx]
