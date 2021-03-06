@@ -2445,7 +2445,7 @@
     if (typeof str === 'string')
       throw Opal.FrozenError.$new("can't modify frozen String");
 
-    var encoding = Opal.Encoding.$find(name);
+    var encoding = Opal.find_encoding(name);
 
     if (encoding === str.encoding) { return str; }
 
@@ -2453,6 +2453,14 @@
 
     return str;
   };
+
+  // Fetches the encoding for the given name or raises ArgumentError.
+  Opal.find_encoding = function(name) {
+    var register = Opal.encodings;
+    var encoding = register[name] || register[name.toUpperCase()];
+    if (!encoding) throw Opal.ArgumentError.$new("unknown encoding name - " + name);
+    return encoding;
+  }
 
   // @returns a String object with the encoding set from a string literal
   Opal.enc = function(str, name) {
