@@ -770,7 +770,7 @@ class Hash
     %x{
       var i, j, other, other_keys, length, key, value, other_value;
       for (i = 0; i < others.length; ++i) {
-        other = #{Opal.coerce_to!(`others[i]`, Hash, :to_hash)}
+        other = #{Opal.coerce_to!(`others[i]`, Hash, :to_hash)};
         other_keys = other.$$keys, length = other_keys.length;
 
         if (block === nil) {
