@@ -123,6 +123,7 @@ opal_unsupported_filter "Time" do
   fails "Time#utc_offset returns the correct offset for US Eastern time zone around daylight savings time change"
   fails "Time#utc_offset returns the offset in seconds between the timezone of time and UTC"
   fails "Time#wday returns an integer representing the day of the week, 0..6, with Sunday being 0"
+  fails "Time#yday returns an integer representing the day of the year, 1..366" # Expected 117 == 116
   fails "Time#year returns the four digit year for a Time with a fixed offset"
   fails "Time#year returns the four digit year for a local Time as an Integer"
   fails "Time#zone Encoding.default_internal is set doesn't raise errors for a Time with a fixed offset"

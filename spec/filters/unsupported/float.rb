@@ -33,6 +33,9 @@ opal_unsupported_filter "Float" do
   fails "Float#to_s emits a trailing '.0' for a whole number"
   fails "Float#to_s emits a trailing '.0' for the mantissa in e format"
   fails "Float#to_s returns '0.0' for 0.0"
+  fails "Float#<=> returns 1 when self is negative and other is -Infinity" # Expected 0 == 1
+  fails "Float#<=> returns 1 when self is Infinity and other is an Integer" # Expected 0 == 1
+  fails "Float#<=> returns -1 when self is -Infinity and other is negative" # Expected 0 == -1
   fails "Math.gamma returns approximately (n-1)! given n for n between 24 and 30" # precision error
   fails "Numeric#step with keyword arguments when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
   fails "Numeric#step with mixed arguments when no block is given returned Enumerator size when self, stop or step is a Float and step is positive returns the difference between self and stop divided by the number of steps"
