@@ -767,16 +767,15 @@ class Hash
   end
 
   def merge!(*others, &block)
-    others.map! { |other| Opal.coerce_to!(other, Hash, :to_hash) }
-
-    `var i, other_keys, length, key, value, other_value;`
-    others.each do |other|
-      %x{
+    %x{
+      var i, j, other, other_keys, length, key, value, other_value;
+      for (i = 0; i < others.length; ++i) {
+        other = #{Opal.coerce_to!(`others[i]`, Hash, :to_hash)}
         other_keys = other.$$keys, length = other_keys.length;
 
         if (block === nil) {
-          for (i = 0; i < length; i++) {
-            key = other_keys[i];
+          for (j = 0; j < length; j++) {
+            key = other_keys[j];
 
             if (key.$$is_string) {
               other_value = other.$$smap[key];
@@ -788,8 +787,8 @@ class Hash
             Opal.hash_put(self, key, other_value);
           }
         } else {
-          for (i = 0; i < length; i++) {
-            key = other_keys[i];
+          for (j = 0; j < length; j++) {
+            key = other_keys[j];
 
             if (key.$$is_string) {
               other_value = other.$$smap[key];
@@ -809,9 +808,9 @@ class Hash
           }
         }
       }
-    end
 
-    self
+      return self;
+    }
   end
 
   def rassoc(object)
