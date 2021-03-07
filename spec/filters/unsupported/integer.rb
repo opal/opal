@@ -24,6 +24,9 @@ opal_unsupported_filter "Integer" do
   fails "Integer#<< (with n << m) fixnum returns an Bignum == fixnum_max * 2 when fixnum_max << 1 and n > 0" # Expected 2147483646 (Number) to be an instance of Bignum
   fails "Integer#<< (with n << m) fixnum returns an Bignum == fixnum_min * 2 when fixnum_min << 1 and n < 0" # Expected -2147483648 (Number) to be an instance of Bignum
   fails "Integer#<= bignum returns false if compares with near float" # Expected true to equal false
+  fails "Integer#<=> bignum returns -1 when self is -Infinity and other is negative" # Expected 0 == -1
+  fails "Integer#<=> bignum returns 1 when self is Infinity and other is a Bignum" # Expected 0 == 1
+  fails "Integer#<=> bignum returns 1 when self is negative and other is -Infinity" # Expected 0 == 1
   fails "Integer#<=> bignum with a Bignum when other is negative returns -1 when self is negative and other is larger" # Expected 0 to equal -1
   fails "Integer#<=> bignum with a Bignum when other is negative returns 1 when self is negative and other is smaller" # Expected 0 to equal 1
   fails "Integer#<=> bignum with a Bignum when other is positive returns -1 when self is positive and other is larger" # Expected 0 to equal -1

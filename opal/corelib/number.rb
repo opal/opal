@@ -865,7 +865,7 @@ class Number < Numeric
   end
 
   def to_i
-    `parseInt(self, 10)`
+    `self < 0 ? Math.ceil(self) : Math.floor(self)`
   end
 
   alias to_int to_i
