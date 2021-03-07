@@ -18,10 +18,7 @@ class Encoding
 
   def self.find(name)
     return default_external if name == :default_external
-    register = `Opal.encodings`
-    encoding = register.JS[name] || register.JS[name.upcase]
-    raise ArgumentError, "unknown encoding name - #{name}" unless encoding
-    encoding
+    `return Opal.find_encoding(name)`
   end
 
   singleton_class.attr_accessor :default_external
