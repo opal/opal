@@ -30,6 +30,7 @@ module Opal
 
         def on_restarg(arg_name = nil)
           if arg_name
+            arg_name = :* if arg_name == :fwd_rest_arg
             %{['rest', '#{arg_name}']}
           else
             %{['rest']}
@@ -53,6 +54,7 @@ module Opal
         end
 
         def on_blockarg(arg_name)
+          arg_name = :& if arg_name == :fwd_block_arg
           %{['block', '#{arg_name}']}
         end
 

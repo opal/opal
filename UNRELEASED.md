@@ -1,6 +1,7 @@
 ### Added
 
 - Support for multiple arguments in Hash#{merge, merge!, update} (#2187)
+- Support for Ruby 3.0 forward arguments: `def a(...) puts(...) end` (#2153)
 
 ### Fixed
 
