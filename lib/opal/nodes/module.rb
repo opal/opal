@@ -15,20 +15,14 @@ module Opal
 
         push '(function($base, $parent_nesting) {'
         line "  var self = $module($base, '#{name}');"
-
         in_scope do
           scope.name = name
-          add_temp '$nesting = [self].concat($parent_nesting)'
-
-          body_code = stmt(body || s(:nil))
-          empty_line
-
-          line scope.to_vars
-          line body_code
+          compile_body
         end
-
         line '})(', base, ', $nesting)'
       end
+
+      private
 
       # cid is always s(:const, scope_sexp_or_nil, :ConstName)
       def name_and_base
@@ -39,6 +33,16 @@ module Opal
         else
           [name, expr(base)]
         end
+      end
+
+      def compile_body
+        add_temp '$nesting = [self].concat($parent_nesting)'
+
+        body_code = stmt(compiler.returns(body || s(:nil)))
+        empty_line
+
+        line scope.to_vars
+        line body_code
       end
     end
   end
