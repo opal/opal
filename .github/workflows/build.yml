@@ -26,6 +26,10 @@ jobs:
           - name: minitest
             ruby: 3.0
             command: bin/rake minitest
+          - name: minitest
+            ruby: 3.0
+            command: bin/rake minitest
+            strict: 'true'
           - name: current-ruby
             ruby: 3.0
           - name: previous-ruby
@@ -87,4 +91,8 @@ jobs:
           bundle config path $PWD/vendor/bundle
           bundle install --jobs 4 --retry 3
           bundle clean
+      - name: set environment variables
+        if: ${{ matrix.combo.strict == 'true' }}
+        run: |
+          echo "USE_STRICT=true" >> $GITHUB_ENV
       - run: ${{ matrix.combo.command || 'bin/rake rspec' }}
