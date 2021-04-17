@@ -16,7 +16,7 @@
   <a href="https://stackoverflow.com/questions/ask?tags=opalrb"><img src="https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat" alt="Stack Overflow" title="" /></a>
   <a href="#backers"><img src="https://opencollective.com/opal/backers/badge.svg" alt="Backers on Open Collective" title="" /></a>
   <a href="#sponsors"><img src="https://opencollective.com/opal/sponsors/badge.svg" alt="Sponsors on Open Collective" title="" /></a>
-  <a href="https://slack.opalrb.com?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://img.shields.io/badge/slack-join%20chat-46BC99?logo=slack&style=flat" alt="Slack" title="Join Chat" /></a>
+  <a href="https://slack.opalrb.com/"><img src="https://img.shields.io/badge/slack-join%20chat-46BC99?logo=slack&style=flat" alt="Slack" title="Join Chat" /></a>
   <a href="https://opalrb.com/docs"><img src="https://img.shields.io/badge/docs-updated-blue.svg" alt="Documentation" title="" /></a>
   
   <br>
