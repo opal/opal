@@ -265,9 +265,6 @@ opal_filter "String" do
   fails "String#split with Regexp when a block is given yields the string when limit is 1" # Expected ["chunky bacon"] == "chunky bacon" to be truthy but was false
   fails "String#split with String returns String instances based on self" # Expected "x" (StringSpecs::MyString) to be an instance of String
   fails "String#squeeze returns String instances when called on a subclass" # Expected "oh no!" (StringSpecs::MyString) to be an instance of String
-  fails "String#start_with? sets Regexp.last_match if it returns true" # TypeError: no implicit conversion of Regexp into String
-  fails "String#start_with? supports regexps with ^ and $ modifiers" # TypeError: no implicit conversion of Regexp into String
-  fails "String#start_with? supports regexps" # TypeError: no implicit conversion of Regexp into String
   fails "String#sub with pattern, replacement returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#sub with pattern, replacement returns a copy of self when no modification is made" # Expected "hello" not to be identical to "hello"
   fails "String#succ returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String

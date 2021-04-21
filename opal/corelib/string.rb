@@ -1141,10 +1141,22 @@ class String < `String`
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
-        var prefix = $coerce_to(prefixes[i], #{String}, 'to_str').$to_s();
+        if (prefixes[i].$$is_regexp) {
+          var prefix = prefixes[i];
+          var match = prefix.exec(self);
 
-        if (self.indexOf(prefix) === 0) {
-          return true;
+          if (match != null && match.index === 0) {
+            #{$~ = MatchData.new(`prefix`, `match`)};
+            return true;
+          } else {
+            #{$~ = nil}
+          }
+        } else {
+          var prefix = $coerce_to(prefixes[i], #{String}, 'to_str').$to_s();
+
+          if (self.indexOf(prefix) === 0) {
+            return true;
+          }
         }
       }
 
