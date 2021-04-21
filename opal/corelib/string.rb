@@ -1142,11 +1142,11 @@ class String < `String`
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
         if (prefixes[i].$$is_regexp) {
-          var prefix = prefixes[i];
-          var match = prefix.exec(self);
+          var regexp = prefixes[i];
+          var match = regexp.exec(self);
 
           if (match != null && match.index === 0) {
-            #{$~ = MatchData.new(`prefix`, `match`)};
+            #{$~ = MatchData.new(`regexp`, `match`)};
             return true;
           } else {
             #{$~ = nil}
