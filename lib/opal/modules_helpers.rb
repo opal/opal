@@ -106,6 +106,9 @@ module Opal
           return original_path
         elsif original_path.start_with?('.')
           return absolute_module_path(Pathname.new(original_path).expand_path.to_s)
+        elsif /^[a-zA-Z]:[\/\\]/.match?(original_path)
+          # absolute path on Windows beginning with eg. c:\ or C:/
+          return original_path
         else
           module_paths_to_check = []
           unless original_path.end_with?('.rb', '.js')
