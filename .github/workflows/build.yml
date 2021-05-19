@@ -32,8 +32,8 @@ jobs:
             ruby: 2.7
           - name: older-ruby
             ruby: 2.6
-          - name: near-eol-ruby
-            ruby: 2.5
+          # - name: near-eol-ruby
+          #   ruby: 2.6
           - name: smoke-test
             ruby: 3.0
             command: bin/rake smoke_test
