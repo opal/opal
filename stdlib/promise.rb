@@ -153,6 +153,8 @@ class Promise < `Promise`
     alias error reject
   end
 
+  attr_reader :prev, :next
+
   # Is this promise native to JavaScript? This means, that methods like resolve
   # or reject won't be available.
   def native?
@@ -167,7 +169,7 @@ class Promise < `Promise`
   # Raise an exception when a non-JS-native method is called on a JS-native promise
   # but permits some typed promises
   def light_nativity_check!
-    return if %i[reject resolve].include? @type
+    return if %i[reject resolve trace always fail then].include? @type
     raise ArgumentError, 'this promise is native to JavaScript' if native?
   end
 
@@ -175,7 +177,15 @@ class Promise < `Promise`
   # This isn't a strict check - it's always possible on the JS side to chain a
   # given block.
   def there_can_be_only_one!
-    raise ArgumentError, 'a promise has already been chained' if @chained
+    raise ArgumentError, 'a promise has already been chained' if @next && @next.any?
+  end
+
+  def gen_tracing_proc(passing, &block)
+    proc do |i|
+      res = passing.(i)
+      block.(res)
+      res
+    end
   end
 
   def resolve(value = nil)
@@ -199,8 +209,17 @@ class Promise < `Promise`
   alias reject! reject
 
   def then(&block)
-    @chained = true
-    `self.then(#{block})`
+    prom = nil
+    blk = gen_tracing_proc(block) do |val|
+      prom.instance_variable_set(:@realized, :resolve)
+      prom.instance_variable_set(:@value, val)
+    end
+    prom = `self.then(#{blk})`
+    prom.instance_variable_set(:@prev, self)
+    prom.instance_variable_set(:@type, :then)
+    @next ||= []
+    @next << prom
+    prom
   end
 
   def then!(&block)
@@ -213,8 +232,17 @@ class Promise < `Promise`
   alias do! then!
 
   def fail(&block)
-    @chained = true
-    `self.catch(#{block})`
+    prom = nil
+    blk = gen_tracing_proc(block) do |val|
+      prom.instance_variable_set(:@realized, :resolve)
+      prom.instance_variable_set(:@value, val)
+    end
+    prom = `self.catch(#{blk})`
+    prom.instance_variable_set(:@prev, self)
+    prom.instance_variable_set(:@type, :fail)
+    @next ||= []
+    @next << prom
+    prom
   end
 
   def fail!(&block)
@@ -228,8 +256,17 @@ class Promise < `Promise`
   alias catch! fail!
 
   def always(&block)
-    @chained = true
-    `self.finally(#{block})`
+    prom = nil
+    blk = gen_tracing_proc(block) do |val|
+      prom.instance_variable_set(:@realized, :resolve)
+      prom.instance_variable_set(:@value, val)
+    end
+    `self.finally(#{blk})`
+    prom.instance_variable_set(:@prev, self)
+    prom.instance_variable_set(:@type, :always)
+    @next ||= []
+    @next << prom
+    prom
   end
 
   def always!(&block)
@@ -241,6 +278,26 @@ class Promise < `Promise`
   alias ensure always
   alias finally! always!
   alias ensure! always!
+
+  def trace(depth = nil, &block)
+    self.then do
+      values = []
+      prom = self
+      while prom && (!depth || depth > 0)
+        values.unshift(prom.value)
+        depth -= 1 if depth
+        prom = prom.prev
+      end
+      yield(*values)
+    end.tap do |prom|
+      prom.instance_variable_set(:@type, :trace)
+    end
+  end
+
+  def trace!(*args, &block)
+    there_can_be_only_one!
+    trace(*args, &block)
+  end
 
   def resolved?
     light_nativity_check!
@@ -258,7 +315,6 @@ class Promise < `Promise`
   end
 
   def value
-    light_nativity_check!
     if resolved?
       if Promise === @value
         @value.value
@@ -271,6 +327,17 @@ class Promise < `Promise`
   def error
     light_nativity_check!
     @value if rejected?
+  end
+
+  def and(*promises)
+    promises = promises.map do |i|
+      if Promise === i
+        i
+      else
+        Promise.value(i)
+      end
+    end
+    Promise.when(self, *promises)
   end
 
   def initialize(&block)
@@ -299,6 +366,11 @@ class Promise < `Promise`
 
     result += ":#{@realized}" if @realized
     result += "(#{object_id})"
+
+    if @next && @next.any?
+      result += " >> #{@next.inspect}"
+    end
+
     result += ": #{@value.inspect}" if @value
     result += ">"
 
