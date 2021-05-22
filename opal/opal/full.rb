@@ -1,3 +1,4 @@
+::Object.require 'corelib/bignum'
 ::Object.autoload :Marshal, 'corelib/marshal'
 ::Object.require 'corelib/string/unpack'
 ::Object.require 'corelib/array/pack'

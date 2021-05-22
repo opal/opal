@@ -6,6 +6,7 @@ require 'corelib/numeric'
 class ::Number < ::Numeric
   ::Opal.bridge(`Number`, self)
   `Opal.prop(self.$$prototype, '$$is_number', true)`
+  `Opal.prop(self.$$prototype, '$$is_numeric', true)`
   `self.$$is_number_class = true`
   `var number_id_map = new Map()`
 
@@ -21,6 +22,14 @@ class ::Number < ::Numeric
     %x{
       if (other === nil) {
         #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
+      }
+      else if (other.$$is_bignum) {
+        if (#{integer?}) {
+          return [other, #{Bignum(self)}]
+        }
+        else {
+          return [#{Float(other)}, self]
+        }
       }
       else if (other.$$is_string) {
         return [#{::Kernel.Float(other)}, self];
@@ -167,7 +176,7 @@ class ::Number < ::Numeric
 
   def <(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_numeric) {
         return self < other;
       }
       else {
@@ -178,7 +187,7 @@ class ::Number < ::Numeric
 
   def <=(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_numeric) {
         return self <= other;
       }
       else {
@@ -189,7 +198,7 @@ class ::Number < ::Numeric
 
   def >(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_numeric) {
         return self > other;
       }
       else {
@@ -200,7 +209,7 @@ class ::Number < ::Numeric
 
   def >=(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_numeric) {
         return self >= other;
       }
       else {
@@ -213,8 +222,8 @@ class ::Number < ::Numeric
   # can be optimized despite a try/finally construct.
   %x{
     var spaceship_operator = function(self, other) {
-      if (other.$$is_number) {
-        if (isNaN(self) || isNaN(other)) {
+      if (other.$$is_numeric) {
+        if (!other.$$is_bignum && !self.$$is_bignum && (isNaN(self) || isNaN(other))) {
           return nil;
         }
 
@@ -294,8 +303,8 @@ class ::Number < ::Numeric
 
   def ==(other)
     %x{
-      if (other.$$is_number) {
-        return self.valueOf() === other.valueOf();
+      if (other.$$is_numeric) {
+        return self.valueOf() == other.valueOf();
       }
       else if (#{other.respond_to? :==}) {
         return #{other == self};
@@ -453,8 +462,16 @@ class ::Number < ::Numeric
     end
 
     %x{
-      var min = Math.abs(self),
-          max = Math.abs(other);
+      var self_ = self;
+      if (self_.$$is_bignum && !other.$$is_bignum) {
+        other = #{other.to_bn};
+      }
+      if (!self_.$$is_bignum && other.$$is_bignum) {
+        self_ = #{to_bn};
+      }
+
+      var min = self_ < 0 ? -self_ : self_,
+          max = other < 0 ? -other : other;
 
       while (min > 0) {
         var tmp = min;
@@ -501,7 +518,8 @@ class ::Number < ::Numeric
         return 0;
       }
       else {
-        return Math.abs(self * other / #{gcd(other)});
+        var val = self * other / #{gcd(other)};
+        return val < 0 ? -val : val;
       }
     }
   end
@@ -940,6 +958,8 @@ class ::Integer < ::Numeric
   self::MAX = `Math.pow(2, 30) - 1`
   self::MIN = `-Math.pow(2, 30)`
 end
+
+::Fixnum = ::Number
 
 class ::Float < ::Numeric
   `self.$$is_number_class = true`

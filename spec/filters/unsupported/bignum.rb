@@ -1,6 +1,7 @@
 # NOTE: run bin/format-filters after changing this file
 opal_unsupported_filter "Bignum" do
   fails "BasicObject#__id__ returns a different value for two Bignum literals" # Expected 4e+100 == 4e+100 to be falsy but was true
+  fails "Bignum is no longer defined" # Expected Object.const_defined? "Bignum" to be falsy but was true
   fails "Complex#== with Numeric returns true when self's imaginary part is 0 and the real part and other have numerical equality" # Expected (18446744073709552000+0i) == 18446744073709552000 to be falsy but was true
   fails "Complex#fdiv with an imaginary part sets the real part to self's real part fdiv'd with the argument" # Expected (9223372036854776000/5) == 1844674407370955300 to be truthy but was false
   fails "Complex#fdiv with no imaginary part sets the real part to self's real part fdiv'd with the argument" # Expected (9223372036854776000/5) == 1844674407370955300 to be truthy but was false
