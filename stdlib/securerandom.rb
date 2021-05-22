@@ -6,16 +6,21 @@ module SecureRandom
 
     if ((Opal.global.crypto   && Opal.global.crypto.getRandomValues) ||
         (Opal.global.msCrypto && Opal.global.msCrypto.getRandomValues)) {
-
-      // This method is available from Node 15 and may not be available in MiniRacer.
-      // It is available in all non-ancient web browsers though.
+      // This method is available in all non-ancient web browsers.
 
       var crypto = Opal.global.crypto || Opal.global.msCrypto;
       gen_random_bytes = function(count) {
         var storage = new Uint8Array(count);
         crypto.getRandomValues(storage);
         return storage;
-      }
+      };
+    }
+    else if (Opal.global.crypto && Opal.global.crypto.randomBytes) {
+      // This method is available in Node.js
+
+      gen_random_bytes = function(count) {
+        return Opal.global.crypto.randomBytes(count);
+      };
     }
     else {
       // Let's dangerously polyfill this interface with our MersenneTwister
@@ -26,9 +31,9 @@ module SecureRandom
       // It's possible to interface other libraries by adding an else if above if
       // that's really desired.
 
-      #{warn 'Can\'t get a Crypto.getRandomValues interface. The random values ' \
-             'generated with SecureRandom won\'t be cryptographically secure. ' \
-             'Please update to Node 15.0.'}
+      #{warn 'Can\'t get a Crypto.getRandomValues interface or Crypto.randomBytes.' \
+             'The random values generated with SecureRandom won\'t be ' \
+             'cryptographically secure'}
 
       gen_random_bytes = function(count) {
         var storage = new Uint8Array(count);
