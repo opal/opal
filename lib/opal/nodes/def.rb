@@ -61,6 +61,9 @@ module Opal
         unshift ') {'
         unshift(inline_params)
         unshift "function#{function_name}("
+        if scope.await_encountered
+          unshift "async "
+        end
         unshift "#{scope_name} = " if scope_name
         line '}'
 

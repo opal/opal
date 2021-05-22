@@ -290,6 +290,8 @@ module Opal
       def in_ensure?
         @in_ensure
       end
+
+      attr_accessor :await_encountered
     end
   end
 end
