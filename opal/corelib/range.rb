@@ -153,6 +153,7 @@ class Range
   def size
     infinity = Float::INFINITY
 
+    return 0 if (@begin == infinity && !@end.nil?) || (@end == -infinity && !@begin.nil?)
     return infinity if `infinite(self)`
     return nil unless Numeric === @begin && Numeric === @end
 
