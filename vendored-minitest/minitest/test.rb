@@ -105,16 +105,16 @@ module Minitest
           capture_exceptions do
             before_setup; setup; after_setup
 
-            self.send self.name
-          end
+            self.send(self.name).await
+          end.await
 
-          TEARDOWN_METHODS.each do |hook|
+          TEARDOWN_METHODS.each_await do |hook|
             capture_exceptions do
-              self.send hook
-            end
-          end
-        end
-      end
+              self.send(hook).await
+            end.await
+          end.await
+        end.await
+      end.await
 
       self # per contract
     end
@@ -202,7 +202,7 @@ module Minitest
     end # LifecycleHooks
 
     def capture_exceptions # :nodoc:
-      yield
+      yield.await
     rescue *PASSTHROUGH_EXCEPTIONS
       raise
     rescue Assertion => e
@@ -253,7 +253,7 @@ module Minitest
     def time_it # :nodoc:
       t0 = Time.now
 
-      yield
+      yield.await
     ensure
       self.time = Time.now - t0
     end
@@ -273,7 +273,7 @@ module Minitest
         warn "\nCurrent: %s#%s %.2fs" % [self.class, self.name, Time.now - t0]
       end
 
-      self.class.on_signal "INFO", handler, &block
+      self.class.on_signal("INFO", handler, &block).await
     end
 
     include LifecycleHooks
@@ -282,4 +282,4 @@ module Minitest
   end # Test
 end
 
-require "minitest/unit" unless defined?(MiniTest) # compatibility layer only
+#require "minitest/unit" unless defined?(MiniTest) # compatibility layer only

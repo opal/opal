@@ -91,7 +91,7 @@ module Minitest
       range.each do |x|
         GC.start
         t0 = Time.now
-        instance_exec(x, &work)
+        instance_exec(x, &work).await
         t = Time.now - t0
 
         io.print "\t%9.6f" % t
@@ -132,7 +132,7 @@ module Minitest
         [a, b, rr]
       end
 
-      assert_performance validation, &work
+      assert_performance(validation, &work).await
     end
 
     ##
@@ -152,7 +152,7 @@ module Minitest
     #   end
 
     def assert_performance_exponential threshold = 0.99, &work
-      assert_performance validation_for_fit(:exponential, threshold), &work
+      assert_performance(validation_for_fit(:exponential, threshold), &work).await
     end
 
     ##
@@ -172,7 +172,7 @@ module Minitest
     #   end
 
     def assert_performance_logarithmic threshold = 0.99, &work
-      assert_performance validation_for_fit(:logarithmic, threshold), &work
+      assert_performance(validation_for_fit(:logarithmic, threshold), &work).await
     end
 
     ##
@@ -192,7 +192,7 @@ module Minitest
     #   end
 
     def assert_performance_linear threshold = 0.99, &work
-      assert_performance validation_for_fit(:linear, threshold), &work
+      assert_performance(validation_for_fit(:linear, threshold), &work).await
     end
 
     ##
@@ -212,7 +212,7 @@ module Minitest
     #   end
 
     def assert_performance_power threshold = 0.99, &work
-      assert_performance validation_for_fit(:power, threshold), &work
+      assert_performance(validation_for_fit(:power, threshold), &work).await
     end
 
     ##
