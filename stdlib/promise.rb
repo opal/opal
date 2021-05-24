@@ -111,24 +111,23 @@ class Promise < `Promise`
     end
 
     def when(*promises)
-      `Promise.allSettled(#{promises})`.tap do |prom|
+      promises = Array(promises.length == 1 ? promises.first : promises)
+      `Promise.all(#{promises})`.tap do |prom|
         prom.instance_variable_set(:@type, :when)
       end
     end
 
-    def all(*promises)
-      `Promise.all(#{promises})`.tap do |prom|
-        prom.instance_variable_set(:@type, :all)
-      end
-    end
+    alias all when
 
     def any(*promises)
+      promises = Array(promises.length == 1 ? promises.first : promises)
       `Promise.any(#{promises})`.tap do |prom|
         prom.instance_variable_set(:@type, :any)
       end
     end
 
     def race(*promises)
+      promises = Array(promises.length == 1 ? promises.first : promises)
       `Promise.race(#{promises})`.tap do |prom|
         prom.instance_variable_set(:@type, :race)
       end
@@ -217,8 +216,7 @@ class Promise < `Promise`
     prom = `self.then(#{blk})`
     prom.instance_variable_set(:@prev, self)
     prom.instance_variable_set(:@type, :then)
-    @next ||= []
-    @next << prom
+    (@next ||= []) << prom
     prom
   end
 
@@ -227,7 +225,6 @@ class Promise < `Promise`
     self.then(&block)
   end
 
-  alias then! then
   alias do then
   alias do! then!
 
@@ -240,8 +237,7 @@ class Promise < `Promise`
     prom = `self.catch(#{blk})`
     prom.instance_variable_set(:@prev, self)
     prom.instance_variable_set(:@type, :fail)
-    @next ||= []
-    @next << prom
+    (@next ||= []) << prom
     prom
   end
 
@@ -261,11 +257,10 @@ class Promise < `Promise`
       prom.instance_variable_set(:@realized, :resolve)
       prom.instance_variable_set(:@value, val)
     end
-    `self.finally(#{blk})`
+    prom = `self.finally(#{blk})`
     prom.instance_variable_set(:@prev, self)
     prom.instance_variable_set(:@type, :always)
-    @next ||= []
-    @next << prom
+    (@next ||= []) << prom
     prom
   end
 
@@ -284,7 +279,13 @@ class Promise < `Promise`
       values = []
       prom = self
       while prom && (!depth || depth > 0)
-        values.unshift(prom.value)
+        val = nil
+        begin
+          val = prom.value
+        rescue ArgumentError
+          val = :native
+        end
+        values.unshift(val)
         depth -= 1 if depth
         prom = prom.prev
       end
@@ -337,7 +338,9 @@ class Promise < `Promise`
         Promise.value(i)
       end
     end
-    Promise.when(self, *promises)
+    Promise.when(self, *promises).then do |a, *b|
+      [*a, *b]
+    end
   end
 
   def initialize(&block)
@@ -346,14 +349,14 @@ class Promise < `Promise`
 
   alias to_n itself
 
-  include Enumerable
-  def each(&block)
-    return enum_for(:each) unless block_given?
-
-    self.then do |res|
-      res.each(&block)
-    end
-  end
+  #include Enumerable
+  #def each(&block)
+  #  return enum_for(:each) unless block_given?
+  #
+  #  self.then do |res|
+  #    res.each(&block)
+  #  end
+  #end
 
   def inspect
     result = "#<#{self.class}"

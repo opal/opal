@@ -331,6 +331,13 @@ platforms.each do |platform|
           opal/test_openuri.rb
           opal/unsupported_and_bugs.rb
           opal/test_matrix.rb
+          opal/promise/test_always.rb
+          opal/promise/test_error.rb
+          opal/promise/test_rescue.rb
+          opal/promise/test_then.rb
+          opal/promise/test_trace.rb
+          opal/promise/test_value.rb
+          opal/promise/test_when.rb
         ]
       end
       Testing::HTTPServer.new.with_server do |session|
@@ -467,4 +474,3 @@ task :test_all => [:rspec, :mspec, :minitest]
 task(:cruby_tests) { warn "The task 'cruby_tests' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_cruby)  { warn "The task 'test_cruby' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_nodejs) { warn "The task 'test_nodejs' has been renamed to 'minitest_node_nodejs'."; exit 1 }
-
