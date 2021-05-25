@@ -5,8 +5,8 @@ class Exception < `Error`
   def self.new(*args)
     %x{
       var message   = (args.length > 0) ? args[0] : nil;
-      var error     = new self.$$constructor(message);
-      error.name    = self.$$name;
+      var error     = new self[Opal.$$constructor_s](message);
+      error.name    = self[Opal.$$name_s];
       error.message = message;
       Opal.send(error, error.$initialize, args);
 
@@ -83,13 +83,13 @@ class Exception < `Error`
       if (backtrace === nil) {
         self.backtrace = nil;
         self.stack = '';
-      } else if (backtrace.$$is_string) {
+      } else if (backtrace[Opal.$$is_string_s]) {
         self.backtrace = [backtrace];
         self.stack = backtrace;
       } else {
-        if (backtrace.$$is_array) {
+        if (backtrace[Opal.$$is_array_s]) {
           for (i = 0, ii = backtrace.length; i < ii; i++) {
-            if (!backtrace[i].$$is_string) {
+            if (!backtrace[i][Opal.$$is_string_s]) {
               valid = false;
               break;
             }

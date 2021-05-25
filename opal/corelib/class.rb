@@ -3,7 +3,7 @@ require 'corelib/module'
 class Class
   def self.new(superclass = Object, &block)
     %x{
-      if (!superclass.$$is_class) {
+      if (!superclass[Opal.$$is_class_s]) {
         throw Opal.TypeError.$new("superclass must be a Class");
       }
 
@@ -16,7 +16,7 @@ class Class
 
   def allocate
     %x{
-      var obj = new self.$$constructor();
+      var obj = new self[Opal.$$constructor_s]();
       obj[Opal.$$id_s] = Opal.uid();
       return obj;
     }
@@ -28,7 +28,7 @@ class Class
   def initialize_dup(original)
     initialize_copy(original)
     %x{
-      self.$$name = null;
+      self[Opal.$$name_s] = null;
       self.$$full_name = null;
     }
   end
@@ -42,19 +42,19 @@ class Class
   end
 
   def superclass
-    `self.$$super || nil`
+    `self[Opal.$$super_s] || nil`
   end
 
   def to_s
     %x{
-      var singleton_of = self.$$singleton_of;
+      var singleton_of = self[Opal.$$singleton_of_s];
 
-      if (singleton_of && singleton_of.$$is_a_module) {
+      if (singleton_of && singleton_of[Opal.$$is_a_module_s]) {
         return #{"#<Class:#{`singleton_of`.name}>"};
       }
       else if (singleton_of) {
         // a singleton class created from an object
-        return #{"#<Class:#<#{`singleton_of.$$class`.name}:0x#{`Opal.id(singleton_of)`.to_s(16)}>>"};
+        return #{"#<Class:#<#{`singleton_of[Opal.$$class_s]`.name}:0x#{`Opal.id(singleton_of)`.to_s(16)}>>"};
       }
 
       return #{super()};

@@ -195,7 +195,7 @@ module Opal
 
       def compile
         with_temp do |tmp|
-          push "((#{tmp} = #{class_variable_owner}.$$cvars['#{name}']) == null ? nil : #{tmp})"
+          push "((#{tmp} = #{class_variable_owner}[Opal.$$cvars_s]['#{name}']) == null ? nil : #{tmp})"
         end
       end
     end

@@ -58,7 +58,7 @@ opal_filter "language" do
   fails "A method assigns local variables from method parameters for definition 'def m(a:, b:) [a, b] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b: 2) [a, b] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b:) [a, b] end'"
-  fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
+  fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array_s' of undefined
   fails "A method definition in an eval creates a class method"
   fails "A method definition in an eval creates a singleton method"
   fails "A method definition in an eval creates an instance method"

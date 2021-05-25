@@ -359,7 +359,7 @@ class Date
 
   def -(date)
     %x{
-      if (date.$$is_number) {
+      if (date[Opal.$$is_number_s]) {
         var result = #{clone};
         result.date.setDate(#{@date}.getDate() - date);
         return result;
@@ -375,7 +375,7 @@ class Date
 
   def +(date)
     %x{
-      if (date.$$is_number) {
+      if (date[Opal.$$is_number_s]) {
         var result = #{clone};
         result.date.setDate(#{@date}.getDate() + date);
         return result;
@@ -424,7 +424,7 @@ class Date
 
   def <=>(other)
     %x{
-      if (other.$$is_number) {
+      if (other[Opal.$$is_number_s]) {
         return #{jd <=> other}
       }
 
@@ -450,7 +450,7 @@ class Date
 
   def >>(n)
     %x{
-      if (!n.$$is_number) {
+      if (!n[Opal.$$is_number_s]) {
         #{raise TypeError};
       }
 
@@ -464,7 +464,7 @@ class Date
 
   def <<(n)
     %x{
-      if (!n.$$is_number) {
+      if (!n[Opal.$$is_number_s]) {
         #{raise TypeError};
       }
 

@@ -25,7 +25,7 @@ class Time < `Date`
         return result;
       }
 
-      if (!seconds.$$is_number) {
+      if (!seconds[Opal.$$is_number_s]) {
         seconds = #{Opal.coerce_to!(seconds, Integer, :to_int)};
       }
 
@@ -33,7 +33,7 @@ class Time < `Date`
         return new Date(seconds * 1000);
       }
 
-      if (!frac.$$is_number) {
+      if (!frac[Opal.$$is_number_s]) {
         frac = #{Opal.coerce_to!(frac, Integer, :to_int)};
       }
 
@@ -43,7 +43,7 @@ class Time < `Date`
 
   %x{
     function time_params(year, month, day, hour, min, sec) {
-      if (year.$$is_string) {
+      if (year[Opal.$$is_string_s]) {
         year = parseInt(year, 10);
       } else {
         year = #{Opal.coerce_to!(`year`, Integer, :to_int)};
@@ -51,7 +51,7 @@ class Time < `Date`
 
       if (month === nil) {
         month = 1;
-      } else if (!month.$$is_number) {
+      } else if (!month[Opal.$$is_number_s]) {
         if (#{`month`.respond_to?(:to_str)}) {
           month = #{`month`.to_str};
           switch (month.toLowerCase()) {
@@ -81,7 +81,7 @@ class Time < `Date`
 
       if (day === nil) {
         day = 1;
-      } else if (day.$$is_string) {
+      } else if (day[Opal.$$is_string_s]) {
         day = parseInt(day, 10);
       } else {
         day = #{Opal.coerce_to!(`day`, Integer, :to_int)};
@@ -93,7 +93,7 @@ class Time < `Date`
 
       if (hour === nil) {
         hour = 0;
-      } else if (hour.$$is_string) {
+      } else if (hour[Opal.$$is_string_s]) {
         hour = parseInt(hour, 10);
       } else {
         hour = #{Opal.coerce_to!(`hour`, Integer, :to_int)};
@@ -105,7 +105,7 @@ class Time < `Date`
 
       if (min === nil) {
         min = 0;
-      } else if (min.$$is_string) {
+      } else if (min[Opal.$$is_string_s]) {
         min = parseInt(min, 10);
       } else {
         min = #{Opal.coerce_to!(`min`, Integer, :to_int)};
@@ -117,8 +117,8 @@ class Time < `Date`
 
       if (sec === nil) {
         sec = 0;
-      } else if (!sec.$$is_number) {
-        if (sec.$$is_string) {
+      } else if (!sec[Opal.$$is_number_s]) {
+        if (sec[Opal.$$is_string_s]) {
           sec = parseInt(sec, 10);
         } else {
           sec = #{Opal.coerce_to!(`sec`, Integer, :to_int)};
@@ -239,7 +239,7 @@ class Time < `Date`
     end
 
     %x{
-      if (!other.$$is_number) {
+      if (!other[Opal.$$is_number_s]) {
         other = #{Opal.coerce_to!(other, Integer, :to_int)};
       }
       var result = new Date(self.getTime() + (other * 1000));
@@ -254,7 +254,7 @@ class Time < `Date`
     end
 
     %x{
-      if (!other.$$is_number) {
+      if (!other[Opal.$$is_number_s]) {
         other = #{Opal.coerce_to!(other, Integer, :to_int)};
       }
       var result = new Date(self.getTime() - (other * 1000));

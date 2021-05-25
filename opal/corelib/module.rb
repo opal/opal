@@ -5,7 +5,7 @@ class Module
     %x{
       var module = Opal.allocate_module(nil, function(){});
       // Link the prototype of Module subclasses
-      if (self !== Opal.Module) Object.setPrototypeOf(module, self.$$prototype);
+      if (self !== Opal.Module) Object.setPrototypeOf(module, self[Opal.$$prototype_s]);
       return module;
     }
   end
@@ -126,7 +126,7 @@ class Module
 
   def attr_reader(*names)
     %x{
-      var proto = self.$$prototype;
+      var proto = self[Opal.$$prototype_s];
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
@@ -161,7 +161,7 @@ class Module
 
   def attr_writer(*names)
     %x{
-      var proto = self.$$prototype;
+      var proto = self[Opal.$$prototype_s];
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
@@ -229,9 +229,9 @@ class Module
     name = Opal.class_variable_name!(name)
 
     %x{
-      if (Opal.hasOwnProperty.call(self.$$cvars, name)) {
-        var value = self.$$cvars[name];
-        delete self.$$cvars[name];
+      if (Opal.hasOwnProperty.call(self[Opal.$$cvars_s], name)) {
+        var value = self[Opal.$$cvars_s][name];
+        delete self[Opal.$$cvars_s][name];
         return value;
       } else {
         #{raise NameError, "cannot remove #{name} for #{self}"}
@@ -251,7 +251,7 @@ class Module
             i, ii;
 
         for(i = 0, ii = nesting.length; i < ii; i++) {
-          for (constant in nesting[i].$$const) {
+          for (constant in nesting[i][Opal.$$const_s]) {
             constants[constant] = true;
           }
         }
@@ -281,14 +281,14 @@ class Module
         modules = modules.concat(Opal.ancestors(self));
 
         // Add Object's ancestors if it's a module – modules have no ancestors otherwise
-        if (self.$$is_module) {
+        if (self[Opal.$$is_module_s]) {
           modules = modules.concat([Opal.Object]).concat(Opal.ancestors(Opal.Object));
         }
       }
 
       for (i = 0, ii = modules.length; i < ii; i++) {
         module = modules[i];
-        if (module.$$const[name] != null) {
+        if (module[Opal.$$const_s][name] != null) {
           return true;
         }
       }
@@ -401,7 +401,7 @@ class Module
   end
 
   def singleton_class?
-    `!!self.$$is_singleton`
+    `!!self[Opal.$$is_singleton_s]`
   end
 
   def include(*mods)
@@ -409,7 +409,7 @@ class Module
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
-        if (!mod.$$is_module) {
+        if (!mod[Opal.$$is_module_s]) {
           #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
 
@@ -427,7 +427,7 @@ class Module
 
   def include?(mod)
     %x{
-      if (!mod.$$is_module) {
+      if (!mod[Opal.$$is_module_s]) {
         #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
       }
 
@@ -446,7 +446,7 @@ class Module
 
   def instance_method(name)
     %x{
-      var meth = self.$$prototype['$' + name];
+      var meth = self[Opal.$$prototype_s]['$' + name];
 
       if (!meth || meth.$$stub) {
         #{raise NameError.new("undefined method `#{name}' for class `#{self.name}'", name)};
@@ -538,7 +538,7 @@ class Module
 
   def method_defined?(method)
     %x{
-      var body = self.$$prototype['$' + method];
+      var body = self[Opal.$$prototype_s]['$' + method];
       return (!!body) && !body.$$stub;
     }
   end
@@ -552,7 +552,7 @@ class Module
         for (var i = 0, length = methods.length; i < length; i++) {
           var meth = methods[i],
               id   = '$' + meth,
-              func = self.$$prototype[id];
+              func = self[Opal.$$prototype_s][id];
 
           Opal.defs(self, id, func);
         }
@@ -572,9 +572,9 @@ class Module
 
       while (base) {
         // Give up if any of the ancestors is unnamed
-        if (base.$$name === nil || base.$$name == null) return nil;
+        if (base[Opal.$$name_s] === nil || base[Opal.$$name_s] == null) return nil;
 
-        result.unshift(base.$$name);
+        result.unshift(base[Opal.$$name_s]);
 
         base = base.$$base_module;
 
@@ -600,7 +600,7 @@ class Module
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
-        if (!mod.$$is_module) {
+        if (!mod[Opal.$$is_module_s]) {
           #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
 
@@ -614,7 +614,7 @@ class Module
 
   def prepend_features(prepender)
     %x{
-      if (!self.$$is_module) {
+      if (!self[Opal.$$is_module_s]) {
         #{raise TypeError, "wrong argument type #{self.class} (expected Module)"};
       }
 
@@ -631,7 +631,7 @@ class Module
   end
 
   def to_s
-    `Opal.Module.$name.call(self)` || "#<#{`self.$$is_module ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
+    `Opal.Module.$name.call(self)` || "#<#{`self[Opal.$$is_module_s] ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
   end
 
   def undef_method(*names)
@@ -668,15 +668,15 @@ class Module
 
   def copy_class_variables(other)
     %x{
-      for (var name in other.$$cvars) {
-        self.$$cvars[name] = other.$$cvars[name];
+      for (var name in other[Opal.$$cvars_s]) {
+        self[Opal.$$cvars_s][name] = other[Opal.$$cvars_s][name];
       }
     }
   end
 
   def copy_constants(other)
     %x{
-      var name, other_constants = other.$$const;
+      var name, other_constants = other[Opal.$$const_s];
 
       for (name in other_constants) {
         Opal.const_set(self, name, other_constants[name]);

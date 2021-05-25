@@ -78,7 +78,7 @@ class BasicObject
       // Need to pass $$eval so that method definitions know if this is
       // being done on a class/module. Cannot be compiler driven since
       // send(:instance_eval) needs to work.
-      if (self.$$is_a_module) {
+      if (self[Opal.$$is_a_module_s]) {
         self.$$eval = true;
         try {
           result = block.call(self, self);
@@ -106,7 +106,7 @@ class BasicObject
 
       block.$$s = null;
 
-      if (self.$$is_a_module) {
+      if (self[Opal.$$is_a_module_s]) {
         self.$$eval = true;
         try {
           result = block.apply(self, args);
@@ -136,9 +136,9 @@ class BasicObject
 
   def method_missing(symbol, *args, &block)
     message = if `self.$inspect && !self.$inspect.$$stub`
-                "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}"
+                "undefined method `#{symbol}' for #{inspect}:#{`self[Opal.$$class_s]`}"
               else
-                "undefined method `#{symbol}' for #{`self.$$class`}"
+                "undefined method `#{symbol}' for #{`self[Opal.$$class_s]`}"
               end
 
     ::Kernel.raise ::NoMethodError.new(message, symbol)

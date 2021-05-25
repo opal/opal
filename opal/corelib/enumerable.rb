@@ -1244,7 +1244,7 @@ module Enumerable
       self.$each.$$p = function() {
         var param = #{Opal.destructure(`arguments`)};
         var ary = #{Opal.coerce_to?(`param`, Array, :to_ary)}, key, val;
-        if (!ary.$$is_array) {
+        if (!ary[Opal.$$is_array_s]) {
           #{raise TypeError, "wrong element type #{`ary`.class} (expected array)"}
         }
         if (ary.length !== 2) {
