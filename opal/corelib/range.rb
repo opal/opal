@@ -21,7 +21,7 @@ class Range
   end
 
   %x{
-    function infinite(self) {
+    function is_infinite(self) {
       if (self.begin === nil || self.end === nil ||
           self.begin === -Infinity || self.end === Infinity ||
           self.begin === Infinity || self.end === -Infinity) return true;
@@ -30,14 +30,14 @@ class Range
   }
 
   def count(&block)
-    if !block_given? && `infinite(self)`
+    if !block_given? && `is_infinite(self)`
       return Float::INFINITY
     end
     super
   end
 
   def to_a
-    raise TypeError, 'cannot convert endless range to an array' if `infinite(self)`
+    raise TypeError, 'cannot convert endless range to an array' if `is_infinite(self)`
     super
   end
 
@@ -154,7 +154,7 @@ class Range
     infinity = Float::INFINITY
 
     return 0 if (@begin == infinity && !@end.nil?) || (@end == -infinity && !@begin.nil?)
-    return infinity if `infinite(self)`
+    return infinity if `is_infinite(self)`
     return nil unless Numeric === @begin && Numeric === @end
 
     range_begin = @begin
@@ -255,7 +255,7 @@ class Range
   def bsearch(&block)
     return enum_for(:bsearch) unless block_given?
 
-    if `infinite(self) && (self.begin.$$is_number || self.end.$$is_number)`
+    if `is_infinite(self) && (self.begin.$$is_number || self.end.$$is_number)`
       raise NotImplementedError, "Can't #bsearch an infinite range"
     end
 
