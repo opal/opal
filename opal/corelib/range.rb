@@ -267,11 +267,11 @@ class Range
   end
 
   def to_s
-    "#{@begin.nil? ? '' : @begin}#{@excl ? '...' : '..'}#{@end.nil? ? '' : @end}"
+    "#{@begin || ''}#{@excl ? '...' : '..'}#{@end || ''}"
   end
 
   def inspect
-    "#{@begin.nil? ? '' : @begin.inspect}#{@excl ? '...' : '..'}#{@end.nil? ? '' : @end.inspect}"
+    "#{@begin && @begin.inspect}#{@excl ? '...' : '..'}#{@end && @end.inspect}"
   end
 
   def marshal_load(args)
