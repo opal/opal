@@ -3,7 +3,7 @@
   align="center" title="Opal logo by Elia Schito" width="105" height="105" />
   <br/>
   Opal  <br/>
-  <img src="https://img.shields.io/badge/Opal-Ruby%20💛%20JavaScript-yellow.svg?logo=ruby&style=social&logoColor=777" alt="Opal-Ruby💛JavaScript"/>
+  <img src="https://img.shields.io/badge/Opal-Ruby%20💛%20JavaScript-yellow.svg?logo=ruby&style=social&logoColor=777" alt="Opal-Ruby 💛 JavaScript"/>
 </h1>
 
 <p align="center">
@@ -222,6 +222,15 @@ This project exists thanks to all the people who contribute. [![contributors](ht
 Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/opal#backer)]
 
 <a href="https://opencollective.com/opal#backers" target="_blank"><img src="https://opencollective.com/opal/backers.svg?width=890" alt="Become a Backer Button" /></a>
+<a href="https://opencollective.com/opal/sponsor/1/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/2/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/3/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/4/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/5/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/6/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/7/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/8/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/opal/sponsor/9/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/9/avatar.svg"></a>
 
 
 ## Sponsors
