@@ -7,7 +7,7 @@ class Array < `Array`
   include Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays
-  `Opal.defineProperty(self[Opal.$$prototype_s], Opal.$$is_array_s, true)`
+  `Opal.defineProperty(self[Opal.s.$$prototype], Opal.s.$$is_array, true)`
 
   %x{
     // Recent versions of V8 (> 7.1) only use an optimized implementation when Array.prototype is unmodified.
@@ -34,7 +34,7 @@ class Array < `Array`
     }
 
     function toArraySubclass(obj, klass) {
-      if (klass[Opal.$$name_s] === Opal.Array) {
+      if (klass[Opal.s.$$name] === Opal.Array) {
         return obj;
       } else {
         return klass.$allocate().$replace(#{`obj`.to_a});
@@ -94,7 +94,7 @@ class Array < `Array`
       }
 
       if (arguments.length === 1) {
-        if (size[Opal.$$is_array_s]) {
+        if (size[Opal.s.$$is_array]) {
           #{replace(size.to_a)}
           return self;
         } else if (#{size.respond_to? :to_ary}) {
@@ -282,7 +282,7 @@ class Array < `Array`
         if (array === other)
           return true;
 
-        if (!other[Opal.$$is_array_s]) {
+        if (!other[Opal.s.$$is_array]) {
           if ($respond_to(other, '$to_ary')) {
             return #{`other` == `array`};
           } else {
@@ -290,9 +290,9 @@ class Array < `Array`
           }
         }
 
-        if (array[Opal.$$constructor_s] !== Array)
+        if (array[Opal.s.$$constructor] !== Array)
           array = #{`array`.to_a};
-        if (other[Opal.$$constructor_s] !== Array)
+        if (other[Opal.s.$$constructor] !== Array)
           other = #{`other`.to_a};
 
         if (array.length !== other.length) {
@@ -304,8 +304,8 @@ class Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           a = array[i];
           b = other[i];
-          if (a[Opal.$$is_array_s]) {
-            if (b[Opal.$$is_array_s] && b.length !== a.length) {
+          if (a[Opal.s.$$is_array]) {
+            if (b[Opal.s.$$is_array] && b.length !== a.length) {
               return false;
             }
             if (!recursed.hasOwnProperty(#{`a`.object_id})) {
@@ -400,7 +400,7 @@ class Array < `Array`
 
   def [](index, length = undefined)
     %x{
-      if (index[Opal.$$is_range_s]) {
+      if (index[Opal.s.$$is_range]) {
         return $array_slice_range(self, index);
       }
       else {
@@ -569,7 +569,7 @@ class Array < `Array`
         else if (ret === false || ret === nil) {
           smaller = false;
         }
-        else if (ret[Opal.$$is_number_s]) {
+        else if (ret[Opal.s.$$is_number]) {
           if (ret === 0) { return mid; }
           smaller = (ret < 0);
         }
@@ -590,7 +590,7 @@ class Array < `Array`
     index = bsearch_index(&block)
 
     %x{
-      if (index != null && index[Opal.$$is_number_s]) {
+      if (index != null && index[Opal.s.$$is_number]) {
         return self[index];
       } else {
         return index;
@@ -913,8 +913,8 @@ class Array < `Array`
 
   def dup
     %x{
-      if (self[Opal.$$class_s] === Opal.Array &&
-          self[Opal.$$class_s].$allocate.$$pristine &&
+      if (self[Opal.s.$$class] === Opal.Array &&
+          self[Opal.s.$$class].$allocate.$$pristine &&
           self.$copy_instance_variables.$$pristine &&
           self.$initialize_dup.$$pristine) {
         return self.slice(0);
@@ -959,7 +959,7 @@ class Array < `Array`
       function _eql(array, other) {
         var i, length, a, b;
 
-        if (!other[Opal.$$is_array_s]) {
+        if (!other[Opal.s.$$is_array]) {
           return false;
         }
 
@@ -974,8 +974,8 @@ class Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           a = array[i];
           b = other[i];
-          if (a[Opal.$$is_array_s]) {
-            if (b[Opal.$$is_array_s] && b.length !== a.length) {
+          if (a[Opal.s.$$is_array]) {
+            if (b[Opal.s.$$is_array] && b.length !== a.length) {
               return false;
             }
             if (!recursed.hasOwnProperty(#{`a`.object_id})) {
@@ -1154,7 +1154,7 @@ class Array < `Array`
             continue;
           }
 
-          if (!ary[Opal.$$is_array_s]) {
+          if (!ary[Opal.s.$$is_array]) {
             #{raise TypeError};
           }
 
@@ -2179,7 +2179,7 @@ class Array < `Array`
 
       for (i = 0; i < len; i++) {
         ary = #{Opal.coerce_to?(`array[i]`, Array, :to_ary)};
-        if (!ary[Opal.$$is_array_s]) {
+        if (!ary[Opal.s.$$is_array]) {
           #{raise TypeError, "wrong element type #{`ary`.class} at #{`i`} (expected array)"}
         }
         if (ary.length !== 2) {
@@ -2329,7 +2329,7 @@ class Array < `Array`
 
       for (j = 0, jj = others.length; j < jj; j++) {
         o = others[j];
-        if (o[Opal.$$is_array_s]) {
+        if (o[Opal.s.$$is_array]) {
           continue;
         }
         if (o.$$is_enumerator) {
@@ -2376,7 +2376,7 @@ class Array < `Array`
 
   def self.inherited(klass)
     %x{
-      klass[Opal.$$prototype_s].$to_a = function() {
+      klass[Opal.s.$$prototype].$to_a = function() {
         return this.slice(0, this.length);
       }
     }

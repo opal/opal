@@ -1,8 +1,8 @@
 # helpers: slice
 
 class Proc < `Function`
-  `Opal.defineProperty(self[Opal.$$prototype_s], Opal.$$is_proc_s, true)`
-  `Opal.defineProperty(self[Opal.$$prototype_s], Opal.$$is_lambda_s, false)`
+  `Opal.defineProperty(self[Opal.s.$$prototype], Opal.s.$$is_proc, true)`
+  `Opal.defineProperty(self[Opal.s.$$prototype], Opal.s.$$is_lambda, false)`
 
   def self.new(&block)
     unless block
@@ -22,7 +22,7 @@ class Proc < `Function`
 
       if ($brk) {
         try {
-          if (self[Opal.$$is_lambda_s]) {
+          if (self[Opal.s.$$is_lambda]) {
             result = self.apply(null, args);
           }
           else {
@@ -38,7 +38,7 @@ class Proc < `Function`
         }
       }
       else {
-        if (self[Opal.$$is_lambda_s]) {
+        if (self[Opal.s.$$is_lambda]) {
           result = self.apply(null, args);
         }
         else {
@@ -75,7 +75,7 @@ class Proc < `Function`
   def lambda?
     # This method should tell the user if the proc tricks are unavailable,
     # (see Proc#lambda? on ruby docs to find out more).
-    `!!self[Opal.$$is_lambda_s]`
+    `!!self[Opal.s.$$is_lambda]`
   end
 
   def arity
@@ -103,7 +103,7 @@ class Proc < `Function`
       if (self.$$is_curried) {
         return #{[[:rest]]};
       } else if (self.$$parameters) {
-        if (self[Opal.$$is_lambda_s]) {
+        if (self[Opal.s.$$is_lambda]) {
           return self.$$parameters;
         } else {
           var result = [], i, length;
@@ -134,7 +134,7 @@ class Proc < `Function`
       }
       else {
         arity = #{Opal.coerce_to!(arity, Integer, :to_int)};
-        if (self[Opal.$$is_lambda_s] && arity !== self.length) {
+        if (self[Opal.s.$$is_lambda] && arity !== self.length) {
           #{raise ArgumentError, "wrong number of arguments (#{`arity`} for #{`self.length`})"}
         }
       }
@@ -144,7 +144,7 @@ class Proc < `Function`
             length = args.length,
             result;
 
-        if (length > arity && self[Opal.$$is_lambda_s] && !self.$$is_curried) {
+        if (length > arity && self[Opal.s.$$is_lambda] && !self.$$is_curried) {
           #{raise ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
         }
 
@@ -156,13 +156,13 @@ class Proc < `Function`
           return curried.apply(null,
             args.concat($slice.call(arguments)));
         }
-        result[Opal.$$is_lambda_s] = self[Opal.$$is_lambda_s];
+        result[Opal.s.$$is_lambda] = self[Opal.s.$$is_lambda];
         result.$$is_curried = true;
 
         return result;
       };
 
-      curried[Opal.$$is_lambda_s] = self[Opal.$$is_lambda_s];
+      curried[Opal.s.$$is_lambda] = self[Opal.s.$$is_lambda];
       curried.$$is_curried = true;
       return curried;
     }

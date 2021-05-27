@@ -52,7 +52,7 @@ module Opal
       if (args.length == 1) {
         return args[0];
       }
-      else if (args[Opal.$$is_array_s]) {
+      else if (args[Opal.s.$$is_array]) {
         return args;
       }
       else {
@@ -66,7 +66,7 @@ module Opal
 
   def self.respond_to?(obj, method, include_all = false)
     %x{
-      if (obj == null || !obj[Opal.$$class_s]) {
+      if (obj == null || !obj[Opal.s.$$class]) {
         return false;
       }
     }
@@ -135,7 +135,7 @@ module Opal
       var method_name, method;
       for (var i = method_names.length - 1; i >= 0; i--) {
         method_name = method_names[i];
-        method = owner_class[Opal.$$prototype_s]['$'+method_name];
+        method = owner_class[Opal.s.$$prototype]['$'+method_name];
 
         if (method && !method.$$stub) {
           method.$$pristine = true;

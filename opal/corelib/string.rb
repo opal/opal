@@ -7,14 +7,14 @@ class String < `String`
   include Comparable
 
   %x{
-    Opal.defineProperty(#{self}[Opal.$$prototype_s], Opal.$$is_string_s, true);
+    Opal.defineProperty(#{self}[Opal.s.$$prototype], Opal.s.$$is_string, true);
 
-    Opal.defineProperty(#{self}[Opal.$$prototype_s], Opal.$$cast_s, function(string) {
-      var klass = this[Opal.$$class_s];
-      if (klass[Opal.$$constructor_s] === String) {
+    Opal.defineProperty(#{self}[Opal.s.$$prototype], Opal.s.$$cast, function(string) {
+      var klass = this[Opal.s.$$class];
+      if (klass[Opal.s.$$constructor] === String) {
         return string;
       } else {
-        return new klass[Opal.$$constructor_s](string);
+        return new klass[Opal.s.$$constructor](string);
       }
     });
   }
@@ -31,7 +31,7 @@ class String < `String`
 
   def self.new(str = '')
     str = `$coerce_to(str, #{String}, 'to_str')`
-    `new self[Opal.$$constructor_s](str)`
+    `new self[Opal.s.$$constructor](str)`
   end
 
   def initialize(str = undefined)
@@ -60,7 +60,7 @@ class String < `String`
       }
 
       if (count === 0) {
-        return self[Opal.$$cast_s]('');
+        return self[Opal.s.$$cast]('');
       }
 
       var result = '',
@@ -85,7 +85,7 @@ class String < `String`
         string += string;
       }
 
-      return self[Opal.$$cast_s](result);
+      return self[Opal.s.$$cast](result);
     }
   end
 
@@ -116,7 +116,7 @@ class String < `String`
 
   def ==(other)
     %x{
-      if (other[Opal.$$is_string_s]) {
+      if (other[Opal.s.$$is_string]) {
         return self.toString() === other.toString();
       }
       if ($respond_to(other, '$to_str')) {
@@ -131,7 +131,7 @@ class String < `String`
 
   def =~(other)
     %x{
-      if (other[Opal.$$is_string_s]) {
+      if (other[Opal.s.$$is_string]) {
         #{raise TypeError, 'type mismatch: String given'};
       }
 
@@ -143,7 +143,7 @@ class String < `String`
     %x{
       var size = self.length, exclude;
 
-      if (index[Opal.$$is_range_s]) {
+      if (index[Opal.s.$$is_range]) {
         exclude = index.excl;
         length  = $coerce_to(index.end, #{Integer}, 'to_int');
         index   = $coerce_to(index.begin, #{Integer}, 'to_int');
@@ -170,19 +170,19 @@ class String < `String`
           length = 0;
         }
 
-        return self[Opal.$$cast_s](self.substr(index, length));
+        return self[Opal.s.$$cast](self.substr(index, length));
       }
 
 
-      if (index[Opal.$$is_string_s]) {
+      if (index[Opal.s.$$is_string]) {
         if (length != null) {
           #{raise TypeError}
         }
-        return self.indexOf(index) !== -1 ? self[Opal.$$cast_s](index) : nil;
+        return self.indexOf(index) !== -1 ? self[Opal.s.$$cast](index) : nil;
       }
 
 
-      if (index[Opal.$$is_regexp_s]) {
+      if (index[Opal.s.$$is_regexp]) {
         var match = self.match(index);
 
         if (match === null) {
@@ -193,17 +193,17 @@ class String < `String`
         #{$~ = MatchData.new(`index`, `match`)}
 
         if (length == null) {
-          return self[Opal.$$cast_s](match[0]);
+          return self[Opal.s.$$cast](match[0]);
         }
 
         length = $coerce_to(length, #{Integer}, 'to_int');
 
         if (length < 0 && -length < match.length) {
-          return self[Opal.$$cast_s](match[length += match.length]);
+          return self[Opal.s.$$cast](match[length += match.length]);
         }
 
         if (length >= 0 && length < match.length) {
-          return self[Opal.$$cast_s](match[length]);
+          return self[Opal.s.$$cast](match[length]);
         }
 
         return nil;
@@ -220,7 +220,7 @@ class String < `String`
         if (index >= size || index < 0) {
           return nil;
         }
-        return self[Opal.$$cast_s](self.substr(index, 1));
+        return self[Opal.s.$$cast](self.substr(index, 1));
       }
 
       length = $coerce_to(length, #{Integer}, 'to_int');
@@ -233,7 +233,7 @@ class String < `String`
         return nil;
       }
 
-      return self[Opal.$$cast_s](self.substr(index, length));
+      return self[Opal.s.$$cast](self.substr(index, length));
     }
   end
 
@@ -244,7 +244,7 @@ class String < `String`
   end
 
   def capitalize
-    `self[Opal.$$cast_s](self.charAt(0).toUpperCase() + self.substr(1).toLowerCase())`
+    `self[Opal.s.$$cast](self.charAt(0).toUpperCase() + self.substr(1).toLowerCase())`
   end
 
   def casecmp(other)
@@ -285,7 +285,7 @@ class String < `String`
       var ljustified = #{ljust ((width + `self.length`) / 2).ceil, padstr},
           rjustified = #{rjust ((width + `self.length`) / 2).floor, padstr};
 
-      return self[Opal.$$cast_s](rjustified + ljustified.slice(self.length));
+      return self[Opal.s.$$cast](rjustified + ljustified.slice(self.length));
     }
   end
 
@@ -318,7 +318,7 @@ class String < `String`
       }
 
       if (result != null) {
-        return self[Opal.$$cast_s](result);
+        return self[Opal.s.$$cast](result);
       }
     }
 
@@ -337,7 +337,7 @@ class String < `String`
         result = self.substr(0, length - 1);
       }
 
-      return self[Opal.$$cast_s](result);
+      return self[Opal.s.$$cast](result);
     }
   end
 
@@ -380,18 +380,18 @@ class String < `String`
       if (char_class === null) {
         return self;
       }
-      return self[Opal.$$cast_s](self.replace(new RegExp(char_class, 'g'), ''));
+      return self[Opal.s.$$cast](self.replace(new RegExp(char_class, 'g'), ''));
     }
   end
 
   def delete_prefix(prefix)
     %x{
-      if (!prefix[Opal.$$is_string_s]) {
+      if (!prefix[Opal.s.$$is_string]) {
         prefix = $coerce_to(prefix, #{String}, 'to_str');
       }
 
       if (self.slice(0, prefix.length) === prefix) {
-        return self[Opal.$$cast_s](self.slice(prefix.length));
+        return self[Opal.s.$$cast](self.slice(prefix.length));
       } else {
         return self;
       }
@@ -400,12 +400,12 @@ class String < `String`
 
   def delete_suffix(suffix)
     %x{
-      if (!suffix[Opal.$$is_string_s]) {
+      if (!suffix[Opal.s.$$is_string]) {
         suffix = $coerce_to(suffix, #{String}, 'to_str');
       }
 
       if (self.slice(self.length - suffix.length) === suffix) {
-        return self[Opal.$$cast_s](self.slice(0, self.length - suffix.length));
+        return self[Opal.s.$$cast](self.slice(0, self.length - suffix.length));
       } else {
         return self;
       }
@@ -413,7 +413,7 @@ class String < `String`
   end
 
   def downcase
-    `self[Opal.$$cast_s](self.toLowerCase())`
+    `self[Opal.s.$$cast](self.toLowerCase())`
   end
 
   def each_char(&block)
@@ -446,7 +446,7 @@ class String < `String`
         for (a = self.split(/(\n{2,})/), i = 0, n = a.length; i < n; i += 2) {
           if (a[i] || a[i + 1]) {
             var value = (a[i] || "") + (a[i + 1] || "");
-            Opal.yield1(block, self[Opal.$$cast_s](value));
+            Opal.yield1(block, self[Opal.s.$$cast](value));
           }
         }
 
@@ -459,10 +459,10 @@ class String < `String`
 
       for (i = 0, length = splitted.length; i < length; i++) {
         if (i < length - 1 || trailing) {
-          Opal.yield1(block, self[Opal.$$cast_s](splitted[i] + separator));
+          Opal.yield1(block, self[Opal.s.$$cast](splitted[i] + separator));
         }
         else {
-          Opal.yield1(block, self[Opal.$$cast_s](splitted[i]));
+          Opal.yield1(block, self[Opal.s.$$cast](splitted[i]));
         }
       }
     }
@@ -499,7 +499,7 @@ class String < `String`
 
       var result = '', match_data = nil, index = 0, match, _replacement;
 
-      if (pattern[Opal.$$is_regexp_s]) {
+      if (pattern[Opal.s.$$is_regexp]) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{String}, 'to_str');
@@ -523,11 +523,11 @@ class String < `String`
           _replacement = block(match[0]);
           pattern.lastIndex = lastIndex; // save and restore lastIndex
         }
-        else if (replacement[Opal.$$is_hash_s]) {
+        else if (replacement[Opal.s.$$is_hash]) {
           _replacement = #{`replacement`[`match[0]`].to_s};
         }
         else {
-          if (!replacement[Opal.$$is_string_s]) {
+          if (!replacement[Opal.s.$$is_string]) {
             replacement = $coerce_to(replacement, #{String}, 'to_str');
           }
           _replacement = replacement.replace(/([\\]+)([0-9+&`'])/g, function (original, slashes, command) {
@@ -561,7 +561,7 @@ class String < `String`
       }
 
       #{$~ = `match_data`}
-      return self[Opal.$$cast_s](result);
+      return self[Opal.s.$$cast](result);
     }
   end
 
@@ -575,7 +575,7 @@ class String < `String`
 
   def include?(other)
     %x{
-      if (!other[Opal.$$is_string_s]) {
+      if (!other[Opal.s.$$is_string]) {
         other = $coerce_to(other, #{String}, 'to_str');
       }
       return self.indexOf(other) !== -1;
@@ -600,7 +600,7 @@ class String < `String`
         }
       }
 
-      if (search[Opal.$$is_regexp_s]) {
+      if (search[Opal.s.$$is_regexp]) {
         regex = Opal.global_multiline_regexp(search);
         while (true) {
           match = regex.exec(self);
@@ -684,7 +684,7 @@ class String < `String`
         result += padstr;
       }
 
-      return self[Opal.$$cast_s](self + result.slice(0, width));
+      return self[Opal.s.$$cast](self + result.slice(0, width));
     }
   end
 
@@ -735,7 +735,7 @@ class String < `String`
     %x{
       var i = self.length;
       if (i === 0) {
-        return self[Opal.$$cast_s]('');
+        return self[Opal.s.$$cast]('');
       }
       var result = self;
       var first_alphanum_char_index = self.search(/[a-zA-Z0-9]/);
@@ -797,7 +797,7 @@ class String < `String`
           break;
         }
       }
-      return self[Opal.$$cast_s](result);
+      return self[Opal.s.$$cast](result);
     }
   end
 
@@ -852,7 +852,7 @@ class String < `String`
     %x{
       var i, m;
 
-      if (sep[Opal.$$is_regexp_s]) {
+      if (sep[Opal.s.$$is_regexp]) {
         m = sep.exec(self);
         if (m === null) {
           i = -1;
@@ -898,7 +898,7 @@ class String < `String`
         }
       }
 
-      if (search[Opal.$$is_regexp_s]) {
+      if (search[Opal.s.$$is_regexp]) {
         m = null;
         r = Opal.global_multiline_regexp(search);
         while (true) {
@@ -941,7 +941,7 @@ class String < `String`
           result    = Array(patterns + 1).join(padstr),
           remaining = chars - result.length;
 
-      return self[Opal.$$cast_s](result + padstr.slice(0, remaining) + self);
+      return self[Opal.s.$$cast](result + padstr.slice(0, remaining) + self);
     }
   end
 
@@ -949,7 +949,7 @@ class String < `String`
     %x{
       var i, m, r, _m;
 
-      if (sep[Opal.$$is_regexp_s]) {
+      if (sep[Opal.s.$$is_regexp]) {
         m = null;
         r = Opal.global_multiline_regexp(sep);
 
@@ -997,7 +997,7 @@ class String < `String`
           match_data = nil,
           match;
 
-      if (pattern[Opal.$$is_regexp_s]) {
+      if (pattern[Opal.s.$$is_regexp]) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{String}, 'to_str');
@@ -1051,7 +1051,7 @@ class String < `String`
           match,
           i, ii;
 
-      if (pattern[Opal.$$is_regexp_s]) {
+      if (pattern[Opal.s.$$is_regexp]) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{String}, 'to_str').$to_s();
@@ -1066,7 +1066,7 @@ class String < `String`
       result = string.split(pattern);
 
       if (result.length === 1 && result[0] === string) {
-        return [self[Opal.$$cast_s](result[0])];
+        return [self[Opal.s.$$cast](result[0])];
       }
 
       while ((i = result.indexOf(undefined)) !== -1) {
@@ -1075,7 +1075,7 @@ class String < `String`
 
       function castResult() {
         for (i = 0; i < result.length; i++) {
-          result[i] = self[Opal.$$cast_s](result[i]);
+          result[i] = self[Opal.s.$$cast](result[i]);
         }
       }
 
@@ -1128,20 +1128,20 @@ class String < `String`
   def squeeze(*sets)
     %x{
       if (sets.length === 0) {
-        return self[Opal.$$cast_s](self.replace(/(.)\1+/g, '$1'));
+        return self[Opal.s.$$cast](self.replace(/(.)\1+/g, '$1'));
       }
       var char_class = char_class_from_char_sets(sets);
       if (char_class === null) {
         return self;
       }
-      return self[Opal.$$cast_s](self.replace(new RegExp('(' + char_class + ')\\1+', 'g'), '$1'));
+      return self[Opal.s.$$cast](self.replace(new RegExp('(' + char_class + ')\\1+', 'g'), '$1'));
     }
   end
 
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
-        if (prefixes[i][Opal.$$is_regexp_s]) {
+        if (prefixes[i][Opal.s.$$is_regexp]) {
           var regexp = prefixes[i];
           var match = regexp.exec(self);
 
@@ -1170,7 +1170,7 @@ class String < `String`
 
   def sub(pattern, replacement = undefined, &block)
     %x{
-      if (!pattern[Opal.$$is_regexp_s]) {
+      if (!pattern[Opal.s.$$is_regexp]) {
         pattern = $coerce_to(pattern, #{String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       }
@@ -1190,7 +1190,7 @@ class String < `String`
           }
           result = self.slice(0, match.index) + block(match[0]) + self.slice(match.index + match[0].length);
 
-        } else if (replacement[Opal.$$is_hash_s]) {
+        } else if (replacement[Opal.s.$$is_hash]) {
 
           result = self.slice(0, match.index) + #{`replacement`[`match[0]`].to_s} + self.slice(match.index + match[0].length);
 
@@ -1221,7 +1221,7 @@ class String < `String`
         }
       }
 
-      return self[Opal.$$cast_s](result);
+      return self[Opal.s.$$cast](result);
     }
   end
 
@@ -1518,7 +1518,7 @@ class String < `String`
           new_str += (sub != null ? sub : ch);
         }
       }
-      return self[Opal.$$cast_s](new_str);
+      return self[Opal.s.$$cast](new_str);
     }
   end
 
@@ -1681,12 +1681,12 @@ class String < `String`
           }
         }
       }
-      return self[Opal.$$cast_s](new_str);
+      return self[Opal.s.$$cast](new_str);
     }
   end
 
   def upcase
-    `self[Opal.$$cast_s](self.toUpperCase())`
+    `self[Opal.s.$$cast](self.toUpperCase())`
   end
 
   def upto(stop, excl = false, &block)

@@ -72,7 +72,7 @@ module Kernel
         return [];
       }
 
-      if (object[Opal.$$is_array_s]) {
+      if (object[Opal.s.$$is_array]) {
         return object;
       }
 
@@ -111,7 +111,7 @@ module Kernel
   end
 
   def class
-    `self[Opal.$$class_s]`
+    `self[Opal.s.$$class]`
   end
 
   def copy_instance_variables(other)
@@ -130,22 +130,22 @@ module Kernel
     %x{
       var i, name, names, length;
 
-      if (other.hasOwnProperty(Opal.$$meta_s)) {
+      if (other.hasOwnProperty(Opal.s.$$meta)) {
         var other_singleton_class = Opal.get_singleton_class(other);
         var self_singleton_class = Opal.get_singleton_class(self);
-        names = Object.getOwnPropertyNames(other_singleton_class[Opal.$$prototype_s]);
+        names = Object.getOwnPropertyNames(other_singleton_class[Opal.s.$$prototype]);
 
         for (i = 0, length = names.length; i < length; i++) {
           name = names[i];
           if (Opal.is_method(name)) {
-            self_singleton_class[Opal.$$prototype_s][name] = other_singleton_class[Opal.$$prototype_s][name];
+            self_singleton_class[Opal.s.$$prototype][name] = other_singleton_class[Opal.s.$$prototype][name];
           }
         }
 
-        self_singleton_class[Opal.$$const_s] = Object.assign({}, other_singleton_class[Opal.$$const_s]);
+        self_singleton_class[Opal.s.$$const] = Object.assign({}, other_singleton_class[Opal.s.$$const]);
         Object.setPrototypeOf(
-          self_singleton_class[Opal.$$prototype_s],
-          Object.getPrototypeOf(other_singleton_class[Opal.$$prototype_s])
+          self_singleton_class[Opal.s.$$prototype],
+          Object.getPrototypeOf(other_singleton_class[Opal.s.$$prototype])
         );
       }
 
@@ -208,7 +208,7 @@ module Kernel
     end
 
     %x{
-      if (status[Opal.$$is_boolean_s]) {
+      if (status[Opal.s.$$is_boolean]) {
         status = status ? 0 : 1;
       } else {
         status = $coerce_to(status, #{Integer}, 'to_int')
@@ -226,7 +226,7 @@ module Kernel
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
-        if (!mod[Opal.$$is_module_s]) {
+        if (!mod[Opal.s.$$is_module]) {
           #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
 
@@ -252,11 +252,11 @@ module Kernel
 
   def instance_of?(klass)
     %x{
-      if (!klass[Opal.$$is_class_s] && !klass[Opal.$$is_module_s]) {
+      if (!klass[Opal.s.$$is_class] && !klass[Opal.s.$$is_module]) {
         #{raise TypeError, 'class or module required'};
       }
 
-      return self[Opal.$$class_s] === klass;
+      return self[Opal.s.$$class] === klass;
     }
   end
 
@@ -321,14 +321,14 @@ module Kernel
     %x{
       var i, str, base_digits;
 
-      if (!value[Opal.$$is_string_s]) {
+      if (!value[Opal.s.$$is_string]) {
         if (base !== undefined) {
           #{raise ArgumentError, 'base specified for non string value'}
         }
         if (value === nil) {
           #{raise TypeError, "can't convert nil into Integer"}
         }
-        if (value[Opal.$$is_number_s]) {
+        if (value[Opal.s.$$is_number]) {
           if (value === Infinity || value === -Infinity || isNaN(value)) {
             #{raise FloatDomainError, value}
           }
@@ -413,7 +413,7 @@ module Kernel
         #{raise TypeError, "can't convert nil into Float"}
       }
 
-      if (value[Opal.$$is_string_s]) {
+      if (value[Opal.s.$$is_string]) {
         str = value.toString();
 
         str = str.replace(/(\d)_(?=\d)/g, '$1');
@@ -442,7 +442,7 @@ module Kernel
 
   def is_a?(klass)
     %x{
-      if (!klass[Opal.$$is_class_s] && !klass[Opal.$$is_module_s]) {
+      if (!klass[Opal.s.$$is_class] && !klass[Opal.s.$$is_module]) {
         #{raise TypeError, 'class or module required'};
       }
 
@@ -498,7 +498,7 @@ module Kernel
       raise ArgumentError, 'tried to create Proc object without a block'
     end
 
-    `block[Opal.$$is_lambda_s] = false`
+    `block[Opal.s.$$is_lambda] = false`
     block
   end
 
@@ -536,11 +536,11 @@ module Kernel
       if (exception == null) {
         exception = #{RuntimeError.new};
       }
-      else if (exception[Opal.$$is_string_s]) {
+      else if (exception[Opal.s.$$is_string]) {
         exception = #{RuntimeError.new exception};
       }
       // using respond_to? and not an undefined check to avoid method_missing matching as true
-      else if (exception[Opal.$$is_class_s] && #{exception.respond_to?(:exception)}) {
+      else if (exception[Opal.s.$$is_class] && #{exception.respond_to?(:exception)}) {
         exception = #{exception.exception string};
       }
       else if (#{exception.is_a?(Exception)}) {
@@ -568,7 +568,7 @@ module Kernel
         return #{Random::DEFAULT.rand};
       }
 
-      if (max[Opal.$$is_number_s]) {
+      if (max[Opal.s.$$is_number]) {
         if (max < 0) {
           max = Math.abs(max);
         }
@@ -649,7 +649,7 @@ module Kernel
       if (seconds === nil) {
         #{raise TypeError, "can't convert NilClass into time interval"}
       }
-      if (!seconds[Opal.$$is_number_s]) {
+      if (!seconds[Opal.s.$$is_number]) {
         #{raise TypeError, "can't convert #{seconds.class} into time interval"}
       }
       if (seconds < 0) {

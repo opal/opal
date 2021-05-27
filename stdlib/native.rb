@@ -213,7 +213,7 @@ end
 
 module Kernel
   def native?(value)
-    `value == null || !value[Opal.$$class_s]`
+    `value == null || !value[Opal.s.$$class]`
   end
 
   # Wraps a native JavaScript with `Native::Object.new`
@@ -344,11 +344,11 @@ class Native::Object < BasicObject
   alias kind_of? is_a?
 
   def instance_of?(klass)
-    `self[Opal.$$class_s] === klass`
+    `self[Opal.s.$$class] === klass`
   end
 
   def class
-    `self[Opal.$$class_s]`
+    `self[Opal.s.$$class]`
   end
 
   def to_a(options = {}, &block)
@@ -548,7 +548,7 @@ class Hash
                (value.constructor === undefined ||
                  value.constructor === Object)) {
             smap[key] = #{Hash.new(`value`)};
-          } else if (value && value[Opal.$$is_array_s]) {
+          } else if (value && value[Opal.s.$$is_array]) {
             value = value.map(function(item) {
               if (item &&
                    (item.constructor === undefined ||
@@ -585,7 +585,7 @@ class Hash
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
 
-        if (key[Opal.$$is_string_s]) {
+        if (key[Opal.s.$$is_string]) {
           value = smap[key];
         } else {
           key = key.key;

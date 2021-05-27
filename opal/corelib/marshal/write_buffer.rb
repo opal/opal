@@ -379,9 +379,9 @@ module Marshal
       append('U')
       namespace = `#{klass}.$$base_module`
       if namespace.equal?(Object)
-        append_symbol(`#{klass}[Opal.$$name_s]`)
+        append_symbol(`#{klass}[Opal.s.$$name]`)
       else
-        append_symbol(namespace.name + '::' + `#{klass}[Opal.$$name_s]`)
+        append_symbol(namespace.name + '::' + `#{klass}[Opal.s.$$name]`)
       end
       write(value)
     end

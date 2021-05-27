@@ -88,9 +88,9 @@ class Random
 
       if (limit == null) {
         return randomFloat();
-      } else if (limit[Opal.$$is_range_s]) {
+      } else if (limit[Opal.s.$$is_range]) {
         return randomRange();
-      } else if (limit[Opal.$$is_number_s]) {
+      } else if (limit[Opal.s.$$is_number]) {
         if (limit <= 0) {
           #{raise ArgumentError, "invalid argument - #{limit}"}
         }

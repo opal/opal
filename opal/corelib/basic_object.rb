@@ -14,11 +14,11 @@ class BasicObject
 
   def __id__
     %x{
-      if (self[Opal.$$id_s] != null) {
-        return self[Opal.$$id_s];
+      if (self[Opal.s.$$id] != null) {
+        return self[Opal.s.$$id];
       }
-      Opal.defineProperty(self, Opal.$$id_s, Opal.uid());
-      return self[Opal.$$id_s];
+      Opal.defineProperty(self, Opal.s.$$id, Opal.uid());
+      return self[Opal.s.$$id];
     }
   end
 
@@ -78,7 +78,7 @@ class BasicObject
       // Need to pass $$eval so that method definitions know if this is
       // being done on a class/module. Cannot be compiler driven since
       // send(:instance_eval) needs to work.
-      if (self[Opal.$$is_a_module_s]) {
+      if (self[Opal.s.$$is_a_module]) {
         self.$$eval = true;
         try {
           result = block.call(self, self);
@@ -106,7 +106,7 @@ class BasicObject
 
       block.$$s = null;
 
-      if (self[Opal.$$is_a_module_s]) {
+      if (self[Opal.s.$$is_a_module]) {
         self.$$eval = true;
         try {
           result = block.apply(self, args);
@@ -136,9 +136,9 @@ class BasicObject
 
   def method_missing(symbol, *args, &block)
     message = if `self.$inspect && !self.$inspect.$$stub`
-                "undefined method `#{symbol}' for #{inspect}:#{`self[Opal.$$class_s]`}"
+                "undefined method `#{symbol}' for #{inspect}:#{`self[Opal.s.$$class]`}"
               else
-                "undefined method `#{symbol}' for #{`self[Opal.$$class_s]`}"
+                "undefined method `#{symbol}' for #{`self[Opal.s.$$class]`}"
               end
 
     ::Kernel.raise ::NoMethodError.new(message, symbol)

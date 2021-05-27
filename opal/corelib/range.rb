@@ -3,7 +3,7 @@ require 'corelib/enumerable'
 class Range
   include Enumerable
 
-  `self[Opal.$$prototype_s][Opal.$$is_range_s] = true`
+  `self[Opal.s.$$prototype][Opal.s.$$is_range] = true`
 
   attr_reader :begin, :end
 
@@ -37,7 +37,7 @@ class Range
     %x{
       var i, limit;
 
-      if (#{@begin}[Opal.$$is_number_s] && #{@end}[Opal.$$is_number_s]) {
+      if (#{@begin}[Opal.s.$$is_number] && #{@end}[Opal.s.$$is_number]) {
         if (#{@begin} % 1 !== 0 || #{@end} % 1 !== 0) {
           #{raise TypeError, "can't iterate from Float"}
         }
@@ -49,7 +49,7 @@ class Range
         return self;
       }
 
-      if (#{@begin}[Opal.$$is_string_s] && #{@end}[Opal.$$is_string_s]) {
+      if (#{@begin}[Opal.s.$$is_string] && #{@end}[Opal.s.$$is_string]) {
         #{@begin.upto(@end, @excl, &block)}
         return self;
       }
@@ -142,7 +142,7 @@ class Range
   def step(n = 1)
     %x{
       function coerceStepSize() {
-        if (!n[Opal.$$is_number_s]) {
+        if (!n[Opal.s.$$is_number]) {
           n = #{Opal.coerce_to!(n, Integer, :to_int)}
         }
 
@@ -158,7 +158,7 @@ class Range
           return nil;
         }
 
-        if (#{@begin}[Opal.$$is_string_s] && #{@end}[Opal.$$is_string_s]) {
+        if (#{@begin}[Opal.s.$$is_string] && #{@end}[Opal.s.$$is_string]) {
           return nil;
         }
 
@@ -200,7 +200,7 @@ class Range
 
     `coerceStepSize()`
 
-    if `self.begin[Opal.$$is_number_s] && self.end[Opal.$$is_number_s]`
+    if `self.begin[Opal.s.$$is_number] && self.end[Opal.s.$$is_number]`
       i = 0
       loop do
         current = @begin + i * n
@@ -214,7 +214,7 @@ class Range
       end
     else
       %x{
-        if (#{@begin}[Opal.$$is_string_s] && #{@end}[Opal.$$is_string_s] && n % 1 !== 0) {
+        if (#{@begin}[Opal.s.$$is_string] && #{@end}[Opal.s.$$is_string] && n % 1 !== 0) {
           #{raise TypeError, 'no implicit conversion to float from string'}
         }
       }
@@ -228,7 +228,7 @@ class Range
   def bsearch(&block)
     return enum_for(:bsearch) unless block_given?
 
-    unless `self.begin[Opal.$$is_number_s] && self.end[Opal.$$is_number_s]`
+    unless `self.begin[Opal.s.$$is_number] && self.end[Opal.s.$$is_number]`
       raise TypeError, "can't do binary search for #{@begin.class}"
     end
 

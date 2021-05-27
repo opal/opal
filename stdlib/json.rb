@@ -35,7 +35,7 @@ module JSON
         case 'object':
           if (!value) return nil;
 
-          if (value[Opal.$$is_array_s]) {
+          if (value[Opal.s.$$is_array]) {
             arr = #{`options.array_class`.new};
 
             for (i = 0, ii = value.length; i < ii; i++) {
@@ -158,7 +158,7 @@ class Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key[Opal.$$is_string_s]) {
+        if (key[Opal.s.$$is_string]) {
           value = self.$$smap[key];
         } else {
           value = key.value;

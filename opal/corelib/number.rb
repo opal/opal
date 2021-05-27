@@ -2,8 +2,8 @@ require 'corelib/numeric'
 
 class Number < Numeric
   Opal.bridge(`Number`, self)
-  `Opal.defineProperty(self[Opal.$$prototype_s], Opal.$$is_number_s, true)`
-  `self[Opal.$$is_number_class_s] = true`
+  `Opal.defineProperty(self[Opal.s.$$prototype], Opal.s.$$is_number, true)`
+  `self[Opal.s.$$is_number_class] = true`
 
   class << self
     def allocate
@@ -18,13 +18,13 @@ class Number < Numeric
       if (other === nil) {
         #{raise TypeError, "can't convert #{other.class} into Float"};
       }
-      else if (other[Opal.$$is_string_s]) {
+      else if (other[Opal.s.$$is_string]) {
         return [#{Float(other)}, self];
       }
       else if (#{other.respond_to?(:to_f)}) {
         return [#{Opal.coerce_to!(other, Float, :to_f)}, self];
       }
-      else if (other[Opal.$$is_number_s]) {
+      else if (other[Opal.s.$$is_number]) {
         return [other, self];
       }
       else {
@@ -41,7 +41,7 @@ class Number < Numeric
 
   def +(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self + other;
       }
       else {
@@ -52,7 +52,7 @@ class Number < Numeric
 
   def -(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self - other;
       }
       else {
@@ -63,7 +63,7 @@ class Number < Numeric
 
   def *(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self * other;
       }
       else {
@@ -74,7 +74,7 @@ class Number < Numeric
 
   def /(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self / other;
       }
       else {
@@ -87,7 +87,7 @@ class Number < Numeric
 
   def %(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         if (other == -Infinity) {
           return other;
         }
@@ -109,7 +109,7 @@ class Number < Numeric
 
   def &(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self & other;
       }
       else {
@@ -120,7 +120,7 @@ class Number < Numeric
 
   def |(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self | other;
       }
       else {
@@ -131,7 +131,7 @@ class Number < Numeric
 
   def ^(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self ^ other;
       }
       else {
@@ -142,7 +142,7 @@ class Number < Numeric
 
   def <(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self < other;
       }
       else {
@@ -153,7 +153,7 @@ class Number < Numeric
 
   def <=(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self <= other;
       }
       else {
@@ -164,7 +164,7 @@ class Number < Numeric
 
   def >(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self > other;
       }
       else {
@@ -175,7 +175,7 @@ class Number < Numeric
 
   def >=(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self >= other;
       }
       else {
@@ -188,7 +188,7 @@ class Number < Numeric
   # can be optimized despite a try/finally construct.
   %x{
     var spaceship_operator = function(self, other) {
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         if (isNaN(self) || isNaN(other)) {
           return nil;
         }
@@ -260,7 +260,7 @@ class Number < Numeric
       end
     elsif self < 0 && (Float === other || Rational === other)
       Complex.new(self, 0)**other.to_f
-    elsif `other[Opal.$$is_number_s] != null`
+    elsif `other[Opal.s.$$is_number] != null`
       `Math.pow(self, other)`
     else
       __coerced__ :**, other
@@ -269,7 +269,7 @@ class Number < Numeric
 
   def ===(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self.valueOf() === other.valueOf();
       }
       else if (#{other.respond_to? :==}) {
@@ -283,7 +283,7 @@ class Number < Numeric
 
   def ==(other)
     %x{
-      if (other[Opal.$$is_number_s]) {
+      if (other[Opal.s.$$is_number]) {
         return self.valueOf() === other.valueOf();
       }
       else if (#{other.respond_to? :==}) {
@@ -399,7 +399,7 @@ class Number < Numeric
     end
 
     %x{
-      if (!stop[Opal.$$is_number_s]) {
+      if (!stop[Opal.s.$$is_number]) {
         #{raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
       for (var i = self; i >= stop; i--) {
@@ -955,7 +955,7 @@ class Number < Numeric
     end
 
     %x{
-      if (!stop[Opal.$$is_number_s]) {
+      if (!stop[Opal.s.$$is_number]) {
         #{raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
       for (var i = self; i <= stop; i++) {
@@ -1009,8 +1009,8 @@ end
 Fixnum = Number
 
 class Integer < Numeric
-  `self[Opal.$$is_number_class_s] = true`
-  `self[Opal.$$is_integer_class_s] = true`
+  `self[Opal.s.$$is_number_class] = true`
+  `self[Opal.s.$$is_integer_class] = true`
 
   class << self
     def allocate
@@ -1036,7 +1036,7 @@ class Integer < Numeric
 end
 
 class Float < Numeric
-  `self[Opal.$$is_number_class_s] = true`
+  `self[Opal.s.$$is_number_class] = true`
 
   class << self
     def allocate
@@ -1046,7 +1046,7 @@ class Float < Numeric
     undef :new
 
     def ===(other)
-      `!!other[Opal.$$is_number_s]`
+      `!!other[Opal.s.$$is_number]`
     end
   end
 

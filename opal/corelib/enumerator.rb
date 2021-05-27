@@ -5,7 +5,7 @@ require 'corelib/enumerable'
 class Enumerator
   include Enumerable
 
-  `self[Opal.$$prototype_s].$$is_enumerator = true`
+  `self[Opal.s.$$prototype].$$is_enumerator = true`
 
   def self.for(object, method = :each, *args, &block)
     %x{

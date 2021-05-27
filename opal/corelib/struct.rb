@@ -78,7 +78,7 @@ class Struct
     if `#{self.class}.$$keyword_init`
       kwargs = args.last || {}
 
-      if args.length > 1 || `(args.length === 1 && !kwargs[Opal.$$is_hash_s])`
+      if args.length > 1 || `(args.length === 1 && !kwargs[Opal.s.$$is_hash])`
         raise ArgumentError, "wrong number of arguments (given #{args.length}, expected 0)"
       end
 
@@ -279,11 +279,11 @@ class Struct
   end
 
   def values_at(*args)
-    args = args.map { |arg| `arg[Opal.$$is_range_s] ? #{arg.to_a} : arg` }.flatten
+    args = args.map { |arg| `arg[Opal.s.$$is_range] ? #{arg.to_a} : arg` }.flatten
     %x{
       var result = [];
       for (var i = 0, len = args.length; i < len; i++) {
-        if (!args[i][Opal.$$is_number_s]) {
+        if (!args[i][Opal.s.$$is_number]) {
           #{raise TypeError, "no implicit conversion of #{`args[i]`.class} into Integer"}
         }
         result.push(#{self[`args[i]`]});
@@ -293,7 +293,7 @@ class Struct
   end
 
   def dig(key, *keys)
-    item = if `key[Opal.$$is_string_s] && self.$$data.hasOwnProperty(key)`
+    item = if `key[Opal.s.$$is_string] && self.$$data.hasOwnProperty(key)`
              `self.$$data[key] || nil`
            end
 

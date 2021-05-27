@@ -17,7 +17,7 @@ module Comparable
         when nil, true, false, Integer, Float
           `class_name = rhs.$inspect()`
         else
-          `class_name = rhs[Opal.$$class_s]`
+          `class_name = rhs[Opal.s.$$class]`
         end
       }
       #{raise ArgumentError, "comparison of #{`lhs`.class} with #{`class_name`} failed"}

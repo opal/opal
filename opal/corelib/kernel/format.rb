@@ -219,7 +219,7 @@ module Kernel
                 }
                 pos_arg_num = -2;
 
-                if (args[0] === undefined || !args[0][Opal.$$is_hash_s]) {
+                if (args[0] === undefined || !args[0][Opal.s.$$is_hash]) {
                   #{raise ArgumentError, 'one hash required'}
                 }
 

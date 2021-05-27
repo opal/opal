@@ -69,56 +69,59 @@
   };
 
   //  Define properties as Symbol (#2145)
-  var properties = [
-    '$$id',
-    '$$is_number',
-    '$$is_string',
-    '$$is_boolean',
-    '$$is_array',
-    '$$is_hash',
-    '$$is_range',
-    '$$is_integer_class',
-    '$$is_number_class',
-    '$$is_class',
-    '$$is_module',
-    '$$is_a_module',
-    '$$constructor',
-    '$$name',
-    '$$super',
-    '$$cvars',
-    '$$ancestors_cache_version',
-    '$$ancestors',
-    '$$own_included_modules',
-    '$$own_prepended_modules',
-    '$$iclasses',
-    '$$meta',
-    '$$is_singleton',
-    '$$singleton_of',
-    '$$iclass',
-    '$$module',
-    '$$root',
-    '$$prototype',
-    '$$is_regexp',
-    '$$const_cache',
-    '$$class',
-    '$$cast',
-    '$$const',
-    '$$included',
-    '$$prepended',
-    '$$bridge',
-    '$$dummy',
-    '$$define_methods_on',
-    '$$is_proc',
-    '$$is_lambda',
-  ];
-
-  Opal.propertySymbols = {};
-  var property;
-  for(property of properties) {
-    var symbol_name = property + "_s";
-
-    Opal.propertySymbols[property] = Opal[symbol_name] = Symbol(property);
+  if (typeof Symbol !== "undefined") {
+    Opal.s = function(name) {
+      if (typeof Opal.s[name] !== 'undefined') return Opal.s[name];
+      return Opal.s[name] = Symbol(name);
+    };
   }
+  else {
+    Opal.s = function(name) {
+      if (typeof Opal.s[name] !== 'undefined') return Opal.s[name];
+      return Opal.s[name] = name;
+    };
+  }
+
+  Opal.s('$$id');
+  Opal.s('$$is_number');
+  Opal.s('$$is_string');
+  Opal.s('$$is_boolean');
+  Opal.s('$$is_array');
+  Opal.s('$$is_hash');
+  Opal.s('$$is_range');
+  Opal.s('$$is_integer_class');
+  Opal.s('$$is_number_class');
+  Opal.s('$$is_class');
+  Opal.s('$$is_module');
+  Opal.s('$$is_a_module');
+  Opal.s('$$constructor');
+  Opal.s('$$name');
+  Opal.s('$$super');
+  Opal.s('$$cvars');
+  Opal.s('$$ancestors_cache_version');
+  Opal.s('$$ancestors');
+  Opal.s('$$own_included_modules');
+  Opal.s('$$own_prepended_modules');
+  Opal.s('$$iclasses');
+  Opal.s('$$meta');
+  Opal.s('$$is_singleton');
+  Opal.s('$$singleton_of');
+  Opal.s('$$iclass');
+  Opal.s('$$module');
+  Opal.s('$$root');
+  Opal.s('$$prototype');
+  Opal.s('$$is_regexp');
+  Opal.s('$$const_cache');
+  Opal.s('$$class');
+  Opal.s('$$cast');
+  Opal.s('$$const');
+  Opal.s('$$included');
+  Opal.s('$$prepended');
+  Opal.s('$$bridge');
+  Opal.s('$$dummy');
+  Opal.s('$$define_methods_on');
+  Opal.s('$$is_proc');
+  Opal.s('$$is_lambda');
 
   // Minify common function calls
   var $has_own   = Object.hasOwnProperty;
@@ -142,12 +145,12 @@
 
   // Retrieve or assign the id of an object
   Opal.id = function(obj) {
-    if (obj[Opal.$$is_number_s]) return (obj * 2)+1;
-    if (obj[Opal.$$id_s] != null) {
-      return obj[Opal.$$id_s];
+    if (obj[Opal.s.$$is_number]) return (obj * 2)+1;
+    if (obj[Opal.s.$$id] != null) {
+      return obj[Opal.s.$$id];
     }
-    $defineProperty(obj, Opal.$$id_s, Opal.uid());
-    return obj[Opal.$$id_s];
+    $defineProperty(obj, Opal.s.$$id, Opal.uid());
+    return obj[Opal.s.$$id];
   };
 
   // Globals table
@@ -174,7 +177,7 @@
     else if (obj === null) {
       return "null";
     }
-    else if (!obj[Opal.$$class_s]) {
+    else if (!obj[Opal.s.$$class]) {
       return obj.toString();
     }
     else {
@@ -215,18 +218,18 @@
   // -----
 
   Opal.truthy = function(val) {
-    return (val !== nil && val != null && (!val[Opal.$$is_boolean_s] || val == true));
+    return (val !== nil && val != null && (!val[Opal.s.$$is_boolean] || val == true));
   };
 
   Opal.falsy = function(val) {
-    return (val === nil || val == null || (val[Opal.$$is_boolean_s] && val == false))
+    return (val === nil || val == null || (val[Opal.s.$$is_boolean] && val == false))
   };
 
   Opal.type_error = function(object, type, method, coerced) {
-    object = object[Opal.$$class_s];
+    object = object[Opal.s.$$class];
 
     if (coerced && method) {
-      coerced = coerced[Opal.$$class_s];
+      coerced = coerced[Opal.s.$$class];
       return Opal.TypeError.$new(
         "can't convert " + object + " into " + type +
         " (" + object + "#" + method + " gives " + coerced + ")"
@@ -250,7 +253,7 @@
   }
 
   Opal.respond_to = function(obj, jsid, include_all) {
-    if (obj == null || !obj[Opal.$$class_s]) return false;
+    if (obj == null || !obj[Opal.s.$$class]) return false;
     include_all = !!include_all;
     var body = obj[jsid];
 
@@ -280,7 +283,7 @@
 
   // Get the constant in the scope of the current cref
   function const_get_name(cref, name) {
-    if (cref) return cref[Opal.$$const_s][name];
+    if (cref) return cref[Opal.s.$$const][name];
   }
 
   // Walk up the nesting array looking for the constant
@@ -292,7 +295,7 @@
     // If the nesting is not empty the constant is looked up in its elements
     // and in order. The ancestors of those elements are ignored.
     for (i = 0, ii = nesting.length; i < ii; i++) {
-      constant = nesting[i][Opal.$$const_s][name];
+      constant = nesting[i][Opal.s.$$const][name];
       if (constant != null) return constant;
     }
   }
@@ -306,8 +309,8 @@
     ancestors = Opal.ancestors(cref);
 
     for (i = 0, ii = ancestors.length; i < ii; i++) {
-      if (ancestors[i][Opal.$$const_s] && $has_own.call(ancestors[i][Opal.$$const_s], name)) {
-        return ancestors[i][Opal.$$const_s][name];
+      if (ancestors[i][Opal.s.$$const] && $has_own.call(ancestors[i][Opal.s.$$const], name)) {
+        return ancestors[i][Opal.s.$$const][name];
       }
     }
   }
@@ -315,7 +318,7 @@
   // Walk up Object's ancestors chain looking for the constant,
   // but only if cref is missing or a module.
   function const_lookup_Object(cref, name) {
-    if (cref == null || cref[Opal.$$is_module_s]) {
+    if (cref == null || cref[Opal.s.$$is_module]) {
       return const_lookup_ancestors(_Object, name);
     }
   }
@@ -335,7 +338,7 @@
 
     if (cref === '::') cref = _Object;
 
-    if (!cref[Opal.$$is_module_s] && !cref[Opal.$$is_class_s]) {
+    if (!cref[Opal.s.$$is_module] && !cref[Opal.s.$$is_class]) {
       throw new Opal.TypeError(cref.toString() + " is not a class/module");
     }
 
@@ -352,13 +355,13 @@
 
     if (cref === '::') cref = _Object;
 
-    if (!cref[Opal.$$is_module_s] && !cref[Opal.$$is_class_s]) {
+    if (!cref[Opal.s.$$is_module] && !cref[Opal.s.$$is_class]) {
       throw new Opal.TypeError(cref.toString() + " is not a class/module");
     }
 
-    if ((cache = cref[Opal.$$const_cache_s]) == null) {
-      $defineProperty(cref, Opal.$$const_cache_s, Object.create(null));
-      cache = cref[Opal.$$const_cache_s];
+    if ((cache = cref[Opal.s.$$const_cache]) == null) {
+      $defineProperty(cref, Opal.s.$$const_cache, Object.create(null));
+      cache = cref[Opal.s.$$const_cache];
     }
     cached = cache[name];
 
@@ -381,9 +384,9 @@
   Opal.const_get_relative = function(nesting, name, skip_missing) {
     var cref = nesting[0], result, current_version = Opal.const_cache_version, cache, cached;
 
-    if ((cache = nesting[Opal.$$const_cache_s]) == null) {
-      $defineProperty(nesting, Opal.$$const_cache_s, Object.create(null));
-      cache = nesting[Opal.$$const_cache_s];
+    if ((cache = nesting[Opal.s.$$const_cache]) == null) {
+      $defineProperty(nesting, Opal.s.$$const_cache, Object.create(null));
+      cache = nesting[Opal.s.$$const_cache];
     }
     cached = cache[name];
 
@@ -406,18 +409,18 @@
   Opal.const_set = function(cref, name, value) {
     if (cref == null || cref === '::') cref = _Object;
 
-    if (value[Opal.$$is_a_module_s]) {
-      if (value[Opal.$$name_s] == null || value[Opal.$$name_s] === nil) value[Opal.$$name_s] = name;
+    if (value[Opal.s.$$is_a_module]) {
+      if (value[Opal.s.$$name] == null || value[Opal.s.$$name] === nil) value[Opal.s.$$name] = name;
       if (value.$$base_module == null) value.$$base_module = cref;
     }
 
-    cref[Opal.$$const_s] = (cref[Opal.$$const_s] || Object.create(null));
-    cref[Opal.$$const_s][name] = value;
+    cref[Opal.s.$$const] = (cref[Opal.s.$$const] || Object.create(null));
+    cref[Opal.s.$$const][name] = value;
 
     // Add a short helper to navigate constants manually.
     // @example
     //   Opal.$$.Regexp.$$.IGNORECASE
-    cref.$$ = cref[Opal.$$const_s];
+    cref.$$ = cref[Opal.s.$$const];
 
     Opal.const_cache_version++;
 
@@ -438,7 +441,7 @@
     var module, modules = [cref], i, ii, constants = {}, constant;
 
     if (inherit) modules = modules.concat(Opal.ancestors(cref));
-    if (inherit && cref[Opal.$$is_module_s]) modules = modules.concat([Opal.Object]).concat(Opal.ancestors(Opal.Object));
+    if (inherit && cref[Opal.s.$$is_module]) modules = modules.concat([Opal.Object]).concat(Opal.ancestors(Opal.Object));
 
     for (i = 0, ii = modules.length; i < ii; i++) {
       module = modules[i];
@@ -446,7 +449,7 @@
       // Do not show Objects constants unless we're querying Object itself
       if (cref !== _Object && module == _Object) break;
 
-      for (constant in module[Opal.$$const_s]) {
+      for (constant in module[Opal.s.$$const]) {
         constants[constant] = true;
       }
     }
@@ -458,9 +461,9 @@
   Opal.const_remove = function(cref, name) {
     Opal.const_cache_version++;
 
-    if (cref[Opal.$$const_s][name] != null) {
-      var old = cref[Opal.$$const_s][name];
-      delete cref[Opal.$$const_s][name];
+    if (cref[Opal.s.$$const][name] != null) {
+      var old = cref[Opal.s.$$const][name];
+      delete cref[Opal.s.$$const][name];
       return old;
     }
 
@@ -508,15 +511,15 @@
   Opal.allocate_class = function(name, superclass) {
     var klass, constructor;
 
-    if (superclass != null && superclass[Opal.$$bridge_s]) {
+    if (superclass != null && superclass[Opal.s.$$bridge]) {
       // Inheritance from bridged classes requires
       // calling original JS constructors
       constructor = function() {
         var args = $slice.call(arguments),
-            self = new ($bind.apply(superclass[Opal.$$constructor_s], [null].concat(args)))();
+            self = new ($bind.apply(superclass[Opal.s.$$constructor], [null].concat(args)))();
 
         // and replacing a __proto__ manually
-        $set_proto(self, klass[Opal.$$prototype_s]);
+        $set_proto(self, klass[Opal.s.$$prototype]);
         return self;
       }
     } else {
@@ -529,20 +532,20 @@
 
     klass = constructor;
 
-    $defineProperty(klass, Opal.$$name_s, name);
-    $defineProperty(klass, Opal.$$constructor_s, constructor);
-    $defineProperty(klass, Opal.$$prototype_s, constructor.prototype);
-    $defineProperty(klass, Opal.$$const_s, {});
-    $defineProperty(klass, Opal.$$is_class_s, true);
-    $defineProperty(klass, Opal.$$is_a_module_s, true);
-    $defineProperty(klass, Opal.$$super_s, superclass);
-    $defineProperty(klass, Opal.$$cvars_s, {});
-    $defineProperty(klass, Opal.$$own_included_modules_s, []);
-    $defineProperty(klass, Opal.$$own_prepended_modules_s, []);
-    $defineProperty(klass, Opal.$$ancestors_s, []);
-    $defineProperty(klass, Opal.$$ancestors_cache_version_s, null);
+    $defineProperty(klass, Opal.s.$$name, name);
+    $defineProperty(klass, Opal.s.$$constructor, constructor);
+    $defineProperty(klass, Opal.s.$$prototype, constructor.prototype);
+    $defineProperty(klass, Opal.s.$$const, {});
+    $defineProperty(klass, Opal.s.$$is_class, true);
+    $defineProperty(klass, Opal.s.$$is_a_module, true);
+    $defineProperty(klass, Opal.s.$$super, superclass);
+    $defineProperty(klass, Opal.s.$$cvars, {});
+    $defineProperty(klass, Opal.s.$$own_included_modules, []);
+    $defineProperty(klass, Opal.s.$$own_prepended_modules, []);
+    $defineProperty(klass, Opal.s.$$ancestors, []);
+    $defineProperty(klass, Opal.s.$$ancestors_cache_version, null);
 
-    $defineProperty(klass[Opal.$$prototype_s], Opal.$$class_s, klass);
+    $defineProperty(klass[Opal.s.$$prototype], Opal.s.$$class, klass);
 
     // By default if there are no singleton class methods
     // __proto__ is Class.prototype
@@ -553,9 +556,9 @@
     }
 
     if (superclass != null) {
-      $set_proto(klass[Opal.$$prototype_s], superclass[Opal.$$prototype_s]);
+      $set_proto(klass[Opal.s.$$prototype], superclass[Opal.s.$$prototype]);
 
-      if (superclass[Opal.$$meta_s]) {
+      if (superclass[Opal.s.$$meta]) {
         // If superclass has metaclass then we have explicitely inherit it.
         Opal.build_class_singleton_class(klass);
       }
@@ -572,7 +575,7 @@
     // If the class exists in the scope, then we must use that
     if (klass) {
       // Make sure the existing constant is a class, or raise error
-      if (!klass[Opal.$$is_class_s]) {
+      if (!klass[Opal.s.$$is_class]) {
         throw Opal.TypeError.$new(name + " is not a class");
       }
 
@@ -581,8 +584,8 @@
   }
 
   function ensureSuperclassMatch(klass, superclass) {
-    if (klass[Opal.$$super_s] !== superclass) {
-      throw Opal.TypeError.$new("superclass mismatch for class " + klass[Opal.$$name_s]);
+    if (klass[Opal.s.$$super] !== superclass) {
+      throw Opal.TypeError.$new("superclass mismatch for class " + klass[Opal.s.$$name]);
     }
   }
 
@@ -592,13 +595,13 @@
     if (scope == null) {
       // Global scope
       scope = _Object;
-    } else if (!scope[Opal.$$is_class_s] && !scope[Opal.$$is_module_s]) {
+    } else if (!scope[Opal.s.$$is_class] && !scope[Opal.s.$$is_module]) {
       // Scope is an object, use its class
-      scope = scope[Opal.$$class_s];
+      scope = scope[Opal.s.$$class];
     }
 
     // If the superclass is not an Opal-generated class then we're bridging a native JS class
-    if (superclass != null && !superclass.hasOwnProperty(Opal.$$is_class_s)) {
+    if (superclass != null && !superclass.hasOwnProperty(Opal.s.$$is_class)) {
       bridged = superclass;
       superclass = _Object;
     }
@@ -666,17 +669,17 @@
     if (name)
       $defineProperty(constructor, 'displayName', name+'.constructor');
 
-    $defineProperty(module, Opal.$$name_s, name);
-    $defineProperty(module, Opal.$$prototype_s, constructor.prototype);
-    $defineProperty(module, Opal.$$const_s, {});
-    $defineProperty(module, Opal.$$is_module_s, true);
-    $defineProperty(module, Opal.$$is_a_module_s, true);
-    $defineProperty(module, Opal.$$cvars_s, {});
-    $defineProperty(module, Opal.$$iclasses_s, []);
-    $defineProperty(module, Opal.$$own_included_modules_s, []);
-    $defineProperty(module, Opal.$$own_prepended_modules_s, []);
-    $defineProperty(module, Opal.$$ancestors_s, [module]);
-    $defineProperty(module, Opal.$$ancestors_cache_version_s, null);
+    $defineProperty(module, Opal.s.$$name, name);
+    $defineProperty(module, Opal.s.$$prototype, constructor.prototype);
+    $defineProperty(module, Opal.s.$$const, {});
+    $defineProperty(module, Opal.s.$$is_module, true);
+    $defineProperty(module, Opal.s.$$is_a_module, true);
+    $defineProperty(module, Opal.s.$$cvars, {});
+    $defineProperty(module, Opal.s.$$iclasses, []);
+    $defineProperty(module, Opal.s.$$own_included_modules, []);
+    $defineProperty(module, Opal.s.$$own_prepended_modules, []);
+    $defineProperty(module, Opal.s.$$ancestors, [module]);
+    $defineProperty(module, Opal.s.$$ancestors_cache_version, null);
 
     $set_proto(module, Opal.Module.prototype);
 
@@ -688,7 +691,7 @@
     if (module == null && scope === _Object) module = const_lookup_ancestors(_Object, name);
 
     if (module) {
-      if (!module[Opal.$$is_module_s] && module !== _Object) {
+      if (!module[Opal.s.$$is_module] && module !== _Object) {
         throw Opal.TypeError.$new(name + " is not a module");
       }
     }
@@ -702,9 +705,9 @@
     if (scope == null) {
       // Global scope
       scope = _Object;
-    } else if (!scope[Opal.$$is_class_s] && !scope[Opal.$$is_module_s]) {
+    } else if (!scope[Opal.s.$$is_class] && !scope[Opal.s.$$is_module]) {
       // Scope is an object, use its class
-      scope = scope[Opal.$$class_s];
+      scope = scope[Opal.s.$$class];
     }
 
     module = find_existing_module(scope, name);
@@ -732,13 +735,13 @@
   // @param object [Object] the ruby object
   // @return [Class] the singleton class for object
   Opal.get_singleton_class = function(object) {
-    if (object[Opal.$$meta_s]) {
-      return object[Opal.$$meta_s];
+    if (object[Opal.s.$$meta]) {
+      return object[Opal.s.$$meta];
     }
 
-    if (object.hasOwnProperty(Opal.$$is_class_s)) {
+    if (object.hasOwnProperty(Opal.s.$$is_class)) {
       return Opal.build_class_singleton_class(object);
-    } else if (object.hasOwnProperty(Opal.$$is_module_s)) {
+    } else if (object.hasOwnProperty(Opal.s.$$is_module)) {
       return Opal.build_module_singleton_class(object);
     } else {
       return Opal.build_object_singleton_class(object);
@@ -757,40 +760,40 @@
   Opal.build_class_singleton_class = function(klass) {
     var superclass, meta;
 
-    if (klass[Opal.$$meta_s]) {
-      return klass[Opal.$$meta_s];
+    if (klass[Opal.s.$$meta]) {
+      return klass[Opal.s.$$meta];
     }
 
     // The singleton_class superclass is the singleton_class of its superclass;
     // but BasicObject has no superclass (its `$$super` is null), thus we
     // fallback on `Class`.
-    superclass = klass === BasicObject ? Class : Opal.get_singleton_class(klass[Opal.$$super_s]);
+    superclass = klass === BasicObject ? Class : Opal.get_singleton_class(klass[Opal.s.$$super]);
 
     meta = Opal.allocate_class(null, superclass, function(){});
 
-    $defineProperty(meta, Opal.$$is_singleton_s, true);
-    $defineProperty(meta, Opal.$$singleton_of_s, klass);
-    $defineProperty(klass, Opal.$$meta_s, meta);
-    $set_proto(klass, meta[Opal.$$prototype_s]);
+    $defineProperty(meta, Opal.s.$$is_singleton, true);
+    $defineProperty(meta, Opal.s.$$singleton_of, klass);
+    $defineProperty(klass, Opal.s.$$meta, meta);
+    $set_proto(klass, meta[Opal.s.$$prototype]);
     // Restoring ClassName.class
-    $defineProperty(klass, Opal.$$class_s, Opal.Class);
+    $defineProperty(klass, Opal.s.$$class, Opal.Class);
 
     return meta;
   };
 
   Opal.build_module_singleton_class = function(mod) {
-    if (mod[Opal.$$meta_s]) {
-      return mod[Opal.$$meta_s];
+    if (mod[Opal.s.$$meta]) {
+      return mod[Opal.s.$$meta];
     }
 
     var meta = Opal.allocate_class(null, Opal.Module, function(){});
 
-    $defineProperty(meta, Opal.$$is_singleton_s, true);
-    $defineProperty(meta, Opal.$$singleton_of_s, mod);
-    $defineProperty(mod, Opal.$$meta_s, meta);
-    $set_proto(mod, meta[Opal.$$prototype_s]);
+    $defineProperty(meta, Opal.s.$$is_singleton, true);
+    $defineProperty(meta, Opal.s.$$singleton_of, mod);
+    $defineProperty(mod, Opal.s.$$meta, meta);
+    $set_proto(mod, meta[Opal.s.$$prototype]);
     // Restoring ModuleName.class
-    $defineProperty(mod, Opal.$$class_s, Opal.Module);
+    $defineProperty(mod, Opal.s.$$class, Opal.Module);
 
     return meta;
   };
@@ -800,17 +803,17 @@
   // @param object [Object]
   // @return [Class]
   Opal.build_object_singleton_class = function(object) {
-    var superclass = object[Opal.$$class_s],
+    var superclass = object[Opal.s.$$class],
         klass = Opal.allocate_class(nil, superclass, function(){});
 
-    $defineProperty(klass, Opal.$$is_singleton_s, true);
-    $defineProperty(klass, Opal.$$singleton_of_s, object);
+    $defineProperty(klass, Opal.s.$$is_singleton, true);
+    $defineProperty(klass, Opal.s.$$singleton_of, object);
 
-    delete klass[Opal.$$prototype_s][Opal.$$class_s];
+    delete klass[Opal.s.$$prototype][Opal.s.$$class];
 
-    $defineProperty(object, Opal.$$meta_s, klass);
+    $defineProperty(object, Opal.s.$$meta, klass);
 
-    $set_proto(object, object[Opal.$$meta_s][Opal.$$prototype_s]);
+    $set_proto(object, object[Opal.s.$$meta][Opal.s.$$prototype]);
 
     return klass;
   };
@@ -824,10 +827,10 @@
 
     for (var i = 0, l = ancestors.length; i < l; i++) {
       var ancestor = ancestors[i],
-          proto = ancestor[Opal.$$prototype_s];
+          proto = ancestor[Opal.s.$$prototype];
 
-      if (proto.hasOwnProperty(Opal.$$dummy_s)) {
-        proto = proto[Opal.$$define_methods_on_s];
+      if (proto.hasOwnProperty(Opal.s.$$dummy)) {
+        proto = proto[Opal.s.$$define_methods_on];
       }
 
       var props = Object.getOwnPropertyNames(proto);
@@ -855,10 +858,10 @@
 
   Opal.own_instance_methods = function(mod) {
     var results = [],
-        proto = mod[Opal.$$prototype_s];
+        proto = mod[Opal.s.$$prototype];
 
-    if (proto.hasOwnProperty(Opal.$$dummy_s)) {
-      proto = proto[Opal.$$define_methods_on_s];
+    if (proto.hasOwnProperty(Opal.s.$$dummy)) {
+      proto = proto[Opal.s.$$define_methods_on];
     }
 
     var props = Object.getOwnPropertyNames(proto);
@@ -890,7 +893,7 @@
   Opal.receiver_methods = function(obj) {
     var mod = Opal.get_singleton_class(obj);
     var singleton_methods = Opal.own_instance_methods(mod);
-    var instance_methods = Opal.own_instance_methods(mod[Opal.$$super_s]);
+    var instance_methods = Opal.own_instance_methods(mod[Opal.s.$$super]);
     return singleton_methods.concat(instance_methods);
   };
 
@@ -908,8 +911,8 @@
     for (i = length - 1; i >= 0; i--) {
       var ancestor = ancestors[i];
 
-      for (var cvar in ancestor[Opal.$$cvars_s]) {
-        result[cvar] = ancestor[Opal.$$cvars_s][cvar];
+      for (var cvar in ancestor[Opal.s.$$cvars]) {
+        result[cvar] = ancestor[Opal.s.$$cvars][cvar];
       }
     }
 
@@ -929,26 +932,26 @@
     for (i = length - 2; i >= 0; i--) {
       var ancestor = ancestors[i];
 
-      if ($has_own.call(ancestor[Opal.$$cvars_s], name)) {
-        ancestor[Opal.$$cvars_s][name] = value;
+      if ($has_own.call(ancestor[Opal.s.$$cvars], name)) {
+        ancestor[Opal.s.$$cvars][name] = value;
         return value;
       }
     }
 
-    module[Opal.$$cvars_s][name] = value;
+    module[Opal.s.$$cvars][name] = value;
 
     return value;
   };
 
   function isRoot(proto) {
-    return proto.hasOwnProperty(Opal.$$iclass_s) && proto.hasOwnProperty(Opal.$$root_s);
+    return proto.hasOwnProperty(Opal.s.$$iclass) && proto.hasOwnProperty(Opal.s.$$root);
   }
 
   function own_included_modules(module) {
-    var result = [], mod, proto = Object.getPrototypeOf(module[Opal.$$prototype_s]);
+    var result = [], mod, proto = Object.getPrototypeOf(module[Opal.s.$$prototype]);
 
     while (proto) {
-      if (proto.hasOwnProperty(Opal.$$class_s)) {
+      if (proto.hasOwnProperty(Opal.s.$$class)) {
         // superclass
         break;
       }
@@ -963,11 +966,11 @@
   }
 
   function own_prepended_modules(module) {
-    var result = [], mod, proto = Object.getPrototypeOf(module[Opal.$$prototype_s]);
+    var result = [], mod, proto = Object.getPrototypeOf(module[Opal.s.$$prototype]);
 
-    if (module[Opal.$$prototype_s].hasOwnProperty(Opal.$$dummy_s)) {
+    if (module[Opal.s.$$prototype].hasOwnProperty(Opal.s.$$dummy)) {
       while (proto) {
-        if (proto === module[Opal.$$prototype_s][Opal.$$define_methods_on_s]) {
+        if (proto === module[Opal.s.$$prototype][Opal.s.$$define_methods_on]) {
           break;
         }
 
@@ -1012,7 +1015,7 @@
 
     for (var i = 0, length = module_ancestors.length; i < length; i++) {
       var ancestor = module_ancestors[i], iclass = create_iclass(ancestor);
-      $defineProperty(iclass, Opal.$$included_s, true);
+      $defineProperty(iclass, Opal.s.$$included, true);
       iclasses.push(iclass);
     }
     var includer_ancestors = Opal.ancestors(includer),
@@ -1024,8 +1027,8 @@
       // first time include
 
       // includer -> chain.first -> ...chain... -> chain.last -> includer.parent
-      start_chain_after = includer[Opal.$$prototype_s];
-      end_chain_on = Object.getPrototypeOf(includer[Opal.$$prototype_s]);
+      start_chain_after = includer[Opal.s.$$prototype];
+      end_chain_on = Object.getPrototypeOf(includer[Opal.s.$$prototype]);
     } else {
       // The module has been already included,
       // we don't need to put it into the ancestors chain again,
@@ -1053,10 +1056,10 @@
       // because there are no intermediate classes between `parent` and `next ancestor`.
       // It doesn't break any prototypes of other objects as we don't change class references.
 
-      var proto = includer[Opal.$$prototype_s], parent = proto, module_iclass = Object.getPrototypeOf(parent);
+      var proto = includer[Opal.s.$$prototype], parent = proto, module_iclass = Object.getPrototypeOf(parent);
 
       while (module_iclass != null) {
-        if (isRoot(module_iclass) && module_iclass[Opal.$$module_s] === module) {
+        if (isRoot(module_iclass) && module_iclass[Opal.s.$$module] === module) {
           break;
         }
 
@@ -1067,7 +1070,7 @@
       var next_ancestor = Object.getPrototypeOf(module_iclass);
 
       // skip non-root iclasses (that were recursively included)
-      while (next_ancestor.hasOwnProperty(Opal.$$iclass_s) && !isRoot(next_ancestor)) {
+      while (next_ancestor.hasOwnProperty(Opal.s.$$iclass) && !isRoot(next_ancestor)) {
         next_ancestor = Object.getPrototypeOf(next_ancestor);
       }
 
@@ -1079,7 +1082,7 @@
     $set_proto(chain.last, end_chain_on);
 
     // recalculate own_included_modules cache
-    includer[Opal.$$own_included_modules_s] = own_included_modules(includer);
+    includer[Opal.s.$$own_included_modules] = own_included_modules(includer);
 
     Opal.const_cache_version++;
   };
@@ -1109,27 +1112,27 @@
 
     for (var i = 0, length = module_ancestors.length; i < length; i++) {
       var ancestor = module_ancestors[i], iclass = create_iclass(ancestor);
-      $defineProperty(iclass, Opal.$$prepended_s, true);
+      $defineProperty(iclass, Opal.s.$$prepended, true);
       iclasses.push(iclass);
     }
 
     var chain = chain_iclasses(iclasses),
-        dummy_prepender = prepender[Opal.$$prototype_s],
+        dummy_prepender = prepender[Opal.s.$$prototype],
         previous_parent = Object.getPrototypeOf(dummy_prepender),
         prepender_iclass,
         start_chain_after,
         end_chain_on;
 
-    if (dummy_prepender.hasOwnProperty(Opal.$$dummy_s)) {
+    if (dummy_prepender.hasOwnProperty(Opal.s.$$dummy)) {
       // The module already has some prepended modules
       // which means that we don't need to make it "dummy"
-      prepender_iclass = dummy_prepender[Opal.$$define_methods_on_s];
+      prepender_iclass = dummy_prepender[Opal.s.$$define_methods_on];
     } else {
       // Making the module "dummy"
       prepender_iclass = create_dummy_iclass(prepender);
       flush_methods_in(prepender);
-      $defineProperty(dummy_prepender, Opal.$$dummy_s, true);
-      $defineProperty(dummy_prepender, Opal.$$define_methods_on_s, prepender_iclass);
+      $defineProperty(dummy_prepender, Opal.s.$$dummy, true);
+      $defineProperty(dummy_prepender, Opal.s.$$define_methods_on, prepender_iclass);
 
       // Converting
       //   dummy(prepender) -> previous_parent
@@ -1150,9 +1153,9 @@
       end_chain_on = Object.getPrototypeOf(dummy_prepender);
       while (end_chain_on != null) {
         if (
-          end_chain_on.hasOwnProperty(Opal.$$root_s) ||
+          end_chain_on.hasOwnProperty(Opal.s.$$root) ||
           end_chain_on === prepender_iclass ||
-          !end_chain_on.hasOwnProperty(Opal.$$iclass_s)
+          !end_chain_on.hasOwnProperty(Opal.s.$$iclass)
         ) {
           break;
         }
@@ -1167,13 +1170,13 @@
     $set_proto(chain.last, end_chain_on);
 
     // recalculate own_prepended_modules cache
-    prepender[Opal.$$own_prepended_modules_s] = own_prepended_modules(prepender);
+    prepender[Opal.s.$$own_prepended_modules] = own_prepended_modules(prepender);
 
     Opal.const_cache_version++;
   };
 
   function flush_methods_in(module) {
-    var proto = module[Opal.$$prototype_s],
+    var proto = module[Opal.s.$$prototype],
         props = Object.getOwnPropertyNames(proto);
 
     for (var i = 0; i < props.length; i++) {
@@ -1187,8 +1190,8 @@
   function create_iclass(module) {
     var iclass = create_dummy_iclass(module);
 
-    if (module[Opal.$$is_module_s]) {
-      module[Opal.$$iclasses_s].push(iclass);
+    if (module[Opal.s.$$is_module]) {
+      module[Opal.s.$$iclasses].push(iclass);
     }
 
     return iclass;
@@ -1197,10 +1200,10 @@
   // Dummy iclass doesn't receive updates when the module gets a new method.
   function create_dummy_iclass(module) {
     var iclass = {},
-        proto = module[Opal.$$prototype_s];
+        proto = module[Opal.s.$$prototype];
 
-    if (proto.hasOwnProperty(Opal.$$dummy_s)) {
-      proto = proto[Opal.$$define_methods_on_s];
+    if (proto.hasOwnProperty(Opal.s.$$dummy)) {
+      proto = proto[Opal.s.$$define_methods_on];
     }
 
     var props = Object.getOwnPropertyNames(proto),
@@ -1211,8 +1214,8 @@
       $defineProperty(iclass, prop, proto[prop]);
     }
 
-    $defineProperty(iclass, Opal.$$iclass_s, true);
-    $defineProperty(iclass, Opal.$$module_s, module);
+    $defineProperty(iclass, Opal.s.$$iclass, true);
+    $defineProperty(iclass, Opal.s.$$module, module);
 
     return iclass;
   }
@@ -1220,7 +1223,7 @@
   function chain_iclasses(iclasses) {
     var length = iclasses.length, first = iclasses[0];
 
-    $defineProperty(first, Opal.$$root_s, true);
+    $defineProperty(first, Opal.s.$$root, true);
 
     if (length === 1) {
       return { first: first, last: first };
@@ -1256,7 +1259,7 @@
   // @return [Class] returns the passed Ruby class
   //
   Opal.bridge = function(native_klass, klass) {
-    if (native_klass.hasOwnProperty(Opal.$$bridge_s)) {
+    if (native_klass.hasOwnProperty(Opal.s.$$bridge)) {
       throw Opal.ArgumentError.$new("already bridged");
     }
 
@@ -1275,35 +1278,35 @@
     //         - super (window.Object)
     //           - null
     //
-    $defineProperty(native_klass, Opal.$$bridge_s, klass);
-    $set_proto(native_klass.prototype, (klass[Opal.$$super_s] || Opal.Object)[Opal.$$prototype_s]);
-    $defineProperty(klass, Opal.$$prototype_s, native_klass.prototype);
+    $defineProperty(native_klass, Opal.s.$$bridge, klass);
+    $set_proto(native_klass.prototype, (klass[Opal.s.$$super] || Opal.Object)[Opal.s.$$prototype]);
+    $defineProperty(klass, Opal.s.$$prototype, native_klass.prototype);
 
-    $defineProperty(klass[Opal.$$prototype_s], Opal.$$class_s, klass);
-    $defineProperty(klass, Opal.$$constructor_s, native_klass);
-    $defineProperty(klass, Opal.$$bridge_s, true);
+    $defineProperty(klass[Opal.s.$$prototype], Opal.s.$$class, klass);
+    $defineProperty(klass, Opal.s.$$constructor, native_klass);
+    $defineProperty(klass, Opal.s.$$bridge, true);
   };
 
   function protoToModule(proto) {
-    if (proto.hasOwnProperty(Opal.$$dummy_s)) {
+    if (proto.hasOwnProperty(Opal.s.$$dummy)) {
       return;
-    } else if (proto.hasOwnProperty(Opal.$$iclass_s)) {
-      return proto[Opal.$$module_s];
-    } else if (proto.hasOwnProperty(Opal.$$class_s)) {
-      return proto[Opal.$$class_s];
+    } else if (proto.hasOwnProperty(Opal.s.$$iclass)) {
+      return proto[Opal.s.$$module];
+    } else if (proto.hasOwnProperty(Opal.s.$$class)) {
+      return proto[Opal.s.$$class];
     }
   }
 
   function own_ancestors(module) {
-    return module[Opal.$$own_prepended_modules_s].concat([module]).concat(module[Opal.$$own_included_modules_s]);
+    return module[Opal.s.$$own_prepended_modules].concat([module]).concat(module[Opal.s.$$own_included_modules]);
   }
 
   // The Array of ancestors for a given module/class
   Opal.ancestors = function(module) {
     if (!module) { return []; }
 
-    if (module[Opal.$$ancestors_cache_version_s] === Opal.const_cache_version) {
-      return module[Opal.$$ancestors_s];
+    if (module[Opal.s.$$ancestors_cache_version] === Opal.const_cache_version) {
+      return module[Opal.s.$$ancestors];
     }
 
     var result = [], i, mods, length;
@@ -1312,24 +1315,24 @@
       result.push(mods[i]);
     }
 
-    if (module[Opal.$$super_s]) {
-      for (i = 0, mods = Opal.ancestors(module[Opal.$$super_s]), length = mods.length; i < length; i++) {
+    if (module[Opal.s.$$super]) {
+      for (i = 0, mods = Opal.ancestors(module[Opal.s.$$super]), length = mods.length; i < length; i++) {
         result.push(mods[i]);
       }
     }
 
-    module[Opal.$$ancestors_cache_version_s] = Opal.const_cache_version;
-    module[Opal.$$ancestors_s] = result;
+    module[Opal.s.$$ancestors_cache_version] = Opal.const_cache_version;
+    module[Opal.s.$$ancestors] = result;
 
     return result;
   };
 
   Opal.included_modules = function(module) {
-    var result = [], mod = null, proto = Object.getPrototypeOf(module[Opal.$$prototype_s]);
+    var result = [], mod = null, proto = Object.getPrototypeOf(module[Opal.s.$$prototype]);
 
     for (; proto && Object.getPrototypeOf(proto); proto = Object.getPrototypeOf(proto)) {
       mod = protoToModule(proto);
-      if (mod && mod[Opal.$$is_module_s] && proto[Opal.$$iclass_s] && proto[Opal.$$included_s]) {
+      if (mod && mod[Opal.s.$$is_module] && proto[Opal.s.$$iclass] && proto[Opal.s.$$included]) {
         result.push(mod);
       }
     }
@@ -1369,7 +1372,7 @@
   // @param stubs [Array] an array of method stubs to add
   // @return [undefined]
   Opal.add_stubs = function(stubs) {
-    var proto = Opal.BasicObject[Opal.$$prototype_s];
+    var proto = Opal.BasicObject[Opal.s.$$prototype];
 
     for (var i = 0, length = stubs.length; i < length; i++) {
       var stub = stubs[i], existing_method = proto[stub];
@@ -1431,11 +1434,11 @@
   // @raise [ArgumentError]
   Opal.ac = function(actual, expected, object, meth) {
     var inspect = '';
-    if (object[Opal.$$is_a_module_s]) {
-      inspect += object[Opal.$$name_s] + '.';
+    if (object[Opal.s.$$is_a_module]) {
+      inspect += object[Opal.s.$$name] + '.';
     }
     else {
-      inspect += object[Opal.$$class_s][Opal.$$name_s] + '#';
+      inspect += object[Opal.s.$$class][Opal.s.$$name] + '#';
     }
     inspect += meth;
 
@@ -1458,20 +1461,20 @@
   Opal.find_super_dispatcher = function(obj, mid, current_func, defcheck, allow_stubs) {
     var jsid = '$' + mid, ancestors, super_method;
 
-    if (obj.hasOwnProperty(Opal.$$meta_s)) {
-      ancestors = Opal.ancestors(obj[Opal.$$meta_s]);
+    if (obj.hasOwnProperty(Opal.s.$$meta)) {
+      ancestors = Opal.ancestors(obj[Opal.s.$$meta]);
     } else {
-      ancestors = Opal.ancestors(obj[Opal.$$class_s]);
+      ancestors = Opal.ancestors(obj[Opal.s.$$class]);
     }
 
     var current_index = ancestors.indexOf(current_func.$$owner);
 
     for (var i = current_index + 1; i < ancestors.length; i++) {
       var ancestor = ancestors[i],
-          proto = ancestor[Opal.$$prototype_s];
+          proto = ancestor[Opal.s.$$prototype];
 
-      if (proto.hasOwnProperty(Opal.$$dummy_s)) {
-        proto = proto[Opal.$$define_methods_on_s];
+      if (proto.hasOwnProperty(Opal.s.$$dummy)) {
+        proto = proto[Opal.s.$$define_methods_on];
       }
 
       if (proto.hasOwnProperty(jsid)) {
@@ -1544,7 +1547,7 @@
       arg = Opal.to_ary(arg);
     }
 
-    if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg[Opal.$$is_array_s]) {
+    if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg[Opal.s.$$is_array]) {
       return block.apply(null, arg);
     }
     else {
@@ -1559,12 +1562,12 @@
     }
 
     if (block.length > 1 && args.length === 1) {
-      if (args[0][Opal.$$is_array_s]) {
+      if (args[0][Opal.s.$$is_array]) {
         return block.apply(null, args[0]);
       }
     }
 
-    if (!args[Opal.$$is_array_s]) {
+    if (!args[Opal.s.$$is_array]) {
       var args_ary = new Array(args.length);
       for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = args[i]; }
 
@@ -1580,7 +1583,7 @@
     for (var i = 0; i < candidates.length; i++) {
       var candidate = candidates[i];
 
-      if (candidate[Opal.$$is_array_s]) {
+      if (candidate[Opal.s.$$is_array]) {
         var result = Opal.rescue(exception, candidate);
 
         if (result) {
@@ -1599,15 +1602,15 @@
   };
 
   Opal.is_a = function(object, klass) {
-    if (klass != null && object[Opal.$$meta_s] === klass || object[Opal.$$class_s] === klass) {
+    if (klass != null && object[Opal.s.$$meta] === klass || object[Opal.s.$$class] === klass) {
       return true;
     }
 
-    if (object[Opal.$$is_number_s] && klass[Opal.$$is_number_class_s]) {
-      return (klass[Opal.$$is_integer_class_s]) ? (object % 1) === 0 : true;
+    if (object[Opal.s.$$is_number] && klass[Opal.s.$$is_number_class]) {
+      return (klass[Opal.s.$$is_integer_class]) ? (object % 1) === 0 : true;
     }
 
-    var i, length, ancestors = Opal.ancestors(object[Opal.$$is_class_s] ? Opal.get_singleton_class(object) : (object[Opal.$$meta_s] || object[Opal.$$class_s]));
+    var i, length, ancestors = Opal.ancestors(object[Opal.s.$$is_class] ? Opal.get_singleton_class(object) : (object[Opal.s.$$meta] || object[Opal.s.$$class]));
 
     for (i = 0, length = ancestors.length; i < length; i++) {
       if (ancestors[i] === klass) {
@@ -1621,21 +1624,21 @@
   // Helpers for extracting kwsplats
   // Used for: { **h }
   Opal.to_hash = function(value) {
-    if (value[Opal.$$is_hash_s]) {
+    if (value[Opal.s.$$is_hash]) {
       return value;
     }
     else if (value['$respond_to?']('to_hash', true)) {
       var hash = value.$to_hash();
-      if (hash[Opal.$$is_hash_s]) {
+      if (hash[Opal.s.$$is_hash]) {
         return hash;
       }
       else {
-        throw Opal.TypeError.$new("Can't convert " + value[Opal.$$class_s] +
-          " to Hash (" + value[Opal.$$class_s] + "#to_hash gives " + hash[Opal.$$class_s] + ")");
+        throw Opal.TypeError.$new("Can't convert " + value[Opal.s.$$class] +
+          " to Hash (" + value[Opal.s.$$class] + "#to_hash gives " + hash[Opal.s.$$class] + ")");
       }
     }
     else {
-      throw Opal.TypeError.$new("no implicit conversion of " + value[Opal.$$class_s] + " into Hash");
+      throw Opal.TypeError.$new("no implicit conversion of " + value[Opal.s.$$class] + " into Hash");
     }
   };
 
@@ -1646,7 +1649,7 @@
 
   // Used for: a, b = something (no splat)
   Opal.to_ary = function(value) {
-    if (value[Opal.$$is_array_s]) {
+    if (value[Opal.s.$$is_array]) {
       return value;
     }
     else if (value['$respond_to?']('to_ary', true)) {
@@ -1654,12 +1657,12 @@
       if (ary === nil) {
         return [value];
       }
-      else if (ary[Opal.$$is_array_s]) {
+      else if (ary[Opal.s.$$is_array]) {
         return ary;
       }
       else {
-        throw Opal.TypeError.$new("Can't convert " + value[Opal.$$class_s] +
-          " to Array (" + value[Opal.$$class_s] + "#to_ary gives " + ary[Opal.$$class_s] + ")");
+        throw Opal.TypeError.$new("Can't convert " + value[Opal.s.$$class] +
+          " to Array (" + value[Opal.s.$$class] + "#to_ary gives " + ary[Opal.s.$$class] + ")");
       }
     }
     else {
@@ -1669,7 +1672,7 @@
 
   // Used for: a, b = *something (with splat)
   Opal.to_a = function(value) {
-    if (value[Opal.$$is_array_s]) {
+    if (value[Opal.s.$$is_array]) {
       // A splatted array must be copied
       return value.slice();
     }
@@ -1678,12 +1681,12 @@
       if (ary === nil) {
         return [value];
       }
-      else if (ary[Opal.$$is_array_s]) {
+      else if (ary[Opal.s.$$is_array]) {
         return ary;
       }
       else {
-        throw Opal.TypeError.$new("Can't convert " + value[Opal.$$class_s] +
-          " to Array (" + value[Opal.$$class_s] + "#to_a gives " + ary[Opal.$$class_s] + ")");
+        throw Opal.TypeError.$new("Can't convert " + value[Opal.s.$$class] +
+          " to Array (" + value[Opal.s.$$class] + "#to_a gives " + ary[Opal.s.$$class] + ")");
       }
     }
     else {
@@ -1786,7 +1789,7 @@
   };
 
   Opal.lambda = function(block) {
-    block[Opal.$$is_lambda_s] = true;
+    block[Opal.s.$$is_lambda] = true;
     return block;
   };
 
@@ -1833,7 +1836,7 @@
       Opal.defn(Opal.Object, jsid, body)
     }
     // if instance_eval is invoked on a module/class, it sets inst_eval_mod
-    else if (!obj.$$eval && obj[Opal.$$is_a_module_s]) {
+    else if (!obj.$$eval && obj[Opal.s.$$is_a_module]) {
       Opal.defn(obj, jsid, body);
     }
     else {
@@ -1846,24 +1849,24 @@
     body.displayName = jsid;
     body.$$owner = module;
 
-    var proto = module[Opal.$$prototype_s];
-    if (proto.hasOwnProperty(Opal.$$dummy_s)) {
-      proto = proto[Opal.$$define_methods_on_s];
+    var proto = module[Opal.s.$$prototype];
+    if (proto.hasOwnProperty(Opal.s.$$dummy)) {
+      proto = proto[Opal.s.$$define_methods_on];
     }
     $defineProperty(proto, jsid, body);
 
-    if (module[Opal.$$is_module_s]) {
+    if (module[Opal.s.$$is_module]) {
       if (module.$$module_function) {
         Opal.defs(module, jsid, body)
       }
 
-      for (var i = 0, iclasses = module[Opal.$$iclasses_s], length = iclasses.length; i < length; i++) {
+      for (var i = 0, iclasses = module[Opal.s.$$iclasses], length = iclasses.length; i < length; i++) {
         var iclass = iclasses[i];
         $defineProperty(iclass, jsid, body);
       }
     }
 
-    var singleton_of = module[Opal.$$singleton_of_s];
+    var singleton_of = module[Opal.s.$$singleton_of];
     if (module.$method_added && !module.$method_added.$$stub && !singleton_of) {
       module.$method_added(jsid.substr(1));
     }
@@ -1874,7 +1877,7 @@
 
   // Define a singleton method on the given object (see Opal.def).
   Opal.defs = function(obj, jsid, body) {
-    if (obj[Opal.$$is_string_s] || obj[Opal.$$is_number_s]) {
+    if (obj[Opal.s.$$is_string] || obj[Opal.s.$$is_number]) {
       throw Opal.TypeError.$new("can't define singleton");
     }
     Opal.defn(Opal.get_singleton_class(obj), jsid, body)
@@ -1882,15 +1885,15 @@
 
   // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
-    if (!$has_own.call(obj[Opal.$$prototype_s], jsid)) {
+    if (!$has_own.call(obj[Opal.s.$$prototype], jsid)) {
       throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
     }
 
-    delete obj[Opal.$$prototype_s][jsid];
+    delete obj[Opal.s.$$prototype][jsid];
 
-    if (obj[Opal.$$is_singleton_s]) {
-      if (obj[Opal.$$prototype_s].$singleton_method_removed && !obj[Opal.$$prototype_s].$singleton_method_removed.$$stub) {
-        obj[Opal.$$prototype_s].$singleton_method_removed(jsid.substr(1));
+    if (obj[Opal.s.$$is_singleton]) {
+      if (obj[Opal.s.$$prototype].$singleton_method_removed && !obj[Opal.s.$$prototype].$singleton_method_removed.$$stub) {
+        obj[Opal.s.$$prototype].$singleton_method_removed(jsid.substr(1));
       }
     }
     else {
@@ -1902,15 +1905,15 @@
 
   // Called from #undef_method.
   Opal.udef = function(obj, jsid) {
-    if (!obj[Opal.$$prototype_s][jsid] || obj[Opal.$$prototype_s][jsid].$$stub) {
+    if (!obj[Opal.s.$$prototype][jsid] || obj[Opal.s.$$prototype][jsid].$$stub) {
       throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
     }
 
-    Opal.add_stub_for(obj[Opal.$$prototype_s], jsid);
+    Opal.add_stub_for(obj[Opal.s.$$prototype], jsid);
 
-    if (obj[Opal.$$is_singleton_s]) {
-      if (obj[Opal.$$prototype_s].$singleton_method_undefined && !obj[Opal.$$prototype_s].$singleton_method_undefined.$$stub) {
-        obj[Opal.$$prototype_s].$singleton_method_undefined(jsid.substr(1));
+    if (obj[Opal.s.$$is_singleton]) {
+      if (obj[Opal.s.$$prototype].$singleton_method_undefined && !obj[Opal.s.$$prototype].$singleton_method_undefined.$$stub) {
+        obj[Opal.s.$$prototype].$singleton_method_undefined(jsid.substr(1));
       }
     }
     else {
@@ -1927,7 +1930,7 @@
   Opal.alias = function(obj, name, old) {
     var id     = '$' + name,
         old_id = '$' + old,
-        body   = obj[Opal.$$prototype_s]['$' + old],
+        body   = obj[Opal.s.$$prototype]['$' + old],
         alias;
 
     // When running inside #instance_eval the alias refers to class methods.
@@ -1936,16 +1939,16 @@
     }
 
     if (!is_method_body(body)) {
-      var ancestor = obj[Opal.$$super_s];
+      var ancestor = obj[Opal.s.$$super];
 
       while (typeof(body) !== "function" && ancestor) {
         body     = ancestor[old_id];
-        ancestor = ancestor[Opal.$$super_s];
+        ancestor = ancestor[Opal.s.$$super];
       }
 
-      if (!is_method_body(body) && obj[Opal.$$is_module_s]) {
+      if (!is_method_body(body) && obj[Opal.s.$$is_module]) {
         // try to look into Object
-        body = Opal.Object[Opal.$$prototype_s][old_id]
+        body = Opal.Object[Opal.s.$$prototype][old_id]
       }
 
       if (!is_method_body(body)) {
@@ -1996,7 +1999,7 @@
 
   Opal.alias_native = function(obj, name, native_name) {
     var id   = '$' + name,
-        body = obj[Opal.$$prototype_s][native_name];
+        body = obj[Opal.s.$$prototype][native_name];
 
     if (typeof(body) !== "function" || body.$$stub) {
       throw Opal.NameError.$new("undefined native method `" + native_name + "' for class `" + obj.$name() + "'")
@@ -2024,7 +2027,7 @@
     for (var i = 0, keys = from_hash.$$keys, smap = from_hash.$$smap, len = keys.length, key, value; i < len; i++) {
       key = keys[i];
 
-      if (key[Opal.$$is_string_s]) {
+      if (key[Opal.s.$$is_string]) {
         value = smap[key];
       } else {
         value = key.value;
@@ -2036,7 +2039,7 @@
   };
 
   Opal.hash_put = function(hash, key, value) {
-    if (key[Opal.$$is_string_s]) {
+    if (key[Opal.s.$$is_string]) {
       if (!$has_own.call(hash.$$smap, key)) {
         hash.$$keys.push(key);
       }
@@ -2074,7 +2077,7 @@
   };
 
   Opal.hash_get = function(hash, key) {
-    if (key[Opal.$$is_string_s]) {
+    if (key[Opal.s.$$is_string]) {
       if ($has_own.call(hash.$$smap, key)) {
         return hash.$$smap[key];
       }
@@ -2099,7 +2102,7 @@
   Opal.hash_delete = function(hash, key) {
     var i, keys = hash.$$keys, length = keys.length, value;
 
-    if (key[Opal.$$is_string_s]) {
+    if (key[Opal.s.$$is_string]) {
       if (typeof key !== "string") key = key.valueOf();
 
       if (!$has_own.call(hash.$$smap, key)) {
@@ -2160,7 +2163,7 @@
   Opal.hash_rehash = function(hash) {
     for (var i = 0, length = hash.$$keys.length, key_hash, bucket, last_bucket; i < length; i++) {
 
-      if (hash.$$keys[i][Opal.$$is_string_s]) {
+      if (hash.$$keys[i][Opal.s.$$is_string]) {
         continue;
       }
 
@@ -2221,14 +2224,14 @@
   Opal.hash = function() {
     var arguments_length = arguments.length, args, hash, i, length, key, value;
 
-    if (arguments_length === 1 && arguments[0][Opal.$$is_hash_s]) {
+    if (arguments_length === 1 && arguments[0][Opal.s.$$is_hash]) {
       return arguments[0];
     }
 
     hash = new Opal.Hash();
     Opal.hash_init(hash);
 
-    if (arguments_length === 1 && arguments[0][Opal.$$is_array_s]) {
+    if (arguments_length === 1 && arguments[0][Opal.s.$$is_array]) {
       args = arguments[0];
       length = args.length;
 
@@ -2539,13 +2542,13 @@
   Opal.Module      = Module      = Opal.allocate_class('Module', Opal.Object, $Module);
   Opal.Class       = Class       = Opal.allocate_class('Class', Opal.Module, $Class);
 
-  $set_proto(Opal.BasicObject, Opal.Class[Opal.$$prototype_s]);
-  $set_proto(Opal.Object, Opal.Class[Opal.$$prototype_s]);
-  $set_proto(Opal.Module, Opal.Class[Opal.$$prototype_s]);
-  $set_proto(Opal.Class, Opal.Class[Opal.$$prototype_s]);
+  $set_proto(Opal.BasicObject, Opal.Class[Opal.s.$$prototype]);
+  $set_proto(Opal.Object, Opal.Class[Opal.s.$$prototype]);
+  $set_proto(Opal.Module, Opal.Class[Opal.s.$$prototype]);
+  $set_proto(Opal.Class, Opal.Class[Opal.s.$$prototype]);
 
   // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
-  BasicObject[Opal.$$const_s]["BasicObject"] = BasicObject;
+  BasicObject[Opal.s.$$const]["BasicObject"] = BasicObject;
 
   // Assign basic constants
   Opal.const_set(_Object, "BasicObject",  BasicObject);
@@ -2554,15 +2557,15 @@
   Opal.const_set(_Object, "Class",        Class);
 
   // Fix booted classes to have correct .class value
-  BasicObject[Opal.$$class_s] = Class;
-  _Object[Opal.$$class_s]     = Class;
-  Module[Opal.$$class_s]      = Class;
-  Class[Opal.$$class_s]       = Class;
+  BasicObject[Opal.s.$$class] = Class;
+  _Object[Opal.s.$$class]     = Class;
+  Module[Opal.s.$$class]      = Class;
+  Class[Opal.s.$$class]       = Class;
 
   // Forward .toString() to #to_s
-  $defineProperty(_Object[Opal.$$prototype_s], 'toString', function() {
+  $defineProperty(_Object[Opal.s.$$prototype], 'toString', function() {
     var to_s = this.$to_s();
-    if (to_s[Opal.$$is_string_s] && typeof(to_s) === 'object') {
+    if (to_s[Opal.s.$$is_string] && typeof(to_s) === 'object') {
       // a string created using new String('string')
       return to_s.valueOf();
     } else {
@@ -2572,7 +2575,7 @@
 
   // Make Kernel#require immediately available as it's needed to require all the
   // other corelib files.
-  $defineProperty(_Object[Opal.$$prototype_s], '$require', Opal.require);
+  $defineProperty(_Object[Opal.s.$$prototype], '$require', Opal.require);
 
   // Instantiate the main object
   Opal.top = new _Object();
@@ -2593,11 +2596,11 @@
   Opal.NilClass = Opal.allocate_class('NilClass', Opal.Object, $NilClass);
   Opal.const_set(_Object, 'NilClass', Opal.NilClass);
   nil = Opal.nil = new Opal.NilClass();
-  nil[Opal.$$id_s] = nil_id;
+  nil[Opal.s.$$id] = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
 
   // Errors
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
-  TypeError[Opal.$$super_s] = Error;
+  TypeError[Opal.s.$$super] = Error;
 }).call(this);

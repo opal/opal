@@ -50,7 +50,7 @@ class Method
     %x{
       var proc = self.$call.bind(self);
       proc.$$unbound = #{@method};
-      proc[Opal.$$is_lambda_s] = true;
+      proc[Opal.s.$$is_lambda] = true;
       proc.$$arity = #{@method}.$$arity;
       proc.$$parameters = #{@method}.$$parameters;
       return proc;
@@ -90,7 +90,7 @@ class UnboundMethod
 
   def bind(object)
     %x{
-      if (#{@owner}[Opal.$$is_module_s] || Opal.is_a(#{object}, #{@owner})) {
+      if (#{@owner}[Opal.s.$$is_module] || Opal.is_a(#{object}, #{@owner})) {
         return #{Method.new(object, @owner, @method, @name)};
       }
       else {
