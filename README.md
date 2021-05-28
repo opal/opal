@@ -216,6 +216,10 @@ then we support Opera 12.1x, 19.x and 20.x but not Opera 15.x through 18.x.
 
 This project exists thanks to all the people who contribute. [![contributors](https://opencollective.com/opal/contributors.svg?width=890&button=false")](https://github.com/opal/opal/graphs/contributors)
 
+## Versioning
+
+Opal will broadly follow semver as a version policy, trying to bump the major version when introducing breaking changes.
+Being a language implementation we're also aware that there's a fine line between what can be considered breaking and what is expected to be "safe" or just "additive". Moving forward we'll attempt to better clarify what interfaces are meant to be public and what should be considered private.
 
 ## Backers
 
