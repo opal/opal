@@ -284,9 +284,6 @@ class String
 
       if (encoding === self.encoding) { return self; }
 
-      if (typeof self === 'string') {
-        self = self.$dup();
-      }
       Opal.set_encoding(self, encoding);
 
       return self;
