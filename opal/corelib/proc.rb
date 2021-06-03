@@ -15,10 +15,10 @@ class Proc < `Function`
   def call(*args, &block)
     %x{
       if (block !== nil) {
-        self.$$p = block;
+        self[Opal.s.$$p] = block;
       }
 
-      var result, $brk = self.$$brk;
+      var result, $brk = self[Opal.s.$$brk];
 
       if ($brk) {
         try {
@@ -30,7 +30,7 @@ class Proc < `Function`
           }
         } catch (err) {
           if (err === $brk) {
-            return $brk.$v
+            return $brk[Opal.s.$v]
           }
           else {
             throw err
@@ -80,36 +80,36 @@ class Proc < `Function`
 
   def arity
     %x{
-      if (self.$$is_curried) {
+      if (self[Opal.s.$$is_curried]) {
         return -1;
       } else {
-        return self.$$arity;
+        return self[Opal.s.$$arity];
       }
     }
   end
 
   def source_location
-    `if (self.$$is_curried) { return nil; }`
+    `if (self[Opal.s.$$is_curried]) { return nil; }`
     nil
   end
 
   def binding
-    `if (self.$$is_curried) { #{raise ArgumentError, "Can't create Binding"} }`
+    `if (self[Opal.s.$$is_curried]) { #{raise ArgumentError, "Can't create Binding"} }`
     nil
   end
 
   def parameters
     %x{
-      if (self.$$is_curried) {
+      if (self[Opal.s.$$is_curried]) {
         return #{[[:rest]]};
-      } else if (self.$$parameters) {
+      } else if (self[Opal.s.$$parameters]) {
         if (self[Opal.s.$$is_lambda]) {
-          return self.$$parameters;
+          return self[Opal.s.$$parameters];
         } else {
           var result = [], i, length;
 
-          for (i = 0, length = self.$$parameters.length; i < length; i++) {
-            var parameter = self.$$parameters[i];
+          for (i = 0, length = self[Opal.s.$$parameters].length; i < length; i++) {
+            var parameter = self[Opal.s.$$parameters][i];
 
             if (parameter[0] === 'req') {
               // required arguments always have name
@@ -144,12 +144,12 @@ class Proc < `Function`
             length = args.length,
             result;
 
-        if (length > arity && self[Opal.s.$$is_lambda] && !self.$$is_curried) {
+        if (length > arity && self[Opal.s.$$is_lambda] && !self[Opal.s.$$is_curried]) {
           #{raise ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
         }
 
         if (length >= arity) {
-          return self.$call.apply(self, args);
+          return self[Opal.s.$call].apply(self, args);
         }
 
         result = function () {
@@ -157,20 +157,20 @@ class Proc < `Function`
             args.concat($slice.call(arguments)));
         }
         result[Opal.s.$$is_lambda] = self[Opal.s.$$is_lambda];
-        result.$$is_curried = true;
+        result[Opal.s.$$is_curried] = true;
 
         return result;
       };
 
       curried[Opal.s.$$is_lambda] = self[Opal.s.$$is_lambda];
-      curried.$$is_curried = true;
+      curried[Opal.s.$$is_curried] = true;
       return curried;
     }
   end
 
   def dup
     %x{
-      var original_proc = self.$$original_proc || self,
+      var original_proc = self[Opal.s.$$original_proc] || self,
           proc = function () {
             return original_proc.apply(this, arguments);
           };

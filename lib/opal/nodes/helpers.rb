@@ -20,9 +20,9 @@ module Opal
       # wrapped in brackets to use reference notation calling.
       def mid_to_jsid(mid)
         if %r{\=|\+|\-|\*|\/|\!|\?|<|\>|\&|\||\^|\%|\~|\[} =~ mid.to_s
-          "['$#{mid}']"
+          "[Opal.s['$#{mid}']]"
         else
-          '.$' + mid
+          '[Opal.s.$' + mid + ']'
         end
       end
 

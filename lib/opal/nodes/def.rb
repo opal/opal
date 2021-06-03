@@ -43,7 +43,7 @@ module Opal
 
           if scope.catch_return
             unshift "try {\n"
-            line '} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }'
+            line '} catch ($returner) { if ($returner === Opal.returner) { return $returner[Opal.s.$v] }'
             push ' throw $returner; }'
           end
         end
@@ -64,25 +64,25 @@ module Opal
         unshift "#{scope_name} = " if scope_name
         line '}'
 
-        push ", #{scope_name}.$$arity = #{arity}"
+        push ", #{scope_name}[Opal.s.$$arity] = #{arity}"
 
         if compiler.arity_check?
-          push ", #{scope_name}.$$parameters = #{parameters_code}"
+          push ", #{scope_name}[Opal.s.$$parameters] = #{parameters_code}"
         end
 
         if compiler.parse_comments?
-          push ", #{scope_name}.$$comments = #{comments_code}"
+          push ", #{scope_name}[Opal.s.$$comments] = #{comments_code}"
         end
 
         if compiler.enable_source_location?
-          push ", #{scope_name}.$$source_location = #{source_location}"
+          push ", #{scope_name}[Opal.s.$$source_location] = #{source_location}"
         end
 
         wrap_with_definition
       end
 
       def wrap_with_definition
-        wrap "Opal.def(self, '$#{mid}', ", ')'
+        wrap "Opal.def(self, Opal.s('$#{mid}'), ", ')'
 
         if expr?
           wrap '(', ", nil) && '#{mid}'"

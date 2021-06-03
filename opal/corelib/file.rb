@@ -80,7 +80,7 @@ class File < IO
       // Coerce a given path to a path string using #to_path and #to_str
       function $coerce_to_path(path) {
         if ($truthy(#{`path`.respond_to?(:to_path)})) {
-          path = path.$to_path();
+          path = path[Opal.s.$to_path]();
         }
 
         path = #{Opal.coerce_to!(`path`, String, :to_str)};

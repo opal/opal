@@ -82,7 +82,7 @@ module Opal
 
       def super_block_invocation
         chain, cur_defn, mid = scope.super_chain
-        trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
+        trys = chain.map { |c| "#{c}[Opal.s.$$def]" }.join(' || ')
         "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
       end
 

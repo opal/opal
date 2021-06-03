@@ -19,7 +19,7 @@ module Opal
           line 'if ($kwargs == null) {'
           line '  $kwargs = $hash2([], {});'
           line '} else if (!$kwargs[Opal.s.$$is_hash]) {'
-          line "  throw Opal.ArgumentError.$new('expected kwargs');"
+          line "  throw Opal.ArgumentError[Opal.s.$new]('expected kwargs');"
           line '}'
         end
       end

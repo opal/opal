@@ -159,7 +159,7 @@ class File < IO
     if block_given?
       `
         __fs__.realpath(#{pathname}, #{cache}, function(error, realpath){
-          if (error) Opal.IOError.$new(error.message)
+          if (error) Opal.IOError[Opal.s.$new](error.message)
           else #{block.call(`realpath`)}
         })
         `

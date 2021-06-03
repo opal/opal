@@ -149,7 +149,7 @@ module Opal
           push('/(?:)/')
         when %r{\?<\w+\>}
           message = "named captures are not supported in javascript: #{value.inspect}"
-          push "self.$raise(new SyntaxError('#{message}'))"
+          push "self[Opal.s.$raise](new SyntaxError('#{message}'))"
         else
           push "#{Regexp.new(value).inspect}#{flags.join}"
         end
@@ -275,7 +275,7 @@ module Opal
       end
 
       def compile_range_initialize
-        push 'Opal.Range.$new(', expr(start), ', ', expr(finish), ', false)'
+        push 'Opal.Range[Opal.s.$new](', expr(start), ', ', expr(finish), ', false)'
       end
     end
 
@@ -287,7 +287,7 @@ module Opal
       end
 
       def compile_range_initialize
-        push 'Opal.Range.$new(', expr(start), ',', expr(finish), ', true)'
+        push 'Opal.Range[Opal.s.$new](', expr(start), ',', expr(finish), ', true)'
       end
     end
 
@@ -299,7 +299,7 @@ module Opal
       children :value
 
       def compile
-        push "Opal.Rational.$new(#{value.numerator}, #{value.denominator})"
+        push "Opal.Rational[Opal.s.$new](#{value.numerator}, #{value.denominator})"
       end
     end
 
@@ -311,7 +311,7 @@ module Opal
       children :value
 
       def compile
-        push "Opal.Complex.$new(#{value.real}, #{value.imag})"
+        push "Opal.Complex[Opal.s.$new](#{value.real}, #{value.imag})"
       end
     end
   end

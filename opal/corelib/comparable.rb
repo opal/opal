@@ -15,7 +15,7 @@ module Comparable
       #{
         case `rhs`
         when nil, true, false, Integer, Float
-          `class_name = rhs.$inspect()`
+          `class_name = rhs[Opal.s.$inspect]()`
         else
           `class_name = rhs[Opal.s.$$class]`
         end
@@ -34,13 +34,13 @@ module Comparable
     return true if equal?(other)
 
     %x{
-      if (self["$<=>"] == Opal.Kernel["$<=>"]) {
+      if (self[Opal.s["$<=>"]] == Opal.Kernel[Opal.s["$<=>"]]) {
         return false;
       }
 
       // check for infinite recursion
-      if (self.$$comparable) {
-        delete self.$$comparable;
+      if (self[Opal.s.$$comparable]) {
+        delete self[Opal.s.$$comparable];
         return false;
       }
     }

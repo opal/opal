@@ -377,7 +377,7 @@ module Marshal
       value = object.marshal_dump
       klass = object.class
       append('U')
-      namespace = `#{klass}.$$base_module`
+      namespace = `#{klass}[Opal.s.$$base_module]`
       if namespace.equal?(Object)
         append_symbol(`#{klass}[Opal.s.$$name]`)
       else

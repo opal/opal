@@ -141,7 +141,7 @@ module Opal
 
           identity = scope.identity
 
-          line "if (#{identity}[Opal.s.$$is_lambda] || #{identity}.$$define_meth) {"
+          line "if (#{identity}[Opal.s.$$is_lambda] || #{identity}[Opal.s.$$define_meth]) {"
           line '  var $arity = arguments.length;'
           line "  if (#{arity_checks.join(' || ')}) { Opal.block_ac($arity, #{arity}, #{context}); }"
           line '}'

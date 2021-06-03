@@ -11,7 +11,7 @@ RSpec.describe Opal::Compiler do
 
   describe 'requiring' do
     it 'calls #require' do
-      expect_compiled("require 'pippo'").to include('self.$require("pippo")')
+      expect_compiled("require 'pippo'").to include('self[Opal.s.$require]("pippo")')
     end
   end
 
@@ -48,11 +48,11 @@ RSpec.describe Opal::Compiler do
   end
 
   it "adds method missing stubs" do
-    expect_compiled("self.puts 'hello'").to include("Opal.add_stubs(['$puts'])")
+    expect_compiled("self.puts 'hello'").to include("Opal.add_stubs([Opal.s('$puts')])")
   end
 
   it 'adds method missing stubs with operators' do
-    expect_compiled("class Foo; end; Foo.new > 5").to include("Opal.add_stubs(['$>', '$new'])")
+    expect_compiled("class Foo; end; Foo.new > 5").to include("Opal.add_stubs([Opal.s('$>'), Opal.s('$new')])")
   end
 
   it "should compile constant lookups" do
@@ -61,8 +61,8 @@ RSpec.describe Opal::Compiler do
   end
 
   it "should compile undef calls" do
-    expect_compiled("undef a").to include("Opal.udef(self, '$' + \"a\")")
-    expect_compiled("undef a,b").to match(/Opal.udef\(self, '\$' \+ "a"\);.*Opal.udef\(self, '\$' \+ "b"\);/m)
+    expect_compiled("undef a").to include("Opal.udef(self, Opal.s['$' + \"a\"])")
+    expect_compiled("undef a,b").to match(/Opal.udef\(self, Opal.s['\$' \+ "a"\]);.*Opal.udef\(self, Opal.s['\$' \+ "b"\]);/m)
   end
 
   describe "method names" do

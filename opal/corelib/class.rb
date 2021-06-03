@@ -4,11 +4,11 @@ class Class
   def self.new(superclass = Object, &block)
     %x{
       if (!superclass[Opal.s.$$is_class]) {
-        throw Opal.TypeError.$new("superclass must be a Class");
+        throw Opal.TypeError[Opal.s.$new]("superclass must be a Class");
       }
 
       var klass = Opal.allocate_class(nil, superclass);
-      superclass.$inherited(klass);
+      superclass[Opal.s.$inherited](klass);
       #{`klass`.class_eval(&block) if block_given?}
       return klass;
     }
@@ -29,14 +29,14 @@ class Class
     initialize_copy(original)
     %x{
       self[Opal.s.$$name] = null;
-      self.$$full_name = null;
+      self[Opal.s.$$full_name] = null;
     }
   end
 
   def new(*args, &block)
     %x{
       var object = #{allocate};
-      Opal.send(object, object.$initialize, args, block);
+      Opal.send(object, object[Opal.s.$initialize], args, block);
       return object;
     }
   end

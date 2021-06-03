@@ -11,7 +11,7 @@ module Opal
 
       def compile
         children.each do |child|
-          line "Opal.udef(self, '$' + ", expr(child), ');'
+          line "Opal.udef(self, Opal.s('$' + ", expr(child), '));'
         end
       end
     end

@@ -95,7 +95,7 @@ module JSON
     options[:object_class] ||= Hash
     options[:array_class]  ||= Array
 
-    `to_opal(js_object, options.$$smap)`
+    `to_opal(js_object, options[Opal.s.$$smap])`
   end
 
   def self.generate(obj, options = {})
@@ -155,11 +155,11 @@ class Hash
     %x{
       var result = [];
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = self[Opal.s.$$keys], length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
         if (key[Opal.s.$$is_string]) {
-          value = self.$$smap[key];
+          value = self[Opal.s.$$smap][key];
         } else {
           value = key.value;
           key = key.key;

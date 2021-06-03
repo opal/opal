@@ -584,7 +584,7 @@ class Date
         return #{to_s};
       }
 
-      return #{@date}.$strftime(#{format});
+      return #{@date}[Opal.s.$strftime](#{format});
     }
   end
 

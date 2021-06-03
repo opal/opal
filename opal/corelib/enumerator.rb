@@ -5,7 +5,7 @@ require 'corelib/enumerable'
 class Enumerator
   include Enumerable
 
-  `self[Opal.s.$$prototype].$$is_enumerator = true`
+  `self[Opal.s.$$prototype][Opal.s.$$is_enumerator] = true`
 
   def self.for(object, method = :each, *args, &block)
     %x{
@@ -64,7 +64,7 @@ class Enumerator
     %x{
       var result, index = offset;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)},
             value = block(param, index);
 
@@ -73,7 +73,7 @@ class Enumerator
         return value;
       }
 
-      return self.$each();
+      return self[Opal.s.$each]();
     }
   end
 
@@ -116,7 +116,7 @@ class Enumerator
         }
         catch (e) {
           if (e === $breaker) {
-            return $breaker.$v;
+            return $breaker[Opal.s.$v];
           }
           else {
             throw e;

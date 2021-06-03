@@ -32,10 +32,10 @@ module Opal
           scope_name  = scope.identity
           yielder     = scope.block_name || '$yield'
 
-          add_temp "$iter = #{scope_name}.$$p"
+          add_temp "$iter = #{scope_name}[Opal.s.$$p]"
           add_temp "#{yielder} = $iter || nil"
 
-          line "if ($iter) #{scope_name}.$$p = null;"
+          line "if ($iter) #{scope_name}[Opal.s.$$p] = null;"
         end
       end
 

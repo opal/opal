@@ -20,7 +20,7 @@ module Kernel
   def <=>(other)
     %x{
       // set guard for infinite recursion
-      self.$$comparable = true;
+      self[Opal.s.$$comparable] = true;
 
       var x = #{self == other};
 
@@ -34,13 +34,13 @@ module Kernel
 
   def method(name)
     %x{
-      var meth = self['$' + name];
+      var meth = self[Opal.s('$' + name)];
 
-      if (!meth || meth.$$stub) {
+      if (!meth || meth[Opal.s.$$stub]) {
         #{raise NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
       }
 
-      return #{Method.new(self, `meth.$$owner || #{self.class}`, `meth`, name)};
+      return #{Method.new(self, `meth[Opal.s.$$owner] || #{self.class}`, `meth`, name)};
     }
   end
 
@@ -133,7 +133,7 @@ module Kernel
       if (other.hasOwnProperty(Opal.s.$$meta)) {
         var other_singleton_class = Opal.get_singleton_class(other);
         var self_singleton_class = Opal.get_singleton_class(self);
-        names = Object.getOwnPropertyNames(other_singleton_class[Opal.s.$$prototype]);
+        names = Opal.getOwnProperties(other_singleton_class[Opal.s.$$prototype]);
 
         for (i = 0, length = names.length; i < length; i++) {
           name = names[i];
@@ -149,9 +149,9 @@ module Kernel
         );
       }
 
-      for (i = 0, names = Object.getOwnPropertyNames(other), length = names.length; i < length; i++) {
+      for (i = 0, names = Opal.getOwnProperties(other), length = names.length; i < length; i++) {
         name = names[i];
-        if (name.charAt(0) === '$' && name.charAt(1) !== '$' && other.hasOwnProperty(name)) {
+        if (name.description.charAt(0) === '$' && name.description.charAt(1) !== '$' && other.hasOwnProperty(name)) {
           self[name] = other[name];
         }
       }
@@ -574,7 +574,7 @@ module Kernel
         }
 
         if (max % 1 !== 0) {
-          max = max.$to_i();
+          max = max[Opal.s.$to_i]();
         }
 
         if (max === 0) {
@@ -587,13 +587,13 @@ module Kernel
 
   def respond_to?(name, include_all = false)
     %x{
-      var body = self['$' + name];
+      var body = self[Opal.s('$' + name)];
 
-      if (typeof(body) === "function" && !body.$$stub) {
+      if (typeof(body) === "function" && !body[Opal.s.$$stub]) {
         return true;
       }
 
-      if (self['$respond_to_missing?'].$$pristine === true) {
+      if (self[Opal.s['$respond_to_missing?']][Opal.s.$$pristine] === true) {
         return false;
       } else {
         return #{respond_to_missing?(name, include_all)};

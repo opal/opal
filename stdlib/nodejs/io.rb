@@ -8,7 +8,7 @@
           error.code === 'EMFILE' ||
           error.code === 'ENOENT' ||
           error.code === 'EPERM') {
-        throw Opal.IOError.$new(error.message)
+        throw Opal.IOError[Opal.s.$new](error.message)
       }
       throw error;
     }

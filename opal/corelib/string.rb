@@ -119,7 +119,7 @@ class String < `String`
       if (other[Opal.s.$$is_string]) {
         return self.toString() === other.toString();
       }
-      if ($respond_to(other, '$to_str')) {
+      if ($respond_to(other, Opal.s.$to_str)) {
         return #{other == self};
       }
       return false;
@@ -477,7 +477,7 @@ class String < `String`
   def end_with?(*suffixes)
     %x{
       for (var i = 0, length = suffixes.length; i < length; i++) {
-        var suffix = $coerce_to(suffixes[i], #{String}, 'to_str').$to_s();
+        var suffix = $coerce_to(suffixes[i], #{String}, 'to_str')[Opal.s.$to_s]();
 
         if (self.length >= suffix.length &&
             self.substr(self.length - suffix.length, suffix.length) == suffix) {
@@ -1054,7 +1054,7 @@ class String < `String`
       if (pattern[Opal.s.$$is_regexp]) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
-        pattern = $coerce_to(pattern, #{String}, 'to_str').$to_s();
+        pattern = $coerce_to(pattern, #{String}, 'to_str')[Opal.s.$to_s]();
         if (pattern === ' ') {
           pattern = /\s+/gm;
           string = string.replace(/^\s+/, '');
@@ -1152,7 +1152,7 @@ class String < `String`
             #{$~ = nil}
           }
         } else {
-          var prefix = $coerce_to(prefixes[i], #{String}, 'to_str').$to_s();
+          var prefix = $coerce_to(prefixes[i], #{String}, 'to_str')[Opal.s.$to_s]();
 
           if (self.indexOf(prefix) === 0) {
             return true;
@@ -1350,14 +1350,14 @@ class String < `String`
 
         if (recv == null) recv = nil;
 
-        var body = recv[#{method_name}];
+        var body = recv[Opal.s(#{method_name})];
 
         if (!body) {
-          return recv.$method_missing.apply(recv, args);
+          return recv[Opal.s.$method_missing].apply(recv, args);
         }
 
         if (typeof block === 'function') {
-          body.$$p = block;
+          body[Opal.s.$$p] = block;
         }
 
         if (args.length === 1) {
@@ -1379,8 +1379,8 @@ class String < `String`
 
   def tr(from, to)
     %x{
-      from = $coerce_to(from, #{String}, 'to_str').$to_s();
-      to = $coerce_to(to, #{String}, 'to_str').$to_s();
+      from = $coerce_to(from, #{String}, 'to_str')[Opal.s.$to_s]();
+      to = $coerce_to(to, #{String}, 'to_str')[Opal.s.$to_s]();
 
       if (from.length == 0 || from === to) {
         return self;
@@ -1524,8 +1524,8 @@ class String < `String`
 
   def tr_s(from, to)
     %x{
-      from = $coerce_to(from, #{String}, 'to_str').$to_s();
-      to = $coerce_to(to, #{String}, 'to_str').$to_s();
+      from = $coerce_to(from, #{String}, 'to_str')[Opal.s.$to_s]();
+      to = $coerce_to(to, #{String}, 'to_str')[Opal.s.$to_s]();
 
       if (from.length == 0) {
         return self;

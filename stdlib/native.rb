@@ -94,14 +94,14 @@ module Native
           return block.apply(self, #{args});
         }
 
-        var self_ = block.$$s;
-        block.$$s = null;
+        var self_ = block[Opal.s.$$s];
+        block[Opal.s.$$s] = null;
 
         try {
           return block.apply(#{instance}, #{args});
         }
         finally {
-          block.$$s = self_;
+          block[Opal.s.$$s] = self_;
         }
       }
     }
@@ -537,8 +537,8 @@ class Hash
       if (defaults != null &&
            (defaults.constructor === undefined ||
              defaults.constructor === Object)) {
-        var smap = self.$$smap,
-            keys = self.$$keys,
+        var smap = self[Opal.s.$$smap],
+            keys = self[Opal.s.$$keys],
             key, value;
 
         for (key in defaults) {
@@ -578,8 +578,8 @@ class Hash
   def to_n
     %x{
       var result = {},
-          keys = self.$$keys,
-          smap = self.$$smap,
+          keys = self[Opal.s.$$keys],
+          smap = self[Opal.s.$$smap],
           key, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
@@ -611,7 +611,7 @@ end
 class Class
   def native_alias(new_jsid, existing_mid)
     %x{
-      var aliased = #{self}.prototype['$' + #{existing_mid}];
+      var aliased = #{self}.prototype[Opal.s('$' + #{existing_mid})];
       if (!aliased) {
         #{raise NameError.new("undefined method `#{existing_mid}' for class `#{inspect}'", existing_mid)};
       }
@@ -621,7 +621,7 @@ class Class
 
   def native_class
     native_module
-    `self["new"] = self.$new`
+    `self["new"] = self[Opal.s.$new]`
   end
 end
 

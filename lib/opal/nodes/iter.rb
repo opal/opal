@@ -17,7 +17,7 @@ module Opal
 
         in_scope do
           identity = scope.identify!
-          add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s"
+          add_temp "self = #{identity}[Opal.s.$$s] == null ? this : #{identity}[Opal.s.$$s]"
 
           inline_params = process(inline_args)
 
@@ -32,12 +32,12 @@ module Opal
         unshift to_vars
 
         unshift "(#{identity} = function(", inline_params, '){'
-        push "}, #{identity}.$$s = self,"
-        push " #{identity}.$$brk = $brk," if contains_break?
-        push " #{identity}.$$arity = #{arity},"
+        push "}, #{identity}[Opal.s.$$s] = self,"
+        push " #{identity}[Opal.s.$$brk] = $brk," if contains_break?
+        push " #{identity}[Opal.s.$$arity] = #{arity},"
 
         if compiler.arity_check?
-          push " #{identity}.$$parameters = #{parameters_code},"
+          push " #{identity}[Opal.s.$$parameters] = #{parameters_code},"
         end
 
         # MRI expands a passed argument if the block:
@@ -49,11 +49,11 @@ module Opal
         # This flag on the method indicates that a block has a top level mlhs argument
         # which means that we have to expand passed array explicitly in runtime.
         if has_top_level_mlhs_arg?
-          push " #{identity}.$$has_top_level_mlhs_arg = true,"
+          push " #{identity}[Opal.s.$$has_top_level_mlhs_arg] = true,"
         end
 
         if has_trailing_comma_in_args?
-          push " #{identity}.$$has_trailing_comma_in_args = true,"
+          push " #{identity}[Opal.s.$$has_trailing_comma_in_args] = true,"
         end
 
         push " #{identity})"
@@ -65,8 +65,8 @@ module Opal
           scope.add_temp block_arg
           scope_name = scope.identify!
 
-          line "#{block_arg} = #{scope_name}.$$p || nil;"
-          line "if (#{block_arg}) #{scope_name}.$$p = null;"
+          line "#{block_arg} = #{scope_name}[Opal.s.$$p] || nil;"
+          line "if (#{block_arg}) #{scope_name}[Opal.s.$$p] = null;"
         end
       end
 

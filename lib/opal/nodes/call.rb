@@ -139,7 +139,7 @@ module Opal
         if iter_has_break?
           unshift 'return '
           unshift '(function(){var $brk = Opal.new_brk(); try {'
-          line '} catch (err) { if (err === $brk) { return err.$v } else { throw err } }})()'
+          line '} catch (err) { if (err === $brk) { return err[Opal.s.$v] } else { throw err } }})()'
         end
       end
 
@@ -225,7 +225,7 @@ module Opal
           dir = File.dirname(file)
           compiler.requires << Pathname(dir).join(arg.children[0]).cleanpath.to_s
         end
-        push fragment("self.$require(#{file.inspect}+ '/../' + ")
+        push fragment("self[Opal.s.$require](#{file.inspect}+ '/../' + ")
         push process(arglist)
         push fragment(')')
       end
@@ -283,14 +283,14 @@ module Opal
 
       add_special :nesting do |compile_default|
         push_nesting = push_nesting?
-        push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
+        push '(Opal.Module[Opal.s.$$nesting] = $nesting, ' if push_nesting
         compile_default.call
         push ')' if push_nesting
       end
 
       add_special :constants do |compile_default|
         push_nesting = push_nesting?
-        push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
+        push '(Opal.Module[Opal.s.$$nesting] = $nesting, ' if push_nesting
         compile_default.call
         push ')' if push_nesting
       end
