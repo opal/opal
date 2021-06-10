@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'shellwords'
 require 'opal/paths'
 require 'opal/cli_runners/system_runner'
 
@@ -14,10 +15,13 @@ module Opal
         argv = data[:argv].dup.to_a
         argv.unshift('--') if argv.any?
 
+        opts = Shellwords.shellwords(ENV['NODE_OPTS'] || "")
+
         SystemRunner.call(data) do |tempfile|
           [
             'node',
             '--require', "#{__dir__}/source-map-support-node",
+            *opts,
             tempfile.path,
             *argv
           ]
