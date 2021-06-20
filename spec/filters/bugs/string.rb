@@ -142,7 +142,6 @@ opal_filter "String" do
   fails "String#chop returns String instances when called on a subclass" # Expected "hello" (StringSpecs::MyString) to be an instance of String
   fails "String#clone calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#clone copies singleton methods" # NoMethodError: undefined method `special' for "string"
-  fails "String#codepoints is synonymous with #bytes for Strings which are single-byte optimizable" # Expected [40, 41, 123, 125] to equal [40, 0, 41, 0, 123, 0, 125, 0]
   fails "String#concat when self is BINARY and argument is US-ASCII uses BINARY encoding" # NoMethodError: undefined method `concat' for "abc"
   fails "String#concat with Integer returns a BINARY string if self is US-ASCII and the argument is between 128-255 (inclusive)" # NoMethodError: undefined method `concat' for ""
   fails "String#delete returns String instances when called on a subclass" # Expected "oh no" (StringSpecs::MyString) to be an instance of String
@@ -179,7 +178,6 @@ opal_filter "String" do
   fails "String#dup calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string" # Expected nil to equal 10
-  fails "String#each_codepoint is synonymous with #bytes for Strings which are single-byte optimizable" # Expected [40, 41, 123, 125] to equal [40, 0, 41, 0, 123, 0, 125, 0]
   fails "String#each_grapheme_cluster is unicode aware" # NoMethodError: undefined method `each_grapheme_cluster' for "Ç∂éƒg"
   fails "String#each_grapheme_cluster passes each char in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
   fails "String#each_grapheme_cluster passes each grapheme cluster in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "ab🏳️\u200D🌈🐾"
