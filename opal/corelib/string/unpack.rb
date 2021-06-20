@@ -46,7 +46,7 @@ class String
       var utf8 = [];
       for (var i=0; i < string.length; i++) {
         var charcode = string.charCodeAt(i);
-        if (charcode < 0x100) utf8.push(charcode);
+        if (charcode < 0x80) utf8.push(charcode);
         else if (charcode < 0x800) {
           utf8.push(0xc0 | (charcode >> 6),
                     0x80 | (charcode & 0x3f));
