@@ -202,4 +202,7 @@ opal_unsupported_filter "Time" do
   fails "Time.utc ignores fractional seconds if a passed fractional number of microseconds"
   fails "Time.utc ignores fractional seconds if a passed whole number of microseconds"
   fails "Time.utc returns subclass instances"
+  fails_badly "Marshal.load for a Time loads the zone" # Seasonal failure
+  fails_badly "Time#inspect formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'" # Seasonal failure
+  fails_badly "Time#to_s formats the local time following the pattern 'yyyy-MM-dd HH:mm:ss Z'" # Seasonal failure
 end

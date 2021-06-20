@@ -51,8 +51,6 @@ opal_filter "Float" do
   fails "Float#round rounds self to an optionally given precision with a half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
   fails "Float#round when 0.0 is given returns 0 for 0 or undefined ndigits" # TypeError: no implicit conversion of Hash into Integer
   fails "Float#round when 0.0 is given returns self for positive ndigits" # Expected "0" == "0.0" to be truthy but was false
-  fails "Float#to_i returns self truncated to an Integer"
-  fails "Float#to_int returns self truncated to an Integer"
   fails "Float#to_s encoding returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Float#to_s encoding returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Float#to_s matches random examples in all ranges" # Expected "4.9247416523566613e-8" to equal "4.9247416523566613e-08"
