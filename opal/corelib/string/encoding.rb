@@ -208,13 +208,12 @@ Encoding.register 'UTF-32LE' do
   end
 end
 
-Encoding.register 'ASCII-8BIT', aliases: ['BINARY', 'US-ASCII', 'ASCII'], ascii: true, dummy: true do
+Encoding.register 'ASCII-8BIT', aliases: ['BINARY', 'US-ASCII', 'ASCII'], ascii: true do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
         var code = string.charCodeAt(i);
         #{yield `code & 0xff`};
-        #{yield `code >> 8`};
       }
     }
   end
