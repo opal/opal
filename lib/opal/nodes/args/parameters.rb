@@ -58,6 +58,10 @@ module Opal
           %{['block', '#{arg_name}']}
         end
 
+        def on_kwnilarg
+          %{['nokey']}
+        end
+
         def on_shadowarg(_arg_name); end
       end
     end
