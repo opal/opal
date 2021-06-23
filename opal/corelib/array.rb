@@ -2169,7 +2169,14 @@ class Array < `Array`
   end
 
   def to_a
-    self.class == Array ? self : Array.new(self)
+    %x{
+      if (self.$$class === Opal.Array) {
+        return self;
+      }
+      else {
+        return Opal.Array.$new(self);
+      }
+    }
   end
 
   def to_ary
