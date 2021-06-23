@@ -196,7 +196,7 @@ class Array < `Array`
         result = result.concat(converted);
       }
 
-      return toArraySubclass(result, #{self.class});
+      return result;
     }
   end
 
@@ -361,7 +361,7 @@ class Array < `Array`
       }
 
       result = self.slice(from, to);
-      return toArraySubclass(result, self.$class());
+      return result;
     }
 
     function $array_slice_index_length(self, index, length) {
@@ -394,7 +394,7 @@ class Array < `Array`
 
         result = self.slice(index, index + length);
       }
-      return toArraySubclass(result, self.$class());
+      return result;
     }
   }
 
@@ -883,7 +883,9 @@ class Array < `Array`
     self
   end
 
-  alias difference -
+  def difference(*arrays)
+    arrays.reduce(to_a.dup) { |a, b| a - b }
+  end
 
   def dig(idx, *idxs)
     item = self[idx]
@@ -1180,7 +1182,7 @@ class Array < `Array`
         level = $coerce_to(level, #{Integer}, 'to_int');
       }
 
-      return toArraySubclass(_flatten(self, level), #{self.class});
+      return _flatten(self, level);
     }
   end
 
@@ -1335,7 +1337,9 @@ class Array < `Array`
     }
   end
 
-  alias intersection &
+  def intersection(*arrays)
+    arrays.reduce(to_a.dup) { |a, b| a & b }
+  end
 
   def join(sep = nil)
     return '' if `self.length === 0`
@@ -2165,10 +2169,19 @@ class Array < `Array`
   end
 
   def to_a
-    self
+    %x{
+      if (self.$$class === Opal.Array) {
+        return self;
+      }
+      else {
+        return Opal.Array.$new(self);
+      }
+    }
   end
 
-  alias to_ary to_a
+  def to_ary
+    self
+  end
 
   def to_h(&block)
     array = self
@@ -2224,7 +2237,9 @@ class Array < `Array`
     result
   end
 
-  alias union |
+  def union(*arrays)
+    arrays.reduce(uniq) { |a, b| a | b }
+  end
 
   def uniq(&block)
     %x{
@@ -2248,7 +2263,7 @@ class Array < `Array`
         }
       }
 
-      return toArraySubclass(#{`hash`.values}, #{self.class});
+      return #{`hash`.values};
     }
   end
 
