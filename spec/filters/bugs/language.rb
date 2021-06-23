@@ -128,8 +128,6 @@ opal_filter "language" do
   fails "Literal (A::X) constant resolution uses the module or class #inspect to craft the error message if they are anonymous" # Expected NameError (/uninitialized constant <unusable info>::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50c0>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution uses the module or class #name to craft the error message" # Expected NameError (/uninitialized constant ModuleName::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50ba>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution with dynamically assigned constants evaluates the right hand side before evaluating a constant path"
-  fails "Literal Ranges creates beginless ranges" # Opal::SyntaxError: undefined method `type' for nil
-  fails "Literal Ranges creates endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Literal Regexps caches the Regexp object"
   fails "Literal Regexps raises a RegexpError for lookbehind with specific characters" # Expected RegexpError but no exception was raised (0 was returned)
   fails "Literal Regexps support handling unicode 9.0 characters with POSIX bracket expressions" # Expected "" to equal "𐓘"
@@ -436,7 +434,6 @@ opal_filter "language" do
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
   fails "a method definition that sets more than one default parameter all to the same value only allows overriding the default value of the first such parameter in each set" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for -1)
   fails "a method definition that sets more than one default parameter all to the same value treats the argument after the multi-parameter normally" # ArgumentError: [MSpecEnv#bar] wrong number of arguments(3 for -1)
-  fails "delegation with def(...) parses as open endless Range when brackets are omitted" # Opal::SyntaxError: Unsupported sexp: forward_args
   fails "self in a metaclass body (class << obj) raises a TypeError for numbers"
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols"
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block"
