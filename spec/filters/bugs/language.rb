@@ -434,7 +434,6 @@ opal_filter "language" do
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
   fails "a method definition that sets more than one default parameter all to the same value only allows overriding the default value of the first such parameter in each set" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for -1)
   fails "a method definition that sets more than one default parameter all to the same value treats the argument after the multi-parameter normally" # ArgumentError: [MSpecEnv#bar] wrong number of arguments(3 for -1)
-  fails "delegation with def(...) parses as open endless Range when brackets are omitted" # Opal::SyntaxError: Unsupported sexp: forward_args
   fails "self in a metaclass body (class << obj) raises a TypeError for numbers"
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols"
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block"
