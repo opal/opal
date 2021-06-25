@@ -240,7 +240,7 @@ class String < `String`
   alias byteslice []
 
   def b
-    force_encoding('binary')
+    `new String(#{self})`.force_encoding('binary')
   end
 
   def capitalize
@@ -1852,6 +1852,10 @@ class String < `String`
 
   def unpack1(format)
     raise "To use String#unpack1, you must first require 'corelib/string/unpack'."
+  end
+
+  def frozen?
+    `typeof self === 'string'`
   end
 end
 

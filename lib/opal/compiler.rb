@@ -151,7 +151,7 @@ module Opal
 
     # @!method use_strict?
     #
-    # Adds source_location for every method definition
+    # Enables JavaScript's strict mode (i.e., adds 'use strict'; statement)
     compiler_option :use_strict, default: false, as: :use_strict?, magic_comment: true
 
     # @!method parse_comments?

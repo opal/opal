@@ -133,6 +133,7 @@ module Opal
         irb_enabled
         inline_operators
         enable_source_location
+        use_strict
         parse_comments
       ]
     end

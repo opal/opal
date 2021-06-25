@@ -232,6 +232,13 @@ class String
   `Opal.defineProperty(String.prototype, 'internal_encoding', #{Encoding::UTF_8})`
 
   def bytes
+    # REMIND: required when running in strict mode, otherwise the following error will be thrown:
+    # Cannot create property 'bytes' on string 'abc'
+    %x{
+      if (typeof self === 'string') {
+        return #{`new String(self)`.each_byte.to_a};
+      }
+    }
     @bytes ||= each_byte.to_a
     @bytes.dup
   end
