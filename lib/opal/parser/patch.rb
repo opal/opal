@@ -39,3 +39,12 @@ if RUBY_ENGINE == 'opal'
     end
   end
 end
+
+class Parser::Builders::Default
+  # string_value raises on invalid UTF-8 strings, like "\x80",
+  # otherwise it's the same as value.
+  undef string_value
+  def string_value(token)
+    value(token)
+  end
+end

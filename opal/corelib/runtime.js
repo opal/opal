@@ -905,7 +905,7 @@
 
     var ancestors = Opal.ancestors(module),
       i, length = ancestors.length;
-    
+
     for (i = 0; i < length; i++) {
       var ancestor = ancestors[i];
 
@@ -916,7 +916,7 @@
 
     if (!tolerant)
       throw Opal.NameError.$new('uninitialized class variable '+name+' in '+module.$name());
-    
+
     return nil;
   }
 
@@ -2483,17 +2483,20 @@
 
   // Sets the encoding on a string, will treat string literals as frozen strings
   // raising a FrozenError.
-  // @param str [String] the string on which the encoding should be set.
+  //
+  // @param str [String] the string on which the encoding should be set
   // @param name [String] the canonical name of the encoding
-  Opal.set_encoding = function(str, name) {
+  // @param type [String] possible values are either `"encoding"`, `"internal_encoding"`, or `undefined
+  Opal.set_encoding = function(str, name, type) {
+    if (typeof type === "undefined") type = "encoding";
     if (typeof str === 'string')
       throw Opal.FrozenError.$new("can't modify frozen String");
 
     var encoding = Opal.find_encoding(name);
 
-    if (encoding === str.encoding) { return str; }
+    if (encoding === str[type]) { return str; }
 
-    str.encoding = encoding;
+    str[type] = encoding;
 
     return str;
   };
@@ -2512,6 +2515,12 @@
     dup = Opal.set_encoding(dup, name);
     dup.internal_encoding = dup.encoding;
     return dup
+  }
+
+  // @returns a String object with the internal encoding set to Binary
+  Opal.binary = function(str) {
+    var dup = new String(str);
+    return Opal.set_encoding(dup, "binary", "internal_encoding");
   }
 
 

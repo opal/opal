@@ -16,9 +16,7 @@ describe 'String#unpack' do
   end
 
   it 'correctly unpacks with s* binary strings' do
-    # It should be: "\xc8\x01". I will try to work this out with
-    # parser in the following patch.
-    "\u00c8\u0001".encode("iso-8859-1").unpack('s*').should == [456]
+    "\xc8\x01".unpack('s*').should == [456]
     [678].pack('s').unpack('s').should == [678]
   end
 end
