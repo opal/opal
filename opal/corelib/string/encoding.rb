@@ -45,6 +45,10 @@ class Encoding
     @dummy
   end
 
+  def binary?
+    false
+  end
+
   def to_s
     @name
   end
@@ -214,7 +218,7 @@ Encoding.register 'UTF-16LE' do
   end
 end
 
-Encoding.register 'UTF-16BE' do
+Encoding.register 'UTF-16BE', inherits: Encoding::UTF_16LE do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -224,10 +228,6 @@ Encoding.register 'UTF-16BE' do
         #{yield `code & 0xff`};
       }
     }
-  end
-
-  def bytesize(string)
-    `string.length * 2`
   end
 end
 
@@ -239,14 +239,29 @@ Encoding.register 'UTF-32LE' do
 
         #{yield `code & 0xff`};
         #{yield `code >> 8`};
-        #{yield 0}
-        #{yield 0}
+        #{yield 0};
+        #{yield 0};
       }
     }
   end
 
   def bytesize(string)
     `string.length * 4`
+  end
+end
+
+Encoding.register 'UTF-32BE', inherits: Encoding::UTF_32LE do
+  def each_byte(string, &block)
+    %x{
+      for (var i = 0, length = string.length; i < length; i++) {
+        var code = string.charCodeAt(i);
+
+        #{yield 0};
+        #{yield 0};
+        #{yield `code >> 8`};
+        #{yield `code & 0xff`};
+      }
+    }
   end
 end
 
@@ -276,6 +291,10 @@ Encoding.register 'ASCII-8BIT', aliases: ['BINARY'], ascii: true do
 
   def bytesize(string)
     `string.length`
+  end
+
+  def binary?
+    true
   end
 end
 
