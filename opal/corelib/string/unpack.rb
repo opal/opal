@@ -681,6 +681,21 @@ class String
     %x{
       var output = [];
 
+      // A very optimized handler for U*.
+      if (format == "U*" &&
+          self.internal_encoding.name === "UTF-8" &&
+          typeof self.codePointAt === "function") {
+
+        var cp, j = 0;
+
+        output = new Array(self.length);
+        for (var i = 0; i < self.length; i++) {
+          cp = output[j++] = self.codePointAt(i);
+          if (cp > 0xffff) i++;
+        }
+        return output.slice(0, j);
+      }
+
       var buffer = self.$bytes();
 
 
