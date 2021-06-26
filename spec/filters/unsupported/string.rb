@@ -66,6 +66,48 @@ opal_unsupported_filter "String" do
   fails "String#[]= with Fixnum index, count raises an IndexError if |idx| is greater than the length of the string"
   fails "String#[]= with Fixnum index, count starts at idx and overwrites count characters before inserting the rest of other_str"
   fails "String#[]= with Fixnum index, count taints self if other_str is tainted"
+  fails "String#[]= with Integer index allows assignment to the zero'th element of an empty String" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index calls #to_int to convert the index" # Mock 'string element set' expected to receive to_int("any_args") exactly 1 times but received it 0 times
+  fails "String#[]= with Integer index calls #to_str to convert other to a String" # Mock '-test-' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "String#[]= with Integer index calls to_int on index" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index encodes the String in an encoding compatible with the replacement" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index raises IndexError if the string index doesn't match a position in the string" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises a FrozenError when self is frozen" # Expected FrozenError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises a TypeError if #to_int does not return an Integer" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises a TypeError if other_str can't be converted to a String" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises a TypeError if passed an Integer replacement" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises an Encoding::CompatibilityError if the replacement encoding is incompatible" # NameError: uninitialized constant Encoding::EUC_JP
+  fails "String#[]= with Integer index raises an IndexError if #to_int returns a value out of range" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises an IndexError if the index is greater than character size" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises an IndexError without changing self if idx is outside of self" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index replaces a character with a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index replaces a multibyte character with a character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index replaces a multibyte character with a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index replaces the char at idx with other_str" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index taints self if other_str is tainted" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count appends other_str to the end of the string if idx == the length of the string" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count calls #to_int to convert the index and count objects" # Mock 'string element set index' expected to receive to_int("any_args") exactly 1 times but received it 0 times
+  fails "String#[]= with Integer index, count calls #to_str to convert the replacement object" # Mock 'string element set replacement' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "String#[]= with Integer index, count counts negative idx values from end of the string" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count deletes a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count deletes characters if other_str is an empty string" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count deletes characters up to the maximum length of the existing string" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count encodes the String in an encoding compatible with the replacement" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count inserts a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count overwrites and deletes characters if count is more than the length of other_str" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count raises a TypeError if #to_int for count does not return an Integer" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises a TypeError if #to_int for index does not return an Integer" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises a TypeError if other_str is a type other than String" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises a TypeError of #to_str does not return a String" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises an Encoding::CompatibilityError if the replacement encoding is incompatible" # NameError: uninitialized constant Encoding::EUC_JP
+  fails "String#[]= with Integer index, count raises an IndexError if count < 0" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises an IndexError if the character index is out of range of a multibyte String" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises an IndexError if |idx| is greater than the length of the string" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count replaces characters with a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count replaces multibyte characters with characters" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count replaces multibyte characters with multibyte characters" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count starts at idx and overwrites count characters before inserting the rest of other_str" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count taints self if other_str is tainted" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with String index raises an IndexError if the search String is not found"
   fails "String#[]= with String index replaces characters with no characters"
   fails "String#[]= with String index replaces fewer characters with more characters"
@@ -91,6 +133,7 @@ opal_unsupported_filter "String" do
   fails "String#[]= with a Regexp index with 3 arguments checks the match index before calling #to_str to convert the replacement"
   fails "String#[]= with a Regexp index with 3 arguments raises IndexError if the specified capture isn't available"
   fails "String#[]= with a Regexp index with 3 arguments raises a TypeError if #to_int does not return a Fixnum"
+  fails "String#[]= with a Regexp index with 3 arguments raises a TypeError if #to_int does not return an Integer" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
   fails "String#[]= with a Regexp index with 3 arguments uses the 2nd of 3 arguments as which capture should be replaced"
   fails "String#[]= with a Regexp index with 3 arguments when the optional capture does not match raises an IndexError before setting the replacement"
   fails "String#capitalize taints resulting string when self is tainted"
@@ -101,13 +144,16 @@ opal_unsupported_filter "String" do
   fails "String#capitalize! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! full Unicode case mapping only capitalizes the first resulting character when upcasing a character produces a multi-character sequence" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! full Unicode case mapping updates string metadata" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for ASCII-only case mapping does not capitalize non-ASCII characters" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Lithuanian does not allow any other additional option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Turkic languages capitalizes ASCII characters according to Turkic semantics" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! raises a RuntimeError when self is frozen"
   fails "String#capitalize! returns nil when no changes are made"
   fails "String#center with length, padding taints result when self or padstr is tainted"
@@ -227,6 +273,7 @@ opal_unsupported_filter "String" do
   fails "String#downcase is locale insensitive (only replaces A-Z)"
   fails "String#downcase taints result when self is tainted"
   fails "String#downcase! ASCII-only case mapping does not downcase non-ASCII characters" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! case folding case folds special characters" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! does not allow invalid options" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
@@ -238,6 +285,7 @@ opal_unsupported_filter "String" do
   fails "String#downcase! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! full Unicode case mapping updates string metadata" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! modifies self in place for all of Unicode" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! modifies self in place"
   fails "String#downcase! raises a RuntimeError when self is frozen"
   fails "String#downcase! returns nil if no modifications were made"
@@ -442,6 +490,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! Range deletes and return the substring given by the offsets of the range"
   fails "String#slice! Range raises a RuntimeError on a frozen instance that is modified"
   fails "String#slice! Range raises a RuntimeError on a frozen instance that would not be modified"
+  fails "String#slice! Range returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! Range returns nil if the given range is out of self"
   fails "String#slice! Range returns subclass instances"
   fails "String#slice! Range returns the substring given by the character offsets of the range" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
@@ -451,6 +500,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! with Regexp doesn't taint self when regexp is tainted"
   fails "String#slice! with Regexp raises a RuntimeError on a frozen instance that is modified"
   fails "String#slice! with Regexp raises a RuntimeError on a frozen instance that would not be modified"
+  fails "String#slice! with Regexp returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with Regexp returns nil if there was no match"
   fails "String#slice! with Regexp returns subclass instances"
   fails "String#slice! with Regexp returns the matching portion of self with a multi byte character" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
@@ -461,6 +511,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! with Regexp, index deletes and returns the capture for idx from self"
   fails "String#slice! with Regexp, index doesn't taint self when regexp is tainted"
   fails "String#slice! with Regexp, index raises a RuntimeError if self is frozen"
+  fails "String#slice! with Regexp, index returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with Regexp, index returns nil if there is no capture for idx"
   fails "String#slice! with Regexp, index returns nil if there was no match"
   fails "String#slice! with Regexp, index returns subclass instances"
@@ -482,6 +533,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! with index, length calls to_int on idx and length"
   fails "String#slice! with index, length deletes and returns the substring at idx and the given length"
   fails "String#slice! with index, length raises a RuntimeError if self is frozen"
+  fails "String#slice! with index, length returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with index, length returns nil if the length is negative"
   fails "String#slice! with index, length returns subclass instances"
   fails "String#slice! with index, length returns the substring given by the character offsets" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
@@ -545,11 +597,14 @@ opal_unsupported_filter "String" do
   fails "String#swapcase! full Unicode case mapping adapted for Lithuanian does not allow any other additional option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! full Unicode case mapping updates string metadata" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for ASCII-only case mapping does not swapcase non-ASCII characters" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for all of Unicode" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for full Unicode case mapping adapted for Turkic languages swaps case of ASCII characters according to Turkic semantics" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place"
   fails "String#swapcase! raises a RuntimeError when self is frozen"
   fails "String#swapcase! returns nil if no modifications were made"
@@ -612,7 +667,9 @@ opal_unsupported_filter "String" do
   fails "String#upcase! does not allow the :fold option for upcasing" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! full Unicode case mapping updates string metadata for self" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for ASCII-only case mapping does not upcase non-ASCII characters" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for all of Unicode" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
@@ -620,6 +677,7 @@ opal_unsupported_filter "String" do
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Turkic languages upcases ASCII characters according to Turkic semantics" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place"
   fails "String#upcase! raises a RuntimeError when self is frozen"
   fails "String#upcase! returns nil if no modifications were made"
