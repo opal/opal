@@ -70,6 +70,11 @@ module Opal
             wrap "$enc(", ", \"#{encoding.name}\")"
           end
         end
+
+        unless value.valid_encoding?
+          helper :binary
+          wrap "$binary(", ")"
+        end
       end
 
       # http://www.2ality.com/2013/09/javascript-unicode.html
