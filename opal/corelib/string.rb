@@ -297,12 +297,6 @@ class String < `String`
     }
   end
 
-  def chars(&block)
-    return each_char.to_a unless block
-
-    each_char(&block)
-  end
-
   def chomp(separator = $/)
     return self if `separator === nil || self.length === 0`
 
@@ -422,18 +416,6 @@ class String < `String`
 
   def downcase
     `self.$$cast(self.toLowerCase())`
-  end
-
-  def each_char(&block)
-    return enum_for(:each_char) { size } unless block_given?
-
-    %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        Opal.yield1(block, self.charAt(i));
-      }
-    }
-
-    self
   end
 
   def each_line(separator = $/, &block)
@@ -666,10 +648,6 @@ class String < `String`
   def lines(separator = $/, &block)
     e = each_line(separator, &block)
     block ? self : e.to_a
-  end
-
-  def length
-    `self.length`
   end
 
   def ljust(width, padstr = ' ')
@@ -1029,8 +1007,6 @@ class String < `String`
       return (block !== nil ? self : result);
     }
   end
-
-  alias size length
 
   alias slice []
 

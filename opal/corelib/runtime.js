@@ -2509,7 +2509,7 @@
   // @returns a String object with the encoding set from a string literal
   Opal.enc = function(str, name) {
     var dup = new String(str);
-    Opal.set_encoding(dup, name);
+    dup = Opal.set_encoding(dup, name);
     dup.internal_encoding = dup.encoding;
     return dup
   }

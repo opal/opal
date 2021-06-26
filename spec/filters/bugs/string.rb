@@ -177,7 +177,6 @@ opal_filter "String" do
   fails "String#dump wraps string with \"" # NoMethodError: undefined method `dump' for "foo"
   fails "String#dup calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
-  fails "String#each_byte when no block is given returned enumerator size should return the bytesize of the string" # Expected nil to equal 10
   fails "String#each_grapheme_cluster is unicode aware" # NoMethodError: undefined method `each_grapheme_cluster' for "Ç∂éƒg"
   fails "String#each_grapheme_cluster passes each char in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
   fails "String#each_grapheme_cluster passes each grapheme cluster in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "ab🏳️\u200D🌈🐾"
@@ -203,7 +202,6 @@ opal_filter "String" do
   fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to ASCII-8BIT if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to BINARY if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#getbyte returns an Integer between 0 and 255" # NotImplementedError: NotImplementedError
   fails "String#grapheme_clusters is unicode aware" # NoMethodError: undefined method `grapheme_clusters' for "Ç∂éƒg"
   fails "String#grapheme_clusters passes each char in self to the given block" # NoMethodError: undefined method `grapheme_clusters' for "hello"
   fails "String#grapheme_clusters passes each grapheme cluster in self to the given block" # NoMethodError: undefined method `grapheme_clusters' for "ab🏳️\u200D🌈🐾"
