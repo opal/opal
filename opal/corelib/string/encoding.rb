@@ -6,12 +6,17 @@ class Encoding
     ascii = options[:ascii] || false
     dummy = options[:dummy] || false
 
-    encoding = new(name, names, ascii, dummy)
-    encoding.instance_eval(&block)
+    if options[:inherits]
+      encoding = options[:inherits].clone
+      encoding.initialize(name, names, ascii, dummy)
+    else
+      encoding = new(name, names, ascii, dummy)
+    end
+    encoding.instance_eval(&block) if block_given?
 
     register = `Opal.encodings`
     names.each do |encoding_name|
-      const_set encoding_name.sub('-', '_'), encoding
+      const_set encoding_name.tr('-', '_'), encoding
       register.JS[encoding_name] = encoding
     end
   end
@@ -49,6 +54,41 @@ class Encoding
   end
 
   # methods to implement per encoding
+  def charsize(string)
+    %x{
+      var len = 0;
+      for (var i = 0, length = string.length; i < length; i++) {
+        var charcode = string.charCodeAt(i);
+        if (!(charcode >= 0xD800 && charcode <= 0xDBFF)) {
+          len++;
+        }
+      }
+      return len;
+    }
+  end
+
+  def each_char(string, &block)
+    %x{
+      var low_surrogate = "";
+      for (var i = 0, length = string.length; i < length; i++) {
+        var charcode = string.charCodeAt(i);
+        var chr = string.charAt(i);
+        if (charcode >= 0xDC00 && charcode <= 0xDFFF) {
+          low_surrogate = chr;
+          continue;
+        }
+        else if (charcode >= 0xD800 && charcode <= 0xDBFF) {
+          chr = low_surrogate + chr;
+        }
+        if (string.encoding.name != "UTF-8") {
+          chr = new String(chr);
+          chr.encoding = string.encoding;
+        }
+        Opal.yield1(block, chr);
+      }
+    }
+  end
+
   def each_byte(*)
     raise NotImplementedError
   end
@@ -170,7 +210,7 @@ Encoding.register 'UTF-16LE' do
   end
 
   def bytesize(string)
-    string.bytes.length
+    `string.length * 2`
   end
 end
 
@@ -187,7 +227,7 @@ Encoding.register 'UTF-16BE' do
   end
 
   def bytesize(string)
-    string.bytes.length
+    `string.length * 2`
   end
 end
 
@@ -199,16 +239,32 @@ Encoding.register 'UTF-32LE' do
 
         #{yield `code & 0xff`};
         #{yield `code >> 8`};
+        #{yield 0}
+        #{yield 0}
       }
     }
   end
 
   def bytesize(string)
-    string.bytes.length
+    `string.length * 4`
   end
 end
 
-Encoding.register 'ASCII-8BIT', aliases: ['BINARY', 'US-ASCII', 'ASCII'], ascii: true do
+Encoding.register 'ASCII-8BIT', aliases: ['BINARY'], ascii: true do
+  def each_char(string, &block)
+    %x{
+      for (var i = 0, length = string.length; i < length; i++) {
+        var chr = new String(string.charAt(i));
+        chr.encoding = string.encoding;
+        #{yield `chr`};
+      }
+    }
+  end
+
+  def charsize(string)
+    `string.length`
+  end
+
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -219,9 +275,12 @@ Encoding.register 'ASCII-8BIT', aliases: ['BINARY', 'US-ASCII', 'ASCII'], ascii:
   end
 
   def bytesize(string)
-    string.bytes.length
+    `string.length`
   end
 end
+
+Encoding.register 'ISO-8859-1', aliases: ['ISO8859-1'], ascii: true, inherits: Encoding::ASCII_8BIT
+Encoding.register 'US-ASCII', aliases: ['ASCII'], ascii: true, inherits: Encoding::ASCII_8BIT
 
 class String
   attr_reader :encoding
@@ -229,6 +288,22 @@ class String
   `Opal.defineProperty(String.prototype, 'bytes', nil)`
   `Opal.defineProperty(String.prototype, 'encoding', #{Encoding::UTF_8})`
   `Opal.defineProperty(String.prototype, 'internal_encoding', #{Encoding::UTF_8})`
+
+  def b
+    force_encoding('binary')
+  end
+
+  def bytesize
+    @internal_encoding.bytesize(self)
+  end
+
+  def each_byte(&block)
+    return enum_for(:each_byte) { bytesize } unless block_given?
+
+    @internal_encoding.each_byte(self, &block)
+
+    self
+  end
 
   def bytes
     # REMIND: required when running in strict mode, otherwise the following error will be thrown:
@@ -238,20 +313,23 @@ class String
         return #{`new String(self)`.each_byte.to_a};
       }
     }
+
     @bytes ||= each_byte.to_a
     @bytes.dup
   end
 
-  def bytesize
-    @internal_encoding.bytesize(self)
-  end
+  def each_char(&block)
+    return enum_for(:each_char) { length } unless block_given?
 
-  def each_byte(&block)
-    return enum_for :each_byte unless block_given?
-
-    @internal_encoding.each_byte(self, &block)
+    @encoding.each_char(self, &block)
 
     self
+  end
+
+  def chars(&block)
+    return each_char.to_a unless block
+
+    each_char(&block)
   end
 
   def each_codepoint(&block)
@@ -276,16 +354,23 @@ class String
 
   def force_encoding(encoding)
     %x{
-      if (encoding === self.encoding) { return self; }
+      var str = self;
+
+      if (encoding === str.encoding) { return str; }
 
       encoding = #{Opal.coerce_to!(encoding, String, :to_s)};
       encoding = #{Encoding.find(encoding)};
 
-      if (encoding === self.encoding) { return self; }
+      if (encoding === str.encoding) { return str; }
 
-      Opal.set_encoding(self, encoding);
+      if (typeof str === "string") {
+        str = new String(str);
+        str.internal_encoding = self.internal_encoding;
+      }
 
-      return self;
+      str = Opal.set_encoding(str, encoding);
+
+      return str;
     }
   end
 
@@ -296,6 +381,12 @@ class String
 
     string_bytes[idx]
   end
+
+  def length
+    `self.length`
+  end
+
+  alias size length
 
   # stub
   def valid_encoding?
