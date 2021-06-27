@@ -3,6 +3,7 @@
 if RUBY_ENGINE != 'opal'
   require 'fileutils'
   require 'digest/sha2'
+  require 'zlib'
 end
 
 module Opal
@@ -25,12 +26,24 @@ module Opal
         if klass != Opal::BuilderProcessors::RubyProcessor || disabled?
           yield
         elsif File.exist?(file = cache_file_name(key))
-          Marshal.load(File.binread(file))
+          load_data(file)
         else
           compiler = yield
-          File.binwrite(file, Marshal.dump(compiler))
+          store_data(file, compiler)
           compiler
         end
+      end
+
+      private def store_data(file, data)
+        out = Marshal.dump(data)
+        out = Zlib.gzip(out, level: 9)
+        File.binwrite(file, out)
+      end
+
+      private def load_data(file)
+        out = File.binread(file)
+        out = Zlib.gunzip(out)
+        out = Marshal.load(out)
       end
 
       private def cache_directory_name
@@ -50,7 +63,7 @@ module Opal
       end
 
       private def cache_file_name(key)
-        "#{cache_directory_name}/#{runtime_hash}-#{hash key}.rbm"
+        "#{cache_directory_name}/#{runtime_hash}-#{hash key}.rbm.gz"
       end
 
       private def hash(object)
