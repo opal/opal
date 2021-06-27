@@ -2,6 +2,7 @@
 
 require 'opal/compiler'
 require 'opal/erb'
+require 'opal/cache'
 
 module Opal
   module BuilderProcessors
@@ -79,7 +80,7 @@ module Opal
       end
 
       def compiled
-        @compiled ||= begin
+        @compiled ||= Cache.find_key_or_exec(self.class, @filename, @source, @options) do
           compiler = compiler_for(@source, file: @filename)
           compiler.compile
           compiler
