@@ -9,9 +9,7 @@ opal_filter "Hash" do
   fails "Hash#[]= does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#[]= keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
   fails "Hash#compare_by_identity gives different identity for string literals" # Expected [2] to equal [1, 2]
-  fails "Hash#deconstruct_keys ignores argument" # NoMethodError: undefined method `deconstruct_keys' for {"a"=>1, "b"=>2}
-  fails "Hash#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: NoMethodError (undefined method `deconstruct_keys' for {"a"=>1})
-  fails "Hash#deconstruct_keys returns self" # NoMethodError: undefined method `deconstruct_keys' for {"a"=>1, "b"=>2}
+  fails "Hash#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: ArgumentError ([Hash#deconstruct_keys] wrong number of arguments(0 for 1))
   fails "Hash#delete allows removing a key while iterating" # Exception: Cannot read property '$$is_string' of undefined
   fails "Hash#each always yields an Array of 2 elements, even when given a callable of arity 2" # Expected ArgumentError but no exception was raised ({"a"=>1} was returned)
   fails "Hash#each yields 2 values and not an Array of 2 elements when given a callable of arity 2" # ArgumentError: [Object#foo] wrong number of arguments(1 for 2)
@@ -21,9 +19,6 @@ opal_filter "Hash" do
   fails "Hash#eql? computes equality for complex recursive hashes"
   fails "Hash#eql? computes equality for recursive hashes & arrays"
   fails "Hash#except always returns a Hash without a default" # NoMethodError: undefined method `except' for {"bar"=>12, "foo"=>42}
-  fails "Hash#except ignores keys not present in the original hash" # NoMethodError: undefined method `except' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#except returns a hash without the requested subset" # NoMethodError: undefined method `except' for {"a"=>1, "b"=>2, "c"=>3}
-  fails "Hash#except returns a new duplicate hash without arguments" # NoMethodError: undefined method `except' for {"a"=>1, "b"=>2, "c"=>3}
   fails "Hash#inspect calls #to_s on the object returned from #inspect if the Object isn't a String" # Expected "{\"a\"=>abc}" to equal "{:a=>abc}"
   fails "Hash#inspect does not call #to_s on a String returned from #inspect" # Expected "{\"a\"=>\"abc\"}" to equal "{:a=>\"abc\"}"
   fails "Hash#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0x30638>}" to match /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/
