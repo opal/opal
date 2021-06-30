@@ -33,17 +33,6 @@ class Array < `Array`
       return r;
     }
 
-    function unshiftOne(list, elem) {
-      var len = list.length - 1;
-      list.push(list[len]);
-      while (len > 0) {
-        list[len] = list[len - 1];
-        len--;
-      }
-      list[0] = elem;
-      return list.length;
-    }
-
     function toArraySubclass(obj, klass) {
       if (klass.$$name === Opal.Array) {
         return obj;
@@ -2302,12 +2291,23 @@ class Array < `Array`
 
   def unshift(*objects)
     %x{
-      for (var i = objects.length - 1; i >= 0; i--) {
-        unshiftOne(self, objects[i]);
+      var selfLength = self.length
+      var objectsLength = objects.length
+      if (objectsLength == 0) return self;
+      var index = selfLength - objectsLength
+      for (var i = 0; i < objectsLength; i++) {
+        self.push(self[index + i])
       }
+      var len = selfLength - 1
+      while (len - objectsLength >= 0) {
+        self[len] = self[len - objectsLength]
+        len--
+      }
+      for (var j = 0; j < objectsLength; j++) {
+        self[j] = objects[j]
+      }
+      return self;
     }
-
-    self
   end
 
   alias prepend unshift
