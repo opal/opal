@@ -97,127 +97,177 @@
 #       puts "got two json payloads: #{first}, #{second}"
 #     end
 #
+class Promise
+  def self.value(value)
+    new.resolve(value)
+  end
 
-class Promise < `Promise`
-  class << self
-    def allocate
-      ok, fail = nil, nil
+  def self.error(value)
+    new.reject(value)
+  end
 
-      prom = `new self.$$constructor(function(_ok, _fail) { #{ok} = _ok; #{fail} = _fail; })`
-      prom.instance_variable_set(:@type, :opal)
-      prom.instance_variable_set(:@resolve_proc, ok)
-      prom.instance_variable_set(:@reject_proc, fail)
-      prom
+  def self.when(*promises)
+    When.new(promises)
+  end
+
+  attr_reader :error, :prev, :next
+
+  def initialize(action = {})
+    @action = action
+
+    @realized  = false
+    @exception = false
+    @value     = nil
+    @error     = nil
+    @delayed   = false
+
+    @prev = nil
+    @next = []
+  end
+
+  def value
+    if Promise === @value
+      @value.value
+    else
+      @value
     end
+  end
 
-    def when(*promises)
-      promises = Array(promises.length == 1 ? promises.first : promises)
-      `Promise.all(#{promises})`.tap do |prom|
-        prom.instance_variable_set(:@type, :when)
+  def act?
+    @action.key?(:success) || @action.key?(:always)
+  end
+
+  def action
+    @action.keys
+  end
+
+  def exception?
+    @exception
+  end
+
+  def realized?
+    @realized != false
+  end
+
+  def resolved?
+    @realized == :resolve
+  end
+
+  def rejected?
+    @realized == :reject
+  end
+
+  def ^(promise)
+    promise << self
+    self >> promise
+
+    promise
+  end
+
+  def <<(promise)
+    @prev = promise
+
+    self
+  end
+
+  def >>(promise)
+    @next << promise
+
+    if exception?
+      promise.reject(@delayed[0])
+    elsif resolved?
+      promise.resolve(@delayed ? @delayed[0] : value)
+    elsif rejected?
+      if !@action.key?(:failure) || Promise === (@delayed ? @delayed[0] : @error)
+        promise.reject(@delayed ? @delayed[0] : error)
+      elsif promise.action.include?(:always)
+        promise.reject(@delayed ? @delayed[0] : error)
       end
     end
 
-    alias all when
-
-    def any(*promises)
-      promises = Array(promises.length == 1 ? promises.first : promises)
-      `Promise.any(#{promises})`.tap do |prom|
-        prom.instance_variable_set(:@type, :any)
-      end
-    end
-
-    def race(*promises)
-      promises = Array(promises.length == 1 ? promises.first : promises)
-      `Promise.race(#{promises})`.tap do |prom|
-        prom.instance_variable_set(:@type, :race)
-      end
-    end
-
-    def resolve(value = nil)
-      `Promise.resolve(#{value})`.tap do |prom|
-        prom.instance_variable_set(:@type, :resolve)
-        prom.instance_variable_set(:@realized, :resolve)
-        prom.instance_variable_set(:@value, value)
-      end
-    end
-    alias value resolve
-
-    def reject(value = nil)
-      `Promise.reject(#{value})`.tap do |prom|
-        prom.instance_variable_set(:@type, :reject)
-        prom.instance_variable_set(:@realized, :reject)
-        prom.instance_variable_set(:@value, value)
-      end
-    end
-    alias error reject
-  end
-
-  attr_reader :prev, :next
-
-  # Is this promise native to JavaScript? This means, that methods like resolve
-  # or reject won't be available.
-  def native?
-    @type != :opal
-  end
-
-  # Raise an exception when a non-JS-native method is called on a JS-native promise
-  def nativity_check!
-    raise ArgumentError, 'this promise is native to JavaScript' if native?
-  end
-
-  # Raise an exception when a non-JS-native method is called on a JS-native promise
-  # but permits some typed promises
-  def light_nativity_check!
-    return if %i[reject resolve trace always fail then].include? @type
-    raise ArgumentError, 'this promise is native to JavaScript' if native?
-  end
-
-  # Allow only one chain to be present, as needed by the previous implementation.
-  # This isn't a strict check - it's always possible on the JS side to chain a
-  # given block.
-  def there_can_be_only_one!
-    raise ArgumentError, 'a promise has already been chained' if @next && @next.any?
-  end
-
-  def gen_tracing_proc(passing, &block)
-    proc do |i|
-      res = passing.(i)
-      block.(res)
-      res
-    end
+    self
   end
 
   def resolve(value = nil)
-    nativity_check!
-    raise ArgumentError, 'this promise was already resolved' if @realized
-    @value = value
-    @realized = :resolve
-    @resolve_proc.(value)
+    if realized?
+      raise ArgumentError, 'the promise has already been realized'
+    end
+
+    if Promise === value
+      return (value << @prev) ^ self
+    end
+
+    begin
+      block = @action[:success] || @action[:always]
+      if block
+        value = block.call(value)
+      end
+
+      resolve!(value)
+    rescue Exception => e
+      exception!(e)
+    end
+
     self
   end
-  alias resolve! resolve
+
+  def resolve!(value)
+    @realized = :resolve
+    @value    = value
+
+    if @next.any?
+      @next.each { |p| p.resolve(value) }
+    else
+      @delayed = [value]
+    end
+  end
 
   def reject(value = nil)
-    nativity_check!
-    raise ArgumentError, 'this promise was already resolved' if @realized
-    @value = value
-    @realized = :reject
-    @reject_proc.(value)
+    if realized?
+      raise ArgumentError, 'the promise has already been realized'
+    end
+
+    if Promise === value
+      return (value << @prev) ^ self
+    end
+
+    begin
+      block = @action[:failure] || @action[:always]
+      if block
+        value = block.call(value)
+      end
+
+      if @action.key?(:always)
+        resolve!(value)
+      else
+        reject!(value)
+      end
+    rescue Exception => e
+      exception!(e)
+    end
+
     self
   end
-  alias reject! reject
+
+  def reject!(value)
+    @realized = :reject
+    @error    = value
+
+    if @next.any?
+      @next.each { |p| p.reject(value) }
+    else
+      @delayed = [value]
+    end
+  end
+
+  def exception!(error)
+    @exception = true
+
+    reject!(error)
+  end
 
   def then(&block)
-    prom = nil
-    blk = gen_tracing_proc(block) do |val|
-      prom.instance_variable_set(:@realized, :resolve)
-      prom.instance_variable_set(:@value, val)
-    end
-    prom = `self.then(#{blk})`
-    prom.instance_variable_set(:@prev, self)
-    prom.instance_variable_set(:@type, :then)
-    (@next ||= []) << prom
-    prom
+    self ^ Promise.new(success: block)
   end
 
   def then!(&block)
@@ -229,16 +279,7 @@ class Promise < `Promise`
   alias do! then!
 
   def fail(&block)
-    prom = nil
-    blk = gen_tracing_proc(block) do |val|
-      prom.instance_variable_set(:@realized, :resolve)
-      prom.instance_variable_set(:@value, val)
-    end
-    prom = `self.catch(#{blk})`
-    prom.instance_variable_set(:@prev, self)
-    prom.instance_variable_set(:@type, :fail)
-    (@next ||= []) << prom
-    prom
+    self ^ Promise.new(failure: block)
   end
 
   def fail!(&block)
@@ -252,16 +293,7 @@ class Promise < `Promise`
   alias catch! fail!
 
   def always(&block)
-    prom = nil
-    blk = gen_tracing_proc(block) do |val|
-      prom.instance_variable_set(:@realized, :resolve)
-      prom.instance_variable_set(:@value, val)
-    end
-    prom = `self.finally(#{blk})`
-    prom.instance_variable_set(:@prev, self)
-    prom.instance_variable_set(:@type, :always)
-    (@next ||= []) << prom
-    prom
+    self ^ Promise.new(always: block)
   end
 
   def always!(&block)
@@ -275,24 +307,7 @@ class Promise < `Promise`
   alias ensure! always!
 
   def trace(depth = nil, &block)
-    self.then do
-      values = []
-      prom = self
-      while prom && (!depth || depth > 0)
-        val = nil
-        begin
-          val = prom.value
-        rescue ArgumentError
-          val = :native
-        end
-        values.unshift(val)
-        depth -= 1 if depth
-        prom = prom.prev
-      end
-      yield(*values)
-    end.tap do |prom|
-      prom.instance_variable_set(:@type, :trace)
-    end
+    self ^ Trace.new(depth, block)
   end
 
   def trace!(*args, &block)
@@ -300,83 +315,132 @@ class Promise < `Promise`
     trace(*args, &block)
   end
 
-  def resolved?
-    light_nativity_check!
-    @realized == :resolve
-  end
-
-  def rejected?
-    light_nativity_check!
-    @realized == :reject
-  end
-
-  def realized?
-    light_nativity_check!
-    !@realized.nil?
-  end
-
-  def value
-    if resolved?
-      if Promise === @value
-        @value.value
-      else
-        @value
-      end
+  def there_can_be_only_one!
+    if @next.any?
+      raise ArgumentError, 'a promise has already been chained'
     end
   end
-
-  def error
-    light_nativity_check!
-    @value if rejected?
-  end
-
-  def and(*promises)
-    promises = promises.map do |i|
-      if Promise === i
-        i
-      else
-        Promise.value(i)
-      end
-    end
-    Promise.when(self, *promises).then do |a, *b|
-      [*a, *b]
-    end
-  end
-
-  def initialize(&block)
-    yield self if block_given?
-  end
-
-  alias to_n itself
-
-  #include Enumerable
-  #def each(&block)
-  #  return enum_for(:each) unless block_given?
-  #
-  #  self.then do |res|
-  #    res.each(&block)
-  #  end
-  #end
 
   def inspect
-    result = "#<#{self.class}"
+    result = "#<#{self.class}(#{object_id})"
 
-    if @type
-      result += ":#{@type}" unless %i[opal resolve reject].include? @type
-    else
-      result += ":native"
-    end
-
-    result += ":#{@realized}" if @realized
-    result += "(#{object_id})"
-
-    if @next && @next.any?
+    if @next.any?
       result += " >> #{@next.inspect}"
     end
 
-    result += ": #{@value.inspect}" if @value
-    result += ">"
+    result += if realized?
+                ": #{(@value || @error).inspect}>"
+              else
+                '>'
+              end
 
     result
+  end
+
+  class Trace < self
+    def self.it(promise)
+      current = []
+
+      if promise.act? || promise.prev.nil?
+        current.push(promise.value)
+      end
+
+      prev = promise.prev
+      if prev
+        current.concat(it(prev))
+      else
+        current
+      end
+    end
+
+    def initialize(depth, block)
+      @depth = depth
+
+      super success: proc {
+        trace = Trace.it(self).reverse
+        trace.pop
+
+        if depth && depth <= trace.length
+          trace.shift(trace.length - depth)
+        end
+
+        block.call(*trace)
+      }
+    end
+  end
+
+  class When < self
+    def initialize(promises = [])
+      super()
+
+      @wait = []
+
+      promises.each do |promise|
+        wait promise
+      end
+    end
+
+    def each(&block)
+      raise ArgumentError, 'no block given' unless block
+
+      self.then do |values|
+        values.each(&block)
+      end
+    end
+
+    def collect(&block)
+      raise ArgumentError, 'no block given' unless block
+
+      self.then do |values|
+        When.new(values.map(&block))
+      end
+    end
+
+    def inject(*args, &block)
+      self.then do |values|
+        values.reduce(*args, &block)
+      end
+    end
+
+    alias map collect
+
+    alias reduce inject
+
+    def wait(promise)
+      unless Promise === promise
+        promise = Promise.value(promise)
+      end
+
+      if promise.act?
+        promise = promise.then
+      end
+
+      @wait << promise
+
+      promise.always do
+        try if @next.any?
+      end
+
+      self
+    end
+
+    alias and wait
+
+    def >>(*)
+      super.tap do
+        try
+      end
+    end
+
+    def try
+      if @wait.all?(&:realized?)
+        promise = @wait.find(&:rejected?)
+        if promise
+          reject(promise.error)
+        else
+          resolve(@wait.map(&:value))
+        end
+      end
+    end
   end
 end
