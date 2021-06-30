@@ -1,3 +1,10 @@
+warn 'Await functionality is a technology preview, which means it may change its behavior ' \
+     'in the future unless this warning is removed. If you are interested in this part, ' \
+     'please make sure you track the async/await/promises tag on Opal issues: ' \
+     'https://github.com/opal/opal/issues?q=label%3Aasync%2Fawait%2Fpromises'
+
+require 'promise/v2'
+
 class Array
   def map_await(&block)
     i = 0
@@ -17,7 +24,7 @@ end
 
 module Enumerable
   def each_async(&block)
-    Promise.when(*map(&block)).await
+    PromiseV2.when(*map(&block)).await
   end
 end
 

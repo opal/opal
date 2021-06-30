@@ -282,4 +282,4 @@ module Minitest
   end # Test
 end
 
-#require "minitest/unit" unless defined?(MiniTest) # compatibility layer only
+# require "minitest/unit" unless defined?(MiniTest) # compatibility layer only

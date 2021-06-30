@@ -2,7 +2,7 @@ require "optparse"
 require "thread"
 require "mutex_m"
 # require "minitest/parallel"
-require "async"
+require "await"
 
 ##
 # :include: README.txt
