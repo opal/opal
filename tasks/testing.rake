@@ -331,13 +331,13 @@ platforms.each do |platform|
           opal/test_openuri.rb
           opal/unsupported_and_bugs.rb
           opal/test_matrix.rb
-          opal/promise/test_always.rb
-          opal/promise/test_error.rb
-          opal/promise/test_rescue.rb
-          opal/promise/test_then.rb
-          opal/promise/test_trace.rb
-          opal/promise/test_value.rb
-          opal/promise/test_when.rb
+          opal/promisev2/test_always.rb
+          opal/promisev2/test_error.rb
+          opal/promisev2/test_rescue.rb
+          opal/promisev2/test_then.rb
+          opal/promisev2/test_trace.rb
+          opal/promisev2/test_value.rb
+          opal/promisev2/test_when.rb
         ]
       end
       Testing::HTTPServer.new.with_server do |session|

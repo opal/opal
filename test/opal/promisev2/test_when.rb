@@ -1,14 +1,14 @@
 require 'test/unit'
-require 'promise'
+require 'promise/v2'
 
 class TestPromiseWhen < Test::Unit::TestCase
   def test_calls_the_block_with_all_promises_results
-    a = Promise.new
-    b = Promise.new
+    a = PromiseV2.new
+    b = PromiseV2.new
 
     x = 42
 
-    p = Promise.when(a, b).then {|y, z|
+    p = PromiseV2.when(a, b).then {|y, z|
       x = y + z
     }
 
@@ -19,12 +19,12 @@ class TestPromiseWhen < Test::Unit::TestCase
   end
 
   def test_can_be_built_lazily
-    a = Promise.new
-    b = Promise.value(3)
+    a = PromiseV2.new
+    b = PromiseV2.value(3)
 
     x = 42
 
-    p = Promise.when(a).and(b).then {|c, d|
+    p = PromiseV2.when(a).and(b).then {|c, d|
       x = c + d
     }
 
