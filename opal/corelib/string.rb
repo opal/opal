@@ -29,18 +29,26 @@ class String < `String`
     Opal.coerce_to?(what, String, :to_str)
   end
 
-  def self.new(str = '')
-    str = `$coerce_to(str, #{String}, 'to_str')`
-    `new self.$$constructor(str)`
+  def self.new(*args)
+    %x{
+      var str = args[0] || "";
+      var opts = args[args.length-1];
+      str = $coerce_to(str, #{String}, 'to_str');
+      if (opts && opts.$$is_hash) {
+        if (opts.$$smap.encoding) str = str.$force_encoding(opts.$$smap.encoding);
+      }
+      str = new self.$$constructor(str);
+      if (!str.$initialize.$$pristine) #{`str`.initialize(*args)};
+      return str;
+    }
   end
 
-  def initialize(str = undefined)
-    %x{
-      if (str === undefined) {
-        return self;
-      }
-    }
-    raise NotImplementedError, 'Mutable strings are not supported in Opal.'
+  # Our initialize method does nothing, the string value setup is being
+  # done by String.new. Therefore not all kinds of subclassing will work.
+  # As a rule of thumb, when subclassing String, either make sure to override
+  # .new or make sure that the first argument given to a constructor is
+  # a string we want our subclass-string to hold.
+  def initialize(str = undefined, encoding: nil, capacity: nil)
   end
 
   def %(data)
@@ -1857,6 +1865,8 @@ class String < `String`
   def frozen?
     `typeof self === 'string'`
   end
+
+  Opal.pristine self, :initialize
 end
 
 Symbol = String
