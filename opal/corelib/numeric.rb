@@ -155,25 +155,25 @@ class Numeric
         #{raise ArgumentError, 'step is given twice'}
       }
 
+      if (to !== undefined) {
+        limit = to;
+      }
+
+      if (by !== undefined) {
+        step = by;
+      }
+
+      if (limit === undefined) {
+        limit = nil;
+      }
+
       function validateParameters() {
-        if (to !== undefined) {
-          limit = to;
-        }
-
-        if (limit === undefined) {
-          limit = nil;
-        }
-
         if (step === nil) {
           #{raise TypeError, 'step must be numeric'}
         }
 
-        if (step === 0) {
+        if (step != null && #{step == 0}) {
           #{raise ArgumentError, "step can't be 0"}
-        }
-
-        if (by !== undefined) {
-          step = by;
         }
 
         if (step === nil || step == null) {
@@ -233,94 +233,72 @@ class Numeric
           return ceil(lhs / rhs);
         }
       }
+
     }
 
-    unless block_given?
-      positional_args = []
-      keyword_args = {}
-
-      %x{
-        if (limit !== undefined) {
-          positional_args.push(limit);
-        }
-
-        if (step !== undefined) {
-          positional_args.push(step);
-        }
-
-        if (to !== undefined) {
-          Opal.hash_put(keyword_args, "to", to);
-        }
-
-        if (by !== undefined) {
-          Opal.hash_put(keyword_args, "by", by);
-        }
-
-        if (#{keyword_args.any?}) {
-          positional_args.push(keyword_args);
-        }
-      }
-
-      return enum_for(:step, *positional_args) { `stepSize()` }
-    end
+    return enum_for(:step, limit, step, &`stepSize`) unless block_given?
 
     %x{
       validateParameters();
 
-      if (step === 0) {
-        while (true) {
-          block(self);
-        }
-      }
+      var isDesc = #{step.negative?},
+          isInf = #{step == 0} ||
+                  (limit === Infinity && !isDesc) ||
+                  (limit === -Infinity && isDesc);
 
-      if (self % 1 !== 0 || limit % 1 !== 0 || step % 1 !== 0) {
-        var n = stepFloatSize();
+      if (self.$$is_number && step.$$is_number && limit.$$is_number) {
+        if (self % 1 === 0 && (isInf || limit % 1 === 0) && step % 1 === 0) {
+          var value = self;
 
-        if (n > 0) {
-          if (step === Infinity || step === -Infinity) {
-            block(self);
+          if (isInf) {
+            for (;; value += step) {
+              block(value);
+            }
+          } else if (isDesc) {
+            for (; value >= limit; value += step) {
+              block(value);
+            }
           } else {
-            var i = 0, d;
-
-            if (step > 0) {
-              while (i < n) {
-                d = i * step + self;
-                if (limit < d) {
-                  d = limit;
-                }
-                block(d);
-                i += 1;
-              }
-            } else {
-              while (i < n) {
-                d = i * step + self;
-                if (limit > d) {
-                  d = limit;
-                }
-                block(d);
-                i += 1
-              }
+            for (; value <= limit; value += step) {
+              block(value);
             }
           }
-        }
-      } else {
-        var value = self;
 
-        if (step > 0) {
-          while (value <= limit) {
-            block(value);
-            value += step;
-          }
+          return self;
         } else {
-          while (value >= limit) {
-            block(value);
-            value += step
+          var begin = #{to_f}.valueOf();
+          step = #{step.to_f}.valueOf();
+          limit = #{limit.to_f}.valueOf();
+
+          var n = stepFloatSize();
+
+          if (!isFinite(step)) {
+            if (n !== 0) block(begin);
+          } else if (step === 0) {
+            while (true) {
+              block(begin);
+            }
+          } else {
+            for (var i = 0; i < n; i++) {
+              var d = i * step + self;
+              if (step >= 0 ? limit < d : limit > d) {
+                d = limit;
+              }
+              block(d);
+            }
           }
+
+          return self;
         }
       }
-
-      return self;
     }
+
+    counter = self
+
+    while `isDesc ? #{counter >= limit} : #{counter <= limit}`
+      yield counter
+      counter += step
+    end
   end
 
   def to_c

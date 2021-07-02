@@ -245,6 +245,8 @@ class Complex < Numeric
 
   alias rectangular rect
 
+  undef step
+
   def to_f
     unless @imag == 0
       raise RangeError, "can't convert #{self} into Float"
