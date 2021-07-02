@@ -309,7 +309,7 @@ class String
   `Opal.defineProperty(String.prototype, 'internal_encoding', #{Encoding::UTF_8})`
 
   def b
-    force_encoding('binary')
+    dup.force_encoding('binary')
   end
 
   def bytesize
@@ -382,11 +382,6 @@ class String
 
       if (encoding === str.encoding) { return str; }
 
-      if (typeof str === "string") {
-        str = new String(str);
-        str.internal_encoding = self.internal_encoding;
-      }
-
       str = Opal.set_encoding(str, encoding);
 
       return str;
@@ -399,6 +394,13 @@ class String
     return if string_bytes.length < idx
 
     string_bytes[idx]
+  end
+
+  def initialize_copy(other)
+    %{
+      self.encoding = other.encoding;
+      self.internal_encoding = other.internal_encoding;
+    }
   end
 
   def length

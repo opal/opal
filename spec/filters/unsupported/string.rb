@@ -10,6 +10,8 @@ opal_unsupported_filter "String" do
   fails "String#% taints result for %s when argument is tainted"
   fails "String#* always taints the result when self is tainted"
   fails "String#+ taints the result when self or other is tainted"
+  fails "String#-@ deduplicates frozen strings" # May fail randomly outside of "use strict"
+  fails "String#-@ returns a frozen copy if the String is not frozen" # May fail randomly outside of "use strict"
   fails "String#<< concatenates the given argument to self and returns self"
   fails "String#<< converts the given argument to a String using to_str"
   fails "String#<< raises a RuntimeError when self is frozen"
