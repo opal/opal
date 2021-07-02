@@ -57,7 +57,6 @@ opal_filter "String" do
   fails "String#-@ does not deduplicate strings with additional instance variables" # NoMethodError: undefined method `-@' for "this string is frozen"
   fails "String#-@ does not deduplicate tainted strings" # NoMethodError: undefined method `-@' for "this string is frozen"
   fails "String#-@ returns the same object for equal unfrozen strings" # Expected "this is a string" not to be identical to "this is a string"
-  fails "String#-@ returns the same object when it's called on the same String literal" # NoMethodError: undefined method `-@' for "unfrozen string"
   fails "String#<< when self is BINARY and argument is US-ASCII uses BINARY encoding" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#<< with Integer returns a BINARY string if self is US-ASCII and the argument is between 128-255 (inclusive)" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#<=> with String compares the indices of the encodings when the strings have identical non-ASCII-compatible bytes" # Expected 0 == -1 to be truthy but was false

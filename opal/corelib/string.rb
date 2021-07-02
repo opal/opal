@@ -101,13 +101,12 @@ class String < `String`
     other = `$coerce_to(#{other}, #{String}, 'to_str')`
 
     %x{
-      if (other == "" && self.$$class === #{String}) return #{self};
-      if (self == "" && other.$$class === #{String}) return #{other};
+      if (other == "" && self.$$class === Opal.String) return #{self};
+      if (self == "" && other.$$class === Opal.String) return #{other};
       var out = self + other;
       if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
       if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
       return Opal.enc(out, self.encoding);
-      return out;
     }
   end
 
@@ -1852,8 +1851,27 @@ class String < `String`
     raise "To use String#unpack1, you must first require 'corelib/string/unpack'."
   end
 
+  def freeze
+    %x{
+      if (typeof self === 'string') return self;
+      self.$$frozen = true;
+      return self;
+    }
+  end
+
+  alias +@ dup
+
+  def -@
+    %x{
+      if (typeof self === 'string') return self;
+      if (self.$$frozen === true) return self;
+      if (self.encoding.name == 'UTF-8' && self.internal_encoding.name == 'UTF-8') return self.toString();
+      return self.$dup().$freeze();
+    }
+  end
+
   def frozen?
-    `typeof self === 'string'`
+    `typeof self === 'string' || self.$$frozen === true`
   end
 
   Opal.pristine self, :initialize

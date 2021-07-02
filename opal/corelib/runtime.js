@@ -2489,7 +2489,7 @@
   // @param type [String] possible values are either `"encoding"`, `"internal_encoding"`, or `undefined
   Opal.set_encoding = function(str, name, type) {
     if (typeof type === "undefined") type = "encoding";
-    if (typeof str === 'string')
+    if (typeof str === 'string' || str.$$frozen === true)
       throw Opal.FrozenError.$new("can't modify frozen String");
 
     var encoding = Opal.find_encoding(name);
