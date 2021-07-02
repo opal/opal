@@ -27,7 +27,12 @@ opal_filter "Time" do
   fails "Time#hash returns an Integer" # Expected "Time:100000" (String) to be an instance of Integer
   fails "Time#inspect formats nanoseconds as a Rational" # NoMethodError: undefined method `nsec' for 2007-11-01 15:25:00 UTC
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
+  fails "Time#inspect omits trailing zeros from microseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.1 UTC" to be truthy but was false
+  fails "Time#inspect preserves microseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.123456 UTC" to be truthy but was false
   fails "Time#inspect preserves milliseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.123456 UTC" to be truthy but was false
+  fails "Time#inspect preserves nanoseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.123456789 UTC" to be truthy but was false
+  fails "Time#inspect uses the correct time zone with microseconds" # NoMethodError: undefined method `localtime' for 2000-01-01 00:00:00 UTC
+  fails "Time#inspect uses the correct time zone without microseconds" # NoMethodError: undefined method `localtime' for 2000-01-01 00:00:00 UTC
   fails "Time#localtime raises ArgumentError if the String argument is not in an ASCII-compatible encoding"
   fails "Time#nsec returns a positive value for dates before the epoch" # NoMethodError: undefined method `nsec' for 1969-11-12 13:18:57 UTC
   fails "Time#round copies own timezone to the returning value"
@@ -38,6 +43,7 @@ opal_filter "Time" do
   fails "Time#strftime rounds an offset to the nearest second when formatting with %z"
   fails "Time#strftime should be able to print the commercial year with leading zeroes"
   fails "Time#strftime should be able to print the commercial year with only two digits"
+  fails "Time#strftime should be able to show default Logger format" # Expected "2001-12-03T04:05:06.000000 " == "2001-12-03T04:05:06.100000 " to be truthy but was false
   fails "Time#strftime should be able to show the commercial week day"
   fails "Time#strftime should be able to show the number of seconds since the unix epoch" # fails under FIJI et al TZs
   fails "Time#strftime should be able to show the timezone if available"
@@ -62,6 +68,8 @@ opal_filter "Time" do
   fails "Time.at :in keyword argument could be UTC offset as a number of seconds" # TypeError: no implicit conversion of Hash into Integer
   fails "Time.at :in keyword argument could be a timezone object" # TypeError: no implicit conversion of Hash into Integer
   fails "Time.at passed Numeric passed BigDecimal doesn't round input value"
+  fails "Time.at passed Numeric passed Rational returns Time with correct microseconds" # Expected 0 == 539759 to be truthy but was false
+  fails "Time.at passed Numeric passed Rational returns Time with correct nanoseconds" # Expected 0 == 539759 to be truthy but was false
   fails "Time.at passed Numeric roundtrips a Rational produced by #to_r"
   fails "Time.at passed [Time, Numeric, format] :microsecond format traits second argument as microseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
   fails "Time.at passed [Time, Numeric, format] :microsecond format treats second argument as microseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)

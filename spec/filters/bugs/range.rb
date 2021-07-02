@@ -52,6 +52,10 @@ opal_filter "Range" do
   fails "Range#bsearch with endless ranges and Integer values with a block returning negative, zero, positive numbers returns nil if the block returns less than zero for every element" # NotImplementedError: Can't #bsearch an infinite range
   fails "Range#bsearch with endless ranges and Integer values with a block returning true or false returns minimum element if the block returns true for every element" # NotImplementedError: Can't #bsearch an infinite range
   fails "Range#bsearch with endless ranges and Integer values with a block returning true or false returns the smallest element for which block returns true" # NotImplementedError: Can't #bsearch an infinite range
+  fails "Range#cover? accepts beginless range argument" # Expected false to be true
+  fails "Range#cover? accepts endless range argument" # Expected false to be true
+  fails "Range#cover? allows self to be a beginless range" # Expected false to be true
+  fails "Range#cover? allows self to be a endless range" # Expected false to be true
   fails "Range#cover? range argument accepts range argument" # Expected false to be true
   fails "Range#cover? range argument honors exclusion of right boundary (:exclude_end option)" # Expected false to be true
   fails "Range#cover? range argument supports boundaries of different comparable types" # Expected false to be true
@@ -92,11 +96,12 @@ opal_filter "Range" do
   fails "Range#step when no block is given returned Enumerator type when both begin and end are numerics returns an instance of Enumerator::ArithmeticSequence" # Expected Enumerator == Enumerator::ArithmeticSequence to be truthy but was false
   fails "Range#step with an endless range and Float values yields Float values incremented by a Float step" # Expected [-1, 0] to have same value and type as [-1, -0.5, 0, 0.5]
   fails "Range#step with an endless range and Integer values yields Float values incremented by a Float step" # Expected [-2, 1] to have same value and type as [-2, -0.5, 1]
-  fails "Range#step with exclusive end and Float values returns Float values of 'step * n + begin < end'" # Expected [1, 2.8, 4.6, 1, 19.2, 37.4, 55.599999999999994] to have same value and type as [1, 2.8, 4.6, 1, 19.2, 37.4]
   fails "Range#step with exclusive end and String values raises a TypeError when passed a Float step" # Expected TypeError but no exception was raised ("A"..."G" was returned)
   fails "Range#step with inclusive end and Float values returns Float values of 'step * n + begin <= end'" # Expected [1, 2.8, 4.6, 6.4, 1, 2.3, 3.6, 4.9, 6.2, 7.5, 8.8, 10.1, 11.4] to have same value and type as [1, 2.8, 4.6, 6.4, 1, 2.3, 3.6, 4.9, 6.2, 7.5, 8.8, 10.1, 11.4, 12.7]
   fails "Range#step with inclusive end and String values raises a TypeError when passed a Float step" # Expected TypeError but no exception was raised ("A".."G" was returned)
   fails "Range#to_a throws an exception for endless ranges" # Expected RangeError but got: TypeError (cannot convert endless range to an array)
+  fails "Range#to_a works with Ranges of 64-bit integers" # Expected [256, 257] == [1099511627776, 1099511627777] to be truthy but was false
+  fails "Range#to_s can show beginless ranges" # Expected "...1" == "...1.0" to be truthy but was false
   fails "Range#to_s can show endless ranges" # Expected "1..." == "1.0..." to be truthy but was false
   fails_badly "Range#min given a block raises RangeError when called with custom comparison method on an endless range" # Expected RangeError but got: Opal::SyntaxError (undefined method `type' for nil)
   fails_badly "Range#minmax on an exclusive range should return the minimum and maximum values for a numeric range without iterating the range"

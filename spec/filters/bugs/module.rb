@@ -16,6 +16,7 @@ opal_filter "Module" do
   fails "Module#attr_accessor converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr_accessor not allows creating an attr_accessor on an immediate class"
   fails "Module#attr_accessor on immediates can read through the accessor" # NoMethodError: undefined method `foobar' for 1
+  fails "Module#attr_accessor raises FrozenError if the receiver if frozen" # Expected FrozenError but no exception was raised (42 was returned)
   fails "Module#attr_accessor raises a TypeError when the given names can't be converted to strings using to_str"
   fails "Module#attr_accessor returns an array of defined method names as symbols" # Expected nil == ["foo", "foo=", "bar", "bar="] to be truthy but was false
   fails "Module#attr_reader applies current visibility to methods created"
@@ -28,6 +29,7 @@ opal_filter "Module" do
   fails "Module#attr_writer converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
   fails "Module#attr_writer converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr_writer not allows for adding an attr_writer to an immediate"
+  fails "Module#attr_writer raises FrozenError if the receiver if frozen" # Expected FrozenError but no exception was raised (42 was returned)
   fails "Module#attr_writer raises a TypeError when the given names can't be converted to strings using to_str"
   fails "Module#attr_writer returns an array of defined method names as symbols" # Expected nil == ["foo=", "bar="] to be truthy but was false
   fails "Module#autoload (concurrently) blocks a second thread while a first is doing the autoload"
@@ -78,11 +80,13 @@ opal_filter "Module" do
   fails "Module#class_eval resolves constants in the caller scope ignoring send"
   fails "Module#class_eval resolves constants in the caller scope" # fails because of the difference between module_eval("Const") and module_eval { Const } (only the second one is supported by Opal)
   fails "Module#class_eval uses the optional filename and lineno parameters for error messages"
+  fails "Module#const_defined? coerces the inherit flag to a boolean" # Expected true to be false
   fails "Module#const_defined? returns true for toplevel constant when the name begins with '::'"
   fails "Module#const_defined? returns true or false for the nested name"
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is default"
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is true"
   fails "Module#const_defined? returns true when passed a scoped constant name"
+  fails "Module#const_get coerces the inherit flag to a boolean" # Expected NameError but no exception was raised ("const1" was returned)
   fails "Module#const_get does autoload a constant with a toplevel scope qualifier" # NameError: uninitialized constant CSAutoloadB
   fails "Module#const_get does autoload a constant" # NameError: uninitialized constant CSAutoloadA
   fails "Module#const_get does autoload a module and resolve a constant within" # NameError: uninitialized constant CSAutoloadC
@@ -130,6 +134,7 @@ opal_filter "Module" do
   fails "Module#const_source_location with statically assigned constants searches location path the superclass chain" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#constants doesn't returns inherited constants when passed nil"
   fails "Module#constants returns only public constants"
+  fails "Module#define_method passed { |a,|  } creates a method that does not destructure the passed argument" # Expected [1, 2] == 1 to be truthy but was false
   fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class"
   fails "Module#define_method raises a TypeError when a Method from one class is defined on an unrelated class"
   fails "Module#define_method raises a TypeError when an UnboundMethod from a child class is defined on a parent class"
@@ -180,6 +185,7 @@ opal_filter "Module" do
   fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0x6c37a>] == [#<Module:0x6c38c>, #<Module:0x6c37a>] to be truthy but was false
   fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x7b0e0> to have private instance method 'test1' but it does not
   fails "Module#private with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x2f186> to have private instance method 'test1' but it does not
+  fails "Module#private_constant marked constants in a module raises a NameError when accessed directly from modules that include the module" # Expected NameError but no exception was raised (true was returned)
   fails "Module#private_constant marked constants sends #const_missing to the original class or module" # Expected true == "Foo" to be truthy but was false
   fails "Module#private_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#private_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
@@ -206,7 +212,9 @@ opal_filter "Module" do
   fails "Module#refine for methods accessed indirectly is honored by &" # NoMethodError: undefined method `refine' for #<Module:0x4b006>
   fails "Module#refine for methods accessed indirectly is honored by BasicObject#__send__" # NoMethodError: undefined method `refine' for #<Module:0x3aeb2>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#binding" # NoMethodError: undefined method `refine' for #<Module:0x3aeaa>
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NoMethodError: undefined method `refine' for #<Module:0x3a6b2>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#method" # NoMethodError: undefined method `refine' for #<Module:0x4b00a>
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_method" # NoMethodError: undefined method `refine' for #<Module:0x3a6b6>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#public_send" # NoMethodError: undefined method `refine' for #<Module:0x4b00e>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#respond_to?" # NoMethodError: undefined method `refine' for #<Module:0x4b016>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # NoMethodError: undefined method `refine' for #<Module:0x3aeae>
@@ -248,6 +256,14 @@ opal_filter "Module" do
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#remove_const returns nil when removing autoloaded constant"
+  fails "Module#ruby2_keywords acceps String as well" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40040>>
+  fails "Module#ruby2_keywords marks the final hash argument as keyword hash" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40036>>
+  fails "Module#ruby2_keywords prints warning when a method accepts keyword splat" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x4001e>>
+  fails "Module#ruby2_keywords prints warning when a method accepts keywords" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40048>>
+  fails "Module#ruby2_keywords prints warning when a method does not accept argument splat" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x4002e>>
+  fails "Module#ruby2_keywords raises NameError when passed not existing method name" # Expected NameError (/undefined method `not_existing'/) but got: NoMethodError (undefined method `ruby2_keywords' for #<Class:#<Object:0x4003a>>)
+  fails "Module#ruby2_keywords raises TypeError when passed not Symbol or String" # Expected TypeError (/is not a symbol nor a string/) but got: NoMethodError (undefined method `ruby2_keywords' for #<Class:#<Object:0x40026>>)
+  fails "Module#ruby2_keywords returns nil" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40044>>
   fails "Module#to_s always show the refinement name, even if the module is named" # NoMethodError: undefined method `refine' for ModuleSpecs::RefinementInspect
   fails "Module#to_s does not call #inspect or #to_s for singleton classes" # Expected "#<Class:#<:0x25bee>>" =~ /\A#<Class:#<#<Class:0x25bf2>:0x\h+>>\z/ to be truthy but was nil
   fails "Module#to_s for objects includes class name and object ID" # Expected "#<Class:#<ModuleSpecs::NamedClass:0xa424>>" =~ /^#<Class:#<ModuleSpecs::NamedClass:0x\h+>>$/ to be truthy but was nil

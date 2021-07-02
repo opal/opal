@@ -7,6 +7,7 @@ opal_filter "Proc" do
   fails "Proc#== is a public method" # Expected Proc to have public instance method '==' but it does not
   fails "Proc#== returns true if other is a dup of the original" # Expected false to be true
   fails "Proc#=== can call its block argument declared with a block argument" # Expected 6 to equal 10
+  fails "Proc#=== on a Proc created with Kernel#lambda or Kernel#proc ignores excess arguments when self is a proc" # ArgumentError: expected kwargs
   fails "Proc#=== yields to the block given at declaration and not to the block argument" # Expected 3 to equal 7
   fails "Proc#>> composition is a lambda when self is lambda" # NoMethodError: undefined method `>>' for #<Proc:0x76126>
   fails "Proc#>> does not try to coerce argument with #to_proc" # Expected TypeError (callable object is expected) but got: NoMethodError (undefined method `>>' for #<Proc:0x76108>)
@@ -22,6 +23,7 @@ opal_filter "Proc" do
   fails "Proc#binding returns a Binding instance"
   fails "Proc#binding returns the binding associated with self"
   fails "Proc#call can call its block argument declared with a block argument" # Expected 6 to equal 10
+  fails "Proc#call on a Proc created with Kernel#lambda or Kernel#proc ignores excess arguments when self is a proc" # ArgumentError: expected kwargs
   fails "Proc#call yields to the block given at declaration and not to the block argument" # Expected 3 to equal 7
   fails "Proc#curry with arity argument returns Procs with arities of -1 regardless of the value of _arity_"
   fails "Proc#curry with arity argument returns a Proc if called on a lambda that requires fewer than _arity_ arguments but may take more" # ArgumentError: wrong number of arguments (4 for 5)
@@ -41,6 +43,11 @@ opal_filter "Proc" do
   fails "Proc#inspect for a proc created with proc returns a description including file and line number" # Expected "#<Proc:0x25a>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:26>$/ to be truthy but was nil
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword"
   fails "Proc#lambda? is preserved when passing a Proc with & to the proc keyword"
+  fails "Proc#ruby2_keywords marks the final hash argument as keyword hash" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x36616>
+  fails "Proc#ruby2_keywords prints warning when a proc accepts keyword splat" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x365fe>
+  fails "Proc#ruby2_keywords prints warning when a proc accepts keywords" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x36612>
+  fails "Proc#ruby2_keywords prints warning when a proc does not accept argument splat" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x3660a>
+  fails "Proc#ruby2_keywords returns self" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x36602>
   fails "Proc#source_location returns an Array"
   fails "Proc#source_location returns the first line of a multi-line proc (i.e. the line containing 'proc do')"
   fails "Proc#source_location returns the location of the proc's body; not necessarily the proc itself"
@@ -62,6 +69,7 @@ opal_filter "Proc" do
   fails "Proc#to_s for a proc created with proc has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#to_s for a proc created with proc returns a description including file and line number" # Expected "#<Proc:0x17d18>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:26>$/ to be truthy but was nil
   fails "Proc#yield can call its block argument declared with a block argument" # Expected 6 to equal 10
+  fails "Proc#yield on a Proc created with Kernel#lambda or Kernel#proc ignores excess arguments when self is a proc" # ArgumentError: expected kwargs
   fails "Proc#yield yields to the block given at declaration and not to the block argument" # Expected 3 to equal 7
   fails "Proc.allocate raises a TypeError"
   fails "Proc.new with a block argument called indirectly from a subclass returns the passed proc created from a block"

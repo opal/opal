@@ -417,6 +417,8 @@ module Minitest
       end
     end
 
+    alias capture_output capture_io
+
     ##
     # Captures $stdout and $stderr into strings, using Tempfile to
     # ensure that subprocess IO is captured as well.

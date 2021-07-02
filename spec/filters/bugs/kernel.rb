@@ -59,6 +59,7 @@ opal_filter "Kernel" do
   fails "Kernel#caller returns an Array of caller locations using a range" # NoMethodError: undefined method `+' for 1..1
   fails "Kernel#caller returns an Array with the block given to #at_exit at the base of the stack" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xe208>
   fails "Kernel#caller returns the locations as String instances" # Expected "corelib/runtime.js:1675" to include "ruby/core/kernel/caller_spec.rb:32:in"
+  fails "Kernel#caller works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
   fails "Kernel#caller works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Kernel#class returns the class of the object"
   fails "Kernel#clone copies frozen?" # Expected false to be true
@@ -108,6 +109,7 @@ opal_filter "Kernel" do
   fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
   fails "Kernel#inspect does not call #to_s if it is defined"
+  fails "Kernel#inspect returns a String for an object without #class method" # Exception: Maximum call stack size exceeded
   fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
   fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#is_a? returns true if given a Module that object has been extended with" # Requires string mutability
@@ -118,7 +120,9 @@ opal_filter "Kernel" do
   fails "Kernel#local_variables is accessible from bindings"
   fails "Kernel#local_variables is accessible in eval"
   fails "Kernel#method can be called even if we only repond_to_missing? method, true"
+  fails "Kernel#method returns a method object if respond_to_missing?(method) is true" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'
   fails "Kernel#method returns a method object if we repond_to_missing? method"
+  fails "Kernel#method the returned method object if respond_to_missing?(method) calls #method_missing with a Symbol name" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'
   fails "Kernel#method will see an alias of the original method as == when in a derived class"
   fails "Kernel#methods does not return private singleton methods defined in 'class << self'"
   fails "Kernel#object_id returns a different value for two Bignum literals"
@@ -131,14 +135,21 @@ opal_filter "Kernel" do
   fails "Kernel#public_method raises a NameError if we only repond_to_missing? method, true"
   fails "Kernel#public_method returns a method object for a valid method"
   fails "Kernel#public_method returns a method object for a valid singleton method"
+  fails "Kernel#public_method returns a method object if respond_to_missing?(method) is true" # Expected "Done public_method(handled_publicly)" (String) to be an instance of Method
   fails "Kernel#public_method returns a method object if we repond_to_missing? method"
+  fails "Kernel#public_method the returned method object if respond_to_missing?(method) calls #method_missing with a Symbol name" # Expected "Done public_method(handled_publicly)" (String) to be an instance of Method
   fails "Kernel#public_methods returns a list of names without protected accessible methods in the object"
   fails "Kernel#public_methods when passed false returns a list of public methods in without its ancestors"
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors"
+  fails "Kernel#public_send includes `public_send` in the backtrace when passed a single incorrect argument" # Expected TypeError but got: NoMethodError (undefined method `#<Object:0x3da7a>' for #<MSpecEnv:0x3d9f4>)
+  fails "Kernel#public_send includes `public_send` in the backtrace when passed not enough arguments" # Expected "ArgumentError: [MSpecEnv#__send__] wrong number of arguments(0 for -2)".include? "`public_send'" to be truthy but was false
   fails "Kernel#public_send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#puts delegates to $stdout.puts"
+  fails "Kernel#raise accepts a cause keyword argument that overrides the last exception" # NoMethodError: undefined method `cause' for #<RuntimeError: error>
+  fails "Kernel#raise accepts a cause keyword argument that sets the cause" # NoMethodError: undefined method `cause' for #<RuntimeError: error>
   fails "Kernel#raise passes no arguments to the constructor when given only an exception class" # Expected #<Class:0x4c8> but got: ArgumentError ([#initialize] wrong number of arguments(1 for 0))
   fails "Kernel#raise raises RuntimeError if no exception class is given" # RuntimeError: RuntimeError
+  fails "Kernel#raise raises an ArgumentError when only cause is given" # Expected ArgumentError but got: TypeError (exception class/object expected)
   fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"
@@ -211,6 +222,7 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with a module"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extented with two modules"
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object"
+  fails "Kernel#sleep accepts any Object that reponds to divmod" # TypeError: can't convert Object into time interval
   fails "Kernel#sprintf can produce a string with invalid encoding" # Expected true to be false
   fails "Kernel#sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
   fails "Kernel#sprintf flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" to equal "1.e+02"
@@ -245,6 +257,7 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf integer formats i works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "Kernel#sprintf integer formats u works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "Kernel#sprintf other formats % alone raises an ArgumentError" # Expected ArgumentError but no exception was raised ("%" was returned)
+  fails "Kernel#sprintf other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Kernel#sprintf precision float types controls the number of decimal places displayed in fraction part" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
   fails "Kernel#sprintf precision float types does not affect G format" # Expected "12.12340000" to equal "12.1234"
   fails "Kernel#sprintf precision string formats determines the maximum number of characters to be copied from the string" # Expected "1" to equal "["
@@ -353,6 +366,8 @@ opal_filter "Kernel" do
   fails "Kernel.lambda returns the passed Proc if given an existing Proc" # Expected true to be false
   fails "Kernel.loop returns StopIteration#result, the result value of a finished iterator" # requires changes in enumerator.rb
   fails "Kernel.printf calls write on the first argument when it is not a string"
+  fails "Kernel.printf formatting io is not specified other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
+  fails "Kernel.printf formatting io is specified other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Kernel.printf writes to stdout when a string is the first argument"
   fails "Kernel.proc returned the passed Proc if given an existing Proc" # Expected false to be true
   fails "Kernel.rand is random on boot" # NoMethodError: undefined method `insert' for "rubyexe.rb"
@@ -391,6 +406,7 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf integer formats i works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "Kernel.sprintf integer formats u works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "Kernel.sprintf other formats % alone raises an ArgumentError" # Expected ArgumentError but no exception was raised ("%" was returned)
+  fails "Kernel.sprintf other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Kernel.sprintf precision float types controls the number of decimal places displayed in fraction part" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
   fails "Kernel.sprintf precision float types does not affect G format" # Expected "12.12340000" to equal "12.1234"
   fails "Kernel.sprintf precision string formats determines the maximum number of characters to be copied from the string" # Expected "1" to equal "["

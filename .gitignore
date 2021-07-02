@@ -3,6 +3,7 @@
 .yardoc
 .bundle
 Gemfile.lock
+Gemfile.local
 build/
 /.github_access_token
 /cdn

@@ -59,6 +59,7 @@ opal_filter "language" do
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b: 2) [a, b] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b:) [a, b] end'"
   fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
+  fails "A method assigns the last Hash to the last optional argument if the Hash contains non-Symbol keys and is not passed as keywords" # Exception: Object.defineProperty called on non-object
   fails "A method definition in an eval creates a class method"
   fails "A method definition in an eval creates a singleton method"
   fails "A method definition in an eval creates an instance method"
@@ -82,6 +83,7 @@ opal_filter "language" do
   fails "Allowed characters does not allow non-ASCII upcased characters at the beginning" # Expected SyntaxError (/dynamic constant assignment/) but no exception was raised ("test" was returned)
   fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
+  fails "An ensure block inside a begin block sets exception cause if raises exception in block and in ensure" # NoMethodError: undefined method `cause' for #<RuntimeError: from ensure>  
   fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
   fails "An instance method definition with a splat requires the presence of any arguments that precede the *" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(1 for -3)
   fails "An instance method raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised (#<Module:0x225b4> was returned)
@@ -114,6 +116,7 @@ opal_filter "language" do
   fails "Global variable $FILENAME is read-only"
   fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
   fails "Global variable $\" is read-only"
+  fails "Hash literal checks duplicated keys on initialization" # Expected warning to match: /key 1000 is duplicated|duplicated key/ but got: ""
   fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for BasicObject
   fails "Heredoc string allow HEREDOC with <<\"identifier\", interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<'identifier', no interpolation" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
@@ -202,6 +205,8 @@ opal_filter "language" do
   fails "NoMethodError#message fallbacks to a simpler representation of the receiver when receiver.inspect raises an exception" # NoMethodError: undefined method `name' for #<NoMethodErrorSpecs::InstanceException: NoMethodErrorSpecs::InstanceException>
   fails "Numbered parameters does not support more than 9 parameters" # Expected NameError (/undefined local variable or method `_10'/) but got: NoMethodError (undefined method `_10' for #<MSpecEnv:0x5d700>)
   fails "Operators * / % are left-associative"
+  fails "Optional constant assignment with ||= causes side-effects of the module part to be applied (for nil constant)" # Expected 3 == 1 to be truthy but was false
+  fails "Optional constant assignment with ||= causes side-effects of the module part to be applied only once (for undefined constant)" # Expected 2 == 1 to be truthy but was false  
   fails "Optional variable assignments using compounded constants with &&= assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compounded constants with operator assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compunded constants with ||= assignments"
@@ -392,6 +397,7 @@ opal_filter "language" do
   fails "The rescue keyword only accepts Module or Class in rescue clauses" # RuntimeError: error
   fails "The rescue keyword only accepts Module or Class in splatted rescue clauses" # RuntimeError: error
   fails "The rescue keyword rescues the exception in the deepest rescue block declared to handle the appropriate exception type" # Expected "StandardError: an error occurred" to include ":in `raise_standard_error'"
+  fails "The rescue keyword suppresses exception from block when raises one from rescue expression" # NoMethodError: undefined method `cause' for #<RuntimeError: from rescue expression>
   fails "The rescue keyword will execute an else block even without rescue and ensure" # Expected warning to match: /else without rescue is useless/ but got: ""
   fails "The rescue keyword without rescue expression will not rescue exceptions except StandardError" # NameError: uninitialized constant SystemStackError
   fails "The retry keyword inside a begin block's rescue block causes the begin block to be executed again"

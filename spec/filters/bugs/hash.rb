@@ -29,6 +29,7 @@ opal_filter "Hash" do
   fails "Hash#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0x30638>}" to match /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/
   fails "Hash#inspect does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Hash#invert compares new keys with eql? semantics" # spec relies on integer and float being different
+  fails "Hash#rehash removes duplicate keys for large hashes" # Expected 102 == 101 to be truthy but was false
   fails "Hash#rehash removes duplicate keys" # Expected 2 to equal 1
   fails "Hash#shift allows shifting entries while iterating" # Exception: Cannot read property '$$is_string' of undefined
   fails "Hash#store does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"

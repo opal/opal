@@ -40,6 +40,8 @@ opal_filter "Set" do
   fails "Set#flatten_merge flattens the passed Set and merges it into self"
   fails "Set#flatten_merge raises an ArgumentError when trying to flatten a recursive Set"
   fails "Set#hash is static"
+  fails "Set#initialize uses #each on the provided Enumerable if it does not respond to #each_entry" # ArgumentError: value must be enumerable
+  fails "Set#initialize uses #each_entry on the provided Enumerable" # ArgumentError: value must be enumerable
   fails "Set#inspect correctly handles self-references"
   fails "Set#intersection raises an ArgumentError when passed a non-Enumerable"
   fails "Set#intersection returns a new Set containing only elements shared by self and the passed Enumerable"

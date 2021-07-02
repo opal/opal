@@ -10,6 +10,8 @@ opal_filter "Struct" do
   fails "Struct#deconstruct_keys returns an empty hash when there are more keys than attributes" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2>
   fails "Struct#deconstruct_keys returns at first not existing attribute name" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2>
   fails "Struct#deconstruct_keys returns only specified keys" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2, z=3>
+  fails "Struct#dig returns the value by the index" # Expected nil == "one" to be truthy but was false
+  fails "Struct#hash returns different hashes for different struct classes" # Expected "Hash" != "Hash" to be truthy but was false
   fails "Struct#hash returns different hashes for structs with different values when using keyword_init: true" # NameError: wrong constant name 1 non symbol member
   fails "Struct#hash returns different hashes for structs with different values" # Expected "Hash" == "Hash" to be falsy but was true
   fails "Struct#hash returns the same fixnum for structs with the same content"
