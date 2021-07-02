@@ -15,6 +15,9 @@ opal_unsupported_filter "private" do
   fails "Defining an 'initialize_copy' method sets the method's visibility to private"
   fails "Defining an 'initialize_dup' method sets the method's visibility to private"
   fails "Enumerator#initialize is a private method"
+  fails "Enumerator::Generator#initialize is a private method" # Expected Enumerator::Generator to have private instance method 'initialize' but it does not
+  fails "Enumerator::Lazy#initialize is a private method" # Expected Enumerator::Lazy to have private instance method 'initialize' but it does not
+  fails "Enumerator::Yielder#initialize is a private method" # Expected Enumerator::Yielder to have private instance method 'initialize' but it does not
   fails "Invoking a private getter method does not permit self as a receiver"
   fails "Kernel#block_given? is a private method"
   fails "Kernel#eval is a private method"
@@ -107,6 +110,7 @@ opal_unsupported_filter "private" do
   fails "Kernel.proc is a private method"
   fails "Kernel.rand is a private method"
   fails "Kernel.srand is a private method"
+  fails "Matrix.new is private" # Expected Matrix to have private method 'new' but it does not
   fails "Method#== missing methods calls respond_to_missing? with true to include private methods"
   fails "Method#eql? missing methods calls respond_to_missing? with true to include private methods"
   fails "Module#alias_method aliasing special methods keeps initialize private when aliasing"
