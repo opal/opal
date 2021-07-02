@@ -53,6 +53,7 @@ opal_filter "Exception" do
   fails "Exception#to_s calls #to_s on the message" # Mock 'message' expected to receive 'to_s' exactly 1 times but received it 2 times
   fails "IOError is a superclass of EOFError"
   fails "Interrupt is a subclass of SignalException" # Expected Exception to equal SignalException
+  fails "Interrupt is raised on the main Thread by the default SIGINT handler" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x2316>
   fails "Interrupt.new returns an instance of interrupt with no message given" # NoMethodError: undefined method `signo' for #<Interrupt: Interrupt>:Interrupt
   fails "Interrupt.new takes an optional message argument" # NoMethodError: undefined method `signo' for #<Interrupt: message>:Interrupt
   fails "KeyError accepts :receiver and :key options" # ArgumentError: no receiver is available
