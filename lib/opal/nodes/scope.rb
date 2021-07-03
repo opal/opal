@@ -92,6 +92,11 @@ module Opal
         @type == :top
       end
 
+      # Returns true for top and top-level iterators
+      def top_or_iter_in_top?
+        top? || (iter? && @parent.top_or_iter_in_top?)
+      end
+
       # True if a block/iter scope
       def iter?
         @type == :iter
