@@ -21,6 +21,7 @@ opal_filter "Marshal" do
   fails "Marshal.load for a Regexp loads a extended_user_regexp having ivar"
   fails "Marshal.load for a Regexp loads an extended Regexp" # Expected /[a-z]/ == /(?:)/ to be truthy but was false
   fails "Marshal.load for a String loads a String as BINARY if no encoding is specified at the end" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Marshal.load for a String loads a String subclass with custom constructor" # ArgumentError: [UserCustomConstructorString#initialize] wrong number of arguments(1 for 2)
   fails "Marshal.load for a Struct does not call initialize on the unmarshaled struct"
   fails "Marshal.load for a Symbol loads a Symbol" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Marshal.load for a Symbol loads a binary encoded Symbol" # Expected "â\u0086\u0092" to equal "→"
