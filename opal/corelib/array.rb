@@ -2291,12 +2291,23 @@ class Array < `Array`
 
   def unshift(*objects)
     %x{
-      for (var i = objects.length - 1; i >= 0; i--) {
-        self.unshift(objects[i]);
+      var selfLength = self.length
+      var objectsLength = objects.length
+      if (objectsLength == 0) return self;
+      var index = selfLength - objectsLength
+      for (var i = 0; i < objectsLength; i++) {
+        self.push(self[index + i])
       }
+      var len = selfLength - 1
+      while (len - objectsLength >= 0) {
+        self[len] = self[len - objectsLength]
+        len--
+      }
+      for (var j = 0; j < objectsLength; j++) {
+        self[j] = objects[j]
+      }
+      return self;
     }
-
-    self
   end
 
   alias prepend unshift
