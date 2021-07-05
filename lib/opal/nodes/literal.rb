@@ -159,11 +159,10 @@ module Opal
         *values, flags_sexp = *children
         self.flags = flags_sexp.children.map(&:to_s)
 
-        self.value = case values.length
-                     when 0
+        self.value = if values.length == 0
                        # empty regexp, we can process it inline
                        s(:str, '')
-                     when 1
+                     elsif single_line?(values)
                        # simple plain regexp, we can put it inline
                        values[0]
                      else
@@ -194,6 +193,16 @@ module Opal
 
       def raw_value
         self.value = @sexp.loc.expression.source
+      end
+
+      private
+
+      def single_line?(values)
+        return false if values.length > 1
+
+        value = values[0]
+        # JavaScript doesn't support multiline regexp
+        value.type != :str || !value.children[0].include?("\n")
       end
     end
 

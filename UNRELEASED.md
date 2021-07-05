@@ -12,6 +12,7 @@
 - Add regexp support to `String#start_with` (#2198)
 - `String#bytes` now works in strict mode (#2194)
 - Fix nested module inclusion (#2053)
+- Fixed multiple line Regexp literal to not generate invalid syntax as JavaScript (#1616)
 
 ### Changed
 
