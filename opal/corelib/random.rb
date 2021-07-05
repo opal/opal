@@ -1,5 +1,17 @@
+# helpers: falsy
+
 class Random
   attr_reader :seed, :state
+
+  def self._verify_count(count)
+    %x{
+      if ($falsy(count)) count = 16;
+      if (typeof count !== "number") count = #{`count`.to_int};
+      if (count < 0) #{raise ArgumentError, 'negative string size (or size too big)'};
+      count = Math.floor(count);
+      return count;
+    }
+  end
 
   def initialize(seed = Random.new_seed)
     seed = Opal.coerce_to!(seed, Integer, :to_int)
@@ -29,13 +41,7 @@ class Random
   end
 
   def self.urandom(size)
-    size = Opal.coerce_to!(size, Integer, :to_int)
-
-    if size < 0
-      raise ArgumentError, 'negative string size (or size too big)'
-    end
-
-    Array.new(size) { rand(255).chr }.join.encode('ASCII-8BIT')
+    ::SecureRandom.bytes(size)
   end
 
   def ==(other)
@@ -45,72 +51,31 @@ class Random
   end
 
   def bytes(length)
-    length = Opal.coerce_to!(length, Integer, :to_int)
+    length = Random._verify_count(length)
 
     Array.new(length) { rand(255).chr }.join.encode('ASCII-8BIT')
   end
 
+  def self.bytes(length)
+    DEFAULT.bytes(length)
+  end
+
   def rand(limit = undefined)
+    random_number(limit)
+  end
+
+  # Not part of the Ruby interface (use #random_number for portability), but
+  # used by Random::Formatter as a shortcut, as for Random interface the float
+  # RNG is primary.
+  def random_float
     %x{
-      function randomFloat() {
-        self.state++;
-        return Opal.$$rand.rand(self.$rng);
-      }
-
-      function randomInt() {
-        return Math.floor(randomFloat() * limit);
-      }
-
-      function randomRange() {
-        var min = limit.begin,
-            max = limit.end;
-
-        if (min === nil || max === nil) {
-          return nil;
-        }
-
-        var length = max - min;
-
-        if (length < 0) {
-          return nil;
-        }
-
-        if (length === 0) {
-          return min;
-        }
-
-        if (max % 1 === 0 && min % 1 === 0 && !limit.excl) {
-          length++;
-        }
-
-        return self.$rand(length) + min;
-      }
-
-      if (limit == null) {
-        return randomFloat();
-      } else if (limit.$$is_range) {
-        return randomRange();
-      } else if (limit.$$is_number) {
-        if (limit <= 0) {
-          #{raise ArgumentError, "invalid argument - #{limit}"}
-        }
-
-        if (limit % 1 === 0) {
-          // integer
-          return randomInt();
-        } else {
-          return randomFloat() * limit;
-        }
-      } else {
-        limit = #{Opal.coerce_to!(limit, Integer, :to_int)};
-
-        if (limit <= 0) {
-          #{raise ArgumentError, "invalid argument - #{limit}"}
-        }
-
-        return randomInt();
-      }
+      self.state++;
+      return Opal.$$rand.rand(self.$rng);
     }
+  end
+
+  def self.random_float
+    DEFAULT.random_float
   end
 
   def self.generator=(generator)

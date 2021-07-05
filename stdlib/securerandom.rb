@@ -1,44 +1,64 @@
 module SecureRandom
-  def self.hex(count = nil)
-    count ||= 16
-    count = count.to_int unless `typeof count === "number"`
-    raise ArgumentError, 'count of hex numbers must be positive' if count < 0
-    %x{
-      count = Math.floor(count);
-      var repeat = Math.floor(count / 6),
-          remain = count % 6,
-          remain_total = remain * 2,
-          string = '',
-          temp;
-      for (var i = 0; i < repeat; i++) {
-        // parseInt('ff'.repeat(6), 16) == 281474976710655
-        temp = Math.floor(Math.random() * 281474976710655).toString(16);
-        if (temp.length < 12) {
-          // account for leading zeros gone missing
-          temp = '0'.repeat(12 - temp.length) + temp;
-        }
-        string = string + temp;
-      }
-      if (remain > 0) {
-        temp = Math.floor(Math.random()*parseInt('ff'.repeat(remain), 16)).toString(16);
-        if (temp.length < remain_total) {
-          // account for leading zeros gone missing
-          temp = '0'.repeat(remain_total - temp.length) + temp;
-        }
-        string = string + temp;
-      }
-      return string;
+  extend Random::Formatter
+
+  %x{
+    var gen_random_bytes;
+
+    if ((Opal.global.crypto   && Opal.global.crypto.getRandomValues) ||
+        (Opal.global.msCrypto && Opal.global.msCrypto.getRandomValues)) {
+      // This method is available in all non-ancient web browsers.
+
+      var crypto = Opal.global.crypto || Opal.global.msCrypto;
+      gen_random_bytes = function(count) {
+        var storage = new Uint8Array(count);
+        crypto.getRandomValues(storage);
+        return storage;
+      };
     }
+    else if (Opal.global.crypto && Opal.global.crypto.randomBytes) {
+      // This method is available in Node.js
+
+      gen_random_bytes = function(count) {
+        return Opal.global.crypto.randomBytes(count);
+      };
+    }
+    else {
+      // Let's dangerously polyfill this interface with our MersenneTwister
+      // xor native JS Math.random xor something about current time...
+      // That's hardly secure, but the following warning should provide a person
+      // deploying the code a good idea on what he should do to make his deployment
+      // actually secure.
+      // It's possible to interface other libraries by adding an else if above if
+      // that's really desired.
+
+      #{warn 'Can\'t get a Crypto.getRandomValues interface or Crypto.randomBytes.' \
+             'The random values generated with SecureRandom won\'t be ' \
+             'cryptographically secure'}
+
+      gen_random_bytes = function(count) {
+        var storage = new Uint8Array(count);
+        for (var i = 0; i < count; i++) {
+          storage[i] = #{rand(0xff)} ^ Math.floor(Math.random() * 256);
+          storage[i] ^= +(new Date())>>#{rand(0xff)}&0xff;
+        }
+        return storage;
+      }
+    }
+  }
+
+  def self.bytes(bytes = nil)
+    gen_random(bytes)
   end
 
-  def self.uuid
-    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.gsub(/[xy]/) do |ch,|
-      %x{
-        var r = Math.random() * 16 | 0,
-            v = ch == "x" ? r : (r & 3 | 8);
-
-        return v.toString(16);
+  def self.gen_random(count = nil)
+    count = Random._verify_count(count)
+    out = ''
+    %x{
+      var bytes = gen_random_bytes(#{count});
+      for (var i = 0; i < #{count}; i++) {
+        out += String.fromCharCode(bytes[i]);
       }
-    end
+    }
+    out.encode('ASCII-8BIT')
   end
 end

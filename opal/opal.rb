@@ -13,6 +13,7 @@ require 'corelib/main'
 require 'corelib/dir'
 require 'corelib/file'
 require 'corelib/process'
+require 'corelib/random/formatter'
 require 'corelib/random'
 require 'corelib/random/mersenne_twister'
 

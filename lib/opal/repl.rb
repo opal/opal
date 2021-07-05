@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal'
+require 'securerandom'
 
 module Opal
   class REPL
@@ -38,9 +39,15 @@ module Opal
       eval_ruby File.read(filename)
     end
 
+    # A polyfill so that SecureRandom works in repl correctly.
+    def random_bytes(bytes)
+      ::SecureRandom.bytes(bytes).split('').map(&:ord)
+    end
+
     def load_opal
       v8.attach('console.log', method(:puts).to_proc)
       v8.attach('console.warn', method(:warn).to_proc)
+      v8.attach('crypto.randomBytes', method(:random_bytes).to_proc)
       v8.eval Opal::Builder.new.build('opal').to_s
       v8.attach('Opal.exit', method(:exit).to_proc)
     end
