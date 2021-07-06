@@ -884,6 +884,31 @@
     return value;
   };
 
+  // Gets class variable with specified +name+ from provided +module+
+  //
+  // @param module [Module]
+  // @param name [String]
+  Opal.class_variable_get = function(module, name, tolerant) {
+    if ($has_own.call(module.$$cvars, name))
+      return module.$$cvars[name];
+
+    var ancestors = Opal.ancestors(module),
+      i, length = ancestors.length;
+    
+    for (i = 0; i < length; i++) {
+      var ancestor = ancestors[i];
+
+      if ($has_own.call(ancestor.$$cvars, name)) {
+        return ancestor.$$cvars[name];
+      }
+    }
+
+    if (!tolerant)
+      throw Opal.NameError.$new('uninitialized class variable '+name+' in '+module.$name());
+    
+    return nil;
+  }
+
   function isRoot(proto) {
     return proto.hasOwnProperty('$$iclass') && proto.hasOwnProperty('$$root');
   }

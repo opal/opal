@@ -20,7 +20,7 @@ module Opal
           get_node = lhs.updated(get_type)              # lhs
           condition_node = s(root_type, get_node, rhs)  # lhs || rhs
 
-          if get_type == :const && root_type == :or
+          if %i[const cvar].include?(get_type) && root_type == :or
             # defined?(lhs)
             defined_node = s(:defined?, get_node)
             # LHS = defined?(LHS) ? (LHS || rhs) : rhs
@@ -51,7 +51,10 @@ module Opal
       GlobalVariableHandler = GET_SET[:gvar, :gvasgn]
 
       # Takes    `@@lhs ||= rhs`
-      # Produces `@@lhs = @@lhs || rhs`
+      # Produces `@@lhs = defined?(@@lhs) ? (@@lhs || rhs) : rhs`
+      #
+      # Takes    `@@lhs &&= rhs`
+      # Produces `@@lhs = @@lhs && rhs`
       ClassVariableHandler = GET_SET[:cvar, :cvasgn]
 
       # Takes    `recvr.meth ||= rhs`
