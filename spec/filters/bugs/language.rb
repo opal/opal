@@ -94,8 +94,6 @@ opal_filter "language" do
   fails "An instance method with a default argument shadows an existing method with the same name as the local"
   fails "An instance method with a default argument warns and uses a nil value when there is an existing local method with same name" # Expected warning to match: /circular argument reference/ but got: ""
   fails "Assigning an anonymous module to a constant sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
-  fails "Constant resolution within methods with dynamically assigned constants searches Object as a lexical scope only if Object is explicitly opened"
-  fails "Constant resolution within methods with statically assigned constants searches Object as a lexical scope only if Object is explicitly opened"
   fails "Executing break from within a block raises LocalJumpError when converted into a proc during a a super call" # Expected LocalJumpError but no exception was raised (1 was returned)
   fails "Executing break from within a block returns from the original invoking method even in case of chained calls"
   fails "Executing break from within a block works when passing through a super call" # Expected to not get Exception
