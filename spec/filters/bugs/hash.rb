@@ -44,7 +44,7 @@ opal_filter "Hash" do
   fails "Hash#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0x1b948>}" to match /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/
   fails "Hash#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Hash#transform_keys! prevents conflicts between new keys and old ones" # Expected {"e"=>1} to equal {"b"=>1, "c"=>2, "d"=>3, "e"=>4}
-  fails "Hash#transform_keys! returns the processed keys if we broke from the block" # Expected {"c"=>1, "d"=>4} to equal {"b"=>1, "c"=>2}
+  fails "Hash#transform_keys! returns the processed keys and non evaluated keys if we broke from the block" # Expected {"c"=>1, "d"=>4} == {"b"=>1, "c"=>2, "d"=>4} to be truthy but was false
   fails "Hash.[] raises for elements that are not arrays" # Expected ArgumentError but no exception was raised (nil was returned)
   fails "Hash.ruby2_keywords_hash raises TypeError for non-Hash" # Expected TypeError but got: NoMethodError (undefined method `ruby2_keywords_hash' for Hash)
   fails "Hash.ruby2_keywords_hash returns a copy of a Hash and marks the copy as a keywords Hash" # NoMethodError: undefined method `ruby2_keywords_hash' for Hash
