@@ -113,6 +113,7 @@ module Testing
 
         require 'spec_helper'
         require 'opal/full'
+        require 'securerandom'
         #{enter_benchmarking_mode}
 
         #{filter_requires}
