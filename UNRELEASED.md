@@ -4,6 +4,7 @@
 - Support for Ruby 3.0 forward arguments: `def a(...) puts(...) end` (#2153)
 - Support for beginless and endless ranges: `(1..)`, `(..1)` (#2150)
 - Preliminary support for **nil argument - see #2240 to note limitations (#2152)
+- Support for `Random::Formatters` which add methods `#{hex,base64,urlsafe_base64,uuid,random_float,random_number,alphanumeric}` to `Random` and `SecureRandom` (#2218)
 
 ### Fixed
 
@@ -12,6 +13,9 @@
 - Add regexp support to `String#start_with` (#2198)
 - `String#bytes` now works in strict mode (#2194)
 - Fix nested module inclusion (#2053)
+- SecureRandom is now cryptographically secure on most platforms (#2218, #2170)
+- Fix performance regression for `Array#unshift` on v8 > 7.1 (#2116)
+- String subclasses now call `#initialize` with multiple arguments correctly (with a limitation caused by the String immutability issue, that a source string must be the first argument and `#initialize` can't change its value) (#2238, #2185)
 
 ### Changed
 
