@@ -85,6 +85,10 @@ module Opal
         @compiler.scope
       end
 
+      def top_scope
+        scope.top_scope
+      end
+
       def s(*args)
         @compiler.s(*args)
       end
