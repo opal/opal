@@ -27,6 +27,9 @@ ruby/core/array/pack/u_spec
 !ruby/core/array/pack/z_spec
 
 ruby/core/basicobject
+
+ruby/core/binding
+
 ruby/core/builtin_constants
 ruby/core/class
 ruby/core/comparable

@@ -6,16 +6,20 @@ require 'opal/erb'
 require 'opal/version'
 
 module Kernel
-  def eval(str)
+  def eval(str, binding = nil, file = nil, line = nil)
     str = Opal.coerce_to!(str, String, :to_str)
-    default_eval_options = { file: '(eval)', eval: true }
+    default_eval_options = { file: file || '(eval)', eval: true }
     compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
     code = `Opal.compile(str, compiling_options)`
-    %x{
-      return (function(self) {
-        return eval(#{code});
-      })(self)
-    }
+    if binding
+      binding.js_eval(code)
+    else
+      %x{
+        return (function(self) {
+          return eval(#{code});
+        })(self)
+      }
+    end
   end
 
   def require_remote(url)
