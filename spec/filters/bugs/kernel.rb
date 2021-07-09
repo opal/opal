@@ -79,8 +79,6 @@ opal_filter "Kernel" do
   fails "Kernel#eval does not share locals across eval scopes"
   fails "Kernel#eval doesn't accept a Proc object as a binding"
   fails "Kernel#eval evaluates string with given filename and negative linenumber" # NameError: uninitialized constant TOPLEVEL_BINDING
-  fails "Kernel#eval finds a local in an enclosing scope"
-  fails "Kernel#eval finds locals in a nested eval"
   fails "Kernel#eval includes file and line information in syntax error"
   fails "Kernel#eval raises a LocalJumpError if there is no lambda-style closure in the chain"
   fails "Kernel#eval unwinds through a Proc-style closure and returns from a lambda-style closure in the closure chain"

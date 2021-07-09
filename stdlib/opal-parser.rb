@@ -10,7 +10,7 @@ module Kernel
     str = Opal.coerce_to!(str, String, :to_str)
     default_eval_options = { file: '(eval)', eval: true }
     compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
-    code = Opal.compile str, compiling_options
+    code = `Opal.compile(str, compiling_options)`
     %x{
       return (function(self) {
         return eval(#{code});
@@ -30,10 +30,19 @@ end
 
 %x{
   Opal.compile = function(str, options) {
-    if (options) {
-      options = Opal.hash(options);
+    try {
+      str = #{Opal.coerce_to!(`str`, String, :to_str)}
+      if (options) options = Opal.hash(options);
+      return Opal.Opal.$compile(str, options);
     }
-    return Opal.Opal.$compile(str, options);
+    catch (e) {
+      if (e.$$class === Opal.Opal.SyntaxError) {
+        var err = Opal.SyntaxError.$new(e.message);
+        err.$set_backtrace(e.$backtrace());
+        throw(err);
+      }
+      else { throw e; }
+    }
   };
 
   Opal['eval'] = function(str, options) {
