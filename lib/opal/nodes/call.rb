@@ -295,6 +295,13 @@ module Opal
         push ')' if push_nesting
       end
 
+      add_special :await do |_compile_default|
+        push fragment '(await ('
+        push process(recvr)
+        push fragment '))'
+        scope.await_encountered = true
+      end
+
       def push_nesting?
         recv = children.first
 

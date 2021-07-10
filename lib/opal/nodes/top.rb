@@ -15,7 +15,6 @@ module Opal
       def compile
         push version_comment
 
-        opening
         in_scope do
           line '"use strict";' if compiler.use_strict?
 
@@ -42,25 +41,37 @@ module Opal
 
           line body_code
         end
-
+        opening
         closing
       end
 
       def opening
+        as = ""
+        aw = ""
+        if await_encountered
+          as = "async "
+          aw = "(await ("
+        end
+
         if compiler.requirable?
-          line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
+          unshift "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = #{as}function(Opal) {"
         elsif compiler.eval?
-          line '(function(Opal, self) {'
+          unshift "#{aw}(#{as}function(Opal, self) {"
         else
-          line '(function(Opal) {'
+          unshift "(#{as}function(Opal) {"
         end
       end
 
       def closing
+        aw = ""
+        if await_encountered
+          aw = "))"
+        end
+
         if compiler.requirable?
           line "};\n"
         elsif compiler.eval?
-          line '})(Opal, self)'
+          line "})(Opal, self)#{aw};"
         else
           line "})(Opal);\n"
         end
