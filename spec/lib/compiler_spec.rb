@@ -236,7 +236,7 @@ RSpec.describe Opal::Compiler do
         it 'adds nil check for primitives' do
           expect_compiled('foo = 42 if 2').to include('if ($truthy(2))')
           expect_compiled('foo = 42 if 2.5').to include('if ($truthy(2.5))')
-          expect_compiled('foo = 42 if true').to include('if ($truthy(true))')
+          expect_compiled('foo = 42 if :true').to include('if ($truthy("true"))')
         end
 
         it 'adds nil check for boolean method calls' do
@@ -289,7 +289,7 @@ RSpec.describe Opal::Compiler do
         it 'adds nil check for primitives' do
           expect_compiled('foo = 42 if (2)').to include('if ($truthy(2)')
           expect_compiled('foo = 42 if (2.5)').to include('if ($truthy(2.5)')
-          expect_compiled('foo = 42 if (true)').to include('if ($truthy(true)')
+          expect_compiled('foo = 42 if (:true)').to include('if ($truthy("true")')
         end
 
         it 'adds nil check for boolean method calls' do
