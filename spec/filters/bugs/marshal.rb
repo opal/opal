@@ -21,6 +21,7 @@ opal_filter "Marshal" do
   fails "Marshal.load for a Regexp loads a extended_user_regexp having ivar"
   fails "Marshal.load for a Regexp loads an extended Regexp" # Expected /[a-z]/ == /(?:)/ to be truthy but was false
   fails "Marshal.load for a String loads a String as BINARY if no encoding is specified at the end" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Marshal.load for a String loads a String subclass with custom constructor" # ArgumentError: [UserCustomConstructorString#initialize] wrong number of arguments(1 for 2)
   fails "Marshal.load for a Struct does not call initialize on the unmarshaled struct"
   fails "Marshal.load for a Symbol loads a Symbol" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Marshal.load for a Symbol loads a binary encoded Symbol" # Expected "â\u0086\u0092" to equal "→"
@@ -34,11 +35,8 @@ opal_filter "Marshal" do
   fails "Marshal.load for an Exception loads a marshalled exception with a message"
   fails "Marshal.load for an Exception loads a marshalled exception with no message"
   fails "Marshal.load for an Exception loads an marshalled exception with ivars" # Expected "Exception" == "foo" to be truthy but was false
-  fails "Marshal.load for an Integer loads an Integer -2361183241434822606847" # Expected -2 == -2.3611832414348226e+21 to be truthy but was false
-  fails "Marshal.load for an Integer loads an Integer 2361183241434822606847" # Expected 2 == 2.3611832414348226e+21 to be truthy but was false
   fails "Marshal.load for an Object loads an Object with a non-US-ASCII instance variable" # NameError: '@Ã©' is not allowed as an instance variable name
   fails "Marshal.load for an Object raises ArgumentError if the object from an 'o' stream is not dumpable as 'o' type user class" # Expected ArgumentError but no exception was raised (#<File:0x3b160> was returned)
-  fails "Marshal.load loads a Integer 2**90" # Expected 1 == 1.2379400392853803e+27 to be truthy but was false
   fails "Marshal.load loads a Regexp" # anchors difference
   fails "Marshal.load loads an array containing objects having _dump method, and with proc"
   fails "Marshal.load loads an array containing objects having marshal_dump method, and with proc"

@@ -196,7 +196,7 @@ class Array < `Array`
         result = result.concat(converted);
       }
 
-      return toArraySubclass(result, #{self.class});
+      return result;
     }
   end
 
@@ -361,7 +361,7 @@ class Array < `Array`
       }
 
       result = self.slice(from, to);
-      return toArraySubclass(result, self[Opal.s.$class]());
+      return result;
     }
 
     function $array_slice_index_length(self, index, length) {
@@ -394,7 +394,7 @@ class Array < `Array`
 
         result = self.slice(index, index + length);
       }
-      return toArraySubclass(result, self[Opal.s.$class]());
+      return result;
     }
   }
 
@@ -883,7 +883,9 @@ class Array < `Array`
     self
   end
 
-  alias difference -
+  def difference(*arrays)
+    arrays.reduce(to_a.dup) { |a, b| a - b }
+  end
 
   def dig(idx, *idxs)
     item = self[idx]
@@ -1180,7 +1182,7 @@ class Array < `Array`
         level = $coerce_to(level, #{Integer}, 'to_int');
       }
 
-      return toArraySubclass(_flatten(self, level), #{self.class});
+      return _flatten(self, level);
     }
   end
 
@@ -1335,7 +1337,9 @@ class Array < `Array`
     }
   end
 
-  alias intersection &
+  def intersection(*arrays)
+    arrays.reduce(to_a.dup) { |a, b| a & b }
+  end
 
   def join(sep = nil)
     return '' if `self.length === 0`
@@ -2165,10 +2169,19 @@ class Array < `Array`
   end
 
   def to_a
-    self
+    %x{
+      if (self[Opal.s.$$class] === Opal.Array) {
+        return self;
+      }
+      else {
+        return Opal.Array[Opal.s.$new](self);
+      }
+    }
   end
 
-  alias to_ary to_a
+  def to_ary
+    self
+  end
 
   def to_h(&block)
     array = self
@@ -2224,7 +2237,9 @@ class Array < `Array`
     result
   end
 
-  alias union |
+  def union(*arrays)
+    arrays.reduce(uniq) { |a, b| a | b }
+  end
 
   def uniq(&block)
     %x{
@@ -2248,7 +2263,7 @@ class Array < `Array`
         }
       }
 
-      return toArraySubclass(#{`hash`.values}, #{self.class});
+      return #{`hash`.values};
     }
   end
 
@@ -2276,12 +2291,23 @@ class Array < `Array`
 
   def unshift(*objects)
     %x{
-      for (var i = objects.length - 1; i >= 0; i--) {
-        self.unshift(objects[i]);
+      var selfLength = self.length
+      var objectsLength = objects.length
+      if (objectsLength == 0) return self;
+      var index = selfLength - objectsLength
+      for (var i = 0; i < objectsLength; i++) {
+        self.push(self[index + i])
       }
+      var len = selfLength - 1
+      while (len - objectsLength >= 0) {
+        self[len] = self[len - objectsLength]
+        len--
+      }
+      for (var j = 0; j < objectsLength; j++) {
+        self[j] = objects[j]
+      }
+      return self;
     }
-
-    self
   end
 
   alias prepend unshift
@@ -2332,12 +2358,8 @@ class Array < `Array`
         if (o[Opal.s.$$is_array]) {
           continue;
         }
-        if (o[Opal.s.$$is_enumerator]) {
-          if (o[Opal.s.$size]() === Infinity) {
-            others[j] = o[Opal.s.$take](size);
-          } else {
-            others[j] = o[Opal.s.$to_a]();
-          }
+        if (o[Opal.s.$$is_range] || o[Opal.s.$$is_enumerator]) {
+          others[j] = o[Opal.s.$take](size);
           continue;
         }
         others[j] = #{(

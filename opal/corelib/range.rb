@@ -9,7 +9,7 @@ class Range
 
   def initialize(first, last, exclude = false)
     raise NameError, "'initialize' called twice" if @begin
-    raise ArgumentError, 'bad value for range' unless first <=> last
+    raise ArgumentError, 'bad value for range' unless first <=> last || first.nil? || last.nil?
 
     @begin = first
     @end   = last
@@ -20,15 +20,35 @@ class Range
     include? value
   end
 
+  %x{
+    function is_infinite(self) {
+      if (self.begin === nil || self.end === nil ||
+          self.begin === -Infinity || self.end === Infinity ||
+          self.begin === Infinity || self.end === -Infinity) return true;
+      return false;
+    }
+  }
+
+  def count(&block)
+    if !block_given? && `is_infinite(self)`
+      return Float::INFINITY
+    end
+    super
+  end
+
+  def to_a
+    raise TypeError, 'cannot convert endless range to an array' if `is_infinite(self)`
+    super
+  end
+
   def cover?(value)
-    beg_cmp = (@begin <=> value)
-    return false unless beg_cmp && beg_cmp <= 0
-    end_cmp = (value <=> @end)
+    beg_cmp = (@begin.nil? && -1) || (@begin <=> value) || false
+    end_cmp = (@end.nil? && -1) || (value <=> @end) || false
     if @excl
       end_cmp && end_cmp < 0
     else
       end_cmp && end_cmp <= 0
-    end
+    end && beg_cmp && beg_cmp <= 0
   end
 
   def each(&block)
@@ -62,7 +82,7 @@ class Range
       raise TypeError, "can't iterate from #{current.class}"
     end
 
-    while (current <=> last) < 0
+    while @end.nil? || (current <=> last) < 0
       yield current
 
       current = current.succ
@@ -88,6 +108,7 @@ class Range
   end
 
   def first(n = undefined)
+    raise RangeError, 'cannot get the minimum of beginless range' if @begin.nil?
     return @begin if `n == null`
     super
   end
@@ -95,17 +116,19 @@ class Range
   alias include? cover?
 
   def last(n = undefined)
+    raise RangeError, 'cannot get the maximum of endless range' if @end.nil?
     return @end if `n == null`
     to_a.last(n)
   end
 
   # FIXME: currently hardcoded to assume range holds numerics
   def max
-    if block_given?
+    if @end.nil?
+      raise RangeError, 'cannot get the maximum of endless range'
+    elsif block_given?
       super
-    elsif @begin > @end
-      nil
-    elsif @excl && @begin == @end
+    elsif !@begin.nil? && (@begin > @end ||
+                           @excl && @begin == @end)
       nil
     else
       `#{@excl} ? #{@end} - 1 : #{@end}`
@@ -115,11 +138,12 @@ class Range
   alias member? cover?
 
   def min
-    if block_given?
+    if @begin.nil?
+      raise RangeError, 'cannot get the minimum of beginless range'
+    elsif block_given?
       super
-    elsif @begin > @end
-      nil
-    elsif @excl && @begin == @end
+    elsif !@end.nil? && (@begin > @end ||
+                         @excl && @begin == @end)
       nil
     else
       @begin
@@ -127,14 +151,17 @@ class Range
   end
 
   def size
+    infinity = Float::INFINITY
+
+    return 0 if (@begin == infinity && !@end.nil?) || (@end == -infinity && !@begin.nil?)
+    return infinity if `is_infinite(self)`
+    return nil unless Numeric === @begin && Numeric === @end
+
     range_begin = @begin
     range_end   = @end
     range_end  -= 1 if @excl
 
-    return nil unless Numeric === range_begin && Numeric === range_end
     return 0 if range_end < range_begin
-    infinity = Float::INFINITY
-    return infinity if [range_begin.abs, range_end.abs].include?(infinity)
 
     `Math.abs(range_end - range_begin) + 1`.to_i
   end
@@ -228,6 +255,10 @@ class Range
   def bsearch(&block)
     return enum_for(:bsearch) unless block_given?
 
+    if `is_infinite(self) && (self.begin[Opal.s.$$is_number] || self.end[Opal.s.$$is_number])`
+      raise NotImplementedError, "Can't #bsearch an infinite range"
+    end
+
     unless `self.begin[Opal.s.$$is_number] && self.end[Opal.s.$$is_number]`
       raise TypeError, "can't do binary search for #{@begin.class}"
     end
@@ -236,11 +267,11 @@ class Range
   end
 
   def to_s
-    "#{@begin}#{@excl ? '...' : '..'}#{@end}"
+    "#{@begin || ''}#{@excl ? '...' : '..'}#{@end || ''}"
   end
 
   def inspect
-    "#{@begin.inspect}#{@excl ? '...' : '..'}#{@end.inspect}"
+    "#{@begin && @begin.inspect}#{@excl ? '...' : '..'}#{@end && @end.inspect}"
   end
 
   def marshal_load(args)

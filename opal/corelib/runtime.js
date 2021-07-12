@@ -182,6 +182,7 @@
   Opal.s('$each');
   Opal.s('$each_cons');
   Opal.s('$eql?');
+  Opal.s('$force_encoding');
   Opal.s('$hash');
   Opal.s('$initialize');
   Opal.s('$initialize_dup');
@@ -1158,10 +1159,10 @@
       // because there are no intermediate classes between `parent` and `next ancestor`.
       // It doesn't break any prototypes of other objects as we don't change class references.
 
-      var proto = includer[Opal.s.$$prototype], parent = proto, module_iclass = Object.getPrototypeOf(parent);
+      var parent = includer[Opal.s.$$prototype], module_iclass = Object.getPrototypeOf(parent);
 
       while (module_iclass != null) {
-        if (isRoot(module_iclass) && module_iclass[Opal.s.$$module] === module) {
+        if (module_iclass[Opal.s.$$module] === module && isRoot(module_iclass)) {
           break;
         }
 
@@ -1169,15 +1170,23 @@
         module_iclass = Object.getPrototypeOf(module_iclass);
       }
 
-      var next_ancestor = Object.getPrototypeOf(module_iclass);
+      if (module_iclass) {
+        // module has been directly included
+        var next_ancestor = Object.getPrototypeOf(module_iclass);
 
-      // skip non-root iclasses (that were recursively included)
-      while (next_ancestor.hasOwnProperty(Opal.s.$$iclass) && !isRoot(next_ancestor)) {
-        next_ancestor = Object.getPrototypeOf(next_ancestor);
+        // skip non-root iclasses (that were recursively included)
+        while (next_ancestor.hasOwnProperty(Opal.s.$$iclass) && !isRoot(next_ancestor)) {
+          next_ancestor = Object.getPrototypeOf(next_ancestor);
+        }
+
+        start_chain_after = parent;
+        end_chain_on = next_ancestor;
+      } else {
+        // module has not been directly included but was in ancestor chain because it was included by another module
+        // include it directly
+        start_chain_after = includer[Opal.s.$$prototype];
+        end_chain_on = Object.getPrototypeOf(includer[Opal.s.$$prototype]);
       }
-
-      start_chain_after = parent;
-      end_chain_on = next_ancestor;
     }
 
     $set_proto(start_chain_after, chain.first);

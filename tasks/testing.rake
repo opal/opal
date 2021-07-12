@@ -113,6 +113,7 @@ module Testing
 
         require 'spec_helper'
         require 'opal/full'
+        require 'securerandom'
         #{enter_benchmarking_mode}
 
         #{filter_requires}
@@ -354,12 +355,13 @@ task :minitest_node_nodejs do
   files = %w[
     nodejs
     opal-parser
-    nodejs/test_file.rb
     nodejs/test_dir.rb
+    nodejs/test_encoding.rb
     nodejs/test_env.rb
-    nodejs/test_io.rb
     nodejs/test_error.rb
+    nodejs/test_file.rb
     nodejs/test_file_encoding.rb
+    nodejs/test_io.rb
     nodejs/test_opal_builder.rb
   ]
 
@@ -369,8 +371,9 @@ task :minitest_node_nodejs do
   stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
   includes = "-Itest -Ilib -Ivendored-minitest"
 
+  use_strict_opt = ENV['USE_STRICT'] ? ' --use-strict' : ''
   sh "ruby -rbundler/setup "\
-     "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+     "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location#{use_strict_opt} #{filename}"
 end
 
 desc 'Run smoke tests with opal-rspec to see if something is broken'

@@ -30,11 +30,11 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
             s(:send, ruby_const_sexp, :==, opal_str_sexp)
           end
 
-          it 'replaces true branch with s(:nil)' do
+          it 'replaces the expression with the true branch' do
             expect_rewritten(
               s(:if, check, true_branch, false_branch)
             ).to eq(
-              s(:if, check, true_branch, s(:nil))
+              true_branch
             )
           end
         end
@@ -58,11 +58,11 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
             s(:send, ruby_const_sexp, :!=, opal_str_sexp)
           end
 
-          it 'replaces true branch with s(:nil)' do
+          it 'replaces the expression with the false branch' do
             expect_rewritten(
               s(:if, check, true_branch, false_branch)
             ).to eq(
-              s(:if, check, s(:nil), false_branch)
+              false_branch
             )
           end
         end
@@ -78,6 +78,51 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
             )
           end
         end
+      end
+
+      it 'supports nested blocks' do
+        expect_rewritten(
+          # if true
+          #   if RUBY_ENGINE == 'opal'
+          #     if RUBY_ENGINE == 'opal'
+          #       :a
+          #     end
+          #     if RUBY_ENGINE != 'opal'
+          #       :b
+          #     end
+          #   end
+          # end
+
+          s(:if,
+            s(:true),
+            s(:if,
+              s(:send, ruby_const_sexp, :==, opal_str_sexp),
+              s(:begin,
+                s(:if,
+                  s(:send, ruby_const_sexp, :==, opal_str_sexp),
+                  s(:sym, :a)
+                ),
+                s(:if,
+                  s(:send, ruby_const_sexp, :!=, opal_str_sexp),
+                  s(:sym, :b)
+                )
+              )
+            )
+          )
+        ).to eq(
+          # if true
+          #   :a
+          #   nil
+          # end
+
+          s(:if,
+            s(:true),
+            s(:begin,
+              s(:sym, :a),
+              s(:nil)
+            )
+          )
+        )
       end
     end
   end

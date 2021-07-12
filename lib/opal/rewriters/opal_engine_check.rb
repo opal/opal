@@ -9,14 +9,12 @@ module Opal
         test, true_body, false_body = *node.children
 
         if skip_check_present?(test)
-          false_body = s(:nil)
+          process(true_body || s(:nil))
+        elsif skip_check_present_not?(test)
+          process(false_body || s(:nil))
+        else
+          super
         end
-
-        if skip_check_present_not?(test)
-          true_body = s(:nil)
-        end
-
-        node.updated(nil, process_all([test, true_body, false_body]))
       end
 
       def skip_check_present?(test)

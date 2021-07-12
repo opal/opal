@@ -21,6 +21,7 @@ module Opal
         @kwargs    = arguments.kwargs
         @kwoptargs = arguments.kwoptargs
         @kwrestarg = arguments.kwrestarg
+        @kwnilarg  = arguments.kwnilarg
       end
 
       def compile

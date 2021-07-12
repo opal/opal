@@ -34,6 +34,7 @@ opal_filter "String" do
   fails "String#% integer formats i works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "String#% integer formats u works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "String#% other formats % alone raises an ArgumentError" # Expected ArgumentError but no exception was raised ("%" was returned)
+  fails "String#% other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "String#% output's encoding is the same as the format string if passed value is encoding-compatible" # NameError: uninitialized constant Encoding::SHIFT_JIS
   fails "String#% output's encoding raises if a compatible encoding can't be found" # Expected Encoding::CompatibilityError but no exception was raised ("hello world" was returned)
   fails "String#% precision float types controls the number of decimal places displayed in fraction part" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
@@ -58,6 +59,7 @@ opal_filter "String" do
   fails "String#[] with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
   fails "String#[] with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#[] with Range works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
   fails "String#[] with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#[] with Regexp returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#[] with Regexp, index returns String instances" # Expected "he" (StringSpecs::MyString) to be an instance of String
@@ -114,6 +116,7 @@ opal_filter "String" do
   fails "String#byteslice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
   fails "String#byteslice with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#byteslice with Range works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
   fails "String#byteslice with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#byteslice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with index, length returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
@@ -202,7 +205,6 @@ opal_filter "String" do
   fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to ASCII-8BIT if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to BINARY if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#getbyte interprets bytes relative to the String's encoding" # NotImplementedError: NotImplementedError
   fails "String#getbyte returns an Integer between 0 and 255" # NotImplementedError: NotImplementedError
   fails "String#grapheme_clusters is unicode aware" # NoMethodError: undefined method `grapheme_clusters' for "Ç∂éƒg"
   fails "String#grapheme_clusters passes each char in self to the given block" # NoMethodError: undefined method `grapheme_clusters' for "hello"
@@ -219,6 +221,7 @@ opal_filter "String" do
   fails "String#gsub with pattern and replacement returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#include? with String raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#inspect uses \\x notation for broken UTF-8 sequences" # Expected "\"ð\\u009F\"" == "\"\\xF0\\x9F\"" to be truthy but was false
+  fails "String#inspect when the string's encoding is different than the result's encoding and the string has both ASCII-compatible and ASCII-incompatible chars returns a string with the non-ASCII characters replaced by \\u notation" # Expected "\"hello привет\"" == "\"hello \\u043F\\u0440\\u0438\\u0432\\u0435\\u0442\"" to be truthy but was false
   fails "String#inspect when the string's encoding is different than the result's encoding and the string's encoding is ASCII-compatible but the characters are non-ASCII returns a string with the non-ASCII characters replaced by \\x notation" # ArgumentError: unknown encoding name - EUC-JP
   fails "String#intern raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
   fails "String#intern returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
@@ -235,12 +238,14 @@ opal_filter "String" do
   fails "String#ljust with length, padding returns String instances when called on subclasses" # Expected "          " (StringSpecs::MyString) to be an instance of String
   fails "String#next returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#rjust with length, padding returns String instances when called on subclasses" # Expected "          " (StringSpecs::MyString) to be an instance of String
+  fails "String#rpartition with String returns new object if doesn't match" # Expected "hello".equal? "hello" to be falsy but was true
   fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
   fails "String#size returns the correct length after force_encoding(BINARY)" # Expected 2 == 4 to be truthy but was false
   fails "String#slice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
   fails "String#slice with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#slice with Range works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
   fails "String#slice with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#slice with Regexp returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#slice with Regexp, index returns String instances" # Expected "he" (StringSpecs::MyString) to be an instance of String
@@ -252,6 +257,7 @@ opal_filter "String" do
   fails "String#slice! with Regexp returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with Regexp, index returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with index, length returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
+  fails "String#split with Regexp allows concurrent Regexp calls in a shared context" # NotImplementedError: Thread creation not available
   fails "String#split with Regexp applies the limit to the number of split substrings, without counting captures" # Expected ["a", "aBa"] to equal ["a", "B", "", "", "aBa"]
   fails "String#split with Regexp for a String subclass yields instances of String" # Expected nil (NilClass) to be an instance of String
   fails "String#split with Regexp returns String instances based on self" # Expected "x" (StringSpecs::MyString) to be an instance of String
@@ -259,6 +265,7 @@ opal_filter "String" do
   fails "String#split with Regexp when a block is given yields each split letter" # Expected ["c", "h", "u", "n", "k", "y"] == "chunky" to be truthy but was false
   fails "String#split with Regexp when a block is given yields each split substring with a pattern" # Expected ["chunky", "bacon"] == "chunky-bacon" to be truthy but was false
   fails "String#split with Regexp when a block is given yields each split substring with a regexp pattern" # Expected ["chunky", "bacon"] == "chunky:bacon" to be truthy but was false
+  fails "String#split with Regexp when a block is given yields each split substring with default pattern for a non-ASCII string" # Expected ["l'été", "arrive", "bientôt"] == "l'été arrive bientôt" to be truthy but was false
   fails "String#split with Regexp when a block is given yields each split substring with default pattern" # Expected ["chunky", "bacon"] == "chunky bacon" to be truthy but was false
   fails "String#split with Regexp when a block is given yields each split substring with empty regexp pattern and limit" # Expected ["c", "h", "unky"] == "chunky" to be truthy but was false
   fails "String#split with Regexp when a block is given yields each split substring with empty regexp pattern" # Expected ["c", "h", "u", "n", "k", "y"] == "chunky" to be truthy but was false
@@ -332,7 +339,6 @@ opal_filter "String" do
   fails "String#upcase! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#valid_encoding? returns true for IBM720 encoding self is valid in" # ArgumentError: unknown encoding name - IBM720
-  fails "String.new accepts a capacity argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
   fails "String.new accepts an encoding argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
   fails "String.new is called on subclasses" # Expected nil to equal "subclass"
 end
