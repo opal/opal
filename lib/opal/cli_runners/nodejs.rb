@@ -15,7 +15,7 @@ module Opal
         argv = data[:argv].dup.to_a
         argv.unshift('--') if argv.any?
 
-        opts = Shellwords.shellwords(ENV['NODE_OPTS'] || "")
+        opts = Shellwords.shellwords(ENV['NODE_OPTS'] || '')
 
         SystemRunner.call(data) do |tempfile|
           [
