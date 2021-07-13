@@ -31,7 +31,6 @@ class String < `String`
 
   def self.new(*args)
     %x{
-      debugger;
       var str = args[0] || "";
       var opts = args[args.length-1];
       str = $coerce_to(str, #{String}, 'to_str');
