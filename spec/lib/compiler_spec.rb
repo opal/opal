@@ -59,7 +59,7 @@ RSpec.describe Opal::Compiler do
   end
 
   it "should compile method calls" do
-    expect_compiled("self.inspect").to include("$inspect()")
+    expect_compiled("self.inspect").to include("[Opal.s.$inspect]()")
     expect_compiled("self.map { |a| a + 10 }").to include("$map")
   end
 
@@ -77,8 +77,8 @@ RSpec.describe Opal::Compiler do
   end
 
   it "should compile undef calls" do
-    expect_compiled("undef a").to include("Opal.udef(self, Opal.s\['$' + \"a\"\])")
-    expect_compiled("undef a,b").to match(/Opal.udef\(self, Opal.s\['\$' \+ "a"\]\);.*Opal.udef\(self, Opal.s\['\$' \+ "b"\]\);/m)
+    expect_compiled("undef a").to include("Opal.udef(self, Opal.s\('$' + \"a\"))")
+    expect_compiled("undef a,b").to match(/Opal.udef\(self, Opal.s\('\$' \+ "a"\)\);.*Opal.udef\(self, Opal.s\('\$' \+ "b"\)\);/m)
   end
 
   describe "method names" do
@@ -202,9 +202,9 @@ RSpec.describe Opal::Compiler do
           expect_compiled('foo = 42 if 2.5 > 3.5').to include('if ($rb_gt(2.5, 3.5))')
           expect_compiled('foo = 42 if true > false').to include('if ($rb_gt(true, false))')
 
-          expect_compiled('foo = 42 if 2 == 3').to include("if ((2)['$=='](3))")
-          expect_compiled('foo = 42 if 2.5 == 3.5').to include("if ((2.5)['$=='](3.5))")
-          expect_compiled('foo = 42 if true == false').to include("if (true['$=='](false))")
+          expect_compiled('foo = 42 if 2 == 3').to include("if ((2)[Opal.s['$==']](3))")
+          expect_compiled('foo = 42 if 2.5 == 3.5').to include("if ((2.5)[Opal.s['$==']](3.5))")
+          expect_compiled('foo = 42 if true == false').to include("if (true[Opal.s['$==']](false))")
         end
 
         it 'adds nil check for strings' do
@@ -212,7 +212,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'specifically == excludes nil check for strings' do
-          expect_compiled('foo = 42 if "test" == "bar"').to include("if (\"test\"['$=='](\"bar\"))")
+          expect_compiled('foo = 42 if "test" == "bar"').to include("if (\"test\"[Opal.s['$==']](\"bar\"))")
         end
 
         it 'adds nil check for lvars' do
@@ -220,7 +220,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'specifically == excludes nil check for lvars' do
-          expect_compiled("bar = 4\nfoo = 42 if bar == 5").to include("if (bar['$=='](5))")
+          expect_compiled("bar = 4\nfoo = 42 if bar == 5").to include("if (bar[Opal.s['$==']](5))")
         end
 
         it 'adds nil check for constants' do
@@ -228,7 +228,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'specifically == excludes nil check for constants' do
-          expect_compiled("foo = 42 if Test == 4").to include("if ($$($nesting, 'Test')['$=='](4))")
+          expect_compiled("foo = 42 if Test == 4").to include("if ($$($nesting, 'Test')[Opal.s['$==']](4))")
         end
       end
 
@@ -240,7 +240,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for boolean method calls' do
-          expect_compiled('foo = 42 if true.something').to include('if ($truthy(true.$something()))')
+          expect_compiled('foo = 42 if true.something').to include('if ($truthy(true[Opal.s.$something]()))')
         end
 
         it 'adds nil check for strings' do
@@ -264,24 +264,24 @@ RSpec.describe Opal::Compiler do
           expect_compiled('foo = 42 if (2.5 > 3.5)').to include('if ($truthy($rb_gt(2.5, 3.5))')
           expect_compiled('foo = 42 if (true > false)').to include('if ($truthy($rb_gt(true, false))')
 
-          expect_compiled('foo = 42 if (2 == 3)').to include("if ($truthy((2)['$=='](3))")
-          expect_compiled('foo = 42 if (2.5 == 3.5)').to include("if ($truthy((2.5)['$=='](3.5))")
-          expect_compiled('foo = 42 if (true == false)').to include("if ($truthy(true['$=='](false)))")
+          expect_compiled('foo = 42 if (2 == 3)').to include("if ($truthy((2)[Opal.s['$==']](3))")
+          expect_compiled('foo = 42 if (2.5 == 3.5)').to include("if ($truthy((2.5)[Opal.s['$==']](3.5))")
+          expect_compiled('foo = 42 if (true == false)').to include("if ($truthy(true[Opal.s['$==']](false)))")
         end
 
         it 'adds nil check for strings' do
           expect_compiled('foo = 42 if ("test" > "bar")').to include('if ($truthy($rb_gt("test", "bar"))')
-          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ($truthy(\"test\"['$=='](\"bar\"))")
+          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ($truthy(\"test\"[Opal.s['$==']](\"bar\"))")
         end
 
         it 'adds nil check for lvars' do
           expect_compiled("bar = 4\nfoo = 42 if (bar > 5)").to include('if ($truthy($rb_gt(bar, 5))')
-          expect_compiled("bar = 4\nfoo = 42 if (bar == 5)").to include("if ($truthy(bar['$=='](5))) ")
+          expect_compiled("bar = 4\nfoo = 42 if (bar == 5)").to include("if ($truthy(bar[Opal.s['$==']](5))) ")
         end
 
         it 'adds nil check for constants' do
           expect_compiled("foo = 42 if (Test > 4)").to include("if ($truthy($rb_gt($$($nesting, 'Test'), 4))")
-          expect_compiled("foo = 42 if (Test == 4)").to include("if ($truthy($$($nesting, 'Test')['$=='](4))")
+          expect_compiled("foo = 42 if (Test == 4)").to include("if ($truthy($$($nesting, 'Test')[Opal.s['$==']](4))")
         end
       end
 
@@ -293,7 +293,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for boolean method calls' do
-          expect_compiled('foo = 42 if (true.something)').to include('if ($truthy(true.$something())')
+          expect_compiled('foo = 42 if (true.something)').to include('if ($truthy(true[Opal.s.$something]())')
         end
 
         it 'adds nil check for strings' do
@@ -364,7 +364,7 @@ RSpec.describe Opal::Compiler do
             789
             `#{123 + bar} * 456;`
           end
-        }).to include("  return $rb_plus(123, self.$bar()) * 456;\n")
+        }).to include("  return $rb_plus(123, self[Opal.s.$bar]()) * 456;\n")
 
         expect_compiled(%q{
           def foo
