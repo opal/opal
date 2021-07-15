@@ -33,7 +33,7 @@ end
     if (options) {
       options = Opal.hash(options);
     }
-    return Opal.Opal.$compile(str, options);
+    return Opal.Opal[Opal.s("$compile")](str, options);
   };
 
   Opal['eval'] = function(str, options) {

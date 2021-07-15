@@ -5,10 +5,10 @@ class Exception < `Error`
   def self.new(*args)
     %x{
       var message   = (args.length > 0) ? args[0] : nil;
-      var error     = new self.$$constructor(message);
-      error.name    = self.$$name;
+      var error     = new self[Opal.s.$$constructor](message);
+      error.name    = self[Opal.s.$$name];
       error.message = message;
-      Opal.send(error, error.$initialize, args);
+      Opal.send(error, error[Opal.s.$initialize], args);
 
       // Error.captureStackTrace() will use .name and .toString to build the
       // first line of the stack trace so it must be called after the error
@@ -22,7 +22,7 @@ class Exception < `Error`
       return error;
     }
   end
-  `stack_trace_limit = self.$new`
+  `stack_trace_limit = self[Opal.s.$new]`
 
   def self.exception(*args)
     new(*args)
@@ -83,13 +83,13 @@ class Exception < `Error`
       if (backtrace === nil) {
         self.backtrace = nil;
         self.stack = '';
-      } else if (backtrace.$$is_string) {
+      } else if (backtrace[Opal.s.$$is_string]) {
         self.backtrace = [backtrace];
         self.stack = backtrace;
       } else {
-        if (backtrace.$$is_array) {
+        if (backtrace[Opal.s.$$is_array]) {
           for (i = 0, ii = backtrace.length; i < ii; i++) {
-            if (!backtrace[i].$$is_string) {
+            if (!backtrace[i][Opal.s.$$is_string]) {
               valid = false;
               break;
             }

@@ -19,7 +19,7 @@ RSpec.describe Opal::SourceMap::File do
       fragment(line: nil, column: nil, source_map_name: nil, code: "\n  ", sexp_type: :top),
       fragment(line: nil, column: nil, source_map_name: nil, code: "var self = Opal.top, $nesting = [], nil = Opal.nil, $$$ = Opal.$$$, $$ = Opal.$$, $breaker = Opal.breaker, $slice = Opal.slice;\n", sexp_type: :top),
       fragment(line: nil, column: nil, source_map_name: nil, code: "\n  ", sexp_type: :top),
-      fragment(line: nil, column: nil, source_map_name: nil, code: "Opal.add_stubs(['$puts']);", sexp_type: :top),
+      fragment(line: nil, column: nil, source_map_name: nil, code: "Opal.add_stubs([Opal.s('$puts')]);", sexp_type: :top),
       fragment(line: nil, column: nil, source_map_name: nil, code: "\n  ", sexp_type: :top),
       fragment(line: 1, column: 0, source_map_name: nil, code: "\n  ", sexp_type: :begin),
       fragment(line: nil, column: nil, source_map_name: "self", code: "self", sexp_type: :self),

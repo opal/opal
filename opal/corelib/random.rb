@@ -21,7 +21,7 @@ class Random
 
   def reseed(seed)
     @seed = seed
-    `self.$rng = Opal.$$rand.reseed(seed)`
+    `self[Opal.s.$rng] = Opal.$$rand.reseed(seed)`
   end
 
   def self.new_seed
@@ -70,7 +70,7 @@ class Random
   def random_float
     %x{
       self.state++;
-      return Opal.$$rand.rand(self.$rng);
+      return Opal.$$rand.rand(self[Opal.s.$rng]);
     }
   end
 

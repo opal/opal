@@ -20,6 +20,6 @@ RSpec.describe Opal::CliRunners::Server do
     described_class.call(builder: builder, options: {port: 1234})
 
     get '/cli_runner.js'
-    expect(last_response.body).to include(".$puts(123)")
+    expect(last_response.body).to include("[Opal.s.$puts](123)")
   end
 end

@@ -9,7 +9,7 @@ describe "Kernel#respond_to?" do
   end
 
   it "returns false if a method exists, but is marked with a '$$stub' property" do
-    `#{@a}.$foo.$$stub = true`
+    `#{@a}[Opal.s("$foo")][Opal.s.$$stub] = true`
     @a.respond_to?(:foo).should be_false
   end
 end

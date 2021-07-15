@@ -7,7 +7,7 @@ class Array < `Array`
   include Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays
-  `Opal.defineProperty(self.$$prototype, '$$is_array', true)`
+  `Opal.defineProperty(self[Opal.s.$$prototype], Opal.s.$$is_array, true)`
 
   %x{
     // Recent versions of V8 (> 7.1) only use an optimized implementation when Array.prototype is unmodified.
@@ -34,10 +34,10 @@ class Array < `Array`
     }
 
     function toArraySubclass(obj, klass) {
-      if (klass.$$name === Opal.Array) {
+      if (klass[Opal.s.$$name] === Opal.Array) {
         return obj;
       } else {
-        return klass.$allocate().$replace(#{`obj`.to_a});
+        return klass[Opal.s.$allocate]()[Opal.s.$replace](#{`obj`.to_a});
       }
     }
 
@@ -94,7 +94,7 @@ class Array < `Array`
       }
 
       if (arguments.length === 1) {
-        if (size.$$is_array) {
+        if (size[Opal.s.$$is_array]) {
           #{replace(size.to_a)}
           return self;
         } else if (#{size.respond_to? :to_ary}) {
@@ -175,7 +175,7 @@ class Array < `Array`
         $hash_put(hash, other[i], true);
       }
 
-      return hash.$keys();
+      return hash[Opal.s.$keys]();
     }
   end
 
@@ -282,17 +282,17 @@ class Array < `Array`
         if (array === other)
           return true;
 
-        if (!other.$$is_array) {
-          if ($respond_to(other, '$to_ary')) {
+        if (!other[Opal.s.$$is_array]) {
+          if ($respond_to(other, Opal.s.$to_ary)) {
             return #{`other` == `array`};
           } else {
             return false;
           }
         }
 
-        if (array.$$constructor !== Array)
+        if (array[Opal.s.$$constructor] !== Array)
           array = #{`array`.to_a};
-        if (other.$$constructor !== Array)
+        if (other[Opal.s.$$constructor] !== Array)
           other = #{`other`.to_a};
 
         if (array.length !== other.length) {
@@ -304,8 +304,8 @@ class Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           a = array[i];
           b = other[i];
-          if (a.$$is_array) {
-            if (b.$$is_array && b.length !== a.length) {
+          if (a[Opal.s.$$is_array]) {
+            if (b[Opal.s.$$is_array] && b.length !== a.length) {
               return false;
             }
             if (!recursed.hasOwnProperty(#{`a`.object_id})) {
@@ -400,7 +400,7 @@ class Array < `Array`
 
   def [](index, length = undefined)
     %x{
-      if (index.$$is_range) {
+      if (index[Opal.s.$$is_range]) {
         return $array_slice_range(self, index);
       }
       else {
@@ -569,7 +569,7 @@ class Array < `Array`
         else if (ret === false || ret === nil) {
           smaller = false;
         }
-        else if (ret.$$is_number) {
+        else if (ret[Opal.s.$$is_number]) {
           if (ret === 0) { return mid; }
           smaller = (ret < 0);
         }
@@ -590,7 +590,7 @@ class Array < `Array`
     index = bsearch_index(&block)
 
     %x{
-      if (index != null && index.$$is_number) {
+      if (index != null && index[Opal.s.$$is_number]) {
         return self[index];
       } else {
         return index;
@@ -915,10 +915,10 @@ class Array < `Array`
 
   def dup
     %x{
-      if (self.$$class === Opal.Array &&
-          self.$$class.$allocate.$$pristine &&
-          self.$copy_instance_variables.$$pristine &&
-          self.$initialize_dup.$$pristine) {
+      if (self[Opal.s.$$class] === Opal.Array &&
+          self[Opal.s.$$class][Opal.s.$allocate][Opal.s.$$pristine] &&
+          self[Opal.s.$copy_instance_variables][Opal.s.$$pristine] &&
+          self[Opal.s.$initialize_dup][Opal.s.$$pristine]) {
         return self.slice(0);
       }
     }
@@ -961,7 +961,7 @@ class Array < `Array`
       function _eql(array, other) {
         var i, length, a, b;
 
-        if (!other.$$is_array) {
+        if (!other[Opal.s.$$is_array]) {
           return false;
         }
 
@@ -976,8 +976,8 @@ class Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           a = array[i];
           b = other[i];
-          if (a.$$is_array) {
-            if (b.$$is_array && b.length !== a.length) {
+          if (a[Opal.s.$$is_array]) {
+            if (b[Opal.s.$$is_array] && b.length !== a.length) {
               return false;
             }
             if (!recursed.hasOwnProperty(#{`a`.object_id})) {
@@ -1144,7 +1144,7 @@ class Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           item = array[i];
 
-          if (!$respond_to(item, '$to_ary', true)) {
+          if (!$respond_to(item, Opal.s.$to_ary, true)) {
             result.push(item);
             continue;
           }
@@ -1156,7 +1156,7 @@ class Array < `Array`
             continue;
           }
 
-          if (!ary.$$is_array) {
+          if (!ary[Opal.s.$$is_array]) {
             #{raise TypeError};
           }
 
@@ -1212,7 +1212,7 @@ class Array < `Array`
     %x{
       var top = ($hash_ids === undefined),
           result = ['A'],
-          hash_id = self.$object_id(),
+          hash_id = self[Opal.s.$object_id](),
           item, i, key;
 
       try {
@@ -1236,7 +1236,7 @@ class Array < `Array`
 
         for (i = 0; i < self.length; i++) {
           item = self[i];
-          result.push(item.$hash());
+          result.push(item[Opal.s.$hash]());
         }
 
         return result.join(',');
@@ -1355,7 +1355,7 @@ class Array < `Array`
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
 
-        if ($respond_to(item, '$to_str')) {
+        if ($respond_to(item, Opal.s.$to_str)) {
           tmp = #{`item`.to_str};
 
           if (tmp !== nil) {
@@ -1365,7 +1365,7 @@ class Array < `Array`
           }
         }
 
-        if ($respond_to(item, '$to_ary')) {
+        if ($respond_to(item, Opal.s.$to_ary)) {
           tmp = #{`item`.to_ary};
 
           if (tmp === self) {
@@ -1379,7 +1379,7 @@ class Array < `Array`
           }
         }
 
-        if ($respond_to(item, '$to_s')) {
+        if ($respond_to(item,Opal.s.$to_s)) {
           tmp = #{`item`.to_s};
 
           if (tmp !== nil) {
@@ -1980,7 +1980,7 @@ class Array < `Array`
 
       while (i) {
         if (randgen) {
-          j = randgen.$rand(i).$to_int();
+          j = randgen[Opal.s.$rand](i)[Opal.s.$to_int]();
 
           if (j < 0) {
             #{raise RangeError, "random number too small #{`j`}"}
@@ -2170,11 +2170,11 @@ class Array < `Array`
 
   def to_a
     %x{
-      if (self.$$class === Opal.Array) {
+      if (self[Opal.s.$$class] === Opal.Array) {
         return self;
       }
       else {
-        return Opal.Array.$new(self);
+        return Opal.Array[Opal.s.$new](self);
       }
     }
   end
@@ -2192,7 +2192,7 @@ class Array < `Array`
 
       for (i = 0; i < len; i++) {
         ary = #{Opal.coerce_to?(`array[i]`, Array, :to_ary)};
-        if (!ary.$$is_array) {
+        if (!ary[Opal.s.$$is_array]) {
           #{raise TypeError, "wrong element type #{`ary`.class} at #{`i`} (expected array)"}
         }
         if (ary.length !== 2) {
@@ -2355,11 +2355,11 @@ class Array < `Array`
 
       for (j = 0, jj = others.length; j < jj; j++) {
         o = others[j];
-        if (o.$$is_array) {
+        if (o[Opal.s.$$is_array]) {
           continue;
         }
-        if (o.$$is_range || o.$$is_enumerator) {
-          others[j] = o.$take(size);
+        if (o[Opal.s.$$is_range] || o[Opal.s.$$is_enumerator]) {
+          others[j] = o[Opal.s.$take](size);
           continue;
         }
         others[j] = #{(
@@ -2398,7 +2398,7 @@ class Array < `Array`
 
   def self.inherited(klass)
     %x{
-      klass.$$prototype.$to_a = function() {
+      klass[Opal.s.$$prototype][Opal.s.$to_a] = function() {
         return this.slice(0, this.length);
       }
     }

@@ -114,9 +114,9 @@ module Opal
         push "(#{recv_value_tmp} = #{recv_tmp}) && "
 
         meth_tmp = scope.new_temp
-        push "(((#{meth_tmp} = #{recv_value_tmp}#{mid}) && !#{meth_tmp}.$$stub)"
+        push "(((#{meth_tmp} = #{recv_value_tmp}#{mid}) && !#{meth_tmp}[Opal.s.$$stub])"
 
-        push " || #{recv_value_tmp}['$respond_to_missing?']('#{method_name}'))"
+        push " || #{recv_value_tmp}[Opal.s['$respond_to_missing?']]('#{method_name}'))"
 
         args.each do |arg|
           case arg.type
@@ -178,7 +178,7 @@ module Opal
       def compile_defined_cvar(node)
         cvar_name, _ = *node
         cvar_tmp = scope.new_temp
-        push "(#{cvar_tmp} = #{class_variable_owner}.$$cvars['#{cvar_name}'], #{cvar_tmp} != null)"
+        push "(#{cvar_tmp} = #{class_variable_owner}[Opal.s.$$cvars]['#{cvar_name}'], #{cvar_tmp} != null)"
         cvar_tmp
       end
 

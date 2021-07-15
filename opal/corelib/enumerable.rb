@@ -76,7 +76,7 @@ module Enumerable
           }
         }
 
-        self.$each.$$p = function(value) {
+        self[Opal.s.$each][Opal.s.$$p] = function(value) {
           var key = Opal.yield1(block, value);
 
           if (key === nil) {
@@ -95,7 +95,7 @@ module Enumerable
           }
         }
 
-        self.$each();
+        self[Opal.s.$each]();
 
         releaseAccumulate();
       }
@@ -114,13 +114,13 @@ module Enumerable
     %x{
       var result = [];
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var value = Opal.yieldX(block, arguments);
 
         result.push(value);
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return result;
     }
@@ -176,14 +176,14 @@ module Enumerable
     %x{
       var all = [], i, length, value;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         all.push(param);
       }
 
-      self.$each();
+      self[Opal.s.$each]();
 
       if (all.length === 0) {
         return nil;
@@ -242,7 +242,7 @@ module Enumerable
       var result  = [],
           current = 0;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         if (number <= current) {
           result.push(#{Opal.destructure(`arguments`)});
         }
@@ -250,7 +250,7 @@ module Enumerable
         current++;
       };
 
-      self.$each()
+      self[Opal.s.$each]()
 
       return result;
     }
@@ -263,7 +263,7 @@ module Enumerable
       var result   = [],
           dropping = true;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)};
 
         if (dropping) {
@@ -279,7 +279,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return result;
     }
@@ -312,7 +312,7 @@ module Enumerable
     %x{
       var buffer = [];
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var element = #{Opal.destructure(`arguments`)};
         buffer.push(element);
         if (buffer.length > n) {
@@ -323,7 +323,7 @@ module Enumerable
         }
       }
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return nil;
     }
@@ -335,13 +335,13 @@ module Enumerable
     end
 
     %x{
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var item = #{Opal.destructure(`arguments`)};
 
         Opal.yield1(block, item);
       }
 
-      self.$each.apply(self, data);
+      self[Opal.s.$each].apply(self, data);
 
       return self;
     }
@@ -359,7 +359,7 @@ module Enumerable
     %x{
       var slice = []
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)};
 
         slice.push(param);
@@ -370,7 +370,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       // our "last" group, if smaller than n then won't have been yielded
       if (slice.length > 0) {
@@ -387,7 +387,7 @@ module Enumerable
     %x{
       var index = 0;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)};
 
         block(param, index);
@@ -395,7 +395,7 @@ module Enumerable
         index++;
       };
 
-      self.$each.apply(self, args);
+      self[Opal.s.$each].apply(self, args);
     }
 
     self
@@ -405,13 +405,13 @@ module Enumerable
     return enum_for(:each_with_object, object) { enumerator_size } unless block_given?
 
     %x{
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)};
 
         block(param, object);
       };
 
-      self.$each();
+      self[Opal.s.$each]();
     }
 
     object
@@ -421,11 +421,11 @@ module Enumerable
     %x{
       var result = [];
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         result.push(#{Opal.destructure(`arguments`)});
       };
 
-      self.$each.apply(self, args);
+      self[Opal.s.$each].apply(self, args);
 
       return result;
     }
@@ -445,7 +445,7 @@ module Enumerable
     %x{
       var result = [];
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
@@ -454,7 +454,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return result;
     }
@@ -573,14 +573,14 @@ module Enumerable
     %x{
       var result;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         #{(hash[`value`] ||= []) << `param`};
       }
 
-      self.$each();
+      self[Opal.s.$each]();
 
       if (result !== undefined) {
         return result;
@@ -605,7 +605,7 @@ module Enumerable
       var result = object;
 
       if (block !== nil && sym === undefined) {
-        self.$each.$$p = function() {
+        self[Opal.s.$each][Opal.s.$$p] = function() {
           var value = #{Opal.destructure(`arguments`)};
 
           if (result === undefined) {
@@ -628,7 +628,7 @@ module Enumerable
           result = undefined;
         }
 
-        self.$each.$$p = function() {
+        self[Opal.s.$each][Opal.s.$$p] = function() {
           var value = #{Opal.destructure(`arguments`)};
 
           if (result === undefined) {
@@ -640,7 +640,7 @@ module Enumerable
         };
       }
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return result == undefined ? nil : result;
     }
@@ -663,7 +663,7 @@ module Enumerable
       if (n === undefined || n === nil) {
         var result, value;
 
-        self.$each.$$p = function() {
+        self[Opal.s.$each][Opal.s.$$p] = function() {
           var item = #{Opal.destructure(`arguments`)};
 
           if (result === undefined) {
@@ -686,7 +686,7 @@ module Enumerable
           }
         }
 
-        self.$each();
+        self[Opal.s.$each]();
 
         if (result === undefined) {
           return nil;
@@ -712,7 +712,7 @@ module Enumerable
       var result,
           by;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
@@ -728,7 +728,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return result === undefined ? nil : result;
     }
@@ -749,7 +749,7 @@ module Enumerable
       var result;
 
       if (block !== nil) {
-        self.$each.$$p = function() {
+        self[Opal.s.$each][Opal.s.$$p] = function() {
           var param = #{Opal.destructure(`arguments`)};
 
           if (result === undefined) {
@@ -769,7 +769,7 @@ module Enumerable
         };
       }
       else {
-        self.$each.$$p = function() {
+        self[Opal.s.$each][Opal.s.$$p] = function() {
           var param = #{Opal.destructure(`arguments`)};
 
           if (result === undefined) {
@@ -783,7 +783,7 @@ module Enumerable
         };
       }
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return result === undefined ? nil : result;
     }
@@ -800,7 +800,7 @@ module Enumerable
       var result,
           by;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
@@ -816,7 +816,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return result === undefined ? nil : result;
     }
@@ -828,7 +828,7 @@ module Enumerable
     %x{
       var min = nil, max = nil, first_time = true;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var element = #{Opal.destructure(`arguments`)};
         if (first_time) {
           min = max = element;
@@ -852,7 +852,7 @@ module Enumerable
         }
       }
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return [min, max];
     }
@@ -867,7 +867,7 @@ module Enumerable
           min_by,
           max_by;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
@@ -882,7 +882,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return [min_result, max_result];
     }
@@ -949,7 +949,7 @@ module Enumerable
     %x{
       var truthy = [], falsy = [], result;
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
@@ -961,7 +961,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return [truthy, falsy];
     }
@@ -975,7 +975,7 @@ module Enumerable
     %x{
       var result = [];
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
@@ -984,7 +984,7 @@ module Enumerable
         }
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       return result;
     }
@@ -996,11 +996,11 @@ module Enumerable
     %x{
       var result = [];
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         result.push(arguments);
       };
 
-      self.$each();
+      self[Opal.s.$each]();
 
       for (var i = result.length - 1; i >= 0; i--) {
         Opal.yieldX(block, result[i]);
@@ -1027,7 +1027,7 @@ module Enumerable
 
         if (block !== nil) {
           if (pattern === undefined) {
-            self.$each.$$p = function() {
+            self[Opal.s.$each][Opal.s.$$p] = function() {
               var param = #{Opal.destructure(`arguments`)},
                   value = Opal.yield1(block, param);
 
@@ -1040,7 +1040,7 @@ module Enumerable
             };
           }
           else {
-            self.$each.$$p = function() {
+            self[Opal.s.$each][Opal.s.$$p] = function() {
               var param = #{Opal.destructure(`arguments`)},
                   value = block(param, #{pattern.dup});
 
@@ -1054,7 +1054,7 @@ module Enumerable
           }
         }
         else {
-          self.$each.$$p = function() {
+          self[Opal.s.$each][Opal.s.$$p] = function() {
             var param = #{Opal.destructure(`arguments`)},
                 value = #{pattern === `param`};
 
@@ -1067,7 +1067,7 @@ module Enumerable
           };
         }
 
-        self.$each();
+        self[Opal.s.$each]();
 
         if (slice.length > 0) {
           #{e << `slice`};
@@ -1093,7 +1093,7 @@ module Enumerable
       %x{
         var accumulate;
 
-        self.$each.$$p = function() {
+        self[Opal.s.$each][Opal.s.$$p] = function() {
           var element = #{Opal.destructure(`arguments`)},
               end_chunk = Opal.yield1(block, element);
 
@@ -1110,7 +1110,7 @@ module Enumerable
           }
         }
 
-        self.$each();
+        self[Opal.s.$each]();
 
         if (accumulate != null) {
           #{yielder.yield(`accumulate`)};
@@ -1126,7 +1126,7 @@ module Enumerable
       %x{
         var slice = nil, last_after = nil;
 
-        self.$each_cons.$$p = function() {
+        self[Opal.s.$each_cons][Opal.s.$$p] = function() {
           var params = #{Opal.destructure(`arguments`)},
               before = params[0],
               after = params[1],
@@ -1147,7 +1147,7 @@ module Enumerable
           }
         }
 
-        self.$each_cons(2);
+        self[Opal.s.$each_cons](2);
 
         if (slice !== nil) {
           slice.push(last_after);
@@ -1241,10 +1241,10 @@ module Enumerable
     %x{
       var hash = #{{}};
 
-      self.$each.$$p = function() {
+      self[Opal.s.$each][Opal.s.$$p] = function() {
         var param = #{Opal.destructure(`arguments`)};
         var ary = #{Opal.coerce_to?(`param`, Array, :to_ary)}, key, val;
-        if (!ary.$$is_array) {
+        if (!ary[Opal.s.$$is_array]) {
           #{raise TypeError, "wrong element type #{`ary`.class} (expected array)"}
         }
         if (ary.length !== 2) {
@@ -1256,7 +1256,7 @@ module Enumerable
         Opal.hash_put(hash, key, val);
       };
 
-      self.$each.apply(self, args);
+      self[Opal.s.$each].apply(self, args);
 
       return hash;
     }

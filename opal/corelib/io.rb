@@ -35,7 +35,7 @@ class IO
         for (var i = 0, ii = args.length; i < ii; i++) {
           args[i] = #{String(`args[i]`)}
         }
-        self.$write(args.join(#{$,}));
+        self[Opal.s.$write](args.join(#{$,}));
       }
       nil
     end
@@ -45,7 +45,7 @@ class IO
         for (var i = 0, ii = args.length; i < ii; i++) {
           args[i] = #{String(`args[i]`).chomp}
         }
-        self.$write(args.concat([nil]).join(#{$/}));
+        self[Opal.s.$write](args.concat([nil]).join(#{$/}));
       }
       nil
     end

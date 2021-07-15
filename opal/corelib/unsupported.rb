@@ -157,7 +157,7 @@ class Module
   def public(*methods)
     %x{
       if (methods.length === 0) {
-        self.$$module_function = false;
+        self[Opal.s.$$module_function] = false;
       }
 
       return nil;

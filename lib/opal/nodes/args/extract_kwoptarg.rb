@@ -21,7 +21,7 @@ module Opal
 
           add_temp lvar_name
 
-          line "#{lvar_name} = $kwargs.$$smap[#{key_name.to_s.inspect}];"
+          line "#{lvar_name} = $kwargs[Opal.s.$$smap][#{key_name.to_s.inspect}];"
 
           return if default_value.children[1] == :undefined
 

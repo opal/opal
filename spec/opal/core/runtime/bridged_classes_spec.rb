@@ -2,7 +2,7 @@ require 'spec_helper'
 
 %x{
   var bridge_class_demo = function(){};
-  bridge_class_demo.prototype.$foo = function() { return "bar" };
+  bridge_class_demo.prototype[Opal.s("$foo")] = function() { return "bar" };
 }
 class TopBridgedClassDemo < `bridge_class_demo`
   def some_bridged_method
@@ -82,7 +82,7 @@ end
 
 %x{
   var bridge_class_demo_module = function(){};
-  bridge_class_demo_module.prototype.$foo = function() { return "foobar" };
+  bridge_class_demo_module.prototype[Opal.s("$foo")] = function() { return "foobar" };
 }
 
 module BridgeModule

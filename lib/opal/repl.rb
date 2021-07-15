@@ -78,7 +78,7 @@ module Opal
       last_processed_file = builder.processed.last.to_s
       eval_js <<-JS
         var $_result = #{last_processed_file};
-        $_result.$inspect()
+        $_result[Opal.s.$inspect]()
       JS
     rescue => e
       puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"

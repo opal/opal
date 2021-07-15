@@ -70,7 +70,7 @@ module Opal
           if idx == 0
             push fragment
           else
-            push '.$merge(', fragment, ')'
+            push '[Opal.s.$merge](', fragment, ')'
           end
         end
       end

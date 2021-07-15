@@ -94,14 +94,14 @@ module Native
           return block.apply(self, #{args});
         }
 
-        var self_ = block.$$s;
-        block.$$s = null;
+        var self_ = block[Opal.s.$$s];
+        block[Opal.s.$$s] = null;
 
         try {
           return block.apply(#{instance}, #{args});
         }
         finally {
-          block.$$s = self_;
+          block[Opal.s.$$s] = self_;
         }
       }
     }
@@ -213,7 +213,7 @@ end
 
 module Kernel
   def native?(value)
-    `value == null || !value.$$class`
+    `value == null || !value[Opal.s.$$class]`
   end
 
   # Wraps a native JavaScript with `Native::Object.new`
@@ -344,11 +344,11 @@ class Native::Object < BasicObject
   alias kind_of? is_a?
 
   def instance_of?(klass)
-    `self.$$class === klass`
+    `self[Opal.s.$$class] === klass`
   end
 
   def class
-    `self.$$class`
+    `self[Opal.s.$$class]`
   end
 
   def to_a(options = {}, &block)
@@ -537,8 +537,8 @@ class Hash
       if (defaults != null &&
            (defaults.constructor === undefined ||
              defaults.constructor === Object)) {
-        var smap = self.$$smap,
-            keys = self.$$keys,
+        var smap = self[Opal.s.$$smap],
+            keys = self[Opal.s.$$keys],
             key, value;
 
         for (key in defaults) {
@@ -548,7 +548,7 @@ class Hash
                (value.constructor === undefined ||
                  value.constructor === Object)) {
             smap[key] = #{Hash.new(`value`)};
-          } else if (value && value.$$is_array) {
+          } else if (value && value[Opal.s.$$is_array]) {
             value = value.map(function(item) {
               if (item &&
                    (item.constructor === undefined ||
@@ -578,14 +578,14 @@ class Hash
   def to_n
     %x{
       var result = {},
-          keys = self.$$keys,
-          smap = self.$$smap,
+          keys = self[Opal.s.$$keys],
+          smap = self[Opal.s.$$smap],
           key, value;
 
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
+        if (key[Opal.s.$$is_string]) {
           value = smap[key];
         } else {
           key = key.key;
@@ -611,7 +611,7 @@ end
 class Class
   def native_alias(new_jsid, existing_mid)
     %x{
-      var aliased = #{self}.prototype['$' + #{existing_mid}];
+      var aliased = #{self}.prototype[Opal.s('$' + #{existing_mid})];
       if (!aliased) {
         #{raise NameError.new("undefined method `#{existing_mid}' for class `#{inspect}'", existing_mid)};
       }
@@ -621,7 +621,7 @@ class Class
 
   def native_class
     native_module
-    `self["new"] = self.$new`
+    `self["new"] = self[Opal.s.$new]`
   end
 end
 

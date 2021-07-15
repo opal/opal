@@ -68,14 +68,14 @@ RSpec.describe Opal::CLI do
     context 'when false' do
       let(:options) { {no_exit: false, runner: :compiler, evals: ['']} }
       it 'appends a Kernel#exit at the end of the source' do
-        expect_output_of{ subject.run }.to include(".$exit()")
+        expect_output_of{ subject.run }.to include("[Opal.s.$exit]()")
       end
     end
 
     context 'when true' do
       let(:options) { {no_exit: true, runner: :compiler, evals: ['']} }
       it 'appends a Kernel#exit at the end of the source' do
-        expect_output_of{ subject.run }.not_to include(".$exit();")
+        expect_output_of{ subject.run }.not_to include("[Opal.s.$exit]();")
       end
     end
   end
@@ -175,7 +175,7 @@ RSpec.describe Opal::CLI do
       let(:options)  { {runner: :compiler, evals: ['puts 2342']} }
 
       it 'outputs the compiled javascript' do
-        expect_output_of{ subject.run }.to include(".$puts(2342)")
+        expect_output_of{ subject.run }.to include("[Opal.s.$puts](2342)")
         expect_output_of{ subject.run }.not_to include("2342\n")
       end
 
@@ -185,7 +185,7 @@ RSpec.describe Opal::CLI do
         let(:options) { super().merge(runner_options: runner_options) }
 
         it 'writes the map file to the specified path' do
-          expect_output_of{ subject.run }.to include(".$puts(2342)")
+          expect_output_of{ subject.run }.to include("[Opal.s.$puts](2342)")
           expect_output_of{ subject.run }.not_to include("2342\n")
           expect(File.read(map_file)).to include(%{"version":3})
         end
@@ -223,7 +223,7 @@ RSpec.describe Opal::CLI do
     let(:options) { { parse_comments: true, evals: [code], runner: :compiler } }
 
     it 'sets $$comment prop for compiled methods' do
-      expect_output_of { subject.run }.to include('$$comments = ["# multiline", "# comment"]')
+      expect_output_of { subject.run }.to include('[Opal.s.$$comments] = ["# multiline", "# comment"]')
     end
   end
 

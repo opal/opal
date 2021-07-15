@@ -23,7 +23,7 @@ module Opal
           body_code = [body_code] unless body_code.is_a?(Array)
 
           if compiler.eval?
-            add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]'
+            add_temp '$nesting = self[Opal.s.$$is_a_module] ? [self] : [self[Opal.s.$$class]]'
           else
             add_temp 'self = Opal.top'
             add_temp '$nesting = []'
@@ -85,7 +85,7 @@ module Opal
         operators.each do |op|
           name = Nodes::CallNode::OPERATORS[op]
           line "function $rb_#{name}(lhs, rhs) {"
-          line "  return (typeof(lhs) === 'number' && typeof(rhs) === 'number') ? lhs #{op} rhs : lhs['$#{op}'](rhs);"
+          line "  return (typeof(lhs) === 'number' && typeof(rhs) === 'number') ? lhs #{op} rhs : lhs[Opal.s['$#{op}']](rhs);"
           line '}'
         end
       end
@@ -93,7 +93,7 @@ module Opal
       def compile_method_stubs
         if compiler.method_missing?
           calls = compiler.method_calls
-          stubs = calls.to_a.map { |k| "'$#{k}'" }.join(', ')
+          stubs = calls.to_a.map { |k| "Opal.s('$#{k}')" }.join(', ')
           line "Opal.add_stubs([#{stubs}]);" unless stubs.empty?
         end
       end
@@ -101,8 +101,8 @@ module Opal
       # Any special __END__ content in code
       def compile_end_construct
         if content = compiler.eof_content
-          line 'var $__END__ = Opal.Object.$new();'
-          line "$__END__.$read = function() { return #{content.inspect}; };"
+          line 'var $__END__ = Opal.Object[Opal.s.$new]();'
+          line "$__END__[Opal.s.$read] = function() { return #{content.inspect}; };"
         end
       end
 

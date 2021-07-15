@@ -137,19 +137,19 @@ module Opal
 
       def handle_global_match
         with_temp do |tmp|
-          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}['$[]'](0))"
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}[Opal.s['$[]']](0))"
         end
       end
 
       def handle_pre_match
         with_temp do |tmp|
-          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}.$pre_match())"
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}[Opal.s.$pre_match]())"
         end
       end
 
       def handle_post_match
         with_temp do |tmp|
-          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}.$post_match())"
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}[Opal.s.$post_match]())"
         end
       end
     end
@@ -183,7 +183,7 @@ module Opal
         helper :gvars
 
         with_temp do |tmp|
-          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}['$[]'](#{index}))"
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}[Opal.s['$[]']](#{index}))"
         end
       end
     end
@@ -195,7 +195,7 @@ module Opal
 
       def compile
         with_temp do |tmp|
-          push "((#{tmp} = #{class_variable_owner}.$$cvars['#{name}']) == null ? nil : #{tmp})"
+          push "((#{tmp} = #{class_variable_owner}[Opal.s.$$cvars]['#{name}']) == null ? nil : #{tmp})"
         end
       end
     end

@@ -21,10 +21,10 @@ module Opal
 
           add_temp lvar_name
 
-          line "if (!Opal.hasOwnProperty.call($kwargs.$$smap, '#{key_name}')) {"
-          line "  throw Opal.ArgumentError.$new('missing keyword: #{key_name}');"
+          line "if (!Opal.hasOwnProperty.call($kwargs[Opal.s.$$smap], '#{key_name}')) {"
+          line "  throw Opal.ArgumentError[Opal.s.$new]('missing keyword: #{key_name}');"
           line '}'
-          line "#{lvar_name} = $kwargs.$$smap[#{key_name.to_s.inspect}];"
+          line "#{lvar_name} = $kwargs[Opal.s.$$smap][#{key_name.to_s.inspect}];"
         end
       end
     end

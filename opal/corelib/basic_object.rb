@@ -14,31 +14,31 @@ class BasicObject
 
   def __id__
     %x{
-      if (self.$$id != null) {
-        return self.$$id;
+      if (self[Opal.s.$$id] != null) {
+        return self[Opal.s.$$id];
       }
-      Opal.defineProperty(self, '$$id', Opal.uid());
-      return self.$$id;
+      Opal.defineProperty(self, Opal.s.$$id, Opal.uid());
+      return self[Opal.s.$$id];
     }
   end
 
   def __send__(symbol, *args, &block)
     %x{
-      var func = self['$' + symbol]
+      var func = self[Opal.s('$' + symbol)]
 
       if (func) {
         if (block !== nil) {
-          func.$$p = block;
+          func[Opal.s.$$p] = block;
         }
 
         return func.apply(self, args);
       }
 
       if (block !== nil) {
-        self.$method_missing.$$p = block;
+        self[Opal.s.$method_missing][Opal.s.$$p] = block;
       }
 
-      return self.$method_missing.apply(self, [symbol].concat(args));
+      return self[Opal.s.$method_missing].apply(self, [symbol].concat(args));
     }
   end
 
@@ -70,28 +70,28 @@ class BasicObject
     end
 
     %x{
-      var old = block.$$s,
+      var old = block[Opal.s.$$s],
           result;
 
-      block.$$s = null;
+      block[Opal.s.$$s] = null;
 
       // Need to pass $$eval so that method definitions know if this is
       // being done on a class/module. Cannot be compiler driven since
       // send(:instance_eval) needs to work.
-      if (self.$$is_a_module) {
-        self.$$eval = true;
+      if (self[Opal.s.$$is_a_module]) {
+        self[Opal.s.$$eval] = true;
         try {
           result = block.call(self, self);
         }
         finally {
-          self.$$eval = false;
+          self[Opal.s.$$eval] = false;
         }
       }
       else {
         result = block.call(self, self);
       }
 
-      block.$$s = old;
+      block[Opal.s.$$s] = old;
 
       return result;
     }
@@ -101,25 +101,25 @@ class BasicObject
     ::Kernel.raise ::ArgumentError, 'no block given' unless block
 
     %x{
-      var block_self = block.$$s,
+      var block_self = block[Opal.s.$$s],
           result;
 
-      block.$$s = null;
+      block[Opal.s.$$s] = null;
 
-      if (self.$$is_a_module) {
-        self.$$eval = true;
+      if (self[Opal.s.$$is_a_module]) {
+        self[Opal.s.$$eval] = true;
         try {
           result = block.apply(self, args);
         }
         finally {
-          self.$$eval = false;
+          self[Opal.s.$$eval] = false;
         }
       }
       else {
         result = block.apply(self, args);
       }
 
-      block.$$s = block_self;
+      block[Opal.s.$$s] = block_self;
 
       return result;
     }
@@ -135,10 +135,10 @@ class BasicObject
   end
 
   def method_missing(symbol, *args, &block)
-    message = if `self.$inspect && !self.$inspect.$$stub`
-                "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}"
+    message = if `self[Opal.s.$inspect] && !self[Opal.s.$inspect][Opal.s.$$stub]`
+                "undefined method `#{symbol}' for #{inspect}:#{`self[Opal.s.$$class]`}"
               else
-                "undefined method `#{symbol}' for #{`self.$$class`}"
+                "undefined method `#{symbol}' for #{`self[Opal.s.$$class]`}"
               end
 
     ::Kernel.raise ::NoMethodError.new(message, symbol)

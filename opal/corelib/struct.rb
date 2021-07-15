@@ -23,7 +23,7 @@ class Struct
       class << self
         def new(*args)
           instance = allocate
-          `#{instance}.$$data = {}`
+          `#{instance}[Opal.s.$$data] = {}`
           instance.initialize(*args)
           instance
         end
@@ -33,7 +33,7 @@ class Struct
     end
 
     klass.module_eval(&block) if block
-    `klass.$$keyword_init = keyword_init`
+    `klass[Opal.s.$$keyword_init] = keyword_init`
 
     if const_name
       Struct.const_set(const_name, klass)
@@ -50,11 +50,11 @@ class Struct
     members << name
 
     define_method name do
-      `self.$$data[name]`
+      `self[Opal.s.$$data][name]`
     end
 
     define_method "#{name}=" do |value|
-      `self.$$data[name] = value`
+      `self[Opal.s.$$data][name] = value`
     end
   end
 
@@ -75,10 +75,10 @@ class Struct
   end
 
   def initialize(*args)
-    if `#{self.class}.$$keyword_init`
+    if `#{self.class}[Opal.s.$$keyword_init]`
       kwargs = args.last || {}
 
-      if args.length > 1 || `(args.length === 1 && !kwargs.$$is_hash)`
+      if args.length > 1 || `(args.length === 1 && !kwargs[Opal.s.$$is_hash])`
         raise ArgumentError, "wrong number of arguments (given #{args.length}, expected 0)"
       end
 
@@ -103,11 +103,11 @@ class Struct
 
   def initialize_copy(from)
     %x{
-      self.$$data = {}
-      var keys = Object.keys(from.$$data), i, max, name;
+      self[Opal.s.$$data] = {}
+      var keys = Object.keys(from[Opal.s.$$data]), i, max, name;
       for (i = 0, max = keys.length; i < max; i++) {
         name = keys[i];
-        self.$$data[name] = from.$$data[name];
+        self[Opal.s.$$data][name] = from[Opal.s.$$data][name];
       }
     }
   end
@@ -117,7 +117,7 @@ class Struct
   end
 
   def hash
-    Hash.new(`self.$$data`).hash
+    Hash.new(`self[Opal.s.$$data]`).hash
   end
 
   def [](name)
@@ -128,7 +128,7 @@ class Struct
       name = self.class.members[name]
     elsif String === name
       %x{
-        if(!self.$$data.hasOwnProperty(name)) {
+        if(!self[Opal.s.$$data].hasOwnProperty(name)) {
           #{raise NameError.new("no member '#{name}' in struct", name)}
         }
       }
@@ -137,7 +137,7 @@ class Struct
     end
 
     name = Opal.coerce_to!(name, String, :to_str)
-    `self.$$data[name]`
+    `self[Opal.s.$$data][name]`
   end
 
   def []=(name, value)
@@ -153,7 +153,7 @@ class Struct
     end
 
     name = Opal.coerce_to!(name, String, :to_str)
-    `self.$$data[name] = value`
+    `self[Opal.s.$$data][name] = value`
   end
 
   def ==(other)
@@ -168,9 +168,9 @@ class Struct
         recursed1[#{`struct`.__id__}] = true;
         recursed2[#{`other`.__id__}] = true;
 
-        for (key in struct.$$data) {
-          a = struct.$$data[key];
-          b = other.$$data[key];
+        for (key in struct[Opal.s.$$data]) {
+          a = struct[Opal.s.$$data][key];
+          b = other[Opal.s.$$data][key];
 
           if (#{Struct === `a`}) {
             if (!recursed1.hasOwnProperty(#{`a`.__id__}) || !recursed2.hasOwnProperty(#{`b`.__id__})) {
@@ -204,9 +204,9 @@ class Struct
         recursed1[#{`struct`.__id__}] = true;
         recursed2[#{`other`.__id__}] = true;
 
-        for (key in struct.$$data) {
-          a = struct.$$data[key];
-          b = other.$$data[key];
+        for (key in struct[Opal.s.$$data]) {
+          a = struct[Opal.s.$$data][key];
+          b = other[Opal.s.$$data][key];
 
           if (#{Struct === `a`}) {
             if (!recursed1.hasOwnProperty(#{`a`.__id__}) || !recursed2.hasOwnProperty(#{`b`.__id__})) {
@@ -279,11 +279,11 @@ class Struct
   end
 
   def values_at(*args)
-    args = args.map { |arg| `arg.$$is_range ? #{arg.to_a} : arg` }.flatten
+    args = args.map { |arg| `arg[Opal.s.$$is_range] ? #{arg.to_a} : arg` }.flatten
     %x{
       var result = [];
       for (var i = 0, len = args.length; i < len; i++) {
-        if (!args[i].$$is_number) {
+        if (!args[i][Opal.s.$$is_number]) {
           #{raise TypeError, "no implicit conversion of #{`args[i]`.class} into Integer"}
         }
         result.push(#{self[`args[i]`]});
@@ -293,8 +293,8 @@ class Struct
   end
 
   def dig(key, *keys)
-    item = if `key.$$is_string && self.$$data.hasOwnProperty(key)`
-             `self.$$data[key] || nil`
+    item = if `key[Opal.s.$$is_string] && self[Opal.s.$$data].hasOwnProperty(key)`
+             `self[Opal.s.$$data][key] || nil`
            end
 
     %x{

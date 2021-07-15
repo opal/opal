@@ -7,7 +7,7 @@ class Regexp < `RegExp`
   EXTENDED = 2
   MULTILINE = 4
 
-  `Opal.defineProperty(self.$$prototype, '$$is_regexp', true)`
+  `Opal.defineProperty(self[Opal.s.$$prototype], Opal.s.$$is_regexp, true)`
 
   class << self
     def allocate
@@ -37,11 +37,11 @@ class Regexp < `RegExp`
           return /(?!)/;
         }
         // return fast if there's only one element
-        if (parts.length == 1 && parts[0].$$is_regexp) {
+        if (parts.length == 1 && parts[0][Opal.s.$$is_regexp]) {
           return parts[0];
         }
         // cover the 2 arrays passed as arguments case
-        is_first_part_array = parts[0].$$is_array;
+        is_first_part_array = parts[0][Opal.s.$$is_array];
         if (parts.length > 1 && is_first_part_array) {
           #{raise TypeError, 'no implicit conversion of Array into String'}
         }
@@ -53,10 +53,10 @@ class Regexp < `RegExp`
         quoted_validated = [];
         for (var i=0; i < parts.length; i++) {
           part = parts[i];
-          if (part.$$is_string) {
+          if (part[Opal.s.$$is_string]) {
             quoted_validated.push(#{escape(`part`)});
           }
-          else if (part.$$is_regexp) {
+          else if (part[Opal.s.$$is_regexp]) {
             each_part_options = #{`part`.options};
             if (options != undefined && options != each_part_options) {
               #{raise TypeError, 'All expressions must use the same options'}
@@ -75,7 +75,7 @@ class Regexp < `RegExp`
 
     def new(regexp, options = undefined)
       %x{
-        if (regexp.$$is_regexp) {
+        if (regexp[Opal.s.$$is_regexp]) {
           return new RegExp(regexp);
         }
 
@@ -89,7 +89,7 @@ class Regexp < `RegExp`
           return new RegExp(regexp);
         }
 
-        if (options.$$is_number) {
+        if (options[Opal.s.$$is_number]) {
           var temp = '';
           if (#{IGNORECASE} & options) { temp += 'i'; }
           if (#{MULTILINE}  & options) { temp += 'm'; }
@@ -382,7 +382,7 @@ class MatchData
 
       for (i = 0; i < args.length; i++) {
 
-        if (args[i].$$is_range) {
+        if (args[i][Opal.s.$$is_range]) {
           a = #{`args[i]`.to_a};
           a.unshift(i, 1);
           Array.prototype.splice.apply(args, a);

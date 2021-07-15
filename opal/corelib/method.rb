@@ -13,20 +13,20 @@ class Method
   end
 
   def parameters
-    `#{@method}.$$parameters`
+    `#{@method}[Opal.s.$$parameters]`
   end
 
   def source_location
-    `#{@method}.$$source_location` || ['(eval)', 0]
+    `#{@method}[Opal.s.$$source_location]` || ['(eval)', 0]
   end
 
   def comments
-    `#{@method}.$$comments` || []
+    `#{@method}[Opal.s.$$comments]` || []
   end
 
   def call(*args, &block)
     %x{
-      #{@method}.$$p = block;
+      #{@method}[Opal.s.$$p] = block;
 
       return #{@method}.apply(#{@receiver}, args);
     }
@@ -48,11 +48,11 @@ class Method
 
   def to_proc
     %x{
-      var proc = self.$call.bind(self);
-      proc.$$unbound = #{@method};
-      proc.$$is_lambda = true;
-      proc.$$arity = #{@method}.$$arity;
-      proc.$$parameters = #{@method}.$$parameters;
+      var proc = self[Opal.s.$call].bind(self);
+      proc[Opal.s.$$unbound] = #{@method};
+      proc[Opal.s.$$is_lambda] = true;
+      proc[Opal.s.$$arity] = #{@method}[Opal.s.$$arity];
+      proc[Opal.s.$$parameters] = #{@method}[Opal.s.$$parameters];
       return proc;
     }
   end
@@ -77,20 +77,20 @@ class UnboundMethod
   end
 
   def parameters
-    `#{@method}.$$parameters`
+    `#{@method}[Opal.s.$$parameters]`
   end
 
   def source_location
-    `#{@method}.$$source_location` || ['(eval)', 0]
+    `#{@method}[Opal.s.$$source_location]` || ['(eval)', 0]
   end
 
   def comments
-    `#{@method}.$$comments` || []
+    `#{@method}[Opal.s.$$comments]` || []
   end
 
   def bind(object)
     %x{
-      if (#{@owner}.$$is_module || Opal.is_a(#{object}, #{@owner})) {
+      if (#{@owner}[Opal.s.$$is_module] || Opal.is_a(#{object}, #{@owner})) {
         return #{Method.new(object, @owner, @method, @name)};
       }
       else {

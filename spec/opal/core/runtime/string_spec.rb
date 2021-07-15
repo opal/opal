@@ -12,8 +12,8 @@ describe "Runtime String helpers" do
   context 'Opal.set_encoding' do
     it 'sets the encoding for boxed strings' do
       expect(`Opal.set_encoding(new String("foo"), 'UTF-8')`.encoding).to eq(Encoding::UTF_8)
-      expect(`Opal.set_encoding("foo".$dup(), 'UTF-8')`.encoding).to eq(Encoding::UTF_8)
-      expect(`Opal.set_encoding("foo".$clone(), 'UTF-8')`.encoding).to eq(Encoding::UTF_8)
+      expect(`Opal.set_encoding("foo"[Opal.s('$dup')](), 'UTF-8')`.encoding).to eq(Encoding::UTF_8)
+      expect(`Opal.set_encoding("foo"[Opal.s('$clone')](), 'UTF-8')`.encoding).to eq(Encoding::UTF_8)
     end
 
     it 'raises FrozenError when provided a literal' do

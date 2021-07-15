@@ -3,7 +3,7 @@ require 'corelib/enumerable'
 class Range
   include Enumerable
 
-  `self.$$prototype.$$is_range = true`
+  `self[Opal.s.$$prototype][Opal.s.$$is_range] = true`
 
   attr_reader :begin, :end
 
@@ -57,7 +57,7 @@ class Range
     %x{
       var i, limit;
 
-      if (#{@begin}.$$is_number && #{@end}.$$is_number) {
+      if (#{@begin}[Opal.s.$$is_number] && #{@end}[Opal.s.$$is_number]) {
         if (#{@begin} % 1 !== 0 || #{@end} % 1 !== 0) {
           #{raise TypeError, "can't iterate from Float"}
         }
@@ -69,7 +69,7 @@ class Range
         return self;
       }
 
-      if (#{@begin}.$$is_string && #{@end}.$$is_string) {
+      if (#{@begin}[Opal.s.$$is_string] && #{@end}[Opal.s.$$is_string]) {
         #{@begin.upto(@end, @excl, &block)}
         return self;
       }
@@ -169,7 +169,7 @@ class Range
   def step(n = 1)
     %x{
       function coerceStepSize() {
-        if (!n.$$is_number) {
+        if (!n[Opal.s.$$is_number]) {
           n = #{Opal.coerce_to!(n, Integer, :to_int)}
         }
 
@@ -185,7 +185,7 @@ class Range
           return nil;
         }
 
-        if (#{@begin}.$$is_string && #{@end}.$$is_string) {
+        if (#{@begin}[Opal.s.$$is_string] && #{@end}[Opal.s.$$is_string]) {
           return nil;
         }
 
@@ -227,7 +227,7 @@ class Range
 
     `coerceStepSize()`
 
-    if `self.begin.$$is_number && self.end.$$is_number`
+    if `self.begin[Opal.s.$$is_number] && self.end[Opal.s.$$is_number]`
       i = 0
       loop do
         current = @begin + i * n
@@ -241,7 +241,7 @@ class Range
       end
     else
       %x{
-        if (#{@begin}.$$is_string && #{@end}.$$is_string && n % 1 !== 0) {
+        if (#{@begin}[Opal.s.$$is_string] && #{@end}[Opal.s.$$is_string] && n % 1 !== 0) {
           #{raise TypeError, 'no implicit conversion to float from string'}
         }
       }
@@ -255,11 +255,11 @@ class Range
   def bsearch(&block)
     return enum_for(:bsearch) unless block_given?
 
-    if `is_infinite(self) && (self.begin.$$is_number || self.end.$$is_number)`
+    if `is_infinite(self) && (self.begin[Opal.s.$$is_number] || self.end[Opal.s.$$is_number])`
       raise NotImplementedError, "Can't #bsearch an infinite range"
     end
 
-    unless `self.begin.$$is_number && self.end.$$is_number`
+    unless `self.begin[Opal.s.$$is_number] && self.end[Opal.s.$$is_number]`
       raise TypeError, "can't do binary search for #{@begin.class}"
     end
 

@@ -1,10 +1,10 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "BigDecimal" do
-  fails "BidDecimal#hash two BigDecimal objects with numerically equal values should have the same hash value" # Exception: self.$BigDecimal(...).$hash is not a function
-  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for NaNs" # Exception: self.$BigDecimal(...).$hash is not a function
-  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for infinite values" # Exception: self.$BigDecimal(...).$hash is not a function
-  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for ordinary values" # Exception: self.$BigDecimal(...).$hash is not a function
-  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for zero values" # Exception: self.$BigDecimal(...).$hash is not a function
+  fails "BidDecimal#hash two BigDecimal objects with numerically equal values should have the same hash value" # Exception: self.$BigDecimal(...)[Opal.s.$hash] is not a function
+  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for NaNs" # Exception: self.$BigDecimal(...)[Opal.s.$hash] is not a function
+  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for infinite values" # Exception: self.$BigDecimal(...)[Opal.s.$hash] is not a function
+  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for ordinary values" # Exception: self.$BigDecimal(...)[Opal.s.$hash] is not a function
+  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for zero values" # Exception: self.$BigDecimal(...)[Opal.s.$hash] is not a function
   fails "BigDecimal constants defines a VERSION value" # Expected false to be true
   fails "BigDecimal constants exception-related constants has a EXCEPTION_ALL value" # NameError: uninitialized constant BigDecimal::EXCEPTION_ALL
   fails "BigDecimal constants exception-related constants has a EXCEPTION_INFINITY value" # NameError: uninitialized constant BigDecimal::EXCEPTION_INFINITY
@@ -80,7 +80,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#frac returns 0 if the value is an integer"
   fails "BigDecimal#frac returns a BigDecimal"
   fails "BigDecimal#frac returns the fractional part of the absolute value"
-  fails "BigDecimal#inspect does not add an exponent for zero values" # Exception: self.$BigDecimal(...).$inspect is not a function
+  fails "BigDecimal#inspect does not add an exponent for zero values" # Exception: self.$BigDecimal(...)[Opal.s.$inspect] is not a function
   fails "BigDecimal#inspect encloses information in angle brackets"
   fails "BigDecimal#inspect is comma separated list of three items"
   fails "BigDecimal#inspect last part is number of significant digits"
@@ -182,10 +182,10 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_s can return a leading space for values > 0"
   fails "BigDecimal#to_s can use conventional floating point notation"
   fails "BigDecimal#to_s can use engineering notation"
-  fails "BigDecimal#to_s does not add an exponent for zero values" # Exception: self.$BigDecimal(...).$to_s is not a function
+  fails "BigDecimal#to_s does not add an exponent for zero values" # Exception: self.$BigDecimal(...)[Opal.s.$to_s] is not a function
   fails "BigDecimal#to_s inserts a space every n chars, if integer n is supplied"
   fails "BigDecimal#to_s removes trailing spaces in floating point notation"
-  fails "BigDecimal#to_s return type is of class String" # Exception: self.bigdec.$to_s is not a function
+  fails "BigDecimal#to_s return type is of class String" # Exception: self.bigdec[Opal.s.$to_s] is not a function
   fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s starts with + if + is supplied and value is positive"
