@@ -121,3 +121,19 @@ describe 'Bridged classes in different modules' do
     @bridged.new.some_bridged_method.should == [4, 5, 6]
   end
 end
+
+
+describe "Invalid bridged classes" do
+  it "raises a TypeError when trying to extend with non-Class" do
+    error_msg = /superclass must be a Class/
+    -> { class TestClass < `""`;                  end }.should raise_error(TypeError, error_msg)
+    -> { class TestClass < `3`;                   end }.should raise_error(TypeError, error_msg)
+    -> { class TestClass < `true`;                end }.should raise_error(TypeError, error_msg)
+    -> { class TestClass < `Math`;                end }.should raise_error(TypeError, error_msg)
+    -> { class TestClass < `Object.create({})`;   end }.should raise_error(TypeError, error_msg)
+    -> { class TestClass < `Object.create(null)`; end }.should raise_error(TypeError, error_msg)
+    -> { class TestClass < Module.new;            end }.should raise_error(TypeError, error_msg)
+    -> { class TestClass < BasicObject.new;       end }.should raise_error(TypeError, error_msg)
+  end
+end
+
