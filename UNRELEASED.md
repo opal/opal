@@ -17,6 +17,7 @@
 - Fix performance regression for `Array#unshift` on v8 > 7.1 (#2116)
 - String subclasses now call `#initialize` with multiple arguments correctly (with a limitation caused by the String immutability issue, that a source string must be the first argument and `#initialize` can't change its value) (#2238, #2185)
 - Number#step is moved to Numeric (#2100)
+- Fix class Class < superclass for invalid superclasses (#2123)
 
 
 ### Changed
