@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'bundler/setup'
+
 specs = ARGV.map do |s|
   s.end_with?('.rb') ? s : "#{s}/**/*_spec.rb"
 end
