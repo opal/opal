@@ -24,7 +24,7 @@ jobs:
           - name: minitest
             ruby: 3.0
             command: bin/rake minitest
-          - name: minitest
+          - name: minitest-strict-mode
             ruby: 3.0
             command: bin/rake minitest
             strict: 'true'

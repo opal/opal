@@ -42,38 +42,6 @@ class String
       }
     }
 
-    function utf16LEToBytes(string) {
-      var utf8 = [];
-      for (var i=0; i < string.length; i++) {
-        var charcode = string.charCodeAt(i);
-        if (charcode < 0x100) utf8.push(charcode);
-        else if (charcode < 0x800) {
-          utf8.push(0xc0 | (charcode >> 6),
-                    0x80 | (charcode & 0x3f));
-        }
-        else if (charcode < 0xd800 || charcode >= 0xe000) {
-          utf8.push(0xe0 | (charcode >> 12),
-                    0x80 | ((charcode>>6) & 0x3f),
-                    0x80 | (charcode & 0x3f));
-        }
-        // surrogate pair
-        else {
-          i++;
-          // UTF-16 encodes 0x10000-0x10FFFF by
-          // subtracting 0x10000 and splitting the
-          // 20 bits of 0x0-0xFFFFF into two halves
-          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
-                    | (string.charCodeAt(i) & 0x3ff))
-          utf8.push(0xf0 | (charcode >>18),
-                    0x80 | ((charcode>>12) & 0x3f),
-                    0x80 | ((charcode>>6) & 0x3f),
-                    0x80 | (charcode & 0x3f));
-        }
-      }
-
-      return utf8;
-    }
-
     function toNByteSigned(bytesCount, callback) {
       return function(data) {
         var unsignedBits = callback(data),
@@ -321,9 +289,11 @@ class String
     }
 
     function readUnicodeCharChunk(bytes) {
+      var currentByteIndex = 0;
+      var bytesLength = bytes.length;
       function readByte() {
-        var result = bytes[0];
-        bytes = bytes.slice(1, bytes.length);
+        var result = bytes[currentByteIndex++];
+        bytesLength = bytes.length - currentByteIndex;
         return result;
       }
 
@@ -331,7 +301,7 @@ class String
 
       if (c >> 7 == 0) {
         // 0xxx xxxx
-        return { chunk: [c], rest: bytes };
+        return { chunk: [c], rest: bytes.slice(currentByteIndex) };
       }
 
       if (c >> 6 == 0x02) {
@@ -357,10 +327,10 @@ class String
         #{raise 'malformed UTF-8 character'}
       }
 
-      if (extraLength > bytes.length) {
+      if (extraLength > bytesLength) {
         #{
           expected = `extraLength + 1`
-          given = `bytes.length + 1`
+          given = `bytesLength + 1`
           raise ArgumentError, "malformed UTF-8 character (expected #{expected} bytes, given #{given} bytes)"
         }
       }
@@ -380,12 +350,12 @@ class String
       }
 
       if (result <= 0xffff) {
-        return { chunk: [result], rest: bytes };
+        return { chunk: [result], rest: bytes.slice(currentByteIndex) };
       } else {
         result -= 0x10000;
         var high = ((result >> 10) & 0x3ff) + 0xd800,
             low = (result & 0x3ff) + 0xdc00;
-        return { chunk: [high, low], rest: bytes };
+        return { chunk: [high, low], rest: bytes.slice(currentByteIndex) };
       }
     }
 
@@ -711,7 +681,23 @@ class String
     %x{
       var output = [];
 
-      var buffer = utf16LEToBytes(self);
+      // A very optimized handler for U*.
+      if (format == "U*" &&
+          self.internal_encoding.name === "UTF-8" &&
+          typeof self.codePointAt === "function") {
+
+        var cp, j = 0;
+
+        output = new Array(self.length);
+        for (var i = 0; i < self.length; i++) {
+          cp = output[j++] = self.codePointAt(i);
+          if (cp > 0xffff) i++;
+        }
+        return output.slice(0, j);
+      }
+
+      var buffer = self.$bytes();
+
 
       // optimization
       var optimizedHandler = optimized[format];
