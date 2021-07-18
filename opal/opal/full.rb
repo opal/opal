@@ -1,3 +1,5 @@
 require 'corelib/marshal'
 require 'corelib/string/unpack'
 require 'corelib/array/pack'
+require 'corelib/pattern_matching'
+require 'corelib/binding'

@@ -61,7 +61,6 @@ opal_filter "language" do
   fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
   fails "A method assigns the last Hash to the last optional argument if the Hash contains non-Symbol keys and is not passed as keywords" # Exception: Object.defineProperty called on non-object
   fails "A method definition in an eval creates a class method"
-  fails "A method definition in an eval creates a singleton method"
   fails "A method definition in an eval creates an instance method"
   fails "A method raises ArgumentError if passing hash as keyword arguments for definition 'def m(a: nil); a; end'" # Expected ArgumentError but no exception was raised (1 was returned)
   fails "A method when passing an empty keyword splat to a method that does not accept keywords for definition 'def m(*a); a; end'" # Expected [{}] == [] to be truthy but was false
@@ -78,7 +77,6 @@ opal_filter "language" do
   fails "A singleton method definition can be declared for a global variable"
   fails "A singleton method definition raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised ("foo" was returned)
   fails "Allowed characters allows non-ASCII lowercased characters at the beginning" # Expected nil == 1 to be truthy but was false
-  fails "Allowed characters allows not ASCII characters in the middle of a name" # NoMethodError: undefined method `mod' for #<MSpecEnv:0xa920>
   fails "Allowed characters allows not ASCII upcased characters at the beginning" # NameError: wrong constant name ἍBB
   fails "Allowed characters does not allow non-ASCII upcased characters at the beginning" # Expected SyntaxError (/dynamic constant assignment/) but no exception was raised ("test" was returned)
   fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
@@ -118,6 +116,7 @@ opal_filter "language" do
   fails "Global variable $\" is read-only"
   fails "Hash literal checks duplicated keys on initialization" # Expected warning to match: /key 1000 is duplicated|duplicated key/ but got: ""
   fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for BasicObject
+  fails "Hash#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: ArgumentError ([Hash#deconstruct_keys] wrong number of arguments(0 for 1))
   fails "Heredoc string allow HEREDOC with <<\"identifier\", interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<'identifier', no interpolation" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<-'identifier', allowing to indent identifier, no interpolation" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
@@ -210,84 +209,17 @@ opal_filter "language" do
   fails "Optional variable assignments using compounded constants with &&= assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compounded constants with operator assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compunded constants with ||= assignments"
-  fails "Pattern matching AS pattern binds a variable to a value if pattern matches" # Opal::SyntaxError: `n' is not allowed as a local variable name
-  fails "Pattern matching AS pattern can be used as a nested pattern" # Opal::SyntaxError: `ary' is not allowed as a local variable name
-  fails "Pattern matching Array pattern accepts a subclass of Array from #deconstruct" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern binds variables" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching Array pattern calls #deconstruct even on objects that are already an array" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern calls #deconstruct once for multiple patterns, caching the result" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern does match partially from the array beginning if list + , syntax used" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern does not match object if Constant === object returns false" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern does not match object if elements of array returned by #deconstruct method does not match elements in pattern" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern does not match object without #deconstruct method" # Mock '#<Object:0x75326>' expected to receive respond_to?("deconstruct") exactly 1 times but received it 0 times
-  fails "Pattern matching Array pattern does not match partially by default" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern matches [] with []" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern matches an object with #deconstruct method which returns an array and each element in array matches element in pattern" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern matches anything with *" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern raises TypeError if #deconstruct method does not return array" # Expected TypeError (/deconstruct must return Array/) but got: Opal::SyntaxError (Unsupported sexp: case_match)
-  fails "Pattern matching Array pattern supports form Constant(pat, pat, ...)" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern supports form Constant[pat, pat, ...]" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern supports form [pat, pat, ...]" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern supports form pat, pat, ..." # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Array pattern supports splat operator *rest" # Opal::SyntaxError: `rest' is not allowed as a local variable name
-  fails "Pattern matching Hash pattern binds variables" # Opal::SyntaxError: `x' is not allowed as a local variable name
-  fails "Pattern matching Hash pattern calls #deconstruct_keys per pattern" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern can match partially" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern can mix key (a:) and key-value (a: b) declarations" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method does not return Hash" # Expected TypeError (/deconstruct_keys must return Hash/) but got: Opal::SyntaxError (Unsupported sexp: case_match)
-  fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method returns Hash with non-symbol keys" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern does not match object if Constant === object returns false" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern does not match object if elements of Hash returned by #deconstruct_keys method does not match values in pattern" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern does not match object without #deconstruct_keys method" # Mock '#<Object:0x78c14>' expected to receive respond_to?("deconstruct_keys") exactly 1 times but received it 0 times
-  fails "Pattern matching Hash pattern matches an object with #deconstruct_keys method which returns a Hash with equal keys and each value in Hash matches value in pattern" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern matches anything with **" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern matches {} with {}" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern passes keys specified in pattern as arguments to #deconstruct_keys method" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern passes keys specified in pattern to #deconstruct_keys method if pattern contains double splat operator **" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern passes nil to #deconstruct_keys method if pattern contains double splat operator **rest" # Opal::SyntaxError: `rest' is not allowed as a local variable name
-  fails "Pattern matching Hash pattern raise SyntaxError when keys duplicate in pattern" # Expected SyntaxError (/duplicated key name/) but got: Opal::SyntaxError (duplicate hash pattern key a)
-  fails "Pattern matching Hash pattern supports 'string': key literal" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern supports a: which means a: a" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching Hash pattern supports double splat operator **rest" # Opal::SyntaxError: `rest' is not allowed as a local variable name
-  fails "Pattern matching Hash pattern supports form Constant(id: pat, id: pat, ...)" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern supports form Constant[id: pat, id: pat, ...]" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern supports form id: pat, id: pat, ..." # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern supports form {id: pat, id: pat, ...}" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching Hash pattern treats **nil like there should not be any other keys in a matched Hash" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching allows using then operator" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching alternative pattern does not support variable binding" # Expected SyntaxError (/illegal variable in alternative pattern/) but got: Opal::SyntaxError (`a' is not allowed as a local variable name)
-  fails "Pattern matching alternative pattern matches if any of patterns matches" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching alternative pattern support underscore prefixed variables in alternation" # Opal::SyntaxError: `_' is not allowed as a local variable name
-  fails "Pattern matching binds variables" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching can be standalone assoc operator that deconstructs value" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching cannot mix in and when operators" # Expected SyntaxError (/syntax error, unexpected `in'/) but got: Opal::SyntaxError (unexpected token kIN)
-  fails "Pattern matching checks patterns until the first matching" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching evaluates the case expression once for multiple patterns, caching the result" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching executes else clause if no pattern matches" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching extends case expression with case/in construction" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching guards does not evaluate guard if pattern does not match" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching guards executes else clause if no guarded pattern matches" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching guards makes bound variables visible in guard" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching guards raises NoMatchingPatternError if no guarded pattern matches and no else clause" # NameError: uninitialized constant NoMatchingPatternError
-  fails "Pattern matching guards supports if guard" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching guards supports unless guard" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching guards takes guards into account when there are several matching patterns" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching raises NoMatchingPatternError if no pattern matches and no else clause" # NameError: uninitialized constant NoMatchingPatternError
-  fails "Pattern matching refinements are used for #=== in constant pattern" # NoMethodError: undefined method `refine' for #<Module:0x79d4c>
-  fails "Pattern matching refinements are used for #deconstruct" # NoMethodError: undefined method `refine' for #<Module:0x79d50>
-  fails "Pattern matching refinements are used for #deconstruct_keys" # NoMethodError: undefined method `refine' for #<Module:0x79d54>
-  fails "Pattern matching value pattern allows string literal with interpolation" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching value pattern matches an object such that pattern === object" # Opal::SyntaxError: Unsupported sexp: case_match
-  fails "Pattern matching variable pattern allow using _ name to drop values" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching variable pattern allows applying ^ operator to bound variables" # Opal::SyntaxError: `n' is not allowed as a local variable name
-  fails "Pattern matching variable pattern create local variables even if a pattern doesn't match" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching variable pattern does not support using variable name (except _) several times" # Expected SyntaxError (/duplicated variable name/) but got: Opal::SyntaxError (`a' is not allowed as a local variable name)
-  fails "Pattern matching variable pattern makes bounded variable visible outside a case statement scope" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching variable pattern matches a value and binds variable name to this value" # Opal::SyntaxError: `a' is not allowed as a local variable name
-  fails "Pattern matching variable pattern requires bound variable to be specified in a pattern before ^ operator when it relies on a bound variable" # Expected SyntaxError (/n: no such local variable/) but got: Opal::SyntaxError (no such local variable: `n')
-  fails "Pattern matching variable pattern supports existing variables in a pattern specified with ^ operator" # Opal::SyntaxError: no such local variable: `a'
-  fails "Pattern matching variable pattern supports using _ in a pattern several times" # Opal::SyntaxError: `_' is not allowed as a local variable name
-  fails "Pattern matching variable pattern supports using any name with _ at the beginning in a pattern several times" # Opal::SyntaxError: `_x' is not allowed as a local variable name
+  fails "Pattern matching Array pattern calls #deconstruct once for multiple patterns, caching the result" # Expected ["deconstruct", "deconstruct"] == ["deconstruct"] to be truthy but was false
+  fails "Pattern matching Array pattern raises TypeError if #deconstruct method does not return array" # Expected TypeError (/deconstruct must return Array/) but no exception was raised (nil was returned)
+  fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method does not return Hash" # Expected TypeError (/deconstruct_keys must return Hash/) but got: NoMethodError (undefined method `key?' for "")
+  fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method returns Hash with non-symbol keys" # Expected true == false to be truthy but was false
+  fails "Pattern matching Hash pattern raise SyntaxError when keys duplicate in pattern" # Expected SyntaxError (/duplicated key name/) but got: SyntaxError (duplicate hash pattern key a)
+  fails "Pattern matching alternative pattern does not support variable binding" # Expected SyntaxError (/illegal variable in alternative pattern/) but no exception was raised (nil was returned)
+  fails "Pattern matching cannot mix in and when operators" # Expected SyntaxError (/syntax error, unexpected `in'/) but got: SyntaxError (unexpected token kIN)
+  fails "Pattern matching variable pattern allows applying ^ operator to bound variables" # NoMatchingPatternError: [1, 1]
+  fails "Pattern matching variable pattern does not support using variable name (except _) several times" # Expected SyntaxError (/duplicated variable name/) but got: SyntaxError (duplicate variable name a)
+  fails "Pattern matching variable pattern requires bound variable to be specified in a pattern before ^ operator when it relies on a bound variable" # Expected SyntaxError (/n: no such local variable/) but got: SyntaxError (no such local variable: `n')
+  fails "Pattern matching variable pattern supports existing variables in a pattern specified with ^ operator" # SyntaxError: no such local variable: `a'
   fails "Pattern matching warning warns about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Post-args with optional args with a circular argument reference shadows an existing local with the same name as the argument"
   fails "Post-args with optional args with a circular argument reference shadows an existing method with the same name as the argument"
@@ -319,8 +251,7 @@ opal_filter "language" do
   fails "Ruby String interpolation returns a string with the source encoding by default" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
   fails "Safe navigator allows assignment methods"
-  fails "Safe navigator allows assignment operators"
-  fails "Safe navigator does not call the operator method lazily with an assignment operator"
+  fails "Struct#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: ArgumentError ([#deconstruct_keys] wrong number of arguments(0 for 1))  
   fails "The =~ operator with named captures on syntax of 'string_literal' =~ /regexp/ does not set local variables" # Exception: named captures are not supported in javascript: "(?<matched>foo)(?<unmatched>bar)?"
   fails "The =~ operator with named captures on syntax of /regexp/ =~ string_variable sets local variables by the captured pairs"
   fails "The =~ operator with named captures on syntax of regexp_variable =~ string_variable does not set local variables"
@@ -374,8 +305,6 @@ opal_filter "language" do
   fails "The defined? keyword for variables returns nil for a global variable that has been read but not assigned to"
   fails "The defined? keyword for variables when a Regexp matches a String returns nil for non-captures"
   fails "The defined? keyword for variables when a String matches a Regexp returns nil for non-captures"
-  fails "The if expression accepts multiple assignments in conditional expression with nil values" # NoMethodError: undefined method `ary' for #<MSpecEnv:0x50754>
-  fails "The if expression accepts multiple assignments in conditional expression with non-nil values" # NoMethodError: undefined method `ary' for #<MSpecEnv:0x50754>
   fails "The if expression with a boolean range ('flip-flop' operator) allows combining two flip-flops"
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with exclusive-end range"
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with inclusive-end range"
@@ -388,9 +317,9 @@ opal_filter "language" do
   fails "The if expression with a boolean range ('flip-flop' operator) mimics an awk conditional with a single-element inclusive-end range"
   fails "The if expression with a boolean range ('flip-flop' operator) scopes state by flip-flop"
   fails "The or operator has a lower precedence than 'next' in 'next true or false'"
-  fails "The predefined global constants includes TOPLEVEL_BINDING"
   fails "The redo statement in a method is invalid and raises a SyntaxError"
   fails "The redo statement triggers ensure block when re-executing a block"
+  fails "The rescue keyword allows rescue in 'do end' block" # NoMethodError: undefined method `call' for nil
   fails "The rescue keyword can capture the raised exception using a setter method" # NoMethodError: undefined method `message' for nil
   fails "The rescue keyword can capture the raised exception using a square brackets setter" # ArgumentError: [SquareBracketsCaptor#[]=] wrong number of arguments(1 for 2)
   fails "The rescue keyword inline form can be inlined" # Expected Infinity to equal 1

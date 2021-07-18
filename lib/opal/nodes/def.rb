@@ -91,14 +91,6 @@ module Opal
         end
       end
 
-      def source_location
-        file = @sexp.loc.expression.source_buffer.name
-        file = "<internal:#{file}>" if file.start_with?("corelib/")
-        file = "<js:#{file}>" if file.end_with?(".js")
-        line = @sexp.loc.line
-        "['#{file}', #{line}]"
-      end
-
       def comments_code
         '[' + comments.map { |comment| comment.text.inspect }.join(', ') + ']'
       end

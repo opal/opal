@@ -6,6 +6,7 @@ require 'opal/rewriters/explicit_writer_return'
 require 'opal/rewriters/js_reserved_words'
 require 'opal/rewriters/block_to_iter'
 require 'opal/rewriters/dot_js_syntax'
+require 'opal/rewriters/pattern_matching'
 require 'opal/rewriters/logical_operator_assignment'
 require 'opal/rewriters/binary_operator_assignment'
 require 'opal/rewriters/hashes/key_duplicates_rewriter'
@@ -49,6 +50,7 @@ module Opal
     use Rewriters::ForwardArgs
     use Rewriters::BlockToIter
     use Rewriters::DotJsSyntax
+    use Rewriters::PatternMatching
     use Rewriters::JsReservedWords
     use Rewriters::LogicalOperatorAssignment
     use Rewriters::BinaryOperatorAssignment
