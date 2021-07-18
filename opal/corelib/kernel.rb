@@ -620,7 +620,7 @@ module Kernel
   end
 
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
-  def require_tree(path)
+  def require_tree(path, autoload = false)
     %x{
       var result = [];
 
@@ -629,7 +629,11 @@ module Kernel
       if (path === '.') path = '';
       for (var name in Opal.modules) {
         if (#{`name`.start_with?(path)}) {
-          result.push([name, Opal.require(name)]);
+          if(autoload) {
+            result.push([name, true]); // do nothing, delegated to a autoloader
+          } else {
+            result.push([name, Opal.require(name)]);
+          }
         }
       }
 
@@ -714,5 +718,9 @@ module Kernel
 end
 
 class Object
+  # Object#require has been set to runtime.js Opal.require
+  # Now Kernel is active, make sure Kernel#require is used
+  # which is what ruby does and makes Kernel#require overwritable
+  `delete Opal.Object.$$prototype.$require`
   include Kernel
 end
