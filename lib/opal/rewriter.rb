@@ -15,6 +15,7 @@ require 'opal/rewriters/inline_args'
 require 'opal/rewriters/numblocks'
 require 'opal/rewriters/returnable_logic'
 require 'opal/rewriters/forward_args'
+require 'opal/rewriters/simple_if'
 
 module Opal
   class Rewriter
@@ -58,6 +59,7 @@ module Opal
     use Rewriters::DumpArgs
     use Rewriters::MlhsArgs
     use Rewriters::InlineArgs
+    use Rewriters::SimpleIf
 
     def initialize(sexp)
       @sexp = sexp
@@ -67,11 +69,20 @@ module Opal
       return @sexp if self.class.disabled?
 
       self.class.list.each do |rewriter_class|
+        #$rtime[rewriter_class] ||= 0.0
+        #t = Time.now
         rewriter = rewriter_class.new
         @sexp = rewriter.process(@sexp)
+        #$rtime[rewriter_class] += (Time.now - t)
       end
 
       @sexp
     end
   end
 end
+
+#$rtime = {}
+#
+#at_exit do
+#  pp $rtime
+#end
