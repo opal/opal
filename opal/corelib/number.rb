@@ -828,8 +828,6 @@ class Number < Numeric
   end
 end
 
-Fixnum = Number
-
 class Integer < Numeric
   `self.$$is_number_class = true`
   `self.$$is_integer_class = true`
@@ -856,6 +854,8 @@ class Integer < Numeric
   MAX = `Math.pow(2, 30) - 1`
   MIN = `-Math.pow(2, 30)`
 end
+
+Fixnum = Integer
 
 class Float < Numeric
   `self.$$is_number_class = true`
