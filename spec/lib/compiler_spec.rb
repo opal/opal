@@ -663,6 +663,36 @@ RSpec.describe Opal::Compiler do
     end
   end
 
+  describe 'irb mode' do
+    it 'uses local variables from global scope via Opal.irb_vars in global scope' do
+      expect_compiled('a=6; puts a', irb: true).to include("$a = Opal.irb_vars.a")
+    end
+
+    it 'uses local variables from global scope via Opal.irb_vars in a top block scope' do
+      expect_compiled('b=6; proc { puts b }', irb: true).to include("$a = Opal.irb_vars.b")
+    end
+
+    it 'uses local variables from global scope via Opal.irb_vars in a nested top block scope' do
+      expect_compiled('b=6; proc { proc { puts b } }', irb: true).to include("$a = Opal.irb_vars.b")
+    end
+
+    it 'uses local variables from global scope via Opal.irb_vars in a nested top block scope even if rewritten' do
+      expect_compiled('b=6; proc { b = 7; proc { puts b } }', irb: true).to include("$a = Opal.irb_vars.b")
+    end
+
+    it 'uses local variables from global scope via Opal.irb_vars in if clause' do
+      expect_compiled('c=6; if true; puts c; end', irb: true).to include("$a = Opal.irb_vars.c")
+    end
+
+    it "doesn't use local variables from global scope via Opal.irb_vars in def scope" do
+      expect_compiled('d=6; def x; puts d; end', irb: true).to_not include("$a = Opal.irb_vars.d")
+    end
+
+    it "doesn't use local variables from global scope via Opal.irb_vars in a nested block scope" do
+      expect_compiled('proc { b=6; proc { puts b } }', irb: true).to_not include("$a = Opal.irb_vars.b")
+    end
+  end
+
   describe '[regressions]' do
     it 'accepts empty rescue within while loop' do
       # found running bm_vm1_rescue.rb
