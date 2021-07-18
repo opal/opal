@@ -13,7 +13,6 @@ get '/plain_text' do
   body 'plain text'
 end
 
-
 get '/no_header' do
   status 200
   headers \
