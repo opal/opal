@@ -57,7 +57,7 @@ RSpec.describe Opal::Rewriters::LogicalOperatorAssignment do
     end
 
     context 'class variable' do
-      include_examples 'it rewrites', '@@a ||= 1', '@@a = @@a || 1'
+      include_examples 'it rewrites', '@@a ||= 1', '@@a = defined?(@@a) ? (@@a || 1) : 1'
       include_examples 'it rewrites', '@@a &&= 1', '@@a = @@a && 1'
     end
 

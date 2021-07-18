@@ -194,9 +194,16 @@ module Opal
       children :name
 
       def compile
-        with_temp do |tmp|
-          push "((#{tmp} = #{class_variable_owner}.$$cvars['#{name}']) == null ? nil : #{tmp})"
-        end
+        helper :class_variable_get
+
+        tolerant = false
+        # We should be tolerant of expressions like: def x; @@notexist; 0; end
+        # (NB: Shouldn't we actually optimize them out?)
+        tolerant = true if stmt?
+        # We should be tolerant of expressions like: @@notexist ||= 6
+        # (those are handled with logical_operator_assignment)
+
+        push "$class_variable_get(#{class_variable_owner}, '#{name}', #{tolerant.inspect})"
       end
     end
 
@@ -206,7 +213,9 @@ module Opal
       children :name, :value
 
       def compile
-        push "(Opal.class_variable_set(#{class_variable_owner}, '#{name}', ", expr(value), '))'
+        helper :class_variable_set
+
+        push "$class_variable_set(#{class_variable_owner}, '#{name}', ", expr(value), ')'
       end
     end
   end

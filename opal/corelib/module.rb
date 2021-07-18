@@ -204,13 +204,8 @@ class Module
 
   def class_variable_get(name)
     name = Opal.class_variable_name!(name)
-    %x{
-      var value = Opal.class_variables(self)[name];
-      if (value == null) {
-        #{raise NameError.new("uninitialized class variable #{name} in #{self}", name)}
-      }
-      return value;
-    }
+
+    `Opal.class_variable_get(self, name, false)`
   end
 
   def class_variable_set(name, value)
