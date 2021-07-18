@@ -12,9 +12,11 @@ module Kernel
     compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
     code = Opal.compile str, compiling_options
     %x{
-      return (function(self) {
-        return eval(#{code});
-      })(self)
+      return (
+        Function(
+          "return function(self) { return (" + #{code} + "); }"
+        )()(self)
+      )
     }
   end
 
@@ -37,7 +39,7 @@ end
   };
 
   Opal['eval'] = function(str, options) {
-   return eval(Opal.compile(str, options));
+    return Function(Opal.compile(str, options))();
   };
 
   function run_ruby_scripts() {
