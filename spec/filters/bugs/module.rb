@@ -293,5 +293,4 @@ opal_filter "Module" do
   fails "Module#using scope of refinement is not active for code defined outside the current scope" # NoMethodError: undefined method `refine' for #<Module:0x2a072>
   fails "Module#using scope of refinement is not active when class/module reopens" # NoMethodError: undefined method `refine' for #<Module:0x2a056>
   fails "Module#using works in classes too" # NoMethodError: undefined method `refine' for #<Module:0x2a01c>
-  fails "Module::Nesting returns the list of Modules nested at the point of call"
 end
