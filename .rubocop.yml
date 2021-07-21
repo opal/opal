@@ -107,8 +107,9 @@ Layout/SpaceAroundOperators:
 
 Lint/BooleanSymbol:
   Exclude:
-    # There are AST nodes with types :true and :false
+    # There are AST nodes and rewriters with types :true and :false
     - 'lib/opal/nodes/**/*.rb'
+    - 'lib/opal/rewriters/**/*.rb'
 
 Lint/InheritException:
   Exclude:

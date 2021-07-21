@@ -28,7 +28,11 @@ module Opal
       def on_match_pattern_p(node)
         from, pat = *node
 
-        convert_full_pattern(from, pat)
+        s(:if,
+          convert_full_pattern(from, pat),
+          s(:true),
+          s(:false)
+        )
       end
 
       # case a; in b; end
@@ -141,8 +145,8 @@ module Opal
         def on_match_as(node)
           pat, save = *node
 
-          process(pat)
-          array(s(:sym, :save), process(save))
+          process(save)
+          array(s(:sym, :save), process(pat))
         end
 
         def on_literal(node)
@@ -163,6 +167,7 @@ module Opal
         alias on_const on_literal
         alias on_regexp on_literal
         alias on_lambda on_literal
+        alias on_begin on_literal
 
         # ^a
         def on_pin(node)
@@ -234,6 +239,7 @@ module Opal
               any_size = to_ast(false)
               nil
             when :match_rest
+              # Capturing rest?
               if i.children.first
                 any_size = process(i.children.first)
               else
@@ -247,8 +253,12 @@ module Opal
         end
 
         # [*, a, b, *]
-        def on_find_pattern(_node)
-          raise NotImplementedError, 'Find pattern is not yet implemented'
+        def on_find_pattern(node)
+          children = *node
+
+          children = children.map(&method(:process))
+
+          array(s(:sym, :find), array(*children))
         end
 
         private

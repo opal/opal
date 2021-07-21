@@ -3,7 +3,7 @@
 class PatternMatching
   def self.call(from, pattern)
     pm = new(from, pattern)
-    pm.match || (return false)
+    pm.match || (return nil)
     pm.returns
   end
 
@@ -54,7 +54,44 @@ class PatternMatching
           end
         end
       when :find # [*, a, b, *]
-        raise NotImplementedError, 'Find pattern is not yet implemented'
+        find_match, = *args
+        first, *find_match, last = *find_match
+        pattern_length = find_match.length
+
+        return false unless from.respond_to? :deconstruct
+        a = from.deconstruct
+        a_length = a.length
+        return false if a_length < pattern_length
+
+        # We will save the backup of returns, to be restored
+        # on each iteration to try again.
+        returns_backup = @returns.dup
+
+        # Extract the capture info from first and last.
+        # Both are of a form [:rest], or [:rest, :var].
+        # So our new variables will be either :var, or nil.
+        first, last = first[1], last[1]
+
+        # Let's try to match each possibility...
+        # [A, B, c, d], [a, B, C, d], [a, b, C, D]
+        iterations = a_length - pattern_length + 1
+
+        iterations.times.any? do |skip|
+          first_part = a[0, skip]
+          content = a[skip, pattern_length]
+          last_part = a[skip + pattern_length..-1]
+
+          match(first_part, first) if first
+          success = content.each_with_index.all? do |e, i|
+            match(e, find_match[i])
+          end
+          match(last_part, last) if last
+
+          # Match failed. Let's not return anything.
+          @returns = returns_backup.dup unless success
+
+          success
+        end
       when :hash # {...}
         any_size, hash_match = *args
 
