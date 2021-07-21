@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "chrome-remote-interface": "latest"
+    "chrome-remote-interface": "^0.31.0"
   }
 }

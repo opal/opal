@@ -10,6 +10,10 @@ module Opal
     class Chrome
       SCRIPT_PATH = File.expand_path('chrome.js', __dir__).freeze
 
+      def script_path
+        SCRIPT_PATH
+      end
+
       DEFAULT_CHROME_HOST = 'localhost'
       DEFAULT_CHROME_PORT = 9222
 
@@ -43,7 +47,7 @@ module Opal
               "CHROME_PORT=#{chrome_port}",
               'node',
               '--require', "#{__dir__}/source-map-support",
-              SCRIPT_PATH
+              script_path
             ]
 
             prepare_files_in(dir)

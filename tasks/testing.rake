@@ -284,7 +284,7 @@ Use PATTERN environment variable to manually set the glob for specs:
   bundle exec rake mspec_nodejs PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
 
-platforms = %w[nodejs server chrome]
+platforms = %w[nodejs server chrome firefox]
 mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
 
