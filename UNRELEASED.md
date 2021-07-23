@@ -3,8 +3,9 @@
 - Support for multiple arguments in Hash#{merge, merge!, update} (#2187)
 - Support for Ruby 3.0 forward arguments: `def a(...) puts(...) end` (#2153)
 - Support for beginless and endless ranges: `(1..)`, `(..1)` (#2150)
-- Preliminary support for **nil argument - see #2240 to note limitations (#2152)
+- Preliminary support for `**nil` argument - see #2240 to note limitations (#2152)
 - Support for `Random::Formatters` which add methods `#{hex,base64,urlsafe_base64,uuid,random_float,random_number,alphanumeric}` to `Random` and `SecureRandom` (#2218)
+- Basic support for ObjectSpace finalizers and ObjectSpace::WeakMap (#2247)
 
 ### Fixed
 
