@@ -48,7 +48,3 @@ end unless ENV['CI']
 group :doc do
   gem 'redcarpet' unless RUBY_ENGINE == 'truffleruby'
 end unless ENV['CI']
-
-platforms :ruby, :mswin, :mswin64, :mingw, :x64_mingw do
-  #gem 'c_lexer', '~> 2.6' unless RUBY_ENGINE == 'truffleruby'
-end

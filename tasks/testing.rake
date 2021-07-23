@@ -356,13 +356,13 @@ task :minitest_node_nodejs do
     nodejs
     opal-parser
     nodejs/test_dir.rb
-    nodejs/test_encoding.rb
     nodejs/test_env.rb
     nodejs/test_error.rb
     nodejs/test_file.rb
     nodejs/test_file_encoding.rb
     nodejs/test_io.rb
     nodejs/test_opal_builder.rb
+    nodejs/test_string.rb
   ]
 
   filename = "tmp/minitest_node_nodejs.rb"

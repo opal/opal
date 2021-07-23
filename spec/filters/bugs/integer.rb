@@ -46,8 +46,6 @@ opal_filter "Integer" do
   fails "Integer#chr without argument raises a RangeError is self is less than 0"
   fails "Integer#chr without argument returns a new String for each call"
   fails "Integer#chr without argument when Encoding.default_internal is nil and self is between 0 and 127 (inclusive) returns a US-ASCII String"
-  fails "Integer#chr without argument when Encoding.default_internal is nil and self is between 128 and 255 (inclusive) returns a String containing self interpreted as a byte"
-  fails "Integer#chr without argument when Encoding.default_internal is nil and self is between 128 and 255 (inclusive) returns a binary String" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Integer#chr without argument when Encoding.default_internal is nil and self is between 128 and 255 (inclusive) returns an ASCII-8BIT String"
   fails "Integer#chr without argument when Encoding.default_internal is nil raises a RangeError is self is greater than 255"
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is between 0 and 127 (inclusive) returns a String encoding self interpreted as a US-ASCII codepoint"

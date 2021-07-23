@@ -2,17 +2,6 @@
 opal_unsupported_filter "String" do
   fails "BasicObject#__id__ returns a different value for two String literals"
   fails "Module#const_defined? returns true when passed a constant name with EUC-JP characters"
-  fails "Ruby character strings Unicode escaping can be done with \\u{} and one to six hex digits"
-  fails "Ruby character strings Unicode escaping with ASCII_8BIT source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "Ruby character strings Unicode escaping with ASCII_8BIT source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u{}" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
-  fails "Ruby character strings Unicode escaping with ASCII_8BIT source encoding produces an ASCII string when escaping ASCII characters via \\u" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
-  fails "Ruby character strings Unicode escaping with ASCII_8BIT source encoding produces an ASCII string when escaping ASCII characters via \\u{}" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
-  fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u"
-  fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces a UTF-8-encoded string when escaping non-ASCII characters via \\u{}"
-  fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces an ASCII string when escaping ASCII characters via \\u"
-  fails "Ruby character strings Unicode escaping with US-ASCII source encoding produces an ASCII string when escaping ASCII characters via \\u{}"
-  fails "Ruby character strings are produced from control character shortcuts"
-  fails "Ruby character strings backslashes follow the same rules as interpolation"
   fails "Ruby character strings taints the result of interpolation when an interpolated value is tainted"
   fails "Ruby character strings untrusts the result of interpolation when an interpolated value is untrusted"
   fails "String#% always taints the result when the format string is tainted"
@@ -21,19 +10,8 @@ opal_unsupported_filter "String" do
   fails "String#% taints result for %s when argument is tainted"
   fails "String#* always taints the result when self is tainted"
   fails "String#+ taints the result when self or other is tainted"
-  fails "String#+ when self and the argument are in different ASCII-compatible encodings raises Encoding::CompatibilityError if neither are ASCII-only"
-  fails "String#+ when self and the argument are in different ASCII-compatible encodings uses self's encoding if both are ASCII-only"
-  fails "String#+ when self and the argument are in different ASCII-compatible encodings uses self's encoding if the argument is ASCII-only"
-  fails "String#+ when self and the argument are in different ASCII-compatible encodings uses the argument's encoding if self is ASCII-only"
-  fails "String#+ when self is ASCII-8BIT and argument is US-ASCII uses ASCII-8BIT encoding"
-  fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding raises Encoding::CompatibilityError if neither are empty"
-  fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding uses self's encoding if both are empty"
-  fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding uses self's encoding if the argument is empty"
-  fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding uses the argument's encoding if self is empty"
-  fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding raises Encoding::CompatibilityError if neither are empty"
-  fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses self's encoding if both are empty"
-  fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses self's encoding if the argument is empty"
-  fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding uses the argument's encoding if self is empty"
+  fails "String#-@ deduplicates frozen strings" # May fail randomly outside of "use strict"
+  fails "String#-@ returns a frozen copy if the String is not frozen" # May fail randomly outside of "use strict"
   fails "String#<< concatenates the given argument to self and returns self"
   fails "String#<< converts the given argument to a String using to_str"
   fails "String#<< raises a RuntimeError when self is frozen"
@@ -61,17 +39,6 @@ opal_unsupported_filter "String" do
   fails "String#<< with Integer raises RangeError if the argument is negative"
   fails "String#<< with Integer raises a RuntimeError when self is frozen"
   fails "String#<< with Integer returns a ASCII-8BIT string if self is US-ASCII and the argument is between 128-255 (inclusive)"
-  fails "String#<=> with String compares the indices of the encodings when the strings have identical non-ASCII-compatible bytes"
-  fails "String#<=> with String ignores encoding difference"
-  fails "String#<=> with String returns -1 if self is bytewise less than other"
-  fails "String#<=> with String returns 0 with identical ASCII-compatible bytes of different encodings"
-  fails "String#<=> with String returns 1 if self is bytewise greater than other"
-  fails "String#== considers encoding compatibility"
-  fails "String#== considers encoding difference of incompatible string"
-  fails "String#== ignores encoding difference of compatible string"
-  fails "String#=== considers encoding compatibility"
-  fails "String#=== considers encoding difference of incompatible string"
-  fails "String#=== ignores encoding difference of compatible string"
   fails "String#[] with Range always taints resulting strings when self is tainted"
   fails "String#[] with Regexp, index always taints resulting strings when self or regexp is tainted"
   fails "String#[] with String taints resulting strings when other is tainted"
@@ -101,6 +68,48 @@ opal_unsupported_filter "String" do
   fails "String#[]= with Fixnum index, count raises an IndexError if |idx| is greater than the length of the string"
   fails "String#[]= with Fixnum index, count starts at idx and overwrites count characters before inserting the rest of other_str"
   fails "String#[]= with Fixnum index, count taints self if other_str is tainted"
+  fails "String#[]= with Integer index allows assignment to the zero'th element of an empty String" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index calls #to_int to convert the index" # Mock 'string element set' expected to receive to_int("any_args") exactly 1 times but received it 0 times
+  fails "String#[]= with Integer index calls #to_str to convert other to a String" # Mock '-test-' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "String#[]= with Integer index calls to_int on index" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index encodes the String in an encoding compatible with the replacement" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index raises IndexError if the string index doesn't match a position in the string" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises a FrozenError when self is frozen" # Expected FrozenError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises a TypeError if #to_int does not return an Integer" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises a TypeError if other_str can't be converted to a String" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises a TypeError if passed an Integer replacement" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises an Encoding::CompatibilityError if the replacement encoding is incompatible" # NameError: uninitialized constant Encoding::EUC_JP
+  fails "String#[]= with Integer index raises an IndexError if #to_int returns a value out of range" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises an IndexError if the index is greater than character size" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index raises an IndexError without changing self if idx is outside of self" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index replaces a character with a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index replaces a multibyte character with a character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index replaces a multibyte character with a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index replaces the char at idx with other_str" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index taints self if other_str is tainted" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count appends other_str to the end of the string if idx == the length of the string" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count calls #to_int to convert the index and count objects" # Mock 'string element set index' expected to receive to_int("any_args") exactly 1 times but received it 0 times
+  fails "String#[]= with Integer index, count calls #to_str to convert the replacement object" # Mock 'string element set replacement' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "String#[]= with Integer index, count counts negative idx values from end of the string" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count deletes a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count deletes characters if other_str is an empty string" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count deletes characters up to the maximum length of the existing string" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count encodes the String in an encoding compatible with the replacement" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count inserts a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count overwrites and deletes characters if count is more than the length of other_str" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count raises a TypeError if #to_int for count does not return an Integer" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises a TypeError if #to_int for index does not return an Integer" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises a TypeError if other_str is a type other than String" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises a TypeError of #to_str does not return a String" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises an Encoding::CompatibilityError if the replacement encoding is incompatible" # NameError: uninitialized constant Encoding::EUC_JP
+  fails "String#[]= with Integer index, count raises an IndexError if count < 0" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises an IndexError if the character index is out of range of a multibyte String" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count raises an IndexError if |idx| is greater than the length of the string" # Expected IndexError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
+  fails "String#[]= with Integer index, count replaces characters with a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count replaces multibyte characters with characters" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count replaces multibyte characters with multibyte characters" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count starts at idx and overwrites count characters before inserting the rest of other_str" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index, count taints self if other_str is tainted" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with String index raises an IndexError if the search String is not found"
   fails "String#[]= with String index replaces characters with no characters"
   fails "String#[]= with String index replaces fewer characters with more characters"
@@ -126,9 +135,9 @@ opal_unsupported_filter "String" do
   fails "String#[]= with a Regexp index with 3 arguments checks the match index before calling #to_str to convert the replacement"
   fails "String#[]= with a Regexp index with 3 arguments raises IndexError if the specified capture isn't available"
   fails "String#[]= with a Regexp index with 3 arguments raises a TypeError if #to_int does not return a Fixnum"
+  fails "String#[]= with a Regexp index with 3 arguments raises a TypeError if #to_int does not return an Integer" # Expected TypeError but got: NotImplementedError (String#[]= not supported. Mutable String methods are not supported in Opal.)
   fails "String#[]= with a Regexp index with 3 arguments uses the 2nd of 3 arguments as which capture should be replaced"
   fails "String#[]= with a Regexp index with 3 arguments when the optional capture does not match raises an IndexError before setting the replacement"
-  fails "String#capitalize is locale insensitive (only upcases a-z and only downcases A-Z)"
   fails "String#capitalize taints resulting string when self is tainted"
   fails "String#capitalize! capitalizes self in place for all of Unicode" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! capitalizes self in place"
@@ -137,27 +146,26 @@ opal_unsupported_filter "String" do
   fails "String#capitalize! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! full Unicode case mapping only capitalizes the first resulting character when upcasing a character produces a multi-character sequence" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! full Unicode case mapping updates string metadata" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for ASCII-only case mapping does not capitalize non-ASCII characters" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Lithuanian does not allow any other additional option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Turkic languages capitalizes ASCII characters according to Turkic semantics" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! modifies self in place for full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
+  fails "String#capitalize! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#capitalize! not supported. Mutable String methods are not supported in Opal.
   fails "String#capitalize! raises a RuntimeError when self is frozen"
   fails "String#capitalize! returns nil when no changes are made"
   fails "String#center with length, padding taints result when self or padstr is tainted"
   fails "String#center with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
-  fails "String#chars is unicode aware"
-  fails "String#chomp removes the final carriage return, newline from a non-ASCII String when the record separator is changed"
-  fails "String#chomp removes the final carriage return, newline from a non-ASCII String"
   fails "String#chomp when passed '' taints the result if self is tainted"
   fails "String#chomp when passed '\\n' taints the result if self is tainted"
   fails "String#chomp when passed a String does not taint the result when the argument is tainted"
   fails "String#chomp when passed a String taints the result if self is tainted"
   fails "String#chomp when passed nil returns a copy of the String"
   fails "String#chomp when passed nil taints the result if self is tainted"
-  fails "String#chomp when passed no argument returns a copy of the String when it is not modified"
   fails "String#chomp when passed no argument taints the result if self is tainted"
   fails "String#chomp! raises a RuntimeError on a frozen instance when it is modified"
   fails "String#chomp! raises a RuntimeError on a frozen instance when it would not be modified"
@@ -267,6 +275,7 @@ opal_unsupported_filter "String" do
   fails "String#downcase is locale insensitive (only replaces A-Z)"
   fails "String#downcase taints result when self is tainted"
   fails "String#downcase! ASCII-only case mapping does not downcase non-ASCII characters" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! case folding case folds special characters" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! does not allow invalid options" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
@@ -278,6 +287,7 @@ opal_unsupported_filter "String" do
   fails "String#downcase! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! full Unicode case mapping updates string metadata" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! modifies self in place for all of Unicode" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#downcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#downcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#downcase! modifies self in place"
   fails "String#downcase! raises a RuntimeError when self is frozen"
   fails "String#downcase! returns nil if no modifications were made"
@@ -334,23 +344,12 @@ opal_unsupported_filter "String" do
   fails "String#encode! when passed to, options calls #to_hash to convert the options object" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode! when passed to, options replaces invalid characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode! when passed to, options replaces undefined characters in the destination encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#eql? considers encoding compatibility"
-  fails "String#eql? considers encoding difference of incompatible string"
-  fails "String#eql? ignores encoding difference of compatible string"
-  fails "String#gsub with pattern and Hash ignores non-String keys"
+  fails "String#gsub with pattern and Hash ignores non-String keys" # Expected "tazoo" == "taboo" to be truthy but was false
   fails "String#gsub with pattern and Hash taints the result if a hash value is tainted"
   fails "String#gsub with pattern and Hash taints the result if the original string is tainted"
   fails "String#gsub with pattern and Hash untrusts the result if a hash value is untrusted"
   fails "String#gsub with pattern and Hash untrusts the result if the original string is untrusted"
-  fails "String#gsub with pattern and block raises an ArgumentError if encoding is not valid"
-  fails "String#gsub with pattern and block raises an Encoding::CompatibilityError if the encodings are not compatible"
-  fails "String#gsub with pattern and block replaces the incompatible part properly even if the encodings are not compatible"
   fails "String#gsub with pattern and block untrusts the result if the original string or replacement is untrusted"
-  fails "String#gsub with pattern and block uses the compatible encoding if they are compatible"
-  fails "String#gsub with pattern and replacement doesn't freak out when replacing ^" #Only fails "Text\nFoo".gsub(/^/, ' ').should == " Text\n Foo"
-  fails "String#gsub with pattern and replacement replaces \\k named backreferences with the regexp's corresponding capture"
-  fails "String#gsub with pattern and replacement returns a copy of self with all occurrences of pattern replaced with replacement" #Only fails str.gsub(/\Ah\S+\s*/, "huh? ").should == "huh? homely world. hah!"
-  fails "String#gsub with pattern and replacement supports \\G which matches at the beginning of the remaining (non-matched) string"
   fails "String#gsub with pattern and replacement taints the result if the original string or replacement is tainted"
   fails "String#gsub with pattern and replacement untrusts the result if the original string or replacement is untrusted"
   fails "String#gsub! with pattern and Hash coerces the hash values with #to_s"
@@ -408,8 +407,6 @@ opal_unsupported_filter "String" do
   fails "String#insert with index, other raises a TypeError if other can't be converted to string"
   fails "String#insert with index, other raises an IndexError if the index is beyond string"
   fails "String#insert with index, other taints self if string to insert is tainted"
-  fails "String#inspect returns a string with a NUL character replaced by \\x notation"
-  fails "String#inspect returns a string with non-printing characters replaced by \\x notation"
   fails "String#inspect taints the result if self is tainted"
   fails "String#inspect untrusts the result if self is untrusted"
   fails "String#lines does not care if the string is modified while substituting"
@@ -495,6 +492,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! Range deletes and return the substring given by the offsets of the range"
   fails "String#slice! Range raises a RuntimeError on a frozen instance that is modified"
   fails "String#slice! Range raises a RuntimeError on a frozen instance that would not be modified"
+  fails "String#slice! Range returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! Range returns nil if the given range is out of self"
   fails "String#slice! Range returns subclass instances"
   fails "String#slice! Range returns the substring given by the character offsets of the range" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
@@ -504,6 +502,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! with Regexp doesn't taint self when regexp is tainted"
   fails "String#slice! with Regexp raises a RuntimeError on a frozen instance that is modified"
   fails "String#slice! with Regexp raises a RuntimeError on a frozen instance that would not be modified"
+  fails "String#slice! with Regexp returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with Regexp returns nil if there was no match"
   fails "String#slice! with Regexp returns subclass instances"
   fails "String#slice! with Regexp returns the matching portion of self with a multi byte character" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
@@ -514,6 +513,7 @@ opal_unsupported_filter "String" do
   fails "String#slice! with Regexp, index deletes and returns the capture for idx from self"
   fails "String#slice! with Regexp, index doesn't taint self when regexp is tainted"
   fails "String#slice! with Regexp, index raises a RuntimeError if self is frozen"
+  fails "String#slice! with Regexp, index returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with Regexp, index returns nil if there is no capture for idx"
   fails "String#slice! with Regexp, index returns nil if there was no match"
   fails "String#slice! with Regexp, index returns subclass instances"
@@ -535,15 +535,12 @@ opal_unsupported_filter "String" do
   fails "String#slice! with index, length calls to_int on idx and length"
   fails "String#slice! with index, length deletes and returns the substring at idx and the given length"
   fails "String#slice! with index, length raises a RuntimeError if self is frozen"
+  fails "String#slice! with index, length returns String instances" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with index, length returns nil if the length is negative"
   fails "String#slice! with index, length returns subclass instances"
   fails "String#slice! with index, length returns the substring given by the character offsets" # NotImplementedError: String#slice! not supported. Mutable String methods are not supported in Opal.
   fails "String#slice! with index, length treats invalid bytes as single bytes" # NoMethodError: undefined method `pack' for [230, 203]:Array
   fails "String#split with Regexp doesn't taints the resulting strings if the Regexp is tainted"
-  fails "String#split with Regexp respects the encoding of the regexp when splitting between characters"
-  fails "String#split with Regexp retains the encoding of the source string"
-  fails "String#split with Regexp returns an ArgumentError if an invalid UTF-8 string is supplied"
-  fails "String#split with Regexp splits a string on each character for a multibyte encoding and empty split"
   fails "String#split with Regexp taints an empty string if self is tainted"
   fails "String#split with Regexp taints the resulting strings if self is tainted"
   fails "String#split with String taints the resulting strings if self is tainted"
@@ -558,15 +555,14 @@ opal_unsupported_filter "String" do
   fails "String#strip! raises a RuntimeError on a frozen instance that is modified"
   fails "String#strip! raises a RuntimeError on a frozen instance that would not be modified"
   fails "String#strip! returns nil if no modifications where made"
-  fails "String#sub with pattern and Hash ignores non-String keys"
+  fails "String#sub with pattern and Hash ignores non-String keys" # Expected "tazoo" == "taboo" to be truthy but was false
   fails "String#sub with pattern and Hash taints the result if a hash value is tainted"
   fails "String#sub with pattern and Hash taints the result if the original string is tainted"
   fails "String#sub with pattern and Hash untrusts the result if a hash value is untrusted"
   fails "String#sub with pattern and Hash untrusts the result if the original string is untrusted"
-  fails "String#sub with pattern and block doesn't raise a RuntimeError if the string is modified while substituting"
+  fails "String#sub with pattern and block doesn't raise a RuntimeError if the string is modified while substituting" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#sub with pattern and block taints the result if the original string or replacement is tainted"
   fails "String#sub with pattern, replacement raises a TypeError when pattern is a Symbol"
-  fails "String#sub with pattern, replacement supports \\G which matches at the beginning of the string"
   fails "String#sub with pattern, replacement taints the result if the original string or replacement is tainted"
   fails "String#sub! with pattern and Hash coerces the hash values with #to_s"
   fails "String#sub! with pattern and Hash doesn't interpolate special sequences like \\1 for the block's return value"
@@ -603,49 +599,52 @@ opal_unsupported_filter "String" do
   fails "String#swapcase! full Unicode case mapping adapted for Lithuanian does not allow any other additional option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! full Unicode case mapping updates string metadata" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for ASCII-only case mapping does not swapcase non-ASCII characters" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for all of Unicode" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place for full Unicode case mapping adapted for Turkic languages swaps case of ASCII characters according to Turkic semantics" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#swapcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#swapcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#swapcase! modifies self in place"
   fails "String#swapcase! raises a RuntimeError when self is frozen"
   fails "String#swapcase! returns nil if no modifications were made"
-  fails "String#to_i with bases parses a String in base 10"
-  fails "String#to_i with bases parses a String in base 11"
-  fails "String#to_i with bases parses a String in base 12"
-  fails "String#to_i with bases parses a String in base 13"
-  fails "String#to_i with bases parses a String in base 14"
-  fails "String#to_i with bases parses a String in base 15"
-  fails "String#to_i with bases parses a String in base 16"
-  fails "String#to_i with bases parses a String in base 17"
-  fails "String#to_i with bases parses a String in base 18"
-  fails "String#to_i with bases parses a String in base 19"
-  fails "String#to_i with bases parses a String in base 2"
-  fails "String#to_i with bases parses a String in base 20"
-  fails "String#to_i with bases parses a String in base 21"
-  fails "String#to_i with bases parses a String in base 22"
-  fails "String#to_i with bases parses a String in base 23"
-  fails "String#to_i with bases parses a String in base 24"
-  fails "String#to_i with bases parses a String in base 25"
-  fails "String#to_i with bases parses a String in base 26"
-  fails "String#to_i with bases parses a String in base 27"
-  fails "String#to_i with bases parses a String in base 28"
-  fails "String#to_i with bases parses a String in base 29"
-  fails "String#to_i with bases parses a String in base 3"
-  fails "String#to_i with bases parses a String in base 30"
-  fails "String#to_i with bases parses a String in base 31"
-  fails "String#to_i with bases parses a String in base 32"
-  fails "String#to_i with bases parses a String in base 33"
-  fails "String#to_i with bases parses a String in base 34"
-  fails "String#to_i with bases parses a String in base 35"
-  fails "String#to_i with bases parses a String in base 36"
-  fails "String#to_i with bases parses a String in base 4"
-  fails "String#to_i with bases parses a String in base 5"
-  fails "String#to_i with bases parses a String in base 6"
-  fails "String#to_i with bases parses a String in base 7"
-  fails "String#to_i with bases parses a String in base 8"
-  fails "String#to_i with bases parses a String in base 9"
+  fails "String#to_i with bases parses a String in base 10" # Expected "1.2345678901234567e+99" == "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 11" # Expected "1234567890a1234720000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890a1234567890a1234567890a1234567890a1234567890a1234567890a1234567890a1234567890a1234567890a" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 12" # Expected "1234567890ab121800000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890ab1234567890ab1234567890ab1234567890ab1234567890ab1234567890ab1234567890ab1234567890ab" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 13" # Expected "1234567890abc110000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abc1234567890abc1234567890abc1234567890abc1234567890abc1234567890abc1234567890abc" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 14" # Expected "1234567890abcdc00000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcd1234567890abcd1234567890abcd1234567890abcd1234567890abcd1234567890abcd1234567890abcd" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 15" # Expected "1234567890abcd9000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcde1234567890abcde1234567890abcde1234567890abcde1234567890abcde1234567890abcde" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 16" # Expected "1234567890abce0000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 17" # Expected "1234567890abcg00000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefg1234567890abcdefg1234567890abcdefg1234567890abcdefg1234567890abcdefg" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 18" # Expected "1234567890abc40000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefgh1234567890abcdefgh1234567890abcdefgh1234567890abcdefgh1234567890abcdefgh" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 19" # Expected "1234567890abcc000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghi1234567890abcdefghi1234567890abcdefghi1234567890abcdefghi1234567890abcdefghi" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 2" # Expected "1010101010101010101010101010101010101010101010101010100000000000000000000000000000000000000000000000" == "1010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 20" # Expected "1234567890abcg00000000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghij1234567890abcdefghij1234567890abcdefghij1234567890abcdefghij1234567890abcdefghij" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 21" # Expected "1234567890abad0000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijk1234567890abcdefghijk1234567890abcdefghijk1234567890abcdefghijk" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 22" # Expected "1234567890abg000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijkl1234567890abcdefghijkl1234567890abcdefghijkl1234567890abcdefghijkl" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 23" # Expected "1234567890abk0000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklm1234567890abcdefghijklm1234567890abcdefghijklm1234567890abcdefghijklm" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 24" # Expected "1234567890acg00000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmn1234567890abcdefghijklmn1234567890abcdefghijklmn1234567890abcdefghijklmn" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 25" # Expected "1234567890ae3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmno1234567890abcdefghijklmno1234567890abcdefghijklmno1234567890abcdefghijklmno" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 26" # Expected "1234567890aba00000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnop1234567890abcdefghijklmnop1234567890abcdefghijklmnop" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 27" # Expected "1234567890aen00000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopq1234567890abcdefghijklmnopq1234567890abcdefghijklmnopq" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 28" # Expected "1234567890a6o00000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopqr1234567890abcdefghijklmnopqr1234567890abcdefghijklmnopqr" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 29" # Expected "1234567890ab000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopqrs1234567890abcdefghijklmnopqrs1234567890abcdefghijklmnopqrs" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 3" # Expected "120120120120120120120120120120121200000000000000000000000000000000000000000000000000000000000000000" == "120120120120120120120120120120120120120120120120120120120120120120120120120120120120120120120120120" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 30" # Expected "1234567890a8000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopqrst1234567890abcdefghijklmnopqrst1234567890abcdefghijklmnopqrst" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 31" # Expected "1234567890a7000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopqrstu1234567890abcdefghijklmnopqrstu1234567890abcdefghijklmnopqrstu" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 32" # Expected "1234567890a8000000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopqrstuv1234567890abcdefghijklmnopqrstuv1234567890abcdefghijklmnopqrstuv" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 33" # Expected "1234567890ah000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopqrstuvw1234567890abcdefghijklmnopqrstuvw1234567890abcdefghijklmnopqrstuvw" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 34" # Expected "1234567890a400000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopqrstuvwx1234567890abcdefghijklmnopqrstuvwx" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 35" # Expected "12345678908x0000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopqrstuvwxy1234567890abcdefghijklmnopqrstuvwxy" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 36" # Expected "1234567890ao000000000000000000000000000000000000000000000000000000000000" == "1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 4" # Expected "1230123012301230123012301230000000000000000000000000000000000000000000000000000000000000000000000000" == "1230123012301230123012301230123012301230123012301230123012301230123012301230123012301230123012301230" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 5" # Expected "1234012340123401234012100000000000000000000000000000000000000000000000000000000000000000000000000000" == "1234012340123401234012340123401234012340123401234012340123401234012340123401234012340123401234012340" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 6" # Expected "123450123450123450122400000000000000000000000000000000000000000000000000000000000000000000000000" == "123450123450123450123450123450123450123450123450123450123450123450123450123450123450123450123450" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 7" # Expected "12345601234560123501000000000000000000000000000000000000000000000000000000000000000000000000000000" == "12345601234560123456012345601234560123456012345601234560123456012345601234560123456012345601234560" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 8" # Expected "123456701234567012400000000000000000000000000000000000000000000000000000000000000000000000000000" == "123456701234567012345670123456701234567012345670123456701234567012345670123456701234567012345670" to be truthy but was false
+  fails "String#to_i with bases parses a String in base 9" # Expected "123456780123456780000000000000000000000000000000000000000000000000000000000000000000000000000000000" == "123456780123456780123456780123456780123456780123456780123456780123456780123456780123456780123456780" to be truthy but was false  
   fails "String#to_s taints the result when self is tainted"
   fails "String#to_str taints the result when self is tainted"
   fails "String#tr taints the result when self is tainted"
@@ -665,13 +664,14 @@ opal_unsupported_filter "String" do
   fails "String#unicode_normalize! normalizes code points and modifies the receiving string"
   fails "String#unicode_normalize! raises an ArgumentError if the specified form is invalid"
   fails "String#unicode_normalize! raises an Encoding::CompatibilityError if the string is not in an unicode encoding"
-  fails "String#upcase is locale insensitive (only replaces a-z)"
   fails "String#upcase taints result when self is tainted"
   fails "String#upcase! does not allow invalid options" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! does not allow the :fold option for upcasing" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! full Unicode case mapping modifies self in place for all of Unicode with no option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! full Unicode case mapping updates string metadata for self" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! full Unicode case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for ASCII-only case mapping does not upcase non-ASCII characters" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for ASCII-only case mapping works for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for all of Unicode" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
@@ -679,6 +679,7 @@ opal_unsupported_filter "String" do
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Turkic languages does not allow any other additional option" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place for full Unicode case mapping adapted for Turkic languages upcases ASCII characters according to Turkic semantics" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
+  fails "String#upcase! modifies self in place for non-ascii-compatible encodings" # NotImplementedError: String#upcase! not supported. Mutable String methods are not supported in Opal.
   fails "String#upcase! modifies self in place"
   fails "String#upcase! raises a RuntimeError when self is frozen"
   fails "String#upcase! returns nil if no modifications were made"

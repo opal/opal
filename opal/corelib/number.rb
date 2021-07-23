@@ -379,7 +379,7 @@ class Number < Numeric
   end
 
   def chr(encoding = undefined)
-    `String.fromCharCode(self)`
+    `Opal.enc(String.fromCharCode(self), encoding || "BINARY")`
   end
 
   def denominator

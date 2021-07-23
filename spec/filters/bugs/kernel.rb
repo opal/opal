@@ -100,7 +100,6 @@ opal_filter "Kernel" do
   fails "Kernel#eval with a magic encoding comment ignores the frozen_string_literal magic comment if it appears after a token and warns if $VERBOSE is true" # Expected warning to match: /warning: `frozen_string_literal' is ignored after any tokens/ but got: ""
   fails "Kernel#eval with a magic encoding comment ignores the magic encoding comment if it is after a frozen_string_literal magic comment" # Opal::SyntaxError: unexpected token $end
   fails "Kernel#eval with a magic encoding comment uses the magic comment encoding for parsing constants" # Opal::SyntaxError: unexpected token $end
-  fails "Kernel#eval with a magic encoding comment uses the magic comment encoding for the encoding of literal strings" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:UTF-8>
   fails "Kernel#extend does not calls append_features on arguments metaclass"
   fails "Kernel#extend raises an ArgumentError when no arguments given"
   fails "Kernel#fail accepts an Object with an exception method returning an Exception" # TypeError: exception class/object expected

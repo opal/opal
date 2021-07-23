@@ -442,7 +442,12 @@ class Array
         output = output.concat(part);
       });
 
-      return output;
+      if (format.match(/^(U\*?)+$/)) {
+        return output;
+      }
+      else {
+        return Opal.enc(output, "binary");
+      }
     }
   end
 end

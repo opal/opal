@@ -100,7 +100,14 @@ class String < `String`
   def +(other)
     other = `$coerce_to(#{other}, #{String}, 'to_str')`
 
-    `self + #{other.to_s}`
+    %x{
+      if (other == "" && self.$$class === Opal.String) return #{self};
+      if (self == "" && other.$$class === Opal.String) return #{other};
+      var out = self + other;
+      if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
+      if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
+      return Opal.enc(out, self.encoding);
+    }
   end
 
   def <=>(other)
@@ -297,12 +304,6 @@ class String < `String`
     }
   end
 
-  def chars(&block)
-    return each_char.to_a unless block
-
-    each_char(&block)
-  end
-
   def chomp(separator = $/)
     return self if `separator === nil || self.length === 0`
 
@@ -422,18 +423,6 @@ class String < `String`
 
   def downcase
     `self.$$cast(self.toLowerCase())`
-  end
-
-  def each_char(&block)
-    return enum_for(:each_char) { size } unless block_given?
-
-    %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        Opal.yield1(block, self.charAt(i));
-      }
-    }
-
-    self
   end
 
   def each_line(separator = $/, &block)
@@ -653,7 +642,13 @@ class String < `String`
             '\\': '\\\\'
           },
           escaped = self.replace(escapable, function (chr) {
-            return meta[chr] || '\\u' + ('0000' + chr.charCodeAt(0).toString(16).toUpperCase()).slice(-4);
+            if (meta[chr]) return meta[chr];
+            chr = chr.charCodeAt(0);
+            if (chr <= 0xff && (self.encoding["$binary?"]() || self.internal_encoding["$binary?"]())) {
+              return '\\x' + ('00' + chr.toString(16).toUpperCase()).slice(-2);
+            } else {
+              return '\\u' + ('0000' + chr.toString(16).toUpperCase()).slice(-4);
+            }
           });
       return '"' + escaped.replace(/\#[\$\@\{]/g, '\\$&') + '"';
     }
@@ -666,10 +661,6 @@ class String < `String`
   def lines(separator = $/, &block)
     e = each_line(separator, &block)
     block ? self : e.to_a
-  end
-
-  def length
-    `self.length`
   end
 
   def ljust(width, padstr = ' ')
@@ -702,17 +693,10 @@ class String < `String`
 
   def ascii_only?
     # non-ASCII-compatible encoding must return false
-    # NOTE: Encoding::UTF_16LE is also non-ASCII-compatible encoding,
-    # but since the default encoding in JavaScript is UTF_16LE,
-    # we cannot return false otherwise the following will (incorrectly) return false: "hello".ascii_only?
-    # In other words, we cannot tell the difference between:
-    # - "hello".force_encoding("UTF-16LE")
-    # - "hello"
-    # The problem is that "ascii_only" should return false in the first case and true in the second case.
-    if encoding == Encoding::UTF_16BE
-      return false
-    end
-    `/^[\x00-\x7F]*$/.test(self)`
+    %x{
+      if (!self.encoding.ascii) return false;
+      return /^[\x00-\x7F]*$/.test(self);
+    }
   end
 
   def match(pattern, pos = undefined, &block)
@@ -853,7 +837,14 @@ class String < `String`
   end
 
   def ord
-    `self.charCodeAt(0)`
+    %x{
+      if (typeof self.codePointAt === "function") {
+        return self.codePointAt(0);
+      }
+      else {
+        return self.charCodeAt(0);
+      }
+    }
   end
 
   def partition(sep)
@@ -1029,8 +1020,6 @@ class String < `String`
       return (block !== nil ? self : result);
     }
   end
-
-  alias size length
 
   alias slice []
 
@@ -1862,8 +1851,27 @@ class String < `String`
     raise "To use String#unpack1, you must first require 'corelib/string/unpack'."
   end
 
+  def freeze
+    %x{
+      if (typeof self === 'string') return self;
+      self.$$frozen = true;
+      return self;
+    }
+  end
+
+  alias +@ dup
+
+  def -@
+    %x{
+      if (typeof self === 'string') return self;
+      if (self.$$frozen === true) return self;
+      if (self.encoding.name == 'UTF-8' && self.internal_encoding.name == 'UTF-8') return self.toString();
+      return self.$dup().$freeze();
+    }
+  end
+
   def frozen?
-    `typeof self === 'string'`
+    `typeof self === 'string' || self.$$frozen === true`
   end
 
   Opal.pristine self, :initialize
