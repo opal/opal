@@ -106,6 +106,9 @@ ruby/core/marshal/minor_version_spec
 ruby/core/nil
 ruby/core/numeric
 
+ruby/core/objectspace
+ruby/core/objectspace/weakmap
+
 ruby/core/proc
 
 ruby/core/range
