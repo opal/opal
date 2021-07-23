@@ -358,7 +358,7 @@ module Opal
     def in_while
       return unless block_given?
       @while_loop = @scope.push_while
-      result = indent { yield }
+      result = yield
       @scope.pop_while
       result
     end

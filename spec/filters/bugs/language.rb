@@ -424,16 +424,9 @@ opal_filter "language" do
   fails "The unpacking splat operator (*) when applied to a BasicObject coerces it to Array if it respond_to?(:to_a)" # NoMethodError: undefined method `respond_to?' for BasicObject
   fails "The until expression restarts the current iteration without reevaluating condition with redo"
   fails "The until modifier restarts the current iteration without reevaluating condition with redo"
-  fails "The until modifier with begin .. end block evaluates condition after block execution"
   fails "The until modifier with begin .. end block restart the current iteration without reevaluating condition with redo" # Expected [1] to equal [0, 0, 0, 1, 2]
-  fails "The until modifier with begin .. end block runs block at least once (even if the expression is true)"
-  fails "The until modifier with begin .. end block skips to end of body with next"
   fails "The while expression stops running body if interrupted by break in a begin ... end element op-assign value"
   fails "The while expression stops running body if interrupted by break in a parenthesized element op-assign value"
-  fails "The while modifier with begin .. end block evaluates condition after block execution"
-  fails "The while modifier with begin .. end block restarts the current iteration without reevaluating condition with redo" # Expected [1, 1, 1, 2] to equal [0, 0, 0, 1, 2]
-  fails "The while modifier with begin .. end block runs block at least once (even if the expression is false)"
-  fails "The while modifier with begin .. end block skips to end of body with next"
   fails "The yield call taking a single argument yielding to a lambda should not destructure an Array into multiple arguments" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
   fails "a method definition that sets more than one default parameter all to the same value only allows overriding the default value of the first such parameter in each set" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for -1)
