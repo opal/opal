@@ -245,7 +245,7 @@ class Complex < Numeric
 
   alias rectangular rect
 
-  undef step
+  begin; undef step; rescue; nil; end
 
   def to_f
     unless @imag == 0
