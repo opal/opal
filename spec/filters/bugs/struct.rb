@@ -1,15 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Struct" do
-  fails "Struct#deconstruct returns an array of attribute values" # NoMethodError: undefined method `deconstruct' for #<struct x=1, y=2>
-  fails "Struct#deconstruct_keys accepts argument position number as well but returns them as keys" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=10, y=20, z=30>
-  fails "Struct#deconstruct_keys accepts nil argument and return all the attributes" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2>
-  fails "Struct#deconstruct_keys accepts string attribute names" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2>
-  fails "Struct#deconstruct_keys raise TypeError if passed anything accept nil or array" # Expected TypeError (/expected Array or nil/) but got: NoMethodError (undefined method `deconstruct_keys' for #<struct x=1, y=2>)
-  fails "Struct#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: NoMethodError (undefined method `deconstruct_keys' for #<struct x=1>)
-  fails "Struct#deconstruct_keys returns a hash of attributes" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2>
-  fails "Struct#deconstruct_keys returns an empty hash when there are more keys than attributes" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2>
-  fails "Struct#deconstruct_keys returns at first not existing attribute name" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2>
-  fails "Struct#deconstruct_keys returns only specified keys" # NoMethodError: undefined method `deconstruct_keys' for #<struct x=1, y=2, z=3>
   fails "Struct#dig returns the value by the index" # Expected nil == "one" to be truthy but was false
   fails "Struct#hash returns different hashes for different struct classes" # Expected "Hash" != "Hash" to be truthy but was false
   fails "Struct#hash returns different hashes for structs with different values when using keyword_init: true" # NameError: wrong constant name 1 non symbol member
