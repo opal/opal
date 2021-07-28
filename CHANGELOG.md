@@ -30,6 +30,9 @@ Changes are grouped as follows:
 - Support for `"\x80"` syntax in String literals ([#2235](https://github.com/opal/opal/pull/2235))
 - Added `String#+@`, `String#-@` ([#2235](https://github.com/opal/opal/pull/2235))
 - Support for `begin <CODE> end while <CONDITION>` ([#2255](https://github.com/opal/opal/pull/2255))
+- Added Hash#except and `Hash#except!` ([#2243](https://github.com/opal/opal/pull/2243))
+- Parser 3.0: Implement pattern matching (as part of this `{Array,Hash,Struct}#{deconstruct,deconstruct_keys} methods were added)` ([#2243](https://github.com/opal/opal/pull/2243))
+- [experimental] Reimplement Promise to make it bridged with JS native Promise, this new implementation can be used by requiring `promise/v2` ([#2220](https://github.com/opal/opal/pull/2220))
 
 ### Fixed
 
@@ -48,6 +51,7 @@ Changes are grouped as follows:
 - Rework class variables to support inheritance correctly ([#2251](https://github.com/opal/opal/pull/2251))
 - ISO-8859-1 and US-ASCII encodings are now separated as in MRI ([#2235](https://github.com/opal/opal/pull/2235))
 - `String#b` no longer modifies object strings in-place ([#2235](https://github.com/opal/opal/pull/2235))
+- Parser::Builder::Default.check_lvar_name patch ([#2195](https://github.com/opal/opal/pull/2195))
 
 ### Changed
 
