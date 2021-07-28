@@ -23,10 +23,8 @@ opal_filter "language" do
   fails "A block yielded a single Array raises a TypeError if #to_hash does not return a Hash"
   fails "A block yielded a single Array when non-symbol keys are in a keyword arguments Hash does not separate non-symbol keys and symbol keys and does not autosplat" # Expected [nil, {"a"=>10, "b"=>2}] == [[{"a"=>10, "b"=>2}], {}] to be truthy but was false
   fails "A block yielded a single Array when non-symbol keys are in a keyword arguments Hash separates non-symbol keys and symbol keys" # Expected [nil, {"a"=>10, "b"=>2}] to equal [{"a"=>10}, {"b"=>2}]
-  fails "A class definition allows using self as the superclass if self is a class"
   fails "A class definition extending an object (sclass) allows accessing the block of the original scope" # Opal::SyntaxError: undefined method `uses_block!' for nil
   fails "A class definition extending an object (sclass) can use return to cause the enclosing method to return"
-  fails "A class definition extending an object (sclass) raises a TypeError when trying to extend non-Class" # Expected TypeError (/superclass must be a.* Class/) but no exception was raised (nil was returned)
   fails "A class definition extending an object (sclass) raises a TypeError when trying to extend numbers"
   fails "A class definition raises TypeError if any constant qualifying the class is not a Module"
   fails "A class definition raises TypeError if the constant qualifying the class is nil"
