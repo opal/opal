@@ -5,11 +5,18 @@ class Struct
 
   def self.new(const_name, *args, keyword_init: false, &block)
     if const_name
-      begin
-        const_name = Opal.const_name!(const_name)
-      rescue TypeError, NameError
+      if const_name.class == String && const_name[0].upcase != const_name[0]
+        # Fast track so that we skip needlessly going thru exceptions
+        # in most cases.
         args.unshift(const_name)
         const_name = nil
+      else
+        begin
+          const_name = Opal.const_name!(const_name)
+        rescue TypeError, NameError
+          args.unshift(const_name)
+          const_name = nil
+        end
       end
     end
 
