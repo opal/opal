@@ -49,7 +49,7 @@ CHANGELOG_HEADING = <<~MARKDOWN
   - **Security** to invite users to upgrade in case of vulnerabilities.
 MARKDOWN
 
-desc "Update CHANGELOG.md usign info from published GitHub releases (the first unreleased section is preserved)"
+desc "Update CHANGELOG.md using info from published GitHub releases (the first unreleased section is preserved)"
 task :changelog do
   changelog_path    = "#{__dir__}/../CHANGELOG.md"
   unreleased_path   = "#{__dir__}/../UNRELEASED.md"
