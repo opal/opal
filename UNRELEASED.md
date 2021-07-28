@@ -10,6 +10,8 @@
 - Support for `"\x80"` syntax in String literals (#2235)
 - Added `String#+@`, `String#-@` (#2235)
 - Support for `begin <CODE> end while <CONDITION>` (#2255)
+- Parser 3.0: Implement pattern matching (#2243)
+- [experimental] Reimplement Promise to make it bridged with JS native Promise, this new implementation can be used by requiring `promise/v2` (#2220)
 
 ### Fixed
 
