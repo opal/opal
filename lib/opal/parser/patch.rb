@@ -38,6 +38,16 @@ if RUBY_ENGINE == 'opal'
       end
     end
   end
+
+  class Parser::Builders::Default
+    def check_lvar_name(name, loc)
+      if name =~ `/^[\p{Ll}|_][\p{L}\p{Nl}\p{Nd}_]*$/u`
+        # OK
+      else
+        diagnostic :error, :lvar_name, { name: name }, loc
+      end
+    end
+  end
 end
 
 module AST::Processor::Mixin
