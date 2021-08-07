@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'opal/paths'
+
 if RUBY_ENGINE != 'opal'
   require 'fileutils'
   require 'digest/sha2'
@@ -7,25 +9,37 @@ if RUBY_ENGINE != 'opal'
 end
 
 module Opal
-  module Cache
-    module_function
+  singleton_class.attr_writer :cache
 
+  def self.cache
+    @cache ||=
+      if RUBY_ENGINE == 'opal' || %w[1 true TRUE].include?(ENV['OPAL_CACHE'])
+        Cache::NullCache.new
+      else
+        Cache::FileCache.new
+      end
+  end
+
+  class Cache
     class CacheError < StandardError; end
 
-    if RUBY_ENGINE == 'opal'
-      def find_key_or_exec(*, &block)
+    class NullCache
+      def fetch(*)
         yield
       end
-    else
-      def disabled?
-        # In the future we may think about some kind of a compiler switch.
-        !%w[1 true TRUE].include? ENV['OPAL_CACHE']
+    end
+
+    class FileCache
+      def initialize(dir: nil)
+        @root = File.expand_path '..', Opal.gem_dir
+        @dir = dir || find_dir
       end
 
-      def find_key_or_exec(klass, *key, &block)
-        if klass != Opal::BuilderProcessors::RubyProcessor || disabled?
-          yield
-        elsif File.exist?(file = cache_file_name(key))
+      def fetch(*key)
+        key = key.join('/')
+        file = cache_filename_for(key)
+
+        if File.exist?(file)
           load_data(file)
         else
           compiler = yield
@@ -41,29 +55,34 @@ module Opal
       end
 
       private def load_data(file)
+        FileUtils.touch(file)
         out = File.binread(file)
         out = Zlib.gunzip(out)
-        out = Marshal.load(out)
+        Marshal.load(out) # rubocop:disable Security/MarshalLoad
       end
 
-      private def cache_directory_name
-        @cache_directory_name ||= begin
-          # Is our Opal directory writable?
-          if File.writable?(dir = __dir__ + '/../..')
-            FileUtils.mkdir_p(dir += '/tmp/cache')
-          elsif File.writable?(dir = '/tmp') && File.sticky?(dir)
-            FileUtils.mkdir_p(dir += "/opal-cache-#{ENV['USER']}")
-            FileUtils.chmod(0o700, dir)
-          else
-            raise CacheError, "Can't find a reliable cache directory"
-          end
-
+      private def find_dir
+        case
+        when ENV['OPAL_CACHE_DIR']
+          dir = ENV['OPAL_CACHE_DIR']
+          FileUtils.mkdir_p(dir)
           dir
+        when File.writable?(@root)
+          dir = "#{@root}/tmp/cache"
+          FileUtils.mkdir_p(dir)
+          dir
+        when File.writable?('/tmp') && File.sticky?('/tmp')
+          dir = "/tmp/opal-cache-#{ENV['USER']}"
+          FileUtils.mkdir_p(dir)
+          FileUtils.chmod(0o700, dir)
+          dir
+        else
+          raise CacheError, "Can't find a reliable cache directory"
         end
       end
 
-      private def cache_file_name(key)
-        "#{cache_directory_name}/#{runtime_hash}-#{hash key}.rbm.gz"
+      private def cache_filename_for(key)
+        "#{@dir}/#{runtime_hash}-#{hash key}.rbm.gz"
       end
 
       private def hash(object)
@@ -76,19 +95,13 @@ module Opal
 
       private def runtime_hash
         @runtime_hash ||= begin
-          # We want to ensure the compiler stays untouched
-          files = Dir[__dir__ + '/../../lib/**/*']
-          # Along with our Gemfiles
-          files += Dir[__dir__ + '/../../Gemfile*']
-          files += Dir[__dir__ + '/../../*.gemspec']
+          # We want to ensure the compiler and any Gemfile/gemspec (for development) stays untouched
+          files = Dir["#{@root}/{Gemfile*,*.gemspec,lib/**/*}"]
 
-          str = files.map { |i| File.mtime(i).to_f.to_s }.join(',')
-
-          # Add Opal::Config
-          str << hash(Opal::Config.compiler_options)
-
-          # Compute our hash
-          digest str
+          digest [
+            files.sort.map { |f| File.mtime(f).to_f.to_s },
+            Opal::Config.compiler_options.inspect,
+          ].join('/')
         end
       end
     end
