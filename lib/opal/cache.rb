@@ -17,9 +17,11 @@ module Opal
         yield
       end
     else
+      SHARED_ENV = Ractor.make_shareable(ENV.to_h)
+
       def disabled?
         # In the future we may think about some kind of a compiler switch.
-        !%w[1 true TRUE].include? ENV['OPAL_CACHE']
+        !%w[1 true TRUE].include? SHARED_ENV['OPAL_CACHE']
       end
 
       def find_key_or_exec(klass, *key, &block)

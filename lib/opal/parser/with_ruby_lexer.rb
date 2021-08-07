@@ -2,5 +2,5 @@
 
 class Opal::Parser::WithRubyLexer < Parser::Ruby30
   include Opal::Parser::DefaultConfig
-  Opal::Parser.default_parser_class = self
+  Opal::Parser::DEFAULT_PARSER_CLASS = self
 end

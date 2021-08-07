@@ -71,6 +71,8 @@ module Opal
       @compiler_options         ||= Opal::Config.compiler_options
       @missing_require_severity ||= Opal::Config.missing_require_severity
 
+      @queue = nil
+
       @processed = []
     end
 
@@ -79,6 +81,7 @@ module Opal
     end
 
     def build(path, options = {})
+      path = path.freeze
       build_str(source_for(path), path, options)
     end
 
@@ -90,14 +93,12 @@ module Opal
     def build_str(source, rel_path, options = {})
       return if source.nil?
       abs_path = expand_path(rel_path)
-      rel_path = expand_ext(rel_path)
+      rel_path = expand_ext(rel_path).freeze
       asset = processor_for(source, rel_path, abs_path, options)
       requires = preload + asset.requires + tree_requires(asset, abs_path)
-      requires.map { |r| process_require(r, options) }
+      parallelly_process_requires(rel_path, requires, options)
       processed << asset
       self
-    rescue MissingRequire => error
-      raise error, "A file required by #{rel_path.inspect} wasn't found.\n#{error.message}", error.backtrace
     end
 
     def build_require(path, options = {})
@@ -114,6 +115,7 @@ module Opal
       @compiler_options = other.compiler_options.dup
       @missing_require_severity = other.missing_require_severity.to_sym
       @processed = other.processed.dup
+      @queue = other.queue.dup
     end
 
     def to_s
@@ -130,7 +132,7 @@ module Opal
 
     include UseGem
 
-    attr_reader :processed
+    attr_reader :processed, :queue
 
     attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
       :compiler_options, :missing_require_severity
@@ -188,10 +190,8 @@ module Opal
       end
     end
 
-    def process_require(rel_path, options)
+    def process_require_threadsafely(rel_path, options)
       return if prerequired.include?(rel_path)
-      return if already_processed.include?(rel_path)
-      already_processed << rel_path
 
       source = stub?(rel_path) ? '' : read(rel_path)
 
@@ -202,6 +202,13 @@ module Opal
       rel_path = expand_ext(rel_path)
       asset = processor_for(source, rel_path, abs_path, options.merge(requirable: true))
       process_requires(rel_path, asset.requires + tree_requires(asset, abs_path), options)
+      asset
+    end
+
+    def process_require(rel_path, options)
+      return if already_processed.include?(rel_path)
+      already_processed << rel_path
+      asset = process_require_threadsafely(rel_path, options)
       processed << asset
     end
 
@@ -223,8 +230,103 @@ module Opal
       (path_reader.expand(path) || File.expand_path(path)).to_s
     end
 
+    def parallelly_process_requires(rel_path, requires, options)
+      if RUBY_ENGINE == 'opal'
+        process_requires(rel_path, requires, options)
+      elsif !defined? ::Ractor # Doubled to appease opal_engine_check rewriter
+        process_requires(rel_path, requires, options)
+      else
+        @queue = []
+        @queue += requires
+        
+        ractors = RactorStorage.new(self, 1, options)
+
+        loop do
+          while ractors.has_free_ractors? && !@queue.empty?
+            file = @queue.pop
+            next if already_processed.include?(rel_path)
+            already_processed << file
+            ractors.send_to_free(:process, file)
+          end
+
+          change_type, *args = ractors.wait_for_change
+          case change_type
+          when :new_requires
+            @queue += rest[0]
+          when :new_asset
+            @processed << rest[0]
+          end
+          
+          break if ractors.all_free?
+        end
+
+        ractors.stop!
+
+        @queue = nil
+      end
+    end
+
+    public def ractor_worker(options, _, file)
+      asset = process_require_threadsafely(file, options)
+      Ractor.yield([:new_asset, asset], move: true)
+    end
+
+    class RactorStorage < Array
+      def initialize(obj, count, *args)
+        super([])
+        @count = count
+        count.times do |i|
+          self << Ractor.new(obj.dup, *args) do |obj, *args|
+            loop do
+              msg = Ractor.receive
+              break if msg == [:stop]
+              obj.ractor_worker(*args, *msg)
+              Ractor.yield([:free])
+            end
+          end
+        end
+        @free_ractors = count.times.to_a
+      end
+
+      def send_to_free(*data)
+        chosen_ractor = @free_ractors.pop
+        self[chosen_ractor] << data
+      end
+
+      def has_free_ractors?
+        !@free_ractors.empty?
+      end
+
+      def all_free?
+        @free_ractors.count == @count
+      end
+
+      def stop!
+        each { |i| i << [:stop] }
+      end
+
+      def wait_for_change
+        ractor, msg = Ractor.select(*self, Ractor.current)
+        ractor_id = index(ractor)
+
+        type, *rest = *msg
+        case type
+        when :free
+          @free_ractors << ractor_id
+        end
+
+        msg
+      rescue Ractor::RemoteError => e
+        raise e.cause
+      end
+    end
+
     def process_requires(rel_path, requires, options)
-      requires.map { |r| process_require(r, options) }
+      if @queue
+        Ractor.yield([:new_requires, requires])
+      else
+        requires.map { |r| process_require(r, options) }        
+      end
     rescue MissingRequire => error
       raise error, "A file required by #{rel_path.inspect} wasn't found.\n#{error.message}", error.backtrace
     end

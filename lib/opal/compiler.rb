@@ -64,7 +64,13 @@ module Opal
     # @option magic_comment: [Bool] allows magic-comments to override the option value
     def self.compiler_option(name, config = {})
       method_name = config.fetch(:as, name)
-      define_method(method_name) { option_value(name, config) }
+      config = Ractor.make_shareable(config) if defined? ::Ractor
+      content = proc { option_value(name, config) }
+      if defined? ::Ractor
+        define_method(method_name, &Ractor.make_shareable(content))
+      else
+        define_method(method_name, &content) 
+      end
     end
 
     # Fetches and memoizes the value for an option.

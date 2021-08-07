@@ -40,10 +40,8 @@ module Opal
     end
 
     class << self
-      attr_accessor :default_parser_class
-
       def default_parser
-        default_parser_class.default_parser
+        DEFAULT_PARSER_CLASS.default_parser
       end
     end
   end

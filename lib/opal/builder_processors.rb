@@ -9,7 +9,7 @@ module Opal
     class Processor
       def initialize(source, filename, options = {})
         source += "\n" unless source.end_with?("\n")
-        @source, @filename, @options = source, filename, options
+        @source, @filename, @options = source.freeze, filename.freeze, options.freeze
         @requires = []
         @required_trees = []
       end
@@ -26,7 +26,7 @@ module Opal
           @extensions = extensions
           matches = extensions.join('|')
           matches = "(#{matches})" unless extensions.size == 1
-          @match_regexp = Regexp.new "\\.#{matches}#{REGEXP_END}"
+          self.const_set(:MATCH_REGEXP, Regexp.new("\\.#{matches}#{REGEXP_END}").freeze)
 
           ::Opal::Builder.register_processor(self, extensions)
           nil
@@ -37,7 +37,7 @@ module Opal
         end
 
         def match_regexp
-          @match_regexp || raise(NotImplementedError)
+          self::MATCH_REGEXP || raise(NotImplementedError)
         end
       end
 
