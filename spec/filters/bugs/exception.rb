@@ -92,7 +92,6 @@ opal_filter "Exception" do
   fails "SystemCallError.new requires at least one argument" # Expected ArgumentError but no exception was raised (#<SystemCallError: SystemCallError> was returned)
   fails "SystemExit sets the exit status and exits silently when raised when subclassed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x6edd2>
   fails "SystemExit sets the exit status and exits silently when raised" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x6edd2>
-  fails "UncaughtThrowError#tag returns the object thrown" # NoMethodError: undefined method `tag' for #<UncaughtThrowError: uncaught throw "abc">
   fails_badly "SystemExit#status returns the exit status"
   fails_badly "SystemExit#success? returns false if the process exited unsuccessfully"
   fails_badly "SystemExit#success? returns true if the process exited successfully"

@@ -687,15 +687,16 @@ module Kernel
     "#<#{self.class}:0x#{__id__.to_s(16)}>"
   end
 
-  def catch(sym)
-    yield
+  def catch(tag=nil)
+    tag ||= Object.new
+    yield(tag)
   rescue UncaughtThrowError => e
-    return e.arg if e.sym == sym
+    return e.value if e.tag == tag
     raise
   end
 
-  def throw(*args)
-    raise UncaughtThrowError, args
+  def throw(tag, obj=nil)
+    raise UncaughtThrowError.new(tag, obj)
   end
 
   # basic implementation of open, delegate to File.open

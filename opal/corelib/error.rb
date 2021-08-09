@@ -237,13 +237,13 @@ module Errno
 end
 
 class UncaughtThrowError < ArgumentError
-  attr_reader :sym, :arg
+  attr_reader :tag, :value
 
-  def initialize(args)
-    @sym = args[0]
-    @arg = args[1] if args.length > 1
+  def initialize(tag, value=nil)
+    @tag = tag
+    @value = value
 
-    super("uncaught throw #{@sym.inspect}")
+    super("uncaught throw #{@tag.inspect}")
   end
 end
 

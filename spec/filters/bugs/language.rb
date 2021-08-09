@@ -331,7 +331,7 @@ opal_filter "language" do
   fails "The if expression with a boolean range ('flip-flop' operator) scopes state by flip-flop"
   fails "The or operator has a lower precedence than 'next' in 'next true or false'"
   fails "The predefined global constants includes TOPLEVEL_BINDING"
-  fails "The redo statement in a method is invalid and raises a SyntaxError"
+  fails "The redo statement in a method is invalid and raises a SyntaxError" # Expected SyntaxError but no exception was raised ("m" was returned)
   fails "The redo statement triggers ensure block when re-executing a block"
   fails "The rescue keyword can capture the raised exception using a setter method" # NoMethodError: undefined method `message' for nil
   fails "The rescue keyword can capture the raised exception using a square brackets setter" # ArgumentError: [SquareBracketsCaptor#[]=] wrong number of arguments(1 for 2)
@@ -341,7 +341,7 @@ opal_filter "language" do
   fails "The rescue keyword rescues the exception in the deepest rescue block declared to handle the appropriate exception type" # Expected "StandardError: an error occurred" to include ":in `raise_standard_error'"
   fails "The rescue keyword will execute an else block even without rescue and ensure" # Expected warning to match: /else without rescue is useless/ but got: ""
   fails "The retry keyword inside a begin block's rescue block causes the begin block to be executed again"
-  fails "The retry statement raises a SyntaxError when used outside of a begin statement"
+  fails "The retry statement raises a SyntaxError when used outside of a begin statement" # Expected SyntaxError but got: NoMethodError (undefined method `retry' for #<MSpecEnv:0x810f0>)
   fails "The retry statement re-executes the closest block"
   fails "The return keyword at top level return with argument warns but does not affect exit status" # Exception: path.substr is not a function
   fails "The return keyword at top level within a block within a class is allowed" # Exception: path.substr is not a function
