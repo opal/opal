@@ -106,6 +106,24 @@ module Opal
         @type == :def || @type == :defs
       end
 
+      def lambda?
+        iter? && @is_lambda
+      end
+
+      def is_lambda! # rubocop:disable Naming/PredicateName
+        @is_lambda = true
+      end
+
+      def defines_lambda
+        @lambda_definition = true
+        yield
+        @lambda_definition = false
+      end
+
+      def lambda_definition?
+        @lambda_definition
+      end
+
       # Is this a normal def method directly inside a class? This is
       # used for optimizing ivars as we can set them to nil in the
       # class body
@@ -250,7 +268,7 @@ module Opal
       def find_parent_def
         scope = self
         while scope = scope.parent
-          if scope.def?
+          if scope.def? || scope.lambda?
             return scope
           end
         end

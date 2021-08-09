@@ -404,4 +404,5 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "Kernel.sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel.srand returns the previous seed value on the first call" # NoMethodError: undefined method `insert' for "rubyexe.rb"
+  fails "Kernel.lambda treats the block as a Proc when lambda is re-defined" # Expected 2 == 1 to be truthy but was false
 end

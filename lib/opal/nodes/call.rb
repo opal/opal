@@ -344,6 +344,12 @@ module Opal
         push fragment "Opal.hash({ arity_check: #{compiler.arity_check?} })"
       end
 
+      add_special :lambda do |compile_default|
+        scope.defines_lambda do
+          compile_default.call
+        end
+      end
+
       add_special :nesting do |compile_default|
         push_nesting = push_nesting?
         push '(Opal.Module.$$nesting = $nesting, ' if push_nesting

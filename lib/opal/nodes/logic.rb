@@ -126,13 +126,13 @@ module Opal
       end
 
       def return_in_iter?
-        if scope.iter? && parent_def = scope.find_parent_def
+        if (scope.iter? && !scope.lambda?) && parent_def = scope.find_parent_def
           parent_def
         end
       end
 
       def return_expr_in_def?
-        return scope if expr? && scope.def?
+        return scope if expr? && (scope.def? || scope.lambda?)
       end
 
       def scope_to_catch_return
