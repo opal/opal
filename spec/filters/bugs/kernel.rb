@@ -264,7 +264,6 @@ opal_filter "Kernel" do
   fails "Kernel#then returns a sized Enumerator when no block given" # NoMethodError: undefined method `then' for #<Object:0x22882>
   fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: false/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: false\n"
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
-  fails "Kernel#warn :uplevel keyword argument does not prepend caller information if the uplevel argument is too large" # Expected:   $stderr: "warning: foo\n"       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"
   fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: foo/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"
   fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: \n$/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: \n"
   fails "Kernel#warn :uplevel keyword argument raises if :category keyword is not nil and not convertible to symbol" # Expected TypeError but no exception was raised (nil was returned)

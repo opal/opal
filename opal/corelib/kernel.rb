@@ -94,19 +94,18 @@ module Kernel
 
   def caller(start = 1, length = nil)
     %x{
-      var stack, result
+      var stack, result;
 
-      stack = (new Error().stack || "").split("\n")
-      result = []
+      stack = new Error().$backtrace();
+      result = [];
 
-      // Skip the initial line ("Error:") and Kernel#caller with i=3
-      for (var i = 3, ii = stack.length; i < ii; i++) {
-        if (!stack[i].match("runtime.js")) {
-          result.push(stack[i].replace(/^ *\w+ +/, ''))
-          if (length && result.length == length) break
+      for (var i = #{start} - 1, ii = stack.length; i < ii; i++) {
+        if (!stack[i].match(/runtime\.js|`caller'/)) {
+          result.push(stack[i]);
         }
       }
-      return result
+      if (length != nil) result = result.slice(0, length);
+      return result;
     }
   end
 
@@ -520,7 +519,7 @@ module Kernel
     if uplevel
       uplevel = Opal.coerce_to!(uplevel, Integer, :to_str)
       raise ArgumentError, "negative level (#{uplevel})" if uplevel < 0
-      location = caller(uplevel + 2, 1).first
+      location = caller(uplevel + 1, 1).first&.split(':in `')&.first
       location = "#{location}: " if location
       strs = strs.map { |s| "#{location}warning: #{s}" }
     end
@@ -555,6 +554,7 @@ module Kernel
       }
 
       #{$!} = exception;
+      #{$@} = #{`exception`.backtrace};
 
       throw exception;
     }

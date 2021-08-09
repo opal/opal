@@ -81,7 +81,6 @@ opal_filter "language" do
   fails "Allowed characters does not allow non-ASCII upcased characters at the beginning" # Expected SyntaxError (/dynamic constant assignment/) but no exception was raised ("test" was returned)
   fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
-  fails "An ensure block inside a begin block sets exception cause if raises exception in block and in ensure" # NoMethodError: undefined method `cause' for #<RuntimeError: from ensure>  
   fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
   fails "An instance method definition with a splat requires the presence of any arguments that precede the *" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(1 for -3)
   fails "An instance method raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised (#<Module:0x225b4> was returned)
@@ -340,9 +339,7 @@ opal_filter "language" do
   fails "The rescue keyword only accepts Module or Class in rescue clauses" # RuntimeError: error
   fails "The rescue keyword only accepts Module or Class in splatted rescue clauses" # RuntimeError: error
   fails "The rescue keyword rescues the exception in the deepest rescue block declared to handle the appropriate exception type" # Expected "StandardError: an error occurred" to include ":in `raise_standard_error'"
-  fails "The rescue keyword suppresses exception from block when raises one from rescue expression" # NoMethodError: undefined method `cause' for #<RuntimeError: from rescue expression>
   fails "The rescue keyword will execute an else block even without rescue and ensure" # Expected warning to match: /else without rescue is useless/ but got: ""
-  fails "The rescue keyword without rescue expression will not rescue exceptions except StandardError" # NameError: uninitialized constant SystemStackError
   fails "The retry keyword inside a begin block's rescue block causes the begin block to be executed again"
   fails "The retry statement raises a SyntaxError when used outside of a begin statement"
   fails "The retry statement re-executes the closest block"

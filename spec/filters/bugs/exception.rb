@@ -10,7 +10,6 @@ opal_filter "Exception" do
   fails "Errno::EMFILE can be subclassed"
   fails "Errno::ENOTSUP is defined" # Expected Errno to have constant 'ENOTSUP' but it does not
   fails "Errno::ENOTSUP is the same class as Errno::EOPNOTSUPP if they represent the same errno value" # NameError: uninitialized constant Errno::ENOTSUP
-  fails "Exception has the right class hierarchy" # NameError: uninitialized constant FiberError
   fails "Exception is a superclass of Interrupt"
   fails "Exception is a superclass of SystemStackError"
   fails "Exception#== returns true if both exceptions have the same class, no message, and no backtrace"
@@ -26,24 +25,13 @@ opal_filter "Exception" do
   fails "Exception#backtrace includes the line number of the location where self raised in the first element"
   fails "Exception#backtrace includes the name of the method from where self raised in the first element"
   fails "Exception#backtrace produces a backtrace for an exception captured using $!" # Expected "RuntimeError" to match /backtrace_spec/
-  fails "Exception#backtrace returns an Array that can be updated" # Expected "RuntimeError" to equal "backtrace first"
   fails "Exception#backtrace returns nil if no backtrace was set"
-  fails "Exception#backtrace returns the same array after duping"
   fails "Exception#backtrace_locations produces a backtrace for an exception captured using $!" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
-  fails "Exception#backtrace_locations returns an Array that can be updated" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
-  fails "Exception#backtrace_locations returns an Array" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
   fails "Exception#backtrace_locations returns nil if no backtrace was set" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
-  fails "Exception#backtrace_locations sets each element to a Thread::Backtrace::Location" # NoMethodError: undefined method `backtrace_locations' for #<RuntimeError: RuntimeError>
-  fails "Exception#cause is not set to the exception itself when it is re-raised" # NoMethodError: undefined method `cause' for #<RuntimeError: RuntimeError>
   fails "Exception#cause is set for internal errors caused by user errors" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
   fails "Exception#cause is set for user errors caused by internal errors" # Expected RuntimeError but no exception was raised (Infinity was returned)
-  fails "Exception#cause returns the active exception when an exception is raised"
-  fails "Exception#dup does copy the backtrace" # Expected [] to equal ["InitializeException: my exception", "    at TMP_13 (...)"]
-  fails "Exception#dup does copy the cause" # NoMethodError: undefined method `cause' for #<RuntimeError: the consequence>
   fails "Exception#exception captures an exception into $!" # Expected "RuntimeError" == "" to be truthy but was false
   fails "Exception#full_message contains all the chain of exceptions" # NoMethodError: undefined method `full_message' for #<RuntimeError: last exception>
-  fails "Exception#full_message contains cause of exception" # NoMethodError: undefined method `full_message' for #<RuntimeError: main exception>
-  fails "Exception#full_message returns formatted string of exception using the same format that is used to print an uncaught exceptions to stderr" # NoMethodError: undefined method `full_message' for #<RuntimeError: Some runtime error>
   fails "Exception#full_message shows the caller if the exception has no backtrace"
   fails "Exception#full_message shows the exception class at the end of the first line of the message when the message contains multiple lines" # NoMethodError: undefined method `full_message' for #<RuntimeError: first line second line>
   fails "Exception#full_message supports :highlight option and adds escape sequences to highlight some strings" # NoMethodError: undefined method `full_message' for #<RuntimeError: Some runtime error>
