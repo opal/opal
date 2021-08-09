@@ -118,7 +118,7 @@ class Thread
         @str = str
 
         str =~ /^(.*?):(\d+):(\d+):in `(.*?)'$/
-        @path = @absolute_path = Regexp.last_match(1)
+        @path = Regexp.last_match(1)
         @label = Regexp.last_match(4)
         @lineno = Regexp.last_match(2).to_i
 
@@ -134,7 +134,10 @@ class Thread
         @str.inspect
       end
 
-      attr_reader :absolute_path, :base_label, :label, :lineno, :path
+      attr_reader :base_label, :label, :lineno, :path
+
+      # TODO: Make it somehow provide the absolute path.
+      alias absolute_path path
     end
   end
 end

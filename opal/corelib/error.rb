@@ -1,5 +1,5 @@
 class Exception < `Error`
-  # `var Kernel$raise = #{Kernel}.$raise`
+  `Opal.defineProperty(self.$$prototype, '$$is_exception', true)`
   `var stack_trace_limit`
 
   def self.new(*args)
@@ -132,10 +132,10 @@ class Exception < `Error`
     end
 
     bt = backtrace.dup
-    first = bt&.shift
+    bt = caller if !bt || bt.empty?
+    first = bt.shift
 
-    msg = ''
-    msg = "#{first}: " if first
+    msg = "#{first}: "
     msg += "#{bold}#{to_s} (#{bold_underline}#{self.class}#{reset}#{bold})#{reset}\n"
 
     msg += bt.map { |loc| "\tfrom #{loc}\n" }.join
@@ -164,7 +164,7 @@ class Exception < `Error`
         self.stack = '';
       } else if (backtrace.$$is_string) {
         self.backtrace = [backtrace];
-        self.stack = backtrace;
+        self.stack = '  from ' + backtrace;
       } else {
         if (backtrace.$$is_array) {
           for (i = 0, ii = backtrace.length; i < ii; i++) {
@@ -182,7 +182,7 @@ class Exception < `Error`
         }
 
         self.backtrace = backtrace;
-        self.stack = backtrace.join('\n');
+        self.stack = #{`backtrace`.map { |i| '  from ' + i }}.join("\n");
       }
 
       return backtrace;

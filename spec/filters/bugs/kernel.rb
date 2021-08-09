@@ -145,7 +145,6 @@ opal_filter "Kernel" do
   fails "Kernel#raise accepts a cause keyword argument that overrides the last exception" # NoMethodError: undefined method `cause' for #<RuntimeError: error>
   fails "Kernel#raise accepts a cause keyword argument that sets the cause" # NoMethodError: undefined method `cause' for #<RuntimeError: error>
   fails "Kernel#raise passes no arguments to the constructor when given only an exception class" # Expected #<Class:0x4c8> but got: ArgumentError ([#initialize] wrong number of arguments(1 for 0))
-  fails "Kernel#raise raises RuntimeError if no exception class is given" # RuntimeError: RuntimeError
   fails "Kernel#raise raises an ArgumentError when only cause is given" # Expected ArgumentError but got: TypeError (exception class/object expected)
   fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"

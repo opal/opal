@@ -14,7 +14,7 @@ class TestNodejsError < Test::Unit::TestCase
   def test_should_set_stack
     raise ArgumentError.new('oops')
   rescue => ex
-    backtrace_line = "nodejs/test_error.rb:#{__LINE__ - 2}"
+    backtrace_line = " from nodejs/test_error.rb:#{__LINE__ - 2}"
     wrapped_ex = ex.exception %(context - #{ex.message})
     wrapped_ex.set_backtrace ex.backtrace
     assert(`wrapped_ex.stack`.include?(backtrace_line))

@@ -2,7 +2,7 @@
 
 module Kernel
   def method_missing(symbol, *args, &block)
-    raise NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args)
+    raise NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args), nil, caller(1)
   end
 
   def =~(obj)
@@ -99,8 +99,8 @@ module Kernel
       stack = new Error().$backtrace();
       result = [];
 
-      for (var i = #{start} - 1, ii = stack.length; i < ii; i++) {
-        if (!stack[i].match(/runtime\.js|`caller'/)) {
+      for (var i = #{start} + 1, ii = stack.length; i < ii; i++) {
+        if (!stack[i].match(/runtime\.js/)) {
           result.push(stack[i]);
         }
       }
@@ -527,26 +527,30 @@ module Kernel
     $stderr.puts(*strs) unless $VERBOSE.nil? || strs.empty?
   end
 
-  def raise(exception = undefined, string = nil, _backtrace = nil)
+  def raise(exception = undefined, string = nil, backtrace = nil)
     %x{
       if (exception == null && #{$!} !== nil) {
         throw #{$!};
       }
       if (exception == null) {
-        exception = #{RuntimeError.new};
+        exception = #{RuntimeError.new ''};
       }
-      else if (exception.$$is_string) {
-        exception = #{RuntimeError.new exception};
+      else if ($respond_to(exception, '$to_str')) {
+        exception = #{RuntimeError.new exception.to_str};
       }
       // using respond_to? and not an undefined check to avoid method_missing matching as true
-      else if (exception.$$is_class && #{exception.respond_to?(:exception)}) {
+      else if (exception.$$is_class && $respond_to(exception, '$exception')) {
         exception = #{exception.exception string};
       }
-      else if (#{exception.is_a?(Exception)}) {
+      else if (exception.$$is_exception) {
         // exception is fine
       }
       else {
         exception = #{TypeError.new 'exception class/object expected'};
+      }
+
+      if (backtrace !== nil) {
+        exception.$set_backtrace(backtrace);
       }
 
       if (#{$!} !== nil) {
