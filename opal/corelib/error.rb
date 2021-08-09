@@ -130,7 +130,7 @@ class Exception < `Error`
 
     msg = ''
     msg = "#{first}: " if first
-    msg += "#{bold}#{to_s} (#{bold_underline}#{self.class}#{bold})#{reset}\n"
+    msg += "#{bold}#{to_s} (#{bold_underline}#{self.class}#{reset}#{bold})#{reset}\n"
 
     msg += bt.map { |loc| "\tfrom #{loc}\n" }.join
 
