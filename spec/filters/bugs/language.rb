@@ -340,9 +340,6 @@ opal_filter "language" do
   fails "The rescue keyword only accepts Module or Class in splatted rescue clauses" # RuntimeError: error
   fails "The rescue keyword rescues the exception in the deepest rescue block declared to handle the appropriate exception type" # Expected "StandardError: an error occurred" to include ":in `raise_standard_error'"
   fails "The rescue keyword will execute an else block even without rescue and ensure" # Expected warning to match: /else without rescue is useless/ but got: ""
-  fails "The retry keyword inside a begin block's rescue block causes the begin block to be executed again"
-  fails "The retry statement raises a SyntaxError when used outside of a begin statement" # Expected SyntaxError but got: NoMethodError (undefined method `retry' for #<MSpecEnv:0x810f0>)
-  fails "The retry statement re-executes the closest block"
   fails "The return keyword at top level return with argument warns but does not affect exit status" # Exception: path.substr is not a function
   fails "The return keyword at top level within a block within a class is allowed" # Exception: path.substr is not a function
   fails "The return keyword at top level within a block within a class is not allowed" # Exception: path.substr is not a function

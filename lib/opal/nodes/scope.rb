@@ -31,7 +31,7 @@ module Opal
       attr_accessor :uses_super
       attr_accessor :uses_zuper
 
-      attr_accessor :catch_return, :has_break
+      attr_accessor :catch_return, :has_break, :has_retry
 
       attr_accessor :rescue_else_sexp
 
@@ -277,6 +277,34 @@ module Opal
         !rescue_else_sexp.nil?
       end
 
+      def in_rescue(node)
+        @rescues ||= []
+
+        @rescues.push(node)
+        result = yield
+        @rescues.pop
+
+        result
+      end
+
+      def current_rescue
+        @rescues.last
+      end
+
+      def in_resbody
+        return unless block_given?
+
+        @in_resbody = true
+        result = yield
+        @in_resbody = false
+
+        result
+      end
+
+      def in_resbody?
+        @in_resbody
+      end
+
       def in_ensure
         return unless block_given?
 
@@ -289,6 +317,11 @@ module Opal
 
       def in_ensure?
         @in_ensure
+      end
+
+      def gen_retry_id
+        @next_retry_id ||= 'retry_0'
+        @next_retry_id = @next_retry_id.succ
       end
     end
   end

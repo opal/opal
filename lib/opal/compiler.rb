@@ -422,7 +422,7 @@ module Opal
       when :undef
         # undef :method_name always returns nil
         returns s(:begin, sexp, s(:nil))
-      when :break, :next, :redo
+      when :break, :next, :redo, :retry
         sexp
       when :yield
         sexp.updated(:returnable_yield, nil)

@@ -165,6 +165,18 @@ module Opal
         scope.in_ensure?
       end
 
+      def in_resbody(&block)
+        scope.in_resbody(&block)
+      end
+
+      def in_resbody?
+        scope.in_resbody?
+      end
+
+      def in_rescue(node, &block)
+        scope.in_rescue(node, &block)
+      end
+
       def class_variable_owner_nesting_level
         cvar_scope = scope
         nesting_level = 0

@@ -88,43 +88,47 @@ module Opal
           line 'var $no_errors = true;'
         end
 
-        push 'try {'
-        indent do
-          line stmt(body_code)
-        end
-        line '} catch ($err) {'
-
-        indent do
-          if has_rescue_else?
-            line '$no_errors = false;'
-          end
-
-          children[1..-1].each_with_index do |child, idx|
-            # counting only rescue, ignoring rescue-else statement
-            next unless child && child.type == :resbody
-            _has_rescue_handlers = true
-
-            push ' else ' unless idx == 0
-            line process(child, @level)
-          end
-
-          # if no resbodys capture our error, then rethrow
-          push ' else { throw $err; }'
-        end
-
-        line '}'
-
-        if handle_rescue_else_manually?
-          # here we must add 'finally' explicitly
-          push 'finally {'
+        in_rescue(self) do
+          push 'try {'
           indent do
-            line 'if ($no_errors) { '
-            indent do
-              line stmt(rescue_else_code)
-            end
-            line '}'
+            line stmt(body_code)
           end
-          push '}'
+          line '} catch ($err) {'
+
+          indent do
+            if has_rescue_else?
+              line '$no_errors = false;'
+            end
+
+            children[1..-1].each_with_index do |child, idx|
+              # counting only rescue, ignoring rescue-else statement
+              next unless child && child.type == :resbody
+              _has_rescue_handlers = true
+
+              push ' else ' unless idx == 0
+              line process(child, @level)
+            end
+
+            # if no resbodys capture our error, then rethrow
+            push ' else { throw $err; }'
+          end
+
+          line '}'
+
+          if handle_rescue_else_manually?
+            # here we must add 'finally' explicitly
+            push 'finally {'
+            indent do
+              line 'if ($no_errors) { '
+              indent do
+                line stmt(rescue_else_code)
+              end
+              line '}'
+            end
+            push '}'
+          end
+
+          wrap "#{retry_id}: do { ", ' break; } while(1)' if retry_id
         end
 
         # Wrap a try{} catch{} into a function
@@ -149,8 +153,14 @@ module Opal
       #  wrapping current rescue.
       #
       def handle_rescue_else_manually?
-        !scope.in_ensure? && scope.has_rescue_else?
+        !in_ensure? && has_rescue_else?
       end
+
+      def gen_retry_id
+        @retry_id ||= scope.gen_retry_id
+      end
+
+      attr_reader :retry_id
     end
 
     class ResBodyNode < Base
@@ -168,9 +178,11 @@ module Opal
           # Need to ensure we clear the current exception out after the rescue block ends
           line 'try {'
           indent do
-            line stmt(rescue_body)
+            in_resbody do
+              line stmt(rescue_body)
+            end
           end
-          line '} finally { Opal.pop_exception() }'
+          line '} finally { Opal.pop_exception(); }'
         end
         line '}'
       end
@@ -190,7 +202,8 @@ module Opal
       handle :retry
 
       def compile
-        push stmt(s(:send, nil, :retry))
+        error 'Invalid retry' unless in_resbody?
+        push "continue #{scope.current_rescue.gen_retry_id}"
       end
     end
   end

@@ -412,6 +412,7 @@ Style/ConditionalAssignment:
 Naming/MemoizedInstanceVariableName:
   Exclude:
     - lib/opal/parser/patch.rb # it's a monkey-patch on the parser gem
+    - lib/opal/nodes/rescue.rb # we know what we are doing here and no, it's not memoization
 
 Style/AccessModifierDeclarations:
   Enabled: false
