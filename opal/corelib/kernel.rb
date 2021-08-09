@@ -687,7 +687,7 @@ module Kernel
     "#<#{self.class}:0x#{__id__.to_s(16)}>"
   end
 
-  def catch(tag=nil)
+  def catch(tag = nil)
     tag ||= Object.new
     yield(tag)
   rescue UncaughtThrowError => e
@@ -695,7 +695,7 @@ module Kernel
     raise
   end
 
-  def throw(tag, obj=nil)
+  def throw(tag, obj = nil)
     raise UncaughtThrowError.new(tag, obj)
   end
 

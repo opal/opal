@@ -42,21 +42,21 @@ class Exception < `Error`
       for (var i = 0; i < backtrace.length; i++) {
         var loc = backtrace[i];
         if (!loc || !loc.$$is_string) {
-          // Do nothing
+          /* Do nothing */
         }
-        // Chromium format
-        else if (m = loc.match(/^    at (.*?) \((.*?)\)$/)) {
+        /* Chromium format */
+        else if ((m = loc.match(/^    at (.*?) \((.*?)\)$/))) {
           new_bt.push(m[2] + ":in `" + m[1] + "'");
         }
-        else if (m = loc.match(/^    at (.*?)$/)) {
+        else if ((m = loc.match(/^    at (.*?)$/))) {
           new_bt.push(m[1] + ":in `undefined'");
         }
-        // Node format
-        else if (m = loc.match(/^  from (.*?)$/)) {
+        /* Node format */
+        else if ((m = loc.match(/^  from (.*?)$/))) {
           new_bt.push(m[1]);
         }
-        // Mozilla/Apple format
-        else if (m = loc.match(/^(.*?)@(.*?)$/)) {
+        /* Mozilla/Apple format */
+        else if ((m = loc.match(/^(.*?)@(.*?)$/))) {
           new_bt.push(m[2] + ':in `' + m[1] + "'");
         }
       }
@@ -86,9 +86,13 @@ class Exception < `Error`
   end
 
   def backtrace_locations
-    @backtrace_locations ||= backtrace&.map do |loc|
-      ::Thread::Backtrace::Location.new(loc)
-    end
+    %x{
+      if (self.backtrace_locations) return self.backtrace_locations;
+      self.backtrace_locations = #{backtrace&.map do |loc|
+        ::Thread::Backtrace::Location.new(loc)
+      end}
+      return self.backtrace_locations;
+    }
   end
 
   def cause
@@ -103,7 +107,9 @@ class Exception < `Error`
 
       var cloned = #{clone};
       cloned.message = str;
+      if (self.backtrace) cloned.backtrace = self.backtrace.$dup();
       cloned.stack = self.stack;
+      cloned.cause = self.cause;
       return cloned;
     }
   end
@@ -239,7 +245,7 @@ end
 class UncaughtThrowError < ArgumentError
   attr_reader :tag, :value
 
-  def initialize(tag, value=nil)
+  def initialize(tag, value = nil)
     @tag = tag
     @value = value
 

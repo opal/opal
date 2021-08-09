@@ -111,8 +111,8 @@
   // @private
   // Pops an exception from the stack and updates `$!`.
   Opal.pop_exception = function() {
-    var exception;
-    if (exception = Opal.exceptions.pop()) {
+    var exception = Opal.exceptions.pop();
+    if (exception) {
       Opal.gvars["!"] = exception;
       Opal.gvars["@"] = exception.$backtrace();
     }

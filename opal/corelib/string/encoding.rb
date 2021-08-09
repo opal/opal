@@ -109,13 +109,13 @@ Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
   def each_byte(string, &block)
     %x{
       // Taken from: https://github.com/feross/buffer/blob/f52dffd9df0445b93c0c9065c2f8f0f46b2c729a/index.js#L1954-L2032
-      var units = Infinity
-      var codePoint
-      var length = string.length
-      var leadSurrogate = null
+      var units = Infinity;
+      var codePoint;
+      var length = string.length;
+      var leadSurrogate = null;
 
       for (var i = 0; i < length; ++i) {
-        codePoint = string.charCodeAt(i)
+        codePoint = string.charCodeAt(i);
 
         // is surrogate component
         if (codePoint > 0xD7FF && codePoint < 0xE000) {
@@ -129,7 +129,7 @@ Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
                 #{yield `0xBF`};
                 #{yield `0xBD`};
               }
-              continue
+              continue;
             } else if (i + 1 === length) {
               // unpaired lead
               if ((units -= 3) > -1) {
@@ -137,13 +137,13 @@ Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
                 #{yield `0xBF`};
                 #{yield `0xBD`};
               }
-              continue
+              continue;
             }
 
             // valid lead
-            leadSurrogate = codePoint
+            leadSurrogate = codePoint;
 
-            continue
+            continue;
           }
 
           // 2 leads in a row
@@ -153,12 +153,12 @@ Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
               #{yield `0xBF`};
               #{yield `0xBD`};
             }
-            leadSurrogate = codePoint
-            continue
+            leadSurrogate = codePoint;
+            continue;
           }
 
           // valid surrogate pair
-          codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
+          codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000;
         } else if (leadSurrogate) {
           // valid bmp char, but last char was a lead
           if ((units -= 3) > -1) {
@@ -168,23 +168,23 @@ Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
           }
         }
 
-        leadSurrogate = null
+        leadSurrogate = null;
 
         // encode utf8
         if (codePoint < 0x80) {
-          if ((units -= 1) < 0) break
+          if ((units -= 1) < 0) break;
           #{yield `codePoint`};
         } else if (codePoint < 0x800) {
-          if ((units -= 2) < 0) break
+          if ((units -= 2) < 0) break;
           #{yield `codePoint >> 0x6 | 0xC0`};
           #{yield `codePoint & 0x3F | 0x80`};
         } else if (codePoint < 0x10000) {
-          if ((units -= 3) < 0) break
+          if ((units -= 3) < 0) break;
           #{yield `codePoint >> 0xC | 0xE0`};
           #{yield `codePoint >> 0x6 & 0x3F | 0x80`};
           #{yield `codePoint & 0x3F | 0x80`};
         } else if (codePoint < 0x110000) {
-          if ((units -= 4) < 0) break
+          if ((units -= 4) < 0) break;
           #{yield `codePoint >> 0x12 | 0xF0`};
           #{yield `codePoint >> 0xC & 0x3F | 0x80`};
           #{yield `codePoint >> 0x6 & 0x3F | 0x80`};
