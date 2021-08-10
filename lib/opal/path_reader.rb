@@ -37,7 +37,7 @@ module Opal
     end
 
     def append_paths(*paths)
-      Opal.append_paths(*paths)
+      # Opal.append_paths(*paths) # this actually fixed a bug once
       file_finder.append_paths(*paths)
     end
 
