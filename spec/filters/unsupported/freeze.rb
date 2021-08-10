@@ -23,6 +23,11 @@ opal_unsupported_filter "freezing" do
   fails "Array#dup does not copy frozen status from the original"
   fails "Array#fill raises a FrozenError on a frozen array" # Expected FrozenError but no exception was raised (["x", "x", "x"] was returned)
   fails "Array#fill raises a FrozenError on an empty frozen array" # Expected FrozenError but no exception was raised ([] was returned)
+  fails "Array#filter! on frozen objects returns an Enumerator if no block is given" # NoMethodError: undefined method `filter!' for [true, false]
+  fails "Array#filter! on frozen objects with falsy block keeps elements after any exception" # Expected Exception but no exception was raised ([] was returned)
+  fails "Array#filter! on frozen objects with falsy block raises a FrozenError" # Expected FrozenError but got: NoMethodError (undefined method `filter!' for [true, false])
+  fails "Array#filter! on frozen objects with truthy block keeps elements after any exception" # Expected Exception but no exception was raised (nil was returned)
+  fails "Array#filter! on frozen objects with truthy block raises a FrozenError" # Expected FrozenError but got: NoMethodError (undefined method `filter!' for [true, false])
   fails "Array#flatten! raises a FrozenError on frozen arrays when the array is modified" # Expected FrozenError but no exception was raised ([1, 2] was returned)
   fails "Array#flatten! raises a FrozenError on frozen arrays when the array would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Array#initialize raises a FrozenError on frozen arrays" # Expected FrozenError but no exception was raised ([] was returned)
@@ -67,6 +72,10 @@ opal_unsupported_filter "freezing" do
   fails "Date constants freezes MONTHNAMES, DAYNAMES, ABBR_MONTHNAMES, ABBR_DAYSNAMES"
   fails "Enumerable#sort doesn't raise an error if #to_a returns a frozen Array"
   fails "Enumerator#initialize on frozen instance raises a RuntimeError"
+  fails "FalseClass#to_s returns a frozen string" # Expected "false".frozen? to be truthy but was false
+  fails "File.basename returns a new unfrozen String" # Expected "foo.rb" not to be identical to "foo.rb"
+  fails "FrozenError#receiver should return frozen object that modification was attempted on" # RuntimeError: RuntimeError
+  fails "FrozenError.new should take optional receiver argument" # NoMethodError: undefined method `receiver' for #<FrozenError: msg>
   fails "Hash literal does not change encoding of literal string keys during creation"
   fails "Hash literal freezes string keys on initialization"
   fails "Hash#== compares keys with matching hash codes via eql?"
@@ -86,6 +95,10 @@ opal_unsupported_filter "freezing" do
   fails "Hash#each_pair returns an Enumerator if called on a frozen instance"
   fails "Hash#each_value returns an Enumerator if called on a frozen instance"
   fails "Hash#eql? compares keys with matching hash codes via eql?"
+  fails "Hash#filter returns an Enumerator if called on a frozen instance" # NoMethodError: undefined method `filter' for {1=>2, 3=>4, 5=>6}
+  fails "Hash#filter! raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but got: NoMethodError (undefined method `filter!' for {1=>2, 3=>4})
+  fails "Hash#filter! raises a FrozenError if called on an empty frozen instance" # Expected FrozenError but got: NoMethodError (undefined method `filter!' for {})
+  fails "Hash#filter! returns an Enumerator if called on a frozen instance" # NoMethodError: undefined method `filter!' for {1=>2, 3=>4, 5=>6}
   fails "Hash#initialize raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({1=>2, 3=>4} was returned)
   fails "Hash#keep_if raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
   fails "Hash#keep_if returns an Enumerator if called on a frozen instance"
@@ -114,6 +127,7 @@ opal_unsupported_filter "freezing" do
   fails "Hash#update raises a FrozenError on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({} was returned)
   fails "Kernel#clone copies frozen state from the original"
   fails "Kernel#clone copies frozen? and tainted?" # Expected false to be true
+  fails "Kernel#clone takes an freeze: true option to frozen copy" # Expected #<KernelSpecs::Duplicate:0x25158>.frozen? to be truthy but was false
   fails "Kernel#clone takes an option to copy freeze state or not" # TODO: move to unsupported/freeze
   fails "Kernel#extend on frozen instance raises a FrozenError" # Expected FrozenError but no exception was raised (main was returned)
   fails "Kernel#extend on frozen instance raises a RuntimeError"
@@ -142,6 +156,7 @@ opal_unsupported_filter "freezing" do
   fails "Kernel#instance_variable_set on frozen objects raises a FrozenError when passed replacement is identical to stored object" # Expected FrozenError but no exception was raised ("origin" was returned)
   fails "Kernel#instance_variable_set on frozen objects raises a RuntimeError when passed replacement is different from stored object"
   fails "Kernel#instance_variable_set on frozen objects raises a RuntimeError when passed replacement is identical to stored object"
+  fails "Literal Regexps is frozen" # Expected /Hello/.frozen? to be truthy but was false
   fails "MatchData#string returns a frozen copy of the match string"
   fails "Module#alias_method raises FrozenError if frozen" # Expected FrozenError but no exception was raised (#<Class:0x39d44> was returned)
   fails "Module#alias_method raises RuntimeError if frozen"
@@ -156,6 +171,7 @@ opal_unsupported_filter "freezing" do
   fails "Module#define_method raises a FrozenError if frozen" # Expected FrozenError but no exception was raised (#<Class:0x13e2> was returned)
   fails "Module#define_method raises a RuntimeError if frozen"
   fails "Module#extend_object when given a frozen object raises a RuntimeError before extending the object"
+  fails "Module#name returns a frozen String" # Expected "ModuleSpecs".frozen? to be truthy but was false
   fails "Module#name returns a mutable string that when mutated does not modify the original module name" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "Module#remove_method on frozen instance does not raise exceptions when no arguments given"
   fails "Module#remove_method on frozen instance raises a FrozenError when passed a missing name" # NameError: method 'not_exist' not defined in
@@ -169,11 +185,15 @@ opal_unsupported_filter "freezing" do
   fails "Module#undef_method on frozen instance raises a RuntimeError when passed a missing name"
   fails "Module#undef_method on frozen instance raises a RuntimeError when passed a name"
   fails "Module#undef_method on frozen instance raises a TypeError when passed a not name"
+  fails "NilClass#to_s returns a frozen string" # Expected "".frozen? to be truthy but was false
   fails "OpenStruct#method_missing when called with a method name ending in '=' raises a TypeError when self is frozen"
   fails "Proc#[] with frozen_string_literals doesn't duplicate frozen strings" # Expected false to be true
+  fails "Regexp#initialize raises a FrozenError on a Regexp literal" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Set#compare_by_identity raises a FrozenError on frozen sets" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
   fails "String#+@ returns an unfrozen copy of a frozen String"
   fails "String#+@ returns self if the String is not frozen"
+  fails "String#-@ deduplicates frozen strings" # Expected "this string is frozen" not to be identical to "this string is frozen"
+  fails "String#-@ interns the provided string if it is frozen" # NoMethodError: undefined method `-@' for "this string is unique and frozen 0.5421131713191049"
   fails "String#-@ returns a frozen copy if the String is not frozen"
   fails "String#-@ returns self if the String is frozen"
   fails "String#<< raises a FrozenError when self is frozen" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
@@ -236,4 +256,5 @@ opal_unsupported_filter "freezing" do
   fails "Time#localtime on a frozen time does not raise an error if already in the right time zone"
   fails "Time#localtime on a frozen time raises a RuntimeError if the time has a different time zone"
   fails "Time#utc on a frozen time raises a RuntimeError if the time is not UTC"
+  fails "TrueClass#to_s returns a frozen string" # Expected "true".frozen? to be truthy but was false
 end

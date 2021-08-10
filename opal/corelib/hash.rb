@@ -476,6 +476,15 @@ class Hash
 
   alias eql? ==
 
+  def except(*keys)
+    dup.except!(*keys)
+  end
+
+  def except!(*keys)
+    keys.each { |key| delete(key) }
+    self
+  end
+
   def fetch(key, defaults = undefined, &block)
     %x{
       var value = Opal.hash_get(self, key);
@@ -762,53 +771,51 @@ class Hash
 
   alias member? has_key?
 
-  def merge(other, &block)
-    dup.merge!(other, &block)
+  def merge(*others, &block)
+    dup.merge!(*others, &block)
   end
 
-  def merge!(other, &block)
+  def merge!(*others, &block)
     %x{
-      if (!other.$$is_hash) {
-        other = #{Opal.coerce_to!(other, Hash, :to_hash)};
-      }
+      var i, j, other, other_keys, length, key, value, other_value;
+      for (i = 0; i < others.length; ++i) {
+        other = #{Opal.coerce_to!(`others[i]`, Hash, :to_hash)};
+        other_keys = other.$$keys, length = other_keys.length;
 
-      var i, other_keys = other.$$keys, length = other_keys.length, key, value, other_value;
+        if (block === nil) {
+          for (j = 0; j < length; j++) {
+            key = other_keys[j];
 
-      if (block === nil) {
-        for (i = 0; i < length; i++) {
-          key = other_keys[i];
+            if (key.$$is_string) {
+              other_value = other.$$smap[key];
+            } else {
+              other_value = key.value;
+              key = key.key;
+            }
 
-          if (key.$$is_string) {
-            other_value = other.$$smap[key];
-          } else {
-            other_value = key.value;
-            key = key.key;
+            Opal.hash_put(self, key, other_value);
           }
-
-          Opal.hash_put(self, key, other_value);
-        }
-
-        return self;
-      }
-
-      for (i = 0; i < length; i++) {
-        key = other_keys[i];
-
-        if (key.$$is_string) {
-          other_value = other.$$smap[key];
         } else {
-          other_value = key.value;
-          key = key.key;
+          for (j = 0; j < length; j++) {
+            key = other_keys[j];
+
+            if (key.$$is_string) {
+              other_value = other.$$smap[key];
+            } else {
+              other_value = key.value;
+              key = key.key;
+            }
+
+            value = Opal.hash_get(self, key);
+
+            if (value === undefined) {
+              Opal.hash_put(self, key, other_value);
+              continue;
+            }
+
+            Opal.hash_put(self, key, block(key, value, other_value));
+          }
         }
-
-        value = Opal.hash_get(self, key);
-
-        if (value === undefined) {
-          Opal.hash_put(self, key, other_value);
-          continue;
-        }
-
-        Opal.hash_put(self, key, block(key, value, other_value));
       }
 
       return self;
@@ -988,6 +995,9 @@ class Hash
     }
   end
 
+  alias filter select
+  alias filter! select!
+
   def shift
     %x{
       var keys = self.$$keys,
@@ -1046,7 +1056,9 @@ class Hash
     }
   end
 
-  def to_h
+  def to_h(&block)
+    return map(&block).to_h if block_given?
+
     %x{
       if (self.$$class === Opal.Hash) {
         return self;

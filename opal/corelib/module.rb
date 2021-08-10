@@ -1,3 +1,5 @@
+# helpers: truthy, coerce_to
+
 class Module
   def self.allocate
     %x{
@@ -82,8 +84,8 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    newname = Opal.coerce_to newname, String, :to_str
-    oldname = Opal.coerce_to oldname, String, :to_str
+    newname = `$coerce_to(newname, #{String}, 'to_str')`
+    oldname = `$coerce_to(oldname, #{String}, 'to_str')`
     `Opal.alias(self, newname, oldname)`
 
     self
@@ -227,13 +229,8 @@ class Module
 
   def class_variable_get(name)
     name = Opal.class_variable_name!(name)
-    %x{
-      var value = Opal.class_variables(self)[name];
-      if (value == null) {
-        #{raise NameError.new("uninitialized class variable #{name} in #{self}", name)}
-      }
-      return value;
-    }
+
+    `Opal.class_variable_get(self, name, false)`
   end
 
   def class_variable_set(name, value)
@@ -470,7 +467,7 @@ class Module
 
   def instance_methods(include_super = true)
     %x{
-      if (#{Opal.truthy?(include_super)}) {
+      if ($truthy(#{include_super})) {
         return Opal.instance_methods(self);
       } else {
         return Opal.own_instance_methods(self);

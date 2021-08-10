@@ -1,3 +1,5 @@
+# helpers: truthy, coerce_to, respond_to
+
 module Kernel
   def method_missing(symbol, *args, &block)
     raise NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args)
@@ -44,7 +46,7 @@ module Kernel
 
   def methods(all = true)
     %x{
-      if (#{Opal.truthy?(all)}) {
+      if ($truthy(#{all})) {
         return Opal.methods(self);
       } else {
         return Opal.own_methods(self);
@@ -54,7 +56,7 @@ module Kernel
 
   def public_methods(all = true)
     %x{
-      if (#{Opal.truthy?(all)}) {
+      if ($truthy(#{all})) {
         return Opal.methods(self);
       } else {
         return Opal.receiver_methods(self);
@@ -90,10 +92,22 @@ module Kernel
     block
   end
 
-  # Opal does not support #caller, but we stub it as an empty array to not
-  # break dependant libs
-  def caller(*args)
-    []
+  def caller(start = 1, length = nil)
+    %x{
+      var stack, result
+
+      stack = (new Error().stack || "").split("\n")
+      result = []
+
+      // Skip the initial line ("Error:") and Kernel#caller with i=3
+      for (var i = 3, ii = stack.length; i < ii; i++) {
+        if (!stack[i].match("runtime.js")) {
+          result.push(stack[i].replace(/^ *\w+ +/, ''))
+          if (length && result.length == length) break
+        }
+      }
+      return result
+    }
   end
 
   def class
@@ -197,7 +211,7 @@ module Kernel
       if (status.$$is_boolean) {
         status = status ? 0 : 1;
       } else {
-        status = #{Opal.coerce_to(status, Integer, :to_int)}
+        status = $coerce_to(status, #{Integer}, 'to_int')
       }
 
       Opal.exit(status);
@@ -336,7 +350,7 @@ module Kernel
       if (base === undefined) {
         base = 0;
       } else {
-        base = #{Opal.coerce_to(`base`, Integer, :to_int)};
+        base = $coerce_to(base, #{Integer}, 'to_int');
         if (base === 1 || base < 0 || base > 36) {
           #{raise ArgumentError, "invalid radix #{base}"}
         }
@@ -506,8 +520,9 @@ module Kernel
     if uplevel
       uplevel = Opal.coerce_to!(uplevel, Integer, :to_str)
       raise ArgumentError, "negative level (#{uplevel})" if uplevel < 0
-
-      strs = strs.map { |s| "warning: #{caller}" }
+      location = caller(uplevel + 2, 1).first
+      location = "#{location}: " if location
+      strs = strs.map { |s| "#{location}warning: #{s}" }
     end
 
     $stderr.puts(*strs) unless $VERBOSE.nil? || strs.empty?
@@ -571,22 +586,26 @@ module Kernel
   end
 
   def respond_to?(name, include_all = false)
-    return true if respond_to_missing?(name, include_all)
-
     %x{
       var body = self['$' + name];
 
       if (typeof(body) === "function" && !body.$$stub) {
         return true;
       }
-    }
 
-    false
+      if (self['$respond_to_missing?'].$$pristine === true) {
+        return false;
+      } else {
+        return #{respond_to_missing?(name, include_all)};
+      }
+    }
   end
 
   def respond_to_missing?(method_name, include_all = false)
     false
   end
+
+  Opal.pristine(self, :respond_to?, :respond_to_missing?)
 
   def require(file)
     # as Object.require refers to Kernel.require once Kernel has been loaded
@@ -649,7 +668,7 @@ module Kernel
 
       var t = get_time();
       while (get_time() - t <= seconds * 1000);
-      return seconds;
+      return Math.round(seconds);
     }
   end
 
@@ -695,6 +714,10 @@ module Kernel
     return enum_for(:yield_self) { 1 } unless block_given?
     yield self
   end
+
+  alias then yield_self
+
+  Opal.pristine(self, :method_missing)
 end
 
 class Object

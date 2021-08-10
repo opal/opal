@@ -24,13 +24,13 @@ opal_filter "Date" do
   fails "Date#mjd determines the Modified Julian day"
   fails "Date#mon determines the month"
   fails "Date#new_start converts a date object into another with a new calendar reform"
+  fails "Date#parse coerces using to_str" # ArgumentError: invalid date
   fails "Date#parse parses a day name into a Date object"
   fails "Date#parse parses a month day into a Date object"
   fails "Date#parse parses a month name into a Date object"
   fails "Date#parse raises a TypeError trying to parse non-String-like object" # ArgumentError: invalid date
   fails "Date#strftime should be able to print the commercial year with leading zeroes"
   fails "Date#strftime should be able to print the commercial year with only two digits"
-  fails "Date#strftime should be able to print the julian day with leading zeroes"
   fails "Date#strftime should be able to show a full notation"
   fails "Date#strftime should be able to show the commercial week day"
   fails "Date#strftime should be able to show the commercial week"
@@ -75,6 +75,8 @@ opal_filter "Date" do
   fails "Date#valid_date? returns false if it is not a valid civil date"
   fails "Date#valid_date? returns true if it is a valid civil date"
   fails "Date#yday determines the year"
+  fails "Date._iso8601 returns an empty hash if the argument is a invalid Date" # NoMethodError: undefined method `_iso8601' for Date
+  fails "Date._rfc3339 returns an empty hash if the argument is a invalid Date" # NoMethodError: undefined method `_rfc3339' for Date
   fails "Date.iso8601 parses YYYY-MM-DD into a Date object" # NoMethodError: undefined method `iso8601' for Date
   fails "Date.iso8601 parses YYYYMMDD into a Date object" # NoMethodError: undefined method `iso8601' for Date
   fails "Date.iso8601 parses a StringSubclass into a Date object" # NoMethodError: undefined method `iso8601' for Date
@@ -90,9 +92,13 @@ opal_filter "Date" do
   fails "Date.new creates a Date for different calendar reform dates"
   fails "Date.new doesn't create dates for invalid arguments"
   fails "Date.ordinal constructs a Date object from an ordinal date"
+  fails "Date.valid_jd? returns false if passed false" # NoMethodError: undefined method `valid_jd?' for Date
   fails "Date.valid_jd? returns false if passed nil"
+  fails "Date.valid_jd? returns false if passed symbol" # NoMethodError: undefined method `valid_jd?' for Date
+  fails "Date.valid_jd? returns true if passed a number value" # NoMethodError: undefined method `valid_jd?' for Date
   fails "Date.valid_jd? returns true if passed any value other than nil"
   fails "Date.valid_jd? returns true if passed false"
+  fails "Date.valid_jd? returns true if passed symbol" # NoMethodError: undefined method `valid_jd?' for Date
   fails "Date.valid_ordinal? determines if the date is a valid ordinal date"
   fails "Date.valid_ordinal? handles negative day numbers"
 end

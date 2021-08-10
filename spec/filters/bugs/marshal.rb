@@ -10,6 +10,7 @@ opal_filter "Marshal" do
   fails "Marshal.dump with a Time dumps the zone, but not the offset if zone is UTC" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Marshal.dump with an Exception contains the filename in the backtrace"
   fails "Marshal.dump with an Exception dumps an empty Exception"
+  fails "Marshal.dump with an Exception dumps instance variables if they exist" # Expected  "\u0004\bo:\u000EException\a: @name\"\u000EException: @ivari\u0006" ==  "\u0004\bo:\u000EException\b:\tmesg\"\bfoo:\abt0: @ivari\u0006" to be truthy but was false
   fails "Marshal.dump with an Exception dumps the cause for the exception" # NoMethodError: undefined method `cause' for #<RuntimeError: the consequence>
   fails "Marshal.dump with an Exception dumps the message for the exception"
   fails "Marshal.dump with an Object dumps a BasicObject subclass if it defines respond_to?"
@@ -18,14 +19,14 @@ opal_filter "Marshal" do
   fails "Marshal.dump with an object responding to #_dump dumps the object returned by #marshal_dump"
   fails "Marshal.load for a Module loads an old module"
   fails "Marshal.load for a Regexp loads a extended_user_regexp having ivar"
+  fails "Marshal.load for a Regexp loads an extended Regexp" # Expected /[a-z]/ == /(?:)/ to be truthy but was false
   fails "Marshal.load for a String loads a String as BINARY if no encoding is specified at the end" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "Marshal.load for a String loads a String subclass with custom constructor"
+  fails "Marshal.load for a String loads a String subclass with custom constructor" # ArgumentError: [UserCustomConstructorString#initialize] wrong number of arguments(1 for 2)
   fails "Marshal.load for a Struct does not call initialize on the unmarshaled struct"
   fails "Marshal.load for a Symbol loads a Symbol" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Marshal.load for a Symbol loads a binary encoded Symbol" # Expected "â\u0086\u0092" to equal "→"
   fails "Marshal.load for a Symbol loads an encoded Symbol" # Expected "â\u0086\u0092" to equal "→"
   fails "Marshal.load for a Time loads nanoseconds"
-  fails "Marshal.load for a Time loads the zone"
   fails "Marshal.load for a Time loads"
   fails "Marshal.load for a user Class raises ArgumentError if the object from an 'o' stream is not dumpable as 'o' type user class"
   fails "Marshal.load for a user Class that extends a core type other than Object or BasicObject raises ArgumentError if the resulting class does not extend the same type"
@@ -33,6 +34,7 @@ opal_filter "Marshal" do
   fails "Marshal.load for an Exception loads a marshalled exception with a backtrace"
   fails "Marshal.load for an Exception loads a marshalled exception with a message"
   fails "Marshal.load for an Exception loads a marshalled exception with no message"
+  fails "Marshal.load for an Exception loads an marshalled exception with ivars" # Expected "Exception" == "foo" to be truthy but was false
   fails "Marshal.load for an Object loads an Object with a non-US-ASCII instance variable" # NameError: '@Ã©' is not allowed as an instance variable name
   fails "Marshal.load for an Object raises ArgumentError if the object from an 'o' stream is not dumpable as 'o' type user class" # Expected ArgumentError but no exception was raised (#<File:0x3b160> was returned)
   fails "Marshal.load loads a Regexp" # anchors difference

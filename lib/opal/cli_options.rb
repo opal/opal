@@ -58,6 +58,13 @@ module Opal
         options[:requires] << library
       end
 
+      on('-q', '--rbrequire LIBRARY', String,
+        'Require the library in Ruby context before compiling'
+      ) do |library|
+        options[:rbrequires] ||= []
+        options[:rbrequires] << library
+      end
+
       on('-s', '--stub FILE', String, 'Stubbed files will be compiled as empty files') do |stub|
         options[:stubs] ||= []
         options[:stubs] << stub
@@ -105,11 +112,11 @@ module Opal
 
       section 'Compilation Options:'
 
-      on('-M', '--no-method-missing', 'Enable/Disable method missing') do
+      on('-M', '--no-method-missing', 'Disable method missing') do
         options[:method_missing] = false
       end
 
-      on('-O', '--no-opal', 'Enable/Disable implicit `require "opal"`') do
+      on('-O', '--no-opal', 'Disable implicit `require "opal"`') do
         options[:skip_opal_require] = true
       end
 
@@ -137,7 +144,7 @@ module Opal
         options[:missing_require_severity] = level.to_sym
       end
 
-      on('-P', '--map FILE', 'Enable/Disable source map') do |file|
+      on('-P', '--map FILE', 'Output path to FILE') do |file|
         options[:runner_options] ||= {}
         options[:runner_options][:map_file] = file
       end
@@ -159,6 +166,10 @@ module Opal
 
       on('--enable-source-location', 'Compiles source location for each method definition.') do
         options[:enable_source_location] = true
+      end
+
+      on('--use-strict', 'Enables JavaScript\'s strict mode (i.e., adds \'use strict\'; statement)') do
+        options[:use_strict] = true
       end
 
       on('--parse-comments', 'Compiles comments for each method definition.') do

@@ -31,17 +31,22 @@ class IO
     end
 
     def print(*args)
-      write args.map { |arg| String(arg) }.join($,)
+      %x{
+        for (var i = 0, ii = args.length; i < ii; i++) {
+          args[i] = #{String(`args[i]`)}
+        }
+        self.$write(args.join(#{$,}));
+      }
       nil
     end
 
     def puts(*args)
-      newline = $/
-      if args.empty?
-        write $/
-      else
-        write args.map { |arg| String(arg).chomp }.concat([nil]).join(newline)
-      end
+      %x{
+        for (var i = 0, ii = args.length; i < ii; i++) {
+          args[i] = #{String(`args[i]`).chomp}
+        }
+        self.$write(args.concat([nil]).join(#{$/}));
+      }
       nil
     end
   end

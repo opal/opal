@@ -1,3 +1,5 @@
+# helpers: falsy, truthy, coerce_to
+
 module Enumerable
   %x{
     function comparableForPattern(value) {
@@ -230,7 +232,7 @@ module Enumerable
   end
 
   def drop(number)
-    number = Opal.coerce_to number, Integer, :to_int
+    number = `$coerce_to(number, #{Integer}, 'to_int')`
 
     if `number < 0`
       raise ArgumentError, 'attempt to drop negative size'
@@ -267,7 +269,7 @@ module Enumerable
         if (dropping) {
           var value = Opal.yield1(block, param);
 
-          if (#{Opal.falsy?(`value`)}) {
+          if ($falsy(value)) {
             dropping = false;
             result.push(param);
           }
@@ -346,7 +348,7 @@ module Enumerable
   end
 
   def each_slice(n, &block)
-    n = Opal.coerce_to n, Integer, :to_int
+    n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
 
     if `n <= 0`
       raise ArgumentError, 'invalid slice size'
@@ -429,6 +431,12 @@ module Enumerable
     }
   end
 
+  def filter_map(&block)
+    return enum_for(:filter_map) { enumerator_size } unless block_given?
+
+    map(&block).select(&:itself)
+  end
+
   alias find detect
 
   def find_all(&block)
@@ -441,7 +449,7 @@ module Enumerable
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
-        if (#{Opal.truthy?(`value`)}) {
+        if ($truthy(value)) {
           result.push(param);
         }
       };
@@ -451,6 +459,8 @@ module Enumerable
       return result;
     }
   end
+
+  alias filter find_all
 
   def find_index(object = undefined, &block)
     return enum_for :find_index if `object === undefined && block === nil`
@@ -491,7 +501,7 @@ module Enumerable
       end
     else
       result = []
-      number = Opal.coerce_to number, Integer, :to_int
+      number = `$coerce_to(number, #{Integer}, 'to_int')`
 
       if `number < 0`
         raise ArgumentError, 'attempt to take negative size'
@@ -684,9 +694,9 @@ module Enumerable
           return result;
         }
       }
-    }
 
-    n = Opal.coerce_to(n, Integer, :to_int)
+      n = $coerce_to(n, #{Integer}, 'to_int');
+    }
 
     sort(&block).reverse.first(n)
   end
@@ -943,7 +953,7 @@ module Enumerable
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
-        if (#{Opal.truthy?(`value`)}) {
+        if ($truthy(value)) {
           truthy.push(param);
         }
         else {
@@ -969,7 +979,7 @@ module Enumerable
         var param = #{Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
-        if (#{Opal.falsy?(`value`)}) {
+        if ($falsy(value)) {
           result.push(param);
         }
       };
@@ -1021,7 +1031,7 @@ module Enumerable
               var param = #{Opal.destructure(`arguments`)},
                   value = Opal.yield1(block, param);
 
-              if (#{Opal.truthy?(`value`)} && slice.length > 0) {
+              if ($truthy(value) && slice.length > 0) {
                 #{e << `slice`};
                 slice = [];
               }
@@ -1034,7 +1044,7 @@ module Enumerable
               var param = #{Opal.destructure(`arguments`)},
                   value = block(param, #{pattern.dup});
 
-              if (#{Opal.truthy?(`value`)} && slice.length > 0) {
+              if ($truthy(value) && slice.length > 0) {
                 #{e << `slice`};
                 slice = [];
               }
@@ -1048,7 +1058,7 @@ module Enumerable
             var param = #{Opal.destructure(`arguments`)},
                 value = #{pattern === `param`};
 
-            if (#{Opal.truthy?(`value`)} && slice.length > 0) {
+            if ($truthy(value) && slice.length > 0) {
               #{e << `slice`};
               slice = [];
             }
@@ -1091,7 +1101,7 @@ module Enumerable
             accumulate = [];
           }
 
-          if (#{Opal.truthy?(`end_chunk`)}) {
+          if ($truthy(end_chunk)) {
             accumulate.push(element);
             #{yielder.yield(`accumulate`)};
             accumulate = null;
@@ -1128,7 +1138,7 @@ module Enumerable
             slice = [];
           }
 
-          if (#{Opal.truthy?(`match`)}) {
+          if ($truthy(match)) {
             slice.push(before);
             #{yielder.yield(`slice`)};
             slice = [];
@@ -1219,9 +1229,15 @@ module Enumerable
     hash.values
   end
 
+  def tally
+    group_by(&:itself).transform_values(&:count)
+  end
+
   alias to_a entries
 
-  def to_h(*args)
+  def to_h(*args, &block)
+    return map(&block).to_h(*args) if block_given?
+
     %x{
       var hash = #{{}};
 

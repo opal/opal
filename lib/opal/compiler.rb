@@ -139,12 +139,6 @@ module Opal
     # @return [Boolean]
     compiler_option :freezing, default: true, as: :freezing?
 
-    # @deprecated
-    # @!method tainting?
-    #
-    # stubs out #taint, #untaint and #tainted?
-    compiler_option :tainting, default: true, as: :tainting?
-
     # @!method irb?
     #
     # compile top level local vars with support for irb style vars
@@ -179,7 +173,7 @@ module Opal
 
     # @!method use_strict?
     #
-    # Adds source_location for every method definition
+    # Enables JavaScript's strict mode (i.e., adds 'use strict'; statement)
     compiler_option :use_strict, default: false, as: :use_strict?, magic_comment: true
 
     # @!method parse_comments?
@@ -386,7 +380,7 @@ module Opal
     def in_while
       return unless block_given?
       @while_loop = @scope.push_while
-      result = indent { yield }
+      result = yield
       @scope.pop_while
       result
     end

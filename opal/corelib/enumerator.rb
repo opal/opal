@@ -1,4 +1,4 @@
-# helpers: breaker, slice
+# helpers: breaker, slice, falsy, truthy, coerce_to
 
 require 'corelib/enumerable'
 
@@ -28,7 +28,7 @@ class Enumerator
       @size   = `arguments[0] || nil`
 
       if @size && !@size.respond_to?(:call)
-        @size = Opal.coerce_to @size, Integer, :to_int
+        @size = `$coerce_to(#{@size}, #{Integer}, 'to_int')`
       end
     else
       @object = `arguments[0]`
@@ -54,7 +54,7 @@ class Enumerator
 
   def with_index(offset = 0, &block)
     offset = if offset
-               Opal.coerce_to offset, Integer, :to_int
+               `$coerce_to(offset, #{Integer}, 'to_int')`
              else
                0
              end
@@ -222,7 +222,7 @@ class Enumerator
     end
 
     def drop(n)
-      n = Opal.coerce_to n, Integer, :to_int
+      n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
 
       if n < 0
         raise ArgumentError, 'attempt to drop negative size'
@@ -256,7 +256,7 @@ class Enumerator
           %x{
             var value = Opal.yieldX(block, args);
 
-            if (#{Opal.falsy?(`value`)}) {
+            if ($falsy(value)) {
               succeeding = false;
 
               #{enum.yield(*args)};
@@ -272,6 +272,8 @@ class Enumerator
       self.class.for(self, method, *args, &block)
     end
 
+    alias filter find_all
+
     def find_all(&block)
       unless block
         raise ArgumentError, 'tried to call lazy select without a block'
@@ -281,7 +283,7 @@ class Enumerator
         %x{
           var value = Opal.yieldX(block, args);
 
-          if (#{Opal.truthy?(`value`)}) {
+          if ($truthy(value)) {
             #{enum.yield(*args)};
           }
         }
@@ -297,7 +299,7 @@ class Enumerator
             var param = #{Opal.destructure(args)},
                 value = #{pattern === `param`};
 
-            if (#{Opal.truthy?(`value`)}) {
+            if ($truthy(value)) {
               value = Opal.yield1(block, param);
 
               #{enum.yield `Opal.yield1(block, param)`};
@@ -310,7 +312,7 @@ class Enumerator
             var param = #{Opal.destructure(args)},
                 value = #{pattern === `param`};
 
-            if (#{Opal.truthy?(`value`)}) {
+            if ($truthy(value)) {
               #{enum.yield `param`};
             }
           }
@@ -331,7 +333,7 @@ class Enumerator
         %x{
           var value = Opal.yieldX(block, args);
 
-          if (#{Opal.falsy?(`value`)}) {
+          if ($falsy(value)) {
             #{enum.yield(*args)};
           }
         }
@@ -339,7 +341,7 @@ class Enumerator
     end
 
     def take(n)
-      n = Opal.coerce_to n, Integer, :to_int
+      n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
 
       if n < 0
         raise ArgumentError, 'attempt to take negative size'
@@ -372,7 +374,7 @@ class Enumerator
         %x{
           var value = Opal.yieldX(block, args);
 
-          if (#{Opal.truthy?(`value`)}) {
+          if ($truthy(value)) {
             #{enum.yield(*args)};
           }
           else {
@@ -387,5 +389,9 @@ class Enumerator
     def inspect
       "#<#{self.class}: #{@enumerator.inspect}>"
     end
+  end
+
+  class ArithmeticSequence < self
+    # We need to stub this for the time being
   end
 end

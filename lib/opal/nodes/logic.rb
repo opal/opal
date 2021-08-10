@@ -10,9 +10,10 @@ module Opal
       def compile
         if in_while?
           push 'continue;'
+        elsif scope.iter?
+          push 'return ', expr_or_nil(value), ';'
         else
-          push expr_or_nil(value)
-          wrap 'return ', ';'
+          error 'Invalid next'
         end
       end
 
@@ -108,83 +109,6 @@ module Opal
       end
     end
 
-    class BinaryOp < Base
-      def compile
-        if rhs.type == :break
-          compile_if
-        else
-          compile_ternary
-        end
-      end
-
-      def compile_ternary
-        raise NotImplementedError
-      end
-
-      def compile_if
-        raise NotImplementedError
-      end
-    end
-
-    class OrNode < BinaryOp
-      handle :or
-
-      children :lhs, :rhs
-
-      def compile_ternary
-        helper :truthy
-
-        with_temp do |tmp|
-          push "($truthy(#{tmp} = ", expr(lhs), ") ? #{tmp} : ", expr(rhs), ')'
-        end
-      end
-
-      def compile_if
-        helper :truthy
-
-        with_temp do |tmp|
-          push "if ($truthy(#{tmp} = ", expr(lhs), ')) {'
-          indent { line tmp }
-          line '} else {'
-          indent { line expr(rhs) }
-          line '}'
-        end
-      end
-    end
-
-    class AndNode < BinaryOp
-      handle :and
-
-      children :lhs, :rhs
-
-      def compile_ternary
-        truthy_opt = nil
-
-        with_temp do |tmp|
-          if truthy_opt = js_truthy_optimize(lhs)
-            push "((#{tmp} = ", truthy_opt
-            push ') ? '
-            push expr(rhs)
-            push ' : ', expr(lhs), ')'
-          else
-            helper :truthy
-
-            push "($truthy(#{tmp} = ", expr(lhs), ') ? ', expr(rhs), " : #{tmp})"
-          end
-        end
-      end
-
-      def compile_if
-        helper :truthy
-        condition = js_truthy_optimize(lhs) || expr(lhs)
-
-        line 'if ($truthy(', condition, ')) {'
-        indent { line expr(rhs) }
-        line '} else {'
-        indent { line expr(lhs) }
-        line '}'
-      end
-    end
 
     class ReturnNode < Base
       handle :return
@@ -222,7 +146,7 @@ module Opal
         elsif stmt?
           push 'return ', return_val
         else
-          raise SyntaxError, 'void value expression: cannot return as an expression'
+          error 'void value expression: cannot return as an expression'
         end
       end
     end

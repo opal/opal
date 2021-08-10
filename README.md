@@ -3,7 +3,7 @@
   align="center" title="Opal logo by Elia Schito" width="105" height="105" />
   <br/>
   Opal  <br/>
-  <img src="https://img.shields.io/badge/Opal-Ruby%20💛%20JavaScript-yellow.svg?logo=ruby&style=social&logoColor=777"/>
+  <img src="https://img.shields.io/badge/Opal-Ruby%20💛%20JavaScript-yellow.svg?logo=ruby&style=social&logoColor=777" alt="Opal-Ruby 💛 JavaScript"/>
 </h1>
 
 <p align="center">
@@ -16,15 +16,19 @@
   <a href="https://stackoverflow.com/questions/ask?tags=opalrb"><img src="https://img.shields.io/badge/stackoverflow-%23opalrb-orange.svg?style=flat" alt="Stack Overflow" title="" /></a>
   <a href="#backers"><img src="https://opencollective.com/opal/backers/badge.svg" alt="Backers on Open Collective" title="" /></a>
   <a href="#sponsors"><img src="https://opencollective.com/opal/sponsors/badge.svg" alt="Sponsors on Open Collective" title="" /></a>
-  <a href="https://gitter.im/opal/opal?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter" title="" /></a>
+  <a href="https://slack.opalrb.com/"><img src="https://img.shields.io/badge/slack-join%20chat-46BC99?logo=slack&style=flat" alt="Slack" title="Join Chat" /></a>
   <a href="https://opalrb.com/docs"><img src="https://img.shields.io/badge/docs-updated-blue.svg" alt="Documentation" title="" /></a>
+  
   <br>
   <strong>Code:</strong><br>
   <a href="https://badge.fury.io/rb/opal"><img src="https://img.shields.io/gem/v/opal.svg?style=flat" alt="Gem Version" title="" /></a>
-  <a href="https://travis-ci.org/opal/opal"><img src="https://img.shields.io/travis/opal/opal/master.svg?style=flat" alt="Build Status (Linux)" title="" /></a>
-  <a href="https://ci.appveyor.com/project/elia/opal/branch/master"><img src="https://ci.appveyor.com/api/projects/status/jtsvwl8tfgn3u67n/branch/master?svg=true" alt="Build Status (Windows)" title="" /></a>
+  <a href="https://github.com/opal/opal/actions?query=workflow%3Abuild"><img src="https://github.com/opal/opal/workflows/build/badge.svg" alt="Build Status" /></a>
   <a href="https://codeclimate.com/github/opal/opal"><img src="https://img.shields.io/codeclimate/maintainability-percentage/opal/opal.svg" alt="Code Climate" title="" /></a>
   <a href="https://coveralls.io/github/opal/opal?branch=master"><img src="https://coveralls.io/repos/opal/opal/badge.svg?branch=master&amp;service=github" alt="Coverage Status" title="" /></a>
+  
+  <br>
+  <strong>Sponsors:</strong>
+  <br/><a href="https://nebulab.it?utm_source=github&utm_medium=badge"><img src="https://img.shields.io/static/v1?label=Nebulab&message=Open+Source+Fridays&color=%235dbefd&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMQSURBVHgBrZZNTxNRFIbfczsgIMQiLBCRFDaGhUr9A9iiIa5EEneIwE/AlRsNv8KlIKwFl35RTUBX8rFBdiVKAgqmXSCY0M71nJl+zJTOdKh9k6Yzc8/cZ86555x7CQE0mji5hSyGlQoNaOgIPwrnhtIArWszu4EQFudjdR8rzUV+gw8/ZMZB9IwvIwimJJGafhmjWZwFOJ7QkYzWCwTdj+qUDJGKz8Rou3RAlT4YS+hHWW2u/QdM1MNzrI6+zwyXDrg8FANStIDaSXOIJ5whLgAljOIZiglRK6U4vDfz4S2ElGGJWsEaQkCTUbhtNbV+lb+xgFY2Bs9ET0h/GzBxlfAkqnCUKY5xKfVLbsi1/R126lcF6WgCYp2ES42EBp6tvQFY+alLTUlrUxizJEVNWiVwBkVagGg7oe+CDclLYOfrgMdfTBz8PfWa1lkzbsDEsH/5FyF9YUK0zQ1xwpoZtsm9pwxMRLyA9wyi0A2Jcjl1NNqeeEFEimxYPkmWd014ikIDnDTeBb53DOweaRxnvWGyhnmYfPZWGt487sNi6lsK67/lZ1oZGOtUaD3nhtU7etXXfe0VzrzCBgLKCR68rNDX6oaJlvd0xXnklbSfgSTL/QghXF8EP980cVKyVL/Ys9UDVFJa8Tdt+1lYmcmJM3Vd4UEvWeslRf32h9ubrVRl77gBrCto85OfUU+LXTMGx+JuN2Hoin3/Zkfjj6ObBAknV+KG4jpc9BqXMEpiCMz6Z9ZQ12kvJZxb6co4Zr1W83esY8F2OYsIe+eEyfTiVXczCl7uM2wliHfMEJaRc3Wa++mLUotrF4EW7h6f94Dvh6aVFM60Fy8Xkya+BfBOjh5yUWhqY0vmKi9q1GnVxZ7sHKIWSs7FQ71yUagkRTTCfymnVY1gsgHHC5z8hbUjaz0Fr8ZanXhX0pPOw5SrV8wNGjNscMrTKpXKaj05f9twVYHnMZGPHEuwTwEBNi+3NGiNt6GRcsfEIAfhp2cAV3cQLtXoOz7q8+ZJRLx3kmxn4dy7aas1SrfiBpKraV/9A+PSJLDAXLUvAAAAAElFTkSuQmCC" alt="Nebulab: Open Source Fridays" /></a>
 </p>
 
 ## Usage
@@ -212,19 +216,16 @@ then we support Opera 12.1x, 19.x and 20.x but not Opera 15.x through 18.x.
 
 This project exists thanks to all the people who contribute. [![contributors](https://opencollective.com/opal/contributors.svg?width=890&button=false")](https://github.com/opal/opal/graphs/contributors)
 
+## Versioning
+
+Opal will broadly follow semver as a version policy, trying to bump the major version when introducing breaking changes.
+Being a language implementation we're also aware that there's a fine line between what can be considered breaking and what is expected to be "safe" or just "additive". Moving forward we'll attempt to better clarify what interfaces are meant to be public and what should be considered private.
 
 ## Backers
 
 Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/opal#backer)]
 
-<a href="https://opencollective.com/opal#backers" target="_blank"><img src="https://opencollective.com/opal/backers.svg?width=890"></a>
-
-
-## Sponsors
-
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/opal#sponsor)]
-
-<a href="https://opencollective.com/opal/sponsor/0/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/opal#backers" target="_blank"><img src="https://opencollective.com/opal/backers.svg?width=890" alt="Become a Backer Button" /></a>
 <a href="https://opencollective.com/opal/sponsor/1/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/1/avatar.svg"></a>
 <a href="https://opencollective.com/opal/sponsor/2/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/2/avatar.svg"></a>
 <a href="https://opencollective.com/opal/sponsor/3/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/3/avatar.svg"></a>
@@ -236,11 +237,24 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/opal/sponsor/9/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/9/avatar.svg"></a>
 
 
+## Sponsors
+
+### Donations
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/opal#sponsor)]
+
+<a href="https://opencollective.com/opal/sponsor/0/website" target="_blank"><img src="https://opencollective.com/opal/sponsor/0/avatar.svg" alt="Become a Sponsor Button"></a>
+
+### Sponsored Contributions
+
+<a href="https://nebulab.it/?utm_source=github&utm_medium=sponsors" target="_blank"><img src="https://nebulab.com/assets/img/logo-nebulab_black.svg" alt="Nebulab Logo"></a>
+
+
 ## License
 
 (The MIT License)
 
-Copyright (C) 2013-2019 by Adam Beynon and the Opal contributors
+Copyright (C) 2013-2021 by Adam Beynon and the Opal contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

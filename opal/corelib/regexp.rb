@@ -1,3 +1,5 @@
+# helpers: coerce_to
+
 class RegexpError < StandardError; end
 
 class Regexp < `RegExp`
@@ -100,6 +102,8 @@ class Regexp < `RegExp`
         return new RegExp(regexp, options);
       }
     end
+
+    alias compile new
   end
 
   def ==(other)
@@ -162,7 +166,7 @@ class Regexp < `RegExp`
 
       if (pos === undefined) {
         if (string === nil) return #{$~ = nil};
-        var m = self.exec(#{Opal.coerce_to(string, String, :to_str)});
+        var m = self.exec($coerce_to(string, #{String}, 'to_str'));
         if (m) {
           #{$~ = MatchData.new(`self`, `m`)};
           return block === nil ? #{$~} : #{yield $~};
@@ -171,13 +175,13 @@ class Regexp < `RegExp`
         }
       }
 
-      pos = #{Opal.coerce_to(pos, Integer, :to_int)};
+      pos = $coerce_to(pos, #{Integer}, 'to_int');
 
       if (string === nil) {
         return #{$~ = nil};
       }
 
-      string = #{Opal.coerce_to(string, String, :to_str)};
+      string = $coerce_to(string, #{String}, 'to_str');
 
       if (pos < 0) {
         pos += string.length;
@@ -210,16 +214,16 @@ class Regexp < `RegExp`
       }
 
       if (pos === undefined) {
-        return string === nil ? false : self.test(#{Opal.coerce_to(string, String, :to_str)});
+        return string === nil ? false : self.test($coerce_to(string, #{String}, 'to_str'));
       }
 
-      pos = #{Opal.coerce_to(pos, Integer, :to_int)};
+      pos = $coerce_to(pos, #{Integer}, 'to_int');
 
       if (string === nil) {
         return false;
       }
 
-      string = #{Opal.coerce_to(string, String, :to_str)};
+      string = $coerce_to(string, #{String}, 'to_str');
 
       if (pos < 0) {
         pos += string.length;

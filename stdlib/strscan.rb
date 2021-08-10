@@ -63,6 +63,7 @@ class StringScanner
 
         if (result == null) {
           if (working.length === 0) {
+            #{@match} = [];
             return #{@matched} = nil;
           }
 
@@ -70,6 +71,7 @@ class StringScanner
         }
 
         #{@matched}  = #{@string}.substr(#{@pos}, pos - #{@pos} - 1 + result[0].length);
+        #{@match}    = result;
         #{@prev_pos} = pos - 1;
         #{@pos}      = pos;
         #{@working}  = working.substr(result[0].length);
@@ -80,6 +82,17 @@ class StringScanner
   end
 
   def [](idx)
+    if @match.empty?
+      return nil
+    end
+    case idx
+    when Symbol
+      idx = idx.to_s
+    when String
+      # noop
+    else
+      idx = Opal.coerce_to!(idx, Integer, :to_int)
+    end
     %x{
       var match = #{@match};
 
@@ -163,6 +176,7 @@ class StringScanner
       var result = pattern.exec(#{@working});
 
       if (result == null) {
+        #{@match} = [];
         return #{@matched} = nil;
       }
       else {
@@ -170,6 +184,7 @@ class StringScanner
         var match_len = match_str.length;
 
         #{@matched}   = match_str;
+        #{@match}     = result;
         #{@prev_pos}  = #{@pos};
         #{@pos}      += match_len;
         #{@working}   = #{@working}.substring(match_len);

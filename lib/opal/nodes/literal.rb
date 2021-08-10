@@ -70,6 +70,11 @@ module Opal
             wrap "$enc(", ", \"#{encoding.name}\")"
           end
         end
+
+        unless value.valid_encoding?
+          helper :binary
+          wrap "$binary(", ")"
+        end
       end
 
       # http://www.2ality.com/2013/09/javascript-unicode.html
@@ -124,20 +129,22 @@ module Opal
           end
         end
 
-        case value.type
-        when :dstr, :begin
-          compile_dynamic_regexp
-        when :str
+        if value.type == :str
           compile_static_regexp
+        else
+          compile_dynamic_regexp
         end
       end
 
       def compile_dynamic_regexp
-        if flags.any?
-          push 'new RegExp(', expr(value), ", '#{flags.join}')"
-        else
-          push 'new RegExp(', expr(value), ')'
+        push 'Opal.regexp(['
+        value.children.each_with_index do |v, index|
+          push ', ' unless index.zero?
+          push expr(v)
         end
+        push ']'
+        push ", '#{flags.join}'" if flags.any?
+        push ")"
       end
 
       def compile_static_regexp
@@ -251,9 +258,11 @@ module Opal
       end
 
       def compile_inline?
-        start.type == finish.type &&
-          SIMPLE_CHILDREN_TYPES.include?(start.type) &&
-          SIMPLE_CHILDREN_TYPES.include?(finish.type)
+        (
+          !start || (start.type && SIMPLE_CHILDREN_TYPES.include?(start.type))
+        ) && (
+          !finish || (finish.type && SIMPLE_CHILDREN_TYPES.include?(finish.type))
+        )
       end
 
       def compile_inline
@@ -269,11 +278,11 @@ module Opal
       handle :irange
 
       def compile_inline
-        push '$range(', expr(start), ', ', expr(finish), ', false)'
+        push '$range(', expr_or_nil(start), ', ', expr_or_nil(finish), ', false)'
       end
 
       def compile_range_initialize
-        push 'Opal.Range.$new(', expr(start), ', ', expr(finish), ', false)'
+        push 'Opal.Range.$new(', expr_or_nil(start), ', ', expr_or_nil(finish), ', false)'
       end
     end
 
@@ -281,11 +290,11 @@ module Opal
       handle :erange
 
       def compile_inline
-        push '$range(', expr(start), ', ', expr(finish), ', true)'
+        push '$range(', expr_or_nil(start), ', ', expr_or_nil(finish), ', true)'
       end
 
       def compile_range_initialize
-        push 'Opal.Range.$new(', expr(start), ',', expr(finish), ', true)'
+        push 'Opal.Range.$new(', expr_or_nil(start), ',', expr_or_nil(finish), ', true)'
       end
     end
 

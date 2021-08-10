@@ -4,7 +4,7 @@ module Opal
   module Rewriters
     class Arguments
       attr_reader :args, :optargs, :restarg, :postargs,
-        :kwargs, :kwoptargs, :kwrestarg,
+        :kwargs, :kwoptargs, :kwrestarg, :kwnilarg,
         :shadowargs, :blockarg
 
       def initialize(args)
@@ -15,6 +15,7 @@ module Opal
         @kwargs = []
         @kwoptargs = []
         @kwrestarg = nil
+        @kwnilarg = false
         @shadowargs = []
         @blockarg = nil
 
@@ -30,6 +31,8 @@ module Opal
             @kwargs << arg
           when :kwoptarg
             @kwoptargs << arg
+          when :kwnilarg
+            @kwnilarg = true
           when :kwrestarg
             @kwrestarg = arg
           when :shadowarg

@@ -42,6 +42,22 @@ RSpec.describe Opal::Compiler do
     expect_compiled('"hello #{100}"').to include('"hello "', '100')
   end
 
+  it "should compile ruby ranges" do
+    expect_compiled('1..1').to include('$range(1, 1, false)')
+    expect_compiled('1...1').to include('$range(1, 1, true)')
+    expect_compiled('..1').to include('$range(nil, 1, false)')
+    expect_compiled('...1').to include('$range(nil, 1, true)')
+    expect_compiled('1..').to include('$range(1, nil, false)')
+    expect_compiled('1...').to include('$range(1, nil, true)')
+    # Following return Opal.range.$new instead of $range. Some also miss a space.
+    expect_compiled('nil..1').to include('(nil, 1, false)')
+    expect_compiled('nil...1').to include('(nil,1, true)')
+    expect_compiled('"a"..nil').to include('("a", nil, false)')
+    expect_compiled('"a"...nil').to include('("a",nil, true)')
+    expect_compiled('..nil').to include('(nil, nil, false)')
+    expect_compiled('...nil').to include('(nil,nil, true)')
+  end
+
   it "should compile method calls" do
     expect_compiled("self.inspect").to include("$inspect()")
     expect_compiled("self.map { |a| a + 10 }").to include("$map")

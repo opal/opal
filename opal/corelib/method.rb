@@ -34,6 +34,14 @@ class Method
 
   alias [] call
 
+  def >>(other)
+    @method >> other
+  end
+
+  def <<(other)
+    @method << other
+  end
+
   def unbind
     UnboundMethod.new(@receiver.class, @owner, @method, @name)
   end

@@ -3,6 +3,7 @@
 require 'shellwords'
 require 'socket'
 require 'timeout'
+require 'tmpdir'
 
 module Opal
   module CliRunners
@@ -27,24 +28,29 @@ module Opal
           warn "warning: ARGV is not supported by the Chrome runner #{argv.inspect}"
         end
 
-        @code = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
         @output = options.fetch(:output, $stdout)
+        @builder = builder
       end
 
-      attr_reader :output, :exit_status, :code
+      attr_reader :output, :exit_status, :builder
 
       def run
-        with_chrome_server do
-          cmd = [
-            'env',
-            "CHROME_HOST=#{chrome_host}",
-            "CHROME_PORT=#{chrome_port}",
-            'node',
-            SCRIPT_PATH
-          ]
+        mktmpdir do |dir|
+          with_chrome_server do
+            cmd = [
+              'env',
+              "CHROME_HOST=#{chrome_host}",
+              "CHROME_PORT=#{chrome_port}",
+              'node',
+              '--require', "#{__dir__}/source-map-support",
+              SCRIPT_PATH
+            ]
 
-          IO.popen(cmd, 'w', out: output) do |io|
-            io.write(code)
+            prepare_files_in(dir)
+
+            IO.popen(cmd, 'w', out: output) do |io|
+              io.write dir
+            end
           end
 
           @exit_status = $?.exitstatus
@@ -52,6 +58,35 @@ module Opal
       end
 
       private
+
+      def prepare_files_in(dir)
+        js = builder.to_s
+        map = builder.source_map.to_json
+        stack = File.read("#{__dir__}/source-map-support-browser.js")
+
+        # Chrome can't handle huge data passed to `addScriptToEvaluateOnLoad`
+        # https://groups.google.com/a/chromium.org/forum/#!topic/chromium-discuss/U5qyeX_ydBo
+        # The only way is to create temporary files and pass them to chrome.
+        File.write("#{dir}/index.js", js)
+        File.write("#{dir}/source-map-support.js", stack)
+        File.write("#{dir}/index.html", <<~HTML)
+          <html><head>
+            <meta charset='utf-8'>
+            <script src='./source-map-support.js'></script>
+            <script>
+            sourceMapSupport.install({
+              retrieveSourceMap: function(path) {
+                return path.endsWith('/index.js') ? {
+                  url: './index.map', map: #{map.to_json}
+                } : null;
+              }
+            });
+            </script>
+          </head><body>
+            <script src='./index.js'></script>
+          </body></html>
+        HTML
+      end
 
       def chrome_host
         ENV['CHROME_HOST'] || DEFAULT_CHROME_HOST
@@ -73,8 +108,11 @@ module Opal
         raise 'Chrome server can be started only on localhost' if chrome_host != DEFAULT_CHROME_HOST
 
         # Disable web security with "--disable-web-security" flag to be able to do XMLHttpRequest (see test_openuri.rb)
-        chrome_server_cmd = "#{chrome_executable} --headless --disable-web-security --disable-gpu --remote-debugging-port=#{chrome_port} #{ENV['CHROME_OPTS']}"
-        puts chrome_server_cmd
+        chrome_server_cmd = "#{chrome_executable} \
+          --headless \
+          --disable-web-security \
+          --remote-debugging-port=#{chrome_port} \
+          #{ENV['CHROME_OPTS']}"
 
         chrome_pid = Process.spawn(chrome_server_cmd)
 
@@ -122,6 +160,10 @@ module Opal
           when /solaris|bsd/
             raise 'Headless chrome is supported only by Mac OS and Linux'
           end
+      end
+
+      def mktmpdir(&block)
+        Dir.mktmpdir('chrome-opal-', &block)
       end
     end
   end

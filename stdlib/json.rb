@@ -186,7 +186,9 @@ class Numeric
 end
 
 class String
-  alias to_json inspect
+  def to_json
+    `JSON.stringify(self)`
+  end
 end
 
 class Time

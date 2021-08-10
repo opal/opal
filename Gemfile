@@ -11,7 +11,6 @@ sprockets_version = ENV['SPROCKETS_VERSION']
 
 gem 'json', '< 1.8.1',  platform: :ruby if ruby_version < v['2.2']
 gem 'rack-test', '< 0.8' if ruby_version <= v['2.0']
-gem 'rubysl', platform: :rbx
 gem 'coveralls', platform: :mri
 
 # Some browsers have problems with WEBrick
@@ -48,8 +47,4 @@ end unless ENV['CI']
 
 group :doc do
   gem 'redcarpet' unless RUBY_ENGINE == 'truffleruby'
-end
-
-platforms :ruby, :mswin, :mswin64, :mingw, :x64_mingw do
-  gem 'c_lexer', '~> 2.6' unless RUBY_ENGINE == 'truffleruby'
-end
+end unless ENV['CI']

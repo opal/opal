@@ -77,13 +77,14 @@ class Class
     %x{
       var singleton_of = self.$$singleton_of;
 
-      if (singleton_of && (singleton_of.$$is_a_module)) {
+      if (singleton_of && singleton_of.$$is_a_module) {
         return #{"#<Class:#{`singleton_of`.name}>"};
       }
       else if (singleton_of) {
         // a singleton class created from an object
         return #{"#<Class:#<#{`singleton_of.$$class`.name}:0x#{`Opal.id(singleton_of)`.to_s(16)}>>"};
       }
+
       return #{super()};
     }
   end

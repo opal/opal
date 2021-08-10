@@ -4,9 +4,6 @@ require 'bundler'
 Bundler.require
 Bundler::GemHelper.install_tasks
 
-# Let the release process update the changelog from github
-task :release => :changelog
-
 github_releases = -> do
   require 'date'
   require 'octokit'
@@ -52,7 +49,7 @@ CHANGELOG_HEADING = <<~MARKDOWN
   - **Security** to invite users to upgrade in case of vulnerabilities.
 MARKDOWN
 
-desc "Update CHANGELOG.md usign info from published GitHub releases (the first unreleased section is preserved)"
+desc "Update CHANGELOG.md using info from published GitHub releases (the first unreleased section is preserved)"
 task :changelog do
   changelog_path    = "#{__dir__}/../CHANGELOG.md"
   unreleased_path   = "#{__dir__}/../UNRELEASED.md"
@@ -70,8 +67,8 @@ task :changelog do
   end
 
   changelog_entries.unshift changelog_entry.call(
-    tag_name: 'HEAD',
-    release_date: 'unreleased',
+    tag_name: ENV['VERSION'] || 'HEAD',
+    release_date: (ENV['VERSION'] ? Time.now.to_date.iso8601 : 'unreleased'),
     previous_tag_name: previous_tag_name,
     body: File.read(unreleased_path),
   )

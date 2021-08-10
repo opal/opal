@@ -30,6 +30,7 @@ module Testing
         lib/spec_helper
         mspec/commands/mspec-run
         etc
+        rubygems
       ]
     end
 
@@ -107,12 +108,13 @@ module Testing
 
       env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
 
-      File.write filename, <<-RUBY
+      File.write filename, <<~RUBY
         require 'opal/platform' # in node ENV is replaced
         #{env_data}
 
         require 'spec_helper'
         require 'opal/full'
+        require 'securerandom'
         #{enter_benchmarking_mode}
 
         #{filter_requires}
@@ -124,7 +126,12 @@ module Testing
         ]
 
         srand(#{random_seed})
-        MSpec.randomize(true)
+        MSpec.randomize = true
+
+        # legacy MSpec
+        def frozen_error_class
+          FrozenError
+        end
 
         MSpec.process
         OSpecFilter.main.unused_filters_message(list: #{!!ENV['LIST_UNUSED_FILTERS']})
@@ -452,30 +459,31 @@ minitest_suites.each do |suite|
 end
 
 # The name ends with the platform, which is of course mandated in this case
-%w[nodejs strictnodejs].each do |platform|
-  desc "Run the Node.js Minitest suite on Node.js - #{platform}"
-  task :"minitest_node_#{platform}" do
-    files = %w[
-      nodejs
-      opal-parser
-      nodejs/test_file.rb
-      nodejs/test_dir.rb
-      nodejs/test_env.rb
-      nodejs/test_io.rb
-      nodejs/test_error.rb
-      nodejs/test_file_encoding.rb
-      nodejs/test_opal_builder.rb
-    ]
+desc "Run the Node.js Minitest suite on Node.js"
+task :minitest_node_nodejs do
+  platform = 'nodejs'
+  files = %w[
+    nodejs
+    opal-parser
+    nodejs/test_dir.rb
+    nodejs/test_env.rb
+    nodejs/test_error.rb
+    nodejs/test_file.rb
+    nodejs/test_file_encoding.rb
+    nodejs/test_io.rb
+    nodejs/test_opal_builder.rb
+    nodejs/test_string.rb
+  ]
 
-    filename = "tmp/minitest_node_nodejs.rb"
-    Testing::Minitest.write_file(filename, files, ENV)
+  filename = "tmp/minitest_node_nodejs.rb"
+  Testing::Minitest.write_file(filename, files, ENV)
 
-    stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
-    includes = "-Itest -Ilib -Ivendored-minitest"
+  stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+  includes = "-Itest -Ilib -Ivendored-minitest"
 
-    sh "ruby -rbundler/setup "\
-       "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
-  end
+  use_strict_opt = ENV['USE_STRICT'] ? ' --use-strict' : ''
+  sh "ruby -rbundler/setup "\
+     "exe/opal #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location#{use_strict_opt} #{filename}"
 end
 
 desc 'Run smoke tests with opal-rspec to see if something is broken'
@@ -493,7 +501,7 @@ task :smoke_test do
   cp "tasks/testing/#{gemfile_name}", "#{opal_rspec_dir}/Gemfile"
 
   cd opal_rspec_dir do
-    Bundler.with_clean_env do
+    Bundler.with_unbundled_env do
       sh 'bundle check && bundle update opal-rspec || bundle install'
       sh %{bundle exec opal-rspec --color --default-path=../../spec ../../spec/lib/deprecations_spec.rb > #{actual_output_path}}
 
@@ -502,14 +510,13 @@ task :smoke_test do
         require 'rspec/expectations'
         extend RSpec::Matchers
         expect(actual_output.lines[0]).to    eq("[32m.[0m[32m.[0m\n")
-        expect(actual_output.lines[1]).to    eq("\n")
-        expect(actual_output.lines[2]).to match(%r{^Finished in \d+\.\d+ seconds \(files took \d+\.\d+ seconds to load\)\n$})
-        expect(actual_output.lines[3]).to    eq("[32m2 examples, 0 failures[0m\n")
-        expect(actual_output.lines[4]).to    eq("\n")
-        expect(actual_output.lines[5]).to match(%r{Top 2 slowest examples \(\d+\.\d+ seconds, \d+\.\d+% of total time\):\n})
-        expect(actual_output.lines[6]).to    eq("  Opal::Deprecations defaults to warn\n")
-        expect(actual_output.lines[7]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m \n})
-        expect(actual_output.lines[8]).to    eq("  Opal::Deprecations can be set to raise\n")
+        expect(actual_output.lines[1]).to match(%r{^Finished in \d+\.\d+ seconds \(files took \d+\.\d+ seconds to load\)\n$})
+        expect(actual_output.lines[2]).to    eq("[32m2 examples, 0 failures[0m\n")
+        expect(actual_output.lines[3]).to    eq("\n")
+        expect(actual_output.lines[4]).to match(%r{Top 2 slowest examples \(\d+\.\d+ seconds, \d+\.\d+% of total time\):\n})
+        expect(actual_output.lines[5]).to    eq("  Opal::Deprecations defaults to warn\n")
+        expect(actual_output.lines[6]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m \n})
+        expect(actual_output.lines[7]).to    eq("  Opal::Deprecations can be set to raise\n")
       rescue RSpec::Expectations::ExpectationNotMetError
         warn $!.message
         warn "\n\n== Full output:\n#{actual_output}"
@@ -576,4 +583,3 @@ task :test_all => [:rspec, :mspec, :minitest]
 task(:cruby_tests) { warn "The task 'cruby_tests' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_cruby)  { warn "The task 'test_cruby' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_nodejs) { warn "The task 'test_nodejs' has been renamed to 'minitest_node_nodejs'."; exit 1 }
-

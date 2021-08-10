@@ -24,7 +24,7 @@ module Opal
         def handles(*extensions)
           @extensions = extensions
           matches = extensions.join('|')
-          matches = "(#{matches})" if extensions.size == 1
+          matches = "(#{matches})" unless extensions.size == 1
           @match_regexp = Regexp.new "\\.#{matches}#{REGEXP_END}"
 
           ::Opal::Builder.register_processor(self, extensions)

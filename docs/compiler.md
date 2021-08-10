@@ -21,7 +21,7 @@ The [opal parser][parser] relies on the `parser` gem, see debug/development docu
 The [opal compiler][compiler] takes these sexps from the parser
 and generates ruby code from them. Each type of sexp has [its own node type][base-node]
 used to generate javascript. Each node creates an array of one or more
-[fragments][fragments] which are the concatendated together to
+[fragments][fragments] which are the concatenated together to
 form the final javascript. Fragments are used as they contain the generated
 code as well as a reference back to the original sexp which is useful for
 generating source maps afterwards.

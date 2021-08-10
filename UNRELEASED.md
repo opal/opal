@@ -1,64 +1,50 @@
-<!--
-Whitespace conventions:
-- 4 spaces before ## titles
-- 2 spaces before ### titles
-- 1 spaces before normal text
--->
 
-### Added
-
-- Basic support for `uplevel:` keyword argument in `Kernel#warn` (#2006)
-- Added a `#respond_to_missing?` implementation for `BasicObject`, `Delegator`, `OpenStruct`, that's meant for future support in the Opal runtime, which currently ignores it (#2007)
-- `Opal::Compiler#magic_comments` that allows to access magic-comments format and converts it to a hash (#2038)
-- Use magic-comments to declare helpers required by the file (#2038)
-- `Opal.$$` is now a shortcut for `Opal.const_get_relative` (#2038)
-- `Opal.$$$` is now a shortcut for `Opal.const_get_qualified` (#2038)
-- Added support for `globalThis` as the generic global object accessor (#2047)
-- `Opal::Compiler#magic_comments` that allows to access magic-comments format and converts it to a hash
-- Use magic-comments to declare helpers required by the file
-- `Opal.$$` is now a shortcut for `Opal.const_get_relative`
-- `Opal.$$$` is now a shortcut for `Opal.const_get_qualified`
-- Source-map support for Node.js in the default runner (#2045)
+- Support for multiple arguments in Hash#{merge, merge!, update} (#2187)
+- Support for Ruby 3.0 forward arguments: `def a(...) puts(...) end` (#2153)
+- Support for beginless and endless ranges: `(1..)`, `(..1)` (#2150)
+- Preliminary support for `**nil` argument - see #2240 to note limitations (#2152)
+- Support for `Random::Formatters` which add methods `#{hex,base64,urlsafe_base64,uuid,random_float,random_number,alphanumeric}` to `Random` and `SecureRandom` (#2218)
+- Basic support for ObjectSpace finalizers and ObjectSpace::WeakMap (#2247)
+- A more robust support for encodings (especially binary strings) (#2235)
+- Support for `"\x80"` syntax in String literals (#2235)
+- Added `String#+@`, `String#-@` (#2235)
+- Support for `begin <CODE> end while <CONDITION>` (#2255)
+- Added Hash#except and `Hash#except!` (#2243)
+- Parser 3.0: Implement pattern matching (as part of this `{Array,Hash,Struct}#{deconstruct,deconstruct_keys} methods were added)` (#2243)
+- [experimental] Reimplement Promise to make it bridged with JS native Promise, this new implementation can be used by requiring `promise/v2` (#2220)
 
 
 ### Fixed
 
-- Struct#dup (#1995)
-- Integer#gcdlcm (#1972)
-- Enumerable#to_h (#1979)
-- Enumerator#size (#1980)
-- Enumerable#min (#1982)
-- Enumerable#min_by (#1985)
-- Enumerable#max_by (#1985)
-- Set#intersect? (#1988)
-- Set#disjoint? (#1988)
-- Set#keep_if (#1987)
-- Set#select! (#1987)
-- Set#reject! (#1987)
-- Module#alias_method (#1983)
-- Enumerable#minmax_by (#1981)
-- Enumerator#each_with_index (#1990)
-- Range#== (#1992)
-- Range#each (#1991)
-- Enumerable#zip (#1986)
-- Struct#dup not copying `$$data` (#1995)
-- Fixed usage of semicolon in single-line backticks (#2004)
-- Module#attr with multiple arguments (#2003)
-- `PathReader` used to try to read missing files instead of respecting the `missing_require_severity` configuration value (#2044)
-
+- Encoding lookup was working only with uppercase names, not giving any errors for wrong ones (#2181, #2183, #2190)
+- Fix `Number#to_i` with huge number (#2191)
+- Add regexp support to `String#start_with` (#2198)
+- `String#bytes` now works in strict mode (#2194)
+- Fix nested module inclusion (#2053)
+- SecureRandom is now cryptographically secure on most platforms (#2218, #2170)
+- Fix performance regression for `Array#unshift` on v8 > 7.1 (#2116)
+- String subclasses now call `#initialize` with multiple arguments correctly (with a limitation caused by the String immutability issue, that a source string must be the first argument and `#initialize` can't change its value) (#2238, #2185)
+- Number#step is moved to Numeric (#2100)
+- Fix class Class < superclass for invalid superclasses (#2123)
+- Fix `String#unpack("U*")` on binary strings with latin1 high characters, fix performance regression on that call (#2235, #2189, #2129, #2099, #2094, #2000, #2128)
+- Fix `String#to_json` output on some edge cases (#2235)
+- Rework class variables to support inheritance correctly (#2251)
+- ISO-8859-1 and US-ASCII encodings are now separated as in MRI (#2235)
+- `String#b` no longer modifies object strings in-place (#2235)
+- Parser::Builder::Default.check_lvar_name patch (#2195)
 
 ### Changed
 
-- Updated outdated parser version (#2013)
-- Nashorn has been deprecated but GraalVM still supports it (#1997)
-- "opal/mini" now includes "opal/io" (#2002)
-- Regexps assigned to constants are now frozen (#2007)
-- `Opal.$$` changed from being the constant cache of Object to being a shortcut for `Opal.const_get_relative` (#2038)
-- Moved REPL implementation from bin/ to its own lib/ file as `opal/repl.rb` (#2048)
-
+- `String#unpack`, `Array#pack`, `String#chars`, `String#length`, `Number#chr`, and (only partially) `String#+` are now encoding aware (#2235)
+- `String#inspect` now uses `\x` for binary stirngs (#2235)
+- `if RUBY_ENGINE == "opal"` and friends are now outputing less JS code (#2159, #1965)
+- `Array`: `to_a`, `slice`/`[]`, `uniq`, `*`, `difference`/`-`, `intersection`/`&`, `union`/`|`, flatten now return Array, not a subclass, as Ruby 3.0 does (#2237)
+- `Array`: `difference`, `intersection`, `union` now accept multiple arguments (#2237)
 
 ### Deprecated
 
-- Requiring nodejs/stacktrace has been deprecated, source-maps are already
-  supported by the default Node.js runner or by requiring https://github.com/evanw/node-source-map-support
-  before loading code compiled by Opal (#2045)
+- Stopped testing Opal on Ruby 2.5 since it reached EOL.
+
+### Removed
+
+- Removed support for the outdated `c_lexer`, it was optional and didn't work for the last few releases of parser (#2235)

@@ -33,7 +33,6 @@ module Opal
         end
 
         require 'rack'
-        require 'webrick'
         require 'logger'
 
         app = build_app(code)

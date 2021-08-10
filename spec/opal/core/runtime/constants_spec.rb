@@ -23,7 +23,7 @@ end
 
 describe "Inclusion of modules" do
   it "that have been included by other modules works" do
-    # here ClassC would have failed to be build due to a bug in Opal.append_features
+    # here ClassC would have failed to be created due to a bug in Opal.append_features
     module RuntimeFixtures
       class ClassC
         include ModuleA
