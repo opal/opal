@@ -52,20 +52,44 @@ module Opal
     class IFlipFlop < Base
       handle :iflipflop
 
+      children :from, :to
+
+      # Is this an exclusive flip flop? If no, run both branches
+      def excl
+        ""
+      end
+
+      # We create a function that we put in the top scope, that stores the state of our
+      # flip-flop. We pass to it functions that are ran with the current binding.
       def compile
-        # Unsupported
-        # Always compiles to 'true' to not break generated JS
-        push 'true'
+        helper :truthy
+
+        fun_name = top_scope.new_temp
+        ff = "#{fun_name}.$$ff"
+
+        push "(typeof #{fun_name} === 'undefined' ? (#{fun_name} = function(from, to){"
+        push "  if (typeof #{ff} === 'undefined') #{ff} = false;"
+        push "  var retval = #{ff};"
+        push "  if (!#{ff}) {"
+        push "    #{ff} = retval = $truthy(from());"
+        push "  }"
+        push "  #{excl}if (#{ff}) {"
+        push "    if ($truthy(to())) #{ff} = false;"
+        push "  }"
+        push "  return retval;"
+        push "}) : #{fun_name})("
+        push "  function() { ", stmt(compiler.returns(from)), " },"
+        push "  function() { ", stmt(compiler.returns(to)), " }"
+        push ")"
       end
     end
 
-    class EFlipFlop < Base
+    class EFlipFlop < IFlipFlop
       handle :eflipflop
 
-      def compile
-        # Unsupported
-        # Always compiles to 'true' to not break generated JS
-        push 'true'
+      # Is this an exclusive flip flop? If yes, run only a single branch
+      def excl
+        "else "
       end
     end
   end
