@@ -60,5 +60,9 @@ module JS
   end
   alias method_missing call
 
+  def [](name)
+    `Opal.global[#{name}]`
+  end
+
   extend self
 end

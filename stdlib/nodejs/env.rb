@@ -34,6 +34,13 @@ class << ENV
     }
   end
 
+  def fetch(key, default_value = undefined, &block)
+    return self[key] if key?(key)
+    return yield key if block_given?
+    return default_value unless `typeof(#{default_value}) === 'undefined'`
+    raise KeyError, 'key not found'
+  end
+
   def to_s
     'ENV'
   end
