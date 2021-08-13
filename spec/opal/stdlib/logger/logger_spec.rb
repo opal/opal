@@ -301,8 +301,17 @@ describe Logger do
       rescue => e
         message = e
       end
+
+      # Disable formatting for #full_message by making sure we are not on a tty
+      tty = $stderr.JS[:tty]
+      $stderr.JS[:tty] = false
+
       @logger.debug(message).should == true
-      @pipe.string.should =~ / message \(ArgumentError\)\nArgumentError: message\n  from /
+
+      # Restore a tty status
+      $stderr.JS[:tty] = tty
+
+      @pipe.string.should =~ / message \(ArgumentError\)\n\tfrom /
     end
   end
 end

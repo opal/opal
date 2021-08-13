@@ -145,7 +145,6 @@ opal_filter "Kernel" do
   fails "Kernel#raise accepts a cause keyword argument that overrides the last exception" # NoMethodError: undefined method `cause' for #<RuntimeError: error>
   fails "Kernel#raise accepts a cause keyword argument that sets the cause" # NoMethodError: undefined method `cause' for #<RuntimeError: error>
   fails "Kernel#raise passes no arguments to the constructor when given only an exception class" # Expected #<Class:0x4c8> but got: ArgumentError ([#initialize] wrong number of arguments(1 for 0))
-  fails "Kernel#raise raises RuntimeError if no exception class is given" # RuntimeError: RuntimeError
   fails "Kernel#raise raises an ArgumentError when only cause is given" # Expected ArgumentError but got: TypeError (exception class/object expected)
   fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
@@ -264,7 +263,6 @@ opal_filter "Kernel" do
   fails "Kernel#then returns a sized Enumerator when no block given" # NoMethodError: undefined method `then' for #<Object:0x22882>
   fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: false/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: false\n"
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
-  fails "Kernel#warn :uplevel keyword argument does not prepend caller information if the uplevel argument is too large" # Expected:   $stderr: "warning: foo\n"       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"
   fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: foo/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"
   fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: \n$/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: \n"
   fails "Kernel#warn :uplevel keyword argument raises if :category keyword is not nil and not convertible to symbol" # Expected TypeError but no exception was raised (nil was returned)

@@ -4,7 +4,7 @@ class IO
   SEEK_END = 2
 
   def tty?
-    @tty
+    `self.tty == true`
   end
 
   def closed?

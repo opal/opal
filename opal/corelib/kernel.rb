@@ -2,7 +2,7 @@
 
 module Kernel
   def method_missing(symbol, *args, &block)
-    raise NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args)
+    raise NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args), nil, caller(1)
   end
 
   def =~(obj)
@@ -94,19 +94,18 @@ module Kernel
 
   def caller(start = 1, length = nil)
     %x{
-      var stack, result
+      var stack, result;
 
-      stack = (new Error().stack || "").split("\n")
-      result = []
+      stack = new Error().$backtrace();
+      result = [];
 
-      // Skip the initial line ("Error:") and Kernel#caller with i=3
-      for (var i = 3, ii = stack.length; i < ii; i++) {
-        if (!stack[i].match("runtime.js")) {
-          result.push(stack[i].replace(/^ *\w+ +/, ''))
-          if (length && result.length == length) break
+      for (var i = #{start} + 1, ii = stack.length; i < ii; i++) {
+        if (!stack[i].match(/runtime\.js/)) {
+          result.push(stack[i]);
         }
       }
-      return result
+      if (length != nil) result = result.slice(0, length);
+      return result;
     }
   end
 
@@ -520,7 +519,7 @@ module Kernel
     if uplevel
       uplevel = Opal.coerce_to!(uplevel, Integer, :to_str)
       raise ArgumentError, "negative level (#{uplevel})" if uplevel < 0
-      location = caller(uplevel + 2, 1).first
+      location = caller(uplevel + 1, 1).first&.split(':in `')&.first
       location = "#{location}: " if location
       strs = strs.map { |s| "#{location}warning: #{s}" }
     end
@@ -528,26 +527,30 @@ module Kernel
     $stderr.puts(*strs) unless $VERBOSE.nil? || strs.empty?
   end
 
-  def raise(exception = undefined, string = nil, _backtrace = nil)
+  def raise(exception = undefined, string = nil, backtrace = nil)
     %x{
       if (exception == null && #{$!} !== nil) {
         throw #{$!};
       }
       if (exception == null) {
-        exception = #{RuntimeError.new};
+        exception = #{RuntimeError.new ''};
       }
-      else if (exception.$$is_string) {
-        exception = #{RuntimeError.new exception};
+      else if ($respond_to(exception, '$to_str')) {
+        exception = #{RuntimeError.new exception.to_str};
       }
       // using respond_to? and not an undefined check to avoid method_missing matching as true
-      else if (exception.$$is_class && #{exception.respond_to?(:exception)}) {
+      else if (exception.$$is_class && $respond_to(exception, '$exception')) {
         exception = #{exception.exception string};
       }
-      else if (#{exception.is_a?(Exception)}) {
+      else if (exception.$$is_exception) {
         // exception is fine
       }
       else {
         exception = #{TypeError.new 'exception class/object expected'};
+      }
+
+      if (backtrace !== nil) {
+        exception.$set_backtrace(backtrace);
       }
 
       if (#{$!} !== nil) {
@@ -555,6 +558,7 @@ module Kernel
       }
 
       #{$!} = exception;
+      #{$@} = #{`exception`.backtrace};
 
       throw exception;
     }
@@ -687,15 +691,16 @@ module Kernel
     "#<#{self.class}:0x#{__id__.to_s(16)}>"
   end
 
-  def catch(sym)
-    yield
+  def catch(tag = nil)
+    tag ||= Object.new
+    yield(tag)
   rescue UncaughtThrowError => e
-    return e.arg if e.sym == sym
+    return e.value if e.tag == tag
     raise
   end
 
-  def throw(*args)
-    raise UncaughtThrowError, args
+  def throw(tag, obj = nil)
+    raise UncaughtThrowError.new(tag, obj)
   end
 
   # basic implementation of open, delegate to File.open

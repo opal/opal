@@ -111,6 +111,35 @@ class Thread
       @storage.each(&block)
     end
   end
+
+  class Backtrace
+    class Location
+      def initialize(str)
+        @str = str
+
+        str =~ /^(.*?):(\d+):(\d+):in `(.*?)'$/
+        @path = Regexp.last_match(1)
+        @label = Regexp.last_match(4)
+        @lineno = Regexp.last_match(2).to_i
+
+        @label =~ /(\w+)$/
+        @base_label = Regexp.last_match(1) || @label
+      end
+
+      def to_s
+        @str
+      end
+
+      def inspect
+        @str.inspect
+      end
+
+      attr_reader :base_label, :label, :lineno, :path
+
+      # TODO: Make it somehow provide the absolute path.
+      alias absolute_path path
+    end
+  end
 end
 
 Queue = Thread::Queue

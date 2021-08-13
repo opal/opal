@@ -111,7 +111,14 @@
   // @private
   // Pops an exception from the stack and updates `$!`.
   Opal.pop_exception = function() {
-    Opal.gvars["!"] = Opal.exceptions.pop() || nil;
+    var exception = Opal.exceptions.pop();
+    if (exception) {
+      Opal.gvars["!"] = exception;
+      Opal.gvars["@"] = exception.$backtrace();
+    }
+    else {
+      Opal.gvars["!"] = Opal.gvars["@"] = nil;
+    }
   };
 
   // Inspect any kind of object, including non Ruby ones

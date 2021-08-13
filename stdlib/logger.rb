@@ -24,7 +24,7 @@ class Logger
       when ::String
         msg
       when ::Exception
-        "#{msg.message} (#{msg.class})\n" + (msg.backtrace || []).join("\n")
+        msg.full_message
       else
         msg.inspect
       end
