@@ -176,7 +176,7 @@ module Opal
       end
 
       def compile_eval_var
-        push "#{meth}"
+        push meth.to_s
       end
 
       # a variable reference in irb mode in top scope might be a var ref,
@@ -310,17 +310,34 @@ module Opal
         push ')' if push_nesting
       end
 
+      # This can be refactored in terms of binding, but it would 'corelib/binding'
+      # to be required in existing code.
       add_special :eval do |compile_default|
         next compile_default.call if arglist.children.length != 1 || ![s(:self), nil].include?(recvr)
 
         temp = scope.new_temp
         scope_variables = scope.scope_locals.map(&:to_s).inspect
-        push "(#{temp} = "
-        push expr(arglist)
+        push "(#{temp} = ", expr(arglist)
         push ", typeof Opal.compile === 'function' ? eval(Opal.compile(#{temp}"
         push ', {scope_variables: ', scope_variables
         push ", arity_check: #{compiler.arity_check?}, file: '(eval)', eval: true})) : "
         push "self.$eval(#{temp}))"
+      end
+
+      add_special :binding do
+        push "Opal.Binding.$new("
+        push "  function($code, $value) {"
+        push "    if (typeof $value === 'undefined') {"
+        push "      return eval($code);"
+        push "    }"
+        push "    else {"
+        push "      return eval($code + ' = $value');"
+        push "    }"
+        push "  },"
+        push "  ", scope.scope_locals.map(&:to_s).inspect, ","
+        push "  self,"
+        push "  ", source_location
+        push ")"
       end
 
       def push_nesting?

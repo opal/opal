@@ -71,11 +71,7 @@ opal_filter "Kernel" do
   fails "Kernel#eval activates refinements from the binding" # NoMethodError: undefined method `refine' for #<Module:0x1ad8>
   fails "Kernel#eval activates refinements from the eval scope" # NoMethodError: undefined method `refine' for #<Module:0x20d4>
   fails "Kernel#eval allows a binding to be captured inside an eval"
-  fails "Kernel#eval allows creating a new class in a binding created by #eval"
-  fails "Kernel#eval allows creating a new class in a binding"
   fails "Kernel#eval can be aliased"
-  fails "Kernel#eval does not alter the value of __FILE__ in the binding"
-  fails "Kernel#eval does not make Proc locals visible to evaluated code"
   fails "Kernel#eval does not share locals across eval scopes"
   fails "Kernel#eval doesn't accept a Proc object as a binding"
   fails "Kernel#eval evaluates string with given filename and negative linenumber" # NameError: uninitialized constant TOPLEVEL_BINDING
@@ -86,7 +82,6 @@ opal_filter "Kernel" do
   fails "Kernel#eval updates a local in a scope above when modified in a nested block scope"
   fails "Kernel#eval updates a local in a surrounding block scope"
   fails "Kernel#eval updates a local in an enclosing scope"
-  fails "Kernel#eval uses (eval) filename if none is provided" # NoMethodError: undefined method `binding' for #<MSpecEnv:0x50788>
   fails "Kernel#eval uses the filename of the binding if none is provided"
   fails "Kernel#eval uses the same scope for local variables when given the same binding"
   fails "Kernel#eval with a magic encoding comment allows a magic encoding comment and a frozen_string_literal magic comment on the same line in emacs style" # Opal::SyntaxError: unexpected token $end

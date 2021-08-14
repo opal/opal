@@ -59,7 +59,6 @@ opal_filter "language" do
   fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
   fails "A method assigns the last Hash to the last optional argument if the Hash contains non-Symbol keys and is not passed as keywords" # Exception: Object.defineProperty called on non-object
   fails "A method definition in an eval creates a class method"
-  fails "A method definition in an eval creates a singleton method"
   fails "A method definition in an eval creates an instance method"
   fails "A method raises ArgumentError if passing hash as keyword arguments for definition 'def m(a: nil); a; end'" # Expected ArgumentError but no exception was raised (1 was returned)
   fails "A method when passing an empty keyword splat to a method that does not accept keywords for definition 'def m(*a); a; end'" # Expected [{}] == [] to be truthy but was false
@@ -304,7 +303,6 @@ opal_filter "language" do
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with exclusive-end range"
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with inclusive-end range"
   fails "The or operator has a lower precedence than 'next' in 'next true or false'"
-  fails "The predefined global constants includes TOPLEVEL_BINDING"
   fails "The redo statement in a method is invalid and raises a SyntaxError" # Expected SyntaxError but no exception was raised ("m" was returned)
   fails "The redo statement triggers ensure block when re-executing a block"
   fails "The rescue keyword allows rescue in 'do end' block" # NoMethodError: undefined method `call' for nil

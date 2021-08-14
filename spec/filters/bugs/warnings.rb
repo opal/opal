@@ -19,10 +19,6 @@ opal_filter "warnings" do
   fails "Regexp.new given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/
   fails "String#split with String when $; is not nil warns" # Expected warning to match: /warning: \$; is set to non-nil value/ but got: ""
   fails "Struct.new overwrites previously defined constants with string as first argument" # Expected warning to match: /redefining constant/
-  fails "The defined? keyword for a variable scoped constant returns 'constant' if the constant is defined in the scope of the class variable" # Expected warning to match: /class variable access from toplevel/
-  fails "The defined? keyword for a variable scoped constant returns nil if the class scoped constant is not defined" # Expected warning to match: /class variable access from toplevel/
-  fails "The defined? keyword for an expression with logical connectives returns nil for an expression with '!' and an unset class variable" # Expected warning to match: /class variable access from toplevel/
-  fails "The defined? keyword for an expression with logical connectives returns nil for an expression with 'not' and an unset class variable" # Expected warning to match: /class variable access from toplevel/
   fails "The for expression allows a constant as an iterator name" # Expected warning to match: /already initialized constant/
   fails "The predefined global constants includes FALSE" # Expected warning to match: /constant ::FALSE is deprecated/
   fails "The predefined global constants includes NIL" # Expected warning to match: /constant ::NIL is deprecated/
