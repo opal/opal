@@ -175,6 +175,10 @@ module Opal
         false
       end
 
+      def scope_locals
+        @locals | @args | (@parent && @type == :iter ? @parent.scope_locals : [])
+      end
+
       def add_scope_temp(tmp)
         return if has_temp?(tmp)
 

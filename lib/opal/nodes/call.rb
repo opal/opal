@@ -45,6 +45,9 @@ module Opal
         handle_special do
           compiler.method_calls << meth.to_sym if record_method?
 
+          # if trying to access an lvar in eval mode
+          return compile_eval_var if using_eval?
+
           # if trying to access an lvar in irb mode
           return compile_irb_var if using_irb?
 
@@ -172,10 +175,22 @@ module Opal
         end
       end
 
+      def compile_eval_var
+        push "#{meth}"
+      end
+
       # a variable reference in irb mode in top scope might be a var ref,
       # or it might be a method call
       def using_irb?
-        @compiler.irb? && scope.top? && arglist == s(:arglist) && recvr.nil? && iter.nil?
+        @compiler.irb? && scope.top? && variable_like?
+      end
+
+      def using_eval?
+        @compiler.eval? && scope.top? && @compiler.scope_variables.include?(meth)
+      end
+
+      def variable_like?
+        arglist == s(:arglist) && recvr.nil? && iter.nil?
       end
 
       def sexp_with_arglist
@@ -293,6 +308,19 @@ module Opal
         push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
         compile_default.call
         push ')' if push_nesting
+      end
+
+      add_special :eval do |compile_default|
+        next compile_default.call if arglist.children.length != 1 || ![s(:self), nil].include?(recvr)
+
+        temp = scope.new_temp
+        scope_variables = scope.scope_locals.map(&:to_s).inspect
+        push "(#{temp} = "
+        push expr(arglist)
+        push ", typeof Opal.compile === 'function' ? eval(Opal.compile(#{temp}"
+        push ', {scope_variables: ', scope_variables
+        push ", arity_check: #{compiler.arity_check?}, file: '(eval)', eval: true})) : "
+        push "self.$eval(#{temp}))"
       end
 
       def push_nesting?
