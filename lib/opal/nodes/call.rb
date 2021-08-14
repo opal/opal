@@ -45,7 +45,7 @@ module Opal
         handle_special do
           compiler.method_calls << meth.to_sym if record_method?
 
-          # if trying to access an lvar in eval mode
+          # if trying to access an lvar in eval or irb mode
           return compile_eval_var if using_eval?
 
           # if trying to access an lvar in irb mode
@@ -84,8 +84,14 @@ module Opal
         iter || splat?
       end
 
+      def invoke_using_refinement?
+        !scope.scope.collect_refinements_temps.empty?
+      end
+
       def default_compile
-        if invoke_using_send?
+        if invoke_using_refinement?
+          compile_using_refined_send
+        elsif invoke_using_send?
           compile_using_send
         else
           compile_simple_call_chain
@@ -105,6 +111,25 @@ module Opal
         helper :send
 
         push '$send('
+        compile_receiver
+        compile_method_name
+        compile_arguments
+        compile_block_pass
+        push ')'
+      end
+
+      # Compiles method call using `Opal.refined_send`
+      #
+      # @example
+      #   a.b(c, &block)
+      #
+      #   Opal.refined_send(a, 'b', [c], block, [[Opal.MyRefinements]])
+      #
+      def compile_using_refined_send
+        helper :refined_send
+
+        push '$refined_send('
+        compile_refinements
         compile_receiver
         compile_method_name
         compile_arguments
@@ -136,6 +161,11 @@ module Opal
         if iter
           push ', ', expr(iter)
         end
+      end
+
+      def compile_refinements
+        refinements = scope.collect_refinements_temps.map { |i| s(:js_tmp, i) }
+        push expr(s(:array, *refinements)), ', '
       end
 
       def compile_break_catcher
@@ -285,6 +315,24 @@ module Opal
           push fragment scope.mid.to_s.inspect
         else
           push fragment 'nil'
+        end
+      end
+
+      # Refinements support
+      add_special :using do |compile_default|
+        if scope.accepts_using? && arglist.children.count == 1
+          using_refinement(arglist.children.first)
+        else
+          compile_default.call
+        end
+      end
+
+      def using_refinement(arg)
+        prev, curr = *scope.refinements_temp
+        if prev
+          push "(#{curr} = #{prev}.slice(), #{curr}.push(", expr(arg), '), self)'
+        else
+          push "(#{curr} = [", expr(arg), '], self)'
         end
       end
 

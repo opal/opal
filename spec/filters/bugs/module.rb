@@ -71,8 +71,7 @@ opal_filter "Module" do
   fails "Module#autoload when changing $LOAD_PATH does not reload a file due to a different load path"
   fails "Module#autoload? returns nil if no file has been registered for a constant"
   fails "Module#autoload? returns the name of the file that will be autoloaded"
-  fails "Module#class_eval activates refinements from the eval scope with block" # NoMethodError: undefined method `refine' for #<Module:0x89ba>
-  fails "Module#class_eval activates refinements from the eval scope" # NoMethodError: undefined method `refine' for #<Module:0x90be>
+  fails "Module#class_eval activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<ModuleSpecs::NamedClass:0x4a168>
   fails "Module#class_eval converts a non-string filename to a string using to_str"
   fails "Module#class_eval converts non string eval-string to string using to_str"
   fails "Module#class_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
@@ -160,8 +159,7 @@ opal_filter "Module" do
   fails "Module#method_defined? returns true if a public or private method with the given name is defined in self, self's ancestors or one of self's included modules"
   fails "Module#method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.method_defined?] wrong number of arguments(2 for 1)
   fails "Module#method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.method_defined?] wrong number of arguments(2 for 1)
-  fails "Module#module_eval activates refinements from the eval scope with block" # NoMethodError: undefined method `refine' for #<Module:0x81e0>
-  fails "Module#module_eval activates refinements from the eval scope" # NoMethodError: undefined method `refine' for #<Module:0x88e4>
+  fails "Module#module_eval activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<ModuleSpecs::NamedClass:0x81f82>
   fails "Module#module_eval converts a non-string filename to a string using to_str"
   fails "Module#module_eval converts non string eval-string to string using to_str"
   fails "Module#module_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
@@ -197,62 +195,32 @@ opal_filter "Module" do
   fails "Module#protected_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
   fails "Module#protected_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
   fails "Module#public_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
-  fails "Module#refine accepts a module as argument" # NoMethodError: undefined method `refine' for #<Module:0x4c172>
-  fails "Module#refine adds methods defined in its block to the anonymous module's public instance methods" # NoMethodError: undefined method `refine' for #<Module:0x3ae64>
-  fails "Module#refine and alias aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab4>
-  fails "Module#refine and alias_method aliases a method within a refinement module, but not outside it" # NoMethodError: undefined method `refine' for #<Module:0x1aab0>
-  fails "Module#refine and instance_methods returns a list of methods including those of the refined module" # NoMethodError: undefined method `refine' for #<Module:0x228>
-  fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae7a>
-  fails "Module#refine applies refinements to the module" # NoMethodError: undefined method `refine' for #<Module:0x22c>
-  fails "Module#refine does not apply refinements to external scopes not using the module" # NoMethodError: undefined method `refine' for #<Module:0x3ae60>
-  fails "Module#refine does not list methods defined only in refinement" # NoMethodError: undefined method `refine' for #<Module:0x1e042>
-  fails "Module#refine does not make available methods from another refinement module" # NoMethodError: undefined method `refine' for #<Module:0x3ae8c>
-  fails "Module#refine does not override methods in subclasses" # NoMethodError: undefined method `refine' for #<Module:0x3ae56>
-  fails "Module#refine doesn't apply refinements outside the refine block" # NoMethodError: undefined method `refine' for #<Module:0x3ae72>
-  fails "Module#refine for methods accessed indirectly is honored by &" # NoMethodError: undefined method `refine' for #<Module:0x4b006>
-  fails "Module#refine for methods accessed indirectly is honored by BasicObject#__send__" # NoMethodError: undefined method `refine' for #<Module:0x3aeb2>
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#binding" # NoMethodError: undefined method `refine' for #<Module:0x3aeaa>
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NoMethodError: undefined method `refine' for #<Module:0x3a6b2>
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#method" # NoMethodError: undefined method `refine' for #<Module:0x4b00a>
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_method" # NoMethodError: undefined method `refine' for #<Module:0x3a6b6>
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_send" # NoMethodError: undefined method `refine' for #<Module:0x4b00e>
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#respond_to?" # NoMethodError: undefined method `refine' for #<Module:0x4b016>
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # NoMethodError: undefined method `refine' for #<Module:0x3aeae>
-  fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # NoMethodError: undefined method `refine' for #<Module:0x3aeba>
-  fails "Module#refine for methods accessed indirectly is honored by string interpolation" # NoMethodError: undefined method `refine' for #<Module:0x3aeb6>
-  fails "Module#refine for methods accessed indirectly is not honored by &" # NoMethodError: undefined method `refine' for #<Module:0x21e9c>
-  fails "Module#refine for methods accessed indirectly is not honored by Kernel#instance_method" # NoMethodError: undefined method `refine' for #<Module:0x4c176>
-  fails "Module#refine for methods accessed indirectly is not honored by Kernel#method" # NoMethodError: undefined method `refine' for #<Module:0x3aec0>
-  fails "Module#refine for methods accessed indirectly is not honored by Kernel#public_send" # NoMethodError: undefined method `refine' for #<Module:0x21ea0>
-  fails "Module#refine for methods accessed indirectly is not honored by Kernel#respond_to?" # NoMethodError: undefined method `refine' for #<Module:0x3aea6>
-  fails "Module#refine makes available all refinements from the same module" # NoMethodError: undefined method `refine' for #<Module:0x3ae88>
-  fails "Module#refine method lookup looks in included modules from the refinement then" # NoMethodError: undefined method `refine' for #<Module:0x3aea0>
-  fails "Module#refine method lookup looks in later included modules of the refined module first" # NoMethodError: undefined method `refine' for #<Module:0x230>
-  fails "Module#refine method lookup looks in prepended modules from the refinement first" # NoMethodError: undefined method `refine' for #<Module:0x3ae98>
-  fails "Module#refine method lookup looks in refinement then" # NoMethodError: undefined method `refine' for #<Module:0x3ae94>
-  fails "Module#refine method lookup looks in the class then" # NoMethodError: undefined method `refine' for #<Module:0x3ae90>
-  fails "Module#refine method lookup looks in the included modules for builtin methods" # NoMethodError: undefined method `insert' for "rubyexe.rb"
-  fails "Module#refine method lookup looks in the object singleton class first" # NoMethodError: undefined method `refine' for #<Module:0x3ae9c>
-  fails "Module#refine module inclusion activates all refinements from all ancestors" # NoMethodError: undefined method `refine' for #<Module:0x3aed4>
-  fails "Module#refine module inclusion overrides methods of ancestors by methods in descendants" # NoMethodError: undefined method `refine' for #<Module:0x3aed0>
-  fails "Module#refine raises ArgumentError if not given a block" # NoMethodError: undefined method `refine' for #<Module:0x3ae5c>
-  fails "Module#refine raises ArgumentError if not passed an argument" # NoMethodError: undefined method `refine' for #<Module:0x3ae80>
-  fails "Module#refine raises TypeError if not passed a class" # NoMethodError: undefined method `refine' for #<Module:0x3ae6e>
-  fails "Module#refine returns created anonymous module" # NoMethodError: undefined method `refine' for #<Module:0x3ae68>
-  fails "Module#refine runs its block in an anonymous module" # NoMethodError: undefined method `refine' for #<Module:0x3ae76>
-  fails "Module#refine uses the same anonymous module for future refines of the same class" # NoMethodError: undefined method `refine' for #<Module:0x3ae84>
-  fails "Module#refine when super is called in a refinement does't have access to active refinements for C from included module" # NoMethodError: undefined method `refine' for #<Module:0x242>
-  fails "Module#refine when super is called in a refinement does't have access to other active refinements from included module" # NoMethodError: undefined method `refine' for #<Module:0x24a>
-  fails "Module#refine when super is called in a refinement looks in the another active refinement if super called from included modules" # NoMethodError: undefined method `refine' for #<Module:0x252>
-  fails "Module#refine when super is called in a refinement looks in the current active refinement from included modules" # NoMethodError: undefined method `refine' for #<Module:0x256>
-  fails "Module#refine when super is called in a refinement looks in the included to refinery module" # NoMethodError: undefined method `refine' for #<Module:0x3aec8>
-  fails "Module#refine when super is called in a refinement looks in the lexical scope refinements before other active refinements" # NoMethodError: undefined method `refine' for #<Module:0x236>
-  fails "Module#refine when super is called in a refinement looks in the refined ancestors from included module" # NoMethodError: undefined method `refine' for #<Module:0x23e>
-  fails "Module#refine when super is called in a refinement looks in the refined class even if there is another active refinement" # NoMethodError: undefined method `refine' for #<Module:0x3aec4>
-  fails "Module#refine when super is called in a refinement looks in the refined class first if called from refined method" # NoMethodError: undefined method `refine' for #<Module:0x246>
-  fails "Module#refine when super is called in a refinement looks in the refined class from included module" # NoMethodError: undefined method `refine' for #<Module:0x23a>
-  fails "Module#refine when super is called in a refinement looks in the refined class" # NoMethodError: undefined method `refine' for #<Module:0x3aecc>
-  fails "Module#refine when super is called in a refinement looks only in the refined class even if there is another active refinement" # NoMethodError: undefined method `refine' for #<Module:0x24e>
+  fails "Module#refine and alias aliases a method within a refinement module, but not outside it" # NameError: undefined method `count' for class `'
+  fails "Module#refine and alias_method aliases a method within a refinement module, but not outside it" # NameError: undefined method `count' for class `'
+  fails "Module#refine and instance_methods returns a list of methods including those of the refined module" # Expected ["to_json_format",  "initialize",  "&",  "|",  "*",  "+",  "-",  "<<",  "<=>",  "==",  "[]",  "[]=",  "any?",  "assoc",  "at",  "bsearch_index",  "bsearch",  "cycle",  "clear",  "count",  "initialize_copy",  "collect",  "collect!",  "combination",  "repeated_combination",  "compact",  "compact!",  "concat",  "delete",  "delete_at",  "delete_if",  "difference",  "dig",  "drop",  "dup",  "each",  "each_index",  "empty?",  "eql?",  "fetch",  "fill",  "first",  "flatten",  "flatten!",  "hash",  "include?",  "index",  "insert",  "inspect",  "intersection",  "join",  "keep_if",  "last",  "length",  "map",  "map!",  "max",  "min",  "permutation",  "repeated_permutation",  "pop",  "product",  "push",  "append",  "rassoc",  "reject",  "reject!",  "replace",  "reverse",  "reverse!",  "reverse_each",  "rindex",  "rotate",  "rotate!",  "sample",  "select",  "select!",  "filter",  "filter!",  "shift",  "size",  "shuffle",  "shuffle!",  "slice",  "slice!",  "sort",  "sort!",  "sort_by!",  "take",  "take_while",  "to_a",  "to_ary",  "to_h",  "to_s",  "transpose",  "union",  "uniq",  "uniq!",  "unshift",  "prepend",  "values_at",  "zip",  "instance_variables",  "pack",  "pretty_print",  "pretty_print_cycle",  "__marshal__",  "deconstruct",  "all?",  "chunk",  "chunk_while",  "collect_concat",  "detect",  "drop_while",  "each_cons",  "each_entry",  "each_slice",  "each_with_index",  "each_with_object",  "entries",  "filter_map",  "find",  "find_all",  "find_index",  "flat_map",  "grep",  "grep_v",  "group_by",  "inject",  "lazy",  "enumerator_size",  "max_by",  "member?",  "min_by",  "minmax",  "minmax_by",  "none?",  "one?",  "partition",  "reduce",  "slice_before",  "slice_after",  "slice_when",  "sort_by",  "sum",  "tally",  "to_set",  "require",  "using",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "unpack_format",  "toplevel_define_other_method",  "some_toplevel_method",  "public_toplevel_method",  "main_public_method",  "main_public_method2",  "main_private_method",  "main_private_method2",  "check_autoload",  "defined_specs_method",  "defined_specs_receiver",  "expect",  "eq",  "pretty_print_instance_variables",  "pretty_print_inspect",  "method_missing",  "=~",  "!~",  "===",  "method",  "methods",  "public_methods",  "Array",  "at_exit",  "caller",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "initialize_clone",  "define_singleton_method",  "initialize_dup",  "enum_for",  "to_enum",  "equal?",  "exit",  "extend",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "kind_of?",  "lambda",  "load",  "loop",  "nil?",  "object_id",  "printf",  "proc",  "puts",  "p",  "print",  "warn",  "raise",  "fail",  "rand",  "respond_to?",  "respond_to_missing?",  "require_relative",  "require_tree",  "send",  "public_send",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "catch",  "throw",  "open",  "yield_self",  "then",  "format",  "sprintf",  "Complex",  "Rational",  "freeze",  "frozen?",  "taint",  "untaint",  "tainted?",  "private_methods",  "private_instance_methods",  "eval",  "node_require",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "binding",  "BigDecimal",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel",  "__send__",  "!=",  "__id__",  "!",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined"] == [] to be truthy but was false
+  fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `foo' for "hello"
+  fails "Module#refine does not override methods in subclasses" # Expected "foo from refinement" == "foo from subclass" to be truthy but was false
+  fails "Module#refine for methods accessed indirectly is honored by BasicObject#__send__" # Expected "foo" == "foo from refinement" to be truthy but was false
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NameError: undefined method `foo' for class `'
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#method" # NameError: undefined method `foo' for class `#<Class:0x87710>'
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_method" # NoMethodError: undefined method `public_method' for #<#<Class:0x1b194>:0x1b196>
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_send" # Expected "foo" == "foo from refinement" to be truthy but was false
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#respond_to?" # Expected false == true to be truthy but was false
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # Expected "foo" == "foo from refinement" to be truthy but was false
+  fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc"
+  fails "Module#refine for methods accessed indirectly is honored by string interpolation"
+  fails "Module#refine looks in the included modules for builtin methods"
+  fails "Module#refine makes available all refinements from the same module" # NoMethodError: undefined method `dump' for "1"
+  fails "Module#refine method lookup looks in the included modules for builtin methods" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1aaee>
+  fails "Module#refine method lookup looks in the object singleton class first" # Expected "foo from refinement" == "foo from singleton class" to be truthy but was false
+  fails "Module#refine module inclusion activates all refinements from all ancestors" # NoMethodError: undefined method `to_json_format' for 5
+  fails "Module#refine module inclusion overrides methods of ancestors by methods in descendants" # NoMethodError: undefined method `to_json_format' for 5
+  fails "Module#refine raises ArgumentError if not given a block" # Expected ArgumentError but got: LocalJumpError (no block given)
+  fails "Module#refine raises TypeError if not passed a class" # Expected TypeError but no exception was raised (#<Module:0x1abe8> was returned)
+  fails "Module#refine when super is called in a refinement looks in the another active refinement if super called from included modules" # Expected ["B", "C"] == ["B", "A", "C"] to be truthy but was false
+  fails "Module#refine when super is called in a refinement looks in the current active refinement from included modules" # Expected ["B", "C"] == ["B", "A", "LAST", "C"] to be truthy but was false
+  fails "Module#refine when super is called in a refinement looks in the included to refinery module" # Expected "foo" == "foo from included module" to be truthy but was false
+  fails "Module#refine when super is called in a refinement looks in the lexical scope refinements before other active refinements" # Expected ["A", "C"] == ["A", "LOCAL", "C"] to be truthy but was false
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#remove_const returns nil when removing autoloaded constant"
@@ -274,23 +242,12 @@ opal_filter "Module" do
   fails "Module#undef_method raises a NameError when passed a missing name for a metaclass" # Expected NameError (/undefined method `not_exist' for class `String'/) but got: NameError (method 'not_exist' not defined in )
   fails "Module#undef_method raises a NameError when passed a missing name for a module" # Expected NameError (/undefined method `not_exist' for module `#<Module:0xa502>'/) but got: NameError (method 'not_exist' not defined in )
   fails "Module#undef_method raises a NameError when passed a missing name for a singleton class" # Expected NameError (/undefined method `not_exist' for class `#<Class:#<:0xa51a>>'/) but got: NameError (method 'not_exist' not defined in )
-  fails "Module#using accepts module as argument" # NoMethodError: undefined method `refine' for #<Module:0x2a040>
-  fails "Module#using accepts module without refinements" # Expected to not get Exception but got NoMethodError (undefined method `using' for #<Module:0x2a02a>)
-  fails "Module#using activates refinement even for existed objects" # NoMethodError: undefined method `refine' for #<Module:0x2a052>
-  fails "Module#using activates updates when refinement reopens later" # NoMethodError: undefined method `refine' for #<Module:0x2a018>
-  fails "Module#using does not accept class" # NoMethodError: undefined method `using' for #<Module:0x2a03c>
-  fails "Module#using imports class refinements from module into the current class/module" # NoMethodError: undefined method `refine' for #<Module:0x2a02e>
-  fails "Module#using raises TypeError if passed something other than module" # NoMethodError: undefined method `using' for #<Module:0x2a034>
-  fails "Module#using raises error in method scope" # NoMethodError: undefined method `using' for #<Module:0x2a044>
-  fails "Module#using returns self" # NoMethodError: undefined method `using' for #<Module:0x2a022>
-  fails "Module#using scope of refinement is active for block called via instance_eval" # NoMethodError: undefined method `refine' for #<Module:0x102>
-  fails "Module#using scope of refinement is active for block called via instance_exec" # NoMethodError: undefined method `refine' for #<Module:0xfe>
-  fails "Module#using scope of refinement is active for class defined via Class.new {}" # NoMethodError: undefined method `refine' for #<Module:0x106>
-  fails "Module#using scope of refinement is active for method defined in a scope wherever it's called" # NoMethodError: undefined method `refine' for #<Module:0x2a06a>
-  fails "Module#using scope of refinement is active for module defined via Module.new {}" # NoMethodError: undefined method `refine' for #<Module:0x10a>
-  fails "Module#using scope of refinement is active until the end of current class/module" # NoMethodError: undefined method `refine' for #<Module:0x2a07a>
-  fails "Module#using scope of refinement is not active before the `using` call" # NoMethodError: undefined method `refine' for #<Module:0x2a05e>
-  fails "Module#using scope of refinement is not active for code defined outside the current scope" # NoMethodError: undefined method `refine' for #<Module:0x2a072>
-  fails "Module#using scope of refinement is not active when class/module reopens" # NoMethodError: undefined method `refine' for #<Module:0x2a056>
-  fails "Module#using works in classes too" # NoMethodError: undefined method `refine' for #<Module:0x2a01c>
+  fails "Module#using does not accept class" # Expected TypeError but no exception was raised (#<Module:0x3dd76> was returned)
+  fails "Module#using imports class refinements from module into the current class/module" # NoMethodError: undefined method `foo' for 1
+  fails "Module#using raises TypeError if passed something other than module" # Expected TypeError but no exception was raised (#<Module:0x3dd66> was returned)
+  fails "Module#using scope of refinement is active for block called via instance_eval" # TypeError: can't define singleton
+  fails "Module#using scope of refinement is active for block called via instance_exec" # NoMethodError: undefined method `foo' for 1
+  fails "Module#using scope of refinement is active for class defined via Class.new {}" # NoMethodError: undefined method `foo' for 1
+  fails "Module#using scope of refinement is active for module defined via Module.new {}" # NoMethodError: undefined method `foo' for 1
+  fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1
 end

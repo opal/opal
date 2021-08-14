@@ -1,6 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Binding" do
-  fails " " # NoMethodError: undefined method `refine' for BindingSpecs::AddFooToString
   fails "Binding#clone is a shallow copy of the Binding object" # NoMethodError: undefined method `a' for #<BindingSpecs::Demo:0x1c7b0>
   fails "Binding#clone returns a copy of the Binding object" # NoMethodError: undefined method `a' for #<BindingSpecs::Demo:0x1c958>
   fails "Binding#dup is a shallow copy of the Binding object" # NoMethodError: undefined method `a' for #<BindingSpecs::Demo:0x67b30>

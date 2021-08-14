@@ -93,6 +93,8 @@ ruby/core/kernel
 !ruby/core/kernel/untrusted_spec
 !ruby/core/kernel/untrust_spec
 
+ruby/core/main
+
 ruby/core/matchdata
 ruby/core/math
 

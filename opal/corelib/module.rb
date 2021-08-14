@@ -678,4 +678,30 @@ class Module
       }
     }
   end
+
+  def refine(mod, &block)
+    s, m, mod_id = self, nil, nil
+    %x{
+      mod_id = Opal.id(mod);
+      if (typeof self.$$refine_modules === "undefined") {
+        self.$$refine_modules = {};
+      }
+      if (typeof self.$$refine_modules[mod_id] === "undefined") {
+        m = self.$$refine_modules[mod_id] = #{::Module.new};
+      }
+      else {
+        m = self.$$refine_modules[mod_id];
+      }
+    }
+    m.define_singleton_method :inspect do
+      "#<refinement:#{mod.inspect}@#{s.inspect}>"
+    end
+    m.class_exec(&block)
+    m
+  end
+
+  # Compiler overrides this method
+  def using(mod)
+    raise 'Module#using is not permitted in methods'
+  end
 end

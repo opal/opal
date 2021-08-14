@@ -1806,6 +1806,44 @@
     return body.apply(recv, args);
   };
 
+  Opal.refined_send = function(refinement_groups, recv, method, args, block) {
+    var i, j, k, ancestors, ancestor, refinements, refinement, refine_modules, refine_module, body;
+
+    if (recv.hasOwnProperty('$$meta')) {
+      ancestors = Opal.ancestors(recv.$$meta);
+    } else {
+      ancestors = Opal.ancestors(recv.$$class);
+    }
+
+    // For all ancestors that there are, starting from the closest to the furthest...
+    for (i = 0; i < ancestors.length; i++) {
+      ancestor = Opal.id(ancestors[i]);
+      // For all refinement groups there are, starting from the closest scope to the furthest...
+      for (j = 0; j < refinement_groups.length; j++) {
+        refinements = refinement_groups[j];
+        // For all refinements there are, starting from the last `using` call to the furthest...
+        for (k = refinements.length - 1; k >= 0; k--) {
+          refinement = refinements[k];
+          if (typeof refinement.$$refine_modules === 'undefined') continue;
+          // A single module being given as an argument of the `using` call contains multiple
+          // refinement modules
+          refine_modules = refinement.$$refine_modules;
+          // Does this module refine a given call for a given ancestor module?
+          if (typeof refine_modules[ancestor] !== 'undefined') {
+            refine_module = refine_modules[ancestor];
+            // Does this module define a method we want to call?
+            if (typeof refine_module.$$prototype['$'+method] !== 'undefined') {
+              body = refine_module.$$prototype['$'+method];
+              return Opal.send2(recv, body, method, args, block);
+            }
+          }
+        }
+      }
+    }
+
+    return Opal.send(recv, method, args, block);
+  };
+
   Opal.lambda = function(block) {
     block.$$is_lambda = true;
     return block;

@@ -348,6 +348,9 @@ opal_filter "language" do
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block"
   fails "self.send(:block_given?) returns true if and only if a block is supplied"
   fails "top-level constant lookup on a class does not search Object after searching other scopes" # Expected NameError but no exception was raised (Hash was returned)
+  fails_badly "Pattern matching refinements are used for #=== in constant pattern"
+  fails_badly "Pattern matching refinements are used for #deconstruct"
+  fails_badly "Pattern matching refinements are used for #deconstruct_keys"
   fails_badly "The while expression stops running body if interrupted by break in a begin ... end attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break in a parenthesized attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break with unless in a begin ... end attribute op-assign-or value"
