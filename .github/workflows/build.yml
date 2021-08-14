@@ -49,6 +49,11 @@ jobs:
             ruby: 3.0
           - name: timezone
             ruby: 3.0
+          - name: optstatus
+            ruby: 3.0
+            permissive: true
+            fetchdepth: '0'
+            command: bin/rake optstatus_compare
 
           # Currently failing:
           # - ruby: truffleruby
@@ -56,8 +61,11 @@ jobs:
           # - ruby: ruby-head
 
     runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
+    continue-on-error: ${{ matrix.combo.permissive || false }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: ${{ fromJSON(matrix.combo.fetchdepth || '1') }}
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.combo.ruby }}
