@@ -39,4 +39,8 @@ class Buffer
   def view(offset = nil, length = nil)
     View.new(self, offset, length)
   end
+
+  def to_s
+    to_a.to_a.pack('c*')
+  end
 end
