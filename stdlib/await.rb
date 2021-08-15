@@ -54,4 +54,10 @@ module Kernel
     }
     nil
   end
+
+  def sleep(seconds)
+    prom = PromiseV2.new
+    `setTimeout(#{proc { prom.resolve }}, #{seconds * 1000})`
+    prom
+  end
 end
