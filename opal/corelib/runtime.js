@@ -2015,6 +2015,20 @@
     return obj;
   };
 
+  Opal.alias_gvar = function(new_name, old_name) {
+    Object.defineProperty(Opal.gvars, new_name, {
+      configurable: true,
+      enumerable: true,
+      get: function() {
+        return Opal.gvars[old_name];
+      },
+      set: function(new_value) {
+        Opal.gvars[old_name] = new_value;
+      }
+    });
+    return nil;
+  }
+
   Opal.alias_native = function(obj, name, native_name) {
     var id   = '$' + name,
         body = obj.$$prototype[native_name];

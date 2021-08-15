@@ -22,7 +22,19 @@ module Opal
       children :new_name, :old_name
 
       def compile
-        push 'Opal.alias(self, ', expr(new_name), ', ', expr(old_name), ')'
+        # We only need to check one type, because parser otherwise denies invalid expressions
+        case new_name.type
+        when :gvar # This is a gvar alias: alias $a $b
+          helper :alias_gvar
+          new_name_str = new_name.children.first.to_s[1..-1].inspect
+          old_name_str = old_name.children.first.to_s[1..-1].inspect
+          push '$alias_gvar(', new_name_str, ', ', old_name_str , ')'
+        when :dsym, :sym # This is a method alias: alias a b
+          helper :alias
+          push '$alias(self, ', expr(new_name), ', ', expr(old_name), ')'
+        else # Nothing else is available, but just in case, drop an error
+          error "Opal doesn't know yet how to alias with #{new_name.type}"
+        end
       end
     end
 
