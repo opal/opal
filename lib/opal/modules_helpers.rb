@@ -65,7 +65,6 @@ module Opal
         return [''] if ruby_module_path.empty?
         import_lines = []
         absolute_module_path = Opal::ModulesHelpers.absolute_module_path(ruby_module_path)
-        puts "ruby_module_path: #{ruby_module_path} absolute_module_path: #{absolute_module_path}"
         import_module_name, ruby_module_name = Opal::ModulesHelpers.module_names_from_paths(Pathname.new(absolute_module_path), absolute_module_path)
         import_name = generate_import_name(import_module_name)
         if absolute_module_path.end_with?('.js')
