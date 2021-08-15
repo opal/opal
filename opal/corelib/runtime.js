@@ -2620,6 +2620,37 @@
     return Opal.set_encoding(dup, "binary", "internal_encoding");
   }
 
+  Opal.last_promise = null;
+  Opal.promise_unhandled_exception = false;
+
+  // Run a block of code, but if it returns a Promise, don't run the next
+  // one, but queue it.
+  Opal.queue = function(proc) {
+    if (Opal.last_promise) {
+      // The async path is taken only if anything before returned a
+      // Promise(V2).
+      Opal.last_promise = Opal.last_promise.then(function() {
+        if (!Opal.promise_unhandled_exception) return proc(Opal);
+      }).catch(function(error) {
+        if (Opal.respond_to(error, '$full_message')) {
+          error = error.$full_message();
+        }
+        console.error(error);
+        // Abort further execution
+        Opal.promise_unhandled_exception = true;
+        Opal.exit(1);
+      });
+      return Opal.last_promise;
+    }
+    else {
+      var ret = proc(Opal);
+      if (typeof ret === 'object' && ret instanceof Promise) {
+        Opal.last_promise = ret;
+      }
+      return ret;
+    }
+  }
+
 
   // Initialization
   // --------------

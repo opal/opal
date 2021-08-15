@@ -58,9 +58,9 @@ module Opal
         elsif compiler.eval?
           unshift "#{aw}(#{as}function(Opal, self) {"
         elsif compiler.esm?
-          unshift "export default (#{as}function(Opal) {"
+          unshift "export default Opal.queue(#{as}function(Opal) {"
         else
-          unshift "(#{as}function(Opal) {"
+          unshift "Opal.queue(#{as}function(Opal) {"
         end
       end
 
@@ -75,7 +75,7 @@ module Opal
         elsif compiler.eval?
           line "})(Opal, self)#{aw};"
         else
-          line "})(Opal);\n"
+          line "});\n"
         end
       end
 
