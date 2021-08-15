@@ -40,8 +40,6 @@ opal_filter "regular_expressions" do
   fails "Regexp#named_captures sets the values of the Hash to Arrays"
   fails "Regexp#named_captures works with duplicate capture group names"
   fails "Regexp#names returns all of the named captures"
-  fails "Regexp#names returns an Array"
-  fails "Regexp#names returns an empty Array if there are no named captures"
   fails "Regexp#names returns each capture name only once"
   fails "Regexp#names returns each named capture as a String"
   fails "Regexp#names works with nested named captures"
