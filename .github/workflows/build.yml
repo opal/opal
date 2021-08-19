@@ -49,11 +49,11 @@ jobs:
             ruby: 3.0
           - name: timezone
             ruby: 3.0
-          - name: optstatus
+          - name: performance
             ruby: 3.0
             permissive: true
             fetchdepth: '0'
-            command: bin/rake optstatus_compare
+            command: bin/rake performance_compare
 
           # Currently failing:
           # - ruby: truffleruby

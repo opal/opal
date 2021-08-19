@@ -467,32 +467,3 @@ task :test_all => [:rspec, :mspec, :minitest]
 task(:cruby_tests) { warn "The task 'cruby_tests' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_cruby)  { warn "The task 'test_cruby' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_nodejs) { warn "The task 'test_nodejs' has been renamed to 'minitest_node_nodejs'."; exit 1 }
-
-desc "Generate V8 function optimization status report for corelib methods"
-task :optstatus do
-  system("NODE_OPTS=--allow-natives-syntax bin/opal tasks/testing/optimization_status.rb")
-end
-
-task :optstatus_compare do
-  this_ref = `git describe`.chomp
-  ref = "HEAD^"
-  ref = ENV['GITHUB_BASE_REF'] if ENV['GITHUB_BASE_REF'] && !ENV['GITHUB_BASE_REF'].empty?
-  ref = `git describe #{ref}`.chomp
-
-  system("bundle exec rake optstatus > /tmp/optstatus_current")
-  system("git checkout --recurse-submodules #{ref}")
-  system("bundle install >/dev/null 2>&1")
-  system("bundle exec rake optstatus > /tmp/optstatus_previous")
-  system("git checkout --recurse-submodules #{this_ref}")
-  system("bundle install >/dev/null 2>&1")
-
-  diff = `diff -F '^Class' -Naur /tmp/optstatus_previous /tmp/optstatus_current`
-  diff_lines = diff.split("\n")
-
-  puts
-  puts "Comparison of V8 function optimization status between #{ref} and #{this_ref}:"
-  puts diff
-  puts
-
-  fail if diff_lines.grep(/^-\s+\[COMPILED\]/).count > 0
-end

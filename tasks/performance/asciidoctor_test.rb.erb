@@ -1,0 +1,6 @@
+JAVASCRIPT_IO_MODULE="nodejs" if RUBY_ENGINE == 'opal'
+require "asciidoctor"
+puts Asciidoctor.convert(DATA.read)
+
+__END__
+<%= File.read('asciidoctor/benchmark/sample-data/mdbasics.adoc') %>
