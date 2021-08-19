@@ -7,5 +7,6 @@ import 'tasks/building.rake'
 import 'tasks/linting.rake'
 import 'tasks/benchmarking.rake'
 import 'tasks/releasing.rake'
+import 'tasks/performance.rake'
 
 task :default => [:rspec, :mspec, :minitest]
