@@ -2,6 +2,7 @@
 
 require 'opal/compiler'
 require 'opal/erb'
+require 'opal/cache'
 
 module Opal
   module BuilderProcessors
@@ -79,11 +80,15 @@ module Opal
       end
 
       def compiled
-        @compiled ||= begin
+        @compiled ||= Opal.cache.fetch(cache_key) do
           compiler = compiler_for(@source, file: @filename)
           compiler.compile
           compiler
         end
+      end
+
+      def cache_key
+        [self.class, @filename, @source, @options]
       end
 
       def compiler_for(source, options = {})

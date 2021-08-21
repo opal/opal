@@ -7,11 +7,12 @@ class Opal::SourceMap::File
   attr_reader :file
   attr_reader :source
 
-  def initialize(fragments, file, source)
+  def initialize(fragments, file, source, generated_code = nil)
     @fragments = fragments
     @file = file
     @source = source
     @names_map = Hash.new { |hash, name| hash[name] = hash.size }
+    @generated_code = generated_code
     @absolute_mappings = nil
   end
 

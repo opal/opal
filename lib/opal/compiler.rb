@@ -223,7 +223,8 @@ module Opal
     # @param source_file [String] optional source_file to reference ruby source
     # @return [Opal::SourceMap]
     def source_map
-      ::Opal::SourceMap::File.new(@fragments, file, @source)
+      # We only use @source_map if compiler is cached.
+      @source_map || ::Opal::SourceMap::File.new(@fragments, file, @source, @result)
     end
 
     # Any helpers required by this file. Used by {Opal::Nodes::Top} to reference
@@ -491,6 +492,19 @@ module Opal
       else
         fragment('false', scope, sexp)
       end
+    end
+
+    # Marshalling for cache shortpath
+    def marshal_dump
+      [@options, @option_values, @source_map ||= source_map.cache,
+       @magic_comments, @result,
+       @required_trees, @requires]
+    end
+
+    def marshal_load(src)
+      @options, @option_values, @source_map,
+      @magic_comments, @result,
+      @required_trees, @requires = src
     end
   end
 end
