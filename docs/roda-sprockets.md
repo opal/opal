@@ -22,8 +22,6 @@ require 'roda'
 class App < Roda
    plugin :sprockets, precompile: %w(application.js),
                       prefix: %w(app/),
-                      root: __dir__,
-                      public_path: 'public/',
                       opal: true,
                       debug: ENV['RACK_ENV'] != 'production'
    plugin :public
