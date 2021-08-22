@@ -5,6 +5,7 @@
   - Add `#cause`, `#backtrace_locations`, `#full_message` to `Exception`
   - Normalize backtraces across platforms
   - Add `Thread::Backtrace::Location`
+  - Output Exception#full_message on uncaught exceptions (#2269)
 - TracePoint `:class` support (#2049)
 - Implement the Flip-Flop operators (#2261)
 - Add `JS[]` to access properties on the global object (#2259)
@@ -17,6 +18,7 @@
 - Fixed multiple line `Regexp` literal to not generate invalid syntax as JavaScript (#1616)
 - Fix `Kernel#{try,catch}` along with `UncaughtThrowError` (#2264)
 - Update source-map-support to fix an off-by-one error (#2264)
+- Source map: lines should start from 1, not 0 (#2273)
 
 ### Changed
 
