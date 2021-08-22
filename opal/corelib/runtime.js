@@ -1948,8 +1948,15 @@
   Opal.alias = function(obj, name, old) {
     var id     = '$' + name,
         old_id = '$' + old,
-        body   = obj.$$prototype['$' + old],
+        body,
         alias;
+
+    // Aliasing on main means aliasing on Object...
+    if (typeof obj.$$prototype === 'undefined') {
+      obj = Opal.Object;
+    }
+
+    body = obj.$$prototype['$' + old];
 
     // When running inside #instance_eval the alias refers to class methods.
     if (obj.$$eval) {
@@ -2014,6 +2021,20 @@
 
     return obj;
   };
+
+  Opal.alias_gvar = function(new_name, old_name) {
+    Object.defineProperty(Opal.gvars, new_name, {
+      configurable: true,
+      enumerable: true,
+      get: function() {
+        return Opal.gvars[old_name];
+      },
+      set: function(new_value) {
+        Opal.gvars[old_name] = new_value;
+      }
+    });
+    return nil;
+  }
 
   Opal.alias_native = function(obj, name, native_name) {
     var id   = '$' + name,
