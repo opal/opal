@@ -99,10 +99,10 @@ class Opal::SourceMap::File
   #    field, in which case the whole value is represented.
   def segment_from_fragment(fragment, generated_column)
     source_index     = 0                          # always 0, we're dealing with a single file
-    original_line    = fragment.line - 1          # fragments have 1-based lines
+    original_line    = (fragment.line || 0) - 1   # fragments have 1-based lines
     original_line    = 0 if original_line < 0     # line 0 (-1) for fragments in source maps will crash
                                                   # browsers devtools and the webpack build process
-    original_column  = fragment.column            # fragments have 0-based columns
+    original_column  = fragment.column || 0       # fragments have 0-based columns
 
     if fragment.source_map_name
       map_name_index = (@names_map[fragment.source_map_name.to_s] ||= @names_map.size)
@@ -165,9 +165,7 @@ class Opal::SourceMap::File
         generated_column = 0
         segments = []
         raw_segments.each do |(generated_code, fragment)|
-          if fragment.line && fragment.column
-            segments << segment_from_fragment(fragment, generated_column)
-          end
+          segments << segment_from_fragment(fragment, generated_column)
           generated_column += generated_code.size
         end
         mappings << segments
