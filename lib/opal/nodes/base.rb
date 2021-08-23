@@ -89,8 +89,8 @@ module Opal
         scope.top_scope
       end
 
-      def s(*args)
-        @compiler.s(*args)
+      def s(type, *children)
+        ::Opal::AST::Node.new(type, children, location: @sexp.loc)
       end
 
       def expr?
