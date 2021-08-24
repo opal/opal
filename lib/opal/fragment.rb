@@ -28,41 +28,100 @@ module Opal
       "f(#{@code.inspect})"
     end
 
-    def source_map_name
-      case @sexp.type
-      when :top, :begin, :newline, :js_return
-        nil
+    def source_map_name_for(sexp)
+      case sexp.type
+      when :top
+        case sexp.meta[:kind]
+        when :require
+          '<top (required)>'
+        when :eval
+          '(eval)'
+        when :main
+          '<main>'
+        end
+      when :begin, :newline, :js_return
+        source_map_name_for(@scope.sexp) if @scope
+      when :iter
+        scope = @scope
+        iters = 1
+        while scope
+          if scope.class == Nodes::IterNode
+            iters += 1
+            scope = scope.parent
+          else
+            break
+          end
+        end
+        level = " (#{iters} levels)" if iters > 1
+        "block#{level} in #{source_map_name_for(scope.sexp)}"
       when :self
         'self'
       when :module
-        'module'
+        const, = *sexp
+        "<module:#{source_map_name_for(const)}>"
       when :class
-        'class'
+        const, = *sexp
+        "<class:#{source_map_name_for(const)}>"
+      when :const
+        scope, name = *sexp
+        if !scope || scope.type == :cbase
+          name.to_s
+        else
+          "#{source_map_name_for(scope)}::#{name}"
+        end
       when :int
-        @sexp.children.first
+        sexp.children.first
       when :def
-        @sexp.children.first
+        sexp.children.first
       when :defs
-        @sexp.children[1]
+        sexp.children[1]
       when :send
-        @sexp.children[1]
-      when :lvar, :lvasgn, :lvdeclare, :ivar, :ivasgn, :gvar, :cvar, :cvasgn, :gvars, :gvasgn
-        @sexp.children.first
+        sexp.children[1]
+      when :lvar, :lvasgn, :lvdeclare, :ivar, :ivasgn, :gvar, :cvar, :cvasgn, :gvars, :gvasgn, :arg
+        sexp.children.first
+      when :str, :xstr # Inside xstr - JS calls
+        source_map_name_for(@scope.sexp)
       else
         # nil
+      end
+    end
+
+    def source_map_name
+      return nil unless @sexp
+
+      source_map_name_for(@sexp)
+    end
+
+    def location
+      case
+      when !@sexp
+        nil
+      when @sexp.type == :send
+        loc = @sexp.loc
+        if loc.respond_to? :dot # a>.b || a>+b / >a / a>[b]
+          loc.dot || loc.selector
+        elsif loc.respond_to? :operator # a >|= b
+          loc.operator
+        else
+          @sexp
+        end
+      when @sexp.type == :iter
+        @sexp.loc.begin # [1,2].each >{ }
+      else
+        @sexp
       end
     end
 
     # Original line this fragment was created from
     # @return [Integer, nil]
     def line
-      @sexp.line if @sexp
+      location&.line
     end
 
     # Original column this fragment was created from
     # @return [Integer, nil]
     def column
-      @sexp.column if @sexp
+      location&.column
     end
   end
 end

@@ -49,7 +49,7 @@ RSpec.describe Opal::SourceMap::File do
       sourceRoot: '',
       sources: ['foo.rb'],
       sourcesContent: ["puts 5\n\nputs 6"],
-      names: ['puts', '5', '6'],
+      names: ['self', 'puts', '5', '6'],
       mappings: nil,
     )
 

@@ -35,12 +35,12 @@ module Opal
       end
 
       def line(*strs)
-        push "\n#{current_indent}"
+        push fragment("\n#{current_indent}", loc: false)
         push(*strs)
       end
 
       def empty_line
-        push "\n"
+        push fragment("\n", loc: false)
       end
 
       def js_truthy(sexp)

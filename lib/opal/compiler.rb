@@ -233,7 +233,16 @@ module Opal
 
       sexp, comments, tokens = re_raise_with_location { @parser.tokenize(@buffer) }
 
-      @sexp = s(:top, sexp || s(:nil))
+      kind = case
+             when requirable?
+               :require
+             when eval?
+               :eval
+             else
+               :main
+             end
+
+      @sexp = s(:top, sexp || s(:nil)).tap { |i| i.meta[:kind] = kind }
       @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
       @magic_comments = MagicComments.parse(sexp, comments)
       @eof_content = EofContent.new(tokens, @source).eof

@@ -6,11 +6,11 @@ module Opal
   module Rewriters
     class BlockToIter < Base
       def on_block(node)
-        recvr, args, body = *super
+        recvr, args, body = *node
         iter_node = s(:iter, args, body)
-        recvr.updated(
+        process recvr.updated(
           nil,
-          recvr.children + [iter_node],
+          (recvr.children + [iter_node]),
         )
       end
     end
