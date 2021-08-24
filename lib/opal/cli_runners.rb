@@ -65,6 +65,7 @@ module Opal
     register_runner :compiler,    :Compiler,    'opal/cli_runners/compiler'
     register_runner :nashorn,     :Nashorn,     'opal/cli_runners/nashorn'
     register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
+    register_runner :gjs,         :Gjs,         'opal/cli_runners/gjs'
     register_runner :server,      :Server,      'opal/cli_runners/server'
 
     alias_runner :osascript, :applescript

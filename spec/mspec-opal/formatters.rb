@@ -124,17 +124,17 @@ class BrowserFormatter < BaseOpalFormatter
   end
 end
 
-class NodeJSFormatter < BaseOpalFormatter
+class ColoredDottedFormatter < BaseOpalFormatter
   def red(str)
-    `process.stdout.write("\u001b[31m"+#{str}+"\u001b[0m")`
+    print "\e[31m"+str+"\e[0m"
   end
 
   def green(str)
-    `process.stdout.write("\u001b[32m"+#{str}+"\u001b[0m")`
+    print "\e[32m"+str+"\e[0m"
   end
 
   def cyan(str)
-    `process.stdout.write("\u001b[36m"+#{str}+"\u001b[0m")`
+    print "\e[36m"+str+"\e[0m"
   end
 
   def log(str)
@@ -156,6 +156,20 @@ class NodeJSFormatter < BaseOpalFormatter
 
   def finish_with_code(code)
     exit(code)
+  end
+end
+
+class NodeJSFormatter < ColoredDottedFormatter
+  def red(str)
+    `process.stdout.write("\u001b[31m"+#{str}+"\u001b[0m")`
+  end
+
+  def green(str)
+    `process.stdout.write("\u001b[32m"+#{str}+"\u001b[0m")`
+  end
+
+  def cyan(str)
+    `process.stdout.write("\u001b[36m"+#{str}+"\u001b[0m")`
   end
 end
 
