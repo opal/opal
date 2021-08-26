@@ -20,132 +20,130 @@ failure = proc do |reason|
 end
 
 compare_values = proc do |name, current, previous|
-  change = ((current - previous).to_f / previous) * 100 
+  current = current.to_f
+  previous = previous.to_f
 
-  puts ("%30s: %.3f -> %.3f (change: %.2f%%)" % [name, previous, current, change]).gsub('.000','')
+  change = ((current - previous).to_f / previous) * 100
+
+  puts ("%30s: %.3f -> %.3f (change: %+.2f%%)" % [name, previous, current, change]).gsub('.000','')
 
   if change > 5.0
     failure.("#{name} increased by more than 5%")
   end
 end
 
-task :asciidoctor_prepare do
-  # Selected asciidoctor versions were working on Aug 19 2021, feel free to update.
-  system("bash", "-c", <<~END)
+ASCIIDOCTOR_REPO_BASE = ENV['ASCIIDOCTOR_REPO_BASE'] || 'https://github.com/asciidoctor'
+
+# Selected asciidoctor versions were working on Aug 19 2021, feel free to update.
+ASCIIDOCTOR_PREPARE = [
+  "bundle",
+  "exec",
+  "bash",
+  "-c",
+  <<~BASH
     mkdir -p tmp/performance
     pushd tmp/performance
-    git clone https://github.com/asciidoctor/asciidoctor >/dev/null 2>&1
+    git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor >/dev/null 2>&1
     pushd asciidoctor; git checkout 869e8236 >/dev/null 2>&1; popd
-    git clone https://github.com/asciidoctor/asciidoctor.js >/dev/null 2>&1
+    git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor.js >/dev/null 2>&1
     pushd asciidoctor.js; git checkout 053fa0d3 >/dev/null 2>&1; popd
     erb ../../tasks/performance/asciidoctor_test.rb.erb > asciidoctor_test.rb
     popd
-  END
-end
+  BASH
+]
 
-task :asciidoctor_build_opal do
-  system("bin/opal -c" \
+ASCIIDOCTOR_BUILD_OPAL = "bin/opal --no-cache -c " \
            "-Itmp/performance/asciidoctor/lib " \
            "-Itmp/performance/asciidoctor.js/packages/core/lib " \
-           "tmp/performance/asciidoctor_test.rb > tmp/performance/asciidoctor_test.js")
-end
+           "tmp/performance/asciidoctor_test.rb > tmp/performance/asciidoctor_test.js"
+ASCIIDOCTOR_RUN_RUBY = "bundle exec ruby -Itmp/performance/asciidoctor/lib tmp/performance/asciidoctor_test.rb"
+ASCIIDOCTOR_RUN_OPAL = "node tmp/performance/asciidoctor_test.js"
 
-task :asciidoctor_run_ruby do
-  system("ruby -Itmp/performance/asciidoctor/lib tmp/performance/asciidoctor_test.rb")
-end
+# Generate V8 function optimization status report for corelib methods
+NODE_OPTSTATUS = "env NODE_OPTS=--allow-natives-syntax bin/opal tasks/performance/optimization_status.rb"
 
-task :asciidoctor_run_opal do
-  system("node tmp/performance/asciidoctor_test.js")
-end
-
-desc "Generate V8 function optimization status report for corelib methods"
-task :optstatus do
-  system("NODE_OPTS=--allow-natives-syntax bin/opal tasks/performance/optimization_status.rb")
-end
-
-task :performance_compare do
-  this_ref = `git describe --tags`.chomp
-  ref = 'master'
-  ref = ENV['GITHUB_BASE_REF'] if ENV['GITHUB_BASE_REF'] && !ENV['GITHUB_BASE_REF'].empty?
-
-  # Prepare
-  system("bundle exec rake asciidoctor_prepare")
-  system("bundle exec rake asciidoctor_run_ruby > tmp/performance/ruby_result.html")
+performance_stat = ->(name) {
+  stat = {}
 
   # Run on current
-  puts "* Checking optimization status with current..."
-  system("bundle exec rake optstatus > tmp/performance/optstatus_current")
-  puts "* Building AsciiDoctor with current..."
-  compiler_time_current = mean_time.(tries: 7) do
-    system("bundle exec rake asciidoctor_build_opal")
-  end
-  puts "* Running AsciiDoctor with current..."
-  run_time_current = mean_time.(tries: 31) do
-    system("bundle exec rake asciidoctor_run_opal > tmp/performance/opal_result_current.html")
-  end
-  correct_current = File.read("tmp/performance/opal_result_current.html") == File.read("tmp/performance/ruby_result.html")
-  size_current = File.size("tmp/performance/asciidoctor_test.js")
-  puts "* Minifying AsciiDoctor with current..."
-  min_size_current = Opal::Util.uglify(File.read("tmp/performance/asciidoctor_test.js")).bytesize rescue 133799999999999
+  puts "\n* Checking optimization status with #{name}..."
+  sh("#{NODE_OPTSTATUS} > tmp/performance/optstatus_#{name}")
 
-  # Prepare previous
-  system("git checkout --recurse-submodules #{ref}")
-  system("bundle install >/dev/null 2>&1")
+  puts "\n* Building AsciiDoctor with #{name}..."
+  stat[:compiler_time] = mean_time.(tries: 3) { sh(ASCIIDOCTOR_BUILD_OPAL) }
 
-  # Run on previous
-  puts "* Checking optimization status with previous..."
-  system("bundle exec rake optstatus > tmp/performance/optstatus_previous")
-  puts "* Building AsciiDoctor with previous..."
-  compiler_time_previous = mean_time.(tries: 7) do
-    system("bundle exec rake asciidoctor_build_opal")
-  end
-  puts "* Running AsciiDoctor with previous..."
-  run_time_previous = mean_time.(tries: 31) do
-    system("bundle exec rake asciidoctor_run_opal > tmp/performance/opal_result_previous.html")
-  end
-  correct_previous = File.read("tmp/performance/opal_result_previous.html") == File.read("tmp/performance/ruby_result.html")
-  size_previous = File.size("tmp/performance/asciidoctor_test.js")
-  puts "* Minifying AsciiDoctor with previous..."
-  min_size_previous = Opal::Util.uglify(File.read("tmp/performance/asciidoctor_test.js")).bytesize rescue 133799999999999
+  puts "\n* Running AsciiDoctor with #{name}..."
+  stat[:run_time] = mean_time.(tries: 31) { sh("#{ASCIIDOCTOR_RUN_OPAL} > tmp/performance/opal_result_#{name}.html") }
+  stat[:correct] = File.read("tmp/performance/opal_result_#{name}.html") == File.read("tmp/performance/ruby_result.html")
+  stat[:size] = File.size("tmp/performance/asciidoctor_test.js")
 
-  # Restore current
-  system("git checkout --recurse-submodules #{this_ref}")
-  system("bundle install >/dev/null 2>&1")
+  puts "\n* Minifying AsciiDoctor with #{name}..."
+  stat[:min_size] = Opal::Util.uglify(File.read("tmp/performance/asciidoctor_test.js")).bytesize rescue Float::INFINITY
 
-  # Summary
-  puts
-  puts "Summary of performance changes between (previous) #{ref} and (current) #{this_ref}:"
+  stat
+}
 
-  diff = `diff -F '^Class' -Naur tmp/performance/optstatus_previous tmp/performance/optstatus_current`
-  diff_lines = diff.split("\n")
+namespace :performance do
+  task :compare do
+    this_ref = `git describe --tags`.chomp
+    ref = 'master'
+    ref = ENV['GITHUB_BASE_REF'] if ENV['GITHUB_BASE_REF'] && !ENV['GITHUB_BASE_REF'].empty?
 
-  puts
-  puts "Comparison of V8 function optimization status:"
-  puts diff
+    # Prepare
+    puts "\n* Preparing asciidoctor..."
+    sh(*ASCIIDOCTOR_PREPARE)
 
-  if diff_lines.grep(/^-\s+\[COMPILED\]/).count > 0
-    failure.("Some methods are no longer compiled on V8")
-  end
+    puts "\n* Running AsciiDoctor with CRuby..."
+    sh("#{ASCIIDOCTOR_RUN_RUBY} > tmp/performance/ruby_result.html")
 
-  puts
-  puts "Comparison of the Asciidoctor (a real-life Opal application) compile and run:"
+    current = performance_stat.(:current)
 
-  failure.("Wrong result on the current branch") unless correct_current
-  failure.("Wrong result on the previous branch - ignore it") unless correct_previous
+    # Prepare previous
+    sh("git checkout --recurse-submodules #{ref} && bundle install >/dev/null 2>&1")
 
-  compare_values.("Compile time",        compiler_time_current, compiler_time_previous)
-  compare_values.("Run time",                 run_time_current,      run_time_previous)
-  compare_values.("Bundle size",                  size_current,          size_previous)
-  compare_values.("Minified bundle size",     min_size_current,      min_size_previous)
+    previous = performance_stat.(:previous)
 
-  if failed
+    # Restore current
+    sh("git checkout --recurse-submodules - && bundle install >/dev/null 2>&1")
+
+    # Summary
+    puts "\n=== Summary ==="
+    puts "Summary of performance changes between (previous) #{ref} and (current) #{this_ref}:"
+
+    diff = `diff --report-identical-files -F '^Class' -Naur tmp/performance/optstatus_previous tmp/performance/optstatus_current`
+    diff_lines = diff.split("\n")
+
     puts
-    puts "This run failed - some performance checks did not pass. Don't worry, this is"
-    puts "informative, not fatal. It may be worth to rerun the task or consult those"
-    puts "results with a pull request reviewer:"
-    failed.each do |f|
-      puts " - #{f}"
+    puts "Comparison of V8 function optimization status:"
+    puts diff
+
+    if diff_lines.grep(/^-\s+\[COMPILED\]/).count > 0
+      failure.("Some methods are no longer compiled on V8")
     end
-    fail
+
+    puts
+    puts "Comparison of the Asciidoctor (a real-life Opal application) compile and run:"
+
+    failure.("Wrong result on the current branch") unless current[:correct]
+    failure.("Wrong result on the previous branch - ignore it") unless previous[:correct]
+
+    compare_values.("Compile time",        current[:compiler_time], previous[:compiler_time])
+    compare_values.("Run time",                 current[:run_time],      previous[:run_time])
+    compare_values.("Bundle size",                  current[:size],          previous[:size])
+    compare_values.("Minified bundle size",     current[:min_size],      previous[:min_size])
+
+    if failed
+      puts "--- Failures ---"
+      failed.each do |f|
+        puts " - #{f}"
+      end
+      puts
+      puts "This run failed - some performance checks did not pass. Don't worry, this is"
+      puts "informative, not fatal. It may be worth to rerun the task, rebase the branch,"
+      puts "or consult those results with a pull request reviewer."
+      fail
+    end
   end
 end
+
+task :performance => ['performance:compare']
