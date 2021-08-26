@@ -140,6 +140,7 @@ module Opal
         enable_source_location
         use_strict
         parse_comments
+        esm
       ]
     end
 
