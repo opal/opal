@@ -8,7 +8,8 @@ module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
       :output, :requires, :rbrequires, :gems, :stubs, :verbose, :runner_options,
-      :preload, :filename, :debug, :no_exit, :lib_only, :missing_require_severity
+      :preload, :filename, :debug, :no_exit, :lib_only, :missing_require_severity,
+      :no_cache
 
     class << self
       attr_accessor :stdout
@@ -38,6 +39,7 @@ module Opal
       @filename    = options.delete(:filename)   { @file && @file.path }
       @requires    = options.delete(:requires)   { [] }
       @rbrequires  = options.delete(:rbrequires) { [] }
+      @no_cache    = options.delete(:no_cache)   { false }
 
       @missing_require_severity = options.delete(:missing_require_severity) { Opal::Config.missing_require_severity }
 
@@ -87,6 +89,9 @@ module Opal
         compiler_options: compiler_options,
         missing_require_severity: missing_require_severity,
       )
+
+      # --no-cache
+      builder.cache = Opal::Cache::NullCache.new if no_cache
 
       # --include
       builder.append_paths(*load_paths)

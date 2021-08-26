@@ -2,14 +2,14 @@
 
 require 'opal/compiler'
 require 'opal/erb'
-require 'opal/cache'
 
 module Opal
   module BuilderProcessors
     class Processor
       def initialize(source, filename, options = {})
         source += "\n" unless source.end_with?("\n")
-        @source, @filename, @options = source, filename, options
+        @source, @filename, @options = source, filename, options.dup
+        @cache = @options.delete(:cache) { Opal.cache }
         @requires = []
         @required_trees = []
       end
@@ -80,7 +80,7 @@ module Opal
       end
 
       def compiled
-        @compiled ||= Opal.cache.fetch(cache_key) do
+        @compiled ||= Opal::Cache.fetch(@cache, cache_key) do
           compiler = compiler_for(@source, file: @filename)
           compiler.compile
           compiler
