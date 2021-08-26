@@ -47,9 +47,6 @@ module Opal
     end
 
     def runtime_key
-      # Re-compute runtime hash if some compiler options changed during the process.
-      compiler_options = Opal::Config.compiler_options.inspect
-      @runtime_key = nil if @compiler_options != compiler_options
       @runtime_key ||= begin
         # We want to ensure the compiler and any Gemfile/gemspec (for development)
         # stays untouched
@@ -61,7 +58,6 @@ module Opal
 
         digest [
           files.sort.map { |f| "#{f}:#{File.size(f)}:#{File.mtime(f).to_f}" },
-          @compiler_options = compiler_options,
           RUBY_VERSION,
           RUBY_PATCHLEVEL
         ].join('/')

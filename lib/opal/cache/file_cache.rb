@@ -47,12 +47,11 @@ module Opal
         return unless size_sum > @max_size
 
         # First, we try to get the oldest files first.
-        entries = entries.sort_by { |i| File.mtime(i) }
         # Then, what's more important, is that we try to get the least
         # recently used files first. Filesystems with relatime or noatime
         # will get this wrong, but it doesn't matter that much, because
         # the previous sort got things "maybe right".
-        entries = entries.sort_by { |i| File.atime(i) }
+        entries = entries.sort_by { |i| [File.mtime(i), File.atime(i)] }
 
         entries.each do |i|
           size_sum -= File.size(i)
