@@ -71,6 +71,7 @@ module Opal
       @prerequired              ||= []
       @compiler_options         ||= Opal::Config.compiler_options
       @missing_require_severity ||= Opal::Config.missing_require_severity
+      @cache                    ||= Opal.cache
 
       @processed = []
     end
@@ -134,12 +135,7 @@ module Opal
     attr_reader :processed
 
     attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
-      :compiler_options, :missing_require_severity
-
-    attr_writer :cache
-    def cache
-      @cache || Opal.cache
-    end
+      :compiler_options, :missing_require_severity, :cache
 
     private
 
