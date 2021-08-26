@@ -52,7 +52,7 @@ ASCIIDOCTOR_PREPARE = [
   BASH
 ]
 
-ASCIIDOCTOR_BUILD_OPAL = "bin/opal -c " \
+ASCIIDOCTOR_BUILD_OPAL = "bin/opal --no-cache -c " \
            "-Itmp/performance/asciidoctor/lib " \
            "-Itmp/performance/asciidoctor.js/packages/core/lib " \
            "tmp/performance/asciidoctor_test.rb > tmp/performance/asciidoctor_test.js"
