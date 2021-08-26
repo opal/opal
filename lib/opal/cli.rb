@@ -136,6 +136,7 @@ module Opal
         use_strict
         parse_comments
         es6_modules
+        es6_wrap
       ]
     end
 
