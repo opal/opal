@@ -132,13 +132,14 @@ task :performance_compare do
   compare_values.("Minified bundle size",     current[:min_size],      previous[:min_size])
 
   if failed
-    puts
-    puts "This run failed - some performance checks did not pass. Don't worry, this is"
-    puts "informative, not fatal. It may be worth to rerun the task, rebase the branch,"
-    puts "or consult those results with a pull request reviewer:"
+    puts "--- Failures ---"
     failed.each do |f|
       puts " - #{f}"
     end
+    puts
+    puts "This run failed - some performance checks did not pass. Don't worry, this is"
+    puts "informative, not fatal. It may be worth to rerun the task, rebase the branch,"
+    puts "or consult those results with a pull request reviewer."
     fail
   end
 end
