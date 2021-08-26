@@ -168,7 +168,7 @@ class Hash
         result.push(#{`key`.to_s.to_json} + ':' + #{`value`.to_json});
       }
 
-      return '{' + result.join(', ') + '}';
+      return '{' + result.join(',') + '}';
     }
   end
 end
