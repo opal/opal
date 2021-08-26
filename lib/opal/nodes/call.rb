@@ -45,6 +45,9 @@ module Opal
         handle_special do
           compiler.method_calls << meth.to_sym if record_method?
 
+          # if trying to access an lvar in eval or irb mode
+          return compile_eval_var if using_eval?
+
           # if trying to access an lvar in irb mode
           return compile_irb_var if using_irb?
 
@@ -81,8 +84,14 @@ module Opal
         iter || splat?
       end
 
+      def invoke_using_refinement?
+        !scope.scope.collect_refinements_temps.empty?
+      end
+
       def default_compile
-        if invoke_using_send?
+        if invoke_using_refinement?
+          compile_using_refined_send
+        elsif invoke_using_send?
           compile_using_send
         else
           compile_simple_call_chain
@@ -102,6 +111,25 @@ module Opal
         helper :send
 
         push '$send('
+        compile_receiver
+        compile_method_name
+        compile_arguments
+        compile_block_pass
+        push ')'
+      end
+
+      # Compiles method call using `Opal.refined_send`
+      #
+      # @example
+      #   a.b(c, &block)
+      #
+      #   Opal.refined_send(a, 'b', [c], block, [[Opal.MyRefinements]])
+      #
+      def compile_using_refined_send
+        helper :refined_send
+
+        push '$refined_send('
+        compile_refinements
         compile_receiver
         compile_method_name
         compile_arguments
@@ -133,6 +161,11 @@ module Opal
         if iter
           push ', ', expr(iter)
         end
+      end
+
+      def compile_refinements
+        refinements = scope.collect_refinements_temps.map { |i| s(:js_tmp, i) }
+        push expr(s(:array, *refinements)), ', '
       end
 
       def compile_break_catcher
@@ -172,10 +205,22 @@ module Opal
         end
       end
 
+      def compile_eval_var
+        push meth.to_s
+      end
+
       # a variable reference in irb mode in top scope might be a var ref,
       # or it might be a method call
       def using_irb?
-        @compiler.irb? && scope.top? && arglist == s(:arglist) && recvr.nil? && iter.nil?
+        @compiler.irb? && scope.top? && variable_like?
+      end
+
+      def using_eval?
+        @compiler.eval? && scope.top? && @compiler.scope_variables.include?(meth)
+      end
+
+      def variable_like?
+        arglist == s(:arglist) && recvr.nil? && iter.nil?
       end
 
       def sexp_with_arglist
@@ -273,6 +318,24 @@ module Opal
         end
       end
 
+      # Refinements support
+      add_special :using do |compile_default|
+        if scope.accepts_using? && arglist.children.count == 1
+          using_refinement(arglist.children.first)
+        else
+          compile_default.call
+        end
+      end
+
+      def using_refinement(arg)
+        prev, curr = *scope.refinements_temp
+        if prev
+          push "(#{curr} = #{prev}.slice(), #{curr}.push(", expr(arg), '), self)'
+        else
+          push "(#{curr} = [", expr(arg), '], self)'
+        end
+      end
+
       add_special :debugger do
         push fragment 'debugger'
       end
@@ -293,6 +356,36 @@ module Opal
         push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
         compile_default.call
         push ')' if push_nesting
+      end
+
+      # This can be refactored in terms of binding, but it would 'corelib/binding'
+      # to be required in existing code.
+      add_special :eval do |compile_default|
+        next compile_default.call if arglist.children.length != 1 || ![s(:self), nil].include?(recvr)
+
+        temp = scope.new_temp
+        scope_variables = scope.scope_locals.map(&:to_s).inspect
+        push "(#{temp} = ", expr(arglist)
+        push ", typeof Opal.compile === 'function' ? eval(Opal.compile(#{temp}"
+        push ', {scope_variables: ', scope_variables
+        push ", arity_check: #{compiler.arity_check?}, file: '(eval)', eval: true})) : "
+        push "self.$eval(#{temp}))"
+      end
+
+      add_special :binding do
+        push "Opal.Binding.$new("
+        push "  function($code, $value) {"
+        push "    if (typeof $value === 'undefined') {"
+        push "      return eval($code);"
+        push "    }"
+        push "    else {"
+        push "      return eval($code + ' = $value');"
+        push "    }"
+        push "  },"
+        push "  ", scope.scope_locals.map(&:to_s).inspect, ","
+        push "  self,"
+        push "  ", source_location
+        push ")"
       end
 
       def push_nesting?

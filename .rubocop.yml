@@ -135,6 +135,7 @@ Lint/RescueException:
     - 'opal/corelib/enumerator.rb'
     # Promises must care about all exceptions
     - 'stdlib/promise.rb'
+    - 'opal/corelib/binding.rb'
 
 Lint/StringConversionInInterpolation:
   Exclude:

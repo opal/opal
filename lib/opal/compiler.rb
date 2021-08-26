@@ -159,6 +159,8 @@ module Opal
     # Adds comments for every method definition
     compiler_option :parse_comments, default: false, as: :parse_comments?
 
+    compiler_option :scope_variables, default: []
+
     # @return [String] The compiled ruby code
     attr_reader :result
 

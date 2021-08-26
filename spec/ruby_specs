@@ -27,6 +27,9 @@ ruby/core/array/pack/u_spec
 !ruby/core/array/pack/z_spec
 
 ruby/core/basicobject
+
+ruby/core/binding
+
 ruby/core/builtin_constants
 ruby/core/class
 ruby/core/comparable
@@ -89,6 +92,8 @@ ruby/core/kernel
 !ruby/core/kernel/untrace_var_spec
 !ruby/core/kernel/untrusted_spec
 !ruby/core/kernel/untrust_spec
+
+ruby/core/main
 
 ruby/core/matchdata
 ruby/core/math

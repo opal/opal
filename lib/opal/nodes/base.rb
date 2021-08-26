@@ -208,6 +208,14 @@ module Opal
       def comments
         compiler.comments[@sexp.loc]
       end
+
+      def source_location
+        file = @sexp.loc.expression.source_buffer.name
+        file = "<internal:#{file}>" if file.start_with?("corelib/")
+        file = "<js:#{file}>" if file.end_with?(".js")
+        line = @sexp.loc.line
+        "['#{file}', #{line}]"
+      end
     end
   end
 end

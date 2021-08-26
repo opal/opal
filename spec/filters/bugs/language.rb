@@ -59,7 +59,6 @@ opal_filter "language" do
   fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Exception: Cannot read property '$$is_array' of undefined
   fails "A method assigns the last Hash to the last optional argument if the Hash contains non-Symbol keys and is not passed as keywords" # Exception: Object.defineProperty called on non-object
   fails "A method definition in an eval creates a class method"
-  fails "A method definition in an eval creates a singleton method"
   fails "A method definition in an eval creates an instance method"
   fails "A method raises ArgumentError if passing hash as keyword arguments for definition 'def m(a: nil); a; end'" # Expected ArgumentError but no exception was raised (1 was returned)
   fails "A method when passing an empty keyword splat to a method that does not accept keywords for definition 'def m(*a); a; end'" # Expected [{}] == [] to be truthy but was false
@@ -76,7 +75,6 @@ opal_filter "language" do
   fails "A singleton method definition can be declared for a global variable"
   fails "A singleton method definition raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised ("foo" was returned)
   fails "Allowed characters allows non-ASCII lowercased characters at the beginning" # Expected nil == 1 to be truthy but was false
-  fails "Allowed characters allows not ASCII characters in the middle of a name" # NoMethodError: undefined method `mod' for #<MSpecEnv:0xa920>
   fails "Allowed characters allows not ASCII upcased characters at the beginning" # NameError: wrong constant name ἍBB
   fails "Allowed characters does not allow non-ASCII upcased characters at the beginning" # Expected SyntaxError (/dynamic constant assignment/) but no exception was raised ("test" was returned)
   fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
@@ -206,29 +204,17 @@ opal_filter "language" do
   fails "Optional variable assignments using compounded constants with &&= assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compounded constants with operator assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compunded constants with ||= assignments"
-  fails "Pattern matching Array pattern accepts a subclass of Array from #deconstruct" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Array pattern calls #deconstruct even on objects that are already an array" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Array pattern calls #deconstruct once for multiple patterns, caching the result" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Array pattern does not match object if elements of array returned by #deconstruct method does not match elements in pattern" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Array pattern does not match object without #deconstruct method" # Mock '#<Object:0x239ca>' expected to receive respond_to?("deconstruct") exactly 1 times but received it 0 times
-  fails "Pattern matching Array pattern matches an object with #deconstruct method which returns an array and each element in array matches element in pattern" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Array pattern raises TypeError if #deconstruct method does not return array" # Expected TypeError (/deconstruct must return Array/) but got: NoMethodError (undefined method `obj' for #<MSpecEnv:0x1af0a>)
-  fails "Pattern matching Hash pattern calls #deconstruct_keys per pattern" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method does not return Hash" # Expected TypeError (/deconstruct_keys must return Hash/) but got: NoMethodError (undefined method `obj' for #<MSpecEnv:0x1af0a>)
-  fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method returns Hash with non-symbol keys" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Hash pattern does not match object if elements of Hash returned by #deconstruct_keys method does not match values in pattern" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Hash pattern does not match object without #deconstruct_keys method" # Mock '#<Object:0x29382>' expected to receive respond_to?("deconstruct_keys") exactly 1 times but received it 0 times
-  fails "Pattern matching Hash pattern matches an object with #deconstruct_keys method which returns a Hash with equal keys and each value in Hash matches value in pattern" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Hash pattern passes keys specified in pattern as arguments to #deconstruct_keys method" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Hash pattern passes keys specified in pattern to #deconstruct_keys method if pattern contains double splat operator **" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Hash pattern passes nil to #deconstruct_keys method if pattern contains double splat operator **rest" # NoMethodError: undefined method `obj' for #<MSpecEnv:0x1af0a>
-  fails "Pattern matching Hash pattern raise SyntaxError when keys duplicate in pattern" # Expected SyntaxError (/duplicated key name/) but got: Opal::SyntaxError (duplicate hash pattern key a)
+  fails "Pattern matching Array pattern calls #deconstruct once for multiple patterns, caching the result" # Expected ["deconstruct", "deconstruct"] == ["deconstruct"] to be truthy but was false
+  fails "Pattern matching Array pattern raises TypeError if #deconstruct method does not return array" # Expected TypeError (/deconstruct must return Array/) but no exception was raised (nil was returned)
+  fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method does not return Hash" # Expected TypeError (/deconstruct_keys must return Hash/) but got: NoMethodError (undefined method `key?' for "")
+  fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method returns Hash with non-symbol keys" # Expected true == false to be truthy but was false
+  fails "Pattern matching Hash pattern raise SyntaxError when keys duplicate in pattern" # Expected SyntaxError (/duplicated key name/) but got: SyntaxError (duplicate hash pattern key a)
   fails "Pattern matching alternative pattern does not support variable binding" # Expected SyntaxError (/illegal variable in alternative pattern/) but no exception was raised (nil was returned)
-  fails "Pattern matching cannot mix in and when operators" # Expected SyntaxError (/syntax error, unexpected `in'/) but got: Opal::SyntaxError (unexpected token kIN)
+  fails "Pattern matching cannot mix in and when operators" # Expected SyntaxError (/syntax error, unexpected `in'/) but got: SyntaxError (unexpected token kIN)
   fails "Pattern matching variable pattern allows applying ^ operator to bound variables" # NoMatchingPatternError: [1, 1]
-  fails "Pattern matching variable pattern does not support using variable name (except _) several times" # Expected SyntaxError (/duplicated variable name/) but got: Opal::SyntaxError (duplicate variable name a)
-  fails "Pattern matching variable pattern requires bound variable to be specified in a pattern before ^ operator when it relies on a bound variable" # Expected SyntaxError (/n: no such local variable/) but got: Opal::SyntaxError (no such local variable: `n')
-  fails "Pattern matching variable pattern supports existing variables in a pattern specified with ^ operator" # Opal::SyntaxError: no such local variable: `a'
+  fails "Pattern matching variable pattern does not support using variable name (except _) several times" # Expected SyntaxError (/duplicated variable name/) but got: SyntaxError (duplicate variable name a)
+  fails "Pattern matching variable pattern requires bound variable to be specified in a pattern before ^ operator when it relies on a bound variable" # Expected SyntaxError (/n: no such local variable/) but got: SyntaxError (no such local variable: `n')
+  fails "Pattern matching variable pattern supports existing variables in a pattern specified with ^ operator" # SyntaxError: no such local variable: `a'
   fails "Pattern matching warning warns about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Post-args with optional args with a circular argument reference shadows an existing local with the same name as the argument"
   fails "Post-args with optional args with a circular argument reference shadows an existing method with the same name as the argument"
@@ -260,8 +246,6 @@ opal_filter "language" do
   fails "Ruby String interpolation returns a string with the source encoding by default" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
   fails "Safe navigator allows assignment methods"
-  fails "Safe navigator allows assignment operators"
-  fails "Safe navigator does not call the operator method lazily with an assignment operator"
   fails "Struct#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: ArgumentError ([#deconstruct_keys] wrong number of arguments(0 for 1))  
   fails "The =~ operator with named captures on syntax of 'string_literal' =~ /regexp/ does not set local variables" # Exception: named captures are not supported in javascript: "(?<matched>foo)(?<unmatched>bar)?"
   fails "The =~ operator with named captures on syntax of /regexp/ =~ string_variable sets local variables by the captured pairs"
@@ -316,14 +300,12 @@ opal_filter "language" do
   fails "The defined? keyword for variables returns nil for a global variable that has been read but not assigned to"
   fails "The defined? keyword for variables when a Regexp matches a String returns nil for non-captures"
   fails "The defined? keyword for variables when a String matches a Regexp returns nil for non-captures"
-  fails "The if expression accepts multiple assignments in conditional expression with nil values" # NoMethodError: undefined method `ary' for #<MSpecEnv:0x50754>
-  fails "The if expression accepts multiple assignments in conditional expression with non-nil values" # NoMethodError: undefined method `ary' for #<MSpecEnv:0x50754>
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with exclusive-end range"
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with inclusive-end range"
   fails "The or operator has a lower precedence than 'next' in 'next true or false'"
-  fails "The predefined global constants includes TOPLEVEL_BINDING"
   fails "The redo statement in a method is invalid and raises a SyntaxError" # Expected SyntaxError but no exception was raised ("m" was returned)
   fails "The redo statement triggers ensure block when re-executing a block"
+  fails "The rescue keyword allows rescue in 'do end' block" # NoMethodError: undefined method `call' for nil
   fails "The rescue keyword can capture the raised exception using a setter method" # NoMethodError: undefined method `message' for nil
   fails "The rescue keyword can capture the raised exception using a square brackets setter" # ArgumentError: [SquareBracketsCaptor#[]=] wrong number of arguments(1 for 2)
   fails "The rescue keyword inline form can be inlined" # Expected Infinity to equal 1
@@ -366,6 +348,9 @@ opal_filter "language" do
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block"
   fails "self.send(:block_given?) returns true if and only if a block is supplied"
   fails "top-level constant lookup on a class does not search Object after searching other scopes" # Expected NameError but no exception was raised (Hash was returned)
+  fails_badly "Pattern matching refinements are used for #=== in constant pattern"
+  fails_badly "Pattern matching refinements are used for #deconstruct"
+  fails_badly "Pattern matching refinements are used for #deconstruct_keys"
   fails_badly "The while expression stops running body if interrupted by break in a begin ... end attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break in a parenthesized attribute op-assign-or value"
   fails_badly "The while expression stops running body if interrupted by break with unless in a begin ... end attribute op-assign-or value"

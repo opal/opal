@@ -20,7 +20,6 @@ opal_filter "Proc" do
   fails "Proc#arity for instances created with proc { || } returns zero for definition \n    @a = proc { |a: 1| }\n    @b = proc { |a: 1, b: 2| }"
   fails "Proc#arity for instances created with proc { || } returns zero for definition \n    @a = proc { |a=1, b: 2| }\n    @b = proc { |a=1, b: 2| }"
   fails "Proc#arity for instances created with proc { || } returns zero for definition \n    @a = proc { |a=1| }\n    @b = proc { |a=1, b=2| }"
-  fails "Proc#binding returns a Binding instance"
   fails "Proc#binding returns the binding associated with self"
   fails "Proc#call can call its block argument declared with a block argument" # Expected 6 to equal 10
   fails "Proc#call on a Proc created with Kernel#lambda or Kernel#proc ignores excess arguments when self is a proc" # ArgumentError: expected kwargs
