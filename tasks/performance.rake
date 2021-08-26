@@ -83,63 +83,67 @@ performance_stat = ->(name) {
   stat
 }
 
-task :performance_compare do
-  this_ref = `git describe --tags`.chomp
-  ref = 'master'
-  ref = ENV['GITHUB_BASE_REF'] if ENV['GITHUB_BASE_REF'] && !ENV['GITHUB_BASE_REF'].empty?
+namespace :performance do
+  task :compare do
+    this_ref = `git describe --tags`.chomp
+    ref = 'master'
+    ref = ENV['GITHUB_BASE_REF'] if ENV['GITHUB_BASE_REF'] && !ENV['GITHUB_BASE_REF'].empty?
 
-  # Prepare
-  puts "\n* Preparing asciidoctor..."
-  sh(*ASCIIDOCTOR_PREPARE)
+    # Prepare
+    puts "\n* Preparing asciidoctor..."
+    sh(*ASCIIDOCTOR_PREPARE)
 
-  puts "\n* Running AsciiDoctor with CRuby..."
-  sh("#{ASCIIDOCTOR_RUN_RUBY} > tmp/performance/ruby_result.html")
+    puts "\n* Running AsciiDoctor with CRuby..."
+    sh("#{ASCIIDOCTOR_RUN_RUBY} > tmp/performance/ruby_result.html")
 
-  current = performance_stat.(:current)
+    current = performance_stat.(:current)
 
-  # Prepare previous
-  sh("git checkout --recurse-submodules #{ref} && bundle install >/dev/null 2>&1")
+    # Prepare previous
+    sh("git checkout --recurse-submodules #{ref} && bundle install >/dev/null 2>&1")
 
-  previous = performance_stat.(:previous)
+    previous = performance_stat.(:previous)
 
-  # Restore current
-  sh("git checkout --recurse-submodules - && bundle install >/dev/null 2>&1")
+    # Restore current
+    sh("git checkout --recurse-submodules - && bundle install >/dev/null 2>&1")
 
-  # Summary
-  puts "\n=== Summary ==="
-  puts "Summary of performance changes between (previous) #{ref} and (current) #{this_ref}:"
+    # Summary
+    puts "\n=== Summary ==="
+    puts "Summary of performance changes between (previous) #{ref} and (current) #{this_ref}:"
 
-  diff = `diff --report-identical-files -F '^Class' -Naur tmp/performance/optstatus_previous tmp/performance/optstatus_current`
-  diff_lines = diff.split("\n")
+    diff = `diff --report-identical-files -F '^Class' -Naur tmp/performance/optstatus_previous tmp/performance/optstatus_current`
+    diff_lines = diff.split("\n")
 
-  puts
-  puts "Comparison of V8 function optimization status:"
-  puts diff
-
-  if diff_lines.grep(/^-\s+\[COMPILED\]/).count > 0
-    failure.("Some methods are no longer compiled on V8")
-  end
-
-  puts
-  puts "Comparison of the Asciidoctor (a real-life Opal application) compile and run:"
-
-  failure.("Wrong result on the current branch") unless current[:correct]
-  failure.("Wrong result on the previous branch - ignore it") unless previous[:correct]
-
-  compare_values.("Compile time",        current[:compiler_time], previous[:compiler_time])
-  compare_values.("Run time",                 current[:run_time],      previous[:run_time])
-  compare_values.("Bundle size",                  current[:size],          previous[:size])
-  compare_values.("Minified bundle size",     current[:min_size],      previous[:min_size])
-
-  if failed
-    puts "--- Failures ---"
-    failed.each do |f|
-      puts " - #{f}"
-    end
     puts
-    puts "This run failed - some performance checks did not pass. Don't worry, this is"
-    puts "informative, not fatal. It may be worth to rerun the task, rebase the branch,"
-    puts "or consult those results with a pull request reviewer."
-    fail
+    puts "Comparison of V8 function optimization status:"
+    puts diff
+
+    if diff_lines.grep(/^-\s+\[COMPILED\]/).count > 0
+      failure.("Some methods are no longer compiled on V8")
+    end
+
+    puts
+    puts "Comparison of the Asciidoctor (a real-life Opal application) compile and run:"
+
+    failure.("Wrong result on the current branch") unless current[:correct]
+    failure.("Wrong result on the previous branch - ignore it") unless previous[:correct]
+
+    compare_values.("Compile time",        current[:compiler_time], previous[:compiler_time])
+    compare_values.("Run time",                 current[:run_time],      previous[:run_time])
+    compare_values.("Bundle size",                  current[:size],          previous[:size])
+    compare_values.("Minified bundle size",     current[:min_size],      previous[:min_size])
+
+    if failed
+      puts "--- Failures ---"
+      failed.each do |f|
+        puts " - #{f}"
+      end
+      puts
+      puts "This run failed - some performance checks did not pass. Don't worry, this is"
+      puts "informative, not fatal. It may be worth to rerun the task, rebase the branch,"
+      puts "or consult those results with a pull request reviewer."
+      fail
+    end
   end
 end
+
+task :performance => ['performance:compare']

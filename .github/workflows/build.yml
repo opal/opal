@@ -53,7 +53,7 @@ jobs:
             ruby: 3.0
             permissive: true
             fetchdepth: '0'
-            command: bin/rake performance_compare
+            command: bin/rake performance:compare
 
           # Currently failing:
           # - ruby: truffleruby
