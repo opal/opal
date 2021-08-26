@@ -2,6 +2,8 @@
 
 require 'opal'
 require 'securerandom'
+require 'stringio'
+require 'fileutils'
 
 module Opal
   class REPL
@@ -22,6 +24,11 @@ module Opal
 
       MiniRacer::Platform.set_flags! :harmony
 
+      begin
+        FileUtils.touch(HISTORY_PATH)
+      rescue
+        nil
+      end
       @history = File.exist?(HISTORY_PATH)
     end
 
@@ -45,16 +52,18 @@ module Opal
     end
 
     def load_opal
-      v8.attach('console.log', method(:puts).to_proc)
-      v8.attach('console.warn', method(:warn).to_proc)
+      v8.attach('console.log', method(:print).to_proc)
+      v8.attach('console.warn', ->(i) { $stderr.print(i) })
       v8.attach('crypto.randomBytes', method(:random_bytes).to_proc)
       v8.eval Opal::Builder.new.build('opal').to_s
+      v8.eval Opal::Builder.new.build('pp').to_s
+      v8.eval Opal::Builder.new.build('opal/replutils').to_s
       v8.attach('Opal.exit', method(:exit).to_proc)
     end
 
     def run_line(line)
       result = eval_ruby(line)
-      puts "=> #{result}"
+      puts result.to_s if result
     end
 
     def run_input_loop
@@ -71,15 +80,108 @@ module Opal
 
     private
 
+    LINEBREAKS = [
+      'unexpected token $end',
+      'unterminated string meets end of file'
+    ].freeze
+
+    class Silencer
+      def initialize
+        @stderr = $stderr
+      end
+
+      def silence
+        @collector = StringIO.new
+        $stderr = @collector
+        yield
+      ensure
+        $stderr = @stderr
+      end
+
+      def warnings
+        @collector.string
+      end
+    end
+
     def eval_ruby(code)
       builder = Opal::Builder.new
-      builder.build_str(code, '(irb)', irb: true, const_missing: true)
+      silencer = Silencer.new
+
+      code = "#{@incomplete}#{code}"
+      if code.start_with? 'ls '
+        eval_code = code[3..-1]
+        mode = :ls
+      elsif code == 'ls'
+        eval_code = 'self'
+        mode = :ls
+      elsif code.start_with? 'show '
+        eval_code = code[5..-1]
+        mode = :show
+      else
+        eval_code = code
+        mode = :inspect
+      end
+
+      begin
+        silencer.silence do
+          builder.build_str(eval_code, '(irb)', irb: true, const_missing: true)
+        end
+        @incomplete = nil
+      rescue Opal::SyntaxError => e
+        if LINEBREAKS.include?(e.message)
+          @incomplete = "#{code}\n"
+          return
+        else
+          @incomplete = nil
+          if silencer.warnings.empty?
+            return e.full_message
+          else
+            # Most likely a parser error
+            return silencer.warnings
+          end
+        end
+      end
       builder.processed[0...-1].each { |js_code| eval_js js_code.to_s }
       last_processed_file = builder.processed.last.to_s
-      eval_js <<-JS
-        var $_result = #{last_processed_file};
-        $_result.$inspect()
+
+      return last_processed_file if mode == :show
+
+      result = eval_js <<-JS
+        (function () {
+          try {
+            var $_result = #{last_processed_file};
+
+            if (typeof $_result === 'null') {
+              return "=> null";
+            }
+            else if (typeof $_result === 'undefined') {
+              return "=> undefined";
+            }
+            else if (typeof $_result.$$class === 'undefined') {
+              try {
+                return "=> " + $_result.toString() + " => " + JSON.stringify($_result, null, 2);
+              }
+              catch(e) {
+                return "=> " + $_result.toString();
+              }
+            }
+            else {
+              if (#{mode.to_s.inspect} == 'ls') {
+                return Opal.REPLUtils.$ls($_result);
+              }
+              else {
+                return "=> " + $_result.$pretty_inspect();
+              }
+            }
+          }
+          catch(e) {
+            var out = e.$full_message(Opal.hash({highlight: true}));
+            Opal.pop_exception();
+            return out;
+          }
+        })();
       JS
+      result
     rescue => e
       puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end
@@ -93,7 +195,8 @@ module Opal
     end
 
     def readline
-      Readline.readline '>> ', true
+      prompt = @incomplete ? '.. ' : '>> '
+      Readline.readline prompt, true
     end
 
     def load_history
