@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
 require 'fileutils'
-require 'digest/sha2'
 require 'zlib'
 
 module Opal
-  class Cache
+  module Cache
     class FileCache
       def initialize(dir: nil, max_size: nil)
         @dir = dir || self.class.find_dir
-        @root = File.expand_path('..', Opal.gem_dir)
         # Store at most 32MB of cache - de facto this 32MB is larger,
         # as we don't account for inode size for instance. In fact, it's
         # about 50M. Also we run this check before anything runs, so things
@@ -19,34 +17,23 @@ module Opal
         tidy_up_cache
       end
 
-      def fetch(*key)
-        key = key.join('/')
+      def set(key, data)
         file = cache_filename_for(key)
 
-        if File.exist?(file)
-          data = load_data(file)
-        end
-
-        if data
-          data
-        else
-          compiler = yield
-          store_data(file, compiler)
-          compiler
-        end
-      end
-
-      private def store_data(file, data)
         out = Marshal.dump(data)
         out = Zlib.gzip(out, level: 9)
         File.binwrite(file, out)
       end
 
-      private def load_data(file)
-        FileUtils.touch(file)
-        out = File.binread(file)
-        out = Zlib.gunzip(out)
-        Marshal.load(out) # rubocop:disable Security/MarshalLoad
+      def get(key)
+        file = cache_filename_for(key)
+
+        if File.exist?(file)
+          FileUtils.touch(file)
+          out = File.binread(file)
+          out = Zlib.gunzip(out)
+          Marshal.load(out) # rubocop:disable Security/MarshalLoad
+        end
       rescue Zlib::GzipFile::Error
         nil
       end
@@ -116,42 +103,13 @@ module Opal
                       # No way... we can't write anywhere...
                       else
                         warn "Couldn't find a writable path to store Opal cache. " \
-                            'Try setting OPAL_CACHE_DIR environment variable'
+                             'Try setting OPAL_CACHE_DIR environment variable'
                         nil
                       end
       end
 
       private def cache_filename_for(key)
-        "#{@dir}/#{runtime_hash}-#{hash key}.rbm.gz"
-      end
-
-      private def hash(object)
-        digest object.inspect
-      end
-
-      private def digest(string)
-        Digest::SHA256.hexdigest(string)[-32..-1].to_i(16).to_s(36)
-      end
-
-      private def runtime_hash
-        # Re-compute runtime hash if some compiler options changed during the process.
-        compiler_options = Opal::Config.compiler_options.inspect
-        @runtime_hash = nil if @compiler_options != compiler_options
-        @runtime_hash ||= begin
-          # We want to ensure the compiler and any Gemfile/gemspec (for development)
-          # stays untouched
-          files = Dir["#{@root}/{Gemfile*,*.gemspec,lib/**/*}"]
-
-          # Also check if parser wasn't changed:
-          files += $LOADED_FEATURES.grep(%r{lib/(parser|ast)})
-
-          digest [
-            files.sort.map { |f| "#{f}:#{File.size(f)}:#{File.mtime(f).to_f}" },
-            @compiler_options = compiler_options,
-            RUBY_VERSION,
-            RUBY_PATCHLEVEL
-          ].join('/')
-        end
+        "#{@dir}/#{key}.rbm.gz"
       end
     end
   end

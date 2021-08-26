@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 require 'opal/paths'
+require 'digest/sha2' unless RUBY_ENGINE == 'opal'
 
 if RUBY_ENGINE != 'opal'
   require 'opal/cache/file_cache'
 end
 
 module Opal
+  # A Sprockets-compatible cache, for example an instance of
+  # Opal::Cache::FileCache or Opal::Cache::NullCache.
   singleton_class.attr_writer :cache
 
   def self.cache
@@ -18,13 +21,55 @@ module Opal
       end
   end
 
-  class Cache
-    class CacheError < StandardError; end
-
+  module Cache
     class NullCache
       def fetch(*)
         yield
       end
+    end
+
+    module_function
+
+    def fetch(cache, key, &block)
+      # Extension to the Sprockets API of Cache, if a cache responds
+      # to #fetch, then we call it instead of using #get and #set.
+      return cache.fetch(key, &block) if cache.respond_to? :fetch
+
+      key = digest(key.join('/')) + '-' + runtime_key
+
+      data = cache.get(key)
+
+      data || begin
+                compiler = yield
+                cache.set(key, compiler)
+                compiler
+              end
+    end
+
+    def runtime_key
+      # Re-compute runtime hash if some compiler options changed during the process.
+      compiler_options = Opal::Config.compiler_options.inspect
+      @runtime_key = nil if @compiler_options != compiler_options
+      @runtime_key ||= begin
+        # We want to ensure the compiler and any Gemfile/gemspec (for development)
+        # stays untouched
+        opal_path = File.expand_path('..', Opal.gem_dir)
+        files = Dir["#{opal_path}/{Gemfile*,*.gemspec,lib/**/*}"]
+
+        # Also check if parser wasn't changed:
+        files += $LOADED_FEATURES.grep(%r{lib/(parser|ast)})
+
+        digest [
+          files.sort.map { |f| "#{f}:#{File.size(f)}:#{File.mtime(f).to_f}" },
+          @compiler_options = compiler_options,
+          RUBY_VERSION,
+          RUBY_PATCHLEVEL
+        ].join('/')
+      end
+    end
+
+    def digest(string)
+      ::Digest::SHA256.hexdigest(string)[-32..-1].to_i(16).to_s(36)
     end
   end
 end
