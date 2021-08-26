@@ -139,7 +139,7 @@ class Array
         result.push(#{`self[i]`.to_json});
       }
 
-      return '[' + result.join(', ') + ']';
+      return '[' + result.join(',') + ']';
     }
   end
 end
