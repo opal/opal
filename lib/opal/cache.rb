@@ -48,7 +48,11 @@ module Opal
           file = cache_filename_for(key)
 
           if File.exist?(file)
-            load_data(file)
+            data = load_data(file)
+          end
+
+          if data
+            data
           else
             compiler = yield
             store_data(file, compiler)
@@ -67,6 +71,8 @@ module Opal
           out = File.binread(file)
           out = Zlib.gunzip(out)
           Marshal.load(out) # rubocop:disable Security/MarshalLoad
+        rescue Zlib::GzipFile::Error
+          nil
         end
 
         # Remove cache entries that overflow our cache limit... and which
