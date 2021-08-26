@@ -3,6 +3,7 @@
 require 'opal/path_reader'
 require 'opal/paths'
 require 'opal/config'
+require 'opal/cache'
 require 'set'
 
 module Opal
@@ -135,6 +136,11 @@ module Opal
     attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
       :compiler_options, :missing_require_severity
 
+    attr_writer :cache
+    def cache
+      @cache || Opal.cache
+    end
+
     private
 
     def tree_requires(asset, asset_path)
@@ -164,6 +170,8 @@ module Opal
                                            "source: #{source.inspect}, "\
                                            "processors: #{processors.inspect}"
                   )
+
+      options = options.merge(cache: cache)
 
       processor.new(source, rel_path, @compiler_options.merge(options))
     end

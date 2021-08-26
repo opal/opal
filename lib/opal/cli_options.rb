@@ -176,6 +176,10 @@ module Opal
         options[:parse_comments] = true
       end
 
+      on('--no-cache', 'Disable filesystem cache') do
+        options[:no_cache] = true
+      end
+
       separator ''
     end
 
