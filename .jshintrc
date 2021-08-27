@@ -3,7 +3,7 @@
 
   "curly"         : true, // Require curly braces around blocks in loops and conditionals
   "eqeqeq"        : true, // Prohibit the use of == and != in favor of === and !==
-  "es3"           : true, // Adhere to ECMAScript 3 specification
+  "esversion"     : "6", // Adhere to ECMAScript 5 specification
   "forin"         : true, // Require all for in loops to filter object's items (hasOwnProperty)
   "latedef"       : "nofunc", // Prohibit the use of a variable before it was defined (allow function declarations to be ignored)
   "noarg"         : true, // Prohibit the use of arguments.caller and arguments.callee

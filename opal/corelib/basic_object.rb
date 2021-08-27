@@ -14,11 +14,11 @@ class BasicObject
 
   def __id__
     %x{
-      if (self.$$id != null) {
-        return self.$$id;
+      if (self[Opal.$$id_s] != null) {
+        return self[Opal.$$id_s];
       }
-      Opal.defineProperty(self, '$$id', Opal.uid());
-      return self.$$id;
+      Opal.defineProperty(self, Opal.$$id_s, Opal.uid());
+      return self[Opal.$$id_s];
     }
   end
 
