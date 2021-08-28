@@ -1,3 +1,5 @@
+`/* global imports */`
+
 # Basic version, appends \n:
 # $stdout.write_proc = `function(s){print(s)}`
 # $stderr.write_proc = `function(s){printerr(s)}`

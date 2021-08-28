@@ -366,22 +366,26 @@ module Kernel
             base = 2;
             return head;
           }
+          // no-break
         case '0':
         case '0o':
           if (base === 0 || base === 8) {
             base = 8;
             return head;
           }
+          // no-break
         case '0d':
           if (base === 0 || base === 10) {
             base = 10;
             return head;
           }
+          // no-break
         case '0x':
           if (base === 0 || base === 16) {
             base = 16;
             return head;
           }
+          // no-break
         }
         #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
       });
