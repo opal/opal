@@ -1,3 +1,5 @@
+`/* global Java, GjsFileImporter */`
+
 browser         = `typeof(document) !== "undefined"`
 node            = `typeof(process) !== "undefined" && process.versions && process.versions.node`
 nashorn         = `typeof(Java) !== "undefined" && Java.type`

@@ -1,3 +1,5 @@
+`/* global Java */`
+
 class File
   def self.read(path)
     %x(

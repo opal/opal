@@ -66,8 +66,8 @@ module Kernel
 
       function GET_NEXT_ARG() {
         switch (pos_arg_num) {
-        case -1: #{raise ArgumentError, "unnumbered(#{`seq_arg_num`}) mixed with numbered"}
-        case -2: #{raise ArgumentError, "unnumbered(#{`seq_arg_num`}) mixed with named"}
+        case -1: #{raise ArgumentError, "unnumbered(#{`seq_arg_num`}) mixed with numbered"} // raise
+        case -2: #{raise ArgumentError, "unnumbered(#{`seq_arg_num`}) mixed with named"} // raise
         }
         pos_arg_num = seq_arg_num++;
         return GET_NTH_ARG(pos_arg_num - 1);
@@ -135,6 +135,7 @@ module Kernel
         switch (format_string.charAt(i)) {
         case '%':
           begin_slice = i;
+          // no-break
         case '':
         case '\n':
         case '\0':
@@ -240,6 +241,7 @@ module Kernel
               }
               hash_parameter_key += format_string.charAt(i);
             }
+            // raise
 
           case '*':
             i++;
@@ -482,6 +484,7 @@ module Kernel
           case 'A':
             // Not implemented because there are no specs for this field type.
             #{raise NotImplementedError, '`A` and `a` format field types are not implemented in Opal yet'}
+            // raise
 
           case 'c':
             arg = GET_ARG();

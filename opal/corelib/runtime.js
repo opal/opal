@@ -1419,8 +1419,6 @@
   Opal.stub_for = function(method_name) {
 
     function method_missing_stub() {
-      /* jshint validthis: true */
-
       // Copy any given block onto the method_missing dispatcher
       this.$method_missing.$$p = method_missing_stub.$$p;
 

@@ -41,7 +41,8 @@ if RUBY_ENGINE == 'opal'
 
   class Parser::Builders::Default
     def check_lvar_name(name, loc)
-      if name =~ `/^[\p{Ll}|_][\p{L}\p{Nl}\p{Nd}_]*$/u`
+      # https://javascript.info/regexp-unicode
+      if name =~ `new RegExp('^[\\p{Ll}|_][\\p{L}\\p{Nl}\\p{Nd}_]*$', 'u')`
         # OK
       else
         diagnostic :error, :lvar_name, { name: name }, loc

@@ -628,6 +628,7 @@ class String < `String`
 
   def inspect
     %x{
+      /* eslint-disable no-misleading-character-class */
       var escapable = /[\\\"\x00-\x1f\u007F-\u009F\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
           meta = {
             '\u0007': '\\a',
@@ -651,6 +652,7 @@ class String < `String`
             }
           });
       return '"' + escaped.replace(/\#[\$\@\{]/g, '\\$&') + '"';
+      /* eslint-enable no-misleading-character-class */
     }
   end
 
