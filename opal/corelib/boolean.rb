@@ -56,8 +56,33 @@ class Boolean < `Boolean`
   end
 end
 
-TrueClass  = Boolean
-FalseClass = Boolean
+class TrueClass < Boolean
+  `self.$$is_true_class = true`
+
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{name}"
+    end
+
+    def ===(object)
+      `Opal.is_obj_true(object, self)`
+    end
+  end
+end
+
+class FalseClass < Boolean
+  `self.$$is_false_class = true`
+
+  class << self
+    def allocate
+      raise TypeError, "allocator undefined for #{name}"
+    end
+
+    def ===(object)
+      `Opal.is_obj_false(object, self)`
+    end
+  end
+end
 
 TRUE  = true
 FALSE = false
