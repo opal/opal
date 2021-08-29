@@ -1,16 +1,21 @@
 class Boolean < `Boolean`
   `Opal.defineProperty(self.$$prototype, '$$is_boolean', true)`
-  `Opal.defineProperty(self.$$prototype, '$$meta', #{self})`
 
-  `Object.defineProperty(self.$$prototype, '$$class', {
-    configurable: true,
-    enumerable: false,
-    get: function() {
-      return this == true  ? Opal.TrueClass : 
-             this == false ? Opal.FalseClass :
-                             Opal.Boolean;
+  %x{
+    var properties = ['$$class', '$$meta'];
+
+    for (var i = 0; i < properties.length; i++) {
+      Object.defineProperty(self.$$prototype, properties[i], {
+        configurable: true,
+        enumerable: false,
+        get: function() {
+          return this == true  ? Opal.TrueClass :
+                 this == false ? Opal.FalseClass :
+                                 Opal.Boolean;
+        }
+      });
     }
-  })`
+  }
 
   class << self
     def allocate
@@ -50,7 +55,7 @@ class Boolean < `Boolean`
   alias eql? ==
 
   def singleton_class
-    Boolean
+    `self.$$meta`
   end
 
   def to_s
