@@ -33,3 +33,7 @@
 ### Deprecated
 
 ### Removed
+
+### Internal
+
+- Switch from jshint to ESLint (#2289)
