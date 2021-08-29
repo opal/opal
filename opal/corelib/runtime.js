@@ -173,20 +173,6 @@
     return (val === nil || val == null || (val.$$is_boolean && val == false))
   };
 
-  Opal.is_obj_true = function(object, klass) {
-    if (klass.$$is_true_class) {
-      return object === true;
-    }
-    return false;
-  }
-
-  Opal.is_obj_false = function(object, klass) {
-    if (klass.$$is_false_class && object !== nil) {
-      return object === false;
-    }
-    return false;
-  }
-
   Opal.type_error = function(object, type, method, coerced) {
     object = object.$$class;
 

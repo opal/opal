@@ -2,6 +2,16 @@ class Boolean < `Boolean`
   `Opal.defineProperty(self.$$prototype, '$$is_boolean', true)`
   `Opal.defineProperty(self.$$prototype, '$$meta', #{self})`
 
+  `Object.defineProperty(self.$$prototype, '$$class', {
+    configurable: true,
+    enumerable: false,
+    get: function() {
+      return this == true  ? Opal.TrueClass : 
+             this == false ? Opal.FalseClass :
+                             Opal.Boolean;
+    }
+  })`
+
   class << self
     def allocate
       raise TypeError, "allocator undefined for #{name}"
@@ -56,33 +66,8 @@ class Boolean < `Boolean`
   end
 end
 
-class TrueClass < Boolean
-  `self.$$is_true_class = true`
-
-  class << self
-    def allocate
-      raise TypeError, "allocator undefined for #{name}"
-    end
-
-    def ===(object)
-      `Opal.is_obj_true(object, self)`
-    end
-  end
-end
-
-class FalseClass < Boolean
-  `self.$$is_false_class = true`
-
-  class << self
-    def allocate
-      raise TypeError, "allocator undefined for #{name}"
-    end
-
-    def ===(object)
-      `Opal.is_obj_false(object, self)`
-    end
-  end
-end
+class TrueClass < Boolean; end
+class FalseClass < Boolean; end
 
 TRUE  = true
 FALSE = false
