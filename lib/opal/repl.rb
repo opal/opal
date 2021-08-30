@@ -56,7 +56,6 @@ module Opal
       v8.attach('console.warn', ->(i) { $stderr.print(i) })
       v8.attach('crypto.randomBytes', method(:random_bytes).to_proc)
       v8.eval Opal::Builder.new.build('opal').to_s
-      v8.eval Opal::Builder.new.build('pp').to_s
       v8.eval Opal::Builder.new.build('opal/replutils').to_s
       v8.attach('Opal.exit', method(:exit).to_proc)
     end
@@ -147,43 +146,14 @@ module Opal
       return last_processed_file if mode == :show
 
       result = eval_js <<-JS
-        (function () {
-          try {
-            var $_result = #{last_processed_file};
-
-            if (typeof $_result === 'null') {
-              return "=> null";
-            }
-            else if (typeof $_result === 'undefined') {
-              return "=> undefined";
-            }
-            else if (typeof $_result.$$class === 'undefined') {
-              try {
-                return "=> " + $_result.toString() + " => " + JSON.stringify($_result, null, 2);
-              }
-              catch(e) {
-                return "=> " + $_result.toString();
-              }
-            }
-            else {
-              if (#{mode.to_s.inspect} == 'ls') {
-                return Opal.REPLUtils.$ls($_result);
-              }
-              else {
-                return "=> " + $_result.$pretty_inspect();
-              }
-            }
-          }
-          catch(e) {
-            var out = e.$full_message(Opal.hash({highlight: true}));
-            Opal.pop_exception();
-            return out;
-          }
-        })();
+        Opal.REPLUtils.$eval_and_print(function () {
+          var ret = #{last_processed_file};
+          return ret;
+        }, #{mode.to_s.inspect});
       JS
       result
-    rescue => e
-      puts "#{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    rescue Exception => e # rubocop:disable Lint/RescueException
+      puts e.full_message(highlight: true)
     end
 
     def eval_js(code)

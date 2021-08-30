@@ -1,3 +1,5 @@
+require 'pp'
+
 module REPLUtils
   module_function
 
@@ -30,5 +32,40 @@ module REPLUtils
     out = "self.methods: #{methods.sort.join('  ')}\n" + out unless methods.empty?
     out = "constants: #{constants.sort.join('  ')}\n" + out unless constants.empty?
     out
+  end
+
+  def eval_and_print(func, mode)
+    %x{
+      var $_result = #{func}();
+
+      if (typeof $_result === 'null') {
+        return "=> null";
+      }
+      else if (typeof $_result === 'undefined') {
+        return "=> undefined";
+      }
+      else if (typeof $_result.$$class === 'undefined') {
+        try {
+          return "=> " + $_result.toString() + " => " + JSON.stringify($_result, null, 2);
+        }
+        catch(e) {
+          return "=> " + $_result.toString();
+        }
+      }
+      else {
+        if (mode == 'ls') {
+          return #{ls(`$_result`)};
+        }
+        else {
+          var pretty = #{`$_result`.pretty_inspect};
+          // Is it multiline? If yes, add a linebreak
+          if (pretty.match(/\n.*?\n/)) pretty = "\n" + pretty;
+          return "=> " + pretty;
+        }
+      }
+    }
+    `ret`
+  rescue Exception => e # rubocop:disable Lint/RescueException
+    e.full_message(highlight: true)
   end
 end
