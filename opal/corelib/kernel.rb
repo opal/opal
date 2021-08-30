@@ -246,7 +246,11 @@ module Kernel
   end
 
   def inspect
-    to_s
+    ivs = ''
+    instance_variables.each do |i|
+      ivs += " #{i}=#{instance_variable_get(i)}"
+    end
+    "#<#{self.class}:0x#{__id__.to_s(16)}#{ivs}>"
   end
 
   def instance_of?(klass)

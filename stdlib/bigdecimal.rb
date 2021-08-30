@@ -234,6 +234,7 @@ class BigDecimal < Numeric
   def to_s(s = '')
     bignumber.JS.toString
   end
+  alias inspect to_s
 
   def zero?
     bignumber.JS.isZero

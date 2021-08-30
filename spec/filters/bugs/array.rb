@@ -31,7 +31,6 @@ opal_filter "Array" do
   fails "Array#flatten performs respond_to? and method_missing-aware checks when coercing elements to array"
   fails "Array#flatten with a non-Array object in the Array calls #method_missing if defined"
   fails "Array#inspect does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
-  fails "Array#join raises a NoMethodError if an element does not respond to #to_str, #to_ary, or #to_s"
   fails "Array#partition returns in the left array values for which the block evaluates to true"
   fails "Array#rassoc calls elem == obj on the second element of each contained array"
   fails "Array#rassoc does not check the last element in each contained but specifically the second" # Expected [1, "foobar", #<MockObject:0x4ef6e>] to equal [2, #<MockObject:0x4ef6e>, 1]
