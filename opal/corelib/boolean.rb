@@ -1,6 +1,21 @@
 class Boolean < `Boolean`
   `Opal.defineProperty(self.$$prototype, '$$is_boolean', true)`
-  `Opal.defineProperty(self.$$prototype, '$$meta', #{self})`
+
+  %x{
+    var properties = ['$$class', '$$meta'];
+
+    for (var i = 0; i < properties.length; i++) {
+      Object.defineProperty(self.$$prototype, properties[i], {
+        configurable: true,
+        enumerable: false,
+        get: function() {
+          return this == true  ? Opal.TrueClass :
+                 this == false ? Opal.FalseClass :
+                                 Opal.Boolean;
+        }
+      });
+    }
+  }
 
   class << self
     def allocate
@@ -40,7 +55,7 @@ class Boolean < `Boolean`
   alias eql? ==
 
   def singleton_class
-    Boolean
+    `self.$$meta`
   end
 
   def to_s
@@ -54,10 +69,33 @@ class Boolean < `Boolean`
   def clone(freeze: true)
     self
   end
+
+  # See: https://github.com/opal/opal/issues/2230
+  #
+  # This is a hack that allows you to add methods to TrueClass and FalseClass.
+  # Do note, that while true and false have a correct $$class (it's either
+  # TrueClass or FalseClass), their prototype is `Boolean.$$prototype`, which
+  # basically means that when calling `true.something` we actually call
+  # `Boolean#something` instead of `TrueClass#something`. So using
+  # method_missing we dispatch it to `TrueClass/FalseClass#something` correctly.
+  #
+  # The downside is that a correct implementation would also allow us to override
+  # the methods defined on Boolean, but our implementation doesn't allow that,
+  # unless you define them on Boolean and not on TrueClass/FalseClass.
+  def method_missing(method, *args, &block)
+    `var body = self.$$class.$$prototype['$' + #{method}]`
+    super unless `typeof body !== 'undefined' && !body.$$stub`
+    `Opal.send(self, body, #{args}, #{block})`
+  end
+
+  def respond_to_missing?(method, _include_all = false)
+    `var body = self.$$class.$$prototype['$' + #{method}]`
+    `typeof body !== 'undefined' && !body.$$stub`
+  end
 end
 
-TrueClass  = Boolean
-FalseClass = Boolean
+class TrueClass < Boolean; end
+class FalseClass < Boolean; end
 
 TRUE  = true
 FALSE = false
