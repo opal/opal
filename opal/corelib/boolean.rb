@@ -15,6 +15,16 @@ class Boolean < `Boolean`
         }
       });
     }
+
+    Object.defineProperty(self.$$prototype, "$$id", {
+      configurable: true,
+      enumerable: false,
+      get: function() {
+        return this == true  ? 2 :
+               this == false ? 0 :
+                               nil;
+      }
+    });
   }
 
   class << self
@@ -61,6 +71,8 @@ class Boolean < `Boolean`
   def to_s
     `(self == true) ? 'true' : 'false'`
   end
+
+  alias inspect to_s
 
   def dup
     self
