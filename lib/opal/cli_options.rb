@@ -149,6 +149,11 @@ module Opal
         options[:runner_options][:map_file] = file
       end
 
+      on('--no-source-map', "Don't append source map to a compiled file") do
+        options[:runner_options] ||= {}
+        options[:runner_options][:no_source_map] = true
+      end
+
       on('-F', '--file FILE', 'Set filename for compiled code') do |file|
         options[:file] = file
       end
@@ -166,6 +171,10 @@ module Opal
 
       on('--enable-source-location', 'Compiles source location for each method definition.') do
         options[:enable_source_location] = true
+      end
+
+      on('--debug-source-maps', 'Highlights parts with no source map mapping in red') do
+        options[:debug_source_maps] = true
       end
 
       on('--use-strict', 'Enables JavaScript\'s strict mode (i.e., adds \'use strict\'; statement)') do

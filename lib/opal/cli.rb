@@ -139,6 +139,7 @@ module Opal
         inline_operators
         enable_source_location
         use_strict
+        debug_source_maps
         parse_comments
         esm
       ]
