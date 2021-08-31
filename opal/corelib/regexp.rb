@@ -245,12 +245,7 @@ class Regexp < `RegExp`
   end
 
   def names
-    %x{
-      var n = self.toString().match(/(?<=\(\?<)\w+(?=>.+\))/g);
-      if (!n) { return []; }
-      // make sure values are uniq
-      return Array.from(new Set(n));
-    }
+    source.scan(/\(?<(\w+)>/).map(&:first).uniq
   end
 
   def ~
