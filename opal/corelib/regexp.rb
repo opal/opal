@@ -248,6 +248,16 @@ class Regexp < `RegExp`
     source.scan(/\(?<(\w+)>/).map(&:first).uniq
   end
 
+  def named_captures
+    source.scan(/\(?<(\w+)>/)        # Scan for capture groups
+          .map(&:first)              # Get the first regexp match (\w+)
+          .each_with_index           # Add index to an iterator
+          .group_by(&:first)         # Group by the capture group names
+          .transform_values do |i|   # Convert hash values
+            i.map { |j| j.last + 1 } # Drop the capture group names; increase indexes by 1
+          end
+  end
+
   def ~
     self =~ $_
   end
@@ -354,12 +364,32 @@ class MatchData
     `#{@matches}.slice(1)`
   end
 
+  def named_captures
+    matches = captures
+    regexp.named_captures.transform_values do |i|
+      matches[i.last - 1]
+    end
+  end
+
+  def names
+    regexp.names
+  end
+
   def inspect
     %x{
       var str = "#<MatchData " + #{`#{@matches}[0]`.inspect};
 
-      for (var i = 1, length = #{@matches}.length; i < length; i++) {
-        str += " " + i + ":" + #{`#{@matches}[i]`.inspect};
+      if (#{regexp.names.empty?}) {
+        for (var i = 1, length = #{@matches}.length; i < length; i++) {
+          str += " " + i + ":" + #{`#{@matches}[i]`.inspect};
+        }
+      }
+      else {
+        #{ named_captures.each do |k, v|
+             %x{
+               str += " " + #{k} + ":" + #{v.inspect}
+             }
+           end }
       }
 
       return str + ">";

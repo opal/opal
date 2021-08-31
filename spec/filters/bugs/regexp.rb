@@ -1,6 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "regular_expressions" do
-  fails "MatchData#inspect returns a human readable representation of named captures" # Exception: named captures are not supported in javascript: "(?<first>\w+)\s+(?<last>\w+)\s+(\w+)"
   fails "MatchData#regexp returns a Regexp for the result of gsub(String)" # Expected /\[/gm == /\[/ to be truthy but was false
   fails "MatchData#string returns a frozen copy of the matched string for gsub(String)" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
   fails "MatchData.allocate is undefined" # Expected NoMethodError but no exception was raised (#<MatchData>(#pretty_inspect raised #<NoMethodError: undefined method `named_captures' for nil>) was returned)
@@ -33,11 +32,6 @@ opal_filter "regular_expressions" do
   fails "Regexp#inspect does not include a character set code"
   fails "Regexp#inspect does not include the 'o' option"
   fails "Regexp#inspect returns options in the order 'mixn'"
-  fails "Regexp#named_captures returns a Hash"
-  fails "Regexp#named_captures returns an empty Hash when there are no capture groups"
-  fails "Regexp#named_captures sets each element of the Array to the corresponding group's index"
-  fails "Regexp#named_captures sets the keys of the Hash to the names of the capture groups"
-  fails "Regexp#named_captures sets the values of the Hash to Arrays"
   fails "Regexp#named_captures works with duplicate capture group names"
   fails "Regexp#names returns each capture name only once"
   fails "Regexp#source will remove escape characters" # Expected "foo\\/bar" to equal "foo/bar"
