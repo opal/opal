@@ -318,7 +318,17 @@ class MatchData
   end
 
   def [](*args)
-    @matches[*args]
+    %x{
+      if (args[0].$$is_string) {
+        if (#{!regexp.names.include?(args[0])}) {
+          #{raise IndexError, "undefined group name reference: #{args[0]}"}
+        }
+        return #{named_captures[args[0]]}
+      }
+      else {
+        return #{@matches[*args]}
+      }
+    }
   end
 
   def offset(n)
