@@ -173,10 +173,6 @@ module Opal
         options[:enable_source_location] = true
       end
 
-      on('--debug-source-maps', 'Highlights parts with no source map mapping in red') do
-        options[:debug_source_maps] = true
-      end
-
       on('--use-strict', 'Enables JavaScript\'s strict mode (i.e., adds \'use strict\'; statement)') do
         options[:use_strict] = true
       end
