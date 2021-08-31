@@ -374,6 +374,8 @@ module Opal
         @refinements_temp = curr
         [prev, curr]
       end
+
+      attr_accessor :await_encountered
     end
   end
 end
