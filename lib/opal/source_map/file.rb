@@ -165,7 +165,9 @@ class Opal::SourceMap::File
         generated_column = 0
         segments = []
         raw_segments.each do |(generated_code, fragment)|
-          segments << segment_from_fragment(fragment, generated_column)
+          unless fragment.is_a?(Opal::Fragment) && fragment.skip_source_map?
+            segments << segment_from_fragment(fragment, generated_column)
+          end
           generated_column += generated_code.size
         end
         mappings << segments

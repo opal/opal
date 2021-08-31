@@ -123,5 +123,9 @@ module Opal
     def column
       location&.column
     end
+
+    def skip_source_map?
+      @sexp == false
+    end
   end
 end
