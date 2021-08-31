@@ -11,6 +11,8 @@ module Opal
       children :inline_args, :body
 
       def compile
+        is_lambda! if scope.lambda_definition?
+
         inline_params = nil
 
         to_vars = identity = body_code = nil
@@ -25,9 +27,15 @@ module Opal
 
           body_code = stmt(returned_body)
           to_vars = scope.to_vars
-        end
 
-        line body_code
+          line body_code
+
+          if scope.catch_return
+            unshift "try {\n"
+            line '} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }'
+            push ' throw $returner; }'
+          end
+        end
 
         unshift to_vars
 

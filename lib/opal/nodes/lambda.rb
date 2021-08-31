@@ -11,7 +11,9 @@ module Opal
       def compile
         helper :lambda
 
-        push '$lambda(', expr(iter), ')'
+        scope.defines_lambda do
+          push '$lambda(', expr(iter), ')'
+        end
       end
     end
   end
