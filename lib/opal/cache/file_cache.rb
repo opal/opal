@@ -60,6 +60,10 @@ module Opal
           # We don't need to work this out anymore - we reached out goal.
           break unless size_sum > @max_size
         end
+      rescue Errno::ENOENT
+        # Do nothing, this comes from multithreading. We will tidy up at
+        # the next chance.
+        nil
       end
 
       # This complex piece of code tries to check if we can robustly mkdir_p a directory.
