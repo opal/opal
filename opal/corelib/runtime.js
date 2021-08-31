@@ -2631,7 +2631,7 @@
       // Promise(V2).
       Opal.last_promise = Opal.last_promise.then(function() {
         if (!Opal.promise_unhandled_exception) return proc(Opal);
-      }).catch(function(error) {
+      })['catch'](function(error) {
         if (Opal.respond_to(error, '$full_message')) {
           error = error.$full_message();
         }
@@ -2644,7 +2644,7 @@
     }
     else {
       var ret = proc(Opal);
-      if (typeof ret === 'object' && ret instanceof Promise) {
+      if (typeof Promise === 'function' && typeof ret === 'object' && ret instanceof Promise) {
         Opal.last_promise = ret;
       }
       return ret;

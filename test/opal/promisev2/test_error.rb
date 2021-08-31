@@ -3,14 +3,20 @@ require 'promise/v2'
 
 class TestPromiseError < Test::Unit::TestCase
   def test_rejects_the_promise_with_the_given_error
-    assert_equal(PromiseV2.error(23).error, 23)
+    prom = PromiseV2.error(23)
+    assert_equal(prom.error, 23)
+    prom.rescue{} # Needed, otherwise we have an uncaught exception
   end
 
   def test_marks_the_promise_as_realized
-    assert_equal(PromiseV2.error(23).realized?, true)
+    prom = PromiseV2.error(23)
+    assert_equal(prom.realized?, true)
+    prom.rescue{} # Needed, otherwise we have an uncaught exception
   end
 
   def test_marks_the_promise_as_rejected
-    assert_equal(PromiseV2.error(23).rejected?, true)
+    prom = PromiseV2.error(23)
+    assert_equal(prom.rejected?, true)
+    prom.rescue{}
   end
 end

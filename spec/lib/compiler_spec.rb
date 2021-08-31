@@ -18,7 +18,8 @@ RSpec.describe Opal::Compiler do
   describe 'requirable' do
     it 'executes the file' do
       expect_compiled("").to include('(function(Opal) {')
-      expect_compiled("").to end_with("})(Opal);\n")
+      expect_compiled("").to start_with('Opal.queue(function(Opal) {')
+      expect_compiled("").to end_with("});\n")
     end
 
     it 'puts the compiled into "Opal.modules"' do
