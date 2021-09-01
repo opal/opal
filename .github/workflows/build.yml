@@ -37,7 +37,7 @@ jobs:
           - name: jruby
             ruby: jruby
           - name: truffleruby
-            ruby: truffleruby
+            ruby: truffleruby+graalvm
           # - name: near-eol-ruby
           #   ruby: 2.6
           - name: smoke-test
