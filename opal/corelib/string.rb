@@ -1,4 +1,6 @@
 # helpers: coerce_to, respond_to
+# use_strict: true
+# frozen_string_literal: true
 
 require 'corelib/comparable'
 require 'corelib/regexp'

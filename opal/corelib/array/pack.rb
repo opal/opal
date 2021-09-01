@@ -1,4 +1,6 @@
 # helpers: coerce_to
+# use_strict: true
+# frozen_string_literal: true
 
 require 'corelib/pack_unpack/format_string_parser'
 

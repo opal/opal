@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 require 'corelib/marshal/read_buffer'
 require 'corelib/marshal/write_buffer'
 

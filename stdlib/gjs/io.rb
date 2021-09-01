@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 `/* global imports */`
 
 # Basic version, appends \n:

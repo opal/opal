@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module FileUtils
   extend self
   `var __fs__ = #{File}.__fs__`

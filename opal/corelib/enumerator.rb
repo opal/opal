@@ -1,4 +1,6 @@
 # helpers: breaker, slice, falsy, truthy, coerce_to
+# use_strict: true
+# frozen_string_literal: true
 
 require 'corelib/enumerable'
 

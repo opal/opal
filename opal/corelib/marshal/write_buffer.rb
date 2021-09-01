@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class NilClass
   def __marshal__(buffer)
     buffer.append('0')

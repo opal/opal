@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # parser uses String#unpack
 require 'corelib/string/unpack'
 

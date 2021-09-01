@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class IO
   SEEK_SET = 0
   SEEK_CUR = 1

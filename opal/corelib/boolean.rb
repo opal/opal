@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class Boolean < `Boolean`
   `Opal.defineProperty(self.$$prototype, '$$is_boolean', true)`
 

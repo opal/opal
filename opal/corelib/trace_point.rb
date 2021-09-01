@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class TracePoint
   # partial implementation of TracePoint
   # for the moment only supports the :class event

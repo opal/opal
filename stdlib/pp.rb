@@ -1,3 +1,4 @@
+# use_strict: true
 # frozen_string_literal: true
 
 # Opal: load stdlib/thread.rb

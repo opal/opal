@@ -1,4 +1,6 @@
 # helpers: type_error, coerce_to
+# use_strict: true
+# frozen_string_literal: true
 
 module Opal
   def self.bridge(constructor, klass)

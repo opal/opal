@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 RUBY_PLATFORM       = 'opal'
 RUBY_ENGINE         = 'opal'
 RUBY_VERSION        = '3.0.2'

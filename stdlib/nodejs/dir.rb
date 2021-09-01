@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class Dir
   @__glob__ = `require('glob')`
   @__fs__ = `require('fs')`

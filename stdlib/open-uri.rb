@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # Copied from https://raw.githubusercontent.com/ruby/ruby/373babeaac8c3e663e1ded74a9f06ac94a671ed9/lib/open-uri.rb
 # frozen_string_literal: true
 require 'stringio'

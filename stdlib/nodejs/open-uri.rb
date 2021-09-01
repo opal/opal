@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module OpenURI
   @__xmlhttprequest__ = `require('unxhr')`
   `var __XMLHttpRequest__ = #{@__xmlhttprequest__}.XMLHttpRequest`
