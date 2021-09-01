@@ -292,6 +292,10 @@ module Opal
       ::Opal::AST::Node.new(type, children)
     end
 
+    def node(*args)
+      ::Opal::AST::Node.new(*args)
+    end
+
     def fragment(str, scope, sexp = nil)
       Fragment.new(str, scope, sexp)
     end
