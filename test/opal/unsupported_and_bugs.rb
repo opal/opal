@@ -37,3 +37,21 @@ class TestCall
   unsupported :test_safe_call_block_call_brace
   unsupported :test_safe_call_block_call_command
 end
+
+class TestShellwords
+  # TestShellwords#test_multibyte_characters [Assertion: Expected: "\\あ\\い"]:
+  # Expected: "\\あ\\い"
+  #   Actual: "あい"
+  unsupported :test_multibyte_characters
+
+  # TestShellwords#test_backslashes [Assertion: Expected: ["a\\b\\c\\\\d\\\\e a\\b\\c\\\\d\\\\e \\a\\\\b\\\\\\c\\\\\\\\d\\\\\\\\\\e\\ a\\b\\c\\\\d\\\\e "]]:
+  # Expected: ["a\\b\\c\\\\d\\\\e a\\b\\c\\\\d\\\\e \\a\\\\b\\\\\\c\\\\\\\\d\\\\\\\\\\e\\ a\\b\\c\\\\d\\\\e "]
+  #   Actual: ["a\\b\\c\\\\d\\\\e \\a\\b\\\\c\\\\d\\\\\\e\\ \\a\\\\b\\\\\\c\\\\\\\\d\\\\\\\\\\e\\ a\\b\\c\\\\d\\\\e "]
+  bug :test_backslashes
+
+  def test_stringification
+    assert_equal "3", shellescape(3)
+    pid = rand(1000)
+    assert_equal "ps -p #{pid}", ['ps', '-p', pid].shelljoin
+  end
+end

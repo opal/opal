@@ -324,6 +324,7 @@ platforms.each do |platform|
       else
         includes = "-Itest/cruby/test"
         files = %w[
+          test_shellwords.rb
           benchmark/test_benchmark.rb
           ruby/test_call.rb
           opal/test_keyword.rb
