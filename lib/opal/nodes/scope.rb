@@ -57,6 +57,10 @@ module Opal
 
         # used by classes to store all ivars used in direct def methods
         @proto_ivars = []
+
+        @refinements_temp = nil
+        @lambda_definition = nil
+        @is_lambda = nil
       end
 
       def in_scope
