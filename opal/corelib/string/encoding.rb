@@ -377,8 +377,12 @@ class String
 
       if (encoding === str.encoding) { return str; }
 
-      encoding = #{Opal.coerce_to!(encoding, String, :to_s)};
-      encoding = #{Encoding.find(encoding)};
+      if (typeof Opal.Encoding !== 'undefined' &&
+          !Opal.is_a(encoding, Opal.Encoding)) {
+
+        encoding = #{Opal.coerce_to!(encoding, String, :to_s)};
+        encoding = #{Encoding.find(encoding)};
+      }
 
       if (encoding === str.encoding) { return str; }
 
