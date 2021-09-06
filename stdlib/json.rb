@@ -29,7 +29,7 @@ module JSON
         case 'boolean':
           return !!value;
 
-        case 'null':
+        case 'undefined':
           return nil;
 
         case 'object':
