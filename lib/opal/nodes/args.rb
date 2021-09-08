@@ -35,7 +35,7 @@ module Opal
       # 1. check for args starting with '_' and check if they appear multiple times
       # 2. leave the first appearance as it is and rename the other ones
       # compiler result:
-      #   function $$funny_method_name(_, __opal_js_strict_mode_arg_2)
+      #   function $$funny_method_name(_, __$2)
 
       def compile
         same_arg_counter = {}
@@ -44,7 +44,7 @@ module Opal
             same_arg_counter[arg] ||= 0
             same_arg_counter[arg]  += 1
             if same_arg_counter[arg] > 1
-              arg = Opal::AST::Node.new(arg.type, [:"#{arg.children[0]}_opal_js_strict_mode_arg_#{same_arg_counter[arg]}"])
+              arg = s(arg.type, :"#{arg.children[0]}_$#{same_arg_counter[arg]}")
             end
           end
 
