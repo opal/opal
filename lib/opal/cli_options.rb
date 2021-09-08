@@ -180,6 +180,10 @@ module Opal
         options[:no_cache] = true
       end
 
+      on('--esm', 'Wraps compiled bundle as for ES6 module(requires -c or -L)') do
+        options[:esm] = true
+      end
+
       separator ''
     end
 

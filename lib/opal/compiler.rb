@@ -137,6 +137,11 @@ module Opal
     # Prepare the code for future requires
     compiler_option :requirable, default: false, as: :requirable?
 
+    # @!method esm?
+    #
+    # Wrap compiler result as self contained ES6 module
+    compiler_option :esm, default: false, as: :esm?
+
     # @!method inline_operators?
     #
     # are operators compiled inline
