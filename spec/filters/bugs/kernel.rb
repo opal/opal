@@ -354,6 +354,7 @@ opal_filter "Kernel" do
   fails "Kernel.lambda returns from the lambda itself, not the creation site of the lambda"
   fails "Kernel.lambda returns the passed Proc if given an existing Proc through super" # Expected true to be false
   fails "Kernel.lambda returns the passed Proc if given an existing Proc" # Expected true to be false
+  fails "Kernel.lambda treats the block as a Proc when lambda is re-defined" # Expected 2 == 1 to be truthy but was false
   fails "Kernel.loop returns StopIteration#result, the result value of a finished iterator" # requires changes in enumerator.rb
   fails "Kernel.printf calls write on the first argument when it is not a string"
   fails "Kernel.printf formatting io is not specified other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
@@ -404,5 +405,4 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "Kernel.sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel.srand returns the previous seed value on the first call" # NoMethodError: undefined method `insert' for "rubyexe.rb"
-  fails "Kernel.lambda treats the block as a Proc when lambda is re-defined" # Expected 2 == 1 to be truthy but was false
 end

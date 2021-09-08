@@ -1,6 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "regular_expressions" do
-  fails "MatchData#inspect returns a human readable representation of named captures" # Exception: named captures are not supported in javascript: "(?<first>\w+)\s+(?<last>\w+)\s+(\w+)"
   fails "MatchData#regexp returns a Regexp for the result of gsub(String)" # Expected /\[/gm == /\[/ to be truthy but was false
   fails "MatchData#string returns a frozen copy of the matched string for gsub(String)" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
   fails "MatchData.allocate is undefined" # Expected NoMethodError but no exception was raised (#<MatchData>(#pretty_inspect raised #<NoMethodError: undefined method `named_captures' for nil>) was returned)
@@ -33,18 +32,8 @@ opal_filter "regular_expressions" do
   fails "Regexp#inspect does not include a character set code"
   fails "Regexp#inspect does not include the 'o' option"
   fails "Regexp#inspect returns options in the order 'mixn'"
-  fails "Regexp#named_captures returns a Hash"
-  fails "Regexp#named_captures returns an empty Hash when there are no capture groups"
-  fails "Regexp#named_captures sets each element of the Array to the corresponding group's index"
-  fails "Regexp#named_captures sets the keys of the Hash to the names of the capture groups"
-  fails "Regexp#named_captures sets the values of the Hash to Arrays"
   fails "Regexp#named_captures works with duplicate capture group names"
-  fails "Regexp#names returns all of the named captures"
-  fails "Regexp#names returns an Array"
-  fails "Regexp#names returns an empty Array if there are no named captures"
   fails "Regexp#names returns each capture name only once"
-  fails "Regexp#names returns each named capture as a String"
-  fails "Regexp#names works with nested named captures"
   fails "Regexp#source will remove escape characters" # Expected "foo\\/bar" to equal "foo/bar"
   fails "Regexp#to_s deals properly with the two types of lookahead groups"
   fails "Regexp#to_s returns a string in (?xxx:yyy) notation"
@@ -74,11 +63,6 @@ opal_filter "regular_expressions" do
   fails "Regexp.compile works by default for subclasses with overridden #initialize" # Expected /hi/ (Regexp) to be kind of RegexpSpecsSubclass
   fails "Regexp.escape sets the encoding of the result to BINARY if any non-US-ASCII characters are present in an input String with invalid encoding" # Expected true to be false
   fails "Regexp.last_match returns nil when there is no match" # NoMethodError: undefined method `[]' for nil
-  fails "Regexp.last_match when given a String returns a named capture" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
-  fails "Regexp.last_match when given a Symbol raises an IndexError when given a missing name" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
-  fails "Regexp.last_match when given a Symbol returns a named capture" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
-  fails "Regexp.last_match when given an Object coerces argument to an index using #to_int" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
-  fails "Regexp.last_match when given an Object raises a TypeError when unable to coerce" # Exception: named captures are not supported in javascript: "(?<test>[A-Z]+.*)"
   fails "Regexp.new given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.new given a String raises a RegexpError when passed an incorrect regexp"
   fails "Regexp.new given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits"
