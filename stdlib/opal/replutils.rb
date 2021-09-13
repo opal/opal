@@ -5,7 +5,6 @@ require 'stringio'
 module REPLUtils
   module_function
 
-  # rubocop:disable Style/LambdaCall
   def ls(object)
     methods = imethods = object.methods
     ancestors = object.class.ancestors
@@ -20,28 +19,25 @@ module REPLUtils
       cvs = object.class_variables
     end
 
-    # Blue color
-    b = proc { |i| "\e[1;34m" + i + "\e[0m" }
-    # Dark blue color
-    db = proc { |i| "\e[34m" + i + "\e[0m" }
+    blue      = ->(i) { "\e[1;34m#{i}\e[0m" }
+    dark_blue = ->(i) { "\e[34m#{i}\e[0m" }
 
     out = ''
-    out = "#{b.('class variables')}: #{cvs.map { |i| db.(i) }.sort.join('  ')}\n" + out unless cvs.empty?
-    out = "#{b.('instance variables')}: #{ivs.map { |i| db.(i) }.sort.join('  ')}\n" + out unless ivs.empty?
+    out = "#{blue['class variables']}: #{cvs.map { |i| dark_blue[i] }.sort.join('  ')}\n" + out unless cvs.empty?
+    out = "#{blue['instance variables']}: #{ivs.map { |i| dark_blue[i] }.sort.join('  ')}\n" + out unless ivs.empty?
     ancestors.each do |a|
       im = a.instance_methods(false)
       meths = (im & imethods)
       methods -= meths
       imethods -= meths
       next if meths.empty? || [Object, BasicObject, Kernel, PP::ObjectMixin].include?(a)
-      out = "#{b.("#{a.name}#methods")}: #{meths.sort.join('  ')}\n" + out
+      out = "#{blue["#{a.name}#methods"]}: #{meths.sort.join('  ')}\n" + out
     end
     methods &= object.methods(false)
-    out = "#{b.('self.methods')}: #{methods.sort.join('  ')}\n" + out unless methods.empty?
-    out = "#{b.('constants')}: #{constants.map { |i| db.(i) }.sort.join('  ')}\n" + out unless constants.empty?
+    out = "#{blue['self.methods']}: #{methods.sort.join('  ')}\n" + out unless methods.empty?
+    out = "#{blue['constants']}: #{constants.map { |i| dark_blue[i] }.sort.join('  ')}\n" + out unless constants.empty?
     out
   end
-  # rubocop:enable Style/LambdaCall
 
   def eval_and_print(func, mode)
     %x{
