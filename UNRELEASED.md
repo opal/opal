@@ -19,6 +19,9 @@
 - [CI] Performance regression check (#2276, #2282)
 - Add support for ECMAScript modules with an `--esm` CLI option (#2286)
 - Implement `Regexp#names` and add named captures support (#2272)
+- REPL improvements: (#2285)
+  - Colored output & history support
+  - `ls` to show available constants and variable
 
 ### Fixed
 
@@ -27,6 +30,7 @@
 - Update source-map-support to fix an off-by-one error (#2264)
 - Source map: lines should start from 1, not 0 (#2273)
 - Allow for multiple underscored args with the same name in strict mode (#2292)
+- Show instance variables in `Kernel#inspect` (#2285)
 
 ### Changed
 
