@@ -2532,7 +2532,7 @@
     }
   };
 
-  Opal.load = function(path) {
+  Opal.load = function(path, async_load) {
     path = Opal.normalize(path);
 
     Opal.loaded([path]);
@@ -2540,7 +2540,8 @@
     var module = Opal.modules[path];
 
     if (module) {
-      module(Opal);
+      var retval = module(Opal);
+      if (async_load) return retval;
     }
     else {
       var severity = Opal.config.missing_require_severity;

@@ -39,7 +39,7 @@ module Opal
 
         unshift to_vars
 
-        if scope.await_encountered
+        if await_encountered
           unshift "(#{identity} = async function(", inline_params, '){'
         else
           unshift "(#{identity} = function(", inline_params, '){'
