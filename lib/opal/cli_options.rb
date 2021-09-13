@@ -180,8 +180,8 @@ module Opal
         options[:es6_modules] = true
       end
 
-      on('--es6-wrap', 'Wraps compiled bundle as for ES6 module(requires -c or -L)') do
-        options[:es6_wrap] = true
+      on('--esm', 'Wraps compiled bundle as ES6 module (requires -c or -L)') do
+        options[:esm] = true
       end
 
       separator ''

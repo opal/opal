@@ -67,7 +67,7 @@ module Opal
           line "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = function(Opal) {"
         elsif compiler.eval?
           line '(function(Opal, self) {'
-        elsif compiler.es6_wrap?
+        elsif compiler.esm?
           line 'export default (function(Opal) {'
         else
           line '(function(Opal) {'

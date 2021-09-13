@@ -159,10 +159,10 @@ module Opal
     # Make modules ES6 import/export-able
     compiler_option :es6_modules, default: false, as: :es6_modules?
 
-    # @!method es6_wrap?
+    # @!method esm?
     #
     # Wrap compiler result as self contained ES6 module
-    compiler_option :es6_wrap, default: false, as: :es6_wrap?
+    compiler_option :esm, default: false, as: :esm?
 
     # @!method inline_operators?
     #
