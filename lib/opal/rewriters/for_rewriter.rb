@@ -60,11 +60,11 @@ module Opal
 
         loop_body = prepend_to_body(loop_body, loop_variable_assignment)
 
-        node = node.updated(:send, [iterating_value, :each, # (0..3).each {
+        node = node.updated(:send, [iterating_value, :each,                                    # (0..3).each {
                                     node.updated(:iter, [s(:args, s(:arg, tmp_loop_variable)), #                |__jstmp|
-                                                         process(loop_body)]
-)]
-) #                          i = __jstmp; j = i + 1 }
+                                                         process(loop_body)]                   #                          i = __jstmp; j = i + 1 }
+                                    )]
+        )
 
         node.updated(:begin, [*outer_assigns, node])
       end
