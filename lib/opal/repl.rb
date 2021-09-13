@@ -10,6 +10,8 @@ module Opal
     HISTORY_PATH = File.expand_path('~/.opal-repl-history')
 
     def initialize
+      @exit = @exit_status = nil
+
       begin
         require 'mini_racer'
       rescue LoadError
@@ -57,11 +59,12 @@ module Opal
       v8.attach('crypto.randomBytes', method(:random_bytes).to_proc)
       v8.eval Opal::Builder.new.build('opal').to_s
       v8.eval Opal::Builder.new.build('opal/replutils').to_s
-      v8.attach('Opal.exit', method(:exit).to_proc)
+      v8.attach('Opal.exit', ->(status) { @exit = true; @exit_status = status })
     end
 
     def run_line(line)
       result = eval_ruby(line)
+      Kernel.exit(@exit_status) if @exit
       puts result.to_s if result
     end
 
