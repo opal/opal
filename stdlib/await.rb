@@ -1,4 +1,5 @@
 # helpers: coerce_to
+# await: true
 
 warn 'Await functionality is a technology preview, which means it may change its behavior ' \
      'in the future unless this warning is removed. If you are interested in this part, ' \

@@ -394,11 +394,15 @@ module Opal
         push ")"
       end
 
-      add_special :await do |_compile_default|
-        push fragment '(await ('
-        push process(recvr)
-        push fragment '))'
-        scope.await_encountered = true
+      add_special :await do |compile_default|
+        if compiler.async_await
+          push fragment '(await ('
+          push process(recvr)
+          push fragment '))'
+          scope.await_encountered = true
+        else
+          compile_default.call
+        end
       end
 
       def push_nesting?

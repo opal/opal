@@ -1,3 +1,5 @@
+# await: true
+
 require "minitest" unless defined? Minitest::Runnable
 
 module Minitest

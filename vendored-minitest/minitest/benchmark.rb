@@ -1,3 +1,5 @@
+# await: true
+
 require 'minitest/unit'
 require 'minitest/spec'
 

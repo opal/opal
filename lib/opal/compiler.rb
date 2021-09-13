@@ -166,6 +166,11 @@ module Opal
 
     compiler_option :scope_variables, default: []
 
+    # @!method await
+    #
+    # Enable async/await support
+    compiler_option :await, default: false, as: :async_await, magic_comment: true
+
     # @return [String] The compiled ruby code
     attr_reader :result
 

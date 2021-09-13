@@ -1,3 +1,5 @@
+# await: true
+
 require "optparse"
 require "thread"
 require "mutex_m"
