@@ -60,4 +60,6 @@ class Class
       return #{super()};
     }
   end
+
+  alias inspect to_s
 end

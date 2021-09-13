@@ -629,6 +629,8 @@ class Module
     `Opal.Module.$name.call(self)` || "#<#{`self.$$is_module ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
   end
 
+  alias inspect to_s
+
   def undef_method(*names)
     %x{
       for (var i = 0, length = names.length; i < length; i++) {
