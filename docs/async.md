@@ -3,6 +3,14 @@
 Please be aware that this functionality is marked as experimental and may change
 in the future.
 
+In order to disable the warnings that will be shown if you use those experimental
+features, add the following line before requiring `promise/v2` or `await` and after
+requiring `opal`.
+
+```ruby
+`Opal.config.experimental_features_severity = 'ignore'`
+```
+
 ## PromiseV2
 
 In Opal 1.2 we introduced PromiseV2 which is to replace the default Promise in Opal 2.0

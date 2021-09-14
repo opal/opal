@@ -1,10 +1,12 @@
 # helpers: coerce_to
 # await: true
 
-warn 'Await functionality is a technology preview, which means it may change its behavior ' \
-     'in the future unless this warning is removed. If you are interested in this part, ' \
-     'please make sure you track the async/await/promises tag on Opal issues: ' \
-     'https://github.com/opal/opal/issues?q=label%3Aasync%2Fawait%2Fpromises'
+if `Opal.config.experimental_features_severity == 'warning'`
+  warn 'Await functionality is a technology preview, which means it may change its behavior ' \
+      'in the future unless this warning is removed. If you are interested in this part, ' \
+      'please make sure you track the async/await/promises tag on Opal issues: ' \
+      'https://github.com/opal/opal/issues?q=label%3Aasync%2Fawait%2Fpromises'
+end
 
 require 'promise/v2'
 
