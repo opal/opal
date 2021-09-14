@@ -1,4 +1,4 @@
-# await: true
+# await: suffix
 
 require "optparse"
 require "thread"
@@ -150,8 +150,8 @@ module Minitest
     # the serial tests won't lock around Reporter#record. Run the serial tests
     # first, so that after they complete, the parallel tests will lock when
     # recording results.
-    serial.map_await { |suite| suite.run(reporter, options).await }.await +
-      parallel.map_await { |suite| suite.run(reporter, options).await }.await
+    serial.map_await { |suite| suite.run(reporter, options).await } +
+      parallel.map_await { |suite| suite.run(reporter, options).await }
   end
 
   def self.process_args args = [] # :nodoc:

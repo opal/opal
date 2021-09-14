@@ -1,4 +1,4 @@
-# await: true
+# await: suffix
 
 require 'minitest/unit'
 require 'minitest/spec'
@@ -90,7 +90,7 @@ module Minitest
 
       times = []
 
-      range.each do |x|
+      range.each_await do |x|
         GC.start
         t0 = Time.now
         instance_exec(x, &work).await

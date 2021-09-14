@@ -166,9 +166,33 @@ module Opal
 
     compiler_option :scope_variables, default: []
 
-    # @!method await
+    # @!method async_await
     #
-    # Enable async/await support
+    # Enable async/await support and optionally enable auto-await.
+    #
+    # Use either true, false, an Array of Symbols or a String containing names
+    # to auto-await separated by a comma.
+    #
+    # Auto-await awaits provided methods by default as if .await was added to
+    # them automatically.
+    #
+    # By default, the support is disabled (set to false).
+    #
+    # If the config value is not set to false, any calls to #await will be
+    # translated to ES8 await keyword which makes the scope return a Promise
+    # and
+    #
+    # If the config value is an array, or a String separated by a comma,
+    # auto-await is also enabled.
+    #
+    # A value of :suffix automatically awaits all calls to #anything_await{!,?,=,},
+    # eg. `[1,2,3].each_await{}` is translated to `[1,2,3].each_await{}.await`.
+    #
+    # It can be used as a magic comment, examples:
+    # ```
+    # # await: true
+    # # await: suffix
+    # # await: suffix, sleep, gets
     compiler_option :await, default: false, as: :async_await, magic_comment: true
 
     # @return [String] The compiled ruby code
@@ -258,6 +282,26 @@ module Opal
     # Method calls made in this file
     def method_calls
       @method_calls ||= Set.new
+    end
+
+    alias async_await_before_typecasting async_await
+    def async_await
+      if defined? @async_await
+        @async_await
+      else
+        original = async_await_before_typecasting
+        @async_await = case original
+                       when String
+                         original.split(',').map { |h| h.strip.to_sym }
+                       when Array, Set
+                         Set.new(original.to_a.map(&:to_sym))
+                       when true, false
+                         original
+                       else
+                         raise 'A value of await compiler option can be either ' \
+                               'a Set, an Array, a String or a Boolean.'
+                       end
+      end
     end
 
     # This is called when a parsing/processing error occurs. This
