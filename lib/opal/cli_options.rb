@@ -86,6 +86,10 @@ module Opal
         options[:sexp] = true
       end
 
+      on('--debug-source-map', 'Debug source map') do
+        options[:debug_source_map] = true
+      end
+
       on('-c', '--compile', 'Compile to JavaScript') do
         options[:runner] = :compiler
       end
