@@ -13,13 +13,23 @@ module Opal
         name, base = name_and_base
         helper :module
 
-        push '(function($base, $parent_nesting) {'
         line "  var self = $module($base, '#{name}');"
         in_scope do
           scope.name = name
           compile_body
         end
-        line '})(', base, ', $nesting)'
+
+        if await_encountered
+          await_begin = '(await '
+          await_end = ')'
+          async = 'async '
+          parent.await_encountered = true
+        else
+          await_begin, await_end, async = '', '', ''
+        end
+
+        unshift "#{await_begin}(#{async}function($base, $parent_nesting) {"
+        line '})(', base, ", $nesting)#{await_end}"
       end
 
       private

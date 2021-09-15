@@ -166,7 +166,4 @@ class TestAwait < Test::Unit::TestCase
       assert_equal(expect, $taval)
     end
   end
-
-  undef test_await_in_class
-  undef test_await_in_module
 end
