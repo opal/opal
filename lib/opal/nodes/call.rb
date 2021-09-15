@@ -275,11 +275,19 @@ module Opal
         push fragment(')')
       end
 
-      add_special :autoload do |compile_default|
-        if scope.class_scope?
-          str = DependencyResolver.new(compiler, arglist.children[1]).resolve
-          compiler.requires << str unless str.nil?
-          compile_default.call
+      add_special :autoload do
+        unless scope.top?
+          push recv(receiver_sexp), method_jsid, '(', expr(arglist.children[0]), ', '
+          if arglist.children[1].type == :str && arglist.children[1].children[0] != ''
+            str = DependencyResolver.new(compiler, arglist.children[1]).resolve
+            if str.nil?
+              warn "Warning: File '#{arglist.children[1].children[0]}' for autoload of constant '#{arglist.children[0].children[0]}' could not be found!"
+            end
+            push expr(arglist.children[1])
+          else
+            push expr(arglist.children[1])
+          end
+          push ')'
         end
       end
 
