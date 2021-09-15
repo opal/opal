@@ -39,6 +39,11 @@ ruby/core/complex
 
 ruby/core/enumerable
 ruby/core/enumerator
+!ruby/core/enumerator/arithmetic_sequence
+!ruby/core/enumerator/chain
+ruby/core/enumerator/generator
+ruby/core/enumerator/lazy
+ruby/core/enumerator/yielder
 
 ruby/core/exception
 !ruby/core/exception/load_error_spec
@@ -185,6 +190,11 @@ ruby/library/openstruct
 ruby/library/pathname
 !ruby/library/pathname/empty_spec
 !ruby/library/pathname/glob_spec
+ruby/library/matrix
+ruby/library/matrix/eigenvalue_decomposition
+ruby/library/matrix/lup_decomposition
+ruby/library/matrix/scalar
+ruby/library/matrix/vector
 ruby/library/pp
 ruby/library/securerandom
 ruby/library/set
