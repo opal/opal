@@ -35,6 +35,8 @@
 ### Changed
 
 - Fast-track bad constant names passed to `Struct.new` (#2259)
+- Renamed internal `super` related helpers,
+  `find_super_dispatcher` is now `find_super`, `find_iter_super_dispatcher` is now `find_block_super` (#2090)
 
 ### Deprecated
 
