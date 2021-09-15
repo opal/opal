@@ -42,6 +42,11 @@ RSpec.describe Opal::Compiler do
     expect_compiled('"hello #{100}"').to include('"hello "', '100')
   end
 
+  it "should compile ruby strings with escapes" do
+    expect_compiled('"hello \e"').to include('\u001b')
+    expect_compiled('"hello \e#{nil}"').to include('\u001b')
+  end
+
   it "should compile ruby ranges" do
     expect_compiled('1..1').to include('$range(1, 1, false)')
     expect_compiled('1...1').to include('$range(1, 1, true)')

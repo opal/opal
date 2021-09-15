@@ -235,7 +235,7 @@ module Opal
           push ' + '
 
           if part.type == :str
-            push part.children[0].inspect
+            push expr(part)
           else
             push '(', expr(part), ')'
           end
