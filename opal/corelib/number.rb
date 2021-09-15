@@ -747,9 +747,15 @@ class Number < Numeric
     end
 
     %x{
+      if (self != parseInt(self)) #{raise NoMethodError, "undefined method `digits' for #{inspect}"}
+
       var value = self, result = [];
 
-      while (value !== 0) {
+      if (self == 0) {
+        return [0];
+      }
+
+      while (value != 0) {
         result.push(value % base);
         value = parseInt(value / base, 10);
       }
