@@ -56,23 +56,25 @@ def wait_5_seconds
   puts "Done!"
 end
 
-wait_5_seconds.await
+wait_5_seconds.__await__
 ```
 
-It's important to understand what happens under the hood: every scope in which `#await` is
+It's important to understand what happens under the hood: every scope in which `#__await__` is
 encountered will become async, which means that it will return a Promise that will resolve
-to a value. This includes methods, blocks and the top scope. This means, that `#await` is
-infectious and you need to remember to `#await` everything along the way, otherwise
+to a value. This includes methods, blocks and the top scope. This means, that `#__await__` is
+infectious and you need to remember to `#__await__` everything along the way, otherwise
 a program will finish too early and the values may be incorrect.
 
-[You can take a look at how we ported Minitest to support asynchronous tests.](https://github.com/opal/opal/pull/2221/commits/8383c7b45a94fe4628778f429508b9c08c8948b0)
+[You can take a look at how we ported Minitest to support asynchronous tests.](https://github.com/opal/opal/pull/2221/commits/8383c7b45a94fe4628778f429508b9c08c8948b0) Take note, that
+it was ported to use `#await` while the finally accepted version uses `#__await__`.
 
-It is certainly correct to `#await` any value, including non-Promises, for instance
-`5.await` will correctly resolve to `5` (except that it will make the scope an async
+It is certainly correct to `#__await__` any value, including non-Promises, for instance
+`5.__await__` will correctly resolve to `5` (except that it will make the scope an async
 function, with all the limitations described above).
 
 The `await` stdlib module includes a few useful functions, like async-aware `each_await`
-function and `sleep` that doesn't block the thread.
+function and `sleep` that doesn't block the thread. It also includes a method `#await`
+which is an alias of `#itself` - it makes sense to auto-await that method.
 
 This approach is certainly incompatible with what Ruby does, but due to a dynamic nature
 of Ruby and a different model of JavaScript this was the least invasive way to catch up
@@ -81,9 +83,8 @@ with the latest JavaScript trends and support `Promise` heavy APIs and asynchron
 ## Auto-await
 
 The magic comment also accepts a comma-separated list of methods to be automatically
-awaited. A special value of `suffix` will automatically await any method which name ends
-with `_await` (or `_await?`, `_await!`, `_await=`). For instance, those two blocks of
-code are equivalent:
+awaited. An individual value can contain a wildcard character `*`. For instance,
+those two blocks of code are equivalent:
 
 ```ruby
 # await: true
@@ -92,12 +93,12 @@ require "await"
 
 [1,2,3].each_await do |i|
   p i
-  sleep(i).await
-end.await
+  sleep(i).__await__
+end.__await__
 ```
 
 ```ruby
-# await: sleep, suffix
+# await: sleep, *await*
 
 require "await"
 

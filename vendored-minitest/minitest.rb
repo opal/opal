@@ -1,4 +1,4 @@
-# await: suffix
+# await: *await*
 
 require "optparse"
 require "thread"
@@ -290,7 +290,7 @@ module Minitest
       with_info_handler(reporter) do
         filtered_methods.each_await do |method_name|
           run_one_method(self, method_name, reporter).await
-        end.await
+        end
       end.await
     end
 

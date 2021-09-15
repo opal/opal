@@ -235,9 +235,7 @@ module Opal
       def auto_await?
         awaited_set = compiler.async_await
 
-        awaited_set && awaited_set != true &&
-          (awaited_set.include?(meth) ||
-           (awaited_set.include?(:suffix) && meth.to_s =~ /_await[?!=]?\z/))
+        awaited_set && awaited_set != true && awaited_set.match?(meth.to_s)
       end
 
       # Handle "special" method calls, e.g. require(). Subclasses can override
@@ -407,7 +405,7 @@ module Opal
         push ")"
       end
 
-      add_special :await do |compile_default|
+      add_special :__await__ do |compile_default|
         if compiler.async_await
           push fragment '(await ('
           push process(recvr)

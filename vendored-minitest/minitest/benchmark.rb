@@ -1,4 +1,4 @@
-# await: suffix
+# await: *await*
 
 require 'minitest/unit'
 require 'minitest/spec'

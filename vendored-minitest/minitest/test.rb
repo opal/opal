@@ -1,4 +1,4 @@
-# await: true
+# await: *await*
 
 require "minitest" unless defined? Minitest::Runnable
 
