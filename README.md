@@ -116,7 +116,7 @@ your web applications.
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="https://cdn.opalrb.com/opal/current/opal.js" onload="Opal.load('opal')"></script>
+    <script src="https://cdn.opalrb.com/opal/current/opal.js"></script>
     <script src="https://cdn.opalrb.com/opal/current/opal-parser.js" onload="Opal.load('opal-parser')"></script>
 
     <script type="text/ruby">
