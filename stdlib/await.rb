@@ -34,11 +34,6 @@ module Enumerable
 end
 
 module Kernel
-  def async_load(file)
-    file = Opal.coerce_to!(file, String, :to_str)
-    `Opal.load(#{file}, true)`.__await__
-  end
-
   # Overwrite Kernel.exit to be async-capable.
   def exit(status = true)
     $__at_exit__ ||= []

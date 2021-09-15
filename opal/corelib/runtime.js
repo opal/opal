@@ -2533,7 +2533,7 @@
     }
   };
 
-  Opal.load = function(path, async_load) {
+  Opal.load = function(path) {
     path = Opal.normalize(path);
 
     Opal.loaded([path]);
@@ -2542,7 +2542,11 @@
 
     if (module) {
       var retval = module(Opal);
-      if (async_load) return retval;
+      if (typeof Promise !== 'undefined' && retval instanceof Promise) {
+        // A special case of require having an async top:
+        // We will need to await it.
+        return retval.then(function() { return true; });
+      }
     }
     else {
       var severity = Opal.config.missing_require_severity;
