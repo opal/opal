@@ -370,6 +370,7 @@ task :minitest_node_nodejs do
     nodejs/test_io.rb
     nodejs/test_opal_builder.rb
     nodejs/test_string.rb
+    nodejs/test_await.rb
   ]
 
   filename = "tmp/minitest_node_nodejs.rb"

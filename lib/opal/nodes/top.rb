@@ -56,7 +56,7 @@ module Opal
         if compiler.requirable?
           unshift "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = #{as}function(Opal) {"
         elsif compiler.eval?
-          unshift "#{aw}(#{as}function(Opal, self) {"
+          unshift "(#{as}function(Opal, self) {"
         elsif compiler.esm?
           unshift "export default Opal.queue(#{as}function(Opal) {"
         else
@@ -65,15 +65,10 @@ module Opal
       end
 
       def closing
-        aw = ""
-        if await_encountered
-          aw = "))"
-        end
-
         if compiler.requirable?
           line "};\n"
         elsif compiler.eval?
-          line "})(Opal, self)#{aw};"
+          line "})(Opal, self);"
         else
           line "});\n"
         end
