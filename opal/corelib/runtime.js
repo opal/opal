@@ -247,7 +247,27 @@
 
   // Get the constant in the scope of the current cref
   function const_get_name(cref, name) {
-    if (cref) return cref.$$const[name];
+    if (cref) {
+      if (cref.$$const[name]) { return cref.$$const[name]; }
+      if (cref.$$prototype.$$autoload && cref.$$prototype.$$autoload[name]) {
+        if (!cref.$$prototype.$$autoload[name].loaded) {
+          cref.$$prototype.$$autoload[name].loaded = true;
+          try {
+            Opal.Kernel.$require(cref.$$prototype.$$autoload[name].path);
+          } catch (e) {
+            cref.$$prototype.$$autoload[name].exception = e;
+            throw e;
+          }
+          cref.$$prototype.$$autoload[name].required = true;
+          if (cref.$$const[name]) {
+            cref.$$prototype.$$autoload[name].success = true;
+            return cref.$$const[name];
+          }
+        } else if (cref.$$prototype.$$autoload[name].loaded && !cref.$$prototype.$$autoload[name].required) {
+          if (cref.$$prototype.$$autoload[name].exception) { throw cref.$$prototype.$$autoload[name].exception; }
+        }
+      }
+    }
   }
 
   // Walk up the nesting array looking for the constant
@@ -260,7 +280,26 @@
     // and in order. The ancestors of those elements are ignored.
     for (i = 0, ii = nesting.length; i < ii; i++) {
       constant = nesting[i].$$const[name];
-      if (constant != null) return constant;
+      if (constant != null) {
+        return constant;
+      } else if (nesting[i].$$prototype.$$autoload && nesting[i].$$prototype.$$autoload[name]) {
+        if (!nesting[i].$$prototype.$$autoload[name].loaded) {
+          nesting[i].$$prototype.$$autoload[name].loaded = true;
+          try {
+            Opal.Kernel.$require(nesting[i].$$prototype.$$autoload[name].path);
+          } catch (e) {
+            nesting[i].$$prototype.$$autoload[name].exception = e;
+            throw e;
+          }
+          nesting[i].$$prototype.$$autoload[name].required = true;
+          if (nesting[i].$$const && nesting[i].$$const[name]) {
+            nesting[i].$$prototype.$$autoload[name].success = true;
+            return nesting[i].$$const[name];
+          }
+        } else if (nesting[i].$$prototype.$$autoload[name].loaded && !nesting[i].$$prototype.$$autoload[name].required) {
+          if (nesting[i].$$prototype.$$autoload[name].exception) { throw nesting[i].$$prototype.$$autoload[name].exception; }
+        }
+      }
     }
   }
 
@@ -275,6 +314,23 @@
     for (i = 0, ii = ancestors.length; i < ii; i++) {
       if (ancestors[i].$$const && $has_own.call(ancestors[i].$$const, name)) {
         return ancestors[i].$$const[name];
+      } else if (ancestors[i].$$prototype.$$autoload && ancestors[i].$$prototype.$$autoload[name]) {
+        if (!ancestors[i].$$prototype.$$autoload[name].loaded) {
+          ancestors[i].$$prototype.$$autoload[name].loaded = true;
+          try {
+            Opal.Kernel.$require(ancestors[i].$$prototype.$$autoload[name].path);
+          } catch (e) {
+            ancestors[i].$$prototype.$$autoload[name].exception = e;
+            throw e;
+          }
+          ancestors[i].$$prototype.$$autoload[name].required = true;
+          if (ancestors[i].$$const && ancestors[i].$$const[name]) {
+            ancestors[i].$$prototype.$$autoload[name].success = true;
+            return ancestors[i].$$const[name];
+          }
+        } else if (ancestors[i].$$prototype.$$autoload[name].loaded && !ancestors[i].$$prototype.$$autoload[name].required) {
+          if (ancestors[i].$$prototype.$$autoload[name].exception) { throw ancestors[i].$$prototype.$$autoload[name].exception; }
+        }
       }
     }
   }
@@ -416,6 +472,11 @@
       for (constant in module.$$const) {
         constants[constant] = true;
       }
+      if (module.$$prototype.$$autoload) {
+        for (constant in module.$$prototype.$$autoload) {
+          constants[constant] = true;
+        }
+      }
     }
 
     return Object.keys(constants);
@@ -431,8 +492,8 @@
       return old;
     }
 
-    if (cref.$$autoload != null && cref.$$autoload[name] != null) {
-      delete cref.$$autoload[name];
+    if (cref.$$prototype.$$autoload && cref.$$prototype.$$autoload[name]) {
+      delete cref.$$prototype.$$autoload[name];
       return nil;
     }
 
@@ -1391,9 +1452,10 @@
   // @return [undefined]
   Opal.add_stubs = function(stubs) {
     var proto = Opal.BasicObject.$$prototype;
+    var stub, existing_method;
 
     for (var i = 0, length = stubs.length; i < length; i++) {
-      var stub = stubs[i], existing_method = proto[stub];
+      stub = stubs[i], existing_method = proto[stub];
 
       if (existing_method == null || existing_method.$$stub) {
         Opal.add_stub_for(proto, stub);
@@ -1408,8 +1470,8 @@
   // @param stub [String] stub name to add (e.g. "$foo")
   // @return [undefined]
   Opal.add_stub_for = function(prototype, stub) {
-    var method_missing_stub = Opal.stub_for(stub);
-    $defineProperty(prototype, stub, method_missing_stub);
+    // Opal.stub_for(stub) is the method_missing_stub
+    $defineProperty(prototype, stub, Opal.stub_for(stub));
   };
 
   // Generate the method_missing stub for a given method name.

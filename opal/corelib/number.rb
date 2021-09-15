@@ -2,8 +2,10 @@ require 'corelib/numeric'
 
 class Number < Numeric
   Opal.bridge(`Number`, self)
-  `Opal.defineProperty(self.$$prototype, '$$is_number', true)`
-  `self.$$is_number_class = true`
+  `Object.defineProperty(Number.prototype, '$$is_number', { value: true })`
+  `Object.defineProperty(Number.prototype, '$$is_number_class', { value: true })`
+  `Object.defineProperty(self, '$$is_number', { value: true })`
+  `Object.defineProperty(self, '$$is_number_class', { value: true })`
 
   class << self
     def allocate
@@ -747,6 +749,10 @@ class Number < Numeric
     end
 
     %x{
+      if (self === 0) {
+        return [0];
+      }
+
       var value = self, result = [];
 
       while (value !== 0) {
@@ -858,7 +864,7 @@ class Integer < Numeric
 end
 
 class Float < Numeric
-  `self.$$is_number_class = true`
+  `Object.defineProperty(self, '$$is_number_class', { value: true })`
 
   class << self
     def allocate
