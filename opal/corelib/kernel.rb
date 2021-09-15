@@ -628,8 +628,14 @@ module Kernel
   Opal.pristine(self, :respond_to?, :respond_to_missing?)
 
   def require(file)
-    file = Opal.coerce_to!(file, String, :to_str)
-    `Opal.require(#{file})`
+    %x{
+      // As Object.require refers to Kernel.require once Kernel has been loaded the String
+      // class may not be available yet, the coercion requires both  String and Array to be loaded.
+      if (typeof #{file} !== 'string' && Opal.String && Opal.Array) {
+        #{file = Opal.coerce_to!(file, String, :to_str) }
+      }
+      Opal.require(#{file})
+    }
   end
 
   def require_relative(file)
