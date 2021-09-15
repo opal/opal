@@ -26,7 +26,13 @@ module Opal
           end
         end
 
-        wrap '(function() {', '; return nil; })()' if wrap_in_closure?
+        if wrap_in_closure?
+          if scope.await_encountered
+            wrap '(await (async function() {', '; return nil; })())'
+          else
+            wrap '(function() {', '; return nil; })()'
+          end
+        end
       end
 
       private

@@ -33,7 +33,13 @@ module Opal
           push '}'
         end
 
-        wrap '(function() {', '; return nil; })()' if needs_wrapper?
+        if needs_wrapper?
+          if scope.await_encountered
+            wrap '(await (async function() {', '; return nil; })())'
+          else
+            wrap '(function() {', '; return nil; })()'
+          end
+        end
       end
 
       def truthy

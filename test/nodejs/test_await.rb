@@ -68,6 +68,34 @@ class TestAwait < Test::Unit::TestCase
         $taval = 9
       end while false
     RUBY
+    test_await_in_while_expr: [<<~RUBY, -9],
+      #{stdheader}
+      $taval = 5
+      x = if true
+        begin
+          sleep(0.001).__await__
+          $taval = -9
+        end while false
+      end
+    RUBY
+    test_await_in_case: [<<~RUBY, 88],
+      #{stdheader}
+      $taval = 5
+      case true
+      when true
+        sleep(0.001).__await__
+        $taval = 88
+      end
+    RUBY
+    test_await_in_case_expr: [<<~RUBY, 99],
+      #{stdheader}
+      $taval = 5
+      x = case true
+      when true
+        sleep(0.001).__await__
+        $taval = 99
+      end
+    RUBY
     test_await_in_rescue: [<<~RUBY, 10],
       #{stdheader}
       $taval = 5
@@ -92,6 +120,19 @@ class TestAwait < Test::Unit::TestCase
         $taval = 11
       end
     RUBY
+    test_await_in_ensure_expr: [<<~RUBY, -11],
+      #{stdheader}
+      $taval = 5
+      x = begin
+        sleep(0.001).__await__
+        nomethoderror
+      rescue
+        sleep(0.001).__await__
+      ensure
+        sleep(0.001).__await__
+        $taval = -11
+      end
+    RUBY
     test_await_in_module: [<<~RUBY, 12],
       #{stdheader}
       $taval = 5
@@ -110,7 +151,7 @@ class TestAwait < Test::Unit::TestCase
     RUBY
     test_await_in_and: [<<~RUBY, 14],
       #{stdheader}
-      ($taval = 5) && (Promise.value(4).__await__) && ($taval = 14)
+      ($taval = 5) && (PromiseV2.value(4).__await__) && ($taval = 14)
     RUBY
     test_await_in_plus: [<<~RUBY, 15],
       #{stdheader}
@@ -122,11 +163,10 @@ class TestAwait < Test::Unit::TestCase
   tests.each do |name,(code,expect)|
     define_method name do
       eval(code).__await__
-      assert_equal($taval, expect)
+      assert_equal(expect, $taval)
     end
   end
 
   undef test_await_in_class
   undef test_await_in_module
-  undef test_await_in_and
 end

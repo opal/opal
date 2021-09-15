@@ -47,10 +47,8 @@ module Opal
 
       def opening
         as = ""
-        aw = ""
         if await_encountered
           as = "async "
-          aw = "(await ("
         end
 
         if compiler.requirable?

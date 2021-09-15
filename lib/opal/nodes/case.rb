@@ -13,7 +13,13 @@ module Opal
         compiler.in_case do
           compile_code
 
-          wrap '(function() {', '})()' if needs_closure?
+          if needs_closure?
+            if scope.await_encountered
+              wrap '(await (async function() {', '})())'
+            else
+              wrap '(function() {', '})()'
+            end
+          end
         end
       end
 
