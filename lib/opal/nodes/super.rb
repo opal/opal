@@ -48,20 +48,12 @@ module Opal
         @def_scope ||= scope.def? ? scope : scope.find_parent_def
       end
 
-      def raise_exception?
-        @sexp.type == :defined_super
-      end
-
       def defined_check_param
-        raise_exception? ? 'true' : 'false'
-      end
-
-      def implicit_args?
-        @sexp.type == :zsuper
+        'false'
       end
 
       def implicit_arguments_param
-        implicit_args? ? 'true' : 'false'
+        'false'
       end
 
       def method_id
@@ -73,17 +65,19 @@ module Opal
       end
 
       def allow_stubs
-        true
+        'true'
       end
 
       def super_method_invocation
-        "Opal.find_super_dispatcher(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, #{allow_stubs})"
+        helper :find_super
+        "$find_super(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, #{allow_stubs})"
       end
 
       def super_block_invocation
+        helper :find_block_super
         chain, cur_defn, mid = scope.super_chain
         trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
-        "Opal.find_iter_super_dispatcher(self, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
+        "$find_block_super(self, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
       end
 
       def compile_method_body
@@ -111,7 +105,11 @@ module Opal
       handle :defined_super
 
       def allow_stubs
-        false
+        'false'
+      end
+
+      def defined_check_param
+        'true'
       end
 
       def compile
@@ -142,6 +140,10 @@ module Opal
     # super with explicit args
     class ZsuperNode < SuperNode
       handle :zsuper
+
+      def implicit_arguments_param
+        'true'
+      end
 
       def initialize(*)
         super
