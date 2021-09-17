@@ -238,6 +238,10 @@ module Kernel
     self
   end
 
+  def gets(*args)
+    $stdin.gets(*args)
+  end
+
   def hash
     __id__
   end
@@ -521,6 +525,10 @@ module Kernel
 
   def print(*strs)
     $stdout.print(*strs)
+  end
+
+  def readline(*args)
+    $stdin.readline(*args)
   end
 
   def warn(*strs, uplevel: nil)

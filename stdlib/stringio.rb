@@ -1,7 +1,4 @@
 class StringIO < IO
-  include IO::Readable
-  include IO::Writable
-
   def self.open(string = "", mode = nil, &block)
     io  = new(string, mode)
     res = block.call(io)
@@ -167,6 +164,12 @@ class StringIO < IO
       string
     end
   end
+
+  def sysread(length)
+    read(length) or raise EOFError, 'end of file reached'
+  end
+
+  alias readpartial read
 
   def close
     @closed = :both

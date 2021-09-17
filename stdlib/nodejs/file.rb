@@ -120,9 +120,6 @@
 }
 
 class File < IO
-  include ::IO::Writable
-  include ::IO::Readable
-
   @__fs__ = `require('fs')`
   @__path__ = `require('path')`
   @__util__ = `require('util')`
@@ -263,9 +260,9 @@ class File < IO
 
   attr_reader :path
 
-  def read
+  def sysread(bytes)
     if @eof
-      ''
+      raise EOFError, 'end of file reached'
     else
       if @binary_flag
         %x{
@@ -285,40 +282,6 @@ class File < IO
       @eof = true
       @lineno = res.size
       res
-    end
-  end
-
-  def readlines(separator = $/)
-    each_line(separator).to_a
-  end
-
-  def each_line(separator = $/, &block)
-    if @eof
-      return block_given? ? self : [].to_enum
-    end
-
-    if block_given?
-      lines = File.read(@path)
-      %x{
-        self.eof = false;
-        self.lineno = 0;
-        var chomped  = #{lines.chomp},
-            trailing = lines.length != chomped.length,
-            splitted = chomped.split(separator);
-        for (var i = 0, length = splitted.length; i < length; i++) {
-          self.lineno += 1;
-          if (i < length - 1 || trailing) {
-            #{yield `splitted[i] + separator`};
-          }
-          else {
-            #{yield `splitted[i]`};
-          }
-        }
-        self.eof = true;
-      }
-      self
-    else
-      read.each_line separator
     end
   end
 

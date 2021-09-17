@@ -54,6 +54,7 @@ module Opal
     end
 
     def load_opal
+      v8.attach('prompt', ->(_msg = '') { $stdin.gets&.chomp })
       v8.attach('console.log', method(:print).to_proc)
       v8.attach('console.warn', ->(i) { $stderr.print(i) })
       v8.attach('crypto.randomBytes', method(:random_bytes).to_proc)

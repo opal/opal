@@ -15,9 +15,10 @@
   }
 }
 
+`var __fs__ = require('fs')`
+
 class IO
-  @__fs__ = `require('fs')`
-  `var __fs__ = #{@__fs__}`
+  @__fs__ = `__fs__`
 
   attr_reader :eof
   attr_reader :lineno
@@ -43,5 +44,13 @@ end
 STDOUT.write_proc = ->(string) { `process.stdout.write(string)` }
 STDERR.write_proc = ->(string) { `process.stderr.write(string)` }
 
+STDIN.read_proc = %x{function(count) {
+  var buf = Buffer.alloc(count);
+  var count = __fs__.readSync(this.fd, buf, 0, count, null);
+  if (count == 0) return nil;
+  return buf.toString('utf8', 0, count);
+}}
+
+STDIN.tty = true
 STDOUT.tty = true
 STDERR.tty = true
