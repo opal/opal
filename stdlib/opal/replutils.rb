@@ -5,7 +5,7 @@ require 'stringio'
 module REPLUtils
   module_function
 
-  def ls(object)
+  def ls(object, colorize)
     methods = imethods = object.methods
     ancestors = object.class.ancestors
     constants = []
@@ -19,8 +19,12 @@ module REPLUtils
       cvs = object.class_variables
     end
 
-    blue      = ->(i) { "\e[1;34m#{i}\e[0m" }
-    dark_blue = ->(i) { "\e[34m#{i}\e[0m" }
+    if colorize
+      blue      = ->(i) { "\e[1;34m#{i}\e[0m" }
+      dark_blue = ->(i) { "\e[34m#{i}\e[0m" }
+    else
+      blue = dark_blue = ->(i) { i }
+    end
 
     out = ''
     out = "#{blue['class variables']}: #{cvs.map { |i| dark_blue[i] }.sort.join('  ')}\n" + out unless cvs.empty?
@@ -39,9 +43,17 @@ module REPLUtils
     out
   end
 
-  def eval_and_print(func, mode)
+  def eval_and_print(func, mode, colorize)
+    printer = if colorize
+      ->(i) { ColorPrinter.default(i) }
+    else
+      ->(i) { out = []; PP.pp(i, out); out.join }
+    end
+
     %x{
-      var $_result = #{func}();
+      var $_result = eval(func);
+
+      if (mode == 'silent') return nil;
 
       if (typeof $_result === 'null') {
         return "=> null";
@@ -52,7 +64,7 @@ module REPLUtils
       else if (typeof $_result.$$class === 'undefined') {
         try {
           var json = JSON.stringify($_result, null, 2);
-          json = #{ColorPrinter.colorize(`json`)}
+          if (!colorize) json = #{ColorPrinter.colorize(`json`)}
           return "=> " + $_result.toString() + " => " + json;
         }
         catch(e) {
@@ -61,19 +73,28 @@ module REPLUtils
       }
       else {
         if (mode == 'ls') {
-          return #{ls(`$_result`)};
+          return #{ls(`$_result`, colorize)};
         }
         else {
-          var pretty = #{ColorPrinter.default(`$_result`)};
+          var pretty = #{printer.call(`$_result`)};
           // Is it multiline? If yes, add a linebreak
           if (pretty.match(/\n.*?\n/)) pretty = "\n" + pretty;
           return "=> " + pretty;
         }
       }
     }
-    `ret`
   rescue Exception => e # rubocop:disable Lint/RescueException
     e.full_message(highlight: true)
+  end
+
+  def js_repl
+    while (line = gets)
+      input = JSON.parse(line)
+
+      out = eval_and_print(input[:code], input[:mode], input[:colorize])
+      puts out if out
+      puts '<<<ready>>>'
+    end
   end
 
   # Slightly based on Pry's implementation

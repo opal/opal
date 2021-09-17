@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'opal/repl'
+ARGV << "--repl"
 
-repl = Opal::REPL.new.run ARGV.first
+load __dir__+"/opal"

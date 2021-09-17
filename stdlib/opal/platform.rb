@@ -10,4 +10,6 @@ when 'nodejs'
   require 'nodejs/io'
 when 'headless-chrome'
   require 'headless_chrome'
+when 'opal-miniracer'
+  require 'opal/miniracer'
 end
