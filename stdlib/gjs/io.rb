@@ -24,4 +24,10 @@
     stderr.write_chars(buf, buf.length);
     stderr.flush();
   }
+
+  Opal.gvars.stdin.read_proc = function(_s) {
+    var out = stdin.read_line();
+    if (out[0] == GLib.IOStatus.EOF) return nil;
+    return out[1].toString();
+  }
 }
