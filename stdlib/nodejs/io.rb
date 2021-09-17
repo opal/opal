@@ -20,12 +20,13 @@
 class IO
   @__fs__ = `__fs__`
 
-  attr_reader :eof
   attr_reader :lineno
 
-  def initialize
-    @eof = false
+  alias initialize_before_node_io initialize
+
+  def initialize(fd, flags = 'r')
     @lineno = 0
+    initialize_before_node_io(fd, flags)
   end
 
   def self.write(path, data)

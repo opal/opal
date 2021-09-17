@@ -254,8 +254,9 @@ class File < IO
       flags = flags.sub(encoding_option_rx, '')
     end
     @path = path
-    @flags = flags
-    @fd = `executeIOAction(function(){return __fs__.openSync(path, flags)})`
+
+    fd = `executeIOAction(function(){return __fs__.openSync(path, flags)})`
+    super(fd, flags)
   end
 
   attr_reader :path
@@ -295,6 +296,7 @@ class File < IO
 
   def close
     `executeIOAction(function(){return __fs__.closeSync(#{@fd})})`
+    super
   end
 
   def mtime
