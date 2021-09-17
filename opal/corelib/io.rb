@@ -81,7 +81,7 @@ class IO
         @read_buffer = @read_buffer[1..-1]
         return ret
       end
-    end while parts = sysread_noraise(65_536)
+    end while parts = sysread_noraise(1)
 
     nil
   end
@@ -102,42 +102,58 @@ class IO
     gets(*args) || raise(EOFError, 'end of file reached')
   end
 
-  def gets(sep = $/, limit = nil, opts = {})
+  def gets(sep = false, limit = nil, opts = {})
     if `sep.$$is_number` && !limit
-      sep, limit, opts = $/, sep, {}
-    elsif `sep.$$is_hash`
-      sep, limit, opts = $/, nil, sep
+      sep, limit, opts = false, sep, limit
     end
-    sep = "\n" if sep == ''
-    sep ||= ''
+    if `sep.$$is_hash` && !limit && opts == {}
+      sep, limit, opts = false, nil, sep
+    elsif `limit.$$is_hash` && opts == {}
+      sep, limit, opts = sep, nil, limit
+    end
 
-    sep = sep.to_str
+    orig_sep = sep
+
+    sep = $/ if sep == false
+    sep = /\r?\n\r?\n/ if sep == ''
+    sep ||= ''
+    sep = sep.to_str unless orig_sep == ''
+
+    # Try to deduce length of a regexp
+    seplen = `orig_sep == '' ? 2 : sep.length`
+
+    sep = / / if sep == ' ' # WTF is this, String#split(" ") matches all whitespaces???
 
     @read_buffer ||= ''
     data = ''
+    ret = nil
 
     begin
       @read_buffer += data
-      if sep == '' || @read_buffer.include?(sep)
+      if sep != '' && (`sep.$$is_regexp` ? @read_buffer.match?(sep) : @read_buffer.include?(sep))
         orig_buffer = @read_buffer
         ret, @read_buffer = @read_buffer.split(sep, 2)
-        ret += sep if ret != orig_buffer
-        ret = ret.chomp('') if opts[:chomp]
-        if limit
-          ret = ret[0...limit]
-          @read_buffer = ret[limit..-1] + @read_buffer
-        end
-        return ret
+        ret += orig_buffer[ret.length, seplen] if ret != orig_buffer
+        break
       end
-    end while data = sysread_noraise(65_536)
+    end while data = sysread_noraise(sep == '' ? 65_536 : 1)
 
-    ret, @read_buffer = (@read_buffer || ''), ''
-    ret = nil if ret == ''
-    if limit
-      ret = ret[0...limit]
-      @read_buffer = ret[limit..-1] + @read_buffer
+    unless ret
+      ret, @read_buffer = (@read_buffer || ''), ''
+      ret = nil if ret == ''
     end
-    $_ = ret
+
+    if ret
+      if limit
+        ret = ret[0...limit]
+        @read_buffer = ret[limit..-1] + @read_buffer
+      end
+      ret = ret.sub(/\r?\n\z/, '') if opts[:chomp]
+      ret = ret.sub(/\A[\r\n]+/, '') if orig_sep == ''
+    end
+
+    $_ = ret if orig_sep == false
+    ret
   end
 
   # This method is to be overloaded, or read_proc can be changed
@@ -174,7 +190,7 @@ class IO
         ret, @read_buffer = @read_buffer[0...integer], @read_buffer[integer..-1]
         return ret
       end
-    end while parts = sysread_noraise(65_536)
+    end while parts = sysread_noraise(integer || 65_536)
 
     ret, @read_buffer = @read_buffer, ''
     ret
@@ -186,10 +202,10 @@ class IO
     each_line(separator).to_a
   end
 
-  def each(*args, &block)
-    return enum_for :each, *args unless block_given?
+  def each(sep = $/, *args, &block)
+    return enum_for :each, sep, *args unless block_given?
 
-    while (s = gets(*args))
+    while (s = gets(sep, *args))
       yield(s)
     end
 
@@ -201,7 +217,7 @@ class IO
   def each_byte(&block)
     return enum_for :each_byte unless block_given?
 
-    while (s = getbyte(separator))
+    while (s = getbyte)
       yield(s)
     end
 
@@ -211,7 +227,7 @@ class IO
   def each_char(&block)
     return enum_for :each_char unless block_given?
 
-    while (s = getc(separator))
+    while (s = getc)
       yield(s)
     end
 

@@ -11,7 +11,7 @@ class StringIO < IO
 
   def initialize(string = "", mode = 'rw')
     @string   = string
-    @position = string.length
+    @position = 0
 
     super(nil, mode)
   end
@@ -67,6 +67,9 @@ class StringIO < IO
   def write(string)
     check_writable
 
+    # Let's reset the read buffer, because it will be most likely wrong
+    @read_buffer = ''
+
     string = String(string)
 
     if @string.length == @position
@@ -89,6 +92,7 @@ class StringIO < IO
     string = if length
       str = @string[@position, length]
       @position += length
+      @position = @string.length if @position > @string.length
       str
     else
       str = @string[@position .. -1]
