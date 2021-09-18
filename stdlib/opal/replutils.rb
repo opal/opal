@@ -91,7 +91,7 @@ module REPLUtils
     while (line = gets)
       input = JSON.parse(line)
 
-      out = eval_and_print(input[:code], input[:mode], input[:colorize])
+      out = eval_and_print(input[:code], input[:mode], input[:colors])
       puts out if out
       puts '<<<ready>>>'
     end

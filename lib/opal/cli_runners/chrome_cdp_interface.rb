@@ -1,13 +1,18 @@
+# This script I converted into Opal, so that I don't have to write
+# buffer handling again. We have gets, Node has nothing close to it,
+# even async.
+
+require 'opal/platform'
+
+%x{
 var CDP = require("chrome-remote-interface");
 var fs = require("fs");
 
-// NOTE: the code above doesn't work on Windows
-// and it doesn't support interactive stdin input (which is ok for our scenario)
-var dir = fs.readFileSync("/dev/stdin").toString();
+var dir = #{ARGV[0]}
 
 var options = {
-  host: process.env.CHROME_HOST || 'localhost',
-  port: process.env.CHROME_PORT || 9222
+  host: #{ENV['CHROME_HOST'] || 'localhost'},
+  port: #{ENV['CHROME_PORT'] || 9222}
 };
 
 CDP(options, function(client) {
@@ -88,7 +93,20 @@ CDP(options, function(client) {
       console.log(stack);
 
       process.exit(1);
-    })
+    });
+
+    Page.javascriptDialogOpening((dialog) => {
+      #{
+        if `dialog.type` == 'prompt'
+          message = gets&.chomp
+          if message
+            `Page.handleJavaScriptDialog({accept: true, promptText: #{message}})`
+          else
+            `Page.handleJavaScriptDialog({accept: false})`
+          end
+        end
+      }
+    });
 
     Page.loadEventFired(() => {
       Runtime.evaluate({ expression: "window.OPAL_EXIT_CODE" }).then(function(output) {
@@ -105,3 +123,4 @@ CDP(options, function(client) {
     Page.navigate({ url: "file://"+dir+"/index.html" })
   });
 });
+}
