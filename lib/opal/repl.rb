@@ -66,11 +66,9 @@ module Opal
     end
 
     def finish
-      begin
-        @pipe.close
-      rescue
-        nil
-      end
+      @pipe.close
+    rescue
+      nil
     end
 
     def eval_ruby(code)

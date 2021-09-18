@@ -45,10 +45,10 @@ module REPLUtils
 
   def eval_and_print(func, mode, colorize)
     printer = if colorize
-      ->(i) { ColorPrinter.default(i) }
-    else
-      ->(i) { out = []; PP.pp(i, out); out.join }
-    end
+                ->(i) { ColorPrinter.default(i) }
+              else
+                ->(i) { out = []; PP.pp(i, out); out.join }
+              end
 
     %x{
       var $_result = eval(func);

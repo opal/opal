@@ -38,7 +38,8 @@ module Opal
           with_chrome_server do
             # This has to be moved to some generator.
             system(%{bundle exec opal -r opal/cli_runners/source-map-support-node } +
-                   %{-cE #{__dir__}/chrome_cdp_interface.rb > "#{SCRIPT_PATH}"})
+                   %{-cE #{__dir__}/chrome_cdp_interface.rb > "#{SCRIPT_PATH}"}
+)
 
             prepare_files_in(dir)
 
@@ -144,8 +145,8 @@ module Opal
           case RbConfig::CONFIG['host_os']
           when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
             [
-              "C:/Program Files/Google/Chrome Dev/Application/chrome.exe",
-              "C:/Program Files/Google/Chrome/Application/chrome.exe"
+              'C:/Program Files/Google/Chrome Dev/Application/chrome.exe',
+              'C:/Program Files/Google/Chrome/Application/chrome.exe'
             ].each do |path|
               next unless File.exist? path
               return path

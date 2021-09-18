@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This script I converted into Opal, so that I don't have to write
 # buffer handling again. We have gets, Node has nothing close to it,
 # even async.
