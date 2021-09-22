@@ -4,7 +4,6 @@ opal_filter "Float" do
   fails "Float constant MIN is 2.2250738585072014e-308"
   fails "Float#<=> raises TypeError when #coerce misbehaves" # Expected TypeError (coerce must return [x, y]) but no exception was raised (nil was returned)
   fails "Float#divmod returns an [quotient, modulus] from dividing self by other" # precision errors caused by Math.frexp and Math.ldexp
-  fails "Float#inspect emits '-' for -0.0" # Expected "0" == "-0.0" to be truthy but was false
   fails "Float#inspect emits a trailing '.0' for a whole number" # Expected "50" == "50.0" to be truthy but was false
   fails "Float#inspect emits a trailing '.0' for the mantissa in e format" # Expected "100000000000000000000" == "1.0e+20" to be truthy but was false
   fails "Float#inspect encoding returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding

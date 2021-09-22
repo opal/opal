@@ -711,6 +711,11 @@ class Number < Numeric
       raise ArgumentError, "invalid radix #{base}"
     end
 
+    # Don't lose the negative zero
+    if self == 0 && `1/self === -Infinity`
+      return '-0.0'
+    end
+
     `self.toString(base)`
   end
 
