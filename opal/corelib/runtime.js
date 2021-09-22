@@ -2181,7 +2181,7 @@
   };
 
   Opal.hash_delete = function(hash, key) {
-    var i, keys = hash.$$keys, length = keys.length, value;
+    var i, keys = hash.$$keys, length = keys.length, value, key_tmp;
 
     if (key.$$is_string) {
       if (typeof key !== "string") key = key.valueOf();
@@ -2191,7 +2191,13 @@
       }
 
       for (i = 0; i < length; i++) {
-        if (keys[i] === key) {
+        key_tmp = keys[i];
+
+        if (key_tmp.$$is_string && typeof key_tmp !== "string") {
+          key_tmp = key_tmp.valueOf();
+        }
+
+        if (key_tmp === key) {
           keys.splice(i, 1);
           break;
         }
