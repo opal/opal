@@ -33,6 +33,7 @@ class Method
   end
 
   alias [] call
+  alias === call
 
   def >>(other)
     @method >> other
