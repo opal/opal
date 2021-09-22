@@ -482,11 +482,18 @@ module Opal
           ]
         )
       else
-        s(:js_return, sexp).updated(
-          nil,
-          nil,
-          location: sexp.loc,
-        )
+        if sexp.type == :send && sexp.children[1] == :debugger
+          # debugger is a statement, so it doesn't return a value
+          # and returning it is invalid. Therefore we update it
+          # to do `debugger; return nil`.
+          s(:begin, sexp, s(:js_return, s(:nil)))
+        else
+          s(:js_return, sexp).updated(
+            nil,
+            nil,
+            location: sexp.loc,
+          )
+        end
       end
     end
 
