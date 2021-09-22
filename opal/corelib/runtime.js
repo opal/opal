@@ -1391,9 +1391,10 @@
   // @return [undefined]
   Opal.add_stubs = function(stubs) {
     var proto = Opal.BasicObject.$$prototype;
+    var stub, existing_method;
 
     for (var i = 0, length = stubs.length; i < length; i++) {
-      var stub = stubs[i], existing_method = proto[stub];
+      stub = stubs[i], existing_method = proto[stub];
 
       if (existing_method == null || existing_method.$$stub) {
         Opal.add_stub_for(proto, stub);
@@ -1408,8 +1409,8 @@
   // @param stub [String] stub name to add (e.g. "$foo")
   // @return [undefined]
   Opal.add_stub_for = function(prototype, stub) {
-    var method_missing_stub = Opal.stub_for(stub);
-    $defineProperty(prototype, stub, method_missing_stub);
+    // Opal.stub_for(stub) is the method_missing_stub
+    $defineProperty(prototype, stub, Opal.stub_for(stub));
   };
 
   // Generate the method_missing stub for a given method name.
