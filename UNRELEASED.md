@@ -22,6 +22,7 @@
 - REPL improvements: (#2285)
   - Colored output & history support
   - `ls` to show available constants and variable
+- Add `Method#===` as an alias to `Method#call`, works the same as `Proc#===` (#2305)
 
 ### Fixed
 
@@ -31,6 +32,12 @@
 - Source map: lines should start from 1, not 0 (#2273)
 - Allow for multiple underscored args with the same name in strict mode (#2292)
 - Show instance variables in `Kernel#inspect` (#2285)
+- `0.digits` was returning an empty array in strict mode (#2301)
+- Non Integer numbers were responding to `#digits` (#2301)
+- Correctly delete hash members when dealing with boxed strings (#2306)
+- Escape string components in interpolated strings (`dstrs`) correctly (#2308)
+- Don't try to return the JS `debugger` statement, just return `nil` (#2307)
+- Retain the `-` while stringifying `-0.0` (#2304)
 
 ### Changed
 
