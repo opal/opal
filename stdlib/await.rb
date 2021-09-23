@@ -8,6 +8,10 @@ if `Opal.config.experimental_features_severity == 'warning'`
       'https://github.com/opal/opal/issues?q=label%3Aasync%2Fawait%2Fpromises'
 end
 
+%x{
+  var AsyncFunction = Object.getPrototypeOf(async function() {}).constructor;
+}
+
 require 'promise/v2'
 
 class Array
@@ -64,4 +68,16 @@ end
 
 module Kernel
   alias await itself
+end
+
+class Proc
+  def async?
+    `self instanceof AsyncFunction`
+  end
+end
+
+class Method
+  def async?
+    @method.async?
+  end
 end
