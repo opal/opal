@@ -19,19 +19,17 @@ module Opal
         children :name, :args_to_keep
 
         def compile
-          if name
-            add_temp name
+          # def m(*)
+          # arguments are assigned to `$rest_arg` for super call
+          name = self.name || '$rest_arg'
 
-            if args_to_keep == 0
-              # no post-args, we are free to grab everything
-              line "#{name} = $post_args;"
-            else
-              line "#{name} = $post_args.splice(0, $post_args.length - #{args_to_keep});"
-            end
-          elsif args_to_keep != 0
-            # def m(*, a)
-            # We still have to "cut" our splat
-            line "$post_args.splice(0, $post_args.length - #{args_to_keep});"
+          add_temp name
+
+          if args_to_keep == 0
+            # no post-args, we are free to grab everything
+            line "#{name} = $post_args;"
+          else
+            line "#{name} = $post_args.splice(0, $post_args.length - #{args_to_keep});"
           end
         end
       end

@@ -33,10 +33,6 @@ module Opal
 
           compile_arity_check
 
-          if scope.uses_zuper
-            prepare_super
-          end
-
           unshift "\n#{current_indent}", scope.to_vars
 
           line stmt_code
@@ -93,17 +89,6 @@ module Opal
 
       def comments_code
         '[' + comments.map { |comment| comment.text.inspect }.join(', ') + ']'
-      end
-
-      def prepare_super
-        add_local '$zuper'
-        add_local '$zuper_i'
-        add_local '$zuper_ii'
-
-        line '// Prepare super implicit arguments'
-        line 'for($zuper_i = 0, $zuper_ii = arguments.length, $zuper = new Array($zuper_ii); $zuper_i < $zuper_ii; $zuper_i++) {'
-        line '  $zuper[$zuper_i] = arguments[$zuper_i];'
-        line '}'
       end
     end
   end

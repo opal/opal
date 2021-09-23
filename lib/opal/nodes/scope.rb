@@ -27,10 +27,6 @@ module Opal
       # used by modules to know what methods to donate to includees
       attr_reader :methods
 
-      # uses parents super method
-      attr_accessor :uses_super
-      attr_accessor :uses_zuper
-
       attr_accessor :catch_return, :has_break, :has_retry
 
       attr_accessor :rescue_else_sexp
