@@ -36,7 +36,7 @@ class Opal::SimpleServer
 
   def call(env)
     case env['PATH_INFO']
-    when %r{\A/#{@prefix}/(.*)\.js\z}
+    when %r{\A/#{@prefix}/(.*)\.m?js\z}
       path, _cache_invalidator = Regexp.last_match(1).split('?', 2)
       call_js(path)
     else call_index
@@ -65,7 +65,12 @@ class Opal::SimpleServer
   end
 
   def javascript_include_tag(path)
-    %{<script src="/#{@prefix}/#{path}.js#{cache_invalidator}"></script>}
+    case Opal::Config.esm
+    when true
+      %{<script src="/#{@prefix}/#{path}.mjs#{cache_invalidator}" type="module"></script>}
+    when false
+      %{<script src="/#{@prefix}/#{path}.js#{cache_invalidator}"></script>}
+    end
   end
 
   def cache_invalidator
