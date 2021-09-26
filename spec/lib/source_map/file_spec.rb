@@ -49,7 +49,7 @@ RSpec.describe Opal::SourceMap::File do
       sourceRoot: '',
       sources: ['foo.rb'],
       sourcesContent: ["puts 5\n\nputs 6"],
-      names: ['puts', '5', '6'],
+      names: ['self', 'puts', '5', '6'],
       mappings: nil,
     )
 
@@ -59,8 +59,8 @@ RSpec.describe Opal::SourceMap::File do
     expect('$puts(6)').to be_at_line_and_column(7, 14, source: generated_code)
     expect('6'       ).to be_at_line_and_column(7, 20, source: generated_code)
 
-    expect('puts(5)').to be_mapped_to_line_and_column(1, 0, map: subject, source: generated_code, file: 'foo.rb')
-    expect('5);'    ).to be_mapped_to_line_and_column(1, 5, map: subject, source: generated_code, file: 'foo.rb')
+    expect('puts(5)').to be_mapped_to_line_and_column(0, 0, map: subject, source: generated_code, file: 'foo.rb')
+    expect('5);'    ).to be_mapped_to_line_and_column(0, 5, map: subject, source: generated_code, file: 'foo.rb')
     expect('puts(6)').to be_mapped_to_line_and_column(2, 0, map: subject, source: generated_code, file: 'foo.rb')
     expect('6);'    ).to be_mapped_to_line_and_column(2, 5, map: subject, source: generated_code, file: 'foo.rb')
   end

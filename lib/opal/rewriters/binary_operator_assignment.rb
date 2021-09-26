@@ -16,11 +16,11 @@ module Opal
       end
 
       GET_SET = ->(get_type, set_type) {
-        ->(lhs, operation, rhs) {
-          get_node = lhs.updated(get_type)               # lhs
-          set_node = s(:send, get_node, operation, rhs)  # lhs + rhs
+        ->(node, lhs, operation, rhs) {
+          get_node = lhs.updated(get_type) # lhs
+          set_node = node.updated(:send, [get_node, operation, rhs]) # lhs + rhs
 
-          lhs.updated(set_type, [*lhs, set_node])        # lhs = lhs + rhs
+          lhs.updated(set_type, [*lhs, set_node]) # lhs = lhs + rhs
         }
       }
 
@@ -48,7 +48,7 @@ module Opal
       # Produces `recvr.meth = recvr.meth + rhs`
       # (lhs is a recvr.meth, op is :+)
       class SendHandler < self
-        def self.call(lhs, operation, rhs)
+        def self.call(node, lhs, operation, rhs)
           recvr, reader_method, *args = *lhs
 
           # If recvr is a complex expression it must be cached.
@@ -62,11 +62,11 @@ module Opal
           writer_method = :"#{reader_method}="
 
           call_reader = lhs.updated(:send, [recvr, reader_method, *args])          # $tmp.meth
-          call_op = s(:send, call_reader, operation, rhs)                          # $tmp.meth + rhs
+          call_op = node.updated(:send, [call_reader, operation, rhs])             # $tmp.meth + rhs
           call_writer = lhs.updated(:send, [recvr, writer_method, *args, call_op]) # $tmp.meth = $tmp.meth + rhs
 
           if cache_recvr
-            s(:begin, cache_recvr, call_writer)
+            node.updated(:begin, [cache_recvr, call_writer])
           else
             call_writer
           end
@@ -78,7 +78,7 @@ module Opal
       #   NOTE: Later output of this handler gets post-processed by this rewriter again
       #   using SendHandler to `recvr.nil? ? nil : (recvr.meth = recvr.meth + rhs)`
       class ConditionalSendHandler < self
-        def self.call(lhs, operation, rhs)
+        def self.call(node, lhs, operation, rhs)
           recvr, meth, *args = *lhs
 
           recvr_tmp = new_temp
@@ -87,7 +87,7 @@ module Opal
 
           recvr_is_nil = s(:send, recvr, :nil?)                   # recvr.nil?
           plain_send = lhs.updated(:send, [recvr, meth, *args])   # recvr.meth
-          plain_op_asgn = s(:op_asgn, plain_send, operation, rhs) # recvr.meth += rhs
+          plain_op_asgn = node.updated(:op_asgn, [plain_send, operation, rhs]) # recvr.meth += rhs
 
           s(:begin,
             cache_recvr,
@@ -116,7 +116,7 @@ module Opal
 
         result = HANDLERS
                  .fetch(lhs.type) { error "cannot handle LHS type: #{lhs.type}" }
-                 .call(lhs, op, rhs)
+                 .call(node, lhs, op, rhs)
 
         process(result)
       end

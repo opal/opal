@@ -41,6 +41,8 @@ module Opal
       @rbrequires  = options.delete(:rbrequires) { [] }
       @no_cache    = options.delete(:no_cache)   { false }
 
+      @debug_source_map = options.delete(:debug_source_map) { false }
+
       @missing_require_severity = options.delete(:missing_require_severity) { Opal::Config.missing_require_severity }
 
       @requires.unshift('opal') unless options.delete(:skip_opal_require)
@@ -62,6 +64,7 @@ module Opal
 
     def run
       return show_sexp if @sexp
+      return debug_source_map if @debug_source_map
       @exit_status = runner.call(
         options: runner_options,
         output: output,
@@ -126,6 +129,21 @@ module Opal
         buffer.source = contents
         sexp = Opal::Parser.default_parser.parse(buffer)
         output.puts sexp.inspect
+      end
+    end
+
+    def debug_source_map
+      evals_or_file do |contents, filename|
+        compiler = Opal::Compiler.new(contents, file: filename, **compiler_options)
+
+        compiler.compile
+
+        result = compiler.result
+        source_map = compiler.source_map.to_json
+
+        b64 = [result, source_map, contents].map { |i| Base64.strict_encode64(i) }.join(',')
+
+        output.puts "https://sokra.github.io/source-map-visualization/#base64,#{b64}"
       end
     end
 

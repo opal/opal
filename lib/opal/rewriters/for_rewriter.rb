@@ -52,7 +52,7 @@ module Opal
         loop_variable_assignment = case loop_variable.type
                                    when :mlhs # multiple left-hand statement like in "for i,j in [[1, 2], [3, 4]]"
                                      # i, j = __jstmp
-                                     s(:masgn, loop_variable, get_tmp_loop_variable)
+                                     loop_variable.updated(:masgn, [loop_variable, get_tmp_loop_variable])
                                    else # single argument like "for i in (0..3)"
                                      # i = __jstmp
                                      loop_variable << get_tmp_loop_variable
@@ -60,13 +60,13 @@ module Opal
 
         loop_body = prepend_to_body(loop_body, loop_variable_assignment)
 
-        node = s(:send, iterating_value, :each,          # (0..3).each {
-          s(:iter, s(:args, s(:arg, tmp_loop_variable)), #                |__jstmp|
-            process(loop_body)
-          )
-        )                                                #                          i = __jstmp; j = i + 1 }
+        node = node.updated(:send, [iterating_value, :each,                                    # (0..3).each {
+                                    node.updated(:iter, [s(:args, s(:arg, tmp_loop_variable)), #                |__jstmp|
+                                                         process(loop_body)]                   #                          i = __jstmp; j = i + 1 }
+                                    )]
+        )
 
-        s(:begin, *outer_assigns, node)
+        node.updated(:begin, [*outer_assigns, node])
       end
 
       class LocalVariableAssigns < Base

@@ -218,7 +218,16 @@ module Opal
 
       sexp, comments, tokens = re_raise_with_location { @parser.tokenize(@buffer) }
 
-      @sexp = s(:top, sexp || s(:nil))
+      kind = case
+             when requirable?
+               :require
+             when eval?
+               :eval
+             else
+               :main
+             end
+
+      @sexp = s(:top, sexp || s(:nil)).tap { |i| i.meta[:kind] = kind }
       @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
       @magic_comments = MagicComments.parse(sexp, comments)
       @eof_content = EofContent.new(tokens, @source).eof
@@ -429,7 +438,7 @@ module Opal
       case sexp.type
       when :undef
         # undef :method_name always returns nil
-        returns s(:begin, sexp, s(:nil))
+        returns sexp.updated(:begin, [sexp, s(:nil)])
       when :break, :next, :redo, :retry
         sexp
       when :yield
@@ -461,7 +470,7 @@ module Opal
       when :ensure
         rescue_sexp, ensure_body = *sexp
         sexp = sexp.updated(nil, [returns(rescue_sexp), ensure_body])
-        s(:js_return, sexp)
+        sexp.updated(:js_return, [sexp])
       when :begin, :kwbegin
         # Wrapping last expression with s(:js_return, ...)
         *rest, last = *sexp
@@ -486,13 +495,9 @@ module Opal
           # debugger is a statement, so it doesn't return a value
           # and returning it is invalid. Therefore we update it
           # to do `debugger; return nil`.
-          s(:begin, sexp, s(:js_return, s(:nil)))
+          sexp.updated(:begin, [sexp, s(:js_return, s(:nil))])
         else
-          s(:js_return, sexp).updated(
-            nil,
-            nil,
-            location: sexp.loc,
-          )
+          sexp.updated(:js_return, [sexp])
         end
       end
     end

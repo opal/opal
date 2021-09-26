@@ -86,6 +86,10 @@ module Opal
         options[:sexp] = true
       end
 
+      on('--debug-source-map', 'Debug source map') do
+        options[:debug_source_map] = true
+      end
+
       on('-c', '--compile', 'Compile to JavaScript') do
         options[:runner] = :compiler
       end
@@ -147,6 +151,11 @@ module Opal
       on('-P', '--map FILE', 'Output path to FILE') do |file|
         options[:runner_options] ||= {}
         options[:runner_options][:map_file] = file
+      end
+
+      on('--no-source-map', "Don't append source map to a compiled file") do
+        options[:runner_options] ||= {}
+        options[:runner_options][:no_source_map] = true
       end
 
       on('-F', '--file FILE', 'Set filename for compiled code') do |file|
