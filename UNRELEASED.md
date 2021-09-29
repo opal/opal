@@ -23,6 +23,14 @@
   - Colored output & history support
   - `ls` to show available constants and variable
 - Add `Method#===` as an alias to `Method#call`, works the same as `Proc#===` (#2305)
+- Add `IO#gets` and `IO#read_proc` along with other supporting methods (#2309)
+  - Support `#gets` on most platforms, including browsers (via `prompt`)
+  - Move the REPL to a `--repl` CLI option of the main executable
+  - Completely refactor IO, now supporting 
+  - Add a runner for MiniRacer (as `miniracer`)
+  - Support Windows on the Chrome runner 
+  - Support Windows on the REPL
+  - Platforms an IO implementations should either set `IO#read_proc` or overwrite `IO#sysread`
 
 ### Fixed
 
@@ -38,12 +46,15 @@
 - Escape string components in interpolated strings (`dstrs`) correctly (#2308)
 - Don't try to return the JS `debugger` statement, just return `nil` (#2307)
 - Retain the `-` while stringifying `-0.0` (#2304)
+- Fix super support for rest args and re-assignments with implicit arguments (#2315)
 
 ### Changed
 
 - Fast-track bad constant names passed to `Struct.new` (#2259)
 - Renamed internal `super` related helpers,
   `find_super_dispatcher` is now `find_super`, `find_iter_super_dispatcher` is now `find_block_super` (#2090)
+- The `opal-repl` CLI now requires files to be passed with `--require` (or `-r`) instead of the bare filename (#2309)
+
 
 ### Deprecated
 
