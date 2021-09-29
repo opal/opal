@@ -24,6 +24,7 @@ module Opal
 
       @options     = options
       @sexp        = options.delete(:sexp)
+      @repl        = options.delete(:repl)
       @file        = options.delete(:file)
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
@@ -65,6 +66,8 @@ module Opal
     def run
       return show_sexp if @sexp
       return debug_source_map if @debug_source_map
+      return run_repl if @repl
+
       @exit_status = runner.call(
         options: runner_options,
         output: output,
@@ -76,6 +79,13 @@ module Opal
     def runner
       CliRunners[@runner_type] ||
         raise(ArgumentError, "unknown runner: #{@runner_type.inspect}")
+    end
+
+    def run_repl
+      require 'opal/repl'
+
+      repl = REPL.new
+      repl.run(OriginalARGV)
     end
 
     attr_reader :exit_status

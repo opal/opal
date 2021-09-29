@@ -1,7 +1,7 @@
 require 'lib/spec_helper'
 require 'opal/repl'
 
-RSpec.describe Opal::REPL, skip: RUBY_PLATFORM != 'ruby' do
+RSpec.describe Opal::REPL do
   describe '#eval_ruby' do
     let(:input_and_output) { {
       'puts 5'          => "5\n=> nil\n",
@@ -16,10 +16,12 @@ RSpec.describe Opal::REPL, skip: RUBY_PLATFORM != 'ruby' do
     subject(:repl) { described_class.new }
 
     it 'evaluates user inputs' do
+      repl.colorize = false
+
       repl.load_opal
 
       input_and_output.each do |input, output|
-        expect { repl.run_line(input) }.to output(output).to_stdout
+        expect { repl.eval_ruby(input) }.to output(output).to_stdout
       end
 
       repl.finish

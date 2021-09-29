@@ -32,6 +32,10 @@ module Opal
         exit
       end
 
+      on('--repl', 'Run the Opal REPL') do
+        options[:repl] = true
+      end
+
       on('-h', '--help', 'Show this message') do
         puts self
         exit

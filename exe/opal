@@ -2,6 +2,8 @@
 
 # Error codes are taken from /usr/include/sysexits.h
 
+OriginalARGV = ARGV.dup
+
 require 'opal/cli_options'
 options = Opal::CLIOptions.new
 begin

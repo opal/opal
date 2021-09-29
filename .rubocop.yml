@@ -125,6 +125,11 @@ Lint/LiteralAsCondition:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
 
+Lint/Loop:
+  Exclude:
+    # This is for optimization purposes mostly
+    - 'opal/corelib/io.rb'
+
 # Allow the use of if/unless inside blocks
 Style/Next:
   Enabled: false

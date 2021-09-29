@@ -8,7 +8,7 @@ require 'tmpdir'
 module Opal
   module CliRunners
     class Chrome
-      SCRIPT_PATH = File.expand_path('chrome.js', __dir__).freeze
+      SCRIPT_PATH = File.expand_path('chrome_cdp_interface.js', __dir__).freeze
 
       DEFAULT_CHROME_HOST = 'localhost'
       DEFAULT_CHROME_PORT = 9222
@@ -16,7 +16,6 @@ module Opal
       def self.call(data)
         runner = new(data)
         runner.run
-        runner.exit_status
       end
 
       def initialize(data)
@@ -37,23 +36,24 @@ module Opal
       def run
         mktmpdir do |dir|
           with_chrome_server do
+            # This has to be moved to some generator.
+            system(%{bundle exec opal -r opal/cli_runners/source-map-support-node } +
+                   %{-cE #{__dir__}/chrome_cdp_interface.rb > "#{SCRIPT_PATH}"}
+)
+
+            prepare_files_in(dir)
+
             cmd = [
               'env',
               "CHROME_HOST=#{chrome_host}",
               "CHROME_PORT=#{chrome_port}",
               'node',
-              '--require', "#{__dir__}/source-map-support",
-              SCRIPT_PATH
+              SCRIPT_PATH,
+              dir,
             ]
 
-            prepare_files_in(dir)
-
-            IO.popen(cmd, 'w', out: output) do |io|
-              io.write dir
-            end
+            Kernel.exec(*cmd)
           end
-
-          @exit_status = $?.exitstatus
         end
       end
 
@@ -108,11 +108,11 @@ module Opal
         raise 'Chrome server can be started only on localhost' if chrome_host != DEFAULT_CHROME_HOST
 
         # Disable web security with "--disable-web-security" flag to be able to do XMLHttpRequest (see test_openuri.rb)
-        chrome_server_cmd = "#{chrome_executable} \
+        chrome_server_cmd = %{"#{chrome_executable}" \
           --headless \
           --disable-web-security \
           --remote-debugging-port=#{chrome_port} \
-          #{ENV['CHROME_OPTS']}"
+          #{ENV['CHROME_OPTS']}}
 
         chrome_pid = Process.spawn(chrome_server_cmd)
 
@@ -144,13 +144,20 @@ module Opal
         ENV['GOOGLE_CHROME_BINARY'] ||
           case RbConfig::CONFIG['host_os']
           when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-            raise 'Headless chrome is supported only by Mac OS and Linux'
+            [
+              'C:/Program Files/Google/Chrome Dev/Application/chrome.exe',
+              'C:/Program Files/Google/Chrome/Application/chrome.exe'
+            ].each do |path|
+              next unless File.exist? path
+              return path
+            end
           when /darwin|mac os/
             '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
           when /linux/
             %w[
               google-chrome-stable
               chromium
+              chromium-freeworld
               chromium-browser
             ].each do |name|
               next unless system('sh', '-c', "command -v #{name.shellescape}", out: '/dev/null')

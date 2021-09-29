@@ -154,8 +154,7 @@ end
 module OutputSilencer
   def silence_stdout
     original_stdout = $stdout
-    new_stdout = IO.new
-    new_stdout.extend IO::Writable
+    new_stdout = IO.new(1, 'w')
     new_stdout.write_proc = ->s{}
 
     begin

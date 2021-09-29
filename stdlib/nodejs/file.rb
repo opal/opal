@@ -120,9 +120,6 @@
 }
 
 class File < IO
-  include ::IO::Writable
-  include ::IO::Readable
-
   @__fs__ = `require('fs')`
   @__path__ = `require('path')`
   @__util__ = `require('util')`
@@ -257,15 +254,16 @@ class File < IO
       flags = flags.sub(encoding_option_rx, '')
     end
     @path = path
-    @flags = flags
-    @fd = `executeIOAction(function(){return __fs__.openSync(path, flags)})`
+
+    fd = `executeIOAction(function(){return __fs__.openSync(path, flags)})`
+    super(fd, flags)
   end
 
   attr_reader :path
 
-  def read
+  def sysread(bytes)
     if @eof
-      ''
+      raise EOFError, 'end of file reached'
     else
       if @binary_flag
         %x{
@@ -288,40 +286,6 @@ class File < IO
     end
   end
 
-  def readlines(separator = $/)
-    each_line(separator).to_a
-  end
-
-  def each_line(separator = $/, &block)
-    if @eof
-      return block_given? ? self : [].to_enum
-    end
-
-    if block_given?
-      lines = File.read(@path)
-      %x{
-        self.eof = false;
-        self.lineno = 0;
-        var chomped  = #{lines.chomp},
-            trailing = lines.length != chomped.length,
-            splitted = chomped.split(separator);
-        for (var i = 0, length = splitted.length; i < length; i++) {
-          self.lineno += 1;
-          if (i < length - 1 || trailing) {
-            #{yield `splitted[i] + separator`};
-          }
-          else {
-            #{yield `splitted[i]`};
-          }
-        }
-        self.eof = true;
-      }
-      self
-    else
-      read.each_line separator
-    end
-  end
-
   def write(string)
     `executeIOAction(function(){return __fs__.writeSync(#{@fd}, #{string})})`
   end
@@ -332,6 +296,7 @@ class File < IO
 
   def close
     `executeIOAction(function(){return __fs__.closeSync(#{@fd})})`
+    super
   end
 
   def mtime

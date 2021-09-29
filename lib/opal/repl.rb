@@ -9,22 +9,17 @@ module Opal
   class REPL
     HISTORY_PATH = File.expand_path('~/.opal-repl-history')
 
-    def initialize
-      @exit = @exit_status = nil
+    attr_accessor :colorize
 
-      begin
-        require 'mini_racer'
-      rescue LoadError
-        abort 'opal-repl depends on mini_racer gem, which is not currently installed'
-      end
+    def initialize
+      @argv = []
+      @colorize = true
 
       begin
         require 'readline'
       rescue LoadError
         abort 'opal-repl depends on readline, which is not currently available'
       end
-
-      MiniRacer::Platform.set_flags! :harmony
 
       begin
         FileUtils.touch(HISTORY_PATH)
@@ -34,75 +29,46 @@ module Opal
       @history = File.exist?(HISTORY_PATH)
     end
 
-    def run(filename = nil)
+    def run(argv = [])
+      @argv = argv
+
+      savepoint = save_tty
       load_opal
-      load_file(filename) if filename
       load_history
       run_input_loop
     ensure
       dump_history
-    end
-
-    def load_file(filename)
-      raise "file does not exist: #{filename}" unless File.exist? filename
-      eval_ruby File.read(filename)
-    end
-
-    # A polyfill so that SecureRandom works in repl correctly.
-    def random_bytes(bytes)
-      ::SecureRandom.bytes(bytes).split('').map(&:ord)
+      restore_tty(savepoint)
     end
 
     def load_opal
-      v8.attach('console.log', method(:print).to_proc)
-      v8.attach('console.warn', ->(i) { $stderr.print(i) })
-      v8.attach('crypto.randomBytes', method(:random_bytes).to_proc)
-      v8.eval Opal::Builder.new.build('opal').to_s
-      v8.eval Opal::Builder.new.build('opal/replutils').to_s
-      v8.attach('Opal.exit', ->(status) { @exit = true; @exit_status = status })
-    end
+      runner = @argv.reject { |i| i == '--repl' }
+      runner += ['-e', 'require "opal/repl_js"']
+      runner = %w[bundle exec opal] + runner
 
-    def run_line(line)
-      result = eval_ruby(line)
-      Kernel.exit(@exit_status) if @exit
-      puts result.to_s if result
+      @pipe = IO.popen(runner, 'r+',
+        # What I try to achieve here: let the runner ignore
+        # interrupts. Those should be handled by a supervisor.
+        pgroup: true,
+        new_pgroup: true,
+      )
     end
 
     def run_input_loop
-      # on SIGINT lets just return from the loop..
-      previous_trap = trap('SIGINT') { return }
-
       while (line = readline)
-        run_line(line)
+        eval_ruby(line)
       end
-
+    rescue Interrupt
+      @incomplete = nil
+      retry
     ensure
-      trap('SIGINT', previous_trap || 'DEFAULT')
+      finish
     end
 
-    private
-
-    LINEBREAKS = [
-      'unexpected token $end',
-      'unterminated string meets end of file'
-    ].freeze
-
-    class Silencer
-      def initialize
-        @stderr = $stderr
-      end
-
-      def silence
-        @collector = StringIO.new
-        $stderr = @collector
-        yield
-      ensure
-        $stderr = @stderr
-      end
-
-      def warnings
-        @collector.string
-      end
+    def finish
+      @pipe.close
+    rescue
+      nil
     end
 
     def eval_ruby(code)
@@ -132,39 +98,72 @@ module Opal
       rescue Opal::SyntaxError => e
         if LINEBREAKS.include?(e.message)
           @incomplete = "#{code}\n"
-          return
         else
           @incomplete = nil
           if silencer.warnings.empty?
-            return e.full_message
+            warn e.full_message
           else
             # Most likely a parser error
-            return silencer.warnings
+            warn silencer.warnings
           end
         end
+        return
       end
-      builder.processed[0...-1].each { |js_code| eval_js js_code.to_s }
+      builder.processed[0...-1].each { |js_code| eval_js(:silent, js_code.to_s) }
       last_processed_file = builder.processed.last.to_s
 
-      return last_processed_file if mode == :show
+      if mode == :show
+        puts last_processed_file
+        return
+      end
 
-      result = eval_js <<-JS
-        Opal.REPLUtils.$eval_and_print(function () {
-          var ret = #{last_processed_file};
-          return ret;
-        }, #{mode.to_s.inspect});
-      JS
-      result
+      eval_js(mode, last_processed_file)
+    rescue Interrupt, SystemExit => e
+      raise e
     rescue Exception => e # rubocop:disable Lint/RescueException
       puts e.full_message(highlight: true)
     end
 
-    def eval_js(code)
-      v8.eval(code)
+    private
+
+    LINEBREAKS = [
+      'unexpected token $end',
+      'unterminated string meets end of file'
+    ].freeze
+
+    class Silencer
+      def initialize
+        @stderr = $stderr
+      end
+
+      def silence
+        @collector = StringIO.new
+        $stderr = @collector
+        yield
+      ensure
+        $stderr = @stderr
+      end
+
+      def warnings
+        @collector.string
+      end
     end
 
-    def v8
-      @v8 ||= MiniRacer::Context.new
+    def eval_js(mode, code)
+      obj = { mode: mode, code: code, colors: colorize }.to_json
+      @pipe.puts obj
+      while (line = @pipe.readline)
+        break if line.chomp == '<<<ready>>>'
+        puts line
+      end
+    rescue Interrupt => e
+      # A child stopped responding... let's create a new one
+      warn "* Killing #{@pipe.pid}"
+      Process.kill('-KILL', @pipe.pid)
+      load_opal
+      raise e
+    rescue EOFError, Errno::EPIPE
+      exit $?.exitstatus
     end
 
     def readline
@@ -181,6 +180,19 @@ module Opal
       return unless @history
       length = Readline::HISTORY.size > 1000 ? 1000 : Readline::HISTORY.size
       File.write(HISTORY_PATH, Readline::HISTORY.to_a[-length..-1].join("\n"))
+    end
+
+    # How do we support Win32?
+    def save_tty
+      %x{stty -g}.chomp
+    rescue
+      nil
+    end
+
+    def restore_tty(savepoint)
+      system('stty', savepoint)
+    rescue
+      nil
     end
   end
 end
