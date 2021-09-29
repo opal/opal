@@ -170,7 +170,6 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#sub with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(123450000000000) exactly 1 times but received it 0 times
   fails "BigDecimal#sub with Rational produces a BigDecimal" # Exception: lhs.$- is not a function
   fails "BigDecimal#to_f properly handles special values"
-  fails "BigDecimal#to_f remembers negative zero when converted to float"
   fails "BigDecimal#to_i raises FloatDomainError if BigDecimal is infinity or NaN"
   fails "BigDecimal#to_i returns Integer or Bignum otherwise"
   fails "BigDecimal#to_i returns Integer otherwise" # NoMethodError: undefined method `to_i' for 3e-20001

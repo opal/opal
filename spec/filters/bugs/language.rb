@@ -239,7 +239,6 @@ opal_filter "language" do
   fails "Predefined global $/ raises a TypeError if assigned an Integer" # Expected TypeError but no exception was raised (#<Number>(#pretty_inspect raised #<TypeError: no implicit conversion of Number into String>) was returned)
   fails "Predefined global $_ is Thread-local"
   fails "Predefined global $_ is set at the method-scoped level rather than block-scoped"
-  fails "Predefined global $_ is set to the last line read by e.g. StringIO#gets"
   fails "Predefined global $stdout raises TypeError error if assigned to nil"
   fails "Predefined global $stdout raises TypeError error if assigned to object that doesn't respond to #write"
   fails "Predefined global $~ is set at the method-scoped level rather than block-scoped"
