@@ -49,7 +49,13 @@ module Opal
 
         line '}'
 
-        wrap '(function() { ', '; })()' if wrap_in_closure?
+        if wrap_in_closure?
+          if scope.await_encountered
+            wrap '(await (async function() { ', '; })())'
+          else
+            wrap '(function() { ', '; })()'
+          end
+        end
       end
 
       def body_sexp
@@ -134,7 +140,13 @@ module Opal
         # Wrap a try{} catch{} into a function
         # when it's an expression
         # or when there's a method call after begin;rescue;end
-        wrap '(function() { ', '})()' if expr? || recv?
+        if expr? || recv?
+          if scope.await_encountered
+            wrap '(await (async function() { ', '})())'
+          else
+            wrap '(function() { ', '})()'
+          end
+        end
       end
 
       def body_code

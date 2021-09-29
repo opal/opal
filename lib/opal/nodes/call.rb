@@ -89,6 +89,11 @@ module Opal
       end
 
       def default_compile
+        if auto_await?
+          push 'await '
+          scope.await_encountered = true
+        end
+
         if invoke_using_refinement?
           compile_using_refined_send
         elsif invoke_using_send?
@@ -225,6 +230,12 @@ module Opal
 
       def sexp_with_arglist
         @sexp.updated(nil, [recvr, meth, arglist])
+      end
+
+      def auto_await?
+        awaited_set = compiler.async_await
+
+        awaited_set && awaited_set != true && awaited_set.match?(meth.to_s)
       end
 
       # Handle "special" method calls, e.g. require(). Subclasses can override
@@ -392,6 +403,17 @@ module Opal
         push "  self,"
         push "  ", source_location
         push ")"
+      end
+
+      add_special :__await__ do |compile_default|
+        if compiler.async_await
+          push fragment '(await ('
+          push process(recvr)
+          push fragment '))'
+          scope.await_encountered = true
+        else
+          compile_default.call
+        end
       end
 
       def push_nesting?

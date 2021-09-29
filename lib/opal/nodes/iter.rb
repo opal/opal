@@ -39,7 +39,11 @@ module Opal
 
         unshift to_vars
 
-        unshift "(#{identity} = function(", inline_params, '){'
+        if await_encountered
+          unshift "(#{identity} = async function(", inline_params, '){'
+        else
+          unshift "(#{identity} = function(", inline_params, '){'
+        end
         push "}, #{identity}.$$s = self,"
         push " #{identity}.$$brk = $brk," if contains_break?
         push " #{identity}.$$arity = #{arity},"

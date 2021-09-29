@@ -331,6 +331,13 @@ platforms.each do |platform|
           opal/test_openuri.rb
           opal/unsupported_and_bugs.rb
           opal/test_matrix.rb
+          opal/promisev2/test_always.rb
+          opal/promisev2/test_error.rb
+          opal/promisev2/test_rescue.rb
+          opal/promisev2/test_then.rb
+          opal/promisev2/test_trace.rb
+          opal/promisev2/test_value.rb
+          opal/promisev2/test_when.rb
         ]
       end
       Testing::HTTPServer.new.with_server do |session|
@@ -363,6 +370,7 @@ task :minitest_node_nodejs do
     nodejs/test_io.rb
     nodejs/test_opal_builder.rb
     nodejs/test_string.rb
+    nodejs/test_await.rb
   ]
 
   filename = "tmp/minitest_node_nodejs.rb"

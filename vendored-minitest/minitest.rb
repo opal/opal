@@ -1,7 +1,10 @@
+# await: *await*
+
 require "optparse"
 require "thread"
 require "mutex_m"
-require "minitest/parallel"
+# require "minitest/parallel"
+require "await"
 
 ##
 # :include: README.txt
@@ -19,8 +22,8 @@ module Minitest
   ##
   # Parallel test executor
 
-  mc.send :attr_accessor, :parallel_executor
-  self.parallel_executor = Parallel::Executor.new((ENV['N'] || 2).to_i)
+  # mc.send :attr_accessor, :parallel_executor
+  # self.parallel_executor = Parallel::Executor.new((ENV['N'] || 2).to_i)
 
   ##
   # Filter object for backtraces.
@@ -53,7 +56,7 @@ module Minitest
         exit exit_code || false
       }
 
-      exit_code = Minitest.run ARGV
+      exit_code = Minitest.run(ARGV).await
     } unless @@installed_at_exit
     @@installed_at_exit = true
   end
@@ -124,8 +127,8 @@ module Minitest
     self.reporter = nil # runnables shouldn't depend on the reporter, ever
 
     reporter.start
-    __run reporter, options
-    self.parallel_executor.shutdown
+    __run(reporter, options).await
+    # self.parallel_executor.shutdown
     reporter.report
 
     reporter.passed?
@@ -147,8 +150,8 @@ module Minitest
     # the serial tests won't lock around Reporter#record. Run the serial tests
     # first, so that after they complete, the parallel tests will lock when
     # recording results.
-    serial.map { |suite| suite.run reporter, options } +
-      parallel.map { |suite| suite.run reporter, options }
+    serial.map_await { |suite| suite.run(reporter, options).await } +
+      parallel.map_await { |suite| suite.run(reporter, options).await }
   end
 
   def self.process_args args = [] # :nodoc:
@@ -284,11 +287,11 @@ module Minitest
         filter === m || filter === "#{self}##{m}"
       }
 
-      with_info_handler reporter do
-        filtered_methods.each do |method_name|
-          run_one_method self, method_name, reporter
+      with_info_handler(reporter) do
+        filtered_methods.each_await do |method_name|
+          run_one_method(self, method_name, reporter).await
         end
-      end
+      end.await
     end
 
     ##
@@ -298,7 +301,7 @@ module Minitest
     # test. See Minitest::ParallelTest::ClassMethods for an example.
 
     def self.run_one_method klass, method_name, reporter
-      reporter.record Minitest.run_one_method(klass, method_name)
+      reporter.record Minitest.run_one_method(klass, method_name).await
     end
 
     def self.with_info_handler reporter, &block # :nodoc:
@@ -311,7 +314,7 @@ module Minitest
         end
       end
 
-      on_signal "INFO", handler, &block
+      on_signal("INFO", handler, &block).await
     end
 
     SIGNALS = {} # Signal.list # :nodoc:
@@ -324,7 +327,7 @@ module Minitest
         action.call
       end if supported
 
-      yield
+      yield.await
     ensure
       trap name, old_trap if supported
     end
@@ -771,7 +774,7 @@ module Minitest
   self.backtrace_filter = BacktraceFilter.new
 
   def self.run_one_method klass, method_name # :nodoc:
-    result = klass.new(method_name).run
+    result = klass.new(method_name).run.await
     raise "#{klass}#run _must_ return self" unless klass === result
     result
   end

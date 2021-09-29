@@ -37,3 +37,8 @@ class TestCall
   unsupported :test_safe_call_block_call_brace
   unsupported :test_safe_call_block_call_command
 end
+
+class TestBenchmark
+  # sleep is unsupported if not awaited
+  unsupported :test_realtime_output
+end

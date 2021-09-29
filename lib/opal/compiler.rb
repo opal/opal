@@ -166,6 +166,36 @@ module Opal
 
     compiler_option :scope_variables, default: []
 
+    # @!method async_await
+    #
+    # Enable async/await support and optionally enable auto-await.
+    #
+    # Use either true, false, an Array of Symbols, a String containing names
+    # to auto-await separated by a comma or a Regexp.
+    #
+    # Auto-await awaits provided methods by default as if .__await__ was added to
+    # them automatically.
+    #
+    # By default, the support is disabled (set to false).
+    #
+    # If the config value is not set to false, any calls to #__await__ will be
+    # translated to ES8 await keyword which makes the scope return a Promise
+    # and a containing scope will be async (instead of a value, it will return
+    # a Promise).
+    #
+    # If the config value is an array, or a String separated by a comma,
+    # auto-await is also enabled.
+    #
+    # A member of this collection can contain a wildcard character * in which
+    # case all methods containing a given substring will be awaited.
+    #
+    # It can be used as a magic comment, examples:
+    # ```
+    # # await: true
+    # # await: *await*
+    # # await: *await*, sleep, gets
+    compiler_option :await, default: false, as: :async_await, magic_comment: true
+
     # @return [String] The compiled ruby code
     attr_reader :result
 
@@ -262,6 +292,32 @@ module Opal
     # Method calls made in this file
     def method_calls
       @method_calls ||= Set.new
+    end
+
+    alias async_await_before_typecasting async_await
+    def async_await
+      if defined? @async_await
+        @async_await
+      else
+        original = async_await_before_typecasting
+        @async_await = case original
+                       when String
+                         async_await_set_to_regexp(original.split(',').map { |h| h.strip.to_sym })
+                       when Array, Set
+                         async_await_set_to_regexp(original.to_a.map(&:to_sym))
+                       when Regexp, true, false
+                         original
+                       else
+                         raise 'A value of await compiler option can be either ' \
+                               'a Set, an Array, a String or a Boolean.'
+                       end
+      end
+    end
+
+    def async_await_set_to_regexp(set)
+      set = set.map { |name| Regexp.escape(name.to_s).gsub('\*', '.*?') }
+      set = set.join('|')
+      /^(#{set})$/
     end
 
     # This is called when a parsing/processing error occurs. This

@@ -29,5 +29,6 @@ module.exports = {
     "ArrayBuffer": "readonly",
     "globalThis": "readonly",
     "Uint8Array": "readonly",
+    "Promise": "readonly",
   }
 };

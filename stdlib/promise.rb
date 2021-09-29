@@ -337,6 +337,18 @@ class Promise
     result
   end
 
+  alias to_v1 itself
+
+  def to_v2
+    v2 = PromiseV2.new
+
+    self.then { |i| v2.resolve(i) }.rescue { |i| v2.reject(i) }
+
+    v2
+  end
+
+  alias to_n to_v2
+
   class Trace < self
     def self.it(promise)
       current = []
@@ -444,3 +456,5 @@ class Promise
     end
   end
 end
+
+PromiseV1 = Promise

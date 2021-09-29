@@ -93,6 +93,7 @@ Style/GlobalVars:
     - 'stdlib/nodejs/irb.rb'
     - 'stdlib/console.rb'
     - 'stdlib/native.rb'
+    - 'stdlib/await.rb'
 
 Layout/ExtraSpacing:
   Exclude:

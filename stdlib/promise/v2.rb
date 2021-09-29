@@ -98,10 +98,12 @@
 #     end
 #
 
-warn 'PromiseV2 is a technology preview, which means it may change its behavior ' \
-     'in the future until this warning is removed. If you are interested in this part, ' \
-     'please make sure you track the async/await/promises tag on Opal issues: ' \
-     'https://github.com/opal/opal/issues?q=label%3Aasync%2Fawait%2Fpromises'
+if `Opal.config.experimental_features_severity == 'warning'`
+  warn 'PromiseV2 is a technology preview, which means it may change its behavior ' \
+      'in the future until this warning is removed. If you are interested in this part, ' \
+      'please make sure you track the async/await/promises tag on Opal issues: ' \
+      'https://github.com/opal/opal/issues?q=label%3Aasync%2Fawait%2Fpromises'
+end
 
 class PromiseV2 < `Promise`
   class << self
@@ -358,6 +360,16 @@ class PromiseV2 < `Promise`
 
   def initialize(&block)
     yield self if block_given?
+  end
+
+  alias to_v2 itself
+
+  def to_v1
+    v1 = PromiseV1.new
+
+    self.then { |i| v1.resolve(i) }.rescue { |i| v1.reject(i) }
+
+    v1
   end
 
   alias to_n itself
