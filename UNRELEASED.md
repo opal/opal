@@ -31,6 +31,17 @@
   - Support Windows on the Chrome runner 
   - Support Windows on the REPL
   - Platforms an IO implementations should either set `IO#read_proc` or overwrite `IO#sysread`
+- [experimental] Add support for JavaScript async/await (#2221)
+  - Enable the feature by adding a magic comment: `# await: true`
+  - The magic comment can be also used to mark specific method patterns to be awaited
+    (e.g. `# await: *_await, sleep` will make any method ending in `_await` or named `sleep` to be awaited) 
+  - Add `Kernel#__await__` as a bridge to the `await` keyword (inspired by CoffeeScript await support)
+  - Require `opal/await` to get additional support
+  - Read more on the newly added documentation page
+- Better interoperability between legacy Promise (v1) and native Promise (v2) (#2221)
+  - Add `PromiseV1` as an alias to the original (legacy) Promise class
+  - Add `#to_v1` and `#to_v2` to both classes
+  - `Promise#to_n` will convert it to a native Promise (v2)
 
 ### Fixed
 
