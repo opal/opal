@@ -10,7 +10,7 @@
 - Implement the Flip-Flop operators (#2261)
 - Add `JS[]` to access properties on the global object (#2259)
 - Add `ENV.fetch` to the Nodejs implementation of `ENV` (#2259)
-- [experimental] Opal::Cache, an optional compiler cache (#2242, #2278)
+- Opal::Cache, an optional compiler cache (enabled by default) (#2242, #2278)
 - Alias for gvars, alias on main (#2270)
 - Support for GJS (GNOME's JavaScript runtime) runner (#2280)
 - Scope variables support for `eval()` (#2256)
