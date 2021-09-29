@@ -120,7 +120,7 @@ module Opal
       end
     end
 
-    # super with implicit args
+    # super with explicit args
     class SuperNode < BaseSuperNode
       handle :super
 
@@ -137,7 +137,7 @@ module Opal
       end
     end
 
-    # super with explicit args
+    # super with implicit args
     class ZsuperNode < SuperNode
       handle :zsuper
 
@@ -159,8 +159,7 @@ module Opal
 
       def compile
         if def_scope
-          def_scope.uses_zuper = true
-          implicit_args = [s(:js_tmp, '$zuper')]
+          implicit_args = implicit_arglist
           # If the method we're in has a block and we're using a default super call with no args, we need to grab the block
           # If an iter (block via braces) is provided, that takes precedence
           if block_name && !iter
@@ -174,14 +173,40 @@ module Opal
         compile_using_send
       end
 
-      def compile_arguments
-        push ', '
+      def implicit_arglist
+        args = []
+        kwargs = []
+        same_arg_counter = Hash.new(0)
 
-        if arglist.children.empty?
-          push '[]'
-        else
-          push expr(arglist)
+        def_scope.original_args.children.each do |sexp|
+          arg_name = sexp.meta[:arg_name]
+
+          case sexp.type
+          when :arg, :optarg
+            arg_node = s(:lvar, arg_name)
+            #   def m(_, _)
+            # is compiled to
+            #   function $$m(_, __$2)
+            # See Opal::Node::ArgsNode
+            if arg_name[0] == '_'
+              same_arg_counter[arg_name] += 1
+              arg_node = s(:js_tmp, "#{arg_name}_$#{same_arg_counter[arg_name]}") if same_arg_counter[arg_name] > 1
+            end
+
+            args << arg_node
+          when :restarg
+            arg_node = arg_name ? s(:lvar, arg_name) : s(:js_tmp, '$rest_arg')
+            args << s(:splat, arg_node)
+          when :kwarg, :kwoptarg
+            kwargs << s(:pair, s(:sym, arg_name), s(:lvar, arg_name))
+          when :kwrestarg
+            arg_node = arg_name ? s(:lvar, arg_name) : s(:js_tmp, '$kw_rest_arg')
+            kwargs << s(:kwsplat, arg_node)
+          end
         end
+
+        args << s(:hash, *kwargs) unless kwargs.empty?
+        args
       end
 
       def block_name

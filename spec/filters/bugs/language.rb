@@ -317,22 +317,8 @@ opal_filter "language" do
   fails "The return keyword at top level return with argument warns but does not affect exit status" # Exception: path.substr is not a function
   fails "The return keyword at top level within a block within a class is allowed" # Exception: path.substr is not a function
   fails "The return keyword at top level within a block within a class is not allowed" # Exception: path.substr is not a function
-  fails "The super keyword passes along modified rest args when they were originally empty"
-  fails "The super keyword passes along modified rest args when they weren't originally empty"
-  fails "The super keyword passes along reassigned rest args" # Expected ["bar"] to equal ["foo"]
   fails "The super keyword uses block argument given to method when used in a block" # LocalJumpError: no block given
   fails "The super keyword uses given block even if arguments are passed explicitly"
-  fails "The super keyword when using keyword arguments passes any given keyword arguments including optional and required ones to the parent"
-  fails "The super keyword when using keyword arguments passes default argument values to the parent" # Expected {} to equal {"b"=>"b"}
-  fails "The super keyword when using regular and keyword arguments passes default argument values to the parent" # Expected ["a", {}] to equal ["a", {"c"=>"c"}]
-  fails "The super keyword without explicit arguments passes arguments and rest arguments including any modifications"
-  fails "The super keyword without explicit arguments passes arguments, rest arguments including modifications, and post arguments" # Expected [1, 2, 3] == [1, 14, 3] to be truthy but was false
-  fails "The super keyword without explicit arguments passes optional arguments that have a default value but were modified"
-  fails "The super keyword without explicit arguments passes optional arguments that have a default value"
-  fails "The super keyword without explicit arguments passes optional arguments that have a non-default value but were modified"
-  fails "The super keyword without explicit arguments passes rest arguments including any modifications"
-  fails "The super keyword without explicit arguments that are '_' including any modifications" # Expected [1, 2] to equal [14, 2]
-  fails "The super keyword wraps into array and passes along reassigned rest args with non-array scalar value" # Expected ["bar"] to equal ["foo"]
   fails "The throw keyword raises an UncaughtThrowError if used to exit a thread" # NotImplementedError: Thread creation not available
   fails "The unpacking splat operator (*) when applied to a BasicObject coerces it to Array if it respond_to?(:to_a)" # NoMethodError: undefined method `respond_to?' for BasicObject
   fails "The until expression restarts the current iteration without reevaluating condition with redo"

@@ -16,10 +16,12 @@ module Opal
         children :name
 
         def compile
-          if name
-            add_temp name
-            line "#{name} = Opal.kwrestargs($kwargs, #{used_kwargs});"
-          end
+          # def m(**)
+          # arguments are assigned to `$kw_rest_arg` for super call
+          name = self.name || '$kw_rest_arg'
+
+          add_temp name
+          line "#{name} = Opal.kwrestargs($kwargs, #{used_kwargs});"
         end
 
         def used_kwargs

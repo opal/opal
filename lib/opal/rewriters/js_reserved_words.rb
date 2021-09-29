@@ -86,9 +86,9 @@ module Opal
         super(node)
       end
 
-      # Restarg is a special case
-      # because it may have no name
-      # def m(*); end
+      # Restarg and kwrestarg are special cases
+      # because they may have no name
+      # def m(*, **); end
       def on_restarg(node)
         name, _ = *node
 
@@ -98,6 +98,8 @@ module Opal
 
         node
       end
+
+      alias on_kwrestarg on_restarg
 
       def on_argument(node)
         node = super(node)

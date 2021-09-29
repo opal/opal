@@ -647,8 +647,8 @@ class Array < `Array`
     self
   end
 
-  def count(object = nil, &block)
-    if object || block
+  def count(object = undefined, &block)
+    if `object !== undefined` || block
       super
     else
       size
