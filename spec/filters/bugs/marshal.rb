@@ -6,6 +6,8 @@ opal_filter "Marshal" do
   fails "Marshal.dump with a Range dumps a Range with extra instance variables" # Expected nil to equal 42
   fails "Marshal.dump with a Regexp dumps a Regexp subclass" # requires Class.new(Regexp).new("").class != Regexp
   fails "Marshal.dump with a Regexp dumps a Regexp with instance variables" # //.source.should == ''
+  fails "Marshal.dump with a Struct dumps an extended Struct" # Expected  "\x04\be: MethsS:\x15Struct::Extended\a:\x06a[\a\"\x06a\"\ahi:\x06b[\a\" Meths@\b" ==  "\x04\be: MethsS:\x15Struct::Extended\a:\x06a[\a;\a\"\ahi:\x06b[\a;\x00@\a" to be truthy but was false
+  fails "Marshal.dump with a Symbol dumps multiple Symbols sharing the same encoding" # Expected "\x04\b[\a\"\tâ\x82¬a\"\tâ\x82¬b" == "\u0004\b[\aI:\tâ\u0082¬a\u0006:\u0006ETI:\tâ\u0082¬b\u0006;\u0006T" to be truthy but was false
   fails "Marshal.dump with a Time dumps the zone and the offset"
   fails "Marshal.dump with a Time dumps the zone, but not the offset if zone is UTC" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Marshal.dump with an Exception contains the filename in the backtrace"
@@ -37,6 +39,7 @@ opal_filter "Marshal" do
   fails "Marshal.load for an Exception loads an marshalled exception with ivars" # Expected "Exception" == "foo" to be truthy but was false
   fails "Marshal.load for an Object loads an Object with a non-US-ASCII instance variable" # NameError: '@Ã©' is not allowed as an instance variable name
   fails "Marshal.load for an Object raises ArgumentError if the object from an 'o' stream is not dumpable as 'o' type user class" # Expected ArgumentError but no exception was raised (#<File:0x3b160> was returned)
+  fails "Marshal.load for an object responding to #marshal_dump and #marshal_load loads a user-marshaled object" # Expected "\x04\b[\aU:\x10UserMarshal\"\tdata@\x06" == "\x04\b[\aU:\x10UserMarshal:\tdata;\x06" to be truthy but was false
   fails "Marshal.load loads a Regexp" # anchors difference
   fails "Marshal.load loads an array containing objects having _dump method, and with proc"
   fails "Marshal.load loads an array containing objects having marshal_dump method, and with proc"

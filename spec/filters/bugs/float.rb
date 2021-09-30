@@ -3,6 +3,9 @@ opal_filter "Float" do
   fails "Float constant MAX is 1.7976931348623157e+308"
   fails "Float constant MIN is 2.2250738585072014e-308"
   fails "Float#<=> raises TypeError when #coerce misbehaves" # Expected TypeError (coerce must return [x, y]) but no exception was raised (nil was returned)
+  fails "Float#<=> returns 0 when self is Infinity and other other is infinite?=1" # Expected nil == 0 to be truthy but was false
+  fails "Float#<=> returns 1 when self is Infinity and other is infinite?=-1" # Expected nil == 1 to be truthy but was false
+  fails "Float#<=> returns 1 when self is Infinity and other is infinite?=nil (which means finite)" # Expected nil == 1 to be truthy but was false
   fails "Float#divmod returns an [quotient, modulus] from dividing self by other" # precision errors caused by Math.frexp and Math.ldexp
   fails "Float#inspect emits a trailing '.0' for a whole number" # Expected "50" == "50.0" to be truthy but was false
   fails "Float#inspect emits a trailing '.0' for the mantissa in e format" # Expected "100000000000000000000" == "1.0e+20" to be truthy but was false

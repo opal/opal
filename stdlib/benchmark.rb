@@ -519,6 +519,20 @@ module Benchmark
       [@label, @utime, @stime, @cutime, @cstime, @real]
     end
 
+    #
+    # Returns a hash containing the same data as `to_a`.
+    #
+    def to_h
+      {
+        label:  @label,
+        utime:  @utime,
+        stime:  @stime,
+        cutime: @cutime,
+        cstime: @cstime,
+        real:   @real
+      }
+    end
+
     protected
 
     #
