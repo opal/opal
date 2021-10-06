@@ -110,10 +110,35 @@ module Opal
       # Store the current node for reporting.
       attr_accessor :current_node
 
-      # Intercept the main call and assign current node.
+      # Supported on handlers for this class
+      singleton_class.attr_accessor :on_handler_cache
+
+      # We rewrite #process to remove a bit of dynamic abilities (removed
+      # call to node.to_ast) and to try to optimize away the string
+      # operations and method existence check by caching them inside a
+      # processor. Additionally, we drop support for #handler_missing.
+      #
+      # This is the second most inefficient call in the compilation phase
+      # so an optimization may be warranted.
+      #
+      # Additionally, we want to keep track of the current_node, so we can
+      # report it, or generate a nicer source map.
       def process(node)
-        self.current_node = node
-        super
+        return if node.nil?
+
+        self.class.on_handler_cache ||= {}
+
+        on_handler = self.class.on_handler_cache[node.type] ||= begin
+          handler = :"on_#{node.type}"
+          handler if respond_to? handler
+        end
+
+        if on_handler
+          self.current_node = node
+          send(on_handler, node) || node
+        else
+          node
+        end
       ensure
         self.current_node = nil
       end

@@ -51,31 +51,6 @@ if RUBY_ENGINE == 'opal'
   end
 end
 
-module AST::Processor::Mixin
-  undef process
-  # This patch to #process removes a bit of dynamic abilities (removed
-  # call to node.to_ast) and it tries to optimize away the string
-  # operations and method existence check by caching them inside a
-  # processor.
-  #
-  # This is the second most inefficient call in the compilation phase
-  # so an optimization may be warranted.
-  def process(node)
-    return if node.nil?
-
-    @_on_handler_cache ||= {}
-    type = node.type
-
-    on_handler = @_on_handler_cache[type] ||= begin
-      handler = :"on_#{type}"
-      handler = :handler_missing unless respond_to?(handler)
-      handler
-    end
-
-    send(on_handler, node) || node
-  end
-end
-
 class Parser::Builders::Default
   # string_value raises on invalid UTF-8 strings, like "\x80",
   # otherwise it's the same as value.
