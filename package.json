@@ -5,7 +5,7 @@
     "benchmark": "^2.1.4",
     "browserify": "^17.0.0",
     "source-map-support": "0.5.19",
-    "uglify-js": "^3.7.2"
+    "terser": "^5.9.0"
   },
   "devDependencies": {
     "eslint": "^7.32.0"

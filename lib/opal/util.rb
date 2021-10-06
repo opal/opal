@@ -15,7 +15,7 @@ module Opal
     # @param str [String] string to minify
     # @return [String]
     def uglify(source)
-      sh 'bin/yarn -s run uglifyjs -c', data: source
+      sh 'bin/yarn -s run terser -c', data: source
     end
 
     # Gzip code to check file size.
