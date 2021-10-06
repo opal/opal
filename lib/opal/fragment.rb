@@ -106,7 +106,11 @@ module Opal
           @sexp
         end
       when @sexp.type == :iter
-        @sexp.loc.begin # [1,2].each >{ }
+        if loc.respond_to? :begin
+          @sexp.loc.begin # [1,2].each >{ }
+        else
+          @sexp
+        end
       else
         @sexp
       end
