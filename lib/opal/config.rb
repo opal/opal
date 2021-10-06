@@ -93,6 +93,11 @@ module Opal
     # @return [true, false]
     config_option :freezing_stubs_enabled, true, compiler_option: :freezing
 
+    # Build ECMAScript modules, instead of legacy JS
+    #
+    # @return [true, false]
+    config_option :esm, false, compiler_option: :esm
+
     # Set the error severity for when a require can't be parsed at compile time.
     #
     # @example
