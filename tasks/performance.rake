@@ -70,7 +70,7 @@ performance_stat = ->(name) {
   sh("#{NODE_OPTSTATUS} > tmp/performance/optstatus_#{name}")
 
   puts "\n* Building AsciiDoctor with #{name}..."
-  stat[:compiler_time] = mean_time.(tries: 3) { sh(ASCIIDOCTOR_BUILD_OPAL) }
+  stat[:compiler_time] = mean_time.(tries: 7) { sh(ASCIIDOCTOR_BUILD_OPAL) }
 
   puts "\n* Running AsciiDoctor with #{name}..."
   stat[:run_time] = mean_time.(tries: 31) { sh("#{ASCIIDOCTOR_RUN_OPAL} > tmp/performance/opal_result_#{name}.html") }
