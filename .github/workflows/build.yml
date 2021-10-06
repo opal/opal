@@ -67,7 +67,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: ${{ fromJSON(matrix.combo.fetchdepth || '1') }}
-      - uses: ruby/setup-ruby@v1
+      - if: ${{ matrix.combo.os != 'ryzen' }}
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.combo.ruby }}
           # NOTE: Bundler 2.2.0 fails to install libv8
