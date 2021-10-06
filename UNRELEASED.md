@@ -42,6 +42,9 @@
   - Add `PromiseV1` as an alias to the original (legacy) Promise class
   - Add `#to_v1` and `#to_v2` to both classes
   - `Promise#to_n` will convert it to a native Promise (v2)
+- Add `Opal::Config.esm` to enable/disable ES modules (#2316)
+  - If Config.esm is enabled, SimpleServer does type="module"
+  - Add new rack-esm example
 
 ### Fixed
 
@@ -65,7 +68,8 @@
 - Renamed internal `super` related helpers,
   `find_super_dispatcher` is now `find_super`, `find_iter_super_dispatcher` is now `find_block_super` (#2090)
 - The `opal-repl` CLI now requires files to be passed with `--require` (or `-r`) instead of the bare filename (#2309)
-
+- Migrate from UglifyJS to Terser (#2318)
+- Chrome CDP interface won't use temporary files anymore, except for caching files (#2319)
 
 ### Deprecated
 
