@@ -43,6 +43,7 @@ opal_filter "Kernel" do
   fails "Kernel#__dir__ when used in eval with top level binding returns the real name of the directory containing the currently-executing file"
   fails "Kernel#autoload calls main.require(path) to load the file" # NameError: uninitialized constant TOPLEVEL_BINDING
   fails "Kernel#autoload can autoload in instance_eval" # NameError: uninitialized constant KSAutoloadD
+  fails "Kernel#autoload inside a Class.new method body should define on the new anonymous class" # NoMethodError: undefined method `autoload?' for #<#<Class:0x61d4a>:0x61d48>
   fails "Kernel#autoload is a private method" # Expected Kernel to have private instance method 'autoload' but it does not
   fails "Kernel#autoload loads the file when the constant is accessed" # NameError: uninitialized constant KSAutoloadB
   fails "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x7849c>

@@ -164,6 +164,11 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#uniq without block returns a lazy enumerator" # Expected [0, 1] (Array) to be an instance of Enumerator::Lazy
   fails "Enumerator::Lazy#uniq without block sets the size to nil" # Expected 2 == nil to be truthy but was false
   fails "Enumerator::Lazy#uniq works with an infinite enumerable" # TypeError: can't iterate from Float
+  fails "Enumerator::Lazy#with_index enumerates with a given block" # Expected [] == [[0, 0], [2, 1], [4, 2]] to be truthy but was false
+  fails "Enumerator::Lazy#with_index enumerates with an index starting at 0 when offset is nil" # Expected [] == [[0, 0], [1, 1], [2, 2]] to be truthy but was false
+  fails "Enumerator::Lazy#with_index enumerates with an index starting at a given offset" # Expected [] == [[0, 3], [1, 4], [2, 5]] to be truthy but was false
+  fails "Enumerator::Lazy#with_index enumerates with an index" # Expected [] == [[0, 0], [1, 1], [2, 2]] to be truthy but was false
+  fails "Enumerator::Lazy#with_index raises TypeError when offset does not convert to Integer" # Expected TypeError but no exception was raised ([] was returned)
   fails "Enumerator::Lazy#zip calls the block with a gathered array when yield with multiple arguments" # NoMethodError: undefined method `force' for [[[], []], [0, 0], [[0, 1], [0, 1]], [[0, 1, 2], [0, 1, 2]], [[0, 1, 2], [0, 1, 2]], [nil, nil], ["default_arg", "default_arg"], [[], []], [[], []], [[0], [0]], [[0, 1], [0, 1]], [[0, 1, 2], [0, 1, 2]]]
   fails "Enumerator::Lazy#zip keeps size" # Expected 0 == 100 to be truthy but was false
   fails "Enumerator::Lazy#zip on a nested Lazy keeps size" # Expected 0 == 100 to be truthy but was false

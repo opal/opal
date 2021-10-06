@@ -29,6 +29,7 @@ opal_filter "Method" do
   fails "Method#curry with optional arity argument raises ArgumentError when the method requires more arguments than the given arity"
   fails "Method#curry with optional arity argument returns a curried proc when given correct arity"
   fails "Method#define_method when passed a Proc object and a method is defined inside defines the nested method in the default definee where the Proc was created" # Expected #<#<Class:0x3753c>:0x37538> NOT to have method 'nested_method_in_proc_for_define_method' but it does
+  fails "Method#define_method when passed a block behaves exactly like a lambda for break" # Exception: unexpected break
   fails "Method#define_method when passed an UnboundMethod object defines a method with the same #arity as the original"
   fails "Method#define_method when passed an UnboundMethod object defines a method with the same #parameters as the original"
   fails "Method#eql? missing methods returns true for the same method missing"
