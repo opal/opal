@@ -54,6 +54,7 @@ jobs:
             permissive: true
             fetchdepth: '0'
             command: bin/rake performance:compare
+            os: ryzen
 
           # Currently failing:
           # - ruby: truffleruby
