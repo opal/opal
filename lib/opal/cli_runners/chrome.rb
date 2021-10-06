@@ -8,7 +8,7 @@ require 'tmpdir'
 module Opal
   module CliRunners
     class Chrome
-      SCRIPT_PATH = File.expand_path('chrome_cdp_interface.js', __dir__).freeze
+      SCRIPT_PATH = File.expand_path('chrome_cdp_interface.rb', __dir__).freeze
 
       DEFAULT_CHROME_HOST = 'localhost'
       DEFAULT_CHROME_PORT = 9222
@@ -36,18 +36,17 @@ module Opal
       def run
         mktmpdir do |dir|
           with_chrome_server do
-            # This has to be moved to some generator.
-            system(%{bundle exec opal -r opal/cli_runners/source-map-support-node } +
-                   %{-cE #{__dir__}/chrome_cdp_interface.rb > "#{SCRIPT_PATH}"}
-)
-
             prepare_files_in(dir)
 
             cmd = [
               'env',
               "CHROME_HOST=#{chrome_host}",
               "CHROME_PORT=#{chrome_port}",
-              'node',
+              "NODE_PATH=#{__dir__}/node_modules",
+              'bundle', 'exec', 'opal',
+              '--no-exit',
+              '-I', __dir__,
+              '-r', 'source-map-support-node',
               SCRIPT_PATH,
               dir,
             ]

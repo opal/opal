@@ -10,7 +10,7 @@ require 'opal/platform'
 var CDP = require("chrome-remote-interface");
 var fs = require("fs");
 
-var dir = #{ARGV[0]}
+var dir = #{ARGV.last}
 
 var options = {
   host: #{ENV['CHROME_HOST'] || 'localhost'},
