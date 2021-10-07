@@ -47,6 +47,14 @@ module Opal
           ensure
             @specs_stack.pop
           end
+        elsif method_name == :fixture
+          # We want to expand the fixture paths before autoload happens.
+          if args.all? { |i| i.type == :str }
+            as = args.map { |i| i.children.first }
+            s(:str, fixture(*as))
+          else
+            super
+          end
         else
           super
         end
@@ -62,6 +70,14 @@ module Opal
 
       def current_spec_name
         @specs_stack.join(' ')
+      end
+
+      # Adapted from: spec/mspec/lib/mspec/helpers/fixture.rb
+      def fixture(file, *args)
+        path = File.dirname(file)
+        path = path[0..-7] if path[-7..-1] == '/shared'
+        fixtures = path[-9..-1] == '/fixtures' ? '' : 'fixtures'
+        File.join(path, fixtures, args)
       end
     end
   end
