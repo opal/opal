@@ -329,6 +329,10 @@ module Opal
         end
       end
 
+      add_special :__dir__ do
+        push File.dirname(Opal::Compiler.module_name(compiler.file)).inspect
+      end
+
       # Refinements support
       add_special :using do |compile_default|
         if scope.accepts_using? && arglist.children.count == 1
@@ -441,31 +445,31 @@ module Opal
           type = sexp.type
 
           if type == :str
-            return sexp.children[0]
+              return sexp.children[0]
           elsif type == :send
-            recv, meth, *args = sexp.children
+              recv, meth, *args = sexp.children
 
             parts = args.map { |s| handle_part s }
 
-            if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
-              if meth == :expand_path
-                return expand_path(*parts)
-              elsif meth == :join
-                return expand_path parts.join('/')
-              elsif meth == :dirname
-                return expand_path parts[0].split('/')[0...-1].join('/')
-              end
+              if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
+                if meth == :expand_path
+                  return expand_path(*parts)
+                elsif meth == :join
+                  return expand_path parts.join('/')
+                elsif meth == :dirname
+                  return expand_path parts[0].split('/')[0...-1].join('/')
+                end
             end
           end
 
-          msg = 'Cannot handle dynamic require'
-          case @compiler.dynamic_require_severity
-          when :error
-            @compiler.error msg, @sexp.line
-          when :warning
-            @compiler.warning msg, @sexp.line
+            msg = 'Cannot handle dynamic require'
+            case @compiler.dynamic_require_severity
+            when :error
+              @compiler.error msg, @sexp.line
+            when :warning
+              @compiler.warning msg, @sexp.line
+            end
           end
-        end
 
         def expand_path(path, base = '')
           "#{base}/#{path}".split('/').each_with_object([]) do |part, p|
