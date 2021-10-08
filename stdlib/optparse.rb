@@ -1793,10 +1793,14 @@ XXX
   #
   def complete(typ, opt, icase = false, *pat) # :nodoc:
     if pat.empty?
-      search(typ, opt) { |sw| return [sw, opt] } # exact match or...
+      retval = nil
+      search(typ, opt) { |sw| retval = [sw, opt]; break } # exact match or...
+      return retval if retval
     end
     ambiguous = catch(:ambiguous) do
-      visit(:complete, typ, opt, icase, *pat) { |o, *sw| return sw }
+      retval = nil
+      visit(:complete, typ, opt, icase, *pat) { |o, *sw| retval = sw; break }
+      return retval if retval
     end
     exc = ambiguous ? AmbiguousOption : InvalidOption
     raise exc.new(opt, additional: method(:additional_message).curry[typ])
