@@ -20,6 +20,10 @@ class Pathname
     raise ArgumentError if @path == "\0"
   end
 
+  def self.pwd
+    new(Dir.pwd)
+  end
+
   attr_reader :path
 
   def ==(other)
