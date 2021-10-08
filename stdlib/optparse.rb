@@ -1407,7 +1407,7 @@ XXX
           default_pattern, conv = search(:atype, o) unless default_pattern
         end
         ldesc << "--[no-]#{q}"
-        (o = q.downcase).tr!('_', '-')
+        o = q.downcase.tr('_', '-')
         long << o
         not_pattern, not_conv = search(:atype, FalseClass) unless not_style
         not_style = Switch::NoArgument

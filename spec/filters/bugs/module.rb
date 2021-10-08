@@ -4,6 +4,7 @@ opal_filter "Module" do
   fails "Module#alias_method handles aliasing a method only present in a refinement" # NoMethodError: undefined method `refine' for #<Module:0x90fa>
   fails "Module#alias_method retains method visibility"
   fails "Module#alias_method returned value returns symbol of the defined method name" # Expected #<Class:0x1c94a> to be identical to "checking_return_value"
+  fails "Module#ancestors returns a list of modules included in self (including self)" # Expected [ModuleSpecs::Parent, Object, Shellwords, Kernel, BasicObject] == [ModuleSpecs::Parent, Object, Kernel, BasicObject] to be truthy but was false -- a random failure
   fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#attr applies current visibility to methods created"
   fails "Module#attr converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false

@@ -198,7 +198,9 @@ ruby/library/matrix/vector
 ruby/library/pp
 ruby/library/securerandom
 ruby/library/set
+ruby/library/shellwords
 ruby/library/singleton
 ruby/library/stringio/each_line_spec
 ruby/library/stringio/each_spec
 ruby/library/stringscanner
+ruby/library/optionparser

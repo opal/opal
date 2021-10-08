@@ -86,9 +86,10 @@ module Shellwords
   #   argv = 'here are "two words"'.shellsplit
   #   argv #=> ["here", "are", "two words"]
   def shellsplit(line)
+    line += " " # Somehow this is needed for the JS regexp engine
     words = []
     field = String.new
-    line.scan(/\G\s*(?>([^\s\\\'\"]+)|'([^\']*)'|"((?:[^\"\\]|\\.)*)"|(\\.?)|(\S))(\s|\z)?/m) do |word, sq, dq, esc, garbage, sep|
+    line.scan(/\s*(?:([^\s\\\'\"]+)|'([^\']*)'|"((?:[^\"\\]|\\.)*)"|(\\.?)|(\S))(\r?\n?\Z|\s)?/m) do |(word, sq, dq, esc, garbage, sep)|
       raise ArgumentError, "Unmatched quote: #{line.inspect}" if garbage
       # 2.2.3 Double-Quotes:
       #
@@ -97,7 +98,7 @@ module Shellwords
       #   characters when considered special:
       #
       #   $ ` " \ <newline>
-      field << (word || sq || (dq && dq.gsub(/\\([$`"\\\n])/, '\\1')) || esc.gsub(/\\(.)/, '\\1'))
+      field += (word || sq || (dq && dq.gsub(/\\([$`"\\\n])/, '\\1')) || esc.gsub(/\\(.)/, '\\1'))
       if sep
         words << field
         field = String.new
@@ -155,11 +156,11 @@ module Shellwords
     # Treat multibyte characters as is.  It is the caller's responsibility
     # to encode the string in the right encoding for the shell
     # environment.
-    str.gsub!(/[^A-Za-z0-9_\-.,:+\/@\n]/, '\\\\\\&')
+    str = str.gsub(/[^A-Za-z0-9_\-.,:+\/@\n]/, '\\\\\\&')
 
     # A LF cannot be escaped with a backslash because a backslash + LF
     # combo is regarded as a line continuation and simply ignored.
-    str.gsub!(/\n/, "'\n'")
+    str = str.gsub(/\n/, "'\n'")
 
     str
   end
