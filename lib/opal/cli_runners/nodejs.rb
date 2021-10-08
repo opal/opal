@@ -7,7 +7,14 @@ require 'opal/cli_runners/system_runner'
 module Opal
   module CliRunners
     class Nodejs
-      NODE_PATH = File.expand_path('../stdlib/nodejs/node_modules', ::Opal.gem_dir)
+      if RUBY_ENGINE == 'opal'
+        # We can't rely on Opal.gem_dir for now...
+        NODE_PATH = 'stdlib/nodejs/node_modules'
+        DIR = './lib/opal/cli_runners'
+      else
+        NODE_PATH = File.expand_path('../stdlib/nodejs/node_modules', ::Opal.gem_dir)
+        DIR = __dir__
+      end
 
       def self.call(data)
         (data[:options] ||= {})[:env] = { 'NODE_PATH' => node_modules }
@@ -20,7 +27,7 @@ module Opal
         SystemRunner.call(data) do |tempfile|
           [
             'node',
-            '--require', "#{__dir__}/source-map-support-node",
+            '--require', "#{DIR}/source-map-support-node",
             *opts,
             tempfile.path,
             *argv

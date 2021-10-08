@@ -17,9 +17,11 @@ SystemRunner = ->(data, &block) {
   output   = data.fetch(:output)
 
   env      = options.fetch(:env, {})
-  debug    = options.fetch(:debug, false)
+  debug    = options.fetch(:debug, false) || RUBY_ENGINE == 'opal'
 
-  code = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
+  code = builder.to_s
+  # Temporary issue with UTF-8, Base64 and source maps
+  code += "\n" + builder.source_map.to_data_uri_comment unless RUBY_ENGINE == 'opal'
 
   tempfile =
     if debug
@@ -32,11 +34,15 @@ SystemRunner = ->(data, &block) {
   cmd = block.call tempfile
   tempfile.close
 
-  # JRuby (v9.2) doesn't support using `out:` to redirect output.
-  if IO.try_convert(output) && RUBY_PLATFORM != 'java'
+  if RUBY_PLATFORM == 'opal'
+    # Opal doesn't support neither `out:` nor `IO.try_convert` nor `open3`
+    system(env, *cmd)
+    $?.exitstatus
+  elsif IO.try_convert(output) && RUBY_PLATFORM != 'java'
     system(env, *cmd, out: output)
     $?.exitstatus
   else
+    # JRuby (v9.2) doesn't support using `out:` to redirect output.
     require 'open3'
     captured_output, status = Open3.capture2(env, *cmd)
     output.write captured_output
