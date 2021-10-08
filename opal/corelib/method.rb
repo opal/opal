@@ -32,6 +32,10 @@ class Method
     }
   end
 
+  def curry(arity = undefined)
+    @method.curry(arity)
+  end
+
   alias [] call
   alias === call
 
