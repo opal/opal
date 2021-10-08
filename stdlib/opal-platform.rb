@@ -5,7 +5,7 @@ node            = `typeof(process) !== "undefined" && process.versions && proces
 nashorn         = `typeof(Java) !== "undefined" && Java.type`
 headless_chrome = `typeof(navigator) !== "undefined" && /\bHeadlessChrome\//.test(navigator.userAgent)`
 gjs             = `typeof(window) !== "undefined" && typeof(GjsFileImporter) !== 'undefined'`
-opalminiracer   = `typeof(opalminiracer) !== 'undefined'`
+opal_miniracer  = `typeof(opalminiracer) !== 'undefined'`
 
 OPAL_PLATFORM = if nashorn
                   'nashorn'
@@ -15,7 +15,7 @@ OPAL_PLATFORM = if nashorn
                   'headless-chrome'
                 elsif gjs
                   'gjs'
-                elsif opalminiracer
+                elsif opal_miniracer
                   'opal-miniracer'
                 else # possibly browser, which is the primary target
                 end
