@@ -23,7 +23,7 @@ class Regexp < `RegExp`
     def last_match(n = nil)
       if n.nil?
         $~
-      else
+      elsif $~
         $~[n]
       end
     end
