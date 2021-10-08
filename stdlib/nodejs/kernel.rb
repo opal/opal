@@ -11,3 +11,5 @@ module Kernel
 end
 
 ARGV = `process.argv.slice(2)`
+
+ARGV.shift if ARGV.first == '--'
