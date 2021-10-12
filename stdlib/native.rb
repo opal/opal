@@ -529,74 +529,79 @@ class NilClass
   end
 end
 
-class Hash
-  alias _initialize initialize
+# Running this code twice results in an infinite loop. While it's true
+# that we shouldn't run this file twice, there are certain cases, like
+# for example live reload, when this may happen.
+unless Hash.method_defined? :_initialize
+  class Hash
+    alias _initialize initialize
 
-  def initialize(defaults = undefined, &block)
-    %x{
-      if (defaults != null &&
-           (defaults.constructor === undefined ||
-             defaults.constructor === Object)) {
-        var smap = self.$$smap,
-            keys = self.$$keys,
-            key, value;
+    def initialize(defaults = undefined, &block)
+      %x{
+        if (defaults != null &&
+             (defaults.constructor === undefined ||
+               defaults.constructor === Object)) {
+          var smap = self.$$smap,
+              keys = self.$$keys,
+              key, value;
 
-        for (key in defaults) {
-          value = defaults[key];
+          for (key in defaults) {
+            value = defaults[key];
 
-          if (value &&
-               (value.constructor === undefined ||
-                 value.constructor === Object)) {
-            smap[key] = #{Hash.new(`value`)};
-          } else if (value && value.$$is_array) {
-            value = value.map(function(item) {
-              if (item &&
-                   (item.constructor === undefined ||
-                     item.constructor === Object)) {
-                return #{Hash.new(`item`)};
-              }
+            if (value &&
+                 (value.constructor === undefined ||
+                   value.constructor === Object)) {
+              smap[key] = #{Hash.new(`value`)};
+            } else if (value && value.$$is_array) {
+              value = value.map(function(item) {
+                if (item &&
+                     (item.constructor === undefined ||
+                       item.constructor === Object)) {
+                  return #{Hash.new(`item`)};
+                }
 
-              return #{Native(`item`)};
-            });
-            smap[key] = value
-          } else {
-            smap[key] = #{Native(`value`)};
+                return #{Native(`item`)};
+              });
+              smap[key] = value
+            } else {
+              smap[key] = #{Native(`value`)};
+            }
+
+            keys.push(key);
           }
 
-          keys.push(key);
+          return self;
         }
 
-        return self;
+        return #{_initialize(defaults, &block)};
       }
+    end
 
-      return #{_initialize(defaults, &block)};
-    }
-  end
+    # @return a JavaScript object with the same keys but calling #to_n on
+    # all values.
+    def to_n
+      %x{
+        var result = {},
+            keys = self.$$keys,
+            smap = self.$$smap,
+            key, value;
 
-  # @return a JavaScript object with the same keys but calling #to_n on
-  # all values.
-  def to_n
-    %x{
-      var result = {},
-          keys = self.$$keys,
-          smap = self.$$smap,
-          key, value;
+        for (var i = 0, length = keys.length; i < length; i++) {
+          key = keys[i];
 
-      for (var i = 0, length = keys.length; i < length; i++) {
-        key = keys[i];
+          if (key.$$is_string) {
+            value = smap[key];
+          } else {
+            key = key.key;
+            value = key.value;
+          }
 
-        if (key.$$is_string) {
-          value = smap[key];
-        } else {
-          key = key.key;
-          value = key.value;
+          result[key] = #{Native.try_convert(`value`, `value`)};
         }
 
-        result[key] = #{Native.try_convert(`value`, `value`)};
+        return result;
       }
-
-      return result;
-    }
+    end
   end
 end
 
