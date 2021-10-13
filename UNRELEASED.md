@@ -62,6 +62,10 @@
 - Retain the `-` while stringifying `-0.0` (#2304)
 - Fix super support for rest args and re-assignments with implicit arguments (#2315)
 - Fix calling `Regexp#last_match` when `$~` is nil (#2328)
+- Windows support for chrome runner (#2324)
+  - Use correct node separator for NODE_PATH on Windows
+  - Pass dir and emulate exec a bit on Windows
+  - Use Gem.win_platform?, match supported plattform to ruby, simplify run
 
 ### Changed
 
