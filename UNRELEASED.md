@@ -10,7 +10,7 @@
 - Implement the Flip-Flop operators (#2261)
 - Add `JS[]` to access properties on the global object (#2259)
 - Add `ENV.fetch` to the Nodejs implementation of `ENV` (#2259)
-- Opal::Cache, an optional compiler cache (enabled by default) (#2242, #2278)
+- Opal::Cache, an optional compiler cache (enabled by default) (#2242, #2278, #2329)
 - Alias for gvars, alias on main (#2270)
 - Support for GJS (GNOME's JavaScript runtime) runner (#2280)
 - Scope variables support for `eval()` (#2256)
@@ -26,15 +26,15 @@
 - Add `IO#gets` and `IO#read_proc` along with other supporting methods (#2309)
   - Support `#gets` on most platforms, including browsers (via `prompt`)
   - Move the REPL to a `--repl` CLI option of the main executable
-  - Completely refactor IO, now supporting 
+  - Completely refactor IO, now supporting
   - Add a runner for MiniRacer (as `miniracer`)
-  - Support Windows on the Chrome runner 
+  - Support Windows on the Chrome runner
   - Support Windows on the REPL
   - Platforms an IO implementations should either set `IO#read_proc` or overwrite `IO#sysread`
 - [experimental] Add support for JavaScript async/await (#2221)
   - Enable the feature by adding a magic comment: `# await: true`
   - The magic comment can be also used to mark specific method patterns to be awaited
-    (e.g. `# await: *_await, sleep` will make any method ending in `_await` or named `sleep` to be awaited) 
+    (e.g. `# await: *_await, sleep` will make any method ending in `_await` or named `sleep` to be awaited)
   - Add `Kernel#__await__` as a bridge to the `await` keyword (inspired by CoffeeScript await support)
   - Require `opal/await` to get additional support
   - Read more on the newly added documentation page
@@ -61,6 +61,7 @@
 - Don't try to return the JS `debugger` statement, just return `nil` (#2307)
 - Retain the `-` while stringifying `-0.0` (#2304)
 - Fix super support for rest args and re-assignments with implicit arguments (#2315)
+- Fix calling `Regexp#last_match` when `$~` is nil (#2328)
 
 ### Changed
 
