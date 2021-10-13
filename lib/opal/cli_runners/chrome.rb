@@ -109,7 +109,7 @@ module Opal
         raise 'Chrome server can be started only on localhost' if chrome_host != DEFAULT_CHROME_HOST
 
         # Disable web security with "--disable-web-security" flag to be able to do XMLHttpRequest (see test_openuri.rb)
-        chrome_server_cmd = %{"#{chrome_executable}" \
+        chrome_server_cmd = %{#{chrome_executable.shellescape} \
           --headless \
           --disable-web-security \
           --remote-debugging-port=#{chrome_port} \
