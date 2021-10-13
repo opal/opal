@@ -32,9 +32,10 @@ module Opal
 
       # Ensure stdlib node_modules is among NODE_PATHs
       def self.node_modules
-        ENV['NODE_PATH'].to_s.split(':').tap do |paths|
+        npsep = Gem.win_platform? ? ';' : ':'
+        ENV['NODE_PATH'].to_s.split(npsep).tap do |paths|
           paths << NODE_PATH unless paths.include? NODE_PATH
-        end.join(':')
+        end.join(npsep)
       end
 
       class MissingNodeJS < RunnerError

@@ -38,11 +38,13 @@ module Opal
           with_chrome_server do
             prepare_files_in(dir)
 
+            env = {
+              'CHROME_HOST' => chrome_host,
+              'CHROME_PORT' => chrome_port.to_s,
+              'NODE_PATH' => File.join(__dir__, 'node_modules')
+            }
+
             cmd = [
-              'env',
-              "CHROME_HOST=#{chrome_host}",
-              "CHROME_PORT=#{chrome_port}",
-              "NODE_PATH=#{__dir__}/node_modules",
               'bundle', 'exec', 'opal',
               '--no-exit',
               '-I', __dir__,
@@ -51,7 +53,7 @@ module Opal
               dir,
             ]
 
-            Kernel.exec(*cmd)
+            Kernel.exec(env, *cmd)
           end
         end
       end
@@ -128,7 +130,11 @@ module Opal
         puts 'Make sure that you have it installed and that its version is > 59'
         exit(1)
       ensure
-        Process.kill('HUP', chrome_pid) if chrome_pid
+        if Gem.win_platform? && chrome_pid
+          Process.kill('KILL', chrome_pid) unless system("taskkill /f /t /pid #{chrome_pid} >NUL 2>NUL")
+        elsif chrome_pid
+          Process.kill('HUP', chrome_pid)
+        end
       end
 
       def chrome_server_running?
@@ -142,7 +148,7 @@ module Opal
       def chrome_executable
         ENV['GOOGLE_CHROME_BINARY'] ||
           case RbConfig::CONFIG['host_os']
-          when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+          when /bccwin|cygwin|djgpp|mingw|mswin|wince/
             [
               'C:/Program Files/Google/Chrome Dev/Application/chrome.exe',
               'C:/Program Files/Google/Chrome/Application/chrome.exe'
