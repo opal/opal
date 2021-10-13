@@ -157,7 +157,7 @@ module Opal
               return path
             end
           when /darwin|mac os/
-            '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
           when /linux/
             %w[
               google-chrome-stable
