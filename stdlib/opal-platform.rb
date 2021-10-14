@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 `/* global Java, GjsFileImporter */`
 
 browser         = `typeof(document) !== "undefined"`

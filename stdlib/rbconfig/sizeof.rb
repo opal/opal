@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # This file is not intended for real checks,
 # but just to make happy libraries needing it.
 

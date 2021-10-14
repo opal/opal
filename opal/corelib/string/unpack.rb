@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 require 'base64'
 require 'corelib/pack_unpack/format_string_parser'
 

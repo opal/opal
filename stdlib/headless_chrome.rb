@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 %x{
   Opal.exit = function(code) {
     // You can't exit from the browser.

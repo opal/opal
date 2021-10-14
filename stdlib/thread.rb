@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # This shim implementation of Thread is meant to only appease code that tries
 # to be safe in the presence of threads, but does not actually utilize them,
 # e.g., uses thread- or fiber-local variables.

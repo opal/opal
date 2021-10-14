@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class Random
   MATH_RANDOM_GENERATOR = `{
     new_seed: function() { return 0; },

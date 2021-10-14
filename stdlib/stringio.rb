@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class StringIO < IO
   def self.open(string = "", mode = nil, &block)
     io  = new(string, mode)

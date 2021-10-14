@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module Base64
   # FROM https://github.com/davidchambers/Base64.js/blob/69262ec7e1fa4541de5700a1b0b03b0de0e3f5aa/base64.js
   %x{

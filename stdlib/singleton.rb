@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 module Singleton
   def clone
     raise TypeError, "can't clone instance of singleton #{self.class}"

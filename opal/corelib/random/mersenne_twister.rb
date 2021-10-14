@@ -1,3 +1,5 @@
+# use_strict: true
+
 # This is based on an adaptation of Makoto Matsumoto and Takuji Nishimura's code
 # done by Sean McCullough <banksean@gmail.com> and Dave Heitzman
 # <daveheitzman@yahoo.com>, subsequently readapted from an updated version of

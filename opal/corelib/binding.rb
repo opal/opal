@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class Binding
   # @private
   def initialize(jseval, scope_variables, receiver, source_location)

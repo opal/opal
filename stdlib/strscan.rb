@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class StringScanner
   attr_reader :pos
   attr_reader :matched

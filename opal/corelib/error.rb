@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class Exception < `Error`
   `Opal.defineProperty(self.$$prototype, '$$is_exception', true)`
   `var stack_trace_limit`
@@ -75,10 +78,10 @@ class Exception < `Error`
       var backtrace = self.stack;
 
       if (backtrace.$$is_string) {
-        return self.backtrace = correct_backtrace(backtrace.split("\n").slice(0, 15));
+        return self.backtrace = correct_backtrace(backtrace.split("\n"));
       }
       else if (backtrace) {
-        return self.backtrace = correct_backtrace(backtrace.slice(0, 15));
+        return self.backtrace = correct_backtrace(backtrace);
       }
 
       return [];

@@ -1,4 +1,6 @@
 # helpers: respond_to, falsy, truthy
+# use_strict: true
+# frozen_string_literal: true
 
 module ObjectSpace
   module_function

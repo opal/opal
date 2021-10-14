@@ -1,4 +1,6 @@
 # helpers: falsy
+# use_strict: true
+# frozen_string_literal: true
 
 module Comparable
   %x{

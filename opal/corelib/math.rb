@@ -1,4 +1,6 @@
 # helpers: type_error
+# use_strict: true
+# frozen_string_literal: true
 
 module Math
   E  = `Math.E`

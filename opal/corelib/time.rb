@@ -1,3 +1,5 @@
+# use_strict: true
+# frozen_string_literal: true
 # helpers: slice
 
 require 'corelib/comparable'

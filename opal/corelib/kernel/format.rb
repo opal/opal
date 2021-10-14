@@ -1,4 +1,6 @@
 # helpers: coerce_to
+# use_strict: true
+# frozen_string_literal: true
 
 module Kernel
   def format(format_string, *args)

@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # {Promise} is used to help structure asynchronous code.
 #
 # It is available in the Opal standard library, and can be required in any Opal

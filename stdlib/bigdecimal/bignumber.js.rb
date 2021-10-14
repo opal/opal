@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 class BigDecimal < Numeric
   %x{
     var define = function (f) { Opal.const_set(self, 'BigNumber', f()); };

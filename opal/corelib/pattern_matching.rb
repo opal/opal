@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # A "userland" implementation of pattern matching for Opal
 
 class PatternMatching

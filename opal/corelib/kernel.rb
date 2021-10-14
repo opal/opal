@@ -1,4 +1,6 @@
 # helpers: truthy, coerce_to, respond_to
+# use_strict: true
+# frozen_string_literal: true
 
 module Kernel
   def method_missing(symbol, *args, &block)

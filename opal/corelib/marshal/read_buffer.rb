@@ -1,3 +1,6 @@
+# use_strict: true
+# frozen_string_literal: true
+
 # https://github.com/ruby/ruby/blob/trunk/doc/marshal.rdoc
 # https://github.com/ruby/ruby/blob/trunk/marshal.c
 
