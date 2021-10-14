@@ -16,8 +16,23 @@ module Opal
       end
     end
 
-    class NumericNode < Base
-      handle :int, :float
+    class IntegerNode < Base
+      handle :int
+
+      children :value
+
+      def compile
+        push value.to_s + 'n'
+        wrap '(', ')' if recv?
+      end
+
+      def self.truthy_optimize?
+        true
+      end
+    end
+
+    class FloatNode < Base
+      handle :float
 
       children :value
 

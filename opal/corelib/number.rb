@@ -1,8 +1,8 @@
 require 'corelib/numeric'
 
 class Number < Numeric
-  Opal.bridge(`Number`, self)
   `Opal.defineProperty(self.$$prototype, '$$is_number', true)`
+  `Opal.defineProperty(self.$$prototype, '$$is_numeric', true)`
   `self.$$is_number_class = true`
 
   class << self
@@ -17,6 +17,14 @@ class Number < Numeric
     %x{
       if (other === nil) {
         #{raise TypeError, "can't convert #{other.class} into Float"};
+      }
+      else if (other.$$is_bignum) {
+        if (#{self.integer?}) {
+          return [other, #{Bignum(self)}]
+        }
+        else {
+          return [#{Float(other)}, self]
+        }
       }
       else if (other.$$is_string) {
         return [#{Float(other)}, self];
@@ -142,7 +150,7 @@ class Number < Numeric
 
   def <(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_numeric) {
         return self < other;
       }
       else {
@@ -153,7 +161,7 @@ class Number < Numeric
 
   def <=(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_numeric) {
         return self <= other;
       }
       else {
@@ -164,7 +172,7 @@ class Number < Numeric
 
   def >(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_numeric) {
         return self > other;
       }
       else {
@@ -175,7 +183,7 @@ class Number < Numeric
 
   def >=(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_numeric) {
         return self >= other;
       }
       else {
@@ -188,8 +196,8 @@ class Number < Numeric
   # can be optimized despite a try/finally construct.
   %x{
     var spaceship_operator = function(self, other) {
-      if (other.$$is_number) {
-        if (isNaN(self) || isNaN(other)) {
+      if (other.$$is_numeric) {
+        if (!other.$$is_bignum && !self.$$is_bignum && (isNaN(self) || isNaN(other))) {
           return nil;
         }
 
@@ -283,8 +291,8 @@ class Number < Numeric
 
   def ==(other)
     %x{
-      if (other.$$is_number) {
-        return self.valueOf() === other.valueOf();
+      if (other.$$is_numeric) {
+        return self.valueOf() == other.valueOf();
       }
       else if (#{other.respond_to? :==}) {
         return #{other == self};
@@ -445,8 +453,16 @@ class Number < Numeric
     end
 
     %x{
-      var min = Math.abs(self),
-          max = Math.abs(other);
+      var self_ = self;
+      if (self_.$$is_bignum && !other.$$is_bignum) {
+        other = #{other.to_bn};
+      }
+      if (!self_.$$is_bignum && other.$$is_bignum) {
+        self_ = #{self.to_bn};
+      }
+
+      var min = self_ < 0 ? -self_ : self_,
+          max = other < 0 ? -other : other;
 
       while (min > 0) {
         var tmp = min;
@@ -495,7 +511,8 @@ class Number < Numeric
         return 0;
       }
       else {
-        return Math.abs(self * other / #{gcd(other)});
+        var val = self * other / #{gcd(other)};
+        return val < 0 ? -val : val;
       }
     }
   end
@@ -839,19 +856,13 @@ class Number < Numeric
   end
 end
 
-Fixnum = Number
+class Integer < Number
+  Opal.bridge(`BigInt`, self)
 
-class Integer < Numeric
   `self.$$is_number_class = true`
   `self.$$is_integer_class = true`
 
   class << self
-    def allocate
-      raise TypeError, "allocator undefined for #{name}"
-    end
-
-    undef :new
-
     def sqrt(n)
       n = Opal.coerce_to!(n, Integer, :to_int)
       %x{
@@ -868,16 +879,14 @@ class Integer < Numeric
   MIN = `-Math.pow(2, 30)`
 end
 
-class Float < Numeric
+Fixnum = Number
+
+class Float < Number
+  Opal.bridge(`Number`, self)
+
   `self.$$is_number_class = true`
 
   class << self
-    def allocate
-      raise TypeError, "allocator undefined for #{name}"
-    end
-
-    undef :new
-
     def ===(other)
       `!!other.$$is_number`
     end
