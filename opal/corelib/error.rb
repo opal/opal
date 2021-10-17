@@ -74,7 +74,7 @@ class Exception < `Error`
 
       var backtrace = self.stack;
 
-      if (backtrace.$$is_string) {
+      if (typeof(backtrace) !== 'undefined' && backtrace.$$is_string) {
         return self.backtrace = correct_backtrace(backtrace.split("\n").slice(0, 15));
       }
       else if (backtrace) {
