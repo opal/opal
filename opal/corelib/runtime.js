@@ -21,6 +21,7 @@
   if (typeof(globalThis) !== 'undefined') { global_object = globalThis; }
   else if (typeof(global) !== 'undefined') { global_object = global; }
   else if (typeof(window) !== 'undefined') { global_object = window; }
+  else if (typeof(global_object) === 'undefined') { global_object = this; }
 
   // Setup a dummy console object if missing
   if (typeof(global_object.console) === 'object') {
@@ -72,7 +73,7 @@
   // Minify common function calls
   var $has_own   = Object.hasOwnProperty;
   var $bind      = Function.prototype.bind;
-  var $set_proto = Object.setPrototypeOf;
+  var $set_proto = Object.setPrototypeOf || function(obj, proto) { obj.__proto__ = proto; };
   var $slice     = Array.prototype.slice;
   var $splice    = Array.prototype.splice;
 
@@ -139,7 +140,7 @@
   };
 
   function $defineProperty(object, name, initialValue) {
-    if (typeof(object) === "string") {
+    if (typeof(object) === "string" || typeof(Object.defineProperty) === 'undefined') {
       // Special case for:
       //   s = "string"
       //   def s.m; end
@@ -2017,11 +2018,16 @@
 
       if (!is_method_body(body) && obj.$$is_module) {
         // try to look into Object
-        body = Opal.Object.$$prototype[old_id]
+        body = Opal.Object.$$prototype[old_id];
       }
 
       if (!is_method_body(body)) {
-        throw Opal.NameError.$new("undefined method `" + old + "' for class `" + obj.$name() + "'")
+        if (typeof (Opal.NameError) !== 'undefined') {
+          throw Opal.NameError.$new("undefined method `" + old + "' for class `" + obj.$name() + "'");
+        }
+        else {
+          throw "undefined method `" + old + "' for class `" + obj.$$name + "'";
+        }
       }
     }
 
@@ -2588,7 +2594,7 @@
   // Strings
   // -------
 
-  Opal.encodings = Object.create(null);
+  Opal.encodings = {};//Object.create(null);
 
   // Sets the encoding on a string, will treat string literals as frozen strings
   // raising a FrozenError.

@@ -12,4 +12,6 @@ when 'headless-chrome'
   require 'headless_chrome'
 when 'opal-miniracer'
   require 'opal/miniracer'
+when 'wscript'
+  require 'wscript'
 end

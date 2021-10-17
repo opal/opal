@@ -66,6 +66,7 @@ module Opal
     register_runner :nashorn,     :Nashorn,     'opal/cli_runners/nashorn'
     register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
     register_runner :gjs,         :Gjs,         'opal/cli_runners/gjs'
+    register_runner :wscript,     :Wscript,     'opal/cli_runners/wscript'
     register_runner :miniracer,   :MiniRacer,   'opal/cli_runners/mini_racer'
     register_runner :server,      :Server,      'opal/cli_runners/server'
 
