@@ -1,5 +1,7 @@
 # helpers: falsy
 
+require 'corelib/random/formatter'
+
 class Random
   attr_reader :seed, :state
 
@@ -88,3 +90,5 @@ class Random
     end
   end
 end
+
+require 'corelib/random/mersenne_twister'

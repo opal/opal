@@ -191,9 +191,38 @@ class Module
 
   def autoload(const, path)
     %x{
-      if (self.$$autoload == null) self.$$autoload = {};
-      Opal.const_cache_version++;
-      self.$$autoload[#{const}] = #{path};
+      if (!#{Opal.const_name?(const)}) {
+        #{raise NameError, "autoload must be constant name: #{const}"}
+      }
+
+      if (path == "") {
+        #{raise ArgumentError, 'empty file name'}
+      }
+
+      if (!self.$$const.hasOwnProperty(#{const})) {
+        if (!self.$$autoload) {
+          self.$$autoload = {};
+        }
+        Opal.const_cache_version++;
+        self.$$autoload[#{const}] = { path: #{path}, loaded: false, required: false, success: false, exception: false };
+      }
+      return nil;
+    }
+  end
+
+  def autoload?(const)
+    %x{
+      if (self.$$autoload && self.$$autoload[#{const}] && !self.$$autoload[#{const}].required && !self.$$autoload[#{const}].success) {
+        return self.$$autoload[#{const}].path;
+      }
+
+      var ancestors = self.$ancestors();
+
+      for (var i = 0, length = ancestors.length; i < length; i++) {
+        if (ancestors[i].$$autoload && ancestors[i].$$autoload[#{const}] && !ancestors[i].$$autoload[#{const}].required && !ancestors[i].$$autoload[#{const}].success) {
+          return ancestors[i].$$autoload[#{const}].path;
+        }
+      }
       return nil;
     }
   end
@@ -283,7 +312,13 @@ class Module
 
       for (i = 0, ii = modules.length; i < ii; i++) {
         module = modules[i];
-        if (module.$$const[name] != null) {
+        if (module.$$const[#{name}] != null) { return true; }
+        if (
+          module.$$autoload &&
+          module.$$autoload[#{name}] &&
+          !module.$$autoload[#{name}].required &&
+          !module.$$autoload[#{name}].success
+        ) {
           return true;
         }
       }
@@ -317,18 +352,6 @@ class Module
   end
 
   def const_missing(name)
-    %x{
-      if (self.$$autoload) {
-        var file = self.$$autoload[name];
-
-        if (file) {
-          self.$require(file);
-
-          return #{const_get name};
-        }
-      }
-    }
-
     full_const_name = self == Object ? name : "#{self}::#{name}"
 
     raise NameError.new("uninitialized constant #{full_const_name}", name)

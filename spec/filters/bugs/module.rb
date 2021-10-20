@@ -86,10 +86,6 @@ opal_filter "Module" do
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is true"
   fails "Module#const_defined? returns true when passed a scoped constant name"
   fails "Module#const_get coerces the inherit flag to a boolean" # Expected NameError but no exception was raised ("const1" was returned)
-  fails "Module#const_get does autoload a constant with a toplevel scope qualifier" # NameError: uninitialized constant CSAutoloadB
-  fails "Module#const_get does autoload a constant" # NameError: uninitialized constant CSAutoloadA
-  fails "Module#const_get does autoload a module and resolve a constant within" # NameError: uninitialized constant CSAutoloadC
-  fails "Module#const_get does autoload a non-toplevel module" # LoadError: cannot load such file -- ruby/core/module/fixtures/constants_autoload_d
   fails "Module#const_set sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#const_set when overwriting an existing constant does not warn if the previous value was undefined" # Expected #<Module:0x48fd0> to have constant 'Foo' but it does not
   fails "Module#const_set when overwriting an existing constant warns if the previous value was a normal value" # Expected warning to match: /already initialized constant/ but got: ""
@@ -177,7 +173,6 @@ opal_filter "Module" do
   fails "Module#name is not nil for a nested module created with the module keyword"
   fails "Module#name is not nil when assigned to a constant in an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil to match /^#<Module:0x\h+>::Child$/
-  fails "Module#name preserves the encoding in which the class was defined"
   fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
   fails "Module#prepend keeps the module in the chain when dupping the class"
   fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0x6c37a>] == [#<Module:0x6c38c>, #<Module:0x6c37a>] to be truthy but was false
@@ -223,7 +218,6 @@ opal_filter "Module" do
   fails "Module#refine when super is called in a refinement looks in the lexical scope refinements before other active refinements" # Expected ["A", "C"] == ["A", "LOCAL", "C"] to be truthy but was false
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
-  fails "Module#remove_const returns nil when removing autoloaded constant"
   fails "Module#ruby2_keywords acceps String as well" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40040>>
   fails "Module#ruby2_keywords marks the final hash argument as keyword hash" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40036>>
   fails "Module#ruby2_keywords prints warning when a method accepts keyword splat" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x4001e>>

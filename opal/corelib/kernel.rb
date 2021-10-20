@@ -630,8 +630,14 @@ module Kernel
   Opal.pristine(self, :respond_to?, :respond_to_missing?)
 
   def require(file)
-    file = Opal.coerce_to!(file, String, :to_str)
-    `Opal.require(#{file})`
+    %x{
+      // As Object.require refers to Kernel.require once Kernel has been loaded the String
+      // class may not be available yet, the coercion requires both  String and Array to be loaded.
+      if (typeof #{file} !== 'string' && Opal.String && Opal.Array) {
+        #{file = Opal.coerce_to!(file, String, :to_str) }
+      }
+      Opal.require(#{file})
+    }
   end
 
   def require_relative(file)
@@ -642,7 +648,7 @@ module Kernel
   end
 
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
-  def require_tree(path)
+  def require_tree(path, autoload: false)
     %x{
       var result = [];
 
@@ -651,7 +657,11 @@ module Kernel
       if (path === '.') path = '';
       for (var name in Opal.modules) {
         if (#{`name`.start_with?(path)}) {
-          result.push([name, Opal.require(name)]);
+          if(!#{autoload}) {
+            result.push([name, Opal.require(name)]);
+          } else {
+            result.push([name, true]); // do nothing, delegated to a autoloading
+          }
         }
       }
 
@@ -737,5 +747,9 @@ module Kernel
 end
 
 class Object
+  # Object.require has been set to runtime.js Opal.require
+  # Now we have Kernel loaded, make sure Object.require refers to Kernel.require
+  # which is what ruby does and allows for overwriting by autoloaders
+  `delete Opal.Object.$$prototype.$require`
   include Kernel
 end

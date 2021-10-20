@@ -45,9 +45,7 @@ opal_filter "Kernel" do
   fails "Kernel#autoload can autoload in instance_eval" # NameError: uninitialized constant KSAutoloadD
   fails "Kernel#autoload inside a Class.new method body should define on the new anonymous class" # NoMethodError: undefined method `autoload?' for #<#<Class:0x61d4a>:0x61d48>
   fails "Kernel#autoload is a private method" # Expected Kernel to have private instance method 'autoload' but it does not
-  fails "Kernel#autoload loads the file when the constant is accessed" # NameError: uninitialized constant KSAutoloadB
-  fails "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x7849c>
-  fails "Kernel#autoload sets the autoload constant in Object's constant table" # Expected Object to have constant 'KSAutoloadA' but it does not
+  fails "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x5b168>
   fails "Kernel#autoload when Object is frozen raises a FrozenError before defining the constant" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x7849c>
   fails "Kernel#autoload when called from included module's method setups the autoload on the included module" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethod
   fails "Kernel#autoload when called from included module's method the autoload is reachable from the class too" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethodIncluder
@@ -340,13 +338,8 @@ opal_filter "Kernel" do
   fails "Kernel.__method__ returns the caller from blocks too"
   fails "Kernel.__method__ returns the caller from define_method too"
   fails "Kernel.autoload calls #to_path on non-String filenames" # Mock 'path' expected to receive to_path("any_args") exactly 1 times but received it 0 times
-  fails "Kernel.autoload registers a file to load the first time the toplevel constant is accessed" # NoMethodError: undefined method `autoload?' for Kernel
-  fails "Kernel.autoload sets the autoload constant in Object's constant table" # Expected Object to have constant 'KSAutoloadBB' but it does not
   fails "Kernel.autoload when called from included module's method setups the autoload on the included module" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethod2
-  fails "Kernel.autoload when called from included module's method the autoload is reachable from the class too" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethodIncluder2
   fails "Kernel.autoload when called from included module's method the autoload relative to the included module works" # NameError: uninitialized constant KernelSpecs::AutoloadMethod2::AutoloadFromIncludedModule2
-  fails "Kernel.autoload? returns nil if no file has been registered for a constant" # NoMethodError: undefined method `autoload?' for Kernel
-  fails "Kernel.autoload? returns the name of the file that will be autoloaded" # NoMethodError: undefined method `autoload?' for Kernel
   fails "Kernel.global_variables finds subset starting with std"
   fails "Kernel.lambda does not create lambda-style Procs when captured with #method" # Expected true to be false
   fails "Kernel.lambda raises an ArgumentError when no block is given"

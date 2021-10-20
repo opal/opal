@@ -234,6 +234,25 @@
     }
   }
 
+  function handle_autoload(cref, name) {
+    if (!cref.$$autoload[name].loaded) {
+      cref.$$autoload[name].loaded = true;
+      try {
+        Opal.Kernel.$require(cref.$$autoload[name].path);
+      } catch (e) {
+        cref.$$autoload[name].exception = e;
+        throw e;
+      }
+      cref.$$autoload[name].required = true;
+      if (cref.$$const[name]) {
+        cref.$$autoload[name].success = true;
+        return cref.$$const[name];
+      }
+    } else if (cref.$$autoload[name].loaded && !cref.$$autoload[name].required) {
+      if (cref.$$autoload[name].exception) { throw cref.$$autoload[name].exception; }
+    }
+  }
+
   // Constants
   // ---------
   //
@@ -248,7 +267,12 @@
 
   // Get the constant in the scope of the current cref
   function const_get_name(cref, name) {
-    if (cref) return cref.$$const[name];
+    if (cref) {
+      if (cref.$$const[name]) { return cref.$$const[name]; }
+      if (cref.$$autoload && cref.$$autoload[name]) {
+        return handle_autoload(cref, name);
+      }
+    }
   }
 
   // Walk up the nesting array looking for the constant
@@ -261,7 +285,11 @@
     // and in order. The ancestors of those elements are ignored.
     for (i = 0, ii = nesting.length; i < ii; i++) {
       constant = nesting[i].$$const[name];
-      if (constant != null) return constant;
+      if (constant != null) {
+        return constant;
+      } else if (nesting[i].$$autoload && nesting[i].$$autoload[name]) {
+        return handle_autoload(nesting[i], name);
+      }
     }
   }
 
@@ -276,6 +304,8 @@
     for (i = 0, ii = ancestors.length; i < ii; i++) {
       if (ancestors[i].$$const && $has_own.call(ancestors[i].$$const, name)) {
         return ancestors[i].$$const[name];
+      } else if (ancestors[i].$$autoload && ancestors[i].$$autoload[name]) {
+        return handle_autoload(ancestors[i], name);
       }
     }
   }
@@ -417,6 +447,11 @@
       for (constant in module.$$const) {
         constants[constant] = true;
       }
+      if (module.$$autoload) {
+        for (constant in module.$$autoload) {
+          constants[constant] = true;
+        }
+      }
     }
 
     return Object.keys(constants);
@@ -432,7 +467,7 @@
       return old;
     }
 
-    if (cref.$$autoload != null && cref.$$autoload[name] != null) {
+    if (cref.$$autoload && cref.$$autoload[name]) {
       delete cref.$$autoload[name];
       return nil;
     }

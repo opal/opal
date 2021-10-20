@@ -477,6 +477,12 @@ module Opal
       @required_trees ||= []
     end
 
+    # An array of things (requires, trees) which don't need to success in
+    # loading compile-time.
+    def autoloads
+      @autoloads ||= []
+    end
+
     # The last sexps in method bodies, for example, need to be returned
     # in the compiled javascript. Due to syntax differences between
     # javascript any ruby, some sexps need to be handled specially. For
@@ -573,13 +579,13 @@ module Opal
     def marshal_dump
       [@options, @option_values, @source_map ||= source_map.cache,
        @magic_comments, @result,
-       @required_trees, @requires]
+       @required_trees, @requires, @autoloads]
     end
 
     def marshal_load(src)
       @options, @option_values, @source_map,
       @magic_comments, @result,
-      @required_trees, @requires = src
+      @required_trees, @requires, @autoloads = src
     end
   end
 end

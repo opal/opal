@@ -6,6 +6,10 @@ def self.include(mod)
   Object.include mod
 end
 
+def self.autoload(*args)
+  Object.autoload(*args)
+end
+
 # Compiler overrides this method
 def self.using(mod)
   raise 'main.using is permitted only at toplevel'

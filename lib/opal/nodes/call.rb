@@ -287,11 +287,17 @@ module Opal
       end
 
       add_special :autoload do |compile_default|
-        if scope.class_scope?
-          str = DependencyResolver.new(compiler, arglist.children[1]).resolve
-          compiler.requires << str unless str.nil?
-          compile_default.call
+        args = arglist.children
+        if args.length == 2 && args[0].type == :sym
+          str = DependencyResolver.new(compiler, args[1], :ignore).resolve
+          if str.nil?
+            compiler.warning "File for autoload of constant '#{args[0].children[0]}' could not be bundled!"
+          else
+            compiler.requires << str
+            compiler.autoloads << str
+          end
         end
+        compile_default.call
       end
 
       add_special :require_tree do |compile_default|
@@ -327,6 +333,10 @@ module Opal
         else
           push fragment 'nil'
         end
+      end
+
+      add_special :__dir__ do
+        push File.dirname(Opal::Compiler.module_name(compiler.file)).inspect
       end
 
       # Refinements support
@@ -428,42 +438,51 @@ module Opal
       end
 
       class DependencyResolver
-        def initialize(compiler, sexp)
+        def initialize(compiler, sexp, missing_dynamic_require = nil)
           @compiler = compiler
           @sexp = sexp
+          @missing_dynamic_require = missing_dynamic_require || @compiler.dynamic_require_severity
         end
 
         def resolve
           handle_part @sexp
         end
 
-        def handle_part(sexp)
-          type = sexp.type
+        def handle_part(sexp, missing_dynamic_require = @missing_dynamic_require)
+          if sexp
+            case sexp.type
+            when :str
+              return sexp.children[0]
+            when :dstr
+              return sexp.children.map { |i| handle_part i }.join
+            when :begin
+              return handle_part sexp.children[0] if sexp.children.length == 1
+            when :send
+              recv, meth, *args = sexp.children
 
-          if type == :str
-            return sexp.children[0]
-          elsif type == :send
-            recv, meth, *args = sexp.children
+              parts = args.map { |s| handle_part(s, :ignore) }
 
-            parts = args.map { |s| handle_part s }
+              return nil if parts.include? nil
 
-            if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
-              if meth == :expand_path
-                return expand_path(*parts)
-              elsif meth == :join
-                return expand_path parts.join('/')
-              elsif meth == :dirname
-                return expand_path parts[0].split('/')[0...-1].join('/')
+              if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
+                if meth == :expand_path
+                  return expand_path(*parts)
+                elsif meth == :join
+                  return expand_path parts.join('/')
+                elsif meth == :dirname
+                  return expand_path parts[0].split('/')[0...-1].join('/')
+                end
+              elsif meth == :__dir__
+                return File.dirname(Opal::Compiler.module_name(@compiler.file))
               end
             end
           end
 
-          msg = 'Cannot handle dynamic require'
-          case @compiler.dynamic_require_severity
+          case missing_dynamic_require
           when :error
-            @compiler.error msg, @sexp.line
+            @compiler.error 'Cannot handle dynamic require', @sexp.line
           when :warning
-            @compiler.warning msg, @sexp.line
+            @compiler.warning 'Cannot handle dynamic require', @sexp.line
           end
         end
 

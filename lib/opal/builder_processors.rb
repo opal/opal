@@ -12,8 +12,9 @@ module Opal
         @cache = @options.delete(:cache) { Opal.cache }
         @requires = []
         @required_trees = []
+        @autoloads = []
       end
-      attr_reader :source, :filename, :options, :requires, :required_trees
+      attr_reader :source, :filename, :options, :requires, :required_trees, :autoloads
 
       def to_s
         source.to_s
@@ -101,6 +102,10 @@ module Opal
 
       def required_trees
         compiled.required_trees
+      end
+
+      def autoloads
+        compiled.autoloads
       end
 
       # Also catch a files with missing extensions and nil.

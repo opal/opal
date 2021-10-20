@@ -1,3 +1,5 @@
+require 'corelib/file'
+
 %x{
   var warnings = {}, errno_code, errno_codes = [
     'EACCES',
