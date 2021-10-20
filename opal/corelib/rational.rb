@@ -1,4 +1,5 @@
 require 'corelib/numeric'
+require 'corelib/rational/base'
 
 class Rational < Numeric
   def self.reduce(num, den)
@@ -350,18 +351,10 @@ class Rational < Numeric
       Rational(s.send(method), p)
     end
   end
-end
 
-module Kernel
-  def Rational(numerator, denominator = 1)
-    Rational.convert(numerator, denominator)
-  end
-end
-
-class String
-  def to_r
+  def self.from_string(string)
     %x{
-      var str = self.trimLeft(),
+      var str = string.trimLeft(),
           re = /^[+-]?[\d_]+(\.[\d_]+)?/,
           match = str.match(re),
           numerator, denominator;

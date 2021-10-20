@@ -1,3 +1,5 @@
+require 'corelib/random/formatter'
+
 module SecureRandom
   extend Random::Formatter
 

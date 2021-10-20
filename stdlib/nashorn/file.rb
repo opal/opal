@@ -1,5 +1,7 @@
 `/* global Java */`
 
+require 'corelib/file'
+
 class File
   def self.read(path)
     %x(

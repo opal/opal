@@ -1,4 +1,5 @@
 require 'corelib/numeric'
+require 'corelib/complex/base'
 
 class Complex < Numeric
   def self.rect(real, imag = 0)
@@ -291,23 +292,10 @@ class Complex < Numeric
   end
 
   I = new(0, 1)
-end
 
-module Kernel
-  def Complex(real, imag = nil)
-    if imag
-      Complex.new(real, imag)
-    else
-      Complex.new(real, 0)
-    end
-  end
-end
-
-class String
-  def to_c
+  def self.from_string(str)
     %x{
-      var str = self,
-          re = /[+-]?[\d_]+(\.[\d_]+)?(e\d+)?/,
+      var re = /[+-]?[\d_]+(\.[\d_]+)?(e\d+)?/,
           match = str.match(re),
           real, imag, denominator;
 
