@@ -646,7 +646,7 @@ module Kernel
   end
 
   # `path` should be the full path to be found in registered modules (`Opal.modules`)
-  def require_tree(path)
+  def require_tree(path, autoload: false)
     %x{
       var result = [];
 
@@ -655,7 +655,11 @@ module Kernel
       if (path === '.') path = '';
       for (var name in Opal.modules) {
         if (#{`name`.start_with?(path)}) {
-          result.push([name, Opal.require(name)]);
+          if(!#{autoload}) {
+            result.push([name, Opal.require(name)]);
+          } else {
+            result.push([name, true]); // do nothing, delegated to a autoloading
+          }
         }
       }
 
