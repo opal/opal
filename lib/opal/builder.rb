@@ -28,6 +28,10 @@ module Opal
     # ## `#required_trees`
     # An array of string containing the logic paths of required directories
     #
+    # ## `#autoloads`
+    # An array of entities that are autoloaded and their compile-time load failure can
+    # be safely ignored
+    #
     # ## `#to_s`
     # The processed source
     #
@@ -86,16 +90,16 @@ module Opal
 
     # Retrieve the source for a given path the same way #build would do.
     def source_for(path)
-      read(path)
+      read(path, false)
     end
 
     def build_str(source, rel_path, options = {})
       return if source.nil?
       abs_path = expand_path(rel_path)
       rel_path = expand_ext(rel_path)
-      asset = processor_for(source, rel_path, abs_path, options)
+      asset = processor_for(source, rel_path, abs_path, false, options)
       requires = preload + asset.requires + tree_requires(asset, abs_path)
-      requires.map { |r| process_require(r, options) }
+      requires.map { |r| process_require(r, asset.autoloads, options) }
       processed << asset
       self
     rescue MissingRequire => error
@@ -103,7 +107,7 @@ module Opal
     end
 
     def build_require(path, options = {})
-      process_require(path, options)
+      process_require(path, [], options)
     end
 
     def initialize_copy(other)
@@ -158,21 +162,24 @@ module Opal
       end
     end
 
-    def processor_for(source, rel_path, abs_path, options)
-      processor = processors.find { |p| p.match? abs_path } ||
-                  raise(ProcessorNotFound, "can't find processor for rel_path: " \
-                                           "#{rel_path.inspect}, "\
-                                           "abs_path: #{abs_path.inspect}, "\
-                                           "source: #{source.inspect}, "\
-                                           "processors: #{processors.inspect}"
-                  )
+    def processor_for(source, rel_path, abs_path, autoload, options)
+      processor = processors.find { |p| p.match? abs_path }
+
+      if !processor && !autoload
+        raise(ProcessorNotFound, "can't find processor for rel_path: " \
+                                 "#{rel_path.inspect}, "\
+                                 "abs_path: #{abs_path.inspect}, "\
+                                 "source: #{source.inspect}, "\
+                                 "processors: #{processors.inspect}"
+             )
+      end
 
       options = options.merge(cache: cache)
 
       processor.new(source, rel_path, @compiler_options.merge(options))
     end
 
-    def read(path)
+    def read(path, autoload)
       path_reader.read(path) || begin
         print_list = ->(list) { "- #{list.join("\n- ")}\n" }
         message = "can't find file: #{path.inspect} in:\n" +
@@ -182,30 +189,39 @@ module Opal
                   "\nAnd the following processors:\n" +
                   print_list[processors]
 
-        case missing_require_severity
-        when :error   then raise MissingRequire, message
-        when :warning then warn message
-        when :ignore  then # noop
+        unless autoload
+          case missing_require_severity
+          when :error   then raise MissingRequire, message
+          when :warning then warn message
+          when :ignore  then # noop
+          end
         end
 
         nil
       end
     end
 
-    def process_require(rel_path, options)
+    def process_require(rel_path, autoloads, options)
       return if prerequired.include?(rel_path)
       return if already_processed.include?(rel_path)
       already_processed << rel_path
 
-      source = stub?(rel_path) ? '' : read(rel_path)
+      autoload = autoloads.include? rel_path
+
+      source = stub?(rel_path) ? '' : read(rel_path, autoload)
 
       # The handling is delegated to the runtime
       return if source.nil?
 
       abs_path = expand_path(rel_path)
       rel_path = expand_ext(rel_path)
-      asset = processor_for(source, rel_path, abs_path, options.merge(requirable: true))
-      process_requires(rel_path, asset.requires + tree_requires(asset, abs_path), options)
+      asset = processor_for(source, rel_path, abs_path, autoload, options.merge(requirable: true))
+      process_requires(
+        rel_path,
+        asset.requires + tree_requires(asset, abs_path),
+        asset.autoloads,
+        options
+      )
       processed << asset
     end
 
@@ -227,8 +243,8 @@ module Opal
       (path_reader.expand(path) || File.expand_path(path)).to_s
     end
 
-    def process_requires(rel_path, requires, options)
-      requires.map { |r| process_require(r, options) }
+    def process_requires(rel_path, requires, autoloads, options)
+      requires.map { |r| process_require(r, autoloads, options) }
     rescue MissingRequire => error
       raise error, "A file required by #{rel_path.inspect} wasn't found.\n#{error.message}", error.backtrace
     end
