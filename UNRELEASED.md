@@ -16,7 +16,6 @@
 - Scope variables support for `eval()` (#2256)
 - Add support for `Kernel#binding` (#2256)
 - A (mostly) correct support for refinements (#2256)
-- [CI] Performance regression check (#2276, #2282)
 - Add support for ECMAScript modules with an `--esm` CLI option (#2286)
 - Implement `Regexp#names` and add named captures support (#2272)
 - REPL improvements: (#2285)
@@ -65,7 +64,7 @@
 - Windows support for chrome runner (#2324)
   - Use correct node separator for NODE_PATH on Windows
   - Pass dir and emulate exec a bit on Windows
-  - Use Gem.win_platform?, match supported plattform to ruby, simplify run
+  - Use Gem.win_platform?, match supported platform to ruby, simplify run
 
 ### Changed
 
@@ -73,8 +72,6 @@
 - Renamed internal `super` related helpers,
   `find_super_dispatcher` is now `find_super`, `find_iter_super_dispatcher` is now `find_block_super` (#2090)
 - The `opal-repl` CLI now requires files to be passed with `--require` (or `-r`) instead of the bare filename (#2309)
-- Migrate from UglifyJS to Terser (#2318)
-- Chrome CDP interface won't use temporary files anymore, except for caching files (#2319)
 
 ### Deprecated
 
@@ -83,3 +80,5 @@
 ### Internal
 
 - Switch from jshint to ESLint (#2289)
+- Switch from UglifyJS to Terser (#2318)
+- [CI] Performance regression check (#2276, #2282)
