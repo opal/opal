@@ -55,6 +55,7 @@ ASCIIDOCTOR_PREPARE = [
 ASCIIDOCTOR_BUILD_OPAL = "bin/opal --no-cache -c " \
            "-Itmp/performance/asciidoctor/lib " \
            "-Itmp/performance/asciidoctor.js/packages/core/lib " \
+           "-sconcurrent/map -sslim/include " \
            "tmp/performance/asciidoctor_test.rb > tmp/performance/asciidoctor_test.js"
 ASCIIDOCTOR_RUN_RUBY = "bundle exec ruby -Itmp/performance/asciidoctor/lib tmp/performance/asciidoctor_test.rb"
 ASCIIDOCTOR_RUN_OPAL = "node tmp/performance/asciidoctor_test.js"
