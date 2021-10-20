@@ -294,6 +294,7 @@ module Opal
             compiler.warning "File for autoload of constant '#{args[0].children[0]}' could not be bundled!"
           else
             compiler.requires << str
+            compiler.autoloads << str
           end
         end
         compile_default.call
