@@ -443,22 +443,31 @@ module Opal
         end
 
         def handle_part(sexp, missing_dynamic_require = @missing_dynamic_require)
-          type = sexp.type
+          if sexp
+            case sexp.type
+            when :str
+              return sexp.children[0]
+            when :dstr
+              return sexp.children.map { |i| handle_part i }.join
+            when :begin
+              return handle_part sexp.children[0] if sexp.children.length == 1
+            when :send
+              recv, meth, *args = sexp.children
 
-          if type == :str
-            return sexp.children[0]
-          elsif type == :send
-            recv, meth, *args = sexp.children
+              parts = args.map { |s| handle_part(s, :ignore) }
 
-            parts = args.map { |s| handle_part s }
+              return nil if parts.include? nil
 
-            if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
-              if meth == :expand_path
-                return expand_path(*parts)
-              elsif meth == :join
-                return expand_path parts.join('/')
-              elsif meth == :dirname
-                return expand_path parts[0].split('/')[0...-1].join('/')
+              if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
+                if meth == :expand_path
+                  return expand_path(*parts)
+                elsif meth == :join
+                  return expand_path parts.join('/')
+                elsif meth == :dirname
+                  return expand_path parts[0].split('/')[0...-1].join('/')
+                end
+              elsif meth == :__dir__
+                return File.dirname(Opal::Compiler.module_name(@compiler.file))
               end
             end
           end
