@@ -94,6 +94,16 @@ module Opal
     name
   end
 
+  def self.const_name?(const_name)
+    %x{
+      if (typeof const_name !== 'string') {
+        #{const_name = Opal.coerce_to!(const_name, String, :to_str)}
+      }
+
+      return #{const_name}[0] === #{const_name}[0].toUpperCase()
+    }
+  end
+
   def self.const_name!(const_name)
     const_name = Opal.coerce_to!(const_name, String, :to_str)
 

@@ -191,6 +191,14 @@ class Module
 
   def autoload(const, path)
     %x{
+      if (!#{Opal.const_name?(const)}) {
+        #{raise NameError, "autoload must be constant name: #{const}"}
+      }
+
+      if (path == "") {
+        #{raise ArgumentError, 'empty file name'}
+      }
+
       if (self.$$autoload == null) self.$$autoload = {};
       Opal.const_cache_version++;
       self.$$autoload[#{const}] = #{path};
