@@ -432,44 +432,44 @@ module Opal
       end
 
       class DependencyResolver
-        def initialize(compiler, sexp)
+        def initialize(compiler, sexp, missing_dynamic_require = nil)
           @compiler = compiler
           @sexp = sexp
+          @missing_dynamic_require = missing_dynamic_require || @compiler.dynamic_require_severity
         end
 
         def resolve
           handle_part @sexp
         end
 
-        def handle_part(sexp)
+        def handle_part(sexp, missing_dynamic_require = @missing_dynamic_require)
           type = sexp.type
 
           if type == :str
-              return sexp.children[0]
+            return sexp.children[0]
           elsif type == :send
-              recv, meth, *args = sexp.children
+            recv, meth, *args = sexp.children
 
             parts = args.map { |s| handle_part s }
 
-              if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
-                if meth == :expand_path
-                  return expand_path(*parts)
-                elsif meth == :join
-                  return expand_path parts.join('/')
-                elsif meth == :dirname
-                  return expand_path parts[0].split('/')[0...-1].join('/')
-                end
+            if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
+              if meth == :expand_path
+                return expand_path(*parts)
+              elsif meth == :join
+                return expand_path parts.join('/')
+              elsif meth == :dirname
+                return expand_path parts[0].split('/')[0...-1].join('/')
+              end
             end
           end
 
-            msg = 'Cannot handle dynamic require'
-            case @compiler.dynamic_require_severity
-            when :error
-              @compiler.error msg, @sexp.line
-            when :warning
-              @compiler.warning msg, @sexp.line
-            end
+          case missing_dynamic_require
+          when :error
+            @compiler.error 'Cannot handle dynamic require', @sexp.line
+          when :warning
+            @compiler.warning 'Cannot handle dynamic require', @sexp.line
           end
+        end
 
         def expand_path(path, base = '')
           "#{base}/#{path}".split('/').each_with_object([]) do |part, p|
