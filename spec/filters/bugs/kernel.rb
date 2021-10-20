@@ -103,7 +103,6 @@ opal_filter "Kernel" do
   fails "Kernel#initialize_copy does nothing if the argument is the same as the receiver" # Expected nil.equal? #<Object:0x590> to be truthy but was false
   fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
-  fails "Kernel#inspect does not call #to_s if it is defined"
   fails "Kernel#inspect returns a String for an object without #class method" # Exception: Maximum call stack size exceeded
   fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
   fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton

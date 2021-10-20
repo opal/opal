@@ -1,4 +1,4 @@
-class Process
+module Process
   @__clocks__ = []
   def self.__register_clock__(name, func)
     const_set name, @__clocks__.size

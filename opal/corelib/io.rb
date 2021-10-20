@@ -20,6 +20,10 @@ class IO
     end
   end
 
+  def fileno
+    @fd
+  end
+
   def tty?
     `self.tty == true`
   end

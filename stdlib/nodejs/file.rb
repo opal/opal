@@ -146,6 +146,14 @@ class File < IO
     data.size
   end
 
+  def self.delete(path)
+    `executeIOAction(function(){return __fs__.unlinkSync(#{path})})`
+  end
+
+  class << self
+    alias unlink delete
+  end
+
   def self.exist?(path)
     path = path.path if path.respond_to? :path
     `return executeIOAction(function(){return __fs__.existsSync(#{path})})`

@@ -44,4 +44,16 @@ class << ENV
   def to_s
     'ENV'
   end
+
+  alias inspect to_s
+
+  def to_h
+    keys.to_h { |k| [k, self[k]] }
+  end
+
+  alias to_hash to_h
+
+  def merge(keys)
+    to_h.merge(keys)
+  end
 end
