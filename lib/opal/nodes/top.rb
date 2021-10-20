@@ -46,19 +46,16 @@ module Opal
       end
 
       def opening
-        as = ""
-        if await_encountered
-          as = "async "
-        end
+        async_prefix = "async " if await_encountered
 
         if compiler.requirable?
-          unshift "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = #{as}function(Opal) {"
+          unshift "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = #{async_prefix}function(Opal) {"
         elsif compiler.eval?
-          unshift "(#{as}function(Opal, self) {"
+          unshift "(#{async_prefix}function(Opal, self) {"
         elsif compiler.esm?
-          unshift "export default Opal.queue(#{as}function(Opal) {"
+          unshift "export default Opal.queue(#{async_prefix}function(Opal) {"
         else
-          unshift "Opal.queue(#{as}function(Opal) {"
+          unshift "Opal.queue(#{async_prefix}function(Opal) {"
         end
       end
 
