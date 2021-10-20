@@ -287,11 +287,16 @@ module Opal
       end
 
       add_special :autoload do |compile_default|
-        if scope.class_scope?
-          str = DependencyResolver.new(compiler, arglist.children[1]).resolve
-          compiler.requires << str unless str.nil?
-          compile_default.call
+        args = arglist.children
+        if args.length == 2 && args[0].type == :sym
+          str = DependencyResolver.new(compiler, args[1], :ignore).resolve
+          if str.nil?
+            compiler.warning "File for autoload of constant '#{args[0].children[0]}' could not be bundled!"
+          else
+            compiler.requires << str
+          end
         end
+        compile_default.call
       end
 
       add_special :require_tree do |compile_default|

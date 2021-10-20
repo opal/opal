@@ -170,9 +170,9 @@ RSpec.describe Opal::Compiler do
     end
 
     describe '#autoload' do
-      it 'ignores autoload outside of context class' do
+      it 'parses and resolve second #autoload arguments in top scope' do
         compiler = compiler_for(%Q{autoload :Whatever, "#{__FILE__}"})
-        expect(compiler.requires).to eq([])
+        expect(compiler.requires).to eq([__FILE__])
       end
 
       it 'parses and resolve second #autoload arguments' do
