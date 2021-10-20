@@ -44,6 +44,18 @@
 - Add `Opal::Config.esm` to enable/disable ES modules (#2316)
   - If Config.esm is enabled, SimpleServer does type="module"
   - Add new rack-esm example
+- Add a QuickJS (https://bellard.org/quickjs/) runner (#2331)
+- Add `IO#fileno`, `Method#curry`, `Buffer#to_s`, `Pathname.pwd` (#2332)
+- Add NodeJS support for `ARGF`, `ENV.{inspect,to_h,to_hash,merge}`, `File.{delete,unlink}`, `Kernel#system`, <code>Kernel#`</code>, `Process::Status` (#2332)
+- Introduce `__dir__` support (#2323)
+- Full autoload support (#2323)
+  - Now compatible with `opal-zeitwerk` and `isomorfeus`
+  - Allow toplevel autoloads
+  - Allow dynamic autoloads (e.g. can be hooked to fetch a URL upon autoload with a custom loader)
+  - Allow overwriting `require` (e.g. like rubygems does)
+  - Allow autoloading trees with `require_tree "./foo", autoload: true`
+  - Add Module#autoload?
+- Autoload parts of the corelib (#2323)
 
 ### Fixed
 
@@ -65,6 +77,8 @@
   - Use correct node separator for NODE_PATH on Windows
   - Pass dir and emulate exec a bit on Windows
   - Use Gem.win_platform?, match supported platform to ruby, simplify run
+- NodeJS: Drop the first `--` argument in `ARGV` (#2332)
+- Fix `Object#require` not pointing to `Kernel#require` (#2323)
 
 ### Changed
 
@@ -72,6 +86,7 @@
 - Renamed internal `super` related helpers,
   `find_super_dispatcher` is now `find_super`, `find_iter_super_dispatcher` is now `find_block_super` (#2090)
 - The `opal-repl` CLI now requires files to be passed with `--require` (or `-r`) instead of the bare filename (#2309)
+- `Process` is now a Module, not a Class - just like in MRI (#2332)
 
 ### Deprecated
 
