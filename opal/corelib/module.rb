@@ -210,6 +210,23 @@ class Module
     }
   end
 
+  def autoload?(const)
+    %x{
+      if (self.$$autoload && self.$$autoload[#{const}] && !self.$$autoload[#{const}].required && !self.$$autoload[#{const}].success) {
+        return self.$$autoload[#{const}].path;
+      }
+
+      var ancestors = self.$ancestors();
+
+      for (var i = 0, length = ancestors.length; i < length; i++) {
+        if (ancestors[i].$$autoload && ancestors[i].$$autoload[#{const}] && !ancestors[i].$$autoload[#{const}].required && !ancestors[i].$$autoload[#{const}].success) {
+          return ancestors[i].$$autoload[#{const}].path;
+        }
+      }
+      return nil;
+    }
+  end
+
   def class_variables
     `Object.keys(Opal.class_variables(self))`
   end
