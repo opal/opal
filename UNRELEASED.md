@@ -46,7 +46,7 @@
   - Add new rack-esm example
 - Add a QuickJS (https://bellard.org/quickjs/) runner (#2331)
 - Add `IO#fileno`, `Method#curry`, `Buffer#to_s`, `Pathname.pwd` (#2332)
-- Add NodeJS support for `ARGF`, `ENV.{inspect,to_h,to_hash,merge}`, `File.{delete,unlink}`, `Kernel#system`, <code>Kernel#`</code>, `Process::Status` (#2332)
+- Add NodeJS support for `ARGF`, `ENV.{inspect,to_h,to_hash,merge}`, `File.{delete,unlink}`, `Kernel#system`, <code>Kernel#\`</code>, `Process::Status` (#2332)
 - Introduce `__dir__` support (#2323)
 - Full autoload support (#2323)
   - Now compatible with `opal-zeitwerk` and `isomorfeus`
