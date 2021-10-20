@@ -25,7 +25,7 @@
 - Add `IO#gets` and `IO#read_proc` along with other supporting methods (#2309)
   - Support `#gets` on most platforms, including browsers (via `prompt`)
   - Move the REPL to a `--repl` CLI option of the main executable
-  - Completely refactor IO, now supporting
+  - Completely refactor IO, now supporting methods like `#each_line` throughout the entire IO chain
   - Add a runner for MiniRacer (as `miniracer`)
   - Support Windows on the Chrome runner
   - Support Windows on the REPL
@@ -87,6 +87,7 @@
   `find_super_dispatcher` is now `find_super`, `find_iter_super_dispatcher` is now `find_block_super` (#2090)
 - The `opal-repl` CLI now requires files to be passed with `--require` (or `-r`) instead of the bare filename (#2309)
 - `Process` is now a Module, not a Class - just like in MRI (#2332)
+- `s = StringIO.new("a"); s << "b"; s.string` now returns "b", like MRI, but Opal used to return "ab" (#2309)
 
 ### Deprecated
 
