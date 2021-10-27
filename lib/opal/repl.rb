@@ -44,7 +44,7 @@ module Opal
     def load_opal
       runner = @argv.reject { |i| i == '--repl' }
       runner += ['-e', 'require "opal/repl_js"']
-      runner = %w[bundle exec opal] + runner
+      runner = %W[ruby #{__dir__}/../../exe/opal] + runner
 
       @pipe = IO.popen(runner, 'r+',
         # What I try to achieve here: let the runner ignore
