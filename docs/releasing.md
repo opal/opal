@@ -16,3 +16,18 @@ _This guide is a work-in-progress._
 
 - Commit the updated changelog along with the version bump using this commmit message:
   "Release v1.2.3"
+
+## Opal docs
+
+- Open `opal-docs` and run `bin/build v1.2.3`
+- Then run `bin/deploy`
+
+## Opal site
+
+- Open `opal.github.io` and update the opal version in the `Gemfile`
+- run `bin/build`
+- `git push` the latest changes
+
+## Opal CDN
+
+- Run `bin/release v1.2.3`
