@@ -636,7 +636,7 @@ module Kernel
       if (typeof #{file} !== 'string' && Opal.String && Opal.Array) {
         #{file = Opal.coerce_to!(file, String, :to_str) }
       }
-      Opal.require(#{file})
+      return Opal.require(#{file})
     }
   end
 
