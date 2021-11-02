@@ -45,7 +45,7 @@ module Opal
             }
 
             cmd = [
-              'bundle', 'exec', 'opal',
+              "#{__dir__}/../../../exe/opal",
               '--no-exit',
               '-I', __dir__,
               '-r', 'source-map-support-node',
