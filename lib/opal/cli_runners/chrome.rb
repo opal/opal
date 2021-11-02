@@ -158,7 +158,7 @@ module Opal
             end
           when /darwin|mac os/
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-          when /linux/
+          else
             %w[
               google-chrome-stable
               chromium
@@ -169,8 +169,6 @@ module Opal
               return name
             end
             raise 'Cannot find chrome executable'
-          when /solaris|bsd/
-            raise 'Headless chrome is supported only by Mac OS and Linux'
           end
       end
 
