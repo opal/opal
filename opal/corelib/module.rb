@@ -373,9 +373,10 @@ class Module
   end
 
   def define_method(name, method = undefined, &block)
-    if `method === undefined && block === nil`
-      raise ArgumentError, 'tried to create a Proc object without a block'
-    end
+    %x{
+      if (method === undefined && block === nil)
+        #{raise ArgumentError, 'tried to create a Proc object without a block'}
+    }
 
     block ||= case method
               when Proc
@@ -395,14 +396,27 @@ class Module
               end
 
     %x{
+      // Wrapping and forwarding is required to make super work, as the
+      // same block can be used to define multiple methods.
+      var wrapper = function() {
+        block.$$jsid        = name
+        block.$$p           = wrapper.$$p
+        block.$$s           = null;
+        block.$$def         = wrapper;
+        block.$$define_meth = true;
+
+        return block.apply(this, arguments)
+      }
+
       var id = '$' + name;
+      wrapper.$$jsid        = name
+      wrapper.$$s           = null;
+      wrapper.$$def         = wrapper;
+      wrapper.$$define_meth = true;
 
-      block.$$jsid        = name;
-      block.$$s           = null;
-      block.$$def         = block;
-      block.$$define_meth = true;
+      Object.assign(wrapper, block)
 
-      Opal.defn(self, id, block);
+      Opal.defn(self, id, wrapper);
 
       return name;
     }
