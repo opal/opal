@@ -16,6 +16,10 @@ _This guide is a work-in-progress._
 
 - Commit the updated changelog along with the version bump using this commit message:
   "Release v1.2.3"
+- Push the commit and run `bin/rake release` to release the new version to Rubygems
+- Go to GitHub releases and create a new release from the latest tag pasting the contents of UNRELEASED.md
+- Empty UNRELEASED.md and run `bin/rake changelog`
+- Push the updated changelog
 
 ## Opal docs
 
