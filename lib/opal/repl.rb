@@ -4,6 +4,7 @@ require 'opal'
 require 'securerandom'
 require 'stringio'
 require 'fileutils'
+require 'rbconfig'
 
 module Opal
   class REPL
@@ -44,7 +45,7 @@ module Opal
     def load_opal
       runner = @argv.reject { |i| i == '--repl' }
       runner += ['-e', 'require "opal/repl_js"']
-      runner = %W[ruby #{__dir__}/../../exe/opal] + runner
+      runner = [RbConfig.ruby, "#{__dir__}/../../exe/opal"] + runner
 
       @pipe = IO.popen(runner, 'r+',
         # What I try to achieve here: let the runner ignore

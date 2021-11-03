@@ -4,6 +4,7 @@ require 'shellwords'
 require 'socket'
 require 'timeout'
 require 'tmpdir'
+require 'rbconfig'
 
 module Opal
   module CliRunners
@@ -45,6 +46,7 @@ module Opal
             }
 
             cmd = [
+              RbConfig.ruby,
               "#{__dir__}/../../../exe/opal",
               '--no-exit',
               '-I', __dir__,
