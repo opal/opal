@@ -74,6 +74,11 @@ class Array < `Array`
     `toArraySubclass(objects, self)`
   end
 
+  def self.allocate
+    # Let's ensure the allocator doesn't get any arguments.
+    super()
+  end
+
   def initialize(size = nil, obj = nil, &block)
     %x{
       if (obj !== nil && block !== nil) {

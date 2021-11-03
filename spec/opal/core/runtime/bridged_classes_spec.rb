@@ -137,3 +137,20 @@ describe "Invalid bridged classes" do
   end
 end
 
+%x{
+  var bridge_class_demo_args = function(arg){ this.arg = arg; };
+  bridge_class_demo_args.prototype.$foo = function() { return this.arg; };
+}
+
+class BridgedClassWithArgs < `bridge_class_demo_args`
+end
+
+describe "Bridged classes with a constructor that accepts arguments" do
+  before do
+    @bridged = ::BridgedClassWithArgs
+  end
+
+  it "passes the arguments to the constructor" do
+    @bridged.new("hello").foo.should == "hello"
+  end
+end

@@ -49,4 +49,5 @@ opal_filter "Array" do
   fails "Array#uniq! properly handles recursive arrays"
   fails "Array#values_at works when given beginless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#values_at works when given endless ranges" # Opal::SyntaxError: undefined method `type' for nil
+  fails "Array.allocate does not accept any arguments" # Expected ArgumentError but no exception was raised ([] was returned)
 end
