@@ -15,6 +15,20 @@ Changes are grouped as follows:
 
 
 
+## [3.0.1](https://github.com/opal/opal/compare/v1.3.0...v3.0.1) - 2021-11-03
+
+
+### Fixed
+
+* Fix REPL if bundler environment isn't set ([#2338](https://github.com/opal/opal/pull/2338))
+* Fix Chrome runner if bundler environment isn't set and make it work on other Unixes ([#2339](https://github.com/opal/opal/pull/2339))
+* `Proc#binding` to return a binding if `Binding` is defined (#2341, #2340)
+* `Array#zip` to correctly `yield` (#2342, #1611)
+* `String#scan` to correctly `yield` (#2342, #1660)
+
+
+
+
 ## [1.3.0](https://github.com/opal/opal/compare/v1.2.0...v1.3.0) - 2021-10-27
 
 
