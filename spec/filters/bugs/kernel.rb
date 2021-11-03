@@ -70,7 +70,9 @@ opal_filter "Kernel" do
   fails "Kernel#eval activates refinements from the binding" # NoMethodError: undefined method `refine' for #<Module:0x1ad8>
   fails "Kernel#eval activates refinements from the eval scope" # NoMethodError: undefined method `refine' for #<Module:0x20d4>
   fails "Kernel#eval allows a binding to be captured inside an eval"
+  fails "Kernel#eval allows creating a new class in a binding" # RuntimeError: Evaluation on a Proc#binding is not supported
   fails "Kernel#eval can be aliased"
+  fails "Kernel#eval does not make Proc locals visible to evaluated code" # Expected NameError but got: RuntimeError (Evaluation on a Proc#binding is not supported)
   fails "Kernel#eval does not share locals across eval scopes"
   fails "Kernel#eval doesn't accept a Proc object as a binding"
   fails "Kernel#eval evaluates string with given filename and negative linenumber" # NameError: uninitialized constant TOPLEVEL_BINDING

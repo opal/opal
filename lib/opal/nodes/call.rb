@@ -385,7 +385,7 @@ module Opal
         push ')' if push_nesting
       end
 
-      # This can be refactored in terms of binding, but it would 'corelib/binding'
+      # This can be refactored in terms of binding, but it would need 'corelib/binding'
       # to be required in existing code.
       add_special :eval do |compile_default|
         next compile_default.call if arglist.children.length != 1 || ![s(:self), nil].include?(recvr)
@@ -399,7 +399,9 @@ module Opal
         push "self.$eval(#{temp}))"
       end
 
-      add_special :binding do
+      add_special :binding do |compile_default|
+        next compile_default.call unless recvr.nil?
+
         push "Opal.Binding.$new("
         push "  function($code, $value) {"
         push "    if (typeof $value === 'undefined') {"
