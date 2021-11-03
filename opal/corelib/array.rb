@@ -2386,7 +2386,7 @@ class Array < `Array`
 
       if (block !== nil) {
         for (i = 0; i < size; i++) {
-          block(result[i]);
+          Opal.yield1(block, result[i]);
         }
 
         return nil;

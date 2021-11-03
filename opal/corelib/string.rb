@@ -1010,7 +1010,7 @@ class String < `String`
         if (block === nil) {
           match.length == 1 ? result.push(match[0]) : result.push(#{`match_data`.captures});
         } else {
-          match.length == 1 ? block(match[0]) : block.call(self, #{`match_data`.captures});
+          match.length == 1 ? Opal.yield1(block, match[0]) : Opal.yield1(block, #{`match_data`.captures});
         }
         if (pattern.lastIndex === match.index) {
           pattern.lastIndex += 1;
