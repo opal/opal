@@ -95,7 +95,10 @@ class Proc < `Function`
 
   def binding
     `if (self.$$is_curried) { #{raise ArgumentError, "Can't create Binding"} }`
-    nil
+
+    if defined? Binding
+      Binding.new(nil, [], `self.$$s`, source_location)
+    end
   end
 
   def parameters

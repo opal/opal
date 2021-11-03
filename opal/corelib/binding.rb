@@ -6,7 +6,11 @@ class Binding
   end
 
   def js_eval(*args)
-    @jseval.call(*args)
+    if @jseval
+      @jseval.call(*args)
+    else
+      raise 'Evaluation on a Proc#binding is not supported'
+    end
   end
 
   def local_variable_get(symbol)
