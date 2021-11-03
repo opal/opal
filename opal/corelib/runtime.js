@@ -1560,7 +1560,7 @@
       call_jsid = current_func.$$jsid;
     }
 
-    return Opal.find_super_dispatcher(obj, call_jsid, current_func, defcheck);
+    return Opal.find_super(obj, call_jsid, current_func, defcheck);
   };
 
   // @deprecated
