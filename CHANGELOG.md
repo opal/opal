@@ -15,16 +15,29 @@ Changes are grouped as follows:
 
 
 
-## [3.0.1](https://github.com/opal/opal/compare/v1.3.0...v3.0.1) - 2021-11-03
+## [Unreleased](https://github.com/opal/opal/compare/v1.3.1...HEAD) - unreleased
+
+
+### Added
+### Fixed
+### Changed
+### Deprecated
+### Removed
+### Internal
+
+
+
+
+## [1.3.1](https://github.com/opal/opal/compare/v1.3.0...v1.3.1) - 2021-11-03
 
 
 ### Fixed
 
-* Fix REPL if bundler environment isn't set ([#2338](https://github.com/opal/opal/pull/2338))
-* Fix Chrome runner if bundler environment isn't set and make it work on other Unixes ([#2339](https://github.com/opal/opal/pull/2339))
-* `Proc#binding` to return a binding if `Binding` is defined (#2341, #2340)
-* `Array#zip` to correctly `yield` (#2342, #1611)
-* `String#scan` to correctly `yield` (#2342, #1660)
+- Fix REPL if bundler environment isn't set ([#2338](https://github.com/opal/opal/pull/2338))
+- Fix Chrome runner if bundler environment isn't set and make it work on other Unixes ([#2339](https://github.com/opal/opal/pull/2339))
+- `Proc#binding` to return a binding if `Binding` is defined (#2341, #2340)
+- `Array#zip` to correctly `yield` (#2342, #1611)
+- `String#scan` to correctly `yield` (#2342, #1660)
 
 
 
@@ -94,7 +107,7 @@ Changes are grouped as follows:
 ### Fixed
 
 - Fixed multiple line `Regexp` literal to not generate invalid syntax as JavaScript ([#1616](https://github.com/opal/opal/pull/1616))
-- Fix `Kernel#{try,catch}` along with `UncaughtThrowError` ([#2264](https://github.com/opal/opal/pull/2264))
+- Fix `Kernel#{throw,catch}` along with `UncaughtThrowError` ([#2264](https://github.com/opal/opal/pull/2264))
 - Update source-map-support to fix an off-by-one error ([#2264](https://github.com/opal/opal/pull/2264))
 - Source map: lines should start from 1, not 0 ([#2273](https://github.com/opal/opal/pull/2273))
 - Allow for multiple underscored args with the same name in strict mode ([#2292](https://github.com/opal/opal/pull/2292))
@@ -122,10 +135,6 @@ Changes are grouped as follows:
 - The `opal-repl` CLI now requires files to be passed with `--require` (or `-r`) instead of the bare filename ([#2309](https://github.com/opal/opal/pull/2309))
 - `Process` is now a Module, not a Class - just like in MRI ([#2332](https://github.com/opal/opal/pull/2332))
 - `s = StringIO.new("a"); s << "b"; s.string` now returns "b", like MRI, but Opal used to return "ab" ([#2309](https://github.com/opal/opal/pull/2309))
-
-### Deprecated
-
-### Removed
 
 ### Internal
 
