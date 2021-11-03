@@ -14,7 +14,7 @@ _This guide is a work-in-progress._
 
 ## The commit
 
-- Commit the updated changelog along with the version bump using this commmit message:
+- Commit the updated changelog along with the version bump using this commit message:
   "Release v1.2.3"
 
 ## Opal docs
