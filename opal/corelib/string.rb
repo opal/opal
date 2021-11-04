@@ -686,7 +686,7 @@ class ::String < `String`
   end
 
   def lstrip
-    `self.replace(/^\s*/, '')`
+    `self.replace(/^[\u0000\s]*/, '')`
   end
 
   def ascii_only?
@@ -1167,7 +1167,7 @@ class ::String < `String`
   end
 
   def strip
-    `self.replace(/^\s*/, '').replace(/[\s\u0000]*$/, '')`
+    `self.replace(/^[\s\u0000]*|[\s\u0000]*$/g, '')`
   end
 
   def sub(pattern, replacement = undefined, &block)
