@@ -24,7 +24,11 @@ class BasicObject
 
   def __send__(symbol, *args, &block)
     %x{
-      var func = self['$' + symbol]
+      if (!symbol.$$is_string) {
+        #{raise ::TypeError, "#{inspect} is not a symbol nor a string"}
+      }
+
+      var func = self['$' + symbol];
 
       if (func) {
         if (block !== nil) {
