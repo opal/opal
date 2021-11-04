@@ -1343,6 +1343,10 @@ class ::Array < `Array`
     arrays.reduce(to_a.dup) { |a, b| a & b }
   end
 
+  def intersect?(other)
+    !intersection(other).empty?
+  end
+
   def join(sep = nil)
     return '' if `self.length === 0`
 
