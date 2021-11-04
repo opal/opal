@@ -6,7 +6,7 @@ end
 
 class ::Boolean
   def __marshal__(buffer)
-    if `self`
+    if `self == true`
       buffer.append('T')
     else
       buffer.append('F')
