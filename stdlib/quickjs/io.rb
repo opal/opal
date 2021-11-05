@@ -1,5 +1,3 @@
-`/* global std */`
-
 %x{
   Opal.gvars.stdout.write_proc = function(s) {
     std.out.printf("%s", s);
