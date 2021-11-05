@@ -37,3 +37,4 @@ results.forEach(
 )
 
 puts(`\nFailed with ${count} error${count === 1 ? '' : 's'}.`)
+process.exit(count || 1)

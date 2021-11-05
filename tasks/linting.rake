@@ -25,16 +25,6 @@ namespace :lint do
           puts "Successful."
         else
           sh 'node tasks/linting-parse-eslint-results.js'
-          # results = JSON.parse File.read(result_path), symbolize_names: true
-          # results.each do |data|
-          #   next if data[:messages].empty?
-          #
-          #   relative_path = Pathname(data[:filePath]).relative_path_from(Pathname(dir).expand_path)
-          #   puts "* #{relative_path}"
-          #   data[:messages].each do |message|
-          #     puts "  - #{relative_path}:#{message[:line]}:#{message[:column]}-#{message[:endLine]}:#{message[:endColumn]} #{message[:message]}"
-          #   end
-          # end
         end
       end
     end
