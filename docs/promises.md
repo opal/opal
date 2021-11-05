@@ -8,6 +8,8 @@ It can be required inside any Opal applicaton:
 require 'promise'
 ```
 
+_Please also take a look at the Asynchronous code guide - we are in the process of modernizing the Promises, along with supporting async/await_
+
 ## Usage
 
 This example shows how to use a `HTTP` request from `opal-jquery` from a callback style, into a promise style handler.
