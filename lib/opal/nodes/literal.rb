@@ -8,7 +8,11 @@ module Opal
       handle :true, :false, :self, :nil
 
       def compile
-        push type.to_s
+        if type == :self
+          push scope.self
+        else
+          push type.to_s
+        end
       end
 
       def self.truthy_optimize?

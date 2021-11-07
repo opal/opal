@@ -371,6 +371,12 @@ module Opal
         [prev, curr]
       end
 
+      # Returns 'self', but also ensures that the self variable is set
+      def self
+        @define_self = true
+        'self'
+      end
+
       attr_accessor :await_encountered
     end
   end

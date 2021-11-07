@@ -107,7 +107,7 @@ module Opal
           recv_tmp = scope.new_temp
           push "(#{recv_tmp} = ", recv_code, ", #{recv_tmp}) && "
         else
-          recv_tmp = 'self'
+          recv_tmp = scope.self
         end
 
         recv_value_tmp = scope.new_temp
@@ -139,7 +139,7 @@ module Opal
         # we can't tell if it was the user that put nil and made the ivar #defined?
         # or not.
         tmp = scope.new_temp
-        push "(#{tmp} = self['#{name}'], #{tmp} != null && #{tmp} !== nil)"
+        push "(#{tmp} = #{scope.self}['#{name}'], #{tmp} != null && #{tmp} !== nil)"
 
         tmp
       end

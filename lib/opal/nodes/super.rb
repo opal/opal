@@ -70,14 +70,14 @@ module Opal
 
       def super_method_invocation
         helper :find_super
-        "$find_super(self, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, #{allow_stubs})"
+        "$find_super(#{scope.self}, '#{method_id}', #{def_scope_identity}, #{defined_check_param}, #{allow_stubs})"
       end
 
       def super_block_invocation
         helper :find_block_super
         chain, cur_defn, mid = scope.super_chain
         trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
-        "$find_block_super(self, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
+        "$find_block_super(#{scope.self}, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
       end
 
       def compile_method_body

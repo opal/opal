@@ -70,7 +70,7 @@ module Opal
       def compile
         name = property(var_name)
         add_ivar name
-        push "self#{name}"
+        push "#{scope.self}#{name}"
       end
     end
 
@@ -85,7 +85,7 @@ module Opal
 
       def compile
         name = property(var_name)
-        push "self#{name} = "
+        push "#{scope.self}#{name} = "
         push expr(value)
 
         wrap '(', ')' if (recv? || expr?) && value

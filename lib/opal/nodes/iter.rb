@@ -19,13 +19,15 @@ module Opal
 
         in_scope do
           identity = scope.identify!
-          add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s"
 
           inline_params = process(inline_args)
 
           compile_arity_check
 
           body_code = stmt(returned_body)
+
+          add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s" if @define_self
+
           to_vars = scope.to_vars
 
           line body_code
@@ -44,7 +46,8 @@ module Opal
         else
           unshift "(#{identity} = function(", inline_params, '){'
         end
-        push "}, #{identity}.$$s = self,"
+        push '},'
+        push " #{identity}.$$s = #{scope.self}," if @define_self
         push " #{identity}.$$brk = $brk," if contains_break?
         push " #{identity}.$$arity = #{arity},"
 

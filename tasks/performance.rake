@@ -74,7 +74,7 @@ performance_stat = ->(name) {
   stat[:compiler_time] = mean_time.(tries: 7) { sh(ASCIIDOCTOR_BUILD_OPAL) }
 
   puts "\n* Running AsciiDoctor with #{name}..."
-  stat[:run_time] = mean_time.(tries: 31) { sh("#{ASCIIDOCTOR_RUN_OPAL} > tmp/performance/opal_result_#{name}.html") }
+  stat[:run_time] = mean_time.(tries: 63) { sh("#{ASCIIDOCTOR_RUN_OPAL} > tmp/performance/opal_result_#{name}.html") }
   stat[:correct] = File.read("tmp/performance/opal_result_#{name}.html") == File.read("tmp/performance/ruby_result.html")
   stat[:size] = File.size("tmp/performance/asciidoctor_test.js")
 

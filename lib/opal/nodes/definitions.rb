@@ -11,7 +11,7 @@ module Opal
 
       def compile
         children.each do |child|
-          line "Opal.udef(self, '$' + ", expr(child), ');'
+          line "Opal.udef(#{scope.self}, '$' + ", expr(child), ');'
         end
       end
     end
@@ -31,7 +31,7 @@ module Opal
           push '$alias_gvar(', new_name_str, ', ', old_name_str, ')'
         when :dsym, :sym # This is a method alias: alias a b
           helper :alias
-          push '$alias(self, ', expr(new_name), ', ', expr(old_name), ')'
+          push "$alias(#{scope.self}, ", expr(new_name), ', ', expr(old_name), ')'
         else # Nothing else is available, but just in case, drop an error
           error "Opal doesn't know yet how to alias with #{new_name.type}"
         end
@@ -60,6 +60,8 @@ module Opal
             wrap '(function() {', '})()'
           end
         end
+
+        scope.self if @define_self
       end
 
       def returned_children

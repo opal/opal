@@ -281,7 +281,7 @@ module Opal
           dir = File.dirname(file)
           compiler.requires << Pathname(dir).join(arg.children[0]).cleanpath.to_s
         end
-        push fragment("self.$require(#{file.inspect}+ '/../' + ")
+        push fragment("#{scope.self}.$require(#{file.inspect}+ '/../' + ")
         push process(arglist)
         push fragment(')')
       end
@@ -351,9 +351,9 @@ module Opal
       def using_refinement(arg)
         prev, curr = *scope.refinements_temp
         if prev
-          push "(#{curr} = #{prev}.slice(), #{curr}.push(", expr(arg), '), self)'
+          push "(#{curr} = #{prev}.slice(), #{curr}.push(", expr(arg), "), #{scope.self})"
         else
-          push "(#{curr} = [", expr(arg), '], self)'
+          push "(#{curr} = [", expr(arg), "], #{scope.self})"
         end
       end
 
@@ -396,7 +396,7 @@ module Opal
         push ", typeof Opal.compile === 'function' ? eval(Opal.compile(#{temp}"
         push ', {scope_variables: ', scope_variables
         push ", arity_check: #{compiler.arity_check?}, file: '(eval)', eval: true})) : "
-        push "self.$eval(#{temp}))"
+        push "#{scope.self}.$eval(#{temp}))"
       end
 
       add_special :binding do |compile_default|
@@ -412,7 +412,7 @@ module Opal
         push "    }"
         push "  },"
         push "  ", scope.scope_locals.map(&:to_s).inspect, ","
-        push "  self,"
+        push "  ", scope.self, ","
         push "  ", source_location
         push ")"
       end
