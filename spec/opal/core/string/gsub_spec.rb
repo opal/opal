@@ -23,6 +23,14 @@ describe 'String' do
       expect("test".gsub(/$/, '2')).to eq "test2"
       expect("test".gsub(/\b/, '2')).to eq "2test2"
     end
+
+    it "doesn't override $~ when it's inspected" do
+      'a:b'.gsub(/([a-z]):([a-z])/) do
+        $~.inspect
+        target, content = $1, $2
+        expect([target, content]).to eq(['a', 'b'])
+      end
+    end
   end
 
   describe '#sub' do

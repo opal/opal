@@ -245,16 +245,16 @@ class Regexp < `RegExp`
   end
 
   def names
-    source.scan(/\(?<(\w+)>/).map(&:first).uniq
+    source.scan(/\(?<(\w+)>/, no_matchdata: true).map(&:first).uniq
   end
 
   def named_captures
-    source.scan(/\(?<(\w+)>/)        # Scan for capture groups
-          .map(&:first)              # Get the first regexp match (\w+)
-          .each_with_index           # Add index to an iterator
-          .group_by(&:first)         # Group by the capture group names
-          .transform_values do |i|   # Convert hash values
-            i.map { |j| j.last + 1 } # Drop the capture group names; increase indexes by 1
+    source.scan(/\(?<(\w+)>/, no_matchdata: true) # Scan for capture groups
+          .map(&:first)                           # Get the first regexp match (\w+)
+          .each_with_index                        # Add index to an iterator
+          .group_by(&:first)                      # Group by the capture group names
+          .transform_values do |i|                # Convert hash values
+            i.map { |j| j.last + 1 }              # Drop the capture group names; increase indexes by 1
           end
   end
 
