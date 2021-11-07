@@ -425,8 +425,8 @@ class String < `String`
     `self.$$cast(self.toLowerCase())`
   end
 
-  def each_line(separator = $/, &block)
-    return enum_for :each_line, separator unless block_given?
+  def each_line(separator = $/, chomp: false, &block)
+    return enum_for :each_line, separator, chomp: chomp unless block_given?
 
     %x{
       if (separator === nil) {
@@ -435,15 +435,18 @@ class String < `String`
         return self;
       }
 
-      separator = $coerce_to(separator, #{String}, 'to_str')
+      separator = $coerce_to(separator, #{String}, 'to_str');
 
-      var a, i, n, length, chomped, trailing, splitted;
+      var a, i, n, length, chomped, trailing, splitted, value;
 
       if (separator.length === 0) {
-        for (a = self.split(/(\n{2,})/), i = 0, n = a.length; i < n; i += 2) {
+        for (a = self.split(/((?:\r?\n){2})(?:(?:\r?\n)*)/), i = 0, n = a.length; i < n; i += 2) {
           if (a[i] || a[i + 1]) {
-            var value = (a[i] || "") + (a[i + 1] || "");
-            Opal.yield1(block, self.$$cast(value));
+            value = (a[i] || "") + (a[i + 1] || "");
+            if (chomp) {
+              value = #{`value`.chomp("\n")};
+            }
+            Opal.yield1(block, value);
           }
         }
 
@@ -455,12 +458,14 @@ class String < `String`
       splitted = chomped.split(separator);
 
       for (i = 0, length = splitted.length; i < length; i++) {
+        value = splitted[i];
         if (i < length - 1 || trailing) {
-          Opal.yield1(block, self.$$cast(splitted[i] + separator));
+          value += separator;
         }
-        else {
-          Opal.yield1(block, self.$$cast(splitted[i]));
+        if (chomp) {
+          value = #{`value`.chomp(separator)};
         }
+        Opal.yield1(block, value);
       }
     }
 
@@ -660,8 +665,8 @@ class String < `String`
     `self.toString()`
   end
 
-  def lines(separator = $/, &block)
-    e = each_line(separator, &block)
+  def lines(separator = $/, chomp: false, &block)
+    e = each_line(separator, chomp: chomp, &block)
     block ? self : e.to_a
   end
 
