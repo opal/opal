@@ -9,11 +9,12 @@ module Opal
       children :recvr, :mid, :inline_args, :stmts
 
       def wrap_with_definition
-        unshift 'Opal.defs(', expr(recvr), ", '$#{mid}', "
+        helper :defs
+        unshift '$defs(', expr(recvr), ", '$#{mid}', "
         push ')'
 
         if expr?
-          wrap '', " && '#{mid}'"
+          wrap '(', ", '#{mid}')"
         end
       end
     end
