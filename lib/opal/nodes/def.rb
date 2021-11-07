@@ -29,7 +29,7 @@ module Opal
 
           compile_block_arg
 
-          add_temp 'self = this'
+          add_temp 'self = this' if @define_self
 
           compile_arity_check
 
@@ -81,7 +81,7 @@ module Opal
       end
 
       def wrap_with_definition
-        wrap "Opal.def(self, '$#{mid}', ", ')'
+        wrap "Opal.def(#{scope.self}, '$#{mid}', ", ')'
 
         if expr?
           wrap '(', ", nil) && '#{mid}'"

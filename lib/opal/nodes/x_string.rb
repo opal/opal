@@ -37,6 +37,7 @@ module Opal
         case child.type
         when :str
           value = child.loc.expression.source
+          scope.self if value.include? 'self'
           push Fragment.new(value, scope, child)
         when :begin, :gvar, :ivar, :nil
           push expr(child)
@@ -80,6 +81,8 @@ module Opal
       # Will drop the trailing semicolon if all conditions are met
       def extract_last_value(last_child)
         last_value = last_child.loc.expression.source.rstrip
+
+        scope.self if last_value.include? 'self'
 
         if (@returning || expr?) && last_value.end_with?(';')
           compiler.warning(
