@@ -13,7 +13,7 @@ module Opal
         push ')'
 
         if expr?
-          wrap '(', ", nil) && '#{mid}'"
+          wrap '', " && '#{mid}'"
         end
       end
     end
