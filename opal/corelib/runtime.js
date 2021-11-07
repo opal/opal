@@ -1763,7 +1763,7 @@
   Opal.extract_kwargs = function(parameters) {
     var kwargs = parameters[parameters.length - 1];
     if (kwargs != null && Opal.respond_to(kwargs, '$to_hash', true)) {
-      $splice.call(parameters, parameters.length - 1, 1);
+      $splice.call(parameters, parameters.length - 1);
       return kwargs.$to_hash();
     }
     else {
@@ -2753,7 +2753,7 @@
 
   // Foward calls to define_method on the top object to Object
   function top_define_method() {
-    var args = Opal.slice.call(arguments, 0, arguments.length);
+    var args = Opal.slice.call(arguments);
     var block = top_define_method.$$p;
     top_define_method.$$p = null;
     return Opal.send(_Object, 'define_method', args, block)
