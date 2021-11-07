@@ -84,7 +84,7 @@ module Opal
         wrap "Opal.def(#{scope.self}, '$#{mid}', ", ')'
 
         if expr?
-          wrap '(', ", nil) && '#{mid}'"
+          wrap '(', ", '#{mid}')"
         else
           unshift "\n#{current_indent}"
         end
