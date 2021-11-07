@@ -81,7 +81,8 @@ module Opal
       end
 
       def wrap_with_definition
-        wrap "Opal.def(#{scope.self}, '$#{mid}', ", ')'
+        helper :def
+        wrap "$def(#{scope.self}, '$#{mid}', ", ')'
 
         if expr?
           wrap '(', ", '#{mid}')"
