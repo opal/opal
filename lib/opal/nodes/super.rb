@@ -153,7 +153,7 @@ module Opal
         unless iter.type == :iter
           # Need to support passing block up even if it's not referenced in this method at all
           scope.uses_block!
-          @iter = s(:js_tmp, '$iter')
+          @iter = s(:js_tmp, scope.block_name || '$yield')
         end
       end
 
