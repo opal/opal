@@ -244,7 +244,7 @@
         throw e;
       }
       cref.$$autoload[name].required = true;
-      if (cref.$$const[name]) {
+      if (cref.$$const[name] != null) {
         cref.$$autoload[name].success = true;
         return cref.$$const[name];
       }
@@ -268,7 +268,7 @@
   // Get the constant in the scope of the current cref
   function const_get_name(cref, name) {
     if (cref) {
-      if (cref.$$const[name]) { return cref.$$const[name]; }
+      if (cref.$$const[name] != null) { return cref.$$const[name]; }
       if (cref.$$autoload && cref.$$autoload[name]) {
         return handle_autoload(cref, name);
       }
