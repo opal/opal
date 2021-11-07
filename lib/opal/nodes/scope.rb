@@ -377,6 +377,18 @@ module Opal
         'self'
       end
 
+      def prepare_block(block_name = nil)
+        scope_name = scope.identity
+        self.block_name = block_name if block_name
+
+        add_temp "#{self.block_name} = #{scope_name}.$$p || nil"
+
+        unless @block_prepared
+          line "if (#{self.block_name}) #{scope_name}.$$p = null;"
+          @block_prepared = true
+        end
+      end
+
       attr_accessor :await_encountered
     end
   end
