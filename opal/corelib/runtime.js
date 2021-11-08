@@ -355,6 +355,13 @@
   Opal.const_get_qualified = function(cref, name, skip_missing) {
     var result, cache, cached, current_version = Opal.const_cache_version;
 
+    if (name == null) {
+      result = const_get_name(_Object, cref);
+
+      if (result != null) return result;
+      return Opal.const_get_qualified(_Object, cref, skip_missing);
+    }
+
     if (cref == null) return;
 
     if (cref === '::') cref = _Object;
@@ -1865,7 +1872,7 @@
     }
 
     apply_blockopts(block, blockopts);
-  
+
     if (typeof block === 'function') body.$$p = block;
     return body.apply(recv, args);
   };
@@ -1910,7 +1917,7 @@
 
   Opal.lambda = function(block, blockopts) {
     block.$$is_lambda = true;
-    
+
     apply_blockopts(block, blockopts);
 
     return block;
