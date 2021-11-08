@@ -17,7 +17,7 @@ class BasicObject
       if (self.$$id != null) {
         return self.$$id;
       }
-      Opal.defineProperty(self, '$$id', Opal.uid());
+      Opal.prop(self, '$$id', Opal.uid());
       return self.$$id;
     }
   end

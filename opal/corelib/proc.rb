@@ -1,8 +1,8 @@
 # helpers: slice
 
 class Proc < `Function`
-  `Opal.defineProperty(self.$$prototype, '$$is_proc', true)`
-  `Opal.defineProperty(self.$$prototype, '$$is_lambda', false)`
+  `Opal.prop(self.$$prototype, '$$is_proc', true)`
+  `Opal.prop(self.$$prototype, '$$is_lambda', false)`
 
   def self.new(&block)
     unless block

@@ -304,9 +304,9 @@ Encoding.register 'US-ASCII', aliases: ['ASCII'], ascii: true, inherits: Encodin
 class String
   attr_reader :encoding
   attr_reader :internal_encoding
-  `Opal.defineProperty(String.prototype, 'bytes', nil)`
-  `Opal.defineProperty(String.prototype, 'encoding', #{Encoding::UTF_8})`
-  `Opal.defineProperty(String.prototype, 'internal_encoding', #{Encoding::UTF_8})`
+  `Opal.prop(String.prototype, 'bytes', nil)`
+  `Opal.prop(String.prototype, 'encoding', #{Encoding::UTF_8})`
+  `Opal.prop(String.prototype, 'internal_encoding', #{Encoding::UTF_8})`
 
   def b
     dup.force_encoding('binary')
