@@ -42,17 +42,19 @@ module Opal
         unshift to_vars
 
         if await_encountered
-          unshift "(#{identity} = async function(", inline_params, '){'
+          unshift "async function #{identity}(", inline_params, '){'
         else
-          unshift "(#{identity} = function(", inline_params, '){'
+          unshift "function #{identity}(", inline_params, '){'
         end
-        push '},'
-        push " #{identity}.$$s = #{scope.self}," if @define_self
-        push " #{identity}.$$brk = $brk," if contains_break?
-        push " #{identity}.$$arity = #{arity},"
+        push '}'
+
+        blockopts = []
+        blockopts << "$$s: #{scope.self}" if @define_self
+        blockopts << "$$brk: $brk" if contains_break?
+        blockopts << "$$arity: #{arity}"
 
         if compiler.arity_check?
-          push " #{identity}.$$parameters = #{parameters_code},"
+          blockopts << "$$parameters: #{parameters_code}"
         end
 
         # MRI expands a passed argument if the block:
@@ -64,14 +66,16 @@ module Opal
         # This flag on the method indicates that a block has a top level mlhs argument
         # which means that we have to expand passed array explicitly in runtime.
         if has_top_level_mlhs_arg?
-          push " #{identity}.$$has_top_level_mlhs_arg = true,"
+          blockopts << "$$has_top_level_mlhs_arg: true"
         end
 
         if has_trailing_comma_in_args?
-          push " #{identity}.$$has_trailing_comma_in_args = true,"
+          blockopts << "$$has_trailing_comma_in_args: true"
         end
 
-        push " #{identity})"
+        unless blockopts.empty?
+          push ', {', blockopts.join(', '), '}'
+        end
       end
 
       def compile_block_arg

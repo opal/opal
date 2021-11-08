@@ -56,25 +56,30 @@ module Opal
 
         unshift ') {'
         unshift(inline_params)
-        unshift "function#{function_name}("
+        unshift "function #{scope_name}("
         if await_encountered
           unshift "async "
         end
-        unshift "#{scope_name} = " if scope_name
         line '}'
 
-        push ", #{scope_name}.$$arity = #{arity}"
+        blockopts = []
+
+        blockopts << "$$arity: #{arity}"
 
         if compiler.arity_check?
-          push ", #{scope_name}.$$parameters = #{parameters_code}"
+          blockopts << "$$parameters: #{parameters_code}"
         end
 
         if compiler.parse_comments?
-          push ", #{scope_name}.$$comments = #{comments_code}"
+          blockopts << "$$comments: #{comments_code}"
         end
 
         if compiler.enable_source_location?
-          push ", #{scope_name}.$$source_location = #{source_location}"
+          blockopts << "$$source_location: #{source_location}"
+        end
+
+        unless blockopts.empty?
+          push ', {', blockopts.join(', '), '}'
         end
 
         wrap_with_definition
