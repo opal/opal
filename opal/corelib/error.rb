@@ -120,8 +120,8 @@ class Exception < `Error`
   end
 
   def full_message(highlight: $stderr.tty?, order: :top)
-    raise ArgumentError, "expected true or false as highlight: #{highlight}" unless [true, false].include? highlight
-    raise ArgumentError, "expected :top or :bottom as order: #{order}" unless %i[top bottom].include? order
+    ::Kernel.raise ::ArgumentError, "expected true or false as highlight: #{highlight}" unless [true, false].include? highlight
+    ::Kernel.raise ::ArgumentError, "expected :top or :bottom as order: #{order}" unless %i[top bottom].include? order
 
     if highlight
       bold_underline = "\e[1;4m"
@@ -178,7 +178,7 @@ class Exception < `Error`
         }
 
         if (valid === false) {
-          #{raise TypeError, 'backtrace must be Array of String'}
+          #{::Kernel.raise ::TypeError, 'backtrace must be Array of String'}
         }
 
         self.backtrace = backtrace;
@@ -283,11 +283,11 @@ class KeyError
   end
 
   def receiver
-    @receiver || raise(ArgumentError, 'no receiver is available')
+    @receiver || ::Kernel.raise(::ArgumentError, 'no receiver is available')
   end
 
   def key
-    @key || raise(ArgumentError, 'no key is available')
+    @key || ::Kernel.raise(::ArgumentError, 'no key is available')
   end
 end
 

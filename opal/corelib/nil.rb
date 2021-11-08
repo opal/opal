@@ -3,7 +3,7 @@ class NilClass
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{name}"
+      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
     end
 
     undef :new
@@ -72,7 +72,7 @@ class NilClass
   end
 
   def rationalize(*args)
-    raise ArgumentError if args.length > 1
+    ::Kernel.raise ::ArgumentError if args.length > 1
     Rational(0, 1)
   end
 

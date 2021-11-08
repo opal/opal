@@ -10,7 +10,7 @@ $/ = "\n"
 $, = nil
 
 ARGV = []
-ARGF = Object.new
+ARGF = ::Object.new
 ENV  = {}
 
 $VERBOSE = false

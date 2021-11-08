@@ -54,6 +54,12 @@
   // The actual Class class
   var Class;
 
+  // The Opal.Opal class (helpers etc.)
+  var _Opal;
+
+  // The Kernel module
+  var Kernel;
+
   // The Opal object that is exposed globally
   var Opal = global_object.Opal = {};
 
@@ -2739,6 +2745,8 @@
   Opal.Object      = _Object     = Opal.allocate_class('Object', Opal.BasicObject, $Object);
   Opal.Module      = Module      = Opal.allocate_class('Module', Opal.Object, $Module);
   Opal.Class       = Class       = Opal.allocate_class('Class', Opal.Module, $Class);
+  Opal.Opal        = _Opal       = Opal.allocate_module('Opal');
+  Opal.Kernel      = Kernel      = Opal.allocate_module('Kernel');
 
   $set_proto(Opal.BasicObject, Opal.Class.$$prototype);
   $set_proto(Opal.Object, Opal.Class.$$prototype);
@@ -2753,12 +2761,16 @@
   Opal.const_set(_Object, "Object",       _Object);
   Opal.const_set(_Object, "Module",       Module);
   Opal.const_set(_Object, "Class",        Class);
+  Opal.const_set(_Object, "Opal",         _Opal);
+  Opal.const_set(_Object, "Kernel",       Kernel);
 
   // Fix booted classes to have correct .class value
   BasicObject.$$class = Class;
   _Object.$$class     = Class;
   Module.$$class      = Class;
   Class.$$class       = Class;
+  _Opal.$$class       = Module;
+  Kernel.$$class      = Module;
 
   // Forward .toString() to #to_s
   $prop(_Object.$$prototype, 'toString', function() {

@@ -63,9 +63,9 @@ class File < IO
       sep_chars = `$sep_chars()`
       if `path[0] === '~' || (basedir && basedir[0] === '~')`
         home = Dir.home
-        raise(ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
+        ::Kernel.raise(::ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
         leading_sep = `windows_root_rx.test(home) ? '' : #{home.sub(/^([#{sep_chars}]+).*$/, '\1')}`
-        raise(ArgumentError, 'non-absolute home') unless home.start_with?(leading_sep)
+        ::Kernel.raise(::ArgumentError, 'non-absolute home') unless home.start_with?(leading_sep)
 
         home            += sep
         home_path_regexp = /^\~(?:#{sep}|$)/
@@ -83,7 +83,7 @@ class File < IO
           path = path.$to_path();
         }
 
-        path = #{Opal.coerce_to!(`path`, String, :to_str)};
+        path = #{::Opal.coerce_to!(`path`, ::String, :to_str)};
 
         return path;
       }
@@ -125,7 +125,7 @@ class File < IO
         }
 
         if (suffix !== nil) {
-          suffix = #{Opal.coerce_to!(suffix, String, :to_str)}
+          suffix = #{::Opal.coerce_to!(suffix, ::String, :to_str)}
         } else {
           suffix = null;
         }

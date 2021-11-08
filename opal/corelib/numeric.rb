@@ -8,7 +8,7 @@ class Numeric
       return [other, self]
     end
 
-    [Float(other), Float(self)]
+    [::Kernel.Float(other), ::Kernel.Float(self)]
   end
 
   def __coerced__(method, other)
@@ -18,9 +18,9 @@ class Numeric
     else
       case method
       when :+, :-, :*, :/, :%, :&, :|, :^, :**
-        raise TypeError, "#{other.class} can't be coerced into Numeric"
+        ::Kernel.raise ::TypeError, "#{other.class} can't be coerced into Numeric"
       when :>, :>=, :<, :<=, :<=>
-        raise ArgumentError, "comparison of #{self.class} with #{other.class} failed"
+        ::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{other.class} failed"
       end
     end
   end
@@ -54,7 +54,7 @@ class Numeric
   end
 
   def angle
-    self < 0 ? Math::PI : 0
+    self < 0 ? ::Math::PI : 0
   end
 
   alias arg angle
@@ -74,7 +74,7 @@ class Numeric
   end
 
   def div(other)
-    raise ZeroDivisionError, 'divided by o' if other == 0
+    ::Kernel.raise ::ZeroDivisionError, 'divided by o' if other == 0
 
     (self / other).floor
   end
@@ -92,7 +92,7 @@ class Numeric
   end
 
   def i
-    Complex(0, self)
+    ::Kernel.Complex(0, self)
   end
 
   def imag
@@ -124,7 +124,7 @@ class Numeric
   end
 
   def quo(other)
-    Opal.coerce_to!(self, Rational, :to_r) / other
+    ::Opal.coerce_to!(self, ::Rational, :to_r) / other
   end
 
   def real
@@ -148,11 +148,11 @@ class Numeric
   def step(limit = undefined, step = undefined, to: undefined, by: undefined, &block)
     %x{
       if (limit !== undefined && to !== undefined) {
-        #{raise ArgumentError, 'to is given twice'}
+        #{::Kernel.raise ::ArgumentError, 'to is given twice'}
       }
 
       if (step !== undefined && by !== undefined) {
-        #{raise ArgumentError, 'step is given twice'}
+        #{::Kernel.raise ::ArgumentError, 'step is given twice'}
       }
 
       if (to !== undefined) {
@@ -169,11 +169,11 @@ class Numeric
 
       function validateParameters() {
         if (step === nil) {
-          #{raise TypeError, 'step must be numeric'}
+          #{::Kernel.raise ::TypeError, 'step must be numeric'}
         }
 
         if (step != null && #{step == 0}) {
-          #{raise ArgumentError, "step can't be 0"}
+          #{::Kernel.raise ::ArgumentError, "step can't be 0"}
         }
 
         if (step === nil || step == null) {
@@ -183,14 +183,14 @@ class Numeric
         var sign = #{step <=> 0};
 
         if (sign === nil) {
-          #{raise ArgumentError, "0 can't be coerced into #{step.class}"}
+          #{::Kernel.raise ::ArgumentError, "0 can't be coerced into #{step.class}"}
         }
 
         if (limit === nil || limit == null) {
-          limit = sign > 0 ? #{Float::INFINITY} : #{-Float::INFINITY};
+          limit = sign > 0 ? #{::Float::INFINITY} : #{-::Float::INFINITY};
         }
 
-        #{Opal.compare(self, limit)}
+        #{::Opal.compare(self, limit)}
       }
 
       function stepFloatSize() {
@@ -302,7 +302,7 @@ class Numeric
   end
 
   def to_c
-    Complex(self, 0)
+    ::Kernel.Complex(self, 0)
   end
 
   def to_int

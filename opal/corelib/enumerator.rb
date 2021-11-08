@@ -28,7 +28,7 @@ class Enumerator
       @size   = `arguments[0] || nil`
 
       if @size && !@size.respond_to?(:call)
-        @size = `$coerce_to(#{@size}, #{Integer}, 'to_int')`
+        @size = `$coerce_to(#{@size}, #{::Integer}, 'to_int')`
       end
     else
       @object = `arguments[0]`
@@ -54,7 +54,7 @@ class Enumerator
 
   def with_index(offset = 0, &block)
     offset = if offset
-               `$coerce_to(offset, #{Integer}, 'to_int')`
+               `$coerce_to(offset, #{::Integer}, 'to_int')`
              else
                0
              end
@@ -100,7 +100,7 @@ class Enumerator
     include Enumerable
 
     def initialize(&block)
-      raise LocalJumpError, 'no block given' unless block
+      ::Kernel.raise ::LocalJumpError, 'no block given' unless block
 
       @block = block
     end
@@ -157,7 +157,7 @@ class Enumerator
 
     def initialize(object, size = nil, &block)
       unless block_given?
-        raise ArgumentError, 'tried to call lazy new without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy new without a block'
       end
 
       @enumerator = object
@@ -170,7 +170,7 @@ class Enumerator
             Opal.yieldX(block, args);
           }
         end
-      rescue Exception
+      rescue ::Exception
         nil
       end
     end
@@ -183,7 +183,7 @@ class Enumerator
 
     def collect(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy map without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy map without a block'
       end
 
       Lazy.new(self, enumerator_size) do |enum, *args|
@@ -197,7 +197,7 @@ class Enumerator
 
     def collect_concat(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy map without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy map without a block'
       end
 
       Lazy.new(self, nil) do |enum, *args|
@@ -208,7 +208,7 @@ class Enumerator
             #{`value`.each { |v| enum.yield v }}
           }
           else {
-            var array = #{Opal.try_convert `value`, Array, :to_ary};
+            var array = #{::Opal.try_convert `value`, ::Array, :to_ary};
 
             if (array === nil) {
               #{enum.yield `value`};
@@ -222,14 +222,14 @@ class Enumerator
     end
 
     def drop(n)
-      n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
+      n = `$coerce_to(#{n}, #{::Integer}, 'to_int')`
 
       if n < 0
-        raise ArgumentError, 'attempt to drop negative size'
+        ::Kernel.raise ::ArgumentError, 'attempt to drop negative size'
       end
 
       current_size = enumerator_size
-      set_size     = if Integer === current_size
+      set_size     = if ::Integer === current_size
                        n < current_size ? n : current_size
                      else
                        current_size
@@ -247,7 +247,7 @@ class Enumerator
 
     def drop_while(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy drop_while without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy drop_while without a block'
       end
 
       succeeding = true
@@ -276,7 +276,7 @@ class Enumerator
 
     def find_all(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy select without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy select without a block'
       end
 
       Lazy.new(self, nil) do |enum, *args|
@@ -326,7 +326,7 @@ class Enumerator
 
     def reject(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy reject without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy reject without a block'
       end
 
       Lazy.new(self, nil) do |enum, *args|
@@ -341,14 +341,14 @@ class Enumerator
     end
 
     def take(n)
-      n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
+      n = `$coerce_to(#{n}, #{::Integer}, 'to_int')`
 
       if n < 0
-        raise ArgumentError, 'attempt to take negative size'
+        ::Kernel.raise ::ArgumentError, 'attempt to take negative size'
       end
 
       current_size = enumerator_size
-      set_size     = if Integer === current_size
+      set_size     = if ::Integer === current_size
                        n < current_size ? n : current_size
                      else
                        current_size
@@ -360,14 +360,14 @@ class Enumerator
           enum.yield(*args)
           taken += 1
         else
-          raise StopLazyError
+          ::Kernel.raise StopLazyError
         end
       end
     end
 
     def take_while(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy take_while without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy take_while without a block'
       end
 
       Lazy.new(self, nil) do |enum, *args|
@@ -378,7 +378,7 @@ class Enumerator
             #{enum.yield(*args)};
           }
           else {
-            #{raise StopLazyError};
+            #{::Kernel.raise StopLazyError};
           }
         }
       end

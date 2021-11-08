@@ -2,7 +2,7 @@
 
 module Kernel
   def method_missing(symbol, *args, &block)
-    raise NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args), nil, caller(1)
+    ::Kernel.raise ::NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args), nil, caller(1)
   end
 
   def =~(obj)
@@ -37,10 +37,10 @@ module Kernel
       var meth = self['$' + name];
 
       if (!meth || meth.$$stub) {
-        #{raise NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
+        #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
       }
 
-      return #{Method.new(self, `meth.$$owner || #{self.class}`, `meth`, name)};
+      return #{::Method.new(self, `meth.$$owner || #{self.class}`, `meth`, name)};
     }
   end
 
@@ -76,10 +76,10 @@ module Kernel
         return object;
       }
 
-      coerced = #{Opal.coerce_to?(object, Array, :to_ary)};
+      coerced = #{::Opal.coerce_to?(object, ::Array, :to_ary)};
       if (coerced !== nil) { return coerced; }
 
-      coerced = #{Opal.coerce_to?(object, Array, :to_a)};
+      coerced = #{::Opal.coerce_to?(object, ::Array, :to_a)};
       if (coerced !== nil) { return coerced; }
 
       return [object];
@@ -210,7 +210,7 @@ module Kernel
       if (status.$$is_boolean) {
         status = status ? 0 : 1;
       } else {
-        status = $coerce_to(status, #{Integer}, 'to_int')
+        status = $coerce_to(status, #{::Integer}, 'to_int')
       }
 
       Opal.exit(status);
@@ -226,7 +226,7 @@ module Kernel
         var mod = mods[i];
 
         if (!mod.$$is_module) {
-          #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+          #{::Kernel.raise ::TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
 
         #{`mod`.append_features `singleton`};
@@ -262,7 +262,7 @@ module Kernel
   def instance_of?(klass)
     %x{
       if (!klass.$$is_class && !klass.$$is_module) {
-        #{raise TypeError, 'class or module required'};
+        #{::Kernel.raise ::TypeError, 'class or module required'};
       }
 
       return self.$$class === klass;
@@ -270,13 +270,13 @@ module Kernel
   end
 
   def instance_variable_defined?(name)
-    name = Opal.instance_variable_name!(name)
+    name = ::Opal.instance_variable_name!(name)
 
     `Opal.hasOwnProperty.call(self, name.substr(1))`
   end
 
   def instance_variable_get(name)
-    name = Opal.instance_variable_name!(name)
+    name = ::Opal.instance_variable_name!(name)
 
     %x{
       var ivar = self[Opal.ivar(name.substr(1))];
@@ -286,13 +286,13 @@ module Kernel
   end
 
   def instance_variable_set(name, value)
-    name = Opal.instance_variable_name!(name)
+    name = ::Opal.instance_variable_name!(name)
 
     `self[Opal.ivar(name.substr(1))] = value`
   end
 
   def remove_instance_variable(name)
-    name = Opal.instance_variable_name!(name)
+    name = ::Opal.instance_variable_name!(name)
 
     %x{
       var key = Opal.ivar(name.substr(1)),
@@ -304,7 +304,7 @@ module Kernel
       }
     }
 
-    raise NameError, "instance variable #{name} not defined"
+    ::Kernel.raise ::NameError, "instance variable #{name} not defined"
   end
 
   def instance_variables
@@ -332,14 +332,14 @@ module Kernel
 
       if (!value.$$is_string) {
         if (base !== undefined) {
-          #{raise ArgumentError, 'base specified for non string value'}
+          #{::Kernel.raise ::ArgumentError, 'base specified for non string value'}
         }
         if (value === nil) {
-          #{raise TypeError, "can't convert nil into Integer"}
+          #{::Kernel.raise ::TypeError, "can't convert nil into Integer"}
         }
         if (value.$$is_number) {
           if (value === Infinity || value === -Infinity || isNaN(value)) {
-            #{raise FloatDomainError, value}
+            #{::Kernel.raise ::FloatDomainError, value}
           }
           return Math.floor(value);
         }
@@ -349,7 +349,7 @@ module Kernel
             return i;
           }
         }
-        return #{Opal.coerce_to!(value, Integer, :to_i)};
+        return #{::Opal.coerce_to!(value, ::Integer, :to_i)};
       }
 
       if (value === "0") {
@@ -359,9 +359,9 @@ module Kernel
       if (base === undefined) {
         base = 0;
       } else {
-        base = $coerce_to(base, #{Integer}, 'to_int');
+        base = $coerce_to(base, #{::Integer}, 'to_int');
         if (base === 1 || base < 0 || base > 36) {
-          #{raise ArgumentError, "invalid radix #{base}"}
+          #{::Kernel.raise ::ArgumentError, "invalid radix #{base}"}
         }
       }
 
@@ -397,7 +397,7 @@ module Kernel
           }
           // no-break
         }
-        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
+        #{::Kernel.raise ::ArgumentError, "invalid value for Integer(): \"#{value}\""}
       });
 
       base = (base === 0 ? 10 : base);
@@ -405,13 +405,13 @@ module Kernel
       base_digits = '0-' + (base <= 10 ? base - 1 : '9a-' + String.fromCharCode(97 + (base - 11)));
 
       if (!(new RegExp('^\\s*[+-]?[' + base_digits + ']+\\s*$')).test(str)) {
-        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
+        #{::Kernel.raise ::ArgumentError, "invalid value for Integer(): \"#{value}\""}
       }
 
       i = parseInt(str, base);
 
       if (isNaN(i)) {
-        #{raise ArgumentError, "invalid value for Integer(): \"#{value}\""}
+        #{::Kernel.raise ::ArgumentError, "invalid value for Integer(): \"#{value}\""}
       }
 
       return i;
@@ -423,7 +423,7 @@ module Kernel
       var str;
 
       if (value === nil) {
-        #{raise TypeError, "can't convert nil into Float"}
+        #{::Kernel.raise ::TypeError, "can't convert nil into Float"}
       }
 
       if (value.$$is_string) {
@@ -433,30 +433,30 @@ module Kernel
 
         //Special case for hex strings only:
         if (/^\s*[-+]?0[xX][0-9a-fA-F]+\s*$/.test(str)) {
-          return #{Integer(`str`)};
+          return #{::Kernel.Integer(`str`)};
         }
 
         if (!/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/.test(str)) {
-          #{raise ArgumentError, "invalid value for Float(): \"#{value}\""}
+          #{::Kernel.raise ::ArgumentError, "invalid value for Float(): \"#{value}\""}
         }
 
         return parseFloat(str);
       }
 
-      return #{Opal.coerce_to!(value, Float, :to_f)};
+      return #{::Opal.coerce_to!(value, ::Float, :to_f)};
     }
   end
 
   def Hash(arg)
     return {} if arg.nil? || arg == []
-    return arg if Hash === arg
-    Opal.coerce_to!(arg, Hash, :to_hash)
+    return arg if ::Hash === arg
+    ::Opal.coerce_to!(arg, ::Hash, :to_hash)
   end
 
   def is_a?(klass)
     %x{
       if (!klass.$$is_class && !klass.$$is_module) {
-        #{raise TypeError, 'class or module required'};
+        #{::Kernel.raise ::TypeError, 'class or module required'};
       }
 
       return Opal.is_a(self, klass);
@@ -474,7 +474,7 @@ module Kernel
   end
 
   def load(file)
-    file = Opal.coerce_to!(file, String, :to_str)
+    file = ::Opal.coerce_to!(file, ::String, :to_str)
     `Opal.load(#{file})`
   end
 
@@ -484,7 +484,7 @@ module Kernel
     while true
       begin
         yield
-      rescue StopIteration => e
+      rescue ::StopIteration => e
         return e.result
       end
     end
@@ -508,7 +508,7 @@ module Kernel
 
   def proc(&block)
     unless block
-      raise ArgumentError, 'tried to create Proc object without a block'
+      ::Kernel.raise ::ArgumentError, 'tried to create Proc object without a block'
     end
 
     `block.$$is_lambda = false`
@@ -535,8 +535,8 @@ module Kernel
 
   def warn(*strs, uplevel: nil)
     if uplevel
-      uplevel = Opal.coerce_to!(uplevel, Integer, :to_str)
-      raise ArgumentError, "negative level (#{uplevel})" if uplevel < 0
+      uplevel = ::Opal.coerce_to!(uplevel, ::Integer, :to_str)
+      ::Kernel.raise ::ArgumentError, "negative level (#{uplevel})" if uplevel < 0
       location = caller(uplevel + 1, 1).first&.split(':in `')&.first
       location = "#{location}: " if location
       strs = strs.map { |s| "#{location}warning: #{s}" }
@@ -604,7 +604,7 @@ module Kernel
         }
       }
     }
-    Random::DEFAULT.rand(max)
+    ::Random::DEFAULT.rand(max)
   end
 
   def respond_to?(name, include_all = false)
@@ -627,22 +627,22 @@ module Kernel
     false
   end
 
-  Opal.pristine(self, :respond_to?, :respond_to_missing?)
+  ::Opal.pristine(self, :respond_to?, :respond_to_missing?)
 
   def require(file)
     %x{
       // As Object.require refers to Kernel.require once Kernel has been loaded the String
       // class may not be available yet, the coercion requires both  String and Array to be loaded.
       if (typeof #{file} !== 'string' && Opal.String && Opal.Array) {
-        #{file = Opal.coerce_to!(file, String, :to_str) }
+        #{file = ::Opal.coerce_to!(file, ::String, :to_str) }
       }
       return Opal.require(#{file})
     }
   end
 
   def require_relative(file)
-    Opal.try_convert!(file, String, :to_str)
-    file = File.expand_path File.join(`Opal.current_file`, '..', file)
+    ::Opal.try_convert!(file, ::String, :to_str)
+    file = ::File.expand_path ::File.join(`Opal.current_file`, '..', file)
 
     `Opal.require(#{file})`
   end
@@ -679,13 +679,13 @@ module Kernel
   def sleep(seconds = nil)
     %x{
       if (seconds === nil) {
-        #{raise TypeError, "can't convert NilClass into time interval"}
+        #{::Kernel.raise ::TypeError, "can't convert NilClass into time interval"}
       }
       if (!seconds.$$is_number) {
-        #{raise TypeError, "can't convert #{seconds.class} into time interval"}
+        #{::Kernel.raise ::TypeError, "can't convert #{seconds.class} into time interval"}
       }
       if (seconds < 0) {
-        #{raise ArgumentError, 'time interval must be positive'}
+        #{::Kernel.raise ::ArgumentError, 'time interval must be positive'}
       }
       var get_time = Opal.global.performance ?
         function() {return performance.now()} :
@@ -698,12 +698,12 @@ module Kernel
   end
 
   def srand(seed = Random.new_seed)
-    Random.srand(seed)
+    ::Random.srand(seed)
   end
 
   def String(str)
-    Opal.coerce_to?(str, String, :to_str) ||
-      Opal.coerce_to!(str, String, :to_s)
+    ::Opal.coerce_to?(str, ::String, :to_str) ||
+      ::Opal.coerce_to!(str, ::String, :to_s)
   end
 
   def tap(&block)
@@ -720,20 +720,20 @@ module Kernel
   end
 
   def catch(tag = nil)
-    tag ||= Object.new
+    tag ||= ::Object.new
     yield(tag)
-  rescue UncaughtThrowError => e
+  rescue ::UncaughtThrowError => e
     return e.value if e.tag == tag
-    raise
+    ::Kernel.raise
   end
 
   def throw(tag, obj = nil)
-    raise UncaughtThrowError.new(tag, obj)
+    ::Kernel.raise ::UncaughtThrowError.new(tag, obj)
   end
 
   # basic implementation of open, delegate to File.open
   def open(*args, &block)
-    File.open(*args, &block)
+    ::File.open(*args, &block)
   end
 
   def yield_self
@@ -743,7 +743,7 @@ module Kernel
 
   alias then yield_self
 
-  Opal.pristine(self, :method_missing)
+  ::Opal.pristine(self, :method_missing)
 end
 
 class Object

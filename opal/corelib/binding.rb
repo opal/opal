@@ -9,14 +9,14 @@ class Binding
     if @jseval
       @jseval.call(*args)
     else
-      raise 'Evaluation on a Proc#binding is not supported'
+      ::Kernel.raise 'Evaluation on a Proc#binding is not supported'
     end
   end
 
   def local_variable_get(symbol)
     js_eval(symbol)
-  rescue Exception
-    raise NameError, "local variable `#{symbol}' is not defined for #{inspect}"
+  rescue ::Exception
+    ::Kernel.raise ::NameError, "local variable `#{symbol}' is not defined for #{inspect}"
   end
 
   def local_variable_set(symbol, value)
@@ -42,7 +42,7 @@ end
 
 module Kernel
   def binding
-    raise "Opal doesn't support dynamic calls to binding"
+    ::Kernel.raise "Opal doesn't support dynamic calls to binding"
   end
 end
 

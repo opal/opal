@@ -21,8 +21,8 @@ class Module
   end
 
   def <(other)
-    unless Module === other
-      raise TypeError, 'compared with non class/module'
+    unless ::Module === other
+      ::Kernel.raise ::TypeError, 'compared with non class/module'
     end
 
     # class cannot be a descendant of itself
@@ -56,8 +56,8 @@ class Module
   end
 
   def >(other)
-    unless Module === other
-      raise TypeError, 'compared with non class/module'
+    unless ::Module === other
+      ::Kernel.raise ::TypeError, 'compared with non class/module'
     end
 
     other < self
@@ -74,7 +74,7 @@ class Module
       }
     }
 
-    unless Module === other
+    unless ::Module === other
       return nil
     end
 
@@ -84,8 +84,8 @@ class Module
   end
 
   def alias_method(newname, oldname)
-    newname = `$coerce_to(newname, #{String}, 'to_str')`
-    oldname = `$coerce_to(oldname, #{String}, 'to_str')`
+    newname = `$coerce_to(newname, #{::String}, 'to_str')`
+    oldname = `$coerce_to(oldname, #{::String}, 'to_str')`
     `Opal.alias(self, newname, oldname)`
 
     self
@@ -192,11 +192,11 @@ class Module
   def autoload(const, path)
     %x{
       if (!#{Opal.const_name?(const)}) {
-        #{raise NameError, "autoload must be constant name: #{const}"}
+        #{::Kernel.raise ::NameError, "autoload must be constant name: #{const}"}
       }
 
       if (path == "") {
-        #{raise ArgumentError, 'empty file name'}
+        #{::Kernel.raise ::ArgumentError, 'empty file name'}
       }
 
       if (!self.$$const.hasOwnProperty(#{const})) {
@@ -258,7 +258,7 @@ class Module
         delete self.$$cvars[name];
         return value;
       } else {
-        #{raise NameError, "cannot remove #{name} for #{self}"}
+        #{::Kernel.raise ::NameError, "cannot remove #{name} for #{self}"}
       }
     }
   end
@@ -295,7 +295,7 @@ class Module
   def const_defined?(name, inherit = true)
     name = Opal.const_name!(name)
 
-    raise NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
+    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
 
     %x{
       var module, modules = [self], module_constants, i, ii;
@@ -340,7 +340,7 @@ class Module
       return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
 
-    raise NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
+    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
 
     %x{
       if (inherit) {
@@ -354,14 +354,14 @@ class Module
   def const_missing(name)
     full_const_name = self == Object ? name : "#{self}::#{name}"
 
-    raise NameError.new("uninitialized constant #{full_const_name}", name)
+    ::Kernel.raise ::NameError.new("uninitialized constant #{full_const_name}", name)
   end
 
   def const_set(name, value)
     name = Opal.const_name!(name)
 
     if name !~ Opal::CONST_NAME_REGEXP || name.start_with?('::')
-      raise NameError.new("wrong constant name #{name}", name)
+      ::Kernel.raise ::NameError.new("wrong constant name #{name}", name)
     end
 
     `Opal.const_set(self, name, value)`
@@ -374,24 +374,24 @@ class Module
 
   def define_method(name, method = undefined, &block)
     if `method === undefined && block === nil`
-      raise ArgumentError, 'tried to create a Proc object without a block'
+      ::Kernel.raise ::ArgumentError, 'tried to create a Proc object without a block'
     end
 
     block ||= case method
-              when Proc
+              when ::Proc
                 method
 
-              when Method
+              when ::Method
                 `#{method.to_proc}.$$unbound`
 
-              when UnboundMethod
+              when ::UnboundMethod
                 ->(*args) {
                   bound = method.bind(self)
                   bound.call(*args)
                 }
 
               else
-                raise TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
+                ::Kernel.raise ::TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
               end
 
     %x{
@@ -426,7 +426,7 @@ class Module
         var mod = mods[i];
 
         if (!mod.$$is_module) {
-          #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+          #{::Kernel.raise ::TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
 
         #{`mod`.append_features self};
@@ -444,7 +444,7 @@ class Module
   def include?(mod)
     %x{
       if (!mod.$$is_module) {
-        #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+        #{::Kernel.raise ::TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
       }
 
       var i, ii, mod2, ancestors = Opal.ancestors(self);
@@ -465,10 +465,10 @@ class Module
       var meth = self.$$prototype['$' + name];
 
       if (!meth || meth.$$stub) {
-        #{raise NameError.new("undefined method `#{name}' for class `#{self.name}'", name)};
+        #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.name}'", name)};
       }
 
-      return #{UnboundMethod.new(self, `meth.$$owner || #{self}`, `meth`, name)};
+      return #{::UnboundMethod.new(self, `meth.$$owner || #{self}`, `meth`, name)};
     }
   end
 
@@ -502,13 +502,13 @@ class Module
 
   def module_eval(*args, &block)
     if block.nil? && `!!Opal.compile`
-      Kernel.raise ArgumentError, 'wrong number of arguments (0 for 1..3)' unless (1..3).cover? args.size
+      ::Kernel.raise ::ArgumentError, 'wrong number of arguments (0 for 1..3)' unless (1..3).cover? args.size
 
       string, file, _lineno = *args
       default_eval_options = { file: (file || '(eval)'), eval: true }
       compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
-      compiled = Opal.compile string, compiling_options
-      block = Kernel.proc do
+      compiled = ::Opal.compile string, compiling_options
+      block = ::Kernel.proc do
         %x{
           return (function(self) {
             return eval(compiled);
@@ -516,8 +516,8 @@ class Module
         }
       end
     elsif args.any?
-      Kernel.raise ArgumentError, "wrong number of arguments (#{args.size} for 0)" \
-                                  "\n\n  NOTE:If you want to enable passing a String argument please add \"require 'opal-parser'\" to your script\n"
+      ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{args.size} for 0)" \
+                                      "\n\n  NOTE:If you want to enable passing a String argument please add \"require 'opal-parser'\" to your script\n"
     end
 
     %x{
@@ -537,7 +537,7 @@ class Module
   def module_exec(*args, &block)
     %x{
       if (block === nil) {
-        #{raise LocalJumpError, 'no block given'}
+        #{::Kernel.raise ::LocalJumpError, 'no block given'}
       }
 
       var block_self = block.$$s, result;
@@ -610,14 +610,14 @@ class Module
   def prepend(*mods)
     %x{
       if (mods.length === 0) {
-        #{raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'}
+        #{::Kernel.raise ::ArgumentError, 'wrong number of arguments (given 0, expected 1+)'}
       }
 
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
         if (!mod.$$is_module) {
-          #{raise TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
+          #{::Kernel.raise ::TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
 
         #{`mod`.prepend_features self};
@@ -631,7 +631,7 @@ class Module
   def prepend_features(prepender)
     %x{
       if (!self.$$is_module) {
-        #{raise TypeError, "wrong argument type #{self.class} (expected Module)"};
+        #{::Kernel.raise ::TypeError, "wrong argument type #{self.class} (expected Module)"};
       }
 
       Opal.prepend_features(self, prepender)
@@ -725,6 +725,6 @@ class Module
 
   # Compiler overrides this method
   def using(mod)
-    raise 'Module#using is not permitted in methods'
+    ::Kernel.raise 'Module#using is not permitted in methods'
   end
 end

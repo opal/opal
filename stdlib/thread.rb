@@ -66,7 +66,7 @@ class Thread
   end
 
   def coerce_key_name(key)
-    Opal.coerce_to!(key, String, :to_s)
+    ::Opal.coerce_to!(key, String, :to_s)
   end
 
   class Queue

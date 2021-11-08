@@ -3,7 +3,7 @@
 module Kernel
   def format(format_string, *args)
     if args.length == 1 && args[0].respond_to?(:to_ary)
-      ary = Opal.coerce_to?(args[0], Array, :to_ary)
+      ary = ::Opal.coerce_to?(args[0], ::Array, :to_ary)
       args = ary.to_a unless ary.nil?
     end
 
@@ -50,24 +50,24 @@ module Kernel
           FPREC0 = 128;
 
       function CHECK_FOR_FLAGS() {
-        if (flags&FWIDTH) { #{raise ArgumentError, 'flag after width'} }
-        if (flags&FPREC0) { #{raise ArgumentError, 'flag after precision'} }
+        if (flags&FWIDTH) { #{::Kernel.raise ::ArgumentError, 'flag after width'} }
+        if (flags&FPREC0) { #{::Kernel.raise ::ArgumentError, 'flag after precision'} }
       }
 
       function CHECK_FOR_WIDTH() {
-        if (flags&FWIDTH) { #{raise ArgumentError, 'width given twice'} }
-        if (flags&FPREC0) { #{raise ArgumentError, 'width after precision'} }
+        if (flags&FWIDTH) { #{::Kernel.raise ::ArgumentError, 'width given twice'} }
+        if (flags&FPREC0) { #{::Kernel.raise ::ArgumentError, 'width after precision'} }
       }
 
       function GET_NTH_ARG(num) {
-        if (num >= args.length) { #{raise ArgumentError, 'too few arguments'} }
+        if (num >= args.length) { #{::Kernel.raise ::ArgumentError, 'too few arguments'} }
         return args[num];
       }
 
       function GET_NEXT_ARG() {
         switch (pos_arg_num) {
-        case -1: #{raise ArgumentError, "unnumbered(#{`seq_arg_num`}) mixed with numbered"} // raise
-        case -2: #{raise ArgumentError, "unnumbered(#{`seq_arg_num`}) mixed with named"} // raise
+        case -1: #{::Kernel.raise ::ArgumentError, "unnumbered(#{`seq_arg_num`}) mixed with numbered"} // raise
+        case -2: #{::Kernel.raise ::ArgumentError, "unnumbered(#{`seq_arg_num`}) mixed with named"} // raise
         }
         pos_arg_num = seq_arg_num++;
         return GET_NTH_ARG(pos_arg_num - 1);
@@ -75,13 +75,13 @@ module Kernel
 
       function GET_POS_ARG(num) {
         if (pos_arg_num > 0) {
-          #{raise ArgumentError, "numbered(#{`num`}) after unnumbered(#{`pos_arg_num`})"}
+          #{::Kernel.raise ::ArgumentError, "numbered(#{`num`}) after unnumbered(#{`pos_arg_num`})"}
         }
         if (pos_arg_num === -2) {
-          #{raise ArgumentError, "numbered(#{`num`}) after named"}
+          #{::Kernel.raise ::ArgumentError, "numbered(#{`num`}) after named"}
         }
         if (num < 1) {
-          #{raise ArgumentError, "invalid index - #{`num`}$"}
+          #{::Kernel.raise ::ArgumentError, "invalid index - #{`num`}$"}
         }
         pos_arg_num = -1;
         return GET_NTH_ARG(num - 1);
@@ -95,13 +95,13 @@ module Kernel
         var num, str = '';
         for (;; i++) {
           if (i === len) {
-            #{raise ArgumentError, 'malformed format string - %*[0-9]'}
+            #{::Kernel.raise ::ArgumentError, 'malformed format string - %*[0-9]'}
           }
           if (format_string.charCodeAt(i) < 48 || format_string.charCodeAt(i) > 57) {
             i--;
             num = parseInt(str, 10) || 0;
             if (num > 2147483647) {
-              #{raise ArgumentError, "#{`label`} too big"}
+              #{::Kernel.raise ::ArgumentError, "#{`label`} too big"}
             }
             return num;
           }
@@ -188,7 +188,7 @@ module Kernel
                 break format_sequence;
               }
               if (next_arg !== undefined) {
-                #{raise ArgumentError, "value given twice - %#{`tmp_num`}$"}
+                #{::Kernel.raise ::ArgumentError, "value given twice - %#{`tmp_num`}$"}
               }
               next_arg = GET_POS_ARG(tmp_num);
               i++;
@@ -208,20 +208,20 @@ module Kernel
 
             for (;; i++) {
               if (i === len) {
-                #{raise ArgumentError, 'malformed name - unmatched parenthesis'}
+                #{::Kernel.raise ::ArgumentError, 'malformed name - unmatched parenthesis'}
               }
               if (format_string.charAt(i) === closing_brace_char) {
 
                 if (pos_arg_num > 0) {
-                  #{raise ArgumentError, "named #{`hash_parameter_key`} after unnumbered(#{`pos_arg_num`})"}
+                  #{::Kernel.raise ::ArgumentError, "named #{`hash_parameter_key`} after unnumbered(#{`pos_arg_num`})"}
                 }
                 if (pos_arg_num === -1) {
-                  #{raise ArgumentError, "named #{`hash_parameter_key`} after numbered"}
+                  #{::Kernel.raise ::ArgumentError, "named #{`hash_parameter_key`} after numbered"}
                 }
                 pos_arg_num = -2;
 
                 if (args[0] === undefined || !args[0].$$is_hash) {
-                  #{raise ArgumentError, 'one hash required'}
+                  #{::Kernel.raise ::ArgumentError, 'one hash required'}
                 }
 
                 next_arg = #{`args[0]`.fetch(`hash_parameter_key`)};
@@ -256,7 +256,7 @@ module Kernel
 
           case '.':
             if (flags&FPREC0) {
-              #{raise ArgumentError, 'precision given twice'}
+              #{::Kernel.raise ::ArgumentError, 'precision given twice'}
             }
             flags |= FPREC|FPREC0;
             precision = 0;
@@ -275,7 +275,7 @@ module Kernel
           case 'd':
           case 'i':
           case 'u':
-            arg = #{Integer(`GET_ARG()`)};
+            arg = #{::Kernel.Integer(`GET_ARG()`)};
             if (arg >= 0) {
               str = arg.toString();
               while (str.length < precision) { str = '0' + str; }
@@ -336,7 +336,7 @@ module Kernel
               base_neg_zero_digit = 'f';
               break;
             }
-            arg = #{Integer(`GET_ARG()`)};
+            arg = #{::Kernel.Integer(`GET_ARG()`)};
             if (arg >= 0) {
               str = arg.toString(base_number);
               while (str.length < precision) { str = '0' + str; }
@@ -483,7 +483,7 @@ module Kernel
           case 'a':
           case 'A':
             // Not implemented because there are no specs for this field type.
-            #{raise NotImplementedError, '`A` and `a` format field types are not implemented in Opal yet'}
+            #{::Kernel.raise ::NotImplementedError, '`A` and `a` format field types are not implemented in Opal yet'}
             // raise
 
           case 'c':
@@ -492,10 +492,10 @@ module Kernel
             if (#{`arg`.respond_to?(:to_str)}) {
               str = #{`arg`.to_str};
             } else {
-              str = String.fromCharCode($coerce_to(arg, #{Integer}, 'to_int'));
+              str = String.fromCharCode($coerce_to(arg, #{::Integer}, 'to_int'));
             }
             if (str.length !== 1) {
-              #{raise ArgumentError, '%c requires a character'}
+              #{::Kernel.raise ::ArgumentError, '%c requires a character'}
             }
             if (flags&FMINUS) {
               while (str.length < width) { str = str + ' '; }
@@ -525,12 +525,12 @@ module Kernel
             break format_sequence;
 
           default:
-            #{raise ArgumentError, "malformed format string - %#{`format_string.charAt(i)`}"}
+            #{::Kernel.raise ::ArgumentError, "malformed format string - %#{`format_string.charAt(i)`}"}
           }
         }
 
         if (str === undefined) {
-          #{raise ArgumentError, 'malformed format string - %'}
+          #{::Kernel.raise ::ArgumentError, 'malformed format string - %'}
         }
 
         result += format_string.slice(begin_slice, end_slice) + str;
@@ -538,7 +538,7 @@ module Kernel
       }
 
       if (#{$DEBUG} && pos_arg_num >= 0 && seq_arg_num < args.length) {
-        #{raise ArgumentError, 'too many arguments for format string'}
+        #{::Kernel.raise ::ArgumentError, 'too many arguments for format string'}
       }
 
       return result + format_string.slice(begin_slice);

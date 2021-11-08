@@ -305,7 +305,7 @@ class String
       }
 
       if (c >> 6 == 0x02) {
-        #{raise ArgumentError, 'malformed UTF-8 character'}
+        #{::Kernel.raise ::ArgumentError, 'malformed UTF-8 character'}
       }
 
       if (c >> 5 == 0x06) {
@@ -324,14 +324,14 @@ class String
         // 1111 110x (six bytes)
         extraLength = 5;
       } else {
-        #{raise 'malformed UTF-8 character'}
+        #{::Kernel.raise 'malformed UTF-8 character'}
       }
 
       if (extraLength > bytesLength) {
         #{
           expected = `extraLength + 1`
           given = `bytesLength + 1`
-          raise ArgumentError, "malformed UTF-8 character (expected #{expected} bytes, given #{given} bytes)"
+          ::Kernel.raise ::ArgumentError, "malformed UTF-8 character (expected #{expected} bytes, given #{given} bytes)"
         }
       }
 
@@ -343,7 +343,7 @@ class String
         c = readByte();
 
         if (c >> 6 != 0x02) {
-          #{raise 'Invalid multibyte sequence'}
+          #{::Kernel.raise 'Invalid multibyte sequence'}
         }
 
         result = (result << 6) | (c & 0x3f);
@@ -676,7 +676,7 @@ class String
   }
 
   def unpack(format)
-    format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').delete("\000")
+    format = ::Opal.coerce_to!(format, ::String, :to_str).gsub(/\s/, '').delete("\000")
 
     %x{
       var output = [];
@@ -718,7 +718,7 @@ class String
             chunkReader = readChunk[directive];
 
         if (chunkReader == null) {
-          #{raise "Unsupported unpack directive #{`directive`.inspect} (no chunk reader defined)"}
+          #{::Kernel.raise "Unsupported unpack directive #{`directive`.inspect} (no chunk reader defined)"}
         }
 
         var chunkData = chunkReader(buffer, count);
@@ -728,7 +728,7 @@ class String
         var handler = handlers[directive];
 
         if (handler == null) {
-          #{raise "Unsupported unpack directive #{`directive`.inspect} (no handler defined)"}
+          #{::Kernel.raise "Unsupported unpack directive #{`directive`.inspect} (no handler defined)"}
         }
 
         return handler(chunk);
@@ -741,7 +741,7 @@ class String
           var shouldAutocomplete = autocompletion[directive];
 
           if (shouldAutocomplete == null) {
-            #{raise "Unsupported unpack directive #{`directive`.inspect} (no autocompletion rule defined)"}
+            #{::Kernel.raise "Unsupported unpack directive #{`directive`.inspect} (no autocompletion rule defined)"}
           }
 
           if (shouldAutocomplete) {
@@ -757,7 +757,7 @@ class String
   end
 
   def unpack1(format)
-    format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').delete("\000")
+    format = ::Opal.coerce_to!(format, ::String, :to_str).gsub(/\s/, '').delete("\000")
 
     unpack(format[0])[0]
   end

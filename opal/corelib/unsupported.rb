@@ -4,7 +4,7 @@
   function handle_unsupported_feature(message) {
     switch (Opal.config.unsupported_features_severity) {
     case 'error':
-      #{Kernel.raise NotImplementedError, `message`}
+      #{::Kernel.raise ::NotImplementedError, `message`}
       break;
     case 'warning':
       warn(message)
@@ -28,95 +28,95 @@ class String
   `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal."`
 
   def <<(*)
-    raise NotImplementedError, `ERROR` % '<<'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % '<<'
   end
 
   def capitalize!(*)
-    raise NotImplementedError, `ERROR` % 'capitalize!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'capitalize!'
   end
 
   def chomp!(*)
-    raise NotImplementedError, `ERROR` % 'chomp!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'chomp!'
   end
 
   def chop!(*)
-    raise NotImplementedError, `ERROR` % 'chop!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'chop!'
   end
 
   def downcase!(*)
-    raise NotImplementedError, `ERROR` % 'downcase!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'downcase!'
   end
 
   def gsub!(*)
-    raise NotImplementedError, `ERROR` % 'gsub!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'gsub!'
   end
 
   def lstrip!(*)
-    raise NotImplementedError, `ERROR` % 'lstrip!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'lstrip!'
   end
 
   def next!(*)
-    raise NotImplementedError, `ERROR` % 'next!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'next!'
   end
 
   def reverse!(*)
-    raise NotImplementedError, `ERROR` % 'reverse!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'reverse!'
   end
 
   def slice!(*)
-    raise NotImplementedError, `ERROR` % 'slice!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'slice!'
   end
 
   def squeeze!(*)
-    raise NotImplementedError, `ERROR` % 'squeeze!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'squeeze!'
   end
 
   def strip!(*)
-    raise NotImplementedError, `ERROR` % 'strip!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'strip!'
   end
 
   def sub!(*)
-    raise NotImplementedError, `ERROR` % 'sub!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'sub!'
   end
 
   def succ!(*)
-    raise NotImplementedError, `ERROR` % 'succ!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'succ!'
   end
 
   def swapcase!(*)
-    raise NotImplementedError, `ERROR` % 'swapcase!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'swapcase!'
   end
 
   def tr!(*)
-    raise NotImplementedError, `ERROR` % 'tr!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'tr!'
   end
 
   def tr_s!(*)
-    raise NotImplementedError, `ERROR` % 'tr_s!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'tr_s!'
   end
 
   def upcase!(*)
-    raise NotImplementedError, `ERROR` % 'upcase!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'upcase!'
   end
 
   def prepend(*)
-    raise NotImplementedError, `ERROR` % 'prepend'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'prepend'
   end
 
   def []=(*)
-    raise NotImplementedError, `ERROR` % '[]='
+    ::Kernel.raise ::NotImplementedError, `ERROR` % '[]='
   end
 
   def clear(*)
-    raise NotImplementedError, `ERROR` % 'clear'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'clear'
   end
 
   def encode!(*)
-    raise NotImplementedError, `ERROR` % 'encode!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'encode!'
   end
 
   def unicode_normalize!(*)
-    raise NotImplementedError, `ERROR` % 'unicode_normalize!'
+    ::Kernel.raise ::NotImplementedError, `ERROR` % 'unicode_normalize!'
   end
 end
 
@@ -202,8 +202,8 @@ end
 
 module Kernel
   def eval(*)
-    raise NotImplementedError, "To use Kernel#eval, you must first require 'opal-parser'. "\
-                               "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
+    ::Kernel.raise NotImplementedError, "To use Kernel#eval, you must first require 'opal-parser'. "\
+                                        "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
   end
 end
 

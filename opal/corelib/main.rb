@@ -12,5 +12,5 @@ end
 
 # Compiler overrides this method
 def self.using(mod)
-  raise 'main.using is permitted only at toplevel'
+  ::Kernel.raise 'main.using is permitted only at toplevel'
 end

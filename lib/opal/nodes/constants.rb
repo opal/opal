@@ -12,6 +12,9 @@ module Opal
       def compile
         if magical_data_const?
           push('$__END__')
+        elsif optimized_access?
+          helper :"#{name}"
+          push "$#{name}"
         elsif const_scope
           push '$$$(', recv(const_scope), ", '#{name}')"
         elsif compiler.eval?
@@ -29,6 +32,17 @@ module Opal
       #    DATA const should be resolved to a regular ::DATA constant
       def magical_data_const?
         const_scope.nil? && name == :DATA && compiler.eof_content
+      end
+
+      OPTIMIZED_ACCESS_CONSTS = %i[
+        BasicObject Object Module Class Opal Kernel NilClass
+      ].freeze
+
+      # For a certain case of calls like `::Opal.coerce_to?` we can
+      # optimize the calls. We can be sure they are defined from the
+      # beginning.
+      def optimized_access?
+        const_scope == s(:cbase) && OPTIMIZED_ACCESS_CONSTS.include?(name)
       end
     end
 

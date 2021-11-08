@@ -26,14 +26,14 @@ class String < `String`
   alias object_id __id__
 
   def self.try_convert(what)
-    Opal.coerce_to?(what, String, :to_str)
+    ::Opal.coerce_to?(what, ::String, :to_str)
   end
 
   def self.new(*args)
     %x{
       var str = args[0] || "";
       var opts = args[args.length-1];
-      str = $coerce_to(str, #{String}, 'to_str');
+      str = $coerce_to(str, #{::String}, 'to_str');
       if (opts && opts.$$is_hash) {
         if (opts.$$smap.encoding) str = str.$force_encoding(opts.$$smap.encoding);
       }
@@ -61,10 +61,10 @@ class String < `String`
 
   def *(count)
     %x{
-      count = $coerce_to(count, #{Integer}, 'to_int');
+      count = $coerce_to(count, #{::Integer}, 'to_int');
 
       if (count < 0) {
-        #{raise ArgumentError, 'negative argument'}
+        #{::Kernel.raise ::ArgumentError, 'negative argument'}
       }
 
       if (count === 0) {
@@ -79,7 +79,7 @@ class String < `String`
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat
 
       if (string.length * count >= 1 << 28) {
-        #{raise RangeError, 'multiply count must not overflow maximum string size'}
+        #{::Kernel.raise ::RangeError, 'multiply count must not overflow maximum string size'}
       }
 
       for (;;) {
@@ -98,7 +98,7 @@ class String < `String`
   end
 
   def +(other)
-    other = `$coerce_to(#{other}, #{String}, 'to_str')`
+    other = `$coerce_to(#{other}, #{::String}, 'to_str')`
 
     %x{
       if (other == "" && self.$$class === Opal.String) return #{self};
@@ -147,7 +147,7 @@ class String < `String`
   def =~(other)
     %x{
       if (other.$$is_string) {
-        #{raise TypeError, 'type mismatch: String given'};
+        #{::Kernel.raise ::TypeError, 'type mismatch: String given'};
       }
 
       return #{other =~ self};
@@ -160,8 +160,8 @@ class String < `String`
 
       if (index.$$is_range) {
         exclude = index.excl;
-        length  = $coerce_to(index.end, #{Integer}, 'to_int');
-        index   = $coerce_to(index.begin, #{Integer}, 'to_int');
+        length  = $coerce_to(index.end, #{::Integer}, 'to_int');
+        index   = $coerce_to(index.begin, #{::Integer}, 'to_int');
 
         if (Math.abs(index) > size) {
           return nil;
@@ -191,7 +191,7 @@ class String < `String`
 
       if (index.$$is_string) {
         if (length != null) {
-          #{raise TypeError}
+          #{::Kernel.raise ::TypeError}
         }
         return self.indexOf(index) !== -1 ? self.$$cast(index) : nil;
       }
@@ -205,13 +205,13 @@ class String < `String`
           return nil;
         }
 
-        #{$~ = MatchData.new(`index`, `match`)}
+        #{$~ = ::MatchData.new(`index`, `match`)}
 
         if (length == null) {
           return self.$$cast(match[0]);
         }
 
-        length = $coerce_to(length, #{Integer}, 'to_int');
+        length = $coerce_to(length, #{::Integer}, 'to_int');
 
         if (length < 0 && -length < match.length) {
           return self.$$cast(match[length += match.length]);
@@ -225,7 +225,7 @@ class String < `String`
       }
 
 
-      index = $coerce_to(index, #{Integer}, 'to_int');
+      index = $coerce_to(index, #{::Integer}, 'to_int');
 
       if (index < 0) {
         index += size;
@@ -238,7 +238,7 @@ class String < `String`
         return self.$$cast(self.substr(index, 1));
       }
 
-      length = $coerce_to(length, #{Integer}, 'to_int');
+      length = $coerce_to(length, #{::Integer}, 'to_int');
 
       if (length < 0) {
         return nil;
@@ -264,7 +264,7 @@ class String < `String`
 
   def casecmp(other)
     return nil unless other.respond_to?(:to_str)
-    other = `$coerce_to(other, #{String}, 'to_str')`.to_s
+    other = `$coerce_to(other, #{::String}, 'to_str')`.to_s
     %x{
       var ascii_only = /^[\x00-\x7F]*$/;
       if (ascii_only.test(self) && ascii_only.test(other)) {
@@ -287,11 +287,11 @@ class String < `String`
   end
 
   def center(width, padstr = ' ')
-    width  = `$coerce_to(#{width}, #{Integer}, 'to_int')`
-    padstr = `$coerce_to(#{padstr}, #{String}, 'to_str')`.to_s
+    width  = `$coerce_to(#{width}, #{::Integer}, 'to_int')`
+    padstr = `$coerce_to(#{padstr}, #{::String}, 'to_str')`.to_s
 
     if padstr.empty?
-      raise ArgumentError, 'zero width padding'
+      ::Kernel.raise ::ArgumentError, 'zero width padding'
     end
 
     return self if `width <= self.length`
@@ -307,7 +307,7 @@ class String < `String`
   def chomp(separator = $/)
     return self if `separator === nil || self.length === 0`
 
-    separator = Opal.coerce_to!(separator, String, :to_str).to_s
+    separator = ::Opal.coerce_to!(separator, ::String, :to_str).to_s
 
     %x{
       var result;
@@ -370,7 +370,7 @@ class String < `String`
   def count(*sets)
     %x{
       if (sets.length === 0) {
-        #{raise ArgumentError, 'ArgumentError: wrong number of arguments (0 for 1+)'}
+        #{::Kernel.raise ArgumentError, 'ArgumentError: wrong number of arguments (0 for 1+)'}
       }
       var char_class = char_class_from_char_sets(sets);
       if (char_class === null) {
@@ -383,7 +383,7 @@ class String < `String`
   def delete(*sets)
     %x{
       if (sets.length === 0) {
-        #{raise ArgumentError, 'ArgumentError: wrong number of arguments (0 for 1+)'}
+        #{::Kernel.raise ::ArgumentError, 'ArgumentError: wrong number of arguments (0 for 1+)'}
       }
       var char_class = char_class_from_char_sets(sets);
       if (char_class === null) {
@@ -396,7 +396,7 @@ class String < `String`
   def delete_prefix(prefix)
     %x{
       if (!prefix.$$is_string) {
-        prefix = $coerce_to(prefix, #{String}, 'to_str');
+        prefix = $coerce_to(prefix, #{::String}, 'to_str');
       }
 
       if (self.slice(0, prefix.length) === prefix) {
@@ -410,7 +410,7 @@ class String < `String`
   def delete_suffix(suffix)
     %x{
       if (!suffix.$$is_string) {
-        suffix = $coerce_to(suffix, #{String}, 'to_str');
+        suffix = $coerce_to(suffix, #{::String}, 'to_str');
       }
 
       if (self.slice(self.length - suffix.length) === suffix) {
@@ -435,7 +435,7 @@ class String < `String`
         return self;
       }
 
-      separator = $coerce_to(separator, #{String}, 'to_str')
+      separator = $coerce_to(separator, #{::String}, 'to_str')
 
       var a, i, n, length, chomped, trailing, splitted;
 
@@ -474,7 +474,7 @@ class String < `String`
   def end_with?(*suffixes)
     %x{
       for (var i = 0, length = suffixes.length; i < length; i++) {
-        var suffix = $coerce_to(suffixes[i], #{String}, 'to_str').$to_s();
+        var suffix = $coerce_to(suffixes[i], #{::String}, 'to_str').$to_s();
 
         if (self.length >= suffix.length &&
             self.substr(self.length - suffix.length, suffix.length) == suffix) {
@@ -499,7 +499,7 @@ class String < `String`
       if (pattern.$$is_regexp) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
-        pattern = $coerce_to(pattern, #{String}, 'to_str');
+        pattern = $coerce_to(pattern, #{::String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
       }
 
@@ -525,7 +525,7 @@ class String < `String`
         }
         else {
           if (!replacement.$$is_string) {
-            replacement = $coerce_to(replacement, #{String}, 'to_str');
+            replacement = $coerce_to(replacement, #{::String}, 'to_str');
           }
           _replacement = replacement.replace(/([\\]+)([0-9+&`'])/g, function (original, slashes, command) {
             if (slashes.length % 2 === 0) {
@@ -573,7 +573,7 @@ class String < `String`
   def include?(other)
     %x{
       if (!other.$$is_string) {
-        other = $coerce_to(other, #{String}, 'to_str');
+        other = $coerce_to(other, #{::String}, 'to_str');
       }
       return self.indexOf(other) !== -1;
     }
@@ -588,7 +588,7 @@ class String < `String`
       if (offset === undefined) {
         offset = 0;
       } else {
-        offset = $coerce_to(offset, #{Integer}, 'to_int');
+        offset = $coerce_to(offset, #{::Integer}, 'to_int');
         if (offset < 0) {
           offset += self.length;
           if (offset < 0) {
@@ -614,7 +614,7 @@ class String < `String`
           regex.lastIndex = match.index + 1;
         }
       } else {
-        search = $coerce_to(search, #{String}, 'to_str');
+        search = $coerce_to(search, #{::String}, 'to_str');
         if (search.length === 0 && offset > self.length) {
           index = -1;
         } else {
@@ -666,11 +666,11 @@ class String < `String`
   end
 
   def ljust(width, padstr = ' ')
-    width  = `$coerce_to(#{width}, #{Integer}, 'to_int')`
-    padstr = `$coerce_to(#{padstr}, #{String}, 'to_str')`.to_s
+    width  = `$coerce_to(#{width}, #{::Integer}, 'to_int')`
+    padstr = `$coerce_to(#{padstr}, #{::String}, 'to_str')`.to_s
 
     if padstr.empty?
-      raise ArgumentError, 'zero width padding'
+      ::Kernel.raise ::ArgumentError, 'zero width padding'
     end
 
     return self if `width <= self.length`
@@ -703,11 +703,11 @@ class String < `String`
 
   def match(pattern, pos = undefined, &block)
     if String === pattern || pattern.respond_to?(:to_str)
-      pattern = Regexp.new(pattern.to_str)
+      pattern = ::Regexp.new(pattern.to_str)
     end
 
-    unless Regexp === pattern
-      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+    unless ::Regexp === pattern
+      ::Kernel.raise ::TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
     end
 
     pattern.match(self, pos, &block)
@@ -715,11 +715,11 @@ class String < `String`
 
   def match?(pattern, pos = undefined)
     if String === pattern || pattern.respond_to?(:to_str)
-      pattern = Regexp.new(pattern.to_str)
+      pattern = ::Regexp.new(pattern.to_str)
     end
 
-    unless Regexp === pattern
-      raise TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
+    unless ::Regexp === pattern
+      ::Kernel.raise ::TypeError, "wrong argument type #{pattern.class} (expected Regexp)"
     end
 
     pattern.match?(self, pos)
@@ -863,7 +863,7 @@ class String < `String`
           i = m.index;
         }
       } else {
-        sep = $coerce_to(sep, #{String}, 'to_str');
+        sep = $coerce_to(sep, #{::String}, 'to_str');
         i = self.indexOf(sep);
       }
 
@@ -890,7 +890,7 @@ class String < `String`
       if (offset === undefined) {
         offset = self.length;
       } else {
-        offset = $coerce_to(offset, #{Integer}, 'to_int');
+        offset = $coerce_to(offset, #{::Integer}, 'to_int');
         if (offset < 0) {
           offset += self.length;
           if (offset < 0) {
@@ -918,7 +918,7 @@ class String < `String`
           i = m.index;
         }
       } else {
-        search = $coerce_to(search, #{String}, 'to_str');
+        search = $coerce_to(search, #{::String}, 'to_str');
         i = self.lastIndexOf(search, offset);
       }
 
@@ -927,11 +927,11 @@ class String < `String`
   end
 
   def rjust(width, padstr = ' ')
-    width  = `$coerce_to(#{width}, #{Integer}, 'to_int')`
-    padstr = `$coerce_to(#{padstr}, #{String}, 'to_str')`.to_s
+    width  = `$coerce_to(#{width}, #{::Integer}, 'to_int')`
+    padstr = `$coerce_to(#{padstr}, #{::String}, 'to_str')`.to_s
 
     if padstr.empty?
-      raise ArgumentError, 'zero width padding'
+      ::Kernel.raise ::ArgumentError, 'zero width padding'
     end
 
     return self if `width <= self.length`
@@ -972,7 +972,7 @@ class String < `String`
         }
 
       } else {
-        sep = $coerce_to(sep, #{String}, 'to_str');
+        sep = $coerce_to(sep, #{::String}, 'to_str');
         i = self.lastIndexOf(sep);
       }
 
@@ -1001,7 +1001,7 @@ class String < `String`
       if (pattern.$$is_regexp) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
-        pattern = $coerce_to(pattern, #{String}, 'to_str');
+        pattern = $coerce_to(pattern, #{::String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
       }
 
@@ -1034,7 +1034,7 @@ class String < `String`
       if (limit === undefined) {
         limit = 0;
       } else {
-        limit = #{Opal.coerce_to!(limit, Integer, :to_int)};
+        limit = #{::Opal.coerce_to!(limit, ::Integer, :to_int)};
         if (limit === 1) {
           return [self];
         }
@@ -1053,7 +1053,7 @@ class String < `String`
       if (pattern.$$is_regexp) {
         pattern = Opal.global_multiline_regexp(pattern);
       } else {
-        pattern = $coerce_to(pattern, #{String}, 'to_str').$to_s();
+        pattern = $coerce_to(pattern, #{::String}, 'to_str').$to_s();
         if (pattern === ' ') {
           pattern = /\s+/gm;
           string = string.replace(/^\s+/, '');
@@ -1151,7 +1151,7 @@ class String < `String`
             #{$~ = nil}
           }
         } else {
-          var prefix = $coerce_to(prefixes[i], #{String}, 'to_str').$to_s();
+          var prefix = $coerce_to(prefixes[i], #{::String}, 'to_str').$to_s();
 
           if (self.indexOf(prefix) === 0) {
             return true;
@@ -1170,7 +1170,7 @@ class String < `String`
   def sub(pattern, replacement = undefined, &block)
     %x{
       if (!pattern.$$is_regexp) {
-        pattern = $coerce_to(pattern, #{String}, 'to_str');
+        pattern = $coerce_to(pattern, #{::String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       }
 
@@ -1180,12 +1180,12 @@ class String < `String`
         #{$~ = nil}
         result = self.toString();
       } else {
-        #{MatchData.new `pattern`, `match`}
+        #{::MatchData.new `pattern`, `match`}
 
         if (replacement === undefined) {
 
           if (block === nil) {
-            #{raise ArgumentError, 'wrong number of arguments (1 for 2)'}
+            #{::Kernel.raise ::ArgumentError, 'wrong number of arguments (1 for 2)'}
           }
           result = self.slice(0, match.index) + block(match[0]) + self.slice(match.index + match[0].length);
 
@@ -1195,7 +1195,7 @@ class String < `String`
 
         } else {
 
-          replacement = $coerce_to(replacement, #{String}, 'to_str');
+          replacement = $coerce_to(replacement, #{::String}, 'to_str');
 
           replacement = replacement.replace(/([\\]+)([0-9+&`'])/g, function (original, slashes, command) {
             if (slashes.length % 2 === 0) {
@@ -1228,7 +1228,7 @@ class String < `String`
 
   def sum(n = 16)
     %x{
-      n = $coerce_to(n, #{Integer}, 'to_int');
+      n = $coerce_to(n, #{::Integer}, 'to_int');
 
       var result = 0,
           length = self.length,
@@ -1281,10 +1281,10 @@ class String < `String`
     %x{
       var result,
           string = self.toLowerCase(),
-          radix = $coerce_to(base, #{Integer}, 'to_int');
+          radix = $coerce_to(base, #{::Integer}, 'to_int');
 
       if (radix === 1 || radix < 0 || radix > 36) {
-        #{raise ArgumentError, "invalid radix #{`radix`}"}
+        #{::Kernel.raise ::ArgumentError, "invalid radix #{`radix`}"}
       }
 
       if (/^\s*_/.test(string)) {
@@ -1342,7 +1342,7 @@ class String < `String`
     proc do |*args, &block|
       %x{
         if (args.length === 0) {
-          #{raise ArgumentError, 'no receiver given'}
+          #{::Kernel.raise ::ArgumentError, 'no receiver given'}
         }
 
         var recv = args[0];
@@ -1378,8 +1378,8 @@ class String < `String`
 
   def tr(from, to)
     %x{
-      from = $coerce_to(from, #{String}, 'to_str').$to_s();
-      to = $coerce_to(to, #{String}, 'to_str').$to_s();
+      from = $coerce_to(from, #{::String}, 'to_str').$to_s();
+      to = $coerce_to(to, #{::String}, 'to_str').$to_s();
 
       if (from.length == 0 || from === to) {
         return self;
@@ -1426,7 +1426,7 @@ class String < `String`
           start = last_from.charCodeAt(0);
           end = ch.charCodeAt(0);
           if (start > end) {
-            #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+            #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
           }
           for (c = start + 1; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
@@ -1475,7 +1475,7 @@ class String < `String`
               start = last_to.charCodeAt(0);
               end = ch.charCodeAt(0);
               if (start > end) {
-                #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+                #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
               }
               for (c = start + 1; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
@@ -1523,8 +1523,8 @@ class String < `String`
 
   def tr_s(from, to)
     %x{
-      from = $coerce_to(from, #{String}, 'to_str').$to_s();
-      to = $coerce_to(to, #{String}, 'to_str').$to_s();
+      from = $coerce_to(from, #{::String}, 'to_str').$to_s();
+      to = $coerce_to(to, #{::String}, 'to_str').$to_s();
 
       if (from.length == 0) {
         return self;
@@ -1571,7 +1571,7 @@ class String < `String`
           start = last_from.charCodeAt(0);
           end = ch.charCodeAt(0);
           if (start > end) {
-            #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+            #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
           }
           for (c = start + 1; c < end; c++) {
             from_chars_expanded.push(String.fromCharCode(c));
@@ -1620,7 +1620,7 @@ class String < `String`
               start = last_from.charCodeAt(0);
               end = ch.charCodeAt(0);
               if (start > end) {
-                #{raise ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+                #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
               }
               for (c = start + 1; c < end; c++) {
                 to_chars_expanded.push(String.fromCharCode(c));
@@ -1693,7 +1693,7 @@ class String < `String`
     %x{
       var a, b, s = self.toString();
 
-      stop = $coerce_to(stop, #{String}, 'to_str');
+      stop = $coerce_to(stop, #{::String}, 'to_str');
 
       if (s.length === 1 && stop.length === 1) {
 
@@ -1758,7 +1758,7 @@ class String < `String`
             char_code_from = set.charCodeAt(i - 1);
             char_code_upto = set.charCodeAt(i + 1);
             if (char_code_from > char_code_upto) {
-              #{raise ArgumentError, "invalid range \"#{`char_code_from`}-#{`char_code_upto`}\" in string transliteration"}
+              #{::Kernel.raise ::ArgumentError, "invalid range \"#{`char_code_from`}-#{`char_code_upto`}\" in string transliteration"}
             }
             for (char_code = char_code_from + 1; char_code < char_code_upto + 1; char_code++) {
               result += String.fromCharCode(char_code);
@@ -1794,7 +1794,7 @@ class String < `String`
           neg_intersection = '';
 
       for (i = 0, len = sets.length; i < len; i++) {
-        set = $coerce_to(sets[i], #{String}, 'to_str');
+        set = $coerce_to(sets[i], #{::String}, 'to_str');
         neg = (set.charAt(0) === '^' && set.length > 1);
         set = explode_sequences_in_character_set(neg ? set.slice(1) : set);
         if (neg) {
@@ -1817,11 +1817,11 @@ class String < `String`
       }
 
       if (pos_intersection.length > 0) {
-        return '[' + #{Regexp.escape(`pos_intersection`)} + ']';
+        return '[' + #{::Regexp.escape(`pos_intersection`)} + ']';
       }
 
       if (neg_intersection.length > 0) {
-        return '[^' + #{Regexp.escape(`neg_intersection`)} + ']';
+        return '[^' + #{::Regexp.escape(`neg_intersection`)} + ']';
       }
 
       return null;
@@ -1837,7 +1837,7 @@ class String < `String`
   end
 
   def unicode_normalize(form = :nfc)
-    raise ArgumentError, "Invalid normalization form #{form}" unless %i[nfc nfd nfkc nfkd].include?(form)
+    ::Kernel.raise ::ArgumentError, "Invalid normalization form #{form}" unless %i[nfc nfd nfkc nfkd].include?(form)
     `self.normalize(#{form.upcase})`
   end
 
@@ -1846,11 +1846,11 @@ class String < `String`
   end
 
   def unpack(format)
-    raise "To use String#unpack, you must first require 'corelib/string/unpack'."
+    ::Kernel.raise "To use String#unpack, you must first require 'corelib/string/unpack'."
   end
 
   def unpack1(format)
-    raise "To use String#unpack1, you must first require 'corelib/string/unpack'."
+    ::Kernel.raise "To use String#unpack1, you must first require 'corelib/string/unpack'."
   end
 
   def freeze
@@ -1876,7 +1876,7 @@ class String < `String`
     `typeof self === 'string' || self.$$frozen === true`
   end
 
-  Opal.pristine self, :initialize
+  ::Opal.pristine self, :initialize
 end
 
 Symbol = String

@@ -87,7 +87,7 @@ class Random
           return randomRange();
         } else if (limit.$$is_number) {
           if (limit <= 0) {
-            #{raise ArgumentError, "invalid argument - #{limit}"}
+            #{::Kernel.raise ::ArgumentError, "invalid argument - #{limit}"}
           }
 
           if (limit % 1 === 0) {
@@ -97,10 +97,10 @@ class Random
             return randomFloat() * limit;
           }
         } else {
-          limit = #{Opal.coerce_to!(limit, Integer, :to_int)};
+          limit = #{::Opal.coerce_to!(limit, ::Integer, :to_int)};
 
           if (limit <= 0) {
-            #{raise ArgumentError, "invalid argument - #{limit}"}
+            #{::Kernel.raise ::ArgumentError, "invalid argument - #{limit}"}
           }
 
           return randomInt(limit);
@@ -111,12 +111,12 @@ class Random
     def alphanumeric(count = nil)
       count = Random._verify_count(count)
       map = ['0'..'9', 'a'..'z', 'A'..'Z'].map(&:to_a).flatten
-      Array.new(count) do |i|
+      ::Array.new(count) do |i|
         map[random_number(map.length)]
       end.join
     end
   end
 
-  include Random::Formatter
-  extend Random::Formatter
+  include ::Random::Formatter
+  extend ::Random::Formatter
 end
