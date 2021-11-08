@@ -251,10 +251,21 @@ module Opal
       def identify!(name = nil)
         return @identity if @identity
 
-        # Parent scope is the defining module/class
-        name ||= [(parent && (parent.name || parent.scope_name)), mid].compact.join('_')
-        @identity = @compiler.unique_temp(name)
-        @parent.add_scope_temp @identity if @parent
+        if valid_name? mid
+          # There are some special utf8 chars that can be used as valid JS
+          # identifiers, some examples:
+          #
+          # utf8_pond = 'ⵌ'
+          # utf8_question = 'ʔ̣'
+          # utf8_exclamation 'ǃ'
+          #
+          # For now we're just using $$, to maintain compatibility with older IEs.
+          @identity = "$$#{mid}"
+        else
+          # Parent scope is the defining module/class
+          name ||= [(parent && (parent.name || parent.scope_name)), mid].compact.join('_')
+          @identity = @compiler.unique_temp(name)
+        end
 
         @identity
       end

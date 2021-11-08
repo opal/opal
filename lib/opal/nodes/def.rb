@@ -44,37 +44,34 @@ module Opal
           end
         end
 
-        # There are some special utf8 chars that can be used as valid JS
-        # identifiers, some examples:
-        #
-        # utf8_pond = 'ⵌ'
-        # utf8_question = 'ʔ̣'
-        # utf8_exclamation 'ǃ'
-        #
-        # For now we're just using $$, to maintain compatibility with older IEs.
-        function_name = valid_name?(mid) ? " $$#{mid}" : ''
-
         unshift ') {'
         unshift(inline_params)
-        unshift "function#{function_name}("
+        unshift "function #{scope_name}("
         if await_encountered
           unshift "async "
         end
-        unshift "#{scope_name} = " if scope_name
         line '}'
 
-        push ", #{scope_name}.$$arity = #{arity}"
+        blockopts = []
+
+        blockopts << "$$arity: #{arity}"
 
         if compiler.arity_check?
-          push ", #{scope_name}.$$parameters = #{parameters_code}"
+          blockopts << "$$parameters: #{parameters_code}"
         end
 
         if compiler.parse_comments?
-          push ", #{scope_name}.$$comments = #{comments_code}"
+          blockopts << "$$comments: #{comments_code}"
         end
 
         if compiler.enable_source_location?
-          push ", #{scope_name}.$$source_location = #{source_location}"
+          blockopts << "$$source_location: #{source_location}"
+        end
+
+        if blockopts.length == 1
+          push ", #{arity}"
+        elsif blockopts.length > 1
+          push ', {', blockopts.join(', '), '}'
         end
 
         wrap_with_definition

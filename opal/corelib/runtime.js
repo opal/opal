@@ -1798,6 +1798,15 @@
     return Opal.hash2(keys, map);
   };
 
+  function apply_blockopts(block, blockopts) {
+    if (typeof(blockopts) === 'number') {
+      block.$$arity = blockopts;
+    }
+    else if (typeof(blockopts) === 'object') {
+      Object.assign(block, blockopts);
+    }
+  }
+
   // Calls passed method on a ruby object with arguments and block:
   //
   // Can take a method or a method name.
@@ -1821,9 +1830,12 @@
   // @param method [Function, String] method body or name of the method
   // @param args [Array] arguments that will be passed to the method call
   // @param block [Function] ruby block
+  // @param blockopts [Object, Number] optional properties to set on the block
   // @return [Object] returning value of the method call
-  Opal.send = function(recv, method, args, block) {
+  Opal.send = function(recv, method, args, block, blockopts) {
     var body;
+
+    apply_blockopts(block, blockopts);
 
     if (typeof(method) === 'function') {
       body = method;
@@ -1837,12 +1849,14 @@
     return Opal.send2(recv, body, method, args, block);
   };
 
-  Opal.send2 = function(recv, body, method, args, block) {
+  Opal.send2 = function(recv, body, method, args, block, blockopts) {
     if (body == null && method != null && recv.$method_missing) {
       body = recv.$method_missing;
       args = [method].concat(args);
     }
 
+    apply_blockopts(block, blockopts);
+  
     if (typeof block === 'function') body.$$p = block;
     return body.apply(recv, args);
   };
@@ -1885,8 +1899,11 @@
     return Opal.send(recv, method, args, block);
   };
 
-  Opal.lambda = function(block) {
+  Opal.lambda = function(block, blockopts) {
     block.$$is_lambda = true;
+    
+    apply_blockopts(block, blockopts);
+
     return block;
   };
 
@@ -1924,9 +1941,12 @@
   // @param obj  [Object, Class] the actual obj to define method for
   // @param jsid [String] the JavaScript friendly method name (e.g. '$foo')
   // @param body [JS.Function] the literal JavaScript function used as method
+  // @param blockopts [Object, Number] optional properties to set on the body
   // @return [null]
   //
-  Opal.def = function(obj, jsid, body) {
+  Opal.def = function(obj, jsid, body, blockopts) {
+    apply_blockopts(body, blockopts);
+
     // Special case for a method definition in the
     // top-level namespace
     if (obj === Opal.top) {
@@ -1973,7 +1993,9 @@
   };
 
   // Define a singleton method on the given object (see Opal.def).
-  Opal.defs = function(obj, jsid, body) {
+  Opal.defs = function(obj, jsid, body, blockopts) {
+    apply_blockopts(body, blockopts);
+
     if (obj.$$is_string || obj.$$is_number) {
       throw Opal.TypeError.$new("can't define singleton");
     }
