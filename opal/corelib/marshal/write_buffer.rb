@@ -323,11 +323,11 @@ module Marshal
     end
 
     def write_float(f)
-      if f.equal?(Float::INFINITY)
+      if f.equal?(::Float::INFINITY)
         write_string('inf')
-      elsif f.equal?(-Float::INFINITY)
+      elsif f.equal?(-::Float::INFINITY)
         write_string('-inf')
-      elsif f.equal?(Float::NAN)
+      elsif f.equal?(::Float::NAN)
         write_string('nan')
       else
         write_string(f.to_s)

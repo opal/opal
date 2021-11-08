@@ -4,7 +4,7 @@ require 'corelib/comparable'
 require 'corelib/regexp'
 
 class String < `String`
-  include Comparable
+  include ::Comparable
 
   %x{
     Opal.prop(#{self}.$$prototype, '$$is_string', true);
@@ -518,7 +518,7 @@ class String < `String`
           break;
         }
 
-        match_data = #{MatchData.new `pattern`, `match`};
+        match_data = #{::MatchData.new `pattern`, `match`};
 
         if (replacement === undefined) {
           lastIndex = pattern.lastIndex;
@@ -612,7 +612,7 @@ class String < `String`
             break;
           }
           if (match.index >= offset) {
-            #{$~ = MatchData.new(`regex`, `match`)}
+            #{$~ = ::MatchData.new(`regex`, `match`)}
             index = match.index;
             break;
           }
@@ -863,7 +863,7 @@ class String < `String`
         if (m === null) {
           i = -1;
         } else {
-          #{MatchData.new `sep`, `m`};
+          #{::MatchData.new `sep`, `m`};
           sep = m[0];
           i = m.index;
         }
@@ -919,7 +919,7 @@ class String < `String`
           #{$~ = nil}
           i = -1;
         } else {
-          #{MatchData.new `r`, `m`};
+          #{::MatchData.new `r`, `m`};
           i = m.index;
         }
       } else {
@@ -971,7 +971,7 @@ class String < `String`
         if (m === null) {
           i = -1;
         } else {
-          #{MatchData.new `r`, `m`};
+          #{::MatchData.new `r`, `m`};
           sep = m[0];
           i = m.index;
         }
@@ -1011,7 +1011,7 @@ class String < `String`
       }
 
       while ((match = pattern.exec(self)) != null) {
-        match_data = #{MatchData.new `pattern`, `match`};
+        match_data = #{::MatchData.new `pattern`, `match`};
         if (block === nil) {
           match.length == 1 ? result.push(match[0]) : result.push(#{`match_data`.captures});
         } else {
@@ -1150,7 +1150,7 @@ class String < `String`
           var match = regexp.exec(self);
 
           if (match != null && match.index === 0) {
-            #{$~ = MatchData.new(`regexp`, `match`)};
+            #{$~ = ::MatchData.new(`regexp`, `match`)};
             return true;
           } else {
             #{$~ = nil}
@@ -1344,7 +1344,7 @@ class String < `String`
   def to_proc
     method_name = '$' + `self.valueOf()`
 
-    proc do |*args, &block|
+    ::Kernel.proc do |*args, &block|
       %x{
         if (args.length === 0) {
           #{::Kernel.raise ::ArgumentError, 'no receiver given'}

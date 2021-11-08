@@ -30,7 +30,7 @@ module Enumerable
       end
     else
       each do |*value|
-        unless Opal.destructure(value)
+        unless ::Opal.destructure(value)
           return false
         end
       end
@@ -54,7 +54,7 @@ module Enumerable
       end
     else
       each do |*value|
-        if Opal.destructure(value)
+        if ::Opal.destructure(value)
           return true
         end
       end
@@ -141,11 +141,11 @@ module Enumerable
     }
 
     if `object != null`
-      block = proc do |*args|
-        Opal.destructure(args) == object
+      block = ::Kernel.proc do |*args|
+        ::Opal.destructure(args) == object
       end
     elsif block.nil?
-      block = proc { true }
+      block = ::Kernel.proc { true }
     end
 
     each do |*args|
@@ -159,7 +159,7 @@ module Enumerable
     unless block_given?
       return enum_for(:cycle, n) do
         if n.nil?
-          respond_to?(:size) ? Float::INFINITY : nil
+          respond_to?(:size) ? ::Float::INFINITY : nil
         else
           n = ::Opal.coerce_to!(n, ::Integer, :to_int)
           n > 0 ? enumerator_size * n : 0
@@ -177,7 +177,7 @@ module Enumerable
       var all = [], i, length, value;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         all.push(param);
@@ -212,7 +212,7 @@ module Enumerable
     return enum_for :detect, ifnone unless block_given?
 
     each do |*args|
-      value = Opal.destructure(args)
+      value = ::Opal.destructure(args)
       if yield(value)
         return value
       end
@@ -244,7 +244,7 @@ module Enumerable
 
       self.$each.$$p = function() {
         if (number <= current) {
-          result.push(#{Opal.destructure(`arguments`)});
+          result.push(#{::Opal.destructure(`arguments`)});
         }
 
         current++;
@@ -264,7 +264,7 @@ module Enumerable
           dropping = true;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)};
+        var param = #{::Opal.destructure(`arguments`)};
 
         if (dropping) {
           var value = Opal.yield1(block, param);
@@ -313,7 +313,7 @@ module Enumerable
       var buffer = [];
 
       self.$each.$$p = function() {
-        var element = #{Opal.destructure(`arguments`)};
+        var element = #{::Opal.destructure(`arguments`)};
         buffer.push(element);
         if (buffer.length > n) {
           buffer.shift();
@@ -336,7 +336,7 @@ module Enumerable
 
     %x{
       self.$each.$$p = function() {
-        var item = #{Opal.destructure(`arguments`)};
+        var item = #{::Opal.destructure(`arguments`)};
 
         Opal.yield1(block, item);
       }
@@ -360,7 +360,7 @@ module Enumerable
       var slice = []
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)};
+        var param = #{::Opal.destructure(`arguments`)};
 
         slice.push(param);
 
@@ -388,7 +388,7 @@ module Enumerable
       var index = 0;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)};
+        var param = #{::Opal.destructure(`arguments`)};
 
         block(param, index);
 
@@ -406,7 +406,7 @@ module Enumerable
 
     %x{
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)};
+        var param = #{::Opal.destructure(`arguments`)};
 
         block(param, object);
       };
@@ -422,7 +422,7 @@ module Enumerable
       var result = [];
 
       self.$each.$$p = function() {
-        result.push(#{Opal.destructure(`arguments`)});
+        result.push(#{::Opal.destructure(`arguments`)});
       };
 
       self.$each.apply(self, args);
@@ -446,7 +446,7 @@ module Enumerable
       var result = [];
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         if ($truthy(value)) {
@@ -475,7 +475,7 @@ module Enumerable
 
     if `object != null`
       each do |*value|
-        if Opal.destructure(value) == object
+        if ::Opal.destructure(value) == object
           return index
         end
 
@@ -514,7 +514,7 @@ module Enumerable
       current = 0
 
       each do |*args|
-        `result.push(#{Opal.destructure(args)})`
+        `result.push(#{::Opal.destructure(args)})`
 
         if `number <= ++current`
           return result
@@ -574,7 +574,7 @@ module Enumerable
       var result;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         #{(hash[`value`] ||= []) << `param`};
@@ -592,7 +592,7 @@ module Enumerable
 
   def include?(obj)
     each do |*args|
-      if Opal.destructure(args) == obj
+      if ::Opal.destructure(args) == obj
         return true
       end
     end
@@ -606,7 +606,7 @@ module Enumerable
 
       if (block !== nil && sym === undefined) {
         self.$each.$$p = function() {
-          var value = #{Opal.destructure(`arguments`)};
+          var value = #{::Opal.destructure(`arguments`)};
 
           if (result === undefined) {
             result = value;
@@ -629,7 +629,7 @@ module Enumerable
         }
 
         self.$each.$$p = function() {
-          var value = #{Opal.destructure(`arguments`)};
+          var value = #{::Opal.destructure(`arguments`)};
 
           if (result === undefined) {
             result = value;
@@ -664,7 +664,7 @@ module Enumerable
         var result, value;
 
         self.$each.$$p = function() {
-          var item = #{Opal.destructure(`arguments`)};
+          var item = #{::Opal.destructure(`arguments`)};
 
           if (result === undefined) {
             result = item;
@@ -713,7 +713,7 @@ module Enumerable
           by;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         if (result === undefined) {
@@ -750,7 +750,7 @@ module Enumerable
 
       if (block !== nil) {
         self.$each.$$p = function() {
-          var param = #{Opal.destructure(`arguments`)};
+          var param = #{::Opal.destructure(`arguments`)};
 
           if (result === undefined) {
             result = param;
@@ -770,7 +770,7 @@ module Enumerable
       }
       else {
         self.$each.$$p = function() {
-          var param = #{Opal.destructure(`arguments`)};
+          var param = #{::Opal.destructure(`arguments`)};
 
           if (result === undefined) {
             result = param;
@@ -801,7 +801,7 @@ module Enumerable
           by;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         if (result === undefined) {
@@ -823,13 +823,13 @@ module Enumerable
   end
 
   def minmax(&block)
-    block ||= proc { |a, b| a <=> b }
+    block ||= ::Kernel.proc { |a, b| a <=> b }
 
     %x{
       var min = nil, max = nil, first_time = true;
 
       self.$each.$$p = function() {
-        var element = #{Opal.destructure(`arguments`)};
+        var element = #{::Opal.destructure(`arguments`)};
         if (first_time) {
           min = max = element;
           first_time = false;
@@ -868,7 +868,7 @@ module Enumerable
           max_by;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         if ((min_by === undefined) || #{`value` <=> `min_by`} < 0) {
@@ -903,7 +903,7 @@ module Enumerable
       end
     else
       each do |*value|
-        item = Opal.destructure(value)
+        item = ::Opal.destructure(value)
 
         return false if item
       end
@@ -933,7 +933,7 @@ module Enumerable
       end
     else
       each do |*value|
-        next unless Opal.destructure(value)
+        next unless ::Opal.destructure(value)
         count += 1
 
         return false if count > 1
@@ -950,7 +950,7 @@ module Enumerable
       var truthy = [], falsy = [], result;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         if ($truthy(value)) {
@@ -976,7 +976,7 @@ module Enumerable
       var result = [];
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = Opal.yield1(block, param);
 
         if ($falsy(value)) {
@@ -1041,7 +1041,7 @@ module Enumerable
           }
           else {
             self.$each.$$p = function() {
-              var param = #{Opal.destructure(`arguments`)},
+              var param = #{::Opal.destructure(`arguments`)},
                   value = block(param, #{pattern.dup});
 
               if ($truthy(value) && slice.length > 0) {
@@ -1055,7 +1055,7 @@ module Enumerable
         }
         else {
           self.$each.$$p = function() {
-            var param = #{Opal.destructure(`arguments`)},
+            var param = #{::Opal.destructure(`arguments`)},
                 value = #{pattern === `param`};
 
             if ($truthy(value) && slice.length > 0) {
@@ -1086,7 +1086,7 @@ module Enumerable
     end
 
     if `pattern !== undefined`
-      block = proc { |e| pattern === e }
+      block = ::Kernel.proc { |e| pattern === e }
     end
 
     Enumerator.new do |yielder|
@@ -1094,7 +1094,7 @@ module Enumerable
         var accumulate;
 
         self.$each.$$p = function() {
-          var element = #{Opal.destructure(`arguments`)},
+          var element = #{::Opal.destructure(`arguments`)},
               end_chunk = Opal.yield1(block, element);
 
           if (accumulate == null) {
@@ -1127,7 +1127,7 @@ module Enumerable
         var slice = nil, last_after = nil;
 
         self.$each_cons.$$p = function() {
-          var params = #{Opal.destructure(`arguments`)},
+          var params = #{::Opal.destructure(`arguments`)},
               before = params[0],
               after = params[1],
               match = Opal.yieldX(block, [before, after]);
@@ -1167,7 +1167,7 @@ module Enumerable
     return enum_for(:sort_by) { enumerator_size } unless block_given?
 
     dup = map do
-      arg = Opal.destructure(`arguments`)
+      arg = ::Opal.destructure(`arguments`)
       [yield(arg), arg]
     end
     dup.sort! { |a, b| `a[0]` <=> `b[0]` }
@@ -1181,7 +1181,7 @@ module Enumerable
       item = if block_given?
                yield(*args)
              else
-               Opal.destructure(args)
+               ::Opal.destructure(args)
              end
       result += item
     end
@@ -1199,7 +1199,7 @@ module Enumerable
     result = []
 
     each do |*args|
-      value = Opal.destructure(args)
+      value = ::Opal.destructure(args)
 
       unless yield(value)
         return result
@@ -1213,7 +1213,7 @@ module Enumerable
     hash = {}
 
     each do |*args|
-      value = Opal.destructure(args)
+      value = ::Opal.destructure(args)
 
       produced = if block_given?
                    yield(value)

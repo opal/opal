@@ -345,7 +345,7 @@ module Marshal
     def read_class
       klass_name = read_string(cache: false)
       result = safe_const_get(klass_name)
-      unless result.class == Class
+      unless result.class == ::Class
         ::Kernel.raise ::ArgumentError, "#{klass_name} does not refer to a Class"
       end
       @object_cache << result
@@ -362,7 +362,7 @@ module Marshal
     def read_module
       mod_name = read_string(cache: false)
       result = safe_const_get(mod_name)
-      unless result.class == Module
+      unless result.class == ::Module
         ::Kernel.raise ::ArgumentError, "#{mod_name} does not refer to a Module"
       end
       @object_cache << result

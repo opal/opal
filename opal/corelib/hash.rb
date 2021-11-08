@@ -9,7 +9,7 @@ require 'corelib/enumerable'
 # - $$proc        [Proc,null,nil] the default proc used for missing keys
 # - hash-bucket   [JS::Object] an element of a linked list that holds hash values, keys are `{key:,key_hash:,value:,next:}`
 class Hash
-  include Enumerable
+  include ::Enumerable
 
   # Mark all hash instances as valid hashes (used to check keyword args, etc)
   `self.$$prototype.$$is_hash = true`

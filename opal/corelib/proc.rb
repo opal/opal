@@ -55,14 +55,14 @@ class Proc < `Function`
   alias yield call
 
   def >>(other)
-    proc do |*args, &block|
+    ::Kernel.proc do |*args, &block|
       out = call(*args, &block)
       other.call(out)
     end
   end
 
   def <<(other)
-    proc do |*args, &block|
+    ::Kernel.proc do |*args, &block|
       out = other.call(*args, &block)
       call(out)
     end

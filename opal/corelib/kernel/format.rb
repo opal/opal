@@ -404,7 +404,7 @@ module Kernel
           case 'E':
           case 'g':
           case 'G':
-            arg = #{Float(`GET_ARG()`)};
+            arg = #{::Kernel.Float(`GET_ARG()`)};
             if (arg >= 0 || isNaN(arg)) {
               if (arg === Infinity) {
                 str = 'Inf';

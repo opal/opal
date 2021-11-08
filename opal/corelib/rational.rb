@@ -1,7 +1,7 @@
 require 'corelib/numeric'
 require 'corelib/rational/base'
 
-class Rational < Numeric
+class Rational < ::Numeric
   def self.reduce(num, den)
     num = num.to_i
     den = den.to_i
@@ -151,7 +151,7 @@ class Rational < Numeric
       ::Kernel.Rational(num, den)
 
     when ::Integer
-      Rational(@num * other, @den)
+      ::Kernel.Rational(@num * other, @den)
 
     when ::Float
       to_f * other
@@ -379,15 +379,15 @@ class Rational < Numeric
 
           if (isFloat()) {
             denominator = parseFloat(cutFloat());
-            return #{Rational(`numerator`, `denominator`)};
+            return #{::Kernel.Rational(`numerator`, `denominator`)};
           } else {
-            return #{Rational(`numerator`, 1)};
+            return #{::Kernel.Rational(`numerator`, 1)};
           }
         } else {
-          return #{Rational(`numerator`, 1)};
+          return #{::Kernel.Rational(`numerator`, 1)};
         }
       } else {
-        return #{Rational(0, 1)};
+        return #{::Kernel.Rational(0, 1)};
       }
     }
   end

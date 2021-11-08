@@ -1,7 +1,7 @@
 class Random
   module Formatter
     def hex(count = nil)
-      count = Random._verify_count(count)
+      count = ::Random._verify_count(count)
       %x{
         var bytes = #{bytes(count)};
         var out = "";
@@ -17,11 +17,11 @@ class Random
     end
 
     def base64(count = nil)
-      Base64.strict_encode64(random_bytes(count)).encode('US-ASCII')
+      ::Base64.strict_encode64(random_bytes(count)).encode('US-ASCII')
     end
 
     def urlsafe_base64(count = nil, padding = false)
-      Base64.urlsafe_encode64(random_bytes(count), padding).encode('US-ASCII')
+      ::Base64.urlsafe_encode64(random_bytes(count), padding).encode('US-ASCII')
     end
 
     def uuid

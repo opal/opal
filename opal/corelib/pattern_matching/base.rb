@@ -32,4 +32,4 @@ class Struct
   end
 end
 
-class NoMatchingPatternError < StandardError; end
+class NoMatchingPatternError < ::StandardError; end

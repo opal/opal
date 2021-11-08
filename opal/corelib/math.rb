@@ -4,7 +4,7 @@ module Math
   E  = `Math.E`
   PI = `Math.PI`
 
-  DomainError = Class.new(StandardError)
+  DomainError = Class.new(::StandardError)
 
   def self.checked(method, *args)
     %x{
@@ -23,15 +23,15 @@ module Math
   end
 
   def self.float!(value)
-    Float(value)
+    ::Kernel.Float(value)
   rescue ::ArgumentError
-    ::Kernel.raise `$type_error(value, #{Float})`
+    ::Kernel.raise `$type_error(value, #{::Float})`
   end
 
   def self.integer!(value)
     ::Kernel.Integer(value)
   rescue ::ArgumentError
-    ::Kernel.raise `$type_error(value, #{Integer})`
+    ::Kernel.raise `$type_error(value, #{::Integer})`
   end
 
   module_function
@@ -300,7 +300,7 @@ module Math
       }
 
       if (n < 0.5) {
-        return Math.PI / (Math.sin(Math.PI * n) * #{Math.gamma(1 - n)});
+        return Math.PI / (Math.sin(Math.PI * n) * #{::Math.gamma(1 - n)});
       }
 
       if (n >= 171.35) {
@@ -394,7 +394,7 @@ module Math
 
   def log10(x)
     if ::String === x
-      ::Kernel.raise `$type_error(x, #{Float})`
+      ::Kernel.raise `$type_error(x, #{::Float})`
     end
 
     ::Math.checked :log10, ::Math.float!(x)
@@ -410,7 +410,7 @@ module Math
 
   def log2(x)
     if ::String === x
-      ::Kernel.raise `$type_error(x, #{Float})`
+      ::Kernel.raise `$type_error(x, #{::Float})`
     end
 
     ::Math.checked :log2, ::Math.float!(x)

@@ -53,7 +53,7 @@ class Random
   end
 
   def bytes(length)
-    length = Random._verify_count(length)
+    length = ::Random._verify_count(length)
 
     ::Array.new(length) { rand(255).chr }.join.encode('ASCII-8BIT')
   end
