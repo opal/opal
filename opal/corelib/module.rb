@@ -416,9 +416,7 @@ class Module
 
       Object.assign(wrapper, block)
 
-      Opal.defn(self, id, wrapper);
-
-      return name;
+      return Opal.defn(self, id, wrapper);
     }
   end
 
