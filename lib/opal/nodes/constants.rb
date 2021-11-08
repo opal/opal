@@ -15,6 +15,8 @@ module Opal
         elsif optimized_access?
           helper :"#{name}"
           push "$#{name}"
+        elsif const_scope == s(:cbase)
+          push "$$$('#{name}')"
         elsif const_scope
           push '$$$(', recv(const_scope), ", '#{name}')"
         elsif compiler.eval?

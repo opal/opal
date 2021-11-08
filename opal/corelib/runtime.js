@@ -355,29 +355,35 @@
   Opal.const_get_qualified = function(cref, name, skip_missing) {
     var result, cache, cached, current_version = Opal.const_cache_version;
 
-    if (cref == null) return;
-
-    if (cref === '::') cref = _Object;
-
-    if (!cref.$$is_module && !cref.$$is_class) {
-      throw new Opal.TypeError(cref.toString() + " is not a class/module");
+    if (name == null) {
+      result = const_get_name(_Object, cref);              if (result != null) return result;
+      return Opal.const_get_qualified(_Object, cref, skip_missing);
     }
+    else {
+      if (cref == null) return;
 
-    if ((cache = cref.$$const_cache) == null) {
-      $prop(cref, '$$const_cache', Object.create(null));
-      cache = cref.$$const_cache;
+      if (cref === '::') cref = _Object;
+
+      if (!cref.$$is_module && !cref.$$is_class) {
+        throw new Opal.TypeError(cref.toString() + " is not a class/module");
+      }
+
+      if ((cache = cref.$$const_cache) == null) {
+        $prop(cref, '$$const_cache', Object.create(null));
+        cache = cref.$$const_cache;
+      }
+      cached = cache[name];
+
+      if (cached == null || cached[0] !== current_version) {
+        ((result = const_get_name(cref, name))              != null) ||
+        ((result = const_lookup_ancestors(cref, name))      != null);
+        cache[name] = [current_version, result];
+      } else {
+        result = cached[1];
+      }
+
+      return result != null ? result : const_missing(cref, name, skip_missing);
     }
-    cached = cache[name];
-
-    if (cached == null || cached[0] !== current_version) {
-      ((result = const_get_name(cref, name))              != null) ||
-      ((result = const_lookup_ancestors(cref, name))      != null);
-      cache[name] = [current_version, result];
-    } else {
-      result = cached[1];
-    }
-
-    return result != null ? result : const_missing(cref, name, skip_missing);
   };
 
   // Initialize the top level constant cache generation counter

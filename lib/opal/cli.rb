@@ -128,7 +128,7 @@ module Opal
       evals_or_file { |source, filename| builder.build_str(source, filename) }
 
       # --no-exit
-      builder.build_str 'Kernel.exit', '(exit)' unless no_exit
+      builder.build_str '::Kernel.exit', '(exit)' unless no_exit
 
       builder
     end
