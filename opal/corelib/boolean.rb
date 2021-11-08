@@ -1,5 +1,5 @@
 class Boolean < `Boolean`
-  `Opal.defineProperty(self.$$prototype, '$$is_boolean', true)`
+  `Opal.prop(self.$$prototype, '$$is_boolean', true)`
 
   %x{
     var properties = ['$$class', '$$meta'];

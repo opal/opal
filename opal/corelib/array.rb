@@ -7,7 +7,7 @@ class Array < `Array`
   include Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays
-  `Opal.defineProperty(self.$$prototype, '$$is_array', true)`
+  `Opal.prop(self.$$prototype, '$$is_array', true)`
 
   %x{
     // Recent versions of V8 (> 7.1) only use an optimized implementation when Array.prototype is unmodified.

@@ -1,5 +1,5 @@
 class Exception < `Error`
-  `Opal.defineProperty(self.$$prototype, '$$is_exception', true)`
+  `Opal.prop(self.$$prototype, '$$is_exception', true)`
   `var stack_trace_limit`
 
   def self.new(*args)
