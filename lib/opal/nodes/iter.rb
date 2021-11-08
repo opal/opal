@@ -49,9 +49,9 @@ module Opal
         push '}'
 
         blockopts = []
+        blockopts << "$$arity: #{arity}"
         blockopts << "$$s: #{scope.self}" if @define_self
         blockopts << "$$brk: $brk" if contains_break?
-        blockopts << "$$arity: #{arity}"
 
         if compiler.arity_check?
           blockopts << "$$parameters: #{parameters_code}"
@@ -73,7 +73,9 @@ module Opal
           blockopts << "$$has_trailing_comma_in_args: true"
         end
 
-        unless blockopts.empty?
+        if blockopts.length == 1
+          push ", #{arity}"
+        elsif blockopts.length > 1
           push ', {', blockopts.join(', '), '}'
         end
       end

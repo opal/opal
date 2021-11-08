@@ -44,16 +44,6 @@ module Opal
           end
         end
 
-        # There are some special utf8 chars that can be used as valid JS
-        # identifiers, some examples:
-        #
-        # utf8_pond = 'ⵌ'
-        # utf8_question = 'ʔ̣'
-        # utf8_exclamation 'ǃ'
-        #
-        # For now we're just using $$, to maintain compatibility with older IEs.
-        function_name = valid_name?(mid) ? " $$#{mid}" : ''
-
         unshift ') {'
         unshift(inline_params)
         unshift "function #{scope_name}("
@@ -78,7 +68,9 @@ module Opal
           blockopts << "$$source_location: #{source_location}"
         end
 
-        unless blockopts.empty?
+        if blockopts.length == 1
+          push ", #{arity}"
+        elsif blockopts.length > 1
           push ', {', blockopts.join(', '), '}'
         end
 
