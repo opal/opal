@@ -82,12 +82,7 @@ module Opal
 
       def compile_block_arg
         if block_arg
-          scope.block_name = block_arg
-          scope.add_temp block_arg
-          scope_name = scope.identify!
-
-          line "#{block_arg} = #{scope_name}.$$p || nil;"
-          line "if (#{block_arg}) #{scope_name}.$$p = null;"
+          scope.prepare_block
         end
       end
 

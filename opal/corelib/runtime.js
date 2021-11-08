@@ -1460,7 +1460,7 @@
       this.$method_missing.$$p = method_missing_stub.$$p;
 
       // Set block property to null ready for the next call (stop false-positives)
-      method_missing_stub.$$p = null;
+      delete method_missing_stub.$$p;
 
       // call method missing with correct args (remove '$' prefix on method name)
       var args_ary = new Array(arguments.length);
@@ -2096,7 +2096,7 @@
         args[i] = arguments[i];
       }
 
-      if (block != null) { alias.$$p = null }
+      delete alias.$$p;
 
       return Opal.send(this, body, args, block);
     };
@@ -2777,7 +2777,7 @@
   function top_define_method() {
     var args = Opal.slice.call(arguments);
     var block = top_define_method.$$p;
-    top_define_method.$$p = null;
+    delete top_define_method.$$p;
     return Opal.send(_Object, 'define_method', args, block)
   };
 
