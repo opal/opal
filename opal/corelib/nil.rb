@@ -46,7 +46,7 @@ class NilClass
   end
 
   def singleton_class
-    NilClass
+    ::NilClass
   end
 
   def to_a
@@ -68,16 +68,16 @@ class NilClass
   end
 
   def to_c
-    Complex.new(0, 0)
+    ::Complex.new(0, 0)
   end
 
   def rationalize(*args)
     ::Kernel.raise ::ArgumentError if args.length > 1
-    Rational(0, 1)
+    ::Kernel.Rational(0, 1)
   end
 
   def to_r
-    Rational(0, 1)
+    ::Kernel.Rational(0, 1)
   end
 
   def instance_variables

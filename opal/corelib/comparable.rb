@@ -14,7 +14,7 @@ module Comparable
       var class_name;
       #{
         case `rhs`
-        when nil, true, false, Integer, Float
+        when nil, true, false, ::Integer, ::Float
           `class_name = rhs.$inspect()`
         else
           `class_name = rhs.$$class`

@@ -106,8 +106,8 @@ class Boolean < `Boolean`
   end
 end
 
-class TrueClass < Boolean; end
-class FalseClass < Boolean; end
+class TrueClass < ::Boolean; end
+class FalseClass < ::Boolean; end
 
 TRUE  = true
 FALSE = false

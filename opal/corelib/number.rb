@@ -1,6 +1,6 @@
 require 'corelib/numeric'
 
-class Number < Numeric
+class Number < ::Numeric
   ::Opal.bridge(`Number`, self)
   `Opal.prop(self.$$prototype, '$$is_number', true)`
   `self.$$is_number_class = true`
@@ -393,7 +393,7 @@ class Number < Numeric
   def downto(stop, &block)
     unless block_given?
       return enum_for(:downto, stop) do
-        ::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
+        ::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless ::Numeric === stop
         stop > self ? 0 : self - stop + 1
       end
     end
@@ -782,7 +782,7 @@ class Number < Numeric
   def upto(stop, &block)
     unless block_given?
       return enum_for(:upto, stop) do
-        ::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
+        ::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless ::Numeric === stop
         stop < self ? 0 : stop - self + 1
       end
     end
@@ -839,9 +839,9 @@ class Number < Numeric
   end
 end
 
-Fixnum = Number
+::Fixnum = ::Number
 
-class Integer < Numeric
+class Integer < ::Numeric
   `self.$$is_number_class = true`
   `self.$$is_integer_class = true`
 
@@ -868,7 +868,7 @@ class Integer < Numeric
   MIN = `-Math.pow(2, 30)`
 end
 
-class Float < Numeric
+class Float < ::Numeric
   `self.$$is_number_class = true`
 
   class << self

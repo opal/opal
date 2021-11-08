@@ -479,7 +479,7 @@ module Kernel
   end
 
   def loop
-    return enum_for(:loop) { Float::INFINITY } unless block_given?
+    return enum_for(:loop) { ::Float::INFINITY } unless block_given?
 
     while true
       begin
@@ -551,10 +551,10 @@ module Kernel
         throw #{$!};
       }
       if (exception == null) {
-        exception = #{RuntimeError.new ''};
+        exception = #{::RuntimeError.new ''};
       }
       else if ($respond_to(exception, '$to_str')) {
-        exception = #{RuntimeError.new exception.to_str};
+        exception = #{::RuntimeError.new exception.to_str};
       }
       // using respond_to? and not an undefined check to avoid method_missing matching as true
       else if (exception.$$is_class && $respond_to(exception, '$exception')) {
@@ -564,7 +564,7 @@ module Kernel
         // exception is fine
       }
       else {
-        exception = #{TypeError.new 'exception class/object expected'};
+        exception = #{::TypeError.new 'exception class/object expected'};
       }
 
       if (backtrace !== nil) {
@@ -652,7 +652,7 @@ module Kernel
     %x{
       var result = [];
 
-      path = #{File.expand_path(path)}
+      path = #{::File.expand_path(path)}
       path = Opal.normalize(path);
       if (path === '.') path = '';
       for (var name in Opal.modules) {
@@ -751,5 +751,5 @@ class Object
   # Now we have Kernel loaded, make sure Object.require refers to Kernel.require
   # which is what ruby does and allows for overwriting by autoloaders
   `delete Opal.Object.$$prototype.$require`
-  include Kernel
+  include ::Kernel
 end

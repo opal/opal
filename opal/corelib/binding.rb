@@ -34,7 +34,7 @@ class Binding
   def eval(str, file = nil, line = nil)
     return receiver if str == 'self'
 
-    Kernel.eval(str, self, file, line)
+    ::Kernel.eval(str, self, file, line)
   end
 
   attr_reader :receiver, :source_location

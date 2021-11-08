@@ -356,7 +356,9 @@
     var result, cache, cached, current_version = Opal.const_cache_version;
 
     if (name == null) {
-      result = const_get_name(_Object, cref);              if (result != null) return result;
+      // A shortpath for calls like ::String => $$$("String")
+      result = const_get_name(_Object, cref);
+      if (result != null) return result;
       return Opal.const_get_qualified(_Object, cref, skip_missing);
     }
     else {

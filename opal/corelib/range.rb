@@ -1,7 +1,7 @@
 require 'corelib/enumerable'
 
 class Range
-  include Enumerable
+  include ::Enumerable
 
   `self.$$prototype.$$is_range = true`
 
@@ -195,7 +195,7 @@ class Range
           // n is a float
           var begin = self.begin, end = self.end,
               abs = Math.abs, floor = Math.floor,
-              err = (abs(begin) + abs(end) + abs(end - begin)) / abs(n) * #{Float::EPSILON},
+              err = (abs(begin) + abs(end) + abs(end - begin)) / abs(n) * #{::Float::EPSILON},
               size;
 
           if (err > 0.5) {

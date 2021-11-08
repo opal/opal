@@ -1,6 +1,6 @@
 # helpers: coerce_to
 
-class RegexpError < StandardError; end
+class RegexpError < ::StandardError; end
 
 class Regexp < `RegExp`
   IGNORECASE = 1
@@ -168,7 +168,7 @@ class Regexp < `RegExp`
         if (string === nil) return #{$~ = nil};
         var m = self.exec($coerce_to(string, #{::String}, 'to_str'));
         if (m) {
-          #{$~ = MatchData.new(`self`, `m`)};
+          #{$~ = ::MatchData.new(`self`, `m`)};
           return block === nil ? #{$~} : #{yield $~};
         } else {
           return #{$~ = nil};
@@ -199,7 +199,7 @@ class Regexp < `RegExp`
           return #{$~ = nil};
         }
         if (md.index >= pos) {
-          #{$~ = MatchData.new(`re`, `md`)};
+          #{$~ = ::MatchData.new(`re`, `md`)};
           return block === nil ? #{$~} : #{yield $~};
         }
         re.lastIndex = md.index + 1;
@@ -341,7 +341,7 @@ class MatchData
   end
 
   def ==(other)
-    return false unless MatchData === other
+    return false unless ::MatchData === other
 
     `self.string == other.string` &&
       `self.regexp.toString() == other.regexp.toString()` &&

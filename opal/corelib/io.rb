@@ -164,7 +164,7 @@ class IO
   def sysread(integer)
     `self.read_proc(integer)` || begin
       @eof = true
-      raise EOFError, 'end of file reached'
+      ::Kernel.raise ::EOFError, 'end of file reached'
     end
   end
 
@@ -287,12 +287,12 @@ class IO
   end
 end
 
-STDIN  = $stdin  = IO.new(0, 'r')
-STDOUT = $stdout = IO.new(1, 'w')
-STDERR = $stderr = IO.new(2, 'w')
+::STDIN  = $stdin  = ::IO.new(0, 'r')
+::STDOUT = $stdout = ::IO.new(1, 'w')
+::STDERR = $stderr = ::IO.new(2, 'w')
 
 `var console = Opal.global.console`
-STDOUT.write_proc = `typeof(process) === 'object' && typeof(process.stdout) === 'object' ? function(s){process.stdout.write(s)} : function(s){console.log(s)}`
-STDERR.write_proc = `typeof(process) === 'object' && typeof(process.stderr) === 'object' ? function(s){process.stderr.write(s)} : function(s){console.warn(s)}`
+::STDOUT.write_proc = `typeof(process) === 'object' && typeof(process.stdout) === 'object' ? function(s){process.stdout.write(s)} : function(s){console.log(s)}`
+::STDERR.write_proc = `typeof(process) === 'object' && typeof(process.stderr) === 'object' ? function(s){process.stderr.write(s)} : function(s){console.warn(s)}`
 
-STDIN.read_proc = `function(s) { var p = prompt(); if (p !== null) return p + "\n"; return nil; }`
+::STDIN.read_proc = `function(s) { var p = prompt(); if (p !== null) return p + "\n"; return nil; }`

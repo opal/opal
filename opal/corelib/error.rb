@@ -196,44 +196,44 @@ class Exception < `Error`
 end
 
 # keep the indentation, it makes the exception hierarchy clear
-class ScriptError       < Exception; end
-class SyntaxError         < ScriptError; end
-class LoadError           < ScriptError; end
-class NotImplementedError < ScriptError; end
+class ScriptError       < ::Exception; end
+class SyntaxError         < ::ScriptError; end
+class LoadError           < ::ScriptError; end
+class NotImplementedError < ::ScriptError; end
 
-class SystemExit        < Exception; end
-class NoMemoryError     < Exception; end
-class SignalException   < Exception; end
-class Interrupt           < SignalException; end
-class SecurityError     < Exception; end
-class SystemStackError  < Exception; end
+class SystemExit        < ::Exception; end
+class NoMemoryError     < ::Exception; end
+class SignalException   < ::Exception; end
+class Interrupt           < ::SignalException; end
+class SecurityError     < ::Exception; end
+class SystemStackError  < ::Exception; end
 
-class StandardError     < Exception; end
-class EncodingError       < StandardError; end
-class ZeroDivisionError   < StandardError; end
-class NameError           < StandardError; end
-class NoMethodError         < NameError; end
-class RuntimeError        < StandardError; end
-class FrozenError           < RuntimeError; end
-class LocalJumpError      < StandardError; end
-class TypeError           < StandardError; end
-class ArgumentError       < StandardError; end
-class UncaughtThrowError    < ArgumentError; end
-class IndexError          < StandardError; end
-class StopIteration         < IndexError; end
-class ClosedQueueError        < StopIteration; end
-class KeyError              < IndexError; end
-class RangeError          < StandardError; end
-class FloatDomainError      < RangeError; end
-class IOError             < StandardError; end
-class EOFError              < IOError; end
-class SystemCallError     < StandardError; end
-class RegexpError         < StandardError; end
-class ThreadError         < StandardError; end
-class FiberError          < StandardError; end
+class StandardError     < ::Exception; end
+class EncodingError       < ::StandardError; end
+class ZeroDivisionError   < ::StandardError; end
+class NameError           < ::StandardError; end
+class NoMethodError         < ::NameError; end
+class RuntimeError        < ::StandardError; end
+class FrozenError           < ::RuntimeError; end
+class LocalJumpError      < ::StandardError; end
+class TypeError           < ::StandardError; end
+class ArgumentError       < ::StandardError; end
+class UncaughtThrowError    < ::ArgumentError; end
+class IndexError          < ::StandardError; end
+class StopIteration         < ::IndexError; end
+class ClosedQueueError        < ::StopIteration; end
+class KeyError              < ::IndexError; end
+class RangeError          < ::StandardError; end
+class FloatDomainError      < ::RangeError; end
+class IOError             < ::StandardError; end
+class EOFError              < ::IOError; end
+class SystemCallError     < ::StandardError; end
+class RegexpError         < ::StandardError; end
+class ThreadError         < ::StandardError; end
+class FiberError          < ::StandardError; end
 
 module Errno
-  class EINVAL              < SystemCallError
+  class EINVAL              < ::SystemCallError
     def self.new(name = nil)
       message = 'Invalid argument'
       message += " - #{name}" if name
@@ -242,7 +242,7 @@ module Errno
   end
 end
 
-class UncaughtThrowError < ArgumentError
+class UncaughtThrowError < ::ArgumentError
   attr_reader :tag, :value
 
   def initialize(tag, value = nil)

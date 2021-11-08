@@ -3,7 +3,7 @@
 require 'corelib/enumerable'
 
 class Enumerator
-  include Enumerable
+  include ::Enumerable
 
   `self.$$prototype.$$is_enumerator = true`
 
@@ -65,7 +65,7 @@ class Enumerator
       var result, index = offset;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = block(param, index);
 
         index++;
@@ -90,14 +90,14 @@ class Enumerator
     result = "#<#{self.class}: #{@object.inspect}:#{@method}"
 
     if @args.any?
-      result += "(#{@args.inspect[Range.new(1, -2)]})"
+      result += "(#{@args.inspect[::Range.new(1, -2)]})"
     end
 
     result + '>'
   end
 
   class Generator
-    include Enumerable
+    include ::Enumerable
 
     def initialize(&block)
       ::Kernel.raise ::LocalJumpError, 'no block given' unless block
@@ -153,7 +153,7 @@ class Enumerator
   end
 
   class Lazy < self
-    class StopLazyError < Exception; end
+    class StopLazyError < ::Exception; end
 
     def initialize(object, size = nil, &block)
       unless block_given?
@@ -296,7 +296,7 @@ class Enumerator
       if block
         Lazy.new(self, nil) do |enum, *args|
           %x{
-            var param = #{Opal.destructure(args)},
+            var param = #{::Opal.destructure(args)},
                 value = #{pattern === `param`};
 
             if ($truthy(value)) {
@@ -309,7 +309,7 @@ class Enumerator
       else
         Lazy.new(self, nil) do |enum, *args|
           %x{
-            var param = #{Opal.destructure(args)},
+            var param = #{::Opal.destructure(args)},
                 value = #{pattern === `param`};
 
             if ($truthy(value)) {

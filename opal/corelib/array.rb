@@ -4,7 +4,7 @@ require 'corelib/enumerable'
 require 'corelib/numeric'
 
 class Array < `Array`
-  include Enumerable
+  include ::Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays
   `Opal.prop(self.$$prototype, '$$is_array', true)`
@@ -414,7 +414,7 @@ class Array < `Array`
       var i, size = self.length;
     }
 
-    if Range === index
+    if ::Range === index
       data = if Array === value
                value.to_a
              elsif value.respond_to? :to_ary
@@ -1055,7 +1055,7 @@ class Array < `Array`
       obj, one, two = args
     end
 
-    if Range === one
+    if ::Range === one
       ::Kernel.raise ::TypeError, 'length invalid with range' if two
 
       left   = `$coerce_to(one.begin, #{::Integer}, 'to_int')`
@@ -2009,7 +2009,7 @@ class Array < `Array`
     result = nil
 
     if `length === undefined`
-      if Range === index
+      if ::Range === index
         range = index
         result = self[range]
 
@@ -2316,7 +2316,7 @@ class Array < `Array`
     out = []
 
     args.each do |elem|
-      if elem.is_a? Range
+      if elem.is_a? ::Range
         finish = `$coerce_to(#{elem.last}, #{::Integer}, 'to_int')`
         start = `$coerce_to(#{elem.first}, #{::Integer}, 'to_int')`
 

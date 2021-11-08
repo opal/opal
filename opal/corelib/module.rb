@@ -232,25 +232,25 @@ class Module
   end
 
   def class_variable_get(name)
-    name = Opal.class_variable_name!(name)
+    name = ::Opal.class_variable_name!(name)
 
     `Opal.class_variable_get(self, name, false)`
   end
 
   def class_variable_set(name, value)
-    name = Opal.class_variable_name!(name)
+    name = ::Opal.class_variable_name!(name)
 
     `Opal.class_variable_set(self, name, value)`
   end
 
   def class_variable_defined?(name)
-    name = Opal.class_variable_name!(name)
+    name = ::Opal.class_variable_name!(name)
 
     `Opal.class_variables(self).hasOwnProperty(name)`
   end
 
   def remove_class_variable(name)
-    name = Opal.class_variable_name!(name)
+    name = ::Opal.class_variable_name!(name)
 
     %x{
       if (Opal.hasOwnProperty.call(self.$$cvars, name)) {

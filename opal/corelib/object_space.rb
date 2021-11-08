@@ -36,7 +36,7 @@ module ObjectSpace
   def define_finalizer(obj, aproc = undefined, &block)
     %x{
       if ($truthy(block)) aproc = block;
-      if ($falsy(aproc)) aproc = #{proc};
+      if ($falsy(aproc)) aproc = #{::Kernel.proc};
       if (!$respond_to(aproc, '$call')) {
         #{::Kernel.raise ::ArgumentError, "Wrong type argument #{aproc.class} (should be callable)"};
       }
@@ -63,7 +63,7 @@ module ObjectSpace
   end
 
   class WeakMap
-    include Enumerable
+    include ::Enumerable
 
     def initialize
       @weak_map = `new WeakMap()`

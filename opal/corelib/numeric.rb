@@ -1,7 +1,7 @@
 require 'corelib/comparable'
 
 class Numeric
-  include Comparable
+  include ::Comparable
 
   def coerce(other)
     if other.instance_of? self.class
@@ -200,7 +200,7 @@ class Numeric
           return 1;
         } else {
           var abs = Math.abs, floor = Math.floor,
-              err = (abs(self) + abs(limit) + abs(limit - self)) / abs(step) * #{Float::EPSILON};
+              err = (abs(self) + abs(limit) + abs(limit - self)) / abs(step) * #{::Float::EPSILON};
 
           if (err === Infinity || err === -Infinity) {
             return 0;

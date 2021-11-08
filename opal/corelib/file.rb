@@ -1,6 +1,6 @@
 # helpers: truthy
 
-class File < IO
+class File < ::IO
   Separator = SEPARATOR = '/'
   ALT_SEPARATOR = nil
   PATH_SEPARATOR = ':'
@@ -15,7 +15,7 @@ class File < IO
       new_parts = []
 
       path = path.respond_to?(:to_path) ? path.to_path : path
-      basedir ||= Dir.pwd
+      basedir ||= ::Dir.pwd
       path_abs    = `path.substr(0, sep.length) === sep || windows_root_rx.test(path)`
       basedir_abs = `basedir.substr(0, sep.length) === sep || windows_root_rx.test(basedir)`
 

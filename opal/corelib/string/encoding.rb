@@ -101,8 +101,8 @@ class Encoding
     ::Kernel.raise ::NotImplementedError
   end
 
-  class EncodingError < StandardError; end
-  class CompatibilityError < EncodingError; end
+  class ::EncodingError < StandardError; end
+  class ::CompatibilityError < EncodingError; end
 end
 
 Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
@@ -415,4 +415,4 @@ class String
   end
 end
 
-Encoding.default_external = __ENCODING__
+::Encoding.default_external = __ENCODING__

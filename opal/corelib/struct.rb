@@ -1,7 +1,7 @@
 require 'corelib/enumerable'
 
 class Struct
-  include Enumerable
+  include ::Enumerable
 
   def self.new(const_name, *args, keyword_init: false, &block)
     if const_name
