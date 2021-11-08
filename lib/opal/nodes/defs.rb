@@ -12,10 +12,6 @@ module Opal
         helper :defs
         unshift '$defs(', expr(recvr), ", '$#{mid}', "
         push ')'
-
-        if expr?
-          wrap '(', ", '#{mid}')"
-        end
       end
     end
   end

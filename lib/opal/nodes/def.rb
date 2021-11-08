@@ -81,11 +81,7 @@ module Opal
         helper :def
         wrap "$def(#{scope.self}, '$#{mid}', ", ')'
 
-        if expr?
-          wrap '(', ", '#{mid}')"
-        else
-          unshift "\n#{current_indent}"
-        end
+        unshift "\n#{current_indent}" unless expr?
       end
 
       def comments_code

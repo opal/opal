@@ -402,9 +402,7 @@ class Module
       block.$$def         = block;
       block.$$define_meth = true;
 
-      Opal.defn(self, id, block);
-
-      return name;
+      return Opal.defn(self, id, block);
     }
   end
 

@@ -1950,14 +1950,14 @@
     // Special case for a method definition in the
     // top-level namespace
     if (obj === Opal.top) {
-      Opal.defn(Opal.Object, jsid, body)
+      return Opal.defn(Opal.Object, jsid, body);
     }
     // if instance_eval is invoked on a module/class, it sets inst_eval_mod
     else if (!obj.$$eval && obj.$$is_a_module) {
-      Opal.defn(obj, jsid, body);
+      return Opal.defn(obj, jsid, body);
     }
     else {
-      Opal.defs(obj, jsid, body);
+      return Opal.defs(obj, jsid, body);
     }
   };
 
@@ -1965,6 +1965,8 @@
   Opal.defn = function(module, jsid, body) {
     body.displayName = jsid;
     body.$$owner = module;
+
+    var name = jsid.substr(1);
 
     var proto = module.$$prototype;
     if (proto.hasOwnProperty('$$dummy')) {
@@ -1985,11 +1987,13 @@
 
     var singleton_of = module.$$singleton_of;
     if (module.$method_added && !module.$method_added.$$stub && !singleton_of) {
-      module.$method_added(jsid.substr(1));
+      module.$method_added(name);
     }
     else if (singleton_of && singleton_of.$singleton_method_added && !singleton_of.$singleton_method_added.$$stub) {
-      singleton_of.$singleton_method_added(jsid.substr(1));
+      singleton_of.$singleton_method_added(name);
     }
+
+    return name;
   };
 
   // Define a singleton method on the given object (see Opal.def).
@@ -1999,7 +2003,7 @@
     if (obj.$$is_string || obj.$$is_number) {
       throw Opal.TypeError.$new("can't define singleton");
     }
-    Opal.defn(Opal.get_singleton_class(obj), jsid, body)
+    return Opal.defn(Opal.get_singleton_class(obj), jsid, body);
   };
 
   // Called from #remove_method.
