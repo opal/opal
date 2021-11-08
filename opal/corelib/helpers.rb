@@ -9,7 +9,7 @@ module Opal
     coerced = `$coerce_to(object, type, method, args)`
 
     unless type === coerced
-      raise `$type_error(object, type, method, coerced)`
+      ::Kernel.raise `$type_error(object, type, method, coerced)`
     end
 
     coerced
@@ -23,7 +23,7 @@ module Opal
     return if coerced.nil?
 
     unless type === coerced
-      raise `$type_error(object, type, method, coerced)`
+      ::Kernel.raise `$type_error(object, type, method, coerced)`
     end
 
     coerced
@@ -41,7 +41,7 @@ module Opal
     compare = a <=> b
 
     if `compare === nil`
-      raise ArgumentError, "comparison of #{a.class} with #{b.class} failed"
+      ::Kernel.raise ::ArgumentError, "comparison of #{a.class} with #{b.class} failed"
     end
 
     compare
@@ -75,20 +75,20 @@ module Opal
   end
 
   def self.instance_variable_name!(name)
-    name = Opal.coerce_to!(name, String, :to_str)
+    name = ::Opal.coerce_to!(name, ::String, :to_str)
 
     unless `/^@[a-zA-Z_][a-zA-Z0-9_]*?$/.test(name)`
-      raise NameError.new("'#{name}' is not allowed as an instance variable name", name)
+      ::Kernel.raise ::NameError.new("'#{name}' is not allowed as an instance variable name", name)
     end
 
     name
   end
 
   def self.class_variable_name!(name)
-    name = Opal.coerce_to!(name, String, :to_str)
+    name = ::Opal.coerce_to!(name, ::String, :to_str)
 
     if `name.length < 3 || name.slice(0,2) !== '@@'`
-      raise NameError.new("`#{name}' is not allowed as a class variable name", name)
+      ::Kernel.raise ::NameError.new("`#{name}' is not allowed as a class variable name", name)
     end
 
     name
@@ -97,7 +97,7 @@ module Opal
   def self.const_name?(const_name)
     %x{
       if (typeof const_name !== 'string') {
-        #{const_name = Opal.coerce_to!(const_name, String, :to_str)}
+        #{const_name = ::Opal.coerce_to!(const_name, ::String, :to_str)}
       }
 
       return #{const_name}[0] === #{const_name}[0].toUpperCase()
@@ -105,10 +105,10 @@ module Opal
   end
 
   def self.const_name!(const_name)
-    const_name = Opal.coerce_to!(const_name, String, :to_str)
+    const_name = ::Opal.coerce_to!(const_name, ::String, :to_str)
 
     if const_name[0] != const_name[0].upcase
-      raise NameError, "wrong constant name #{const_name}"
+      ::Kernel.raise ::NameError, "wrong constant name #{const_name}"
     end
 
     const_name

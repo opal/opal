@@ -6,7 +6,7 @@ class Proc < `Function`
 
   def self.new(&block)
     unless block
-      raise ArgumentError, 'tried to create a Proc object without a block'
+      ::Kernel.raise ArgumentError, 'tried to create a Proc object without a block'
     end
 
     block
@@ -94,10 +94,10 @@ class Proc < `Function`
   end
 
   def binding
-    `if (self.$$is_curried) { #{raise ArgumentError, "Can't create Binding"} }`
+    `if (self.$$is_curried) { #{::Kernel.raise ArgumentError, "Can't create Binding"} }`
 
-    if defined? Binding
-      Binding.new(nil, [], `self.$$s`, source_location)
+    if defined? ::Binding
+      ::Binding.new(nil, [], `self.$$s`, source_location)
     end
   end
 
@@ -136,9 +136,9 @@ class Proc < `Function`
         arity = self.length;
       }
       else {
-        arity = #{Opal.coerce_to!(arity, Integer, :to_int)};
+        arity = #{::Opal.coerce_to!(arity, ::Integer, :to_int)};
         if (self.$$is_lambda && arity !== self.length) {
-          #{raise ArgumentError, "wrong number of arguments (#{`arity`} for #{`self.length`})"}
+          #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arity`} for #{`self.length`})"}
         }
       }
 
@@ -148,7 +148,7 @@ class Proc < `Function`
             result;
 
         if (length > arity && self.$$is_lambda && !self.$$is_curried) {
-          #{raise ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
+          #{::Kernel.raise ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
         }
 
         if (length >= arity) {

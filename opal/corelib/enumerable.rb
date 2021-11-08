@@ -103,7 +103,7 @@ module Enumerable
   end
 
   def chunk_while(&block)
-    raise ArgumentError, 'no block given' unless block_given?
+    ::Kernel.raise ::ArgumentError, 'no block given' unless block_given?
 
     slice_when { |before, after| !(yield before, after) }
   end
@@ -161,14 +161,14 @@ module Enumerable
         if n.nil?
           respond_to?(:size) ? Float::INFINITY : nil
         else
-          n = Opal.coerce_to!(n, Integer, :to_int)
+          n = ::Opal.coerce_to!(n, ::Integer, :to_int)
           n > 0 ? enumerator_size * n : 0
         end
       end
     end
 
     unless n.nil?
-      n = Opal.coerce_to! n, Integer, :to_int
+      n = ::Opal.coerce_to! n, ::Integer, :to_int
 
       return if `n <= 0`
     end
@@ -232,10 +232,10 @@ module Enumerable
   end
 
   def drop(number)
-    number = `$coerce_to(number, #{Integer}, 'to_int')`
+    number = `$coerce_to(number, #{::Integer}, 'to_int')`
 
     if `number < 0`
-      raise ArgumentError, 'attempt to drop negative size'
+      ::Kernel.raise ::ArgumentError, 'attempt to drop negative size'
     end
 
     %x{
@@ -287,13 +287,13 @@ module Enumerable
 
   def each_cons(n, &block)
     if `arguments.length != 1`
-      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 1)"
+      ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arguments.length`} for 1)"
     end
 
-    n = Opal.try_convert n, Integer, :to_int
+    n = ::Opal.try_convert n, ::Integer, :to_int
 
     if `n <= 0`
-      raise ArgumentError, 'invalid size'
+      ::Kernel.raise ::ArgumentError, 'invalid size'
     end
 
     unless block_given?
@@ -348,10 +348,10 @@ module Enumerable
   end
 
   def each_slice(n, &block)
-    n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
+    n = `$coerce_to(#{n}, #{::Integer}, 'to_int')`
 
     if `n <= 0`
-      raise ArgumentError, 'invalid slice size'
+      ::Kernel.raise ::ArgumentError, 'invalid slice size'
     end
 
     return enum_for(:each_slice, n) { respond_to?(:size) ? (size / n).ceil : nil } unless block_given?
@@ -501,10 +501,10 @@ module Enumerable
       end
     else
       result = []
-      number = `$coerce_to(number, #{Integer}, 'to_int')`
+      number = `$coerce_to(number, #{::Integer}, 'to_int')`
 
       if `number < 0`
-        raise ArgumentError, 'attempt to take negative size'
+        ::Kernel.raise ::ArgumentError, 'attempt to take negative size'
       end
 
       if `number == 0`
@@ -621,7 +621,7 @@ module Enumerable
       else {
         if (sym === undefined) {
           if (!#{Symbol === object}) {
-            #{raise TypeError, "#{object.inspect} is not a Symbol"};
+            #{::Kernel.raise ::TypeError, "#{object.inspect} is not a Symbol"};
           }
 
           sym    = object;
@@ -678,7 +678,7 @@ module Enumerable
           }
 
           if (value === nil) {
-            #{raise ArgumentError, 'comparison failed'};
+            #{::Kernel.raise ::ArgumentError, 'comparison failed'};
           }
 
           if (value > 0) {
@@ -695,7 +695,7 @@ module Enumerable
         }
       }
 
-      n = $coerce_to(n, #{Integer}, 'to_int');
+      n = $coerce_to(n, #{::Integer}, 'to_int');
     }
 
     sort(&block).reverse.first(n)
@@ -760,7 +760,7 @@ module Enumerable
           var value = block(param, result);
 
           if (value === nil) {
-            #{raise ArgumentError, 'comparison failed'};
+            #{::Kernel.raise ::ArgumentError, 'comparison failed'};
           }
 
           if (value < 0) {
@@ -837,7 +837,7 @@ module Enumerable
           var min_cmp = #{block.call(`min`, `element`)};
 
           if (min_cmp === nil) {
-            #{raise ArgumentError, 'comparison failed'}
+            #{::Kernel.raise ::ArgumentError, 'comparison failed'}
           } else if (min_cmp > 0) {
             min = element;
           }
@@ -845,7 +845,7 @@ module Enumerable
           var max_cmp = #{block.call(`max`, `element`)};
 
           if (max_cmp === nil) {
-            #{raise ArgumentError, 'comparison failed'}
+            #{::Kernel.raise ::ArgumentError, 'comparison failed'}
           } else if (max_cmp < 0) {
             max = element;
           }
@@ -1014,21 +1014,21 @@ module Enumerable
 
   def slice_before(pattern = undefined, &block)
     if `pattern === undefined && block === nil`
-      raise ArgumentError, 'both pattern and block are given'
+      ::Kernel.raise ::ArgumentError, 'both pattern and block are given'
     end
 
     if `pattern !== undefined && block !== nil || arguments.length > 1`
-      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} expected 1)"
+      ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arguments.length`} expected 1)"
     end
 
-    Enumerator.new do |e|
+    ::Enumerator.new do |e|
       %x{
         var slice = [];
 
         if (block !== nil) {
           if (pattern === undefined) {
             self.$each.$$p = function() {
-              var param = #{Opal.destructure(`arguments`)},
+              var param = #{::Opal.destructure(`arguments`)},
                   value = Opal.yield1(block, param);
 
               if ($truthy(value) && slice.length > 0) {
@@ -1078,11 +1078,11 @@ module Enumerable
 
   def slice_after(pattern = undefined, &block)
     if `pattern === undefined && block === nil`
-      raise ArgumentError, 'both pattern and block are given'
+      ::Kernel.raise ::ArgumentError, 'both pattern and block are given'
     end
 
     if `pattern !== undefined && block !== nil || arguments.length > 1`
-      raise ArgumentError, "wrong number of arguments (#{`arguments.length`} expected 1)"
+      ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arguments.length`} expected 1)"
     end
 
     if `pattern !== undefined`
@@ -1120,7 +1120,7 @@ module Enumerable
   end
 
   def slice_when(&block)
-    raise ArgumentError, 'wrong number of arguments (0 for 1)' unless block_given?
+    ::Kernel.raise ::ArgumentError, 'wrong number of arguments (0 for 1)' unless block_given?
 
     Enumerator.new do |yielder|
       %x{
@@ -1242,13 +1242,13 @@ module Enumerable
       var hash = #{{}};
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)};
-        var ary = #{Opal.coerce_to?(`param`, Array, :to_ary)}, key, val;
+        var param = #{::Opal.destructure(`arguments`)};
+        var ary = #{::Opal.coerce_to?(`param`, ::Array, :to_ary)}, key, val;
         if (!ary.$$is_array) {
-          #{raise TypeError, "wrong element type #{`ary`.class} (expected array)"}
+          #{::Kernel.raise ::TypeError, "wrong element type #{`ary`.class} (expected array)"}
         }
         if (ary.length !== 2) {
-          #{raise ArgumentError, "wrong array length (expected 2, was #{`ary`.length})"}
+          #{::Kernel.raise ::ArgumentError, "wrong array length (expected 2, was #{`ary`.length})"}
         }
         key = ary[0];
         val = ary[1];

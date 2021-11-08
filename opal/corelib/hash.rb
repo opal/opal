@@ -19,14 +19,14 @@ class Hash
       var hash, argc = argv.length, i;
 
       if (argc === 1) {
-        hash = #{Opal.coerce_to?(argv[0], Hash, :to_hash)};
+        hash = #{::Opal.coerce_to?(argv[0], ::Hash, :to_hash)};
         if (hash !== nil) {
           return #{allocate.merge!(`hash`)};
         }
 
-        argv = #{Opal.coerce_to?(argv[0], Array, :to_ary)};
+        argv = #{::Opal.coerce_to?(argv[0], ::Array, :to_ary)};
         if (argv === nil) {
-          #{raise ArgumentError, 'odd number of arguments for Hash'}
+          #{::Kernel.raise ::ArgumentError, 'odd number of arguments for Hash'}
         }
 
         argc = argv.length;
@@ -42,7 +42,7 @@ class Hash
             hash.$store(argv[i][0], argv[i][1]);
             break;
           default:
-            #{raise ArgumentError, "invalid number of elements (#{`argv[i].length`} for 1..2)"}
+            #{::Kernel.raise ::ArgumentError, "invalid number of elements (#{`argv[i].length`} for 1..2)"}
           }
         }
 
@@ -50,7 +50,7 @@ class Hash
       }
 
       if (argc % 2 !== 0) {
-        #{raise ArgumentError, 'odd number of arguments for Hash'}
+        #{::Kernel.raise ::ArgumentError, 'odd number of arguments for Hash'}
       }
 
       hash = #{allocate};
@@ -77,13 +77,13 @@ class Hash
   end
 
   def self.try_convert(obj)
-    Opal.coerce_to?(obj, Hash, :to_hash)
+    ::Opal.coerce_to?(obj, ::Hash, :to_hash)
   end
 
   def initialize(defaults = undefined, &block)
     %x{
       if (defaults !== undefined && block !== nil) {
-        #{raise ArgumentError, 'wrong number of arguments (1 for 0)'}
+        #{::Kernel.raise ::ArgumentError, 'wrong number of arguments (1 for 0)'}
       }
       self.$$none = (defaults === undefined ? nil : defaults);
       self.$$proc = block;
@@ -127,7 +127,7 @@ class Hash
   end
 
   def >=(other)
-    other = Opal.coerce_to!(other, Hash, :to_hash)
+    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
 
     %x{
       if (self.$$keys.length < other.$$keys.length) {
@@ -152,7 +152,7 @@ class Hash
   end
 
   def >(other)
-    other = Opal.coerce_to!(other, Hash, :to_hash)
+    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
 
     %x{
       if (self.$$keys.length <= other.$$keys.length) {
@@ -164,12 +164,12 @@ class Hash
   end
 
   def <(other)
-    other = Opal.coerce_to!(other, Hash, :to_hash)
+    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
     other > self
   end
 
   def <=(other)
-    other = Opal.coerce_to!(other, Hash, :to_hash)
+    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
     other >= self
   end
 
@@ -343,10 +343,10 @@ class Hash
       var proc = default_proc;
 
       if (proc !== nil) {
-        proc = #{Opal.coerce_to!(`proc`, Proc, :to_proc)};
+        proc = #{::Opal.coerce_to!(`proc`, ::Proc, :to_proc)};
 
         if (#{`proc`.lambda?} && #{`proc`.arity.abs} !== 2) {
-          #{raise TypeError, 'default_proc takes two arguments'};
+          #{::Kernel.raise ::TypeError, 'default_proc takes two arguments'};
         }
       }
 
@@ -413,7 +413,7 @@ class Hash
     }
 
     unless item.respond_to?(:dig)
-      raise TypeError, "#{item.class} does not have #dig method"
+      ::Kernel.raise ::TypeError, "#{item.class} does not have #dig method"
     end
 
     item.dig(*keys)
@@ -502,7 +502,7 @@ class Hash
       }
     }
 
-    raise KeyError.new("key not found: #{key.inspect}", key: key, receiver: self)
+    ::Kernel.raise ::KeyError.new("key not found: #{key.inspect}", key: key, receiver: self)
   end
 
   def fetch_values(*keys, &block)
@@ -510,7 +510,7 @@ class Hash
   end
 
   def flatten(level = 1)
-    level = Opal.coerce_to!(level, Integer, :to_int)
+    level = ::Opal.coerce_to!(level, ::Integer, :to_int)
 
     %x{
       var result = [];
@@ -779,7 +779,7 @@ class Hash
     %x{
       var i, j, other, other_keys, length, key, value, other_value;
       for (i = 0; i < others.length; ++i) {
-        other = #{Opal.coerce_to!(`others[i]`, Hash, :to_hash)};
+        other = #{::Opal.coerce_to!(`others[i]`, ::Hash, :to_hash)};
         other_keys = other.$$keys, length = other_keys.length;
 
         if (block === nil) {
@@ -909,7 +909,7 @@ class Hash
   end
 
   def replace(other)
-    other = Opal.coerce_to!(other, Hash, :to_hash)
+    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
 
     %x{
       Opal.hash_init(self);
@@ -1081,7 +1081,7 @@ class Hash
     proc do |key = undefined|
       %x{
         if (key == null) {
-          #{raise ArgumentError, 'no key given'}
+          #{::Kernel.raise ::ArgumentError, 'no key given'}
         }
       }
 

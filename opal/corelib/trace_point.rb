@@ -8,7 +8,7 @@ class TracePoint
   attr_reader :event
 
   def initialize(event, &block)
-    raise 'Only the :class event is supported' unless event == :class
+    ::Kernel.raise 'Only the :class event is supported' unless event == :class
     @event = event
     @block = block
     @trace_object = nil

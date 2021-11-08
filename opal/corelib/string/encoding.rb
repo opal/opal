@@ -94,11 +94,11 @@ class Encoding
   end
 
   def each_byte(*)
-    raise NotImplementedError
+    ::Kernel.raise ::NotImplementedError
   end
 
   def bytesize(*)
-    raise NotImplementedError
+    ::Kernel.raise ::NotImplementedError
   end
 
   class EncodingError < StandardError; end
@@ -377,7 +377,7 @@ class String
 
       if (encoding === str.encoding) { return str; }
 
-      encoding = #{Opal.coerce_to!(encoding, String, :to_s)};
+      encoding = #{::Opal.coerce_to!(encoding, ::String, :to_s)};
       encoding = #{Encoding.find(encoding)};
 
       if (encoding === str.encoding) { return str; }
@@ -390,7 +390,7 @@ class String
 
   def getbyte(idx)
     string_bytes = bytes
-    idx = Opal.coerce_to!(idx, Integer, :to_int)
+    idx = ::Opal.coerce_to!(idx, ::Integer, :to_int)
     return if string_bytes.length < idx
 
     string_bytes[idx]

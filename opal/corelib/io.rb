@@ -53,7 +53,7 @@ class IO
   def print(*args)
     %x{
       for (var i = 0, ii = args.length; i < ii; i++) {
-        args[i] = #{String(`args[i]`)}
+        args[i] = #{::Kernel.String(`args[i]`)}
       }
       self.$write(args.join(#{$,}));
     }
@@ -63,7 +63,7 @@ class IO
   def puts(*args)
     %x{
       for (var i = 0, ii = args.length; i < ii; i++) {
-        args[i] = #{String(`args[i]`).chomp}
+        args[i] = #{::Kernel.String(`args[i]`).chomp}
       }
       self.$write(args.concat([nil]).join(#{$/}));
     }
@@ -99,11 +99,11 @@ class IO
   end
 
   def readchar
-    getc || raise(EOFError, 'end of file reached')
+    getc || ::Kernel.raise(::EOFError, 'end of file reached')
   end
 
   def readline(*args)
-    gets(*args) || raise(EOFError, 'end of file reached')
+    gets(*args) || ::Kernel.raise(::EOFError, 'end of file reached')
   end
 
   def gets(sep = false, limit = nil, opts = {})
@@ -171,7 +171,7 @@ class IO
   # @private
   def sysread_noraise(integer)
     sysread(integer)
-  rescue EOFError
+  rescue ::EOFError
     nil
   end
 
@@ -275,14 +275,14 @@ class IO
   # @private
   def check_writable
     if closed_write?
-      raise IOError, 'not opened for writing'
+      ::Kernel.raise ::IOError, 'not opened for writing'
     end
   end
 
   # @private
   def check_readable
     if closed_read?
-      raise IOError, 'not opened for reading'
+      ::Kernel.raise ::IOError, 'not opened for reading'
     end
   end
 end

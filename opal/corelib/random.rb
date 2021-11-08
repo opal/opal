@@ -9,14 +9,14 @@ class Random
     %x{
       if ($falsy(count)) count = 16;
       if (typeof count !== "number") count = #{`count`.to_int};
-      if (count < 0) #{raise ArgumentError, 'negative string size (or size too big)'};
+      if (count < 0) #{::Kernel.raise ::ArgumentError, 'negative string size (or size too big)'};
       count = Math.floor(count);
       return count;
     }
   end
 
-  def initialize(seed = Random.new_seed)
-    seed = Opal.coerce_to!(seed, Integer, :to_int)
+  def initialize(seed = ::Random.new_seed)
+    seed = ::Opal.coerce_to!(seed, ::Integer, :to_int)
     @state = seed
     reseed(seed)
   end
@@ -34,8 +34,8 @@ class Random
     DEFAULT.rand(limit)
   end
 
-  def self.srand(n = Random.new_seed)
-    n = Opal.coerce_to!(n, Integer, :to_int)
+  def self.srand(n = ::Random.new_seed)
+    n = ::Opal.coerce_to!(n, ::Integer, :to_int)
 
     previous_seed = DEFAULT.seed
     DEFAULT.reseed(n)
@@ -55,7 +55,7 @@ class Random
   def bytes(length)
     length = Random._verify_count(length)
 
-    Array.new(length) { rand(255).chr }.join.encode('ASCII-8BIT')
+    ::Array.new(length) { rand(255).chr }.join.encode('ASCII-8BIT')
   end
 
   def self.bytes(length)

@@ -4,7 +4,7 @@ require 'corelib/complex/base'
 class Complex < Numeric
   def self.rect(real, imag = 0)
     unless Numeric === real && real.real? && Numeric === imag && imag.real?
-      raise TypeError, 'not a real'
+      ::Kernel.raise ::TypeError, 'not a real'
     end
 
     new(real, imag)
@@ -16,7 +16,7 @@ class Complex < Numeric
 
   def self.polar(r, theta = 0)
     unless Numeric === r && r.real? && Numeric === theta && theta.real?
-      raise TypeError, 'not a real'
+      ::Kernel.raise ::TypeError, 'not a real'
     end
 
     new(r * Math.cos(theta), r * Math.sin(theta))
@@ -35,7 +35,7 @@ class Complex < Numeric
     elsif Numeric === other && other.real?
       [Complex.new(other, 0), self]
     else
-      raise TypeError, "#{other.class} can't be coerced into Complex"
+      ::Kernel.raise ::TypeError, "#{other.class} can't be coerced into Complex"
     end
   end
 
@@ -105,7 +105,7 @@ class Complex < Numeric
       return Complex.new(1, 0)
     end
 
-    if Complex === other
+    if ::Complex === other
       r, theta = polar
       ore      = other.real
       oim      = other.imag
@@ -113,7 +113,7 @@ class Complex < Numeric
       ntheta   = theta * ore + oim * Math.log(r)
 
       Complex.polar(nr, ntheta)
-    elsif Integer === other
+    elsif ::Integer === other
       if other > 0
         x = self
         z = x
@@ -122,7 +122,7 @@ class Complex < Numeric
         while n != 0
           div, mod = n.divmod(2)
           while mod == 0
-            x = Complex(x.real * x.real - x.imag * x.imag, 2 * x.real * x.imag)
+            x = ::Kernel.Complex(x.real * x.real - x.imag * x.imag, 2 * x.real * x.imag)
             n = div
             div, mod = n.divmod(2)
           end
@@ -176,7 +176,7 @@ class Complex < Numeric
 
   def fdiv(other)
     unless Numeric === other
-      raise TypeError, "#{other.class} can't be coerced into Complex"
+      ::Kernel.raise ::TypeError, "#{other.class} can't be coerced into Complex"
     end
 
     self / other
@@ -225,12 +225,12 @@ class Complex < Numeric
   def rationalize(eps = undefined)
     %x{
       if (arguments.length > 1) {
-        #{raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
+        #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
       }
     }
 
     if @imag != 0
-      raise RangeError, "can't' convert #{self} into Rational"
+      ::Kernel.raise ::RangeError, "can't' convert #{self} into Rational"
     end
 
     real.rationalize(eps)
@@ -250,7 +250,7 @@ class Complex < Numeric
 
   def to_f
     unless @imag == 0
-      raise RangeError, "can't convert #{self} into Float"
+      ::Kernel.raise ::RangeError, "can't convert #{self} into Float"
     end
 
     @real.to_f
@@ -258,7 +258,7 @@ class Complex < Numeric
 
   def to_i
     unless @imag == 0
-      raise RangeError, "can't convert #{self} into Integer"
+      ::Kernel.raise ::RangeError, "can't convert #{self} into Integer"
     end
 
     @real.to_i
@@ -266,7 +266,7 @@ class Complex < Numeric
 
   def to_r
     unless @imag == 0
-      raise RangeError, "can't convert #{self} into Rational"
+      ::Kernel.raise ::RangeError, "can't convert #{self} into Rational"
     end
 
     @real.to_r
