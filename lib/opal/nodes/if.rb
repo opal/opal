@@ -10,6 +10,14 @@ module Opal
       children :test, :true_body, :false_body
 
       def compile
+        if should_compile_with_ternary?
+          compile_with_ternary
+        else
+          compile_with_if
+        end
+      end
+
+      def compile_with_if
         truthy = self.truthy
         falsy = self.falsy
 
@@ -40,10 +48,10 @@ module Opal
 
           # This resolution isn't finite. Let's ensure this block
           # always return something if we expect a return
-          line 'return nil;' if needs_wrapper?
+          line 'return nil;' if expects_expression?
         end
 
-        if needs_wrapper?
+        if expects_expression?
           if scope.await_encountered
             wrap '(await (async function() {', '})())'
           else
@@ -61,15 +69,57 @@ module Opal
       end
 
       def returnify(body)
-        if needs_wrapper? && body
+        if expects_expression? && body
           compiler.returns(body)
         else
           body
         end
       end
 
-      def needs_wrapper?
+      def expects_expression?
         expr? || recv?
+      end
+
+      # There was a particular case in the past, that when we
+      # expected an expression from if, we always had to closure
+      # it. This produced an ugly code that was hard to minify
+      # it. This addition tries to make a few cases compiled with
+      # a ternary operator instead.
+      def should_compile_with_ternary?
+        expects_expression? && simple?(true_body) && simple?(false_body)
+      end
+
+      def compile_with_ternary
+        truthy = true_body
+        falsy = false_body
+
+        push '('
+
+        push js_truthy(test), ' ? '
+
+        push '(', expr(truthy || s(:nil)), ') : '
+        if !falsy || falsy.type == :if
+          push expr(falsy || s(:nil))
+        else
+          push '(', expr(falsy || s(:nil)), ')'
+        end
+
+        push ')'
+      end
+
+      # Let's ensure there are no control flow statements inside.
+      def simple? (body)
+        case body
+        when AST::Node
+          case body.type
+          when :return, :js_return, :break, :next, :redo, :retry
+            false
+          else
+            body.children.all? { |i| simple?(i) }
+          end
+        else
+          true
+        end
       end
     end
 
