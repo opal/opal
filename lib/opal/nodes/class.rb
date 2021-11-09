@@ -24,7 +24,9 @@ module Opal
           line "  var self = $klass($base, $super, '#{name}');"
           in_scope do
             scope.name = name
-            compile_body
+            in_closure(Closure::MODULE | Closure::JS_FUNCTION) do
+              compile_body
+            end
           end
 
           if await_encountered

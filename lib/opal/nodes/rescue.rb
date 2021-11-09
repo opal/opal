@@ -10,6 +10,9 @@ module Opal
       children :begn, :ensr
 
       def compile
+        # FIXME: We don't need this if there's no rescue else
+        push_closure
+
         push 'try {'
 
         in_ensure do
@@ -48,6 +51,8 @@ module Opal
         end
 
         line '}'
+
+        pop_closure
 
         if wrap_in_closure?
           if scope.await_encountered
@@ -94,6 +99,8 @@ module Opal
           line 'var $no_errors = true;'
         end
 
+        push_closure if expr? || recv?
+
         in_rescue(self) do
           push 'try {'
           indent do
@@ -136,6 +143,8 @@ module Opal
 
           wrap "#{retry_id}: do { ", ' break; } while(1)' if retry_id
         end
+
+        pop_closure if expr? || recv?
 
         # Wrap a try{} catch{} into a function
         # when it's an expression

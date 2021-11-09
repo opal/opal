@@ -1,5 +1,3 @@
-# helpers: breaker
-
 class Enumerator
   class Yielder
     def initialize(&block)
@@ -13,8 +11,8 @@ class Enumerator
       %x{
         var value = Opal.yieldX(#{@block}, values);
 
-        if (value === $breaker) {
-          throw $breaker;
+        if (value && value.$thrower_type == "break") {
+          throw value;
         }
 
         return value;

@@ -18,7 +18,8 @@ module Opal
         blockopts = []
         blockopts << "$$arity: #{arity}"
         blockopts << "$$s: #{scope.self}" if @define_self
-        blockopts << "$$brk: $brk" if contains_break?
+        blockopts << "$$brk: #{@closure.throwers[:break]}" if @closure&.throwers&.key? :break
+        blockopts << "$$ret: #{@closure.throwers[:return]}" if @closure&.throwers&.key? :return
 
         if compiler.arity_check?
           blockopts << "$$parameters: #{parameters_code}"
@@ -66,18 +67,14 @@ module Opal
 
           compile_arity_check
 
-          body_code = stmt(returned_body)
+          in_closure(Closure::JS_FUNCTION | Closure::ITER | (@is_lambda ? Closure::LAMBDA : 0)) do
+            body_code = stmt(returned_body)
 
-          add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s" if @define_self
+            add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s" if @define_self
 
-          to_vars = scope.to_vars
+            to_vars = scope.to_vars
 
-          line body_code
-
-          if scope.catch_return
-            unshift "try {\n"
-            line '} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }'
-            push ' throw $returner; }'
+            line body_code
           end
         end
 
@@ -138,12 +135,6 @@ module Opal
 
       def arity_check_node
         s(:iter_arity_check, original_args)
-      end
-
-      def contains_break?
-        finder = Opal::Rewriters::BreakFinder.new
-        finder.process(@sexp)
-        finder.found_break?
       end
     end
   end

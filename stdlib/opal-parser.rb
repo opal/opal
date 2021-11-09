@@ -50,7 +50,7 @@ end
   };
 
   Opal['eval'] = function(str, options) {
-   return eval(Opal.compile(str, options));
+    return eval(Opal.compile(str, options));
   };
 
   function run_ruby_scripts() {

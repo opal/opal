@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require 'opal/nodes/helpers'
+require 'opal/nodes/closure'
 
 module Opal
   module Nodes
     class Base
       include Helpers
+      include Closure::NodeSupport
 
       def self.handlers
         @handlers ||= {}

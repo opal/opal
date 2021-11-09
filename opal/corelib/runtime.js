@@ -1624,30 +1624,6 @@
   // @deprecated
   Opal.find_iter_super_dispatcher = Opal.find_block_super;
 
-  // Used to return as an expression. Sometimes, we can't simply return from
-  // a javascript function as if we were a method, as the return is used as
-  // an expression, or even inside a block which must "return" to the outer
-  // method. This helper simply throws an error which is then caught by the
-  // method. This approach is expensive, so it is only used when absolutely
-  // needed.
-  //
-  Opal.ret = function(val) {
-    Opal.returner.$v = val;
-    throw Opal.returner;
-  };
-
-  // Used to break out of a block.
-  Opal.brk = function(val, breaker) {
-    breaker.$v = val;
-    throw breaker;
-  };
-
-  // Builds a new unique breaker, this is to avoid multiple nested breaks to get
-  // in the way of each other.
-  Opal.new_brk = function() {
-    return new Error('unexpected break');
-  };
-
   // handles yield calls for 1 yielded arg
   Opal.yield1 = function(block, arg) {
     if (typeof(block) !== "function") {
@@ -2989,9 +2965,18 @@
   nil.$$comparable = false;
   Object.seal(nil);
 
-  // Errors
-  Opal.breaker  = new Error('unexpected break (old)');
-  Opal.returner = new Error('unexpected return');
+  Opal.new_thrower = function(type) {
+    var thrower = new Error('unexpected '+type);
+    thrower.$thrower_type = type;
+    thrower.$throw = function(value) {
+      thrower.$v = value;
+      throw thrower;
+    };
+    return thrower;
+  };
+
+  Opal.t_eval_return = Opal.new_thrower("return");
+
   TypeError.$$super = Error;
 
   // If enable-file-source-embed compiler option is enabled, each module loaded will add its
