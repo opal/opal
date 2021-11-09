@@ -13,7 +13,13 @@ module Opal
         truthy = self.truthy
         falsy = self.falsy
 
-        push 'if (', js_truthy(test), ') {'
+        if falsy && !truthy
+          # Let's optimize a little bit `unless` calls.
+          push 'if (!', js_truthy(test), ') {'
+          falsy, truthy = truthy, falsy
+        else
+          push 'if (', js_truthy(test), ') {'
+        end
 
         # skip if-body if no truthy sexp
         indent { line stmt(truthy) } if truthy
@@ -30,24 +36,36 @@ module Opal
             line '}'
           end
         else
-          push '}'
+          line '}'
+
+          # This resolution isn't finite. Let's ensure this block
+          # always return something if we expect a return
+          line 'return nil;' if needs_wrapper?
         end
 
         if needs_wrapper?
           if scope.await_encountered
-            wrap '(await (async function() {', '; return nil; })())'
+            wrap '(await (async function() {', '})())'
           else
-            wrap '(function() {', '; return nil; })()'
+            wrap '(function() {', '})()'
           end
         end
       end
 
       def truthy
-        needs_wrapper? ? compiler.returns(true_body || s(:nil)) : true_body
+        returnify(true_body)
       end
 
       def falsy
-        needs_wrapper? ? compiler.returns(false_body || s(:nil)) : false_body
+        returnify(false_body)
+      end
+
+      def returnify(body)
+        if needs_wrapper? && body
+          compiler.returns(body)
+        else
+          body
+        end
       end
 
       def needs_wrapper?
