@@ -99,8 +99,8 @@ RSpec.describe Opal::Compiler do
     end
 
     context "when function name is not valid" do
-      it "skips generating a name" do
-        expect_compiled("def test_method?; end").to include("function()")
+      it "generates a name in a safe way" do
+        expect_compiled("def test_method?; end").to include("function $test_method$ques$1()")
       end
     end
   end

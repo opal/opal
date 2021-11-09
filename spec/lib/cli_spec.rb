@@ -223,7 +223,7 @@ RSpec.describe Opal::CLI do
     let(:options) { { parse_comments: true, evals: [code], runner: :compiler } }
 
     it 'sets $$comment prop for compiled methods' do
-      expect_output_of { subject.run }.to include('$$comments = ["# multiline", "# comment"]')
+      expect_output_of { subject.run }.to include('$$comments: ["# multiline", "# comment"]')
     end
   end
 
