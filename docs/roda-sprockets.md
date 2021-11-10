@@ -23,7 +23,6 @@ class App < Roda
    plugin :sprockets, precompile: %w(application.js),
                       prefix: %w(app/),
                       opal: true,
-                      debug: ENV['RACK_ENV'] != 'production'
    plugin :public
 
    route do |r|

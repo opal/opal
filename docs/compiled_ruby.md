@@ -30,8 +30,8 @@ to convert values to opal specific values.
 
 NOTE: Because `true` and `false` compile to their native
 javascript equivalents, they must share the same class: `Boolean`.
-For this reason, they do not belong to their respective `TrueClass`
-and `FalseClass` classes from ruby.
+Thru some level of hackery, we make them pseudo-members of the appropriate
+`TrueClass` and `FalseClass`.
 
 #### Strings & Symbols
 
@@ -55,11 +55,11 @@ class. Symbols and Strings can therefore be used interchangeably.
 
 #### Numbers
 
-In Opal there is a single class for numbers; `Numeric`. To keep Opal
+In Opal there is a single class for numbers; `Number`. To keep Opal
 as performant as possible, Ruby numbers are mapped to native numbers.
 This has the side effect that all numbers must be of the same class.
-Most relevant methods from `Integer`, `Float` and `Numeric` are
-implemented on this class.
+Most relevant methods from `Integer` and `Float` are implemented on
+this class.
 
 ```ruby
 42        # => 42
@@ -104,7 +104,7 @@ else is a truthy value including `""`, `0` and `[]`. This differs from
 JavaScript as these values are also treated as false.
 
 For this reason, most truthy tests must check if values are `false` or
-`nil`.
+`nil` (we also check for `null` and `undefined`).
 
 Taking the following test:
 
@@ -204,16 +204,16 @@ obvious what went wrong.
 
 As Opal just generates JavaScript, it is useful to use a native
 debugger to work through JavaScript code. To use a debugger, simply
-add an x-string similar to the following at the place you wish to
-debug:
+add a `debugger` statement:
 
 ```ruby
 # .. code
-`debugger`
+debugger
 # .. more code
 ```
-The x-strings just pass the debugger statement straight through to the
-JavaScript output.
+
+The `debugger` statement is compiled to become a JavaScript `debugger`
+statement. This statement breaks the code if you have your Inspector open.
 
 NOTE: All local variables and method/block arguments also keep their Ruby
 names except in the rare cases when the name is reserved in JavaScript.
@@ -246,7 +246,7 @@ in the browser.
 }
 
 # => opal version is:
-# => 0.6.0
+# => 1.3.1
 ```
 
 Even interpolations are supported, as seen here.
@@ -279,6 +279,9 @@ require 'native'
 
 win = Native(`window`) # equivalent to Native::Object.new(`window`)
 ```
+
+To access a Native-wrapped global JavaScript object, we can also use `$$`, after
+we have the `native` module required.
 
 Now what if we want to access one of its properties?
 
@@ -514,10 +517,10 @@ Opal.BAZ;          // => 789
 To reach nested constants the safest way is to call `#const_get` on `Object`:
 
 ```javascript
-Opal.Object.$$const_get('Bar::BAR'); // => 123
-Opal.Object.$$const_get('Foo::BAR'); // => 123
-Opal.Object.$$const_get('Foo::FOO'); // => 456
-Opal.Object.$$const_get('BAZ');      // => 789
+Opal.Object.$const_get('Bar::BAR'); // => 123
+Opal.Object.$const_get('Foo::BAR'); // => 123
+Opal.Object.$const_get('Foo::FOO'); // => 456
+Opal.Object.$const_get('BAZ');      // => 789
 ```
 
 Constants can also be navigated using the `$$` property, although this is limited to constants defined directly under the current object:
@@ -526,6 +529,14 @@ Constants can also be navigated using the `$$` property, although this is limite
 Opal.Bar.$$.BAR // => 123
 Opal.Foo.$$.FOO // => 456
 Opal.Foo.$$.BAR // => undefined
+```
+
+A later feature also allows you to skip the `$$` property:
+
+```javascript
+Opal.Bar.BAR // => 123
+Opal.Foo.FOO // => 456
+Opal.Foo.BAR // => undefined
 ```
 
 

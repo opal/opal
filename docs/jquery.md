@@ -1,8 +1,6 @@
 # JQuery
 
-`opal-jquery` offers a nicer ruby-like syntax for JQuery (and Zepto). It is
-useful for projects which cannot use `opal-browser` due to a reliance on jquery
-for plugins or other libraries.
+`opal-jquery` offers a nicer ruby-like syntax for JQuery. It is useful for projects which cannot use `opal-browser` due to a reliance on jquery for plugins or other libraries.
 
 ```ruby
 foos = Element.find('.foo')
@@ -90,9 +88,6 @@ each respective script in your html!
 bridged instances of jquery objects. Just like ruby arrays are just javascript
 arrays, `Element` instances are just jquery objects. This makes interaction
 with jquery plugins much easier.
-
-Also, `Element` will try to bridge with Zepto if it cannot find jQuery loaded,
-making it ideal for mobile applications as well.
 
 ### Interacting with the DOM
 

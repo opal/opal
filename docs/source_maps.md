@@ -1,10 +1,6 @@
 # Source maps
 
-Source maps are available (on current stable release, v0.6.x) even without explicit support from Sprockets in a sort of hackish way.
-
-_As such even if they generally work fine there are some limitations and edge case issues._
-
-NOTE: Currently on `master` branch sourcemaps are work-in-progress and probably will integrate with the upcoming Sprockets 4 that has integrated support for them.
+Source maps are available on most environments we support.
 
 #### Processor `source_map_enabled` flag
 To enable sourcemaps in the Sprockets processor you need to turn on the relative flag:
@@ -16,8 +12,7 @@ Opal::Config.source_map_enabled = true # default
 
 #### Sprockets debug mode
 
-The  sourcemaps only work with Sprockets in debug mode because they are generated just for single files.
-
+The source maps only work with Sprockets in debug mode - this is a limitation of Sprockets.
 
 ## Enable source maps
 
@@ -37,13 +32,17 @@ config.assets.debug = true
 
 ### Sinatra
 
-You can add `Opal::Server` as in the official example: [sinatra/config.ru](https://github.com/opal/opal/blob/0-6-stable/examples/sinatra/config.ru).
+You can add `Opal::Server` as in the official example: [sinatra/config.ru](https://github.com/opal/opal/blob/master/examples/sinatra/config.ru).
 
 ### Opal::Server
 
-`Opal::Server` implements sourcemaps and can be used alone or with `Rack::Cascade` in conjunction with other apps.
+`Opal::Server` (which is based on Sprockets) implements sourcemaps and can be used alone or with `Rack::Cascade` in conjunction with other apps.
 
-### Opal::Environment
+### Opal::SimpleServer
 
-`Opal::Environment` is a bit lower level and doesn't support source maps by itself.
+Like `Opal::Server`, `Opal::SimpleServer` (which isn't based on Sprockets) implements sourcemaps properly.
+
+### Opal::Builder
+
+`Opal::Builder` is a bit lower level and doesn't support source maps by itself. It requires you to call in a specific method to generate them yourself.
 

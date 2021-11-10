@@ -3,7 +3,6 @@
 ## Requirements
 
 First of all, make sure that you have Chrome at least 59.0 installed.
-Also for now it's supported only on Mac and Linux. (version 60 may get support on Windows)
 
 ## Using the runner
 
@@ -22,11 +21,9 @@ The runner also listens for any exceptions and prints formatted stracktraces bac
     raising_method
     "
 
-    RuntimeError : test error
-        at $$raise (file:///tmp/chrome-opal.js:4996:6)
-        at $$raising_method (file:///tmp/chrome-opal.js:21144:16)
-        at  (file:///tmp/chrome-opal.js:21146:14)
-        at  (file:///tmp/chrome-opal.js:21147:2)
+    RuntimeError: test error
+      from <internal:corelib/…>:2693:7:in `<main>'
+      from -e:1:1:in `undefined'
 
 ## Using exit codes
 
@@ -36,10 +33,9 @@ By default headless chrome runner explicitly sets exit code to 1 when there was 
     0
 
     $ opal -Rchrome -e "raise 'error'"; echo $?
-    RuntimeError : error
-        at $$raise (file:///tmp/chrome-opal.js:4996:6)
-        at  (file:///tmp/chrome-opal.js:21139:14)
-        at  (file:///tmp/chrome-opal.js:21140:2)
+    RuntimeError: error
+      from <internal:corelib/kerne…>:2693:7:in `<main>'
+      from -e:1:1:in `undefined'
     1
 
 You can change final exit code by using `Kernel#exit`, but make sure to require `opal/platform` in your code.
@@ -69,19 +65,11 @@ or runs the server on its own. It detects your platform and uses a default path 
 (`Opal::CliRunners::Chrome#chrome_executable`) but you can override it by specifying `GOOGLE_CHROME_BINARY` environment
 variable.
 
-When the server is up and running it passes compiled js code to `node lib/opal/cli_runners/chrome.js`
+When the server is up and running it passes compiled js code to `lib/opal/cli_runners/chrome_cdp_interface.rb`
 as a plain input using stdin (basically, it's a second part of the runner).
-`chrome.js` is a node js script that does the main job. It runs any provided code on the running chrome server,
+`chrome_cdp_interface.rb` is a node js + Opal script that does the main job. It runs any provided code on the running chrome server,
 catches errors and forwards console messages.
 
-
-Moreover, you can actually call any js using headless chrome by running
-
-      $ echo "console.log('Hello, Opal')" | node lib/opal/cli_runners/chrome.js
-
-NOTE: to run it you need to have a chrome server running on `localhost:9222` (usually `chrome.rb` does it for you)
-
-      $ chrome --disable-gpu --headless --remote-debugging-port=9222
 
 ## Using a remote chrome server
 
@@ -99,7 +87,9 @@ NOTE: `CHROME_HOST` requires a chrome server to be started. You can't start remo
 
 If you need to pass additional CLI options to the Chrome executable you can do so by setting the `CHROME_OPTS` environment variable:
 
-      $ CHROME_OPS="--window-size=412,732" opal -Rchrome -e "puts 42"
+      $ CHROME_OPTS="--window-size=412,732" opal -Rchrome -e "puts 42"
       42
+
+Docker users may need `CHROME_OPTS="--no-sandbox"` due to the user namespaces limitations.
 
 _For a list of additional options see https://developers.google.com/web/updates/2017/04/headless-chrome_

@@ -8,12 +8,14 @@ Opal is able to compile its – pure Ruby – compiler to JavaScript (how cool i
 require 'opal-parser'
 ```
 
+_Note: For the best performance and application load times, it is strongly recommended to design your application so that it won't need the parser. A lot of methods described in this document are more fun hacks than robust solutions. But if you really want or need to use them, for example so that you can implement a Ruby REPL or an interactive Ruby playground - we have you covered, but for all other cases, we strongly discourage you to take an advice from this guide._
+
 
 ## Features
 
 ### `Kernel#eval`
 
-`opal-parser` provides a partial implementation of `Kernel#eval` that only support the first parameter (String) and refuse any passed `binding`, `lineno` or `filename`.
+`opal-parser` provides a partial implementation of `Kernel#eval`.
 
 Example:
 

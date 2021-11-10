@@ -2,7 +2,7 @@
 
 `opal` makes it easy to build static opal applications. Opal uses internal load
 paths to make it easy to handle resolving requirements during building. `opal`
-forms the basis of rails support, so anything you can do there, you can do
+forms the basis of Rails support, so anything you can do there, you can do
 standalone as well.
 
 ## Overview
@@ -11,7 +11,7 @@ First, install `opal` adding them to a `Gemfile`:
 
 ```ruby
 # Gemfile
-gem "opal", "~> 0.7.0"
+gem "opal"
 ```
 
 Next, we want to add our main app code. Keep all opal code inside `app/`

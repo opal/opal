@@ -10,7 +10,7 @@ We run opal against the [ruby spec](https://github.com/ruby/spec) as our primary
 
 ### What version of ruby does Opal target?
 
-We are running tests under ruby 2.0.0 conditions, but are mostly compatible with 1.9 level features.
+We are running tests under ruby 3.0.0 conditions, but are mostly compatible with 2.6 level features.
 
 ### Why doesn't Opal support mutable strings?
 
