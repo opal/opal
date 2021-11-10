@@ -15,15 +15,23 @@ Changes are grouped as follows:
 
 
 
-## [Unreleased](https://github.com/opal/opal/compare/v1.3.1...HEAD) - unreleased
+## [1.3.2](https://github.com/opal/opal/compare/v1.3.1...v1.3.2) - 2021-11-10
 
 
-### Added
 ### Fixed
+
+- Update documentation ([#2350](https://github.com/opal/opal/pull/2350))
+- Fix `IO#gets` getting an extra char under some circumstances ([#2349](https://github.com/opal/opal/pull/2349))
+- Raise a `TypeError` instead of `UndefinedMethod` if not a string is passed to `__send__` ([#2346](https://github.com/opal/opal/pull/2346))
+- Do not modify `$~` when calling `String#scan` from internal methods ([#2353](https://github.com/opal/opal/pull/2353))
+- Stop interpreting falsey values as a missing constant in `Module#const_get` ([#2354](https://github.com/opal/opal/pull/2354))
+
+<!--
 ### Changed
 ### Deprecated
 ### Removed
 ### Internal
+-->
 
 
 
