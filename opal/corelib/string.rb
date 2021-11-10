@@ -992,7 +992,7 @@ class String < `String`
     `self.replace(/[\s\u0000]*$/, '')`
   end
 
-  def scan(pattern, &block)
+  def scan(pattern, no_matchdata: false, &block)
     %x{
       var result = [],
           match_data = nil,
@@ -1017,7 +1017,7 @@ class String < `String`
         }
       }
 
-      #{$~ = `match_data`}
+      if (!no_matchdata) #{$~ = `match_data`};
 
       return (block !== nil ? self : result);
     }
