@@ -27,3 +27,17 @@ describe "Bridging" do
     `typeof(String.call)`.should == "function"
   end
 end
+
+describe "Constants" do
+  it "doesn't raise error when a JS falsey constant is referenced" do
+    z = Class.new {
+      C1 = 0
+      C2 = nil
+      C3 = false
+      C4 = ''
+      C5 = C3
+    }
+
+    [z::C1, z::C2, z::C3, z::C4, z::C5].should == [0, nil, false, '', false]
+  end
+end
