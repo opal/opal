@@ -124,7 +124,7 @@ class IO
     sep = sep.to_str unless orig_sep == ''
 
     # Try to deduce length of a regexp
-    seplen = `orig_sep == '' ? 2 : sep.length`
+    seplen = orig_sep == '' ? 2 : sep.length
 
     sep = / / if sep == ' ' # WTF is this, String#split(" ") matches all whitespaces???
 
