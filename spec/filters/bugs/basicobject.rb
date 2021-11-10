@@ -1,7 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "BasicObject" do
   fails "BasicObject raises NoMethodError for nonexistent methods after #method_missing is removed"
-  fails "BasicObject#__send__ raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "BasicObject#initialize does not accept arguments"
   fails "BasicObject#instance_eval evaluates string with given filename and linenumber"
   fails "BasicObject#instance_eval evaluates string with given filename and negative linenumber" # Expected ["RuntimeError"] to equal ["b_file", "-98"]
