@@ -404,7 +404,7 @@ class String
   end
 
   def length
-    `self.length`
+    `self.toString().length`
   end
 
   alias size length

@@ -306,7 +306,7 @@ platforms.each do |platform|
       stubs = Testing::MSpec.stubs.map{|s| "-s#{s}"}.join(' ')
 
       sh "ruby -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-         "exe/opal -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+         "exe/opal -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location --no-frozen-string-literal #{filename}"
 
       if bm_filepath
         puts "Benchmark results have been written to #{bm_filepath}"

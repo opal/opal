@@ -66,6 +66,10 @@ module Opal
         end
         push translate_escape_chars(sanitized_value)
 
+        unless compiler.frozen_string_literal?
+          wrap "new String(", ")"
+        end
+
         if RUBY_ENGINE != 'opal'
           encoding = string_value.encoding
 
@@ -243,9 +247,19 @@ module Opal
           else
             push '(', expr(part), ')'
           end
-
-          wrap '(', ')' if recv?
         end
+
+        # The dstrs actually should always be unfrozen, regardless of the
+        # `frozen_string_literal` comment. In Opal <1.4 they were always
+        # frozen (=unboxed). Opal 2.0 could change behavior. But for now,
+        # let's assume that strings will always be frozen on
+        # `frozen_string_literal == true` (ie. by default), but `false`
+        # unfreezes everything. This way we preserve compatibility with
+        # older Opal code, but if we declare `frozen_string_literal: false`
+        # then we get unfrozen (=boxed) dstrs.
+        wrap 'new String(', ')' unless compiler.frozen_string_literal?
+
+        wrap '(', ')' if recv?
       end
     end
 

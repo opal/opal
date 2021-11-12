@@ -1,4 +1,5 @@
 autoload :Marshal, 'corelib/marshal'
+require 'corelib/string/mutable'
 require 'corelib/string/unpack'
 require 'corelib/array/pack'
 autoload :ObjectSpace, 'corelib/object_space'

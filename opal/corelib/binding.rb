@@ -1,3 +1,5 @@
+# helpers: coerce_to
+
 class Binding
   # @private
   def initialize(jseval, scope_variables, receiver, source_location)
@@ -14,12 +16,14 @@ class Binding
   end
 
   def local_variable_get(symbol)
+    symbol = `$coerce_to(symbol, #{::String}, 'to_str')`
     js_eval(symbol)
   rescue ::Exception
     ::Kernel.raise ::NameError, "local variable `#{symbol}' is not defined for #{inspect}"
   end
 
   def local_variable_set(symbol, value)
+    symbol = `$coerce_to(symbol, #{::String}, 'to_str')`
     js_eval(symbol, value)
   end
 

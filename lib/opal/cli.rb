@@ -166,6 +166,7 @@ module Opal
         irb_enabled
         inline_operators
         enable_source_location
+        frozen_string_literal
         use_strict
         parse_comments
         esm
