@@ -72,6 +72,55 @@ describe "Bridged Classes" do
       @instance.catched_by_method_missing.should == :catched
     end
   end
+
+  describe "Immutable prototype" do
+
+    it "raises for Object" do
+      instance = `Object.create({})`
+      -> {
+        class ObjectBridge < `#{instance}.constructor`
+          def object_method
+            42
+          end
+        end
+      }.should raise_error(ArgumentError)
+    end
+
+    it "raises for built-in Math" do
+      -> {
+        class MathBridge < `Math.constructor`
+          def math_method
+            1337
+          end
+        end
+      }.should raise_error(ArgumentError)
+    end
+
+  end
+
+  describe "Extendable" do
+    before do
+      @instance = `new bridge_class_demo()`
+    end
+
+    it "can be extendable multiple times" do
+      class ExtraClass1 < `#{@instance}.constructor`
+        def method1
+          11
+        end
+      end
+
+      class ExtraClass2 < `#{@instance}.constructor`
+        def method2
+          22
+        end
+      end
+
+      @instance.method1.should == 11
+      @instance.method2.should == 22
+    end
+  end
+
 end
 
 class ModularizedBridgeClass
