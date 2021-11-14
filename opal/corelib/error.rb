@@ -119,7 +119,17 @@ class Exception < `Error`
     to_s
   end
 
-  def full_message(highlight: $stderr.tty?, order: :top)
+  def full_message(kwargs = nil)
+    unless defined? Hash
+      # We are dealing with an unfully loaded Opal library, so we should
+      # do with as little as we can.
+
+      return "#{@message}\n#{`self.stack`}"
+    end
+
+    kwargs = { highlight: $stderr.tty?, order: :top }.merge(kwargs || {})
+    highlight, order = kwargs[:highlight], kwargs[:order]
+
     ::Kernel.raise ::ArgumentError, "expected true or false as highlight: #{highlight}" unless [true, false].include? highlight
     ::Kernel.raise ::ArgumentError, "expected :top or :bottom as order: #{order}" unless %i[top bottom].include? order
 
