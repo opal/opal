@@ -1,4 +1,4 @@
-module Process
+module ::Process
   @__clocks__ = []
   def self.__register_clock__(name, func)
     const_set name, @__clocks__.size
@@ -34,8 +34,8 @@ module Process
   end
 
   def self.times
-    t = Time.now.to_f
-    Benchmark::Tms.new(t, t, t, t, t)
+    t = ::Time.now.to_f
+    ::Benchmark::Tms.new(t, t, t, t, t)
   end
 
   def self.clock_gettime(clock_id, unit = :float_second)

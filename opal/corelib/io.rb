@@ -1,12 +1,12 @@
-class IO
-  SEEK_SET = 0
-  SEEK_CUR = 1
-  SEEK_END = 2
-  SEEK_DATA = 3
-  SEEK_HOLE = 4
+class ::IO
+  self::SEEK_SET = 0
+  self::SEEK_CUR = 1
+  self::SEEK_END = 2
+  self::SEEK_DATA = 3
+  self::SEEK_HOLE = 4
 
-  READABLE = 1
-  WRITABLE = 4
+  self::READABLE = 1
+  self::WRITABLE = 4
 
   def initialize(fd, flags = 'r')
     @fd = fd

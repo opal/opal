@@ -3,7 +3,7 @@
 require 'corelib/enumerable'
 require 'corelib/numeric'
 
-class Array < `Array`
+class ::Array < `Array`
   include ::Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays
@@ -133,7 +133,7 @@ class Array < `Array`
   end
 
   def &(other)
-    other = if Array === other
+    other = if ::Array === other
               other.to_a
             else
               `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
@@ -201,7 +201,7 @@ class Array < `Array`
   end
 
   def +(other)
-    other = if Array === other
+    other = if ::Array === other
               other.to_a
             else
               `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
@@ -211,7 +211,7 @@ class Array < `Array`
   end
 
   def -(other)
-    other = if Array === other
+    other = if ::Array === other
               other.to_a
             else
               `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
@@ -245,7 +245,7 @@ class Array < `Array`
   end
 
   def <=>(other)
-    if Array === other
+    if ::Array === other
       other = other.to_a
     elsif other.respond_to? :to_ary
       other = other.to_ary.to_a
@@ -415,7 +415,7 @@ class Array < `Array`
     }
 
     if ::Range === index
-      data = if Array === value
+      data = if ::Array === value
                value.to_a
              elsif value.respond_to? :to_ary
                value.to_ary.to_a
@@ -466,7 +466,7 @@ class Array < `Array`
         length = value
         value  = extra
 
-        data = if Array === value
+        data = if ::Array === value
                  value.to_a
                elsif value.respond_to? :to_ary
                  value.to_ary.to_a
@@ -602,7 +602,7 @@ class Array < `Array`
     unless block_given?
       return enum_for(:cycle, n) do
         if n.nil?
-          Float::INFINITY
+          ::Float::INFINITY
         else
           n = ::Opal.coerce_to!(n, ::Integer, :to_int)
           n > 0 ? enumerator_size * n : 0
@@ -1680,7 +1680,7 @@ class Array < `Array`
   end
 
   def replace(other)
-    other = if Array === other
+    other = if ::Array === other
               other.to_a
             else
               `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
@@ -1781,7 +1781,7 @@ class Array < `Array`
     replace ary
   end
 
-  class SampleRandom
+  class self::SampleRandom
     def initialize(rng)
       @rng = rng
     end

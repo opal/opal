@@ -2,7 +2,7 @@ require 'corelib/pattern_matching/base'
 
 # A "userland" implementation of pattern matching for Opal
 
-class PatternMatching
+class ::PatternMatching
   def self.call(from, pattern)
     pm = new(from, pattern)
     pm.match || (return nil)

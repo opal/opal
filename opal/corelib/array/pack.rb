@@ -2,7 +2,7 @@
 
 require 'corelib/pack_unpack/format_string_parser'
 
-class Array
+class ::Array
   %x{
     // Format Parser
     var eachDirectiveAndCount = Opal.PackUnpack.eachDirectiveAndCount;

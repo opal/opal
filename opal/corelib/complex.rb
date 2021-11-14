@@ -1,7 +1,7 @@
 require 'corelib/numeric'
 require 'corelib/complex/base'
 
-class Complex < ::Numeric
+class ::Complex < ::Numeric
   def self.rect(real, imag = 0)
     unless ::Numeric === real && real.real? && ::Numeric === imag && imag.real?
       ::Kernel.raise ::TypeError, 'not a real'
@@ -175,7 +175,7 @@ class Complex < ::Numeric
   end
 
   def fdiv(other)
-    unless Numeric === other
+    unless ::Numeric === other
       ::Kernel.raise ::TypeError, "#{other.class} can't be coerced into Complex"
     end
 

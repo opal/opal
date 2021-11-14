@@ -2,7 +2,7 @@
 
 require 'corelib/comparable'
 
-class Time < `Date`
+class ::Time < `Date`
   include ::Comparable
 
   %x{
@@ -16,7 +16,7 @@ class Time < `Date`
     %x{
       var result;
 
-      if (#{Time === seconds}) {
+      if (#{::Time === seconds}) {
         if (frac !== undefined) {
           #{::Kernel.raise ::TypeError, "can't convert Time into an exact number"}
         }

@@ -1,4 +1,4 @@
-module PackUnpack
+module ::PackUnpack
   %x{
     var directives = [
       // Integer

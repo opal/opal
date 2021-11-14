@@ -1,5 +1,5 @@
-class Random
-  module Formatter
+class ::Random
+  module self::Formatter
     def hex(count = nil)
       count = ::Random._verify_count(count)
       %x{

@@ -1,4 +1,4 @@
-class TracePoint
+class ::TracePoint
   # partial implementation of TracePoint
   # for the moment only supports the :class event
   def self.trace(event, &block)

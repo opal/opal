@@ -1,11 +1,11 @@
 # helpers: coerce_to
 
-class RegexpError < ::StandardError; end
+class ::RegexpError < ::StandardError; end
 
-class Regexp < `RegExp`
-  IGNORECASE = 1
-  EXTENDED = 2
-  MULTILINE = 4
+class ::Regexp < `RegExp`
+  self::IGNORECASE = 1
+  self::EXTENDED = 2
+  self::MULTILINE = 4
 
   `Opal.prop(self.$$prototype, '$$is_regexp', true)`
 

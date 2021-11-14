@@ -1,6 +1,6 @@
 require 'corelib/enumerable'
 
-class Struct
+class ::Struct
   include ::Enumerable
 
   def self.new(const_name, *args, keyword_init: false, &block)
@@ -179,7 +179,7 @@ class Struct
           a = struct.$$data[key];
           b = other.$$data[key];
 
-          if (#{Struct === `a`}) {
+          if (#{::Struct === `a`}) {
             if (!recursed1.hasOwnProperty(#{`a`.__id__}) || !recursed2.hasOwnProperty(#{`b`.__id__})) {
               if (!_eqeq(a, b)) {
                 return false;
@@ -215,7 +215,7 @@ class Struct
           a = struct.$$data[key];
           b = other.$$data[key];
 
-          if (#{Struct === `a`}) {
+          if (#{::Struct === `a`}) {
             if (!recursed1.hasOwnProperty(#{`a`.__id__}) || !recursed2.hasOwnProperty(#{`b`.__id__})) {
               if (!_eqeq(a, b)) {
                 return false;
@@ -264,7 +264,7 @@ class Struct
   def inspect
     result = '#<struct '
 
-    if Struct === self && self.class.name
+    if ::Struct === self && self.class.name
       result += "#{self.class} "
     end
 

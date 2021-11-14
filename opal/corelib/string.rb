@@ -3,7 +3,7 @@
 require 'corelib/comparable'
 require 'corelib/regexp'
 
-class String < `String`
+class ::String < `String`
   include ::Comparable
 
   %x{
@@ -52,7 +52,7 @@ class String < `String`
   end
 
   def %(data)
-    if Array === data
+    if ::Array === data
       format(self, *data)
     else
       format(self, data)
@@ -370,7 +370,7 @@ class String < `String`
   def count(*sets)
     %x{
       if (sets.length === 0) {
-        #{::Kernel.raise ArgumentError, 'ArgumentError: wrong number of arguments (0 for 1+)'}
+        #{::Kernel.raise ::ArgumentError, 'ArgumentError: wrong number of arguments (0 for 1+)'}
       }
       var char_class = char_class_from_char_sets(sets);
       if (char_class === null) {

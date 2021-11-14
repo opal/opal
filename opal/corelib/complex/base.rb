@@ -1,4 +1,4 @@
-module Kernel
+module ::Kernel
   def Complex(real, imag = nil)
     if imag
       Complex.new(real, imag)
@@ -8,7 +8,7 @@ module Kernel
   end
 end
 
-class String
+class ::String
   def to_c
     Complex.from_string(self)
   end

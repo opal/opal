@@ -1,4 +1,4 @@
-class Method
+class ::Method
   attr_reader :owner, :receiver, :name
 
   def initialize(receiver, owner, method, name)
@@ -67,7 +67,7 @@ class Method
   end
 end
 
-class UnboundMethod
+class ::UnboundMethod
   attr_reader :source, :owner, :name
 
   def initialize(source, owner, method, name)

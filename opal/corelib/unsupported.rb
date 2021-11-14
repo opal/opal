@@ -24,7 +24,7 @@
   }
 }
 
-class String
+class ::String
   `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal."`
 
   %i[
@@ -38,7 +38,7 @@ class String
   end
 end
 
-module Kernel
+module ::Kernel
   `var ERROR = "Object freezing is not supported by Opal"`
 
   def freeze
@@ -52,7 +52,7 @@ module Kernel
   end
 end
 
-module Kernel
+module ::Kernel
   `var ERROR = "Object tainting is not supported by Opal"`
 
   def taint
@@ -71,7 +71,7 @@ module Kernel
   end
 end
 
-class Module
+class ::Module
   def public(*methods)
     %x{
       if (methods.length === 0) {
@@ -110,7 +110,7 @@ class Module
   alias public_method_defined? method_defined?
 end
 
-module Kernel
+module ::Kernel
   def private_methods(*)
     []
   end
@@ -118,10 +118,10 @@ module Kernel
   alias private_instance_methods private_methods
 end
 
-module Kernel
+module ::Kernel
   def eval(*)
-    ::Kernel.raise NotImplementedError, "To use Kernel#eval, you must first require 'opal-parser'. "\
-                                        "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
+    ::Kernel.raise ::NotImplementedError, "To use Kernel#eval, you must first require 'opal-parser'. "\
+                                          "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
   end
 end
 

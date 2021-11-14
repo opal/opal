@@ -1,6 +1,6 @@
 require 'corelib/comparable'
 
-class Numeric
+class ::Numeric
   include ::Comparable
 
   def coerce(other)

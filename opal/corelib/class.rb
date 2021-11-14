@@ -1,6 +1,6 @@
 require 'corelib/module'
 
-class Class
+class ::Class
   def self.new(superclass = Object, &block)
     %x{
       if (!superclass.$$is_class) {

@@ -1,6 +1,6 @@
 # helpers: falsy, truthy, coerce_to, yield1, yieldX
 
-module Enumerable
+module ::Enumerable
   %x{
     function comparableForPattern(value) {
       if (value.length === 0) {
@@ -647,7 +647,7 @@ module Enumerable
   end
 
   def lazy
-    Enumerator::Lazy.new(self, enumerator_size) do |enum, *args|
+    ::Enumerator::Lazy.new(self, enumerator_size) do |enum, *args|
       enum.yield(*args)
     end
   end
@@ -777,7 +777,7 @@ module Enumerable
             return;
           }
 
-          if (#{Opal.compare(`param`, `result`)} < 0) {
+          if (#{::Opal.compare(`param`, `result`)} < 0) {
             result = param;
           }
         };
@@ -1089,7 +1089,7 @@ module Enumerable
       block = ::Kernel.proc { |e| pattern === e }
     end
 
-    Enumerator.new do |yielder|
+    ::Enumerator.new do |yielder|
       %x{
         var accumulate;
 
@@ -1122,7 +1122,7 @@ module Enumerable
   def slice_when(&block)
     ::Kernel.raise ::ArgumentError, 'wrong number of arguments (0 for 1)' unless block_given?
 
-    Enumerator.new do |yielder|
+    ::Enumerator.new do |yielder|
       %x{
         var slice = nil, last_after = nil;
 

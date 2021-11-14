@@ -1,4 +1,4 @@
-class Binding
+class ::Binding
   # @private
   def initialize(jseval, scope_variables, receiver, source_location)
     @jseval, @scope_variables, @receiver, @source_location = \
@@ -40,7 +40,7 @@ class Binding
   attr_reader :receiver, :source_location
 end
 
-module Kernel
+module ::Kernel
   def binding
     ::Kernel.raise "Opal doesn't support dynamic calls to binding"
   end

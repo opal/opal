@@ -1,6 +1,6 @@
 # helpers: truthy, coerce_to, const_set, Object
 
-class Module
+class ::Module
   def self.allocate
     %x{
       var module = Opal.allocate_module(nil, function(){});

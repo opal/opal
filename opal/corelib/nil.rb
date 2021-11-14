@@ -1,4 +1,4 @@
-class NilClass
+class ::NilClass
   `self.$$prototype.$$meta = #{self}`
 
   class << self
@@ -85,4 +85,4 @@ class NilClass
   end
 end
 
-NIL = nil
+::NIL = nil

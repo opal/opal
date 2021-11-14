@@ -1,6 +1,6 @@
-# helpers: truthy, coerce_to, respond_to
+# helpers: truthy, coerce_to, respond_to, Opal
 
-module Kernel
+module ::Kernel
   def method_missing(symbol, *args, &block)
     ::Kernel.raise ::NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args), nil, caller(1)
   end
@@ -189,7 +189,7 @@ module Kernel
   end
 
   def enum_for(method = :each, *args, &block)
-    Enumerator.for(self, method, *args, &block)
+    ::Enumerator.for(self, method, *args, &block)
   end
 
   alias to_enum enum_for
@@ -587,7 +587,7 @@ module Kernel
   def rand(max = undefined)
     %x{
       if (max === undefined) {
-        return #{Random::DEFAULT.rand};
+        return #{::Random::DEFAULT.rand};
       }
 
       if (max.$$is_number) {
@@ -746,10 +746,10 @@ module Kernel
   ::Opal.pristine(self, :method_missing)
 end
 
-class Object
+class ::Object
   # Object.require has been set to runtime.js Opal.require
   # Now we have Kernel loaded, make sure Object.require refers to Kernel.require
   # which is what ruby does and allows for overwriting by autoloaders
-  `delete Opal.Object.$$prototype.$require`
+  `delete $Object.$$prototype.$require`
   include ::Kernel
 end

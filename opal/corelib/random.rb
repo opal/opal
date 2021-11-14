@@ -2,7 +2,7 @@
 
 require 'corelib/random/formatter'
 
-class Random
+class ::Random
   attr_reader :seed, :state
 
   def self._verify_count(count)
@@ -31,14 +31,14 @@ class Random
   end
 
   def self.rand(limit = undefined)
-    DEFAULT.rand(limit)
+    self::DEFAULT.rand(limit)
   end
 
   def self.srand(n = ::Random.new_seed)
     n = ::Opal.coerce_to!(n, ::Integer, :to_int)
 
-    previous_seed = DEFAULT.seed
-    DEFAULT.reseed(n)
+    previous_seed = self::DEFAULT.seed
+    self::DEFAULT.reseed(n)
     previous_seed
   end
 
@@ -47,7 +47,7 @@ class Random
   end
 
   def ==(other)
-    return false unless Random === other
+    return false unless ::Random === other
 
     seed == other.seed && state == other.state
   end
@@ -59,7 +59,7 @@ class Random
   end
 
   def self.bytes(length)
-    DEFAULT.bytes(length)
+    self::DEFAULT.bytes(length)
   end
 
   def rand(limit = undefined)
@@ -77,14 +77,14 @@ class Random
   end
 
   def self.random_float
-    DEFAULT.random_float
+    self::DEFAULT.random_float
   end
 
   def self.generator=(generator)
     `Opal.$$rand = #{generator}`
 
     if const_defined? :DEFAULT
-      DEFAULT.reseed
+      self::DEFAULT.reseed
     else
       const_set :DEFAULT, new(new_seed)
     end

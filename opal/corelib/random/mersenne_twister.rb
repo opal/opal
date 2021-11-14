@@ -134,14 +134,14 @@ mersenne_twister = %x{(function() {
   return { genrand_real: genrand_real, init: init };
 })()}
 
-class Random
+class ::Random
   `var MAX_INT = Number.MAX_SAFE_INTEGER || Math.pow(2, 53) - 1`
 
-  MERSENNE_TWISTER_GENERATOR = `{
+  self::MERSENNE_TWISTER_GENERATOR = `{
     new_seed: function() { return Math.round(Math.random() * MAX_INT); },
     reseed: function(seed) { return mersenne_twister.init(seed); },
     rand: function(mt) { return mersenne_twister.genrand_real(mt); }
   }`
 
-  self.generator = MERSENNE_TWISTER_GENERATOR
+  self.generator = self::MERSENNE_TWISTER_GENERATOR
 end

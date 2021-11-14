@@ -1,7 +1,7 @@
 require 'base64'
 require 'corelib/pack_unpack/format_string_parser'
 
-class String
+class ::String
   %x{
     // Format Parser
     var eachDirectiveAndCount = Opal.PackUnpack.eachDirectiveAndCount;

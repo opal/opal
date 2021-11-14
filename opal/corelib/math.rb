@@ -1,10 +1,10 @@
 # helpers: type_error
 
-module Math
-  E  = `Math.E`
-  PI = `Math.PI`
+module ::Math
+  self::E  = `Math.E`
+  self::PI = `Math.PI`
 
-  DomainError = Class.new(::StandardError)
+  self::DomainError = ::Class.new(::StandardError)
 
   def self.checked(method, *args)
     %x{
@@ -363,7 +363,7 @@ module Math
         return [Infinity, 1];
       }
       else {
-        return [Math.log(Math.abs(#{Math.gamma(n)})), #{Math.gamma(n)} < 0 ? -1 : 1];
+        return [Math.log(Math.abs(#{::Math.gamma(n)})), #{::Math.gamma(n)} < 0 ? -1 : 1];
       }
     }
   end

@@ -1,6 +1,6 @@
 require 'corelib/enumerable'
 
-class Range
+class ::Range
   include ::Enumerable
 
   `self.$$prototype.$$is_range = true`

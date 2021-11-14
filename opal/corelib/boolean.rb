@@ -1,4 +1,4 @@
-class Boolean < `Boolean`
+class ::Boolean < `Boolean`
   `Opal.prop(self.$$prototype, '$$is_boolean', true)`
 
   %x{
@@ -106,8 +106,8 @@ class Boolean < `Boolean`
   end
 end
 
-class TrueClass < ::Boolean; end
-class FalseClass < ::Boolean; end
+class ::TrueClass < ::Boolean; end
+class ::FalseClass < ::Boolean; end
 
-TRUE  = true
-FALSE = false
+::TRUE  = true
+::FALSE = false

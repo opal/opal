@@ -1,12 +1,12 @@
 # helpers: slice
 
-class Proc < `Function`
+class ::Proc < `Function`
   `Opal.prop(self.$$prototype, '$$is_proc', true)`
   `Opal.prop(self.$$prototype, '$$is_lambda', false)`
 
   def self.new(&block)
     unless block
-      ::Kernel.raise ArgumentError, 'tried to create a Proc object without a block'
+      ::Kernel.raise ::ArgumentError, 'tried to create a Proc object without a block'
     end
 
     block
@@ -94,7 +94,7 @@ class Proc < `Function`
   end
 
   def binding
-    `if (self.$$is_curried) { #{::Kernel.raise ArgumentError, "Can't create Binding"} }`
+    `if (self.$$is_curried) { #{::Kernel.raise ::ArgumentError, "Can't create Binding"} }`
 
     if defined? ::Binding
       ::Binding.new(nil, [], `self.$$s`, source_location)
@@ -148,7 +148,7 @@ class Proc < `Function`
             result;
 
         if (length > arity && self.$$is_lambda && !self.$$is_curried) {
-          #{::Kernel.raise ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
+          #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
         }
 
         if (length >= arity) {

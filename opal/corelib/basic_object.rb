@@ -1,4 +1,4 @@
-class BasicObject
+class ::BasicObject
   def initialize(*)
   end
 

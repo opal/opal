@@ -1,8 +1,8 @@
 # https://github.com/ruby/ruby/blob/trunk/doc/marshal.rdoc
 # https://github.com/ruby/ruby/blob/trunk/marshal.c
 
-module Marshal
-  class ReadBuffer
+module ::Marshal
+  class self::ReadBuffer
     %x{
       function stringToBytes(string) {
         var i,
@@ -554,7 +554,7 @@ module Marshal
     #  re-raises Marshal-specific error when it's missing
     #
     def safe_const_get(const_name)
-      Object.const_get(const_name)
+      ::Object.const_get(const_name)
     rescue ::NameError
       ::Kernel.raise ::ArgumentError, "undefined class/module #{const_name}"
     end

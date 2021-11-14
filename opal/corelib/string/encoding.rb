@@ -1,6 +1,6 @@
 require 'corelib/string'
 
-class Encoding
+class ::Encoding
   def self.register(name, options = {}, &block)
     names = [name] + (options[:aliases] || [])
     ascii = options[:ascii] || false
@@ -101,11 +101,11 @@ class Encoding
     ::Kernel.raise ::NotImplementedError
   end
 
-  class ::EncodingError < StandardError; end
-  class ::CompatibilityError < EncodingError; end
+  class ::EncodingError < ::StandardError; end
+  class ::CompatibilityError < ::EncodingError; end
 end
 
-Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
+::Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
   def each_byte(string, &block)
     %x{
       // Taken from: https://github.com/feross/buffer/blob/f52dffd9df0445b93c0c9065c2f8f0f46b2c729a/index.js#L1954-L2032
@@ -201,7 +201,7 @@ Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
   end
 end
 
-Encoding.register 'UTF-16LE' do
+::Encoding.register 'UTF-16LE' do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -218,7 +218,7 @@ Encoding.register 'UTF-16LE' do
   end
 end
 
-Encoding.register 'UTF-16BE', inherits: Encoding::UTF_16LE do
+::Encoding.register 'UTF-16BE', inherits: ::Encoding::UTF_16LE do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -231,7 +231,7 @@ Encoding.register 'UTF-16BE', inherits: Encoding::UTF_16LE do
   end
 end
 
-Encoding.register 'UTF-32LE' do
+::Encoding.register 'UTF-32LE' do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -250,7 +250,7 @@ Encoding.register 'UTF-32LE' do
   end
 end
 
-Encoding.register 'UTF-32BE', inherits: Encoding::UTF_32LE do
+::Encoding.register 'UTF-32BE', inherits: ::Encoding::UTF_32LE do
   def each_byte(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -265,7 +265,7 @@ Encoding.register 'UTF-32BE', inherits: Encoding::UTF_32LE do
   end
 end
 
-Encoding.register 'ASCII-8BIT', aliases: ['BINARY'], ascii: true do
+::Encoding.register 'ASCII-8BIT', aliases: ['BINARY'], ascii: true do
   def each_char(string, &block)
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
@@ -298,15 +298,15 @@ Encoding.register 'ASCII-8BIT', aliases: ['BINARY'], ascii: true do
   end
 end
 
-Encoding.register 'ISO-8859-1', aliases: ['ISO8859-1'], ascii: true, inherits: Encoding::ASCII_8BIT
-Encoding.register 'US-ASCII', aliases: ['ASCII'], ascii: true, inherits: Encoding::ASCII_8BIT
+::Encoding.register 'ISO-8859-1', aliases: ['ISO8859-1'], ascii: true, inherits: ::Encoding::ASCII_8BIT
+::Encoding.register 'US-ASCII', aliases: ['ASCII'], ascii: true, inherits: ::Encoding::ASCII_8BIT
 
-class String
+class ::String
   attr_reader :encoding
   attr_reader :internal_encoding
   `Opal.prop(String.prototype, 'bytes', nil)`
-  `Opal.prop(String.prototype, 'encoding', #{Encoding::UTF_8})`
-  `Opal.prop(String.prototype, 'internal_encoding', #{Encoding::UTF_8})`
+  `Opal.prop(String.prototype, 'encoding', #{::Encoding::UTF_8})`
+  `Opal.prop(String.prototype, 'internal_encoding', #{::Encoding::UTF_8})`
 
   def b
     dup.force_encoding('binary')
@@ -378,7 +378,7 @@ class String
       if (encoding === str.encoding) { return str; }
 
       encoding = #{::Opal.coerce_to!(encoding, ::String, :to_s)};
-      encoding = #{Encoding.find(encoding)};
+      encoding = #{::Encoding.find(encoding)};
 
       if (encoding === str.encoding) { return str; }
 

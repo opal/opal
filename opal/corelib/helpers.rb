@@ -1,6 +1,6 @@
 # helpers: type_error, coerce_to
 
-module Opal
+module ::Opal
   def self.bridge(constructor, klass)
     `Opal.bridge(constructor, klass)`
   end

@@ -1,6 +1,6 @@
 # helpers: respond_to, falsy, truthy
 
-module ObjectSpace
+module ::ObjectSpace
   module_function
 
   %x{
@@ -62,7 +62,7 @@ module ObjectSpace
     }
   end
 
-  class WeakMap
+  class self::WeakMap
     include ::Enumerable
 
     def initialize

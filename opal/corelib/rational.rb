@@ -1,7 +1,7 @@
 require 'corelib/numeric'
 require 'corelib/rational/base'
 
-class Rational < ::Numeric
+class ::Rational < ::Numeric
   def self.reduce(num, den)
     num = num.to_i
     den = den.to_i

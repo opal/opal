@@ -1,4 +1,4 @@
-class Random
+class ::Random
   %x{
     var module = { exports: {} };
 
@@ -17,11 +17,11 @@ class Random
     var $seed_generator = new Math.seedrandom('opal', { entropy: true })
   }
 
-  SEEDRANDOM_GENERATOR = `{
+  self::SEEDRANDOM_GENERATOR = `{
     new_seed: function() { return Math.abs($seed_generator.int32()); },
     reseed: function(seed) { return new seedrandom(seed); },
     rand: function($rng) { return $rng.quick(); }
   }`
 
-  self.generator = SEEDRANDOM_GENERATOR
+  self.generator = self::SEEDRANDOM_GENERATOR
 end

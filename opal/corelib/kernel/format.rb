@@ -1,6 +1,6 @@
 # helpers: coerce_to
 
-module Kernel
+module ::Kernel
   def format(format_string, *args)
     if args.length == 1 && args[0].respond_to?(:to_ary)
       ary = ::Opal.coerce_to?(args[0], ::Array, :to_ary)

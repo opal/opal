@@ -2,7 +2,7 @@
 
 require 'corelib/enumerable'
 
-class Enumerator
+class ::Enumerator
   include ::Enumerable
 
   `self.$$prototype.$$is_enumerator = true`
@@ -152,8 +152,8 @@ class Enumerator
     end
   end
 
-  class Lazy < self
-    class StopLazyError < ::Exception; end
+  class self::Lazy < self
+    class self::StopLazyError < ::Exception; end
 
     def initialize(object, size = nil, &block)
       unless block_given?
@@ -391,7 +391,7 @@ class Enumerator
     end
   end
 
-  class ArithmeticSequence < self
+  class self::ArithmeticSequence < self
     # We need to stub this for the time being
   end
 end

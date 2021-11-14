@@ -1,6 +1,6 @@
 # helpers: falsy
 
-module Comparable
+module ::Comparable
   %x{
     function normalize(what) {
       if (Opal.is_a(what, Opal.Integer)) { return what; }

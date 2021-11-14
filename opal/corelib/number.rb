@@ -1,6 +1,6 @@
 require 'corelib/numeric'
 
-class Number < ::Numeric
+class ::Number < ::Numeric
   ::Opal.bridge(`Number`, self)
   `Opal.prop(self.$$prototype, '$$is_number', true)`
   `self.$$is_number_class = true`
@@ -590,7 +590,7 @@ class Number < ::Numeric
       ::Kernel.raise ::FloatDomainError, 'NaN'
     elsif `eps == null`
       f, n  = ::Math.frexp self
-      f     = ::Math.ldexp(f, Float::MANT_DIG).to_i
+      f     = ::Math.ldexp(f, ::Float::MANT_DIG).to_i
       n    -= ::Float::MANT_DIG
 
       ::Rational.new(2 * f, 1 << (1 - n)).rationalize(::Rational.new(1, 1 << (1 - n)))
@@ -841,7 +841,7 @@ end
 
 ::Fixnum = ::Number
 
-class Integer < ::Numeric
+class ::Integer < ::Numeric
   `self.$$is_number_class = true`
   `self.$$is_integer_class = true`
 
@@ -864,11 +864,11 @@ class Integer < ::Numeric
     end
   end
 
-  MAX = `Math.pow(2, 30) - 1`
-  MIN = `-Math.pow(2, 30)`
+  self::MAX = `Math.pow(2, 30) - 1`
+  self::MIN = `-Math.pow(2, 30)`
 end
 
-class Float < ::Numeric
+class ::Float < ::Numeric
   `self.$$is_number_class = true`
 
   class << self
@@ -883,14 +883,14 @@ class Float < ::Numeric
     end
   end
 
-  INFINITY = `Infinity`
-  MAX      = `Number.MAX_VALUE`
-  MIN      = `Number.MIN_VALUE`
-  NAN      = `NaN`
+  self::INFINITY = `Infinity`
+  self::MAX      = `Number.MAX_VALUE`
+  self::MIN      = `Number.MIN_VALUE`
+  self::NAN      = `NaN`
 
-  DIG      = 15
-  MANT_DIG = 53
-  RADIX    = 2
+  self::DIG      = 15
+  self::MANT_DIG = 53
+  self::RADIX    = 2
 
-  EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
+  self::EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
 end
