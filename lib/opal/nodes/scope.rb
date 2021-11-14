@@ -88,11 +88,6 @@ module Opal
         @type == :top
       end
 
-      # Traverses to the top scope.
-      def top_scope
-        top? ? self : parent.top_scope
-      end
-
       # True if a block/iter scope
       def iter?
         @type == :iter
