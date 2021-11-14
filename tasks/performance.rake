@@ -79,7 +79,9 @@ performance_stat = ->(name) {
   stat[:size] = File.size("tmp/performance/asciidoctor_test.js")
 
   puts "\n* Minifying AsciiDoctor with #{name}..."
-  stat[:min_size] = Opal::Util.uglify(File.read("tmp/performance/asciidoctor_test.js")).bytesize rescue Float::INFINITY
+  source = File.read("tmp/performance/asciidoctor_test.js")
+  stat[:min_size] = Opal::Util.uglify(source).bytesize rescue Float::INFINITY
+  stat[:min_size_m] = Opal::Util.uglify(source, mangle: true).bytesize rescue Float::INFINITY
 
   stat
 }
@@ -132,6 +134,7 @@ namespace :performance do
     compare_values.("Run time",                 current[:run_time],      previous[:run_time])
     compare_values.("Bundle size",                  current[:size],          previous[:size])
     compare_values.("Minified bundle size",     current[:min_size],      previous[:min_size])
+    compare_values.("Mangled & minified",     current[:min_size_m],    previous[:min_size_m])
 
     if failed
       puts "--- Failures ---"
