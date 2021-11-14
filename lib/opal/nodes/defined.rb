@@ -165,12 +165,12 @@ module Opal
         const_tmp = scope.new_temp
 
         if const_scope.nil?
-          push "(#{const_tmp} = $$($nesting, '#{const_name}', 'skip_raise'))"
+          push "(#{const_tmp} = #{top_scope.relative_const}($nesting, '#{const_name}', 'skip_raise'))"
         elsif const_scope == s(:cbase)
-          push "(#{const_tmp} = $$$('::', '#{const_name}', 'skip_raise'))"
+          push "(#{const_tmp} = #{top_scope.absolute_const}('::', '#{const_name}', 'skip_raise'))"
         else
           const_scope_tmp = compile_defined(const_scope)
-          push " && (#{const_tmp} = $$$(#{const_scope_tmp}, '#{const_name}', 'skip_raise'))"
+          push " && (#{const_tmp} = #{top_scope.absolute_const}(#{const_scope_tmp}, '#{const_name}', 'skip_raise'))"
         end
         const_tmp
       end

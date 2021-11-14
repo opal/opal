@@ -13,6 +13,8 @@ module Opal
       children :body
 
       def compile
+        compiler.top_scope = self
+
         push version_comment
 
         in_scope do
@@ -32,8 +34,8 @@ module Opal
               add_temp '$nesting = []'
             end
             add_temp 'nil = Opal.nil'
-            add_temp '$$$ = Opal.$$$'
-            add_temp '$$ = Opal.$$'
+            add_temp '$$$ = Opal.$$$' if @define_absolute_const
+            add_temp '$$ = Opal.$$' if @define_relative_const
 
             add_used_helpers
             add_used_operators
@@ -76,6 +78,18 @@ module Opal
 
       def stmts
         compiler.returns(body)
+      end
+
+      # Returns '$$$', but also ensures that the '$$$' variable is set
+      def absolute_const
+        @define_absolute_const = true
+        '$$$'
+      end
+
+      # Returns '$$', but also ensures that the '$$' variable is set
+      def relative_const
+        @define_relative_const = true
+        '$$'
       end
 
       def compile_irb_vars

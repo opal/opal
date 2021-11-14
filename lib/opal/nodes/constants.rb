@@ -16,13 +16,13 @@ module Opal
           helper :"#{name}"
           push "$#{name}"
         elsif const_scope == s(:cbase)
-          push "$$$('#{name}')"
+          push "#{top_scope.absolute_const}('#{name}')"
         elsif const_scope
-          push '$$$(', recv(const_scope), ", '#{name}')"
+          push "#{top_scope.absolute_const}(", recv(const_scope), ", '#{name}')"
         elsif compiler.eval?
-          push "$$($nesting, '#{name}')"
+          push "#{top_scope.relative_const}($nesting, '#{name}')"
         else
-          push "$$($nesting, '#{name}')"
+          push "#{top_scope.relative_const}($nesting, '#{name}')"
         end
       end
 

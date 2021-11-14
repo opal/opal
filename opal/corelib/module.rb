@@ -295,7 +295,7 @@ class Module
   def const_defined?(name, inherit = true)
     name = Opal.const_name!(name)
 
-    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
+    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
 
     %x{
       var module, modules = [self], module_constants, i, ii;
@@ -340,11 +340,11 @@ class Module
       return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
 
-    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ Opal::CONST_NAME_REGEXP
+    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
 
     %x{
       if (inherit) {
-        return $$([self], name);
+        return Opal.$$([self], name);
       } else {
         return Opal.const_get_local(self, name);
       }
@@ -352,15 +352,15 @@ class Module
   end
 
   def const_missing(name)
-    full_const_name = self == Object ? name : "#{self}::#{name}"
+    full_const_name = self == ::Object ? name : "#{self}::#{name}"
 
     ::Kernel.raise ::NameError.new("uninitialized constant #{full_const_name}", name)
   end
 
   def const_set(name, value)
-    name = Opal.const_name!(name)
+    name = ::Opal.const_name!(name)
 
-    if name !~ Opal::CONST_NAME_REGEXP || name.start_with?('::')
+    if name !~ ::Opal::CONST_NAME_REGEXP || name.start_with?('::')
       ::Kernel.raise ::NameError.new("wrong constant name #{name}", name)
     end
 
