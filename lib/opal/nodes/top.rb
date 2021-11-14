@@ -28,10 +28,10 @@ module Opal
             body_code = [body_code] unless body_code.is_a?(Array)
 
             if compiler.eval?
-              add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]'
+              add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]' if @define_nesting
             else
-              add_temp 'self = Opal.top'
-              add_temp '$nesting = []'
+              add_temp 'self = Opal.top' if @define_self
+              add_temp '$nesting = []' if @define_nesting
             end
             add_temp 'nil = Opal.nil'
             add_temp '$$$ = Opal.$$$' if @define_absolute_const

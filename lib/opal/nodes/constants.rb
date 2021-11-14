@@ -20,9 +20,9 @@ module Opal
         elsif const_scope
           push "#{top_scope.absolute_const}(", recv(const_scope), ", '#{name}')"
         elsif compiler.eval?
-          push "#{top_scope.relative_const}($nesting, '#{name}')"
+          push "#{top_scope.relative_const}(#{scope.nesting}, '#{name}')"
         else
-          push "#{top_scope.relative_const}($nesting, '#{name}')"
+          push "#{top_scope.relative_const}(#{scope.nesting}, '#{name}')"
         end
       end
 
@@ -69,7 +69,7 @@ module Opal
         if base
           push '$const_set(', expr(base), ", '#{name}', ", expr(value), ')'
         else
-          push "$const_set($nesting[0], '#{name}', ", expr(value), ')'
+          push "$const_set(#{scope.nesting}[0], '#{name}', ", expr(value), ')'
         end
       end
     end

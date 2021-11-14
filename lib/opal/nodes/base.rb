@@ -200,7 +200,7 @@ module Opal
 
       def class_variable_owner
         if scope
-          "$nesting[#{class_variable_owner_nesting_level}]"
+          "#{scope.nesting}[#{class_variable_owner_nesting_level}]"
         else
           'Opal.Object'
         end

@@ -37,7 +37,7 @@ module Opal
           end
 
           unshift "#{await_begin}(#{async}function($base, $super, $parent_nesting) {"
-          line '})(', base, ', ', super_code, ", $nesting)#{await_end}"
+          line '})(', base, ', ', super_code, ", #{scope.nesting})#{await_end}"
         end
       end
 

@@ -37,7 +37,7 @@ module Opal
           end
 
           unshift "#{await_begin}(#{async}function($base, $parent_nesting) {"
-          line '})(', base, ", $nesting)#{await_end}"
+          line '})(', base, ", #{scope.nesting})#{await_end}"
         end
       end
 
@@ -48,17 +48,17 @@ module Opal
         base, name = cid.children
 
         if base.nil?
-          [name, '$nesting[0]']
+          [name, "#{scope.nesting}[0]"]
         else
           [name, expr(base)]
         end
       end
 
       def compile_body
-        add_temp '$nesting = [self].concat($parent_nesting)'
-
         body_code = stmt(compiler.returns(body))
         empty_line
+
+        add_temp "$nesting = [self].concat($parent_nesting)" if @define_nesting
 
         line scope.to_vars
         line body_code

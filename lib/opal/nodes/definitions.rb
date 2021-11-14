@@ -60,8 +60,6 @@ module Opal
             wrap '(function() {', '})()'
           end
         end
-
-        scope.self if @define_self
       end
 
       def returned_children

@@ -385,6 +385,12 @@ module Opal
         'self'
       end
 
+      # Returns '$nesting', but also ensures we compile the nesting chain
+      def nesting
+        @define_nesting = true
+        '$nesting'
+      end
+
       def prepare_block(block_name = nil)
         scope_name = scope.identity
         self.block_name = block_name if block_name

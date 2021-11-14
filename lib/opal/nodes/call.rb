@@ -373,14 +373,14 @@ module Opal
 
       add_special :nesting do |compile_default|
         push_nesting = push_nesting?
-        push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
+        push "(Opal.Module.$$nesting = #{scope.nesting}, " if push_nesting
         compile_default.call
         push ')' if push_nesting
       end
 
       add_special :constants do |compile_default|
         push_nesting = push_nesting?
-        push '(Opal.Module.$$nesting = $nesting, ' if push_nesting
+        push "(Opal.Module.$$nesting = #{scope.nesting}, " if push_nesting
         compile_default.call
         push ')' if push_nesting
       end
@@ -390,6 +390,7 @@ module Opal
       add_special :eval do |compile_default|
         next compile_default.call if arglist.children.length != 1 || ![s(:self), nil].include?(recvr)
 
+        scope.nesting
         temp = scope.new_temp
         scope_variables = scope.scope_locals.map(&:to_s).inspect
         push "(#{temp} = ", expr(arglist)
@@ -402,6 +403,7 @@ module Opal
       add_special :binding do |compile_default|
         next compile_default.call unless recvr.nil?
 
+        scope.nesting
         push "Opal.Binding.$new("
         push "  function($code, $value) {"
         push "    if (typeof $value === 'undefined') {"

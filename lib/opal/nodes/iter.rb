@@ -78,6 +78,8 @@ module Opal
         elsif blockopts.length > 1
           push ', {', blockopts.join(', '), '}'
         end
+
+        scope.nesting if @define_nesting
       end
 
       def compile_block_arg
