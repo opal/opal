@@ -235,10 +235,18 @@ module Opal
       handle :dstr
 
       def compile
-        push '""'
+        if children.length > 1 && children.first.type == :str
+          skip_empty = true
+        else
+          push '""'
+        end
 
         children.each do |part|
-          push ' + '
+          if skip_empty
+            skip_empty = false
+          else
+            push ' + '
+          end
 
           if part.type == :str
             push expr(part)
