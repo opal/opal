@@ -5,14 +5,14 @@ describe Opal::Compiler do
   describe "irb parser option" do
     it "creates Opal.irb_vars if it does not exist" do
       $global["Opal"].irb_vars = nil
-      eval_js compile("nil", :irb => true)
+      eval_js compile("0;nil", :irb => true)
 
       ($global["Opal"].irb_vars == nil).should be_false
     end
 
     it "does not create Opal.irb_vars if :irb option not passed" do
       $global["Opal"].irb_vars = nil
-      eval_js compile("nil")
+      eval_js compile("0;nil")
 
       ($global["Opal"].irb_vars == nil).should be_true
     end

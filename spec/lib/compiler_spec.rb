@@ -35,7 +35,7 @@ RSpec.describe Opal::Compiler do
     expect_compiled("123E+10").to include("return 1230000000000")
     expect_compiled("false").to include("return false")
     expect_compiled("true").to include("return true")
-    expect_compiled("nil").to include("return nil")
+    expect_compiled("0;nil").to include("return nil") # NB: Empty nil return is compiled-out
   end
 
   it "should compile ruby strings" do

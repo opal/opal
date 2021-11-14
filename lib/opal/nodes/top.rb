@@ -16,30 +16,35 @@ module Opal
         push version_comment
 
         in_scope do
-          line '"use strict";' if compiler.use_strict?
-
-          body_code = stmt(stmts)
-          body_code = [body_code] unless body_code.is_a?(Array)
-
-          if compiler.eval?
-            add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]'
+          if body == s(:nil)
+            # A shortpath for empty (stub?) modules.
+            line 'return Opal.nil;'
           else
-            add_temp 'self = Opal.top'
-            add_temp '$nesting = []'
+            line '"use strict";' if compiler.use_strict?
+
+            body_code = stmt(stmts)
+            body_code = [body_code] unless body_code.is_a?(Array)
+
+            if compiler.eval?
+              add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]'
+            else
+              add_temp 'self = Opal.top'
+              add_temp '$nesting = []'
+            end
+            add_temp 'nil = Opal.nil'
+            add_temp '$$$ = Opal.$$$'
+            add_temp '$$ = Opal.$$'
+
+            add_used_helpers
+            add_used_operators
+            line scope.to_vars
+
+            compile_method_stubs
+            compile_irb_vars
+            compile_end_construct
+
+            line body_code
           end
-          add_temp 'nil = Opal.nil'
-          add_temp '$$$ = Opal.$$$'
-          add_temp '$$ = Opal.$$'
-
-          add_used_helpers
-          add_used_operators
-          line scope.to_vars
-
-          compile_method_stubs
-          compile_irb_vars
-          compile_end_construct
-
-          line body_code
         end
         opening
         closing
