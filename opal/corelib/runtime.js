@@ -1447,9 +1447,10 @@
   Opal.add_stubs = function(stubs) {
     var proto = Opal.BasicObject.$$prototype;
     var stub, existing_method;
+    stubs = stubs.split(',');
 
     for (var i = 0, length = stubs.length; i < length; i++) {
-      stub = stubs[i], existing_method = proto[stub];
+      stub = '$'+stubs[i], existing_method = proto[stub];
 
       if (existing_method == null || existing_method.$$stub) {
         Opal.add_stub_for(proto, stub);
