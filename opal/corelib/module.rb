@@ -523,11 +523,7 @@ class Module
       compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
       compiled = ::Opal.compile string, compiling_options
       block = ::Kernel.proc do
-        %x{
-          return (function(self) {
-            return eval(compiled);
-          })(self)
-        }
+        %x{new Function("Opal,self", "return " + compiled)(Opal, self)}
       end
     elsif args.any?
       ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{args.size} for 0)" \
