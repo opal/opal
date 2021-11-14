@@ -1,3 +1,5 @@
+# helpers: yield1, hash, hash_init, hash_get, hash_put, hash_delete
+
 require 'corelib/enumerable'
 
 # ---
@@ -67,7 +69,7 @@ class Hash
     %x{
       var hash = new self.$$constructor();
 
-      Opal.hash_init(hash);
+      $hash_init(hash);
 
       hash.$$none = nil;
       hash.$$proc = nil;
@@ -114,7 +116,7 @@ class Hash
           other_value = other.$$smap[key];
         } else {
           value = key.value;
-          other_value = Opal.hash_get(other, key.key);
+          other_value = $hash_get(other, key.key);
         }
 
         if (other_value === undefined || !value['$eql?'](other_value)) {
@@ -175,7 +177,7 @@ class Hash
 
   def [](key)
     %x{
-      var value = Opal.hash_get(self, key);
+      var value = $hash_get(self, key);
 
       if (value !== undefined) {
         return value;
@@ -187,7 +189,7 @@ class Hash
 
   def []=(key, value)
     %x{
-      Opal.hash_put(self, key, value);
+      $hash_put(self, key, value);
       return value;
     }
   end
@@ -214,7 +216,7 @@ class Hash
 
   def clear
     %x{
-      Opal.hash_init(self);
+      $hash_init(self);
       return self;
     }
   end
@@ -223,7 +225,7 @@ class Hash
     %x{
       var hash = new self.$$class();
 
-      Opal.hash_init(hash);
+      $hash_init(hash);
       Opal.hash_clone(self, hash);
 
       return hash;
@@ -232,7 +234,7 @@ class Hash
 
   def compact
     %x{
-      var hash = Opal.hash();
+      var hash = $hash();
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
@@ -245,7 +247,7 @@ class Hash
         }
 
         if (value !== nil) {
-          Opal.hash_put(hash, key, value);
+          $hash_put(hash, key, value);
         }
       }
 
@@ -268,7 +270,7 @@ class Hash
         }
 
         if (value === nil) {
-          if (Opal.hash_delete(self, key) !== undefined) {
+          if ($hash_delete(self, key) !== undefined) {
             changes_were_made = true;
             length--;
             i--;
@@ -294,7 +296,7 @@ class Hash
       for(i = 0, ii = keys.length; i < ii; i++) {
         key = keys[i];
         if (!key.$$is_string) key = key.key;
-        Opal.hash_put(identity_hash, key, Opal.hash_get(self, key));
+        $hash_put(identity_hash, key, $hash_get(self, key));
       }
 
       self.$$by_identity = true;
@@ -359,7 +361,7 @@ class Hash
 
   def delete(key, &block)
     %x{
-      var value = Opal.hash_delete(self, key);
+      var value = $hash_delete(self, key);
 
       if (value !== undefined) {
         return value;
@@ -390,7 +392,7 @@ class Hash
         obj = block(key, value);
 
         if (obj !== false && obj !== nil) {
-          if (Opal.hash_delete(self, key) !== undefined) {
+          if ($hash_delete(self, key) !== undefined) {
             length--;
             i--;
           }
@@ -433,7 +435,7 @@ class Hash
           key = key.key;
         }
 
-        Opal.yield1(block, [key, value]);
+        $yield1(block, [key, value]);
       }
 
       return self;
@@ -487,7 +489,7 @@ class Hash
 
   def fetch(key, defaults = undefined, &block)
     %x{
-      var value = Opal.hash_get(self, key);
+      var value = $hash_get(self, key);
 
       if (value !== undefined) {
         return value;
@@ -545,7 +547,7 @@ class Hash
   end
 
   def has_key?(key)
-    `Opal.hash_get(self, key) !== undefined`
+    `$hash_get(self, key) !== undefined`
   end
 
   def has_value?(value)
@@ -636,7 +638,7 @@ class Hash
 
       for (var i = 0, length = args.length, key, value; i < length; i++) {
         key = args[i];
-        value = Opal.hash_get(self, key);
+        value = $hash_get(self, key);
 
         if (value === undefined) {
           result.push(#{default});
@@ -696,7 +698,7 @@ class Hash
 
   def invert
     %x{
-      var hash = Opal.hash();
+      var hash = $hash();
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
@@ -708,7 +710,7 @@ class Hash
           key = key.key;
         }
 
-        Opal.hash_put(hash, value, key);
+        $hash_put(hash, value, key);
       }
 
       return hash;
@@ -732,7 +734,7 @@ class Hash
         obj = block(key, value);
 
         if (obj === false || obj === nil) {
-          if (Opal.hash_delete(self, key) !== undefined) {
+          if ($hash_delete(self, key) !== undefined) {
             length--;
             i--;
           }
@@ -793,7 +795,7 @@ class Hash
               key = key.key;
             }
 
-            Opal.hash_put(self, key, other_value);
+            $hash_put(self, key, other_value);
           }
         } else {
           for (j = 0; j < length; j++) {
@@ -806,14 +808,14 @@ class Hash
               key = key.key;
             }
 
-            value = Opal.hash_get(self, key);
+            value = $hash_get(self, key);
 
             if (value === undefined) {
-              Opal.hash_put(self, key, other_value);
+              $hash_put(self, key, other_value);
               continue;
             }
 
-            Opal.hash_put(self, key, block(key, value, other_value));
+            $hash_put(self, key, block(key, value, other_value));
           }
         }
       }
@@ -854,7 +856,7 @@ class Hash
     return enum_for(:reject) { size } unless block
 
     %x{
-      var hash = Opal.hash();
+      var hash = $hash();
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
@@ -869,7 +871,7 @@ class Hash
         obj = block(key, value);
 
         if (obj === false || obj === nil) {
-          Opal.hash_put(hash, key, value);
+          $hash_put(hash, key, value);
         }
       }
 
@@ -896,7 +898,7 @@ class Hash
         obj = block(key, value);
 
         if (obj !== false && obj !== nil) {
-          if (Opal.hash_delete(self, key) !== undefined) {
+          if ($hash_delete(self, key) !== undefined) {
             changes_were_made = true;
             length--;
             i--;
@@ -912,7 +914,7 @@ class Hash
     other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
 
     %x{
-      Opal.hash_init(self);
+      $hash_init(self);
 
       for (var i = 0, other_keys = other.$$keys, length = other_keys.length, key, value, other_value; i < length; i++) {
         key = other_keys[i];
@@ -924,7 +926,7 @@ class Hash
           key = key.key;
         }
 
-        Opal.hash_put(self, key, other_value);
+        $hash_put(self, key, other_value);
       }
     }
 
@@ -941,7 +943,7 @@ class Hash
     return enum_for(:select) { size } unless block
 
     %x{
-      var hash = Opal.hash();
+      var hash = $hash();
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
@@ -956,7 +958,7 @@ class Hash
         obj = block(key, value);
 
         if (obj !== false && obj !== nil) {
-          Opal.hash_put(hash, key, value);
+          $hash_put(hash, key, value);
         }
       }
 
@@ -983,7 +985,7 @@ class Hash
         obj = block(key, value);
 
         if (obj === false || obj === nil) {
-          if (Opal.hash_delete(self, key) !== undefined) {
+          if ($hash_delete(self, key) !== undefined) {
             length--;
             i--;
           }
@@ -1008,7 +1010,7 @@ class Hash
 
         key = key.$$is_string ? key : key.key;
 
-        return [key, Opal.hash_delete(self, key)];
+        return [key, $hash_delete(self, key)];
       }
 
       return self.$default(nil);
@@ -1019,13 +1021,13 @@ class Hash
 
   def slice(*keys)
     %x{
-      var result = Opal.hash();
+      var result = $hash();
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], value = Opal.hash_get(self, key);
+        var key = keys[i], value = $hash_get(self, key);
 
         if (value !== undefined) {
-          Opal.hash_put(result, key, value);
+          $hash_put(result, key, value);
         }
       }
 
@@ -1066,7 +1068,7 @@ class Hash
 
       var hash = new Opal.Hash();
 
-      Opal.hash_init(hash);
+      $hash_init(hash);
       Opal.hash_clone(self, hash);
 
       return hash;
@@ -1095,7 +1097,7 @@ class Hash
     return enum_for(:transform_keys) { size } unless block
 
     %x{
-      var result = Opal.hash();
+      var result = $hash();
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
@@ -1107,9 +1109,9 @@ class Hash
           key = key.key;
         }
 
-        key = Opal.yield1(block, key);
+        key = $yield1(block, key);
 
-        Opal.hash_put(result, key, value);
+        $hash_put(result, key, value);
       }
 
       return result;
@@ -1133,10 +1135,10 @@ class Hash
           key = key.key;
         }
 
-        new_key = Opal.yield1(block, key);
+        new_key = $yield1(block, key);
 
-        Opal.hash_delete(self, key);
-        Opal.hash_put(self, new_key, value);
+        $hash_delete(self, key);
+        $hash_put(self, new_key, value);
       }
 
       return self;
@@ -1147,7 +1149,7 @@ class Hash
     return enum_for(:transform_values) { size } unless block
 
     %x{
-      var result = Opal.hash();
+      var result = $hash();
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
@@ -1159,9 +1161,9 @@ class Hash
           key = key.key;
         }
 
-        value = Opal.yield1(block, value);
+        value = $yield1(block, value);
 
-        Opal.hash_put(result, key, value);
+        $hash_put(result, key, value);
       }
 
       return result;
@@ -1182,9 +1184,9 @@ class Hash
           key = key.key;
         }
 
-        value = Opal.yield1(block, value);
+        value = $yield1(block, value);
 
-        Opal.hash_put(self, key, value);
+        $hash_put(self, key, value);
       }
 
       return self;

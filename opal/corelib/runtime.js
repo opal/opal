@@ -418,7 +418,7 @@
 
   // Register the constant on a cref and opportunistically set the name of
   // unnamed classes/modules.
-  Opal.const_set = function(cref, name, value) {
+  function $const_set(cref, name, value) {
     if (cref == null || cref === '::') cref = _Object;
 
     if (value.$$is_a_module) {
@@ -444,6 +444,8 @@
 
     return value;
   };
+
+  Opal.const_set = $const_set;
 
   // Get all the constants reachable from a given cref, by default will include
   // inherited constants.
@@ -656,7 +658,7 @@
 
     // Create the class object (instance of Class)
     klass = Opal.allocate_class(name, superclass);
-    Opal.const_set(scope, name, klass);
+    $const_set(scope, name, klass);
 
     // Call .inherited() hook with new class on the superclass
     if (superclass.$inherited) {
@@ -754,7 +756,7 @@
 
     // Module doesnt exist, create a new one...
     module = Opal.allocate_module(name);
-    Opal.const_set(scope, name, module);
+    $const_set(scope, name, module);
 
     if (Opal.trace_class) { invoke_tracers_for_class(module); }
 
@@ -2765,12 +2767,12 @@
   BasicObject.$$const["BasicObject"] = BasicObject;
 
   // Assign basic constants
-  Opal.const_set(_Object, "BasicObject",  BasicObject);
-  Opal.const_set(_Object, "Object",       _Object);
-  Opal.const_set(_Object, "Module",       Module);
-  Opal.const_set(_Object, "Class",        Class);
-  Opal.const_set(_Object, "Opal",         _Opal);
-  Opal.const_set(_Object, "Kernel",       Kernel);
+  $const_set(_Object, "BasicObject",  BasicObject);
+  $const_set(_Object, "Object",       _Object);
+  $const_set(_Object, "Module",       Module);
+  $const_set(_Object, "Class",        Class);
+  $const_set(_Object, "Opal",         _Opal);
+  $const_set(_Object, "Kernel",       Kernel);
 
   // Fix booted classes to have correct .class value
   BasicObject.$$class = Class;
@@ -2812,7 +2814,7 @@
   // Nil
   function $NilClass() {}
   Opal.NilClass = Opal.allocate_class('NilClass', Opal.Object, $NilClass);
-  Opal.const_set(_Object, 'NilClass', Opal.NilClass);
+  $const_set(_Object, 'NilClass', Opal.NilClass);
   nil = Opal.nil = new Opal.NilClass();
   nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };

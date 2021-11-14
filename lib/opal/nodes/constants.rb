@@ -64,10 +64,12 @@ module Opal
       children :base, :name, :value
 
       def compile
+        helper :const_set
+
         if base
-          push 'Opal.const_set(', expr(base), ", '#{name}', ", expr(value), ')'
+          push '$const_set(', expr(base), ", '#{name}', ", expr(value), ')'
         else
-          push "Opal.const_set($nesting[0], '#{name}', ", expr(value), ')'
+          push "$const_set($nesting[0], '#{name}', ", expr(value), ')'
         end
       end
     end

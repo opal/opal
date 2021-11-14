@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to
+# helpers: truthy, coerce_to, const_set, Object
 
 class Module
   def self.allocate
@@ -270,7 +270,7 @@ class Module
   def self.constants(inherit = undefined)
     %x{
       if (inherit == null) {
-        var nesting = (self.$$nesting || []).concat(Opal.Object),
+        var nesting = (self.$$nesting || []).concat($Object),
             constant, constants = {},
             i, ii;
 
@@ -306,7 +306,7 @@ class Module
 
         // Add Object's ancestors if it's a module – modules have no ancestors otherwise
         if (self.$$is_module) {
-          modules = modules.concat([Opal.Object]).concat(Opal.ancestors(Opal.Object));
+          modules = modules.concat([$Object]).concat(Opal.ancestors($Object));
         }
       }
 
@@ -364,7 +364,7 @@ class Module
       ::Kernel.raise ::NameError.new("wrong constant name #{name}", name)
     end
 
-    `Opal.const_set(self, name, value)`
+    `$const_set(self, name, value)`
 
     value
   end
@@ -604,7 +604,7 @@ class Module
 
         base = base.$$base_module;
 
-        if (base === Opal.Object) {
+        if (base === $Object) {
           break;
         }
       }
@@ -707,7 +707,7 @@ class Module
       var name, other_constants = other.$$const;
 
       for (name in other_constants) {
-        Opal.const_set(self, name, other_constants[name]);
+        $const_set(self, name, other_constants[name]);
       }
     }
   end

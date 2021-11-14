@@ -141,7 +141,9 @@ module Opal
       end
 
       def compile_dynamic_regexp
-        push 'Opal.regexp(['
+        helper :regexp
+
+        push '$regexp(['
         value.children.each_with_index do |v, index|
           push ', ' unless index.zero?
           push expr(v)
