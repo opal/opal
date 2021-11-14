@@ -11,6 +11,10 @@ module Opal
         "$ret_or_#{@counter}"
       end
 
+      def free_tmp
+        @counter -= 1
+      end
+
       def reset_tmp_counter!
         @counter = nil
       end
@@ -19,14 +23,18 @@ module Opal
         lhs, rhs = *node.children
         lhs_tmp = next_tmp
 
-        node.updated(:if, [s(:lvasgn, lhs_tmp, process(lhs)), s(:js_tmp, lhs_tmp), process(rhs)])
+        out = node.updated(:if, [s(:lvasgn, lhs_tmp, process(lhs)), s(:js_tmp, lhs_tmp), process(rhs)])
+        free_tmp
+        out
       end
 
       def on_and(node)
         lhs, rhs = *node.children
         lhs_tmp = next_tmp
 
-        node.updated(:if, [s(:lvasgn, lhs_tmp, process(lhs)), process(rhs), s(:js_tmp, lhs_tmp)])
+        out = node.updated(:if, [s(:lvasgn, lhs_tmp, process(lhs)), process(rhs), s(:js_tmp, lhs_tmp)])
+        free_tmp
+        out
       end
     end
   end
