@@ -36,8 +36,8 @@ module Opal
             await_begin, await_end, async = '', '', ''
           end
 
-          unshift "#{await_begin}(#{async}function($base, $parent_nesting) {"
-          line '})(', base, ", #{scope.nesting})#{await_end}"
+          unshift "#{await_begin}(#{async}function($base#{', $parent_nesting' if @define_nesting}) {"
+          line '})(', base, "#{', ' + scope.nesting if @define_nesting})#{await_end}"
         end
       end
 
