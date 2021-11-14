@@ -77,6 +77,7 @@ module Opal
         wrap_with_definition
 
         scope.nesting if @define_nesting
+        scope.relative_access if @define_relative_access
       end
 
       def wrap_with_definition

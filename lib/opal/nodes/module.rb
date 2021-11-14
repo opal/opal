@@ -59,6 +59,7 @@ module Opal
         empty_line
 
         add_temp "$nesting = [self].concat($parent_nesting)" if @define_nesting
+        add_temp '$$ = Opal.$r($nesting)' if @define_relative_access
 
         line scope.to_vars
         line body_code

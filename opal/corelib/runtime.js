@@ -494,10 +494,17 @@
     throw Opal.NameError.$new("constant "+cref+"::"+cref.$name()+" not defined");
   };
 
+  // Generates a function that is a curried const_get_relative.
+  Opal.const_get_relative_factory = function(nesting) {
+    return function(name, skip_missing) {
+      return Opal.$$(nesting, name, skip_missing);
+    }
+  }
+
   // Setup some shortcuts to reduce compiled size
   Opal.$$ = Opal.const_get_relative;
   Opal.$$$ = Opal.const_get_qualified;
-
+  Opal.$r = Opal.const_get_relative_factory;
 
   // Modules & Classes
   // -----------------

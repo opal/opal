@@ -391,6 +391,12 @@ module Opal
         '$nesting'
       end
 
+      # Returns '$$', but also ensures we compile it
+      def relative_access
+        @define_relative_access = @define_nesting = true
+        '$$'
+      end
+
       def prepare_block(block_name = nil)
         scope_name = scope.identity
         self.block_name = block_name if block_name

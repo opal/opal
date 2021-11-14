@@ -20,9 +20,9 @@ module Opal
         elsif const_scope
           push "#{top_scope.absolute_const}(", recv(const_scope), ", '#{name}')"
         elsif compiler.eval?
-          push "#{top_scope.relative_const}(#{scope.nesting}, '#{name}')"
+          push "#{scope.relative_access}('#{name}')"
         else
-          push "#{top_scope.relative_const}(#{scope.nesting}, '#{name}')"
+          push "#{scope.relative_access}('#{name}')"
         end
       end
 

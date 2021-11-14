@@ -33,9 +33,10 @@ module Opal
               add_temp 'self = Opal.top' if @define_self
               add_temp '$nesting = []' if @define_nesting
             end
+            add_temp '$$ = Opal.$r($nesting)' if @define_relative_access
+
             add_temp 'nil = Opal.nil'
             add_temp '$$$ = Opal.$$$' if @define_absolute_const
-            add_temp '$$ = Opal.$$' if @define_relative_const
 
             add_used_helpers
             add_used_operators
@@ -84,12 +85,6 @@ module Opal
       def absolute_const
         @define_absolute_const = true
         '$$$'
-      end
-
-      # Returns '$$', but also ensures that the '$$' variable is set
-      def relative_const
-        @define_relative_const = true
-        '$$'
       end
 
       def compile_irb_vars
