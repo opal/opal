@@ -141,19 +141,21 @@ module Opal
           "if ($gvars#{gvar} == null) $gvars#{gvar} = nil;\n"
         end
 
+        if class? && !@proto_ivars.empty?
+          vars << '$proto = self.$$prototype'
+        end
+
         indent = @compiler.parser_indent
         str  = vars.empty? ? '' : "var #{vars.join ', '};\n"
         str += "#{indent}#{iv.join indent}" unless ivars.empty?
         str += "#{indent}#{gv.join indent}" unless gvars.empty?
 
         if class? && !@proto_ivars.empty?
-          pvars = @proto_ivars.map { |i| "self.$$prototype#{i}" }.join(' = ')
-          result = "#{str}\n#{indent}#{pvars} = nil;"
-        else
-          result = str
+          pvars = @proto_ivars.map { |i| "$proto#{i}" }.join(' = ')
+          str = "#{str}\n#{indent}#{pvars} = nil;"
         end
 
-        fragment(result)
+        fragment(str)
       end
 
       def add_scope_ivar(ivar)
