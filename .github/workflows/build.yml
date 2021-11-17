@@ -71,9 +71,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.combo.ruby }}
-          # NOTE: Bundler 2.2.0 fails to install libv8
-          # https://github.com/rubyjs/libv8/issues/310
-          bundler: "2.1.4"
           bundler-cache: false
       - run: ruby bin/git-submodule-fast-install
       - run: bundle lock
