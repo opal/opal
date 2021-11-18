@@ -32,7 +32,7 @@ group :repl do
 end
 
 group :browser do
-  gem 'selenium-webdriver', '>= 3.0.0.beta3.1', platform: :mri
+  gem 'puppeteer-ruby', require: false
 end
 
 group :development do

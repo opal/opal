@@ -3,36 +3,16 @@
 require 'shellwords'
 require 'socket'
 require 'timeout'
-require 'tmpdir'
 require 'rbconfig'
+require 'opal/cli_runners/browser_runner'
 
 module Opal
   module CliRunners
-    class Chrome
+    class Chrome < BrowserRunner
       SCRIPT_PATH = File.expand_path('chrome_cdp_interface.rb', __dir__).freeze
 
       DEFAULT_CHROME_HOST = 'localhost'
       DEFAULT_CHROME_PORT = 9222
-
-      def self.call(data)
-        runner = new(data)
-        runner.run
-      end
-
-      def initialize(data)
-        builder = data[:builder]
-        options = data[:options]
-        argv    = data[:argv]
-
-        if argv && argv.any?
-          warn "warning: ARGV is not supported by the Chrome runner #{argv.inspect}"
-        end
-
-        @output = options.fetch(:output, $stdout)
-        @builder = builder
-      end
-
-      attr_reader :output, :exit_status, :builder
 
       def run
         mktmpdir do |dir|
@@ -61,35 +41,6 @@ module Opal
       end
 
       private
-
-      def prepare_files_in(dir)
-        js = builder.to_s
-        map = builder.source_map.to_json
-        stack = File.read("#{__dir__}/source-map-support-browser.js")
-
-        # Chrome can't handle huge data passed to `addScriptToEvaluateOnLoad`
-        # https://groups.google.com/a/chromium.org/forum/#!topic/chromium-discuss/U5qyeX_ydBo
-        # The only way is to create temporary files and pass them to chrome.
-        File.write("#{dir}/index.js", js)
-        File.write("#{dir}/source-map-support.js", stack)
-        File.write("#{dir}/index.html", <<~HTML)
-          <html><head>
-            <meta charset='utf-8'>
-            <script src='./source-map-support.js'></script>
-            <script>
-            sourceMapSupport.install({
-              retrieveSourceMap: function(path) {
-                return path.endsWith('/index.js') ? {
-                  url: './index.map', map: #{map.to_json}
-                } : null;
-              }
-            });
-            </script>
-          </head><body>
-            <script src='./index.js'></script>
-          </body></html>
-        HTML
-      end
 
       def chrome_host
         ENV['CHROME_HOST'] || DEFAULT_CHROME_HOST
@@ -172,10 +123,6 @@ module Opal
             end
             raise 'Cannot find chrome executable'
           end
-      end
-
-      def mktmpdir(&block)
-        Dir.mktmpdir('chrome-opal-', &block)
       end
     end
   end
