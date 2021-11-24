@@ -52,19 +52,17 @@ if RUBY_ENGINE == 'opal'
     # Taken From:
     # https://github.com/whitequark/parser/blob/a7c638b7b205db9213a56897b41a8e5620df766e/lib/parser/builders/default.rb#L388
     def dedent_string(node, dedent_level)
-      if !dedent_level.nil?
-        dedenter = Lexer::Dedenter.new(dedent_level)
+      unless dedent_level.nil?
+        dedenter = ::Parser::Lexer::Dedenter.new(dedent_level)
 
         case node.type
         when :str
-          str = node.children.first
-          dedenter.dedent(str)
+          node = node.updated(nil, [dedenter.dedent(node.children.first)])
         when :dstr, :xstr
           children = node.children.map do |str_node|
             if str_node.type == :str
-              str = str_node.children.first
-              dedenter.dedent(str)
-              next nil if str.empty?
+              str_node = str_node.updated(nil, [dedenter.dedent(str_node.children.first)])
+              next nil if str_node.children.first.empty?
             else
               dedenter.interrupt
             end
@@ -81,7 +79,7 @@ if RUBY_ENGINE == 'opal'
 
   class Parser::Lexer::Dedenter
     # Taken From:
-    # https://github.com/whitequark/parser/blob/6337d7bf676f66d80e43bd9d33dc17659f8af7f3/lib/parser/lexer/dedenter.rb#L36
+    # https://github.com/whitequark/parser/blob/b7a08031523d05b2f76b0bab22fac00b1d3fe653/lib/parser/lexer/dedenter.rb#L36
     def dedent(string)
       original_encoding = string.encoding
       # Prevent the following error when processing binary encoded source.
@@ -92,26 +90,21 @@ if RUBY_ENGINE == 'opal'
         # line, it was not really a line continuation and must be ignored.
         lines = [string.force_encoding(original_encoding)]
       else
-        lines.map! {|s| s.force_encoding(original_encoding) }
+        lines.map! { |s| s.force_encoding(original_encoding) }
       end
 
-      if @at_line_begin
-        lines_to_dedent = lines
-      else
-        _first, *lines_to_dedent = lines
-      end
-
-      lines_to_dedent.each do |line|
+      lines.each_with_index do |line, index|
+        next if (index == 0) && !@at_line_begin
         left_to_remove = @dedent_level
         remove = 0
 
         line.each_char do |char|
           break if left_to_remove <= 0
           case char
-          when ?\s
+          when "\s"
             remove += 1
             left_to_remove -= 1
-          when ?\t
+          when "\t"
             break if TAB_WIDTH * (remove / TAB_WIDTH + 1) > @dedent_level
             remove += 1
             left_to_remove -= TAB_WIDTH
@@ -121,12 +114,14 @@ if RUBY_ENGINE == 'opal'
           end
         end
 
-        line.slice!(0, remove)
+        lines[index] = line[remove..-1]
       end
 
-      string.replace(lines.join)
+      string = lines.join
 
       @at_line_begin = string.end_with?("\n")
+
+      string
     end
   end
 end
