@@ -175,7 +175,7 @@
   // Helpers
   // -----
 
-  Opal.truthy = function(val) {
+  var $truthy = Opal.truthy = function(val) {
     return (val !== nil && val != null && (!val.$$is_boolean || val == true));
   };
 
@@ -2774,6 +2774,13 @@
     }
   }
   generate_operator_helpers();
+
+  Opal.eqeq = function(lhs, rhs) {
+    return $truthy((lhs)['$=='](rhs));
+  };
+  Opal.eqeqeq = function(lhs, rhs) {
+    return $truthy((lhs)['$==='](rhs));
+  };
 
   // Initialization
   // --------------

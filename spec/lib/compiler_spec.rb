@@ -207,34 +207,42 @@ RSpec.describe Opal::Compiler do
           expect_compiled('foo = 42 if 2 > 3').to include('if ($rb_gt(2, 3))')
           expect_compiled('foo = 42 if 2.5 > 3.5').to include('if ($rb_gt(2.5, 3.5))')
           expect_compiled('foo = 42 if true > false').to include('if ($rb_gt(true, false))')
-
-          expect_compiled('foo = 42 if 2 == 3').to include("if ((2)['$=='](3))")
-          expect_compiled('foo = 42 if 2.5 == 3.5').to include("if ((2.5)['$=='](3.5))")
-          expect_compiled('foo = 42 if true == false').to include("if (true['$=='](false))")
         end
 
         it 'adds nil check for strings' do
           expect_compiled('foo = 42 if "test" > "bar"').to include('if ($truthy($rb_gt("test", "bar")))')
         end
 
-        it 'specifically == excludes nil check for strings' do
-          expect_compiled('foo = 42 if "test" == "bar"').to include("if (\"test\"['$=='](\"bar\"))")
-        end
-
         it 'adds nil check for lvars' do
           expect_compiled("bar = 4\nfoo = 42 if bar > 5").to include('if ($truthy($rb_gt(bar, 5)))')
-        end
-
-        it 'specifically == excludes nil check for lvars' do
-          expect_compiled("bar = 4\nfoo = 42 if bar == 5").to include("if (bar['$=='](5))")
         end
 
         it 'adds nil check for constants' do
           expect_compiled("foo = 42 if Test > 4").to include("if ($truthy($rb_gt($$('Test'), 4))) ")
         end
 
-        it 'specifically == excludes nil check for constants' do
-          expect_compiled("foo = 42 if Test == 4").to include("if ($$('Test')['$=='](4))")
+        it 'converts each == call inside if to an $eqeq wrapper, which does a truthy check' do
+          expect_compiled('foo = 42 if 2 == 3').to include("if ($eqeq(2, 3))")
+          expect_compiled('foo = 42 if 2.5 == 3.5').to include("if ($eqeq(2.5, 3.5))")
+          expect_compiled('foo = 42 if true == false').to include("if ($eqeq(true, false))")
+          expect_compiled('foo = 42 if "test" == "bar"').to include("if ($eqeq(\"test\", \"bar\"))")
+          expect_compiled("bar = 4\nfoo = 42 if bar == 5").to include("if ($eqeq(bar, 5))")
+          expect_compiled("foo = 42 if Test == 4").to include("if ($eqeq($$('Test'), 4))")
+          expect_compiled("bar = 4\nfoo = 42 if bar == 5").to include("if ($eqeq(bar, 5))")
+        end
+
+        it "doesn't convert ==/=== calls to $eqeq(eq) wrappers outside of an if" do
+          expect_compiled("bar == 5").not_to include("$eqeq(bar, 5)")
+        end
+
+        it 'converts each === call inside if to an $eqeqeq wrapper, which does a truthy check' do
+          expect_compiled('foo = 42 if 2 === 3').to include("if ($eqeqeq(2, 3))")
+          expect_compiled('foo = 42 if 2.5 === 3.5').to include("if ($eqeqeq(2.5, 3.5))")
+          expect_compiled('foo = 42 if true === false').to include("if ($eqeqeq(true, false))")
+          expect_compiled('foo = 42 if "test" === "bar"').to include("if ($eqeqeq(\"test\", \"bar\"))")
+          expect_compiled("bar = 4\nfoo = 42 if bar === 5").to include("if ($eqeqeq(bar, 5))")
+          expect_compiled("foo = 42 if Test === 4").to include("if ($eqeqeq($$('Test'), 4))")
+          expect_compiled("bar = 4\nfoo = 42 if bar === 5").to include("if ($eqeqeq(bar, 5))")
         end
       end
 
@@ -265,29 +273,21 @@ RSpec.describe Opal::Compiler do
 
     context 'parentheses' do
       context 'with operators' do
-        it 'adds nil check for primitives' do
-          expect_compiled('foo = 42 if (2 > 3)').to include('if ($truthy($rb_gt(2, 3))')
-          expect_compiled('foo = 42 if (2.5 > 3.5)').to include('if ($truthy($rb_gt(2.5, 3.5))')
-          expect_compiled('foo = 42 if (true > false)').to include('if ($truthy($rb_gt(true, false))')
-
-          expect_compiled('foo = 42 if (2 == 3)').to include("if ($truthy((2)['$=='](3))")
-          expect_compiled('foo = 42 if (2.5 == 3.5)').to include("if ($truthy((2.5)['$=='](3.5))")
-          expect_compiled('foo = 42 if (true == false)').to include("if ($truthy(true['$=='](false)))")
-        end
-
         it 'adds nil check for strings' do
           expect_compiled('foo = 42 if ("test" > "bar")').to include('if ($truthy($rb_gt("test", "bar"))')
-          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ($truthy(\"test\"['$=='](\"bar\"))")
         end
 
         it 'adds nil check for lvars' do
           expect_compiled("bar = 4\nfoo = 42 if (bar > 5)").to include('if ($truthy($rb_gt(bar, 5))')
-          expect_compiled("bar = 4\nfoo = 42 if (bar == 5)").to include("if ($truthy(bar['$=='](5))) ")
         end
 
-        it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test > 4)").to include("if ($truthy($rb_gt($$('Test'), 4))")
-          expect_compiled("foo = 42 if (Test == 4)").to include("if ($truthy($$('Test')['$=='](4))")
+        it 'converts == expressions to $eqeq checks' do
+          expect_compiled('foo = 42 if (2 == 3)').to include("if ($eqeq(2, 3))")
+          expect_compiled('foo = 42 if (2.5 == 3.5)').to include("if ($eqeq(2.5, 3.5))")
+          expect_compiled('foo = 42 if (true == false)').to include("if ($eqeq(true, false))")
+          expect_compiled('foo = 42 if ("test" == "bar")').to include("if ($eqeq(\"test\", \"bar\")")
+          expect_compiled("bar = 4\nfoo = 42 if (bar == 5)").to include("if ($eqeq(bar, 5))")
+          expect_compiled("foo = 42 if (Test == 4)").to include("if ($eqeq($$('Test'), 4))")
         end
       end
 

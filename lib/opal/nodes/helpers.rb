@@ -66,9 +66,10 @@ module Opal
       end
 
       def js_truthy_optimize(sexp)
-        if sexp.type == :send
-          mid = sexp.children[1]
-          receiver_handler_class = (receiver = sexp.children[0]) && compiler.handlers[receiver.type]
+        case sexp.type
+        when :send
+          receiver, mid, *args = *sexp
+          receiver_handler_class = receiver && compiler.handlers[receiver.type]
 
           # Only operator calls on the truthy_optimize? node classes should be optimized.
           # Monkey patch method calls might return 'self'/aka a bridged instance and need
@@ -78,9 +79,23 @@ module Opal
                                        receiver_handler_class.truthy_optimize?
 
           if allow_optimization_on_type ||
-             mid == :block_given? ||
-             mid == :"=="
+             mid == :block_given?
             expr(sexp)
+          elsif args.count == 1
+            case mid
+            when :==
+              helper :eqeq
+              compiler.method_calls << mid
+              [fragment('$eqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
+            when :===
+              helper :eqeqeq
+              compiler.method_calls << mid
+              [fragment('$eqeqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
+            end
+          end
+        when :begin
+          if sexp.children.count == 1
+            js_truthy_optimize(sexp.children.first)
           end
         end
       end
