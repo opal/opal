@@ -52,19 +52,6 @@ module Opal
         [fragment('$truthy('), expr(sexp), fragment(')')]
       end
 
-      def js_falsy(sexp)
-        if sexp.type == :send
-          mid = sexp.children[1]
-          if mid == :block_given?
-            scope.uses_block!
-            return "#{scope.block_name} === nil"
-          end
-        end
-
-        helper :falsy
-        [fragment('$falsy('), expr(sexp), fragment(')')]
-      end
-
       def js_truthy_optimize(sexp)
         case sexp.type
         when :send

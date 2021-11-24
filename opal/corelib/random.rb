@@ -1,4 +1,4 @@
-# helpers: falsy
+# helpers: truthy
 
 require 'corelib/random/formatter'
 
@@ -7,7 +7,7 @@ class ::Random
 
   def self._verify_count(count)
     %x{
-      if ($falsy(count)) count = 16;
+      if (!$truthy(count)) count = 16;
       if (typeof count !== "number") count = #{`count`.to_int};
       if (count < 0) #{::Kernel.raise ::ArgumentError, 'negative string size (or size too big)'};
       count = Math.floor(count);

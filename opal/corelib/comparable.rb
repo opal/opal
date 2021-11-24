@@ -1,4 +1,4 @@
-# helpers: falsy
+# helpers: truthy
 
 module ::Comparable
   %x{
@@ -25,7 +25,7 @@ module ::Comparable
 
     function cmp_or_fail(lhs, rhs) {
       var cmp = #{`lhs` <=> `rhs`};
-      if ($falsy(cmp)) fail_comparison(lhs, rhs);
+      if (!$truthy(cmp)) fail_comparison(lhs, rhs);
       return normalize(cmp);
     }
   }

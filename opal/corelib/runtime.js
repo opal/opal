@@ -180,7 +180,7 @@
   };
 
   Opal.falsy = function(val) {
-    return (val === nil || val == null || (val.$$is_boolean && val == false))
+    return !$truthy(val);
   };
 
   Opal.type_error = function(object, type, method, coerced) {

@@ -1,4 +1,4 @@
-# helpers: respond_to, falsy, truthy
+# helpers: respond_to, truthy
 
 module ::ObjectSpace
   module_function
@@ -36,7 +36,7 @@ module ::ObjectSpace
   def define_finalizer(obj, aproc = undefined, &block)
     %x{
       if ($truthy(block)) aproc = block;
-      if ($falsy(aproc)) aproc = #{::Kernel.proc};
+      if (!$truthy(aproc)) aproc = #{::Kernel.proc};
       if (!$respond_to(aproc, '$call')) {
         #{::Kernel.raise ::ArgumentError, "Wrong type argument #{aproc.class} (should be callable)"};
       }
