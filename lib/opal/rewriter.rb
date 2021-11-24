@@ -44,6 +44,9 @@ module Opal
       end
     end
 
+    use Rewriters::LogicalOperatorAssignment
+    use Rewriters::BinaryOperatorAssignment
+    use Rewriters::ReturnableLogic
     use Rewriters::OpalEngineCheck
     use Rewriters::ForRewriter
     use Rewriters::Numblocks
@@ -52,11 +55,8 @@ module Opal
     use Rewriters::DotJsSyntax
     use Rewriters::PatternMatching
     use Rewriters::JsReservedWords
-    use Rewriters::LogicalOperatorAssignment
-    use Rewriters::BinaryOperatorAssignment
     use Rewriters::ExplicitWriterReturn
     use Rewriters::Hashes::KeyDuplicatesRewriter
-    use Rewriters::ReturnableLogic
     use Rewriters::DumpArgs
     use Rewriters::MlhsArgs
     use Rewriters::InlineArgs
