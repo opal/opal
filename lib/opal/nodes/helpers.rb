@@ -84,6 +84,23 @@ module Opal
           if sexp.children.count == 1
             js_truthy_optimize(sexp.children.first)
           end
+        when :if
+          _test, true_body, false_body = *sexp
+          if true_body == s(:true)
+            # Ensure we recurse the js_truthy call on the `false_body` of the if `expr`.
+            # This transforms an expression like:
+            #
+            # $truthy($truthy(a) || b)
+            #
+            # Into:
+            #
+            # $truthy(a) || $truthy(b)
+            sexp.meta[:do_js_truthy_on_false_body] = true
+            expr(sexp)
+          elsif false_body == s(:false)
+            sexp.meta[:do_js_truthy_on_true_body] = true
+            expr(sexp)
+          end
         end
       end
 
