@@ -2776,9 +2776,17 @@
   generate_operator_helpers();
 
   Opal.eqeq = function(lhs, rhs) {
+    if ((typeof lhs === 'number' && typeof rhs === 'number') ||
+        (typeof lhs === 'string' && typeof rhs === 'string')) {
+      return lhs === rhs;
+    }
     return $truthy((lhs)['$=='](rhs));
   };
   Opal.eqeqeq = function(lhs, rhs) {
+    if ((typeof lhs === 'number' && typeof rhs === 'number') ||
+        (typeof lhs === 'string' && typeof rhs === 'string')) {
+      return lhs === rhs;
+    }
     return $truthy((lhs)['$==='](rhs));
   };
 
