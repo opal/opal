@@ -18,14 +18,6 @@ module Opal
           rhs_len = rhs.children.any? { |c| c.type == :splat } ? nil : rhs.children.size
           compile_masgn(lhs.children, array, rhs_len)
           push ", #{array}" # a mass assignment evaluates to the RHS
-        elsif rhs.type == :begin
-          helper :to_ary
-          retval = scope.new_temp
-          push "#{retval} = ", expr(rhs)
-          push ", #{array} = $to_ary(#{retval})"
-          compile_masgn(lhs.children, array)
-          push ", #{retval}"
-          scope.queue_temp(retval)
         else
           helper :to_ary
           retval = scope.new_temp
