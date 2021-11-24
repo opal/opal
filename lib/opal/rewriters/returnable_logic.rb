@@ -24,7 +24,9 @@ module Opal
         els ||= s(:nil)
         lhs_tmp = next_tmp if lhs
 
-        build_if_from_when(node, lhs, lhs_tmp, whens, els)
+        out = build_if_from_when(node, lhs, lhs_tmp, whens, els)
+        free_tmp if lhs
+        out
       end
 
       def on_or(node)
