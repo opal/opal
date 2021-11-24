@@ -2751,6 +2751,29 @@
     }
   }
 
+  // Operator helpers
+  // ----------------
+  function generate_operator_helpers() {
+    var name, op, i, helpers = [
+      ['plus', '+'],
+      ['minus', '-'],
+      ['times', '*'],
+      ['divide', '/'],
+      ['lt', '<'],
+      ['gt', '>'],
+      ['le', '<='],
+      ['ge', '>=']
+    ];
+
+    for (i = 0; i < helpers.length; i++) {
+      name = helpers[i][0];
+      op = helpers[i][1];
+      Opal['rb_'+name] = new Function('l', 'r',
+        "return(typeof(l)==='number'&&typeof(r)==='number')?l"+op+"r:l['$"+op+"'](r);"
+      );
+    }
+  }
+  generate_operator_helpers();
 
   // Initialization
   // --------------
