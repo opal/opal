@@ -9,9 +9,9 @@ $LOAD_PATH       = $: = []
 $/ = "\n"
 $, = nil
 
-ARGV = []
-ARGF = Object.new
-ENV  = {}
+::ARGV = []
+::ARGF = ::Object.new
+::ENV  = {}
 
 $VERBOSE = false
 $DEBUG   = false

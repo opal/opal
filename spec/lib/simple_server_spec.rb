@@ -47,10 +47,10 @@ RSpec.describe Opal::SimpleServer do
 
   it 'respects config set in Opal::Config' do
     Opal::Config.arity_check_enabled = false
-    expect(get('/assets/console.js').body).not_to include('$Console_clear$1.$$parameters = []')
+    expect(get('/assets/console.js').body).not_to include('$$parameters: []')
 
     Opal::Config.arity_check_enabled = true
     self.app = described_class.new(main: 'console')
-    expect(get('/assets/console.js').body).to include('$Console_clear$1.$$parameters = []')
+    expect(get('/assets/console.js').body).to include('$$parameters: []')
   end
 end

@@ -1,4 +1,4 @@
-module PackUnpack
+module ::PackUnpack
   %x{
     var directives = [
       // Integer
@@ -84,11 +84,11 @@ module PackUnpack
         var directiveSupportsModifiers = /[sSiIlLqQjJ]/.test(currentDirective);
 
         if (!directiveSupportsModifiers && currentModifiers.length > 0) {
-          #{raise ArgumentError, "'#{`currentModifiers[0]`}' allowed only after types sSiIlLqQjJ"}
+          #{::Kernel.raise ::ArgumentError, "'#{`currentModifiers[0]`}' allowed only after types sSiIlLqQjJ"}
         }
 
         if (currentModifiers.indexOf('<') !== -1 && currentModifiers.indexOf('>') !== -1) {
-          #{raise RangeError, "Can't use both '<' and '>'"}
+          #{::Kernel.raise ::RangeError, "Can't use both '<' and '>'"}
         }
 
         if (!countSpecified) {

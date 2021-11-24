@@ -13,33 +13,41 @@ module Opal
       children :body
 
       def compile
+        compiler.top_scope = self
+
         push version_comment
 
         in_scope do
-          line '"use strict";' if compiler.use_strict?
-
-          body_code = stmt(stmts)
-          body_code = [body_code] unless body_code.is_a?(Array)
-
-          if compiler.eval?
-            add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]'
+          if body == s(:nil)
+            # A shortpath for empty (stub?) modules.
+            line 'return Opal.nil;'
           else
-            add_temp 'self = Opal.top'
-            add_temp '$nesting = []'
+            line '"use strict";' if compiler.use_strict?
+
+            body_code = stmt(stmts)
+            body_code = [body_code] unless body_code.is_a?(Array)
+
+            if compiler.eval?
+              add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]' if @define_nesting
+            else
+              add_temp 'self = Opal.top' if @define_self
+              add_temp '$nesting = []' if @define_nesting
+            end
+            add_temp '$$ = Opal.$r($nesting)' if @define_relative_access
+
+            add_temp 'nil = Opal.nil'
+            add_temp '$$$ = Opal.$$$' if @define_absolute_const
+
+            add_used_helpers
+            add_used_operators
+            line scope.to_vars
+
+            compile_method_stubs
+            compile_irb_vars
+            compile_end_construct
+
+            line body_code
           end
-          add_temp 'nil = Opal.nil'
-          add_temp '$$$ = Opal.$$$'
-          add_temp '$$ = Opal.$$'
-
-          add_used_helpers
-          add_used_operators
-          line scope.to_vars
-
-          compile_method_stubs
-          compile_irb_vars
-          compile_end_construct
-
-          line body_code
         end
         opening
         closing
@@ -73,6 +81,12 @@ module Opal
         compiler.returns(body)
       end
 
+      # Returns '$$$', but also ensures that the '$$$' variable is set
+      def absolute_const
+        @define_absolute_const = true
+        '$$$'
+      end
+
       def compile_irb_vars
         if compiler.irb?
           line 'if (!Opal.irb_vars) { Opal.irb_vars = {}; }'
@@ -96,8 +110,8 @@ module Opal
       def compile_method_stubs
         if compiler.method_missing?
           calls = compiler.method_calls
-          stubs = calls.to_a.map { |k| "'$#{k}'" }.join(', ')
-          line "Opal.add_stubs([#{stubs}]);" unless stubs.empty?
+          stubs = calls.to_a.map(&:to_s).join(',')
+          line "Opal.add_stubs('#{stubs}');" unless stubs.empty?
         end
       end
 

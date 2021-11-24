@@ -1,4 +1,4 @@
-class Binding
+class ::Binding
   # @private
   def initialize(jseval, scope_variables, receiver, source_location)
     @jseval, @scope_variables, @receiver, @source_location = \
@@ -9,14 +9,14 @@ class Binding
     if @jseval
       @jseval.call(*args)
     else
-      raise 'Evaluation on a Proc#binding is not supported'
+      ::Kernel.raise 'Evaluation on a Proc#binding is not supported'
     end
   end
 
   def local_variable_get(symbol)
     js_eval(symbol)
-  rescue Exception
-    raise NameError, "local variable `#{symbol}' is not defined for #{inspect}"
+  rescue ::Exception
+    ::Kernel.raise ::NameError, "local variable `#{symbol}' is not defined for #{inspect}"
   end
 
   def local_variable_set(symbol, value)
@@ -34,15 +34,15 @@ class Binding
   def eval(str, file = nil, line = nil)
     return receiver if str == 'self'
 
-    Kernel.eval(str, self, file, line)
+    ::Kernel.eval(str, self, file, line)
   end
 
   attr_reader :receiver, :source_location
 end
 
-module Kernel
+module ::Kernel
   def binding
-    raise "Opal doesn't support dynamic calls to binding"
+    ::Kernel.raise "Opal doesn't support dynamic calls to binding"
   end
 end
 

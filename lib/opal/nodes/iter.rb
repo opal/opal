@@ -19,13 +19,15 @@ module Opal
 
         in_scope do
           identity = scope.identify!
-          add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s"
 
           inline_params = process(inline_args)
 
           compile_arity_check
 
           body_code = stmt(returned_body)
+
+          add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s" if @define_self
+
           to_vars = scope.to_vars
 
           line body_code
@@ -40,16 +42,19 @@ module Opal
         unshift to_vars
 
         if await_encountered
-          unshift "(#{identity} = async function(", inline_params, '){'
+          unshift "async function #{identity}(", inline_params, '){'
         else
-          unshift "(#{identity} = function(", inline_params, '){'
+          unshift "function #{identity}(", inline_params, '){'
         end
-        push "}, #{identity}.$$s = self,"
-        push " #{identity}.$$brk = $brk," if contains_break?
-        push " #{identity}.$$arity = #{arity},"
+        push '}'
+
+        blockopts = []
+        blockopts << "$$arity: #{arity}"
+        blockopts << "$$s: #{scope.self}" if @define_self
+        blockopts << "$$brk: $brk" if contains_break?
 
         if compiler.arity_check?
-          push " #{identity}.$$parameters = #{parameters_code},"
+          blockopts << "$$parameters: #{parameters_code}"
         end
 
         # MRI expands a passed argument if the block:
@@ -61,24 +66,26 @@ module Opal
         # This flag on the method indicates that a block has a top level mlhs argument
         # which means that we have to expand passed array explicitly in runtime.
         if has_top_level_mlhs_arg?
-          push " #{identity}.$$has_top_level_mlhs_arg = true,"
+          blockopts << "$$has_top_level_mlhs_arg: true"
         end
 
         if has_trailing_comma_in_args?
-          push " #{identity}.$$has_trailing_comma_in_args = true,"
+          blockopts << "$$has_trailing_comma_in_args: true"
         end
 
-        push " #{identity})"
+        if blockopts.length == 1
+          push ", #{arity}"
+        elsif blockopts.length > 1
+          push ', {', blockopts.join(', '), '}'
+        end
+
+        scope.nesting if @define_nesting
+        scope.relative_access if @define_relative_access
       end
 
       def compile_block_arg
         if block_arg
-          scope.block_name = block_arg
-          scope.add_temp block_arg
-          scope_name = scope.identify!
-
-          line "#{block_arg} = #{scope_name}.$$p || nil;"
-          line "if (#{block_arg}) #{scope_name}.$$p = null;"
+          scope.prepare_block
         end
       end
 

@@ -1,10 +1,10 @@
 # helpers: type_error
 
-module Math
-  E  = `Math.E`
-  PI = `Math.PI`
+module ::Math
+  self::E  = `Math.E`
+  self::PI = `Math.PI`
 
-  DomainError = Class.new(StandardError)
+  self::DomainError = ::Class.new(::StandardError)
 
   def self.checked(method, *args)
     %x{
@@ -15,7 +15,7 @@ module Math
       var result = Math[method].apply(null, args);
 
       if (isNaN(result)) {
-        #{raise DomainError, "Numerical argument is out of domain - \"#{method}\""};
+        #{::Kernel.raise DomainError, "Numerical argument is out of domain - \"#{method}\""};
       }
 
       return result;
@@ -23,21 +23,21 @@ module Math
   end
 
   def self.float!(value)
-    Float(value)
-  rescue ArgumentError
-    raise `$type_error(value, #{Float})`
+    ::Kernel.Float(value)
+  rescue ::ArgumentError
+    ::Kernel.raise `$type_error(value, #{::Float})`
   end
 
   def self.integer!(value)
-    Integer(value)
-  rescue ArgumentError
-    raise `$type_error(value, #{Integer})`
+    ::Kernel.Integer(value)
+  rescue ::ArgumentError
+    ::Kernel.raise `$type_error(value, #{::Integer})`
   end
 
   module_function
 
   def acos(x)
-    Math.checked :acos, Math.float!(x)
+    ::Math.checked :acos, ::Math.float!(x)
   end
 
   unless defined?(`Math.acosh`)
@@ -49,11 +49,11 @@ module Math
   end
 
   def acosh(x)
-    Math.checked :acosh, Math.float!(x)
+    ::Math.checked :acosh, ::Math.float!(x)
   end
 
   def asin(x)
-    Math.checked :asin, Math.float!(x)
+    ::Math.checked :asin, ::Math.float!(x)
   end
 
   unless defined?(`Math.asinh`)
@@ -65,15 +65,15 @@ module Math
   end
 
   def asinh(x)
-    Math.checked :asinh, Math.float!(x)
+    ::Math.checked :asinh, ::Math.float!(x)
   end
 
   def atan(x)
-    Math.checked :atan, Math.float!(x)
+    ::Math.checked :atan, ::Math.float!(x)
   end
 
   def atan2(y, x)
-    Math.checked :atan2, Math.float!(y), Math.float!(x)
+    ::Math.checked :atan2, ::Math.float!(y), ::Math.float!(x)
   end
 
   unless defined?(`Math.atanh`)
@@ -85,7 +85,7 @@ module Math
   end
 
   def atanh(x)
-    Math.checked :atanh, Math.float!(x)
+    ::Math.checked :atanh, ::Math.float!(x)
   end
 
   unless defined?(`Math.cbrt`)
@@ -135,11 +135,11 @@ module Math
   end
 
   def cbrt(x)
-    Math.checked :cbrt, Math.float!(x)
+    ::Math.checked :cbrt, ::Math.float!(x)
   end
 
   def cos(x)
-    Math.checked :cos, Math.float!(x)
+    ::Math.checked :cos, ::Math.float!(x)
   end
 
   unless defined?(`Math.cosh`)
@@ -151,12 +151,12 @@ module Math
   end
 
   def cosh(x)
-    Math.checked :cosh, Math.float!(x)
+    ::Math.checked :cosh, ::Math.float!(x)
   end
 
   unless defined?(`Math.erf`)
     %x{
-      Opal.defineProperty(Math, 'erf', function(x) {
+      Opal.prop(Math, 'erf', function(x) {
         var A1 =  0.254829592,
             A2 = -0.284496736,
             A3 =  1.421413741,
@@ -181,12 +181,12 @@ module Math
   end
 
   def erf(x)
-    Math.checked :erf, Math.float!(x)
+    ::Math.checked :erf, ::Math.float!(x)
   end
 
   unless defined?(`Math.erfc`)
     %x{
-      Opal.defineProperty(Math, 'erfc', function(x) {
+      Opal.prop(Math, 'erfc', function(x) {
         var z = Math.abs(x),
             t = 1.0 / (0.5 * z + 1.0);
 
@@ -214,11 +214,11 @@ module Math
   end
 
   def erfc(x)
-    Math.checked :erfc, Math.float!(x)
+    ::Math.checked :erfc, ::Math.float!(x)
   end
 
   def exp(x)
-    Math.checked :exp, Math.float!(x)
+    ::Math.checked :exp, ::Math.float!(x)
   end
 
   def frexp(x)
@@ -272,7 +272,7 @@ module Math
       }
 
       if (n === -1 || n === -Infinity) {
-        #{raise DomainError, 'Numerical argument is out of domain - "gamma"'};
+        #{::Kernel.raise DomainError, 'Numerical argument is out of domain - "gamma"'};
       }
 
       if (#{Integer === n}) {
@@ -300,7 +300,7 @@ module Math
       }
 
       if (n < 0.5) {
-        return Math.PI / (Math.sin(Math.PI * n) * #{Math.gamma(1 - n)});
+        return Math.PI / (Math.sin(Math.PI * n) * #{::Math.gamma(1 - n)});
       }
 
       if (n >= 171.35) {
@@ -341,7 +341,7 @@ module Math
   end
 
   def hypot(x, y)
-    Math.checked :hypot, Math.float!(x), Math.float!(y)
+    ::Math.checked :hypot, ::Math.float!(x), ::Math.float!(y)
   end
 
   def ldexp(mantissa, exponent)
@@ -350,7 +350,7 @@ module Math
 
     %x{
       if (isNaN(exponent)) {
-        #{raise RangeError, 'float NaN out of range of integer'};
+        #{::Kernel.raise ::RangeError, 'float NaN out of range of integer'};
       }
 
       return mantissa * Math.pow(2, exponent);
@@ -363,24 +363,24 @@ module Math
         return [Infinity, 1];
       }
       else {
-        return [Math.log(Math.abs(#{Math.gamma(n)})), #{Math.gamma(n)} < 0 ? -1 : 1];
+        return [Math.log(Math.abs(#{::Math.gamma(n)})), #{::Math.gamma(n)} < 0 ? -1 : 1];
       }
     }
   end
 
   def log(x, base = undefined)
-    if String === x
-      raise `$type_error(x, #{Float})`
+    if ::String === x
+      ::Kernel.raise `$type_error(x, #{::Float})`
     end
 
     if `base == null`
-      Math.checked :log, Math.float!(x)
+      ::Math.checked :log, ::Math.float!(x)
     else
-      if String === base
-        raise `$type_error(base, #{Float})`
+      if ::String === base
+        ::Kernel.raise `$type_error(base, #{::Float})`
       end
 
-      Math.checked(:log, Math.float!(x)) / Math.checked(:log, Math.float!(base))
+      ::Math.checked(:log, ::Math.float!(x)) / ::Math.checked(:log, ::Math.float!(base))
     end
   end
 
@@ -393,11 +393,11 @@ module Math
   end
 
   def log10(x)
-    if String === x
-      raise `$type_error(x, #{Float})`
+    if ::String === x
+      ::Kernel.raise `$type_error(x, #{::Float})`
     end
 
-    Math.checked :log10, Math.float!(x)
+    ::Math.checked :log10, ::Math.float!(x)
   end
 
   unless defined?(`Math.log2`)
@@ -409,15 +409,15 @@ module Math
   end
 
   def log2(x)
-    if String === x
-      raise `$type_error(x, #{Float})`
+    if ::String === x
+      ::Kernel.raise `$type_error(x, #{::Float})`
     end
 
-    Math.checked :log2, Math.float!(x)
+    ::Math.checked :log2, ::Math.float!(x)
   end
 
   def sin(x)
-    Math.checked :sin, Math.float!(x)
+    ::Math.checked :sin, ::Math.float!(x)
   end
 
   unless defined?(`Math.sinh`)
@@ -429,21 +429,21 @@ module Math
   end
 
   def sinh(x)
-    Math.checked :sinh, Math.float!(x)
+    ::Math.checked :sinh, ::Math.float!(x)
   end
 
   def sqrt(x)
-    Math.checked :sqrt, Math.float!(x)
+    ::Math.checked :sqrt, ::Math.float!(x)
   end
 
   def tan(x)
-    x = Math.float!(x)
+    x = ::Math.float!(x)
 
     if x.infinite?
-      return Float::NAN
+      return ::Float::NAN
     end
 
-    Math.checked :tan, Math.float!(x)
+    ::Math.checked :tan, ::Math.float!(x)
   end
 
   unless defined?(`Math.tanh`)
@@ -463,6 +463,6 @@ module Math
   end
 
   def tanh(x)
-    Math.checked :tanh, Math.float!(x)
+    ::Math.checked :tanh, ::Math.float!(x)
   end
 end

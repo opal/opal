@@ -1,6 +1,6 @@
 # helpers: falsy
 
-module Comparable
+module ::Comparable
   %x{
     function normalize(what) {
       if (Opal.is_a(what, Opal.Integer)) { return what; }
@@ -14,13 +14,13 @@ module Comparable
       var class_name;
       #{
         case `rhs`
-        when nil, true, false, Integer, Float
+        when nil, true, false, ::Integer, ::Float
           `class_name = rhs.$inspect()`
         else
           `class_name = rhs.$$class`
         end
       }
-      #{raise ArgumentError, "comparison of #{`lhs`.class} with #{`class_name`} failed"}
+      #{::Kernel.raise ::ArgumentError, "comparison of #{`lhs`.class} with #{`class_name`} failed"}
     }
 
     function cmp_or_fail(lhs, rhs) {
@@ -81,7 +81,7 @@ module Comparable
         // provide a single Range argument instead of 2 Comparables.
 
         if (!Opal.is_a(min, Opal.Range)) {
-          #{raise TypeError, "wrong argument type #{min.class} (expected Range)"}
+          #{::Kernel.raise ::TypeError, "wrong argument type #{min.class} (expected Range)"}
         }
 
         excl = min.excl;
@@ -89,12 +89,12 @@ module Comparable
         min = min.begin;
 
         if (max !== nil && excl) {
-          #{raise ArgumentError, 'cannot clamp with an exclusive range'}
+          #{::Kernel.raise ::ArgumentError, 'cannot clamp with an exclusive range'}
         }
       }
 
       if (min !== nil && max !== nil && cmp_or_fail(min, max) > 0) {
-        #{raise ArgumentError, 'min argument must be smaller than max argument'}
+        #{::Kernel.raise ::ArgumentError, 'min argument must be smaller than max argument'}
       }
 
       if (min !== nil) {

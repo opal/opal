@@ -36,6 +36,7 @@ module Opal
         @type = sexp.type
         @level = level
         @compiler = compiler
+        @compiler.top_scope ||= self
       end
 
       def children
@@ -86,7 +87,7 @@ module Opal
       end
 
       def top_scope
-        scope.top_scope
+        @compiler.top_scope
       end
 
       def s(type, *children)
@@ -199,7 +200,7 @@ module Opal
 
       def class_variable_owner
         if scope
-          "$nesting[#{class_variable_owner_nesting_level}]"
+          "#{scope.nesting}[#{class_variable_owner_nesting_level}]"
         else
           'Opal.Object'
         end

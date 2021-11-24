@@ -10,10 +10,24 @@ module Opal
       children :test, :true_body, :false_body
 
       def compile
+        if should_compile_with_ternary?
+          compile_with_ternary
+        else
+          compile_with_if
+        end
+      end
+
+      def compile_with_if
         truthy = self.truthy
         falsy = self.falsy
 
-        push 'if (', js_truthy(test), ') {'
+        if falsy && !truthy
+          # Let's optimize a little bit `unless` calls.
+          push 'if (!', js_truthy(test), ') {'
+          falsy, truthy = truthy, falsy
+        else
+          push 'if (', js_truthy(test), ') {'
+        end
 
         # skip if-body if no truthy sexp
         indent { line stmt(truthy) } if truthy
@@ -30,28 +44,82 @@ module Opal
             line '}'
           end
         else
-          push '}'
+          line '}'
+
+          # This resolution isn't finite. Let's ensure this block
+          # always return something if we expect a return
+          line 'return nil;' if expects_expression?
         end
 
-        if needs_wrapper?
+        if expects_expression?
           if scope.await_encountered
-            wrap '(await (async function() {', '; return nil; })())'
+            wrap '(await (async function() {', '})())'
           else
-            wrap '(function() {', '; return nil; })()'
+            wrap '(function() {', '})()'
           end
         end
       end
 
       def truthy
-        needs_wrapper? ? compiler.returns(true_body || s(:nil)) : true_body
+        returnify(true_body)
       end
 
       def falsy
-        needs_wrapper? ? compiler.returns(false_body || s(:nil)) : false_body
+        returnify(false_body)
       end
 
-      def needs_wrapper?
+      def returnify(body)
+        if expects_expression? && body
+          compiler.returns(body)
+        else
+          body
+        end
+      end
+
+      def expects_expression?
         expr? || recv?
+      end
+
+      # There was a particular case in the past, that when we
+      # expected an expression from if, we always had to closure
+      # it. This produced an ugly code that was hard to minify
+      # it. This addition tries to make a few cases compiled with
+      # a ternary operator instead.
+      def should_compile_with_ternary?
+        expects_expression? && simple?(true_body) && simple?(false_body)
+      end
+
+      def compile_with_ternary
+        truthy = true_body
+        falsy = false_body
+
+        push '('
+
+        push js_truthy(test), ' ? '
+
+        push '(', expr(truthy || s(:nil)), ') : '
+        if !falsy || falsy.type == :if
+          push expr(falsy || s(:nil))
+        else
+          push '(', expr(falsy || s(:nil)), ')'
+        end
+
+        push ')'
+      end
+
+      # Let's ensure there are no control flow statements inside.
+      def simple?(body)
+        case body
+        when AST::Node
+          case body.type
+          when :return, :js_return, :break, :next, :redo, :retry
+            false
+          else
+            body.children.all? { |i| simple?(i) }
+          end
+        else
+          true
+        end
       end
     end
 

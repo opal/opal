@@ -1,4 +1,4 @@
-class Method
+class ::Method
   attr_reader :owner, :receiver, :name
 
   def initialize(receiver, owner, method, name)
@@ -48,7 +48,7 @@ class Method
   end
 
   def unbind
-    UnboundMethod.new(@receiver.class, @owner, @method, @name)
+    ::UnboundMethod.new(@receiver.class, @owner, @method, @name)
   end
 
   def to_proc
@@ -67,7 +67,7 @@ class Method
   end
 end
 
-class UnboundMethod
+class ::UnboundMethod
   attr_reader :source, :owner, :name
 
   def initialize(source, owner, method, name)
@@ -96,10 +96,10 @@ class UnboundMethod
   def bind(object)
     %x{
       if (#{@owner}.$$is_module || Opal.is_a(#{object}, #{@owner})) {
-        return #{Method.new(object, @owner, @method, @name)};
+        return #{::Method.new(object, @owner, @method, @name)};
       }
       else {
-        #{raise TypeError, "can't bind singleton method to a different class (expected #{object}.kind_of?(#{@owner} to be true)"};
+        #{::Kernel.raise ::TypeError, "can't bind singleton method to a different class (expected #{object}.kind_of?(#{@owner} to be true)"};
       }
     }
   end

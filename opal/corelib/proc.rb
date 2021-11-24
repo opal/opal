@@ -1,12 +1,12 @@
 # helpers: slice
 
-class Proc < `Function`
-  `Opal.defineProperty(self.$$prototype, '$$is_proc', true)`
-  `Opal.defineProperty(self.$$prototype, '$$is_lambda', false)`
+class ::Proc < `Function`
+  `Opal.prop(self.$$prototype, '$$is_proc', true)`
+  `Opal.prop(self.$$prototype, '$$is_lambda', false)`
 
   def self.new(&block)
     unless block
-      raise ArgumentError, 'tried to create a Proc object without a block'
+      ::Kernel.raise ::ArgumentError, 'tried to create a Proc object without a block'
     end
 
     block
@@ -55,14 +55,14 @@ class Proc < `Function`
   alias yield call
 
   def >>(other)
-    proc do |*args, &block|
+    ::Kernel.proc do |*args, &block|
       out = call(*args, &block)
       other.call(out)
     end
   end
 
   def <<(other)
-    proc do |*args, &block|
+    ::Kernel.proc do |*args, &block|
       out = other.call(*args, &block)
       call(out)
     end
@@ -94,10 +94,10 @@ class Proc < `Function`
   end
 
   def binding
-    `if (self.$$is_curried) { #{raise ArgumentError, "Can't create Binding"} }`
+    `if (self.$$is_curried) { #{::Kernel.raise ::ArgumentError, "Can't create Binding"} }`
 
-    if defined? Binding
-      Binding.new(nil, [], `self.$$s`, source_location)
+    if defined? ::Binding
+      ::Binding.new(nil, [], `self.$$s`, source_location)
     end
   end
 
@@ -136,9 +136,9 @@ class Proc < `Function`
         arity = self.length;
       }
       else {
-        arity = #{Opal.coerce_to!(arity, Integer, :to_int)};
+        arity = #{::Opal.coerce_to!(arity, ::Integer, :to_int)};
         if (self.$$is_lambda && arity !== self.length) {
-          #{raise ArgumentError, "wrong number of arguments (#{`arity`} for #{`self.length`})"}
+          #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arity`} for #{`self.length`})"}
         }
       }
 
@@ -148,7 +148,7 @@ class Proc < `Function`
             result;
 
         if (length > arity && self.$$is_lambda && !self.$$is_curried) {
-          #{raise ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
+          #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
         }
 
         if (length >= arity) {

@@ -107,7 +107,7 @@ module Opal
           recv_tmp = scope.new_temp
           push "(#{recv_tmp} = ", recv_code, ", #{recv_tmp}) && "
         else
-          recv_tmp = 'self'
+          recv_tmp = scope.self
         end
 
         recv_value_tmp = scope.new_temp
@@ -139,7 +139,7 @@ module Opal
         # we can't tell if it was the user that put nil and made the ivar #defined?
         # or not.
         tmp = scope.new_temp
-        push "(#{tmp} = self['#{name}'], #{tmp} != null && #{tmp} !== nil)"
+        push "(#{tmp} = #{scope.self}['#{name}'], #{tmp} != null && #{tmp} !== nil)"
 
         tmp
       end
@@ -165,12 +165,12 @@ module Opal
         const_tmp = scope.new_temp
 
         if const_scope.nil?
-          push "(#{const_tmp} = $$($nesting, '#{const_name}', 'skip_raise'))"
+          push "(#{const_tmp} = #{scope.relative_access}('#{const_name}', 'skip_raise'))"
         elsif const_scope == s(:cbase)
-          push "(#{const_tmp} = $$$('::', '#{const_name}', 'skip_raise'))"
+          push "(#{const_tmp} = #{top_scope.absolute_const}('::', '#{const_name}', 'skip_raise'))"
         else
           const_scope_tmp = compile_defined(const_scope)
-          push " && (#{const_tmp} = $$$(#{const_scope_tmp}, '#{const_name}', 'skip_raise'))"
+          push " && (#{const_tmp} = #{top_scope.absolute_const}(#{const_scope_tmp}, '#{const_name}', 'skip_raise'))"
         end
         const_tmp
       end

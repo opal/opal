@@ -2,8 +2,8 @@
 
 require 'corelib/comparable'
 
-class Time < `Date`
-  include Comparable
+class ::Time < `Date`
+  include ::Comparable
 
   %x{
     var days_of_week = #{%w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday Sunday]},
@@ -16,9 +16,9 @@ class Time < `Date`
     %x{
       var result;
 
-      if (#{Time === seconds}) {
+      if (#{::Time === seconds}) {
         if (frac !== undefined) {
-          #{raise TypeError, "can't convert Time into an exact number"}
+          #{::Kernel.raise ::TypeError, "can't convert Time into an exact number"}
         }
         result = new Date(seconds.getTime());
         result.is_utc = seconds.is_utc;
@@ -26,7 +26,7 @@ class Time < `Date`
       }
 
       if (!seconds.$$is_number) {
-        seconds = #{Opal.coerce_to!(seconds, Integer, :to_int)};
+        seconds = #{::Opal.coerce_to!(seconds, ::Integer, :to_int)};
       }
 
       if (frac === undefined) {
@@ -34,7 +34,7 @@ class Time < `Date`
       }
 
       if (!frac.$$is_number) {
-        frac = #{Opal.coerce_to!(frac, Integer, :to_int)};
+        frac = #{::Opal.coerce_to!(frac, ::Integer, :to_int)};
       }
 
       return new Date(seconds * 1000 + (frac / 1000));
@@ -46,7 +46,7 @@ class Time < `Date`
       if (year.$$is_string) {
         year = parseInt(year, 10);
       } else {
-        year = #{Opal.coerce_to!(`year`, Integer, :to_int)};
+        year = #{::Opal.coerce_to!(`year`, ::Integer, :to_int)};
       }
 
       if (month === nil) {
@@ -70,12 +70,12 @@ class Time < `Date`
           default: month = #{`month`.to_i};
           }
         } else {
-          month = #{Opal.coerce_to!(`month`, Integer, :to_int)};
+          month = #{::Opal.coerce_to!(`month`, ::Integer, :to_int)};
         }
       }
 
       if (month < 1 || month > 12) {
-        #{raise ArgumentError, "month out of range: #{`month`}"}
+        #{::Kernel.raise ::ArgumentError, "month out of range: #{`month`}"}
       }
       month = month - 1;
 
@@ -84,11 +84,11 @@ class Time < `Date`
       } else if (day.$$is_string) {
         day = parseInt(day, 10);
       } else {
-        day = #{Opal.coerce_to!(`day`, Integer, :to_int)};
+        day = #{::Opal.coerce_to!(`day`, ::Integer, :to_int)};
       }
 
       if (day < 1 || day > 31) {
-        #{raise ArgumentError, "day out of range: #{`day`}"}
+        #{::Kernel.raise ::ArgumentError, "day out of range: #{`day`}"}
       }
 
       if (hour === nil) {
@@ -96,11 +96,11 @@ class Time < `Date`
       } else if (hour.$$is_string) {
         hour = parseInt(hour, 10);
       } else {
-        hour = #{Opal.coerce_to!(`hour`, Integer, :to_int)};
+        hour = #{::Opal.coerce_to!(`hour`, ::Integer, :to_int)};
       }
 
       if (hour < 0 || hour > 24) {
-        #{raise ArgumentError, "hour out of range: #{`hour`}"}
+        #{::Kernel.raise ::ArgumentError, "hour out of range: #{`hour`}"}
       }
 
       if (min === nil) {
@@ -108,11 +108,11 @@ class Time < `Date`
       } else if (min.$$is_string) {
         min = parseInt(min, 10);
       } else {
-        min = #{Opal.coerce_to!(`min`, Integer, :to_int)};
+        min = #{::Opal.coerce_to!(`min`, ::Integer, :to_int)};
       }
 
       if (min < 0 || min > 59) {
-        #{raise ArgumentError, "min out of range: #{`min`}"}
+        #{::Kernel.raise ::ArgumentError, "min out of range: #{`min`}"}
       }
 
       if (sec === nil) {
@@ -121,12 +121,12 @@ class Time < `Date`
         if (sec.$$is_string) {
           sec = parseInt(sec, 10);
         } else {
-          sec = #{Opal.coerce_to!(`sec`, Integer, :to_int)};
+          sec = #{::Opal.coerce_to!(`sec`, ::Integer, :to_int)};
         }
       }
 
       if (sec < 0 || sec > 60) {
-        #{raise ArgumentError, "sec out of range: #{`sec`}"}
+        #{::Kernel.raise ::ArgumentError, "sec out of range: #{`sec`}"}
       }
 
       return [year, month, day, hour, min, sec];
@@ -142,7 +142,7 @@ class Time < `Date`
       }
 
       if (utc_offset !== nil) {
-        #{raise ArgumentError, 'Opal does not support explicitly specifying UTC offset for Time'}
+        #{::Kernel.raise ::ArgumentError, 'Opal does not support explicitly specifying UTC offset for Time'}
       }
 
       args  = time_params(year, month, day, hour, min, sec);
@@ -234,13 +234,13 @@ class Time < `Date`
   end
 
   def +(other)
-    if Time === other
-      raise TypeError, 'time + time?'
+    if ::Time === other
+      ::Kernel.raise ::TypeError, 'time + time?'
     end
 
     %x{
       if (!other.$$is_number) {
-        other = #{Opal.coerce_to!(other, Integer, :to_int)};
+        other = #{::Opal.coerce_to!(other, ::Integer, :to_int)};
       }
       var result = new Date(self.getTime() + (other * 1000));
       result.is_utc = self.is_utc;
@@ -249,13 +249,13 @@ class Time < `Date`
   end
 
   def -(other)
-    if Time === other
+    if ::Time === other
       return `(self.getTime() - other.getTime()) / 1000`
     end
 
     %x{
       if (!other.$$is_number) {
-        other = #{Opal.coerce_to!(other, Integer, :to_int)};
+        other = #{::Opal.coerce_to!(other, ::Integer, :to_int)};
       }
       var result = new Date(self.getTime() - (other * 1000));
       result.is_utc = self.is_utc;
@@ -264,7 +264,7 @@ class Time < `Date`
   end
 
   def <=>(other)
-    if Time === other
+    if ::Time === other
       to_f <=> other.to_f
     else
       r = other <=> self
@@ -281,7 +281,7 @@ class Time < `Date`
   end
 
   def ==(other)
-    Time === other && `#{to_f} === #{other.to_f}`
+    ::Time === other && `#{to_f} === #{other.to_f}`
   end
 
   def asctime
@@ -325,7 +325,7 @@ class Time < `Date`
   end
 
   def eql?(other)
-    other.is_a?(Time) && (self <=> other).zero?
+    other.is_a?(::Time) && (self <=> other).zero?
   end
 
   def friday?
@@ -720,7 +720,7 @@ class Time < `Date`
   end
 
   def cweek_cyear
-    jan01 = Time.new(year, 1, 1)
+    jan01 = ::Time.new(year, 1, 1)
     jan01_wday = jan01.wday
     first_monday = 0
     year = self.year
@@ -737,10 +737,10 @@ class Time < `Date`
 
     if week <= 0
       # Get the last week of the previous year
-      return Time.new(self.year - 1, 12, 31).cweek_cyear
+      return ::Time.new(self.year - 1, 12, 31).cweek_cyear
     elsif week == 53
       # Find out whether this is actually week 53 or already week 01 of the following year
-      dec31 = Time.new(self.year, 12, 31)
+      dec31 = ::Time.new(self.year, 12, 31)
       dec31_wday = dec31.wday
       if dec31_wday <= 3 && dec31_wday != 0
         week = 1

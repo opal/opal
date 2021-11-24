@@ -1,4 +1,4 @@
-class Random
+class ::Random
   MATH_RANDOM_GENERATOR = `{
     new_seed: function() { return 0; },
     reseed: function(seed) { return {}; },

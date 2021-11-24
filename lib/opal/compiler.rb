@@ -205,6 +205,9 @@ module Opal
     # Current scope
     attr_accessor :scope
 
+    # Top scope
+    attr_accessor :top_scope
+
     # Current case_stmt
     attr_reader :case_stmt
 

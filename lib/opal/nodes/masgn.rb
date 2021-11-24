@@ -18,17 +18,11 @@ module Opal
           rhs_len = rhs.children.any? { |c| c.type == :splat } ? nil : rhs.children.size
           compile_masgn(lhs.children, array, rhs_len)
           push ", #{array}" # a mass assignment evaluates to the RHS
-        elsif rhs.type == :begin
-          retval = scope.new_temp
-          push "#{retval} = ", expr(rhs)
-          push ", #{array} = Opal.to_ary(#{retval})"
-          compile_masgn(lhs.children, array)
-          push ", #{retval}"
-          scope.queue_temp(retval)
         else
+          helper :to_ary
           retval = scope.new_temp
           push "#{retval} = ", expr(rhs)
-          push ", #{array} = Opal.to_ary(#{retval})"
+          push ", #{array} = $to_ary(#{retval})"
           compile_masgn(lhs.children, array)
           push ", #{retval}"
           scope.queue_temp(retval)
@@ -97,9 +91,10 @@ module Opal
         elsif child.type == :attrasgn
           part.last << assign
         elsif child.type == :mlhs
+          helper :to_ary
           # nested destructuring
           tmp = scope.new_temp
-          push ", (#{tmp} = Opal.to_ary(#{assign.children[0]})"
+          push ", (#{tmp} = $to_ary(#{assign.children[0]})"
           compile_masgn(child.children, tmp)
           push ')'
           scope.queue_temp(tmp)

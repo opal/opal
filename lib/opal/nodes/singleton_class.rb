@@ -13,14 +13,16 @@ module Opal
         push '(function(self, $parent_nesting) {'
 
         in_scope do
-          add_temp '$nesting = [self].concat($parent_nesting)'
-
           body_stmt = stmt(compiler.returns(body))
+
+          add_temp '$nesting = [self].concat($parent_nesting)' if @define_nesting
+          add_temp '$$ = Opal.$r($nesting)' if @define_relative_access
+
           line scope.to_vars
           line body_stmt
         end
 
-        line '})(Opal.get_singleton_class(', recv(object), '), $nesting)'
+        line '})(Opal.get_singleton_class(', recv(object), "), #{scope.nesting})"
       end
     end
   end

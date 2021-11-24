@@ -1,8 +1,8 @@
 # https://github.com/ruby/ruby/blob/trunk/doc/marshal.rdoc
 # https://github.com/ruby/ruby/blob/trunk/marshal.c
 
-module Marshal
-  class ReadBuffer
+module ::Marshal
+  class self::ReadBuffer
     %x{
       function stringToBytes(string) {
         var i,
@@ -26,7 +26,7 @@ module Marshal
       major = read_byte
       minor = read_byte
       if major != MAJOR_VERSION || minor != MINOR_VERSION
-        raise TypeError, "incompatible marshal file format (can't be read)"
+        ::Kernel.raise ::TypeError, "incompatible marshal file format (can't be read)"
       end
       @version = "#{major}.#{minor}"
       @object_cache = []
@@ -89,17 +89,17 @@ module Marshal
       when 'U'
         read_user_marshal
       when 'M'
-        raise NotImplementedError, 'ModuleOld type cannot be demarshaled yet' # read_module_old
+        ::Kernel.raise ::NotImplementedError, 'ModuleOld type cannot be demarshaled yet' # read_module_old
       when 'd'
-        raise NotImplementedError, 'Data type cannot be demarshaled'
+        ::Kernel.raise ::NotImplementedError, 'Data type cannot be demarshaled'
       else
-        raise ArgumentError, 'dump format error'
+        ::Kernel.raise ::ArgumentError, 'dump format error'
       end
     end
 
     def read_byte
       if @index >= length
-        raise ArgumentError, 'marshal data too short'
+        ::Kernel.raise ::ArgumentError, 'marshal data too short'
       end
       result = @buffer[@index]
       @index += 1
@@ -312,7 +312,7 @@ module Marshal
       string = read_string(cache: false)
       options = read_byte
 
-      result = Regexp.new(string, options)
+      result = ::Regexp.new(string, options)
       @object_cache << result
       result
     end
@@ -345,8 +345,8 @@ module Marshal
     def read_class
       klass_name = read_string(cache: false)
       result = safe_const_get(klass_name)
-      unless result.class == Class
-        raise ArgumentError, "#{klass_name} does not refer to a Class"
+      unless result.class == ::Class
+        ::Kernel.raise ::ArgumentError, "#{klass_name} does not refer to a Class"
       end
       @object_cache << result
       result
@@ -362,8 +362,8 @@ module Marshal
     def read_module
       mod_name = read_string(cache: false)
       result = safe_const_get(mod_name)
-      unless result.class == Module
-        raise ArgumentError, "#{mod_name} does not refer to a Module"
+      unless result.class == ::Module
+        ::Kernel.raise ::ArgumentError, "#{mod_name} does not refer to a Module"
       end
       @object_cache << result
       result
@@ -554,9 +554,9 @@ module Marshal
     #  re-raises Marshal-specific error when it's missing
     #
     def safe_const_get(const_name)
-      Object.const_get(const_name)
-    rescue NameError
-      raise ArgumentError, "undefined class/module #{const_name}"
+      ::Object.const_get(const_name)
+    rescue ::NameError
+      ::Kernel.raise ::ArgumentError, "undefined class/module #{const_name}"
     end
   end
 end

@@ -1,13 +1,13 @@
 require 'corelib/numeric'
 
-class Number < Numeric
-  Opal.bridge(`Number`, self)
-  `Opal.defineProperty(self.$$prototype, '$$is_number', true)`
+class ::Number < ::Numeric
+  ::Opal.bridge(`Number`, self)
+  `Opal.prop(self.$$prototype, '$$is_number', true)`
   `self.$$is_number_class = true`
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{name}"
+      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
     end
 
     undef :new
@@ -16,19 +16,19 @@ class Number < Numeric
   def coerce(other)
     %x{
       if (other === nil) {
-        #{raise TypeError, "can't convert #{other.class} into Float"};
+        #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
       }
       else if (other.$$is_string) {
-        return [#{Float(other)}, self];
+        return [#{::Kernel.Float(other)}, self];
       }
       else if (#{other.respond_to?(:to_f)}) {
-        return [#{Opal.coerce_to!(other, Float, :to_f)}, self];
+        return [#{::Opal.coerce_to!(other, ::Float, :to_f)}, self];
       }
       else if (other.$$is_number) {
         return [other, self];
       }
       else {
-        #{raise TypeError, "can't convert #{other.class} into Float"};
+        #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
       }
     }
   end
@@ -92,7 +92,7 @@ class Number < Numeric
           return other;
         }
         else if (other == 0) {
-          #{raise ZeroDivisionError, 'divided by 0'};
+          #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'};
         }
         else if (other < 0 || self < 0) {
           return (self % other + other) % other;
@@ -209,24 +209,24 @@ class Number < Numeric
 
   def <=>(other)
     `spaceship_operator(self, other)`
-  rescue ArgumentError
+  rescue ::ArgumentError
     nil
   end
 
   def <<(count)
-    count = Opal.coerce_to! count, Integer, :to_int
+    count = ::Opal.coerce_to! count, ::Integer, :to_int
 
     `#{count} > 0 ? self << #{count} : self >> -#{count}`
   end
 
   def >>(count)
-    count = Opal.coerce_to! count, Integer, :to_int
+    count = ::Opal.coerce_to! count, ::Integer, :to_int
 
     `#{count} > 0 ? self >> #{count} : self << -#{count}`
   end
 
   def [](bit)
-    bit = Opal.coerce_to! bit, Integer, :to_int
+    bit = ::Opal.coerce_to! bit, ::Integer, :to_int
 
     %x{
       if (#{bit} < 0) {
@@ -252,14 +252,14 @@ class Number < Numeric
   end
 
   def **(other)
-    if Integer === other
-      if !(Integer === self) || other > 0
+    if ::Integer === other
+      if !(::Integer === self) || other > 0
         `Math.pow(self, other)`
       else
-        Rational.new(self, 1)**other
+        ::Rational.new(self, 1)**other
       end
-    elsif self < 0 && (Float === other || Rational === other)
-      Complex.new(self, 0)**other.to_f
+    elsif self < 0 && (::Float === other || ::Rational === other)
+      ::Complex.new(self, 0)**other.to_f
     elsif `other.$$is_number != null`
       `Math.pow(self, other)`
     else
@@ -304,12 +304,12 @@ class Number < Numeric
   end
 
   def allbits?(mask)
-    mask = Opal.coerce_to! mask, Integer, :to_int
+    mask = ::Opal.coerce_to! mask, ::Integer, :to_int
     `(self & mask) == mask`
   end
 
   def anybits?(mask)
-    mask = Opal.coerce_to! mask, Integer, :to_int
+    mask = ::Opal.coerce_to! mask, ::Integer, :to_int
     `(self & mask) !== 0`
   end
 
@@ -338,8 +338,8 @@ class Number < Numeric
   alias phase angle
 
   def bit_length
-    unless Integer === self
-      raise NoMethodError.new("undefined method `bit_length` for #{self}:Float", 'bit_length')
+    unless ::Integer === self
+      ::Kernel.raise ::NoMethodError.new("undefined method `bit_length` for #{self}:Float", 'bit_length')
     end
 
     %x{
@@ -393,14 +393,14 @@ class Number < Numeric
   def downto(stop, &block)
     unless block_given?
       return enum_for(:downto, stop) do
-        raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
+        ::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless ::Numeric === stop
         stop > self ? 0 : self - stop + 1
       end
     end
 
     %x{
       if (!stop.$$is_number) {
-        #{raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
+        #{::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
       for (var i = self; i >= stop; i--) {
         block(i);
@@ -440,8 +440,8 @@ class Number < Numeric
   end
 
   def gcd(other)
-    unless Integer === other
-      raise TypeError, 'not an integer'
+    unless ::Integer === other
+      ::Kernel.raise ::TypeError, 'not an integer'
     end
 
     %x{
@@ -468,9 +468,9 @@ class Number < Numeric
   end
 
   def is_a?(klass)
-    return true if klass == Integer && Integer === self
-    return true if klass == Integer && Integer === self
-    return true if klass == Float && Float === self
+    return true if klass == ::Integer && ::Integer === self
+    return true if klass == ::Integer && ::Integer === self
+    return true if klass == ::Float && ::Float === self
 
     super
   end
@@ -478,16 +478,16 @@ class Number < Numeric
   alias kind_of? is_a?
 
   def instance_of?(klass)
-    return true if klass == Integer && Integer === self
-    return true if klass == Integer && Integer === self
-    return true if klass == Float && Float === self
+    return true if klass == ::Integer && ::Integer === self
+    return true if klass == ::Integer && ::Integer === self
+    return true if klass == ::Float && ::Float === self
 
     super
   end
 
   def lcm(other)
-    unless Integer === other
-      raise TypeError, 'not an integer'
+    unless ::Integer === other
+      ::Kernel.raise ::TypeError, 'not an integer'
     end
 
     %x{
@@ -509,7 +509,7 @@ class Number < Numeric
   end
 
   def nobits?(mask)
-    mask = Opal.coerce_to! mask, Integer, :to_int
+    mask = ::Opal.coerce_to! mask, ::Integer, :to_int
     `(self & mask) == 0`
   end
 
@@ -536,26 +536,26 @@ class Number < Numeric
   def pow(b, m = undefined)
     %x{
       if (self == 0) {
-        #{raise ZeroDivisionError, 'divided by 0'}
+        #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'}
       }
 
       if (m === undefined) {
         return #{self**b};
       } else {
-        if (!(#{Integer === b})) {
-          #{raise TypeError, 'Integer#pow() 2nd argument not allowed unless a 1st argument is integer'}
+        if (!(#{::Integer === b})) {
+          #{::Kernel.raise ::TypeError, 'Integer#pow() 2nd argument not allowed unless a 1st argument is integer'}
         }
 
         if (b < 0) {
-          #{raise TypeError, 'Integer#pow() 1st argument cannot be negative when 2nd argument specified'}
+          #{::Kernel.raise ::TypeError, 'Integer#pow() 1st argument cannot be negative when 2nd argument specified'}
         }
 
-        if (!(#{Integer === m})) {
-          #{raise TypeError, 'Integer#pow() 2nd argument not allowed unless all arguments are integers'}
+        if (!(#{::Integer === m})) {
+          #{::Kernel.raise ::TypeError, 'Integer#pow() 2nd argument not allowed unless all arguments are integers'}
         }
 
         if (m === 0) {
-          #{raise ZeroDivisionError, 'divided by 0'}
+          #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'}
         }
 
         return #{(self**b) % m}
@@ -568,7 +568,7 @@ class Number < Numeric
   end
 
   def quo(other)
-    if Integer === self
+    if ::Integer === self
       super
     else
       self / other
@@ -578,22 +578,22 @@ class Number < Numeric
   def rationalize(eps = undefined)
     %x{
       if (arguments.length > 1) {
-        #{raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
+        #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
       }
     }
 
-    if Integer === self
-      Rational.new(self, 1)
+    if ::Integer === self
+      ::Rational.new(self, 1)
     elsif infinite?
-      raise FloatDomainError, 'Infinity'
+      ::Kernel.raise ::FloatDomainError, 'Infinity'
     elsif nan?
-      raise FloatDomainError, 'NaN'
+      ::Kernel.raise ::FloatDomainError, 'NaN'
     elsif `eps == null`
-      f, n  = Math.frexp self
-      f     = Math.ldexp(f, Float::MANT_DIG).to_i
-      n    -= Float::MANT_DIG
+      f, n  = ::Math.frexp self
+      f     = ::Math.ldexp(f, ::Float::MANT_DIG).to_i
+      n    -= ::Float::MANT_DIG
 
-      Rational.new(2 * f, 1 << (1 - n)).rationalize(Rational.new(1, 1 << (1 - n)))
+      ::Rational.new(2 * f, 1 << (1 - n)).rationalize(::Rational.new(1, 1 << (1 - n)))
     else
       to_r.rationalize(eps)
     end
@@ -604,19 +604,19 @@ class Number < Numeric
   end
 
   def round(ndigits = undefined)
-    if Integer === self
+    if ::Integer === self
       if `ndigits == null`
         return self
       end
 
-      if Float === ndigits && ndigits.infinite?
-        raise RangeError, 'Infinity'
+      if ::Float === ndigits && ndigits.infinite?
+        ::Kernel.raise ::RangeError, 'Infinity'
       end
 
-      ndigits = Opal.coerce_to!(ndigits, Integer, :to_int)
+      ndigits = ::Opal.coerce_to!(ndigits, ::Integer, :to_int)
 
-      if ndigits < Integer::MIN
-        raise RangeError, 'out of bounds'
+      if ndigits < ::Integer::MIN
+        ::Kernel.raise ::RangeError, 'out of bounds'
       end
 
       if `ndigits >= 0`
@@ -637,16 +637,16 @@ class Number < Numeric
       }
     else
       if nan? && `ndigits == null`
-        raise FloatDomainError, 'NaN'
+        ::Kernel.raise ::FloatDomainError, 'NaN'
       end
 
-      ndigits = Opal.coerce_to!(`ndigits || 0`, Integer, :to_int)
+      ndigits = ::Opal.coerce_to!(`ndigits || 0`, ::Integer, :to_int)
 
       if ndigits <= 0
         if nan?
-          raise RangeError, 'NaN'
+          ::Kernel.raise ::RangeError, 'NaN'
         elsif infinite?
-          raise FloatDomainError, 'Infinity'
+          ::Kernel.raise ::FloatDomainError, 'Infinity'
         end
       elsif ndigits == 0
         return `Math.round(self)`
@@ -654,9 +654,9 @@ class Number < Numeric
         return self
       end
 
-      _, exp = Math.frexp(self)
+      _, exp = ::Math.frexp(self)
 
-      if ndigits >= (Float::DIG + 2) - (exp > 0 ? exp / 4 : exp / 3 - 1)
+      if ndigits >= (::Float::DIG + 2) - (exp > 0 ? exp / 4 : exp / 3 - 1)
         return self
       end
 
@@ -693,22 +693,22 @@ class Number < Numeric
   alias to_int to_i
 
   def to_r
-    if Integer === self
-      Rational.new(self, 1)
+    if ::Integer === self
+      ::Rational.new(self, 1)
     else
-      f, e  = Math.frexp(self)
-      f     = Math.ldexp(f, Float::MANT_DIG).to_i
-      e    -= Float::MANT_DIG
+      f, e  = ::Math.frexp(self)
+      f     = ::Math.ldexp(f, ::Float::MANT_DIG).to_i
+      e    -= ::Float::MANT_DIG
 
-      (f * (Float::RADIX**e)).to_r
+      (f * (::Float::RADIX**e)).to_r
     end
   end
 
   def to_s(base = 10)
-    base = Opal.coerce_to! base, Integer, :to_int
+    base = ::Opal.coerce_to! base, ::Integer, :to_int
 
     if base < 2 || base > 36
-      raise ArgumentError, "invalid radix #{base}"
+      ::Kernel.raise ::ArgumentError, "invalid radix #{base}"
     end
 
     # Don't lose the negative zero
@@ -742,17 +742,17 @@ class Number < Numeric
 
   def digits(base = 10)
     if self < 0
-      raise Math::DomainError, 'out of domain'
+      ::Kernel.raise ::Math::DomainError, 'out of domain'
     end
 
-    base = Opal.coerce_to! base, Integer, :to_int
+    base = ::Opal.coerce_to! base, ::Integer, :to_int
 
     if base < 2
-      raise ArgumentError, "invalid radix #{base}"
+      ::Kernel.raise ::ArgumentError, "invalid radix #{base}"
     end
 
     %x{
-      if (self != parseInt(self)) #{raise NoMethodError, "undefined method `digits' for #{inspect}"}
+      if (self != parseInt(self)) #{::Kernel.raise ::NoMethodError, "undefined method `digits' for #{inspect}"}
 
       var value = self, result = [];
 
@@ -771,9 +771,9 @@ class Number < Numeric
 
   def divmod(other)
     if nan? || other.nan?
-      raise FloatDomainError, 'NaN'
+      ::Kernel.raise ::FloatDomainError, 'NaN'
     elsif infinite?
-      raise FloatDomainError, 'Infinity'
+      ::Kernel.raise ::FloatDomainError, 'Infinity'
     else
       super
     end
@@ -782,14 +782,14 @@ class Number < Numeric
   def upto(stop, &block)
     unless block_given?
       return enum_for(:upto, stop) do
-        raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless Numeric === stop
+        ::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless ::Numeric === stop
         stop < self ? 0 : stop - self + 1
       end
     end
 
     %x{
       if (!stop.$$is_number) {
-        #{raise ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
+        #{::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
       for (var i = self; i <= stop; i++) {
         block(i);
@@ -839,24 +839,24 @@ class Number < Numeric
   end
 end
 
-Fixnum = Number
+::Fixnum = ::Number
 
-class Integer < Numeric
+class ::Integer < ::Numeric
   `self.$$is_number_class = true`
   `self.$$is_integer_class = true`
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{name}"
+      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
     end
 
     undef :new
 
     def sqrt(n)
-      n = Opal.coerce_to!(n, Integer, :to_int)
+      n = ::Opal.coerce_to!(n, ::Integer, :to_int)
       %x{
         if (n < 0) {
-          #{raise Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
+          #{::Kernel.raise ::Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
         }
 
         return parseInt(Math.sqrt(n), 10);
@@ -864,16 +864,16 @@ class Integer < Numeric
     end
   end
 
-  MAX = `Math.pow(2, 30) - 1`
-  MIN = `-Math.pow(2, 30)`
+  self::MAX = `Math.pow(2, 30) - 1`
+  self::MIN = `-Math.pow(2, 30)`
 end
 
-class Float < Numeric
+class ::Float < ::Numeric
   `self.$$is_number_class = true`
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{name}"
+      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
     end
 
     undef :new
@@ -883,14 +883,14 @@ class Float < Numeric
     end
   end
 
-  INFINITY = `Infinity`
-  MAX      = `Number.MAX_VALUE`
-  MIN      = `Number.MIN_VALUE`
-  NAN      = `NaN`
+  self::INFINITY = `Infinity`
+  self::MAX      = `Number.MAX_VALUE`
+  self::MIN      = `Number.MIN_VALUE`
+  self::NAN      = `NaN`
 
-  DIG      = 15
-  MANT_DIG = 53
-  RADIX    = 2
+  self::DIG      = 15
+  self::MANT_DIG = 53
+  self::RADIX    = 2
 
-  EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
+  self::EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
 end

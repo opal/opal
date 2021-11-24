@@ -2,7 +2,7 @@
 
 require 'corelib/pack_unpack/format_string_parser'
 
-class Array
+class ::Array
   %x{
     // Format Parser
     var eachDirectiveAndCount = Opal.PackUnpack.eachDirectiveAndCount;
@@ -93,7 +93,7 @@ class Array
         var buffer = callback(data);
 
         return buffer.map(function(item) {
-          return $coerce_to(item, #{Integer}, 'to_int')
+          return $coerce_to(item, #{::Integer}, 'to_int')
         });
       }
     }
@@ -103,7 +103,7 @@ class Array
         var buffer = callback(data);
 
         return buffer.map(function(item) {
-          return $coerce_to(item, #{String}, 'to_str')
+          return $coerce_to(item, #{::String}, 'to_str')
         });
       }
     }
@@ -116,7 +116,7 @@ class Array
             return String.fromCodePoint(item);
           } catch (error) {
             if (error instanceof RangeError) {
-              #{raise RangeError, 'value out of range'};
+              #{::Kernel.raise ::RangeError, 'value out of range'};
             }
             throw error;
           }
@@ -199,7 +199,7 @@ class Array
           }
         } else {
           if (buffer.length < count) {
-            #{raise ArgumentError, 'too few arguments'};
+            #{::Kernel.raise ::ArgumentError, 'too few arguments'};
           }
           for (var i = 0; i < count; i++) {
             chunkData = callback(buffer);
@@ -225,9 +225,9 @@ class Array
         if (source === nil) {
           source = '';
         } else if (source === undefined) {
-          #{raise ArgumentError, 'too few arguments'};
+          #{::Kernel.raise ::ArgumentError, 'too few arguments'};
         } else {
-          source = $coerce_to(source, #{String}, 'to_str');
+          source = $coerce_to(source, #{::String}, 'to_str');
         }
 
         buffer = buffer.slice(1, buffer.length);
@@ -388,7 +388,7 @@ class Array
   }
 
   def pack(format)
-    format = Opal.coerce_to!(format, String, :to_str).gsub(/\s/, '').delete("\000")
+    format = ::Opal.coerce_to!(format, ::String, :to_str).gsub(/\s/, '').delete("\000")
 
     %x{
       var output = '';
@@ -408,7 +408,7 @@ class Array
             chunkReader = readChunk[directive];
 
         if (chunkReader == null) {
-          #{raise "Unsupported pack directive #{`directive`.inspect} (no chunk reader defined)"}
+          #{::Kernel.raise "Unsupported pack directive #{`directive`.inspect} (no chunk reader defined)"}
         }
 
         var chunkData = chunkReader(buffer, count);
@@ -418,7 +418,7 @@ class Array
         var handler = handlers[directive];
 
         if (handler == null) {
-          #{raise "Unsupported pack directive #{`directive`.inspect} (no handler defined)"}
+          #{::Kernel.raise "Unsupported pack directive #{`directive`.inspect} (no handler defined)"}
         }
 
         return handler(chunk);
@@ -431,7 +431,7 @@ class Array
           var shouldAutocomplete = autocompletion[directive]
 
           if (shouldAutocomplete == null) {
-            #{raise "Unsupported pack directive #{`directive`.inspect} (no autocompletion rule defined)"}
+            #{::Kernel.raise "Unsupported pack directive #{`directive`.inspect} (no autocompletion rule defined)"}
           }
 
           if (shouldAutocomplete) {

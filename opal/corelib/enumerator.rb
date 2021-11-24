@@ -1,9 +1,9 @@
-# helpers: breaker, slice, falsy, truthy, coerce_to
+# helpers: breaker, slice, falsy, truthy, coerce_to, yield1, yieldX
 
 require 'corelib/enumerable'
 
-class Enumerator
-  include Enumerable
+class ::Enumerator
+  include ::Enumerable
 
   `self.$$prototype.$$is_enumerator = true`
 
@@ -28,7 +28,7 @@ class Enumerator
       @size   = `arguments[0] || nil`
 
       if @size && !@size.respond_to?(:call)
-        @size = `$coerce_to(#{@size}, #{Integer}, 'to_int')`
+        @size = `$coerce_to(#{@size}, #{::Integer}, 'to_int')`
       end
     else
       @object = `arguments[0]`
@@ -54,7 +54,7 @@ class Enumerator
 
   def with_index(offset = 0, &block)
     offset = if offset
-               `$coerce_to(offset, #{Integer}, 'to_int')`
+               `$coerce_to(offset, #{::Integer}, 'to_int')`
              else
                0
              end
@@ -65,7 +65,7 @@ class Enumerator
       var result, index = offset;
 
       self.$each.$$p = function() {
-        var param = #{Opal.destructure(`arguments`)},
+        var param = #{::Opal.destructure(`arguments`)},
             value = block(param, index);
 
         index++;
@@ -90,17 +90,17 @@ class Enumerator
     result = "#<#{self.class}: #{@object.inspect}:#{@method}"
 
     if @args.any?
-      result += "(#{@args.inspect[Range.new(1, -2)]})"
+      result += "(#{@args.inspect[::Range.new(1, -2)]})"
     end
 
     result + '>'
   end
 
   class Generator
-    include Enumerable
+    include ::Enumerable
 
     def initialize(&block)
-      raise LocalJumpError, 'no block given' unless block
+      ::Kernel.raise ::LocalJumpError, 'no block given' unless block
 
       @block = block
     end
@@ -112,7 +112,7 @@ class Enumerator
         try {
           args.unshift(#{yielder});
 
-          Opal.yieldX(#{@block}, args);
+          $yieldX(#{@block}, args);
         }
         catch (e) {
           if (e === $breaker) {
@@ -135,7 +135,7 @@ class Enumerator
 
     def yield(*values)
       %x{
-        var value = Opal.yieldX(#{@block}, values);
+        var value = $yieldX(#{@block}, values);
 
         if (value === $breaker) {
           throw $breaker;
@@ -152,12 +152,12 @@ class Enumerator
     end
   end
 
-  class Lazy < self
-    class StopLazyError < Exception; end
+  class self::Lazy < self
+    class self::StopLazyError < ::Exception; end
 
     def initialize(object, size = nil, &block)
       unless block_given?
-        raise ArgumentError, 'tried to call lazy new without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy new without a block'
       end
 
       @enumerator = object
@@ -167,10 +167,10 @@ class Enumerator
           %x{
             args.unshift(#{yielder});
 
-            Opal.yieldX(block, args);
+            $yieldX(block, args);
           }
         end
-      rescue Exception
+      rescue ::Exception
         nil
       end
     end
@@ -183,12 +183,12 @@ class Enumerator
 
     def collect(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy map without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy map without a block'
       end
 
       Lazy.new(self, enumerator_size) do |enum, *args|
         %x{
-          var value = Opal.yieldX(block, args);
+          var value = $yieldX(block, args);
 
           #{enum.yield `value`};
         }
@@ -197,18 +197,18 @@ class Enumerator
 
     def collect_concat(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy map without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy map without a block'
       end
 
       Lazy.new(self, nil) do |enum, *args|
         %x{
-          var value = Opal.yieldX(block, args);
+          var value = $yieldX(block, args);
 
           if (#{`value`.respond_to? :force} && #{`value`.respond_to? :each}) {
             #{`value`.each { |v| enum.yield v }}
           }
           else {
-            var array = #{Opal.try_convert `value`, Array, :to_ary};
+            var array = #{::Opal.try_convert `value`, ::Array, :to_ary};
 
             if (array === nil) {
               #{enum.yield `value`};
@@ -222,14 +222,14 @@ class Enumerator
     end
 
     def drop(n)
-      n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
+      n = `$coerce_to(#{n}, #{::Integer}, 'to_int')`
 
       if n < 0
-        raise ArgumentError, 'attempt to drop negative size'
+        ::Kernel.raise ::ArgumentError, 'attempt to drop negative size'
       end
 
       current_size = enumerator_size
-      set_size     = if Integer === current_size
+      set_size     = if ::Integer === current_size
                        n < current_size ? n : current_size
                      else
                        current_size
@@ -247,14 +247,14 @@ class Enumerator
 
     def drop_while(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy drop_while without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy drop_while without a block'
       end
 
       succeeding = true
       Lazy.new(self, nil) do |enum, *args|
         if succeeding
           %x{
-            var value = Opal.yieldX(block, args);
+            var value = $yieldX(block, args);
 
             if ($falsy(value)) {
               succeeding = false;
@@ -276,12 +276,12 @@ class Enumerator
 
     def find_all(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy select without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy select without a block'
       end
 
       Lazy.new(self, nil) do |enum, *args|
         %x{
-          var value = Opal.yieldX(block, args);
+          var value = $yieldX(block, args);
 
           if ($truthy(value)) {
             #{enum.yield(*args)};
@@ -296,20 +296,20 @@ class Enumerator
       if block
         Lazy.new(self, nil) do |enum, *args|
           %x{
-            var param = #{Opal.destructure(args)},
+            var param = #{::Opal.destructure(args)},
                 value = #{pattern === `param`};
 
             if ($truthy(value)) {
-              value = Opal.yield1(block, param);
+              value = $yield1(block, param);
 
-              #{enum.yield `Opal.yield1(block, param)`};
+              #{enum.yield `$yield1(block, param)`};
             }
           }
         end
       else
         Lazy.new(self, nil) do |enum, *args|
           %x{
-            var param = #{Opal.destructure(args)},
+            var param = #{::Opal.destructure(args)},
                 value = #{pattern === `param`};
 
             if ($truthy(value)) {
@@ -326,12 +326,12 @@ class Enumerator
 
     def reject(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy reject without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy reject without a block'
       end
 
       Lazy.new(self, nil) do |enum, *args|
         %x{
-          var value = Opal.yieldX(block, args);
+          var value = $yieldX(block, args);
 
           if ($falsy(value)) {
             #{enum.yield(*args)};
@@ -341,14 +341,14 @@ class Enumerator
     end
 
     def take(n)
-      n = `$coerce_to(#{n}, #{Integer}, 'to_int')`
+      n = `$coerce_to(#{n}, #{::Integer}, 'to_int')`
 
       if n < 0
-        raise ArgumentError, 'attempt to take negative size'
+        ::Kernel.raise ::ArgumentError, 'attempt to take negative size'
       end
 
       current_size = enumerator_size
-      set_size     = if Integer === current_size
+      set_size     = if ::Integer === current_size
                        n < current_size ? n : current_size
                      else
                        current_size
@@ -360,25 +360,25 @@ class Enumerator
           enum.yield(*args)
           taken += 1
         else
-          raise StopLazyError
+          ::Kernel.raise StopLazyError
         end
       end
     end
 
     def take_while(&block)
       unless block
-        raise ArgumentError, 'tried to call lazy take_while without a block'
+        ::Kernel.raise ::ArgumentError, 'tried to call lazy take_while without a block'
       end
 
       Lazy.new(self, nil) do |enum, *args|
         %x{
-          var value = Opal.yieldX(block, args);
+          var value = $yieldX(block, args);
 
           if ($truthy(value)) {
             #{enum.yield(*args)};
           }
           else {
-            #{raise StopLazyError};
+            #{::Kernel.raise StopLazyError};
           }
         }
       end
@@ -391,7 +391,7 @@ class Enumerator
     end
   end
 
-  class ArithmeticSequence < self
+  class self::ArithmeticSequence < self
     # We need to stub this for the time being
   end
 end

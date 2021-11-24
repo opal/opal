@@ -1,12 +1,12 @@
-class IO
-  SEEK_SET = 0
-  SEEK_CUR = 1
-  SEEK_END = 2
-  SEEK_DATA = 3
-  SEEK_HOLE = 4
+class ::IO
+  self::SEEK_SET = 0
+  self::SEEK_CUR = 1
+  self::SEEK_END = 2
+  self::SEEK_DATA = 3
+  self::SEEK_HOLE = 4
 
-  READABLE = 1
-  WRITABLE = 4
+  self::READABLE = 1
+  self::WRITABLE = 4
 
   def initialize(fd, flags = 'r')
     @fd = fd
@@ -53,7 +53,7 @@ class IO
   def print(*args)
     %x{
       for (var i = 0, ii = args.length; i < ii; i++) {
-        args[i] = #{String(`args[i]`)}
+        args[i] = #{::Kernel.String(`args[i]`)}
       }
       self.$write(args.join(#{$,}));
     }
@@ -63,7 +63,7 @@ class IO
   def puts(*args)
     %x{
       for (var i = 0, ii = args.length; i < ii; i++) {
-        args[i] = #{String(`args[i]`).chomp}
+        args[i] = #{::Kernel.String(`args[i]`).chomp}
       }
       self.$write(args.concat([nil]).join(#{$/}));
     }
@@ -99,11 +99,11 @@ class IO
   end
 
   def readchar
-    getc || raise(EOFError, 'end of file reached')
+    getc || ::Kernel.raise(::EOFError, 'end of file reached')
   end
 
   def readline(*args)
-    gets(*args) || raise(EOFError, 'end of file reached')
+    gets(*args) || ::Kernel.raise(::EOFError, 'end of file reached')
   end
 
   def gets(sep = false, limit = nil, opts = {})
@@ -164,14 +164,14 @@ class IO
   def sysread(integer)
     `self.read_proc(integer)` || begin
       @eof = true
-      raise EOFError, 'end of file reached'
+      ::Kernel.raise ::EOFError, 'end of file reached'
     end
   end
 
   # @private
   def sysread_noraise(integer)
     sysread(integer)
-  rescue EOFError
+  rescue ::EOFError
     nil
   end
 
@@ -275,24 +275,24 @@ class IO
   # @private
   def check_writable
     if closed_write?
-      raise IOError, 'not opened for writing'
+      ::Kernel.raise ::IOError, 'not opened for writing'
     end
   end
 
   # @private
   def check_readable
     if closed_read?
-      raise IOError, 'not opened for reading'
+      ::Kernel.raise ::IOError, 'not opened for reading'
     end
   end
 end
 
-STDIN  = $stdin  = IO.new(0, 'r')
-STDOUT = $stdout = IO.new(1, 'w')
-STDERR = $stderr = IO.new(2, 'w')
+::STDIN  = $stdin  = ::IO.new(0, 'r')
+::STDOUT = $stdout = ::IO.new(1, 'w')
+::STDERR = $stderr = ::IO.new(2, 'w')
 
 `var console = Opal.global.console`
-STDOUT.write_proc = `typeof(process) === 'object' && typeof(process.stdout) === 'object' ? function(s){process.stdout.write(s)} : function(s){console.log(s)}`
-STDERR.write_proc = `typeof(process) === 'object' && typeof(process.stderr) === 'object' ? function(s){process.stderr.write(s)} : function(s){console.warn(s)}`
+::STDOUT.write_proc = `typeof(process) === 'object' && typeof(process.stdout) === 'object' ? function(s){process.stdout.write(s)} : function(s){console.log(s)}`
+::STDERR.write_proc = `typeof(process) === 'object' && typeof(process.stderr) === 'object' ? function(s){process.stderr.write(s)} : function(s){console.warn(s)}`
 
-STDIN.read_proc = `function(s) { var p = prompt(); if (p !== null) return p + "\n"; return nil; }`
+::STDIN.read_proc = `function(s) { var p = prompt(); if (p !== null) return p + "\n"; return nil; }`

@@ -35,7 +35,7 @@ RSpec.describe Opal::Compiler do
     expect_compiled("123E+10").to include("return 1230000000000")
     expect_compiled("false").to include("return false")
     expect_compiled("true").to include("return true")
-    expect_compiled("nil").to include("return nil")
+    expect_compiled("0;nil").to include("return nil") # NB: Empty nil return is compiled-out
   end
 
   it "should compile ruby strings" do
@@ -66,15 +66,15 @@ RSpec.describe Opal::Compiler do
 
   it "should compile method calls" do
     expect_compiled("self.inspect").to include("$inspect()")
-    expect_compiled("self.map { |a| a + 10 }").to include("$map")
+    expect_compiled("self.map { |a| a + 10 }").to include("'map'")
   end
 
   it "adds method missing stubs" do
-    expect_compiled("self.puts 'hello'").to include("Opal.add_stubs(['$puts'])")
+    expect_compiled("self.puts 'hello'").to include("Opal.add_stubs('puts')")
   end
 
   it 'adds method missing stubs with operators' do
-    expect_compiled("class Foo; end; Foo.new > 5").to include("Opal.add_stubs(['$>', '$new'])")
+    expect_compiled("class Foo; end; Foo.new > 5").to include("Opal.add_stubs('>,new')")
   end
 
   it "should compile constant lookups" do
@@ -99,8 +99,8 @@ RSpec.describe Opal::Compiler do
     end
 
     context "when function name is not valid" do
-      it "skips generating a name" do
-        expect_compiled("def test_method?; end").to include("function()")
+      it "generates a name in a safe way" do
+        expect_compiled("def test_method?; end").to include("function $test_method$ques$1()")
       end
     end
   end
@@ -230,11 +230,11 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if Test > 4").to include("if ($truthy($rb_gt($$($nesting, 'Test'), 4))) ")
+          expect_compiled("foo = 42 if Test > 4").to include("if ($truthy($rb_gt($$('Test'), 4))) ")
         end
 
         it 'specifically == excludes nil check for constants' do
-          expect_compiled("foo = 42 if Test == 4").to include("if ($$($nesting, 'Test')['$=='](4))")
+          expect_compiled("foo = 42 if Test == 4").to include("if ($$('Test')['$=='](4))")
         end
       end
 
@@ -258,7 +258,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if Test").to include("if ($truthy($$($nesting, 'Test')))")
+          expect_compiled("foo = 42 if Test").to include("if ($truthy($$('Test')))")
         end
       end
     end
@@ -286,8 +286,8 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test > 4)").to include("if ($truthy($rb_gt($$($nesting, 'Test'), 4))")
-          expect_compiled("foo = 42 if (Test == 4)").to include("if ($truthy($$($nesting, 'Test')['$=='](4))")
+          expect_compiled("foo = 42 if (Test > 4)").to include("if ($truthy($rb_gt($$('Test'), 4))")
+          expect_compiled("foo = 42 if (Test == 4)").to include("if ($truthy($$('Test')['$=='](4))")
         end
       end
 
@@ -311,7 +311,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for constants' do
-          expect_compiled("foo = 42 if (Test)").to include("if ($truthy($$($nesting, 'Test'))")
+          expect_compiled("foo = 42 if (Test)").to include("if ($truthy($$('Test'))")
         end
       end
     end

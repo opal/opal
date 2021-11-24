@@ -1,15 +1,15 @@
 require 'corelib/enumerable'
 
-class Range
-  include Enumerable
+class ::Range
+  include ::Enumerable
 
   `self.$$prototype.$$is_range = true`
 
   attr_reader :begin, :end
 
   def initialize(first, last, exclude = false)
-    raise NameError, "'initialize' called twice" if @begin
-    raise ArgumentError, 'bad value for range' unless first <=> last || first.nil? || last.nil?
+    ::Kernel.raise ::NameError, "'initialize' called twice" if @begin
+    ::Kernel.raise ::ArgumentError, 'bad value for range' unless first <=> last || first.nil? || last.nil?
 
     @begin = first
     @end   = last
@@ -31,13 +31,13 @@ class Range
 
   def count(&block)
     if !block_given? && `is_infinite(self)`
-      return Float::INFINITY
+      return ::Float::INFINITY
     end
     super
   end
 
   def to_a
-    raise TypeError, 'cannot convert endless range to an array' if `is_infinite(self)`
+    ::Kernel.raise ::TypeError, 'cannot convert endless range to an array' if `is_infinite(self)`
     super
   end
 
@@ -59,7 +59,7 @@ class Range
 
       if (#{@begin}.$$is_number && #{@end}.$$is_number) {
         if (#{@begin} % 1 !== 0 || #{@end} % 1 !== 0) {
-          #{raise TypeError, "can't iterate from Float"}
+          #{::Kernel.raise ::TypeError, "can't iterate from Float"}
         }
 
         for (i = #{@begin}, limit = #{@end} + #{@excl ? 0 : 1}; i < limit; i++) {
@@ -79,7 +79,7 @@ class Range
     last    = @end
 
     unless current.respond_to?(:succ)
-      raise TypeError, "can't iterate from #{current.class}"
+      ::Kernel.raise ::TypeError, "can't iterate from #{current.class}"
     end
 
     while @end.nil? || (current <=> last) < 0
@@ -94,7 +94,7 @@ class Range
   end
 
   def eql?(other)
-    return false unless Range === other
+    return false unless ::Range === other
 
     @excl === other.exclude_end? &&
       @begin.eql?(other.begin) &&
@@ -108,7 +108,7 @@ class Range
   end
 
   def first(n = undefined)
-    raise RangeError, 'cannot get the minimum of beginless range' if @begin.nil?
+    ::Kernel.raise ::RangeError, 'cannot get the minimum of beginless range' if @begin.nil?
     return @begin if `n == null`
     super
   end
@@ -116,7 +116,7 @@ class Range
   alias include? cover?
 
   def last(n = undefined)
-    raise RangeError, 'cannot get the maximum of endless range' if @end.nil?
+    ::Kernel.raise ::RangeError, 'cannot get the maximum of endless range' if @end.nil?
     return @end if `n == null`
     to_a.last(n)
   end
@@ -124,7 +124,7 @@ class Range
   # FIXME: currently hardcoded to assume range holds numerics
   def max
     if @end.nil?
-      raise RangeError, 'cannot get the maximum of endless range'
+      ::Kernel.raise ::RangeError, 'cannot get the maximum of endless range'
     elsif block_given?
       super
     elsif !@begin.nil? && (@begin > @end ||
@@ -139,7 +139,7 @@ class Range
 
   def min
     if @begin.nil?
-      raise RangeError, 'cannot get the minimum of beginless range'
+      ::Kernel.raise ::RangeError, 'cannot get the minimum of beginless range'
     elsif block_given?
       super
     elsif !@end.nil? && (@begin > @end ||
@@ -151,11 +151,11 @@ class Range
   end
 
   def size
-    infinity = Float::INFINITY
+    infinity = ::Float::INFINITY
 
     return 0 if (@begin == infinity && !@end.nil?) || (@end == -infinity && !@begin.nil?)
     return infinity if `is_infinite(self)`
-    return nil unless Numeric === @begin && Numeric === @end
+    return nil unless ::Numeric === @begin && ::Numeric === @end
 
     range_begin = @begin
     range_end   = @end
@@ -170,13 +170,13 @@ class Range
     %x{
       function coerceStepSize() {
         if (!n.$$is_number) {
-          n = #{Opal.coerce_to!(n, Integer, :to_int)}
+          n = #{::Opal.coerce_to!(n, ::Integer, :to_int)}
         }
 
         if (n < 0) {
-          #{raise ArgumentError, "step can't be negative"}
+          #{::Kernel.raise ::ArgumentError, "step can't be negative"}
         } else if (n === 0) {
-          #{raise ArgumentError, "step can't be 0"}
+          #{::Kernel.raise ::ArgumentError, "step can't be 0"}
         }
       }
 
@@ -195,7 +195,7 @@ class Range
           // n is a float
           var begin = self.begin, end = self.end,
               abs = Math.abs, floor = Math.floor,
-              err = (abs(begin) + abs(end) + abs(end - begin)) / abs(n) * #{Float::EPSILON},
+              err = (abs(begin) + abs(end) + abs(end - begin)) / abs(n) * #{::Float::EPSILON},
               size;
 
           if (err > 0.5) {
@@ -242,7 +242,7 @@ class Range
     else
       %x{
         if (#{@begin}.$$is_string && #{@end}.$$is_string && n % 1 !== 0) {
-          #{raise TypeError, 'no implicit conversion to float from string'}
+          #{::Kernel.raise ::TypeError, 'no implicit conversion to float from string'}
         }
       }
       each_with_index do |value, idx|
@@ -256,11 +256,11 @@ class Range
     return enum_for(:bsearch) unless block_given?
 
     if `is_infinite(self) && (self.begin.$$is_number || self.end.$$is_number)`
-      raise NotImplementedError, "Can't #bsearch an infinite range"
+      ::Kernel.raise ::NotImplementedError, "Can't #bsearch an infinite range"
     end
 
     unless `self.begin.$$is_number && self.end.$$is_number`
-      raise TypeError, "can't do binary search for #{@begin.class}"
+      ::Kernel.raise ::TypeError, "can't do binary search for #{@begin.class}"
     end
 
     to_a.bsearch(&block)

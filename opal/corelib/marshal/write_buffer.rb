@@ -1,10 +1,10 @@
-class NilClass
+class ::NilClass
   def __marshal__(buffer)
     buffer.append('0')
   end
 end
 
-class Boolean
+class ::Boolean
   def __marshal__(buffer)
     if `self`
       buffer.append('T')
@@ -14,7 +14,7 @@ class Boolean
   end
 end
 
-class Integer
+class ::Integer
   def __marshal__(buffer)
     if self >= -0x40000000 && self < 0x40000000
       buffer.append('i')
@@ -26,7 +26,7 @@ class Integer
   end
 end
 
-class Float
+class ::Float
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.append('f')
@@ -34,33 +34,33 @@ class Float
   end
 end
 
-class String
+class ::String
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_ivars_prefix(self)
     buffer.write_extends(self)
-    buffer.write_user_class(String, self)
+    buffer.write_user_class(::String, self)
     buffer.append('"')
     buffer.write_string(self)
   end
 end
 
-class Array
+class ::Array
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_ivars_prefix(self)
     buffer.write_extends(self)
-    buffer.write_user_class(Array, self)
+    buffer.write_user_class(::Array, self)
     buffer.append('[')
     buffer.write_array(self)
     buffer.write_ivars_suffix(self)
   end
 end
 
-class Hash
+class ::Hash
   def __marshal__(buffer)
     if default_proc
-      raise TypeError, "can't dump hash with default proc"
+      ::Kernel.raise ::TypeError, "can't dump hash with default proc"
     end
 
     buffer.save_link(self)
@@ -79,40 +79,40 @@ class Hash
   end
 end
 
-class Regexp
+class ::Regexp
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_ivars_prefix(self)
     buffer.write_extends(self)
-    buffer.write_user_class(Regexp, self)
+    buffer.write_user_class(::Regexp, self)
     buffer.append('/')
     buffer.write_regexp(self)
     buffer.write_ivars_suffix(self)
   end
 end
 
-class Proc
+class ::Proc
   def __marshal__(buffer)
-    raise TypeError, "no _dump_data is defined for class #{self.class}"
+    ::Kernel.raise ::TypeError, "no _dump_data is defined for class #{self.class}"
   end
 end
 
-class Method
+class ::Method
   def __marshal__(buffer)
-    raise TypeError, "no _dump_data is defined for class #{self.class}"
+    ::Kernel.raise ::TypeError, "no _dump_data is defined for class #{self.class}"
   end
 end
 
-class MatchData
+class ::MatchData
   def __marshal__(buffer)
-    raise TypeError, "no _dump_data is defined for class #{self.class}"
+    ::Kernel.raise ::TypeError, "no _dump_data is defined for class #{self.class}"
   end
 end
 
-class Module
+class ::Module
   def __marshal__(buffer)
     unless name
-      raise TypeError, "can't dump anonymous module"
+      ::Kernel.raise ::TypeError, "can't dump anonymous module"
     end
 
     buffer.save_link(self)
@@ -121,14 +121,14 @@ class Module
   end
 end
 
-class Class
+class ::Class
   def __marshal__(buffer)
     unless name
-      raise TypeError, "can't dump anonymous class"
+      ::Kernel.raise ::TypeError, "can't dump anonymous class"
     end
 
     if singleton_class?
-      raise TypeError, "singleton class can't be dumped"
+      ::Kernel.raise ::TypeError, "singleton class can't be dumped"
     end
 
     buffer.save_link(self)
@@ -137,7 +137,7 @@ class Class
   end
 end
 
-class BasicObject
+class ::BasicObject
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_extends(self)
@@ -146,7 +146,7 @@ class BasicObject
   end
 end
 
-class Range
+class ::Range
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_extends(self)
@@ -162,7 +162,7 @@ class Range
   end
 end
 
-class Struct
+class ::Struct
   def __marshal__(buffer)
     buffer.save_link(self)
     buffer.write_ivars_prefix(self)
@@ -178,8 +178,8 @@ class Struct
   end
 end
 
-module Marshal
-  class WriteBuffer
+module ::Marshal
+  class self::WriteBuffer
     attr_reader :buffer
 
     %x{
@@ -194,7 +194,7 @@ module Marshal
       @object = object
       @buffer = ''
       @cache = []
-      @extends = Hash.new { |h, k| h[k] = [] }
+      @extends = ::Hash.new { |h, k| h[k] = [] }
       append(version)
     end
 
@@ -207,16 +207,17 @@ module Marshal
         write_userdef(object)
       else
         case object
-        when nil, true, false, Proc, Method, MatchData, Range, Struct, Array, Class, Module, Hash, Regexp
+        when nil, true, false, ::Proc, ::Method, ::MatchData, ::Range, ::Struct,
+             ::Array, ::Class, ::Module, ::Hash, ::Regexp
           object.__marshal__(self)
-        when Integer
-          Integer.instance_method(:__marshal__).bind(object).call(self)
-        when Float
-          Float.instance_method(:__marshal__).bind(object).call(self)
-        when String
-          String.instance_method(:__marshal__).bind(object).call(self)
+        when ::Integer
+          ::Integer.instance_method(:__marshal__).bind(object).call(self)
+        when ::Float
+          ::Float.instance_method(:__marshal__).bind(object).call(self)
+        when ::String
+          ::String.instance_method(:__marshal__).bind(object).call(self)
         else
-          BasicObject.instance_method(:__marshal__).bind(object).call(self)
+          ::BasicObject.instance_method(:__marshal__).bind(object).call(self)
         end
       end
 
@@ -322,11 +323,11 @@ module Marshal
     end
 
     def write_float(f)
-      if f.equal?(Float::INFINITY)
+      if f.equal?(::Float::INFINITY)
         write_string('inf')
-      elsif f.equal?(-Float::INFINITY)
+      elsif f.equal?(-::Float::INFINITY)
         write_string('-inf')
-      elsif f.equal?(Float::NAN)
+      elsif f.equal?(::Float::NAN)
         write_string('nan')
       else
         write_string(f.to_s)
@@ -378,7 +379,7 @@ module Marshal
       klass = object.class
       append('U')
       namespace = `#{klass}.$$base_module`
-      if namespace.equal?(Object)
+      if namespace.equal?(::Object)
         append_symbol(`#{klass}.$$name`)
       else
         append_symbol(namespace.name + '::' + `#{klass}.$$name`)
@@ -389,8 +390,8 @@ module Marshal
     def write_userdef(object)
       value = object._dump(0)
 
-      unless value.is_a?(String)
-        raise TypeError, '_dump() must return string'
+      unless value.is_a?(::String)
+        ::Kernel.raise ::TypeError, '_dump() must return string'
       end
 
       write_ivars_prefix(value)

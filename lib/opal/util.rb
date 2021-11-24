@@ -14,8 +14,8 @@ module Opal
     #
     # @param str [String] string to minify
     # @return [String]
-    def uglify(source)
-      sh 'bin/yarn -s run terser -c', data: source
+    def uglify(source, mangle: false)
+      sh "bin/yarn -s run terser -c #{'-m' if mangle}", data: source
     end
 
     # Gzip code to check file size.

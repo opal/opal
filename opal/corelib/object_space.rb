@@ -1,6 +1,6 @@
 # helpers: respond_to, falsy, truthy
 
-module ObjectSpace
+module ::ObjectSpace
   module_function
 
   %x{
@@ -36,9 +36,9 @@ module ObjectSpace
   def define_finalizer(obj, aproc = undefined, &block)
     %x{
       if ($truthy(block)) aproc = block;
-      if ($falsy(aproc)) aproc = #{proc};
+      if ($falsy(aproc)) aproc = #{::Kernel.proc};
       if (!$respond_to(aproc, '$call')) {
-        #{raise ArgumentError, "Wrong type argument #{aproc.class} (should be callable)"};
+        #{::Kernel.raise ::ArgumentError, "Wrong type argument #{aproc.class} (should be callable)"};
       }
       var id = #{obj.__id__};
       add_caller(id, aproc);
@@ -47,7 +47,7 @@ module ObjectSpace
       }
       catch (e) {
         delete_callers(id);
-        #{raise ArgumentError, "cannot define finalizer for #{obj.class}"};
+        #{::Kernel.raise ::ArgumentError, "cannot define finalizer for #{obj.class}"};
       }
       return [0, aproc];
     }
@@ -62,8 +62,8 @@ module ObjectSpace
     }
   end
 
-  class WeakMap
-    include Enumerable
+  class self::WeakMap
+    include ::Enumerable
 
     def initialize
       @weak_map = `new WeakMap()`
@@ -95,7 +95,7 @@ module ObjectSpace
 
     %i[each each_key each_value each_pair keys values size length].each do |i|
       define_method i do |*|
-        raise NotImplementedError, "##{i} can't be implemented on top of JS interfaces"
+        ::Kernel.raise ::NotImplementedError, "##{i} can't be implemented on top of JS interfaces"
       end
     end
   end

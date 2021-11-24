@@ -1,13 +1,13 @@
 require 'corelib/numeric'
 require 'corelib/rational/base'
 
-class Rational < Numeric
+class ::Rational < ::Numeric
   def self.reduce(num, den)
     num = num.to_i
     den = den.to_i
 
     if den == 0
-      raise ZeroDivisionError, 'divided by 0'
+      ::Kernel.raise ::ZeroDivisionError, 'divided by 0'
     elsif den < 0
       num = -num
       den = -den
@@ -22,24 +22,24 @@ class Rational < Numeric
 
   def self.convert(num, den)
     if num.nil? || den.nil?
-      raise TypeError, 'cannot convert nil into Rational'
+      ::Kernel.raise ::TypeError, 'cannot convert nil into Rational'
     end
 
-    if Integer === num && Integer === den
+    if ::Integer === num && ::Integer === den
       return reduce(num, den)
     end
 
-    if Float === num || String === num || Complex === num
+    if ::Float === num || ::String === num || ::Complex === num
       num = num.to_r
     end
 
-    if Float === den || String === den || Complex === den
+    if ::Float === den || ::String === den || ::Complex === den
       den = den.to_r
     end
 
-    if den.equal?(1) && !(Integer === num)
-      Opal.coerce_to!(num, Rational, :to_r)
-    elsif Numeric === num && Numeric === den
+    if den.equal?(1) && !(::Integer === num)
+      ::Opal.coerce_to!(num, ::Rational, :to_r)
+    elsif ::Numeric === num && ::Numeric === den
       num / den
     else
       reduce(num, den)
@@ -61,26 +61,26 @@ class Rational < Numeric
 
   def coerce(other)
     case other
-    when Rational
+    when ::Rational
       [other, self]
 
-    when Integer
+    when ::Integer
       [other.to_r, self]
 
-    when Float
+    when ::Float
       [other, to_f]
     end
   end
 
   def ==(other)
     case other
-    when Rational
+    when ::Rational
       @num == other.numerator && @den == other.denominator
 
-    when Integer
+    when ::Integer
       @num == other && @den == 1
 
-    when Float
+    when ::Float
       to_f == other
 
     else
@@ -90,13 +90,13 @@ class Rational < Numeric
 
   def <=>(other)
     case other
-    when Rational
+    when ::Rational
       @num * other.denominator - @den * other.numerator <=> 0
 
-    when Integer
+    when ::Integer
       @num - @den * other <=> 0
 
-    when Float
+    when ::Float
       to_f <=> other
 
     else
@@ -106,16 +106,16 @@ class Rational < Numeric
 
   def +(other)
     case other
-    when Rational
+    when ::Rational
       num = @num * other.denominator + @den * other.numerator
       den = @den * other.denominator
 
-      Rational(num, den)
+      ::Kernel.Rational(num, den)
 
-    when Integer
-      Rational(@num + other * @den, @den)
+    when ::Integer
+      ::Kernel.Rational(@num + other * @den, @den)
 
-    when Float
+    when ::Float
       to_f + other
 
     else
@@ -125,16 +125,16 @@ class Rational < Numeric
 
   def -(other)
     case other
-    when Rational
+    when ::Rational
       num = @num * other.denominator - @den * other.numerator
       den = @den * other.denominator
 
-      Rational(num, den)
+      ::Kernel.Rational(num, den)
 
-    when Integer
-      Rational(@num - other * @den, @den)
+    when ::Integer
+      ::Kernel.Rational(@num - other * @den, @den)
 
-    when Float
+    when ::Float
       to_f - other
 
     else
@@ -144,16 +144,16 @@ class Rational < Numeric
 
   def *(other)
     case other
-    when Rational
+    when ::Rational
       num = @num * other.numerator
       den = @den * other.denominator
 
-      Rational(num, den)
+      ::Kernel.Rational(num, den)
 
-    when Integer
-      Rational(@num * other, @den)
+    when ::Integer
+      ::Kernel.Rational(@num * other, @den)
 
-    when Float
+    when ::Float
       to_f * other
 
     else
@@ -163,20 +163,20 @@ class Rational < Numeric
 
   def /(other)
     case other
-    when Rational
+    when ::Rational
       num = @num * other.denominator
       den = @den * other.numerator
 
-      Rational(num, den)
+      ::Kernel.Rational(num, den)
 
-    when Integer
+    when ::Integer
       if other == 0
         to_f / 0.0
       else
-        Rational(@num, @den * other)
+        ::Kernel.Rational(@num, @den * other)
       end
 
-    when Float
+    when ::Float
       to_f / other
 
     else
@@ -186,31 +186,31 @@ class Rational < Numeric
 
   def **(other)
     case other
-    when Integer
+    when ::Integer
       if self == 0 && other < 0
-        Float::INFINITY
+        ::Float::INFINITY
       elsif other > 0
-        Rational(@num**other, @den**other)
+        ::Kernel.Rational(@num**other, @den**other)
       elsif other < 0
-        Rational(@den**-other, @num**-other)
+        ::Kernel.Rational(@den**-other, @num**-other)
       else
-        Rational(1, 1)
+        ::Kernel.Rational(1, 1)
       end
 
-    when Float
+    when ::Float
       to_f**other
 
-    when Rational
+    when ::Rational
       if other == 0
-        Rational(1, 1)
+        ::Kernel.Rational(1, 1)
       elsif other.denominator == 1
         if other < 0
-          Rational(@den**other.numerator.abs, @num**other.numerator.abs)
+          ::Kernel.Rational(@den**other.numerator.abs, @num**other.numerator.abs)
         else
-          Rational(@num**other.numerator, @den**other.numerator)
+          ::Kernel.Rational(@num**other.numerator, @den**other.numerator)
         end
       elsif self == 0 && other < 0
-        raise ZeroDivisionError, 'divided by 0'
+        ::Kernel.raise ::ZeroDivisionError, 'divided by 0'
       else
         to_f**other
       end
@@ -221,7 +221,7 @@ class Rational < Numeric
   end
 
   def abs
-    Rational(@num.abs, @den.abs)
+    ::Kernel.Rational(@num.abs, @den.abs)
   end
 
   def ceil(precision = 0)
@@ -255,7 +255,7 @@ class Rational < Numeric
   def rationalize(eps = undefined)
     %x{
       if (arguments.length > 1) {
-        #{raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
+        #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
       }
 
       if (eps == null) {
@@ -294,7 +294,7 @@ class Rational < Numeric
         q1 = q2;
       }
 
-      return #{Rational(`c * p1 + p0`, `c * q1 + q0`)};
+      return #{::Kernel.Rational(`c * p1 + p0`, `c * q1 + q0`)};
     }
   end
 
@@ -340,7 +340,7 @@ class Rational < Numeric
   end
 
   def with_precision(method, precision)
-    raise TypeError, 'not an Integer' unless Integer === precision
+    ::Kernel.raise ::TypeError, 'not an Integer' unless ::Integer === precision
 
     p = 10**precision
     s = self * p
@@ -348,7 +348,7 @@ class Rational < Numeric
     if precision < 1
       (s.send(method) / p).to_i
     else
-      Rational(s.send(method), p)
+      ::Kernel.Rational(s.send(method), p)
     end
   end
 
@@ -379,15 +379,15 @@ class Rational < Numeric
 
           if (isFloat()) {
             denominator = parseFloat(cutFloat());
-            return #{Rational(`numerator`, `denominator`)};
+            return #{::Kernel.Rational(`numerator`, `denominator`)};
           } else {
-            return #{Rational(`numerator`, 1)};
+            return #{::Kernel.Rational(`numerator`, 1)};
           }
         } else {
-          return #{Rational(`numerator`, 1)};
+          return #{::Kernel.Rational(`numerator`, 1)};
         }
       } else {
-        return #{Rational(0, 1)};
+        return #{::Kernel.Rational(0, 1)};
       }
     }
   end

@@ -18,15 +18,8 @@ module Opal
         def compile
           scope.uses_block!
           scope.add_arg name
-          scope.block_name = name
 
-          scope_name  = scope.identity
-          yielder     = scope.block_name
-
-          add_temp "$iter = #{scope_name}.$$p"
-          add_temp "#{yielder} = $iter || nil"
-
-          line "if ($iter) #{scope_name}.$$p = null;"
+          scope.prepare_block(name)
         end
       end
     end

@@ -8,7 +8,11 @@ module Opal
       handle :true, :false, :self, :nil
 
       def compile
-        push type.to_s
+        if type == :self
+          push scope.self
+        else
+          push type.to_s
+        end
       end
 
       def self.truthy_optimize?
@@ -137,7 +141,9 @@ module Opal
       end
 
       def compile_dynamic_regexp
-        push 'Opal.regexp(['
+        helper :regexp
+
+        push '$regexp(['
         value.children.each_with_index do |v, index|
           push ', ' unless index.zero?
           push expr(v)
@@ -229,10 +235,18 @@ module Opal
       handle :dstr
 
       def compile
-        push '""'
+        if children.length > 1 && children.first.type == :str
+          skip_empty = true
+        else
+          push '""'
+        end
 
         children.each do |part|
-          push ' + '
+          if skip_empty
+            skip_empty = false
+          else
+            push ' + '
+          end
 
           if part.type == :str
             push expr(part)

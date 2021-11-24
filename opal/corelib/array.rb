@@ -3,11 +3,11 @@
 require 'corelib/enumerable'
 require 'corelib/numeric'
 
-class Array < `Array`
-  include Enumerable
+class ::Array < `Array`
+  include ::Enumerable
 
   # Mark all javascript arrays as being valid ruby arrays
-  `Opal.defineProperty(self.$$prototype, '$$is_array', true)`
+  `Opal.prop(self.$$prototype, '$$is_array', true)`
 
   %x{
     // Recent versions of V8 (> 7.1) only use an optimized implementation when Array.prototype is unmodified.
@@ -77,15 +77,15 @@ class Array < `Array`
   def initialize(size = nil, obj = nil, &block)
     %x{
       if (obj !== nil && block !== nil) {
-        #{warn('warning: block supersedes default value argument')}
+        #{::Kernel.warn('warning: block supersedes default value argument')}
       }
 
-      if (size > #{Integer::MAX}) {
-        #{raise ArgumentError, 'array size too big'}
+      if (size > #{::Integer::MAX}) {
+        #{::Kernel.raise ::ArgumentError, 'array size too big'}
       }
 
       if (arguments.length > 2) {
-        #{raise ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..2)"}
+        #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..2)"}
       }
 
       if (arguments.length === 0) {
@@ -103,10 +103,10 @@ class Array < `Array`
         }
       }
 
-      size = $coerce_to(size, #{Integer}, 'to_int');
+      size = $coerce_to(size, #{::Integer}, 'to_int');
 
       if (size < 0) {
-        #{raise ArgumentError, 'negative array size'}
+        #{::Kernel.raise ::ArgumentError, 'negative array size'}
       }
 
       self.splice(0, self.length);
@@ -129,14 +129,14 @@ class Array < `Array`
   end
 
   def self.try_convert(obj)
-    Opal.coerce_to? obj, Array, :to_ary
+    ::Opal.coerce_to? obj, ::Array, :to_ary
   end
 
   def &(other)
-    other = if Array === other
+    other = if ::Array === other
               other.to_a
             else
-              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
+              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
             end
 
     %x{
@@ -158,10 +158,10 @@ class Array < `Array`
   end
 
   def |(other)
-    other = if Array === other
+    other = if ::Array === other
               other.to_a
             else
-              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
+              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
             end
 
     %x{
@@ -182,10 +182,10 @@ class Array < `Array`
   def *(other)
     return join(other.to_str) if other.respond_to? :to_str
 
-    other = `$coerce_to(other, #{Integer}, 'to_int')`
+    other = `$coerce_to(other, #{::Integer}, 'to_int')`
 
     if `other < 0`
-      raise ArgumentError, 'negative argument'
+      ::Kernel.raise ::ArgumentError, 'negative argument'
     end
 
     %x{
@@ -201,20 +201,20 @@ class Array < `Array`
   end
 
   def +(other)
-    other = if Array === other
+    other = if ::Array === other
               other.to_a
             else
-              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
+              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
             end
 
     `self.concat(other)`
   end
 
   def -(other)
-    other = if Array === other
+    other = if ::Array === other
               other.to_a
             else
-              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
+              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
             end
 
     return [] if `self.length === 0`
@@ -245,7 +245,7 @@ class Array < `Array`
   end
 
   def <=>(other)
-    if Array === other
+    if ::Array === other
       other = other.to_a
     elsif other.respond_to? :to_ary
       other = other.to_ary.to_a
@@ -414,8 +414,8 @@ class Array < `Array`
       var i, size = self.length;
     }
 
-    if Range === index
-      data = if Array === value
+    if ::Range === index
+      data = if ::Array === value
                value.to_a
              elsif value.respond_to? :to_ary
                value.to_ary.to_a
@@ -425,14 +425,14 @@ class Array < `Array`
 
       %x{
         var exclude = index.excl,
-            from    = $coerce_to(index.begin, #{Integer}, 'to_int'),
-            to      = $coerce_to(index.end, #{Integer}, 'to_int');
+            from    = $coerce_to(index.begin, #{::Integer}, 'to_int'),
+            to      = $coerce_to(index.end, #{::Integer}, 'to_int');
 
         if (from < 0) {
           from += size;
 
           if (from < 0) {
-            #{raise RangeError, "#{index.inspect} out of range"};
+            #{::Kernel.raise ::RangeError, "#{index.inspect} out of range"};
           }
         }
 
@@ -466,7 +466,7 @@ class Array < `Array`
         length = value
         value  = extra
 
-        data = if Array === value
+        data = if ::Array === value
                  value.to_a
                elsif value.respond_to? :to_ary
                  value.to_ary.to_a
@@ -478,20 +478,20 @@ class Array < `Array`
       %x{
         var old;
 
-        index  = $coerce_to(index, #{Integer}, 'to_int');
-        length = $coerce_to(length, #{Integer}, 'to_int');
+        index  = $coerce_to(index, #{::Integer}, 'to_int');
+        length = $coerce_to(length, #{::Integer}, 'to_int');
 
         if (index < 0) {
           old    = index;
           index += size;
 
           if (index < 0) {
-            #{raise IndexError, "index #{`old`} too small for array; minimum #{`-self.length`}"};
+            #{::Kernel.raise ::IndexError, "index #{`old`} too small for array; minimum #{`-self.length`}"};
           }
         }
 
         if (length < 0) {
-          #{raise IndexError, "negative length (#{length})"}
+          #{::Kernel.raise ::IndexError, "negative length (#{length})"}
         }
 
         if (index > size) {
@@ -531,7 +531,7 @@ class Array < `Array`
 
   def at(index)
     %x{
-      index = $coerce_to(index, #{Integer}, 'to_int')
+      index = $coerce_to(index, #{::Integer}, 'to_int')
 
       if (index < 0) {
         index += self.length;
@@ -574,7 +574,7 @@ class Array < `Array`
           smaller = (ret < 0);
         }
         else {
-          #{raise TypeError, "wrong argument type #{`ret`.class} (must be numeric, true, false or nil)"}
+          #{::Kernel.raise ::TypeError, "wrong argument type #{`ret`.class} (must be numeric, true, false or nil)"}
         }
 
         if (smaller) { max = mid; } else { min = mid + 1; }
@@ -602,9 +602,9 @@ class Array < `Array`
     unless block_given?
       return enum_for(:cycle, n) do
         if n.nil?
-          Float::INFINITY
+          ::Float::INFINITY
         else
-          n = Opal.coerce_to!(n, Integer, :to_int)
+          n = ::Opal.coerce_to!(n, ::Integer, :to_int)
           n > 0 ? enumerator_size * n : 0
         end
       end
@@ -623,7 +623,7 @@ class Array < `Array`
         }
       }
       else {
-        n = #{Opal.coerce_to!(n, Integer, :to_int)};
+        n = #{::Opal.coerce_to!(n, ::Integer, :to_int)};
         if (n <= 0) {
           return self;
         }
@@ -702,7 +702,7 @@ class Array < `Array`
   }
 
   def combination(n)
-    num = Opal.coerce_to! n, Integer, :to_int
+    num = ::Opal.coerce_to! n, ::Integer, :to_int
     return enum_for(:combination, num) { `binomial_coefficient(#{self}.length, num)` } unless block_given?
 
     %x{
@@ -750,7 +750,7 @@ class Array < `Array`
   end
 
   def repeated_combination(n)
-    num = Opal.coerce_to! n, Integer, :to_int
+    num = ::Opal.coerce_to! n, ::Integer, :to_int
 
     unless block_given?
       return enum_for(:repeated_combination, num) { `binomial_coefficient(self.length + num - 1, num)` }
@@ -810,10 +810,10 @@ class Array < `Array`
 
   def concat(*others)
     others = others.map do |other|
-      other = if Array === other
+      other = if ::Array === other
                 other.to_a
               else
-                `$coerce_to(other, #{Array}, 'to_ary')`.to_a
+                `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
               end
 
       if other.equal?(self)
@@ -859,7 +859,7 @@ class Array < `Array`
 
   def delete_at(index)
     %x{
-      index = $coerce_to(index, #{Integer}, 'to_int');
+      index = $coerce_to(index, #{::Integer}, 'to_int');
 
       if (index < 0) {
         index += self.length;
@@ -897,7 +897,7 @@ class Array < `Array`
     }
 
     unless item.respond_to?(:dig)
-      raise TypeError, "#{item.class} does not have #dig method"
+      ::Kernel.raise ::TypeError, "#{item.class} does not have #dig method"
     end
 
     item.dig(*idxs)
@@ -906,7 +906,7 @@ class Array < `Array`
   def drop(number)
     %x{
       if (number < 0) {
-        #{raise ArgumentError}
+        #{::Kernel.raise ::ArgumentError}
       }
 
       return self.slice(number);
@@ -1003,7 +1003,7 @@ class Array < `Array`
     %x{
       var original = index;
 
-      index = $coerce_to(index, #{Integer}, 'to_int');
+      index = $coerce_to(index, #{::Integer}, 'to_int');
 
       if (index < 0) {
         index += self.length;
@@ -1026,10 +1026,10 @@ class Array < `Array`
       }
 
       if (self.length === 0) {
-        #{raise IndexError, "index #{`original`} outside of array bounds: 0...0"}
+        #{::Kernel.raise ::IndexError, "index #{`original`} outside of array bounds: 0...0"}
       }
       else {
-        #{raise IndexError, "index #{`original`} outside of array bounds: -#{`self.length`}...#{`self.length`}"};
+        #{::Kernel.raise ::IndexError, "index #{`original`} outside of array bounds: -#{`self.length`}...#{`self.length`}"};
       }
     }
   end
@@ -1041,39 +1041,39 @@ class Array < `Array`
 
     if block
       if `args.length > 2`
-        raise ArgumentError, "wrong number of arguments (#{args.length} for 0..2)"
+        ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{args.length} for 0..2)"
       end
 
       one, two = args
     else
       if `args.length == 0`
-        raise ArgumentError, 'wrong number of arguments (0 for 1..3)'
+        ::Kernel.raise ::ArgumentError, 'wrong number of arguments (0 for 1..3)'
       elsif `args.length > 3`
-        raise ArgumentError, "wrong number of arguments (#{args.length} for 1..3)"
+        ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{args.length} for 1..3)"
       end
 
       obj, one, two = args
     end
 
-    if Range === one
-      raise TypeError, 'length invalid with range' if two
+    if ::Range === one
+      ::Kernel.raise ::TypeError, 'length invalid with range' if two
 
-      left   = `$coerce_to(one.begin, #{Integer}, 'to_int')`
+      left   = `$coerce_to(one.begin, #{::Integer}, 'to_int')`
       `left += this.length` if `left < 0`
-      raise RangeError, "#{one.inspect} out of range" if `left < 0`
+      ::Kernel.raise ::RangeError, "#{one.inspect} out of range" if `left < 0`
 
-      right = `$coerce_to(one.end, #{Integer}, 'to_int')`
+      right = `$coerce_to(one.end, #{::Integer}, 'to_int')`
       `right += this.length` if `right < 0`
       `right += 1` unless one.exclude_end?
 
       return self if `right <= left`
     elsif one
-      left   = `$coerce_to(one, #{Integer}, 'to_int')`
+      left   = `$coerce_to(one, #{::Integer}, 'to_int')`
       `left += this.length` if `left < 0`
       left   = 0 if `left < 0`
 
       if two
-        right = `$coerce_to(two, #{Integer}, 'to_int')`
+        right = `$coerce_to(two, #{::Integer}, 'to_int')`
 
         return self if `right == 0`
 
@@ -1122,10 +1122,10 @@ class Array < `Array`
         return self.length === 0 ? nil : self[0];
       }
 
-      count = $coerce_to(count, #{Integer}, 'to_int');
+      count = $coerce_to(count, #{::Integer}, 'to_int');
 
       if (count < 0) {
-        #{raise ArgumentError, 'negative array size'};
+        #{::Kernel.raise ::ArgumentError, 'negative array size'};
       }
 
       return self.slice(0, count);
@@ -1157,11 +1157,11 @@ class Array < `Array`
           }
 
           if (!ary.$$is_array) {
-            #{raise TypeError};
+            #{::Kernel.raise ::TypeError};
           }
 
           if (ary === self) {
-            #{raise ArgumentError};
+            #{::Kernel.raise ::ArgumentError};
           }
 
           switch (level) {
@@ -1179,7 +1179,7 @@ class Array < `Array`
       }
 
       if (level !== undefined) {
-        level = $coerce_to(level, #{Integer}, 'to_int');
+        level = $coerce_to(level, #{::Integer}, 'to_int');
       }
 
       return _flatten(self, level);
@@ -1294,14 +1294,14 @@ class Array < `Array`
 
   def insert(index, *objects)
     %x{
-      index = $coerce_to(index, #{Integer}, 'to_int');
+      index = $coerce_to(index, #{::Integer}, 'to_int');
 
       if (objects.length > 0) {
         if (index < 0) {
           index += self.length + 1;
 
           if (index < 0) {
-            #{ raise IndexError, "#{index} is out of bounds" };
+            #{ ::Kernel.raise ::IndexError, "#{index} is out of bounds" };
           }
         }
         if (index > self.length) {
@@ -1369,7 +1369,7 @@ class Array < `Array`
           tmp = #{`item`.to_ary};
 
           if (tmp === self) {
-            #{raise ArgumentError};
+            #{::Kernel.raise ::ArgumentError};
           }
 
           if (tmp !== nil) {
@@ -1389,14 +1389,14 @@ class Array < `Array`
           }
         }
 
-        #{raise NoMethodError.new("#{`Opal.inspect(item)`} doesn't respond to #to_str, #to_ary or #to_s", 'to_str')};
+        #{::Kernel.raise ::NoMethodError.new("#{`Opal.inspect(item)`} doesn't respond to #to_str, #to_ary or #to_s", 'to_str')};
       }
 
       if (sep === nil) {
         return result.join('');
       }
       else {
-        return result.join(#{Opal.coerce_to!(sep, String, :to_str).to_s});
+        return result.join(#{::Opal.coerce_to!(sep, ::String, :to_str).to_s});
       }
     }
   end
@@ -1413,10 +1413,10 @@ class Array < `Array`
         return self.length === 0 ? nil : self[self.length - 1];
       }
 
-      count = $coerce_to(count, #{Integer}, 'to_int');
+      count = $coerce_to(count, #{::Integer}, 'to_int');
 
       if (count < 0) {
-        #{raise ArgumentError, 'negative array size'};
+        #{::Kernel.raise ::ArgumentError, 'negative array size'};
       }
 
       if (count > self.length) {
@@ -1470,7 +1470,7 @@ class Array < `Array`
         num = self.length;
       }
       else {
-        num = $coerce_to(num, #{Integer}, 'to_int');
+        num = $coerce_to(num, #{::Integer}, 'to_int');
       }
 
       if (num < 0 || self.length < num) {
@@ -1527,7 +1527,7 @@ class Array < `Array`
   end
 
   def repeated_permutation(n)
-    num = Opal.coerce_to! n, Integer, :to_int
+    num = ::Opal.coerce_to! n, ::Integer, :to_int
     return enum_for(:repeated_permutation, num) { num >= 0 ? size**num : 0 } unless block_given?
 
     %x{
@@ -1556,10 +1556,10 @@ class Array < `Array`
       return `self.pop()`
     end
 
-    count = `$coerce_to(count, #{Integer}, 'to_int')`
+    count = `$coerce_to(count, #{::Integer}, 'to_int')`
 
     if `count < 0`
-      raise ArgumentError, 'negative array size'
+      ::Kernel.raise ::ArgumentError, 'negative array size'
     end
 
     return [] if `self.length === 0`
@@ -1584,7 +1584,7 @@ class Array < `Array`
 
       arrays[0] = self;
       for (i = 1; i < n; i++) {
-        arrays[i] = $coerce_to(args[i - 1], #{Array}, 'to_ary');
+        arrays[i] = $coerce_to(args[i - 1], #{::Array}, 'to_ary');
       }
 
       for (i = 0; i < n; i++) {
@@ -1594,7 +1594,7 @@ class Array < `Array`
         }
         resultlen *= len;
         if (resultlen > 2147483647) {
-          #{raise RangeError, 'too big to product'}
+          #{::Kernel.raise ::RangeError, 'too big to product'}
         }
         lengths[i] = len;
         counters[i] = 0;
@@ -1680,10 +1680,10 @@ class Array < `Array`
   end
 
   def replace(other)
-    other = if Array === other
+    other = if ::Array === other
               other.to_a
             else
-              `$coerce_to(other, #{Array}, 'to_ary')`.to_a
+              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
             end
 
     %x{
@@ -1752,7 +1752,7 @@ class Array < `Array`
     %x{
       var ary, idx, firstPart, lastPart;
 
-      n = $coerce_to(n, #{Integer}, 'to_int')
+      n = $coerce_to(n, #{::Integer}, 'to_int')
 
       if (self.length === 1) {
         return self.slice();
@@ -1775,51 +1775,51 @@ class Array < `Array`
       if (self.length === 0 || self.length === 1) {
         return self;
       }
-      cnt = $coerce_to(cnt, #{Integer}, 'to_int');
+      cnt = $coerce_to(cnt, #{::Integer}, 'to_int');
     }
     ary = rotate(cnt)
     replace ary
   end
 
-  class SampleRandom
+  class self::SampleRandom
     def initialize(rng)
       @rng = rng
     end
 
     def rand(size)
-      random = `$coerce_to(#{@rng.rand(size)}, #{Integer}, 'to_int')`
-      raise RangeError, 'random value must be >= 0' if `random < 0`
-      raise RangeError, 'random value must be less than Array size' unless `random < size`
+      random = `$coerce_to(#{@rng.rand(size)}, #{::Integer}, 'to_int')`
+      ::Kernel.raise ::RangeError, 'random value must be >= 0' if `random < 0`
+      ::Kernel.raise ::RangeError, 'random value must be less than Array size' unless `random < size`
 
       random
     end
   end
 
   def sample(count = undefined, options = undefined)
-    return at Kernel.rand(`self.length`) if `count === undefined`
+    return at ::Kernel.rand(`self.length`) if `count === undefined`
 
     if `options === undefined`
-      if (o = Opal.coerce_to? count, Hash, :to_hash)
+      if (o = ::Opal.coerce_to? count, ::Hash, :to_hash)
         options = o
         count = nil
       else
         options = nil
-        count = `$coerce_to(count, #{Integer}, 'to_int')`
+        count = `$coerce_to(count, #{::Integer}, 'to_int')`
       end
     else
-      count = `$coerce_to(count, #{Integer}, 'to_int')`
-      options = `$coerce_to(options, #{Hash}, 'to_hash')`
+      count = `$coerce_to(count, #{::Integer}, 'to_int')`
+      options = `$coerce_to(options, #{::Hash}, 'to_hash')`
     end
 
     if count && `count < 0`
-      raise ArgumentError, 'count must be greater than 0'
+      ::Kernel.raise ::ArgumentError, 'count must be greater than 0'
     end
 
     rng = options[:random] if options
     rng = if rng && rng.respond_to?(:rand)
             SampleRandom.new rng
           else
-            Kernel
+            ::Kernel
           end
 
     return `self[#{rng.rand(`self.length`)}]` unless count
@@ -1945,10 +1945,10 @@ class Array < `Array`
       return `shiftNoArg(self)`
     end
 
-    count = `$coerce_to(count, #{Integer}, 'to_int')`
+    count = `$coerce_to(count, #{::Integer}, 'to_int')`
 
     if `count < 0`
-      raise ArgumentError, 'negative array size'
+      ::Kernel.raise ::ArgumentError, 'negative array size'
     end
 
     return [] if `self.length === 0`
@@ -1967,7 +1967,7 @@ class Array < `Array`
       var randgen, i = self.length, j, tmp;
 
       if (rng !== undefined) {
-        rng = #{Opal.coerce_to?(rng, Hash, :to_hash)};
+        rng = #{::Opal.coerce_to?(rng, ::Hash, :to_hash)};
 
         if (rng !== nil) {
           rng = #{rng[:random]};
@@ -1983,11 +1983,11 @@ class Array < `Array`
           j = randgen.$rand(i).$to_int();
 
           if (j < 0) {
-            #{raise RangeError, "random number too small #{`j`}"}
+            #{::Kernel.raise ::RangeError, "random number too small #{`j`}"}
           }
 
           if (j >= i) {
-            #{raise RangeError, "random number too big #{`j`}"}
+            #{::Kernel.raise ::RangeError, "random number too big #{`j`}"}
           }
         }
         else {
@@ -2009,12 +2009,12 @@ class Array < `Array`
     result = nil
 
     if `length === undefined`
-      if Range === index
+      if ::Range === index
         range = index
         result = self[range]
 
-        range_start = `$coerce_to(range.begin, #{Integer}, 'to_int')`
-        range_end = `$coerce_to(range.end, #{Integer}, 'to_int')`
+        range_start = `$coerce_to(range.begin, #{::Integer}, 'to_int')`
+        range_end = `$coerce_to(range.end, #{::Integer}, 'to_int')`
 
         %x{
           if (range_start < 0) {
@@ -2042,7 +2042,7 @@ class Array < `Array`
           }
         }
       else
-        start = `$coerce_to(index, #{Integer}, 'to_int')`
+        start = `$coerce_to(index, #{::Integer}, 'to_int')`
         %x{
           if (start < 0) {
             start += self.length;
@@ -2062,8 +2062,8 @@ class Array < `Array`
         }
       end
     else
-      start = `$coerce_to(index, #{Integer}, 'to_int')`
-      length = `$coerce_to(length, #{Integer}, 'to_int')`
+      start = `$coerce_to(index, #{::Integer}, 'to_int')`
+      length = `$coerce_to(length, #{::Integer}, 'to_int')`
 
       %x{
         if (length < 0) {
@@ -2104,7 +2104,7 @@ class Array < `Array`
         var ret = block(x, y);
 
         if (ret === nil) {
-          #{raise ArgumentError, "comparison of #{`x`.inspect} with #{`y`.inspect} failed"};
+          #{::Kernel.raise ::ArgumentError, "comparison of #{`x`.inspect} with #{`y`.inspect} failed"};
         }
 
         return #{`ret` > 0} ? 1 : (#{`ret` < 0} ? -1 : 0);
@@ -2141,7 +2141,7 @@ class Array < `Array`
   def take(count)
     %x{
       if (count < 0) {
-        #{raise ArgumentError};
+        #{::Kernel.raise ::ArgumentError};
       }
 
       return self.slice(0, count);
@@ -2191,12 +2191,12 @@ class Array < `Array`
       var i, len = array.length, ary, key, val, hash = #{{}};
 
       for (i = 0; i < len; i++) {
-        ary = #{Opal.coerce_to?(`array[i]`, Array, :to_ary)};
+        ary = #{::Opal.coerce_to?(`array[i]`, ::Array, :to_ary)};
         if (!ary.$$is_array) {
-          #{raise TypeError, "wrong element type #{`ary`.class} at #{`i`} (expected array)"}
+          #{::Kernel.raise ::TypeError, "wrong element type #{`ary`.class} at #{`i`} (expected array)"}
         }
         if (ary.length !== 2) {
-          #{raise ArgumentError, "wrong array length at #{`i`} (expected 2, was #{`ary`.length})"}
+          #{::Kernel.raise ::ArgumentError, "wrong array length at #{`i`} (expected 2, was #{`ary`.length})"}
         }
         key = ary[0];
         val = ary[1];
@@ -2216,16 +2216,16 @@ class Array < `Array`
     max    = nil
 
     each do |row|
-      row = if Array === row
+      row = if ::Array === row
               row.to_a
             else
-              `$coerce_to(row, #{Array}, 'to_ary')`.to_a
+              `$coerce_to(row, #{::Array}, 'to_ary')`.to_a
             end
 
       max ||= `row.length`
 
       if `row.length` != max
-        raise IndexError, "element size differs (#{`row.length`} should be #{max})"
+        ::Kernel.raise ::IndexError, "element size differs (#{`row.length`} should be #{max})"
       end
 
       `row.length`.times do |i|
@@ -2316,9 +2316,9 @@ class Array < `Array`
     out = []
 
     args.each do |elem|
-      if elem.is_a? Range
-        finish = `$coerce_to(#{elem.last}, #{Integer}, 'to_int')`
-        start = `$coerce_to(#{elem.first}, #{Integer}, 'to_int')`
+      if elem.is_a? ::Range
+        finish = `$coerce_to(#{elem.last}, #{::Integer}, 'to_int')`
+        start = `$coerce_to(#{elem.first}, #{::Integer}, 'to_int')`
 
         %x{
           if (start < 0) {
@@ -2341,7 +2341,7 @@ class Array < `Array`
 
         start.upto(finish) { |i| out << at(i) }
       else
-        i = `$coerce_to(elem, #{Integer}, 'to_int')`
+        i = `$coerce_to(elem, #{::Integer}, 'to_int')`
         out << at(i)
       end
     end
@@ -2363,8 +2363,8 @@ class Array < `Array`
           continue;
         }
         others[j] = #{(
-          Opal.coerce_to?(`o`, Array, :to_ary) ||
-          Opal.coerce_to!(`o`, Enumerator, :to_enum, :each)
+          ::Opal.coerce_to?(`o`, ::Array, :to_ary) ||
+          ::Opal.coerce_to!(`o`, ::Enumerator, :to_enum, :each)
         ).to_a};
       }
 
@@ -2408,10 +2408,10 @@ class Array < `Array`
     super.reject { |ivar| `/^@\d+$/.test(#{ivar})` || ivar == '@length' }
   end
 
-  Opal.pristine singleton_class, :allocate
-  Opal.pristine self, :copy_instance_variables, :initialize_dup
+  ::Opal.pristine singleton_class, :allocate
+  ::Opal.pristine self, :copy_instance_variables, :initialize_dup
 
   def pack(*args)
-    raise "To use Array#pack, you must first require 'corelib/array/pack'."
+    ::Kernel.raise "To use Array#pack, you must first require 'corelib/array/pack'."
   end
 end

@@ -1,4 +1,4 @@
-class Dir
+class ::Dir
   class << self
     def chdir(dir)
       prev_cwd = `Opal.current_dir`
@@ -14,7 +14,7 @@ class Dir
     alias getwd pwd
 
     def home
-      ENV['HOME'] || '.'
+      ::ENV['HOME'] || '.'
     end
   end
 end

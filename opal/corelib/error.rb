@@ -1,5 +1,5 @@
-class Exception < `Error`
-  `Opal.defineProperty(self.$$prototype, '$$is_exception', true)`
+class ::Exception < `Error`
+  `Opal.prop(self.$$prototype, '$$is_exception', true)`
   `var stack_trace_limit`
 
   def self.new(*args)
@@ -119,9 +119,19 @@ class Exception < `Error`
     to_s
   end
 
-  def full_message(highlight: $stderr.tty?, order: :top)
-    raise ArgumentError, "expected true or false as highlight: #{highlight}" unless [true, false].include? highlight
-    raise ArgumentError, "expected :top or :bottom as order: #{order}" unless %i[top bottom].include? order
+  def full_message(kwargs = nil)
+    unless defined? Hash
+      # We are dealing with an unfully loaded Opal library, so we should
+      # do with as little as we can.
+
+      return "#{@message}\n#{`self.stack`}"
+    end
+
+    kwargs = { highlight: $stderr.tty?, order: :top }.merge(kwargs || {})
+    highlight, order = kwargs[:highlight], kwargs[:order]
+
+    ::Kernel.raise ::ArgumentError, "expected true or false as highlight: #{highlight}" unless [true, false].include? highlight
+    ::Kernel.raise ::ArgumentError, "expected :top or :bottom as order: #{order}" unless %i[top bottom].include? order
 
     if highlight
       bold_underline = "\e[1;4m"
@@ -178,7 +188,7 @@ class Exception < `Error`
         }
 
         if (valid === false) {
-          #{raise TypeError, 'backtrace must be Array of String'}
+          #{::Kernel.raise ::TypeError, 'backtrace must be Array of String'}
         }
 
         self.backtrace = backtrace;
@@ -196,44 +206,44 @@ class Exception < `Error`
 end
 
 # keep the indentation, it makes the exception hierarchy clear
-class ScriptError       < Exception; end
-class SyntaxError         < ScriptError; end
-class LoadError           < ScriptError; end
-class NotImplementedError < ScriptError; end
+class ::ScriptError       < ::Exception; end
+class ::SyntaxError         < ::ScriptError; end
+class ::LoadError           < ::ScriptError; end
+class ::NotImplementedError < ::ScriptError; end
 
-class SystemExit        < Exception; end
-class NoMemoryError     < Exception; end
-class SignalException   < Exception; end
-class Interrupt           < SignalException; end
-class SecurityError     < Exception; end
-class SystemStackError  < Exception; end
+class ::SystemExit        < ::Exception; end
+class ::NoMemoryError     < ::Exception; end
+class ::SignalException   < ::Exception; end
+class ::Interrupt           < ::SignalException; end
+class ::SecurityError     < ::Exception; end
+class ::SystemStackError  < ::Exception; end
 
-class StandardError     < Exception; end
-class EncodingError       < StandardError; end
-class ZeroDivisionError   < StandardError; end
-class NameError           < StandardError; end
-class NoMethodError         < NameError; end
-class RuntimeError        < StandardError; end
-class FrozenError           < RuntimeError; end
-class LocalJumpError      < StandardError; end
-class TypeError           < StandardError; end
-class ArgumentError       < StandardError; end
-class UncaughtThrowError    < ArgumentError; end
-class IndexError          < StandardError; end
-class StopIteration         < IndexError; end
-class ClosedQueueError        < StopIteration; end
-class KeyError              < IndexError; end
-class RangeError          < StandardError; end
-class FloatDomainError      < RangeError; end
-class IOError             < StandardError; end
-class EOFError              < IOError; end
-class SystemCallError     < StandardError; end
-class RegexpError         < StandardError; end
-class ThreadError         < StandardError; end
-class FiberError          < StandardError; end
+class ::StandardError     < ::Exception; end
+class ::EncodingError       < ::StandardError; end
+class ::ZeroDivisionError   < ::StandardError; end
+class ::NameError           < ::StandardError; end
+class ::NoMethodError         < ::NameError; end
+class ::RuntimeError        < ::StandardError; end
+class ::FrozenError           < ::RuntimeError; end
+class ::LocalJumpError      < ::StandardError; end
+class ::TypeError           < ::StandardError; end
+class ::ArgumentError       < ::StandardError; end
+class ::UncaughtThrowError    < ::ArgumentError; end
+class ::IndexError          < ::StandardError; end
+class ::StopIteration         < ::IndexError; end
+class ::ClosedQueueError        < ::StopIteration; end
+class ::KeyError              < ::IndexError; end
+class ::RangeError          < ::StandardError; end
+class ::FloatDomainError      < ::RangeError; end
+class ::IOError             < ::StandardError; end
+class ::EOFError              < ::IOError; end
+class ::SystemCallError     < ::StandardError; end
+class ::RegexpError         < ::StandardError; end
+class ::ThreadError         < ::StandardError; end
+class ::FiberError          < ::StandardError; end
 
-module Errno
-  class EINVAL              < SystemCallError
+module ::Errno
+  class EINVAL              < ::SystemCallError
     def self.new(name = nil)
       message = 'Invalid argument'
       message += " - #{name}" if name
@@ -242,7 +252,7 @@ module Errno
   end
 end
 
-class UncaughtThrowError < ArgumentError
+class ::UncaughtThrowError < ::ArgumentError
   attr_reader :tag, :value
 
   def initialize(tag, value = nil)
@@ -253,7 +263,7 @@ class UncaughtThrowError < ArgumentError
   end
 end
 
-class NameError
+class ::NameError
   attr_reader :name
 
   def initialize(message, name = nil)
@@ -262,7 +272,7 @@ class NameError
   end
 end
 
-class NoMethodError
+class ::NoMethodError
   attr_reader :args
 
   def initialize(message, name = nil, args = [])
@@ -271,11 +281,11 @@ class NoMethodError
   end
 end
 
-class StopIteration
+class ::StopIteration
   attr_reader :result
 end
 
-class KeyError
+class ::KeyError
   def initialize(message, receiver: nil, key: nil)
     super(message)
     @receiver = receiver
@@ -283,15 +293,15 @@ class KeyError
   end
 
   def receiver
-    @receiver || raise(ArgumentError, 'no receiver is available')
+    @receiver || ::Kernel.raise(::ArgumentError, 'no receiver is available')
   end
 
   def key
-    @key || raise(ArgumentError, 'no key is available')
+    @key || ::Kernel.raise(::ArgumentError, 'no key is available')
   end
 end
 
-module JS
+module ::JS
   class Error
   end
 end

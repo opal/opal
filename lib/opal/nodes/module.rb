@@ -13,23 +13,32 @@ module Opal
         name, base = name_and_base
         helper :module
 
-        line "  var self = $module($base, '#{name}');"
-        in_scope do
-          scope.name = name
-          compile_body
-        end
-
-        if await_encountered
-          await_begin = '(await '
-          await_end = ')'
-          async = 'async '
-          parent.await_encountered = true
+        if body.nil?
+          # Simplified compile for empty body
+          if stmt?
+            unshift '$module(', base, ", '#{name}')"
+          else
+            unshift '($module(', base, ", '#{name}'), nil)"
+          end
         else
-          await_begin, await_end, async = '', '', ''
-        end
+          line "  var self = $module($base, '#{name}');"
+          in_scope do
+            scope.name = name
+            compile_body
+          end
 
-        unshift "#{await_begin}(#{async}function($base, $parent_nesting) {"
-        line '})(', base, ", $nesting)#{await_end}"
+          if await_encountered
+            await_begin = '(await '
+            await_end = ')'
+            async = 'async '
+            parent.await_encountered = true
+          else
+            await_begin, await_end, async = '', '', ''
+          end
+
+          unshift "#{await_begin}(#{async}function($base#{', $parent_nesting' if @define_nesting}) {"
+          line '})(', base, "#{', ' + scope.nesting if @define_nesting})#{await_end}"
+        end
       end
 
       private
@@ -39,17 +48,18 @@ module Opal
         base, name = cid.children
 
         if base.nil?
-          [name, '$nesting[0]']
+          [name, "#{scope.nesting}[0]"]
         else
           [name, expr(base)]
         end
       end
 
       def compile_body
-        add_temp '$nesting = [self].concat($parent_nesting)'
-
-        body_code = stmt(compiler.returns(body || s(:nil)))
+        body_code = stmt(compiler.returns(body))
         empty_line
+
+        add_temp "$nesting = [self].concat($parent_nesting)" if @define_nesting
+        add_temp '$$ = Opal.$r($nesting)' if @define_relative_access
 
         line scope.to_vars
         line body_code

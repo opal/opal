@@ -1,13 +1,13 @@
 # helpers: coerce_to
 
-class RegexpError < StandardError; end
+class ::RegexpError < ::StandardError; end
 
-class Regexp < `RegExp`
-  IGNORECASE = 1
-  EXTENDED = 2
-  MULTILINE = 4
+class ::Regexp < `RegExp`
+  self::IGNORECASE = 1
+  self::EXTENDED = 2
+  self::MULTILINE = 4
 
-  `Opal.defineProperty(self.$$prototype, '$$is_regexp', true)`
+  `Opal.prop(self.$$prototype, '$$is_regexp', true)`
 
   class << self
     def allocate
@@ -43,7 +43,7 @@ class Regexp < `RegExp`
         // cover the 2 arrays passed as arguments case
         is_first_part_array = parts[0].$$is_array;
         if (parts.length > 1 && is_first_part_array) {
-          #{raise TypeError, 'no implicit conversion of Array into String'}
+          #{::Kernel.raise ::TypeError, 'no implicit conversion of Array into String'}
         }
         // deal with splat issues (related to https://github.com/opal/opal/issues/858)
         if (is_first_part_array) {
@@ -59,7 +59,7 @@ class Regexp < `RegExp`
           else if (part.$$is_regexp) {
             each_part_options = #{`part`.options};
             if (options != undefined && options != each_part_options) {
-              #{raise TypeError, 'All expressions must use the same options'}
+              #{::Kernel.raise ::TypeError, 'All expressions must use the same options'}
             }
             options = each_part_options;
             quoted_validated.push('('+part.source+')');
@@ -79,10 +79,10 @@ class Regexp < `RegExp`
           return new RegExp(regexp);
         }
 
-        regexp = #{Opal.coerce_to!(regexp, String, :to_str)};
+        regexp = #{::Opal.coerce_to!(regexp, ::String, :to_str)};
 
         if (regexp.charAt(regexp.length - 1) === '\\' && regexp.charAt(regexp.length - 2) !== '\\') {
-          #{raise RegexpError, "too short escape sequence: /#{regexp}/"}
+          #{::Kernel.raise ::RegexpError, "too short escape sequence: /#{regexp}/"}
         }
 
         if (options === undefined || #{!options}) {
@@ -111,7 +111,7 @@ class Regexp < `RegExp`
   end
 
   def ===(string)
-    `#{match(Opal.coerce_to?(string, String, :to_str))} !== nil`
+    `#{match(::Opal.coerce_to?(string, ::String, :to_str))} !== nil`
   end
 
   def =~(string)
@@ -161,27 +161,27 @@ class Regexp < `RegExp`
   def match(string, pos = undefined, &block)
     %x{
       if (self.uninitialized) {
-        #{raise TypeError, 'uninitialized Regexp'}
+        #{::Kernel.raise ::TypeError, 'uninitialized Regexp'}
       }
 
       if (pos === undefined) {
         if (string === nil) return #{$~ = nil};
-        var m = self.exec($coerce_to(string, #{String}, 'to_str'));
+        var m = self.exec($coerce_to(string, #{::String}, 'to_str'));
         if (m) {
-          #{$~ = MatchData.new(`self`, `m`)};
+          #{$~ = ::MatchData.new(`self`, `m`)};
           return block === nil ? #{$~} : #{yield $~};
         } else {
           return #{$~ = nil};
         }
       }
 
-      pos = $coerce_to(pos, #{Integer}, 'to_int');
+      pos = $coerce_to(pos, #{::Integer}, 'to_int');
 
       if (string === nil) {
         return #{$~ = nil};
       }
 
-      string = $coerce_to(string, #{String}, 'to_str');
+      string = $coerce_to(string, #{::String}, 'to_str');
 
       if (pos < 0) {
         pos += string.length;
@@ -199,7 +199,7 @@ class Regexp < `RegExp`
           return #{$~ = nil};
         }
         if (md.index >= pos) {
-          #{$~ = MatchData.new(`re`, `md`)};
+          #{$~ = ::MatchData.new(`re`, `md`)};
           return block === nil ? #{$~} : #{yield $~};
         }
         re.lastIndex = md.index + 1;
@@ -210,20 +210,20 @@ class Regexp < `RegExp`
   def match?(string, pos = undefined)
     %x{
       if (self.uninitialized) {
-        #{raise TypeError, 'uninitialized Regexp'}
+        #{::Kernel.raise ::TypeError, 'uninitialized Regexp'}
       }
 
       if (pos === undefined) {
-        return string === nil ? false : self.test($coerce_to(string, #{String}, 'to_str'));
+        return string === nil ? false : self.test($coerce_to(string, #{::String}, 'to_str'));
       }
 
-      pos = $coerce_to(pos, #{Integer}, 'to_int');
+      pos = $coerce_to(pos, #{::Integer}, 'to_int');
 
       if (string === nil) {
         return false;
       }
 
-      string = $coerce_to(string, #{String}, 'to_str');
+      string = $coerce_to(string, #{::String}, 'to_str');
 
       if (pos < 0) {
         pos += string.length;
@@ -270,7 +270,7 @@ class Regexp < `RegExp`
     # Flags would be nice to use with this, but still experimental - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/flags
     %x{
       if (self.uninitialized) {
-        #{raise TypeError, 'uninitialized Regexp'}
+        #{::Kernel.raise ::TypeError, 'uninitialized Regexp'}
       }
       var result = 0;
       // should be supported in IE6 according to https://msdn.microsoft.com/en-us/library/7f5z26w4(v=vs.94).aspx
@@ -321,7 +321,7 @@ class MatchData
     %x{
       if (args[0].$$is_string) {
         if (#{!regexp.names.include?(args[0])}) {
-          #{raise IndexError, "undefined group name reference: #{args[0]}"}
+          #{::Kernel.raise ::IndexError, "undefined group name reference: #{args[0]}"}
         }
         return #{named_captures[args[0]]}
       }
@@ -334,14 +334,14 @@ class MatchData
   def offset(n)
     %x{
       if (n !== 0) {
-        #{raise ArgumentError, 'MatchData#offset only supports 0th element'}
+        #{::Kernel.raise ::ArgumentError, 'MatchData#offset only supports 0th element'}
       }
       return [self.begin, self.begin + self.matches[n].length];
     }
   end
 
   def ==(other)
-    return false unless MatchData === other
+    return false unless ::MatchData === other
 
     `self.string == other.string` &&
       `self.regexp.toString() == other.regexp.toString()` &&
@@ -355,7 +355,7 @@ class MatchData
   def begin(n)
     %x{
       if (n !== 0) {
-        #{raise ArgumentError, 'MatchData#begin only supports 0th element'}
+        #{::Kernel.raise ::ArgumentError, 'MatchData#begin only supports 0th element'}
       }
       return self.begin;
     }
@@ -364,7 +364,7 @@ class MatchData
   def end(n)
     %x{
       if (n !== 0) {
-        #{raise ArgumentError, 'MatchData#end only supports 0th element'}
+        #{::Kernel.raise ::ArgumentError, 'MatchData#end only supports 0th element'}
       }
       return self.begin + self.matches[n].length;
     }
@@ -432,7 +432,7 @@ class MatchData
           Array.prototype.splice.apply(args, a);
         }
 
-        index = #{Opal.coerce_to!(`args[i]`, Integer, :to_int)};
+        index = #{::Opal.coerce_to!(`args[i]`, ::Integer, :to_int)};
 
         if (index < 0) {
           index += #{@matches}.length;

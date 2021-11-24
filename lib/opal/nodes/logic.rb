@@ -104,7 +104,8 @@ module Opal
         if empty_splat?
           push '[]'
         else
-          push 'Opal.to_a(', recv(value), ')'
+          helper :to_a
+          push '$to_a(', recv(value), ')'
         end
       end
     end

@@ -88,11 +88,6 @@ module Opal
         @type == :top
       end
 
-      # Traverses to the top scope.
-      def top_scope
-        top? ? self : parent.top_scope
-      end
-
       # True if a block/iter scope
       def iter?
         @type == :iter
@@ -141,19 +136,21 @@ module Opal
           "if ($gvars#{gvar} == null) $gvars#{gvar} = nil;\n"
         end
 
+        if class? && !@proto_ivars.empty?
+          vars << '$proto = self.$$prototype'
+        end
+
         indent = @compiler.parser_indent
         str  = vars.empty? ? '' : "var #{vars.join ', '};\n"
         str += "#{indent}#{iv.join indent}" unless ivars.empty?
         str += "#{indent}#{gv.join indent}" unless gvars.empty?
 
         if class? && !@proto_ivars.empty?
-          pvars = @proto_ivars.map { |i| "self.$$prototype#{i}" }.join(' = ')
-          result = "#{str}\n#{indent}#{pvars} = nil;"
-        else
-          result = str
+          pvars = @proto_ivars.map { |i| "$proto#{i}" }.join(' = ')
+          str = "#{str}\n#{indent}#{pvars} = nil;"
         end
 
-        fragment(result)
+        fragment(str)
       end
 
       def add_scope_ivar(ivar)
@@ -251,10 +248,21 @@ module Opal
       def identify!(name = nil)
         return @identity if @identity
 
-        # Parent scope is the defining module/class
-        name ||= [(parent && (parent.name || parent.scope_name)), mid].compact.join('_')
-        @identity = @compiler.unique_temp(name)
-        @parent.add_scope_temp @identity if @parent
+        if valid_name? mid
+          # There are some special utf8 chars that can be used as valid JS
+          # identifiers, some examples:
+          #
+          # utf8_pond = 'ⵌ'
+          # utf8_question = 'ʔ̣'
+          # utf8_exclamation 'ǃ'
+          #
+          # For now we're just using $$, to maintain compatibility with older IEs.
+          @identity = "$$#{mid}"
+        else
+          # Parent scope is the defining module/class
+          name ||= [(parent && (parent.name || parent.scope_name)), mid].compact.join('_')
+          @identity = @compiler.unique_temp(name)
+        end
 
         @identity
       end
@@ -369,6 +377,36 @@ module Opal
         prev, curr = @refinements_temp, new_refinements_temp
         @refinements_temp = curr
         [prev, curr]
+      end
+
+      # Returns 'self', but also ensures that the self variable is set
+      def self
+        @define_self = true
+        'self'
+      end
+
+      # Returns '$nesting', but also ensures we compile the nesting chain
+      def nesting
+        @define_nesting = true
+        '$nesting'
+      end
+
+      # Returns '$$', but also ensures we compile it
+      def relative_access
+        @define_relative_access = @define_nesting = true
+        '$$'
+      end
+
+      def prepare_block(block_name = nil)
+        scope_name = scope.identity
+        self.block_name = block_name if block_name
+
+        add_temp "#{self.block_name} = #{scope_name}.$$p || nil"
+
+        unless @block_prepared
+          line "delete #{scope_name}.$$p;"
+          @block_prepared = true
+        end
       end
 
       attr_accessor :await_encountered

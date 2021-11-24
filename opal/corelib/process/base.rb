@@ -1,9 +1,9 @@
-class Signal
+class ::Signal
   def self.trap(*)
   end
 end
 
-class GC
+class ::GC
   def self.start
   end
 end

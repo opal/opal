@@ -1,5 +1,5 @@
-class Boolean < `Boolean`
-  `Opal.defineProperty(self.$$prototype, '$$is_boolean', true)`
+class ::Boolean < `Boolean`
+  `Opal.prop(self.$$prototype, '$$is_boolean', true)`
 
   %x{
     var properties = ['$$class', '$$meta'];
@@ -29,7 +29,7 @@ class Boolean < `Boolean`
 
   class << self
     def allocate
-      raise TypeError, "allocator undefined for #{name}"
+      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
     end
 
     undef :new
@@ -106,8 +106,8 @@ class Boolean < `Boolean`
   end
 end
 
-class TrueClass < Boolean; end
-class FalseClass < Boolean; end
+class ::TrueClass < ::Boolean; end
+class ::FalseClass < ::Boolean; end
 
-TRUE  = true
-FALSE = false
+::TRUE  = true
+::FALSE = false

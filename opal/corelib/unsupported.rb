@@ -4,7 +4,7 @@
   function handle_unsupported_feature(message) {
     switch (Opal.config.unsupported_features_severity) {
     case 'error':
-      #{Kernel.raise NotImplementedError, `message`}
+      #{::Kernel.raise ::NotImplementedError, `message`}
       break;
     case 'warning':
       warn(message)
@@ -24,103 +24,21 @@
   }
 }
 
-class String
+class ::String
   `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal."`
 
-  def <<(*)
-    raise NotImplementedError, `ERROR` % '<<'
-  end
-
-  def capitalize!(*)
-    raise NotImplementedError, `ERROR` % 'capitalize!'
-  end
-
-  def chomp!(*)
-    raise NotImplementedError, `ERROR` % 'chomp!'
-  end
-
-  def chop!(*)
-    raise NotImplementedError, `ERROR` % 'chop!'
-  end
-
-  def downcase!(*)
-    raise NotImplementedError, `ERROR` % 'downcase!'
-  end
-
-  def gsub!(*)
-    raise NotImplementedError, `ERROR` % 'gsub!'
-  end
-
-  def lstrip!(*)
-    raise NotImplementedError, `ERROR` % 'lstrip!'
-  end
-
-  def next!(*)
-    raise NotImplementedError, `ERROR` % 'next!'
-  end
-
-  def reverse!(*)
-    raise NotImplementedError, `ERROR` % 'reverse!'
-  end
-
-  def slice!(*)
-    raise NotImplementedError, `ERROR` % 'slice!'
-  end
-
-  def squeeze!(*)
-    raise NotImplementedError, `ERROR` % 'squeeze!'
-  end
-
-  def strip!(*)
-    raise NotImplementedError, `ERROR` % 'strip!'
-  end
-
-  def sub!(*)
-    raise NotImplementedError, `ERROR` % 'sub!'
-  end
-
-  def succ!(*)
-    raise NotImplementedError, `ERROR` % 'succ!'
-  end
-
-  def swapcase!(*)
-    raise NotImplementedError, `ERROR` % 'swapcase!'
-  end
-
-  def tr!(*)
-    raise NotImplementedError, `ERROR` % 'tr!'
-  end
-
-  def tr_s!(*)
-    raise NotImplementedError, `ERROR` % 'tr_s!'
-  end
-
-  def upcase!(*)
-    raise NotImplementedError, `ERROR` % 'upcase!'
-  end
-
-  def prepend(*)
-    raise NotImplementedError, `ERROR` % 'prepend'
-  end
-
-  def []=(*)
-    raise NotImplementedError, `ERROR` % '[]='
-  end
-
-  def clear(*)
-    raise NotImplementedError, `ERROR` % 'clear'
-  end
-
-  def encode!(*)
-    raise NotImplementedError, `ERROR` % 'encode!'
-  end
-
-  def unicode_normalize!(*)
-    raise NotImplementedError, `ERROR` % 'unicode_normalize!'
+  %i[
+    << capitalize! chomp! chop! downcase! gsub! lstrip! next! reverse!
+    slice! squeeze! strip! sub! succ! swapcase! tr! tr_s! upcase! prepend
+    []= clear encode! unicode_normalize!
+  ].each do |method_name|
+    define_method method_name do |*|
+      ::Kernel.raise ::NotImplementedError, `ERROR` % method_name
+    end
   end
 end
 
-module Kernel
+module ::Kernel
   `var ERROR = "Object freezing is not supported by Opal"`
 
   def freeze
@@ -134,7 +52,7 @@ module Kernel
   end
 end
 
-module Kernel
+module ::Kernel
   `var ERROR = "Object tainting is not supported by Opal"`
 
   def taint
@@ -153,7 +71,7 @@ module Kernel
   end
 end
 
-class Module
+class ::Module
   def public(*methods)
     %x{
       if (methods.length === 0) {
@@ -192,7 +110,7 @@ class Module
   alias public_method_defined? method_defined?
 end
 
-module Kernel
+module ::Kernel
   def private_methods(*)
     []
   end
@@ -200,10 +118,10 @@ module Kernel
   alias private_instance_methods private_methods
 end
 
-module Kernel
+module ::Kernel
   def eval(*)
-    raise NotImplementedError, "To use Kernel#eval, you must first require 'opal-parser'. "\
-                               "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
+    ::Kernel.raise ::NotImplementedError, "To use Kernel#eval, you must first require 'opal-parser'. "\
+                                          "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
   end
 end
 

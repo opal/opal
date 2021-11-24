@@ -1,4 +1,4 @@
-module Process
+module ::Process
   @__clocks__ = []
   def self.__register_clock__(name, func)
     const_set name, @__clocks__.size
@@ -34,12 +34,12 @@ module Process
   end
 
   def self.times
-    t = Time.now.to_f
-    Benchmark::Tms.new(t, t, t, t, t)
+    t = ::Time.now.to_f
+    ::Benchmark::Tms.new(t, t, t, t, t)
   end
 
   def self.clock_gettime(clock_id, unit = :float_second)
-    (clock = @__clocks__[clock_id]) || raise(Errno::EINVAL, "clock_gettime(#{clock_id}) #{@__clocks__[clock_id]}")
+    (clock = @__clocks__[clock_id]) || ::Kernel.raise(::Errno::EINVAL, "clock_gettime(#{clock_id}) #{@__clocks__[clock_id]}")
     %x{
       var ms = clock();
       switch (unit) {
@@ -50,7 +50,7 @@ module Process
         case 'millisecond':       return ((ms / 1)       | 0); // number of milliseconds as an integer
         case 'microsecond':       return ((ms * 1000)    | 0); // number of microseconds as an integer
         case 'nanosecond':        return ((ms * 1000000) | 0); // number of nanoseconds as an integer
-        default: #{raise ArgumentError, "unexpected unit: #{unit}"}
+        default: #{::Kernel.raise ::ArgumentError, "unexpected unit: #{unit}"}
       }
     }
   end
