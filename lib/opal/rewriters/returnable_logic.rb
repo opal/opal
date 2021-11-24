@@ -19,6 +19,14 @@ module Opal
         @counter = nil
       end
 
+      def on_if(node)
+        test, = *node.children
+        # The if_test metadata signifies that we don't care about the return value except if it's
+        # truthy or falsy. And those tests will be carried out by the respective $truthy helper calls.
+        test.meta[:if_test] = true if test
+        super
+      end
+
       def on_case(node)
         lhs, *whens, els = *node.children
         els ||= s(:nil)
@@ -29,22 +37,46 @@ module Opal
         out
       end
 
+      # `a || b` / `a or b`
       def on_or(node)
         lhs, rhs = *node.children
-        lhs_tmp = next_tmp
 
-        out = node.updated(:if, [s(:lvasgn, lhs_tmp, process(lhs)), s(:js_tmp, lhs_tmp), process(rhs)])
-        free_tmp
+        if node.meta[:if_test]
+          # Let's forward the if_test to the lhs and rhs - since we don't care about the exact return
+          # value of our or, we neither do care about a return value of our lhs or rhs.
+          lhs.meta[:if_test] = rhs.meta[:if_test] = true
+          out = process(node.updated(:if, [lhs, s(:true), rhs]))
+        else
+          lhs_tmp = next_tmp
+          out = process(node.updated(:if, [s(:lvasgn, lhs_tmp, lhs), s(:js_tmp, lhs_tmp), rhs]))
+          free_tmp
+        end
         out
       end
 
+      # `a && b` / `a and b`
       def on_and(node)
         lhs, rhs = *node.children
-        lhs_tmp = next_tmp
 
-        out = node.updated(:if, [s(:lvasgn, lhs_tmp, process(lhs)), process(rhs), s(:js_tmp, lhs_tmp)])
-        free_tmp
+        if node.meta[:if_test]
+          lhs.meta[:if_test] = rhs.meta[:if_test] = true
+          out = process(node.updated(:if, [lhs, rhs, s(:false)]))
+        else
+          lhs_tmp = next_tmp
+          out = process(node.updated(:if, [s(:lvasgn, lhs_tmp, lhs), rhs, s(:js_tmp, lhs_tmp)]))
+          free_tmp
+        end
         out
+      end
+
+      # Parser sometimes generates parentheses as a begin node. If it's a single node begin value, then
+      # let's forward the if_test metadata.
+      def on_begin(node)
+        if node.meta[:if_test] && node.children.count == 1
+          node.children.first.meta[:if_test] = true
+        end
+        node.meta.delete(:if_test)
+        super
       end
 
       private

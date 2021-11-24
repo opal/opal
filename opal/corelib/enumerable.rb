@@ -614,7 +614,7 @@ module ::Enumerable
       }
       else {
         if (sym === undefined) {
-          if (!#{Symbol === object}) {
+          if (!#{::Symbol === object}) {
             #{::Kernel.raise ::TypeError, "#{object.inspect} is not a Symbol"};
           }
 
