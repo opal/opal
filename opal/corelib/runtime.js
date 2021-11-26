@@ -2775,6 +2775,7 @@
   }
   generate_operator_helpers();
 
+  // Optimized helpers for calls like $truthy((a)['$==='](b)) -> $eqeqeq(a, b)
   Opal.eqeq = function(lhs, rhs) {
     if ((typeof lhs === 'number' && typeof rhs === 'number') ||
         (typeof lhs === 'string' && typeof rhs === 'string')) {
@@ -2789,6 +2790,20 @@
     }
     return $truthy((lhs)['$==='](rhs));
   };
+  Opal.neqeq = function(lhs, rhs) {
+    if ((typeof lhs === 'number' && typeof rhs === 'number') ||
+        (typeof lhs === 'string' && typeof rhs === 'string')) {
+      return lhs !== rhs;
+    }
+    return $truthy((lhs)['$!='](rhs));
+  };
+  Opal.not = function(arg) {
+    if (typeof arg === 'boolean') return !arg;
+    if (arg === nil || arg == null) return true;
+    return $truthy(arg['$!']());
+  }
+
+
 
   // Initialization
   // --------------

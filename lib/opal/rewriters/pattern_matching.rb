@@ -60,7 +60,7 @@ module Opal
       # raise NoMatchingPatternError, from
       def raise_no_matching_pattern_error(from)
         s(:send, nil, :raise,
-          s(:const, nil, :NoMatchingPatternError),
+          s(:const, s(:cbase), :NoMatchingPatternError),
           s(:lvar, from)
         )
       end

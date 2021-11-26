@@ -78,6 +78,17 @@ module Opal
               helper :eqeqeq
               compiler.method_calls << mid
               [fragment('$eqeqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
+            when :!=
+              helper :neqeq
+              compiler.method_calls << mid
+              [fragment('$neqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
+            end
+          elsif args.count == 0
+            case mid
+            when :!
+              helper :not
+              compiler.method_calls << mid
+              [fragment('$not('), expr(receiver), fragment(')')]
             end
           end
         when :begin
