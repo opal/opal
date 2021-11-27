@@ -176,7 +176,10 @@ class File < IO
   end
 
   def self.join(*paths)
-    `__path__.posix.join.apply(__path__, #{paths})`
+    # by itself, `path.posix.join` normalizes leading // to /.
+    # restore the leading / on UNC paths (i.e., paths starting with //).
+    prefix = paths.first&.start_with?('//') ? '/' : ''
+    `#{prefix} + __path__.posix.join.apply(__path__, #{paths})`
   end
 
   def self.directory?(path)
