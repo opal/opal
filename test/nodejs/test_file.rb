@@ -202,5 +202,16 @@ class TestNodejsFile < Test::Unit::TestCase
 
   def test_join
     assert_equal('usr/bin', File.join('usr', 'bin'))
+    assert_equal('//a/b', File.join('//a', 'b'))
+  end
+
+  def test_join_supports_any_number_of_arguments
+    assert_equal("a/b/c/d", File.join("a", "b", "c", "d"))
+  end
+
+  def test_join_handles_leading_parts_edge_cases
+    assert_equal("/bin", File.join("/bin"))
+    assert_equal("/bin", File.join("/", "bin"))
+    assert_equal("/bin", File.join("/", "/bin"))
   end
 end
