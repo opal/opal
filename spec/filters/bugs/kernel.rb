@@ -99,7 +99,6 @@ opal_filter "Kernel" do
   fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#kind_of? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#local_variables is accessible from bindings"
-  fails "Kernel#local_variables is accessible in eval"
   fails "Kernel#method can be called even if we only repond_to_missing? method, true"
   fails "Kernel#method returns a method object if respond_to_missing?(method) is true" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'
   fails "Kernel#method the returned method object if respond_to_missing?(method) calls #method_missing with a Symbol name" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'

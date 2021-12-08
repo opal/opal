@@ -292,8 +292,8 @@ end
 class MatchData
   attr_reader :post_match, :pre_match, :regexp, :string
 
-  def initialize(regexp, match_groups)
-    $~          = self
+  def initialize(regexp, match_groups, no_matchdata: false)
+    $~          = self unless no_matchdata
     @regexp     = regexp
     @begin      = `match_groups.index`
     @string     = `match_groups.input`

@@ -1002,7 +1002,7 @@ class ::String < `String`
       }
 
       while ((match = pattern.exec(self)) != null) {
-        match_data = #{::MatchData.new `pattern`, `match`};
+        match_data = #{::MatchData.new `pattern`, `match`, no_matchdata: no_matchdata};
         if (block === nil) {
           match.length == 1 ? result.push(match[0]) : result.push(#{`match_data`.captures});
         } else {

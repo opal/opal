@@ -215,11 +215,6 @@ opal_filter "language" do
   fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
   fails "Safe navigator allows assignment methods"
   fails "Struct#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: ArgumentError ([#deconstruct_keys] wrong number of arguments(0 for 1))  
-  fails "The =~ operator with named captures on syntax of 'string_literal' =~ /regexp/ does not set local variables" # Exception: named captures are not supported in javascript: "(?<matched>foo)(?<unmatched>bar)?"
-  fails "The =~ operator with named captures on syntax of /regexp/ =~ string_variable sets local variables by the captured pairs"
-  fails "The =~ operator with named captures on syntax of regexp_variable =~ string_variable does not set local variables"
-  fails "The =~ operator with named captures on syntax of string_variable =~ /regexp/ does not set local variables"
-  fails "The =~ operator with named captures on the method calling does not set local variables"
   fails "The BEGIN keyword accesses variables outside the eval scope"
   fails "The BEGIN keyword runs first in a given code unit"
   fails "The BEGIN keyword runs in a shared scope"
