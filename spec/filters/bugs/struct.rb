@@ -12,4 +12,6 @@ opal_filter "Struct" do
   fails "Struct.new keyword_init: true option raises when there is a duplicate member" # Expected ArgumentError (duplicate member: foo) but no exception was raised (#<Class:0x294> was returned)
   fails "Struct.new raises ArgumentError when there is a duplicate member" # Expected ArgumentError (duplicate member: foo) but no exception was raised (#<Class:0x256> was returned)
   fails "Struct.new raises a ArgumentError if passed a Hash with an unknown key" # Just like "def m(a: nil); end; m(b: nil)" doesn't raise an error. That's a bug in the handling of kwargs
+  fails_badly "Struct#hash returns different hashes for different struct classes" # A failure in Chromium that once passes, other times it doesn't, most probably related to some kind of undeterminism.
+  fails_badly "Struct#hash returns different hashes for structs with different values" # Ditto
 end
