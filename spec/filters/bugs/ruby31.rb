@@ -25,11 +25,6 @@ opal_filter "Ruby 3.1" do
   fails "MatchData#match_length returns nil on non-matching index matches" # NoMethodError: undefined method `match_length' for #<MatchData "1138" 1:nil>
   fails "MatchData#match_length returns the length of the corresponding match when given an Integer" # NoMethodError: undefined method `match_length' for #<MatchData "HX1138" 1:"H" 2:"X" 3:"113" 4:"8">
   fails "MatchData#match_length returns the length of the corresponding named match when given a Symbol" # NoMethodError: undefined method `match_length' for #<MatchData "tack" t:"tack" a:"ack">
-  fails "Module#module_function as a toggle (no arguments) in a Module body returns nil" # Expected #<Module:0xb5a4> to be identical to nil
-  fails "Module#module_function with specific method names returns argument or arguments if given" # Expected #<Module:0xb352> to be identical to "foo"
-  fails "Module#private returns argument or arguments if given" # Expected nil to be identical to "foo"
-  fails "Module#protected returns argument or arguments if given" # Expected nil to be identical to "foo"
-  fails "Module#public returns argument or arguments if given" # Expected nil to be identical to "foo"
   fails "Pattern matching warning when one-line form does not warn about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Range#step with exclusive end and Float values correctly handles values near the upper limit" # Expected 3 == 4 to be truthy but was false
   fails "String#lstrip! strips leading \\0" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.

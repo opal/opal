@@ -569,6 +569,7 @@ class ::Module
     %x{
       if (methods.length === 0) {
         self.$$module_function = true;
+        return nil;
       }
       else {
         for (var i = 0, length = methods.length; i < length; i++) {
@@ -578,6 +579,7 @@ class ::Module
 
           Opal.defs(self, id, func);
         }
+        return methods.length === 1 ? methods[0] : methods;
       }
 
       return self;

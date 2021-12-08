@@ -76,9 +76,9 @@ class ::Module
     %x{
       if (methods.length === 0) {
         self.$$module_function = false;
+        return nil;
       }
-
-      return nil;
+      return (methods.length === 1) ? methods[0] : methods;
     }
   end
 
