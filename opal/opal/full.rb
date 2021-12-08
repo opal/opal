@@ -1,4 +1,5 @@
 ::Object.autoload :Marshal, 'corelib/marshal'
+::Object.require 'corelib/string/mutable'
 ::Object.require 'corelib/string/unpack'
 ::Object.require 'corelib/array/pack'
 ::Object.autoload :ObjectSpace, 'corelib/object_space'

@@ -15,7 +15,6 @@ opal_filter "Binding" do
   fails "Binding#local_variable_defined? allows usage of an object responding to #to_str as the variable name" # Expected false == true to be truthy but was false
   fails "Binding#local_variable_defined? returns true when a local variable is defined using Binding#local_variable_set" # Expected false == true to be truthy but was false
   fails "Binding#local_variable_defined? returns true when a local variable is defined using eval()" # Expected false == true to be truthy but was false
-  fails "Binding#local_variable_get gets a local variable defined using eval()" # Exception: number is not defined
   fails "Binding#local_variable_set adds nonexistent variables to the binding's eval scope" # NoMethodError: undefined method `local_variables' for #<BindingSpecs::Demo:0x77602>
   fails "Binding#local_variable_set raises a NameError on global access" # Expected NameError but no exception was raised ("" was returned)
   fails "Binding#local_variable_set raises a NameError on special variable access" # Expected NameError but got: Exception (Unexpected token '~')

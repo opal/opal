@@ -159,6 +159,14 @@ module Opal
     # Enables JavaScript's strict mode (i.e., adds 'use strict'; statement)
     compiler_option :use_strict, default: false, as: :use_strict?, magic_comment: true
 
+    # @!method frozen_string_literal?
+    #
+    # Disabling this will cause Opal to return boxed Strings from String literals.
+    #
+    # In MRI this defaults to false, we want it to default to true to keep
+    # compatibility. Opal 2.0 may switch behavior.
+    compiler_option :frozen_string_literal, default: true, as: :frozen_string_literal?, magic_comment: true
+
     # @!method parse_comments?
     #
     # Adds comments for every method definition

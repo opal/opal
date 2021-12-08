@@ -181,6 +181,10 @@ module Opal
         options[:enable_source_location] = true
       end
 
+      on('--[no-]frozen-string-literal', 'Enables/disables default value for frozen string literals') do |value|
+        options[:frozen_string_literal] = value
+      end
+
       on('--use-strict', 'Enables JavaScript\'s strict mode (i.e., adds \'use strict\'; statement)') do
         options[:use_strict] = true
       end

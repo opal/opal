@@ -4,7 +4,6 @@ opal_filter "Hash" do
   fails "Hash#== computes equality for complex recursive hashes"
   fails "Hash#== computes equality for recursive hashes & arrays"
   fails "Hash#[] compares keys with eql? semantics" # spec relies on integer and float being different
-  fails "Hash#[] does not create copies of the immediate default value" # spec uses mutable string
   fails "Hash#[] does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#[]= does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#[]= keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"

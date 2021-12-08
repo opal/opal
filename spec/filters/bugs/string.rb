@@ -53,7 +53,6 @@ opal_filter "String" do
   fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding raises Encoding::CompatibilityError if neither are empty" # Expected Encoding::CompatibilityError but no exception was raised ("xy" was returned)
   fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding raises Encoding::CompatibilityError if neither are empty" # Expected Encoding::CompatibilityError but no exception was raised ("xy" was returned)
   fails "String#-@ returns the same object for equal unfrozen strings" # Expected "this is a string" not to be identical to "this is a string"
-  fails "String#<< when self is BINARY and argument is US-ASCII uses BINARY encoding" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#<< with Integer returns a BINARY string if self is US-ASCII and the argument is between 128-255 (inclusive)" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#<=> with String compares the indices of the encodings when the strings have identical non-ASCII-compatible bytes" # Expected 0 == -1 to be truthy but was false
   fails "String#== considers encoding compatibility" # Expected true to be false
@@ -87,7 +86,6 @@ opal_filter "String" do
   fails "String#chomp when passed no argument returns a copy of the String when it is not modified" # Expected "abc" not to be identical to "abc"
   fails "String#clone calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#clone copies singleton methods" # NoMethodError: undefined method `special' for "string"
-  fails "String#concat when self is BINARY and argument is US-ASCII uses BINARY encoding" # NoMethodError: undefined method `concat' for "abc"
   fails "String#concat with Integer returns a BINARY string if self is US-ASCII and the argument is between 128-255 (inclusive)" # NoMethodError: undefined method `concat' for ""
   fails "String#downcase ASCII-only case mapping does not downcase non-ASCII characters" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
   fails "String#downcase case folding case folds special characters" # ArgumentError: [String#downcase] wrong number of arguments(1 for 0)
@@ -230,10 +228,6 @@ opal_filter "String" do
   fails "String#undump undumps correctly string produced from non ASCII-compatible one" # NoMethodError: undefined method `dump' for "ࡶ"
   fails "String#unicode_normalize raises an Encoding::CompatibilityError if string is not in an unicode encoding" # ArgumentError: unknown encoding name - ISO-8859-1
   fails "String#unicode_normalized? raises an Encoding::CompatibilityError if the string is not in an unicode encoding" # ArgumentError: unknown encoding name - ISO-8859-1
-  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfc)" # Expected true to be false
-  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfd)" # Expected true to be false
-  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfkc)" # Expected true to be false
-  fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfkd)" # Expected true to be false
   fails "String#unpack with format 'm' when given count 0 raises an ArgumentError for an invalid base64 character" # Expected ArgumentError but no exception was raised (["test"] was returned)
   fails "String#unpack1 returns the first value of #unpack" # RuntimeError: Unsupported unpack directive "x" (no chunk reader defined)
   fails "String#unpack1 starts unpacking from the given offset" # RuntimeError: Unsupported unpack directive "x" (no chunk reader defined)
