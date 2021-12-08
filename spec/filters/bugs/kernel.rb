@@ -98,8 +98,6 @@ opal_filter "Kernel" do
   fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
   fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#kind_of? does not take into account `class` method overriding" # TypeError: can't define singleton
-  fails "Kernel#local_variables contains locals as they are added"
-  fails "Kernel#local_variables includes only unique variable names" # NoMethodError: undefined method `local_variables' for #<MSpecEnv:0x476>
   fails "Kernel#local_variables is accessible from bindings"
   fails "Kernel#local_variables is accessible in eval"
   fails "Kernel#method can be called even if we only repond_to_missing? method, true"
