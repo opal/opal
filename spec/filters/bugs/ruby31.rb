@@ -1,14 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Ruby 3.1" do
   fails "$LOAD_PATH.resolve_feature_path return nil if feature cannot be found" # NoMethodError: undefined method `resolve_feature_path' for ["foo"]
-  fails "Class#descendants does not return included modules" # NoMethodError: undefined method `descendants' for #<Class:0x4102c>
-  fails "Class#descendants does not return singleton classes" # NoMethodError: undefined method `descendants' for #<Class:0x41032>
-  fails "Class#descendants has 1 entry per module or class" # NoMethodError: undefined method `descendants' for ModuleSpecs::Parent
-  fails "Class#descendants returns a list of classes descended from self (excluding self)" # NoMethodError: undefined method `descendants' for ModuleSpecs::Parent
-  fails "Class#subclasses does not return included modules" # NoMethodError: undefined method `subclasses' for #<Class:0x25eae>
-  fails "Class#subclasses does not return singleton classes" # NoMethodError: undefined method `subclasses' for #<Class:0x25eb4>
-  fails "Class#subclasses has 1 entry per module or class" # NoMethodError: undefined method `subclasses' for ModuleSpecs::Parent
-  fails "Class#subclasses returns a list of classes directly inheriting from self" # NoMethodError: undefined method `subclasses' for ModuleSpecs::Parent
   fails "Enumerable#tally with a hash does not call given block" # ArgumentError: [Numerous#tally] wrong number of arguments(1 for 0)
   fails "Enumerable#tally with a hash ignores the default proc" # ArgumentError: [Numerous#tally] wrong number of arguments(1 for 0)
   fails "Enumerable#tally with a hash ignores the default value" # ArgumentError: [Numerous#tally] wrong number of arguments(1 for 0)
@@ -80,4 +72,6 @@ opal_filter "Ruby 3.1" do
   fails "kwarg with omitted value in a method call with methods and local variables for definition \n    def call(*args, **kwargs) = [args, kwargs]\n    def bar\n      \"baz\"\n    end\n    def foo(val)\n      call bar:, val:\n    end" # NameError: uninitialized constant SpecEvaluate::bar
   fails "main#private returns argument" # Expected nil to be identical to "main_public_method"
   fails "main#public returns argument" # Expected nil to be identical to "main_private_method"
+  fails_badly "Class#descendants returns a list of classes descended from self (excluding self)" # GC/Spec order issue. Expected [#<Class:0x2e77c>,  #<Class:0x2e79a>,  #<Class:0x37368>,  ModuleSpecs::Child,  ModuleSpecs::Child2,  ModuleSpecs::Grandchild] == [ModuleSpecs::Child, ModuleSpecs::Child2, ModuleSpecs::Grandchild] to be truthy but was false
+  fails_badly "Class#subclasses returns a list of classes directly inheriting from self" # GC/Spec order issue. Expected [#<Class:0x2e77c>,  #<Class:0x2e79a>,  #<Class:0x37368>,  ModuleSpecs::Child,  ModuleSpecs::Child2] == [ModuleSpecs::Child, ModuleSpecs::Child2] to be truthy but was false
 end

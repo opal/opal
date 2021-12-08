@@ -30,5 +30,6 @@ module.exports = {
     "globalThis": "readonly",
     "Uint8Array": "readonly",
     "Promise": "readonly",
+    "WeakRef": "readonly",
   }
 };

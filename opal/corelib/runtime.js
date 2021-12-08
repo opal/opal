@@ -528,13 +528,13 @@
   // use that as the scope instead.
   //
   // @param scope        [Object] where the class is being created
-  // @param superclass  [Class,null] superclass of the new class (may be null)
-  // @param id          [String] the name of the class to be created
-  // @param constructor [JS.Function] function to use as constructor
+  // @param superclass   [Class,null] superclass of the new class (may be null)
+  // @param singleton    [Boolean,null] a true value denotes we want to allocate
+  //                                    a singleton
   //
   // @return new [Class]  or existing ruby class
   //
-  Opal.allocate_class = function(name, superclass) {
+  Opal.allocate_class = function(name, superclass, singleton) {
     var klass, constructor;
 
     if (superclass != null && superclass.$$bridge) {
@@ -570,6 +570,7 @@
     $prop(klass, '$$own_prepended_modules', []);
     $prop(klass, '$$ancestors', []);
     $prop(klass, '$$ancestors_cache_version', null);
+    $prop(klass, '$$subclasses', []);
 
     $prop(klass.$$prototype, '$$class', klass);
 
@@ -583,6 +584,27 @@
 
     if (superclass != null) {
       $set_proto(klass.$$prototype, superclass.$$prototype);
+
+      if (singleton !== true) {
+        // Let's not forbid GC from cleaning up our
+        // subclasses.
+        if (typeof WeakRef !== 'undefined') {
+          // First, let's clean up our array from empty objects.
+          var i, subclass, rebuilt_subclasses = [];
+          for (i = 0; i < superclass.$$subclasses.length; i++) {
+            subclass = superclass.$$subclasses[i];
+            if (subclass.deref() !== undefined) {
+              rebuilt_subclasses.push(subclass);
+            }
+          }
+          // Now, let's add our class.
+          rebuilt_subclasses.push(new WeakRef(klass));
+          superclass.$$subclasses = rebuilt_subclasses;
+        }
+        else {
+          superclass.$$subclasses.push(klass);
+        }
+      }
 
       if (superclass.$$meta) {
         // If superclass has metaclass then we have explicitely inherit it.
@@ -816,7 +838,7 @@
     // fallback on `Class`.
     superclass = klass === BasicObject ? Class : Opal.get_singleton_class(klass.$$super);
 
-    meta = Opal.allocate_class(null, superclass, function(){});
+    meta = Opal.allocate_class(null, superclass, true);
 
     $prop(meta, '$$is_singleton', true);
     $prop(meta, '$$singleton_of', klass);
@@ -833,7 +855,7 @@
       return mod.$$meta;
     }
 
-    var meta = Opal.allocate_class(null, Opal.Module, function(){});
+    var meta = Opal.allocate_class(null, Opal.Module, true);
 
     $prop(meta, '$$is_singleton', true);
     $prop(meta, '$$singleton_of', mod);
@@ -851,7 +873,7 @@
   // @return [Class]
   Opal.build_object_singleton_class = function(object) {
     var superclass = object.$$class,
-        klass = Opal.allocate_class(nil, superclass, function(){});
+        klass = Opal.allocate_class(nil, superclass, true);
 
     $prop(klass, '$$is_singleton', true);
     $prop(klass, '$$singleton_of', object);
@@ -2799,15 +2821,10 @@
 
   // Initialization
   // --------------
-  function $BasicObject() {}
-  function $Object() {}
-  function $Module() {}
-  function $Class() {}
-
-  Opal.BasicObject = BasicObject = Opal.allocate_class('BasicObject', null, $BasicObject);
-  Opal.Object      = _Object     = Opal.allocate_class('Object', Opal.BasicObject, $Object);
-  Opal.Module      = Module      = Opal.allocate_class('Module', Opal.Object, $Module);
-  Opal.Class       = Class       = Opal.allocate_class('Class', Opal.Module, $Class);
+  Opal.BasicObject = BasicObject = Opal.allocate_class('BasicObject', null);
+  Opal.Object      = _Object     = Opal.allocate_class('Object', Opal.BasicObject);
+  Opal.Module      = Module      = Opal.allocate_class('Module', Opal.Object);
+  Opal.Class       = Class       = Opal.allocate_class('Class', Opal.Module);
   Opal.Opal        = _Opal       = Opal.allocate_module('Opal');
   Opal.Kernel      = Kernel      = Opal.allocate_module('Kernel');
 
@@ -2863,10 +2880,8 @@
     return Opal.send(_Object, 'define_method', args, block)
   };
 
-
   // Nil
-  function $NilClass() {}
-  Opal.NilClass = Opal.allocate_class('NilClass', Opal.Object, $NilClass);
+  Opal.NilClass = Opal.allocate_class('NilClass', Opal.Object);
   $const_set(_Object, 'NilClass', Opal.NilClass);
   nil = Opal.nil = new Opal.NilClass();
   nil.$$id = nil_id;
