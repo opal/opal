@@ -119,6 +119,10 @@ class ::Struct
     }
   end
 
+  def self.keyword_init?
+    `self.$$keyword_init`
+  end
+
   def members
     self.class.members
   end
