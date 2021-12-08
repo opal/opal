@@ -59,6 +59,7 @@ opal_filter "Range" do
   fails "Range#cover? range argument accepts range argument" # Expected false to be true
   fails "Range#cover? range argument honors exclusion of right boundary (:exclude_end option)" # Expected false to be true
   fails "Range#cover? range argument supports boundaries of different comparable types" # Expected false to be true
+  fails "Range#each raises a TypeError if the first element is a Time object even if it responds to #succ" # Expected TypeError but no exception was raised (1970-01-01 00:00:00 UTC..1970-01-01 00:00:01 UTC was returned)
   fails "Range#each raises a TypeError if the first element is a Time object" # Expected TypeError but no exception was raised (2021-01-02 22:49:45 +0100..2021-01-02 22:49:46 +0100 was returned)
   fails "Range#eql? returns false if the endpoints are not eql?" # Expected 0..1 not to have same value or type as 0..1
   fails "Range#first raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised ([2] was returned)
@@ -93,7 +94,9 @@ opal_filter "Range" do
   fails "Range#step when no block is given returned Enumerator size raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised (#<Enumerator: 1..2:step(#<MockObject:0x2d238>)> was returned)
   fails "Range#step when no block is given returned Enumerator size raises a TypeError if step does not respond to #to_int" # Expected TypeError but no exception was raised (#<Enumerator: 1..2:step(#<MockObject:0x2d214>)> was returned)
   fails "Range#step when no block is given returned Enumerator size returns the ceil of range size divided by the number of steps even if step is negative" # ArgumentError: step can't be negative
+  fails "Range#step when no block is given returned Enumerator type when begin is not defined and end is numeric returns an instance of Enumerator::ArithmeticSequence" # Expected Enumerator == Enumerator::ArithmeticSequence to be truthy but was false
   fails "Range#step when no block is given returned Enumerator type when both begin and end are numerics returns an instance of Enumerator::ArithmeticSequence" # Expected Enumerator == Enumerator::ArithmeticSequence to be truthy but was false
+  fails "Range#step when no block is given returned Enumerator type when range is endless returns an instance of Enumerator::ArithmeticSequence when begin is numeric" # Expected Enumerator == Enumerator::ArithmeticSequence to be truthy but was false
   fails "Range#step with an endless range and Float values yields Float values incremented by a Float step" # Expected [-1, 0] to have same value and type as [-1, -0.5, 0, 0.5]
   fails "Range#step with an endless range and Integer values yields Float values incremented by a Float step" # Expected [-2, 1] to have same value and type as [-2, -0.5, 1]
   fails "Range#step with exclusive end and String values raises a TypeError when passed a Float step" # Expected TypeError but no exception was raised ("A"..."G" was returned)

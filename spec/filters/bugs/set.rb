@@ -2,6 +2,8 @@
 opal_filter "Set" do
   fails "Set#& raises an ArgumentError when passed a non-Enumerable"
   fails "Set#& returns a new Set containing only elements shared by self and the passed Enumerable"
+  fails "Set#<=> returns +1 if the set is a proper superset of other set" # Expected nil == 1 to be truthy but was false
+  fails "Set#<=> returns -1 if the set is a proper subset of the other set" # Expected nil == -1 to be truthy but was false
   fails "Set#== does not depend on the order of nested Sets"
   fails "Set#== returns true when the passed Object is a Set and self and the Object contain the same elements"
   fails "Set#=== is an alias for include?" # Expected #<Method: Set#=== (defined in Kernel in corelib/kernel.rb:14)> to equal #<Method: Set#include? (defined in Set in set.rb:125)>
@@ -42,9 +44,15 @@ opal_filter "Set" do
   fails "Set#hash is static"
   fails "Set#initialize uses #each on the provided Enumerable if it does not respond to #each_entry" # ArgumentError: value must be enumerable
   fails "Set#initialize uses #each_entry on the provided Enumerable" # ArgumentError: value must be enumerable
+  fails "Set#initialize_clone does not freeze the new Set when called from clone(freeze: false)" # Expected false == true to be truthy but was false
   fails "Set#inspect correctly handles self-references"
   fails "Set#intersection raises an ArgumentError when passed a non-Enumerable"
   fails "Set#intersection returns a new Set containing only elements shared by self and the passed Enumerable"
+  fails "Set#join calls #to_a to convert the Set in to an Array" # NoMethodError: undefined method `join' for #<Set: {a,b,c}>
+  fails "Set#join does not separate elements when the passed separator is nil" # NoMethodError: undefined method `join' for #<Set: {a,b,c}>
+  fails "Set#join returns a new string formed by joining elements after conversion" # NoMethodError: undefined method `join' for #<Set: {a,b,c}>
+  fails "Set#join returns a string formed by concatenating each element separated by the separator" # NoMethodError: undefined method `join' for #<Set: {a,b,c}>
+  fails "Set#join returns an empty string if the Set is empty" # NoMethodError: undefined method `join' for #<Set: {}>
   fails "Set#merge raises an ArgumentError when passed a non-Enumerable"
   fails "Set#pretty_print passes the 'pretty print' representation of self to the pretty print writer"
   fails "Set#pretty_print_cycle passes the 'pretty print' representation of a self-referencing Set to the pretty print writer"

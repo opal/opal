@@ -8,6 +8,7 @@ opal_filter "Exception" do
   fails "Errno::EINVAL.new accepts an optional custom message" # NoMethodError: undefined method `errno' for #<Errno::EINVAL: Invalid argument - custom message>
   fails "Errno::EINVAL.new can be called with no arguments" # NoMethodError: undefined method `errno' for #<Errno::EINVAL: Invalid argument>
   fails "Errno::EMFILE can be subclassed" # NameError: uninitialized constant Errno::EMFILE
+  fails "Errno::ENOENT lets subclasses inherit the default error message" # Expected "uninitialized constant Errno::ENOENT" == "No such file or directory - custom message" to be truthy but was false
   fails "Errno::ENOTSUP is defined" # Expected Errno to have constant 'ENOTSUP' but it does not
   fails "Errno::ENOTSUP is the same class as Errno::EOPNOTSUPP if they represent the same errno value" # NameError: uninitialized constant Errno::ENOTSUP
   fails "Exception#== returns true if both exceptions have the same class, no message, and no backtrace" # Expected #<RuntimeError: RuntimeError> == #<RuntimeError: RuntimeError> to be truthy but was false

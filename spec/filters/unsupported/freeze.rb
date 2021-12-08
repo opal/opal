@@ -131,6 +131,17 @@ opal_unsupported_filter "freezing" do
   fails "Kernel#clone copies frozen? and tainted?" # Expected false to be true
   fails "Kernel#clone takes an freeze: true option to frozen copy" # Expected #<KernelSpecs::Duplicate:0x25158>.frozen? to be truthy but was false
   fails "Kernel#clone takes an option to copy freeze state or not" # TODO: move to unsupported/freeze
+  fails "Kernel#clone with freeze: anything else raises ArgumentError when passed not true/false/nil" # Expected ArgumentError (/unexpected value for freeze: Integer/) but no exception was raised (#<KernelSpecs::Duplicate:0x22130 @one=1 @two="a"> was returned)
+  fails "Kernel#clone with freeze: false calls #initialize_clone with kwargs freeze: false even if #initialize_clone only takes a single argument" # Expected ArgumentError (wrong number of arguments (given 2, expected 1)) but no exception was raised (#<KernelSpecs::Clone:0x220b2> was returned)
+  fails "Kernel#clone with freeze: false calls #initialize_clone with kwargs freeze: false" # Expected [#<KernelSpecs::CloneFreeze:0x220d0>, {}] == [#<KernelSpecs::CloneFreeze:0x220d0>, {"freeze"=>false}] to be truthy but was false
+  fails "Kernel#clone with freeze: nil copies frozen state from the original, like #clone without arguments" # Expected #<KernelSpecs::Duplicate:0x21fd4 @one=1 @two="a">.frozen? to be truthy but was false
+  fails "Kernel#clone with freeze: nil copies frozen?" # ArgumentError: [String#clone] wrong number of arguments(1 for 0)
+  fails "Kernel#clone with freeze: true calls #initialize_clone with kwargs freeze: true even if #initialize_clone only takes a single argument" # Expected ArgumentError (wrong number of arguments (given 2, expected 1)) but no exception was raised (#<KernelSpecs::Clone:0x21ffa> was returned)
+  fails "Kernel#clone with freeze: true calls #initialize_clone with kwargs freeze: true" # Expected [#<KernelSpecs::CloneFreeze:0x22050>, {}] == [#<KernelSpecs::CloneFreeze:0x22050>, {"freeze"=>true}] to be truthy but was false
+  fails "Kernel#clone with freeze: true freezes the copy even if the original was not frozen" # Expected #<KernelSpecs::Duplicate:0x2200c @one=1 @two="a">.frozen? to be truthy but was false
+  fails "Kernel#clone with freeze: true makes a frozen copy if the original is frozen" # Expected #<KernelSpecs::Duplicate:0x2202e @one=1 @two="a">.frozen? to be truthy but was false
+  fails "Kernel#clone with no arguments copies frozen state from the original" # Expected #<KernelSpecs::Duplicate:0x21faa @one=1 @two="a">.frozen? to be truthy but was false
+  fails "Kernel#clone with no arguments copies frozen?" # Expected false to be true
   fails "Kernel#extend on frozen instance raises a FrozenError" # Expected FrozenError but no exception was raised (main was returned)
   fails "Kernel#extend on frozen instance raises a RuntimeError"
   fails "Kernel#extend on frozen instance raises an ArgumentError when no arguments given"
@@ -153,11 +164,13 @@ opal_unsupported_filter "freezing" do
   fails "Kernel#frozen? on integers returns true"
   fails "Kernel#frozen? on true, false and nil returns true"
   fails "Kernel#frozen? returns true if self is frozen"
+  fails "Kernel#initialize_clone accepts a :freeze keyword argument for obj.clone(freeze: value)" # ArgumentError: [Object#initialize_clone] wrong number of arguments(2 for 1)
   fails "Kernel#instance_variable_set on frozen objects keeps stored object after any exceptions"
   fails "Kernel#instance_variable_set on frozen objects raises a FrozenError when passed replacement is different from stored object" # Expected FrozenError but no exception was raised ("replacement" was returned)
   fails "Kernel#instance_variable_set on frozen objects raises a FrozenError when passed replacement is identical to stored object" # Expected FrozenError but no exception was raised ("origin" was returned)
   fails "Kernel#instance_variable_set on frozen objects raises a RuntimeError when passed replacement is different from stored object"
   fails "Kernel#instance_variable_set on frozen objects raises a RuntimeError when passed replacement is identical to stored object"
+  fails "Literal Ranges is frozen" # Expected 42...frozen? to be truthy but was false
   fails "Literal Regexps is frozen" # Expected /Hello/.frozen? to be truthy but was false
   fails "MatchData#string returns a frozen copy of the match string"
   fails "Module#alias_method raises FrozenError if frozen" # Expected FrozenError but no exception was raised (#<Class:0x39d44> was returned)

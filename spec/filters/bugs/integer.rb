@@ -11,6 +11,7 @@ opal_filter "Integer" do
   fails "Integer#** fixnum raises a ZeroDivisionError for 0 ** -1" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
   fails "Integer#** fixnum returns Float::INFINITY when the number is too big" # Expected warning to match: /warning: in a\*\*b, b may be too big/ but got: ""
   fails "Integer#** fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
+  fails "Integer#+ can be redefined" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x31b0a @method="+" @object=nil>
   fails "Integer#/ fixnum coerces fixnum and return self divided by other" # Expected 1.0842021724855044e-19 to equal 0
   fails "Integer#/ fixnum raises a ZeroDivisionError if the given argument is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
   fails "Integer#/ fixnum returns result the same class as the argument" # Expected 1.5 to equal 1
@@ -70,6 +71,7 @@ opal_filter "Integer" do
   fails "Integer#round returns different rounded values depending on the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
   fails "Integer#round returns itself if passed a positive precision and the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
   fails "Integer#round returns itself rounded to nearest if passed a negative value" # Expected NaN to have same value and type as 300
+  fails "Integer#zero? Integer#zero? overrides Numeric#zero?" # Expected Number == Integer to be truthy but was false
   fails "Integer#| fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
   fails "Integer#| fixnum returns self bitwise OR other" # Expected 65535 to equal 9223372036854841000
   fails "Integer.sqrt returns the integer square root of the argument" # Number overflow, 10**400

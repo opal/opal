@@ -5,6 +5,14 @@ opal_filter "Array" do
   fails "Array#[] can accept beginless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#[] can accept endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#[] can accept nil...nil ranges" # TypeError: no implicit conversion of NilClass into Integer
+  fails "Array#[] can be sliced with Enumerator::ArithmeticSequence has beginless range and positive steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#[] can be sliced with Enumerator::ArithmeticSequence has closed range and negative steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#[] can be sliced with Enumerator::ArithmeticSequence has closed range and positive steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#[] can be sliced with Enumerator::ArithmeticSequence has endless range and negative steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#[] can be sliced with Enumerator::ArithmeticSequence has endless range and positive steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#[] can be sliced with Enumerator::ArithmeticSequence has endless range with start outside of array's bounds" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#[] can be sliced with Enumerator::ArithmeticSequence has inverted closed range and positive steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#[] can be sliced with Enumerator::ArithmeticSequence has range with bounds outside of array" # TypeError: no implicit conversion of Enumerator into Integer
   fails "Array#[] raises TypeError if to_int returns non-integer" # Expected TypeError but no exception was raised ([1, 2, 3, 4] was returned)
   fails "Array#[] raises a RangeError if passed a range with a bound that is too large" # Expected RangeError but no exception was raised (nil was returned)
   fails "Array#[] raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ([2, 3] was returned)
@@ -38,11 +46,20 @@ opal_filter "Array" do
   fails "Array#slice can accept beginless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#slice can accept endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#slice can accept nil...nil ranges" # TypeError: no implicit conversion of NilClass into Integer
+  fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has beginless range and positive steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has closed range and negative steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has closed range and positive steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has endless range and negative steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has endless range and positive steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has endless range with start outside of array's bounds" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has inverted closed range and positive steps" # TypeError: no implicit conversion of Enumerator into Integer
+  fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has range with bounds outside of array" # TypeError: no implicit conversion of Enumerator into Integer
   fails "Array#slice raises TypeError if to_int returns non-integer" # Expected TypeError but no exception was raised ([1, 2, 3, 4] was returned)
   fails "Array#slice raises a RangeError if passed a range with a bound that is too large" # Expected RangeError but no exception was raised (nil was returned)
   fails "Array#slice raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ([2, 3] was returned)
   fails "Array#slice! works with beginless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#slice! works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
+  fails "Array#sum uses Kahan's compensated summation algorithm for precise sum of float numbers" # Expected 50.00000000000001 == 50 to be truthy but was false
   fails "Array#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject at 0/) but got: TypeError (wrong element type NilClass at 0 (expected array))
   fails "Array#to_h with block raises TypeError if block returns something other than Array" # Expected TypeError (/wrong element type String at 0/) but got: TypeError (wrong element type NilClass at 0 (expected array))
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value

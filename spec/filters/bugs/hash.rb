@@ -38,6 +38,11 @@ opal_filter "Hash" do
   fails "Hash#to_s does not call #to_s on a String returned from #inspect" # Expected "{\"a\"=>\"abc\"}" to equal "{:a=>\"abc\"}"
   fails "Hash#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0x1b948>}" to match /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/
   fails "Hash#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
+  fails "Hash#transform_keys allows a combination of hash and block argument" # ArgumentError: [Hash#transform_keys] wrong number of arguments(1 for 0)
+  fails "Hash#transform_keys allows a hash argument" # ArgumentError: [Hash#transform_keys] wrong number of arguments(1 for 0)
+  fails "Hash#transform_keys allows a partial transformation of keys when using a hash argument" # ArgumentError: [Hash#transform_keys] wrong number of arguments(1 for 0)
+  fails "Hash#transform_keys! allows a hash argument" # ArgumentError: [Hash#transform_keys!] wrong number of arguments(1 for 0)
+  fails "Hash#transform_keys! on frozen instance raises a FrozenError on hash argument" # Expected FrozenError but got: ArgumentError ([Hash#transform_keys!] wrong number of arguments(1 for 0))
   fails "Hash#transform_keys! prevents conflicts between new keys and old ones" # Expected {"e"=>1} to equal {"b"=>1, "c"=>2, "d"=>3, "e"=>4}
   fails "Hash#transform_keys! returns the processed keys and non evaluated keys if we broke from the block" # Expected {"c"=>1, "d"=>4} == {"b"=>1, "c"=>2, "d"=>4} to be truthy but was false
   fails "Hash.[] raises for elements that are not arrays" # Expected ArgumentError but no exception was raised (nil was returned)

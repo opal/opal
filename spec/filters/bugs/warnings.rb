@@ -20,7 +20,4 @@ opal_filter "warnings" do
   fails "String#split with String when $; is not nil warns" # Expected warning to match: /warning: \$; is set to non-nil value/ but got: ""
   fails "Struct.new overwrites previously defined constants with string as first argument" # Expected warning to match: /redefining constant/
   fails "The for expression allows a constant as an iterator name" # Expected warning to match: /already initialized constant/
-  fails "The predefined global constants includes FALSE" # Expected warning to match: /constant ::FALSE is deprecated/
-  fails "The predefined global constants includes NIL" # Expected warning to match: /constant ::NIL is deprecated/
-  fails "The predefined global constants includes TRUE" # Expected warning to match: /constant ::TRUE is deprecated/
 end

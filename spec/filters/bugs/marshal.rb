@@ -44,8 +44,10 @@ opal_filter "Marshal" do
   fails "Marshal.load loads an array containing objects having _dump method, and with proc"
   fails "Marshal.load loads an array containing objects having marshal_dump method, and with proc"
   fails "Marshal.load when a class does not exist in the namespace raises an ArgumentError" # an issue with constant resolving, e.g. String::Array
+  fails "Marshal.load when called with a proc call the proc with fully initialized strings" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
   fails "Marshal.load when called with a proc calls the proc for recursively visited data"
   fails "Marshal.load when called with a proc loads an Array with proc"
+  fails "Marshal.load when called with a proc no longer mutate the object after it was passed to the proc" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
   fails "Marshal.load when called with a proc returns the value of the proc"
   fails "Marshal.load when called with nil for the proc argument behaves as if no proc argument was passed" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
 end

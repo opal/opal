@@ -158,6 +158,14 @@ opal_filter "Encoding" do
   fails "String#encode when passed options normalizes newlines" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode when passed options raises an Encoding::ConverterNotFoundError when no conversion is possible despite 'invalid: :replace, undef: :replace'" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode when passed options replaces invalid characters when replacing Emacs-Mule encoded strings" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode when passed options replaces invalid encoding in source using a specified replacement even when a fallback is given" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode when passed options replaces invalid encoding in source using replace even when fallback is given as proc" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode when passed options replaces invalid encoding in source with a specified replacement" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode when passed options replaces invalid encoding in source with default replacement" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode when passed options replaces undefined encoding in destination using a fallback proc" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode when passed options replaces undefined encoding in destination with a specified replacement even if a fallback is given" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode when passed options replaces undefined encoding in destination with a specified replacement" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#encode when passed options replaces undefined encoding in destination with default replacement" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode when passed options returns a copy when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode when passed options transcodes to Encoding.default_internal when set" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode when passed to encoding accepts a String argument" # NoMethodError: undefined method `default_internal' for Encoding

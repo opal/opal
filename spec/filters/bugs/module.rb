@@ -87,6 +87,7 @@ opal_filter "Module" do
   fails "Module#const_defined? returns true when passed a scoped constant name"
   fails "Module#const_get coerces the inherit flag to a boolean" # Expected NameError but no exception was raised ("const1" was returned)
   fails "Module#const_set sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
+  fails "Module#const_set when overwriting an existing constant does not warn after a failed autoload" # Expected NameError but got: LoadError (cannot load such file -- ruby/core/module/fixtures/autoload_o)
   fails "Module#const_set when overwriting an existing constant does not warn if the previous value was undefined" # Expected #<Module:0x48fd0> to have constant 'Foo' but it does not
   fails "Module#const_set when overwriting an existing constant warns if the previous value was a normal value" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Module#const_source_location accepts a String or Symbol name" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
@@ -138,6 +139,7 @@ opal_filter "Module" do
   fails "Module#deprecate_constant accepts multiple symbols and strings as constant names"
   fails "Module#deprecate_constant raises a NameError when given an undefined name"
   fails "Module#deprecate_constant returns self"
+  fails "Module#deprecate_constant when accessing the deprecated module does not warn if Warning[:deprecated] is false" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x133e6>
   fails "Module#deprecate_constant when accessing the deprecated module passes the accessing"
   fails "Module#deprecate_constant when accessing the deprecated module warns with a message"
   fails "Module#extend_object extends the given object with its constants and methods by default"
@@ -178,6 +180,7 @@ opal_filter "Module" do
   fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0x6c37a>] == [#<Module:0x6c38c>, #<Module:0x6c37a>] to be truthy but was false
   fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x7b0e0> to have private instance method 'test1' but it does not
   fails "Module#private with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x2f186> to have private instance method 'test1' but it does not
+  fails "Module#private_class_method when single argument is passed and is an array sets the visibility of the given methods to private" # Expected NoMethodError but no exception was raised ("foo" was returned)
   fails "Module#private_constant marked constants in a module raises a NameError when accessed directly from modules that include the module" # Expected NameError but no exception was raised (true was returned)
   fails "Module#private_constant marked constants sends #const_missing to the original class or module" # Expected true == "Foo" to be truthy but was false
   fails "Module#private_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)

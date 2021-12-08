@@ -3,6 +3,7 @@ opal_filter "language" do
   fails "$LOAD_PATH.resolve_feature_path raises LoadError if feature cannot be found" # Expected LoadError but got: NoMethodError (undefined method `resolve_feature_path' for ["foo"])
   fails "$LOAD_PATH.resolve_feature_path returns what will be loaded without actual loading, .rb file" # NoMethodError: undefined method `resolve_feature_path' for ["foo"]
   fails "$LOAD_PATH.resolve_feature_path returns what will be loaded without actual loading, .so file" # NoMethodError: undefined method `resolve_feature_path' for ["foo"]
+  fails "A Proc taking |*a, **kw| arguments does not autosplat keyword arguments" # Expected [[1], {"a"=>1}] == [[[1, {"a"=>1}]], {}] to be truthy but was false
   fails "A Symbol literal with invalid bytes raises an EncodingError at parse time" # Actually passes, the error comes from the difference between MRI's opal and compiled opal-parser
   fails "A block yielded a single Array assigns elements to mixed argument types" # Expected [1, 2, [], 3, 2, {"x"=>9}] == [1, 2, [3], {"x"=>9}, 2, {}] to be truthy but was false
   fails "A block yielded a single Array assigns elements to required arguments when a keyword rest argument is present"
@@ -74,6 +75,8 @@ opal_filter "language" do
   fails "A singleton class raises a TypeError for symbols"
   fails "A singleton method definition can be declared for a global variable"
   fails "A singleton method definition raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised ("foo" was returned)
+  fails "Accessing a class variable raises a RuntimeError when a class variable is overtaken in an ancestor class" # Expected RuntimeError (/class variable @@cvar_overtaken of .+ is overtaken by .+/) but no exception was raised ("subclass" was returned)
+  fails "Accessing a class variable raises a RuntimeError when accessed from the toplevel scope (not in some module or class)" # Expected RuntimeError (class variable access from toplevel) but got: NameError (uninitialized class variable @@cvar_toplevel1 in MSpecEnv)
   fails "Allowed characters allows non-ASCII lowercased characters at the beginning" # Expected nil == 1 to be truthy but was false
   fails "Allowed characters allows not ASCII upcased characters at the beginning" # NameError: wrong constant name ἍBB
   fails "Allowed characters does not allow non-ASCII upcased characters at the beginning" # Expected SyntaxError (/dynamic constant assignment/) but no exception was raised ("test" was returned)
@@ -122,6 +125,8 @@ opal_filter "language" do
   fails "Instantiating a singleton class raises a TypeError when allocate is called"
   fails "Instantiating a singleton class raises a TypeError when new is called"
   fails "Invoking a method expands the Array elements from the splat after executing the arguments and block if no other arguments follow the splat" # Expected [[1, nil], nil] to equal [[1], nil]
+  fails "Keyword arguments are now separated from positional arguments when the method takes a ** parameter does not convert a positional Hash to keyword arguments" # Expected ArgumentError (wrong number of arguments (given 4, expected 3)) but no exception was raised (42 was returned)
+  fails "Keyword arguments are now separated from positional arguments when the method takes a key: parameter when it's called with a positional Hash and no ** raises ArgumentError" # Expected ArgumentError (wrong number of arguments (given 4, expected 3)) but no exception was raised (42 was returned)
   fails "Literal (A::X) constant resolution uses the module or class #inspect to craft the error message if they are anonymous" # Expected NameError (/uninitialized constant <unusable info>::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50c0>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution uses the module or class #name to craft the error message" # Expected NameError (/uninitialized constant ModuleName::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50ba>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution with dynamically assigned constants evaluates the right hand side before evaluating a constant path"
@@ -217,6 +222,8 @@ opal_filter "language" do
   fails "Pattern matching variable pattern requires bound variable to be specified in a pattern before ^ operator when it relies on a bound variable" # Expected SyntaxError (/n: no such local variable/) but got: SyntaxError (no such local variable: `n')
   fails "Pattern matching variable pattern supports existing variables in a pattern specified with ^ operator" # SyntaxError: no such local variable: `a'
   fails "Pattern matching warning warns about pattern matching is experimental feature" # NameError: uninitialized constant Warning
+  fails "Pattern matching warning when one-line form warns about pattern matching is experimental feature" # NameError: uninitialized constant Warning
+  fails "Pattern matching warning when regular form does not warn about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Post-args with optional args with a circular argument reference shadows an existing local with the same name as the argument"
   fails "Post-args with optional args with a circular argument reference shadows an existing method with the same name as the argument"
   fails "Post-args with optional args with a circular argument reference warns and uses a nil value when there is an existing local variable with same name" # Expected warning to match: /circular argument reference/ but got: ""
@@ -296,10 +303,24 @@ opal_filter "language" do
   fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility"
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the class" # Expected "constant" to be nil
+  fails "The defined? keyword for a simple constant returns 'constant' when the constant is defined" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for an expression returns 'assignment' for assigning a local variable" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for literals for a literal Array returns 'expression' if each element is defined" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for literals returns 'false' for false" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for literals returns 'nil' for nil" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for literals returns 'self' for self" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for literals returns 'true' for true" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for super for a method taking no arguments returns 'super' when a superclass method exists" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for variables returns 'class variable' when called with the name of a class variable" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for variables returns 'global-variable' for a global variable that has been assigned nil" # Expected false == true to be truthy but was false
   fails "The defined? keyword for variables returns 'instance-variable' for an instance variable that has been assigned to nil"
+  fails "The defined? keyword for variables returns 'instance-variable' for an instance variable that has been assigned" # Expected false == true to be truthy but was false
+  fails "The defined? keyword for variables returns 'local-variable' when called with the name of a local variable" # Expected false == true to be truthy but was false
   fails "The defined? keyword for variables returns nil for a global variable that has been read but not assigned to"
   fails "The defined? keyword for variables when a Regexp matches a String returns nil for non-captures"
   fails "The defined? keyword for variables when a String matches a Regexp returns nil for non-captures"
+  fails "The defined? keyword for yield returns 'yield' if a block is passed to a method not taking a block parameter" # Expected false == true to be truthy but was false
+  fails "The defined? keyword when called with a method name without a receiver returns 'method' if the method is defined" # Expected false == true to be truthy but was false
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with exclusive-end range"
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with inclusive-end range"
   fails "The or operator has a lower precedence than 'next' in 'next true or false'"
@@ -327,6 +348,7 @@ opal_filter "language" do
   fails "The while expression stops running body if interrupted by break in a parenthesized element op-assign value"
   fails "The yield call taking a single argument yielding to a lambda should not destructure an Array into multiple arguments" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
+  fails "Using yield in a singleton class literal raises a SyntaxError" # Expected SyntaxError (/Invalid yield/) but got: SyntaxError (undefined method `uses_block!' for nil)
   fails "a method definition that sets more than one default parameter all to the same value only allows overriding the default value of the first such parameter in each set" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for -1)
   fails "a method definition that sets more than one default parameter all to the same value treats the argument after the multi-parameter normally" # ArgumentError: [MSpecEnv#bar] wrong number of arguments(3 for -1)
   fails "self in a metaclass body (class << obj) raises a TypeError for numbers"
