@@ -1915,7 +1915,7 @@
     return body.apply(recv, args);
   };
 
-  Opal.refined_send = function(refinement_groups, recv, method, args, block) {
+  Opal.refined_send = function(refinement_groups, recv, method, args, block, blockopts) {
     var i, j, k, ancestors, ancestor, refinements, refinement, refine_modules, refine_module, body;
 
     if (recv.hasOwnProperty('$$meta')) {
@@ -1923,6 +1923,8 @@
     } else {
       ancestors = Opal.ancestors(recv.$$class);
     }
+
+    apply_blockopts(block, blockopts);
 
     // For all ancestors that there are, starting from the closest to the furthest...
     for (i = 0; i < ancestors.length; i++) {
