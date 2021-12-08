@@ -131,6 +131,10 @@ module ::Enumerable
     map { |item| yield item }.flatten(1)
   end
 
+  def compact
+    to_a.compact
+  end
+
   def count(object = undefined, &block)
     result = 0
 
@@ -325,7 +329,7 @@ module ::Enumerable
 
       self.$each();
 
-      return nil;
+      return self;
     }
   end
 
@@ -378,7 +382,7 @@ module ::Enumerable
       }
     }
 
-    nil
+    self
   end
 
   def each_with_index(*args, &block)
@@ -1215,8 +1219,14 @@ module ::Enumerable
     hash.values
   end
 
-  def tally
-    group_by(&:itself).transform_values(&:count)
+  def tally(hash = undefined)
+    out = group_by(&:itself).transform_values(&:count)
+    if hash
+      out.each { |k, v| hash[k] = hash.fetch(k, 0) + v }
+      hash
+    else
+      out
+    end
   end
 
   def to_h(*args, &block)

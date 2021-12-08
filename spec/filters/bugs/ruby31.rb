@@ -1,13 +1,7 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Ruby 3.1" do
   fails "$LOAD_PATH.resolve_feature_path return nil if feature cannot be found" # NoMethodError: undefined method `resolve_feature_path' for ["foo"]
-  fails "Enumerable#tally with a hash does not call given block" # ArgumentError: [Numerous#tally] wrong number of arguments(1 for 0)
-  fails "Enumerable#tally with a hash ignores the default proc" # ArgumentError: [Numerous#tally] wrong number of arguments(1 for 0)
-  fails "Enumerable#tally with a hash ignores the default value" # ArgumentError: [Numerous#tally] wrong number of arguments(1 for 0)
-  fails "Enumerable#tally with a hash needs the values counting each elements to be an integer" # Expected TypeError but got: ArgumentError ([Numerous#tally] wrong number of arguments(1 for 0))
   fails "Enumerable#tally with a hash raises a FrozenError and does not update the given hash when the hash is frozen" # Expected FrozenError but got: ArgumentError ([Numerous#tally] wrong number of arguments(1 for 0))
-  fails "Enumerable#tally with a hash returns a hash with counts according to the value" # ArgumentError: [Numerous#tally] wrong number of arguments(1 for 0)
-  fails "Enumerable#tally with a hash returns the given hash" # ArgumentError: [Numerous#tally] wrong number of arguments(1 for 0)
   fails "File.dirname returns all the components of filename except the last parts by the level" # ArgumentError: [File.dirname] wrong number of arguments(2 for 1)
   fails "File.dirname returns the same string if the level is 0" # ArgumentError: [File.dirname] wrong number of arguments(2 for 1)
   fails "Hash literal checks duplicated float keys on initialization" # Expected warning to match: /key 1.0 is duplicated|duplicated key/ but got: ""
