@@ -108,6 +108,3 @@ end
 
 class ::TrueClass < ::Boolean; end
 class ::FalseClass < ::Boolean; end
-
-::TRUE  = true
-::FALSE = false
