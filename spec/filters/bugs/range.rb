@@ -59,7 +59,6 @@ opal_filter "Range" do
   fails "Range#cover? range argument accepts range argument" # Expected false to be true
   fails "Range#cover? range argument honors exclusion of right boundary (:exclude_end option)" # Expected false to be true
   fails "Range#cover? range argument supports boundaries of different comparable types" # Expected false to be true
-  fails "Range#each raises a TypeError if the first element is a Time object even if it responds to #succ" # Expected TypeError but no exception was raised (1970-01-01 00:00:00 UTC..1970-01-01 00:00:01 UTC was returned)
   fails "Range#eql? returns false if the endpoints are not eql?" # Expected 0..1 not to have same value or type as 0..1
   fails "Range#first raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised ([2] was returned)
   fails "Range#hash generates an Integer for the hash value" # Expected "A,1,1,0" (String) to be an instance of Integer

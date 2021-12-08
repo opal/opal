@@ -1,6 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "language" do
-  fails "$LOAD_PATH.resolve_feature_path raises LoadError if feature cannot be found" # Expected LoadError but got: NoMethodError (undefined method `resolve_feature_path' for ["foo"])
   fails "$LOAD_PATH.resolve_feature_path returns what will be loaded without actual loading, .rb file" # NoMethodError: undefined method `resolve_feature_path' for ["foo"]
   fails "$LOAD_PATH.resolve_feature_path returns what will be loaded without actual loading, .so file" # NoMethodError: undefined method `resolve_feature_path' for ["foo"]
   fails "A Proc taking |*a, **kw| arguments does not autosplat keyword arguments" # Expected [[1], {"a"=>1}] == [[[1, {"a"=>1}]], {}] to be truthy but was false
@@ -191,7 +190,6 @@ opal_filter "language" do
   fails "Pattern matching variable pattern does not support using variable name (except _) several times" # Expected SyntaxError (/duplicated variable name/) but got: SyntaxError (duplicate variable name a)
   fails "Pattern matching variable pattern requires bound variable to be specified in a pattern before ^ operator when it relies on a bound variable" # Expected SyntaxError (/n: no such local variable/) but got: SyntaxError (no such local variable: `n')
   fails "Pattern matching variable pattern supports existing variables in a pattern specified with ^ operator" # SyntaxError: no such local variable: `a'
-  fails "Pattern matching warning when one-line form warns about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Pattern matching warning when regular form does not warn about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Predefined global $+ captures the last non nil capture"
   fails "Predefined global $+ is equivalent to $~.captures.last"

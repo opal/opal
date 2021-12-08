@@ -158,10 +158,6 @@ opal_filter "Module" do
   fails "Module#refine module inclusion overrides methods of ancestors by methods in descendants" # NoMethodError: undefined method `to_json_format' for 5
   fails "Module#refine raises ArgumentError if not given a block" # Expected ArgumentError but got: LocalJumpError (no block given)
   fails "Module#refine raises TypeError if not passed a class" # Expected TypeError but no exception was raised (#<Module:0x1abe8> was returned)
-  fails "Module#refine when super is called in a refinement looks in the another active refinement if super called from included modules" # Expected ["B", "C"] == ["B", "A", "C"] to be truthy but was false
-  fails "Module#refine when super is called in a refinement looks in the current active refinement from included modules" # Expected ["B", "C"] == ["B", "A", "LAST", "C"] to be truthy but was false
-  fails "Module#refine when super is called in a refinement looks in the included to refinery module" # Expected "foo" == "foo from included module" to be truthy but was false
-  fails "Module#refine when super is called in a refinement looks in the lexical scope refinements before other active refinements" # Expected ["A", "C"] == ["A", "LOCAL", "C"] to be truthy but was false
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#ruby2_keywords acceps String as well" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40040>>
