@@ -315,6 +315,18 @@ class MatchData
     }
   end
 
+  def match(idx)
+    if (match = self[idx])
+      match
+    elsif idx.is_a?(Integer) && idx >= length
+      ::Kernel.raise ::IndexError, "index #{idx} out of matches"
+    end
+  end
+
+  def match_length(idx)
+    match(idx)&.length
+  end
+
   def [](*args)
     %x{
       if (args[0].$$is_string) {

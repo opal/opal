@@ -11,12 +11,6 @@ opal_filter "Ruby 3.1" do
   fails "File.dirname returns all the components of filename except the last parts by the level" # ArgumentError: [File.dirname] wrong number of arguments(2 for 1)
   fails "File.dirname returns the same string if the level is 0" # ArgumentError: [File.dirname] wrong number of arguments(2 for 1)
   fails "Hash literal checks duplicated float keys on initialization" # Expected warning to match: /key 1.0 is duplicated|duplicated key/ but got: ""
-  fails "MatchData#match returns nil on non-matching index matches" # NoMethodError: undefined method `match' for #<MatchData "1138" 1:nil>
-  fails "MatchData#match returns the corresponding match when given an Integer" # NoMethodError: undefined method `match' for #<MatchData "HX1138" 1:"H" 2:"X" 3:"113" 4:"8">
-  fails "MatchData#match returns the corresponding named match when given a Symbol" # NoMethodError: undefined method `match' for #<MatchData "tack" t:"tack" a:"ack">
-  fails "MatchData#match_length returns nil on non-matching index matches" # NoMethodError: undefined method `match_length' for #<MatchData "1138" 1:nil>
-  fails "MatchData#match_length returns the length of the corresponding match when given an Integer" # NoMethodError: undefined method `match_length' for #<MatchData "HX1138" 1:"H" 2:"X" 3:"113" 4:"8">
-  fails "MatchData#match_length returns the length of the corresponding named match when given a Symbol" # NoMethodError: undefined method `match_length' for #<MatchData "tack" t:"tack" a:"ack">
   fails "Pattern matching warning when one-line form does not warn about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Range#step with exclusive end and Float values correctly handles values near the upper limit" # Expected 3 == 4 to be truthy but was false
   fails "String#lstrip! strips leading \\0" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.
