@@ -58,17 +58,5 @@ def opal_unsupported_filter(filter_name, &block)
   Opal::Rubyspec::FiltersRewriter.instance_eval(&block)
 end
 
-# In the test environment we have to parse invalid characters
-# Otherwise the parser throws an error and the whole suites aborts
-class Opal::AST::Builder
-  def string_value(token)
-    unless token[0].valid_encoding?
-      diagnostic(:warning, :invalid_encoding, nil, token[1])
-    end
-
-    token[0]
-  end
-end
-
 Dir[File.expand_path('../../../spec/filters/unsupported/**/*.rb', __FILE__)].each { |f| require f }
 Dir[File.expand_path('../../../spec/filters/bugs/**/*.rb', __FILE__)].each { |f| require f }
