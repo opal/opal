@@ -19,15 +19,6 @@ opal_filter "Ruby 3.1" do
   fails "File.dirname returns all the components of filename except the last parts by the level" # ArgumentError: [File.dirname] wrong number of arguments(2 for 1)
   fails "File.dirname returns the same string if the level is 0" # ArgumentError: [File.dirname] wrong number of arguments(2 for 1)
   fails "Hash literal checks duplicated float keys on initialization" # Expected warning to match: /key 1.0 is duplicated|duplicated key/ but got: ""
-  fails "Marshal.load when called with freeze: true does not freeze classes" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
-  fails "Marshal.load when called with freeze: true does not freeze modules" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
-  fails "Marshal.load when called with freeze: true returns frozen arrays" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
-  fails "Marshal.load when called with freeze: true returns frozen hashes" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
-  fails "Marshal.load when called with freeze: true returns frozen objects" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
-  fails "Marshal.load when called with freeze: true returns frozen regexps" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
-  fails "Marshal.load when called with freeze: true returns frozen strings" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
-  fails "Marshal.load when called with freeze: true when called with a proc call the proc with frozen objects" # ArgumentError: [Marshal.load] wrong number of arguments(3 for 1)
-  fails "Marshal.load when called with freeze: true when called with a proc does not freeze the object returned by the proc" # ArgumentError: [Marshal.load] wrong number of arguments(3 for 1)
   fails "MatchData#match returns nil on non-matching index matches" # NoMethodError: undefined method `match' for #<MatchData "1138" 1:nil>
   fails "MatchData#match returns the corresponding match when given an Integer" # NoMethodError: undefined method `match' for #<MatchData "HX1138" 1:"H" 2:"X" 3:"113" 4:"8">
   fails "MatchData#match returns the corresponding named match when given a Symbol" # NoMethodError: undefined method `match' for #<MatchData "tack" t:"tack" a:"ack">
