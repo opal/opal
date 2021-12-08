@@ -37,15 +37,12 @@ opal_filter "Kernel" do
   fails "Kernel#String calls #to_s if #respond_to?(:to_s) returns true" # TypeError: no implicit conversion of MockObject into String
   fails "Kernel#String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true"
   fails "Kernel#__dir__ returns the expanded path of the directory when used in the main script" # NoMethodError: undefined method `insert' for "rubyexe.rb"
-  fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file"
-  fails "Kernel#__dir__ when used in eval with a given filename returns File.dirname(filename)" # ArgumentError: [MSpecEnv#eval] wrong number of arguments(3 for 1)
   fails "Kernel#__dir__ when used in eval with top level binding returns nil" # NoMethodError: undefined method `binding' for #<MSpecEnv:0x5b3aa>
   fails "Kernel#__dir__ when used in eval with top level binding returns the real name of the directory containing the currently-executing file"
   fails "Kernel#autoload calls main.require(path) to load the file" # NameError: uninitialized constant TOPLEVEL_BINDING
   fails "Kernel#autoload can autoload in instance_eval" # NameError: uninitialized constant KSAutoloadD
   fails "Kernel#autoload inside a Class.new method body should define on the new anonymous class" # NoMethodError: undefined method `autoload?' for #<#<Class:0x61d4a>:0x61d48>
   fails "Kernel#autoload is a private method" # Expected Kernel to have private instance method 'autoload' but it does not
-  fails "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x5b168>
   fails "Kernel#autoload when Object is frozen raises a FrozenError before defining the constant" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x7849c>
   fails "Kernel#autoload when called from included module's method setups the autoload on the included module" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethod
   fails "Kernel#autoload when called from included module's method the autoload is reachable from the class too" # NoMethodError: undefined method `autoload?' for KernelSpecs::AutoloadMethodIncluder
@@ -136,7 +133,6 @@ opal_filter "Kernel" do
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors"
   fails "Kernel#public_send includes `public_send` in the backtrace when passed a single incorrect argument" # Expected TypeError but got: NoMethodError (undefined method `#<Object:0x3da7a>' for #<MSpecEnv:0x3d9f4>)
   fails "Kernel#public_send includes `public_send` in the backtrace when passed not enough arguments" # Expected "ArgumentError: [MSpecEnv#__send__] wrong number of arguments(0 for -2)".include? "`public_send'" to be truthy but was false
-  fails "Kernel#public_send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#puts delegates to $stdout.puts"
   fails "Kernel#raise accepts a cause keyword argument that overrides the last exception" # NoMethodError: undefined method `cause' for #<RuntimeError: error>
   fails "Kernel#raise accepts a cause keyword argument that sets the cause" # NoMethodError: undefined method `cause' for #<RuntimeError: error>
@@ -146,7 +142,6 @@ opal_filter "Kernel" do
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"
   fails "Kernel#respond_to_missing? causes #respond_to? to return true if called and not returning false"
-  fails "Kernel#send raises a TypeError if the method name is not a string or symbol" # NoMethodError: undefined method `' for SendSpecs
   fails "Kernel#singleton_class raises TypeError for Fixnum"
   fails "Kernel#singleton_class raises TypeError for Integer" # Expected TypeError but no exception was raised (#<Class:#<Number:0xf7>> was returned)
   fails "Kernel#singleton_class raises TypeError for Symbol"
@@ -401,4 +396,5 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "Kernel.sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel.srand returns the previous seed value on the first call" # NoMethodError: undefined method `insert' for "rubyexe.rb"
+  fails_badly "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x5b168>
 end

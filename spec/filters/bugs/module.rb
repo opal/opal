@@ -99,13 +99,7 @@ opal_filter "Module" do
   fails "Module#const_source_location does not search the containing scope" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location does not search the singleton class of a Class or Module" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location does search private constants path" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location raises a NameError if a Symbol has a toplevel scope qualifier" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location raises a NameError if a Symbol is a scoped constant name" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location raises a NameError if only '::' is passed" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location raises a NameError if the name contains non-alphabetic characters except '_'" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location raises a NameError if the name does not start with a capital letter" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location raises a NameError if the name includes two successive scope separators" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location raises a NameError if the name starts with a non-alphabetic character" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location raises a TypeError if conversion to a String by calling #to_str fails" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location return empty path if constant defined in C code" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location returns nil if no constant is defined in the search path" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
@@ -199,11 +193,8 @@ opal_filter "Module" do
   fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `foo' for "hello"
   fails "Module#refine does not override methods in subclasses" # Expected "foo from refinement" == "foo from subclass" to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by BasicObject#__send__" # Expected "foo" == "foo from refinement" to be truthy but was false
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NameError: undefined method `foo' for class `'
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#method" # NameError: undefined method `foo' for class `#<Class:0x6854>'
   fails "Module#refine for methods accessed indirectly is honored by Kernel#public_method" # NoMethodError: undefined method `public_method' for #<#<Class:0x1b194>:0x1b196>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#public_send" # Expected "foo" == "foo from refinement" to be truthy but was false
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#respond_to?" # Expected false == true to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # Expected "foo" == "foo from refinement" to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc"
   fails "Module#refine for methods accessed indirectly is honored by string interpolation"
@@ -247,4 +238,7 @@ opal_filter "Module" do
   fails "Module#using scope of refinement is active for class defined via Class.new {}" # NoMethodError: undefined method `foo' for 1
   fails "Module#using scope of refinement is active for module defined via Module.new {}" # NoMethodError: undefined method `foo' for 1
   fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1
+  fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NameError: undefined method `foo' for class `'
+  fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#method" # NameError: undefined method `foo' for class `#<Class:0x581e4>'
+  fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#respond_to?" # Expected false == true to be truthy but was false
 end

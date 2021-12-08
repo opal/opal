@@ -198,7 +198,6 @@ opal_filter "String" do
   fails "String#rjust with length, padding returns String instances when called on subclasses" # Expected "          " (StringSpecs::MyString) to be an instance of String
   fails "String#rpartition with String returns String instances when called on a subclass" # Expected "hello" (StringSpecs::MyString) to be an instance of String
   fails "String#rpartition with String returns new object if doesn't match" # Expected "hello".equal? "hello" to be falsy but was true
-  fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
   fails "String#size adds 1 (and not 2) for a incomplete surrogate in UTF-16" # Expected 2 == 1 to be truthy but was false
   fails "String#size adds 1 for a broken sequence in UTF-32" # Expected 4 == 1 to be truthy but was false
   fails "String#size returns the correct length after force_encoding(BINARY)" # Expected 2 == 4 to be truthy but was false

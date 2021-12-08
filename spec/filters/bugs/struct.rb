@@ -1,9 +1,7 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Struct" do
   fails "Struct#dig returns the value by the index" # Expected nil == "one" to be truthy but was false
-  fails "Struct#hash returns different hashes for different struct classes" # Expected "Hash" != "Hash" to be truthy but was false
   fails "Struct#hash returns different hashes for structs with different values when using keyword_init: true" # NameError: wrong constant name 1 non symbol member
-  fails "Struct#hash returns different hashes for structs with different values" # Expected "Hash" == "Hash" to be falsy but was true
   fails "Struct#hash returns the same fixnum for structs with the same content"
   fails "Struct#hash returns the same integer for structs with the same content" # Expected "Hash" (String) to be kind of Integer
   fails "Struct#to_h with block coerces returned pair to Array with #to_ary" # Expected {"make"=>nil, "model"=>nil, "year"=>nil} == {"b"=>"b"} to be truthy but was false
