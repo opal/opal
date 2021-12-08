@@ -10,11 +10,9 @@ opal_filter "Enumerator" do
   fails "Enumerator#feed sets the future return value of yield if called before advancing the iterator"
   fails "Enumerator#feed sets the return value of Yielder#yield"
   fails "Enumerator#initialize returns self when given a block"
-  fails "Enumerator#initialize returns self when given an object"
   fails "Enumerator#initialize sets size to nil if size is not given"
   fails "Enumerator#initialize sets size to nil if the given size is nil"
   fails "Enumerator#initialize sets size to the given size if the given size is Float::INFINITY"
-  fails "Enumerator#initialize sets size to the given size if the given size is a Fixnum"
   fails "Enumerator#initialize sets size to the given size if the given size is a Proc"
   fails "Enumerator#initialize sets size to the given size if the given size is an Integer" # Expected 4 == 100 to be truthy but was false
   fails "Enumerator#next restarts the enumerator if an exception terminated a previous iteration" # Expected [#<NoMethodError: undefined method `next' for #<Enumerator: #<Enumerator::Generator:0x4f2>:each>>,  #<NoMethodError: undefined method `next' for #<Enumerator: #<Enumerator::Generator:0x4f2>:each>>] == [#<StandardError: StandardError>, #<StandardError: StandardError>] to be truthy but was false

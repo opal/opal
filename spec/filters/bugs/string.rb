@@ -53,9 +53,6 @@ opal_filter "String" do
   fails "String#+ when self and the argument are in different ASCII-compatible encodings uses the argument's encoding if self is ASCII-only" # Expected #<Encoding:UTF-8> == #<Encoding:ISO-8859-1> to be truthy but was false
   fails "String#+ when self is in an ASCII-incompatible encoding incompatible with the argument's encoding raises Encoding::CompatibilityError if neither are empty" # Expected Encoding::CompatibilityError but no exception was raised ("xy" was returned)
   fails "String#+ when the argument is in an ASCII-incompatible encoding incompatible with self's encoding raises Encoding::CompatibilityError if neither are empty" # Expected Encoding::CompatibilityError but no exception was raised ("xy" was returned)
-  fails "String#-@ does not deduplicate already frozen strings" # Expected "this string is frozen" not to be identical to "this string is frozen"
-  fails "String#-@ does not deduplicate strings with additional instance variables" # NoMethodError: undefined method `-@' for "this string is frozen"
-  fails "String#-@ does not deduplicate tainted strings" # NoMethodError: undefined method `-@' for "this string is frozen"
   fails "String#-@ returns the same object for equal unfrozen strings" # Expected "this is a string" not to be identical to "this is a string"
   fails "String#<< when self is BINARY and argument is US-ASCII uses BINARY encoding" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#<< with Integer returns a BINARY string if self is US-ASCII and the argument is between 128-255 (inclusive)" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
@@ -124,9 +121,7 @@ opal_filter "String" do
   fails "String#dump returns a string with # not escaped when followed by any other character" # NoMethodError: undefined method `dump' for "#"
   fails "String#dump returns a string with \" and \\ escaped with a backslash" # NoMethodError: undefined method `dump' for "\""
   fails "String#dump returns a string with \\#<char> when # is followed by $, @, @@, {" # NoMethodError: undefined method `dump' for "\#$PATH"
-  fails "String#dump returns a string with \\#<char> when # is followed by $, @, {" # NoMethodError: undefined method `dump' for "\#$"
   fails "String#dump returns a string with lower-case alpha characters unescaped" # NoMethodError: undefined method `dump' for "a"
-  fails "String#dump returns a string with multi-byte UTF-8 characters replaced by \\u{} notation with lower-case hex digits" # NoMethodError: undefined method `dump' for "\u0080"
   fails "String#dump returns a string with multi-byte UTF-8 characters replaced by \\u{} notation with upper-case hex digits" # NoMethodError: undefined method `dump' for "\u0080"
   fails "String#dump returns a string with non-printing ASCII characters replaced by \\x notation" # NoMethodError: undefined method `dump' for "\u0000"
   fails "String#dump returns a string with non-printing single-byte UTF-8 characters replaced by \\x notation" # NoMethodError: undefined method `dump' for "\u0000"
@@ -134,7 +129,6 @@ opal_filter "String" do
   fails "String#dump returns a string with printable non-alphanumeric characters unescaped" # NoMethodError: undefined method `dump' for " "
   fails "String#dump returns a string with special characters replaced with \\<char> notation" # NoMethodError: undefined method `dump' for "\a"
   fails "String#dump returns a string with upper-case alpha characters unescaped" # NoMethodError: undefined method `dump' for "A"
-  fails "String#dump returns a subclass instance" # NoMethodError: undefined method `dump' for ""
   fails "String#dump wraps string with \"" # NoMethodError: undefined method `dump' for "foo"
   fails "String#dup calls #initialize_copy on the new instance" # Expected nil to equal "string"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
@@ -144,20 +138,18 @@ opal_filter "String" do
   fails "String#each_grapheme_cluster returns a different character if the String is transcoded" # NoMethodError: undefined method `each_grapheme_cluster' for "€"
   fails "String#each_grapheme_cluster returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
   fails "String#each_grapheme_cluster returns self" # NoMethodError: undefined method `each_grapheme_cluster' for "ab🏳️\u200D🌈🐾"
-  fails "String#each_grapheme_cluster taints resulting strings when self is tainted" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
   fails "String#each_grapheme_cluster uses the String's encoding to determine what characters it contains" # NoMethodError: undefined method `each_grapheme_cluster' for "𤭢"
   fails "String#each_grapheme_cluster when no block is given returned enumerator size should return the size of the string" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
   fails "String#each_grapheme_cluster when no block is given returns an enumerator" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
   fails "String#each_grapheme_cluster works if the String's contents is invalid for its encoding" # Expected true to be false
   fails "String#each_grapheme_cluster works with multibyte characters" # NoMethodError: undefined method `each_grapheme_cluster' for "覇"
-  fails "String#encode when passed options replaces invalid encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "String#each_grapheme_cluster yields String instances for subclasses" # NoMethodError: undefined method `each_grapheme_cluster' for "abc"
   fails "String#encode when passed to, from, options returns a copy in the destination encoding when both encodings are the same" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encoding for Strings with \\x escapes returns BINARY when an escape creates a byte with the 8th bit set if the source encoding is US-ASCII" # Expected #<Encoding:UTF-8> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#end_with? raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#eql? considers encoding compatibility" # Expected true to be false
   fails "String#eql? considers encoding difference of incompatible string" # Expected true to be false
   fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#force_encoding with a special encoding name defaults to ASCII-8BIT if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to BINARY if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#grapheme_clusters is unicode aware" # NoMethodError: undefined method `grapheme_clusters' for "Ç∂éƒg"
   fails "String#grapheme_clusters passes each char in self to the given block" # NoMethodError: undefined method `grapheme_clusters' for "hello"
@@ -166,7 +158,6 @@ opal_filter "String" do
   fails "String#grapheme_clusters returns an array when no block given" # NoMethodError: undefined method `grapheme_clusters' for "ab🏳️\u200D🌈🐾"
   fails "String#grapheme_clusters returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
   fails "String#grapheme_clusters returns self" # NoMethodError: undefined method `grapheme_clusters' for "ab🏳️\u200D🌈🐾"
-  fails "String#grapheme_clusters taints resulting strings when self is tainted" # NoMethodError: undefined method `grapheme_clusters' for "hello"
   fails "String#grapheme_clusters uses the String's encoding to determine what characters it contains" # NoMethodError: undefined method `grapheme_clusters' for "𤭢"
   fails "String#grapheme_clusters works if the String's contents is invalid for its encoding" # Expected true to be false
   fails "String#grapheme_clusters works with multibyte characters" # NoMethodError: undefined method `grapheme_clusters' for "覇"
@@ -188,12 +179,17 @@ opal_filter "String" do
   fails "String#intern returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#intern returns a UTF-16LE Symbol for a UTF-16LE String containing non US-ASCII characters" # Error
   fails "String#intern returns a binary Symbol for a binary String containing non US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "String#length adds 1 (and not 2) for a incomplete surrogate in UTF-16" # Expected 2 == 1 to be truthy but was false
+  fails "String#length adds 1 for a broken sequence in UTF-32" # Expected 4 == 1 to be truthy but was false
   fails "String#length returns the correct length after force_encoding(BINARY)" # Expected 2 == 4 to be truthy but was false
   fails "String#ljust with length, padding returns String instances when called on subclasses" # Expected "          " (StringSpecs::MyString) to be an instance of String
   fails "String#next returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
+  fails "String#partition with String returns String instances when called on a subclass" # Expected "hello" (StringSpecs::MyString) to be an instance of String
   fails "String#rjust with length, padding returns String instances when called on subclasses" # Expected "          " (StringSpecs::MyString) to be an instance of String
+  fails "String#rpartition with String returns String instances when called on a subclass" # Expected "hello" (StringSpecs::MyString) to be an instance of String
   fails "String#rpartition with String returns new object if doesn't match" # Expected "hello".equal? "hello" to be falsy but was true
-  fails "String#scan with pattern and block passes block arguments as individual arguments when blocks are provided" # Expected ["a", "b", "c"] to equal "a"
+  fails "String#size adds 1 (and not 2) for a incomplete surrogate in UTF-16" # Expected 2 == 1 to be truthy but was false
+  fails "String#size adds 1 for a broken sequence in UTF-32" # Expected 4 == 1 to be truthy but was false
   fails "String#size returns the correct length after force_encoding(BINARY)" # Expected 2 == 4 to be truthy but was false
   fails "String#slice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
@@ -235,7 +231,6 @@ opal_filter "String" do
   fails "String#swapcase full Unicode case mapping updates string metadata" # Expected "aßET" to equal "aSSET"
   fails "String#swapcase full Unicode case mapping works for all of Unicode with no option" # Expected "äÖü" to equal "ÄöÜ"
   fails "String#swapcase returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
-  fails "String#swapcase works for all of Unicode" # Expected "äÖü" to equal "ÄöÜ"
   fails "String#to_sym raises an EncodingError for UTF-8 String containing invalid bytes" # Expected true to equal false
   fails "String#to_sym returns a US-ASCII Symbol for a UTF-8 String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "String#to_sym returns a US-ASCII Symbol for a binary String containing only US-ASCII characters" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
@@ -264,12 +259,9 @@ opal_filter "String" do
   fails "String#undump returns a string with special characters in \\<char> notation replaced with the characters" # NoMethodError: undefined method `undump' for "\"\\a\""
   fails "String#undump returns a string with unescaped sequences \" and \\" # NoMethodError: undefined method `undump' for "\"\\\"\""
   fails "String#undump returns a string with unescaped sequences \\#<char> when # is followed by $, @, {" # NoMethodError: undefined method `undump' for "\"\\\#$PATH\""
-  fails "String#undump returns a string with unescaped sequencies \" and \\" # NoMethodError: undefined method `undump' for "\"\\\"\""
   fails "String#undump returns a string with upper-case alpha characters unescaped" # NoMethodError: undefined method `undump' for "\"A\""
   fails "String#undump strips outer \"" # NoMethodError: undefined method `undump' for "\"foo\""
-  fails "String#undump taints the result if self is tainted" # NoMethodError: undefined method `undump' for "\"foo\""
   fails "String#undump undumps correctly string produced from non ASCII-compatible one" # NoMethodError: undefined method `dump' for "ࡶ"
-  fails "String#undump untrusts the result if self is untrusted" # NoMethodError: undefined method `untrust' for "\"foo\""
   fails "String#unicode_normalize raises an Encoding::CompatibilityError if string is not in an unicode encoding" # ArgumentError: unknown encoding name - ISO-8859-1
   fails "String#unicode_normalized? raises an Encoding::CompatibilityError if the string is not in an unicode encoding" # ArgumentError: unknown encoding name - ISO-8859-1
   fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfc)" # Expected true to be false

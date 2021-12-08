@@ -9,7 +9,6 @@ opal_filter "regular_expressions" do
   fails "Regexp#encoding defaults to UTF-8 if a literal UTF-8 character appears"
   fails "Regexp#encoding ignores the default_internal encoding"
   fails "Regexp#encoding ignores the encoding and uses US-ASCII if the string has only ASCII characters"
-  fails "Regexp#encoding returns ASCII-8BIT if the 'n' modifier is supplied and non-US-ASCII characters are present"
   fails "Regexp#encoding returns BINARY if the 'n' modifier is supplied and non-US-ASCII characters are present" # NoMethodError: undefined method `encoding' for /\xc2\xa1/
   fails "Regexp#encoding returns EUC_JP if the 'e' modifier is supplied"
   fails "Regexp#encoding returns US_ASCII if the 'n' modifier is supplied and only US-ASCII characters are present"
@@ -27,7 +26,6 @@ opal_filter "regular_expressions" do
   fails "Regexp#fixed_encoding? returns true if the Regexp was created with the Regexp::FIXEDENCODING option"
   fails "Regexp#hash is based on the text and options of Regexp"
   fails "Regexp#hash returns the same value for two Regexps differing only in the /n option"
-  fails "Regexp#initialize raises a SecurityError on a Regexp literal"
   fails "Regexp#initialize raises a TypeError on an initialized non-literal Regexp"
   fails "Regexp#inspect does not include a character set code"
   fails "Regexp#inspect does not include the 'o' option"
@@ -41,7 +39,6 @@ opal_filter "regular_expressions" do
   fails "Regexp#to_s shows non-included options after a - sign"
   fails "Regexp#to_s shows the pattern after the options"
   fails "Regexp.compile given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/ but got: ""
-  fails "Regexp.compile given a String accepts a Fixnum of two or more options ORed together as the second argument" # Expected 0 not to equal 0
   fails "Regexp.compile given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.compile given a String ignores the third argument if it is 'e' or 'euc' (case-insensitive)" # ArgumentError: [Regexp.new] wrong number of arguments(3 for -2)
   fails "Regexp.compile given a String ignores the third argument if it is 's' or 'sjis' (case-insensitive)" # ArgumentError: [Regexp.new] wrong number of arguments(3 for -2)

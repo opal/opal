@@ -23,5 +23,4 @@ opal_filter "Binding" do
   fails "Binding#local_variables includes local variables defined after calling binding.local_variables" # Expected [] == ["a", "b"] to be truthy but was false
   fails "Binding#local_variables includes local variables of inherited scopes and eval'ed context" # Expected ["c"] == ["c", "a", "b", "p"] to be truthy but was false
   fails "Binding#local_variables includes new variables defined in the binding" # Expected ["b"] == ["a", "b"] to be truthy but was false
-  fails "Proc#curry produces Procs that raise ArgumentError for #binding" # Expected ArguentError but no exception was raised (#<Binding:0x1ade4> was returned)
 end

@@ -97,6 +97,7 @@ opal_unsupported_filter "Integer" do
   fails "Integer#| bignum returns self bitwise OR other when one operand is negative" # Expected 0 to equal -64563604257983430000
   fails "Integer#| bignum returns self bitwise OR other" # Expected 2 to equal 9223372036854776000
   fails "Integer#~ bignum returns self with each bit flipped" # Expected -1 to equal -9223372036854776000
+  fails "Numeric#quo raises a ZeroDivisionError if the given argument is zero and not a Float" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
   fails "String#to_r does not treat a leading period without a numeric prefix as a decimal point" # Expected (8106479329266893/9007199254740992) not to equal (8106479329266893/9007199254740992)
   fails "String#to_r ignores underscores between numbers" # Expected (-5228919960423629/274877906944) to equal (-190227/10)
   fails "String#to_r understands a forward slash as separating the numerator from the denominator" # Expected (-896028675862255/140737488355328) to equal (-191/30)

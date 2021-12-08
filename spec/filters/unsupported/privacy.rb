@@ -21,6 +21,8 @@ opal_unsupported_filter "private" do
   fails "Invoking a private getter method does not permit self as a receiver"
   fails "Kernel#block_given? is a private method"
   fails "Kernel#eval is a private method"
+  fails "Kernel#initialize_clone is a private instance method" # Expected Kernel to have private instance method 'initialize_clone' but it does not
+  fails "Kernel#initialize_dup is a private instance method" # Expected Kernel to have private instance method 'initialize_dup' but it does not
   fails "Kernel#iterator? is a private method"
   fails "Kernel#local_variables is a private method"
   fails "Kernel#methods returns private singleton methods defined by obj.meth"

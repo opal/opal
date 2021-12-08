@@ -43,9 +43,9 @@ opal_filter "ObjectSpace" do
   fails "ObjectSpace.each_object on singleton classes walks singleton classes" # NoMethodError: undefined method `each_object' for ObjectSpace
   fails "ObjectSpace.each_object returns an enumerator if not given a block" # NoMethodError: undefined method `each_object' for ObjectSpace
   fails "ObjectSpace.each_object walks a class and its normal descendants when passed the class's singleton class" # NoMethodError: undefined method `each_object' for ObjectSpace
+  fails "ObjectSpace.garbage_collect accepts keyword arguments" # NoMethodError: undefined method `garbage_collect' for ObjectSpace
   fails "ObjectSpace.garbage_collect always returns nil" # NoMethodError: undefined method `garbage_collect' for ObjectSpace
   fails "ObjectSpace.garbage_collect can be invoked without any exceptions" # Expected to not get Exception but got: NoMethodError (undefined method `garbage_collect' for ObjectSpace)
-  fails "ObjectSpace.garbage_collect doesn't accept any arguments" # Expected ArgumentError but got: NoMethodError (undefined method `garbage_collect' for ObjectSpace)
   fails "ObjectSpace.garbage_collect ignores the supplied block" # Expected to not get Exception but got: NoMethodError (undefined method `garbage_collect' for ObjectSpace)
   fails "ObjectSpace::WeakMap#[] matches using identity semantics" # Expected "x" == nil to be truthy but was false
   fails "ObjectSpace::WeakMap#each is correct" # NotImplementedError: #each can't be implemented on top of JS interfaces

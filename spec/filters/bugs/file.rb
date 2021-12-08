@@ -19,11 +19,9 @@ opal_filter "File" do
   fails "File.expand_path does not modify the string argument" # Expected "a/c" to equal "/a/c"
   fails "File.expand_path does not replace multiple '/' at the beginning of the path" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
   fails "File.expand_path expand path with" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
-  fails "File.expand_path expand_path for commoms unix path  give a full path" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
   fails "File.expand_path expand_path for common unix path gives a full path" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
   fails "File.expand_path expands ../foo with ~/dir as base dir to /path/to/user/home/foo" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
   fails "File.expand_path expands /./dir to /dir" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
-  fails "File.expand_path expands a path when the default external encoding is ASCII-8BIT" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
   fails "File.expand_path expands a path when the default external encoding is BINARY" # ArgumentError: [Dir.home] wrong number of arguments(1 for 0)
   fails "File.expand_path expands a path with multi-byte characters" # Expected "Ångström" to equal "/Ångström"
   fails "File.expand_path expands ~ENV['USER'] to the user's home directory" # Expected "./~elia" to equal "/Users/elia"

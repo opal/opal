@@ -35,7 +35,6 @@ opal_filter "Date" do
   fails "Date#strftime should be able to show the commercial week day"
   fails "Date#strftime should be able to show the commercial week"
   fails "Date#strftime should be able to show the number of seconds since the unix epoch for a date" # Expected "954964800" to equal "954979200"
-  fails "Date#strftime should be able to show the number of seconds since the unix epoch"
   fails "Date#strftime should be able to show the timezone of the date with a : separator"
   fails "Date#strftime should be able to show the timezone with a : separator"
   fails "Date#strftime should be able to show the week number with the week starting on Sunday (%U) and Monday (%W)"
@@ -96,9 +95,6 @@ opal_filter "Date" do
   fails "Date.valid_jd? returns false if passed nil"
   fails "Date.valid_jd? returns false if passed symbol" # NoMethodError: undefined method `valid_jd?' for Date
   fails "Date.valid_jd? returns true if passed a number value" # NoMethodError: undefined method `valid_jd?' for Date
-  fails "Date.valid_jd? returns true if passed any value other than nil"
-  fails "Date.valid_jd? returns true if passed false"
-  fails "Date.valid_jd? returns true if passed symbol" # NoMethodError: undefined method `valid_jd?' for Date
   fails "Date.valid_ordinal? determines if the date is a valid ordinal date"
   fails "Date.valid_ordinal? handles negative day numbers"
 end

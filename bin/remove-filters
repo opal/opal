@@ -15,10 +15,7 @@
 #  5) "Set#filter! returns nil when self was not modified"
 
 filters = $stdin.read.split("\n").map do |i|
-  # This special example should be rather moved to unsupported for now...
-  next if i =~ /formats the local time following the pattern/
-
-  i.scan(/\d+\) (".*")/).first.first
+  i.scan(/(?:\d+\)|fails) (".*")/).first.first
 end.compact
 filters = Regexp.union(*filters)
 
