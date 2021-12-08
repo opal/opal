@@ -81,12 +81,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#frac returns a BigDecimal"
   fails "BigDecimal#frac returns the fractional part of the absolute value"
   fails "BigDecimal#inspect does not add an exponent for zero values" # Exception: self.$BigDecimal(...).$inspect is not a function
-  fails "BigDecimal#inspect encloses information in angle brackets"
-  fails "BigDecimal#inspect is comma separated list of three items"
-  fails "BigDecimal#inspect last part is number of significant digits"
   fails "BigDecimal#inspect looks like this"
-  fails "BigDecimal#inspect returns String starting with #"
-  fails "BigDecimal#inspect value after first comma is value as string"
   fails "BigDecimal#mod_part_of_divmod returns NaN if NaN is involved"
   fails "BigDecimal#mod_part_of_divmod returns NaN if the dividend is Infinity"
   fails "BigDecimal#mod_part_of_divmod returns self modulo other"
@@ -162,7 +157,6 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#sqrt returns 0 for 0, +0.0 and -0.0"
   fails "BigDecimal#sqrt returns 1 if precision is 0 or 1"
   fails "BigDecimal#sqrt returns positive infinity for infinity" # NoMethodError: undefined method `sqrt' for Infinity
-  fails "BigDecimal#sqrt returns positive infitinity for infinity"
   fails "BigDecimal#sqrt returns square root of 0.9E-99999 with desired precision"
   fails "BigDecimal#sqrt returns square root of 121 with desired precision"
   fails "BigDecimal#sqrt returns square root of 2 with desired precision"
@@ -171,10 +165,8 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#sub with Rational produces a BigDecimal" # Exception: lhs.$- is not a function
   fails "BigDecimal#to_f properly handles special values"
   fails "BigDecimal#to_i raises FloatDomainError if BigDecimal is infinity or NaN"
-  fails "BigDecimal#to_i returns Integer or Bignum otherwise"
   fails "BigDecimal#to_i returns Integer otherwise" # NoMethodError: undefined method `to_i' for 3e-20001
   fails "BigDecimal#to_int raises FloatDomainError if BigDecimal is infinity or NaN"
-  fails "BigDecimal#to_int returns Integer or Bignum otherwise"
   fails "BigDecimal#to_int returns Integer otherwise" # NoMethodError: undefined method `to_i' for 3e-20001
   fails "BigDecimal#to_r returns a Rational with bignum values" # NoMethodError: undefined method `to_r' for 3.141592653589793238462643
   fails "BigDecimal#to_r returns a Rational" # NoMethodError: undefined method `to_r' for 3.14159
@@ -189,7 +181,6 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s starts with + if + is supplied and value is positive"
   fails "BigDecimal#to_s takes an optional argument" # Expected to not get Exception
-  fails "BigDecimal#to_s the default format looks like 0.xxxxEnn"
   fails "BigDecimal#to_s the default format looks like 0.xxxxenn" # Expected "3.14159265358979323846264338327950288419716939937" to match /^0\.[0-9]*e[0-9]*$/
   fails "BigDecimal#truncate returns Infinity if self is infinite"
   fails "BigDecimal#truncate returns the same value if self is special value"
@@ -198,33 +189,19 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.limit picks the global precision when limit 0 specified" # Expected 0.8888 to equal 0.889
   fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 to equal 0.89
   fails "BigDecimal.limit returns the value before set if the passed argument is nil or is not specified"
-  fails "BigDecimal.limit use the global limit if no precision is specified"
   fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 to equal 0.9
   fails "BigDecimal.mode raise an exception if the flag is true"
   fails "BigDecimal.mode returns Infinity when too big"
   fails "BigDecimal.mode returns the appropriate value and continue the computation if the flag is false"
-  fails "BigDecimal.new accepts significant digits >= given precision" # NoMethodError: undefined method `precs' for 3.1415923
-  fails "BigDecimal.new allows for [eEdD] as exponent separator"
-  fails "BigDecimal.new allows for underscores in all parts"
-  fails "BigDecimal.new creates a new object of class BigDecimal"
-  fails "BigDecimal.new determines precision from initial value"
-  fails "BigDecimal.new ignores trailing garbage"
-  fails "BigDecimal.new raises ArgumentError for invalid strings" # Exception: new BigNumber() not a number: ruby
-  fails "BigDecimal.new raises ArgumentError when Float is used without precision"
-  fails "BigDecimal.new treats invalid strings as 0.0"
-  fails "BigDecimal.ver returns the Version number"
   fails "Float#to_d returns appropriate BigDecimal zero for signed zero" # NoMethodError: undefined method `to_d' for 0
   fails "Kernel#BigDecimal BigDecimal(Rational) with bigger-than-double numerator" # Expected 1000000000000000000 > 18446744073709552000 to be truthy but was false
   fails "Kernel#BigDecimal accepts significant digits >= given precision" # NoMethodError: undefined method `precs' for 3.1415923
   fails "Kernel#BigDecimal allows for [eEdD] as exponent separator" # Exception: new BigNumber() not a number: 12345.67d89
-  fails "Kernel#BigDecimal allows for underscores in all parts" # Exception: new BigNumber() not a number: 12_345.67E89
   fails "Kernel#BigDecimal coerces the value argument with #to_str" # Exception: new BigNumber() not a number: #<MockObject:0x666>
   fails "Kernel#BigDecimal creates a new object of class BigDecimal" # Expected 1 to equal (1/1)
   fails "Kernel#BigDecimal determines precision from initial value" # NoMethodError: undefined method `precs' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
   fails "Kernel#BigDecimal does not call to_s when calling inspect" # Expected "44.44" == "0.4444e2" to be truthy but was false
   fails "Kernel#BigDecimal does not ignores trailing garbage" # Expected ArgumentError but got: Exception (new BigNumber() not a number: 123E45ruby)
-  fails "Kernel#BigDecimal ignores leading whitespace" # Exception: self.$BigDecimal(...).$should is not a function
-  fails "Kernel#BigDecimal ignores trailing garbage" # Exception: new BigNumber() not a number: 123E45ruby
   fails "Kernel#BigDecimal pre-coerces long integers" # Expected 262000 == 1130000000000000 to be truthy but was false
   fails "Kernel#BigDecimal process underscores as Float()" # Exception: new BigNumber() not a number: 12_345.67E89
   fails "Kernel#BigDecimal raises ArgumentError for invalid strings" # Exception: new BigNumber() not a number: ruby

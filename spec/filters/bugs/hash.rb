@@ -12,9 +12,7 @@ opal_filter "Hash" do
   fails "Hash#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: ArgumentError ([Hash#deconstruct_keys] wrong number of arguments(0 for 1))
   fails "Hash#delete allows removing a key while iterating" # Exception: Cannot read property '$$is_string' of undefined
   fails "Hash#each always yields an Array of 2 elements, even when given a callable of arity 2" # Expected ArgumentError but no exception was raised ({"a"=>1} was returned)
-  fails "Hash#each yields 2 values and not an Array of 2 elements when given a callable of arity 2" # ArgumentError: [Object#foo] wrong number of arguments(1 for 2)
   fails "Hash#each_pair always yields an Array of 2 elements, even when given a callable of arity 2" # Expected ArgumentError but no exception was raised ({"a"=>1} was returned)
-  fails "Hash#each_pair yields 2 values and not an Array of 2 elements when given a callable of arity 2" # ArgumentError: [Object#foo] wrong number of arguments(1 for 2)
   fails "Hash#eql? compares keys with eql? semantics" # spec relies on integer and float being different
   fails "Hash#eql? computes equality for complex recursive hashes"
   fails "Hash#eql? computes equality for recursive hashes & arrays"

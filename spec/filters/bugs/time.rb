@@ -25,11 +25,9 @@ opal_filter "Time" do
   fails "Time#getlocal with a timezone argument subject's class implements .find_timezone method does not call .find_timezone if passed any not string/numeric/timezone timezone argument" # Expected TypeError (/can't convert \w+ into an exact number/) but got: NoMethodError (undefined method `getlocal' for 2000-01-01 12:00:00 UTC)
   fails "Time#gmtime converts self to UTC, modifying the receiver" # Expected 2007-01-09 03:00:00 UTC to equal 2007-01-09 12:00:00 UTC
   fails "Time#hash returns an Integer" # Expected "Time:100000" (String) to be an instance of Integer
-  fails "Time#inspect formats nanoseconds as a Rational" # NoMethodError: undefined method `nsec' for 2007-11-01 15:25:00 UTC
   fails "Time#inspect formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
   fails "Time#inspect omits trailing zeros from microseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.1 UTC" to be truthy but was false
   fails "Time#inspect preserves microseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.123456 UTC" to be truthy but was false
-  fails "Time#inspect preserves milliseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.123456 UTC" to be truthy but was false
   fails "Time#inspect preserves nanoseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.123456789 UTC" to be truthy but was false
   fails "Time#inspect uses the correct time zone with microseconds" # NoMethodError: undefined method `localtime' for 2000-01-01 00:00:00 UTC
   fails "Time#inspect uses the correct time zone without microseconds" # NoMethodError: undefined method `localtime' for 2000-01-01 00:00:00 UTC
@@ -55,7 +53,6 @@ opal_filter "Time" do
   fails "Time#strftime with %N formats the nanoseconds of the second with %N"
   fails "Time#strftime with %N formats the picoseconds of the second with %12N"
   fails "Time#subsec returns 0 as an Integer for a Time with a whole number of seconds" # NoMethodError: undefined method `subsec' for 1970-01-01 01:01:40 +0100
-  fails "Time#succ is obsolete" # Expected warning to match: /Time#succ is obsolete/ but got: ""
   fails "Time#to_f returns the float number of seconds + usecs since the epoch"
   fails "Time#to_i rounds fractional seconds toward zero" # Expected -315619200 == -315619199 to be truthy but was false
   fails "Time#to_s formats the fixed offset time following the pattern 'yyyy-MM-dd HH:mm:ss +/-HHMM'"
@@ -71,15 +68,10 @@ opal_filter "Time" do
   fails "Time.at passed Numeric passed Rational returns Time with correct microseconds" # Expected 0 == 539759 to be truthy but was false
   fails "Time.at passed Numeric passed Rational returns Time with correct nanoseconds" # Expected 0 == 539759 to be truthy but was false
   fails "Time.at passed Numeric roundtrips a Rational produced by #to_r"
-  fails "Time.at passed [Time, Numeric, format] :microsecond format traits second argument as microseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
   fails "Time.at passed [Time, Numeric, format] :microsecond format treats second argument as microseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
-  fails "Time.at passed [Time, Numeric, format] :millisecond format traits second argument as milliseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
   fails "Time.at passed [Time, Numeric, format] :millisecond format treats second argument as milliseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
-  fails "Time.at passed [Time, Numeric, format] :nanosecond format traits second argument as nanoseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
   fails "Time.at passed [Time, Numeric, format] :nanosecond format treats second argument as nanoseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
-  fails "Time.at passed [Time, Numeric, format] :nsec format traits second argument as nanoseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
   fails "Time.at passed [Time, Numeric, format] :nsec format treats second argument as nanoseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
-  fails "Time.at passed [Time, Numeric, format] :usec format traits second argument as microseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
   fails "Time.at passed [Time, Numeric, format] :usec format treats second argument as microseconds" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
   fails "Time.at passed [Time, Numeric, format] supports Float second argument" # ArgumentError: [Time.at] wrong number of arguments(3 for -2)
   fails "Time.at passed non-Time, non-Numeric with an argument that responds to #to_r needs for the argument to respond to #to_int too" # Mock 'rational-but-no-to_int' expected to receive to_r("any_args") exactly 1 times but received it 0 times

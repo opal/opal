@@ -47,13 +47,11 @@ opal_filter "Integer" do
   fails "Integer#chr without argument raises a RangeError is self is less than 0"
   fails "Integer#chr without argument returns a new String for each call"
   fails "Integer#chr without argument when Encoding.default_internal is nil and self is between 0 and 127 (inclusive) returns a US-ASCII String"
-  fails "Integer#chr without argument when Encoding.default_internal is nil and self is between 128 and 255 (inclusive) returns an ASCII-8BIT String"
   fails "Integer#chr without argument when Encoding.default_internal is nil raises a RangeError is self is greater than 255"
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is between 0 and 127 (inclusive) returns a String encoding self interpreted as a US-ASCII codepoint"
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is between 0 and 127 (inclusive) returns a US-ASCII String"
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is between 128 and 255 (inclusive) returns a String containing self interpreted as a byte"
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is between 128 and 255 (inclusive) returns a binary String" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Integer#chr without argument when Encoding.default_internal is not nil and self is between 128 and 255 (inclusive) returns an ASCII-8BIT String"
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is greater than 255 raises RangeError if self is invalid as a codepoint in the default internal encoding"
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is greater than 255 returns a String encoding self interpreted as a codepoint in the default internal encoding"
   fails "Integer#chr without argument when Encoding.default_internal is not nil and self is greater than 255 returns a String with the default internal encoding"
@@ -67,7 +65,6 @@ opal_filter "Integer" do
   fails "Integer#pow one argument is passed fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
   fails "Integer#pow two arguments are passed raises a RangeError when the first argument is negative and the second argument is present" # Expected RangeError but got: TypeError (Integer#pow() 1st argument cannot be negative when 2nd argument specified)
   fails "Integer#round raises ArgumentError for an unknown rounding mode" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
-  fails "Integer#round raises a RangeError when passed a big negative value" # Expected RangeError but no exception was raised (0 was returned)
   fails "Integer#round returns different rounded values depending on the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
   fails "Integer#round returns itself if passed a positive precision and the half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
   fails "Integer#round returns itself rounded to nearest if passed a negative value" # Expected NaN to have same value and type as 300

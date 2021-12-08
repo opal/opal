@@ -41,7 +41,6 @@ opal_filter "Float" do
   fails "Float#prev_float returns a float the smallest possible step smaller than the receiver"
   fails "Float#prev_float returns positive zero when stepping downward from just above zero"
   fails "Float#prev_float reverses the effect of next_float for all Floats except -INFINITY and -0.0" # NoMethodError: undefined method `next_float' for 0.7192216026596725
-  fails "Float#prev_float reverses the effect of next_float"
   fails "Float#prev_float steps directly between -1.0 and -1.0 - EPSILON"
   fails "Float#prev_float steps directly between 1.0 and 1.0 - EPSILON/2"
   fails "Float#prev_float steps directly between MAX and INFINITY"
@@ -66,9 +65,7 @@ opal_filter "Float" do
   fails "Float#to_s uses e format for a positive value with whole part having 18 significant figures"
   fails "Float#to_s uses non-e format for a negative value with whole part having 15 significant figures"
   fails "Float#to_s uses non-e format for a negative value with whole part having 16 significant figures"
-  fails "Float#to_s uses non-e format for a negative value with whole part having 17 significant figures"
   fails "Float#to_s uses non-e format for a positive value with whole part having 15 significant figures"
   fails "Float#to_s uses non-e format for a positive value with whole part having 16 significant figures"
-  fails "Float#to_s uses non-e format for a positive value with whole part having 17 significant figures"
   fails "Float#truncate returns self truncated to an Integer"
 end

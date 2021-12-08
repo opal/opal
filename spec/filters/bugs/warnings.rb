@@ -4,7 +4,6 @@ opal_filter "warnings" do
   fails "Constant resolution within methods with dynamically assigned constants returns the updated value when a constant is reassigned" # Expected warning to match: /already initialized constant/
   fails "Fixnum is deprecated" # Expected warning to match: /constant ::Fixnum is deprecated/ but got: ""
   fails "Hash#fetch gives precedence to the default block over the default argument when passed both" # Expected warning to match: /block supersedes default value argument/
-  fails "Hash.[] ignores elements that are not arrays" # Expected warning to match: /ignoring wrong elements/
   fails "Integer#** bignum switch to a Float when the values is too big" # Expected warning to match: /warning: in a\*\*b, b may be too big/ but got: ""
   fails "Integer#** fixnum returns Float::INFINITY when the number is too big" # Expected warning to match: /warning: in a\*\*b, b may be too big/ but got: ""
   fails "Integer#pow one argument is passed fixnum returns Float::INFINITY when the number is too big" # Expected warning to match: /warning: in a\*\*b, b may be too big/ but got: ""
@@ -12,8 +11,6 @@ opal_filter "warnings" do
   fails "Literal (A::X) constant resolution with dynamically assigned constants returns the updated value when a constant is reassigned" # Expected warning to match: /already initialized constant/
   fails "Literal Regexps matches against $_ (last input) in a conditional if no explicit matchee provided" # Expected warning to match: /regex literal in condition/
   fails "Module#const_get with dynamically assigned constants returns the updated value of a constant" # Expected warning to match: /already initialized constant/
-  fails "Optional variable assignments using compunded constants with &&= assignments" # Expected warning to match: /already initialized constant/
-  fails "Optional variable assignments using compunded constants with operator assignments" # Expected warning to match: /already initialized constant/
   fails "Predefined global $, warns if assigned non-nil" # Expected warning to match: /warning: `\$,' is deprecated/ but got: ""
   fails "Predefined global $; warns if assigned non-nil" # Expected warning to match: /warning: `\$;' is deprecated/ but got: ""
   fails "Regexp.new given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/

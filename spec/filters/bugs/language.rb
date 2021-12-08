@@ -7,24 +7,13 @@ opal_filter "language" do
   fails "A Symbol literal with invalid bytes raises an EncodingError at parse time" # Actually passes, the error comes from the difference between MRI's opal and compiled opal-parser
   fails "A block yielded a single Array assigns elements to mixed argument types" # Expected [1, 2, [], 3, 2, {"x"=>9}] == [1, 2, [3], {"x"=>9}, 2, {}] to be truthy but was false
   fails "A block yielded a single Array assigns elements to required arguments when a keyword rest argument is present"
-  fails "A block yielded a single Array assigns non-symbol keys to non-keyword arguments"
-  fails "A block yielded a single Array assigns symbol keys from a Hash returned by #to_hash to keyword arguments"
-  fails "A block yielded a single Array assigns symbol keys from a Hash to keyword arguments"
-  fails "A block yielded a single Array assigns the last element to a non-keyword argument if #to_hash returns nil"
-  fails "A block yielded a single Array calls #to_hash on the argument and uses resulting hash as first argument when optional argument and keyword argument accepted" # Expected [nil, {"a"=>1, "b"=>2}] == [{"a"=>1, "b"=>2}, {}] to be truthy but was false
-  fails "A block yielded a single Array calls #to_hash on the argument but does not use the result when no keywords are present"
-  fails "A block yielded a single Array calls #to_hash on the argument" # Expected [nil, {"a"=>1, "b"=>2}] to equal [{"a"=>1, "b"=>2}, {}]
   fails "A block yielded a single Array does not call #to_hash on final argument to get keyword arguments and does not autosplat" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on the argument when optional argument and keyword argument accepted and does not autosplat" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on the last element if keyword arguments are present" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on the last element when there are more arguments than parameters" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not treat final Hash as keyword arguments and does not autosplat" # Expected [nil, {"a"=>10}] == [[{"a"=>10}], {}] to be truthy but was false
   fails "A block yielded a single Array does not treat hashes with string keys as keyword arguments and does not autosplat" # Expected [nil, {"a"=>10}] == [[{"a"=>10}], {}] to be truthy but was false
-  fails "A block yielded a single Array does not treat hashes with string keys as keyword arguments"
-  fails "A block yielded a single Array raises a TypeError if #to_hash does not return a Hash"
   fails "A block yielded a single Array when non-symbol keys are in a keyword arguments Hash does not separate non-symbol keys and symbol keys and does not autosplat" # Expected [nil, {"a"=>10, "b"=>2}] == [[{"a"=>10, "b"=>2}], {}] to be truthy but was false
-  fails "A block yielded a single Array when non-symbol keys are in a keyword arguments Hash separates non-symbol keys and symbol keys" # Expected [nil, {"a"=>10, "b"=>2}] to equal [{"a"=>10}, {"b"=>2}]
-  fails "A class definition extending an object (sclass) allows accessing the block of the original scope" # Opal::SyntaxError: undefined method `uses_block!' for nil
   fails "A class definition extending an object (sclass) can use return to cause the enclosing method to return"
   fails "A class definition extending an object (sclass) raises a TypeError when trying to extend numbers"
   fails "A class definition raises TypeError if any constant qualifying the class is not a Module"
@@ -33,20 +22,10 @@ opal_filter "language" do
   fails "A lambda expression 'lambda { ... }' assigns variables from parameters for definition '@a = lambda { |*, **k| k }'" # ArgumentError: expected kwargs
   fails "A lambda expression 'lambda { ... }' assigns variables from parameters for definition \n    def m(a) yield a end\n    def m2() yield end\n    @a = lambda { |a, | a }"
   fails "A lambda expression 'lambda { ... }' requires a block"
-  fails "A lambda expression 'lambda { ... }' with an implicit block can be created"
   fails "A lambda expression 'lambda { ... }' with an implicit block raises ArgumentError" # Expected ArgumentError (/tried to create Proc object without a block/) but no exception was raised (nil was returned)
   fails "A lambda literal -> () { } assigns variables from parameters for definition '@a = -> (*, **k) { k }'" # ArgumentError: expected kwargs
-  fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing local with the same name as the argument"
-  fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference shadows an existing method with the same name as the argument"
-  fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference warns and uses a nil value when there is an existing local variable with same name" # Expected warning to match: /circular argument reference/ but got: ""
-  fails "A lambda literal -> () { } assigns variables from parameters with circular optional argument reference warns and uses a nil value when there is an existing method with same name" # Expected warning to match: /circular argument reference/ but got: ""
   fails "A method assigns local variables from method parameters for definition 'def m() end'" # ArgumentError: [SpecEvaluate#m] wrong number of arguments(1 for 0)
   fails "A method assigns local variables from method parameters for definition 'def m(*a) a end'" # Expected [{}] to equal []
-  fails "A method assigns local variables from method parameters for definition 'def m(*a, **) a end'"
-  fails "A method assigns local variables from method parameters for definition 'def m(*a, **k) [a, k] end'"
-  fails "A method assigns local variables from method parameters for definition 'def m(*a, b: 1) [a, b] end'"
-  fails "A method assigns local variables from method parameters for definition 'def m(*a, b:) [a, b] end'"
-  fails "A method assigns local variables from method parameters for definition 'def m(a = nil, **k) [a, k] end'"
   fails "A method assigns local variables from method parameters for definition 'def m(a, **) a end'" # Expected ArgumentError but no exception was raised ({"a"=>1, "b"=>2} was returned)
   fails "A method assigns local variables from method parameters for definition 'def m(a, **k) [a, k] end'" # Expected ArgumentError but no exception was raised ([{"a"=>1, "b"=>2}, {}] was returned)
   fails "A method assigns local variables from method parameters for definition 'def m(a, **nil); a end;'" # Opal::SyntaxError: Unsupported arg type kwnilarg
@@ -71,7 +50,6 @@ opal_filter "language" do
   fails "A number literal can be a decimal literal with trailing 'r' to represent a Rational" # requires String#to_r
   fails "A number literal can be a float literal with trailing 'r' to represent a Rational" # Expected (5030569068109113/288230376151711740) == (136353847812057/7812500000000000) to be truthy but was false
   fails "A singleton class doesn't have singleton class"
-  fails "A singleton class raises a TypeError for Fixnum's"
   fails "A singleton class raises a TypeError for symbols"
   fails "A singleton method definition can be declared for a global variable"
   fails "A singleton method definition raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised ("foo" was returned)
@@ -89,8 +67,6 @@ opal_filter "language" do
   fails "An instance method raises an error with too many arguments" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for 1)
   fails "An instance method with a default argument evaluates the default when required arguments precede it" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(0 for -2)
   fails "An instance method with a default argument prefers to assign to a default argument before a splat argument" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(0 for -2)
-  fails "An instance method with a default argument shadows an existing method with the same name as the local"
-  fails "An instance method with a default argument warns and uses a nil value when there is an existing local method with same name" # Expected warning to match: /circular argument reference/ but got: ""
   fails "Assigning an anonymous module to a constant sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Executing break from within a block raises LocalJumpError when converted into a proc during a a super call" # Expected LocalJumpError but no exception was raised (1 was returned)
   fails "Executing break from within a block returns from the original invoking method even in case of chained calls"
@@ -121,17 +97,14 @@ opal_filter "language" do
   fails "Heredoc string allows HEREDOC with <<-\"identifier\", allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<-identifier, allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
-  fails "Heredoc string prints a warning if quoted HEREDOC identifier is ending not on same line" # Opal::SyntaxError: unterminated string meets end of file
   fails "Instantiating a singleton class raises a TypeError when allocate is called"
   fails "Instantiating a singleton class raises a TypeError when new is called"
-  fails "Invoking a method expands the Array elements from the splat after executing the arguments and block if no other arguments follow the splat" # Expected [[1, nil], nil] to equal [[1], nil]
   fails "Keyword arguments are now separated from positional arguments when the method takes a ** parameter does not convert a positional Hash to keyword arguments" # Expected ArgumentError (wrong number of arguments (given 4, expected 3)) but no exception was raised (42 was returned)
   fails "Keyword arguments are now separated from positional arguments when the method takes a key: parameter when it's called with a positional Hash and no ** raises ArgumentError" # Expected ArgumentError (wrong number of arguments (given 4, expected 3)) but no exception was raised (42 was returned)
   fails "Literal (A::X) constant resolution uses the module or class #inspect to craft the error message if they are anonymous" # Expected NameError (/uninitialized constant <unusable info>::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50c0>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution uses the module or class #name to craft the error message" # Expected NameError (/uninitialized constant ModuleName::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50ba>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution with dynamically assigned constants evaluates the right hand side before evaluating a constant path"
   fails "Literal Regexps caches the Regexp object"
-  fails "Literal Regexps raises a RegexpError for lookbehind with specific characters" # Expected RegexpError but no exception was raised (0 was returned)
   fails "Literal Regexps support handling unicode 9.0 characters with POSIX bracket expressions" # Expected "" to equal "𐓘"
   fails "Literal Regexps supports (?# )"
   fails "Literal Regexps supports (?> ) (embedded subexpression)"
@@ -144,8 +117,6 @@ opal_filter "language" do
   fails "Literal Regexps throws SyntaxError for malformed literals"
   fails "Literal Regexps treats an escaped non-escapable character normally when used as a terminator" # Expected "\\$" to equal "(?-mix:\\$)"
   fails "Local variable shadowing does not warn in verbose mode" # Expected nil == [3, 3, 3] to be truthy but was false
-  fails "Local variable shadowing leads to warning in verbose mode" # Expected warning to match: /shadowing outer local variable/ but got: ""
-  fails "Magic comment is optional"
   fails "Magic comments in a loaded file are case-insensitive" # LoadError: cannot load such file -- ruby/language/fixtures/case_magic_comment
   fails "Magic comments in a loaded file are optional" # LoadError: cannot load such file -- ruby/language/fixtures/no_magic_comment
   fails "Magic comments in a loaded file can be after the shebang" # LoadError: cannot load such file -- ruby/language/fixtures/shebang_magic_comment
@@ -209,7 +180,6 @@ opal_filter "language" do
   fails "Optional constant assignment with ||= causes side-effects of the module part to be applied only once (for undefined constant)" # Expected 2 == 1 to be truthy but was false  
   fails "Optional variable assignments using compounded constants with &&= assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compounded constants with operator assignments" # Expected warning to match: /already initialized constant/ but got: ""
-  fails "Optional variable assignments using compunded constants with ||= assignments"
   fails "Pattern matching Array pattern calls #deconstruct once for multiple patterns, caching the result" # Expected ["deconstruct", "deconstruct"] == ["deconstruct"] to be truthy but was false
   fails "Pattern matching Array pattern raises TypeError if #deconstruct method does not return array" # Expected TypeError (/deconstruct must return Array/) but no exception was raised (nil was returned)
   fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method does not return Hash" # Expected TypeError (/deconstruct_keys must return Hash/) but got: NoMethodError (undefined method `key?' for "")
@@ -221,19 +191,13 @@ opal_filter "language" do
   fails "Pattern matching variable pattern does not support using variable name (except _) several times" # Expected SyntaxError (/duplicated variable name/) but got: SyntaxError (duplicate variable name a)
   fails "Pattern matching variable pattern requires bound variable to be specified in a pattern before ^ operator when it relies on a bound variable" # Expected SyntaxError (/n: no such local variable/) but got: SyntaxError (no such local variable: `n')
   fails "Pattern matching variable pattern supports existing variables in a pattern specified with ^ operator" # SyntaxError: no such local variable: `a'
-  fails "Pattern matching warning warns about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Pattern matching warning when one-line form warns about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Pattern matching warning when regular form does not warn about pattern matching is experimental feature" # NameError: uninitialized constant Warning
-  fails "Post-args with optional args with a circular argument reference shadows an existing local with the same name as the argument"
-  fails "Post-args with optional args with a circular argument reference shadows an existing method with the same name as the argument"
-  fails "Post-args with optional args with a circular argument reference warns and uses a nil value when there is an existing local variable with same name" # Expected warning to match: /circular argument reference/ but got: ""
-  fails "Post-args with optional args with a circular argument reference warns and uses a nil value when there is an existing method with same name" # Expected warning to match: /circular argument reference/ but got: ""
   fails "Predefined global $+ captures the last non nil capture"
   fails "Predefined global $+ is equivalent to $~.captures.last"
   fails "Predefined global $, raises TypeError if assigned a non-String"
   fails "Predefined global $-0 changes $/"
   fails "Predefined global $-0 does not call #to_str to convert the object to a String"
-  fails "Predefined global $-0 raises a TypeError if assigned a Fixnum"
   fails "Predefined global $-0 raises a TypeError if assigned a boolean"
   fails "Predefined global $-0 raises a TypeError if assigned an Integer" # Expected TypeError but no exception was raised (1 was returned)
   fails "Predefined global $. can be assigned a Float" # Expected 123.5 to equal 123
@@ -241,7 +205,6 @@ opal_filter "language" do
   fails "Predefined global $. should call #to_int to convert the object to an Integer" # Expected #<MockObject:0x518c2> to equal 321
   fails "Predefined global $/ changes $-0"
   fails "Predefined global $/ does not call #to_str to convert the object to a String"
-  fails "Predefined global $/ raises a TypeError if assigned a Fixnum"
   fails "Predefined global $/ raises a TypeError if assigned a boolean"
   fails "Predefined global $/ raises a TypeError if assigned an Integer" # Expected TypeError but no exception was raised (#<Number>(#pretty_inspect raised #<TypeError: no implicit conversion of Number into String>) was returned)
   fails "Predefined global $_ is Thread-local"
@@ -276,7 +239,6 @@ opal_filter "language" do
   fails "The __LINE__ pseudo-variable equals the line number of the text in a loaded file"
   fails "The alias keyword can create a new global variable, synonym of the original" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
   fails "The alias keyword can override an existing global variable and make them synonyms" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
-  fails "The alias keyword is not allowed against Fixnum or String instances"
   fails "The alias keyword is not allowed against Integer or String instances" # Expected TypeError but got: Exception (Cannot read property '$to_s' of undefined)
   fails "The alias keyword on top level defines the alias on Object"
   fails "The alias keyword operates on methods defined via attr, attr_reader, and attr_accessor"
@@ -333,9 +295,7 @@ opal_filter "language" do
   fails "The rescue keyword only accepts Module or Class in rescue clauses" # RuntimeError: error
   fails "The rescue keyword only accepts Module or Class in splatted rescue clauses" # RuntimeError: error
   fails "The rescue keyword rescues the exception in the deepest rescue block declared to handle the appropriate exception type" # Expected "StandardError: an error occurred" to include ":in `raise_standard_error'"
-  fails "The rescue keyword will execute an else block even without rescue and ensure" # Expected warning to match: /else without rescue is useless/ but got: ""
   fails "The return keyword at top level return with argument warns but does not affect exit status" # Exception: path.substr is not a function
-  fails "The return keyword at top level within a block within a class is allowed" # Exception: path.substr is not a function
   fails "The return keyword at top level within a block within a class is not allowed" # Exception: path.substr is not a function
   fails "The super keyword uses block argument given to method when used in a block" # LocalJumpError: no block given
   fails "The super keyword uses given block even if arguments are passed explicitly"

@@ -1,19 +1,16 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Module" do
   fails "Module#alias_method creates methods that are == to each other" # Expected #<Method: #<Class:0x9122>#uno (defined in #<Class:0x9122> in ruby/core/module/fixtures/classes.rb:206)> == #<Method: #<Class:0x9122>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:206)> to be truthy but was false
-  fails "Module#alias_method creates methods that are == to eachother" # Expected #<Method: #<Class:0x3ee54>#uno (defined in #<Class:0x3ee54> in ruby/core/module/fixtures/classes.rb:203)> to equal #<Method: #<Class:0x3ee54>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:203)>
   fails "Module#alias_method handles aliasing a method only present in a refinement" # NoMethodError: undefined method `refine' for #<Module:0x90fa>
   fails "Module#alias_method retains method visibility"
   fails "Module#alias_method returned value returns symbol of the defined method name" # Expected #<Class:0x1c94a> to be identical to "checking_return_value"
   fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#attr applies current visibility to methods created"
   fails "Module#attr converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
-  fails "Module#attr converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr raises a TypeError when the given names can't be converted to strings using to_str"
   fails "Module#attr returns an array of defined method names as symbols" # Expected nil == ["foo", "bar"] to be truthy but was false
   fails "Module#attr_accessor applies current visibility to methods created"
   fails "Module#attr_accessor converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
-  fails "Module#attr_accessor converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr_accessor not allows creating an attr_accessor on an immediate class"
   fails "Module#attr_accessor on immediates can read through the accessor" # NoMethodError: undefined method `foobar' for 1
   fails "Module#attr_accessor raises FrozenError if the receiver if frozen" # Expected FrozenError but no exception was raised (42 was returned)
@@ -21,56 +18,15 @@ opal_filter "Module" do
   fails "Module#attr_accessor returns an array of defined method names as symbols" # Expected nil == ["foo", "foo=", "bar", "bar="] to be truthy but was false
   fails "Module#attr_reader applies current visibility to methods created"
   fails "Module#attr_reader converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
-  fails "Module#attr_reader converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr_reader not allows for adding an attr_reader to an immediate"
   fails "Module#attr_reader raises a TypeError when the given names can't be converted to strings using to_str"
   fails "Module#attr_reader returns an array of defined method names as symbols" # Expected nil == ["foo", "bar"] to be truthy but was false
   fails "Module#attr_writer applies current visibility to methods created"
   fails "Module#attr_writer converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
-  fails "Module#attr_writer converts non string/symbol/fixnum names to strings using to_str"
   fails "Module#attr_writer not allows for adding an attr_writer to an immediate"
   fails "Module#attr_writer raises FrozenError if the receiver if frozen" # Expected FrozenError but no exception was raised (42 was returned)
   fails "Module#attr_writer raises a TypeError when the given names can't be converted to strings using to_str"
   fails "Module#attr_writer returns an array of defined method names as symbols" # Expected nil == ["foo=", "bar="] to be truthy but was false
-  fails "Module#autoload (concurrently) blocks a second thread while a first is doing the autoload"
-  fails "Module#autoload (concurrently) blocks others threads while doing an autoload"
-  fails "Module#autoload allows multiple autoload constants for a single file"
-  fails "Module#autoload calls #to_path on non-String filename arguments"
-  fails "Module#autoload calls #to_path on non-string filenames"
-  fails "Module#autoload does NOT raise a NameError when the autoload file did not define the constant and a module is opened with the same name"
-  fails "Module#autoload does not load the file if the file is manually required"
-  fails "Module#autoload does not load the file when accessing the constants table of the module"
-  fails "Module#autoload does not load the file when referring to the constant in defined?"
-  fails "Module#autoload does not remove the constant from the constant table if load fails"
-  fails "Module#autoload does not remove the constant from the constant table if the loaded files does not define it"
-  fails "Module#autoload ignores the autoload request if the file is already loaded"
-  fails "Module#autoload loads a file with .rb extension when passed the name without the extension"
-  fails "Module#autoload loads the file that defines subclass XX::YY < YY and YY is a top level constant"
-  fails "Module#autoload loads the file when opening a module that is the autoloaded constant"
-  fails "Module#autoload loads the registered constant into a dynamically created class"
-  fails "Module#autoload loads the registered constant into a dynamically created module"
-  fails "Module#autoload loads the registered constant when it is accessed"
-  fails "Module#autoload loads the registered constant when it is included"
-  fails "Module#autoload loads the registered constant when it is inherited from"
-  fails "Module#autoload loads the registered constant when it is opened as a class"
-  fails "Module#autoload loads the registered constant when it is opened as a module"
-  fails "Module#autoload looks up the constant in the scope where it is referred"
-  fails "Module#autoload looks up the constant when in a meta class scope"
-  fails "Module#autoload raises a NameError when the constant name has a space in it"
-  fails "Module#autoload raises a NameError when the constant name starts with a lower case letter"
-  fails "Module#autoload raises a NameError when the constant name starts with a number"
-  fails "Module#autoload raises a TypeError if not passed a String or object respodning to #to_path for the filename"
-  fails "Module#autoload raises a TypeError if opening a class with a different superclass than the class defined in the autoload file"
-  fails "Module#autoload raises an ArgumentError when an empty filename is given"
-  fails "Module#autoload registers a file to load the first time the named constant is accessed"
-  fails "Module#autoload retains the autoload even if the request to require fails"
-  fails "Module#autoload returns 'constant' on referring the constant with defined?()"
-  fails "Module#autoload runs for an exception condition class and doesn't trample the exception"
-  fails "Module#autoload sets the autoload constant in the constants table"
-  fails "Module#autoload shares the autoload request across dup'ed copies of modules"
-  fails "Module#autoload when changing $LOAD_PATH does not reload a file due to a different load path"
-  fails "Module#autoload? returns nil if no file has been registered for a constant"
-  fails "Module#autoload? returns the name of the file that will be autoloaded"
   fails "Module#class_eval activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<ModuleSpecs::NamedClass:0x4a168>
   fails "Module#class_eval converts a non-string filename to a string using to_str"
   fails "Module#class_eval converts non string eval-string to string using to_str"
@@ -88,7 +44,6 @@ opal_filter "Module" do
   fails "Module#const_get coerces the inherit flag to a boolean" # Expected NameError but no exception was raised ("const1" was returned)
   fails "Module#const_set sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#const_set when overwriting an existing constant does not warn after a failed autoload" # Expected NameError but got: LoadError (cannot load such file -- ruby/core/module/fixtures/autoload_o)
-  fails "Module#const_set when overwriting an existing constant does not warn if the previous value was undefined" # Expected #<Module:0x48fd0> to have constant 'Foo' but it does not
   fails "Module#const_set when overwriting an existing constant warns if the previous value was a normal value" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Module#const_source_location accepts a String or Symbol name" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location accepts a scoped constant name" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
@@ -147,7 +102,6 @@ opal_filter "Module" do
   fails "Module#method_added is called with a precise caller location with the line of the 'def'" # NoMethodError: undefined method `caller_locations' for #<Module:0xaa8>
   fails "Module#method_defined? converts the given name to a string using to_str"
   fails "Module#method_defined? raises a TypeError when the given object is not a string/symbol" # Expected TypeError but no exception was raised (false was returned)
-  fails "Module#method_defined? raises a TypeError when the given object is not a string/symbol/fixnum"
   fails "Module#method_defined? returns true if a public or private method with the given name is defined in self, self's ancestors or one of self's included modules"
   fails "Module#method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.method_defined?] wrong number of arguments(2 for 1)
   fails "Module#method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.method_defined?] wrong number of arguments(2 for 1)
@@ -169,7 +123,6 @@ opal_filter "Module" do
   fails "Module#name is not nil for a nested module created with the module keyword"
   fails "Module#name is not nil when assigned to a constant in an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil to match /^#<Module:0x\h+>::Child$/
-  fails "Module#prepend keeps the module in the chain when dupping an intermediate module"
   fails "Module#prepend keeps the module in the chain when dupping the class"
   fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0x6c37a>] == [#<Module:0x6c38c>, #<Module:0x6c37a>] to be truthy but was false
   fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x7b0e0> to have private instance method 'test1' but it does not
@@ -198,7 +151,6 @@ opal_filter "Module" do
   fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # Expected "foo" == "foo from refinement" to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc"
   fails "Module#refine for methods accessed indirectly is honored by string interpolation"
-  fails "Module#refine looks in the included modules for builtin methods"
   fails "Module#refine makes available all refinements from the same module" # NoMethodError: undefined method `dump' for "1"
   fails "Module#refine method lookup looks in the included modules for builtin methods" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1aaee>
   fails "Module#refine method lookup looks in the object singleton class first" # Expected "foo from refinement" == "foo from singleton class" to be truthy but was false

@@ -2,8 +2,6 @@
 opal_filter "StringScanner" do
   fails "StringScanner#<< concatenates the given argument to self and returns self"
   fails "StringScanner#<< raises a TypeError if the given argument can't be converted to a String"
-  fails "StringScanner#<< when passed a Fixnum doesn't call to_int on the argument"
-  fails "StringScanner#<< when passed a Fixnum raises a TypeError"
   fails "StringScanner#<< when passed an Integer doesn't call to_int on the argument" # Expected TypeError but got: NoMethodError (undefined method `<<' for #<StringScanner:0x28c>)
   fails "StringScanner#<< when passed an Integer raises a TypeError" # Expected TypeError but got: NoMethodError (undefined method `<<' for #<StringScanner:0x290>)
   fails "StringScanner#[] raises a IndexError when there's no named capture"
@@ -14,8 +12,6 @@ opal_filter "StringScanner" do
   fails "StringScanner#clear warns in verbose mode that the method is obsolete"
   fails "StringScanner#concat concatenates the given argument to self and returns self"
   fails "StringScanner#concat raises a TypeError if the given argument can't be converted to a String"
-  fails "StringScanner#concat when passed a Fixnum doesn't call to_int on the argument"
-  fails "StringScanner#concat when passed a Fixnum raises a TypeError"
   fails "StringScanner#concat when passed an Integer doesn't call to_int on the argument" # Expected TypeError but got: NoMethodError (undefined method `concat' for #<StringScanner:0x362>)
   fails "StringScanner#concat when passed an Integer raises a TypeError" # Expected TypeError but got: NoMethodError (undefined method `concat' for #<StringScanner:0x366>)
   fails "StringScanner#dup copies previous match state"
@@ -42,7 +38,6 @@ opal_filter "StringScanner" do
   fails "StringScanner#peep returns an empty string when the passed argument is zero"
   fails "StringScanner#peep returns an instance of String when passed a String subclass"
   fails "StringScanner#peep returns at most the specified number of bytes from the current position" # NoMethodError: undefined method `peep' for #<StringScanner:0x590>
-  fails "StringScanner#peep returns at most the specified number of characters from the current position"
   fails "StringScanner#peep warns in verbose mode that the method is obsolete"
   fails "StringScanner#pointer returns 0 in the reset position"
   fails "StringScanner#pointer returns the length of the string in the terminate position"
@@ -57,9 +52,7 @@ opal_filter "StringScanner" do
   fails "StringScanner#restsize is equivalent to rest.size"
   fails "StringScanner#restsize returns the length of the rest of the string" # NoMethodError: undefined method `restsize' for #<StringScanner:0x4a4>
   fails "StringScanner#restsize warns in verbose mode that the method is obsolete"
-  fails "StringScanner#scan raises a TypeError if pattern is a String" # Expected TypeError but no exception was raised (nil was returned)
   fails "StringScanner#scan raises a TypeError if pattern isn't a Regexp nor String" # Expected TypeError but no exception was raised (nil was returned)
-  fails "StringScanner#scan raises a TypeError if pattern isn't a Regexp"
   fails "StringScanner#scan treats String as the pattern itself" # Expected nil == "This" to be truthy but was false
   fails "StringScanner#scan with fixed_anchor: true returns the matched string" # ArgumentError: [StringScanner#initialize] wrong number of arguments(2 for 1)
   fails "StringScanner#scan with fixed_anchor: true treats \\A as matching from the beginning of string" # ArgumentError: [StringScanner#initialize] wrong number of arguments(2 for 1)

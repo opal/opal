@@ -50,9 +50,7 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'A' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'A' returns a string in encoding of common to the concatenated results" # RuntimeError: Unsupported pack directive "U" (no chunk reader defined)
   fails "Array#pack with format 'C' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
-  fails "Array#pack with format 'C' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "Array#pack with format 'L' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
-  fails "Array#pack with format 'L' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "Array#pack with format 'L' with modifier '>' and '!' calls #to_int to convert the pack argument to an Integer" # Mock 'to_int' expected to receive to_int("any_args") exactly 1 times but received it 0 times
   fails "Array#pack with format 'L' with modifier '>' and '!' encodes a Float truncated as an Integer" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
   fails "Array#pack with format 'L' with modifier '>' and '!' encodes all remaining elements when passed the '*' modifier" # RuntimeError: Unsupported pack directive "L>" (no chunk reader defined)
@@ -83,9 +81,7 @@ opal_filter "Array#pack" do
   fails "Array#pack with format 'a' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
   fails "Array#pack with format 'a' returns a string in encoding of common to the concatenated results" # RuntimeError: Unsupported pack directive "U" (no chunk reader defined)
   fails "Array#pack with format 'c' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
-  fails "Array#pack with format 'c' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "Array#pack with format 'l' calls #to_str to coerce the directives string" # RuntimeError: Unsupported pack directive "x" (no chunk reader defined)
-  fails "Array#pack with format 'l' returns an ASCII-8BIT string" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT>
   fails "Array#pack with format 'l' with modifier '>' and '!' calls #to_int to convert the pack argument to an Integer" # Mock 'to_int' expected to receive to_int("any_args") exactly 1 times but received it 0 times
   fails "Array#pack with format 'l' with modifier '>' and '!' encodes a Float truncated as an Integer" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
   fails "Array#pack with format 'l' with modifier '>' and '!' encodes all remaining elements when passed the '*' modifier" # RuntimeError: Unsupported pack directive "l>" (no chunk reader defined)
