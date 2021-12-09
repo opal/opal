@@ -905,6 +905,8 @@ class ::Array < `Array`
 
   def drop(number)
     %x{
+      number = $coerce_to(number, #{::Integer}, 'to_int');
+
       if (number < 0) {
         #{::Kernel.raise ::ArgumentError}
       }
