@@ -83,8 +83,6 @@ class Date
   ABBR_DAYNAMES   = %w[Sun Mon Tue Wed Thu Fri Sat]
 
   class << self
-    alias civil new
-
     def wrap(native)
       instance = allocate
       `#{instance}.date = #{native}`
@@ -344,6 +342,8 @@ class Date
     def gregorian_leap?(year)
       `(new Date(#{year}, 1, 29).getMonth()-1) === 0`
     end
+
+    alias civil new
   end
 
   def initialize(year = -4712, month = 1, day = 1, start = ITALY)
@@ -472,8 +472,6 @@ class Date
     }
   end
 
-  alias eql? ==
-
   def clone
     Date.wrap(`new Date(#{@date}.getTime())`)
   end
@@ -588,8 +586,6 @@ class Date
     }
   end
 
-  alias succ next
-
   def sunday?
     wday == 0
   end
@@ -680,4 +676,7 @@ class Date
       return [31, (leap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
     }
   }
+
+  alias eql? ==
+  alias succ next
 end

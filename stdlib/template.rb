@@ -36,10 +36,10 @@ class Template
       @buffer << str
     end
 
-    alias append= append
-
     def join
       @buffer.join
     end
+
+    alias append= append
   end
 end

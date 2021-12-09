@@ -1,6 +1,5 @@
 class StringScanner
-  attr_reader :pos
-  attr_reader :matched
+  attr_reader :pos, :matched
 
   def initialize(string)
     @string  = string
@@ -15,8 +14,6 @@ class StringScanner
   def beginning_of_line?
     `#{@pos} === 0 || #{@string}.charAt(#{@pos} - 1) === "\n"`
   end
-
-  alias bol? beginning_of_line?
 
   def scan(pattern)
     pattern = anchor(pattern)
@@ -227,9 +224,6 @@ class StringScanner
     }
   end
 
-  # not exactly, but for now...
-  alias getch get_byte
-
   def match?(pattern)
     pattern = anchor(pattern)
 
@@ -318,6 +312,9 @@ class StringScanner
 
     self
   end
+
+  alias bol? beginning_of_line?
+  alias getch get_byte # not exactly the same, but for now...
 
   private
 

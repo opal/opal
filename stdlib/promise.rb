@@ -275,9 +275,6 @@ class Promise
     self.then(&block)
   end
 
-  alias do then
-  alias do! then!
-
   def fail(&block)
     self ^ Promise.new(failure: block)
   end
@@ -287,11 +284,6 @@ class Promise
     fail(&block)
   end
 
-  alias rescue fail
-  alias catch fail
-  alias rescue! fail!
-  alias catch! fail!
-
   def always(&block)
     self ^ Promise.new(always: block)
   end
@@ -300,11 +292,6 @@ class Promise
     there_can_be_only_one!
     always(&block)
   end
-
-  alias finally always
-  alias ensure always
-  alias finally! always!
-  alias ensure! always!
 
   def trace(depth = nil, &block)
     self ^ Trace.new(depth, block)
@@ -337,8 +324,6 @@ class Promise
     result
   end
 
-  alias to_v1 itself
-
   def to_v2
     v2 = PromiseV2.new
 
@@ -347,7 +332,18 @@ class Promise
     v2
   end
 
+  alias catch fail
+  alias catch! fail!
+  alias do then
+  alias do! then!
+  alias ensure always
+  alias ensure! always!
+  alias finally always
+  alias finally! always!
+  alias rescue fail
+  alias rescue! fail!
   alias to_n to_v2
+  alias to_v1 itself
 
   class Trace < self
     def self.it(promise)
@@ -414,10 +410,6 @@ class Promise
       end
     end
 
-    alias map collect
-
-    alias reduce inject
-
     def wait(promise)
       unless Promise === promise
         promise = Promise.value(promise)
@@ -436,8 +428,6 @@ class Promise
       self
     end
 
-    alias and wait
-
     def >>(*)
       super.tap do
         try
@@ -454,6 +444,10 @@ class Promise
         end
       end
     end
+
+    alias map collect
+    alias reduce inject
+    alias and wait
   end
 end
 

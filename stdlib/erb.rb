@@ -10,6 +10,7 @@ class ERB
     end
 
     alias h html_escape
+
     module_function :h
     module_function :html_escape
   end

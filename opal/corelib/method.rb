@@ -36,9 +36,6 @@ class ::Method
     @method.curry(arity)
   end
 
-  alias [] call
-  alias === call
-
   def >>(other)
     @method >> other
   end
@@ -65,6 +62,9 @@ class ::Method
   def inspect
     "#<#{self.class}: #{@receiver.class}##{@name} (defined in #{@owner} in #{source_location.join(':')})>"
   end
+
+  alias [] call
+  alias === call
 end
 
 class ::UnboundMethod

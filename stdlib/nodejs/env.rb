@@ -13,11 +13,6 @@ class << ENV
     `process.env.hasOwnProperty(#{name})`
   end
 
-  # alias
-  alias has_key? key?
-  alias include? key?
-  alias member? key?
-
   def empty?
     `Object.keys(process.env).length === 0`
   end
@@ -45,15 +40,17 @@ class << ENV
     'ENV'
   end
 
-  alias inspect to_s
-
   def to_h
     keys.to_h { |k| [k, self[k]] }
   end
 
-  alias to_hash to_h
-
   def merge(keys)
     to_h.merge(keys)
   end
+
+  alias has_key? key?
+  alias include? key?
+  alias inspect to_s
+  alias member? key?
+  alias to_hash to_h
 end

@@ -124,8 +124,6 @@ class PromiseV2 < `Promise`
       end
     end
 
-    alias all when
-
     def all_resolved(*promises)
       promises = Array(promises.length == 1 ? promises.first : promises)
       `Promise.allResolved(#{promises})`.tap do |prom|
@@ -154,7 +152,6 @@ class PromiseV2 < `Promise`
         prom.instance_variable_set(:@value, value)
       end
     end
-    alias value resolve
 
     def reject(value = nil)
       `Promise.reject(#{value})`.tap do |prom|
@@ -163,7 +160,10 @@ class PromiseV2 < `Promise`
         prom.instance_variable_set(:@value, value)
       end
     end
+
+    alias all when
     alias error reject
+    alias value resolve
   end
 
   attr_reader :prev, :next
@@ -209,7 +209,6 @@ class PromiseV2 < `Promise`
     @resolve_proc.call(value)
     self
   end
-  alias resolve! resolve
 
   def reject(value = nil)
     nativity_check!
@@ -219,7 +218,6 @@ class PromiseV2 < `Promise`
     @reject_proc.call(value)
     self
   end
-  alias reject! reject
 
   def then(&block)
     prom = nil
@@ -239,9 +237,6 @@ class PromiseV2 < `Promise`
     self.then(&block)
   end
 
-  alias do then
-  alias do! then!
-
   def fail(&block)
     prom = nil
     blk = gen_tracing_proc(block) do |val|
@@ -260,11 +255,6 @@ class PromiseV2 < `Promise`
     fail(&block)
   end
 
-  alias rescue fail
-  alias catch fail
-  alias rescue! fail!
-  alias catch! fail!
-
   def always(&block)
     prom = nil
     blk = gen_tracing_proc(block) do |val|
@@ -282,11 +272,6 @@ class PromiseV2 < `Promise`
     there_can_be_only_one!
     always(&block)
   end
-
-  alias finally always
-  alias ensure always
-  alias finally! always!
-  alias ensure! always!
 
   def trace(depth = nil, &block)
     prom = self.then do
@@ -362,8 +347,6 @@ class PromiseV2 < `Promise`
     yield self if block_given?
   end
 
-  alias to_v2 itself
-
   def to_v1
     v1 = PromiseV1.new
 
@@ -371,8 +354,6 @@ class PromiseV2 < `Promise`
 
     v1
   end
-
-  alias to_n itself
 
   def inspect
     result = "#<#{self.class}"
@@ -395,4 +376,19 @@ class PromiseV2 < `Promise`
 
     result
   end
+
+  alias catch fail
+  alias catch! fail!
+  alias do then
+  alias do! then!
+  alias ensure always
+  alias ensure! always!
+  alias finally always
+  alias finally! always!
+  alias reject! reject
+  alias rescue fail
+  alias rescue! fail!
+  alias resolve! resolve
+  alias to_n itself
+  alias to_v2 itself
 end

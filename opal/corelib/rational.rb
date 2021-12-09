@@ -232,8 +232,6 @@ class ::Rational < ::Numeric
     end
   end
 
-  alias divide /
-
   def floor(precision = 0)
     if precision == 0
       (-(-@num / @den)).floor
@@ -249,8 +247,6 @@ class ::Rational < ::Numeric
   def inspect
     "(#{self})"
   end
-
-  alias quo /
 
   def rationalize(eps = undefined)
     %x{
@@ -391,4 +387,7 @@ class ::Rational < ::Numeric
       }
     }
   end
+
+  alias divide /
+  alias quo /
 end

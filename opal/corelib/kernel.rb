@@ -192,8 +192,6 @@ module ::Kernel
     ::Enumerator.for(self, method, *args, &block)
   end
 
-  alias to_enum enum_for
-
   def equal?(other)
     `self === other`
   end
@@ -467,8 +465,6 @@ module ::Kernel
     self
   end
 
-  alias kind_of? is_a?
-
   def lambda(&block)
     `Opal.lambda(block)`
   end
@@ -495,8 +491,6 @@ module ::Kernel
   def nil?
     false
   end
-
-  alias object_id __id__
 
   def printf(*args)
     if args.any?
@@ -581,8 +575,6 @@ module ::Kernel
       throw exception;
     }
   end
-
-  alias fail raise
 
   def rand(max = undefined)
     %x{
@@ -669,9 +661,6 @@ module ::Kernel
     }
   end
 
-  alias send        __send__
-  alias public_send __send__
-
   def singleton_class
     `Opal.get_singleton_class(self)`
   end
@@ -741,7 +730,13 @@ module ::Kernel
     yield self
   end
 
+  alias fail raise
+  alias kind_of? is_a?
+  alias object_id __id__
+  alias public_send __send__
+  alias send __send__
   alias then yield_self
+  alias to_enum enum_for
 
   ::Opal.pristine(self, :method_missing)
 end

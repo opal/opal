@@ -58,11 +58,12 @@ module JS
     args << block if block
     g.JS[func].JS.apply(g, args)
   end
-  alias method_missing call
 
   def [](name)
     `Opal.global[#{name}]`
   end
+
+  alias method_missing call
 
   extend self
 end

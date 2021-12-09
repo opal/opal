@@ -8,6 +8,10 @@ class ::IO
   self::READABLE = 1
   self::WRITABLE = 4
 
+  attr_reader :eof
+
+  attr_accessor :read_proc,  :sync, :tty, :write_proc
+
   def initialize(fd, flags = 'r')
     @fd = fd
     @flags = flags
@@ -28,18 +32,10 @@ class ::IO
     `self.tty == true`
   end
 
-  attr_accessor :write_proc
-  attr_accessor :read_proc
-
   def write(string)
     `self.write_proc(string)`
     string.size
   end
-
-  attr_accessor :sync, :tty
-
-  attr_reader :eof
-  alias eof? eof
 
   def flush
     # noop
@@ -216,8 +212,6 @@ class ::IO
     self
   end
 
-  alias each_line each
-
   def each_byte(&block)
     return enum_for :each_byte unless block_given?
 
@@ -285,6 +279,9 @@ class ::IO
       ::Kernel.raise ::IOError, 'not opened for reading'
     end
   end
+
+  alias each_line each
+  alias eof? eof
 end
 
 ::STDIN  = $stdin  = ::IO.new(0, 'r')

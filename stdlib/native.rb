@@ -261,10 +261,6 @@ class Native::Object < BasicObject
     `Opal.hasOwnProperty.call(#{@native}, #{name})`
   end
 
-  alias key? has_key?
-  alias include? has_key?
-  alias member? has_key?
-
   def each(*args)
     if block_given?
       %x{
@@ -341,8 +337,6 @@ class Native::Object < BasicObject
     `Opal.is_a(self, klass)`
   end
 
-  alias kind_of? is_a?
-
   def instance_of?(klass)
     `self.$$class === klass`
   end
@@ -358,6 +352,11 @@ class Native::Object < BasicObject
   def inspect
     "#<Native:#{`String(#{@native})`}>"
   end
+
+  alias include? has_key?
+  alias key? has_key?
+  alias kind_of? is_a?
+  alias member? has_key?
 end
 
 class Native::Array
@@ -435,11 +434,11 @@ class Native::Array
     `#{@native}[#{@length}]`
   end
 
-  alias to_ary to_a
-
   def inspect
     to_a.inspect
   end
+
+  alias to_ary to_a
 end
 
 class Numeric

@@ -77,8 +77,6 @@ class ::Enumerator
     }
   end
 
-  alias with_object each_with_object
-
   def each_with_index(&block)
     return enum_for(:each_with_index) { size } unless block_given?
 
@@ -95,6 +93,8 @@ class ::Enumerator
 
     result + '>'
   end
+
+  alias with_object each_with_object
 
   class Generator
     include ::Enumerable
@@ -174,8 +174,6 @@ class ::Enumerator
         nil
       end
     end
-
-    alias force to_a
 
     def lazy
       self
@@ -272,8 +270,6 @@ class ::Enumerator
       self.class.for(self, method, *args, &block)
     end
 
-    alias filter find_all
-
     def find_all(&block)
       unless block
         ::Kernel.raise ::ArgumentError, 'tried to call lazy select without a block'
@@ -290,7 +286,29 @@ class ::Enumerator
       end
     end
 
-    alias flat_map collect_concat
+    def detect(ifnone = undefined, &block)
+      return enum_for :detect, ifnone unless block_given?
+
+      each do |*args|
+        value = ::Opal.destructure(args)
+        p value: value
+        if yield(value)
+          return value
+        end
+      end
+
+      %x{
+        if (ifnone !== undefined) {
+          if (typeof(ifnone) === 'function') {
+            return ifnone();
+          } else {
+            return ifnone;
+          }
+        }
+      }
+
+      nil
+    end
 
     def grep(pattern, &block)
       if block
@@ -319,10 +337,6 @@ class ::Enumerator
         end
       end
     end
-
-    alias map collect
-
-    alias select find_all
 
     def reject(&block)
       unless block
@@ -384,11 +398,16 @@ class ::Enumerator
       end
     end
 
-    alias to_enum enum_for
-
     def inspect
       "#<#{self.class}: #{@enumerator.inspect}>"
     end
+
+    alias force to_a
+    alias flat_map collect_concat
+    alias filter find_all
+    alias map collect
+    alias select find_all
+    alias to_enum enum_for
   end
 
   class self::ArithmeticSequence < self

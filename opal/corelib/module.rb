@@ -542,8 +542,6 @@ class ::Module
     }
   end
 
-  alias class_eval module_eval
-
   def module_exec(*args, &block)
     %x{
       if (block === nil) {
@@ -559,8 +557,6 @@ class ::Module
       return result;
     }
   end
-
-  alias class_exec module_exec
 
   def method_defined?(method)
     %x{
@@ -660,8 +656,6 @@ class ::Module
     `Opal.Module.$name.call(self)` || "#<#{`self.$$is_module ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
   end
 
-  alias inspect to_s
-
   def undef_method(*names)
     %x{
       for (var i = 0, length = names.length; i < length; i++) {
@@ -737,4 +731,8 @@ class ::Module
   def using(mod)
     ::Kernel.raise 'Module#using is not permitted in methods'
   end
+
+  alias class_eval module_eval
+  alias class_exec module_exec
+  alias inspect to_s
 end

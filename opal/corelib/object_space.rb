@@ -90,13 +90,14 @@ module ::ObjectSpace
         return #{@weak_map}.has(p1);
       }
     end
-    alias member? include?
-    alias key? include?
 
     %i[each each_key each_value each_pair keys values size length].each do |i|
       define_method i do |*|
         ::Kernel.raise ::NotImplementedError, "##{i} can't be implemented on top of JS interfaces"
       end
     end
+
+    alias member? include?
+    alias key? include?
   end
 end

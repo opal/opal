@@ -437,8 +437,6 @@ module ::Enumerable
     map(&block).select(&:itself)
   end
 
-  alias find detect
-
   def find_all(&block)
     return enum_for(:find_all) { enumerator_size } unless block_given?
 
@@ -459,8 +457,6 @@ module ::Enumerable
       return result;
     }
   end
-
-  alias filter find_all
 
   def find_index(object = undefined, &block)
     return enum_for :find_index if `object === undefined && block === nil`
@@ -524,8 +520,6 @@ module ::Enumerable
       result
     end
   end
-
-  alias flat_map collect_concat
 
   def grep(pattern, &block)
     result = []
@@ -656,8 +650,6 @@ module ::Enumerable
     respond_to?(:size) ? size : nil
   end
 
-  alias map collect
-
   def max(n = undefined, &block)
     %x{
       if (n === undefined || n === nil) {
@@ -733,8 +725,6 @@ module ::Enumerable
       return result === undefined ? nil : result;
     }
   end
-
-  alias member? include?
 
   def min(n = nil, &block)
     unless n.nil?
@@ -967,8 +957,6 @@ module ::Enumerable
     }
   end
 
-  alias reduce inject
-
   def reject(&block)
     return enum_for(:reject) { enumerator_size } unless block_given?
 
@@ -1009,8 +997,6 @@ module ::Enumerable
       return result;
     }
   end
-
-  alias select find_all
 
   def slice_before(pattern = undefined, &block)
     if `pattern === undefined && block === nil`
@@ -1233,8 +1219,6 @@ module ::Enumerable
     group_by(&:itself).transform_values(&:count)
   end
 
-  alias to_a entries
-
   def to_h(*args, &block)
     return map(&block).to_h(*args) if block_given?
 
@@ -1265,4 +1249,13 @@ module ::Enumerable
   def zip(*others, &block)
     to_a.zip(*others)
   end
+
+  alias find detect
+  alias filter find_all
+  alias flat_map collect_concat
+  alias map collect
+  alias member? include?
+  alias reduce inject
+  alias select find_all
+  alias to_a entries
 end

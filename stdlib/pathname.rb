@@ -165,12 +165,6 @@ class Pathname
     path <=> other.path
   end
 
-  alias eql? ==
-  alias === ==
-
-  alias to_str to_path
-  alias to_s to_path
-
   SAME_PATHS = if File::FNM_SYSCASE.nonzero?
                  # Avoid #zero? here because #casecmp can return nil.
                  proc { |a, b| a.casecmp(b) == 0 }
@@ -217,6 +211,11 @@ class Pathname
   def entries
     Dir.entries(@path).map { |f| self.class.new(f) }
   end
+
+  alias === ==
+  alias eql? ==
+  alias to_s to_path
+  alias to_str to_path
 end
 
 module Kernel

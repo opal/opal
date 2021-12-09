@@ -23,11 +23,11 @@ module FileUtils
     `__fs__.mkdirSync(#{path})`
   end
 
-  alias mkpath mkdir_p
-  alias makedirs mkdir_p
-
   def mv(source, target)
     target = File.join(target, File.basename(source)) if File.directory? target
     `__fs__.renameSync(source, target)`
   end
+
+  alias mkpath mkdir_p
+  alias makedirs mkdir_p
 end

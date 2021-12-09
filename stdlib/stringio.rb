@@ -22,8 +22,6 @@ class StringIO < IO
     @position == @string.length
   end
 
-  alias eof eof?
-
   def seek(pos, whence = IO::SEEK_SET)
     # Let's reset the read buffer, because it will be most likely wrong
     @read_buffer = ''
@@ -55,10 +53,6 @@ class StringIO < IO
   def tell
     @position
   end
-
-  alias pos tell
-
-  alias pos= seek
 
   def rewind
     seek 0
@@ -113,5 +107,8 @@ class StringIO < IO
     read(length)
   end
 
+  alias eof eof?
+  alias pos tell
+  alias pos= seek
   alias readpartial read
 end

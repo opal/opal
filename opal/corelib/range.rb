@@ -101,8 +101,6 @@ class ::Range
       @end.eql?(other.end)
   end
 
-  alias == eql?
-
   def exclude_end?
     @excl
   end
@@ -112,8 +110,6 @@ class ::Range
     return @begin if `n == null`
     super
   end
-
-  alias include? cover?
 
   def last(n = undefined)
     ::Kernel.raise ::RangeError, 'cannot get the maximum of endless range' if @end.nil?
@@ -134,8 +130,6 @@ class ::Range
       `#{@excl} ? #{@end} - 1 : #{@end}`
     end
   end
-
-  alias member? cover?
 
   def min
     if @begin.nil?
@@ -283,4 +277,8 @@ class ::Range
   def hash
     [@begin, @end, @excl].hash
   end
+
+  alias == eql?
+  alias include? cover?
+  alias member? cover?
 end

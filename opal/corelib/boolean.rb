@@ -39,8 +39,6 @@ class ::Boolean < `Boolean`
     `self.valueOf() ? 2 : 0`
   end
 
-  alias object_id __id__
-
   def !
     `self != true`
   end
@@ -61,9 +59,6 @@ class ::Boolean < `Boolean`
     `(self == true) === other.valueOf()`
   end
 
-  alias equal? ==
-  alias eql? ==
-
   def singleton_class
     `self.$$meta`
   end
@@ -71,8 +66,6 @@ class ::Boolean < `Boolean`
   def to_s
     `(self == true) ? 'true' : 'false'`
   end
-
-  alias inspect to_s
 
   def dup
     self
@@ -104,6 +97,11 @@ class ::Boolean < `Boolean`
     `var body = self.$$class.$$prototype['$' + #{method}]`
     `typeof body !== 'undefined' && !body.$$stub`
   end
+
+  alias eql? ==
+  alias equal? ==
+  alias inspect to_s
+  alias object_id __id__
 end
 
 class ::TrueClass < ::Boolean; end

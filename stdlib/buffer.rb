@@ -30,8 +30,6 @@ class Buffer
     `#{@native}.byteLength`
   end
 
-  alias size length
-
   def to_a(bits = 8, type = :unsigned)
     Array.new(self, bits, type)
   end
@@ -43,4 +41,6 @@ class Buffer
   def to_s
     to_a.to_a.pack('c*')
   end
+
+  alias size length
 end

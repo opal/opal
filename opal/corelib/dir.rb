@@ -11,10 +11,11 @@ class ::Dir
     def pwd
       `Opal.current_dir || '.'`
     end
-    alias getwd pwd
 
     def home
       ::ENV['HOME'] || '.'
     end
+
+    alias getwd pwd
   end
 end

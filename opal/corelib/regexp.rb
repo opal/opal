@@ -28,8 +28,6 @@ class ::Regexp < `RegExp`
       end
     end
 
-    alias quote escape
-
     def union(*parts)
       %x{
         var is_first_part_array, quoted_validated, part, options, each_part_options;
@@ -104,6 +102,7 @@ class ::Regexp < `RegExp`
     end
 
     alias compile new
+    alias quote escape
   end
 
   def ==(other)
@@ -117,8 +116,6 @@ class ::Regexp < `RegExp`
   def =~(string)
     match(string) && $~.begin(0)
   end
-
-  alias eql? ==
 
   def inspect
     # Use a regexp to extract the regular expression and the optional mode modifiers from the string.
@@ -288,6 +285,7 @@ class ::Regexp < `RegExp`
     `self.ignoreCase`
   end
 
+  alias eql? ==
   alias to_s source
 end
 
@@ -350,8 +348,6 @@ class MatchData
       `self.begin == other.begin`
   end
 
-  alias eql? ==
-
   def begin(n)
     %x{
       if (n !== 0) {
@@ -410,8 +406,6 @@ class MatchData
     `#{@matches}.length`
   end
 
-  alias size length
-
   def to_a
     @matches
   end
@@ -448,4 +442,7 @@ class MatchData
       return values;
     }
   end
+
+  alias eql? ==
+  alias size length
 end

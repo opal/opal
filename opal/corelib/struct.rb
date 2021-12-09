@@ -253,13 +253,9 @@ class ::Struct
     self.class.members.length
   end
 
-  alias size length
-
   def to_a
     self.class.members.map { |name| self[name] }
   end
-
-  alias values to_a
 
   def inspect
     result = '#<struct '
@@ -276,8 +272,6 @@ class ::Struct
 
     result
   end
-
-  alias to_s inspect
 
   def to_h(&block)
     return map(&block).to_h(*args) if block_given?
@@ -316,4 +310,8 @@ class ::Struct
 
     item.dig(*keys)
   end
+
+  alias size length
+  alias to_s inspect
+  alias values to_a
 end
