@@ -104,6 +104,10 @@ class ::UnboundMethod
     }
   end
 
+  def bind_call(object, *args, &block)
+    bind(object).call(*args, &block)
+  end
+
   def inspect
     "#<#{self.class}: #{@source}##{@name} (defined in #{@owner} in #{source_location.join(':')})>"
   end
