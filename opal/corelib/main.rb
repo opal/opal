@@ -1,16 +1,18 @@
-def self.to_s
-  'main'
-end
+class << self
+  def to_s
+    'main'
+  end
 
-def self.include(mod)
-  ::Object.include mod
-end
+  def include(mod)
+    ::Object.include mod
+  end
 
-def self.autoload(*args)
-  ::Object.autoload(*args)
-end
+  def autoload(*args)
+    `Opal.Object.$autoload.apply(Opal.Object, args)`
+  end
 
-# Compiler overrides this method
-def self.using(mod)
-  ::Kernel.raise 'main.using is permitted only at toplevel'
+  # Compiler overrides this method
+  def using(mod)
+    ::Kernel.raise 'main.using is permitted only at toplevel'
+  end
 end

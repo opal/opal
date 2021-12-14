@@ -105,11 +105,13 @@ module ::Opal
   end
 
   def self.const_name!(const_name)
-    const_name = ::Opal.coerce_to!(const_name, ::String, :to_str)
+    const_name = ::Opal.coerce_to!(const_name, ::String, :to_str) if defined? ::String
 
-    if const_name[0] != const_name[0].upcase
-      ::Kernel.raise ::NameError, "wrong constant name #{const_name}"
-    end
+    %x{
+      if (!const_name || const_name[0] != const_name[0].toUpperCase()) {
+        #{raise ::NameError, "wrong constant name #{const_name}"}
+      }
+    }
 
     const_name
   end

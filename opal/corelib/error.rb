@@ -242,41 +242,7 @@ class ::RegexpError         < ::StandardError; end
 class ::ThreadError         < ::StandardError; end
 class ::FiberError          < ::StandardError; end
 
-module ::Errno
-  errors = [
-    [:EINVAL, 'Invalid argument'],
-    [:EEXIST, 'File exists'],
-    [:EISDIR, 'Is a directory'],
-    [:EMFILE, 'Too many open files'],
-    [:EACCES, 'Permission denied'],
-    [:EPERM, 'Operation not permitted'],
-    [:ENOENT, 'No such file or directory']
-  ]
-
-  klass = nil
-
-  %x{
-    var i;
-    for (i = 0; i < errors.length; i++) {
-      (function() { // Create a closure
-        var class_name = errors[i][0];
-        var default_message = errors[i][1];
-
-        klass = Opal.klass(self, Opal.SystemCallError, class_name);
-
-        #{
-          class << klass
-            def new(name = nil)
-              message = `default_message`
-              message += " - #{name}" if name
-              super(message)
-            end
-          end
-        }
-      })();
-    }
-  }
-end
+::Object.autoload :Errno, 'corelib/error/errno'
 
 class ::UncaughtThrowError < ::ArgumentError
   attr_reader :tag, :value
