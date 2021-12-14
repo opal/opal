@@ -200,9 +200,10 @@
     var body = obj[jsid];
 
     if (obj['$respond_to?'].$$pristine) {
-      if (obj['$respond_to_missing?'].$$pristine) {
-        return typeof(body) === "function" && !body.$$stub;
-      } else {
+      if (typeof(body) === "function" && !body.$$stub) {
+        return true;
+      }
+      if (!obj['$respond_to_missing?'].$$pristine) {
         return Opal.send(obj, obj['$respond_to_missing?'], [jsid.substr(1), include_all]);
       }
     } else {
