@@ -1164,8 +1164,10 @@ module ::Enumerable
     dup.map! { |i| `i[1]` }
   end
 
+  # This method implements the Kahan summation algorithm if it is possible to apply one.
   def sum(initial = 0)
     result = initial
+    compensation = 0
 
     each do |*args|
       item = if block_given?
@@ -1173,7 +1175,15 @@ module ::Enumerable
              else
                ::Opal.destructure(args)
              end
-      result += item
+
+      if ![::Float::INFINITY, -::Float::INFINITY].include?(item) && item.respond_to?(:-)
+        y = item - compensation
+        t = result + y
+        compensation = (t - result) - y
+        result = t
+      else
+        result += item
+      end
     end
 
     result
