@@ -1,13 +1,7 @@
 require 'corelib/file'
 
 %x{
-  var warnings = {}, errno_code, errno_codes = [
-    'EACCES',
-    'EISDIR',
-    'EMFILE',
-    'ENOENT',
-    'EPERM'
-  ];
+  var warnings = {}, errno_codes = #{Errno.constants};
 
   function handle_unsupported_feature(message) {
     switch (Opal.config.unsupported_features_severity) {
@@ -107,16 +101,9 @@ require 'corelib/file'
     } catch (error) {
       if (errno_codes.indexOf(error.code) >= 0) {
         var error_class = #{Errno.const_get(`error.code`)}
-        throw #{`error_class`.new(`error.message`)};
+        #{Kernel.raise `error_class`.new(`error.message`)}
       }
-      throw error;
-    }
-  }
-
-  for(var i = 0, ii = errno_codes.length; i < ii; i++) {
-    errno_code = errno_codes[i];
-    if (!#{Errno.const_defined?(`errno_code`)}) {
-      #{Errno.const_set(`errno_code`, Class.new(SystemCallError))}
+      #{Kernel.raise error}
     }
   }
 }
@@ -329,7 +316,23 @@ class File::Stat
     `return executeIOAction(function(){return __fs__.statSync(#{@path}).isFile()})`
   end
 
+  def directory?
+    `return executeIOAction(function(){return __fs__.statSync(#{@path}).isDirectory()})`
+  end
+
   def mtime
     `return executeIOAction(function(){return __fs__.statSync(#{@path}).mtime})`
+  end
+
+  def readable?
+    `return executeIOAction(function(){return __fs__.accessSync(#{@path}, __fs__.constants.R_OK)})`
+  end
+
+  def writable?
+    `return executeIOAction(function(){return __fs__.accessSync(#{@path}, __fs__.constants.W_OK)})`
+  end
+
+  def executable?
+    `return executeIOAction(function(){return __fs__.accessSync(#{@path}, __fs__.constants.X_OK)})`
   end
 end
