@@ -254,7 +254,7 @@ module ::Errno
   ]
 
   klass = nil
-  
+
   %x{
     var i;
     for (i = 0; i < errors.length; i++) {
@@ -276,7 +276,6 @@ module ::Errno
       })();
     }
   }
-
 end
 
 class ::UncaughtThrowError < ::ArgumentError

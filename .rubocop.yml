@@ -54,6 +54,8 @@ AllCops:
     - 'stdlib/prettyprint.rb'
     - 'stdlib/optparse.rb'
     - 'stdlib/optparse/*.rb'
+    - 'stdlib/tmpdir.rb'
+    - 'stdlib/tempfile.rb'
 
 inherit_mode:
   merge:

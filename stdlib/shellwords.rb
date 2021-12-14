@@ -86,7 +86,7 @@ module Shellwords
   #   argv = 'here are "two words"'.shellsplit
   #   argv #=> ["here", "are", "two words"]
   def shellsplit(line)
-    line += " " # Somehow this is needed for the JS regexp engine
+    line += ' ' # Somehow this is needed for the JS regexp engine
     words = []
     field = String.new
     line.scan(/\s*(?:([^\s\\\'\"]+)|'([^\']*)'|"((?:[^\"\\]|\\.)*)"|(\\.?)|(\S))(\r?\n?\Z|\s)?/m) do |(word, sq, dq, esc, garbage, sep)|
