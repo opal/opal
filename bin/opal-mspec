@@ -7,7 +7,5 @@ specs = ARGV.map do |s|
 end
 
 env = {}
-env['MSPEC_PATTERN'] = "{#{specs.join(',')}}" if specs.any?
+env['PATTERN'] = "{#{specs.join(',')}}" if specs.any?
 exec env, 'rake', 'mspec'
-
-# RUBYOPT="-rbundler/setup -rmspec/opal/special_calls" bundle exec mspec run -t opal -pspec/ruby/spec_helper spec/ruby/core/true/*
