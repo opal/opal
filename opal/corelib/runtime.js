@@ -2753,27 +2753,14 @@
 
   // Operator helpers
   // ----------------
-  function generate_operator_helpers() {
-    var name, op, i, helpers = [
-      ['plus', '+'],
-      ['minus', '-'],
-      ['times', '*'],
-      ['divide', '/'],
-      ['lt', '<'],
-      ['gt', '>'],
-      ['le', '<='],
-      ['ge', '>=']
-    ];
-
-    for (i = 0; i < helpers.length; i++) {
-      name = helpers[i][0];
-      op = helpers[i][1];
-      Opal['rb_'+name] = new Function('l', 'r',
-        "return(typeof(l)==='number'&&typeof(r)==='number')?l"+op+"r:l['$"+op+"'](r);"
-      );
-    }
-  }
-  generate_operator_helpers();
+  Opal.rb_plus   = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l + r : l['$+'](r); }
+  Opal.rb_minus  = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l - r : l['$-'](r); }
+  Opal.rb_times  = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l * r : l['$*'](r); }
+  Opal.rb_divide = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l / r : l['$/'](r); }
+  Opal.rb_lt     = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l < r : l['$<'](r); }
+  Opal.rb_gt     = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l > r : l['$>'](r); }
+  Opal.rb_le     = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l <= r : l['$<='](r); }
+  Opal.rb_ge     = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l >= r : l['$>='](r); }
 
   // Optimized helpers for calls like $truthy((a)['$==='](b)) -> $eqeqeq(a, b)
   Opal.eqeq = function(lhs, rhs) {
