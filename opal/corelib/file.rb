@@ -74,7 +74,6 @@ class ::File < ::IO
       end
       absolute_path(path, basedir)
     end
-    alias realpath expand_path
 
     %x{
       // Coerce a given path to a path string using #to_path and #to_str
@@ -156,7 +155,6 @@ class ::File < ::IO
     def exist?(path)
       `Opal.modules[#{path}] != null`
     end
-    alias exists? exist?
 
     def directory?(path)
       files = []
@@ -206,5 +204,8 @@ class ::File < ::IO
     def split(path)
       path.split(SEPARATOR)
     end
+
+    alias realpath expand_path
+    alias exists? exist?
   end
 end

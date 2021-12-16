@@ -403,8 +403,6 @@ class ::Hash
     }
   end
 
-  alias dup clone
-
   def dig(key, *keys)
     item = self[key]
 
@@ -456,8 +454,6 @@ class ::Hash
     }
   end
 
-  alias each_pair each
-
   def each_value(&block)
     return enum_for(:each_value) { size } unless block
 
@@ -475,8 +471,6 @@ class ::Hash
   def empty?
     `self.$$keys.length === 0`
   end
-
-  alias eql? ==
 
   def except(*keys)
     dup.except!(*keys)
@@ -609,8 +603,6 @@ class ::Hash
     }
   end
 
-  alias include? has_key?
-
   def index(object)
     %x{
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
@@ -651,8 +643,6 @@ class ::Hash
       return result;
     }
   end
-
-  alias indices indexes
 
   `var inspect_ids`
 
@@ -745,10 +735,6 @@ class ::Hash
     }
   end
 
-  alias key index
-
-  alias key? has_key?
-
   def keys
     %x{
       var result = [];
@@ -770,8 +756,6 @@ class ::Hash
   def length
     `self.$$keys.length`
   end
-
-  alias member? has_key?
 
   def merge(*others, &block)
     dup.merge!(*others, &block)
@@ -997,9 +981,6 @@ class ::Hash
     }
   end
 
-  alias filter select
-  alias filter! select!
-
   def shift
     %x{
       var keys = self.$$keys,
@@ -1017,8 +998,6 @@ class ::Hash
     }
   end
 
-  alias size length
-
   def slice(*keys)
     %x{
       var result = $hash();
@@ -1034,8 +1013,6 @@ class ::Hash
       return result;
     }
   end
-
-  alias store []=
 
   def to_a
     %x{
@@ -1090,8 +1067,6 @@ class ::Hash
       self[key]
     end
   end
-
-  alias to_s inspect
 
   def transform_keys(&block)
     return enum_for(:transform_keys) { size } unless block
@@ -1193,12 +1168,6 @@ class ::Hash
     }
   end
 
-  alias update merge!
-
-  alias value? has_value?
-
-  alias values_at indexes
-
   def values
     %x{
       var result = [];
@@ -1216,4 +1185,21 @@ class ::Hash
       return result;
     }
   end
+
+  alias dup clone
+  alias each_pair each
+  alias eql? ==
+  alias filter select
+  alias filter! select!
+  alias include? has_key?
+  alias indices indexes
+  alias key index
+  alias key? has_key?
+  alias member? has_key?
+  alias size length
+  alias store []=
+  alias to_s inspect
+  alias update merge!
+  alias value? has_value?
+  alias values_at indexes
 end

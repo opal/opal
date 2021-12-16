@@ -99,12 +99,12 @@ class << ARGF
     file.eof?
   end
 
-  alias to_io file
-  alias to_i fileno
-  alias skip close
-  alias path filename
   alias each_line each
   alias eof eof?
+  alias path filename
+  alias skip close
+  alias to_i fileno
+  alias to_io file
 end
 
 ARGF.lineno = 1

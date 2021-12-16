@@ -27,7 +27,6 @@ opal_filter "Array" do
   fails "Array#[]= with [m..] just sets the section defined by range to nil if m and n < 0 and the rhs is nil" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#[]= with [m..] replaces the section defined by range" # Opal::SyntaxError: undefined method `type' for nil
   fails "Array#[]= with [m..] replaces the section if m and n < 0" # Opal::SyntaxError: undefined method `type' for nil
-  fails "Array#drop raises a TypeError when the passed argument can't be coerced to Integer" # Expected TypeError but no exception was raised ([1, 2] was returned)
   fails "Array#drop raises a TypeError when the passed argument isn't an integer and #to_int returns non-Integer" # Expected TypeError but no exception was raised ([1, 2] was returned)
   fails "Array#drop tries to convert the passed argument to an Integer using #to_int" # Expected [1, 2, 3] == [3] to be truthy but was false
   fails "Array#each does not yield elements deleted from the end of the array" # Expected [2, 3, nil] to equal [2, 3]

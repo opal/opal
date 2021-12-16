@@ -10,10 +10,6 @@ class ::Complex < ::Numeric
     new(real, imag)
   end
 
-  class << self
-    alias rectangular rect
-  end
-
   def self.polar(r, theta = 0)
     unless ::Numeric === r && r.real? && ::Numeric === theta && theta.real?
       ::Kernel.raise ::TypeError, 'not a real'
@@ -156,19 +152,13 @@ class ::Complex < ::Numeric
     ::Math.atan2(@imag, @real)
   end
 
-  alias arg angle
-
   def conj
     ::Kernel.Complex(@real, -@imag)
   end
 
-  alias conjugate conj
-
   def denominator
     @real.denominator.lcm(@imag.denominator)
   end
-
-  alias divide /
 
   def eql?(other)
     Complex === other && @real.class == @imag.class && self == other
@@ -190,8 +180,6 @@ class ::Complex < ::Numeric
     "Complex:#{@real}:#{@imag}"
   end
 
-  alias imaginary imag
-
   def infinite?
     @real.infinite? || @imag.infinite?
   end
@@ -199,10 +187,6 @@ class ::Complex < ::Numeric
   def inspect
     "(#{self})"
   end
-
-  alias magnitude abs
-
-  undef negative?
 
   def numerator
     d = denominator
@@ -212,15 +196,9 @@ class ::Complex < ::Numeric
     )
   end
 
-  alias phase arg
-
   def polar
     [abs, arg]
   end
-
-  undef positive?
-
-  alias quo /
 
   def rationalize(eps = undefined)
     %x{
@@ -243,10 +221,6 @@ class ::Complex < ::Numeric
   def rect
     [@real, @imag]
   end
-
-  alias rectangular rect
-
-  undef step
 
   def to_f
     unless @imag == 0
@@ -370,4 +344,21 @@ class ::Complex < ::Numeric
       }
     }
   end
+
+  class << self
+    alias rectangular rect
+  end
+
+  alias arg angle
+  alias conjugate conj
+  alias divide /
+  alias imaginary imag
+  alias magnitude abs
+  alias phase arg
+  alias quo /
+  alias rectangular rect
+
+  undef negative?
+  undef positive?
+  undef step
 end

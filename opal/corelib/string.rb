@@ -23,8 +23,6 @@ class ::String < `String`
     `self.toString()`
   end
 
-  alias object_id __id__
-
   def self.try_convert(what)
     ::Opal.coerce_to?(what, ::String, :to_str)
   end
@@ -141,9 +139,6 @@ class ::String < `String`
     }
   end
 
-  alias eql? ==
-  alias === ==
-
   def =~(other)
     %x{
       if (other.$$is_string) {
@@ -251,8 +246,6 @@ class ::String < `String`
       return self.$$cast(self.substr(index, length));
     }
   end
-
-  alias byteslice []
 
   def b
     `new String(#{self})`.force_encoding('binary')
@@ -490,8 +483,6 @@ class ::String < `String`
 
     false
   end
-
-  alias equal? ===
 
   def gsub(pattern, replacement = undefined, &block)
     %x{
@@ -1028,8 +1019,6 @@ class ::String < `String`
     }
   end
 
-  alias slice []
-
   def split(pattern = undefined, limit = undefined)
     %x{
       if (self.length === 0) {
@@ -1229,8 +1218,6 @@ class ::String < `String`
     }
   end
 
-  alias succ next
-
   def sum(n = 16)
     %x{
       n = $coerce_to(n, #{::Integer}, 'to_int');
@@ -1376,10 +1363,6 @@ class ::String < `String`
   def to_s
     `self.toString()`
   end
-
-  alias to_str to_s
-
-  alias to_sym intern
 
   def tr(from, to)
     %x{
@@ -1866,8 +1849,6 @@ class ::String < `String`
     }
   end
 
-  alias +@ dup
-
   def -@
     %x{
       if (typeof self === 'string') return self;
@@ -1880,6 +1861,17 @@ class ::String < `String`
   def frozen?
     `typeof self === 'string' || self.$$frozen === true`
   end
+
+  alias +@ dup
+  alias === ==
+  alias byteslice []
+  alias eql? ==
+  alias equal? ===
+  alias object_id __id__
+  alias slice []
+  alias succ next
+  alias to_str to_s
+  alias to_sym intern
 
   ::Opal.pristine self, :initialize
 end

@@ -224,11 +224,6 @@ class ::Time < `Date`
     }
   end
 
-  class << self
-    alias mktime local
-    alias utc gm
-  end
-
   def self.now
     new
   end
@@ -288,8 +283,6 @@ class ::Time < `Date`
     strftime '%a %b %e %H:%M:%S %Y'
   end
 
-  alias ctime asctime
-
   def day
     `self.is_utc ? self.getUTCDate() : self.getDate()`
   end
@@ -312,8 +305,6 @@ class ::Time < `Date`
       return self.getTimezoneOffset() < Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
     }
   end
-
-  alias dst? isdst
 
   def dup
     copy = `new Date(self.getTime())`
@@ -348,8 +339,6 @@ class ::Time < `Date`
     end
   end
 
-  alias mday day
-
   def min
     `self.is_utc ? self.getUTCMinutes() : self.getMinutes()`
   end
@@ -361,8 +350,6 @@ class ::Time < `Date`
   def monday?
     `#{wday} == 1`
   end
-
-  alias month mon
 
   def saturday?
     `#{wday} == 6`
@@ -413,16 +400,12 @@ class ::Time < `Date`
     }
   end
 
-  alias getutc getgm
-
   def gmtime
     %x{
       self.is_utc = true;
       return self;
     }
   end
-
-  alias utc gmtime
 
   def gmt?
     `self.is_utc === true`
@@ -692,20 +675,9 @@ class ::Time < `Date`
     `parseInt(self.getTime() / 1000, 10)`
   end
 
-  alias to_s inspect
-
   def tuesday?
     `#{wday} == 2`
   end
-
-  alias tv_sec to_i
-
-  alias tv_usec usec
-
-  alias utc? gmt?
-
-  alias gmtoff gmt_offset
-  alias utc_offset gmt_offset
 
   def wday
     `self.is_utc ? self.getUTCDay() : self.getDay()`
@@ -750,4 +722,22 @@ class ::Time < `Date`
 
     [week, year]
   end
+
+  class << self
+    alias mktime local
+    alias utc gm
+  end
+
+  alias ctime asctime
+  alias dst? isdst
+  alias getutc getgm
+  alias gmtoff gmt_offset
+  alias mday day
+  alias month mon
+  alias to_s inspect
+  alias tv_sec to_i
+  alias tv_usec usec
+  alias utc gmtime
+  alias utc? gmt?
+  alias utc_offset gmt_offset
 end

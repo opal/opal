@@ -27,8 +27,6 @@ class Buffer
       `#{@native}.byteLength`
     end
 
-    alias size length
-
     def get(offset, bits = 8, type = :unsigned, little = false)
       `#{@native}["get" + #{Buffer.name_for bits, type}](offset, little)`
     end
@@ -104,5 +102,7 @@ class Buffer
     def set_float64(offset, value, little = false)
       `#{@native}.setFloat64(offset, value, little)`
     end
+
+    alias size length
   end
 end

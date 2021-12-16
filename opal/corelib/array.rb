@@ -905,6 +905,8 @@ class ::Array < `Array`
 
   def drop(number)
     %x{
+      number = $coerce_to(number, #{::Integer}, 'to_int');
+
       if (number < 0) {
         #{::Kernel.raise ::ArgumentError}
       }
@@ -1431,10 +1433,6 @@ class ::Array < `Array`
     `self.length`
   end
 
-  alias map collect
-
-  alias map! collect!
-
   def max(n = undefined, &block)
     each.max(n, &block)
   end
@@ -1632,8 +1630,6 @@ class ::Array < `Array`
 
     self
   end
-
-  alias append push
 
   def rassoc(object)
     %x{
@@ -1936,9 +1932,6 @@ class ::Array < `Array`
     }
   end
 
-  alias filter select
-  alias filter! select!
-
   def shift(count = undefined)
     if `count === undefined`
       return if `self.length === 0`
@@ -1955,8 +1948,6 @@ class ::Array < `Array`
 
     `self.splice(0, count)`
   end
-
-  alias size length
 
   def shuffle(rng = undefined)
     dup.to_a.shuffle!(rng)
@@ -2002,8 +1993,6 @@ class ::Array < `Array`
       return self;
     }
   end
-
-  alias slice []
 
   def slice!(index, length = undefined)
     result = nil
@@ -2207,8 +2196,6 @@ class ::Array < `Array`
     }
   end
 
-  alias to_s inspect
-
   def transpose
     return [] if empty?
 
@@ -2310,8 +2297,6 @@ class ::Array < `Array`
     }
   end
 
-  alias prepend unshift
-
   def values_at(*args)
     out = []
 
@@ -2408,10 +2393,20 @@ class ::Array < `Array`
     super.reject { |ivar| `/^@\d+$/.test(#{ivar})` || ivar == '@length' }
   end
 
-  ::Opal.pristine singleton_class, :allocate
-  ::Opal.pristine self, :copy_instance_variables, :initialize_dup
-
   def pack(*args)
     ::Kernel.raise "To use Array#pack, you must first require 'corelib/array/pack'."
   end
+
+  alias append push
+  alias filter select
+  alias filter! select!
+  alias map collect
+  alias map! collect!
+  alias prepend unshift
+  alias size length
+  alias slice []
+  alias to_s inspect
+
+  ::Opal.pristine singleton_class, :allocate
+  ::Opal.pristine self, :copy_instance_variables, :initialize_dup
 end

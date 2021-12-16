@@ -57,8 +57,6 @@ class ::Numeric
     self < 0 ? ::Math::PI : 0
   end
 
-  alias arg angle
-
   def ceil(ndigits = 0)
     to_f.ceil(ndigits)
   end
@@ -66,8 +64,6 @@ class ::Numeric
   def conj
     self
   end
-
-  alias conjugate conj
 
   def denominator
     to_r.denominator
@@ -99,15 +95,9 @@ class ::Numeric
     0
   end
 
-  alias imaginary imag
-
   def integer?
     false
   end
-
-  alias magnitude abs
-
-  alias modulo %
 
   def nonzero?
     zero? ? nil : self
@@ -116,8 +106,6 @@ class ::Numeric
   def numerator
     to_r.numerator
   end
-
-  alias phase arg
 
   def polar
     [abs, arg]
@@ -138,8 +126,6 @@ class ::Numeric
   def rect
     [self, 0]
   end
-
-  alias rectangular rect
 
   def round(digits = undefined)
     to_f.round(digits)
@@ -340,4 +326,12 @@ class ::Numeric
   def infinite?
     nil
   end
+
+  alias arg angle
+  alias conjugate conj
+  alias imaginary imag
+  alias magnitude abs
+  alias modulo %
+  alias phase arg
+  alias rectangular rect
 end

@@ -37,8 +37,6 @@ class ::Number < ::Numeric
     `(self * 2) + 1`
   end
 
-  alias object_id __id__
-
   def +(other)
     %x{
       if (other.$$is_number) {
@@ -82,8 +80,6 @@ class ::Number < ::Numeric
       }
     }
   end
-
-  alias fdiv /
 
   def %(other)
     %x{
@@ -334,9 +330,6 @@ class ::Number < ::Numeric
     }
   end
 
-  alias arg angle
-  alias phase angle
-
   def bit_length
     unless ::Integer === self
       ::Kernel.raise ::NoMethodError.new("undefined method `bit_length` for #{self}:Float", 'bit_length')
@@ -410,8 +403,6 @@ class ::Number < ::Numeric
     self
   end
 
-  alias eql? ==
-
   def equal?(other)
     self == other || `isNaN(self) && isNaN(other)`
   end
@@ -475,8 +466,6 @@ class ::Number < ::Numeric
     super
   end
 
-  alias kind_of? is_a?
-
   def instance_of?(klass)
     return true if klass == ::Integer && ::Integer === self
     return true if klass == ::Integer && ::Integer === self
@@ -499,10 +488,6 @@ class ::Number < ::Numeric
       }
     }
   end
-
-  alias magnitude abs
-
-  alias modulo %
 
   def next
     `self + 1`
@@ -668,8 +653,6 @@ class ::Number < ::Numeric
     end
   end
 
-  alias succ next
-
   def times(&block)
     return enum_for(:times) { self } unless block
 
@@ -689,8 +672,6 @@ class ::Number < ::Numeric
   def to_i
     `self < 0 ? Math.ceil(self) : Math.floor(self)`
   end
-
-  alias to_int to_i
 
   def to_r
     if ::Integer === self
@@ -737,8 +718,6 @@ class ::Number < ::Numeric
       return result;
     }
   end
-
-  alias inspect to_s
 
   def digits(base = 10)
     if self < 0
@@ -837,6 +816,18 @@ class ::Number < ::Numeric
   def negative?
     `self == -Infinity || 1 / self < 0`
   end
+
+  alias arg angle
+  alias eql? ==
+  alias fdiv /
+  alias inspect to_s
+  alias kind_of? is_a?
+  alias magnitude abs
+  alias modulo %
+  alias object_id __id__
+  alias phase angle
+  alias succ next
+  alias to_int to_i
 end
 
 ::Fixnum = ::Number

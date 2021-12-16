@@ -61,8 +61,6 @@ class ::NilClass
     0
   end
 
-  alias to_f to_i
-
   def to_s
     ''
   end
@@ -83,6 +81,8 @@ class ::NilClass
   def instance_variables
     []
   end
+
+  alias to_f to_i
 end
 
 ::NIL = nil

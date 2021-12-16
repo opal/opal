@@ -86,8 +86,6 @@ class Thread
       @storage.size
     end
 
-    alias length size
-
     def pop(non_block = false)
       if empty?
         raise ThreadError, 'Queue empty' if non_block
@@ -97,19 +95,19 @@ class Thread
       @storage.shift
     end
 
-    alias shift pop
-    alias deq   pop
-
     def push(value)
       @storage.push(value)
     end
 
-    alias <<  push
-    alias enq push
-
     def each(&block)
       @storage.each(&block)
     end
+
+    alias << push
+    alias deq pop
+    alias enq push
+    alias length size
+    alias shift pop
   end
 
   class Backtrace

@@ -31,7 +31,6 @@ class ::Set
 
     dup.subtract(enum)
   end
-  alias difference -
 
   def inspect
     "#<Set: {#{to_a.join(',')}}>"
@@ -53,7 +52,6 @@ class ::Set
     @hash[o] = true
     self
   end
-  alias << add
 
   def classify(&block)
     return enum_for(:classify) unless block_given?
@@ -71,7 +69,6 @@ class ::Set
     each { |item| result << yield(item) }
     replace result
   end
-  alias map! collect!
 
   def delete(o)
     @hash.delete(o)
@@ -113,8 +110,6 @@ class ::Set
     size == before ? nil : self
   end
 
-  alias filter! select!
-
   def add?(o)
     if include?(o)
       nil
@@ -145,7 +140,6 @@ class ::Set
   def include?(o)
     @hash.include?(o)
   end
-  alias member? include?
 
   def merge(enum)
     enum.each { |item| add item }
@@ -162,7 +156,6 @@ class ::Set
   def size
     @hash.size
   end
-  alias length size
 
   def subtract(enum)
     enum.each { |item| delete item }
@@ -188,15 +181,11 @@ class ::Set
     set.all? { |o| include?(o) }
   end
 
-  alias >= superset?
-
   def proper_superset?(set)
     `is_set(set)`
     return false if size <= set.size
     set.all? { |o| include?(o) }
   end
-
-  alias > proper_superset?
 
   def subset?(set)
     `is_set(set)`
@@ -204,15 +193,11 @@ class ::Set
     all? { |o| set.include?(o) }
   end
 
-  alias <= subset?
-
   def proper_subset?(set)
     `is_set(set)`
     return false if set.size <= size
     all? { |o| set.include?(o) }
   end
-
-  alias < proper_subset?
 
   def intersect?(set)
     `is_set(set)`
@@ -227,12 +212,22 @@ class ::Set
     !intersect?(set)
   end
 
-  alias + |
-  alias union |
-
   def to_a
     @hash.keys
   end
+
+  alias + |
+  alias < proper_subset?
+  alias << add
+  alias <= subset?
+  alias > proper_superset?
+  alias >= superset?
+  alias difference -
+  alias filter! select!
+  alias length size
+  alias map! collect!
+  alias member? include?
+  alias union |
 end
 
 module ::Enumerable

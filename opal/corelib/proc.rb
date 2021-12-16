@@ -50,10 +50,6 @@ class ::Proc < `Function`
     }
   end
 
-  alias [] call
-  alias === call
-  alias yield call
-
   def >>(other)
     ::Kernel.proc do |*args, &block|
       out = call(*args, &block)
@@ -188,5 +184,8 @@ class ::Proc < `Function`
     }
   end
 
+  alias === call
   alias clone dup
+  alias yield call
+  alias [] call
 end

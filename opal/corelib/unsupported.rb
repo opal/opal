@@ -82,17 +82,9 @@ class ::Module
     }
   end
 
-  alias private public
-
-  alias protected public
-
-  alias nesting public
-
   def private_class_method(*)
     self
   end
-
-  alias public_class_method private_class_method
 
   def private_method_defined?(obj)
     false
@@ -101,12 +93,13 @@ class ::Module
   def private_constant(*)
   end
 
+  alias nesting public
+  alias private public
+  alias protected public
   alias protected_method_defined? private_method_defined?
-
-  alias public_instance_methods instance_methods
-
+  alias public_class_method private_class_method
   alias public_instance_method instance_method
-
+  alias public_instance_methods instance_methods
   alias public_method_defined? method_defined?
 end
 

@@ -67,8 +67,6 @@ class BigDecimal < Numeric
     end
   end
 
-  alias === ==
-
   def <=>(other)
     result = case other
              when self.class
@@ -122,8 +120,6 @@ class BigDecimal < Numeric
 
     self.class.new(result)
   end
-
-  alias + add
 
   def ceil(n = nil)
     unless bignumber.JS.isFinite
@@ -188,8 +184,6 @@ class BigDecimal < Numeric
     self.class.new(bignumber.JS.minus(other.bignumber))
   end
 
-  alias - minus
-
   def mult(other, digits = nil)
     other, _ = coerce(other)
 
@@ -200,8 +194,6 @@ class BigDecimal < Numeric
     self.class.new(bignumber.JS.times(other.bignumber).JS.round(digits, self.class.mode(ROUND_MODE)))
   end
 
-  alias * mult
-
   def nan?
     bignumber.JS.isNaN
   end
@@ -210,8 +202,6 @@ class BigDecimal < Numeric
     other, _ = coerce(other)
     self.class.new(bignumber.JS.dividedBy(other.bignumber))
   end
-
-  alias / quo
 
   def sign
     if bignumber.JS.isNaN
@@ -234,9 +224,15 @@ class BigDecimal < Numeric
   def to_s(s = '')
     bignumber.JS.toString
   end
-  alias inspect to_s
 
   def zero?
     bignumber.JS.isZero
   end
+
+  alias === ==
+  alias + add
+  alias - minus
+  alias * mult
+  alias / quo
+  alias inspect to_s
 end
