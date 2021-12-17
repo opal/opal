@@ -1,4 +1,4 @@
-# helpers: breaker, slice, falsy, truthy, coerce_to, yield1, yieldX
+# helpers: breaker, slice, truthy, coerce_to, yield1, yieldX
 
 require 'corelib/enumerable'
 
@@ -254,7 +254,7 @@ class ::Enumerator
           %x{
             var value = $yieldX(block, args);
 
-            if ($falsy(value)) {
+            if (!$truthy(value)) {
               succeeding = false;
 
               #{enum.yield(*args)};
@@ -347,7 +347,7 @@ class ::Enumerator
         %x{
           var value = $yieldX(block, args);
 
-          if ($falsy(value)) {
+          if (!$truthy(value)) {
             #{enum.yield(*args)};
           }
         }

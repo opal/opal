@@ -15,12 +15,9 @@ module Opal
         def compile
           add_temp name
 
-          line "#{name} = $post_args[0];"
-          line "$post_args.splice(0, 1);"
+          line "#{name} = $post_args.shift();"
 
-          line "if (#{name} == null) {"
-          line "  #{name} = nil"
-          line "}"
+          line "if (#{name} == null) #{name} = nil;"
         end
       end
     end

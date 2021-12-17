@@ -1,4 +1,4 @@
-# helpers: falsy, truthy, coerce_to, yield1, yieldX
+# helpers: truthy, coerce_to, yield1, yieldX
 
 module ::Enumerable
   %x{
@@ -269,7 +269,7 @@ module ::Enumerable
         if (dropping) {
           var value = $yield1(block, param);
 
-          if ($falsy(value)) {
+          if (!$truthy(value)) {
             dropping = false;
             result.push(param);
           }
@@ -614,7 +614,7 @@ module ::Enumerable
       }
       else {
         if (sym === undefined) {
-          if (!#{Symbol === object}) {
+          if (!#{::Symbol === object}) {
             #{::Kernel.raise ::TypeError, "#{object.inspect} is not a Symbol"};
           }
 
@@ -967,7 +967,7 @@ module ::Enumerable
         var param = #{::Opal.destructure(`arguments`)},
             value = $yield1(block, param);
 
-        if ($falsy(value)) {
+        if (!$truthy(value)) {
           result.push(param);
         }
       };

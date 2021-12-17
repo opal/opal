@@ -24,16 +24,11 @@ module Opal
         def compile
           add_temp name
 
-          line "if ($post_args.length > #{args_to_keep}) {"
-          line "  #{name} = $post_args[0];"
-          line "  $post_args.splice(0, 1);"
-          line "}"
+          line "if ($post_args.length > #{args_to_keep}) #{name} = $post_args.shift();"
 
           return if default_value.children[1] == :undefined
 
-          line "if (#{name} == null) {"
-          line "  #{name} = ", expr(default_value), ";"
-          line "}"
+          line "if (#{name} == null) #{name} = ", expr(default_value), ";"
         end
       end
     end

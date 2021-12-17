@@ -10,8 +10,14 @@ module Opal
       children :test, :true_body, :false_body
 
       def compile
-        if should_compile_with_ternary?
-          compile_with_ternary
+        if should_compile_as_simple_expression?
+          if true_body == s(:true)
+            compile_with_binary_or
+          elsif false_body == s(:false)
+            compile_with_binary_and
+          else
+            compile_with_ternary
+          end
         else
           compile_with_if
         end
@@ -82,10 +88,11 @@ module Opal
 
       # There was a particular case in the past, that when we
       # expected an expression from if, we always had to closure
-      # it. This produced an ugly code that was hard to minify
-      # it. This addition tries to make a few cases compiled with
-      # a ternary operator instead.
-      def should_compile_with_ternary?
+      # it. This produced an ugly code that was hard to minify.
+      # This addition tries to make a few cases compiled with
+      # a ternary operator instead and possibly a binary operator
+      # even?
+      def should_compile_as_simple_expression?
         expects_expression? && simple?(true_body) && simple?(false_body)
       end
 
@@ -104,6 +111,32 @@ module Opal
           push '(', expr(falsy || s(:nil)), ')'
         end
 
+        push ')'
+      end
+
+      def compile_with_binary_and
+        if sexp.meta[:do_js_truthy_on_true_body]
+          truthy = js_truthy(true_body || s(:nil))
+        else
+          truthy = expr(true_body || s(:nil))
+        end
+
+        push '('
+        push js_truthy(test), ' && '
+        push '(', truthy, ')'
+        push ')'
+      end
+
+      def compile_with_binary_or
+        if sexp.meta[:do_js_truthy_on_false_body]
+          falsy = js_truthy(false_body || s(:nil))
+        else
+          falsy = expr(false_body || s(:nil))
+        end
+
+        push '('
+        push js_truthy(test), ' || '
+        push '(', falsy, ')'
         push ')'
       end
 

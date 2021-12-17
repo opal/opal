@@ -252,9 +252,11 @@ module Opal
 
       OPERATORS.each do |operator, name|
         add_special(operator.to_sym) do |compile_default|
-          if compiler.inline_operators?
+          if invoke_using_refinement?
+            compile_default.call
+          elsif compiler.inline_operators?
             compiler.method_calls << operator.to_sym if record_method?
-            compiler.operator_helpers << operator.to_sym
+            helper :"rb_#{name}"
             lhs, rhs = expr(recvr), expr(arglist)
 
             push fragment("$rb_#{name}(")

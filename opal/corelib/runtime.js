@@ -175,12 +175,12 @@
   // Helpers
   // -----
 
-  Opal.truthy = function(val) {
-    return (val !== nil && val != null && (!val.$$is_boolean || val == true));
+  var $truthy = Opal.truthy = function(val) {
+    return false !== val && nil !== val && undefined !== val && null !== val && (!(val instanceof Boolean) || true === val.valueOf());
   };
 
   Opal.falsy = function(val) {
-    return (val === nil || val == null || (val.$$is_boolean && val == false))
+    return !$truthy(val);
   };
 
   Opal.type_error = function(object, type, method, coerced) {
@@ -2750,6 +2750,46 @@
       return ret;
     }
   }
+
+  // Operator helpers
+  // ----------------
+  Opal.rb_plus   = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l + r : l['$+'](r); }
+  Opal.rb_minus  = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l - r : l['$-'](r); }
+  Opal.rb_times  = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l * r : l['$*'](r); }
+  Opal.rb_divide = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l / r : l['$/'](r); }
+  Opal.rb_lt     = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l < r : l['$<'](r); }
+  Opal.rb_gt     = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l > r : l['$>'](r); }
+  Opal.rb_le     = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l <= r : l['$<='](r); }
+  Opal.rb_ge     = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l >= r : l['$>='](r); }
+
+  // Optimized helpers for calls like $truthy((a)['$==='](b)) -> $eqeqeq(a, b)
+  Opal.eqeq = function(lhs, rhs) {
+    if ((typeof lhs === 'number' && typeof rhs === 'number') ||
+        (typeof lhs === 'string' && typeof rhs === 'string')) {
+      return lhs === rhs;
+    }
+    return $truthy((lhs)['$=='](rhs));
+  };
+  Opal.eqeqeq = function(lhs, rhs) {
+    if ((typeof lhs === 'number' && typeof rhs === 'number') ||
+        (typeof lhs === 'string' && typeof rhs === 'string')) {
+      return lhs === rhs;
+    }
+    return $truthy((lhs)['$==='](rhs));
+  };
+  Opal.neqeq = function(lhs, rhs) {
+    if ((typeof lhs === 'number' && typeof rhs === 'number') ||
+        (typeof lhs === 'string' && typeof rhs === 'string')) {
+      return lhs !== rhs;
+    }
+    return $truthy((lhs)['$!='](rhs));
+  };
+  Opal.not = function(arg) {
+    if (true === arg) return false;
+    if (undefined === arg || null === arg || false === arg || nil === arg) return true;
+    return $truthy(arg['$!']());
+  }
+
 
 
   // Initialization

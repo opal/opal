@@ -52,23 +52,11 @@ module Opal
         [fragment('$truthy('), expr(sexp), fragment(')')]
       end
 
-      def js_falsy(sexp)
-        if sexp.type == :send
-          mid = sexp.children[1]
-          if mid == :block_given?
-            scope.uses_block!
-            return "#{scope.block_name} === nil"
-          end
-        end
-
-        helper :falsy
-        [fragment('$falsy('), expr(sexp), fragment(')')]
-      end
-
       def js_truthy_optimize(sexp)
-        if sexp.type == :send
-          mid = sexp.children[1]
-          receiver_handler_class = (receiver = sexp.children[0]) && compiler.handlers[receiver.type]
+        case sexp.type
+        when :send
+          receiver, mid, *args = *sexp
+          receiver_handler_class = receiver && compiler.handlers[receiver.type]
 
           # Only operator calls on the truthy_optimize? node classes should be optimized.
           # Monkey patch method calls might return 'self'/aka a bridged instance and need
@@ -78,8 +66,50 @@ module Opal
                                        receiver_handler_class.truthy_optimize?
 
           if allow_optimization_on_type ||
-             mid == :block_given? ||
-             mid == :"=="
+             mid == :block_given?
+            expr(sexp)
+          elsif args.count == 1
+            case mid
+            when :==
+              helper :eqeq
+              compiler.method_calls << mid
+              [fragment('$eqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
+            when :===
+              helper :eqeqeq
+              compiler.method_calls << mid
+              [fragment('$eqeqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
+            when :!=
+              helper :neqeq
+              compiler.method_calls << mid
+              [fragment('$neqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
+            end
+          elsif args.count == 0
+            case mid
+            when :!
+              helper :not
+              compiler.method_calls << mid
+              [fragment('$not('), expr(receiver), fragment(')')]
+            end
+          end
+        when :begin
+          if sexp.children.count == 1
+            js_truthy_optimize(sexp.children.first)
+          end
+        when :if
+          _test, true_body, false_body = *sexp
+          if true_body == s(:true)
+            # Ensure we recurse the js_truthy call on the `false_body` of the if `expr`.
+            # This transforms an expression like:
+            #
+            # $truthy($truthy(a) || b)
+            #
+            # Into:
+            #
+            # $truthy(a) || $truthy(b)
+            sexp.meta[:do_js_truthy_on_false_body] = true
+            expr(sexp)
+          elsif false_body == s(:false)
+            sexp.meta[:do_js_truthy_on_true_body] = true
             expr(sexp)
           end
         end
