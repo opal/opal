@@ -229,6 +229,10 @@ module Opal
       @case_stmt = nil
       @option_values = {}
       @magic_comments = {}
+
+      @source_map = nil
+      @required_trees = nil
+      @requires = nil
     end
 
     # Compile some ruby code to a string.

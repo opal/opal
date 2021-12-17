@@ -10,6 +10,7 @@ class Opal::SourceMap::Index
   def initialize(source_maps, join: nil)
     @source_maps = source_maps
     @join = join
+    @to_h = nil
   end
 
   # To support concatenating generated code and other common post processing, an
