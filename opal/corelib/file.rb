@@ -15,6 +15,8 @@ class ::File < ::IO
       new_parts = []
 
       path = path.respond_to?(:to_path) ? path.to_path : path
+      path = ::Opal.coerce_to!(`path`, ::String, :to_str)
+
       basedir ||= ::Dir.pwd
       path_abs    = `path.substr(0, sep.length) === sep || windows_root_rx.test(path)`
       basedir_abs = `basedir.substr(0, sep.length) === sep || windows_root_rx.test(basedir)`

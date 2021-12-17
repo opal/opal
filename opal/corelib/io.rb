@@ -58,10 +58,26 @@ class ::IO
 
   def puts(*args)
     %x{
-      for (var i = 0, ii = args.length; i < ii; i++) {
-        args[i] = #{::Kernel.String(`args[i]`).chomp}
+      var line
+      if (args.length === 0) {
+        #{write "\n"};
+        return nil;
+      } else {
+        for (var i = 0, ii = args.length; i < ii; i++) {
+          if (args[i].$$is_array){
+            var ary = #{`args[i]`.flatten}
+            if (ary.length > 0) #{puts(*`ary`)}
+          } else {
+            if (args[i].$$is_string) {
+              line = args[i].valueOf();
+            } else {
+              line = #{::Kernel.String(`args[i]`)};
+            }
+            if (!line.endsWith("\n")) line += "\n"
+            #{write `line`}
+          }
+        }
       }
-      self.$write(args.concat([nil]).join(#{$/}));
     }
     nil
   end
