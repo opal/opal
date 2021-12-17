@@ -5,7 +5,8 @@
 ### Fixed
 
 - Fix defining multiple methods with the same block (#2345)
-- Fix coertion for Array#drop (#2371)
+- Fix coertion for `Array#drop` (#2371)
+- Fix some `IO#puts` edge cases (no args, empty array, nested array, …) (#2372)
 
 <!--
 ### Changed
