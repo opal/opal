@@ -171,75 +171,6 @@ module Testing
     end
   end
 
-  class SauceLabs
-    include FileUtils
-
-    def initialize(options = {})
-      @host = options.fetch(:host, '127.0.0.1')
-      @port = options.fetch(:port, '3000')
-      @username = options.fetch(:username)
-      @access_key = options.fetch(:access_key)
-      @tunnel = options.fetch(:tunnel, nil)
-    end
-    attr_reader :host, :port, :username, :access_key, :tunnel
-
-    def with_server
-      cd 'examples/rack'
-      system 'bundle install' or raise 'bundle install failed'
-      begin
-        server = Process.spawn "bundle exec rackup --host #{host} --port #{port}"
-        puts 'Waiting for server…'
-        sleep 0.1 until system "curl -s 'http://#{host}:#{port}/' > /dev/null"
-        puts 'Server ready.'
-        yield self
-      ensure
-        Process.kill(:TERM, server)
-        Process.wait(server)
-      end
-    end
-
-    def on_platform(options = {})
-      browser = options.fetch(:browser)
-      version = options.fetch(:version)
-      platform = options.fetch(:platform, nil)
-      device = options.fetch(:device, nil)
-
-      puts "=============== Testing on browser: #{browser} v#{version} #{"(#{platform})" if platform}"
-      require "selenium/webdriver"
-
-      caps = {}
-      caps[:platform]           = platform if platform
-      caps[:browserName]        = browser if browser
-      caps[:version]            = version if version
-      caps[:device]             = device if device
-      caps['tunnel-identifier'] = tunnel if tunnel
-
-      driver = Selenium::WebDriver.for(
-        :remote,
-        url: "http://#{username}:#{access_key}@localhost:4445/wd/hub",
-        desired_capabilities: caps
-      )
-
-      driver.get("http://#{host}:#{port}/")
-      yield driver
-      driver.quit
-    end
-
-    def test_title(driver)
-      if (title = driver.title) == 'Bob is authenticated'
-        puts "SUCCESS! title of webpage is: #{title}"
-      else
-        raise "FAILED! title of webpage is: #{title}"
-      end
-    end
-
-    def run(**options)
-      on_platform(**options) do |driver|
-        test_title(driver)
-      end
-    end
-  end
-
   class HTTPServer
     def with_server
       begin
@@ -284,7 +215,7 @@ Use PATTERN environment variable to manually set the glob for specs:
   bundle exec rake mspec_nodejs PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
 
-platforms = %w[nodejs server chrome gjs quickjs]
+platforms = %w[nodejs server chrome chromium firefox gjs quickjs]
 mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
 
@@ -425,32 +356,6 @@ task :smoke_test do
   end
 
   puts "Smoke test was successful!"
-end
-
-desc 'Run browser tests with SauceLabs'
-task :browser_test do
-  credentials = {
-    username: ENV['SAUCE_USERNAME'] || warn('missing SAUCE_USERNAME env var'),
-    access_key: ENV['SAUCE_ACCESS_KEY'] || warn('missing SAUCE_ACCESS_KEY env var'),
-    tunnel: ENV['TRAVIS_JOB_NUMBER'],
-  }
-
-  # Exit if we're missing credentials.
-  exit unless credentials[:username] && credentials[:access_key]
-
-  Testing::SauceLabs.new(credentials).with_server do |session|
-    session.run(browser: 'Internet Explorer', version: '9')
-    session.run(browser: 'Internet Explorer', version: '10')
-    session.run(browser: 'Internet Explorer', version: '11')
-    # session.run(browser: 'Edge', version: '13') # something goes wrong
-    session.run(browser: 'Firefox', version: '47')
-    session.run(browser: 'Firefox', version: '48')
-    # session.run(browser: 'Chrome', version: '52') # chrome webdriver is broken
-    # session.run(browser: 'Chrome', version: '53') # chrome webdriver is broken
-    session.run(browser: 'Safari', version: '8')
-    session.run(browser: 'Safari', version: '9')
-    session.run(browser: 'Safari', version: '10')
-  end
 end
 
 platforms.each do |platform|

@@ -69,6 +69,8 @@ module Opal
     register_runner :quickjs,     :Quickjs,     'opal/cli_runners/quickjs'
     register_runner :miniracer,   :MiniRacer,   'opal/cli_runners/mini_racer'
     register_runner :server,      :Server,      'opal/cli_runners/server'
+    register_runner :firefox,     :Firefox,     'opal/cli_runners/puppeteer_ruby'
+    register_runner :chromium,    :Chromium,    'opal/cli_runners/puppeteer_ruby'
 
     alias_runner :osascript, :applescript
     alias_runner :node, :nodejs

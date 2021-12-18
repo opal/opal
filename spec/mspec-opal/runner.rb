@@ -78,7 +78,9 @@ class OSpecFormatter
     formatters = {
       'browser'      => BrowserFormatter,
       'server'       => BrowserFormatter,
-      'chrome'       => DottedFormatter,
+      'chrome'       => BufferedColoredDottedFormatter,
+      'chromium'     => BufferedColoredDottedFormatter,
+      'firefox'      => BufferedColoredDottedFormatter,
       'node'         => NodeJSFormatter,
       'nodejs'       => NodeJSFormatter,
       'gjs'          => ColoredDottedFormatter,

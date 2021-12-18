@@ -126,15 +126,15 @@ end
 
 class ColoredDottedFormatter < BaseOpalFormatter
   def red(str)
-    print "\e[31m"+str+"\e[0m"
+    print "\e[31m#{str}\e[0m"
   end
 
   def green(str)
-    print "\e[32m"+str+"\e[0m"
+    print "\e[32m#{str}\e[0m"
   end
 
   def cyan(str)
-    print "\e[36m"+str+"\e[0m"
+    print "\e[36m#{str}\e[0m"
   end
 
   def log(str)
@@ -156,6 +156,41 @@ class ColoredDottedFormatter < BaseOpalFormatter
 
   def finish_with_code(code)
     exit(code)
+  end
+end
+
+# Required for the puppeteer-ruby based runners, as puppeteer-ruby
+# is not very performant with very repetitive prints.
+class BufferedColoredDottedFormatter < ColoredDottedFormatter
+  def initialize(*)
+    super
+    @buffer = []
+    @last_flush = Time.now
+  end
+
+  def print(str)
+    @buffer << str
+    flush?
+  end
+
+  def puts(str)
+    @buffer << str << "\n"
+    flush!
+  end
+
+  def finish_with_code(code)
+    super
+    flush!
+  end
+
+  def flush?
+    flush! if (Time.now - @last_flush) > 0.05
+  end
+
+  def flush!
+    @last_flush = Time.now
+    Kernel.print @buffer.join
+    @buffer = []
   end
 end
 
