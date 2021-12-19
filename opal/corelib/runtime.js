@@ -1455,7 +1455,7 @@
   // Note: all ruby methods have a `$` prefix in javascript, so all stubs will
   // have this prefix as well (to make this method more performant).
   //
-  //    Opal.add_stubs(["$foo", "$bar", "$baz="]);
+  //    Opal.add_stubs("foo,bar,baz=");
   //
   // All stub functions will have a private `$$stub` property set to true so
   // that other internal methods can detect if a method is just a stub or not.
