@@ -1,5 +1,3 @@
 #!/usr/bin/env ruby
 
-ARGV << "--repl"
-
-load __dir__+"/opal"
+exec "#{__dir__}/opal", '--repl', *ARGV
