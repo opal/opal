@@ -1,4 +1,4 @@
-# helpers: breaker, slice, truthy, coerce_to, yield1, yieldX
+# helpers: slice, coerce_to
 
 require 'corelib/enumerable'
 
@@ -15,12 +15,14 @@ class ::Enumerator
       obj.size   = block;
       obj.method = method;
       obj.args   = args;
+      obj.cursor = 0;
 
       return obj;
     }
   end
 
   def initialize(*, &block)
+    @cursor = 0
     if block
       @object = Generator.new(&block)
       @method = :each
@@ -84,6 +86,42 @@ class ::Enumerator
     @object
   end
 
+  def rewind
+    @cursor = 0
+
+    self
+  end
+
+  def peek_values
+    @values ||= map { |*i| i }
+    ::Kernel.raise ::StopIteration, 'iteration reached an end' if @cursor >= @values.length
+    @values[@cursor]
+  end
+
+  def peek
+    values = peek_values
+    values.length <= 1 ? values[0] : values
+  end
+
+  def next_values
+    out = peek_values
+    @cursor += 1
+    out
+  end
+
+  def next
+    values = next_values
+    values.length <= 1 ? values[0] : values
+  end
+
+  def feed(arg)
+    raise NotImplementedError, "Opal doesn't support Enumerator#feed"
+  end
+
+  def +(other)
+    ::Enumerator::Chain.new(self, other)
+  end
+
   def inspect
     result = "#<#{self.class}: #{@object.inspect}:#{@method}"
 
@@ -96,321 +134,9 @@ class ::Enumerator
 
   alias with_object each_with_object
 
-  class Generator
-    include ::Enumerable
-
-    def initialize(&block)
-      ::Kernel.raise ::LocalJumpError, 'no block given' unless block
-
-      @block = block
-    end
-
-    def each(*args, &block)
-      yielder = Yielder.new(&block)
-
-      %x{
-        try {
-          args.unshift(#{yielder});
-
-          $yieldX(#{@block}, args);
-        }
-        catch (e) {
-          if (e === $breaker) {
-            return $breaker.$v;
-          }
-          else {
-            throw e;
-          }
-        }
-      }
-
-      self
-    end
-  end
-
-  class Yielder
-    def initialize(&block)
-      @block = block
-    end
-
-    def yield(*values)
-      %x{
-        var value = $yieldX(#{@block}, values);
-
-        if (value === $breaker) {
-          throw $breaker;
-        }
-
-        return value;
-      }
-    end
-
-    def <<(*values)
-      self.yield(*values)
-
-      self
-    end
-  end
-
-  class self::Lazy < self
-    class self::StopLazyError < ::Exception; end
-
-    def initialize(object, size = nil, &block)
-      unless block_given?
-        ::Kernel.raise ::ArgumentError, 'tried to call lazy new without a block'
-      end
-
-      @enumerator = object
-
-      super size do |yielder, *each_args|
-        object.each(*each_args) do |*args|
-          %x{
-            args.unshift(#{yielder});
-
-            $yieldX(block, args);
-          }
-        end
-      rescue ::Exception
-        nil
-      end
-    end
-
-    def lazy
-      self
-    end
-
-    def collect(&block)
-      unless block
-        ::Kernel.raise ::ArgumentError, 'tried to call lazy map without a block'
-      end
-
-      Lazy.new(self, enumerator_size) do |enum, *args|
-        %x{
-          var value = $yieldX(block, args);
-
-          #{enum.yield `value`};
-        }
-      end
-    end
-
-    def collect_concat(&block)
-      unless block
-        ::Kernel.raise ::ArgumentError, 'tried to call lazy map without a block'
-      end
-
-      Lazy.new(self, nil) do |enum, *args|
-        %x{
-          var value = $yieldX(block, args);
-
-          if (#{`value`.respond_to? :force} && #{`value`.respond_to? :each}) {
-            #{`value`.each { |v| enum.yield v }}
-          }
-          else {
-            var array = #{::Opal.try_convert `value`, ::Array, :to_ary};
-
-            if (array === nil) {
-              #{enum.yield `value`};
-            }
-            else {
-              #{`value`.each { |v| enum.yield v }};
-            }
-          }
-        }
-      end
-    end
-
-    def drop(n)
-      n = `$coerce_to(#{n}, #{::Integer}, 'to_int')`
-
-      if n < 0
-        ::Kernel.raise ::ArgumentError, 'attempt to drop negative size'
-      end
-
-      current_size = enumerator_size
-      set_size     = if ::Integer === current_size
-                       n < current_size ? n : current_size
-                     else
-                       current_size
-                     end
-
-      dropped = 0
-      Lazy.new(self, set_size) do |enum, *args|
-        if dropped < n
-          dropped += 1
-        else
-          enum.yield(*args)
-        end
-      end
-    end
-
-    def drop_while(&block)
-      unless block
-        ::Kernel.raise ::ArgumentError, 'tried to call lazy drop_while without a block'
-      end
-
-      succeeding = true
-      Lazy.new(self, nil) do |enum, *args|
-        if succeeding
-          %x{
-            var value = $yieldX(block, args);
-
-            if (!$truthy(value)) {
-              succeeding = false;
-
-              #{enum.yield(*args)};
-            }
-          }
-        else
-          enum.yield(*args)
-        end
-      end
-    end
-
-    def enum_for(method = :each, *args, &block)
-      self.class.for(self, method, *args, &block)
-    end
-
-    def find_all(&block)
-      unless block
-        ::Kernel.raise ::ArgumentError, 'tried to call lazy select without a block'
-      end
-
-      Lazy.new(self, nil) do |enum, *args|
-        %x{
-          var value = $yieldX(block, args);
-
-          if ($truthy(value)) {
-            #{enum.yield(*args)};
-          }
-        }
-      end
-    end
-
-    def detect(ifnone = undefined, &block)
-      return enum_for :detect, ifnone unless block_given?
-
-      each do |*args|
-        value = ::Opal.destructure(args)
-        p value: value
-        if yield(value)
-          return value
-        end
-      end
-
-      %x{
-        if (ifnone !== undefined) {
-          if (typeof(ifnone) === 'function') {
-            return ifnone();
-          } else {
-            return ifnone;
-          }
-        }
-      }
-
-      nil
-    end
-
-    def grep(pattern, &block)
-      if block
-        Lazy.new(self, nil) do |enum, *args|
-          %x{
-            var param = #{::Opal.destructure(args)},
-                value = #{pattern === `param`};
-
-            if ($truthy(value)) {
-              value = $yield1(block, param);
-
-              #{enum.yield `$yield1(block, param)`};
-            }
-          }
-        end
-      else
-        Lazy.new(self, nil) do |enum, *args|
-          %x{
-            var param = #{::Opal.destructure(args)},
-                value = #{pattern === `param`};
-
-            if ($truthy(value)) {
-              #{enum.yield `param`};
-            }
-          }
-        end
-      end
-    end
-
-    def reject(&block)
-      unless block
-        ::Kernel.raise ::ArgumentError, 'tried to call lazy reject without a block'
-      end
-
-      Lazy.new(self, nil) do |enum, *args|
-        %x{
-          var value = $yieldX(block, args);
-
-          if (!$truthy(value)) {
-            #{enum.yield(*args)};
-          }
-        }
-      end
-    end
-
-    def take(n)
-      n = `$coerce_to(#{n}, #{::Integer}, 'to_int')`
-
-      if n < 0
-        ::Kernel.raise ::ArgumentError, 'attempt to take negative size'
-      end
-
-      current_size = enumerator_size
-      set_size     = if ::Integer === current_size
-                       n < current_size ? n : current_size
-                     else
-                       current_size
-                     end
-
-      taken = 0
-      Lazy.new(self, set_size) do |enum, *args|
-        if taken < n
-          enum.yield(*args)
-          taken += 1
-        else
-          ::Kernel.raise StopLazyError
-        end
-      end
-    end
-
-    def take_while(&block)
-      unless block
-        ::Kernel.raise ::ArgumentError, 'tried to call lazy take_while without a block'
-      end
-
-      Lazy.new(self, nil) do |enum, *args|
-        %x{
-          var value = $yieldX(block, args);
-
-          if ($truthy(value)) {
-            #{enum.yield(*args)};
-          }
-          else {
-            #{::Kernel.raise StopLazyError};
-          }
-        }
-      end
-    end
-
-    def inspect
-      "#<#{self.class}: #{@enumerator.inspect}>"
-    end
-
-    alias force to_a
-    alias flat_map collect_concat
-    alias filter find_all
-    alias map collect
-    alias select find_all
-    alias to_enum enum_for
-  end
-
-  class self::ArithmeticSequence < self
-    # We need to stub this for the time being
-  end
+  autoload :ArithmeticSequence, 'corelib/enumerator/arithmetic_sequence'
+  autoload :Chain, 'corelib/enumerator/chain'
+  autoload :Generator, 'corelib/enumerator/generator'
+  autoload :Lazy, 'corelib/enumerator/lazy'
+  autoload :Yielder, 'corelib/enumerator/yielder'
 end

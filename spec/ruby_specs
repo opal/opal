@@ -39,8 +39,8 @@ ruby/core/complex
 
 ruby/core/enumerable
 ruby/core/enumerator
-!ruby/core/enumerator/arithmetic_sequence
-!ruby/core/enumerator/chain
+ruby/core/enumerator/arithmetic_sequence
+ruby/core/enumerator/chain
 ruby/core/enumerator/generator
 ruby/core/enumerator/lazy
 ruby/core/enumerator/yielder

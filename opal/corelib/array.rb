@@ -333,8 +333,8 @@ class ::Array < `Array`
           exclude, from, to, result;
 
       exclude = index.excl;
-      from    = $coerce_to(index.begin, Opal.Integer, 'to_int');
-      to      = $coerce_to(index.end, Opal.Integer, 'to_int');
+      from    = index.begin === nil ? 0 : $coerce_to(index.begin, Opal.Integer, 'to_int');
+      to      = index.end === nil ? -1 : $coerce_to(index.end, Opal.Integer, 'to_int');
 
       if (from < 0) {
         from += size;
@@ -342,6 +342,10 @@ class ::Array < `Array`
         if (from < 0) {
           return nil;
         }
+      }
+
+      if (index.excl_rev && index.begin !== nil) {
+        from += 1;
       }
 
       if (from > size) {
@@ -356,12 +360,36 @@ class ::Array < `Array`
         }
       }
 
-      if (!exclude) {
+      if (!exclude || index.end === nil) {
         to += 1;
       }
 
       result = self.slice(from, to);
       return result;
+    }
+
+    function $array_slice_arithmetic_seq(self, index) {
+      var array, out = [], i = 0, pseudorange;
+
+      if (index.step < 0) {
+        pseudorange = {
+          begin: index.range.end,
+          end: index.range.begin,
+          excl: false,
+          excl_rev: index.range.excl
+        };
+        array = $array_slice_range(self, pseudorange).$reverse();
+      }
+      else {
+        array = $array_slice_range(self, index.range);
+      }
+
+      while (i < array.length) {
+        out.push(array[i]);
+        i += Math.abs(index.step);
+      }
+
+      return out;
     }
 
     function $array_slice_index_length(self, index, length) {
@@ -403,6 +431,9 @@ class ::Array < `Array`
       if (index.$$is_range) {
         return $array_slice_range(self, index);
       }
+      else if (index.$$is_arithmetic_seq) {
+        return $array_slice_arithmetic_seq(self, index);
+      }
       else {
         return $array_slice_index_length(self, index, length);
       }
@@ -425,8 +456,8 @@ class ::Array < `Array`
 
       %x{
         var exclude = index.excl,
-            from    = $coerce_to(index.begin, #{::Integer}, 'to_int'),
-            to      = $coerce_to(index.end, #{::Integer}, 'to_int');
+            from    = index.begin === nil ? 0 : $coerce_to(index.begin, Opal.Integer, 'to_int');
+            to      = index.end === nil ? -1 : $coerce_to(index.end, Opal.Integer, 'to_int');
 
         if (from < 0) {
           from += size;
@@ -440,7 +471,7 @@ class ::Array < `Array`
           to += size;
         }
 
-        if (!exclude) {
+        if (!exclude || index.end === nil) {
           to += 1;
         }
 
@@ -1060,11 +1091,11 @@ class ::Array < `Array`
     if ::Range === one
       ::Kernel.raise ::TypeError, 'length invalid with range' if two
 
-      left   = `$coerce_to(one.begin, #{::Integer}, 'to_int')`
+      left   = `one.begin === nil ? 0 : $coerce_to(one.begin, #{::Integer}, 'to_int')`
       `left += this.length` if `left < 0`
       ::Kernel.raise ::RangeError, "#{one.inspect} out of range" if `left < 0`
 
-      right = `$coerce_to(one.end, #{::Integer}, 'to_int')`
+      right = `one.end === nil ? -1 : $coerce_to(one.end, #{::Integer}, 'to_int')`
       `right += this.length` if `right < 0`
       `right += 1` unless one.exclude_end?
 
@@ -2006,8 +2037,8 @@ class ::Array < `Array`
         range = index
         result = self[range]
 
-        range_start = `$coerce_to(range.begin, #{::Integer}, 'to_int')`
-        range_end = `$coerce_to(range.end, #{::Integer}, 'to_int')`
+        range_start = `range.begin === nil ? 0 : $coerce_to(range.begin, #{::Integer}, 'to_int')`
+        range_end = `range.end === nil ? -1 : $coerce_to(range.end, #{::Integer}, 'to_int')`
 
         %x{
           if (range_start < 0) {
@@ -2024,7 +2055,7 @@ class ::Array < `Array`
           }
 
           var range_length = range_end - range_start;
-          if (range.excl) {
+          if (range.excl && range.end !== nil) {
             range_end -= 1;
           } else {
             range_length += 1;

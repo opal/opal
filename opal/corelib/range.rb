@@ -160,10 +160,13 @@ class ::Range
     `Math.abs(range_end - range_begin) + 1`.to_i
   end
 
-  def step(n = 1)
+  def step(n = undefined)
     %x{
       function coerceStepSize() {
-        if (!n.$$is_number) {
+        if (n == null) {
+          n = 1;
+        }
+        else if (!n.$$is_number) {
           n = #{::Opal.coerce_to!(n, ::Integer, :to_int)}
         }
 
@@ -211,11 +214,18 @@ class ::Range
     }
 
     unless block_given?
-      return enum_for(:step, n) do
-        %x{
-          coerceStepSize();
-          return enumeratorSize();
-        }
+      if (@begin.is_a?(Numeric) || @begin.nil?) &&
+         (@end.is_a?(Numeric) || @end.nil?) &&
+         !(@begin.nil? && @end.nil?)
+
+        return ::Enumerator::ArithmeticSequence.new(self, n, :step)
+      else
+        return enum_for(:step, n) do
+          %x{
+            coerceStepSize();
+            return enumeratorSize();
+          }
+        end
       end
     end
 
@@ -244,6 +254,14 @@ class ::Range
       end
     end
     self
+  end
+
+  def %(n)
+    if @begin.is_a?(Numeric) && @end.is_a?(Numeric)
+      ::Enumerator::ArithmeticSequence.new(self, n, :%)
+    else
+      step(n)
+    end
   end
 
   def bsearch(&block)

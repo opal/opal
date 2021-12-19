@@ -72,6 +72,7 @@ opal_unsupported_filter "freezing" do
   fails "Date constants freezes MONTHNAMES, DAYNAMES, ABBR_MONTHNAMES, ABBR_DAYSNAMES"
   fails "Enumerable#sort doesn't raise an error if #to_a returns a frozen Array"
   fails "Enumerator#initialize on frozen instance raises a RuntimeError"
+  fails "Enumerator::Chain#initialize on frozen instance raises a RuntimeError" # Expected RuntimeError but no exception was raised (#<Enumerator::Chain: []> was returned)
   fails "Enumerator::Generator#initialize on frozen instance raises a RuntimeError" # Expected RuntimeError but no exception was raised (#<Proc:0x1b314> was returned)
   fails "Enumerator::Lazy#initialize on frozen instance raises a RuntimeError" # Expected RuntimeError but no exception was raised (nil was returned)
   fails "FalseClass#to_s returns a frozen string" # Expected "false".frozen? to be truthy but was false

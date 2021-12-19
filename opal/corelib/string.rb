@@ -151,12 +151,13 @@ class ::String < `String`
 
   def [](index, length = undefined)
     %x{
-      var size = self.length, exclude;
+      var size = self.length, exclude, range;
 
       if (index.$$is_range) {
         exclude = index.excl;
-        length  = $coerce_to(index.end, #{::Integer}, 'to_int');
-        index   = $coerce_to(index.begin, #{::Integer}, 'to_int');
+        range   = index;
+        length  = index.end === nil ? -1 : $coerce_to(index.end, #{::Integer}, 'to_int');
+        index   = index.begin === nil ? 0 : $coerce_to(index.begin, #{::Integer}, 'to_int');
 
         if (Math.abs(index) > size) {
           return nil;
@@ -170,7 +171,7 @@ class ::String < `String`
           length += size;
         }
 
-        if (!exclude) {
+        if (!exclude || range.end === nil) {
           length += 1;
         }
 

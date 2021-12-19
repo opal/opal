@@ -65,8 +65,6 @@ opal_filter "String" do
   fails "String#[] with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
   fails "String#[] with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
-  fails "String#[] with Range works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
-  fails "String#[] with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#[] with Regexp returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#[] with Regexp, index returns String instances" # Expected "he" (StringSpecs::MyString) to be an instance of String
   fails "String#[] with String returns a String instance when given a subclass instance" # Expected "el" (StringSpecs::MyString) to be an instance of String
@@ -78,8 +76,6 @@ opal_filter "String" do
   fails "String#byteslice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
   fails "String#byteslice with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
-  fails "String#byteslice with Range works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
-  fails "String#byteslice with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#byteslice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with index, length returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#byteslice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
@@ -195,8 +191,6 @@ opal_filter "String" do
   fails "String#slice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
   fails "String#slice with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
-  fails "String#slice with Range works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
-  fails "String#slice with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#slice with Regexp returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#slice with Regexp, index returns String instances" # Expected "he" (StringSpecs::MyString) to be an instance of String
   fails "String#slice with String returns a String instance when given a subclass instance" # Expected "el" (StringSpecs::MyString) to be an instance of String
