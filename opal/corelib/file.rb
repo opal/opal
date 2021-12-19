@@ -99,21 +99,32 @@ class ::File < ::IO
       }
     }
 
-    def dirname(path)
+    def dirname(path, level = 1)
+      return path if level == 0
+      ::Kernel.raise ::ArgumentError, "level can't be negative" if level < 0
+
       sep_chars = `$sep_chars()`
       path = `$coerce_to_path(path)`
       %x{
-        var absolute = path.match(new RegExp(#{"^[#{sep_chars}]"}));
+        var absolute = path.match(new RegExp(#{"^[#{sep_chars}]"})), out;
 
         path = path.replace(new RegExp(#{"[#{sep_chars}]+$"}), ''); // remove trailing separators
         path = path.replace(new RegExp(#{"[^#{sep_chars}]+$"}), ''); // remove trailing basename
         path = path.replace(new RegExp(#{"[#{sep_chars}]+$"}), ''); // remove final trailing separators
 
         if (path === '') {
-          return absolute ? '/' : '.';
+          out = absolute ? '/' : '.';
+        }
+        else {
+          out = path;
         }
 
-        return path;
+        if (level == 1) {
+          return out;
+        }
+        else {
+          return #{dirname(`out`, level - 1)}
+        }
       }
     end
 
