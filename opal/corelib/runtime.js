@@ -1513,6 +1513,10 @@
   // @param meth [String] method name that got wrong number of arguments
   // @raise [ArgumentError]
   Opal.ac = function(actual, expected, object, meth) {
+    // Allocate methods don't accept additional arguments, yet we
+    // pass them, so that they can be forwarded to a bridged class.
+    if (meth == 'allocate') return;
+
     var inspect = '';
     if (object.$$is_a_module) {
       inspect += object.$$name + '.';

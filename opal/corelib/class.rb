@@ -14,9 +14,21 @@ class ::Class
     }
   end
 
-  def allocate
+  # Passing arguments to allocate is non-standard, yet we want
+  # to pass them to a JS constructor by default.
+  def allocate(*args)
     %x{
-      var obj = new self.$$constructor();
+      var obj;
+
+      if (args.length == 0) {
+        obj = new self.$$constructor();
+      }
+      else {
+        obj = new (Function.prototype.bind.apply(
+          self.$$constructor, [null].concat(args)
+        ));
+      }
+
       obj.$$id = Opal.uid();
       return obj;
     }
@@ -35,7 +47,13 @@ class ::Class
 
   def new(*args, &block)
     %x{
-      var object = #{allocate};
+      var object;
+      if (self.$$bridge) {
+        object = #{allocate(*args)};
+      }
+      else {
+        object = #{allocate};
+      }
       Opal.send(object, object.$initialize, args, block);
       return object;
     }
