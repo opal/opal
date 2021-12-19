@@ -1350,24 +1350,35 @@ class ::Array < `Array`
     self
   end
 
+  `var inspect_stack = []`
+
   def inspect
     %x{
       var result = [],
-          id     = #{__id__};
-
-      for (var i = 0, length = self.length; i < length; i++) {
-        var item = #{self[`i`]};
-
-        if (#{`item`.__id__} === id) {
-          result.push('[...]');
-        }
-        else {
-          result.push(#{`item`.inspect});
-        }
-      }
-
-      return '[' + result.join(', ') + ']';
+      id = #{__id__},
+      pushed = true;
     }
+
+    begin
+      %x{
+        if (inspect_stack.indexOf(id) !== -1) {
+          pushed = false;
+          return '[...]';
+        }
+        inspect_stack.push(id)
+
+        for (var i = 0, length = self.length; i < length; i++) {
+          var item = #{self[`i`]};
+
+          result.push(#{Opal.inspect(`item`)});
+        }
+
+        return '[' + result.join(', ') + ']';
+      }
+      nil
+    ensure
+      `if (pushed) inspect_stack.pop()`
+    end
   end
 
   def intersection(*arrays)
@@ -1426,7 +1437,7 @@ class ::Array < `Array`
           }
         }
 
-        #{::Kernel.raise ::NoMethodError.new("#{`Opal.inspect(item)`} doesn't respond to #to_str, #to_ary or #to_s", 'to_str')};
+        #{::Kernel.raise ::NoMethodError.new("#{Opal.inspect(item)} doesn't respond to #to_str, #to_ary or #to_s", 'to_str')};
       }
 
       if (sep === nil) {

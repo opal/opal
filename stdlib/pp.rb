@@ -151,7 +151,23 @@ class PP < PrettyPrint
     #
     # Object#pretty_print_cycle is used when +obj+ is already
     # printed, a.k.a the object reference chain has a cycle.
-    def pp(obj)
+    def pp(obj = undefined)
+      # Opal: consider JS-native variables:
+      %x{
+        if (obj === null) {
+          #{text "null"}
+          #{return}
+        }
+        else if (obj === undefined) {
+          #{text "undefined"}
+          #{return}
+        }
+        else if (obj.$$class === undefined) {
+          #{text `Object.prototype.toString.apply(obj)`}
+          #{return}
+        }
+      }
+
       # If obj is a Delegator then use the object being delegated to for cycle
       # detection
       obj = obj.__getobj__ if defined?(::Delegator) and obj.is_a?(::Delegator)
@@ -180,7 +196,7 @@ class PP < PrettyPrint
     # object_id.
     def object_address_group(obj, &block)
       str = Kernel.instance_method(:to_s).bind_call(obj)
-      str.chomp!('>')
+      str = str.chomp('>')
       group(1, str, '>', &block)
     end
 

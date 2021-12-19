@@ -170,7 +170,6 @@ opal_filter "language" do
   fails "Magic comments in the main file must be at the first line" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x8aa2e>
   fails "Magic comments in the main file must be the first token of the line" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x8aa2e>
   fails "NoMethodError#message calls receiver.inspect only when calling Exception#message" # Expected ["inspect_called"] to equal []
-  fails "NoMethodError#message fallbacks to a simpler representation of the receiver when receiver.inspect raises an exception" # NoMethodError: undefined method `name' for #<NoMethodErrorSpecs::InstanceException: NoMethodErrorSpecs::InstanceException>
   fails "Numbered parameters does not support more than 9 parameters" # Expected NameError (/undefined local variable or method `_10'/) but got: NoMethodError (undefined method `_10' for #<MSpecEnv:0x5d700>)
   fails "Operators * / % are left-associative"
   fails "Operators <=> == === != =~ !~ have higher precedence than &&" # Expected false == false to be falsy but was true

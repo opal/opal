@@ -45,9 +45,19 @@ module REPLUtils
 
   def eval_and_print(func, mode, colorize)
     printer = if colorize
-                ->(i) { ColorPrinter.default(i) }
+                ->(i) do
+                  ColorPrinter.default(i)
+                rescue => e
+                  ColorPrinter.colorize(Opal.inspect(i))
+                end
               else
-                ->(i) { out = []; PP.pp(i, out); out.join }
+                ->(i) do
+                  out = []
+                  PP.pp(i, out)
+                  out.join
+                rescue
+                  Opal.inspect(i)
+                end
               end
 
     %x{
@@ -231,9 +241,10 @@ module REPLUtils
       TOKEN_COLORS.dig(*name) + string + "\e[0m"
     end
 
-    NUMBER = '[+-]?[0-9.]+(?:e[+-][0-9]+|i)?'
+    NUMBER = '[+-]?(?:0x[0-9a-fA-F]+|[0-9.]+(?:e[+-][0-9]+|i)?)'
     REGEXP = '/.*?/[iesu]*'
-    TOKEN_REGEXP = /(\s+|=>|[@$:]?[a-z]\w+|[A-Z]\w+|#{NUMBER}|#{REGEXP}|".*?"|#<.*?[> ]|.)/
+    STRING = '".*?"'
+    TOKEN_REGEXP = /(\s+|=>|[@$:]?[a-z]\w+|[A-Z]\w+|#{NUMBER}|#{REGEXP}|#{STRING}|#<.*?[> ]|.)/
 
     def self.tokenize(str)
       str.scan(TOKEN_REGEXP).map(&:first)
@@ -256,7 +267,7 @@ module REPLUtils
           token(tok, :symbol, :self)
         when /^[A-Z]/
           token(tok, :constant)
-        when /^#</, '=', '>'
+        when '<', '#', /^#</, '=', '>'
           token(tok, :keyword)
         when /^\/./
           token(tok, :regexp, :self)

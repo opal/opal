@@ -67,6 +67,9 @@ class ::BasicObject
       block = ::Kernel.proc do
         %x{new Function("Opal,self", "return " + compiled)(Opal, self)}
       end
+    elsif block.nil? && args.length >= 1 && args.first[0] == '@'
+      # get instance variable
+      return instance_variable_get(args.first)
     elsif args.any?
       ::Kernel.raise ::ArgumentError, "wrong number of arguments (#{args.size} for 0)"
     end
@@ -137,14 +140,13 @@ class ::BasicObject
   end
 
   def method_missing(symbol, *args, &block)
-    message = if `self.$inspect && !self.$inspect.$$stub`
-                "undefined method `#{symbol}' for #{inspect}:#{`self.$$class`}"
-              else
-                "undefined method `#{symbol}' for #{`self.$$class`}"
-              end
-
-    ::Kernel.raise ::NoMethodError.new(message, symbol)
+    inspect_result = ::Opal.inspect(self)
+    ::Kernel.raise ::NoMethodError.new(
+      "undefined method `#{symbol}' for #{inspect_result}", symbol, args
+    ), nil, ::Kernel.caller(1)
   end
+
+  ::Opal.pristine(self, :method_missing)
 
   def respond_to_missing?(method_name, include_all = false)
     false

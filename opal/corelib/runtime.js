@@ -128,22 +128,6 @@
     }
   };
 
-  // Inspect any kind of object, including non Ruby ones
-  Opal.inspect = function(obj) {
-    if (obj === undefined) {
-      return "undefined";
-    }
-    else if (obj === null) {
-      return "null";
-    }
-    else if (!obj.$$class) {
-      return obj.toString();
-    }
-    else {
-      return obj.$inspect();
-    }
-  };
-
   function $prop(object, name, initialValue) {
     if (typeof(object) === "string") {
       // Special case for:

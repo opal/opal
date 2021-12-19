@@ -2,7 +2,7 @@ require: rubocop-performance
 inherit_from: .rubocop/todo.yml
 
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.6
   Exclude:
     - CHANGELOG.md
     - CONDUCT.md

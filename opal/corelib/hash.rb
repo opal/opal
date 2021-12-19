@@ -651,8 +651,10 @@ class ::Hash
       var top = (inspect_ids === undefined),
           hash_id = self.$object_id(),
           result = [];
+    }
 
-      try {
+    begin
+      %x{
         if (top) {
           inspect_ids = {};
         }
@@ -673,17 +675,18 @@ class ::Hash
             key = key.key;
           }
 
-          result.push(key.$inspect() + '=>' + value.$inspect());
+          key = #{Opal.inspect(`key`)}
+          value = #{Opal.inspect(`value`)}
+
+          result.push(key + '=>' + value);
         }
 
         return '{' + result.join(', ') + '}';
-
-      } finally {
-        if (top) {
-          inspect_ids = undefined;
-        }
       }
-    }
+      nil
+    ensure
+      `if (top) inspect_ids = undefined`
+    end
   end
 
   def invert
