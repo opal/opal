@@ -1,6 +1,39 @@
 ### Added
 
 - Implement `chomp:` option for `String#each_line` and `#lines` (#2355)
+- Ruby 3.1 support and some older Ruby features we missed (#2347)
+  - Use parser in 3.1 mode to support new language-level features like hashes/kwargs value omission, the pin operator for pattern matching
+  - `Array#intersect?`
+  - `String#strip` and `String#lstrip` to also remove NUL bytes
+  - `Integer.try_convert`
+  - `public`, `private`, `protected`, `module_function` now return their arguments
+  - `Class#descendants`, `Class#subclasses`
+  - (<=1.8) `Kernel#local_variables`
+  - (<=2.3) Set local variables for regexp named captures (`/(?<b>a)/ =~ 'a'` => `b = 'a'`)
+  - Remove deprecated `NIL`, `TRUE`, `FALSE` constants
+  - `String#unpack` and `String#unpack1` to support an `offset:` kwarg
+  - `MatchData#match`, `MatchData#match_length`
+  - Enumerable modernization
+    - `Enumerable#tally` to support an optional hash accumulator
+    - `Enumerable#each_{cons,slice}` to return self
+    - `Enumerable#compact`
+  - `Refinement` becomes its own class now
+  - `Struct#keyword_init?`
+  - (pre-3.1) Large Enumerator rework
+    - Introduce `Enumerator::ArithmeticSequence`
+    - Introduce `Enumerator::Chain`
+    - Introduce `Enumerator#+` to create `Enumerator::Chain`s
+    - `Enumerator#{rewind,peek,peek_values,next,next_values}`
+    - Improve corelib support for beginless/endless ranges and `ArithmeticSequences`
+      - `String#[]`, `Array#[]`, `Array#[]=`, `Array#fill`, `Array#values_at`
+    - `Range#step` and `Numeric#step` return an `ArithmeticSequence` when `Numeric` values are in play
+    - Introduce `Range#%`
+    - `Enumerator::Yielder#to_proc`
+    - Fix #2367
+  - (2.7) `UnboundMethod#bind_call`
+  - (Opal) `{Kernel,BasicObject}#{inspect,p,pp,method_missing}` may work with JS native values now, also they now correctly report cycles
+  - `Enumerable#sum` uses Kahan's summation algorithm to reduce error with floating point values
+  - `File.dirname` supports a new `level` argument
 
 ### Fixed
 
