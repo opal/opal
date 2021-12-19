@@ -71,6 +71,7 @@ opal_unsupported_filter "freezing" do
   fails "Array#unshift raises a FrozenError on a frozen array when the array would not be modified" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
   fails "Date constants freezes MONTHNAMES, DAYNAMES, ABBR_MONTHNAMES, ABBR_DAYSNAMES"
   fails "Enumerable#sort doesn't raise an error if #to_a returns a frozen Array"
+  fails "Enumerable#tally with a hash raises a FrozenError and does not update the given hash when the hash is frozen" # Expected FrozenError but got: ArgumentError ([Numerous#tally] wrong number of arguments(1 for 0))
   fails "Enumerator#initialize on frozen instance raises a RuntimeError"
   fails "Enumerator::Chain#initialize on frozen instance raises a RuntimeError" # Expected RuntimeError but no exception was raised (#<Enumerator::Chain: []> was returned)
   fails "Enumerator::Generator#initialize on frozen instance raises a RuntimeError" # Expected RuntimeError but no exception was raised (#<Proc:0x1b314> was returned)

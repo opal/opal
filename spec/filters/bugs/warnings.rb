@@ -11,6 +11,7 @@ opal_filter "warnings" do
   fails "Literal (A::X) constant resolution with dynamically assigned constants returns the updated value when a constant is reassigned" # Expected warning to match: /already initialized constant/
   fails "Literal Regexps matches against $_ (last input) in a conditional if no explicit matchee provided" # Expected warning to match: /regex literal in condition/
   fails "Module#const_get with dynamically assigned constants returns the updated value of a constant" # Expected warning to match: /already initialized constant/
+  fails "Pattern matching warning when one-line form does not warn about pattern matching is experimental feature" # NameError: uninitialized constant Warning
   fails "Predefined global $, warns if assigned non-nil" # Expected warning to match: /warning: `\$,' is deprecated/ but got: ""
   fails "Predefined global $; warns if assigned non-nil" # Expected warning to match: /warning: `\$;' is deprecated/ but got: ""
   fails "Regexp.new given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/

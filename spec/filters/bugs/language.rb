@@ -1,5 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "language" do
+  fails "$LOAD_PATH.resolve_feature_path return nil if feature cannot be found" # NoMethodError: undefined method `resolve_feature_path' for ["foo"]
   fails "$LOAD_PATH.resolve_feature_path returns what will be loaded without actual loading, .rb file" # NoMethodError: undefined method `resolve_feature_path' for ["foo"]
   fails "$LOAD_PATH.resolve_feature_path returns what will be loaded without actual loading, .so file" # NoMethodError: undefined method `resolve_feature_path' for ["foo"]
   fails "A Proc taking |*a, **kw| arguments does not autosplat keyword arguments" # Expected [[1], {"a"=>1}] == [[[1, {"a"=>1}]], {}] to be truthy but was false
@@ -87,6 +88,7 @@ opal_filter "language" do
   fails "Global variable $FILENAME is read-only"
   fails "Global variable $VERBOSE converts truthy values to true" # Expected 1 to be true
   fails "Global variable $\" is read-only"
+  fails "Hash literal checks duplicated float keys on initialization" # Expected warning to match: /key 1.0 is duplicated|duplicated key/ but got: ""
   fails "Hash literal checks duplicated keys on initialization" # Expected warning to match: /key 1000 is duplicated|duplicated key/ but got: ""
   fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for BasicObject
   fails "Heredoc string allow HEREDOC with <<\"identifier\", interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
@@ -212,6 +214,10 @@ opal_filter "language" do
   fails "Ruby String interpolation returns a string with the source encoding by default" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
   fails "Safe navigator allows assignment methods"
+  fails "The ** operator hash with omitted value accepts mixed syntax" # NameError: uninitialized constant MSpecEnv::a
+  fails "The ** operator hash with omitted value accepts short notation 'key' for 'key: value' syntax" # NameError: uninitialized constant MSpecEnv::a
+  fails "The ** operator hash with omitted value ignores hanging comma on short notation" # NameError: uninitialized constant MSpecEnv::a
+  fails "The ** operator hash with omitted value works with methods and local vars" # NameError: uninitialized constant #<Class:0x874c0>::bar
   fails "The BEGIN keyword accesses variables outside the eval scope"
   fails "The BEGIN keyword runs first in a given code unit"
   fails "The BEGIN keyword runs in a shared scope"
@@ -301,6 +307,8 @@ opal_filter "language" do
   fails "Using yield in a singleton class literal raises a SyntaxError" # Expected SyntaxError (/Invalid yield/) but got: SyntaxError (undefined method `uses_block!' for nil)
   fails "a method definition that sets more than one default parameter all to the same value only allows overriding the default value of the first such parameter in each set" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for -1)
   fails "a method definition that sets more than one default parameter all to the same value treats the argument after the multi-parameter normally" # ArgumentError: [MSpecEnv#bar] wrong number of arguments(3 for -1)
+  fails "kwarg with omitted value in a method call accepts short notation 'kwarg' in method call for definition 'def call(*args, **kwargs) = [args, kwargs]'" # NameError: uninitialized constant SpecEvaluate::a
+  fails "kwarg with omitted value in a method call with methods and local variables for definition \n    def call(*args, **kwargs) = [args, kwargs]\n    def bar\n      \"baz\"\n    end\n    def foo(val)\n      call bar:, val:\n    end" # NameError: uninitialized constant SpecEvaluate::bar
   fails "self in a metaclass body (class << obj) raises a TypeError for numbers"
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols"
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block"

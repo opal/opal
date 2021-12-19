@@ -212,6 +212,7 @@ opal_filter "String" do
   fails "String#split with Regexp when a block is given yields each split substring with empty regexp pattern" # Expected ["c", "h", "u", "n", "k", "y"] == "chunky" to be truthy but was false
   fails "String#split with Regexp when a block is given yields the string when limit is 1" # Expected ["chunky bacon"] == "chunky bacon" to be truthy but was false
   fails "String#split with String returns String instances based on self" # Expected "x" (StringSpecs::MyString) to be an instance of String
+  fails "String#split with String when $; is not nil warns" # Expected warning to match: /warning: \$; is set to non-nil value/ but got: ""
   fails "String#squeeze returns String instances when called on a subclass" # Expected "oh no!" (StringSpecs::MyString) to be an instance of String
   fails "String#sub with pattern, replacement returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#sub with pattern, replacement returns a copy of self when no modification is made" # Expected "hello" not to be identical to "hello"
@@ -264,6 +265,7 @@ opal_filter "String" do
   fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfkd)" # Expected true to be false
   fails "String#unpack with format 'm' when given count 0 raises an ArgumentError for an invalid base64 character" # Expected ArgumentError but no exception was raised (["test"] was returned)
   fails "String#unpack1 returns the first value of #unpack" # RuntimeError: Unsupported unpack directive "x" (no chunk reader defined)
+  fails "String#unpack1 starts unpacking from the given offset" # RuntimeError: Unsupported unpack directive "x" (no chunk reader defined)
   fails "String#upcase ASCII-only case mapping does not upcase non-ASCII characters" # ArgumentError: [String#upcase] wrong number of arguments(1 for 0)
   fails "String#upcase full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#upcase] wrong number of arguments(2 for 0)
   fails "String#upcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#upcase] wrong number of arguments(1 for 0)

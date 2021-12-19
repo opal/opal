@@ -419,6 +419,7 @@ opal_unsupported_filter "String" do
   fails "String#lstrip! raises a RuntimeError on a frozen instance that is modified"
   fails "String#lstrip! raises a RuntimeError on a frozen instance that would not be modified"
   fails "String#lstrip! returns nil if no modifications were made"
+  fails "String#lstrip! strips leading \\0" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.
   fails "String#match matches \\G at the start of the string"
   fails "String#next taints the result if self is tainted"
   fails "String#next! is equivalent to succ, but modifies self in place (still returns self)"
@@ -554,6 +555,7 @@ opal_unsupported_filter "String" do
   fails "String#strip! modifies self removing trailing NULL bytes and whitespace"
   fails "String#strip! raises a RuntimeError on a frozen instance that is modified"
   fails "String#strip! raises a RuntimeError on a frozen instance that would not be modified"
+  fails "String#strip! removes leading and trailing NULL bytes and whitespace" # NotImplementedError: String#strip! not supported. Mutable String methods are not supported in Opal.
   fails "String#strip! returns nil if no modifications where made"
   fails "String#sub with pattern and Hash ignores non-String keys" # Expected "tazoo" == "taboo" to be truthy but was false
   fails "String#sub with pattern and Hash taints the result if a hash value is tainted"
