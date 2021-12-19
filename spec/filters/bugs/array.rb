@@ -8,7 +8,6 @@ opal_filter "Array" do
   fails "Array#[] raises a RangeError if passed a range with a bound that is too large" # Expected RangeError but no exception was raised (nil was returned)
   fails "Array#[] raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ([2, 3] was returned)
   fails "Array#drop raises a TypeError when the passed argument isn't an integer and #to_int returns non-Integer" # Expected TypeError but no exception was raised ([1, 2] was returned)
-  fails "Array#drop tries to convert the passed argument to an Integer using #to_int" # Expected [1, 2, 3] == [3] to be truthy but was false
   fails "Array#each does not yield elements deleted from the end of the array" # Expected [2, 3, nil] to equal [2, 3]
   fails "Array#each yields elements added to the end of the array by the block" # Expected [2] to equal [2, 0, 0]
   fails "Array#fill with (filler, range) works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
@@ -30,6 +29,4 @@ opal_filter "Array" do
   fails "Array#to_h with block raises TypeError if block returns something other than Array" # Expected TypeError (/wrong element type String at 0/) but got: TypeError (wrong element type NilClass at 0 (expected array))
   fails "Array#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Array#uniq! properly handles recursive arrays"
-  fails "Array#values_at works when given beginless ranges" # Opal::SyntaxError: undefined method `type' for nil
-  fails "Array#values_at works when given endless ranges" # Opal::SyntaxError: undefined method `type' for nil
 end

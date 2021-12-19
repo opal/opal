@@ -54,11 +54,7 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#enum_for passes given arguments to wrapped method" # Expected [] == [0, 6, 20, 42] to be truthy but was false
   fails "Enumerator::Lazy#enum_for works with an infinite enumerable" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#filter calls the block with a gathered array when yield with multiple arguments" # NoMethodError: undefined method `force' for [[], 0, [0, 1], [0, 1, 2], [0, 1, 2], nil, "default_arg", [], [], [0], [0, 1], [0, 1, 2]]
-  fails "Enumerator::Lazy#filter on a nested Lazy sets #size to nil" # Expected 0 == nil to be truthy but was false
   fails "Enumerator::Lazy#filter on a nested Lazy when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == [6, 8, 10] to be truthy but was false
-  fails "Enumerator::Lazy#filter raises an ArgumentError when not given a block" # Expected ArgumentError but no exception was raised (#<Enumerator::Lazy: nil> was returned)
-  fails "Enumerator::Lazy#filter returns a new instance of Enumerator::Lazy" # Expected [] (Array) to be an instance of Enumerator::Lazy
-  fails "Enumerator::Lazy#filter sets #size to nil" # Expected 0 == nil to be truthy but was false
   fails "Enumerator::Lazy#filter when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == [0, 2, 4] to be truthy but was false
   fails "Enumerator::Lazy#filter works with an infinite enumerable" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#filter_map does not map false results" # Expected [] == [1, 3, 5, 7] to be truthy but was false

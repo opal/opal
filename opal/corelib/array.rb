@@ -456,7 +456,7 @@ class ::Array < `Array`
 
       %x{
         var exclude = index.excl,
-            from    = index.begin === nil ? 0 : $coerce_to(index.begin, Opal.Integer, 'to_int');
+            from    = index.begin === nil ? 0 : $coerce_to(index.begin, Opal.Integer, 'to_int'),
             to      = index.end === nil ? -1 : $coerce_to(index.end, Opal.Integer, 'to_int');
 
         if (from < 0) {
@@ -2348,8 +2348,8 @@ class ::Array < `Array`
 
     args.each do |elem|
       if elem.is_a? ::Range
-        finish = `$coerce_to(#{elem.last}, #{::Integer}, 'to_int')`
-        start = `$coerce_to(#{elem.first}, #{::Integer}, 'to_int')`
+        finish = `#{elem.end} === nil ? -1 : $coerce_to(#{elem.end}, #{::Integer}, 'to_int')`
+        start = `#{elem.begin} === nil ? 0 : $coerce_to(#{elem.begin}, #{::Integer}, 'to_int')`
 
         %x{
           if (start < 0) {
@@ -2362,7 +2362,7 @@ class ::Array < `Array`
           if (finish < 0) {
             finish = finish + self.length;
           }
-          if (#{elem.exclude_end?}) {
+          if (#{elem.exclude_end?} && #{elem.end} !== nil) {
             finish--;
           }
           if (finish < start) {
