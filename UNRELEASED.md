@@ -9,6 +9,8 @@
 - Fix coertion for `File.absolute_path` (#2372)
 - Fix some `IO#puts` edge cases (no args, empty array, nested array, …) (#2372)
 - Preserve UNC path prefix on File.join (#2366)
+- Methods on `Kernel`, `BasicObject`, `Boolean` will never return boxed values anymore (#2293)
+  - `false.tap{}` will now correctly return a JS value of `false`, not `Object(false)`
 
 ### Changed
 
