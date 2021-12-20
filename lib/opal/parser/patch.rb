@@ -48,6 +48,81 @@ if RUBY_ENGINE == 'opal'
         diagnostic :error, :lvar_name, { name: name }, loc
       end
     end
+
+    # Taken From:
+    # https://github.com/whitequark/parser/blob/a7c638b7b205db9213a56897b41a8e5620df766e/lib/parser/builders/default.rb#L388
+    def dedent_string(node, dedent_level)
+      unless dedent_level.nil?
+        dedenter = ::Parser::Lexer::Dedenter.new(dedent_level)
+
+        case node.type
+        when :str
+          node = node.updated(nil, [dedenter.dedent(node.children.first)])
+        when :dstr, :xstr
+          children = node.children.map do |str_node|
+            if str_node.type == :str
+              str_node = str_node.updated(nil, [dedenter.dedent(str_node.children.first)])
+              next nil if str_node.children.first.empty?
+            else
+              dedenter.interrupt
+            end
+            str_node
+          end
+
+          node = node.updated(nil, children.compact)
+        end
+      end
+
+      node
+    end
+  end
+
+  class Parser::Lexer::Dedenter
+    # Taken From:
+    # https://github.com/whitequark/parser/blob/b7a08031523d05b2f76b0bab22fac00b1d3fe653/lib/parser/lexer/dedenter.rb#L36
+    def dedent(string)
+      original_encoding = string.encoding
+      # Prevent the following error when processing binary encoded source.
+      # "\xC0".split # => ArgumentError (invalid byte sequence in UTF-8)
+      lines = string.force_encoding(Encoding::BINARY).split("\\\n")
+      if lines.length == 1
+        # If the line continuation sequence was found but there is no second
+        # line, it was not really a line continuation and must be ignored.
+        lines = [string.force_encoding(original_encoding)]
+      else
+        lines.map! { |s| s.force_encoding(original_encoding) }
+      end
+
+      lines.each_with_index do |line, index|
+        next if (index == 0) && !@at_line_begin
+        left_to_remove = @dedent_level
+        remove = 0
+
+        line.each_char do |char|
+          break if left_to_remove <= 0
+          case char
+          when "\s"
+            remove += 1
+            left_to_remove -= 1
+          when "\t"
+            break if TAB_WIDTH * (remove / TAB_WIDTH + 1) > @dedent_level
+            remove += 1
+            left_to_remove -= TAB_WIDTH
+          else
+            # no more spaces or tabs
+            break
+          end
+        end
+
+        lines[index] = line[remove..-1]
+      end
+
+      string = lines.join
+
+      @at_line_begin = string.end_with?("\n")
+
+      string
+    end
   end
 end
 
