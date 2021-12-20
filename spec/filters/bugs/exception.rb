@@ -7,8 +7,6 @@ opal_filter "Exception" do
   fails "Errno::EINVAL.new accepts an optional custom message and location" # ArgumentError: [EINVAL.new] wrong number of arguments(2 for -1)
   fails "Errno::EINVAL.new accepts an optional custom message" # NoMethodError: undefined method `errno' for #<Errno::EINVAL: Invalid argument - custom message>
   fails "Errno::EINVAL.new can be called with no arguments" # NoMethodError: undefined method `errno' for #<Errno::EINVAL: Invalid argument>
-  fails "Errno::EMFILE can be subclassed" # NameError: uninitialized constant Errno::EMFILE
-  fails "Errno::ENOENT lets subclasses inherit the default error message" # Expected "uninitialized constant Errno::ENOENT" == "No such file or directory - custom message" to be truthy but was false
   fails "Errno::ENOTSUP is defined" # Expected Errno to have constant 'ENOTSUP' but it does not
   fails "Errno::ENOTSUP is the same class as Errno::EOPNOTSUPP if they represent the same errno value" # NameError: uninitialized constant Errno::ENOTSUP
   fails "Exception#== returns true if both exceptions have the same class, no message, and no backtrace" # Expected #<RuntimeError: RuntimeError> == #<RuntimeError: RuntimeError> to be truthy but was false
@@ -75,7 +73,6 @@ opal_filter "Exception" do
   fails "StopIteration#result returns the method-returned-object from an Enumerator" # NoMethodError: undefined method `next' for #<Enumerator: #<Object:0x4fb42>:each>
   fails "SystemCallError#backtrace is nil if not raised" # Expected ["ruby/core/exception/system_call_error_spec.rb:141:5:in `new'",  "<internal:corelib/basic_object.rb>:119:1:in `instance_exec'",  "<internal:corelib/runtime.js>:1780:5:in `Opal.send2'",  "<internal:corelib/runtime.js>:1770:5:in `Opal.send'",  "mspec/runner/mspec.rb:114:7:in `instance_exec'",  "<internal:corelib/runtime.js>:1780:5:in `Opal.send2'",  "<internal:corelib/runtime.js>:1770:5:in `Opal.send'",  "mspec/runner/context.rb:176:34:in `protect'",  "<internal:corelib/runtime.js>:1569:5:in `Opal.yieldX'",  "<internal:corelib/enumerable.rb>:27:16:in `$$3'"] == nil to be truthy but was false
   fails "SystemCallError#dup copies the errno" # NoMethodError: undefined method `errno' for #<SystemCallError: message>
-  fails "SystemCallError#errno returns nil when no errno given" # NoMethodError: undefined method `errno' for #<SystemCallError: message>
   fails "SystemCallError#errno returns the errno given as optional argument to new" # NoMethodError: undefined method `errno' for #<SystemCallError: message>
   fails "SystemCallError#message returns the default message when no message is given" # Expected "268435456" =~ /Unknown error/i to be truthy but was nil
   fails "SystemCallError.=== returns false if errnos different" # NoMethodError: undefined method `+' for Errno

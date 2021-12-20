@@ -52,6 +52,10 @@ AllCops:
     - 'stdlib/matrix/*.rb'
     - 'stdlib/pp.rb'
     - 'stdlib/prettyprint.rb'
+    - 'stdlib/optparse.rb'
+    - 'stdlib/optparse/*.rb'
+    - 'stdlib/tmpdir.rb'
+    - 'stdlib/tempfile.rb'
 
 inherit_mode:
   merge:

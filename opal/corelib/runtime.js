@@ -552,7 +552,7 @@
       constructor = function(){};
     }
 
-    if (name) {
+    if (name && name !== nil) {
       $prop(constructor, 'displayName', '::'+name);
     }
 

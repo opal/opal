@@ -242,15 +242,7 @@ class ::RegexpError         < ::StandardError; end
 class ::ThreadError         < ::StandardError; end
 class ::FiberError          < ::StandardError; end
 
-module ::Errno
-  class EINVAL              < ::SystemCallError
-    def self.new(name = nil)
-      message = 'Invalid argument'
-      message += " - #{name}" if name
-      super(message)
-    end
-  end
-end
+::Object.autoload :Errno, 'corelib/error/errno'
 
 class ::UncaughtThrowError < ::ArgumentError
   attr_reader :tag, :value
