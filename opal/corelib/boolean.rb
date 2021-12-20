@@ -1,3 +1,5 @@
+# use_strict: true
+
 class ::Boolean < `Boolean`
   `Opal.prop(self.$$prototype, '$$is_boolean', true)`
 

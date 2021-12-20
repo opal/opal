@@ -1019,6 +1019,15 @@ class ::String < `String`
     }
   end
 
+  # We redefine this method on String, as kernel.rb is in strict mode
+  # so that things like Boolean don't get boxed. For String though -
+  # we either need to box it to define properties on it, or run it in
+  # non-strict mode. This is a mess and we need to come back to it
+  # at a later time.
+  def singleton_class
+    `Opal.get_singleton_class(self)`
+  end
+
   def split(pattern = undefined, limit = undefined)
     %x{
       if (self.length === 0) {

@@ -930,11 +930,16 @@
   };
 
   Opal.methods = function(obj) {
-    return Opal.instance_methods(Opal.get_singleton_class(obj));
+    return Opal.instance_methods(obj.$$meta || obj.$$class);
   };
 
   Opal.own_methods = function(obj) {
-    return Opal.own_instance_methods(Opal.get_singleton_class(obj));
+    if (obj.$$meta) {
+      return Opal.own_instance_methods(obj.$$meta);
+    }
+    else {
+      return [];
+    }
   };
 
   Opal.receiver_methods = function(obj) {

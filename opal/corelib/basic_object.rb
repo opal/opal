@@ -1,3 +1,5 @@
+# use_strict: true
+
 class ::BasicObject
   def initialize(*)
   end

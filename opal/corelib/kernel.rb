@@ -1,4 +1,5 @@
 # helpers: truthy, coerce_to, respond_to, Opal
+# use_strict: true
 
 module ::Kernel
   def method_missing(symbol, *args, &block)
