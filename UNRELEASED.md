@@ -34,6 +34,8 @@
   - (Opal) `{Kernel,BasicObject}#{inspect,p,pp,method_missing}` may work with JS native values now, also they now correctly report cycles
   - `Enumerable#sum` uses Kahan's summation algorithm to reduce error with floating point values
   - `File.dirname` supports a new `level` argument
+- Vendor in `optparse` and `shellwords` (#2326)
+- Preliminary support for compiling the whole `bin/opal` with Opal (#2326)
 
 ### Fixed
 
@@ -45,6 +47,7 @@
 - Methods on `Kernel`, `BasicObject`, `Boolean` will never return boxed values anymore (#2293)
   - `false.tap{}` will now correctly return a JS value of `false`, not `Object(false)`
 - opal-parser doesn't break on `<<~END` strings anymore (#2364)
+- Fix error reporting at the early stage of loading (#2326)
 
 ### Changed
 
