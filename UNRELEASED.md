@@ -44,6 +44,7 @@
 - Preserve UNC path prefix on File.join (#2366)
 - Methods on `Kernel`, `BasicObject`, `Boolean` will never return boxed values anymore (#2293)
   - `false.tap{}` will now correctly return a JS value of `false`, not `Object(false)`
+- opal-parser doesn't break on `<<~END` strings anymore (#2364)
 
 ### Changed
 
