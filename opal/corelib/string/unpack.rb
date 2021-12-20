@@ -675,7 +675,8 @@ class ::String
     alias('L', 'V');
   }
 
-  def unpack(format)
+  def unpack(format, offset: 0)
+    ::Kernel.raise ::ArgumentError, "offset can't be negative" if offset < 0
     format = ::Opal.coerce_to!(format, ::String, :to_str).gsub(/\s/, '').delete("\000")
 
     %x{
@@ -689,7 +690,7 @@ class ::String
         var cp, j = 0;
 
         output = new Array(self.length);
-        for (var i = 0; i < self.length; i++) {
+        for (var i = offset; i < self.length; i++) {
           cp = output[j++] = self.codePointAt(i);
           if (cp > 0xffff) i++;
         }
@@ -697,6 +698,10 @@ class ::String
       }
 
       var buffer = self.$bytes();
+
+      #{::Kernel.raise ::ArgumentError, 'offset outside of string' if offset > `buffer`.length}
+
+      buffer = buffer.slice(offset);
 
 
       // optimization
@@ -756,9 +761,9 @@ class ::String
     }
   end
 
-  def unpack1(format)
+  def unpack1(format, offset: 0)
     format = ::Opal.coerce_to!(format, ::String, :to_str).gsub(/\s/, '').delete("\000")
 
-    unpack(format[0])[0]
+    unpack(format[0], offset: offset)[0]
   end
 end

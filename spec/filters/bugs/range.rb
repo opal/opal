@@ -1,7 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Range" do
-  fails "Range#% produces an arithmetic sequence with a percent sign in #inspect" # NoMethodError: undefined method `%' for 1..10
-  fails "Range#% works as a Range#step" # NoMethodError: undefined method `%' for 1..10
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers accepts (+/-)Float::INFINITY from the block" # TypeError: can't iterate from Float
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns a boundary element if appropriate" # NoMethodError: undefined method `prev_float' for 3
   fails "Range#bsearch with Float values with a block returning negative, zero, positive numbers returns an element at an index for which block returns 0 (small numbers)" # TypeError: can't iterate from Float
@@ -59,7 +57,6 @@ opal_filter "Range" do
   fails "Range#cover? range argument accepts range argument" # Expected false to be true
   fails "Range#cover? range argument honors exclusion of right boundary (:exclude_end option)" # Expected false to be true
   fails "Range#cover? range argument supports boundaries of different comparable types" # Expected false to be true
-  fails "Range#each raises a TypeError if the first element is a Time object even if it responds to #succ" # Expected TypeError but no exception was raised (1970-01-01 00:00:00 UTC..1970-01-01 00:00:01 UTC was returned)
   fails "Range#eql? returns false if the endpoints are not eql?" # Expected 0..1 not to have same value or type as 0..1
   fails "Range#first raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised ([2] was returned)
   fails "Range#hash generates an Integer for the hash value" # Expected "A,1,1,0" (String) to be an instance of Integer
@@ -89,13 +86,9 @@ opal_filter "Range" do
   fails "Range#minmax on an inclusive range should return the minimum and maximum values for a non-numeric range without iterating the range" # Mock 'x' expected to receive succ("any_args") exactly 0 times but received it 1 times
   fails "Range#minmax on an inclusive range should return the minimum and maximum values for a numeric range without iterating the range" # TypeError: can't iterate from Float
   fails "Range#size returns nil for endless ranges if the start is not numeric" # Expected Infinity == nil to be truthy but was false
-  fails "Range#step when no block is given raises an ArgumentError if step is 0" # Expected ArgumentError but no exception was raised (#<Enumerator: -1..1:step(0)> was returned)
   fails "Range#step when no block is given returned Enumerator size raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised (#<Enumerator: 1..2:step(#<MockObject:0x2d238>)> was returned)
   fails "Range#step when no block is given returned Enumerator size raises a TypeError if step does not respond to #to_int" # Expected TypeError but no exception was raised (#<Enumerator: 1..2:step(#<MockObject:0x2d214>)> was returned)
-  fails "Range#step when no block is given returned Enumerator size returns the ceil of range size divided by the number of steps even if step is negative" # ArgumentError: step can't be negative
-  fails "Range#step when no block is given returned Enumerator type when begin is not defined and end is numeric returns an instance of Enumerator::ArithmeticSequence" # Expected Enumerator == Enumerator::ArithmeticSequence to be truthy but was false
-  fails "Range#step when no block is given returned Enumerator type when both begin and end are numerics returns an instance of Enumerator::ArithmeticSequence" # Expected Enumerator == Enumerator::ArithmeticSequence to be truthy but was false
-  fails "Range#step when no block is given returned Enumerator type when range is endless returns an instance of Enumerator::ArithmeticSequence when begin is numeric" # Expected Enumerator == Enumerator::ArithmeticSequence to be truthy but was false
+  fails "Range#step when no block is given returned Enumerator size returns the range size when there's no step_size" # Expected 9 == 10 to be truthy but was false
   fails "Range#step with an endless range and Float values yields Float values incremented by a Float step" # Expected [-1, 0] to have same value and type as [-1, -0.5, 0, 0.5]
   fails "Range#step with an endless range and Integer values yields Float values incremented by a Float step" # Expected [-2, 1] to have same value and type as [-2, -0.5, 1]
   fails "Range#step with exclusive end and String values raises a TypeError when passed a Float step" # Expected TypeError but no exception was raised ("A"..."G" was returned)

@@ -71,7 +71,9 @@ opal_unsupported_filter "freezing" do
   fails "Array#unshift raises a FrozenError on a frozen array when the array would not be modified" # Expected FrozenError but no exception was raised ([1, 2, 3] was returned)
   fails "Date constants freezes MONTHNAMES, DAYNAMES, ABBR_MONTHNAMES, ABBR_DAYSNAMES"
   fails "Enumerable#sort doesn't raise an error if #to_a returns a frozen Array"
+  fails "Enumerable#tally with a hash raises a FrozenError and does not update the given hash when the hash is frozen" # Expected FrozenError but got: ArgumentError ([Numerous#tally] wrong number of arguments(1 for 0))
   fails "Enumerator#initialize on frozen instance raises a RuntimeError"
+  fails "Enumerator::Chain#initialize on frozen instance raises a RuntimeError" # Expected RuntimeError but no exception was raised (#<Enumerator::Chain: []> was returned)
   fails "Enumerator::Generator#initialize on frozen instance raises a RuntimeError" # Expected RuntimeError but no exception was raised (#<Proc:0x1b314> was returned)
   fails "Enumerator::Lazy#initialize on frozen instance raises a RuntimeError" # Expected RuntimeError but no exception was raised (nil was returned)
   fails "FalseClass#to_s returns a frozen string" # Expected "false".frozen? to be truthy but was false
@@ -172,6 +174,15 @@ opal_unsupported_filter "freezing" do
   fails "Kernel#instance_variable_set on frozen objects raises a RuntimeError when passed replacement is identical to stored object"
   fails "Literal Ranges is frozen" # Expected 42...frozen? to be truthy but was false
   fails "Literal Regexps is frozen" # Expected /Hello/.frozen? to be truthy but was false
+  fails "Marshal.load when called with freeze: true does not freeze classes" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
+  fails "Marshal.load when called with freeze: true does not freeze modules" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
+  fails "Marshal.load when called with freeze: true returns frozen arrays" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
+  fails "Marshal.load when called with freeze: true returns frozen hashes" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
+  fails "Marshal.load when called with freeze: true returns frozen objects" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
+  fails "Marshal.load when called with freeze: true returns frozen regexps" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
+  fails "Marshal.load when called with freeze: true returns frozen strings" # ArgumentError: [Marshal.load] wrong number of arguments(2 for 1)
+  fails "Marshal.load when called with freeze: true when called with a proc call the proc with frozen objects" # ArgumentError: [Marshal.load] wrong number of arguments(3 for 1)
+  fails "Marshal.load when called with freeze: true when called with a proc does not freeze the object returned by the proc" # ArgumentError: [Marshal.load] wrong number of arguments(3 for 1)
   fails "MatchData#string returns a frozen copy of the match string"
   fails "Module#alias_method raises FrozenError if frozen" # Expected FrozenError but no exception was raised (#<Class:0x39d44> was returned)
   fails "Module#alias_method raises RuntimeError if frozen"

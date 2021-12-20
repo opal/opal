@@ -54,7 +54,6 @@ opal_filter "Set" do
   fails "Set#join returns a string formed by concatenating each element separated by the separator" # NoMethodError: undefined method `join' for #<Set: {a,b,c}>
   fails "Set#join returns an empty string if the Set is empty" # NoMethodError: undefined method `join' for #<Set: {}>
   fails "Set#merge raises an ArgumentError when passed a non-Enumerable"
-  fails "Set#pretty_print passes the 'pretty print' representation of self to the pretty print writer"
   fails "Set#pretty_print_cycle passes the 'pretty print' representation of a self-referencing Set to the pretty print writer"
   fails "Set#to_s correctly handles self-references" # Expected "#<Set:0x865de>" to include "#<Set: {...}>"
   fails "Set#to_s is an alias of inspect" # Expected #<Method: Set#to_s (defined in Kernel in corelib/kernel.rb:1201)> to equal #<Method: Set#inspect (defined in Set in set.rb:36)>

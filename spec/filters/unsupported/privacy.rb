@@ -15,6 +15,7 @@ opal_unsupported_filter "private" do
   fails "Defining an 'initialize_copy' method sets the method's visibility to private"
   fails "Defining an 'initialize_dup' method sets the method's visibility to private"
   fails "Enumerator#initialize is a private method"
+  fails "Enumerator::Chain#initialize is a private method" # Expected Enumerator::Chain to have private instance method 'initialize' but it does not
   fails "Enumerator::Generator#initialize is a private method" # Expected Enumerator::Generator to have private instance method 'initialize' but it does not
   fails "Enumerator::Lazy#initialize is a private method" # Expected Enumerator::Lazy to have private instance method 'initialize' but it does not
   fails "Enumerator::Yielder#initialize is a private method" # Expected Enumerator::Yielder to have private instance method 'initialize' but it does not

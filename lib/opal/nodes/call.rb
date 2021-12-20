@@ -402,6 +402,13 @@ module Opal
         push "#{scope.self}.$eval(#{temp}))"
       end
 
+      add_special :local_variables do |compile_default|
+        next compile_default.call unless [s(:self), nil].include?(recvr)
+
+        scope_variables = scope.scope_locals.map(&:to_s).inspect
+        push scope_variables
+      end
+
       add_special :binding do |compile_default|
         next compile_default.call unless recvr.nil?
 

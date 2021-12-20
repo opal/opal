@@ -19,7 +19,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#slice_when when given a block doesn't yield an empty array on a small enumerable" # Expected [] to equal [[42]]
   fails "Enumerable#sort_by calls #each to iterate over the elements to be sorted" # Mock '#<EnumerableSpecs::Numerous:0x64116>' expected to receive each("any_args") exactly 1 times but received it 0 times
   fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable"
-  fails "Enumerable#sum uses Kahan's compensated summation algorithm for precise sum of float numbers" # Expected 50.00000000000001 == 50 to be truthy but was false
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments"
   fails "Enumerable#tally counts values as gathered array when yielded with multiple arguments" # NoMethodError: undefined method `tally' for #<EnumerableSpecs::YieldsMixed2:0x8e6b4>
   fails "Enumerable#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject/) but got: TypeError (wrong element type NilClass (expected array))

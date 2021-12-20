@@ -156,4 +156,51 @@ module ::Opal
     }
     nil
   end
+
+  `var inspect_stack = []`
+
+  # Performs a safe call to inspect for any value, whether
+  # native or Opal-wrapped.
+  #
+  # @param value [Object]
+  # @return [String]
+  def self.inspect(value = undefined)
+    `var pushed = false`
+    begin
+      %x{
+        if (value === null) {
+          // JS null value
+          return 'null';
+        }
+        else if (value === undefined) {
+          // JS undefined value
+          return 'undefined';
+        }
+        else if (typeof value.$$class === 'undefined') {
+          // JS object / other value that is not bridged
+          return Object.prototype.toString.apply(value);
+        }
+        else if (typeof value.$inspect !== 'function' || value.$inspect.$$stub) {
+          // BasicObject and friends
+          return #{"#<#{`value.$$class`}:0x#{value.__id__.to_s(16)}>"}
+        }
+        else if (inspect_stack.indexOf(#{value.__id__}) !== -1) {
+          // inspect recursing inside inspect to find out about the
+          // same object
+          return #{"#<#{`value.$$class`}:0x#{value.__id__.to_s(16)}>"}
+        }
+        else {
+          // anything supporting Opal
+          inspect_stack.push(#{value.__id__});
+          pushed = true;
+          return value.$inspect();
+        }
+      }
+      nil
+    rescue ::Exception => e # rubocop:disable Lint/RescueException
+      "#<#{`value.$$class`}:0x#{value.__id__.to_s(16)}>"
+    ensure
+      `if (pushed) inspect_stack.pop()`
+    end
+  end
 end

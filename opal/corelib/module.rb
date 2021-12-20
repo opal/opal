@@ -569,6 +569,7 @@ class ::Module
     %x{
       if (methods.length === 0) {
         self.$$module_function = true;
+        return nil;
       }
       else {
         for (var i = 0, length = methods.length; i < length; i++) {
@@ -578,6 +579,7 @@ class ::Module
 
           Opal.defs(self, id, func);
         }
+        return methods.length === 1 ? methods[0] : methods;
       }
 
       return self;
@@ -706,23 +708,22 @@ class ::Module
     }
   end
 
-  def refine(mod, &block)
-    s, m, mod_id = self, nil, nil
+  def refine(klass, &block)
+    refinement_module, m, klass_id = self, nil, nil
     %x{
-      mod_id = Opal.id(mod);
+      klass_id = Opal.id(klass);
       if (typeof self.$$refine_modules === "undefined") {
         self.$$refine_modules = {};
       }
-      if (typeof self.$$refine_modules[mod_id] === "undefined") {
-        m = self.$$refine_modules[mod_id] = #{::Module.new};
+      if (typeof self.$$refine_modules[klass_id] === "undefined") {
+        m = self.$$refine_modules[klass_id] = #{::Refinement.new};
       }
       else {
-        m = self.$$refine_modules[mod_id];
+        m = self.$$refine_modules[klass_id];
       }
+      m.refinement_module = refinement_module
+      m.refined_class = klass
     }
-    m.define_singleton_method :inspect do
-      "#<refinement:#{mod.inspect}@#{s.inspect}>"
-    end
     m.class_exec(&block)
     m
   end
@@ -735,4 +736,14 @@ class ::Module
   alias class_eval module_eval
   alias class_exec module_exec
   alias inspect to_s
+end
+
+class ::Refinement < ::Module
+  def inspect
+    if @refinement_module
+      "#<refinement:#{@refined_class.inspect}@#{@refinement_module.inspect}>"
+    else
+      super
+    end
+  end
 end

@@ -119,6 +119,10 @@ class ::Struct
     }
   end
 
+  def self.keyword_init?
+    `self.$$keyword_init`
+  end
+
   def members
     self.class.members
   end
@@ -257,20 +261,31 @@ class ::Struct
     self.class.members.map { |name| self[name] }
   end
 
+  `var inspect_stack = []`
+
   def inspect
     result = '#<struct '
 
-    if ::Struct === self && self.class.name
-      result += "#{self.class} "
+    if `inspect_stack`.include? __id__
+      result + ':...>'
+    else
+      `inspect_stack` << __id__
+      pushed = true
+
+      if ::Struct === self && self.class.name
+        result += "#{self.class} "
+      end
+
+      result += each_pair.map do |name, value|
+        "#{name}=#{Opal.inspect(value)}"
+      end.join ', '
+
+      result += '>'
+
+      result
     end
-
-    result += each_pair.map do |name, value|
-      "#{name}=#{value.inspect}"
-    end.join ', '
-
-    result += '>'
-
-    result
+  ensure
+    `inspect_stack.pop()` if pushed
   end
 
   def to_h(&block)

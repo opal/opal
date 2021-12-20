@@ -29,7 +29,7 @@ module RewritersHelper
   def parse_without_rewriting(source)
     buffer = Opal::Parser::SourceBuffer.new('(eval)')
     buffer.source = source
-    parser = Parser::Ruby30.new
+    parser = Parser::Ruby31.new
     parser.parse(buffer)
   end
 end

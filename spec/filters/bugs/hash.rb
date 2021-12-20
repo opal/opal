@@ -9,7 +9,6 @@ opal_filter "Hash" do
   fails "Hash#[]= does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#[]= keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
   fails "Hash#compare_by_identity gives different identity for string literals" # Expected [2] to equal [1, 2]
-  fails "Hash#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: ArgumentError ([Hash#deconstruct_keys] wrong number of arguments(0 for 1))
   fails "Hash#delete allows removing a key while iterating" # Exception: Cannot read property '$$is_string' of undefined
   fails "Hash#each always yields an Array of 2 elements, even when given a callable of arity 2" # Expected ArgumentError but no exception was raised ({"a"=>1} was returned)
   fails "Hash#each_pair always yields an Array of 2 elements, even when given a callable of arity 2" # Expected ArgumentError but no exception was raised ({"a"=>1} was returned)

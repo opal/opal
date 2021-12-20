@@ -853,6 +853,10 @@ class ::Integer < ::Numeric
         return parseInt(Math.sqrt(n), 10);
       }
     end
+
+    def try_convert(object)
+      Opal.coerce_to?(object, self, :to_int)
+    end
   end
 
   self::MAX = `Math.pow(2, 30) - 1`

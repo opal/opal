@@ -22,6 +22,10 @@ class ::Class
     }
   end
 
+  def descendants
+    subclasses + subclasses.map(&:descendants).flatten
+  end
+
   def inherited(cls)
   end
 
@@ -38,6 +42,24 @@ class ::Class
       var object = #{allocate};
       Opal.send(object, object.$initialize, args, block);
       return object;
+    }
+  end
+
+  def subclasses
+    %x{
+      if (typeof WeakRef !== 'undefined') {
+        var i, subclass, out = [];
+        for (i = 0; i < self.$$subclasses.length; i++) {
+          subclass = self.$$subclasses[i].deref();
+          if (subclass !== undefined) {
+            out.push(subclass);
+          }
+        }
+        return out;
+      }
+      else {
+        return self.$$subclasses;
+      }
     }
   end
 

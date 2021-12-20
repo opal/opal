@@ -292,8 +292,8 @@ end
 class MatchData
   attr_reader :post_match, :pre_match, :regexp, :string
 
-  def initialize(regexp, match_groups)
-    $~          = self
+  def initialize(regexp, match_groups, no_matchdata: false)
+    $~          = self unless no_matchdata
     @regexp     = regexp
     @begin      = `match_groups.index`
     @string     = `match_groups.input`
@@ -313,6 +313,18 @@ class MatchData
         }
       }
     }
+  end
+
+  def match(idx)
+    if (match = self[idx])
+      match
+    elsif idx.is_a?(Integer) && idx >= length
+      ::Kernel.raise ::IndexError, "index #{idx} out of matches"
+    end
+  end
+
+  def match_length(idx)
+    match(idx)&.length
   end
 
   def [](*args)

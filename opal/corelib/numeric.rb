@@ -222,7 +222,17 @@ class ::Numeric
 
     }
 
-    return enum_for(:step, limit, step, &`stepSize`) unless block_given?
+    unless block_given?
+      if (!limit || limit.is_a?(::Numeric)) &&
+         (!step || step.is_a?(::Numeric))
+
+        return ::Enumerator::ArithmeticSequence.new(
+          [limit, step, ('to: ' if to), ('by: ' if by)], self
+        )
+      else
+        return enum_for(:step, limit, step, &`stepSize`)
+      end
+    end
 
     %x{
       validateParameters();

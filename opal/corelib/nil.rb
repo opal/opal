@@ -84,5 +84,3 @@ class ::NilClass
 
   alias to_f to_i
 end
-
-::NIL = nil

@@ -65,8 +65,6 @@ opal_filter "String" do
   fails "String#[] with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
   fails "String#[] with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
-  fails "String#[] with Range works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
-  fails "String#[] with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#[] with Regexp returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#[] with Regexp, index returns String instances" # Expected "he" (StringSpecs::MyString) to be an instance of String
   fails "String#[] with String returns a String instance when given a subclass instance" # Expected "el" (StringSpecs::MyString) to be an instance of String
@@ -78,8 +76,6 @@ opal_filter "String" do
   fails "String#byteslice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
   fails "String#byteslice with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
-  fails "String#byteslice with Range works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
-  fails "String#byteslice with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#byteslice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with index, length returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#byteslice with index, length returns a string with the same encoding" # ArgumentError: unknown encoding name - ISO-8859-1
@@ -195,8 +191,6 @@ opal_filter "String" do
   fails "String#slice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
   fails "String#slice with Range returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
-  fails "String#slice with Range works with beginless ranges" # TypeError: no implicit conversion of NilClass into Integer
-  fails "String#slice with Range works with endless ranges" # Opal::SyntaxError: undefined method `type' for nil
   fails "String#slice with Regexp returns String instances" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#slice with Regexp, index returns String instances" # Expected "he" (StringSpecs::MyString) to be an instance of String
   fails "String#slice with String returns a String instance when given a subclass instance" # Expected "el" (StringSpecs::MyString) to be an instance of String
@@ -218,6 +212,7 @@ opal_filter "String" do
   fails "String#split with Regexp when a block is given yields each split substring with empty regexp pattern" # Expected ["c", "h", "u", "n", "k", "y"] == "chunky" to be truthy but was false
   fails "String#split with Regexp when a block is given yields the string when limit is 1" # Expected ["chunky bacon"] == "chunky bacon" to be truthy but was false
   fails "String#split with String returns String instances based on self" # Expected "x" (StringSpecs::MyString) to be an instance of String
+  fails "String#split with String when $; is not nil warns" # Expected warning to match: /warning: \$; is set to non-nil value/ but got: ""
   fails "String#squeeze returns String instances when called on a subclass" # Expected "oh no!" (StringSpecs::MyString) to be an instance of String
   fails "String#sub with pattern, replacement returns String instances when called on a subclass" # Expected "" (StringSpecs::MyString) to be an instance of String
   fails "String#sub with pattern, replacement returns a copy of self when no modification is made" # Expected "hello" not to be identical to "hello"
@@ -270,6 +265,7 @@ opal_filter "String" do
   fails "String#unicode_normalized? returns true if str is in Unicode normalization form (nfkd)" # Expected true to be false
   fails "String#unpack with format 'm' when given count 0 raises an ArgumentError for an invalid base64 character" # Expected ArgumentError but no exception was raised (["test"] was returned)
   fails "String#unpack1 returns the first value of #unpack" # RuntimeError: Unsupported unpack directive "x" (no chunk reader defined)
+  fails "String#unpack1 starts unpacking from the given offset" # RuntimeError: Unsupported unpack directive "x" (no chunk reader defined)
   fails "String#upcase ASCII-only case mapping does not upcase non-ASCII characters" # ArgumentError: [String#upcase] wrong number of arguments(1 for 0)
   fails "String#upcase full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#upcase] wrong number of arguments(2 for 0)
   fails "String#upcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#upcase] wrong number of arguments(1 for 0)
@@ -279,5 +275,4 @@ opal_filter "String" do
   fails "String#valid_encoding? returns true for IBM720 encoding self is valid in" # ArgumentError: unknown encoding name - IBM720
   fails "String.new accepts an encoding argument" # ArgumentError: [String.new] wrong number of arguments(2 for -1)
   fails "String.new is called on subclasses" # Expected nil to equal "subclass"
-  fails "Struct#deconstruct_keys requires one argument" # Expected ArgumentError (/wrong number of arguments \(given 0, expected 1\)/) but got: ArgumentError ([#deconstruct_keys] wrong number of arguments(0 for 1))
 end

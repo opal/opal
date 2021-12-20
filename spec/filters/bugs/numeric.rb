@@ -9,11 +9,4 @@ opal_filter "Numeric" do
   fails "Numeric#remainder returns the result of calling self#% with other if self and other are less than 0"
   fails "Numeric#remainder returns the result of calling self#% with other if self is 0"
   fails "Numeric#singleton_method_added raises a TypeError when trying to define a singleton method on a Numeric"
-  fails "Numeric#step with keyword arguments when no block is given returns an Enumerator::ArithmeticSequence when not passed a block and self < stop" # Expected #<Enumerator: 1:step(2, 3)> (Enumerator) to be an instance of Enumerator::ArithmeticSequence
-  fails "Numeric#step with keyword arguments when no block is given returns an Enumerator::ArithmeticSequence when not passed a block and self > stop" # Expected #<Enumerator: 1:step(0, 2)> (Enumerator) to be an instance of Enumerator::ArithmeticSequence
-  fails "Numeric#step with mixed arguments when no block is given returns an Enumerator::ArithmeticSequence when not passed a block and self < stop" # Expected #<Enumerator: 1:step(2, 3)> (Enumerator) to be an instance of Enumerator::ArithmeticSequence
-  fails "Numeric#step with mixed arguments when no block is given returns an Enumerator::ArithmeticSequence when not passed a block and self > stop" # Expected #<Enumerator: 1:step(0, 2)> (Enumerator) to be an instance of Enumerator::ArithmeticSequence
-  fails "Numeric#step with positional args when no block is given returned Enumerator::ArithmeticSequence type returns an instance of Enumerator::ArithmeticSequence" # Expected Enumerator == Enumerator::ArithmeticSequence to be truthy but was false
-  fails "Numeric#step with positional args when no block is given returns an Enumerator::ArithmeticSequence when not passed a block and self < stop" # Expected #<Enumerator: 1:step(2, 3)> (Enumerator) to be an instance of Enumerator::ArithmeticSequence
-  fails "Numeric#step with positional args when no block is given returns an Enumerator::ArithmeticSequence when not passed a block and self > stop" # Expected #<Enumerator: 1:step(0, 2)> (Enumerator) to be an instance of Enumerator::ArithmeticSequence
 end

@@ -2,10 +2,6 @@
 # use_strict: true
 
 module ::Kernel
-  def method_missing(symbol, *args, &block)
-    ::Kernel.raise ::NoMethodError.new("undefined method `#{symbol}' for #{inspect}", symbol, args), nil, caller(1)
-  end
-
   def =~(obj)
     false
   end
@@ -248,14 +244,27 @@ module ::Kernel
   def initialize_copy(other)
   end
 
+  `var inspect_stack = []`
+
   def inspect
     ivs = ''
-    instance_variables.each do |i|
-      ivs += " #{i}=#{instance_variable_get(i).inspect}"
+    id = __id__
+    if `inspect_stack`.include? id
+      ivs = ' ...'
+    else
+      `inspect_stack` << id
+      pushed = true
+      instance_variables.each do |i|
+        ivar = instance_variable_get(i)
+        inspect = Opal.inspect(ivar)
+        ivs += " #{i}=#{inspect}"
+      end
     end
-    "#<#{self.class}:0x#{__id__.to_s(16)}#{ivs}>"
-  rescue
-    "#<#{self.class}:0x#{__id__.to_s(16)}>"
+    "#<#{self.class}:0x#{id.to_s(16)}#{ivs}>"
+  rescue => e
+    "#<#{self.class}:0x#{id.to_s(16)}>"
+  ensure
+    `inspect_stack`.pop if pushed
   end
 
   def instance_of?(klass)
@@ -738,8 +747,6 @@ module ::Kernel
   alias send __send__
   alias then yield_self
   alias to_enum enum_for
-
-  ::Opal.pristine(self, :method_missing)
 end
 
 class ::Object

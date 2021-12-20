@@ -1,8 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Enumerator" do
-  fails "Enumerator#+ calls #each on each argument" # Mock 'obj1' expected to receive each("any_args") exactly 1 times but received it 0 times
-  fails "Enumerator#+ returns a chain of self and provided enumerators" # NoMethodError: undefined method `+' for #<Enumerator: #<Enumerator::Generator:0x55192>:each>
-  fails "Enumerator#enum_for exposes multi-arg yields as an array"
   fails "Enumerator#feed can be called for each iteration"
   fails "Enumerator#feed causes yield to return the value if called during iteration"
   fails "Enumerator#feed raises a TypeError if called more than once without advancing the enumerator"
@@ -15,34 +12,15 @@ opal_filter "Enumerator" do
   fails "Enumerator#initialize sets size to the given size if the given size is Float::INFINITY"
   fails "Enumerator#initialize sets size to the given size if the given size is a Proc"
   fails "Enumerator#initialize sets size to the given size if the given size is an Integer" # Expected 4 == 100 to be truthy but was false
-  fails "Enumerator#next restarts the enumerator if an exception terminated a previous iteration" # Expected [#<NoMethodError: undefined method `next' for #<Enumerator: #<Enumerator::Generator:0x4f2>:each>>,  #<NoMethodError: undefined method `next' for #<Enumerator: #<Enumerator::Generator:0x4f2>:each>>] == [#<StandardError: StandardError>, #<StandardError: StandardError>] to be truthy but was false
-  fails "Enumerator#next_values advances the position of the current element"
-  fails "Enumerator#next_values advances the position of the enumerator each time when called multiple times"
-  fails "Enumerator#next_values raises StopIteration if called on a finished enumerator"
-  fails "Enumerator#next_values returns an array with only nil if yield is called with nil"
-  fails "Enumerator#next_values returns an empty array if yield is called without arguments"
-  fails "Enumerator#next_values returns the next element in self"
-  fails "Enumerator#next_values works in concert with #rewind"
-  fails "Enumerator#peek can be called repeatedly without advancing the position of the current element"
-  fails "Enumerator#peek does not advance the position of the current element"
-  fails "Enumerator#peek raises StopIteration if called on a finished enumerator"
-  fails "Enumerator#peek returns the next element in self"
-  fails "Enumerator#peek works in concert with #rewind"
-  fails "Enumerator#peek_values can be called repeatedly without advancing the position of the current element"
-  fails "Enumerator#peek_values does not advance the position of the current element"
-  fails "Enumerator#peek_values raises StopIteration if called on a finished enumerator"
-  fails "Enumerator#peek_values returns an array with only nil if yield is called with nil"
-  fails "Enumerator#peek_values returns an empty array if yield is called without arguments"
-  fails "Enumerator#peek_values returns the next element in self"
-  fails "Enumerator#peek_values works in concert with #rewind"
-  fails "Enumerator#to_enum exposes multi-arg yields as an array" # NoMethodError: undefined method `next' for #<Enumerator: #<Object:0x53e80>:each>
   fails "Enumerator.new no block given raises" # Expected ArgumentError but no exception was raised (#<Enumerator: 1:upto(3)> was returned)
-  fails "Enumerator.new when passed a block defines iteration with block, yielder argument and treating it as a proc" # Expected [] == ["a\n", "b\n", "c"] to be truthy but was false
   fails "Enumerator.new when passed a block yielded values handles yield arguments properly" # Expected 1 == [1, 2] to be truthy but was false
   fails "Enumerator.produce creates an infinite enumerator" # NoMethodError: undefined method `produce' for Enumerator
   fails "Enumerator.produce terminates iteration when block raises StopIteration exception" # NoMethodError: undefined method `produce' for Enumerator
   fails "Enumerator.produce when initial value skipped starts enumerable from result of first block call" # NoMethodError: undefined method `produce' for Enumerator
   fails "Enumerator.produce when initial value skipped uses nil instead" # NoMethodError: undefined method `produce' for Enumerator
+  fails "Enumerator::ArithmeticSequence#hash is based on begin, end, step and exclude_end?" # Expected "A,3,21,3,0" (String) to be an instance of Integer
+  fails "Enumerator::ArithmeticSequence.allocate is not defined" # Expected TypeError (allocator undefined for Enumerator::ArithmeticSequence) but no exception was raised (#<Enumerator::ArithmeticSequence>(#pretty_inspect raised #<NoMethodError: undefined method `begin' for nil>) was returned)
+  fails "Enumerator::ArithmeticSequence.new is not defined" # Expected NoMethodError but got: ArgumentError ([ArithmeticSequence#initialize] wrong number of arguments (given 0, expected -2))  
   fails "Enumerator::Generator#each returns the block returned value" # Expected #<Enumerator::Generator:0x74c7e> to be identical to "block_returned"
   fails "Enumerator::Generator#initialize returns self when given a block" # Expected #<Proc:0x1b2ee> to be identical to #<Enumerator::Generator:0x1b2e2>
   fails "Enumerator::Lazy defines lazy versions of a whitelist of Enumerator methods" # Expected ["initialize",  "force",  "lazy",  "collect",  "collect_concat",  "drop",  "drop_while",  "enum_for",  "filter",  "find_all",  "flat_map",  "grep",  "map",  "select",  "reject",  "take",  "take_while",  "to_enum",  "inspect"] to include "chunk"
@@ -76,11 +54,7 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#enum_for passes given arguments to wrapped method" # Expected [] == [0, 6, 20, 42] to be truthy but was false
   fails "Enumerator::Lazy#enum_for works with an infinite enumerable" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#filter calls the block with a gathered array when yield with multiple arguments" # NoMethodError: undefined method `force' for [[], 0, [0, 1], [0, 1, 2], [0, 1, 2], nil, "default_arg", [], [], [0], [0, 1], [0, 1, 2]]
-  fails "Enumerator::Lazy#filter on a nested Lazy sets #size to nil" # Expected 0 == nil to be truthy but was false
   fails "Enumerator::Lazy#filter on a nested Lazy when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == [6, 8, 10] to be truthy but was false
-  fails "Enumerator::Lazy#filter raises an ArgumentError when not given a block" # Expected ArgumentError but no exception was raised (#<Enumerator::Lazy: nil> was returned)
-  fails "Enumerator::Lazy#filter returns a new instance of Enumerator::Lazy" # Expected [] (Array) to be an instance of Enumerator::Lazy
-  fails "Enumerator::Lazy#filter sets #size to nil" # Expected 0 == nil to be truthy but was false
   fails "Enumerator::Lazy#filter when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == [0, 2, 4] to be truthy but was false
   fails "Enumerator::Lazy#filter works with an infinite enumerable" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#filter_map does not map false results" # Expected [] == [1, 3, 5, 7] to be truthy but was false
@@ -126,7 +100,6 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#map when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == [1, 2, 3] to be truthy but was false
   fails "Enumerator::Lazy#map works with an infinite enumerable" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#reject calls the block with a gathered array when yield with multiple arguments" # Expected [nil, 0, 0, 0, 0, nil, "default_arg", [], [], [0], [0, 1], [0, 1, 2]] == [nil,  0,  [0, 1],  [0, 1, 2],  [0, 1, 2],  nil,  "default_arg",  [],  [],  [0],  [0, 1],  [0, 1, 2]] to be truthy but was false
-  fails "Enumerator::Lazy#reject lets exceptions raised in the block go through" # Expected RuntimeError (foo) but no exception was raised (#<Enumerator::Generator:0x44bec> was returned)
   fails "Enumerator::Lazy#reject on a nested Lazy when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == [5, 7, 9] to be truthy but was false
   fails "Enumerator::Lazy#reject when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == [1, 3, 5] to be truthy but was false
   fails "Enumerator::Lazy#reject works with an infinite enumerable" # TypeError: can't iterate from Float
@@ -166,7 +139,6 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#with_index enumerates with an index starting at 0 when offset is nil" # Expected [] == [[0, 0], [1, 1], [2, 2]] to be truthy but was false
   fails "Enumerator::Lazy#with_index enumerates with an index starting at a given offset" # Expected [] == [[0, 3], [1, 4], [2, 5]] to be truthy but was false
   fails "Enumerator::Lazy#with_index enumerates with an index" # Expected [] == [[0, 0], [1, 1], [2, 2]] to be truthy but was false
-  fails "Enumerator::Lazy#with_index raises TypeError when offset does not convert to Integer" # Expected TypeError but no exception was raised ([] was returned)
   fails "Enumerator::Lazy#zip calls the block with a gathered array when yield with multiple arguments" # NoMethodError: undefined method `force' for [[[], []], [0, 0], [[0, 1], [0, 1]], [[0, 1, 2], [0, 1, 2]], [[0, 1, 2], [0, 1, 2]], [nil, nil], ["default_arg", "default_arg"], [[], []], [[], []], [[0], [0]], [[0, 1], [0, 1]], [[0, 1, 2], [0, 1, 2]]]
   fails "Enumerator::Lazy#zip keeps size" # Expected 0 == 100 to be truthy but was false
   fails "Enumerator::Lazy#zip on a nested Lazy keeps size" # Expected 0 == 100 to be truthy but was false
@@ -177,7 +149,4 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#zip when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == [[0, 4, 8], [1, 5, nil]] to be truthy but was false
   fails "Enumerator::Lazy#zip works with an infinite enumerable and an array" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#zip works with two infinite enumerables" # TypeError: can't iterate from Float
-  fails "Enumerator::Yielder#<< when multiple arguments passed raises an ArgumentError" # Expected ArgumentError (/wrong number of arguments/) but no exception was raised (#<Enumerator::Yielder:0x4b442> was returned)
-  fails "Enumerator::Yielder#initialize returns self when given a block" # Expected #<Proc:0x3d4f8> to be identical to #<Enumerator::Yielder:0x3d4ec>
-  fails "Enumerator::Yielder#to_proc returns a Proc object that takes an argument and yields it to the block" # Expected Enumerator::Yielder == Proc to be truthy but was false  
 end

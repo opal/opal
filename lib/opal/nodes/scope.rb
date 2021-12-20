@@ -187,7 +187,8 @@ module Opal
       end
 
       def scope_locals
-        @locals | @args | (@parent && @type == :iter ? @parent.scope_locals : [])
+        locals = @locals | @args | (@parent && @type == :iter ? @parent.scope_locals : [])
+        locals.reject { |i| i.to_s.start_with?('$') }
       end
 
       def add_scope_temp(tmp)

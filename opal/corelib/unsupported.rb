@@ -76,14 +76,14 @@ class ::Module
     %x{
       if (methods.length === 0) {
         self.$$module_function = false;
+        return nil;
       }
-
-      return nil;
+      return (methods.length === 1) ? methods[0] : methods;
     }
   end
 
-  def private_class_method(*)
-    self
+  def private_class_method(*methods)
+    `return (methods.length === 1) ? methods[0] : methods`
   end
 
   def private_method_defined?(obj)
@@ -104,7 +104,7 @@ class ::Module
 end
 
 module ::Kernel
-  def private_methods(*)
+  def private_methods(*methods)
     []
   end
 
@@ -118,10 +118,10 @@ module ::Kernel
   end
 end
 
-def self.public(*)
-  # stub
+def self.public(*methods)
+  `return (methods.length === 1) ? methods[0] : methods`
 end
 
-def self.private(*)
-  # stub
+def self.private(*methods)
+  `return (methods.length === 1) ? methods[0] : methods`
 end
