@@ -1,6 +1,5 @@
 require 'native'
 
-`Opal.exit = process.exit`
 
 module Kernel
   @__child_process__ = `require('child_process')`
@@ -55,7 +54,3 @@ module Process
     end
   end
 end
-
-ARGV = `process.argv.slice(2)`
-
-ARGV.shift if ARGV.first == '--'
