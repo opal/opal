@@ -1,5 +1,5 @@
-require 'native'
-
+require 'buffer'
+require 'corelib/process/status'
 
 module Kernel
   @__child_process__ = `require('child_process')`
@@ -30,27 +30,5 @@ module Kernel
 
   def `(cmdline)
     Buffer.new(`__child_process__.execSync(#{cmdline})`).to_s.encode('UTF-8')
-  end
-end
-
-module Process
-  class Status
-    def initialize(status, pid)
-      @status, @pid = status, pid
-    end
-
-    def exitstatus
-      @status
-    end
-
-    attr_reader :pid
-
-    def success?
-      @status == 0
-    end
-
-    def inspect
-      "#<Process::Status: pid #{@pid} exit #{@status}>"
-    end
   end
 end
