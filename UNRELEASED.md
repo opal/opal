@@ -55,10 +55,17 @@
 - Second round of code size optimizations - 3% improvement for AsciiDoctor bundle on top of the first round - 23% total - see: https://github.com/opal/opal/pull/2365/commits (#2365)
   - The calls to `==`, `!=` and `===` changed their semantics slightly: it's impossible to monkey patch those calls for `String` and `Number`, but on other classes they can now return `nil` and it will be handled correctly
   - The calls to `!` changed their semantics slightly: it's impossible to monkey patch this call for `Boolean` or `NilClass`.
+- Refactored the structure of the internal `stdlib/nodejs` folder (#2374)
+  - Added `nodejs/base` with just I/O, exit, and ARGV management
+  - Moved `Process::Status` to corelib
+  - Fixed requires to be more robust
 
+### Removed
+
+- Removed `nodejs/irb` from stdlib as it's been broken for some time (#2374)
+- Removed `Kernel#node_require` from `nodejs/kernel` as it's been deprecated for a long time (#2374)
 
 <!--
 ### Deprecated
-### Removed
 ### Internal
 -->

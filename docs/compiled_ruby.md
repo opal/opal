@@ -178,15 +178,19 @@ puts "foo"
 This would compile directly into:
 
 ```javascript
-(function(Opal) {
-  var self = Opal.top, $nesting = [], nil = Opal.nil, $breaker = Opal.breaker, $slice = Opal.slice;
+Opal.queue(function(Opal) {
+  var self = Opal.top, nil = Opal.nil;
 
-  Opal.add_stubs(['$puts']);
+  Opal.add_stubs('puts');
   return self.$puts("foo")
-})(Opal);
+});
 ```
 
-**TIP:** you can see the compiled code with this command: `opal --compile --no-exit --no-opal --eval 'puts "foo"'`
+**TIP:**
+
+you can see the compiled code with this command: `opal --compile --no-exit --no-opal --eval 'puts "foo"'`
+or, more briefly: `opal -cEO -e 'puts "foo"'`
+
 
 ### Using compiled sources
 
@@ -667,7 +671,7 @@ It is obvious from here, that unless an object defines any given method, it will
 To optimise the generated code slightly, we reduce the code output from the compiler into the following JavaScript:
 
 ```javascript
-Opal.add_stubs(["first", "second", "to_sym"]);
+Opal.add_stubs("first,second,to_sym"]);
 ```
 
 You will see this at the top of all your generated JavaScript files. This will add a stub method for all methods used in your file.

@@ -1,3 +1,5 @@
+require 'nodejs/file'
+
 %x{
   function executeIOAction(action) {
     try {
@@ -41,23 +43,3 @@ class IO
     `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString('binary')})`
   end
 end
-
-STDOUT.write_proc = ->(string) { `process.stdout.write(string)` }
-STDERR.write_proc = ->(string) { `process.stderr.write(string)` }
-
-STDIN.read_proc = %x{function(_count) {
-  // Ignore count, return as much as we can get
-  var buf = Buffer.alloc(65536), count;
-  try {
-    count = __fs__.readSync(this.fd, buf, 0, 65536, null);
-  }
-  catch (e) { // Windows systems may raise EOF
-    return nil;
-  }
-  if (count == 0) return nil;
-  return buf.toString('utf8', 0, count);
-}}
-
-STDIN.tty = true
-STDOUT.tty = true
-STDERR.tty = true

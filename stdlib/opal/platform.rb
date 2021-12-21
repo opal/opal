@@ -1,17 +1,10 @@
 require 'opal-platform'
 
 case OPAL_PLATFORM
-when 'nashorn'
-  require 'nashorn'
-when 'gjs'
-  require 'gjs'
-when 'quickjs'
-  require 'quickjs'
-when 'nodejs'
-  require 'nodejs/kernel'
-  require 'nodejs/io'
-when 'headless-chrome'
-  require 'headless_chrome'
-when 'opal-miniracer'
-  require 'opal/miniracer'
+when 'nashorn'         then require 'nashorn'
+when 'gjs'             then require 'gjs'
+when 'quickjs'         then require 'quickjs'
+when 'nodejs'          then require 'nodejs/base'
+when 'headless-chrome' then require 'headless_chrome'
+when 'opal-miniracer'  then require 'opal/miniracer'
 end

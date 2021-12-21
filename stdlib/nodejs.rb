@@ -1,6 +1,4 @@
-module NodeJS
-end
-
+require 'nodejs/base'
 require 'nodejs/kernel'
 require 'nodejs/file'
 require 'nodejs/dir'

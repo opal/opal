@@ -1,4 +1,3 @@
 #!/usr/bin/env ruby
 
-require 'bundler/setup'
-load "#{__dir__}/../exe/opal-repl"
+exec "#{__dir__}/opal", '--repl', *ARGV

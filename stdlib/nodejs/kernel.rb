@@ -1,18 +1,9 @@
-require 'native'
-
-`Opal.exit = process.exit`
+require 'buffer'
+require 'corelib/process/status'
 
 module Kernel
-  NODE_REQUIRE = `require`
-
   @__child_process__ = `require('child_process')`
   `var __child_process__ = #{@__child_process__}`
-
-  # @deprecated Please use `require('module')` instead
-  def node_require(path)
-    warn '[DEPRECATION] node_require is deprecated. Please use `require(\'module\')` instead.'
-    `#{NODE_REQUIRE}(#{path.to_str})`
-  end
 
   def system(*argv, exception: false)
     env = {}
@@ -41,29 +32,3 @@ module Kernel
     Buffer.new(`__child_process__.execSync(#{cmdline})`).to_s.encode('UTF-8')
   end
 end
-
-module Process
-  class Status
-    def initialize(status, pid)
-      @status, @pid = status, pid
-    end
-
-    def exitstatus
-      @status
-    end
-
-    attr_reader :pid
-
-    def success?
-      @status == 0
-    end
-
-    def inspect
-      "#<Process::Status: pid #{@pid} exit #{@status}>"
-    end
-  end
-end
-
-ARGV = `process.argv.slice(2)`
-
-ARGV.shift if ARGV.first == '--'
