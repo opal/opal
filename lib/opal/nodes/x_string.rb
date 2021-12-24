@@ -8,9 +8,9 @@ module Opal
       def compile
         @should_add_semicolon = false
         unpacked_children = unpack_return(children)
-        stripped_children = strip_empty_children(unpacked_children)
+        stripped_children = XStringNode.strip_empty_children(unpacked_children)
 
-        if single_line?(stripped_children)
+        if XStringNode.single_line?(stripped_children)
           # If it's a single line we'll try to:
           #
           # - strip empty lines
@@ -30,6 +30,31 @@ module Opal
         push ';' if @should_add_semicolon
       end
 
+      # Check if there's only one child or if they're all part of
+      # the same line (e.g. because of interpolations)
+      def self.single_line?(children)
+        (children.size == 1) || children.none? do |c|
+          c.type == :str && c.loc.expression.source.end_with?("\n")
+        end
+      end
+
+      # Will remove empty :str lines coming from cosmetic newlines in x-strings
+      #
+      # @example
+      #   # this will generate two additional empty
+      #   # children before and after `foo()`
+      #   %x{
+      #     foo()
+      #   }
+      def self.strip_empty_children(children)
+        children = children.dup
+        empty_line = ->(child) { child.nil? || (child.type == :str && child.loc.expression.source.rstrip.empty?) }
+
+        children.shift while children.any? && empty_line[children.first]
+        children.pop while children.any? && empty_line[children.last]
+
+        children
+      end
 
       private
 
@@ -97,14 +122,6 @@ module Opal
         last_value
       end
 
-      # Check if there's only one child or if they're all part of
-      # the same line (e.g. because of interpolations)
-      def single_line?(children)
-        (children.size == 1) || children.none? do |c|
-          c.type == :str && c.loc.expression.source.end_with?("\n")
-        end
-      end
-
       # A case for manually created :js_return statement in Compiler#returns
       # Since we need to take original source of :str we have to use raw source
       # so we need to combine "return" with "raw_source"
@@ -116,24 +133,6 @@ module Opal
           @returning = true
           children = first_child.children
         end
-
-        children
-      end
-
-      # Will remove empty :str lines coming from cosmetic newlines in x-strings
-      #
-      # @example
-      #   # this will generate two additional empty
-      #   # children before and after `foo()`
-      #   %x{
-      #     foo()
-      #   }
-      def strip_empty_children(children)
-        children = children.dup
-        empty_line = ->(child) { child.nil? || (child.type == :str && child.loc.expression.source.rstrip.empty?) }
-
-        children.shift while children.any? && empty_line[children.first]
-        children.pop while children.any? && empty_line[children.last]
 
         children
       end
