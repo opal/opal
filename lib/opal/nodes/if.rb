@@ -147,6 +147,10 @@ module Opal
           case body.type
           when :return, :js_return, :break, :next, :redo, :retry
             false
+          when :xstr
+            XStringNode.single_line?(
+              XStringNode.strip_empty_children(body.children)
+            )
           else
             body.children.all? { |i| simple?(i) }
           end
