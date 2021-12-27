@@ -185,6 +185,10 @@
 
   Opal.coerce_to = function(object, type, method, args) {
     var body;
+
+    if (method === 'to_int' && type === Opal.Integer && object.$$is_number)
+      return object < 0 ? Math.ceil(object) : Math.floor(object);
+
     if (Opal.is_a(object, type)) return object;
 
     // Fast path for the most common situation
