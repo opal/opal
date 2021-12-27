@@ -184,7 +184,15 @@
   };
 
   Opal.coerce_to = function(object, type, method, args) {
-    if (type['$==='](object)) return object;
+    var body;
+    if (Opal.is_a(object, type)) return object;
+
+    // Fast path for the most common situation
+    if (object['$respond_to?'].$$pristine && object.$method_missing.$$pristine) {
+      body = object['$' + method];
+      if (body == null || body.$$stub) throw Opal.type_error(object, type);
+      return body.apply(object, args);
+    }
 
     if (!object['$respond_to?'](method)) {
       throw Opal.type_error(object, type);
