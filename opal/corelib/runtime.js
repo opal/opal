@@ -1708,15 +1708,9 @@
       return (klass.$$is_integer_class) ? (object % 1) === 0 : true;
     }
 
-    var i, length, ancestors = Opal.ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
+    var ancestors = Opal.ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
 
-    for (i = 0, length = ancestors.length; i < length; i++) {
-      if (ancestors[i] === klass) {
-        return true;
-      }
-    }
-
-    return false;
+    return ancestors.indexOf(klass) !== -1;
   };
 
   // Helpers for extracting kwsplats
