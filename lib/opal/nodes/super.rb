@@ -179,28 +179,28 @@ module Opal
         same_arg_counter = Hash.new(0)
 
         def_scope.original_args.children.each do |sexp|
-          arg_name = sexp.meta[:arg_name]
+          lvar_name = sexp.children[0]
 
           case sexp.type
           when :arg, :optarg
-            arg_node = s(:lvar, arg_name)
+            arg_node = s(:lvar, lvar_name)
             #   def m(_, _)
             # is compiled to
             #   function $$m(_, __$2)
             # See Opal::Node::ArgsNode
-            if arg_name[0] == '_'
-              same_arg_counter[arg_name] += 1
-              arg_node = s(:js_tmp, "#{arg_name}_$#{same_arg_counter[arg_name]}") if same_arg_counter[arg_name] > 1
+            if lvar_name[0] == '_'
+              same_arg_counter[lvar_name] += 1
+              arg_node = s(:js_tmp, "#{lvar_name}_$#{same_arg_counter[lvar_name]}") if same_arg_counter[lvar_name] > 1
             end
-
             args << arg_node
           when :restarg
-            arg_node = arg_name ? s(:lvar, arg_name) : s(:js_tmp, '$rest_arg')
+            arg_node = lvar_name ? s(:lvar, lvar_name) : s(:js_tmp, '$rest_arg')
             args << s(:splat, arg_node)
           when :kwarg, :kwoptarg
-            kwargs << s(:pair, s(:sym, arg_name), s(:lvar, arg_name))
+            key_name = sexp.meta[:arg_name]
+            kwargs << s(:pair, s(:sym, key_name), s(:lvar, lvar_name))
           when :kwrestarg
-            arg_node = arg_name ? s(:lvar, arg_name) : s(:js_tmp, '$kw_rest_arg')
+            arg_node = lvar_name ? s(:lvar, lvar_name) : s(:js_tmp, '$kw_rest_arg')
             kwargs << s(:kwsplat, arg_node)
           end
         end
