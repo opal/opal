@@ -15,6 +15,27 @@ Changes are grouped as follows:
 
 
 
+## [1.4.1](https://github.com/opal/opal/compare/v1.4.0...v1.4.1) - 2022-01-12
+
+
+### Changed
+
+- PromiseV2 is now declared a stable interface!
+
+### Fixed
+
+- Args named with JS reserved words weren't always renamed when _zsuper_ was involved ([#2385](https://github.com/opal/opal/pull/2385))
+
+<!--
+### Added
+### Removed
+### Deprecated
+### Internal
+-->
+
+
+
+
 ## [1.4.0](https://github.com/opal/opal/compare/v1.3.2...v1.4.0) - 2021-12-24
 
 
