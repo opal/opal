@@ -189,6 +189,9 @@
     if (method === 'to_int' && type === Opal.Integer && object.$$is_number)
       return object < 0 ? Math.ceil(object) : Math.floor(object);
 
+    if (method === 'to_str' && type === Opal.String && object.$$is_string)
+      return object;
+
     if (Opal.is_a(object, type)) return object;
 
     // Fast path for the most common situation
