@@ -2,35 +2,69 @@
 
 require 'opal/util'
 
-# Runs a block N times and returns a mean number of seconds it took to run it.
-mean_time = proc do |tries: 31, &block|
-  tries.times.map do
-    t = Time.now
-    block.()
-    Time.now - t
-  end.sort[tries/2]
-end
+class Timing
+  def initialize(tries: 31, &block)
+    @tries = tries
+    @times = tries.times.map do
+      t = now
+      block.()
+      (now - t)
+    end.sort
+  end
 
-failed = false
+  def now
+    Process.clock_gettime Process::CLOCK_MONOTONIC, :float_microsecond
+  end
 
-# Mark a failure
-failure = proc do |reason|
-  failed ||= []
-  failed << reason
-end
+  attr_reader :times, :tries
 
-compare_values = proc do |name, current, previous|
-  current = current.to_f
-  previous = previous.to_f
+  # Runs a block N times and returns a mean number of seconds it took to run it.
+  def mean_time
+    @times.sort[tries/2.0.floor + 1]
+  end
 
-  change = ((current - previous).to_f / previous) * 100
+  def error
+    m = mean_time
+    @times.minmax.map { |t| (m - t).abs }.max
+  end
 
-  puts ("%30s: %.3f -> %.3f (change: %+.2f%%)" % [name, previous, current, change]).gsub('.000','')
+  def compare_to(previous, name)
+    current = self
+    percent = ->(a, b) { (a / b) * 100 }
+    change = percent[(current.mean_time - previous.mean_time), previous.mean_time]
 
-  if change > 5.0
-    failure.("#{name} increased by more than 5%")
+    puts ("%30s: %.3f (±%.2f%%) -> %.3f (±%.2f%%) (change: %+.2f%%)" % [
+      name,
+      previous.mean_time / 1_000_000.0, percent[previous.error, previous.mean_time],
+      current.mean_time / 1_000_000.0, percent[current.error, current.mean_time],
+      change
+    ]).gsub('.000','')
+
+    $failures << "#{name} increased by more than 5%" if change > 5.0
   end
 end
+
+class Size
+  def initialize(size)
+    @size = size
+  end
+
+  attr_reader :size
+
+  def compare_to(previous, name)
+    change = 100 * (previous.size - size) / previous.size
+    puts ("%30s: %5.2f kB -> %5.2f kB (change: %+.2f%%)" % [
+      name,
+      previous.size / 1_000.0,
+      size / 1_000.0,
+      change,
+    ])
+
+    $failures << "#{name} increased by more than 5%" if change > 5.0
+  end
+end
+
+$failures = []
 
 ASCIIDOCTOR_REPO_BASE = ENV['ASCIIDOCTOR_REPO_BASE'] || 'https://github.com/asciidoctor'
 
@@ -71,17 +105,17 @@ performance_stat = ->(name) {
   sh("#{NODE_OPTSTATUS} > tmp/performance/optstatus_#{name}")
 
   puts "\n* Building AsciiDoctor with #{name}..."
-  stat[:compiler_time] = mean_time.(tries: 7) { sh(ASCIIDOCTOR_BUILD_OPAL) }
+  stat[:compiler_time] = Timing.new(tries: 7) { sh(ASCIIDOCTOR_BUILD_OPAL) }
 
   puts "\n* Running AsciiDoctor with #{name}..."
-  stat[:run_time] = mean_time.(tries: 63) { sh("#{ASCIIDOCTOR_RUN_OPAL} > tmp/performance/opal_result_#{name}.html") }
+  stat[:run_time] = Timing.new(tries: 63) { sh("#{ASCIIDOCTOR_RUN_OPAL} > tmp/performance/opal_result_#{name}.html") }
   stat[:correct] = File.read("tmp/performance/opal_result_#{name}.html") == File.read("tmp/performance/ruby_result.html")
-  stat[:size] = File.size("tmp/performance/asciidoctor_test.js")
+  stat[:size] = Size.new File.size("tmp/performance/asciidoctor_test.js")
 
   puts "\n* Minifying AsciiDoctor with #{name}..."
   source = File.read("tmp/performance/asciidoctor_test.js")
-  stat[:min_size] = Opal::Util.uglify(source).bytesize rescue Float::INFINITY
-  stat[:min_size_m] = Opal::Util.uglify(source, mangle: true).bytesize rescue Float::INFINITY
+  stat[:min_size] = Size.new Opal::Util.uglify(source).bytesize rescue Float::INFINITY
+  stat[:min_size_m] = Size.new Opal::Util.uglify(source, mangle: true).bytesize rescue Float::INFINITY
 
   stat
 }
@@ -130,15 +164,15 @@ namespace :performance do
     failure.("Wrong result on the current branch") unless current[:correct]
     failure.("Wrong result on the previous branch - ignore it") unless previous[:correct]
 
-    compare_values.("Compile time",        current[:compiler_time], previous[:compiler_time])
-    compare_values.("Run time",                 current[:run_time],      previous[:run_time])
-    compare_values.("Bundle size",                  current[:size],          previous[:size])
-    compare_values.("Minified bundle size",     current[:min_size],      previous[:min_size])
-    compare_values.("Mangled & minified",     current[:min_size_m],    previous[:min_size_m])
+    current[:compiler_time].compare_to(previous[:compiler_time], "Compile time")
+    current[:run_time     ].compare_to(previous[:run_time     ], "Run time")
+    current[:size         ].compare_to(previous[:size         ], "Bundle size")
+    current[:min_size     ].compare_to(previous[:min_size     ], "Minified bundle size")
+    current[:min_size_m   ].compare_to(previous[:min_size_m   ], "Mangled & minified")
 
-    if failed
+    if $failures.any?
       puts "--- Failures ---"
-      failed.each do |f|
+      $failures.each do |f|
         puts " - #{f}"
       end
       puts
