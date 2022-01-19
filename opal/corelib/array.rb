@@ -441,20 +441,18 @@ class ::Array < `Array`
   end
 
   def []=(index, value, extra = undefined)
+    data = nil
     %x{
       var i, size = self.length;
-    }
 
-    if ::Range === index
-      data = if ::Array === value
-               value.to_a
-             elsif value.respond_to? :to_ary
-               value.to_ary.to_a
-             else
-               [value]
-             end
+      if (index.$$is_range) {
+        if (value.$$is_array)
+          data = #{value.to_a};
+        else if (#{value.respond_to? :to_ary})
+          data = #{value.to_ary.to_a};
+        else
+          data = [value];
 
-      %x{
         var exclude = index.excl,
             from    = index.begin === nil ? 0 : $coerce_to(index.begin, Opal.Integer, 'to_int'),
             to      = index.end === nil ? -1 : $coerce_to(index.end, Opal.Integer, 'to_int');
@@ -489,24 +487,21 @@ class ::Array < `Array`
         }
 
         return value;
-      }
-    else
-      if `extra === undefined`
-        length = 1
-      else
-        length = value
-        value  = extra
+      } else {
+        if (extra === undefined) {
+          #{length = 1}
+        } else {
+          length = value;
+          value  = extra;
 
-        data = if ::Array === value
-                 value.to_a
-               elsif value.respond_to? :to_ary
-                 value.to_ary.to_a
-               else
-                 [value]
-               end
-      end
+          if (value.$$is_array)
+            data = #{value.to_a};
+          else if (#{value.respond_to? :to_ary})
+            data = #{value.to_ary.to_a};
+          else
+            data = [value];
+        }
 
-      %x{
         var old;
 
         index  = $coerce_to(index, #{::Integer}, 'to_int');
@@ -540,7 +535,7 @@ class ::Array < `Array`
 
         return value;
       }
-    end
+    }
   end
 
   def any?(pattern = undefined, &block)

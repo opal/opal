@@ -184,7 +184,22 @@
   };
 
   Opal.coerce_to = function(object, type, method, args) {
-    if (type['$==='](object)) return object;
+    var body;
+
+    if (method === 'to_int' && type === Opal.Integer && object.$$is_number)
+      return object < 0 ? Math.ceil(object) : Math.floor(object);
+
+    if (method === 'to_str' && type === Opal.String && object.$$is_string)
+      return object;
+
+    if (Opal.is_a(object, type)) return object;
+
+    // Fast path for the most common situation
+    if (object['$respond_to?'].$$pristine && object.$method_missing.$$pristine) {
+      body = object['$' + method];
+      if (body == null || body.$$stub) throw Opal.type_error(object, type);
+      return body.apply(object, args);
+    }
 
     if (!object['$respond_to?'](method)) {
       throw Opal.type_error(object, type);
@@ -1708,15 +1723,9 @@
       return (klass.$$is_integer_class) ? (object % 1) === 0 : true;
     }
 
-    var i, length, ancestors = Opal.ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
+    var ancestors = Opal.ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
 
-    for (i = 0, length = ancestors.length; i < length; i++) {
-      if (ancestors[i] === klass) {
-        return true;
-      }
-    }
-
-    return false;
+    return ancestors.indexOf(klass) !== -1;
   };
 
   // Helpers for extracting kwsplats
@@ -1874,8 +1883,6 @@
   Opal.send = function(recv, method, args, block, blockopts) {
     var body;
 
-    apply_blockopts(block, blockopts);
-
     if (typeof(method) === 'function') {
       body = method;
       method = null;
@@ -1885,7 +1892,7 @@
       throw Opal.NameError.$new("Passed method should be a string or a function");
     }
 
-    return Opal.send2(recv, body, method, args, block);
+    return Opal.send2(recv, body, method, args, block, blockopts);
   };
 
   Opal.send2 = function(recv, body, method, args, block, blockopts) {
@@ -1909,8 +1916,6 @@
       ancestors = Opal.ancestors(recv.$$class);
     }
 
-    apply_blockopts(block, blockopts);
-
     // For all ancestors that there are, starting from the closest to the furthest...
     for (i = 0; i < ancestors.length; i++) {
       ancestor = Opal.id(ancestors[i]);
@@ -1930,14 +1935,14 @@
             // Does this module define a method we want to call?
             if (typeof refine_module.$$prototype['$'+method] !== 'undefined') {
               body = refine_module.$$prototype['$'+method];
-              return Opal.send2(recv, body, method, args, block);
+              return Opal.send2(recv, body, method, args, block, blockopts);
             }
           }
         }
       }
     }
 
-    return Opal.send(recv, method, args, block);
+    return Opal.send(recv, method, args, block, blockopts);
   };
 
   Opal.lambda = function(block, blockopts) {
