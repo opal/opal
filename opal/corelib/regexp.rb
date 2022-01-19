@@ -83,6 +83,8 @@ class ::Regexp < `RegExp`
           #{::Kernel.raise ::RegexpError, "too short escape sequence: /#{regexp}/"}
         }
 
+        regexp = regexp.replace('\\A', '^').replace('\\z', '$')
+
         if (options === undefined || #{!options}) {
           return new RegExp(regexp);
         }
