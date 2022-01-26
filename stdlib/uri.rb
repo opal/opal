@@ -3,7 +3,6 @@
 module URI
   def self.decode_www_form(str, separator: '&', isindex: false)
     %x{
-      var str = #{str};
       var ary = [];
       if (str.length == 0) {
         return ary;
