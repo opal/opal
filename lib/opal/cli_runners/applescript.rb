@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'opal/cli_runners/system_runner'
+
 module Opal
   module CliRunners
     class Applescript
