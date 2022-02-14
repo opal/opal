@@ -43,7 +43,7 @@ module REPLUtils
     out
   end
 
-  def eval_and_print(func, mode, colorize)
+  def eval_and_print(func, mode, colorize, binding = nil)
     printer = if colorize
                 ->(i) do
                   ColorPrinter.default(i)
@@ -61,7 +61,7 @@ module REPLUtils
               end
 
     %x{
-      var $_result = eval(func);
+      var $_result = binding === nil ? eval(func) : binding.$js_eval(func);
 
       if (mode == 'silent') return nil;
 

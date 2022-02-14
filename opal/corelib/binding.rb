@@ -1,8 +1,9 @@
 class ::Binding
   # @private
-  def initialize(jseval, scope_variables, receiver, source_location)
+  def initialize(jseval, scope_variables = [], receiver = undefined, source_location = nil)
     @jseval, @scope_variables, @receiver, @source_location = \
       jseval, scope_variables, receiver, source_location
+    receiver = js_eval('self') unless `typeof receiver !== undefined`
   end
 
   def js_eval(*args)
@@ -20,7 +21,10 @@ class ::Binding
   end
 
   def local_variable_set(symbol, value)
-    js_eval(symbol, value)
+    `Opal.Binding.tmp_value = value`
+    js_eval("#{symbol} = Opal.Binding.tmp_value")
+    `delete Opal.Binding.tmp_value`
+    value
   end
 
   def local_variables
