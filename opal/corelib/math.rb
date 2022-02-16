@@ -36,124 +36,6 @@ module ::Math
 
   module_function
 
-  def acos(x)
-    ::Math.checked :acos, ::Math.float!(x)
-  end
-
-  unless defined?(`Math.acosh`)
-    %x{
-      Math.acosh = function(x) {
-        return Math.log(x + Math.sqrt(x * x - 1));
-      }
-    }
-  end
-
-  def acosh(x)
-    ::Math.checked :acosh, ::Math.float!(x)
-  end
-
-  def asin(x)
-    ::Math.checked :asin, ::Math.float!(x)
-  end
-
-  unless defined?(`Math.asinh`)
-    %x{
-      Math.asinh = function(x) {
-        return Math.log(x + Math.sqrt(x * x + 1))
-      }
-    }
-  end
-
-  def asinh(x)
-    ::Math.checked :asinh, ::Math.float!(x)
-  end
-
-  def atan(x)
-    ::Math.checked :atan, ::Math.float!(x)
-  end
-
-  def atan2(y, x)
-    ::Math.checked :atan2, ::Math.float!(y), ::Math.float!(x)
-  end
-
-  unless defined?(`Math.atanh`)
-    %x{
-      Math.atanh = function(x) {
-        return 0.5 * Math.log((1 + x) / (1 - x));
-      }
-    }
-  end
-
-  def atanh(x)
-    ::Math.checked :atanh, ::Math.float!(x)
-  end
-
-  unless defined?(`Math.cbrt`)
-    %x{
-      Math.cbrt = function(x) {
-        if (x == 0) {
-          return 0;
-        }
-
-        if (x < 0) {
-          return -Math.cbrt(-x);
-        }
-
-        var r  = x,
-            ex = 0;
-
-        while (r < 0.125) {
-          r *= 8;
-          ex--;
-        }
-
-        while (r > 1.0) {
-          r *= 0.125;
-          ex++;
-        }
-
-        r = (-0.46946116 * r + 1.072302) * r + 0.3812513;
-
-        while (ex < 0) {
-          r *= 0.5;
-          ex++;
-        }
-
-        while (ex > 0) {
-          r *= 2;
-          ex--;
-        }
-
-        r = (2.0 / 3.0) * r + (1.0 / 3.0) * x / (r * r);
-        r = (2.0 / 3.0) * r + (1.0 / 3.0) * x / (r * r);
-        r = (2.0 / 3.0) * r + (1.0 / 3.0) * x / (r * r);
-        r = (2.0 / 3.0) * r + (1.0 / 3.0) * x / (r * r);
-
-        return r;
-      }
-    }
-  end
-
-  def cbrt(x)
-    ::Math.checked :cbrt, ::Math.float!(x)
-  end
-
-  def cos(x)
-    ::Math.checked :cos, ::Math.float!(x)
-  end
-
-  unless defined?(`Math.cosh`)
-    %x{
-      Math.cosh = function(x) {
-        return (Math.exp(x) + Math.exp(-x)) / 2;
-      }
-    }
-  end
-
-  def cosh(x)
-    ::Math.checked :cosh, ::Math.float!(x)
-  end
-
   unless defined?(`Math.erf`)
     %x{
       Opal.prop(Math, 'erf', function(x) {
@@ -178,10 +60,6 @@ module ::Math
         return sign * y;
       });
     }
-  end
-
-  def erf(x)
-    ::Math.checked :erf, ::Math.float!(x)
   end
 
   unless defined?(`Math.erfc`)
@@ -213,12 +91,22 @@ module ::Math
     }
   end
 
-  def erfc(x)
-    ::Math.checked :erfc, ::Math.float!(x)
+  # Single argument equivalent functions
+  %i[
+    acos acosh asin asinh atan atanh cbrt
+    cos cosh erf erfc exp sin sinh sqrt tanh
+  ].each do |method|
+    define_method method do |x|
+      ::Math.checked method, ::Math.float!(x)
+    end
   end
 
-  def exp(x)
-    ::Math.checked :exp, ::Math.float!(x)
+  def atan2(y, x)
+    ::Math.checked :atan2, ::Math.float!(y), ::Math.float!(x)
+  end
+
+  def hypot(x, y)
+    ::Math.checked :hypot, ::Math.float!(x), ::Math.float!(y)
   end
 
   def frexp(x)
@@ -332,18 +220,6 @@ module ::Math
     }
   end
 
-  unless defined?(`Math.hypot`)
-    %x{
-      Math.hypot = function(x, y) {
-        return Math.sqrt(x * x + y * y)
-      }
-    }
-  end
-
-  def hypot(x, y)
-    ::Math.checked :hypot, ::Math.float!(x), ::Math.float!(y)
-  end
-
   def ldexp(mantissa, exponent)
     mantissa = Math.float!(mantissa)
     exponent = Math.integer!(exponent)
@@ -384,28 +260,12 @@ module ::Math
     end
   end
 
-  unless defined?(`Math.log10`)
-    %x{
-      Math.log10 = function(x) {
-        return Math.log(x) / Math.LN10;
-      }
-    }
-  end
-
   def log10(x)
     if ::String === x
       ::Kernel.raise `$type_error(x, #{::Float})`
     end
 
     ::Math.checked :log10, ::Math.float!(x)
-  end
-
-  unless defined?(`Math.log2`)
-    %x{
-      Math.log2 = function(x) {
-        return Math.log(x) / Math.LN2;
-      }
-    }
   end
 
   def log2(x)
@@ -416,26 +276,6 @@ module ::Math
     ::Math.checked :log2, ::Math.float!(x)
   end
 
-  def sin(x)
-    ::Math.checked :sin, ::Math.float!(x)
-  end
-
-  unless defined?(`Math.sinh`)
-    %x{
-      Math.sinh = function(x) {
-        return (Math.exp(x) - Math.exp(-x)) / 2;
-      }
-    }
-  end
-
-  def sinh(x)
-    ::Math.checked :sinh, ::Math.float!(x)
-  end
-
-  def sqrt(x)
-    ::Math.checked :sqrt, ::Math.float!(x)
-  end
-
   def tan(x)
     x = ::Math.float!(x)
 
@@ -444,25 +284,5 @@ module ::Math
     end
 
     ::Math.checked :tan, ::Math.float!(x)
-  end
-
-  unless defined?(`Math.tanh`)
-    %x{
-      Math.tanh = function(x) {
-        if (x == Infinity) {
-          return 1;
-        }
-        else if (x == -Infinity) {
-          return -1;
-        }
-        else {
-          return (Math.exp(x) - Math.exp(-x)) / (Math.exp(x) + Math.exp(-x));
-        }
-      }
-    }
-  end
-
-  def tanh(x)
-    ::Math.checked :tanh, ::Math.float!(x)
   end
 end
