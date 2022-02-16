@@ -21,7 +21,7 @@ class ::Time < `Date`
           #{::Kernel.raise ::TypeError, "can't convert Time into an exact number"}
         }
         result = new Date(seconds.getTime());
-        result.is_utc = seconds.is_utc;
+        result.timezone = seconds.timezone;
         return result;
       }
 
@@ -135,14 +135,10 @@ class ::Time < `Date`
 
   def self.new(year = undefined, month = nil, day = nil, hour = nil, min = nil, sec = nil, utc_offset = nil)
     %x{
-      var args, result;
+      var args, result, timezone;
 
       if (year === undefined) {
         return new Date();
-      }
-
-      if (utc_offset !== nil) {
-        #{::Kernel.raise ::ArgumentError, 'Opal does not support explicitly specifying UTC offset for Time'}
       }
 
       args  = time_params(year, month, day, hour, min, sec);
@@ -157,6 +153,39 @@ class ::Time < `Date`
       if (year < 100) {
         result.setFullYear(year);
       }
+
+      if (utc_offset.$$is_string) {
+        if (utc_offset == 'UTC') {
+          timezone = 0;
+        }
+        else if(/^[+-]\d\d:[0-5]\d$/.test(utc_offset)) {
+          var sign, hours, minutes;
+          sign = utc_offset[0];
+          hours = +(utc_offset[1] + utc_offset[2]);
+          minutes = +(utc_offset[4] + utc_offset[5]);
+
+          timezone = (sign == '-' ? -1 : 1) * (hours + minutes / 60);
+        }
+        else {
+          // Unsupported: "A".."I","K".."Z"
+          #{::Kernel.raise ::ArgumentError, %'"+HH:MM", "-HH:MM", "UTC" expected for utc_offset: #{utc_offset}'}
+        }
+      }
+      else if (utc_offset.$$is_number) {
+        timezone = utc_offset / 3600;
+      }
+      else if (utc_offset === nil) {
+        // Pass
+      }
+      else {
+        #{::Kernel.raise ::ArgumentError, "Opal doesn't support other types for a timezone argument than Integer and String"}
+      }
+
+      if (timezone != null) {
+        result = new Date(result.getTime() - timezone * 3600000 - result.getTimezoneOffset() * 60000);
+        result.timezone = timezone;
+      }
+
       return result;
     }
   end
@@ -219,7 +248,7 @@ class ::Time < `Date`
       if (year < 100) {
         result.setUTCFullYear(year);
       }
-      result.is_utc = true;
+      result.timezone = 0;
       return result;
     }
   end
@@ -238,7 +267,7 @@ class ::Time < `Date`
         other = #{::Opal.coerce_to!(other, ::Integer, :to_int)};
       }
       var result = new Date(self.getTime() + (other * 1000));
-      result.is_utc = self.is_utc;
+      result.timezone = self.timezone;
       return result;
     }
   end
@@ -253,7 +282,7 @@ class ::Time < `Date`
         other = #{::Opal.coerce_to!(other, ::Integer, :to_int)};
       }
       var result = new Date(self.getTime() - (other * 1000));
-      result.is_utc = self.is_utc;
+      result.timezone = self.timezone;
       return result;
     }
   end
@@ -283,8 +312,22 @@ class ::Time < `Date`
     strftime '%a %b %e %H:%M:%S %Y'
   end
 
-  def day
-    `self.is_utc ? self.getUTCDate() : self.getDate()`
+  {
+    year: ['getFullYear', 'getUTCFullYear', 0],
+    mon: ['getMonth', 'getUTCMonth', 1],
+    wday: ['getDay', 'getUTCDay', 0],
+    day: ['getDate', 'getUTCDate', 0],
+    hour: ['getHours', 'getUTCHours', 0],
+    min: ['getMinutes', 'getUTCMinutes', 0],
+    sec: ['getSeconds', 'getUTCSeconds', 0],
+  }.each do |method, (getter, utcgetter, difference)|
+    define_method method do
+      %x{
+        return difference + ((self.timezone != null) ?
+          (new Date(self.getTime() + self.timezone * 3600000))[utcgetter]() :
+          self[getter]())
+      }
+    end
   end
 
   def yday
@@ -327,24 +370,12 @@ class ::Time < `Date`
     `'Time:' + self.getTime()`
   end
 
-  def hour
-    `self.is_utc ? self.getUTCHours() : self.getHours()`
-  end
-
   def inspect
     if utc?
       strftime '%Y-%m-%d %H:%M:%S UTC'
     else
       strftime '%Y-%m-%d %H:%M:%S %z'
     end
-  end
-
-  def min
-    `self.is_utc ? self.getUTCMinutes() : self.getMinutes()`
-  end
-
-  def mon
-    `(self.is_utc ? self.getUTCMonth() : self.getMonth()) + 1`
   end
 
   def monday?
@@ -355,14 +386,10 @@ class ::Time < `Date`
     `#{wday} == 6`
   end
 
-  def sec
-    `self.is_utc ? self.getUTCSeconds() : self.getSeconds()`
-  end
-
   def succ
     %x{
       var result = new Date(self.getTime() + 1000);
-      result.is_utc = self.is_utc;
+      result.timezone = self.timezone;
       return result;
     }
   end
@@ -373,6 +400,9 @@ class ::Time < `Date`
 
   def zone
     %x{
+      if (self.timezone === 0) return "UTC";
+      else if (self.timezone != null) return nil;
+
       var string = self.toString(),
           result;
 
@@ -395,24 +425,24 @@ class ::Time < `Date`
   def getgm
     %x{
       var result = new Date(self.getTime());
-      result.is_utc = true;
+      result.timezone = 0;
       return result;
     }
   end
 
   def gmtime
     %x{
-      self.is_utc = true;
+      self.timezone = 0;
       return self;
     }
   end
 
   def gmt?
-    `self.is_utc === true`
+    `self.timezone === 0`
   end
 
   def gmt_offset
-    `self.is_utc ? 0 : -self.getTimezoneOffset() * 60`
+    `(self.timezone != null) ? self.timezone * 60 : -self.getTimezoneOffset() * 60`
   end
 
   def strftime(format)
@@ -534,7 +564,7 @@ class ::Time < `Date`
             break;
 
           case 'z':
-            var offset  = self.getTimezoneOffset(),
+            var offset  = (self.timezone == null) ? self.getTimezoneOffset() : (-self.timezone * 60),
                 hours   = Math.floor(Math.abs(offset) / 60),
                 minutes = Math.abs(offset) % 60;
 
@@ -679,16 +709,8 @@ class ::Time < `Date`
     `#{wday} == 2`
   end
 
-  def wday
-    `self.is_utc ? self.getUTCDay() : self.getDay()`
-  end
-
   def wednesday?
     `#{wday} == 3`
-  end
-
-  def year
-    `self.is_utc ? self.getUTCFullYear() : self.getFullYear()`
   end
 
   def cweek_cyear
