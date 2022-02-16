@@ -164,7 +164,7 @@ module Opal
       load_opal
       raise e
     rescue EOFError, Errno::EPIPE
-      exit $?.exitstatus
+      exit $?.nil? ? 0 : $?.exitstatus
     end
 
     def readline
