@@ -326,7 +326,7 @@ module Opal
       children :value
 
       def compile
-        push "Opal.Rational.$new(#{value.numerator}, #{value.denominator})"
+        push "#{top_scope.absolute_const}('Rational').$new(#{value.numerator}, #{value.denominator})"
       end
     end
 
@@ -338,7 +338,7 @@ module Opal
       children :value
 
       def compile
-        push "Opal.Complex.$new(#{value.real}, #{value.imag})"
+        push "#{top_scope.absolute_const}('Complex').$new(#{value.real}, #{value.imag})"
       end
     end
   end
