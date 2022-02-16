@@ -1,6 +1,10 @@
+### Added
+
+- Introduce timezone support for Time (#2394)
+
 ### Changed
 
-- Move Math IE11-supporting polyfills to a separate file #2395
+- Move Math IE11-supporting polyfills to a separate file (#2395)
 
 ### Internal
 
