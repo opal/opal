@@ -37,7 +37,6 @@ opal_filter "Marshal" do
   fails "Marshal.load for an Object loads an Object with a non-US-ASCII instance variable" # NameError: '@Ã©' is not allowed as an instance variable name
   fails "Marshal.load for an Object raises ArgumentError if the object from an 'o' stream is not dumpable as 'o' type user class" # Expected ArgumentError but no exception was raised (#<File:0x3b160> was returned)
   fails "Marshal.load for an object responding to #marshal_dump and #marshal_load loads a user-marshaled object" # Expected "\x04\b[\aU:\x10UserMarshal\"\tdata@\x06" == "\x04\b[\aU:\x10UserMarshal:\tdata;\x06" to be truthy but was false
-  fails "Marshal.load loads a Regexp" # anchors difference
   fails "Marshal.load loads an array containing objects having _dump method, and with proc"
   fails "Marshal.load loads an array containing objects having marshal_dump method, and with proc"
   fails "Marshal.load when a class does not exist in the namespace raises an ArgumentError" # an issue with constant resolving, e.g. String::Array
