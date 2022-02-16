@@ -312,15 +312,15 @@ class ::Time < `Date`
     strftime '%a %b %e %H:%M:%S %Y'
   end
 
-  {
-    year: ['getFullYear', 'getUTCFullYear', 0],
-    mon: ['getMonth', 'getUTCMonth', 1],
-    wday: ['getDay', 'getUTCDay', 0],
-    day: ['getDate', 'getUTCDate', 0],
-    hour: ['getHours', 'getUTCHours', 0],
-    min: ['getMinutes', 'getUTCMinutes', 0],
-    sec: ['getSeconds', 'getUTCSeconds', 0],
-  }.each do |method, (getter, utcgetter, difference)|
+  [
+    [:year, 'getFullYear', 'getUTCFullYear'],
+    [:mon, 'getMonth', 'getUTCMonth', 1],
+    [:wday, 'getDay', 'getUTCDay'],
+    [:day, 'getDate', 'getUTCDate'],
+    [:hour, 'getHours', 'getUTCHours'],
+    [:min, 'getMinutes', 'getUTCMinutes'],
+    [:sec, 'getSeconds', 'getUTCSeconds'],
+  ].each do |method, getter, utcgetter, difference = 0|
     define_method method do
       %x{
         return difference + ((self.timezone != null) ?
@@ -362,8 +362,18 @@ class ::Time < `Date`
     other.is_a?(::Time) && (self <=> other).zero?
   end
 
-  def friday?
-    `#{wday} == 5`
+  [
+    [:sunday?, 0],
+    [:monday?, 1],
+    [:tuesday?, 2],
+    [:wednesday?, 3],
+    [:thursday?, 4],
+    [:friday?, 5],
+    [:saturday?, 6]
+  ].each do |method, weekday|
+    define_method method do
+      `#{wday} === weekday`
+    end
   end
 
   def hash
@@ -376,14 +386,6 @@ class ::Time < `Date`
     else
       strftime '%Y-%m-%d %H:%M:%S %z'
     end
-  end
-
-  def monday?
-    `#{wday} == 1`
-  end
-
-  def saturday?
-    `#{wday} == 6`
   end
 
   def succ
@@ -685,14 +687,6 @@ class ::Time < `Date`
     }
   end
 
-  def sunday?
-    `#{wday} == 0`
-  end
-
-  def thursday?
-    `#{wday} == 4`
-  end
-
   def to_a
     [sec, min, hour, day, month, year, wday, yday, isdst, zone]
   end
@@ -703,14 +697,6 @@ class ::Time < `Date`
 
   def to_i
     `parseInt(self.getTime() / 1000, 10)`
-  end
-
-  def tuesday?
-    `#{wday} == 2`
-  end
-
-  def wednesday?
-    `#{wday} == 3`
   end
 
   def cweek_cyear
