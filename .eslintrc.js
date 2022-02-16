@@ -28,6 +28,8 @@ module.exports = {
     "DataView": "readonly",
     "globalThis": "readonly",
     "Opal": "readonly",
+    "Promise": "readonly",
+    "Proxy": "readonly",
     "Reflect": "readonly",
     "Uint8Array": "readonly",
     "WeakRef": "readonly",

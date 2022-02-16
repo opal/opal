@@ -19,3 +19,29 @@ describe 'super without explicit argument' do
     klass.new.test_rest_kwargs(native: 4).should == {native: 4}
   end
 end
+
+class ABlockWithSuperSpec
+  BLOCK = proc {
+    return [self, super()]
+  }
+  def foo; :foo; end
+  def bar; :bar; end
+  def foo_bar; [foo, bar]; end
+end
+
+describe "a block with super" do
+  it "can be used to define multiple methods" do
+    block = nil
+
+    c = Class.new(ABlockWithSuperSpec) {
+      define_method :foo, ABlockWithSuperSpec::BLOCK
+      define_method :bar, ABlockWithSuperSpec::BLOCK
+      define_method :foo_bar, ABlockWithSuperSpec::BLOCK
+    }
+
+    obj = c.new
+    obj.foo.should == [obj, :foo]
+    obj.bar.should == [obj, :bar]
+    obj.foo_bar.should == [obj, [[obj, :foo], [obj, :bar]]]
+  end
+end
