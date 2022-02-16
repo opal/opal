@@ -65,7 +65,7 @@ module REPLUtils
 
       if (mode == 'silent') return nil;
 
-      if (typeof $_result === 'null') {
+      if ($_result === null) {
         return "=> null";
       }
       else if (typeof $_result === 'undefined') {
