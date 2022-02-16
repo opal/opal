@@ -1,3 +1,7 @@
+### Changed
+
+- Move Math IE11-supporting polyfills to a separate file #2395
+
 ### Internal
 
 - Improve performance of argument coertion, fast-track `Integer`, `String`, and calling the designed coertion method (#2383)
