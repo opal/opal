@@ -319,42 +319,6 @@ class Date
     }
   end
 
-  def <(other)
-    %x{
-      var a = #{@date}, b = #{other}.date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
-      return a < b;
-    }
-  end
-
-  def <=(other)
-    %x{
-      var a = #{@date}, b = #{other}.date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
-      return a <= b;
-    }
-  end
-
-  def >(other)
-    %x{
-      var a = #{@date}, b = #{other}.date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
-      return a > b;
-    }
-  end
-
-  def >=(other)
-    %x{
-      var a = #{@date}, b = #{other}.date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
-      return a >= b;
-    }
-  end
-
   def <=>(other)
     %x{
       if (other.$$is_number) {
