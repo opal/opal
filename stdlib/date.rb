@@ -1,6 +1,5 @@
 require 'forwardable'
 require 'date/infinity'
-require 'date/core_ext'
 require 'time'
 
 class Date
@@ -19,6 +18,7 @@ class Date
   class << self
     def wrap(native)
       instance = allocate
+      `#{instance}.start = #{ITALY}`
       `#{instance}.date = #{native}`
       instance
     end
@@ -289,7 +289,10 @@ class Date
       }
     }
     @date = `new Date(year, month - 1, day)`
+    @start = start
   end
+
+  attr_reader :start
 
   def <=>(other)
     %x{
@@ -342,7 +345,9 @@ class Date
   end
 
   def clone
-    Date.wrap(@date.dup)
+    date = Date.wrap(@date.dup)
+    `date.start = #{@start}`
+    date
   end
 
   def_delegators :@date, :sunday?, :monday?, :tuesday?, :wednesday?, :thursday?, :friday?, :saturday?,
@@ -386,6 +391,12 @@ class Date
 
   def julian?
     `#{@date} < new Date(1582, 10 - 1, 15, 12)`
+  end
+
+  def new_start(start)
+    new_date = clone
+    `new_date.start = start`
+    new_date
   end
 
   def next
@@ -539,3 +550,4 @@ class Date
 end
 
 require 'date/date_time'
+require 'date/formatters'

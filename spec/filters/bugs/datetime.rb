@@ -37,7 +37,6 @@ opal_filter "DateTime" do
   fails "DateTime#strftime with %z formats a time with fixed positive offset as '+HHMM'" # ArgumentError: Opal doesn't support other types for a timezone argument than Integer and String
   fails "DateTime#to_date maintains the same mday" # NoMethodError: undefined method `mday' for #<Date:0x19c4c @date=2012-12-24 00:00:00 +0100>
   fails "DateTime#to_date maintains the same month" # NoMethodError: undefined method `mon' for #<Date:0x19c3e @date=2012-12-24 00:00:00 +0100>
-  fails "DateTime#to_s maintains timezone regardless of local time" # Expected "2012-12-23" == "2012-12-24T01:02:03+03:00" to be truthy but was false
   fails "DateTime#to_time preserves the same time regardless of local time or zone" # Expected 180 == 10800 to be truthy but was false
   fails "DateTime#to_time returns a Time representing the same instant" # Expected 22 == 23 to be truthy but was false
   fails "DateTime.min adds 60 to negative minutes" # ArgumentError: min out of range: -20

@@ -154,6 +154,23 @@ class ::Time < `Date`
         result.setFullYear(year);
       }
 
+      if (utc_offset !== nil) {
+        timezone = #{_parse_offset(utc_offset)};
+      }
+
+      if (timezone != null) {
+        result = new Date(result.getTime() - timezone * 3600000 - result.getTimezoneOffset() * 60000);
+        result.timezone = timezone;
+      }
+
+      return result;
+    }
+  end
+
+  # @private
+  def self._parse_offset(utc_offset)
+    %x{
+      var timezone;
       if (utc_offset.$$is_string) {
         if (utc_offset == 'UTC') {
           timezone = 0;
@@ -174,19 +191,10 @@ class ::Time < `Date`
       else if (utc_offset.$$is_number) {
         timezone = utc_offset / 3600;
       }
-      else if (utc_offset === nil) {
-        // Pass
-      }
       else {
         #{::Kernel.raise ::ArgumentError, "Opal doesn't support other types for a timezone argument than Integer and String"}
       }
-
-      if (timezone != null) {
-        result = new Date(result.getTime() - timezone * 3600000 - result.getTimezoneOffset() * 60000);
-        result.timezone = timezone;
-      }
-
-      return result;
+      return timezone;
     }
   end
 
@@ -450,7 +458,7 @@ class ::Time < `Date`
   def strftime(format)
     %x{
       return format.replace(/%([\-_#^0]*:{0,2})(\d+)?([EO]*)(.)/g, function(full, flags, width, _, conv) {
-        var result = "",
+        var result = "", jd, c, s,
             zero   = flags.indexOf('0') !== -1,
             pad    = flags.indexOf('-') === -1,
             blank  = flags.indexOf('_') !== -1,
@@ -663,6 +671,28 @@ class ::Time < `Date`
           case 'T':
           case 'X':
             result += #{strftime('%H:%M:%S')};
+            break;
+
+          // Non-standard: JIS X 0301 date format
+          case 'J':
+            jd = #{to_date.jd};
+            if (jd < 2405160) {
+              result += #{strftime('%Y-%m-%d')};
+              break;
+            }
+            else if (jd < 2419614)
+              c = 'M', s = 1867;
+            else if (jd < 2424875)
+              c = 'T', s = 1911;
+            else if (jd < 2447535)
+              c = 'S', s = 1925;
+            else if (jd < 2458605)
+              c = 'H', s = 1988;
+            else
+              c = 'R', s = 2018;
+
+            result += #{format '%c%02d', `c`, year - `s`};
+            result += #{strftime('-%m-%d')};
             break;
 
           default:

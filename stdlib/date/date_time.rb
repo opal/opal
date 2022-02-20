@@ -20,10 +20,6 @@ class DateTime < Date
     @date = Time.new(year, month, day, hours, minutes, seconds, offset)
   end
 
-  def zone
-    @date.strftime('%:z')
-  end
-
   def_delegators :@date, :min, :hour, :sec
   alias minute min
   alias second sec
@@ -39,17 +35,24 @@ class DateTime < Date
   end
 
   def +(other)
-    DateTime.wrap @date + other
+    ::DateTime.wrap @date + other
   end
 
   def -(other)
     `if (Opal.is_a(other, #{::Date})) other = other.date`
     result = @date - other
     if result.is_a? ::Time
-      DateTime.wrap result
+      ::DateTime.wrap result
     else
       result
     end
+  end
+
+  def new_offset(offset)
+    new_date = clone
+    offset = Time._parse_offset(offset)
+    `new_date.date.timezone = offset`
+    new_date
   end
 
   def to_datetime
