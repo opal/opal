@@ -1,4 +1,3 @@
-require 'forwardable'
 require 'time'
 
 class DateTime < Date
@@ -11,8 +10,6 @@ class DateTime < Date
       wrap Time.parse(str)
     end
   end
-
-  extend Forwardable
 
   def initialize(year = -4712, month = 1, day = 1, hours = 0, minutes = 0, seconds = 0, offset = nil, start = ITALY)
     %x{

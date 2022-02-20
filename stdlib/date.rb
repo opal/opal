@@ -1,8 +1,10 @@
+require 'forwardable'
 require 'date/infinity'
 require 'date/core_ext'
 
 class Date
   include Comparable
+  extend Forwardable
 
   JULIAN          = Infinity.new
   GREGORIAN       = -Infinity.new
@@ -407,13 +409,8 @@ class Date
     Date.wrap(`new Date(#{@date}.getTime())`)
   end
 
-  def day
-    `#{@date}.getDate()`
-  end
-
-  def friday?
-    wday == 5
-  end
+  def_delegators :@date, :sunday?, :monday?, :tuesday?, :wednesday?, :thursday?, :friday?, :saturday?,
+    :day, :month, :year, :wday
 
   def jd
     %x{
@@ -453,14 +450,6 @@ class Date
 
   def julian?
     `#{@date} < new Date(1582, 10 - 1, 15, 12)`
-  end
-
-  def monday?
-    wday == 1
-  end
-
-  def month
-    `#{@date}.getMonth() + 1`
   end
 
   def next
@@ -503,26 +492,14 @@ class Date
     self.class.new(year - years, month, day)
   end
 
-  def saturday?
-    wday == 6
-  end
-
   def strftime(format = '')
     %x{
       if (format == '') {
         return #{to_s};
       }
 
-      return #{@date}.$strftime(#{format});
+      return #{@date.strftime(format)}
     }
-  end
-
-  def sunday?
-    wday == 0
-  end
-
-  def thursday?
-    wday == 4
   end
 
   def to_s
@@ -540,10 +517,6 @@ class Date
 
   def to_n
     @date
-  end
-
-  def tuesday?
-    wday == 2
   end
 
   def step(limit, step = 1, &block)
@@ -574,18 +547,6 @@ class Date
 
   def downto(min, &block)
     step(min, -1, &block)
-  end
-
-  def wday
-    `#{@date}.getDay()`
-  end
-
-  def wednesday?
-    wday == 3
-  end
-
-  def year
-    `#{@date}.getFullYear()`
   end
 
   def cwday
