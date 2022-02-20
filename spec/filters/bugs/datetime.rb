@@ -16,7 +16,6 @@ opal_filter "DateTime" do
   fails "DateTime#strftime should be able to show a full notation" # Expected "%+" == "Sat Feb  3 04:05:06 +00:00 2001" to be truthy but was false
   fails "DateTime#strftime should be able to show default Logger format" # Expected "2001-12-03T04:05:06.000000 " == "2001-12-03T04:05:06.100000 " to be truthy but was false
   fails "DateTime#strftime should be able to show the commercial week day" # Expected "1" == "7" to be truthy but was false
-  fails "DateTime#strftime should be able to show the number of seconds since the unix epoch for a date" # Expected "954972000" == "954979200" to be truthy but was false
   fails "DateTime#strftime should be able to show the number of seconds since the unix epoch" # ArgumentError: Opal doesn't support other types for a timezone argument than Integer and String
   fails "DateTime#strftime should be able to show the timezone of the date with a : separator" # Expected "+0200" == "+0000" to be truthy but was false
   fails "DateTime#strftime should be able to show the timezone with a : separator" # Expected "Central European Standard Time" == "+00:00" to be truthy but was false
@@ -35,20 +34,16 @@ opal_filter "DateTime" do
   fails "DateTime#strftime with %z formats a time with fixed offset as '+/-HH:MM' with ':' specifier" # ArgumentError: Opal doesn't support other types for a timezone argument than Integer and String
   fails "DateTime#strftime with %z formats a time with fixed offset as '+/-HH:MM:SS' with '::' specifier" # ArgumentError: Opal doesn't support other types for a timezone argument than Integer and String
   fails "DateTime#strftime with %z formats a time with fixed positive offset as '+HHMM'" # ArgumentError: Opal doesn't support other types for a timezone argument than Integer and String
-  fails "DateTime#to_date maintains the same mday" # NoMethodError: undefined method `mday' for #<Date:0x19c4c @date=2012-12-24 00:00:00 +0100>
-  fails "DateTime#to_date maintains the same month" # NoMethodError: undefined method `mon' for #<Date:0x19c3e @date=2012-12-24 00:00:00 +0100>
   fails "DateTime#to_time preserves the same time regardless of local time or zone" # Expected 180 == 10800 to be truthy but was false
-  fails "DateTime#to_time returns a Time representing the same instant" # Expected 22 == 23 to be truthy but was false
   fails "DateTime.min adds 60 to negative minutes" # ArgumentError: min out of range: -20
   fails "DateTime.min raises an error for Float" # Expected ArgumentError but no exception was raised (#<DateTime:0x1c098 @date=-4712-01-01 00:05:00 UTC> was returned)
   fails "DateTime.min raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x1bee2 @date=-4712-01-01 02:00:00 UTC> was returned)
   fails "DateTime.minute adds 60 to negative minutes" # ArgumentError: min out of range: -20
   fails "DateTime.minute raises an error for Float" # Expected ArgumentError but no exception was raised (#<DateTime:0x365c2 @date=-4712-01-01 00:05:00 UTC> was returned)
   fails "DateTime.minute raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x3669a @date=-4712-01-01 02:00:00 UTC> was returned)
-  fails "DateTime.new sets all values to default if passed no arguments" # Exception: Cannot read properties of undefined (reading '$/')
-  fails "DateTime.new takes the eighth argument as the date of calendar reform" # NoMethodError: undefined method `start' for #<DateTime:0x191a0 @date=1-02-03 04:05:06 +0000.011666666666666665>
   fails "DateTime.new takes the seventh argument as an offset" # Expected 0.000008101851851851852 == 0.7 to be truthy but was false
   fails "DateTime.now grabs the local timezone" # Expected "+01:00" == "-08:00" to be truthy but was false
+  fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format parses YYYY-MM-DDTHH:MM:SS into a DateTime object" # Expected #<DateTime:0x45dd0 @date=2012-11-08 15:43:59 +0100, @start=2299161> == #<DateTime:0x45dd4 @date=2012-11-08 15:43:59 UTC, @start=2299161> to be truthy but was false
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format throws an argument error for invalid day values" # Expected ArgumentError but no exception was raised (#<DateTime:0x18d2e @date=NaN-NaN-NaN NaN:NaN:NaN -NaNNaN> was returned)
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format throws an argument error for invalid hour values" # Expected ArgumentError but no exception was raised (#<DateTime:0x18e00 @date=NaN-NaN-NaN NaN:NaN:NaN -NaNNaN> was returned)
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format throws an argument error for invalid minute values" # Expected ArgumentError but no exception was raised (#<DateTime:0x18ed8 @date=NaN-NaN-NaN NaN:NaN:NaN -NaNNaN> was returned)

@@ -288,6 +288,7 @@ class Date
         day = 4;
       }
     }
+
     @date = `new Date(year, month - 1, day)`
     @start = start
   end
@@ -321,27 +322,15 @@ class Date
   end
 
   def >>(n)
-    %x{
-      if (!n.$$is_number) {
-        #{raise ::TypeError};
-      }
+    `if (!n.$$is_number) #{raise ::TypeError}`
 
-      var result = #{clone}, date = result.date, cur = date.getDate();
-      date.setDate(1);
-      date.setMonth(date.getMonth() + n);
-      date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
-      return result;
-    }
+    self << -n
   end
 
   def <<(n)
-    %x{
-      if (!n.$$is_number) {
-        #{raise ::TypeError};
-      }
+    `if (!n.$$is_number) #{raise ::TypeError}`
 
-      return #{self >> `-n`};
-    }
+    prev_month(n)
   end
 
   def clone
@@ -351,7 +340,10 @@ class Date
   end
 
   def_delegators :@date, :sunday?, :monday?, :tuesday?, :wednesday?, :thursday?, :friday?, :saturday?,
-    :day, :month, :year, :wday
+    :day, :month, :year, :wday, :yday
+
+  alias mday day
+  alias mon month
 
   def jd
     %x{
@@ -440,7 +432,7 @@ class Date
       var result = #{clone}, date = result.date, cur = date.getDate();
       date.setDate(1);
       date.setMonth(date.getMonth() - n);
-      date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
+      date.setDate(Math.min(cur, #{Date._days_in_month(`date.getFullYear()`, `date.getMonth()`)}));
       return result;
     }
   end
@@ -538,12 +530,12 @@ class Date
     }
   end
 
-  %x{
-    function days_in_month(year, month) {
+  def self._days_in_month(year, month)
+    %x{
       var leap = ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0);
-      return [31, (leap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
+      return [31, (leap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
     }
-  }
+  end
 
   alias eql? ==
   alias succ next
