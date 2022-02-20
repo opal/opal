@@ -1,5 +1,3 @@
-require 'time'
-
 class DateTime < Date
   class << self
     def now
@@ -26,7 +24,7 @@ class DateTime < Date
     @date.strftime('%:z')
   end
 
-  def_delegators :@date, :min, :hour, :sec, :strftime
+  def_delegators :@date, :min, :hour, :sec
   alias minute min
   alias second sec
 
@@ -37,7 +35,21 @@ class DateTime < Date
   alias second_fraction sec_fraction
 
   def offset
-    `self.date.timezone` / 24r
+    @date.gmt_offset / (24 * 3600r)
+  end
+
+  def +(other)
+    DateTime.wrap @date + other
+  end
+
+  def -(other)
+    `if (Opal.is_a(other, #{::Date})) other = other.date`
+    result = @date - other
+    if result.is_a? ::Time
+      DateTime.wrap result
+    else
+      result
+    end
   end
 
   def to_datetime

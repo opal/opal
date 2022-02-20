@@ -1,6 +1,7 @@
 require 'forwardable'
 require 'date/infinity'
 require 'date/core_ext'
+require 'time'
 
 class Date
   include Comparable
@@ -290,45 +291,16 @@ class Date
     @date = `new Date(year, month - 1, day)`
   end
 
-  def -(date)
-    %x{
-      if (date.$$is_number) {
-        var result = #{clone};
-        result.date.setDate(#{@date}.getDate() - date);
-        return result;
-      }
-      else if (date.date) {
-        return Math.round((#{@date} - #{date}.date) / (1000 * 60 * 60 * 24));
-      }
-      else {
-        #{raise TypeError};
-      }
-    }
-  end
-
-  def +(date)
-    %x{
-      if (date.$$is_number) {
-        var result = #{clone};
-        result.date.setDate(#{@date}.getDate() + date);
-        return result;
-      }
-      else {
-        #{raise TypeError};
-      }
-    }
-  end
-
   def <=>(other)
     %x{
       if (other.$$is_number) {
         return #{jd <=> other}
       }
 
-      if (#{Date === other}) {
+      if (#{::Date === other}) {
         var a = #{@date}, b = #{other}.date;
-        a.setHours(0, 0, 0, 0);
-        b.setHours(0, 0, 0, 0);
+        if (!Opal.is_a(#{self}, #{::DateTime})) a.setHours(0, 0, 0, 0);
+        if (!Opal.is_a(#{other}, #{::DateTime})) b.setHours(0, 0, 0, 0);
 
         if (a < b) {
           return -1;
@@ -348,7 +320,7 @@ class Date
   def >>(n)
     %x{
       if (!n.$$is_number) {
-        #{raise TypeError};
+        #{raise ::TypeError};
       }
 
       var result = #{clone}, date = result.date, cur = date.getDate();
@@ -362,7 +334,7 @@ class Date
   def <<(n)
     %x{
       if (!n.$$is_number) {
-        #{raise TypeError};
+        #{raise ::TypeError};
       }
 
       return #{self >> `-n`};
@@ -370,7 +342,7 @@ class Date
   end
 
   def clone
-    Date.wrap(`new Date(#{@date}.getTime())`)
+    Date.wrap(@date.dup)
   end
 
   def_delegators :@date, :sunday?, :monday?, :tuesday?, :wednesday?, :thursday?, :friday?, :saturday?,
@@ -420,30 +392,40 @@ class Date
     self + 1
   end
 
-  def next_day(n = 1)
-    self + n
-  end
-
-  def next_month(n = 1)
+  def -(date)
     %x{
-      var result = #{clone}, date = result.date, cur = date.getDate();
-      date.setDate(1);
-      date.setMonth(date.getMonth() + n);
-      date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
-      return result;
+      if (date.date) {
+        return Math.round((#{@date} - #{date}.date) / (1000 * 60 * 60 * 24));
+      }
     }
+    prev_day(date)
   end
 
-  def next_year(years = 1)
-    self.class.new(year + years, month, day)
+  def +(date)
+    next_day(date)
   end
 
   def prev_day(n = 1)
-    self - n
+    %x{
+      if (n.$$is_number) {
+        var result = #{clone};
+        result.date.setDate(#{@date}.getDate() - n);
+        return result;
+      }
+      else {
+        #{raise ::TypeError};
+      }
+    }
+  end
+
+  def next_day(n = 1)
+    `if (!n.$$is_number) #{raise ::TypeError}`
+    prev_day(-n)
   end
 
   def prev_month(n = 1)
     %x{
+      if (!n.$$is_number) #{raise ::TypeError}
       var result = #{clone}, date = result.date, cur = date.getDate();
       date.setDate(1);
       date.setMonth(date.getMonth() - n);
@@ -452,8 +434,19 @@ class Date
     }
   end
 
+  def next_month(n = 1)
+    `if (!n.$$is_number) #{raise ::TypeError}`
+    prev_month(-n)
+  end
+
   def prev_year(years = 1)
+    `if (!years.$$is_number) #{raise ::TypeError}`
     self.class.new(year - years, month, day)
+  end
+
+  def next_year(years = 1)
+    `if (!years.$$is_number) #{raise ::TypeError}`
+    prev_year(-years)
   end
 
   def strftime(format = '')
@@ -479,6 +472,14 @@ class Date
     Time.new(year, month, day)
   end
 
+  def to_date
+    self
+  end
+
+  def to_datetime
+    DateTime.new(year, month, day)
+  end
+
   def to_n
     @date
   end
@@ -489,7 +490,7 @@ class Date
     steps = if steps_count * step < 0
               []
             elsif steps_count < 0
-              (0..-steps_count).step(step.abs).map(&:-@) .reverse
+              (0..-steps_count).step(step.abs).map(&:-@).reverse
             else
               (0..steps_count).step(step.abs)
             end
