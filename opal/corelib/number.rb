@@ -263,20 +263,6 @@ class ::Number < ::Numeric
     end
   end
 
-  def ===(other)
-    %x{
-      if (other.$$is_number) {
-        return self.valueOf() === other.valueOf();
-      }
-      else if (#{other.respond_to? :==}) {
-        return #{other == self};
-      }
-      else {
-        return false;
-      }
-    }
-  end
-
   def ==(other)
     %x{
       if (other.$$is_number) {
@@ -290,6 +276,8 @@ class ::Number < ::Numeric
       }
     }
   end
+
+  alias === ==
 
   def abs
     `Math.abs(self)`
