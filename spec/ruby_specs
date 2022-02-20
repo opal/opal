@@ -176,6 +176,7 @@ ruby/library/base64
 ruby/library/bigdecimal
 !ruby/library/bigdecimal/util_spec
 ruby/library/date
+ruby/library/datetime
 ruby/library/delegate/delegator/send_spec
 ruby/library/erb/util/h_spec
 ruby/library/erb/util/html_escape_spec

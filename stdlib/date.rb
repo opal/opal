@@ -1,4 +1,5 @@
 require 'date/infinity'
+require 'date/core_ext'
 
 class Date
   include Comparable
@@ -610,3 +611,5 @@ class Date
   alias eql? ==
   alias succ next
 end
+
+require 'date/date_time'
