@@ -680,3 +680,9 @@ class Date
   alias eql? ==
   alias succ next
 end
+
+class Time
+  def to_date
+    Date.new(self.year, self.month, self.day)
+  end
+end
