@@ -683,6 +683,6 @@ end
 
 class Time
   def to_date
-    Date.new(self.year, self.month, self.day)
+    ::Date.new(self.year, self.month, self.day)
   end
 end
