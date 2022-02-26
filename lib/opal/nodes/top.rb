@@ -14,6 +14,7 @@ module Opal
 
       def compile
         compiler.top_scope = self
+        compiler.dynamic_cache_result = true if sexp.meta[:dynamic_cache_result]
 
         push version_comment
 

@@ -220,6 +220,10 @@ module Opal
     # Magic comment flags extracted from the leading comments
     attr_reader :magic_comments
 
+    # Set if some rewritter caused a dynamic cache result, meaning it's not
+    # fit to be cached
+    attr_accessor :dynamic_cache_result
+
     def initialize(source, options = {})
       @source = source
       @indent = ''
@@ -229,6 +233,7 @@ module Opal
       @case_stmt = nil
       @option_values = {}
       @magic_comments = {}
+      @dynamic_cache_result = false
     end
 
     # Compile some ruby code to a string.
@@ -260,9 +265,12 @@ module Opal
                :main
              end
 
-      @sexp = s(:top, sexp || s(:nil)).tap { |i| i.meta[:kind] = kind }
-      @comments = ::Parser::Source::Comment.associate_locations(sexp, comments)
-      @magic_comments = MagicComments.parse(sexp, comments)
+      @sexp = sexp.tap { |i| i.meta[:kind] = kind }
+
+      first_node = sexp.children.first if sexp.children.first.location
+
+      @comments = ::Parser::Source::Comment.associate_locations(first_node, comments)
+      @magic_comments = MagicComments.parse(first_node, comments)
       @eof_content = EofContent.new(tokens, @source).eof
     end
 
@@ -353,9 +361,7 @@ module Opal
       @indent
     end
 
-    # Create a new sexp using the given parts. Even though this just
-    # returns an array, it must be used incase the internal structure
-    # of sexps does change.
+    # Create a new sexp using the given parts.
     def s(type, *children)
       ::Opal::AST::Node.new(type, children)
     end
