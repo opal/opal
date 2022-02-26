@@ -4,7 +4,6 @@ require 'opal/rewriters/forward_args'
 
 RSpec.describe Opal::Rewriters::ForwardArgs do
   include RewritersHelper
-  extend  RewritersHelper
 
   before(:each) { Opal::Rewriters::ForRewriter.reset_tmp_counter! }
 
@@ -23,7 +22,7 @@ RSpec.describe Opal::Rewriters::ForwardArgs do
     end
   end
 
-  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(parse(<<~ENDDEST))
+  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(ast_of(<<~ENDDEST))
     def forward(...)
       other(...)
     end
@@ -33,7 +32,7 @@ RSpec.describe Opal::Rewriters::ForwardArgs do
     end
   ENDDEST
 
-  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(parse(<<~ENDDEST))
+  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(ast_of(<<~ENDDEST))
     def forward(first_arg, ...)
       other(first_arg, second_arg, ...)
       other(other_arg, ...)

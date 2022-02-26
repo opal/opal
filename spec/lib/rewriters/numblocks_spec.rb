@@ -4,9 +4,7 @@ require 'opal/rewriters/numblocks'
 
 RSpec.describe Opal::Rewriters::Numblocks do
   include RewritersHelper
-  extend  RewritersHelper
-
-  before(:each) { Opal::Rewriters::ForRewriter.reset_tmp_counter! }
+  extend RewritersHelper # s() in example scope
 
   correct_names = proc do |ast|
     case ast
@@ -22,7 +20,7 @@ RSpec.describe Opal::Rewriters::Numblocks do
     end
   end
 
-  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(parse(<<~ENDDEST))
+  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(ast_of(<<~ENDDEST))
     proc do
       _1
     end
@@ -32,7 +30,7 @@ RSpec.describe Opal::Rewriters::Numblocks do
     end
   ENDDEST
 
-  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(parse(<<~ENDDEST))
+  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(ast_of(<<~ENDDEST))
     proc do
       _3
     end

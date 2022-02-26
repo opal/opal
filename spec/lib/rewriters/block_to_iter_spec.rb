@@ -1,11 +1,8 @@
 require 'lib/spec_helper'
+require 'support/rewriters_helper'
 
 RSpec.describe Opal::Rewriters::BlockToIter do
-  def s(type, *children)
-    ::Opal::AST::Node.new(type, children)
-  end
-
-  let(:rewriter) { Opal::Rewriters::BlockToIter.new }
+  include RewritersHelper
 
   let(:block_node) do
     # m { |arg1| 1 }
@@ -23,6 +20,6 @@ RSpec.describe Opal::Rewriters::BlockToIter do
   end
 
   it 'rewriters s(:block) to s(:iter)' do
-    expect(rewriter.process(block_node)).to eq(iter_node)
+    expect(rewritten(block_node)).to eq(iter_node)
   end
 end

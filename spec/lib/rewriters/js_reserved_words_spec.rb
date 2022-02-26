@@ -1,21 +1,8 @@
 require 'lib/spec_helper'
+require 'support/rewriters_helper'
 
 RSpec.describe Opal::Rewriters::JsReservedWords do
-  def s(type, *children)
-    ::Opal::AST::Node.new(type, children)
-  end
-
-  def rewrite(sexp)
-    Opal::Rewriters::JsReservedWords.new.process(sexp)
-  end
-
-  def expect_rewritten(sexp)
-    expect(rewrite(sexp))
-  end
-
-  def expect_no_rewriting_for(sexp)
-    expect_rewritten(sexp).to eq(sexp)
-  end
+  include RewritersHelper
 
   reserved_lvars = %i(
     do if in for let new try var case else enum eval false

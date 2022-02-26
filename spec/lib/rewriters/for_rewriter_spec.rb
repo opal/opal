@@ -4,7 +4,6 @@ require 'opal/rewriters/for_rewriter'
 
 RSpec.describe Opal::Rewriters::ForRewriter do
   include RewritersHelper
-  extend  RewritersHelper
 
   before(:each) { Opal::Rewriters::ForRewriter.reset_tmp_counter! }
 

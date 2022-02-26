@@ -207,7 +207,7 @@ RSpec.describe Opal::CLI do
   describe ':sexp option' do
     let(:options) { {evals: ['puts 4'], sexp: true} }
     it 'prints syntax expressions for the given code' do
-      expect_output_of{ subject.run }.to eq("s(:send, nil, :puts,\n  s(:int, 4))\n")
+      expect_output_of{ subject.run }.to eq("s(:top,\n  s(:send, nil, :puts,\n    s(:int, 4)))\n")
     end
   end
 
