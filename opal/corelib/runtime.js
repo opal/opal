@@ -2662,7 +2662,7 @@
       if (typeof Promise !== 'undefined' && retval instanceof Promise) {
         // A special case of require having an async top:
         // We will need to await it.
-        return retval.then(function() { return true; });
+        return retval.then($return_val(true));
       }
     }
     else {
@@ -2785,13 +2785,15 @@
   Opal.rb_ge     = function(l,r) { return (typeof(l) === 'number' && typeof(r) === 'number') ? l >= r : l['$>='](r); }
 
   // Optimized helpers for calls like $truthy((a)['$==='](b)) -> $eqeqeq(a, b)
-  Opal.eqeq = function(lhs, rhs) {
+  function $eqeq(lhs, rhs) {
     if ((typeof lhs === 'number' && typeof rhs === 'number') ||
         (typeof lhs === 'string' && typeof rhs === 'string')) {
       return lhs === rhs;
     }
     return $truthy((lhs)['$=='](rhs));
   };
+  Opal.eqeq = $eqeq;
+
   Opal.eqeqeq = function(lhs, rhs) {
     if ((typeof lhs === 'number' && typeof rhs === 'number') ||
         (typeof lhs === 'string' && typeof rhs === 'string')) {
@@ -2812,7 +2814,49 @@
     return $truthy(arg['$!']());
   }
 
+  // Shortcuts - optimized function generators for simple kinds of functions
+  function $return_val(arg) {
+    return function() {
+      return arg;
+    }
+  }
+  Opal.return_val = $return_val;
 
+  Opal.return_self = function() {
+    return this;
+  }
+  Opal.return_ivar = function(ivar) {
+    return function() {
+      if (this[ivar] == null) this[ivar] = nil;
+      return this[ivar];
+    }
+  }
+  Opal.assign_ivar = function(ivar) {
+    return function(val) {
+      return this[ivar] = val;
+    }
+  }
+  Opal.assign_ivar_val = function(ivar, static_val) {
+    return function() {
+      return this[ivar] = static_val;
+    }
+  }
+  Opal.return_call = function(method) {
+    return function() {
+      return this[method]();
+    }
+  }
+  Opal.return_iter_call = function(method) {
+    return function fun() {
+      return (fun.$$s == null ? this : fun.$$s)[method]();
+    }
+  }
+  Opal.return_ivar_call = function(ivar, method) {
+    return function() {
+      if (this[ivar] == null) this[ivar] = nil;
+      return this[ivar][method]();
+    }
+  }
 
   // Initialization
   // --------------
@@ -2864,7 +2908,7 @@
 
   // Instantiate the main object
   Opal.top = new _Object();
-  Opal.top.$to_s = Opal.top.$inspect = function() { return 'main' };
+  Opal.top.$to_s = Opal.top.$inspect = $return_val('main');
   Opal.top.$define_method = top_define_method;
 
   // Foward calls to define_method on the top object to Object
