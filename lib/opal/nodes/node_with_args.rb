@@ -2,6 +2,7 @@
 
 require 'opal/nodes/scope'
 require 'opal/nodes/args/parameters'
+require 'opal/nodes/node_with_args/shortcuts'
 
 module Opal
   module Nodes

@@ -18,11 +18,18 @@ module Opal
 
         push version_comment
 
-        in_scope do
-          if body == s(:nil)
-            # A shortpath for empty (stub?) modules.
-            line 'return Opal.nil;'
+        helper :return_val if compiler.eof_content
+
+        if body == s(:nil)
+          # A shortpath for empty (stub?) modules.
+          if compiler.requirable? || compiler.esm? || compiler.eval?
+            unshift 'Opal.return_val(Opal.nil); '
+            definition
           else
+            unshift 'Opal.nil; '
+          end
+        else
+          in_scope do
             line '"use strict";' if compiler.use_strict?
 
             body_code = stmt(stmts)
@@ -48,20 +55,28 @@ module Opal
 
             line body_code
           end
+
+          opening
+          definition
+          closing
         end
-        opening
-        closing
+      end
+
+      def definition
+        if compiler.requirable?
+          unshift "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = "
+        elsif compiler.esm?
+          unshift 'export default '
+        end
       end
 
       def opening
         async_prefix = "async " if await_encountered
 
         if compiler.requirable?
-          unshift "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = #{async_prefix}function(Opal) {"
+          unshift "#{async_prefix}function(Opal) {"
         elsif compiler.eval?
           unshift "(#{async_prefix}function(Opal, self) {"
-        elsif compiler.esm?
-          unshift "export default Opal.queue(#{async_prefix}function(Opal) {"
         else
           unshift "Opal.queue(#{async_prefix}function(Opal) {"
         end
@@ -109,7 +124,7 @@ module Opal
       def compile_end_construct
         if content = compiler.eof_content
           line 'var $__END__ = Opal.Object.$new();'
-          line "$__END__.$read = function() { return #{content.inspect}; };"
+          line "$__END__.$read = $return_val(#{content.inspect});"
         end
       end
 
