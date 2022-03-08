@@ -22,7 +22,6 @@ opal_filter "Hash" do
   fails "Hash#invert compares new keys with eql? semantics" # spec relies on integer and float being different
   fails "Hash#rehash removes duplicate keys for large hashes" # Expected 102 == 101 to be truthy but was false
   fails "Hash#rehash removes duplicate keys" # Expected 2 to equal 1
-  fails "Hash#shift allows shifting entries while iterating" # Exception: Cannot read property '$$is_string' of undefined
   fails "Hash#store does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#store keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
   fails "Hash#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject/) but no exception was raised ({"a"=>1} was returned)
