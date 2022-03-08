@@ -423,7 +423,7 @@ class ::Hash
     return enum_for(:each) { size } unless block
 
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
@@ -444,7 +444,7 @@ class ::Hash
     return enum_for(:each_key) { size } unless block
 
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
+      for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key; i < length; i++) {
         key = keys[i];
 
         block(key.$$is_string ? key : key.key);
