@@ -41,7 +41,7 @@ module Opal
 
       data || begin
                 compiler = yield
-                cache.set(key, compiler)
+                cache.set(key, compiler) unless compiler.dynamic_cache_result
                 compiler
               end
     end

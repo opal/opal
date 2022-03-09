@@ -1,11 +1,8 @@
 require 'lib/spec_helper'
+require 'support/rewriters_helper'
 
 RSpec.describe Opal::Rewriters::DotJsSyntax do
-  def s(type, *children)
-    ::Opal::AST::Node.new(type, children)
-  end
-
-  let(:rewriter) { Opal::Rewriters::DotJsSyntax.new }
+  include RewritersHelper
 
   context '.JS. syntax' do
     let(:send_node) do

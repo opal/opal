@@ -51,7 +51,6 @@ module Opal
       end
 
       alias on_iter       process_regular_node
-      alias on_top        process_regular_node
       alias on_zsuper     process_regular_node
       alias on_jscall     on_send
       alias on_jsattr     process_regular_node
@@ -123,6 +122,18 @@ module Opal
         error = ::Opal::RewritingError.new(msg)
         error.location = current_node.loc if current_node
         raise error
+      end
+
+      def on_top(node)
+        node = process_regular_node(node)
+        node.meta[:dynamic_cache_result] = true if @dynamic_cache_result
+        node
+      end
+
+      # Called when a given transformation is deemed to be dynamic, so
+      # that cache is conditionally disabled for a given file.
+      def dynamic!
+        @dynamic_cache_result = true
       end
     end
   end

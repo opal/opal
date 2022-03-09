@@ -1,20 +1,8 @@
 require 'lib/spec_helper'
+require 'support/rewriters_helper'
 
 RSpec.describe Opal::Rewriters::OpalEngineCheck do
-  def s(type, *children)
-    ::Opal::AST::Node.new(type, children)
-  end
-
-  let(:rewriter) { Opal::Rewriters::OpalEngineCheck.new }
-
-  def expect_rewritten(node)
-    processed = rewriter.process(node)
-    expect(processed)
-  end
-
-  def expect_no_rewriting_for(node)
-    expect_rewritten(node).to eq(node)
-  end
+  include RewritersHelper
 
   let(:opal_str_sexp) { s(:str, 'opal') }
   let(:true_branch) { s(:int, 1) }

@@ -21,7 +21,7 @@ RSpec.describe Opal::Rubyspec::FiltersRewriter do
     SOURCE
   end
 
-  let(:ast) { ast_of(source) }
+  let(:ast) { parse(source) }
 
   context 'when spec is filtered' do
     around(:each) do |e|
@@ -44,16 +44,24 @@ RSpec.describe Opal::Rubyspec::FiltersRewriter do
       SOURCE
     end
 
-    let(:expected_ast) { ast_of(rewritten_source) }
+    let(:expected_ast) { parse(rewritten_source) }
 
     it 'replaces it with nil' do
       expect_rewritten(ast).to eq(expected_ast)
+    end
+
+    it 'disables cache' do
+      expect(rewritten(ast).meta[:dynamic_cache_result]).to be_truthy
     end
   end
 
   context 'when spec is not filtered' do
     it 'does not rewrite it' do
       expect_no_rewriting_for(ast)
+    end
+
+    it 'disables cache' do
+      expect(rewritten(ast).meta[:dynamic_cache_result]).to be_truthy
     end
   end
 end

@@ -29,8 +29,9 @@ module Opal
       end
 
       def parse(source_buffer)
-        parsed = super
-        rewriten = rewrite(parsed)
+        parsed = super || ::Opal::AST::Node.new(:nil)
+        wrapped = ::Opal::AST::Node.new(:top, [parsed])
+        rewriten = rewrite(wrapped)
         rewriten
       end
 

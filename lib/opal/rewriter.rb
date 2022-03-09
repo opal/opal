@@ -19,6 +19,8 @@ require 'opal/rewriters/forward_args'
 
 module Opal
   class Rewriter
+    @disabled = false
+
     class << self
       def list
         @list ||= []
@@ -32,15 +34,21 @@ module Opal
         list.delete(rewriter)
       end
 
-      def disable
-        @disabled = true
+      def disable(except: nil)
+        old_disabled = @disabled
+        @disabled = except || true
         yield
       ensure
-        @disabled = false
+        @disabled = old_disabled
       end
 
       def disabled?
-        @disabled if defined?(@disabled)
+        @disabled == true
+      end
+
+      def rewritter_disabled?(rewriter)
+        return false if @disabled == false
+        @disabled != rewriter
       end
     end
 
@@ -69,6 +77,7 @@ module Opal
       return @sexp if self.class.disabled?
 
       self.class.list.each do |rewriter_class|
+        next if self.class.rewritter_disabled?(rewriter_class)
         rewriter = rewriter_class.new
         @sexp = rewriter.process(@sexp)
       end

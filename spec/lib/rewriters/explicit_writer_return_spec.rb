@@ -1,21 +1,8 @@
 require 'lib/spec_helper'
+require 'support/rewriters_helper'
 
 RSpec.describe Opal::Rewriters::ExplicitWriterReturn do
-  def s(type, *children)
-    ::Opal::AST::Node.new(type, children)
-  end
-
-  let(:rewriter) { Opal::Rewriters::ExplicitWriterReturn.new }
-  let(:processed) { rewriter.process(input) }
-
-  def expect_rewritten(sexp)
-    processed = rewriter.process(sexp)
-    expect(processed)
-  end
-
-  def expect_no_rewriting_for(sexp)
-    expect_rewritten(sexp).to eq(sexp)
-  end
+  include RewritersHelper
 
   let(:receiver) do
     # self.a
