@@ -1,6 +1,7 @@
 ### Added
 
 - Introduce timezone support for Time (#2394)
+- DateTime and Date refactor (#2398)
 
 ### Changed
 
@@ -15,6 +16,11 @@
 ### Fixed
 
 - Fix `Regexp.new`, previously `\A` and `\z` didn't match beginning and end of input (#2079)
+- Fix exception during `Hash#each` and `Hash#each_key` if keys get deleted during the loop (#2403)
+
+### Internal
+
+- Rewriters refactor, fix interaction between cache and iverted runner (#2400)
 
 <!--
 ### Internal
