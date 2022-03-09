@@ -51,6 +51,11 @@ opal_filter "Time" do
   fails "Time#strftime with %N formats the nanoseconds of the second with %N"
   fails "Time#strftime with %N formats the picoseconds of the second with %12N"
   fails "Time#subsec returns 0 as an Integer for a Time with a whole number of seconds" # NoMethodError: undefined method `subsec' for 1970-01-01 01:01:40 +0100
+  fails "Time#to_date yields accurate julian date for Julian-Gregorian gap value" # Expected 2299170 == 2299160 to be truthy but was false
+  fails "Time#to_date yields accurate julian date for ambiguous pre-Gregorian reform value" # Expected 2299160 == 2299150 to be truthy but was false
+  fails "Time#to_date yields accurate julian date for post-Gregorian reform value" # Expected 2299171 == 2299161 to be truthy but was false
+  fails "Time#to_date yields same julian day regardless of UTC time value" # Expected 2299171 == 2299161 to be truthy but was false
+  fails "Time#to_date yields same julian day regardless of local time or zone" # Expected 2299171 == 2299161 to be truthy but was false
   fails "Time#to_f returns the float number of seconds + usecs since the epoch"
   fails "Time#to_i rounds fractional seconds toward zero" # Expected -315619200 == -315619199 to be truthy but was false
   fails "Time#tv_sec rounds fractional seconds toward zero" # Expected -315619200 == -315619199 to be truthy but was false
@@ -74,6 +79,7 @@ opal_filter "Time" do
   fails "Time.at passed non-Time, non-Numeric with an argument that responds to #to_r needs for the argument to respond to #to_int too" # Mock 'rational-but-no-to_int' expected to receive to_r("any_args") exactly 1 times but received it 0 times
   fails "Time.gm handles fractional usec close to rounding limit" # NoMethodError: undefined method `nsec' for 2000-01-01 12:30:00 UTC:Time
   fails "Time.gm raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 UTC was returned)
+  fails "Time.httpdate parses RFC-2616 strings" # NoMethodError: undefined method `httpdate' for Time
   fails "Time.local raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 +0200 was returned)
   fails "Time.mktime raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 +0200 was returned)
   fails "Time.new has at least microsecond precision" # NoMethodError: undefined method `nsec' for 2019-05-16 23:25:01 +0200
@@ -101,6 +107,11 @@ opal_filter "Time" do
   fails "Time.new with a utc_offset argument returns a Time with a UTC offset specified as +HH:MM:SS" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
   fails "Time.now has at least microsecond precision" # NoMethodError: undefined method `nsec' for 2019-05-16 23:25:03 +0200
   fails "Time.now uses the local timezone" # Expected 10800 to equal -28800
+  fails "Time.rfc2822 parses RFC-2822 strings" # NoMethodError: undefined method `rfc2822' for Time
+  fails "Time.rfc2822 parses RFC-822 strings" # NoMethodError: undefined method `rfc2822' for Time
+  fails "Time.rfc822 parses RFC-2822 strings" # NoMethodError: undefined method `rfc2822' for Time
+  fails "Time.rfc822 parses RFC-822 strings" # NoMethodError: undefined method `rfc2822' for Time
   fails "Time.utc handles fractional usec close to rounding limit" # NoMethodError: undefined method `nsec' for 2000-01-01 12:30:00 UTC:Time
   fails "Time.utc raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 UTC was returned)
+  fails "Time.xmlschema parses ISO-8601 strings" # NoMethodError: undefined method `xmlschema' for Time
 end

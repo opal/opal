@@ -20,9 +20,7 @@ opal_filter "Date" do
   fails "Date#julian converts a date object into another with the Julian calendar"
   fails "Date#julian? marks a day before the calendar reform as Julian"
   fails "Date#ld determines the Modified Julian day"
-  fails "Date#mday determines the day of the month"
   fails "Date#mjd determines the Modified Julian day"
-  fails "Date#mon determines the month"
   fails "Date#new_start converts a date object into another with a new calendar reform"
   fails "Date#parse coerces using to_str" # ArgumentError: invalid date
   fails "Date#parse parses a day name into a Date object"
@@ -72,7 +70,6 @@ opal_filter "Date" do
   fails "Date#valid_date? handles negative months and days"
   fails "Date#valid_date? returns false if it is not a valid civil date"
   fails "Date#valid_date? returns true if it is a valid civil date"
-  fails "Date#yday determines the year"
   fails "Date._iso8601 returns an empty hash if the argument is a invalid Date" # NoMethodError: undefined method `_iso8601' for Date
   fails "Date._rfc3339 returns an empty hash if the argument is a invalid Date" # NoMethodError: undefined method `_rfc3339' for Date
   fails "Date.iso8601 parses YYYY-MM-DD into a Date object" # NoMethodError: undefined method `iso8601' for Date

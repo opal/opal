@@ -1,77 +1,10 @@
+require 'forwardable'
+require 'date/infinity'
+require 'time'
+
 class Date
   include Comparable
-
-  class Infinity < Numeric
-    include Comparable
-
-    def initialize(d = 1)
-      @d = d <=> 0
-    end
-
-    attr_reader :d
-
-    def zero?
-      false
-    end
-
-    def finite?
-      false
-    end
-
-    def infinite?
-      d.nonzero?
-    end
-
-    def nan?
-      d.zero?
-    end
-
-    def abs
-      self.class.new
-    end
-
-    def -@
-      self.class.new(-d)
-    end
-
-    def +@
-      self.class.new(+d)
-    end
-
-    def <=>(other)
-      case other
-      when Infinity
-        d <=> other.d
-      when Numeric
-        d
-      else
-        begin
-          l, r = other.coerce(self)
-          l <=> r
-        rescue NoMethodError
-          nil
-        end
-      end
-    end
-
-    def coerce(other)
-      case other
-      when Numeric
-        [-d, d]
-      else
-        super
-      end
-    end
-
-    def to_f
-      return 0 if @d == 0
-      if @d > 0
-        Float::INFINITY
-      else
-        -Float::INFINITY
-      end
-    end
-  end
+  extend Forwardable
 
   JULIAN          = Infinity.new
   GREGORIAN       = -Infinity.new
@@ -85,6 +18,7 @@ class Date
   class << self
     def wrap(native)
       instance = allocate
+      `#{instance}.start = #{ITALY}`
       `#{instance}.date = #{native}`
       instance
     end
@@ -354,73 +288,12 @@ class Date
         day = 4;
       }
     }
+
     @date = `new Date(year, month - 1, day)`
+    @start = start
   end
 
-  def -(date)
-    %x{
-      if (date.$$is_number) {
-        var result = #{clone};
-        result.date.setDate(#{@date}.getDate() - date);
-        return result;
-      }
-      else if (date.date) {
-        return Math.round((#{@date} - #{date}.date) / (1000 * 60 * 60 * 24));
-      }
-      else {
-        #{raise TypeError};
-      }
-    }
-  end
-
-  def +(date)
-    %x{
-      if (date.$$is_number) {
-        var result = #{clone};
-        result.date.setDate(#{@date}.getDate() + date);
-        return result;
-      }
-      else {
-        #{raise TypeError};
-      }
-    }
-  end
-
-  def <(other)
-    %x{
-      var a = #{@date}, b = #{other}.date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
-      return a < b;
-    }
-  end
-
-  def <=(other)
-    %x{
-      var a = #{@date}, b = #{other}.date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
-      return a <= b;
-    }
-  end
-
-  def >(other)
-    %x{
-      var a = #{@date}, b = #{other}.date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
-      return a > b;
-    }
-  end
-
-  def >=(other)
-    %x{
-      var a = #{@date}, b = #{other}.date;
-      a.setHours(0, 0, 0, 0);
-      b.setHours(0, 0, 0, 0);
-      return a >= b;
-    }
-  end
+  attr_reader :start
 
   def <=>(other)
     %x{
@@ -428,10 +301,10 @@ class Date
         return #{jd <=> other}
       }
 
-      if (#{Date === other}) {
+      if (#{::Date === other}) {
         var a = #{@date}, b = #{other}.date;
-        a.setHours(0, 0, 0, 0);
-        b.setHours(0, 0, 0, 0);
+        if (!Opal.is_a(#{self}, #{::DateTime})) a.setHours(0, 0, 0, 0);
+        if (!Opal.is_a(#{other}, #{::DateTime})) b.setHours(0, 0, 0, 0);
 
         if (a < b) {
           return -1;
@@ -449,40 +322,28 @@ class Date
   end
 
   def >>(n)
-    %x{
-      if (!n.$$is_number) {
-        #{raise TypeError};
-      }
+    `if (!n.$$is_number) #{raise ::TypeError}`
 
-      var result = #{clone}, date = result.date, cur = date.getDate();
-      date.setDate(1);
-      date.setMonth(date.getMonth() + n);
-      date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
-      return result;
-    }
+    self << -n
   end
 
   def <<(n)
-    %x{
-      if (!n.$$is_number) {
-        #{raise TypeError};
-      }
+    `if (!n.$$is_number) #{raise ::TypeError}`
 
-      return #{self >> `-n`};
-    }
+    prev_month(n)
   end
 
   def clone
-    Date.wrap(`new Date(#{@date}.getTime())`)
+    date = Date.wrap(@date.dup)
+    `date.start = #{@start}`
+    date
   end
 
-  def day
-    `#{@date}.getDate()`
-  end
+  def_delegators :@date, :sunday?, :monday?, :tuesday?, :wednesday?, :thursday?, :friday?, :saturday?,
+    :day, :month, :year, :wday, :yday
 
-  def friday?
-    wday == 5
-  end
+  alias mday day
+  alias mon month
 
   def jd
     %x{
@@ -524,56 +385,71 @@ class Date
     `#{@date} < new Date(1582, 10 - 1, 15, 12)`
   end
 
-  def monday?
-    wday == 1
-  end
-
-  def month
-    `#{@date}.getMonth() + 1`
+  def new_start(start)
+    new_date = clone
+    `new_date.start = start`
+    new_date
   end
 
   def next
     self + 1
   end
 
-  def next_day(n = 1)
-    self + n
-  end
-
-  def next_month(n = 1)
+  def -(date)
     %x{
-      var result = #{clone}, date = result.date, cur = date.getDate();
-      date.setDate(1);
-      date.setMonth(date.getMonth() + n);
-      date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
-      return result;
+      if (date.date) {
+        return Math.round((#{@date} - #{date}.date) / (1000 * 60 * 60 * 24));
+      }
     }
+    prev_day(date)
   end
 
-  def next_year(years = 1)
-    self.class.new(year + years, month, day)
+  def +(date)
+    next_day(date)
   end
 
   def prev_day(n = 1)
-    self - n
+    %x{
+      if (n.$$is_number) {
+        var result = #{clone};
+        result.date.setDate(#{@date}.getDate() - n);
+        return result;
+      }
+      else {
+        #{raise ::TypeError};
+      }
+    }
+  end
+
+  def next_day(n = 1)
+    `if (!n.$$is_number) #{raise ::TypeError}`
+    prev_day(-n)
   end
 
   def prev_month(n = 1)
     %x{
+      if (!n.$$is_number) #{raise ::TypeError}
       var result = #{clone}, date = result.date, cur = date.getDate();
       date.setDate(1);
       date.setMonth(date.getMonth() - n);
-      date.setDate(Math.min(cur, days_in_month(date.getFullYear(), date.getMonth())));
+      date.setDate(Math.min(cur, #{Date._days_in_month(`date.getFullYear()`, `date.getMonth()`)}));
       return result;
     }
   end
 
+  def next_month(n = 1)
+    `if (!n.$$is_number) #{raise ::TypeError}`
+    prev_month(-n)
+  end
+
   def prev_year(years = 1)
+    `if (!years.$$is_number) #{raise ::TypeError}`
     self.class.new(year - years, month, day)
   end
 
-  def saturday?
-    wday == 6
+  def next_year(years = 1)
+    `if (!years.$$is_number) #{raise ::TypeError}`
+    prev_year(-years)
   end
 
   def strftime(format = '')
@@ -582,16 +458,8 @@ class Date
         return #{to_s};
       }
 
-      return #{@date}.$strftime(#{format});
+      return #{@date.strftime(format)}
     }
-  end
-
-  def sunday?
-    wday == 0
-  end
-
-  def thursday?
-    wday == 4
   end
 
   def to_s
@@ -607,12 +475,16 @@ class Date
     Time.new(year, month, day)
   end
 
-  def to_n
-    @date
+  def to_date
+    self
   end
 
-  def tuesday?
-    wday == 2
+  def to_datetime
+    DateTime.new(year, month, day)
+  end
+
+  def to_n
+    @date
   end
 
   def step(limit, step = 1, &block)
@@ -621,7 +493,7 @@ class Date
     steps = if steps_count * step < 0
               []
             elsif steps_count < 0
-              (0..-steps_count).step(step.abs).map(&:-@) .reverse
+              (0..-steps_count).step(step.abs).map(&:-@).reverse
             else
               (0..steps_count).step(step.abs)
             end
@@ -645,18 +517,6 @@ class Date
     step(min, -1, &block)
   end
 
-  def wday
-    `#{@date}.getDay()`
-  end
-
-  def wednesday?
-    wday == 3
-  end
-
-  def year
-    `#{@date}.getFullYear()`
-  end
-
   def cwday
     `#{@date}.getDay() || 7`
   end
@@ -670,13 +530,16 @@ class Date
     }
   end
 
-  %x{
-    function days_in_month(year, month) {
+  def self._days_in_month(year, month)
+    %x{
       var leap = ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0);
-      return [31, (leap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
+      return [31, (leap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
     }
-  }
+  end
 
   alias eql? ==
   alias succ next
 end
+
+require 'date/date_time'
+require 'date/formatters'
