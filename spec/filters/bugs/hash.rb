@@ -9,7 +9,6 @@ opal_filter "Hash" do
   fails "Hash#[]= does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#[]= keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
   fails "Hash#compare_by_identity gives different identity for string literals" # Expected [2] to equal [1, 2]
-  fails "Hash#delete allows removing a key while iterating" # Exception: Cannot read property '$$is_string' of undefined
   fails "Hash#each always yields an Array of 2 elements, even when given a callable of arity 2" # Expected ArgumentError but no exception was raised ({"a"=>1} was returned)
   fails "Hash#each_pair always yields an Array of 2 elements, even when given a callable of arity 2" # Expected ArgumentError but no exception was raised ({"a"=>1} was returned)
   fails "Hash#eql? compares keys with eql? semantics" # spec relies on integer and float being different
@@ -23,7 +22,6 @@ opal_filter "Hash" do
   fails "Hash#invert compares new keys with eql? semantics" # spec relies on integer and float being different
   fails "Hash#rehash removes duplicate keys for large hashes" # Expected 102 == 101 to be truthy but was false
   fails "Hash#rehash removes duplicate keys" # Expected 2 to equal 1
-  fails "Hash#shift allows shifting entries while iterating" # Exception: Cannot read property '$$is_string' of undefined
   fails "Hash#store does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Hash#store keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
   fails "Hash#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject/) but no exception was raised ({"a"=>1} was returned)
