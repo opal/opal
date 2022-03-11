@@ -155,14 +155,14 @@ namespace :performance do
     puts diff
 
     if diff_lines.grep(/^-\s+\[COMPILED\]/).count > 0
-      failure.("Some methods are no longer compiled on V8")
+      $failures << "Some methods are no longer compiled on V8"
     end
 
     puts
     puts "Comparison of the Asciidoctor (a real-life Opal application) compile and run:"
 
-    failure.("Wrong result on the current branch") unless current[:correct]
-    failure.("Wrong result on the previous branch - ignore it") unless previous[:correct]
+    $failures << "Wrong result on the current branch" unless current[:correct]
+    $failures << "Wrong result on the previous branch - ignore it" unless previous[:correct]
 
     current[:compiler_time].compare_to(previous[:compiler_time], "Compile time")
     current[:run_time     ].compare_to(previous[:run_time     ], "Run time")
