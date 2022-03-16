@@ -2,6 +2,7 @@
 
 - Introduce timezone support for Time (#2394)
 - DateTime and Date refactor (#2398)
+- Implement `Number#prev_float`/`#next_float` (#2404)
 
 ### Changed
 
