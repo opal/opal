@@ -45,13 +45,17 @@ module Opal
         handle_special do
           compiler.method_calls << meth.to_sym if record_method?
 
-          # if trying to access an lvar in eval or irb mode
-          return compile_eval_var if using_eval?
-
-          # if trying to access an lvar in irb mode
-          return compile_irb_var if using_irb?
-
-          default_compile
+          with_writer do
+            if using_eval?
+              # if trying to access an lvar in eval or irb mode
+              compile_eval_var
+            elsif using_irb?
+              # if trying to access an lvar in irb mode
+              compile_irb_var
+            else
+              default_compile
+            end
+          end
         end
       end
 
@@ -81,7 +85,7 @@ module Opal
       # to a method body. This is some kind of protection from method calls
       # like 'a(a {}) { 1 }'.
       def invoke_using_send?
-        iter || splat?
+        iter || splat? || call_is_writer_that_needs_handling?
       end
 
       def invoke_using_refinement?
@@ -150,10 +154,12 @@ module Opal
         push ", '#{meth}'"
       end
 
-      def compile_arguments
-        push ', '
+      def compile_arguments(skip_comma = false)
+        push ', ' unless skip_comma
 
-        if splat?
+        if @with_writer_temp
+          push @with_writer_temp
+        elsif splat?
           push expr(arglist)
         elsif arglist.children.empty?
           push '[]'
@@ -448,6 +454,31 @@ module Opal
             recv.children.last == :Module # is Module
           )
         )
+      end
+
+      def with_writer(&block)
+        if call_is_writer_that_needs_handling?
+          handle_writer(&block)
+        else
+          yield
+        end
+      end
+
+      def call_is_writer_that_needs_handling?
+        (expr? || recv?) && (meth.to_s =~ /^\w+=$/ || meth == :[]=)
+      end
+
+      def handle_writer
+        with_temp do |temp|
+          push "(#{temp} = "
+          compile_arguments(true)
+          push ", "
+          @with_writer_temp = temp
+          yield
+          @with_writer_temp = false
+          push ", "
+          push "#{temp}[#{temp}.length - 1])"
+        end
       end
 
       class DependencyResolver
