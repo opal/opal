@@ -11,24 +11,23 @@ module Opal
       children :lhs, :rhs
 
       def compile
-        array = scope.new_temp
-
-        if rhs.type == :array
-          push "#{array} = ", expr(rhs)
-          rhs_len = rhs.children.any? { |c| c.type == :splat } ? nil : rhs.children.size
-          compile_masgn(lhs.children, array, rhs_len)
-          push ", #{array}" # a mass assignment evaluates to the RHS
-        else
-          helper :to_ary
-          retval = scope.new_temp
-          push "#{retval} = ", expr(rhs)
-          push ", #{array} = $to_ary(#{retval})"
-          compile_masgn(lhs.children, array)
-          push ", #{retval}"
-          scope.queue_temp(retval)
+        with_temp do |array|
+          if rhs.type == :array
+            push "#{array} = ", expr(rhs)
+            rhs_len = rhs.children.any? { |c| c.type == :splat } ? nil : rhs.children.size
+            compile_masgn(lhs.children, array, rhs_len)
+            push ", #{array}" # a mass assignment evaluates to the RHS
+          else
+            helper :to_ary
+            with_temp do |retval|
+              retval = scope.new_temp
+              push "#{retval} = ", expr(rhs)
+              push ", #{array} = $to_ary(#{retval})"
+              compile_masgn(lhs.children, array)
+              push ", #{retval}"
+            end
+          end
         end
-
-        scope.queue_temp(array)
       end
 
       # 'len' is how many rhs items are we sure we have

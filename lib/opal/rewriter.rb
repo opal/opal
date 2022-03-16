@@ -2,7 +2,6 @@
 
 require 'opal/rewriters/opal_engine_check'
 require 'opal/rewriters/for_rewriter'
-require 'opal/rewriters/explicit_writer_return'
 require 'opal/rewriters/js_reserved_words'
 require 'opal/rewriters/block_to_iter'
 require 'opal/rewriters/dot_js_syntax'
@@ -62,7 +61,6 @@ module Opal
     use Rewriters::JsReservedWords
     use Rewriters::LogicalOperatorAssignment
     use Rewriters::BinaryOperatorAssignment
-    use Rewriters::ExplicitWriterReturn
     use Rewriters::Hashes::KeyDuplicatesRewriter
     use Rewriters::ReturnableLogic
     use Rewriters::DumpArgs
