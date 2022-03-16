@@ -399,6 +399,7 @@ class ::Module
       if (typeof(Proxy) !== 'undefined') {
         var meta = Object.create(null)
 
+        block.$$proxy_target = block
         block = new Proxy(block, {
           apply: function(target, self, args) {
             var old_name = target.$$jsid
