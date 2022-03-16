@@ -805,6 +805,67 @@ class ::Number < ::Numeric
     `self == -Infinity || 1 / self < 0`
   end
 
+  %x{
+    function numberToUint8Array(num) {
+      var uint8array = new Uint8Array(8);
+      new DataView(uint8array.buffer).setFloat64(0, num, true);
+      return uint8array;
+    }
+
+    function uint8ArrayToNumber(arr) {
+      return new DataView(arr.buffer).getFloat64(0, true);
+    }
+
+    function incrementNumberBit(num) {
+      var arr = numberToUint8Array(num);
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === 0xff) {
+          arr[i] = 0;
+        } else {
+          arr[i]++;
+          break;
+        }
+      }
+      return uint8ArrayToNumber(arr);
+    }
+
+    function decrementNumberBit(num) {
+      var arr = numberToUint8Array(num);
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === 0) {
+          arr[i] = 0xff;
+        } else {
+          arr[i]--;
+          break;
+        }
+      }
+      return uint8ArrayToNumber(arr);
+    }
+  }
+
+  def next_float
+    return ::Float::INFINITY if self == ::Float::INFINITY
+    return ::Float::NAN if nan?
+
+    if self >= 0
+      # Math.abs() is needed to handle -0.0
+      `incrementNumberBit(Math.abs(self))`
+    else
+      `decrementNumberBit(self)`
+    end
+  end
+
+  def prev_float
+    return -::Float::INFINITY if self == -::Float::INFINITY
+    return ::Float::NAN if nan?
+
+    if self > 0
+      `decrementNumberBit(self)`
+    else
+      `-incrementNumberBit(Math.abs(self))`
+    end
+  end
+
   alias arg angle
   alias eql? ==
   alias fdiv /

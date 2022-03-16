@@ -26,24 +26,6 @@ opal_filter "Float" do
   fails "Float#inspect uses non-e format for a positive value with whole part having 15 significant figures" # Expected "10000000000000" == "10000000000000.0" to be truthy but was false
   fails "Float#inspect uses non-e format for a positive value with whole part having 16 significant figures" # Expected "100000000000000" == "100000000000000.0" to be truthy but was false
   fails "Float#negative? on negative zero returns false" # Expected true to be false
-  fails "Float#next_float gives the same result for -0.0 as for +0.0" # NoMethodError: undefined method `next_float' for 0
-  fails "Float#next_float returns Float::INFINITY for Float::INFINITY" # NoMethodError: undefined method `next_float' for Infinity
-  fails "Float#next_float returns NAN if NAN was the receiver"
-  fails "Float#next_float returns a float the smallest possible step greater than the receiver"
-  fails "Float#next_float returns negative zero when stepping upward from just below zero"
-  fails "Float#next_float reverses the effect of prev_float for all Floats except INFINITY and +0.0" # NoMethodError: undefined method `prev_float' for -0.739980680635199
-  fails "Float#next_float steps directly between -1.0 and -1.0 + EPSILON/2"
-  fails "Float#next_float steps directly between 1.0 and 1.0 + EPSILON"
-  fails "Float#next_float steps directly between MAX and INFINITY"
-  fails "Float#prev_float gives the same result for -0.0 as for +0.0" # NoMethodError: undefined method `prev_float' for 0
-  fails "Float#prev_float returns -Float::INFINITY for -Float::INFINITY" # NoMethodError: undefined method `prev_float' for -Infinity
-  fails "Float#prev_float returns NAN if NAN was the receiver"
-  fails "Float#prev_float returns a float the smallest possible step smaller than the receiver"
-  fails "Float#prev_float returns positive zero when stepping downward from just above zero"
-  fails "Float#prev_float reverses the effect of next_float for all Floats except -INFINITY and -0.0" # NoMethodError: undefined method `next_float' for 0.7192216026596725
-  fails "Float#prev_float steps directly between -1.0 and -1.0 - EPSILON"
-  fails "Float#prev_float steps directly between 1.0 and 1.0 - EPSILON/2"
-  fails "Float#prev_float steps directly between MAX and INFINITY"
   fails "Float#rationalize returns self as a simplified Rational with no argument" # precision errors caused by Math.frexp and Math.ldexp
   fails "Float#round raise for a non-existent round mode" # TypeError: no implicit conversion of Hash into Integer
   fails "Float#round raises FloatDomainError for exceptional values with a half option" # TypeError: no implicit conversion of Hash into Integer
