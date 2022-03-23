@@ -20,7 +20,6 @@ module Opal
           else
             helper :to_ary
             with_temp do |retval|
-              retval = scope.new_temp
               push "#{retval} = ", expr(rhs)
               push ", #{array} = $to_ary(#{retval})"
               compile_masgn(lhs.children, array)
