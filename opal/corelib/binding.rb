@@ -50,5 +50,11 @@ module ::Kernel
   end
 end
 
-TOPLEVEL_BINDING = binding
-`#{TOPLEVEL_BINDING}.source_location = ["<main>", 0]`
+TOPLEVEL_BINDING = ::Binding.new(
+  %x{
+    function(js) {
+      return (new Function("self", "return " + js))(self);
+    }
+  },
+  [], self, ['<main>', 0]
+)
