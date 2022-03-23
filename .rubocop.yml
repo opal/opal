@@ -365,6 +365,7 @@ Naming/FileName:
     - 'stdlib/opal-parser.rb'
     - 'stdlib/opal-platform.rb'
     - 'stdlib/opal-source-maps.rb'
+    - 'stdlib/opal-replutils.rb'
 
 Naming/ConstantName:
   Exclude:
