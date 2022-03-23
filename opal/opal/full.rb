@@ -5,4 +5,3 @@
 ::Object.require 'corelib/pattern_matching/base'
 ::Object.autoload :PatternMatching, 'corelib/pattern_matching'
 ::Object.autoload :TracePoint, 'corelib/trace_point'
-::Object.require 'corelib/binding'

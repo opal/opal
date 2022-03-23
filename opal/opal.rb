@@ -10,7 +10,7 @@
 ::Object.autoload :Rational, 'corelib/rational'
 ::Object.require 'corelib/time'
 ::Object.autoload :Struct, 'corelib/struct'
-::Object.require 'corelib/dir'
+::Object.autoload :Dir, 'corelib/dir'
 ::Object.autoload :File, 'corelib/file'
 
 ::Object.require 'corelib/process/base'
@@ -18,3 +18,6 @@
 ::Object.autoload :Random, 'corelib/random'
 
 ::Object.require 'corelib/unsupported'
+
+::Object.require 'corelib/binding'
+::Object.require 'corelib/debug'
