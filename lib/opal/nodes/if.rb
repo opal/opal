@@ -275,8 +275,8 @@ module Opal
           case body.type
           when :break, :redo, :retry
             false
-          when :iter
-            # Don't traverse the iters!
+          when :iter, :while
+            # Don't traverse the iters or whiles!
             true
           else
             body.children.all? { |i| valid_switch_body?(i, check_variable) }
