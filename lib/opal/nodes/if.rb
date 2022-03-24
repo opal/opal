@@ -169,10 +169,32 @@ module Opal
         )
       end
 
+      SWITCH_TEST_MATCH_CONTINUED = AST::Matcher.new do
+        s(:if,
+          s(:send,
+            cap(s(%i[int sym str], :*)), :===,
+            s(:lvasgn, cap(:*), cap(:*))
+          ),
+          s(:true),
+          cap(:*)
+        )
+      end
+
       SWITCH_BRANCH_TEST_MATCH = AST::Matcher.new do
         s(:send,
           cap(s(%i[int sym str], :*)), :===,
           s(:js_tmp, cap(:*))
+        )
+      end
+
+      SWITCH_BRANCH_TEST_MATCH_CONTINUED = AST::Matcher.new do
+        s(:if,
+          s(:send,
+            cap(s(%i[int sym str], :*)), :===,
+            s(:js_tmp, cap(:*))
+          ),
+          s(:true),
+          cap(:*)
         )
       end
 
@@ -181,13 +203,29 @@ module Opal
 
         return true if sexp.meta[:switch_child]
 
-        test_match = SWITCH_TEST_MATCH.match(test)
+        test_match = SWITCH_TEST_MATCH.match(test) || SWITCH_TEST_MATCH_CONTINUED.match(test)
         return false unless test_match
-        @switch_test, @switch_variable, @switch_first_test = *test_match
+        @switch_test, @switch_variable, @switch_first_test, additional_rules = *test_match
+
+        @switch_additional_rules = handle_additional_switch_rules(additional_rules)
 
         return false unless valid_switch_body?(true_body)
 
         could_become_switch_branch?(false_body)
+      end
+
+      def handle_additional_switch_rules(additional_rules)
+        switch_additional_rules = []
+        while additional_rules
+          match = SWITCH_BRANCH_TEST_MATCH.match(additional_rules) || SWITCH_BRANCH_TEST_MATCH_CONTINUED.match(additional_rules)
+          return false unless match
+
+          switch_test, switch_variable, additional_rules = *match
+          return false unless switch_variable == @switch_variable
+
+          switch_additional_rules << switch_test
+        end
+        switch_additional_rules
       end
 
       def could_become_switch_branch?(body)
@@ -203,9 +241,11 @@ module Opal
 
         test, true_body, false_body = *body
 
-        test_match = SWITCH_BRANCH_TEST_MATCH.match(test)
+        test_match = SWITCH_BRANCH_TEST_MATCH.match(test) || SWITCH_BRANCH_TEST_MATCH_CONTINUED.match(test)
         return false unless test_match
-        switch_test, switch_variable = *test_match
+        switch_test, switch_variable, additional_rules = *test_match
+
+        switch_additional_rules = handle_additional_switch_rules(additional_rules)
 
         return false unless switch_variable == @switch_variable
 
@@ -214,7 +254,8 @@ module Opal
 
         body.meta.merge!(switch_child: true,
                          switch_test: switch_test,
-                         switch_variable: @switch_variable
+                         switch_variable: @switch_variable,
+                         switch_additional_rules: switch_additional_rules
         )
 
         true
@@ -224,7 +265,7 @@ module Opal
         case body
         when AST::Node
           case body.type
-          when :break, :next, :redo, :retry
+          when :break, :redo, :retry
             false
           else
             body.children.all? { |i| valid_switch_body?(i) }
@@ -237,6 +278,7 @@ module Opal
       def compile_with_switch
         if sexp.meta[:switch_child]
           @switch_variable = sexp.meta[:switch_variable]
+          @switch_additional_rules = sexp.meta[:switch_additional_rules]
           compile_switch_case(sexp.meta[:switch_test])
         else
           line "switch (", expr(@switch_first_test), ") {"
@@ -248,12 +290,17 @@ module Opal
       end
 
       def returning?(body)
-        %i[return js_return].include?(body.type) ||
-          (body.type == :begin && %i[return js_return].include?(body.children.last.type))
+        %i[return js_return next].include?(body.type) ||
+          (body.type == :begin && %i[return js_return next].include?(body.children.last.type))
       end
 
       def compile_switch_case(test)
         line "case ", expr(test), ":"
+        if @switch_additional_rules
+          @switch_additional_rules.each do |rule|
+            line "case ", expr(rule), ":"
+          end
+        end
         indent do
           line stmt(true_body)
           line "break;" if !true_body || !returning?(true_body)

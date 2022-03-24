@@ -24,6 +24,10 @@ module Opal
         @captures
       end
 
+      def inspect
+        "#<Opal::AST::Matcher: #{@root.inspect}>"
+      end
+
       attr_accessor :captures
 
       Node = Struct.new(:type, :children) do
@@ -57,6 +61,14 @@ module Opal
 
             matcher.captures << ast_elem if capture
             res
+          end
+        end
+
+        def inspect
+          if type == :capture
+            "{#{children.first.inspect}}"
+          else
+            "s(#{type.inspect}, #{children.inspect[1..-2]})"
           end
         end
       end
