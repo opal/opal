@@ -227,7 +227,7 @@ module Opal
           when :break, :next, :redo, :retry
             false
           else
-            body.children.all? { |i| simple?(i) }
+            body.children.all? { |i| valid_switch_body?(i) }
           end
         else
           true
