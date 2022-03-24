@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/nodes/base'
+require 'opal/ast/matcher'
 
 module Opal
   module Nodes
@@ -18,6 +19,8 @@ module Opal
           else
             compile_with_ternary
           end
+        elsif could_become_switch?
+          compile_with_switch
         else
           compile_with_if
         end
@@ -156,6 +159,120 @@ module Opal
           end
         else
           true
+        end
+      end
+
+      SWITCH_TEST_MATCH = AST::Matcher.new do
+        s(:send,
+          cap(s(%i[int sym str], :*)), :===,
+          s(:lvasgn, cap(:*), cap(:*))
+        )
+      end
+
+      SWITCH_BRANCH_TEST_MATCH = AST::Matcher.new do
+        s(:send,
+          cap(s(%i[int sym str], :*)), :===,
+          s(:js_tmp, cap(:*))
+        )
+      end
+
+      def could_become_switch?
+        return false if expects_expression?
+
+        return true if sexp.meta[:switch_child]
+
+        test_match = SWITCH_TEST_MATCH.match(test)
+        return false unless test_match
+        @switch_test, @switch_variable, @switch_first_test = *test_match
+
+        return false unless valid_switch_body?(true_body)
+
+        could_become_switch_branch?(false_body)
+      end
+
+      def could_become_switch_branch?(body)
+        if !body
+          return true
+        elsif body.type != :if
+          if valid_switch_body?(body)
+            body.meta[:switch_default] = true
+            return true
+          end
+          return false
+        end
+
+        test, true_body, false_body = *body
+
+        test_match = SWITCH_BRANCH_TEST_MATCH.match(test)
+        return false unless test_match
+        switch_test, switch_variable = *test_match
+
+        return false unless switch_variable == @switch_variable
+
+        return false unless valid_switch_body?(true_body)
+        return false unless could_become_switch_branch?(false_body)
+
+        body.meta.merge!(switch_child: true,
+                         switch_test: switch_test,
+                         switch_variable: @switch_variable
+        )
+
+        true
+      end
+
+      def valid_switch_body?(body)
+        case body
+        when AST::Node
+          case body.type
+          when :break, :next, :redo, :retry
+            false
+          else
+            body.children.all? { |i| simple?(i) }
+          end
+        else
+          true
+        end
+      end
+
+      def compile_with_switch
+        if sexp.meta[:switch_child]
+          @switch_variable = sexp.meta[:switch_variable]
+          compile_switch_case(sexp.meta[:switch_test])
+        else
+          line "switch (", expr(@switch_first_test), ") {"
+          indent do
+            compile_switch_case(@switch_test)
+          end
+          line "}"
+        end
+      end
+
+      def returning?(body)
+        %i[return js_return].include?(body.type) ||
+          (body.type == :begin && %i[return js_return].include?(body.children.last.type))
+      end
+
+      def compile_switch_case(test)
+        line "case ", expr(test), ":"
+        indent do
+          line stmt(true_body)
+          line "break;" if !true_body || !returning?(true_body)
+        end
+        if false_body
+          if false_body.meta[:switch_default]
+            compile_switch_default
+          elsif false_body.meta[:switch_child]
+            push stmt(false_body)
+          end
+        else
+          push stmt(s(:nil))
+        end
+      end
+
+      def compile_switch_default
+        line "default:"
+        indent do
+          line stmt(false_body)
         end
       end
     end
