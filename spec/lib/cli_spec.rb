@@ -84,7 +84,7 @@ RSpec.describe Opal::CLI do
     context 'when false' do
       let(:options) { {lib_only: false, runner: :compiler, evals: [''], skip_opal_require: true, no_exit: true} }
       it 'appends an empty code block at the end of the source' do
-        expect_output_of{ subject.run }.to include("function(Opal)")
+        expect_output_of{ subject.run }.to include("Opal.nil")
       end
     end
 

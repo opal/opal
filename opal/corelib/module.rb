@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, const_set, Object
+# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar
 
 class ::Module
   def self.allocate
@@ -131,20 +131,9 @@ class ::Module
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
             id   = '$' + name,
-            ivar = Opal.ivar(name);
+            ivar = $ivar(name);
 
-        // the closure here is needed because name will change at the next
-        // cycle, I wish we could use let.
-        var body = (function(ivar) {
-          return function() {
-            if (this[ivar] == null) {
-              return nil;
-            }
-            else {
-              return this[ivar];
-            }
-          };
-        })(ivar);
+        var body = $return_ivar(ivar);
 
         // initialize the instance variable as nil
         Opal.prop(proto, ivar, nil);
@@ -166,15 +155,9 @@ class ::Module
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
             id   = '$' + name + '=',
-            ivar = Opal.ivar(name);
+            ivar = $ivar(name);
 
-        // the closure here is needed because name will change at the next
-        // cycle, I wish we could use let.
-        var body = (function(ivar){
-          return function(value) {
-            return this[ivar] = value;
-          }
-        })(ivar);
+        var body = $assign_ivar(ivar)
 
         body.$$parameters = [['req']];
         body.$$arity = 1;

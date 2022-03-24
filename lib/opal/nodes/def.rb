@@ -10,6 +10,37 @@ module Opal
       children :mid, :inline_args, :stmts
 
       def compile
+        compile_body_or_shortcut
+
+        blockopts = []
+
+        blockopts << "$$arity: #{arity}"
+
+        if compiler.arity_check?
+          blockopts << "$$parameters: #{parameters_code}"
+        end
+
+        if compiler.parse_comments?
+          blockopts << "$$comments: #{comments_code}"
+        end
+
+        if compiler.enable_source_location?
+          blockopts << "$$source_location: #{source_location}"
+        end
+
+        if blockopts.length == 1
+          push ", #{arity}"
+        elsif blockopts.length > 1
+          push ', {', blockopts.join(', '), '}'
+        end
+
+        wrap_with_definition
+
+        scope.nesting if @define_nesting
+        scope.relative_access if @define_relative_access
+      end
+
+      def compile_body
         inline_params = nil
         scope_name = nil
 
@@ -51,33 +82,6 @@ module Opal
           unshift "async "
         end
         line '}'
-
-        blockopts = []
-
-        blockopts << "$$arity: #{arity}"
-
-        if compiler.arity_check?
-          blockopts << "$$parameters: #{parameters_code}"
-        end
-
-        if compiler.parse_comments?
-          blockopts << "$$comments: #{comments_code}"
-        end
-
-        if compiler.enable_source_location?
-          blockopts << "$$source_location: #{source_location}"
-        end
-
-        if blockopts.length == 1
-          push ", #{arity}"
-        elsif blockopts.length > 1
-          push ', {', blockopts.join(', '), '}'
-        end
-
-        wrap_with_definition
-
-        scope.nesting if @define_nesting
-        scope.relative_access if @define_relative_access
       end
 
       def wrap_with_definition
