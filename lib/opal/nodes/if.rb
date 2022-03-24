@@ -244,7 +244,12 @@ module Opal
         test, true_body, false_body = *body
 
         test_match = SWITCH_BRANCH_TEST_MATCH.match(test) || SWITCH_BRANCH_TEST_MATCH_CONTINUED.match(test)
-        return false unless test_match
+        unless test_match
+          if valid_switch_body?(body, true)
+            body.meta[:switch_default] = true
+            return true
+          end
+        end
         switch_test, switch_variable, additional_rules = *test_match
 
         switch_additional_rules = handle_additional_switch_rules(additional_rules)
@@ -264,15 +269,19 @@ module Opal
         true
       end
 
-      def valid_switch_body?(body)
+      def valid_switch_body?(body, check_variable = false)
         case body
         when AST::Node
           case body.type
           when :break, :redo, :retry
             false
           else
-            body.children.all? { |i| valid_switch_body?(i) }
+            body.children.all? { |i| valid_switch_body?(i, check_variable) }
           end
+        when @switch_variable
+          # Perhaps we ended abruptly and we lack a $ret_or variable... but sometimes
+          # we can ignore this.
+          !check_variable
         else
           true
         end
