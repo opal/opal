@@ -207,7 +207,9 @@ module Opal
         return false unless test_match
         @switch_test, @switch_variable, @switch_first_test, additional_rules = *test_match
 
-        @switch_additional_rules = handle_additional_switch_rules(additional_rules)
+        additional_rules = handle_additional_switch_rules(additional_rules)
+        return false unless additional_rules # It's ok for them to be empty, but false denotes a mismatch
+        @switch_additional_rules = additional_rules
 
         return false unless valid_switch_body?(true_body)
 
@@ -246,6 +248,7 @@ module Opal
         switch_test, switch_variable, additional_rules = *test_match
 
         switch_additional_rules = handle_additional_switch_rules(additional_rules)
+        return false unless switch_additional_rules # It's ok for them to be empty, but false denotes a mismatch
 
         return false unless switch_variable == @switch_variable
 
