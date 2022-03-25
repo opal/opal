@@ -34,3 +34,11 @@ _This guide is a work-in-progress._
 ## Opal CDN
 
 - Run `bin/release v1.2.3`
+
+## Prepare for the next release
+
+- Skip this step if releasing a stable release
+- Create a new pull request that:
+  - Updates a version to `v1.x.0.dev` in both `lib/opal/version.rb` and `opal/corelib/constants.rb`
+- Remember to merge that PR before merging anything else next once we decide to not release any more point releases from `master`.
+
