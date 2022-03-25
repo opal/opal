@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/nodes/helpers'
+require 'opal/ast/matcher'
 
 module Opal
   module Nodes
@@ -27,6 +28,10 @@ module Opal
 
       def self.truthy_optimize?
         false
+      end
+
+      def self.define_matcher(name, &block)
+        define_method(name, &AST::Matcher.new(&block))
       end
 
       attr_reader :compiler, :type, :sexp

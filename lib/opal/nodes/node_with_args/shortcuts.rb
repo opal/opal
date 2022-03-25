@@ -6,12 +6,16 @@ module Opal
       # Shortcuts for the simplest kinds of methods
       Shortcut = Struct.new(:name, :for, :when, :transform) do
         def match?(node)
-          node.instance_exec(&self.when)
+          if self.when.is_a? AST::Matcher
+            @matches = self.when.match(node.sexp, lambda_self: node)
+          else
+            node.instance_exec(&self.when)
+          end
         end
 
         def compile(node)
           node.helper name
-          node.instance_exec(&transform)
+          node.instance_exec(*(@matches || []), &transform)
         end
       end
 
@@ -50,6 +54,52 @@ module Opal
         compile_body
       end
 
+      # Matcher helpers
+      # ---------------
+      class Matcher < AST::Matcher
+        def not_setter_call_name
+          ->(call_name) { !!not_setter?(call_name) }
+        end
+
+        def capture_single_arg
+          s(:args, s(:arg, cap), :**)
+        end
+
+        def capture_simple_value
+          cap(s(%i[true false nil int float str sym], :**))
+        end
+      end
+
+      def simple_value?(i)
+        %i[true false nil int float str sym].include? i.type
+      end
+
+      def not_setter?(call_name)
+        !call_name.to_s.end_with? '='
+      end
+
+      define_matcher :simple_value_access? do |arg|
+        [
+          s(:nil),
+          s(:send,
+            s(:lvar, arg), :[],
+            s(%i[int sym str], :*)
+          )
+        ]
+      end
+
+      # Transformer helpers
+      # -------------------
+
+      def format_ivar_name(name, onto = stmts)
+        expr(onto.updated(:sym, [name.to_s[1..-1].to_sym]))
+      end
+
+      def format_call_name(name, onto = stmts)
+        compiler.method_calls << name
+        expr(onto.updated(:sym, ["$#{name}"]))
+      end
+
       # Shortcut definitions
       # --------------------
 
@@ -58,77 +108,196 @@ module Opal
         push '$return_self'
       end
 
-      def simple_value?(node = stmts)
-        %i[true false nil int float str sym].include?(node.type)
-      end
-
       # def a; 123; end
-      define_shortcut :return_val, for: :*, when: -> { simple_value? } do
-        push '$return_val(', expr(stmts), ')'
+      define_shortcut :return_val, for: :*, when: Matcher.new {
+        s(:**,
+          [
+            capture_simple_value,
+            s(:begin, # def a(*); 123; end
+              s(:prepare_post_args, 0),
+              s(:extract_restarg, :*, 0),
+              capture_simple_value
+            )
+          ]
+        )
+      } do |val|
+        push '$return_val(', expr(val), ')'
       end
 
       # def a; @x; end
       define_shortcut :return_ivar, when: -> { stmts.type == :ivar } do
-        name = stmts.children.first.to_s[1..-1].to_sym
-        push '$return_ivar(', expr(stmts.updated(:sym, [name])), ')'
+        push '$return_ivar(', format_ivar_name(stmts.children.last), ')'
       end
 
       # def a; @x = 5; end
-      define_shortcut :assign_ivar, when: -> {
-        stmts.type == :ivasgn &&
-          inline_args.children.length == 1 &&
-          inline_args.children.last.type == :arg &&
-          stmts.children.last.type == :lvar &&
-          stmts.children.last.children.last == inline_args.children.last.children.last
-      } do
-        name = stmts.children.first.to_s[1..-1].to_sym
-        name = expr(stmts.updated(:sym, [name]))
-        push '$assign_ivar(', name, ')'
+      define_shortcut :assign_ivar_pass, when: Matcher.new {
+        s(:**,
+          capture_single_arg,
+          s(:ivasgn, cap, s(:lvar, cap_eq(0)))
+        )
+      } do |_, name|
+        name = format_ivar_name(name)
+        push '$assign_ivar_pass(', name, ')'
       end
 
       # def a(x); @x = x; end
-      define_shortcut :assign_ivar_val, when: -> {
-        stmts.type == :ivasgn &&
-          simple_value?(stmts.children.last)
-      } do
-        name = stmts.children.first.to_s[1..-1].to_sym
-        name = expr(stmts.updated(:sym, [name]))
-        push '$assign_ivar_val(', name, ', ', expr(stmts.children.last), ')'
+      define_shortcut :assign_ivar_arg, when: Matcher.new {
+        s(:**,
+          s(:ivasgn, cap, capture_simple_value)
+        )
+      } do |name, arg|
+        name = format_ivar_name(name)
+        push '$assign_ivar_arg(', name, ', ', expr(arg), ')'
       end
 
-      # each { test }
-      define_shortcut :return_iter_call, for: :iter, when: -> {
-        stmts.type == :send &&
-          stmts.children.length == 2 &&
-          [nil, s(:self)].include?(stmts.children.first)
-      } do
-        compiler.method_calls << stmts.children.last
-        name = expr(stmts.updated(:sym, ["$#{stmts.children.last}"]))
-        push '$return_iter_call(', name, ')'
+      %i[iter def].each do |type|
+        mark = type == :iter ? "_iter" : ""
+
+        # def a; other; end
+        define_shortcut :"return#{mark}_call", for: type, when: Matcher.new {
+          s(:**,
+            s(:send, [nil, s(:self)], cap(not_setter_call_name))
+          )
+        } do |call|
+          call = format_call_name(call)
+          bind = type == :iter ? ".bind(#{scope.self})" : ""
+          push "$return#{mark}_call(", call, ")#{bind}"
+        end
       end
 
-      # def a; other; end
-      define_shortcut :return_call, for: :def, when: -> {
-        stmts.type == :send &&
-          stmts.children.length == 2 &&
-          [nil, s(:self)].include?(stmts.children.first)
-      } do
-        compiler.method_calls << stmts.children.last
-        name = expr(stmts.updated(:sym, ["$#{stmts.children.last}"]))
-        push '$return_call(', name, ')'
+      # def a(b); self.x(b); end
+      define_shortcut :return_call_pass, for: :def, when: Matcher.new {
+        s(:**,
+          capture_single_arg,
+          s(:send,
+            [nil, s(:self)],
+            cap(not_setter_call_name),
+            s(:lvar, cap_eq(0))
+          )
+        )
+      } do |_, call_name|
+        call_name = format_call_name(call_name)
+        push "$return_call_pass(", call_name, ')'
+      end
+
+      # def a(b); self.x(b); end
+      define_shortcut :return_iter_call_pass, for: :iter, when: Matcher.new {
+        s(:**,
+          capture_single_arg,
+          s(:begin,
+            s(:initialize_iter_arg, cap_eq(0)),
+            s(:send,
+              [nil, s(:self)],
+              cap(not_setter_call_name),
+              s(:lvar, cap_eq(0))
+            )
+          )
+        )
+      } do |_, call_name|
+        call_name = format_call_name(call_name)
+        push "$return_iter_call_pass(", call_name, ").bind(#{scope.self})"
+      end
+
+      # def a(b); self.x.other(b); end
+      define_shortcut :return_call_call, when: Matcher.new {
+        s(:**,
+          s(:send,
+            cap(s(:send,
+              [nil, s(:self)],
+              cap(not_setter_call_name),
+            )
+            ),
+            cap(not_setter_call_name)
+          )
+        )
+      } do |call1_name, call1, call2_name|
+        call1_name = format_call_name(call1_name, call1)
+        call2_name = format_call_name(call2_name)
+        push '$return_call_call(', call1_name, ',', call2_name, ')'
       end
 
       # def a; @x.other; end
-      define_shortcut :return_ivar_call, when: -> {
-        stmts.type == :send &&
-          stmts.children.length == 2 &&
-          stmts.children.first.type == :ivar
-      } do
-        compiler.method_calls << stmts.children.last
-        ivar_name = stmts.children.first.children.first.to_s[1..-1].to_sym
-        ivar_name = expr(stmts.children.first.updated(:sym, [ivar_name]))
-        call_name = expr(stmts.updated(:sym, ["$#{stmts.children.last}"]))
+      define_shortcut :return_ivar_call, when: Matcher.new {
+        s(:**,
+          s(:send, cap(s(:ivar, cap)), cap)
+        )
+      } do |ivar_name, ivar, call_name|
+        ivar_name = format_ivar_name(ivar_name, ivar)
+        call_name = format_call_name(call_name)
         push '$return_ivar_call(', ivar_name, ',', call_name, ')'
+      end
+
+      # def a; @x.other(1,2,3); end
+      define_shortcut :return_ivar_call_args, when: Matcher.new {
+        s(:**,
+          s(:send, cap(s(:ivar, cap)), cap,
+            cap(:**) { |args| args.all? { |i| simple_value? i } }
+          )
+        )
+      } do |ivar_name, ivar, call_name, args|
+        ivar_name = format_ivar_name(ivar_name, ivar)
+        call_name = format_call_name(call_name)
+        push '$return_ivar_call_args(', ivar_name, ',', call_name
+        args.each do |arg|
+          push ',', expr(arg)
+        end
+        push ')'
+      end
+
+      # def a(b); @x.other(b); end
+      define_shortcut :return_ivar_call_pass, when: Matcher.new {
+        s(:**,
+          capture_single_arg,
+          s(:send, cap(s(:ivar, cap)),
+            cap(not_setter_call_name),
+            s(:lvar, cap_eq(0))
+          )
+        )
+      } do |_, ivar_name, ivar, call_name|
+        ivar_name = format_ivar_name(ivar_name, ivar)
+        call_name = format_call_name(call_name)
+        push '$return_ivar_call_pass(', ivar_name, ',', call_name, ')'
+      end
+
+      # def a(b); self.x.other(b); end
+      define_shortcut :return_call_call_pass, when: Matcher.new {
+        s(:**,
+          capture_single_arg,
+          s(:send,
+            cap(s(:send,
+              [nil, s(:self)],
+              cap(not_setter_call_name)
+            )
+            ),
+            cap(not_setter_call_name),
+            s(:lvar, cap_eq(0))
+          )
+        )
+      } do |_, call1_name, call1, call2_name|
+        call1_name = format_call_name(call1_name, call1)
+        call2_name = format_call_name(call2_name)
+        push '$return_call_call_pass(', call1_name, ',', call2_name, ')'
+      end
+
+      # This happens a lot in the parser:
+      # def a(y); @x.other(y[1],y[2],nil,y[3]); end
+      define_shortcut :return_ivar_call_access_args, when: Matcher.new {
+        s(:**,
+          capture_single_arg,
+          s(:send, cap(s(:ivar, cap)), cap,
+            cap(:**, pass_captures: 0) do |args, arg|
+              args.all? { |i| simple_value_access?(i, arg) }
+            end
+          )
+        )
+      } do |_, ivar_name, ivar, call_name, args|
+        ivar_name = format_ivar_name(ivar_name, ivar)
+        call_name = format_call_name(call_name)
+        push '$return_ivar_call_access_args(', ivar_name, ',', call_name
+        args.each do |arg|
+          push ',', expr(arg.type == :nil ? arg : arg.children[2])
+        end
+        push ')'
       end
     end
   end

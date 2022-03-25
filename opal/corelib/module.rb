@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar
+# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar_pass, ivar
 
 class ::Module
   def self.allocate
@@ -157,7 +157,7 @@ class ::Module
             id   = '$' + name + '=',
             ivar = $ivar(name);
 
-        var body = $assign_ivar(ivar)
+        var body = $assign_ivar_pass(ivar)
 
         body.$$parameters = [['req']];
         body.$$arity = 1;

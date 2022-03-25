@@ -2828,12 +2828,12 @@
       return this[ivar];
     }
   }
-  Opal.assign_ivar = function(ivar) {
+  Opal.assign_ivar_pass = function(ivar) {
     return function(val) {
       return this[ivar] = val;
     }
   }
-  Opal.assign_ivar_val = function(ivar, static_val) {
+  Opal.assign_ivar_arg = function(ivar, static_val) {
     return function() {
       return this[ivar] = static_val;
     }
@@ -2843,15 +2843,61 @@
       return this[method]();
     }
   }
+  Opal.return_call_pass = function(method) {
+    return function(arg) {
+      return this[method](arg);
+    }
+  }
+  Opal.return_call_call = function(meth1, meth2) {
+    return function(arg) {
+      return this[meth1]()[meth2]();
+    }
+  }
   Opal.return_iter_call = function(method) {
     return function fun() {
       return (fun.$$s == null ? this : fun.$$s)[method]();
+    }
+  }
+  Opal.return_iter_call_pass = function(method) {
+    return function fun(arg) {
+      if (arg == null) arg = nil;
+      return (fun.$$s == null ? this : fun.$$s)[method](arg);
     }
   }
   Opal.return_ivar_call = function(ivar, method) {
     return function() {
       if (this[ivar] == null) this[ivar] = nil;
       return this[ivar][method]();
+    }
+  }
+  Opal.return_ivar_call_args = function(ivar, method) {
+    var pass_args = $slice.call(arguments, 2);
+    return function() {
+      if (this[ivar] == null) this[ivar] = nil;
+      return this[ivar][method].apply(this[ivar], pass_args);
+    }
+  }
+  Opal.return_ivar_call_pass = function(ivar, method) {
+    return function(arg) {
+      if (this[ivar] == null) this[ivar] = nil;
+      return this[ivar][method](arg);
+    }
+  }
+  Opal.return_call_call_pass = function(meth1, meth2) {
+    return function(arg) {
+      return this[meth1]()[meth2](arg);
+    }
+  }
+  Opal.return_ivar_call_access_args = function(ivar, method) {
+    var call_arguments = arguments, length = arguments.length;
+    return function(x) {
+      var new_args = new Array(length - 2), arg;
+      if (this[ivar] == null) this[ivar] = nil;
+      for (var i = 2; i < length; i++) {
+        arg = call_arguments[i];
+        new_args[i - 2] = arg === nil ? nil : x['$[]'](arg);
+      }
+      return this[ivar][method].apply(this[ivar], new_args);
     }
   }
 
