@@ -23,10 +23,12 @@
   else if (typeof(window) !== 'undefined') { global_object = window; }
 
   // Setup a dummy console object if missing
+  if (global_object.console == null) {
+    global_object.console = {};
+  }
+
   if (typeof(global_object.console) === 'object') {
     console = global_object.console;
-  } else if (global_object.console == null) {
-    console = global_object.console = {};
   } else {
     console = {};
   }
@@ -65,7 +67,6 @@
 
   // This is a useful reference to global object inside ruby files
   Opal.global = global_object;
-  global_object.Opal = Opal;
 
   // Configure runtime behavior with regards to require and unsupported features
   Opal.config = {
@@ -98,10 +99,9 @@
   // Retrieve or assign the id of an object
   Opal.id = function(obj) {
     if (obj.$$is_number) return (obj * 2)+1;
-    if (obj.$$id != null) {
-      return obj.$$id;
+    if (obj.$$id == null) {
+      $prop(obj, '$$id', Opal.uid());
     }
-    $prop(obj, '$$id', Opal.uid());
     return obj.$$id;
   };
 
@@ -328,10 +328,8 @@
   }
 
   // Call const_missing if nothing else worked
-  function const_missing(cref, name, skip_missing) {
-    if (!skip_missing) {
-      return (cref || _Object).$const_missing(name);
-    }
+  function const_missing(cref, name) {
+    return (cref || _Object).$const_missing(name);
   }
 
   // Look for the constant just in the current cref or call `#const_missing`
@@ -346,8 +344,8 @@
       throw new Opal.TypeError(cref.toString() + " is not a class/module");
     }
 
-    result = const_get_name(cref, name);              if (result != null) return result;
-    result = const_missing(cref, name, skip_missing); if (result != null) return result;
+    result = const_get_name(cref, name);
+    return result != null || skip_missing ? result : const_missing(cref, name);
   };
 
   // Look for the constant relative to a cref or call `#const_missing` (when the
@@ -385,7 +383,7 @@
       result = cached[1];
     }
 
-    return result != null ? result : const_missing(cref, name, skip_missing);
+    return result != null || skip_missing ? result : const_missing(cref, name);
   };
 
   // Initialize the top level constant cache generation counter
@@ -413,7 +411,7 @@
       result = cached[1];
     }
 
-    return result != null ? result : const_missing(cref, name, skip_missing);
+    return result != null || skip_missing ? result : const_missing(cref, name);
   };
 
   // Register the constant on a cref and opportunistically set the name of
@@ -667,35 +665,32 @@
 
     var klass = find_existing_class(scope, name);
 
-    if (klass) {
+    if (klass != null) {
       if (superclass) {
         // Make sure existing class has same superclass
         ensureSuperclassMatch(klass, superclass);
       }
-
-      if (Opal.trace_class) { invoke_tracers_for_class(klass); }
-
-      return klass;
     }
+    else {
+      // Class doesn't exist, create a new one with given superclass...
 
-    // Class doesn't exist, create a new one with given superclass...
+      // Not specifying a superclass means we can assume it to be Object
+      if (superclass == null) {
+        superclass = _Object;
+      }
 
-    // Not specifying a superclass means we can assume it to be Object
-    if (superclass == null) {
-      superclass = _Object;
-    }
+      // Create the class object (instance of Class)
+      klass = Opal.allocate_class(name, superclass);
+      $const_set(scope, name, klass);
 
-    // Create the class object (instance of Class)
-    klass = Opal.allocate_class(name, superclass);
-    $const_set(scope, name, klass);
+      // Call .inherited() hook with new class on the superclass
+      if (superclass.$inherited) {
+        superclass.$inherited(klass);
+      }
 
-    // Call .inherited() hook with new class on the superclass
-    if (superclass.$inherited) {
-      superclass.$inherited(klass);
-    }
-
-    if (bridged) {
-      Opal.bridge(bridged, klass);
+      if (bridged) {
+        Opal.bridge(bridged, klass);
+      }
     }
 
     if (Opal.trace_class) { invoke_tracers_for_class(klass); }
@@ -724,10 +719,6 @@
   // @return [Module]
   Opal.allocate_module = function(name) {
     var constructor = function(){};
-    if (name) {
-      $prop(constructor, 'displayName', name+'.$$constructor');
-    }
-
     var module = constructor;
 
     if (name)
@@ -776,16 +767,11 @@
 
     module = find_existing_module(scope, name);
 
-    if (module) {
-
-      if (Opal.trace_class) { invoke_tracers_for_class(module); }
-
-      return module;
+    if (module == null) {
+      // Module doesnt exist, create a new one...
+      module = Opal.allocate_module(name);
+      $const_set(scope, name, module);
     }
-
-    // Module doesnt exist, create a new one...
-    module = Opal.allocate_module(name);
-    $const_set(scope, name, module);
 
     if (Opal.trace_class) { invoke_tracers_for_class(module); }
 
@@ -956,12 +942,7 @@
   };
 
   Opal.own_methods = function(obj) {
-    if (obj.$$meta) {
-      return Opal.own_instance_methods(obj.$$meta);
-    }
-    else {
-      return [];
-    }
+    return obj.$$meta ? Opal.own_instance_methods(obj.$$meta) : [];
   };
 
   Opal.receiver_methods = function(obj) {
@@ -1703,10 +1684,7 @@
           return result;
         }
       }
-      else if (candidate === Opal.JS.Error) {
-        return candidate;
-      }
-      else if (candidate['$==='](exception)) {
+      else if (candidate === Opal.JS.Error || candidate['$==='](exception)) {
         return candidate;
       }
     }
@@ -2499,25 +2477,20 @@
     return range;
   };
 
+  var reserved_ivar_names = [
+    // properties
+    "constructor", "displayName", "__count__", "__noSuchMethod__",
+    "__parent__", "__proto__",
+    // methods
+    "hasOwnProperty", "valueOf"
+  ];
+
   // Get the ivar name for a given name.
   // Mostly adds a trailing $ to reserved names.
   //
   Opal.ivar = function(name) {
-    if (
-        // properties
-        name === "constructor" ||
-        name === "displayName" ||
-        name === "__count__" ||
-        name === "__noSuchMethod__" ||
-        name === "__parent__" ||
-        name === "__proto__" ||
-
-        // methods
-        name === "hasOwnProperty" ||
-        name === "valueOf"
-       )
-    {
-      return name + "$";
+    if (reserved_ivar_names.indexOf(name) !== -1) {
+      name += "$";
     }
 
     return name;
@@ -2557,21 +2530,23 @@
   // on the object itself ($$gm or $$g attribute).
   //
   Opal.global_multiline_regexp = function(pattern) {
-    var result;
+    var result, flags;
+    
+    // RegExp already has the global and multiline flag
+    if (pattern.global && pattern.multiline) return pattern; 
+
+    flags = 'gm' + (pattern.ignoreCase ? 'i' : '');
     if (pattern.multiline) {
-      if (pattern.global) {
-        return pattern; // RegExp already has the global and multiline flag
-      }
       // we are using the $$g attribute because the Regexp is already multiline
-      if (pattern.$$g != null) {
-        result = pattern.$$g;
-      } else {
-        result = pattern.$$g = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+      if (pattern.$$g == null) {
+        pattern.$$g = new RegExp(pattern.source, flags);
       }
-    } else if (pattern.$$gm != null) {
-      result = pattern.$$gm;
+      result = pattern.$$g;
     } else {
-      result = pattern.$$gm = new RegExp(pattern.source, 'gm' + (pattern.ignoreCase ? 'i' : ''));
+      if (pattern.$$gm == null) {
+        pattern.$$gm = new RegExp(pattern.source, flags);
+      }
+      result = pattern.$$gm;
     }
     result.lastIndex = null; // reset lastIndex property
     return result;
@@ -2901,7 +2876,7 @@
   $set_proto(Opal.Class, Opal.Class.$$prototype);
 
   // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
-  BasicObject.$$const["BasicObject"] = BasicObject;
+  BasicObject.$$const.BasicObject = BasicObject;
 
   // Assign basic constants
   $const_set(_Object, "BasicObject",  BasicObject);
