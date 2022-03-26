@@ -58,7 +58,7 @@ module Opal
       # ---------------
       class Matcher < AST::Matcher
         def not_setter_call_name
-          ->(call_name) { !!not_setter?(call_name) }
+          ->(call_name) { not_setter?(call_name) }
         end
 
         def capture_single_arg
@@ -66,12 +66,12 @@ module Opal
         end
 
         def capture_simple_value
-          cap(s(%i[true false nil int float str sym], :**))
+          cap { |i| simple_value? i }
         end
       end
 
-      def simple_value?(i)
-        %i[true false nil int float str sym].include? i.type
+      define_matcher :simple_value? do
+        s(%i[true false nil int float str sym], :**)
       end
 
       def not_setter?(call_name)
@@ -151,7 +151,7 @@ module Opal
       end
 
       %i[iter def].each do |type|
-        mark = type == :iter ? "_iter" : ""
+        mark = "_iter" if type == :iter
 
         # def a; other; end
         define_shortcut :"return#{mark}_call", for: type, when: Matcher.new {
@@ -160,8 +160,8 @@ module Opal
           )
         } do |call|
           call = format_call_name(call)
-          bind = type == :iter ? ".bind(#{scope.self})" : ""
-          push "$return#{mark}_call(", call, ")#{bind}"
+          self.self if type == :iter # Ensure self is passed as $$s
+          push "$return#{mark}_call(", call, ")"
         end
       end
 
@@ -195,7 +195,8 @@ module Opal
         )
       } do |_, call_name|
         call_name = format_call_name(call_name)
-        push "$return_iter_call_pass(", call_name, ").bind(#{scope.self})"
+        self.self # Ensure self is passed as $$s
+        push "$return_iter_call_pass(", call_name, ")"
       end
 
       # def a(b); self.x.other(b); end
