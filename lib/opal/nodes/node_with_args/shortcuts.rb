@@ -140,16 +140,6 @@ module Opal
         push '$assign_ivar_pass(', name, ')'
       end
 
-      # def a(x); @x = x; end
-      define_shortcut :assign_ivar_arg, when: Matcher.new {
-        s(:**,
-          s(:ivasgn, cap, capture_simple_value)
-        )
-      } do |name, arg|
-        name = format_ivar_name(name)
-        push '$assign_ivar_arg(', name, ', ', expr(arg), ')'
-      end
-
       %i[iter def].each do |type|
         mark = "_iter" if type == :iter
 
@@ -163,21 +153,6 @@ module Opal
           self.self if type == :iter # Ensure self is passed as $$s
           push "$return#{mark}_call(", call, ")"
         end
-      end
-
-      # def a(b); self.x(b); end
-      define_shortcut :return_call_pass, for: :def, when: Matcher.new {
-        s(:**,
-          capture_single_arg,
-          s(:send,
-            [nil, s(:self)],
-            cap(not_setter_call_name),
-            s(:lvar, cap_eq(0))
-          )
-        )
-      } do |_, call_name|
-        call_name = format_call_name(call_name)
-        push "$return_call_pass(", call_name, ')'
       end
 
       # def a(b); self.x(b); end
@@ -258,26 +233,6 @@ module Opal
         ivar_name = format_ivar_name(ivar_name, ivar)
         call_name = format_call_name(call_name)
         push '$return_ivar_call_pass(', ivar_name, ',', call_name, ')'
-      end
-
-      # def a(b); self.x.other(b); end
-      define_shortcut :return_call_call_pass, when: Matcher.new {
-        s(:**,
-          capture_single_arg,
-          s(:send,
-            cap(s(:send,
-              [nil, s(:self)],
-              cap(not_setter_call_name)
-            )
-            ),
-            cap(not_setter_call_name),
-            s(:lvar, cap_eq(0))
-          )
-        )
-      } do |_, call1_name, call1, call2_name|
-        call1_name = format_call_name(call1_name, call1)
-        call2_name = format_call_name(call2_name)
-        push '$return_call_call_pass(', call1_name, ',', call2_name, ')'
       end
 
       # This happens a lot in the parser:

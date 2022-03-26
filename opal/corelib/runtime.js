@@ -2833,19 +2833,9 @@
       return this[ivar] = val;
     }
   }
-  Opal.assign_ivar_arg = function(ivar, static_val) {
-    return function() {
-      return this[ivar] = static_val;
-    }
-  }
   Opal.return_call = function(method) {
     return function() {
       return this[method]();
-    }
-  }
-  Opal.return_call_pass = function(method) {
-    return function(arg) {
-      return this[method](arg);
     }
   }
   Opal.return_call_call = function(meth1, meth2) {
@@ -2881,11 +2871,6 @@
     return function(arg) {
       if (this[ivar] == null) this[ivar] = nil;
       return this[ivar][method](arg);
-    }
-  }
-  Opal.return_call_call_pass = function(meth1, meth2) {
-    return function(arg) {
-      return this[meth1]()[meth2](arg);
     }
   }
   Opal.return_ivar_call_access_args = function(ivar, method) {
