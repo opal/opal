@@ -8,15 +8,6 @@ class ::String < `String`
 
   %x{
     Opal.prop(#{self}.$$prototype, '$$is_string', true);
-
-    Opal.prop(#{self}.$$prototype, '$$cast', function(string) {
-      var klass = this.$$class;
-      if (klass.$$constructor === String) {
-        return string;
-      } else {
-        return new klass.$$constructor(string);
-      }
-    });
   }
 
   def __id__
@@ -66,7 +57,7 @@ class ::String < `String`
       }
 
       if (count === 0) {
-        return self.$$cast('');
+        return '';
       }
 
       var result = '',
@@ -91,7 +82,7 @@ class ::String < `String`
         string += string;
       }
 
-      return self.$$cast(result);
+      return result;
     }
   end
 
@@ -181,7 +172,7 @@ class ::String < `String`
           length = 0;
         }
 
-        return self.$$cast(self.substr(index, length));
+        return self.substr(index, length);
       }
 
 
@@ -189,7 +180,7 @@ class ::String < `String`
         if (length != null) {
           #{::Kernel.raise ::TypeError}
         }
-        return self.indexOf(index) !== -1 ? self.$$cast(index) : nil;
+        return self.indexOf(index) !== -1 ? index : nil;
       }
 
 
@@ -204,17 +195,17 @@ class ::String < `String`
         #{$~ = ::MatchData.new(`index`, `match`)}
 
         if (length == null) {
-          return self.$$cast(match[0]);
+          return match[0];
         }
 
         length = $coerce_to(length, #{::Integer}, 'to_int');
 
         if (length < 0 && -length < match.length) {
-          return self.$$cast(match[length += match.length]);
+          return match[length += match.length];
         }
 
         if (length >= 0 && length < match.length) {
-          return self.$$cast(match[length]);
+          return match[length];
         }
 
         return nil;
@@ -231,7 +222,7 @@ class ::String < `String`
         if (index >= size || index < 0) {
           return nil;
         }
-        return self.$$cast(self.substr(index, 1));
+        return self.substr(index, 1);
       }
 
       length = $coerce_to(length, #{::Integer}, 'to_int');
@@ -244,7 +235,7 @@ class ::String < `String`
         return nil;
       }
 
-      return self.$$cast(self.substr(index, length));
+      return self.substr(index, length);
     }
   end
 
@@ -253,7 +244,7 @@ class ::String < `String`
   end
 
   def capitalize
-    `self.$$cast(self.charAt(0).toUpperCase() + self.substr(1).toLowerCase())`
+    `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
   end
 
   def casecmp(other)
@@ -294,7 +285,7 @@ class ::String < `String`
       var ljustified = #{ljust ((width + `self.length`) / 2).ceil, padstr},
           rjustified = #{rjust ((width + `self.length`) / 2).floor, padstr};
 
-      return self.$$cast(rjustified + ljustified.slice(self.length));
+      return rjustified + ljustified.slice(self.length);
     }
   end
 
@@ -321,7 +312,7 @@ class ::String < `String`
       }
 
       if (result != null) {
-        return self.$$cast(result);
+        return result;
       }
     }
 
@@ -340,7 +331,7 @@ class ::String < `String`
         result = self.substr(0, length - 1);
       }
 
-      return self.$$cast(result);
+      return result;
     }
   end
 
@@ -383,7 +374,7 @@ class ::String < `String`
       if (char_class === null) {
         return self;
       }
-      return self.$$cast(self.replace(new RegExp(char_class, 'g'), ''));
+      return self.replace(new RegExp(char_class, 'g'), '');
     }
   end
 
@@ -394,7 +385,7 @@ class ::String < `String`
       }
 
       if (self.slice(0, prefix.length) === prefix) {
-        return self.$$cast(self.slice(prefix.length));
+        return self.slice(prefix.length);
       } else {
         return self;
       }
@@ -408,7 +399,7 @@ class ::String < `String`
       }
 
       if (self.slice(self.length - suffix.length) === suffix) {
-        return self.$$cast(self.slice(0, self.length - suffix.length));
+        return self.slice(0, self.length - suffix.length);
       } else {
         return self;
       }
@@ -416,7 +407,7 @@ class ::String < `String`
   end
 
   def downcase
-    `self.$$cast(self.toLowerCase())`
+    `self.toLowerCase()`
   end
 
   def each_line(separator = $/, chomp: false, &block)
@@ -555,7 +546,7 @@ class ::String < `String`
       }
 
       #{$~ = `match_data`}
-      return self.$$cast(result);
+      return result;
     }
   end
 
@@ -682,7 +673,7 @@ class ::String < `String`
         result += padstr;
       }
 
-      return self.$$cast(self + result.slice(0, width));
+      return self + result.slice(0, width);
     }
   end
 
@@ -726,7 +717,7 @@ class ::String < `String`
     %x{
       var i = self.length;
       if (i === 0) {
-        return self.$$cast('');
+        return '';
       }
       var result = self;
       var first_alphanum_char_index = self.search(/[a-zA-Z0-9]/);
@@ -788,7 +779,7 @@ class ::String < `String`
           break;
         }
       }
-      return self.$$cast(result);
+      return result;
     }
   end
 
@@ -939,7 +930,7 @@ class ::String < `String`
           result    = Array(patterns + 1).join(padstr),
           remaining = chars - result.length;
 
-      return self.$$cast(result + padstr.slice(0, remaining) + self);
+      return result + padstr.slice(0, remaining) + self;
     }
   end
 
@@ -1069,24 +1060,17 @@ class ::String < `String`
       result = string.split(pattern);
 
       if (result.length === 1 && result[0] === string) {
-        return [self.$$cast(result[0])];
+        return [result[0]];
       }
 
       while ((i = result.indexOf(undefined)) !== -1) {
         result.splice(i, 1);
       }
 
-      function castResult() {
-        for (i = 0; i < result.length; i++) {
-          result[i] = self.$$cast(result[i]);
-        }
-      }
-
       if (limit === 0) {
         while (result[result.length - 1] === '') {
           result.length -= 1;
         }
-        castResult();
         return result;
       }
 
@@ -1098,18 +1082,15 @@ class ::String < `String`
             result.push('');
           }
         }
-        castResult();
         return result;
       }
 
       if (match !== null && match[0] === '') {
         result.splice(limit - 1, result.length - 1, result.slice(limit - 1).join(''));
-        castResult();
         return result;
       }
 
       if (limit >= result.length) {
-        castResult();
         return result;
       }
 
@@ -1123,7 +1104,6 @@ class ::String < `String`
         match = pattern.exec(string);
       }
       result.splice(limit - 1, result.length - 1, string.slice(index));
-      castResult();
       return result;
     }
   end
@@ -1131,13 +1111,13 @@ class ::String < `String`
   def squeeze(*sets)
     %x{
       if (sets.length === 0) {
-        return self.$$cast(self.replace(/(.)\1+/g, '$1'));
+        return self.replace(/(.)\1+/g, '$1');
       }
       var char_class = char_class_from_char_sets(sets);
       if (char_class === null) {
         return self;
       }
-      return self.$$cast(self.replace(new RegExp('(' + char_class + ')\\1+', 'g'), '$1'));
+      return self.replace(new RegExp('(' + char_class + ')\\1+', 'g'), '$1');
     }
   end
 
@@ -1224,7 +1204,7 @@ class ::String < `String`
         }
       }
 
-      return self.$$cast(result);
+      return result;
     }
   end
 
@@ -1254,11 +1234,7 @@ class ::String < `String`
         return $1 ? $0.toUpperCase() : $0.toLowerCase();
       });
 
-      if (self.constructor === String) {
-        return str;
-      }
-
-      return #{self.class.new `str`};
+      return str;
     }
   end
 
@@ -1515,7 +1491,7 @@ class ::String < `String`
           new_str += (sub != null ? sub : ch);
         }
       }
-      return self.$$cast(new_str);
+      return new_str;
     }
   end
 
@@ -1678,12 +1654,12 @@ class ::String < `String`
           }
         }
       }
-      return self.$$cast(new_str);
+      return new_str;
     }
   end
 
   def upcase
-    `self.$$cast(self.toUpperCase())`
+    `self.toUpperCase()`
   end
 
   def upto(stop, excl = false, &block)
