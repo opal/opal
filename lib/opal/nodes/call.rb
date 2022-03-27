@@ -4,6 +4,7 @@ require 'set'
 require 'pathname'
 require 'opal/nodes/base'
 require 'opal/rewriters/break_finder'
+require 'opal/ast/matcher'
 
 module Opal
   module Nodes
@@ -446,14 +447,10 @@ module Opal
         end
       end
 
-      def push_nesting?
-        recv = children.first
-
-        children.size == 2 && (           # only receiver and method
-          recv.nil? || (                  # and no receiver
-            recv.type == :const &&        # or receiver
-            recv.children.last == :Module # is Module
-          )
+      define_matcher :push_nesting? do
+        s(:*,
+          [nil, s(:const, :*, :Module)], # no receiver or receiver is Module
+          :*                             # only receiver and method
         )
       end
 

@@ -231,6 +231,7 @@ Style/CaseEquality:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
     - 'lib/opal/config.rb'
+    - 'lib/opal/ast/matcher.rb'
 
 Style/ClassAndModuleChildren:
   Enabled: false

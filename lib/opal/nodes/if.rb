@@ -165,7 +165,7 @@ module Opal
       SWITCH_TEST_MATCH = AST::Matcher.new do
         s(:send,
           cap(s(%i[float int sym str true false nil], :*)), :===,
-          s(:lvasgn, cap(:*), cap(:*))
+          s(:lvasgn, cap, cap)
         )
       end
 
@@ -173,17 +173,17 @@ module Opal
         s(:if,
           s(:send,
             cap(s(%i[float int sym str true false nil], :*)), :===,
-            s(:lvasgn, cap(:*), cap(:*))
+            s(:lvasgn, cap, cap)
           ),
           s(:true),
-          cap(:*)
+          cap
         )
       end
 
       SWITCH_BRANCH_TEST_MATCH = AST::Matcher.new do
         s(:send,
           cap(s(%i[float int sym str true false nil], :*)), :===,
-          s(:js_tmp, cap(:*))
+          s(:js_tmp, cap)
         )
       end
 
@@ -191,10 +191,10 @@ module Opal
         s(:if,
           s(:send,
             cap(s(%i[float int sym str true false nil], :*)), :===,
-            s(:js_tmp, cap(:*))
+            s(:js_tmp, cap)
           ),
           s(:true),
-          cap(:*)
+          cap
         )
       end
 
