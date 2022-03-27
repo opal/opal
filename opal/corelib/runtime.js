@@ -1829,7 +1829,13 @@
       block.$$arity = blockopts;
     }
     else if (typeof(blockopts) === 'object') {
-      Object.assign(block, blockopts);
+      if (blockopts instanceof Array) {
+        block.$$arity = blockopts[0];
+        block.$$s = blockopts[1];
+      }
+      else {
+        Object.assign(block, blockopts);
+      }
     }
   }
 

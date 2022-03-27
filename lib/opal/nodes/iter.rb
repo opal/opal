@@ -42,6 +42,9 @@ module Opal
 
         if blockopts.length == 1
           push ", #{arity}"
+        elsif blockopts.length == 2 && @define_self
+          # A shortcut for one of the most common cases
+          push ", [#{arity}, self]"
         elsif blockopts.length > 1
           push ', {', blockopts.join(', '), '}'
         end
