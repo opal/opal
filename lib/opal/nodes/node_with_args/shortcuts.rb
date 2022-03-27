@@ -14,7 +14,7 @@ module Opal
         end
 
         def compile(node)
-          node.helper name
+          node.helper name unless name.to_s.start_with? '_'
           node.instance_exec(*(@matches || []), &transform)
         end
       end
@@ -254,6 +254,18 @@ module Opal
           push ',', expr(arg.type == :nil ? arg : arg.children[2])
         end
         push ')'
+      end
+
+      # def a; `self.toA()`; end
+      define_shortcut :_xstr_to_direct, when: Matcher.new {
+        s(:def, :*,
+          s(:args),
+          s(:xstr,
+            s(:str, cap(/^self.[\w$]+\(\)$/))
+          )
+        )
+      } do |xstr|
+        push "#{self.self}.$$prototype.#{xstr.split('.').last.split('(').first}"
       end
     end
   end
