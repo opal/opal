@@ -217,6 +217,9 @@ module Opal
     # Comments from the source code
     attr_reader :comments
 
+    # Method calls made in this file
+    attr_reader :method_calls
+
     # Magic comment flags extracted from the leading comments
     attr_reader :magic_comments
 
@@ -231,6 +234,7 @@ module Opal
       @options = options
       @comments = Hash.new([])
       @case_stmt = nil
+      @method_calls = Set.new
       @option_values = {}
       @magic_comments = {}
       @dynamic_cache_result = false
@@ -295,9 +299,8 @@ module Opal
       )
     end
 
-    # Method calls made in this file
-    def method_calls
-      @method_calls ||= Set.new
+    def record_method_call(mid)
+      @method_calls << mid
     end
 
     alias async_await_before_typecasting async_await

@@ -43,7 +43,7 @@ module Opal
         # handle some methods specially
         # some special methods need to skip compilation, so we pass the default as a block
         handle_special do
-          compiler.method_calls << meth.to_sym if record_method?
+          compiler.record_method_call meth
 
           # if trying to access an lvar in eval or irb mode
           return compile_eval_var if using_eval?
@@ -197,10 +197,6 @@ module Opal
         mid_to_jsid meth.to_s
       end
 
-      def record_method?
-        true
-      end
-
       # Used to generate the code to use this sexp as an ivar var reference
       def compile_irb_var
         with_temp do |tmp|
@@ -255,7 +251,7 @@ module Opal
           if invoke_using_refinement?
             compile_default.call
           elsif compiler.inline_operators?
-            compiler.method_calls << operator.to_sym if record_method?
+            compiler.record_method_call operator
             helper :"rb_#{name}"
             lhs, rhs = expr(recvr), expr(arglist)
 
