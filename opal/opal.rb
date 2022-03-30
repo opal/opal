@@ -20,4 +20,4 @@
 ::Object.require 'corelib/unsupported'
 
 ::Object.require 'corelib/binding'
-::Object.require 'corelib/debug'
+::Object.require 'corelib/irb'

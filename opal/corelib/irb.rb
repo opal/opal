@@ -4,7 +4,7 @@
 # to provision it.
 
 module Opal
-  module Debug
+  module IRB
     def self.ensure_loaded(library)
       return if `Opal.loaded_features`.include? library
 
@@ -106,18 +106,18 @@ end
 
 class ::Binding
   def irb
-    ::Opal::Debug.ensure_loaded('opal-replutils')
+    ::Opal::IRB.ensure_loaded('opal-replutils')
 
-    silencer = ::Opal::Debug::Silencer.new
+    silencer = ::Opal::IRB::Silencer.new
 
-    ::Opal::Debug.prepare_console do
+    ::Opal::IRB.prepare_console do
       loop do
         print '>> '
         line = gets
         break unless line
         code = ''
 
-        puts line if ::Opal::Debug.browser?
+        puts line if ::Opal::IRB.browser?
 
         if line.start_with? 'ls '
           code = line[3..-1]
@@ -140,11 +140,11 @@ class ::Binding
             js_code = `Opal.compile(code, {irb: true})`
           end
         rescue SyntaxError => e
-          if ::Opal::Debug::LINEBREAKS.include?(e.message)
+          if ::Opal::IRB::LINEBREAKS.include?(e.message)
             print '.. '
             line = gets
             return unless line
-            puts line if ::Opal::Debug.browser?
+            puts line if ::Opal::IRB.browser?
             code += line
             retry
           elsif silencer.warnings.empty?
@@ -173,7 +173,7 @@ end
   }
 
   Opal.load_parser = function() {
-    Opal.Opal.Debug.$ensure_loaded('opal-parser');
+    Opal.Opal.IRB.$ensure_loaded('opal-parser');
   }
 
   if (typeof Opal.eval === 'undefined') {
