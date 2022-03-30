@@ -7,6 +7,8 @@
 ### Changed
 
 - Move Math IE11-supporting polyfills to a separate file (#2395)
+- String methods always return Strings even when overloaded (#2413)
+- `alias` calls will not add the "old name" method to the list of stubs for method missing (#2414)
 
 ### Internal
 
@@ -18,6 +20,7 @@
 
 - Fix `Regexp.new`, previously `\A` and `\z` didn't match beginning and end of input (#2079)
 - Fix exception during `Hash#each` and `Hash#each_key` if keys get deleted during the loop (#2403)
+- Fix defining multiple methods with the same block (#2397)
 
 ### Internal
 
