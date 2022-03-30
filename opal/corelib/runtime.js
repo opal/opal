@@ -1607,7 +1607,10 @@
     }
 
     if (implicit && current_func.$$define_meth) {
-      throw Opal.RuntimeError.$new("implicit argument passing of super from method defined by define_method() is not supported. Specify all arguments explicitly");
+      throw Opal.RuntimeError.$new(
+        "implicit argument passing of super from method defined by define_method() is not supported. " +
+        "Specify all arguments explicitly"
+      );
     }
 
     if (current_func.$$def) {

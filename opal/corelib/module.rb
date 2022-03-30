@@ -396,14 +396,29 @@ class ::Module
               end
 
     %x{
-      var id = '$' + name;
+      if (typeof(Proxy) !== 'undefined') {
+        var meta = Object.create(null)
+
+        block.$$proxy_target = block
+        block = new Proxy(block, {
+          apply: function(target, self, args) {
+            var old_name = target.$$jsid
+            target.$$jsid = name;
+            try {
+              return target.apply(self, args);
+            } finally {
+              target.$$jsid = old_name
+            }
+          }
+        })
+      }
 
       block.$$jsid        = name;
       block.$$s           = null;
       block.$$def         = block;
       block.$$define_meth = true;
 
-      return Opal.defn(self, id, block);
+      return Opal.defn(self, '$' + name, block);
     }
   end
 

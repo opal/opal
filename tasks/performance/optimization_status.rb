@@ -27,7 +27,7 @@ klasses = [
 
     return (optstatus & (1 << 6)) ? "[INTERPRETED]" : "[COMPILED]";
   }
-  
+
   function triggerOptAndGetStatus(fn) {
     // using try/catch to avoid having to call functions properly
     try {
@@ -52,6 +52,7 @@ optimization_status = Hash[klasses.map do |klass|
   methods -= [:product, :exit, :exit!, :at_exit]
   opt_status = Hash[methods.map do |method|
     method_func = `#{klass.instance_method(method)}.method`
+    method_func = `#{method_func}.$$proxy_target || #{method_func}`
     [method, `triggerOptAndGetStatus(#{method_func})`]
   end]
   by_status_grouped = opt_status.group_by {|method, status| status }

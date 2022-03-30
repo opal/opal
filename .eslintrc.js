@@ -24,12 +24,14 @@ module.exports = {
     "no-control-regex": "off",
   },
   "globals": {
-    "Opal": "readonly",
-    "DataView": "readonly",
     "ArrayBuffer": "readonly",
+    "DataView": "readonly",
     "globalThis": "readonly",
-    "Uint8Array": "readonly",
+    "Opal": "readonly",
     "Promise": "readonly",
+    "Proxy": "readonly",
+    "Reflect": "readonly",
+    "Uint8Array": "readonly",
     "WeakRef": "readonly",
   }
 };
