@@ -72,22 +72,22 @@ module Opal
             case mid
             when :==
               helper :eqeq
-              compiler.method_calls << mid
+              compiler.record_method_call mid
               [fragment('$eqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
             when :===
               helper :eqeqeq
-              compiler.method_calls << mid
+              compiler.record_method_call mid
               [fragment('$eqeqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
             when :!=
               helper :neqeq
-              compiler.method_calls << mid
+              compiler.record_method_call mid
               [fragment('$neqeq('), expr(receiver), fragment(', '), expr(args.first), fragment(')')]
             end
           elsif args.count == 0
             case mid
             when :!
               helper :not
-              compiler.method_calls << mid
+              compiler.record_method_call mid
               [fragment('$not('), expr(receiver), fragment(')')]
             end
           end
