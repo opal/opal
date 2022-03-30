@@ -31,6 +31,8 @@ module Opal
           push '$alias_gvar(', new_name_str, ', ', old_name_str, ')'
         when :dsym, :sym # This is a method alias: alias a b
           helper :alias
+          compiler.record_method_call old_name.children.last if old_name.type == :sym
+
           push "$alias(#{scope.self}, ", expr(new_name), ', ', expr(old_name), ')'
         else # Nothing else is available, but just in case, drop an error
           error "Opal doesn't know yet how to alias with #{new_name.type}"
