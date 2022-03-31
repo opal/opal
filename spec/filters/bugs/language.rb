@@ -213,7 +213,6 @@ opal_filter "language" do
   fails "Predefined global $~ raises an error if assigned an object not nil or instanceof MatchData"
   fails "Ruby String interpolation returns a string with the source encoding by default" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
-  fails "Safe navigator allows assignment methods"
   fails "The ** operator hash with omitted value accepts mixed syntax" # NameError: uninitialized constant MSpecEnv::a
   fails "The ** operator hash with omitted value accepts short notation 'key' for 'key: value' syntax" # NameError: uninitialized constant MSpecEnv::a
   fails "The ** operator hash with omitted value ignores hanging comma on short notation" # NameError: uninitialized constant MSpecEnv::a
@@ -285,8 +284,6 @@ opal_filter "language" do
   fails "The redo statement in a method is invalid and raises a SyntaxError" # Expected SyntaxError but no exception was raised ("m" was returned)
   fails "The redo statement triggers ensure block when re-executing a block"
   fails "The rescue keyword allows rescue in 'do end' block" # NoMethodError: undefined method `call' for nil
-  fails "The rescue keyword can capture the raised exception using a setter method" # NoMethodError: undefined method `message' for nil
-  fails "The rescue keyword can capture the raised exception using a square brackets setter" # ArgumentError: [SquareBracketsCaptor#[]=] wrong number of arguments(1 for 2)
   fails "The rescue keyword inline form can be inlined" # Expected Infinity to equal 1
   fails "The rescue keyword only accepts Module or Class in rescue clauses" # RuntimeError: error
   fails "The rescue keyword only accepts Module or Class in splatted rescue clauses" # RuntimeError: error

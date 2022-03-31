@@ -8,7 +8,7 @@ require 'opal/rewriters/break_finder'
 module Opal
   module Nodes
     class CallNode < Base
-      handle :send
+      handle :send, :csend
 
       attr_reader :recvr, :meth, :arglist, :iter
 
@@ -45,13 +45,17 @@ module Opal
         handle_special do
           compiler.record_method_call meth
 
-          # if trying to access an lvar in eval or irb mode
-          return compile_eval_var if using_eval?
-
-          # if trying to access an lvar in irb mode
-          return compile_irb_var if using_irb?
-
-          default_compile
+          with_wrapper do
+            if using_eval?
+              # if trying to access an lvar in eval or irb mode
+              compile_eval_var
+            elsif using_irb?
+              # if trying to access an lvar in irb mode
+              compile_irb_var
+            else
+              default_compile
+            end
+          end
         end
       end
 
@@ -81,11 +85,16 @@ module Opal
       # to a method body. This is some kind of protection from method calls
       # like 'a(a {}) { 1 }'.
       def invoke_using_send?
-        iter || splat?
+        iter || splat? || call_is_writer_that_needs_handling?
       end
 
       def invoke_using_refinement?
         !scope.scope.collect_refinements_temps.empty?
+      end
+
+      # Is it a conditional send, ie. `foo&.bar`?
+      def csend?
+        @sexp.type == :csend
       end
 
       def default_compile
@@ -143,17 +152,19 @@ module Opal
       end
 
       def compile_receiver
-        push recv(receiver_sexp)
+        push @conditional_recvr || recv(receiver_sexp)
       end
 
       def compile_method_name
         push ", '#{meth}'"
       end
 
-      def compile_arguments
-        push ', '
+      def compile_arguments(skip_comma = false)
+        push ', ' unless skip_comma
 
-        if splat?
+        if @with_writer_temp
+          push @with_writer_temp
+        elsif splat?
           push expr(arglist)
         elsif arglist.children.empty?
           push '[]'
@@ -440,6 +451,48 @@ module Opal
             recv.children.last == :Module # is Module
           )
         )
+      end
+
+      def with_wrapper(&block)
+        if csend? && !@conditional_recvr
+          handle_conditional_send do
+            with_wrapper(&block)
+          end
+        elsif call_is_writer_that_needs_handling?
+          handle_writer(&block)
+        else
+          yield
+        end
+      end
+
+      def call_is_writer_that_needs_handling?
+        (expr? || recv?) && (meth.to_s =~ /^\w+=$/ || meth == :[]=)
+      end
+
+      # Handle safe-operator calls: foo&.bar / foo&.bar ||= baz / ...
+      def handle_conditional_send
+        # temporary variable that stores method receiver
+        receiver_temp = scope.new_temp
+        push "#{receiver_temp} = ", expr(recvr)
+
+        # execute the sexp only if the receiver isn't nil
+        push ", (#{receiver_temp} === nil || #{receiver_temp} == null) ? nil : "
+        @conditional_recvr = receiver_temp
+        yield
+        wrap '(', ')'
+      end
+
+      def handle_writer
+        with_temp do |temp|
+          push "(#{temp} = "
+          compile_arguments(true)
+          push ", "
+          @with_writer_temp = temp
+          yield
+          @with_writer_temp = false
+          push ", "
+          push "#{temp}[#{temp}.length - 1])"
+        end
       end
 
       class DependencyResolver
