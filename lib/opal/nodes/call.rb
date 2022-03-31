@@ -202,7 +202,8 @@ module Opal
         with_temp do |tmp|
           lvar = meth
           call = s(:send, s(:self), meth.intern, s(:arglist))
-          push "((#{tmp} = Opal.irb_vars.#{lvar}) == null ? ", expr(call), " : #{tmp})"
+          ref = "(typeof #{lvar} !== 'undefined') ? #{lvar} : "
+          push "((#{tmp} = Opal.irb_vars.#{lvar}) == null ? ", ref, expr(call), " : #{tmp})"
         end
       end
 
@@ -410,13 +411,8 @@ module Opal
 
         scope.nesting
         push "Opal.Binding.$new("
-        push "  function($code, $value) {"
-        push "    if (typeof $value === 'undefined') {"
-        push "      return eval($code);"
-        push "    }"
-        push "    else {"
-        push "      return eval($code + ' = $value');"
-        push "    }"
+        push "  function($code) {"
+        push "    return eval($code);"
         push "  },"
         push "  ", scope.scope_locals.map(&:to_s).inspect, ","
         push "  ", scope.self, ","

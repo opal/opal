@@ -33,6 +33,10 @@ describe Opal::Compiler do
       $global["Opal"].irb_vars.bar.should == "HELLO WORLD"
     end
 
+    it "can reference an outer variable" do
+      eval_js("var a = 10;" + compile("a", :irb => true)).should == 10
+    end
+
     it "can still call top level methods" do
       eval_js(compile("to_s", :irb => true)).should == "main"
     end
