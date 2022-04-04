@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 require 'opal/builder'
 
 RSpec.describe Opal::Builder do

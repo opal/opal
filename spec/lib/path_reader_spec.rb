@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 require 'opal/path_reader'
 
 RSpec.describe Opal::PathReader do

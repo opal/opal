@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 require 'support/rewriters_helper'
 
 RSpec.describe Opal::Rewriters::BinaryOperatorAssignment do

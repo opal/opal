@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 require 'opal/cli_runners'
 
 RSpec.describe Opal::CliRunners do

@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 
 RSpec.describe 'Opal.use_gem' do
   # Coverage probably should be improved
