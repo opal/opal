@@ -95,41 +95,6 @@ module Opal
         name = expr(stmts.updated(:sym, [name]))
         push '$assign_ivar_val(', name, ', ', expr(stmts.children.last), ')'
       end
-
-      # each { test }
-      define_shortcut :return_iter_call, for: :iter, when: -> {
-        stmts.type == :send &&
-          stmts.children.length == 2 &&
-          [nil, s(:self)].include?(stmts.children.first)
-      } do
-        compiler.method_calls << stmts.children.last
-        name = expr(stmts.updated(:sym, ["$#{stmts.children.last}"]))
-        push '$return_iter_call(', name, ')'
-      end
-
-      # def a; other; end
-      define_shortcut :return_call, for: :def, when: -> {
-        stmts.type == :send &&
-          stmts.children.length == 2 &&
-          [nil, s(:self)].include?(stmts.children.first)
-      } do
-        compiler.method_calls << stmts.children.last
-        name = expr(stmts.updated(:sym, ["$#{stmts.children.last}"]))
-        push '$return_call(', name, ')'
-      end
-
-      # def a; @x.other; end
-      define_shortcut :return_ivar_call, when: -> {
-        stmts.type == :send &&
-          stmts.children.length == 2 &&
-          stmts.children.first.type == :ivar
-      } do
-        compiler.method_calls << stmts.children.last
-        ivar_name = stmts.children.first.children.first.to_s[1..-1].to_sym
-        ivar_name = expr(stmts.children.first.updated(:sym, [ivar_name]))
-        call_name = expr(stmts.updated(:sym, ["$#{stmts.children.last}"]))
-        push '$return_ivar_call(', ivar_name, ',', call_name, ')'
-      end
     end
   end
 end

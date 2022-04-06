@@ -2841,22 +2841,6 @@
       return this[ivar] = static_val;
     }
   }
-  Opal.return_call = function(method) {
-    return function() {
-      return this[method]();
-    }
-  }
-  Opal.return_iter_call = function(method) {
-    return function fun() {
-      return (fun.$$s == null ? this : fun.$$s)[method]();
-    }
-  }
-  Opal.return_ivar_call = function(ivar, method) {
-    return function() {
-      if (this[ivar] == null) this[ivar] = nil;
-      return this[ivar][method]();
-    }
-  }
 
   // Initialization
   // --------------
