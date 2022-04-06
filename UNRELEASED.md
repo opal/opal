@@ -32,7 +32,7 @@
 
 ### Internal
 
-- Rewriters refactor, fix interaction between cache and iverted runner (#2400)
+- Rewriters refactor, fix interaction between cache and inverted runner (#2400)
 
 <!--
 ### Internal
