@@ -8,45 +8,12 @@ module Opal
     class IterNode < NodeWithArgs
       handle :iter
 
-      children :inline_args, :body
+      children :inline_args, :stmts
 
       def compile
         is_lambda! if scope.lambda_definition?
 
-        inline_params = nil
-
-        to_vars = identity = body_code = nil
-
-        in_scope do
-          identity = scope.identify!
-
-          inline_params = process(inline_args)
-
-          compile_arity_check
-
-          body_code = stmt(returned_body)
-
-          add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s" if @define_self
-
-          to_vars = scope.to_vars
-
-          line body_code
-
-          if scope.catch_return
-            unshift "try {\n"
-            line '} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }'
-            push ' throw $returner; }'
-          end
-        end
-
-        unshift to_vars
-
-        if await_encountered
-          unshift "async function #{identity}(", inline_params, '){'
-        else
-          unshift "function #{identity}(", inline_params, '){'
-        end
-        push '}'
+        compile_body_or_shortcut
 
         blockopts = []
         blockopts << "$$arity: #{arity}"
@@ -83,6 +50,43 @@ module Opal
         scope.relative_access if @define_relative_access
       end
 
+      def compile_body
+        inline_params = nil
+
+        to_vars = identity = body_code = nil
+
+        in_scope do
+          identity = scope.identify!
+
+          inline_params = process(inline_args)
+
+          compile_arity_check
+
+          body_code = stmt(returned_body)
+
+          add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s" if @define_self
+
+          to_vars = scope.to_vars
+
+          line body_code
+
+          if scope.catch_return
+            unshift "try {\n"
+            line '} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }'
+            push ' throw $returner; }'
+          end
+        end
+
+        unshift to_vars
+
+        if await_encountered
+          unshift "async function #{identity}(", inline_params, '){'
+        else
+          unshift "function #{identity}(", inline_params, '){'
+        end
+        push '}'
+      end
+
       def compile_block_arg
         if block_arg
           scope.prepare_block
@@ -108,13 +112,13 @@ module Opal
         @sexp = @sexp.updated(
           nil, [
             args.updated(nil, valid_args),
-            body
+            stmts
           ]
         )
       end
 
       def returned_body
-        compiler.returns(body || s(:nil))
+        compiler.returns(stmts || s(:nil))
       end
 
       def has_top_level_mlhs_arg?

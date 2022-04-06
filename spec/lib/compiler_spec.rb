@@ -17,15 +17,15 @@ RSpec.describe Opal::Compiler do
 
   describe 'requirable' do
     it 'executes the file' do
-      expect_compiled("").to include('(function(Opal) {')
-      expect_compiled("").to start_with('Opal.queue(function(Opal) {')
-      expect_compiled("").to end_with("});\n")
+      expect_compiled("true").to include('(function(Opal) {')
+      expect_compiled("true").to start_with('Opal.queue(function(Opal) {')
+      expect_compiled("true").to end_with("});\n")
     end
 
     it 'puts the compiled into "Opal.modules"' do
       options = { :requirable => true, :file => "pippo" }
-      expect_compiled("", options).to include('Opal.modules["pippo"] = function(Opal) {')
-      expect_compiled("", options).to end_with("};\n")
+      expect_compiled("true", options).to include('Opal.modules["pippo"] = function(Opal) {')
+      expect_compiled("true", options).to end_with("};\n")
     end
   end
 
@@ -89,18 +89,18 @@ RSpec.describe Opal::Compiler do
 
   describe "method names" do
     it "generates a named function for method" do
-      expect_compiled("def test_method; end").to include("function $$test_method()")
+      expect_compiled("def test_method; []; end").to include("function $$test_method()")
     end
 
     context "when function name is reserved" do
       it "generates a valid named function for method" do
-        expect_compiled("def Array; end").to include("function $$Array()")
+        expect_compiled("def Array; []; end").to include("function $$Array()")
       end
     end
 
     context "when function name is not valid" do
       it "generates a name in a safe way" do
-        expect_compiled("def test_method?; end").to include("function $test_method$ques$1()")
+        expect_compiled("def test_method?; []; end").to include("function $test_method$ques$1()")
       end
     end
   end
