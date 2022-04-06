@@ -10,8 +10,8 @@ _This guide is a work-in-progress._
 ## Updating the changelog
 
 - Ensure all the unreleased changes are documented in UNRELEASED.md
-- Run `bin/rake changelog VERSION=v1.2.3` specifying the version number you're about to release
-- Empty UNRELEASED.md
+- [skip for pre-releases] Run `bin/rake changelog VERSION=v1.2.3` specifying the version number you're about to release
+- [skip for pre-releases] Empty UNRELEASED.md
 
 ## The commit
 
