@@ -1315,7 +1315,7 @@ class ::String < `String`
   end
 
   def to_proc
-    method_name = '$' + `self.valueOf()`
+    method_name = `self.valueOf()`
 
     ::Kernel.proc do |*args, &block|
       %x{
@@ -1327,20 +1327,23 @@ class ::String < `String`
 
         if (recv == null) recv = nil;
 
-        var body = recv[#{method_name}];
+        var body = recv['$' + #{method_name}];
 
         if (!body) {
-          return recv.$method_missing.apply(recv, args);
+          body = recv.$method_missing;
+          args[0] = #{method_name};
+        } else {
+          args = args.slice(1);
         }
 
         if (typeof block === 'function') {
           body.$$p = block;
         }
 
-        if (args.length === 1) {
+        if (args.length === 0) {
           return body.call(recv);
         } else {
-          return body.apply(recv, args.slice(1));
+          return body.apply(recv, args);
         }
       }
     end
