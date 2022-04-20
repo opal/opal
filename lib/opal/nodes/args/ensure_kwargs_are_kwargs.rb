@@ -16,7 +16,7 @@ module Opal
         def compile
           helper :ensure_kwargs
 
-          line '$kwargs = $ensure_kwargs($kwargs);'
+          push '$kwargs = $ensure_kwargs($kwargs)'
         end
       end
     end

@@ -2854,6 +2854,13 @@
     }
   }
 
+  Opal.get_kwarg = function(kwargs, key) {
+    if (!$has_own.call(kwargs.$$smap, key)) {
+      throw Opal.ArgumentError.$new('missing keyword: '+key);
+    }
+    return kwargs.$$smap[key];
+  }
+
   // Initialization
   // --------------
   Opal.BasicObject = BasicObject = Opal.allocate_class('BasicObject', null);
