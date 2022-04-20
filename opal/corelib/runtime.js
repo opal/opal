@@ -1815,10 +1815,7 @@
     var kwargs = parameters[parameters.length - 1];
     if (kwargs != null && Opal.respond_to(kwargs, '$to_hash', true)) {
       $splice.call(parameters, parameters.length - 1);
-      return kwargs.$to_hash();
-    }
-    else {
-      return Opal.hash2([], {});
+      return kwargs;
     }
   };
 
@@ -2843,6 +2840,17 @@
   Opal.assign_ivar_val = function(ivar, static_val) {
     return function() {
       return this[ivar] = static_val;
+    }
+  }
+
+  // Primitives for handling parameters
+  Opal.ensure_kwargs = function(kwargs) {
+    if (kwargs == null) {
+      return Opal.hash2([], {});
+    } else if (kwargs.$$is_hash) {
+      return kwargs;
+    } else {
+      throw Opal.ArgumentError.$new('expected kwargs');
     }
   }
 

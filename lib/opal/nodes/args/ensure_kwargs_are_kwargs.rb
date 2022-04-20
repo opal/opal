@@ -14,13 +14,9 @@ module Opal
         handle :ensure_kwargs_are_kwargs
 
         def compile
-          helper :hash2
+          helper :ensure_kwargs
 
-          line 'if ($kwargs == null) {'
-          line '  $kwargs = $hash2([], {});'
-          line '} else if (!$kwargs.$$is_hash) {'
-          line "  throw Opal.ArgumentError.$new('expected kwargs');"
-          line '}'
+          line '$kwargs = $ensure_kwargs($kwargs);'
         end
       end
     end
