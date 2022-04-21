@@ -27,9 +27,9 @@ module Opal
 
           if args_to_keep == 0
             # no post-args, we are free to grab everything
-            line "#{name} = $post_args;"
+            push "#{name} = $post_args"
           else
-            line "#{name} = $post_args.splice(0, $post_args.length - #{args_to_keep});"
+            push "#{name} = $post_args.splice(0, $post_args.length - #{args_to_keep})"
           end
         end
       end

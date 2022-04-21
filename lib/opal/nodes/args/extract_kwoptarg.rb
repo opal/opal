@@ -25,7 +25,7 @@ module Opal
 
           return if default_value.children[1] == :undefined
 
-          line "if (#{lvar_name} == null) #{lvar_name} = ", expr(default_value)
+          push "if (#{lvar_name} == null) #{lvar_name} = ", expr(default_value)
         end
       end
     end
