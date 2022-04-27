@@ -46,7 +46,6 @@ opal_filter "StringScanner" do
   fails "StringScanner#pointer= positions from the end if the argument is negative"
   fails "StringScanner#pointer= raises a RangeError if position too far backward"
   fails "StringScanner#pointer= raises a RangeError when the passed argument is out of range"
-  fails "StringScanner#pos returns the position of the scan pointer"
   fails "StringScanner#pos= raises a RangeError if position too far backward"
   fails "StringScanner#pos= raises a RangeError when the passed argument is out of range"
   fails "StringScanner#restsize is equivalent to rest.size"

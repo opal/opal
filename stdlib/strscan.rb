@@ -24,24 +24,13 @@ class StringScanner
       if (result == null) {
         return #{@matched} = nil;
       }
-      else if (typeof(result) === 'object') {
-        #{@prev_pos} = #{@pos};
-        #{@pos}     += result[0].length;
-        #{@working}  = #{@working}.substring(result[0].length);
-        #{@matched}  = result[0];
-        #{@match}    = result;
+      #{@prev_pos} = #{@pos};
+      #{@pos}     += result[0].length;
+      #{@working}  = #{@working}.substring(result[0].length);
+      #{@matched}  = result[0];
+      #{@match}    = result;
 
-        return result[0];
-      }
-      else if (typeof(result) === 'string') {
-        #{@pos}     += result.length;
-        #{@working}  = #{@working}.substring(result.length);
-
-        return result;
-      }
-      else {
-        return nil;
-      }
+      return result[0];
     }
   end
 
@@ -49,32 +38,24 @@ class StringScanner
     pattern = anchor(pattern)
 
     %x{
-      var pos     = #{@pos},
-          working = #{@working},
-          result;
+      var working = #{@working}
 
-      while (true) {
-        result   = pattern.exec(working);
-        pos     += 1;
-        working  = working.substr(1);
+      for(var i = 0; working.length != i; ++i) {
+        var result  = pattern.exec(working.substr(i));
+        if (result !== null) {
+          var matched_size = i + result[0].length
+          var matched = working.substr(0, matched_size)
 
-        if (result == null) {
-          if (working.length === 0) {
-            #{@match} = [];
-            return #{@matched} = nil;
-          }
+          #{@matched}  = result[0]
+          #{@match}  = result
+          #{@prev_pos} = #{@pos} + i; // Position of first character of matched
+          #{@pos} += matched_size // Position one after last character of matched
+          #{@working} = working.substr(matched_size)
 
-          continue;
+          return matched
         }
-
-        #{@matched}  = #{@string}.substr(#{@pos}, pos - #{@pos} - 1 + result[0].length);
-        #{@match}    = result;
-        #{@prev_pos} = pos - 1;
-        #{@pos}      = pos;
-        #{@working}  = working.substr(result[0].length);
-
-        return #{@matched};
       }
+      return #{@matched} = nil;
     }
   end
 
@@ -125,18 +106,15 @@ class StringScanner
 
   def check_until(pattern)
     %x{
-      var prev_pos = #{@prev_pos},
-          pos      = #{@pos};
+      var old_prev_pos = #{@prev_pos};
+      var old_pos      = #{@pos};
+      var old_working  = #{@working};
 
       var result = #{scan_until(pattern)};
 
-      if (result !== nil) {
-        #{@matched} = result.substr(-1);
-        #{@working} = #{@string}.substr(pos);
-      }
-
-      #{@prev_pos} = prev_pos;
-      #{@pos}      = pos;
+      #{@prev_pos} = old_prev_pos;
+      #{@pos}      = old_pos;
+      #{@working}  = old_working;
 
       return result;
     }
