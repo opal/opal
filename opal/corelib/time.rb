@@ -135,7 +135,7 @@ class ::Time < `Date`
 
   def self.new(year = undefined, month = nil, day = nil, hour = nil, min = nil, sec = nil, utc_offset = nil)
     %x{
-      var args, result, timezone;
+      var args, result, timezone, utc_date;
 
       if (year === undefined) {
         return new Date();
@@ -149,19 +149,22 @@ class ::Time < `Date`
       min   = args[4];
       sec   = args[5];
 
-      result = new Date(year, month, day, hour, min, 0, sec * 1000);
+      if (utc_offset === nil) {
+        result = new Date(year, month, day, hour, min, 0, sec * 1000);
+        if (year < 100) {
+          result.setFullYear(year);
+        }
+        return result;
+      }
+
+      timezone = #{_parse_offset(utc_offset)};
+      utc_date = new Date(Date.UTC(year, month, day, hour, min, 0, sec * 1000));
       if (year < 100) {
-        result.setFullYear(year);
+        utc_date.setUTCFullYear(year);
       }
 
-      if (utc_offset !== nil) {
-        timezone = #{_parse_offset(utc_offset)};
-      }
-
-      if (timezone != null) {
-        result = new Date(result.getTime() - timezone * 3600000 - result.getTimezoneOffset() * 60000);
-        result.timezone = timezone;
-      }
+      result = new Date(utc_date.getTime() - timezone * 3600000);
+      result.timezone = timezone;
 
       return result;
     }
