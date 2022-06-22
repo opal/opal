@@ -111,8 +111,8 @@ module Testing
         require 'opal/platform' # in node ENV is replaced
         #{env_data}
 
-        require 'spec_helper'
         require 'opal/full'
+        require 'spec_helper'
         require 'securerandom'
         #{enter_benchmarking_mode}
 
