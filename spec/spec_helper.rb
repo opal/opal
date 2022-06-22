@@ -14,6 +14,10 @@ TOLERANCE = 0.00004
 
 ENV['MSPEC_RUNNER'] = true
 
+# Trigger autoloading, needed by `Module.constants`
+# in `spec/ruby/core/module/constants_spec.rb`.
+Dir
+
 module Kernel
   def opal_parse(str, file='(string)')
     Opal::Parser.new.parse str, file
