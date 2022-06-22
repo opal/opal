@@ -51,6 +51,7 @@ jobs:
             command: bin/rake lint
             ruby: '3.0'
           - name: timezone
+            command: bin/rake mspec_nodejs TZ="Pacific/Fiji"
             ruby: '3.0'
           - name: performance
             ruby: '3.0'
