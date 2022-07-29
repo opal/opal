@@ -1,5 +1,6 @@
 # helpers: truthy, falsy, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze, opal32_init, opal32_add
 # backtick_javascript: true
+# pristine: true
 
 require 'corelib/enumerable'
 require 'corelib/numeric'
@@ -2562,7 +2563,4 @@ class ::Array < `Array`
   alias size length
   alias slice []
   alias to_s inspect
-
-  ::Opal.pristine singleton_class, :allocate
-  ::Opal.pristine self, :copy_instance_variables, :initialize_dup
 end
