@@ -1,6 +1,7 @@
 # helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid
 # use_strict: true
 # backtick_javascript: true
+# pristine: true
 
 module ::Kernel
   def =~(obj)
@@ -735,8 +736,6 @@ module ::Kernel
   def respond_to_missing?(method_name, include_all = false)
     false
   end
-
-  ::Opal.pristine(self, :respond_to?, :respond_to_missing?)
 
   def require(file)
     %x{

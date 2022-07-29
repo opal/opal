@@ -1,5 +1,6 @@
 # helpers: coerce_to, respond_to, global_multiline_regexp, prop
 # backtick_javascript: true
+# pristine: true
 
 require 'corelib/comparable'
 require 'corelib/regexp'
@@ -1887,8 +1888,6 @@ class ::String < `String`
   alias succ next
   alias to_str to_s
   alias to_sym intern
-
-  ::Opal.pristine self, :initialize
 end
 
 Symbol = String

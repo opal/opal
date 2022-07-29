@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# pristine: true
 
 require 'corelib/module'
 
