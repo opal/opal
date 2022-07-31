@@ -47,6 +47,7 @@ CHANGELOG_HEADING = <<~MARKDOWN
   - **Removed** for deprecated features removed in this release.
   - **Fixed** for any bug fixes.
   - **Security** to invite users to upgrade in case of vulnerabilities.
+  - **Performance** changes related to speed and efficiency.
 MARKDOWN
 
 desc "Update CHANGELOG.md using info from published GitHub releases (the first unreleased section is preserved)"
