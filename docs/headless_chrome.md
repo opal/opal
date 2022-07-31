@@ -1,4 +1,4 @@
-# Headless Chrome
+# Running code in a Headless Chrome
 
 ## Requirements
 

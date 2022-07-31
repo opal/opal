@@ -1,4 +1,4 @@
-# Compiler Directives
+# Compiler File Loading Directives
 
 The Opal compiler supports some special directives that can optimize or
 enhance the output of compiled Ruby code to suit the Ruby environment.
