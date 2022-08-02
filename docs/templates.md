@@ -42,6 +42,43 @@ Template['login']
 # => #<Template: 'login'>
 ```
 
+## ERB Templates
+
+Support for `erb` templates is built in directly to the opal gem and stdlib.
+There is one caveat though when working with sprockets - it must have the
+`.opalerb` file extension, instead of `.erb`. This is because sprockets has a
+built in handler for `.erb` files.
+
+If we have the same user class as above, create an `app/views/user.opalerb`
+file:
+
+```erb
+<!-- app/views/user.opalerb -->
+<div class="row">
+  <div class="col-md-3"><%= self.name %></div>
+</div>
+```
+
+Again, you must then require the template (without the `.opalerb` extension):
+
+```ruby
+# app/application.rb
+require 'opal'
+require 'views/user'
+```
+
+And then you can access and render the template:
+
+```ruby
+# app/application.rb
+
+template = Template['views/user']
+user = User.new('Ford Prefect')
+
+puts template.render(user)
+# => "<div class="row">...</div>"
+```
+
 ## Haml templates
 
 `opal-haml` allows `.haml` templates to be compiled, just like opal compiles
@@ -110,41 +147,4 @@ check it out, you should see it compiled into something like the following:
     42
   </div>
 </div>
-```
-
-## ERB Templates
-
-Support for `erb` templates is built in directly to the opal gem and stdlib.
-There is one caveat though when working with sprockets - it must have the
-`.opalerb` file extension, instead of `.erb`. This is because sprockets has a
-built in handler for `.erb` files.
-
-If we have the same user class as above, create an `app/views/user.opalerb`
-file:
-
-```erb
-<!-- app/views/user.opalerb -->
-<div class="row">
-  <div class="col-md-3"><%= self.name %></div>
-</div>
-```
-
-Again, you must then require the template (without the `.opalerb` extension):
-
-```ruby
-# app/application.rb
-require 'opal'
-require 'views/user'
-```
-
-And then you can access and render the template:
-
-```ruby
-# app/application.rb
-
-template = Template['views/user']
-user = User.new('Ford Prefect')
-
-puts template.render(user)
-# => "<div class="row">...</div>"
 ```

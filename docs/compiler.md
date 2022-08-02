@@ -9,7 +9,7 @@ other runtime helpers.
 
 The compiler can be broken down into 3 separate stages:
 
-* lexing/parsing
+* lexing + parsing
 * code generation
 
 ### Lexer/Parser
