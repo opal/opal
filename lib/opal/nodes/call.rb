@@ -439,6 +439,25 @@ module Opal
         end
       end
 
+      # Record methods used in coerce_to helpers.
+      record_coerce_to_method_calls = ->(arglist) do
+        arglist.children[2..-1].map do |meth_arg|
+          next unless meth_arg.type == :sym
+
+          compiler.record_method_call(meth_arg.children.first)
+        end
+      end
+
+      add_special :coerce_to do |compile_default|
+        record_coerce_to_method_calls.call(arglist)
+        compile_default.call
+      end
+
+      add_special :coerce_to! do |compile_default|
+        record_coerce_to_method_calls.call(arglist)
+        compile_default.call
+      end
+
       def push_nesting?
         recv = children.first
 
