@@ -10,6 +10,11 @@ module Opal
       children :mid, :inline_args, :stmts
 
       def compile
+        if compiler.dead_method?(mid)
+          push mid.to_s.inspect if expr?
+          return
+        end
+
         compile_body_or_shortcut
 
         blockopts = {}
@@ -29,7 +34,7 @@ module Opal
         end
 
         if compiler.pristine?
-          blockopts << "$$pristine: true"
+          blockopts["$$pristine"] = true
         end
 
         if blockopts.keys == ["$$arity"]

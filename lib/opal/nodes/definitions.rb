@@ -11,6 +11,12 @@ module Opal
 
       def compile
         children.each do |child|
+          mid = child.children.last
+          if child.type == :sym && compiler.dead_method?(mid)
+            push mid.to_s.inspect if expr?
+            next
+          end
+
           line "Opal.udef(#{scope.self}, '$' + ", expr(child), ');'
         end
       end
@@ -30,8 +36,16 @@ module Opal
           old_name_str = old_name.children.first.to_s[1..-1].inspect
           push '$alias_gvar(', new_name_str, ', ', old_name_str, ')'
         when :dsym, :sym # This is a method alias: alias a b
+          new_mid = new_name.children.last
+          old_mid = old_name.children.last
+
+          if new_name.type == :sym && compiler.dead_method?(new_mid)
+            push new_mid.to_s.inspect if expr?
+            return
+          end
+
           helper :alias
-          compiler.record_method_call old_name.children.last if old_name.type == :sym
+          compiler.record_method_call(old_mid, [:def, new_mid]) if old_name.type == :sym
 
           push "$alias(#{scope.self}, ", expr(new_name), ', ', expr(old_name), ')'
         else # Nothing else is available, but just in case, drop an error

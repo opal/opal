@@ -444,7 +444,8 @@ module Opal
         arglist.children[2..-1].map do |meth_arg|
           next unless meth_arg.type == :sym
 
-          compiler.record_method_call(meth_arg.children.first)
+          binding.irb
+          @compiler.record_method_call(meth_arg.children.first)
         end
       end
 

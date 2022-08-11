@@ -47,6 +47,7 @@ module Opal
       @rbrequires  = options.delete(:rbrequires) { [] }
       @no_cache    = options.delete(:no_cache)   { false }
       @stdin       = options.delete(:stdin)      { $stdin }
+      @dce         = options.delete(:dce)        { false }
 
       @debug_source_map = options.delete(:debug_source_map) { false }
 
@@ -121,6 +122,8 @@ module Opal
         compiler_options: compiler_options,
         missing_require_severity: missing_require_severity,
       )
+
+      builder.dce = @dce
 
       # --no-cache
       builder.cache = Opal::Cache::NullCache.new if no_cache

@@ -249,6 +249,8 @@ module Opal
     # # await: *await*, sleep, gets
     compiler_option :await, default: false, as: :async_await, magic_comment: true
 
+    compiler_option :top_called_methods, default: nil
+
     # @return [String] The compiled ruby code
     attr_reader :result
 
@@ -272,6 +274,8 @@ module Opal
 
     # Method calls made in this file
     attr_reader :method_calls
+    attr_reader :method_calls_by_name
+    attr_reader :method_calls_by_site
 
     # Magic comment flags extracted from the leading comments
     attr_reader :magic_comments
@@ -294,6 +298,38 @@ module Opal
       @option_values = {}
       @magic_comments = {}
       @dynamic_cache_result = false
+      @method_calls_by_site = {
+        top: Set.new(
+          %i[
+            backtrace
+            call
+            const_missing
+            define_method
+            full_message
+            hash
+            inherited
+            inspect
+            length
+            method_added
+            method_missing
+            method_removed
+            method_undefined
+            name
+            new
+            require
+            respond_to?
+            set_backtrace
+            singleton_method_added
+            singleton_method_removed
+            singleton_method_undefined
+            to_a
+            to_ary
+            to_hash
+            to_s
+            warn
+          ] + ENV['OPAL_DCE_PRESERVE_METHODS'].to_s.split(',').map(&:to_sym)
+        )
+      }
     end
 
     # Compile some ruby code to a string.
@@ -355,8 +391,30 @@ module Opal
       )
     end
 
-    def record_method_call(mid)
+    def record_method_call(mid, call_site = nil)
       @method_calls << mid
+
+      call_site ||= begin
+        call_scope = scope
+        call_scope = call_scope.parent while call_scope.is_a?(Opal::Nodes::IterNode) && call_scope.parent
+
+        case call_scope
+        when Opal::Nodes::DefNode, Opal::Nodes::DefsNode
+          [:def, call_scope.mid]
+        else
+          :top
+        end
+      end
+
+      @method_calls_by_site[call_site] ||= Set.new
+      @method_calls_by_site[call_site] << mid
+    end
+
+    def dead_method?(mid)
+      (mid && top_called_methods && !top_called_methods.include?(mid)).tap do
+        # Just use the name if it's an expression
+        warn "DCE: #{mid.inspect} (#{caller(0, 1)})" if $DEBUG
+      end
     end
 
     alias async_await_before_typecasting async_await
