@@ -855,6 +855,6 @@ class ::Object
   # Object.require has been set to runtime.js Opal.require
   # Now we have Kernel loaded, make sure Object.require refers to Kernel.require
   # which is what ruby does and allows for overwriting by autoloaders
-  `delete $Object.$$prototype.$require`
+  `delete #{self}.$$prototype.$require`
   include ::Kernel
 end
