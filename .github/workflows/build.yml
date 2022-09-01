@@ -8,6 +8,9 @@ on:
       - "*/ci-check"
   pull_request: {}
 
+permissions:
+  contents: read
+
 jobs:
   rake:
     name: ${{ matrix.combo.name || matrix.combo.ruby }}
