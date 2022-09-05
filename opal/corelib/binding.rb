@@ -8,9 +8,9 @@ class ::Binding
     receiver = js_eval('self') unless `typeof receiver !== undefined`
   end
 
-  def js_eval(*args)
+  def js_eval(code)
     if @jseval
-      @jseval.call(*args)
+      @jseval.call(code.JS.toString)
     else
       ::Kernel.raise 'Evaluation on a Proc#binding is not supported'
     end
@@ -18,9 +18,10 @@ class ::Binding
 
   def local_variable_get(symbol)
     symbol = `$coerce_to(symbol, #{::String}, 'to_str')`
+    `console.log(typeof #{symbol})`
     js_eval(symbol)
-  rescue ::Exception
-    ::Kernel.raise ::NameError, "local variable `#{symbol}' is not defined for #{inspect}"
+  rescue ::Exception => error
+    ::Kernel.raise ::NameError, "local variable `#{symbol}' is not defined for #{inspect} -- #{error}"
   end
 
   def local_variable_set(symbol, value)

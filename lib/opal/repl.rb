@@ -5,6 +5,7 @@ require 'securerandom'
 require 'stringio'
 require 'fileutils'
 require 'rbconfig'
+require 'json'
 
 module Opal
   class REPL

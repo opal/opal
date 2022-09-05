@@ -17,6 +17,12 @@
 # performant in Opal as it is in Ruby.
 
 class String
+  %x{
+    function toString() {
+      return this.$$string;
+    }
+  }
+
   # return_nil argument is private
   def replace(other, return_nil = false)
     %x{
@@ -27,16 +33,13 @@ class String
       var oldstr = self.toString();
       var newstr = other.toString();
 
-      if (oldstr === newstr) {
-        return return_nil ? nil : self;
-      }
+      if (oldstr === newstr) return return_nil ? nil : self;
 
-      var to_string = function() {
-        return other;
+      if (self.$$string == null) {
+        $prop(self, "toString", toString);
+        $prop(self, "valueOf", toString);
       }
-
-      $prop(self, "toString", to_string);
-      $prop(self, "valueOf", to_string);
+      self.$$string = newstr
 
       return self;
     }
@@ -78,10 +81,6 @@ class String
 
   def reverse!(*)
     replace(reverse)
-  end
-
-  def slice!(*)
-    raise NotImplementedError
   end
 
   def squeeze!(*args)

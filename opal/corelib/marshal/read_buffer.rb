@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # https://github.com/ruby/ruby/blob/trunk/doc/marshal.rdoc
 # https://github.com/ruby/ruby/blob/trunk/marshal.c
 
@@ -93,7 +95,7 @@ module ::Marshal
       when 'd'
         ::Kernel.raise ::NotImplementedError, 'Data type cannot be demarshaled'
       else
-        ::Kernel.raise ::ArgumentError, 'dump format error'
+        ::Kernel.raise ::ArgumentError, 'dump format error ' + "#{code.inspect} - #{code === '}'}"
       end
     end
 
