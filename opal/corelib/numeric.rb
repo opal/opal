@@ -1,3 +1,5 @@
+# helpers: is_nil
+
 require 'corelib/comparable'
 
 class ::Numeric
@@ -162,7 +164,7 @@ class ::Numeric
           #{::Kernel.raise ::ArgumentError, "step can't be 0"}
         }
 
-        if (step === nil || step == null) {
+        if ($is_nil(step)) {
           step = 1;
         }
 
@@ -172,7 +174,7 @@ class ::Numeric
           #{::Kernel.raise ::ArgumentError, "0 can't be coerced into #{step.class}"}
         }
 
-        if (limit === nil || limit == null) {
+        if ($is_nil(limit)) {
           limit = sign > 0 ? #{::Float::INFINITY} : #{-::Float::INFINITY};
         }
 
