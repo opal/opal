@@ -558,7 +558,7 @@ module Opal
             returns(true_body),
             returns(false_body)
           ]
-        )
+        ).tap { |s| s.meta[:returning] = true }
       else
         if sexp.type == :send && sexp.children[1] == :debugger
           # debugger is a statement, so it doesn't return a value
