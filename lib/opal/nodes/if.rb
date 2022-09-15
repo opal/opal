@@ -61,12 +61,18 @@ module Opal
         end
 
         if expects_expression?
+          return_kw = 'return ' if returning_if?
+
           if scope.await_encountered
-            wrap '(await (async function() {', '})())'
+            wrap "#{return_kw}(await (async function() {", '})())'
           else
-            wrap '(function() {', '})()'
+            wrap "#{return_kw}(function() {", '})()'
           end
         end
+      end
+
+      def returning_if?
+        @sexp.meta[:returning]
       end
 
       def truthy
