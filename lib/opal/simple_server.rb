@@ -86,10 +86,11 @@ class Opal::SimpleServer
       <!doctype html>
       <html>
         <head>
-          <meta charset="utf8">
-          #{javascript_include_tag(main)}
+          <meta charset="utf-8">
         </head>
-        <body></body>
+        <body>
+          #{javascript_include_tag(main)}
+        </body>
       </html>
       HTML
     end
