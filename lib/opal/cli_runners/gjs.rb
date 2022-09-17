@@ -10,11 +10,12 @@ module Opal
     class Gjs
       def self.call(data)
         exe = ENV['GJS_PATH'] || 'gjs'
+        builder = data[:builder].call
 
         opts = Shellwords.shellwords(ENV['GJS_OPTS'] || '')
-        opts.unshift('-m') if data[:builder].esm?
+        opts.unshift('-m') if builder.esm?
 
-        SystemRunner.call(data) do |tempfile|
+        SystemRunner.call(data.merge(builder: -> { builder })) do |tempfile|
           [exe, *opts, tempfile.path, *data[:argv]]
         end
       rescue Errno::ENOENT

@@ -13,7 +13,7 @@ require 'tempfile'
 # @yieldreturn command [Array<String>] the command to be used in the system call
 SystemRunner = ->(data, &block) {
   options  = data[:options] || {}
-  builder  = data.fetch(:builder)
+  builder  = data.fetch(:builder).call
   output   = data.fetch(:output)
 
   env      = options.fetch(:env, {})

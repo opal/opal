@@ -5,7 +5,7 @@ require 'opal/paths'
 # The compiler runner will just output the compiled JavaScript
 Opal::CliRunners::Compiler = ->(data) {
   options  = data[:options] || {}
-  builder  = data.fetch(:builder)
+  builder  = data.fetch(:builder).call
   map_file = options[:map_file]
   output   = data.fetch(:output)
 

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'opal/simple_server'
+
 module Opal
   module CliRunners
     class Server
@@ -11,9 +13,8 @@ module Opal
 
       def initialize(data)
         options = data[:options] || {}
-        builder = data[:builder]
+        @builder = data[:builder]
 
-        @code = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
         @argv = data[:argv] || []
 
         @output = data[:output] || $stdout
@@ -25,7 +26,7 @@ module Opal
         @static_folder = File.expand_path(@static_folder) if @static_folder
       end
 
-      attr_reader :output, :port, :server, :static_folder, :code, :argv
+      attr_reader :output, :port, :server, :static_folder, :builder, :argv
 
       def run
         unless argv.empty?
@@ -35,7 +36,7 @@ module Opal
         require 'rack'
         require 'logger'
 
-        app = build_app(code)
+        app = build_app(builder)
 
         @server = Rack::Server.start(
           app:       app,
@@ -49,8 +50,8 @@ module Opal
         nil
       end
 
-      def build_app(source)
-        app = App.new(source)
+      def build_app(builder)
+        app = App.new(builder: builder, main: 'cli-runner')
 
         if static_folder
           not_found = [404, {}, []]
@@ -65,30 +66,14 @@ module Opal
         app
       end
 
-      class App
-        def initialize(source)
-          @source = source
+      class App < SimpleServer
+        def initialize(options = {})
+          @builder = options.fetch(:builder)
+          super
         end
 
-        BODY = <<-HTML
-          <!doctype html>
-          <html>
-            <head>
-              <meta charset="utf-8"/>
-              <script src="/cli_runner.js"></script>
-            </head>
-          </html>
-        HTML
-
-        def call(env)
-          case env['PATH_INFO']
-          when '/'
-            [200, { 'Content-Type' => 'text/html' }, [BODY]]
-          when '/cli_runner.js'
-            [200, { 'Content-Type' => 'text/javascript' }, [@source]]
-          else
-            [404, {}, ['not found']]
-          end
+        def builder(_)
+          @builder.call
         end
       end
     end

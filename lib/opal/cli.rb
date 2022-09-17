@@ -48,14 +48,12 @@ module Opal
 
       @requires.unshift('opal') unless options.delete(:skip_opal_require)
 
-      @compiler_options = Hash[
-        *compiler_option_names.map do |option|
-          key = option.to_sym
-          next unless options.key? key
-          value = options.delete(key)
-          [key, value]
-        end.compact.flatten
-      ]
+      @compiler_options = compiler_option_names.map do |option|
+        key = option.to_sym
+        next unless options.key? key
+        value = options.delete(key)
+        [key, value]
+      end.compact.to_h
 
       raise ArgumentError, 'no libraries to compile' if @lib_only && @requires.empty?
       raise ArgumentError, 'no runnable code provided (evals or file)' if @evals.empty? && @file.nil? && !@lib_only
@@ -67,6 +65,16 @@ module Opal
       return show_sexp if @sexp
       return debug_source_map if @debug_source_map
       return run_repl if @repl
+
+      rbrequires.each { |file| require file }
+
+      runner = self.runner
+
+      # Some runners may need to use a dynamic builder, that is,
+      # a builder that will try to build the entire package every time
+      # a page is loaded - for example a Server runner that needs to
+      # rerun if files are changed.
+      builder = proc { create_builder }
 
       @exit_status = runner.call(
         options: runner_options,
@@ -90,13 +98,7 @@ module Opal
 
     attr_reader :exit_status
 
-    def builder
-      @builder ||= create_builder
-    end
-
     def create_builder
-      rbrequires.each(&Kernel.method(:require))
-
       builder = Opal::Builder.new(
         stubs: stubs,
         compiler_options: compiler_options,
@@ -181,6 +183,7 @@ module Opal
       if evals.any?
         yield evals.join("\n"), '-e'
       elsif file && (filename != '-' || evals.empty?)
+        file.rewind
         yield file.read, filename
       end
     end

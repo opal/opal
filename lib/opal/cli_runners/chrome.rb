@@ -20,7 +20,7 @@ module Opal
       end
 
       def initialize(data)
-        builder = data[:builder]
+        builder = data[:builder].call
         options = data[:options]
         argv    = data[:argv]
 

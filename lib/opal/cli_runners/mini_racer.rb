@@ -9,7 +9,7 @@ module Opal
       def self.call(data)
         ::MiniRacer::Platform.set_flags! :harmony
 
-        builder = data.fetch(:builder)
+        builder = data.fetch(:builder).call
         output = data.fetch(:output)
         # TODO: pass it
         argv = data.fetch(:argv)

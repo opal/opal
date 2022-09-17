@@ -10,7 +10,8 @@ module Opal
   # - `output`: an IO-like object responding to `#write` and `#puts`
   # - `argv`: is the arguments vector coming from the CLI that is being
   #     forwarded to the program
-  # - `builder`: the current instance of Opal::Builder
+  # - `builder`: a proc returning a new instance of Opal::Builder so it
+  #     can be re-created and pick up the most up-to-date sources
   #
   # Runners can be registered using `#register_runner(name, runner)`.
   #
@@ -21,7 +22,7 @@ module Opal
     @register = {}
 
     def self.[](name)
-      @register[name.to_sym]
+      @register[name.to_sym]&.call
     end
 
     # @private
@@ -44,10 +45,10 @@ module Opal
     def self.register_runner(name, runner, path = nil)
       autoload runner, path if path
 
-      if runner.respond_to?(:call)
-        self[name] = runner
+      if runner.respond_to? :call
+        self[name] = -> { runner }
       else
-        self[name] = ->(data) { const_get(runner).call(data) }
+        self[name] = -> { const_get(runner) }
       end
 
       nil
@@ -55,7 +56,7 @@ module Opal
 
     # Alias a runner name
     def self.alias_runner(new_name, old_name)
-      self[new_name.to_sym] = self[old_name.to_sym]
+      self[new_name.to_sym] = -> { self[old_name.to_sym] }
 
       nil
     end
