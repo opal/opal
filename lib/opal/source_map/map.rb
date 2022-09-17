@@ -9,7 +9,15 @@ module Opal::SourceMap::Map
   end
 
   def to_json
-    to_h.to_json
+    map = to_h
+    map.to_json
+  rescue Encoding::UndefinedConversionError
+    map[:sections].each do |i|
+      i.to_json
+    rescue Encoding::UndefinedConversionError
+      map[:sections].delete(i)
+    end
+    map.to_json
   end
 
   def as_json(*)
