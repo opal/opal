@@ -12,6 +12,7 @@ module Opal
         exe = ENV['GJS_PATH'] || 'gjs'
 
         opts = Shellwords.shellwords(ENV['GJS_OPTS'] || '')
+        opts.unshift('-m') if data[:builder].esm?
 
         SystemRunner.call(data) do |tempfile|
           [exe, *opts, tempfile.path, *data[:argv]]

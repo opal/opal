@@ -23,11 +23,13 @@ SystemRunner = ->(data, &block) {
   # Temporary issue with UTF-8, Base64 and source maps
   code += "\n" + builder.source_map.to_data_uri_comment unless RUBY_ENGINE == 'opal'
 
+  ext = builder.output_extension
+
   tempfile =
     if debug
-      File.new('opal-nodejs-runner.js', 'w')
+      File.new("opal-nodejs-runner.#{ext}", 'w')
     else
-      Tempfile.new('opal-system-runner-')
+      Tempfile.new(['opal-system-runner', ".#{ext}"])
     end
 
   tempfile.write code

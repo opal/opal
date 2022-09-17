@@ -113,22 +113,22 @@ module Opal
       gems.each { |gem_name| builder.use_gem gem_name }
 
       # --require
-      requires.each { |required| builder.build(required) }
+      requires.each { |required| builder.build(required, requirable: true, load: true) }
 
       # --preload
       preload.each { |path| builder.build_require(path) }
 
       # --verbose
-      builder.build_str '$VERBOSE = true', '(flags)' if verbose
+      builder.build_str '$VERBOSE = true', '(flags)', no_export: true if verbose
 
       # --debug
-      builder.build_str '$DEBUG = true', '(flags)' if debug
+      builder.build_str '$DEBUG = true', '(flags)', no_export: true if debug
 
       # --eval / stdin / file
       evals_or_file { |source, filename| builder.build_str(source, filename) }
 
       # --no-exit
-      builder.build_str '::Kernel.exit', '(exit)' unless no_exit
+      builder.build_str '::Kernel.exit', '(exit)', no_export: true unless no_exit
 
       builder
     end

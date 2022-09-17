@@ -99,7 +99,10 @@ module Opal
       rel_path = expand_ext(rel_path)
       asset = processor_for(source, rel_path, abs_path, false, options)
       requires = preload + asset.requires + tree_requires(asset, abs_path)
-      requires.map { |r| process_require(r, asset.autoloads, options) }
+      requires.map do |r|
+        # Don't automatically load modules required by the module
+        process_require(r, asset.autoloads, options.merge(load: false))
+      end
       processed << asset
       self
     rescue MissingRequire => error
@@ -140,6 +143,20 @@ module Opal
 
     attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
       :compiler_options, :missing_require_severity, :cache
+
+    def esm?
+      @compiler_options[:esm]
+    end
+
+    # Output extension, to be used by runners. At least Node.JS switches
+    # to ESM mode only if the extension is "mjs"
+    def output_extension
+      if esm?
+        'mjs'
+      else
+        'js'
+      end
+    end
 
     private
 
