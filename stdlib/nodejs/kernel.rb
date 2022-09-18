@@ -2,8 +2,7 @@ require 'buffer'
 require 'corelib/process/status'
 
 module Kernel
-  @__child_process__ = `require('child_process')`
-  `var __child_process__ = #{@__child_process__}`
+  __child_process__ = ::JS.import('child_process')
 
   def system(*argv, exception: false)
     env = {}

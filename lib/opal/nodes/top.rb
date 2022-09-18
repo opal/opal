@@ -59,16 +59,17 @@ module Opal
           opening
           definition
           closing
-        end
-      end
 
-      def module_name
-        Opal::Compiler.module_name(compiler.file).inspect
+          in_scope do
+            esm_imports if compiler.esm?
+            esm_exports if compiler.esm?
+          end
+        end
       end
 
       def definition
         if compiler.requirable?
-          unshift "Opal.modules[#{module_name}] = "
+          unshift "Opal.modules[#{compiler.module_name.inspect}] = "
         elsif compiler.esm? && !compiler.no_export?
           unshift 'export default '
         end
@@ -95,12 +96,26 @@ module Opal
             # require absolute paths from CLI. For other cases
             # we can expect the module names to be normalized
             # already.
-            line "Opal.load_normalized(#{module_name});"
+            line "Opal.load_normalized(#{compiler.module_name.inspect});"
           end
         elsif compiler.eval?
           line "})(Opal, self);"
         else
           line "});\n"
+        end
+      end
+
+      def esm_imports
+        compiler.esm_imports.reverse.each do |name,path|
+          tmp = "esi#{rand 100000}"
+          unshift "import * as #{tmp} from ", expr(s(:str, path)), ";\n",
+                  "Opal.esm_imports[", expr(s(:str, name)), "] = #{tmp};\n"
+        end
+      end
+
+      def esm_exports
+        compiler.esm_exports.each do |name,var|
+          push "export #{var} Opal.esm_exports[", expr(s(:str, name)), "];"
         end
       end
 

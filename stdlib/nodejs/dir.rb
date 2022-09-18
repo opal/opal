@@ -1,12 +1,15 @@
 class Dir
-  @__glob__ = `require('glob')`
-  @__fs__ = `require('fs')`
-  @__path__ = `require('path')`
-  @__os__ = `require('os')`
-  `var __glob__ = #{@__glob__}`
-  `var __fs__ = #{@__fs__}`
-  `var __path__ = #{@__path__}`
-  `var __os__ = #{@__os__}`
+  # legacy:
+  #__glob__ = `require('glob')`
+  # ES6: not working
+  #__glob__ = ::JS.import('../../home/user/Code/opal/opal/node_modules/glob/glob.js').JS[:default]
+  #`console.log(__glob__)`
+  __glob__ = ::JS.import('glob')
+  # ES5:
+  # __glob__ = ::JS.import('glob')
+  __fs__ = ::JS.import('fs')
+  __path__ = ::JS.import('path')
+  __os__ = ::JS.import('os')
 
   class << self
     def [](glob)

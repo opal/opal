@@ -17,11 +17,9 @@ require 'nodejs/file'
   }
 }
 
-`var __fs__ = require('fs')`
+__fs__ = ::JS.import('fs')
 
 class IO
-  @__fs__ = `__fs__`
-
   attr_reader :lineno
 
   alias initialize_before_node_io initialize

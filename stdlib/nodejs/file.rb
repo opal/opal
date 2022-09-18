@@ -1,5 +1,9 @@
 require 'corelib/file'
 
+__fs__ = ::JS.import('fs')
+__path__ = ::JS.import('path')
+__util__ = ::JS.import('util')
+
 %x{
   var warnings = {}, errno_codes = #{Errno.constants};
 
@@ -109,12 +113,6 @@ require 'corelib/file'
 }
 
 class File < IO
-  @__fs__ = `require('fs')`
-  @__path__ = `require('path')`
-  @__util__ = `require('util')`
-  `var __fs__ = #{@__fs__}`
-  `var __path__ = #{@__path__}`
-  `var __util__ = #{@__util__}`
   # Since Node.js 11+ TextEncoder and TextDecoder are now available on the global object.
   `var __TextEncoder__ = typeof TextEncoder !== 'undefined' ? TextEncoder : __util__.TextEncoder`
   `var __TextDecoder__ = typeof TextDecoder !== 'undefined' ? TextDecoder : __util__.TextDecoder`
@@ -305,9 +303,6 @@ class File < IO
 end
 
 class File::Stat
-  @__fs__ = `require('fs')`
-  `var __fs__ = #{@__fs__}`
-
   def initialize(path)
     @path = path
   end

@@ -1,6 +1,5 @@
 module OpenURI
-  @__xmlhttprequest__ = `require('unxhr')`
-  `var __XMLHttpRequest__ = #{@__xmlhttprequest__}.XMLHttpRequest`
+  #__xmlhttprequest__ = ::JS.import('../../home/user/Code/opal/opal/node_modules/unxhr/lib/XMLHttpRequest.js')
 
   def self.request(uri)
     %x{

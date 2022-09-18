@@ -58,6 +58,10 @@ module Opal
       Pathname(path).cleanpath.to_s
     end
 
+    def module_name
+      Opal::Compiler.module_name(file)
+    end
+
     # Defines a compiler option.
     # @option as: [Symbol] uses a different method name, e.g. with a question mark for booleans
     # @option default: [Object] the default value for the option
@@ -250,6 +254,8 @@ module Opal
       @option_values = {}
       @magic_comments = {}
       @dynamic_cache_result = false
+      @esm_imports = []
+      @esm_exports = []
     end
 
     # Compile some ruby code to a string.
@@ -594,17 +600,35 @@ module Opal
       end
     end
 
+    # ESM/CommonJS imports and exports
+    def esm_import(path)
+      name = "#{module_name}/#{path}"
+      @esm_imports << [name, path]
+      name
+    end
+
+    def esm_export(var)
+      name = "#{module_name}/#{var}"
+      @esm_exports << [name, var]
+      name
+    end
+
+    attr_reader :esm_imports, :esm_exports
+
     # Marshalling for cache shortpath
     def marshal_dump
       [@options, @option_values, @source_map ||= source_map.cache,
        @magic_comments, @result,
-       @required_trees, @requires, @autoloads]
+       @required_trees, @requires, @autoloads,
+       @esm_imports, @esm_exports
+      ]
     end
 
     def marshal_load(src)
       @options, @option_values, @source_map,
       @magic_comments, @result,
-      @required_trees, @requires, @autoloads = src
+      @required_trees, @requires, @autoloads,
+      @esm_imports, @esm_exports = src
     end
   end
 end

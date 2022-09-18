@@ -2846,6 +2846,12 @@
     }
   }
 
+  // ESM
+  // ---
+
+  Opal.esm_imports = {};
+  Opal.esm_exports = {};
+
   // Initialization
   // --------------
   Opal.BasicObject = BasicObject = Opal.allocate_class('BasicObject', null);

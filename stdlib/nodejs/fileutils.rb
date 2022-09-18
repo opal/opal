@@ -1,6 +1,6 @@
 module FileUtils
   extend self
-  `var __fs__ = #{File}.__fs__`
+  __fs__ = ::JS.import('fs')
 
   def chmod(mode, file_list)
     raise NotImplementedError, 'symbolic mode is not supported, use numeric mode' if String === mode

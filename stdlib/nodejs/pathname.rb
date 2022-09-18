@@ -3,8 +3,7 @@ require 'pathname'
 class Pathname
   include Comparable
 
-  @__path__ = `require('path')`
-  `var __path__ = #{@__path__}`
+  __path__ = ::JS.import("path")
 
   def absolute?
     `__path__.isAbsolute(#{@path.to_str})`
