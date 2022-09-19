@@ -5,11 +5,15 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class ValueNode < Base
-      handle :true, :false, :self, :nil
+      handle :true, :false, :self, :nil, :shorttrue, :shortfalse
 
       def compile
         if type == :self
           push scope.self
+        elsif type == :shorttrue
+          push "true"
+        elsif type == :shortfalse
+          push "false"
         else
           push type.to_s
         end

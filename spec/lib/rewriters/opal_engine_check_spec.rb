@@ -22,7 +22,7 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
             expect_rewritten(
               s(:if, check, true_branch, false_branch)
             ).to eq(
-              true_branch
+              s(:if, s(:shorttrue), true_branch, false_branch)
             )
           end
         end
@@ -50,7 +50,7 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
             expect_rewritten(
               s(:if, check, true_branch, false_branch)
             ).to eq(
-              false_branch
+              s(:if, s(:shortfalse), true_branch, false_branch)
             )
           end
         end
@@ -98,16 +98,20 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
             )
           )
         ).to eq(
-          # if true
-          #   :a
-          #   nil
-          # end
-
           s(:if,
             s(:true),
-            s(:begin,
-              s(:sym, :a),
-              s(:nil)
+            s(:if,
+              s(:shorttrue),
+              s(:begin,
+                s(:if,
+                  s(:shorttrue),
+                  s(:sym, :a)
+                ),
+                s(:if,
+                  s(:shortfalse),
+                  s(:sym, :b)
+                )
+              )
             )
           )
         )

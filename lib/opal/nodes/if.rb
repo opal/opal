@@ -11,7 +11,9 @@ module Opal
       children :test, :true_body, :false_body
 
       def compile
-        if should_compile_as_simple_expression?
+        if shorted?
+          compile_shorted
+        elsif should_compile_as_simple_expression?
           if true_body == s(:true)
             compile_with_binary_or
           elsif false_body == s(:false)
@@ -88,6 +90,23 @@ module Opal
           compiler.returns(body)
         else
           body
+        end
+      end
+
+      # Shorted expressions are those that have s(:shorttrue) or
+      # s(:shortfalse) as test. This is so that we can rewrite
+      # expressions either in compiler or rewriters to skip
+      # certain cases.
+      def shorted?
+        %i[shorttrue shortfalse].include? test.type
+      end
+
+      def compile_shorted
+        case test.type
+        when :shorttrue
+          push process(true_body, @level)
+        when :shortfalse
+          push process(false_body, @level)
         end
       end
 
