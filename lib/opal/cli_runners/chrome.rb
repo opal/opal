@@ -67,10 +67,13 @@ module Opal
         map = builder.source_map.to_json
         stack = File.read("#{__dir__}/source-map-support-browser.js")
 
+        ext = builder.output_extension
+        module_type = ' type="module"' if builder.esm?
+
         # Chrome can't handle huge data passed to `addScriptToEvaluateOnLoad`
         # https://groups.google.com/a/chromium.org/forum/#!topic/chromium-discuss/U5qyeX_ydBo
         # The only way is to create temporary files and pass them to chrome.
-        File.write("#{dir}/index.js", js)
+        File.write("#{dir}/index.#{ext}", js)
         File.write("#{dir}/source-map-support.js", stack)
         File.write("#{dir}/index.html", <<~HTML)
           <html><head>
@@ -79,14 +82,14 @@ module Opal
             <script>
             sourceMapSupport.install({
               retrieveSourceMap: function(path) {
-                return path.endsWith('/index.js') ? {
+                return path.endsWith('/index.#{ext}') ? {
                   url: './index.map', map: #{map.to_json}
                 } : null;
               }
             });
             </script>
           </head><body>
-            <script src='./index.js'></script>
+            <script src='./index.#{ext}'#{module_type}></script>
           </body></html>
         HTML
       end

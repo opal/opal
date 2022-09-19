@@ -62,10 +62,14 @@ module Opal
         end
       end
 
+      def module_name
+        Opal::Compiler.module_name(compiler.file).inspect
+      end
+
       def definition
         if compiler.requirable?
-          unshift "Opal.modules[#{Opal::Compiler.module_name(compiler.file).inspect}] = "
-        elsif compiler.esm?
+          unshift "Opal.modules[#{module_name}] = "
+        elsif compiler.esm? && !compiler.no_export?
           unshift 'export default '
         end
       end
@@ -85,6 +89,14 @@ module Opal
       def closing
         if compiler.requirable?
           line "};\n"
+
+          if compiler.load?
+            # Opal.load normalizes the path, so that we can't
+            # require absolute paths from CLI. For other cases
+            # we can expect the module names to be normalized
+            # already.
+            line "Opal.load_normalized(#{module_name});"
+          end
         elsif compiler.eval?
           line "})(Opal, self);"
         else

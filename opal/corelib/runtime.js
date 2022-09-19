@@ -2650,9 +2650,7 @@
     }
   };
 
-  Opal.load = function(path) {
-    path = Opal.normalize(path);
-
+  Opal.load_normalized = function(path) {
     Opal.loaded([path]);
 
     var module = Opal.modules[path];
@@ -2684,6 +2682,12 @@
     return true;
   };
 
+  Opal.load = function(path) {
+    path = Opal.normalize(path);
+
+    return Opal.load_normalized(path);
+  };
+
   Opal.require = function(path) {
     path = Opal.normalize(path);
 
@@ -2691,7 +2695,7 @@
       return false;
     }
 
-    return Opal.load(path);
+    return Opal.load_normalized(path);
   };
 
 

@@ -137,10 +137,22 @@ module Opal
     # Prepare the code for future requires
     compiler_option :requirable, default: false, as: :requirable?
 
+    # @!method load?
+    #
+    # Instantly load a requirable module
+    compiler_option :load, default: false, as: :load?
+
     # @!method esm?
     #
-    # Wrap compiler result as self contained ES6 module
+    # Encourage ESM semantics, eg. exporting run result
     compiler_option :esm, default: false, as: :esm?
+
+    # @!method no_export?
+    #
+    # Don't export this compile, even if ESM mode is enabled. We use
+    # this internally in CLI, so that even if ESM output is desired,
+    # we would only have one default export.
+    compiler_option :no_export, default: false, as: :no_export?
 
     # @!method inline_operators?
     #
