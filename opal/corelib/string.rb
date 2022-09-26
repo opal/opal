@@ -387,7 +387,7 @@ class ::String < `String`
       if (self.slice(0, prefix.length) === prefix) {
         return self.slice(prefix.length);
       } else {
-        return self;
+        return new String(self.toString());
       }
     }
   end
@@ -401,7 +401,7 @@ class ::String < `String`
       if (self.slice(self.length - suffix.length) === suffix) {
         return self.slice(0, self.length - suffix.length);
       } else {
-        return self;
+        return new String(self.toString());
       }
     }
   end

@@ -60,7 +60,6 @@ opal_filter "Encoding" do
   fails "String#[]= with a Regexp index replaces multibyte characters with characters" # NoMethodError: undefined method `[]=' for "ありがとう":String
   fails "String#[]= with a Regexp index replaces multibyte characters with multibyte characters" # NoMethodError: undefined method `[]=' for "ありがとう":String
   fails "String#ascii_only? returns false after appending non ASCII characters to an empty String" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
-  fails "String#ascii_only? returns false when concatenating an ASCII and non-ASCII String" # NoMethodError: undefined method `concat' for "":String
   fails "String#ascii_only? returns false when replacing an ASCII String with a non-ASCII String" # NoMethodError: undefined method `replace' for "":String
   fails "String#b returns new string without modifying self" # NoMethodError: undefined method `b' for "こんちには":String
   fails "String#byteslice on on non ASCII strings returns byteslice of unicode strings" # Expected nil to equal "\u0081"

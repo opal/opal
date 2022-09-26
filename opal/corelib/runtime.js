@@ -2746,7 +2746,12 @@
     return Opal.set_encoding(dup, "binary", "internal_encoding");
   }
 
+
+  // Promises
+  // --------
+
   Opal.last_promise = null;
+
   Opal.promise_unhandled_exception = false;
 
   // Run a block of code, but if it returns a Promise, don't run the next

@@ -24,20 +24,6 @@
   }
 }
 
-class ::String
-  `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal."`
-
-  %i[
-    << capitalize! chomp! chop! downcase! gsub! lstrip! next! reverse!
-    slice! squeeze! strip! sub! succ! swapcase! tr! tr_s! upcase! prepend
-    []= clear encode! unicode_normalize!
-  ].each do |method_name|
-    define_method method_name do |*|
-      ::Kernel.raise ::NotImplementedError, `ERROR` % method_name
-    end
-  end
-end
-
 module ::Kernel
   `var ERROR = "Object freezing is not supported by Opal"`
 
