@@ -648,6 +648,12 @@ class ::String < `String`
     `self.toString()`
   end
 
+  def length
+    `self.length`
+  end
+
+  alias size length
+
   def lines(separator = $/, chomp: false, &block)
     e = each_line(separator, chomp: chomp, &block)
     block ? self : e.to_a
