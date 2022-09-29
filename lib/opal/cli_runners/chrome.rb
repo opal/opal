@@ -80,6 +80,7 @@ module Opal
             <meta charset='utf-8'>
             <script src='./source-map-support.js'></script>
             <script>
+            window.opalheadlesschrome = true;
             sourceMapSupport.install({
               retrieveSourceMap: function(path) {
                 return path.endsWith('/index.#{ext}') ? {

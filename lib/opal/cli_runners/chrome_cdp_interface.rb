@@ -106,17 +106,34 @@ CDP(options, function(client) {
           else
             `Page.handleJavaScriptDialog({accept: false})`
           end
+        elsif `dialog.type` == 'alert' && `dialog.message` == 'opalheadlesschromeexit'
+          # A special case of an alert with a magic string "opalheadlesschromeexit".
+          # This denotes that `Kernel#exit` has been called. We would have rather used
+          # an exception here, but they don't bubble sometimes.
+          %x{
+            Page.handleJavaScriptDialog({accept: true});
+            Runtime.evaluate({ expression: "window.OPAL_EXIT_CODE" }).then(function(output) {
+              client.close();
+              if (typeof(output.result) !== "undefined" && output.result.type === "number") {
+                process.exit(output.result.value);
+              } else {
+                process.exit(0);
+              }
+            });
+          }
         end
       }
     });
 
     Page.loadEventFired(() => {
       Runtime.evaluate({ expression: "window.OPAL_EXIT_CODE" }).then(function(output) {
-        client.close();
-
         if (typeof(output.result) !== "undefined" && output.result.type === "number") {
+          client.close();
           process.exit(output.result.value);
+        } else if (typeof(output.result) !== "undefined" && output.result.type === "string" && output.result.value === "noexit") {
+          // do nothing, we have headless chrome support enabled and there are most probably async events awaiting
         } else {
+          client.close();
           process.exit(0);
         }
       })
