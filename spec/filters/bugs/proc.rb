@@ -45,12 +45,9 @@ opal_filter "Proc" do
   fails "Proc#ruby2_keywords prints warning when a proc does not accept argument splat" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x3660a>
   fails "Proc#ruby2_keywords returns self" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x36602>
   fails "Proc#source_location returns an Array"
-  fails "Proc#source_location returns the first line of a multi-line proc (i.e. the line containing 'proc do')"
-  fails "Proc#source_location returns the location of the proc's body; not necessarily the proc itself"
   fails "Proc#source_location returns the same value for a proc-ified method as the method reports" # Expected ["ruby/core/proc/fixtures/source_location.rb", 3] to equal nil
   fails "Proc#source_location sets the first value to the path of the file in which the proc was defined"
   fails "Proc#source_location sets the last value to an Integer representing the line on which the proc was defined" # NoMethodError: undefined method `last' for nil
-  fails "Proc#source_location works even if the proc was created on the same line"
   fails "Proc#to_s for a proc created with Proc.new has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Proc#to_s for a proc created with Proc.new returns a description including file and line number" # Expected "#<Proc:0x17cc0>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:6>$/ to be truthy but was nil
   fails "Proc#to_s for a proc created with Symbol#to_proc has a binary encoding" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>

@@ -24,6 +24,10 @@ module Opal
           blockopts << "$$parameters: #{parameters_code}"
         end
 
+        if compiler.enable_source_location?
+          blockopts << "$$source_location: #{source_location}"
+        end
+
         # MRI expands a passed argument if the block:
         # 1. takes a single argument that is an array
         # 2. has more that one argument

@@ -1323,7 +1323,7 @@ class ::String < `String`
   def to_proc
     method_name = `self.valueOf()`
 
-    ::Kernel.proc do |*args, &block|
+    proc = ::Kernel.proc do |*args, &block|
       %x{
         if (args.length === 0) {
           #{::Kernel.raise ::ArgumentError, 'no receiver given'}
@@ -1353,6 +1353,10 @@ class ::String < `String`
         }
       }
     end
+
+    `proc.$$source_location = nil`
+
+    proc
   end
 
   def to_s
