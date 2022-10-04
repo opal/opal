@@ -181,6 +181,10 @@ module Opal
         options[:enable_source_location] = true
       end
 
+      on('--enable-file-source-embed', 'Embeds file sources to be accessed by applications.') do
+        options[:enable_file_source_embed] = true
+      end
+
       on('--use-strict', 'Enables JavaScript\'s strict mode (i.e., adds \'use strict\'; statement)') do
         options[:use_strict] = true
       end

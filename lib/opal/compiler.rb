@@ -166,6 +166,11 @@ module Opal
     # Adds source_location for every method definition
     compiler_option :enable_source_location, default: false, as: :enable_source_location?
 
+    # @!method enable_file_source_embed?
+    #
+    # Embeds source code along compiled files
+    compiler_option :enable_file_source_embed, default: false, as: :enable_file_source_embed?
+
     # @!method use_strict?
     #
     # Enables JavaScript's strict mode (i.e., adds 'use strict'; statement)
@@ -234,6 +239,9 @@ module Opal
 
     # Magic comment flags extracted from the leading comments
     attr_reader :magic_comments
+
+    # Access the source code currently processed
+    attr_reader :source
 
     # Set if some rewritter caused a dynamic cache result, meaning it's not
     # fit to be cached
