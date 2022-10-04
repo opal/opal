@@ -103,7 +103,7 @@ require 'corelib/file'
         var error_class = #{Errno.const_get(`error.code`)}
         #{Kernel.raise `error_class`.new(`error.message`)}
       }
-      #{Kernel.raise error}
+      #{Kernel.raise `error`}
     }
   }
 }
@@ -165,6 +165,7 @@ class File < IO
   def self.join(*paths)
     # by itself, `path.posix.join` normalizes leading // to /.
     # restore the leading / on UNC paths (i.e., paths starting with //).
+    paths = paths.map(&:to_s)
     prefix = paths.first&.start_with?('//') ? '/' : ''
     `#{prefix} + __path__.posix.join.apply(__path__, #{paths})`
   end
