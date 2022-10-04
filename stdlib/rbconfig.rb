@@ -7,10 +7,13 @@ module RbConfig
     'TEENY'        => versions[2],
     'RUBY'         => RUBY_ENGINE,
     'RUBY_INSTALL_NAME' => RUBY_ENGINE,
+    'ruby_install_name' => RUBY_ENGINE,
     'RUBY_SO_NAME'      => RUBY_ENGINE,
     'target_os'         => 'ECMA-262',
     'host_os'           => 'ECMA-262',
-    'PATH_SEPARATOR'    => ':'
+    'PATH_SEPARATOR'    => ':',
+    'EXEEXT'            => '',
+    'bindir'            => '',
   }
 end
 
