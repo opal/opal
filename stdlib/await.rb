@@ -1,5 +1,5 @@
 # helpers: coerce_to
-# await: true
+# await: await
 
 if `Opal.config.experimental_features_severity == 'warning'`
   warn 'Await functionality is a technology preview, which means it may change its behavior ' \
@@ -19,21 +19,25 @@ class Array
     i = 0
     results = []
     while i < `self.length`
-      results << yield(self[i]).__await__
+      results << yield(self[i]).await
       i += 1
     end
     results
   end
 
   def each_await(&block)
-    map_await(&block).__await__
+    i = 0
+    while i < `self.length`
+      yield(self[i]).await
+      i += 1
+    end
     self
   end
 end
 
 module Enumerable
   def each_async(&block)
-    PromiseV2.when(*map(&block)).__await__
+    PromiseV2.when(*map(&block)).await
   end
 end
 
@@ -44,7 +48,7 @@ module Kernel
 
     until $__at_exit__.empty?
       block = $__at_exit__.pop
-      block.call.__await__
+      block.call.await
     end
 
     %x{
@@ -64,9 +68,7 @@ module Kernel
     `setTimeout(#{proc { prom.resolve }}, #{seconds * 1000})`
     prom
   end
-end
 
-module Kernel
   alias await itself
 end
 
@@ -79,5 +81,40 @@ end
 class Method
   def async?
     @method.async?
+  end
+end
+
+class BasicObject
+  def instance_exec_await(*args, &block)
+    ::Kernel.raise ::ArgumentError, 'no block given' unless block
+
+    # The awaits are defined inside an x-string. Opal can't find them
+    # reliably and async-ify a method. Therefore, let's make Opal know
+    # this is an async method.
+    nil.__await__
+
+    %x{
+      var block_self = block.$$s,
+          result;
+
+      block.$$s = null;
+
+      if (self.$$is_a_module) {
+        self.$$eval = true;
+        try {
+          result = await block.apply(self, args);
+        }
+        finally {
+          self.$$eval = false;
+        }
+      }
+      else {
+        result = await block.apply(self, args);
+      }
+
+      block.$$s = block_self;
+
+      return result;
+    }
   end
 end

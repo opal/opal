@@ -332,6 +332,9 @@ class Promise
     v2
   end
 
+  # PromiseV1 is not a native construct, we must convert it to a v2 promise
+  alias await to_v2
+
   alias catch fail
   alias catch! fail!
   alias do then
