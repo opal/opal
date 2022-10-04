@@ -212,8 +212,10 @@ module REPLUtils
       },
       head: {
         self: "\e[45m",
-        filename: "\e[37;45m"
+        filename: "\e[37;45m",
       },
+
+      reset: "\e[0m",
     }
 
     TOKEN_COLORS[:keyword] = TOKEN_COLORS[:reserved]
@@ -238,7 +240,7 @@ module REPLUtils
     end
 
     def self.token(string, *name)
-      TOKEN_COLORS.dig(*name) + string + "\e[0m"
+      TOKEN_COLORS.dig(*name) + string + TOKEN_COLORS[:reset]
     end
 
     NUMBER = '[+-]?(?:0x[0-9a-fA-F]+|[0-9.]+(?:e[+-][0-9]+|i)?)'
@@ -274,7 +276,7 @@ module REPLUtils
         when 'true', 'false', 'nil'
           token(tok, :predefined_constant)
         else
-          tok
+          token(tok, :reset)
         end
       end.join
     end
