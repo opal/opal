@@ -1,11 +1,15 @@
 %x{
+  // Inhibit the default exit behavior
+  window.OPAL_EXIT_CODE = "noexit";
+
   Opal.exit = function(code) {
-    // You can't exit from the browser.
     // The first call to Opal.exit should save an exit code.
     // All next invocations must be ignored.
+    // Then we send an event to Chrome CDP Interface that we are finished
 
-    if (typeof(window.OPAL_EXIT_CODE) === "undefined") {
+    if (window.OPAL_EXIT_CODE === "noexit") {
       window.OPAL_EXIT_CODE = code;
+      window.alert("opalheadlesschromeexit");
     }
   }
 }
