@@ -11,6 +11,8 @@ require 'opal/deprecations'
 #
 # @example (CLI)
 #   rackup -ropal -ropal/simple_server -b 'Opal.append_path("app"); run Opal::SimpleServer.new'
+#   ... or use the Server runner ...
+#   opal -Rserver app.rb
 class Opal::SimpleServer
   require 'set'
   require 'erb'
@@ -54,13 +56,16 @@ class Opal::SimpleServer
     ]
   end
 
-  def fetch_asset(path)
+  def builder(path)
     builder = Opal::Builder.new
     builder.build(path.gsub(/(\.(?:rb|js|opal))*\z/, ''))
+  end
+
+  def fetch_asset(path)
+    builder = self.builder(path)
     {
       data: builder.to_s,
-      map: builder.source_map,
-      source: builder.source_for(path),
+      map: builder.source_map
     }
   end
 
@@ -86,10 +91,11 @@ class Opal::SimpleServer
       <!doctype html>
       <html>
         <head>
-          <meta charset="utf8">
-          #{javascript_include_tag(main)}
+          <meta charset="utf-8">
         </head>
-        <body></body>
+        <body>
+          #{javascript_include_tag(main)}
+        </body>
       </html>
       HTML
     end

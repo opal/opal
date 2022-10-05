@@ -15,11 +15,10 @@ RSpec.describe Opal::CliRunners::Server do
       expect(options[:Port]).to eq(1234)
     end
 
-    builder = Opal::Builder.new
-    builder.build_str("puts 123", "app.rb")
+    builder = -> { Opal::Builder.new.build_str("puts 123", "app.rb") }
     described_class.call(builder: builder, options: {port: 1234})
 
-    get '/cli_runner.js'
+    get '/assets/cli_runner.js'
     expect(last_response.body).to include(".$puts(123)")
   end
 end

@@ -138,7 +138,7 @@ RSpec.describe Opal::CLI do
       let(:options)  { {:gems => [gem_name], :evals => ['']} }
 
       it "adds the gem's lib paths to Opal.path" do
-        builder = cli.builder
+        builder = cli.create_builder
 
         spec = Gem::Specification.find_by_name(gem_name)
         spec.require_paths.each do |require_path|
