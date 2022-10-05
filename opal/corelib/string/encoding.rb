@@ -403,12 +403,6 @@ class ::String
     }
   end
 
-  def length
-    `self.length`
-  end
-
-  alias size length
-
   # stub
   def valid_encoding?
     true
