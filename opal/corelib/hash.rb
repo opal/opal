@@ -84,6 +84,8 @@ class ::Hash
 
   def initialize(defaults = undefined, &block)
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       if (defaults !== undefined && block !== nil) {
         #{::Kernel.raise ::ArgumentError, 'wrong number of arguments (1 for 0)'}
       }
@@ -189,6 +191,8 @@ class ::Hash
 
   def []=(key, value)
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       $hash_put(self, key, value);
       return value;
     }
@@ -216,6 +220,8 @@ class ::Hash
 
   def clear
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       $hash_init(self);
       return self;
     }
@@ -257,6 +263,8 @@ class ::Hash
 
   def compact!
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       var changes_were_made = false;
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
@@ -284,6 +292,8 @@ class ::Hash
 
   def compare_by_identity
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       var i, ii, key, keys = self.$$keys, identity_hash;
 
       if (self.$$by_identity) return self;
@@ -324,6 +334,8 @@ class ::Hash
 
   def default=(object)
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       self.$$proc = nil;
       self.$$none = object;
 
@@ -342,6 +354,8 @@ class ::Hash
 
   def default_proc=(default_proc)
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       var proc = default_proc;
 
       if (proc !== nil) {
@@ -361,6 +375,7 @@ class ::Hash
 
   def delete(key, &block)
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
       var value = $hash_delete(self, key);
 
       if (value !== undefined) {
@@ -379,6 +394,8 @@ class ::Hash
     return enum_for(:delete_if) { size } unless block
 
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
@@ -538,6 +555,30 @@ class ::Hash
 
       return result;
     }
+  end
+
+  def freeze
+    %x{
+      try {
+        // try to use Object.freeze()
+        Object.freeze(self.$$map);
+        Object.freeze(self.$$smap);
+        Object.freeze(self.$$keys);
+        // Object.freeze(self); // causes lots of errors in the specs
+      } catch(err) {
+        // Object.freeze may fail for various reasons depending on js engine
+        // but ignore if it fails, it is just a safe guard against manipulation
+        // from javascript, rely on $$frozen instead for access from ruby
+      }
+      // calling Object.isFrozen is way slower than testing for a flag
+      // set the flag and test for it in the other methods for performance
+      self.$$frozen = true;
+    }
+    self
+  end
+
+  def frozen?
+    `self.$$frozen ? true : false`
   end
 
   def has_key?(key)
@@ -714,6 +755,8 @@ class ::Hash
     return enum_for(:keep_if) { size } unless block
 
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
@@ -766,6 +809,7 @@ class ::Hash
 
   def merge!(*others, &block)
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
       var i, j, other, other_keys, length, key, value, other_value;
       for (i = 0; i < others.length; ++i) {
         other = #{::Opal.coerce_to!(`others[i]`, ::Hash, :to_hash)};
@@ -834,6 +878,7 @@ class ::Hash
 
   def rehash
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
       Opal.hash_rehash(self);
       return self;
     }
@@ -870,6 +915,8 @@ class ::Hash
     return enum_for(:reject!) { size } unless block
 
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       var changes_were_made = false;
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
@@ -898,6 +945,8 @@ class ::Hash
   end
 
   def replace(other)
+    `if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }`
+
     other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
 
     %x{
@@ -957,6 +1006,8 @@ class ::Hash
     return enum_for(:select!) { size } unless block
 
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       var result = nil;
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
@@ -986,6 +1037,7 @@ class ::Hash
 
   def shift
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
       var keys = self.$$keys,
           key;
 
@@ -1100,6 +1152,8 @@ class ::Hash
     return enum_for(:transform_keys!) { size } unless block
 
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       var keys = Opal.slice.call(self.$$keys),
           i, length = keys.length, key, value, new_key;
 
@@ -1152,6 +1206,8 @@ class ::Hash
     return enum_for(:transform_values!) { size } unless block
 
     %x{
+      if (self.$$frozen) { #{raise FrozenError.new("can't modify frozen #{self.class}: #{self}", receiver: self)} }
+
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
