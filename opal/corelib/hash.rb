@@ -572,7 +572,9 @@ class ::Hash
         Object.freeze(self.$$map);
         Object.freeze(self.$$smap);
         Object.freeze(self.$$keys);
-        Object.freeze(self);
+        // some properties (eg. used as cache) are lazily added to instances
+        // therefor currently can't freeze the instances
+        // Object.freeze(self);
       }
     }
     self
