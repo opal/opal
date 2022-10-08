@@ -79,56 +79,12 @@ opal_unsupported_filter "freezing" do
   fails "FalseClass#to_s returns a frozen string" # Expected "false".frozen? to be truthy but was false
   fails "File.basename returns a new unfrozen String" # Expected "foo.rb" not to be identical to "foo.rb"
   fails "FrozenError#receiver should return frozen object that modification was attempted on" # RuntimeError: RuntimeError
-  fails "FrozenError.new should take optional receiver argument" # NoMethodError: undefined method `receiver' for #<FrozenError: msg>
   fails "Hash literal does not change encoding of literal string keys during creation"
   fails "Hash literal freezes string keys on initialization"
   fails "Hash#== compares keys with matching hash codes via eql?"
   fails "Hash#[]= doesn't duplicate and freeze already frozen string keys"
-  fails "Hash#[]= raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (2 was returned)
-  fails "Hash#clear raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
-  fails "Hash#compact! on frozen instance keeps pairs and raises a FrozenError" # Expected FrozenError but no exception was raised ({"truthy"=>true, "false"=>false, nil=>true} was returned)
-  fails "Hash#compact! on frozen instance keeps pairs and raises a RuntimeError"
-  fails "Hash#compare_by_identity raises a FrozenError on frozen hashes" # Expected FrozenError but no exception was raised ({} was returned)
-  fails "Hash#default= raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
-  fails "Hash#default_proc= raises a FrozenError if self is frozen" # Expected FrozenError but no exception was raised (main was returned)
-  fails "Hash#delete raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
-  fails "Hash#delete_if raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({1=>2, 3=>4} was returned)
-  fails "Hash#delete_if returns an Enumerator if called on a frozen instance"
-  fails "Hash#each returns an Enumerator if called on a frozen instance"
-  fails "Hash#each_key returns an Enumerator if called on a frozen instance"
-  fails "Hash#each_pair returns an Enumerator if called on a frozen instance"
-  fails "Hash#each_value returns an Enumerator if called on a frozen instance"
   fails "Hash#eql? compares keys with matching hash codes via eql?"
-  fails "Hash#filter returns an Enumerator if called on a frozen instance" # NoMethodError: undefined method `filter' for {1=>2, 3=>4, 5=>6}
-  fails "Hash#filter! raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but got: NoMethodError (undefined method `filter!' for {1=>2, 3=>4})
-  fails "Hash#filter! raises a FrozenError if called on an empty frozen instance" # Expected FrozenError but got: NoMethodError (undefined method `filter!' for {})
-  fails "Hash#filter! returns an Enumerator if called on a frozen instance" # NoMethodError: undefined method `filter!' for {1=>2, 3=>4, 5=>6}
-  fails "Hash#initialize raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({1=>2, 3=>4} was returned)
-  fails "Hash#keep_if raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
-  fails "Hash#keep_if returns an Enumerator if called on a frozen instance"
-  fails "Hash#merge! raises a FrozenError on a frozen instance that is modified" # Expected FrozenError but no exception was raised ({1=>2} was returned)
-  fails "Hash#merge! raises a FrozenError on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({1=>2} was returned)
-  fails "Hash#rehash raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised ({} was returned)
-  fails "Hash#reject returns an Enumerator if called on a frozen instance"
-  fails "Hash#reject! raises a FrozenError if called on a frozen instance that is modified" # Expected FrozenError but no exception was raised (nil was returned)
-  fails "Hash#reject! raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
-  fails "Hash#replace raises a FrozenError if called on a frozen instance that is modified" # Expected FrozenError but no exception was raised ({} was returned)
-  fails "Hash#replace raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({} was returned)
-  fails "Hash#select returns an Enumerator if called on a frozen instance"
-  fails "Hash#select! raises a FrozenError if called on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised (nil was returned)
-  fails "Hash#select! raises a FrozenError if called on an empty frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
-  fails "Hash#select! returns an Enumerator if called on a frozen instance"
-  fails "Hash#shift raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Hash#store doesn't duplicate and freeze already frozen string keys"
-  fails "Hash#store raises a FrozenError if called on a frozen instance" # Expected FrozenError but no exception was raised (2 was returned)
-  fails "Hash#transform_keys! on frozen instance keeps pairs and raises a FrozenError" # NoMethodError: undefined method `transform_keys!' for {"a"=>1, "b"=>2, "c"=>3, "d"=>4}
-  fails "Hash#transform_keys! on frozen instance raises a FrozenError on an empty hash" # NoMethodError: undefined method `transform_keys!' for {}
-  fails "Hash#transform_values! on frozen instance keeps pairs and raises a FrozenError" # Expected FrozenError but no exception was raised ({"a"=>2, "b"=>3, "c"=>4} was returned)
-  fails "Hash#transform_values! on frozen instance keeps pairs and raises a RuntimeError"
-  fails "Hash#transform_values! on frozen instance raises a FrozenError on an empty hash" # Expected FrozenError but no exception was raised ({} was returned)
-  fails "Hash#transform_values! on frozen instance when no block is given does not raise an exception"
-  fails "Hash#update raises a FrozenError on a frozen instance that is modified" # Expected FrozenError but no exception was raised ({1=>2} was returned)
-  fails "Hash#update raises a FrozenError on a frozen instance that would not be modified" # Expected FrozenError but no exception was raised ({} was returned)
   fails "Kernel#clone copies frozen state from the original"
   fails "Kernel#clone copies frozen? and tainted?" # Expected false to be true
   fails "Kernel#clone takes an freeze: true option to frozen copy" # Expected #<KernelSpecs::Duplicate:0x25158>.frozen? to be truthy but was false
