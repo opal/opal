@@ -224,7 +224,6 @@ class ::ZeroDivisionError   < ::StandardError; end
 class ::NameError           < ::StandardError; end
 class ::NoMethodError         < ::NameError; end
 class ::RuntimeError        < ::StandardError; end
-class ::FrozenError           < ::RuntimeError; end
 class ::LocalJumpError      < ::StandardError; end
 class ::TypeError           < ::StandardError; end
 class ::ArgumentError       < ::StandardError; end
@@ -243,6 +242,15 @@ class ::ThreadError         < ::StandardError; end
 class ::FiberError          < ::StandardError; end
 
 ::Object.autoload :Errno, 'corelib/error/errno'
+
+class ::FrozenError < ::RuntimeError
+  attr_reader :receiver
+
+  def initialize(message, receiver: nil)
+    super message
+    @receiver = receiver
+  end
+end
 
 class ::UncaughtThrowError < ::ArgumentError
   attr_reader :tag, :value
