@@ -115,7 +115,7 @@ module Opal
         raise 'Chrome server can be started only on localhost' if chrome_host != DEFAULT_CHROME_HOST
 
         # Disable web security with "--disable-web-security" flag to be able to do XMLHttpRequest (see test_openuri.rb)
-        chrome_server_cmd = %{#{chrome_executable.shellescape} \
+        chrome_server_cmd = %{#{windows? ? "\"#{chrome_executable.shellescape}\"" : chrome_executable.shellescape} \
           --headless \
           --disable-web-security \
           --remote-debugging-port=#{chrome_port} \
@@ -136,7 +136,7 @@ module Opal
         puts 'Make sure that you have it installed and that its version is > 59'
         exit(1)
       ensure
-        if Gem.win_platform? && chrome_pid
+        if windows? && chrome_pid
           Process.kill('KILL', chrome_pid) unless system("taskkill /f /t /pid #{chrome_pid} >NUL 2>NUL")
         elsif chrome_pid
           Process.kill('HUP', chrome_pid)
@@ -153,8 +153,7 @@ module Opal
 
       def chrome_executable
         ENV['GOOGLE_CHROME_BINARY'] ||
-          case RbConfig::CONFIG['host_os']
-          when /bccwin|cygwin|djgpp|mingw|mswin|wince/
+          if windows?
             [
               'C:/Program Files/Google/Chrome Dev/Application/chrome.exe',
               'C:/Program Files/Google/Chrome/Application/chrome.exe'
@@ -162,7 +161,7 @@ module Opal
               next unless File.exist? path
               return path
             end
-          when /darwin|mac os/
+          elsif mac_os?
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
           else
             %w[
@@ -176,6 +175,14 @@ module Opal
             end
             raise 'Cannot find chrome executable'
           end
+      end
+
+      def windows?
+        /bccwin|cygwin|djgpp|mingw|mswin|wince/.match?(RbConfig::CONFIG['host_os'])
+      end
+
+      def mac_os?
+        /darwin|mac os/.match?(RbConfig::CONFIG['host_os'])
       end
 
       def mktmpdir(&block)
