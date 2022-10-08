@@ -565,19 +565,14 @@ class ::Hash
 
   def freeze
     %x{
-      // calling Object.isFrozen is way slower than testing for a flag
-      // set the flag and test for it in the other methods for performance
-      self.$$frozen = true;
-      try {
-        // try to use Object.freeze()
+      if (!self.$$frozen) {
+        // calling Object.isFrozen is way slower than testing for a flag
+        // set the flag and test for it in the other methods for performance
+        self.$$frozen = true;
         Object.freeze(self.$$map);
         Object.freeze(self.$$smap);
         Object.freeze(self.$$keys);
         Object.freeze(self);
-      } catch(err) {
-        // Object.freeze may fail for various reasons depending on js engine
-        // but ignore if it fails, it is just a safe guard against manipulation
-        // from javascript, rely on $$frozen instead for access from ruby
       }
     }
     self
