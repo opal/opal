@@ -79,7 +79,6 @@ opal_unsupported_filter "freezing" do
   fails "FalseClass#to_s returns a frozen string" # Expected "false".frozen? to be truthy but was false
   fails "File.basename returns a new unfrozen String" # Expected "foo.rb" not to be identical to "foo.rb"
   fails "FrozenError#receiver should return frozen object that modification was attempted on" # RuntimeError: RuntimeError
-  fails "FrozenError.new should take optional receiver argument" # NoMethodError: undefined method `receiver' for #<FrozenError: msg>
   fails "Hash literal does not change encoding of literal string keys during creation"
   fails "Hash literal freezes string keys on initialization"
   fails "Hash#== compares keys with matching hash codes via eql?"
