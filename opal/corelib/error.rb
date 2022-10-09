@@ -244,6 +244,15 @@ class ::FiberError          < ::StandardError; end
 
 ::Object.autoload :Errno, 'corelib/error/errno'
 
+class ::FrozenError < ::RuntimeError
+  attr_reader :receiver
+
+  def initialize(message, receiver: nil)
+    super message
+    @receiver = receiver
+  end
+end
+
 class ::UncaughtThrowError < ::ArgumentError
   attr_reader :tag, :value
 
