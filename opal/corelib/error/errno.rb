@@ -6,7 +6,8 @@ module ::Errno
     [:EMFILE, 'Too many open files', 24],
     [:EACCES, 'Permission denied', 13],
     [:EPERM, 'Operation not permitted', 1],
-    [:ENOENT, 'No such file or directory', 2]
+    [:ENOENT, 'No such file or directory', 2],
+    [:ENAMETOOLONG, 'File name too long', 36]
   ]
 
   klass = nil

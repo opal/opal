@@ -86,7 +86,7 @@ class ::Proc < `Function`
 
   def source_location
     `if (self.$$is_curried) { return nil; }`
-    nil
+    `self.$$source_location` || nil
   end
 
   def binding

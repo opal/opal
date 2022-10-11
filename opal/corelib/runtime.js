@@ -2918,4 +2918,8 @@
   Opal.breaker  = new Error('unexpected break (old)');
   Opal.returner = new Error('unexpected return');
   TypeError.$$super = Error;
+
+  // If enable-file-source-embed compiler option is enabled, each module loaded will add its
+  // sources to this object
+  Opal.file_sources = {};
 }).call(this);

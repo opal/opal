@@ -99,7 +99,7 @@ module Opal
 
       def default_compile
         if auto_await?
-          push 'await '
+          push '(await '
           scope.await_encountered = true
         end
 
@@ -112,6 +112,10 @@ module Opal
         end
 
         compile_break_catcher
+
+        if auto_await?
+          push ')'
+        end
       end
 
       # Compiles method call using `Opal.send`

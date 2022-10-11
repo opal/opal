@@ -14,8 +14,6 @@ opal_filter "UnboundMethod" do
   fails "UnboundMethod#original_name returns the original name even when aliased twice" # NoMethodError: undefined method `original_name' for #<UnboundMethod: UnboundMethodSpecs::Methods#foo (defined in UnboundMethodSpecs::Methods in ruby/core/unboundmethod/fixtures/classes.rb:30)>
   fails "UnboundMethod#original_name returns the original name" # NoMethodError: undefined method `original_name' for #<UnboundMethod: UnboundMethodSpecs::Methods#foo (defined in UnboundMethodSpecs::Methods in ruby/core/unboundmethod/fixtures/classes.rb:30)>
   fails "UnboundMethod#source_location sets the first value to the path of the file in which the method was defined" # Expected "ruby/core/unboundmethod/fixtures/classes.rb" to equal "./ruby/core/unboundmethod/fixtures/classes.rb"
-  fails "UnboundMethod#source_location works for define_method methods"
-  fails "UnboundMethod#source_location works for define_singleton_method methods"
   fails "UnboundMethod#super_method returns nil when the parent's method is removed"
   fails "UnboundMethod#super_method returns nil when there's no super method in the parent"
   fails "UnboundMethod#super_method returns the method that would be called by super in the method"

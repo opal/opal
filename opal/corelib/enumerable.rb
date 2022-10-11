@@ -128,7 +128,7 @@ module ::Enumerable
 
   def collect_concat(&block)
     return enum_for(:collect_concat) { enumerator_size } unless block_given?
-    map { |item| yield item }.flatten(1)
+    map(&block).flatten(1)
   end
 
   def compact

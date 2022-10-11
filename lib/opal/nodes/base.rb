@@ -211,9 +211,14 @@ module Opal
       end
 
       def source_location
-        file = @sexp.loc.expression.source_buffer.name
-        file = "<internal:#{file}>" if file.start_with?("corelib/")
-        file = "<js:#{file}>" if file.end_with?(".js")
+        expr = @sexp.loc.expression
+        if expr.respond_to? :source_buffer
+          file = expr.source_buffer.name
+          file = "<internal:#{file}>" if file.start_with?("corelib/")
+          file = "<js:#{file}>" if file.end_with?(".js")
+        else
+          file = "(eval)"
+        end
         line = @sexp.loc.line
         "['#{file}', #{line}]"
       end

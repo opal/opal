@@ -106,6 +106,12 @@ module ::Kernel
     }
   end
 
+  def caller_locations(*args)
+    caller(*args).map do |loc|
+      ::Thread::Backtrace::Location.new(loc)
+    end
+  end
+
   def class
     `self.$$class`
   end

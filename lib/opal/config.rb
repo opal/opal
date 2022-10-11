@@ -139,6 +139,16 @@ module Opal
     # @return [true, false]
     config_option :source_map_enabled, true
 
+    # Enable source location embedded for methods and procs.
+    #
+    # @return [true, false]
+    config_option :enable_source_location, false, compiler_option: :enable_source_location
+
+    # Enable embedding source code to be read by applications.
+    #
+    # @return [true, false]
+    config_option :enable_file_source_embed, false, compiler_option: :enable_file_source_embed
+
     # A set of stubbed files that will be marked as loaded and skipped during
     # compilation. The value is expected to be mutated but it's ok to replace
     # it.

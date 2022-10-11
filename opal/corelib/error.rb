@@ -2,6 +2,8 @@ class ::Exception < `Error`
   `Opal.prop(self.$$prototype, '$$is_exception', true)`
   `var stack_trace_limit`
 
+  `Error.stackTraceLimit = 100`
+
   def self.new(*args)
     %x{
       var message   = (args.length > 0) ? args[0] : nil;
@@ -75,10 +77,10 @@ class ::Exception < `Error`
       var backtrace = self.stack;
 
       if (typeof(backtrace) !== 'undefined' && backtrace.$$is_string) {
-        return self.backtrace = correct_backtrace(backtrace.split("\n").slice(0, 15));
+        return self.backtrace = correct_backtrace(backtrace.split("\n"));
       }
       else if (backtrace) {
-        return self.backtrace = correct_backtrace(backtrace.slice(0, 15));
+        return self.backtrace = correct_backtrace(backtrace);
       }
 
       return [];

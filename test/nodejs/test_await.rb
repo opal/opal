@@ -9,6 +9,11 @@ class TestAwait < Test::Unit::TestCase
     require "await"
   RUBY
 
+  autoawaitheader = <<~RUBY
+    # await: *await*
+    require "await"
+  RUBY
+
   tests = {
     test_await_in_top: [<<~RUBY, 6],
       #{stdheader}
@@ -157,6 +162,39 @@ class TestAwait < Test::Unit::TestCase
       #{stdheader}
       $taval = 5
       $taval = PromiseV2.value(5).__await__ + 10
+    RUBY
+    # Bug before Opal 1.6: compiled autoawait expressions had wrong parentheses rules
+    test_autoawait_awaiting: [<<~RUBY, "very correct"],
+      #{autoawaitheader}
+      $taval = "incorrect"
+      $taval = PromiseV2.value("also incorrect").await.sub("also in", "")
+      $taval = PromiseV2.value("very ").await + $taval
+    RUBY
+    test_autoawait_instance_exec_await: [<<~RUBY, 2*3*5*7*11*13],
+      #{autoawaitheader}
+      # await: *await*
+      $taval = 1
+      module AutoawaitTemporary1
+        $block_with_module_self = proc do
+          # Ensure that block.$$s is generated:
+          self   
+          # AutoawaitTemporary2.$$eval should be true, block.$$s should be unset
+          `\#{AutoawaitTemporary2}.$$eval` && ($taval *= PromiseV2.value(2).await)
+          `block.$$s === null` && ($taval *= PromiseV2.value(3).await)
+        end
+        block = $block_with_module_self
+      end
+      block = $block_with_module_self
+      module AutoawaitTemporary2; end
+      # AutoawaitTemporary2.$$eval should be false, block.$$s should refer to AutoawaitTemporary1
+      `\#{AutoawaitTemporary2}.$$eval` || ($taval *= PromiseV2.value(5).await)
+      `block.$$s === \#{AutoawaitTemporary1}` && ($taval *= PromiseV2.value(7).await)
+      module AutoawaitTemporary2
+        instance_exec_await(&$block_with_module_self)
+      end
+      # both should get their values back after instance_exec_await is finished
+      `\#{AutoawaitTemporary2}.$$eval` || ($taval *= PromiseV2.value(11).await)
+      `block.$$s === \#{AutoawaitTemporary1}` && ($taval *= PromiseV2.value(13).await)
     RUBY
   }
 
