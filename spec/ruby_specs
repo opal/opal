@@ -177,7 +177,8 @@ ruby/library/bigdecimal
 !ruby/library/bigdecimal/util_spec
 ruby/library/date
 ruby/library/datetime
-ruby/library/delegate/delegator/send_spec
+ruby/library/delegate/delegate_class
+ruby/library/delegate/delegator
 ruby/library/erb/util/h_spec
 ruby/library/erb/util/html_escape_spec
 ruby/library/logger/severity_spec

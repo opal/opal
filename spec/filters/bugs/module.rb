@@ -135,7 +135,6 @@ opal_filter "Module" do
   fails "Module#private_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
   fails "Module#private_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
   fails "Module#protected with argument array as a single argument sets visibility of given method names" # NoMethodError: undefined method `protected_instance_methods' for #<Module:0x6994a>
-  fails "Module#protected with argument does not clone method from the ancestor when setting to the same visibility in a child" # NoMethodError: undefined method `protected_instance_methods' for #<Module:0xa2d8>
   fails "Module#protected with argument one or more arguments sets visibility of given method names" # NoMethodError: undefined method `protected_instance_methods' for #<Module:0x33d4a>
   fails "Module#protected_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#protected_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
