@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 # = delegate -- Support for the Delegation Pattern
 #
+# This file ended up in Opal as a port of the following file:
+# https://github.com/ruby/ruby/blob/master/lib/delegate.rb
+#
 # Documentation by James Edward Gray II and Gavin Sinclair
 
 ##

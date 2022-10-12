@@ -1,3 +1,6 @@
+# This file ended up in Opal as a port of:
+# https://github.com/ruby/ruby2_keywords/blob/master/lib/ruby2_keywords.rb
+
 class Module
   unless private_method_defined?(:ruby2_keywords)
     private
