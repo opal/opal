@@ -108,7 +108,9 @@ module ::Kernel
     []
   end
 
+  alias protected_methods private_methods
   alias private_instance_methods private_methods
+  alias protected_instance_methods private_methods
 end
 
 module ::Kernel
