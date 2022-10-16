@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, respond_to, Opal
+# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, rt_freeze
 # use_strict: true
 
 module ::Kernel
@@ -132,7 +132,7 @@ module ::Kernel
     %x{
       var i, name, names, length;
 
-      if (other.hasOwnProperty('$$meta')) {
+      if (other.hasOwnProperty('$$meta') && other.$$meta !== null) {
         var other_singleton_class = Opal.get_singleton_class(other);
         var self_singleton_class = Opal.get_singleton_class(self);
         names = Object.getOwnPropertyNames(other_singleton_class.$$prototype);
@@ -160,18 +160,27 @@ module ::Kernel
     }
   end
 
-  def clone(freeze: true)
+  def clone(freeze: nil)
+    unless freeze.nil? || freeze == true || freeze == false
+      raise ArgumentError.new("unexpected value for freeze: #{freeze.class}")
+    end
+
     copy = self.class.allocate
 
     copy.copy_instance_variables(self)
     copy.copy_singleton_methods(self)
-    copy.initialize_clone(self)
+    copy.initialize_clone(self, freeze: freeze)
+
+    if freeze == true || (freeze.nil? && self.frozen?)
+      copy.freeze
+    end
 
     copy
   end
 
-  def initialize_clone(other)
+  def initialize_clone(other, freeze: nil)
     initialize_copy(other)
+    self
   end
 
   def define_singleton_method(name, method = undefined, &block)
@@ -221,6 +230,12 @@ module ::Kernel
 
   def extend(*mods)
     %x{
+      if (mods.length == 0) {
+        #{raise ::ArgumentError.new("wrong number of arguments (given 0, expected 1+)")}
+      }
+
+      $deny_frozen_access(self);
+
       var singleton = #{singleton_class};
 
       for (var i = mods.length - 1; i >= 0; i--) {
@@ -237,6 +252,60 @@ module ::Kernel
     }
 
     self
+  end
+
+  def freeze
+    return self if frozen?
+
+    %x{
+      if (typeof(self) === "object") {
+        // make setters of instance variables throw FrozenError
+        var prop, prop_type, desc;
+
+        for(prop in self) {
+          prop_type = typeof(prop);
+
+          // prop_type "object" here is a String(), skip $ props
+          if ((prop_type === "string" || prop_type === "object") && prop[0] === '$') {
+            continue;
+          }
+
+          desc = Object.getOwnPropertyDescriptor(self, prop);
+          if (desc && desc.enumerable && desc.writable) {
+            // create closure to retain current value as cv
+            // for Opal 2.0 let for cv should do the trick, instead of a function
+            (function() {
+              // set v to undefined, as if the property is not set
+              var cv = self[prop];
+              Object.defineProperty(self, prop, {
+                get() { return cv; },
+                set(value) { $deny_frozen_access(self); },
+                enumerable: true
+              });
+            })();
+          }
+        }
+
+        return $rt_freeze(self);
+      }
+      return self;
+    }
+  end
+
+  def frozen?
+    %x{
+      switch (typeof(self)) {
+      case "string":
+      case "symbol":
+      case "number":
+      case "boolean":
+        return true;
+      case "object":
+        return (self.$$frozen || false);
+      default:
+        return false;
+      }
+    }
   end
 
   def gets(*args)
@@ -300,6 +369,8 @@ module ::Kernel
   end
 
   def instance_variable_set(name, value)
+    `$deny_frozen_access(self)`
+
     name = ::Opal.instance_variable_name!(name)
 
     `self[Opal.ivar(name.substr(1))] = value`

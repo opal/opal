@@ -1,4 +1,4 @@
-# helpers: coerce_to
+# helpers: coerce_to, prop, rt_freeze
 
 class ::RegexpError < ::StandardError; end
 
@@ -117,6 +117,20 @@ class ::Regexp < `RegExp`
 
   def =~(string)
     match(string) && $~.begin(0)
+  end
+
+  def freeze
+    # Specialized version of freeze, because the $$gm and $$g properties need to be set
+    # especially for RegExp.
+
+    return self if frozen?
+
+    %x{
+      if (!self.hasOwnProperty('$$g')) { $prop(self, '$$g', null); }
+      if (!self.hasOwnProperty('$$gm')) { $prop(self, '$$gm', null); }
+
+      return $rt_freeze(self);
+    }
   end
 
   def inspect

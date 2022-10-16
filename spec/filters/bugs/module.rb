@@ -14,7 +14,6 @@ opal_filter "Module" do
   fails "Module#attr_accessor converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
   fails "Module#attr_accessor not allows creating an attr_accessor on an immediate class"
   fails "Module#attr_accessor on immediates can read through the accessor" # NoMethodError: undefined method `foobar' for 1
-  fails "Module#attr_accessor raises FrozenError if the receiver if frozen" # Expected FrozenError but no exception was raised (42 was returned)
   fails "Module#attr_accessor raises a TypeError when the given names can't be converted to strings using to_str"
   fails "Module#attr_accessor returns an array of defined method names as symbols" # Expected nil == ["foo", "foo=", "bar", "bar="] to be truthy but was false
   fails "Module#attr_reader applies current visibility to methods created"
@@ -25,7 +24,6 @@ opal_filter "Module" do
   fails "Module#attr_writer applies current visibility to methods created"
   fails "Module#attr_writer converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
   fails "Module#attr_writer not allows for adding an attr_writer to an immediate"
-  fails "Module#attr_writer raises FrozenError if the receiver if frozen" # Expected FrozenError but no exception was raised (42 was returned)
   fails "Module#attr_writer raises a TypeError when the given names can't be converted to strings using to_str"
   fails "Module#attr_writer returns an array of defined method names as symbols" # Expected nil == ["foo=", "bar="] to be truthy but was false
   fails "Module#class_eval activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<ModuleSpecs::NamedClass:0x4a168>

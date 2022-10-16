@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to
+# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, deny_frozen_access_t, rt_freeze
 
 require 'corelib/enumerable'
 require 'corelib/numeric'
@@ -704,6 +704,8 @@ class ::Array < `Array`
     return enum_for(:collect!) { size } unless block_given?
 
     %x{
+      $deny_frozen_access(self);
+
       for (var i = 0, length = self.length; i < length; i++) {
         var value = $yield1(block, self[i]);
         self[i] = value;
@@ -866,6 +868,8 @@ class ::Array < `Array`
 
       for (var i = 0, length = original; i < length; i++) {
         if (#{`self[i]` == object}) {
+          $deny_frozen_access(self);
+
           self.splice(i, 1);
 
           length--;
@@ -905,7 +909,11 @@ class ::Array < `Array`
 
   def delete_if(&block)
     return enum_for(:delete_if) { size } unless block_given?
-    %x{filterIf(self, $falsy, block)}
+    %x{
+      $deny_frozen_access(self);
+
+      filterIf(self, $falsy, block)
+    }
     self
   end
 
@@ -1236,6 +1244,44 @@ class ::Array < `Array`
     self
   end
 
+  def freeze
+    return self if frozen?
+
+    %x{
+      // inject prototype to override methods that deny frozen access
+      var inject = {
+        "$<<": $deny_frozen_access_t,
+        $initialize: $deny_frozen_access_t,
+        "$[]=": $deny_frozen_access_t,
+        $append: $deny_frozen_access_t,
+        $clear: $deny_frozen_access_t,
+        "$compact!": $deny_frozen_access_t,
+        $concat: $deny_frozen_access_t,
+        $delete_at: $deny_frozen_access_t,
+        $fill: $deny_frozen_access_t,
+        "$flatten!": $deny_frozen_access_t,
+        $insert: $deny_frozen_access_t,
+        $pop: $deny_frozen_access_t,
+        $prepend: $deny_frozen_access_t,
+        $push: $deny_frozen_access_t,
+        $replace: $deny_frozen_access_t,
+        "$reverse!": $deny_frozen_access_t,
+        "$rotate!": $deny_frozen_access_t,
+        $shift: $deny_frozen_access_t,
+        "$shuffle!": $deny_frozen_access_t,
+        "$slice!": $deny_frozen_access_t,
+        "$sort!": $deny_frozen_access_t,
+        "$uniq!": $deny_frozen_access_t,
+        $unshift: $deny_frozen_access_t,
+      };
+
+      Object.setPrototypeOf(inject, Object.getPrototypeOf(self));
+      Object.setPrototypeOf(self, inject);
+
+      return $rt_freeze(self);
+    }
+  end
+
   def hash
     %x{
       var top = ($hash_ids === undefined),
@@ -1446,7 +1492,11 @@ class ::Array < `Array`
 
   def keep_if(&block)
     return enum_for(:keep_if) { size } unless block_given?
-    %x{filterIf(self, $truthy, block)}
+    %x{
+      $deny_frozen_access(self);
+
+      filterIf(self, $truthy, block)
+    }
     self
   end
 
@@ -1708,6 +1758,8 @@ class ::Array < `Array`
   def reject!(&block)
     return enum_for(:reject!) { size } unless block_given?
 
+    `$deny_frozen_access(self)`
+
     original = length
     delete_if(&block)
 
@@ -1967,6 +2019,8 @@ class ::Array < `Array`
     return enum_for(:select!) { size } unless block_given?
 
     %x{
+      $deny_frozen_access(self)
+
       var original = self.length;
       #{ keep_if(&block) };
       return self.length === original ? nil : self;
@@ -2164,6 +2218,8 @@ class ::Array < `Array`
 
   def sort_by!(&block)
     return enum_for(:sort_by!) { size } unless block_given?
+
+    `$deny_frozen_access(self)`
 
     replace sort_by(&block)
   end

@@ -445,7 +445,7 @@ class ::Time < `Date`
 
   def gmtime
     %x{
-      self.timezone = 0;
+      if (self.timezone !== 0) { self.timezone = 0; }
       return self;
     }
   end

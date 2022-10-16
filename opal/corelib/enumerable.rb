@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, yield1, yieldX
+# helpers: truthy, coerce_to, yield1, yieldX, deny_frozen_access
 
 module ::Enumerable
   %x{
@@ -1230,6 +1230,8 @@ module ::Enumerable
   end
 
   def tally(hash = undefined)
+    `if (hash && hash !== nil) { $deny_frozen_access(hash); }`
+
     out = group_by(&:itself).transform_values(&:count)
     if hash
       out.each { |k, v| hash[k] = hash.fetch(k, 0) + v }

@@ -1,4 +1,4 @@
-# helpers: yield1, hash, hash_init, hash_get, hash_put, hash_delete
+# helpers: yield1, hash, hash_init, hash_get, hash_put, hash_delete, deny_frozen_access, deny_frozen_access_t, rt_freeze
 
 require 'corelib/enumerable'
 
@@ -284,7 +284,7 @@ class ::Hash
 
   def compare_by_identity
     %x{
-      var i, ii, key, keys = self.$$keys, identity_hash;
+        var i, ii, key, keys = self.$$keys, identity_hash;
 
       if (self.$$by_identity) return self;
       if (self.$$keys.length === 0) {
@@ -379,6 +379,8 @@ class ::Hash
     return enum_for(:delete_if) { size } unless block
 
     %x{
+      $deny_frozen_access(self);
+
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
@@ -537,6 +539,37 @@ class ::Hash
       }
 
       return result;
+    }
+  end
+
+  %x{
+    var OVERRIDE_OBJ = {
+      $initialize: $deny_frozen_access_t,
+      "$[]=": $deny_frozen_access_t,
+      $clear: $deny_frozen_access_t,
+      "$compact!": $deny_frozen_access_t,
+      $compare_by_identity: $deny_frozen_access_t,
+      "$default=": $deny_frozen_access_t,
+      "$default_proc=": $deny_frozen_access_t,
+      $delete: $deny_frozen_access_t,
+      "$merge!": $deny_frozen_access_t,
+      $rehash: $deny_frozen_access_t,
+      $replace: $deny_frozen_access_t,
+      $shift: $deny_frozen_access_t,
+      $store: $deny_frozen_access_t,
+      $update: $deny_frozen_access_t
+    };
+    Object.freeze(OVERRIDE_OBJ);
+  }
+
+  def freeze
+    return self if frozen?
+
+    %x{
+      // Override methods
+      Object.assign(self, OVERRIDE_OBJ);
+
+      return $rt_freeze(self);
     }
   end
 
@@ -714,6 +747,8 @@ class ::Hash
     return enum_for(:keep_if) { size } unless block
 
     %x{
+      $deny_frozen_access(self);
+
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
@@ -870,6 +905,8 @@ class ::Hash
     return enum_for(:reject!) { size } unless block
 
     %x{
+      $deny_frozen_access(self);
+
       var changes_were_made = false;
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
@@ -957,6 +994,8 @@ class ::Hash
     return enum_for(:select!) { size } unless block
 
     %x{
+      $deny_frozen_access(self);
+
       var result = nil;
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
@@ -1100,6 +1139,8 @@ class ::Hash
     return enum_for(:transform_keys!) { size } unless block
 
     %x{
+      $deny_frozen_access(self);
+
       var keys = Opal.slice.call(self.$$keys),
           i, length = keys.length, key, value, new_key;
 
@@ -1152,6 +1193,8 @@ class ::Hash
     return enum_for(:transform_values!) { size } unless block
 
     %x{
+      $deny_frozen_access(self);
+
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 

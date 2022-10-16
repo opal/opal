@@ -246,6 +246,10 @@ class Delegator < BasicObject
     super()
   end
 
+  def frozen?
+    `(self.$$frozen || false)`
+  end
+
   @delegator_api = public_instance_methods
   def self.public_api # :nodoc:
     @delegator_api
