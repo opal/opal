@@ -4,6 +4,7 @@ require 'opal/path_reader'
 require 'opal/paths'
 require 'opal/config'
 require 'opal/cache'
+require 'opal/builder_scheduler'
 require 'set'
 
 module Opal
@@ -55,8 +56,6 @@ module Opal
       processor_extensions.each { |ext| extensions << ext }
     end
 
-
-
     class MissingRequire < LoadError
     end
 
@@ -76,6 +75,11 @@ module Opal
       @compiler_options         ||= Opal::Config.compiler_options
       @missing_require_severity ||= Opal::Config.missing_require_severity
       @cache                    ||= Opal.cache
+      @scheduler                ||= Opal.builder_scheduler
+
+      if @scheduler.respond_to? :new
+        @scheduler = @scheduler.new(self)
+      end
 
       @processed = []
     end
@@ -99,14 +103,10 @@ module Opal
       rel_path = expand_ext(rel_path)
       asset = processor_for(source, rel_path, abs_path, false, options)
       requires = preload + asset.requires + tree_requires(asset, abs_path)
-      requires.map do |r|
-        # Don't automatically load modules required by the module
-        process_require(r, asset.autoloads, options.merge(load: false))
-      end
+      # Don't automatically load modules required by the module
+      process_requires(rel_path, requires, asset.autoloads, options.merge(load: false))
       processed << asset
       self
-    rescue MissingRequire => error
-      raise error, "A file required by #{rel_path.inspect} wasn't found.\n#{error.message}", error.backtrace
     end
 
     def build_require(path, options = {})
@@ -137,6 +137,39 @@ module Opal
       path_reader.append_paths(*paths)
     end
 
+    def process_require_threadsafely(rel_path, autoloads, options)
+      return if prerequired.include?(rel_path)
+
+      autoload = autoloads.include? rel_path
+
+      source = stub?(rel_path) ? '' : read(rel_path, autoload)
+
+      # The handling is delegated to the runtime
+      return if source.nil?
+
+      abs_path = expand_path(rel_path)
+      rel_path = expand_ext(rel_path)
+      asset = processor_for(source, rel_path, abs_path, autoload, options.merge(requirable: true))
+      process_requires(
+        rel_path,
+        asset.requires + tree_requires(asset, abs_path),
+        asset.autoloads,
+        options
+      )
+      asset
+    end
+
+    def process_require(rel_path, autoloads, options)
+      return if already_processed.include?(rel_path)
+      already_processed << rel_path
+
+      processed << process_require_threadsafely(rel_path, autoloads, options)
+    end
+
+    def already_processed
+      @already_processed ||= Set.new
+    end
+
     include UseGem
 
     attr_reader :processed
@@ -159,6 +192,10 @@ module Opal
     end
 
     private
+
+    def process_requires(rel_path, requires, autoloads, options)
+      @scheduler.process_requires(rel_path, requires, autoloads, options)
+    end
 
     def tree_requires(asset, asset_path)
       dirname = asset_path.to_s.empty? ? Pathname.pwd : Pathname(asset_path).expand_path.dirname
@@ -218,30 +255,6 @@ module Opal
       end
     end
 
-    def process_require(rel_path, autoloads, options)
-      return if prerequired.include?(rel_path)
-      return if already_processed.include?(rel_path)
-      already_processed << rel_path
-
-      autoload = autoloads.include? rel_path
-
-      source = stub?(rel_path) ? '' : read(rel_path, autoload)
-
-      # The handling is delegated to the runtime
-      return if source.nil?
-
-      abs_path = expand_path(rel_path)
-      rel_path = expand_ext(rel_path)
-      asset = processor_for(source, rel_path, abs_path, autoload, options.merge(requirable: true))
-      process_requires(
-        rel_path,
-        asset.requires + tree_requires(asset, abs_path),
-        asset.autoloads,
-        options
-      )
-      processed << asset
-    end
-
     def expand_ext(path)
       abs_path = path_reader.expand(path)
 
@@ -258,16 +271,6 @@ module Opal
     def expand_path(path)
       return if stub?(path)
       (path_reader.expand(path) || File.expand_path(path)).to_s
-    end
-
-    def process_requires(rel_path, requires, autoloads, options)
-      requires.map { |r| process_require(r, autoloads, options) }
-    rescue MissingRequire => error
-      raise error, "A file required by #{rel_path.inspect} wasn't found.\n#{error.message}", error.backtrace
-    end
-
-    def already_processed
-      @already_processed ||= Set.new
     end
 
     def stub?(path)

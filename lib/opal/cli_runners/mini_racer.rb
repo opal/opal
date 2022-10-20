@@ -14,6 +14,10 @@ module Opal
         # TODO: pass it
         argv = data.fetch(:argv)
 
+        # MiniRacer doesn't like to fork. Let's build Opal first
+        # in a forked environment.
+        code = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
+
         v8 = ::MiniRacer::Context.new
         v8.attach('prompt', ->(_msg = '') { $stdin.gets&.chomp })
         v8.attach('console.log', ->(i) { output.print(i); output.flush })
@@ -21,8 +25,6 @@ module Opal
         v8.attach('crypto.randomBytes', method(:random_bytes).to_proc)
         v8.attach('opalminiracer.exit', ->(status) { Kernel.exit(status) })
         v8.attach('opalminiracer.argv', argv)
-
-        code = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
 
         v8.eval(code)
       end

@@ -1,10 +1,18 @@
 require 'lib/spec_helper'
 require 'opal/builder'
+require 'opal/builder_scheduler/sequential'
 
 RSpec.describe Opal::Builder do
   subject(:builder) { described_class.new(options) }
   let(:options) { {} }
   let(:ruby_processor) { Opal::BuilderProcessors::RubyProcessor }
+
+  def temporarily_with_sequential_scheduler(&block)
+    previous = Opal.builder_scheduler
+    Opal.builder_scheduler = Opal::BuilderScheduler::Sequential
+    yield
+    Opal.builder_scheduler = previous
+  end
 
   it 'compiles opal' do
     expect(builder.build('opal').to_s).to match('(Opal);')
@@ -17,6 +25,8 @@ RSpec.describe Opal::Builder do
 
   describe ':stubs' do
     let(:options) { {stubs: ['foo']} }
+
+    around(:each) { |example| temporarily_with_sequential_scheduler(&example) }
 
     it 'compiles them as empty files' do
       source = 'require "foo"'
@@ -38,6 +48,8 @@ RSpec.describe Opal::Builder do
 
   describe ':preload' do
     let(:options) { {preload: ['base64']} }
+
+    around(:each) { |example| temporarily_with_sequential_scheduler(&example) }
 
     it 'compiles them as empty files' do
       source = 'puts 5'
@@ -87,6 +99,8 @@ RSpec.describe Opal::Builder do
   end
 
   describe '#missing_require_severity' do
+    around(:each) { |example| temporarily_with_sequential_scheduler(&example) }
+
     it 'defaults to warning' do
       expect(builder.missing_require_severity).to eq(:error)
     end
