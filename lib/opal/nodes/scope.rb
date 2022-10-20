@@ -405,7 +405,7 @@ module Opal
         add_temp "#{self.block_name} = #{scope_name}.$$p || nil"
 
         unless @block_prepared
-          line "delete #{scope_name}.$$p;"
+          line "#{scope_name}.$$p = null;"
           @block_prepared = true
         end
       end
