@@ -15,10 +15,10 @@ module Opal
 
         if body.nil?
           # Simplified compile for empty body
-          if stmt?
-            unshift '$klass(', base, ', ', super_code, ", '#{name}')"
+          if stmt? || compressed?
+            push '$klass(', base, ', ', super_code, ", '#{name}')"
           else
-            unshift '($klass(', base, ', ', super_code, ", '#{name}'), nil)"
+            push '($klass(', base, ', ', super_code, ", '#{name}'), nil)"
           end
         else
           line "  var self = $klass($base, $super, '#{name}');"
@@ -39,6 +39,8 @@ module Opal
           unshift "#{await_begin}(#{async}function($base, $super#{', $parent_nesting' if @define_nesting}) {"
           line '})(', base, ', ', super_code, "#{', ' + scope.nesting if @define_nesting})#{await_end}"
         end
+
+        handle_compressed_scope_variables
       end
 
       def super_code
