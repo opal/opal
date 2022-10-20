@@ -12,6 +12,10 @@
 
 - No longer truncate stacktraces to 15 lines (#2440)
 
+### Performance
+
+- Improve method block performance for runtime (#2449)
+
 ### Added
 
 - Add CLI support for ESM, at least for Chrome, NodeJS, QuickJS and GJS (#2435)
@@ -21,6 +25,7 @@
 - Source code can now be embedded in the compiled file to improve development/debugging, e.g. RSpec reports, `Proc#source_location` (#2440)
 - Added `Proc#source_location` (#2440)
 - Added `Kernel#caller_locations` (#2440)
+- `Opal::Builder::Prefork` for blazingly fast multicore compilation times (#2263)
 
 ### Fixed
 
