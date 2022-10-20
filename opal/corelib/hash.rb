@@ -1,4 +1,4 @@
-# helpers: yield1, hash, hash_init, hash_get, hash_put, hash_delete, deny_frozen_access, deny_frozen_access_t, rt_freeze
+# helpers: yield1, hash, hash_init, hash_get, hash_put, hash_delete, deny_frozen_access, deny_frozen_access_this, freeze
 
 require 'corelib/enumerable'
 
@@ -544,20 +544,20 @@ class ::Hash
 
   %x{
     var OVERRIDE_OBJ = {
-      $initialize: $deny_frozen_access_t,
-      "$[]=": $deny_frozen_access_t,
-      $clear: $deny_frozen_access_t,
-      "$compact!": $deny_frozen_access_t,
-      $compare_by_identity: $deny_frozen_access_t,
-      "$default=": $deny_frozen_access_t,
-      "$default_proc=": $deny_frozen_access_t,
-      $delete: $deny_frozen_access_t,
-      "$merge!": $deny_frozen_access_t,
-      $rehash: $deny_frozen_access_t,
-      $replace: $deny_frozen_access_t,
-      $shift: $deny_frozen_access_t,
-      $store: $deny_frozen_access_t,
-      $update: $deny_frozen_access_t
+      $initialize: $deny_frozen_access_this,
+      "$[]=": $deny_frozen_access_this,
+      $clear: $deny_frozen_access_this,
+      "$compact!": $deny_frozen_access_this,
+      $compare_by_identity: $deny_frozen_access_this,
+      "$default=": $deny_frozen_access_this,
+      "$default_proc=": $deny_frozen_access_this,
+      $delete: $deny_frozen_access_this,
+      "$merge!": $deny_frozen_access_this,
+      $rehash: $deny_frozen_access_this,
+      $replace: $deny_frozen_access_this,
+      $shift: $deny_frozen_access_this,
+      $store: $deny_frozen_access_this,
+      $update: $deny_frozen_access_this
     };
     Object.freeze(OVERRIDE_OBJ);
   }
@@ -569,7 +569,7 @@ class ::Hash
       // Override methods
       Object.assign(self, OVERRIDE_OBJ);
 
-      return $rt_freeze(self);
+      return $freeze(self);
     }
   end
 

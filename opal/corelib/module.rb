@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, deny_frozen_access_t, rt_freeze
+# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, deny_frozen_access_this, freeze
 
 class ::Module
   def self.allocate
@@ -409,18 +409,18 @@ class ::Module
 
   %x{
     var OVERRIDE_OBJ = {
-      $alias_method: $deny_frozen_access_t,
-      $alias_native: $deny_frozen_access_t,
-      $attr_reader: $deny_frozen_access_t,
-      $attr_writer: $deny_frozen_access_t,
-      $autoload: $deny_frozen_access_t,
-      $class_variable_set: $deny_frozen_access_t,
-      $remove_class_variable: $deny_frozen_access_t,
-      "$const_set": $deny_frozen_access_t,
-      $define_method: $deny_frozen_access_t,
-      $module_function: $deny_frozen_access_t,
-      $prepend_features: $deny_frozen_access_t,
-      $remove_const: $deny_frozen_access_t
+      $alias_method: $deny_frozen_access_this,
+      $alias_native: $deny_frozen_access_this,
+      $attr_reader: $deny_frozen_access_this,
+      $attr_writer: $deny_frozen_access_this,
+      $autoload: $deny_frozen_access_this,
+      $class_variable_set: $deny_frozen_access_this,
+      $remove_class_variable: $deny_frozen_access_this,
+      "$const_set": $deny_frozen_access_this,
+      $define_method: $deny_frozen_access_this,
+      $module_function: $deny_frozen_access_this,
+      $prepend_features: $deny_frozen_access_this,
+      $remove_const: $deny_frozen_access_this
     };
     Object.freeze(OVERRIDE_OBJ);
   }
@@ -432,7 +432,7 @@ class ::Module
       // Override methods
       Object.assign(self, OVERRIDE_OBJ);
 
-      return $rt_freeze(self);
+      return $freeze(self);
     }
   end
 

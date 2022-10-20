@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, rt_freeze
+# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze
 # use_strict: true
 
 module ::Kernel
@@ -278,15 +278,15 @@ module ::Kernel
               // set v to undefined, as if the property is not set
               var cv = self[prop];
               Object.defineProperty(self, prop, {
-                get() { return cv; },
-                set(value) { $deny_frozen_access(self); },
+                get: function() { return cv; },
+                set: function(value) { $deny_frozen_access(self); },
                 enumerable: true
               });
             })();
           }
         }
 
-        return $rt_freeze(self);
+        return $freeze(self);
       }
       return self;
     }

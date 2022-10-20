@@ -1,4 +1,4 @@
-# helpers: coerce_to, prop, rt_freeze
+# helpers: coerce_to, prop, freeze
 
 class ::RegexpError < ::StandardError; end
 
@@ -129,7 +129,7 @@ class ::Regexp < `RegExp`
       if (!self.hasOwnProperty('$$g')) { $prop(self, '$$g', null); }
       if (!self.hasOwnProperty('$$gm')) { $prop(self, '$$gm', null); }
 
-      return $rt_freeze(self);
+      return $freeze(self);
     }
   end
 

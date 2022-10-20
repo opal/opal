@@ -2553,12 +2553,12 @@
   };
 
   // helper that can be used in prototypes
-  Opal.deny_frozen_access_t = function() {
+  Opal.deny_frozen_access_this = function() {
     throw_frozen_error(this);
   };
 
   // common #freeze runtime support
-  Opal.rt_freeze = function(obj) {
+  Opal.freeze = function(obj) {
     $prop(obj, "$$frozen", true);
 
     // set $$id

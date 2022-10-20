@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, deny_frozen_access_t, rt_freeze
+# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, deny_frozen_access_this, freeze
 
 require 'corelib/enumerable'
 require 'corelib/numeric'
@@ -1250,35 +1250,35 @@ class ::Array < `Array`
     %x{
       // inject prototype to override methods that deny frozen access
       var inject = {
-        "$<<": $deny_frozen_access_t,
-        $initialize: $deny_frozen_access_t,
-        "$[]=": $deny_frozen_access_t,
-        $append: $deny_frozen_access_t,
-        $clear: $deny_frozen_access_t,
-        "$compact!": $deny_frozen_access_t,
-        $concat: $deny_frozen_access_t,
-        $delete_at: $deny_frozen_access_t,
-        $fill: $deny_frozen_access_t,
-        "$flatten!": $deny_frozen_access_t,
-        $insert: $deny_frozen_access_t,
-        $pop: $deny_frozen_access_t,
-        $prepend: $deny_frozen_access_t,
-        $push: $deny_frozen_access_t,
-        $replace: $deny_frozen_access_t,
-        "$reverse!": $deny_frozen_access_t,
-        "$rotate!": $deny_frozen_access_t,
-        $shift: $deny_frozen_access_t,
-        "$shuffle!": $deny_frozen_access_t,
-        "$slice!": $deny_frozen_access_t,
-        "$sort!": $deny_frozen_access_t,
-        "$uniq!": $deny_frozen_access_t,
-        $unshift: $deny_frozen_access_t,
+        "$<<": $deny_frozen_access_this,
+        $initialize: $deny_frozen_access_this,
+        "$[]=": $deny_frozen_access_this,
+        $append: $deny_frozen_access_this,
+        $clear: $deny_frozen_access_this,
+        "$compact!": $deny_frozen_access_this,
+        $concat: $deny_frozen_access_this,
+        $delete_at: $deny_frozen_access_this,
+        $fill: $deny_frozen_access_this,
+        "$flatten!": $deny_frozen_access_this,
+        $insert: $deny_frozen_access_this,
+        $pop: $deny_frozen_access_this,
+        $prepend: $deny_frozen_access_this,
+        $push: $deny_frozen_access_this,
+        $replace: $deny_frozen_access_this,
+        "$reverse!": $deny_frozen_access_this,
+        "$rotate!": $deny_frozen_access_this,
+        $shift: $deny_frozen_access_this,
+        "$shuffle!": $deny_frozen_access_this,
+        "$slice!": $deny_frozen_access_this,
+        "$sort!": $deny_frozen_access_this,
+        "$uniq!": $deny_frozen_access_this,
+        $unshift: $deny_frozen_access_this
       };
 
       Object.setPrototypeOf(inject, Object.getPrototypeOf(self));
       Object.setPrototypeOf(self, inject);
 
-      return $rt_freeze(self);
+      return $freeze(self);
     }
   end
 
