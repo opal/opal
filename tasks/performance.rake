@@ -1,6 +1,6 @@
 # A set of tasks to track performance regressions by the CI
 
-require 'opal/util'
+require_relative "#{__dir__}/../lib/opal/util"
 
 class Timing
   def initialize(tries: 31, &block)
@@ -67,35 +67,54 @@ end
 $failures = []
 
 ASCIIDOCTOR_REPO_BASE = ENV['ASCIIDOCTOR_REPO_BASE'] || 'https://github.com/asciidoctor'
-
+ASCIIDOCTOR_COMMIT = '869e8236'
+ASCIIDOCTOR_JS_COMMIT = '053fa0d3'
 # Selected asciidoctor versions were working on Aug 19 2021, feel free to update.
-ASCIIDOCTOR_PREPARE = [
-  "bundle",
-  "exec",
-  "bash",
-  "-c",
-  <<~BASH
-    mkdir -p tmp/performance
-    pushd tmp/performance
-    git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor >/dev/null 2>&1
-    pushd asciidoctor; git checkout 869e8236 >/dev/null 2>&1; popd
-    git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor.js >/dev/null 2>&1
-    pushd asciidoctor.js; git checkout 053fa0d3 >/dev/null 2>&1; popd
-    erb ../../tasks/performance/asciidoctor_test.rb.erb > asciidoctor_test.rb
-    popd
-  BASH
-]
+ASCIIDOCTOR_PREPARE = if Gem.win_platform?
+  [
+    "bundle",
+    "exec",
+    "cmd",
+    "/c",
+    "pushd tmp\\performance & git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor 1>NUL 1<&2 & " \
+    "pushd asciidoctor & git checkout #{ASCIIDOCTOR_COMMIT} 1>NUL 1<&2 & popd & " \
+    "git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor.js 1>NUL 1<&2 & pushd asciidoctor.js & " \
+    "git checkout #{ASCIIDOCTOR_JS_COMMIT} 1>NUL 1<&2 & popd & " \
+    "erb ..\\..\\tasks\\performance\\asciidoctor_test.rb.erb > asciidoctor_test.rb &" \
+    "popd"
+  ]
+else
+  [
+    "bundle",
+    "exec",
+    "bash",
+    "-c",
+    <<~BASH
+      pushd tmp/performance
+      git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor >/dev/null 2>&1
+      pushd asciidoctor; git checkout #{ASCIIDOCTOR_COMMIT} >/dev/null 2>&1; popd
+      git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor.js >/dev/null 2>&1
+      pushd asciidoctor.js; git checkout #{ASCIIDOCTOR_JS_COMMIT} >/dev/null 2>&1; popd
+      erb ../../tasks/performance/asciidoctor_test.rb.erb > asciidoctor_test.rb
+      popd
+    BASH
+  ]
+end
 
-ASCIIDOCTOR_BUILD_OPAL = "bin/opal --no-cache -c " \
-           "-Itmp/performance/asciidoctor/lib " \
-           "-Itmp/performance/asciidoctor.js/packages/core/lib " \
-           "-sconcurrent/map -sslim/include " \
-           "tmp/performance/asciidoctor_test.rb > tmp/performance/asciidoctor_test.js"
+ASCIIDOCTOR_BUILD_OPAL = "#{'ruby ' if Gem.win_platform?}bin/opal --no-cache -c " \
+                         "-Itmp/performance/asciidoctor/lib " \
+                         "-Itmp/performance/asciidoctor.js/packages/core/lib " \
+                         "-sconcurrent/map -sslim/include " \
+                         "tmp/performance/asciidoctor_test.rb > tmp/performance/asciidoctor_test.js"
 ASCIIDOCTOR_RUN_RUBY = "bundle exec ruby -Itmp/performance/asciidoctor/lib tmp/performance/asciidoctor_test.rb"
 ASCIIDOCTOR_RUN_OPAL = "node tmp/performance/asciidoctor_test.js"
 
 # Generate V8 function optimization status report for corelib methods
-NODE_OPTSTATUS = "env NODE_OPTS=--allow-natives-syntax bin/opal tasks/performance/optimization_status.rb"
+NODE_OPTSTATUS = if Gem.win_platform?
+  "set NODE_OPTS=--allow-natives-syntax && ruby bin/opal tasks/performance/optimization_status.rb"
+else
+  "env NODE_OPTS=--allow-natives-syntax bin/opal tasks/performance/optimization_status.rb"
+end
 
 performance_stat = ->(name) {
   stat = {}
@@ -128,6 +147,7 @@ namespace :performance do
 
     # Prepare
     puts "\n* Preparing asciidoctor..."
+    FileUtils.mkdir_p("tmp/performance") unless Dir.exist?("tmp/performance")
     sh(*ASCIIDOCTOR_PREPARE)
 
     puts "\n* Running AsciiDoctor with CRuby..."
@@ -136,12 +156,20 @@ namespace :performance do
     current = performance_stat.(:current)
 
     # Prepare previous
-    sh("git checkout --recurse-submodules #{ref} && bundle install >/dev/null 2>&1")
+    if Gem.win_platform?
+      sh("git checkout --recurse-submodules #{ref} && bundle install 1>NUL 1<&2")
+    else
+      sh("git checkout --recurse-submodules #{ref} && bundle install >/dev/null 2>&1")
+    end
 
     previous = performance_stat.(:previous)
 
     # Restore current
-    sh("git checkout --recurse-submodules - && bundle install >/dev/null 2>&1")
+    if Gem.win_platform?
+      sh("git checkout --recurse-submodules - && bundle install 1>NUL 1<&2")
+    else
+      sh("git checkout --recurse-submodules - && bundle install >/dev/null 2>&1")
+    end
 
     # Summary
     puts "\n=== Summary ==="
