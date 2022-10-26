@@ -14,10 +14,12 @@ module Opal
         def compile
           add_temp '$post_args'
 
+          helper :slice
+
           if offset == 0
-            line "$post_args = Opal.slice.call(arguments)"
+            push "$post_args = $slice.call(arguments)"
           else
-            line "$post_args = Opal.slice.call(arguments, #{offset})"
+            push "$post_args = $slice.call(arguments, #{offset})"
           end
         end
       end

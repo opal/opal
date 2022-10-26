@@ -20,7 +20,9 @@ module Opal
         def compile
           add_temp '$kwargs'
 
-          line '$kwargs = Opal.extract_kwargs($post_args)'
+          helper :extract_kwargs
+
+          push '$kwargs = $extract_kwargs($post_args)'
         end
       end
     end

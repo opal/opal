@@ -17,7 +17,7 @@ module Opal
 
           line "#{name} = $post_args.shift();"
 
-          line "if (#{name} == null) #{name} = nil;"
+          push "if (#{name} == null) #{name} = nil"
         end
       end
     end

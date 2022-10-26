@@ -18,7 +18,7 @@ module Opal
         children :name
 
         def compile
-          line "if (#{name} == null) #{name} = nil;"
+          push "if (#{name} == null) #{name} = nil"
         end
       end
     end

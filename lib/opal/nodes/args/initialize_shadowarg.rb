@@ -16,7 +16,7 @@ module Opal
         def compile
           scope.locals << name
           scope.add_arg(name)
-          line "#{name} = nil;"
+          push "#{name} = nil"
         end
       end
     end

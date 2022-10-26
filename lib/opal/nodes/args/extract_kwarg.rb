@@ -21,10 +21,9 @@ module Opal
 
           add_temp lvar_name
 
-          line "if (!Opal.hasOwnProperty.call($kwargs.$$smap, '#{key_name}')) {"
-          line "  throw Opal.ArgumentError.$new('missing keyword: #{key_name}');"
-          line '}'
-          line "#{lvar_name} = $kwargs.$$smap[#{key_name.to_s.inspect}];"
+          helper :get_kwarg
+
+          push "#{lvar_name} = $get_kwarg($kwargs, #{key_name.to_s.inspect})"
         end
       end
     end

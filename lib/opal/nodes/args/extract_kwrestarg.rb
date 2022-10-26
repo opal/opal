@@ -21,7 +21,10 @@ module Opal
           name = self.name || '$kw_rest_arg'
 
           add_temp name
-          line "#{name} = Opal.kwrestargs($kwargs, #{used_kwargs});"
+
+          helper :kwrestargs
+
+          push "#{name} = $kwrestargs($kwargs, #{used_kwargs})"
         end
 
         def used_kwargs
