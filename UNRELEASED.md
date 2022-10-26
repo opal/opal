@@ -15,6 +15,8 @@
 ### Performance
 
 - Improve method block performance for runtime (#2449)
+- Uninline non-typical argument handling (#2419)
+- Logic optimization of runtime.js (#2415)
 
 ### Added
 
