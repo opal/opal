@@ -3,6 +3,7 @@
 require 'shellwords'
 require 'opal/paths'
 require 'opal/cli_runners/system_runner'
+require 'opal/os'
 
 module Opal
   module CliRunners
@@ -39,10 +40,9 @@ module Opal
 
       # Ensure stdlib node_modules is among NODE_PATHs
       def self.node_modules
-        npsep = Gem.win_platform? ? ';' : ':'
-        ENV['NODE_PATH'].to_s.split(npsep).tap do |paths|
+        ENV['NODE_PATH'].to_s.split(OS.env_sep).tap do |paths|
           paths << NODE_PATH unless paths.include? NODE_PATH
-        end.join(npsep)
+        end.join(OS.env_sep)
       end
 
       class MissingNodeJS < RunnerError

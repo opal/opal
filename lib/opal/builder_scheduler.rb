@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'opal/os' unless RUBY_ENGINE == 'opal'
+
 module Opal
   class BuilderScheduler
     def initialize(builder)
@@ -13,7 +15,7 @@ module Opal
 
   if RUBY_ENGINE != 'opal'
     # Windows has a faulty `fork`.
-    if Gem.win_platform? || ENV['OPAL_PREFORK_DISABLE']
+    if OS.windows? || ENV['OPAL_PREFORK_DISABLE']
       require 'opal/builder_scheduler/sequential'
       Opal.builder_scheduler = BuilderScheduler::Sequential
     else

@@ -1,6 +1,9 @@
 # A set of tasks to track performance regressions by the CI
 
 require_relative "#{__dir__}/../lib/opal/util"
+require_relative "#{__dir__}/../lib/opal/os"
+
+OS = Opal::OS
 
 class Timing
   def initialize(tries: 31, &block)
@@ -70,36 +73,16 @@ ASCIIDOCTOR_REPO_BASE = ENV['ASCIIDOCTOR_REPO_BASE'] || 'https://github.com/asci
 ASCIIDOCTOR_COMMIT = '869e8236'
 ASCIIDOCTOR_JS_COMMIT = '053fa0d3'
 # Selected asciidoctor versions were working on Aug 19 2021, feel free to update.
-ASCIIDOCTOR_PREPARE = if Gem.win_platform?
-  [
-    "bundle",
-    "exec",
-    "cmd",
-    "/c",
-    "pushd tmp\\performance & git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor 1>NUL 1<&2 & " \
-    "pushd asciidoctor & git checkout #{ASCIIDOCTOR_COMMIT} 1>NUL 1<&2 & popd & " \
-    "git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor.js 1>NUL 1<&2 & pushd asciidoctor.js & " \
-    "git checkout #{ASCIIDOCTOR_JS_COMMIT} 1>NUL 1<&2 & popd & " \
-    "erb ..\\..\\tasks\\performance\\asciidoctor_test.rb.erb > asciidoctor_test.rb &" \
-    "popd"
-  ]
-else
-  [
-    "bundle",
-    "exec",
-    "bash",
-    "-c",
-    <<~BASH
-      pushd tmp/performance
-      git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor >/dev/null 2>&1
-      pushd asciidoctor; git checkout #{ASCIIDOCTOR_COMMIT} >/dev/null 2>&1; popd
-      git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor.js >/dev/null 2>&1
-      pushd asciidoctor.js; git checkout #{ASCIIDOCTOR_JS_COMMIT} >/dev/null 2>&1; popd
-      erb ../../tasks/performance/asciidoctor_test.rb.erb > asciidoctor_test.rb
-      popd
-    BASH
-  ]
-end
+S = OS.path_sep
+ASCIIDOCTOR_PREPARE = OS.bash_c(
+  "pushd tmp#{S}performance",
+  "git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor >#{OS.dev_null} 2>&1",
+  "pushd asciidoctor", "git checkout #{ASCIIDOCTOR_COMMIT} >#{OS.dev_null} 2>&1", "popd",
+  "git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor.js >#{OS.dev_null} 2>&1",
+  "pushd asciidoctor.js", "git checkout #{ASCIIDOCTOR_JS_COMMIT} >#{OS.dev_null} 2>&1", "popd",
+  "erb ../../tasks/performance/asciidoctor_test.rb.erb > asciidoctor_test.rb",
+  "popd"
+)
 
 ASCIIDOCTOR_BUILD_OPAL = "#{'ruby ' if Gem.win_platform?}bin/opal --no-cache -c " \
                          "-Itmp/performance/asciidoctor/lib " \
@@ -156,20 +139,12 @@ namespace :performance do
     current = performance_stat.(:current)
 
     # Prepare previous
-    if Gem.win_platform?
-      sh("git checkout --recurse-submodules #{ref} && bundle install 1>NUL 1<&2")
-    else
-      sh("git checkout --recurse-submodules #{ref} && bundle install >/dev/null 2>&1")
-    end
+    sh("git checkout --recurse-submodules #{ref} && bundle install >#{OS.dev_null} 2>&1")
 
     previous = performance_stat.(:previous)
 
     # Restore current
-    if Gem.win_platform?
-      sh("git checkout --recurse-submodules - && bundle install 1>NUL 1<&2")
-    else
-      sh("git checkout --recurse-submodules - && bundle install >/dev/null 2>&1")
-    end
+    sh("git checkout --recurse-submodules - && bundle install >#{OS.dev_null} 2>&1")
 
     # Summary
     puts "\n=== Summary ==="
