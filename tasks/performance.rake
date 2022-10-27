@@ -77,7 +77,7 @@ class SpeedTiming
   MAX_VARIATION = 0.1 # percent
   WITHIN_VARIATION = 10 # results within MAX_VARIATION
 
-  def initialize(max_tries: 64, &block)
+  def initialize(max_tries: 128, &block)
     @max_tries = max_tries
     @times = []
     until margin_achieved?
