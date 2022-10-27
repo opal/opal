@@ -22,8 +22,8 @@ class Timing
   # expecting 10 results within MAX_VARIATION margin
   def margin_achieved?
     @times.sort!
-    return true if @times.size >= WITHIN_VARIATION && error < max_error
-    return true if @times.size >= @max_tries
+    return true if tries >= WITHIN_VARIATION && error < max_error
+    return true if tries >= @max_tries
     false
   end
 
