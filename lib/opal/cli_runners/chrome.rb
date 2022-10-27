@@ -5,6 +5,7 @@ require 'socket'
 require 'timeout'
 require 'tmpdir'
 require 'rbconfig'
+require 'opal/os'
 
 module Opal
   module CliRunners
@@ -115,7 +116,7 @@ module Opal
         raise 'Chrome server can be started only on localhost' if chrome_host != DEFAULT_CHROME_HOST
 
         # Disable web security with "--disable-web-security" flag to be able to do XMLHttpRequest (see test_openuri.rb)
-        chrome_server_cmd = %{#{windows? ? "\"#{chrome_executable.shellescape}\"" : chrome_executable.shellescape} \
+        chrome_server_cmd = %{#{OS.shellescape(chrome_executable)} \
           --headless \
           --disable-web-security \
           --remote-debugging-port=#{chrome_port} \
@@ -153,7 +154,7 @@ module Opal
 
       def chrome_executable
         ENV['GOOGLE_CHROME_BINARY'] ||
-          if windows?
+          if OS.windows?
             [
               'C:/Program Files/Google/Chrome Dev/Application/chrome.exe',
               'C:/Program Files/Google/Chrome/Application/chrome.exe'
@@ -161,7 +162,7 @@ module Opal
               next unless File.exist? path
               return path
             end
-          elsif mac_os?
+          elsif OS.macos?
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
           else
             %w[
@@ -175,14 +176,6 @@ module Opal
             end
             raise 'Cannot find chrome executable'
           end
-      end
-
-      def windows?
-        /bccwin|cygwin|djgpp|mingw|mswin|wince/.match?(RbConfig::CONFIG['host_os'])
-      end
-
-      def mac_os?
-        /darwin|mac os/.match?(RbConfig::CONFIG['host_os'])
       end
 
       def mktmpdir(&block)

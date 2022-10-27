@@ -185,6 +185,29 @@ Array#permutation_returns_an_Enumerator_which_works_as_expected_even_when_the_ar
 Array#permutation_generates_from_a_defensive_copy,_ignoring_mutations                                                         0.038
 ```
 
+### AsciiDoctor Benchmark and git branch performance comparison
+
+It is testing the performance for the real life application AsciiDoctor, compiling it, running it and asset size.
+It prints a nice summary to compare the current branch with the master branch.
+On Windows make sure to have the Ruby DevKit enabled with `ridk enable`.
+
+Run the task on any system with: `bundle exec rake performance:compare`
+
+Example output:
+```
+=== Summary ===
+Summary of performance changes between (previous) master and (current) v1.5.1-48-gc470e969:
+
+Comparison of V8 function optimization status:
+Dateien tmp/performance/optstatus_previous und tmp/performance/optstatus_current sind identisch.
+
+Comparison of the Asciidoctor (a real-life Opal application) compile and run:
+                  Compile time: 9.367 (±2.21%) -> 9.579 (±17.53%) (change: +2.26%)
+                      Run time: 2.049 (±9.25%) -> 2.147 (±19.70%) (change: +4.80%)
+                   Bundle size: 4740.27 kB -> 4740.27 kB (change: +0.00%)
+          Minified bundle size: 995.10 kB -> 995.10 kB (change: +0.00%)
+            Mangled & minified: 706.32 kB -> 706.32 kB (change: +0.00%)
+```
 
 ## Parser
 

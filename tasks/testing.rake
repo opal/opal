@@ -1,4 +1,8 @@
+require_relative "#{__dir__}/../lib/opal/os"
 require 'rspec/core/rake_task'
+
+OS = Opal::OS
+
 RSpec::Core::RakeTask.new(:rspec) do |t|
   t.pattern = 'spec/lib/**/*_spec.rb'
 end
@@ -249,7 +253,7 @@ module Testing
         puts 'Server ready.'
         yield self
       ensure
-        if windows?
+        if OS.windows?
           # https://blog.simplificator.com/2016/01/18/how-to-kill-processes-on-windows-using-ruby/
           # system("taskkill /f /pid #{pid}")
           Process.kill("KILL", server)
@@ -258,10 +262,6 @@ module Testing
         end
         Process.wait(server)
       end
-    end
-
-    def windows?
-      (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
     end
 
     def sinatra_server_running?
