@@ -225,7 +225,7 @@ performance_stat_speed = ->(name) {
   stat[:run_time] = SpeedTiming.new do
     res = context.bench(source)
     File.write("tmp/performance/opal_result_#{name}.html", res['result'])
-    res['duration']
+    res['duration'] * 1000
   end
   stat[:correct] = File.read("tmp/performance/opal_result_#{name}.html") == File.read("tmp/performance/ruby_result.html")
   stat[:size] = Size.new File.size("tmp/performance/asciidoctor_test.js")
