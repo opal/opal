@@ -82,7 +82,7 @@ class SpeedTiming
     @times = []
     until margin_achieved?
       puts "run #{@times.size + 1}"
-      puts "error #{error} max_error #{max_error}"
+      puts "error #{error} max_error #{max_error}" if @times.size > 1
       puts "times #{@times}"
       @times << block.()
     end
