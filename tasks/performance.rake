@@ -74,7 +74,7 @@ class Timing
 end
 
 class SpeedTiming
-  MAX_VARIATION = 3 # percent
+  MAX_VARIATION = 0.1 # percent
   WITHIN_VARIATION = 10 # results within MAX_VARIATION
 
   def initialize(max_tries: 64, &block)
