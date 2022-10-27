@@ -21,25 +21,28 @@ class Timing
 
   attr_reader :times, :tries
 
-  # Runs a block N times and returns a mean number of seconds it took to run it.
+  # Runs a block N times and returns the best number of seconds it took to run it.
   def mean_time
     @times.sort[tries/2.0.floor + 1]
   end
 
+  def best_time
+    @times.min
+  end
+
   def error
-    m = mean_time
-    @times.minmax.map { |t| (m - t).abs }.max
+    @times.max - @times.min
   end
 
   def compare_to(previous, name)
     current = self
     percent = ->(a, b) { (a / b) * 100 }
-    change = percent[(current.mean_time - previous.mean_time), previous.mean_time]
+    change = percent[(current.best_time - previous.best_time), previous.best_time]
 
-    puts ("%30s: %.3f (±%.2f%%) -> %.3f (±%.2f%%) (change: %+.2f%%)" % [
+    puts ("%30s: %.3f (+%.2f%%) -> %.3f (+%.2f%%) (change: %+.2f%%)" % [
       name,
-      previous.mean_time / 1_000_000.0, percent[previous.error, previous.mean_time],
-      current.mean_time / 1_000_000.0, percent[current.error, current.mean_time],
+      previous.best_time / 1_000_000.0, percent[previous.error, previous.best_time],
+      current.best_time / 1_000_000.0, percent[current.error, current.best_time],
       change
     ]).gsub('.000','')
 

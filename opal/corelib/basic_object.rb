@@ -51,6 +51,7 @@ class ::BasicObject
   def !
     false
   end
+  ::Opal.pristine :!
 
   def !=(other)
     !(self == other)
