@@ -2,6 +2,7 @@
 
 require_relative "#{__dir__}/../lib/opal/util"
 require_relative "#{__dir__}/../lib/opal/os"
+require 'isomorfeus-speednode'
 
 OS = Opal::OS
 
@@ -29,6 +30,70 @@ class Timing
 
   def now
     Process.clock_gettime Process::CLOCK_MONOTONIC, :float_microsecond
+  end
+
+  attr_reader :times, :max_tries
+
+  def tries
+    @times.size
+  end
+
+  # Runs a block N times and returns the best number of seconds it took to run it.
+  def mean_time
+    @times[tries/2.0.floor + 1]
+  end
+
+  def best_time
+    @times[0]
+  end
+
+  def max_error
+    (@times[0] * ((MAX_VARIATION + 100) / 100.0)) - @times[0]
+  end
+
+  def error
+    @times[([WITHIN_VARIATION, tries].min - 1)] - @times[0]
+  end
+
+  def compare_to(previous, name)
+    current = self
+    percent = ->(a, b) { (a / b) * 100 }
+    change = percent[(current.best_time - previous.best_time), previous.best_time]
+
+    puts ("%30s: %.3f (+%.2f%%) -> %.3f (+%.2f%%) (change: %+.2f%%)" % [
+      name,
+      previous.best_time / 1_000_000.0, percent[previous.error, previous.best_time],
+      current.best_time / 1_000_000.0, percent[current.error, current.best_time],
+      change
+    ]).gsub('.000','')
+
+    $failures << "#{name} current variation too high" if current.error > current.max_error
+    $failures << "#{name} previous variation too high" if previous.error > previous.max_error
+    $failures << "#{name} increased by more than 5%" if change > 5.0
+  end
+end
+
+class SpeedTiming
+  MAX_VARIATION = 3 # percent
+  WITHIN_VARIATION = 10 # results within MAX_VARIATION
+
+  def initialize(max_tries: 64, &block)
+    @max_tries = max_tries
+    @times = []
+    until margin_achieved?
+      puts "run #{@times.size + 1}"
+      puts "error #{error} max_error #{max_error}"
+      puts "times #{@times}"
+      @times << block.()
+    end
+  end
+
+  # expecting WITHIN_VARIATION results within MAX_VARIATION margin
+  def margin_achieved?
+    @times.sort!
+    return true if tries >= WITHIN_VARIATION && error < max_error
+    return true if tries >= @max_tries
+    false
   end
 
   attr_reader :times, :max_tries
@@ -127,12 +192,11 @@ end
 performance_stat = ->(name) {
   stat = {}
 
-  # Run on current
   puts "\n* Checking optimization status with #{name}..."
   sh("#{NODE_OPTSTATUS} > tmp/performance/optstatus_#{name}")
 
   puts "\n* Building AsciiDoctor with #{name}..."
-  stat[:compiler_time] = Timing.new { sh(ASCIIDOCTOR_BUILD_OPAL) }
+  stat[:compiler_time] = Timing.new(max_tries: 1) { sh(ASCIIDOCTOR_BUILD_OPAL) }
 
   puts "\n* Running AsciiDoctor with #{name}..."
   stat[:run_time] = Timing.new { sh("#{ASCIIDOCTOR_RUN_OPAL} > tmp/performance/opal_result_#{name}.html") }
@@ -143,6 +207,27 @@ performance_stat = ->(name) {
   source = File.read("tmp/performance/asciidoctor_test.js")
   stat[:min_size] = Size.new Opal::Util.uglify(source).bytesize rescue Float::INFINITY
   stat[:min_size_m] = Size.new Opal::Util.uglify(source, mangle: true).bytesize rescue Float::INFINITY
+
+  stat
+}
+
+
+performance_stat_speed = ->(name) {
+  stat = {}
+
+  puts "\n* Building AsciiDoctor with #{name}..."
+  stat[:compiler_time] = Timing.new(max_tries: 1) { sh(ASCIIDOCTOR_BUILD_OPAL) }
+
+  source = File.read("tmp/performance/asciidoctor_test.js")
+
+  puts "\n* Running AsciiDoctor in speednode with #{name}..."
+  stat[:run_time] = SpeedTiming.new do
+    res = ExecJS.permissive_bench(source)
+    File.write("tmp/performance/opal_result_#{name}.html", res['result'])
+    res['duration']
+  end
+  stat[:correct] = File.read("tmp/performance/opal_result_#{name}.html") == File.read("tmp/performance/ruby_result.html")
+  stat[:size] = Size.new File.size("tmp/performance/asciidoctor_test.js")
 
   stat
 }
@@ -162,11 +247,13 @@ namespace :performance do
     sh("#{ASCIIDOCTOR_RUN_RUBY} > tmp/performance/ruby_result.html")
 
     current = performance_stat.(:current)
+    speed_c = performance_stat_speed.(:current)
 
     # Prepare previous
     sh("git checkout --recurse-submodules #{ref} && bundle install >#{OS.dev_null} 2>&1")
 
     previous = performance_stat.(:previous)
+    speed_pr = performance_stat_speed.(:previous)
 
     # Restore current
     sh("git checkout --recurse-submodules - && bundle install >#{OS.dev_null} 2>&1")
@@ -194,6 +281,7 @@ namespace :performance do
 
     current[:compiler_time].compare_to(previous[:compiler_time], "Compile time")
     current[:run_time     ].compare_to(previous[:run_time     ], "Run time")
+    speed_c[:run_time     ].compare_to(speed_pr[:run_time     ], "Speed run time")
     current[:size         ].compare_to(previous[:size         ], "Bundle size")
     current[:min_size     ].compare_to(previous[:min_size     ], "Minified bundle size")
     current[:min_size_m   ].compare_to(previous[:min_size_m   ], "Mangled & minified")
