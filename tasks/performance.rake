@@ -6,32 +6,52 @@ require_relative "#{__dir__}/../lib/opal/os"
 OS = Opal::OS
 
 class Timing
-  def initialize(tries: 31, &block)
-    @tries = tries
-    @times = tries.times.map do
+  MAX_VARIATION = 3 # percent
+  WITHIN_VARIATION = 10 # results within MAX_VARIATION
+
+  def initialize(max_tries: 64, &block)
+    @max_tries = max_tries
+    @times = []
+    until margin_achieved?
       t = now
       block.()
-      (now - t)
-    end.sort
+      @times << (now - t)
+    end
+  end
+
+  # expecting 10 results within MAX_VARIATION margin
+  def margin_achieved?
+    @times.sort!
+    return true if @times.size >= WITHIN_VARIATION && error < max_error
+    return true if @times.size >= @max_tries
+    false
   end
 
   def now
     Process.clock_gettime Process::CLOCK_MONOTONIC, :float_microsecond
   end
 
-  attr_reader :times, :tries
+  attr_reader :times, :max_tries
+
+  def tries
+    @times.size
+  end
 
   # Runs a block N times and returns the best number of seconds it took to run it.
   def mean_time
-    @times.sort[tries/2.0.floor + 1]
+    @times[tries/2.0.floor + 1]
   end
 
   def best_time
-    @times.min
+    @times[0]
+  end
+
+  def max_error
+    (@times[0] * ((MAX_VARIATION + 100) / 100.0)) - @times[0]
   end
 
   def error
-    @times.max - @times.min
+    @times[([WITHIN_VARIATION, tries].min - 1)] - @times[0]
   end
 
   def compare_to(previous, name)
@@ -46,6 +66,8 @@ class Timing
       change
     ]).gsub('.000','')
 
+    $failures << "#{name} current variation too high" if current.error > current.max_error
+    $failures << "#{name} previous variation too high" if previous.error > previous.max_error
     $failures << "#{name} increased by more than 5%" if change > 5.0
   end
 end
@@ -58,7 +80,7 @@ class Size
   attr_reader :size
 
   def compare_to(previous, name)
-    change = 100 * (previous.size - size) / previous.size
+    change = 100.0 * (size - previous.size) / previous.size
     puts ("%30s: %5.2f kB -> %5.2f kB (change: %+.2f%%)" % [
       name,
       previous.size / 1_000.0,
@@ -110,7 +132,7 @@ performance_stat = ->(name) {
   sh("#{NODE_OPTSTATUS} > tmp/performance/optstatus_#{name}")
 
   puts "\n* Building AsciiDoctor with #{name}..."
-  stat[:compiler_time] = Timing.new(tries: 7) { sh(ASCIIDOCTOR_BUILD_OPAL) }
+  stat[:compiler_time] = Timing.new { sh(ASCIIDOCTOR_BUILD_OPAL) }
 
   puts "\n* Running AsciiDoctor with #{name}..."
   stat[:run_time] = Timing.new { sh("#{ASCIIDOCTOR_RUN_OPAL} > tmp/performance/opal_result_#{name}.html") }
