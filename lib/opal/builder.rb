@@ -162,8 +162,8 @@ module Opal
     def process_require(rel_path, autoloads, options)
       return if already_processed.include?(rel_path)
       already_processed << rel_path
-
-      processed << process_require_threadsafely(rel_path, autoloads, options)
+      asset = process_require_threadsafely(rel_path, autoloads, options)
+      processed << asset if asset
     end
 
     def already_processed
