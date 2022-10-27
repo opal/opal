@@ -221,8 +221,9 @@ performance_stat_speed = ->(name) {
   source = File.read("tmp/performance/asciidoctor_test.js")
 
   puts "\n* Running AsciiDoctor in speednode with #{name}..."
+  context = ExecJS.permissive_compile('')
   stat[:run_time] = SpeedTiming.new do
-    res = ExecJS.permissive_bench(source)
+    res = context.bench(source)
     File.write("tmp/performance/opal_result_#{name}.html", res['result'])
     res['duration']
   end
