@@ -7,7 +7,7 @@ OS = Opal::OS
 
 class Timing
   MAX_VARIATION = 3 # percent
-  WITHIN_VARIATION = 10 # results within MAX_VARIATION
+   = 10 # results within MAX_VARIATION
 
   def initialize(max_tries: 64, &block)
     @max_tries = max_tries
@@ -19,7 +19,7 @@ class Timing
     end
   end
 
-  # expecting 10 results within MAX_VARIATION margin
+  # expecting WITHIN_VARIATION results within MAX_VARIATION margin
   def margin_achieved?
     @times.sort!
     return true if tries >= WITHIN_VARIATION && error < max_error
