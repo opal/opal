@@ -1,6 +1,7 @@
 if RUBY_ENGINE == 'opal'
   require 'opal/compiler'
   require 'nodejs'
+  require 'corelib/string/unpack'
 end
 
 BEST_OF_N = Integer(ENV['BEST_OF_N']) rescue 1
