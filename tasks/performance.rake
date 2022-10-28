@@ -58,7 +58,7 @@ class Size
   attr_reader :size
 
   def compare_to(previous, name)
-    change = 100 * (previous.size - size) / previous.size
+    change = 100.0 * (size - previous.size) / previous.size
     puts ("%30s: %5.2f kB -> %5.2f kB (change: %+.2f%%)" % [
       name,
       previous.size / 1_000.0,
