@@ -127,7 +127,7 @@ class File < IO
 
 
   def self.read(path)
-    `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString()})`
+    `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString().replaceAll("\r\n", "\n")})`
   end
 
   def self.write(path, data)
@@ -279,7 +279,7 @@ class File < IO
         }
         res = `content`
       else
-        res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString('utf8')})`
+        res = `executeIOAction(function(){return __fs__.readFileSync(#{@path}).toString('utf8').replaceAll("\r\n", "\n")})`
       end
       @eof = true
       @lineno = res.size
