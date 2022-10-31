@@ -12,7 +12,6 @@ opal_unsupported_filter "Kernel" do
   fails "Kernel#clone preserves tainted state from the original"
   fails "Kernel#clone preserves untrusted state from the original"
   fails "Kernel#clone raises a TypeError for Symbol"
-  fails "Kernel#dup does not copy frozen state from the original"
   fails "Kernel#dup preserves tainted state from the original"
   fails "Kernel#dup preserves untrusted state from the original"
   fails "Kernel#dup raises a TypeError for Symbol"

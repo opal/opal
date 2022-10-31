@@ -91,16 +91,17 @@
   var unique_id = nil_id;
 
   // Return next unique id
-  Opal.uid = function() {
+  function $uid() {
     unique_id += 2;
     return unique_id;
   };
+  Opal.uid = $uid;
 
   // Retrieve or assign the id of an object
   Opal.id = function(obj) {
     if (obj.$$is_number) return (obj * 2)+1;
     if (obj.$$id == null) {
-      $prop(obj, '$$id', Opal.uid());
+      $prop(obj, '$$id', $uid());
     }
     return obj.$$id;
   };
@@ -805,6 +806,23 @@
     }
   };
 
+  // helper to set $$meta on klass, module or instance
+  function set_meta(obj, meta) {
+    if (obj.hasOwnProperty('$$meta')) {
+      obj.$$meta = meta;
+    } else {
+      $prop(obj, '$$meta', meta);
+    }
+    if (obj.$$frozen) {
+      // If a object is frozen (sealed), freeze $$meta too.
+      // No need to inject $$meta.$$prototype in the prototype chain,
+      // as $$meta cannot be modified anyway.
+      obj.$$meta.$freeze();
+    } else {
+      $set_proto(obj, meta.$$prototype);
+    }
+  };
+
   // Build the singleton class for an existing class. Class object are built
   // with their singleton class already in the prototype chain and inheriting
   // from their superclass object (up to `Class` itself).
@@ -815,8 +833,6 @@
   // @param klass [Class]
   // @return [Class]
   Opal.build_class_singleton_class = function(klass) {
-    var superclass, meta;
-
     if (klass.$$meta) {
       return klass.$$meta;
     }
@@ -824,14 +840,13 @@
     // The singleton_class superclass is the singleton_class of its superclass;
     // but BasicObject has no superclass (its `$$super` is null), thus we
     // fallback on `Class`.
-    superclass = klass === BasicObject ? Class : Opal.get_singleton_class(klass.$$super);
+    var superclass = klass === BasicObject ? Class : Opal.get_singleton_class(klass.$$super);
 
-    meta = $allocate_class(null, superclass, true);
+    var meta = $allocate_class(null, superclass, true);
 
     $prop(meta, '$$is_singleton', true);
     $prop(meta, '$$singleton_of', klass);
-    $prop(klass, '$$meta', meta);
-    $set_proto(klass, meta.$$prototype);
+    set_meta(klass, meta);
     // Restoring ClassName.class
     $prop(klass, '$$class', Opal.Class);
 
@@ -847,8 +862,7 @@
 
     $prop(meta, '$$is_singleton', true);
     $prop(meta, '$$singleton_of', mod);
-    $prop(mod, '$$meta', meta);
-    $set_proto(mod, meta.$$prototype);
+    set_meta(mod, meta);
     // Restoring ModuleName.class
     $prop(mod, '$$class', Opal.Module);
 
@@ -868,9 +882,7 @@
 
     delete klass.$$prototype.$$class;
 
-    $prop(object, '$$meta', klass);
-
-    $set_proto(object, object.$$meta.$$prototype);
+    set_meta(object, klass);
 
     return klass;
   };
@@ -1548,15 +1560,19 @@
     throw Opal.ArgumentError.$new(inspect + ': wrong number of arguments (given ' + actual + ', expected ' + expected + ')');
   };
 
+  function get_ancestors(obj) {
+    if (obj.hasOwnProperty('$$meta') && obj.$$meta !== null) {
+      return $ancestors(obj.$$meta);
+    } else {
+      return $ancestors(obj.$$class);
+    }
+  };
+
   // Super dispatcher
   Opal.find_super = function(obj, mid, current_func, defcheck, allow_stubs) {
     var jsid = '$' + mid, ancestors, super_method;
 
-    if (obj.hasOwnProperty('$$meta')) {
-      ancestors = $ancestors(obj.$$meta);
-    } else {
-      ancestors = $ancestors(obj.$$class);
-    }
+    ancestors = get_ancestors(obj);
 
     var current_index = ancestors.indexOf(current_func.$$owner);
 
@@ -1891,11 +1907,7 @@
   Opal.refined_send = function(refinement_groups, recv, method, args, block, blockopts) {
     var i, j, k, ancestors, ancestor, refinements, refinement, refine_modules, refine_module, body;
 
-    if (recv.hasOwnProperty('$$meta')) {
-      ancestors = $ancestors(recv.$$meta);
-    } else {
-      ancestors = $ancestors(recv.$$class);
-    }
+    ancestors = get_ancestors(recv);
 
     // For all ancestors that there are, starting from the closest to the furthest...
     for (i = 0; i < ancestors.length; i++) {
@@ -1994,6 +2006,8 @@
 
   // Define method on a module or class (see Opal.def).
   Opal.defn = function(module, jsid, body) {
+    $deny_frozen_access(module);
+
     body.displayName = jsid;
     body.$$owner = module;
 
@@ -2505,6 +2519,70 @@
     return name;
   };
 
+  // Support for #freeze
+  // -------------------
+
+  // helper that can be used from methods
+  function $deny_frozen_access(obj) {
+    if (obj.$$frozen) {
+      throw Opal.FrozenError.$new("can't modify frozen " + (obj.$class()) + ": " + (obj), Opal.hash2(["receiver"], {"receiver": obj}));
+    }
+  };
+  Opal.deny_frozen_access = $deny_frozen_access;
+
+  // common #freeze runtime support
+  Opal.freeze = function(obj) {
+    $prop(obj, "$$frozen", true);
+
+    // set $$id
+    if (!obj.hasOwnProperty('$$id')) { $prop(obj, '$$id', $uid()); }
+
+    if (obj.hasOwnProperty('$$meta')) {
+      // freeze $$meta if it has already been set
+      obj.$$meta.$freeze();
+    } else {
+      // ensure $$meta can be set lazily, $$meta is frozen when set in runtime.js
+      $prop(obj, '$$meta', null);
+    }
+
+    // $$comparable is used internally and set multiple times
+    // defining it before sealing ensures it can be modified later on
+    if (!obj.hasOwnProperty('$$comparable')) { $prop(obj, '$$comparable', null); }
+
+    // seal the Object
+    Object.seal(obj);
+
+    return obj;
+  };
+
+  // freze props, make setters of instance variables throw FrozenError
+  Opal.freeze_props = function(obj) {
+    var prop, prop_type, desc;
+
+    for(prop in obj) {
+      prop_type = typeof(prop);
+
+      // prop_type "object" here is a String(), skip $ props
+      if ((prop_type === "string" || prop_type === "object") && prop[0] === '$') {
+        continue;
+      }
+
+      desc = Object.getOwnPropertyDescriptor(obj, prop);
+      if (desc && desc.enumerable && desc.writable) {
+        // create closure to retain current value as cv
+        // for Opal 2.0 let for cv should do the trick, instead of a function
+        (function() {
+          // set v to undefined, as if the property is not set
+          var cv = obj[prop];
+          Object.defineProperty(obj, prop, {
+            get: function() { return cv; },
+            set: function(_val) { $deny_frozen_access(obj); },
+            enumerable: true
+          });
+        })();
+      }
+    }
+  };
 
   // Regexps
   // -------
@@ -2540,9 +2618,9 @@
   //
   Opal.global_multiline_regexp = function(pattern) {
     var result, flags;
-    
+
     // RegExp already has the global and multiline flag
-    if (pattern.global && pattern.multiline) return pattern; 
+    if (pattern.global && pattern.multiline) return pattern;
 
     flags = 'gm' + (pattern.ignoreCase ? 'i' : '');
     if (pattern.multiline) {
@@ -2807,17 +2885,19 @@
   }
   Opal.return_ivar = function(ivar) {
     return function() {
-      if (this[ivar] == null) this[ivar] = nil;
+      if (this[ivar] == null) { return nil; }
       return this[ivar];
     }
   }
   Opal.assign_ivar = function(ivar) {
     return function(val) {
+      $deny_frozen_access(this);
       return this[ivar] = val;
     }
   }
   Opal.assign_ivar_val = function(ivar, static_val) {
     return function() {
+      $deny_frozen_access(this);
       return this[ivar] = static_val;
     }
   }
@@ -2907,6 +2987,9 @@
   nil = Opal.nil = new Opal.NilClass();
   nil.$$id = nil_id;
   nil.call = nil.apply = function() { throw Opal.LocalJumpError.$new('no block given'); };
+  nil.$$frozen = true;
+  nil.$$comparable = false;
+  Object.seal(nil);
 
   // Errors
   Opal.breaker  = new Error('unexpected break (old)');

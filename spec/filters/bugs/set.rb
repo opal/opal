@@ -11,22 +11,10 @@ opal_filter "Set" do
   fails "Set#=== returns true when self contains the passed Object" # Expected false to be true
   fails "Set#^ raises an ArgumentError when passed a non-Enumerable"
   fails "Set#^ returns a new Set containing elements that are not in both self and the passed Enumerable" # NoMethodError: undefined method `^' for #<Set: {1,2,3,4}>
-  fails "Set#compare_by_identity causes future comparisons on the receiver to be made by identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {1}>
-  fails "Set#compare_by_identity compares its members by identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity does not call #hash on members" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity is idempotent and has no effect on an already compare_by_identity set" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity is not equal to set what does not compare by identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {1,2}>
-  fails "Set#compare_by_identity persists over #clones" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity persists over #dups" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity regards #clone'd objects as having different identities" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity regards #dup'd objects as having different identities" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity rehashes internally so that old members can be looked up" # NoMethodError: undefined method `compare_by_identity' for #<Set: {1,2,3,4,5,6,7,8,9,10,#<Object:0x13a2>}>
-  fails "Set#compare_by_identity returns self" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity uses #equal? semantics, but doesn't actually call #equal? to determine identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity uses the semantics of BasicObject#equal? to determine members identity" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity? returns false by default" # NoMethodError: undefined method `compare_by_identity?' for #<Set: {}>
-  fails "Set#compare_by_identity? returns true once #compare_by_identity has been invoked on self" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
-  fails "Set#compare_by_identity? returns true when called multiple times on the same set" # NoMethodError: undefined method `compare_by_identity' for #<Set: {}>
+  fails "Set#compare_by_identity compares its members by identity" # Expected ["a", "b"] == ["a", "b", "b"] to be truthy but was false
+  fails "Set#compare_by_identity is not equal to set what does not compare by identity" # Expected #<Set: {1,2}> == #<Set: {1,2}> to be falsy but was true
+  fails "Set#compare_by_identity regards #clone'd objects as having different identities" # Expected ["a"] == ["a", "a"] to be truthy but was false
+  fails "Set#compare_by_identity regards #dup'd objects as having different identities" # Expected ["a"] == ["a", "a"] to be truthy but was false
   fails "Set#divide divides self into a set of subsets based on the blocks return values"
   fails "Set#divide when passed a block with an arity of 2 divides self into a set of subsets based on the blocks return values"
   fails "Set#divide when passed a block with an arity of 2 yields each two Object to the block"

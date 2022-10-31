@@ -24,10 +24,6 @@ Encodings only have a very small implementation inside Opal.
 
 JavaScript does not have a native `Thread` implementation, so they are not present inside Opal. There is a placeholder `Thread` class just to provide some small level of compatibility with libraries that expect it. It does not have any function.
 
-#### Frozen Objects ####
-
-Opal does not currently support frozen objects, but has placeholder methods to prevent other libraries breaking when expecting these methods. Opal could support frozen objects in the future once a similar implementation becomes available across JavaScript runtimes.
-
 #### Private, Public and Protected methods ####
 
 All methods in Opal are defined as `public` to avoid additional runtime overhead. `Module#private` and `Module#protected` exist as just placeholder methods and are no-op methods.

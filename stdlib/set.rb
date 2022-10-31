@@ -1,3 +1,4 @@
+# helpers: freeze
 # Portions Copyright (c) 2002-2013 Akinori MUSHA <knu@iDaemons.org>
 class ::Set
   include ::Enumerable
@@ -70,6 +71,19 @@ class ::Set
     replace result
   end
 
+  def compare_by_identity
+    if @hash.respond_to?(:compare_by_identity)
+      @hash.compare_by_identity
+      self
+    else
+      raise NotImplementedError, "#{self.class.name}\##{__method__} is not implemented"
+    end
+  end
+
+  def compare_by_identity?
+    @hash.respond_to?(:compare_by_identity?) && @hash.compare_by_identity?
+  end
+
   def delete(o)
     @hash.delete(o)
     self
@@ -88,6 +102,13 @@ class ::Set
     # of enumeration in subclasses.
     select { |o| yield o }.each { |o| @hash.delete(o) }
     self
+  end
+
+  def freeze
+    return self if frozen?
+
+    @hash.freeze
+    `$freeze(self)`
   end
 
   def keep_if

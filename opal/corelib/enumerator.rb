@@ -1,4 +1,4 @@
-# helpers: slice, coerce_to
+# helpers: slice, coerce_to, deny_frozen_access
 
 require 'corelib/enumerable'
 
@@ -22,6 +22,8 @@ class ::Enumerator
   end
 
   def initialize(*, &block)
+    `$deny_frozen_access(self)`
+
     @cursor = 0
     if block
       @object = Generator.new(&block)

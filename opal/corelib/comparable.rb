@@ -40,7 +40,7 @@ module ::Comparable
 
       // check for infinite recursion
       if (self.$$comparable) {
-        delete self.$$comparable;
+        self.$$comparable = false;
         return false;
       }
     }

@@ -109,7 +109,7 @@ opal_filter "Kernel" do
   fails "Kernel#p flushes output if receiver is a File"
   fails "Kernel#p is not affected by setting $\\, $/ or $,"
   fails "Kernel#pp lazily loads the 'pp' library and delegates the call to that library" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4f28>
-  fails "Kernel#print prints $_ when no arguments are given" # Expected:   $stdout: "foo"       got:   $stdout: "" 
+  fails "Kernel#print prints $_ when no arguments are given" # Expected:   $stdout: "foo"       got:   $stdout: ""
   fails "Kernel#public_method changes the method called for super on a target aliased method"
   fails "Kernel#public_method raises a NameError if we only repond_to_missing? method, true"
   fails "Kernel#public_method returns a method object for a valid method"

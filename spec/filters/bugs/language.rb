@@ -52,7 +52,7 @@ opal_filter "language" do
   fails "A singleton class doesn't have singleton class"
   fails "A singleton class raises a TypeError for symbols"
   fails "A singleton method definition can be declared for a global variable"
-  fails "A singleton method definition raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised ("foo" was returned)
+  fails "A singleton method definition raises FrozenError with the correct class name" # Expected "can't modify frozen Class: #<Class:#<Object:0x80db0>>".start_with? "can't modify frozen object" to be truthy but was false
   fails "Accessing a class variable raises a RuntimeError when a class variable is overtaken in an ancestor class" # Expected RuntimeError (/class variable @@cvar_overtaken of .+ is overtaken by .+/) but no exception was raised ("subclass" was returned)
   fails "Accessing a class variable raises a RuntimeError when accessed from the toplevel scope (not in some module or class)" # Expected RuntimeError (class variable access from toplevel) but got: NameError (uninitialized class variable @@cvar_toplevel1 in MSpecEnv)
   fails "Allowed characters allows non-ASCII lowercased characters at the beginning" # Expected nil == 1 to be truthy but was false
@@ -62,7 +62,7 @@ opal_filter "language" do
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
   fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
   fails "An instance method definition with a splat requires the presence of any arguments that precede the *" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(1 for -3)
-  fails "An instance method raises FrozenError with the correct class name" # Expected FrozenError but no exception was raised (#<Module:0x225b4> was returned)
+  fails "An instance method raises FrozenError with the correct class name" # Expected "can't modify frozen Module: #<Module:0x80c36>".start_with? "can't modify frozen module" to be truthy but was false
   fails "An instance method raises an error with too few arguments" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(1 for 2)
   fails "An instance method raises an error with too many arguments" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for 1)
   fails "An instance method with a default argument evaluates the default when required arguments precede it" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(0 for -2)
@@ -176,7 +176,7 @@ opal_filter "language" do
   fails "Operators * / % are left-associative"
   fails "Operators <=> == === != =~ !~ have higher precedence than &&" # Expected false == false to be falsy but was true
   fails "Optional constant assignment with ||= causes side-effects of the module part to be applied (for nil constant)" # Expected 3 == 1 to be truthy but was false
-  fails "Optional constant assignment with ||= causes side-effects of the module part to be applied only once (for undefined constant)" # Expected 2 == 1 to be truthy but was false  
+  fails "Optional constant assignment with ||= causes side-effects of the module part to be applied only once (for undefined constant)" # Expected 2 == 1 to be truthy but was false
   fails "Optional variable assignments using compounded constants with &&= assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compounded constants with operator assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Pattern matching Array pattern calls #deconstruct once for multiple patterns, caching the result" # Expected ["deconstruct", "deconstruct"] == ["deconstruct"] to be truthy but was false

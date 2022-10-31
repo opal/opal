@@ -23,6 +23,7 @@ class ::Complex < ::Numeric
   def initialize(real, imag = 0)
     @real = real
     @imag = imag
+    freeze
   end
 
   def coerce(other)

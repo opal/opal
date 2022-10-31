@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, respond_to, Opal
+# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props
 # use_strict: true
 
 module ::Kernel
@@ -132,7 +132,7 @@ module ::Kernel
     %x{
       var i, name, names, length;
 
-      if (other.hasOwnProperty('$$meta')) {
+      if (other.hasOwnProperty('$$meta') && other.$$meta !== null) {
         var other_singleton_class = Opal.get_singleton_class(other);
         var self_singleton_class = Opal.get_singleton_class(self);
         names = Object.getOwnPropertyNames(other_singleton_class.$$prototype);
@@ -160,18 +160,27 @@ module ::Kernel
     }
   end
 
-  def clone(freeze: true)
+  def clone(freeze: nil)
+    unless freeze.nil? || freeze == true || freeze == false
+      raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
+    end
+
     copy = self.class.allocate
 
     copy.copy_instance_variables(self)
     copy.copy_singleton_methods(self)
-    copy.initialize_clone(self)
+    copy.initialize_clone(self, freeze: freeze)
+
+    if freeze == true || (freeze.nil? && frozen?)
+      copy.freeze
+    end
 
     copy
   end
 
-  def initialize_clone(other)
+  def initialize_clone(other, freeze: nil)
     initialize_copy(other)
+    self
   end
 
   def define_singleton_method(name, method = undefined, &block)
@@ -221,6 +230,12 @@ module ::Kernel
 
   def extend(*mods)
     %x{
+      if (mods.length == 0) {
+        #{raise ::ArgumentError, 'wrong number of arguments (given 0, expected 1+)'}
+      }
+
+      $deny_frozen_access(self);
+
       var singleton = #{singleton_class};
 
       for (var i = mods.length - 1; i >= 0; i--) {
@@ -237,6 +252,34 @@ module ::Kernel
     }
 
     self
+  end
+
+  def freeze
+    return self if frozen?
+
+    %x{
+      if (typeof(self) === "object") {
+        $freeze_props(self);
+        return $freeze(self);
+      }
+      return self;
+    }
+  end
+
+  def frozen?
+    %x{
+      switch (typeof(self)) {
+      case "string":
+      case "symbol":
+      case "number":
+      case "boolean":
+        return true;
+      case "object":
+        return (self.$$frozen || false);
+      default:
+        return false;
+      }
+    }
   end
 
   def gets(*args)
@@ -300,6 +343,8 @@ module ::Kernel
   end
 
   def instance_variable_set(name, value)
+    `$deny_frozen_access(self)`
+
     name = ::Opal.instance_variable_name!(name)
 
     `self[Opal.ivar(name.substr(1))] = value`

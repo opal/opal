@@ -39,20 +39,6 @@ class ::String
 end
 
 module ::Kernel
-  `var ERROR = "Object freezing is not supported by Opal"`
-
-  def freeze
-    `handle_unsupported_feature(ERROR)`
-    self
-  end
-
-  def frozen?
-    `handle_unsupported_feature(ERROR)`
-    false
-  end
-end
-
-module ::Kernel
   `var ERROR = "Object tainting is not supported by Opal"`
 
   def taint

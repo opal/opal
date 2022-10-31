@@ -1,6 +1,10 @@
+# helpers: deny_frozen_access
+
 class ::Enumerator
   class self::Chain < self
     def initialize(*enums)
+      `$deny_frozen_access(self)`
+
       @enums = enums
       @iterated = []
       @object = self
