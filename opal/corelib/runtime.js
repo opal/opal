@@ -1873,7 +1873,16 @@
       throw Opal.NameError.$new("Passed method should be a string or a function");
     }
 
-    return Opal.send2(recv, body, method, args, block, blockopts);
+    // Inlined send2 follows:
+    if (body == null && method != null && recv.$method_missing) {
+      body = recv.$method_missing;
+      args = [method].concat(args);
+    }
+
+    apply_blockopts(block, blockopts);
+
+    if (typeof block === 'function') body.$$p = block;
+    return body.apply(recv, args);
   };
 
   Opal.send2 = function(recv, body, method, args, block, blockopts) {
