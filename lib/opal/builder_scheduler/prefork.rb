@@ -182,6 +182,8 @@ module Opal
             break
           end
         end
+      rescue Errno::EPIPE
+        exit!
       end
 
       def prefork_reactor(rel_path, requires, autoloads, options)
