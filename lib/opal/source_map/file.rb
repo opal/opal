@@ -51,7 +51,7 @@ class Opal::SourceMap::File
       # file: "out.js", # This is optional
       sourceRoot: source_root,
       sources: [file],
-      sourcesContent: [source.force_encoding('UTF-8')],
+      sourcesContent: [source.encoding == Encoding::UTF_8 ? source : source.encode('UTF-8', undef: :replace)],
       names: names,
       mappings: Opal::SourceMap::VLQ.encode_mappings(relative_mappings),
       # x_com_opalrb_original_lines: source.count("\n"),
