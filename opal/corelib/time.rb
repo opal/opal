@@ -1,4 +1,4 @@
-# helpers: slice
+# helpers: slice, deny_frozen_access
 
 require 'corelib/comparable'
 
@@ -445,7 +445,10 @@ class ::Time < `Date`
 
   def gmtime
     %x{
-      self.timezone = 0;
+      if (self.timezone !== 0) {
+        $deny_frozen_access(self);
+        self.timezone = 0;
+      }
       return self;
     }
   end

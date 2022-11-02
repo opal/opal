@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, yield1, yieldX
+# helpers: truthy, coerce_to, yield1, yieldX, deny_frozen_access
 
 class ::Enumerator
   class self::Lazy < self
@@ -11,6 +11,8 @@ class ::Enumerator
     end
 
     def initialize(object, size = nil, &block)
+      `$deny_frozen_access(self)`
+
       unless block_given?
         ::Kernel.raise ::ArgumentError, 'tried to call lazy new without a block'
       end

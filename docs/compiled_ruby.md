@@ -617,6 +617,14 @@ myHash.$to_n(); // provided by the Native module
 
 NOTE: Be aware `Hash#to_n` produces a duplicate copy of the hash.
 
+
+### Freezing Objects
+
+Starting with Opal 1.6.0 freezing objects is supported in general but a few differences to Ruby apply.
+Contrary to Ruby, where #freeze is often used to optimize performance, there is no performance benefit when freezing objects in Opal, instead its main use case is to prevent modification of objects.
+There are a few edge cases, where accessing frozen objects in Opal behaves different from Ruby. In those cases a modification attempt will fail silently, with no "FrozenError" exception thrown.
+
+
 ## Advanced Compilation
 
 ### Method Missing

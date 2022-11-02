@@ -1,4 +1,4 @@
-# helpers: coerce_to, respond_to, global_multiline_regexp
+# helpers: coerce_to, respond_to, global_multiline_regexp, prop
 
 require 'corelib/comparable'
 require 'corelib/regexp'
@@ -339,10 +339,21 @@ class ::String < `String`
     `self.charAt(0)`
   end
 
-  def clone
+  def clone(freeze: nil)
+    unless freeze.nil? || freeze == true || freeze == false
+      raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
+    end
+
     copy = `new String(self)`
     copy.copy_singleton_methods(self)
-    copy.initialize_clone(self)
+    copy.initialize_clone(self, freeze: freeze)
+
+    if freeze == true
+      `if (!copy.$$frozen) { copy.$$frozen = true; }`
+    elsif freeze.nil?
+      `if (self.$$frozen) { copy.$$frozen = true; }`
+    end
+
     copy
   end
 
@@ -1842,8 +1853,8 @@ class ::String < `String`
 
   def freeze
     %x{
-      if (typeof self === 'string') return self;
-      self.$$frozen = true;
+      if (typeof self === 'string') { return self; }
+      $prop(self, "$$frozen", true);
       return self;
     }
   end
@@ -1851,7 +1862,7 @@ class ::String < `String`
   def -@
     %x{
       if (typeof self === 'string') return self;
-      if (self.$$frozen === true) return self;
+      if (self.$$frozen) return self;
       if (self.encoding.name == 'UTF-8' && self.internal_encoding.name == 'UTF-8') return self.toString();
       return self.$dup().$freeze();
     }

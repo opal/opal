@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# helpers: freeze, freeze_props
 # = delegate -- Support for the Delegation Pattern
 #
 # This file ended up in Opal as a port of the following file:
@@ -243,7 +244,12 @@ class Delegator < BasicObject
   #
   def freeze
     __getobj__.freeze
-    super()
+    `$freeze_props(self)`
+    `$freeze(self)`
+  end
+
+  def frozen?
+    `(self.$$frozen || false)`
   end
 
   @delegator_api = public_instance_methods

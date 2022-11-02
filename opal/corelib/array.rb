@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to
+# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze
 
 require 'corelib/enumerable'
 require 'corelib/numeric'
@@ -76,6 +76,8 @@ class ::Array < `Array`
 
   def initialize(size = nil, obj = nil, &block)
     %x{
+      $deny_frozen_access(self);
+
       if (obj !== nil && block !== nil) {
         #{::Kernel.warn('warning: block supersedes default value argument')}
       }
@@ -239,6 +241,7 @@ class ::Array < `Array`
   end
 
   def <<(object)
+    `$deny_frozen_access(self)`
     `self.push(object)`
 
     self
@@ -441,6 +444,8 @@ class ::Array < `Array`
   end
 
   def []=(index, value, extra = undefined)
+    `$deny_frozen_access(self)`
+
     data = nil
     %x{
       var i, size = self.length;
@@ -668,6 +673,8 @@ class ::Array < `Array`
   end
 
   def clear
+    `$deny_frozen_access(self)`
+
     `self.splice(0, self.length)`
 
     self
@@ -704,6 +711,8 @@ class ::Array < `Array`
     return enum_for(:collect!) { size } unless block_given?
 
     %x{
+      $deny_frozen_access(self);
+
       for (var i = 0, length = self.length; i < length; i++) {
         var value = $yield1(block, self[i]);
         self[i] = value;
@@ -819,6 +828,8 @@ class ::Array < `Array`
 
   def compact!
     %x{
+      $deny_frozen_access(self);
+
       var original = self.length;
 
       for (var i = 0, length = self.length; i < length; i++) {
@@ -835,6 +846,8 @@ class ::Array < `Array`
   end
 
   def concat(*others)
+    `$deny_frozen_access(self)`
+
     others = others.map do |other|
       other = if ::Array === other
                 other.to_a
@@ -866,6 +879,8 @@ class ::Array < `Array`
 
       for (var i = 0, length = original; i < length; i++) {
         if (#{`self[i]` == object}) {
+          $deny_frozen_access(self);
+
           self.splice(i, 1);
 
           length--;
@@ -885,6 +900,8 @@ class ::Array < `Array`
 
   def delete_at(index)
     %x{
+      $deny_frozen_access(self);
+
       index = $coerce_to(index, #{::Integer}, 'to_int');
 
       if (index < 0) {
@@ -905,7 +922,11 @@ class ::Array < `Array`
 
   def delete_if(&block)
     return enum_for(:delete_if) { size } unless block_given?
-    %x{filterIf(self, $falsy, block)}
+    %x{
+      $deny_frozen_access(self);
+
+      filterIf(self, $falsy, block)
+    }
     self
   end
 
@@ -1064,6 +1085,8 @@ class ::Array < `Array`
 
   def fill(*args, &block)
     %x{
+      $deny_frozen_access(self);
+
       var i, length, value;
     }
 
@@ -1216,6 +1239,8 @@ class ::Array < `Array`
 
   def flatten!(level = undefined)
     %x{
+      $deny_frozen_access(self);
+
       var flattened = #{flatten level};
 
       if (self.length == flattened.length) {
@@ -1234,6 +1259,12 @@ class ::Array < `Array`
     }
 
     self
+  end
+
+  def freeze
+    return self if frozen?
+
+    `$freeze(self)`
   end
 
   def hash
@@ -1322,6 +1353,8 @@ class ::Array < `Array`
 
   def insert(index, *objects)
     %x{
+      $deny_frozen_access(self);
+
       index = $coerce_to(index, #{::Integer}, 'to_int');
 
       if (objects.length > 0) {
@@ -1446,7 +1479,11 @@ class ::Array < `Array`
 
   def keep_if(&block)
     return enum_for(:keep_if) { size } unless block_given?
-    %x{filterIf(self, $truthy, block)}
+    %x{
+      $deny_frozen_access(self);
+
+      filterIf(self, $truthy, block)
+    }
     self
   end
 
@@ -1590,6 +1627,8 @@ class ::Array < `Array`
   end
 
   def pop(count = undefined)
+    `$deny_frozen_access(self)`
+
     if `count === undefined`
       return if `self.length === 0`
       return `self.pop()`
@@ -1664,6 +1703,8 @@ class ::Array < `Array`
 
   def push(*objects)
     %x{
+      $deny_frozen_access(self);
+
       for (var i = 0, length = objects.length; i < length; i++) {
         self.push(objects[i]);
       }
@@ -1708,6 +1749,8 @@ class ::Array < `Array`
   def reject!(&block)
     return enum_for(:reject!) { size } unless block_given?
 
+    `$deny_frozen_access(self)`
+
     original = length
     delete_if(&block)
 
@@ -1717,6 +1760,8 @@ class ::Array < `Array`
   end
 
   def replace(other)
+    `$deny_frozen_access(self)`
+
     other = if ::Array === other
               other.to_a
             else
@@ -1736,6 +1781,8 @@ class ::Array < `Array`
   end
 
   def reverse!
+    `$deny_frozen_access(self)`
+
     `self.reverse()`
   end
 
@@ -1809,6 +1856,8 @@ class ::Array < `Array`
 
   def rotate!(cnt = 1)
     %x{
+      $deny_frozen_access(self);
+
       if (self.length === 0 || self.length === 1) {
         return self;
       }
@@ -1967,6 +2016,8 @@ class ::Array < `Array`
     return enum_for(:select!) { size } unless block_given?
 
     %x{
+      $deny_frozen_access(self)
+
       var original = self.length;
       #{ keep_if(&block) };
       return self.length === original ? nil : self;
@@ -1974,6 +2025,8 @@ class ::Array < `Array`
   end
 
   def shift(count = undefined)
+    `$deny_frozen_access(self)`
+
     if `count === undefined`
       return if `self.length === 0`
       return `shiftNoArg(self)`
@@ -1996,6 +2049,8 @@ class ::Array < `Array`
 
   def shuffle!(rng = undefined)
     %x{
+      $deny_frozen_access(self);
+
       var randgen, i = self.length, j, tmp;
 
       if (rng !== undefined) {
@@ -2036,6 +2091,8 @@ class ::Array < `Array`
   end
 
   def slice!(index, length = undefined)
+    `$deny_frozen_access(self)`
+
     result = nil
 
     if `length === undefined`
@@ -2144,6 +2201,8 @@ class ::Array < `Array`
 
   def sort!(&block)
     %x{
+      $deny_frozen_access(self)
+
       var result;
 
       if (#{block_given?}) {
@@ -2164,6 +2223,8 @@ class ::Array < `Array`
 
   def sort_by!(&block)
     return enum_for(:sort_by!) { size } unless block_given?
+
+    `$deny_frozen_access(self)`
 
     replace sort_by(&block)
   end
@@ -2297,6 +2358,8 @@ class ::Array < `Array`
 
   def uniq!(&block)
     %x{
+      $deny_frozen_access(self);
+
       var original_length = self.length, hash = #{{}}, i, length, item, key;
 
       for (i = 0, length = original_length; i < length; i++) {
@@ -2319,6 +2382,8 @@ class ::Array < `Array`
 
   def unshift(*objects)
     %x{
+      $deny_frozen_access(self);
+
       var selfLength = self.length
       var objectsLength = objects.length
       if (objectsLength == 0) return self;

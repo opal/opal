@@ -49,6 +49,7 @@ class ::Rational < ::Numeric
   def initialize(num, den)
     @num = num
     @den = den
+    freeze
   end
 
   def numerator

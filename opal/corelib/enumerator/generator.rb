@@ -1,10 +1,12 @@
-# helpers: breaker
+# helpers: breaker, deny_frozen_access
 
 class Enumerator
   class Generator
     include ::Enumerable
 
     def initialize(&block)
+      `$deny_frozen_access(self)`
+
       ::Kernel.raise ::LocalJumpError, 'no block given' unless block
 
       @block = block

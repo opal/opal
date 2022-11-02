@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar
+# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze
 
 class ::Module
   def self.allocate
@@ -84,6 +84,8 @@ class ::Module
   end
 
   def alias_method(newname, oldname)
+    `$deny_frozen_access(self)`
+
     newname = `$coerce_to(newname, #{::String}, 'to_str')`
     oldname = `$coerce_to(oldname, #{::String}, 'to_str')`
     `Opal.alias(self, newname, oldname)`
@@ -92,6 +94,8 @@ class ::Module
   end
 
   def alias_native(mid, jsid = mid)
+    `$deny_frozen_access(self)`
+
     `Opal.alias_native(self, mid, jsid)`
 
     self
@@ -102,6 +106,8 @@ class ::Module
   end
 
   def append_features(includer)
+    `$deny_frozen_access(includer)`
+
     `Opal.append_features(self, includer)`
     self
   end
@@ -126,6 +132,8 @@ class ::Module
 
   def attr_reader(*names)
     %x{
+      $deny_frozen_access(self);
+
       var proto = self.$$prototype;
 
       for (var i = names.length - 1; i >= 0; i--) {
@@ -150,6 +158,8 @@ class ::Module
 
   def attr_writer(*names)
     %x{
+      $deny_frozen_access(self);
+
       var proto = self.$$prototype;
 
       for (var i = names.length - 1; i >= 0; i--) {
@@ -174,6 +184,8 @@ class ::Module
 
   def autoload(const, path)
     %x{
+      $deny_frozen_access(self);
+
       if (!#{Opal.const_name?(const)}) {
         #{::Kernel.raise ::NameError, "autoload must be constant name: #{const}"}
       }
@@ -221,6 +233,8 @@ class ::Module
   end
 
   def class_variable_set(name, value)
+    `$deny_frozen_access(self)`
+
     name = ::Opal.class_variable_name!(name)
 
     `Opal.class_variable_set(self, name, value)`
@@ -233,6 +247,8 @@ class ::Module
   end
 
   def remove_class_variable(name)
+    `$deny_frozen_access(self)`
+
     name = ::Opal.class_variable_name!(name)
 
     %x{
@@ -341,6 +357,8 @@ class ::Module
   end
 
   def const_set(name, value)
+    `$deny_frozen_access(self)`
+
     name = ::Opal.const_name!(name)
 
     if name !~ ::Opal::CONST_NAME_REGEXP || name.start_with?('::')
@@ -357,6 +375,8 @@ class ::Module
 
   def define_method(name, method = undefined, &block)
     %x{
+      $deny_frozen_access(self);
+
       if (method === undefined && block === nil)
         #{::Kernel.raise ::ArgumentError, 'tried to create a Proc object without a block'}
     }
@@ -405,10 +425,22 @@ class ::Module
     }
   end
 
+  def freeze
+    return self if frozen?
+
+    `$freeze(self)`
+  end
+
   def remove_method(*names)
     %x{
-      for (var i = 0, length = names.length; i < length; i++) {
-        Opal.rdef(self, "$" + names[i]);
+      for (var i = 0; i < names.length; i++) {
+        var name = names[i];
+        if (!(typeof name === "string" || name.$$is_string)) {
+          #{raise ::TypeError, "#{name} is not a symbol nor a string"}
+        }
+        $deny_frozen_access(self);
+
+        Opal.rdef(self, "$" + name);
       }
     }
 
@@ -488,6 +520,8 @@ class ::Module
   end
 
   def extend_object(object)
+    `$deny_frozen_access(object)`
+    nil
   end
 
   def method_added(*)
@@ -552,6 +586,8 @@ class ::Module
 
   def module_function(*methods)
     %x{
+      $deny_frozen_access(self);
+
       if (methods.length === 0) {
         self.$$module_function = true;
         return nil;
@@ -623,6 +659,8 @@ class ::Module
 
   def prepend_features(prepender)
     %x{
+      $deny_frozen_access(prepender);
+
       if (!self.$$is_module) {
         #{::Kernel.raise ::TypeError, "wrong argument type #{self.class} (expected Module)"};
       }
@@ -636,6 +674,8 @@ class ::Module
   end
 
   def remove_const(name)
+    `$deny_frozen_access(self)`
+
     `Opal.const_remove(self, name)`
   end
 
@@ -645,7 +685,13 @@ class ::Module
 
   def undef_method(*names)
     %x{
-      for (var i = 0, length = names.length; i < length; i++) {
+      for (var i = 0; i < names.length; i++) {
+        var name = names[i];
+        if (!(typeof name === "string" || name.$$is_string)) {
+          #{raise ::TypeError, "#{name} is not a symbol nor a string"}
+        }
+        $deny_frozen_access(self);
+
         Opal.udef(self, "$" + names[i]);
       }
     }
