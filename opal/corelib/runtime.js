@@ -534,12 +534,12 @@
   // @return new [Class]  or existing ruby class
   //
   function $allocate_class(name, superclass, singleton) {
-    var klass, constructor;
+    var klass;
 
     if (superclass != null && superclass.$$bridge) {
       // Inheritance from bridged classes requires
       // calling original JS constructors
-      constructor = function() {
+      klass = function() {
         var args = $slice.call(arguments),
             self = new ($bind.apply(superclass.$$constructor, [null].concat(args)))();
 
@@ -548,18 +548,16 @@
         return self;
       }
     } else {
-      constructor = function(){};
+      klass = function(){};
     }
 
     if (name && name !== nil) {
-      $prop(constructor, 'displayName', '::'+name);
+      $prop(klass, 'displayName', '::'+name);
     }
 
-    klass = constructor;
-
     $prop(klass, '$$name', name);
-    $prop(klass, '$$constructor', constructor);
-    $prop(klass, '$$prototype', constructor.prototype);
+    $prop(klass, '$$constructor', klass);
+    $prop(klass, '$$prototype', klass.prototype);
     $prop(klass, '$$const', {});
     $prop(klass, '$$is_class', true);
     $prop(klass, '$$is_a_module', true);
