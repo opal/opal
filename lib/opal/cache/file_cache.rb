@@ -23,6 +23,11 @@ module Opal
         out = Marshal.dump(data)
         out = Zlib.gzip(out, level: 9)
         File.binwrite(file, out)
+      rescue Zlib::BufError
+        # This sometimes happens, unsure why, makes no sense, possibly
+        # some race condition
+        warn '[Opal]: Zlib::BufError; retrying'
+        retry
       end
 
       def get(key)
