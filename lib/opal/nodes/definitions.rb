@@ -56,7 +56,7 @@ module Opal
         else
           compile_children(returned_children, @level)
 
-          if scope.parent.await_encountered
+          if scope.parent&.await_encountered
             wrap '(await (async function() {', '})())'
           else
             wrap '(function() {', '})()'
