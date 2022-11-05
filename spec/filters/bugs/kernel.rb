@@ -316,7 +316,6 @@ opal_filter "Kernel" do
   fails "Kernel.global_variables finds subset starting with std"
   fails "Kernel.lambda does not create lambda-style Procs when captured with #method" # Expected true to be false
   fails "Kernel.lambda raises an ArgumentError when no block is given"
-  fails "Kernel.lambda returns from the lambda itself, not the creation site of the lambda"
   fails "Kernel.lambda returns the passed Proc if given an existing Proc through super" # Expected true to be false
   fails "Kernel.lambda returns the passed Proc if given an existing Proc" # Expected true to be false
   fails "Kernel.loop returns StopIteration#result, the result value of a finished iterator" # requires changes in enumerator.rb
