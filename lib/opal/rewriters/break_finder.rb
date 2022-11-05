@@ -18,6 +18,16 @@ module Opal
         node
       end
 
+      # don't process nested blocks
+      def on_send(node)
+        node.children.each do |child|
+          next unless child.is_a? Opal::AST::Node
+          next if child.type == :iter
+
+          process(child)
+        end
+      end
+
       def stop_lookup(node)
         # noop
       end
@@ -28,6 +38,9 @@ module Opal
       alias on_while_post stop_lookup
       alias on_until      stop_lookup
       alias on_until_post stop_lookup
+
+      # ignore break inside defined
+      alias on_defined?   stop_lookup
 
       # nested block
       alias on_block      stop_lookup

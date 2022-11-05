@@ -56,22 +56,18 @@ module Opal
 
           inline_params = process(inline_args)
 
-          stmt_code = stmt(compiler.returns(stmts))
+          in_closure(Closure::DEF | Closure::JS_FUNCTION) do
+            stmt_code = stmt(compiler.returns(stmts))
 
-          compile_block_arg
+            compile_block_arg
 
-          add_temp 'self = this' if @define_self
+            add_temp 'self = this' if @define_self
 
-          compile_arity_check
+            compile_arity_check
 
-          unshift "\n#{current_indent}", scope.to_vars
+            unshift "\n#{current_indent}", scope.to_vars
 
-          line stmt_code
-
-          if scope.catch_return
-            unshift "try {\n"
-            line '} catch ($returner) { if ($returner === Opal.returner) { return $returner.$v }'
-            push ' throw $returner; }'
+            line stmt_code
           end
         end
 

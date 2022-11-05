@@ -409,6 +409,9 @@ class ::Module
             target.$$jsid = name;
             try {
               return target.apply(self, args);
+            } catch(e) {
+              if (e === target.$$brk || e === target.$$ret) return e.$v;
+              throw e;
             } finally {
               target.$$jsid = old_name
             }

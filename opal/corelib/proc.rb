@@ -18,9 +18,9 @@ class ::Proc < `Function`
         self.$$p = block;
       }
 
-      var result, $brk = self.$$brk;
+      var result, $brk = self.$$brk, $ret = self.$$ret;
 
-      if ($brk) {
+      if ($brk || ($ret && self.$$is_lambda)) {
         try {
           if (self.$$is_lambda) {
             result = self.apply(null, args);
@@ -30,10 +30,13 @@ class ::Proc < `Function`
           }
         } catch (err) {
           if (err === $brk) {
-            return $brk.$v
+            return err.$v;
+          }
+          else if (self.$$is_lambda && err === $ret) {
+            return err.$v;
           }
           else {
-            throw err
+            throw err;
           }
         }
       }

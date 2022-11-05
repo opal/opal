@@ -197,6 +197,12 @@ module Opal
         @temps.push(tmp)
       end
 
+      def prepend_scope_temp(tmp)
+        return if has_temp?(tmp)
+
+        @temps.unshift(tmp)
+      end
+
       def has_temp?(tmp)
         @temps.include? tmp
       end

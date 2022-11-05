@@ -1,4 +1,4 @@
-# helpers: breaker, deny_frozen_access
+# helpers: deny_frozen_access
 
 class Enumerator
   class Generator
@@ -22,8 +22,8 @@ class Enumerator
           Opal.yieldX(#{@block}, args);
         }
         catch (e) {
-          if (e === $breaker) {
-            return $breaker.$v;
+          if (e && e.$thrower_type == "breaker") {
+            return e.$v;
           }
           else {
             throw e;
