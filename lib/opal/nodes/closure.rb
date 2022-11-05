@@ -99,6 +99,7 @@ module Opal
           id = closure.register_catcher(type)
           closure.register_thrower(type, id)
           push id, '.$throw(', value, ')'
+          id
         end
 
         def generate_thrower_without_catcher(type, closure, value)
@@ -113,6 +114,7 @@ module Opal
             closure.register_thrower(type, id)
           end
           push id, '.$throw(', value, ')'
+          id
         end
 
         def thrower(type, value = nil)
@@ -133,7 +135,10 @@ module Opal
             elsif thrower_closure == last_closure
               push 'return ', expr_or_nil(value)
             else
-              generate_thrower(:return, thrower_closure, expr_or_nil(value))
+              id = generate_thrower(:return, thrower_closure, expr_or_nil(value))
+              # Additionally, register our thrower on the surrounding iter, if present
+              iter_closure = select_closure(ITER, break_after: DEF | MODULE | TOP)
+              iter_closure.register_thrower(:return, id) if iter_closure
             end
           when :eval_return
             thrower_closure = select_closure(DEF | LAMBDA, break_after: MODULE | TOP)
@@ -174,7 +179,10 @@ module Opal
                 push 'break'
               end
             else
-              generate_thrower(:break, thrower_closure, expr_or_nil(value))
+              id = generate_thrower(:break, thrower_closure, expr_or_nil(value))
+              # Additionally, register our thrower on the surrounding iter, if present
+              iter_closure = select_closure(ITER, break_after: DEF | MODULE | TOP)
+              iter_closure.register_thrower(:break, id) if iter_closure
             end
           when :retry
             # TODO: Find the closest RETRIER and Opal.cflow(:retry) (set x to catch it)
