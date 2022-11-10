@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze
+# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop
 
 class ::Module
   def self.allocate
@@ -426,9 +426,16 @@ class ::Module
   end
 
   def freeze
+    # Specialized version of freeze, because the $$base_module property needs to be
+    # accessible despite the frozen status
+
     return self if frozen?
 
-    `$freeze(self)`
+    %x{
+      if (!self.hasOwnProperty('$$base_module')) { $prop(self, '$$base_module', null); }
+
+      return $freeze(self);
+    }
   end
 
   def remove_method(*names)

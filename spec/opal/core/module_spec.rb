@@ -60,4 +60,12 @@ describe 'Module' do
     ->{ klass.new.cvarz0 }.should raise_error NameError
     ->{ klass.new.cvar0 }.should raise_error NameError
   end
+
+  it "can be set to a constant while being frozen" do
+    OPAL_SPEC_MODULE = Module.new.freeze
+    OPAL_SPEC_CLASS = Class.new.freeze
+
+    OPAL_SPEC_MODULE.class.should == Module
+    OPAL_SPEC_CLASS.class.should == Class
+  end
 end
