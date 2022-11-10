@@ -225,12 +225,12 @@ module Opal
           end
           line "}"
 
-          unshift "return " if is_a? CallNode
+          unshift "return " if closure_is? SEND
 
           unshift "var ", catchers.map { |type| "$t_#{type} = $new_thrower('#{type}')" }.join(", "), "; "
           unshift "try { "
 
-          if (catchers & %i[return eval_return]).empty?
+          unless closure_is? JS_FUNCTION
             if scope.await_encountered
               wrap "(await (async function(){", "})())"
             else
