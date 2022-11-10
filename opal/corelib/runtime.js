@@ -2965,7 +2965,7 @@
   nil.$$comparable = false;
   Object.seal(nil);
 
-  Opal.new_thrower = function(type) {
+  Opal.thrower = function(type) {
     var thrower = new Error('unexpected '+type);
     thrower.$thrower_type = type;
     thrower.$throw = function(value) {
@@ -2975,7 +2975,7 @@
     return thrower;
   };
 
-  Opal.t_eval_return = Opal.new_thrower("return");
+  Opal.t_eval_return = Opal.thrower("return");
 
   TypeError.$$super = Error;
 

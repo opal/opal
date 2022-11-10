@@ -107,14 +107,14 @@ module Opal
         end
 
         def generate_thrower_without_catcher(type, closure, value)
-          helper :new_thrower
+          helper :thrower
 
           if closure.throwers.key? type
             id = closure.throwers[type]
           else
             id = compiler.unique_temp('t_')
             scope = closure.node.scope&.parent || top_scope
-            scope.add_scope_temp("#{id} = $new_thrower('#{type}')")
+            scope.add_scope_temp("#{id} = $thrower('#{type}')")
             closure.register_thrower(type, id)
           end
           push id, '.$throw(', value, ')'
@@ -209,7 +209,7 @@ module Opal
 
           return if catchers.empty?
 
-          helper :new_thrower
+          helper :thrower
 
           push "} catch($e) {"
           indent do
@@ -227,7 +227,7 @@ module Opal
 
           unshift "return " if closure_is? SEND
 
-          unshift "var ", catchers.map { |type| "$t_#{type} = $new_thrower('#{type}')" }.join(", "), "; "
+          unshift "var ", catchers.map { |type| "$t_#{type} = $thrower('#{type}')" }.join(", "), "; "
           unshift "try { "
 
           unless closure_is? JS_FUNCTION
