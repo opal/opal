@@ -18,10 +18,11 @@
 - Uninline non-typical argument handling (#2419)
 - Logic optimization of runtime.js (#2415)
 - Windows support for `performance:compare` CI check (#2450)
+- Improve block performance for even more cases (#2465)
 
 ### Added
 
-- Added support for `#freeze` and `#frozen?` (#2444)
+- Added support for `#freeze` and `#frozen?` (#2444, #2468)
 - Add CLI support for ESM, at least for Chrome, NodeJS, QuickJS and GJS (#2435)
 - Support exit in Chrome CLI Runner, both sync and async (#2439)
 - Make sure the Server CLI Runner can pick up changes in sources (#2436)
