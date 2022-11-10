@@ -84,6 +84,13 @@ module Opal
       end
     end
 
+    class RetryNode < Base
+      handle :retry
+
+      def compile
+        thrower(:retry)
+      end
+    end
 
     class ReturnNode < Base
       handle :return

@@ -12,6 +12,7 @@ module Opal
       def initialize
         @break_stack = []
         @redo_stack = []
+        @retry_stack = []
         @rescue_else_stack = []
       end
 
@@ -25,12 +26,17 @@ module Opal
         super
       end
 
+      def on_retry(node)
+        tracking(:retry, @retry_stack)
+        super
+      end
+
       def on_iter(node)
-        pushing(@break_stack => node) { super }
+        pushing([@break_stack, node]) { super }
       end
 
       def on_loop(node, &block)
-        pushing(@redo_stack => node, @break_stack => nil, &block)
+        pushing([@redo_stack, node], [@break_stack, nil], &block)
       end
 
       def on_for(node);        on_loop(node) { super }; end
@@ -41,7 +47,11 @@ module Opal
 
       # ignore throwers inside defined
       def on_defined(node)
-        pushing(@redo_stack => nil, @break_stack => nil) { super }
+        pushing(
+          [@redo_stack, nil],
+          [@break_stack, nil],
+          [@retry_stack, nil]
+        ) { super }
       end
 
       # In Opal we handle rescue-else either in ensure or in
@@ -51,7 +61,7 @@ module Opal
       # ensure node should expect a rescue-else inside a
       # rescue node.
       def on_ensure(node)
-        pushing(@rescue_else_stack => node) { super }
+        pushing([@rescue_else_stack, node]) { super }
       end
 
       def on_rescue(node)
@@ -59,22 +69,20 @@ module Opal
           tracking(:rescue_else, @rescue_else_stack)
         end
 
-        pushing(@rescue_else_stack => nil) { super }
+        pushing([@rescue_else_stack, nil], [@retry_stack, node]) { super }
       end
 
       private
 
-      def pushing(stacks)
+      def pushing(*stacks)
         stacks.each { |stack, node| stack.push(node) }
         result = yield
-        stacks.keys.each(&:pop)
+        stacks.map(&:first).each(&:pop)
         result
       end
 
       def tracking(breaker, stack)
-        if stack.last
-          stack.last.meta[:"has_#{breaker}"] = true
-        end
+        stack.last.meta[:"has_#{breaker}"] = true if stack.last
       end
     end
   end

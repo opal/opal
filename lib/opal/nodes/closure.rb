@@ -27,15 +27,19 @@ module Opal
         end.map(&:first).join("|")
       end
 
-      add_type(:JS_FUNCTION, 1 << 0) # everything that generates an IIFE
-      add_type(:DEF,         1 << 1) # def
-      add_type(:LAMBDA,      1 << 2) # lambda
-      add_type(:ITER,        1 << 3) # iter, lambda
-      add_type(:MODULE,      1 << 4)
-      add_type(:LOOP,        1 << 5) # for building a catcher outside a loop
-      add_type(:LOOP_INSIDE, 1 << 6) # for building a catcher inside a loop
-      add_type(:SEND,        1 << 7) # to generate a break catcher after send with a block
-      add_type(:TOP,         1 << 8)
+      add_type(:JS_FUNCTION,    1 <<  0) # everything that generates an IIFE
+      add_type(:JS_LOOP,        1 <<  1) # exerything that generates a JS loop
+      add_type(:JS_LOOP_INSIDE, 1 <<  2) # everything that generates an inside of a loop
+
+      add_type(:DEF,            1 <<  3) # def
+      add_type(:LAMBDA,         1 <<  4) # lambda
+      add_type(:ITER,           1 <<  5) # iter, lambda
+      add_type(:MODULE,         1 <<  6)
+      add_type(:LOOP,           1 <<  7) # for building a catcher outside a loop
+      add_type(:LOOP_INSIDE,    1 <<  8) # for building a catcher inside a loop
+      add_type(:SEND,           1 <<  9) # to generate a break catcher after send with a block
+      add_type(:TOP,            1 << 10)
+      add_type(:RESCUE_RETRIER, 1 << 11) # a virtual loop to catch a retrier
 
       ANY = 0xffffffff
 
@@ -148,7 +152,7 @@ module Opal
             end
           when :next, :redo
             thrower_closure = select_closure(ITER | LOOP_INSIDE, break_after: DEF | MODULE | TOP)
-            last_closure = select_closure(JS_FUNCTION | LOOP_INSIDE)
+            last_closure = select_closure(JS_FUNCTION | JS_LOOP_INSIDE)
 
             if !thrower_closure
               error 'Invalid next'
@@ -163,7 +167,7 @@ module Opal
             end
           when :break
             thrower_closure = select_closure(SEND | LAMBDA | LOOP, break_after: DEF | MODULE | TOP)
-            last_closure = select_closure(JS_FUNCTION | LOOP)
+            last_closure = select_closure(JS_FUNCTION | JS_LOOP)
 
             if !thrower_closure
               iter_closure = select_closure(ITER, break_after: DEF | MODULE | TOP)
@@ -182,7 +186,16 @@ module Opal
               generate_thrower(:break, thrower_closure, expr_or_nil(value))
             end
           when :retry
-            # TODO: Find the closest RETRIER and Opal.cflow(:retry) (set x to catch it)
+            thrower_closure = select_closure(RESCUE_RETRIER, break_after: DEF | MODULE | TOP)
+            last_closure = select_closure(JS_LOOP_INSIDE)
+
+            if !thrower_closure
+              error 'Invalid retry'
+            elsif thrower_closure == last_closure
+              push 'continue'
+            else
+              generate_thrower(:retry, thrower_closure, expr_or_nil(value))
+            end
           end
         end
 

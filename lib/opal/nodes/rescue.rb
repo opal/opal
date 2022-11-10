@@ -102,7 +102,14 @@ module Opal
           line 'var $no_errors = true;'
         end
 
-        push_closure if expr? || recv?
+        closure_type = Closure::NONE
+        closure_type |= Closure::JS_FUNCTION if expr? || recv?
+        if has_retry?
+          closure_type |= Closure::JS_LOOP        \
+                       |  Closure::JS_LOOP_INSIDE \
+                       |  Closure::RESCUE_RETRIER
+        end
+        push_closure(closure_type) if closure_type != Closure::NONE
 
         in_rescue(self) do
           push 'try {'
@@ -143,11 +150,11 @@ module Opal
             end
             push '}'
           end
-
-          wrap "#{retry_id}: do { ", ' break; } while(1)' if retry_id
         end
 
-        pop_closure if expr? || recv?
+        pop_closure if closure_type != Closure::NONE
+
+        wrap 'do { ', ' break; } while(1)' if has_retry?
 
         # Wrap a try{} catch{} into a function
         # when it's an expression
@@ -180,11 +187,9 @@ module Opal
         !in_ensure? && has_rescue_else?
       end
 
-      def gen_retry_id
-        @retry_id ||= scope.gen_retry_id
+      def has_retry?
+        @sexp.meta[:has_retry]
       end
-
-      attr_reader :retry_id
     end
 
     class ResBodyNode < Base
@@ -219,15 +224,6 @@ module Opal
         body_code = (body || s(:nil))
         body_code = compiler.returns(body_code) unless stmt?
         body_code
-      end
-    end
-
-    class RetryNode < Base
-      handle :retry
-
-      def compile
-        error 'Invalid retry' unless in_resbody?
-        push "continue #{scope.current_rescue.gen_retry_id}"
       end
     end
   end
