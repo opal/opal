@@ -128,6 +128,10 @@ module Opal
         sexp ? expr(sexp) : 'nil'
       end
 
+      def expr_or_empty(sexp)
+        sexp && sexp.type != :nil ? expr(sexp) : ''
+      end
+
       def add_local(name)
         scope.add_scope_local name.to_sym
       end

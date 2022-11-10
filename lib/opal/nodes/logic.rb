@@ -29,15 +29,7 @@ module Opal
       children :value
 
       def compile
-        thrower(:break, break_val)
-      end
-
-      def break_val
-        if value.nil?
-          s(:nil)
-        else
-          value
-        end
+        thrower(:break, value)
       end
     end
 

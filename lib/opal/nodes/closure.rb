@@ -102,7 +102,7 @@ module Opal
         def generate_thrower(type, closure, value)
           id = closure.register_catcher(type)
           closure.register_thrower(type, id)
-          push id, '.$throw(', value, ')'
+          push id, '.$throw(', expr_or_empty(value), ')'
           id
         end
 
@@ -117,7 +117,7 @@ module Opal
             scope.add_scope_temp("#{id} = $thrower('#{type}')")
             closure.register_thrower(type, id)
           end
-          push id, '.$throw(', value, ')'
+          push id, '.$throw(', expr_or_empty(value), ')'
           id
         end
 
@@ -130,16 +130,16 @@ module Opal
             if !thrower_closure
               iter_closure = select_closure(ITER, break_after: DEF | MODULE | TOP)
               if iter_closure
-                generate_thrower_without_catcher(:return, iter_closure, expr_or_nil(value))
+                generate_thrower_without_catcher(:return, iter_closure, value)
               elsif compiler.eval?
-                push 'Opal.t_eval_return.$throw(', expr_or_nil(value), ')'
+                push 'Opal.t_eval_return.$throw(', expr_or_empty(value), ')'
               else
                 error 'Invalid return'
               end
             elsif thrower_closure == last_closure
               push 'return ', expr_or_nil(value)
             else
-              id = generate_thrower(:return, thrower_closure, expr_or_nil(value))
+              id = generate_thrower(:return, thrower_closure, value)
               # Additionally, register our thrower on the surrounding iter, if present
               iter_closure = select_closure(ITER, break_after: DEF | MODULE | TOP)
               iter_closure.register_thrower(:return, id) if iter_closure
@@ -163,7 +163,7 @@ module Opal
                 push 'return ', expr_or_nil(value)
               end
             else
-              generate_thrower(:next, thrower_closure, expr_or_nil(value))
+              generate_thrower(:next, thrower_closure, value)
             end
           when :break
             thrower_closure = select_closure(SEND | LAMBDA | LOOP, break_after: DEF | MODULE | TOP)
@@ -172,7 +172,7 @@ module Opal
             if !thrower_closure
               iter_closure = select_closure(ITER, break_after: DEF | MODULE | TOP)
               if iter_closure
-                generate_thrower_without_catcher(:break, iter_closure, expr_or_nil(value))
+                generate_thrower_without_catcher(:break, iter_closure, value)
               else
                 error 'Invalid break'
               end
@@ -183,7 +183,7 @@ module Opal
                 push 'break'
               end
             else
-              generate_thrower(:break, thrower_closure, expr_or_nil(value))
+              generate_thrower(:break, thrower_closure, value)
             end
           when :retry
             thrower_closure = select_closure(RESCUE_RETRIER, break_after: DEF | MODULE | TOP)
@@ -194,7 +194,7 @@ module Opal
             elsif thrower_closure == last_closure
               push 'continue'
             else
-              generate_thrower(:retry, thrower_closure, expr_or_nil(value))
+              generate_thrower(:retry, thrower_closure, value)
             end
           end
         end

@@ -2969,6 +2969,7 @@
     var thrower = new Error('unexpected '+type);
     thrower.$thrower_type = type;
     thrower.$throw = function(value) {
+      if (value == null) value = nil;
       thrower.$v = value;
       throw thrower;
     };
