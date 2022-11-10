@@ -12,26 +12,26 @@ module Opal
       def compile
         test_code = js_truthy(test)
 
-        with_temp do |redo_var|
-          @redo_var = redo_var
+        @redo_var = scope.new_temp if uses_redo?
 
-          compiler.in_while do
-            while_loop[:closure] = true if wrap_in_closure?
-            while_loop[:redo_var] = redo_var
+        compiler.in_while do
+          while_loop[:closure] = true if wrap_in_closure?
+          while_loop[:redo_var] = @redo_var
 
-            in_closure(Closure::LOOP | (wrap_in_closure? ? Closure::JS_FUNCTION : 0)) do
-              in_closure(Closure::LOOP_INSIDE) do
-                line(indent { stmt(body) })
-              end
+          in_closure(Closure::LOOP | (wrap_in_closure? ? Closure::JS_FUNCTION : 0)) do
+            in_closure(Closure::LOOP_INSIDE) do
+              line(indent { stmt(body) })
+            end
 
-              if uses_redo?
-                compile_with_redo(test_code)
-              else
-                compile_without_redo(test_code)
-              end
+            if uses_redo?
+              compile_with_redo(test_code)
+            else
+              compile_without_redo(test_code)
             end
           end
         end
+
+        scope.queue_temp(@redo_var) if uses_redo?
 
         if wrap_in_closure?
           if scope.await_encountered
@@ -72,7 +72,7 @@ module Opal
       end
 
       def uses_redo?
-        while_loop[:use_redo]
+        @sexp.meta[:has_redo]
       end
 
       def wrap_in_closure?

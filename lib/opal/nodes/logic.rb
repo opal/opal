@@ -55,7 +55,6 @@ module Opal
       end
 
       def compile_while
-        while_loop[:use_redo] = true
         push "#{while_loop[:redo_var]} = true;"
         thrower(:redo)
       end

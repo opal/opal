@@ -35,6 +35,7 @@ class Opal::Nodes::CallNode
   end
 end
 
+require 'opal/rewriter'
 require 'opal/rewriters/rubyspec/filters_rewriter'
 
 Opal::Rewriter.use Opal::Rubyspec::FiltersRewriter

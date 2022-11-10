@@ -10,8 +10,7 @@ module Opal
       children :begn, :ensr
 
       def compile
-        # FIXME: We don't need this if there's no rescue else
-        push_closure
+        push_closure if wrap_in_closure?
 
         push 'try {'
 
@@ -52,7 +51,7 @@ module Opal
 
         line '}'
 
-        pop_closure
+        pop_closure if wrap_in_closure?
 
         if wrap_in_closure?
           if scope.await_encountered
@@ -83,6 +82,10 @@ module Opal
         rescue_else_code = scope.rescue_else_sexp
         rescue_else_code = compiler.returns(rescue_else_code) unless stmt?
         rescue_else_code
+      end
+
+      def has_rescue_else?
+        @sexp.meta[:has_rescue_else]
       end
     end
 

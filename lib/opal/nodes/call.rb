@@ -3,7 +3,6 @@
 require 'set'
 require 'pathname'
 require 'opal/nodes/base'
-require 'opal/rewriters/break_finder'
 
 module Opal
   module Nodes
@@ -64,11 +63,7 @@ module Opal
       def iter_has_break?
         return false unless iter
 
-        return @has_break unless @has_break.nil?
-
-        finder = Opal::Rewriters::BreakFinder.new
-        finder.process(iter)
-        @has_break = finder.found_break?
+        iter.meta[:has_break]
       end
 
       # Opal has a runtime helper 'Opal.send_method_name' that assigns

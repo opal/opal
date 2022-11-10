@@ -15,6 +15,7 @@ require 'opal/rewriters/inline_args'
 require 'opal/rewriters/numblocks'
 require 'opal/rewriters/returnable_logic'
 require 'opal/rewriters/forward_args'
+require 'opal/rewriters/thrower_finder'
 
 module Opal
   class Rewriter
@@ -66,6 +67,7 @@ module Opal
     use Rewriters::DumpArgs
     use Rewriters::MlhsArgs
     use Rewriters::InlineArgs
+    use Rewriters::ThrowerFinder
 
     def initialize(sexp)
       @sexp = sexp
