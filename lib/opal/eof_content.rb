@@ -15,9 +15,12 @@ module Opal
       eof_content = @source[last_token_position..-1]
       return nil unless eof_content
 
-      eof_content = eof_content.lines.drop_while { |line| line == "\n" }
+      # On Windows token position is off a bit, because Parser does not seem to compensate for \r\n
+      # The first eof_content line on Windows may be for example "end\r\n"
+      # Must match for it and \r\n and \n
+      eof_content = eof_content.lines.drop_while { |line| /\A.*\r?\n?\z/.match?(line) && !line.start_with?('__END__') }
 
-      if eof_content[0] == "__END__\n"
+      if /\A__END__\r?\n?\z/.match?(eof_content[0])
         eof_content = eof_content[1..-1] || []
         eof_content.join
       elsif eof_content == ['__END__']

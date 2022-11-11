@@ -45,9 +45,20 @@ jobs:
           - name: smoke-test
             ruby: '3.0'
             command: bin/rake smoke_test
+          - name: windows-mspec-nodejs
+            command: bundle exec rake mspec_nodejs
+            ruby: '3.0'
+            os: windows-latest
+          - name: windows-mspec-chrome
+            command: bundle exec rake mspec_chrome
+            ruby: '3.0'
+            os: windows-latest
+          - name: windows-minitest
+            command: bundle exec rake minitest
+            ruby: '3.0'
+            os: windows-latest
           - name: windows
-            # These two fail because of broken stacktraces on windows: minitest_node_nodejs mspec_nodejs
-            command: bundle exec rake rspec minitest_nodejs
+            command: bundle exec rake rspec
             ruby: '3.0'
             os: windows-latest
           - name: lint

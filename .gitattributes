@@ -1,1 +1,5 @@
 UNRELEASED.md merge=union
+spec/opal/core/language/DATA/characters_support_crlf_spec.rb text eol=crlf
+spec/opal/core/language/DATA/characters_support_spec.rb text eol=lf
+spec/opal/core/language/DATA/multiple___END___crlf_spec.rb text eol=crlf
+spec/opal/core/language/DATA/multiple___END___spec.rb text eol=lf
