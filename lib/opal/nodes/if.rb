@@ -27,6 +27,8 @@ module Opal
       end
 
       def compile_with_if
+        push_closure if expects_expression?
+
         truthy = self.truthy
         falsy = self.falsy
 
@@ -59,6 +61,8 @@ module Opal
           # always return something if we expect a return
           line 'return nil;' if expects_expression?
         end
+
+        pop_closure if expects_expression?
 
         if expects_expression?
           return_kw = 'return ' if returning_if?

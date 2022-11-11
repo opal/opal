@@ -69,7 +69,6 @@ opal_filter "language" do
   fails "An instance method with a default argument prefers to assign to a default argument before a splat argument" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(0 for -2)
   fails "Assigning an anonymous module to a constant sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Executing break from within a block raises LocalJumpError when converted into a proc during a a super call" # Expected LocalJumpError but no exception was raised (1 was returned)
-  fails "Executing break from within a block returns from the original invoking method even in case of chained calls"
   fails "Executing break from within a block works when passing through a super call" # Expected to not get Exception
   fails "Execution variable $: is initialized to an array of strings"
   fails "Execution variable $: is read-only"
@@ -248,15 +247,6 @@ opal_filter "language" do
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from a block"
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from a method"
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from the toplevel"
-  fails "The break statement in a lambda from a scope that has returned raises a LocalJumpError when yielding to a lambda passed as a block argument"
-  fails "The break statement in a lambda from a scope that has returned returns a value to the block scope invoking the lambda in a method" # Exception: $brk is not defined
-  fails "The break statement in a lambda from a scope that has returned returns a value to the method scope invoking the lambda" # Exception: $brk is not defined
-  fails "The break statement in a lambda returns from the call site if the lambda is passed as a block" # Expected ["before", "unreachable1", "unreachable2", "after"] to equal ["before", "after"]
-  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns a value to a block scope invoking the lambda in a method below" # Exception: $brk is not defined
-  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns a value to the method scope below invoking the lambda" # Exception: $brk is not defined
-  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns a value to the scope creating and calling the lambda" # Exception: $brk is not defined
-  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns from the lambda" # Exception: unexpected break
-  fails "The break statement in a lambda when the invocation of the scope creating the lambda is still active returns nil when not passed an argument" # Exception: $brk is not defined
   fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility"
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the class" # Expected "constant" to be nil
@@ -280,7 +270,6 @@ opal_filter "language" do
   fails "The defined? keyword when called with a method name without a receiver returns 'method' if the method is defined" # Expected false == true to be truthy but was false
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with exclusive-end range"
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with inclusive-end range"
-  fails "The or operator has a lower precedence than 'next' in 'next true or false'"
   fails "The redo statement in a method is invalid and raises a SyntaxError" # Expected SyntaxError but no exception was raised ("m" was returned)
   fails "The redo statement triggers ensure block when re-executing a block"
   fails "The rescue keyword allows rescue in 'do end' block" # NoMethodError: undefined method `call' for nil
@@ -294,11 +283,6 @@ opal_filter "language" do
   fails "The super keyword uses given block even if arguments are passed explicitly"
   fails "The throw keyword raises an UncaughtThrowError if used to exit a thread" # NotImplementedError: Thread creation not available
   fails "The unpacking splat operator (*) when applied to a BasicObject coerces it to Array if it respond_to?(:to_a)" # NoMethodError: undefined method `respond_to?' for BasicObject
-  fails "The until expression restarts the current iteration without reevaluating condition with redo"
-  fails "The until modifier restarts the current iteration without reevaluating condition with redo"
-  fails "The until modifier with begin .. end block restart the current iteration without reevaluating condition with redo" # Expected [1] to equal [0, 0, 0, 1, 2]
-  fails "The while expression stops running body if interrupted by break in a begin ... end element op-assign value"
-  fails "The while expression stops running body if interrupted by break in a parenthesized element op-assign value"
   fails "The yield call taking a single argument yielding to a lambda should not destructure an Array into multiple arguments" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
   fails "Using yield in a singleton class literal raises a SyntaxError" # Expected SyntaxError (/Invalid yield/) but got: SyntaxError (undefined method `uses_block!' for nil)
@@ -314,8 +298,4 @@ opal_filter "language" do
   fails_badly "Pattern matching refinements are used for #=== in constant pattern"
   fails_badly "Pattern matching refinements are used for #deconstruct"
   fails_badly "Pattern matching refinements are used for #deconstruct_keys"
-  fails_badly "The while expression stops running body if interrupted by break in a begin ... end attribute op-assign-or value"
-  fails_badly "The while expression stops running body if interrupted by break in a parenthesized attribute op-assign-or value"
-  fails_badly "The while expression stops running body if interrupted by break with unless in a begin ... end attribute op-assign-or value"
-  fails_badly "The while expression stops running body if interrupted by break with unless in a parenthesized attribute op-assign-or value"
 end

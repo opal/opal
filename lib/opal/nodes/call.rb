@@ -3,7 +3,6 @@
 require 'set'
 require 'pathname'
 require 'opal/nodes/base'
-require 'opal/rewriters/break_finder'
 
 module Opal
   module Nodes
@@ -64,9 +63,7 @@ module Opal
       def iter_has_break?
         return false unless iter
 
-        finder = Opal::Rewriters::BreakFinder.new
-        finder.process(iter)
-        finder.found_break?
+        iter.meta[:has_break]
       end
 
       # Opal has a runtime helper 'Opal.send_method_name' that assigns
@@ -103,6 +100,7 @@ module Opal
           scope.await_encountered = true
         end
 
+        push_closure(Closure::SEND) if iter_has_break?
         if invoke_using_refinement?
           compile_using_refined_send
         elsif invoke_using_send?
@@ -110,8 +108,7 @@ module Opal
         else
           compile_simple_call_chain
         end
-
-        compile_break_catcher
+        pop_closure if iter_has_break?
 
         if auto_await?
           push ')'
@@ -186,14 +183,6 @@ module Opal
       def compile_refinements
         refinements = scope.collect_refinements_temps.map { |i| s(:js_tmp, i) }
         push expr(s(:array, *refinements)), ', '
-      end
-
-      def compile_break_catcher
-        if iter_has_break?
-          unshift 'return '
-          unshift '(function(){var $brk = Opal.new_brk(); try {'
-          line '} catch (err) { if (err === $brk) { return err.$v } else { throw err } }})()'
-        end
       end
 
       def compile_simple_call_chain
@@ -402,6 +391,9 @@ module Opal
       # This can be refactored in terms of binding, but it would need 'corelib/binding'
       # to be required in existing code.
       add_special :eval do |compile_default|
+        # Catch the return throw coming from eval
+        thrower(:eval_return)
+
         next compile_default.call if arglist.children.length != 1 || ![s(:self), nil].include?(recvr)
 
         scope.nesting

@@ -7,6 +7,7 @@ require 'opal/nodes'
 require 'opal/eof_content'
 require 'opal/errors'
 require 'opal/magic_comments'
+require 'opal/nodes/closure'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -46,6 +47,8 @@ module Opal
   #   compiler.source_map # => #<SourceMap:>
   #
   class Compiler
+    include Nodes::Closure::CompilerSupport
+
     # Generated code gets indented with two spaces on each scope
     INDENT = '  '
 

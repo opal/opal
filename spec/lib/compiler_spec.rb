@@ -479,7 +479,7 @@ RSpec.describe Opal::Compiler do
 
     def expect_number_of_warnings(code)
       warnings_number = 0
-      compiler = Opal::Compiler.new(code)
+      compiler = Opal::Compiler.new(code, eval: true)
       allow(compiler).to receive(:warning) { warnings_number += 1}
       compiler.compile
       expect(warnings_number)

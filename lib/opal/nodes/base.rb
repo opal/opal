@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require 'opal/nodes/helpers'
+require 'opal/nodes/closure'
 
 module Opal
   module Nodes
     class Base
       include Helpers
+      include Closure::NodeSupport
 
       def self.handlers
         @handlers ||= {}
@@ -124,6 +126,10 @@ module Opal
 
       def expr_or_nil(sexp)
         sexp ? expr(sexp) : 'nil'
+      end
+
+      def expr_or_empty(sexp)
+        sexp && sexp.type != :nil ? expr(sexp) : ''
       end
 
       def add_local(name)

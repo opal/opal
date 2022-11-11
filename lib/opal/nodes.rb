@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'opal/nodes/closure'
 require 'opal/nodes/base'
 require 'opal/nodes/literal'
 require 'opal/nodes/variables'

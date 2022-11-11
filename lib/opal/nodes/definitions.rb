@@ -54,7 +54,9 @@ module Opal
         elsif children.size == 1
           compile_inline_children(returned_children, @level)
         else
-          compile_children(returned_children, @level)
+          in_closure do
+            compile_children(returned_children, @level)
+          end
 
           if scope.parent&.await_encountered
             wrap '(await (async function() {', '})())'

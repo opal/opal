@@ -21,6 +21,9 @@ module Opal
 
       def on_if(node)
         test, = *node.children
+
+        check_control_flow!(test)
+
         # The if_test metadata signifies that we don't care about the return value except if it's
         # truthy or falsy. And those tests will be carried out by the respective $truthy helper calls.
         test.meta[:if_test] = true if test
@@ -41,6 +44,8 @@ module Opal
       def on_or(node)
         lhs, rhs = *node.children
 
+        check_control_flow!(lhs)
+
         if node.meta[:if_test]
           # Let's forward the if_test to the lhs and rhs - since we don't care about the exact return
           # value of our or, we neither do care about a return value of our lhs or rhs.
@@ -57,6 +62,8 @@ module Opal
       # `a && b` / `a and b`
       def on_and(node)
         lhs, rhs = *node.children
+
+        check_control_flow!(lhs)
 
         if node.meta[:if_test]
           lhs.meta[:if_test] = rhs.meta[:if_test] = true
@@ -80,6 +87,13 @@ module Opal
       end
 
       private
+
+      def check_control_flow!(node)
+        case node.type
+        when :break, :next, :redo, :retry, :return
+          error 'void value expression'
+        end
+      end
 
       def build_if_from_when(node, lhs, lhs_tmp, whens, els)
         first_when, *next_whens = *whens

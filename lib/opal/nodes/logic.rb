@@ -8,13 +8,7 @@ module Opal
       handle :next
 
       def compile
-        if in_while?
-          push 'continue;'
-        elsif scope.iter?
-          push 'return ', expr_or_nil(value), ';'
-        else
-          error 'Invalid next'
-        end
+        thrower(:next, value)
       end
 
       def value
@@ -35,35 +29,7 @@ module Opal
       children :value
 
       def compile
-        if in_while?
-          compile_while
-        elsif scope.iter?
-          compile_iter
-        else
-          error 'void value expression: cannot use break outside of iter/while'
-        end
-      end
-
-      def compile_while
-        if while_loop[:closure]
-          push 'return ', expr_or_nil(value)
-        else
-          push 'break;'
-        end
-      end
-
-      def compile_iter
-        error 'break must be used as a statement' unless stmt?
-
-        line 'Opal.brk(', break_val, ', $brk)'
-      end
-
-      def break_val
-        if value.nil?
-          expr(s(:nil))
-        else
-          expr(value)
-        end
+        thrower(:break, value)
       end
     end
 
@@ -81,8 +47,8 @@ module Opal
       end
 
       def compile_while
-        while_loop[:use_redo] = true
-        push "#{while_loop[:redo_var]} = true; continue;"
+        push "#{while_loop[:redo_var]} = true;"
+        thrower(:redo)
       end
 
       def compile_iter
@@ -110,6 +76,13 @@ module Opal
       end
     end
 
+    class RetryNode < Base
+      handle :retry
+
+      def compile
+        thrower(:retry)
+      end
+    end
 
     class ReturnNode < Base
       handle :return
@@ -118,37 +91,16 @@ module Opal
 
       def return_val
         if value.nil?
-          expr(s(:nil))
+          s(:nil)
         elsif children.size > 1
-          expr(s(:array, *children))
+          s(:array, *children)
         else
-          expr(value)
+          value
         end
-      end
-
-      def return_in_iter?
-        if (scope.iter? && !scope.lambda?) && parent_def = scope.find_parent_def
-          parent_def
-        end
-      end
-
-      def return_expr_in_def?
-        return scope if expr? && (scope.def? || scope.lambda?)
-      end
-
-      def scope_to_catch_return
-        return_in_iter? || return_expr_in_def?
       end
 
       def compile
-        if def_scope = scope_to_catch_return
-          def_scope.catch_return = true
-          push 'Opal.ret(', return_val, ')'
-        elsif stmt?
-          push 'return ', return_val
-        else
-          error 'void value expression: cannot return as an expression'
-        end
+        thrower(:return, return_val)
       end
     end
 
