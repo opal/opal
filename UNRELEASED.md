@@ -33,6 +33,7 @@
 
 ### Fixed
 
+- Closure tracking support fixes a whole array of bugs handling `break` / `next` / `retry` / … (#2357)
 - Fix an edge case of if in the most complex form not returning (#2433)
 - `String#length` is now available when using `opal/mini` (#2438)
 - Auto-await produced invalid code (#2440)
