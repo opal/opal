@@ -161,6 +161,9 @@ module Opal
       end
 
       def fork_entrypoint(io)
+        # Ensure we can work with our forks async...
+        Fiber.set_scheduler(nil) if Fiber.respond_to? :set_scheduler
+
         @in_fork = io
 
         until io.eof?
