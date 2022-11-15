@@ -114,6 +114,12 @@ module Opal
       end
     end
 
+    # This handler is for files named ".opalerb", which ought to
+    # first get compiled to Ruby code using ERB, then with Opal.
+    # Unlike below processors, OpalERBProcessor can be used to
+    # compile templates, which will in turn output HTML. Take
+    # a look at docs/templates.md to understand this subsystem
+    # better.
     class OpalERBProcessor < RubyProcessor
       handles :opalerb
 
@@ -133,6 +139,24 @@ module Opal
       end
     end
 
+    # This handler is for files named ".rb.erb", which ought to
+    # first get preprocessed via ERB, then via Opal.
+    class RubyERBProcessor < RubyProcessor
+      handles :"rb.erb"
+
+      def compiled
+        @compiled ||= begin
+          @source = ::ERB.new(@source.to_s).result
+
+          compiler = compiler_for(@source, file: @filename)
+          compiler.compile
+          compiler
+        end
+      end
+    end
+
+    # This handler is for files named ".js.erb", which ought to
+    # first get preprocessed via ERB, then served verbatim as JS.
     class ERBProcessor < Processor
       handles :erb
 
