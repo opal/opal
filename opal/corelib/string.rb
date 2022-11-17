@@ -1,4 +1,4 @@
-# helpers: coerce_to, respond_to, global_multiline_regexp, prop
+# helpers: coerce_to, respond_to, global_multiline_regexp, prop, yield1
 
 require 'corelib/comparable'
 require 'corelib/regexp'
@@ -426,7 +426,7 @@ class ::String < `String`
 
     %x{
       if (separator === nil) {
-        Opal.yield1(block, self);
+        $yield1(block, self);
 
         return self;
       }
@@ -442,7 +442,7 @@ class ::String < `String`
             if (chomp) {
               value = #{`value`.chomp("\n")};
             }
-            Opal.yield1(block, value);
+            $yield1(block, value);
           }
         }
 
@@ -461,7 +461,7 @@ class ::String < `String`
         if (chomp) {
           value = #{`value`.chomp(separator)};
         }
-        Opal.yield1(block, value);
+        $yield1(block, value);
       }
     }
 
@@ -1015,7 +1015,7 @@ class ::String < `String`
         if (block === nil) {
           match.length == 1 ? result.push(match[0]) : result.push(#{`match_data`.captures});
         } else {
-          match.length == 1 ? Opal.yield1(block, match[0]) : Opal.yield1(block, #{`match_data`.captures});
+          match.length == 1 ? $yield1(block, match[0]) : $yield1(block, #{`match_data`.captures});
         }
         if (pattern.lastIndex === match.index) {
           pattern.lastIndex += 1;
