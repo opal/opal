@@ -19,15 +19,21 @@ module Opal
 
       def set(key, data)
         file = cache_filename_for(key)
-
         out = Marshal.dump(data)
-        out = Zlib.gzip(out, level: 9)
+
+        # Sometimes `Zlib::BufError` gets raised, unsure why, makes no sense, possibly
+        # some race condition (see https://github.com/ruby/zlib/issues/49).
+        # Limit the number of retries to avoid infinite loops.
+        retries = 5
+        begin
+          out = Zlib.gzip(out, level: 9)
+        rescue Zlib::BufError
+          warn "\n[Opal]: Zlib::BufError; retrying (#{retries} retries left)"
+          retries -= 1
+          retry if retries > 0
+        end
+
         File.binwrite(file, out)
-      rescue Zlib::BufError
-        # This sometimes happens, unsure why, makes no sense, possibly
-        # some race condition
-        warn '[Opal]: Zlib::BufError; retrying'
-        retry
       end
 
       def get(key)
