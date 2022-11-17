@@ -4,6 +4,7 @@ module ::Errno
     [:EEXIST, 'File exists', 17],
     [:EISDIR, 'Is a directory', 21],
     [:EMFILE, 'Too many open files', 24],
+    [:ESPIPE, 'Illegal seek', 29],
     [:EACCES, 'Permission denied', 13],
     [:EPERM, 'Operation not permitted', 1],
     [:ENOENT, 'No such file or directory', 2],

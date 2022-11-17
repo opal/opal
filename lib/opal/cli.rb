@@ -184,8 +184,21 @@ module Opal
       if evals.any?
         yield evals.join("\n"), '-e'
       elsif file && (filename != '-' || evals.empty?)
-        file.rewind
-        yield file.read, filename
+        return @content if @content
+
+        if file.tty?
+          save = true
+        else
+          begin
+            file.rewind
+          rescue Errno::ESPIPE
+            save = true
+          end
+        end
+
+        content = yield(file.read, filename)
+        @content = content if save
+        content
       end
     end
   end
