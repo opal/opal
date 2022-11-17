@@ -27,9 +27,9 @@ SystemRunner = ->(data, &block) {
 
   tempfile =
     if debug
-      File.new("opal-nodejs-runner.#{ext}", 'w')
+      File.new("opal-nodejs-runner.#{ext}", 'wb')
     else
-      Tempfile.new(['opal-system-runner', ".#{ext}"])
+      Tempfile.new(['opal-system-runner', ".#{ext}"], mode: File::BINARY)
     end
 
   tempfile.write code

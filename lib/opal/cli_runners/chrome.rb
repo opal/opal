@@ -66,7 +66,7 @@ module Opal
       def prepare_files_in(dir)
         js = builder.to_s
         map = builder.source_map.to_json
-        stack = File.read("#{__dir__}/source-map-support-browser.js")
+        stack = File.binread("#{__dir__}/source-map-support-browser.js")
 
         ext = builder.output_extension
         module_type = ' type="module"' if builder.esm?
@@ -74,9 +74,9 @@ module Opal
         # Chrome can't handle huge data passed to `addScriptToEvaluateOnLoad`
         # https://groups.google.com/a/chromium.org/forum/#!topic/chromium-discuss/U5qyeX_ydBo
         # The only way is to create temporary files and pass them to chrome.
-        File.write("#{dir}/index.#{ext}", js)
-        File.write("#{dir}/source-map-support.js", stack)
-        File.write("#{dir}/index.html", <<~HTML)
+        File.binwrite("#{dir}/index.#{ext}", js)
+        File.binwrite("#{dir}/source-map-support.js", stack)
+        File.binwrite("#{dir}/index.html", <<~HTML)
           <html><head>
             <meta charset='utf-8'>
             <script src='./source-map-support.js'></script>
@@ -124,7 +124,7 @@ module Opal
 
         chrome_pid = Process.spawn(chrome_server_cmd)
 
-        Timeout.timeout(10) do
+        Timeout.timeout(30) do
           loop do
             break if chrome_server_running?
             sleep 0.5
@@ -137,7 +137,7 @@ module Opal
         puts 'Make sure that you have it installed and that its version is > 59'
         exit(1)
       ensure
-        if windows? && chrome_pid
+        if OS.windows? && chrome_pid
           Process.kill('KILL', chrome_pid) unless system("taskkill /f /t /pid #{chrome_pid} >NUL 2>NUL")
         elsif chrome_pid
           Process.kill('HUP', chrome_pid)

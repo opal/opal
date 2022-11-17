@@ -182,8 +182,9 @@ class Opal::SourceMap::File
   def fragments_by_line
     raw_mappings = [[]]
     fragments.flat_map do |fragment|
-      fragment_code  = fragment.code
-      fragment_lines = fragment_code.split("\n", -1) # a negative limit won't suppress trailing null values
+      fragment_code = fragment.code
+      splitter = /\r/.match?(fragment_code) ? /\r?\n/ : "\n"
+      fragment_lines = fragment_code.split(splitter, -1) # a negative limit won't suppress trailing null values
       fragment_lines.each.with_index do |fragment_line, index|
         raw_segment = [fragment_line, fragment]
         if index.zero? && !fragment_line.size.zero?

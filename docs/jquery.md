@@ -58,7 +58,7 @@ builder.build('opal')
 builder.build('opal-jquery')
 builder.build('./app/application.rb')
 
-File.write('application.js', builder.to_s)
+File.binwrite('application.js', builder.to_s) # must use binary mode for writing
 ```
 
 then simply load the compiled file in your html:
@@ -67,7 +67,7 @@ then simply load the compiled file in your html:
 <!DOCTYPE html>
 <html>
   <head>
-    <script src='https://code.jquery.com/jquery-3.3.1.min.js' integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=' crossorigin='anonymous'></script> 
+    <script src='https://code.jquery.com/jquery-3.3.1.min.js' integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=' crossorigin='anonymous'></script>
     <script type='text/javascript' src='./application.js'></script>
   </head>
   <body></body>
@@ -75,11 +75,11 @@ then simply load the compiled file in your html:
 ```
 
 NOTE: opal-jquery expects a jquery library to be loaded. This example loads it
-remotely from jquery.com, but a locally downloaded copy works just as well, or- 
+remotely from jquery.com, but a locally downloaded copy works just as well, or-
 if you're using rails- jquery may be included automatically.
 
-This example builds opal, opal-jquery and the application into a single `.js` file, 
-but you may build them separately, if you so choose. Just remember to include 
+This example builds opal, opal-jquery and the application into a single `.js` file,
+but you may build them separately, if you so choose. Just remember to include
 each respective script in your html!
 
 ### How does opal-jquery work
