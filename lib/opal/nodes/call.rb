@@ -186,7 +186,8 @@ module Opal
       end
 
       def compile_simple_call_chain
-        push recv(receiver_sexp), method_jsid, '(', expr(arglist), ')'
+        compile_receiver
+        push method_jsid, '(', expr(arglist), ')'
       end
 
       def splat?
@@ -469,7 +470,7 @@ module Opal
       def handle_conditional_send
         # temporary variable that stores method receiver
         receiver_temp = scope.new_temp
-        push "#{receiver_temp} = ", expr(recvr)
+        push "#{receiver_temp} = ", expr(receiver_sexp)
 
         # execute the sexp only if the receiver isn't nil
         push ", (#{receiver_temp} === nil || #{receiver_temp} == null) ? nil : "

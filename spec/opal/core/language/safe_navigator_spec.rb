@@ -4,4 +4,14 @@ describe 'Safe navigator' do
       value&.unknown.should == nil
     end
   end
+
+  it "calls a receiver exactly once" do
+    def receiver
+      @calls += 1
+    end
+    @calls = 0
+    receiver&.itself.should == 1
+    @calls = 0
+    receiver&.itself{}.should == 1
+  end
 end
