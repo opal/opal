@@ -29,7 +29,8 @@
 - Delegate and ruby2_keywords (#2446)
 - Source code can now be embedded in the compiled file to improve development/debugging, e.g. RSpec reports, `Proc#source_location` (#2440)
 - Added `Kernel#caller_locations` (#2440)
-- `Opal::Builder::Prefork` for blazingly fast multicore compilation times (#2263, #2462, #2454)
+- `Opal::Builder::Prefork` for blazingly fast multicore compilation times (#2263, #2462, #2454, #2469, #2475)
+- Add `Opal::BuilderProcessors::RubyERBProcessor` (#2470)
 
 ### Fixed
 
@@ -42,6 +43,9 @@
 - Compilation error occurs while compiling `being/end` returning a `case/when` (#2459)
 - Ensure UTF-8 encoding of `.sourcesContent` of source maps (#2451)
 - Benchmarks require string/unpack (#2453)
+- Fix compilation of a call: `gets&.chomp` (#2473)
+- Fix specs on Windows (#2460)
+- Make opal CLI tool work again with pipes (#2474)
 
 ### Internal
 
@@ -49,3 +53,4 @@
 - Retry if file cache write operation exits with Zlib::BufError (#2463)
 - Eliminate redundant `var constructor` in `allocate_class` (#2452)
 - Fix `performance:compare` asset size calculation (#2457)
+- Fix a few specs after the Opal RSpec 1.0 (alpha) release (#2471, #2472)
