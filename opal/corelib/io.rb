@@ -89,7 +89,7 @@ class ::IO
     parts = ''
 
     # Will execure at most twice - one time reading from a buffer
-    # second time
+    # second time executing read proc
     begin
       @read_buffer += parts
       if @read_buffer != ''
