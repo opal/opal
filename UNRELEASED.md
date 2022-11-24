@@ -11,6 +11,7 @@
 ### Changed
 
 - No longer truncate stacktraces to 15 lines (#2440)
+- Mark async/await as non-experimental (#2477)
 
 ### Performance
 
