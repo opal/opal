@@ -18,14 +18,14 @@ _This guide is a work-in-progress._
 - Commit the updated changelog along with the version bump using this commit message:
   "Release v1.2.3"
 - Push the commit and run `bin/rake release` to release the new version to Rubygems
-- Go to GitHub releases and create a new release from the latest tag pasting the contents from CHANGELOG.md
+- Go to GitHub releases and create a new release from the latest tag pasting the contents from CHANGELOG.md (or UNRELEASED.md for pre-releases)
 
 ## Opal docs
 
 - Open `opal-docs` and run `bin/build v1.2.3`
 - Then run `bin/deploy`
 
-## Opal site
+## [skip for pre-releases] Opal site
 
 - Open `opal.github.io` and update the opal version in the `Gemfile`
 - run `bin/build`
@@ -35,9 +35,8 @@ _This guide is a work-in-progress._
 
 - Run `bin/release v1.2.3`
 
-## Prepare for the next release
+## [skip for minor-releases] Prepare for the next release
 
-- Skip this step if releasing a stable release
 - Create a new pull request that:
   - Updates a version to `v1.x.0.dev` in both `lib/opal/version.rb` and `opal/corelib/constants.rb`
 - Remember to merge that PR before merging anything else next once we decide to not release any more point releases from `master`.
