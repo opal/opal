@@ -1,16 +1,5 @@
 # Asynchronous code (PromiseV2 / async / await)
 
-Please be aware that this functionality is marked as experimental and may change
-in the future.
-
-In order to disable the warnings that will be shown if you use those experimental
-features, add the following line before requiring `promise/v2` or `await` and after
-requiring `opal`.
-
-```ruby
-`Opal.config.experimental_features_severity = 'ignore'`
-```
-
 ## PromiseV2
 
 In Opal 1.2 we introduced PromiseV2 which is to replace the default Promise in Opal 2.0
@@ -52,7 +41,7 @@ require "await"
 
 def wait_5_seconds
   puts "Let's wait 5 seconds..."
-  sleep(5).await
+  sleep(5).__await__
   puts "Done!"
 end
 
@@ -60,13 +49,10 @@ wait_5_seconds.__await__
 ```
 
 It's important to understand what happens under the hood: every scope in which `#__await__` is
-encountered will become async, which means that it will return a Promise that will resolve
+encountered will become async, which means that it will return a PromiseV2 that will resolve
 to a value. This includes methods, blocks and the top scope. This means, that `#__await__` is
 infectious and you need to remember to `#__await__` everything along the way, otherwise
 a program will finish too early and the values may be incorrect.
-
-[You can take a look at how we ported Minitest to support asynchronous tests.](https://github.com/opal/opal/pull/2221/commits/8383c7b45a94fe4628778f429508b9c08c8948b0) Take note, that
-it was ported to use `#await` while the finally accepted version uses `#__await__`.
 
 It is certainly correct to `#__await__` any value, including non-Promises, for instance
 `5.__await__` will correctly resolve to `5` (except that it will make the scope an async
@@ -75,6 +61,8 @@ function, with all the limitations described above).
 The `await` stdlib module includes a few useful functions, like async-aware `each_await`
 function and `sleep` that doesn't block the thread. It also includes a method `#await`
 which is an alias of `#itself` - it makes sense to auto-await that method.
+
+[You can take a look at how we ported Minitest to support asynchronous tests.](https://github.com/opal/opal/pull/2221/files#diff-bdc8868ad4476bff7b25475f1b19059ac684d64c6531a645b3ba0aef0c466d0f).
 
 This approach is certainly incompatible with what Ruby does, but due to a dynamic nature
 of Ruby and a different model of JavaScript this was the least invasive way to catch up
