@@ -10,7 +10,72 @@ Changes are grouped as follows:
 - **Removed** for deprecated features removed in this release.
 - **Fixed** for any bug fixes.
 - **Security** to invite users to upgrade in case of vulnerabilities.
+- **Performance** changes related to speed and efficiency.
 
+
+
+
+
+## [1.6.0](https://github.com/opal/opal/compare/v1.5.1...v1.6.0) - 2022-11-24
+
+
+<!--
+### Internal
+### Changed
+### Added
+### Removed
+### Deprecated
+### Performance
+### Fixed
+-->
+
+### Changed
+
+- No longer truncate stacktraces to 15 lines ([#2440](https://github.com/opal/opal/pull/2440))
+- Mark async/await as non-experimental ([#2477](https://github.com/opal/opal/pull/2477))
+
+### Performance
+
+- Improve method block performance for runtime ([#2449](https://github.com/opal/opal/pull/2449))
+- Uninline non-typical argument handling ([#2419](https://github.com/opal/opal/pull/2419))
+- Logic optimization of runtime.js ([#2415](https://github.com/opal/opal/pull/2415))
+- Windows support for `performance:compare` CI check ([#2450](https://github.com/opal/opal/pull/2450))
+- Improve block performance for even more cases ([#2465](https://github.com/opal/opal/pull/2465))
+
+### Added
+
+- Added support for `#freeze` and `#frozen?` (#2444, #2468)
+- Add CLI support for ESM, at least for Chrome, NodeJS, QuickJS and GJS ([#2435](https://github.com/opal/opal/pull/2435))
+- Support exit in Chrome CLI Runner, both sync and async ([#2439](https://github.com/opal/opal/pull/2439))
+- Make sure the Server CLI Runner can pick up changes in sources ([#2436](https://github.com/opal/opal/pull/2436))
+- Delegate and ruby2_keywords ([#2446](https://github.com/opal/opal/pull/2446))
+- Source code can now be embedded in the compiled file to improve development/debugging, e.g. RSpec reports, `Proc#source_location` ([#2440](https://github.com/opal/opal/pull/2440))
+- Added `Kernel#caller_locations` ([#2440](https://github.com/opal/opal/pull/2440))
+- `Opal::Builder::Prefork` for blazingly fast multicore compilation times (#2263, #2462, #2454, #2469, #2475)
+- Add `Opal::BuilderProcessors::RubyERBProcessor` ([#2470](https://github.com/opal/opal/pull/2470))
+
+### Fixed
+
+- Closure tracking support fixes a whole array of bugs handling `break` / `next` / `retry` / … ([#2357](https://github.com/opal/opal/pull/2357))
+- Fix an edge case of if in the most complex form not returning ([#2433](https://github.com/opal/opal/pull/2433))
+- `String#length` is now available when using `opal/mini` ([#2438](https://github.com/opal/opal/pull/2438))
+- Auto-await produced invalid code ([#2440](https://github.com/opal/opal/pull/2440))
+- Fix `Enumerable#collect_concat` and `#flat_map` implementation ([#2440](https://github.com/opal/opal/pull/2440))
+- Improved await support for PromiseV1 ([#2440](https://github.com/opal/opal/pull/2440))
+- Compilation error occurs while compiling `being/end` returning a `case/when` ([#2459](https://github.com/opal/opal/pull/2459))
+- Ensure UTF-8 encoding of `.sourcesContent` of source maps ([#2451](https://github.com/opal/opal/pull/2451))
+- Benchmarks require string/unpack ([#2453](https://github.com/opal/opal/pull/2453))
+- Fix compilation of a call: `gets&.chomp` ([#2473](https://github.com/opal/opal/pull/2473))
+- Fix specs on Windows ([#2460](https://github.com/opal/opal/pull/2460))
+- Make opal CLI tool work again with pipes ([#2474](https://github.com/opal/opal/pull/2474))
+
+### Internal
+
+- GitHub Workflows security hardening ([#2432](https://github.com/opal/opal/pull/2432))
+- Retry if file cache write operation exits with Zlib::BufError ([#2463](https://github.com/opal/opal/pull/2463))
+- Eliminate redundant `var constructor` in `allocate_class` ([#2452](https://github.com/opal/opal/pull/2452))
+- Fix `performance:compare` asset size calculation ([#2457](https://github.com/opal/opal/pull/2457))
+- Fix a few specs after the Opal RSpec 1.0 (alpha) release (#2471, #2472)
 
 
 
@@ -23,6 +88,11 @@ Changes are grouped as follows:
 - Make `Time.new` not depend on `Date.prototype.getTimezoneOffset()` ([#2426](https://github.com/opal/opal/pull/2426))
 - Fix exception during `Hash#each_value` if keys get deleted during loop ([#2427](https://github.com/opal/opal/pull/2427))
 - Fix scan_until and check_until implementation of StringScanner ([#2420](https://github.com/opal/opal/pull/2420))
+
+## New Contributors
+* @Leon0402 made their first contribution in https://github.com/opal/opal/pull/2420
+
+**Full Changelog**: https://github.com/opal/opal/compare/v1.5.0...v1.5.1
 
 
 
