@@ -123,6 +123,7 @@ module Opal
       @compiler_options = other.compiler_options.dup
       @missing_require_severity = other.missing_require_severity.to_sym
       @processed = other.processed.dup
+      @scheduler = other.scheduler.dup.tap { |i| i.builder = self }
     end
 
     def to_s
@@ -175,7 +176,7 @@ module Opal
     attr_reader :processed
 
     attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
-      :compiler_options, :missing_require_severity, :cache
+      :compiler_options, :missing_require_severity, :cache, :scheduler
 
     def esm?
       @compiler_options[:esm]

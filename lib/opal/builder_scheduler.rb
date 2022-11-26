@@ -8,7 +8,7 @@ module Opal
       @builder = builder
     end
 
-    attr_reader :builder
+    attr_accessor :builder
   end
 
   singleton_class.attr_accessor :builder_scheduler
