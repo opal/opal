@@ -50,6 +50,11 @@ module Opal
         ".#{meth}"
       end
 
+      # We want to avoid "compiling using send" whenever possible
+      def invoke_using_send?
+        iter || splat? || call_is_writer_that_needs_handling?
+      end
+
       def compile_using_send
         push recv(receiver_sexp), method_jsid, '.apply(null'
         compile_arguments
