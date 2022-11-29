@@ -1867,6 +1867,8 @@
   };
 
   Opal.send2 = function(recv, body, method, args, block, blockopts) {
+    if (args == null) args = [];
+
     if (body == null && method != null && recv.$method_missing) {
       body = recv.$method_missing;
       args = [method].concat(args);

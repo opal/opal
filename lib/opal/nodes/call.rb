@@ -152,14 +152,18 @@ module Opal
       end
 
       def compile_arguments(skip_comma = false)
-        push ', ' unless skip_comma
+        push ', ' if !skip_comma && !(arglist.children.empty? && !iter)
 
         if @with_writer_temp
           push @with_writer_temp
         elsif splat?
           push expr(arglist)
         elsif arglist.children.empty?
-          push '[]'
+          if iter
+            push '[]'
+          else
+            push ''
+          end
         else
           push '[', expr(arglist), ']'
         end
