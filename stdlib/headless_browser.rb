@@ -9,7 +9,7 @@
 
     if (window.OPAL_EXIT_CODE === "noexit") {
       window.OPAL_EXIT_CODE = code;
-      window.alert("opalheadlesschromeexit");
+      window.alert("opalheadlessbrowserexit");
     }
   }
 }
