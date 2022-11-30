@@ -86,26 +86,29 @@ Also there are some specs in `spec/ruby/language/while_spec.rb` that cause an in
 
 ## Benchmarking
 
-There are two ways to benchmark Opal's performance: one way is to write a program (or a set of programs) that takes sufficently long time to execute, then measure the execution time, and the other is to execute a specific Ruby Spec Suite example (or a set of examples) multiple times, then measure the execution time. Let's call the former "Traditional Benchmarking", and the latter "The Ruby Spec Suite Benchmarking".
+Opal benchmarking uses the standard Ruby [benchmark_driver](https://github.com/benchmark-driver/), allowing for Ruby .rb and .yaml benchmarks. Examples are available in the `benchmark` directory.
 
-Regardless of which of the two types of benchmarking above you happen to be doing, the reporting of benchmark results works the same way: `bundle exec rake bench:report`.
-
-It's important to understand that benchmarking in Opal works on the principle of a single, shared benchmarking workspace, a *bench*, where the results of each benchmark run that you perform get automatically saved. When you do `bundle exec rake bench:report`, you get a combined report of all of the benchmark results that are currently sitting in your workspace. This means you can check out an older commit, run benchmarks, checkout a newer commit, run benchmarks, then run the report to see the results from the two commits side-by-side. After you're done, (or before starting a new benchmarking session), you can do `bundle exec rake bench:clear` to reset your workspace to a clean slate.
+Benchmarking in Opal works on the principle of a single, shared benchmarking workspace, a *bench*, where the results of each benchmark run that you perform get automatically saved. When you do `bundle exec rake bench:report`, you get a combined report of all of the benchmark results that are currently sitting in your workspace. This means you can check out an older commit, run benchmarks, checkout a newer commit, run benchmarks, then run the report to see the results from the two commits side-by-side. After you're done, (or before starting a new benchmarking session), you can do `bundle exec rake bench:clear` to reset your workspace to a clean slate.
 
 You can get a list of all the available benchmarking commands by running `bundle exec rake -T | grep bench` as shown below.
+
+On Windows make sure to enable the DevKit before running benchmarks: `ridk enable`.
+On Linux, depending on your environment, it may be required to use `xvfb-run bundle exec ...` to make sure browser runners can run in headless mode.
 
 ```
 $ bundle exec rake -T | grep bench
 
 rake bench:clear            # Delete all benchmark results
-rake bench:opal             # Benchmark Opal
-rake bench:report           # Combined report of all benchmark results
+rake bench:opal_chrome      # Benchmark Opal with Chrome runner
+rake bench:opal_firefox     # Benchmark Opal with Firefox runner
+rake bench:opal_node        # Benchmark Opal with Node runner
 rake bench:ruby             # Benchmark Ruby
+rake bench:ruby_vs_opal     # Benchmark Ruby vs Opal Node
+rake bench:all              # Benchmark Ruby vs Opal Node vs Opal Chrome vs Opal Firefox
+rake bench:report           # Combined report of all benchmark results
 ```
 
-### Traditional Benchmarking
-
-At the root of the opal project tree is a folder called `benchmark` that contains a file called `benchmarks`. This file lists all of the benchmarks that will be run if you do `bundle exec bench:opal` without specifying any particular benchmark file(s) as parameters to this rake task. In the example below, I pick which benchmarks to run by passing their file paths as parameters to the rake task.
+At the root of the opal project tree is a folder called `benchmark` that contains a file called `benchmarks`. This file lists all of the benchmarks that will be run if you do `bundle exec bench:opal_node` without specifying any particular benchmark file(s) as parameters to this rake task. In the example below, I pick which benchmarks to run by passing their file paths as parameters to the rake task.
 
 Start with a clean slate:
 
@@ -115,42 +118,60 @@ $ bundle exec rake bench:clear
 rm tmp/bench/*
 ```
 
-Run two benchmark programs from the MRI benchmarking suite by passing their file paths as parameters:
+Run two benchmark programs from the benchmarking suite by passing their file paths as parameters:
 (Note: passing params to Rake tasks is tricky - notice there is no space after the comma!)
 
 ```
-$ bundle exec rake bench:opal[test/cruby/benchmark/bm_app_answer.rb,test/cruby/benchmark/bm_app_factorial.rb]
+$ bundle exec rake bench:opal_node[benchmark/bm_array_flatten.rb,benchmark/bm_array_add.rb]
+bundle exec ruby benchmark/run.rb -node benchmark/bm_array_flatten.rb benchmark/bm_array_add.rb | tee tmp/bench/1_opal-node-1-5-1.txt
 
-bundle exec opal benchmark/run.rb test/cruby/benchmark/bm_app_answer.rb test/cruby/benchmark/bm_app_factorial.rb | tee tmp/bench/Opal1
-test/cruby/benchmark/bm_app_answer.rb    0.7710001468658447
-test/cruby/benchmark/bm_app_factorial.rb 0.0820000171661377
-===============================================
-Executed 2 benchmarks in 0.8530001640319824 sec
+Benchmarking benchmark/bm_array_add.rb started at 2022-11-06 10:20:57 +0100:
+Calculating -------------------------------------
+        bm_array_add                  1.941k i/s -       1.000 times in 0.000515s (515.20μs/i)
+
+Benchmarking benchmark/bm_array_flatten.rb started at 2022-11-06 10:21:05 +0100:
+Calculating -------------------------------------
+    bm_array_flatten                   1.037 i/s -       1.000 times in 0.964620s (964.62ms/i)
+
+
+        bm_array_add                  1.941k i/s -       1.000 times in 0.000515s (515.20μs/i)
+    bm_array_flatten                   1.037 i/s -       1.000 times in 0.964620s (964.62ms/i)
 ```
 
 In this case, I want to see how Opal's results stack up against MRI's results, so I will run the same set of benchmarks for Ruby:
 
 ```
-$ bundle exec rake bench:ruby[test/cruby/benchmark/bm_app_answer.rb,test/cruby/benchmark/bm_app_factorial.rb]
+$ bundle exec rake bench:ruby[benchmark/bm_array_flatten.rb,benchmark/bm_array_add.rb]
+bundle exec ruby benchmark/run.rb -ruby benchmark/bm_array_flatten.rb benchmark/bm_array_add.rb | tee tmp/bench/2_ruby-3-2-0.txt
 
-bundle exec ruby benchmark/run.rb test/cruby/benchmark/bm_app_answer.rb test/cruby/benchmark/bm_app_factorial.rb | tee tmp/bench/Ruby1
-test/cruby/benchmark/bm_app_answer.rb    0.04913724200014258
-test/cruby/benchmark/bm_app_factorial.rb 1.3288652799965348
-===============================================
-Executed 2 benchmarks in 1.3780025219966774 sec
+Benchmarking benchmark/bm_array_add.rb started at 2022-11-06 10:22:23 +0100:
+Calculating -------------------------------------
+        bm_array_add                    14.306k i/s -       1.000 times in 0.000070s (69.90μs/i)
+
+Benchmarking benchmark/bm_array_flatten.rb started at 2022-11-06 10:22:27 +0100:
+Calculating -------------------------------------
+    bm_array_flatten                      7.347 i/s -       1.000 times in 0.136105s (136.10ms/i)
+
+
+        bm_array_add                    14.306k i/s -       1.000 times in 0.000070s (69.90μs/i)
+    bm_array_flatten                      7.347 i/s -       1.000 times in 0.136105s (136.10ms/i)
 ```
 
 Now I'm ready to see the result of the two runs side-by-side:
 
 ```
 $ bundle exec rake bench:report
-
-Benchmark                                 Opal1  Ruby1
-test/cruby/benchmark/bm_app_answer.rb     0.771  0.049
-test/cruby/benchmark/bm_app_factorial.rb  0.082  1.329
+Base: 1_opal-node-1-5-1
+Benchmark                  1_opal-node-1-5-1 |                2_ruby-3-2-0 |
+bm_array_flatten                   1.037 i/s |         +608.49%  7.347 i/s |
+bm_array_add                    1941.000 i/s |     +637.04%  14306.000 i/s |
 ```
 
 If I were to continue running benchmarks, more columns would be added to the report. You can select which columns you want to display (and in what order) by passing their names as params to the rake task like so: `bundle exec rake bench:report[Ruby1,Opal1]`
+
+Rubies, that are unknown to the Opal benchmarking harness, can be benchmarked by setting the `OPAL_BENCH_EXTRA_RUBIES` environment variable.
+The full paths to the extra rubies must be specified, separated by ';', ready for benchmark_driver to be passed as option. Example:
+`OPAL_BENCH_EXTRA_RUBIES="/usr/local/bin/ruby.wasm;/usr/local/bin/ruby.head"`
 
 ### The Ruby Spec Suite Benchmarking
 

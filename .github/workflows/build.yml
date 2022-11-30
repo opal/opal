@@ -24,6 +24,12 @@ jobs:
           - name: mspec-chrome
             ruby: '3.0'
             command: bin/rake mspec_chrome
+          - name: mspec-firefox
+            env:
+              # when changing version, also change it below
+              MOZILLA_FIREFOX_BINARY: '/opt/hostedtoolcache/firefox/106.0.4/x64/firefox'
+            ruby: '3.0'
+            command: xvfb-run bin/rake mspec_firefox
           - name: minitest
             ruby: '3.0'
             command: bin/rake minitest
@@ -53,6 +59,13 @@ jobs:
             command: bundle exec rake mspec_chrome
             ruby: '3.0'
             os: windows-latest
+          - name: windows-mspec-firefox
+            env:
+              # when changing version, also change it below and above
+              MOZILLA_FIREFOX_BINARY: 'C:/Program Files/Firefox_106.0.4/firefox.exe'
+            ruby: '3.0'
+            command: bundle exec rake mspec_firefox
+            os: windows-latest
           - name: windows-minitest
             command: bundle exec rake minitest
             ruby: '3.0'
@@ -81,6 +94,10 @@ jobs:
     runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.combo.permissive || false }}
     steps:
+      - uses: browser-actions/setup-firefox@latest
+        with:
+          # when changing version, also change it above
+          firefox-version: '106.0.4'
       - uses: actions/checkout@v2
         with:
           fetch-depth: ${{ fromJSON(matrix.combo.fetchdepth || '1') }}
