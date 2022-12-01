@@ -468,12 +468,14 @@ module Opal
 
       # Handle safe-operator calls: foo&.bar / foo&.bar ||= baz / ...
       def handle_conditional_send
+        helper :is_nil
+
         # temporary variable that stores method receiver
         receiver_temp = scope.new_temp
         push "#{receiver_temp} = ", expr(receiver_sexp)
 
         # execute the sexp only if the receiver isn't nil
-        push ", (#{receiver_temp} === nil || #{receiver_temp} == null) ? nil : "
+        push ", $is_nil(#{receiver_temp}) ? nil : "
         @conditional_recvr = receiver_temp
         yield
         wrap '(', ')'

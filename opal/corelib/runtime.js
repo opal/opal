@@ -168,6 +168,10 @@
     return !$truthy(val);
   };
 
+  Opal.is_nil = function(val) {
+    return nil === val || undefined === val || null === val;
+  }
+
   Opal.type_error = function(object, type, method, coerced) {
     object = object.$$class;
 

@@ -198,9 +198,9 @@ module Opal
       end
 
       def compile_defined_back_ref
-        helper :gvars
+        helper :gvars, :is_nil
         back_ref_temp = scope.new_temp
-        push "(#{back_ref_temp} = $gvars['~'], #{back_ref_temp} != null && #{back_ref_temp} !== nil)"
+        push "(#{back_ref_temp} = $gvars['~'], !$is_nil(#{back_ref_temp}))"
         back_ref_temp
       end
 
@@ -208,7 +208,7 @@ module Opal
         helper :gvars
 
         nth_ref_tmp = scope.new_temp
-        push "(#{nth_ref_tmp} = $gvars['~'], #{nth_ref_tmp} != null && #{nth_ref_tmp} != nil)"
+        push "(#{nth_ref_tmp} = $gvars['~'], !$is_nil(#{back_ref_temp}))"
         nth_ref_tmp
       end
 
