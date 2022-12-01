@@ -5,8 +5,6 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class MassAssignNode < Base
-      SIMPLE_ASSIGNMENT = %i[lvasgn ivasgn lvar gvasgn cdecl casgn].freeze
-
       handle :masgn
       children :lhs, :rhs
 
@@ -82,13 +80,12 @@ module Opal
           end
 
         part = child.updated
-        if SIMPLE_ASSIGNMENT.include?(child.type)
+        case child.type
+        when :lvasgn, :ivasgn, :lvar, :gvasgn, :cdecl, :casgn, :send # Simple assignment
           part = part.updated(nil, part.children + [assign])
-        elsif child.type == :send
-          part = part.updated(nil, part.children + [assign])
-        elsif child.type == :attrasgn
+        when :attrasgn
           part.last << assign
-        elsif child.type == :mlhs
+        when :mlhs
           helper :to_ary
           # nested destructuring
           tmp = scope.new_temp

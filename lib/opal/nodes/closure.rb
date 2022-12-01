@@ -30,16 +30,17 @@ module Opal
       add_type(:JS_FUNCTION,    1 <<  0) # everything that generates an IIFE
       add_type(:JS_LOOP,        1 <<  1) # exerything that generates a JS loop
       add_type(:JS_LOOP_INSIDE, 1 <<  2) # everything that generates an inside of a loop
+      add_type(:JS_SWITCH,      1 <<  3) # exerything that generates a JS switch
 
-      add_type(:DEF,            1 <<  3) # def
-      add_type(:LAMBDA,         1 <<  4) # lambda
-      add_type(:ITER,           1 <<  5) # iter, lambda
-      add_type(:MODULE,         1 <<  6)
-      add_type(:LOOP,           1 <<  7) # for building a catcher outside a loop
-      add_type(:LOOP_INSIDE,    1 <<  8) # for building a catcher inside a loop
-      add_type(:SEND,           1 <<  9) # to generate a break catcher after send with a block
-      add_type(:TOP,            1 << 10)
-      add_type(:RESCUE_RETRIER, 1 << 11) # a virtual loop to catch a retrier
+      add_type(:DEF,            1 <<  4) # def
+      add_type(:LAMBDA,         1 <<  5) # lambda
+      add_type(:ITER,           1 <<  6) # iter, lambda
+      add_type(:MODULE,         1 <<  7)
+      add_type(:LOOP,           1 <<  8) # for building a catcher outside a loop
+      add_type(:LOOP_INSIDE,    1 <<  9) # for building a catcher inside a loop
+      add_type(:SEND,           1 << 10) # to generate a break catcher after send with a block
+      add_type(:TOP,            1 << 11)
+      add_type(:RESCUE_RETRIER, 1 << 12) # a virtual loop to catch a retrier
 
       ANY = 0xffffffff
 
@@ -167,7 +168,7 @@ module Opal
             end
           when :break
             thrower_closure = select_closure(SEND | LAMBDA | LOOP, break_after: DEF | MODULE | TOP)
-            last_closure = select_closure(JS_FUNCTION | JS_LOOP)
+            last_closure = select_closure(JS_FUNCTION | JS_LOOP | JS_SWITCH)
 
             if !thrower_closure
               iter_closure = select_closure(ITER, break_after: DEF | MODULE | TOP)
