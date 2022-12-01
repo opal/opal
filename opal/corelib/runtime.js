@@ -2919,6 +2919,33 @@
     return kwargs.$$smap[key];
   }
 
+  // Arrays of size > 32 elements that contain only strings,
+  // symbols, integers and nils are compiled as a self-extracting
+  // string.
+  Opal.large_array_unpack = function(str) {
+    var array = str.split(","), length = array.length, i;
+    for (i = 0; i < length; i++) {
+      switch(array[i][0]) {
+        case undefined:
+          array[i] = nil
+          break;
+        case '-':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+          array[i] = +array[i];
+      }
+    }
+    return array;
+  }
+
   // Initialization
   // --------------
   Opal.BasicObject = BasicObject = $allocate_class('BasicObject', null);
