@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props
+# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid
 # use_strict: true
 
 module ::Kernel
@@ -31,7 +31,7 @@ module ::Kernel
 
   def method(name)
     %x{
-      var meth = self['$' + name];
+      var meth = self[$jsid(name)];
 
       if (!meth || meth.$$stub) {
         #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
@@ -662,7 +662,7 @@ module ::Kernel
 
   def respond_to?(name, include_all = false)
     %x{
-      var body = self['$' + name];
+      var body = self[$jsid(name)];
 
       if (typeof(body) === "function" && !body.$$stub) {
         return true;

@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop
+# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop, jsid
 
 class ::Module
   def self.allocate
@@ -138,7 +138,7 @@ class ::Module
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
-            id   = '$' + name,
+            id   = $jsid(name),
             ivar = $ivar(name);
 
         var body = $return_ivar(ivar);
@@ -164,7 +164,7 @@ class ::Module
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
-            id   = '$' + name + '=',
+            id   = $jsid(name + '='),
             ivar = $ivar(name);
 
         var body = $assign_ivar(ivar)
@@ -424,7 +424,7 @@ class ::Module
       block.$$def         = block;
       block.$$define_meth = true;
 
-      return Opal.defn(self, '$' + name, block);
+      return Opal.defn(self, $jsid(name), block);
     }
   end
 
@@ -503,7 +503,7 @@ class ::Module
 
   def instance_method(name)
     %x{
-      var meth = self.$$prototype['$' + name];
+      var meth = self.$$prototype[$jsid(name)];
 
       if (!meth || meth.$$stub) {
         #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.name}'", name)};
@@ -589,7 +589,7 @@ class ::Module
 
   def method_defined?(method)
     %x{
-      var body = self.$$prototype['$' + method];
+      var body = self.$$prototype[$jsid(method)];
       return (!!body) && !body.$$stub;
     }
   end
@@ -605,7 +605,7 @@ class ::Module
       else {
         for (var i = 0, length = methods.length; i < length; i++) {
           var meth = methods[i],
-              id   = '$' + meth,
+              id   = $jsid(meth),
               func = self.$$prototype[id];
 
           Opal.defs(self, id, func);
