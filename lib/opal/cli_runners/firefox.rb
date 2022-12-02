@@ -70,31 +70,21 @@ module Opal
       def prepare_files_in(dir)
         js = builder.to_s
         map = builder.source_map.to_json
-        stack = File.binread("#{__dir__}/source-map-support-browser.js")
-
         ext = builder.output_extension
         module_type = ' type="module"' if builder.esm?
 
-        # Chrome can't handle huge data passed to `addScriptToEvaluateOnLoad`
+        # CDP can't handle huge data passed to `addScriptToEvaluateOnLoad`
         # https://groups.google.com/a/chromium.org/forum/#!topic/chromium-discuss/U5qyeX_ydBo
-        # The only way is to create temporary files and pass them to chrome.
+        # The only way is to create temporary files and pass them to the browser.
         File.binwrite("#{dir}/index.#{ext}", js)
-        File.binwrite("#{dir}/source-map-support.js", stack)
+        File.binwrite("#{dir}/index.#{ext}.map", map)
         File.binwrite("#{dir}/index.html", <<~HTML)
           <!DOCTYPE html>
           <html><head>
             <meta charset='utf-8'>
             <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
-            <script src='/source-map-support.js'></script>
             <script>
             window.opalheadlessfirefox = true;
-            sourceMapSupport.install({
-              retrieveSourceMap: function(path) {
-                return path.endsWith('/index.#{ext}') ? {
-                  url: '/index.map', map: #{map.to_json}
-                } : null;
-              }
-            });
             </script>
           </head><body>
             <script src='/index.#{ext}'#{module_type}></script>

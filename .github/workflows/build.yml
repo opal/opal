@@ -24,12 +24,12 @@ jobs:
           - name: mspec-chrome
             ruby: '3.0'
             command: bin/rake mspec_chrome
-          - name: mspec-firefox
+          - name: minitest-firefox
             env:
               # when changing version, also change it below
               MOZILLA_FIREFOX_BINARY: '/opt/hostedtoolcache/firefox/106.0.4/x64/firefox'
             ruby: '3.0'
-            command: xvfb-run bin/rake mspec_firefox
+            command: xvfb-run bin/rake minitest_firefox
           - name: minitest
             ruby: '3.0'
             command: bin/rake minitest
@@ -59,12 +59,12 @@ jobs:
             command: bundle exec rake mspec_chrome
             ruby: '3.0'
             os: windows-latest
-          - name: windows-mspec-firefox
+          - name: windows-minitest-firefox
             env:
               # when changing version, also change it below and above
               MOZILLA_FIREFOX_BINARY: 'C:/Program Files/Firefox_106.0.4/firefox.exe'
             ruby: '3.0'
-            command: bundle exec rake mspec_firefox
+            command: bundle exec rake minitest_firefox
             os: windows-latest
           - name: windows-minitest
             command: bundle exec rake minitest

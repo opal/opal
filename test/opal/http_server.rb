@@ -61,3 +61,9 @@ get '/last_modified' do
        'Access-Control-Allow-Origin' => '*')
   body 'Look Ma, I have a Last-Modified header'
 end
+
+get '/*' do
+  status 404
+  headers \
+    'Access-Control-Allow-Origin' => '*'
+end
