@@ -130,10 +130,25 @@ class TestNodejsFile < Test::Unit::TestCase
     refute(File.directory?('test/nodejs/fixtures/hello.rb'),              'test/nodejs/fixtures/hello.rb should not be a directory')
   end
 
+  # Let's not ship our repo with symlinks, but create them on the go
+  def with_symlinks(&block)
+    dir_symlink = 'test/nodejs/fixtures/symlink-to-directory'
+    file_symlink = 'test/nodejs/fixtures/symlink-to-file'
+    
+    File.symlink('.', dir_symlink)
+    File.symlink('hello.rb', file_symlink)
+    block.call(dir_symlink, file_symlink)
+  ensure
+    File.unlink(dir_symlink)
+    File.unlink(file_symlink)
+  end
+
   def test_directory_check_with_symlinks
-    assert(File.directory?('test/nodejs/fixtures/symlink-to-directory'),  'test/nodejs/fixtures/symlink-to-directory should be a directory')
-    assert(File.directory?('test/nodejs/fixtures/symlink-to-directory/'), 'test/nodejs/fixtures/symlink-to-directory/ should be a directory')
-    refute(File.directory?('test/nodejs/fixtures/symlink-to-file'),       'test/nodejs/fixtures/symlink-to-file should not be a directory')
+    with_symlinks do |dir_symlink, file_symlink|
+      assert(File.directory?(dir_symlink),     dir_symlink+' should be a directory')
+      assert(File.directory?(dir_symlink+'/'), dir_symlink+'/ should be a directory')
+      refute(File.directory?(file_symlink),    file_symlink+' should not be a directory')
+    end
   end unless windows_platform?
 
   def test_file_check
@@ -144,16 +159,20 @@ class TestNodejsFile < Test::Unit::TestCase
   end
 
   def test_file_check_with_symlinks
-    refute(File.file?('test/nodejs/fixtures/symlink-to-directory'),  'test/nodejs/fixtures/symlink-to-directory should not be a file')
-    refute(File.file?('test/nodejs/fixtures/symlink-to-directory/'), 'test/nodejs/fixtures/symlink-to-directory/ should not be a file')
-    assert(File.file?('test/nodejs/fixtures/symlink-to-file'),       'test/nodejs/fixtures/symlink-to-file should be a file')
+    with_symlinks do |dir_symlink, file_symlink|
+      refute(File.file?(dir_symlink),     dir_symlink+' should not be a file')
+      refute(File.file?(dir_symlink+'/'), dir_symlink+'/ should not be a file')
+      assert(File.file?(file_symlink),    file_symlink+' should be a file')
+    end
   end unless windows_platform?
 
   def test_file_symlink?
-    assert(File.symlink?('test/nodejs/fixtures/symlink-to-file'))
-    assert(File.symlink?('test/nodejs/fixtures/symlink-to-directory'))
-    refute(File.symlink?('test/nodejs/fixtures'))
-    refute(File.symlink?('test/nodejs/fixtures/hello.rb'))
+    with_symlinks do |dir_symlink, file_symlink|
+      assert(File.symlink?(file_symlink))
+      assert(File.symlink?(dir_symlink))
+      refute(File.symlink?('test/nodejs/fixtures'))
+      refute(File.symlink?('test/nodejs/fixtures/hello.rb'))
+    end
   end unless windows_platform?
 
   def test_file_readable
