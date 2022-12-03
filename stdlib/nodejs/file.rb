@@ -135,6 +135,11 @@ class File < IO
     data.size
   end
 
+  def self.symlink(path, new_path)
+    `executeIOAction(function(){return __fs__.symlinkSync(#{path}, #{new_path})})`
+    0
+  end
+
   def self.delete(path)
     `executeIOAction(function(){return __fs__.unlinkSync(#{path})})`
   end
