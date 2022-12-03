@@ -48,13 +48,7 @@ module Opal
 
     def runtime_key
       @runtime_key ||= begin
-        # We want to ensure the compiler and any Gemfile/gemspec (for development)
-        # stays untouched
-        opal_path = File.expand_path('..', Opal.gem_dir)
-        files = Dir["#{opal_path}/{Gemfile*,*.gemspec,lib/**/*}"]
-
-        # Also check if parser wasn't changed:
-        files += $LOADED_FEATURES.grep(%r{lib/(parser|ast)})
+        files = Opal.dependent_files
 
         digest [
           files.sort.map { |f| "#{f}:#{File.size(f)}:#{File.mtime(f).to_f}" },
