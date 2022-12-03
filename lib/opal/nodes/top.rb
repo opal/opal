@@ -68,14 +68,18 @@ module Opal
       end
 
       def module_name
-        Opal::Compiler.module_name(compiler.file).inspect
+        Opal::Compiler.module_name(compiler.file)
       end
 
       def definition
         if compiler.requirable?
-          unshift "Opal.modules[#{module_name}] = "
-        elsif compiler.esm? && !compiler.no_export?
+          unshift "Opal.modules[#{module_name.inspect}] = "
+        elsif compiler.esm? && !compiler.no_export? && !compiler.directory?
           unshift 'export default '
+        end
+
+        if compiler.directory?
+          imports
         end
       end
 
@@ -100,12 +104,32 @@ module Opal
             # require absolute paths from CLI. For other cases
             # we can expect the module names to be normalized
             # already.
-            line "Opal.load_normalized(#{module_name});"
+            line "Opal.load_normalized(#{module_name.inspect});"
           end
         elsif compiler.eval?
           line "})(Opal, self);"
         else
           line "});\n"
+        end
+      end
+
+      def imports
+        imports = compiler.requires
+
+        unshift "\n" unless imports.empty?
+
+        # Check how many directories we have to go up
+        depth = module_name.sub(%r{\A\./}, '').count("/")
+
+        imports.reverse_each do |req|
+          ref = depth == 0 ? "./" : ("../" * depth)
+          mod = "#{ref}#{Compiler.module_name(req)}.#{compiler.esm? ? 'mjs' : 'js'}"
+
+          if compiler.esm?
+            unshift "import #{mod.inspect};\n"
+          else
+            unshift "require(#{mod.inspect});\n"
+          end
         end
       end
 

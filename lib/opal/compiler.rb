@@ -183,6 +183,12 @@ module Opal
     # Enables JavaScript's strict mode (i.e., adds 'use strict'; statement)
     compiler_option :use_strict, default: false, as: :use_strict?, magic_comment: true
 
+    # @!method directory?
+    #
+    # Builds a JavaScript file that is aimed to reside as part of a directory
+    # for an import map build or something similar.
+    compiler_option :directory, default: false, as: :directory?
+
     # @!method parse_comments?
     #
     # Adds comments for every method definition
@@ -335,8 +341,11 @@ module Opal
     # @param source_file [String] optional source_file to reference ruby source
     # @return [Opal::SourceMap]
     def source_map
+      # For directory output, ensure the paths for source maps are correct
+      filename = directory? ? File.basename(file) : file
+
       # We only use @source_map if compiler is cached.
-      @source_map || ::Opal::SourceMap::File.new(@fragments, file, @source, @result)
+      @source_map || ::Opal::SourceMap::File.new(@fragments, filename, @source, @result)
     end
 
     # Any helpers required by this file. Used by {Opal::Nodes::Top} to reference
