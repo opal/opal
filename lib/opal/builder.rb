@@ -6,6 +6,7 @@ require 'opal/config'
 require 'opal/cache'
 require 'opal/builder_scheduler'
 require 'opal/project'
+require 'opal/builder/directory'
 require 'set'
 
 module Opal
@@ -176,6 +177,7 @@ module Opal
     end
 
     include Project::Collection
+    include Builder::Directory
 
     attr_reader :processed
 
@@ -212,6 +214,13 @@ module Opal
       else
         path
       end
+    end
+
+    # Output method #compiled_source aims to replace #to_s
+    def compiled_source(with_source_map: true)
+      compiled_source = to_s
+      compiled_source += "\n" + source_map.to_data_uri_comment if with_source_map
+      compiled_source
     end
 
     private

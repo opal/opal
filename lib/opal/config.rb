@@ -98,6 +98,11 @@ module Opal
     # @return [true, false]
     config_option :esm, false, compiler_option: :esm
 
+    # Build a program as a directory; don't bundle
+    #
+    # @return [true, false]
+    config_option :directory, false, compiler_option: :directory
+
     # Set the error severity for when a require can't be parsed at compile time.
     #
     # @example

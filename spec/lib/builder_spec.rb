@@ -1,6 +1,7 @@
 require 'lib/spec_helper'
 require 'opal/builder'
 require 'opal/builder_scheduler/sequential'
+require 'tmpdir'
 
 RSpec.describe Opal::Builder do
   subject(:builder) { described_class.new(options) }
@@ -184,6 +185,45 @@ RSpec.describe Opal::Builder do
           FILE_7
         ])
       end
+    end
+  end
+
+  describe 'directory mode' do
+    shared_examples 'directory mode' do
+      let(:options) { {compiler_options: {directory: true, esm: esm?}}}
+      let(:ver) { Opal::VERSION_MAJOR_MINOR }
+
+      it 'builds a correct directory structure' do
+        Dir.mktmpdir("opal-test-") do |dir|
+          builder.build('console')
+          builder.compile_to_directory(dir+"/UniqueString/")
+
+          files = Dir["#{dir}/**/*"].map { |i| i.split("/UniqueString/")[1] }.compact
+          expected_files = %W[index.#{ext} opal opal/#{ver} opal/#{ver}/console.#{ext}
+                              opal/#{ver}/console.map opal/#{ver}/native.#{ext} opal/#{ver}/native.map
+                              opal/src opal/src/console.rb opal/src/native.rb]
+          expected_files << 'index.html' if esm?
+          expect(files.sort).to eq(expected_files.sort)
+        end
+      end
+
+      it 'builds a single file if requested' do
+        builder.build('console')
+        file = builder.compile_to_directory(single_file: "opal/src/console.rb")
+        expect(file).to eq(File.binread("#{__dir__}/../../stdlib/console.rb"))
+      end
+    end
+
+    context 'with ESM enabled' do
+      let(:esm?) { true }
+      let(:ext) { "mjs" }
+      include_examples 'directory mode'
+    end
+
+    context 'with ESM disabled' do
+      let(:esm?) { false }
+      let(:ext) { "js" }
+      include_examples 'directory mode'
     end
   end
 end
