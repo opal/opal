@@ -6,15 +6,17 @@ require 'opal/erb'
 module Opal
   module BuilderProcessors
     class Processor
-      def initialize(source, filename, options = {})
+      def initialize(source, filename, abs_path = nil, options = {})
+        options = abs_path if abs_path.is_a? Hash
+
         source += "\n" unless source.end_with?("\n")
-        @source, @filename, @options = source, filename, options.dup
+        @source, @filename, @abs_path, @options = source, filename, abs_path, options.dup
         @cache = @options.delete(:cache) { Opal.cache }
         @requires = []
         @required_trees = []
         @autoloads = []
       end
-      attr_reader :source, :filename, :options, :requires, :required_trees, :autoloads
+      attr_reader :source, :filename, :options, :requires, :required_trees, :autoloads, :abs_path
 
       def to_s
         source.to_s
