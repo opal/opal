@@ -10,6 +10,7 @@ rack_version      = ENV['RACK_VERSION']
 sprockets_version = ENV['SPROCKETS_VERSION']
 
 gem 'json', '< 1.8.1',  platform: :ruby if ruby_version < v['2.2']
+gem 'psych', '< 5.0.0', platform: :ruby if ruby_version < v['3.2a']
 gem 'rack-test', '< 0.8' if ruby_version <= v['2.0']
 gem 'coveralls', platform: :mri
 
