@@ -40,6 +40,7 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#collect_concat when the returned lazy enumerator is evaluated by Enumerable#first flattens elements when the given block returned an array or responding to .each and .force" # Expected [] == ["0", "1", "0", "2", "0", "3"] to be truthy but was false
   fails "Enumerator::Lazy#collect_concat when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == ["0", "10", "20", "30", "40", "50"] to be truthy but was false
   fails "Enumerator::Lazy#collect_concat works with an infinite enumerable" # TypeError: can't iterate from Float
+  fails "Enumerator::Lazy#compact returns array without nil elements" # Expected [1, 3, false, 5] (Array) to be an instance of Enumerator::Lazy
   fails "Enumerator::Lazy#drop on a nested Lazy sets difference of given count with old size to new size" # Expected 20 == 30 to be truthy but was false
   fails "Enumerator::Lazy#drop on a nested Lazy when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # Expected [] == [4, 5] to be truthy but was false
   fails "Enumerator::Lazy#drop sets difference of given count with old size to new size" # Expected 20 == 80 to be truthy but was false

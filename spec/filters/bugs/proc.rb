@@ -39,11 +39,11 @@ opal_filter "Proc" do
   fails "Proc#inspect for a proc created with proc returns a description including file and line number" # Expected "#<Proc:0x25a>" =~ /^#<Proc:([^ ]*?)@ruby\/core\/proc\/shared\/to_s\.rb:26>$/ to be truthy but was nil
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword"
   fails "Proc#lambda? is preserved when passing a Proc with & to the proc keyword"
+  fails "Proc#ruby2_keywords applies to the underlying method and applies across duplication" # Expected false == true to be truthy but was false
   fails "Proc#ruby2_keywords marks the final hash argument as keyword hash" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x36616>
   fails "Proc#ruby2_keywords prints warning when a proc accepts keyword splat" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x365fe>
   fails "Proc#ruby2_keywords prints warning when a proc accepts keywords" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x36612>
   fails "Proc#ruby2_keywords prints warning when a proc does not accept argument splat" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x3660a>
-  fails "Proc#ruby2_keywords returns self" # NoMethodError: undefined method `ruby2_keywords' for #<Proc:0x36602>
   fails "Proc#source_location returns an Array"
   fails "Proc#source_location returns the same value for a proc-ified method as the method reports" # Expected ["ruby/core/proc/fixtures/source_location.rb", 3] to equal nil
   fails "Proc#source_location sets the first value to the path of the file in which the proc was defined"

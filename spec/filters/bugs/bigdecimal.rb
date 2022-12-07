@@ -168,6 +168,8 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_i returns Integer otherwise" # NoMethodError: undefined method `to_i' for 3e-20001
   fails "BigDecimal#to_int raises FloatDomainError if BigDecimal is infinity or NaN"
   fails "BigDecimal#to_int returns Integer otherwise" # NoMethodError: undefined method `to_i' for 3e-20001
+  fails "BigDecimal#to_r returns a Rational from a BigDecimal with an exponent" # NoMethodError: undefined method `to_r' for 100
+  fails "BigDecimal#to_r returns a Rational from a negative BigDecimal with an exponent" # NoMethodError: undefined method `to_r' for -100
   fails "BigDecimal#to_r returns a Rational with bignum values" # NoMethodError: undefined method `to_r' for 3.141592653589793238462643
   fails "BigDecimal#to_r returns a Rational" # NoMethodError: undefined method `to_r' for 3.14159
   fails "BigDecimal#to_s can return a leading space for values > 0"

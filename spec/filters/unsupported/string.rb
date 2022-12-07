@@ -16,6 +16,7 @@ opal_unsupported_filter "String" do
   fails "String#<< converts the given argument to a String using to_str"
   fails "String#<< raises a RuntimeError when self is frozen"
   fails "String#<< raises a TypeError if the given argument can't be converted to a String"
+  fails "String#<< raises an ArgumentError when given the incorrect number of arguments" # Expected ArgumentError but got: NotImplementedError (String#<< not supported. Mutable String methods are not supported in Opal.)
   fails "String#<< returns a String when given a subclass instance"
   fails "String#<< returns an instance of same class when called on a subclass"
   fails "String#<< taints self if other is tainted"
@@ -87,6 +88,7 @@ opal_unsupported_filter "String" do
   fails "String#[]= with Integer index replaces a multibyte character with a multibyte character" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with Integer index replaces the char at idx with other_str" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with Integer index taints self if other_str is tainted" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
+  fails "String#[]= with Integer index updates the string to a compatible encoding" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with Integer index, count appends other_str to the end of the string if idx == the length of the string" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with Integer index, count calls #to_int to convert the index and count objects" # Mock 'string element set index' expected to receive to_int("any_args") exactly 1 times but received it 0 times
   fails "String#[]= with Integer index, count calls #to_str to convert the replacement object" # Mock 'string element set replacement' expected to receive to_str("any_args") exactly 1 times but received it 0 times
@@ -375,6 +377,8 @@ opal_unsupported_filter "String" do
   fails "String#gsub! with pattern and block taints self if block's result is tainted"
   fails "String#gsub! with pattern and block untrusts self if block's result is untrusted"
   fails "String#gsub! with pattern and block uses the compatible encoding if they are compatible"
+  fails "String#gsub! with pattern and replacement handles a pattern in a subset encoding" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
+  fails "String#gsub! with pattern and replacement handles a pattern in a superset encoding" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
   fails "String#gsub! with pattern and replacement modifies self in place and returns self"
   fails "String#gsub! with pattern and replacement modifies self in place with multi-byte characters and returns self"
   fails "String#gsub! with pattern and replacement raises a RuntimeError when self is frozen"
@@ -415,9 +419,12 @@ opal_unsupported_filter "String" do
   fails "String#ljust with length, padding taints result when self or padstr is tainted"
   fails "String#ljust with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
   fails "String#lstrip taints the result when self is tainted"
+  fails "String#lstrip! makes a string empty if it is only whitespace" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.
   fails "String#lstrip! modifies self in place and returns self"
   fails "String#lstrip! raises a RuntimeError on a frozen instance that is modified"
   fails "String#lstrip! raises a RuntimeError on a frozen instance that would not be modified"
+  fails "String#lstrip! raises an ArgumentError if the first non-space codepoint is invalid" # Expected true to be false
+  fails "String#lstrip! removes leading NULL bytes and whitespace" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.
   fails "String#lstrip! returns nil if no modifications were made"
   fails "String#lstrip! strips leading \\0" # NotImplementedError: String#lstrip! not supported. Mutable String methods are not supported in Opal.
   fails "String#match matches \\G at the start of the string"
@@ -451,14 +458,18 @@ opal_unsupported_filter "String" do
   fails "String#reverse! raises a RuntimeError on a frozen instance that would not be modified"
   fails "String#reverse! reverses a string with multi byte characters" # NotImplementedError: String#reverse! not supported. Mutable String methods are not supported in Opal.
   fails "String#reverse! reverses self in place and always returns self"
+  fails "String#reverse! works with a broken string" # Expected true to be false
   fails "String#rindex with Regexp supports \\G which matches at the given start offset"
   fails "String#rjust with length, padding taints result when self or padstr is tainted"
   fails "String#rjust with length, padding when padding is tainted and self is untainted returns a tainted string if and only if length is longer than self"
   fails "String#rstrip taints the result when self is tainted"
+  fails "String#rstrip! makes a string empty if it is only whitespace" # NoMethodError: undefined method `rstrip!' for ""
   fails "String#rstrip! modifies self in place and returns self"
   fails "String#rstrip! modifies self removing trailing NULL bytes and whitespace"
   fails "String#rstrip! raises a RuntimeError on a frozen instance that is modified"
   fails "String#rstrip! raises a RuntimeError on a frozen instance that would not be modified"
+  fails "String#rstrip! raises an ArgumentError if the last non-space codepoint is invalid" # Expected true to be false
+  fails "String#rstrip! removes trailing NULL bytes and whitespace" # NoMethodError: undefined method `rstrip!' for "\u0000 goodbye \u0000"
   fails "String#rstrip! returns nil if no modifications were made"
   fails "String#scan supports \\G which matches the end of the previous match / string start for first match"
   fails "String#scan taints the results if the Regexp argument is tainted"
@@ -551,6 +562,7 @@ opal_unsupported_filter "String" do
   fails "String#squeeze! raises an ArgumentError when the parameter is out of sequence"
   fails "String#squeeze! returns nil if no modifications were made"
   fails "String#strip taints the result when self is tainted"
+  fails "String#strip! makes a string empty if it is only whitespace" # NotImplementedError: String#strip! not supported. Mutable String methods are not supported in Opal.
   fails "String#strip! modifies self in place and returns self"
   fails "String#strip! modifies self removing trailing NULL bytes and whitespace"
   fails "String#strip! raises a RuntimeError on a frozen instance that is modified"
@@ -586,6 +598,8 @@ opal_unsupported_filter "String" do
   fails "String#sub! with pattern and block sets $~ for access from the block"
   fails "String#sub! with pattern and block taints self if block's result is tainted"
   fails "String#sub! with pattern and without replacement and block raises a ArgumentError"
+  fails "String#sub! with pattern, replacement handles a pattern in a subset encoding" # NotImplementedError: String#sub! not supported. Mutable String methods are not supported in Opal.
+  fails "String#sub! with pattern, replacement handles a pattern in a superset encoding" # NotImplementedError: String#sub! not supported. Mutable String methods are not supported in Opal.
   fails "String#sub! with pattern, replacement modifies self in place and returns self"
   fails "String#sub! with pattern, replacement raises a RuntimeError when self is frozen"
   fails "String#sub! with pattern, replacement returns nil if no modifications were made"

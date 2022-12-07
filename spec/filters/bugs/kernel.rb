@@ -88,18 +88,20 @@ opal_filter "Kernel" do
   fails "Kernel#eval with refinements activates refinements from the binding" # NoMethodError: undefined method `foo' for #<EvalSpecs::A:0x26588>
   fails "Kernel#eval with refinements activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<EvalSpecs::A:0x26698>
   fails "Kernel#extend does not calls append_features on arguments metaclass"
-  fails "Kernel#extend raises an ArgumentError when no arguments given"
   fails "Kernel#fail accepts an Object with an exception method returning an Exception" # TypeError: exception class/object expected
   fails "Kernel#freeze freezes an object's singleton class" # Expected false == true to be truthy but was false
   fails "Kernel#initialize_copy does nothing if the argument is the same as the receiver" # Expected nil.equal? #<Object:0x590> to be truthy but was false
   fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
   fails "Kernel#inspect returns a String for an object without #class method" # Exception: Maximum call stack size exceeded
+  fails "Kernel#instance_variable_set on frozen objects accepts unicode instance variable names" # NameError: '@💙' is not allowed as an instance variable name
+  fails "Kernel#instance_variable_set on frozen objects raises for frozen objects" # Expected NameError but got: FrozenError (can't modify frozen NilClass: )
   fails "Kernel#instance_variables immediate values returns the correct array if an instance variable is added"
   fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#kind_of? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#local_variables is accessible from bindings"
   fails "Kernel#method can be called even if we only repond_to_missing? method, true"
+  fails "Kernel#method can call a #method_missing accepting zero or one arguments" # NameError: undefined method `foo' for class `#<Class:0x404ae>'
   fails "Kernel#method returns a method object if respond_to_missing?(method) is true" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'
   fails "Kernel#method the returned method object if respond_to_missing?(method) calls #method_missing with a Symbol name" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'
   fails "Kernel#method will see an alias of the original method as == when in a derived class"
@@ -127,6 +129,11 @@ opal_filter "Kernel" do
   fails "Kernel#raise passes no arguments to the constructor when given only an exception class" # Expected #<Class:0x4c8> but got: ArgumentError ([#initialize] wrong number of arguments(1 for 0))
   fails "Kernel#raise raises an ArgumentError when only cause is given" # Expected ArgumentError but got: TypeError (exception class/object expected)
   fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "RuntimeError: raised" to include "ruby/shared/kernel/raise.rb:65:"
+  fails "Kernel#rand is a private method" # Expected Kernel to have private instance method 'rand' but it does not
+  fails "Kernel#rand is random on boot" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x31a04>
+  fails "Kernel#rand supports custom object types" # Expected "NaN#<struct KernelSpecs::CustomRangeInteger value=1>" (String) to be an instance of KernelSpecs::CustomRangeInteger
+  fails "Kernel#remove_instance_variable raises a FrozenError if self is frozen" # Expected FrozenError but got: NameError (instance variable @foo not defined)
+  fails "Kernel#remove_instance_variable raises for frozen objects" # Expected FrozenError but got: NameError (instance variable @foo not defined)
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol"
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil"
   fails "Kernel#respond_to_missing? causes #respond_to? to return true if called and not returning false"
@@ -189,6 +196,8 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x104ea>
   fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object"
   fails "Kernel#sleep accepts any Object that reponds to divmod" # TypeError: can't convert Object into time interval
+  fails "Kernel#sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (/out of char range/) but no exception was raised ("Ԇ" was returned)
+  fails "Kernel#sprintf %c uses the encoding of the format string to interpret codepoints" # ArgumentError: unknown encoding name - euc-jp
   fails "Kernel#sprintf can produce a string with invalid encoding" # Expected true to be false
   fails "Kernel#sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
   fails "Kernel#sprintf flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" to equal "1.e+02"
@@ -223,12 +232,21 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf integer formats i works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "Kernel#sprintf integer formats u works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "Kernel#sprintf other formats % alone raises an ArgumentError" # Expected ArgumentError but no exception was raised ("%" was returned)
+  fails "Kernel#sprintf other formats c raises TypeError if argument is nil" # Expected TypeError (/no implicit conversion from nil to integer/) but got: TypeError (no implicit conversion of NilClass into Integer)
+  fails "Kernel#sprintf other formats c raises TypeError if argument is not String or Integer and cannot be converted to them" # Expected TypeError (/no implicit conversion of Array into Integer/) but got: ArgumentError (too few arguments)
+  fails "Kernel#sprintf other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x7b8c0>)
+  fails "Kernel#sprintf other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x7b8e8>)
+  fails "Kernel#sprintf other formats c tries to convert argument to Integer with to_int" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x7b8e4>
+  fails "Kernel#sprintf other formats c tries to convert argument to String with to_str" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x7b8e0>
   fails "Kernel#sprintf other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Kernel#sprintf precision float types controls the number of decimal places displayed in fraction part" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
   fails "Kernel#sprintf precision float types does not affect G format" # Expected "12.12340000" to equal "12.1234"
   fails "Kernel#sprintf precision string formats determines the maximum number of characters to be copied from the string" # Expected "1" to equal "["
   fails "Kernel#sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there ano not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
+  fails "Kernel#sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
   fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
+  fails "Kernel#srand is a private method" # Expected Kernel to have private instance method 'srand' but it does not
+  fails "Kernel#srand returns the system-initialized seed value on the first call" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x7c8be @seed=33>
   fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: false/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: false\n"
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
   fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:441: warning: foo/       got:   $stderr: "ruby/core/kernel/fixtures/classes.rb:441:7:in `warn': warning: foo\n"
@@ -243,6 +261,50 @@ opal_filter "Kernel" do
   fails "Kernel.Complex() when passed Numerics n1 and n2 and at least one responds to #real? with false returns n1 + n2 * Complex(0, 1)"
   fails "Kernel.Complex() when passed [Complex, Complex] returns a new Complex number based on the two given numbers"
   fails "Kernel.Complex() when passed [Complex] returns the passed Complex number"
+  fails "Kernel.Complex() when passed [String] ignores leading whitespaces" # Expected ("  79+4i"+0i) == (79+4i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] ignores trailing whitespaces" # Expected ("79+4i  "+0i) == (79+4i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] invalid argument and exception: false passed raises Encoding::CompatibilityError if String is in not ASCII-compatible encoding" # Expected CompatibilityError (ASCII incompatible encoding: UTF-16) but got: ArgumentError (unknown encoding name - UTF-16)
+  fails "Kernel.Complex() when passed [String] invalid argument and exception: false passed returns nil for Float::INFINITY" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for {"exception"=>false}>) == nil to be truthy but was false
+  fails "Kernel.Complex() when passed [String] invalid argument and exception: false passed returns nil for Float::NAN" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for {"exception"=>false}>) == nil to be truthy but was false
+  fails "Kernel.Complex() when passed [String] invalid argument and exception: false passed returns nil for unrecognised Strings" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for {"exception"=>false}>) == nil to be truthy but was false
+  fails "Kernel.Complex() when passed [String] invalid argument and exception: false passed returns nil when String contains null-byte" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for {"exception"=>false}>) == nil to be truthy but was false
+  fails "Kernel.Complex() when passed [String] invalid argument and exception: false passed returns nil when there is a sequence of _" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for {"exception"=>false}>) == nil to be truthy but was false
+  fails "Kernel.Complex() when passed [String] invalid argument and exception: false passed returns nil when trailing garbage" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for {"exception"=>false}>) == nil to be truthy but was false
+  fails "Kernel.Complex() when passed [String] invalid argument does not allow null-byte" # Expected ArgumentError (string contains null byte) but no exception was raised (("1-2i\u0000"+0i) was returned)
+  fails "Kernel.Complex() when passed [String] invalid argument does not understand Float::INFINITY" # Expected ArgumentError (invalid value for convert(): "Infinity") but no exception was raised (("Infinity"+0i) was returned)
+  fails "Kernel.Complex() when passed [String] invalid argument does not understand Float::NAN" # Expected ArgumentError (invalid value for convert(): "NaN") but no exception was raised (("NaN"+0i) was returned)
+  fails "Kernel.Complex() when passed [String] invalid argument does not understand a sequence of _" # Expected ArgumentError (invalid value for convert(): "7__9+4__0i") but no exception was raised (("7__9+4__0i"+0i) was returned)
+  fails "Kernel.Complex() when passed [String] invalid argument raises ArgumentError for trailing garbage" # Expected ArgumentError (invalid value for convert(): "79+4iruby") but no exception was raised (("79+4iruby"+0i) was returned)
+  fails "Kernel.Complex() when passed [String] invalid argument raises ArgumentError for unrecognised Strings" # Expected ArgumentError (invalid value for convert(): "ruby") but no exception was raised (("ruby"+0i) was returned)
+  fails "Kernel.Complex() when passed [String] invalid argument raises Encoding::CompatibilityError if String is in not ASCII-compatible encoding" # Expected CompatibilityError (ASCII incompatible encoding: UTF-16) but got: ArgumentError (unknown encoding name - UTF-16)
+  fails "Kernel.Complex() when passed [String] understands 'a+bi' to mean a complex number with 'a' as the real part, 'b' as the imaginary" # Expected ("79+4i"+0i) == (79+4i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands 'a+i' to mean a complex number with 'a' as the real part, 1i as the imaginary" # Expected ("79+i"+0i) == (79+1i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands 'a-bi' to mean a complex number with 'a' as the real part, '-b' as the imaginary" # Expected ("79-4i"+0i) == (79-4i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands 'a-i' to mean a complex number with 'a' as the real part, -1i as the imaginary" # Expected ("79-i"+0i) == (79-1i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands 'm@a' to mean a complex number in polar form with 'm' as the modulus, 'a' as the argument" # Expected ("79@4"+0i) == (-51.63784604822534-59.78739712932633i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands _" # Expected ("7_9+4_0i"+0i) == (79+40i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands a '-i' by itself as denoting a complex number with an imaginary part of -1" # Expected ("-i"+0i) == (0-1i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands a negative integer followed by 'i' to mean that negative integer is the imaginary part" # Expected ("-29i"+0i) == (0-29i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands an 'i' by itself as denoting a complex number with an imaginary part of 1" # Expected ("i"+0i) == (0+1i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands an integer followed by 'i' to mean that integer is the imaginary part" # Expected ("35i"+0i) == (0+35i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands floats (a.b) for the imaginary part" # Expected ("4+2.3i"+0i) == (4+2.3i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands floats (a.b) for the real part" # Expected ("2.3"+0i) == (2.3+0i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands fractions (numerator/denominator) for the imaginary part" # Expected ("4+2/3i"+0i) == (4+(2/3)i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands fractions (numerator/denominator) for the real part" # Expected ("2/3"+0i) == ((2/3)+0i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands i, I, j, and J imaginary units" # Expected ("79+4i"+0i) == (79+4i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands integers" # Expected ("20"+0i) == (20+0i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands negative floats (-a.b) for the imaginary part" # Expected ("7-28.771i"+0i) == (7-28.771i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands negative floats (-a.b) for the real part" # Expected ("-2.33"+0i) == (-2.33+0i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands negative fractions (-numerator/denominator) for the imaginary part" # Expected ("7-2/3i"+0i) == (7-(2/3)i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands negative fractions (-numerator/denominator) for the real part" # Expected ("-2/3"+0i) == ((-2/3)+0i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands negative integers" # Expected ("-3"+0i) == (-3+0i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands negative scientific notation for the imaginary part" # Expected ("4-2e3i"+0i) == (4-2000i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands negative scientific notation for the real and imaginary part in the same String" # Expected ("-2e3-2e4i"+0i) == (-2000-20000i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands negative scientific notation for the real part" # Expected ("-2e3+4i"+0i) == (-2000+4i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands scientific notation for the imaginary part" # Expected ("4+2e3i"+0i) == (4+2000i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands scientific notation for the real and imaginary part in the same String" # Expected ("2e3+2e4i"+0i) == (2000+20000i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands scientific notation for the real part" # Expected ("2e3+4i"+0i) == (2000+4i) to be truthy but was false
+  fails "Kernel.Complex() when passed [String] understands scientific notation with e and E" # Expected ("2e3+2e4i"+0i) == (2000+20000i) to be truthy but was false
   fails "Kernel.Complex() when passed a Numeric which responds to #real? with false returns the passed argument"
   fails "Kernel.Complex() when passed a non-Numeric second argument raises TypeError"
   fails "Kernel.Complex() when passed a single non-Numeric coerces the passed argument using #to_c"
@@ -320,12 +382,28 @@ opal_filter "Kernel" do
   fails "Kernel.lambda returns the passed Proc if given an existing Proc" # Expected true to be false
   fails "Kernel.loop returns StopIteration#result, the result value of a finished iterator" # requires changes in enumerator.rb
   fails "Kernel.printf calls write on the first argument when it is not a string"
+  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if argument is nil" # Expected TypeError (/no implicit conversion from nil to integer/) but got: TypeError (no implicit conversion of NilClass into Integer)
+  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if argument is not String or Integer and cannot be converted to them" # Expected TypeError (/no implicit conversion of Array into Integer/) but got: ArgumentError (too few arguments)
+  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x69f02>)
+  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x69f0c>)
+  fails "Kernel.printf formatting io is not specified other formats c tries to convert argument to Integer with to_int" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x69f24>
+  fails "Kernel.printf formatting io is not specified other formats c tries to convert argument to String with to_str" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x69f1e>
   fails "Kernel.printf formatting io is not specified other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
+  fails "Kernel.printf formatting io is specified other formats c raises TypeError if argument is nil" # Expected TypeError (/no implicit conversion from nil to integer/) but got: Exception (format_string.indexOf is not a function)
+  fails "Kernel.printf formatting io is specified other formats c raises TypeError if argument is not String or Integer and cannot be converted to them" # Expected TypeError (/no implicit conversion of Array into Integer/) but got: Exception (format_string.indexOf is not a function)
+  fails "Kernel.printf formatting io is specified other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (/can't convert BasicObject to String/) but got: Exception (format_string.indexOf is not a function)
+  fails "Kernel.printf formatting io is specified other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (/can't convert BasicObject to String/) but got: Exception (format_string.indexOf is not a function)
+  fails "Kernel.printf formatting io is specified other formats c tries to convert argument to Integer with to_int" # Exception: format_string.indexOf is not a function
+  fails "Kernel.printf formatting io is specified other formats c tries to convert argument to String with to_str" # Exception: format_string.indexOf is not a function
+  fails "Kernel.printf formatting io is specified other formats s formats nil with precision" # Exception: format_string.indexOf is not a function
+  fails "Kernel.printf formatting io is specified other formats s formats nil with width" # Exception: format_string.indexOf is not a function
   fails "Kernel.printf formatting io is specified other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Kernel.printf writes to stdout when a string is the first argument"
   fails "Kernel.proc returned the passed Proc if given an existing Proc" # Expected false to be true
   fails "Kernel.rand is random on boot" # NoMethodError: undefined method `insert' for "rubyexe.rb"
   fails "Kernel.rand supports custom object types" # Expected "NaN#<struct KernelSpecs::CustomRangeInteger value=1>" (String) to be an instance of KernelSpecs::CustomRangeInteger
+  fails "Kernel.sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (/out of char range/) but no exception was raised ("Ԇ" was returned)
+  fails "Kernel.sprintf %c uses the encoding of the format string to interpret codepoints" # ArgumentError: unknown encoding name - euc-jp
   fails "Kernel.sprintf can produce a string with invalid encoding" # Expected true to be false
   fails "Kernel.sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" to equal "..7651"
   fails "Kernel.sprintf flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" to equal "1.e+02"
@@ -360,11 +438,18 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf integer formats i works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "Kernel.sprintf integer formats u works well with large numbers" # Expected "1234567890987654400" to equal "1234567890987654321"
   fails "Kernel.sprintf other formats % alone raises an ArgumentError" # Expected ArgumentError but no exception was raised ("%" was returned)
+  fails "Kernel.sprintf other formats c raises TypeError if argument is nil" # Expected TypeError (/no implicit conversion from nil to integer/) but got: TypeError (no implicit conversion of NilClass into Integer)
+  fails "Kernel.sprintf other formats c raises TypeError if argument is not String or Integer and cannot be converted to them" # Expected TypeError (/no implicit conversion of Array into Integer/) but got: ArgumentError (too few arguments)
+  fails "Kernel.sprintf other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x7bc3a>)
+  fails "Kernel.sprintf other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x7bc62>)
+  fails "Kernel.sprintf other formats c tries to convert argument to Integer with to_int" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x7bc42>
+  fails "Kernel.sprintf other formats c tries to convert argument to String with to_str" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x7bc46>
   fails "Kernel.sprintf other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT (dummy)> to be truthy but was false
   fails "Kernel.sprintf precision float types controls the number of decimal places displayed in fraction part" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
   fails "Kernel.sprintf precision float types does not affect G format" # Expected "12.12340000" to equal "12.1234"
   fails "Kernel.sprintf precision string formats determines the maximum number of characters to be copied from the string" # Expected "1" to equal "["
   fails "Kernel.sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there ano not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
+  fails "Kernel.sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
   fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "Kernel.sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" to equal "        1.095200e+02"
   fails "Kernel.srand returns the previous seed value on the first call" # NoMethodError: undefined method `insert' for "rubyexe.rb"

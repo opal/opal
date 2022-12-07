@@ -20,9 +20,15 @@ opal_filter "Integer" do
   fails "Integer#<< (with n << m) fixnum calls #to_int to convert the argument to an Integer" # Expected 3 == 0 to be truthy but was false
   fails "Integer#<< (with n << m) fixnum returns -1 when n < 0, m < 0 and n > -(2**-m)" # Expected -7 to equal -1
   fails "Integer#<< (with n << m) fixnum returns 0 when n > 0, m < 0 and n < 2**-m" # Expected 7 to equal 0
+  fails "Integer#<< (with n << m) when m is a bignum or larger than int raises NoMemoryError when m > 0 and n != 0" # Expected NoMemoryError but no exception was raised (1 was returned)
+  fails "Integer#<< (with n << m) when m is a bignum or larger than int returns -1 when m < 0 and n < 0" # Expected 0 == -1 to be truthy but was false
+  fails "Integer#<< (with n << m) when m is a bignum or larger than int returns 0 when m < 0 and n >= 0" # Expected 1 == 0 to be truthy but was false
   fails "Integer#>> (with n >> m) fixnum calls #to_int to convert the argument to an Integer" # Expected 8 == 0 to be truthy but was false
   fails "Integer#>> (with n >> m) fixnum returns -1 when n < 0, m > 0 and n > -(2**m)" # Expected -7 to equal -1
   fails "Integer#>> (with n >> m) fixnum returns 0 when n > 0, m > 0 and n < 2**m" # Expected 7 to equal 0
+  fails "Integer#>> (with n >> m) when m is a bignum or larger than int raises NoMemoryError when m < 0 and n != 0" # Expected NoMemoryError but no exception was raised (1 was returned)
+  fails "Integer#>> (with n >> m) when m is a bignum or larger than int returns -1 when m > 0 and n < 0" # Expected 0 == -1 to be truthy but was false
+  fails "Integer#>> (with n >> m) when m is a bignum or larger than int returns 0 when m > 0 and n >= 0" # Expected 1 == 0 to be truthy but was false
   fails "Integer#[] fixnum when index and length passed ensures n[i, len] equals to (n >> i) & ((1 << len) - 1)" # ArgumentError: [Number#[]] wrong number of arguments(2 for 1)
   fails "Integer#[] fixnum when index and length passed ignores negative length" # ArgumentError: [Number#[]] wrong number of arguments(2 for 1)
   fails "Integer#[] fixnum when index and length passed moves start position to the most significant bits when negative index passed" # ArgumentError: [Number#[]] wrong number of arguments(2 for 1)
@@ -37,6 +43,7 @@ opal_filter "Integer" do
   fails "Integer#[] fixnum when range passed when passed (..i) returns 0 if all i bits equal 0" # Opal::SyntaxError: undefined method `type' for nil
   fails "Integer#^ fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
   fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 to equal 9223372041149743000
+  fails "Integer#^ fixnum returns self bitwise XOR other when one operand is negative" # Expected -3 == -8589934593 to be truthy but was false
   fails "Integer#chr with an encoding argument raises RangeError if self is invalid as a codepoint in the specified encoding"
   fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
   fails "Integer#chr with an encoding argument raises a RangeError is self is less than 0"
@@ -44,6 +51,7 @@ opal_filter "Integer" do
   fails "Integer#chr with an encoding argument returns a String encoding self interpreted as a codepoint in the specified encoding"
   fails "Integer#chr with an encoding argument returns a String with the specified encoding"
   fails "Integer#chr with an encoding argument returns a new String for each call"
+  fails "Integer#chr without argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
   fails "Integer#chr without argument raises a RangeError is self is less than 0"
   fails "Integer#chr without argument returns a new String for each call"
   fails "Integer#chr without argument when Encoding.default_internal is nil and self is between 0 and 127 (inclusive) returns a US-ASCII String"
@@ -60,6 +68,9 @@ opal_filter "Integer" do
   fails "Integer#coerce fixnum when given a Fixnum returns an array containing two Fixnums" # Expected [Number, Number] == [Integer, Integer] to be truthy but was false
   fails "Integer#div fixnum calls #coerce and #div if argument responds to #coerce" # Mock 'x' expected to receive div(#<MockObject:0x16c22>) exactly 1 times but received it 0 times
   fails "Integer#divmod fixnum raises a TypeError when given a non-Integer" # NoMethodError: undefined method `nan?' for #<MockObject:0x1df78>
+  fails "Integer#fdiv performs floating-point division between self bignum and a bignum" # Expected NaN == 500 to be truthy but was false
+  fails "Integer#fdiv rounds to the correct float for bignum denominators" # Expected 0 == 1e-323 to be truthy but was false
+  fails "Integer#fdiv rounds to the correct value for bignums" # Expected NaN == 11.11111111111111 to be truthy but was false
   fails "Integer#odd? fixnum returns true when self is an odd number" # Expected false to be true
   fails "Integer#pow one argument is passed fixnum returns Float::INFINITY when the number is too big" # Expected warning to match: /warning: in a\*\*b, b may be too big/ but got: ""
   fails "Integer#pow one argument is passed fixnum returns self raised to the given power" # Exception: Maximum call stack size exceeded
@@ -70,6 +81,7 @@ opal_filter "Integer" do
   fails "Integer#round returns itself rounded to nearest if passed a negative value" # Expected NaN to have same value and type as 300
   fails "Integer#zero? Integer#zero? overrides Numeric#zero?" # Expected Number == Integer to be truthy but was false
   fails "Integer#| fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
+  fails "Integer#| fixnum returns self bitwise OR other when one operand is negative" # Expected -3 == -8589934593 to be truthy but was false
   fails "Integer#| fixnum returns self bitwise OR other" # Expected 65535 to equal 9223372036854841000
   fails "Integer.sqrt returns the integer square root of the argument" # Number overflow, 10**400
 end

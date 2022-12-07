@@ -6,10 +6,6 @@ opal_unsupported_filter "freezing" do
   fails "FrozenError#receiver should return frozen object that modification was attempted on" # RuntimeError: RuntimeError
   fails "Hash literal does not change encoding of literal string keys during creation"
   fails "Hash literal freezes string keys on initialization"
-  fails "Hash#== compares keys with matching hash codes via eql?"
-  fails "Hash#[]= doesn't duplicate and freeze already frozen string keys"
-  fails "Hash#eql? compares keys with matching hash codes via eql?"
-  fails "Hash#store doesn't duplicate and freeze already frozen string keys"
   fails "Kernel#clone with freeze: anything else raises ArgumentError when passed not true/false/nil" # Expected ArgumentError (/unexpected value for freeze: Integer/) but got: ArgumentError (unexpected value for freeze: Number)
   fails "Kernel#clone with freeze: false calls #initialize_clone with kwargs freeze: false even if #initialize_clone only takes a single argument" # Expected ArgumentError (wrong number of arguments (given 2, expected 1)) but got: ArgumentError ([Clone#initialize_clone] wrong number of arguments (given 2, expected 1))
   fails "Kernel#clone with freeze: nil copies frozen?" # Fails because of "".freeze.clone(freeze: nil)
@@ -37,9 +33,7 @@ opal_unsupported_filter "freezing" do
   fails "String#+@ returns an unfrozen copy of a frozen String"
   fails "String#+@ returns self if the String is not frozen"
   fails "String#-@ deduplicates frozen strings" # Expected "this string is frozen" not to be identical to "this string is frozen"
-  fails "String#-@ interns the provided string if it is frozen" # NoMethodError: undefined method `-@' for "this string is unique and frozen 0.5421131713191049"
   fails "String#-@ returns a frozen copy if the String is not frozen"
-  fails "String#-@ returns self if the String is frozen"
   fails "String#<< raises a FrozenError when self is frozen" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#<< with Integer raises a FrozenError when self is frozen" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with Fixnum index raises a FrozenError when self is frozen" # NoMethodError: undefined method `[]=' for "hello":String

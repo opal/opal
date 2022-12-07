@@ -7,6 +7,7 @@ opal_filter "language" do
   fails "A Symbol literal with invalid bytes raises an EncodingError at parse time" # Actually passes, the error comes from the difference between MRI's opal and compiled opal-parser
   fails "A block yielded a single Array assigns elements to mixed argument types" # Expected [1, 2, [], 3, 2, {"x"=>9}] == [1, 2, [3], {"x"=>9}, 2, {}] to be truthy but was false
   fails "A block yielded a single Array assigns elements to required arguments when a keyword rest argument is present"
+  fails "A block yielded a single Array autosplats single argument to required arguments when a keyword rest argument is present" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on final argument to get keyword arguments and does not autosplat" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on the argument when optional argument and keyword argument accepted and does not autosplat" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on the last element if keyword arguments are present" # ArgumentError: expected kwargs
@@ -14,6 +15,7 @@ opal_filter "language" do
   fails "A block yielded a single Array does not treat final Hash as keyword arguments and does not autosplat" # Expected [nil, {"a"=>10}] == [[{"a"=>10}], {}] to be truthy but was false
   fails "A block yielded a single Array does not treat hashes with string keys as keyword arguments and does not autosplat" # Expected [nil, {"a"=>10}] == [[{"a"=>10}], {}] to be truthy but was false
   fails "A block yielded a single Array when non-symbol keys are in a keyword arguments Hash does not separate non-symbol keys and symbol keys and does not autosplat" # Expected [nil, {"a"=>10, "b"=>2}] == [[{"a"=>10, "b"=>2}], {}] to be truthy but was false
+  fails "A block yielded a single Object receives the object if it does not respond to #respond_to?" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0xb61c6>
   fails "A class definition extending an object (sclass) can use return to cause the enclosing method to return"
   fails "A class definition extending an object (sclass) raises a TypeError when trying to extend numbers"
   fails "A class definition raises TypeError if any constant qualifying the class is not a Module"
@@ -58,6 +60,7 @@ opal_filter "language" do
   fails "Allowed characters allows non-ASCII lowercased characters at the beginning" # Expected nil == 1 to be truthy but was false
   fails "Allowed characters allows not ASCII upcased characters at the beginning" # NameError: wrong constant name ἍBB
   fails "Allowed characters does not allow non-ASCII upcased characters at the beginning" # Expected SyntaxError (/dynamic constant assignment/) but no exception was raised ("test" was returned)
+  fails "Allowed characters parses a non-ASCII upcased character as a constant identifier" # Expected SyntaxError (/dynamic constant assignment/) but no exception was raised ("test" was returned)
   fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] to equal ["begin", "ensure"]
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block"
   fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] to equal ["class", "ensure"]
@@ -67,9 +70,15 @@ opal_filter "language" do
   fails "An instance method raises an error with too many arguments" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for 1)
   fails "An instance method with a default argument evaluates the default when required arguments precede it" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(0 for -2)
   fails "An instance method with a default argument prefers to assign to a default argument before a splat argument" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(0 for -2)
+  fails "Anonymous block forwarding forwards blocks to other functions that formally declare anonymous blocks" # LocalJumpError: no block given
+  fails "Anonymous block forwarding works alongside positional arguments and disallowed keyword arguments" # LocalJumpError: no block given
+  fails "Anonymous block forwarding works alongside positional arguments and splatted keyword arguments" # LocalJumpError: no block given
+  fails "Anonymous block forwarding works alongside positional parameters" # LocalJumpError: no block given
+  fails "Anonymous block forwarding works when it's the only declared parameter" # LocalJumpError: no block given
   fails "Assigning an anonymous module to a constant sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Executing break from within a block raises LocalJumpError when converted into a proc during a a super call" # Expected LocalJumpError but no exception was raised (1 was returned)
   fails "Executing break from within a block works when passing through a super call" # Expected to not get Exception
+  fails "Execution variable $: default $LOAD_PATH entries until sitelibdir included have @gem_prelude_index set" # Expected [].include? nil to be truthy but was false
   fails "Execution variable $: is initialized to an array of strings"
   fails "Execution variable $: is read-only"
   fails "Execution variable $: is the same object as $LOAD_PATH and $-I"
@@ -96,13 +105,35 @@ opal_filter "language" do
   fails "Heredoc string allows HEREDOC with <<-\"identifier\", allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<-identifier, allowing to indent identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
   fails "Heredoc string allows HEREDOC with <<identifier, interpolated" # Expected #<Encoding:UTF-16LE> to equal #<Encoding:ASCII-8BIT (dummy)>
+  fails "Inside 'endless' method definitions allows method calls without parenthesis" # NoMethodError: undefined method `concat' for "Hi, "
+  fails "Instance variables global variable when global variable is uninitialized warns about accessing uninitialized global variable in verbose mode" # Expected warning to match: /warning: global variable `\$specs_uninitialized_global_variable' not initialized/ but got: ""
   fails "Instantiating a singleton class raises a TypeError when allocate is called"
   fails "Instantiating a singleton class raises a TypeError when new is called"
+  fails "Interrupt shows the backtrace and has a signaled exit status" # NoMethodError: undefined method `popen' for IO
   fails "Keyword arguments are now separated from positional arguments when the method takes a ** parameter does not convert a positional Hash to keyword arguments" # Expected ArgumentError (wrong number of arguments (given 4, expected 3)) but no exception was raised (42 was returned)
   fails "Keyword arguments are now separated from positional arguments when the method takes a key: parameter when it's called with a positional Hash and no ** raises ArgumentError" # Expected ArgumentError (wrong number of arguments (given 4, expected 3)) but no exception was raised (42 was returned)
+  fails "Keyword arguments are separated from positional arguments" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation does not work with (*args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation omitted values accepts short notation 'key' for 'key: value' syntax" # NameError: uninitialized constant MSpecEnv::a
+  fails "Keyword arguments delegation works with (*args, **kwargs)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation works with (...)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation works with -> (*args, **kwargs) {}" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation works with call(*ruby2_keyword_args) with missing ruby2_keywords in between due to CRuby bug #18625" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation works with call(*ruby2_keyword_args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation works with proc { |*args, **kwargs| }" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation works with super(*ruby2_keyword_args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation works with yield(*ruby2_keyword_args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments delegation works with zsuper" # Expected [[], {}] == [[{}], {}] to be truthy but was false
+  fails "Keyword arguments empty kwargs are treated as if they were not passed when calling a method" # Expected [{}] == [] to be truthy but was false
+  fails "Keyword arguments empty kwargs are treated as if they were not passed when yielding to a block" # Expected [{}] == [] to be truthy but was false
+  fails "Keyword arguments extra keywords are not allowed without **kwrest" # Expected ArgumentError (unknown keyword: :kw2) but no exception was raised ([] was returned)
+  fails "Keyword arguments handle * and ** at the same call site" # Expected [{}] == [] to be truthy but was false
+  fails "Keyword arguments raises ArgumentError exception when required keyword argument is not passed" # Expected ArgumentError (/missing keyword: :c/) but got: ArgumentError (missing keyword: c)
+  fails "Keyword arguments raises ArgumentError for missing keyword arguments even if there are extra ones" # Expected ArgumentError (/missing keyword: :a/) but got: ArgumentError (missing keyword: a)
   fails "Literal (A::X) constant resolution uses the module or class #inspect to craft the error message if they are anonymous" # Expected NameError (/uninitialized constant <unusable info>::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50c0>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution uses the module or class #name to craft the error message" # Expected NameError (/uninitialized constant ModuleName::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x50ba>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution with dynamically assigned constants evaluates the right hand side before evaluating a constant path"
+  fails "Literal Ranges creates a simple range as an object literal" # Expected 1..3.equal? 1..3 to be truthy but was false
   fails "Literal Regexps caches the Regexp object"
   fails "Literal Regexps support handling unicode 9.0 characters with POSIX bracket expressions" # Expected "" to equal "𐓘"
   fails "Literal Regexps supports (?# )"
@@ -176,6 +207,8 @@ opal_filter "language" do
   fails "Operators <=> == === != =~ !~ have higher precedence than &&" # Expected false == false to be falsy but was true
   fails "Optional constant assignment with ||= causes side-effects of the module part to be applied (for nil constant)" # Expected 3 == 1 to be truthy but was false
   fails "Optional constant assignment with ||= causes side-effects of the module part to be applied only once (for undefined constant)" # Expected 2 == 1 to be truthy but was false
+  fails "Optional variable assignments using &&= using a #[] evaluates the index arguments in the correct order" # TypeError: NilClass can't be coerced into Numeric
+  fails "Optional variable assignments using &&= using a #[] evaluates the index precisely once" # Expected [] == ["x"] to be truthy but was false
   fails "Optional variable assignments using compounded constants with &&= assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Optional variable assignments using compounded constants with operator assignments" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Pattern matching Array pattern calls #deconstruct once for multiple patterns, caching the result" # Expected ["deconstruct", "deconstruct"] == ["deconstruct"] to be truthy but was false
@@ -204,6 +237,10 @@ opal_filter "language" do
   fails "Predefined global $/ does not call #to_str to convert the object to a String"
   fails "Predefined global $/ raises a TypeError if assigned a boolean"
   fails "Predefined global $/ raises a TypeError if assigned an Integer" # Expected TypeError but no exception was raised (#<Number>(#pretty_inspect raised #<TypeError: no implicit conversion of Number into String>) was returned)
+  fails "Predefined global $= warns when accessed" # Expected warning to match: /is no longer effective/ but got: ""
+  fails "Predefined global $= warns when assigned" # Expected warning to match: /is no longer effective/ but got: ""
+  fails "Predefined global $\\ does not call #to_str to convert the object to a String" # Expected TypeError but no exception was raised (#<MockObject:0x1b530 @name="$\\ value", @null=nil> was returned)
+  fails "Predefined global $\\ raises a TypeError if assigned not String" # Expected TypeError but no exception was raised (1 was returned)
   fails "Predefined global $_ is Thread-local"
   fails "Predefined global $_ is set at the method-scoped level rather than block-scoped"
   fails "Predefined global $stdout raises TypeError error if assigned to nil"
@@ -230,6 +267,10 @@ opal_filter "language" do
   fails "The __ENCODING__ pseudo-variable is the evaluated strings's one inside an eval"
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by a relative path" # we can't clear $LOADED_FEATURES, should be treated as readonly
   fails "The __FILE__ pseudo-variable equals the absolute path of a file loaded by an absolute path" # we can't clear $LOADED_FEATURES, should be treated as readonly
+  fails "The __FILE__ pseudo-variable with load equals the absolute path of a file loaded by a relative path" # LoadError: cannot load such file -- ruby/fixtures/code/file_fixture
+  fails "The __FILE__ pseudo-variable with load equals the absolute path of a file loaded by an absolute path" # LoadError: cannot load such file -- ruby/fixtures/code/file_fixture
+  fails "The __FILE__ pseudo-variable with require equals the absolute path of a file loaded by a relative path" # LoadError: cannot load such file -- ruby/fixtures/code/file_fixture
+  fails "The __FILE__ pseudo-variable with require equals the absolute path of a file loaded by an absolute path" # LoadError: cannot load such file -- ruby/fixtures/code/file_fixture
   fails "The __LINE__ pseudo-variable equals the line number of the text in a loaded file"
   fails "The alias keyword can create a new global variable, synonym of the original" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
   fails "The alias keyword can override an existing global variable and make them synonyms" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4478>
@@ -286,6 +327,7 @@ opal_filter "language" do
   fails "The yield call taking a single argument yielding to a lambda should not destructure an Array into multiple arguments" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block"
   fails "Using yield in a singleton class literal raises a SyntaxError" # Expected SyntaxError (/Invalid yield/) but got: SyntaxError (undefined method `uses_block!' for nil)
+  fails "Using yield in non-lambda block raises a SyntaxError" # Expected SyntaxError (/Invalid yield/) but got: SyntaxError (undefined method `uses_block!' for nil)
   fails "a method definition that sets more than one default parameter all to the same value only allows overriding the default value of the first such parameter in each set" # ArgumentError: [MSpecEnv#foo] wrong number of arguments(2 for -1)
   fails "a method definition that sets more than one default parameter all to the same value treats the argument after the multi-parameter normally" # ArgumentError: [MSpecEnv#bar] wrong number of arguments(3 for -1)
   fails "kwarg with omitted value in a method call accepts short notation 'kwarg' in method call for definition 'def call(*args, **kwargs) = [args, kwargs]'" # NameError: uninitialized constant SpecEvaluate::a

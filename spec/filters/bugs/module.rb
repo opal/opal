@@ -4,7 +4,6 @@ opal_filter "Module" do
   fails "Module#alias_method handles aliasing a method only present in a refinement" # NoMethodError: undefined method `refine' for #<Module:0x90fa>
   fails "Module#alias_method retains method visibility"
   fails "Module#alias_method returned value returns symbol of the defined method name" # Expected #<Class:0x1c94a> to be identical to "checking_return_value"
-  fails "Module#ancestors returns a list of modules included in self (including self)" # Expected [ModuleSpecs::Parent, Object, Shellwords, Kernel, BasicObject] == [ModuleSpecs::Parent, Object, Kernel, BasicObject] to be truthy but was false -- a random failure
   fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class"
   fails "Module#attr applies current visibility to methods created"
   fails "Module#attr converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
@@ -31,16 +30,22 @@ opal_filter "Module" do
   fails "Module#class_eval converts non string eval-string to string using to_str"
   fails "Module#class_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
   fails "Module#class_eval raises a TypeError when the given filename can't be converted to string using to_str"
+  fails "Module#class_eval raises an ArgumentError when a block and normal arguments are given" # Expected ArgumentError (wrong number of arguments (given 1, expected 0)) but got: ArgumentError (wrong number of arguments (1 for 0)    NOTE:If you want to enable passing a String argument please add "require 'opal-parser'" to your script )
+  fails "Module#class_eval raises an ArgumentError when more than 3 arguments are given" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but got: ArgumentError (wrong number of arguments (0 for 1..3))
+  fails "Module#class_eval raises an ArgumentError when no arguments and no block are given" # Expected ArgumentError (wrong number of arguments (given 0, expected 1..3)) but got: ArgumentError (wrong number of arguments (0 for 1..3))
   fails "Module#class_eval resolves constants in the caller scope ignoring send"
   fails "Module#class_eval resolves constants in the caller scope" # fails because of the difference between module_eval("Const") and module_eval { Const } (only the second one is supported by Opal)
   fails "Module#class_eval uses the optional filename and lineno parameters for error messages"
+  fails "Module#class_variables returns the correct class variables when inherit is given" # ArgumentError: [SubCVars.class_variables] wrong number of arguments (given 1, expected 0)
   fails "Module#const_defined? coerces the inherit flag to a boolean" # Expected true to be false
   fails "Module#const_defined? returns true for toplevel constant when the name begins with '::'"
   fails "Module#const_defined? returns true or false for the nested name"
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is default"
   fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is true"
   fails "Module#const_defined? returns true when passed a scoped constant name"
+  fails "Module#const_get accepts a toplevel scope qualifier when inherit is false" # NameError: uninitialized constant ConstantSpecs::CS_CONST1
   fails "Module#const_get coerces the inherit flag to a boolean" # Expected NameError but no exception was raised ("const1" was returned)
+  fails "Module#const_get raises a NameError when the nested constant does not exist on the module but exists in Object" # Expected NameError but no exception was raised ("const1" was returned)
   fails "Module#const_set sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#const_set when overwriting an existing constant does not warn after a failed autoload" # Expected NameError but got: LoadError (cannot load such file -- ruby/core/module/fixtures/autoload_o)
   fails "Module#const_set when overwriting an existing constant warns if the previous value was a normal value" # Expected warning to match: /already initialized constant/ but got: ""
@@ -60,6 +65,7 @@ opal_filter "Module" do
   fails "Module#const_source_location returns nil if the constant is defined in the receiver's superclass and the inherit flag is false" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location returns nil when the receiver is a Class, the constant is defined at toplevel and the inherit flag is false" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location returns nil when the receiver is a Module, the constant is defined at toplevel and the inherit flag is false" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
+  fails "Module#const_source_location returns updated location from const_set" # NoMethodError: undefined method `const_source_location' for #<Module:0x2b06c>
   fails "Module#const_source_location searches into the receiver superclasses if the inherit flag is true" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location with dynamically assigned constants returns path to a toplevel constant when the receiver is a Class" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#const_source_location with dynamically assigned constants returns path to a toplevel constant when the receiver is a Module" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
@@ -78,12 +84,17 @@ opal_filter "Module" do
   fails "Module#const_source_location with statically assigned constants searches location path the superclass chain" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
   fails "Module#constants doesn't returns inherited constants when passed nil"
   fails "Module#constants returns only public constants"
+  fails "Module#define_method converts non-String name to String with #to_str" # NoMethodError: undefined method `foo' for #<#<Class:0x686e2>:0x686e0>
   fails "Module#define_method passed { |a,|  } creates a method that does not destructure the passed argument" # Expected [1, 2] == 1 to be truthy but was false
+  fails "Module#define_method raises TypeError if name cannot converted to String" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (#<Class:0x68702> was returned)
+  fails "Module#define_method raises TypeError when #to_str called on non-String name returns non-String value" # Expected TypeError (/can't convert Object to String/) but no exception was raised (#<Class:0x68664> was returned)
   fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class"
   fails "Module#define_method raises a TypeError when a Method from one class is defined on an unrelated class"
   fails "Module#define_method raises a TypeError when an UnboundMethod from a child class is defined on a parent class"
   fails "Module#define_method raises a TypeError when an UnboundMethod from a singleton class is defined on another class" # Expected TypeError (/can't bind singleton method to a different class/) but no exception was raised (#<Class:0x47ae6> was returned)
   fails "Module#define_method raises a TypeError when an UnboundMethod from one class is defined on an unrelated class"
+  fails "Module#define_method raises a TypeError when the given method is no Method/Proc" # Expected TypeError (wrong argument type String (expected Proc/Method/UnboundMethod)) but got: TypeError (wrong argument type NilClass (expected Proc/Method))
+  fails "Module#define_method uses provided Method/Proc even if block is specified" # Expected "block_is_called" == "method_is_called" to be truthy but was false
   fails "Module#deprecate_constant accepts multiple symbols and strings as constant names"
   fails "Module#deprecate_constant raises a NameError when given an undefined name"
   fails "Module#deprecate_constant returns self"
@@ -95,8 +106,11 @@ opal_filter "Module" do
   fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0x4fbac> was returned)
   fails "Module#initialize_copy should produce a duped module with inspectable class methods" # NameError: undefined method `hello' for class `Module'
   fails "Module#initialize_copy should retain singleton methods when duped" # Expected [] to equal ["hello"]
+  fails "Module#instance_method converts non-String name by calling #to_str method" # NameError: undefined method `#<Object:0x2fc5c>' for class `ModuleSpecs::InstanceMeth'
+  fails "Module#instance_method raises TypeError when passed non-String name and #to_str returns non-String value" # Expected TypeError (/can't convert Object to String/) but got: NameError (undefined method `#<Object:0x2fbfc>' for class `ModuleSpecs::InstanceMeth')
   fails "Module#instance_method raises a NameError if the method has been undefined"
   fails "Module#instance_method raises a TypeError if not passed a symbol"
+  fails "Module#instance_method raises a TypeError if the given name is not a String/Symbol" # Expected TypeError (/is not a symbol nor a string/) but got: NameError (undefined method `' for class `Object')
   fails "Module#instance_method raises a TypeError if the given name is not a string/symbol"
   fails "Module#method_added is called with a precise caller location with the line of the 'def'" # NoMethodError: undefined method `caller_locations' for #<Module:0xaa8>
   fails "Module#method_defined? converts the given name to a string using to_str"
@@ -109,6 +123,9 @@ opal_filter "Module" do
   fails "Module#module_eval converts non string eval-string to string using to_str"
   fails "Module#module_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
   fails "Module#module_eval raises a TypeError when the given filename can't be converted to string using to_str"
+  fails "Module#module_eval raises an ArgumentError when a block and normal arguments are given" # Expected ArgumentError (wrong number of arguments (given 1, expected 0)) but got: ArgumentError (wrong number of arguments (1 for 0)    NOTE:If you want to enable passing a String argument please add "require 'opal-parser'" to your script )
+  fails "Module#module_eval raises an ArgumentError when more than 3 arguments are given" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but got: ArgumentError (wrong number of arguments (0 for 1..3))
+  fails "Module#module_eval raises an ArgumentError when no arguments and no block are given" # Expected ArgumentError (wrong number of arguments (given 0, expected 1..3)) but got: ArgumentError (wrong number of arguments (0 for 1..3))
   fails "Module#module_eval resolves constants in the caller scope ignoring send"
   fails "Module#module_eval resolves constants in the caller scope"
   fails "Module#module_eval uses the optional filename and lineno parameters for error messages"
@@ -159,13 +176,18 @@ opal_filter "Module" do
   fails "Module#remove_const calls #to_str to convert the given name to a String"
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
   fails "Module#ruby2_keywords acceps String as well" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40040>>
+  fails "Module#ruby2_keywords accepts String as well" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords applies to the underlying method and applies across aliasing" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords does NOT copy the Hash when calling a method taking (*args)" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (**kw)" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (arg)" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords makes a copy of the hash and only marks the copy as keyword hash" # Expected false == true to be truthy but was false
   fails "Module#ruby2_keywords marks the final hash argument as keyword hash" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40036>>
   fails "Module#ruby2_keywords prints warning when a method accepts keyword splat" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x4001e>>
   fails "Module#ruby2_keywords prints warning when a method accepts keywords" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40048>>
   fails "Module#ruby2_keywords prints warning when a method does not accept argument splat" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x4002e>>
   fails "Module#ruby2_keywords raises NameError when passed not existing method name" # Expected NameError (/undefined method `not_existing'/) but got: NoMethodError (undefined method `ruby2_keywords' for #<Class:#<Object:0x4003a>>)
   fails "Module#ruby2_keywords raises TypeError when passed not Symbol or String" # Expected TypeError (/is not a symbol nor a string/) but got: NoMethodError (undefined method `ruby2_keywords' for #<Class:#<Object:0x40026>>)
-  fails "Module#ruby2_keywords returns nil" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40044>>
   fails "Module#to_s always show the refinement name, even if the module is named" # NoMethodError: undefined method `refine' for ModuleSpecs::RefinementInspect
   fails "Module#to_s does not call #inspect or #to_s for singleton classes" # Expected "#<Class:#<:0x25bee>>" =~ /\A#<Class:#<#<Class:0x25bf2>:0x\h+>>\z/ to be truthy but was nil
   fails "Module#to_s for objects includes class name and object ID" # Expected "#<Class:#<ModuleSpecs::NamedClass:0xa424>>" =~ /^#<Class:#<ModuleSpecs::NamedClass:0x\h+>>$/ to be truthy but was nil
@@ -184,6 +206,7 @@ opal_filter "Module" do
   fails "Module#using scope of refinement is active for class defined via Class.new {}" # NoMethodError: undefined method `foo' for 1
   fails "Module#using scope of refinement is active for module defined via Module.new {}" # NoMethodError: undefined method `foo' for 1
   fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1
+  fails_badly "Module#ancestors returns a list of modules included in self (including self)" # Expected [ModuleSpecs::Parent, Object, Shellwords, Kernel, BasicObject] == [ModuleSpecs::Parent, Object, Kernel, BasicObject] to be truthy but was false -- a random failure
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NameError: undefined method `foo' for class `'
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#method" # NameError: undefined method `foo' for class `#<Class:0x581e4>'
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#respond_to?" # Expected false == true to be truthy but was false

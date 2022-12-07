@@ -45,6 +45,7 @@ opal_filter "Time" do
   fails "Time#strftime should be able to show the number of seconds since the unix epoch" # fails under FIJI et al TZs
   fails "Time#strftime should be able to show the timezone of the date with a : separator"
   fails "Time#strftime should be able to show the week number with the week starting on Sunday (%U) and Monday (%W)"
+  fails "Time#strftime supports RFC 3339 UTC for unknown offset local time, -0000, as %-z" # Expected "-0000" == "+0000" to be truthy but was false
   fails "Time#strftime with %N formats the microseconds of the second with %6N"
   fails "Time#strftime with %N formats the milliseconds of the second with %3N"
   fails "Time#strftime with %N formats the nanoseconds of the second with %9N"
@@ -66,6 +67,7 @@ opal_filter "Time" do
   fails "Time.at :in keyword argument could be UTC offset as a String in '+HH:MM or '-HH:MM' format" # TypeError: no implicit conversion of Hash into Integer
   fails "Time.at :in keyword argument could be UTC offset as a number of seconds" # TypeError: no implicit conversion of Hash into Integer
   fails "Time.at :in keyword argument could be a timezone object" # TypeError: no implicit conversion of Hash into Integer
+  fails "Time.at :in keyword argument raises ArgumentError if format is invalid" # Expected ArgumentError but got: TypeError (no implicit conversion of Hash into Integer)
   fails "Time.at passed Numeric passed BigDecimal doesn't round input value"
   fails "Time.at passed Numeric passed Rational returns Time with correct microseconds" # Expected 0 == 539759 to be truthy but was false
   fails "Time.at passed Numeric passed Rational returns Time with correct nanoseconds" # Expected 0 == 539759 to be truthy but was false
@@ -81,11 +83,17 @@ opal_filter "Time" do
   fails "Time.gm raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 UTC was returned)
   fails "Time.httpdate parses RFC-2616 strings" # NoMethodError: undefined method `httpdate' for Time
   fails "Time.local raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 +0200 was returned)
+  fails "Time.local uses the 'CET' timezone with TZ=Europe/Amsterdam in 1970" # Expected [0, 0, 0, 16, 5, 1970, 6, 136, false, "Central European Standard Time"] == [0, 0, 0, 16, 5, 1970, 6, 136, false, "CET"] to be truthy but was false
   fails "Time.mktime raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 +0200 was returned)
+  fails "Time.mktime uses the 'CET' timezone with TZ=Europe/Amsterdam in 1970" # Expected [0, 0, 0, 16, 5, 1970, 6, 136, false, "Central European Standard Time"] == [0, 0, 0, 16, 5, 1970, 6, 136, false, "CET"] to be truthy but was false
   fails "Time.new has at least microsecond precision" # NoMethodError: undefined method `nsec' for 2019-05-16 23:25:01 +0200
+  fails "Time.new uses the 'CET' timezone with TZ=Europe/Amsterdam in 1970" # Expected [0, 0, 0, 16, 5, 1970, 6, 136, false, "Central European Standard Time"] == [0, 0, 0, 16, 5, 1970, 6, 136, false, "CET"] to be truthy but was false
   fails "Time.new uses the local timezone" # Expected 10800 to equal -28800
   fails "Time.new with a timezone argument #name method cannot marshal Time if #name method isn't implemented" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
   fails "Time.new with a timezone argument #name method uses the optional #name method for marshaling" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.new with a timezone argument :in keyword argument could be UTC offset as a String in '+HH:MM or '-HH:MM' format" # ArgumentError: Opal doesn't support other types for a timezone argument than Integer and String
+  fails "Time.new with a timezone argument :in keyword argument could be UTC offset as a number of seconds" # ArgumentError: Opal doesn't support other types for a timezone argument than Integer and String
+  fails "Time.new with a timezone argument :in keyword argument could be a timezone object" # ArgumentError: Opal doesn't support other types for a timezone argument than Integer and String
   fails "Time.new with a timezone argument Time-like argument of #utc_to_local and #local_to_utc methods has attribute values the same as a Time object in UTC" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
   fails "Time.new with a timezone argument Time-like argument of #utc_to_local and #local_to_utc methods implements subset of Time methods" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
   fails "Time.new with a timezone argument accepts timezone argument that must have #local_to_utc and #utc_to_local methods" # Expected to not get Exception but got: ArgumentError (Opal doesn't support other types for a timezone argument than Integer and String)
@@ -105,6 +113,9 @@ opal_filter "Time" do
   fails "Time.new with a utc_offset argument raises ArgumentError if the month is greater than 12" # Expected ArgumentError (/(mon|argument) out of range/) but got: ArgumentError (Opal does not support explicitly specifying UTC offset for Time)
   fails "Time.new with a utc_offset argument raises ArgumentError if the utc_offset argument is greater than or equal to 10e9" # Expected ArgumentError but no exception was raised (2031-09-09 00:46:40 +27777746.66666666418314 was returned)
   fails "Time.new with a utc_offset argument returns a Time with a UTC offset specified as +HH:MM:SS" # ArgumentError: Opal does not support explicitly specifying UTC offset for Time
+  fails "Time.now :in keyword argument could be UTC offset as a String in '+HH:MM or '-HH:MM' format" # ArgumentError: [Time.now] wrong number of arguments (given 1, expected 0)
+  fails "Time.now :in keyword argument could be UTC offset as a number of seconds" # ArgumentError: [Time.now] wrong number of arguments (given 1, expected 0)
+  fails "Time.now :in keyword argument could be a timezone object" # ArgumentError: [Time.now] wrong number of arguments (given 1, expected 0)
   fails "Time.now has at least microsecond precision" # NoMethodError: undefined method `nsec' for 2019-05-16 23:25:03 +0200
   fails "Time.now uses the local timezone" # Expected 10800 to equal -28800
   fails "Time.rfc2822 parses RFC-2822 strings" # NoMethodError: undefined method `rfc2822' for Time

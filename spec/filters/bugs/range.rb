@@ -59,6 +59,8 @@ opal_filter "Range" do
   fails "Range#cover? range argument supports boundaries of different comparable types" # Expected false to be true
   fails "Range#eql? returns false if the endpoints are not eql?" # Expected 0..1 not to have same value or type as 0..1
   fails "Range#first raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised ([2] was returned)
+  fails "Range#frozen? is true for Range.new" # Expected 1..2.frozen? to be truthy but was false
+  fails "Range#frozen? is true for literal ranges" # Expected 1..2.frozen? to be truthy but was false
   fails "Range#hash generates an Integer for the hash value" # Expected "A,1,1,0" (String) to be an instance of Integer
   fails "Range#include? on string elements returns false if other is not matched by element.succ" # Expected true to be false
   fails "Range#include? with weird succ when excluded end value returns false if other is not matched by element.succ" # Expected true to be false
@@ -98,6 +100,7 @@ opal_filter "Range" do
   fails "Range#to_a works with Ranges of 64-bit integers" # Expected [256, 257] == [1099511627776, 1099511627777] to be truthy but was false
   fails "Range#to_s can show beginless ranges" # Expected "...1" == "...1.0" to be truthy but was false
   fails "Range#to_s can show endless ranges" # Expected "1..." == "1.0..." to be truthy but was false
+  fails "Range.new beginless/endless range creates a frozen range if the class is Range.class" # Expected 1..2.frozen? to be truthy but was false
   fails_badly "Range#min given a block raises RangeError when called with custom comparison method on an endless range" # Expected RangeError but got: Opal::SyntaxError (undefined method `type' for nil)
   fails_badly "Range#minmax on an exclusive range should return the minimum and maximum values for a numeric range without iterating the range"
   fails_badly "Range#step with an endless range and String values raises a TypeError when passed a Float step" # Expected TypeError but got: Opal::SyntaxError (undefined method `type' for nil)

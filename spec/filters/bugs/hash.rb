@@ -15,6 +15,7 @@ opal_filter "Hash" do
   fails "Hash#eql? computes equality for complex recursive hashes"
   fails "Hash#eql? computes equality for recursive hashes & arrays"
   fails "Hash#except always returns a Hash without a default" # NoMethodError: undefined method `except' for {"bar"=>12, "foo"=>42}
+  fails "Hash#hash allows ommiting values" # NameError: uninitialized constant MSpecEnv::a
   fails "Hash#inspect calls #to_s on the object returned from #inspect if the Object isn't a String" # Expected "{\"a\"=>abc}" to equal "{:a=>abc}"
   fails "Hash#inspect does not call #to_s on a String returned from #inspect" # Expected "{\"a\"=>\"abc\"}" to equal "{:a=>\"abc\"}"
   fails "Hash#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0x30638>}" to match /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/
@@ -39,12 +40,13 @@ opal_filter "Hash" do
   fails "Hash#transform_keys! allows a hash argument" # ArgumentError: [Hash#transform_keys!] wrong number of arguments(1 for 0)
   fails "Hash#transform_keys! on frozen instance raises a FrozenError on hash argument" # Expected FrozenError but got: ArgumentError ([Hash#transform_keys!] wrong number of arguments(1 for 0))
   fails "Hash#transform_keys! prevents conflicts between new keys and old ones" # Expected {"e"=>1} to equal {"b"=>1, "c"=>2, "d"=>3, "e"=>4}
+  fails "Hash#transform_keys! returns the processed keys and non evaluated keys if we break from the block" # Expected {"c"=>1, "d"=>4} == {"b"=>1, "c"=>2, "d"=>4} to be truthy but was false
   fails "Hash#transform_keys! returns the processed keys and non evaluated keys if we broke from the block" # Expected {"c"=>1, "d"=>4} == {"b"=>1, "c"=>2, "d"=>4} to be truthy but was false
   fails "Hash.[] raises for elements that are not arrays" # Expected ArgumentError but no exception was raised (nil was returned)
+  fails "Hash.ruby2_keywords_hash copies instance variables" # Expected nil == 42 to be truthy but was false
   fails "Hash.ruby2_keywords_hash raises TypeError for non-Hash" # Expected TypeError but got: NoMethodError (undefined method `ruby2_keywords_hash' for Hash)
   fails "Hash.ruby2_keywords_hash returns a copy of a Hash and marks the copy as a keywords Hash" # NoMethodError: undefined method `ruby2_keywords_hash' for Hash
   fails "Hash.ruby2_keywords_hash returns an instance of the subclass if called on an instance of a subclass of Hash" # NoMethodError: undefined method `ruby2_keywords_hash' for Hash
   fails "Hash.ruby2_keywords_hash? raises TypeError for non-Hash" # Expected TypeError but got: NoMethodError (undefined method `ruby2_keywords_hash?' for Hash)
-  fails "Hash.ruby2_keywords_hash? returns false if the Hash is not a keywords Hash" # NoMethodError: undefined method `ruby2_keywords_hash?' for Hash
   fails "Hash.ruby2_keywords_hash? returns true if the Hash is a keywords Hash marked by Module#ruby2_keywords" # NoMethodError: undefined method `ruby2_keywords' for #<Class:0x57648>
 end

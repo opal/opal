@@ -63,6 +63,8 @@ opal_filter "regular_expressions" do
   fails "Regexp.new given a String raises a RegexpError when passed an incorrect regexp"
   fails "Regexp.new given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits"
   fails "Regexp.new given a String with escaped characters raises a RegexpError if more than six hexadecimal digits are given"
+  fails "Regexp.new given a non-String/Regexp raises TypeError if #to_str returns non-String value" # Expected TypeError (/can't convert Object to String/) but got: TypeError (can't convert Object into String (Object#to_str gives Array))
+  fails "Regexp.new given a non-String/Regexp raises TypeError if there is no #to_str method for non-String/Regexp argument" # Expected TypeError (no implicit conversion of Integer into String) but got: TypeError (no implicit conversion of Number into String)
   fails "Regexp.new works by default for subclasses with overridden #initialize"
   fails "Regexp.quote sets the encoding of the result to BINARY if any non-US-ASCII characters are present in an input String with invalid encoding" # Expected true to be false
   fails "Regexp.try_convert returns nil if given an argument that can't be converted to a Regexp"

@@ -27,6 +27,8 @@ opal_filter "Float" do
   fails "Float#inspect uses non-e format for a positive value with whole part having 16 significant figures" # Expected "100000000000000" == "100000000000000.0" to be truthy but was false
   fails "Float#negative? on negative zero returns false" # Expected true to be false
   fails "Float#rationalize returns self as a simplified Rational with no argument" # precision errors caused by Math.frexp and Math.ldexp
+  fails "Float#round does not lose precision during the rounding process" # ArgumentError: [Number#round] wrong number of arguments (given 2, expected -1)
+  fails "Float#round preserves cases where neighbouring floating pointer number increase the decimal places" # ArgumentError: [Number#round] wrong number of arguments (given 2, expected -1)
   fails "Float#round raise for a non-existent round mode" # TypeError: no implicit conversion of Hash into Integer
   fails "Float#round raises FloatDomainError for exceptional values with a half option" # TypeError: no implicit conversion of Hash into Integer
   fails "Float#round returns big values rounded to nearest" # Expected 0 to have same value and type as 300000000000000000000
@@ -34,6 +36,8 @@ opal_filter "Float" do
   fails "Float#round rounds self to an optionally given precision with a half option" # ArgumentError: [Number#round] wrong number of arguments(2 for -1)
   fails "Float#round when 0.0 is given returns 0 for 0 or undefined ndigits" # TypeError: no implicit conversion of Hash into Integer
   fails "Float#round when 0.0 is given returns self for positive ndigits" # Expected "0" == "0.0" to be truthy but was false
+  fails "Float#to_i raises a FloatDomainError for NaN" # Expected FloatDomainError but no exception was raised (NaN was returned)
+  fails "Float#to_int raises a FloatDomainError for NaN" # Expected FloatDomainError but no exception was raised (NaN was returned)
   fails "Float#to_s encoding returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Float#to_s encoding returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Float#to_s matches random examples in all ranges" # Expected "4.9247416523566613e-8" to equal "4.9247416523566613e-08"
@@ -49,5 +53,6 @@ opal_filter "Float" do
   fails "Float#to_s uses non-e format for a negative value with whole part having 16 significant figures"
   fails "Float#to_s uses non-e format for a positive value with whole part having 15 significant figures"
   fails "Float#to_s uses non-e format for a positive value with whole part having 16 significant figures"
+  fails "Float#truncate raises a FloatDomainError for NaN" # Expected FloatDomainError but no exception was raised (NaN was returned)
   fails "Float#truncate returns self truncated to an Integer"
 end
