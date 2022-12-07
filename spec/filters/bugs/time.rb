@@ -125,4 +125,8 @@ opal_filter "Time" do
   fails "Time.utc handles fractional usec close to rounding limit" # NoMethodError: undefined method `nsec' for 2000-01-01 12:30:00 UTC
   fails "Time.utc raises an ArgumentError for out of range microsecond" # Expected ArgumentError but no exception was raised (2000-01-01 20:15:01 UTC was returned)
   fails "Time.xmlschema parses ISO-8601 strings" # NoMethodError: undefined method `xmlschema' for Time
+  fails_badly "Time#dst? dst? returns whether time is during daylight saving time" # Expected false == true to be truthy but was false
+  fails_badly "Time#isdst dst? returns whether time is during daylight saving time" # Expected false == true to be truthy but was false
+  fails_badly "Time#strftime with %z formats a local time with positive UTC offset as '+HHMM'" # Expected "+0900" == "+0100" to be truthy but was false
+  fails_badly "Time#yday returns an integer representing the day of the year, 1..366" # Expected 117 == 116 to be truthy but was false
 end
