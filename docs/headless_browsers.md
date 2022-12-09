@@ -1,14 +1,19 @@
-# Running code in a Headless Chrome
+# Running code in a Headless Browsers
 
 ## Requirements
 
-First of all, make sure that you have Chrome at least 59.0 installed.
+First of all, make sure that you have Chrome, at least version 59.0, installed or Firefox, at least version 106.
 
-## Using the runner
+## Using the runners
 
-To run your code using headless chrome, use `-R chrome` (`--runner chrome`) option:
+To run your code using headless Chrome, use `-R chrome` (`--runner chrome`) option:
 
     $ opal -Rchrome -e "puts 'Hello, Opal'"
+    Hello, Opal
+
+To run your code using headless Firefox, use `-R firefox` (`--runner firefox`) option:
+
+    $ opal -Rfirefox -e "puts 'Hello, Opal'"
     Hello, Opal
 
 The runner also listens for any exceptions and prints formatted stracktraces back to your console:
@@ -27,7 +32,7 @@ The runner also listens for any exceptions and prints formatted stracktraces bac
 
 ## Using exit codes
 
-By default headless chrome runner explicitly sets exit code to 1 when there was any error in the code.
+By default headless browser runner explicitly sets exit code to 1 when there was any error in the code.
 
     $ opal -Rchrome -e "42"; echo $?
     0
@@ -46,23 +51,21 @@ You can change final exit code by using `Kernel#exit`, but make sure to require 
     $ opal -Rchrome -ropal/platform -e "exit(1)"; echo $?
     1
 
-Also `Kernel#exit` doesn't abort your script. It simply takes the value that was passed to the first
-invocation and persists it in `window.OPAL_EXIT_CODE`. Later headless chrome runner extracts it from the chrome runtime.
-
 ## Known limitations
 
-1. `exit` doesn't abort you script (but `raise/throw` does)
-2. When you call `console.log(one, two, three)` from your code headless chrome prints only the first passed object.
+1. When you call `console.log(one, two, three)` from your code headless chrome prints only the first passed object.
    The reason behind it is the format of the message that chrome sends to the runner.
    Opal intentionally uses a simplified method from Chrome API (`Console.messageAdded`) to catch `console.log` invocations.
    (Check `lib/opal/cli_runners/chrome.js` do get more information)
 
 ## Internals
 
+### Chrome
+
 Under the hood when you call `opal -Rchrome -e 'your code'` Opal uses chrome runner that is defined in
 `lib/opal/cli_runners/chrome.rb`. This runner tries to connect to `localhost:9222` (9222 is a default port for a headless chrome server)
-or runs the server on its own. It detects your platform and uses a default path to the chrome executable
-(`Opal::CliRunners::Chrome#chrome_executable`) but you can override it by specifying `GOOGLE_CHROME_BINARY` environment
+or runs the server on its own. It detects your platform and uses a default path to the Chrome executable
+(`Opal::CliRunners::Chrome#chrome_executable`), but you can override it by specifying `GOOGLE_CHROME_BINARY` environment
 variable.
 
 When the server is up and running it passes compiled js code to `lib/opal/cli_runners/chrome_cdp_interface.rb`
@@ -70,6 +73,18 @@ as a plain input using stdin (basically, it's a second part of the runner).
 `chrome_cdp_interface.rb` is a node js + Opal script that does the main job. It runs any provided code on the running chrome server,
 catches errors and forwards console messages.
 
+### Firefox
+
+This runner tries to connect to `localhost:9333` (9333 is the default port for a headless firefox server used by Opal to prevent accidental
+connection to a lingering Chrome at port 9222)
+or runs the server on its own. It detects your platform and uses a default path to the Firefox executable
+(`Opal::CliRunners::Firefox#firefox_executable`), but you can override it by specifying `MOZILLA_FIREFOX_BINARY` environment
+variable.
+
+When the server is up and running it passes compiled js code to `lib/opal/cli_runners/firefox_cdp_interface.rb`
+as a plain input using stdin (basically, it's a second part of the runner).
+`firefox_cdp_interface.rb` is a node js + Opal script that does the main job. It runs any provided code on the running chrome server,
+catches errors and forwards console messages.
 
 ## Using a remote chrome server
 
@@ -82,6 +97,8 @@ you can override default values by specifying `CHROME_HOST` and `CHROME_PORT` en
 
 NOTE: `CHROME_HOST` requires a chrome server to be started. You can't start remotely a server on a different host.
 
+The `CHROME_HOST` and `CHROME_PORT` environment variables are also used by the Firefox runner, the underlying 'chrome-remote-interface'
+node module depends on them.
 
 ## Additional options
 
@@ -93,3 +110,5 @@ If you need to pass additional CLI options to the Chrome executable you can do s
 Docker users may need `CHROME_OPTS="--no-sandbox"` due to the user namespaces limitations.
 
 _For a list of additional options see https://developers.google.com/web/updates/2017/04/headless-chrome_
+
+For the Firefox runner use the `FIREFOX_OPTS` environment variable instead.
