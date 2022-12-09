@@ -49,4 +49,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-performance', '~> 1.1.0'
   spec.add_development_dependency 'rack', '~> 2.2'
   spec.add_development_dependency 'webrick'
+  spec.add_development_dependency 'benchmark_driver', '0.15.17' # version taken from test/cruby/common.mk
 end
