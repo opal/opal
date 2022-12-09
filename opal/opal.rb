@@ -20,5 +20,7 @@
 
 ::Object.require 'corelib/unsupported'
 
+::Object.require 'corelib/privacy'
+
 ::Object.require 'corelib/binding'
 ::Object.require 'corelib/irb'

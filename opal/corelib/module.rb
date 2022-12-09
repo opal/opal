@@ -569,10 +569,13 @@ class ::Module
 
     %x{
       var old = block.$$s,
+          old_def_priv = self.$$def_priv,
           result;
 
       block.$$s = null;
+      self.$$def_priv = 'public';
       result = block.apply(self, [self]);
+      self.$$def_priv = old_def_priv;
       block.$$s = old;
 
       return result;

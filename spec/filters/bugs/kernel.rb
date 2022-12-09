@@ -46,7 +46,6 @@ opal_filter "Kernel" do
   fails "Kernel#autoload? is a private method" # Expected Kernel to have private instance method 'autoload?' but it does not
   fails "Kernel#autoload? returns nil if no file has been registered for a constant" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x4b3b4 @loaded_features=["corelib/runtime", "opal", "opal/base"...]>
   fails "Kernel#autoload? returns the name of the file that will be autoloaded" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x4b3b4 @loaded_features=["corelib/runtime", "opal", "opal/base"...]>
-  fails "Kernel#caller is a private method" # Expected Kernel to have private instance method 'caller' but it does not
   fails "Kernel#caller returns an Array of caller locations using a custom offset" # Expected "ruby/core/kernel/fixtures/caller.rb:4:7:in `locations'" =~ /runner\/mspec.rb/ to be truthy but was nil
   fails "Kernel#caller returns an Array of caller locations using a range" # Expected 0 == 1 to be truthy but was false
   fails "Kernel#caller returns an Array with the block given to #at_exit at the base of the stack" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xafc18>
@@ -108,15 +107,8 @@ opal_filter "Kernel" do
   fails "Kernel#p is not affected by setting $\\, $/ or $," # NoMethodError: undefined method `tmp' for #<OutputToFDMatcher:0x49902 @to=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true> @expected="Next time, Gadget, NEXT TIME!\n" @to_name="STDOUT">
   fails "Kernel#pp lazily loads the 'pp' library and delegates the call to that library" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x572a>
   fails "Kernel#print prints $_ when no arguments are given" # Expected:   $stdout: "foo"       got:   $stdout: "" 
-  fails "Kernel#public_method changes the method called for super on a target aliased method" # NoMethodError: undefined method `public_method' for #<#<Class:0x5a558>:0x5a556>
-  fails "Kernel#public_method raises a NameError if we only repond_to_missing? method, true" # Expected NameError but no exception was raised ("Done public_method(handled_privately)" was returned)
-  fails "Kernel#public_method returns a method object for a valid method" # NoMethodError: undefined method `public_method' for #<KernelSpecs::Foo:0x5a56c>
-  fails "Kernel#public_method returns a method object for a valid singleton method" # NoMethodError: undefined method `public_method' for KernelSpecs::Foo
   fails "Kernel#public_method returns a method object if respond_to_missing?(method) is true" # Expected "Done public_method(handled_publicly)" (String) to be an instance of Method
   fails "Kernel#public_method the returned method object if respond_to_missing?(method) calls #method_missing with a Symbol name" # Expected "Done public_method(handled_publicly)" (String) to be an instance of Method
-  fails "Kernel#public_methods returns a list of names without protected accessible methods in the object" # Expected ["hachi", "ichi", "juu", "juu_ichi", "juu_ni", "roku", "san", "shi", "shichi"] not to include "juu_ichi"
-  fails "Kernel#public_methods when passed false returns a list of public methods in without its ancestors" # Expected ["f_pub", "f_pro", "f_pri"] == ["f_pub"] to be truthy but was false
-  fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors" # Expected ["f_pub", "f_pro", "f_pri"] == ["f_pub"] to be truthy but was false
   fails "Kernel#public_send includes `public_send` in the backtrace when passed a single incorrect argument" # Expected "method=\"public_send\" @object=nil> is not a symbol nor a string:in `TypeError: #<MSpecEnv:0x5399c '".include? "`public_send'" to be truthy but was false
   fails "Kernel#public_send includes `public_send` in the backtrace when passed not enough arguments" # Expected "<internal:corelib/runtime.js>:1546:5:in `Opal.ac'".include? "`public_send'" to be truthy but was false
   fails "Kernel#puts delegates to $stdout.puts" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x561c0 @name=nil @stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true>>
@@ -125,7 +117,6 @@ opal_filter "Kernel" do
   fails "Kernel#raise passes no arguments to the constructor when given only an exception class" # Expected #<Class:0x5390e> but got: ArgumentError ([#initialize] wrong number of arguments (given 1, expected 0))
   fails "Kernel#raise raises an ArgumentError when only cause is given" # Expected ArgumentError but got: TypeError (exception class/object expected)
   fails "Kernel#raise re-raises a previously rescued exception without overwriting the backtrace" # Expected "<internal:corelib/kernel.rb>:612:37:in `raise'" to include "ruby/shared/kernel/raise.rb:130:"
-  fails "Kernel#rand is a private method" # Expected Kernel to have private instance method 'rand' but it does not
   fails "Kernel#rand is random on boot" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x19c2a>
   fails "Kernel#rand supports custom object types" # Expected "NaN#<struct KernelSpecs::CustomRangeInteger value=1>" (String) to be an instance of KernelSpecs::CustomRangeInteger
   fails "Kernel#remove_instance_variable raises a FrozenError if self is frozen" # Expected FrozenError but got: NameError (instance variable @foo not defined)
@@ -240,7 +231,6 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf precision string formats determines the maximum number of characters to be copied from the string" # Expected "1" == "[" to be truthy but was false
   fails "Kernel#sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
   fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false
-  fails "Kernel#srand is a private method" # Expected Kernel to have private instance method 'srand' but it does not
   fails "Kernel#srand returns the system-initialized seed value on the first call" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x46d76 @seed=6933182541716747>
   fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: false/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: false " 
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer

@@ -3,6 +3,7 @@
 class ::Proc < `Function`
   `Opal.prop(self.$$prototype, '$$is_proc', true)`
   `Opal.prop(self.$$prototype, '$$is_lambda', false)`
+  `Opal.prop(self.$$prototype, '$$priv', 'public')`
 
   def self.new(&block)
     unless block

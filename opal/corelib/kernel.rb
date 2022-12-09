@@ -71,15 +71,11 @@ module ::Kernel
     }
   end
 
-  def public_methods(all = true)
-    %x{
-      if ($truthy(#{all})) {
-        return Opal.methods(self);
-      } else {
-        return Opal.receiver_methods(self);
-      }
-    }
-  end
+  # This is wrong on purpose - it will be refined once corelib/privacy
+  # has been loaded. In Ruby, public_methods has a slightly different
+  # semantic regarding methods if false has been passed - it loads both
+  # the singleton methods and the immediate class methods.
+  alias public_methods methods
 
   def Array(object)
     %x{

@@ -35,9 +35,17 @@ opal_unsupported_filter "privacy" do
   fails "Enumerator::Generator#initialize is a private method" # Expected Enumerator::Generator to have private instance method 'initialize' but it does not
   fails "Enumerator::Lazy#initialize is a private method" # Expected Enumerator::Lazy to have private instance method 'initialize' but it does not
   fails "Enumerator::Yielder#initialize is a private method" # Expected Enumerator::Yielder to have private instance method 'initialize' but it does not
+  fails "Kernel has private instance method Array()" # Expected Kernel to have private instance method 'Array' but it does not
+  fails "Kernel has private instance method Hash()" # Expected Kernel to have private instance method 'Hash' but it does not
+  fails "Kernel#Float is a private method" # Expected Kernel to have private instance method 'Float' but it does not
+  fails "Kernel#Integer is a private method" # Expected Kernel to have private instance method 'Integer' but it does not
   fails "Kernel#Pathname is a private instance method" # Expected Kernel to have private instance method 'Pathname' but it does not
+  fails "Kernel#String is a private method" # Expected Kernel to have private instance method 'String' but it does not
   fails "Kernel#block_given? is a private method" # Expected Kernel to have private instance method 'block_given?' but it does not
+  fails "Kernel#eql? is a public instance method" # Expected Kernel to have public instance method 'eql?' but it does not
   fails "Kernel#eval is a private method" # Expected Kernel to have private instance method 'eval' but it does not
+  fails "Kernel#fail is a private method" # Expected Kernel to have private instance method 'fail' but it does not
+  fails "Kernel#format is a private method" # Expected Kernel to have private instance method 'format' but it does not
   fails "Kernel#initialize_clone is a private instance method" # Expected Kernel to have private instance method 'initialize_clone' but it does not
   fails "Kernel#initialize_dup is a private instance method" # Expected Kernel to have private instance method 'initialize_dup' but it does not
   fails "Kernel#local_variables is a private method" # Expected Kernel to have private instance method 'local_variables' but it does not
@@ -47,25 +55,9 @@ opal_unsupported_filter "privacy" do
   fails "Kernel#private_methods returns a list of the names of privately accessible methods in the object and its ancestors and mixed-in modules" # Expected [] to include "shichi"
   fails "Kernel#private_methods returns a list of the names of privately accessible methods in the object" # Expected [] to include "shichi"
   fails "Kernel#private_methods returns private methods mixed in to the metaclass" # Expected [] to include "shoo"
-  fails "Kernel#private_methods when not passed an argument returns a unique list for a class including a module" # Expected [] == ["pri"] to be truthy but was false
-  fails "Kernel#private_methods when not passed an argument returns a unique list for a subclass of a class that includes a module" # Expected [] == ["pri"] to be truthy but was false
-  fails "Kernel#private_methods when not passed an argument returns a unique list for an object extended by a module" # Expected [] == ["pri"] to be truthy but was false
-  fails "Kernel#private_methods when passed false returns a list of private methods in without its ancestors" # Expected [] == ["ds_pri", "fs_pri"] to be truthy but was false
-  fails "Kernel#private_methods when passed nil returns a list of private methods in without its ancestors" # Expected [] == ["ds_pri", "fs_pri"] to be truthy but was false
-  fails "Kernel#private_methods when passed true returns a unique list for a class including a module" # Expected [] == ["pri"] to be truthy but was false
-  fails "Kernel#private_methods when passed true returns a unique list for a subclass of a class that includes a module" # Expected [] == ["pri"] to be truthy but was false
-  fails "Kernel#private_methods when passed true returns a unique list for an object extended by a module" # Expected [] == ["pri"] to be truthy but was false
   fails "Kernel#protected_methods returns a list of the names of protected methods accessible in the object and from its ancestors and mixed-in modules" # Expected [] to include "juu_ichi"
   fails "Kernel#protected_methods returns a list of the names of protected methods accessible in the object" # Expected [] to include "juu_ichi"
   fails "Kernel#protected_methods returns methods mixed in to the metaclass" # Expected [] to include "nopeeking"
-  fails "Kernel#protected_methods when not passed an argument returns a unique list for a class including a module" # Expected [] == ["pro"] to be truthy but was false
-  fails "Kernel#protected_methods when not passed an argument returns a unique list for a subclass of a class that includes a module" # Expected [] == ["pro"] to be truthy but was false
-  fails "Kernel#protected_methods when not passed an argument returns a unique list for an object extended by a module" # Expected [] == ["pro"] to be truthy but was false
-  fails "Kernel#protected_methods when passed false returns a list of protected methods in without its ancestors" # Expected [] == ["ds_pro", "fs_pro"] to be truthy but was false
-  fails "Kernel#protected_methods when passed nil returns a list of protected methods in without its ancestors" # Expected [] == ["ds_pro", "fs_pro"] to be truthy but was false
-  fails "Kernel#protected_methods when passed true returns a unique list for a class including a module" # Expected [] == ["pro"] to be truthy but was false
-  fails "Kernel#protected_methods when passed true returns a unique list for a subclass of a class that includes a module" # Expected [] == ["pro"] to be truthy but was false
-  fails "Kernel#protected_methods when passed true returns a unique list for an object extended by a module" # Expected [] == ["pro"] to be truthy but was false
   fails "Kernel#public_send called from own public method raises a NoMethodError if the method is private" # Expected NoMethodError but got: RuntimeError (Should not called)
   fails "Kernel#public_send called from own public method raises a NoMethodError if the method is protected" # Expected NoMethodError but got: RuntimeError (Should not called)
   fails "Kernel#public_send raises a NoMethodError if the method is protected" # Expected NoMethodError but no exception was raised ("done" was returned)
@@ -73,6 +65,7 @@ opal_unsupported_filter "privacy" do
   fails "Kernel#public_send raises a NoMethodError if the named method is an alias of a protected method" # Expected NoMethodError but no exception was raised ("done2" was returned)
   fails "Kernel#public_send raises a NoMethodError if the named method is private" # Expected NoMethodError but no exception was raised ("done2" was returned)
   fails "Kernel#puts is a private method" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x2d0e6 @name=nil @stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="read" @write_proc=#<Proc:0x2d0ec> @tty=true>>
+  fails "Kernel#raise is a private method" # Expected Kernel to have private instance method 'raise' but it does not
   fails "Kernel#respond_to? does not change method visibility when finding private method" # Expected true == false to be truthy but was false
   fails "Kernel#respond_to? returns false even if obj responds to the given private method (include_private = false)" # Expected true == false to be truthy but was false
   fails "Kernel#respond_to? returns false if obj responds to the given private method" # Expected true == false to be truthy but was false
@@ -114,12 +107,11 @@ opal_unsupported_filter "privacy" do
   fails "Kernel#singleton_methods when passed true does not return private singleton methods for a class extended with a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::P
   fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x4496 @name="Object extended" @null=nil>
   fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x44a2 @name="Object extended twice" @null=nil>
+  fails "Kernel#sleep is a private method" # Expected Kernel to have private instance method 'sleep' but it does not
   fails "Kernel.global_variables is a private method" # Expected Kernel to have private instance method 'global_variables' but it does not
   fails "Kernel.lambda is a private method" # Expected Kernel to have private instance method 'lambda' but it does not
   fails "Kernel.loop is a private method" # Expected Kernel to have private instance method 'loop' but it does not
   fails "Kernel.proc is a private method" # Expected Kernel to have private instance method 'proc' but it does not
-  fails "Method#== missing methods calls respond_to_missing? with true to include private methods" # Mock '#<MethodSpecs::Methods:0x49b7c>' expected to receive respond_to_missing?("some_missing_method", true) exactly 1 times but received it 0 times
-  fails "Method#eql? missing methods calls respond_to_missing? with true to include private methods" # Mock '#<MethodSpecs::Methods:0x36ba8>' expected to receive respond_to_missing?("some_missing_method", true) exactly 1 times but received it 0 times
   fails "Module#alias_method aliasing special methods keeps initialize private when aliasing" # Expected false to be true
   fails "Module#alias_method aliasing special methods keeps initialize_clone private when aliasing" # Expected false to be true
   fails "Module#alias_method aliasing special methods keeps initialize_copy private when aliasing" # Expected false to be true
@@ -149,13 +141,7 @@ opal_unsupported_filter "privacy" do
   fails "Module#private makes the target method uncallable from other types" # Expected NoMethodError but no exception was raised (true was returned)
   fails "Module#private only makes the method private in the class it is called on" # Expected NameError but no exception was raised (2 was returned)
   fails "Module#private raises a NameError when given an undefined name" # Expected NameError but no exception was raised ("undefined" was returned)
-  fails "Module#private without arguments affects evaled method definitions when itself is outside the eval" # Expected #<Module:0x2bfce> to have private instance method 'test1' but it does not
-  fails "Module#private without arguments affects normally if itself and following method definitions are inside a eval" # Expected #<Module:0x2bc96> to have private instance method 'test1' but it does not
-  fails "Module#private without arguments affects normally if itself and method definitions are inside a module_eval" # Expected #<Module:0x2bd64> to have private instance method 'test1' but it does not
-  fails "Module#private without arguments continues setting visibility if the body encounters other visibility setters with arguments" # Expected #<Module:0x2bd70> to have private instance method 'test2' but it does not
-  fails "Module#private without arguments sets visibility to following method definitions" # Expected #<Module:0x2bd6a> to have private instance method 'test1' but it does not
-  fails "Module#private without arguments stops setting visibility if the body encounters other visibility setters without arguments" # Expected #<Module:0x2bea2> to have protected instance method 'test1' but it does not
-  fails "Module#private without arguments within a closure sets the visibility outside the closure" # Expected #<Module:0x2bfd4> to have private instance method 'test1' but it does not
+  fails "Module#private without arguments does not affect method definitions when itself is inside an eval and method definitions are outside" # Expected #<Module:0x33796> to have public instance method 'test1' but it does not
   fails "Module#private_class_method accepts more than one method at a time" # Expected NoMethodError but no exception was raised (nil was returned)
   fails "Module#private_class_method makes a class method private" # Expected NoMethodError but no exception was raised ("foo" was returned)
   fails "Module#private_class_method makes an existing class method private up the inheritance tree" # Expected NoMethodError but no exception was raised (nil was returned)
@@ -180,11 +166,7 @@ opal_unsupported_filter "privacy" do
   fails "Module#private_constant marked constants in a module is not defined? with A::B form" # Expected "constant" == nil to be truthy but was false
   fails "Module#private_constant marked constants remain private even when updated" # Expected warning to match: /already initialized constant/ but got: ""
   fails "Module#private_instance_methods returns a list of private methods in module and its ancestors" # Expected ModuleSpecs::CountsMixin to have private instance method 'private_3' but it does not
-  fails "Module#private_instance_methods when not passed an argument returns a unique list for a class including a module" # Expected [] == ["pri"] to be truthy but was false
-  fails "Module#private_instance_methods when not passed an argument returns a unique list for a subclass" # Expected [] == ["pri"] to be truthy but was false
   fails "Module#private_instance_methods when passed false as a parameter, should return only methods defined in that module" # Expected ModuleSpecs::CountsMixin to have private instance method 'private_3' but it does not
-  fails "Module#private_instance_methods when passed true returns a unique list for a class including a module" # Expected [] == ["pri"] to be truthy but was false
-  fails "Module#private_instance_methods when passed true returns a unique list for a subclass" # Expected [] == ["pri"] to be truthy but was false
   fails "Module#private_method_defined? accepts symbols for the method name" # Expected false == true to be truthy but was false
   fails "Module#private_method_defined? calls #to_str to convert an Object" # Expected false == true to be truthy but was false
   fails "Module#private_method_defined? raises a TypeError if passed an object that defines #to_sym" # Expected TypeError but no exception was raised (false was returned)
@@ -197,19 +179,9 @@ opal_unsupported_filter "privacy" do
   fails "Module#protected makes a public Object instance method protected in a new module" # Expected #<Module:0x4c5f6> to have protected instance method 'module_specs_public_method_on_object' but it does not
   fails "Module#protected makes an existing class method protected" # Expected NoMethodError but no exception was raised (5 was returned)
   fails "Module#protected raises a NameError when given an undefined name" # Expected NameError but no exception was raised ("undefined" was returned)
-  fails "Module#protected without arguments affects evaled method definitions when itself is outside the eval" # Expected #<Module:0x4cace> to have protected instance method 'test1' but it does not
-  fails "Module#protected without arguments affects normally if itself and following method definitions are inside a eval" # Expected #<Module:0x4c796> to have protected instance method 'test1' but it does not
-  fails "Module#protected without arguments affects normally if itself and method definitions are inside a module_eval" # Expected #<Module:0x4c79c> to have protected instance method 'test1' but it does not
-  fails "Module#protected without arguments continues setting visibility if the body encounters other visibility setters with arguments" # Expected #<Module:0x4c8d4> to have protected instance method 'test2' but it does not
-  fails "Module#protected without arguments sets visibility to following method definitions" # Expected #<Module:0x4c8da> to have protected instance method 'test1' but it does not
-  fails "Module#protected without arguments stops setting visibility if the body encounters other visibility setters without arguments" # Expected #<Module:0x4c7a2> to have private instance method 'test1' but it does not
-  fails "Module#protected without arguments within a closure sets the visibility outside the closure" # Expected #<Module:0x4cad4> to have protected instance method 'test1' but it does not
+  fails "Module#protected without arguments does not affect method definitions when itself is inside an eval and method definitions are outside" # Expected #<Module:0x3a2ae> to have public instance method 'test1' but it does not
   fails "Module#protected_instance_methods returns a list of protected methods in module and its ancestors" # Expected [] to include "protected_3"
-  fails "Module#protected_instance_methods when not passed an argument returns a unique list for a class including a module" # Expected [] == ["pro"] to be truthy but was false
-  fails "Module#protected_instance_methods when not passed an argument returns a unique list for a subclass" # Expected [] == ["pro"] to be truthy but was false
   fails "Module#protected_instance_methods when passed false as a parameter, should return only methods defined in that module" # Expected [] == ["protected_3"] to be truthy but was false
-  fails "Module#protected_instance_methods when passed true returns a unique list for a class including a module" # Expected [] == ["pro"] to be truthy but was false
-  fails "Module#protected_instance_methods when passed true returns a unique list for a subclass" # Expected [] == ["pro"] to be truthy but was false
   fails "Module#protected_method_defined? accepts symbols for the method name" # Expected false == true to be truthy but was false
   fails "Module#protected_method_defined? calls #to_str to convert an Object" # Expected false == true to be truthy but was false
   fails "Module#protected_method_defined? raises a TypeError if passed an object that defines #to_sym" # Expected TypeError but no exception was raised (false was returned)
@@ -222,7 +194,6 @@ opal_unsupported_filter "privacy" do
   fails "Module#public makes a private Object instance method public in a new module" # Expected #<Module:0x1b994> to have public instance method 'module_specs_private_method_on_object' but it does not
   fails "Module#public raises a NameError when given an undefined name" # Expected NameError but no exception was raised ("undefined" was returned)
   fails "Module#public without arguments does not affect method definitions when itself is inside an eval and method definitions are outside" # Expected #<Module:0x1bd3c> to have protected instance method 'test1' but it does not
-  fails "Module#public without arguments stops setting visibility if the body encounters other visibility setters without arguments" # Expected #<Module:0x1bd46> to have protected instance method 'test1' but it does not
   fails "Module#public_class_method accepts more than one method at a time" # Expected NameError but no exception was raised (nil was returned)
   fails "Module#public_class_method makes an existing class method public up the inheritance tree" # Expected NoMethodError but no exception was raised (nil was returned)
   fails "Module#public_class_method makes an existing class method public" # Expected NoMethodError but no exception was raised (nil was returned)
@@ -242,6 +213,7 @@ opal_unsupported_filter "privacy" do
   fails "Module#public_method_defined? raises a TypeError if passed false" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#public_method_defined? raises a TypeError if passed nil" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#public_method_defined? returns false if method is not a public method" # Expected true == false to be truthy but was false
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_method" # NameError: undefined method `foo' for class `#<Class:0x87350>'
   fails "Module#remove_const is a private method" # Expected [] to include "remove_const"
   fails "NoMethodError#message for an protected method match /protected method/" # No behavior expectation was found in the example
   fails "NoMethodError#message for private method match /private method/" # No behavior expectation was found in the example
