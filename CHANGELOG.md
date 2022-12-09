@@ -16,7 +16,7 @@ Changes are grouped as follows:
 
 
 
-## [1.6.0](https://github.com/opal/opal/compare/v1.5.1...v1.6.0) - 2022-11-24
+## [1.6.1](https://github.com/opal/opal/compare/v1.6.0...v1.6.1) - 2022-12-09
 
 
 <!--
@@ -28,6 +28,20 @@ Changes are grouped as follows:
 ### Performance
 ### Fixed
 -->
+
+### Fixed
+
+- Fix builder.dup breaking Tilt support ([#2479](https://github.com/opal/opal/pull/2479))
+
+### Changed
+
+- Build also opal variants for the CDN: opal/mini.js etc. ([#2489](https://github.com/opal/opal/pull/2489))
+
+
+
+
+## [1.6.0](https://github.com/opal/opal/compare/v1.5.1...v1.6.0) - 2022-11-24
+
 
 ### Changed
 
