@@ -1,0 +1,28 @@
+#
+# Compare call overhead
+#
+prelude: |
+  class Test
+    def test(a)
+      a + a
+    end
+
+    def method_missing(method, a)
+      a + a
+    end
+
+    alias testal test
+    alias_method :testam, :test
+  end
+
+  instance = Test.new
+
+  %x{function testing(a) {return a+a;}}
+benchmark:
+  method: instance.test(__bmdv_i)
+  alias: instance.testal(__bmdv_i)
+  alias_method: instance.testam(__bmdv_i)
+  method_missing: instance.testmi(__bmdv_i)
+  js_funcall: |
+    %x{testing(__bmdv_i)}
+loop_count: 1000000
