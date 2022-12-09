@@ -15,6 +15,7 @@ DESC
 task :dist do
   require 'opal/util'
   require 'opal/config'
+  require 'fileutils'
 
   Opal::Config.arity_check_enabled = false
   Opal::Config.const_missing_enabled = false
@@ -23,7 +24,8 @@ task :dist do
 
   build_dir = ENV['DIR'] || 'build'
   files     = ENV['FILES'] ? ENV['FILES'].split(',') :
-              Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') }
+              Dir['{opal,stdlib}/*.rb'].map { |lib| File.basename(lib, '.rb') } +
+              Dir['opal/opal/*.rb'].map { |lib| 'opal/' + File.basename(lib, '.rb') }
   formats = (ENV['FORMATS'] || 'js,min,gz').split(',')
 
   mkdir_p build_dir unless File.directory? build_dir
@@ -36,13 +38,15 @@ task :dist do
       $stdout.flush
 
       # Set requirable to true, unless building opal. This allows opal to be auto-loaded.
-      requirable = (lib != 'opal')
+      requirable = (%w[opal opal/mini opal/base].include? lib)
       builder = Opal::Builder.build(lib, requirable: requirable)
 
       src = builder.to_s if (formats & %w[js min gz]).any?
       src << ";" << builder.source_map.to_data_uri_comment if (formats & %w[map]).any?
       min = Opal::Util.uglify src if (formats & %w[min gz]).any?
       gzp = Opal::Util.gzip min if (formats & %w[gz]).any?
+
+      FileUtils.mkdir_p(File.dirname("#{build_dir}/#{lib}.js"))
 
       File.open("#{build_dir}/#{lib}.js", 'w+')        { |f| f << src }
       File.open("#{build_dir}/#{lib}.min.js", 'w+')    { |f| f << min } if min
