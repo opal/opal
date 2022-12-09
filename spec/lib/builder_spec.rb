@@ -68,6 +68,16 @@ RSpec.describe Opal::Builder do
         b2.send(m).should_not equal(builder.send(m))
       end
     end
+
+    it 'processes dependencies correctly' do
+      b2 = builder
+      2.times do
+        b2 = b2.dup
+        source = 'require "json"'
+        b2.build_str(source, 'bar.rb')
+        b2.to_s.should include("$to_json")
+      end
+    end
   end
 
   describe 'requiring a native .js file' do
