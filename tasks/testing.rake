@@ -1,7 +1,9 @@
 require_relative "#{__dir__}/../lib/opal/os"
+require_relative "#{__dir__}/../lib/opal/cli_runners"
+
 require 'rspec/core/rake_task'
 
-OS = Opal::OS
+OS = Opal::OS unless defined? OS
 
 RSpec::Core::RakeTask.new(:rspec) do |t|
   t.pattern = 'spec/lib/**/*_spec.rb'
@@ -283,8 +285,8 @@ Use PATTERN environment variable to manually set the glob for specs:
   bundle exec rake mspec_nodejs PATTERN=spec/ruby/core/module/class_variable*_spec.rb
   bundle exec rake mspec_nodejs PATTERN=spec/ruby/core/numeric/**_spec.rb
 DESC
-
-platforms = %w[nodejs opalopal_nodejs server chrome gjs quickjs]
+runners = Opal::CliRunners.to_h.keys.map(&:to_s).reject { |r| r == 'compiler' }
+platforms = (%w[opalopal_nodejs] + runners).sort
 node_platforms = %w[nodejs opalopal_nodejs]
 mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
