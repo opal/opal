@@ -64,6 +64,7 @@ module Opal
     register_runner :applescript, :Applescript, 'opal/cli_runners/applescript'
     register_runner :chrome,      :Chrome,      'opal/cli_runners/chrome'
     register_runner :compiler,    :Compiler,    'opal/cli_runners/compiler'
+    register_runner :deno,        :Deno,        'opal/cli_runners/deno'
     register_runner :nashorn,     :Nashorn,     'opal/cli_runners/nashorn'
     register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
     register_runner :gjs,         :Gjs,         'opal/cli_runners/gjs'
