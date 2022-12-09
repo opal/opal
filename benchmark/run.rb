@@ -1,15 +1,53 @@
-if RUBY_ENGINE == 'opal'
-  require 'opal/compiler'
-  require 'nodejs'
-  require 'corelib/string/unpack'
-end
+require 'open3'
+require 'optparse'
+require 'opal/os'
+require 'opal/cli_runners'
 
-BEST_OF_N = Integer(ENV['BEST_OF_N']) rescue 1
-
-require 'benchmark'
+OS = Opal::OS
 
 files = ARGV
 
+# ruby exes
+
+ruby_exe = Gem.ruby
+
+bench_exe = {
+  "chrome"  => "bin/opal -Rchrome -rheadless_browser/base -rheadless_browser/file",
+  "firefox" => "bin/opal -Rfirefox -rheadless_browser/base -rheadless_browser/file",
+  "deno"    => "bin/opal -Rdeno -rdeno/file",
+  "nodejs"  => "bin/opal -Rnodejs -rnodejs/file",
+}.transform_values { |i| "#{ruby_exe} #{i}" }
+
+# runners
+runners = Opal::CliRunners.registered_runners.sort.reject { |r| r == 'Compiler' }
+
+# rubies for benchmark_driver
+selected_rubies = []
+
+OptionParser.new do |parser|
+  parser.banner = "Usage: run.rb runner(s) [files...]"
+  parser.on("--ruby", "Use system Ruby") { rubies << ruby_exe }
+
+  runners.each do |runner|
+    runner_dc = runner.downcase
+    parser.on("--#{runner_dc}", "Use Opal #{runner} runner") { selected_rubies << [runner_dc, bench_exe[runner_dc]] }
+  end
+end.parse!
+
+# check if rubies exist
+raise "No runner! Must provide at least one runner with --{runner name}, eg. --chrome or --firefox." if selected_rubies.empty?
+selected_rubies.each do |ruby, command|
+  raise "The #{ruby} does not exist yet. Pleas use another runner." unless command
+end
+
+rubies = selected_rubies.map(&:last).join(';')
+
+if ENV['OPAL_BENCH_EXTRA_RUBIES']
+  rubies << ';'
+  rubies << ENV['OPAL_BENCH_EXTRA_RUBIES']
+end
+
+# files
 if files.empty?
   files = File.read('benchmark/benchmarks').lines.map(&:strip).reject do |line|
     line.empty? || line.start_with?('#')
@@ -18,39 +56,22 @@ end
 
 files = files.shuffle
 
-maxlen = files.max_by{|file| file.length}.length + 1
-
-total_time = 0
-
+# run
 files.each do |file|
-  print file, " " * (maxlen - file.length)
-
-  times = []
-
-  if RUBY_ENGINE == 'opal'
-    code = File.read(file)
-    code = "Benchmark.measure { #{code} }"
-    code = Opal.compile(code, file: file)
-
-    BEST_OF_N.times do
-      times << `eval(code)`
-    end
-  else
-    code = File.read(file)
-    code = "Benchmark.measure { #{code} }"
-
-    BEST_OF_N.times do
-      times << eval(code)
-    end
+  if !File.exist?(file)
+    STDERR.puts "Error: #{file} does not exist!"
+    next
   end
-
-  time = times.min_by{|t| t.real}
-
-  total_time += time.real
-
-  print time.real, "\n"
+  STDERR.puts "\nBenchmarking #{file} started at #{Time.now}:"
+  out, err, status = Open3.capture3("bundle exec benchmark-driver -e \"#{rubies}\" #{file}")
+  if out.include?('ERROR')
+    # print errors
+    STDERR.puts "ERROR:\n#{err}"
+  end
+  # print numbers to STDOUT for tee to record
+  c_idx = out.index("Calculating")
+  out[c_idx..-1].each_line { |line| puts line if line.include?(' times in ') && !line.include?('ERROR')}
+  # print complete output to STDERR for a nice view
+  STDERR.puts out
 end
-
-bottom_line = "Executed #{ files.length } benchmark#{ 's' if files.length != 1} in #{ total_time } sec"
-$stderr.print "=" * bottom_line.length, "\n"
-$stderr.print bottom_line, "\n"
+STDERR.puts "\n\n" # keep this because of tee delay (Windows)

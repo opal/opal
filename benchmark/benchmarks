@@ -1,103 +1,415 @@
-test/cruby/benchmark/bm_app_answer.rb
-#[error] test/cruby/benchmark/bm_app_aobench.rb
-#[error] test/cruby/benchmark/bm_app_erb.rb
-test/cruby/benchmark/bm_app_factorial.rb
-test/cruby/benchmark/bm_app_fib.rb
-#[too long] test/cruby/benchmark/bm_app_lc_fizzbuzz.rb
-#[error] test/cruby/benchmark/bm_app_mandelbrot.rb
-#[too long] test/cruby/benchmark/bm_app_pentomino.rb
-#[longish] test/cruby/benchmark/bm_app_raise.rb
-test/cruby/benchmark/bm_app_strconcat.rb
-test/cruby/benchmark/bm_app_tak.rb
-test/cruby/benchmark/bm_app_tarai.rb
-#[error] test/cruby/benchmark/bm_app_uri.rb
-#[error] test/cruby/benchmark/bm_hash_aref_flo.rb
-test/cruby/benchmark/bm_hash_aref_miss.rb
-test/cruby/benchmark/bm_hash_aref_str.rb
-#[error] test/cruby/benchmark/bm_hash_aref_sym_long.rb
-#[error] test/cruby/benchmark/bm_hash_aref_sym.rb
-test/cruby/benchmark/bm_hash_flatten.rb
-#[error] test/cruby/benchmark/bm_hash_ident_flo.rb
-#[error] test/cruby/benchmark/bm_hash_ident_num.rb
-#[error] test/cruby/benchmark/bm_hash_ident_obj.rb
-#[error] test/cruby/benchmark/bm_hash_ident_str.rb
-#[error] test/cruby/benchmark/bm_hash_ident_sym.rb
-test/cruby/benchmark/bm_hash_keys.rb
-test/cruby/benchmark/bm_hash_shift.rb
-test/cruby/benchmark/bm_hash_values.rb
-test/cruby/benchmark/bm_loop_for.rb
-#[error] test/cruby/benchmark/bm_loop_generator.rb
-test/cruby/benchmark/bm_loop_times.rb
-test/cruby/benchmark/bm_loop_whileloop2.rb
-test/cruby/benchmark/bm_loop_whileloop.rb
-#[error] test/cruby/benchmark/bm_securerandom.rb
-test/cruby/benchmark/bm_so_ackermann.rb
-#[<30] test/cruby/benchmark/bm_so_array.rb
-#[error] test/cruby/benchmark/bm_so_binary_trees.rb
-#[error] test/cruby/benchmark/bm_so_concatenate.rb
-#[error] test/cruby/benchmark/bm_so_count_words.rb
-#[longish] test/cruby/benchmark/bm_so_exception.rb
-#[longish] test/cruby/benchmark/bm_so_fannkuch.rb
-#[error] test/cruby/benchmark/bm_so_fasta.rb
-#[error] test/cruby/benchmark/bm_so_k_nucleotide.rb
-test/cruby/benchmark/bm_so_lists.rb
-#[writes to stdout] test/cruby/benchmark/bm_so_mandelbrot.rb
-test/cruby/benchmark/bm_so_matrix.rb
-#[error] test/cruby/benchmark/bm_so_meteor_contest.rb
-#[error] test/cruby/benchmark/bm_so_nbody.rb
-test/cruby/benchmark/bm_so_nested_loop.rb
-#[error] test/cruby/benchmark/bm_so_nsieve_bits.rb
-#[error] test/cruby/benchmark/bm_so_nsieve.rb
-test/cruby/benchmark/bm_so_object.rb
-#[error] test/cruby/benchmark/bm_so_partial_sums.rb
-#[error] test/cruby/benchmark/bm_so_pidigits.rb
-test/cruby/benchmark/bm_so_random.rb
-#[error] test/cruby/benchmark/bm_so_reverse_complement.rb
-#[<30] test/cruby/benchmark/bm_so_sieve.rb
-#[error] test/cruby/benchmark/bm_so_spectralnorm.rb
-test/cruby/benchmark/bm_vm1_attr_ivar.rb
-test/cruby/benchmark/bm_vm1_attr_ivar_set.rb
-test/cruby/benchmark/bm_vm1_block.rb
-test/cruby/benchmark/bm_vm1_const.rb
-test/cruby/benchmark/bm_vm1_ensure.rb
-test/cruby/benchmark/bm_vm1_float_simple.rb
-test/cruby/benchmark/bm_vm1_gc_short_lived.rb
-test/cruby/benchmark/bm_vm1_ivar.rb
-test/cruby/benchmark/bm_vm1_ivar_set.rb
-test/cruby/benchmark/bm_vm1_length.rb
-test/cruby/benchmark/bm_vm1_lvar_init.rb
-test/cruby/benchmark/bm_vm1_lvar_set.rb
-test/cruby/benchmark/bm_vm1_neq.rb
-test/cruby/benchmark/bm_vm1_not.rb
-test/cruby/benchmark/bm_vm1_rescue.rb
-test/cruby/benchmark/bm_vm1_simplereturn.rb
-test/cruby/benchmark/bm_vm1_swap.rb
-test/cruby/benchmark/bm_vm1_yield.rb
-test/cruby/benchmark/bm_vm2_array.rb
-test/cruby/benchmark/bm_vm2_bigarray.rb
-test/cruby/benchmark/bm_vm2_bighash.rb
-test/cruby/benchmark/bm_vm2_case.rb
-test/cruby/benchmark/bm_vm2_defined_method.rb
-test/cruby/benchmark/bm_vm2_dstr.rb
-#[error] test/cruby/benchmark/bm_vm2_eval.rb
-test/cruby/benchmark/bm_vm2_method_missing.rb
-test/cruby/benchmark/bm_vm2_method.rb
-test/cruby/benchmark/bm_vm2_method_with_block.rb
-test/cruby/benchmark/bm_vm2_newlambda.rb
-test/cruby/benchmark/bm_vm2_poly_method_ov.rb
-test/cruby/benchmark/bm_vm2_poly_method.rb
-test/cruby/benchmark/bm_vm2_proc.rb
-#[longish] test/cruby/benchmark/bm_vm2_raise1.rb
-#[longish] test/cruby/benchmark/bm_vm2_raise2.rb
-#[error] test/cruby/benchmark/bm_vm2_regexp.rb
-test/cruby/benchmark/bm_vm2_send.rb
-test/cruby/benchmark/bm_vm2_struct_big_aref_hi.rb
-test/cruby/benchmark/bm_vm2_struct_big_aref_lo.rb
-test/cruby/benchmark/bm_vm2_struct_big_aset.rb
-test/cruby/benchmark/bm_vm2_struct_small_aref.rb
-test/cruby/benchmark/bm_vm2_struct_small_aset.rb
-test/cruby/benchmark/bm_vm2_super.rb
-test/cruby/benchmark/bm_vm2_unif1.rb
-test/cruby/benchmark/bm_vm2_zsuper.rb
-#[too long] test/cruby/benchmark/bm_vm3_backtrace.rb
-test/cruby/benchmark/bm_vm3_clearmethodcache.rb
+# MRI Benchmarks
+test/cruby/benchmark/app_answer.rb
+# ERROR test/cruby/benchmark/app_aobench.rb
+# ERROR test/cruby/benchmark/app_erb.yml
+test/cruby/benchmark/app_factorial.rb
+test/cruby/benchmark/app_fib.rb
+test/cruby/benchmark/app_lc_fizzbuzz.rb
+# ERROR test/cruby/benchmark/app_mandelbrot.rb
+# ERROR taking too long test/cruby/benchmark/app_pentomino.rb
+test/cruby/benchmark/app_raise.rb
+test/cruby/benchmark/app_strconcat.rb
+test/cruby/benchmark/app_tak.rb
+test/cruby/benchmark/app_tarai.rb
+# ERROR "`method_missing_stub': undefined method `parse' for URI (NoMethodError)" test/cruby/benchmark/app_uri.rb
+test/cruby/benchmark/array_flatten.yml
+# ERROR taking too long test/cruby/benchmark/array_intersection.yml
+test/cruby/benchmark/array_max_float.yml
+# ERROR taking too long test/cruby/benchmark/array_max_int.yml
+# ERROR taking too long test/cruby/benchmark/array_max_str.yml
+# ERROR taking too long test/cruby/benchmark/array_min.yml
+test/cruby/benchmark/array_sample.yml
+test/cruby/benchmark/array_sample_100k_10.rb
+test/cruby/benchmark/array_sample_100k_11.rb
+test/cruby/benchmark/array_sample_100k__100.rb
+test/cruby/benchmark/array_sample_100k__1k.rb
+test/cruby/benchmark/array_sample_100k__6k.rb
+test/cruby/benchmark/array_sample_100k___10k.rb
+test/cruby/benchmark/array_sample_100k___50k.rb
+test/cruby/benchmark/array_shift.rb
+test/cruby/benchmark/array_small_and.rb
+test/cruby/benchmark/array_small_diff.rb
+test/cruby/benchmark/array_small_or.rb
+test/cruby/benchmark/array_sort_block.rb
+test/cruby/benchmark/array_sort_float.rb
+test/cruby/benchmark/array_values_at_int.rb
+test/cruby/benchmark/array_values_at_range.rb
+# ERROR "" test/cruby/benchmark/attr_accessor.yml
+test/cruby/benchmark/bighash.rb
+# ERROR "`const_missing': uninitialized constant IO::Buffer (NameError)" test/cruby/benchmark/buffer_get.yml
+# ERROR "A file required by "benchmark_driver-20221101-30992-g979qr.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/cgi_escape_html.yml
+test/cruby/benchmark/complex_float_add.yml
+test/cruby/benchmark/complex_float_div.yml
+test/cruby/benchmark/complex_float_mul.yml
+test/cruby/benchmark/complex_float_new.yml
+test/cruby/benchmark/complex_float_power.yml
+test/cruby/benchmark/complex_float_sub.yml
+# ERROR "A file required by "benchmark_driver-20221031-14300-9apv1m.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/dir_empty_p.rb
+# ERROR taking too long test/cruby/benchmark/enum_lazy_flat_map.yml
+test/cruby/benchmark/enum_lazy_grep_v_100.rb
+test/cruby/benchmark/enum_lazy_grep_v_20.rb
+test/cruby/benchmark/enum_lazy_grep_v_50.rb
+test/cruby/benchmark/enum_lazy_uniq_100.rb
+test/cruby/benchmark/enum_lazy_uniq_20.rb
+test/cruby/benchmark/enum_lazy_uniq_50.rb
+test/cruby/benchmark/enum_lazy_zip.yml
+test/cruby/benchmark/enum_tally.yml
+# ERROR "`method_missing_stub': undefined method `src' for #<ERB:0x38> (NoMethodError)" test/cruby/benchmark/erb_render.yml
+# ERROR "`const_missing': uninitialized constant Fiber (NameError)" test/cruby/benchmark/fiber_chain.yml
+# ERROR "`const_missing': uninitialized constant Thread (NameError)" test/cruby/benchmark/fiber_locals.yml
+# ERROR "A file required by "benchmark_driver-20221031-3780-dvhs8b.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/file_chmod.rb
+# ERROR "A file required by "benchmark_driver-20221101-21000-dq40yq.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/file_rename.rb
+test/cruby/benchmark/float_methods.yml
+test/cruby/benchmark/float_neg_posi.yml
+test/cruby/benchmark/float_to_s.yml
+test/cruby/benchmark/gc/aobench.rb
+test/cruby/benchmark/gc/binary_trees.rb
+test/cruby/benchmark/gc/gcbench.rb
+test/cruby/benchmark/gc/hash1.rb
+test/cruby/benchmark/gc/hash2.rb
+test/cruby/benchmark/gc/null.rb
+test/cruby/benchmark/gc/pentomino.rb
+test/cruby/benchmark/gc/rdoc.rb
+test/cruby/benchmark/gc/redblack.rb
+test/cruby/benchmark/gc/ring.rb
+test/cruby/benchmark/hash_aref_array.rb
+test/cruby/benchmark/hash_aref_dsym.rb
+test/cruby/benchmark/hash_aref_dsym_long.rb
+test/cruby/benchmark/hash_aref_fix.rb
+test/cruby/benchmark/hash_aref_flo.rb
+test/cruby/benchmark/hash_aref_miss.rb
+test/cruby/benchmark/hash_aref_str.rb
+# ERROR "`raise': You need to provision opal-parser yourself in this environment (RuntimeError)" test/cruby/benchmark/hash_aref_sym.rb
+# ERROR "`raise': You need to provision opal-parser yourself in this environment (RuntimeError)" test/cruby/benchmark/hash_aref_sym_long.rb
+test/cruby/benchmark/hash_defaults.yml
+test/cruby/benchmark/hash_dup.yml
+# ERROR taking too long test/cruby/benchmark/hash_first.yml
+test/cruby/benchmark/hash_flatten.rb
+test/cruby/benchmark/hash_ident_flo.rb
+test/cruby/benchmark/hash_ident_num.rb
+test/cruby/benchmark/hash_ident_obj.rb
+test/cruby/benchmark/hash_ident_str.rb
+test/cruby/benchmark/hash_ident_sym.rb
+test/cruby/benchmark/hash_keys.rb
+test/cruby/benchmark/hash_literal_small2.rb
+test/cruby/benchmark/hash_literal_small4.rb
+test/cruby/benchmark/hash_literal_small8.rb
+test/cruby/benchmark/hash_long.rb
+test/cruby/benchmark/hash_shift.rb
+# ERROR taking too long test/cruby/benchmark/hash_shift_u16.rb
+# ERROR taking too long test/cruby/benchmark/hash_shift_u24.rb
+# ERROR taking too long test/cruby/benchmark/hash_shift_u32.rb
+test/cruby/benchmark/hash_small2.rb
+test/cruby/benchmark/hash_small4.rb
+test/cruby/benchmark/hash_small8.rb
+test/cruby/benchmark/hash_to_proc.rb
+test/cruby/benchmark/hash_values.rb
+test/cruby/benchmark/int_quo.rb
+# ERROR "A file required by "benchmark_driver-20221031-15544-v0c8lf.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/io_copy_stream_write.rb
+# ERROR "A file required by "benchmark_driver-20221101-55300-3srwe6.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/io_copy_stream_write_socket.rb
+test/cruby/benchmark/io_file_create.rb
+# ERROR "A file required by "benchmark_driver-20221101-43572-n93s0c.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/io_file_read.rb
+# ERROR "A file required by "benchmark_driver-20221031-15544-v0c8lf.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/io_file_write.rb
+# ERROR "`method_missing_stub': undefined method `close' for nil (NoMethodError)" test/cruby/benchmark/io_nonblock_noex.rb
+# ERROR "`method_missing_stub': undefined method `close' for nil (NoMethodError)" test/cruby/benchmark/io_nonblock_noex2.rb
+# ERROR "`method_missing_stub': undefined method `pipe' for IO (NoMethodError)" test/cruby/benchmark/io_pipe_rw.rb
+# ERROR "`method_missing_stub': undefined method `pipe' for IO (NoMethodError)" test/cruby/benchmark/io_select.rb
+# ERROR "`method_missing_stub': undefined method `pipe' for IO (NoMethodError)" test/cruby/benchmark/io_select2.rb
+# ERROR "`method_missing_stub': undefined method `pipe' for IO (NoMethodError)" test/cruby/benchmark/io_select3.rb
+# ERROR "A file required by "benchmark_driver-20221101-45364-tuqsig.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/irb_color.yml
+# ERROR "`method_missing_stub': undefined method `ruby' for RbConfig (NoMethodError)" test/cruby/benchmark/irb_exec.yml
+# ERROR "`const_missing': uninitialized constant RubyVM (NameError)" test/cruby/benchmark/iseq_load_from_binary.yml
+test/cruby/benchmark/ivar_extend.yml
+test/cruby/benchmark/kernel_clone.yml
+test/cruby/benchmark/kernel_float.yml
+test/cruby/benchmark/kernel_tap.yml
+test/cruby/benchmark/kernel_then.yml
+test/cruby/benchmark/keyword_arguments.yml
+test/cruby/benchmark/loop_for.rb
+# ERROR "can't find file: "generator" in:" test/cruby/benchmark/loop_generator.rb
+test/cruby/benchmark/loop_times.rb
+test/cruby/benchmark/loop_whileloop.rb
+test/cruby/benchmark/loop_whileloop2.rb
+# ERROR "`const_missing': uninitialized constant Marshal (NameError)" test/cruby/benchmark/marshal_dump_flo.rb
+# ERROR "`const_missing': uninitialized constant Marshal (NameError)" test/cruby/benchmark/marshal_dump_load_geniv.rb
+# ERROR "`const_missing': uninitialized constant Marshal (NameError)" test/cruby/benchmark/marshal_dump_load_time.rb
+# ERROR "" test/cruby/benchmark/masgn.yml
+test/cruby/benchmark/match_gt4.rb
+test/cruby/benchmark/match_small.rb
+test/cruby/benchmark/method_bind_call.yml
+# ERROR "" test/cruby/benchmark/mjit_exec_jt2jt.yml
+# ERROR "" test/cruby/benchmark/mjit_exec_vm2jt.yml
+# ERROR "" test/cruby/benchmark/mjit_exec_vm2vm.yml
+test/cruby/benchmark/mjit_exivar.yml
+test/cruby/benchmark/mjit_integer.yml
+test/cruby/benchmark/mjit_kernel.yml
+test/cruby/benchmark/mjit_leave.yml
+# ERROR "" test/cruby/benchmark/mjit_opt_cc_insns.yml
+test/cruby/benchmark/mjit_struct_aref.yml
+# ERROR "" test/cruby/benchmark/nilclass.yml
+# ERROR "" test/cruby/benchmark/nil_p.yml
+# ERROR "" test/cruby/benchmark/numeric_methods.yml
+test/cruby/benchmark/num_zero_p.yml
+# ERROR "`method_missing_stub': undefined method `disable' for GC (NoMethodError)" test/cruby/benchmark/object_allocate.yml
+# ERROR "A file required by "benchmark_driver-20221031-11376-ajdnqp.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/objspace_dump_all.yml
+# ERROR "" test/cruby/benchmark/pm_array.yml
+# ERROR "`const_missing': uninitialized constant Warning (NameError)" test/cruby/benchmark/ractor_const.yml
+# ERROR "`const_missing': uninitialized constant Warning (NameError)" test/cruby/benchmark/ractor_float_to_s.yml
+test/cruby/benchmark/range_last.yml
+# ERROR "" test/cruby/benchmark/realpath.yml
+# ERROR "A file required by "benchmark_driver-20221101-52500-y0t5y0.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/require.yml
+# ERROR "A file required by "benchmark_driver-20221101-19204-90ls9v.rb" wasn't found. (Opal::Builder::MissingRequire)" test/cruby/benchmark/require_thread.yml
+test/cruby/benchmark/securerandom.rb
+test/cruby/benchmark/so_ackermann.rb
+test/cruby/benchmark/so_array.rb
+# ERROR "Cannot read properties of undefined (reading '$puts') (Exception)" test/cruby/benchmark/so_binary_trees.rb
+# ERROR "String#<< not supported. Mutable String methods are not supported in Opal. (NotImplementedError)" test/cruby/benchmark/so_concatenate.rb
+# ERROR "`Opal.type_error': no implicit conversion of NilClass into String (TypeError)" test/cruby/benchmark/so_count_words.yml
+test/cruby/benchmark/so_exception.rb
+test/cruby/benchmark/so_fannkuch.rb
+# ERROR "String#slice! not supported" test/cruby/benchmark/so_fasta.rb
+# ERROR "`Opal.type_error': no implicit conversion of NilClass into String (TypeError)" test/cruby/benchmark/so_k_nucleotide.yml
+test/cruby/benchmark/so_lists.rb
+test/cruby/benchmark/so_mandelbrot.rb
+test/cruby/benchmark/so_matrix.rb
+# ERROR "Maximum call stack size exceeded (Exception)" test/cruby/benchmark/so_meteor_contest.rb
+test/cruby/benchmark/so_nbody.rb
+test/cruby/benchmark/so_nested_loop.rb
+# ERROR "`abs': To use String#unpack, you must first require 'corelib/string/unpack'. (RuntimeError)" test/cruby/benchmark/so_nsieve.rb
+# ERROR "String#<< not supported. Mutable String methods are not supported in Opal. (NotImplementedError)" test/cruby/benchmark/so_nsieve_bits.rb
+test/cruby/benchmark/so_object.rb
+test/cruby/benchmark/so_partial_sums.rb
+# ERROR "`compose': Maximum call stack size exceeded (Exception)" test/cruby/benchmark/so_pidigits.rb
+test/cruby/benchmark/so_random.rb
+# ERROR "`Opal.type_error': no implicit conversion of NilClass into String (TypeError)" test/cruby/benchmark/so_reverse_complement.yml
+test/cruby/benchmark/so_sieve.rb
+test/cruby/benchmark/so_spectralnorm.rb
+test/cruby/benchmark/string_capitalize.yml
+test/cruby/benchmark/string_casecmp.yml
+test/cruby/benchmark/string_casecmp_p.yml
+test/cruby/benchmark/string_downcase.yml
+test/cruby/benchmark/string_index.rb
+test/cruby/benchmark/string_scan_re.rb
+test/cruby/benchmark/string_scan_str.rb
+# ERROR "`Opal.send2': String#slice! not supported. Mutable String methods are not supported in Opal. (NotImplementedError)" test/cruby/benchmark/string_slice.yml
+test/cruby/benchmark/string_split.yml
+test/cruby/benchmark/string_swapcase.yml
+# ERROR taking too long test/cruby/benchmark/string_upcase.yml
+# ERROR "" test/cruby/benchmark/time_at.yml
+test/cruby/benchmark/time_new.yml
+# ERROR "" test/cruby/benchmark/time_parse.yml
+# ERROR "" test/cruby/benchmark/time_strptime.yml
+# ERROR "`method_missing_stub': undefined method `subsec' for 2022-11-01 03:01:27 +0100 (NoMethodError)" test/cruby/benchmark/time_subsec.rb
+# ERROR "" test/cruby/benchmark/vm_array.yml
+test/cruby/benchmark/vm_attr_ivar.yml
+test/cruby/benchmark/vm_attr_ivar_set.yml
+test/cruby/benchmark/vm_backtrace.rb
+# ERROR "" test/cruby/benchmark/vm_bigarray.yml
+test/cruby/benchmark/vm_bighash.yml
+test/cruby/benchmark/vm_block.yml
+test/cruby/benchmark/vm_blockparam.yml
+test/cruby/benchmark/vm_blockparam_call.yml
+test/cruby/benchmark/vm_blockparam_pass.yml
+test/cruby/benchmark/vm_blockparam_yield.yml
+test/cruby/benchmark/vm_block_handler.yml
+# ERROR "" test/cruby/benchmark/vm_case.yml
+test/cruby/benchmark/vm_case_classes.yml
+test/cruby/benchmark/vm_case_lit.yml
+# ERROR taking too long test/cruby/benchmark/vm_clearmethodcache.rb
+test/cruby/benchmark/vm_const.yml
+# ERROR "`raise': You need to provision opal-parser yourself in this environment (RuntimeError)" test/cruby/benchmark/vm_cvar.yml
+test/cruby/benchmark/vm_defined_method.yml
+test/cruby/benchmark/vm_dstr.yml
+test/cruby/benchmark/vm_dstr_ary.rb
+test/cruby/benchmark/vm_dstr_bool.rb
+test/cruby/benchmark/vm_dstr_class_module.rb
+test/cruby/benchmark/vm_dstr_digit.rb
+test/cruby/benchmark/vm_dstr_int.rb
+test/cruby/benchmark/vm_dstr_nil.rb
+test/cruby/benchmark/vm_dstr_obj.rb
+test/cruby/benchmark/vm_dstr_obj_def.rb
+test/cruby/benchmark/vm_dstr_str.rb
+test/cruby/benchmark/vm_dstr_sym.rb
+test/cruby/benchmark/vm_ensure.yml
+# ERROR "`raise': You need to provision opal-parser yourself in this environment (RuntimeError)" test/cruby/benchmark/vm_eval.yml
+# ERROR "`method_missing_stub': undefined method `disable' for GC (NoMethodError)" test/cruby/benchmark/vm_fiber_allocate.yml
+# ERROR "`const_missing': uninitialized constant Fiber (NameError)" test/cruby/benchmark/vm_fiber_count.yml
+# ERROR "`method_missing_stub': undefined method `disable' for GC (NoMethodError)" test/cruby/benchmark/vm_fiber_reuse.yml
+# ERROR "`const_missing': uninitialized constant Fiber (NameError)" test/cruby/benchmark/vm_fiber_reuse_gc.yml
+# ERROR "`const_missing': uninitialized constant Fiber (NameError)" test/cruby/benchmark/vm_fiber_switch.yml
+test/cruby/benchmark/vm_float_simple.yml
+test/cruby/benchmark/vm_freezestring.yml
+test/cruby/benchmark/vm_gc.rb
+test/cruby/benchmark/vm_gc_old_full.rb
+test/cruby/benchmark/vm_gc_old_immediate.rb
+test/cruby/benchmark/vm_gc_old_lazy.rb
+test/cruby/benchmark/vm_gc_short_lived.yml
+# ERROR "" test/cruby/benchmark/vm_gc_short_with_complex_long.yml
+# ERROR "" test/cruby/benchmark/vm_gc_short_with_long.yml
+# ERROR "" test/cruby/benchmark/vm_gc_short_with_symbol.yml
+test/cruby/benchmark/vm_gc_wb_ary.yml
+test/cruby/benchmark/vm_gc_wb_ary_promoted.yml
+test/cruby/benchmark/vm_gc_wb_obj.yml
+test/cruby/benchmark/vm_gc_wb_obj_promoted.yml
+# ERROR "`raise': You need to provision opal-parser yourself in this environment (RuntimeError)" test/cruby/benchmark/vm_iclass_super.yml
+test/cruby/benchmark/vm_ivar.yml
+test/cruby/benchmark/vm_ivar_init.yml
+test/cruby/benchmark/vm_ivar_of_class.yml
+test/cruby/benchmark/vm_ivar_of_class_set.yml
+test/cruby/benchmark/vm_ivar_set.yml
+test/cruby/benchmark/vm_ivar_set_subclass.yml
+test/cruby/benchmark/vm_length.yml
+test/cruby/benchmark/vm_lvar_init.yml
+test/cruby/benchmark/vm_lvar_set.yml
+# ERROR "" test/cruby/benchmark/vm_method.yml
+test/cruby/benchmark/vm_method_missing.yml
+test/cruby/benchmark/vm_method_with_block.yml
+test/cruby/benchmark/vm_module_ann_const_set.yml
+test/cruby/benchmark/vm_module_const_set.yml
+test/cruby/benchmark/vm_mutex.yml
+test/cruby/benchmark/vm_neq.yml
+test/cruby/benchmark/vm_newlambda.yml
+test/cruby/benchmark/vm_not.yml
+test/cruby/benchmark/vm_poly_method.yml
+test/cruby/benchmark/vm_poly_method_ov.yml
+# ERROR "" test/cruby/benchmark/vm_poly_same_method.yml
+test/cruby/benchmark/vm_poly_singleton.yml
+test/cruby/benchmark/vm_proc.yml
+# ERROR taking too long test/cruby/benchmark/vm_raise1.yml
+# ERROR taking too long test/cruby/benchmark/vm_raise2.yml
+test/cruby/benchmark/vm_regexp.yml
+# ERROR "" test/cruby/benchmark/vm_rescue.yml
+test/cruby/benchmark/vm_send.yml
+test/cruby/benchmark/vm_send_cfunc.yml
+test/cruby/benchmark/vm_simplereturn.yml
+# ERROR "" test/cruby/benchmark/vm_string_literal.yml
+test/cruby/benchmark/vm_struct_big_aref_hi.yml
+test/cruby/benchmark/vm_struct_big_aref_lo.yml
+test/cruby/benchmark/vm_struct_big_aset.yml
+test/cruby/benchmark/vm_struct_big_href_hi.yml
+test/cruby/benchmark/vm_struct_big_href_lo.yml
+test/cruby/benchmark/vm_struct_big_hset.yml
+test/cruby/benchmark/vm_struct_small_aref.yml
+test/cruby/benchmark/vm_struct_small_aset.yml
+test/cruby/benchmark/vm_struct_small_href.yml
+test/cruby/benchmark/vm_struct_small_hset.yml
+test/cruby/benchmark/vm_super.yml
+test/cruby/benchmark/vm_swap.yml
+# ERROR "`raise': You need to provision opal-parser yourself in this environment (RuntimeError)" test/cruby/benchmark/vm_symbol_block_pass.rb
+# ERROR "`const_missing': uninitialized constant Thread (NameError)" test/cruby/benchmark/vm_thread_alive_check.yml
+# ERROR "`const_missing': uninitialized constant Thread (NameError)" test/cruby/benchmark/vm_thread_close.rb
+# ERROR "`const_missing': uninitialized constant Thread::ConditionVariable (NameError)" test/cruby/benchmark/vm_thread_condvar1.rb
+# ERROR "`const_missing': uninitialized constant Thread::ConditionVariable (NameError)" test/cruby/benchmark/vm_thread_condvar2.rb
+# ERROR "`const_missing': uninitialized constant Thread (NameError)" test/cruby/benchmark/vm_thread_create_join.rb
+# ERROR "`Opal.send2': Thread creation not available (NotImplementedError)" test/cruby/benchmark/vm_thread_mutex1.rb
+# ERROR "`Opal.send2': Thread creation not available (NotImplementedError)" test/cruby/benchmark/vm_thread_mutex2.rb
+# ERROR "`Opal.send2': Thread creation not available (NotImplementedError)" test/cruby/benchmark/vm_thread_mutex3.rb
+# ERROR "`const_missing': uninitialized constant Thread (NameError)" test/cruby/benchmark/vm_thread_pass.rb
+taking too long test/cruby/benchmark/vm_thread_pass_flood.rb
+# ERROR "`method_missing_stub': undefined method `pipe' for IO (NoMethodError)" test/cruby/benchmark/vm_thread_pipe.rb
+# ERROR "`Opal.send2': Thread creation not available (NotImplementedError)" test/cruby/benchmark/vm_thread_queue.rb
+# ERROR "`const_missing': uninitialized constant Thread::SizedQueue (NameError)" test/cruby/benchmark/vm_thread_sized_queue.rb
+# ERROR "`const_missing': uninitialized constant Thread::SizedQueue (NameError)" test/cruby/benchmark/vm_thread_sized_queue2.rb
+# ERROR "`const_missing': uninitialized constant Thread::SizedQueue (NameError)" test/cruby/benchmark/vm_thread_sized_queue3.rb
+# ERROR "`const_missing': uninitialized constant Thread::SizedQueue (NameError)" test/cruby/benchmark/vm_thread_sized_queue4.rb
+# ERROR "`const_missing': uninitialized constant Thread (NameError)" test/cruby/benchmark/vm_thread_sleep.yml
+# ERROR "" test/cruby/benchmark/vm_unif1.yml
+test/cruby/benchmark/vm_yield.yml
+test/cruby/benchmark/vm_zsuper.yml
+# Opal Benchmarks
+benchmark/bm_array_flatten.rb
+benchmark/bm_array_intersection_numbers.rb
+benchmark/bm_array_intersection_objects.rb
+benchmark/bm_array_intersection_strings.rb
+benchmark/bm_array_join_ary.rb
+benchmark/bm_array_minus_numbers.rb
+benchmark/bm_array_minus_objects.rb
+benchmark/bm_array_minus_strings.rb
+benchmark/bm_array_union_numbers.rb
+benchmark/bm_array_union_objects.rb
+benchmark/bm_array_union_strings.rb
+benchmark/bm_array_uniq_bang_numbers.rb
+benchmark/bm_array_uniq_bang_objects.rb
+benchmark/bm_array_uniq_bang_strings.rb
+benchmark/bm_array_uniq_numbers.rb
+benchmark/bm_array_uniq_objects.rb
+benchmark/bm_array_uniq_strings.rb
+benchmark/bm_call_overhead.yml
+benchmark/bm_constant_lookup_big.rb
+benchmark/bm_constant_lookup_small.rb
+benchmark/bm_dispatch_bind_table.rb
+# ERROR "`options': undefined method `compile' for undefined (NoMethodError)" benchmark/bm_dispatch_code_gen.rb
+# ERROR "`options': undefined method `compile' for undefined (NoMethodError)" benchmark/bm_dispatch_code_gen_if.rb
+benchmark/bm_dispatch_hardcoded.rb
+benchmark/bm_dispatch_send.rb
+benchmark/bm_dispatch_send_table.rb
+benchmark/bm_hash_assoc_object.rb
+benchmark/bm_hash_assoc_string.rb
+benchmark/bm_hash_clone_object.rb
+benchmark/bm_hash_clone_string.rb
+benchmark/bm_hash_delete_object.rb
+benchmark/bm_hash_delete_string.rb
+benchmark/bm_hash_each_key_object.rb
+benchmark/bm_hash_each_key_string.rb
+benchmark/bm_hash_each_object.rb
+benchmark/bm_hash_each_string.rb
+benchmark/bm_hash_each_value_object.rb
+benchmark/bm_hash_each_value_string.rb
+benchmark/bm_hash_element_reference_object.rb
+benchmark/bm_hash_element_reference_string.rb
+benchmark/bm_hash_element_set_object.rb
+benchmark/bm_hash_element_set_string.rb
+benchmark/bm_hash_equal_value_object.rb
+benchmark/bm_hash_equal_value_string.rb
+benchmark/bm_hash_fetch_object.rb
+benchmark/bm_hash_fetch_string.rb
+benchmark/bm_hash_flatten_object.rb
+benchmark/bm_hash_flatten_string.rb
+benchmark/bm_hash_hash_object.rb
+benchmark/bm_hash_hash_string.rb
+benchmark/bm_hash_has_key_object.rb
+benchmark/bm_hash_has_key_string.rb
+benchmark/bm_hash_has_value_object.rb
+benchmark/bm_hash_has_value_string.rb
+benchmark/bm_hash_inspect_object.rb
+benchmark/bm_hash_inspect_string.rb
+benchmark/bm_hash_invert_object.rb
+benchmark/bm_hash_invert_string.rb
+benchmark/bm_hash_keep_if_object.rb
+benchmark/bm_hash_keep_if_string.rb
+benchmark/bm_hash_keys_object.rb
+benchmark/bm_hash_keys_string.rb
+benchmark/bm_hash_key_object.rb
+benchmark/bm_hash_key_string.rb
+benchmark/bm_hash_literal_mixed_large.rb
+benchmark/bm_hash_literal_mixed_small.rb
+benchmark/bm_hash_literal_object_large.rb
+benchmark/bm_hash_literal_object_small.rb
+benchmark/bm_hash_literal_string_large.rb
+benchmark/bm_hash_literal_string_small.rb
+benchmark/bm_hash_merge_object.rb
+benchmark/bm_hash_merge_string.rb
+benchmark/bm_hash_rassoc_object.rb
+benchmark/bm_hash_rassoc_string.rb
+benchmark/bm_hash_rehash_object.rb
+benchmark/bm_hash_rehash_string.rb
+benchmark/bm_hash_reject_bang_object.rb
+benchmark/bm_hash_reject_bang_string.rb
+benchmark/bm_hash_reject_object.rb
+benchmark/bm_hash_reject_string.rb
+benchmark/bm_hash_replace_object.rb
+benchmark/bm_hash_replace_string.rb
+benchmark/bm_hash_select_bang_object.rb
+benchmark/bm_hash_select_bang_string.rb
+benchmark/bm_hash_select_object.rb
+benchmark/bm_hash_select_string.rb
+# ERROR taking too long benchmark/bm_hash_shift_object.rb
+# ERROR taking too long benchmark/bm_hash_shift_string.rb
+benchmark/bm_hash_to_a_object.rb
+benchmark/bm_hash_to_a_string.rb
+benchmark/bm_hash_to_h_object.rb
+benchmark/bm_hash_to_h_string.rb
+benchmark/bm_hash_values_object.rb
+benchmark/bm_hash_values_string.rb
+benchmark/bm_module_definition_big.rb
+benchmark/bm_module_definition_small.rb
