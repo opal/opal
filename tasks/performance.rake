@@ -3,7 +3,7 @@
 require_relative "#{__dir__}/../lib/opal/util"
 require_relative "#{__dir__}/../lib/opal/os"
 
-OS = Opal::OS
+OS = Opal::OS unless defined? OS
 
 class Timing
   def initialize(tries: 31, &block)

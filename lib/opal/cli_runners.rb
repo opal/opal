@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'opal/os'
+
 module Opal
   # `Opal::CliRunners` is the register in which JavaScript runners can be
   # defined for use by `Opal::CLI`. Runners will be called via the `#call`
@@ -17,6 +19,12 @@ module Opal
   #
   module CliRunners
     class RunnerError < StandardError
+    end
+
+    @runners = []
+
+    def self.registered_runners
+      @runners
     end
 
     @register = {}
@@ -45,6 +53,8 @@ module Opal
     def self.register_runner(name, runner, path = nil)
       autoload runner, path if path
 
+      @runners.push(runner.to_s)
+
       if runner.respond_to? :call
         self[name] = -> { runner }
       else
@@ -61,18 +71,28 @@ module Opal
       nil
     end
 
-    register_runner :applescript, :Applescript, 'opal/cli_runners/applescript'
+    # running on all OS
     register_runner :chrome,      :Chrome,      'opal/cli_runners/chrome'
     register_runner :compiler,    :Compiler,    'opal/cli_runners/compiler'
     register_runner :deno,        :Deno,        'opal/cli_runners/deno'
     register_runner :nashorn,     :Nashorn,     'opal/cli_runners/nashorn'
     register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
-    register_runner :gjs,         :Gjs,         'opal/cli_runners/gjs'
     register_runner :quickjs,     :Quickjs,     'opal/cli_runners/quickjs'
-    register_runner :miniracer,   :MiniRacer,   'opal/cli_runners/mini_racer'
     register_runner :server,      :Server,      'opal/cli_runners/server'
 
-    alias_runner :osascript, :applescript
     alias_runner :node, :nodejs
+
+    if !OS.windows? && !OS.macos?
+      register_runner :gjs,         :Gjs,         'opal/cli_runners/gjs'
+    end
+
+    unless OS.windows?
+      register_runner :miniracer,   :MiniRacer,   'opal/cli_runners/mini_racer'
+    end
+
+    if OS.macos?
+      register_runner :applescript, :Applescript, 'opal/cli_runners/applescript'
+      alias_runner :osascript, :applescript
+    end
   end
 end
