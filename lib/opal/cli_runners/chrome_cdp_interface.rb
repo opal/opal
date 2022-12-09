@@ -106,8 +106,8 @@ CDP(options, function(client) {
           else
             `Page.handleJavaScriptDialog({accept: false})`
           end
-        elsif `dialog.type` == 'alert' && `dialog.message` == 'opalheadlesschromeexit'
-          # A special case of an alert with a magic string "opalheadlesschromeexit".
+        elsif `dialog.type` == 'alert' && `dialog.message` == 'opalheadlessbrowserexit'
+          # A special case of an alert with a magic string "opalheadlessbrowserexit".
           # This denotes that `Kernel#exit` has been called. We would have rather used
           # an exception here, but they don't bubble sometimes.
           %x{
