@@ -21,16 +21,14 @@ module Opal
       end
 
       def initialize(data)
-        builder = data[:builder].call
-        options = data[:options]
-        argv    = data[:argv]
-
+        argv = data[:argv]
         if argv && argv.any?
           warn "warning: ARGV is not supported by the Chrome runner #{argv.inspect}"
         end
 
-        @output = options.fetch(:output, $stdout)
-        @builder = builder
+        options  = data[:options]
+        @output  = options.fetch(:output, $stdout)
+        @builder = data[:builder].call
       end
 
       attr_reader :output, :exit_status, :builder
@@ -43,7 +41,8 @@ module Opal
             env = {
               'CHROME_HOST' => chrome_host,
               'CHROME_PORT' => chrome_port.to_s,
-              'NODE_PATH' => File.join(__dir__, 'node_modules')
+              'NODE_PATH' => File.join(__dir__, 'node_modules'),
+              'OPAL_CDP_EXT' => builder.output_extension
             }
 
             cmd = [
@@ -53,7 +52,7 @@ module Opal
               '-I', __dir__,
               '-r', 'source-map-support-node',
               SCRIPT_PATH,
-              dir,
+              dir
             ]
 
             Kernel.exec(env, *cmd)
@@ -75,10 +74,12 @@ module Opal
         # https://groups.google.com/a/chromium.org/forum/#!topic/chromium-discuss/U5qyeX_ydBo
         # The only way is to create temporary files and pass them to chrome.
         File.binwrite("#{dir}/index.#{ext}", js)
+        File.binwrite("#{dir}/index.map", map)
         File.binwrite("#{dir}/source-map-support.js", stack)
         File.binwrite("#{dir}/index.html", <<~HTML)
           <html><head>
             <meta charset='utf-8'>
+            <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
             <script src='./source-map-support.js'></script>
             <script>
             window.opalheadlesschrome = true;
@@ -115,14 +116,46 @@ module Opal
       def run_chrome_server
         raise 'Chrome server can be started only on localhost' if chrome_host != DEFAULT_CHROME_HOST
 
+        profile = mktmpprofile
+
         # Disable web security with "--disable-web-security" flag to be able to do XMLHttpRequest (see test_openuri.rb)
+        # For other options see https://github.com/puppeteer/puppeteer/blob/main/packages/puppeteer-core/src/node/ChromeLauncher.ts
         chrome_server_cmd = %{#{OS.shellescape(chrome_executable)} \
+          --allow-pre-commit-input \
+          --disable-background-networking \
+          --enable-features=NetworkServiceInProcess2 \
+          --disable-background-timer-throttling \
+          --disable-backgrounding-occluded-windows \
+          --disable-breakpad \
+          --disable-client-side-phishing-detection \
+          --disable-component-extensions-with-background-pages \
+          --disable-default-apps \
+          --disable-dev-shm-usage \
+          --disable-extensions \
+          --disable-features=Translate,BackForwardCache,AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync \
+          --disable-hang-monitor \
+          --disable-ipc-flooding-protection \
+          --disable-popup-blocking \
+          --disable-prompt-on-repost \
+          --disable-renderer-backgrounding \
+          --disable-sync \
+          --force-color-profile=srgb \
+          --metrics-recording-only \
+          --no-first-run \
+          --enable-automation \
+          --password-store=basic \
+          --use-mock-keychain \
+          --enable-blink-features=IdleDetection \
+          --export-tagged-pdf \
           --headless \
+          --user-data-dir=#{profile} \
+          --hide-scrollbars \
+          --mute-audio \
           --disable-web-security \
           --remote-debugging-port=#{chrome_port} \
           #{ENV['CHROME_OPTS']}}
 
-        chrome_pid = Process.spawn(chrome_server_cmd)
+        chrome_pid = Process.spawn(chrome_server_cmd, in: OS.dev_null, out: OS.dev_null, err: OS.dev_null)
 
         Timeout.timeout(30) do
           loop do
@@ -142,6 +175,7 @@ module Opal
         elsif chrome_pid
           Process.kill('HUP', chrome_pid)
         end
+        FileUtils.rm_rf(profile) if profile
       end
 
       def chrome_server_running?
@@ -180,6 +214,10 @@ module Opal
 
       def mktmpdir(&block)
         Dir.mktmpdir('chrome-opal-', &block)
+      end
+
+      def mktmpprofile
+        Dir.mktmpdir('chrome-opal-profile-')
       end
     end
   end

@@ -41,4 +41,5 @@ end
 class TestBenchmark
   # sleep is unsupported if not awaited
   unsupported :test_realtime_output
+  bug :test_bugs_ruby_dev_40906_can_add_in_place_the_time_of_execution_of_the_block_given
 end
