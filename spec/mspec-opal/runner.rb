@@ -79,6 +79,7 @@ class OSpecFormatter
       'browser'      => BrowserFormatter,
       'server'       => BrowserFormatter,
       'chrome'       => DottedFormatter,
+      'deno'         => NodeJSFormatter,
       'node'         => NodeJSFormatter,
       'nodejs'       => NodeJSFormatter,
       'gjs'          => ColoredDottedFormatter,
