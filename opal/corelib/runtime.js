@@ -197,7 +197,7 @@
 
     // Fast path for the most common situation
     if (object['$respond_to?'].$$pristine && object.$method_missing.$$pristine) {
-      body = object['$' + method];
+      body = object[$jsid(method)];
       if (body == null || body.$$stub) throw Opal.type_error(object, type);
       return body.apply(object, args);
     }
@@ -1478,7 +1478,7 @@
     stubs = stubs.split(',');
 
     for (var i = 0, length = stubs.length; i < length; i++) {
-      stub = '$'+stubs[i], existing_method = proto[stub];
+      stub = $jsid(stubs[i]), existing_method = proto[stub];
 
       if (existing_method == null || existing_method.$$stub) {
         Opal.add_stub_for(proto, stub);
@@ -1568,7 +1568,7 @@
 
   // Super dispatcher
   Opal.find_super = function(obj, mid, current_func, defcheck, allow_stubs) {
-    var jsid = '$' + mid, ancestors, super_method;
+    var jsid = $jsid(mid), ancestors, super_method;
 
     ancestors = get_ancestors(obj);
 
@@ -1826,6 +1826,13 @@
     }
   }
 
+  // Optimization for a costly operation of prepending '$' to method names
+  var jsid_cache = {}
+  function $jsid(name) {
+    return jsid_cache[name] || (jsid_cache[name] = '$' + name);
+  }
+  Opal.jsid = $jsid;
+
   // Calls passed method on a ruby object with arguments and block:
   //
   // Can take a method or a method name.
@@ -1858,7 +1865,7 @@
       body = method;
       method = null;
     } else if (typeof(method) === 'string') {
-      body = recv['$'+method];
+      body = recv[$jsid(method)];
     } else {
       throw Opal.NameError.$new("Passed method should be a string or a function");
     }
@@ -1905,8 +1912,8 @@
           refine_module = refine_modules[ancestor];
 
           // Does this module define a method we want to call?
-          if (typeof refine_module.$$prototype['$'+method] !== 'undefined') {
-            body = refine_module.$$prototype['$'+method];
+          if (typeof refine_module.$$prototype[$jsid(method)] !== 'undefined') {
+            body = refine_module.$$prototype[$jsid(method)];
             return Opal.send2(recv, body, method, args, block, blockopts);
           }
         }
@@ -2070,8 +2077,8 @@
   }
 
   Opal.alias = function(obj, name, old) {
-    var id     = '$' + name,
-        old_id = '$' + old,
+    var id     = $jsid(name),
+        old_id = $jsid(old),
         body,
         alias;
 
@@ -2080,7 +2087,7 @@
       obj = Opal.Object;
     }
 
-    body = obj.$$prototype['$' + old];
+    body = obj.$$prototype[old_id];
 
     // When running inside #instance_eval the alias refers to class methods.
     if (obj.$$eval) {
@@ -2161,7 +2168,7 @@
   }
 
   Opal.alias_native = function(obj, name, native_name) {
-    var id   = '$' + name,
+    var id   = $jsid(name),
         body = obj.$$prototype[native_name];
 
     if (typeof(body) !== "function" || body.$$stub) {

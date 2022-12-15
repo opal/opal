@@ -1333,6 +1333,7 @@ class ::String < `String`
 
   def to_proc
     method_name = `self.valueOf()`
+    jsid = `Opal.jsid(method_name)`
 
     proc = ::Kernel.proc do |*args, &block|
       %x{
@@ -1344,7 +1345,7 @@ class ::String < `String`
 
         if (recv == null) recv = nil;
 
-        var body = recv['$' + #{method_name}];
+        var body = recv[jsid];
 
         if (!body) {
           body = recv.$method_missing;

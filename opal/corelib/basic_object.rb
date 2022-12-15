@@ -30,7 +30,7 @@ class ::BasicObject
         #{raise ::TypeError, "#{inspect} is not a symbol nor a string"}
       }
 
-      var func = self['$' + symbol];
+      var func = self[Opal.jsid(symbol)];
 
       if (func) {
         if (block !== nil) {
