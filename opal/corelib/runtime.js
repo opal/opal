@@ -1854,11 +1854,16 @@
   Opal.send = function(recv, method, args, block, blockopts) {
     var body;
 
-    if (typeof(method) === 'function') {
+    if (args == null) args = [];
+
+    if (typeof(method) === 'string') {
+      // A shortcut for the most obvious path
+      if (!block) return recv['$'+method](...args);
+
+      body = recv['$'+method];
+    } else if (typeof(method) === 'function') {
       body = method;
       method = null;
-    } else if (typeof(method) === 'string') {
-      body = recv['$'+method];
     } else {
       throw Opal.NameError.$new("Passed method should be a string or a function");
     }

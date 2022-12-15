@@ -66,23 +66,14 @@ module Opal
         iter.meta[:has_break]
       end
 
-      # Opal has a runtime helper 'Opal.send_method_name' that assigns
+      # Opal has a runtime helper 'Opal.send' that assigns
       # provided block to a '$$p' property of the method body
       # and invokes a method using 'apply'.
       #
-      # We have to compile a method call using this 'Opal.send_method_name' when a method:
-      # 1. takes a splat
-      # 2. takes a block
-      #
-      # Arguments that contain splat must be handled in a different way.
-      # @see #compile_arguments
-      #
-      # When a method takes a block we have to calculate all arguments
-      # **before** assigning '$$p' property (that stores a passed block)
-      # to a method body. This is some kind of protection from method calls
-      # like 'a(a {}) { 1 }'.
+      # We use this helper every time now, but subclasses may
+      # override it.
       def invoke_using_send?
-        iter || splat? || call_is_writer_that_needs_handling?
+        true
       end
 
       def invoke_using_refinement?
@@ -161,14 +152,18 @@ module Opal
       end
 
       def compile_arguments(skip_comma = false)
-        push ', ' unless skip_comma
+        push ', ' if !skip_comma && !(arglist.children.empty? && !iter)
 
         if @with_writer_temp
           push @with_writer_temp
         elsif splat?
           push expr(arglist)
         elsif arglist.children.empty?
-          push '[]'
+          if iter
+            push '[]'
+          else
+            push ''
+          end
         else
           push '[', expr(arglist), ']'
         end
@@ -285,9 +280,10 @@ module Opal
           dir = File.dirname(file)
           compiler.requires << Pathname(dir).join(arg.children[0]).cleanpath.to_s
         end
-        push fragment("#{scope.self}.$require(#{file.inspect}+ '/../' + ")
+        helper :send
+        push fragment("$send(#{scope.self}, 'require', [#{file.inspect}+ '/../' + ")
         push process(arglist)
-        push fragment(')')
+        push fragment('])')
       end
 
       add_special :autoload do |compile_default|
@@ -392,6 +388,8 @@ module Opal
       # This can be refactored in terms of binding, but it would need 'corelib/binding'
       # to be required in existing code.
       add_special :eval do |compile_default|
+        helper :send
+
         # Catch the return throw coming from eval
         thrower(:eval_return)
 
@@ -404,7 +402,7 @@ module Opal
         push ", typeof Opal.compile === 'function' ? eval(Opal.compile(#{temp}"
         push ', {scope_variables: ', scope_variables
         push ", arity_check: #{compiler.arity_check?}, file: '(eval)', eval: true})) : "
-        push "#{scope.self}.$eval(#{temp}))"
+        push "$send(#{scope.self}, 'eval', [#{temp}]))"
       end
 
       add_special :local_variables do |compile_default|
@@ -415,17 +413,19 @@ module Opal
       end
 
       add_special :binding do |compile_default|
+        helper :send
+
         next compile_default.call unless recvr.nil?
 
         scope.nesting
-        push "Opal.Binding.$new("
+        push "$send(Opal.Binding, 'new', ["
         push "  function($code) {"
         push "    return eval($code);"
         push "  },"
         push "  ", scope.scope_locals.map(&:to_s).inspect, ","
         push "  ", scope.self, ","
         push "  ", source_location
-        push ")"
+        push "])"
       end
 
       add_special :__await__ do |compile_default|
