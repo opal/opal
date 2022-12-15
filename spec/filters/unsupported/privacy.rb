@@ -1,311 +1,255 @@
 # NOTE: run bin/format-filters after changing this file
-opal_unsupported_filter "private" do
+opal_unsupported_filter "privacy" do
   fails "A method definition always resets the visibility to public for nested definitions at the toplevel" # Expected NoMethodError (/private/) but no exception was raised ("nested_method_in_toplevel_method" was returned)
   fails "A method definition always resets the visibility to public for nested definitions in Class.new" # Expected NoMethodError (/private/) but no exception was raised ("new_def" was returned)
-  fails "BasicObject#initialize is a private instance method"
-  fails "BasicObject#method_missing for a Class raises a NoMethodError when an undefined method is called"
-  fails "BasicObject#method_missing is a private method"
-  fails "BasicObject#singleton_method_added is a private method"
-  fails "BasicObject#singleton_method_removed is a private method"
-  fails "BasicObject#singleton_method_undefined is a private method"
-  fails "Defining a 'respond_to_missing?' method sets the method's visibility to private"
-  fails "Defining a method at the top-level defines it on Object with private visibility by default"
-  fails "Defining an 'initialize' method sets the method's visibility to private"
-  fails "Defining an 'initialize_clone' method sets the method's visibility to private"
-  fails "Defining an 'initialize_copy' method sets the method's visibility to private"
-  fails "Defining an 'initialize_dup' method sets the method's visibility to private"
-  fails "DelegateClass.instance_method raises a NameError for a private instance methods of the delegated class" # Expected NameError but no exception was raised (#<UnboundMethod: DelegateSpecs::DelegateClass#priv (defined in #<Class:0x1663a> in ./delegate.rb:351)> was returned)
-  fails "DelegateClass.instance_methods does not include private methods" # Expected ["extra",  "extra_private",  "extra_protected",  "__getobj__",  "__setobj__",  "pub",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "DelegateClass",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "<=>",  "method",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "define_singleton_method",  "dup",  "enum_for",  "exit",  "extend",  "gets",  "hash",  "initialize_copy",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "frozen?",  "taint",  "untaint",  "tainted?",  "private_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "initialize",  "method_missing",  "respond_to_missing?",  "target_respond_to?",  "methods",  "public_methods",  "protected_methods",  "==",  "!=",  "eql?",  "!",  "marshal_dump",  "marshal_load",  "initialize_clone",  "initialize_dup",  "freeze",  "__raise__",  "__send__",  "__id__",  "equal?",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "unpack_format",  "be_close_to_matrix",  "=~",  "!~",  "===",  "inspect",  "to_s",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel"] not to include "priv"
+  fails "BasicObject#initialize is a private instance method" # Expected BasicObject to have private instance method 'initialize' but it does not
+  fails "BasicObject#method_missing is a private method" # Expected BasicObject to have private instance method 'method_missing' but it does not
+  fails "BasicObject#singleton_method_added is a private method" # Expected BasicObject to have private instance method 'singleton_method_added' but it does not
+  fails "BasicObject#singleton_method_removed is a private method" # Expected BasicObject to have private instance method 'singleton_method_removed' but it does not
+  fails "BasicObject#singleton_method_undefined is a private method" # Expected BasicObject to have private instance method 'singleton_method_undefined' but it does not
+  fails "Defining a 'respond_to_missing?' method sets the method's visibility to private" # Expected DefRespondToMissingPSpec to have private instance method 'respond_to_missing?' but it does not
+  fails "Defining a method at the top-level defines it on Object with private visibility by default" # Expected Object to have private instance method 'some_toplevel_method' but it does not
+  fails "Defining an 'initialize' method sets the method's visibility to private" # Expected DefInitializeSpec to have private instance method 'initialize' but it does not
+  fails "Defining an 'initialize_clone' method sets the method's visibility to private" # Expected DefInitializeCloneSpec to have private instance method 'initialize_clone' but it does not
+  fails "Defining an 'initialize_copy' method sets the method's visibility to private" # Expected DefInitializeCopySpec to have private instance method 'initialize_copy' but it does not
+  fails "Defining an 'initialize_dup' method sets the method's visibility to private" # Expected DefInitializeDupSpec to have private instance method 'initialize_dup' but it does not
+  fails "DelegateClass.instance_method raises a NameError for a private instance methods of the delegated class" # Expected NameError but no exception was raised (#<UnboundMethod: DelegateSpecs::DelegateClass#priv (defined in #<Class:0x6cf4> in ./delegate.rb:360)> was returned)
+  fails "DelegateClass.instance_methods does not include private methods" # Expected ["extra",  "extra_private",  "extra_protected",  "__getobj__",  "__setobj__",  "pub",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "kernel_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_real_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "unpack_format",  "DelegateClass",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "<=>",  "method",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "define_singleton_method",  "dup",  "enum_for",  "exit",  "extend",  "gets",  "hash",  "initialize_copy",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "taint",  "untaint",  "tainted?",  "private_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "initialize",  "method_missing",  "respond_to_missing?",  "target_respond_to?",  "methods",  "public_methods",  "protected_methods",  "==",  "!=",  "eql?",  "!",  "marshal_dump",  "marshal_load",  "initialize_clone",  "initialize_dup",  "freeze",  "frozen?",  "__raise__",  "__send__",  "__id__",  "equal?",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "__marshal__",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "lang_send_rest_len",  "example_instance_method_of_object",  "defined_specs_method",  "defined_specs_receiver",  "main_public_method",  "main_public_method2",  "main_private_method",  "main_private_method2",  "toplevel_define_other_method",  "some_toplevel_method",  "public_toplevel_method",  "be_close_to_matrix",  "check_autoload",  "shellsplit",  "shellwords",  "shellescape",  "shelljoin",  "=~",  "!~",  "===",  "inspect",  "to_s",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel"] not to include "priv"
   fails "DelegateClass.private_instance_methods includes private instance methods of the DelegateClass class" # Expected [] to include "extra_private"
   fails "DelegateClass.protected_instance_methods includes protected instance methods of the DelegateClass class" # Expected [] to include "extra_protected"
   fails "DelegateClass.protected_instance_methods includes the protected methods of the delegated class" # Expected [] to include "prot"
-  fails "DelegateClass.public_instance_methods does not include private methods" # Expected ["extra",  "extra_private",  "extra_protected",  "__getobj__",  "__setobj__",  "pub",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "DelegateClass",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "<=>",  "method",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "define_singleton_method",  "dup",  "enum_for",  "exit",  "extend",  "gets",  "hash",  "initialize_copy",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "frozen?",  "taint",  "untaint",  "tainted?",  "private_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "initialize",  "method_missing",  "respond_to_missing?",  "target_respond_to?",  "methods",  "public_methods",  "protected_methods",  "==",  "!=",  "eql?",  "!",  "marshal_dump",  "marshal_load",  "initialize_clone",  "initialize_dup",  "freeze",  "__raise__",  "__send__",  "__id__",  "equal?",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "unpack_format",  "be_close_to_matrix",  "=~",  "!~",  "===",  "inspect",  "to_s",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel"] not to include "priv"
-  fails "DelegateClass.public_instance_methods does not include the protected methods of the delegated class" # Expected ["extra",  "extra_private",  "extra_protected",  "__getobj__",  "__setobj__",  "pub",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "DelegateClass",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "<=>",  "method",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "define_singleton_method",  "dup",  "enum_for",  "exit",  "extend",  "gets",  "hash",  "initialize_copy",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "frozen?",  "taint",  "untaint",  "tainted?",  "private_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "initialize",  "method_missing",  "respond_to_missing?",  "target_respond_to?",  "methods",  "public_methods",  "protected_methods",  "==",  "!=",  "eql?",  "!",  "marshal_dump",  "marshal_load",  "initialize_clone",  "initialize_dup",  "freeze",  "__raise__",  "__send__",  "__id__",  "equal?",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "unpack_format",  "be_close_to_matrix",  "=~",  "!~",  "===",  "inspect",  "to_s",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel"] not to include "prot"
+  fails "DelegateClass.public_instance_methods does not include private methods" # Expected ["extra",  "extra_private",  "extra_protected",  "__getobj__",  "__setobj__",  "pub",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "kernel_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_real_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "unpack_format",  "DelegateClass",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "<=>",  "method",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "define_singleton_method",  "dup",  "enum_for",  "exit",  "extend",  "gets",  "hash",  "initialize_copy",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "taint",  "untaint",  "tainted?",  "private_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "initialize",  "method_missing",  "respond_to_missing?",  "target_respond_to?",  "methods",  "public_methods",  "protected_methods",  "==",  "!=",  "eql?",  "!",  "marshal_dump",  "marshal_load",  "initialize_clone",  "initialize_dup",  "freeze",  "frozen?",  "__raise__",  "__send__",  "__id__",  "equal?",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "__marshal__",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "lang_send_rest_len",  "example_instance_method_of_object",  "defined_specs_method",  "defined_specs_receiver",  "main_public_method",  "main_public_method2",  "main_private_method",  "main_private_method2",  "toplevel_define_other_method",  "some_toplevel_method",  "public_toplevel_method",  "be_close_to_matrix",  "check_autoload",  "shellsplit",  "shellwords",  "shellescape",  "shelljoin",  "=~",  "!~",  "===",  "inspect",  "to_s",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel"] not to include "priv"
+  fails "DelegateClass.public_instance_methods does not include the protected methods of the delegated class" # Expected ["extra",  "extra_private",  "extra_protected",  "__getobj__",  "__setobj__",  "pub",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "kernel_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_real_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "unpack_format",  "DelegateClass",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "<=>",  "method",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "define_singleton_method",  "dup",  "enum_for",  "exit",  "extend",  "gets",  "hash",  "initialize_copy",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "taint",  "untaint",  "tainted?",  "private_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "initialize",  "method_missing",  "respond_to_missing?",  "target_respond_to?",  "methods",  "public_methods",  "protected_methods",  "==",  "!=",  "eql?",  "!",  "marshal_dump",  "marshal_load",  "initialize_clone",  "initialize_dup",  "freeze",  "frozen?",  "__raise__",  "__send__",  "__id__",  "equal?",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "__marshal__",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "lang_send_rest_len",  "example_instance_method_of_object",  "defined_specs_method",  "defined_specs_receiver",  "main_public_method",  "main_public_method2",  "main_private_method",  "main_private_method2",  "toplevel_define_other_method",  "some_toplevel_method",  "public_toplevel_method",  "be_close_to_matrix",  "check_autoload",  "shellsplit",  "shellwords",  "shellescape",  "shelljoin",  "=~",  "!~",  "===",  "inspect",  "to_s",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel"] not to include "prot"
   fails "Delegator#method raises a NameError for a private methods of the delegate object" # Expected warning to match: /delegator does not forward private method #priv/ but got: ""
   fails "Delegator#method raises a NameError for protected methods of the delegate object" # Expected warning to match: /delegator does not forward private method #prot/ but got: ""
   fails "Delegator#method returns a method object for private methods of the Delegator class" # NameError: undefined method `extra_private' for class `DelegateSpecs::Simple'
   fails "Delegator#method returns a method object for protected methods of the Delegator class" # NameError: undefined method `extra_protected' for class `DelegateSpecs::Simple'
   fails "Delegator#method returns a method object for public methods of the Delegator class" # NameError: undefined method `extra' for class `DelegateSpecs::Simple'
-  fails "Delegator#methods does not include private methods" # Expected ["singleton_method",  "pub",  "respond_to_missing?",  "method_missing",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "DelegateClass",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "unpack_format",  "be_close_to_matrix",  "example_instance_method_of_object",  "check_autoload",  "main_public_method",  "main_public_method2",  "main_private_method",  "main_private_method2",  "lang_send_rest_len",  "toplevel_define_other_method",  "some_toplevel_method",  "public_toplevel_method",  "defined_specs_method",  "defined_specs_receiver",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "=~",  "!~",  "===",  "<=>",  "method",  "methods",  "public_methods",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "initialize_clone",  "define_singleton_method",  "dup",  "initialize_dup",  "enum_for",  "equal?",  "exit",  "extend",  "gets",  "hash",  "initialize_copy",  "inspect",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "to_s",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "freeze",  "frozen?",  "taint",  "untaint",  "tainted?",  "private_methods",  "protected_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel",  "__send__",  "__id__",  "==",  "!",  "initialize",  "eql?",  "!=",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "__marshal__"] not to include "priv"
+  fails "Delegator#methods does not include private methods" # Expected ["singleton_method",  "pub",  "respond_to_missing?",  "method_missing",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "kernel_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_real_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "unpack_format",  "DelegateClass",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "lang_send_rest_len",  "example_instance_method_of_object",  "defined_specs_method",  "defined_specs_receiver",  "main_public_method",  "main_public_method2",  "main_private_method",  "main_private_method2",  "toplevel_define_other_method",  "some_toplevel_method",  "public_toplevel_method",  "be_close_to_matrix",  "shellsplit",  "shellwords",  "shellescape",  "shelljoin",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "=~",  "!~",  "===",  "<=>",  "method",  "methods",  "public_methods",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "initialize_clone",  "define_singleton_method",  "dup",  "initialize_dup",  "enum_for",  "equal?",  "exit",  "extend",  "freeze",  "frozen?",  "gets",  "hash",  "initialize_copy",  "inspect",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "to_s",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "taint",  "untaint",  "tainted?",  "private_methods",  "protected_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel",  "__send__",  "__id__",  "==",  "!",  "initialize",  "eql?",  "!=",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "__marshal__"] not to include "priv"
   fails "Delegator#private_methods includes all private instance methods of the Delegate class" # Expected [] to include "extra_private"
   fails "Delegator#protected_methods includes protected instance methods of the Delegator class" # Expected [] to include "extra_protected"
   fails "Delegator#protected_methods includes protected methods of the delegate object" # Expected [] to include "prot"
-  fails "Delegator#public_methods includes public instance methods of the Delegator class" # Expected ["pub",  "respond_to_missing?",  "method_missing",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "DelegateClass",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "unpack_format",  "be_close_to_matrix",  "example_instance_method_of_object",  "check_autoload",  "main_public_method",  "main_public_method2",  "main_private_method",  "main_private_method2",  "lang_send_rest_len",  "toplevel_define_other_method",  "some_toplevel_method",  "public_toplevel_method",  "defined_specs_method",  "defined_specs_receiver",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "=~",  "!~",  "===",  "<=>",  "method",  "methods",  "public_methods",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "initialize_clone",  "define_singleton_method",  "dup",  "initialize_dup",  "enum_for",  "equal?",  "exit",  "extend",  "gets",  "hash",  "initialize_copy",  "inspect",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "to_s",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "freeze",  "frozen?",  "taint",  "untaint",  "tainted?",  "private_methods",  "protected_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel",  "__send__",  "__id__",  "==",  "!",  "initialize",  "eql?",  "!=",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "__marshal__"] to include "extra"
-  fails "Enumerator#initialize is a private method"
+  fails "Delegator#public_methods includes public instance methods of the Delegator class" # Expected ["pub",  "respond_to_missing?",  "method_missing",  "priv",  "prot",  "to_json",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "kernel_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_real_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "unpack_format",  "DelegateClass",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "lang_send_rest_len",  "expect",  "eq",  "pretty_print",  "pretty_print_cycle",  "pretty_print_instance_variables",  "pretty_print_inspect",  "=~",  "!~",  "===",  "<=>",  "method",  "methods",  "public_methods",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "initialize_clone",  "define_singleton_method",  "dup",  "initialize_dup",  "enum_for",  "equal?",  "exit",  "extend",  "freeze",  "frozen?",  "gets",  "hash",  "initialize_copy",  "inspect",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "to_s",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "taint",  "untaint",  "tainted?",  "private_methods",  "protected_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel",  "__send__",  "__id__",  "==",  "!",  "initialize",  "eql?",  "!=",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined"] to include "extra"
+  fails "Enumerator#initialize is a private method" # Expected Enumerator to have private instance method 'initialize' but it does not
   fails "Enumerator::Chain#initialize is a private method" # Expected Enumerator::Chain to have private instance method 'initialize' but it does not
   fails "Enumerator::Generator#initialize is a private method" # Expected Enumerator::Generator to have private instance method 'initialize' but it does not
   fails "Enumerator::Lazy#initialize is a private method" # Expected Enumerator::Lazy to have private instance method 'initialize' but it does not
   fails "Enumerator::Yielder#initialize is a private method" # Expected Enumerator::Yielder to have private instance method 'initialize' but it does not
-  fails "Invoking a private getter method does not permit self as a receiver"
-  fails "Kernel#block_given? is a private method"
-  fails "Kernel#eval is a private method"
+  fails "Kernel#Pathname is a private instance method" # Expected Kernel to have private instance method 'Pathname' but it does not
+  fails "Kernel#block_given? is a private method" # Expected Kernel to have private instance method 'block_given?' but it does not
+  fails "Kernel#eval is a private method" # Expected Kernel to have private instance method 'eval' but it does not
   fails "Kernel#initialize_clone is a private instance method" # Expected Kernel to have private instance method 'initialize_clone' but it does not
   fails "Kernel#initialize_dup is a private instance method" # Expected Kernel to have private instance method 'initialize_dup' but it does not
-  fails "Kernel#iterator? is a private method"
-  fails "Kernel#local_variables is a private method"
-  fails "Kernel#methods returns private singleton methods defined by obj.meth"
-  fails "Kernel#methods returns singleton methods defined in 'class << self' when it follows 'private'"
-  fails "Kernel#p is a private method"
-  fails "Kernel#print is a private method"
-  fails "Kernel#printf is a private method"
-  fails "Kernel#private_methods returns a list of the names of privately accessible methods in the object and its ancestors and mixed-in modules"
-  fails "Kernel#private_methods returns a list of the names of privately accessible methods in the object"
-  fails "Kernel#private_methods returns private methods mixed in to the metaclass"
-  fails "Kernel#private_methods when not passed an argument returns a unique list for a class including a module"
-  fails "Kernel#private_methods when not passed an argument returns a unique list for a subclass of a class that includes a module"
-  fails "Kernel#private_methods when not passed an argument returns a unique list for an object extended by a module"
-  fails "Kernel#private_methods when passed false returns a list of private methods in without its ancestors"
-  fails "Kernel#private_methods when passed nil returns a list of private methods in without its ancestors"
-  fails "Kernel#private_methods when passed true returns a unique list for a class including a module"
-  fails "Kernel#private_methods when passed true returns a unique list for a subclass of a class that includes a module"
-  fails "Kernel#private_methods when passed true returns a unique list for an object extended by a module"
-  fails "Kernel#protected_methods returns a list of the names of protected methods accessible in the object and from its ancestors and mixed-in modules"
-  fails "Kernel#protected_methods returns a list of the names of protected methods accessible in the object"
-  fails "Kernel#protected_methods returns methods mixed in to the metaclass"
-  fails "Kernel#protected_methods when not passed an argument returns a unique list for a class including a module"
-  fails "Kernel#protected_methods when not passed an argument returns a unique list for a subclass of a class that includes a module"
-  fails "Kernel#protected_methods when not passed an argument returns a unique list for an object extended by a module"
-  fails "Kernel#protected_methods when passed false returns a list of protected methods in without its ancestors"
-  fails "Kernel#protected_methods when passed nil returns a list of protected methods in without its ancestors"
-  fails "Kernel#protected_methods when passed true returns a unique list for a class including a module"
-  fails "Kernel#protected_methods when passed true returns a unique list for a subclass of a class that includes a module"
-  fails "Kernel#protected_methods when passed true returns a unique list for an object extended by a module"
-  fails "Kernel#public_send called from own public method raises a NoMethodError if the method is private"
-  fails "Kernel#public_send called from own public method raises a NoMethodError if the method is protected"
-  fails "Kernel#public_send raises a NoMethodError if the method is protected"
-  fails "Kernel#public_send raises a NoMethodError if the named method is an alias of a private method"
-  fails "Kernel#public_send raises a NoMethodError if the named method is an alias of a protected method"
-  fails "Kernel#public_send raises a NoMethodError if the named method is private"
-  fails "Kernel#puts is a private method"
-  fails "Kernel#respond_to? does not change method visibility when finding private method"
-  fails "Kernel#respond_to? returns false even if obj responds to the given private method (include_private = false)"
-  fails "Kernel#respond_to? returns false if obj responds to the given private method"
-  fails "Kernel#respond_to? returns false if obj responds to the given protected method (include_private = false)"
-  fails "Kernel#respond_to? returns false if obj responds to the given protected method"
-  fails "Kernel#respond_to_missing? is a private method"
-  fails "Kernel#respond_to_missing? is called when obj responds to the given private method, include_private = false"
-  fails "Kernel#respond_to_missing? is called when obj responds to the given protected method, include_private = false"
-  fails "Kernel#respond_to_missing? isn't called when obj responds to the given private method, include_private = true"
-  fails "Kernel#respond_to_missing? isn't called when obj responds to the given protected method, include_private = true"
-  fails "Kernel#respond_to_missing? isn't called when obj responds to the given public method, include_private = true"
-  fails "Kernel#singleton_methods when not passed an argument does not return private class methods for a class"
-  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a class including a module"
-  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a module including a module"
-  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a subclass including a module"
-  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a subclass of a class including a module"
-  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module"
-  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a subclass"
-  fails "Kernel#singleton_methods when not passed an argument does not return private module methods for a module"
-  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for a class extended with a module"
-  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with a module"
-  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with two modules"
-  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extented with a module including a module"
-  fails "Kernel#singleton_methods when passed false does not return private class methods for a class"
-  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a class including a module"
-  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a module including a module"
-  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a subclass including a module"
-  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a subclass of a class including a module"
-  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module"
-  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a subclass"
-  fails "Kernel#singleton_methods when passed false does not return private module methods for a module"
-  fails "Kernel#singleton_methods when passed false does not return private singleton methods for a class extended with a module"
-  fails "Kernel#singleton_methods when passed false does not return private singleton methods for an object extended with a module"
-  fails "Kernel#singleton_methods when passed false does not return private singleton methods for an object extended with two modules"
-  fails "Kernel#singleton_methods when passed false does not return private singleton methods for an object extented with a module including a module"
-  fails "Kernel#singleton_methods when passed true does not return private class methods for a class"
-  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a class including a module"
-  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a module including a module"
-  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a subclass including a module"
-  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a subclass of a class including a module"
-  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module"
-  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a subclass"
-  fails "Kernel#singleton_methods when passed true does not return private module methods for a module"
-  fails "Kernel#singleton_methods when passed true does not return private singleton methods for a class extended with a module"
-  fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with a module"
-  fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with two modules"
-  fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extented with a module including a module"
-  fails "Kernel.global_variables is a private method"
-  fails "Kernel.lambda is a private method"
-  fails "Kernel.loop is a private method"
-  fails "Kernel.proc is a private method"
-  fails "Kernel.rand is a private method"
-  fails "Kernel.srand is a private method"
-  fails "Matrix.new is private" # Expected Matrix to have private method 'new' but it does not
-  fails "Method#== missing methods calls respond_to_missing? with true to include private methods"
-  fails "Method#eql? missing methods calls respond_to_missing? with true to include private methods"
-  fails "Module#alias_method aliasing special methods keeps initialize private when aliasing"
-  fails "Module#alias_method aliasing special methods keeps initialize_clone private when aliasing"
-  fails "Module#alias_method aliasing special methods keeps initialize_copy private when aliasing"
-  fails "Module#alias_method aliasing special methods keeps initialize_dup private when aliasing"
-  fails "Module#alias_method aliasing special methods keeps respond_to_missing? private when aliasing"
-  fails "Module#alias_method is a private method"
-  fails "Module#append_features is a private method"
-  fails "Module#attr is a private method"
-  fails "Module#attr_accessor is a private method"
-  fails "Module#attr_reader is a private method"
-  fails "Module#attr_writer is a private method"
-  fails "Module#define_method is private"
+  fails "Kernel#local_variables is a private method" # Expected Kernel to have private instance method 'local_variables' but it does not
+  fails "Kernel#p is a private method" # Expected Kernel to have private instance method 'p' but it does not
+  fails "Kernel#print is a private method" # Expected Kernel to have private instance method 'print' but it does not
+  fails "Kernel#printf is a private method" # Expected Kernel to have private instance method 'printf' but it does not
+  fails "Kernel#private_methods returns a list of the names of privately accessible methods in the object and its ancestors and mixed-in modules" # Expected [] to include "shichi"
+  fails "Kernel#private_methods returns a list of the names of privately accessible methods in the object" # Expected [] to include "shichi"
+  fails "Kernel#private_methods returns private methods mixed in to the metaclass" # Expected [] to include "shoo"
+  fails "Kernel#private_methods when not passed an argument returns a unique list for a class including a module" # Expected [] == ["pri"] to be truthy but was false
+  fails "Kernel#private_methods when not passed an argument returns a unique list for a subclass of a class that includes a module" # Expected [] == ["pri"] to be truthy but was false
+  fails "Kernel#private_methods when not passed an argument returns a unique list for an object extended by a module" # Expected [] == ["pri"] to be truthy but was false
+  fails "Kernel#private_methods when passed false returns a list of private methods in without its ancestors" # Expected [] == ["ds_pri", "fs_pri"] to be truthy but was false
+  fails "Kernel#private_methods when passed nil returns a list of private methods in without its ancestors" # Expected [] == ["ds_pri", "fs_pri"] to be truthy but was false
+  fails "Kernel#private_methods when passed true returns a unique list for a class including a module" # Expected [] == ["pri"] to be truthy but was false
+  fails "Kernel#private_methods when passed true returns a unique list for a subclass of a class that includes a module" # Expected [] == ["pri"] to be truthy but was false
+  fails "Kernel#private_methods when passed true returns a unique list for an object extended by a module" # Expected [] == ["pri"] to be truthy but was false
+  fails "Kernel#protected_methods returns a list of the names of protected methods accessible in the object and from its ancestors and mixed-in modules" # Expected [] to include "juu_ichi"
+  fails "Kernel#protected_methods returns a list of the names of protected methods accessible in the object" # Expected [] to include "juu_ichi"
+  fails "Kernel#protected_methods returns methods mixed in to the metaclass" # Expected [] to include "nopeeking"
+  fails "Kernel#protected_methods when not passed an argument returns a unique list for a class including a module" # Expected [] == ["pro"] to be truthy but was false
+  fails "Kernel#protected_methods when not passed an argument returns a unique list for a subclass of a class that includes a module" # Expected [] == ["pro"] to be truthy but was false
+  fails "Kernel#protected_methods when not passed an argument returns a unique list for an object extended by a module" # Expected [] == ["pro"] to be truthy but was false
+  fails "Kernel#protected_methods when passed false returns a list of protected methods in without its ancestors" # Expected [] == ["ds_pro", "fs_pro"] to be truthy but was false
+  fails "Kernel#protected_methods when passed nil returns a list of protected methods in without its ancestors" # Expected [] == ["ds_pro", "fs_pro"] to be truthy but was false
+  fails "Kernel#protected_methods when passed true returns a unique list for a class including a module" # Expected [] == ["pro"] to be truthy but was false
+  fails "Kernel#protected_methods when passed true returns a unique list for a subclass of a class that includes a module" # Expected [] == ["pro"] to be truthy but was false
+  fails "Kernel#protected_methods when passed true returns a unique list for an object extended by a module" # Expected [] == ["pro"] to be truthy but was false
+  fails "Kernel#public_send called from own public method raises a NoMethodError if the method is private" # Expected NoMethodError but got: RuntimeError (Should not called)
+  fails "Kernel#public_send called from own public method raises a NoMethodError if the method is protected" # Expected NoMethodError but got: RuntimeError (Should not called)
+  fails "Kernel#public_send raises a NoMethodError if the method is protected" # Expected NoMethodError but no exception was raised ("done" was returned)
+  fails "Kernel#public_send raises a NoMethodError if the named method is an alias of a private method" # Expected NoMethodError but no exception was raised ("done2" was returned)
+  fails "Kernel#public_send raises a NoMethodError if the named method is an alias of a protected method" # Expected NoMethodError but no exception was raised ("done2" was returned)
+  fails "Kernel#public_send raises a NoMethodError if the named method is private" # Expected NoMethodError but no exception was raised ("done2" was returned)
+  fails "Kernel#puts is a private method" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x2d0e6 @name=nil @stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="read" @write_proc=#<Proc:0x2d0ec> @tty=true>>
+  fails "Kernel#respond_to? does not change method visibility when finding private method" # Expected true == false to be truthy but was false
+  fails "Kernel#respond_to? returns false even if obj responds to the given private method (include_private = false)" # Expected true == false to be truthy but was false
+  fails "Kernel#respond_to? returns false if obj responds to the given private method" # Expected true == false to be truthy but was false
+  fails "Kernel#respond_to? returns false if obj responds to the given protected method (include_private = false)" # Expected true == false to be truthy but was false
+  fails "Kernel#respond_to? returns false if obj responds to the given protected method" # Expected true == false to be truthy but was false
+  fails "Kernel#respond_to_missing? is a private method" # Expected Kernel to have private instance method 'respond_to_missing?' but it does not
+  fails "Kernel#respond_to_missing? is called when obj responds to the given private method, include_private = false" # Mock '#<KernelSpecs::A:0x37840>' expected to receive respond_to_missing?("private_method", false) exactly 1 times but received it 0 times
+  fails "Kernel#respond_to_missing? is called when obj responds to the given protected method, include_private = false" # Expected true to be false
+  fails "Kernel#singleton_methods when not passed an argument does not return private class methods for a class" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::A
+  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::D
+  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a module including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::N
+  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a subclass including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::C
+  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a subclass of a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::E
+  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::F
+  fails "Kernel#singleton_methods when not passed an argument does not return private inherited singleton methods for a subclass" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::B
+  fails "Kernel#singleton_methods when not passed an argument does not return private module methods for a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::M
+  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for a class extended with a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::P
+  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x446a @name="Object extended" @null=nil>
+  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x447a @name="Object extended twice" @null=nil>
+  fails "Kernel#singleton_methods when passed false does not return private class methods for a class" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::A
+  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::D
+  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a module including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::N
+  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a subclass including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::C
+  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a subclass of a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::E
+  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::F
+  fails "Kernel#singleton_methods when passed false does not return private inherited singleton methods for a subclass" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::B
+  fails "Kernel#singleton_methods when passed false does not return private module methods for a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::M
+  fails "Kernel#singleton_methods when passed false does not return private singleton methods for a class extended with a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::P
+  fails "Kernel#singleton_methods when passed false does not return private singleton methods for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x44bc @name="Object extended" @null=nil>
+  fails "Kernel#singleton_methods when passed false does not return private singleton methods for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x44b8 @name="Object extended twice" @null=nil>
+  fails "Kernel#singleton_methods when passed true does not return private class methods for a class" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::A
+  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::D
+  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a module including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::N
+  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a subclass including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::C
+  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a subclass of a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::E
+  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::F
+  fails "Kernel#singleton_methods when passed true does not return private inherited singleton methods for a subclass" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::B
+  fails "Kernel#singleton_methods when passed true does not return private module methods for a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::M
+  fails "Kernel#singleton_methods when passed true does not return private singleton methods for a class extended with a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::P
+  fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x4496 @name="Object extended" @null=nil>
+  fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x44a2 @name="Object extended twice" @null=nil>
+  fails "Kernel.global_variables is a private method" # Expected Kernel to have private instance method 'global_variables' but it does not
+  fails "Kernel.lambda is a private method" # Expected Kernel to have private instance method 'lambda' but it does not
+  fails "Kernel.loop is a private method" # Expected Kernel to have private instance method 'loop' but it does not
+  fails "Kernel.proc is a private method" # Expected Kernel to have private instance method 'proc' but it does not
+  fails "Method#== missing methods calls respond_to_missing? with true to include private methods" # Mock '#<MethodSpecs::Methods:0x49b7c>' expected to receive respond_to_missing?("some_missing_method", true) exactly 1 times but received it 0 times
+  fails "Method#eql? missing methods calls respond_to_missing? with true to include private methods" # Mock '#<MethodSpecs::Methods:0x36ba8>' expected to receive respond_to_missing?("some_missing_method", true) exactly 1 times but received it 0 times
+  fails "Module#alias_method aliasing special methods keeps initialize private when aliasing" # Expected false to be true
+  fails "Module#alias_method aliasing special methods keeps initialize_clone private when aliasing" # Expected false to be true
+  fails "Module#alias_method aliasing special methods keeps initialize_copy private when aliasing" # Expected false to be true
+  fails "Module#alias_method aliasing special methods keeps initialize_dup private when aliasing" # Expected false to be true
+  fails "Module#alias_method aliasing special methods keeps respond_to_missing? private when aliasing" # Expected false to be true
+  fails "Module#append_features is a private method" # Expected Module to have private instance method 'append_features' but it does not
   fails "Module#define_method when given an UnboundMethod sets the new method's visibility to the current frame's visibility" # Expected NoMethodError but no exception was raised ("piggy" was returned)
-  fails "Module#define_method when name is :initialize given an UnboundMethod sets the visibility to private when method is named :initialize"
-  fails "Module#define_method when name is :initialize passed a block sets visibility to private when method name is :initialize"
-  fails "Module#define_method when name is not a special private name given an UnboundMethod and called from the target module sets the visibility of the method to the current visibility"
-  fails "Module#define_method when name is not a special private name given an UnboundMethod sets the visibility of the method to the current visibility"
-  fails "Module#define_method when name is not a special private name passed a block and called from the target module sets the visibility of the method to the current visibility"
-  fails "Module#extend_object is a private method"
-  fails "Module#extend_object is called even when private"
-  fails "Module#extended is private in its default implementation"
-  fails "Module#included is private in its default implementation"
-  fails "Module#instance_methods makes a private Object instance method public in Kernel"
-  fails "Module#method_added is a private instance method"
-  fails "Module#method_removed is a private instance method"
-  fails "Module#method_undefined is a private instance method"
-  fails "Module#module_function is a private method"
-  fails "Module#module_function with specific method names can make accessible private methods"
-  fails "Module#module_function with specific method names makes the instance methods private"
-  fails "Module#prepend_features is a private method"
-  fails "Module#prepended is a private method"
-  fails "Module#private is a private method"
-  fails "Module#private makes a public Object instance method private in Kernel"
-  fails "Module#private makes a public Object instance method private in a new module"
-  fails "Module#private makes the target method uncallable from other types"
+  fails "Module#define_method when name is :initialize given an UnboundMethod sets the visibility to private when method is named :initialize" # Expected #<Class:0x50d92> to have private instance method 'initialize' but it does not
+  fails "Module#define_method when name is :initialize passed a block sets visibility to private when method name is :initialize" # Expected #<Class:0x50d8a> to have private instance method 'initialize' but it does not
+  fails "Module#define_method when name is not a special private name given an UnboundMethod and called from the target module sets the visibility of the method to the current visibility" # Expected #<Class:0x50d6a> to have private instance method 'baz' but it does not
+  fails "Module#define_method when name is not a special private name passed a block and called from the target module sets the visibility of the method to the current visibility" # Expected #<Class:0x50d76> to have private instance method 'baz' but it does not
+  fails "Module#extend_object is a private method" # Expected Module to have private instance method 'extend_object' but it does not
+  fails "Module#extended is private in its default implementation" # Expected [] to include "extended"
+  fails "Module#included is private in its default implementation" # Expected Module to have private instance method 'included' but it does not
+  fails "Module#instance_methods makes a private Object instance method public in Kernel" # Expected ["=~",  "!~",  "===",  "<=>",  "method",  "methods",  "public_methods",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "initialize_clone",  "define_singleton_method",  "dup",  "initialize_dup",  "enum_for",  "equal?",  "exit",  "extend",  "freeze",  "frozen?",  "gets",  "hash",  "initialize_copy",  "inspect",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "instance_variables",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "respond_to_missing?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "to_s",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "taint",  "untaint",  "tainted?",  "private_methods",  "protected_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "BigDecimal",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel"] to include "module_specs_private_method_on_object_for_kernel_public"
+  fails "Module#method_added is a private instance method" # Expected Module to have private instance method 'method_added' but it does not
+  fails "Module#method_removed is a private instance method" # Expected Module to have private instance method 'method_removed' but it does not
+  fails "Module#method_undefined is a private instance method" # Expected Module to have private instance method 'method_undefined' but it does not
+  fails "Module#module_function is a private method" # Expected Module to have private instance method 'module_function' but it does not
+  fails "Module#module_function with specific method names can make accessible private methods" # Exception: Cannot set properties of undefined (setting 'displayName')
+  fails "Module#module_function with specific method names makes the instance methods private" # Expected true == false to be truthy but was false
+  fails "Module#prepend_features is a private method" # Expected Module to have private instance method 'prepend_features' but it does not
+  fails "Module#prepended is a private method" # Expected Module to have private instance method 'prepended' but it does not
+  fails "Module#private is a private method" # Expected Module to have private instance method 'private' but it does not
+  fails "Module#private makes a public Object instance method private in Kernel" # Expected Kernel to have private instance method 'module_specs_public_method_on_object_for_kernel_private' but it does not
+  fails "Module#private makes a public Object instance method private in a new module" # Expected #<Module:0x2baf0> to have private instance method 'module_specs_public_method_on_object' but it does not
+  fails "Module#private makes the target method uncallable from other types" # Expected NoMethodError but no exception was raised (true was returned)
   fails "Module#private only makes the method private in the class it is called on" # Expected NameError but no exception was raised (2 was returned)
-  fails "Module#private raises a NameError when given an undefined name"
-  fails "Module#private returns self"
-  fails "Module#private without arguments affects evaled method definitions when itself is outside the eval"
-  fails "Module#private without arguments affects normally if itself and following method definitions are inside a eval"
-  fails "Module#private without arguments affects normally if itself and method definitions are inside a module_eval"
-  fails "Module#private without arguments continues setting visibility if the body encounters other visibility setters with arguments"
-  fails "Module#private without arguments does not affect method definitions when itself is inside an eval and method definitions are outside"
-  fails "Module#private without arguments does not affect module_evaled method definitions when itself is outside the eval"
-  fails "Module#private without arguments sets visibility to following method definitions"
-  fails "Module#private without arguments stops setting visibility if the body encounters other visibility setters without arguments"
-  fails "Module#private without arguments within a closure sets the visibility outside the closure"
-  fails "Module#private_class_method accepts more than one method at a time"
-  fails "Module#private_class_method makes a class method private"
-  fails "Module#private_class_method makes an existing class method private up the inheritance tree"
-  fails "Module#private_class_method makes an existing class method private"
-  fails "Module#private_class_method raises a NameError if class method doesn't exist"
-  fails "Module#private_class_method raises a NameError when the given name is an instance method"
-  fails "Module#private_class_method raises a NameError when the given name is not a method"
-  fails "Module#private_constant accepts multiple names"
-  fails "Module#private_constant accepts strings as constant names"
-  fails "Module#private_constant can only be passed constant names defined in the target (self) module"
+  fails "Module#private raises a NameError when given an undefined name" # Expected NameError but no exception was raised ("undefined" was returned)
+  fails "Module#private without arguments affects evaled method definitions when itself is outside the eval" # Expected #<Module:0x2bfce> to have private instance method 'test1' but it does not
+  fails "Module#private without arguments affects normally if itself and following method definitions are inside a eval" # Expected #<Module:0x2bc96> to have private instance method 'test1' but it does not
+  fails "Module#private without arguments affects normally if itself and method definitions are inside a module_eval" # Expected #<Module:0x2bd64> to have private instance method 'test1' but it does not
+  fails "Module#private without arguments continues setting visibility if the body encounters other visibility setters with arguments" # Expected #<Module:0x2bd70> to have private instance method 'test2' but it does not
+  fails "Module#private without arguments sets visibility to following method definitions" # Expected #<Module:0x2bd6a> to have private instance method 'test1' but it does not
+  fails "Module#private without arguments stops setting visibility if the body encounters other visibility setters without arguments" # Expected #<Module:0x2bea2> to have protected instance method 'test1' but it does not
+  fails "Module#private without arguments within a closure sets the visibility outside the closure" # Expected #<Module:0x2bfd4> to have private instance method 'test1' but it does not
+  fails "Module#private_class_method accepts more than one method at a time" # Expected NoMethodError but no exception was raised (nil was returned)
+  fails "Module#private_class_method makes a class method private" # Expected NoMethodError but no exception was raised ("foo" was returned)
+  fails "Module#private_class_method makes an existing class method private up the inheritance tree" # Expected NoMethodError but no exception was raised (nil was returned)
+  fails "Module#private_class_method makes an existing class method private" # Expected NoMethodError but no exception was raised (nil was returned)
+  fails "Module#private_class_method raises a NameError if class method doesn't exist" # Expected NameError but no exception was raised ("no_method_here" was returned)
+  fails "Module#private_class_method raises a NameError when the given name is an instance method" # Expected NameError but no exception was raised (#<Class:0x364fe> was returned)
+  fails "Module#private_class_method raises a NameError when the given name is not a method" # Expected NameError but no exception was raised (#<Class:0x3654c> was returned)
+  fails "Module#private_constant accepts multiple names" # Expected NameError but no exception was raised (true was returned)
+  fails "Module#private_constant accepts strings as constant names" # Expected NameError but no exception was raised (true was returned)
+  fails "Module#private_constant can only be passed constant names defined in the target (self) module" # Expected NameError but no exception was raised (nil was returned)
   fails "Module#private_constant marked constants NameError by #private_constant has :receiver and :name attributes" # Expected NameError but no exception was raised (true was returned)
   fails "Module#private_constant marked constants NameError by #private_constant has the defined class as the :name attribute" # Expected NameError but no exception was raised (true was returned)
-  fails "Module#private_constant marked constants in Object cannot be accessed using ::Const form"
-  fails "Module#private_constant marked constants in Object is not defined? using ::Const form"
-  fails "Module#private_constant marked constants in a class can be accessed from lexical scope"
-  fails "Module#private_constant marked constants in a class can be accessed from the class itself"
-  fails "Module#private_constant marked constants in a class cannot be accessed from outside the class"
-  fails "Module#private_constant marked constants in a class cannot be reopened as a class"
-  fails "Module#private_constant marked constants in a class cannot be reopened as a module"
-  fails "Module#private_constant marked constants in a class is defined? from lexical scope"
-  fails "Module#private_constant marked constants in a class is not defined? with A::B form"
-  fails "Module#private_constant marked constants in a module can be accessed from lexical scope"
-  fails "Module#private_constant marked constants in a module can be accessed from the module itself"
-  fails "Module#private_constant marked constants in a module cannot be accessed from outside the module"
+  fails "Module#private_constant marked constants in Object cannot be accessed using ::Const form" # Expected NameError but no exception was raised (true was returned)
+  fails "Module#private_constant marked constants in Object is not defined? using ::Const form" # Expected "constant" == nil to be truthy but was false
+  fails "Module#private_constant marked constants in a class cannot be accessed from outside the class" # Expected NameError but no exception was raised (true was returned)
+  fails "Module#private_constant marked constants in a class cannot be reopened as a class" # Expected NameError but no exception was raised (nil was returned)
+  fails "Module#private_constant marked constants in a class cannot be reopened as a module" # Expected NameError but no exception was raised (nil was returned)
+  fails "Module#private_constant marked constants in a class is not defined? with A::B form" # Expected "constant" == nil to be truthy but was false
+  fails "Module#private_constant marked constants in a module cannot be accessed from outside the module" # Expected NameError but no exception was raised (true was returned)
   fails "Module#private_constant marked constants in a module cannot be reopened as a class from scope where constant would be private" # Expected NameError but no exception was raised (nil was returned)
-  fails "Module#private_constant marked constants in a module cannot be reopened as a class"
-  fails "Module#private_constant marked constants in a module cannot be reopened as a module from scope where constant would be private" # Exception: Cannot read property '$pretty_inspect' of undefined
-  fails "Module#private_constant marked constants in a module cannot be reopened as a module"
-  fails "Module#private_constant marked constants in a module is defined? from lexical scope"
-  fails "Module#private_constant marked constants in a module is not defined? with A::B form"
-  fails "Module#private_constant marked constants remain private even when updated"
-  fails "Module#private_instance_methods returns a list of private methods in module and its ancestors"
-  fails "Module#private_instance_methods when not passed an argument returns a unique list for a class including a module"
-  fails "Module#private_instance_methods when not passed an argument returns a unique list for a subclass"
-  fails "Module#private_instance_methods when passed false as a parameter, should return only methods defined in that module"
-  fails "Module#private_instance_methods when passed true returns a unique list for a class including a module"
-  fails "Module#private_instance_methods when passed true returns a unique list for a subclass"
-  fails "Module#private_method_defined? accepts symbols for the method name"
-  fails "Module#private_method_defined? calls #to_str to convert an Object"
-  fails "Module#private_method_defined? raises a TypeError if passed a Fixnum"
-  fails "Module#private_method_defined? raises a TypeError if passed an object that defines #to_sym"
-  fails "Module#private_method_defined? raises a TypeError if passed an object that does not defined #to_str"
-  fails "Module#private_method_defined? raises a TypeError if passed false"
-  fails "Module#private_method_defined? raises a TypeError if passed nil"
-  fails "Module#private_method_defined? returns true if the named private method is defined by module or its ancestors"
-  fails "Module#protected is a private method"
-  fails "Module#protected makes a public Object instance method protected in Kernel"
-  fails "Module#protected makes a public Object instance method protected in a new module"
-  fails "Module#protected makes an existing class method protected"
-  fails "Module#protected raises a NameError when given an undefined name"
-  fails "Module#protected returns self"
-  fails "Module#protected without arguments affects evaled method definitions when itself is outside the eval"
-  fails "Module#protected without arguments affects normally if itself and following method definitions are inside a eval"
-  fails "Module#protected without arguments affects normally if itself and method definitions are inside a module_eval"
-  fails "Module#protected without arguments continues setting visibility if the body encounters other visibility setters with arguments"
-  fails "Module#protected without arguments does not affect method definitions when itself is inside an eval and method definitions are outside"
-  fails "Module#protected without arguments does not affect module_evaled method definitions when itself is outside the eval"
-  fails "Module#protected without arguments sets visibility to following method definitions"
-  fails "Module#protected without arguments stops setting visibility if the body encounters other visibility setters without arguments"
-  fails "Module#protected without arguments within a closure sets the visibility outside the closure"
-  fails "Module#protected_instance_methods default list should be the same as passing true as an argument"
-  fails "Module#protected_instance_methods returns a list of protected methods in module and its ancestors"
-  fails "Module#protected_instance_methods when not passed an argument returns a unique list for a class including a module"
-  fails "Module#protected_instance_methods when not passed an argument returns a unique list for a subclass"
-  fails "Module#protected_instance_methods when passed false as a parameter, should return only methods defined in that module"
-  fails "Module#protected_instance_methods when passed true returns a unique list for a class including a module"
-  fails "Module#protected_instance_methods when passed true returns a unique list for a subclass"
-  fails "Module#protected_method_defined? accepts symbols for the method name"
-  fails "Module#protected_method_defined? calls #to_str to convert an Object"
-  fails "Module#protected_method_defined? raises a TypeError if passed a Fixnum"
-  fails "Module#protected_method_defined? raises a TypeError if passed an object that defines #to_sym"
-  fails "Module#protected_method_defined? raises a TypeError if passed an object that does not defined #to_str"
-  fails "Module#protected_method_defined? raises a TypeError if passed false"
-  fails "Module#protected_method_defined? raises a TypeError if passed nil"
-  fails "Module#protected_method_defined? returns true if the named protected method is defined by module or its ancestors"
-  fails "Module#public is a private method"
-  fails "Module#public makes a private Object instance method public in Kernel"
-  fails "Module#public makes a private Object instance method public in a new module"
-  fails "Module#public raises a NameError when given an undefined name"
-  fails "Module#public returns self"
-  fails "Module#public without arguments affects evaled method definitions when itself is outside the eval"
-  fails "Module#public without arguments affects normally if itself and following method definitions are inside a eval"
-  fails "Module#public without arguments does not affect method definitions when itself is inside an eval and method definitions are outside"
-  fails "Module#public without arguments does not affect module_evaled method definitions when itself is outside the eval"
-  fails "Module#public without arguments stops setting visibility if the body encounters other visibility setters without arguments"
-  fails "Module#public_class_method accepts more than one method at a time"
-  fails "Module#public_class_method makes an existing class method public up the inheritance tree"
-  fails "Module#public_class_method makes an existing class method public"
-  fails "Module#public_class_method raises a NameError if class method doesn't exist"
-  fails "Module#public_class_method raises a NameError when the given name is an instance method"
-  fails "Module#public_class_method raises a NameError when the given name is not a method"
-  fails "Module#public_constant accepts multiple names"
-  fails "Module#public_constant accepts strings as constant names"
-  fails "Module#public_constant can only be passed constant names defined in the target (self) module"
-  fails "Module#public_constant marked constants in a class can be accessed from outside the class"
-  fails "Module#public_constant marked constants in a class is defined? with A::B form" # Exception: Opal.TypeError is not a constructor
-  fails "Module#public_constant marked constants in a module can be accessed from outside the module"
-  fails "Module#public_constant marked constants in a module is defined? with A::B form" # Exception: Opal.TypeError is not a constructor
-  fails "Module#public_instance_method is a public method"
-  fails "Module#public_instance_method raises a NameError if the method is private"
-  fails "Module#public_instance_method raises a NameError when given a protected method name"
-  fails "Module#public_instance_method raises a TypeError when given a name is not Symbol or String"
-  fails "Module#public_instance_method requires an argument"
-  fails "Module#public_instance_method sets the NameError#name attribute to the name of the missing method"
-  fails "Module#public_instance_method when given a public method name accepts if the name is a Symbol or String"
-  fails "Module#public_instance_method when given a public method name returns an UnboundMethod corresponding to the defined Module"
-  fails "Module#public_instance_methods when passed false as a parameter, should return only methods defined in that module"
-  fails "Module#public_method_defined? calls #to_str to convert an Object"
-  fails "Module#public_method_defined? raises a TypeError if passed a Fixnum"
-  fails "Module#public_method_defined? raises a TypeError if passed an object that defines #to_sym"
-  fails "Module#public_method_defined? raises a TypeError if passed an object that does not defined #to_str"
-  fails "Module#public_method_defined? raises a TypeError if passed false"
-  fails "Module#public_method_defined? raises a TypeError if passed nil"
-  fails "Module#public_method_defined? returns false if method is not a public method"
-  fails "Module#remove_const is a private method"
-  fails "Module#remove_method is a private method"
-  fails "Module#undef_method is a private method"
-  fails "NoMethodError#message for an protected method match /protected method/"
-  fails "NoMethodError#message for private method match /private method/"
-  fails "OpenStruct#initialize is private"
-  fails "OpenStruct#new_ostruct_member is protected"
-  fails "OpenStruct#table is protected"
-  fails "Rational#marshal_dump is a private method"
-  fails "Redefining a singleton method does not inherit a previously set visibility"
-  fails "Regexp#initialize is a private method"
-  fails "Set#flatten_merge is protected"
-  fails "String#+@ returns mutable copy despite freeze-magic-comment in file" # NoMethodError: undefined method `tmp' for #<Object:0x3bdc>
-  fails "StringScanner#initialize is a private method"
+  fails "Module#private_constant marked constants in a module cannot be reopened as a module from scope where constant would be private" # Expected NameError but no exception was raised (nil was returned)
+  fails "Module#private_constant marked constants in a module is not defined? with A::B form" # Expected "constant" == nil to be truthy but was false
+  fails "Module#private_constant marked constants remain private even when updated" # Expected warning to match: /already initialized constant/ but got: ""
+  fails "Module#private_instance_methods returns a list of private methods in module and its ancestors" # Expected ModuleSpecs::CountsMixin to have private instance method 'private_3' but it does not
+  fails "Module#private_instance_methods when not passed an argument returns a unique list for a class including a module" # Expected [] == ["pri"] to be truthy but was false
+  fails "Module#private_instance_methods when not passed an argument returns a unique list for a subclass" # Expected [] == ["pri"] to be truthy but was false
+  fails "Module#private_instance_methods when passed false as a parameter, should return only methods defined in that module" # Expected ModuleSpecs::CountsMixin to have private instance method 'private_3' but it does not
+  fails "Module#private_instance_methods when passed true returns a unique list for a class including a module" # Expected [] == ["pri"] to be truthy but was false
+  fails "Module#private_instance_methods when passed true returns a unique list for a subclass" # Expected [] == ["pri"] to be truthy but was false
+  fails "Module#private_method_defined? accepts symbols for the method name" # Expected false == true to be truthy but was false
+  fails "Module#private_method_defined? calls #to_str to convert an Object" # Expected false == true to be truthy but was false
+  fails "Module#private_method_defined? raises a TypeError if passed an object that defines #to_sym" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#private_method_defined? raises a TypeError if passed an object that does not defined #to_str" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#private_method_defined? raises a TypeError if passed false" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#private_method_defined? raises a TypeError if passed nil" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#private_method_defined? returns true if the named private method is defined by module or its ancestors" # Expected false == true to be truthy but was false
+  fails "Module#protected is a private method" # Expected Module to have private instance method 'protected' but it does not
+  fails "Module#protected makes a public Object instance method protected in Kernel" # Expected Kernel to have protected instance method 'module_specs_public_method_on_object_for_kernel_protected' but it does not
+  fails "Module#protected makes a public Object instance method protected in a new module" # Expected #<Module:0x4c5f6> to have protected instance method 'module_specs_public_method_on_object' but it does not
+  fails "Module#protected makes an existing class method protected" # Expected NoMethodError but no exception was raised (5 was returned)
+  fails "Module#protected raises a NameError when given an undefined name" # Expected NameError but no exception was raised ("undefined" was returned)
+  fails "Module#protected without arguments affects evaled method definitions when itself is outside the eval" # Expected #<Module:0x4cace> to have protected instance method 'test1' but it does not
+  fails "Module#protected without arguments affects normally if itself and following method definitions are inside a eval" # Expected #<Module:0x4c796> to have protected instance method 'test1' but it does not
+  fails "Module#protected without arguments affects normally if itself and method definitions are inside a module_eval" # Expected #<Module:0x4c79c> to have protected instance method 'test1' but it does not
+  fails "Module#protected without arguments continues setting visibility if the body encounters other visibility setters with arguments" # Expected #<Module:0x4c8d4> to have protected instance method 'test2' but it does not
+  fails "Module#protected without arguments sets visibility to following method definitions" # Expected #<Module:0x4c8da> to have protected instance method 'test1' but it does not
+  fails "Module#protected without arguments stops setting visibility if the body encounters other visibility setters without arguments" # Expected #<Module:0x4c7a2> to have private instance method 'test1' but it does not
+  fails "Module#protected without arguments within a closure sets the visibility outside the closure" # Expected #<Module:0x4cad4> to have protected instance method 'test1' but it does not
+  fails "Module#protected_instance_methods returns a list of protected methods in module and its ancestors" # Expected [] to include "protected_3"
+  fails "Module#protected_instance_methods when not passed an argument returns a unique list for a class including a module" # Expected [] == ["pro"] to be truthy but was false
+  fails "Module#protected_instance_methods when not passed an argument returns a unique list for a subclass" # Expected [] == ["pro"] to be truthy but was false
+  fails "Module#protected_instance_methods when passed false as a parameter, should return only methods defined in that module" # Expected [] == ["protected_3"] to be truthy but was false
+  fails "Module#protected_instance_methods when passed true returns a unique list for a class including a module" # Expected [] == ["pro"] to be truthy but was false
+  fails "Module#protected_instance_methods when passed true returns a unique list for a subclass" # Expected [] == ["pro"] to be truthy but was false
+  fails "Module#protected_method_defined? accepts symbols for the method name" # Expected false == true to be truthy but was false
+  fails "Module#protected_method_defined? calls #to_str to convert an Object" # Expected false == true to be truthy but was false
+  fails "Module#protected_method_defined? raises a TypeError if passed an object that defines #to_sym" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#protected_method_defined? raises a TypeError if passed an object that does not defined #to_str" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#protected_method_defined? raises a TypeError if passed false" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#protected_method_defined? raises a TypeError if passed nil" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#protected_method_defined? returns true if the named protected method is defined by module or its ancestors" # Expected false == true to be truthy but was false
+  fails "Module#public is a private method" # Expected Module to have private instance method 'public' but it does not
+  fails "Module#public makes a private Object instance method public in Kernel" # Expected Kernel to have public instance method 'module_specs_private_method_on_object_for_kernel_public' but it does not
+  fails "Module#public makes a private Object instance method public in a new module" # Expected #<Module:0x1b994> to have public instance method 'module_specs_private_method_on_object' but it does not
+  fails "Module#public raises a NameError when given an undefined name" # Expected NameError but no exception was raised ("undefined" was returned)
+  fails "Module#public without arguments does not affect method definitions when itself is inside an eval and method definitions are outside" # Expected #<Module:0x1bd3c> to have protected instance method 'test1' but it does not
+  fails "Module#public without arguments stops setting visibility if the body encounters other visibility setters without arguments" # Expected #<Module:0x1bd46> to have protected instance method 'test1' but it does not
+  fails "Module#public_class_method accepts more than one method at a time" # Expected NameError but no exception was raised (nil was returned)
+  fails "Module#public_class_method makes an existing class method public up the inheritance tree" # Expected NoMethodError but no exception was raised (nil was returned)
+  fails "Module#public_class_method makes an existing class method public" # Expected NoMethodError but no exception was raised (nil was returned)
+  fails "Module#public_class_method raises a NameError if class method doesn't exist" # Expected NameError but no exception was raised ("no_method_here" was returned)
+  fails "Module#public_class_method raises a NameError when the given name is an instance method" # Expected NameError but no exception was raised (#<Class:0x37d02> was returned)
+  fails "Module#public_class_method raises a NameError when the given name is not a method" # Expected NameError but no exception was raised (#<Class:0x37d60> was returned)
+  fails "Module#public_constant accepts multiple names" # ArgumentError: [.public_constant] wrong number of arguments (given 2, expected 1)
+  fails "Module#public_constant can only be passed constant names defined in the target (self) module" # Expected NameError but no exception was raised (nil was returned)
+  fails "Module#public_instance_method raises a NameError if the method is private" # Expected NameError but no exception was raised (#<UnboundMethod: ModuleSpecs::Basic#private_module (defined in ModuleSpecs::Basic in ruby/core/module/fixtures/classes.rb:86)> was returned)
+  fails "Module#public_instance_method raises a NameError when given a protected method name" # Expected NameError but no exception was raised (#<UnboundMethod: ModuleSpecs::Basic#protected_module (defined in ModuleSpecs::Basic in ruby/core/module/fixtures/classes.rb:83)> was returned)
+  fails "Module#public_instance_method raises a TypeError when given a name is not Symbol or String" # Expected TypeError but got: NameError (undefined method `' for class `')
+  fails "Module#public_instance_method when given a public method name accepts if the name is a Symbol or String" # Expected #<UnboundMethod: ModuleSpecs::Basic#public_module (defined in ModuleSpecs::Basic in ruby/core/module/fixtures/classes.rb:80)> == #<UnboundMethod: ModuleSpecs::Basic#public_module (defined in ModuleSpecs::Basic in ruby/core/module/fixtures/classes.rb:80)> to be truthy but was false
+  fails "Module#public_instance_methods when passed false as a parameter, should return only methods defined in that module" # Expected ["public_3", "private_3", "protected_3"] == ["public_3"] to be truthy but was false
+  fails "Module#public_method_defined? calls #to_str to convert an Object" # Expected false == true to be truthy but was false
+  fails "Module#public_method_defined? raises a TypeError if passed an object that defines #to_sym" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#public_method_defined? raises a TypeError if passed an object that does not defined #to_str" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#public_method_defined? raises a TypeError if passed false" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#public_method_defined? raises a TypeError if passed nil" # Expected TypeError but no exception was raised (false was returned)
+  fails "Module#public_method_defined? returns false if method is not a public method" # Expected true == false to be truthy but was false
+  fails "Module#remove_const is a private method" # Expected [] to include "remove_const"
+  fails "NoMethodError#message for an protected method match /protected method/" # No behavior expectation was found in the example
+  fails "NoMethodError#message for private method match /private method/" # No behavior expectation was found in the example
+  fails "OpenStruct#initialize is private" # Expected OpenStruct to have private instance method 'initialize' but it does not
+  fails "Rational#marshal_dump is a private method" # Expected Rational to have private instance method 'marshal_dump' but it does not
+  fails "Redefining a singleton method does not inherit a previously set visibility" # Expected #<Class:#<Object:0x4deb2>> to have private instance method 'foo' but it does not
+  fails "Regexp#initialize is a private method" # Expected Regexp to have private method 'initialize' but it does not
+  fails "Set#flatten_merge is protected" # Expected Set to have protected instance method 'flatten_merge' but it does not
+  fails "String#+@ returns mutable copy despite freeze-magic-comment in file" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x2022e>
+  fails "StringScanner#initialize is a private method" # Expected StringScanner to have private instance method 'initialize' but it does not  
 end

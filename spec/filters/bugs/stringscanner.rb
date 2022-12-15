@@ -1,78 +1,78 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "StringScanner" do
-  fails "StringScanner#<< concatenates the given argument to self and returns self"
-  fails "StringScanner#<< raises a TypeError if the given argument can't be converted to a String"
-  fails "StringScanner#<< when passed an Integer doesn't call to_int on the argument" # Expected TypeError but got: NoMethodError (undefined method `<<' for #<StringScanner:0x28c>)
-  fails "StringScanner#<< when passed an Integer raises a TypeError" # Expected TypeError but got: NoMethodError (undefined method `<<' for #<StringScanner:0x290>)
-  fails "StringScanner#[] raises a IndexError when there's no named capture"
-  fails "StringScanner#[] returns named capture"
+  fails "StringScanner#<< concatenates the given argument to self and returns self" # NoMethodError: undefined method `<<' for #<StringScanner:0xb3490 @string="hello " @pos=0 @matched=nil @working="hello " @match=[]>
+  fails "StringScanner#<< raises a TypeError if the given argument can't be converted to a String" # Expected TypeError but got: NoMethodError (undefined method `<<' for #<StringScanner:0xb3488 @string="hello" @pos=0 @matched=nil @working="hello" @match=[]>)
+  fails "StringScanner#<< when passed an Integer doesn't call to_int on the argument" # Expected TypeError but got: NoMethodError (undefined method `<<' for #<StringScanner:0xb34a4 @string="" @pos=0 @matched=nil @working="" @match=[]>)
+  fails "StringScanner#<< when passed an Integer raises a TypeError" # Expected TypeError but got: NoMethodError (undefined method `<<' for #<StringScanner:0xb34ac @string="hello world" @pos=0 @matched=nil @working="hello world" @match=[]>)
+  fails "StringScanner#[] raises a IndexError when there's no named capture" # Expected IndexError but no exception was raised (nil was returned)
+  fails "StringScanner#[] returns named capture" # Expected nil == "Fri" to be truthy but was false
   fails "StringScanner#check treats String as the pattern itself" # Expected nil == "This" to be truthy but was false
   fails "StringScanner#check_until raises TypeError if given a String" # Expected TypeError (wrong argument type String (expected Regexp)) but no exception was raised (nil was returned)
-  fails "StringScanner#clear set the scan pointer to the end of the string and clear matching data."
-  fails "StringScanner#clear warns in verbose mode that the method is obsolete"
-  fails "StringScanner#concat concatenates the given argument to self and returns self"
-  fails "StringScanner#concat raises a TypeError if the given argument can't be converted to a String"
-  fails "StringScanner#concat when passed an Integer doesn't call to_int on the argument" # Expected TypeError but got: NoMethodError (undefined method `concat' for #<StringScanner:0x362>)
-  fails "StringScanner#concat when passed an Integer raises a TypeError" # Expected TypeError but got: NoMethodError (undefined method `concat' for #<StringScanner:0x366>)
-  fails "StringScanner#dup copies previous match state"
-  fails "StringScanner#empty? returns false if the scan pointer is not at the end of the string" # NoMethodError: undefined method `empty?' for #<StringScanner:0x726>
-  fails "StringScanner#empty? returns true if the scan pointer is at the end of the string" # NoMethodError: undefined method `empty?' for #<StringScanner:0x72a>
-  fails "StringScanner#empty? warns in verbose mode that the method is obsolete"
+  fails "StringScanner#clear set the scan pointer to the end of the string and clear matching data." # NoMethodError: undefined method `clear' for #<StringScanner:0xb3478 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#clear warns in verbose mode that the method is obsolete" # NoMethodError: undefined method `clear' for #<StringScanner:0xb346e @string="abc" @pos=0 @matched=nil @working="abc" @match=[]>
+  fails "StringScanner#concat concatenates the given argument to self and returns self" # NoMethodError: undefined method `concat' for #<StringScanner:0x5cc @string="hello " @pos=0 @matched=nil @working="hello " @match=[]>
+  fails "StringScanner#concat raises a TypeError if the given argument can't be converted to a String" # Expected TypeError but got: NoMethodError (undefined method `concat' for #<StringScanner:0x5c4 @string="hello" @pos=0 @matched=nil @working="hello" @match=[]>)
+  fails "StringScanner#concat when passed an Integer doesn't call to_int on the argument" # Expected TypeError but got: NoMethodError (undefined method `concat' for #<StringScanner:0x5e0 @string="" @pos=0 @matched=nil @working="" @match=[]>)
+  fails "StringScanner#concat when passed an Integer raises a TypeError" # Expected TypeError but got: NoMethodError (undefined method `concat' for #<StringScanner:0x5e8 @string="hello world" @pos=0 @matched=nil @working="hello world" @match=[]>)
+  fails "StringScanner#dup copies previous match state" # Expected nil == " " to be truthy but was false
+  fails "StringScanner#empty? returns false if the scan pointer is not at the end of the string" # NoMethodError: undefined method `empty?' for #<StringScanner:0x6a0 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#empty? returns true if the scan pointer is at the end of the string" # NoMethodError: undefined method `empty?' for #<StringScanner:0x6a6 @string="This is a test" @pos=14 @matched=nil @working="" @match=nil>
+  fails "StringScanner#empty? warns in verbose mode that the method is obsolete" # NoMethodError: undefined method `empty?' for #<StringScanner:0x696 @string="abc" @pos=0 @matched=nil @working="abc" @match=[]>
   fails "StringScanner#exist? raises TypeError if given a String" # Expected TypeError (wrong argument type String (expected Regexp)) but got: Exception (pattern.exec is not a function)
-  fails "StringScanner#getbyte is not multi-byte character sensitive"
-  fails "StringScanner#getbyte returns an instance of String when passed a String subclass"
-  fails "StringScanner#getbyte returns nil at the end of the string"
-  fails "StringScanner#getbyte scans one byte and returns it"
-  fails "StringScanner#getbyte warns in verbose mode that the method is obsolete"
-  fails "StringScanner#getch is multi-byte character sensitive"
-  fails "StringScanner#initialize converts the argument into a string using #to_str"
-  fails "StringScanner#inspect returns a string that represents the StringScanner object"
-  fails "StringScanner#matched returns the last matched string"
-  fails "StringScanner#matched? returns false if there's no match"
-  fails "StringScanner#matched? returns true if the last match was successful"
-  fails "StringScanner#peek raises a ArgumentError when the passed argument is negative"
-  fails "StringScanner#peek raises a RangeError when the passed argument is a Bignum"
-  fails "StringScanner#peek returns at most the specified number of bytes from the current position" # Expected "ét" to equal "é"
-  fails "StringScanner#peep raises a ArgumentError when the passed argument is negative"
-  fails "StringScanner#peep raises a RangeError when the passed argument is a Bignum"
-  fails "StringScanner#peep returns an empty string when the passed argument is zero"
-  fails "StringScanner#peep returns an instance of String when passed a String subclass"
-  fails "StringScanner#peep returns at most the specified number of bytes from the current position" # NoMethodError: undefined method `peep' for #<StringScanner:0x590>
-  fails "StringScanner#peep warns in verbose mode that the method is obsolete"
-  fails "StringScanner#pointer returns 0 in the reset position"
-  fails "StringScanner#pointer returns the length of the string in the terminate position"
-  fails "StringScanner#pointer returns the position of the scan pointer"
-  fails "StringScanner#pointer= modify the scan pointer"
-  fails "StringScanner#pointer= positions from the end if the argument is negative"
-  fails "StringScanner#pointer= raises a RangeError if position too far backward"
-  fails "StringScanner#pointer= raises a RangeError when the passed argument is out of range"
-  fails "StringScanner#pos= raises a RangeError if position too far backward"
-  fails "StringScanner#pos= raises a RangeError when the passed argument is out of range"
-  fails "StringScanner#restsize is equivalent to rest.size"
-  fails "StringScanner#restsize returns the length of the rest of the string" # NoMethodError: undefined method `restsize' for #<StringScanner:0x4a4>
-  fails "StringScanner#restsize warns in verbose mode that the method is obsolete"
+  fails "StringScanner#getbyte is not multi-byte character sensitive" # NoMethodError: undefined method `getbyte' for #<StringScanner:0xb3f58 @string="¤¢" @pos=0 @matched=nil @working="¤¢" @match=[]>
+  fails "StringScanner#getbyte returns an instance of String when passed a String subclass" # NoMethodError: undefined method `getbyte' for #<StringScanner:0xb3f46 @string="abc" @pos=0 @matched=nil @working="abc" @match=[]>
+  fails "StringScanner#getbyte returns nil at the end of the string" # NoMethodError: undefined method `getbyte' for #<StringScanner:0xb3f4c @string="" @pos=0 @matched=nil @working="" @match=[]>
+  fails "StringScanner#getbyte scans one byte and returns it" # NoMethodError: undefined method `getbyte' for #<StringScanner:0xb3f52 @string="abc5." @pos=0 @matched=nil @working="abc5." @match=[]>
+  fails "StringScanner#getbyte warns in verbose mode that the method is obsolete" # NoMethodError: undefined method `getbyte' for #<StringScanner:0xb3f5e @string="abc" @pos=0 @matched=nil @working="abc" @match=[]>
+  fails "StringScanner#getch is multi-byte character sensitive" # ArgumentError: unknown encoding name - euc-jp
+  fails "StringScanner#initialize converts the argument into a string using #to_str" # Expected #<MockObject:0xb3788 @name="str", @null=nil> == "test" to be truthy but was false
+  fails "StringScanner#inspect returns a string that represents the StringScanner object" # Expected "#<StringScanner:0x572 @string=\"This is a test\" @pos=0 @matched=nil @working=\"This is a test\" @match=[]>" == "#<StringScanner 0/14 @ \"This ...\">" to be truthy but was false
+  fails "StringScanner#matched returns the last matched string" # Expected nil == "This" to be truthy but was false
+  fails "StringScanner#matched? returns false if there's no match" # NoMethodError: undefined method `matched?' for #<StringScanner:0xb3554 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#matched? returns true if the last match was successful" # NoMethodError: undefined method `matched?' for #<StringScanner:0xb355a @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[] @prev_pos=0>
+  fails "StringScanner#peek raises a ArgumentError when the passed argument is negative" # Expected ArgumentError but no exception was raised ("" was returned)
+  fails "StringScanner#peek raises a RangeError when the passed argument is a Bignum" # Expected RangeError but no exception was raised ("This is a test" was returned)
+  fails "StringScanner#peek returns at most the specified number of bytes from the current position" # Expected "ét" == "é" to be truthy but was false
+  fails "StringScanner#peep raises a ArgumentError when the passed argument is negative" # Expected ArgumentError but got: NoMethodError (undefined method `peep' for #<StringScanner:0xb36ba @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>)
+  fails "StringScanner#peep raises a RangeError when the passed argument is a Bignum" # Expected RangeError but got: NoMethodError (undefined method `peep' for #<StringScanner:0xb36a4 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>)
+  fails "StringScanner#peep returns an empty string when the passed argument is zero" # NoMethodError: undefined method `peep' for #<StringScanner:0xb36ae @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#peep returns an instance of String when passed a String subclass" # NoMethodError: undefined method `peep' for #<StringScanner:0xb36c6 @string="abc" @pos=0 @matched=nil @working="abc" @match=[]>
+  fails "StringScanner#peep returns at most the specified number of bytes from the current position" # NoMethodError: undefined method `peep' for #<StringScanner:0xb36b4 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#peep warns in verbose mode that the method is obsolete" # NoMethodError: undefined method `peep' for #<StringScanner:0xb369a @string="abc" @pos=0 @matched=nil @working="abc" @match=[]>
+  fails "StringScanner#pointer returns 0 in the reset position" # NoMethodError: undefined method `pointer' for #<StringScanner:0xb3618 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#pointer returns the length of the string in the terminate position" # NoMethodError: undefined method `pointer' for #<StringScanner:0xb360e @string="This is a test" @pos=14 @matched=nil @working="" @match=nil>
+  fails "StringScanner#pointer returns the position of the scan pointer" # NoMethodError: undefined method `pointer' for #<StringScanner:0xb3612 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#pointer= modify the scan pointer" # NoMethodError: undefined method `pointer=' for #<StringScanner:0xb3638 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#pointer= positions from the end if the argument is negative" # NoMethodError: undefined method `pointer=' for #<StringScanner:0xb3632 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#pointer= raises a RangeError if position too far backward" # Expected RangeError but got: NoMethodError (undefined method `pointer=' for #<StringScanner:0xb363e @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>)
+  fails "StringScanner#pointer= raises a RangeError when the passed argument is out of range" # Expected RangeError but got: NoMethodError (undefined method `pointer=' for #<StringScanner:0xb3628 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>)
+  fails "StringScanner#pos= raises a RangeError if position too far backward" # Expected RangeError but no exception was raised ("a test" was returned)
+  fails "StringScanner#pos= raises a RangeError when the passed argument is out of range" # Expected RangeError but no exception was raised ("" was returned)
+  fails "StringScanner#restsize is equivalent to rest.size" # NoMethodError: undefined method `restsize' for #<StringScanner:0xb394e @string="This is a test" @pos=4 @matched="This" @working=" is a test" @match=["This"] @prev_pos=0>
+  fails "StringScanner#restsize returns the length of the rest of the string" # NoMethodError: undefined method `restsize' for #<StringScanner:0xb3954 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#restsize warns in verbose mode that the method is obsolete" # NoMethodError: undefined method `restsize' for #<StringScanner:0xb3944 @string="abc" @pos=0 @matched=nil @working="abc" @match=[]>
   fails "StringScanner#scan raises a TypeError if pattern isn't a Regexp nor String" # Expected TypeError but no exception was raised (nil was returned)
   fails "StringScanner#scan treats String as the pattern itself" # Expected nil == "This" to be truthy but was false
-  fails "StringScanner#scan with fixed_anchor: true returns the matched string" # ArgumentError: [StringScanner#initialize] wrong number of arguments(2 for 1)
-  fails "StringScanner#scan with fixed_anchor: true treats \\A as matching from the beginning of string" # ArgumentError: [StringScanner#initialize] wrong number of arguments(2 for 1)
-  fails "StringScanner#scan with fixed_anchor: true treats ^ as matching from the beginning of line" # ArgumentError: [StringScanner#initialize] wrong number of arguments(2 for 1)
-  fails "StringScanner#scan_full returns the matched string if the third argument is true and advances the scan pointer if the second argument is true"
-  fails "StringScanner#scan_full returns the matched string if the third argument is true"
-  fails "StringScanner#scan_full returns the number of bytes advanced and advances the scan pointer if the second argument is true"
-  fails "StringScanner#scan_full returns the number of bytes advanced"
+  fails "StringScanner#scan with fixed_anchor: true returns the matched string" # ArgumentError: [StringScanner#initialize] wrong number of arguments (given 2, expected 1)
+  fails "StringScanner#scan with fixed_anchor: true treats \\A as matching from the beginning of string" # ArgumentError: [StringScanner#initialize] wrong number of arguments (given 2, expected 1)
+  fails "StringScanner#scan with fixed_anchor: true treats ^ as matching from the beginning of line" # ArgumentError: [StringScanner#initialize] wrong number of arguments (given 2, expected 1)
+  fails "StringScanner#scan_full returns the matched string if the third argument is true and advances the scan pointer if the second argument is true" # NoMethodError: undefined method `scan_full' for #<StringScanner:0x472 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#scan_full returns the matched string if the third argument is true" # NoMethodError: undefined method `scan_full' for #<StringScanner:0x484 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#scan_full returns the number of bytes advanced and advances the scan pointer if the second argument is true" # NoMethodError: undefined method `scan_full' for #<StringScanner:0x478 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#scan_full returns the number of bytes advanced" # NoMethodError: undefined method `scan_full' for #<StringScanner:0x47e @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
   fails "StringScanner#scan_until raises TypeError if given a String" # Expected TypeError (wrong argument type String (expected Regexp)) but no exception was raised (nil was returned)
-  fails "StringScanner#search_full raises TypeError if given a String" # Expected TypeError (wrong argument type String (expected Regexp)) but got: NoMethodError (undefined method `search_full' for #<StringScanner:0x196 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>)
-  fails "StringScanner#search_full returns the matched string if the third argument is true and advances the scan pointer if the second argument is true"
-  fails "StringScanner#search_full returns the matched string if the third argument is true"
-  fails "StringScanner#search_full returns the number of bytes advanced and advances the scan pointer if the second argument is true"
-  fails "StringScanner#search_full returns the number of bytes advanced"
-  fails "StringScanner#size returns nil if there is no last match" # NoMethodError: undefined method `size' for #<StringScanner:0x9e0d6 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
-  fails "StringScanner#size returns the number of captures groups of the last match" # NoMethodError: undefined method `size' for #<StringScanner:0x9e0dc @string="This is a test" @pos=3 @matched="Thi" @working="s is a test" @match=["Thi", "T", "h", "i"] @prev_pos=0>
+  fails "StringScanner#search_full raises TypeError if given a String" # Expected TypeError (wrong argument type String (expected Regexp)) but got: NoMethodError (undefined method `search_full' for #<StringScanner:0xb4016 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>)
+  fails "StringScanner#search_full returns the matched string if the third argument is true and advances the scan pointer if the second argument is true" # NoMethodError: undefined method `search_full' for #<StringScanner:0xb4032 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#search_full returns the matched string if the third argument is true" # NoMethodError: undefined method `search_full' for #<StringScanner:0xb4020 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#search_full returns the number of bytes advanced and advances the scan pointer if the second argument is true" # NoMethodError: undefined method `search_full' for #<StringScanner:0xb4026 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#search_full returns the number of bytes advanced" # NoMethodError: undefined method `search_full' for #<StringScanner:0xb402c @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#size returns nil if there is no last match" # NoMethodError: undefined method `size' for #<StringScanner:0x318 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#size returns the number of captures groups of the last match" # NoMethodError: undefined method `size' for #<StringScanner:0x31e @string="This is a test" @pos=3 @matched="Thi" @working="s is a test" @match=["Thi", "T", "h", "i"] @prev_pos=0>
   fails "StringScanner#skip_until raises TypeError if given a String" # Expected TypeError (wrong argument type String (expected Regexp)) but no exception was raised (nil was returned)
-  fails "StringScanner#string returns the string being scanned"
-  fails "StringScanner#string= changes the string being scanned to the argument and resets the scanner"
-  fails "StringScanner#string= converts the argument into a string using #to_str"
-  fails "StringScanner#unscan raises a ScanError when the previous match had failed"
-  fails "StringScanner#unscan set the scan pointer to the previous position"
-  fails "StringScanner.must_C_version returns self"
+  fails "StringScanner#string returns the string being scanned" # NoMethodError: undefined method `<<' for #<StringScanner:0x344 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#string= changes the string being scanned to the argument and resets the scanner" # NoMethodError: undefined method `string=' for #<StringScanner:0x360 @string="This is a test" @pos=0 @matched=nil @working="This is a test" @match=[]>
+  fails "StringScanner#string= converts the argument into a string using #to_str" # Mock 'str' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "StringScanner#unscan raises a ScanError when the previous match had failed" # NameError: uninitialized constant ScanError
+  fails "StringScanner#unscan set the scan pointer to the previous position" # Expected "This" == nil to be truthy but was false
+  fails "StringScanner.must_C_version returns self" # NoMethodError: undefined method `must_C_version' for StringScanner  
 end

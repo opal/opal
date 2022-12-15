@@ -1,189 +1,209 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Module" do
-  fails "Module#alias_method creates methods that are == to each other" # Expected #<Method: #<Class:0x9122>#uno (defined in #<Class:0x9122> in ruby/core/module/fixtures/classes.rb:206)> == #<Method: #<Class:0x9122>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:206)> to be truthy but was false
-  fails "Module#alias_method handles aliasing a method only present in a refinement" # NoMethodError: undefined method `refine' for #<Module:0x90fa>
-  fails "Module#alias_method retains method visibility"
-  fails "Module#alias_method returned value returns symbol of the defined method name" # Expected #<Class:0x1c94a> to be identical to "checking_return_value"
-  fails "Module#ancestors returns a list of modules included in self (including self)" # Expected [ModuleSpecs::Parent, Object, Shellwords, Kernel, BasicObject] == [ModuleSpecs::Parent, Object, Kernel, BasicObject] to be truthy but was false -- a random failure
-  fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class"
-  fails "Module#attr applies current visibility to methods created"
+  fails "Module#alias_method creates methods that are == to each other" # Expected #<Method: #<Class:0x3c38e>#uno (defined in #<Class:0x3c38e> in ruby/core/module/fixtures/classes.rb:214)> == #<Method: #<Class:0x3c38e>#public_one (defined in ModuleSpecs::Aliasing in ruby/core/module/fixtures/classes.rb:214)> to be truthy but was false
+  fails "Module#alias_method handles aliasing a method only present in a refinement" # Expected #<UnboundMethod: #<Module:0x3c30c>#uno_refined_method (defined in #<Module:0x3c30c> in ruby/core/module/alias_method_spec.rb:49)> == #<UnboundMethod: #<Module:0x3c30c>#double_refined_method (defined in #<Module:0x3c30c> in ruby/core/module/alias_method_spec.rb:49)> to be truthy but was false
+  fails "Module#alias_method retains method visibility" # Expected NameError but no exception was raised (1 was returned)
+  fails "Module#alias_method returned value returns symbol of the defined method name" # Expected #<Class:0x3c3d6> to be identical to "checking_return_value"
+  fails "Module#append_features on Class raises a TypeError if calling after rebinded to Class" # Expected TypeError but no exception was raised (#<Class:0x3a2da> was returned)
+  fails "Module#attr applies current visibility to methods created" # Expected NoMethodError but no exception was raised (nil was returned)
   fails "Module#attr converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
-  fails "Module#attr raises a TypeError when the given names can't be converted to strings using to_str"
+  fails "Module#attr raises a TypeError when the given names can't be converted to strings using to_str" # Expected TypeError but no exception was raised (#<Class:0x3a44c> was returned)
   fails "Module#attr returns an array of defined method names as symbols" # Expected nil == ["foo", "bar"] to be truthy but was false
-  fails "Module#attr_accessor applies current visibility to methods created"
+  fails "Module#attr_accessor applies current visibility to methods created" # Expected NoMethodError but no exception was raised (nil was returned)
   fails "Module#attr_accessor converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
-  fails "Module#attr_accessor not allows creating an attr_accessor on an immediate class"
+  fails "Module#attr_accessor not allows creating an attr_accessor on an immediate class" # Expected FrozenError but got: Exception (Cannot create property 'spec_attr_accessor' on boolean 'true')
   fails "Module#attr_accessor on immediates can read through the accessor" # NoMethodError: undefined method `foobar' for 1
-  fails "Module#attr_accessor raises a TypeError when the given names can't be converted to strings using to_str"
+  fails "Module#attr_accessor raises a TypeError when the given names can't be converted to strings using to_str" # Expected TypeError but no exception was raised (#<Class:0x3a710> was returned)
   fails "Module#attr_accessor returns an array of defined method names as symbols" # Expected nil == ["foo", "foo=", "bar", "bar="] to be truthy but was false
-  fails "Module#attr_reader applies current visibility to methods created"
+  fails "Module#attr_reader applies current visibility to methods created" # Expected NoMethodError but no exception was raised (nil was returned)
   fails "Module#attr_reader converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
-  fails "Module#attr_reader not allows for adding an attr_reader to an immediate"
-  fails "Module#attr_reader raises a TypeError when the given names can't be converted to strings using to_str"
+  fails "Module#attr_reader not allows for adding an attr_reader to an immediate" # Expected RuntimeError but got: Exception (Cannot create property 'spec_attr_reader' on boolean 'true')
+  fails "Module#attr_reader raises a TypeError when the given names can't be converted to strings using to_str" # Expected TypeError but no exception was raised (#<Class:0x3ba86> was returned)
   fails "Module#attr_reader returns an array of defined method names as symbols" # Expected nil == ["foo", "bar"] to be truthy but was false
-  fails "Module#attr_writer applies current visibility to methods created"
+  fails "Module#attr_writer applies current visibility to methods created" # Expected NoMethodError but no exception was raised (1 was returned)
   fails "Module#attr_writer converts non string/symbol names to strings using to_str" # Expected false == true to be truthy but was false
-  fails "Module#attr_writer not allows for adding an attr_writer to an immediate"
-  fails "Module#attr_writer raises a TypeError when the given names can't be converted to strings using to_str"
+  fails "Module#attr_writer not allows for adding an attr_writer to an immediate" # Expected FrozenError but got: Exception (Cannot create property 'spec_attr_writer' on boolean 'true')
+  fails "Module#attr_writer raises a TypeError when the given names can't be converted to strings using to_str" # Expected TypeError but no exception was raised (#<Class:0x23050> was returned)
   fails "Module#attr_writer returns an array of defined method names as symbols" # Expected nil == ["foo=", "bar="] to be truthy but was false
-  fails "Module#class_eval activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<ModuleSpecs::NamedClass:0x4a168>
-  fails "Module#class_eval converts a non-string filename to a string using to_str"
-  fails "Module#class_eval converts non string eval-string to string using to_str"
-  fails "Module#class_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
-  fails "Module#class_eval raises a TypeError when the given filename can't be converted to string using to_str"
-  fails "Module#class_eval resolves constants in the caller scope ignoring send"
-  fails "Module#class_eval resolves constants in the caller scope" # fails because of the difference between module_eval("Const") and module_eval { Const } (only the second one is supported by Opal)
-  fails "Module#class_eval uses the optional filename and lineno parameters for error messages"
+  fails "Module#class_eval activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<ModuleSpecs::NamedClass:0x5db0a>
+  fails "Module#class_eval converts a non-string filename to a string using to_str" # Mock 'ruby/core/module/shared/class_eval.rb' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "Module#class_eval converts non string eval-string to string using to_str" # Mock '1 + 1' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "Module#class_eval raises a TypeError when the given eval-string can't be converted to string using to_str" # Expected TypeError (no implicit conversion of MockObject into String) but got: NoMethodError (undefined method `encoding' for #<MockObject:0x5d8a0 @name="x" @null=nil>)
+  fails "Module#class_eval raises a TypeError when the given filename can't be converted to string using to_str" # Expected TypeError (/can't convert MockObject to String/) but no exception was raised (2 was returned)
+  fails "Module#class_eval raises an ArgumentError when a block and normal arguments are given" # Expected ArgumentError (wrong number of arguments (given 1, expected 0)) but got: ArgumentError (wrong number of arguments (1 for 0)    NOTE:If you want to enable passing a String argument please add "require 'opal-parser'" to your script )
+  fails "Module#class_eval raises an ArgumentError when more than 3 arguments are given" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but got: ArgumentError (wrong number of arguments (0 for 1..3))
+  fails "Module#class_eval raises an ArgumentError when no arguments and no block are given" # Expected ArgumentError (wrong number of arguments (given 0, expected 1..3)) but got: ArgumentError (wrong number of arguments (0 for 1..3))
+  fails "Module#class_eval resolves constants in the caller scope ignoring send" # NameError: uninitialized constant ModuleSpecs::ClassEvalTest::Lookup
+  fails "Module#class_eval resolves constants in the caller scope" # NameError: uninitialized constant ModuleSpecs::ClassEvalTest::Lookup
+  fails "Module#class_eval uses the optional filename and lineno parameters for error messages" # Expected ["test", 1] == ["test", 102] to be truthy but was false
+  fails "Module#class_variables returns the correct class variables when inherit is given" # ArgumentError: [SubCVars.class_variables] wrong number of arguments (given 1, expected 0)
   fails "Module#const_defined? coerces the inherit flag to a boolean" # Expected true to be false
-  fails "Module#const_defined? returns true for toplevel constant when the name begins with '::'"
-  fails "Module#const_defined? returns true or false for the nested name"
-  fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is default"
-  fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is true"
-  fails "Module#const_defined? returns true when passed a scoped constant name"
+  fails "Module#const_defined? returns true for toplevel constant when the name begins with '::'" # Expected false to be true
+  fails "Module#const_defined? returns true or false for the nested name" # Expected false == true to be truthy but was false
+  fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is default" # Expected false to be true
+  fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is true" # Expected false to be true
+  fails "Module#const_defined? returns true when passed a scoped constant name" # Expected false to be true
+  fails "Module#const_get accepts a toplevel scope qualifier when inherit is false" # NameError: uninitialized constant ConstantSpecs::CS_CONST1
   fails "Module#const_get coerces the inherit flag to a boolean" # Expected NameError but no exception was raised ("const1" was returned)
+  fails "Module#const_get raises a NameError when the nested constant does not exist on the module but exists in Object" # Expected NameError but no exception was raised ("const1" was returned)
   fails "Module#const_set sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#const_set when overwriting an existing constant does not warn after a failed autoload" # Expected NameError but got: LoadError (cannot load such file -- ruby/core/module/fixtures/autoload_o)
   fails "Module#const_set when overwriting an existing constant warns if the previous value was a normal value" # Expected warning to match: /already initialized constant/ but got: ""
-  fails "Module#const_source_location accepts a String or Symbol name" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location accepts a scoped constant name" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location accepts a toplevel scope qualifier" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location autoload returns the autoload location while not resolved" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location autoload returns where the constant was resolved when resolved" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location calls #to_str to convert the given name to a String" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location does not search the containing scope" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location does not search the singleton class of a Class or Module" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location does search private constants path" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location raises a NameError if the name contains non-alphabetic characters except '_'" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location raises a TypeError if conversion to a String by calling #to_str fails" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location return empty path if constant defined in C code" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location returns nil if no constant is defined in the search path" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location returns nil if the constant is defined in the receiver's superclass and the inherit flag is false" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location returns nil when the receiver is a Class, the constant is defined at toplevel and the inherit flag is false" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location returns nil when the receiver is a Module, the constant is defined at toplevel and the inherit flag is false" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location searches into the receiver superclasses if the inherit flag is true" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with dynamically assigned constants returns path to a toplevel constant when the receiver is a Class" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with dynamically assigned constants returns path to a toplevel constant when the receiver is a Module" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with dynamically assigned constants returns path to the updated value of a constant" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with dynamically assigned constants searches a path in a module included in the immediate class before the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with dynamically assigned constants searches a path in a module included in the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with dynamically assigned constants searches a path in the immediate class or module first" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with dynamically assigned constants searches a path in the superclass before a module included in the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with dynamically assigned constants searches a path in the superclass chain" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with statically assigned constants returns location path a toplevel constant when the receiver is a Class" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with statically assigned constants returns location path a toplevel constant when the receiver is a Module" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with statically assigned constants searches location path a module included in the immediate class before the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with statically assigned constants searches location path a module included in the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with statically assigned constants searches location path the immediate class or module first" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with statically assigned constants searches location path the superclass before a module included in the superclass" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#const_source_location with statically assigned constants searches location path the superclass chain" # NoMethodError: undefined method `__dir__' for #<MSpecEnv:0x6efae>
-  fails "Module#constants doesn't returns inherited constants when passed nil"
-  fails "Module#constants returns only public constants"
+  fails "Module#const_source_location accepts a String or Symbol name" # NoMethodError: undefined method `const_source_location' for Object
+  fails "Module#const_source_location accepts a scoped constant name" # NoMethodError: undefined method `const_source_location' for ConstantSpecs
+  fails "Module#const_source_location accepts a toplevel scope qualifier" # NoMethodError: undefined method `const_source_location' for ConstantSpecs
+  fails "Module#const_source_location autoload returns the autoload location while not resolved" # NoMethodError: undefined method `const_source_location' for ConstantSpecs
+  fails "Module#const_source_location autoload returns where the constant was resolved when resolved" # LoadError: cannot load such file -- ruby/core/module/fixtures/autoload_location
+  fails "Module#const_source_location calls #to_str to convert the given name to a String" # Mock 'ClassA' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "Module#const_source_location does not search the containing scope" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location does not search the singleton class of a Class or Module" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location does search private constants path" # NoMethodError: undefined method `const_source_location' for ConstantSpecs
+  fails "Module#const_source_location raises a NameError if the name contains non-alphabetic characters except '_'" # NoMethodError: undefined method `const_source_location' for Object
+  fails "Module#const_source_location raises a TypeError if conversion to a String by calling #to_str fails" # Expected TypeError but got: NoMethodError (undefined method `const_source_location' for ConstantSpecs)
+  fails "Module#const_source_location return empty path if constant defined in C code" # NoMethodError: undefined method `const_source_location' for Object
+  fails "Module#const_source_location returns nil if no constant is defined in the search path" # NoMethodError: undefined method `const_source_location' for ConstantSpecs
+  fails "Module#const_source_location returns nil if the constant is defined in the receiver's superclass and the inherit flag is false" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location returns nil when the receiver is a Class, the constant is defined at toplevel and the inherit flag is false" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location returns nil when the receiver is a Module, the constant is defined at toplevel and the inherit flag is false" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ModuleA
+  fails "Module#const_source_location returns updated location from const_set" # NoMethodError: undefined method `const_source_location' for #<Module:0x38290>
+  fails "Module#const_source_location searches into the receiver superclasses if the inherit flag is true" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location with dynamically assigned constants returns path to a toplevel constant when the receiver is a Class" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerB::ChildB
+  fails "Module#const_source_location with dynamically assigned constants returns path to a toplevel constant when the receiver is a Module" # NoMethodError: undefined method `const_source_location' for ConstantSpecs
+  fails "Module#const_source_location with dynamically assigned constants returns path to the updated value of a constant" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ClassB
+  fails "Module#const_source_location with dynamically assigned constants searches a path in a module included in the immediate class before the superclass" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerB::ChildB
+  fails "Module#const_source_location with dynamically assigned constants searches a path in a module included in the superclass" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerB::ChildB
+  fails "Module#const_source_location with dynamically assigned constants searches a path in the immediate class or module first" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ClassA
+  fails "Module#const_source_location with dynamically assigned constants searches a path in the superclass before a module included in the superclass" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerB::ChildB
+  fails "Module#const_source_location with dynamically assigned constants searches a path in the superclass chain" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerB::ChildB
+  fails "Module#const_source_location with statically assigned constants returns location path a toplevel constant when the receiver is a Class" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location with statically assigned constants returns location path a toplevel constant when the receiver is a Module" # NoMethodError: undefined method `const_source_location' for ConstantSpecs
+  fails "Module#const_source_location with statically assigned constants searches location path a module included in the immediate class before the superclass" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location with statically assigned constants searches location path a module included in the superclass" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location with statically assigned constants searches location path the immediate class or module first" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ClassA
+  fails "Module#const_source_location with statically assigned constants searches location path the superclass before a module included in the superclass" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location with statically assigned constants searches location path the superclass chain" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#constants doesn't returns inherited constants when passed nil" # Expected ["CS_CONST10",  "CS_CONST10_LINE",  "CS_CONST23",  "CS_CONST24",  "CS_CONST5",  "ChildA"] == ["CS_CONST10", "CS_CONST10_LINE", "CS_CONST23", "CS_CONST5", "ChildA"] to be truthy but was false
+  fails "Module#constants returns only public constants" # Expected ["PRIVATE_CONSTANT", "PUBLIC_CONSTANT"] == ["PUBLIC_CONSTANT"] to be truthy but was false
+  fails "Module#define_method converts non-String name to String with #to_str" # NoMethodError: undefined method `foo' for #<#<Class:0x33ce6>:0x33ce4>
   fails "Module#define_method passed { |a,|  } creates a method that does not destructure the passed argument" # Expected [1, 2] == 1 to be truthy but was false
-  fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class"
-  fails "Module#define_method raises a TypeError when a Method from one class is defined on an unrelated class"
-  fails "Module#define_method raises a TypeError when an UnboundMethod from a child class is defined on a parent class"
-  fails "Module#define_method raises a TypeError when an UnboundMethod from a singleton class is defined on another class" # Expected TypeError (/can't bind singleton method to a different class/) but no exception was raised (#<Class:0x47ae6> was returned)
-  fails "Module#define_method raises a TypeError when an UnboundMethod from one class is defined on an unrelated class"
-  fails "Module#deprecate_constant accepts multiple symbols and strings as constant names"
-  fails "Module#deprecate_constant raises a NameError when given an undefined name"
-  fails "Module#deprecate_constant returns self"
-  fails "Module#deprecate_constant when accessing the deprecated module does not warn if Warning[:deprecated] is false" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x133e6>
-  fails "Module#deprecate_constant when accessing the deprecated module passes the accessing"
-  fails "Module#deprecate_constant when accessing the deprecated module warns with a message"
-  fails "Module#extend_object extends the given object with its constants and methods by default"
-  fails "Module#extend_object on Class raises a TypeError if calling after rebinded to Class"
-  fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0x4fbac> was returned)
+  fails "Module#define_method raises TypeError if name cannot converted to String" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (#<Class:0x33da2> was returned)
+  fails "Module#define_method raises TypeError when #to_str called on non-String name returns non-String value" # Expected TypeError (/can't convert Object to String/) but no exception was raised (#<Class:0x33d52> was returned)
+  fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class" # Expected TypeError (/can't bind singleton method to a different class/) but no exception was raised (#<Class:0x33cdc> was returned)
+  fails "Module#define_method raises a TypeError when a Method from one class is defined on an unrelated class" # Expected TypeError but no exception was raised (#<Class:0x33d6c> was returned)
+  fails "Module#define_method raises a TypeError when an UnboundMethod from a child class is defined on a parent class" # Expected TypeError (/bind argument must be a subclass of ChildClass/) but no exception was raised ("foo" was returned)
+  fails "Module#define_method raises a TypeError when an UnboundMethod from a singleton class is defined on another class" # Expected TypeError (/can't bind singleton method to a different class/) but no exception was raised (#<Class:0x33cac> was returned)
+  fails "Module#define_method raises a TypeError when an UnboundMethod from one class is defined on an unrelated class" # Expected TypeError (/bind argument must be a subclass of ModuleSpecs::InstanceMeth/) but no exception was raised (DestinationClass was returned)
+  fails "Module#define_method raises a TypeError when the given method is no Method/Proc" # Expected TypeError (wrong argument type String (expected Proc/Method/UnboundMethod)) but got: TypeError (wrong argument type NilClass (expected Proc/Method))
+  fails "Module#define_method uses provided Method/Proc even if block is specified" # Expected "block_is_called" == "method_is_called" to be truthy but was false
+  fails "Module#deprecate_constant accepts multiple symbols and strings as constant names" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x3bf08>
+  fails "Module#deprecate_constant raises a NameError when given an undefined name" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x3bf04>
+  fails "Module#deprecate_constant returns self" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x3bf0c>
+  fails "Module#deprecate_constant when accessing the deprecated module does not warn if Warning[:deprecated] is false" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x3bf10>
+  fails "Module#deprecate_constant when accessing the deprecated module passes the accessing" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x3bf18>
+  fails "Module#deprecate_constant when accessing the deprecated module warns with a message" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x3bf14>
+  fails "Module#extend_object extends the given object with its constants and methods by default" # NoMethodError: undefined method `test_method' for #<MockObject:0x2541a @name="extended direct" @null=nil>
+  fails "Module#extend_object on Class raises a TypeError if calling after rebinded to Class" # Expected TypeError but no exception was raised (nil was returned)
+  fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0xdd44> was returned)
   fails "Module#initialize_copy should produce a duped module with inspectable class methods" # NameError: undefined method `hello' for class `Module'
-  fails "Module#initialize_copy should retain singleton methods when duped" # Expected [] to equal ["hello"]
-  fails "Module#instance_method raises a NameError if the method has been undefined"
-  fails "Module#instance_method raises a TypeError if not passed a symbol"
-  fails "Module#instance_method raises a TypeError if the given name is not a string/symbol"
-  fails "Module#method_added is called with a precise caller location with the line of the 'def'" # NoMethodError: undefined method `caller_locations' for #<Module:0xaa8>
-  fails "Module#method_defined? converts the given name to a string using to_str"
+  fails "Module#initialize_copy should retain singleton methods when duped" # Expected [] == ["hello"] to be truthy but was false
+  fails "Module#instance_method converts non-String name by calling #to_str method" # NameError: undefined method `#<Object:0x3a942>' for class `ModuleSpecs::InstanceMeth'
+  fails "Module#instance_method raises TypeError when passed non-String name and #to_str returns non-String value" # Expected TypeError (/can't convert Object to String/) but got: NameError (undefined method `#<Object:0x3a98e>' for class `ModuleSpecs::InstanceMeth')
+  fails "Module#instance_method raises a NameError if the method has been undefined" # Expected #<UnboundMethod: ModuleSpecs::InstanceMeth#foo (defined in ModuleSpecs::InstanceMeth in ruby/core/module/fixtures/classes.rb:319)> == #<UnboundMethod: ModuleSpecs::InstanceMeth#foo (defined in ModuleSpecs::InstanceMeth in ruby/core/module/fixtures/classes.rb:319)> to be truthy but was false
+  fails "Module#instance_method raises a TypeError if the given name is not a String/Symbol" # Expected TypeError (/is not a symbol nor a string/) but got: NameError (undefined method `' for class `Object')
+  fails "Module#method_added is called with a precise caller location with the line of the 'def'" # Expected [110, 110] == [74, 77] to be truthy but was false
+  fails "Module#method_defined? converts the given name to a string using to_str" # Expected false == true to be truthy but was false
   fails "Module#method_defined? raises a TypeError when the given object is not a string/symbol" # Expected TypeError but no exception was raised (false was returned)
-  fails "Module#method_defined? returns true if a public or private method with the given name is defined in self, self's ancestors or one of self's included modules"
-  fails "Module#method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.method_defined?] wrong number of arguments(2 for 1)
-  fails "Module#method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.method_defined?] wrong number of arguments(2 for 1)
-  fails "Module#module_eval activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<ModuleSpecs::NamedClass:0x81f82>
-  fails "Module#module_eval converts a non-string filename to a string using to_str"
-  fails "Module#module_eval converts non string eval-string to string using to_str"
-  fails "Module#module_eval raises a TypeError when the given eval-string can't be converted to string using to_str"
-  fails "Module#module_eval raises a TypeError when the given filename can't be converted to string using to_str"
-  fails "Module#module_eval resolves constants in the caller scope ignoring send"
-  fails "Module#module_eval resolves constants in the caller scope"
-  fails "Module#module_eval uses the optional filename and lineno parameters for error messages"
-  fails "Module#module_function as a toggle (no arguments) in a Module body does not affect module_evaled method definitions also if outside the eval itself"
-  fails "Module#module_function as a toggle (no arguments) in a Module body doesn't affect definitions when inside an eval even if the definitions are outside of it"
-  fails "Module#module_function as a toggle (no arguments) in a Module body has no effect if inside a module_eval if the definitions are outside of it"
-  fails "Module#module_function on Class raises a TypeError if calling after rebinded to Class"
-  fails "Module#module_function with specific method names raises a TypeError when the given names can't be converted to string using to_str"
-  fails "Module#module_function with specific method names tries to convert the given names to strings using to_str"
-  fails "Module#name changes when the module is reachable through a constant path" # Expected nil to match /^#<Module:0x\h+>::N$/
-  fails "Module#name is not nil for a nested module created with the module keyword"
+  fails "Module#method_defined? returns true if a public or private method with the given name is defined in self, self's ancestors or one of self's included modules" # Expected true == false to be truthy but was false
+  fails "Module#method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.method_defined?] wrong number of arguments (given 2, expected 1)
+  fails "Module#method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.method_defined?] wrong number of arguments (given 2, expected 1)
+  fails "Module#module_eval activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<ModuleSpecs::NamedClass:0x34f0c>
+  fails "Module#module_eval converts a non-string filename to a string using to_str" # Mock 'ruby/core/module/shared/class_eval.rb' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "Module#module_eval converts non string eval-string to string using to_str" # Mock '1 + 1' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "Module#module_eval raises a TypeError when the given eval-string can't be converted to string using to_str" # Expected TypeError (no implicit conversion of MockObject into String) but got: NoMethodError (undefined method `encoding' for #<MockObject:0x34dc8 @name="x" @null=nil>)
+  fails "Module#module_eval raises a TypeError when the given filename can't be converted to string using to_str" # Expected TypeError (/can't convert MockObject to String/) but no exception was raised (2 was returned)
+  fails "Module#module_eval raises an ArgumentError when a block and normal arguments are given" # Expected ArgumentError (wrong number of arguments (given 1, expected 0)) but got: ArgumentError (wrong number of arguments (1 for 0)    NOTE:If you want to enable passing a String argument please add "require 'opal-parser'" to your script )
+  fails "Module#module_eval raises an ArgumentError when more than 3 arguments are given" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but got: ArgumentError (wrong number of arguments (0 for 1..3))
+  fails "Module#module_eval raises an ArgumentError when no arguments and no block are given" # Expected ArgumentError (wrong number of arguments (given 0, expected 1..3)) but got: ArgumentError (wrong number of arguments (0 for 1..3))
+  fails "Module#module_eval resolves constants in the caller scope ignoring send" # NameError: uninitialized constant ModuleSpecs::ClassEvalTest::Lookup
+  fails "Module#module_eval resolves constants in the caller scope" # NameError: uninitialized constant ModuleSpecs::ClassEvalTest::Lookup
+  fails "Module#module_eval uses the optional filename and lineno parameters for error messages" # Expected ["test", 1] == ["test", 102] to be truthy but was false
+  fails "Module#module_function as a toggle (no arguments) in a Module body does not affect module_evaled method definitions also if outside the eval itself" # Expected true == false to be truthy but was false
+  fails "Module#module_function as a toggle (no arguments) in a Module body doesn't affect definitions when inside an eval even if the definitions are outside of it" # Expected true == false to be truthy but was false
+  fails "Module#module_function as a toggle (no arguments) in a Module body has no effect if inside a module_eval if the definitions are outside of it" # Expected true == false to be truthy but was false
+  fails "Module#module_function on Class raises a TypeError if calling after rebinded to Class" # Expected TypeError but no exception was raised (nil was returned)
+  fails "Module#module_function with specific method names raises a TypeError when the given names can't be converted to string using to_str" # Expected TypeError but got: Exception (Cannot set properties of undefined (setting 'displayName'))
+  fails "Module#module_function with specific method names tries to convert the given names to strings using to_str" # Exception: Cannot set properties of undefined (setting 'displayName')
+  fails "Module#name changes when the module is reachable through a constant path" # Expected nil =~ /^#<Module:0x\h+>::N$/ to be truthy but was false
+  fails "Module#name is not nil for a nested module created with the module keyword" # Expected nil =~ /^#<Module:0x[0-9a-f]+>::N$/ to be truthy but was false
   fails "Module#name is not nil when assigned to a constant in an anonymous module" # NoMethodError: undefined method `end_with?' for nil
-  fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil to match /^#<Module:0x\h+>::Child$/
-  fails "Module#prepend keeps the module in the chain when dupping the class"
-  fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0x6c37a>] == [#<Module:0x6c38c>, #<Module:0x6c37a>] to be truthy but was false
-  fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x7b0e0> to have private instance method 'test1' but it does not
-  fails "Module#private with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x2f186> to have private instance method 'test1' but it does not
+  fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil =~ /^#<Module:0x\h+>::Child$/ to be truthy but was false
+  fails "Module#prepend keeps the module in the chain when dupping the class" # Exception: self.$$constructor is not a constructor
+  fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0xa8270>] == [#<Module:0xa8282>, #<Module:0xa8270>] to be truthy but was false
+  fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x3bf72> to have private instance method 'test1' but it does not
+  fails "Module#private with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x3bf6c> to have private instance method 'test1' but it does not
   fails "Module#private_class_method when single argument is passed and is an array sets the visibility of the given methods to private" # Expected NoMethodError but no exception was raised ("foo" was returned)
   fails "Module#private_constant marked constants in a module raises a NameError when accessed directly from modules that include the module" # Expected NameError but no exception was raised (true was returned)
   fails "Module#private_constant marked constants sends #const_missing to the original class or module" # Expected true == "Foo" to be truthy but was false
   fails "Module#private_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
-  fails "Module#private_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
-  fails "Module#private_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
-  fails "Module#protected with argument array as a single argument sets visibility of given method names" # NoMethodError: undefined method `protected_instance_methods' for #<Module:0x6994a>
-  fails "Module#protected with argument one or more arguments sets visibility of given method names" # NoMethodError: undefined method `protected_instance_methods' for #<Module:0x33d4a>
+  fails "Module#private_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments (given 2, expected 1)
+  fails "Module#private_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments (given 2, expected 1)
+  fails "Module#protected with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x59bb0> to have protected instance method 'test1' but it does not
+  fails "Module#protected with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x59baa> to have protected instance method 'test1' but it does not
   fails "Module#protected_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
-  fails "Module#protected_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
-  fails "Module#protected_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments(2 for 1)
+  fails "Module#protected_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments (given 2, expected 1)
+  fails "Module#protected_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments (given 2, expected 1)
   fails "Module#public_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#refine and alias aliases a method within a refinement module, but not outside it" # NameError: undefined method `count' for class `'
   fails "Module#refine and alias_method aliases a method within a refinement module, but not outside it" # NameError: undefined method `count' for class `'
-  fails "Module#refine and instance_methods returns a list of methods including those of the refined module" # Expected ["to_json_format",  "initialize",  "&",  "|",  "*",  "+",  "-",  "<<",  "<=>",  "==",  "[]",  "[]=",  "any?",  "assoc",  "at",  "bsearch_index",  "bsearch",  "cycle",  "clear",  "count",  "initialize_copy",  "collect",  "collect!",  "combination",  "repeated_combination",  "compact",  "compact!",  "concat",  "delete",  "delete_at",  "delete_if",  "difference",  "dig",  "drop",  "dup",  "each",  "each_index",  "empty?",  "eql?",  "fetch",  "fill",  "first",  "flatten",  "flatten!",  "hash",  "include?",  "index",  "insert",  "inspect",  "intersection",  "join",  "keep_if",  "last",  "length",  "map",  "map!",  "max",  "min",  "permutation",  "repeated_permutation",  "pop",  "product",  "push",  "append",  "rassoc",  "reject",  "reject!",  "replace",  "reverse",  "reverse!",  "reverse_each",  "rindex",  "rotate",  "rotate!",  "sample",  "select",  "select!",  "filter",  "filter!",  "shift",  "size",  "shuffle",  "shuffle!",  "slice",  "slice!",  "sort",  "sort!",  "sort_by!",  "take",  "take_while",  "to_a",  "to_ary",  "to_h",  "to_s",  "transpose",  "union",  "uniq",  "uniq!",  "unshift",  "prepend",  "values_at",  "zip",  "instance_variables",  "pack",  "pretty_print",  "pretty_print_cycle",  "__marshal__",  "deconstruct",  "all?",  "chunk",  "chunk_while",  "collect_concat",  "detect",  "drop_while",  "each_cons",  "each_entry",  "each_slice",  "each_with_index",  "each_with_object",  "entries",  "filter_map",  "find",  "find_all",  "find_index",  "flat_map",  "grep",  "grep_v",  "group_by",  "inject",  "lazy",  "enumerator_size",  "max_by",  "member?",  "min_by",  "minmax",  "minmax_by",  "none?",  "one?",  "partition",  "reduce",  "slice_before",  "slice_after",  "slice_when",  "sort_by",  "sum",  "tally",  "to_set",  "require",  "using",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "unpack_format",  "toplevel_define_other_method",  "some_toplevel_method",  "public_toplevel_method",  "main_public_method",  "main_public_method2",  "main_private_method",  "main_private_method2",  "check_autoload",  "defined_specs_method",  "defined_specs_receiver",  "expect",  "eq",  "pretty_print_instance_variables",  "pretty_print_inspect",  "method_missing",  "=~",  "!~",  "===",  "method",  "methods",  "public_methods",  "Array",  "at_exit",  "caller",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "initialize_clone",  "define_singleton_method",  "initialize_dup",  "enum_for",  "to_enum",  "equal?",  "exit",  "extend",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "kind_of?",  "lambda",  "load",  "loop",  "nil?",  "object_id",  "printf",  "proc",  "puts",  "p",  "print",  "warn",  "raise",  "fail",  "rand",  "respond_to?",  "respond_to_missing?",  "require_relative",  "require_tree",  "send",  "public_send",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "catch",  "throw",  "open",  "yield_self",  "then",  "format",  "sprintf",  "Complex",  "Rational",  "freeze",  "frozen?",  "taint",  "untaint",  "tainted?",  "private_methods",  "private_instance_methods",  "eval",  "node_require",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "binding",  "BigDecimal",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel",  "__send__",  "!=",  "__id__",  "!",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined"] == [] to be truthy but was false
+  fails "Module#refine and instance_methods returns a list of methods including those of the refined module" # Expected ["initialize",  "&",  "|",  "*",  "+",  "-",  "<<",  "<=>",  "==",  "[]",  "[]=",  "any?",  "assoc",  "at",  "bsearch_index",  "bsearch",  "cycle",  "clear",  "count",  "initialize_copy",  "collect",  "collect!",  "combination",  "repeated_combination",  "compact",  "compact!",  "concat",  "delete",  "delete_at",  "delete_if",  "difference",  "dig",  "drop",  "dup",  "each",  "each_index",  "empty?",  "eql?",  "fetch",  "fill",  "first",  "flatten",  "flatten!",  "freeze",  "hash",  "include?",  "index",  "insert",  "inspect",  "intersection",  "intersect?",  "join",  "keep_if",  "last",  "length",  "max",  "min",  "permutation",  "repeated_permutation",  "pop",  "product",  "push",  "rassoc",  "reject",  "reject!",  "replace",  "reverse",  "reverse!",  "reverse_each",  "rindex",  "rotate",  "rotate!",  "sample",  "select",  "select!",  "shift",  "shuffle",  "shuffle!",  "slice!",  "sort",  "sort!",  "sort_by!",  "take",  "take_while",  "to_a",  "to_ary",  "to_h",  "transpose",  "union",  "uniq",  "uniq!",  "unshift",  "values_at",  "zip",  "instance_variables",  "pack",  "append",  "filter",  "filter!",  "map",  "map!",  "prepend",  "size",  "slice",  "to_s",  "deconstruct",  "to_json",  "pretty_print",  "pretty_print_cycle",  "shelljoin",  "__marshal__",  "all?",  "chunk",  "chunk_while",  "collect_concat",  "detect",  "drop_while",  "each_cons",  "each_entry",  "each_slice",  "each_with_index",  "each_with_object",  "entries",  "filter_map",  "find_all",  "find_index",  "grep",  "grep_v",  "group_by",  "inject",  "lazy",  "enumerator_size",  "max_by",  "min_by",  "minmax",  "minmax_by",  "none?",  "one?",  "partition",  "slice_before",  "slice_after",  "slice_when",  "sort_by",  "sum",  "tally",  "find",  "flat_map",  "member?",  "reduce",  "to_set",  "guard",  "guard_not",  "with_feature",  "without_feature",  "new_fd",  "new_io",  "should",  "should_not",  "version_is",  "ruby_version_is",  "kernel_version_is",  "suppress_warning",  "suppress_keyword_warning",  "should_receive",  "should_not_receive",  "stub!",  "mock",  "mock_int",  "mock_numeric",  "evaluate",  "before",  "after",  "describe",  "it",  "it_should_behave_like",  "context",  "specify",  "it_behaves_like",  "ruby_bug",  "conflicts_with",  "big_endian",  "little_endian",  "platform_is",  "platform_is_not",  "quarantine!",  "not_supported_on",  "as_superuser",  "as_real_superuser",  "as_user",  "argf",  "argv",  "new_datetime",  "with_timezone",  "fixture",  "flunk",  "cp",  "mkdir_p",  "rm_r",  "touch",  "mock_to_path",  "nan_value",  "infinity_value",  "bignum_value",  "max_long",  "min_long",  "fixnum_max",  "fixnum_min",  "ruby_exe_options",  "resolve_ruby_exe",  "ruby_exe",  "ruby_cmd",  "opal_filter",  "opal_unsupported_filter",  "frozen_error_class",  "pack_format",  "module_specs_public_method_on_object",  "module_specs_private_method_on_object",  "module_specs_protected_method_on_object",  "module_specs_private_method_on_object_for_kernel_public",  "module_specs_public_method_on_object_for_kernel_protected",  "module_specs_public_method_on_object_for_kernel_private",  "unpack_format",  "DelegateClass",  "lang_send_rest_len",  "main_public_method",  "main_public_method2",  "main_private_method",  "main_private_method2",  "defined_specs_method",  "defined_specs_receiver",  "example_instance_method_of_object",  "toplevel_define_other_method",  "some_toplevel_method",  "public_toplevel_method",  "check_autoload",  "shellsplit",  "shellwords",  "shellescape",  "expect",  "eq",  "pretty_print_instance_variables",  "pretty_print_inspect",  "=~",  "!~",  "===",  "method",  "methods",  "public_methods",  "Array",  "at_exit",  "caller",  "caller_locations",  "class",  "copy_instance_variables",  "copy_singleton_methods",  "clone",  "initialize_clone",  "define_singleton_method",  "initialize_dup",  "enum_for",  "equal?",  "exit",  "extend",  "frozen?",  "gets",  "instance_of?",  "instance_variable_defined?",  "instance_variable_get",  "instance_variable_set",  "remove_instance_variable",  "Integer",  "Float",  "Hash",  "is_a?",  "itself",  "lambda",  "load",  "loop",  "nil?",  "printf",  "proc",  "puts",  "p",  "print",  "readline",  "warn",  "raise",  "rand",  "respond_to?",  "respond_to_missing?",  "require",  "require_relative",  "require_tree",  "singleton_class",  "sleep",  "srand",  "String",  "tap",  "to_proc",  "catch",  "throw",  "open",  "yield_self",  "fail",  "kind_of?",  "object_id",  "public_send",  "send",  "then",  "to_enum",  "format",  "sprintf",  "Complex",  "Rational",  "taint",  "untaint",  "tainted?",  "private_methods",  "protected_methods",  "private_instance_methods",  "protected_instance_methods",  "eval",  "binding",  "Pathname",  "require_remote",  "pretty_inspect",  "pp",  "opal_parse",  "eval_js",  "module_specs_public_method_on_kernel",  "module_specs_alias_on_kernel",  "BigDecimal",  "__send__",  "__id__",  "!",  "!=",  "instance_eval",  "instance_exec",  "singleton_method_added",  "singleton_method_removed",  "singleton_method_undefined",  "method_missing"] == [] to be truthy but was false
   fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `foo' for "hello"
   fails "Module#refine does not override methods in subclasses" # Expected "foo from refinement" == "foo from subclass" to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by BasicObject#__send__" # Expected "foo" == "foo from refinement" to be truthy but was false
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_method" # NoMethodError: undefined method `public_method' for #<#<Class:0x1b194>:0x1b196>
+  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_method" # NoMethodError: undefined method `public_method' for #<#<Class:0x3d7c2>:0x3d7c6>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#public_send" # Expected "foo" == "foo from refinement" to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # Expected "foo" == "foo from refinement" to be truthy but was false
-  fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc"
-  fails "Module#refine for methods accessed indirectly is honored by string interpolation"
-  fails "Module#refine makes available all refinements from the same module" # NoMethodError: undefined method `dump' for "1"
-  fails "Module#refine method lookup looks in the included modules for builtin methods" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1aaee>
+  fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # Expected ["1", "2", "3"] == ["(1)", "(2)", "(3)"] to be truthy but was false
+  fails "Module#refine for methods accessed indirectly is honored by string interpolation" # Expected "1" == "foo" to be truthy but was false
+  fails "Module#refine makes available all refinements from the same module" # NoMethodError: undefined method `to_json_format' for {1=>2}
+  fails "Module#refine method lookup looks in the included modules for builtin methods" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x3cece>
   fails "Module#refine method lookup looks in the object singleton class first" # Expected "foo from refinement" == "foo from singleton class" to be truthy but was false
   fails "Module#refine module inclusion activates all refinements from all ancestors" # NoMethodError: undefined method `to_json_format' for 5
   fails "Module#refine module inclusion overrides methods of ancestors by methods in descendants" # NoMethodError: undefined method `to_json_format' for 5
   fails "Module#refine raises ArgumentError if not given a block" # Expected ArgumentError but got: LocalJumpError (no block given)
-  fails "Module#refine raises TypeError if not passed a class" # Expected TypeError but no exception was raised (#<Module:0x1abe8> was returned)
-  fails "Module#remove_const calls #to_str to convert the given name to a String"
-  fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails"
-  fails "Module#ruby2_keywords acceps String as well" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40040>>
-  fails "Module#ruby2_keywords marks the final hash argument as keyword hash" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40036>>
-  fails "Module#ruby2_keywords prints warning when a method accepts keyword splat" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x4001e>>
-  fails "Module#ruby2_keywords prints warning when a method accepts keywords" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40048>>
-  fails "Module#ruby2_keywords prints warning when a method does not accept argument splat" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x4002e>>
-  fails "Module#ruby2_keywords raises NameError when passed not existing method name" # Expected NameError (/undefined method `not_existing'/) but got: NoMethodError (undefined method `ruby2_keywords' for #<Class:#<Object:0x4003a>>)
-  fails "Module#ruby2_keywords raises TypeError when passed not Symbol or String" # Expected TypeError (/is not a symbol nor a string/) but got: NoMethodError (undefined method `ruby2_keywords' for #<Class:#<Object:0x40026>>)
-  fails "Module#ruby2_keywords returns nil" # NoMethodError: undefined method `ruby2_keywords' for #<Class:#<Object:0x40044>>
-  fails "Module#to_s always show the refinement name, even if the module is named" # NoMethodError: undefined method `refine' for ModuleSpecs::RefinementInspect
-  fails "Module#to_s does not call #inspect or #to_s for singleton classes" # Expected "#<Class:#<:0x25bee>>" =~ /\A#<Class:#<#<Class:0x25bf2>:0x\h+>>\z/ to be truthy but was nil
-  fails "Module#to_s for objects includes class name and object ID" # Expected "#<Class:#<ModuleSpecs::NamedClass:0xa424>>" =~ /^#<Class:#<ModuleSpecs::NamedClass:0x\h+>>$/ to be truthy but was nil
-  fails "Module#to_s for the singleton class of an object of an anonymous class" # Expected "#<Class:#<:0xa450>>" == "#<Class:#<#<Class:0xa454>:0xa450>>" to be truthy but was false
-  fails "Module#to_s works with an anonymous class" # Expected "#<Class:0xa482>" =~ /^#<Class:0x\h+>$/ to be truthy but was nil
-  fails "Module#to_s works with an anonymous module" # Expected "#<Module:0xa4ae>" =~ /^#<Module:0x\h+>$/ to be truthy but was nil
-  fails "Module#undef_method raises a NameError when passed a missing name for a class" # Expected NameError (/undefined method `not_exist' for class `#<Class:0xa514>'/) but got: NameError (method 'not_exist' not defined in )
+  fails "Module#refine raises TypeError if not passed a class" # Expected TypeError but got: Exception (Cannot create property '$$id' on string 'foo')
+  fails "Module#remove_const calls #to_str to convert the given name to a String" # Mock 'CS_CONST257' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails" # Expected TypeError but got: NameError (constant ConstantSpecs::ConstantSpecs not defined)
+  fails "Module#ruby2_keywords accepts String as well" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords applies to the underlying method and applies across aliasing" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords does NOT copy the Hash when calling a method taking (*args)" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (**kw)" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (arg)" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords makes a copy of the hash and only marks the copy as keyword hash" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords marks the final hash argument as keyword hash" # Expected false == true to be truthy but was false
+  fails "Module#ruby2_keywords prints warning when a method accepts keyword splat" # Expected warning to match: /Skipping set of ruby2_keywords flag for/ but got: ""
+  fails "Module#ruby2_keywords prints warning when a method accepts keywords" # Expected warning to match: /Skipping set of ruby2_keywords flag for/ but got: ""
+  fails "Module#ruby2_keywords prints warning when a method does not accept argument splat" # Expected warning to match: /Skipping set of ruby2_keywords flag for/ but got: ""
+  fails "Module#ruby2_keywords raises NameError when passed not existing method name" # Expected NameError (/undefined method `not_existing'/) but no exception was raised (nil was returned)
+  fails "Module#ruby2_keywords raises TypeError when passed not Symbol or String" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (nil was returned)
+  fails "Module#to_s always show the refinement name, even if the module is named" # Expected "ModuleSpecs::RefinementInspect::R" == "#<refinement:String@ModuleSpecs::RefinementInspect>" to be truthy but was false
+  fails "Module#to_s does not call #inspect or #to_s for singleton classes" # Expected "#<Class:#<:0x599ac>>" =~ /\A#<Class:#<#<Class:0x599b0>:0x\h+>>\z/ to be truthy but was nil
+  fails "Module#to_s for objects includes class name and object ID" # Expected "#<Class:#<ModuleSpecs::NamedClass:0x599e2>>" =~ /^#<Class:#<ModuleSpecs::NamedClass:0x\h+>>$/ to be truthy but was nil
+  fails "Module#to_s for the singleton class of an object of an anonymous class" # Expected "#<Class:#<:0x59a16>>" == "#<Class:#<#<Class:0x59a1a>:0x59a16>>" to be truthy but was false
+  fails "Module#to_s works with an anonymous class" # Expected "#<Class:0x59a4c>" =~ /^#<Class:0x\h+>$/ to be truthy but was nil
+  fails "Module#to_s works with an anonymous module" # Expected "#<Module:0x59a80>" =~ /^#<Module:0x\h+>$/ to be truthy but was nil
+  fails "Module#undef_method raises a NameError when passed a missing name for a class" # Expected NameError (/undefined method `not_exist' for class `#<Class:0x1219e>'/) but got: NameError (method 'not_exist' not defined in )
   fails "Module#undef_method raises a NameError when passed a missing name for a metaclass" # Expected NameError (/undefined method `not_exist' for class `String'/) but got: NameError (method 'not_exist' not defined in )
-  fails "Module#undef_method raises a NameError when passed a missing name for a module" # Expected NameError (/undefined method `not_exist' for module `#<Module:0xa502>'/) but got: NameError (method 'not_exist' not defined in )
-  fails "Module#undef_method raises a NameError when passed a missing name for a singleton class" # Expected NameError (/undefined method `not_exist' for class `#<Class:#<:0xa51a>>'/) but got: NameError (method 'not_exist' not defined in )
-  fails "Module#using does not accept class" # Expected TypeError but no exception was raised (#<Module:0x3dd76> was returned)
+  fails "Module#undef_method raises a NameError when passed a missing name for a module" # Expected NameError (/undefined method `not_exist' for module `#<Module:0x121a6>'/) but got: NameError (method 'not_exist' not defined in )
+  fails "Module#undef_method raises a NameError when passed a missing name for a singleton class" # Expected NameError (/undefined method `not_exist' for class `#<Class:#<:0x121c2>>'/) but got: NameError (method 'not_exist' not defined in )
+  fails "Module#using does not accept class" # Expected TypeError but no exception was raised (#<Module:0x3a10e> was returned)
   fails "Module#using imports class refinements from module into the current class/module" # NoMethodError: undefined method `foo' for 1
-  fails "Module#using raises TypeError if passed something other than module" # Expected TypeError but no exception was raised (#<Module:0x3dd66> was returned)
+  fails "Module#using raises TypeError if passed something other than module" # Expected TypeError but no exception was raised (#<Module:0x3a124> was returned)
   fails "Module#using scope of refinement is active for block called via instance_eval" # TypeError: can't define singleton
   fails "Module#using scope of refinement is active for block called via instance_exec" # NoMethodError: undefined method `foo' for 1
   fails "Module#using scope of refinement is active for class defined via Class.new {}" # NoMethodError: undefined method `foo' for 1
   fails "Module#using scope of refinement is active for module defined via Module.new {}" # NoMethodError: undefined method `foo' for 1
-  fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1
+  fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1  
+  fails_badly "Module#ancestors returns a list of modules included in self (including self)" # Expected [ModuleSpecs::Parent, Object, Shellwords, Kernel, BasicObject] == [ModuleSpecs::Parent, Object, Kernel, BasicObject] to be truthy but was false -- a random failure
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NameError: undefined method `foo' for class `'
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#method" # NameError: undefined method `foo' for class `#<Class:0x581e4>'
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#respond_to?" # Expected false == true to be truthy but was false
