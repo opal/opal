@@ -2135,7 +2135,7 @@
     // Try to make the browser pick the right name
     alias.displayName       = name;
 
-    alias.$$arity           = body.$$arity;
+    alias.$$arity           = body.$$arity == null ? body.length : body.$$arity;
     alias.$$parameters      = body.$$parameters;
     alias.$$source_location = body.$$source_location;
     alias.$$alias_of        = body;

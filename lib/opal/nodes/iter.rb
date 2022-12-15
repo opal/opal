@@ -14,18 +14,18 @@ module Opal
 
         compile_body_or_shortcut
 
-        blockopts = []
-        blockopts << "$$arity: #{arity}"
-        blockopts << "$$s: #{scope.self}" if @define_self
-        blockopts << "$$brk: #{@closure.throwers[:break]}" if @closure&.throwers&.key? :break
-        blockopts << "$$ret: #{@closure.throwers[:return]}" if @closure&.throwers&.key? :return
+        blockopts = {}
+        blockopts["$$arity"] = arity if arity < 0
+        blockopts["$$s"] = scope.self if @define_self
+        blockopts["$$brk"] = @closure.throwers[:break] if @closure&.throwers&.key? :break
+        blockopts["$$ret"] = @closure.throwers[:return] if @closure&.throwers&.key? :return
 
         if compiler.arity_check?
-          blockopts << "$$parameters: #{parameters_code}"
+          blockopts["$$parameters"] = parameters_code
         end
 
         if compiler.enable_source_location?
-          blockopts << "$$source_location: #{source_location}"
+          blockopts["$$source_location"] = source_location
         end
 
         # MRI expands a passed argument if the block:
@@ -37,17 +37,17 @@ module Opal
         # This flag on the method indicates that a block has a top level mlhs argument
         # which means that we have to expand passed array explicitly in runtime.
         if has_top_level_mlhs_arg?
-          blockopts << "$$has_top_level_mlhs_arg: true"
+          blockopts["$$has_top_level_mlhs_arg"] = "true"
         end
 
         if has_trailing_comma_in_args?
-          blockopts << "$$has_trailing_comma_in_args: true"
+          blockopts["$$has_trailing_comma_in_args"] = "true"
         end
 
-        if blockopts.length == 1
+        if blockopts.keys == ["$$arity"]
           push ", #{arity}"
-        elsif blockopts.length > 1
-          push ', {', blockopts.join(', '), '}'
+        elsif !blockopts.empty?
+          push ', {', blockopts.map { |k, v| "#{k}: #{v}" }.join(', '), '}'
         end
 
         scope.nesting if @define_nesting

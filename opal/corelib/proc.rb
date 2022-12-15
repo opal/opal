@@ -81,8 +81,10 @@ class ::Proc < `Function`
     %x{
       if (self.$$is_curried) {
         return -1;
-      } else {
+      } else if (self.$$arity != null) {
         return self.$$arity;
+      } else {
+        return self.length;
       }
     }
   end
