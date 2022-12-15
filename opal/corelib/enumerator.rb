@@ -37,7 +37,7 @@ class ::Enumerator
     else
       @object = `arguments[0]`
       @method = `arguments[1] || "each"`
-      @args   = `$slice.call(arguments, 2)`
+      @args   = `$slice(arguments, 2)`
       @size   = nil
     end
   end

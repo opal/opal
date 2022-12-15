@@ -44,7 +44,7 @@ module Opal
           if post_splat.empty? # trailing splat
             if part = splat.children[0]
               helper :slice
-              part = part.dup << s(:js_tmp, "$slice.call(#{array}, #{pre_splat.size})")
+              part = part.dup << s(:js_tmp, "$slice(#{array}, #{pre_splat.size})")
               push ', '
               push expr(part)
             end
@@ -55,7 +55,7 @@ module Opal
 
             if part = splat.children[0]
               helper :slice
-              part = part.dup << s(:js_tmp, "$slice.call(#{array}, #{pre_splat.size}, #{tmp})")
+              part = part.dup << s(:js_tmp, "$slice(#{array}, #{pre_splat.size}, #{tmp})")
               push ', '
               push expr(part)
             end

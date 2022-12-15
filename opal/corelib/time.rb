@@ -207,7 +207,7 @@ class ::Time < `Date`
       var args, result;
 
       if (arguments.length === 10) {
-        args  = $slice.call(arguments);
+        args  = $slice(arguments);
         year  = args[5];
         month = args[4];
         day   = args[3];
@@ -238,7 +238,7 @@ class ::Time < `Date`
       var args, result;
 
       if (arguments.length === 10) {
-        args  = $slice.call(arguments);
+        args  = $slice(arguments);
         year  = args[5];
         month = args[4];
         day   = args[3];
