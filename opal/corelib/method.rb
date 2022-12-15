@@ -53,7 +53,7 @@ class ::Method
       var proc = self.$call.bind(self);
       proc.$$unbound = #{@method};
       proc.$$is_lambda = true;
-      proc.$$arity = #{@method}.$$arity;
+      proc.$$arity = #{@method}.$$arity == null ? #{@method}.length : #{@method}.$$arity;
       proc.$$parameters = #{@method}.$$parameters;
       return proc;
     }

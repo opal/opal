@@ -1136,7 +1136,7 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      var keys = Opal.slice.call(self.$$keys),
+      var keys = Opal.slice(self.$$keys),
           i, length = keys.length, key, value, new_key;
 
       for (i = 0; i < length; i++) {

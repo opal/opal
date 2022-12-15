@@ -81,8 +81,10 @@ class ::Proc < `Function`
     %x{
       if (self.$$is_curried) {
         return -1;
-      } else {
+      } else if (self.$$arity != null) {
         return self.$$arity;
+      } else {
+        return self.length;
       }
     }
   end
@@ -142,7 +144,7 @@ class ::Proc < `Function`
       }
 
       function curried () {
-        var args = $slice.call(arguments),
+        var args = $slice(arguments),
             length = args.length,
             result;
 
@@ -156,7 +158,7 @@ class ::Proc < `Function`
 
         result = function () {
           return curried.apply(null,
-            args.concat($slice.call(arguments)));
+            args.concat($slice(arguments)));
         }
         result.$$is_lambda = self.$$is_lambda;
         result.$$is_curried = true;

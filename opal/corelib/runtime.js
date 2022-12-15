@@ -77,11 +77,12 @@
   };
 
   // Minify common function calls
-  var $has_own   = Object.hasOwnProperty;
+  var $call      = Function.prototype.call;
   var $bind      = Function.prototype.bind;
+  var $has_own   = Object.hasOwn || $call.bind(Object.prototype.hasOwnProperty);
   var $set_proto = Object.setPrototypeOf;
-  var $slice     = Array.prototype.slice;
-  var $splice    = Array.prototype.splice;
+  var $slice     = $call.bind(Array.prototype.slice);
+  var $splice    = $call.bind(Array.prototype.splice);
 
   // Nil object id is always 4
   var nil_id = 4;
@@ -155,7 +156,6 @@
   Opal.defineProperty = Opal.prop;
 
   Opal.slice = $slice;
-
 
   // Helpers
   // -----
@@ -312,7 +312,7 @@
     ancestors = $ancestors(cref);
 
     for (i = 0, ii = ancestors.length; i < ii; i++) {
-      if (ancestors[i].$$const && $has_own.call(ancestors[i].$$const, name)) {
+      if (ancestors[i].$$const && $has_own(ancestors[i].$$const, name)) {
         return ancestors[i].$$const[name];
       } else if (ancestors[i].$$autoload && ancestors[i].$$autoload[name]) {
         return handle_autoload(ancestors[i], name);
@@ -540,7 +540,7 @@
       // Inheritance from bridged classes requires
       // calling original JS constructors
       klass = function() {
-        var args = $slice.call(arguments),
+        var args = $slice(arguments),
             self = new ($bind.apply(superclass.$$constructor, [null].concat(args)))();
 
         // and replacing a __proto__ manually
@@ -999,7 +999,7 @@
     for (i = length - 2; i >= 0; i--) {
       var ancestor = ancestors[i];
 
-      if ($has_own.call(ancestor.$$cvars, name)) {
+      if ($has_own(ancestor.$$cvars, name)) {
         ancestor.$$cvars[name] = value;
         return value;
       }
@@ -1015,7 +1015,7 @@
   // @param module [Module]
   // @param name [String]
   Opal.class_variable_get = function(module, name, tolerant) {
-    if ($has_own.call(module.$$cvars, name))
+    if ($has_own(module.$$cvars, name))
       return module.$$cvars[name];
 
     var ancestors = $ancestors(module),
@@ -1024,7 +1024,7 @@
     for (i = 0; i < length; i++) {
       var ancestor = ancestors[i];
 
-      if ($has_own.call(ancestor.$$cvars, name)) {
+      if ($has_own(ancestor.$$cvars, name)) {
         return ancestor.$$cvars[name];
       }
     }
@@ -1785,7 +1785,7 @@
   Opal.extract_kwargs = function(parameters) {
     var kwargs = parameters[parameters.length - 1];
     if (kwargs != null && Opal.respond_to(kwargs, '$to_hash', true)) {
-      $splice.call(parameters, parameters.length - 1);
+      $splice(parameters, parameters.length - 1);
       return kwargs;
     }
   };
@@ -2034,7 +2034,7 @@
 
   // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
-    if (!$has_own.call(obj.$$prototype, jsid)) {
+    if (!$has_own(obj.$$prototype, jsid)) {
       throw Opal.NameError.$new("method '" + jsid.substr(1) + "' not defined in " + obj.$name());
     }
 
@@ -2142,7 +2142,7 @@
     // Try to make the browser pick the right name
     alias.displayName       = name;
 
-    alias.$$arity           = body.$$arity;
+    alias.$$arity           = body.$$arity == null ? body.length : body.$$arity;
     alias.$$parameters      = body.$$parameters;
     alias.$$source_location = body.$$source_location;
     alias.$$alias_of        = body;
@@ -2210,7 +2210,7 @@
 
   Opal.hash_put = function(hash, key, value) {
     if (key.$$is_string) {
-      if (!$has_own.call(hash.$$smap, key)) {
+      if (!$has_own(hash.$$smap, key)) {
         hash.$$keys.push(key);
       }
       hash.$$smap[key] = value;
@@ -2220,7 +2220,7 @@
     var key_hash, bucket, last_bucket;
     key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
-    if (!$has_own.call(hash.$$map, key_hash)) {
+    if (!$has_own(hash.$$map, key_hash)) {
       bucket = {key: key, key_hash: key_hash, value: value};
       hash.$$keys.push(bucket);
       hash.$$map[key_hash] = bucket;
@@ -2248,7 +2248,7 @@
 
   Opal.hash_get = function(hash, key) {
     if (key.$$is_string) {
-      if ($has_own.call(hash.$$smap, key)) {
+      if ($has_own(hash.$$smap, key)) {
         return hash.$$smap[key];
       }
       return;
@@ -2257,7 +2257,7 @@
     var key_hash, bucket;
     key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
-    if ($has_own.call(hash.$$map, key_hash)) {
+    if ($has_own(hash.$$map, key_hash)) {
       bucket = hash.$$map[key_hash];
 
       while (bucket) {
@@ -2275,7 +2275,7 @@
     if (key.$$is_string) {
       if (typeof key !== "string") key = key.valueOf();
 
-      if (!$has_own.call(hash.$$smap, key)) {
+      if (!$has_own(hash.$$smap, key)) {
         return;
       }
 
@@ -2299,7 +2299,7 @@
 
     var key_hash = key.$hash();
 
-    if (!$has_own.call(hash.$$map, key_hash)) {
+    if (!$has_own(hash.$$map, key_hash)) {
       return;
     }
 
@@ -2374,7 +2374,7 @@
 
       hash.$$keys[i].key_hash = key_hash;
 
-      if (!$has_own.call(hash.$$map, key_hash)) {
+      if (!$has_own(hash.$$map, key_hash)) {
         hash.$$map[key_hash] = hash.$$keys[i];
         continue;
       }
@@ -2429,7 +2429,7 @@
       else {
         args = arguments[0];
         for (key in args) {
-          if ($has_own.call(args, key)) {
+          if ($has_own(args, key)) {
             value = args[key];
 
             Opal.hash_put(hash, key, value);
@@ -2895,7 +2895,7 @@
   }
 
   Opal.get_kwarg = function(kwargs, key) {
-    if (!$has_own.call(kwargs.$$smap, key)) {
+    if (!$has_own(kwargs.$$smap, key)) {
       throw Opal.ArgumentError.$new('missing keyword: '+key);
     }
     return kwargs.$$smap[key];
@@ -2956,7 +2956,7 @@
 
   // Foward calls to define_method on the top object to Object
   function top_define_method() {
-    var args = Opal.slice.call(arguments);
+    var args = $slice(arguments);
     var block = top_define_method.$$p;
     top_define_method.$$p = null;
     return Opal.send(_Object, 'define_method', args, block)

@@ -17,9 +17,9 @@ module Opal
           helper :slice
 
           if offset == 0
-            push "$post_args = $slice.call(arguments)"
+            push "$post_args = $slice(arguments)"
           else
-            push "$post_args = $slice.call(arguments, #{offset})"
+            push "$post_args = $slice(arguments, #{offset})"
           end
         end
       end

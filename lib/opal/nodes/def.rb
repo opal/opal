@@ -12,26 +12,26 @@ module Opal
       def compile
         compile_body_or_shortcut
 
-        blockopts = []
+        blockopts = {}
 
-        blockopts << "$$arity: #{arity}"
+        blockopts["$$arity"] = arity if arity < 0
 
         if compiler.arity_check?
-          blockopts << "$$parameters: #{parameters_code}"
+          blockopts["$$parameters"] = parameters_code
         end
 
         if compiler.parse_comments?
-          blockopts << "$$comments: #{comments_code}"
+          blockopts["$$comments"] = comments_code
         end
 
         if compiler.enable_source_location?
-          blockopts << "$$source_location: #{source_location}"
+          blockopts["$$source_location"] = source_location
         end
 
-        if blockopts.length == 1
+        if blockopts.keys == ["$$arity"]
           push ", #{arity}"
-        elsif blockopts.length > 1
-          push ', {', blockopts.join(', '), '}'
+        elsif !blockopts.empty?
+          push ', {', blockopts.map { |k, v| "#{k}: #{v}" }.join(', '), '}'
         end
 
         wrap_with_definition
