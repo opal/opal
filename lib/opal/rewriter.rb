@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/rewriters/opal_engine_check'
+require 'opal/rewriters/targeted_patches'
 require 'opal/rewriters/for_rewriter'
 require 'opal/rewriters/js_reserved_words'
 require 'opal/rewriters/block_to_iter'
@@ -57,6 +58,7 @@ module Opal
     use Rewriters::Numblocks
     use Rewriters::ForwardArgs
     use Rewriters::BlockToIter
+    use Rewriters::TargetedPatches
     use Rewriters::DotJsSyntax
     use Rewriters::PatternMatching
     use Rewriters::JsReservedWords
