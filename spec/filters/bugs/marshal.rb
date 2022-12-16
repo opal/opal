@@ -8,9 +8,7 @@ opal_filter "Marshal" do
   fails "Marshal.dump with a Struct dumps an extended Struct" # Expected  "\x04\be: MethsS:\x15Struct::Extended\a:\x06a[\a\"\x06a\"\ahi:\x06b[\a\" Meths@\b" ==  "\x04\be: MethsS:\x15Struct::Extended\a:\x06a[\a;\a\"\ahi:\x06b[\a;\x00@\a" to be truthy but was false
   fails "Marshal.dump with a Symbol dumps multiple Symbols sharing the same encoding" # Expected "\x04\b[\a\"\tâ\x82¬a\"\tâ\x82¬b" == "\u0004\b[\aI:\tâ\u0082¬a\u0006:\u0006ETI:\tâ\u0082¬b\u0006;\u0006T" to be truthy but was false
   fails "Marshal.dump with a Time dumps the zone and the offset" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Marshal.dump with a Time dumps the zone and the offset" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "Marshal.dump with a Time dumps the zone, but not the offset if zone is UTC" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Marshal.dump with a Time dumps the zone, but not the offset if zone is UTC" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "Marshal.dump with an Exception contains the filename in the backtrace" # Expected  "\x04\bo:\x0EException\b: @name\"\x0EException:\v@cause0:\x0F@backtrace[\x06\"\x12foo/bar.rb:10" == "\x04\bo:\x0EException\a:\tmesg\"\bfoo:\abt[\x06\"\x12foo/bar.rb:10" to be truthy but was false
   fails "Marshal.dump with an Exception dumps an empty Exception" # Expected  "\x04\bo:\x0EException\a: @name\"\x0EException:\v@cause0" == "\x04\bo:\x0EException\a:\tmesg0:\abt0" to be truthy but was false
   fails "Marshal.dump with an Exception dumps instance variables if they exist" # Expected  "\x04\bo:\x0EException\b: @name\"\x0EException:\v@cause0: @ivari\x06" ==  "\x04\bo:\x0EException\b:\tmesg\"\bfoo:\abt0: @ivari\x06" to be truthy but was false
@@ -29,8 +27,8 @@ opal_filter "Marshal" do
   fails "Marshal.load for a Symbol loads a Symbol" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "Marshal.load for a Symbol loads a binary encoded Symbol" # Expected "â\u0086\u0092" == "→" to be truthy but was false
   fails "Marshal.load for a Symbol loads an encoded Symbol" # Expected "â\u0086\u0092" == "→" to be truthy but was false
-  fails "Marshal.load for a Time loads" # Expected 2022-12-07 05:35:14 +0100 == 1970-01-01 01:00:01 +0100 to be truthy but was false
   fails "Marshal.load for a Time loads nanoseconds" # NoMethodError: undefined method `nsec' for 2022-12-07 05:35:14 +0100
+  fails "Marshal.load for a Time loads" # Expected 2022-12-07 05:35:14 +0100 == 1970-01-01 01:00:01 +0100 to be truthy but was false
   fails "Marshal.load for a user object that extends a core type other than Object or BasicObject raises ArgumentError if the resulting class does not extend the same type" # Expected ArgumentError but got: TypeError (no implicit conversion of Hash into Integer)
   fails "Marshal.load for an Exception loads a marshalled exception with a backtrace" # Expected "Exception" == "foo" to be truthy but was false
   fails "Marshal.load for an Exception loads a marshalled exception with a message" # Expected "Exception" == "foo" to be truthy but was false

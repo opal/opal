@@ -6,7 +6,6 @@ opal_filter "DateTime" do
   fails "DateTime#hour adds 24 to negative hours" # ArgumentError: hour out of range: -10
   fails "DateTime#hour raises an error for Float" # Expected ArgumentError but no exception was raised (1 was returned)
   fails "DateTime#hour raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0xa6cca @date=-4712-01-01 00:00:00 UTC, @start=2299161> was returned)
-  fails "DateTime#hour raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0xa6e58 @date=-4712-01-01 01:00:00 UTC, @start=2299161> was returned)
   fails "DateTime#second adds 60 to negative values" # ArgumentError: sec out of range: -20
   fails "DateTime#second raises an error when minute is given as a rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x4da4 @date=-4712-01-01 00:05:00 UTC, @start=2299161> was returned)
   fails "DateTime#second raises an error, when the second is greater or equal than 60" # Expected ArgumentError but no exception was raised (#<DateTime:0x4c16 @date=-4712-01-01 00:01:00 UTC, @start=2299161> was returned)
@@ -39,11 +38,9 @@ opal_filter "DateTime" do
   fails "DateTime.min adds 60 to negative minutes" # ArgumentError: min out of range: -20
   fails "DateTime.min raises an error for Float" # Expected ArgumentError but no exception was raised (#<DateTime:0x55fc @date=-4712-01-01 00:05:00 UTC, @start=2299161> was returned)
   fails "DateTime.min raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x52ea @date=-4712-01-01 00:05:00 UTC, @start=2299161> was returned)
-  fails "DateTime.min raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x5474 @date=-4712-01-01 02:00:00 UTC, @start=2299161> was returned)
   fails "DateTime.minute adds 60 to negative minutes" # ArgumentError: min out of range: -20
   fails "DateTime.minute raises an error for Float" # Expected ArgumentError but no exception was raised (#<DateTime:0x6922 @date=-4712-01-01 00:05:00 UTC, @start=2299161> was returned)
   fails "DateTime.minute raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x6618 @date=-4712-01-01 02:00:00 UTC, @start=2299161> was returned)
-  fails "DateTime.minute raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x67a2 @date=-4712-01-01 00:05:00 UTC, @start=2299161> was returned)
   fails "DateTime.new takes the seventh argument as an offset" # Expected 1.3503086419753086e-7 == 0.7 to be truthy but was false
   fails "DateTime.now grabs the local timezone" # Expected "+01:00" == "-08:00" to be truthy but was false
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format parses YYYY-MM-DDTHH:MM:SS into a DateTime object" # Expected #<DateTime:0x8a68 @date=2012-11-08 15:43:59 +0100, @start=2299161> == #<DateTime:0x8a6c @date=2012-11-08 15:43:59 UTC, @start=2299161> to be truthy but was false

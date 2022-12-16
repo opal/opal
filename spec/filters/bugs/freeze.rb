@@ -43,10 +43,8 @@ opal_unsupported_filter "freezing" do
   fails "String#delete_prefix! raises a FrozenError when self is frozen" # Expected FrozenError but got: NoMethodError (undefined method `delete_prefix!' for "hello")
   fails "String#delete_suffix! raises a FrozenError when self is frozen" # Expected FrozenError but got: NoMethodError (undefined method `delete_suffix!' for "hello")
   fails "String#downcase! raises a FrozenError when self is frozen" # Expected FrozenError but got: NotImplementedError (String#downcase! not supported. Mutable String methods are not supported in Opal.)
-  fails "String#encode! raises a FrozenError when called on a frozen String" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! raises a FrozenError when called on a frozen String" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "String#encode! raises a FrozenError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "String#encode! raises a FrozenError when called on a frozen String when it's a no-op" # NoMethodError: undefined method `default_internal=' for Encoding
+  fails "String#encode! raises a FrozenError when called on a frozen String" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding raises a FrozenError if self is frozen" # Expected FrozenError but no exception was raised ("abcd" was returned)
   fails "String#freeze doesn't produce the same object for different instances of literals in the source" # Expected "abc" not to be identical to "abc"
   fails "String#gsub! with pattern and block raises a FrozenError when self is frozen" # Expected FrozenError but got: NotImplementedError (String#gsub! not supported. Mutable String methods are not supported in Opal.)

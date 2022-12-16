@@ -37,6 +37,8 @@ ruby/core/comparable
 ruby/core/complex
 !ruby/core/complex/marshal_dump_spec
 
+ruby/core/data
+
 ruby/core/enumerable
 ruby/core/enumerator
 ruby/core/enumerator/arithmetic_sequence

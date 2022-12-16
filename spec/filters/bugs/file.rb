@@ -4,7 +4,6 @@ opal_filter "File" do
   fails "File.absolute_path does not expand '~user' to a home directory." # Expected "./ruby/core/file/~user" == "ruby/core/file/~user" to be truthy but was false
   fails "File.absolute_path resolves paths relative to the current working directory" # Expected "./ruby/core/file/hello.txt" == "ruby/core/file/hello.txt" to be truthy but was false
   fails "File.absolute_path? calls #to_path on its argument" # Mock 'path' expected to receive to_path("any_args") exactly 1 times but received it 0 times
-  fails "File.absolute_path? calls #to_path on its argument" # NoMethodError: undefined method `absolute_path?' for File
   fails "File.absolute_path? does not expand '~' to a home directory." # NoMethodError: undefined method `absolute_path?' for File
   fails "File.absolute_path? does not expand '~user' to a home directory." # NoMethodError: undefined method `absolute_path?' for File
   fails "File.absolute_path? returns false if it's a relative path" # NoMethodError: undefined method `absolute_path?' for File

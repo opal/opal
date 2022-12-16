@@ -10,9 +10,7 @@ opal_filter "Float" do
   fails "Float#inspect emits a trailing '.0' for a whole number" # Expected "50" == "50.0" to be truthy but was false
   fails "Float#inspect emits a trailing '.0' for the mantissa in e format" # Expected "100000000000000000000" == "1.0e+20" to be truthy but was false
   fails "Float#inspect encoding returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Float#inspect encoding returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "Float#inspect encoding returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Float#inspect encoding returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "Float#inspect matches random examples in all ranges" # Expected "4.9247416523566613e-8" == "4.9247416523566613e-08" to be truthy but was false
   fails "Float#inspect matches random examples in human ranges" # Expected "174" == "174.0" to be truthy but was false
   fails "Float#inspect matches random values from divisions" # Expected "0" == "0.0" to be truthy but was false
@@ -41,9 +39,7 @@ opal_filter "Float" do
   fails "Float#to_i raises a FloatDomainError for NaN" # Expected FloatDomainError but no exception was raised (NaN was returned)
   fails "Float#to_int raises a FloatDomainError for NaN" # Expected FloatDomainError but no exception was raised (NaN was returned)
   fails "Float#to_s encoding returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Float#to_s encoding returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "Float#to_s encoding returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Float#to_s encoding returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal=' for Encoding
   fails "Float#to_s matches random examples in all ranges" # Expected "4.9247416523566613e-8" == "4.9247416523566613e-08" to be truthy but was false
   fails "Float#to_s matches random examples in human ranges" # Expected "174" == "174.0" to be truthy but was false
   fails "Float#to_s matches random values from divisions" # Expected "0" == "0.0" to be truthy but was false

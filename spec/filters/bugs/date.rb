@@ -91,5 +91,4 @@ opal_filter "Date" do
   fails "Date.valid_jd? returns true if passed a number value" # NoMethodError: undefined method `valid_jd?' for Date
   fails "Date.valid_ordinal? determines if the date is a valid ordinal date" # NoMethodError: undefined method `valid_ordinal?' for Date
   fails "Date.valid_ordinal? handles negative day numbers" # NoMethodError: undefined method `valid_ordinal?' for Date
-
 end
