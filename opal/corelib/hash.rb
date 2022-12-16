@@ -1031,7 +1031,7 @@ class ::Hash
         return [key, $hash_delete(self, key)];
       }
 
-      return self.$default(nil);
+      return nil;
     }
   end
 

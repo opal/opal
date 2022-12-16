@@ -9,8 +9,6 @@ opal_filter "Ruby 3.2" do
   fails "Data is a new constant" # NameError: uninitialized constant Data
   fails "Data is not deprecated" # NameError: uninitialized constant Data
   fails "Fixnum is no longer defined" # Expected Object.const_defined? "Fixnum" to be falsy but was true
-  fails "Hash#shift returns nil for empty hashes with defaults and default procs" # Expected 5 == nil to be truthy but was false
-  fails "Hash#shift returns nil if the Hash is empty" # RuntimeError: <No message>
   fails "Kernel#=~ is no longer defined" # Expected #<Object:0x11214>.respond_to? "=~" to be falsy but was true
   fails "Kernel#sprintf other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
   fails "Kernel#sprintf other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
