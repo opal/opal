@@ -10,7 +10,9 @@
 ::Object.autoload :Rational, 'corelib/rational'
 ::Object.require 'corelib/time'
 ::Object.autoload :Struct, 'corelib/struct'
+::Object.autoload :Data, 'corelib/data'
 ::Object.autoload :Set, 'corelib/set'
+
 ::Object.autoload :Dir, 'corelib/dir'
 ::Object.autoload :File, 'corelib/file'
 

@@ -1,8 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Ruby 3.2" do
   fails "A block yielded a single Array does not autosplat single argument to required arguments when a keyword rest argument is present" # ArgumentError: expected kwargs
-  fails "Data is a new constant" # NameError: uninitialized constant Data
-  fails "Data is not deprecated" # NameError: uninitialized constant Data
   fails "Fixnum is no longer defined" # Expected Object.const_defined? "Fixnum" to be falsy but was true
   fails "Kernel#=~ is no longer defined" # Expected #<Object:0x11214>.respond_to? "=~" to be falsy but was true
   fails "Kernel#sprintf other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
@@ -47,7 +45,6 @@ opal_filter "Ruby 3.2" do
   fails "String#dedup returns the same object when it's called on the same String literal" # NoMethodError: undefined method `dedup' for "unfrozen string"
   fails "StringIO#each when passed a separator yields each paragraph with all separation characters when passed an empty String as separator" # Expected ["para1\n" + "\n", "para2\n" + "\n", "para3"] == ["para1\n" + "\n", "para2\n" + "\n" + "\n", "para3"] to be truthy but was false
   fails "StringIO#each_line when passed a separator yields each paragraph with all separation characters when passed an empty String as separator" # Expected ["para1\n" + "\n", "para2\n" + "\n", "para3"] == ["para1\n" + "\n", "para2\n" + "\n" + "\n", "para3"] to be truthy but was false
-  fails "Struct.new on subclasses accepts keyword arguments to initialize" # Expected #<struct  args={"args"=>42}> == #<struct  args=42> to be truthy but was false
   fails "Struct.new raises a TypeError if passed a Hash with an unknown key" # Expected TypeError but no exception was raised (#<Class:0x356> was returned)
   fails "Symbol#to_proc only calls public methods" # Expected NoMethodError (/protected method `pro' called/) but no exception was raised (#<MSpecEnv:0x146c8 @a=["pub", "pro"]> was returned)
   fails "The module keyword does not reopen a module included in Object" # Expected ModuleSpecs::IncludedInObject::IncludedModuleSpecs == ModuleSpecs::IncludedInObject::IncludedModuleSpecs to be falsy but was true

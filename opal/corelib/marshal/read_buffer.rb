@@ -466,6 +466,8 @@ module ::Marshal
         end
       end
 
+      object.freeze if object.is_a? ::Data
+
       object
     end
 
