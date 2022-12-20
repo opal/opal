@@ -1,10 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Ruby 3.2" do
   fails "A block yielded a single Array does not autosplat single argument to required arguments when a keyword rest argument is present" # ArgumentError: expected kwargs
-  fails "Class#attached_object raises TypeError for special singleton classes" # Expected TypeError but got: NoMethodError (undefined method `attached_object' for NilClass)
-  fails "Class#attached_object raises TypeError if the class is not a singleton class" # Expected TypeError but got: NoMethodError (undefined method `attached_object' for #<Class:0x18d56>)
-  fails "Class#attached_object returns the class object that is attached to a class's singleton class" # NoMethodError: undefined method `attached_object' for #<Class:>
-  fails "Class#attached_object returns the object that is attached to a singleton class" # NoMethodError: undefined method `attached_object' for #<Class:#<:0x18d4e>>
   fails "Data is a new constant" # NameError: uninitialized constant Data
   fails "Data is not deprecated" # NameError: uninitialized constant Data
   fails "Fixnum is no longer defined" # Expected Object.const_defined? "Fixnum" to be falsy but was true

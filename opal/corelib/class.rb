@@ -83,5 +83,16 @@ class ::Class
     }
   end
 
+  def attached_object
+    %x{
+      if (self.$$singleton_of != null) {
+        return self.$$singleton_of;
+      }
+      else {
+        #{::Kernel.raise ::TypeError, "`#{self}' is not a singleton class"}
+      }
+    }
+  end
+
   alias inspect to_s
 end
