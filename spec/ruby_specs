@@ -128,6 +128,8 @@ ruby/core/rational
 ruby/core/regexp
 ruby/core/random
 
+ruby/core/refinement
+
 ruby/core/string
 !ruby/core/string/crypt_spec
 !ruby/core/string/scrub_spec

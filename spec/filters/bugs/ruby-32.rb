@@ -36,6 +36,9 @@ opal_filter "Ruby 3.2" do
   fails "Random::DEFAULT is no longer defined" # Expected Random.const_defined? "DEFAULT" to be falsy but was true
   fails "Range#size returns nil for all beginless ranges if the start is numeric" # Expected Infinity == nil to be truthy but was false
   fails "Range#size returns nil if the start and the end is both nil" # Expected Infinity == nil to be truthy but was false
+  fails "Refinement#append_features is not called by Module#include" # Expected TypeError but no exception was raised (#<Class:0x2e61c> was returned)
+  fails "Refinement#extend_object is not called by Object#extend" # Expected TypeError but no exception was raised (#<Class:0x28fcc> was returned)
+  fails "Refinement#prepend_features is not called by Module#prepend" # Expected TypeError but no exception was raised (#<Class:0x70cf6> was returned)
   fails "Regexp.compile given a String accepts a String of supported flags as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.compile given a String raises an Argument error if the second argument contains unsupported chars" # Expected ArgumentError but no exception was raised (/Hi/i was returned)
   fails "Regexp.compile given a String warns any non-Integer, non-nil, non-false second argument" # Expected warning to match: /expected true or false as ignorecase/ but got: ""
