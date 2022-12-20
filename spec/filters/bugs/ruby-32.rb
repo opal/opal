@@ -21,13 +21,7 @@ opal_filter "Ruby 3.2" do
   fails "Method#owner returns the class on which public was called for a private method in ancestor" # Expected MethodSpecs::InheritedMethods::B == MethodSpecs::InheritedMethods::C to be truthy but was false
   fails "Method#parameters adds * rest arg for \"star\" argument" # Expected [["rest"]] == [["rest", "*"]] to be truthy but was false
   fails "Module#const_added is a private instance method" # Expected Module to have private instance method 'const_added' but it does not
-  fails "Module#const_added is called when a new class is defined under self" # Expected [] == ["SubClass"] to be truthy but was false
-  fails "Module#const_added is called when a new constant is assigned on self through const_set" # Expected [] == ["TEST"] to be truthy but was false
-  fails "Module#const_added is called when a new constant is assigned on self" # Expected [] == ["TEST"] to be truthy but was false
-  fails "Module#const_added is called when a new module is defined under self" # Expected [] == ["SubModule"] to be truthy but was false
-  fails "Module#const_added is called when an autoload is defined" # Expected [] == ["Autoload"] to be truthy but was false
   fails "Module#const_added is called with a precise caller location with the line of definition" # Expected [] == [111, 113, 116, 120] to be truthy but was false
-  fails "Module#const_added returns nil in the default implementation" # NoMethodError: undefined method `const_added' for #<Module:0x171fe>
   fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (*args)" # Expected false == true to be truthy but was false
   fails "Proc#parameters adds * rest arg for \"star\" argument" # Expected [["req", "x"], ["rest"]] == [["req", "x"], ["rest", "*"]] to be truthy but was false
   fails "Proc#parameters regards named parameters in lambda as optional if lambda: false keyword used" # ArgumentError: [Proc#parameters] wrong number of arguments (given 1, expected 0)

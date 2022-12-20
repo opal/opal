@@ -200,6 +200,10 @@ class ::Module
         }
         Opal.const_cache_version++;
         self.$$autoload[#{const}] = { path: #{path}, loaded: false, required: false, success: false, exception: false };
+
+        if (self.$const_added && !self.$const_added.$$pristine) {
+          self.$const_added(#{const});
+        }
       }
       return nil;
     }
@@ -245,6 +249,10 @@ class ::Module
 
     `Opal.class_variables(self).hasOwnProperty(name)`
   end
+
+  def const_added(name)
+  end
+  ::Opal.pristine self, :const_added
 
   def remove_class_variable(name)
     `$deny_frozen_access(self)`

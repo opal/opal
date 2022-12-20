@@ -440,6 +440,8 @@
   // Register the constant on a cref and opportunistically set the name of
   // unnamed classes/modules.
   function $const_set(cref, name, value) {
+    var new_const = true;
+
     if (cref == null || cref === '::') cref = _Object;
 
     if (value.$$is_a_module) {
@@ -448,6 +450,11 @@
     }
 
     cref.$$const = (cref.$$const || Object.create(null));
+
+    if (name in cref.$$const || ("$$autoload" in cref && name in cref.$$autoload)) {
+      new_const = false;
+    }
+
     cref.$$const[name] = value;
 
     // Add a short helper to navigate constants manually.
@@ -462,6 +469,10 @@
 
     // Name new class directly onto current scope (Opal.Foo.Baz = klass)
     $prop(cref, name, value);
+
+    if (new_const && cref.$const_added && !cref.$const_added.$$pristine) {
+      cref.$const_added(name);
+    }
 
     return value;
   };
