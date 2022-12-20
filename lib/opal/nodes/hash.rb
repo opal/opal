@@ -5,7 +5,7 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class HashNode < Base
-      handle :hash
+      handle :hash, :kwargs
 
       attr_accessor :has_kwsplat, :keys, :values
 
@@ -26,6 +26,11 @@ module Opal
         end
       end
 
+      # Is this hash passed as kwargs?
+      def kwargs?
+        @sexp.type == :kwargs
+      end
+
       def simple_keys?
         keys.all? { |key| %i[sym str].include?(key.type) }
       end
@@ -40,6 +45,14 @@ module Opal
         end
       end
 
+      def hash_helper
+        kwargs? ? :kwhash : :hash
+      end
+
+      def hash2_helper
+        kwargs? ? :kwhash2 : :hash2
+      end
+
       # Compiles hashes containing kwsplats inside.
       # hash like { **{ nested: 1 }, a: 1, **{ nested: 2} }
       # should be compiled to
@@ -47,7 +60,7 @@ module Opal
       # Each kwsplat overrides previosly defined keys
       # Hash k/v pairs override previously defined kwsplat values
       def compile_merge
-        helper :hash
+        helper hash_helper
 
         result, seq = [], []
 
@@ -78,7 +91,7 @@ module Opal
       # Compiles a hash without kwsplats
       # with complex keys.
       def compile_hash
-        helper :hash
+        helper hash_helper
 
         children.each_with_index do |pair, idx|
           key, value = pair.children
@@ -86,14 +99,14 @@ module Opal
           push expr(key), ', ', expr(value)
         end
 
-        wrap '$hash(', ')'
+        wrap "$#{hash_helper}(", ')'
       end
 
       # Compiles a hash without kwsplats
       # and containing **only** string/symbols as keys.
       def compile_hash2
         hash_obj, hash_keys = {}, []
-        helper :hash2
+        helper hash2_helper
 
         keys.size.times do |idx|
           key = keys[idx].children[0].to_s.inspect
@@ -107,7 +120,7 @@ module Opal
           push hash_obj[key]
         end
 
-        wrap "$hash2([#{hash_keys.join ', '}], {", '})'
+        wrap "$#{hash2_helper}([#{hash_keys.join ', '}], {", '})'
       end
     end
 

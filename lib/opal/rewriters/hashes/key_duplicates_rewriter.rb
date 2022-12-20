@@ -18,6 +18,8 @@ module Opal
           @keys = previous_keys
         end
 
+        alias on_kwargs on_hash
+
         def on_pair(node)
           key, _value = *node
 

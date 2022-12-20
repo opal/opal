@@ -2226,6 +2226,7 @@
   Opal.hash_clone = function(from_hash, to_hash) {
     to_hash.$$none = from_hash.$$none;
     to_hash.$$proc = from_hash.$$proc;
+    to_hash.$$kw = from_hash.$$kw;
 
     for (var i = 0, keys = from_hash.$$keys, smap = from_hash.$$smap, len = keys.length, key, value; i < len; i++) {
       key = keys[i];
@@ -2501,6 +2502,22 @@
 
     return hash;
   };
+
+  // Those are called instead, if we want to dynamically
+  // create a kwargs hash. As of now, they simply do the
+  // same, except that they set a $$kw property. After
+  // kwargs extraction, this property will be unset.
+  Opal.kwhash = function() {
+    var hash = Opal.hash.apply(null, arguments);
+    hash.$$kw = true;
+    return hash;
+  }
+
+  Opal.kwhash2 = function(keys, smap) {
+    var hash = Opal.hash2(keys, smap);
+    hash.$$kw = true;
+    return hash;
+  }
 
   // Create a new range instance with first and last values, and whether the
   // range excludes the last value.
