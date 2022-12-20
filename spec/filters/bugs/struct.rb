@@ -13,7 +13,6 @@ opal_filter "Struct" do
   fails "Struct.new keyword_init: true option raises when there is a duplicate member" # Expected ArgumentError (duplicate member: foo) but no exception was raised (#<Class:0x76a42> was returned)
   fails "Struct.new raises ArgumentError when there is a duplicate member" # Expected ArgumentError (duplicate member: foo) but no exception was raised (#<Class:0x769fa> was returned)
   fails "Struct.new raises a TypeError or ArgumentError if passed a Hash with an unknown key" # Expected StandardError but no exception was raised (#<Class:0x76a0a> was returned)
-  fails "StructClass#keyword_init? returns nil for a struct that did not explicitly specify keyword_init" # Expected false to be nil  
   fails_badly "Struct#hash returns different hashes for different struct classes" # A failure in Chromium that once passes, other times it doesn't, most probably related to some kind of undeterminism.
   fails_badly "Struct#hash returns different hashes for structs with different values" # Ditto
 end
