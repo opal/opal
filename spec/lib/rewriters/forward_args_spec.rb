@@ -15,6 +15,8 @@ RSpec.describe Opal::Rewriters::ForwardArgs do
       end.yield_self { |children| s(ast.type, *children) }
     when :fwd_rest
       "$fwd_rest"
+    when :fwd_kwrest
+      "$fwd_kwrest"
     when :fwd_block
       "$fwd_block"
     else
@@ -33,6 +35,36 @@ RSpec.describe Opal::Rewriters::ForwardArgs do
   ENDDEST
 
   include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(ast_of(<<~ENDDEST))
+    def forward_star(*)
+      other(*)
+    end
+  ENDSOURCE
+    def forward_star(*fwd_rest)
+      other(*fwd_rest)
+    end
+  ENDDEST
+
+  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(ast_of(<<~ENDDEST))
+    def forward_kwstar(**)
+      other(**)
+    end
+  ENDSOURCE
+    def forward_kwstar(**fwd_kwrest)
+      other(**fwd_kwrest)
+    end
+  ENDDEST
+
+  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(ast_of(<<~ENDDEST))
+    def forward_block(&)
+      other(&)
+    end
+  ENDSOURCE
+    def forward_block(&fwd_block)
+      other(&fwd_block)
+    end
+  ENDDEST
+
+  include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(ast_of(<<~ENDDEST))
     def forward(first_arg, ...)
       other(first_arg, second_arg, ...)
       other(other_arg, ...)
@@ -45,16 +77,4 @@ RSpec.describe Opal::Rewriters::ForwardArgs do
       other(*fwd_rest, &fwd_block)
     end
   ENDDEST
-
-  # Not supported by the parser (nor by the rewriter which would have to rearrange the arguments)
-
-  # include_examples 'it rewrites source-to-AST', <<~ENDSOURCE, correct_names.(parse(<<~ENDDEST))
-  #   def forward(a:, ...)
-  #     other(...)
-  #   end
-  # ENDSOURCE
-  #   def forward(*fwd_rest, a:, &fwd_block)
-  #     other(*fwd_rest, &fwd_block)
-  #   end
-  # ENDDEST
 end

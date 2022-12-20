@@ -1,7 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Ruby 3.2" do
   fails "A block yielded a single Array does not autosplat single argument to required arguments when a keyword rest argument is present" # ArgumentError: expected kwargs
-  fails "Anonymous block forwarding works alongside explicit keyword arguments" # LocalJumpError: no block given
   fails "Class#attached_object raises TypeError for special singleton classes" # Expected TypeError but got: NoMethodError (undefined method `attached_object' for NilClass)
   fails "Class#attached_object raises TypeError if the class is not a singleton class" # Expected TypeError but got: NoMethodError (undefined method `attached_object' for #<Class:0x18d56>)
   fails "Class#attached_object returns the class object that is attached to a class's singleton class" # NoMethodError: undefined method `attached_object' for #<Class:>
