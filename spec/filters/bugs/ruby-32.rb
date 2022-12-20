@@ -24,9 +24,6 @@ opal_filter "Ruby 3.2" do
   fails "Module#const_added is called with a precise caller location with the line of definition" # Expected [] == [111, 113, 116, 120] to be truthy but was false
   fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (*args)" # Expected false == true to be truthy but was false
   fails "Proc#parameters adds * rest arg for \"star\" argument" # Expected [["req", "x"], ["rest"]] == [["req", "x"], ["rest", "*"]] to be truthy but was false
-  fails "Proc#parameters regards named parameters in lambda as optional if lambda: false keyword used" # ArgumentError: [Proc#parameters] wrong number of arguments (given 1, expected 0)
-  fails "Proc#parameters regards named parameters in procs as required if lambda keyword used" # ArgumentError: [Proc#parameters] wrong number of arguments (given 1, expected 0)
-  fails "Proc#parameters sets the first element of each sub-Array to :req if argument would be required if a lambda if lambda keyword used" # ArgumentError: [Proc#parameters] wrong number of arguments (given 1, expected 0)
   fails "Random::DEFAULT is no longer defined" # Expected Random.const_defined? "DEFAULT" to be falsy but was true
   fails "Range#size returns nil for all beginless ranges if the start is numeric" # Expected Infinity == nil to be truthy but was false
   fails "Range#size returns nil if the start and the end is both nil" # Expected Infinity == nil to be truthy but was false

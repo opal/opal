@@ -102,12 +102,12 @@ class ::Proc < `Function`
     end
   end
 
-  def parameters
+  def parameters(lambda: undefined)
     %x{
       if (self.$$is_curried) {
         return #{[[:rest]]};
       } else if (self.$$parameters) {
-        if (self.$$is_lambda) {
+        if (lambda == null ? self.$$is_lambda : lambda) {
           return self.$$parameters;
         } else {
           var result = [], i, length;
