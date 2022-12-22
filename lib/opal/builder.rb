@@ -192,6 +192,11 @@ module Opal
       end
     end
 
+    # Return a list of dependent files, for watching purposes
+    def dependent_files
+      processed.map(&:abs_path).compact.select { |fn| File.exist?(fn) }
+    end
+
     private
 
     def process_requires(rel_path, requires, autoloads, options)
@@ -231,7 +236,7 @@ module Opal
 
       options = options.merge(cache: cache)
 
-      processor.new(source, rel_path, @compiler_options.merge(options))
+      processor.new(source, rel_path, abs_path, @compiler_options.merge(options))
     end
 
     def read(path, autoload)

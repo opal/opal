@@ -30,8 +30,8 @@ RSpec.describe Opal::Builder do
 
     it 'compiles them as empty files' do
       source = 'require "foo"'
-      expect(ruby_processor).to receive('new').with(source, anything, anything).once.and_call_original
-      expect(ruby_processor).to receive('new').with('',     anything, anything).once.and_call_original
+      expect(ruby_processor).to receive('new').with(source, anything, anything, anything).once.and_call_original
+      expect(ruby_processor).to receive('new').with('',     anything, anything, anything).once.and_call_original
 
       builder.build_str(source, 'bar.rb')
     end
@@ -53,8 +53,8 @@ RSpec.describe Opal::Builder do
 
     it 'compiles them as empty files' do
       source = 'puts 5'
-      expect(ruby_processor).to receive('new').with(anything, './base64.rb', anything).once.and_call_original
-      expect(ruby_processor).to receive('new').with(source, anything, anything).once.and_call_original
+      expect(ruby_processor).to receive('new').with(anything, './base64.rb', anything, anything).once.and_call_original
+      expect(ruby_processor).to receive('new').with(source, anything, anything, anything).once.and_call_original
 
       builder.build_str(source, 'bar.rb')
     end

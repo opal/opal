@@ -30,6 +30,20 @@ module Opal
     nil
   end
 
+  # All files that Opal depends on while compiling (for cache keying and
+  # watching)
+  def self.dependent_files
+    # We want to ensure the compiler and any Gemfile/gemspec (for development)
+    # stays untouched
+    opal_path = File.expand_path('..', Opal.gem_dir)
+    files = Dir["#{opal_path}/{Gemfile*,*.gemspec,lib/**/*}"]
+
+    # Also check if parser wasn't changed:
+    files += $LOADED_FEATURES.grep(%r{lib/(parser|ast)})
+
+    files
+  end
+
   module UseGem
     # Adds the "require_paths" (usually `lib/`) of gem with the given name to
     # Opal paths. By default will include the "require_paths" from all the
