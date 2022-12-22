@@ -4,8 +4,8 @@ opal_filter "Exception" do
   fails "An Exception reaching the top level the Exception#cause is printed to STDERR with backtraces" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x830fa>
   fails "An Exception reaching the top level with a custom backtrace is printed on STDERR" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x830fa>
   fails "Errno::EAGAIN is the same class as Errno::EWOULDBLOCK if they represent the same errno value" # NameError: uninitialized constant Errno::EAGAIN
-  fails "Errno::EINVAL.new accepts an optional custom message" # Expected 22 == Errno to be truthy but was false
   fails "Errno::EINVAL.new accepts an optional custom message and location" # ArgumentError: [EINVAL.new] wrong number of arguments (given 2, expected -1)
+  fails "Errno::EINVAL.new accepts an optional custom message" # Expected 22 == Errno to be truthy but was false
   fails "Errno::EINVAL.new can be called with no arguments" # Expected 22 == Errno to be truthy but was false
   fails "Errno::ENOTSUP is defined" # Expected Errno to have constant 'ENOTSUP' but it does not
   fails "Errno::ENOTSUP is the same class as Errno::EOPNOTSUPP if they represent the same errno value" # NameError: uninitialized constant Errno::ENOTSUP
@@ -65,7 +65,6 @@ opal_filter "Exception" do
   fails "SignalException.new raises an exception for an optional argument with a signal name" # Expected ArgumentError but no exception was raised (#<SignalException: INT> was returned)
   fails "SignalException.new raises an exception with an invalid first argument type" # Expected ArgumentError but no exception was raised (#<SignalException: #<Object:0x52564>> was returned)
   fails "SignalException.new raises an exception with an invalid signal name" # Expected ArgumentError but no exception was raised (#<SignalException: NONEXISTENT> was returned)
-  fails "SignalException.new raises an exception with an invalid signal name" # Expected ArgumentError but no exception was raised (#<SignalException: NONEXISTENT> was returned)
   fails "SignalException.new raises an exception with an invalid signal number" # Expected ArgumentError but no exception was raised (#<SignalException: 100000> was returned)
   fails "SignalException.new takes a signal name with SIG prefix as the first argument" # NoMethodError: undefined method `signo' for #<SignalException: SIGINT>
   fails "SignalException.new takes a signal name without SIG prefix as the first argument" # NoMethodError: undefined method `signo' for #<SignalException: INT>
@@ -95,8 +94,8 @@ opal_filter "Exception" do
   fails "SystemExit #initialize accepts a status and message" # NoMethodError: undefined method `status' for #<SystemExit: 42>
   fails "SystemExit #initialize accepts a status only" # NoMethodError: undefined method `status' for #<SystemExit: 42>
   fails "SystemExit #initialize accepts no arguments" # NoMethodError: undefined method `status' for #<SystemExit: SystemExit>
-  fails "SystemExit sets the exit status and exits silently when raised" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9fe6a>
   fails "SystemExit sets the exit status and exits silently when raised when subclassed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9fe6a>
+  fails "SystemExit sets the exit status and exits silently when raised" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9fe6a>
   fails_badly "SystemExit#status returns the exit status"
   fails_badly "SystemExit#success? returns false if the process exited unsuccessfully"
   fails_badly "SystemExit#success? returns true if the process exited successfully"

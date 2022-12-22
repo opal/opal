@@ -37,6 +37,8 @@ ruby/core/comparable
 ruby/core/complex
 !ruby/core/complex/marshal_dump_spec
 
+ruby/core/data
+
 ruby/core/enumerable
 ruby/core/enumerator
 ruby/core/enumerator/arithmetic_sequence
@@ -125,6 +127,8 @@ ruby/core/range
 ruby/core/rational
 ruby/core/regexp
 ruby/core/random
+
+ruby/core/refinement
 
 ruby/core/string
 !ruby/core/string/crypt_spec

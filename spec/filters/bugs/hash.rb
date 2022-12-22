@@ -21,8 +21,8 @@ opal_filter "Hash" do
   fails "Hash#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0x40e02>}" =~ /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/ to be truthy but was nil
   fails "Hash#inspect does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
   fails "Hash#invert compares new keys with eql? semantics" # Expected "b" == "a" to be truthy but was false
-  fails "Hash#rehash removes duplicate keys" # Expected 2 == 1 to be truthy but was false
   fails "Hash#rehash removes duplicate keys for large hashes" # Expected 102 == 101 to be truthy but was false
+  fails "Hash#rehash removes duplicate keys" # Expected 2 == 1 to be truthy but was false
   fails "Hash#store does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x627dc @method="store" @object=nil>
   fails "Hash#store keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
   fails "Hash#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject/) but got: TypeError (wrong element type NilClass at 0 (expected array))

@@ -68,11 +68,6 @@ opal_filter "language" do
   fails "An instance method raises an error with too many arguments" # Expected ArgumentError (wrong number of arguments (given 2, expected 1)) but got: ArgumentError ([MSpecEnv#foo] wrong number of arguments (given 2, expected 1))
   fails "An instance method with a default argument evaluates the default when required arguments precede it" # Expected ArgumentError (wrong number of arguments (given 0, expected 1..2)) but got: ArgumentError ([MSpecEnv#foo] wrong number of arguments (given 0, expected -2))
   fails "An instance method with a default argument prefers to assign to a default argument before a splat argument" # Expected ArgumentError (wrong number of arguments (given 0, expected 1+)) but got: ArgumentError ([MSpecEnv#foo] wrong number of arguments (given 0, expected -2))
-  fails "Anonymous block forwarding forwards blocks to other functions that formally declare anonymous blocks" # LocalJumpError: no block given
-  fails "Anonymous block forwarding works alongside positional arguments and disallowed keyword arguments" # LocalJumpError: no block given
-  fails "Anonymous block forwarding works alongside positional arguments and splatted keyword arguments" # LocalJumpError: no block given
-  fails "Anonymous block forwarding works alongside positional parameters" # LocalJumpError: no block given
-  fails "Anonymous block forwarding works when it's the only declared parameter" # LocalJumpError: no block given
   fails "Assigning an anonymous module to a constant sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Executing break from within a block raises LocalJumpError when converted into a proc during a a super call" # Expected LocalJumpError but no exception was raised (1 was returned)
   fails "Executing break from within a block works when passing through a super call" # Expected to not get Exception 

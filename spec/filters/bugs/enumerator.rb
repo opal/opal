@@ -137,9 +137,9 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#uniq without block sets the size to nil" # Expected 2 == nil to be truthy but was false
   fails "Enumerator::Lazy#uniq works with an infinite enumerable" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#with_index enumerates with a given block" # TypeError: can't iterate from Float
-  fails "Enumerator::Lazy#with_index enumerates with an index" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#with_index enumerates with an index starting at 0 when offset is nil" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#with_index enumerates with an index starting at a given offset" # TypeError: can't iterate from Float
+  fails "Enumerator::Lazy#with_index enumerates with an index" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#zip calls the block with a gathered array when yield with multiple arguments" # NoMethodError: undefined method `force' for [[[], []], [0, 0], [[0, 1], [0, 1]], [[0, 1, 2], [0, 1, 2]], [[0, 1, 2], [0, 1, 2]], [nil, nil], ["default_arg", "default_arg"], [[], []], [[], []], [[0], [0]], [[0, 1], [0, 1]], [[0, 1, 2], [0, 1, 2]]]
   fails "Enumerator::Lazy#zip keeps size" # NoMethodError: undefined method `each' for #<Object:0xb6158>
   fails "Enumerator::Lazy#zip on a nested Lazy keeps size" # NoMethodError: undefined method `each' for #<Object:0xb62fe>
@@ -150,6 +150,6 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#zip when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#zip works with an infinite enumerable and an array" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#zip works with two infinite enumerables" # TypeError: can't iterate from Float
-  fails "SimpleDelegator can be marshalled" # Expected String == SimpleDelegator to be truthy but was false
   fails "SimpleDelegator can be marshalled with its instance variables intact" # Exception: Cannot create property 'foo' on string 'hello'
+  fails "SimpleDelegator can be marshalled" # Expected String == SimpleDelegator to be truthy but was false
 end

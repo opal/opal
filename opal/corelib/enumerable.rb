@@ -1268,6 +1268,10 @@ module ::Enumerable
     }
   end
 
+  def to_set(klass = Set, *args, &block)
+    klass.new(self, *args, &block)
+  end
+
   def zip(*others, &block)
     to_a.zip(*others)
   end

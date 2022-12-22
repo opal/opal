@@ -200,6 +200,10 @@ class ::Module
         }
         Opal.const_cache_version++;
         self.$$autoload[#{const}] = { path: #{path}, loaded: false, required: false, success: false, exception: false };
+
+        if (self.$const_added && !self.$const_added.$$pristine) {
+          self.$const_added(#{const});
+        }
       }
       return nil;
     }
@@ -245,6 +249,10 @@ class ::Module
 
     `Opal.class_variables(self).hasOwnProperty(name)`
   end
+
+  def const_added(name)
+  end
+  ::Opal.pristine self, :const_added
 
   def remove_class_variable(name)
     `$deny_frozen_access(self)`
@@ -754,7 +762,7 @@ class ::Module
     %x{
       klass_id = Opal.id(klass);
       if (typeof self.$$refine_modules === "undefined") {
-        self.$$refine_modules = {};
+        self.$$refine_modules = Object.create(null);
       }
       if (typeof self.$$refine_modules[klass_id] === "undefined") {
         m = self.$$refine_modules[klass_id] = #{::Refinement.new};
@@ -769,6 +777,17 @@ class ::Module
     m
   end
 
+  def refinements
+    %x{
+      var refine_modules = self.$$refine_modules, hash = #{{}};;
+      if (typeof refine_modules === "undefined") return hash;
+      for (var id in refine_modules) {
+        hash['$[]='](refine_modules[id].refined_class, refine_modules[id]);
+      }
+      return hash;
+    }
+  end
+
   # Compiler overrides this method
   def using(mod)
     ::Kernel.raise 'Module#using is not permitted in methods'
@@ -780,6 +799,8 @@ class ::Module
 end
 
 class ::Refinement < ::Module
+  attr_reader :refined_class
+
   def inspect
     if @refinement_module
       "#<refinement:#{@refined_class.inspect}@#{@refinement_module.inspect}>"

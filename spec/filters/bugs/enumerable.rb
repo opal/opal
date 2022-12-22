@@ -20,7 +20,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#slice_when when an iterator method yields more than one value processes all yielded values" # Expected [] == [[[1, 2]]] to be truthy but was false
   fails "Enumerable#slice_when when given a block doesn't yield an empty array on a small enumerable" # Expected [] == [[42]] to be truthy but was false
   fails "Enumerable#sort_by calls #each to iterate over the elements to be sorted" # Mock '#<EnumerableSpecs::Numerous:0x42a10 @list=[1, 2, 3]>' expected to receive each("any_args") exactly 1 times but received it 0 times
-  fails "Enumerable#sort_by calls #each to iterate over the elements to be sorted" # NoMethodError: undefined method `sort!' for nil
   fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable" # NoMethodError: undefined method `sort!' for #<EnumerableSpecs::MapReturnsEnumerable::EnumerableMapping:0x42a48 @items=#<EnumerableSpecs::MapReturnsEnumerable:0x42a46> @block=#<Proc:0x42a4a>>
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments" # Expected [1, [2], [3, 4], [5, 6, 7], [8, 9], nil, []] == [1, [2], 3, 5, [8, 9], nil, []] to be truthy but was false
   fails "Enumerable#tally counts values as gathered array when yielded with multiple arguments" # Expected {[]=>3, 0=>1, [0, 1]=>2, [0, 1, 2]=>3, nil=>1, "default_arg"=>1, [0]=>1} == {nil=>2, 0=>1, [0, 1]=>2, [0, 1, 2]=>3, "default_arg"=>1, []=>2, [0]=>1} to be truthy but was false
