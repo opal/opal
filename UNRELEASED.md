@@ -11,6 +11,8 @@
 ### Added
 
 - Update benchmarking and CLI runners, added support for Deno and Firefox (#2490, #2492, #2494, #2495, #2497, #2491, #2496) 
+- Ruby 3.2 support branch (#2500)
+- Added `--watch` and `--output` options to the CLI for live compilation (#2485)
 
 ### Performance
 
