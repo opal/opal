@@ -16,7 +16,7 @@ Changes are grouped as follows:
 
 
 
-## [1.6.1](https://github.com/opal/opal/compare/v1.6.0...v1.6.1) - 2022-12-09
+## [1.7.0](https://github.com/opal/opal/compare/v1.6.1...v1.7.0) - 2022-12-26
 
 
 <!--
@@ -28,6 +28,40 @@ Changes are grouped as follows:
 ### Performance
 ### Fixed
 -->
+
+### Added
+
+- Update benchmarking and CLI runners, added support for Deno and Firefox (#2490, #2492, #2494, #2495, #2497, #2491, #2496)
+- Ruby 3.2 support branch ([#2500](https://github.com/opal/opal/pull/2500))
+  - `Set` now part of the corelib
+  - Anonymous rest keyword and block arguments can be passed to calls: `call(**, &)`
+  - `Refinement#refined_class` has been added
+  - `Module#refinements` has been added
+  - `Module#const_added` has been added
+  - `Proc#parameters` now accepts lambda keyword
+  - `Class#attached_object` has been added, inverse of `singleton_class`
+  - `Hash#shift` now returns `nil` instead of passing `nil` to the `default_proc`
+- Added `--watch` and `--output` options to the CLI for live compilation ([#2485](https://github.com/opal/opal/pull/2485))
+
+### Performance
+
+- Replace all occurences of `'$'+name` with a cached helper, saving about 2% in performance ([#2481](https://github.com/opal/opal/pull/2481))
+- Optimize argument passing and arity checks ([#2499](https://github.com/opal/opal/pull/2499))
+- Targeted patches for Opal-Parser, saves up to 12% during compilation ([#2482](https://github.com/opal/opal/pull/2482))
+
+### Internal
+
+- MSpec & Ruby Spec update ([#2486](https://github.com/opal/opal/pull/2486))
+
+### Fixed
+
+- Remove throws from runtime ([#2484](https://github.com/opal/opal/pull/2484))
+
+
+
+
+## [1.6.1](https://github.com/opal/opal/compare/v1.6.0...v1.6.1) - 2022-12-09
+
 
 ### Fixed
 
