@@ -73,6 +73,12 @@ class ::Data
     self.class.members
   end
 
+  def with(**kwargs)
+    other = self.class.allocate
+    `other.members = #{self.to_h.merge(kwargs)}`
+    other
+  end
+
   def to_h(&block)
     @members.to_h(&block)
   end
