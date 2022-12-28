@@ -22,7 +22,7 @@ module Opal
 
           helper :extract_kwargs
 
-          push '$kwargs = $extract_kwargs($post_args)'
+          push '$kwargs = $extract_kwargs($post_args, ', scope.identity,')'
         end
       end
     end

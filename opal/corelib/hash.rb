@@ -1230,6 +1230,16 @@ class ::Hash
     }
   end
 
+  def self.ruby2_keywords_hash?(hash)
+    `hash.$$ruby2kw == true`
+  end
+
+  def self.ruby2_keywords_hash(hash)
+    newhash = hash.dup
+    `newhash.$$ruby2kw = newhash.$$kw = true`
+    newhash
+  end
+
   alias dup clone
   alias each_pair each
   alias eql? ==

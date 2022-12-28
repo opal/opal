@@ -43,6 +43,7 @@ module Opal
             [
               *prev_children,
               s(:restarg, '$fwd_rest'),
+              s(:kwrestarg, '$fwd_kwrest'),
               s(:blockarg, '$fwd_block')
             ]
           ))
@@ -87,6 +88,9 @@ module Opal
               *prev_children,
               s(:splat,
                 s(:lvar, '$fwd_rest')
+              ),
+              s(:kwargs,
+                s(:kwsplat, s(:lvar, '$fwd_kwrest'))
               ),
               s(:block_pass,
                 s(:lvar, '$fwd_block')

@@ -25,12 +25,9 @@ module Opal
 
           add_temp name
 
-          if args_to_keep == 0
-            # no post-args, we are free to grab everything
-            push "#{name} = $post_args"
-          else
-            push "#{name} = $post_args.splice(0, $post_args.length - #{args_to_keep})"
-          end
+          helper :extract_restargs
+
+          push "#{name} = $extract_restargs($post_args, #{args_to_keep}, ", scope.identity, ")"
         end
       end
     end

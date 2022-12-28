@@ -45,7 +45,6 @@ opal_filter "Ruby 3.2" do
   fails "String#dedup returns the same object when it's called on the same String literal" # NoMethodError: undefined method `dedup' for "unfrozen string"
   fails "StringIO#each when passed a separator yields each paragraph with all separation characters when passed an empty String as separator" # Expected ["para1\n" + "\n", "para2\n" + "\n", "para3"] == ["para1\n" + "\n", "para2\n" + "\n" + "\n", "para3"] to be truthy but was false
   fails "StringIO#each_line when passed a separator yields each paragraph with all separation characters when passed an empty String as separator" # Expected ["para1\n" + "\n", "para2\n" + "\n", "para3"] == ["para1\n" + "\n", "para2\n" + "\n" + "\n", "para3"] to be truthy but was false
-  fails "Struct.new raises a TypeError if passed a Hash with an unknown key" # Expected TypeError but no exception was raised (#<Class:0x356> was returned)
   fails "Symbol#to_proc only calls public methods" # Expected NoMethodError (/protected method `pro' called/) but no exception was raised (#<MSpecEnv:0x146c8 @a=["pub", "pro"]> was returned)
   fails "The module keyword does not reopen a module included in Object" # Expected ModuleSpecs::IncludedInObject::IncludedModuleSpecs == ModuleSpecs::IncludedInObject::IncludedModuleSpecs to be falsy but was true
   fails "UnboundMethod#owner returns the class on which public was called for a private method in ancestor" # Expected MethodSpecs::InheritedMethods::B == MethodSpecs::InheritedMethods::C to be truthy but was false

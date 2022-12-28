@@ -15,4 +15,8 @@ class << self
   def using(mod)
     ::Kernel.raise 'main.using is permitted only at toplevel'
   end
+
+  def ruby2_keywords(*methods)
+    ::Object.ruby2_keywords(*methods)
+  end
 end

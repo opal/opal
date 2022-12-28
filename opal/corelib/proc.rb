@@ -189,6 +189,11 @@ class ::Proc < `Function`
     }
   end
 
+  def ruby2_keywords
+    `self.$$ruby2kw = true`
+    self
+  end
+
   alias === call
   alias clone dup
   alias yield call
