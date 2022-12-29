@@ -228,6 +228,11 @@ module ::Kernel
     nil
   end
 
+  def abort(msg = nil)
+    warn msg if msg
+    exit false
+  end
+
   def extend(*mods)
     %x{
       if (mods.length == 0) {
@@ -791,6 +796,7 @@ module ::Kernel
     yield self
   end
 
+  alias exit! exit
   alias fail raise
   alias kind_of? is_a?
   alias object_id __id__

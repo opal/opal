@@ -104,6 +104,14 @@ module ::Kernel
     ::Kernel.raise ::NotImplementedError, "To use Kernel#eval, you must first require 'opal-parser'. "\
                                           "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
   end
+
+  def fork
+    ::Kernel.raise ::NotImplementedError, "can't fork in a JavaScript environment"
+  end
+
+  def system(*)
+    ::Kernel.raise ::NotImplementedError, "can't run system commands in JavaScript environment"
+  end
 end
 
 def self.public(*methods)
