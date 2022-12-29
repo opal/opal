@@ -736,6 +736,7 @@ class ::Module
     copy = super
     copy.copy_class_variables(self)
     copy.copy_constants(self)
+    copy.copy_instance_methods(self)
     copy
   end
 
@@ -753,6 +754,17 @@ class ::Module
 
       for (name in other_constants) {
         $const_set(self, name, other_constants[name]);
+      }
+    }
+  end
+
+  def copy_instance_methods(other)
+    %x{
+      var props = Opal.own_instance_methods(other);
+
+      for (var i = 0, length = props.length; i < length; i++) {
+        var prop = props[i];
+        $prop(self.$$prototype, $jsid(prop), other.$$prototype[$jsid(prop)]);
       }
     }
   end
