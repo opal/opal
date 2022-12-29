@@ -595,10 +595,11 @@ class ::Module
     }
   end
 
-  def method_defined?(method)
+  def method_defined?(method, inherit = true)
     %x{
-      var body = self.$$prototype[$jsid(method)];
-      return (!!body) && !body.$$stub;
+      var jsid = $jsid(method), body = self.$$prototype[jsid];
+      return (!!body) && !body.$$stub &&
+        (inherit || Object.hasOwnProperty(self.$$prototype, jsid));
     }
   end
 
