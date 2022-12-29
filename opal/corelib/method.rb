@@ -17,7 +17,7 @@ class ::Method
   end
 
   def source_location
-    `#{@method}.$$source_location` || ['(eval)', 0]
+    `#{@method}.$$source_location || ['(eval)', 0]`
   end
 
   def comments

@@ -97,10 +97,9 @@ opal_filter "Kernel" do
   fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#kind_of? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#local_variables is accessible from bindings" # Expected [] to include "a"
-  fails "Kernel#method can be called even if we only repond_to_missing? method, true" # NameError: undefined method `handled_privately' for class `KernelSpecs::RespondViaMissing'
-  fails "Kernel#method can call a #method_missing accepting zero or one arguments" # NameError: undefined method `foo' for class `#<Class:0x4bc80>'
-  fails "Kernel#method returns a method object if respond_to_missing?(method) is true" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'
-  fails "Kernel#method the returned method object if respond_to_missing?(method) calls #method_missing with a Symbol name" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'
+  fails "Kernel#method can be called even if we only repond_to_missing? method, true" # Expected "Done handled_privately(1,2,3)" == "Done handled_privately([1, 2, 3])" to be truthy but was false
+  fails "Kernel#method returns a method object if respond_to_missing?(method) is true" # Expected "Done handled_publicly(42)" == "Done handled_publicly([42])" to be truthy but was false
+  fails "Kernel#method the returned method object if respond_to_missing?(method) calls #method_missing with a Symbol name" # Expected "Done handled_publicly(42)" == "Done handled_publicly([42])" to be truthy but was false
   fails "Kernel#method will see an alias of the original method as == when in a derived class" # Expected #<Method: KernelSpecs::B#aliased_pub_method (defined in KernelSpecs::B in ruby/core/kernel/fixtures/classes.rb:164)> == #<Method: KernelSpecs::B#pub_method (defined in KernelSpecs::A in ruby/core/kernel/fixtures/classes.rb:164)> to be truthy but was false
   fails "Kernel#methods does not return private singleton methods defined in 'class << self'" # Expected ["ichi", "san", "shi", "roku", "shichi", "hachi", "juu", "juu_ichi", "juu_ni"] not to include "shichi"
   fails "Kernel#object_id returns a different value for two Bignum literals" # Expected 4e+100 == 4e+100 to be falsy but was true

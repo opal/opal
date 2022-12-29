@@ -29,15 +29,35 @@ module ::Kernel
     }
   end
 
-  def method(name)
+  %x{
+    var respond_to_missing = $jsid("respond_to_missing?"),
+        method_missing = $jsid("method_missing")
+  }
+
+  # Note: scope is a private API
+  def method(name, scope = true)
     %x{
-      var meth = self[$jsid(name)];
+      var meth = self[$jsid(name)], body = meth;
 
       if (!meth || meth.$$stub) {
-        #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
+        if (!self[respond_to_missing].$$pristine && self[respond_to_missing](name, scope)) {
+          meth = self[method_missing];
+          body = function f() {
+            var meth = self[method_missing], s = f.$$s || this;
+            meth.$$p = f.$$p;
+            meth.$$s = s;
+            return meth.apply(s, [name].concat($slice(arguments)));
+          };
+          body.$$arity = -1;
+          body.$$source_location = nil;
+          body.$$parameters = [["rest"]];
+        }
+        else {
+          #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
+        }
       }
 
-      return #{::Method.new(self, `meth.$$owner || #{self.class}`, `meth`, name)};
+      return #{::Method.new(self, `meth.$$owner || #{self.class}`, `body`, name)};
     }
   end
 
