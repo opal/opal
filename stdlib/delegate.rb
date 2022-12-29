@@ -50,10 +50,9 @@ class Delegator < BasicObject
   kernel = ::Kernel.dup
   kernel.class_eval do
     alias_method :__raise__, :raise
-    # somehow this doesn't work in Opal:
-    # %i[to_s inspect !~ === <=> hash].each do |m|
-    #   undef_method m
-    # end
+    %i[to_s inspect =~ !~ === <=> hash].each do |m|
+      undef_method m
+    end
     private_instance_methods.each do |m|
       if /\Ablock_given\?\z|\Aiterator\?\z|\A__.*__\z/ =~ m
         next
