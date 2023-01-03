@@ -86,6 +86,9 @@ class Opal::CliRunners::Compiler
     $stderr.puts "* Opal v#{Opal::VERSION} successfully compiled your program in --watch mode"
 
     sleep
+  rescue Interrupt
+    $stderr.puts '* Stopping watcher...'
+    @code_listener.stop
   end
 
   def reexec
