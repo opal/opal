@@ -201,7 +201,9 @@ module Opal
         end
 
         if @cached_content.nil? || can_read_again
-          content = file.read
+          # On MacOS file.read is not enough to pick up changes, probably due to some
+          # cache or buffer, unclear if coming from ruby or the OS.
+          content = File.file?(file) ? File.read(file) : file.read
         end
 
         @cached_content ||= content unless can_read_again
