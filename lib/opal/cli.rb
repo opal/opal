@@ -8,7 +8,7 @@ module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
       :output, :requires, :rbrequires, :gems, :stubs, :verbose, :runner_options,
-      :preload, :filename, :debug, :no_exit, :lib_only, :missing_require_severity,
+      :preload, :debug, :no_exit, :lib_only, :missing_require_severity,
       :no_cache, :argv_orig
 
     class << self
@@ -38,7 +38,7 @@ module Opal
       @output      = options.delete(:output)     { self.class.stdout || $stdout }
       @verbose     = options.delete(:verbose)    { false }
       @debug       = options.delete(:debug)      { false }
-      @filename    = options.delete(:filename)   { @file && @file.path }
+      @filename    = options.delete(:filename)   { @file&.path }
       @requires    = options.delete(:requires)   { [] }
       @rbrequires  = options.delete(:rbrequires) { [] }
       @no_cache    = options.delete(:no_cache)   { false }
@@ -60,6 +60,10 @@ module Opal
       raise ArgumentError, 'no runnable code provided (evals or file)' if @evals.empty? && @file.nil? && !@lib_only
       raise ArgumentError, "can't accept evals or file in `library only` mode" if (@evals.any? || @file) && @lib_only
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
+    end
+
+    def filename
+      @evals.any? ? '-e' : @filename
     end
 
     def run
