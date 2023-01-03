@@ -52,22 +52,20 @@ class Opal::CliRunners::Compiler
   end
 
   def fail_unrewindable!
-    warn <<~ERROR
+    abort <<~ERROR
       You have specified --watch, but for watch to work, you must specify an
       --output file.
     ERROR
-    exit 1
   end
 
   def fail_no_listen!
-    warn <<~ERROR
+    abort <<~ERROR
       --watch mode requires the `listen` gem present. Please try to run:
 
           gem install listen
 
       Or if you are using bundler, add listen to your Gemfile.
     ERROR
-    exit 1
   end
 
   def watch_compile
