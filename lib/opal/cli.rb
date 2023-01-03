@@ -9,7 +9,7 @@ module Opal
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
       :output, :requires, :rbrequires, :gems, :stubs, :verbose, :runner_options,
       :preload, :filename, :debug, :no_exit, :lib_only, :missing_require_severity,
-      :no_cache
+      :no_cache, :argv_orig
 
     class << self
       attr_accessor :stdout
@@ -29,6 +29,7 @@ module Opal
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       { [] }
+      @argv_orig   = options.delete(:argv_orig)  { argv }
       @evals       = options.delete(:evals)      { [] }
       @load_paths  = options.delete(:load_paths) { [] }
       @gems        = options.delete(:gems)       { [] }
@@ -93,7 +94,7 @@ module Opal
       require 'opal/repl'
 
       repl = REPL.new
-      repl.run(OriginalARGV)
+      repl.run(argv_orig)
     end
 
     attr_reader :exit_status
