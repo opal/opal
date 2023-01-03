@@ -128,7 +128,8 @@ module Opal
       builder.build_str '$DEBUG = true', '(flags)', no_export: true if debug
 
       # --eval / stdin / file
-      evals_or_file { |source, filename| builder.build_str(source, filename) }
+      source = evals_or_file_source
+      builder.build_str(source, filename) if source
 
       # --no-exit
       builder.build_str '::Kernel.exit', '(exit)', no_export: true unless no_exit
@@ -137,27 +138,27 @@ module Opal
     end
 
     def show_sexp
-      evals_or_file do |contents, filename|
-        buffer = ::Opal::Parser::SourceBuffer.new(filename)
-        buffer.source = contents
-        sexp = Opal::Parser.default_parser.parse(buffer)
-        output.puts sexp.inspect
-      end
+      source = evals_or_file_source or return # rubocop:disable Style/AndOr
+
+      buffer = ::Opal::Parser::SourceBuffer.new(filename)
+      buffer.source = source
+      sexp = Opal::Parser.default_parser.parse(buffer)
+      output.puts sexp.inspect
     end
 
     def debug_source_map
-      evals_or_file do |contents, filename|
-        compiler = Opal::Compiler.new(contents, file: filename, **compiler_options)
+      source = evals_or_file_source or return # rubocop:disable Style/AndOr
 
-        compiler.compile
+      compiler = Opal::Compiler.new(source, file: filename, **compiler_options)
 
-        result = compiler.result
-        source_map = compiler.source_map.to_json
+      compiler.compile
 
-        b64 = [result, source_map, contents].map { |i| Base64.strict_encode64(i) }.join(',')
+      result = compiler.result
+      source_map = compiler.source_map.to_json
 
-        output.puts "https://sokra.github.io/source-map-visualization/#base64,#{b64}"
-      end
+      b64 = [result, source_map, contents].map { |i| Base64.strict_encode64(i) }.join(',')
+
+      output.puts "https://sokra.github.io/source-map-visualization/#base64,#{b64}"
     end
 
     def compiler_option_names
@@ -178,27 +179,28 @@ module Opal
 
     # Internal: Yields a string of source code and the proper filename for either
     #           evals, stdin or a filepath.
-    def evals_or_file
-      # --library
-      return if lib_only
+    def evals_or_file_source
+      return if lib_only # --library
 
       if evals.any?
-        yield evals.join("\n"), '-e'
-      elsif file && (filename != '-' || evals.empty?)
-        return @content if @content
+        evals.join("\n")
+      elsif file
+        return @cached_content if @cached_content
 
-        if file.tty?
-          save = true
-        else
+        unless file.tty?
           begin
             file.rewind
-          rescue Errno::ESPIPE
-            save = true
+            can_read_again = true
+          rescue Errno::ESPIPE # rubocop:disable Lint/HandleExceptions
+            # noop
           end
         end
 
-        content = yield(file.read, filename)
-        @content = content if save
+        if @cached_content.nil? || can_read_again
+          content = file.read
+        end
+
+        @cached_content ||= content unless can_read_again
         content
       end
     end
