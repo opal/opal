@@ -8,6 +8,11 @@
 ### Fixed
 -->
 
+
+### Added
+
+- Add safari runner (#2513)
+
 ### Fixed
 
 - Fix CLI file reading for macOS (#2510)
@@ -19,4 +24,5 @@
 
 - Platform specific spec filters (#2508)
 - Run Firefox specs by default (#2507)
+- Run Safari specs by default (#2513)
 - [mspec_opal] Avoid lookbehind Regexp for compatibility with various javascript engines (#2512)
