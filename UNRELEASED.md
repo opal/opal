@@ -13,6 +13,7 @@
 - Fix CLI file reading for macOS (#2510)
 - Make Date/Time.parse on Firefox more compatible with Chrome and Ruby (#2506)
 - Safari/WebKit can now parse code compiled with lookbehind regexps, failing at runtime instead (#2511)
+- Fix `--watch` ignoring some directories (e.g. `tmp`) (#2509)
 
 ### Internal
 
