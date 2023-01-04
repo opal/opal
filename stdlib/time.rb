@@ -1,6 +1,26 @@
 class Time
   def self.parse(str)
-    `new Date(Date.parse(str))`
+    %x{
+      var d = Date.parse(str);
+      if (d !== d) {
+        // parsing failed, d is a NaN
+        // probably str is not in ISO 8601 format, which is the only format, required to be supported by Javascript
+        // try to make the format more like ISO or more like Chrome and parse again
+        str = str.replace(/^(\d+)([\./])(\d+)([\./])?(\d+)?/, function(matched_sub, c1, c2, c3, c4, c5, offset, orig_string) {
+          if ((c2 === c4) && c5) {
+            // 2007.10.1 or 2007/10/1 are ok, but 2007/10.1 is not, convert to 2007-10-1
+            return c1 + '-' + c3 + '-' + c5;
+          } else if (c3 && !c4) {
+            // 2007.10 or 2007/10
+            // Chrome and Ruby can parse "2007/10", assuming its "2007-10-01", do the same
+            return c1 + '-' + c3 + '-01';
+          };
+          return matched_sub;
+        });
+        d = Date.parse(str);
+      }
+      return new Date(d);
+    }
   end
 
   def self.def_formatter(name, format, on_utc: false, utc_tz: nil, tz_format: nil, fractions: false, on: self)
