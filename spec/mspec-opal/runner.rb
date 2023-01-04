@@ -80,6 +80,7 @@ class OSpecFormatter
       'server'       => BrowserFormatter,
       'chrome'       => DottedFormatter,
       'firefox'      => DottedFormatter,
+      'safari'       => DottedFormatter,
       'deno'         => NodeJSFormatter,
       'node'         => NodeJSFormatter,
       'nodejs'       => NodeJSFormatter,
