@@ -8,8 +8,8 @@ module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
       :output, :requires, :rbrequires, :gems, :stubs, :verbose, :runner_options,
-      :preload, :filename, :debug, :no_exit, :lib_only, :missing_require_severity,
-      :no_cache
+      :preload, :debug, :no_exit, :lib_only, :missing_require_severity,
+      :no_cache, :argv_orig
 
     class << self
       attr_accessor :stdout
@@ -29,6 +29,7 @@ module Opal
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       { [] }
+      @argv_orig   = options.delete(:argv_orig)  { argv }
       @evals       = options.delete(:evals)      { [] }
       @load_paths  = options.delete(:load_paths) { [] }
       @gems        = options.delete(:gems)       { [] }
@@ -37,7 +38,7 @@ module Opal
       @output      = options.delete(:output)     { self.class.stdout || $stdout }
       @verbose     = options.delete(:verbose)    { false }
       @debug       = options.delete(:debug)      { false }
-      @filename    = options.delete(:filename)   { @file && @file.path }
+      @filename    = options.delete(:filename)   { @file&.path }
       @requires    = options.delete(:requires)   { [] }
       @rbrequires  = options.delete(:rbrequires) { [] }
       @no_cache    = options.delete(:no_cache)   { false }
@@ -59,6 +60,10 @@ module Opal
       raise ArgumentError, 'no runnable code provided (evals or file)' if @evals.empty? && @file.nil? && !@lib_only
       raise ArgumentError, "can't accept evals or file in `library only` mode" if (@evals.any? || @file) && @lib_only
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
+    end
+
+    def filename
+      @evals.any? ? '-e' : @filename
     end
 
     def run
@@ -93,7 +98,7 @@ module Opal
       require 'opal/repl'
 
       repl = REPL.new
-      repl.run(OriginalARGV)
+      repl.run(argv_orig)
     end
 
     attr_reader :exit_status
@@ -127,7 +132,8 @@ module Opal
       builder.build_str '$DEBUG = true', '(flags)', no_export: true if debug
 
       # --eval / stdin / file
-      evals_or_file { |source, filename| builder.build_str(source, filename) }
+      source = evals_or_file_source
+      builder.build_str(source, filename) if source
 
       # --no-exit
       builder.build_str '::Kernel.exit', '(exit)', no_export: true unless no_exit
@@ -136,27 +142,27 @@ module Opal
     end
 
     def show_sexp
-      evals_or_file do |contents, filename|
-        buffer = ::Opal::Parser::SourceBuffer.new(filename)
-        buffer.source = contents
-        sexp = Opal::Parser.default_parser.parse(buffer)
-        output.puts sexp.inspect
-      end
+      source = evals_or_file_source or return # rubocop:disable Style/AndOr
+
+      buffer = ::Opal::Parser::SourceBuffer.new(filename)
+      buffer.source = source
+      sexp = Opal::Parser.default_parser.parse(buffer)
+      output.puts sexp.inspect
     end
 
     def debug_source_map
-      evals_or_file do |contents, filename|
-        compiler = Opal::Compiler.new(contents, file: filename, **compiler_options)
+      source = evals_or_file_source or return # rubocop:disable Style/AndOr
 
-        compiler.compile
+      compiler = Opal::Compiler.new(source, file: filename, **compiler_options)
 
-        result = compiler.result
-        source_map = compiler.source_map.to_json
+      compiler.compile
 
-        b64 = [result, source_map, contents].map { |i| Base64.strict_encode64(i) }.join(',')
+      result = compiler.result
+      source_map = compiler.source_map.to_json
 
-        output.puts "https://sokra.github.io/source-map-visualization/#base64,#{b64}"
-      end
+      b64 = [result, source_map, contents].map { |i| Base64.strict_encode64(i) }.join(',')
+
+      output.puts "https://sokra.github.io/source-map-visualization/#base64,#{b64}"
     end
 
     def compiler_option_names
@@ -177,27 +183,30 @@ module Opal
 
     # Internal: Yields a string of source code and the proper filename for either
     #           evals, stdin or a filepath.
-    def evals_or_file
-      # --library
-      return if lib_only
+    def evals_or_file_source
+      return if lib_only # --library
 
       if evals.any?
-        yield evals.join("\n"), '-e'
-      elsif file && (filename != '-' || evals.empty?)
-        return @content if @content
+        evals.join("\n")
+      elsif file
+        return @cached_content if @cached_content
 
-        if file.tty?
-          save = true
-        else
+        unless file.tty?
           begin
             file.rewind
-          rescue Errno::ESPIPE
-            save = true
+            can_read_again = true
+          rescue Errno::ESPIPE # rubocop:disable Lint/HandleExceptions
+            # noop
           end
         end
 
-        content = yield(file.read, filename)
-        @content = content if save
+        if @cached_content.nil? || can_read_again
+          # On MacOS file.read is not enough to pick up changes, probably due to some
+          # cache or buffer, unclear if coming from ruby or the OS.
+          content = File.file?(file) ? File.read(file) : file.read
+        end
+
+        @cached_content ||= content unless can_read_again
         content
       end
     end

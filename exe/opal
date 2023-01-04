@@ -2,7 +2,7 @@
 
 # Error codes are taken from /usr/include/sysexits.h
 
-OriginalARGV = ARGV.dup
+argv_orig = ARGV.dup
 
 require 'opal/cli_options'
 options = Opal::CLIOptions.new
@@ -16,9 +16,10 @@ end
 require 'opal/cli'
 options_hash = options.options
 options_hash.merge!(
-  file:     ARGF.file,
-  filename: ARGF.filename,
-  argv:     ARGV.dup
+  file:      ARGF.file,
+  filename:  ARGF.filename,
+  argv:      ARGV.dup,
+  argv_orig: argv_orig,
 ) unless options_hash[:lib_only]
 cli = Opal::CLI.new options_hash
 
@@ -28,4 +29,8 @@ begin
 rescue Opal::CliRunners::RunnerError => e
   $stderr.puts e.message
   exit 72
+rescue SignalException => e
+  raise unless e.message == 'SIGUSR2'
+
+  exec($0, *argv_orig)
 end

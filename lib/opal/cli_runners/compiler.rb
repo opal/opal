@@ -91,7 +91,7 @@ class Opal::CliRunners::Compiler
   end
 
   def reexec
-    system($0, *OriginalARGV) && exit
+    Process.kill('USR2', Process.pid)
   end
 
   def on_code_change(modified)
