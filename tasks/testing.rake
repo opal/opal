@@ -80,7 +80,7 @@ module Testing
       specs
     end
 
-    def filters(suite)
+    def filters(suite, platform)
       opalspec_filters = Dir['spec/filters/**/*_opal.rb']
 
       if ENV['INVERT_RUNNING_MODE']
@@ -88,7 +88,7 @@ module Testing
         # Unsupported features are not supported anyway
         rubyspec_filters = Dir['spec/filters/bugs/*.rb'] - opalspec_filters
       else
-        rubyspec_filters = Dir['spec/filters/**/*.rb'] - opalspec_filters
+        rubyspec_filters = Dir["spec/filters/{unsupported,bugs,platform/#{platform}}/*.rb"] - opalspec_filters
       end
 
       suite == 'opal' ? opalspec_filters : rubyspec_filters
@@ -310,8 +310,7 @@ platforms.each do |platform|
         'FORMATTER' => platform, # Use the current platform as the default formatter
         'BM_FILEPATH' => bm_filepath,
       }.merge(ENV.to_hash)
-
-      Testing::MSpec.write_file filename, Testing::MSpec.filters(suite), Testing::MSpec.specs(specs_env), specs_env
+      Testing::MSpec.write_file filename, Testing::MSpec.filters(suite, platform), Testing::MSpec.specs(specs_env), specs_env
 
       stubs = Testing::MSpec.stubs.map{|s| "-s#{s}"}.join(' ')
 
