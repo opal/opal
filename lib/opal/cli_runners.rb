@@ -93,6 +93,7 @@ module Opal
 
     if OS.macos?
       register_runner :applescript, :Applescript, 'opal/cli_runners/applescript'
+      register_runner :safari,      :Safari,      'opal/cli_runners/safari'
       alias_runner :osascript, :applescript
     end
   end

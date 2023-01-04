@@ -66,6 +66,10 @@ jobs:
             ruby: '3.0'
             command: bundle exec rake mspec_firefox
             os: windows-latest
+          - name: macos-mspec-safari
+            command: bundle exec rake mspec_safari
+            ruby: '3.0'
+            os: 'macos-latest'
           - name: windows-minitest
             command: bundle exec rake minitest
             ruby: '3.0'
@@ -74,6 +78,10 @@ jobs:
             command: bundle exec rake rspec
             ruby: '3.0'
             os: windows-latest
+          - name: macos
+            command: bundle exec rake rspec
+            ruby: '3.0'
+            os: 'macos-latest'
           - name: lint
             command: bin/rake lint
             ruby: '3.0'
