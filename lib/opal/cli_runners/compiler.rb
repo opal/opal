@@ -134,7 +134,7 @@ class Opal::CliRunners::Compiler
   def watch_files
     @directories = files_to_directories
 
-    Listen.to(*@directories) do |modified, added, removed|
+    Listen.to(*@directories, ignore!: []) do |modified, added, removed|
       our_modified = @files & (modified + added + removed)
       on_code_change(our_modified) unless our_modified.empty?
     end
