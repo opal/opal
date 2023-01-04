@@ -158,9 +158,25 @@ module Opal
         case value
         when ''
           push('/(?:)/')
+        when /\(\?<=|\(\?<!/
+          # Safari/WebKit will not execute javascript code if it contains a lookbehind literal RegExp
+          # and they fail with "Syntax Error". This tricks their parser by disguising the literal RegExp
+          # as string for the dynamic $regexp helper. Safari/Webkit will still fail to execute the RegExp,
+          # but at least they will parse and run everything else.
+          static_as_dynamic(value)
         else
           push "#{Regexp.new(value).inspect}#{flags.join}"
         end
+      end
+
+      def static_as_dynamic(value)
+        helper :regexp
+
+        push '$regexp(["'
+        push value.gsub('\\', '\\\\\\\\')
+        push '"]'
+        push ", '#{flags.join}'" if flags.any?
+        push ")"
       end
 
       def extract_flags_and_value
