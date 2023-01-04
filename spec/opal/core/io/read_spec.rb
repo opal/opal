@@ -32,7 +32,10 @@ describe "IO reading methods" do
     examples.each do |example|
       it "correctly splits messages for input #{example.inspect}" do
         io = prepare_io_for.(example)
-        expected_output = example.gsub("|", "").split(/(?<=\n)/)
+        expected_output = example.gsub("|", "").split(/\n/).map { |e| e + "\n" }
+        len = expected_output.length
+        last = expected_output.last
+        expected_output[len-1] = last.chop if !example.end_with?("\n") && last
         io.readlines.should == expected_output
       end
     end
@@ -42,7 +45,10 @@ describe "IO reading methods" do
     examples.each do |example|
       it "correctly splits messages for input #{example.inspect}" do
         io = prepare_io_for.(example)
-        expected_output = example.gsub("|", "").split(/(?<=\n)/)
+        expected_output = example.gsub("|", "").split(/\n/).map { |e| e + "\n" }
+        len = expected_output.length
+        last = expected_output.last
+        expected_output[len-1] = last.chop if !example.end_with?("\n") && last
         loop do
           expected_output.shift.should == io.readline
         rescue EOFError
@@ -57,7 +63,10 @@ describe "IO reading methods" do
     examples.each do |example|
       it "correctly splits messages for input #{example.inspect}" do
         io = prepare_io_for.(example)
-        expected_output = example.gsub("|", "").split(/(?<=\n)/)
+        expected_output = example.gsub("|", "").split(/\n/).map { |e| e + "\n" }
+        len = expected_output.length
+        last = expected_output.last
+        expected_output[len-1] = last.chop if !example.end_with?("\n") && last
         loop do
           line = io.gets
           expected_output.shift.should == line
