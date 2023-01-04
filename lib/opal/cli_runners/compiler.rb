@@ -52,22 +52,20 @@ class Opal::CliRunners::Compiler
   end
 
   def fail_unrewindable!
-    warn <<~ERROR
+    abort <<~ERROR
       You have specified --watch, but for watch to work, you must specify an
       --output file.
     ERROR
-    exit 1
   end
 
   def fail_no_listen!
-    warn <<~ERROR
+    abort <<~ERROR
       --watch mode requires the `listen` gem present. Please try to run:
 
           gem install listen
 
       Or if you are using bundler, add listen to your Gemfile.
     ERROR
-    exit 1
   end
 
   def watch_compile
@@ -88,6 +86,9 @@ class Opal::CliRunners::Compiler
     $stderr.puts "* Opal v#{Opal::VERSION} successfully compiled your program in --watch mode"
 
     sleep
+  rescue Interrupt
+    $stderr.puts '* Stopping watcher...'
+    @code_listener.stop
   end
 
   def reexec
@@ -133,7 +134,7 @@ class Opal::CliRunners::Compiler
   def watch_files
     @directories = files_to_directories
 
-    Listen.to(*@directories) do |modified, added, removed|
+    Listen.to(*@directories, ignore!: []) do |modified, added, removed|
       our_modified = @files & (modified + added + removed)
       on_code_change(our_modified) unless our_modified.empty?
     end
