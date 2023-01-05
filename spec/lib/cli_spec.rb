@@ -9,7 +9,7 @@ RSpec.describe Opal::CLI do
   subject(:cli) { described_class.new(options) }
 
   context 'with a file' do
-    let(:options) { {:file => File.open(file)} }
+    let(:options) { {argv: [file]} }
 
     it 'runs the file' do
       expect_output_of{ subject.run }.to eq("hi from opal!\n")
@@ -26,8 +26,10 @@ RSpec.describe Opal::CLI do
 
   describe ':evals option' do
     context 'without evals and paths' do
-      it 'raises ArgumentError' do
-        expect { subject.run }.to raise_error(ArgumentError)
+      it 'uses stdin' do
+        expect(cli.file).to eq($stdin)
+        expect(cli.filename).to eq('-')
+        expect(cli.argv).to eq([])
       end
 
       context 'with lib_only: true and opal require' do
@@ -40,7 +42,7 @@ RSpec.describe Opal::CLI do
     end
 
     context 'with one eval' do
-      let(:options) { {:evals => ['puts "hello"']} }
+      let(:options) { {evals: ['puts "hello"']} }
 
       it 'executes the code' do
         expect_output_of{ subject.run }.to eq("hello\n")
@@ -56,10 +58,20 @@ RSpec.describe Opal::CLI do
     end
 
     context 'with many evals' do
-      let(:options) { {:evals => ['puts "hello"', 'puts "ciao"']} }
+      let(:options) { {evals: ['puts "hello"', 'puts "ciao"']} }
 
       it 'executes the code' do
         expect_output_of{ subject.run }.to eq("hello\nciao\n")
+      end
+    end
+
+    context 'with a file path arg' do
+      let(:options) { {:evals => ['puts "hello"'], argv: [file]} }
+
+      it 'considers it as part of ARGV' do
+        expect(cli.argv).to eq([file])
+        expect(cli.file.tap(&:rewind).read).to eq('puts "hello"')
+        expect(cli.filename).to eq('-e')
       end
     end
   end
@@ -229,7 +241,7 @@ RSpec.describe Opal::CLI do
 
   describe ':enable_source_location' do
     let(:file) { File.expand_path('../fixtures/source_location_test.rb', __FILE__) }
-    let(:options) { { enable_source_location: true, runner: :compiler, file: File.open(file) } }
+    let(:options) { { enable_source_location: true, runner: :compiler, argv: [file] } }
 
     it 'sets $$source_location prop for compiled methods' do
       expect_output_of { subject.run }.to include("source_location_test.rb', 6]")
