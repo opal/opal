@@ -3,16 +3,23 @@
 require 'opal/requires'
 require 'opal/builder'
 require 'opal/cli_runners'
+require 'stringio'
 
 module Opal
   class CLI
     attr_reader :options, :file, :compiler_options, :evals, :load_paths, :argv,
       :output, :requires, :rbrequires, :gems, :stubs, :verbose, :runner_options,
       :preload, :debug, :no_exit, :lib_only, :missing_require_severity,
-      :no_cache, :argv_orig
+      :filename, :stdin, :no_cache
 
     class << self
       attr_accessor :stdout
+    end
+
+    class Evals < StringIO
+      def to_path
+        '-e'
+      end
     end
 
     def initialize(options = nil)
@@ -25,11 +32,9 @@ module Opal
       @options     = options
       @sexp        = options.delete(:sexp)
       @repl        = options.delete(:repl)
-      @file        = options.delete(:file)
       @no_exit     = options.delete(:no_exit)
       @lib_only    = options.delete(:lib_only)
       @argv        = options.delete(:argv)       { [] }
-      @argv_orig   = options.delete(:argv_orig)  { argv }
       @evals       = options.delete(:evals)      { [] }
       @load_paths  = options.delete(:load_paths) { [] }
       @gems        = options.delete(:gems)       { [] }
@@ -38,10 +43,10 @@ module Opal
       @output      = options.delete(:output)     { self.class.stdout || $stdout }
       @verbose     = options.delete(:verbose)    { false }
       @debug       = options.delete(:debug)      { false }
-      @filename    = options.delete(:filename)   { @file&.path }
       @requires    = options.delete(:requires)   { [] }
       @rbrequires  = options.delete(:rbrequires) { [] }
       @no_cache    = options.delete(:no_cache)   { false }
+      @stdin       = options.delete(:stdin)      { $stdin }
 
       @debug_source_map = options.delete(:debug_source_map) { false }
 
@@ -56,14 +61,21 @@ module Opal
         [key, value]
       end.compact.to_h
 
-      raise ArgumentError, 'no libraries to compile' if @lib_only && @requires.empty?
-      raise ArgumentError, 'no runnable code provided (evals or file)' if @evals.empty? && @file.nil? && !@lib_only
-      raise ArgumentError, "can't accept evals or file in `library only` mode" if (@evals.any? || @file) && @lib_only
-      raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
-    end
+      if @lib_only
+        raise ArgumentError, 'no libraries to compile' if @requires.empty?
+        raise ArgumentError, "can't accept evals, file, or extra arguments in `library only` mode" if @argv.any? || @evals.any?
+      elsif @evals.any?
+        @filename = '-e'
+        @file = Evals.new(@evals.join("\n"))
+      elsif @argv.first && @argv.first != '-'
+        @filename = @argv.shift
+        @file = File.open(@filename)
+      else
+        @filename = @argv.shift || '-'
+        @file = @stdin
+      end
 
-    def filename
-      @evals.any? ? '-e' : @filename
+      raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end
 
     def run
@@ -98,7 +110,7 @@ module Opal
       require 'opal/repl'
 
       repl = REPL.new
-      repl.run(argv_orig)
+      repl.run(argv)
     end
 
     attr_reader :exit_status
@@ -185,30 +197,25 @@ module Opal
     #           evals, stdin or a filepath.
     def evals_or_file_source
       return if lib_only # --library
+      return @cached_content if @cached_content
 
-      if evals.any?
-        evals.join("\n")
-      elsif file
-        return @cached_content if @cached_content
-
-        unless file.tty?
-          begin
-            file.rewind
-            can_read_again = true
-          rescue Errno::ESPIPE # rubocop:disable Lint/HandleExceptions
-            # noop
-          end
+      unless file.tty?
+        begin
+          file.rewind
+          can_read_again = true
+        rescue Errno::ESPIPE # rubocop:disable Lint/HandleExceptions
+          # noop
         end
-
-        if @cached_content.nil? || can_read_again
-          # On MacOS file.read is not enough to pick up changes, probably due to some
-          # cache or buffer, unclear if coming from ruby or the OS.
-          content = File.file?(file) ? File.read(file) : file.read
-        end
-
-        @cached_content ||= content unless can_read_again
-        content
       end
+
+      if @cached_content.nil? || can_read_again
+        # On MacOS file.read is not enough to pick up changes, probably due to some
+        # cache or buffer, unclear if coming from ruby or the OS.
+        content = File.file?(file) ? File.read(file) : file.read
+      end
+
+      @cached_content ||= content unless can_read_again
+      content
     end
   end
 end
