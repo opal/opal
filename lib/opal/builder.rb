@@ -197,6 +197,19 @@ module Opal
       processed.map(&:abs_path).compact.select { |fn| File.exist?(fn) }
     end
 
+    def expand_ext(path)
+      abs_path = path_reader.expand(path)
+
+      if abs_path
+        File.join(
+          File.dirname(path),
+          File.basename(abs_path)
+        )
+      else
+        path
+      end
+    end
+
     private
 
     def process_requires(rel_path, requires, autoloads, options)
@@ -258,19 +271,6 @@ module Opal
         end
 
         nil
-      end
-    end
-
-    def expand_ext(path)
-      abs_path = path_reader.expand(path)
-
-      if abs_path
-        File.join(
-          File.dirname(path),
-          File.basename(abs_path)
-        )
-      else
-        path
       end
     end
 
