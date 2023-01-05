@@ -38,7 +38,7 @@ task :dist do
       $stdout.flush
 
       # Set requirable to true, unless building opal. This allows opal to be auto-loaded.
-      requirable = (%w[opal opal/mini opal/base].include? lib)
+      requirable = !(%w[opal opal/mini opal/base].include? lib)
       builder = Opal::Builder.build(lib, requirable: requirable)
 
       src = builder.to_s if (formats & %w[js min gz]).any?
