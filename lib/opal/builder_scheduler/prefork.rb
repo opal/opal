@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'etc'
+require 'set'
 
 module Opal
   class BuilderScheduler
@@ -13,11 +14,63 @@ module Opal
           io = @in_fork
           io.send(:new_requires, rel_path, requires, autoloads, options)
         else
-          prefork_reactor(rel_path, requires, autoloads, options)
+          processed = prefork_reactor(rel_path, requires, autoloads, options)
+
+          processed = OrderCorrector.correct_order(processed, requires, builder)
+
+          builder.processed.append(*processed)
         end
       end
 
       private
+
+      # Prefork is not deterministic. This module corrects an order of processed
+      # files so that it would be exactly the same as if building sequentially.
+      # While for Ruby files it usually isn't a problem, because the real order
+      # stems from how `Opal.modules` array is accessed, the JavaScript files
+      # are executed verbatim and their order may be important. Also, having
+      # deterministic output is always a good thing.
+      module OrderCorrector
+        module_function
+
+        def correct_order(processed, requires, builder)
+          # Let's build a hash that maps a filename to an array of files it requires
+          requires_hash = processed.to_h do |i|
+            [i.filename, expand_requires(i.requires, builder)]
+          end
+          # Let's build an array with a correct order of requires
+          order_array = build_require_order_array(expand_requires(requires, builder), requires_hash)
+          # If a key is duplicated, remove the last duplicate
+          order_array = order_array.uniq
+          # Create a hash from this array: [a,b,c] => [a => 0, b => 1, c => 2]
+          order_hash = order_array.each_with_index.to_h
+          # Let's return a processed array that has elements in the order provided
+          processed.sort_by do |asset|
+            # If a filename isn't present somehow in our hash, let's put it at the end
+            order_hash[asset.filename] || order_array.length
+          end
+        end
+
+        # Expand a requires array, so that the requires filenames will be
+        # matching BuilderProcessor#. Builder needs to be passed so that
+        # we can access an `expand_ext` function from its context.
+        def expand_requires(requires, builder)
+          requires.map { |i| builder.expand_ext(i) }
+        end
+
+        def build_require_order_array(requires, requires_hash, built_for = Set.new)
+          array = []
+          requires.each do |name|
+            next if built_for.include?(name)
+            built_for << name
+
+            asset_requires = requires_hash[name]
+            array += build_require_order_array(asset_requires, requires_hash, built_for) if asset_requires
+            array << name
+          end
+          array
+        end
+      end
 
       class ForkSet < Array
         def initialize(count, &block)
@@ -192,6 +245,8 @@ module Opal
       def prefork_reactor(rel_path, requires, autoloads, options)
         prefork
 
+        processed = []
+
         first = rel_path
         queue = requires.map { |i| [rel_path, i, autoloads, options] }
 
@@ -206,7 +261,7 @@ module Opal
           idles.each do |io|
             break if queue.empty?
 
-            rel_path, req, autoloads, options = *queue.pop
+            rel_path, req, autoloads, options = *queue.shift
 
             next if builder.already_processed.include?(req)
             awaiting += 1
@@ -225,11 +280,8 @@ module Opal
               asset, = *args
               if !asset
                 # Do nothing, we received a nil which is expected.
-              elsif asset.filename == 'corelib/runtime.js'
-                # Opal runtime should go first... the rest can go their way.
-                builder.processed.unshift(asset)
               else
-                builder.processed << asset
+                processed << asset
               end
               built += 1
               awaiting -= 1
@@ -252,6 +304,8 @@ module Opal
 
           break if awaiting == 0 && queue.empty?
         end
+
+        processed
       ensure
         $stderr.print "\r\e[K\r" if $stderr.tty?
         @forks.close
