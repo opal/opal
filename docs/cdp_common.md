@@ -1,4 +1,4 @@
-### Common CDP of Chrome, Firefox, Node and Deno
+# Common CDP of Chrome, Firefox, Node and Deno
 
 cdp_common.json documents a subset of the common CDP as reported by Chrome, version 107 and Firefox, version 106.
 All entries that where marked as "experimental" or "deprecated" have been removed.
