@@ -154,4 +154,36 @@ RSpec.describe Opal::Builder do
       expect(builder.build('opal/platform', requirable: true).to_s).to include(%{Opal.modules["opal/platform"]})
     end
   end
+
+  describe 'output order' do
+    it 'is preserved with a prefork scheduler' do
+      my_builder = builder.dup
+      my_builder.append_paths(File.expand_path('..', __FILE__))
+      my_builder.cache = Opal::Cache::NullCache.new
+      10.times do |i| # Increase entropy
+        expect(
+          my_builder.dup.build('fixtures/build_order').to_s.scan(/(FILE_[0-9]+)/).map(&:first)
+        ).to eq(%w[
+          FILE_1 FILE_2 FILE_3 FILE_4
+          FILE_51 FILE_5
+          FILE_61 FILE_62 FILE_63 FILE_64 FILE_6
+          FILE_7
+        ])
+      end
+    end
+
+    it 'is preserved with a sequential scheduler' do
+      temporarily_with_sequential_scheduler do
+        builder.append_paths(File.expand_path('..', __FILE__))
+        expect(
+          builder.build('fixtures/build_order').to_s.scan(/(FILE_[0-9]+)/).map(&:first)
+        ).to eq(%w[
+          FILE_1 FILE_2 FILE_3 FILE_4
+          FILE_51 FILE_5
+          FILE_61 FILE_62 FILE_63 FILE_64 FILE_6
+          FILE_7
+        ])
+      end
+    end
+  end
 end
