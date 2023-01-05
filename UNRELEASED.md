@@ -19,6 +19,9 @@
 - Make Date/Time.parse on Firefox more compatible with Chrome and Ruby (#2506)
 - Safari/WebKit can now parse code compiled with lookbehind regexps, failing at runtime instead (#2511)
 - Fix `--watch` ignoring some directories (e.g. `tmp`) (#2509)
+- Fix rake dist not generating libraries correctly for the CDN (#2515)
+- Prefork: output processed files in a correct, deterministic order (#2516)
+- Fix the handling of ARGV for the opal executable (#2518)
 
 ### Internal
 
