@@ -148,7 +148,10 @@ module Opal
 
       def compiled
         @compiled ||= begin
-          @source = ::ERB.new(@source.to_s).result
+          erb = ::ERB.new(@source.to_s)
+          erb.filename = @abs_path
+
+          @source = erb.result
 
           compiler = compiler_for(@source, file: @filename)
           compiler.compile
@@ -163,7 +166,10 @@ module Opal
       handles :erb
 
       def source
-        result = ::ERB.new(@source.to_s).result
+        erb = ::ERB.new(@source.to_s)
+        erb.filename = @abs_path
+
+        result = erb.result
         module_name = ::Opal::Compiler.module_name(@filename)
         "Opal.modules[#{module_name.inspect}] = function() {#{result}};"
       end
