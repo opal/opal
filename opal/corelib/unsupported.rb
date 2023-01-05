@@ -22,6 +22,14 @@
     warnings[string] = true;
     #{warn(`string`)};
   }
+
+  // Sets an $$unimpl flag, so that respond_to? will return false
+  function unimplemented(obj, funcs) {
+    for (var i = 0; i < funcs.length; i++) {
+      var func = funcs[i];
+      obj[func].$$unimpl = true;
+    }
+  }
 }
 
 class ::String
@@ -68,4 +76,6 @@ module ::Kernel
   def system(*)
     ::Kernel.raise ::NotImplementedError, "can't run system commands in JavaScript environment"
   end
+
+  `unimplemented(self.$$prototype, ["$eval", "$fork", "$system"])`
 end

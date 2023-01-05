@@ -685,7 +685,7 @@ module ::Kernel
     %x{
       var body = self[$jsid(name)];
 
-      if (typeof(body) === "function" && !body.$$stub) {
+      if (typeof(body) === "function" && !body.$$stub && !body.$$unimpl) {
         return true;
       }
 
