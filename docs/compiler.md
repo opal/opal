@@ -28,7 +28,6 @@ generating source maps afterwards.
 
 
 [parser]: https://github.com/opal/opal/tree/master/lib/opal/parser.rb
-[sexps]: https://github.com/opal/opal/tree/master/lib/opal/parser/sexp.rb
 [compiler]: https://github.com/opal/opal/tree/master/lib/opal/compiler.rb
 [fragments]: https://github.com/opal/opal/tree/master/lib/opal/fragment.rb
 [base-node]: https://github.com/opal/opal/tree/master/lib/opal/nodes/base.rb
