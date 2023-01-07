@@ -27,6 +27,7 @@ code as well as a reference back to the original sexp which is useful for
 generating source maps afterwards.
 
 
+[parser]: https://github.com/opal/opal/tree/master/lib/opal/parser.rb
 [sexps]: https://github.com/opal/opal/tree/master/lib/opal/parser/sexp.rb
 [compiler]: https://github.com/opal/opal/tree/master/lib/opal/compiler.rb
 [fragments]: https://github.com/opal/opal/tree/master/lib/opal/fragment.rb
