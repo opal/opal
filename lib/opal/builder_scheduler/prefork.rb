@@ -252,8 +252,9 @@ module Opal
 
         awaiting = 0
         built = 0
+        should_log = $stderr.tty? && !ENV['OPAL_DISABLE_PREFORK_LOGS']
 
-        $stderr.print "\r\e[K" if $stderr.tty?
+        $stderr.print "\r\e[K" if should_log
 
         loop do
           events, idles = @forks.get_events(queue.length)
@@ -296,7 +297,7 @@ module Opal
             end
           end
 
-          if $stderr.tty?
+          if should_log
             percent = (100.0 * built / (awaiting + built)).round(1)
             str = format("[opal/builder] Building %<first>s... (%<percent>4.3g%%)\r", first: first, percent: percent)
             $stderr.print str
@@ -307,7 +308,7 @@ module Opal
 
         processed
       ensure
-        $stderr.print "\r\e[K\r" if $stderr.tty?
+        $stderr.print "\r\e[K\r" if should_log
         @forks.close
         @forks.wait
       end
