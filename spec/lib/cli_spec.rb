@@ -248,6 +248,16 @@ RSpec.describe Opal::CLI do
     end
   end
 
+  describe ':debug_source_map' do
+    let(:options) { { debug_source_map: true, evals: ['puts 123'] } }
+
+    it 'generates a link to https://sokra.github.io/source-map-visualization' do
+      expect_output_of { subject.run }.to start_with(
+        "https://sokra.github.io/source-map-visualization/#base64,"
+      )
+    end
+  end
+
   context 'using pipes' do
     it 'runs the provided source' do
       # `echo` on windows will output double-quotes along with the contents, that's why we print with ruby

@@ -7,6 +7,8 @@ end
 
 require 'opal'
 
+ENV['OPAL_DISABLE_PREFORK_LOGS'] = '1'
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.before { Opal.reset_paths! unless RUBY_PLATFORM == 'opal' }
