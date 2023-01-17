@@ -16,7 +16,7 @@ RSpec.describe "rake dist" do
 
     stdout, _, status = Open3.capture3('node', '-e', code)
 
-    expect(status).to eq(0)
+    expect(status.exitstatus).to eq(0)
 
     stdout.chomp
   end
