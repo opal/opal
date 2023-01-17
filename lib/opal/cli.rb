@@ -169,10 +169,11 @@ module Opal
 
       compiler.compile
 
-      result = compiler.result
-      source_map = compiler.source_map.to_json
-
-      b64 = [result, source_map, contents].map { |i| Base64.strict_encode64(i) }.join(',')
+      b64 = [
+        compiler.result,
+        compiler.source_map.to_json,
+        evals_or_file_source,
+      ].map { |i| Base64.strict_encode64(i) }.join(',')
 
       output.puts "https://sokra.github.io/source-map-visualization/#base64,#{b64}"
     end
