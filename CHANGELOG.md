@@ -16,7 +16,7 @@ Changes are grouped as follows:
 
 
 
-## [1.7.1](https://github.com/opal/opal/compare/v1.7.0...v1.7.1) - 2023-01-06
+## [1.7.2](https://github.com/opal/opal/compare/v1.7.1...v1.7.2) - 2023-01-20
 
 
 <!--
@@ -28,6 +28,16 @@ Changes are grouped as follows:
 ### Performance
 ### Fixed
 -->
+
+### Fixed
+
+- Fix the `--debug-source-map` CLI option ([#2520](https://github.com/opal/opal/pull/2520))
+- Fix links in `docs/compiler.md` ([#2519](https://github.com/opal/opal/pull/2519))
+
+
+
+
+## [1.7.1](https://github.com/opal/opal/compare/v1.7.0...v1.7.1) - 2023-01-05
 
 
 ### Added
