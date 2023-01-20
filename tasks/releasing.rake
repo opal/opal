@@ -80,3 +80,49 @@ task :changelog do
 
   File.write changelog_path, changelog_entries.join("\n\n\n\n\n")
 end
+
+namespace :release do
+  task :prepare do
+    version = ENV['VERSION'] or abort "please provide a version as the first argument, e.g.: #{$0} 1.2.3"
+    version = version[1..] if version.start_with? 'v'
+    gem_version = Gem::Version.new(version)
+
+    version_path = "#{__dir__}/../lib/opal/version.rb"
+    puts "== update #{version_path}"
+    require_relative version_path
+    File.write version_path, File.read(version_path).sub(Opal::VERSION, version)
+
+    constants_path = "#{__dir__}/../opal/corelib/constants.rb"
+    puts "== update #{constants_path}"
+    require_relative constants_path
+    File.write constants_path, File.read(constants_path).sub(Opal::VERSION, version).sub(
+      %r{(RUBY_RELEASE_DATE *= *')\d{4}-\d{2}-\d{2}(')},
+      '\1' + Time.now.strftime('%F') + '\2'
+    )
+
+    if gem_version.prerelease?
+      puts "== (skipping changlog update)"
+    else
+      puts "== update changelog"
+
+      system "bin/rake changelog VERSION=v#{version}" or abort('changelog update failed')
+      File.write "#{__dir__}/../UNRELEASED.md", <<~MARKDOWN
+      <!--
+      ### Internal
+      ### Changed
+      ### Added
+      ### Removed
+      ### Deprecated
+      ### Performance
+      ### Fixed
+      -->
+
+      MARKDOWN
+    end
+
+    puts "== committing"
+    sh 'git add UNRELEASED.md CHANGELOG.md opal/corelib/constants.rb lib/opal/version.rb'
+    sh "git commit -m 'Release v#{version}'"
+    sh 'git show | cat'
+  end
+end
