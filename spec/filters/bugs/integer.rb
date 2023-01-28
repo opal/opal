@@ -1,6 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Integer" do
-  fails "A singleton class raises a TypeError for Integer's" # Expected TypeError but got: Exception (Object.defineProperty called on non-object)
   fails "Bignum is deprecated" # NameError: uninitialized constant Bignum
   fails "Bignum is unified into Integer" # NameError: uninitialized constant Bignum
   fails "Fixnum is deprecated" # Expected warning to match: /constant ::Fixnum is deprecated/ but got: ""
