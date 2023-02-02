@@ -824,6 +824,9 @@
   // @param object [Object] the ruby object
   // @return [Class] the singleton class for object
   Opal.get_singleton_class = function(object) {
+    if (object.$$is_number) {
+      $raise(Opal.TypeError, "can't define singleton");
+    }
     if (object.$$meta) {
       return object.$$meta;
     }

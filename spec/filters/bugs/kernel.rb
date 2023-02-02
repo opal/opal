@@ -134,7 +134,6 @@ opal_filter "Kernel" do
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (false was returned)
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil" # Expected nil to be false
   fails "Kernel#respond_to_missing? causes #respond_to? to return true if called and not returning false" # Expected "glark" to be true
-  fails "Kernel#singleton_class raises TypeError for Integer" # Expected TypeError but got: Exception (Object.defineProperty called on non-object)
   fails "Kernel#singleton_class raises TypeError for Symbol" # Expected TypeError but no exception was raised (#<Class:#<String:0x53aaa>> was returned)
   fails "Kernel#singleton_method find a method defined on the singleton class" # NoMethodError: undefined method `singleton_method' for #<Object:0x4540a>
   fails "Kernel#singleton_method only looks at singleton methods and not at methods in the class" # Expected NoMethodError == NameError to be truthy but was false

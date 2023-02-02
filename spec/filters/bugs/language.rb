@@ -16,7 +16,6 @@ opal_filter "language" do
   fails "A block yielded a single Array when non-symbol keys are in a keyword arguments Hash does not separate non-symbol keys and symbol keys and does not autosplat" # Expected [nil, {"a"=>10, "b"=>2}] == [[{"a"=>10, "b"=>2}], {}] to be truthy but was false
   fails "A block yielded a single Object receives the object if it does not respond to #respond_to?" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x551e>
   fails "A class definition extending an object (sclass) can use return to cause the enclosing method to return" # Expected "outer" == "inner" to be truthy but was false
-  fails "A class definition extending an object (sclass) raises a TypeError when trying to extend numbers" # Expected TypeError but got: Exception (Object.defineProperty called on non-object)
   fails "A class definition raises TypeError if any constant qualifying the class is not a Module" # Expected TypeError but no exception was raised (nil was returned)
   fails "A class definition raises TypeError if the constant qualifying the class is nil" # Expected TypeError but no exception was raised (nil was returned)
   fails "A class definition raises a TypeError if inheriting from a metaclass" # Expected TypeError but no exception was raised (nil was returned)
@@ -50,7 +49,6 @@ opal_filter "language" do
   fails "A nested method definition creates an instance method when evaluated in an instance method" # NoMethodError: undefined method `an_instance_method' for #<DefSpecNested:0x1064c>
   fails "A number literal can be a decimal literal with trailing 'r' to represent a Rational" # Expected (5404319552844595/18014398509481984) == (3/10) to be truthy but was false
   fails "A number literal can be a float literal with trailing 'r' to represent a Rational" # Expected (5030569068109113/288230376151711740) == (136353847812057/7812500000000000) to be truthy but was false
-  fails "A singleton class doesn't have singleton class" # Expected TypeError but got: Exception (Object.defineProperty called on non-object)
   fails "A singleton class raises a TypeError for symbols" # Expected TypeError but no exception was raised (#<Class:#<String:0x9093e>> was returned)
   fails "A singleton method definition can be declared for a global variable" # TypeError: can't define singleton
   fails "A singleton method definition raises FrozenError with the correct class name" # Expected "can't modify frozen Class: #<Class:#<Object:0x10574>>".start_with? "can't modify frozen object" to be truthy but was false
@@ -325,7 +323,6 @@ opal_filter "language" do
   fails "a method definition that sets more than one default parameter all to the same value treats the argument after the multi-parameter normally" # Expected ArgumentError (wrong number of arguments (given 3, expected 0..2)) but got: ArgumentError ([MSpecEnv#bar] wrong number of arguments (given 3, expected -1))
   fails "kwarg with omitted value in a method call accepts short notation 'kwarg' in method call for definition 'def call(*args, **kwargs) = [args, kwargs]'" # NameError: uninitialized constant SpecEvaluate::a
   fails "kwarg with omitted value in a method call with methods and local variables for definition \n    def call(*args, **kwargs) = [args, kwargs]\n    def bar\n      \"baz\"\n    end\n    def foo(val)\n      call bar:, val:\n    end" # NameError: uninitialized constant SpecEvaluate::bar
-  fails "self in a metaclass body (class << obj) raises a TypeError for numbers" # Expected TypeError but got: Exception (Object.defineProperty called on non-object)
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols" # Expected TypeError but got: Exception (Cannot create property '$$meta' on string 'symbol')
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block" # NoMethodError: undefined method `block_given?' for KernelSpecs::SelfBlockGiven
   fails "self.send(:block_given?) returns true if and only if a block is supplied" # NoMethodError: undefined method `block_given?' for KernelSpecs::SelfBlockGiven
