@@ -5,6 +5,8 @@
 ### Removed
 ### Deprecated
 ### Performance
-### Fixed
 -->
 
+### Fixed
+
+- Disallow to define a singleton class for Number (#2521)
