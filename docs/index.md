@@ -8,7 +8,7 @@ The guides for earlier releases are [available here](/docs).
 
 ## Start here
 
-#### [Getting Started with Opal](etting_started.html)
+#### [Getting Started with Opal](getting_started.html)
 
 Everything you need to know to install Opal and create your first application.
 
