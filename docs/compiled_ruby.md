@@ -423,48 +423,48 @@ foo. JS[:a]
 
 ### Calling JavaScript Operators
 
-Opal has a `js` library in the stdlib that provides a `JS` module which can
+Opal has a `opal/raw` library in the stdlib that provides a `Opal::Raw` module which can
 be used to call JavaScript operators such as `new`.  Example:
 
 ```ruby
-require 'js'
+require 'opal/raw'
 
 # new foo(bar)
-JS.new(foo, bar)
+Opal::Raw.new(foo, bar)
 
 # delete foo["bar"]
-JS.delete(foo, :bar)
+Opal::Raw.delete(foo, :bar)
 
 # "bar" in foo
-JS.in(:bar, foo)
+Opal::Raw.in(:bar, foo)
 
 # foo instanceof bar
-JS.instanceof(foo, bar)
+Opal::Raw.instanceof(foo, bar)
 
 # typeof foo
-JS.typeof(foo)
+Opal::Raw.typeof(foo)
 ```
 
 ### Calling JavaScript Global Functions
 
-You can also use the `js` library to call JavaScript global functions via
-`JS.call`:
+You can also use the `opal/raw` library to call JavaScript global functions via
+`Opal::Raw.call`:
 
 ```ruby
-require 'js'
+require 'opal/raw'
 
 # parseFloat("1.1")
-JS.call(:parseFloat, "1.1")
+Opal::Raw.call(:parseFloat, "1.1")
 ```
 
 For convenience, `method_missing` is aliased to call, allowing you to call
-global JavaScript methods directly on the `JS` module:
+global JavaScript methods directly on the `Opal::Raw` module:
 
 ```ruby
-require 'js'
+require 'opal/raw'
 
 # parseFloat("1.1")
-JS.parseFloat("1.1")
+Opal::Raw.parseFloat("1.1")
 ```
 
 

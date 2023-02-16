@@ -326,7 +326,22 @@ class ::LocalJumpError
   end
 end
 
+module ::Opal
+  module Raw
+    class Error
+    end
+  end
+end
+
 module ::JS
-  class Error
+  def self.const_missing(const)
+    if const == :Error
+      warn '[Opal] JS::Error class has been renamed to Opal::Raw::Error and will change semantics in Opal 2.1. ' \
+           'To ensure forward compatibility, please update your rescue clauses.'
+
+      ::JS::Raw::Error
+    else
+      super
+    end
   end
 end

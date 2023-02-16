@@ -1747,7 +1747,7 @@
           return result;
         }
       }
-      else if (candidate === Opal.JS.Error || candidate['$==='](exception)) {
+      else if ((Opal.Opal.Raw && candidate === Opal.Opal.Raw.Error) || candidate['$==='](exception)) {
         return candidate;
       }
     }
