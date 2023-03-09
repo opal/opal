@@ -23,8 +23,10 @@ jobs:
             command: bin/rake mspec_nodejs
           - name: mspec-chrome
             ruby: '3.0'
+            browser: chrome
             command: bin/rake mspec_chrome
           - name: mspec-firefox
+            browser: firefox
             env:
               # when changing version, also change it below
               MOZILLA_FIREFOX_BINARY: '/opt/hostedtoolcache/firefox/106.0.4/x64/firefox'
@@ -57,9 +59,11 @@ jobs:
             os: windows-latest
           - name: windows-mspec-chrome
             command: bundle exec rake mspec_chrome
+            browser: chrome
             ruby: '3.0'
             os: windows-latest
           - name: windows-mspec-firefox
+            browser: firefox
             env:
               # when changing version, also change it below and above
               MOZILLA_FIREFOX_BINARY: 'C:/Program Files/Firefox_106.0.4/firefox.exe'
@@ -102,7 +106,10 @@ jobs:
     runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.combo.permissive || false }}
     steps:
-      - uses: browser-actions/setup-firefox@latest
+      - uses: browser-actions/setup-chrome@v1
+        if: ${{ matrix.combo.browser == 'chrome' }}
+      - uses: browser-actions/setup-firefox@1
+        if: ${{ matrix.combo.browser == 'firefox' }}
         with:
           # when changing version, also change it above
           firefox-version: '106.0.4'
