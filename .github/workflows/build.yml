@@ -108,7 +108,7 @@ jobs:
     steps:
       - uses: browser-actions/setup-chrome@v1
         if: ${{ matrix.combo.browser == 'chrome' }}
-      - uses: browser-actions/setup-firefox@1
+      - uses: browser-actions/setup-firefox@v1
         if: ${{ matrix.combo.browser == 'firefox' }}
         with:
           # when changing version, also change it above
