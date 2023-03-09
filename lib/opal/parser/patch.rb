@@ -13,6 +13,12 @@ if RUBY_ENGINE == 'opal'
       else
         @source_pts = nil
       end
+
+      # Since parser v3.2.1 Parser::Lexer has @strings
+      if @strings
+        @strings.source_buffer = @source_buffer
+        @strings.source_pts = @source_pts
+      end
     end
   end
 
