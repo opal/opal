@@ -20,24 +20,24 @@ jobs:
         combo:
           - name: mspec-nodejs
             ruby: '3.0'
-            command: bin/rake mspec_nodejs
+            command: bin/rake mspec_nodejs --trace
           - name: mspec-chrome
             ruby: '3.0'
             browser: chrome
-            command: bin/rake mspec_chrome
+            command: bin/rake mspec_chrome --trace
           - name: mspec-firefox
             browser: firefox
             env:
               # when changing version, also change it below
               MOZILLA_FIREFOX_BINARY: '/opt/hostedtoolcache/firefox/106.0.4/x64/firefox'
             ruby: '3.0'
-            command: xvfb-run bin/rake mspec_firefox
+            command: xvfb-run bin/rake mspec_firefox --trace
           - name: minitest
             ruby: '3.0'
-            command: bin/rake minitest
+            command: bin/rake minitest --trace
           - name: minitest-strict-mode
             ruby: '3.0'
-            command: bin/rake minitest
+            command: bin/rake minitest --trace
             strict: 'true'
           - name: head-ruby
             ruby: head
@@ -52,7 +52,7 @@ jobs:
             ruby: 2.6
           - name: smoke-test
             ruby: '3.0'
-            command: bin/rake smoke_test
+            command: bin/rake smoke_test --trace
           - name: windows-mspec-nodejs
             command: bundle exec rake mspec_nodejs
             ruby: '3.0'
@@ -87,16 +87,18 @@ jobs:
             ruby: '3.0'
             os: 'macos-latest'
           - name: lint
-            command: bin/rake lint
+            command: bin/rake lint --trace
             ruby: '3.0'
           - name: timezone
-            command: bin/rake mspec_nodejs TZ="Pacific/Fiji"
+            command: bin/rake mspec_nodejs --trace
             ruby: '3.0'
+            env:
+              TZ: "Pacific/Fiji"
           - name: performance
             ruby: '3.0'
             permissive: true
             fetchdepth: '0'
-            command: bin/rake performance:compare
+            command: bin/rake performance:compare --trace
             # os: ryzen
 
           # Currently failing:
@@ -149,4 +151,4 @@ jobs:
         if: ${{ matrix.combo.strict == 'true' }}
         run: |
           echo "USE_STRICT=true" >> $GITHUB_ENV
-      - run: ${{ matrix.combo.command || 'bin/rake rspec' }}
+      - run: ${{ matrix.combo.command || 'bin/rake rspec --trace' }}
