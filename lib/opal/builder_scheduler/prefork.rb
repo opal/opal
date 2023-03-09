@@ -131,8 +131,8 @@ module Opal
 
       class Fork
         def initialize(forkset)
-          @parent_read, @child_write = IO.pipe
-          @child_read, @parent_write = IO.pipe
+          @parent_read, @child_write = IO.pipe(binmode: true)
+          @child_read, @parent_write = IO.pipe(binmode: true)
           @forkset = forkset
           @in_fork = false
 
