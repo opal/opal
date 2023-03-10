@@ -94,10 +94,12 @@ var server = http.createServer(function(req, res) {
 
 // actual CDP code
 
-CDP.List(options, function(err, targets) {
+CDP.List(options, async function(err, targets) {
   offset = targets ? targets.length + 1 : 1;
 
-  return CDP(options, function(browser_client) {
+  const {webSocketDebuggerUrl} = await CDP.Version(options);
+
+  return await CDP({target: webSocketDebuggerUrl}, function(browser_client) {
 
     server.listen({port: offset + options.port, host: options.host });
 
