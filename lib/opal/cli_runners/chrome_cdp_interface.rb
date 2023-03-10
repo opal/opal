@@ -121,14 +121,16 @@ var server = http.createServer(function(req, res) {
 
 // actual CDP code
 
-CDP.List(options, function(err, targets) {
+CDP.List(options, async function(err, targets) {
   // default CDP port is 9222, Firefox runner is at 9333
   // Lets collect clients for
   // Chrome CDP starting at 9273 ...
   // Firefox CDP starting 9334 ...
   port_offset = targets ? targets.length + 51 : 51; // default CDP port is 9222, Node CDP port 9229, Firefox is at 9333
 
-  return CDP(options, function(browser_client) {
+  const {webSocketDebuggerUrl} = await CDP.Version(options);
+
+  return await CDP({target: webSocketDebuggerUrl}, function(browser_client) {
 
     server.listen({ port: port_offset + options.port, host: options.host });
 
