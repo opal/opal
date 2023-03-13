@@ -78,19 +78,16 @@ module Opal
         nil
       end
 
-      # This complex piece of code tries to check if we can robustly mkdir_p a directory.
+      # Check if we can robustly mkdir_p a directory.
       def self.dir_writable?(*paths)
-        dir = nil
-        paths = paths.reduce([]) do |a, b|
-          [*a, dir = a.last ? File.expand_path(b, a.last) : b]
+        return false unless File.exist?(paths.first)
+
+        until paths.empty?
+          dir = File.expand_path(paths.shift, dir)
+          ok = File.directory?(dir) && File.writable?(dir) if File.exist?(dir)
         end
 
-        File.exist?(paths.first) &&
-          paths.reverse.all? do |i|
-            !File.exist?(i) || (File.directory?(i) && File.writable?(i))
-          end
-
-        dir
+        dir if ok
       end
 
       def self.find_dir
