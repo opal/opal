@@ -27,7 +27,6 @@ opal_filter "Array" do
   fails "Array#rassoc calls elem == obj on the second element of each contained array" # Expected [1, "foobar"] == [2, #<MockObject:0x4a6b4 @name="foobar", @null=nil>] to be truthy but was false
   fails "Array#rassoc does not check the last element in each contained but specifically the second" # Expected [1, "foobar", #<MockObject:0x4a37e @name="foobar", @null=nil>] == [2, #<MockObject:0x4a37e @name="foobar", @null=nil>, 1] to be truthy but was false
   fails "Array#sample returns nil for an empty array when called without n and a Random is given" # ArgumentError: invalid argument - 0
-  fails "Array#sample samples evenly" # Expected 15.82 <= 13.277 to be truthy but was false
   fails "Array#select returns a new array of elements for which block is true" # Expected [1] == [1, 4, 6] to be truthy but was false
   fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has endless range with start outside of array's bounds" # Expected [] == nil to be truthy but was false
   fails "Array#slice can be sliced with Enumerator::ArithmeticSequence has range with bounds outside of array" # Expected RangeError but no exception was raised ([0, 2, 4] was returned)

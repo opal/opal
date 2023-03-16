@@ -1927,9 +1927,9 @@ class ::Array < `Array`
           break;
         case 2:
           i = #{rng.rand(`self.length`)};
-          j = #{rng.rand(`self.length`)};
-          if (i === j) {
-            j = i === 0 ? i + 1 : i - 1;
+          j = #{rng.rand(`self.length - 1`)};
+          if (i <= j) {
+            j++;
           }
           return [self[i], self[j]];
           break;
@@ -1981,7 +1981,7 @@ class ::Array < `Array`
           result = self.slice();
 
           for (var c = 0; c < count; c++) {
-            targetIndex = #{rng.rand(`self.length`)};
+            targetIndex = #{rng.rand(`self.length - c`)} + c;
             oldValue = result[c];
             result[c] = result[targetIndex];
             result[targetIndex] = oldValue;
