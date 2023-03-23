@@ -16,7 +16,7 @@ Changes are grouped as follows:
 
 
 
-## [1.7.2](https://github.com/opal/opal/compare/v1.7.1...v1.7.2) - 2023-01-20
+## [1.7.3](https://github.com/opal/opal/compare/v1.7.2...v1.7.3) - 2023-03-23
 
 
 <!--
@@ -26,8 +26,22 @@ Changes are grouped as follows:
 ### Removed
 ### Deprecated
 ### Performance
-### Fixed
 -->
+
+### Fixed
+
+- Disallow to define a singleton class for Number ([#2521](https://github.com/opal/opal/pull/2521))
+- Fix eval with parser gem v3.2.1 ([#2526](https://github.com/opal/opal/pull/2526))
+- Fix certain encoding issues when using Prefork ([#2527](https://github.com/opal/opal/pull/2527))
+- Fix Chrome CDP interface connection ([#2528](https://github.com/opal/opal/pull/2528))
+- Fix for Opal::Cache::FileCache.dir_writable? ([#2529](https://github.com/opal/opal/pull/2529))
+- Fix Array#sample randomness ([#2530](https://github.com/opal/opal/pull/2530))
+
+
+
+
+## [1.7.2](https://github.com/opal/opal/compare/v1.7.1...v1.7.2) - 2023-01-20
+
 
 ### Fixed
 
