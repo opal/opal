@@ -477,7 +477,7 @@ module ::Kernel
     }
   end
 
-  def Float(value)
+  def Float(value, exception: true)
     %x{
       var str;
 
@@ -504,6 +504,12 @@ module ::Kernel
 
       return #{::Opal.coerce_to!(value, ::Float, :to_f)};
     }
+  rescue
+    unless exception
+      return nil
+    end
+
+    ::Kernel.raise
   end
 
   def Hash(arg)

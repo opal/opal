@@ -14,9 +14,6 @@ opal_filter "Kernel" do
   fails "Kernel#Float for hexadecimal literals with binary exponent returns 0 for '0x1p-10000'" # ArgumentError: invalid value for Float(): "0x1p-10000"
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1P10000'" # ArgumentError: invalid value for Float(): "0x1P10000"
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'" # ArgumentError: invalid value for Float(): "0x1p10000"
-  fails "Kernel#Float when passed exception: false and invalid input swallows an error" # ArgumentError: [Object#Float] wrong number of arguments (given 2, expected 1)
-  fails "Kernel#Float when passed exception: false and nil swallows it" # ArgumentError: [Object#Float] wrong number of arguments (given 2, expected 1)
-  fails "Kernel#Float when passed exception: false and valid input returns a Float number" # ArgumentError: [Object#Float] wrong number of arguments (given 2, expected 1)
   fails "Kernel#Integer raises a TypeError when to_int returns not-an-Integer object and to_i returns nil" # Expected TypeError but no exception was raised ("1" was returned)
   fails "Kernel#Integer return a result of to_i when to_int does not return an Integer" # Expected "1" == 42 to be truthy but was false
   fails "Kernel#Integer when passed exception: false and an argument that contains a period swallows an error" # TypeError: no implicit conversion of Hash into Integer
@@ -323,9 +320,6 @@ opal_filter "Kernel" do
   fails "Kernel.Float for hexadecimal literals with binary exponent returns 0 for '0x1p-10000'" # ArgumentError: invalid value for Float(): "0x1p-10000"
   fails "Kernel.Float for hexadecimal literals with binary exponent returns Infinity for '0x1P10000'" # ArgumentError: invalid value for Float(): "0x1P10000"
   fails "Kernel.Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'" # ArgumentError: invalid value for Float(): "0x1p10000"
-  fails "Kernel.Float when passed exception: false and invalid input swallows an error" # ArgumentError: [Kernel.Float] wrong number of arguments (given 2, expected 1)
-  fails "Kernel.Float when passed exception: false and nil swallows it" # ArgumentError: [Kernel.Float] wrong number of arguments (given 2, expected 1)
-  fails "Kernel.Float when passed exception: false and valid input returns a Float number" # ArgumentError: [Kernel.Float] wrong number of arguments (given 2, expected 1)
   fails "Kernel.Integer raises a TypeError when to_int returns not-an-Integer object and to_i returns nil" # Expected TypeError but no exception was raised ("1" was returned)
   fails "Kernel.Integer return a result of to_i when to_int does not return an Integer" # Expected "1" == 42 to be truthy but was false
   fails "Kernel.Integer when passed exception: false and an argument that contains a period swallows an error" # TypeError: no implicit conversion of Hash into Integer
