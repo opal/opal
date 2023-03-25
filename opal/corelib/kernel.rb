@@ -385,7 +385,7 @@ module ::Kernel
     }
   end
 
-  def Integer(value, base = undefined)
+  def Integer(value, base = undefined, exception: true)
     %x{
       var i, str, base_digits;
 
@@ -475,6 +475,12 @@ module ::Kernel
 
       return i;
     }
+  rescue
+    unless exception
+      return nil
+    end
+
+    ::Kernel.raise
   end
 
   def Float(value, exception: true)

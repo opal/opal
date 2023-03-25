@@ -16,20 +16,6 @@ opal_filter "Kernel" do
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'" # ArgumentError: invalid value for Float(): "0x1p10000"
   fails "Kernel#Integer raises a TypeError when to_int returns not-an-Integer object and to_i returns nil" # Expected TypeError but no exception was raised ("1" was returned)
   fails "Kernel#Integer return a result of to_i when to_int does not return an Integer" # Expected "1" == 42 to be truthy but was false
-  fails "Kernel#Integer when passed exception: false and an argument that contains a period swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel#Integer when passed exception: false and an empty string swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel#Integer when passed exception: false and invalid argument swallows an error" # ArgumentError: [MSpecEnv#Integer] wrong number of arguments (given 3, expected -2)
-  fails "Kernel#Integer when passed exception: false and multiple leading -s swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel#Integer when passed exception: false and multiple trailing -s swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel#Integer when passed exception: false and no to_int or to_i methods exist swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel#Integer when passed exception: false and passed Infinity swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel#Integer when passed exception: false and passed NaN swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel#Integer when passed exception: false and passed a String that can't be converted to an Integer swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel#Integer when passed exception: false and passed a String that contains numbers normally parses it and returns an Integer" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel#Integer when passed exception: false and passed nil swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel#Integer when passed exception: false and to_i returns a value that is not an Integer swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel#Integer when passed exception: false and to_int returns nil and no to_i exists swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel#Integer when passed exception: false and valid argument returns an Integer number" # ArgumentError: [MSpecEnv#Integer] wrong number of arguments (given 3, expected -2)
   fails "Kernel#Pathname returns same argument when called with a pathname argument" # Expected #<Pathname:0xb23c2 @path="foo">.equal? #<Pathname:0xb23c4 @path="foo"> to be truthy but was false
   fails "Kernel#String calls #to_s if #respond_to?(:to_s) returns true" # TypeError: no implicit conversion of MockObject into String
   fails "Kernel#String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true" # Expected TypeError but got: NoMethodError (undefined method `to_s' for #<Object:0x2961a>)
@@ -322,20 +308,6 @@ opal_filter "Kernel" do
   fails "Kernel.Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'" # ArgumentError: invalid value for Float(): "0x1p10000"
   fails "Kernel.Integer raises a TypeError when to_int returns not-an-Integer object and to_i returns nil" # Expected TypeError but no exception was raised ("1" was returned)
   fails "Kernel.Integer return a result of to_i when to_int does not return an Integer" # Expected "1" == 42 to be truthy but was false
-  fails "Kernel.Integer when passed exception: false and an argument that contains a period swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel.Integer when passed exception: false and an empty string swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel.Integer when passed exception: false and invalid argument swallows an error" # ArgumentError: [MSpecEnv#Integer] wrong number of arguments (given 3, expected -2)
-  fails "Kernel.Integer when passed exception: false and multiple leading -s swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel.Integer when passed exception: false and multiple trailing -s swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel.Integer when passed exception: false and no to_int or to_i methods exist swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel.Integer when passed exception: false and passed Infinity swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel.Integer when passed exception: false and passed NaN swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel.Integer when passed exception: false and passed a String that can't be converted to an Integer swallows an error" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel.Integer when passed exception: false and passed a String that contains numbers normally parses it and returns an Integer" # TypeError: no implicit conversion of Hash into Integer
-  fails "Kernel.Integer when passed exception: false and passed nil swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel.Integer when passed exception: false and to_i returns a value that is not an Integer swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel.Integer when passed exception: false and to_int returns nil and no to_i exists swallows an error" # ArgumentError: base specified for non string value
-  fails "Kernel.Integer when passed exception: false and valid argument returns an Integer number" # ArgumentError: [MSpecEnv#Integer] wrong number of arguments (given 3, expected -2)
   fails "Kernel.Rational when passed a String converts the String to a Rational using the same method as String#to_r" # Expected (0/1) == (13/25) to be truthy but was false
   fails "Kernel.Rational when passed a String does not use the same method as Float#to_r" # Expected (5404319552844595/9007199254740992) == (3/5) to be truthy but was false
   fails "Kernel.Rational when passed a String raises a TypeError if the first argument is a Symbol" # Expected TypeError but no exception was raised ((0/1) was returned)
