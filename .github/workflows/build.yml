@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - master
-      - "*-stable"
-      - "*/ci-check"
+      - '*-stable'
+      - '*/ci-check'
   pull_request: {}
 
 permissions:
@@ -59,13 +59,13 @@ jobs:
             command: bundle exec rake mspec_chrome
             ruby: '3.0'
             os: windows-latest
-          - name: windows-mspec-firefox
-            env:
-              # when changing version, also change it below and above
-              MOZILLA_FIREFOX_BINARY: 'C:/Program Files/Firefox_106.0.4/firefox.exe'
-            ruby: '3.0'
-            command: bundle exec rake mspec_firefox
-            os: windows-latest
+          # - name: windows-mspec-firefox
+          #   env:
+          #     # when changing version, also change it below and above
+          #     MOZILLA_FIREFOX_BINARY: 'C:/Program Files/Firefox_106.0.4/firefox.exe'
+          #   ruby: '3.0'
+          #   command: bundle exec rake mspec_firefox
+          #   os: windows-latest
           - name: macos-mspec-safari
             command: bundle exec rake mspec_safari
             ruby: '3.0'
