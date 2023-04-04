@@ -482,7 +482,11 @@ module ::Kernel
       var str;
 
       if (value === nil) {
-        #{::Kernel.raise ::TypeError, "can't convert nil into Float"}
+        if ($truthy(#{exception})) {
+          #{::Kernel.raise ::TypeError, "can't convert nil into Float"}
+        } else {
+          return nil;
+        }
       }
 
       if (value.$$is_string) {
@@ -496,20 +500,22 @@ module ::Kernel
         }
 
         if (!/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/.test(str)) {
-          #{::Kernel.raise ::ArgumentError, "invalid value for Float(): \"#{value}\""}
+          if ($truthy(#{exception})) {
+            #{::Kernel.raise ::ArgumentError, "invalid value for Float(): \"#{value}\""}
+          } else {
+            return nil;
+          }
         }
 
         return parseFloat(str);
       }
 
-      return #{::Opal.coerce_to!(value, ::Float, :to_f)};
+      if ($truthy(#{exception})) {
+        return #{::Opal.coerce_to!(value, ::Float, :to_f)};
+      } else {
+        return $coerce_to(value, #{::Float}, 'to_f');
+      }
     }
-  rescue
-    unless exception
-      return nil
-    end
-
-    ::Kernel.raise
   end
 
   def Hash(arg)
