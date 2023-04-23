@@ -1414,7 +1414,27 @@ class ::Array < `Array`
   end
 
   def intersect?(other)
-    !intersection(other).empty?
+    %x{
+      var small, large, hash = #{{}}, i, length;
+      if (self.length < other.length) {
+        small = self;
+        large = other;
+      } else {
+        small = other;
+        large = self;
+      }
+
+      for (i = 0, length = small.length; i < length; i++) {
+        $hash_put(hash, small[i], true);
+      }
+
+      for (i = 0, length = large.length; i < length; i++) {
+        if ($hash_get(hash, large[i])) {
+          return true;
+        }
+      }
+      return false;
+    }
   end
 
   def join(sep = nil)
