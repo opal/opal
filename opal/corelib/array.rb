@@ -68,6 +68,13 @@ class ::Array < `Array`
 
       if (raised) throw raised;
     }
+
+    function convertToArray(array) {
+      if (!array.$$is_array) {
+        array = $coerce_to(array, #{::Array}, 'to_ary');
+      }
+      return #{`array`.to_a};
+    }
   }
 
   def self.[](*objects)
@@ -135,11 +142,7 @@ class ::Array < `Array`
   end
 
   def &(other)
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
+    other = `convertToArray(other)`
 
     %x{
       var result = [], hash = #{{}}, i, length, item;
@@ -160,11 +163,7 @@ class ::Array < `Array`
   end
 
   def |(other)
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
+    other = `convertToArray(other)`
 
     %x{
       var hash = #{{}}, i, length, item;
@@ -203,23 +202,15 @@ class ::Array < `Array`
   end
 
   def +(other)
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
+    other = `convertToArray(other)`
 
     `self.concat(other)`
   end
 
   def -(other)
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
-
     return [] if `self.length === 0`
+
+    other = `convertToArray(other)`
     return `self.slice()` if `other.length === 0`
 
     %x{
@@ -849,11 +840,7 @@ class ::Array < `Array`
     `$deny_frozen_access(self)`
 
     others = others.map do |other|
-      other = if ::Array === other
-                other.to_a
-              else
-                `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-              end
+      `other = convertToArray(other)`
 
       if other.equal?(self)
         other = other.dup
@@ -1782,11 +1769,7 @@ class ::Array < `Array`
   def replace(other)
     `$deny_frozen_access(self)`
 
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
+    other = `convertToArray(other)`
 
     %x{
       self.splice(0, self.length);
@@ -2325,11 +2308,7 @@ class ::Array < `Array`
     max    = nil
 
     each do |row|
-      row = if ::Array === row
-              row.to_a
-            else
-              `$coerce_to(row, #{::Array}, 'to_ary')`.to_a
-            end
+      `row = convertToArray(row)`
 
       max ||= `row.length`
 
