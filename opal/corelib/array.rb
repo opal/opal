@@ -142,6 +142,8 @@ class ::Array < `Array`
   end
 
   def &(other)
+    return [] if `self.length === 0`
+
     other = `convertToArray(other)`
 
     %x{
@@ -1397,7 +1399,30 @@ class ::Array < `Array`
   end
 
   def intersection(*arrays)
-    arrays.reduce(to_a.dup) { |a, b| a & b }
+    %x{
+      if (arrays.length === 0) {
+        return #{to_a.dup};
+      }
+      arrays = arrays.map(convertToArray);
+      if (self.length === 0) {
+        return [];
+      }
+    }
+
+    arrays = arrays.sort_by(&:length)
+    # When self is the smallest among the arrays
+    if `self.length < arrays[0].length`
+      return arrays.reduce(self, &:&)
+    end
+
+    # First, calculate intersection of argument arrays.
+    # Array#& is faster when the argument size is small.
+    # So `largest & shotest & second_shortest & ...` would be the fastest.
+    largest = `arrays.pop()`
+    intersection_of_args = arrays.reduce(largest, &:&)
+
+    # self array must come last to maintain the order
+    self & intersection_of_args
   end
 
   def intersect?(other)
