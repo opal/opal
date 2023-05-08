@@ -103,6 +103,7 @@ class ::Encoding
 
   class ::EncodingError < ::StandardError; end
   class ::CompatibilityError < ::EncodingError; end
+  class UndefinedConversionError < ::EncodingError; end
 end
 
 ::Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
