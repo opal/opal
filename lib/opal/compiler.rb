@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+if RUBY_ENGINE == 'opal'
+  require 'corelib/string/unpack'
+end
 require 'set'
 require 'opal/parser'
 require 'opal/fragment'
@@ -8,6 +11,7 @@ require 'opal/eof_content'
 require 'opal/errors'
 require 'opal/magic_comments'
 require 'opal/nodes/closure'
+require 'opal/source_map'
 
 module Opal
   # Compile a string of ruby code into javascript.
