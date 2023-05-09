@@ -1,8 +1,14 @@
+inherit_from:
+  - .rubocop_todo.yml
+  - .rubocop/todo.yml
+
 require: rubocop-performance
-inherit_from: .rubocop/todo.yml
+
 
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 3.0
+  NewCops: disable
+  SuggestExtensions: false
   Exclude:
     - CHANGELOG.md
     - CONDUCT.md
@@ -78,7 +84,7 @@ Layout/CommentIndentation:
     - 'lib/opal/source_map/file.rb'
 
 # We need to support older rubies
-Layout/IndentHeredoc:
+Layout/HeredocIndentation:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
@@ -104,7 +110,7 @@ Layout/ExtraSpacing:
     # This files uses extra spaces to show an inheritance tree of error classes
     - 'opal/corelib/error.rb'
 
-Layout/IndentArray:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
 Layout/SpaceAroundOperators:
@@ -147,7 +153,7 @@ Lint/RescueException:
     - 'stdlib/promise.rb'
     - 'opal/corelib/binding.rb'
 
-Lint/StringConversionInInterpolation:
+Lint/RedundantStringCoercion:
   Exclude:
     # That's what MRI does
     - 'opal/corelib/error.rb'
@@ -208,7 +214,7 @@ Naming/BinaryOperatorParameterName:
 
 Naming/PredicateName:
   # Ruby has "has_key?" method
-  NamePrefixBlacklist: is_, have_
+  ForbiddenPrefixes: is_, have_
 
 Performance/FlatMap:
   Exclude:
@@ -267,7 +273,7 @@ Style/InverseMethods:
     - 'opal/corelib/basic_object.rb'
     - 'opal/corelib/kernel.rb'
 
-Style/MethodMissingSuper:
+Lint/MissingSuper:
   # Base Opal classes simply can't or shouldn't call super for #method_missing
   Exclude:
     - 'opal/corelib/basic_object.rb'
@@ -318,7 +324,7 @@ Style/TrailingCommaInArguments:
   # Any style is allowed
   Enabled: false
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
 
 Layout/MultilineMethodCallBraceLayout:
@@ -371,6 +377,7 @@ Naming/ConstantName:
   Exclude:
     # MRI has a constant BigDecimal::SIGN_NaN
     - 'stdlib/bigdecimal.rb'
+    - 'stdlib/opal-platform.rb'
 
 Security/Eval:
   Exclude:
@@ -395,7 +402,7 @@ Style/TrailingCommaInHashLiteral:
   # Any style is allowed
   Enabled: false
 
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Exclude:
     # This file uses parser's code that doesn't match our styling requirements
     - 'lib/opal/parser/patch.rb'
@@ -436,7 +443,7 @@ Style/MultipleComparison:
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
-Layout/AlignHash:
+Layout/HashAlignment:
   Enabled: false
 
 # No way to set multiple preferred names

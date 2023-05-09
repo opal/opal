@@ -1,6 +1,6 @@
 # All items in this file require fixing
 
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
 
 Lint/AssignmentInCondition:
@@ -33,7 +33,7 @@ Style/MutableConstant:
     - 'lib/opal/nodes/call.rb'
     - 'lib/opal/util.rb'
 
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Exclude:
     - 'stdlib/ostruct.rb'
 
