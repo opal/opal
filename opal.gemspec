@@ -45,8 +45,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'selenium-webdriver'
   spec.add_development_dependency 'benchmark-ips', '< 2.8'
   spec.add_development_dependency 'sinatra', '~> 3.0'
-  spec.add_development_dependency 'rubocop', '~> 0.67.0'
-  spec.add_development_dependency 'rubocop-performance', '~> 1.1.0'
+  spec.add_development_dependency 'rubocop', '~> 1.50'
+  spec.add_development_dependency 'rubocop-performance', '~> 1.1'
   spec.add_development_dependency 'rack', '~> 2.2'
   spec.add_development_dependency 'webrick'
   spec.add_development_dependency 'benchmark_driver', '0.15.17' # version taken from test/cruby/common.mk
