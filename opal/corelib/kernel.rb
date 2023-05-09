@@ -389,16 +389,18 @@ module ::Kernel
     %x{
       var i, str, base_digits;
 
+      exception = $truthy(#{exception});
+
       if (!value.$$is_string) {
         if (base !== undefined) {
-          if ($truthy(#{exception})) {
+          if (exception) {
             #{::Kernel.raise ::ArgumentError, 'base specified for non string value'}
           } else {
             return nil;
           }
         }
         if (value === nil) {
-          if ($truthy(#{exception})) {
+          if (exception) {
             #{::Kernel.raise ::TypeError, "can't convert nil into Integer"}
           } else {
             return nil;
@@ -406,7 +408,7 @@ module ::Kernel
         }
         if (value.$$is_number) {
           if (value === Infinity || value === -Infinity || isNaN(value)) {
-            if ($truthy(#{exception})) {
+            if (exception) {
               #{::Kernel.raise ::FloatDomainError, value}
             } else {
               return nil;
@@ -427,7 +429,7 @@ module ::Kernel
           }
         }
 
-        if ($truthy(#{exception})) {
+        if (exception) {
           #{::Kernel.raise ::TypeError, "can't convert #{value.class} into Integer"}
         } else {
           return nil;
@@ -443,7 +445,7 @@ module ::Kernel
       } else {
         base = $coerce_to(base, #{::Integer}, 'to_int');
         if (base === 1 || base < 0 || base > 36) {
-          if ($truthy(#{exception})) {
+          if (exception) {
             #{::Kernel.raise ::ArgumentError, "invalid radix #{base}"}
           } else {
             return nil;
@@ -483,7 +485,7 @@ module ::Kernel
           }
           // no-break
         }
-        if ($truthy(#{exception})) {
+        if (exception) {
           #{::Kernel.raise ::ArgumentError, "invalid value for Integer(): \"#{value}\""}
         } else {
           return nil;
@@ -495,7 +497,7 @@ module ::Kernel
       base_digits = '0-' + (base <= 10 ? base - 1 : '9a-' + String.fromCharCode(97 + (base - 11)));
 
       if (!(new RegExp('^\\s*[+-]?[' + base_digits + ']+\\s*$')).test(str)) {
-        if ($truthy(#{exception})) {
+        if (exception) {
           #{::Kernel.raise ::ArgumentError, "invalid value for Integer(): \"#{value}\""}
         } else {
           return nil;
@@ -505,7 +507,7 @@ module ::Kernel
       i = parseInt(str, base);
 
       if (isNaN(i)) {
-        if ($truthy(#{exception})) {
+        if (exception) {
           #{::Kernel.raise ::ArgumentError, "invalid value for Integer(): \"#{value}\""}
         } else {
           return nil;
@@ -520,8 +522,10 @@ module ::Kernel
     %x{
       var str;
 
+      exception = $truthy(#{exception});
+
       if (value === nil) {
-        if ($truthy(#{exception})) {
+        if (exception) {
           #{::Kernel.raise ::TypeError, "can't convert nil into Float"}
         } else {
           return nil;
@@ -539,7 +543,7 @@ module ::Kernel
         }
 
         if (!/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/.test(str)) {
-          if ($truthy(#{exception})) {
+          if (exception) {
             #{::Kernel.raise ::ArgumentError, "invalid value for Float(): \"#{value}\""}
           } else {
             return nil;
@@ -549,7 +553,7 @@ module ::Kernel
         return parseFloat(str);
       }
 
-      if ($truthy(#{exception})) {
+      if (exception) {
         return #{::Opal.coerce_to!(value, ::Float, :to_f)};
       } else {
         return $coerce_to(value, #{::Float}, 'to_f');
