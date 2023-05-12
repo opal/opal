@@ -2977,6 +2977,13 @@
   // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
   BasicObject.$$const.BasicObject = BasicObject;
 
+  // Bridge BasicObject to (JS) Object
+  $prop(Object, '$$bridge', BasicObject)
+  $prop(BasicObject, '$$prototype', Object.prototype)
+  $prop(BasicObject.$$prototype, '$$class', BasicObject)
+  $prop(BasicObject, '$$constructor', Object)
+  $prop(BasicObject, '$$bridge', true)
+
   // Assign basic constants
   $const_set(_Object, "BasicObject",  BasicObject);
   $const_set(_Object, "Object",       _Object);
