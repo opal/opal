@@ -1400,8 +1400,8 @@
     }
 
     // constructor is a JS function with a prototype chain like:
-    // - constructor
-    //   - super
+    // - constructor (window.String)
+    //   - super (window.Object)
     //
     // What we need to do is to inject our class (with its prototype chain)
     // between constructor and super. For example, after injecting ::Object
