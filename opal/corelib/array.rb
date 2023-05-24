@@ -1417,7 +1417,7 @@ class ::Array < `Array`
 
     # First, calculate intersection of argument arrays.
     # Array#& is faster when the argument size is small.
-    # So `largest & shotest & second_shortest & ...` would be the fastest.
+    # So `largest & shortest & second_shortest & ...` would be the fastest.
     largest = `arrays.pop()`
     intersection_of_args = arrays.reduce(largest, &:&)
 
