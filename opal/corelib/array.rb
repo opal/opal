@@ -142,11 +142,13 @@ class ::Array < `Array`
   end
 
   def &(other)
-    return [] if `self.length === 0`
-
-    other = `convertToArray(other)`
-
     %x{
+      other = convertToArray(other)
+
+      if (self.length === 0 || other.length === 0) {
+        return [];
+      }
+
       var result = [], hash = #{{}}, i, length, item;
 
       for (i = 0, length = other.length; i < length; i++) {
@@ -210,9 +212,9 @@ class ::Array < `Array`
   end
 
   def -(other)
-    return [] if `self.length === 0`
-
     other = `convertToArray(other)`
+
+    return [] if `self.length === 0`
     return `self.slice()` if `other.length === 0`
 
     %x{
