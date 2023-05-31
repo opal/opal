@@ -60,8 +60,8 @@ module Opal
       end
     end
 
-    # /regexp/ =~ rhs
-    # s(:match_with_lvasgn, lhs, rhs)
+    # Handles match_with_lvasgn nodes which represent matching a regular expression
+    # with a right-hand side value and assigning the match result to a left-hand side variable.
     class Match3Node < Base
       handle :match_with_lvasgn
 
@@ -69,57 +69,81 @@ module Opal
 
       def compile
         sexp = s(:send, lhs, :=~, rhs)
+
         # Handle named matches like: /(?<abc>b)/ =~ 'b'
         if lhs.type == :regexp && lhs.children.first.type == :str
-          re = lhs.children.first.children.first
-          names = re.scan(/\(\?<([^>]*)>/).flatten.map(&:to_sym)
+          names = extract_names(lhs)
+
           unless names.empty?
-            # $m3names = $~ ? $~.named_captures : {}
-            names_def = s(:lvasgn, :$m3names,
-              s(:if,
-                s(:gvar, :$~),
-                s(:send, s(:gvar, :$~), :named_captures),
-                s(:hash)
-              )
-            )
+            names_def = generate_names_definition
+            names_assignments = generate_names_assignments(names)
 
-            names = names.map do |name|
-              # abc = $m3names[:abc]
-              s(:lvasgn, name,
-                s(:send,
-                  s(:lvar, :$m3names),
-                  :[],
-                  s(:sym, name)
-                )
-              )
-            end
-
-            if stmt?
-              # We don't care about a return value of this one, so we
-              # ignore it and just assign the local variables.
-              #
-              # (/(?<abc>b)/ =~ 'f')
-              # $m3names = $~ ? $~.named_captures : {}
-              # abc = $m3names[:abc]
-              sexp = s(:begin, sexp, names_def, *names)
-            else
-              # We actually do care about a return value, so we must
-              # keep it saved.
-              #
-              # $m3tmp = (/(?<abc>b)/ =~ 'f')
-              # $m3names = $~ ? $~.named_captures : {}
-              # abc = $m3names[:abc]
-              # $m3tmp
-              sexp = s(:begin,
-                s(:lvasgn, :$m3tmp, sexp),
-                names_def,
-                *names,
-                s(:lvar, :$m3tmp)
-              )
-            end
+            sexp = if stmt?
+                     handle_statement(sexp, names_def, names_assignments)
+                   else
+                     handle_non_statement(sexp, names_def, names_assignments)
+                   end
           end
         end
+
         push process(sexp, @level)
+      end
+
+      private
+
+      def extract_names(regexp_node)
+        re = regexp_node.children.first.children.first
+        re.scan(/\(\?<([^>]*)>/).flatten.map(&:to_sym)
+      end
+
+      def generate_names_definition
+        # Generate names definition: $m3names = $~ ? $~.named_captures : {}
+        s(:lvasgn, :$m3names,
+          s(:if,
+            s(:gvar, :$~),
+            s(:send, s(:gvar, :$~), :named_captures),
+            s(:hash)
+          )
+        )
+      end
+
+      def generate_names_assignments(names)
+        # Generate names assignments: abc = $m3names[:abc]
+        names.map do |name|
+          s(:lvasgn, name,
+            s(:send,
+              s(:lvar, :$m3names),
+              :[],
+              s(:sym, name)
+            )
+          )
+        end
+      end
+
+      def handle_statement(sexp, names_def, names_assignments)
+        # We don't care about a return value of this one, so we
+        # ignore it and just assign the local variables.
+        #
+        # (/(?<abc>b)/ =~ 'f')
+        # $m3names = $~ ? $~.named_captures : {}
+        # abc = $m3names[:abc]
+        s(:begin, sexp, names_def, *names_assignments)
+      end
+
+      def handle_non_statement(sexp, names_def, names_assignments)
+        # We actually do care about a return value, so we must
+        # keep it saved.
+        #
+        # $m3tmp = (/(?<abc>b)/ =~ 'f')
+        # $m3names = $~ ? $~.named_captures : {}
+        # abc = $m3names[:abc]
+        # $m3tmp
+        s(:begin,
+          s(:lvasgn, :$m3tmp, sexp),
+          names_def,
+          *names_assignments,
+          s(:lvar, :$m3tmp)
+        )
       end
     end
   end
