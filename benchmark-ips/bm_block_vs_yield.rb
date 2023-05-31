@@ -9,6 +9,9 @@ module BmBlockVsYield
 end
 
 Benchmark.ips do |x|
+  x.warmup = 10
+  x.time = 60
+
   x.report('block') do
     BmBlockVsYield._block { 1+1 }
   end
