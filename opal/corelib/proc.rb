@@ -13,44 +13,45 @@ class ::Proc < `Function`
     block
   end
 
-  def call(*args, &block)
-    %x{
-      if (block !== nil) {
-        self.$$p = block;
-      }
-
-      var result, $brk = self.$$brk, $ret = self.$$ret;
-
-      if ($brk || ($ret && self.$$is_lambda)) {
+  %x{
+    function $call_lambda(self, args) {
+      if (self.$$ret) {
         try {
-          if (self.$$is_lambda) {
-            result = self.apply(null, args);
-          }
-          else {
-            result = Opal.yieldX(self, args);
-          }
+          return self.apply(null, args);
         } catch (err) {
-          if (err === $brk) {
+          if (err === self.$$ret) {
             return err.$v;
-          }
-          else if (self.$$is_lambda && err === $ret) {
-            return err.$v;
-          }
-          else {
+          } else {
             throw err;
           }
         }
+      } else {
+        return self.apply(null, args);
       }
-      else {
-        if (self.$$is_lambda) {
-          result = self.apply(null, args);
-        }
-        else {
-          result = Opal.yieldX(self, args);
-        }
-      }
+    }
 
-      return result;
+    function $call_proc(self, args) {
+      if (self.$$brk) {
+        try {
+          return Opal.yieldX(self, args);
+        } catch (err) {
+          if (err === self.$$brk) {
+            return err.$v;
+          } else {
+            throw err;
+          }
+        }
+      } else {
+        return Opal.yieldX(self, args);
+      }
+    }
+  }
+
+  def call(*args, &block)
+    %x{
+      if (block !== nil) self.$$p = block;
+      if (self.$$is_lambda) return $call_lambda(self, args);
+      return $call_proc(self, args);
     }
   end
 
