@@ -1054,9 +1054,12 @@ class ::Hash
 
   def to_a
     %x{
-      var result = [];
+      var keys = self.$$keys;
+      var length = keys.length;
+      var result = new Array(length);
+      var key, value;
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0; i < length; i++) {
         key = keys[i];
 
         if (key.$$is_string) {
@@ -1066,7 +1069,7 @@ class ::Hash
           key = key.key;
         }
 
-        result.push([key, value]);
+        result[i] = [key, value];
       }
 
       return result;
