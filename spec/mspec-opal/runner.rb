@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'mspec-opal/formatters'
 
 class OSpecFilter

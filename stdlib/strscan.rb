@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class StringScanner
   attr_reader :pos, :matched
 

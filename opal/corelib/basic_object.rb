@@ -1,4 +1,5 @@
 # use_strict: true
+# backtick_javascript: true
 
 class ::BasicObject
   def initialize(*)

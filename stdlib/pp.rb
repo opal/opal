@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# backtick_javascript: true
 
 # Opal: load stdlib/thread.rb
 require 'thread'

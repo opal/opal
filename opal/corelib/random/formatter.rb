@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::Random
   module self::Formatter
     def hex(count = nil)

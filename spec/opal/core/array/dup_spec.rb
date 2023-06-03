@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe "Array#dup" do
   it "should use slice optimization" do
     a = Array.new

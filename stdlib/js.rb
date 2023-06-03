@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 # The JS module provides syntax sugar for calling native javascript
 # operators (e.g. typeof, instanceof, new, delete) and global functions
 # (e.g. parseFloat, parseInt).

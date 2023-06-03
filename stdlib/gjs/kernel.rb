@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 `/* global ARGV */`
 
 ARGV = `ARGV`

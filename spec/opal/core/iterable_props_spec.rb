@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'spec_helper'
 
 describe 'Iterable props defined by Opal on core JS objects' do

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 module NodeJS
   VERSION = `process.version`
 end

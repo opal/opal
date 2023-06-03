@@ -1,4 +1,5 @@
 # helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze
+# backtick_javascript: true
 
 require 'corelib/enumerable'
 require 'corelib/numeric'

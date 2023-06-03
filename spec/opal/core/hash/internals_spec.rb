@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe 'Hash' do
 
   describe 'internal implementation of string keys' do

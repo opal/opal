@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe 'Hash' do
   it 'works with object-strings with regards to deleting' do
     h = {`new String('a')` => 'a'}

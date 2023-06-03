@@ -6,6 +6,19 @@ module Opal
       handle :xstr
 
       def compile
+        if compiler.backtick_javascript_or_warn?
+          compile_javascript
+        else
+          compile_send
+        end
+      end
+
+      def compile_send
+        sexp = s(:send, nil, :`, s(:dstr, *children))
+        push process(sexp, @level)
+      end
+
+      def compile_javascript
         @should_add_semicolon = false
         unpacked_children = unpack_return(children)
         stripped_children = XStringNode.strip_empty_children(unpacked_children)

@@ -1,4 +1,5 @@
 # helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop, jsid
+# backtick_javascript: true
 
 class ::Module
   def self.allocate

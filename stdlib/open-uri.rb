@@ -1,5 +1,8 @@
-# Copied from https://raw.githubusercontent.com/ruby/ruby/373babeaac8c3e663e1ded74a9f06ac94a671ed9/lib/open-uri.rb
 # frozen_string_literal: true
+# backtick_javascript: true
+
+# Copied from https://raw.githubusercontent.com/ruby/ruby/373babeaac8c3e663e1ded74a9f06ac94a671ed9/lib/open-uri.rb
+
 require 'stringio'
 require 'corelib/array/pack'
 

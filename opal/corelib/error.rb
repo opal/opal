@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::Exception < `Error`
   `Opal.prop(self.$$prototype, '$$is_exception', true)`
   `var stack_trace_limit`

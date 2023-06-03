@@ -1,5 +1,6 @@
 # helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid
 # use_strict: true
+# backtick_javascript: true
 
 module ::Kernel
   def =~(obj)

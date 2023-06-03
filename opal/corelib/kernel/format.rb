@@ -1,4 +1,5 @@
 # helpers: coerce_to
+# backtick_javascript: true
 
 module ::Kernel
   def format(format_string, *args)

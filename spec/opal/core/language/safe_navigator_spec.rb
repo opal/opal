@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe 'Safe navigator' do
   it "handles also null and undefined" do
     [`null`, `undefined`].each do |value|

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::NilClass
   def __marshal__(buffer)
     buffer.append('0')

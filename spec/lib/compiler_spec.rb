@@ -154,13 +154,6 @@ RSpec.describe Opal::Compiler do
     end
   end
 
-  describe "escapes in x-strings" do
-    it "compiles the exscapes directly as appearing in x-strings" do
-      expect_compiled('`"hello\nworld"`').to include('"hello\nworld"')
-      expect_compiled('%x{"hello\nworld"}').to include('"hello\nworld"')
-    end
-  end
-
   describe 'pre-processing require-ish methods' do
     describe '#require' do
       it 'parses and resolve #require argument' do
@@ -324,6 +317,15 @@ RSpec.describe Opal::Compiler do
   end
 
   describe 'x-strings' do
+    let(:compiler_options) { {backtick_javascript: true} }
+
+    describe "escapes" do
+      it "compiles the exscapes directly as appearing in x-strings" do
+        expect_compiled('`"hello\nworld"`').to include('"hello\nworld"')
+        expect_compiled('%x{"hello\nworld"}').to include('"hello\nworld"')
+      end
+    end
+
     describe 'semicolons handling' do
       def compiling(code, &block)
         compiler = Opal::Compiler.new(code)
@@ -477,9 +479,10 @@ RSpec.describe Opal::Compiler do
       }).to include("return nil\n")
     end
 
-    def expect_number_of_warnings(code)
+    def expect_number_of_warnings(code, options = compiler_options)
+      options = options.merge(eval: true)
       warnings_number = 0
-      compiler = Opal::Compiler.new(code, eval: true)
+      compiler = Opal::Compiler.new(code, options)
       allow(compiler).to receive(:warning) { warnings_number += 1}
       compiler.compile
       expect(warnings_number)
@@ -695,21 +698,25 @@ RSpec.describe Opal::Compiler do
     end
   end
 
-  def compiled(*args)
-    Opal::Compiler.new(*args).compile
+  def compiler_options
+    {}
   end
 
-  def parsed(*args)
-    Opal::Compiler.new(*args).parse
+  def compiled(code, options = compiler_options)
+    Opal::Compiler.new(code, options).compile
+  end
+
+  def parsed(code, options = compiler_options)
+    Opal::Compiler.new(code, options).parse
   end
 
   alias compile compiled
 
-  def expect_compiled(*args)
-    expect(compiled(*args))
+  def expect_compiled(code, options = compiler_options)
+    expect(compiled(code, options))
   end
 
-  def compiler_for(*args)
-    Opal::Compiler.new(*args).tap(&:compile)
+  def compiler_for(code, options = compiler_options)
+    Opal::Compiler.new(code, options).tap(&:compile)
   end
 end

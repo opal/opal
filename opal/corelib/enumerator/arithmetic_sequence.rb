@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::Enumerator
   class self::ArithmeticSequence < self
     `Opal.prop(self.$$prototype, '$$is_arithmetic_seq', true)`

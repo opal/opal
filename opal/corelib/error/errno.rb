@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 module ::Errno
   errors = [
     [:EINVAL, 'Invalid argument', 22],

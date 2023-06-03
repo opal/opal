@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 module RuntimeFixtures
   class A
   end

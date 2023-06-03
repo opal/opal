@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 module Deno
   VERSION = `Deno.version.deno`
 end

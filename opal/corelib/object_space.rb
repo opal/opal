@@ -1,3 +1,4 @@
+# backtick_javascript: true
 # helpers: respond_to, truthy
 
 module ::ObjectSpace

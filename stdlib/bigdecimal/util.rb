@@ -1,4 +1,5 @@
 # frozen_string_literal: false
+# backtick_javascript: true
 #
 #--
 # bigdecimal/util extends various native classes to provide the #to_d method,

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class Logger
   module Severity
     DEBUG = 0

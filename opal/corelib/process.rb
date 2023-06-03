@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 module ::Process
   @__clocks__ = []
   def self.__register_clock__(name, func)

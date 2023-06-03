@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe 'Opal.loaded' do
   before do
     %w[foo bar baz].each do |module_name|

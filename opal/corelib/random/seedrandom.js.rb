@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::Random
   %x{
     var module = { exports: {} };

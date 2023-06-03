@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'base64'
 require 'corelib/pack_unpack/format_string_parser'
 

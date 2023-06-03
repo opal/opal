@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'native'
 require_relative './js-yaml-3-6-1'
 

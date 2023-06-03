@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 # https://github.com/ruby/ruby/blob/trunk/doc/marshal.rdoc
 # https://github.com/ruby/ruby/blob/trunk/marshal.c
 

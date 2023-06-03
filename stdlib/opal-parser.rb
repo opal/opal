@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 # parser uses String#unpack
 require 'corelib/string/unpack'
 

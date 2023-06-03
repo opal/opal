@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 ENV = Object.new
 
 class << ENV

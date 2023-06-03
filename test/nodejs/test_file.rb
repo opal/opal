@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 # Copied from cruby and modified to skip unsupported syntaxes
 require 'test/unit'
 require 'nodejs'

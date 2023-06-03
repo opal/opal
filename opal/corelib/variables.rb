@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 # regexp matches
 %x{$gvars['&'] = $gvars['~'] = $gvars['`'] = $gvars["'"] = nil}
 

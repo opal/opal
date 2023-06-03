@@ -1,4 +1,5 @@
 # helpers: truthy, coerce_to, yield1, yieldX, deny_frozen_access
+# backtick_javascript: true
 
 class ::Enumerator
   class self::Lazy < self

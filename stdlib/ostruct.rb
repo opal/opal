@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class OpenStruct
   def initialize(hash = nil)
     @table = {}

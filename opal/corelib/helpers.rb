@@ -1,4 +1,5 @@
 # helpers: type_error, coerce_to
+# backtick_javascript: true
 
 module ::Opal
   def self.bridge(constructor, klass)

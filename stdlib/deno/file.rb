@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 `/* global Deno */`
 require 'corelib/file'
 

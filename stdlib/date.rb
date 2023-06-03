@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'forwardable'
 require 'date/infinity'
 require 'time'

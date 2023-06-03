@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::TracePoint
   # partial implementation of TracePoint
   # for the moment only supports the :class event

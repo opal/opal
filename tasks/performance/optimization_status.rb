@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 klasses = [
   Array,
   Class,

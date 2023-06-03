@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class << self
   def to_s
     'main'

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class Boolean
   def self_as_an_object
     self

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class DateTime < Date
   class << self
     def now

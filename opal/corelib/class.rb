@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'corelib/module'
 
 class ::Class

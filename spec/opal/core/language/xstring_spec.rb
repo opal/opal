@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe "The x-string expression" do
   it "works with multiline, case and assignment" do
     a = case 1

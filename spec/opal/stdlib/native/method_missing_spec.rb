@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'native'
 
 describe "Native::Object#method_missing" do
