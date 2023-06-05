@@ -36,6 +36,16 @@ class ::Exception < `Error`
     `self.message = (args.length > 0) ? args[0] : nil`
   end
 
+  # Those instance variables are not enumerable.
+  def copy_instance_variables(other)
+    super
+    %x{
+      self.message = other.message;
+      self.cause = other.cause;
+      self.stack = other.stack;
+    }
+  end
+
   %x{
     // Convert backtrace from any format to Ruby format
     function correct_backtrace(backtrace) {
