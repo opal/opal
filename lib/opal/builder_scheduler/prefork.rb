@@ -205,9 +205,11 @@ module Opal
       end
 
       # By default we use 3/4 of CPU threads detected.
+      # rubocop:disable Lint/RedundantSafeNavigation
       def fork_count
         ENV['OPAL_PREFORK_THREADS']&.to_i || (Etc.nprocessors * 3 / 4.0).ceil
       end
+      # rubocop:enable Lint/RedundantSafeNavigation
 
       def prefork
         @forks = ForkSet.new(fork_count, &method(:fork_entrypoint))
