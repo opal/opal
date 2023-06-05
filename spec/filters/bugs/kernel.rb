@@ -14,8 +14,6 @@ opal_filter "Kernel" do
   fails "Kernel#Float for hexadecimal literals with binary exponent returns 0 for '0x1p-10000'" # ArgumentError: invalid value for Float(): "0x1p-10000"
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1P10000'" # ArgumentError: invalid value for Float(): "0x1P10000"
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'" # ArgumentError: invalid value for Float(): "0x1p10000"
-  fails "Kernel#Integer raises a TypeError when to_int returns not-an-Integer object and to_i returns nil" # Expected TypeError but no exception was raised ("1" was returned)
-  fails "Kernel#Integer return a result of to_i when to_int does not return an Integer" # Expected "1" == 42 to be truthy but was false
   fails "Kernel#Pathname returns same argument when called with a pathname argument" # Expected #<Pathname:0xb23c2 @path="foo">.equal? #<Pathname:0xb23c4 @path="foo"> to be truthy but was false
   fails "Kernel#String calls #to_s if #respond_to?(:to_s) returns true" # TypeError: no implicit conversion of MockObject into String
   fails "Kernel#String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true" # Expected TypeError but got: NoMethodError (undefined method `to_s' for #<Object:0x2961a>)
@@ -306,8 +304,6 @@ opal_filter "Kernel" do
   fails "Kernel.Float for hexadecimal literals with binary exponent returns 0 for '0x1p-10000'" # ArgumentError: invalid value for Float(): "0x1p-10000"
   fails "Kernel.Float for hexadecimal literals with binary exponent returns Infinity for '0x1P10000'" # ArgumentError: invalid value for Float(): "0x1P10000"
   fails "Kernel.Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'" # ArgumentError: invalid value for Float(): "0x1p10000"
-  fails "Kernel.Integer raises a TypeError when to_int returns not-an-Integer object and to_i returns nil" # Expected TypeError but no exception was raised ("1" was returned)
-  fails "Kernel.Integer return a result of to_i when to_int does not return an Integer" # Expected "1" == 42 to be truthy but was false
   fails "Kernel.Rational when passed a String converts the String to a Rational using the same method as String#to_r" # Expected (0/1) == (13/25) to be truthy but was false
   fails "Kernel.Rational when passed a String does not use the same method as Float#to_r" # Expected (5404319552844595/9007199254740992) == (3/5) to be truthy but was false
   fails "Kernel.Rational when passed a String raises a TypeError if the first argument is a Symbol" # Expected TypeError but no exception was raised ((0/1) was returned)
