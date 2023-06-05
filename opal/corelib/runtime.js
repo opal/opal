@@ -1667,13 +1667,16 @@
     }
 
     var has_mlhs = block.$$has_top_level_mlhs_arg,
-        has_trailing_comma = block.$$has_trailing_comma_in_args;
+        has_trailing_comma = block.$$has_trailing_comma_in_args,
+        length = block.$$arity || block.length;
 
-    if (block.length > 1 || ((has_mlhs || has_trailing_comma) && block.length === 1)) {
+    if (length < 0) length = -length;
+
+    if (length > 1 || ((has_mlhs || has_trailing_comma) && length === 1)) {
       arg = Opal.to_ary(arg);
     }
 
-    if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg.$$is_array) {
+    if ((length > 1 || (has_trailing_comma && length === 1)) && arg.$$is_array) {
       return block.apply(null, arg);
     }
     else {
@@ -1687,7 +1690,11 @@
       $raise(Opal.LocalJumpError, "no block given");
     }
 
-    if (block.length > 1 && args.length === 1) {
+    var length = block.$$arity || block.length;
+
+    if (length < 0) length = -length;
+
+    if (length > 1 && args.length === 1) {
       if (args[0].$$is_array) {
         return block.apply(null, args[0]);
       }
