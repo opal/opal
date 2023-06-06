@@ -17,6 +17,7 @@ require 'opal/rewriters/numblocks'
 require 'opal/rewriters/returnable_logic'
 require 'opal/rewriters/forward_args'
 require 'opal/rewriters/thrower_finder'
+require 'opal/rewriters/type_inferrence'
 
 module Opal
   class Rewriter
@@ -70,6 +71,7 @@ module Opal
     use Rewriters::MlhsArgs
     use Rewriters::InlineArgs
     use Rewriters::ThrowerFinder
+    use Rewriters::TypeInferrence
 
     def initialize(sexp)
       @sexp = sexp

@@ -15,7 +15,11 @@ module Opal
 
       # Operators that get optimized by compiler
       OPERATORS = { :+ => :plus, :- => :minus, :* => :times, :/ => :divide,
-                    :< => :lt, :<= => :le, :> => :gt, :>= => :ge }.freeze
+                    :< => :lt, :<= => :le, :> => :gt, :>= => :ge,
+                    :| => nil, :& => nil, :^ => nil, :+@ => nil,
+                    :-@ => nil, :~@ => nil, :!@ => nil, :length => nil,
+                    :<< => nil, :>> => nil
+                  }.freeze
 
       def self.add_special(name, options = {}, &handler)
         SPECIALS[name] = options
@@ -257,15 +261,51 @@ module Opal
           if invoke_using_refinement?
             compile_default.call
           elsif compiler.inline_operators?
-            compiler.record_method_call operator
-            helper :"rb_#{name}"
-            lhs, rhs = expr(recvr), expr(arglist)
+            if @sexp.meta[:type]
+              # We have inferred the types. Therefore, we can compile
+              # the expression directly to JavaScript
+              if @sexp.children.length == 2
+                if /\A[a-z_]*\z/.match? operator.to_s
+                  push recv(recvr), '.', operator.to_s
+                else
+                  push '(', operator.to_s[0], ' ', expr(recvr), ')'
+                end
+              elsif @sexp.children.length == 3
+                # Boolean operators
+                if %i[| &].include?(operator) && @sexp.meta[:type] == :bool
+                  operator = operator.to_s * 2
+                end
 
-            push fragment("$rb_#{name}(")
-            push lhs
-            push fragment(', ')
-            push rhs
-            push fragment(')')
+                if %i[<<].include?(operator) && @sexp.meta[:type] == :array
+                  # Statements are those operations where we discard return value
+                  if stmt?
+                    push recv(recvr), '.push(', expr(arglist), ')'
+                  else
+                    compile_default.call
+                  end
+                elsif %i[<< >>].include?(operator) && @sexp.meta[:type] == :float
+                  # <<, >> with negative right operand have different semantics
+                  if [:int, :float].include?(@sexp.children[2].type) && 
+                     @sexp.children[2].children[0] > 0
+                    push '(', expr(recvr), ' ', operator.to_s, ' ', expr(arglist), ')'
+                  else
+                    compile_default.call
+                  end
+                else
+                  push '(', expr(recvr), ' ', operator.to_s, ' ', expr(arglist), ')'
+                end
+              else
+                compile_default.call
+              end
+            elsif name
+              compiler.record_method_call operator
+
+              helper :"rb_#{name}"
+
+              push "$rb_#{name}(", expr(recvr), ', ', expr(arglist), ')'
+            else
+              compile_default.call
+            end
           else
             compile_default.call
           end
