@@ -1,6 +1,5 @@
 <!--
 ### Internal
-### Changed
 ### Added
 ### Removed
 ### Deprecated
@@ -16,6 +15,10 @@
 ### Added
 
 - SourceMap support for `Kernel#eval` (#2534)
+
+### Changed
+
+- Change compilation of Regexp nodes that may contain advanced features, so if invalid that they would raise at runtime, not parse-time (#2548)
 
 ### Internal
 
