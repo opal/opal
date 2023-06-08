@@ -7,10 +7,17 @@
 ### Fixed
 -->
 
+### Compatibility
+
+- Add a magic-comment that will disable x-string compilation to JavaScript (#2543)
+
 ### Fixed
 
 - Fix `Kernel#Float` with `exception:` option (#2532)
 - Fix `Kernel#Integer` with `exception:` option (#2531)
+- Fix `String#split` with limit and capturing regexp (#2544)
+- Fix `switch` with Object-wrapped values (#2542)
+- Fix non-direct subclasses of bridged classes not calling the original constructor (#2546)
 
 ### Added
 
@@ -23,4 +30,13 @@
 ### Internal
 
 - Update rubocop (#2535)
+
+### Performance
+
+- Improve performance of `Array#intersect?` and `#intersection` (#2533)
+
+### Deprecated
+
+- Deprecate using x-string to access JavaScript without an explicit magic-comment (#2543)
+
 
