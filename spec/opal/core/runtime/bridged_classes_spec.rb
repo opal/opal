@@ -122,6 +122,42 @@ describe 'Bridged classes in different modules' do
   end
 end
 
+%x{
+  var counter = 0;
+  var reset_counter = function() { counter = 0; };
+  var bridge_class_with_constructor = function() { counter++; };
+}
+
+class BridgedLevel0 < `bridge_class_with_constructor`; end
+class BridgedLevel1 < BridgedLevel0; end
+class BridgedLevel2 < BridgedLevel1; end
+class BridgedLevel3 < BridgedLevel2; end
+
+describe 'Inheritance with bridged classes' do
+  it 'should call a JS constructor on level 0' do
+    `reset_counter()`
+    BridgedLevel0.new
+    `counter`.should == 1
+  end
+
+  it 'should call a JS constructor on level 1' do
+    `reset_counter()`
+    BridgedLevel1.new
+    `counter`.should == 1
+  end
+
+  it 'should call a JS constructor on level 2' do
+    `reset_counter()`
+    BridgedLevel2.new
+    `counter`.should == 1
+  end
+
+  it 'should call a JS constructor on level 3' do
+    `reset_counter()`
+    BridgedLevel3.new
+    `counter`.should == 1
+  end
+end
 
 describe "Invalid bridged classes" do
   it "raises a TypeError when trying to extend with non-Class" do

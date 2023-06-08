@@ -538,6 +538,13 @@
   Opal.$$$ = Opal.const_get_qualified;
   Opal.$r = Opal.const_get_relative_factory;
 
+  function descends_from_bridged_class(klass) {
+    if (klass == null) return false;
+    if (klass.$$bridge) return klass;
+    if (klass.$$super) return descends_from_bridged_class(klass.$$super);
+    return false;
+  }
+
   // Modules & Classes
   // -----------------
 
@@ -567,14 +574,14 @@
   // @return new [Class]  or existing ruby class
   //
   function $allocate_class(name, superclass, singleton) {
-    var klass;
+    var klass, bridged_descendant;
 
-    if (superclass != null && superclass.$$bridge) {
+    if (bridged_descendant = descends_from_bridged_class(superclass)) {
       // Inheritance from bridged classes requires
       // calling original JS constructors
       klass = function() {
         var args = $slice(arguments),
-            self = new ($bind.apply(superclass.$$constructor, [null].concat(args)))();
+            self = new ($bind.apply(bridged_descendant.$$constructor, [null].concat(args)))();
 
         // and replacing a __proto__ manually
         $set_proto(self, klass.$$prototype);
