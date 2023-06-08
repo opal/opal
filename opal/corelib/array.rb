@@ -68,6 +68,13 @@ class ::Array < `Array`
 
       if (raised) throw raised;
     }
+
+    function convertToArray(array) {
+      if (!array.$$is_array) {
+        array = $coerce_to(array, #{::Array}, 'to_ary');
+      }
+      return #{`array`.to_a};
+    }
   }
 
   def self.[](*objects)
@@ -135,13 +142,13 @@ class ::Array < `Array`
   end
 
   def &(other)
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
-
     %x{
+      other = convertToArray(other)
+
+      if (self.length === 0 || other.length === 0) {
+        return [];
+      }
+
       var result = [], hash = #{{}}, i, length, item;
 
       for (i = 0, length = other.length; i < length; i++) {
@@ -160,11 +167,7 @@ class ::Array < `Array`
   end
 
   def |(other)
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
+    other = `convertToArray(other)`
 
     %x{
       var hash = #{{}}, i, length, item;
@@ -203,21 +206,13 @@ class ::Array < `Array`
   end
 
   def +(other)
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
+    other = `convertToArray(other)`
 
     `self.concat(other)`
   end
 
   def -(other)
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
+    other = `convertToArray(other)`
 
     return [] if `self.length === 0`
     return `self.slice()` if `other.length === 0`
@@ -849,11 +844,7 @@ class ::Array < `Array`
     `$deny_frozen_access(self)`
 
     others = others.map do |other|
-      other = if ::Array === other
-                other.to_a
-              else
-                `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-              end
+      `other = convertToArray(other)`
 
       if other.equal?(self)
         other = other.dup
@@ -1410,11 +1401,54 @@ class ::Array < `Array`
   end
 
   def intersection(*arrays)
-    arrays.reduce(to_a.dup) { |a, b| a & b }
+    %x{
+      if (arrays.length === 0) {
+        return #{to_a.dup};
+      }
+      arrays = arrays.map(convertToArray);
+      if (self.length === 0) {
+        return [];
+      }
+    }
+
+    arrays = arrays.sort_by(&:length)
+    # When self is the smallest among the arrays
+    if `self.length < arrays[0].length`
+      return arrays.reduce(self, &:&)
+    end
+
+    # First, calculate intersection of argument arrays.
+    # Array#& is faster when the argument size is small.
+    # So `largest & shortest & second_shortest & ...` would be the fastest.
+    largest = `arrays.pop()`
+    intersection_of_args = arrays.reduce(largest, &:&)
+
+    # self array must come last to maintain the order
+    self & intersection_of_args
   end
 
   def intersect?(other)
-    !intersection(other).empty?
+    %x{
+      var small, large, hash = #{{}}, i, length;
+      if (self.length < other.length) {
+        small = self;
+        large = other;
+      } else {
+        small = other;
+        large = self;
+      }
+
+      for (i = 0, length = small.length; i < length; i++) {
+        $hash_put(hash, small[i], true);
+      }
+
+      for (i = 0, length = large.length; i < length; i++) {
+        if ($hash_get(hash, large[i])) {
+          return true;
+        }
+      }
+      return false;
+    }
   end
 
   def join(sep = nil)
@@ -1762,11 +1796,7 @@ class ::Array < `Array`
   def replace(other)
     `$deny_frozen_access(self)`
 
-    other = if ::Array === other
-              other.to_a
-            else
-              `$coerce_to(other, #{::Array}, 'to_ary')`.to_a
-            end
+    other = `convertToArray(other)`
 
     %x{
       self.splice(0, self.length);
@@ -2305,11 +2335,7 @@ class ::Array < `Array`
     max    = nil
 
     each do |row|
-      row = if ::Array === row
-              row.to_a
-            else
-              `$coerce_to(row, #{::Array}, 'to_ary')`.to_a
-            end
+      `row = convertToArray(row)`
 
       max ||= `row.length`
 
