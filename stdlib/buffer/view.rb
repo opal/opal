@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class Buffer
   class View
     include Native::Wrapper

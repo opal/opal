@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 # Polyfills for browsers in the age of IE11
 
 unless defined?(`Math.acosh`)

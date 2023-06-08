@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe 'Opal.is_a' do
   describe 'Numeric/Number special cases' do
     [

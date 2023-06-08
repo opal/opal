@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'spec_helper'
 
 describe 'Number#to_i' do

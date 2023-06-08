@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class Time
   def self.parse(str)
     %x{

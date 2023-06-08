@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 module KernelExit
   extend self
   attr_accessor :status, :original_proc, :proc, :out

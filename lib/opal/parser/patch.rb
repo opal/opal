@@ -1,3 +1,4 @@
+# backtick_javascript: true
 # frozen_string_literal: true
 
 if RUBY_ENGINE == 'opal'

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe 'Regexp#match' do
   describe 'when pos is not specified' do
     it 'calls .exec only once on the current object' do

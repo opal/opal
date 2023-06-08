@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class BigDecimal < Numeric; end
 
 require 'js'

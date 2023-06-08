@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::Binding
   # @private
   def initialize(jseval, scope_variables = [], receiver = undefined, source_location = nil)

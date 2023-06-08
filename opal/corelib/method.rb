@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::Method
   attr_reader :owner, :receiver, :name
 

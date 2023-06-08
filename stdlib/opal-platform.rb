@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 `/* global Java, GjsFileImporter, Deno */`
 
 browser          = `typeof(document) !== "undefined"`

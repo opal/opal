@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 # Debug is a helper module that allows us to conduct some debugging on
 # a live codebase. It goes with an assumption, that opal-parser or
 # opal-replutils will not be loaded, in which case we will do what we can

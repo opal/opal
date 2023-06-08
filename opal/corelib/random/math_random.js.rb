@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::Random
   MATH_RANDOM_GENERATOR = `{
     new_seed: function() { return 0; },

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe "Exit (Kernel#exit / Opal.exit())" do
   it "forwards the status code to Opal.exit(status)" do
     received_status { Kernel.exit }.should == 0

@@ -1,4 +1,5 @@
 # helpers: coerce_to
+# backtick_javascript: true
 
 require 'corelib/pack_unpack/format_string_parser'
 

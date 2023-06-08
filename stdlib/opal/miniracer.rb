@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 `/* global opalminiracer */`
 
 # Compatibility utilities for the API we provide in

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class Dir
   @__glob__ = `require('glob')`
   @__fs__ = `require('fs')`

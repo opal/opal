@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 module FileUtils
   extend self
   `var __fs__ = #{File}.__fs__`

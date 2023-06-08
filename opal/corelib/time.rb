@@ -1,4 +1,5 @@
 # helpers: slice, deny_frozen_access
+# backtick_javascript: true
 
 require 'corelib/comparable'
 

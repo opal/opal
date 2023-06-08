@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 # Provides a complete set of tools to wrap native JavaScript
 # into nice Ruby objects.
 #

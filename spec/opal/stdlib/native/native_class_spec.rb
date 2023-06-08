@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'native'
 
 describe "Class#native_class" do

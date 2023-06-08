@@ -1,4 +1,5 @@
 # helpers: coerce_to, prop, freeze
+# backtick_javascript: true
 
 class ::RegexpError < ::StandardError; end
 

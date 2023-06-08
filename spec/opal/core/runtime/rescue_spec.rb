@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe "The rescue keyword" do
   context 'JS::Error' do
     it 'handles raw js throws' do

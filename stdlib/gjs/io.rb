@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 `/* global imports */`
 
 # Basic version, appends \n:

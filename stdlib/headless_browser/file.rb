@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# backtick_javascript: true
 
 class File
   def self.write(path, data)

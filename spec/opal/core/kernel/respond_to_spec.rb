@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class RespondToSpecs
   def foo
   end

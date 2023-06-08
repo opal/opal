@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::NilClass
   `self.$$prototype.$$meta = #{self}`
 

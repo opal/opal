@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 require 'opal'
 require 'set'
 require 'opal/platform'

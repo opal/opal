@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class Enumerator
   class Yielder
     def initialize(&block)

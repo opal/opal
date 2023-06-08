@@ -1,4 +1,5 @@
 # helpers: yield1, hash, hash_init, hash_get, hash_put, hash_delete, deny_frozen_access, freeze
+# backtick_javascript: true
 
 require 'corelib/enumerable'
 

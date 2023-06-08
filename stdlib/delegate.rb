@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 # helpers: freeze, freeze_props
+# backtick_javascript: true
+
 # = delegate -- Support for the Delegation Pattern
 #
 # This file ended up in Opal as a port of the following file:

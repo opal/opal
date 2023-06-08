@@ -1,5 +1,6 @@
 # helpers: coerce_to
 # await: await
+# backtick_javascript: true
 
 %x{
   var AsyncFunction = Object.getPrototypeOf(async function() {}).constructor;

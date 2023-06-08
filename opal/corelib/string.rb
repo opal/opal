@@ -1,4 +1,5 @@
 # helpers: coerce_to, respond_to, global_multiline_regexp, prop
+# backtick_javascript: true
 
 require 'corelib/comparable'
 require 'corelib/regexp'

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 %x{
   // Inhibit the default exit behavior
   window.OPAL_EXIT_CODE = "noexit";

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::Dir
   class << self
     def chdir(dir)

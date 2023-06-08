@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 module OpenURI
   @__xmlhttprequest__ = `require('unxhr')`
   `var __XMLHttpRequest__ = #{@__xmlhttprequest__}.XMLHttpRequest`

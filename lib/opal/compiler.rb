@@ -188,6 +188,30 @@ module Opal
     # Adds comments for every method definition
     compiler_option :parse_comments, default: false, as: :parse_comments?
 
+    # @!method backtick_javascript?
+    #
+    # Allows use of a backtick operator (and `%x{}``) to embed verbatim JavaScript.
+    # If false, backtick operator will
+    compiler_option :backtick_javascript, default: nil, as: :backtick_javascript?, magic_comment: true
+
+    # Warn about impending compatibility break
+    def backtick_javascript_or_warn?
+      case backtick_javascript?
+      when true
+        true
+      when nil
+        @backtick_javascript_warned ||= begin
+          warning 'Backtick operator usage interpreted as intent to embed JavaScript; this code will ' \
+                  'break in Opal 2.0; add a magic comment: `# backtick_javascript: true`'
+          true
+        end
+
+        true
+      when false
+        false
+      end
+    end
+
     compiler_option :scope_variables, default: []
 
     # @!method async_await
@@ -576,7 +600,11 @@ module Opal
       when :return, :js_return, :returnable_yield
         sexp
       when :xstr
-        sexp.updated(nil, [s(:js_return, *sexp.children)])
+        if backtick_javascript_or_warn?
+          sexp.updated(nil, [s(:js_return, *sexp.children)])
+        else
+          sexp
+        end
       when :if
         cond, true_body, false_body = *sexp
         sexp.updated(

@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class BaseOpalFormatter
   def initialize(out=nil)
     @exception = @failure = false

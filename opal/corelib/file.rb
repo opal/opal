@@ -1,4 +1,5 @@
 # helpers: truthy
+# backtick_javascript: true
 
 class ::File < ::IO
   Separator = SEPARATOR = '/'

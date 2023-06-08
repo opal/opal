@@ -1,4 +1,5 @@
 # use_strict: true
+# backtick_javascript: true
 
 class ::Boolean < `Boolean`
   `Opal.prop(self.$$prototype, '$$is_boolean', true)`
