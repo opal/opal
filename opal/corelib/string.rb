@@ -1060,6 +1060,8 @@ class ::String < `String`
           string = self.toString(),
           index = 0,
           match,
+          match_count = 0,
+          valid_result_length = 0,
           i, ii;
 
       if (pattern.$$is_regexp) {
@@ -1103,7 +1105,8 @@ class ::String < `String`
       }
 
       if (match !== null && match[0] === '') {
-        result.splice(limit - 1, result.length - 1, result.slice(limit - 1).join(''));
+        valid_result_length = (match.length - 1) * (limit - 1) + limit
+        result.splice(valid_result_length - 1, result.length - 1, result.slice(valid_result_length - 1).join(''));
         return result;
       }
 
@@ -1111,16 +1114,16 @@ class ::String < `String`
         return result;
       }
 
-      i = 0;
       while (match !== null) {
-        i++;
+        match_count++;
         index = pattern.lastIndex;
-        if (i + 1 === limit) {
+        valid_result_length += match.length
+        if (match_count + 1 === limit) {
           break;
         }
         match = pattern.exec(string);
       }
-      result.splice(limit - 1, result.length - 1, string.slice(index));
+      result.splice(valid_result_length, result.length - 1, string.slice(index));
       return result;
     }
   end

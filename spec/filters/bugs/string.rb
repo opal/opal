@@ -231,7 +231,6 @@ opal_filter "String" do
   fails "String#slice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with index, length returns a string with the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#split with Regexp allows concurrent Regexp calls in a shared context" # NotImplementedError: Thread creation not available
-  fails "String#split with Regexp applies the limit to the number of split substrings, without counting captures" # Expected ["a", "aBa"] == ["a", "B", "", "", "aBa"] to be truthy but was false
   fails "String#split with Regexp for a String subclass yields instances of String" # Expected nil (NilClass) to be an instance of String
   fails "String#split with Regexp raises a TypeError when not called with nil, String, or Regexp" # Expected TypeError but no exception was raised (["he", "o"] was returned)
   fails "String#split with Regexp returns String instances based on self" # Expected "x:y:z:" (StringSpecs::MyString) to be an instance of String
