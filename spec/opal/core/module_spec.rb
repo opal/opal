@@ -68,4 +68,48 @@ describe 'Module' do
     OPAL_SPEC_MODULE.class.should == Module
     OPAL_SPEC_CLASS.class.should == Class
   end
+
+  describe "updates iclass" do
+    def included_structures
+      mod = Module.new { def method_to_remove; end }
+      klass = Class.new { include mod }
+      [mod, klass]
+    end
+
+    def prepended_structures
+      mod = Module.new { def method_to_remove; end }
+      klass = Class.new { prepend mod }
+      [mod, klass]
+    end
+
+    it "whenever a new method is added to an included module" do
+      mod, klass = included_structures
+      ->{ klass.new.nonexistent }.should raise_error NoMethodError
+      mod.class_exec { def added_method; end }
+      ->{ klass.new.added_method }.should_not raise_error NoMethodError
+    end
+
+    it "whenever a new method is added to a prepended module" do
+      mod, klass = prepended_structures
+      ->{ klass.new.nonexistent }.should raise_error NoMethodError
+      mod.class_exec { def added_method; end }
+      ->{ klass.new.added_method }.should_not raise_error NoMethodError
+    end
+
+    it "whenever a method is removed from an included module" do
+      mod, klass = included_structures
+      ->{ klass.new.nonexistent }.should raise_error NoMethodError
+      ->{ klass.new.method_to_remove }.should_not raise_error NoMethodError
+      mod.class_exec { remove_method :method_to_remove }
+      ->{ klass.new.method_to_remove }.should raise_error NoMethodError
+    end
+
+    it "whenever a method is removed from a prepended module" do
+      mod, klass = prepended_structures
+      ->{ klass.new.nonexistent }.should raise_error NoMethodError
+      ->{ klass.new.method_to_remove }.should_not raise_error NoMethodError
+      mod.class_exec { remove_method :method_to_remove }
+      ->{ klass.new.method_to_remove }.should raise_error NoMethodError
+    end
+  end
 end
