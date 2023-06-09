@@ -17,7 +17,10 @@ class ::Regexp < `RegExp`
     end
 
     def escape(string)
-      `Opal.escape_regexp(string)`
+      %x{
+        string = $coerce_to(string, #{::String}, 'to_str');
+        return Opal.escape_regexp(string);
+      }
     end
 
     def last_match(n = nil)
