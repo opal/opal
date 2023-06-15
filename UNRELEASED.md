@@ -18,6 +18,9 @@
 - Fix `String#split` with limit and capturing regexp (#2544)
 - Fix `switch` with Object-wrapped values (#2542)
 - Fix non-direct subclasses of bridged classes not calling the original constructor (#2546)
+- Regexp.escape: Cast to String or drop exception (#2552)
+- Propagate removal of method from included/prepended modules (#2553)
+- Restore `nodejs/yaml` functionality (#2551)
 
 ### Added
 
