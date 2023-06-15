@@ -5,7 +5,12 @@
 ### Deprecated
 ### Performance
 ### Fixed
+### Documentation
 -->
+
+### Deprecated
+
+- Deprecate using x-string to access JavaScript without an explicit magic-comment (#2543)
 
 ### Compatibility
 
@@ -21,6 +26,7 @@
 - Regexp.escape: Cast to String or drop exception (#2552)
 - Propagate removal of method from included/prepended modules (#2553)
 - Restore `nodejs/yaml` functionality (#2551)
+- Fix sine `Range#size` edge cases (#2541)
 
 ### Added
 
@@ -30,16 +36,21 @@
 
 - Change compilation of Regexp nodes that may contain advanced features, so if invalid that they would raise at runtime, not parse-time (#2548)
 
-### Internal
+### Documentation
 
-- Update rubocop (#2535)
+- Bridging documentation (#2541) 
 
 ### Performance
 
 - Improve performance of `Array#intersect?` and `#intersection` (#2533)
+- Proc#call: Refactor for performance (#2541) 
+- Opal.stub_for: optimize (#2541) 
+- Hash: Optimize #to_a (#2541) 
+- Array: Optimize #collect/#map (#2541)
 
-### Deprecated
+### Internal
 
-- Deprecate using x-string to access JavaScript without an explicit magic-comment (#2543)
-
-
+- Update rubocop (#2535)
+- Match3Node Cleanup (#2541) 
+- IFlipFlop/EFlipFlop: Refactor for readability (#2541) 
+- ForRewriter: Refactor for readability (#2541) 
