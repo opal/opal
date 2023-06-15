@@ -3848,7 +3848,7 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
 var yaml = require('./lib/js-yaml.js');
 
 
-module.exports = yaml;
+module.exports = globalThis.jsyaml = yaml;
 
 },{"./lib/js-yaml.js":1}]},{},[])("/")
 });

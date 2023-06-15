@@ -389,6 +389,7 @@ node_platforms.each do |platform|
       nodejs/test_opal_builder.rb
       nodejs/test_string.rb
       nodejs/test_await.rb
+      nodejs/test_yaml.rb
     ]
 
     filename = "tmp/minitest_node_nodejs.rb"
