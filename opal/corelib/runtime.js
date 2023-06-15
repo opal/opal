@@ -2075,6 +2075,18 @@
     return Opal.defn(Opal.get_singleton_class(obj), jsid, body);
   };
 
+  // Since JavaScript has no concept of modules, we create proxy classes
+  // called `iclasses` that store copies of methods loaded. We need to
+  // update them if we remove a method.
+  function remove_method_from_iclasses(obj, jsid) {
+    if (obj.$$is_module) {
+      for (var i = 0, iclasses = obj.$$iclasses, length = iclasses.length; i < length; i++) {
+        var iclass = iclasses[i];
+        delete iclass[jsid];
+      }
+    }
+  }
+
   // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
     if (!$has_own(obj.$$prototype, jsid)) {
@@ -2082,6 +2094,8 @@
     }
 
     delete obj.$$prototype[jsid];
+
+    remove_method_from_iclasses(obj, jsid);
 
     if (obj.$$is_singleton) {
       if (obj.$$prototype.$singleton_method_removed && !obj.$$prototype.$singleton_method_removed.$$stub) {
@@ -2102,6 +2116,8 @@
     }
 
     Opal.add_stub_for(obj.$$prototype, jsid);
+
+    remove_method_from_iclasses(obj, jsid);
 
     if (obj.$$is_singleton) {
       if (obj.$$prototype.$singleton_method_undefined && !obj.$$prototype.$singleton_method_undefined.$$stub) {
