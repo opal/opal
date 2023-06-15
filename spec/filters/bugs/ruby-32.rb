@@ -21,8 +21,6 @@ opal_filter "Ruby 3.2" do
   fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (*args)" # Expected false == true to be truthy but was false
   fails "Proc#parameters adds * rest arg for \"star\" argument" # Expected [["req", "x"], ["rest"]] == [["req", "x"], ["rest", "*"]] to be truthy but was false
   fails "Random::DEFAULT is no longer defined" # Expected Random.const_defined? "DEFAULT" to be falsy but was true
-  fails "Range#size returns nil for all beginless ranges if the start is numeric" # Expected Infinity == nil to be truthy but was false
-  fails "Range#size returns nil if the start and the end is both nil" # Expected Infinity == nil to be truthy but was false
   fails "Refinement#append_features is not called by Module#include" # Expected TypeError but no exception was raised (#<Class:0x2e61c> was returned)
   fails "Refinement#extend_object is not called by Object#extend" # Expected TypeError but no exception was raised (#<Class:0x28fcc> was returned)
   fails "Refinement#prepend_features is not called by Module#prepend" # Expected TypeError but no exception was raised (#<Class:0x70cf6> was returned)

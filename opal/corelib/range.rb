@@ -147,19 +147,39 @@ class ::Range
   end
 
   def size
-    infinity = ::Float::INFINITY
+    %x{
+      var b = this.begin, e = this.end;
 
-    return 0 if (@begin == infinity && !@end.nil?) || (@end == -infinity && !@begin.nil?)
-    return infinity if `is_infinite(self)`
-    return nil unless ::Numeric === @begin && ::Numeric === @end
+      // If begin is Numeric
+      if (#{::Numeric === `b`}) {
+        // If end is Numeric
+        if (#{::Numeric === `e`}) {
+          // Calculating size based on whether range is exclusive or inclusive
+          var size = #{`e` - `b`};
+          if (size < 0) {
+            return 0;
+          }
+          if (!this.excl) {
+            size += 1;
+          }
+          return (#{::Float === `b`} || #{::Float === `e`}) ? Math.floor(size) : size;
+        }
+        // If end is nil
+        else if (e === nil) {
+          return Infinity;
+        }
+      }
+      // If begin is nil
+      else if (b === nil) {
+        // If end is Numeric
+        if (#{::Numeric === `e`}) {
+          return Infinity;
+        }
+      }
 
-    range_begin = @begin
-    range_end   = @end
-    range_end  -= 1 if @excl
-
-    return 0 if range_end < range_begin
-
-    `Math.abs(range_end - range_begin) + 1`.to_i
+      // If neither begin nor end is Numeric
+      return nil;
+    }
   end
 
   def step(n = undefined)

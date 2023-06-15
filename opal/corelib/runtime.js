@@ -1545,7 +1545,6 @@
   // @param method_name [String] The js-name of the method to stub (e.g. "$foo")
   // @return [undefined]
   Opal.stub_for = function(method_name) {
-
     function method_missing_stub() {
       // Copy any given block onto the method_missing dispatcher
       this.$method_missing.$$p = method_missing_stub.$$p;
@@ -1554,14 +1553,12 @@
       method_missing_stub.$$p = null;
 
       // call method missing with correct args (remove '$' prefix on method name)
-      var args_ary = new Array(arguments.length);
-      for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = arguments[i]; }
-
+      var args_ary = $slice(arguments);
       return this.$method_missing.apply(this, [method_name.slice(1)].concat(args_ary));
-    }
-
+    };
+  
     method_missing_stub.$$stub = true;
-
+  
     return method_missing_stub;
   };
 

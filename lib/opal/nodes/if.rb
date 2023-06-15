@@ -392,45 +392,53 @@ module Opal
       end
     end
 
-    class IFlipFlop < Base
-      handle :iflipflop
+    class BaseFlipFlop < Base
+      children :start_condition, :end_condition
 
-      children :from, :to
-
-      # Is this an exclusive flip flop? If no, run both branches
-      def excl
-        ""
-      end
-
-      # We create a function that we put in the top scope, that stores the state of our
-      # flip-flop. We pass to it functions that are ran with the current binding.
       def compile
         helper :truthy
 
-        fun_name = top_scope.new_temp
-        ff = "#{fun_name}.$$ff"
+        func_name = top_scope.new_temp
+        flip_flop_state = "#{func_name}.$$ff"
 
-        push "(typeof #{fun_name} === 'undefined' ? (#{fun_name} = function(from, to){"
-        push "  if (typeof #{ff} === 'undefined') #{ff} = false;"
-        push "  var retval = #{ff};"
-        push "  if (!#{ff}) {"
-        push "    #{ff} = retval = $truthy(from());"
-        push "  }"
-        push "  #{excl}if (#{ff}) {"
-        push "    if ($truthy(to())) #{ff} = false;"
-        push "  }"
-        push "  return retval;"
-        push "}) : #{fun_name})("
-        push "  function() { ", stmt(compiler.returns(from)), " },"
-        push "  function() { ", stmt(compiler.returns(to)), " }"
+        # Start function definition, checking and initializing it if necessary
+        push "(#{func_name} = #{func_name} || function(_start_func, _end_func){"
+
+        # If flip flop state is not defined, set it to false
+        push "  var flip_flop = #{flip_flop_state} || false;"
+
+        # If flip flop state is false, call the 'start_condition' function and store its truthy result into flip flop state
+        push "  if (!flip_flop) #{flip_flop_state} = flip_flop = $truthy(_start_func());"
+
+        # If flip flop state is true, call the 'end_condition' function and set flip flop state to false if 'end_condition' is truthy
+        push "  #{excl}if (flip_flop && $truthy(_end_func())) #{flip_flop_state} = false;"
+
+        # Return current state of flip flop
+        push "  return flip_flop;"
+
+        # End function definition
+        push "})("
+
+        # Call the function with 'start_condition' and 'end_condition' arguments wrapped in functions to ensure correct binding and delay evaluation
+        push "  function() { ", stmt(compiler.returns(start_condition)), " },"
+        push "  function() { ", stmt(compiler.returns(end_condition)), " }"
         push ")"
       end
     end
 
-    class EFlipFlop < IFlipFlop
+    class IFlipFlop < BaseFlipFlop
+      handle :iflipflop
+
+      # Inclusive flip flop, check 'end_condition' in the same iteration when 'start_condition' is truthy
+      def excl
+        ""
+      end
+    end
+
+    class EFlipFlop < BaseFlipFlop
       handle :eflipflop
 
-      # Is this an exclusive flip flop? If yes, run only a single branch
+      # Exclusive flip flop, check 'end_condition' in the next iteration after 'start_condition' is truthy
       def excl
         "else "
       end

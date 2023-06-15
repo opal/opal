@@ -692,11 +692,12 @@ class ::Array < `Array`
     return enum_for(:collect) { size } unless block_given?
 
     %x{
-      var result = [];
+      var length = self.length;
+      var result = new Array(length);
 
-      for (var i = 0, length = self.length; i < length; i++) {
+      for (var i = 0; i < length; i++) {
         var value = $yield1(block, self[i]);
-        result.push(value);
+        result[i] = value;
       }
 
       return result;

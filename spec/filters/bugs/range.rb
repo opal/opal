@@ -87,7 +87,6 @@ opal_filter "Range" do
   fails "Range#minmax on an inclusive range should raise RangeError on an endless range without iterating the range" # Mock 'x': method <=>  called with unexpected arguments (nil)
   fails "Range#minmax on an inclusive range should return the minimum and maximum values for a non-numeric range without iterating the range" # Mock 'x' expected to receive succ("any_args") exactly 0 times but received it 1 times
   fails "Range#minmax on an inclusive range should return the minimum and maximum values for a numeric range without iterating the range" # TypeError: can't iterate from Float
-  fails "Range#size returns nil for endless ranges if the start is not numeric" # Expected Infinity == nil to be truthy but was false
   fails "Range#step when no block is given returned Enumerator size raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised (((1..2).step(#<MockObject:0x61a92>)) was returned)
   fails "Range#step when no block is given returned Enumerator size raises a TypeError if step does not respond to #to_int" # Expected TypeError but got: ArgumentError (no implicit conversion of MockObject into Integer)
   fails "Range#step when no block is given returned Enumerator size returns the range size when there's no step_size" # Expected 9 == 10 to be truthy but was false

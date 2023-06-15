@@ -34,40 +34,52 @@ module Opal
       #   j = nil
       #   [[1, 2], [3, 4]].each { |__jstmp| i, j = __jstmp }
       #
+
       def on_for(node)
-        loop_variable, iterating_value, loop_body = *node
+        loop_variable, loop_range, loop_body = *node
 
-        iterating_lvars        = LocalVariableAssigns.find(loop_variable) # [:i]
-        lvars_declared_in_body = LocalVariableAssigns.find(loop_body)     # [:j]
+        # Declare local variables used in the loop and the loop body at the outer scope
+        outer_assignments = generate_outer_assignments(loop_variable, loop_body)
 
-        # i = nil; j = nil
-        outer_assigns = (iterating_lvars + lvars_declared_in_body).map do |lvar_name|
-          s(:lvdeclare, lvar_name)
-        end
-
-        # :__jstmp
+        # Generate temporary loop variable
         tmp_loop_variable = self.class.next_tmp
         get_tmp_loop_variable = s(:js_tmp, tmp_loop_variable)
 
-        loop_variable_assignment = case loop_variable.type
-                                   when :mlhs # multiple left-hand statement like in "for i,j in [[1, 2], [3, 4]]"
-                                     # i, j = __jstmp
-                                     loop_variable.updated(:masgn, [loop_variable, get_tmp_loop_variable])
-                                   else # single argument like "for i in (0..3)"
-                                     # i = __jstmp
-                                     loop_variable << get_tmp_loop_variable
-                                   end
+        # Assign the loop variables in the loop body
+        loop_body = prepend_to_body(loop_body, assign_loop_variable(loop_variable, get_tmp_loop_variable))
 
-        loop_body = prepend_to_body(loop_body, loop_variable_assignment)
+        # Transform the for-loop into each-loop with updated loop body
+        node = transform_for_to_each_loop(node, loop_range, tmp_loop_variable, loop_body)
 
-        node = node.updated(:send, [iterating_value, :each,                                    # (0..3).each {
-                                    node.updated(:iter, [s(:args, s(:arg, tmp_loop_variable)), #                |__jstmp|
-                                                         process(loop_body)]                   #                          i = __jstmp; j = i + 1 }
-                                    )]
-        )
-
-        node.updated(:begin, [*outer_assigns, node])
+        node.updated(:begin, [*outer_assignments, node])
       end
+
+      private
+
+      def generate_outer_assignments(loop_variable, loop_body)
+        loop_local_vars = LocalVariableAssigns.find(loop_variable)
+        body_local_vars = LocalVariableAssigns.find(loop_body)
+
+        (loop_local_vars + body_local_vars).map { |lvar_name| s(:lvdeclare, lvar_name) }
+      end
+
+      def assign_loop_variable(loop_variable, tmp_loop_variable)
+        case loop_variable.type
+        when :mlhs # multiple left-hand statement like in "for i,j in [[1, 2], [3, 4]]"
+          loop_variable.updated(:masgn, [loop_variable, tmp_loop_variable])
+        else # single argument like "for i in (0..3)"
+          loop_variable << tmp_loop_variable
+        end
+      end
+
+      # rubocop:disable Layout/MultilineMethodCallBraceLayout,Layout/MultilineArrayBraceLayout
+      def transform_for_to_each_loop(node, loop_range, tmp_loop_variable, loop_body)
+        node.updated(:send, [loop_range, :each,                                         # (0..3).each {
+                             node.updated(:iter, [s(:args, s(:arg, tmp_loop_variable)), # |__jstmp|
+                                                  process(loop_body)                    # i = __jstmp; j = i + 1 }
+                                                 ])])
+      end
+      # rubocop:enable Layout/MultilineMethodCallBraceLayout,Layout/MultilineArrayBraceLayout
 
       class LocalVariableAssigns < Base
         attr_reader :result
