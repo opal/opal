@@ -591,7 +591,7 @@ class ::Hash
 
       try {
         if (top) {
-          Opal.hash_ids = Object.create(null);
+          Opal.hash_ids = {};
         }
 
         if (Opal[hash_id]) {
