@@ -580,8 +580,7 @@
       // Inheritance from bridged classes requires
       // calling original JS constructors
       klass = function() {
-        var args = $slice(arguments),
-            self = new ($bind.apply(bridged_descendant.$$constructor, [null].concat(args)))();
+        var self = new ($bind.apply(bridged_descendant.$$constructor, $prepend(null, arguments)))();
 
         // and replacing a __proto__ manually
         $set_proto(self, klass.$$prototype);
@@ -1553,8 +1552,7 @@
       method_missing_stub.$$p = null;
 
       // call method missing with correct args (remove '$' prefix on method name)
-      var args_ary = $slice(arguments);
-      return this.$method_missing.apply(this, [method_name.slice(1)].concat(args_ary));
+      return this.$method_missing.apply(this, $prepend(method_name.slice(1), arguments));
     };
   
     method_missing_stub.$$stub = true;
@@ -1695,13 +1693,6 @@
       if (args[0].$$is_array) {
         return block.apply(null, args[0]);
       }
-    }
-
-    if (!args.$$is_array) {
-      var args_ary = new Array(args.length);
-      for(var i = 0, l = args_ary.length; i < l; i++) { args_ary[i] = args[i]; }
-
-      return block.apply(null, args_ary);
     }
 
     return block.apply(null, args);
@@ -1873,6 +1864,11 @@
   }
   Opal.jsid = $jsid;
 
+  function $prepend(first, second) {
+    if (!second.$$is_array) second = $slice(second);
+    return [first].concat(second);
+  }
+
   // Calls passed method on a ruby object with arguments and block:
   //
   // Can take a method or a method name.
@@ -1916,7 +1912,7 @@
   Opal.send2 = function(recv, body, method, args, block, blockopts) {
     if (body == null && method != null && recv.$method_missing) {
       body = recv.$method_missing;
-      args = [method].concat(args);
+      args = $prepend(method, args);
     }
 
     apply_blockopts(block, blockopts);
@@ -2175,16 +2171,11 @@
     // We need a wrapper because otherwise properties
     // would be overwritten on the original body.
     alias = function() {
-      var block = alias.$$p, args, i, ii;
-
-      args = new Array(arguments.length);
-      for(i = 0, ii = arguments.length; i < ii; i++) {
-        args[i] = arguments[i];
-      }
+      var block = alias.$$p, i, ii;
 
       alias.$$p = null;
 
-      return Opal.send(this, body, args, block);
+      return Opal.send(this, body, arguments, block);
     };
 
     // Assign the 'length' value with defineProperty because
@@ -3035,10 +3026,9 @@
 
   // Foward calls to define_method on the top object to Object
   function top_define_method() {
-    var args = $slice(arguments);
     var block = top_define_method.$$p;
     top_define_method.$$p = null;
-    return Opal.send(_Object, 'define_method', args, block)
+    return Opal.send(_Object, 'define_method', arguments, block)
   };
 
   // Nil
