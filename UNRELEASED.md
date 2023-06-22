@@ -47,6 +47,8 @@
 - Opal.stub_for: optimize (#2541) 
 - Hash: Optimize #to_a (#2541) 
 - Array: Optimize #collect/#map (#2541)
+- Optimize argument slicing in runtime for performance (#2555)
+- Closure: Generate a JS object, not an Error, gain up to 15% on Asciidoctor (#2556)
 
 ### Internal
 
