@@ -3042,7 +3042,7 @@
   Object.seal(nil);
 
   Opal.thrower = function(type) {
-    var thrower = new Error('unexpected '+type);
+    var thrower = { message: 'unexpected '+type };
     thrower.$thrower_type = type;
     thrower.$throw = function(value) {
       if (value == null) value = nil;
