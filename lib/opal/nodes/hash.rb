@@ -107,7 +107,7 @@ module Opal
           push hash_obj[key]
         end
 
-        wrap "$hash2([#{hash_keys.join ', '}], {", '})'
+        wrap "$hash2([#{hash_keys.join ', '}], Object.setPrototypeOf({", '}, null))'
       end
     end
 

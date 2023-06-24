@@ -1834,7 +1834,7 @@
   //
   Opal.kwrestargs = function(given_args, used_args) {
     var keys      = [],
-        map       = {},
+        map       = Object.create(null),
         key           ,
         given_map = given_args.$$smap;
 
@@ -2553,7 +2553,7 @@
   // helper that can be used from methods
   function $deny_frozen_access(obj) {
     if (obj.$$frozen) {
-      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), Opal.hash2(["receiver"], {"receiver": obj}));
+      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), Opal.hash2(["receiver"], Object.setPrototypeOf({"receiver": obj}, null)));
     }
   };
   Opal.deny_frozen_access = $deny_frozen_access;
@@ -2929,7 +2929,7 @@
   // Primitives for handling parameters
   Opal.ensure_kwargs = function(kwargs) {
     if (kwargs == null) {
-      return Opal.hash2([], {});
+      return Opal.hash2([], Object.create(null));
     } else if (kwargs.$$is_hash) {
       return kwargs;
     } else {
