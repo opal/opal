@@ -228,7 +228,7 @@ class ::Array < `Array`
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        if (hash.get(item) === undefined) {
+        if (hash["$[]"](item) === undefined) {
           result.push(item);
         }
       }
@@ -1442,11 +1442,11 @@ class ::Array < `Array`
       }
 
       for (i = 0, length = small.length; i < length; i++) {
-        hash.set(small[i], true);
+        hash["$[]="](small[i], true);
       }
 
       for (i = 0, length = large.length; i < length; i++) {
-        if (hash.get(large[i])) {
+        if (hash["$[]"](large[i])) {
           return true;
         }
       }
@@ -2366,7 +2366,7 @@ class ::Array < `Array`
       if (block === nil) {
         for (i = 0, length = self.length; i < length; i++) {
           item = self[i];
-          if (hash.get(item) === undefined) {
+          if (hash["$[]"](item) === undefined) {
             hash.set(item, item);
           }
         }
@@ -2375,7 +2375,7 @@ class ::Array < `Array`
         for (i = 0, length = self.length; i < length; i++) {
           item = self[i];
           key = $yield1(block, item);
-          if (hash.get(key) === undefined) {
+          if (hash["$[]"](key) === undefined) {
             hash.set(key, item);
           }
         }
@@ -2395,7 +2395,7 @@ class ::Array < `Array`
         item = self[i];
         key = (block === nil ? item : $yield1(block, item));
 
-        if (hash.get(key) === undefined) {
+        if (hash["$[]"](key) === undefined) {
           hash.set(key, item);
           continue;
         }
