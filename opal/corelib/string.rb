@@ -1158,7 +1158,7 @@ class ::String < `String`
         } else {
           var prefix = $coerce_to(prefixes[i], #{::String}, 'to_str').$to_s();
 
-          if (self.indexOf(prefix) === 0) {
+          if (self.length >= prefix.length && self.startsWith(prefix)) {
             return true;
           }
         }
