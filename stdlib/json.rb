@@ -157,16 +157,11 @@ class Hash
     %x{
       var result = [];
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
-
+        value = self.get(key);
+        
         result.push(#{`key`.to_s.to_json} + ':' + #{`value`.to_json});
       }
 

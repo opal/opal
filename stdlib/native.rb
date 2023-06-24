@@ -542,8 +542,7 @@ unless Hash.method_defined? :_initialize
         if (defaults != null &&
              (defaults.constructor === undefined ||
                defaults.constructor === Object)) {
-          var smap = self.$$smap,
-              keys = self.$$keys,
+          var keys = Array.from(self.keys()),
               key, value;
 
           for (key in defaults) {
@@ -552,7 +551,7 @@ unless Hash.method_defined? :_initialize
             if (value &&
                  (value.constructor === undefined ||
                    value.constructor === Object)) {
-              smap[key] = #{Hash.new(`value`)};
+              self.set(key, #{Hash.new(`value`)});
             } else if (value && value.$$is_array) {
               value = value.map(function(item) {
                 if (item &&
@@ -563,9 +562,9 @@ unless Hash.method_defined? :_initialize
 
                 return #{Native(`item`)};
               });
-              smap[key] = value
+              self.set(key, value);
             } else {
-              smap[key] = #{Native(`value`)};
+              self.set(key, #{Native(`value`)});
             }
 
             keys.push(key);
@@ -583,19 +582,13 @@ unless Hash.method_defined? :_initialize
     def to_n
       %x{
         var result = {},
-            keys = self.$$keys,
-            smap = self.$$smap,
+            keys = Array.from(self.keys()),
             key, value;
 
         for (var i = 0, length = keys.length; i < length; i++) {
           key = keys[i];
 
-          if (key.$$is_string) {
-            value = smap[key];
-          } else {
-            key = key.key;
-            value = key.value;
-          }
+          value = self.get(key);
 
           result[key] = #{Native.try_convert(`value`, `value`)};
         }

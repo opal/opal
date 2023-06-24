@@ -11,11 +11,11 @@ require 'corelib/enumerable'
 # - $$keys        [Array<hash-bucket>] the list of all keys
 # - $$proc        [Proc,null,nil] the default proc used for missing keys
 # - hash-bucket   [JS::Object] an element of a linked list that holds hash values, keys are `{key:,key_hash:,value:,next:}`
-class ::Hash
+class ::Hash < `Map`
   include ::Enumerable
 
   # Mark all hash instances as valid hashes (used to check keyword args, etc)
-  `self.$$prototype.$$is_hash = true`
+  `Opal.prop(self.$$prototype, '$$is_hash', true)`
 
   def self.[](*argv)
     %x{
@@ -67,11 +67,8 @@ class ::Hash
   end
 
   def self.allocate
+    hash = super
     %x{
-      var hash = new self.$$constructor();
-
-      $hash_init(hash);
-
       hash.$$none = nil;
       hash.$$proc = nil;
 
@@ -107,20 +104,15 @@ class ::Hash
         return false;
       }
 
-      if (self.$$keys.length !== other.$$keys.length) {
+      if (self.size !== other.size) {
         return false;
       }
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, other_value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, other_value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-          other_value = other.$$smap[key];
-        } else {
-          value = key.value;
-          other_value = $hash_get(other, key.key);
-        }
+        value = self.get(key);
+        other_value = other.get(key);
 
         if (other_value === undefined || !value['$eql?'](other_value)) {
           return false;
@@ -135,7 +127,7 @@ class ::Hash
     other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
 
     %x{
-      if (self.$$keys.length < other.$$keys.length) {
+      if (self.size < other.size) {
         return false
       }
     }
@@ -160,7 +152,7 @@ class ::Hash
     other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
 
     %x{
-      if (self.$$keys.length <= other.$$keys.length) {
+      if (self.size <= other.size) {
         return false
       }
     }
@@ -180,7 +172,7 @@ class ::Hash
 
   def [](key)
     %x{
-      var value = $hash_get(self, key);
+      var value = self.get(key);
 
       if (value !== undefined) {
         return value;
@@ -194,24 +186,18 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      $hash_put(self, key, value);
+      self.set(key, value);
       return value;
     }
   end
 
   def assoc(object)
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          if (#{`key` == object}) {
-            return [key, self.$$smap[key]];
-          }
-        } else {
-          if (#{`key.key` == object}) {
-            return [key.key, key.value];
-          }
+        if (#{`key` == object}) {
+          return [key, self.get(key)];
         }
       }
 
@@ -223,17 +209,19 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      $hash_init(self);
+      self.clear();
       return self;
     }
   end
 
   def clone
     %x{
-      var hash = new self.$$class();
+      var hash = new Opal.Hash.$$constructor();
 
-      $hash_init(hash);
-      Opal.hash_clone(self, hash);
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key; i < length; i++) {
+        key = keys[i];
+        hash.set(key, self.get(key));
+      }
 
       return hash;
     }
@@ -241,20 +229,15 @@ class ::Hash
 
   def compact
     %x{
-      var hash = $hash();
+      var hash = new Opal.Hash.$$constructor();
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         if (value !== nil) {
-          $hash_put(hash, key, value);
+          hash.set(key, value);
         }
       }
 
@@ -268,22 +251,13 @@ class ::Hash
 
       var changes_were_made = false;
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
-        if (value === nil) {
-          if ($hash_delete(self, key) !== undefined) {
-            changes_were_made = true;
-            length--;
-            i--;
-          }
+        if (value === nil && self.delete(key)) {
+          changes_were_made = true;
         }
       }
 
@@ -295,10 +269,10 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      var i, ii, key, keys = self.$$keys, identity_hash;
+      var i, ii, key, keys = Array.from(self.keys()), identity_hash;
 
       if (self.$$by_identity) return self;
-      if (self.$$keys.length === 0) {
+      if (self.size === 0) {
         self.$$by_identity = true
         return self;
       }
@@ -306,13 +280,13 @@ class ::Hash
       identity_hash = #{ {}.compare_by_identity };
       for(i = 0, ii = keys.length; i < ii; i++) {
         key = keys[i];
-        if (!key.$$is_string) key = key.key;
-        $hash_put(identity_hash, key, $hash_get(self, key));
+        identity_hash.set(key, self.get(key));
       }
 
       self.$$by_identity = true;
-      self.$$map = identity_hash.$$map;
-      self.$$smap = identity_hash.$$smap;
+      // that wont work
+      // self.$$map = identity_hash.$$map;
+      // self.$$smap = identity_hash.$$smap;
       return self;
     }
   end
@@ -377,7 +351,8 @@ class ::Hash
   def delete(key, &block)
     %x{
       $deny_frozen_access(self);
-      var value = $hash_delete(self, key);
+      var value = self.get(key);
+      self.delete(key);
 
       if (value !== undefined) {
         return value;
@@ -397,23 +372,15 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         obj = block(key, value);
 
         if (obj !== false && obj !== nil) {
-          if ($hash_delete(self, key) !== undefined) {
-            length--;
-            i--;
-          }
+          self.delete(key);
         }
       }
 
@@ -441,16 +408,9 @@ class ::Hash
     return enum_for(:each) { size } unless block
 
     %x{
-      for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
-
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
-
+        value = self.get(key);
         $yield1(block, [key, value]);
       }
 
@@ -462,10 +422,8 @@ class ::Hash
     return enum_for(:each_key) { size } unless block
 
     %x{
-      for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        block(key.$$is_string ? key : key.key);
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length; i < length; i++) {
+        block(keys[i]);
       }
 
       return self;
@@ -476,10 +434,8 @@ class ::Hash
     return enum_for(:each_value) { size } unless block
 
     %x{
-      for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        block(key.$$is_string ? self.$$smap[key] : key.value);
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length; i < length; i++) {
+        block(self.get(keys[i]));
       }
 
       return self;
@@ -487,7 +443,7 @@ class ::Hash
   end
 
   def empty?
-    `self.$$keys.length === 0`
+    `self.size === 0`
   end
 
   def except(*keys)
@@ -501,7 +457,7 @@ class ::Hash
 
   def fetch(key, defaults = undefined, &block)
     %x{
-      var value = $hash_get(self, key);
+      var value = self.get(key);
 
       if (value !== undefined) {
         return value;
@@ -529,15 +485,10 @@ class ::Hash
     %x{
       var result = [];
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         result.push(key);
 
@@ -565,15 +516,13 @@ class ::Hash
   end
 
   def has_key?(key)
-    `$hash_get(self, key) !== undefined`
+    `self.has(key)`
   end
 
   def has_value?(value)
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        if (#{`(key.$$is_string ? self.$$smap[key] : key.value)` == value}) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length; i < length; i++) {
+        if (#{`self.get(keys[i])` == value}) {
           return true;
         }
       }
@@ -607,14 +556,9 @@ class ::Hash
 
         Opal.hash_ids[hash_id] = self;
 
-        for (var i = 0, keys = self.$$keys, length = keys.length; i < length; i++) {
+        for (var i = 0, keys = Array.from(self.keys()), length = keys.length; i < length; i++) {
           key = keys[i];
-
-          if (key.$$is_string) {
-            result.push([key, self.$$smap[key].$hash()]);
-          } else {
-            result.push([key.key_hash, key.value.$hash()]);
-          }
+          result.push([key, self.get(key).$hash()]);
         }
 
         return result.sort().join();
@@ -629,15 +573,10 @@ class ::Hash
 
   def index(object)
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         if (#{`value` == object}) {
           return key;
@@ -654,7 +593,7 @@ class ::Hash
 
       for (var i = 0, length = args.length, key, value; i < length; i++) {
         key = args[i];
-        value = $hash_get(self, key);
+        value = self.get(key);
 
         if (value === undefined) {
           result.push(#{default});
@@ -689,15 +628,10 @@ class ::Hash
 
         inspect_ids[hash_id] = true;
 
-        for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+        for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
           key = keys[i];
 
-          if (key.$$is_string) {
-            value = self.$$smap[key];
-          } else {
-            value = key.value;
-            key = key.key;
-          }
+          value = self.get(key);
 
           key = #{Opal.inspect(`key`)}
           value = #{Opal.inspect(`value`)}
@@ -715,19 +649,14 @@ class ::Hash
 
   def invert
     %x{
-      var hash = $hash();
+      var hash = new Opal.Hash.$$constructor();
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
-        $hash_put(hash, value, key);
+        hash.set(value, key);
       }
 
       return hash;
@@ -740,23 +669,15 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         obj = block(key, value);
 
         if (obj === false || obj === nil) {
-          if ($hash_delete(self, key) !== undefined) {
-            length--;
-            i--;
-          }
+          self.delete(key);
         }
       }
 
@@ -765,25 +686,11 @@ class ::Hash
   end
 
   def keys
-    %x{
-      var result = [];
-
-      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        if (key.$$is_string) {
-          result.push(key);
-        } else {
-          result.push(key.key);
-        }
-      }
-
-      return result;
-    }
+    `Array.from(self.keys())`
   end
 
   def length
-    `self.$$keys.length`
+    `self.size`
   end
 
   def merge(*others, &block)
@@ -796,40 +703,27 @@ class ::Hash
       var i, j, other, other_keys, length, key, value, other_value;
       for (i = 0; i < others.length; ++i) {
         other = #{::Opal.coerce_to!(`others[i]`, ::Hash, :to_hash)};
-        other_keys = other.$$keys, length = other_keys.length;
+        other_keys = Array.from(other.keys()), length = other_keys.length;
 
         if (block === nil) {
           for (j = 0; j < length; j++) {
             key = other_keys[j];
-
-            if (key.$$is_string) {
-              other_value = other.$$smap[key];
-            } else {
-              other_value = key.value;
-              key = key.key;
-            }
-
-            $hash_put(self, key, other_value);
+            self.set(key, other.get(key));
           }
         } else {
           for (j = 0; j < length; j++) {
             key = other_keys[j];
 
-            if (key.$$is_string) {
-              other_value = other.$$smap[key];
-            } else {
-              other_value = key.value;
-              key = key.key;
-            }
+            other.get(key)
 
-            value = $hash_get(self, key);
+            value = self.get(key);
 
             if (value === undefined) {
-              $hash_put(self, key, other_value);
+              self.set(key, other_value);
               continue;
             }
 
-            $hash_put(self, key, block(key, value, other_value));
+            self.set(key, block(key, value, other_value));
           }
         }
       }
@@ -840,15 +734,10 @@ class ::Hash
 
   def rassoc(object)
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         if (#{`value` == object}) {
           return [key, value];
@@ -871,22 +760,17 @@ class ::Hash
     return enum_for(:reject) { size } unless block
 
     %x{
-      var hash = $hash();
+      var hash = new Opal.Hash.$$constructor();
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         obj = block(key, value);
 
         if (obj === false || obj === nil) {
-          $hash_put(hash, key, value);
+          hash.set(key, value);
         }
       }
 
@@ -902,24 +786,15 @@ class ::Hash
 
       var changes_were_made = false;
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         obj = block(key, value);
 
-        if (obj !== false && obj !== nil) {
-          if ($hash_delete(self, key) !== undefined) {
-            changes_were_made = true;
-            length--;
-            i--;
-          }
+        if (obj !== false && obj !== nil && self.delete(self, key)) {
+          changes_were_made = true;
         }
       }
 
@@ -933,19 +808,12 @@ class ::Hash
     other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
 
     %x{
-      $hash_init(self);
+      self.clesar();
 
-      for (var i = 0, other_keys = other.$$keys, length = other_keys.length, key, value, other_value; i < length; i++) {
+      for (var i = 0, other_keys = other.$$keys, length = other_keys.length, key, value; i < length; i++) {
         key = other_keys[i];
 
-        if (key.$$is_string) {
-          other_value = other.$$smap[key];
-        } else {
-          other_value = key.value;
-          key = key.key;
-        }
-
-        $hash_put(self, key, other_value);
+        self.set(key, other.get(key));
       }
     }
 
@@ -962,22 +830,17 @@ class ::Hash
     return enum_for(:select) { size } unless block
 
     %x{
-      var hash = $hash();
+      var hash = new Opal.Hash.$$constructor();
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         obj = block(key, value);
 
         if (obj !== false && obj !== nil) {
-          $hash_put(hash, key, value);
+          hash.set(key, value);
         }
       }
 
@@ -993,23 +856,15 @@ class ::Hash
 
       var result = nil;
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         obj = block(key, value);
 
         if (obj === false || obj === nil) {
-          if ($hash_delete(self, key) !== undefined) {
-            length--;
-            i--;
-          }
+          self.delete(key);
           result = self;
         }
       }
@@ -1021,15 +876,17 @@ class ::Hash
   def shift
     %x{
       $deny_frozen_access(self);
-      var keys = self.$$keys,
-          key;
+      var keys = Array.from(self.keys()),
+          key, value;
 
       if (keys.length > 0) {
         key = keys[0];
 
-        key = key.$$is_string ? key : key.key;
+        value = self.get(key);
 
-        return [key, $hash_delete(self, key)];
+        self.delete(key);
+
+        return [key, value];
       }
 
       return nil;
@@ -1038,13 +895,13 @@ class ::Hash
 
   def slice(*keys)
     %x{
-      var result = $hash();
+      var result = new self.$$class();
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], value = $hash_get(self, key);
+        var key = keys[i], value = self.get(key);
 
         if (value !== undefined) {
-          $hash_put(result, key, value);
+          result.set(key, value);
         }
       }
 
@@ -1054,22 +911,15 @@ class ::Hash
 
   def to_a
     %x{
-      var keys = self.$$keys;
+      var keys = Array.from(self.keys());
       var length = keys.length;
       var result = new Array(length);
-      var key, value;
+      var key;
 
       for (var i = 0; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
-
-        result[i] = [key, value];
+        result[i] = [key, self.get(key)];
       }
 
       return result;
@@ -1084,9 +934,8 @@ class ::Hash
         return self;
       }
 
-      var hash = new Opal.Hash();
+      var hash = new Opal.Hash.$$constructor();
 
-      $hash_init(hash);
       Opal.hash_clone(self, hash);
 
       return hash;
@@ -1113,21 +962,16 @@ class ::Hash
     return enum_for(:transform_keys) { size } unless block
 
     %x{
-      var result = $hash();
+      var result = new self.$$class();
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         key = $yield1(block, key);
 
-        $hash_put(result, key, value);
+        result.set(key, value);
       }
 
       return result;
@@ -1140,23 +984,18 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      var keys = Opal.slice(self.$$keys),
+      var keys = Array.from(self.keys()),
           i, length = keys.length, key, value, new_key;
 
       for (i = 0; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         new_key = $yield1(block, key);
 
-        $hash_delete(self, key);
-        $hash_put(self, new_key, value);
+        self.delete(key);
+        self.set(new_key, value);
       }
 
       return self;
@@ -1167,21 +1006,16 @@ class ::Hash
     return enum_for(:transform_values) { size } unless block
 
     %x{
-      var result = $hash();
+      var result = new self.$$class();
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         value = $yield1(block, value);
 
-        $hash_put(result, key, value);
+        result.set(key, value);
       }
 
       return result;
@@ -1194,19 +1028,14 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = self.get(key);
 
         value = $yield1(block, value);
 
-        $hash_put(self, key, value);
+        self.set(key, value);
       }
 
       return self;
@@ -1217,14 +1046,8 @@ class ::Hash
     %x{
       var result = [];
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        if (key.$$is_string) {
-          result.push(self.$$smap[key]);
-        } else {
-          result.push(key.value);
-        }
+      for (var i = 0, keys = Array.from(self.keys()), length = keys.length; i < length; i++) {
+        result.push(self.get(keys[i]));
       }
 
       return result;

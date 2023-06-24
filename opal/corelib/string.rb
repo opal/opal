@@ -24,8 +24,8 @@ class ::String < `String`
       var str = args[0] || "";
       var opts = args[args.length-1];
       str = $coerce_to(str, #{::String}, 'to_str');
-      if (opts && opts.$$is_hash) {
-        if (opts.$$smap.encoding) str = str.$force_encoding(opts.$$smap.encoding);
+      if (opts && opts.$$is_hash && opts.has("encoding")) {
+        str = str.$force_encoding(opts.get("encoding"));
       }
       str = new self.$$constructor(str);
       if (!str.$initialize.$$pristine) #{`str`.initialize(*args)};
