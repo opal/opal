@@ -1554,9 +1554,9 @@
       // call method missing with correct args (remove '$' prefix on method name)
       return this.$method_missing.apply(this, $prepend(method_name.slice(1), arguments));
     };
-  
+
     method_missing_stub.$$stub = true;
-  
+
     return method_missing_stub;
   };
 
@@ -2257,7 +2257,7 @@
 
   Opal.hash_put = function(hash, key, value) {
     if (key.$$is_string) {
-      if (!$has_own(hash.$$smap, key)) {
+      if (typeof hash.$$smap[key] === "undefined") {
         hash.$$keys.push(key);
       }
       hash.$$smap[key] = value;
@@ -2267,7 +2267,7 @@
     var key_hash, bucket, last_bucket;
     key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
-    if (!$has_own(hash.$$map, key_hash)) {
+    if (typeof hash.$$map[key_hash] === "undefined") {
       bucket = {key: key, key_hash: key_hash, value: value};
       hash.$$keys.push(bucket);
       hash.$$map[key_hash] = bucket;
@@ -2295,7 +2295,7 @@
 
   Opal.hash_get = function(hash, key) {
     if (key.$$is_string) {
-      if ($has_own(hash.$$smap, key)) {
+      if (typeof hash.$$smap[key] !== "undefined") {
         return hash.$$smap[key];
       }
       return;
@@ -2304,7 +2304,7 @@
     var key_hash, bucket;
     key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
-    if ($has_own(hash.$$map, key_hash)) {
+    if (typeof hash.$$map[key_hash] !== "undefined") {
       bucket = hash.$$map[key_hash];
 
       while (bucket) {
@@ -2322,7 +2322,7 @@
     if (key.$$is_string) {
       if (typeof key !== "string") key = key.valueOf();
 
-      if (!$has_own(hash.$$smap, key)) {
+      if (typeof hash.$$smap[key] === "undefined") {
         return;
       }
 
@@ -2346,7 +2346,7 @@
 
     var key_hash = key.$hash();
 
-    if (!$has_own(hash.$$map, key_hash)) {
+    if (typeof hash.$$map[key_hash] === "undefined") {
       return;
     }
 
@@ -2421,7 +2421,7 @@
 
       hash.$$keys[i].key_hash = key_hash;
 
-      if (!$has_own(hash.$$map, key_hash)) {
+      if (typeof hash.$$map[key_hash] === "undefined") {
         hash.$$map[key_hash] = hash.$$keys[i];
         continue;
       }
@@ -2938,7 +2938,7 @@
   }
 
   Opal.get_kwarg = function(kwargs, key) {
-    if (!$has_own(kwargs.$$smap, key)) {
+    if (typeof kwargs.$$smap[key] === "undefined") {
       $raise(Opal.ArgumentError, 'missing keyword: '+key);
     }
     return kwargs.$$smap[key];
