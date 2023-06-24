@@ -80,7 +80,7 @@ module Opal
           push '[', expr(key), ', ', expr(value), ']'
         end
 
-        wrap 'new Map([', '])'
+        wrap '(new Map([', ']))'
       end
     end
 

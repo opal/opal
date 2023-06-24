@@ -1833,16 +1833,18 @@
   // @return [Hash]
   //
   Opal.kwrestargs = function(given_args, used_args) {
-    var map       = [],
+    var keys   = Array.from(given_args.keys()),
+        map    = new Map(),
         key;
 
-    for (key in given_args) {
+    for (var i = 0; i < keys.length; i++) {
+      key = keys[i];
       if (!used_args[key]) {
-        map.push([key, given_map[key]]);
+        map.set(key, given_args.get(key));
       }
     }
 
-    return new Map(map);
+    return map;
   };
 
   function apply_blockopts(block, blockopts) {
