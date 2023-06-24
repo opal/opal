@@ -1,4 +1,4 @@
-# helpers: yield1, hash, hash_init, hash_get, hash_put, hash_delete, deny_frozen_access, freeze
+# helpers: yield1, hash, deny_frozen_access, freeze
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -216,7 +216,7 @@ class ::Hash < `Map`
 
   def clone
     %x{
-      var hash = new Opal.Hash.$$constructor();
+      var hash = new Map();
 
       for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key; i < length; i++) {
         key = keys[i];
@@ -229,7 +229,7 @@ class ::Hash < `Map`
 
   def compact
     %x{
-      var hash = new Opal.Hash.$$constructor();
+      var hash = new Map();
 
       for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
@@ -649,7 +649,7 @@ class ::Hash < `Map`
 
   def invert
     %x{
-      var hash = new Opal.Hash.$$constructor();
+      var hash = new Map();
 
       for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
@@ -760,7 +760,7 @@ class ::Hash < `Map`
     return enum_for(:reject) { size } unless block
 
     %x{
-      var hash = new Opal.Hash.$$constructor();
+      var hash = new Map();
 
       for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
@@ -830,7 +830,7 @@ class ::Hash < `Map`
     return enum_for(:select) { size } unless block
 
     %x{
-      var hash = new Opal.Hash.$$constructor();
+      var hash = new Map();
 
       for (var i = 0, keys = Array.from(self.keys()), length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
@@ -934,9 +934,15 @@ class ::Hash < `Map`
         return self;
       }
 
-      var hash = new Opal.Hash.$$constructor();
+      var hash = new Map();
 
-      Opal.hash_clone(self, hash);
+      hash.$$none = self.$$none;
+      hash.$$proc = self.$$proc;
+  
+      for (var i = 0, keys = Array.from(from_hash.keys()), len = keys.length, key; i < len; i++) {
+        key = keys[i];
+        hash.set(key, self.get(key));
+      }
 
       return hash;
     }

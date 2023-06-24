@@ -1246,7 +1246,7 @@ module ::Enumerable
     return map(&block).to_h(*args) if block_given?
 
     %x{
-      var hash = #{{}};
+      var hash = new Map();
 
       self.$each.$$p = function() {
         var param = #{::Opal.destructure(`arguments`)};
@@ -1260,7 +1260,7 @@ module ::Enumerable
         key = ary[0];
         val = ary[1];
 
-        Opal.hash_put(hash, key, val);
+        hash.set(key, val);
       };
 
       self.$each.apply(self, args);

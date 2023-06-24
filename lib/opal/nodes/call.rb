@@ -366,7 +366,7 @@ module Opal
       end
 
       add_special :__OPAL_COMPILER_CONFIG__ do
-        push fragment "Opal.hash({ arity_check: #{compiler.arity_check?} })"
+        push fragment "new Map([['arity_check', #{compiler.arity_check?}]])"
       end
 
       add_special :lambda do |compile_default|

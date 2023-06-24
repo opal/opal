@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze
+# helpers: truthy, falsy, hash_ids, yield1, coerce_to, respond_to, deny_frozen_access, freeze
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -150,15 +150,16 @@ class ::Array < `Array`
         return [];
       }
 
-      var result = [], hash = #{{}}, i, length, item;
+      var result = [], hash = new Map(), i, length, item, val;
 
       for (i = 0, length = other.length; i < length; i++) {
-        $hash_put(hash, other[i], true);
+        hash.set(other[i], true);
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        if ($hash_delete(hash, item) !== undefined) {
+
+        if (hash.delete(item)) {
           result.push(item);
         }
       }
@@ -171,17 +172,17 @@ class ::Array < `Array`
     other = `convertToArray(other)`
 
     %x{
-      var hash = #{{}}, i, length, item;
+      var hash = new Map(), i, length, item;
 
       for (i = 0, length = self.length; i < length; i++) {
-        $hash_put(hash, self[i], true);
+        hash.set(self[i], true);
       }
 
       for (i = 0, length = other.length; i < length; i++) {
-        $hash_put(hash, other[i], true);
+        hash.set(other[i], true);
       }
 
-      return hash.$keys();
+      return Array.from(hash.keys());
     }
   end
 
@@ -219,15 +220,15 @@ class ::Array < `Array`
     return `self.slice()` if `other.length === 0`
 
     %x{
-      var result = [], hash = #{{}}, i, length, item;
+      var result = [], hash = new Map(), i, length, item;
 
       for (i = 0, length = other.length; i < length; i++) {
-        $hash_put(hash, other[i], true);
+        hash.set(other[i], true);
       }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        if ($hash_get(hash, item) === undefined) {
+        if (hash.get(item) === undefined) {
           result.push(item);
         }
       }
@@ -1431,7 +1432,7 @@ class ::Array < `Array`
 
   def intersect?(other)
     %x{
-      var small, large, hash = #{{}}, i, length;
+      var small, large, hash = new Map(), i, length;
       if (self.length < other.length) {
         small = self;
         large = other;
@@ -1441,11 +1442,11 @@ class ::Array < `Array`
       }
 
       for (i = 0, length = small.length; i < length; i++) {
-        $hash_put(hash, small[i], true);
+        hash.set(small[i], true);
       }
 
       for (i = 0, length = large.length; i < length; i++) {
-        if ($hash_get(hash, large[i])) {
+        if (hash.get(large[i])) {
           return true;
         }
       }
@@ -2311,7 +2312,7 @@ class ::Array < `Array`
     array = array.map(&block) if block_given?
 
     %x{
-      var i, len = array.length, ary, key, val, hash = #{{}};
+      var i, len = array.length, ary, key, val, hash = new Map();
 
       for (i = 0; i < len; i++) {
         ary = #{::Opal.coerce_to?(`array[i]`, ::Array, :to_ary)};
@@ -2323,7 +2324,7 @@ class ::Array < `Array`
         }
         key = ary[0];
         val = ary[1];
-        $hash_put(hash, key, val);
+        hash.set(key, val);
       }
 
       return hash;
@@ -2360,13 +2361,13 @@ class ::Array < `Array`
 
   def uniq(&block)
     %x{
-      var hash = #{{}}, i, length, item, key;
+      var hash = new Map(), i, length, item, key;
 
       if (block === nil) {
         for (i = 0, length = self.length; i < length; i++) {
           item = self[i];
-          if ($hash_get(hash, item) === undefined) {
-            $hash_put(hash, item, item);
+          if (hash.get(item) === undefined) {
+            hash.set(item, item);
           }
         }
       }
@@ -2374,13 +2375,13 @@ class ::Array < `Array`
         for (i = 0, length = self.length; i < length; i++) {
           item = self[i];
           key = $yield1(block, item);
-          if ($hash_get(hash, key) === undefined) {
-            $hash_put(hash, key, item);
+          if (hash.get(key) === undefined) {
+            hash.set(key, item);
           }
         }
       }
 
-      return #{`hash`.values};
+      return Array.from(hash.values());
     }
   end
 
@@ -2388,14 +2389,14 @@ class ::Array < `Array`
     %x{
       $deny_frozen_access(self);
 
-      var original_length = self.length, hash = #{{}}, i, length, item, key;
+      var original_length = self.length, hash = new Map(), i, length, item, key;
 
       for (i = 0, length = original_length; i < length; i++) {
         item = self[i];
         key = (block === nil ? item : $yield1(block, item));
 
-        if ($hash_get(hash, key) === undefined) {
-          $hash_put(hash, key, item);
+        if (hash.get(key) === undefined) {
+          hash.set(key, item);
           continue;
         }
 

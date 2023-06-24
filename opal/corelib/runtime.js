@@ -1823,7 +1823,7 @@
 
   // Used to get a list of rest keyword arguments. Method takes the given
   // keyword args, i.e. the hash literal passed to the method containing all
-  // keyword arguemnts passed to method, as well as the used args which are
+  // keyword arguments passed to method, as well as the used args which are
   // the names of required and optional arguments defined. This method then
   // just returns all key/value pairs which have not been used, in a new
   // hash literal.
@@ -1833,19 +1833,16 @@
   // @return [Hash]
   //
   Opal.kwrestargs = function(given_args, used_args) {
-    var keys      = [],
-        map       = {},
-        key           ,
-        given_map = given_args;
+    var map       = [],
+        key;
 
-    for (key in given_map) {
+    for (key in given_args) {
       if (!used_args[key]) {
-        keys.push(key);
-        map[key] = given_map[key];
+        map.push([key, given_map[key]]);
       }
     }
 
-    return Opal.hash2(keys, map);
+    return new Map(map);
   };
 
   function apply_blockopts(block, blockopts) {
@@ -2231,39 +2228,6 @@
   // Hashes
   // ------
 
-  Opal.hash_init = function(hash) {
-    // can be removed, but keep for now until working correctly
-    hash.clear();
-  };
-
-  Opal.hash_clone = function(from_hash, to_hash) {
-    to_hash.$$none = from_hash.$$none;
-    to_hash.$$proc = from_hash.$$proc;
-
-    for (var i = 0, keys = Array.from(from_hash.keys()), len = keys.length, key, value; i < len; i++) {
-      key = keys[i];
-
-      value = from_hash.get(key);
-
-      to_hash.set(key, value);
-    }
-  };
-
-  Opal.hash_put = function(hash, key, value) {
-    // can be removed too, but keep until working correctly
-    hash.set(key, value);
-  };
-
-  Opal.hash_get = function(hash, key) {
-    return hash.get(key);
-  };
-
-  Opal.hash_delete = function(hash, key) {
-    var value = hash.get(key);
-    hash.delete(key);
-    return value;
-  };
-
   Opal.hash_rehash = function(hash) {
     // how to rehash a Map?
   };
@@ -2275,7 +2239,7 @@
       return arguments[0];
     }
 
-    hash = new Opal.Hash.$$constructor();
+    hash = new Map();
 
     if (arguments_length === 1) {
       args = arguments[0];
@@ -2291,7 +2255,7 @@
           key = args[i][0];
           value = args[i][1];
 
-          Opal.hash_put(hash, key, value);
+          hash.set(key, value);
         }
 
         return hash;
@@ -2321,20 +2285,6 @@
       hash.set(key, value);
     }
 
-    return hash;
-  };
-
-  // A faster Hash creator for hashes that just use symbols and
-  // strings as keys. The map and keys array can be constructed at
-  // compile time, so they are just added here by the constructor
-  // function.
-  //
-  Opal.hash2 = function(keys, smap) {
-    var hash = new Opal.Hash.$$constructor();
-    var i, length = keys.length;
-    for (i = 0; i < length; i++) {
-      hash.set(smap[keys[i]]);
-    }
     return hash;
   };
 
@@ -2375,7 +2325,7 @@
   // helper that can be used from methods
   function $deny_frozen_access(obj) {
     if (obj.$$frozen) {
-      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), Opal.hash2(["receiver"], {"receiver": obj}));
+      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), new Map([["receiver", obj]]));
     }
   };
   Opal.deny_frozen_access = $deny_frozen_access;
@@ -2500,7 +2450,7 @@
         if (part.ignoreCase !== ignoreCase)
           Opal.Kernel.$warn(
             "ignore case doesn't match for " + part.source.$inspect(),
-            Opal.hash({uplevel: 1})
+            new Map([["uplevel", 1]])
           )
 
         part = part.source;
@@ -2751,7 +2701,7 @@
   // Primitives for handling parameters
   Opal.ensure_kwargs = function(kwargs) {
     if (kwargs == null) {
-      return Opal.hash2([], {});
+      return new Map();
     } else if (kwargs.$$is_hash) {
       return kwargs;
     } else {
