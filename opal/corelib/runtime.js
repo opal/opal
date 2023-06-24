@@ -2230,8 +2230,23 @@
   // Hashes
   // ------
 
-  Opal.hash_rehash = function(hash) {
-    // how to rehash a Map?
+  // JS Map accesses keys by reference, Ruby Hash by key equality
+  // test non literal keys for key quality
+  Opal.hash_value_for_key = function(hash, key) {
+    var type = typeof key;
+    if (type === "object" || type === "function" || type === "symbol") {
+      var keys_i = hash.keys(), key_o, key_v;
+      while (!(key_o = keys_i.next()).done) {
+        key_v = key_o.value;
+        type = typeof key_v;
+        if ((type === "object" || type === "function" || type === "symbol") && Opal.send(key_v, "eql?", [key])) {
+          return hash.get(key_v);
+        }
+      }
+      return undefined;
+    } else {
+      return hash.get(key);
+    }
   };
 
   Opal.hash = function() {

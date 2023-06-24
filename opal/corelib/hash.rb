@@ -1,4 +1,4 @@
-# helpers: yield1, deny_frozen_access, freeze
+# helpers: hash_value_for_key, yield1, deny_frozen_access, freeze
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -6,9 +6,6 @@ require 'corelib/enumerable'
 # ---
 # Internal properties:
 #
-# - $$map         [JS::Object<String => hash-bucket>] the hash table for ordinary keys
-# - $$smap        [JS::Object<String => hash-bucket>] the hash table for string keys
-# - $$keys        [Array<hash-bucket>] the list of all keys
 # - $$proc        [Proc,null,nil] the default proc used for missing keys
 # - hash-bucket   [JS::Object] an element of a linked list that holds hash values, keys are `{key:,key_hash:,value:,next:}`
 class ::Hash < `Map`
@@ -170,30 +167,9 @@ class ::Hash < `Map`
     other >= self
   end
 
-  %x{
-    // JS Map accesses keys by reference, Ruby Hash by key equality
-    // test for key quality
-    function get_value_for_key(hash, key) {
-      var type = typeof key;
-      if (type === "object" || type === "function" || type === "symbol") {
-        var keys_i = hash.keys(), key_o, key_v;
-        while (!(key_o = keys_i.next()).done) {
-          key_v = key_o.value;
-          type = typeof key_v;
-          if ((type === "object" || type === "function" || type === "symbol") && #{`key_v` == `key`}) {
-            return hash.get(key_v);
-          }
-        }
-        return undefined;
-      } else {
-        return hash.get(key);
-      }
-    }
-  }
-
   def [](key)
     %x{
-      var value = get_value_for_key(self, key);
+      var value = $hash_value_for_key(self, key);
 
       if (value !== undefined) {
         return value;
@@ -389,7 +365,7 @@ class ::Hash < `Map`
   def delete(key, &block)
     %x{
       $deny_frozen_access(self);
-      var value = get_value_for_key(self, key);
+      var value = $hash_value_for_key(self, key);
       self.delete(key);
 
       if (value !== undefined) {
@@ -495,7 +471,7 @@ class ::Hash < `Map`
 
   def fetch(key, defaults = undefined, &block)
     %x{
-      var value = get_value_for_key(self, key);
+      var value = $hash_value_for_key(self, key);
 
       if (value !== undefined) {
         return value;
@@ -769,7 +745,7 @@ class ::Hash < `Map`
 
             other_value = other.get(key)
 
-            value = get_value_for_key(self, key);
+            value = $hash_value_for_key(self, key);
 
             if (value === undefined) {
               self.set(key, other_value);
@@ -951,7 +927,7 @@ class ::Hash < `Map`
       var result = new self.$$class();
 
       for (var i = 0, length = keys.length; i < length; i++) {
-        var key = keys[i], value = get_value_for_key(self, key);
+        var key = keys[i], value = $hash_value_for_key(self, key);
 
         if (value !== undefined) {
           result.set(key, value);
@@ -1102,7 +1078,7 @@ class ::Hash < `Map`
   end
 
   def values
-    `Array.from(self.values());`
+    `Array.from(self.values())`
   end
 
   alias dup clone

@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, hash_ids, yield1, coerce_to, respond_to, deny_frozen_access, freeze
+# helpers: truthy, falsy, hash_value_for_key, hash_ids, yield1, coerce_to, respond_to, deny_frozen_access, freeze
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -228,7 +228,7 @@ class ::Array < `Array`
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
-        if (hash["$[]"](item) === undefined) {
+        if ($hash_value_for_key(hash, item) === undefined) {
           result.push(item);
         }
       }
@@ -1446,7 +1446,7 @@ class ::Array < `Array`
       }
 
       for (i = 0, length = large.length; i < length; i++) {
-        if (hash["$[]"](large[i])) {
+        if ($hash_value_for_key(hash, large[i])) {
           return true;
         }
       }
@@ -2366,7 +2366,7 @@ class ::Array < `Array`
       if (block === nil) {
         for (i = 0, length = self.length; i < length; i++) {
           item = self[i];
-          if (hash["$[]"](item) === undefined) {
+          if ($hash_value_for_key(hash, item) === undefined) {
             hash.set(item, item);
           }
         }
@@ -2375,7 +2375,7 @@ class ::Array < `Array`
         for (i = 0, length = self.length; i < length; i++) {
           item = self[i];
           key = $yield1(block, item);
-          if (hash["$[]"](key) === undefined) {
+          if ($hash_value_for_key(hash, key) === undefined) {
             hash.set(key, item);
           }
         }
@@ -2395,7 +2395,7 @@ class ::Array < `Array`
         item = self[i];
         key = (block === nil ? item : $yield1(block, item));
 
-        if (hash["$[]"](key) === undefined) {
+        if ($hash_value_for_key(hash, key) === undefined) {
           hash.set(key, item);
           continue;
         }
