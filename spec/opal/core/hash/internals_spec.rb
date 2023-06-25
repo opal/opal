@@ -30,15 +30,15 @@ describe 'Hash' do
     end
 
     it 'does not use the `map` object' do
-      `Object.keys(#@h.$$map).length`.should == 0
+      `(#@h.$$map ? #@h.$$map : nil)`.should == nil
 
       @h['c'] = 789
 
-      `Object.keys(#@h.$$map).length`.should == 0
+      `(#@h.$$map ? #@h.$$map : nil)`.should == nil
     end
 
     it 'uses the `map` object when an object key is added' do
-      `Object.keys(#@h.$$map).length`.should == 0
+      `(#@h.$$map ? #@h.$$map : nil)`.should == nil
 
       @h[Object.new] = 789
 
@@ -128,7 +128,7 @@ describe 'Hash' do
       @mock3.should_receive(:hash).at_least(1).and_return('hhh')
       @mock3.should_receive(:eql?).exactly(2).and_return(false)
 
-      `Object.keys(#@hash.$$map).length`.should == 0
+      `(#@hash.$$map ? #@hash.$$map : nil)`.should == nil
       `#@hash.$$keys.length`.should == 0
 
       @hash[@mock1] = 123

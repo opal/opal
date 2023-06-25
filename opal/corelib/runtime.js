@@ -2233,8 +2233,14 @@
 
   Opal.hash_init = function(hash) {
     hash.$$smap = Object.create(null);
-    hash.$$map  = Object.create(null);
+    hash.$$map = undefined;
     hash.$$keys = [];
+  };
+
+  Opal.hash_get_map = function get_map(hash) {
+    if (typeof hash.$$map === "undefined")
+      hash.$$map = Object.create(null);
+    return hash.$$map;
   };
 
   Opal.hash_clone = function(from_hash, to_hash) {
@@ -2267,14 +2273,15 @@
     var key_hash, bucket, last_bucket;
     key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
-    if (typeof hash.$$map[key_hash] === "undefined") {
+    var map = Opal.hash_get_map(hash);
+    if (typeof map[key_hash] === "undefined") {
       bucket = {key: key, key_hash: key_hash, value: value};
       hash.$$keys.push(bucket);
-      hash.$$map[key_hash] = bucket;
+      map[key_hash] = bucket;
       return;
     }
 
-    bucket = hash.$$map[key_hash];
+    bucket = map[key_hash];
 
     while (bucket) {
       if (key === bucket.key || key['$eql?'](bucket.key)) {
@@ -2301,8 +2308,14 @@
       return;
     }
 
-    var key_hash, bucket;
-    key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
+    if (!hash.$$map) {
+      // specs demand key.$hash() to be called even if $$map does not exist
+      // and thus the hash cannot have a value for that key
+      if (!hash.$$by_identity) key.$hash();
+      return;
+    }
+
+    var bucket, key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
 
     if (typeof hash.$$map[key_hash] !== "undefined") {
       bucket = hash.$$map[key_hash];
@@ -2343,6 +2356,8 @@
       delete hash.$$smap[key];
       return value;
     }
+
+    if (!hash.$$map) return;
 
     var key_hash = key.$hash();
 
@@ -2386,7 +2401,7 @@
   Opal.hash_rehash = function(hash) {
     for (var i = 0, length = hash.$$keys.length, key_hash, bucket, last_bucket; i < length; i++) {
 
-      if (hash.$$keys[i].$$is_string) {
+      if (hash.$$keys[i].$$is_string || !hash.$$map) {
         continue;
       }
 
@@ -2510,7 +2525,6 @@
     var hash = new Opal.Hash();
 
     hash.$$smap = smap;
-    hash.$$map  = Object.create(null);
     hash.$$keys = keys;
 
     return hash;
