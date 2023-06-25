@@ -10,4 +10,5 @@ opal_unsupported_filter "Hash" do
   fails "Hash#to_proc the returned proc passed as a block to instance_exec always retrieves the original hash's values" # Expected nil == 1 to be truthy but was false
   fails "Hash#to_proc the returned proc raises ArgumentError if not passed exactly one argument" # Expected ArgumentError but no exception was raised (nil was returned)
   fails "Hash#to_s does not raise if inspected result is not default external encoding" # Mock 'utf_16be' expected to receive inspect("any_args") exactly 1 times but received it 0 times
+  fails "Hash#[] compares key via hash" # Mock '0' expected to receive hash("any_args") exactly 1 times but received it 0 times (performance optimization)
 end
