@@ -95,19 +95,23 @@ module Opal
         hash_obj, hash_keys = {}, []
         helper :hash2
 
-        keys.size.times do |idx|
-          key = keys[idx].children[0].to_s.inspect
-          hash_keys << key unless hash_obj.include? key
-          hash_obj[key] = expr(values[idx])
-        end
+        if keys.size > 0
+          keys.size.times do |idx|
+            key = keys[idx].children[0].to_s.inspect
+            hash_keys << key unless hash_obj.include? key
+            hash_obj[key] = expr(values[idx])
+          end
 
-        hash_keys.each_with_index do |key, idx|
-          push ', ' unless idx == 0
-          push "#{key}: "
-          push hash_obj[key]
-        end
+          hash_keys.each_with_index do |key, idx|
+            push ', ' unless idx == 0
+            push "#{key}: "
+            push hash_obj[key]
+          end
 
-        wrap "$hash2([#{hash_keys.join ', '}], Object.setPrototypeOf({", '}, null))'
+          wrap "$hash2([#{hash_keys.join ', '}], Object.setPrototypeOf({", '}, null))'
+        else
+          push '$hash2([], Object.create(null))' # faster than setPrototypeOf({}, null)
+        end
       end
     end
 
