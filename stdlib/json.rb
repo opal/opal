@@ -38,7 +38,7 @@ module JSON
           if (!value) return nil;
 
           if (value.$$is_array) {
-            arr = #{`options.array_class`.new};
+            arr = #{`Opal.hash_get(options, 'array_class')`.new};
 
             for (i = 0, ii = value.length; i < ii; i++) {
               #{`arr`.push(`to_opal(value[i], options)`)};
@@ -47,7 +47,7 @@ module JSON
             return arr;
           }
           else {
-            hash = #{`options.object_class`.new};
+            hash = #{`Opal.hash_get(options, 'object_class')`.new};
 
             for (k in value) {
               if ($hasOwn.call(value, k)) {
@@ -55,7 +55,7 @@ module JSON
               }
             }
 
-            if (!options.parse && (klass = #{`hash`[JSON.create_id]}) != nil) {
+            if (!Opal.hash_get(options, 'parse') && (klass = #{`hash`[JSON.create_id]}) != nil) {
               return #{::Object.const_get(`klass`).json_create(`hash`)};
             }
             else {
@@ -97,7 +97,7 @@ module JSON
     options[:object_class] ||= Hash
     options[:array_class]  ||= Array
 
-    `to_opal(js_object, options.$$map)`
+    `to_opal(js_object, options)`
   end
 
   def self.generate(obj, options = {})

@@ -542,9 +542,7 @@ unless Hash.method_defined? :_initialize
         if (defaults != null &&
              (defaults.constructor === undefined ||
                defaults.constructor === Object)) {
-          var map = self.$$map,
-              keys = self.$$keys,
-              key, value;
+          var key, value;
 
           for (key in defaults) {
             value = defaults[key];
@@ -552,7 +550,7 @@ unless Hash.method_defined? :_initialize
             if (value &&
                  (value.constructor === undefined ||
                    value.constructor === Object)) {
-              smap[key] = #{Hash.new(`value`)};
+              $hash_put(self, key, #{Hash.new(`value`)});
             } else if (value && value.$$is_array) {
               value = value.map(function(item) {
                 if (item &&
@@ -560,15 +558,12 @@ unless Hash.method_defined? :_initialize
                        item.constructor === Object)) {
                   return #{Hash.new(`item`)};
                 }
-
                 return #{Native(`item`)};
               });
-              map[key] = { key: key, key_hash: key, value: value }
+              $hash_put(self, key, value)
             } else {
-              map[key] = { key: key, key_hash: key, value: #{Native(`value`)} };
+              $hash_put(self, key, #{Native(`value`)});
             }
-
-            keys.push(key);
           }
 
           return self;
@@ -584,7 +579,6 @@ unless Hash.method_defined? :_initialize
       %x{
         var result = {},
             keys = self.$$keys,
-            map = self.$$map,
             key, value;
 
         for (var i = 0, length = keys.length; i < length; i++) {

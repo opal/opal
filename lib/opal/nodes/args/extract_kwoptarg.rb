@@ -16,12 +16,13 @@ module Opal
         children :lvar_name, :default_value
 
         def compile
+          helper :hash_get
           key_name = @sexp.meta[:arg_name]
           scope.used_kwargs << key_name
 
           add_temp lvar_name
 
-          line "#{lvar_name} = ($kwargs.$$map[#{key_name.to_s.inspect}]) ? $kwargs.$$map[#{key_name.to_s.inspect}].value : undefined;"
+          line "#{lvar_name} = $hash_get($kwargs, #{key_name.to_s.inspect});"
 
           return if default_value.children[1] == :undefined
 

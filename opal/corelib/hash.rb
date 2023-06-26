@@ -1,4 +1,4 @@
-# helpers: yield1, hash, hash_init, hash_get, hash_put, hash_delete, deny_frozen_access, freeze
+# helpers: yield1, hash, hash_clone, hash_get, hash_put, hash_delete, deny_frozen_access, freeze
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -10,7 +10,7 @@ require 'corelib/enumerable'
 # - $$keys        [Array<hash-bucket>] the list of all keys
 # - $$proc        [Proc,null,nil] the default proc used for missing keys
 # - hash-bucket   [JS::Object] an element of a linked list that holds hash values, keys are `{key:,key_hash:,value:,next:}`
-class ::Hash
+class ::Hash < `Map`
   include ::Enumerable
 
   # Mark all hash instances as valid hashes (used to check keyword args, etc)
@@ -68,8 +68,7 @@ class ::Hash
   def self.allocate
     %x{
       var hash = new self.$$constructor();
-
-      $hash_init(hash);
+      hash.$$keys = [];
 
       hash.$$none = nil;
       hash.$$proc = nil;
@@ -110,13 +109,12 @@ class ::Hash
         return false;
       }
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, other_value; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, other_value; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
         other_value = $hash_get(other, key.key);
 
-        if (other_value === undefined || !value['$eql?'](other_value)) {
+        if (other_value === undefined || !key.value['$eql?'](other_value)) {
           return false;
         }
       }
@@ -211,17 +209,18 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      $hash_init(self);
+      self.clear()
+      self.$$keys = []
       return self;
     }
   end
 
   def clone
     %x{
-      var hash = new self.$$class();
+      var hash = self.$class().$new();
+      hash.$$keys = []
 
-      $hash_init(hash);
-      Opal.hash_clone(self, hash);
+      $hash_clone(self, hash);
 
       return hash;
     }
@@ -231,14 +230,11 @@ class ::Hash
     %x{
       var hash = $hash();
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, obj; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        if (value !== nil) {
-          $hash_put(hash, key, value);
+        if (key.value !== nil) {
+          $hash_put(hash, key.key, key.value);
         }
       }
 
@@ -252,14 +248,11 @@ class ::Hash
 
       var changes_were_made = false;
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, obj; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        if (value === nil) {
-          if ($hash_delete(self, key) !== undefined) {
+        if (key.value === nil) {
+          if ($hash_delete(self, key.key) !== undefined) {
             changes_were_made = true;
             length--;
             i--;
@@ -290,7 +283,7 @@ class ::Hash
       }
 
       self.$$by_identity = true;
-      self.$$map = identity_hash.$$map;
+      self.$$map = identity_hash.$$map; // TODO
       return self;
     }
   end
@@ -375,16 +368,13 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, obj; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        obj = block(key, value);
+        obj = block(key.key, key.value);
 
         if (obj !== false && obj !== nil) {
-          if ($hash_delete(self, key) !== undefined) {
+          if ($hash_delete(self, key.key) !== undefined) {
             length--;
             i--;
           }
@@ -415,15 +405,12 @@ class ::Hash
     return enum_for(:each) { size } unless block
 
     %x{
-      for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key; i < length; i++) {
         key = keys[i];
 
         if (!key) #{raise};
 
-        value = key.value;
-        key = key.key;
-
-        $yield1(block, [key, value]);
+        $yield1(block, [key.key, key.value]);
       }
 
       return self;
@@ -434,10 +421,8 @@ class ::Hash
     return enum_for(:each_key) { size } unless block
 
     %x{
-      for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        block(key.key);
+      for (var i = 0, keys = self.$$keys.slice(), length = keys.length; i < length; i++) {
+        block(keys[i].key);
       }
 
       return self;
@@ -448,10 +433,8 @@ class ::Hash
     return enum_for(:each_value) { size } unless block
 
     %x{
-      for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        block(key.value);
+      for (var i = 0, keys = self.$$keys.slice(), length = keys.length; i < length; i++) {
+        block(keys[i].value);
       }
 
       return self;
@@ -505,9 +488,8 @@ class ::Hash
         key = keys[i];
 
         value = key.value;
-        key = key.key;
 
-        result.push(key);
+        result.push(key.key);
 
         if (value.$$is_array) {
           if (level === 1) {
@@ -538,10 +520,8 @@ class ::Hash
 
   def has_value?(value)
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        if (#{`key.value` == value}) {
+      for (var i = 0, keys = self.$$keys, length = keys.length; i < length; i++) {
+        if (#{`keys[i].value` == value}) {
           return true;
         }
       }
@@ -593,14 +573,11 @@ class ::Hash
 
   def index(object)
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        if (#{`value` == object}) {
-          return key;
+        if (#{`key.value` == object}) {
+          return key.key;
         }
       }
 
@@ -652,12 +629,9 @@ class ::Hash
         for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
           key = keys[i];
 
-          value = key.value;
-          key = key.key;
-
-          key = #{Opal.inspect(`key`)}
-          value = #{Opal.inspect(`value`)}
-
+          value = #{Opal.inspect(`key.value`)}
+          key = #{Opal.inspect(`key.key`)}
+          
           result.push(key + '=>' + value);
         }
 
@@ -675,11 +649,7 @@ class ::Hash
 
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
-
-        value = key.value;
-        key = key.key;
-
-        $hash_put(hash, value, key);
+        $hash_put(hash, key.value, key.key);
       }
 
       return hash;
@@ -692,16 +662,13 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, obj; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        obj = block(key, value);
+        obj = block(key.key, key.value);
 
         if (obj === false || obj === nil) {
-          if ($hash_delete(self, key) !== undefined) {
+          if ($hash_delete(self, key.key) !== undefined) {
             length--;
             i--;
           }
@@ -735,7 +702,8 @@ class ::Hash
   def merge!(*others, &block)
     %x{
       $deny_frozen_access(self);
-      var i, j, other, other_keys, length, key, value, other_value;
+
+      var i, j, other, other_keys, length, key, value;
       for (i = 0; i < others.length; ++i) {
         other = #{::Opal.coerce_to!(`others[i]`, ::Hash, :to_hash)};
         other_keys = other.$$keys, length = other_keys.length;
@@ -744,26 +712,20 @@ class ::Hash
           for (j = 0; j < length; j++) {
             key = other_keys[j];
 
-            other_value = key.value;
-            key = key.key;
-
-            $hash_put(self, key, other_value);
+            $hash_put(self, key.key, key.value);
           }
         } else {
           for (j = 0; j < length; j++) {
             key = other_keys[j];
 
-            other_value = key.value;
-            key = key.key;
-
-            value = $hash_get(self, key);
+            value = $hash_get(self, key.key);
 
             if (value === undefined) {
-              $hash_put(self, key, other_value);
+              $hash_put(self, key.key, key.value);
               continue;
             }
 
-            $hash_put(self, key, block(key, value, other_value));
+            $hash_put(self, key.key, block(key.key, value, key.value));
           }
         }
       }
@@ -774,14 +736,11 @@ class ::Hash
 
   def rassoc(object)
     %x{
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        if (#{`value` == object}) {
-          return [key, value];
+        if (#{`key.value` == object}) {
+          return [key.key, key.value];
         }
       }
 
@@ -803,16 +762,13 @@ class ::Hash
     %x{
       var hash = $hash();
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, obj; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        obj = block(key, value);
+        obj = block(key.key, key.value);
 
         if (obj === false || obj === nil) {
-          $hash_put(hash, key, value);
+          $hash_put(hash, key.key, key.value);
         }
       }
 
@@ -828,16 +784,13 @@ class ::Hash
 
       var changes_were_made = false;
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, obj; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        obj = block(key, value);
+        obj = block(key.key, key.value);
 
         if (obj !== false && obj !== nil) {
-          if ($hash_delete(self, key) !== undefined) {
+          if ($hash_delete(self, key.key) !== undefined) {
             changes_were_made = true;
             length--;
             i--;
@@ -855,15 +808,13 @@ class ::Hash
     other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
 
     %x{
-      $hash_init(self);
+      self.clear();
+      self.$$keys = []
 
-      for (var i = 0, other_keys = other.$$keys, length = other_keys.length, key, value, other_value; i < length; i++) {
+      for (var i = 0, other_keys = other.$$keys, length = other_keys.length, key, other_value; i < length; i++) {
         key = other_keys[i];
 
-        other_value = key.value;
-        key = key.key;
-
-        $hash_put(self, key, other_value);
+        $hash_put(self, key.key, key.value);
       }
     }
 
@@ -882,16 +833,13 @@ class ::Hash
     %x{
       var hash = $hash();
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, obj; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        obj = block(key, value);
+        obj = block(key.key, key.value);
 
         if (obj !== false && obj !== nil) {
-          $hash_put(hash, key, value);
+          $hash_put(hash, key.key, key.value);
         }
       }
 
@@ -907,16 +855,13 @@ class ::Hash
 
       var result = nil;
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
+      for (var i = 0, keys = self.$$keys, length = keys.length, key, obj; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        obj = block(key, value);
+        obj = block(key.key, key.value);
 
         if (obj === false || obj === nil) {
-          if ($hash_delete(self, key) !== undefined) {
+          if ($hash_delete(self, key.key) !== undefined) {
             length--;
             i--;
           }
@@ -962,15 +907,12 @@ class ::Hash
       var keys = self.$$keys;
       var length = keys.length;
       var result = new Array(length);
-      var key, value;
+      var key;
 
       for (var i = 0; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
-
-        result[i] = [key, value];
+        result[i] = [key.key, key.value];
       }
 
       return result;
@@ -985,10 +927,10 @@ class ::Hash
         return self;
       }
 
-      var hash = new Opal.Hash();
+      var hash = new Map();
+      hash.$$keys = []
 
-      $hash_init(hash);
-      Opal.hash_clone(self, hash);
+      $hash_clone(self, hash);
 
       return hash;
     }
@@ -1020,9 +962,8 @@ class ::Hash
         key = keys[i];
 
         value = key.value;
-        key = key.key;
 
-        key = $yield1(block, key);
+        key = $yield1(block, key.key);
 
         $hash_put(result, key, value);
       }
@@ -1038,18 +979,15 @@ class ::Hash
       $deny_frozen_access(self);
 
       var keys = Opal.slice(self.$$keys),
-          i, length = keys.length, key, value, new_key;
+          i, length = keys.length, key, new_key;
 
       for (i = 0; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
+        new_key = $yield1(block, key.key);
 
-        new_key = $yield1(block, key);
-
-        $hash_delete(self, key);
-        $hash_put(self, new_key, value);
+        $hash_delete(self, key.key);
+        $hash_put(self, new_key, key.value);
       }
 
       return self;
@@ -1065,12 +1003,9 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
+        value = $yield1(block, key.value);
 
-        value = $yield1(block, value);
-
-        $hash_put(result, key, value);
+        $hash_put(result, key.key, value);
       }
 
       return result;
@@ -1086,12 +1021,9 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        value = key.value;
-        key = key.key;
+        value = $yield1(block, key.value);
 
-        value = $yield1(block, value);
-
-        $hash_put(self, key, value);
+        $hash_put(self, key.key, value);
       }
 
       return self;
@@ -1102,10 +1034,8 @@ class ::Hash
     %x{
       var result = [];
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        result.push(key.value);
+      for (var i = 0, keys = self.$$keys, length = keys.length; i < length; i++) {
+        result.push(keys[i].value);
       }
 
       return result;

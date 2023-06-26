@@ -103,12 +103,10 @@ module Opal
 
         hash_keys.each_with_index do |key, idx|
           push ', ' unless idx == 0
-          push "#{key}: { key: #{key}, key_hash: #{key}, value: "
-          push hash_obj[key]
-          push '}'
+          push "#{key}", ', ', hash_obj[key]
         end
 
-        wrap "$hash2({", '})'
+        wrap '$hash2(', ')'
       end
     end
 
