@@ -39,8 +39,6 @@ opal_filter "Proc" do
   fails "Proc#inspect for a proc created with proc returns a description including file and line number" # Expected "#<Proc:0x123ac>" =~ /^#<Proc:([^ ]*?) ruby\/core\/proc\/shared\/to_s\.rb:24>$/ to be truthy but was nil
   fails "Proc#lambda? is preserved when passing a Proc with & to the lambda keyword" # Expected true to be false
   fails "Proc#lambda? is preserved when passing a Proc with & to the proc keyword" # Expected false to be true
-  fails "Proc#ruby2_keywords applies to the underlying method and applies across duplication" # Expected false == true to be truthy but was false
-  fails "Proc#ruby2_keywords marks the final hash argument as keyword hash" # Expected false == true to be truthy but was false
   fails "Proc#ruby2_keywords prints warning when a proc accepts keyword splat" # Expected warning to match: /Skipping set of ruby2_keywords flag for/ but got: ""
   fails "Proc#ruby2_keywords prints warning when a proc accepts keywords" # Expected warning to match: /Skipping set of ruby2_keywords flag for/ but got: ""
   fails "Proc#ruby2_keywords prints warning when a proc does not accept argument splat" # Expected warning to match: /Skipping set of ruby2_keywords flag for/ but got: ""

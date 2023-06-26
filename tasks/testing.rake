@@ -335,6 +335,7 @@ platforms.each do |platform|
         files = %w[
           benchmark/test_benchmark.rb
           ruby/test_call.rb
+          ruby/test_data.rb
           opal/test_keyword.rb
           opal/test_base64.rb
           opal/test_openuri.rb
@@ -359,7 +360,7 @@ platforms.each do |platform|
         files.push('nodejs') if platform == 'nodejs'
         Testing::Minitest.write_file(filename, files, ENV)
 
-        stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
+        stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor -rcorelib/pattern_matching/base -rcorelib/marshal"
         includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
 
         sh "ruby -rbundler/setup "\

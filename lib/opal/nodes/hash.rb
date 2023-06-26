@@ -5,7 +5,7 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class HashNode < Base
-      handle :hash
+      handle :hash, :kwargs
 
       attr_accessor :has_kwsplat, :keys, :values
 
@@ -26,6 +26,11 @@ module Opal
         end
       end
 
+      # Is this hash passed as kwargs?
+      def kwargs?
+        @sexp.type == :kwargs
+      end
+
       def simple_keys?
         keys.all? { |key| %i[sym str].include?(key.type) }
       end
@@ -37,6 +42,12 @@ module Opal
           compile_hash2
         else
           compile_hash
+        end
+
+        if kwargs?
+          helper :kw
+
+          wrap '...$kw(', ')'
         end
       end
 
@@ -86,7 +97,7 @@ module Opal
           push expr(key), ', ', expr(value)
         end
 
-        wrap '$hash(', ')'
+        wrap "$hash(", ')'
       end
 
       # Compiles a hash without kwsplats
@@ -116,7 +127,9 @@ module Opal
       children :value
 
       def compile
-        push 'Opal.to_hash(', expr(value), ')'
+        helper :to_hash
+
+        push '$to_hash(', expr(value), ')'
       end
     end
   end

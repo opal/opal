@@ -247,6 +247,12 @@ module Minitest
       assert o1.__send__(op, o2), msg
     end
 
+    def assert_not_operator o1, op, o2 = UNDEFINED, msg = nil
+      return assert_not_predicate o1, op, msg if UNDEFINED == o2
+      msg = message(msg) { "Expected #{mu_pp(o1)} not to be #{op} #{mu_pp(o2)}" }
+      assert !o1.__send__(op, o2), msg
+    end
+
     ##
     # Fails if stdout or stderr do not output the expected results.
     # Pass in nil if you don't care about that streams output. Pass in
@@ -283,6 +289,11 @@ module Minitest
     def assert_predicate o1, op, msg = nil
       msg = message(msg) { "Expected #{mu_pp(o1)} to be #{op}" }
       assert o1.__send__(op), msg
+    end
+
+    def assert_not_predicate o1, op, msg = nil
+      msg = message(msg) { "Expected #{mu_pp(o1)} not to be #{op}" }
+      assert !o1.__send__(op), msg
     end
 
     ##
@@ -328,6 +339,13 @@ module Minitest
       assert obj.respond_to?(meth), msg
     end
 
+    def assert_not_respond_to obj, meth, msg = nil
+      msg = message(msg) {
+        "Expected #{mu_pp(obj)} (#{obj.class}) not to respond to ##{meth}"
+      }
+      assert !obj.respond_to?(meth), msg
+    end
+
     ##
     # Fails unless +exp+ and +act+ are #equal?
 
@@ -337,6 +355,14 @@ module Minitest
         "Expected %s (oid=%d) to be the same as %s (oid=%d)" % data
       }
       assert exp.equal?(act), msg
+    end
+
+    def assert_not_same exp, act, msg = nil
+      msg = message(msg) {
+        data = [mu_pp(act), act.object_id, mu_pp(exp), exp.object_id]
+        "Expected %s (oid=%d) to not be the same as %s (oid=%d)" % data
+      }
+      assert !exp.equal?(act), msg
     end
 
     ##

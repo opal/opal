@@ -173,17 +173,12 @@ opal_filter "Module" do
   fails "Module#refine raises TypeError if not passed a class" # Expected TypeError but got: Exception (Cannot create property '$$id' on string 'foo')
   fails "Module#remove_const calls #to_str to convert the given name to a String" # Mock 'CS_CONST257' expected to receive to_str("any_args") exactly 1 times but received it 0 times
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails" # Expected TypeError but got: NameError (constant ConstantSpecs::ConstantSpecs not defined)
-  fails "Module#ruby2_keywords accepts String as well" # Expected false == true to be truthy but was false
-  fails "Module#ruby2_keywords applies to the underlying method and applies across aliasing" # Expected false == true to be truthy but was false
   fails "Module#ruby2_keywords does NOT copy the Hash when calling a method taking (*args)" # Expected false == true to be truthy but was false
-  fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (**kw)" # Expected false == true to be truthy but was false
   fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (arg)" # Expected false == true to be truthy but was false
   fails "Module#ruby2_keywords makes a copy of the hash and only marks the copy as keyword hash" # Expected false == true to be truthy but was false
-  fails "Module#ruby2_keywords marks the final hash argument as keyword hash" # Expected false == true to be truthy but was false
   fails "Module#ruby2_keywords prints warning when a method accepts keyword splat" # Expected warning to match: /Skipping set of ruby2_keywords flag for/ but got: ""
   fails "Module#ruby2_keywords prints warning when a method accepts keywords" # Expected warning to match: /Skipping set of ruby2_keywords flag for/ but got: ""
   fails "Module#ruby2_keywords prints warning when a method does not accept argument splat" # Expected warning to match: /Skipping set of ruby2_keywords flag for/ but got: ""
-  fails "Module#ruby2_keywords raises NameError when passed not existing method name" # Expected NameError (/undefined method `not_existing'/) but no exception was raised (nil was returned)
   fails "Module#ruby2_keywords raises TypeError when passed not Symbol or String" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (nil was returned)
   fails "Module#to_s always show the refinement name, even if the module is named" # Expected "ModuleSpecs::RefinementInspect::R" == "#<refinement:String@ModuleSpecs::RefinementInspect>" to be truthy but was false
   fails "Module#to_s does not call #inspect or #to_s for singleton classes" # Expected "#<Class:#<:0x599ac>>" =~ /\A#<Class:#<#<Class:0x599b0>:0x\h+>>\z/ to be truthy but was nil

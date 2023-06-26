@@ -10,12 +10,15 @@ require 'corelib/enumerable'
 # - $$smap        [JS::Object<String => hash-bucket>] the hash table for string keys
 # - $$keys        [Array<hash-bucket>] the list of all keys
 # - $$proc        [Proc,null,nil] the default proc used for missing keys
+# - $$kw          [true,false] is this hash being passed as kwargs?
 # - hash-bucket   [JS::Object] an element of a linked list that holds hash values, keys are `{key:,key_hash:,value:,next:}`
 class ::Hash
   include ::Enumerable
 
   # Mark all hash instances as valid hashes (used to check keyword args, etc)
   `self.$$prototype.$$is_hash = true`
+  # By default, it's not a kwargs hash
+  `self.$$prototype.$$kw = false`
 
   def self.[](*argv)
     %x{
@@ -1229,6 +1232,16 @@ class ::Hash
 
       return result;
     }
+  end
+
+  def self.ruby2_keywords_hash?(hash)
+    `hash.$$ruby2kw == true`
+  end
+
+  def self.ruby2_keywords_hash(hash)
+    newhash = hash.dup
+    `newhash.$$ruby2kw = newhash.$$kw = true`
+    newhash
   end
 
   alias dup clone

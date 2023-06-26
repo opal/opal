@@ -5,12 +5,9 @@ opal_filter "language" do
   fails "$LOAD_PATH.resolve_feature_path returns what will be loaded without actual loading, .so file" # NoMethodError: undefined method `resolve_feature_path' for []
   fails "A Proc taking |*a, **kw| arguments does not autosplat keyword arguments" # Expected [[1], {"a"=>1}] == [[[1, {"a"=>1}]], {}] to be truthy but was false
   fails "A Symbol literal with invalid bytes raises an EncodingError at parse time" # Expected EncodingError (/invalid/) but no exception was raised ("Ã" was returned)
-  fails "A block yielded a single Array assigns elements to mixed argument types" # Expected [1, 2, [], 3, 2, {"x"=>9}] == [1, 2, [3], {"x"=>9}, 2, {}] to be truthy but was false
   fails "A block yielded a single Array autosplats single argument to required arguments when a keyword rest argument is present" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on final argument to get keyword arguments and does not autosplat" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on the argument when optional argument and keyword argument accepted and does not autosplat" # ArgumentError: expected kwargs
-  fails "A block yielded a single Array does not call #to_hash on the last element if keyword arguments are present" # ArgumentError: expected kwargs
-  fails "A block yielded a single Array does not call #to_hash on the last element when there are more arguments than parameters" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not treat final Hash as keyword arguments and does not autosplat" # Expected [nil, {"a"=>10}] == [[{"a"=>10}], {}] to be truthy but was false
   fails "A block yielded a single Array does not treat hashes with string keys as keyword arguments and does not autosplat" # Expected [nil, {"a"=>10}] == [[{"a"=>10}], {}] to be truthy but was false
   fails "A block yielded a single Array when non-symbol keys are in a keyword arguments Hash does not separate non-symbol keys and symbol keys and does not autosplat" # Expected [nil, {"a"=>10, "b"=>2}] == [[{"a"=>10, "b"=>2}], {}] to be truthy but was false
@@ -19,13 +16,9 @@ opal_filter "language" do
   fails "A class definition raises TypeError if any constant qualifying the class is not a Module" # Expected TypeError but no exception was raised (nil was returned)
   fails "A class definition raises TypeError if the constant qualifying the class is nil" # Expected TypeError but no exception was raised (nil was returned)
   fails "A class definition raises a TypeError if inheriting from a metaclass" # Expected TypeError but no exception was raised (nil was returned)
-  fails "A lambda expression 'lambda { ... }' assigns variables from parameters for definition '@a = lambda { |*, **k| k }'" # ArgumentError: expected kwargs
   fails "A lambda expression 'lambda { ... }' assigns variables from parameters for definition \n    def m(a) yield a end\n    def m2() yield end\n    @a = lambda { |a, | a }" # ArgumentError: `block in <main>': wrong number of arguments (given 2, expected 1)
   fails "A lambda expression 'lambda { ... }' requires a block" # Expected ArgumentError but got: Exception (Cannot add property $$is_lambda, object is not extensible)
   fails "A lambda expression 'lambda { ... }' with an implicit block raises ArgumentError" # Expected ArgumentError (/tried to create Proc object without a block/) but got: Exception (Cannot add property $$is_lambda, object is not extensible)
-  fails "A lambda literal -> () { } assigns variables from parameters for definition '@a = -> (*, **k) { k }'" # ArgumentError: expected kwargs
-  fails "A method assigns local variables from method parameters for definition 'def m() end'" # ArgumentError: [SpecEvaluate#m] wrong number of arguments (given 1, expected 0)
-  fails "A method assigns local variables from method parameters for definition 'def m(*a) a end'" # Expected [{}] == [] to be truthy but was false
   fails "A method assigns local variables from method parameters for definition 'def m(a, **) a end'" # Expected ArgumentError but no exception was raised ({"a"=>1, "b"=>2} was returned)
   fails "A method assigns local variables from method parameters for definition 'def m(a, **k) [a, k] end'" # Expected ArgumentError but no exception was raised ([{"a"=>1, "b"=>2}, {}] was returned)
   fails "A method assigns local variables from method parameters for definition 'def m(a, **nil); a end;'" # Expected ArgumentError but no exception was raised ({"a"=>1} was returned)
@@ -36,13 +29,9 @@ opal_filter "language" do
   fails "A method assigns local variables from method parameters for definition 'def m(a:, b:) [a, b] end'" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b: 2) [a, b] end'" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
   fails "A method assigns local variables from method parameters for definition 'def m(a=1, b:) [a, b] end'" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
-  fails "A method assigns local variables from method parameters for definition \n    def m(a, b = nil, c = nil, d, e: nil, **f)\n      [a, b, c, d, e, f]\n    end" # Expected [1, nil, nil, 2, nil, {"foo"=>"bar"}] == [1, 2, nil, {"foo"=>"bar"}, nil, {}] to be truthy but was false
-  fails "A method assigns the last Hash to the last optional argument if the Hash contains non-Symbol keys and is not passed as keywords" # Expected ["a", {}, false] == ["a", {"key"=>"value"}, false] to be truthy but was false
   fails "A method definition in an eval creates a class method" # NoMethodError: undefined method `an_eval_class_method' for DefSpecNestedB
   fails "A method definition in an eval creates an instance method" # NoMethodError: undefined method `an_eval_instance_method' for #<DefSpecNested:0x108f2>
   fails "A method raises ArgumentError if passing hash as keyword arguments for definition 'def m(a: nil); a; end'" # Expected ArgumentError but no exception was raised (1 was returned)
-  fails "A method when passing an empty keyword splat to a method that does not accept keywords for definition 'def m(*a); a; end'" # Expected [{}] == [] to be truthy but was false
-  fails "A method when passing an empty keyword splat to a method that does not accept keywords for definition 'def m(a); a; end'" # Expected ArgumentError but no exception was raised (nil was returned)
   fails "A nested method definition creates a class method when evaluated in a class method" # NoMethodError: undefined method `a_class_method' for DefSpecNested
   fails "A nested method definition creates a method in the surrounding context when evaluated in a def expr.method" # Expected DefSpecNested to have instance method 'inherited_method' but it does not
   fails "A nested method definition creates an instance method inside Class.new" # NoMethodError: undefined method `new_def' for #<#<Class:0x10642>:0x10640>
@@ -104,22 +93,15 @@ opal_filter "language" do
   fails "Interrupt shows the backtrace and has a signaled exit status" # NoMethodError: undefined method `popen' for IO
   fails "Keyword arguments are now separated from positional arguments when the method takes a ** parameter does not convert a positional Hash to keyword arguments" # Expected ArgumentError (wrong number of arguments (given 4, expected 3)) but no exception was raised (42 was returned)
   fails "Keyword arguments are now separated from positional arguments when the method takes a key: parameter when it's called with a positional Hash and no ** raises ArgumentError" # Expected ArgumentError (wrong number of arguments (given 4, expected 3)) but no exception was raised (42 was returned)
-  fails "Keyword arguments are separated from positional arguments" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation does not work with (*args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation omitted values accepts short notation 'key' for 'key: value' syntax" # NameError: uninitialized constant MSpecEnv::a
-  fails "Keyword arguments delegation works with (*args, **kwargs)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
-  fails "Keyword arguments delegation works with (...)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
-  fails "Keyword arguments delegation works with -> (*args, **kwargs) {}" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with call(*ruby2_keyword_args) with missing ruby2_keywords in between due to CRuby bug #18625" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with call(*ruby2_keyword_args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with proc { |*args, **kwargs| }" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with super(*ruby2_keyword_args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with yield(*ruby2_keyword_args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with zsuper" # Expected [[], {}] == [[{}], {}] to be truthy but was false
-  fails "Keyword arguments empty kwargs are treated as if they were not passed when calling a method" # Expected [{}] == [] to be truthy but was false
-  fails "Keyword arguments empty kwargs are treated as if they were not passed when yielding to a block" # Expected [{}] == [] to be truthy but was false
   fails "Keyword arguments extra keywords are not allowed without **kwrest" # Expected ArgumentError (unknown keyword: :kw2) but no exception was raised ([] was returned)
-  fails "Keyword arguments handle * and ** at the same call site" # Expected [{}] == [] to be truthy but was false
   fails "Keyword arguments raises ArgumentError exception when required keyword argument is not passed" # Expected ArgumentError (/missing keyword: :c/) but got: ArgumentError (missing keyword: c)
   fails "Keyword arguments raises ArgumentError for missing keyword arguments even if there are extra ones" # Expected ArgumentError (/missing keyword: :a/) but got: ArgumentError (missing keyword: a)
   fails "Literal (A::X) constant resolution uses the module or class #inspect to craft the error message if they are anonymous" # Expected NameError (/uninitialized constant <unusable info>::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x913b2>::DOES_NOT_EXIST)

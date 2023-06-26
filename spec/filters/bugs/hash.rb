@@ -44,8 +44,5 @@ opal_filter "Hash" do
   fails "Hash.[] raises for elements that are not arrays" # Expected ArgumentError but no exception was raised (nil was returned)
   fails "Hash.ruby2_keywords_hash copies instance variables" # Expected nil == 42 to be truthy but was false
   fails "Hash.ruby2_keywords_hash raises TypeError for non-Hash" # Expected TypeError but no exception was raised (nil was returned)
-  fails "Hash.ruby2_keywords_hash returns a copy of a Hash and marks the copy as a keywords Hash" # Expected false == true to be truthy but was false
-  fails "Hash.ruby2_keywords_hash returns an instance of the subclass if called on an instance of a subclass of Hash" # Expected false == true to be truthy but was false
   fails "Hash.ruby2_keywords_hash? raises TypeError for non-Hash" # Expected TypeError but no exception was raised (false was returned)
-  fails "Hash.ruby2_keywords_hash? returns true if the Hash is a keywords Hash marked by Module#ruby2_keywords" # Expected false == true to be truthy but was false  
 end

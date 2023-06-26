@@ -5,7 +5,7 @@ require 'corelib/enumerable'
 class ::Struct
   include ::Enumerable
 
-  def self.new(const_name, *args, keyword_init: false, &block)
+  def self.new(const_name, *args, keyword_init: nil, &block)
     if const_name
       if const_name.class == ::String && const_name[0].upcase != const_name[0]
         # Fast track so that we skip needlessly going thru exceptions
@@ -77,6 +77,7 @@ class ::Struct
 
   def self.inherited(klass)
     members = @members
+    `klass.$$keyword_init = self.$$keyword_init`
 
     klass.instance_eval do
       @members = members
@@ -84,30 +85,55 @@ class ::Struct
   end
 
   def initialize(*args)
-    if `#{self.class}.$$keyword_init`
-      kwargs = args.last || {}
+    %x{
+      var kwargs = args[args.length - 1], members = #{self.class.members}, members_length = members.length;
 
-      if args.length > 1 || `(args.length === 1 && !kwargs.$$is_hash)`
-        ::Kernel.raise ::ArgumentError, "wrong number of arguments (given #{args.length}, expected 0)"
-      end
+      function initialize_by_args() {
+        if (args.length > members_length) {
+          #{::Kernel.raise ::ArgumentError, 'struct size differs'}
+        }
 
-      extra = kwargs.keys - self.class.members
-      if extra.any?
-        ::Kernel.raise ::ArgumentError, "unknown keywords: #{extra.join(', ')}"
-      end
+        for (var i = 0; i < members_length; i++) {
+          var name = members[i];
+          #{self[`name`] = args[`i`]}
+        }
+      }
 
-      self.class.members.each do |name|
-        self[name] = kwargs[name]
-      end
-    else
-      if args.length > self.class.members.length
-        ::Kernel.raise ::ArgumentError, 'struct size differs'
-      end
+      function initialize_by_kwargs() {
+        if (kwargs == null) kwargs = #{{}};
 
-      self.class.members.each_with_index do |name, index|
-        self[name] = args[index]
-      end
-    end
+        if (args.length > 1 || (args.length === 1 && !kwargs.$$is_hash)) {
+          #{::Kernel.raise ::ArgumentError, "wrong number of arguments (given #{args.length}, expected 0)"}
+        }
+
+        var extra = #{`kwargs`.keys - `members`}
+
+        if (extra.length > 0) {
+          #{::Kernel.raise ::ArgumentError, "unknown keywords: #{`extra`.join(', ')}"}
+        }
+
+        for (var i = 0; i < members_length; i++) {
+          var name = members[i];
+          #{self[`name`] = `kwargs`[`name`]}
+        }
+      }
+
+      function has_kwargs() {
+        return kwargs != null && kwargs.$$is_hash && kwargs.$$kw;
+      }
+
+      switch(#{self.class}.$$keyword_init) {
+        case false:
+          initialize_by_args();
+          return nil;
+        case true:
+          initialize_by_kwargs();
+          return nil;
+        case nil:
+          has_kwargs() ? initialize_by_kwargs() : initialize_by_args();
+          return nil;
+      }
+    }
   end
 
   def initialize_copy(from)

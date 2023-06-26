@@ -180,6 +180,22 @@ class ::Struct
   end
 end
 
+class ::Data
+  def __marshal__(buffer)
+    buffer.save_link(self)
+    buffer.write_ivars_prefix(self)
+    buffer.write_extends(self)
+    buffer.append('S')
+    buffer.append_symbol(self.class.name)
+    buffer.write_fixnum(to_h.length)
+    to_h.each_pair do |attr_name, value|
+      buffer.append_symbol(attr_name)
+      buffer.write(value)
+    end
+    buffer.write_ivars_suffix(self)
+  end
+end
+
 module ::Marshal
   class self::WriteBuffer
     attr_reader :buffer
@@ -210,7 +226,7 @@ module ::Marshal
       else
         case object
         when nil, true, false, ::Proc, ::Method, ::MatchData, ::Range, ::Struct,
-             ::Array, ::Class, ::Module, ::Hash, ::Regexp
+             ::Array, ::Class, ::Module, ::Hash, ::Regexp, ::Data
           object.__marshal__(self)
         when ::Integer
           ::Integer.instance_method(:__marshal__).bind(object).call(self)
@@ -337,12 +353,16 @@ module ::Marshal
     end
 
     def write_ivars_suffix(object, force = false)
-      if object.instance_variables.empty? && !force
+      ivars = object.instance_variables
+
+      ivars.delete(:@members) if object.is_a? ::Data
+
+      if ivars.empty? && !force
         return
       end
 
-      write_fixnum(object.instance_variables.length)
-      object.instance_variables.each do |ivar_name|
+      write_fixnum(ivars.length)
+      ivars.each do |ivar_name|
         append_symbol(ivar_name)
         write(object.instance_variable_get(ivar_name))
       end
@@ -403,9 +423,11 @@ module ::Marshal
     end
 
     def write_ivars_prefix(object)
-      unless object.instance_variables.empty?
-        append('I')
-      end
+      ivars = object.instance_variables
+
+      ivars.delete(:@members) if object.is_a? ::Data
+
+      append('I') unless ivars.empty?
     end
 
     def append(s)

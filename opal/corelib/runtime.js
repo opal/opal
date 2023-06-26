@@ -1806,6 +1806,23 @@
     }
   };
 
+  Opal.extract_restargs = function(args, args_to_keep, func) {
+    if (args_to_keep > 0) {
+      args = args.splice(0, args.length - args_to_keep);
+    }
+
+    var last_arg = args[args.length - 1];
+    if (typeof(last_arg) === 'object') {
+      if (func.$$ruby2kw) {
+        if (last_arg.$$kw) {
+          last_arg.$$ruby2kw = true;
+        }
+      }
+    }
+
+    return args;
+  }
+
   // Used for extracting keyword arguments from arguments passed to
   // JS function. If provided +arguments+ list doesn't have a Hash
   // as a last item, returns a blank Hash.
@@ -1813,13 +1830,31 @@
   // @param parameters [Array]
   // @return [Hash]
   //
-  Opal.extract_kwargs = function(parameters) {
+  Opal.extract_kwargs = function(parameters, func) {
     var kwargs = parameters[parameters.length - 1];
-    if (kwargs != null && Opal.respond_to(kwargs, '$to_hash', true)) {
+    if (kwargs != null && (kwargs.$$kw || func.$$ruby2kw) && Opal.respond_to(kwargs, '$to_hash', true)) {
       $splice(parameters, parameters.length - 1);
       return kwargs;
     }
   };
+
+  // Primitives for handling parameters
+  Opal.ensure_kwargs = function(kwargs) {
+    if (kwargs == null) {
+      return Opal.hash2([], {});
+    } else if (kwargs.$$is_hash) {
+      return kwargs;
+    } else {
+      $raise(Opal.ArgumentError, 'expected kwargs');
+    }
+  }  
+
+  Opal.get_kwarg = function(kwargs, key) {
+    if (!$has_own(kwargs.$$smap, key)) {
+      $raise(Opal.ArgumentError, 'missing keyword: '+key);
+    }
+    return kwargs.$$smap[key];
+  }
 
   // Used to get a list of rest keyword arguments. Method takes the given
   // keyword args, i.e. the hash literal passed to the method containing all
@@ -2240,6 +2275,7 @@
   Opal.hash_clone = function(from_hash, to_hash) {
     to_hash.$$none = from_hash.$$none;
     to_hash.$$proc = from_hash.$$proc;
+    to_hash.$$kw = from_hash.$$kw;
 
     for (var i = 0, keys = from_hash.$$keys, smap = from_hash.$$smap, len = keys.length, key, value; i < len; i++) {
       key = keys[i];
@@ -2515,6 +2551,13 @@
 
     return hash;
   };
+
+  // This is called, if we want to mark a passed argument as kwargs.
+  Opal.kw = function(hash) {
+    if (hash.$$keys.length === 0) return [];
+    hash.$$kw = true;
+    return [hash];
+  }
 
   // Create a new range instance with first and last values, and whether the
   // range excludes the last value.
@@ -2924,24 +2967,6 @@
       $deny_frozen_access(this);
       return this[ivar] = static_val;
     }
-  }
-
-  // Primitives for handling parameters
-  Opal.ensure_kwargs = function(kwargs) {
-    if (kwargs == null) {
-      return Opal.hash2([], {});
-    } else if (kwargs.$$is_hash) {
-      return kwargs;
-    } else {
-      $raise(Opal.ArgumentError, 'expected kwargs');
-    }
-  }
-
-  Opal.get_kwarg = function(kwargs, key) {
-    if (!$has_own(kwargs.$$smap, key)) {
-      $raise(Opal.ArgumentError, 'missing keyword: '+key);
-    }
-    return kwargs.$$smap[key];
   }
 
   // Arrays of size > 32 elements that contain only strings,

@@ -794,6 +794,19 @@ class ::Module
     ::Kernel.raise 'Module#using is not permitted in methods'
   end
 
+  def ruby2_keywords(*methods)
+    %x{
+      for (var i = 0; i < methods.length; i++) {
+        var method = self.$$prototype[$jsid(methods[i])];
+        if (method == null || method.$$stub) {
+          #{::Kernel.raise NoMethodError, "undefined method `#{`methods[i]`}' for class `#{self}'"}
+        }
+        method.$$ruby2kw = true
+      }
+    }
+    nil
+  end
+
   alias class_eval module_eval
   alias class_exec module_exec
   alias inspect to_s
