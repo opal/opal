@@ -1823,7 +1823,7 @@
 
   // Used to get a list of rest keyword arguments. Method takes the given
   // keyword args, i.e. the hash literal passed to the method containing all
-  // keyword arguemnts passed to method, as well as the used args which are
+  // keyword arguments passed to method, as well as the used args which are
   // the names of required and optional arguments defined. This method then
   // just returns all key/value pairs which have not been used, in a new
   // hash literal.
@@ -1833,19 +1833,17 @@
   // @return [Hash]
   //
   Opal.kwrestargs = function(given_args, used_args) {
-    var keys      = [],
-        map       = {},
+    var map       = {},
         key           ,
-        given_map = given_args.$$smap;
+        given_map = given_args.$$map;
 
     for (key in given_map) {
       if (!used_args[key]) {
-        keys.push(key);
         map[key] = given_map[key];
       }
     }
 
-    return Opal.hash2(keys, map);
+    return Opal.hash2(map);
   };
 
   function apply_blockopts(block, blockopts) {
@@ -2232,7 +2230,6 @@
   // ------
 
   Opal.hash_init = function(hash) {
-    hash.$$smap = Object.create(null);
     hash.$$map  = Object.create(null);
     hash.$$keys = [];
   };
@@ -2241,31 +2238,21 @@
     to_hash.$$none = from_hash.$$none;
     to_hash.$$proc = from_hash.$$proc;
 
-    for (var i = 0, keys = from_hash.$$keys, smap = from_hash.$$smap, len = keys.length, key, value; i < len; i++) {
+    for (var i = 0, keys = from_hash.$$keys, len = keys.length, key, value; i < len; i++) {
       key = keys[i];
 
-      if (key.$$is_string) {
-        value = smap[key];
-      } else {
-        value = key.value;
-        key = key.key;
-      }
+      value = key.value;
+      key = key.key;
 
+      // TODO remove if, guards against bug somewhere else
+      if (key)
       Opal.hash_put(to_hash, key, value);
     }
   };
 
   Opal.hash_put = function(hash, key, value) {
-    if (key.$$is_string) {
-      if (!$has_own(hash.$$smap, key)) {
-        hash.$$keys.push(key);
-      }
-      hash.$$smap[key] = value;
-      return;
-    }
-
-    var key_hash, bucket, last_bucket;
-    key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
+    var key_hash = (key.$$is_string) ? key : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
+        bucket, last_bucket;
 
     if (!$has_own(hash.$$map, key_hash)) {
       bucket = {key: key, key_hash: key_hash, value: value};
@@ -2294,15 +2281,8 @@
   };
 
   Opal.hash_get = function(hash, key) {
-    if (key.$$is_string) {
-      if ($has_own(hash.$$smap, key)) {
-        return hash.$$smap[key];
-      }
-      return;
-    }
-
-    var key_hash, bucket;
-    key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
+    var key_hash = (key.$$is_string) ? key : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
+        bucket;
 
     if ($has_own(hash.$$map, key_hash)) {
       bucket = hash.$$map[key_hash];
@@ -2317,34 +2297,9 @@
   };
 
   Opal.hash_delete = function(hash, key) {
-    var i, keys = hash.$$keys, length = keys.length, value, key_tmp;
+    var i, keys = hash.$$keys, length = keys.length, value;
 
-    if (key.$$is_string) {
-      if (typeof key !== "string") key = key.valueOf();
-
-      if (!$has_own(hash.$$smap, key)) {
-        return;
-      }
-
-      for (i = 0; i < length; i++) {
-        key_tmp = keys[i];
-
-        if (key_tmp.$$is_string && typeof key_tmp !== "string") {
-          key_tmp = key_tmp.valueOf();
-        }
-
-        if (key_tmp === key) {
-          keys.splice(i, 1);
-          break;
-        }
-      }
-
-      value = hash.$$smap[key];
-      delete hash.$$smap[key];
-      return value;
-    }
-
-    var key_hash = key.$hash();
+    var key_hash = (key.$$is_string) ? key : key.$hash();
 
     if (!$has_own(hash.$$map, key_hash)) {
       return;
@@ -2386,7 +2341,7 @@
   Opal.hash_rehash = function(hash) {
     for (var i = 0, length = hash.$$keys.length, key_hash, bucket, last_bucket; i < length; i++) {
 
-      if (hash.$$keys[i].$$is_string) {
+      if (hash.$$keys[i].key.$$is_string) {
         continue;
       }
 
@@ -2506,12 +2461,14 @@
   // compile time, so they are just added here by the constructor
   // function.
   //
-  Opal.hash2 = function(keys, smap) {
+  Opal.hash2 = function(map) {
     var hash = new Opal.Hash();
 
-    hash.$$smap = smap;
-    hash.$$map  = Object.create(null);
-    hash.$$keys = keys;
+    hash.$$map  = map;
+    hash.$$keys = []
+    for (var i in map) {
+      hash.$$keys.push(map[i]);
+    }
 
     return hash;
   };
@@ -2553,7 +2510,7 @@
   // helper that can be used from methods
   function $deny_frozen_access(obj) {
     if (obj.$$frozen) {
-      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), Opal.hash2(["receiver"], {"receiver": obj}));
+      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), Opal.hash2({"receiver": { key: 'receiver', key_hash: 'receiver', value: obj}}));
     }
   };
   Opal.deny_frozen_access = $deny_frozen_access;
@@ -2929,7 +2886,7 @@
   // Primitives for handling parameters
   Opal.ensure_kwargs = function(kwargs) {
     if (kwargs == null) {
-      return Opal.hash2([], {});
+      return Opal.hash2({});
     } else if (kwargs.$$is_hash) {
       return kwargs;
     } else {
@@ -2938,10 +2895,10 @@
   }
 
   Opal.get_kwarg = function(kwargs, key) {
-    if (!$has_own(kwargs.$$smap, key)) {
+    if (!$has_own(kwargs.$$map, key)) {
       $raise(Opal.ArgumentError, 'missing keyword: '+key);
     }
-    return kwargs.$$smap[key];
+    return kwargs.$$map[key].value;
   }
 
   // Arrays of size > 32 elements that contain only strings,

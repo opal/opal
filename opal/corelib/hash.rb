@@ -7,7 +7,6 @@ require 'corelib/enumerable'
 # Internal properties:
 #
 # - $$map         [JS::Object<String => hash-bucket>] the hash table for ordinary keys
-# - $$smap        [JS::Object<String => hash-bucket>] the hash table for string keys
 # - $$keys        [Array<hash-bucket>] the list of all keys
 # - $$proc        [Proc,null,nil] the default proc used for missing keys
 # - hash-bucket   [JS::Object] an element of a linked list that holds hash values, keys are `{key:,key_hash:,value:,next:}`
@@ -114,13 +113,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, other_value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-          other_value = other.$$smap[key];
-        } else {
-          value = key.value;
-          other_value = $hash_get(other, key.key);
-        }
+        value = key.value;
+        other_value = $hash_get(other, key.key);
 
         if (other_value === undefined || !value['$eql?'](other_value)) {
           return false;
@@ -204,14 +198,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          if (#{`key` == object}) {
-            return [key, self.$$smap[key]];
-          }
-        } else {
-          if (#{`key.key` == object}) {
-            return [key.key, key.value];
-          }
+        if (#{`key.key` == object}) {
+          return [key.key, key.value];
         }
       }
 
@@ -246,12 +234,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         if (value !== nil) {
           $hash_put(hash, key, value);
@@ -271,12 +255,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         if (value === nil) {
           if ($hash_delete(self, key) !== undefined) {
@@ -295,24 +275,22 @@ class ::Hash
     %x{
       $deny_frozen_access(self);
 
-      var i, ii, key, keys = self.$$keys, identity_hash;
+      var i, key, keys = self.$$keys, length = keys.length, identity_hash;
 
       if (self.$$by_identity) return self;
-      if (self.$$keys.length === 0) {
+      if (length === 0) {
         self.$$by_identity = true
         return self;
       }
 
       identity_hash = #{ {}.compare_by_identity };
-      for(i = 0, ii = keys.length; i < ii; i++) {
-        key = keys[i];
-        if (!key.$$is_string) key = key.key;
+      for(i = 0; i < length; i++) {
+        key = keys[i].key;
         $hash_put(identity_hash, key, $hash_get(self, key));
       }
 
       self.$$by_identity = true;
       self.$$map = identity_hash.$$map;
-      self.$$smap = identity_hash.$$smap;
       return self;
     }
   end
@@ -400,12 +378,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         obj = block(key, value);
 
@@ -444,12 +418,10 @@ class ::Hash
       for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        if (!key) #{raise};
+
+        value = key.value;
+        key = key.key;
 
         $yield1(block, [key, value]);
       }
@@ -465,7 +437,7 @@ class ::Hash
       for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        block(key.$$is_string ? key : key.key);
+        block(key.key);
       }
 
       return self;
@@ -479,7 +451,7 @@ class ::Hash
       for (var i = 0, keys = self.$$keys.slice(), length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        block(key.$$is_string ? self.$$smap[key] : key.value);
+        block(key.value);
       }
 
       return self;
@@ -532,12 +504,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         result.push(key);
 
@@ -573,7 +541,7 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (#{`(key.$$is_string ? self.$$smap[key] : key.value)` == value}) {
+        if (#{`key.value` == value}) {
           return true;
         }
       }
@@ -610,11 +578,7 @@ class ::Hash
         for (var i = 0, keys = self.$$keys, length = keys.length; i < length; i++) {
           key = keys[i];
 
-          if (key.$$is_string) {
-            result.push([key, self.$$smap[key].$hash()]);
-          } else {
-            result.push([key.key_hash, key.value.$hash()]);
-          }
+          result.push([key.key_hash, key.value.$hash()]);
         }
 
         return result.sort().join();
@@ -632,12 +596,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         if (#{`value` == object}) {
           return key;
@@ -692,12 +652,8 @@ class ::Hash
         for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
           key = keys[i];
 
-          if (key.$$is_string) {
-            value = self.$$smap[key];
-          } else {
-            value = key.value;
-            key = key.key;
-          }
+          value = key.value;
+          key = key.key;
 
           key = #{Opal.inspect(`key`)}
           value = #{Opal.inspect(`value`)}
@@ -720,12 +676,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         $hash_put(hash, value, key);
       }
@@ -743,12 +695,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         obj = block(key, value);
 
@@ -768,14 +716,8 @@ class ::Hash
     %x{
       var result = [];
 
-      for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
-        key = keys[i];
-
-        if (key.$$is_string) {
-          result.push(key);
-        } else {
-          result.push(key.key);
-        }
+      for (var i = 0, keys = self.$$keys, length = keys.length; i < length; i++) {
+        result.push(keys[i].key);
       }
 
       return result;
@@ -802,12 +744,8 @@ class ::Hash
           for (j = 0; j < length; j++) {
             key = other_keys[j];
 
-            if (key.$$is_string) {
-              other_value = other.$$smap[key];
-            } else {
-              other_value = key.value;
-              key = key.key;
-            }
+            other_value = key.value;
+            key = key.key;
 
             $hash_put(self, key, other_value);
           }
@@ -815,12 +753,8 @@ class ::Hash
           for (j = 0; j < length; j++) {
             key = other_keys[j];
 
-            if (key.$$is_string) {
-              other_value = other.$$smap[key];
-            } else {
-              other_value = key.value;
-              key = key.key;
-            }
+            other_value = key.value;
+            key = key.key;
 
             value = $hash_get(self, key);
 
@@ -843,12 +777,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         if (#{`value` == object}) {
           return [key, value];
@@ -876,12 +806,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         obj = block(key, value);
 
@@ -905,12 +831,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         obj = block(key, value);
 
@@ -938,12 +860,8 @@ class ::Hash
       for (var i = 0, other_keys = other.$$keys, length = other_keys.length, key, value, other_value; i < length; i++) {
         key = other_keys[i];
 
-        if (key.$$is_string) {
-          other_value = other.$$smap[key];
-        } else {
-          other_value = key.value;
-          key = key.key;
-        }
+        other_value = key.value;
+        key = key.key;
 
         $hash_put(self, key, other_value);
       }
@@ -967,12 +885,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         obj = block(key, value);
 
@@ -996,12 +910,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value, obj; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         obj = block(key, value);
 
@@ -1021,15 +931,10 @@ class ::Hash
   def shift
     %x{
       $deny_frozen_access(self);
-      var keys = self.$$keys,
-          key;
 
-      if (keys.length > 0) {
-        key = keys[0];
-
-        key = key.$$is_string ? key : key.key;
-
-        return [key, $hash_delete(self, key)];
+      if (self.$$keys.length > 0) {
+        var key = self.$$keys[0];
+        return [key.key, $hash_delete(self, key.key)];
       }
 
       return nil;
@@ -1062,12 +967,8 @@ class ::Hash
       for (var i = 0; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         result[i] = [key, value];
       }
@@ -1118,12 +1019,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         key = $yield1(block, key);
 
@@ -1146,12 +1043,8 @@ class ::Hash
       for (i = 0; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         new_key = $yield1(block, key);
 
@@ -1172,12 +1065,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         value = $yield1(block, value);
 
@@ -1197,12 +1086,8 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         value = $yield1(block, value);
 
@@ -1220,11 +1105,7 @@ class ::Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          result.push(self.$$smap[key]);
-        } else {
-          result.push(key.value);
-        }
+        result.push(key.value);
       }
 
       return result;

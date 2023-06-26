@@ -542,7 +542,7 @@ unless Hash.method_defined? :_initialize
         if (defaults != null &&
              (defaults.constructor === undefined ||
                defaults.constructor === Object)) {
-          var smap = self.$$smap,
+          var map = self.$$map,
               keys = self.$$keys,
               key, value;
 
@@ -563,9 +563,9 @@ unless Hash.method_defined? :_initialize
 
                 return #{Native(`item`)};
               });
-              smap[key] = value
+              map[key] = { key: key, key_hash: key, value: value }
             } else {
-              smap[key] = #{Native(`value`)};
+              map[key] = { key: key, key_hash: key, value: #{Native(`value`)} };
             }
 
             keys.push(key);
@@ -584,20 +584,16 @@ unless Hash.method_defined? :_initialize
       %x{
         var result = {},
             keys = self.$$keys,
-            smap = self.$$smap,
+            map = self.$$map,
             key, value;
 
         for (var i = 0, length = keys.length; i < length; i++) {
           key = keys[i];
 
-          if (key.$$is_string) {
-            value = smap[key];
-          } else {
-            key = key.key;
-            value = key.value;
-          }
+          key = key.key;
+          value = key.value;
 
-          result[key] = #{Native.try_convert(`value`, `value`)};
+          result[key] = { key: key, key_hash: key, value: #{Native.try_convert(`value`, `value`)} };
         }
 
         return result;

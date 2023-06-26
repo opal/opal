@@ -97,7 +97,7 @@ module JSON
     options[:object_class] ||= Hash
     options[:array_class]  ||= Array
 
-    `to_opal(js_object, options.$$smap)`
+    `to_opal(js_object, options.$$map)`
   end
 
   def self.generate(obj, options = {})
@@ -160,12 +160,8 @@ class Hash
       for (var i = 0, keys = self.$$keys, length = keys.length, key, value; i < length; i++) {
         key = keys[i];
 
-        if (key.$$is_string) {
-          value = self.$$smap[key];
-        } else {
-          value = key.value;
-          key = key.key;
-        }
+        value = key.value;
+        key = key.key;
 
         result.push(#{`key`.to_s.to_json} + ':' + #{`value`.to_json});
       }
