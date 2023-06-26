@@ -2288,7 +2288,6 @@
 
   Opal.hash_delete = function(hash, key) {
     var i, keys = hash.$$keys, length = keys.length, value;
-
     var key_hash = (key.$$is_string) ? key.valueOf() : key.$hash();
 
     if (!hash.has(key_hash)) {
