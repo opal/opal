@@ -76,6 +76,22 @@ class ::Array < `Array`
       }
       return #{`array`.to_a};
     }
+
+    function fast_push(arr, objects) {
+      // push.apply() for arrays longer than 32767 may cause various argument errors in browsers
+      // but it is significantly faster than a for loop, which pushes each element separately
+      // but apply() has a overhead by itself, for a small number of elements
+      // the for loop is significantly faster
+      // this is using the best option depending on objects.length
+      var length = objects.length;
+      if (length > 6 && length < 32767) {
+        arr.push.apply(arr, objects);
+      } else {
+        for (var i = 0; i < length; i++) {
+          arr.push(objects[i]);
+        }
+      }
+    }
   }
 
   def self.[](*objects)
@@ -99,7 +115,7 @@ class ::Array < `Array`
       }
 
       if (arguments.length === 0) {
-        self.splice(0, self.length);
+        if (self.length > 0) self.splice(0, self.length);
         return self;
       }
 
@@ -1216,7 +1232,7 @@ class ::Array < `Array`
             result.push(ary);
             break;
           default:
-            result.push.apply(result, _flatten(ary, level - 1));
+            fast_push(result, _flatten(ary, level - 1));
           }
         }
         return result;
@@ -1741,9 +1757,7 @@ class ::Array < `Array`
     %x{
       $deny_frozen_access(self);
 
-      for (var i = 0, length = objects.length; i < length; i++) {
-        self.push(objects[i]);
-      }
+      fast_push(self, objects);
     }
 
     self
@@ -1801,8 +1815,8 @@ class ::Array < `Array`
     other = `convertToArray(other)`
 
     %x{
-      self.splice(0, self.length);
-      self.push.apply(self, other);
+      if (self.length > 0) self.splice(0, self.length);
+      fast_push(self, other);
     }
 
     self
