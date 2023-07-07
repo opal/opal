@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# helpers: hash_put
 
 # Provides a complete set of tools to wrap native JavaScript
 # into nice Ruby objects.
@@ -550,7 +551,7 @@ unless Hash.method_defined? :_initialize
             if (value &&
                  (value.constructor === undefined ||
                    value.constructor === Object)) {
-              $hash_put(self, key, #{Hash.new(`value`)});
+              hash_put(self, key, #{Hash.new(`value`)});
             } else if (value && value.$$is_array) {
               value = value.map(function(item) {
                 if (item &&
