@@ -577,7 +577,7 @@ unless Hash.method_defined? :_initialize
     # all values.
     def to_n
       %x{
-        var result = {},
+        var result = {};
 
         if (self.$$buckets) {
           buckets = self.$$buckets,
