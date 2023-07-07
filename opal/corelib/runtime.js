@@ -2951,7 +2951,7 @@
     if (!kwargs.has(key)) {
       $raise(Opal.ArgumentError, 'missing keyword: '+key);
     }
-    return kwargs.get(key).value;
+    return kwargs.get(key);
   }
 
   // Arrays of size > 32 elements that contain only strings,
