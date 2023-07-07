@@ -578,16 +578,22 @@ unless Hash.method_defined? :_initialize
     def to_n
       %x{
         var result = {},
-            keys = self.$$keys,
-            key, value;
 
-        for (var i = 0, length = keys.length; i < length; i++) {
-          key = keys[i];
+        if (self.$$buckets) {
+          buckets = self.$$buckets,
+          bucket, key, value;
+          for (var i = 0, length = buckets.length; i < length; i++) {
+            bucket = buckets[i];
 
-          key = key.key;
-          value = key.value;
+            key = bucket.key;
+            value = bucket.value;
 
-          result[key] = { key: key, key_hash: key, value: #{Native.try_convert(`value`, `value`)} };
+            result[key] = { key: key, key_hash: bucket.key_hash, value: #{Native.try_convert(`value`, `value`)} };
+          }
+        } else {
+          Opal.hash_each(self, false, function(key, value) {
+            result[key] = { key: key, key_hash: key, value: #{Native.try_convert(`value`, `value`)} };
+          });
         }
 
         return result;

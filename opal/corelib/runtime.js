@@ -1833,16 +1833,14 @@
   // @return [Hash]
   //
   Opal.kwrestargs = function(given_args, used_args) {
-    var map = new Map(), i, bucket,
-        keys = given_args.$$keys;
-    map.$$keys = [];
+    var map = new Map();
 
-    for (i in keys) {
-      bucket = keys[i];
-      if (!used_args[bucket.key]) {
-        Opal.hash_put(map, bucket.key, bucket.value);
+    Opal.hash_each(given_args, false, function(key, value) {
+      if (!used_args[key]) {
+        Opal.hash_put(map, key, value);
       }
-    }
+      return [false, false];
+    });
 
     return map;
   };
@@ -2234,117 +2232,106 @@
     to_hash.$$none = from_hash.$$none;
     to_hash.$$proc = from_hash.$$proc;
 
-    for (var i = 0, keys = from_hash.$$keys, len = keys.length, key; i < len; i++) {
-      key = keys[i];
-      Opal.hash_put(to_hash, key.key, key.value);
-    }
+    return Opal.hash_each(from_hash, to_hash, function(key, value) {
+      Opal.hash_put(to_hash, key, value);
+      return [false, to_hash];
+    });
   };
 
   Opal.hash_put = function(hash, key, value) {
-    var key_hash = (key.$$is_string) ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
-        bucket, last_bucket;
+    if (hash.$$buckets) {
+      // object mode
+      var key_hash = (key.$$is_string) ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
+          bucket, last_bucket;
 
-    if (!hash.has(key_hash)) {
-      bucket = {key: key, key_hash: key_hash, value: value};
-      hash.$$keys.push(bucket);
-      hash.set(key_hash, bucket);
-      return;
-    }
-
-    bucket = hash.get(key_hash);
-
-    while (bucket) {
-      if (key === bucket.key || key['$eql?'](bucket.key)) {
-        last_bucket = undefined;
-        bucket.value = value;
-        break;
+      if (!hash.has(key_hash)) {
+        bucket = {key: key, key_hash: key_hash, value: value};
+        hash.$$buckets.push(bucket);
+        hash.set(key_hash, bucket);
+        return;
       }
-      last_bucket = bucket;
-      bucket = bucket.next;
-    }
 
-    if (last_bucket) {
-      bucket = {key: key, key_hash: key_hash, value: value};
-      hash.$$keys.push(bucket);
-      last_bucket.next = bucket;
-    }
-  };
-
-  Opal.hash_get = function(hash, key) {
-    var key_hash = (key.$$is_string) ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
-        bucket;
-
-    if (hash.has(key_hash)) {
       bucket = hash.get(key_hash);
 
       while (bucket) {
         if (key === bucket.key || key['$eql?'](bucket.key)) {
-          return bucket.value;
+          last_bucket = undefined;
+          bucket.value = value;
+          break;
         }
+        last_bucket = bucket;
         bucket = bucket.next;
+      }
+
+      if (last_bucket) {
+        bucket = {key: key, key_hash: key_hash, value: value};
+        hash.$$buckets.push(bucket);
+        last_bucket.next = bucket;
+      }
+    } else {
+      // literal mode
+      var type = typeof key;
+      if (type === "string" || type === "symbol" || type === "number") {
+        hash.set(key, value)
+      } else if (key.$$is_string) {
+        hash.set(key.valueOf(), value);
+      } else {
+        Opal.hash_to_object_mode(hash);
+        Opal.hash_put(hash, key, value);
+      }
+    }
+  };
+
+  Opal.hash_get = function(hash, key) {
+    if (hash.$$buckets) {
+      // object mode
+      var key_hash = (key.$$is_string) ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
+          bucket;
+
+      if (hash.has(key_hash)) {
+        bucket = hash.get(key_hash);
+
+        while (bucket) {
+          if (key === bucket.key || key['$eql?'](bucket.key)) {
+            return bucket.value;
+          }
+          bucket = bucket.next;
+        }
+      }
+    } else {
+      // literal mode
+      var type = typeof key;
+      if (type === "string" || type === "symbol" || type === "number") {
+        return hash.get(key)
+      } else if (key.$$is_string) {
+        return hash.get(key.valueOf());
       }
     }
   };
 
   Opal.hash_delete = function(hash, key) {
-    var i, keys = hash.$$keys, length = keys.length, value;
-    var key_hash = (key.$$is_string) ? key.valueOf() : key.$hash();
+    if (hash.$$buckets) {
+      // object mode
+      var i, keys = hash.$$buckets, length = keys.length, value;
+      var key_hash = (key.$$is_string) ? key.valueOf() : key.$hash();
 
-    if (!hash.has(key_hash)) {
-      return;
-    }
-
-    var bucket = hash.get(key_hash), last_bucket;
-
-    while (bucket) {
-      if (key === bucket.key || key['$eql?'](bucket.key)) {
-        value = bucket.value;
-
-        for (i = 0; i < length; i++) {
-          if (keys[i] === bucket) {
-            keys.splice(i, 1);
-            break;
-          }
-        }
-
-        if (last_bucket && bucket.next) {
-          last_bucket.next = bucket.next;
-        }
-        else if (last_bucket) {
-          delete last_bucket.next;
-        }
-        else if (bucket.next) {
-          hash.set(key_hash, bucket.next);
-        }
-        else {
-          hash.delete(key_hash);
-        }
-
-        return value;
-      }
-      last_bucket = bucket;
-      bucket = bucket.next;
-    }
-  };
-
-  Opal.hash_rehash = function(hash) {
-    for (var i = 0, length = hash.$$keys.length, key_hash, bucket, last_bucket; i < length; i++) {
-
-      if (hash.$$keys[i].key.$$is_string) {
-        continue;
+      if (!hash.has(key_hash)) {
+        return;
       }
 
-      key_hash = hash.$$keys[i].key.$hash();
-
-      if (key_hash === hash.$$keys[i].key_hash) {
-        continue;
-      }
-
-      bucket = hash.get(hash.$$keys[i].key_hash);
-      last_bucket = undefined;
+      var bucket = hash.get(key_hash), last_bucket;
 
       while (bucket) {
-        if (bucket === hash.$$keys[i]) {
+        if (key === bucket.key || key['$eql?'](bucket.key)) {
+          value = bucket.value;
+
+          for (i = 0; i < length; i++) {
+            if (keys[i] === bucket) {
+              keys.splice(i, 1);
+              break;
+            }
+          }
+
           if (last_bucket && bucket.next) {
             last_bucket.next = bucket.next;
           }
@@ -2352,10 +2339,71 @@
             delete last_bucket.next;
           }
           else if (bucket.next) {
-            hash.set(hash.$$keys[i].key_hash, bucket.next);
+            hash.set(key_hash, bucket.next);
           }
           else {
-            hash.delete(hash.$$keys[i].key_hash);
+            hash.delete(key_hash);
+          }
+
+          return value;
+        }
+        last_bucket = bucket;
+        bucket = bucket.next;
+      }
+    } else {
+      // literal mode
+      var type = typeof key, res;
+      if (type === "string" || type === "symbol" || type === "number") {
+        if (hash.has(key)) {
+          res = hash.get(key);
+          hash.delete(key);
+          return res;
+        }
+      } else if (key.$$is_string) {
+        key = key.valueOf();
+        if (hash.has(key)) {
+          res = hash.get(key);
+          hash.delete(key);
+          return res;
+        }
+      }
+    }
+  };
+
+  Opal.hash_rehash = function(hash) {
+    if (!hash.$$buckets) {
+      // hash is in literal mode, nothing to rehash
+      return;
+    }
+
+    for (var i = 0, length = hash.$$buckets.length, key_hash, bucket, last_bucket; i < length; i++) {
+
+      if (hash.$$buckets[i].key.$$is_string) {
+        continue;
+      }
+
+      key_hash = hash.$$buckets[i].key.$hash();
+
+      if (key_hash === hash.$$buckets[i].key_hash) {
+        continue;
+      }
+
+      bucket = hash.get(hash.$$buckets[i].key_hash);
+      last_bucket = undefined;
+
+      while (bucket) {
+        if (bucket === hash.$$buckets[i]) {
+          if (last_bucket && bucket.next) {
+            last_bucket.next = bucket.next;
+          }
+          else if (last_bucket) {
+            delete last_bucket.next;
+          }
+          else if (bucket.next) {
+            hash.set(hash.$$buckets[i].key_hash, bucket.next);
+          }
+          else {
+            hash.delete(hash.$$buckets[i].key_hash);
           }
           break;
         }
@@ -2363,10 +2411,10 @@
         bucket = bucket.next;
       }
 
-      hash.$$keys[i].key_hash = key_hash;
+      hash.$$buckets[i].key_hash = key_hash;
 
       if (!hash.has(key_hash)) {
-        hash.set(key_hash, hash.$$keys[i]);
+        hash.set(key_hash, hash.$$buckets[i]);
         continue;
       }
 
@@ -2374,7 +2422,7 @@
       last_bucket = undefined;
 
       while (bucket) {
-        if (bucket === hash.$$keys[i]) {
+        if (bucket === hash.$$buckets[i]) {
           last_bucket = undefined;
           break;
         }
@@ -2383,9 +2431,43 @@
       }
 
       if (last_bucket) {
-        last_bucket.next = hash.$$keys[i];
+        last_bucket.next = hash.$$buckets[i];
       }
     }
+  };
+
+  Opal.hash_to_object_mode = function(hash) {
+    var entries = Array.from(hash.entries());
+    var i, length = entries.length;
+    hash.clear();
+    hash.$$buckets = [];
+    for (i = 0; i < length; i++) {
+      Opal.hash_put(hash, entries[i][0], entries[i][1]);
+    }
+  };
+
+  Opal.hash_each = function(hash, dres, fun) {
+    // dres = default result, returned if hash is empty
+    // fun is called as fun(key, value) and must return a array with [break, result]
+    // if break is true, iteration stops and result is returned
+    // if break is false, iteration continues and eventually the last result is returned
+    var res;
+    if (hash.$$buckets) {
+      // object mode
+      for (var i = 0, keys = hash.$$buckets.slice(), length = keys.length, key; i < length; i++) {
+        key = keys[i];
+        res = fun(key.key, key.value);
+        if (res[0]) return res[1];
+      }
+    } else {
+      // literal mode
+      for (var i = 0, entry, entries = Array.from(hash.entries()), l = entries.length; i < l; i++) {
+        entry = entries[i];
+        res = fun(entry[0], entry[1]);
+        if (res[0]) return res[1];
+      }
+    }
+    return res ? res[1] : dres;
   };
 
   Opal.hash = function() {
@@ -2396,7 +2478,6 @@
     }
 
     hash = new Map();
-    hash.$$keys = [];
 
     if (arguments_length === 1) {
       args = arguments[0];
@@ -2445,24 +2526,6 @@
     return hash;
   };
 
-  // A faster Hash creator for hashes that just use symbols and
-  // strings as keys. The map and keys array can be constructed at
-  // compile time, so they are just added here by the constructor
-  // function.
-  //
-  Opal.hash2 = function() {
-    var hash = new Map();
-    hash.$$keys = []
-    for (var i = 0, l = arguments.length, key, val; i < l; i += 2) {
-      key = arguments[i];
-      val = { key: key, key_hash: key, value: arguments[i+1] };
-      hash.set(key, val);
-      hash.$$keys.push(val);
-    }
-
-    return hash;
-  };
-
   // Create a new range instance with first and last values, and whether the
   // range excludes the last value.
   //
@@ -2500,7 +2563,7 @@
   // helper that can be used from methods
   function $deny_frozen_access(obj) {
     if (obj.$$frozen) {
-      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), Opal.hash2("receiver", obj));
+      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), new Map([["receiver", obj]]));
     }
   };
   Opal.deny_frozen_access = $deny_frozen_access;
@@ -2876,7 +2939,7 @@
   // Primitives for handling parameters
   Opal.ensure_kwargs = function(kwargs) {
     if (kwargs == null) {
-      return Opal.hash2();
+      return new Map();
     } else if (kwargs.$$is_hash) {
       return kwargs;
     } else {
