@@ -1837,7 +1837,7 @@
 
     Opal.hash_each(given_args, false, function(key, value) {
       if (!used_args[key]) {
-        Opal.hash_put(map, key, value);
+        map.set(key, value);
       }
       return [false, false];
     });
