@@ -6,7 +6,6 @@ require 'corelib/enumerable'
 # ---
 # Internal properties:
 #
-# - $$map         [JS::Object<String => hash-bucket>] the hash table for ordinary keys
 # - $$keys        [Array<hash-bucket>] the list of all keys
 # - $$proc        [Proc,null,nil] the default proc used for missing keys
 # - hash-bucket   [JS::Object] an element of a linked list that holds hash values, keys are `{key:,key_hash:,value:,next:}`
@@ -209,8 +208,8 @@ class ::Hash < `Map`
     %x{
       $deny_frozen_access(self);
 
-      self.clear()
-      self.$$keys = []
+      self.clear();
+      self.$$keys = [];
       return self;
     }
   end
@@ -268,22 +267,23 @@ class ::Hash < `Map`
     %x{
       $deny_frozen_access(self);
 
-      var i, key, keys = self.$$keys, length = keys.length, identity_hash;
-
       if (self.$$by_identity) return self;
+
       if (length === 0) {
         self.$$by_identity = true
         return self;
       }
 
-      identity_hash = #{ {}.compare_by_identity };
-      for(i = 0; i < length; i++) {
-        key = keys[i].key;
-        $hash_put(identity_hash, key, $hash_get(self, key));
-      }
+      var i, keys = self.$$keys.slice(), length = keys.length;
+
+      self.$clear()
 
       self.$$by_identity = true;
-      self.$$map = identity_hash.$$map; // TODO
+
+      for(i = 0; i < length; i++) {
+        $hash_put(self, keys[i].key, keys[i].value);
+      }
+      
       return self;
     }
   end
