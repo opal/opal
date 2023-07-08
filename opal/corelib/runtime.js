@@ -2454,9 +2454,9 @@
     var res;
     if (hash.$$buckets) {
       // object mode
-      for (var i = 0, keys = hash.$$buckets.slice(), length = keys.length, key; i < length; i++) {
-        key = keys[i];
-        res = fun(key.key, key.value);
+      for (var i = 0, buckets = hash.$$buckets.slice(), length = buckets.length, bucket; i < length; i++) {
+        bucket = buckets[i];
+        res = fun(bucket.key, bucket.value);
         if (res[0]) return res[1];
       }
     } else {
