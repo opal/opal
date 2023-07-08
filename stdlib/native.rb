@@ -551,7 +551,7 @@ unless Hash.method_defined? :_initialize
             if (value &&
                  (value.constructor === undefined ||
                    value.constructor === Object)) {
-              hash_put(self, key, #{Hash.new(`value`)});
+              $hash_put(self, key, #{Hash.new(`value`)});
             } else if (value && value.$$is_array) {
               value = value.map(function(item) {
                 if (item &&
