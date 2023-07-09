@@ -2,12 +2,6 @@
 
 require 'spec_helper'
 
-describe '`Opal.hash`' do
-  it 'converts object literals to hashes' do
-    `Opal.hash({a: 1, b: 2})`.should == {a: 1, b: 2}
-  end
-end
-
 describe 'javascript access using .JS' do
   it 'should call javascript methods via .JS.method()' do
     "a1234b5678c".JS.indexOf('c').should == 10

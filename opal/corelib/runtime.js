@@ -2384,62 +2384,6 @@
     return res ? res[1] : dres;
   };
 
-  Opal.hash = function() {
-    var arguments_length = arguments.length, args, hash, i, length, key, value;
-
-    if (arguments_length === 1 && arguments[0].$$is_hash) {
-      return arguments[0];
-    }
-
-    hash = new Map();
-
-    if (arguments_length === 1) {
-      args = arguments[0];
-
-      if (arguments[0].$$is_array) {
-        length = args.length;
-
-        for (i = 0; i < length; i++) {
-          if (args[i].length !== 2) {
-            $raise(Opal.ArgumentError, "value not of length 2: " + args[i].$inspect());
-          }
-
-          key = args[i][0];
-          value = args[i][1];
-
-          Opal.hash_put(hash, key, value);
-        }
-
-        return hash;
-      }
-      else {
-        args = arguments[0];
-        for (key in args) {
-          if ($has_own(args, key)) {
-            value = args[key];
-
-            Opal.hash_put(hash, key, value);
-          }
-        }
-
-        return hash;
-      }
-    }
-
-    if (arguments_length % 2 !== 0) {
-      $raise(Opal.ArgumentError, "odd number of arguments for Hash");
-    }
-
-    for (i = 0; i < arguments_length; i += 2) {
-      key = arguments[i];
-      value = arguments[i + 1];
-
-      Opal.hash_put(hash, key, value);
-    }
-
-    return hash;
-  };
-
   // Create a new range instance with first and last values, and whether the
   // range excludes the last value.
   //
@@ -2602,7 +2546,7 @@
         if (part.ignoreCase !== ignoreCase)
           Opal.Kernel.$warn(
             "ignore case doesn't match for " + part.source.$inspect(),
-            Opal.hash({uplevel: 1})
+            new Map([['uplevel',  1]])
           )
 
         part = part.source;

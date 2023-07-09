@@ -56,7 +56,7 @@ class ::NilClass
   end
 
   def to_h
-    `Opal.hash()`
+    `new Map()`
   end
 
   def to_i

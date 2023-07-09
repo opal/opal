@@ -45,8 +45,6 @@ module Opal
       # Each kwsplat overrides previosly defined keys
       # Hash k/v pairs override previously defined kwsplat values
       def compile_merge
-        helper :hash
-
         result, seq = [], []
 
         children.each do |child|

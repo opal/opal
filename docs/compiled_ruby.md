@@ -78,18 +78,17 @@ Ruby syntaxes for word arrays etc are also supported.
 
 #### Hash
 
-Inside a generated Ruby script, a function `Opal.hash` is available which
-creates a new hash. This is also available in JavaScript as `Opal.hash`
-and simply returns a new instance of the `Hash` class.
+Inside Javascript `new Map()` can be used, which
+creates simply a new instance of the `Hash` class.
 
 ```ruby
-{ :foo => 100, :baz => 700 }    # => Opal.hash("foo", 100, "baz", 700)
-{ foo: 42, bar: [1, 2, 3] }     # => Opal.hash("foo", 42, "bar", [1, 2, 3])
+{ :foo => 100, :baz => 700 }    # => new Map([["foo", 100], ["baz", 700]])
+{ foo: 42, bar: [1, 2, 3] }     # => new Map([["foo", 42], ["bar", [1, 2, 3]]])
 ```
 
 #### Range
 
-Similar to hash, there is a function `Opal.range` available to create
+There is a function `Opal.range` available to create
 range instances.
 
 ```ruby
@@ -598,10 +597,10 @@ array.$map(); // => [2,4,6]
 
 ### Hash
 
-Since Ruby hashes are implemented directly with an Opal class, there's no "toll-free" bridging available (unlike with strings and arrays, for example). However, it's quite possible to interact with hashes from JavaScript:
+Since Ruby hashes are bridged to `Map`. It's quite possible to interact with hashes from JavaScript:
 
 ```javascript
-var myHash = Opal.hash({a: 1, b: 2});
+var myHash = new Map([['a', 1], ['b', 2]]);
 // output of $inspect: {"a"=>1, "b"=>2}
 myHash.$store('a', 10);
 // output of $inspect: {"a"=>10, "b"=>2}
@@ -609,7 +608,7 @@ myHash.$fetch('b','');
 // 2
 myHash.$fetch('z','');
 // ""
-myHash.$update(Opal.hash({b: 20, c: 30}));
+myHash.$update(new Map([['b', 20], ['c', 30]]));
 // output of $inspect: {"a"=>10, "b"=>20, "c"=>30}
 myHash.$to_n(); // provided by the Native module
 // output: Map(2) {'b' => 20, 'c' => 30}

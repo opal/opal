@@ -1,3 +1,4 @@
+# helpers: call, raise
 # backtick_javascript: true
 
 # parser uses String#unpack
@@ -37,6 +38,64 @@ module Kernel
 end
 
 %x{
+  var $has_own = Object.hasOwn || $call.bind(Object.prototype.hasOwnProperty);
+
+  Opal.hash = function() {
+    var arguments_length = arguments.length, args, hash, i, length, key, value;
+
+    if (arguments_length === 1 && arguments[0].$$is_hash) {
+      return arguments[0];
+    }
+
+    hash = new Map();
+
+    if (arguments_length === 1) {
+      args = arguments[0];
+
+      if (arguments[0].$$is_array) {
+        length = args.length;
+
+        for (i = 0; i < length; i++) {
+          if (args[i].length !== 2) {
+            $raise(Opal.ArgumentError, "value not of length 2: " + args[i].$inspect());
+          }
+
+          key = args[i][0];
+          value = args[i][1];
+
+          Opal.hash_put(hash, key, value);
+        }
+
+        return hash;
+      }
+      else {
+        args = arguments[0];
+        for (key in args) {
+          if ($has_own(args, key)) {
+            value = args[key];
+
+            Opal.hash_put(hash, key, value);
+          }
+        }
+
+        return hash;
+      }
+    }
+
+    if (arguments_length % 2 !== 0) {
+      $raise(Opal.ArgumentError, "odd number of arguments for Hash");
+    }
+
+    for (i = 0; i < arguments_length; i += 2) {
+      key = arguments[i];
+      value = arguments[i + 1];
+
+      Opal.hash_put(hash, key, value);
+    }
+
+    return hash;
+  };
+
   Opal.compile = function(str, options) {
     try {
       str = #{::Opal.coerce_to!(`str`, String, :to_str)}

@@ -1,4 +1,4 @@
-# helpers: yield1, hash, hash_clone, hash_delete, hash_each, hash_get, hash_put, deny_frozen_access, freeze
+# helpers: yield1, hash_clone, hash_delete, hash_each, hash_get, hash_put, deny_frozen_access, freeze
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -217,7 +217,7 @@ class ::Hash < `Map`
 
   def compact
     %x{
-      var hash = $hash();
+      var hash = new Map();
 
       return $hash_each(self, hash, function(key, value) {
         if (value !== nil) {
@@ -592,7 +592,7 @@ class ::Hash < `Map`
 
   def invert
     %x{
-      var hash = $hash();
+      var hash = new Map();
 
       return $hash_each(self, hash, function(key, value) {
         $hash_put(hash, value, key);
@@ -684,7 +684,7 @@ class ::Hash < `Map`
     return enum_for(:reject) { size } unless block
 
     %x{
-      var hash = $hash();
+      var hash = new Map();
 
       return $hash_each(self, hash, function(key, value) {
         var obj = block(key, value);
@@ -744,7 +744,7 @@ class ::Hash < `Map`
     return enum_for(:select) { size } unless block
 
     %x{
-      var hash = $hash();
+      var hash = new Map();
 
       return $hash_each(self, hash, function(key, value) {
         var obj = block(key, value);
@@ -789,7 +789,7 @@ class ::Hash < `Map`
 
   def slice(*keys)
     %x{
-      var result = $hash();
+      var result = new Map();
 
       for (var i = 0, length = keys.length; i < length; i++) {
         var key = keys[i], value = $hash_get(self, key);
@@ -850,7 +850,7 @@ class ::Hash < `Map`
     return enum_for(:transform_keys) { size } unless block
 
     %x{
-      var result = $hash();
+      var result = new Map();
 
       return $hash_each(self, result, function(key, value) {
         key = block(key);
@@ -879,7 +879,7 @@ class ::Hash < `Map`
     return enum_for(:transform_values) { size } unless block
 
     %x{
-      var result = $hash();
+      var result = new Map();
 
       return $hash_each(self, result, function(key, value) {
         $hash_put(result, key, block(value));
