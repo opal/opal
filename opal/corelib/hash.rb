@@ -859,16 +859,26 @@ class ::Hash < `Map`
     }
   end
 
-  def transform_keys!(&block)
-    return enum_for(:transform_keys!) { size } unless block
+  def transform_keys!(keys_hash = nil, &block)
+    return enum_for(:transform_keys!) { size } if !(block || keys_hash)
 
     %x{
       $deny_frozen_access(self);
 
+      var modified_keys = new Map();
+
       return $hash_each(self, self, function(key, value) {
-        var new_key = block(key);
-        $hash_delete(self, key);
+        var new_key;
+        if (keys_hash !== nil)
+          new_key = $hash_get(keys_hash, key);
+        if (new_key === undefined && block && block !== nil)
+          new_key = block(key);
+        if (new_key === undefined)
+          return [false, self]; // key not modified
+        if (!$hash_get(modified_keys, key))
+          $hash_delete(self, key);
         $hash_put(self, new_key, value);
+        $hash_put(modified_keys, new_key, true)
         return [false, self];
       });
     }

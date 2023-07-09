@@ -37,10 +37,6 @@ opal_filter "Hash" do
   fails "Hash#transform_keys allows a combination of hash and block argument" # ArgumentError: [Hash#transform_keys] wrong number of arguments (given 1, expected 0)
   fails "Hash#transform_keys allows a hash argument" # ArgumentError: [Hash#transform_keys] wrong number of arguments (given 1, expected 0)
   fails "Hash#transform_keys allows a partial transformation of keys when using a hash argument" # ArgumentError: [Hash#transform_keys] wrong number of arguments (given 1, expected 0)
-  fails "Hash#transform_keys! allows a hash argument" # ArgumentError: [Hash#transform_keys!] wrong number of arguments (given 1, expected 0)
-  fails "Hash#transform_keys! on frozen instance raises a FrozenError on hash argument" # Expected FrozenError but got: ArgumentError ([Hash#transform_keys!] wrong number of arguments (given 1, expected 0))
-  fails "Hash#transform_keys! prevents conflicts between new keys and old ones" # Expected {"e"=>1} == {"b"=>1, "c"=>2, "d"=>3, "e"=>4} to be truthy but was false
-  fails "Hash#transform_keys! returns the processed keys and non evaluated keys if we break from the block" # Expected {"c"=>1, "d"=>4} == {"b"=>1, "c"=>2, "d"=>4} to be truthy but was false
   fails "Hash.ruby2_keywords_hash copies instance variables" # Expected nil == 42 to be truthy but was false
   fails "Hash.ruby2_keywords_hash raises TypeError for non-Hash" # Expected TypeError but no exception was raised (nil was returned)
   fails "Hash.ruby2_keywords_hash returns a copy of a Hash and marks the copy as a keywords Hash" # Expected false == true to be truthy but was false
