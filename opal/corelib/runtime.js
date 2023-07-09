@@ -2353,12 +2353,15 @@
       }
 
       var objects = keys.get(key_hash),
+          objects_copy = objects.slice(),
           object;
 
-      for (var i=0; i<objects.length; i++) {
-        object = objects[0];
+      for (var i=0; i<objects_copy.length; i++) {
+        object = objects_copy[i];
         if (key === object || key['$eql?'](object)) {
-          return [false, false];
+          // got a duplicate, remove it
+          objects.splice(objects.indexOf(object), 1);
+          hash.delete(object);
         }
       }
 
