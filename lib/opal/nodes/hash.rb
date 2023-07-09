@@ -27,14 +27,12 @@ module Opal
       end
 
       def simple_keys?
-        keys.all? { |key| %i[sym str].include?(key.type) }
+        keys.all? { |key| %i[sym str int].include?(key.type) }
       end
 
       def compile
         if has_kwsplat
           compile_merge
-        elsif simple_keys?
-          compile_map
         else
           compile_hash
         end
@@ -76,39 +74,25 @@ module Opal
       end
 
       # Compiles a hash without kwsplats
-      # with complex keys.
+      # with simple or complex keys.
       def compile_hash
-        helper :hash
-
         children.each_with_index do |pair, idx|
           key, value = pair.children
           push ', ' unless idx == 0
-          push expr(key), ', ', expr(value)
+          if %i[sym str].include?(key.type)
+            push "[#{key.children[0].to_s.inspect}", ', ', expr(value), ']'
+          else
+            push '[', expr(key), ', ', expr(value), ']'
+          end
         end
 
-        wrap '$hash(', ')'
-      end
-
-      # Compiles a hash without kwsplats
-      # and containing **only** string/symbols as keys.
-      def compile_map
-        hash_obj, hash_keys = {}, []
-
-        keys.size.times do |idx|
-          key = keys[idx].children[0].to_s.inspect
-          hash_keys << key unless hash_obj.include? key
-          hash_obj[key] = expr(values[idx])
-        end
-
-        hash_keys.each_with_index do |key, idx|
-          push ', ' unless idx == 0
-          push "[#{key}", ', ', hash_obj[key], ']'
-        end
-
-        if hash_keys.empty?
+        if keys.empty?
           push '(new Map())'
-        else
+        elsif simple_keys?
           wrap '(new Map([', ']))'
+        else
+          helper :hash_rehash
+          wrap '$hash_rehash(new Map([', ']))'
         end
       end
     end

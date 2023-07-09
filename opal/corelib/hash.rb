@@ -676,8 +676,7 @@ class ::Hash < `Map`
   def rehash
     %x{
       $deny_frozen_access(self);
-      Opal.hash_rehash(self);
-      return self;
+      return Opal.hash_rehash(self);
     }
   end
 

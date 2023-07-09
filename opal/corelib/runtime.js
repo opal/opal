@@ -1837,7 +1837,7 @@
 
     Opal.hash_each(given_args, false, function(key, value) {
       if (!used_args[key]) {
-        map.set(key, value);
+        Opal.hash_put(map, key, value);
       }
       return [false, false];
     });
@@ -2240,7 +2240,7 @@
 
   Opal.hash_put = function(hash, key, value) {
     var type = typeof key;
-    if (type === "string" || type === "symbol" || type === "number") {
+    if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
       hash.set(key, value)
     } else if (key.$$is_string) {
       hash.set(key.valueOf(), value);
@@ -2248,7 +2248,7 @@
       if (!hash.$$keys)
         hash.$$keys = new Map();
       
-      var key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash(),
+      var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
           keys = hash.$$keys;
 
       if (!keys.has(key_hash)) {
@@ -2275,12 +2275,10 @@
 
   Opal.hash_get = function(hash, key) {
     var type = typeof key;
-    if (type === "string" || type === "symbol" || type === "number") {
+    if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
       return hash.get(key)
-    } else if (key.$$is_string) {
-      return hash.get(key.valueOf());
     } else if (hash.$$keys) {
-      var key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash(),
+      var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
           objects = hash.$$keys.get(key_hash),
           object;
 
@@ -2290,7 +2288,11 @@
           if (key === object || key['$eql?'](object))
             return hash.get(object);
         }
+      } else if (key.$$is_string) {
+        return hash.get(key_hash);
       }
+    } else if (key.$$is_string) {
+      return hash.get(key.valueOf());
     }
   };
 
@@ -2304,12 +2306,10 @@
 
   Opal.hash_delete = function(hash, key) {
     var type = typeof key
-    if (type === "string" || type === "symbol" || type === "number") {
+    if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
       return $hash_delete_stage2(hash, key);
-    } else if (key.$$is_string) {
-      return $hash_delete_stage2(hash, key.valueOf());
     } else if (hash.$$keys) {
-      var key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash(),
+      var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
           objects = hash.$$keys.get(key_hash),
           object;
 
@@ -2323,24 +2323,29 @@
             return $hash_delete_stage2(hash, object);
           }
         }
+      } else if (key.$$is_string) {
+        return $hash_delete_stage2(hash, key_hash);
       }
+    } else if (key.$$is_string) {
+      return $hash_delete_stage2(hash, key.valueOf());
     }
   };
 
   Opal.hash_rehash = function(hash) {
     var keys = hash.$$keys;
 
-    if (!keys) // nothing to rehash
-      return;
+    if (keys)
+      keys.clear();
 
-    keys.clear();
-    
     Opal.hash_each(hash, false, function(key, value) {
       var type = typeof key;
-      if (type === "string" || type === "symbol" || type === "number") // nothing to rehash
-        return [false, false];
+      if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint")
+        return [false, false]; // nothing to rehash
 
-      var key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
+      var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash());
+
+      if (!keys)
+        hash.$$keys = keys = new Map();
 
       if (!keys.has(key_hash)) {
         keys.set(key_hash, [key]);
@@ -2361,6 +2366,8 @@
 
       return [false, false]
     });
+
+    return hash;
   };
 
   Opal.hash_each = function(hash, dres, fun) {
@@ -2855,10 +2862,11 @@
   }
 
   Opal.get_kwarg = function(kwargs, key) {
-    if (!kwargs.has(key)) {
+    var kwarg = Opal.hash_get(kwargs, key);
+    if (kwarg === undefined) {
       $raise(Opal.ArgumentError, 'missing keyword: '+key);
     }
-    return kwargs.get(key);
+    return kwarg;
   }
 
   // Arrays of size > 32 elements that contain only strings,
