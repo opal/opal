@@ -1807,11 +1807,10 @@
   };
 
   // Used for extracting keyword arguments from arguments passed to
-  // JS function. If provided +arguments+ list doesn't have a Hash
-  // as a last item, returns a blank Hash.
+  // JS function.
   //
   // @param parameters [Array]
-  // @return [Hash]
+  // @return [Hash] or undefined
   //
   Opal.extract_kwargs = function(parameters) {
     var kwargs = parameters[parameters.length - 1];
@@ -2353,7 +2352,7 @@
       }
 
       var objects = keys.get(key_hash),
-          objects_copy = objects.slice(),
+          objects_copy = $slice(objects),
           object;
 
       for (var i=0; i<objects_copy.length; i++) {
