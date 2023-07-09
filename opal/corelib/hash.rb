@@ -845,22 +845,28 @@ class ::Hash < `Map`
     end
   end
 
-  def transform_keys(&block)
-    return enum_for(:transform_keys) { size } unless block
+  def transform_keys(keys_hash = nil, &block)
+    return enum_for(:transform_keys) { size } if !block && !keys_hash
 
     %x{
       var result = new Map();
 
       return $hash_each(self, result, function(key, value) {
-        key = block(key);
-        $hash_put(result, key, value);
+        var new_key;
+        if (keys_hash !== nil)
+          new_key = $hash_get(keys_hash, key);
+        if (new_key === undefined && block && block !== nil)
+          new_key = block(key);
+        if (new_key === undefined)
+          new_key = key // key not modified
+        $hash_put(result, new_key, value);
         return [false, result];
       });
     }
   end
 
   def transform_keys!(keys_hash = nil, &block)
-    return enum_for(:transform_keys!) { size } if !(block || keys_hash)
+    return enum_for(:transform_keys!) { size } if !block && !keys_hash
 
     %x{
       $deny_frozen_access(self);

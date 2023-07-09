@@ -34,9 +34,6 @@ opal_filter "Hash" do
   fails "Hash#to_s does not call #to_s on a String returned from #inspect" # Expected "{\"a\"=>\"abc\"}" == "{:a=>\"abc\"}" to be truthy but was false
   fails "Hash#to_s does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0xb4f9a>}" =~ /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/ to be truthy but was nil
   fails "Hash#to_s does not call #to_str on the object returned from #to_s when it is not a String" # Exception: Cannot convert object to primitive value
-  fails "Hash#transform_keys allows a combination of hash and block argument" # ArgumentError: [Hash#transform_keys] wrong number of arguments (given 1, expected 0)
-  fails "Hash#transform_keys allows a hash argument" # ArgumentError: [Hash#transform_keys] wrong number of arguments (given 1, expected 0)
-  fails "Hash#transform_keys allows a partial transformation of keys when using a hash argument" # ArgumentError: [Hash#transform_keys] wrong number of arguments (given 1, expected 0)
   fails "Hash.ruby2_keywords_hash copies instance variables" # Expected nil == 42 to be truthy but was false
   fails "Hash.ruby2_keywords_hash raises TypeError for non-Hash" # Expected TypeError but no exception was raised (nil was returned)
   fails "Hash.ruby2_keywords_hash returns a copy of a Hash and marks the copy as a keywords Hash" # Expected false == true to be truthy but was false
