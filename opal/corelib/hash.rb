@@ -17,7 +17,7 @@ class ::Hash < `Map`
 
   def self.[](*argv)
     %x{
-      var hash, argc = argv.length, i;
+      var hash, argc = argv.length, arg, i;
 
       if (argc === 1) {
         hash = #{::Opal.coerce_to?(argv[0], ::Hash, :to_hash)};
@@ -27,23 +27,22 @@ class ::Hash < `Map`
 
         argv = #{::Opal.coerce_to?(argv[0], ::Array, :to_ary)};
         if (argv === nil) {
-          #{::Kernel.raise ::ArgumentError, 'odd number of arguments for Hash'}
+          #{::Kernel.raise ::ArgumentError, 'odd number of arguments for Hash'};
         }
 
         argc = argv.length;
         hash = #{allocate};
 
         for (i = 0; i < argc; i++) {
-          if (!argv[i].$$is_array) continue;
-          switch(argv[i].length) {
-          case 1:
-            hash.$store(argv[i][0], nil);
-            break;
-          case 2:
-            hash.$store(argv[i][0], argv[i][1]);
-            break;
-          default:
-            #{::Kernel.raise ::ArgumentError, "invalid number of elements (#{`argv[i].length`} for 1..2)"}
+          arg = argv[i];
+          if (!arg.$$is_array)
+            #{::Kernel.raise ::ArgumentError, "invalid element #{`arg`.inspect} for Hash"};
+          if (arg.length === 1) {
+            hash.$store(arg[0], nil);
+          } else if (arg.length === 2) {
+            hash.$store(arg[0], arg[1]);
+          } else {
+            #{::Kernel.raise ::ArgumentError, "invalid number of elements (#{`arg.length`} for #{`arg`.inspect}), must be 1..2"};
           }
         }
 
