@@ -64,8 +64,8 @@ class OpenStruct
     @table.eql? other.instance_variable_get(:@table)
   end
 
-  def to_h
-    @table.dup
+  def to_h(&block)
+    block_given? ? @table.to_h(&block) : @table.dup
   end
 
   def to_n

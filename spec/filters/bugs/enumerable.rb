@@ -23,9 +23,6 @@ opal_filter "Enumerable" do
   fails "Enumerable#sort_by returns an array of elements when a block is supplied and #map returns an enumerable" # NoMethodError: undefined method `sort!' for #<EnumerableSpecs::MapReturnsEnumerable::EnumerableMapping:0x42a48 @items=#<EnumerableSpecs::MapReturnsEnumerable:0x42a46> @block=#<Proc:0x42a4a>>
   fails "Enumerable#take_while calls the block with initial args when yielded with multiple arguments" # Expected [1, [2], [3, 4], [5, 6, 7], [8, 9], nil, []] == [1, [2], 3, 5, [8, 9], nil, []] to be truthy but was false
   fails "Enumerable#tally counts values as gathered array when yielded with multiple arguments" # Expected {[]=>3, 0=>1, [0, 1]=>2, [0, 1, 2]=>3, nil=>1, "default_arg"=>1, [0]=>1} == {nil=>2, 0=>1, [0, 1]=>2, [0, 1, 2]=>3, "default_arg"=>1, []=>2, [0]=>1} to be truthy but was false
-  fails "Enumerable#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject/) but got: TypeError (wrong element type NilClass at 0 (expected array))
-  fails "Enumerable#to_h with block raises ArgumentError if block returns longer or shorter array" # Expected ArgumentError (/element has wrong array length/) but got: ArgumentError (wrong array length at 0 (expected 2, was 3))
-  fails "Enumerable#to_h with block raises TypeError if block returns something other than Array" # Expected TypeError (/wrong element type String/) but got: TypeError (wrong element type NilClass at 0 (expected array))
   fails "Enumerable#uniq uses eql? semantics" # Expected [1] == [1, 1] to be truthy but was false
   fails "Enumerable#zip passes each element of the result array to a block and return nil if a block is given" # Expected [[1, 4, 7], [2, 5, 8], [3, 6, 9]] == nil to be truthy but was false  
 end

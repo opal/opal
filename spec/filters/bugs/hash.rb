@@ -23,9 +23,6 @@ opal_filter "Hash" do
   fails "Hash#invert compares new keys with eql? semantics" # Expected "b" == "a" to be truthy but was false
   fails "Hash#store does not dispatch to hash for Boolean, Integer, Float, String, or Symbol" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x627dc @method="store" @object=nil>
   fails "Hash#store keeps the existing String key in the hash if there is a matching one" # Expected "foo" not to be identical to "foo"
-  fails "Hash#to_h with block does not coerce returned pair to Array with #to_a" # Expected TypeError (/wrong element type MockObject/) but got: TypeError (wrong element type NilClass at 0 (expected array))
-  fails "Hash#to_h with block raises ArgumentError if block returns longer or shorter array" # Expected ArgumentError (/element has wrong array length/) but got: ArgumentError (wrong array length at 0 (expected 2, was 3))
-  fails "Hash#to_h with block raises TypeError if block returns something other than Array" # Expected TypeError (/wrong element type String/) but got: TypeError (wrong element type NilClass at 0 (expected array))
   fails "Hash#to_proc the returned proc has an arity of 1" # Expected -1 == 1 to be truthy but was false
   fails "Hash#to_proc the returned proc is a lambda" # Expected #<Proc:0x42df6>.lambda? to be truthy but was false
   fails "Hash#to_s calls #to_s on the object returned from #inspect if the Object isn't a String" # Expected "{\"a\"=>abc}" == "{:a=>abc}" to be truthy but was false

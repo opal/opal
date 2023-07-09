@@ -2316,10 +2316,10 @@ class ::Array < `Array`
       for (i = 0; i < len; i++) {
         ary = #{::Opal.coerce_to?(`array[i]`, ::Array, :to_ary)};
         if (!ary.$$is_array) {
-          #{::Kernel.raise ::TypeError, "wrong element type #{`ary`.class} at #{`i`} (expected array)"}
+          #{::Kernel.raise ::TypeError, "wrong element type #{`array[i]`.class} at #{`i`} (expected array)"}
         }
         if (ary.length !== 2) {
-          #{::Kernel.raise ::ArgumentError, "wrong array length at #{`i`} (expected 2, was #{`ary`.length})"}
+          #{::Kernel.raise ::ArgumentError, "element has wrong array length at #{`i`} (expected 2, was #{`ary`.length})"}
         }
         key = ary[0];
         val = ary[1];
