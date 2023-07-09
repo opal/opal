@@ -33,5 +33,6 @@ module.exports = {
     "Reflect": "readonly",
     "Uint8Array": "readonly",
     "WeakRef": "readonly",
+    "Map": "readonly",
   }
 };
