@@ -91,9 +91,9 @@ With bridging creating equivalent Ruby and JavaScript objects, no explicit type 
 
 ## Bridged Classes in Corelib
 
-Opal's core library bridges several commonly used JavaScript classes, including `Array`, `Boolean`, `Number` (think: `Float` which also may act as an `Integer`), `Proc`, `Time`, `RegExp`, and `String`, allowing interaction with these JavaScript instances as their Ruby equivalents.
+Opal's core library bridges several commonly used JavaScript classes, including `Array`, `Boolean`, `Number` (think: `Float` which also may act as an `Integer`), `Proc`, `Time`, `RegExp`, and `String`, allowing interaction with these JavaScript instances as their Ruby equivalents. Also `Hash` bridges the Javascript `Map` class and works very well between Javascript and Opal if primitives of the Javascript types "string", "number" and "symbol" (which must be global, generated with `Symbol.for()`) are used as keys. When other types or objects are used as keys, there may be issues retrieving the Map entries from each language, because the original references of the objects that have been used as keys are required for retrieval. When using a `Map` with object keys passed from Javascript as Hash in Opal, calling `Hash#rehash` may resolve issues and make entries accessible.
 
-However, Opal doesn't bridge common JavaScript classes like `Hash` and `Set` due to significant differences in behavior and interfaces between Ruby and JavaScript.
+However, Opal doesn't bridge common JavaScript classes like `Set` due to significant differences in behavior and interfaces between Ruby and JavaScript.
 
 ## Drawbacks
 

@@ -612,7 +612,8 @@ myHash.$fetch('z','');
 myHash.$update(Opal.hash({b: 20, c: 30}));
 // output of $inspect: {"a"=>10, "b"=>20, "c"=>30}
 myHash.$to_n(); // provided by the Native module
-// output: {"a": 10, "b": 20, "c": 30} aka a standard JavaScript object
+// output: Map(2) {'b' => 20, 'c' => 30}
+// aka a standard JavaScript Map
 ```
 
 NOTE: Be aware `Hash#to_n` produces a duplicate copy of the hash.
