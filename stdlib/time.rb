@@ -1,7 +1,7 @@
 # backtick_javascript: true
 
 class Time
-  def self.parse(str)
+  def self.parse(str, now = Time.now)
     %x{
       var d = Date.parse(str);
       if (d !== d) {
@@ -20,6 +20,39 @@ class Time
           return matched_sub;
         });
         d = Date.parse(str);
+      }
+      if (d !== d) {
+        // still failed, d is a NaN
+        if (str.length == 8 && str.match(/^[0-9]{4}[0-1][0-9][0-3][0-9]/)) {
+          // try yyyymmdd
+          d = Date.parse(str.slice(0, 4) + '-' + str.slice(-4, -2) + '-' + str.slice(-2));
+          if (d !== d)
+            #{::Kernel.raise(::ArgumentError,  "argument out of range")}
+        } else if (str.length == 7 && str.match(/^[0-9]{4}[0-3][0-9][0-9]/)) {
+          // try yyyyddd
+          return new Date(Date.UTC(parseInt(str.slice(0, 4)), 0, parseInt(str.slice(-3))));
+        }
+      }
+      if (d !== d) {
+        // still failed, d is a NaN
+        // try hh:mm format
+        var m = str.match(/^([0-2]?[0-9]):([0-5][0-9])/);
+        if (m) {
+          now.setHours(parseInt(m[1]), parseInt(m[2]));
+          return d;
+        }
+      }
+      if (d !== d && str.match(/[a-zA-Z]+/)) {
+        // try monthname
+        var idx = #{`Opal.Time.$$monthnames`.compact.map(&:downcase)}.indexOf(str.toLowerCase());
+        if (idx > 0) {
+          now.setMonth(idx - 1);
+          return d;
+        }
+      }
+      if (d !== d) {
+        // still failed, d is a NaN
+        #{::Kernel.raise(::ArgumentError,  "no time information in #{str}")}
       }
       return new Date(d);
     }

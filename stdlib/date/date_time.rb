@@ -3,11 +3,14 @@
 class DateTime < Date
   class << self
     def now
-      wrap Time.now
+      t = Time.now
+      new(t.year, t.month, t.day, t.hour, t.min, t.sec, t.utc_offset)
     end
 
-    def parse(str)
-      wrap Time.parse(str)
+    def parse(string, comp = true, start = ::Date::ITALY, limit: 128)
+      dth = _parse(string, comp, limit: limit, mode: :datetime)
+      raise ArgumentError, 'invalid date, time' unless dth
+      new(dth[:year], dth[:month], dth[:day], dth[:hour], dth[:min], dth[:sec], dth[:utc_offset] || 0, start)
     end
   end
 
@@ -19,6 +22,14 @@ class DateTime < Date
         day = 4;
       }
     }
+
+    ::Kernel.raise ArgumentError, 'hours must be a Integer' if !hours.nil? && !hours.is_a?(Integer)
+    ::Kernel.raise ArgumentError, 'minutes must be a Integer' if !minutes.nil? && !minutes.is_a?(Integer)
+    ::Kernel.raise ArgumentError, 'seconds must be between -59..59' if !seconds.nil? && (seconds <= -60 || seconds >= 60) 
+
+    hours += 24 if hours && hours < 0
+    minutes += 60 if minutes && minutes < 0
+    seconds += 60 if seconds && seconds < 0
 
     @date = Time.new(year, month, day, hours, minutes, seconds, offset)
     @start = start
