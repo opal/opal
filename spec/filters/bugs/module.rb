@@ -104,8 +104,6 @@ opal_filter "Module" do
   fails "Module#extend_object extends the given object with its constants and methods by default" # NoMethodError: undefined method `test_method' for #<MockObject:0x2541a @name="extended direct" @null=nil>
   fails "Module#extend_object on Class raises a TypeError if calling after rebinded to Class" # Expected TypeError but no exception was raised (nil was returned)
   fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0xdd44> was returned)
-  fails "Module#initialize_copy should produce a duped module with inspectable class methods" # NameError: undefined method `hello' for class `Module'
-  fails "Module#initialize_copy should retain singleton methods when duped" # Expected [] == ["hello"] to be truthy but was false
   fails "Module#instance_method converts non-String name by calling #to_str method" # NameError: undefined method `#<Object:0x3a942>' for class `ModuleSpecs::InstanceMeth'
   fails "Module#instance_method raises TypeError when passed non-String name and #to_str returns non-String value" # Expected TypeError (/can't convert Object to String/) but got: NameError (undefined method `#<Object:0x3a98e>' for class `ModuleSpecs::InstanceMeth')
   fails "Module#instance_method raises a NameError if the method has been undefined" # Expected #<UnboundMethod: ModuleSpecs::InstanceMeth#foo (defined in ModuleSpecs::InstanceMeth in ruby/core/module/fixtures/classes.rb:319)> == #<UnboundMethod: ModuleSpecs::InstanceMeth#foo (defined in ModuleSpecs::InstanceMeth in ruby/core/module/fixtures/classes.rb:319)> to be truthy but was false
