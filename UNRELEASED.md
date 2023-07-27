@@ -8,6 +8,14 @@
 ### Documentation
 -->
 
+<!-- 
+TODO:
+## Major Changes
+
+`Hash` is now bridged to JavaScript `Map` and support for non-symbol keys in keyword arguments (#2568)
+-->
+
+
 ### Deprecated
 
 - Deprecate using x-string to access JavaScript without an explicit magic-comment (#2543)
@@ -31,10 +39,12 @@
 ### Added
 
 - SourceMap support for `Kernel#eval` (#2534)
+- Add `CGI::Util#escapeURIComponent` and `CGI::Util#unescapeURIComponent` (#2566)
 
 ### Changed
 
 - Change compilation of Regexp nodes that may contain advanced features, so if invalid that they would raise at runtime, not parse-time (#2548)
+- `Hash` is now bridged to JavaScript `Map` and support for non-symbol keys in keyword arguments (#2568)
 
 ### Documentation
 
@@ -49,6 +59,7 @@
 - Array: Optimize #collect/#map (#2541)
 - Optimize argument slicing in runtime for performance (#2555)
 - Closure: Generate a JS object, not an Error, gain up to 15% on Asciidoctor (#2556)
+- Optimize `String#split` and `String#start_with` (#2560)
 
 ### Internal
 
