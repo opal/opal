@@ -1554,9 +1554,9 @@
       // call method missing with correct args (remove '$' prefix on method name)
       return this.$method_missing.apply(this, $prepend(method_name.slice(1), arguments));
     };
-  
+
     method_missing_stub.$$stub = true;
-  
+
     return method_missing_stub;
   };
 
@@ -2227,6 +2227,10 @@
   // Hashes
   // ------
 
+  Opal.hash_init = function (_hash) {
+    console.warn("DEPRECATION: Opal.hash_init is deprecated and is now a no-op.");
+  }
+
   Opal.hash_clone = function(from_hash, to_hash) {
     to_hash.$$none = from_hash.$$none;
     to_hash.$$proc = from_hash.$$proc;
@@ -2246,7 +2250,7 @@
     } else {
       if (!hash.$$keys)
         hash.$$keys = new Map();
-      
+
       var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
           keys = hash.$$keys;
 
@@ -2372,7 +2376,83 @@
     return hash;
   };
 
-  Opal.hash_each = function(hash, dres, fun) {
+  Opal.hash = function () {
+    var arguments_length = arguments.length,
+      args,
+      hash,
+      i,
+      length,
+      key,
+      value;
+
+    if (arguments_length === 1 && arguments[0].$$is_hash) {
+      return arguments[0];
+    }
+
+    hash = new Map();
+
+    if (arguments_length === 1) {
+      args = arguments[0];
+
+      if (arguments[0].$$is_array) {
+        length = args.length;
+
+        for (i = 0; i < length; i++) {
+          if (args[i].length !== 2) {
+            $raise(Opal.ArgumentError, 'value not of length 2: ' + args[i].$inspect());
+          }
+
+          key = args[i][0];
+          value = args[i][1];
+
+          Opal.hash_put(hash, key, value);
+        }
+
+        return hash;
+      } else {
+        args = arguments[0];
+        for (key in args) {
+          if ($has_own(args, key)) {
+            value = args[key];
+
+            Opal.hash_put(hash, key, value);
+          }
+        }
+
+        return hash;
+      }
+    }
+
+    if (arguments_length % 2 !== 0) {
+      $raise(Opal.ArgumentError, 'odd number of arguments for Hash');
+    }
+
+    for (i = 0; i < arguments_length; i += 2) {
+      key = arguments[i];
+      value = arguments[i + 1];
+
+      Opal.hash_put(hash, key, value);
+    }
+
+    return hash;
+  };
+
+  // A faster Hash creator for hashes that just use symbols and
+  // strings as keys. The map and keys array can be constructed at
+  // compile time, so they are just added here by the constructor
+  // function.
+  //
+  Opal.hash2 = function(keys, smap) {
+    console.warn("DEPRECATION: `Opal.hash2` is deprecated and will be removed in Opal 2.0. Use `new Map()` with an array of key/value pairs instead.");
+
+    var hash = new Map();
+    for (var i = 0, max = keys.length; i < max; i++) {
+      hash.set(keys[i], smap[keys[i]]);
+    }
+    return hash;
+  };
+
+  Opal.hash_each = function (hash, dres, fun) {
     // dres = default result, returned if hash is empty
     // fun is called as fun(key, value) and must return a array with [break, result]
     // if break is true, iteration stops and result is returned
