@@ -2356,7 +2356,7 @@
       }
 
       var objects = keys.get(key_hash),
-          objects_copy = $slice(objects),
+          objects_copy = (objects.length === 1) ? objects : $slice(objects),
           object;
 
       for (var i=0; i<objects_copy.length; i++) {
