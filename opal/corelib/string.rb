@@ -1063,17 +1063,16 @@ class ::String < `String`
           match,
           match_count = 0,
           valid_result_length = 0,
-          i, ii;
+          i, max;
 
       if (pattern.$$is_regexp) {
         pattern = $global_multiline_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str').$to_s();
+
         if (pattern === ' ') {
           pattern = /\s+/gm;
           string = string.replace(/^\s+/, '');
-        } else {
-          pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
         }
       }
 
@@ -1089,16 +1088,21 @@ class ::String < `String`
 
       if (limit === 0) {
         while (result[result.length - 1] === '') {
-          result.length -= 1;
+          result.pop();
         }
         return result;
+      }
+
+      if (!pattern.$$is_regexp) {
+        pattern = Opal.escape_regexp(pattern)
+        pattern = new RegExp(pattern, 'gm');
       }
 
       match = pattern.exec(string);
 
       if (limit < 0) {
         if (match !== null && match[0] === '' && pattern.source.indexOf('(?=') === -1) {
-          for (i = 0, ii = match.length; i < ii; i++) {
+          for (i = 0, max = match.length; i < max; i++) {
             result.push('');
           }
         }
@@ -1158,7 +1162,7 @@ class ::String < `String`
         } else {
           var prefix = $coerce_to(prefixes[i], #{::String}, 'to_str').$to_s();
 
-          if (self.indexOf(prefix) === 0) {
+          if (self.length >= prefix.length && self.startsWith(prefix)) {
             return true;
           }
         }
