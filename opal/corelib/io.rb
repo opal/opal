@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 class ::IO
   self::SEEK_SET = 0
   self::SEEK_CUR = 1
