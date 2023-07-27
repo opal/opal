@@ -134,7 +134,7 @@ class Opal::SourceMap::File
         absolute_mapping.map do |absolute_segment|
           segment = []
 
-          segment[0] = absolute_segment[0] -  reference_segment[0]
+          segment[0] = absolute_segment[0] - reference_segment[0]
           segment[1] = absolute_segment[1] - (reference_segment[1] || 0)
           segment[2] = absolute_segment[2] - (reference_segment[2] || 0)
           segment[3] = absolute_segment[3] - (reference_segment[3] || 0)
