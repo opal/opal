@@ -38,6 +38,32 @@ describe Hash do
     expect(h).to eq(expected_hash)
   end
 
+  it 'turns a native JS Map into a hash' do
+    obj = %x{
+      new Map([ ['a', 1],
+                ['b', "two"],
+                ['c', new Map([['d', 1]])],
+                ['e', [{f: 'g',h: [null]}]] ]);
+    }
+
+    h = Hash.new(obj)
+    expected_hash = {
+      a: 1,
+      b: "two",
+      c: {
+        d: 1,
+      },
+      e: [
+        {
+          f: 'g',
+          h: [nil],
+        },
+      ],
+    }
+
+    expect(h).to eq(expected_hash)
+  end
+
   it 'turns Object.create(null) JS objects into a hash' do
     %x{
       var obj = Object.create(null);
@@ -56,14 +82,14 @@ describe Hash do
     it 'converts a hash with native objects as values' do
       obj = { 'a_key' => `{ key: 1 }` }
       native = obj.to_n
-      `#{native}.a_key.key`.should == 1
+      `#{native}.get('a_key').key`.should == 1
     end
 
     it 'passes Ruby objects that cannot be converted' do
       object = Object.new
       hash = { foo: object }
       native = hash.to_n
-      expect(`#{native}.foo`).to eq object
+      expect(`#{native}.get('foo')`).to eq object
     end
   end
 end

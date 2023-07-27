@@ -7,42 +7,42 @@ describe 'Hash' do
       @h = {'a' => 123, 'b' => 456}
     end
 
-    it 'stores keys directly as strings in the `keys` array' do
-      `#@h.$$keys.length`.should == 2
-      `#@h.$$keys[0]`.should == 'a'
-      `#@h.$$keys[1]`.should == 'b'
+    it 'stores keys directly as strings in the `Map`' do
+      `#@h.size`.should == 2
+      `Array.from(#@h.keys())[0]`.should == 'a'
+      `Array.from(#@h.keys())[1]`.should == 'b'
 
       @h['c'] = 789
 
-      `#@h.$$keys.length`.should == 3
-      `#@h.$$keys[2]`.should == 'c'
+      `#@h.size`.should == 3
+      `Array.from(#@h.keys())[2]`.should == 'c'
     end
 
-    it 'stores values directly as objects in the `smap` object by their corresponding string key' do
-      `Object.keys(#@h.$$smap).length`.should == 2
-      `#@h.$$smap['a']`.should == 123
-      `#@h.$$smap['b']`.should == 456
+    it 'stores values directly as objects in the `Map`' do
+      `Array.from(#@h.values()).length`.should == 2
+      `Array.from(#@h.values())[0]`.should == 123
+      `Array.from(#@h.values())[1]`.should == 456
 
       @h['c'] = 789
 
-      `Object.keys(#@h.$$smap).length`.should == 3
-      `#@h.$$smap['c']`.should == 789
+      `Array.from(#@h.values()).length`.should == 3
+      `Array.from(#@h.values())[2]`.should == 789
     end
 
-    it 'does not use the `map` object' do
-      `Object.keys(#@h.$$map).length`.should == 0
+    it 'does not use the `Map.$$keys`' do
+      `(#@h.$$keys === undefined)`.should == true
 
       @h['c'] = 789
 
-      `Object.keys(#@h.$$map).length`.should == 0
+      `(#@h.$$keys === undefined)`.should == true
     end
 
-    it 'uses the `map` object when an object key is added' do
-      `Object.keys(#@h.$$map).length`.should == 0
+    it 'uses the `Map.$$keys` object when an object key is added' do
+      `(#@h.$$keys === undefined)`.should == true
 
       @h[Object.new] = 789
 
-      `Object.keys(#@h.$$map).length`.should == 1
+      `#@h.$$keys.size`.should == 1
     end
 
     it 'converts string objects to values when used to delete keys' do
@@ -60,57 +60,10 @@ describe 'Hash' do
       @h = {@obj1 => 123, @obj2 => 456}
     end
 
-    it 'uses a data structure called "bucket", which is a wrapper object with `key`, `key_hash`, `value`, and `next` properties' do
-      bucket = `#@h.$$keys[0]`
-      `#{bucket}.key`.should == @obj1
-      `#{bucket}.key_hash`.should == @obj1.hash
-      `#{bucket}.value`.should == 123
-      `#{bucket}.next === undefined`.should == true
-    end
-
-    it 'stores keys in the `keys` array as "bucket" objects' do
-      `#@h.$$keys.length`.should == 2
-      `#@h.$$keys[0].key`.should == @obj1
-      `#@h.$$keys[1].key`.should == @obj2
-
-      obj3 = Object.new
-      @h[obj3] = 789
-
-      `#@h.$$keys.length`.should == 3
-      `#@h.$$keys[2].key`.should == obj3
-    end
-
-    it 'stores values in the `map` object as "bucket" objects by #hash string of their corresponding object key' do
-      `Object.keys(#@h.$$map).length`.should == 2
-      `#@h.$$map[#{@obj1.hash}].value`.should == 123
-      `#@h.$$map[#{@obj2.hash}].value`.should == 456
-
-      obj3 = Object.new
-      @h[obj3] = 789
-
-      `Object.keys(#@h.$$map).length`.should == 3
-      `#@h.$$map[#{obj3.hash}].value`.should == 789
-    end
-
-    it 'keeps a pointer to the same "bucket" object in the `keys` array and in the `map` object' do
-      `#@h.$$map[#{@obj1.hash}] === #@h.$$keys[0]`.should == true
-      `#@h.$$map[#{@obj2.hash}] === #@h.$$keys[1]`.should == true
-    end
-
-    it 'does not use the `smap` object' do
-      `Object.keys(#@h.$$smap).length`.should == 0
-
-      @h[Object.new] = 789
-
-      `Object.keys(#@h.$$smap).length`.should == 0
-    end
-
-    it 'uses the `smap` object when a string key is added' do
-      `Object.keys(#@h.$$smap).length`.should == 0
-
-      @h['c'] = 789
-
-      `Object.keys(#@h.$$smap).length`.should == 1
+    it 'uses a `Map.$$keys` to keep references of objects to be used as keys' do
+      keys = `Array.from(#@h.$$keys.entries())`
+      `#{keys}[0][1][0]`.should == @obj1
+      `#{keys}[0][0]`.should == @obj1.hash
     end
 
     it 'allows multiple keys that #hash to the same value to be stored in the Hash' do
@@ -128,45 +81,41 @@ describe 'Hash' do
       @mock3.should_receive(:hash).at_least(1).and_return('hhh')
       @mock3.should_receive(:eql?).exactly(2).and_return(false)
 
-      `Object.keys(#@hash.$$map).length`.should == 0
-      `#@hash.$$keys.length`.should == 0
+      `#@hash.size`.should == 0
+      `(#@hash.$$keys === undefined)`.should == true
 
       @hash[@mock1] = 123
-      `Object.keys(#@hash.$$map).length`.should == 1
-      `#@hash.$$keys.length`.should == 1
-      `#@hash.$$keys[0] === #@hash.$$map['hhh']`.should == true
-      `#@hash.$$keys[0].key`.should == @mock1
-      `#@hash.$$keys[0].key_hash`.should == @mock1.hash
-      `#@hash.$$keys[0].value`.should == 123
-      `#@hash.$$keys[0].next === undefined`.should == true
+      `#@hash.$$keys.size`.should == 1
+      keys = `Array.from(#@hash.$$keys.entries())`
+      `#{keys}[0][1].length`.should == 1
+      `#{keys}[0][1][0]`.should == @mock1
+      `#{keys}[0][0]`.should == @mock1.hash
+      `#@hash.get(#@mock1)`.should == 123
 
       @hash[@mock2] = 456
-      `Object.keys(#@hash.$$map).length`.should == 1
-      `#@hash.$$keys.length`.should == 2
-      `#@hash.$$keys[1] === #@hash.$$map['hhh'].next`.should == true
-      `#@hash.$$keys[1].key`.should == @mock2
-      `#@hash.$$keys[1].key_hash`.should == @mock2.hash
-      `#@hash.$$keys[1].value`.should == 456
-      `#@hash.$$keys[1].next === undefined`.should == true
+      `#@hash.$$keys.size`.should == 1
+      keys = `Array.from(#@hash.$$keys.entries())`
+      `#{keys}[0][1].length`.should == 2
+      `#{keys}[0][1][1]`.should == @mock2
+      `#{keys}[0][0]`.should == @mock2.hash
+      `#@hash.get(#@mock2)`.should == 456
 
       @hash[@mock3] = 789
-      `Object.keys(#@hash.$$map).length`.should == 1
-      `#@hash.$$keys.length`.should == 3
-      `#@hash.$$keys[2] === #@hash.$$map['hhh'].next.next`.should == true
-      `#@hash.$$keys[2].key`.should == @mock3
-      `#@hash.$$keys[2].key_hash`.should == @mock3.hash
-      `#@hash.$$keys[2].value`.should == 789
-      `#@hash.$$keys[2].next === undefined`.should == true
+      `#@hash.$$keys.size`.should == 1
+      keys = `Array.from(#@hash.$$keys.entries())`
+      `#{keys}[0][1].length`.should == 3
+      `#{keys}[0][1][2]`.should == @mock3
+      `#{keys}[0][0]`.should == @mock3.hash
+      `#@hash.get(#@mock3)`.should == 789
 
       obj = Object.new
       @hash[obj] = 999
-      `Object.keys(#@hash.$$map).length`.should == 2
-      `#@hash.$$keys.length`.should == 4
-      `#@hash.$$keys[3] === #@hash.$$map[#{obj.hash}]`.should == true
-      `#@hash.$$keys[3].key`.should == obj
-      `#@hash.$$keys[3].key_hash`.should == obj.hash
-      `#@hash.$$keys[3].value`.should == 999
-      `#@hash.$$keys[3].next === undefined`.should == true
+      `#@hash.$$keys.size`.should == 2
+      keys = `Array.from(#@hash.$$keys.entries())`
+      `#{keys}[1][1].length`.should == 1
+      `#{keys}[1][1][0]`.should == obj
+      `#{keys}[1][0]`.should == obj.hash
+      `#@hash.get(#{obj})`.should == 999
     end
 
     it 'correctly updates internal data structures when deleting keys' do
@@ -197,145 +146,142 @@ describe 'Hash' do
         @obj1  => 'xyz'
       }
 
-      `Opal.hasOwnProperty.call(#@hash.$$map, 'hhh')`.should == true
-      `Opal.hasOwnProperty.call(#@hash.$$map, #{@obj1.hash})`.should == true
-      `Opal.hasOwnProperty.call(#@hash.$$smap, 'a')`.should == true
-      `Opal.hasOwnProperty.call(#@hash.$$smap, 'b')`.should == true
-      `Opal.hasOwnProperty.call(#@hash.$$smap, 'c')`.should == true
+      `#@hash.$$keys.has('hhh')`.should == true
+      `#@hash.$$keys.has(#{@obj1.hash})`.should == true
+      `#@hash.has('a')`.should == true
+      `#@hash.has('b')`.should == true
+      `#@hash.has('c')`.should == true
 
-      `#@hash.$$keys.length`.should == 8
-      `Object.keys(#@hash.$$map).length`.should == 2
-      `Object.keys(#@hash.$$smap).length`.should == 3
+      `#@hash.size`.should == 8
+      `#@hash.$$keys.size`.should == 2
 
-      `#@hash.$$keys[0].key`.should == @mock1
-      `#@hash.$$keys[1]`.should == 'a'
-      `#@hash.$$keys[2].key`.should == @mock2
-      `#@hash.$$keys[3]`.should == 'b'
-      `#@hash.$$keys[4].key`.should == @mock3
-      `#@hash.$$keys[5].key`.should == @mock4
-      `#@hash.$$keys[6]`.should == 'c'
-      `#@hash.$$keys[7].key`.should == @obj1
+      keys = `Array.from(#@hash.keys())`
+      keys[0].should == @mock1
+      keys[1].should == 'a'
+      keys[2].should == @mock2
+      keys[3].should == 'b'
+      keys[4].should == @mock3
+      keys[5].should == @mock4
+      keys[6].should == 'c'
+      keys[7].should == @obj1
 
-      `#@hash.$$map['hhh'] === #@hash.$$keys[0]`.should == true
-      `#@hash.$$keys[0].next === #@hash.$$keys[2]`.should == true
-      `#@hash.$$keys[2].next === #@hash.$$keys[4]`.should == true
-      `#@hash.$$keys[4].next === #@hash.$$keys[5]`.should == true
-      `#@hash.$$keys[5].next === undefined`.should == true
+      keys = `Array.from(#@hash.$$keys.values())[0]`
+      `#{keys}.length`.should == 4
+      keys[0].should == @mock1
+      keys[1].should == @mock2
+      keys[2].should == @mock3
+      keys[3].should == @mock4
+      keys = `Array.from(#@hash.$$keys.values())[1]`
+      `#{keys}.length`.should == 1
+      keys[0].should == @obj1
 
       @hash.delete @mock2
 
-      `#@hash.$$keys.length`.should == 7
-      `Object.keys(#@hash.$$map).length`.should == 2
-      `Object.keys(#@hash.$$smap).length`.should == 3
+      `#@hash.size`.should == 7
+      keys = `Array.from(#@hash.$$keys.values())[0]`
+      `#{keys}.length`.should == 3
+      keys[0].should == @mock1
+      keys[1].should == @mock3
+      keys[2].should == @mock4
 
-      `#@hash.$$keys[0].key`.should == @mock1
-      `#@hash.$$keys[1]`.should == 'a'
-      `#@hash.$$keys[2]`.should == 'b'
-      `#@hash.$$keys[3].key`.should == @mock3
-      `#@hash.$$keys[4].key`.should == @mock4
-      `#@hash.$$keys[5]`.should == 'c'
-      `#@hash.$$keys[6].key`.should == @obj1
-
-      `#@hash.$$map['hhh'] === #@hash.$$keys[0]`.should == true
-      `#@hash.$$keys[0].next === #@hash.$$keys[3]`.should == true
-      `#@hash.$$keys[3].next === #@hash.$$keys[4]`.should == true
-      `#@hash.$$keys[4].next === undefined`.should == true
+      keys = `Array.from(#@hash.keys())`
+      keys[0].should == @mock1
+      keys[1].should == 'a'
+      keys[2].should == 'b'
+      keys[3].should == @mock3
+      keys[4].should == @mock4
+      keys[5].should == 'c'
+      keys[6].should == @obj1
 
       @hash.delete @mock4
 
-      `#@hash.$$keys.length`.should == 6
-      `Object.keys(#@hash.$$map).length`.should == 2
-      `Object.keys(#@hash.$$smap).length`.should == 3
+      `#@hash.size`.should == 6
+      keys = `Array.from(#@hash.$$keys.values())[0]`
+      `#{keys}.length`.should == 2
+      keys[0].should == @mock1
+      keys[1].should == @mock3
 
-      `#@hash.$$keys[0].key`.should == @mock1
-      `#@hash.$$keys[1]`.should == 'a'
-      `#@hash.$$keys[2]`.should == 'b'
-      `#@hash.$$keys[3].key`.should == @mock3
-      `#@hash.$$keys[4]`.should == 'c'
-      `#@hash.$$keys[5].key`.should == @obj1
-
-      `#@hash.$$map['hhh'] === #@hash.$$keys[0]`.should == true
-      `#@hash.$$keys[0].next === #@hash.$$keys[3]`.should == true
-      `#@hash.$$keys[3].next === undefined`.should == true
+      keys = `Array.from(#@hash.keys())`
+      keys[0].should == @mock1
+      keys[1].should == 'a'
+      keys[2].should == 'b'
+      keys[3].should == @mock3
+      keys[4].should == 'c'
+      keys[5].should == @obj1
 
       @hash.delete @mock1
 
-      `#@hash.$$keys.length`.should == 5
-      `Object.keys(#@hash.$$map).length`.should == 2
-      `Object.keys(#@hash.$$smap).length`.should == 3
+      `#@hash.size`.should == 5
+      keys = `Array.from(#@hash.$$keys.values())[0]`
+      `#{keys}.length`.should == 1
+      keys[0].should == @mock3
 
-      `#@hash.$$keys[0]`.should == 'a'
-      `#@hash.$$keys[1]`.should == 'b'
-      `#@hash.$$keys[2].key`.should == @mock3
-      `#@hash.$$keys[3]`.should == 'c'
-      `#@hash.$$keys[4].key`.should == @obj1
-
-      `#@hash.$$map['hhh'] === #@hash.$$keys[2]`.should == true
-      `#@hash.$$keys[2].next === undefined`.should == true
+      keys = `Array.from(#@hash.keys())`
+      keys[0].should == 'a'
+      keys[1].should == 'b'
+      keys[2].should == @mock3
+      keys[3].should == 'c'
+      keys[4].should == @obj1
 
       @hash.delete @mock3
 
-      `#@hash.$$keys.length`.should == 4
-      `Object.keys(#@hash.$$map).length`.should == 1
-      `Object.keys(#@hash.$$smap).length`.should == 3
+      `#@hash.size`.should == 4
+      `#@hash.$$keys.size`.should == 1
+      keys = `Array.from(#@hash.$$keys.values())[0]`
+      `#{keys}.length`.should == 1
+      keys[0].should == @obj1
 
-      `#@hash.$$keys[0]`.should == 'a'
-      `#@hash.$$keys[1]`.should == 'b'
-      `#@hash.$$keys[2]`.should == 'c'
-      `#@hash.$$keys[3].key`.should == @obj1
-
-      `#@hash.$$map['hhh'] === undefined`.should == true
+      keys = `Array.from(#@hash.keys())`
+      keys[0].should == 'a'
+      keys[1].should == 'b'
+      keys[2].should == 'c'
+      keys[3].should == @obj1
 
       @hash.delete @obj1
 
-      `#@hash.$$keys.length`.should == 3
-      `Object.keys(#@hash.$$map).length`.should == 0
-      `Object.keys(#@hash.$$smap).length`.should == 3
+      `#@hash.size`.should == 3
+      `#@hash.$$keys.size`.should == 0
 
-      `#@hash.$$keys[0]`.should == 'a'
-      `#@hash.$$keys[1]`.should == 'b'
-      `#@hash.$$keys[2]`.should == 'c'
+      keys = `Array.from(#@hash.keys())`
+      keys[0].should == 'a'
+      keys[1].should == 'b'
+      keys[2].should == 'c'
 
-      `#@hash.$$map[#{@obj1.hash}] === undefined`.should == true
+      `#@hash.$$keys.get(#{@obj1.hash}) === undefined`.should == true
 
       @hash.delete 'b'
 
-      `#@hash.$$keys.length`.should == 2
-      `Object.keys(#@hash.$$map).length`.should == 0
-      `Object.keys(#@hash.$$smap).length`.should == 2
+      `#@hash.size`.should == 2
+      `#@hash.$$keys.size`.should == 0
 
-      `#@hash.$$keys[0]`.should == 'a'
-      `#@hash.$$keys[1]`.should == 'c'
-      `#@hash.$$smap['a']`.should == 'abc'
-      `#@hash.$$smap['b'] === undefined`.should == true
-      `#@hash.$$smap['c']`.should == 'ghi'
+      keys = `Array.from(#@hash.keys())`
+      keys[0].should == 'a'
+      keys[1].should == 'c'
+
+      `#@hash.get('a')`.should == 'abc'
+      `#@hash.get('b') === undefined`.should == true
+      `#@hash.get('c')`.should == 'ghi'
 
       @hash.delete 'c'
 
-      `#@hash.$$keys.length`.should == 1
-      `Object.keys(#@hash.$$map).length`.should == 0
-      `Object.keys(#@hash.$$smap).length`.should == 1
+      `#@hash.size`.should == 1
+      `#@hash.$$keys.size`.should == 0
 
-      `#@hash.$$keys[0]`.should == 'a'
-      `#@hash.$$smap['a']`.should == 'abc'
-      `#@hash.$$smap['b'] === undefined`.should == true
-      `#@hash.$$smap['c'] === undefined`.should == true
+      keys = `Array.from(#@hash.keys())`
+      keys[0].should == 'a'
+
+      `#@hash.get('a')`.should == 'abc'
+      `#@hash.get('b') === undefined`.should == true
+      `#@hash.get('c') === undefined`.should == true
 
       @hash.delete 'a'
 
-      `#@hash.$$keys.length`.should == 0
-      `Object.keys(#@hash.$$map).length`.should == 0
-      `Object.keys(#@hash.$$smap).length`.should == 0
+      `#@hash.size`.should == 0
+      `#@hash.$$keys.size`.should == 0
 
-      `#@hash.$$smap['a'] === undefined`.should == true
-      `#@hash.$$smap['b'] === undefined`.should == true
-      `#@hash.$$smap['c'] === undefined`.should == true
-
-      `Opal.hasOwnProperty.call(#@hash.$$map, 'hhh')`.should == false
-      `Opal.hasOwnProperty.call(#@hash.$$map, #{@obj1.hash})`.should == false
-      `Opal.hasOwnProperty.call(#@hash.$$smap, 'a')`.should == false
-      `Opal.hasOwnProperty.call(#@hash.$$smap, 'b')`.should == false
-      `Opal.hasOwnProperty.call(#@hash.$$smap, 'c')`.should == false
+      `#@hash.get('a') === undefined`.should == true
+      `#@hash.get('b') === undefined`.should == true
+      `#@hash.get('c') === undefined`.should == true
     end
   end
 end

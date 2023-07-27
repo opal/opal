@@ -27,14 +27,12 @@ module Opal
       end
 
       def simple_keys?
-        keys.all? { |key| %i[sym str].include?(key.type) }
+        keys.all? { |key| %i[sym str int].include?(key.type) }
       end
 
       def compile
         if has_kwsplat
           compile_merge
-        elsif simple_keys?
-          compile_hash2
         else
           compile_hash
         end
@@ -47,8 +45,6 @@ module Opal
       # Each kwsplat overrides previosly defined keys
       # Hash k/v pairs override previously defined kwsplat values
       def compile_merge
-        helper :hash
-
         result, seq = [], []
 
         children.each do |child|
@@ -76,38 +72,26 @@ module Opal
       end
 
       # Compiles a hash without kwsplats
-      # with complex keys.
+      # with simple or complex keys.
       def compile_hash
-        helper :hash
-
         children.each_with_index do |pair, idx|
           key, value = pair.children
           push ', ' unless idx == 0
-          push expr(key), ', ', expr(value)
+          if %i[sym str].include?(key.type)
+            push "[#{key.children[0].to_s.inspect}", ', ', expr(value), ']'
+          else
+            push '[', expr(key), ', ', expr(value), ']'
+          end
         end
 
-        wrap '$hash(', ')'
-      end
-
-      # Compiles a hash without kwsplats
-      # and containing **only** string/symbols as keys.
-      def compile_hash2
-        hash_obj, hash_keys = {}, []
-        helper :hash2
-
-        keys.size.times do |idx|
-          key = keys[idx].children[0].to_s.inspect
-          hash_keys << key unless hash_obj.include? key
-          hash_obj[key] = expr(values[idx])
+        if keys.empty?
+          push '(new Map())'
+        elsif simple_keys?
+          wrap '(new Map([', ']))'
+        else
+          helper :hash_rehash
+          wrap '$hash_rehash(new Map([', ']))'
         end
-
-        hash_keys.each_with_index do |key, idx|
-          push ', ' unless idx == 0
-          push "#{key}: "
-          push hash_obj[key]
-        end
-
-        wrap "$hash2([#{hash_keys.join ', '}], {", '})'
       end
     end
 

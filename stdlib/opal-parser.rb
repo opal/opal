@@ -1,3 +1,4 @@
+# helpers: call, raise
 # backtick_javascript: true
 
 # parser uses String#unpack
@@ -37,6 +38,8 @@ module Kernel
 end
 
 %x{
+  var $has_own = Object.hasOwn || $call.bind(Object.prototype.hasOwnProperty);
+
   Opal.compile = function(str, options) {
     try {
       str = #{::Opal.coerce_to!(`str`, String, :to_str)}

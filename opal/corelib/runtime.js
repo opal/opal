@@ -1554,9 +1554,9 @@
       // call method missing with correct args (remove '$' prefix on method name)
       return this.$method_missing.apply(this, $prepend(method_name.slice(1), arguments));
     };
-  
+
     method_missing_stub.$$stub = true;
-  
+
     return method_missing_stub;
   };
 
@@ -1807,11 +1807,10 @@
   };
 
   // Used for extracting keyword arguments from arguments passed to
-  // JS function. If provided +arguments+ list doesn't have a Hash
-  // as a last item, returns a blank Hash.
+  // JS function.
   //
   // @param parameters [Array]
-  // @return [Hash]
+  // @return [Hash] or undefined
   //
   Opal.extract_kwargs = function(parameters) {
     var kwargs = parameters[parameters.length - 1];
@@ -1823,7 +1822,7 @@
 
   // Used to get a list of rest keyword arguments. Method takes the given
   // keyword args, i.e. the hash literal passed to the method containing all
-  // keyword arguemnts passed to method, as well as the used args which are
+  // keyword arguments passed to method, as well as the used args which are
   // the names of required and optional arguments defined. This method then
   // just returns all key/value pairs which have not been used, in a new
   // hash literal.
@@ -1833,19 +1832,16 @@
   // @return [Hash]
   //
   Opal.kwrestargs = function(given_args, used_args) {
-    var keys      = [],
-        map       = {},
-        key           ,
-        given_map = given_args.$$smap;
+    var map = new Map();
 
-    for (key in given_map) {
+    Opal.hash_each(given_args, false, function(key, value) {
       if (!used_args[key]) {
-        keys.push(key);
-        map[key] = given_map[key];
+        Opal.hash_put(map, key, value);
       }
-    }
+      return [false, false];
+    });
 
-    return Opal.hash2(keys, map);
+    return map;
   };
 
   function apply_blockopts(block, blockopts) {
@@ -2231,228 +2227,169 @@
   // Hashes
   // ------
 
-  Opal.hash_init = function(hash) {
-    hash.$$smap = Object.create(null);
-    hash.$$map  = Object.create(null);
-    hash.$$keys = [];
-  };
+  Opal.hash_init = function (_hash) {
+    console.warn("DEPRECATION: Opal.hash_init is deprecated and is now a no-op.");
+  }
 
   Opal.hash_clone = function(from_hash, to_hash) {
     to_hash.$$none = from_hash.$$none;
     to_hash.$$proc = from_hash.$$proc;
 
-    for (var i = 0, keys = from_hash.$$keys, smap = from_hash.$$smap, len = keys.length, key, value; i < len; i++) {
-      key = keys[i];
-
-      if (key.$$is_string) {
-        value = smap[key];
-      } else {
-        value = key.value;
-        key = key.key;
-      }
-
+    return Opal.hash_each(from_hash, to_hash, function(key, value) {
       Opal.hash_put(to_hash, key, value);
-    }
+      return [false, to_hash];
+    });
   };
 
   Opal.hash_put = function(hash, key, value) {
-    if (key.$$is_string) {
-      if (!$has_own(hash.$$smap, key)) {
-        hash.$$keys.push(key);
+    var type = typeof key;
+    if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
+      hash.set(key, value)
+    } else if (key.$$is_string) {
+      hash.set(key.valueOf(), value);
+    } else {
+      if (!hash.$$keys)
+        hash.$$keys = new Map();
+
+      var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
+          keys = hash.$$keys;
+
+      if (!keys.has(key_hash)) {
+        keys.set(key_hash, [key]);
+        hash.set(key, value);
+        return;
       }
-      hash.$$smap[key] = value;
-      return;
-    }
 
-    var key_hash, bucket, last_bucket;
-    key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
+      var objects = keys.get(key_hash),
+          object;
 
-    if (!$has_own(hash.$$map, key_hash)) {
-      bucket = {key: key, key_hash: key_hash, value: value};
-      hash.$$keys.push(bucket);
-      hash.$$map[key_hash] = bucket;
-      return;
-    }
-
-    bucket = hash.$$map[key_hash];
-
-    while (bucket) {
-      if (key === bucket.key || key['$eql?'](bucket.key)) {
-        last_bucket = undefined;
-        bucket.value = value;
-        break;
+      for (var i=0; i<objects.length; i++) {
+        object = objects[0];
+        if (key === object || key['$eql?'](object)) {
+          hash.set(object, value);
+          return;
+        }
       }
-      last_bucket = bucket;
-      bucket = bucket.next;
-    }
 
-    if (last_bucket) {
-      bucket = {key: key, key_hash: key_hash, value: value};
-      hash.$$keys.push(bucket);
-      last_bucket.next = bucket;
+      objects.push(key);
+      hash.set(key, value);
     }
   };
 
   Opal.hash_get = function(hash, key) {
-    if (key.$$is_string) {
-      if ($has_own(hash.$$smap, key)) {
-        return hash.$$smap[key];
-      }
-      return;
-    }
+    var type = typeof key;
+    if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
+      return hash.get(key)
+    } else if (hash.$$keys) {
+      var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
+          objects = hash.$$keys.get(key_hash),
+          object;
 
-    var key_hash, bucket;
-    key_hash = hash.$$by_identity ? Opal.id(key) : key.$hash();
-
-    if ($has_own(hash.$$map, key_hash)) {
-      bucket = hash.$$map[key_hash];
-
-      while (bucket) {
-        if (key === bucket.key || key['$eql?'](bucket.key)) {
-          return bucket.value;
+      if (objects !== undefined) {
+        for (var i=0; i<objects.length; i++) {
+          object = objects[i];
+          if (key === object || key['$eql?'](object))
+            return hash.get(object);
         }
-        bucket = bucket.next;
+      } else if (key.$$is_string) {
+        return hash.get(key_hash);
       }
+    } else if (key.$$is_string) {
+      return hash.get(key.valueOf());
     }
   };
 
-  Opal.hash_delete = function(hash, key) {
-    var i, keys = hash.$$keys, length = keys.length, value, key_tmp;
-
-    if (key.$$is_string) {
-      if (typeof key !== "string") key = key.valueOf();
-
-      if (!$has_own(hash.$$smap, key)) {
-        return;
-      }
-
-      for (i = 0; i < length; i++) {
-        key_tmp = keys[i];
-
-        if (key_tmp.$$is_string && typeof key_tmp !== "string") {
-          key_tmp = key_tmp.valueOf();
-        }
-
-        if (key_tmp === key) {
-          keys.splice(i, 1);
-          break;
-        }
-      }
-
-      value = hash.$$smap[key];
-      delete hash.$$smap[key];
+  function $hash_delete_stage2(hash, key) {
+    var value = hash.get(key);
+    if (value !== undefined) {
+      hash.delete(key);
       return value;
     }
+  }
 
-    var key_hash = key.$hash();
+  Opal.hash_delete = function(hash, key) {
+    var type = typeof key
+    if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
+      return $hash_delete_stage2(hash, key);
+    } else if (hash.$$keys) {
+      var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
+          objects = hash.$$keys.get(key_hash),
+          object;
 
-    if (!$has_own(hash.$$map, key_hash)) {
-      return;
-    }
-
-    var bucket = hash.$$map[key_hash], last_bucket;
-
-    while (bucket) {
-      if (key === bucket.key || key['$eql?'](bucket.key)) {
-        value = bucket.value;
-
-        for (i = 0; i < length; i++) {
-          if (keys[i] === bucket) {
-            keys.splice(i, 1);
-            break;
+      if (objects !== undefined) {
+        for (var i=0; i<objects.length; i++) {
+          object = objects[i];
+          if (key === object || key['$eql?'](object)) {
+            objects.splice(i, 1);
+            if (objects.length === 0)
+              hash.$$keys.delete(key_hash);
+            return $hash_delete_stage2(hash, object);
           }
         }
-
-        if (last_bucket && bucket.next) {
-          last_bucket.next = bucket.next;
-        }
-        else if (last_bucket) {
-          delete last_bucket.next;
-        }
-        else if (bucket.next) {
-          hash.$$map[key_hash] = bucket.next;
-        }
-        else {
-          delete hash.$$map[key_hash];
-        }
-
-        return value;
+      } else if (key.$$is_string) {
+        return $hash_delete_stage2(hash, key_hash);
       }
-      last_bucket = bucket;
-      bucket = bucket.next;
+    } else if (key.$$is_string) {
+      return $hash_delete_stage2(hash, key.valueOf());
     }
   };
 
   Opal.hash_rehash = function(hash) {
-    for (var i = 0, length = hash.$$keys.length, key_hash, bucket, last_bucket; i < length; i++) {
+    var keys = hash.$$keys;
 
-      if (hash.$$keys[i].$$is_string) {
-        continue;
+    if (keys)
+      keys.clear();
+
+    Opal.hash_each(hash, false, function(key, value) {
+      var type = typeof key;
+      if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint")
+        return [false, false]; // nothing to rehash
+
+      var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash());
+
+      if (!keys)
+        hash.$$keys = keys = new Map();
+
+      if (!keys.has(key_hash)) {
+        keys.set(key_hash, [key]);
+        return [false, false];
       }
 
-      key_hash = hash.$$keys[i].key.$hash();
+      var objects = keys.get(key_hash),
+          objects_copy = $slice(objects),
+          object;
 
-      if (key_hash === hash.$$keys[i].key_hash) {
-        continue;
-      }
-
-      bucket = hash.$$map[hash.$$keys[i].key_hash];
-      last_bucket = undefined;
-
-      while (bucket) {
-        if (bucket === hash.$$keys[i]) {
-          if (last_bucket && bucket.next) {
-            last_bucket.next = bucket.next;
-          }
-          else if (last_bucket) {
-            delete last_bucket.next;
-          }
-          else if (bucket.next) {
-            hash.$$map[hash.$$keys[i].key_hash] = bucket.next;
-          }
-          else {
-            delete hash.$$map[hash.$$keys[i].key_hash];
-          }
-          break;
+      for (var i=0; i<objects_copy.length; i++) {
+        object = objects_copy[i];
+        if (key === object || key['$eql?'](object)) {
+          // got a duplicate, remove it
+          objects.splice(objects.indexOf(object), 1);
+          hash.delete(object);
         }
-        last_bucket = bucket;
-        bucket = bucket.next;
       }
 
-      hash.$$keys[i].key_hash = key_hash;
+      objects.push(key);
 
-      if (!$has_own(hash.$$map, key_hash)) {
-        hash.$$map[key_hash] = hash.$$keys[i];
-        continue;
-      }
+      return [false, false]
+    });
 
-      bucket = hash.$$map[key_hash];
-      last_bucket = undefined;
-
-      while (bucket) {
-        if (bucket === hash.$$keys[i]) {
-          last_bucket = undefined;
-          break;
-        }
-        last_bucket = bucket;
-        bucket = bucket.next;
-      }
-
-      if (last_bucket) {
-        last_bucket.next = hash.$$keys[i];
-      }
-    }
+    return hash;
   };
 
-  Opal.hash = function() {
-    var arguments_length = arguments.length, args, hash, i, length, key, value;
+  Opal.hash = function () {
+    var arguments_length = arguments.length,
+      args,
+      hash,
+      i,
+      length,
+      key,
+      value;
 
     if (arguments_length === 1 && arguments[0].$$is_hash) {
       return arguments[0];
     }
 
-    hash = new Opal.Hash();
-    Opal.hash_init(hash);
+    hash = new Map();
 
     if (arguments_length === 1) {
       args = arguments[0];
@@ -2462,7 +2399,7 @@
 
         for (i = 0; i < length; i++) {
           if (args[i].length !== 2) {
-            $raise(Opal.ArgumentError, "value not of length 2: " + args[i].$inspect());
+            $raise(Opal.ArgumentError, 'value not of length 2: ' + args[i].$inspect());
           }
 
           key = args[i][0];
@@ -2472,8 +2409,7 @@
         }
 
         return hash;
-      }
-      else {
+      } else {
         args = arguments[0];
         for (key in args) {
           if ($has_own(args, key)) {
@@ -2488,7 +2424,7 @@
     }
 
     if (arguments_length % 2 !== 0) {
-      $raise(Opal.ArgumentError, "odd number of arguments for Hash");
+      $raise(Opal.ArgumentError, 'odd number of arguments for Hash');
     }
 
     for (i = 0; i < arguments_length; i += 2) {
@@ -2507,13 +2443,27 @@
   // function.
   //
   Opal.hash2 = function(keys, smap) {
-    var hash = new Opal.Hash();
+    console.warn("DEPRECATION: `Opal.hash2` is deprecated and will be removed in Opal 2.0. Use `new Map()` with an array of key/value pairs instead.");
 
-    hash.$$smap = smap;
-    hash.$$map  = Object.create(null);
-    hash.$$keys = keys;
-
+    var hash = new Map();
+    for (var i = 0, max = keys.length; i < max; i++) {
+      hash.set(keys[i], smap[keys[i]]);
+    }
     return hash;
+  };
+
+  Opal.hash_each = function (hash, dres, fun) {
+    // dres = default result, returned if hash is empty
+    // fun is called as fun(key, value) and must return a array with [break, result]
+    // if break is true, iteration stops and result is returned
+    // if break is false, iteration continues and eventually the last result is returned
+    var res;
+    for (var i = 0, entry, entries = Array.from(hash.entries()), l = entries.length; i < l; i++) {
+      entry = entries[i];
+      res = fun(entry[0], entry[1]);
+      if (res[0]) return res[1];
+    }
+    return res ? res[1] : dres;
   };
 
   // Create a new range instance with first and last values, and whether the
@@ -2553,7 +2503,7 @@
   // helper that can be used from methods
   function $deny_frozen_access(obj) {
     if (obj.$$frozen) {
-      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), Opal.hash2(["receiver"], {"receiver": obj}));
+      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), new Map([["receiver", obj]]));
     }
   };
   Opal.deny_frozen_access = $deny_frozen_access;
@@ -2678,7 +2628,7 @@
         if (part.ignoreCase !== ignoreCase)
           Opal.Kernel.$warn(
             "ignore case doesn't match for " + part.source.$inspect(),
-            Opal.hash({uplevel: 1})
+            new Map([['uplevel',  1]])
           )
 
         part = part.source;
@@ -2929,7 +2879,7 @@
   // Primitives for handling parameters
   Opal.ensure_kwargs = function(kwargs) {
     if (kwargs == null) {
-      return Opal.hash2([], {});
+      return new Map();
     } else if (kwargs.$$is_hash) {
       return kwargs;
     } else {
@@ -2938,10 +2888,11 @@
   }
 
   Opal.get_kwarg = function(kwargs, key) {
-    if (!$has_own(kwargs.$$smap, key)) {
+    var kwarg = Opal.hash_get(kwargs, key);
+    if (kwarg === undefined) {
       $raise(Opal.ArgumentError, 'missing keyword: '+key);
     }
-    return kwargs.$$smap[key];
+    return kwarg;
   }
 
   // Arrays of size > 32 elements that contain only strings,

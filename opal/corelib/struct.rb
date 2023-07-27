@@ -290,7 +290,7 @@ class ::Struct
     `inspect_stack.pop()` if pushed
   end
 
-  def to_h(&block)
+  def to_h(*args, &block)
     return map(&block).to_h(*args) if block_given?
 
     self.class.members.each_with_object({}) { |name, h| h[name] = self[name] }

@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# helpers: hash_put
 
 # Provides a complete set of tools to wrap native JavaScript
 # into nice Ruby objects.
@@ -537,68 +538,65 @@ unless Hash.method_defined? :_initialize
   class Hash
     alias _initialize initialize
 
+    %x{
+      function $hash_convert_and_put_value(hash, key, value) {
+        if (value &&
+          (value.constructor === undefined ||
+            value.constructor === Object ||
+            value instanceof Map)) {
+         $hash_put(hash, key, #{Hash.new(`value`)});
+       } else if (value && value.$$is_array) {
+         value = value.map(function(item) {
+           if (item &&
+              (item.constructor === undefined ||
+               item.constructor === Object ||
+               value instanceof Map)) {
+             return #{Hash.new(`item`)};
+           }
+           return #{Native(`item`)};
+         });
+         $hash_put(hash, key, value)
+       } else {
+         $hash_put(hash, key, #{Native(`value`)});
+       }
+      }
+    }
+
     def initialize(defaults = undefined, &block)
       %x{
-        if (defaults != null &&
-             (defaults.constructor === undefined ||
-               defaults.constructor === Object)) {
-          var smap = self.$$smap,
-              keys = self.$$keys,
-              key, value;
+        if (defaults != null) {
+          if (defaults.constructor === undefined ||
+              defaults.constructor === Object) {
+            var key, value;
 
-          for (key in defaults) {
-            value = defaults[key];
-
-            if (value &&
-                 (value.constructor === undefined ||
-                   value.constructor === Object)) {
-              smap[key] = #{Hash.new(`value`)};
-            } else if (value && value.$$is_array) {
-              value = value.map(function(item) {
-                if (item &&
-                     (item.constructor === undefined ||
-                       item.constructor === Object)) {
-                  return #{Hash.new(`item`)};
-                }
-
-                return #{Native(`item`)};
-              });
-              smap[key] = value
-            } else {
-              smap[key] = #{Native(`value`)};
+            for (key in defaults) {
+              value = defaults[key];
+              $hash_convert_and_put_value(self, key, value);
             }
 
-            keys.push(key);
+            return self;
+          } else if (defaults instanceof Map) {
+            Opal.hash_each(defaults, false, function(key, value) {
+              $hash_convert_and_put_value(self, key, value);
+              return [false, false];
+            });
           }
-
-          return self;
         }
 
         return #{_initialize(defaults, &block)};
       }
     end
 
-    # @return a JavaScript object with the same keys but calling #to_n on
-    # all values.
+    # @return a JavaScript Map but calling #to_n on
+    # all keys and values.
     def to_n
       %x{
-        var result = {},
-            keys = self.$$keys,
-            smap = self.$$smap,
-            key, value;
+        var result = new Map();
 
-        for (var i = 0, length = keys.length; i < length; i++) {
-          key = keys[i];
-
-          if (key.$$is_string) {
-            value = smap[key];
-          } else {
-            key = key.key;
-            value = key.value;
-          }
-
-          result[key] = #{Native.try_convert(`value`, `value`)};
-        }
+        Opal.hash_each(self, false, function(key, value) {
+          result.set(#{Native.try_convert(`key`, `key`)} , #{Native.try_convert(`value`, `value`)});
+          return [false, false];
+        });
 
         return result;
       }

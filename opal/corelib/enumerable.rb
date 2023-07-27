@@ -1252,10 +1252,10 @@ module ::Enumerable
         var param = #{::Opal.destructure(`arguments`)};
         var ary = #{::Opal.coerce_to?(`param`, ::Array, :to_ary)}, key, val;
         if (!ary.$$is_array) {
-          #{::Kernel.raise ::TypeError, "wrong element type #{`ary`.class} (expected array)"}
+          #{::Kernel.raise ::TypeError, "wrong element type #{`param`.class} (expected array)"}
         }
         if (ary.length !== 2) {
-          #{::Kernel.raise ::ArgumentError, "wrong array length (expected 2, was #{`ary`.length})"}
+          #{::Kernel.raise ::ArgumentError, "element has wrong array length (expected 2, was #{`ary`.length})"}
         }
         key = ary[0];
         val = ary[1];
