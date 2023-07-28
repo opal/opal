@@ -753,7 +753,10 @@ class ::Module
   }
 
   def initialize_copy(other)
-    `copyInstanceMethods(other, self)`
+    %x{
+      copyInstanceMethods(other, self);
+      self.$$cloned_from = other.$$cloned_from.concat(other);
+    }
     copy_class_variables(other)
     copy_constants(other)
   end

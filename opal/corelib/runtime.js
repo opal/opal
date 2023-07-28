@@ -607,6 +607,7 @@
     $prop(klass, '$$ancestors', []);
     $prop(klass, '$$ancestors_cache_version', null);
     $prop(klass, '$$subclasses', []);
+    $prop(klass, '$$cloned_from', []);
 
     $prop(klass.$$prototype, '$$class', klass);
 
@@ -774,6 +775,7 @@
     $prop(module, '$$own_prepended_modules', []);
     $prop(module, '$$ancestors', [module]);
     $prop(module, '$$ancestors_cache_version', null);
+    $prop(module, '$$cloned_from', []);
 
     $set_proto(module, Opal.Module.prototype);
 
@@ -1606,15 +1608,22 @@
 
   // Super dispatcher
   Opal.find_super = function(obj, mid, current_func, defcheck, allow_stubs) {
-    var jsid = $jsid(mid), ancestors, super_method;
+    var jsid = $jsid(mid), ancestors, ancestor, super_method, method_owner, current_index = -1, i;
 
     ancestors = get_ancestors(obj);
+    method_owner = current_func.$$owner;
 
-    var current_index = ancestors.indexOf(current_func.$$owner);
+    for (i = 0; i < ancestors.length; i++) {
+      ancestor = ancestors[i];
+      if (ancestor === method_owner || ancestor.$$cloned_from.indexOf(method_owner) !== -1) {
+        current_index = i;
+        break;
+      }
+    }
 
-    for (var i = current_index + 1; i < ancestors.length; i++) {
-      var ancestor = ancestors[i],
-          proto = ancestor.$$prototype;
+    for (i = current_index + 1; i < ancestors.length; i++) {
+      ancestor = ancestors[i];
+      var proto = ancestor.$$prototype;
 
       if (proto.hasOwnProperty('$$dummy')) {
         proto = proto.$$define_methods_on;
