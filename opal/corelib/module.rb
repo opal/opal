@@ -757,12 +757,20 @@ class ::Module
         Opal.append_features(modules[i], to);
       }
     }
+
+    function copyPrependedModules(from, to) {
+      var modules = from.$$own_prepended_modules;
+      for (var i = modules.length - 1; i >= 0; i--) {
+        Opal.prepend_features(modules[i], to);
+      }
+    }
   }
 
   def initialize_copy(other)
     %x{
       copyInstanceMethods(other, self);
       copyIncludedModules(other, self);
+      copyPrependedModules(other, self);
       self.$$cloned_from = other.$$cloned_from.concat(other);
     }
     copy_class_variables(other)

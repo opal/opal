@@ -27,4 +27,16 @@ describe "Class#clone" do
     klass.include(mod)
     klass.clone.new.hello.should == "hello"
   end
+
+  it "retains an prepended module in the ancestor chain" do
+    klass = Class.new
+    mod = Module.new do
+      def hello
+        "hello"
+      end
+    end
+
+    klass.prepend(mod)
+    klass.clone.new.hello.should == "hello"
+  end
 end
