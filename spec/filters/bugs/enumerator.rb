@@ -150,6 +150,5 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#zip when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#zip works with an infinite enumerable and an array" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#zip works with two infinite enumerables" # TypeError: can't iterate from Float
-  fails "SimpleDelegator can be marshalled with its instance variables intact" # Exception: Cannot create property 'foo' on string 'hello'
   fails "SimpleDelegator can be marshalled" # Expected String == SimpleDelegator to be truthy but was false
 end
