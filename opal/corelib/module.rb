@@ -737,15 +737,17 @@ class ::Module
     function copyInstanceMethods(from, to) {
       var i, method_names = Opal.own_instance_methods(from);
       for (i = 0; i < method_names.length; i++) {
-        let name = method_names[i],
-            jsid = $jsid(name),
-            body = from.$$prototype[jsid],
-            block = function () {
-              return body.apply(this, arguments);
-            };
+        var name = method_names[i], jsid = $jsid(name), block;
 
-        block.$$jsid = name;
-        block.$$define_meth = body.$$define_meth;
+        // Use an immediate function to create a new variable scope
+        block = (function (body) {
+          var block = function () {
+            return body.apply(this, arguments);
+          };
+          block.$$jsid = name;
+          block.$$define_meth = body.$$define_meth;
+          return block;
+        })(from.$$prototype[jsid]);
 
         Opal.defn(to, jsid, block);
       }
