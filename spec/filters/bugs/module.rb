@@ -135,8 +135,6 @@ opal_filter "Module" do
   fails "Module#name is not nil for a nested module created with the module keyword" # Expected nil =~ /^#<Module:0x[0-9a-f]+>::N$/ to be truthy but was false
   fails "Module#name is not nil when assigned to a constant in an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil =~ /^#<Module:0x\h+>::Child$/ to be truthy but was false
-  fails "Module#prepend keeps the module in the chain when dupping the class" # Exception: self.$$constructor is not a constructor
-  fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0xa8270>] == [#<Module:0xa8282>, #<Module:0xa8270>] to be truthy but was false
   fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x3bf72> to have private instance method 'test1' but it does not
   fails "Module#private with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x3bf6c> to have private instance method 'test1' but it does not
   fails "Module#private_class_method when single argument is passed and is an array sets the visibility of the given methods to private" # Expected NoMethodError but no exception was raised ("foo" was returned)
@@ -200,7 +198,7 @@ opal_filter "Module" do
   fails "Module#using scope of refinement is active for block called via instance_exec" # NoMethodError: undefined method `foo' for 1
   fails "Module#using scope of refinement is active for class defined via Class.new {}" # NoMethodError: undefined method `foo' for 1
   fails "Module#using scope of refinement is active for module defined via Module.new {}" # NoMethodError: undefined method `foo' for 1
-  fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1  
+  fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1
   fails_badly "Module#ancestors returns a list of modules included in self (including self)" # Expected [ModuleSpecs::Parent, Object, Shellwords, Kernel, BasicObject] == [ModuleSpecs::Parent, Object, Kernel, BasicObject] to be truthy but was false -- a random failure
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NameError: undefined method `foo' for class `'
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#method" # NameError: undefined method `foo' for class `#<Class:0x581e4>'
