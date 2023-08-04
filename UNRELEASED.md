@@ -8,13 +8,31 @@
 ### Documentation
 -->
 
-<!-- 
-TODO:
-## Major Changes
+## Highlights
 
-`Hash` is now bridged to JavaScript `Map` and support for non-symbol keys in keyword arguments (#2568)
--->
+### `Hash` is now bridged to JavaScript `Map`
 
+This change brings a lot of benefits, but also some incompatibilities. The main benefit is that `Hash` now is both more performant and relies on native JavaScript capabilities.
+This improves interoperability with JavaScript. As a downside, applications reaching for internal `Hash` data structures will need to be updated.
+
+Interacting with `Hash` from `JavaScript` is easier than ever:
+
+```ruby
+hash = `new Map([['a', 1], ['b', 2]])`
+hash # => {a: 1, b: 2}
+`console.log(hash)` # => Map(2) {"a" => 1, "b" => 2}
+`hash.get('a')` # => 1
+`hash.set('c', 3)`
+hash # => {a: 1, b: 2, c: 3}
+hash.keys # => ["a", "b", "c"]
+hash.values # => [1, 2, 3]
+```
+
+### Performance improvements
+
+This release brings a lot of performance improvements, our tests on Asciidoctor show a 25% improvement in performance, but we've seen up to 66% performance improvement on some applications.
+
+## Changelog
 
 ### Deprecated
 
@@ -48,22 +66,22 @@ TODO:
 
 ### Documentation
 
-- Bridging documentation (#2541) 
+- Bridging documentation (#2541)
 
 ### Performance
 
 - Improve performance of `Array#intersect?` and `#intersection` (#2533)
-- Proc#call: Refactor for performance (#2541) 
-- Opal.stub_for: optimize (#2541) 
-- Hash: Optimize #to_a (#2541) 
-- Array: Optimize #collect/#map (#2541)
+- `Proc#call`: Refactor for performance (#2541)
+- Opal.stub_for: optimize (#2541)
+- Hash: Optimize `#to_a` (#2541)
+- Array: Optimize `#collect`/`#map` (#2541)
 - Optimize argument slicing in runtime for performance (#2555)
-- Closure: Generate a JS object, not an Error, gain up to 15% on Asciidoctor (#2556)
+- Closure: Generate a JavaScript object, not an Error, gain up to 15% on Asciidoctor (#2556)
 - Optimize `String#split` and `String#start_with` (#2560)
 
 ### Internal
 
 - Update rubocop (#2535)
-- Match3Node Cleanup (#2541) 
-- IFlipFlop/EFlipFlop: Refactor for readability (#2541) 
-- ForRewriter: Refactor for readability (#2541) 
+- Match3Node Cleanup (#2541)
+- IFlipFlop/EFlipFlop: Refactor for readability (#2541)
+- ForRewriter: Refactor for readability (#2541)
