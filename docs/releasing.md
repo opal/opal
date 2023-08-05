@@ -8,21 +8,14 @@ _This guide is a work-in-progress._
 
 All of the following is now covered by `bin/rake release:prepare VERSION=v1.2.3`
 
-### Updating the version
-
-- Update `lib/opal/version.rb`
-- Update `opal/corelib/constants.rb` with the same version number along with release dates
-
-### Updating the changelog
-
-- Ensure all the unreleased changes are documented in UNRELEASED.md
-- [skip for pre-releases] Run `bin/rake changelog VERSION=v1.2.3` specifying the version number you're about to release
-- [skip for pre-releases] Empty UNRELEASED.md
-
-### The commit
-
-- Commit the updated changelog along with the version bump using this commit message:
-  "Release v1.2.3"
+1. Update the version
+  - Update `lib/opal/version.rb`
+  - Update `opal/corelib/constants.rb` with the same version number along with release dates
+2. Update the changelog
+  - Ensure all the unreleased changes are documented in UNRELEASED.md
+  - [skip for pre-releases] Run `bin/rake changelog VERSION=v1.2.3` specifying the version number you're about to release
+  - [skip for pre-releases] Empty UNRELEASED.md
+3. Commit the updated changelog along with the version bump using this commit message: "Release v1.2.3"
 
 ---
 
@@ -56,4 +49,3 @@ All of the following is now covered by `bin/rake release:prepare VERSION=v1.2.3`
 - Create a new pull request that:
   - Updates a version to `v1.x.0.dev` in both `lib/opal/version.rb` and `opal/corelib/constants.rb`
 - Remember to merge that PR before merging anything else next once we decide to not release any more point releases from `master`.
-
