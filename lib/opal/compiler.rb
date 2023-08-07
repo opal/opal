@@ -350,6 +350,14 @@ module Opal
       )
     end
 
+    # Any symbols needed by this file. Used by {Opal::Nodes::Top} to reference
+    # runtime symbols that are needed.
+    #
+    # @return [Hash<Symbol, String>]
+    def symbols
+      @symbols ||= {}
+    end
+
     def record_method_call(mid)
       @method_calls << mid
     end
@@ -424,31 +432,45 @@ module Opal
       Fragment.new(str, scope, sexp)
     end
 
+    def id_to_jsid(sym)
+      sym.to_s
+         .gsub('[]', '$idx')
+         .gsub('[]=', '$asgnidx')
+         .gsub('<=>', '$3wcmp')
+         .gsub('===', '$casecmp')
+         .gsub('==', '$eq')
+         .gsub('=~', '$eq_tilde')
+         .gsub('!~', '$excl_tilde')
+         .gsub('~', '$tilde')
+         .gsub('!=', '$not_eq')
+         .gsub('<=', '$lt_eq')
+         .gsub('>=', '$gt_eq')
+         .gsub('=', '$asgn')
+         .gsub('?', '$ques')
+         .gsub('!', '$excl')
+         .gsub('/', '$slash')
+         .gsub('%', '$percent')
+         .gsub('+@', '$uplus')
+         .gsub('+', '$plus')
+         .gsub('-@', '$uminus')
+         .gsub('-', '$minus')
+         .gsub('<', '$lt')
+         .gsub('>', '$gt')
+         .gsub('**', '$pow')
+         .gsub('*', '$mul')
+         .gsub('|', '$or')
+         .gsub('&', '$and')
+         .gsub('^', '$xor')
+         .gsub('!', '$not')
+         .gsub(/[^\w\$]/, '$')
+    end
+
     # Used to generate a unique id name per file. These are used
     # mainly to name method bodies for methods that use blocks.
     def unique_temp(name)
       name = name.to_s
       if name && !name.empty?
-        name = name
-               .to_s
-               .gsub('<=>', '$lt_eq_gt')
-               .gsub('===', '$eq_eq_eq')
-               .gsub('==', '$eq_eq')
-               .gsub('=~', '$eq_tilde')
-               .gsub('!~', '$excl_tilde')
-               .gsub('!=', '$not_eq')
-               .gsub('<=', '$lt_eq')
-               .gsub('>=', '$gt_eq')
-               .gsub('=', '$eq')
-               .gsub('?', '$ques')
-               .gsub('!', '$excl')
-               .gsub('/', '$slash')
-               .gsub('%', '$percent')
-               .gsub('+', '$plus')
-               .gsub('-', '$minus')
-               .gsub('<', '$lt')
-               .gsub('>', '$gt')
-               .gsub(/[^\w\$]/, '$')
+        name = id_to_jsid(name)
       end
       unique = (@unique += 1)
       "#{'$' unless name.start_with?('$')}#{name}$#{unique}"
@@ -457,6 +479,15 @@ module Opal
     # Use the given helper
     def helper(name)
       helpers << name
+    end
+
+    def gen_symbol_name(name)
+      "#{id_to_jsid(name)}$"
+    end
+
+    # Generates a symbol and returns
+    def symbol(name)
+      symbols[name] = gen_symbol_name(name)
     end
 
     # To keep code blocks nicely indented, this will yield a block after

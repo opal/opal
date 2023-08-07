@@ -50,6 +50,7 @@ module Opal
             add_temp '$$$ = Opal.$$$' if @define_absolute_const
 
             add_used_helpers
+            add_used_symbols
             line scope.to_vars
 
             compile_method_stubs
@@ -127,6 +128,10 @@ module Opal
 
       def add_used_helpers
         compiler.helpers.to_a.reverse_each { |h| prepend_scope_temp "$#{h} = Opal.#{h}" }
+      end
+
+      def add_used_symbols
+        compiler.symbols.each { |name, var| add_scope_temp "#{var} = $sym('#{name}')" }
       end
 
       def compile_method_stubs

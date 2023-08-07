@@ -152,6 +152,10 @@ module Opal
         @compiler.helper name
       end
 
+      def symbol(name)
+        @compiler.symbol name
+      end
+
       def with_temp(&block)
         @compiler.with_temp(&block)
       end

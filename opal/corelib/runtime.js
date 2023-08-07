@@ -1897,6 +1897,7 @@
     return jsid;
   }
   Opal.jsid = $jsid;
+  Opal.sym = $jsid;
 
   function $prepend(first, second) {
     if (!second.$$is_array) second = $slice(second);
