@@ -2175,10 +2175,23 @@
 
     // We need a wrapper because otherwise properties
     // would be overwritten on the original body.
-    alias = function() {
-      var block = alias.$$p, i, ii;
+    alias = Opal.wrapMethodBody(body);
 
-      alias.$$p = null;
+    // Try to make the browser pick the right name
+    alias.displayName  = name;
+    alias.$$alias_of   = body;
+    alias.$$alias_name = name;
+
+    Opal.defn(obj, id, alias);
+
+    return obj;
+  };
+
+  Opal.wrapMethodBody = function(body) {
+    var wrapped = function() {
+      var block = wrapped.$$p;
+
+      wrapped.$$p = null;
 
       return Opal.send(this, body, arguments, block);
     };
@@ -2188,21 +2201,14 @@
     // It doesn't work in older browsers (like Chrome 38), where
     // an exception is thrown breaking Opal altogether.
     try {
-      Object.defineProperty(alias, 'length', { value: body.length });
+      Object.defineProperty(wrapped, 'length', { value: body.length });
     } catch (e) {}
 
-    // Try to make the browser pick the right name
-    alias.displayName       = name;
+    wrapped.$$arity           = body.$$arity == null ? body.length : body.$$arity;
+    wrapped.$$parameters      = body.$$parameters;
+    wrapped.$$source_location = body.$$source_location;
 
-    alias.$$arity           = body.$$arity == null ? body.length : body.$$arity;
-    alias.$$parameters      = body.$$parameters;
-    alias.$$source_location = body.$$source_location;
-    alias.$$alias_of        = body;
-    alias.$$alias_name      = name;
-
-    Opal.defn(obj, id, alias);
-
-    return obj;
+    return wrapped;
   };
 
   Opal.alias_gvar = function(new_name, old_name) {

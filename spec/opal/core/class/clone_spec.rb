@@ -27,4 +27,10 @@ describe "Class#clone" do
     klass.include(mod)
     klass.clone.new.hello.should == "hello"
   end
+
+  it "copies a method with a block argument defined by define_method" do
+    klass = Class.new
+    klass.define_method(:add_one) { |&block| block.call + 1 }
+    klass.clone.new.add_one { 1 }.should == 2
+  end
 end
