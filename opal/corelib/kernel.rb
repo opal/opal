@@ -591,15 +591,13 @@ module ::Kernel
     `Opal.load(#{file})`
   end
 
-  def loop
+  def loop(&block)
     return enum_for(:loop) { ::Float::INFINITY } unless block_given?
 
-    while true
-      begin
-        yield
-      rescue ::StopIteration => e
-        return e.result
-      end
+    begin
+      `while (true) block()`
+    rescue ::StopIteration => e
+      return e.result
     end
 
     self
