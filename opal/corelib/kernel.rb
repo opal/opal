@@ -30,15 +30,35 @@ module ::Kernel
     }
   end
 
-  def method(name)
+  %x{
+    var respond_to_missing = $jsid("respond_to_missing?"),
+        method_missing = $jsid("method_missing")
+  }
+
+  # Note: scope is a private API
+  def method(name, scope = true)
     %x{
-      var meth = self[$jsid(name)];
+      var meth = self[$jsid(name)], body = meth;
 
       if (!meth || meth.$$stub) {
-        #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
+        if (!self[respond_to_missing].$$pristine && self[respond_to_missing](name, scope)) {
+          meth = self[method_missing];
+          body = function f() {
+            var meth = self[method_missing], s = f.$$s || this;
+            meth.$$p = f.$$p;
+            meth.$$s = s;
+            return meth.apply(s, [name].concat($slice(arguments)));
+          };
+          body.$$arity = -1;
+          body.$$source_location = nil;
+          body.$$parameters = [["rest"]];
+        }
+        else {
+          #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
+        }
       }
 
-      return #{::Method.new(self, `meth.$$owner || #{self.class}`, `meth`, name)};
+      return #{::Method.new(self, `meth.$$owner || #{self.class}`, `body`, name)};
     }
   end
 
@@ -52,15 +72,11 @@ module ::Kernel
     }
   end
 
-  def public_methods(all = true)
-    %x{
-      if ($truthy(#{all})) {
-        return Opal.methods(self);
-      } else {
-        return Opal.receiver_methods(self);
-      }
-    }
-  end
+  # This is wrong on purpose - it will be refined once corelib/privacy
+  # has been loaded. In Ruby, public_methods has a slightly different
+  # semantic regarding methods if false has been passed - it loads both
+  # the singleton methods and the immediate class methods.
+  alias public_methods methods
 
   def Array(object)
     %x{
@@ -227,6 +243,11 @@ module ::Kernel
       Opal.exit(status);
     }
     nil
+  end
+
+  def abort(msg = nil)
+    warn msg if msg
+    exit false
   end
 
   def extend(*mods)
@@ -720,7 +741,7 @@ module ::Kernel
     %x{
       var body = self[$jsid(name)];
 
-      if (typeof(body) === "function" && !body.$$stub) {
+      if (typeof(body) === "function" && !body.$$stub && !body.$$unimpl) {
         return true;
       }
 
@@ -847,6 +868,7 @@ module ::Kernel
     yield self
   end
 
+  alias exit! exit
   alias fail raise
   alias kind_of? is_a?
   alias object_id __id__

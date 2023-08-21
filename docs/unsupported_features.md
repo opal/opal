@@ -26,4 +26,4 @@ JavaScript does not have a native `Thread` implementation, so they are not prese
 
 #### Private, Public and Protected methods ####
 
-All methods in Opal are defined as `public` to avoid additional runtime overhead. `Module#private` and `Module#protected` exist as just placeholder methods and are no-op methods.
+The privacy status of methods is tracked, but not (always) enforced.

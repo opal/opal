@@ -24,6 +24,14 @@
     warnings[string] = true;
     #{warn(`string`)};
   }
+
+  // Sets an $$unimpl flag, so that respond_to? will return false
+  function unimplemented(obj, funcs) {
+    for (var i = 0; i < funcs.length; i++) {
+      var func = funcs[i];
+      obj[func].$$unimpl = true;
+    }
+  }
 }
 
 class ::String
@@ -57,61 +65,19 @@ module ::Kernel
     `handle_unsupported_feature(ERROR)`
     false
   end
-end
 
-class ::Module
-  def public(*methods)
-    %x{
-      if (methods.length === 0) {
-        self.$$module_function = false;
-        return nil;
-      }
-      return (methods.length === 1) ? methods[0] : methods;
-    }
-  end
-
-  def private_class_method(*methods)
-    `return (methods.length === 1) ? methods[0] : methods`
-  end
-
-  def private_method_defined?(obj)
-    false
-  end
-
-  def private_constant(*)
-  end
-
-  alias nesting public
-  alias private public
-  alias protected public
-  alias protected_method_defined? private_method_defined?
-  alias public_class_method private_class_method
-  alias public_instance_method instance_method
-  alias public_instance_methods instance_methods
-  alias public_method_defined? method_defined?
-end
-
-module ::Kernel
-  def private_methods(*methods)
-    []
-  end
-
-  alias protected_methods private_methods
-  alias private_instance_methods private_methods
-  alias protected_instance_methods private_methods
-end
-
-module ::Kernel
   def eval(*)
     ::Kernel.raise ::NotImplementedError, "To use Kernel#eval, you must first require 'opal-parser'. "\
                                           "See https://github.com/opal/opal/blob/#{RUBY_ENGINE_VERSION}/docs/opal_parser.md for details."
   end
-end
 
-def self.public(*methods)
-  `return (methods.length === 1) ? methods[0] : methods`
-end
+  def fork
+    ::Kernel.raise ::NotImplementedError, "can't fork in a JavaScript environment"
+  end
 
-def self.private(*methods)
-  `return (methods.length === 1) ? methods[0] : methods`
+  def system(*)
+    ::Kernel.raise ::NotImplementedError, "can't run system commands in JavaScript environment"
+  end
+
+  `unimplemented(self.$$prototype, ["$eval", "$fork", "$system"])`
 end

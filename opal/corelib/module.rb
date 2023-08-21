@@ -570,10 +570,13 @@ class ::Module
 
     %x{
       var old = block.$$s,
+          old_def_priv = self.$$def_priv,
           result;
 
       block.$$s = null;
+      self.$$def_priv = 'public';
       result = block.apply(self, [self]);
+      self.$$def_priv = old_def_priv;
       block.$$s = old;
 
       return result;
@@ -596,10 +599,11 @@ class ::Module
     }
   end
 
-  def method_defined?(method)
+  def method_defined?(method, inherit = true)
     %x{
-      var body = self.$$prototype[$jsid(method)];
-      return (!!body) && !body.$$stub;
+      var jsid = $jsid(method), body = self.$$prototype[jsid];
+      return (!!body) && !body.$$stub &&
+        (inherit || Object.hasOwnProperty(self.$$prototype, jsid));
     }
   end
 
@@ -737,6 +741,7 @@ class ::Module
     copy = super
     copy.copy_class_variables(self)
     copy.copy_constants(self)
+    copy.copy_instance_methods(self)
     copy
   end
 
@@ -754,6 +759,17 @@ class ::Module
 
       for (name in other_constants) {
         $const_set(self, name, other_constants[name]);
+      }
+    }
+  end
+
+  def copy_instance_methods(other)
+    %x{
+      var props = Opal.own_instance_methods(other);
+
+      for (var i = 0, length = props.length; i < length; i++) {
+        var prop = props[i];
+        $prop(self.$$prototype, $jsid(prop), other.$$prototype[$jsid(prop)]);
       }
     }
   end

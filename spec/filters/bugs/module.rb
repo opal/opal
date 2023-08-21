@@ -139,19 +139,13 @@ opal_filter "Module" do
   fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil =~ /^#<Module:0x\h+>::Child$/ to be truthy but was false
   fails "Module#prepend keeps the module in the chain when dupping the class" # Exception: self.$$constructor is not a constructor
   fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0xa8270>] == [#<Module:0xa8282>, #<Module:0xa8270>] to be truthy but was false
-  fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x3bf72> to have private instance method 'test1' but it does not
-  fails "Module#private with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x3bf6c> to have private instance method 'test1' but it does not
   fails "Module#private_class_method when single argument is passed and is an array sets the visibility of the given methods to private" # Expected NoMethodError but no exception was raised ("foo" was returned)
   fails "Module#private_constant marked constants in a module raises a NameError when accessed directly from modules that include the module" # Expected NameError but no exception was raised (true was returned)
   fails "Module#private_constant marked constants sends #const_missing to the original class or module" # Expected true == "Foo" to be truthy but was false
   fails "Module#private_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#private_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments (given 2, expected 1)
-  fails "Module#private_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments (given 2, expected 1)
-  fails "Module#protected with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x59bb0> to have protected instance method 'test1' but it does not
-  fails "Module#protected with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x59baa> to have protected instance method 'test1' but it does not
   fails "Module#protected_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#protected_method_defined? when passed false as a second optional argument checks only the class itself" # ArgumentError: [Child.private_method_defined?] wrong number of arguments (given 2, expected 1)
-  fails "Module#protected_method_defined? when passed true as a second optional argument performs a lookup in ancestors" # ArgumentError: [Child.private_method_defined?] wrong number of arguments (given 2, expected 1)
   fails "Module#public_method_defined? raises a TypeError if passed an Integer" # Expected TypeError but no exception was raised (false was returned)
   fails "Module#refine and alias aliases a method within a refinement module, but not outside it" # NameError: undefined method `count' for class `'
   fails "Module#refine and alias_method aliases a method within a refinement module, but not outside it" # NameError: undefined method `count' for class `'
@@ -159,7 +153,6 @@ opal_filter "Module" do
   fails "Module#refine applies refinements to calls in the refine block" # NoMethodError: undefined method `foo' for "hello"
   fails "Module#refine does not override methods in subclasses" # Expected "foo from refinement" == "foo from subclass" to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by BasicObject#__send__" # Expected "foo" == "foo from refinement" to be truthy but was false
-  fails "Module#refine for methods accessed indirectly is honored by Kernel#public_method" # NoMethodError: undefined method `public_method' for #<#<Class:0x3d7c2>:0x3d7c6>
   fails "Module#refine for methods accessed indirectly is honored by Kernel#public_send" # Expected "foo" == "foo from refinement" to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by Kernel#send" # Expected "foo" == "foo from refinement" to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # Expected ["1", "2", "3"] == ["(1)", "(2)", "(3)"] to be truthy but was false

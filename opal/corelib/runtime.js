@@ -709,6 +709,7 @@
         // Make sure existing class has same superclass
         ensureSuperclassMatch(klass, superclass);
       }
+      klass.$$def_priv = 'public';
     }
     else {
       // Class doesn't exist, create a new one with given superclass...
@@ -812,6 +813,9 @@
       module = $allocate_module(name);
       $const_set(scope, name, module);
     }
+    else {
+      module.$$def_priv = 'public';
+    }
 
     if (Opal.trace_class) { invoke_tracers_for_class(module); }
 
@@ -834,6 +838,7 @@
       $raise(Opal.TypeError, "can't define singleton");
     }
     if (object.$$meta) {
+      object.$$meta.$$def_priv = 'public';
       return object.$$meta;
     }
 
@@ -2043,6 +2048,8 @@
       }
     }
 
+    if (module.$$def_priv) body.$$priv = module.$$def_priv;
+
     var singleton_of = module.$$singleton_of;
     if (module.$method_added && !module.$method_added.$$stub && !singleton_of) {
       module.$method_added(name);
@@ -2188,6 +2195,7 @@
     alias.$$arity           = body.$$arity == null ? body.length : body.$$arity;
     alias.$$parameters      = body.$$parameters;
     alias.$$source_location = body.$$source_location;
+    alias.$$priv            = body.$$priv == null ? 'public' : body.$$priv;
     alias.$$alias_of        = body;
     alias.$$alias_name      = name;
 
