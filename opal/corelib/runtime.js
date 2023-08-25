@@ -3027,13 +3027,18 @@
   Object.seal(nil);
 
   Opal.thrower = function(type) {
-    var thrower = { message: 'unexpected '+type };
-    thrower.$thrower_type = type;
-    thrower.$throw = function(value) {
-      if (value == null) value = nil;
-      thrower.$v = value;
-      throw thrower;
-    };
+    var thrower = {
+      $thrower_type: type,
+      $throw: function(value, called_from_lambda) {
+        if (value == null) value = nil;
+        if (this.is_orphan && !called_from_lambda) {
+          $raise(Opal.LocalJumpError, 'unexpected ' + type, value, type.$to_sym());
+        }
+        this.$v = value;
+        throw this;
+      },
+      is_orphan: false
+    }
     return thrower;
   };
 

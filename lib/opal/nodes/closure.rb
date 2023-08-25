@@ -102,7 +102,7 @@ module Opal
         def generate_thrower(type, closure, value)
           id = closure.register_catcher(type)
           closure.register_thrower(type, id)
-          push id, '.$throw(', expr_or_empty(value), ')'
+          push id, '.$throw(', expr_or_nil(value), ', ', scope.identify!, '.$$is_lambda)'
           id
         end
 
@@ -113,11 +113,11 @@ module Opal
             id = closure.throwers[type]
           else
             id = compiler.unique_temp('t_')
-            scope = closure.node.scope&.parent || top_scope
-            scope.add_scope_temp("#{id} = $thrower('#{type}')")
+            parent_scope = closure.node.scope&.parent || top_scope
+            parent_scope.add_scope_temp("#{id} = $thrower('#{type}')")
             closure.register_thrower(type, id)
           end
-          push id, '.$throw(', expr_or_empty(value), ')'
+          push id, '.$throw(', expr_or_nil(value), ', ', scope.identify!, '.$$is_lambda)'
           id
         end
 
@@ -132,7 +132,7 @@ module Opal
               if iter_closure
                 generate_thrower_without_catcher(:return, iter_closure, value)
               elsif compiler.eval?
-                push 'Opal.t_eval_return.$throw(', expr_or_empty(value), ')'
+                push 'Opal.t_eval_return.$throw(', expr_or_nil(value), ', false)'
               else
                 error 'Invalid return'
               end
@@ -211,9 +211,11 @@ module Opal
 
           helper :thrower
 
+          catchers_without_eval_return = catchers.grep_v(:eval_return)
+
           push "} catch($e) {"
           indent do
-            @closure.catchers.each do |type|
+            catchers.each do |type|
               case type
               when :eval_return
                 line "if ($e === Opal.t_eval_return) return $e.$v;"
@@ -223,11 +225,13 @@ module Opal
             end
             line "throw $e;"
           end
-          line "}"
+          line "} finally {", *catchers_without_eval_return.map { |type| "$t_#{type}.is_orphan = true;" }, "}"
 
           unshift "return " if closure_is? SEND
 
-          unshift "var ", catchers.map { |type| "$t_#{type} = $thrower('#{type}')" }.join(", "), "; "
+          unless catchers_without_eval_return.empty?
+            unshift "var ", catchers_without_eval_return.map { |type| "$t_#{type} = $thrower('#{type}')" }.join(", "), "; "
+          end
           unshift "try { "
 
           unless closure_is? JS_FUNCTION

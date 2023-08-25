@@ -316,6 +316,16 @@ class ::KeyError
   end
 end
 
+class ::LocalJumpError
+  attr_reader :exit_value, :reason
+
+  def initialize(message, exit_value = nil, reason = :noreason)
+    super message
+    @exit_value = exit_value
+    @reason = reason
+  end
+end
+
 module ::JS
   class Error
   end
