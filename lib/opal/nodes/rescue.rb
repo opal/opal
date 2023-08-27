@@ -211,7 +211,7 @@ module Opal
               line stmt(rescue_body)
             end
           end
-          line '} finally { Opal.pop_exception(); }'
+          line '} finally { Opal.pop_exception($err); }'
         end
         line '}'
       end
