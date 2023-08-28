@@ -9,10 +9,20 @@ class ::String < `String`
 
   %x{
     Opal.prop(#{self}.$$prototype, '$$is_string', true);
+
+    var string_id_map = new Map();
   }
 
   def __id__
-    `self.toString()`
+    %x{
+      var id, value = self.valueOf();
+      if (string_id_map.has(value)) {
+        return string_id_map.get(value);
+      }
+      id = Opal.uid();
+      string_id_map.set(value, id);
+      return id;
+    }
   end
 
   def self.try_convert(what)
@@ -560,10 +570,6 @@ class ::String < `String`
       #{$~ = `match_data`}
       return result;
     }
-  end
-
-  def hash
-    `self.toString()`
   end
 
   def hex
