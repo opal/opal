@@ -1671,11 +1671,13 @@
     var has_mlhs = block.$$has_top_level_mlhs_arg,
         has_trailing_comma = block.$$has_trailing_comma_in_args;
 
-    if (block.length > 1 || ((has_mlhs || has_trailing_comma) && block.length === 1)) {
+    var required_arg_count = block.$$arity ? (block.$$arity < 0 ? -block.$$arity + 1 : block.$$arity) : block.length
+
+    if (required_arg_count > 1 || ((has_mlhs || has_trailing_comma) && required_arg_count === 1)) {
       arg = Opal.to_ary(arg);
     }
 
-    if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg.$$is_array) {
+    if ((required_arg_count > 1 || (has_trailing_comma && required_arg_count === 1)) && arg.$$is_array) {
       return block.apply(null, arg);
     }
     else {
