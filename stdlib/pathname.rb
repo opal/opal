@@ -77,7 +77,7 @@ class Pathname
   end
 
   def hash
-    @path
+    @path.hash
   end
 
   def expand_path
