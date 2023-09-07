@@ -104,8 +104,6 @@ opal_filter "Module" do
   fails "Module#extend_object extends the given object with its constants and methods by default" # NoMethodError: undefined method `test_method' for #<MockObject:0x2541a @name="extended direct" @null=nil>
   fails "Module#extend_object on Class raises a TypeError if calling after rebinded to Class" # Expected TypeError but no exception was raised (nil was returned)
   fails "Module#include doesn't accept no-arguments" # Expected ArgumentError but no exception was raised (#<Module:0xdd44> was returned)
-  fails "Module#initialize_copy should produce a duped module with inspectable class methods" # NameError: undefined method `hello' for class `Module'
-  fails "Module#initialize_copy should retain singleton methods when duped" # Expected [] == ["hello"] to be truthy but was false
   fails "Module#instance_method converts non-String name by calling #to_str method" # NameError: undefined method `#<Object:0x3a942>' for class `ModuleSpecs::InstanceMeth'
   fails "Module#instance_method raises TypeError when passed non-String name and #to_str returns non-String value" # Expected TypeError (/can't convert Object to String/) but got: NameError (undefined method `#<Object:0x3a98e>' for class `ModuleSpecs::InstanceMeth')
   fails "Module#instance_method raises a NameError if the method has been undefined" # Expected #<UnboundMethod: ModuleSpecs::InstanceMeth#foo (defined in ModuleSpecs::InstanceMeth in ruby/core/module/fixtures/classes.rb:319)> == #<UnboundMethod: ModuleSpecs::InstanceMeth#foo (defined in ModuleSpecs::InstanceMeth in ruby/core/module/fixtures/classes.rb:319)> to be truthy but was false
@@ -137,8 +135,6 @@ opal_filter "Module" do
   fails "Module#name is not nil for a nested module created with the module keyword" # Expected nil =~ /^#<Module:0x[0-9a-f]+>::N$/ to be truthy but was false
   fails "Module#name is not nil when assigned to a constant in an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil =~ /^#<Module:0x\h+>::Child$/ to be truthy but was false
-  fails "Module#prepend keeps the module in the chain when dupping the class" # Exception: self.$$constructor is not a constructor
-  fails "Module#prepend uses only new module when dupping the module" # Expected [#<Module:0xa8270>] == [#<Module:0xa8282>, #<Module:0xa8270>] to be truthy but was false
   fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x3bf72> to have private instance method 'test1' but it does not
   fails "Module#private with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x3bf6c> to have private instance method 'test1' but it does not
   fails "Module#private_class_method when single argument is passed and is an array sets the visibility of the given methods to private" # Expected NoMethodError but no exception was raised ("foo" was returned)
@@ -202,7 +198,7 @@ opal_filter "Module" do
   fails "Module#using scope of refinement is active for block called via instance_exec" # NoMethodError: undefined method `foo' for 1
   fails "Module#using scope of refinement is active for class defined via Class.new {}" # NoMethodError: undefined method `foo' for 1
   fails "Module#using scope of refinement is active for module defined via Module.new {}" # NoMethodError: undefined method `foo' for 1
-  fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1  
+  fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1
   fails_badly "Module#ancestors returns a list of modules included in self (including self)" # Expected [ModuleSpecs::Parent, Object, Shellwords, Kernel, BasicObject] == [ModuleSpecs::Parent, Object, Kernel, BasicObject] to be truthy but was false -- a random failure
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NameError: undefined method `foo' for class `'
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#method" # NameError: undefined method `foo' for class `#<Class:0x581e4>'

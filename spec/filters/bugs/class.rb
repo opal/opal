@@ -1,9 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Class" do
   fails "Class#allocate raises TypeError for #superclass" # Expected TypeError but no exception was raised (nil was returned)
-  fails "Class#dup duplicates both the class and the singleton class" # Exception: self.$$constructor is not a constructor
-  fails "Class#dup retains an included module in the ancestor chain for the singleton class" # NoMethodError: undefined method `hello' for #<Module:0x402e6>
-  fails "Class#dup retains the correct ancestor chain for the singleton class" # Exception: self.$$constructor is not a constructor
   fails "Class#initialize raises a TypeError when called on BasicObject" # Expected TypeError but no exception was raised (nil was returned)
   fails "Class#initialize raises a TypeError when called on already initialized classes" # Expected TypeError but no exception was raised (nil was returned)
   fails "Class#initialize when given the Class raises a TypeError" # Expected TypeError but got: ArgumentError ([.initialize] wrong number of arguments (given 1, expected 0))

@@ -733,11 +733,50 @@ class ::Module
     }
   end
 
-  def dup
-    copy = super
-    copy.copy_class_variables(self)
-    copy.copy_constants(self)
-    copy
+  %x{
+    function copyInstanceMethods(from, to) {
+      var i, method_names = Opal.own_instance_methods(from);
+      for (i = 0; i < method_names.length; i++) {
+        var name = method_names[i],
+            jsid = $jsid(name),
+            body = from.$$prototype[jsid],
+            wrapped = Opal.wrapMethodBody(body);
+
+        wrapped.$$jsid = name;
+        Opal.defn(to, jsid, wrapped);
+      }
+    }
+
+    function copyIncludedModules(from, to) {
+      var modules = from.$$own_included_modules;
+      for (var i = modules.length - 1; i >= 0; i--) {
+        Opal.append_features(modules[i], to);
+      }
+    }
+
+    function copyPrependedModules(from, to) {
+      var modules = from.$$own_prepended_modules;
+      for (var i = modules.length - 1; i >= 0; i--) {
+        Opal.prepend_features(modules[i], to);
+      }
+    }
+  }
+
+  def initialize_copy(other)
+    %x{
+      copyInstanceMethods(other, self);
+      copyIncludedModules(other, self);
+      copyPrependedModules(other, self);
+      self.$$cloned_from = other.$$cloned_from.concat(other);
+    }
+    copy_class_variables(other)
+    copy_constants(other)
+  end
+
+  def initialize_dup(other)
+    super
+    # Unlike other classes, Module's singleton methods are copied on Object#dup.
+    copy_singleton_methods(other)
   end
 
   def copy_class_variables(other)

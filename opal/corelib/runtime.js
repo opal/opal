@@ -607,6 +607,7 @@
     $prop(klass, '$$ancestors', []);
     $prop(klass, '$$ancestors_cache_version', null);
     $prop(klass, '$$subclasses', []);
+    $prop(klass, '$$cloned_from', []);
 
     $prop(klass.$$prototype, '$$class', klass);
 
@@ -774,6 +775,7 @@
     $prop(module, '$$own_prepended_modules', []);
     $prop(module, '$$ancestors', [module]);
     $prop(module, '$$ancestors_cache_version', null);
+    $prop(module, '$$cloned_from', []);
 
     $set_proto(module, Opal.Module.prototype);
 
@@ -1606,15 +1608,22 @@
 
   // Super dispatcher
   Opal.find_super = function(obj, mid, current_func, defcheck, allow_stubs) {
-    var jsid = $jsid(mid), ancestors, super_method;
+    var jsid = $jsid(mid), ancestors, ancestor, super_method, method_owner, current_index = -1, i;
 
     ancestors = get_ancestors(obj);
+    method_owner = current_func.$$owner;
 
-    var current_index = ancestors.indexOf(current_func.$$owner);
+    for (i = 0; i < ancestors.length; i++) {
+      ancestor = ancestors[i];
+      if (ancestor === method_owner || ancestor.$$cloned_from.indexOf(method_owner) !== -1) {
+        current_index = i;
+        break;
+      }
+    }
 
-    for (var i = current_index + 1; i < ancestors.length; i++) {
-      var ancestor = ancestors[i],
-          proto = ancestor.$$prototype;
+    for (i = current_index + 1; i < ancestors.length; i++) {
+      ancestor = ancestors[i];
+      var proto = ancestor.$$prototype;
 
       if (proto.hasOwnProperty('$$dummy')) {
         proto = proto.$$define_methods_on;
@@ -2166,10 +2175,23 @@
 
     // We need a wrapper because otherwise properties
     // would be overwritten on the original body.
-    alias = function() {
-      var block = alias.$$p, i, ii;
+    alias = Opal.wrapMethodBody(body);
 
-      alias.$$p = null;
+    // Try to make the browser pick the right name
+    alias.displayName  = name;
+    alias.$$alias_of   = body;
+    alias.$$alias_name = name;
+
+    Opal.defn(obj, id, alias);
+
+    return obj;
+  };
+
+  Opal.wrapMethodBody = function(body) {
+    var wrapped = function() {
+      var block = wrapped.$$p;
+
+      wrapped.$$p = null;
 
       return Opal.send(this, body, arguments, block);
     };
@@ -2179,21 +2201,14 @@
     // It doesn't work in older browsers (like Chrome 38), where
     // an exception is thrown breaking Opal altogether.
     try {
-      Object.defineProperty(alias, 'length', { value: body.length });
+      Object.defineProperty(wrapped, 'length', { value: body.length });
     } catch (e) {}
 
-    // Try to make the browser pick the right name
-    alias.displayName       = name;
+    wrapped.$$arity           = body.$$arity == null ? body.length : body.$$arity;
+    wrapped.$$parameters      = body.$$parameters;
+    wrapped.$$source_location = body.$$source_location;
 
-    alias.$$arity           = body.$$arity == null ? body.length : body.$$arity;
-    alias.$$parameters      = body.$$parameters;
-    alias.$$source_location = body.$$source_location;
-    alias.$$alias_of        = body;
-    alias.$$alias_name      = name;
-
-    Opal.defn(obj, id, alias);
-
-    return obj;
+    return wrapped;
   };
 
   Opal.alias_gvar = function(new_name, old_name) {

@@ -24,19 +24,37 @@ class ::Class
     }
   end
 
+  def clone(freeze: nil)
+    unless freeze.nil? || freeze == true || freeze == false
+      raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
+    end
+
+    copy = `Opal.allocate_class(nil, self.$$super)`
+    copy.copy_instance_variables(self)
+    copy.copy_singleton_methods(self)
+    copy.initialize_clone(self, freeze: freeze)
+
+    if freeze == true || (freeze.nil? && frozen?)
+      copy.freeze
+    end
+
+    copy
+  end
+
+  def dup
+    copy = `Opal.allocate_class(nil, self.$$super)`
+
+    copy.copy_instance_variables(self)
+    copy.initialize_dup(self)
+
+    copy
+  end
+
   def descendants
     subclasses + subclasses.map(&:descendants).flatten
   end
 
   def inherited(cls)
-  end
-
-  def initialize_dup(original)
-    initialize_copy(original)
-    %x{
-      self.$$name = null;
-      self.$$full_name = null;
-    }
   end
 
   def new(*args, &block)
