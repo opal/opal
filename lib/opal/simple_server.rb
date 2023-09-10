@@ -51,7 +51,7 @@ class Opal::SimpleServer
     asset = fetch_asset(path)
     [
       200,
-      { 'Content-Type' => 'application/javascript' },
+      { 'content-type' => 'application/javascript' },
       [asset[:data], "\n", asset[:map].to_data_uri_comment],
     ]
   end
@@ -99,6 +99,6 @@ class Opal::SimpleServer
       </html>
       HTML
     end
-    [200, { 'Content-Type' => 'text/html' }, [html]]
+    [200, { 'content-type' => 'text/html' }, [html]]
   end
 end
