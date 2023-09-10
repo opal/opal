@@ -256,7 +256,7 @@ class PromiseV2 < `Promise`
       prom.instance_variable_set(:@realized, :resolve)
       prom.instance_variable_set(:@value, val)
     end
-    prom = `self.finally(#{blk})`
+    prom = `self.finally(function() { return blk(prom.prev ? prom.prev.value : nil); })`
     prom.instance_variable_set(:@prev, self)
     prom.instance_variable_set(:@type, :always)
     (@next ||= []) << prom
