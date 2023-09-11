@@ -41,8 +41,6 @@
     return global_object.Opal;
   }
 
-  var nil;
-
   // The actual class for BasicObject
   var BasicObject;
 
@@ -126,7 +124,7 @@
       $gvars["@"] = exception.$backtrace();
     }
     else {
-      $gvars["!"] = $gvars["@"] = nil;
+      $gvars["!"] = $gvars["@"] = null;
     }
   };
 
@@ -183,7 +181,7 @@
   // -----
 
   var $truthy = Opal.truthy = function(val) {
-    return false !== val && nil !== val && undefined !== val && null !== val && (!(val instanceof Boolean) || true === val.valueOf());
+    return false !== val && undefined !== val && null !== val && (!(val instanceof Boolean) || true === val.valueOf());
   };
 
   Opal.falsy = function(val) {
@@ -445,7 +443,7 @@
     if (cref == null || cref === '::') cref = _Object;
 
     if (value.$$is_a_module) {
-      if (value.$$name == null || value.$$name === nil) value.$$name = name;
+      if (value.$$name == null) value.$$name = name;
       if (value.$$base_module == null) value.$$base_module = cref;
     }
 
@@ -520,7 +518,7 @@
 
     if (cref.$$autoload && cref.$$autoload[name]) {
       delete cref.$$autoload[name];
-      return nil;
+      return null;
     }
 
     $raise(Opal.NameError, "constant "+cref+"::"+cref.$name()+" not defined");
@@ -590,7 +588,7 @@
       klass = function(){};
     }
 
-    if (name && name !== nil) {
+    if (name) {
       $prop(klass, 'displayName', '::'+name);
     }
 
@@ -917,7 +915,7 @@
   // @return [Class]
   Opal.build_object_singleton_class = function(object) {
     var superclass = object.$$class,
-        klass = $allocate_class(nil, superclass, true);
+        klass = $allocate_class(null, superclass, true);
 
     $prop(klass, '$$is_singleton', true);
     $prop(klass, '$$singleton_of', object);
@@ -1076,7 +1074,7 @@
     if (!tolerant)
       $raise(Opal.NameError, 'uninitialized class variable '+name+' in '+module.$name());
 
-    return nil;
+    return null;
   }
 
   function isRoot(proto) {
@@ -1775,7 +1773,7 @@
     }
     else if (value['$respond_to?']('to_ary', true)) {
       var ary = value.$to_ary();
-      if (ary === nil) {
+      if (ary === null) {
         return [value];
       }
       else if (ary.$$is_array) {
@@ -1799,7 +1797,7 @@
     }
     else if (value['$respond_to?']('to_a', true)) {
       var ary = value.$to_a();
-      if (ary === nil) {
+      if (ary === null) {
         return [value];
       }
       else if (ary.$$is_array) {
@@ -2222,7 +2220,7 @@
         $gvars[old_name] = new_value;
       }
     });
-    return nil;
+    return null;
   }
 
   Opal.alias_native = function(obj, name, native_name) {
@@ -2856,7 +2854,7 @@
     return are_both_numbers_or_strings(lhs,rhs) ? lhs !== rhs : $truthy((lhs)['$!='](rhs));
   };
   Opal.not = function(arg) {
-    if (undefined === arg || null === arg || false === arg || nil === arg) return true;
+    if (undefined === arg || null === arg || false === arg) return true;
     if (true === arg || arg['$!'].$$pristine) return false;
     return $truthy(arg['$!']());
   }
@@ -2874,7 +2872,6 @@
   }
   Opal.return_ivar = function(ivar) {
     return function() {
-      if (this[ivar] == null) { return nil; }
       return this[ivar];
     }
   }
@@ -2918,7 +2915,7 @@
     for (i = 0; i < length; i++) {
       switch(array[i][0]) {
         case undefined:
-          array[i] = nil
+          array[i] = null
           break;
         case '-':
         case '0':
@@ -3011,7 +3008,6 @@
     var thrower = { message: 'unexpected '+type };
     thrower.$thrower_type = type;
     thrower.$throw = function(value) {
-      if (value == null) value = nil;
       thrower.$v = value;
       throw thrower;
     };
