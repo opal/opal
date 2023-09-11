@@ -145,12 +145,7 @@ The test suite can be run using:
 
     $ bundle exec rake
 
-This will command will run all RSpec and MSpec examples in sequence.
-
-#### Automated runs
-
-A `Guardfile` with decent mappings between specs and lib/corelib/stdlib files is in place.
-Run `bundle exec guard -i` to start `guard`.
+This command will run all RSpec and MSpec examples in sequence.
 
 
 ### MSpec
@@ -169,6 +164,11 @@ visit `http://localhost:9292/` in any web browser.
 
     $ rake rspec
 
+
+### Automated runs
+
+A `Guardfile` with decent mappings between specs and lib/corelib/stdlib files is in place.
+Run `bundle exec guard -i` to start `guard`.
 
 ## Code Overview
 
