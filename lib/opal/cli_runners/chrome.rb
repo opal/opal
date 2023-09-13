@@ -70,6 +70,10 @@ module Opal
         ext = builder.output_extension
         module_type = ' type="module"' if builder.esm?
 
+        # Some maps may contain `</script>` fragment (eg. in strings) which would close our
+        # `<script>` tag prematurely. For this case, we need to escape the `</script>` tag.
+        map_json = map.to_json.gsub(/(<\/scr)(ipt>)/i, '\1"+"\2')
+
         # Chrome can't handle huge data passed to `addScriptToEvaluateOnLoad`
         # https://groups.google.com/a/chromium.org/forum/#!topic/chromium-discuss/U5qyeX_ydBo
         # The only way is to create temporary files and pass them to chrome.
@@ -86,7 +90,7 @@ module Opal
             sourceMapSupport.install({
               retrieveSourceMap: function(path) {
                 return path.endsWith('/index.#{ext}') ? {
-                  url: './index.map', map: #{map.to_json}
+                  url: './index.map', map: #{map_json}
                 } : null;
               }
             });
