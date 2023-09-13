@@ -1,4 +1,4 @@
-# helpers: yield1, hash_clone, hash_delete, hash_each, hash_get, hash_put, deny_frozen_access, freeze
+# helpers: yield1, hash_clone, hash_delete, hash_each, hash_get, hash_put, deny_frozen_access, freeze, opal32_init, opal32_add
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -481,41 +481,53 @@ class ::Hash < `Map`
     }
   end
 
+  `var $hash_ids`
+
   def hash
     %x{
-      var top = (Opal.hash_ids === undefined),
+      var top = ($hash_ids === undefined),
           hash_id = self.$object_id(),
-          result = ['Hash'],
-          key, item;
+          result = $opal32_init(),
+          key, item, i,
+          size = self.size, ary = new Int32Array(size);
+
+      result = $opal32_add(result, 0x4);
+      result = $opal32_add(result, size);
+
+      if (top) {
+        $hash_ids = Object.create(null);
+      }
+      else if ($hash_ids[hash_id]) {
+        return $opal32_add(result, 0x01010101);
+      }
 
       try {
-        if (top) {
-          Opal.hash_ids = Object.create(null);
-        }
-
-        if (Opal[hash_id]) {
-          return 'self';
-        }
-
-        for (key in Opal.hash_ids) {
-          item = Opal.hash_ids[key];
+        for (key in $hash_ids) {
+          item = $hash_ids[key];
           if (#{eql?(`item`)}) {
-            return 'self';
+            return $opal32_add(result, 0x01010101);
           }
         }
 
-        Opal.hash_ids[hash_id] = self;
+        $hash_ids[hash_id] = self;
+        i = 0
 
         $hash_each(self, false, function(key, value) {
-          result.push([key, value.$hash()]);
+          ary[i] = [0x70414952, key, value].$hash();
+          i++;
           return [false, false];
         });
 
-        return result.sort().join();
+        ary = ary.sort();
 
+        for (i = 0; i < ary.length; i++) {
+          result = $opal32_add(result, ary[i]);
+        }
+
+        return result;
       } finally {
         if (top) {
-          Opal.hash_ids = undefined;
+          $hash_ids = undefined;
         }
       }
     }

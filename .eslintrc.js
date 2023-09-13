@@ -32,6 +32,7 @@ module.exports = {
     "Proxy": "readonly",
     "Reflect": "readonly",
     "Uint8Array": "readonly",
+    "Int32Array": "readonly",
     "WeakRef": "readonly",
     "Map": "readonly",
   }

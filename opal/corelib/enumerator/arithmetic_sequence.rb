@@ -153,7 +153,7 @@ class ::Enumerator
     end
 
     def hash
-      [self.begin, self.end, step, exclude_end?].hash
+      [ArithmeticSequence, self.begin, self.end, step, exclude_end?].hash
     end
 
     def inspect

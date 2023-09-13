@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, hash_ids, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze
+# helpers: truthy, falsy, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze, opal32_init, opal32_add
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -253,7 +253,7 @@ class ::Array < `Array`
     end
 
     %x{
-      if (#{hash} === #{other.hash}) {
+      if (#{self} === #{other}) {
         return 0;
       }
 
@@ -1260,27 +1260,31 @@ class ::Array < `Array`
     `$freeze(self)`
   end
 
+  `var $hash_ids`
+
   def hash
     %x{
       var top = ($hash_ids === undefined),
-          result = ['A'],
+          result = $opal32_init(),
           hash_id = self.$object_id(),
           item, i, key;
 
+      result = $opal32_add(result, 0xA);
+      result = $opal32_add(result, self.length);
+
+      if (top) {
+        $hash_ids = Object.create(null);
+      }
+      // return early for recursive structures
+      else if ($hash_ids[hash_id]) {
+        return $opal32_add(result, 0x01010101);
+      }
+
       try {
-        if (top) {
-          $hash_ids = Object.create(null);
-        }
-
-        // return early for recursive structures
-        if ($hash_ids[hash_id]) {
-          return 'self';
-        }
-
         for (key in $hash_ids) {
           item = $hash_ids[key];
           if (#{eql?(`item`)}) {
-            return 'self';
+            return $opal32_add(result, 0x01010101);
           }
         }
 
@@ -1288,10 +1292,10 @@ class ::Array < `Array`
 
         for (i = 0; i < self.length; i++) {
           item = self[i];
-          result.push(item.$hash());
+          result = $opal32_add(result, item.$hash());
         }
 
-        return result.join(',');
+        return result;
       } finally {
         if (top) {
           $hash_ids = undefined;

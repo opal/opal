@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# use_strict: true
 
 require 'corelib/numeric'
 
@@ -6,6 +7,7 @@ class ::Number < ::Numeric
   ::Opal.bridge(`Number`, self)
   `Opal.prop(self.$$prototype, '$$is_number', true)`
   `self.$$is_number_class = true`
+  `var number_id_map = new Map()`
 
   class << self
     def allocate
@@ -36,7 +38,32 @@ class ::Number < ::Numeric
   end
 
   def __id__
-    `(self * 2) + 1`
+    %x{
+      // Binary-safe integers
+      if (self|0 === self) {
+        return (self * 2) + 1;
+      }
+      else {
+        if (number_id_map.has(self)) {
+          return number_id_map.get(self);
+        }
+        var id = Opal.uid();
+        number_id_map.set(self, id);
+        return id;
+      }
+    }
+  end
+
+  def hash
+    %x{
+      // Binary-safe integers
+      if (self|0 === self) {
+        return #{__id__}
+      }
+      else {
+        return self.toString().$hash();
+      }
+    }
   end
 
   def +(other)
