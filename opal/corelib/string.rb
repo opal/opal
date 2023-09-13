@@ -13,17 +13,27 @@ class ::String < `String`
     var string_id_map = new Map();
   }
 
-  def __id__
-    %x{
-      var id, value = self.valueOf();
-      if (string_id_map.has(value)) {
-        return string_id_map.get(value);
+  # Force strict mode to suppress autoboxing of `this`
+  %x{
+    (function() {
+      'use strict';
+      #{
+        def __id__
+          %x{
+            if (typeof self === 'object') {
+              return #{super}
+            }
+            if (string_id_map.has(self)) {
+              return string_id_map.get(self);
+            }
+            var id = Opal.uid();
+            string_id_map.set(self, id);
+            return id;
+          }
+        end
       }
-      id = Opal.uid();
-      string_id_map.set(value, id);
-      return id;
-    }
-  end
+    })();
+  }
 
   def self.try_convert(what)
     ::Opal.coerce_to?(what, ::String, :to_str)
