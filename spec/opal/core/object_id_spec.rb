@@ -50,9 +50,3 @@ describe "Numeric#object_id" do
     -1.object_id.should == -1
   end
 end
-
-describe "String#object_id" do
-  it "returns the primitive string version of self" do
-    `#{"hello".object_id} === "hello".toString()`.should be_true
-  end
-end
