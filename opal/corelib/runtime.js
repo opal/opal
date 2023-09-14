@@ -1863,9 +1863,14 @@
   }
 
   // Optimization for a costly operation of prepending '$' to method names
-  var jsid_cache = {}
+  var jsid_cache = new Map();
   function $jsid(name) {
-    return jsid_cache[name] || (jsid_cache[name] = '$' + name);
+    var jsid = jsid_cache.get(name);
+    if (!jsid) {
+      jsid = '$' + name;
+      jsid_cache.set(name, jsid);
+    }
+    return jsid;
   }
   Opal.jsid = $jsid;
 
