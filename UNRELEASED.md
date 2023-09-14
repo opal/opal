@@ -57,6 +57,7 @@ This release brings a lot of performance improvements, our tests on Asciidoctor 
 - Fix `String#object_id`, `String#__id__`, `String#hash` to match CRuby's behavior (#2576)
 - Lowercase response headers in `SimpleServer` for rack 3.0 compatibility (#2578)
 - Fix `Module#clone` and `Module#dup` to properly copy methods (#2572)
+- Chrome runner fix: support code that contains `</script>` (#2581)
 
 ### Added
 
