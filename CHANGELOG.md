@@ -16,7 +16,7 @@ Changes are grouped as follows:
 
 
 
-## [1.7.3](https://github.com/opal/opal/compare/v1.7.2...v1.7.3) - 2023-03-23
+## [1.7.4](https://github.com/opal/opal/compare/v1.7.3...v1.7.4) - 2023-09-14
 
 
 <!--
@@ -27,6 +27,20 @@ Changes are grouped as follows:
 ### Deprecated
 ### Performance
 -->
+
+### Fixed
+
+- Use a Map instead of a POJO for the jsid_cache ([#2584](https://github.com/opal/opal/pull/2584))
+- Lowercase response headers in `SimpleServer` for rack 3.0 compatibility ([#2578](https://github.com/opal/opal/pull/2578))
+- Fix `switch` with Object-wrapped values ([#2542](https://github.com/opal/opal/pull/2542))
+- Regexp.escape: Cast to String or drop exception ([#2552](https://github.com/opal/opal/pull/2552))
+- Chrome runner fix: support code that contains `</script>` ([#2581](https://github.com/opal/opal/pull/2581))
+
+
+
+
+## [1.7.3](https://github.com/opal/opal/compare/v1.7.2...v1.7.3) - 2023-03-23
+
 
 ### Fixed
 
