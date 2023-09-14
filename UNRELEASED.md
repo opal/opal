@@ -53,6 +53,10 @@ This release brings a lot of performance improvements, our tests on Asciidoctor 
 - Propagate removal of method from included/prepended modules (#2553)
 - Restore `nodejs/yaml` functionality (#2551)
 - Fix sine `Range#size` edge cases (#2541)
+- Use a Map instead of a POJO for the jsid_cache (#2584)
+- Fix `String#object_id`, `String#__id__`, `String#hash` to match CRuby's behavior (#2576)
+- Lowercase response headers in `SimpleServer` for rack 3.0 compatibility (#2578)
+- Fix `Module#clone` and `Module#dup` to properly copy methods (#2572)
 
 ### Added
 
@@ -67,6 +71,7 @@ This release brings a lot of performance improvements, our tests on Asciidoctor 
 ### Documentation
 
 - Bridging documentation (#2541)
+- Fix Typo in Running tests Section of README.md File (#2580)
 
 ### Performance
 
