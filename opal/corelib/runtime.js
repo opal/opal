@@ -2284,7 +2284,7 @@
           object;
 
       for (var i=0; i<objects.length; i++) {
-        object = objects[0];
+        object = objects[i];
         if (key === object || key['$eql?'](object)) {
           hash.set(object, value);
           return;
