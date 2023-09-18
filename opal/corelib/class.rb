@@ -24,6 +24,15 @@ class ::Class
     }
   end
 
+  def allocate_bridged(*args)
+    %x{
+      var con = self.$$constructor
+      var obj = new (con.bind.apply(con, [con].concat(args)));
+      obj.$$id = Opal.uid();
+      return obj;
+    }
+  end
+
   def clone(freeze: nil)
     unless freeze.nil? || freeze == true || freeze == false
       raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
@@ -59,7 +68,15 @@ class ::Class
 
   def new(*args, &block)
     %x{
-      var object = #{allocate};
+      var object;
+
+      if (self.$$bridge && self.$allocate == Opal.Class.prototype.$allocate) {
+        // a bridged class and its allocate method has not been overwritten,
+        // call the original js constructor with args
+        object = #{allocate_bridged(*args)}
+      } else {
+        object = #{allocate};
+      }
       Opal.send(object, object.$initialize, args, block);
       return object;
     }

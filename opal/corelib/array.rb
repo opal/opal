@@ -78,6 +78,18 @@ class ::Array < `Array`
     }
   }
 
+  def self.allocate
+    # source copy of Class::allocate, just overwriting ::allocate
+    # to prevent Class::allocate_bridged being called
+    # to ensure correct error behaviour for this bridged class
+    # as defined in #initialize
+    %x{
+      var obj = new self.$$constructor();
+      obj.$$id = Opal.uid();
+      return obj;
+    }
+  end
+
   def self.[](*objects)
     `toArraySubclass(objects, self)`
   end
