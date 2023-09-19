@@ -409,8 +409,6 @@ class ::Module
 
     %x{
       if (typeof(Proxy) !== 'undefined') {
-        var meta = { __proto__: null }
-
         block.$$proxy_target = block
         block = new Proxy(block, {
           apply: function(target, self, args) {
