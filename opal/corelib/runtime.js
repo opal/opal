@@ -80,6 +80,7 @@
   var $call      = Function.prototype.call;
   var $bind      = Function.prototype.bind;
   var $has_own   = Object.hasOwn || $call.bind(Object.prototype.hasOwnProperty);
+  var $get_proto = Object.getPrototypeOf;
   var $set_proto = Object.setPrototypeOf;
   var $slice     = $call.bind(Array.prototype.slice);
   var $splice    = $call.bind(Array.prototype.splice);
@@ -729,7 +730,7 @@
       }
 
       if (bridged) {
-        Opal.bridge(bridged, klass);
+        Opal.bridge(scope, bridged, klass);
       }
     }
 
@@ -1402,7 +1403,7 @@
   // @param constructor [JS.Function] native JavaScript constructor to use
   // @return [Class] returns the passed Ruby class
   //
-  Opal.bridge = function(native_klass, klass) {
+  Opal.bridge = function(scope, native_klass, klass) {
     if (native_klass.hasOwnProperty('$$bridge')) {
       $raise(Opal.ArgumentError, "already bridged");
     }
@@ -1422,8 +1423,31 @@
     //         - super (window.Object)
     //           - null
     //
-    $prop(native_klass, '$$bridge', klass);
-    $set_proto(native_klass.prototype, (klass.$$super || Opal.Object).$$prototype);
+    var native_klass__proto__ = $get_proto(native_klass);
+
+    if (native_klass__proto__ == Function.prototype) {
+      $prop(native_klass, '$$bridge', klass);
+      $set_proto(native_klass.prototype, (klass.$$super || Opal.Object).$$prototype);
+    } else {
+      // walk __proto__ chain of native_klass and bridge them all
+      // unless the conditions below are met
+      if (native_klass__proto__ != native_klass) {
+        var known__proto__ = native_klass__proto__;
+        while (native_klass__proto__ && // must exist
+          native_klass__proto__ != known__proto__ && // klass instance must not be the __proto__ itself
+          native_klass__proto__ != Function.prototype && // must not be Function (end of chain is near, inject before Function)
+          (native_klass__proto__.$$iclass || native_klass__proto__.$$class || native_klass__proto__.$$bridge)) { // and must not be opalized in between
+          known__proto__ = native_klass__proto__;
+          native_klass__proto__ = $get_proto(native_klass__proto__);
+        }
+        if (native_klass__proto__ &&
+          native_klass__proto__ != known__proto__ &&
+          native_klass__proto__ != Function.prototype  &&
+          !(native_klass__proto__.$$iclass || native_klass__proto__.$$class || native_klass__proto__.$$bridge)) {
+          Opal.klass(scope, native_klass__proto__, native_klass__proto__.name);
+        }
+      }
+    }
     $prop(klass, '$$prototype', native_klass.prototype);
 
     $prop(klass.$$prototype, '$$class', klass);

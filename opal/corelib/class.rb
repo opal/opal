@@ -77,7 +77,10 @@ class ::Class
       } else {
         object = #{allocate};
       }
-      Opal.send(object, object.$initialize, args, block);
+      // a bridged native class may not have $initialize
+      if (object.$initialize) {
+        Opal.send(object, object.$initialize, args, block);
+      }
       return object;
     }
   end
