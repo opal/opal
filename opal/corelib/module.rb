@@ -409,7 +409,7 @@ class ::Module
 
     %x{
       if (typeof(Proxy) !== 'undefined') {
-        var meta = Object.create(null)
+        var meta = { __proto__: null }
 
         block.$$proxy_target = block
         block = new Proxy(block, {
@@ -802,7 +802,7 @@ class ::Module
     %x{
       klass_id = Opal.id(klass);
       if (typeof self.$$refine_modules === "undefined") {
-        self.$$refine_modules = Object.create(null);
+        self.$$refine_modules = { __proto__: null };
       }
       if (typeof self.$$refine_modules[klass_id] === "undefined") {
         m = self.$$refine_modules[klass_id] = #{::Refinement.new};
