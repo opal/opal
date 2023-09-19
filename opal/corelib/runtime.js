@@ -393,7 +393,7 @@
     }
 
     if ((cache = cref.$$const_cache) == null) {
-      $prop(cref, '$$const_cache', Object.create(null));
+      $prop(cref, '$$const_cache', { __proto__: null });
       cache = cref.$$const_cache;
     }
     cached = cache[name];
@@ -418,7 +418,7 @@
     var cref = nesting[0], result, current_version = Opal.const_cache_version, cache, cached;
 
     if ((cache = nesting.$$const_cache) == null) {
-      $prop(nesting, '$$const_cache', Object.create(null));
+      $prop(nesting, '$$const_cache', { __proto__: null });
       cache = nesting.$$const_cache;
     }
     cached = cache[name];
@@ -449,7 +449,7 @@
       if (value.$$base_module == null) value.$$base_module = cref;
     }
 
-    cref.$$const = (cref.$$const || Object.create(null));
+    cref.$$const = (cref.$$const || { __proto__: null });
 
     if (name in cref.$$const || ("$$autoload" in cref && name in cref.$$autoload)) {
       new_const = false;
@@ -2755,7 +2755,7 @@
   // Strings
   // -------
 
-  Opal.encodings = Object.create(null);
+  Opal.encodings = { __proto__: null };
 
   // Sets the encoding on a string, will treat string literals as frozen strings
   // raising a FrozenError.

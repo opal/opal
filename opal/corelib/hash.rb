@@ -490,7 +490,7 @@ class ::Hash < `Map`
 
       try {
         if (top) {
-          Opal.hash_ids = Object.create(null);
+          Opal.hash_ids = { __proto__: null };
         }
 
         if (Opal[hash_id]) {

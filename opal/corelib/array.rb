@@ -1269,7 +1269,7 @@ class ::Array < `Array`
 
       try {
         if (top) {
-          $hash_ids = Object.create(null);
+          $hash_ids = { __proto__: null };
         }
 
         // return early for recursive structures
