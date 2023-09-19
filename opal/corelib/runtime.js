@@ -1674,6 +1674,17 @@
   // @deprecated
   Opal.find_iter_super_dispatcher = Opal.find_block_super;
 
+  function call_lambda(block, arg, ret) {
+    try {
+      block(arg);
+    } catch (e) {
+      if (e === ret) {
+        return ret.$v;
+      }
+      throw e;
+    }
+  }
+
   // handles yield calls for 1 yielded arg
   Opal.yield1 = function(block, arg) {
     if (typeof(block) !== "function") {
@@ -1681,16 +1692,23 @@
     }
 
     var has_mlhs = block.$$has_top_level_mlhs_arg,
-        has_trailing_comma = block.$$has_trailing_comma_in_args;
+        has_trailing_comma = block.$$has_trailing_comma_in_args,
+        is_returning_lambda = block.$$is_lambda && block.$$ret;
 
     if (block.length > 1 || ((has_mlhs || has_trailing_comma) && block.length === 1)) {
       arg = Opal.to_ary(arg);
     }
 
     if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg.$$is_array) {
+      if (is_returning_lambda) {
+        return call_lambda(block.apply.bind(block, null), arg, block.$$ret);
+      }
       return block.apply(null, arg);
     }
     else {
+      if (is_returning_lambda) {
+        return call_lambda(block, arg, block.$$ret);
+      }
       return block(arg);
     }
   };
@@ -1703,10 +1721,13 @@
 
     if (block.length > 1 && args.length === 1) {
       if (args[0].$$is_array) {
-        return block.apply(null, args[0]);
+        args = args[0];
       }
     }
 
+    if (block.$$is_lambda && block.$$ret) {
+      return call_lambda(block.apply.bind(block, null), args, block.$$ret);
+    }
     return block.apply(null, args);
   };
 
