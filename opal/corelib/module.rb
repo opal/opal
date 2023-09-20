@@ -398,10 +398,7 @@ class ::Module
                 `#{method.to_proc}.$$unbound`
 
               when ::UnboundMethod
-                ->(*args) {
-                  bound = method.bind(self)
-                  bound.call(*args)
-                }
+                `Opal.wrap_method_body(method.$$method)`
 
               else
                 ::Kernel.raise ::TypeError, "wrong argument type #{block.class} (expected Proc/Method)"

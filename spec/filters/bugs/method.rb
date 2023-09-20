@@ -27,8 +27,6 @@ opal_filter "Method" do
   fails "Method#curry with optional arity argument raises ArgumentError when the method requires less arguments than the given arity" # Expected ArgumentError but no exception was raised (#<Proc:0x7c68a> was returned)
   fails "Method#curry with optional arity argument raises ArgumentError when the method requires more arguments than the given arity" # Expected ArgumentError but no exception was raised (#<Proc:0x7c66a> was returned)
   fails "Method#define_method when passed a Proc object and a method is defined inside defines the nested method in the default definee where the Proc was created" # Expected #<#<Class:0x51aa0>:0x51a9c> NOT to have method 'nested_method_in_proc_for_define_method' but it does
-  fails "Method#define_method when passed an UnboundMethod object defines a method with the same #arity as the original" # Expected -1 == -3 to be truthy but was false
-  fails "Method#define_method when passed an UnboundMethod object defines a method with the same #parameters as the original" # Expected [["rest", "args"]] == [["req", "a"], ["req", "b"], ["rest", "c"]] to be truthy but was false
   fails "Method#eql? missing methods returns true for the same method missing" # NameError: undefined method `handled_via_method_missing' for class `MethodSpecs::Methods'
   fails "Method#eql? returns true if a method was defined using the other one" # Expected false to be true
   fails "Method#eql? returns true if methods are the same" # Expected false to be true
