@@ -183,4 +183,5 @@ opal_filter "Time" do
   fails_badly "Time#isdst dst? returns whether time is during daylight saving time" # Expected false == true to be truthy but was false
   fails_badly "Time#strftime with %z formats a local time with positive UTC offset as '+HHMM'" # Expected "+0900" == "+0100" to be truthy but was false
   fails_badly "Time#yday returns an integer representing the day of the year, 1..366" # Expected 117 == 116 to be truthy but was false
+  fails_badly "Time.new with a timezone argument Time.new with a String argument returns Time in local timezone if not provided in the String argument" # Expected "Fiji Summer Time" == "Fiji Standard Time" to be truthy but was false
 end
