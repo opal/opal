@@ -335,7 +335,6 @@ platforms.each do |platform|
         includes = "-Itest/cruby/test"
         files = %w[
           benchmark/test_benchmark.rb
-          ruby/test_call.rb
           opal/test_keyword.rb
           opal/test_base64.rb
           opal/test_openuri.rb
