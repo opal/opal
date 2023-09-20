@@ -1,9 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Integer" do
-  fails "Bignum is deprecated" # NameError: uninitialized constant Bignum
-  fails "Bignum is unified into Integer" # NameError: uninitialized constant Bignum
-  fails "Fixnum is deprecated" # Expected warning to match: /constant ::Fixnum is deprecated/ but got: ""
-  fails "Fixnum is unified into Integer" # Expected Number to be identical to Integer
   fails "Integer is the class of both small and large integers" # Expected Number to be identical to Integer
   fails "Integer#& fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (3 was returned)
   fails "Integer#** bignum switch to a Float when the values is too big" # Expected warning to match: /warning: in a\*\*b, b may be too big/ but got: ""
@@ -19,13 +15,13 @@ opal_filter "Integer" do
   fails "Integer#<< (with n << m) fixnum calls #to_int to convert the argument to an Integer" # Expected 3 == 0 to be truthy but was false
   fails "Integer#<< (with n << m) fixnum returns -1 when n < 0, m < 0 and n > -(2**-m)" # Expected -7 == -1 to be truthy but was false
   fails "Integer#<< (with n << m) fixnum returns 0 when n > 0, m < 0 and n < 2**-m" # Expected 7 == 0 to be truthy but was false
-  fails "Integer#<< (with n << m) when m is a bignum or larger than int raises NoMemoryError when m > 0 and n != 0" # Expected NoMemoryError but no exception was raised (1 was returned)
+  fails "Integer#<< (with n << m) when m is a bignum or larger than int raises RangeError when m > 0 and n != 0" # Expected RangeError (shift width too big) but no exception was raised (1 was returned)
   fails "Integer#<< (with n << m) when m is a bignum or larger than int returns -1 when m < 0 and n < 0" # Expected 0 == -1 to be truthy but was false
   fails "Integer#<< (with n << m) when m is a bignum or larger than int returns 0 when m < 0 and n >= 0" # Expected 1 == 0 to be truthy but was false
   fails "Integer#>> (with n >> m) fixnum calls #to_int to convert the argument to an Integer" # Expected 8 == 0 to be truthy but was false
   fails "Integer#>> (with n >> m) fixnum returns -1 when n < 0, m > 0 and n > -(2**m)" # Expected -7 == -1 to be truthy but was false
   fails "Integer#>> (with n >> m) fixnum returns 0 when n > 0, m > 0 and n < 2**m" # Expected 7 == 0 to be truthy but was false
-  fails "Integer#>> (with n >> m) when m is a bignum or larger than int raises NoMemoryError when m < 0 and n != 0" # Expected NoMemoryError but no exception was raised (1 was returned)
+  fails "Integer#>> (with n >> m) when m is a bignum or larger than int raises RangeError when m < 0 and n != 0" # Expected RangeError (shift width too big) but no exception was raised (1 was returned)
   fails "Integer#>> (with n >> m) when m is a bignum or larger than int returns -1 when m > 0 and n < 0" # Expected 0 == -1 to be truthy but was false
   fails "Integer#>> (with n >> m) when m is a bignum or larger than int returns 0 when m > 0 and n >= 0" # Expected 1 == 0 to be truthy but was false
   fails "Integer#[] fixnum when index and length passed ensures n[i, len] equals to (n >> i) & ((1 << len) - 1)" # ArgumentError: [Number#[]] wrong number of arguments (given 2, expected 1)
@@ -43,6 +39,7 @@ opal_filter "Integer" do
   fails "Integer#^ fixnum raises a TypeError when passed a Float" # Expected TypeError but no exception was raised (0 was returned)
   fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 == 18446744078004520000 to be truthy but was false
   fails "Integer#^ fixnum returns self bitwise XOR other when one operand is negative" # Expected -3 == -8589934593 to be truthy but was false
+  fails "Integer#ceildiv returns a quotient of division which is rounded up to the nearest integer" # NoMethodError: undefined method `ceildiv' for 0
   fails "Integer#chr with an encoding argument accepts a String as an argument" # Expected to not get Exception but got: ArgumentError (unknown encoding name - euc-jp)
   fails "Integer#chr with an encoding argument raises RangeError if self is invalid as a codepoint in the specified encoding" # Expected RangeError but no exception was raised ("\x80" was returned)
   fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
@@ -84,4 +81,6 @@ opal_filter "Integer" do
   fails "Integer#| fixnum returns self bitwise OR other when one operand is negative" # Expected -3 == -8589934593 to be truthy but was false
   fails "Integer#| fixnum returns self bitwise OR other" # Expected 65535 == 18446744073709617000 to be truthy but was false
   fails "Integer.sqrt returns the integer square root of the argument" # TypeError: can't convert Number into Integer (Number#to_int gives Number)
+  fails "Integer.try_convert responds with a different error message when it raises a TypeError, depending on the type of the non-Integer object :to_int returns" # Expected TypeError (can't convert MockObject to Integer (MockObject#to_int gives String)) but got: TypeError (can't convert MockObject into Integer (MockObject#to_int gives String))
+  fails "Integer.try_convert sends #to_int to the argument and raises TypeError if it's not a kind of Integer" # Expected TypeError (can't convert MockObject to Integer (MockObject#to_int gives Object)) but got: TypeError (can't convert MockObject into Integer (MockObject#to_int gives Object))
 end

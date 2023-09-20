@@ -19,6 +19,8 @@ opal_filter "ObjectSpace" do
   fails "ObjectSpace.define_finalizer warns if the finalizer has the object as the receiver" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x36f5c>
   fails "ObjectSpace.define_finalizer warns if the finalizer is a method bound to the receiver" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x36f5c>
   fails "ObjectSpace.define_finalizer warns if the finalizer was a block in the receiver" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x36f5c>
+  fails "ObjectSpace.define_finalizer when $VERBOSE is nil does not warn even if an exception is raised in finalizer" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x6e408>
+  fails "ObjectSpace.define_finalizer when $VERBOSE is not nil warns if an exception is raised in finalizer" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x6e408>
   fails "ObjectSpace.each_object calls the block once for each class, module in the Ruby process" # NoMethodError: undefined method `each_object' for ObjectSpace
   fails "ObjectSpace.each_object calls the block once for each living, non-immediate object in the Ruby process" # NoMethodError: undefined method `each_object' for ObjectSpace
   fails "ObjectSpace.each_object finds an object captured in an at_exit handler" # NoMethodError: undefined method `each_object' for ObjectSpace

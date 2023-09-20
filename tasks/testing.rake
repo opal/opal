@@ -36,6 +36,7 @@ module Testing
         mspec/commands/mspec-run
         etc
         rubygems
+        zlib
       ]
     end
 

@@ -6,6 +6,7 @@ opal_filter "Float" do
   fails "Float#<=> returns 0 when self is Infinity and other other is infinite?=1" # Expected nil == 0 to be truthy but was false
   fails "Float#<=> returns 1 when self is Infinity and other is infinite?=-1" # Expected nil == 1 to be truthy but was false
   fails "Float#<=> returns 1 when self is Infinity and other is infinite?=nil (which means finite)" # Expected nil == 1 to be truthy but was false
+  fails "Float#<=> returns the correct result when one side is infinite" # Expected 0 == 1 to be truthy but was false
   fails "Float#divmod returns an [quotient, modulus] from dividing self by other" # Expected 0 to be within 18446744073709552000 +/- 0.00004
   fails "Float#inspect emits a trailing '.0' for a whole number" # Expected "50" == "50.0" to be truthy but was false
   fails "Float#inspect emits a trailing '.0' for the mantissa in e format" # Expected "100000000000000000000" == "1.0e+20" to be truthy but was false

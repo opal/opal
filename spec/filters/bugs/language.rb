@@ -4,9 +4,8 @@ opal_filter "language" do
   fails "$LOAD_PATH.resolve_feature_path returns what will be loaded without actual loading, .rb file" # NoMethodError: undefined method `resolve_feature_path' for []
   fails "$LOAD_PATH.resolve_feature_path returns what will be loaded without actual loading, .so file" # NoMethodError: undefined method `resolve_feature_path' for []
   fails "A Proc taking |*a, **kw| arguments does not autosplat keyword arguments" # Expected [[1], {"a"=>1}] == [[[1, {"a"=>1}]], {}] to be truthy but was false
-  fails "A Symbol literal with invalid bytes raises an EncodingError at parse time" # Expected EncodingError (/invalid/) but no exception was raised ("Ã" was returned)
+  fails "A Symbol literal raises an EncodingError at parse time when Symbol with invalid bytes" # Expected EncodingError (invalid symbol in encoding UTF-8 :"\xC3") but no exception was raised ("Ã" was returned)
   fails "A block yielded a single Array assigns elements to mixed argument types" # Expected [1, 2, [], 3, 2, {"x"=>9}] == [1, 2, [3], {"x"=>9}, 2, {}] to be truthy but was false
-  fails "A block yielded a single Array autosplats single argument to required arguments when a keyword rest argument is present" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on final argument to get keyword arguments and does not autosplat" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on the argument when optional argument and keyword argument accepted and does not autosplat" # ArgumentError: expected kwargs
   fails "A block yielded a single Array does not call #to_hash on the last element if keyword arguments are present" # ArgumentError: expected kwargs
@@ -57,6 +56,8 @@ opal_filter "language" do
   fails "Allowed characters allows non-ASCII lowercased characters at the beginning" # Expected nil == 1 to be truthy but was false
   fails "Allowed characters allows not ASCII upcased characters at the beginning" # NameError: wrong constant name ἍBB
   fails "Allowed characters parses a non-ASCII upcased character as a constant identifier" # Expected SyntaxError (/dynamic constant assignment/) but no exception was raised ("test" was returned)
+  fails "An Exception reaching the top level kills all threads and fibers, ensure clauses are only run for threads current fibers, not for suspended fibers with ensure on non-root fiber" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x29a62>
+  fails "An Exception reaching the top level kills all threads and fibers, ensure clauses are only run for threads current fibers, not for suspended fibers with ensure on the root fiber" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x29a62>
   fails "An ensure block inside 'do end' block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] == ["begin", "ensure"] to be truthy but was false
   fails "An ensure block inside a begin block is executed even when a symbol is thrown in it's corresponding begin block" # Expected ["begin", "rescue", "ensure"] == ["begin", "ensure"] to be truthy but was false
   fails "An ensure block inside a class is executed even when a symbol is thrown" # Expected ["class", "rescue", "ensure"] == ["class", "ensure"] to be truthy but was false
@@ -67,6 +68,9 @@ opal_filter "language" do
   fails "An instance method with a default argument evaluates the default when required arguments precede it" # Expected ArgumentError (wrong number of arguments (given 0, expected 1..2)) but got: ArgumentError ([MSpecEnv#foo] wrong number of arguments (given 0, expected -2))
   fails "An instance method with a default argument prefers to assign to a default argument before a splat argument" # Expected ArgumentError (wrong number of arguments (given 0, expected 1+)) but got: ArgumentError ([MSpecEnv#foo] wrong number of arguments (given 0, expected -2))
   fails "Assigning an anonymous module to a constant sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
+  fails "Evaluation order during assignment with multiple assignment can be used to swap variables with nested method calls" # Expected #<VariablesSpecs::EvalOrder::Node:0x95bdc  @right=   #<VariablesSpecs::EvalOrder::Node:0x95bd8    @left=#<VariablesSpecs::EvalOrder::Node:0x95bdc ...>>> == #<VariablesSpecs::EvalOrder::Node:0x95bd8  @left=   #<VariablesSpecs::EvalOrder::Node:0x95bdc    @right=#<VariablesSpecs::EvalOrder::Node:0x95bd8 ...>>> to be truthy but was false
+  fails "Evaluation order during assignment with multiple assignment evaluates from left to right, receivers first then methods" # Expected ["a", "b", "foo", "foo[]=", "bar", "bar.baz="] == ["foo", "bar", "a", "b", "foo[]=", "bar.baz="] to be truthy but was false
+  fails "Evaluation order during assignment with single assignment evaluates from left to right" # Expected ["a", "foo", "foo[]="] == ["foo", "a", "foo[]="] to be truthy but was false
   fails "Executing break from within a block raises LocalJumpError when converted into a proc during a a super call" # Expected LocalJumpError but no exception was raised (1 was returned)
   fails "Execution variable $: default $LOAD_PATH entries until sitelibdir included have @gem_prelude_index set" # Expected [].include? nil to be truthy but was false
   fails "Execution variable $: is initialized to an array of strings" # Expected false == true to be truthy but was false
@@ -90,6 +94,8 @@ opal_filter "language" do
   fails "Hash literal checks duplicated float keys on initialization" # Expected warning to match: /key 1.0 is duplicated|duplicated key/ but got: ""
   fails "Hash literal checks duplicated keys on initialization" # Expected warning to match: /key 1000 is duplicated|duplicated key/ but got: ""
   fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0xab798>
+  fails "Hash literal raises an EncodingError at parse time when Symbol key with invalid bytes and 'key: value' syntax used" # Expected EncodingError (invalid symbol in encoding UTF-8 :"\xC3") but no exception was raised ({"Ã"=>1} was returned)
+  fails "Hash literal raises an EncodingError at parse time when Symbol key with invalid bytes" # Expected EncodingError (invalid symbol in encoding UTF-8 :"\xC3") but no exception was raised ({"Ã"=>1} was returned)
   fails "Heredoc string allow HEREDOC with <<\"identifier\", interpolated" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "Heredoc string allows HEREDOC with <<'identifier', no interpolation" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "Heredoc string allows HEREDOC with <<-'identifier', allowing to indent identifier, no interpolation" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
@@ -109,7 +115,6 @@ opal_filter "language" do
   fails "Keyword arguments delegation works with (*args, **kwargs)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with (...)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with -> (*args, **kwargs) {}" # Expected [[], {}] == [[{}], {}] to be truthy but was false
-  fails "Keyword arguments delegation works with call(*ruby2_keyword_args) with missing ruby2_keywords in between due to CRuby bug #18625" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with call(*ruby2_keyword_args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with proc { |*args, **kwargs| }" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with super(*ruby2_keyword_args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
@@ -123,7 +128,6 @@ opal_filter "language" do
   fails "Keyword arguments raises ArgumentError for missing keyword arguments even if there are extra ones" # Expected ArgumentError (/missing keyword: :a/) but got: ArgumentError (missing keyword: a)
   fails "Literal (A::X) constant resolution uses the module or class #inspect to craft the error message if they are anonymous" # Expected NameError (/uninitialized constant <unusable info>::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x913b2>::DOES_NOT_EXIST)
   fails "Literal (A::X) constant resolution uses the module or class #name to craft the error message" # Expected NameError (/uninitialized constant ModuleName::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x913aa>::DOES_NOT_EXIST)
-  fails "Literal (A::X) constant resolution with dynamically assigned constants evaluates the right hand side before evaluating a constant path" # NameError: uninitialized constant #<Module:0x91556>::ConstantSpecsRHS
   fails "Literal Ranges creates a simple range as an object literal" # Expected 1..3.equal? 1..3 to be truthy but was false
   fails "Literal Regexps caches the Regexp object" # Expected /foo/ to be identical to /foo/
   fails "Literal Regexps support handling unicode 9.0 characters with POSIX bracket expressions" # Expected "" == "𐓘" to be truthy but was false
@@ -206,7 +210,9 @@ opal_filter "language" do
   fails "Pattern matching Hash pattern does not match object if #deconstruct_keys method returns Hash with non-symbol keys" # Expected true == false to be truthy but was false
   fails "Pattern matching Hash pattern raise SyntaxError when keys duplicate in pattern" # Expected SyntaxError (/duplicated key name/) but got: SyntaxError (duplicate hash pattern key a)
   fails "Pattern matching alternative pattern does not support variable binding" # Expected SyntaxError (/illegal variable in alternative pattern/) but no exception was raised (nil was returned)
+  fails "Pattern matching can be standalone assoc operator that deconstructs value and properly scopes variables" # Expected [nil, nil] == [0, nil] to be truthy but was false
   fails "Pattern matching cannot mix in and when operators" # Expected SyntaxError (/syntax error, unexpected `in'/) but got: SyntaxError (unexpected token kIN)
+  fails "Pattern matching raises NoMatchingPatternError if no pattern matches and evaluates the expression only once" # Expected NoMatchingPatternError (/\[0, 1\]/) but got: NoMethodError (undefined method `+' for nil)
   fails "Pattern matching refinements are used for #=== in constant pattern" # NoMatchingPatternError: {}
   fails "Pattern matching refinements are used for #deconstruct" # NoMatchingPatternError: []
   fails "Pattern matching refinements are used for #deconstruct_keys" # NoMatchingPatternError: {}
@@ -241,6 +247,7 @@ opal_filter "language" do
   fails "Predefined global $~ raises an error if assigned an object not nil or instanceof MatchData" # Expected TypeError but no exception was raised (#<Object:0xa73aa> was returned)
   fails "Ruby String interpolation returns a string with the source encoding by default" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
   fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
+  fails "Source files encoded in UTF-16 LE without a BOM are parsed as empty because they contain a NUL byte before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9a8a0>
   fails "The ** operator hash with omitted value accepts mixed syntax" # NameError: uninitialized constant MSpecEnv::a
   fails "The ** operator hash with omitted value accepts short notation 'key' for 'key: value' syntax" # NameError: uninitialized constant MSpecEnv::a
   fails "The ** operator hash with omitted value ignores hanging comma on short notation" # NameError: uninitialized constant MSpecEnv::a
@@ -250,9 +257,19 @@ opal_filter "language" do
   fails "The BEGIN keyword runs in a shared scope" # SyntaxError: Unsupported sexp: preexe
   fails "The BEGIN keyword runs multiple begins in FIFO order" # SyntaxError: Unsupported sexp: preexe
   fails "The BEGIN keyword uses top-level for self" # SyntaxError: Unsupported sexp: preexe
-  fails "The END keyword runs last in a given code unit" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x193ae>
-  fails "The END keyword runs multiple ends in LIFO order" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x193ae>
+  fails "The END keyword END blocks and at_exit callbacks are mixed runs them all in reverse order of registration" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword allows calling exit inside a handler" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword both exceptions in a handler and in the main script are printed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword calls the nested handler right after the outer one if a handler is nested into another handler" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword decides the exit status if both at_exit and the main script raise SystemExit" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword gives access to the last raised exception - global variables $! and $@" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword is affected by the toplevel assignment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword runs after all other code" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword runs all handlers even if some raise exceptions" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword runs handlers even if the main script fails to parse" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
+  fails "The END keyword runs in reverse order of registration" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
   fails "The END keyword runs only once for multiple calls" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x193ae>
+  fails "The END keyword warns when END is used in a method" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x5bfd0 @method="END" @object=nil>
   fails "The __ENCODING__ pseudo-variable is US-ASCII by default" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "The __ENCODING__ pseudo-variable is the encoding specified by a magic comment in the file" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "The __ENCODING__ pseudo-variable is the encoding specified by a magic comment inside an eval" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
@@ -292,7 +309,11 @@ opal_filter "language" do
   fails "The defined? keyword for variables when a Regexp matches a String returns nil for non-captures" # Expected "global-variable" to be nil
   fails "The defined? keyword for variables when a String matches a Regexp returns nil for non-captures" # Expected "global-variable" to be nil
   fails "The defined? keyword for yield returns 'yield' if a block is passed to a method not taking a block parameter" # Expected false == true to be truthy but was false
+  fails "The defined? keyword when called with a method name having a throw in the receiver escapes defined? and performs the throw semantics as normal" # Expected nil == "unreachable" to be truthy but was false
+  fails "The defined? keyword when called with a method name in a void context does not execute the receiver" # Expected "defined_specs_side_effects" == "not_executed" to be truthy but was false
+  fails "The defined? keyword when called with a method name in a void context warns about the void context when parsing it" # Expected warning to match: /warning: possibly useless use of defined\? in void context/ but got: ""
   fails "The defined? keyword when called with a method name without a receiver returns 'method' if the method is defined" # Expected false == true to be truthy but was false
+  fails "The if expression when a branch syntactically does not return a value raises SyntaxError if both do not return a value" # Expected SyntaxError (/void value expression/) but no exception was raised ("m" was returned)
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with exclusive-end range" # NoMethodError: undefined method `collector' for #<MSpecEnv:0x7bd18>
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with inclusive-end range" # NoMethodError: undefined method `collector' for #<MSpecEnv:0x7bd18>
   fails "The redo statement in a method is invalid and raises a SyntaxError" # Expected SyntaxError but no exception was raised ("m" was returned)
@@ -303,7 +324,9 @@ opal_filter "language" do
   fails "The rescue keyword only accepts Module or Class in splatted rescue clauses" # Expected TypeError but got: RuntimeError (error)
   fails "The rescue keyword rescues the exception in the deepest rescue block declared to handle the appropriate exception type" # Expected "<internal:corelib/runtime.js>:1878:5:in `Opal.send2'" to include ":in `raise_standard_error'"
   fails "The return keyword at top level return with argument warns but does not affect exit status" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1494e @filename=nil>
+  fails "The return keyword at top level within BEGIN is allowed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x29c06>
   fails "The return keyword at top level within a block within a class is not allowed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1494e>
+  fails "The super keyword is able to navigate to super, when a method is defined dynamically on the singleton class" # Exception: Maximum call stack size exceeded
   fails "The super keyword uses block argument given to method when used in a block" # LocalJumpError: no block given
   fails "The super keyword uses given block even if arguments are passed explicitly" # LocalJumpError: no block given
   fails "The throw keyword raises an UncaughtThrowError if used to exit a thread" # NotImplementedError: Thread creation not available

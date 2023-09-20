@@ -12,15 +12,29 @@ opal_filter "Enumerator" do
   fails "Enumerator#initialize sets size to the given size if the given size is Float::INFINITY" # Expected 4 to be identical to Infinity
   fails "Enumerator#initialize sets size to the given size if the given size is a Proc" # NoMethodError: undefined method `size' for nil
   fails "Enumerator#initialize sets size to the given size if the given size is an Integer" # Expected 4 == 100 to be truthy but was false
+  fails "Enumerator#inspect returns a not initialized representation if #initialized is not called yet" # NoMethodError: undefined method `any?' for nil
   fails "Enumerator.new no block given raises" # Expected ArgumentError but no exception was raised (#<Enumerator: 1:upto(3)> was returned)
   fails "Enumerator.new when passed a block yielded values handles yield arguments properly" # Expected 1 == [1, 2] to be truthy but was false
   fails "Enumerator.produce creates an infinite enumerator" # NoMethodError: undefined method `produce' for Enumerator
   fails "Enumerator.produce terminates iteration when block raises StopIteration exception" # NoMethodError: undefined method `produce' for Enumerator
   fails "Enumerator.produce when initial value skipped starts enumerable from result of first block call" # NoMethodError: undefined method `produce' for Enumerator
   fails "Enumerator.produce when initial value skipped uses nil instead" # NoMethodError: undefined method `produce' for Enumerator
+  fails "Enumerator.product accepts a block" # NoMethodError: undefined method `product' for Enumerator
+  fails "Enumerator.product accepts a list of enumerators of any length" # NoMethodError: undefined method `product' for Enumerator
+  fails "Enumerator.product accepts infinite enumerators and returns infinite enumerator" # NoMethodError: undefined method `product' for Enumerator
+  fails "Enumerator.product calls #each_entry lazily" # NoMethodError: undefined method `product' for Enumerator
+  fails "Enumerator.product calls only #each_entry method on arguments" # NoMethodError: undefined method `product' for Enumerator
+  fails "Enumerator.product iterates through consuming enumerator elements only once" # NoMethodError: undefined method `product' for Enumerator
+  fails "Enumerator.product raises NoMethodError when argument doesn't respond to #each_entry" # Expected NoMethodError (/undefined method `each_entry' for/) but got: NoMethodError (undefined method `product' for Enumerator)
+  fails "Enumerator.product reject keyword arguments" # Expected ArgumentError (unknown keywords: :foo, :bar) but got: NoMethodError (undefined method `product' for Enumerator)
+  fails "Enumerator.product returns a Cartesian product of enumerators" # NoMethodError: undefined method `product' for Enumerator
+  fails "Enumerator.product returns an enumerator with an empty array when no arguments passed" # NoMethodError: undefined method `product' for Enumerator
+  fails "Enumerator.product returns an instance of Enumerator::Product" # NoMethodError: undefined method `product' for Enumerator
+  fails "Enumerator.product returns nil when a block passed" # NoMethodError: undefined method `product' for Enumerator
   fails "Enumerator::ArithmeticSequence#hash is based on begin, end, step and exclude_end?" # Expected "A,3,21,3,0" (String) to be an instance of Integer
   fails "Enumerator::ArithmeticSequence.allocate is not defined" # Expected TypeError (allocator undefined for Enumerator::ArithmeticSequence) but no exception was raised (#<Enumerator::ArithmeticSequence>(#pretty_inspect raised #<NoMethodError: undefined method `begin' for nil>) was returned)
   fails "Enumerator::ArithmeticSequence.new is not defined" # Expected NoMethodError but got: ArgumentError ([ArithmeticSequence#initialize] wrong number of arguments (given 0, expected -2))
+  fails "Enumerator::Chain#inspect returns a not initialized representation if #initialized is not called yet" # Expected "#<Enumerator::Chain: nil>" == "#<Enumerator::Chain: uninitialized>" to be truthy but was false
   fails "Enumerator::Generator#each returns the block returned value" # Expected #<Enumerator::Generator:0x3f346 @block=#<Proc:0x3f40c>> to be identical to "block_returned"
   fails "Enumerator::Generator#initialize returns self when given a block" # Expected #<Proc:0x3ff5e> to be identical to #<Enumerator::Generator:0x3ff52 @block=#<Proc:0x3ff5e>>
   fails "Enumerator::Lazy defines lazy versions of a whitelist of Enumerator methods" # Expected ["initialize",  "lazy",  "collect",  "collect_concat",  "drop",  "drop_while",  "enum_for",  "find_all",  "grep",  "reject",  "take",  "take_while",  "inspect",  "force",  "filter",  "flat_map",  "map",  "select",  "to_enum"] to include "chunk"
@@ -41,6 +55,7 @@ opal_filter "Enumerator" do
   fails "Enumerator::Lazy#collect_concat when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#collect_concat works with an infinite enumerable" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#compact returns array without nil elements" # Expected [1, 3, false, 5] (Array) to be an instance of Enumerator::Lazy
+  fails "Enumerator::Lazy#compact sets #size to nil" # NoMethodError: undefined method `each' for #<Object:0x9caea>
   fails "Enumerator::Lazy#drop on a nested Lazy sets difference of given count with old size to new size" # Expected 20 == 30 to be truthy but was false
   fails "Enumerator::Lazy#drop on a nested Lazy when the returned lazy enumerator is evaluated by Enumerable#first stops after specified times" # TypeError: can't iterate from Float
   fails "Enumerator::Lazy#drop sets difference of given count with old size to new size" # Expected 20 == 80 to be truthy but was false

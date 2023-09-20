@@ -1,10 +1,10 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Date" do
+  fails "Date constants defines MONTHNAMES" # Expected [nil,  "January",  "February",  "March",  "April",  "May",  "June",  "July",  "August",  "September",  "October",  "November",  "December",  "Unknown"] == [nil,  "January",  "February",  "March",  "April",  "May",  "June",  "July",  "August",  "September",  "October",  "November",  "December"] to be truthy but was false
+  fails "Date constants freezes MONTHNAMES, DAYNAMES, ABBR_MONTHNAMES, ABBR_DAYSNAMES" # Expected FrozenError (/frozen/) but no exception was raised ([nil,  "January",  "February",  "March",  "April",  "May",  "June",  "July",  "August",  "September",  "October",  "November",  "December",  "Unknown"] was returned)
   fails "Date#>> returns the day of the reform if date falls within calendar reform" # Expected #<Date:0x28ea @date=1582-10-09 00:00:00 +0124, @start=2299161> == #<Date:0x28e6 @date=1582-10-04 00:00:00 +0124, @start=2299161> to be truthy but was false
   fails "Date#ajd determines the Astronomical Julian day" # NoMethodError: undefined method `ajd' for #<Date:0x9f5b0 @date=2007-01-17 00:00:00 +0100 @start=2299161>
   fails "Date#amjd determines the Astronomical Modified Julian day" # NoMethodError: undefined method `amjd' for #<Date:0x9f5ba @date=2007-01-17 00:00:00 +0100 @start=2299161>
-  fails "Date#civil creates a Date for different calendar reform dates" # Expected 5 == 15 to be truthy but was false
-  fails "Date#civil doesn't create dates for invalid arguments" # Expected ArgumentError but no exception was raised (#<Date:0x73d98 @date=2001-01-31 00:00:00 +0100, @start=2299161> was returned)
   fails "Date#commercial creates a Date for Julian Day Number day 0 by default" # NoMethodError: undefined method `commercial' for Date
   fails "Date#commercial creates a Date for the correct day given the year, week and day number" # NoMethodError: undefined method `commercial' for Date
   fails "Date#commercial creates a Date for the monday in the year and week given" # NoMethodError: undefined method `commercial' for Date
@@ -31,6 +31,7 @@ opal_filter "Date" do
   fails "Date#strftime should be able to print the commercial year with only two digits" # TypeError: no implicit conversion of Range into Integer
   fails "Date#strftime should be able to show a full notation" # Expected "%+" == "Sun Apr  9 00:00:00 +00:00 2000" to be truthy but was false
   fails "Date#strftime should be able to show the commercial week day" # Expected "1" == "7" to be truthy but was false
+  fails "Date#strftime should be able to show the commercial week" # Expected " 9-APR-2000" == " 9-Apr-2000" to be truthy but was false
   fails "Date#strftime should be able to show the number of seconds since the unix epoch for a date" # Expected "954972000" == "954979200" to be truthy but was false
   fails "Date#strftime should be able to show the timezone of the date with a : separator" # Expected "+0200" == "+0000" to be truthy but was false
   fails "Date#strftime should be able to show the timezone with a : separator" # Expected "Central European Summer Time" == "+00:00" to be truthy but was false
@@ -72,6 +73,8 @@ opal_filter "Date" do
   fails "Date#valid_date? returns true if it is a valid civil date" # NoMethodError: undefined method `valid_date?' for Date
   fails "Date._iso8601 returns an empty hash if the argument is a invalid Date" # NoMethodError: undefined method `_iso8601' for Date
   fails "Date._rfc3339 returns an empty hash if the argument is a invalid Date" # NoMethodError: undefined method `_rfc3339' for Date
+  fails "Date.civil creates a Date for different calendar reform dates" # Expected 5 == 15 to be truthy but was false
+  fails "Date.civil doesn't create dates for invalid arguments" # Expected ArgumentError but no exception was raised (#<Date:0x9c330 @date=2001-01-31 00:00:00 +0100, @start=2299161> was returned)
   fails "Date.iso8601 parses YYYY-MM-DD into a Date object" # NoMethodError: undefined method `iso8601' for Date
   fails "Date.iso8601 parses YYYYMMDD into a Date object" # NoMethodError: undefined method `iso8601' for Date
   fails "Date.iso8601 parses a StringSubclass into a Date object" # NoMethodError: undefined method `iso8601' for Date

@@ -37,6 +37,7 @@ opal_filter "Module" do
   fails "Module#class_eval resolves constants in the caller scope" # NameError: uninitialized constant ModuleSpecs::ClassEvalTest::Lookup
   fails "Module#class_eval uses the optional filename and lineno parameters for error messages" # Expected ["test", 1] == ["test", 102] to be truthy but was false
   fails "Module#class_variables returns the correct class variables when inherit is given" # ArgumentError: [SubCVars.class_variables] wrong number of arguments (given 1, expected 0)
+  fails "Module#const_added records re-definition of existing constants" # Expected warning to match: /warning: already initialized constant .+::TEST/ but got: ""
   fails "Module#const_defined? coerces the inherit flag to a boolean" # Expected true to be false
   fails "Module#const_defined? returns true for toplevel constant when the name begins with '::'" # Expected false to be true
   fails "Module#const_defined? returns true or false for the nested name" # Expected false == true to be truthy but was false
@@ -82,9 +83,12 @@ opal_filter "Module" do
   fails "Module#const_source_location with statically assigned constants searches location path the immediate class or module first" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ClassA
   fails "Module#const_source_location with statically assigned constants searches location path the superclass before a module included in the superclass" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
   fails "Module#const_source_location with statically assigned constants searches location path the superclass chain" # NoMethodError: undefined method `const_source_location' for ConstantSpecs::ContainerA::ChildA
+  fails "Module#const_source_location with statically assigned constants works for the module and class keywords" # NoMethodError: undefined method `const_source_location' for ConstantSpecs
+  fails "Module#const_source_location works for eval with a given line" # NoMethodError: undefined method `const_source_location' for #<Class:0x2f66a>
   fails "Module#constants doesn't returns inherited constants when passed nil" # Expected ["CS_CONST10",  "CS_CONST10_LINE",  "CS_CONST23",  "CS_CONST24",  "CS_CONST5",  "ChildA"] == ["CS_CONST10", "CS_CONST10_LINE", "CS_CONST23", "CS_CONST5", "ChildA"] to be truthy but was false
   fails "Module#constants returns only public constants" # Expected ["PRIVATE_CONSTANT", "PUBLIC_CONSTANT"] == ["PUBLIC_CONSTANT"] to be truthy but was false
   fails "Module#define_method converts non-String name to String with #to_str" # NoMethodError: undefined method `foo' for #<#<Class:0x33ce6>:0x33ce4>
+  fails "Module#define_method defines the new method according to the scope visibility when a Method passed and the class/module of the context is equal to the receiver of #define_method" # Expected NoMethodError but no exception was raised (nil was returned)
   fails "Module#define_method passed { |a,|  } creates a method that does not destructure the passed argument" # Expected [1, 2] == 1 to be truthy but was false
   fails "Module#define_method raises TypeError if name cannot converted to String" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (#<Class:0x33da2> was returned)
   fails "Module#define_method raises TypeError when #to_str called on non-String name returns non-String value" # Expected TypeError (/can't convert Object to String/) but no exception was raised (#<Class:0x33d52> was returned)
@@ -108,6 +112,7 @@ opal_filter "Module" do
   fails "Module#instance_method raises TypeError when passed non-String name and #to_str returns non-String value" # Expected TypeError (/can't convert Object to String/) but got: NameError (undefined method `#<Object:0x3a98e>' for class `ModuleSpecs::InstanceMeth')
   fails "Module#instance_method raises a NameError if the method has been undefined" # Expected #<UnboundMethod: ModuleSpecs::InstanceMeth#foo (defined in ModuleSpecs::InstanceMeth in ruby/core/module/fixtures/classes.rb:319)> == #<UnboundMethod: ModuleSpecs::InstanceMeth#foo (defined in ModuleSpecs::InstanceMeth in ruby/core/module/fixtures/classes.rb:319)> to be truthy but was false
   fails "Module#instance_method raises a TypeError if the given name is not a String/Symbol" # Expected TypeError (/is not a symbol nor a string/) but got: NameError (undefined method `' for class `Object')
+  fails "Module#method_added is called when using #private in a subclass" # Expected [] == ["foo"] to be truthy but was false
   fails "Module#method_added is called with a precise caller location with the line of the 'def'" # Expected [110, 110] == [74, 77] to be truthy but was false
   fails "Module#method_defined? converts the given name to a string using to_str" # Expected false == true to be truthy but was false
   fails "Module#method_defined? raises a TypeError when the given object is not a string/symbol" # Expected TypeError but no exception was raised (false was returned)
@@ -135,6 +140,7 @@ opal_filter "Module" do
   fails "Module#name is not nil for a nested module created with the module keyword" # Expected nil =~ /^#<Module:0x[0-9a-f]+>::N$/ to be truthy but was false
   fails "Module#name is not nil when assigned to a constant in an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Module#name is set after it is removed from a constant under an anonymous module" # Expected nil =~ /^#<Module:0x\h+>::Child$/ to be truthy but was false
+  fails "Module#prepend prepends a module if it is included in a super class" # RuntimeError: Prepending a module multiple times is not supported
   fails "Module#private with argument array as a single argument sets visibility of given method names" # Expected #<Module:0x3bf72> to have private instance method 'test1' but it does not
   fails "Module#private with argument one or more arguments sets visibility of given method names" # Expected #<Module:0x3bf6c> to have private instance method 'test1' but it does not
   fails "Module#private_class_method when single argument is passed and is an array sets the visibility of the given methods to private" # Expected NoMethodError but no exception was raised ("foo" was returned)
@@ -161,17 +167,18 @@ opal_filter "Module" do
   fails "Module#refine for methods accessed indirectly is honored by Symbol#to_proc" # Expected ["1", "2", "3"] == ["(1)", "(2)", "(3)"] to be truthy but was false
   fails "Module#refine for methods accessed indirectly is honored by string interpolation" # Expected "1" == "foo" to be truthy but was false
   fails "Module#refine makes available all refinements from the same module" # NoMethodError: undefined method `to_json_format' for {1=>2}
-  fails "Module#refine method lookup looks in the included modules for builtin methods" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x3cece>
   fails "Module#refine method lookup looks in the object singleton class first" # Expected "foo from refinement" == "foo from singleton class" to be truthy but was false
   fails "Module#refine module inclusion activates all refinements from all ancestors" # NoMethodError: undefined method `to_json_format' for 5
   fails "Module#refine module inclusion overrides methods of ancestors by methods in descendants" # NoMethodError: undefined method `to_json_format' for 5
   fails "Module#refine raises ArgumentError if not given a block" # Expected ArgumentError but got: LocalJumpError (no block given)
   fails "Module#refine raises TypeError if not passed a class" # Expected TypeError but got: Exception (Cannot create property '$$id' on string 'foo')
+  fails "Module#refinements does not return refinements defined in the included module" # Expected {String=>#<refinement:String@#<Module:0x6530c>>} == [#<refinement:String@#<Module:0x6530c>>] to be truthy but was false
+  fails "Module#refinements returns an empty array if no refinements defined in a module" # Expected {} == [] to be truthy but was false
+  fails "Module#refinements returns refinements defined in a module" # Expected [[String, #<refinement:String@#<Module:0x65354>>],  [Array, #<refinement:Array@#<Module:0x65354>>]] == [#<refinement:String@#<Module:0x65354>>, #<refinement:Array@#<Module:0x65354>>] to be truthy but was false
   fails "Module#remove_const calls #to_str to convert the given name to a String" # Mock 'CS_CONST257' expected to receive to_str("any_args") exactly 1 times but received it 0 times
   fails "Module#remove_const raises a TypeError if conversion to a String by calling #to_str fails" # Expected TypeError but got: NameError (constant ConstantSpecs::ConstantSpecs not defined)
   fails "Module#ruby2_keywords accepts String as well" # Expected false == true to be truthy but was false
   fails "Module#ruby2_keywords applies to the underlying method and applies across aliasing" # Expected false == true to be truthy but was false
-  fails "Module#ruby2_keywords does NOT copy the Hash when calling a method taking (*args)" # Expected false == true to be truthy but was false
   fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (**kw)" # Expected false == true to be truthy but was false
   fails "Module#ruby2_keywords makes a copy and unmark the Hash when calling a method taking (arg)" # Expected false == true to be truthy but was false
   fails "Module#ruby2_keywords makes a copy of the hash and only marks the copy as keyword hash" # Expected false == true to be truthy but was false
@@ -191,6 +198,10 @@ opal_filter "Module" do
   fails "Module#undef_method raises a NameError when passed a missing name for a metaclass" # Expected NameError (/undefined method `not_exist' for class `String'/) but got: NameError (method 'not_exist' not defined in )
   fails "Module#undef_method raises a NameError when passed a missing name for a module" # Expected NameError (/undefined method `not_exist' for module `#<Module:0x121a6>'/) but got: NameError (method 'not_exist' not defined in )
   fails "Module#undef_method raises a NameError when passed a missing name for a singleton class" # Expected NameError (/undefined method `not_exist' for class `#<Class:#<:0x121c2>>'/) but got: NameError (method 'not_exist' not defined in )
+  fails "Module#undefined_instance_methods does not returns ancestors undefined methods" # NoMethodError: undefined method `undefined_instance_methods' for ModuleSpecs::UndefinedInstanceMethods::Grandchild
+  fails "Module#undefined_instance_methods returns inherited methods undefined in the class" # NoMethodError: undefined method `undefined_instance_methods' for ModuleSpecs::UndefinedInstanceMethods::Child
+  fails "Module#undefined_instance_methods returns methods from an included module that are undefined in the class" # NoMethodError: undefined method `undefined_instance_methods' for ModuleSpecs::UndefinedInstanceMethods::Grandchild
+  fails "Module#undefined_instance_methods returns methods undefined in the class" # NoMethodError: undefined method `undefined_instance_methods' for ModuleSpecs::UndefinedInstanceMethods::Parent
   fails "Module#using does not accept class" # Expected TypeError but no exception was raised (#<Module:0x3a10e> was returned)
   fails "Module#using imports class refinements from module into the current class/module" # NoMethodError: undefined method `foo' for 1
   fails "Module#using raises TypeError if passed something other than module" # Expected TypeError but no exception was raised (#<Module:0x3a124> was returned)
@@ -199,6 +210,10 @@ opal_filter "Module" do
   fails "Module#using scope of refinement is active for class defined via Class.new {}" # NoMethodError: undefined method `foo' for 1
   fails "Module#using scope of refinement is active for module defined via Module.new {}" # NoMethodError: undefined method `foo' for 1
   fails "Module#using works in classes too" # NoMethodError: undefined method `foo' for 1
+  fails "Module.used_refinements ignores refinements imported in a module that is included into the current one" # NoMethodError: undefined method `used_refinements' for Module
+  fails "Module.used_refinements returns empty array if does not have any refinements imported" # NoMethodError: undefined method `used_refinements' for Module
+  fails "Module.used_refinements returns list of all refinements imported in the current scope" # NoMethodError: undefined method `used_refinements' for Module
+  fails "Module.used_refinements returns refinements even not defined directly in a module refinements are imported from" # NoMethodError: undefined method `used_refinements' for Module
   fails_badly "Module#ancestors returns a list of modules included in self (including self)" # Expected [ModuleSpecs::Parent, Object, Shellwords, Kernel, BasicObject] == [ModuleSpecs::Parent, Object, Kernel, BasicObject] to be truthy but was false -- a random failure
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#instance_method" # NameError: undefined method `foo' for class `'
   fails_badly "Module#refine for methods accessed indirectly is honored by Kernel#method" # NameError: undefined method `foo' for class `#<Class:0x581e4>'

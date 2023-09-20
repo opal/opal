@@ -23,8 +23,10 @@ opal_filter "Proc" do
   fails "Proc#call can call its block argument declared with a block argument" # Expected 6 == 10 to be truthy but was false
   fails "Proc#call on a Proc created with Kernel#lambda or Kernel#proc ignores excess arguments when self is a proc" # ArgumentError: expected kwargs
   fails "Proc#call yields to the block given at declaration and not to the block argument" # Expected 3 == 7 to be truthy but was false
+  fails "Proc#clone returns an instance of subclass" # Expected Proc == #<Class:0x71d98> to be truthy but was false
   fails "Proc#curry with arity argument returns Procs with arities of -1 regardless of the value of _arity_" # ArgumentError: wrong number of arguments (3 for 1)
   fails "Proc#curry with arity argument returns a Proc if called on a lambda that requires fewer than _arity_ arguments but may take more" # ArgumentError: wrong number of arguments (4 for 5)
+  fails "Proc#dup returns an instance of subclass" # Expected Proc == #<Class:0x8f364> to be truthy but was false
   fails "Proc#eql? is a public method" # Expected Proc to have public instance method 'eql?' but it does not
   fails "Proc#eql? returns true if other is a dup of the original" # Expected false to be true
   fails "Proc#inspect for a proc created with Proc.new has a binary encoding" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
@@ -48,6 +50,7 @@ opal_filter "Proc" do
   fails "Proc#source_location returns the same value for a proc-ified method as the method reports" # Expected ["ruby/core/proc/fixtures/source_location.rb", 3] == nil to be truthy but was false
   fails "Proc#source_location sets the first value to the path of the file in which the proc was defined" # Expected "ruby/core/proc/fixtures/source_location.rb" == "./ruby/core/proc/fixtures/source_location.rb" to be truthy but was false
   fails "Proc#source_location sets the last value to an Integer representing the line on which the proc was defined" # NoMethodError: undefined method `last' for nil
+  fails "Proc#source_location works for eval with a given line" # Expected nil == ["foo", 100] to be truthy but was false
   fails "Proc#to_s for a proc created with Proc.new has a binary encoding" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
   fails "Proc#to_s for a proc created with Proc.new returns a description including file and line number" # Expected "#<Proc:0x5813e>" =~ /^#<Proc:([^ ]*?) ruby\/core\/proc\/shared\/to_s\.rb:4>$/ to be truthy but was nil
   fails "Proc#to_s for a proc created with Symbol#to_proc has a binary encoding" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false

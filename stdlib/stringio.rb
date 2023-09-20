@@ -1,4 +1,6 @@
 class StringIO < IO
+  VERSION = "0"
+
   def self.open(string = "", mode = nil, &block)
     io  = new(string, mode)
     res = block.call(io)

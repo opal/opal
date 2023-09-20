@@ -10,6 +10,8 @@ opal_filter "File" do
   fails "File.absolute_path? returns false if it's a tricky relative path" # NoMethodError: undefined method `absolute_path?' for File
   fails "File.absolute_path? returns true if it's an absolute pathname" # NoMethodError: undefined method `absolute_path?' for File
   fails "File.absolute_path? takes into consideration the platform's root" # NoMethodError: undefined method `absolute_path?' for File
+  fails "File.dirname when level is passed calls #to_int if passed not numeric value" # NoMethodError: undefined method `<' for #<Object:0x56914>
+  fails "File.dirname when level is passed raises ArgumentError if the level is negative" # Expected ArgumentError (negative level: -1) but got: ArgumentError (level can't be negative)
   fails "File.expand_path accepts objects that have a #to_path method" # ArgumentError: [Dir.home] wrong number of arguments (given 1, expected 0)
   fails "File.expand_path converts a pathname to an absolute pathname" # ArgumentError: [Dir.home] wrong number of arguments (given 1, expected 0)
   fails "File.expand_path converts a pathname to an absolute pathname, Ruby-Talk:18512" # ArgumentError: [Dir.home] wrong number of arguments (given 1, expected 0)
