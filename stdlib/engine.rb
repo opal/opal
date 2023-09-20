@@ -16,8 +16,8 @@ class Engine
       else
         property_name = ::Engine.property_for_message(message, self)
         %x{
-          let value = self[#{property_name}];
-          let type = typeof(value);
+          var value = self[#{property_name}];
+          var type = typeof(value);
           if (type === 'undefined') { return #{super}; }
           if (type === 'function') {
             #{args.map! { |arg| `arg && typeof arg.$to_n === 'function'` ? arg.to_n : arg }}
@@ -84,8 +84,8 @@ class Engine
       else
         property_name = property_for_message(message, `globalThis`)
         %x{
-          let value = globalThis[#{property_name}];
-          let type = typeof(value);
+          var value = globalThis[#{property_name}];
+          var type = typeof(value);
           if (type === 'undefined') { return #{super}; }
           if (type === 'function') {
             #{args.map! { |arg| `arg && typeof arg.$to_n === 'function'` ? arg.to_n : arg }}
@@ -120,7 +120,7 @@ class Engine
     }
     def property_for_message(message, scope)
       %x{
-        let camel_cased_message;
+        var camel_cased_message;
         if (typeof(scope[message]) !== 'undefined') { camel_cased_message = message; }
         else { camel_cased_message = camelize(message); }
 
