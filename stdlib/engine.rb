@@ -1,52 +1,85 @@
 # backtick_javascript: true
 
+%x{
+  function camelize(str) {
+    return str.replace(/^([A-Z])|[\s-_](\w)/g, function(match, p1, p2, offset) {
+        if (p2) return p2.toUpperCase();
+        return p1.toLowerCase();
+    });
+  }
+
+  function property_for_message(scope, message) {
+    if (message in scope) { return message; }
+    else { return camelize(message); }
+  }
+
+  function get_property_value(scope, property) {
+    property = property_for_message(scope, property);
+    return scope[property];
+  }
+
+  function value_to_ruby(value) {
+    if (value && typeof(value) === 'object') {
+      // check if the values class has been rubyfied (see const_missing below)
+      const name = value.constructor.name;
+      if (typeof Opal.Engine[name] !== 'function') {
+        // no
+        Opal.Engine.$const_missing(name);
+        if (typeof Opal.Engine[name] !== 'function') {
+          // something went wrong
+          #{raise(TypeError, "can't rubyfy '#{name}'")}
+        }
+      }
+    }
+    if (value === undefined || value === null) { return nil; }
+    return value;
+  }
+
+  function get_property(scope, property) {
+    var value = get_property_value(scope, property);
+    return value_to_ruby(value);
+  }
+
+  function set_property(scope, property, value) {
+    var native_value = (value && typeof value.$to_n === 'function' && !value.$to_n.$$stub) ? value.$to_n() : value;
+    property = property_for_message(scope, property)
+    scope[property] = native_value;
+    return value;
+  }
+
+  function internal_method_missing(scope, message, args, block) {
+    var func = get_property_value(scope, message);
+    if (typeof(func) !== 'function') { return [false, null]; }
+    #{args.map! { |arg| `arg && typeof arg.$to_n === 'function' && !value.$to_n.$$stub` ? arg.to_n : arg }}
+    return [true, value_to_ruby(func.apply(scope, args))];
+  }
+}
+
 class Engine
   module Delegate
     def [](property)
-      method_missing(property)
+      `get_property(self, property)`
+    end
+
+    def []=(property, value)
+      `set_property(self, property, value)`
     end
 
     def method_missing message, *args, &block
-      if message.end_with? '='
-        message = message.chop
-        property_name = ::Engine.property_for_message(message, self)
-        arg = args[0]
-        arg = arg.to_n if `arg && typeof arg.$to_n === 'function'`
-        return `self[#{property_name}] = arg`
-      else
-        property_name = ::Engine.property_for_message(message, self)
-        %x{
-          var value = self[#{property_name}];
-          var type = typeof(value);
-          if (type === 'undefined') { return #{super}; }
-          if (type === 'function') {
-            #{args.map! { |arg| `arg && typeof arg.$to_n === 'function'` ? arg.to_n : arg }}
-            value = value.apply(self, args);
-          }
-
-          type = typeof(value);
-          if (type !== 'number' && type !== 'string') {
-            // check if the values class has been rubyfied (see const_missing below)
-            const name = value.constructor.name;
-            if (typeof Opal.Engine[name] !== 'function') {
-              // no
-              Opal.Engine.$const_missing(name);
-              if (typeof Opal.Engine[name] !== 'function') {
-                // something went wrong
-                #{raise "cant rubyfy #{name}"}
-              }
-            }
-          }
-          return value;
-        }
-      end
+      %x{
+        var val = internal_method_missing(self, message, args, block);
+        if (val[0]) { return val[1]; }
+        else { return #{super} }
+      }
     end
 
     def respond_to_missing? message, include_all
       message = message.chop if message.end_with? '='
-      property_name = property_for_message(message, self)
-      return true if `#{property_name} in self`
-      false
+      %x{
+        message = property_for_message(self, message)
+        if (typeof self[property_name] === 'function') { return true; }
+        return false;
+      }
     end
   end
 
@@ -71,66 +104,18 @@ class Engine
     end
 
     def [](property)
-      method_missing(property)
+      `get_property(Opal.global, property)`
+    end
+
+    def []=(property, value)
+      `set_property(Opal.global, property, value)`
     end
 
     def method_missing message, *args, &block
-      if message.end_with? '='
-        message = message.chop
-        property_name = property_for_message(message, `globalThis`)
-        arg = args[0]
-        arg = arg.to_n if `arg && typeof arg.$to_n === 'function'`
-        return `globalThis[#{property_name}] = arg`
-      else
-        property_name = property_for_message(message, `globalThis`)
-        %x{
-          var value = globalThis[#{property_name}];
-          var type = typeof(value);
-          if (type === 'undefined') { return #{super}; }
-          if (type === 'function') {
-            #{args.map! { |arg| `arg && typeof arg.$to_n === 'function'` ? arg.to_n : arg }}
-            value = value.apply(self, args);
-          }
-
-          type = typeof(value);
-          if (type !== 'number' && type !== 'string') {
-            // check if the values class has been rubyfied (see const_missing below)
-            const name = value.constructor.name;
-            if (typeof Opal.Engine[name] !== 'function') {
-              // no
-              self.$const_missing(name);
-              if (typeof Opal.Engine[name] !== 'function') {
-                // something went wrong
-                #{raise "cant rubyfy #{name}"}
-              }
-            }
-          }
-          return value;
-        }
-      end
-    end
-
-    %x{
-      function camelize(str) {
-        return str.replace(/^([A-Z])|[\s-_](\w)/g, function(match, p1, p2, offset) {
-            if (p2) return p2.toUpperCase();
-            return p1.toLowerCase();
-        });
-      };
-    }
-    def property_for_message(message, scope)
       %x{
-        var camel_cased_message;
-        if (typeof(scope[message]) !== 'undefined') { camel_cased_message = message; }
-        else { camel_cased_message = camelize(message); }
-
-        if (camel_cased_message.endsWith('?')) {
-          camel_cased_message = camel_cased_message.substring(0, camel_cased_message.length - 2);
-          if (typeof(scope[camel_cased_message]) === 'undefined') {
-            camel_cased_message = 'is' + camel_cased_message[0].toUpperCase() + camel_cased_message.substring(0, camel_cased_message.length - 1);
-          }
-        }
-        return camel_cased_message
+        var val = internal_method_missing(Opal.global, message, args, block);
+        if (val[0]) { return val[1]; }
+        else { return #{super} }
       }
     end
   end
