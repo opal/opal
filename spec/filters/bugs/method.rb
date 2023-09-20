@@ -27,7 +27,6 @@ opal_filter "Method" do
   fails "Method#curry with optional arity argument raises ArgumentError when the method requires less arguments than the given arity" # Expected ArgumentError but no exception was raised (#<Proc:0x7c68a> was returned)
   fails "Method#curry with optional arity argument raises ArgumentError when the method requires more arguments than the given arity" # Expected ArgumentError but no exception was raised (#<Proc:0x7c66a> was returned)
   fails "Method#define_method when passed a Proc object and a method is defined inside defines the nested method in the default definee where the Proc was created" # Expected #<#<Class:0x51aa0>:0x51a9c> NOT to have method 'nested_method_in_proc_for_define_method' but it does
-  fails "Method#define_method when passed a block behaves exactly like a lambda for break" # Exception: unexpected break
   fails "Method#define_method when passed an UnboundMethod object defines a method with the same #arity as the original" # Expected -1 == -3 to be truthy but was false
   fails "Method#define_method when passed an UnboundMethod object defines a method with the same #parameters as the original" # Expected [["rest", "args"]] == [["req", "a"], ["req", "b"], ["rest", "c"]] to be truthy but was false
   fails "Method#eql? missing methods returns true for the same method missing" # NameError: undefined method `handled_via_method_missing' for class `MethodSpecs::Methods'
@@ -83,4 +82,5 @@ opal_filter "Method" do
   fails "Method#to_s shows the metaclass and the owner for a Module instance method retrieved from a class" # Expected "#<Method: Class#include (defined in Module in <internal:corelib/module.rb>:464)>".start_with? "#<Method: #<Class:String>(Module)#include" to be truthy but was false
   fails "Method#unbind keeps the origin singleton class if there is one" # Expected "#<UnboundMethod: Object#foo (defined in #<Class:#<Object:0x30684>> in ruby/core/method/unbind_spec.rb:37)>".start_with? "#<UnboundMethod: #<Class:#<Object:0x30684>>#foo" to be truthy but was false
   fails "Method#unbind rebinding UnboundMethod to Method's obj produces exactly equivalent Methods" # Expected #<Method: MethodSpecs::Methods#foo (defined in MethodSpecs::Methods in ruby/core/method/fixtures/classes.rb:24)> == #<Method: MethodSpecs::Methods#foo (defined in MethodSpecs::Methods in ruby/core/method/fixtures/classes.rb:24)> to be truthy but was false  
+  fails_badly "Method#define_method when passed a block behaves exactly like a lambda for break" # Exception: unexpected break
 end

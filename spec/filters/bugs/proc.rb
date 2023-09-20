@@ -69,7 +69,7 @@ opal_filter "Proc" do
   fails "Proc.new with an associated block called on a subclass of Proc that does not 'super' in 'initialize' still constructs a functional proc" # NoMethodError: undefined method `ok' for #<Proc:0x3fc56>
   fails "Proc.new with an associated block called on a subclass of Proc using a reified block parameter returns an instance of the subclass" # Expected Proc == #<Class:0x3fc3e> to be truthy but was false
   fails "Proc.new with an associated block calls initialize on the Proc object" # ArgumentError: [MyProc2.new] wrong number of arguments (given 2, expected 0)
-  fails "Proc.new with an associated block raises a LocalJumpError when context of the block no longer exists" # Expected LocalJumpError but got: Exception (unexpected return)
   fails "Proc.new with an associated block returns a subclass of Proc" # Expected #<Proc:0x3fbfc> (Proc) to be kind of ProcSpecs::MyProc
   fails "Proc.new without a block raises an ArgumentError when passed no block" # Expected ArgumentError (tried to create Proc object without a block) but got: ArgumentError (tried to create a Proc object without a block)  
+  fails_badly "Proc.new with an associated block raises a LocalJumpError when context of the block no longer exists" # Expected LocalJumpError but got: Exception (unexpected return)
 end

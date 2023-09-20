@@ -40,8 +40,6 @@ opal_filter "Exception" do
   fails "Interrupt.new returns an instance of interrupt with no message given" # NoMethodError: undefined method `signo' for #<Interrupt: Interrupt>
   fails "Interrupt.new takes an optional message argument" # NoMethodError: undefined method `signo' for #<Interrupt: message>
   fails "KeyError accepts :receiver and :key options" # ArgumentError: no receiver is available
-  fails "LocalJumpError#exit_value returns the value given to return" # Expected LocalJumpError but got: Exception (unexpected return)
-  fails "LocalJumpError#reason returns 'return' for a return" # Expected LocalJumpError but got: Exception (unexpected return)
   fails "NameError#dup copies the name and receiver" # NoMethodError: undefined method `receiver' for #<NoMethodError: undefined method `foo' for #<MSpecEnv:0x39754>>
   fails "NameError#name returns a class variable name as a symbol" # Expected nil == "@@doesnt_exist" to be truthy but was false
   fails "NameError#receiver returns a class when an undefined class variable is called in a subclass' namespace" # NoMethodError: undefined method `receiver' for #<NameError: uninitialized class variable @@doesnt_exist in NameErrorSpecs::ReceiverClass>
@@ -96,6 +94,8 @@ opal_filter "Exception" do
   fails "SystemExit #initialize accepts no arguments" # NoMethodError: undefined method `status' for #<SystemExit: SystemExit>
   fails "SystemExit sets the exit status and exits silently when raised when subclassed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9fe6a>
   fails "SystemExit sets the exit status and exits silently when raised" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9fe6a>
+  fails_badly "LocalJumpError#exit_value returns the value given to return" # Expected LocalJumpError but got: Exception (unexpected return)
+  fails_badly "LocalJumpError#reason returns 'return' for a return" # Expected LocalJumpError but got: Exception (unexpected return)
   fails_badly "SystemExit#status returns the exit status"
   fails_badly "SystemExit#success? returns false if the process exited unsuccessfully"
   fails_badly "SystemExit#success? returns true if the process exited successfully"

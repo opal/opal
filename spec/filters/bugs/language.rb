@@ -68,7 +68,6 @@ opal_filter "language" do
   fails "An instance method with a default argument prefers to assign to a default argument before a splat argument" # Expected ArgumentError (wrong number of arguments (given 0, expected 1+)) but got: ArgumentError ([MSpecEnv#foo] wrong number of arguments (given 0, expected -2))
   fails "Assigning an anonymous module to a constant sets the name of a module scoped by an anonymous module" # NoMethodError: undefined method `end_with?' for nil
   fails "Executing break from within a block raises LocalJumpError when converted into a proc during a a super call" # Expected LocalJumpError but no exception was raised (1 was returned)
-  fails "Executing break from within a block works when passing through a super call" # Expected to not get Exception 
   fails "Execution variable $: default $LOAD_PATH entries until sitelibdir included have @gem_prelude_index set" # Expected [].include? nil to be truthy but was false
   fails "Execution variable $: is initialized to an array of strings" # Expected false == true to be truthy but was false
   fails "Execution variable $: is read-only" # Expected NameError but no exception was raised ([] was returned)
@@ -270,14 +269,8 @@ opal_filter "language" do
   fails "The alias keyword operates on methods defined via attr, attr_reader, and attr_accessor" # NameError: undefined method `foo' for class `Object'
   fails "The alias keyword operates on the object's metaclass when used in instance_eval" # NameError: undefined method `value' for class `Object'
   fails "The alias keyword supports aliasing twice the same global variables" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1c9ba @obj=#<AliasObject:0x1ce06> @meta=#<Class:#<AliasObject:0x1ce06>>>
-  fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when calling the block from a method" # Expected LocalJumpError but got: Exception (unexpected break)
-  fails "The break statement in a captured block from a scope that has returned raises a LocalJumpError when yielding to the block" # Expected LocalJumpError but got: Exception (unexpected break)
   fails "The break statement in a captured block from another thread raises a LocalJumpError when getting the value from another thread" # NotImplementedError: Thread creation not available
-  fails "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when invoking the block from a method" # Expected LocalJumpError but got: Exception (unexpected break)
-  fails "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when invoking the block from the scope creating the block" # Expected LocalJumpError but got: Exception (unexpected break)
-  fails "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when yielding to the block" # Expected LocalJumpError but got: Exception (unexpected break)
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from a block" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa5de4 @program=#<BreakSpecs::Lambda:0xa5ea2 @ensures=false>>
-  fails "The break statement in a lambda created at the toplevel returns a value when invoking from a method" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa5de4 @program=#<BreakSpecs::Lambda:0xa5ea6 @ensures=false>>
   fails "The break statement in a lambda created at the toplevel returns a value when invoking from the toplevel" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa5de4 @program=#<BreakSpecs::Lambda:0xa5eaa @ensures=false>>
   fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility" # Expected DefSpecsLambdaVisibility to have private instance method 'some_method' but it does not
@@ -327,4 +320,11 @@ opal_filter "language" do
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block" # NoMethodError: undefined method `block_given?' for KernelSpecs::SelfBlockGiven
   fails "self.send(:block_given?) returns true if and only if a block is supplied" # NoMethodError: undefined method `block_given?' for KernelSpecs::SelfBlockGiven
   fails "top-level constant lookup on a class does not search Object after searching other scopes" # Expected NameError but no exception was raised (Hash was returned)  
+  fails_badly "Executing break from within a block works when passing through a super call" # Expected to not get Exception 
+  fails_badly "The break statement in a captured block from a scope that has returned raises a LocalJumpError when calling the block from a method" # Expected LocalJumpError but got: Exception (unexpected break)
+  fails_badly "The break statement in a captured block from a scope that has returned raises a LocalJumpError when yielding to the block" # Expected LocalJumpError but got: Exception (unexpected break)
+  fails_badly "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when invoking the block from a method" # Expected LocalJumpError but got: Exception (unexpected break)
+  fails_badly "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when invoking the block from the scope creating the block" # Expected LocalJumpError but got: Exception (unexpected break)
+  fails_badly "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when yielding to the block" # Expected LocalJumpError but got: Exception (unexpected break)
+  fails_badly "The break statement in a lambda created at the toplevel returns a value when invoking from a method" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa5de4 @program=#<BreakSpecs::Lambda:0xa5ea6 @ensures=false>>
 end
