@@ -2207,7 +2207,7 @@
 
     // We need a wrapper because otherwise properties
     // would be overwritten on the original body.
-    alias = Opal.wrapMethodBody(body);
+    alias = Opal.wrap_method_body(body);
 
     // Try to make the browser pick the right name
     alias.displayName  = name;
@@ -2219,7 +2219,7 @@
     return obj;
   };
 
-  Opal.wrapMethodBody = function(body) {
+  Opal.wrap_method_body = function(body) {
     var wrapped = function() {
       var block = wrapped.$$p;
 

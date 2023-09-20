@@ -740,7 +740,7 @@ class ::Module
         var name = method_names[i],
             jsid = $jsid(name),
             body = from.$$prototype[jsid],
-            wrapped = Opal.wrapMethodBody(body);
+            wrapped = Opal.wrap_method_body(body);
 
         wrapped.$$jsid = name;
         Opal.defn(to, jsid, wrapped);
