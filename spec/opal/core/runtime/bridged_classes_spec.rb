@@ -53,7 +53,7 @@ describe "Bridged Classes" do
     end
   end
 
-  describe ".instance_methdods" do
+  describe ".instance_methods" do
     it "should report methods for class" do
       Array.instance_methods(false).should include(:shift)
     end
@@ -158,6 +158,47 @@ describe 'Inheritance with bridged classes' do
     `reset_counter()`
     BridgedLevel3.new
     `counter`.should == 1
+  end
+end
+
+%x{
+  class BridgedConstructor {
+    constructor(a) { this.a = a; }
+    get_a() { return this.a; }
+  }
+}
+class BridgedConstructor < `BridgedConstructor`
+end
+
+describe 'Native classes with constructor args' do
+  it 'passes args to native constructor' do
+    instance = BridgedConstructor.new(1)
+    `instance.get_a()`.should == 1
+  end
+end
+
+%x{
+  class BridgeA {
+    constructor(a) { this.a = a; }
+    get_a() { return this.a; }
+  }
+  class BridgeB extends BridgeA {
+    get_b() { return this.get_a() + 1; }
+  }
+  class BridgeC extends BridgeB {
+    get_c() { return this.get_b() + 1; }
+  }
+}
+
+class BridgeC < `BridgeC`
+end
+
+describe 'Native subclasses' do
+  it 'preserves prototype chain' do
+    instance = BridgeC.new(2)
+    `instance.get_c()`.should == 4
+    `instance.get_b()`.should == 3
+    `instance.get_a()`.should == 2
   end
 end
 

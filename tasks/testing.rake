@@ -335,7 +335,6 @@ platforms.each do |platform|
         files = %w[
           benchmark/test_benchmark.rb
           ruby/test_call.rb
-          opal/test_bridge.rb
           opal/test_keyword.rb
           opal/test_base64.rb
           opal/test_openuri.rb
