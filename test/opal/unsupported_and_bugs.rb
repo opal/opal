@@ -30,14 +30,6 @@ class TestBase64
   bug :test_urlsafe_decode64_unpadded
 end
 
-class TestCall
-  # They work fine if `"a".sub! "b"` is replaced by `[].slice 1`
-  unsupported :test_safe_call_block_command
-  unsupported :test_safe_call_block_call
-  unsupported :test_safe_call_block_call_brace
-  unsupported :test_safe_call_block_call_command
-end
-
 class TestBenchmark
   # sleep is unsupported if not awaited
   unsupported :test_realtime_output

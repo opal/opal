@@ -16,6 +16,7 @@ opal_filter "DateTime" do
   fails "DateTime#strftime should be able to show a full notation" # Expected "%+" == "Sat Feb  3 04:05:06 +00:00 2001" to be truthy but was false
   fails "DateTime#strftime should be able to show default Logger format" # Expected "2001-12-03T04:05:06.000000 " == "2001-12-03T04:05:06.100000 " to be truthy but was false
   fails "DateTime#strftime should be able to show the commercial week day" # Expected "1" == "7" to be truthy but was false
+  fails "DateTime#strftime should be able to show the commercial week" # Expected " 3-FEB-2001" == " 3-Feb-2001" to be truthy but was false
   fails "DateTime#strftime should be able to show the number of seconds since the unix epoch" # ArgumentError: Opal doesn't support other types for a timezone argument than Integer and String
   fails "DateTime#strftime should be able to show the timezone of the date with a : separator" # Expected "-0000" == "+0000" to be truthy but was false
   fails "DateTime#strftime should be able to show the timezone with a : separator" # Expected "UTC" == "+00:00" to be truthy but was false

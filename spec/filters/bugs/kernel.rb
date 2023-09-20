@@ -1,7 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Kernel" do
   fails "Kernel#=== does not call #object_id nor #equal? but still returns true for #== or #=== on the same object" # Mock '#<Object:0x2514>' expected to receive object_id("any_args") exactly 0 times but received it 2 times
-  fails "Kernel#=~ returns nil matching any object" # Expected false to be nil
   fails "Kernel#Float for hexadecimal literals with binary exponent allows embedded _ in a number on either side of the P" # ArgumentError: invalid value for Float(): "0x1_0P10"
   fails "Kernel#Float for hexadecimal literals with binary exponent allows embedded _ in a number on either side of the p" # ArgumentError: invalid value for Float(): "0x1_0p10"
   fails "Kernel#Float for hexadecimal literals with binary exponent allows hexadecimal points on the left side of the 'P'" # ArgumentError: invalid value for Float(): "0x1.8P0"
@@ -48,6 +47,7 @@ opal_filter "Kernel" do
   fails "Kernel#eval evaluates string with given filename and negative linenumber" # Expected "unexpected token $end" =~ /speccing.rb:-100:.+/ to be truthy but was nil
   fails "Kernel#eval includes file and line information in syntax error" # Expected "unexpected token $end" =~ /speccing.rb:1:.+/ to be truthy but was nil
   fails "Kernel#eval raises a LocalJumpError if there is no lambda-style closure in the chain" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4be5a>
+  fails "Kernel#eval returns from the method calling #eval when evaluating 'return' in BEGIN" # SyntaxError: Unsupported sexp: preexe
   fails "Kernel#eval unwinds through a Proc-style closure and returns from a lambda-style closure in the closure chain" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4be5a>
   fails "Kernel#eval updates a local in a scope above a surrounding block scope" # Expected 1 == 2 to be truthy but was false
   fails "Kernel#eval updates a local in a scope above when modified in a nested block scope" # NoMethodError: undefined method `es' for #<MSpecEnv:0x4be5a>
@@ -71,6 +71,7 @@ opal_filter "Kernel" do
   fails "Kernel#initialize_copy does nothing if the argument is the same as the receiver" # Expected nil.equal? #<Object:0x3cb42> to be truthy but was false
   fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
+  fails "Kernel#initialize_copy returns self" # Expected nil.equal? #<Object:0x66548> to be truthy but was false
   fails "Kernel#inspect returns a String for an object without #class method" # NoMethodError: undefined method `class' for #<Object:0x42c12>
   fails "Kernel#instance_variable_set on frozen objects accepts unicode instance variable names" # NameError: '@💙' is not allowed as an instance variable name
   fails "Kernel#instance_variable_set on frozen objects raises for frozen objects" # Expected NameError but got: FrozenError (can't modify frozen NilClass: )
@@ -78,8 +79,11 @@ opal_filter "Kernel" do
   fails "Kernel#is_a? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#kind_of? does not take into account `class` method overriding" # TypeError: can't define singleton
   fails "Kernel#local_variables is accessible from bindings" # Expected [] to include "a"
-  fails "Kernel#method can be called even if we only repond_to_missing? method, true" # NameError: undefined method `handled_privately' for class `KernelSpecs::RespondViaMissing'
+  fails "Kernel#method can be called even if we only respond_to_missing? method, true" # NameError: undefined method `handled_privately' for class `KernelSpecs::RespondViaMissing'
   fails "Kernel#method can call a #method_missing accepting zero or one arguments" # NameError: undefined method `foo' for class `#<Class:0x4bc80>'
+  fails "Kernel#method converts the given name to a String using #to_str calls #to_str to convert the given name to a String" # Mock 'method-name' expected to receive to_str("any_args") exactly 1 times but received it 0 times
+  fails "Kernel#method converts the given name to a String using #to_str raises a NoMethodError if the given argument raises a NoMethodError during type coercion to a String" # Expected NoMethodError but got: NameError (undefined method `#<MockObject:0x9e5a6>' for class `Class')
+  fails "Kernel#method converts the given name to a String using #to_str raises a TypeError if the given name can't be converted to a String" # Expected TypeError but got: NameError (undefined method `' for class `Class')
   fails "Kernel#method returns a method object if respond_to_missing?(method) is true" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'
   fails "Kernel#method the returned method object if respond_to_missing?(method) calls #method_missing with a Symbol name" # NameError: undefined method `handled_publicly' for class `KernelSpecs::RespondViaMissing'
   fails "Kernel#method will see an alias of the original method as == when in a derived class" # Expected #<Method: KernelSpecs::B#aliased_pub_method (defined in KernelSpecs::B in ruby/core/kernel/fixtures/classes.rb:164)> == #<Method: KernelSpecs::B#pub_method (defined in KernelSpecs::A in ruby/core/kernel/fixtures/classes.rb:164)> to be truthy but was false
@@ -115,7 +119,10 @@ opal_filter "Kernel" do
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (false was returned)
   fails "Kernel#respond_to_missing? causes #respond_to? to return false if called and returning nil" # Expected nil to be false
   fails "Kernel#respond_to_missing? causes #respond_to? to return true if called and not returning false" # Expected "glark" to be true
+  fails "Kernel#singleton_class for an IO object with a replaced singleton class looks up singleton methods from the fresh singleton class after an object instance got a new one" # NoMethodError: undefined method `reopen' for #<File:0x6c204 @fd="ruby/core/kernel/singleton_class_spec.rb" @flags="r" @eof=false @closed="write">
   fails "Kernel#singleton_class raises TypeError for Symbol" # Expected TypeError but no exception was raised (#<Class:#<String:0x53aaa>> was returned)
+  fails "Kernel#singleton_class raises TypeError for a frozen deduplicated String" # Expected TypeError (can't define singleton) but no exception was raised (#<Class:#<String:0x6c200>> was returned)
+  fails "Kernel#singleton_class returns a frozen singleton class if object is frozen" # Expected false to be true
   fails "Kernel#singleton_method find a method defined on the singleton class" # NoMethodError: undefined method `singleton_method' for #<Object:0x4540a>
   fails "Kernel#singleton_method only looks at singleton methods and not at methods in the class" # Expected NoMethodError == NameError to be truthy but was false
   fails "Kernel#singleton_method raises a NameError if there is no such method" # Expected NoMethodError == NameError to be truthy but was false
@@ -304,12 +311,12 @@ opal_filter "Kernel" do
   fails "Kernel.Float for hexadecimal literals with binary exponent returns 0 for '0x1p-10000'" # ArgumentError: invalid value for Float(): "0x1p-10000"
   fails "Kernel.Float for hexadecimal literals with binary exponent returns Infinity for '0x1P10000'" # ArgumentError: invalid value for Float(): "0x1P10000"
   fails "Kernel.Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'" # ArgumentError: invalid value for Float(): "0x1p10000"
+  fails "Kernel.Rational raises a TypeError if the first argument is a Symbol" # Expected TypeError but no exception was raised ((0/1) was returned)
+  fails "Kernel.Rational raises a TypeError if the second argument is a Symbol" # Expected TypeError but got: ZeroDivisionError (divided by 0)
+  fails "Kernel.Rational when passed a Numeric calls #to_r to convert the first argument to a Rational" # NoMethodError: undefined method `/' for #<RationalSpecs::SubNumeric:0x8bc3a @value=(2/1)>
   fails "Kernel.Rational when passed a String converts the String to a Rational using the same method as String#to_r" # Expected (0/1) == (13/25) to be truthy but was false
   fails "Kernel.Rational when passed a String does not use the same method as Float#to_r" # Expected (5404319552844595/9007199254740992) == (3/5) to be truthy but was false
-  fails "Kernel.Rational when passed a String raises a TypeError if the first argument is a Symbol" # Expected TypeError but no exception was raised ((0/1) was returned)
-  fails "Kernel.Rational when passed a String raises a TypeError if the second argument is a Symbol" # Expected TypeError but got: ZeroDivisionError (divided by 0)
   fails "Kernel.Rational when passed a String scales the Rational value of the first argument by the Rational value of the second" # ZeroDivisionError: divided by 0
-  fails "Kernel.Rational when passed a String when passed a Numeric calls #to_r to convert the first argument to a Rational" # NoMethodError: undefined method `/' for #<RationalSpecs::SubNumeric:0x2b4dc @value=(2/1)>
   fails "Kernel.Rational when passed exception: false and [anything, non-Numeric] swallows an error" # ArgumentError: [MSpecEnv#Rational] wrong number of arguments (given 3, expected -2)
   fails "Kernel.Rational when passed exception: false and [non-Numeric, Numeric] swallows an error" # ArgumentError: [MSpecEnv#Rational] wrong number of arguments (given 3, expected -2)
   fails "Kernel.Rational when passed exception: false and [non-Numeric] swallows an error" # NoMethodError: undefined method `to_i' for {"exception"=>false}

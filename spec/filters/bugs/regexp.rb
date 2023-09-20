@@ -1,5 +1,27 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "regular_expressions" do
+  fails "MatchData#byteoffset accepts String as a reference to a named capture" # NoMethodError: undefined method `byteoffset' for #<MatchData "foobar" f:"foo" b:"bar">
+  fails "MatchData#byteoffset accepts Symbol as a reference to a named capture" # NoMethodError: undefined method `byteoffset' for #<MatchData "foobar" f:"foo" b:"bar">
+  fails "MatchData#byteoffset converts argument into integer if is not String nor Symbol" # NoMethodError: undefined method `byteoffset' for #<MatchData "foobar" f:"foo" b:"bar">
+  fails "MatchData#byteoffset raises IndexError if index is out of matches" # Expected IndexError (index -1 out of matches) but got: NoMethodError (undefined method `byteoffset' for #<MatchData "foobar" f:"foo" b:"bar">)
+  fails "MatchData#byteoffset raises IndexError if there is no group with provided name" # Expected IndexError (undefined group name reference: y) but got: NoMethodError (undefined method `byteoffset' for #<MatchData "foobar" f:"foo" b:"bar">)
+  fails "MatchData#byteoffset raises TypeError if can't convert argument into Integer" # Expected TypeError (no implicit conversion of Array into Integer) but got: NoMethodError (undefined method `byteoffset' for #<MatchData "foobar" f:"foo" b:"bar">)
+  fails "MatchData#byteoffset returns [nil, nil] if a capturing group is optional and doesn't match for multi-byte string" # NoMethodError: undefined method `byteoffset' for #<MatchData "あぃい" 1:"ぃ" 2:nil 3:"い">
+  fails "MatchData#byteoffset returns [nil, nil] if a capturing group is optional and doesn't match" # NoMethodError: undefined method `byteoffset' for #<MatchData "" x:nil>
+  fails "MatchData#byteoffset returns beginning and ending byte-based offset of n-th match, all the subsequent elements are capturing groups" # NoMethodError: undefined method `byteoffset' for #<MatchData "HX1138" 1:"H" 2:"X" 3:"113" 4:"8">
+  fails "MatchData#byteoffset returns beginning and ending byte-based offset of whole matched substring for 0 element" # NoMethodError: undefined method `byteoffset' for #<MatchData "HX1138" 1:"H" 2:"X" 3:"113" 4:"8">
+  fails "MatchData#byteoffset returns correct beginning and ending byte-based offset for multi-byte strings" # NoMethodError: undefined method `byteoffset' for #<MatchData "あぃい" 1:"ぃ" 2:nil 3:"い">
+  fails "MatchData#deconstruct returns an array of the match captures" # NoMethodError: undefined method `deconstruct' for #<MatchData "HX1138" 1:"H" 2:"X" 3:"113" 4:"8">
+  fails "MatchData#deconstruct returns instances of String when given a String subclass" # NoMethodError: undefined method `deconstruct' for #<MatchData "HX1138" 1:"H" 2:"X" 3:"113" 4:"8">
+  fails "MatchData#deconstruct_keys does not accept non-Symbol keys" # Expected TypeError (wrong argument type String (expected Symbol)) but got: NoMethodError (undefined method `deconstruct_keys' for #<MatchData "foobar" f:"foo" b:"bar">)
+  fails "MatchData#deconstruct_keys it raises error when argument is neither nil nor array" # Expected TypeError (wrong argument type Integer (expected Array)) but got: NoMethodError (undefined method `deconstruct_keys' for #<MatchData "foobar" f:"foo" b:"bar">)
+  fails "MatchData#deconstruct_keys process keys till the first non-existing one" # NoMethodError: undefined method `deconstruct_keys' for #<MatchData "foobarbaz" f:"foo" b:"bar" c:"baz">
+  fails "MatchData#deconstruct_keys requires one argument" # Expected ArgumentError (wrong number of arguments (given 0, expected 1)) but got: NoMethodError (undefined method `deconstruct_keys' for #<MatchData "l">)
+  fails "MatchData#deconstruct_keys returns only specified keys" # NoMethodError: undefined method `deconstruct_keys' for #<MatchData "foobar" f:"foo" b:"bar">
+  fails "MatchData#deconstruct_keys returns whole hash for nil as an argument" # NoMethodError: undefined method `deconstruct_keys' for #<MatchData "foobar" f:"foo" b:"bar">
+  fails "MatchData#deconstruct_keys returns {} when passed []" # NoMethodError: undefined method `deconstruct_keys' for #<MatchData "foobar" f:"foo" b:"bar">
+  fails "MatchData#deconstruct_keys returns {} when passed more keys than named captured groups" # NoMethodError: undefined method `deconstruct_keys' for #<MatchData "foobar" f:"foo" b:"bar">
+  fails "MatchData#deconstruct_keys returns {} when there are no named captured groups at all" # NoMethodError: undefined method `deconstruct_keys' for #<MatchData "foobar">
   fails "MatchData#regexp returns a Regexp for the result of gsub(String)" # Expected /\[/gm == /\[/ to be truthy but was false
   fails "MatchData#string returns a frozen copy of the matched string for gsub(String)" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
   fails "MatchData.allocate is undefined" # Expected NoMethodError but no exception was raised (#<MatchData>(#pretty_inspect raised #<NoMethodError: undefined method `named_captures' for nil>) was returned)  
@@ -39,12 +61,7 @@ opal_filter "regular_expressions" do
   fails "Regexp#to_s shows the pattern after the options" # Expected "xyz" == "(?-mix:xyz)" to be truthy but was false
   fails "Regexp.compile given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/ but got: ""
   fails "Regexp.compile given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
-  fails "Regexp.compile given a String ignores the third argument if it is 'e' or 'euc' (case-insensitive)" # ArgumentError: [Regexp.new] wrong number of arguments (given 3, expected -2)
-  fails "Regexp.compile given a String ignores the third argument if it is 's' or 'sjis' (case-insensitive)" # ArgumentError: [Regexp.new] wrong number of arguments (given 3, expected -2)
-  fails "Regexp.compile given a String ignores the third argument if it is 'u' or 'utf8' (case-insensitive)" # ArgumentError: [Regexp.new] wrong number of arguments (given 3, expected -2)
   fails "Regexp.compile given a String raises a RegexpError when passed an incorrect regexp" # Expected RegexpError but got: Exception (Invalid regular expression: /^[$/: Unterminated character class)
-  fails "Regexp.compile given a String uses ASCII_8BIT encoding if third argument is 'n' or 'none' (case insensitive) and non-ascii characters" # ArgumentError: [Regexp.new] wrong number of arguments (given 3, expected -2)
-  fails "Regexp.compile given a String uses US_ASCII encoding if third argument is 'n' or 'none' (case insensitive) and only ascii characters" # ArgumentError: [Regexp.new] wrong number of arguments (given 3, expected -2)
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits" # Expected RegexpError but no exception was raised (/\xn/ was returned)
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if less than four digits are given for \\uHHHH" # Expected RegexpError but no exception was raised (/\u304/ was returned)
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if more than six hexadecimal digits are given" # Expected RegexpError but no exception was raised (/\u{0ffffff}/ was returned)
@@ -58,6 +75,10 @@ opal_filter "regular_expressions" do
   fails "Regexp.compile given a String with escaped characters returns a Regexp with the input String's encoding" # NameError: uninitialized constant Encoding::Shift_JIS
   fails "Regexp.compile works by default for subclasses with overridden #initialize" # Expected /hi/ (Regexp) to be kind of RegexpSpecsSubclass
   fails "Regexp.escape sets the encoding of the result to BINARY if any non-US-ASCII characters are present in an input String with invalid encoding" # Expected true to be false
+  fails "Regexp.linear_time? accepts flags for string argument" # NoMethodError: undefined method `linear_time?' for Regexp
+  fails "Regexp.linear_time? return false if matching can't be done in linear time" # NoMethodError: undefined method `linear_time?' for Regexp
+  fails "Regexp.linear_time? returns true if matching can be done in linear time" # NoMethodError: undefined method `linear_time?' for Regexp
+  fails "Regexp.linear_time? warns about flags being ignored for regexp arguments" # NoMethodError: undefined method `linear_time?' for Regexp
   fails "Regexp.new given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.new given a String raises a RegexpError when passed an incorrect regexp" # Expected RegexpError but got: Exception (Invalid regular expression: /^[$/: Unterminated character class)
   fails "Regexp.new given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits" # Expected RegexpError but no exception was raised (/\xn/ was returned)
@@ -66,6 +87,7 @@ opal_filter "regular_expressions" do
   fails "Regexp.new given a non-String/Regexp raises TypeError if there is no #to_str method for non-String/Regexp argument" # Expected TypeError (no implicit conversion of Integer into String) but got: TypeError (no implicit conversion of Number into String)
   fails "Regexp.new works by default for subclasses with overridden #initialize" # Expected /hi/ (Regexp) to be kind of RegexpSpecsSubclass
   fails "Regexp.quote sets the encoding of the result to BINARY if any non-US-ASCII characters are present in an input String with invalid encoding" # Expected true to be false
+  fails "Regexp.try_convert raises a TypeError if the object does not return an Regexp from #to_regexp" # Expected TypeError (can't convert MockObject to Regexp (MockObject#to_regexp gives String)) but got: NoMethodError (undefined method `try_convert' for Regexp)
   fails "Regexp.try_convert returns nil if given an argument that can't be converted to a Regexp" # NoMethodError: undefined method `try_convert' for Regexp
   fails "Regexp.try_convert tries to coerce the argument by calling #to_regexp" # Mock 'regexp' expected to receive to_regexp("any_args") exactly 1 times but received it 0 times
   fails "Regexp.union uses to_regexp to convert argument" # Mock 'pattern' expected to receive to_regexp("any_args") exactly 1 times but received it 0 times

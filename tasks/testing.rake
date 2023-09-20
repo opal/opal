@@ -36,6 +36,7 @@ module Testing
         mspec/commands/mspec-run
         etc
         rubygems
+        zlib
       ]
     end
 
@@ -334,7 +335,6 @@ platforms.each do |platform|
         includes = "-Itest/cruby/test"
         files = %w[
           benchmark/test_benchmark.rb
-          ruby/test_call.rb
           opal/test_keyword.rb
           opal/test_base64.rb
           opal/test_openuri.rb
@@ -427,17 +427,21 @@ task :smoke_test do
       begin
         require 'rspec/expectations'
         extend RSpec::Matchers
-        expect(actual_output.lines[0]).to    eq("[32m.[0m[32m.[0m\n")
-        expect(actual_output.lines[1]).to    eq("\n")
-        expect(actual_output.lines[2]).to match(%r{Top 2 slowest examples \(\d+\.\d+ seconds, \d+\.\d+% of total time\):\n})
-        expect(actual_output.lines[4]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m .*deprecations_spec\.rb:7\n})
-        expect(actual_output.lines[6]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m .*deprecations_spec\.rb:12\n})
-        expect(actual_output.lines[7]).to    eq("\n")
-        expect(actual_output.lines[8]).to match(%r{^Finished in \d+\.\d+ seconds \(files took \d+\.\d+ seconds to load\)\n$})
-        expect(actual_output.lines[9]).to    eq("[32m2 examples, 0 failures[0m\n")
+        expect(actual_output.lines[0]).to    eq("\n")
+        expect(actual_output.lines[1]).to    eq("Opal::Deprecations\n")
+        expect(actual_output.lines[2]).to    eq("\e[32m  defaults to warn\e[0m\n")
+        expect(actual_output.lines[3]).to    eq("\e[32m  can be set to raise\e[0m\n")
+        expect(actual_output.lines[4]).to    eq("\n")
+
+        expect(actual_output.lines[5]).to match(%r{Top 2 slowest examples \(\d+\.\d+ seconds, \d+\.\d+% of total time\):\n})
+        expect(actual_output.lines[7]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m .*deprecations_spec\.rb:7\n})
+        expect(actual_output.lines[9]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m .*deprecations_spec\.rb:12\n})
+        expect(actual_output.lines[10]).to    eq("\n")
+        expect(actual_output.lines[11]).to match(%r{^Finished in \d+\.\d+ seconds \(files took \d+\.\d+ seconds to load\)\n$})
+        expect(actual_output.lines[12]).to    eq("[32m2 examples, 0 failures[0m\n")
         expect([
-          actual_output.lines[3],
-          actual_output.lines[5],
+          actual_output.lines[6],
+          actual_output.lines[8],
         ]).to contain_exactly(
           "  Opal::Deprecations defaults to warn\n",
           "  Opal::Deprecations can be set to raise\n",

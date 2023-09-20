@@ -19,6 +19,8 @@ def BigDecimal.new(*args, **kwargs)
 end
 
 class BigDecimal < Numeric
+  VERSION = '0'
+
   ROUND_MODE = 256
 
   # NOTE: the numeric values of the ROUND_* constants

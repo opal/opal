@@ -5,7 +5,6 @@ opal_filter "BigDecimal" do
   fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for infinite values" # Expected 27530 == 27534 to be truthy but was false
   fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for ordinary values" # Expected 27574 == 27578 to be truthy but was false
   fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for zero values" # Expected 27442 == 27446 to be truthy but was false
-  fails "BigDecimal constants defines a VERSION value" # Expected false to be true
   fails "BigDecimal constants exception-related constants has a EXCEPTION_ALL value" # NameError: uninitialized constant BigDecimal::EXCEPTION_ALL
   fails "BigDecimal constants exception-related constants has a EXCEPTION_INFINITY value" # NameError: uninitialized constant BigDecimal::EXCEPTION_INFINITY
   fails "BigDecimal constants exception-related constants has a EXCEPTION_NaN value" # NameError: uninitialized constant BigDecimal::EXCEPTION_NaN
@@ -176,7 +175,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_s can use conventional floating point notation" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s can use engineering notation" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s does not add an exponent for zero values" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s inserts a space every n chars, if integer n is supplied" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "BigDecimal#to_s inserts a space every n chars to fraction part, if integer n is supplied" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s removes trailing spaces in floating point notation" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s return type is of class String" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
