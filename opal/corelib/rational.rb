@@ -244,7 +244,7 @@ class ::Rational < ::Numeric
   end
 
   def hash
-    "Rational:#{@num}:#{@den}"
+    [::Rational, @num, @den].hash
   end
 
   def inspect

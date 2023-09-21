@@ -315,7 +315,7 @@ class ::Range
   end
 
   def hash
-    [@begin, @end, @excl].hash
+    [::Range, @begin, @end, @excl].hash
   end
 
   alias == eql?

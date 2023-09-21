@@ -180,7 +180,7 @@ class ::Complex < ::Numeric
   end
 
   def hash
-    "Complex:#{@real}:#{@imag}"
+    [::Complex, @real, @imag].hash
   end
 
   def infinite?

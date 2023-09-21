@@ -130,7 +130,7 @@ class ::Struct
   end
 
   def hash
-    Hash.new(`self.$$data`).hash
+    [self.class, to_a].hash
   end
 
   def [](name)

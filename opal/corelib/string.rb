@@ -1,4 +1,4 @@
-# helpers: coerce_to, respond_to, global_multiline_regexp, prop
+# helpers: coerce_to, respond_to, global_multiline_regexp, prop, opal32_init, opal32_add
 # backtick_javascript: true
 
 require 'corelib/comparable'
@@ -29,6 +29,18 @@ class ::String < `String`
             var id = Opal.uid();
             string_id_map.set(self, id);
             return id;
+          }
+        end
+
+        def hash
+          %x{
+            var hash = $opal32_init(), i, length = self.length;
+            hash = $opal32_add(hash, 0x5);
+            hash = $opal32_add(hash, length);
+            for (i = 0; i < length; i++) {
+              hash = $opal32_add(hash, self.charCodeAt(i));
+            }
+            return hash;
           }
         end
       }

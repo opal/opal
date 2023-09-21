@@ -389,7 +389,7 @@ class ::Time < `Date`
   end
 
   def hash
-    `'Time:' + self.getTime()`
+    [::Time, `self.getTime()`].hash
   end
 
   def inspect
