@@ -144,6 +144,7 @@ class PromiseV2 < `Promise`
       `Promise.resolve(#{value})`.tap do |prom|
         prom.instance_variable_set(:@type, :resolve)
         prom.instance_variable_set(:@realized, :resolve)
+        prom.instance_variable_set(:@value_set, true)
         prom.instance_variable_set(:@value, value)
       end
     end
@@ -152,6 +153,7 @@ class PromiseV2 < `Promise`
       `Promise.reject(#{value})`.tap do |prom|
         prom.instance_variable_set(:@type, :reject)
         prom.instance_variable_set(:@realized, :reject)
+        prom.instance_variable_set(:@value_set, true)
         prom.instance_variable_set(:@value, value)
       end
     end
@@ -199,6 +201,7 @@ class PromiseV2 < `Promise`
   def resolve(value = nil)
     nativity_check!
     raise ArgumentError, 'this promise was already resolved' if @realized
+    @value_set = true
     @value = value
     @realized = :resolve
     @resolve_proc.call(value)
@@ -208,6 +211,7 @@ class PromiseV2 < `Promise`
   def reject(value = nil)
     nativity_check!
     raise ArgumentError, 'this promise was already resolved' if @realized
+    @value_set = true
     @value = value
     @realized = :reject
     @reject_proc.call(value)
@@ -218,6 +222,7 @@ class PromiseV2 < `Promise`
     prom = nil
     blk = gen_tracing_proc(block) do |val|
       prom.instance_variable_set(:@realized, :resolve)
+      prom.instance_variable_set(:@value_set, true)
       prom.instance_variable_set(:@value, val)
     end
     prom = `self.then(#{blk})`
@@ -236,6 +241,7 @@ class PromiseV2 < `Promise`
     prom = nil
     blk = gen_tracing_proc(block) do |val|
       prom.instance_variable_set(:@realized, :resolve)
+      prom.instance_variable_set(:@value_set, true)
       prom.instance_variable_set(:@value, val)
     end
     prom = `self.catch(#{blk})`
@@ -254,9 +260,10 @@ class PromiseV2 < `Promise`
     prom = nil
     blk = gen_tracing_proc(block) do |val|
       prom.instance_variable_set(:@realized, :resolve)
+      prom.instance_variable_set(:@value_set, true)
       prom.instance_variable_set(:@value, val)
     end
-    prom = `self.finally(#{blk})`
+    prom = `self.finally(function() { return blk(self.$value_internal()); })`
     prom.instance_variable_set(:@prev, self)
     prom.instance_variable_set(:@type, :always)
     (@next ||= []) << prom
@@ -312,11 +319,7 @@ class PromiseV2 < `Promise`
 
   def value
     if resolved?
-      if PromiseV2 === @value
-        @value.value
-      else
-        @value
-      end
+      value_internal
     end
   end
 
@@ -366,7 +369,7 @@ class PromiseV2 < `Promise`
       result += " >> #{@next.inspect}"
     end
 
-    result += ": #{@value.inspect}" if @value
+    result += ": #{value.inspect}"
     result += '>'
 
     result
@@ -386,4 +389,16 @@ class PromiseV2 < `Promise`
   alias resolve! resolve
   alias to_n itself
   alias to_v2 itself
+
+  private
+
+  def value_internal
+    if PromiseV2 === @value
+      @value.value
+    elsif @value_set
+      @value
+    elsif @prev
+      @prev.value
+    end
+  end
 end

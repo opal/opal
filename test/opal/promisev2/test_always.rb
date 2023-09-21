@@ -60,4 +60,18 @@ class TestPromiseAlways < Test::Unit::TestCase
 
     assert_raise(ArgumentError) { p.always! {} }
   end
+
+  def test_gets_the_value_from_the_previous_successful_block
+    PromiseV2.value(23)
+      .then { 123 }
+      .rescue { 234 }
+      .always { |v| assert_equal(123, v) }
+  end
+
+  def test_gets_the_value_from_the_previous_rescued_block
+    PromiseV2.reject(23)
+      .then { 123 }
+      .rescue { 234 }
+      .always { |v| assert_equal(234, v) }
+  end
 end
