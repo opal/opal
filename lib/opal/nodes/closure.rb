@@ -225,7 +225,11 @@ module Opal
             end
             line "throw $e;"
           end
-          line "} finally {", *catchers_without_eval_return.map { |type| "$t_#{type}.is_orphan = true;" }, "}"
+          line "}"
+
+          unless catchers_without_eval_return.empty?
+            push " finally {", *catchers_without_eval_return.map { |type| "$t_#{type}.is_orphan = true;" }, "}"
+          end
 
           unshift "return " if closure_is? SEND
 
