@@ -390,7 +390,8 @@ class ::Module
         #{::Kernel.raise ::ArgumentError, 'tried to create a Proc object without a block'}
     }
 
-    block ||= case method
+    if `method !== undefined`
+      block = case method
               when ::Proc
                 method
 
@@ -401,8 +402,9 @@ class ::Module
                 `Opal.wrap_method_body(method.$$method)`
 
               else
-                ::Kernel.raise ::TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
+                ::Kernel.raise ::TypeError, "wrong argument type #{method.class} (expected Proc/Method/UnboundMethod)"
               end
+    end
 
     %x{
       if (typeof(Proxy) !== 'undefined') {

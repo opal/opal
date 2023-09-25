@@ -97,8 +97,7 @@ opal_filter "Module" do
   fails "Module#define_method raises a TypeError when an UnboundMethod from a child class is defined on a parent class" # Expected TypeError (/bind argument must be a subclass of ChildClass/) but no exception was raised ("foo" was returned)
   fails "Module#define_method raises a TypeError when an UnboundMethod from a singleton class is defined on another class" # Expected TypeError (/can't bind singleton method to a different class/) but no exception was raised (#<Class:0x33cac> was returned)
   fails "Module#define_method raises a TypeError when an UnboundMethod from one class is defined on an unrelated class" # Expected TypeError (/bind argument must be a subclass of ModuleSpecs::InstanceMeth/) but no exception was raised (DestinationClass was returned)
-  fails "Module#define_method raises a TypeError when the given method is no Method/Proc" # Expected TypeError (wrong argument type String (expected Proc/Method/UnboundMethod)) but got: TypeError (wrong argument type NilClass (expected Proc/Method))
-  fails "Module#define_method uses provided Method/Proc even if block is specified" # Expected "block_is_called" == "method_is_called" to be truthy but was false
+  fails "Module#define_method raises a TypeError when the given method is no Method/Proc" # Expected TypeError (wrong argument type Integer (expected Proc/Method/UnboundMethod)) but got: TypeError (wrong argument type Number (expected Proc/Method/UnboundMethod))
   fails "Module#deprecate_constant accepts multiple symbols and strings as constant names" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x3bf08>
   fails "Module#deprecate_constant raises a NameError when given an undefined name" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x3bf04>
   fails "Module#deprecate_constant returns self" # NoMethodError: undefined method `deprecate_constant' for #<Module:0x3bf0c>
