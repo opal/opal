@@ -87,11 +87,8 @@ opal_filter "Module" do
   fails "Module#const_source_location works for eval with a given line" # NoMethodError: undefined method `const_source_location' for #<Class:0x2f66a>
   fails "Module#constants doesn't returns inherited constants when passed nil" # Expected ["CS_CONST10",  "CS_CONST10_LINE",  "CS_CONST23",  "CS_CONST24",  "CS_CONST5",  "ChildA"] == ["CS_CONST10", "CS_CONST10_LINE", "CS_CONST23", "CS_CONST5", "ChildA"] to be truthy but was false
   fails "Module#constants returns only public constants" # Expected ["PRIVATE_CONSTANT", "PUBLIC_CONSTANT"] == ["PUBLIC_CONSTANT"] to be truthy but was false
-  fails "Module#define_method converts non-String name to String with #to_str" # NoMethodError: undefined method `foo' for #<#<Class:0x33ce6>:0x33ce4>
   fails "Module#define_method defines the new method according to the scope visibility when a Method passed and the class/module of the context is equal to the receiver of #define_method" # Expected NoMethodError but no exception was raised (nil was returned)
   fails "Module#define_method passed { |a,|  } creates a method that does not destructure the passed argument" # Expected [1, 2] == 1 to be truthy but was false
-  fails "Module#define_method raises TypeError if name cannot converted to String" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (#<Class:0x33da2> was returned)
-  fails "Module#define_method raises TypeError when #to_str called on non-String name returns non-String value" # Expected TypeError (/can't convert Object to String/) but no exception was raised (#<Class:0x33d52> was returned)
   fails "Module#define_method raises a TypeError when a Method from a singleton class is defined on another class" # Expected TypeError (/can't bind singleton method to a different class/) but no exception was raised (#<Class:0x33cdc> was returned)
   fails "Module#define_method raises a TypeError when a Method from one class is defined on an unrelated class" # Expected TypeError but no exception was raised (#<Class:0x33d6c> was returned)
   fails "Module#define_method raises a TypeError when an UnboundMethod from a child class is defined on a parent class" # Expected TypeError (/bind argument must be a subclass of ChildClass/) but no exception was raised ("foo" was returned)

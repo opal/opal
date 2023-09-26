@@ -2,6 +2,22 @@
 # backtick_javascript: true
 
 class ::Module
+  %x{
+    function ensure_symbol_or_string(name) {
+      if (name.$$is_string) {
+        return name;
+      };
+      var converted_name = #{::Opal.try_convert(`name`, ::String, :to_str)};
+      if (converted_name.$$is_string) {
+        return converted_name;
+      } else if (converted_name === nil) {
+        #{::Kernel.raise ::TypeError, "#{`name`} is not a symbol nor a string"}
+      } else {
+        #{::Kernel.raise ::TypeError, "can't convert #{`name`.class} to String (#{`name`.class}#to_str gives #{`converted_name`.class}"}
+      }
+    }
+  }
+
   def self.allocate
     %x{
       var module = Opal.allocate_module(nil, function(){});
@@ -388,6 +404,8 @@ class ::Module
 
       if (method === undefined && block === nil)
         #{::Kernel.raise ::ArgumentError, 'tried to create a Proc object without a block'}
+
+      name = ensure_symbol_or_string(name);
     }
 
     if `method !== undefined`
@@ -452,10 +470,7 @@ class ::Module
   def remove_method(*names)
     %x{
       for (var i = 0; i < names.length; i++) {
-        var name = names[i];
-        if (!(typeof name === "string" || name.$$is_string)) {
-          #{raise ::TypeError, "#{name} is not a symbol nor a string"}
-        }
+        var name = ensure_symbol_or_string(names[i]);
         $deny_frozen_access(self);
 
         Opal.rdef(self, "$" + name);
@@ -704,13 +719,10 @@ class ::Module
   def undef_method(*names)
     %x{
       for (var i = 0; i < names.length; i++) {
-        var name = names[i];
-        if (!(typeof name === "string" || name.$$is_string)) {
-          #{raise ::TypeError, "#{name} is not a symbol nor a string"}
-        }
+        var name = ensure_symbol_or_string(names[i]);
         $deny_frozen_access(self);
 
-        Opal.udef(self, "$" + names[i]);
+        Opal.udef(self, "$" + name);
       }
     }
 
