@@ -119,9 +119,12 @@
 
   // @private
   // Pops an exception from the stack and updates `$!`.
-  Opal.pop_exception = function() {
+  Opal.pop_exception = function(rescued_exception) {
     var exception = Opal.exceptions.pop();
-    if (exception) {
+    if (exception === rescued_exception) {
+      // Current $! is raised in the rescue block, so we don't update it
+    }
+    else if (exception) {
       $gvars["!"] = exception;
       $gvars["@"] = exception.$backtrace();
     }
@@ -1671,6 +1674,17 @@
   // @deprecated
   Opal.find_iter_super_dispatcher = Opal.find_block_super;
 
+  function call_lambda(block, arg, ret) {
+    try {
+      block(arg);
+    } catch (e) {
+      if (e === ret) {
+        return ret.$v;
+      }
+      throw e;
+    }
+  }
+
   // handles yield calls for 1 yielded arg
   Opal.yield1 = function(block, arg) {
     if (typeof(block) !== "function") {
@@ -1678,16 +1692,23 @@
     }
 
     var has_mlhs = block.$$has_top_level_mlhs_arg,
-        has_trailing_comma = block.$$has_trailing_comma_in_args;
+        has_trailing_comma = block.$$has_trailing_comma_in_args,
+        is_returning_lambda = block.$$is_lambda && block.$$ret;
 
     if (block.length > 1 || ((has_mlhs || has_trailing_comma) && block.length === 1)) {
       arg = Opal.to_ary(arg);
     }
 
     if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg.$$is_array) {
+      if (is_returning_lambda) {
+        return call_lambda(block.apply.bind(block, null), arg, block.$$ret);
+      }
       return block.apply(null, arg);
     }
     else {
+      if (is_returning_lambda) {
+        return call_lambda(block, arg, block.$$ret);
+      }
       return block(arg);
     }
   };
@@ -1700,10 +1721,13 @@
 
     if (block.length > 1 && args.length === 1) {
       if (args[0].$$is_array) {
-        return block.apply(null, args[0]);
+        args = args[0];
       }
     }
 
+    if (block.$$is_lambda && block.$$ret) {
+      return call_lambda(block.apply.bind(block, null), args, block.$$ret);
+    }
     return block.apply(null, args);
   };
 
@@ -3027,13 +3051,18 @@
   Object.seal(nil);
 
   Opal.thrower = function(type) {
-    var thrower = { message: 'unexpected '+type };
-    thrower.$thrower_type = type;
-    thrower.$throw = function(value) {
-      if (value == null) value = nil;
-      thrower.$v = value;
-      throw thrower;
-    };
+    var thrower = {
+      $thrower_type: type,
+      $throw: function(value, called_from_lambda) {
+        if (value == null) value = nil;
+        if (this.is_orphan && !called_from_lambda) {
+          $raise(Opal.LocalJumpError, 'unexpected ' + type, value, type.$to_sym());
+        }
+        this.$v = value;
+        throw this;
+      },
+      is_orphan: false
+    }
     return thrower;
   };
 

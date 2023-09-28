@@ -102,8 +102,6 @@ opal_filter "Exception" do
   fails "SystemExit #initialize accepts no arguments" # NoMethodError: undefined method `status' for #<SystemExit: SystemExit>
   fails "SystemExit sets the exit status and exits silently when raised when subclassed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9fe6a>
   fails "SystemExit sets the exit status and exits silently when raised" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9fe6a>
-  fails_badly "LocalJumpError#exit_value returns the value given to return" # Expected LocalJumpError but got: Exception (unexpected return)
-  fails_badly "LocalJumpError#reason returns 'return' for a return" # Expected LocalJumpError but got: Exception (unexpected return)
   fails_badly "SystemExit#status returns the exit status"
   fails_badly "SystemExit#success? returns false if the process exited unsuccessfully"
   fails_badly "SystemExit#success? returns true if the process exited successfully"

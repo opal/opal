@@ -231,7 +231,7 @@ opal_filter "language" do
   fails "Predefined global $. can be assigned a Float" # Expected 123.5 == 123 to be truthy but was false
   fails "Predefined global $. raises TypeError if object can't be converted to an Integer" # Expected TypeError but no exception was raised (#<MockObject:0xa7e2c @name="bad-value", @null=nil> was returned)
   fails "Predefined global $. should call #to_int to convert the object to an Integer" # Expected #<MockObject:0xa7fde @name="good-value", @null=nil> == 321 to be truthy but was false
-  fails "Predefined global $/ changes $-0" # Expected nil  to be identical to "xyz" 
+  fails "Predefined global $/ changes $-0" # Expected nil  to be identical to "xyz"
   fails "Predefined global $/ does not call #to_str to convert the object to a String" # Expected TypeError but no exception was raised (#<MockObject>(#pretty_inspect raised #<TypeError: can't convert MockObject into String (MockObject#to_str gives NilClass)>) was returned)
   fails "Predefined global $/ raises a TypeError if assigned a boolean" # Expected TypeError but no exception was raised (#<TrueClass>(#pretty_inspect raised #<TypeError: no implicit conversion of TrueClass into String>) was returned)
   fails "Predefined global $/ raises a TypeError if assigned an Integer" # Expected TypeError but no exception was raised (#<Number>(#pretty_inspect raised #<TypeError: no implicit conversion of Number into String>) was returned)
@@ -342,12 +342,7 @@ opal_filter "language" do
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols" # Expected TypeError but got: Exception (Cannot create property '$$meta' on string 'symbol')
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block" # NoMethodError: undefined method `block_given?' for KernelSpecs::SelfBlockGiven
   fails "self.send(:block_given?) returns true if and only if a block is supplied" # NoMethodError: undefined method `block_given?' for KernelSpecs::SelfBlockGiven
-  fails "top-level constant lookup on a class does not search Object after searching other scopes" # Expected NameError but no exception was raised (Hash was returned)  
-  fails_badly "Executing break from within a block works when passing through a super call" # Expected to not get Exception 
-  fails_badly "The break statement in a captured block from a scope that has returned raises a LocalJumpError when calling the block from a method" # Expected LocalJumpError but got: Exception (unexpected break)
-  fails_badly "The break statement in a captured block from a scope that has returned raises a LocalJumpError when yielding to the block" # Expected LocalJumpError but got: Exception (unexpected break)
-  fails_badly "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when invoking the block from a method" # Expected LocalJumpError but got: Exception (unexpected break)
-  fails_badly "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when invoking the block from the scope creating the block" # Expected LocalJumpError but got: Exception (unexpected break)
-  fails_badly "The break statement in a captured block when the invocation of the scope creating the block is still active raises a LocalJumpError when yielding to the block" # Expected LocalJumpError but got: Exception (unexpected break)
+  fails "top-level constant lookup on a class does not search Object after searching other scopes" # Expected NameError but no exception was raised (Hash was returned)
+  fails_badly "Executing break from within a block works when passing through a super call" # Expected to not get Exception
   fails_badly "The break statement in a lambda created at the toplevel returns a value when invoking from a method" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa5de4 @program=#<BreakSpecs::Lambda:0xa5ea6 @ensures=false>>
 end

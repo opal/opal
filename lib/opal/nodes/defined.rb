@@ -80,7 +80,7 @@ module Opal
         push '  if (Opal.rescue($err, [Opal.Exception])) {'
         push '    try {'
         push '      return false;'
-        push '    } finally { Opal.pop_exception() }'
+        push '    } finally { Opal.pop_exception($err); }'
         push '  } else { throw $err; }'
         push '}})())'
 
