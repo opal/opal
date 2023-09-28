@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 require 'rack/test'
 
 RSpec.describe Opal::SimpleServer do

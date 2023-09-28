@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 require 'opal/config'
 
 RSpec.describe Opal::Config do

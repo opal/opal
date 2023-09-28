@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 require 'support/match_helpers'
 
 RSpec.describe Opal::Compiler do

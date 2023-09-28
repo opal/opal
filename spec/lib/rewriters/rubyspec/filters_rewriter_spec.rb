@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 require 'opal/rewriters/rubyspec/filters_rewriter'
 require 'support/rewriters_helper'
 
