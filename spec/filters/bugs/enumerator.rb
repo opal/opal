@@ -31,7 +31,6 @@ opal_filter "Enumerator" do
   fails "Enumerator.product returns an enumerator with an empty array when no arguments passed" # NoMethodError: undefined method `product' for Enumerator
   fails "Enumerator.product returns an instance of Enumerator::Product" # NoMethodError: undefined method `product' for Enumerator
   fails "Enumerator.product returns nil when a block passed" # NoMethodError: undefined method `product' for Enumerator
-  fails "Enumerator::ArithmeticSequence#hash is based on begin, end, step and exclude_end?" # Expected "A,3,21,3,0" (String) to be an instance of Integer
   fails "Enumerator::ArithmeticSequence.allocate is not defined" # Expected TypeError (allocator undefined for Enumerator::ArithmeticSequence) but no exception was raised (#<Enumerator::ArithmeticSequence>(#pretty_inspect raised #<NoMethodError: undefined method `begin' for nil>) was returned)
   fails "Enumerator::ArithmeticSequence.new is not defined" # Expected NoMethodError but got: ArgumentError ([ArithmeticSequence#initialize] wrong number of arguments (given 0, expected -2))
   fails "Enumerator::Chain#inspect returns a not initialized representation if #initialized is not called yet" # Expected "#<Enumerator::Chain: nil>" == "#<Enumerator::Chain: uninitialized>" to be truthy but was false

@@ -2,7 +2,6 @@
 opal_filter "Struct" do
   fails "Struct#dig returns the value by the index" # Expected nil == "one" to be truthy but was false
   fails "Struct#hash returns different hashes for structs with different values when using keyword_init: true" # NameError: wrong constant name 1 non symbol member
-  fails "Struct#hash returns the same integer for structs with the same content" # Expected "Hash" (String) to be kind of Integer
   fails "Struct#initialize can be initialized with keyword arguments" # Expected "3.2" == {"version"=>"3.2", "platform"=>"OS"} to be truthy but was false
   fails "Struct#inspect does not call #name method when struct is anonymous" # Expected "#<struct #<Class:0x55d36> a=\"\">" == "#<struct a=\"\">" to be truthy but was false
   fails "Struct#to_h with block converts [key, value] pairs returned by the block to a hash" # Expected {"Ford"=>"", "Ranger"=>"", ""=>""} == {"make"=>"ford", "model"=>"ranger", "year"=>""} to be truthy but was false
