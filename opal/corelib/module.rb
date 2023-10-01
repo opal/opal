@@ -422,6 +422,14 @@ class ::Module
               else
                 ::Kernel.raise ::TypeError, "wrong argument type #{method.class} (expected Proc/Method/UnboundMethod)"
               end
+
+      if `!method.$$is_proc`
+        owner = method.owner
+        if `owner.$$is_class` && !(self <= owner) # rubocop:disable Style/InverseMethods
+          message = `owner.$$is_singleton` ? "can't bind singleton method to a different class" : "bind argument must be a subclass of #{owner}"
+          ::Kernel.raise ::TypeError, message
+        end
+      end
     end
 
     %x{
