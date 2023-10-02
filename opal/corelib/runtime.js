@@ -87,6 +87,8 @@
   // Nil object id is always 4
   var nil_id = 4;
 
+  Opal.nil_id = nil_id;
+
   // Generates even sequential numbers greater than 4
   // (nil_id) to serve as unique ids for ruby objects
   var unique_id = nil_id;
@@ -563,6 +565,11 @@
   // Modules & Classes
   // -----------------
 
+  // Returns human-friendly names for Opal classes
+  var $mod_name_getter = function() {
+    return this === Opal.NilClass ? "nil" : this.$inspect();
+  }
+
   // A `class Foo; end` expression in ruby is compiled to call this runtime
   // method which either returns an existing class of the given name, or creates
   // a new class in the given `base` scope.
@@ -589,7 +596,7 @@
   // @return new [Class]  or existing ruby class
   //
   function $allocate_class(name, superclass, singleton) {
-    var klass, bridged_descendant;
+    var klass, bridged_descendant, fun_name;
 
     if (bridged_descendant = descends_from_bridged_class(superclass)) {
       // Inheritance from bridged classes requires
@@ -601,13 +608,15 @@
         $set_proto(self, klass.$$prototype);
         return self;
       }
+    } else if ($truthy(name)) {
+      fun_name = name == "NilClass" ? "nil" : name
+      klass = Function("return function "+fun_name+" (){}")();
     } else {
       klass = function(){};
     }
-
-    if (name && name !== nil) {
-      $prop(klass, 'displayName', '::'+name);
-    }
+  
+    $prop_gs(klass, "name", false, $mod_name_getter);
+    $prop_gs(klass, "displayName", false, $mod_name_getter);
 
     $prop(klass, '$$name', name);
     $prop(klass, '$$constructor', klass);
@@ -773,14 +782,18 @@
   //
   // @return [Module]
   function $allocate_module(name) {
-    var constructor = function(){};
-    var module = constructor;
+    var module;
+    if ($truthy(name)) {
+      module = Function("return function "+name+" (){}")();
+    } else {
+      module = function(){};
+    }
 
-    if (name)
-      $prop(constructor, 'displayName', name+'.constructor');
+    $prop_gs(module, "name", false, $mod_name_getter);
+    $prop_gs(module, "displayName", false, $mod_name_getter);
 
     $prop(module, '$$name', name);
-    $prop(module, '$$prototype', constructor.prototype);
+    $prop(module, '$$prototype', module.prototype);
     $prop(module, '$$const', {});
     $prop(module, '$$is_module', true);
     $prop(module, '$$is_a_module', true);
@@ -3053,10 +3066,7 @@
   Opal.NilClass = $allocate_class('NilClass', Opal.Object);
   $const_set(_Object, 'NilClass', Opal.NilClass);
   nil = Opal.nil = new Opal.NilClass();
-  nil.$$id = nil_id;
-  nil.call = nil.apply = function() { $raise(Opal.LocalJumpError, 'no block given'); };
-  nil.$$frozen = true;
-  nil.$$comparable = false;
+  nil.nil = true;
   Object.seal(nil);
 
   Opal.thrower = function(type) {

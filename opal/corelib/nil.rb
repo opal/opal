@@ -1,7 +1,14 @@
 # backtick_javascript: true
 
 class ::NilClass
-  `self.$$prototype.$$meta = #{self}`
+  %x{
+    var proto = self.$$prototype;
+    proto.$$meta = #{self};
+    proto.$$id = Opal.nil_id;
+    proto.call = proto.apply = function() { Opal.raise(Opal.LocalJumpError, 'no block given'); };
+    proto.$$frozen = true;
+    proto.$$comparable = true;
+  }
 
   class << self
     def allocate
