@@ -113,8 +113,8 @@
 
   // Special symbols
   var $ssym = Opal.ssym = function(name) {
-    var obj = "$$" + name;
-    Opal[obj] = obj;
+    var name = "$$" + name;
+    var obj = Opal[name] = Symbol(name);
     return obj;
   }
 
