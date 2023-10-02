@@ -668,6 +668,14 @@ module Opal
       end
     end
 
+    # Warn for usage that will change in the next release
+    def warn_if_old_method_access_patterns(str, line)
+      # Patterns that contain fragments: .$ or .["$
+      if str =~ /\.\$|\.\[['"]\$/
+        warning 'Old API method access attempted; see: https://opalrb.com/compat/method-access; this code will break in Opal 2.0', line
+      end
+    end
+
     # Marshalling for cache shortpath
     def marshal_dump
       [@options, @option_values, @source_map ||= source_map.cache,

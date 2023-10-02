@@ -76,6 +76,7 @@ module Opal
         when :str
           value = child.loc.expression.source
           scope.self if value.include? 'self'
+          compiler.warn_if_old_method_access_patterns(value, child.loc.expression.line)
           push Fragment.new(value, scope, child)
         when :begin, :gvar, :ivar, :nil
           push expr(child)
