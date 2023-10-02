@@ -41,11 +41,11 @@ module Opal
       end
 
       def fix_var_name(name)
-        self.class.valid_name?(name) ? name : "#{name}$".to_sym
+        self.class.valid_name?(name) ? name : "#{name}$$".to_sym
       end
 
       def fix_ivar_name(name)
-        self.class.valid_ivar_name?(name.to_s[1..-1]) ? name : "#{name}$".to_sym
+        self.class.valid_ivar_name?(name.to_s[1..-1]) ? name : "#{name}$$".to_sym
       end
 
       def on_lvar(node)
