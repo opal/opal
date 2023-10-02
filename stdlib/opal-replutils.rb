@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: class
 
 require 'pp'
 require 'stringio'
@@ -73,7 +74,7 @@ module REPLUtils
       else if (typeof $_result === 'undefined') {
         return "=> undefined";
       }
-      else if (typeof $_result.$$class === 'undefined') {
+      else if (typeof $_result[$$class] === 'undefined') {
         try {
           var json = JSON.stringify($_result, null, 2);
           if (!colorize) json = #{ColorPrinter.colorize(`json`)}

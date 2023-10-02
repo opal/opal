@@ -1,5 +1,6 @@
 # helpers: coerce_to
 # backtick_javascript: true
+# special_symbols: is_hash
 
 module ::Kernel
   def format(format_string, *args)
@@ -221,7 +222,7 @@ module ::Kernel
                 }
                 pos_arg_num = -2;
 
-                if (args[0] === undefined || !args[0].$$is_hash) {
+                if (args[0] === undefined || !args[0][$$is_hash]) {
                   #{::Kernel.raise ::ArgumentError, 'one hash required'}
                 }
 

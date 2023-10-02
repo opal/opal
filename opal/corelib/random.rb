@@ -24,11 +24,11 @@ class ::Random
 
   def reseed(seed)
     @seed = seed
-    `self.$rng = Opal.$$rand.reseed(seed)`
+    `self.$rng = Opal.rand.reseed(seed)`
   end
 
   def self.new_seed
-    `Opal.$$rand.new_seed()`
+    `Opal.rand.new_seed()`
   end
 
   def self.rand(limit = undefined)
@@ -73,7 +73,7 @@ class ::Random
   def random_float
     %x{
       self.state++;
-      return Opal.$$rand.rand(self.$rng);
+      return Opal.rand.rand(self.$rng);
     }
   end
 
@@ -82,7 +82,7 @@ class ::Random
   end
 
   def self.generator=(generator)
-    `Opal.$$rand = #{generator}`
+    `Opal.rand = #{generator}`
 
     if const_defined? :DEFAULT
       self::DEFAULT.reseed

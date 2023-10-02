@@ -1,5 +1,6 @@
 # helpers: coerce_to, prop, freeze
 # backtick_javascript: true
+# special_symbols: prototype, is_regexp, is_array, is_string, is_number, g, gm, is_range
 
 class ::RegexpError < ::StandardError; end
 
@@ -8,7 +9,7 @@ class ::Regexp < `RegExp`
   self::EXTENDED = 2
   self::MULTILINE = 4
 
-  `Opal.prop(self.$$prototype, '$$is_regexp', true)`
+  `Opal.prop(self[$$prototype], $$is_regexp, true)`
 
   class << self
     def allocate
@@ -39,11 +40,11 @@ class ::Regexp < `RegExp`
           return /(?!)/;
         }
         // return fast if there's only one element
-        if (parts.length == 1 && parts[0].$$is_regexp) {
+        if (parts.length == 1 && parts[0][$$is_regexp]) {
           return parts[0];
         }
         // cover the 2 arrays passed as arguments case
-        is_first_part_array = parts[0].$$is_array;
+        is_first_part_array = parts[0][$$is_array];
         if (parts.length > 1 && is_first_part_array) {
           #{::Kernel.raise ::TypeError, 'no implicit conversion of Array into String'}
         }
@@ -55,10 +56,10 @@ class ::Regexp < `RegExp`
         quoted_validated = [];
         for (var i=0; i < parts.length; i++) {
           part = parts[i];
-          if (part.$$is_string) {
+          if (part[$$is_string]) {
             quoted_validated.push(#{escape(`part`)});
           }
-          else if (part.$$is_regexp) {
+          else if (part[$$is_regexp]) {
             each_part_options = #{`part`.options};
             if (options != undefined && options != each_part_options) {
               #{::Kernel.raise ::TypeError, 'All expressions must use the same options'}
@@ -77,7 +78,7 @@ class ::Regexp < `RegExp`
 
     def new(regexp, options = undefined)
       %x{
-        if (regexp.$$is_regexp) {
+        if (regexp[$$is_regexp]) {
           return new RegExp(regexp);
         }
 
@@ -93,7 +94,7 @@ class ::Regexp < `RegExp`
           return new RegExp(regexp);
         }
 
-        if (options.$$is_number) {
+        if (options[$$is_number]) {
           var temp = '';
           if (#{IGNORECASE} & options) { temp += 'i'; }
           if (#{MULTILINE}  & options) { temp += 'm'; }
@@ -130,8 +131,8 @@ class ::Regexp < `RegExp`
     return self if frozen?
 
     %x{
-      if (!self.hasOwnProperty('$$g')) { $prop(self, '$$g', null); }
-      if (!self.hasOwnProperty('$$gm')) { $prop(self, '$$gm', null); }
+      if (!self.hasOwnProperty($$g)) { $prop(self, $$g, null); }
+      if (!self.hasOwnProperty($$gm)) { $prop(self, $$gm, null); }
 
       return $freeze(self);
     }
@@ -349,7 +350,7 @@ class MatchData
 
   def [](*args)
     %x{
-      if (args[0].$$is_string) {
+      if (args[0][$$is_string]) {
         if (#{!regexp.names.include?(args[0])}) {
           #{::Kernel.raise ::IndexError, "undefined group name reference: #{args[0]}"}
         }
@@ -452,7 +453,7 @@ class MatchData
 
       for (i = 0; i < args.length; i++) {
 
-        if (args[i].$$is_range) {
+        if (args[i][$$is_range]) {
           a = #{`args[i]`.to_a};
           a.unshift(i, 1);
           Array.prototype.splice.apply(args, a);

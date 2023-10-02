@@ -1,8 +1,9 @@
 # backtick_javascript: true
+# special_symbols: is_arithmetic_seq, prototype
 
 class ::Enumerator
   class self::ArithmeticSequence < self
-    `Opal.prop(self.$$prototype, '$$is_arithmetic_seq', true)`
+    `Opal.prop(self[$$prototype], $$is_arithmetic_seq, true)`
 
     `var inf = Infinity`
 

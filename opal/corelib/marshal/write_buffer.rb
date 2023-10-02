@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: base_module, name, encoding
 
 class ::NilClass
   def __marshal__(buffer)
@@ -187,7 +188,7 @@ module ::Marshal
     %x{
       function binaryString(s) {
         s = new String(s);
-        s.encoding = #{Encoding::BINARY};
+        s[$$encoding] = #{Encoding::BINARY};
         return s;
       }
     }
@@ -380,11 +381,11 @@ module ::Marshal
       value = object.marshal_dump
       klass = object.class
       append('U')
-      namespace = `#{klass}.$$base_module`
+      namespace = `#{klass}[$$base_module]`
       if namespace.equal?(::Object)
-        append_symbol(`#{klass}.$$name`)
+        append_symbol(`#{klass}[$$name]`)
       else
-        append_symbol(namespace.name + '::' + `#{klass}.$$name`)
+        append_symbol(namespace.name + '::' + `#{klass}[$$name]`)
       end
       write(value)
     end

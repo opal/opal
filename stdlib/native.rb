@@ -1,5 +1,6 @@
 # backtick_javascript: true
 # helpers: hash_put
+# special_symbols: s, class, is_array
 
 # Provides a complete set of tools to wrap native JavaScript
 # into nice Ruby objects.
@@ -97,14 +98,14 @@ module Native
           return block.apply(self, #{args});
         }
 
-        var self_ = block.$$s;
-        block.$$s = null;
+        var self_ = block[$$s];
+        block[$$s] = null;
 
         try {
           return block.apply(#{instance}, #{args});
         }
         finally {
-          block.$$s = self_;
+          block[$$s] = self_;
         }
       }
     }
@@ -216,7 +217,7 @@ end
 
 module Kernel
   def native?(value)
-    `value == null || !value.$$class`
+    `value == null || !value[$$class] || value === Opal`
   end
 
   # Wraps a native JavaScript with `Native::Object.new`
@@ -341,11 +342,11 @@ class Native::Object < BasicObject
   end
 
   def instance_of?(klass)
-    `self.$$class === klass`
+    `self[$$class] === klass`
   end
 
   def class
-    `self.$$class`
+    `self[$$class]`
   end
 
   def to_a(options = {}, &block)
@@ -545,7 +546,7 @@ unless Hash.method_defined? :_initialize
             value.constructor === Object ||
             value instanceof Map)) {
          $hash_put(hash, key, #{Hash.new(`value`)});
-       } else if (value && value.$$is_array) {
+       } else if (value && value[$$is_array]) {
          value = value.map(function(item) {
            if (item &&
               (item.constructor === undefined ||

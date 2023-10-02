@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: parameters, source_location, comments, p, unbound, is_lambda, arity, is_module
 
 class ::Method
   attr_reader :owner, :receiver, :name
@@ -15,20 +16,20 @@ class ::Method
   end
 
   def parameters
-    `#{@method}.$$parameters`
+    `#{@method}[$$parameters]`
   end
 
   def source_location
-    `#{@method}.$$source_location` || ['(eval)', 0]
+    `#{@method}[$$source_location]` || ['(eval)', 0]
   end
 
   def comments
-    `#{@method}.$$comments` || []
+    `#{@method}[$$comments]` || []
   end
 
   def call(*args, &block)
     %x{
-      #{@method}.$$p = block;
+      #{@method}[$$p] = block;
 
       return #{@method}.apply(#{@receiver}, args);
     }
@@ -53,10 +54,10 @@ class ::Method
   def to_proc
     %x{
       var proc = self.$call.bind(self);
-      proc.$$unbound = #{@method};
-      proc.$$is_lambda = true;
-      proc.$$arity = #{@method}.$$arity == null ? #{@method}.length : #{@method}.$$arity;
-      proc.$$parameters = #{@method}.$$parameters;
+      proc[$$unbound] = #{@method};
+      proc[$$is_lambda] = true;
+      proc[$$arity] = #{@method}[$$arity] == null ? #{@method}.length : #{@method}[$$arity];
+      proc[$$parameters] = #{@method}[$$parameters];
       return proc;
     }
   end
@@ -84,20 +85,20 @@ class ::UnboundMethod
   end
 
   def parameters
-    `#{@method}.$$parameters`
+    `#{@method}[$$parameters]`
   end
 
   def source_location
-    `#{@method}.$$source_location` || ['(eval)', 0]
+    `#{@method}[$$source_location]` || ['(eval)', 0]
   end
 
   def comments
-    `#{@method}.$$comments` || []
+    `#{@method}[$$comments]` || []
   end
 
   def bind(object)
     %x{
-      if (#{@owner}.$$is_module || Opal.is_a(#{object}, #{@owner})) {
+      if (#{@owner}[$$is_module] || Opal.is_a(#{object}, #{@owner})) {
         return #{::Method.new(object, @owner, @method, @name)};
       }
       else {

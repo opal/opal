@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # await: true
+# special_symbols: s, eval
 
 require "test/unit"
 
@@ -177,25 +178,25 @@ class TestAwait < Test::Unit::TestCase
       $taval = 1
       module AutoawaitTemporary1
         $block_with_module_self = proc do
-          # Ensure that block.$$s is generated:
+          # Ensure that block[$$s] is generated:
           self   
-          # AutoawaitTemporary2.$$eval should be true, block.$$s should be unset
-          `\#{AutoawaitTemporary2}.$$eval` && ($taval *= PromiseV2.value(2).await)
-          `block.$$s === null` && ($taval *= PromiseV2.value(3).await)
+          # AutoawaitTemporary2[$$eval] should be true, block[$$s] should be unset
+          `\#{AutoawaitTemporary2}[$$eval]` && ($taval *= PromiseV2.value(2).await)
+          `block[$$s] === null` && ($taval *= PromiseV2.value(3).await)
         end
         block = $block_with_module_self
       end
       block = $block_with_module_self
       module AutoawaitTemporary2; end
-      # AutoawaitTemporary2.$$eval should be false, block.$$s should refer to AutoawaitTemporary1
-      `\#{AutoawaitTemporary2}.$$eval` || ($taval *= PromiseV2.value(5).await)
-      `block.$$s === \#{AutoawaitTemporary1}` && ($taval *= PromiseV2.value(7).await)
+      # AutoawaitTemporary2[$$eval] should be false, block[$$s] should refer to AutoawaitTemporary1
+      `\#{AutoawaitTemporary2}[$$eval]` || ($taval *= PromiseV2.value(5).await)
+      `block[$$s] === \#{AutoawaitTemporary1}` && ($taval *= PromiseV2.value(7).await)
       module AutoawaitTemporary2
         instance_exec_await(&$block_with_module_self)
       end
       # both should get their values back after instance_exec_await is finished
-      `\#{AutoawaitTemporary2}.$$eval` || ($taval *= PromiseV2.value(11).await)
-      `block.$$s === \#{AutoawaitTemporary1}` && ($taval *= PromiseV2.value(13).await)
+      `\#{AutoawaitTemporary2}[$$eval]` || ($taval *= PromiseV2.value(11).await)
+      `block[$$s] === \#{AutoawaitTemporary1}` && ($taval *= PromiseV2.value(13).await)
     RUBY
   }
 

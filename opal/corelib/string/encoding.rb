@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: encoding, internal_encoding, bytes
 
 require 'corelib/string'
 
@@ -86,9 +87,9 @@ class ::Encoding
         else if (charcode >= 0xD800 && charcode <= 0xDBFF) {
           chr = low_surrogate + chr;
         }
-        if (string.encoding.name != "UTF-8") {
+        if (string[$$encoding].name != "UTF-8") {
           chr = new String(chr);
-          chr.encoding = string.encoding;
+          chr[$$encoding] = string[$$encoding];
         }
         Opal.yield1(block, chr);
       }
@@ -273,7 +274,7 @@ end
     %x{
       for (var i = 0, length = string.length; i < length; i++) {
         var chr = new String(string.charAt(i));
-        chr.encoding = string.encoding;
+        chr[$$encoding] = string[$$encoding];
         #{yield `chr`};
       }
     }
@@ -305,24 +306,30 @@ end
 ::Encoding.register 'US-ASCII', aliases: ['ASCII'], ascii: true, inherits: ::Encoding::ASCII_8BIT
 
 class ::String
-  attr_reader :encoding
-  attr_reader :internal_encoding
-  `Opal.prop(String.prototype, 'bytes', nil)`
-  `Opal.prop(String.prototype, 'encoding', #{::Encoding::UTF_8})`
-  `Opal.prop(String.prototype, 'internal_encoding', #{::Encoding::UTF_8})`
+  `Opal.prop(String.prototype, $$bytes, null)`
+  `Opal.prop(String.prototype, $$encoding, #{::Encoding::UTF_8})`
+  `Opal.prop(String.prototype, $$internal_encoding, #{::Encoding::UTF_8})`
+
+  def encoding
+    `self[$$encoding]`
+  end
+
+  def internal_encoding
+    `self[$$internal_encoding]`
+  end
 
   def b
     dup.force_encoding('binary')
   end
 
   def bytesize
-    @internal_encoding.bytesize(self)
+    internal_encoding.bytesize(self)
   end
 
   def each_byte(&block)
     return enum_for(:each_byte) { bytesize } unless block_given?
 
-    @internal_encoding.each_byte(self, &block)
+    internal_encoding.each_byte(self, &block)
 
     self
   end
@@ -336,14 +343,14 @@ class ::String
       }
     }
 
-    @bytes ||= each_byte.to_a
-    @bytes.dup
+    `self[$$bytes] = self[$$bytes] || #{each_byte.to_a}`
+    `self[$$bytes]`.dup
   end
 
   def each_char(&block)
     return enum_for(:each_char) { length } unless block_given?
 
-    @encoding.each_char(self, &block)
+    encoding.each_char(self, &block)
 
     self
   end
@@ -378,12 +385,12 @@ class ::String
     %x{
       var str = self;
 
-      if (encoding === str.encoding) { return str; }
+      if (encoding === str[$$encoding]) { return str; }
 
       encoding = #{::Opal.coerce_to!(encoding, ::String, :to_s)};
       encoding = #{::Encoding.find(encoding)};
 
-      if (encoding === str.encoding) { return str; }
+      if (encoding === str[$$encoding]) { return str; }
 
       str = Opal.set_encoding(str, encoding);
 
@@ -401,8 +408,8 @@ class ::String
 
   def initialize_copy(other)
     %{
-      self.encoding = other.encoding;
-      self.internal_encoding = other.internal_encoding;
+      self[$$encoding] = other[$$encoding];
+      self[$$internal_encoding] = other[$$internal_encoding];
     }
   end
 

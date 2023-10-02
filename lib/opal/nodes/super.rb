@@ -76,7 +76,10 @@ module Opal
       def super_block_invocation
         helper :find_block_super
         chain, cur_defn, mid = scope.super_chain
-        trys = chain.map { |c| "#{c}.$$def" }.join(' || ')
+        trys = chain.map do |c|
+          special_symbol :def
+          "#{c}[$$def]"
+        end.join(' || ')
         "$find_block_super(#{scope.self}, #{mid}, (#{trys} || #{cur_defn}), #{defined_check_param}, #{implicit_arguments_param})"
       end
 

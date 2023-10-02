@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: is_number
 
 require 'forwardable'
 require 'date/infinity'
@@ -299,7 +300,7 @@ class Date
 
   def <=>(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return #{jd <=> other}
       }
 
@@ -324,13 +325,13 @@ class Date
   end
 
   def >>(n)
-    `if (!n.$$is_number) #{raise ::TypeError}`
+    `if (!n[$$is_number]) #{raise ::TypeError}`
 
     self << -n
   end
 
   def <<(n)
-    `if (!n.$$is_number) #{raise ::TypeError}`
+    `if (!n[$$is_number]) #{raise ::TypeError}`
 
     prev_month(n)
   end
@@ -412,7 +413,7 @@ class Date
 
   def prev_day(n = 1)
     %x{
-      if (n.$$is_number) {
+      if (n[$$is_number]) {
         var result = #{clone};
         result.date.setDate(#{@date}.getDate() - n);
         return result;
@@ -424,13 +425,13 @@ class Date
   end
 
   def next_day(n = 1)
-    `if (!n.$$is_number) #{raise ::TypeError}`
+    `if (!n[$$is_number]) #{raise ::TypeError}`
     prev_day(-n)
   end
 
   def prev_month(n = 1)
     %x{
-      if (!n.$$is_number) #{raise ::TypeError}
+      if (!n[$$is_number]) #{raise ::TypeError}
       var result = #{clone}, date = result.date, cur = date.getDate();
       date.setDate(1);
       date.setMonth(date.getMonth() - n);
@@ -440,17 +441,17 @@ class Date
   end
 
   def next_month(n = 1)
-    `if (!n.$$is_number) #{raise ::TypeError}`
+    `if (!n[$$is_number]) #{raise ::TypeError}`
     prev_month(-n)
   end
 
   def prev_year(years = 1)
-    `if (!years.$$is_number) #{raise ::TypeError}`
+    `if (!years[$$is_number]) #{raise ::TypeError}`
     self.class.new(year - years, month, day)
   end
 
   def next_year(years = 1)
-    `if (!years.$$is_number) #{raise ::TypeError}`
+    `if (!years[$$is_number]) #{raise ::TypeError}`
     prev_year(-years)
   end
 

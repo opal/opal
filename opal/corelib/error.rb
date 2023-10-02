@@ -1,7 +1,8 @@
 # backtick_javascript: true
+# special_symbols: constructor, prototype, is_exception, name, is_string, is_array
 
 class ::Exception < `Error`
-  `Opal.prop(self.$$prototype, '$$is_exception', true)`
+  `Opal.prop(self[$$prototype], $$is_exception, true)`
   `var stack_trace_limit`
 
   `Error.stackTraceLimit = 100`
@@ -9,8 +10,8 @@ class ::Exception < `Error`
   def self.new(*args)
     %x{
       var message   = (args.length > 0) ? args[0] : nil;
-      var error     = new self.$$constructor(message);
-      error.name    = self.$$name;
+      var error     = new self[$$constructor](message);
+      error.name    = self[$$name];
       error.message = message;
       error.cause   = #{$!};
       Opal.send(error, error.$initialize, args);
@@ -55,11 +56,12 @@ class ::Exception < `Error`
 
       for (var i = 0; i < backtrace.length; i++) {
         var loc = backtrace[i];
-        if (!loc || !loc.$$is_string) {
-          /* Do nothing */
+        if (!loc || !loc[$$is_string]) {
+          continue;
         }
+        loc = loc.replace(/\$\$\$/g, "");
         /* Chromium format */
-        else if ((m = loc.match(/^    at (.*?) \((.*?)\)$/))) {
+        if ((m = loc.match(/^    at (.*?) \((.*?)\)$/))) {
           new_bt.push(m[2] + ":in `" + m[1] + "'");
         }
         else if ((m = loc.match(/^    at (.*?)$/))) {
@@ -88,7 +90,7 @@ class ::Exception < `Error`
 
       var backtrace = self.stack;
 
-      if (typeof(backtrace) !== 'undefined' && backtrace.$$is_string) {
+      if (typeof(backtrace) !== 'undefined' && backtrace[$$is_string]) {
         return self.backtrace = correct_backtrace(backtrace.split("\n"));
       }
       else if (backtrace) {
@@ -186,13 +188,13 @@ class ::Exception < `Error`
       if (backtrace === nil) {
         self.backtrace = nil;
         self.stack = '';
-      } else if (backtrace.$$is_string) {
+      } else if (backtrace[$$is_string]) {
         self.backtrace = [backtrace];
         self.stack = '  from ' + backtrace;
       } else {
-        if (backtrace.$$is_array) {
+        if (backtrace[$$is_array]) {
           for (i = 0, ii = backtrace.length; i < ii; i++) {
-            if (!backtrace[i].$$is_string) {
+            if (!backtrace[i][$$is_string]) {
               valid = false;
               break;
             }

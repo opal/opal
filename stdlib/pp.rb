@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # backtick_javascript: true
+# special_symbols: class
 
 # Opal: load stdlib/thread.rb
 require 'thread'
@@ -163,7 +164,7 @@ class PP < PrettyPrint
           #{text "undefined"}
           #{return}
         }
-        else if (obj.$$class === undefined) {
+        else if (obj[$$class] === undefined) {
           #{text `Object.prototype.toString.apply(obj)`}
           #{return}
         }

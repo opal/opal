@@ -1,11 +1,12 @@
 # backtick_javascript: true
+# special_symbols: is_class, constructor, id, super, subclasses, singleton_of, is_a_module, class
 
 require 'corelib/module'
 
 class ::Class
   def self.new(superclass = Object, &block)
     %x{
-      if (!superclass.$$is_class) {
+      if (!superclass[$$is_class]) {
         throw Opal.TypeError.$new("superclass must be a Class");
       }
 
@@ -18,8 +19,8 @@ class ::Class
 
   def allocate
     %x{
-      var obj = new self.$$constructor();
-      obj.$$id = Opal.uid();
+      var obj = new self[$$constructor]();
+      obj[$$id] = Opal.uid();
       return obj;
     }
   end
@@ -29,7 +30,7 @@ class ::Class
       raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
     end
 
-    copy = `Opal.allocate_class(nil, self.$$super)`
+    copy = `Opal.allocate_class(nil, self[$$super])`
     copy.copy_instance_variables(self)
     copy.copy_singleton_methods(self)
     copy.initialize_clone(self, freeze: freeze)
@@ -42,7 +43,7 @@ class ::Class
   end
 
   def dup
-    copy = `Opal.allocate_class(nil, self.$$super)`
+    copy = `Opal.allocate_class(nil, self[$$super])`
 
     copy.copy_instance_variables(self)
     copy.initialize_dup(self)
@@ -69,8 +70,8 @@ class ::Class
     %x{
       if (typeof WeakRef !== 'undefined') {
         var i, subclass, out = [];
-        for (i = 0; i < self.$$subclasses.length; i++) {
-          subclass = self.$$subclasses[i].deref();
+        for (i = 0; i < self[$$subclasses].length; i++) {
+          subclass = self[$$subclasses][i].deref();
           if (subclass !== undefined) {
             out.push(subclass);
           }
@@ -78,25 +79,25 @@ class ::Class
         return out;
       }
       else {
-        return self.$$subclasses;
+        return self[$$subclasses];
       }
     }
   end
 
   def superclass
-    `self.$$super || nil`
+    `self[$$super] || nil`
   end
 
   def to_s
     %x{
-      var singleton_of = self.$$singleton_of;
+      var singleton_of = self[$$singleton_of];
 
-      if (singleton_of && singleton_of.$$is_a_module) {
+      if (singleton_of && singleton_of[$$is_a_module]) {
         return #{"#<Class:#{`singleton_of`.name}>"};
       }
       else if (singleton_of) {
         // a singleton class created from an object
-        return #{"#<Class:#<#{`singleton_of.$$class`.name}:0x#{`Opal.id(singleton_of)`.to_s(16)}>>"};
+        return #{"#<Class:#<#{`singleton_of[$$class]`.name}:0x#{`Opal.id(singleton_of)`.to_s(16)}>>"};
       }
 
       return #{super()};
@@ -105,8 +106,8 @@ class ::Class
 
   def attached_object
     %x{
-      if (self.$$singleton_of != null) {
-        return self.$$singleton_of;
+      if (self[$$singleton_of] != null) {
+        return self[$$singleton_of];
       }
       else {
         #{::Kernel.raise ::TypeError, "`#{self}' is not a singleton class"}

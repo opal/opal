@@ -1,12 +1,13 @@
 # backtick_javascript: true
 # use_strict: true
+# special_symbols: prototype, is_number, is_number_class, is_string, is_integer_class
 
 require 'corelib/numeric'
 
 class ::Number < ::Numeric
   ::Opal.bridge(`Number`, self)
-  `Opal.prop(self.$$prototype, '$$is_number', true)`
-  `self.$$is_number_class = true`
+  `Opal.prop(self[$$prototype], $$is_number, true)`
+  `self[$$is_number_class] = true`
   `var number_id_map = new Map()`
 
   class << self
@@ -22,13 +23,13 @@ class ::Number < ::Numeric
       if (other === nil) {
         #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
       }
-      else if (other.$$is_string) {
+      else if (other[$$is_string]) {
         return [#{::Kernel.Float(other)}, self];
       }
       else if (#{other.respond_to?(:to_f)}) {
         return [#{::Opal.coerce_to!(other, ::Float, :to_f)}, self];
       }
-      else if (other.$$is_number) {
+      else if (other[$$is_number]) {
         return [other, self];
       }
       else {
@@ -68,7 +69,7 @@ class ::Number < ::Numeric
 
   def +(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self + other;
       }
       else {
@@ -79,7 +80,7 @@ class ::Number < ::Numeric
 
   def -(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self - other;
       }
       else {
@@ -90,7 +91,7 @@ class ::Number < ::Numeric
 
   def *(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self * other;
       }
       else {
@@ -101,7 +102,7 @@ class ::Number < ::Numeric
 
   def /(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self / other;
       }
       else {
@@ -112,7 +113,7 @@ class ::Number < ::Numeric
 
   def %(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         if (other == -Infinity) {
           return other;
         }
@@ -134,7 +135,7 @@ class ::Number < ::Numeric
 
   def &(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self & other;
       }
       else {
@@ -145,7 +146,7 @@ class ::Number < ::Numeric
 
   def |(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self | other;
       }
       else {
@@ -156,7 +157,7 @@ class ::Number < ::Numeric
 
   def ^(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self ^ other;
       }
       else {
@@ -167,7 +168,7 @@ class ::Number < ::Numeric
 
   def <(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self < other;
       }
       else {
@@ -178,7 +179,7 @@ class ::Number < ::Numeric
 
   def <=(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self <= other;
       }
       else {
@@ -189,7 +190,7 @@ class ::Number < ::Numeric
 
   def >(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self > other;
       }
       else {
@@ -200,7 +201,7 @@ class ::Number < ::Numeric
 
   def >=(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self >= other;
       }
       else {
@@ -213,7 +214,7 @@ class ::Number < ::Numeric
   # can be optimized despite a try/finally construct.
   %x{
     var spaceship_operator = function(self, other) {
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         if (isNaN(self) || isNaN(other)) {
           return nil;
         }
@@ -285,7 +286,7 @@ class ::Number < ::Numeric
       end
     elsif self < 0 && (::Float === other || ::Rational === other)
       ::Complex.new(self, 0)**other.to_f
-    elsif `other.$$is_number != null`
+    elsif `other[$$is_number] != null`
       `Math.pow(self, other)`
     else
       __coerced__ :**, other
@@ -294,7 +295,7 @@ class ::Number < ::Numeric
 
   def ==(other)
     %x{
-      if (other.$$is_number) {
+      if (other[$$is_number]) {
         return self.valueOf() === other.valueOf();
       }
       else if (#{other.respond_to? :==}) {
@@ -409,7 +410,7 @@ class ::Number < ::Numeric
     end
 
     %x{
-      if (!stop.$$is_number) {
+      if (!stop[$$is_number]) {
         #{::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
       for (var i = self; i >= stop; i--) {
@@ -784,7 +785,7 @@ class ::Number < ::Numeric
     end
 
     %x{
-      if (!stop.$$is_number) {
+      if (!stop[$$is_number]) {
         #{::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
       for (var i = self; i <= stop; i++) {
@@ -911,8 +912,8 @@ end
 ::Fixnum = ::Number
 
 class ::Integer < ::Numeric
-  `self.$$is_number_class = true`
-  `self.$$is_integer_class = true`
+  `self[$$is_number_class] = true`
+  `self[$$is_integer_class] = true`
 
   class << self
     def allocate
@@ -942,7 +943,7 @@ class ::Integer < ::Numeric
 end
 
 class ::Float < ::Numeric
-  `self.$$is_number_class = true`
+  `self[$$is_number_class] = true`
 
   class << self
     def allocate
@@ -952,7 +953,7 @@ class ::Float < ::Numeric
     undef :new
 
     def ===(other)
-      `!!other.$$is_number`
+      `!!other[$$is_number]`
     end
   end
 

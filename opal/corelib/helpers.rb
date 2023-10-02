@@ -1,5 +1,6 @@
 # helpers: type_error, coerce_to
 # backtick_javascript: true
+# special_symbols: is_array, class, pristine, prototype, stub
 
 module ::Opal
   def self.bridge(constructor, klass)
@@ -53,7 +54,7 @@ module ::Opal
       if (args.length == 1) {
         return args[0];
       }
-      else if (args.$$is_array) {
+      else if (args[$$is_array]) {
         return args;
       }
       else {
@@ -67,7 +68,7 @@ module ::Opal
 
   def self.respond_to?(obj, method, include_all = false)
     %x{
-      if (obj == null || !obj.$$class) {
+      if (obj == null || !obj[$$class]) {
         return false;
       }
     }
@@ -130,9 +131,9 @@ module ::Opal
   #     def dup
   #       %x{
   #         if (
-  #           self.$allocate.$$pristine &&
-  #           self.$copy_instance_variables.$$pristine &&
-  #           self.$initialize_dup.$$pristine
+  #           self.$allocate[$$pristine] &&
+  #           self.$copy_instance_variables[$$pristine] &&
+  #           self.$initialize_dup[$$pristine]
   #         ) return self.slice(0);
   #       }
   #
@@ -148,10 +149,10 @@ module ::Opal
       var method_name, method;
       for (var i = method_names.length - 1; i >= 0; i--) {
         method_name = method_names[i];
-        method = owner_class.$$prototype[Opal.jsid(method_name)];
+        method = owner_class[$$prototype][Opal.jsid(method_name)];
 
-        if (method && !method.$$stub) {
-          method.$$pristine = true;
+        if (method && !method[$$stub]) {
+          method[$$pristine] = true;
         }
       }
     }
@@ -177,18 +178,18 @@ module ::Opal
           // JS undefined value
           return 'undefined';
         }
-        else if (typeof value.$$class === 'undefined') {
+        else if (typeof value[$$class] === 'undefined') {
           // JS object / other value that is not bridged
           return Object.prototype.toString.apply(value);
         }
-        else if (typeof value.$inspect !== 'function' || value.$inspect.$$stub) {
+        else if (typeof value.$inspect !== 'function' || value.$inspect[$$stub]) {
           // BasicObject and friends
-          return #{"#<#{`value.$$class`}:0x#{value.__id__.to_s(16)}>"}
+          return #{"#<#{`value[$$class]`}:0x#{value.__id__.to_s(16)}>"}
         }
         else if (inspect_stack.indexOf(#{value.__id__}) !== -1) {
           // inspect recursing inside inspect to find out about the
           // same object
-          return #{"#<#{`value.$$class`}:0x#{value.__id__.to_s(16)}>"}
+          return #{"#<#{`value[$$class]`}:0x#{value.__id__.to_s(16)}>"}
         }
         else {
           // anything supporting Opal
@@ -199,7 +200,7 @@ module ::Opal
       }
       nil
     rescue ::Exception => e # rubocop:disable Lint/RescueException
-      "#<#{`value.$$class`}:0x#{value.__id__.to_s(16)}>"
+      "#<#{`value[$$class]`}:0x#{value.__id__.to_s(16)}>"
     ensure
       `if (pushed) inspect_stack.pop()`
     end

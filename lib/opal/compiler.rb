@@ -355,7 +355,15 @@ module Opal
     #
     # @return [Hash<Symbol, String>]
     def symbols
-      @symbols ||= {}
+      @symbols ||= magic_comments[:symbols].to_s.split(',').map { |sym| sym = sym.strip; [sym.to_sym, gen_symbol_name(sym)] }.to_h
+    end
+
+    # Any special symbols needed by this file. Used by {Opal::Nodes::Top} to reference
+    # special symbols that are needed.
+    #
+    # @return [Hash<Symbol, String>]
+    def special_symbols
+      @special_symbols ||= magic_comments[:special_symbols].to_s.split(',').map { |sym| sym = sym.strip; [sym.to_sym, "$$#{sym}"] }.to_h
     end
 
     def record_method_call(mid)
@@ -488,6 +496,11 @@ module Opal
     # Generates a symbol and returns
     def symbol(name)
       symbols[name] = gen_symbol_name(name)
+    end
+
+    # Generates a special symbol and returns
+    def special_symbol(name)
+      special_symbols[name] = :"$$#{name}"
     end
 
     # To keep code blocks nicely indented, this will yield a block after

@@ -1,5 +1,6 @@
 # helpers: call, raise
 # backtick_javascript: true
+# special_symbols: class
 
 # parser uses String#unpack
 require 'corelib/string/unpack'
@@ -47,7 +48,7 @@ end
       return Opal.Opal.$compile(str, options);
     }
     catch (e) {
-      if (e.$$class === Opal.Opal.SyntaxError) {
+      if (e[$$class] === Opal.Opal.SyntaxError) {
         var err = Opal.SyntaxError.$new(e.message);
         err.$set_backtrace(e.$backtrace());
         throw(err);

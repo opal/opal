@@ -1,6 +1,7 @@
 # helpers: coerce_to
 # await: await
 # backtick_javascript: true
+# special_symbols: is_boolean, s, is_a_module, eval
 
 %x{
   var AsyncFunction = Object.getPrototypeOf(async function() {}).constructor;
@@ -46,7 +47,7 @@ module Kernel
     end
 
     %x{
-      if (status.$$is_boolean) {
+      if (status[$$is_boolean]) {
         status = status ? 0 : 1;
       } else {
         status = $coerce_to(status, #{Integer}, 'to_int')
@@ -88,25 +89,25 @@ class BasicObject
     nil.__await__
 
     %x{
-      var block_self = block.$$s,
+      var block_self = block[$$s],
           result;
 
-      block.$$s = null;
+      block[$$s] = null;
 
-      if (self.$$is_a_module) {
-        self.$$eval = true;
+      if (self[$$is_a_module]) {
+        self[$$eval] = true;
         try {
           result = await block.apply(self, args);
         }
         finally {
-          self.$$eval = false;
+          self[$$eval] = false;
         }
       }
       else {
         result = await block.apply(self, args);
       }
 
-      block.$$s = block_self;
+      block[$$s] = block_self;
 
       return result;
     }

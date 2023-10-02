@@ -102,7 +102,8 @@ module Opal
         def generate_thrower(type, closure, value)
           id = closure.register_catcher(type)
           closure.register_thrower(type, id)
-          push id, '.$throw(', expr_or_nil(value), ', ', scope.identify!, '.$$is_lambda)'
+          special_symbol :is_lambda
+          push id, '.$throw(', expr_or_nil(value), ', ', scope.identify!, '[$$is_lambda])'
           id
         end
 
@@ -117,7 +118,8 @@ module Opal
             parent_scope.add_scope_temp("#{id} = $thrower('#{type}')")
             closure.register_thrower(type, id)
           end
-          push id, '.$throw(', expr_or_nil(value), ', ', scope.identify!, '.$$is_lambda)'
+          special_symbol :is_lambda
+          push id, '.$throw(', expr_or_nil(value), ', ', scope.identify!, '[$$is_lambda])'
           id
         end
 

@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: is_array, is_string, is_number, is_hash, is_regexp
 
 class ::IO
   self::SEEK_SET = 0
@@ -66,11 +67,11 @@ class ::IO
         return nil;
       } else {
         for (var i = 0, ii = args.length; i < ii; i++) {
-          if (args[i].$$is_array){
+          if (args[i][$$is_array]){
             var ary = #{`args[i]`.flatten}
             if (ary.length > 0) #{puts(*`ary`)}
           } else {
-            if (args[i].$$is_string) {
+            if (args[i][$$is_string]) {
               line = args[i].valueOf();
             } else {
               line = #{::Kernel.String(`args[i]`)};
@@ -121,12 +122,12 @@ class ::IO
   end
 
   def gets(sep = false, limit = nil, opts = {})
-    if `sep.$$is_number` && !limit
+    if `sep[$$is_number]` && !limit
       sep, limit, opts = false, sep, limit
     end
-    if `sep.$$is_hash` && !limit && opts == {}
+    if `sep[$$is_hash]` && !limit && opts == {}
       sep, limit, opts = false, nil, sep
-    elsif `limit.$$is_hash` && opts == {}
+    elsif `limit[$$is_hash]` && opts == {}
       sep, limit, opts = sep, nil, limit
     end
 
@@ -148,7 +149,7 @@ class ::IO
 
     begin
       @read_buffer += data
-      if sep != '' && (`sep.$$is_regexp` ? @read_buffer.match?(sep) : @read_buffer.include?(sep))
+      if sep != '' && (`sep[$$is_regexp]` ? @read_buffer.match?(sep) : @read_buffer.include?(sep))
         orig_buffer = @read_buffer
         ret, @read_buffer = @read_buffer.split(sep, 2)
         ret += orig_buffer[ret.length, seplen] if ret != orig_buffer

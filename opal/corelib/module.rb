@@ -1,12 +1,13 @@
 # helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop, jsid
 # backtick_javascript: true
+# special_symbols: prototype, parameters, arity, const, autoload, pristine, cvars, nesting, is_module, unbound, proxy_target, jsid, ret, brk, s, def, define_meth, base_module, stub, owner, name, full_name, own_included_modules, own_prepended_modules, is_string, cloned_from, refine_modules, module_function, is_singleton
 
 class ::Module
   def self.allocate
     %x{
       var module = Opal.allocate_module(nil, function(){});
       // Link the prototype of Module subclasses
-      if (self !== Opal.Module) Object.setPrototypeOf(module, self.$$prototype);
+      if (self !== Opal.Module) Object.setPrototypeOf(module, self[$$prototype]);
       return module;
     }
   end
@@ -135,7 +136,7 @@ class ::Module
     %x{
       $deny_frozen_access(self);
 
-      var proto = self.$$prototype;
+      var proto = self[$$prototype];
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
@@ -147,8 +148,8 @@ class ::Module
         // initialize the instance variable as nil
         Opal.prop(proto, ivar, nil);
 
-        body.$$parameters = [];
-        body.$$arity = 0;
+        body[$$parameters] = [];
+        body[$$arity] = 0;
 
         Opal.defn(self, id, body);
       }
@@ -161,7 +162,7 @@ class ::Module
     %x{
       $deny_frozen_access(self);
 
-      var proto = self.$$prototype;
+      var proto = self[$$prototype];
 
       for (var i = names.length - 1; i >= 0; i--) {
         var name = names[i],
@@ -170,8 +171,8 @@ class ::Module
 
         var body = $assign_ivar(ivar)
 
-        body.$$parameters = [['req']];
-        body.$$arity = 1;
+        body[$$parameters] = [['req']];
+        body[$$arity] = 1;
 
         // initialize the instance variable as nil
         Opal.prop(proto, ivar, nil);
@@ -195,14 +196,14 @@ class ::Module
         #{::Kernel.raise ::ArgumentError, 'empty file name'}
       }
 
-      if (!self.$$const.hasOwnProperty(#{const})) {
-        if (!self.$$autoload) {
-          self.$$autoload = {};
+      if (!self[$$const].hasOwnProperty(#{const})) {
+        if (!self[$$autoload]) {
+          self[$$autoload] = {};
         }
         Opal.const_cache_version++;
-        self.$$autoload[#{const}] = { path: #{path}, loaded: false, required: false, success: false, exception: false };
+        self[$$autoload][#{const}] = { path: #{path}, loaded: false, required: false, success: false, exception: false };
 
-        if (self.$const_added && !self.$const_added.$$pristine) {
+        if (self.$const_added && !self.$const_added[$$pristine]) {
           self.$const_added(#{const});
         }
       }
@@ -212,15 +213,15 @@ class ::Module
 
   def autoload?(const)
     %x{
-      if (self.$$autoload && self.$$autoload[#{const}] && !self.$$autoload[#{const}].required && !self.$$autoload[#{const}].success) {
-        return self.$$autoload[#{const}].path;
+      if (self[$$autoload] && self[$$autoload][#{const}] && !self[$$autoload][#{const}].required && !self[$$autoload][#{const}].success) {
+        return self[$$autoload][#{const}].path;
       }
 
       var ancestors = self.$ancestors();
 
       for (var i = 0, length = ancestors.length; i < length; i++) {
-        if (ancestors[i].$$autoload && ancestors[i].$$autoload[#{const}] && !ancestors[i].$$autoload[#{const}].required && !ancestors[i].$$autoload[#{const}].success) {
-          return ancestors[i].$$autoload[#{const}].path;
+        if (ancestors[i][$$autoload] && ancestors[i][$$autoload][#{const}] && !ancestors[i][$$autoload][#{const}].required && !ancestors[i][$$autoload][#{const}].success) {
+          return ancestors[i][$$autoload][#{const}].path;
         }
       }
       return nil;
@@ -261,9 +262,9 @@ class ::Module
     name = ::Opal.class_variable_name!(name)
 
     %x{
-      if (Opal.hasOwnProperty.call(self.$$cvars, name)) {
-        var value = self.$$cvars[name];
-        delete self.$$cvars[name];
+      if (Opal.hasOwnProperty.call(self[$$cvars], name)) {
+        var value = self[$$cvars][name];
+        delete self[$$cvars][name];
         return value;
       } else {
         #{::Kernel.raise ::NameError, "cannot remove #{name} for #{self}"}
@@ -278,12 +279,12 @@ class ::Module
   def self.constants(inherit = undefined)
     %x{
       if (inherit == null) {
-        var nesting = (self.$$nesting || []).concat($Object),
+        var nesting = (self[$$nesting] || []).concat($Object),
             constant, constants = {},
             i, ii;
 
         for(i = 0, ii = nesting.length; i < ii; i++) {
-          for (constant in nesting[i].$$const) {
+          for (constant in nesting[i][$$const]) {
             constants[constant] = true;
           }
         }
@@ -295,7 +296,7 @@ class ::Module
   end
 
   def self.nesting
-    `self.$$nesting || []`
+    `self[$$nesting] || []`
   end
 
   # check for constant within current scope
@@ -313,19 +314,19 @@ class ::Module
         modules = modules.concat(Opal.ancestors(self));
 
         // Add Object's ancestors if it's a module – modules have no ancestors otherwise
-        if (self.$$is_module) {
+        if (self[$$is_module]) {
           modules = modules.concat([$Object]).concat(Opal.ancestors($Object));
         }
       }
 
       for (i = 0, ii = modules.length; i < ii; i++) {
         module = modules[i];
-        if (module.$$const[#{name}] != null) { return true; }
+        if (module[$$const][#{name}] != null) { return true; }
         if (
-          module.$$autoload &&
-          module.$$autoload[#{name}] &&
-          !module.$$autoload[#{name}].required &&
-          !module.$$autoload[#{name}].success
+          module[$$autoload] &&
+          module[$$autoload][#{name}] &&
+          !module[$$autoload][#{name}].required &&
+          !module[$$autoload][#{name}].success
         ) {
           return true;
         }
@@ -395,7 +396,7 @@ class ::Module
                 method
 
               when ::Method
-                `#{method.to_proc}.$$unbound`
+                `#{method.to_proc}[$$unbound]`
 
               when ::UnboundMethod
                 ->(*args) {
@@ -411,27 +412,27 @@ class ::Module
       if (typeof(Proxy) !== 'undefined') {
         var meta = Object.create(null)
 
-        block.$$proxy_target = block
+        block[$$proxy_target] = block
         block = new Proxy(block, {
           apply: function(target, self, args) {
-            var old_name = target.$$jsid
-            target.$$jsid = name;
+            var old_name = target[$$jsid]
+            target[$$jsid] = name;
             try {
               return target.apply(self, args);
             } catch(e) {
-              if (e === target.$$brk || e === target.$$ret) return e.$v;
+              if (e === target[$$brk] || e === target[$$ret]) return e.$v;
               throw e;
             } finally {
-              target.$$jsid = old_name
+              target[$$jsid] = old_name
             }
           }
         })
       }
 
-      block.$$jsid        = name;
-      block.$$s           = null;
-      block.$$def         = block;
-      block.$$define_meth = true;
+      block[$$jsid]        = name;
+      block[$$s]           = null;
+      block[$$def]         = block;
+      block[$$define_meth] = true;
 
       return Opal.defn(self, $jsid(name), block);
     }
@@ -444,7 +445,7 @@ class ::Module
     return self if frozen?
 
     %x{
-      if (!self.hasOwnProperty('$$base_module')) { $prop(self, '$$base_module', null); }
+      if (!self.hasOwnProperty($$base_module)) { $prop(self, $$base_module, null); }
 
       return $freeze(self);
     }
@@ -454,7 +455,7 @@ class ::Module
     %x{
       for (var i = 0; i < names.length; i++) {
         var name = names[i];
-        if (!(typeof name === "string" || name.$$is_string)) {
+        if (!(typeof name === "string" || name[$$is_string])) {
           #{raise ::TypeError, "#{name} is not a symbol nor a string"}
         }
         $deny_frozen_access(self);
@@ -467,7 +468,7 @@ class ::Module
   end
 
   def singleton_class?
-    `!!self.$$is_singleton`
+    `!!self[$$is_singleton]`
   end
 
   def include(*mods)
@@ -475,7 +476,7 @@ class ::Module
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
-        if (!mod.$$is_module) {
+        if (!mod[$$is_module]) {
           #{::Kernel.raise ::TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
 
@@ -493,7 +494,7 @@ class ::Module
 
   def include?(mod)
     %x{
-      if (!mod.$$is_module) {
+      if (!mod[$$is_module]) {
         #{::Kernel.raise ::TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
       }
 
@@ -512,13 +513,13 @@ class ::Module
 
   def instance_method(name)
     %x{
-      var meth = self.$$prototype[$jsid(name)];
+      var meth = self[$$prototype][$jsid(name)];
 
-      if (!meth || meth.$$stub) {
+      if (!meth || meth[$$stub]) {
         #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.name}'", name)};
       }
 
-      return #{::UnboundMethod.new(self, `meth.$$owner || #{self}`, `meth`, name)};
+      return #{::UnboundMethod.new(self, `meth[$$owner] || #{self}`, `meth`, name)};
     }
   end
 
@@ -569,12 +570,12 @@ class ::Module
     end
 
     %x{
-      var old = block.$$s,
+      var old = block[$$s],
           result;
 
-      block.$$s = null;
+      block[$$s] = null;
       result = block.apply(self, [self]);
-      block.$$s = old;
+      block[$$s] = old;
 
       return result;
     }
@@ -586,11 +587,11 @@ class ::Module
         #{::Kernel.raise ::LocalJumpError, 'no block given'}
       }
 
-      var block_self = block.$$s, result;
+      var block_self = block[$$s], result;
 
-      block.$$s = null;
+      block[$$s] = null;
       result = block.apply(self, args);
-      block.$$s = block_self;
+      block[$$s] = block_self;
 
       return result;
     }
@@ -598,8 +599,8 @@ class ::Module
 
   def method_defined?(method)
     %x{
-      var body = self.$$prototype[$jsid(method)];
-      return (!!body) && !body.$$stub;
+      var body = self[$$prototype][$jsid(method)];
+      return (!!body) && !body[$$stub];
     }
   end
 
@@ -608,14 +609,14 @@ class ::Module
       $deny_frozen_access(self);
 
       if (methods.length === 0) {
-        self.$$module_function = true;
+        self[$$module_function] = true;
         return nil;
       }
       else {
         for (var i = 0, length = methods.length; i < length; i++) {
           var meth = methods[i],
               id   = $jsid(meth),
-              func = self.$$prototype[id];
+              func = self[$$prototype][id];
 
           Opal.defs(self, id, func);
         }
@@ -628,19 +629,19 @@ class ::Module
 
   def name
     %x{
-      if (self.$$full_name) {
-        return self.$$full_name;
+      if (self[$$full_name]) {
+        return self[$$full_name];
       }
 
       var result = [], base = self;
 
       while (base) {
         // Give up if any of the ancestors is unnamed
-        if (base.$$name === nil || base.$$name == null) return nil;
+        if (base[$$name] === nil || base[$$name] == null) return nil;
 
-        result.unshift(base.$$name);
+        result.unshift(base[$$name]);
 
-        base = base.$$base_module;
+        base = base[$$base_module];
 
         if (base === $Object) {
           break;
@@ -651,7 +652,7 @@ class ::Module
         return nil;
       }
 
-      return self.$$full_name = result.join('::');
+      return self[$$full_name] = result.join('::');
     }
   end
 
@@ -664,7 +665,7 @@ class ::Module
       for (var i = mods.length - 1; i >= 0; i--) {
         var mod = mods[i];
 
-        if (!mod.$$is_module) {
+        if (!mod[$$is_module]) {
           #{::Kernel.raise ::TypeError, "wrong argument type #{`mod`.class} (expected Module)"};
         }
 
@@ -680,7 +681,7 @@ class ::Module
     %x{
       $deny_frozen_access(prepender);
 
-      if (!self.$$is_module) {
+      if (!self[$$is_module]) {
         #{::Kernel.raise ::TypeError, "wrong argument type #{self.class} (expected Module)"};
       }
 
@@ -699,14 +700,14 @@ class ::Module
   end
 
   def to_s
-    `Opal.Module.$name.call(self)` || "#<#{`self.$$is_module ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
+    `Opal.Module.$name.call(self)` || "#<#{`self[$$is_module] ? 'Module' : 'Class'`}:0x#{__id__.to_s(16)}>"
   end
 
   def undef_method(*names)
     %x{
       for (var i = 0; i < names.length; i++) {
         var name = names[i];
-        if (!(typeof name === "string" || name.$$is_string)) {
+        if (!(typeof name === "string" || name[$$is_string])) {
           #{raise ::TypeError, "#{name} is not a symbol nor a string"}
         }
         $deny_frozen_access(self);
@@ -739,23 +740,23 @@ class ::Module
       for (i = 0; i < method_names.length; i++) {
         var name = method_names[i],
             jsid = $jsid(name),
-            body = from.$$prototype[jsid],
+            body = from[$$prototype][jsid],
             wrapped = Opal.wrapMethodBody(body);
 
-        wrapped.$$jsid = name;
+        wrapped[$$jsid] = name;
         Opal.defn(to, jsid, wrapped);
       }
     }
 
     function copyIncludedModules(from, to) {
-      var modules = from.$$own_included_modules;
+      var modules = from[$$own_included_modules];
       for (var i = modules.length - 1; i >= 0; i--) {
         Opal.append_features(modules[i], to);
       }
     }
 
     function copyPrependedModules(from, to) {
-      var modules = from.$$own_prepended_modules;
+      var modules = from[$$own_prepended_modules];
       for (var i = modules.length - 1; i >= 0; i--) {
         Opal.prepend_features(modules[i], to);
       }
@@ -767,7 +768,7 @@ class ::Module
       copyInstanceMethods(other, self);
       copyIncludedModules(other, self);
       copyPrependedModules(other, self);
-      self.$$cloned_from = other.$$cloned_from.concat(other);
+      self[$$cloned_from] = other[$$cloned_from].concat(other);
     }
     copy_class_variables(other)
     copy_constants(other)
@@ -781,15 +782,15 @@ class ::Module
 
   def copy_class_variables(other)
     %x{
-      for (var name in other.$$cvars) {
-        self.$$cvars[name] = other.$$cvars[name];
+      for (var name in other[$$cvars]) {
+        self[$$cvars][name] = other[$$cvars][name];
       }
     }
   end
 
   def copy_constants(other)
     %x{
-      var name, other_constants = other.$$const;
+      var name, other_constants = other[$$const];
 
       for (name in other_constants) {
         $const_set(self, name, other_constants[name]);
@@ -801,14 +802,14 @@ class ::Module
     refinement_module, m, klass_id = self, nil, nil
     %x{
       klass_id = Opal.id(klass);
-      if (typeof self.$$refine_modules === "undefined") {
-        self.$$refine_modules = Object.create(null);
+      if (typeof self[$$refine_modules] === "undefined") {
+        self[$$refine_modules] = Object.create(null);
       }
-      if (typeof self.$$refine_modules[klass_id] === "undefined") {
-        m = self.$$refine_modules[klass_id] = #{::Refinement.new};
+      if (typeof self[$$refine_modules][klass_id] === "undefined") {
+        m = self[$$refine_modules][klass_id] = #{::Refinement.new};
       }
       else {
-        m = self.$$refine_modules[klass_id];
+        m = self[$$refine_modules][klass_id];
       }
       m.refinement_module = refinement_module
       m.refined_class = klass
@@ -819,7 +820,7 @@ class ::Module
 
   def refinements
     %x{
-      var refine_modules = self.$$refine_modules, hash = #{{}};;
+      var refine_modules = self[$$refine_modules], hash = #{{}};;
       if (typeof refine_modules === "undefined") return hash;
       for (var id in refine_modules) {
         hash['$[]='](refine_modules[id].refined_class, refine_modules[id]);

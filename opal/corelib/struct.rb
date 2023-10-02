@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: data, keyword_init, is_hash, is_range, is_number, is_string
 
 require 'corelib/enumerable'
 
@@ -32,7 +33,7 @@ class ::Struct
       class << self
         def new(*args)
           instance = allocate
-          `#{instance}.$$data = {}`
+          `#{instance}[$$data] = {}`
           instance.initialize(*args)
           instance
         end
@@ -42,7 +43,7 @@ class ::Struct
     end
 
     klass.module_eval(&block) if block
-    `klass.$$keyword_init = keyword_init`
+    `klass[$$keyword_init] = keyword_init`
 
     if const_name
       ::Struct.const_set(const_name, klass)
@@ -59,11 +60,11 @@ class ::Struct
     members << name
 
     define_method name do
-      `self.$$data[name]`
+      `self[$$data][name]`
     end
 
     define_method "#{name}=" do |value|
-      `self.$$data[name] = value`
+      `self[$$data][name] = value`
     end
   end
 
@@ -84,10 +85,10 @@ class ::Struct
   end
 
   def initialize(*args)
-    if `#{self.class}.$$keyword_init`
+    if `#{self.class}[$$keyword_init]`
       kwargs = args.last || {}
 
-      if args.length > 1 || `(args.length === 1 && !kwargs.$$is_hash)`
+      if args.length > 1 || `(args.length === 1 && !kwargs[$$is_hash])`
         ::Kernel.raise ::ArgumentError, "wrong number of arguments (given #{args.length}, expected 0)"
       end
 
@@ -112,17 +113,17 @@ class ::Struct
 
   def initialize_copy(from)
     %x{
-      self.$$data = {}
-      var keys = Object.keys(from.$$data), i, max, name;
+      self[$$data] = {}
+      var keys = Object.keys(from[$$data]), i, max, name;
       for (i = 0, max = keys.length; i < max; i++) {
         name = keys[i];
-        self.$$data[name] = from.$$data[name];
+        self[$$data][name] = from[$$data][name];
       }
     }
   end
 
   def self.keyword_init?
-    `self.$$keyword_init`
+    `self[$$keyword_init]`
   end
 
   def members
@@ -141,7 +142,7 @@ class ::Struct
       name = self.class.members[name]
     elsif ::String === name
       %x{
-        if(!self.$$data.hasOwnProperty(name)) {
+        if(!self[$$data].hasOwnProperty(name)) {
           #{::Kernel.raise ::NameError.new("no member '#{name}' in struct", name)}
         }
       }
@@ -150,7 +151,7 @@ class ::Struct
     end
 
     name = ::Opal.coerce_to!(name, ::String, :to_str)
-    `self.$$data[name]`
+    `self[$$data][name]`
   end
 
   def []=(name, value)
@@ -166,7 +167,7 @@ class ::Struct
     end
 
     name = ::Opal.coerce_to!(name, ::String, :to_str)
-    `self.$$data[name] = value`
+    `self[$$data][name] = value`
   end
 
   def ==(other)
@@ -181,9 +182,9 @@ class ::Struct
         recursed1[#{`struct`.__id__}] = true;
         recursed2[#{`other`.__id__}] = true;
 
-        for (key in struct.$$data) {
-          a = struct.$$data[key];
-          b = other.$$data[key];
+        for (key in struct[$$data]) {
+          a = struct[$$data][key];
+          b = other[$$data][key];
 
           if (#{::Struct === `a`}) {
             if (!recursed1.hasOwnProperty(#{`a`.__id__}) || !recursed2.hasOwnProperty(#{`b`.__id__})) {
@@ -217,9 +218,9 @@ class ::Struct
         recursed1[#{`struct`.__id__}] = true;
         recursed2[#{`other`.__id__}] = true;
 
-        for (key in struct.$$data) {
-          a = struct.$$data[key];
-          b = other.$$data[key];
+        for (key in struct[$$data]) {
+          a = struct[$$data][key];
+          b = other[$$data][key];
 
           if (#{::Struct === `a`}) {
             if (!recursed1.hasOwnProperty(#{`a`.__id__}) || !recursed2.hasOwnProperty(#{`b`.__id__})) {
@@ -297,11 +298,11 @@ class ::Struct
   end
 
   def values_at(*args)
-    args = args.map { |arg| `arg.$$is_range ? #{arg.to_a} : arg` }.flatten
+    args = args.map { |arg| `arg[$$is_range] ? #{arg.to_a} : arg` }.flatten
     %x{
       var result = [];
       for (var i = 0, len = args.length; i < len; i++) {
-        if (!args[i].$$is_number) {
+        if (!args[i][$$is_number]) {
           #{::Kernel.raise ::TypeError, "no implicit conversion of #{`args[i]`.class} into Integer"}
         }
         result.push(#{self[`args[i]`]});
@@ -311,8 +312,8 @@ class ::Struct
   end
 
   def dig(key, *keys)
-    item = if `key.$$is_string && self.$$data.hasOwnProperty(key)`
-             `self.$$data[key] || nil`
+    item = if `key[$$is_string] && self[$$data].hasOwnProperty(key)`
+             `self[$$data][key] || nil`
            end
 
     %x{

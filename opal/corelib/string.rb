@@ -1,5 +1,6 @@
 # helpers: coerce_to, respond_to, global_multiline_regexp, prop, opal32_init, opal32_add
 # backtick_javascript: true
+# special_symbols: prototype, is_string, is_hash, constructor, pristine, class, is_range, is_regexp, frozen, p, source_location, encoding, internal_encoding
 
 require 'corelib/comparable'
 require 'corelib/regexp'
@@ -8,7 +9,7 @@ class ::String < `String`
   include ::Comparable
 
   %x{
-    Opal.prop(#{self}.$$prototype, '$$is_string', true);
+    Opal.prop(#{self}[$$prototype], $$is_string, true);
 
     var string_id_map = new Map();
   }
@@ -56,11 +57,11 @@ class ::String < `String`
       var str = args[0] || "";
       var opts = args[args.length-1];
       str = $coerce_to(str, #{::String}, 'to_str');
-      if (opts && opts.$$is_hash) {
+      if (opts && opts[$$is_hash]) {
         if (opts.has('encoding')) str = str.$force_encoding(opts.get('encoding').value);
       }
-      str = new self.$$constructor(str);
-      if (!str.$initialize.$$pristine) #{`str`.initialize(*args)};
+      str = new self[$$constructor](str);
+      if (!str.$initialize[$$pristine]) #{`str`.initialize(*args)};
       return str;
     }
   end
@@ -123,12 +124,12 @@ class ::String < `String`
     other = `$coerce_to(#{other}, #{::String}, 'to_str')`
 
     %x{
-      if (other == "" && self.$$class === Opal.String) return #{self};
-      if (self == "" && other.$$class === Opal.String) return #{other};
+      if (other == "" && self[$$class] === Opal.String) return #{self};
+      if (self == "" && other[$$class] === Opal.String) return #{other};
       var out = self + other;
-      if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
-      if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
-      return Opal.enc(out, self.encoding);
+      if (self[$$encoding] === out[$$encoding] && other[$$encoding] === out[$$encoding]) return out;
+      if (self[$$encoding].name === "UTF-8" || other[$$encoding].name === "UTF-8") return out;
+      return Opal.enc(out, self[$$encoding]);
     }
   end
 
@@ -153,7 +154,7 @@ class ::String < `String`
 
   def ==(other)
     %x{
-      if (other.$$is_string) {
+      if (other[$$is_string]) {
         return self.toString() === other.toString();
       }
       if ($respond_to(other, '$to_str')) {
@@ -165,7 +166,7 @@ class ::String < `String`
 
   def =~(other)
     %x{
-      if (other.$$is_string) {
+      if (other[$$is_string]) {
         #{::Kernel.raise ::TypeError, 'type mismatch: String given'};
       }
 
@@ -177,7 +178,7 @@ class ::String < `String`
     %x{
       var size = self.length, exclude, range;
 
-      if (index.$$is_range) {
+      if (index[$$is_range]) {
         exclude = index.excl;
         range   = index;
         length  = index.end === nil ? -1 : $coerce_to(index.end, #{::Integer}, 'to_int');
@@ -209,7 +210,7 @@ class ::String < `String`
       }
 
 
-      if (index.$$is_string) {
+      if (index[$$is_string]) {
         if (length != null) {
           #{::Kernel.raise ::TypeError}
         }
@@ -217,7 +218,7 @@ class ::String < `String`
       }
 
 
-      if (index.$$is_regexp) {
+      if (index[$$is_regexp]) {
         var match = self.match(index);
 
         if (match === null) {
@@ -382,9 +383,9 @@ class ::String < `String`
     copy.initialize_clone(self, freeze: freeze)
 
     if freeze == true
-      `if (!copy.$$frozen) { copy.$$frozen = true; }`
+      `if (!copy[$$frozen]) { copy[$$frozen] = true; }`
     elsif freeze.nil?
-      `if (self.$$frozen) { copy.$$frozen = true; }`
+      `if (self[$$frozen]) { copy[$$frozen] = true; }`
     end
 
     copy
@@ -424,7 +425,7 @@ class ::String < `String`
 
   def delete_prefix(prefix)
     %x{
-      if (!prefix.$$is_string) {
+      if (!prefix[$$is_string]) {
         prefix = $coerce_to(prefix, #{::String}, 'to_str');
       }
 
@@ -438,7 +439,7 @@ class ::String < `String`
 
   def delete_suffix(suffix)
     %x{
-      if (!suffix.$$is_string) {
+      if (!suffix[$$is_string]) {
         suffix = $coerce_to(suffix, #{::String}, 'to_str');
       }
 
@@ -528,7 +529,7 @@ class ::String < `String`
 
       var result = '', match_data = nil, index = 0, match, _replacement;
 
-      if (pattern.$$is_regexp) {
+      if (pattern[$$is_regexp]) {
         pattern = $global_multiline_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str');
@@ -552,11 +553,11 @@ class ::String < `String`
           _replacement = block(match[0]);
           pattern.lastIndex = lastIndex; // save and restore lastIndex
         }
-        else if (replacement.$$is_hash) {
+        else if (replacement[$$is_hash]) {
           _replacement = #{`replacement`[`match[0]`].to_s};
         }
         else {
-          if (!replacement.$$is_string) {
+          if (!replacement[$$is_string]) {
             replacement = $coerce_to(replacement, #{::String}, 'to_str');
           }
           _replacement = replacement.replace(/([\\]+)([0-9+&`'])/g, function (original, slashes, command) {
@@ -600,7 +601,7 @@ class ::String < `String`
 
   def include?(other)
     %x{
-      if (!other.$$is_string) {
+      if (!other[$$is_string]) {
         other = $coerce_to(other, #{::String}, 'to_str');
       }
       return self.indexOf(other) !== -1;
@@ -625,7 +626,7 @@ class ::String < `String`
         }
       }
 
-      if (search.$$is_regexp) {
+      if (search[$$is_regexp]) {
         regex = $global_multiline_regexp(search);
         while (true) {
           match = regex.exec(self);
@@ -673,7 +674,7 @@ class ::String < `String`
           escaped = self.replace(escapable, function (chr) {
             if (meta[chr]) return meta[chr];
             chr = chr.charCodeAt(0);
-            if (chr <= 0xff && (self.encoding["$binary?"]() || self.internal_encoding["$binary?"]())) {
+            if (chr <= 0xff && (self[$$encoding]["$binary?"]() || self[$$internal_encoding]["$binary?"]())) {
               return '\\x' + ('00' + chr.toString(16).toUpperCase()).slice(-2);
             } else {
               return '\\u' + ('0000' + chr.toString(16).toUpperCase()).slice(-4);
@@ -730,7 +731,7 @@ class ::String < `String`
   def ascii_only?
     # non-ASCII-compatible encoding must return false
     %x{
-      if (!self.encoding.ascii) return false;
+      if (!self[$$encoding].ascii) return false;
       return /^[\x00-\x7F]*$/.test(self);
     }
   end
@@ -887,7 +888,7 @@ class ::String < `String`
     %x{
       var i, m;
 
-      if (sep.$$is_regexp) {
+      if (sep[$$is_regexp]) {
         m = sep.exec(self);
         if (m === null) {
           i = -1;
@@ -933,7 +934,7 @@ class ::String < `String`
         }
       }
 
-      if (search.$$is_regexp) {
+      if (search[$$is_regexp]) {
         m = null;
         r = $global_multiline_regexp(search);
         while (true) {
@@ -984,7 +985,7 @@ class ::String < `String`
     %x{
       var i, m, r, _m;
 
-      if (sep.$$is_regexp) {
+      if (sep[$$is_regexp]) {
         m = null;
         r = $global_multiline_regexp(sep);
 
@@ -1032,7 +1033,7 @@ class ::String < `String`
           match_data = nil,
           match;
 
-      if (pattern.$$is_regexp) {
+      if (pattern[$$is_regexp]) {
         pattern = $global_multiline_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str');
@@ -1093,7 +1094,7 @@ class ::String < `String`
           valid_result_length = 0,
           i, max;
 
-      if (pattern.$$is_regexp) {
+      if (pattern[$$is_regexp]) {
         pattern = $global_multiline_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str').$to_s();
@@ -1121,7 +1122,7 @@ class ::String < `String`
         return result;
       }
 
-      if (!pattern.$$is_regexp) {
+      if (!pattern[$$is_regexp]) {
         pattern = Opal.escape_regexp(pattern)
         pattern = new RegExp(pattern, 'gm');
       }
@@ -1177,7 +1178,7 @@ class ::String < `String`
   def start_with?(*prefixes)
     %x{
       for (var i = 0, length = prefixes.length; i < length; i++) {
-        if (prefixes[i].$$is_regexp) {
+        if (prefixes[i][$$is_regexp]) {
           var regexp = prefixes[i];
           var match = regexp.exec(self);
 
@@ -1206,7 +1207,7 @@ class ::String < `String`
 
   def sub(pattern, replacement = undefined, &block)
     %x{
-      if (!pattern.$$is_regexp) {
+      if (!pattern[$$is_regexp]) {
         pattern = $coerce_to(pattern, #{::String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       }
@@ -1226,7 +1227,7 @@ class ::String < `String`
           }
           result = self.slice(0, match.index) + block(match[0]) + self.slice(match.index + match[0].length);
 
-        } else if (replacement.$$is_hash) {
+        } else if (replacement[$$is_hash]) {
 
           result = self.slice(0, match.index) + #{`replacement`[`match[0]`].to_s} + self.slice(match.index + match[0].length);
 
@@ -1391,7 +1392,7 @@ class ::String < `String`
         }
 
         if (typeof block === 'function') {
-          body.$$p = block;
+          body[$$p] = block;
         }
 
         if (args.length === 0) {
@@ -1402,7 +1403,7 @@ class ::String < `String`
       }
     end
 
-    `proc.$$source_location = nil`
+    `proc[$$source_location] = nil`
 
     proc
   end
@@ -1891,7 +1892,7 @@ class ::String < `String`
   def freeze
     %x{
       if (typeof self === 'string') { return self; }
-      $prop(self, "$$frozen", true);
+      $prop(self, $$frozen, true);
       return self;
     }
   end
@@ -1899,14 +1900,14 @@ class ::String < `String`
   def -@
     %x{
       if (typeof self === 'string') return self;
-      if (self.$$frozen) return self;
-      if (self.encoding.name == 'UTF-8' && self.internal_encoding.name == 'UTF-8') return self.toString();
+      if (self[$$frozen]) return self;
+      if (self[$$encoding].name == 'UTF-8' && self[$$internal_encoding].name == 'UTF-8') return self.toString();
       return self.$dup().$freeze();
     }
   end
 
   def frozen?
-    `typeof self === 'string' || self.$$frozen === true`
+    `typeof self === 'string' || self[$$frozen] === true`
   end
 
   alias +@ dup

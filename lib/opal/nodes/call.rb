@@ -377,14 +377,16 @@ module Opal
 
       add_special :nesting do |compile_default|
         push_nesting = push_nesting?
-        push "(Opal.Module.$$nesting = #{scope.nesting}, " if push_nesting
+        special_symbol :nesting
+        push "(Opal.Module[$$nesting] = #{scope.nesting}, " if push_nesting
         compile_default.call
         push ')' if push_nesting
       end
 
       add_special :constants do |compile_default|
         push_nesting = push_nesting?
-        push "(Opal.Module.$$nesting = #{scope.nesting}, " if push_nesting
+        special_symbol :nesting
+        push "(Opal.Module[$$nesting] = #{scope.nesting}, " if push_nesting
         compile_default.call
         push ')' if push_nesting
       end

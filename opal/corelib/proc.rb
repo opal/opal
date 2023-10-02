@@ -1,9 +1,10 @@
 # helpers: slice
 # backtick_javascript: true
+# special_symbols: prototype, is_proc, is_lambda, ret, brk, p, is_curried, s, parameters, original_proc, source_location, arity
 
 class ::Proc < `Function`
-  `Opal.prop(self.$$prototype, '$$is_proc', true)`
-  `Opal.prop(self.$$prototype, '$$is_lambda', false)`
+  `Opal.prop(self[$$prototype], $$is_proc, true)`
+  `Opal.prop(self[$$prototype], $$is_lambda, false)`
 
   def self.new(&block)
     unless block
@@ -15,11 +16,11 @@ class ::Proc < `Function`
 
   %x{
     function $call_lambda(self, args) {
-      if (self.$$ret) {
+      if (self[$$ret]) {
         try {
           return self.apply(null, args);
         } catch (err) {
-          if (err === self.$$ret) {
+          if (err === self[$$ret]) {
             return err.$v;
           } else {
             throw err;
@@ -31,11 +32,11 @@ class ::Proc < `Function`
     }
 
     function $call_proc(self, args) {
-      if (self.$$brk) {
+      if (self[$$brk]) {
         try {
           return Opal.yieldX(self, args);
         } catch (err) {
-          if (err === self.$$brk) {
+          if (err === self[$$brk]) {
             return err.$v;
           } else {
             throw err;
@@ -49,8 +50,8 @@ class ::Proc < `Function`
 
   def call(*args, &block)
     %x{
-      if (block !== nil) self.$$p = block;
-      if (self.$$is_lambda) return $call_lambda(self, args);
+      if (block !== nil) self[$$p] = block;
+      if (self[$$is_lambda]) return $call_lambda(self, args);
       return $call_proc(self, args);
     }
   end
@@ -76,15 +77,15 @@ class ::Proc < `Function`
   def lambda?
     # This method should tell the user if the proc tricks are unavailable,
     # (see Proc#lambda? on ruby docs to find out more).
-    `!!self.$$is_lambda`
+    `!!self[$$is_lambda]`
   end
 
   def arity
     %x{
-      if (self.$$is_curried) {
+      if (self[$$is_curried]) {
         return -1;
-      } else if (self.$$arity != null) {
-        return self.$$arity;
+      } else if (self[$$arity] != null) {
+        return self[$$arity];
       } else {
         return self.length;
       }
@@ -92,30 +93,30 @@ class ::Proc < `Function`
   end
 
   def source_location
-    `if (self.$$is_curried) { return nil; }`
-    `self.$$source_location` || nil
+    `if (self[$$is_curried]) { return nil; }`
+    `self[$$source_location]` || nil
   end
 
   def binding
-    `if (self.$$is_curried) { #{::Kernel.raise ::ArgumentError, "Can't create Binding"} }`
+    `if (self[$$is_curried]) { #{::Kernel.raise ::ArgumentError, "Can't create Binding"} }`
 
     if defined? ::Binding
-      ::Binding.new(nil, [], `self.$$s`, source_location)
+      ::Binding.new(nil, [], `self[$$s]`, source_location)
     end
   end
 
   def parameters(lambda: undefined)
     %x{
-      if (self.$$is_curried) {
+      if (self[$$is_curried]) {
         return #{[[:rest]]};
-      } else if (self.$$parameters) {
-        if (lambda == null ? self.$$is_lambda : lambda) {
-          return self.$$parameters;
+      } else if (self[$$parameters]) {
+        if (lambda == null ? self[$$is_lambda] : lambda) {
+          return self[$$parameters];
         } else {
           var result = [], i, length;
 
-          for (i = 0, length = self.$$parameters.length; i < length; i++) {
-            var parameter = self.$$parameters[i];
+          for (i = 0, length = self[$$parameters].length; i < length; i++) {
+            var parameter = self[$$parameters][i];
 
             if (parameter[0] === 'req') {
               // required arguments always have name
@@ -140,7 +141,7 @@ class ::Proc < `Function`
       }
       else {
         arity = #{::Opal.coerce_to!(arity, ::Integer, :to_int)};
-        if (self.$$is_lambda && arity !== self.length) {
+        if (self[$$is_lambda] && arity !== self.length) {
           #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arity`} for #{`self.length`})"}
         }
       }
@@ -150,7 +151,7 @@ class ::Proc < `Function`
             length = args.length,
             result;
 
-        if (length > arity && self.$$is_lambda && !self.$$is_curried) {
+        if (length > arity && self[$$is_lambda] && !self[$$is_curried]) {
           #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`length`} for #{`arity`})"}
         }
 
@@ -162,21 +163,21 @@ class ::Proc < `Function`
           return curried.apply(null,
             args.concat($slice(arguments)));
         }
-        result.$$is_lambda = self.$$is_lambda;
-        result.$$is_curried = true;
+        result[$$is_lambda] = self[$$is_lambda];
+        result[$$is_curried] = true;
 
         return result;
       };
 
-      curried.$$is_lambda = self.$$is_lambda;
-      curried.$$is_curried = true;
+      curried[$$is_lambda] = self[$$is_lambda];
+      curried[$$is_curried] = true;
       return curried;
     }
   end
 
   def dup
     %x{
-      var original_proc = self.$$original_proc || self,
+      var original_proc = self[$$original_proc] || self,
           proc = function () {
             return original_proc.apply(this, arguments);
           };

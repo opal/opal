@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: is_array
 
 module JSON
   class JSONError < StandardError
@@ -37,7 +38,7 @@ module JSON
         case 'object':
           if (!value) return nil;
 
-          if (value.$$is_array) {
+          if (value[$$is_array]) {
             arr = #{`Opal.hash_get(options, 'array_class')`.new};
 
             for (i = 0, ii = value.length; i < ii; i++) {

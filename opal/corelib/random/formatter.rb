@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: is_range, is_number
 
 class ::Random
   module self::Formatter
@@ -85,9 +86,9 @@ class ::Random
 
         if (limit == null) {
           return randomFloat();
-        } else if (limit.$$is_range) {
+        } else if (limit[$$is_range]) {
           return randomRange();
-        } else if (limit.$$is_number) {
+        } else if (limit[$$is_number]) {
           if (limit <= 0) {
             #{::Kernel.raise ::ArgumentError, "invalid argument - #{limit}"}
           }

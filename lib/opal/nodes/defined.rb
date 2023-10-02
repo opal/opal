@@ -114,7 +114,8 @@ module Opal
         push "(#{recv_value_tmp} = #{recv_tmp}) && "
 
         meth_tmp = scope.new_temp
-        push "(((#{meth_tmp} = #{recv_value_tmp}#{mid}) && !#{meth_tmp}.$$stub)"
+        special_symbol :stub
+        push "(((#{meth_tmp} = #{recv_value_tmp}#{mid}) && !#{meth_tmp}[$$stub])"
 
         push " || #{recv_value_tmp}['$respond_to_missing?']('#{method_name}'))"
 
@@ -178,7 +179,8 @@ module Opal
       def compile_defined_cvar(node)
         cvar_name, _ = *node
         cvar_tmp = scope.new_temp
-        push "(#{cvar_tmp} = #{class_variable_owner}.$$cvars['#{cvar_name}'], #{cvar_tmp} != null)"
+        special_symbol :cvars
+        push "(#{cvar_tmp} = #{class_variable_owner}[$$cvars]['#{cvar_name}'], #{cvar_tmp} != null)"
         cvar_tmp
       end
 
