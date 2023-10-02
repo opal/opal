@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: keys
 
 describe 'Hash' do
 
@@ -29,20 +30,20 @@ describe 'Hash' do
       `Array.from(#@h.values())[2]`.should == 789
     end
 
-    it 'does not use the `Map.$$keys`' do
-      `(#@h.$$keys === undefined)`.should == true
+    it 'does not use the `Map[$$keys]`' do
+      `(#@h[$$keys] === undefined)`.should == true
 
       @h['c'] = 789
 
-      `(#@h.$$keys === undefined)`.should == true
+      `(#@h[$$keys] === undefined)`.should == true
     end
 
-    it 'uses the `Map.$$keys` object when an object key is added' do
-      `(#@h.$$keys === undefined)`.should == true
+    it 'uses the `Map[$$keys]` object when an object key is added' do
+      `(#@h[$$keys] === undefined)`.should == true
 
       @h[Object.new] = 789
 
-      `#@h.$$keys.size`.should == 1
+      `#@h[$$keys].size`.should == 1
     end
 
     it 'converts string objects to values when used to delete keys' do
@@ -60,8 +61,8 @@ describe 'Hash' do
       @h = {@obj1 => 123, @obj2 => 456}
     end
 
-    it 'uses a `Map.$$keys` to keep references of objects to be used as keys' do
-      keys = `Array.from(#@h.$$keys.entries())`
+    it 'uses a `Map[$$keys]` to keep references of objects to be used as keys' do
+      keys = `Array.from(#@h[$$keys].entries())`
       `#{keys}[0][1][0]`.should == @obj1
       `#{keys}[0][0]`.should == @obj1.hash
     end
@@ -82,27 +83,27 @@ describe 'Hash' do
       @mock3.should_receive(:eql?).exactly(2).and_return(false)
 
       `#@hash.size`.should == 0
-      `(#@hash.$$keys === undefined)`.should == true
+      `(#@hash[$$keys] === undefined)`.should == true
 
       @hash[@mock1] = 123
-      `#@hash.$$keys.size`.should == 1
-      keys = `Array.from(#@hash.$$keys.entries())`
+      `#@hash[$$keys].size`.should == 1
+      keys = `Array.from(#@hash[$$keys].entries())`
       `#{keys}[0][1].length`.should == 1
       `#{keys}[0][1][0]`.should == @mock1
       `#{keys}[0][0]`.should == @mock1.hash
       `#@hash.get(#@mock1)`.should == 123
 
       @hash[@mock2] = 456
-      `#@hash.$$keys.size`.should == 1
-      keys = `Array.from(#@hash.$$keys.entries())`
+      `#@hash[$$keys].size`.should == 1
+      keys = `Array.from(#@hash[$$keys].entries())`
       `#{keys}[0][1].length`.should == 2
       `#{keys}[0][1][1]`.should == @mock2
       `#{keys}[0][0]`.should == @mock2.hash
       `#@hash.get(#@mock2)`.should == 456
 
       @hash[@mock3] = 789
-      `#@hash.$$keys.size`.should == 1
-      keys = `Array.from(#@hash.$$keys.entries())`
+      `#@hash[$$keys].size`.should == 1
+      keys = `Array.from(#@hash[$$keys].entries())`
       `#{keys}[0][1].length`.should == 3
       `#{keys}[0][1][2]`.should == @mock3
       `#{keys}[0][0]`.should == @mock3.hash
@@ -110,8 +111,8 @@ describe 'Hash' do
 
       obj = Object.new
       @hash[obj] = 999
-      `#@hash.$$keys.size`.should == 2
-      keys = `Array.from(#@hash.$$keys.entries())`
+      `#@hash[$$keys].size`.should == 2
+      keys = `Array.from(#@hash[$$keys].entries())`
       `#{keys}[1][1].length`.should == 1
       `#{keys}[1][1][0]`.should == obj
       `#{keys}[1][0]`.should == obj.hash
@@ -146,14 +147,14 @@ describe 'Hash' do
         @obj1  => 'xyz'
       }
 
-      `#@hash.$$keys.has('hhh')`.should == true
-      `#@hash.$$keys.has(#{@obj1.hash})`.should == true
+      `#@hash[$$keys].has('hhh')`.should == true
+      `#@hash[$$keys].has(#{@obj1.hash})`.should == true
       `#@hash.has('a')`.should == true
       `#@hash.has('b')`.should == true
       `#@hash.has('c')`.should == true
 
       `#@hash.size`.should == 8
-      `#@hash.$$keys.size`.should == 2
+      `#@hash[$$keys].size`.should == 2
 
       keys = `Array.from(#@hash.keys())`
       keys[0].should == @mock1
@@ -165,20 +166,20 @@ describe 'Hash' do
       keys[6].should == 'c'
       keys[7].should == @obj1
 
-      keys = `Array.from(#@hash.$$keys.values())[0]`
+      keys = `Array.from(#@hash[$$keys].values())[0]`
       `#{keys}.length`.should == 4
       keys[0].should == @mock1
       keys[1].should == @mock2
       keys[2].should == @mock3
       keys[3].should == @mock4
-      keys = `Array.from(#@hash.$$keys.values())[1]`
+      keys = `Array.from(#@hash[$$keys].values())[1]`
       `#{keys}.length`.should == 1
       keys[0].should == @obj1
 
       @hash.delete @mock2
 
       `#@hash.size`.should == 7
-      keys = `Array.from(#@hash.$$keys.values())[0]`
+      keys = `Array.from(#@hash[$$keys].values())[0]`
       `#{keys}.length`.should == 3
       keys[0].should == @mock1
       keys[1].should == @mock3
@@ -196,7 +197,7 @@ describe 'Hash' do
       @hash.delete @mock4
 
       `#@hash.size`.should == 6
-      keys = `Array.from(#@hash.$$keys.values())[0]`
+      keys = `Array.from(#@hash[$$keys].values())[0]`
       `#{keys}.length`.should == 2
       keys[0].should == @mock1
       keys[1].should == @mock3
@@ -212,7 +213,7 @@ describe 'Hash' do
       @hash.delete @mock1
 
       `#@hash.size`.should == 5
-      keys = `Array.from(#@hash.$$keys.values())[0]`
+      keys = `Array.from(#@hash[$$keys].values())[0]`
       `#{keys}.length`.should == 1
       keys[0].should == @mock3
 
@@ -226,8 +227,8 @@ describe 'Hash' do
       @hash.delete @mock3
 
       `#@hash.size`.should == 4
-      `#@hash.$$keys.size`.should == 1
-      keys = `Array.from(#@hash.$$keys.values())[0]`
+      `#@hash[$$keys].size`.should == 1
+      keys = `Array.from(#@hash[$$keys].values())[0]`
       `#{keys}.length`.should == 1
       keys[0].should == @obj1
 
@@ -240,19 +241,19 @@ describe 'Hash' do
       @hash.delete @obj1
 
       `#@hash.size`.should == 3
-      `#@hash.$$keys.size`.should == 0
+      `#@hash[$$keys].size`.should == 0
 
       keys = `Array.from(#@hash.keys())`
       keys[0].should == 'a'
       keys[1].should == 'b'
       keys[2].should == 'c'
 
-      `#@hash.$$keys.get(#{@obj1.hash}) === undefined`.should == true
+      `#@hash[$$keys].get(#{@obj1.hash}) === undefined`.should == true
 
       @hash.delete 'b'
 
       `#@hash.size`.should == 2
-      `#@hash.$$keys.size`.should == 0
+      `#@hash[$$keys].size`.should == 0
 
       keys = `Array.from(#@hash.keys())`
       keys[0].should == 'a'
@@ -265,7 +266,7 @@ describe 'Hash' do
       @hash.delete 'c'
 
       `#@hash.size`.should == 1
-      `#@hash.$$keys.size`.should == 0
+      `#@hash[$$keys].size`.should == 0
 
       keys = `Array.from(#@hash.keys())`
       keys[0].should == 'a'
@@ -277,7 +278,7 @@ describe 'Hash' do
       @hash.delete 'a'
 
       `#@hash.size`.should == 0
-      `#@hash.$$keys.size`.should == 0
+      `#@hash[$$keys].size`.should == 0
 
       `#@hash.get('a') === undefined`.should == true
       `#@hash.get('b') === undefined`.should == true
