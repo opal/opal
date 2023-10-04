@@ -5,18 +5,22 @@ require 'opal/nodes/base'
 module Opal
   module Nodes
     class ValueNode < Base
-      handle :true, :false, :self, :nil
+      handle :true, :false, :nil
 
       def compile
-        if type == :self
-          push scope.self
-        else
-          push type.to_s
-        end
+        push type.to_s
       end
 
       def self.truthy_optimize?
         true
+      end
+    end
+
+    class SelfNode < Base
+      handle :self
+
+      def compile
+        push scope.self
       end
     end
 
