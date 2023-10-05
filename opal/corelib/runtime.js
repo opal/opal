@@ -155,6 +155,14 @@
     }
   }
 
+  // Reuse the same object for performance/memory sake
+  var prop_options = {
+    value: undefined,
+    enumerable: false,
+    configurable: true,
+    writable: true
+  };
+
   function $prop(object, name, initialValue) {
     if (typeof(object) === "string") {
       // Special case for:
@@ -166,12 +174,8 @@
       // numbers, true, false and null do not support it.
       object[name] = initialValue;
     } else {
-      Object.defineProperty(object, name, {
-        value: initialValue,
-        enumerable: false,
-        configurable: true,
-        writable: true
-      });
+      prop_options.value = initialValue;
+      Object.defineProperty(object, name, prop_options);
     }
   }
 
