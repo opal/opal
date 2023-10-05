@@ -176,19 +176,6 @@
 
   Opal.prop = $prop;
 
-  // Defines a property to be dynamic, having getter
-  // and possibly a setter
-  function $prop_gs(object, name, enumerable, getter, setter) {
-    Object.defineProperty(object, name, {
-      enumerable: enumerable,
-      configurable: true,
-      get: getter,
-      set: setter
-    });
-  }
-
-  Opal.prop_gs = $prop_gs;
-
   // @deprecated
   Opal.defineProperty = Opal.prop;
 
@@ -2253,14 +2240,16 @@
   };
 
   Opal.alias_gvar = function(new_name, old_name) {
-    $prop_gs($gvars, new_name, true,
-      function() {
+    Object.defineProperty($gvars, new_name, {
+      configurable: true,
+      enumerable: true,
+      get: function() {
         return $gvars[old_name];
       },
-      function(new_value) {
+      set: function(new_value) {
         $gvars[old_name] = new_value;
       }
-    );
+    });
     return nil;
   }
 
@@ -2606,10 +2595,11 @@
         (function() {
           // set v to undefined, as if the property is not set
           var cv = obj[prop];
-          $prop_gs(obj, prop, true,
-            function() { return cv; },
-            function(_val) { $deny_frozen_access(obj); }
-          );
+          Object.defineProperty(obj, prop, {
+            get: function() { return cv; },
+            set: function(_val) { $deny_frozen_access(obj); },
+            enumerable: true
+          });
         })();
       }
     }
@@ -3076,24 +3066,18 @@
   };
 
   // Define a "$@" global variable, which would compute and return a backtrace on demand.
-  $prop_gs($gvars, "@", true,
-    function() {
-      if ($truthy($gvars["!"])) {
-        return $gvars["!"].$backtrace();
-      }
-      else {
-        return nil;
-      }
+  Object.defineProperty($gvars, "@", {
+    enumerable: true,
+    configurable: true,
+    get: function() {
+      if ($truthy($gvars["!"])) return $gvars["!"].$backtrace();
+      return nil;
     },
-    function(bt) {
-      if ($truthy($gvars["!"])) {
-        $gvars["!"].$set_backtrace(bt);
-      }
-      else {
-        $raise(Opal.ArgumentError, "$! not set");
-      }
+    set: function(bt) {
+      if ($truthy($gvars["!"])) return $gvars["!"].$set_backtrace(bt);
+      $raise(Opal.ArgumentError, "$! not set");
     }
-  );
+  });
 
   Opal.t_eval_return = Opal.thrower("return");
 
