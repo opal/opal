@@ -31,7 +31,6 @@ opal_filter "Time" do
   fails "Time#getlocal with a timezone argument subject's class implements .find_timezone method calls .find_timezone to build a time object if passed zone name as a timezone argument" # NoMethodError: undefined method `getlocal' for 2000-01-01 12:00:00 UTC
   fails "Time#getlocal with a timezone argument subject's class implements .find_timezone method does not call .find_timezone if passed any not string/numeric/timezone timezone argument" # Expected TypeError (/can't convert \w+ into an exact number/) but got: NoMethodError (undefined method `getlocal' for 2000-01-01 12:00:00 UTC)
   fails "Time#gmtime converts self to UTC, modifying the receiver" # Expected 2007-01-09 05:00:00 UTC == 2007-01-09 12:00:00 UTC to be truthy but was false
-  fails "Time#hash returns an Integer" # Expected "Time:100000" (String) to be an instance of Integer
   fails "Time#inspect omits trailing zeros from microseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.1 UTC" to be truthy but was false
   fails "Time#inspect preserves microseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.123456 UTC" to be truthy but was false
   fails "Time#inspect preserves nanoseconds" # Expected "2007-11-01 15:25:00 UTC" == "2007-11-01 15:25:00.123456789 UTC" to be truthy but was false

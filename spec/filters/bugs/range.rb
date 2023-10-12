@@ -61,7 +61,6 @@ opal_filter "Range" do
   fails "Range#first raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised ([2] was returned)
   fails "Range#frozen? is true for Range.new" # Expected 1..2.frozen? to be truthy but was false
   fails "Range#frozen? is true for literal ranges" # Expected 1..2.frozen? to be truthy but was false
-  fails "Range#hash generates an Integer for the hash value" # Expected "A,1,1,0" (String) to be an instance of Integer
   fails "Range#include? does not include U+9995 in the range U+0999..U+9999" # Expected true to be false
   fails "Range#include? on string elements returns false if other is not matched by element.succ" # Expected true to be false
   fails "Range#include? with weird succ when excluded end value returns false if other is not matched by element.succ" # Expected true to be false

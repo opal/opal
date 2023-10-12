@@ -126,10 +126,9 @@
     }
     else if (exception) {
       $gvars["!"] = exception;
-      $gvars["@"] = exception.$backtrace();
     }
     else {
-      $gvars["!"] = $gvars["@"] = nil;
+      $gvars["!"] = nil;
     }
   };
 
@@ -3069,6 +3068,22 @@
     }
     return thrower;
   };
+
+  // Define a "$@" global variable, which would compute and return a backtrace on demand.
+  Object.defineProperty($gvars, "@", {
+    enumerable: true,
+    configurable: true,
+    get: function() {
+      if ($truthy($gvars["!"])) return $gvars["!"].$backtrace();
+      return nil;
+    },
+    set: function(bt) {
+      if ($truthy($gvars["!"]))
+        $gvars["!"].$set_backtrace(bt);
+      else
+        $raise(Opal.ArgumentError, "$! not set");
+    }
+  });
 
   Opal.t_eval_return = Opal.thrower("return");
 

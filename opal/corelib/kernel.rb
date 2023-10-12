@@ -687,7 +687,6 @@ module ::Kernel
       }
 
       #{$!} = exception;
-      #{$@} = #{`exception`.backtrace};
 
       throw exception;
     }
