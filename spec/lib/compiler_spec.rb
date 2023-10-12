@@ -214,6 +214,10 @@ RSpec.describe Opal::Compiler do
           expect_compiled("foo = 42 if Test > 4").to include("if ($truthy($rb_gt($$('Test'), 4))) ")
         end
 
+        it 'adds nil check for self' do
+          expect_compiled("foo = 42 if self > 4").to include("if ($truthy($rb_gt(self, 4))) ")
+        end
+
         it 'converts each == call inside if to an $eqeq wrapper, which does a truthy check' do
           expect_compiled('foo = 42 if 2 == 3').to include("if ($eqeq(2, 3))")
           expect_compiled('foo = 42 if 2.5 == 3.5').to include("if ($eqeq(2.5, 3.5))")
