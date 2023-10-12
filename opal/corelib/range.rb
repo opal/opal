@@ -19,7 +19,7 @@ class ::Range
   end
 
   def ===(value)
-    include? value
+    cover? value
   end
 
   %x{
@@ -110,6 +110,29 @@ class ::Range
   def first(n = undefined)
     ::Kernel.raise ::RangeError, 'cannot get the minimum of beginless range' if @begin.nil?
     return @begin if `n == null`
+    super
+  end
+
+  def include?(val)
+    if `self.begin.$$is_number || self.end.$$is_number` ||
+        @begin.is_a?(::Time) || @end.is_a?(::Time) ||
+        ::Integer.try_convert(@begin) || ::Integer.try_convert(@end)
+      return cover?(val)
+    end
+
+    if `self.begin.$$is_string || self.end.$$is_string`
+      if `self.begin.$$is_string && self.end.$$is_string`
+        return @begin.upto(@end, @excl).any? { |s| s == val }
+      elsif @begin.nil?
+        cmp = val <=> @end
+        return !cmp.nil? && (@excl ? cmp < 0 : cmp <= 0)
+      elsif @end.nil?
+        cmp = @begin <=> val
+        return !cmp.nil? && cmp <= 0
+      end
+    end
+
+    # invoke Enumerable#include?
     super
   end
 
@@ -319,6 +342,5 @@ class ::Range
   end
 
   alias == eql?
-  alias include? cover?
-  alias member? cover?
+  alias member? include?
 end
