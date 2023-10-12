@@ -50,13 +50,7 @@ opal_filter "Range" do
   fails "Range#bsearch with endless ranges and Integer values with a block returning negative, zero, positive numbers returns nil if the block returns less than zero for every element" # NotImplementedError: Can't #bsearch an infinite range
   fails "Range#bsearch with endless ranges and Integer values with a block returning true or false returns minimum element if the block returns true for every element" # NotImplementedError: Can't #bsearch an infinite range
   fails "Range#bsearch with endless ranges and Integer values with a block returning true or false returns the smallest element for which block returns true" # NotImplementedError: Can't #bsearch an infinite range
-  fails "Range#cover? accepts beginless range argument" # Expected false to be true
-  fails "Range#cover? accepts endless range argument" # Expected false to be true
-  fails "Range#cover? allows self to be a beginless range" # Expected false to be true
-  fails "Range#cover? allows self to be a endless range" # Expected false to be true
-  fails "Range#cover? range argument accepts range argument" # Expected false to be true
-  fails "Range#cover? range argument honors exclusion of right boundary (:exclude_end option)" # Expected false to be true
-  fails "Range#cover? range argument supports boundaries of different comparable types" # Expected false to be true
+  fails "Range#cover? range argument honors exclusion of right boundary (:exclude_end option)" # Expected true to be false
   fails "Range#eql? returns false if the endpoints are not eql?" # Expected 0..1 not to have same value or type as 0..1
   fails "Range#first raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised ([2] was returned)
   fails "Range#frozen? is true for Range.new" # Expected 1..2.frozen? to be truthy but was false

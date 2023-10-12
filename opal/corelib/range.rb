@@ -44,13 +44,34 @@ class ::Range
   end
 
   def cover?(value)
-    beg_cmp = (@begin.nil? && -1) || (@begin <=> value) || false
-    end_cmp = (@end.nil? && -1) || (value <=> @end) || false
-    if @excl
-      end_cmp && end_cmp < 0
-    else
-      end_cmp && end_cmp <= 0
-    end && beg_cmp && beg_cmp <= 0
+    compare = ->(a, b) {
+      a <=> b || 1
+    }
+
+    if `value.$$is_range`
+      val_begin = value.begin
+      val_end = value.end
+      val_excl = value.exclude_end?
+      if (@begin && val_begin.nil?) ||
+         (@end && val_end.nil?) ||
+         (val_begin && val_end && compare.call(val_begin, val_end).then { |c| val_excl ? c >= 0 : c > 0 }) ||
+         (val_begin && !cover?(val_begin))
+        return false
+      end
+
+      cmp = compare.call(@end, val_end)
+      return cmp >= 0 if @excl == val_excl
+      return cmp > 0 if @excl
+      return true if cmp >= 0
+
+      val_max = value.max
+      return !val_max.nil? && compare.call(val_max, @end) <= 0
+    end
+
+    return false if @begin && compare.call(@begin, value) > 0
+    return true if @end.nil?
+    end_cmp = compare.call(value, @end)
+    @excl ? end_cmp < 0 : end_cmp <= 0
   end
 
   def each(&block)
