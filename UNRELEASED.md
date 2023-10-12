@@ -41,6 +41,8 @@ This release brings a lot of performance improvements, our tests on Asciidoctor 
 ### Compatibility
 
 - Add a magic-comment that will disable x-string compilation to JavaScript (#2543)
+- Pass value in `PromiseV2#always` just like `PromiseV1#always` does it (#2579)
+- `#hash` now returns integers #2582)
 
 ### Fixed
 
@@ -58,6 +60,8 @@ This release brings a lot of performance improvements, our tests on Asciidoctor 
 - Lowercase response headers in `SimpleServer` for rack 3.0 compatibility (#2578)
 - Fix `Module#clone` and `Module#dup` to properly copy methods (#2572)
 - Chrome runner fix: support code that contains `</script>` (#2581)
+- Do not skip `$truthy` when left hand side of a comparison is `self` (#2596)
+- Unexpected `return`/`break` should raise `LocalJumpError` (#2591)
 
 ### Added
 
@@ -84,6 +88,10 @@ This release brings a lot of performance improvements, our tests on Asciidoctor 
 - Optimize argument slicing in runtime for performance (#2555)
 - Closure: Generate a JavaScript object, not an Error, gain up to 15% on Asciidoctor (#2556)
 - Optimize `String#split` and `String#start_with` (#2560)
+- Compute `$@` dynamically (#2592)
+- Optimize the `$prop` helper (#2597)
+- Improve `Array.push()` performance when pushing many items (#2565)
+- 
 
 ### Internal
 
