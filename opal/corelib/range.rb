@@ -19,6 +19,7 @@ class ::Range
   end
 
   def ===(value)
+    return false if `value.$$is_range`
     cover? value
   end
 
