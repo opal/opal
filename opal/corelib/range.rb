@@ -137,8 +137,8 @@ class ::Range
 
   def include?(val)
     if `self.begin.$$is_number || self.end.$$is_number` ||
-        @begin.is_a?(::Time) || @end.is_a?(::Time) ||
-        ::Integer.try_convert(@begin) || ::Integer.try_convert(@end)
+       @begin.is_a?(::Time) || @end.is_a?(::Time) ||
+       ::Integer.try_convert(@begin) || ::Integer.try_convert(@end)
       return cover?(val)
     end
 
