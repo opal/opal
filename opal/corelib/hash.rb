@@ -1,5 +1,6 @@
 # helpers: yield1, hash_clone, hash_delete, hash_each, hash_get, hash_put, deny_frozen_access, freeze, opal32_init, opal32_add
 # backtick_javascript: true
+# special_symbols: keys, proc, is_array, is_hash, prototype, none, constructor, by_identity, class
 
 require 'corelib/enumerable'
 
@@ -13,7 +14,7 @@ class ::Hash < `Map`
   include ::Enumerable
 
   # Mark all hash instances as valid hashes (used to check keyword args, etc)
-  `self.$$prototype.$$is_hash = true`
+  `self[$$prototype][$$is_hash] = true`
 
   def self.[](*argv)
     %x{
@@ -35,7 +36,7 @@ class ::Hash < `Map`
 
         for (i = 0; i < argc; i++) {
           arg = argv[i];
-          if (!arg.$$is_array)
+          if (!arg[$$is_array])
             #{::Kernel.raise ::ArgumentError, "invalid element #{`arg`.inspect} for Hash"};
           if (arg.length === 1) {
             hash.$store(arg[0], nil);
@@ -65,10 +66,10 @@ class ::Hash < `Map`
 
   def self.allocate
     %x{
-      var hash = new self.$$constructor();
+      var hash = new self[$$constructor]();
 
-      hash.$$none = nil;
-      hash.$$proc = nil;
+      hash[$$none] = nil;
+      hash[$$proc] = nil;
 
       return hash;
     }
@@ -85,8 +86,8 @@ class ::Hash < `Map`
       if (defaults !== undefined && block !== nil) {
         #{::Kernel.raise ::ArgumentError, 'wrong number of arguments (1 for 0)'}
       }
-      self.$$none = (defaults === undefined ? nil : defaults);
-      self.$$proc = block;
+      self[$$none] = (defaults === undefined ? nil : defaults);
+      self[$$proc] = block;
 
       return self;
     }
@@ -98,7 +99,7 @@ class ::Hash < `Map`
         return true;
       }
 
-      if (!other.$$is_hash) {
+      if (!other[$$is_hash]) {
         return false;
       }
 
@@ -200,8 +201,8 @@ class ::Hash < `Map`
       $deny_frozen_access(self);
 
       self.clear();
-      if (self.$$keys)
-        self.$$keys.clear();
+      if (self[$$keys])
+        self[$$keys].clear();
 
       return self;
     }
@@ -247,8 +248,8 @@ class ::Hash < `Map`
     %x{
       $deny_frozen_access(self);
 
-      if (!self.$$by_identity) {
-        self.$$by_identity = true;
+      if (!self[$$by_identity]) {
+        self[$$by_identity] = true;
 
         if (self.size !== 0)
           Opal.hash_rehash(self);
@@ -259,18 +260,18 @@ class ::Hash < `Map`
   end
 
   def compare_by_identity?
-    `self.$$by_identity === true`
+    `self[$$by_identity] === true`
   end
 
   def default(key = undefined)
     %x{
-      if (key !== undefined && self.$$proc !== nil && self.$$proc !== undefined) {
-        return self.$$proc.$call(self, key);
+      if (key !== undefined && self[$$proc] !== nil && self[$$proc] !== undefined) {
+        return self[$$proc].$call(self, key);
       }
-      if (self.$$none === undefined) {
+      if (self[$$none] === undefined) {
         return nil;
       }
-      return self.$$none;
+      return self[$$none];
     }
   end
 
@@ -278,8 +279,8 @@ class ::Hash < `Map`
     %x{
       $deny_frozen_access(self);
 
-      self.$$proc = nil;
-      self.$$none = object;
+      self[$$proc] = nil;
+      self[$$none] = object;
 
       return object;
     }
@@ -287,8 +288,8 @@ class ::Hash < `Map`
 
   def default_proc
     %x{
-      if (self.$$proc !== undefined) {
-        return self.$$proc;
+      if (self[$$proc] !== undefined) {
+        return self[$$proc];
       }
       return nil;
     }
@@ -308,8 +309,8 @@ class ::Hash < `Map`
         }
       }
 
-      self.$$none = nil;
-      self.$$proc = proc;
+      self[$$none] = nil;
+      self[$$proc] = proc;
 
       return default_proc;
     }
@@ -444,7 +445,7 @@ class ::Hash < `Map`
       return $hash_each(self, result, function(key, value) {
         result.push(key);
 
-        if (value.$$is_array) {
+        if (value[$$is_array]) {
           if (level === 1) {
             result.push(value);
             return [false, result];
@@ -829,7 +830,7 @@ class ::Hash < `Map`
     return map(&block).to_h if block_given?
 
     %x{
-      if (self.$$class === Opal.Hash) {
+      if (self[$$class] === Opal.Hash) {
         return self;
       }
 

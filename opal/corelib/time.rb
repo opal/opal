@@ -1,5 +1,6 @@
 # helpers: slice, deny_frozen_access
 # backtick_javascript: true
+# special_symbols: is_number, is_string
 
 require 'corelib/comparable'
 
@@ -26,7 +27,7 @@ class ::Time < `Date`
         return result;
       }
 
-      if (!seconds.$$is_number) {
+      if (!seconds[$$is_number]) {
         seconds = #{::Opal.coerce_to!(seconds, ::Integer, :to_int)};
       }
 
@@ -34,7 +35,7 @@ class ::Time < `Date`
         return new Date(seconds * 1000);
       }
 
-      if (!frac.$$is_number) {
+      if (!frac[$$is_number]) {
         frac = #{::Opal.coerce_to!(frac, ::Integer, :to_int)};
       }
 
@@ -44,7 +45,7 @@ class ::Time < `Date`
 
   %x{
     function time_params(year, month, day, hour, min, sec) {
-      if (year.$$is_string) {
+      if (year[$$is_string]) {
         year = parseInt(year, 10);
       } else {
         year = #{::Opal.coerce_to!(`year`, ::Integer, :to_int)};
@@ -52,7 +53,7 @@ class ::Time < `Date`
 
       if (month === nil) {
         month = 1;
-      } else if (!month.$$is_number) {
+      } else if (!month[$$is_number]) {
         if (#{`month`.respond_to?(:to_str)}) {
           month = #{`month`.to_str};
           switch (month.toLowerCase()) {
@@ -82,7 +83,7 @@ class ::Time < `Date`
 
       if (day === nil) {
         day = 1;
-      } else if (day.$$is_string) {
+      } else if (day[$$is_string]) {
         day = parseInt(day, 10);
       } else {
         day = #{::Opal.coerce_to!(`day`, ::Integer, :to_int)};
@@ -94,7 +95,7 @@ class ::Time < `Date`
 
       if (hour === nil) {
         hour = 0;
-      } else if (hour.$$is_string) {
+      } else if (hour[$$is_string]) {
         hour = parseInt(hour, 10);
       } else {
         hour = #{::Opal.coerce_to!(`hour`, ::Integer, :to_int)};
@@ -106,7 +107,7 @@ class ::Time < `Date`
 
       if (min === nil) {
         min = 0;
-      } else if (min.$$is_string) {
+      } else if (min[$$is_string]) {
         min = parseInt(min, 10);
       } else {
         min = #{::Opal.coerce_to!(`min`, ::Integer, :to_int)};
@@ -118,8 +119,8 @@ class ::Time < `Date`
 
       if (sec === nil) {
         sec = 0;
-      } else if (!sec.$$is_number) {
-        if (sec.$$is_string) {
+      } else if (!sec[$$is_number]) {
+        if (sec[$$is_string]) {
           sec = parseInt(sec, 10);
         } else {
           sec = #{::Opal.coerce_to!(`sec`, ::Integer, :to_int)};
@@ -175,7 +176,7 @@ class ::Time < `Date`
   def self._parse_offset(utc_offset)
     %x{
       var timezone;
-      if (utc_offset.$$is_string) {
+      if (utc_offset[$$is_string]) {
         if (utc_offset == 'UTC') {
           timezone = 0;
         }
@@ -192,7 +193,7 @@ class ::Time < `Date`
           #{::Kernel.raise ::ArgumentError, %'"+HH:MM", "-HH:MM", "UTC" expected for utc_offset: #{utc_offset}'}
         }
       }
-      else if (utc_offset.$$is_number) {
+      else if (utc_offset[$$is_number]) {
         timezone = utc_offset / 3600;
       }
       else {
@@ -275,7 +276,7 @@ class ::Time < `Date`
     end
 
     %x{
-      if (!other.$$is_number) {
+      if (!other[$$is_number]) {
         other = #{::Opal.coerce_to!(other, ::Integer, :to_int)};
       }
       var result = new Date(self.getTime() + (other * 1000));
@@ -290,7 +291,7 @@ class ::Time < `Date`
     end
 
     %x{
-      if (!other.$$is_number) {
+      if (!other[$$is_number]) {
         other = #{::Opal.coerce_to!(other, ::Integer, :to_int)};
       }
       var result = new Date(self.getTime() - (other * 1000));

@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: proxy_target
 
 klasses = [
   Array,
@@ -53,8 +54,9 @@ optimization_status = Hash[klasses.map do |klass|
   methods -= Object.instance_methods unless klass == Object
   methods -= [:product, :exit, :exit!, :at_exit]
   opt_status = Hash[methods.map do |method|
+    `var $$proxy_target = Opal.$$proxy_target || "$$proxy_target"`
     method_func = `#{klass.instance_method(method)}.method`
-    method_func = `#{method_func}.$$proxy_target || #{method_func}`
+    method_func = `#{method_func}[$$proxy_target] || #{method_func}`
     [method, `triggerOptAndGetStatus(#{method_func})`]
   end]
   by_status_grouped = opt_status.group_by {|method, status| status }

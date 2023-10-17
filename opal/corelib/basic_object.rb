@@ -1,5 +1,6 @@
 # use_strict: true
 # backtick_javascript: true
+# special_symbols: id, is_string, p, s, is_a_module, eval
 
 class ::BasicObject
   def initialize(*)
@@ -17,17 +18,17 @@ class ::BasicObject
 
   def __id__
     %x{
-      if (self.$$id != null) {
-        return self.$$id;
+      if (self[$$id] != null) {
+        return self[$$id];
       }
-      Opal.prop(self, '$$id', Opal.uid());
-      return self.$$id;
+      Opal.prop(self, $$id, Opal.uid());
+      return self[$$id];
     }
   end
 
   def __send__(symbol, *args, &block)
     %x{
-      if (!symbol.$$is_string) {
+      if (!symbol[$$is_string]) {
         #{raise ::TypeError, "#{inspect} is not a symbol nor a string"}
       }
 
@@ -35,14 +36,14 @@ class ::BasicObject
 
       if (func) {
         if (block !== nil) {
-          func.$$p = block;
+          func[$$p] = block;
         }
 
         return func.apply(self, args);
       }
 
       if (block !== nil) {
-        self.$method_missing.$$p = block;
+        self.$method_missing[$$p] = block;
       }
 
       return self.$method_missing.apply(self, [symbol].concat(args));
@@ -77,28 +78,28 @@ class ::BasicObject
     end
 
     %x{
-      var old = block.$$s,
+      var old = block[$$s],
           result;
 
-      block.$$s = null;
+      block[$$s] = null;
 
-      // Need to pass $$eval so that method definitions know if this is
+      // Need to pass [$$eval] so that method definitions know if this is
       // being done on a class/module. Cannot be compiler driven since
       // send(:instance_eval) needs to work.
-      if (self.$$is_a_module) {
-        self.$$eval = true;
+      if (self[$$is_a_module]) {
+        self[$$eval] = true;
         try {
           result = block.call(self, self);
         }
         finally {
-          self.$$eval = false;
+          self[$$eval] = false;
         }
       }
       else {
         result = block.call(self, self);
       }
 
-      block.$$s = old;
+      block[$$s] = old;
 
       return result;
     }
@@ -108,25 +109,25 @@ class ::BasicObject
     ::Kernel.raise ::ArgumentError, 'no block given' unless block
 
     %x{
-      var block_self = block.$$s,
+      var block_self = block[$$s],
           result;
 
-      block.$$s = null;
+      block[$$s] = null;
 
-      if (self.$$is_a_module) {
-        self.$$eval = true;
+      if (self[$$is_a_module]) {
+        self[$$eval] = true;
         try {
           result = block.apply(self, args);
         }
         finally {
-          self.$$eval = false;
+          self[$$eval] = false;
         }
       }
       else {
         result = block.apply(self, args);
       }
 
-      block.$$s = block_self;
+      block[$$s] = block_self;
 
       return result;
     }

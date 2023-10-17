@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: is_number
 
 require 'corelib/comparable'
 
@@ -244,7 +245,7 @@ class ::Numeric
                   (limit === Infinity && !isDesc) ||
                   (limit === -Infinity && isDesc);
 
-      if (self.$$is_number && step.$$is_number && limit.$$is_number) {
+      if (self[$$is_number] && step[$$is_number] && limit[$$is_number]) {
         if (self % 1 === 0 && (isInf || limit % 1 === 0) && step % 1 === 0) {
           var value = self;
 

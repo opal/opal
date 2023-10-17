@@ -11,7 +11,7 @@ RSpec.describe Opal::Compiler do
 
   describe 'requiring' do
     it 'calls #require' do
-      expect_compiled("require 'pippo'").to include('self.$require("pippo")')
+      expect_compiled("require 'pippo'").to include('self[require$]("pippo")')
     end
   end
 
@@ -65,7 +65,7 @@ RSpec.describe Opal::Compiler do
   end
 
   it "should compile method calls" do
-    expect_compiled("self.inspect").to include("$inspect()")
+    expect_compiled("self.inspect").to include("[inspect$]()")
     expect_compiled("self.map { |a| a + 10 }").to include("'map'")
   end
 
@@ -89,12 +89,12 @@ RSpec.describe Opal::Compiler do
 
   describe "method names" do
     it "generates a named function for method" do
-      expect_compiled("def test_method; []; end").to include("function $$test_method()")
+      expect_compiled("def test_method; []; end").to include("function test_method$$$()")
     end
 
     context "when function name is reserved" do
       it "generates a valid named function for method" do
-        expect_compiled("def Array; []; end").to include("function $$Array()")
+        expect_compiled("def Array; []; end").to include("function Array$$$()")
       end
     end
 
@@ -108,7 +108,7 @@ RSpec.describe Opal::Compiler do
   describe "debugger special method" do
     it "generates debugger keyword in javascript" do
       expect_compiled("debugger").to include("debugger")
-      expect_compiled("debugger").to_not include("$debugger")
+      expect_compiled("debugger").to_not include("debugger$")
     end
   end
 
@@ -251,7 +251,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for boolean method calls' do
-          expect_compiled('foo = 42 if true.something').to include('if ($truthy(true.$something()))')
+          expect_compiled('foo = 42 if true.something').to include('if ($truthy(true[something$]()))')
         end
 
         it 'adds nil check for strings' do
@@ -296,7 +296,7 @@ RSpec.describe Opal::Compiler do
         end
 
         it 'adds nil check for boolean method calls' do
-          expect_compiled('foo = 42 if (true.something)').to include('if ($truthy(true.$something())')
+          expect_compiled('foo = 42 if (true.something)').to include('if ($truthy(true[something$]())')
         end
 
         it 'adds nil check for strings' do
@@ -376,7 +376,7 @@ RSpec.describe Opal::Compiler do
             789
             `#{123 + bar} * 456;`
           end
-        }).to include("  return $rb_plus(123, self.$bar()) * 456;\n")
+        }).to include("  return $rb_plus(123, self[bar$]()) * 456;\n")
 
         expect_compiled(%q{
           def foo

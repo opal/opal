@@ -1,7 +1,8 @@
 # backtick_javascript: true
+# special_symbols: prototype, meta
 
 class ::NilClass
-  `self.$$prototype.$$meta = #{self}`
+  `self[$$prototype][$$meta] = #{self}`
 
   class << self
     def allocate

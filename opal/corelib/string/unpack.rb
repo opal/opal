@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: internal_encoding
 
 require 'base64'
 require 'corelib/pack_unpack/format_string_parser'
@@ -686,7 +687,7 @@ class ::String
 
       // A very optimized handler for U*.
       if (format == "U*" &&
-          self.internal_encoding.name === "UTF-8" &&
+          self[$$internal_encoding].name === "UTF-8" &&
           typeof self.codePointAt === "function") {
 
         var cp, j = 0;

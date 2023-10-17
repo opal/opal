@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# special_symbols: constructor
 
 # {Promise} is used to help structure asynchronous code.
 #
@@ -105,7 +106,7 @@ class PromiseV2 < `Promise`
     def allocate
       ok, fail = nil, nil
 
-      prom = `new self.$$constructor(function(_ok, _fail) { #{ok} = _ok; #{fail} = _fail; })`
+      prom = `new self[$$constructor](function(_ok, _fail) { #{ok} = _ok; #{fail} = _fail; })`
       prom.instance_variable_set(:@type, :opal)
       prom.instance_variable_set(:@resolve_proc, ok)
       prom.instance_variable_set(:@reject_proc, fail)

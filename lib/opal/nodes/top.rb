@@ -39,7 +39,9 @@ module Opal
             body_code = [body_code] unless body_code.is_a?(Array)
 
             if compiler.eval?
-              add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]' if @define_nesting
+              special_symbol :is_a_module
+              special_symbol :class
+              add_temp '$nesting = self[$$is_a_module] ? [self] : [self[$$class]]' if @define_nesting
             else
               add_temp 'self = Opal.top' if @define_self
               add_temp '$nesting = []' if @define_nesting
@@ -50,6 +52,8 @@ module Opal
             add_temp '$$$ = Opal.$$$' if @define_absolute_const
 
             add_used_helpers
+            add_used_symbols
+            add_used_special_symbols
             line scope.to_vars
 
             compile_method_stubs
@@ -127,6 +131,14 @@ module Opal
 
       def add_used_helpers
         compiler.helpers.to_a.reverse_each { |h| prepend_scope_temp "$#{h} = Opal.#{h}" }
+      end
+
+      def add_used_symbols
+        compiler.symbols.each { |name, var| add_scope_temp "#{var} = $sym('#{name}')" }
+      end
+
+      def add_used_special_symbols
+        compiler.special_symbols.each { |_name, var| prepend_scope_temp "#{var} = Opal.#{var}" }
       end
 
       def compile_method_stubs

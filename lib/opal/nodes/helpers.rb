@@ -14,16 +14,13 @@ module Opal
       end
 
       # Converts a ruby method name into its javascript equivalent for
-      # a method/function call. All ruby method names get prefixed with
-      # a '$', and if the name is a valid javascript identifier, it will
-      # have a '.' prefix (for dot-calling), otherwise it will be
-      # wrapped in brackets to use reference notation calling.
+      # a method/function call.
       def mid_to_jsid(mid)
-        if %r{\=|\+|\-|\*|\/|\!|\?|<|\>|\&|\||\^|\%|\~|\[|`} =~ mid.to_s
-          "['$#{mid}']"
-        else
-          '.$' + mid
-        end
+        helper :sym
+
+        sym = symbol(mid)
+
+        "[#{sym}]"
       end
 
       def indent(&block)

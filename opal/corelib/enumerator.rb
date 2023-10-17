@@ -1,12 +1,13 @@
 # helpers: slice, coerce_to, deny_frozen_access
 # backtick_javascript: true
+# special_symbols: is_enumerator, prototype, p
 
 require 'corelib/enumerable'
 
 class ::Enumerator
   include ::Enumerable
 
-  `self.$$prototype.$$is_enumerator = true`
+  `self[$$prototype][$$is_enumerator] = true`
 
   def self.for(object, method = :each, *args, &block)
     %x{
@@ -69,7 +70,7 @@ class ::Enumerator
     %x{
       var result, index = offset;
 
-      self.$each.$$p = function() {
+      self.$each[$$p] = function() {
         var param = #{::Opal.destructure(`arguments`)},
             value = block(param, index);
 

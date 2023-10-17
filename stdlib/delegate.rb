@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 # helpers: freeze, freeze_props
 # backtick_javascript: true
+# special_symbols: frozen
 
 # = delegate -- Support for the Delegation Pattern
 #
@@ -250,7 +251,7 @@ class Delegator < BasicObject
   end
 
   def frozen?
-    `(self.$$frozen || false)`
+    `(self[$$frozen] || false)`
   end
 
   @delegator_api = public_instance_methods

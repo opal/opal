@@ -69,7 +69,8 @@ module Opal
           in_closure(Closure::JS_FUNCTION | Closure::ITER | (@is_lambda ? Closure::LAMBDA : 0)) do
             body_code = stmt(returned_body)
 
-            add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s" if @define_self
+            special_symbol :s
+            add_temp "self = #{identity}[$$s] == null ? this : #{identity}[$$s]" if @define_self
 
             to_vars = scope.to_vars
 

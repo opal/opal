@@ -137,7 +137,8 @@ module Opal
         end
 
         if class? && !@proto_ivars.empty?
-          vars << '$proto = self.$$prototype'
+          special_symbol :prototype
+          vars << '$proto = self[$$prototype]'
         end
 
         indent = @compiler.parser_indent
@@ -264,7 +265,7 @@ module Opal
           # utf8_exclamation 'ǃ'
           #
           # For now we're just using $$, to maintain compatibility with older IEs.
-          @identity = "$$#{mid}"
+          @identity = "#{mid}$$$"
         else
           # Parent scope is the defining module/class
           name ||= [(parent && (parent.name || parent.scope_name)), mid].compact.join('_')
@@ -408,10 +409,11 @@ module Opal
         scope_name = scope.identity
         self.block_name = block_name if block_name
 
-        add_temp "#{self.block_name} = #{scope_name}.$$p || nil"
+        special_symbol :p
+        add_temp "#{self.block_name} = #{scope_name}[$$p] || nil"
 
         unless @block_prepared
-          line "#{scope_name}.$$p = null;"
+          line "#{scope_name}[$$p] = null;"
           @block_prepared = true
         end
       end

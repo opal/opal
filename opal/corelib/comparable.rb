@@ -1,5 +1,6 @@
 # helpers: truthy
 # backtick_javascript: true
+# special_symbols: class, comparable
 
 module ::Comparable
   %x{
@@ -18,7 +19,7 @@ module ::Comparable
         when nil, true, false, ::Integer, ::Float
           `class_name = rhs.$inspect()`
         else
-          `class_name = rhs.$$class`
+          `class_name = rhs[$$class]`
         end
       }
       #{::Kernel.raise ::ArgumentError, "comparison of #{`lhs`.class} with #{`class_name`} failed"}
@@ -40,8 +41,8 @@ module ::Comparable
       }
 
       // check for infinite recursion
-      if (self.$$comparable) {
-        self.$$comparable = false;
+      if (self[$$comparable]) {
+        self[$$comparable] = false;
         return false;
       }
     }

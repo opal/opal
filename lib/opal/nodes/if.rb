@@ -399,7 +399,8 @@ module Opal
         helper :truthy
 
         func_name = top_scope.new_temp
-        flip_flop_state = "#{func_name}.$$ff"
+        special_symbol :ff
+        flip_flop_state = "#{func_name}[$$ff]"
 
         # Start function definition, checking and initializing it if necessary
         push "(#{func_name} = #{func_name} || function(_start_func, _end_func){"
