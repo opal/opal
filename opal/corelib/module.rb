@@ -439,15 +439,17 @@ class ::Module
         block.$$proxy_target = block
         block = new Proxy(block, {
           apply: function(target, self, args) {
-            var old_name = target.$$jsid
+            var old_name = target.$$jsid, old_lambda = target.$$is_lambda;
             target.$$jsid = name;
+            target.$$is_lambda = true;
             try {
               return target.apply(self, args);
             } catch(e) {
               if (e === target.$$brk || e === target.$$ret) return e.$v;
               throw e;
             } finally {
-              target.$$jsid = old_name
+              target.$$jsid = old_name;
+              target.$$is_lambda = old_lambda;
             }
           }
         })
