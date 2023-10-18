@@ -36,7 +36,6 @@ opal_filter "Kernel" do
   fails "Kernel#class returns the class of the object" # Expected Number to be identical to Integer
   fails "Kernel#clone replaces a singleton object's metaclass with a new copy with the same superclass" # NoMethodError: undefined method `singleton_methods' for #<#<Class:0x5537a>:0x55378>
   fails "Kernel#clone uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
-  fails "Kernel#define_singleton_method when given an UnboundMethod will raise when attempting to define an object's singleton method from another object's singleton method" # Expected TypeError but no exception was raised ("other_singleton_method" was returned)
   fails "Kernel#dup uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
   fails "Kernel#eval allows a binding to be captured inside an eval" # NoMethodError: undefined method `w' for #<MSpecEnv:0x4be5a>
   fails "Kernel#eval allows creating a new class in a binding" # RuntimeError: Evaluation on a Proc#binding is not supported
