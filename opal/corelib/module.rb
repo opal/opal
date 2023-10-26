@@ -2,6 +2,22 @@
 # backtick_javascript: true
 
 class ::Module
+  %x{
+    function ensure_symbol_or_string(name) {
+      if (name.$$is_string) {
+        return name;
+      };
+      var converted_name = #{::Opal.try_convert(`name`, ::String, :to_str)};
+      if (converted_name.$$is_string) {
+        return converted_name;
+      } else if (converted_name === nil) {
+        #{::Kernel.raise ::TypeError, "#{`name`} is not a symbol nor a string"}
+      } else {
+        #{::Kernel.raise ::TypeError, "can't convert #{`name`.class} to String (#{`name`.class}#to_str gives #{`converted_name`.class}"}
+      }
+    }
+  }
+
   def self.allocate
     %x{
       var module = Opal.allocate_module(nil, function(){});
@@ -388,9 +404,12 @@ class ::Module
 
       if (method === undefined && block === nil)
         #{::Kernel.raise ::ArgumentError, 'tried to create a Proc object without a block'}
+
+      name = ensure_symbol_or_string(name);
     }
 
-    block ||= case method
+    if `method !== undefined`
+      block = case method
               when ::Proc
                 method
 
@@ -398,14 +417,20 @@ class ::Module
                 `#{method.to_proc}.$$unbound`
 
               when ::UnboundMethod
-                ->(*args) {
-                  bound = method.bind(self)
-                  bound.call(*args)
-                }
+                `Opal.wrap_method_body(method.$$method)`
 
               else
-                ::Kernel.raise ::TypeError, "wrong argument type #{block.class} (expected Proc/Method)"
+                ::Kernel.raise ::TypeError, "wrong argument type #{method.class} (expected Proc/Method/UnboundMethod)"
               end
+
+      if `!method.$$is_proc`
+        owner = method.owner
+        if `owner.$$is_class` && !(self <= owner) # rubocop:disable Style/InverseMethods
+          message = `owner.$$is_singleton` ? "can't bind singleton method to a different class" : "bind argument must be a subclass of #{owner}"
+          ::Kernel.raise ::TypeError, message
+        end
+      end
+    end
 
     %x{
       if (typeof(Proxy) !== 'undefined') {
@@ -414,15 +439,17 @@ class ::Module
         block.$$proxy_target = block
         block = new Proxy(block, {
           apply: function(target, self, args) {
-            var old_name = target.$$jsid
+            var old_name = target.$$jsid, old_lambda = target.$$is_lambda;
             target.$$jsid = name;
+            target.$$is_lambda = true;
             try {
               return target.apply(self, args);
             } catch(e) {
               if (e === target.$$brk || e === target.$$ret) return e.$v;
               throw e;
             } finally {
-              target.$$jsid = old_name
+              target.$$jsid = old_name;
+              target.$$is_lambda = old_lambda;
             }
           }
         })
@@ -453,10 +480,7 @@ class ::Module
   def remove_method(*names)
     %x{
       for (var i = 0; i < names.length; i++) {
-        var name = names[i];
-        if (!(typeof name === "string" || name.$$is_string)) {
-          #{raise ::TypeError, "#{name} is not a symbol nor a string"}
-        }
+        var name = ensure_symbol_or_string(names[i]);
         $deny_frozen_access(self);
 
         Opal.rdef(self, "$" + name);
@@ -705,13 +729,10 @@ class ::Module
   def undef_method(*names)
     %x{
       for (var i = 0; i < names.length; i++) {
-        var name = names[i];
-        if (!(typeof name === "string" || name.$$is_string)) {
-          #{raise ::TypeError, "#{name} is not a symbol nor a string"}
-        }
+        var name = ensure_symbol_or_string(names[i]);
         $deny_frozen_access(self);
 
-        Opal.udef(self, "$" + names[i]);
+        Opal.udef(self, "$" + name);
       }
     }
 
@@ -740,7 +761,7 @@ class ::Module
         var name = method_names[i],
             jsid = $jsid(name),
             body = from.$$prototype[jsid],
-            wrapped = Opal.wrapMethodBody(body);
+            wrapped = Opal.wrap_method_body(body);
 
         wrapped.$$jsid = name;
         Opal.defn(to, jsid, wrapped);

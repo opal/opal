@@ -77,6 +77,7 @@ class ::UnboundMethod
     @owner  = owner
     @method = method
     @name   = name
+    `self.$$method = method`
   end
 
   def arity
