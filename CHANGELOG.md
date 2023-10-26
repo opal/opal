@@ -16,17 +16,134 @@ Changes are grouped as follows:
 
 
 
-## [1.7.3](https://github.com/opal/opal/compare/v1.7.2...v1.7.3) - 2023-03-23
+## [1.8.0](https://github.com/opal/opal/compare/v1.7.4...v1.8.0) - 2023-10-26
 
 
 <!--
 ### Internal
-### Changed
 ### Added
 ### Removed
 ### Deprecated
 ### Performance
+### Fixed
+### Documentation
 -->
+
+## Highlights
+
+### `Hash` is now bridged to JavaScript `Map`
+
+This change brings a lot of benefits, but also some incompatibilities. The main benefit is that `Hash` now is both more performant and relies on native JavaScript capabilities.
+This improves interoperability with JavaScript. As a downside, applications reaching for internal `Hash` data structures will need to be updated.
+
+Interacting with `Hash` from `JavaScript` is easier than ever:
+
+```ruby
+hash = `new Map([['a', 1], ['b', 2]])`
+hash # => {a: 1, b: 2}
+`console.log(hash)` # => Map(2) {"a" => 1, "b" => 2}
+`hash.get('a')` # => 1
+`hash.set('c', 3)`
+hash # => {a: 1, b: 2, c: 3}
+hash.keys # => ["a", "b", "c"]
+hash.values # => [1, 2, 3]
+```
+
+### Performance improvements
+
+This release brings a lot of performance improvements, our tests on Asciidoctor show a 25% improvement in performance, but we've seen up to 66% performance improvement on some applications.
+
+## Changelog
+
+### Deprecated
+
+- Deprecate using x-string to access JavaScript without an explicit magic-comment ([#2543](https://github.com/opal/opal/pull/2543))
+
+### Compatibility
+
+- Add a magic-comment that will disable x-string compilation to JavaScript ([#2543](https://github.com/opal/opal/pull/2543))
+- Pass value in `PromiseV2#always` just like `PromiseV1#always` does it ([#2579](https://github.com/opal/opal/pull/2579))
+- `#hash` now returns integers ([#2582](https://github.com/opal/opal/pull/2582))
+- Improve `Range#include?`/`member?`/`cover?`/`===` ([#2598](https://github.com/opal/opal/pull/2598))
+- Make `Module#define_method` more compatible with CRuby ([#2593](https://github.com/opal/opal/pull/2593))
+- `Hash#clone` must freeze clone if original is frozen, but `Hash#dup` must not ([#2603](https://github.com/opal/opal/pull/2603))
+
+### Fixed
+
+- Fix `Kernel#Float` with `exception:` option ([#2532](https://github.com/opal/opal/pull/2532))
+- Fix `Kernel#Integer` with `exception:` option ([#2531](https://github.com/opal/opal/pull/2531))
+- Fix `String#split` with limit and capturing regexp ([#2544](https://github.com/opal/opal/pull/2544))
+- Fix `switch` with Object-wrapped values ([#2542](https://github.com/opal/opal/pull/2542))
+- Fix non-direct subclasses of bridged classes not calling the original constructor ([#2546](https://github.com/opal/opal/pull/2546))
+- Regexp.escape: Cast to String or drop exception ([#2552](https://github.com/opal/opal/pull/2552))
+- Propagate removal of method from included/prepended modules ([#2553](https://github.com/opal/opal/pull/2553))
+- Restore `nodejs/yaml` functionality ([#2551](https://github.com/opal/opal/pull/2551))
+- Fix sine `Range#size` edge cases ([#2541](https://github.com/opal/opal/pull/2541))
+- Use a Map instead of a POJO for the jsid_cache ([#2584](https://github.com/opal/opal/pull/2584))
+- Fix `String#object_id`, `String#__id__`, `String#hash` to match CRuby's behavior ([#2576](https://github.com/opal/opal/pull/2576))
+- Lowercase response headers in `SimpleServer` for rack 3.0 compatibility ([#2578](https://github.com/opal/opal/pull/2578))
+- Fix `Module#clone` and `Module#dup` to properly copy methods ([#2572](https://github.com/opal/opal/pull/2572))
+- Chrome runner fix: support code that contains `</script>` ([#2581](https://github.com/opal/opal/pull/2581))
+- Do not skip `$truthy` when left hand side of a comparison is `self` ([#2596](https://github.com/opal/opal/pull/2596))
+- Unexpected `return`/`break` should raise `LocalJumpError` ([#2591](https://github.com/opal/opal/pull/2591))
+
+### Added
+
+- SourceMap support for `Kernel#eval` ([#2534](https://github.com/opal/opal/pull/2534))
+- Add `CGI::Util#escapeURIComponent` and `CGI::Util#unescapeURIComponent` ([#2566](https://github.com/opal/opal/pull/2566))
+- `CGI::Util` implement additional methods ([#2601](https://github.com/opal/opal/pull/2601))
+
+### Changed
+
+- Change compilation of Regexp nodes that may contain advanced features, so if invalid that they would raise at runtime, not parse-time ([#2548](https://github.com/opal/opal/pull/2548))
+- `Hash` is now bridged to JavaScript `Map` and support for non-symbol keys in keyword arguments ([#2568](https://github.com/opal/opal/pull/2568))
+
+### Documentation
+
+- Bridging documentation ([#2541](https://github.com/opal/opal/pull/2541))
+- Fix Typo in Running tests Section of README.md File ([#2580](https://github.com/opal/opal/pull/2580))
+
+### Performance
+
+- Improve performance of `Array#intersect?` and `#intersection` ([#2533](https://github.com/opal/opal/pull/2533))
+- `Proc#call`: Refactor for performance ([#2541](https://github.com/opal/opal/pull/2541))
+- Opal.stub_for: optimize ([#2541](https://github.com/opal/opal/pull/2541))
+- Hash: Optimize `#to_a` ([#2541](https://github.com/opal/opal/pull/2541))
+- Array: Optimize `#collect`/`#map` ([#2541](https://github.com/opal/opal/pull/2541))
+- Optimize argument slicing in runtime for performance ([#2555](https://github.com/opal/opal/pull/2555))
+- Closure: Generate a JavaScript object, not an Error, gain up to 15% on Asciidoctor ([#2556](https://github.com/opal/opal/pull/2556))
+- Optimize `String#split` and `String#start_with` ([#2560](https://github.com/opal/opal/pull/2560))
+- Compute `$@` dynamically ([#2592](https://github.com/opal/opal/pull/2592))
+- Optimize the `$prop` helper ([#2597](https://github.com/opal/opal/pull/2597))
+- Improve `Array.push()` performance when pushing many items ([#2565](https://github.com/opal/opal/pull/2565))
+- Optimize `Opal.instance_methods` ([#2600](https://github.com/opal/opal/pull/2600))
+
+### Internal
+
+- Update rubocop ([#2535](https://github.com/opal/opal/pull/2535))
+- Match3Node Cleanup ([#2541](https://github.com/opal/opal/pull/2541))
+- IFlipFlop/EFlipFlop: Refactor for readability ([#2541](https://github.com/opal/opal/pull/2541))
+- ForRewriter: Refactor for readability ([#2541](https://github.com/opal/opal/pull/2541))
+
+
+
+
+## [1.7.4](https://github.com/opal/opal/compare/v1.7.3...v1.7.4) - 2023-09-14
+
+
+### Fixed
+
+- Use a Map instead of a POJO for the jsid_cache ([#2584](https://github.com/opal/opal/pull/2584))
+- Lowercase response headers in `SimpleServer` for rack 3.0 compatibility ([#2578](https://github.com/opal/opal/pull/2578))
+- Fix `switch` with Object-wrapped values ([#2542](https://github.com/opal/opal/pull/2542))
+- Regexp.escape: Cast to String or drop exception ([#2552](https://github.com/opal/opal/pull/2552))
+- Chrome runner fix: support code that contains `</script>` ([#2581](https://github.com/opal/opal/pull/2581))
+
+
+
+
+## [1.7.3](https://github.com/opal/opal/compare/v1.7.2...v1.7.3) - 2023-03-23
+
 
 ### Fixed
 
