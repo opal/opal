@@ -940,7 +940,7 @@
   };
 
   Opal.instance_methods = function(mod) {
-    var exclude = [], results = [], ancestors = $ancestors(mod);
+    var processed = Object.create(null), results = [], ancestors = $ancestors(mod);
 
     for (var i = 0, l = ancestors.length; i < l; i++) {
       var ancestor = ancestors[i],
@@ -955,18 +955,18 @@
       for (var j = 0, ll = props.length; j < ll; j++) {
         var prop = props[j];
 
+        if (processed[prop]) {
+          continue;
+        }
         if (Opal.is_method(prop)) {
-          var method_name = prop.slice(1),
-              method = proto[prop];
+          var method = proto[prop];
 
-          if (method.$$stub && exclude.indexOf(method_name) === -1) {
-            exclude.push(method_name);
-          }
-
-          if (!method.$$stub && results.indexOf(method_name) === -1 && exclude.indexOf(method_name) === -1) {
+          if (!method.$$stub) {
+            var method_name = prop.slice(1);
             results.push(method_name);
           }
         }
+        processed[prop] = true;
       }
     }
 
