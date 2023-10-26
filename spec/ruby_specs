@@ -177,6 +177,7 @@ ruby/language
 ruby/library/base64
 ruby/library/bigdecimal
 !ruby/library/bigdecimal/util_spec
+ruby/library/cgi
 ruby/library/date
 ruby/library/datetime
 ruby/library/delegate/delegate_class
