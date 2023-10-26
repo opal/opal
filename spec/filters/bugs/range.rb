@@ -50,22 +50,12 @@ opal_filter "Range" do
   fails "Range#bsearch with endless ranges and Integer values with a block returning negative, zero, positive numbers returns nil if the block returns less than zero for every element" # NotImplementedError: Can't #bsearch an infinite range
   fails "Range#bsearch with endless ranges and Integer values with a block returning true or false returns minimum element if the block returns true for every element" # NotImplementedError: Can't #bsearch an infinite range
   fails "Range#bsearch with endless ranges and Integer values with a block returning true or false returns the smallest element for which block returns true" # NotImplementedError: Can't #bsearch an infinite range
-  fails "Range#cover? accepts beginless range argument" # Expected false to be true
-  fails "Range#cover? accepts endless range argument" # Expected false to be true
-  fails "Range#cover? allows self to be a beginless range" # Expected false to be true
-  fails "Range#cover? allows self to be a endless range" # Expected false to be true
-  fails "Range#cover? range argument accepts range argument" # Expected false to be true
-  fails "Range#cover? range argument honors exclusion of right boundary (:exclude_end option)" # Expected false to be true
-  fails "Range#cover? range argument supports boundaries of different comparable types" # Expected false to be true
+  fails "Range#cover? range argument honors exclusion of right boundary (:exclude_end option)" # Expected true to be false
   fails "Range#eql? returns false if the endpoints are not eql?" # Expected 0..1 not to have same value or type as 0..1
   fails "Range#first raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised ([2] was returned)
   fails "Range#frozen? is true for Range.new" # Expected 1..2.frozen? to be truthy but was false
   fails "Range#frozen? is true for literal ranges" # Expected 1..2.frozen? to be truthy but was false
   fails "Range#include? does not include U+9995 in the range U+0999..U+9999" # Expected true to be false
-  fails "Range#include? on string elements returns false if other is not matched by element.succ" # Expected true to be false
-  fails "Range#include? with weird succ when excluded end value returns false if other is not matched by element.succ" # Expected true to be false
-  fails "Range#include? with weird succ when included end value returns false if other is equal as last element but not matched by element.succ" # Expected true to be false
-  fails "Range#include? with weird succ when included end value returns false if other is not matched by element.succ" # Expected true to be false
   fails "Range#initialize raises a FrozenError if called on an already initialized Range" # Expected FrozenError but got: NameError ('initialize' called twice)
   fails "Range#inspect works for nil ... nil ranges" # Expected ".." == "nil..nil" to be truthy but was false
   fails "Range#last raises a TypeError if #to_int does not return an Integer" # Expected TypeError but no exception was raised ([3] was returned)
@@ -75,10 +65,6 @@ opal_filter "Range" do
   fails "Range#max raises TypeError when called on an exclusive range and a non Integer value" # Expected TypeError but no exception was raised (907.1111 was returned)
   fails "Range#max raises for an exclusive beginless range" # Expected TypeError (cannot exclude end value with non Integer begin value) but no exception was raised (0 was returned)
   fails "Range#max returns the maximum value in the range when called with no arguments" # Expected NaN == "e" to be truthy but was false
-  fails "Range#member? on string elements returns false if other is not matched by element.succ" # Expected true to be false
-  fails "Range#member? with weird succ when excluded end value returns false if other is not matched by element.succ" # Expected true to be false
-  fails "Range#member? with weird succ when included end value returns false if other is equal as last element but not matched by element.succ" # Expected true to be false
-  fails "Range#member? with weird succ when included end value returns false if other is not matched by element.succ" # Expected true to be false
   fails "Range#min given a block calls #> and #< on the return value of the block" # Mock 'obj' expected to receive >("any_args") exactly 2 times but received it 0 times
   fails "Range#minmax on an exclusive range raises TypeError if the end value is not an integer" # Expected TypeError (cannot exclude non Integer end value) but got: TypeError (can't iterate from Float)
   fails "Range#minmax on an exclusive range should raise RangeError on a beginless range" # Expected RangeError (/cannot get the maximum of beginless range with custom comparison method|cannot get the minimum of beginless range/) but got: TypeError (can't iterate from NilClass)
@@ -99,7 +85,7 @@ opal_filter "Range" do
   fails "Range#to_a works with Ranges of 64-bit integers" # Expected [256, 257] == [1099511627776, 1099511627777] to be truthy but was false
   fails "Range#to_s can show beginless ranges" # Expected "...1" == "...1.0" to be truthy but was false
   fails "Range#to_s can show endless ranges" # Expected "1..." == "1.0..." to be truthy but was false
-  fails "Range.new beginless/endless range creates a frozen range if the class is Range.class" # Expected 1..2.frozen? to be truthy but was false  
+  fails "Range.new beginless/endless range creates a frozen range if the class is Range.class" # Expected 1..2.frozen? to be truthy but was false
   fails_badly "Range#min given a block raises RangeError when called with custom comparison method on an endless range" # Expected RangeError but got: Opal::SyntaxError (undefined method `type' for nil)
   fails_badly "Range#minmax on an exclusive range should return the minimum and maximum values for a numeric range without iterating the range"
   fails_badly "Range#step with an endless range and String values raises a TypeError when passed a Float step" # Expected TypeError but got: Opal::SyntaxError (undefined method `type' for nil)

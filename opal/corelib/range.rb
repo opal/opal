@@ -19,7 +19,8 @@ class ::Range
   end
 
   def ===(value)
-    include? value
+    return false if `value.$$is_range`
+    cover? value
   end
 
   %x{
@@ -44,13 +45,34 @@ class ::Range
   end
 
   def cover?(value)
-    beg_cmp = (@begin.nil? && -1) || (@begin <=> value) || false
-    end_cmp = (@end.nil? && -1) || (value <=> @end) || false
-    if @excl
-      end_cmp && end_cmp < 0
-    else
-      end_cmp && end_cmp <= 0
-    end && beg_cmp && beg_cmp <= 0
+    compare = ->(a, b) {
+      a <=> b || 1
+    }
+
+    if `value.$$is_range`
+      val_begin = value.begin
+      val_end = value.end
+      val_excl = value.exclude_end?
+      if (@begin && val_begin.nil?) ||
+         (@end && val_end.nil?) ||
+         (val_begin && val_end && compare.call(val_begin, val_end).then { |c| val_excl ? c >= 0 : c > 0 }) ||
+         (val_begin && !cover?(val_begin))
+        return false
+      end
+
+      cmp = compare.call(@end, val_end)
+      return cmp >= 0 if @excl == val_excl
+      return cmp > 0 if @excl
+      return true if cmp >= 0
+
+      val_max = value.max
+      return !val_max.nil? && compare.call(val_max, @end) <= 0
+    end
+
+    return false if @begin && compare.call(@begin, value) > 0
+    return true if @end.nil?
+    end_cmp = compare.call(value, @end)
+    @excl ? end_cmp < 0 : end_cmp <= 0
   end
 
   def each(&block)
@@ -110,6 +132,29 @@ class ::Range
   def first(n = undefined)
     ::Kernel.raise ::RangeError, 'cannot get the minimum of beginless range' if @begin.nil?
     return @begin if `n == null`
+    super
+  end
+
+  def include?(val)
+    if `self.begin.$$is_number || self.end.$$is_number` ||
+       @begin.is_a?(::Time) || @end.is_a?(::Time) ||
+       ::Integer.try_convert(@begin) || ::Integer.try_convert(@end)
+      return cover?(val)
+    end
+
+    if `self.begin.$$is_string || self.end.$$is_string`
+      if `self.begin.$$is_string && self.end.$$is_string`
+        return @begin.upto(@end, @excl).any? { |s| s == val }
+      elsif @begin.nil?
+        cmp = val <=> @end
+        return !cmp.nil? && (@excl ? cmp < 0 : cmp <= 0)
+      elsif @end.nil?
+        cmp = @begin <=> val
+        return !cmp.nil? && cmp <= 0
+      end
+    end
+
+    # invoke Enumerable#include?
     super
   end
 
@@ -319,6 +364,5 @@ class ::Range
   end
 
   alias == eql?
-  alias include? cover?
-  alias member? cover?
+  alias member? include?
 end
