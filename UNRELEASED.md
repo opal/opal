@@ -42,7 +42,10 @@ This release brings a lot of performance improvements, our tests on Asciidoctor 
 
 - Add a magic-comment that will disable x-string compilation to JavaScript (#2543)
 - Pass value in `PromiseV2#always` just like `PromiseV1#always` does it (#2579)
-- `#hash` now returns integers #2582)
+- `#hash` now returns integers (#2582)
+- Improve `Range#include?`/`member?`/`cover?`/`===` (#2598)
+- Make `Module#define_method` more compatible with CRuby (#2593)
+- `Hash#clone` must freeze clone if original is frozen, but `Hash#dup` must not (#2603)
 
 ### Fixed
 
@@ -67,6 +70,7 @@ This release brings a lot of performance improvements, our tests on Asciidoctor 
 
 - SourceMap support for `Kernel#eval` (#2534)
 - Add `CGI::Util#escapeURIComponent` and `CGI::Util#unescapeURIComponent` (#2566)
+- `CGI::Util` implement additional methods (#2601)
 
 ### Changed
 
@@ -91,7 +95,7 @@ This release brings a lot of performance improvements, our tests on Asciidoctor 
 - Compute `$@` dynamically (#2592)
 - Optimize the `$prop` helper (#2597)
 - Improve `Array.push()` performance when pushing many items (#2565)
-- 
+- Optimize `Opal.instance_methods` (#2600)
 
 ### Internal
 
