@@ -210,7 +210,8 @@ class ::Hash < `Map`
   def clone
     %x{
       var hash = self.$class().$new();
-      return $hash_clone(self, hash);
+      $hash_clone(self, hash);
+      return self["$frozen?"]() ? hash.$freeze() : hash;
     }
   end
 
@@ -363,6 +364,10 @@ class ::Hash < `Map`
     end
 
     item.dig(*keys)
+  end
+
+  def dup
+    `$hash_clone(self, self.$class().$new())`
   end
 
   def each(&block)
@@ -932,7 +937,6 @@ class ::Hash < `Map`
     `Array.from(self.values())`
   end
 
-  alias dup clone
   alias each_pair each
   alias eql? ==
   alias filter select
