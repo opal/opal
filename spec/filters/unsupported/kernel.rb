@@ -21,8 +21,4 @@ opal_unsupported_filter "Kernel" do
   fails "Kernel#warn is a private method" # Expected Kernel to have private instance method 'warn' but it does not
   fails "Kernel.Float raises a TypeError if #to_f returns an Integer" # Expected TypeError but no exception was raised (123 was returned)
   fails "Kernel.lambda when called without a literal block warns when proc isn't a lambda" # Expected warning: "ruby/core/kernel/lambda_spec.rb:142: warning: lambda without a literal block is deprecated; use the proc without lambda instead\n" but got: ""
-  fails "Kernel.printf formatting io is specified other formats s formats nil with width and precision" # Exception: format_string.indexOf is not a function
-  fails "Kernel.printf formatting io is specified other formats s formats string with width and precision" # Exception: format_string.indexOf is not a function
-  fails "Kernel.printf formatting io is specified other formats s formats string with width" # Exception: format_string.indexOf is not a function
-  fails "Kernel.printf formatting io is specified other formats s substitutes '' for nil" # Exception: format_string.indexOf is not a function  
 end

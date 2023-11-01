@@ -610,9 +610,10 @@ module ::Kernel
   end
 
   def printf(*args)
-    if args.any?
-      print format(*args)
-    end
+    return if args.empty?
+
+    io = `args[0].$$is_string` ? $stdout : args.shift
+    io.write format(*args)
 
     nil
   end
