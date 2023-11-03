@@ -67,8 +67,8 @@ module Opal
     use Rewriters::BinaryOperatorAssignment
     use Rewriters::Hashes::KeyDuplicatesRewriter
     use Rewriters::ReturnableLogic
-    use Rewriters::DumpArgs
     use Rewriters::DeduplicateArgName
+    use Rewriters::DumpArgs
     use Rewriters::MlhsArgs
     use Rewriters::InlineArgs
     use Rewriters::ThrowerFinder

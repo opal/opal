@@ -70,4 +70,20 @@ describe 'duplicated underscore parameter' do
     o.foo(1).should == false
     o.foo(1) {}.should == true
   end
+
+  it 'works with zsuper' do
+    parent = Class.new {
+      def foo(*args, **kwargs, &blk)
+        [args, kwargs, blk.call]
+      end
+    }
+    child = Class.new(parent) {
+      def foo(_, _ = 0, *_, _, _:, **_, &_)
+        super
+      end
+    }
+    o = child.new
+
+    o.foo(1, 2, 3, 4, _: 5, a: 6) { 7 }.should == [[1, 2, 3, 4], {_: 5, a: 6}, 7]
+  end
 end

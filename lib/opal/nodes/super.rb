@@ -176,7 +176,6 @@ module Opal
       def implicit_arglist
         args = []
         kwargs = []
-        same_arg_counter = Hash.new(0)
 
         def_scope.original_args.children.each do |sexp|
           lvar_name = sexp.children[0]
@@ -184,14 +183,6 @@ module Opal
           case sexp.type
           when :arg, :optarg
             arg_node = s(:lvar, lvar_name)
-            #   def m(_, _)
-            # is compiled to
-            #   function $$m(_, __$2)
-            # See Opal::Node::ArgsNode
-            if lvar_name[0] == '_'
-              same_arg_counter[lvar_name] += 1
-              arg_node = s(:js_tmp, "#{lvar_name}_$#{same_arg_counter[lvar_name]}") if same_arg_counter[lvar_name] > 1
-            end
             args << arg_node
           when :restarg
             arg_node = lvar_name ? s(:lvar, lvar_name) : s(:js_tmp, '$rest_arg')
