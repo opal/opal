@@ -91,7 +91,6 @@ module Opal
           @initialization = []
 
           @type = type
-          @underscore_found = false
 
           STEPS.each do |step|
             send(step)
@@ -120,20 +119,9 @@ module Opal
           @args.args.each do |arg|
             if @type == :iter
               # block args are not required,
-              # so we neeed to tell compiler that required args
+              # so we need to tell compiler that required args
               # must be initialized with nil-s
               @initialization << arg.updated(:initialize_iter_arg)
-
-              if arg.children[0] == :_
-                if @underscore_found
-                  # for proc { |_, _| _ }.call(1, 2) result must be 1
-                  # here we convert all underscore args starting from the 2nd
-                  # to a "fake" arg
-                  arg = s(:fake_arg)
-                end
-
-                @underscore_found = true
-              end
             else
               # required inline def argument like 'def m(req)'
               # no initialization is required
