@@ -10,25 +10,28 @@ module Opal
 
         def to_code
           stringified_parameters = @args.map do |arg|
-            public_send(:"on_#{arg.type}", *arg)
+            public_send(:"on_#{arg.type}", arg)
           end
 
           "[#{stringified_parameters.compact.join(', ')}]"
         end
 
-        def on_arg(arg_name)
+        def on_arg(arg)
+          arg_name = arg.meta[:arg_name]
           %{['req', '#{arg_name}']}
         end
 
-        def on_mlhs(*)
+        def on_mlhs(_arg)
           %{['req']}
         end
 
-        def on_optarg(arg_name, _default_value)
+        def on_optarg(arg)
+          arg_name = arg.meta[:arg_name]
           %{['opt', '#{arg_name}']}
         end
 
-        def on_restarg(arg_name = nil)
+        def on_restarg(arg)
+          arg_name = arg.meta[:arg_name]
           if arg_name
             arg_name = :* if arg_name == :fwd_rest_arg
             %{['rest', '#{arg_name}']}
@@ -37,15 +40,18 @@ module Opal
           end
         end
 
-        def on_kwarg(arg_name)
+        def on_kwarg(arg)
+          arg_name = arg.meta[:arg_name]
           %{['keyreq', '#{arg_name}']}
         end
 
-        def on_kwoptarg(arg_name, _default_value)
+        def on_kwoptarg(arg)
+          arg_name = arg.meta[:arg_name]
           %{['key', '#{arg_name}']}
         end
 
-        def on_kwrestarg(arg_name = nil)
+        def on_kwrestarg(arg)
+          arg_name = arg.meta[:arg_name]
           if arg_name
             %{['keyrest', '#{arg_name}']}
           else
@@ -53,16 +59,17 @@ module Opal
           end
         end
 
-        def on_blockarg(arg_name)
+        def on_blockarg(arg)
+          arg_name = arg.meta[:arg_name]
           arg_name = :& if arg_name == :fwd_block_arg
           %{['block', '#{arg_name}']}
         end
 
-        def on_kwnilarg
+        def on_kwnilarg(_arg)
           %{['nokey']}
         end
 
-        def on_shadowarg(_arg_name); end
+        def on_shadowarg(_arg); end
       end
     end
   end
