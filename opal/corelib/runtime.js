@@ -2625,12 +2625,15 @@
   // a new Regexp.
   //
   Opal.escape_regexp = function(str) {
-    return str.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1')
-              .replace(/[\n]/g, '\\n')
+    return Opal.escape_metacharacters(str.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1'))
+  };
+
+  Opal.escape_metacharacters = function(str) {
+    return str.replace(/[\n]/g, '\\n')
               .replace(/[\r]/g, '\\r')
               .replace(/[\f]/g, '\\f')
               .replace(/[\t]/g, '\\t');
-  };
+  }
 
   // Create a global Regexp from a RegExp object and cache the result
   // on the object itself ($$g attribute).
@@ -2640,43 +2643,28 @@
       return pattern; // RegExp already has the global flag
     }
     if (pattern.$$g == null) {
-      pattern.$$g = new RegExp(pattern.source, (pattern.multiline ? 'gm' : 'g') + (pattern.ignoreCase ? 'i' : ''));
+      pattern.$$g = new RegExp(pattern.source, 'g' + pattern.flags);
     } else {
       pattern.$$g.lastIndex = null; // reset lastIndex property
     }
     return pattern.$$g;
   };
 
-  // Create a global multiline Regexp from a RegExp object and cache the result
-  // on the object itself ($$gm or $$g attribute).
-  //
-  Opal.global_multiline_regexp = function(pattern) {
-    var result, flags;
-
-    // RegExp already has the global and multiline flag
-    if (pattern.global && pattern.multiline) return pattern;
-
-    flags = 'gm' + (pattern.ignoreCase ? 'i' : '');
-    if (pattern.multiline) {
-      // we are using the $$g attribute because the Regexp is already multiline
-      if (pattern.$$g == null) {
-        pattern.$$g = new RegExp(pattern.source, flags);
-      }
-      result = pattern.$$g;
-    } else {
-      if (pattern.$$gm == null) {
-        pattern.$$gm = new RegExp(pattern.source, flags);
-      }
-      result = pattern.$$gm;
+  // Transform a regular expression from Ruby syntax to JS syntax.
+  Opal.transform_regexp = function(regexp, flags) {
+    if (!Opal.Opal.RegexpTranspiler) {
+      console.warn("ERROR: RegexpTranspiler has not been loaded, yet we try to create a dynamic regexp");
     }
-    result.lastIndex = null; // reset lastIndex property
-    return result;
+    return Opal.Opal.RegexpTranspiler.$transform_regexp(regexp, flags);
   };
 
   // Combine multiple regexp parts together
   Opal.regexp = function(parts, flags) {
     var part;
-    var ignoreCase = typeof flags !== 'undefined' && flags && flags.indexOf('i') >= 0;
+
+    if (flags == null) flags = '';
+
+    var ignoreCase = flags.includes('i');
 
     for (var i = 0, ii = parts.length; i < ii; i++) {
       part = parts[i];
@@ -2687,18 +2675,34 @@
             new Map([['uplevel',  1]])
           )
 
-        part = part.source;
+        part = part.$$source != null ? part.$$source : part.source;
       }
       if (part === '') part = '(?:' + part + ')';
       parts[i] = part;
     }
 
-    if (flags) {
-      return new RegExp(parts.join(''), flags);
-    } else {
-      return new RegExp(parts.join(''));
-    }
+    parts = parts.join('');
+    parts = Opal.escape_metacharacters(parts);
+
+    var output = Opal.transform_regexp(parts, flags);
+
+    var regexp = new RegExp(output[0], output[1]);
+    if (parts != output[0]) regexp.$$source = parts
+    if (flags != output[1]) regexp.$$options = flags;
+    return regexp;
   };
+
+  // Regexp has been transformed, so let's annotate the original regexp
+  Opal.annotate_regexp = function(regexp, source, options) {
+    regexp.$$source = source;
+    regexp.$$options = options;
+    return regexp;
+  }
+
+  // Annotated empty regexp
+  Opal.empty_regexp = function(flags) {
+    return Opal.annotate_regexp(new RegExp(/(?:)/, flags), '');
+  }
 
   // Require system
   // --------------

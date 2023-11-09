@@ -358,7 +358,10 @@ class ::String
     return enum_for :each_codepoint unless block_given?
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        #{yield `self.codePointAt(i)`};
+        var codepoint = self.codePointAt(i);
+        // iteration needs increasing in case the first character is over the BMP
+        if (codepoint > 0xffff) i++;
+        #{yield `codepoint`};
       }
     }
     self

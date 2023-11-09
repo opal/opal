@@ -13,6 +13,7 @@
 ::Object.require 'corelib/proc'
 ::Object.require 'corelib/method'
 ::Object.require 'corelib/regexp'
+::Object.require 'opal/regexp_transpiler'
+::Object.require 'opal/regexp_anchors'
 ::Object.require 'corelib/variables'
 ::Object.require 'corelib/io'
-::Object.require 'opal/regexp_anchors'
