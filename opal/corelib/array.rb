@@ -47,7 +47,7 @@ class ::Array < `Array`
     function filterIf(self, filter, block) {
       var value, raised = null, updated = new Array(self.length);
 
-      for (var i = 0, i2 = 0, length = self.length; i < length; i++) {
+      for (var i = 0, i2 = 0; i < self.length; i++) {
         if (!raised) {
           try {
             value = $yield1(block, self[i])
@@ -708,10 +708,9 @@ class ::Array < `Array`
     return enum_for(:collect) { size } unless block_given?
 
     %x{
-      var length = self.length;
-      var result = new Array(length);
+      var result = [];
 
-      for (var i = 0; i < length; i++) {
+      for (var i = 0; i < self.length; i++) {
         var value = $yield1(block, self[i]);
         result[i] = value;
       }
@@ -726,7 +725,7 @@ class ::Array < `Array`
     %x{
       $deny_frozen_access(self);
 
-      for (var i = 0, length = self.length; i < length; i++) {
+      for (var i = 0; i < self.length; i++) {
         var value = $yield1(block, self[i]);
         self[i] = value;
       }
@@ -988,8 +987,8 @@ class ::Array < `Array`
     return enum_for(:each) { size } unless block_given?
 
     %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        var value = $yield1(block, self[i]);
+      for (var i = 0; i < self.length; i++) {
+        $yield1(block, self[i]);
       }
     }
 
@@ -1000,8 +999,8 @@ class ::Array < `Array`
     return enum_for(:each_index) { size } unless block_given?
 
     %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        var value = $yield1(block, i);
+      for (var i = 0; i < self.length; i++) {
+        $yield1(block, i);
       }
     }
 
@@ -1348,7 +1347,7 @@ class ::Array < `Array`
         }
       }
       else if (block !== nil) {
-        for (i = 0, length = self.length; i < length; i++) {
+        for (i = 0; i < self.length; i++) {
           value = block(self[i]);
 
           if (value !== false && value !== nil) {
@@ -1789,7 +1788,7 @@ class ::Array < `Array`
     %x{
       var result = [];
 
-      for (var i = 0, length = self.length, value; i < length; i++) {
+      for (var i = 0, value; i < self.length; i++) {
         value = block(self[i]);
 
         if (value === false || value === nil) {
@@ -1839,7 +1838,11 @@ class ::Array < `Array`
   def reverse_each(&block)
     return enum_for(:reverse_each) { size } unless block_given?
 
-    reverse.each(&block)
+    %x{
+      for (var i = self.length - 1; i >= 0; i--) {
+        $yield1(block, self[i]);
+      }
+    }
     self
   end
 
@@ -2048,7 +2051,7 @@ class ::Array < `Array`
     %x{
       var result = [];
 
-      for (var i = 0, length = self.length, item, value; i < length; i++) {
+      for (var i = 0, item, value; i < self.length; i++) {
         item = self[i];
 
         value = $yield1(block, item);
@@ -2293,7 +2296,7 @@ class ::Array < `Array`
     %x{
       var result = [];
 
-      for (var i = 0, length = self.length, item, value; i < length; i++) {
+      for (var i = 0, item, value; i < self.length; i++) {
         item = self[i];
 
         value = block(item);
@@ -2389,7 +2392,7 @@ class ::Array < `Array`
         }
       }
       else {
-        for (i = 0, length = self.length; i < length; i++) {
+        for (i = 0; i < self.length; i++) {
           item = self[i];
           key = $yield1(block, item);
           if ($hash_get(hash, key) === undefined) {
@@ -2406,23 +2409,24 @@ class ::Array < `Array`
     %x{
       $deny_frozen_access(self);
 
-      var original_length = self.length, hash = #{{}}, i, length, item, key;
+      var hash = #{{}}, i, item, key, delete_indexes = [];
 
-      for (i = 0, length = original_length; i < length; i++) {
+      for (i = 0; i < self.length; i++) {
         item = self[i];
         key = (block === nil ? item : $yield1(block, item));
 
         if ($hash_get(hash, key) === undefined) {
           $hash_put(hash, key, item);
-          continue;
+        } else {
+          delete_indexes.push(i);
         }
-
-        self.splice(i, 1);
-        length--;
-        i--;
       }
 
-      return self.length === original_length ? nil : self;
+      for (i = delete_indexes.length - 1; i >= 0; i--) {
+        self.splice(delete_indexes[i], 1);
+      }
+
+      return delete_indexes.length === 0 ? nil : self;
     }
   end
 
