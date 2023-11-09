@@ -16,6 +16,38 @@ Changes are grouped as follows:
 
 
 
+## [1.8.1](https://github.com/opal/opal/compare/v1.8.0...v1.8.1) - 2023-11-09
+
+
+<!--
+### Internal
+### Changed
+### Added
+### Removed
+### Deprecated
+### Performance
+### Fixed
+-->
+
+
+### Fixed
+
+- `Array` methods should handle elements inserted during the iteration ([#2602](https://github.com/opal/opal/pull/2602))
+- Assign correct values to duplicated underscore parameters ([#2606](https://github.com/opal/opal/pull/2606))
+
+
+### Added
+
+- Support an `IO` argument of `Kernel.printf` ([#2605](https://github.com/opal/opal/pull/2605))
+
+
+### Performance
+
+- Fix a performance regression introduced by freezing support ([#2609](https://github.com/opal/opal/pull/2609))
+
+
+
+
 ## [1.8.0](https://github.com/opal/opal/compare/v1.7.4...v1.8.0) - 2023-10-26
 
 
