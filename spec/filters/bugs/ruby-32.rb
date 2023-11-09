@@ -7,8 +7,8 @@ opal_filter "Ruby 3.2" do
   fails "Kernel#sprintf other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
   fails "Kernel.printf formatting io is not specified other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
   fails "Kernel.printf formatting io is not specified other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
-  fails "Kernel.printf formatting io is specified other formats c displays no characters if argument is an empty string" # Exception: format_string.indexOf is not a function
-  fails "Kernel.printf formatting io is specified other formats c displays only the first character if argument is a string of several characters" # Exception: format_string.indexOf is not a function
+  fails "Kernel.printf formatting io is specified other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
+  fails "Kernel.printf formatting io is specified other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
   fails "Kernel.sprintf other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
   fails "Kernel.sprintf other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
   fails "Keyword arguments delegation does not work with call(*ruby2_keyword_args) with missing ruby2_keywords in between" # Expected [[], {}] == [[{}], {}] to be truthy but was false
