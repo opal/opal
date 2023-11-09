@@ -1,4 +1,4 @@
-# helpers: coerce_to, prop, freeze
+# helpers: coerce_to, prop, freeze, annotate_regexp, escape_metacharacters
 # backtick_javascript: true
 # use_strict: true
 
@@ -8,8 +8,14 @@ class ::Regexp < `RegExp`
   self::IGNORECASE = 1
   self::EXTENDED = 2
   self::MULTILINE = 4
+  # Not supported:
+  self::FIXEDENCODING = 16
+  self::NOENCODING = 32
 
   `Opal.prop(self.$$prototype, '$$is_regexp', true)`
+  `Opal.prop(self.$$prototype, '$$source', null)`
+  `Opal.prop(self.$$prototype, '$$options', null)`
+  `Opal.prop(self.$$prototype, '$$g', null)`
 
   class << self
     def allocate
@@ -35,6 +41,13 @@ class ::Regexp < `RegExp`
 
     def union(*parts)
       %x{
+        function exclude_compatible(flags) {
+          return (flags || 0) & ~#{MULTILINE} & ~#{EXTENDED};
+        }
+        function compatible_flags(first, second) {
+          return exclude_compatible(first) == exclude_compatible(second)
+        }
+
         var is_first_part_array, quoted_validated, part, options, each_part_options;
         if (parts.length == 0) {
           return /(?!)/;
@@ -61,11 +74,11 @@ class ::Regexp < `RegExp`
           }
           else if (part.$$is_regexp) {
             each_part_options = #{`part`.options};
-            if (options != undefined && options != each_part_options) {
+            if (options != undefined && !compatible_flags(options, each_part_options)) {
               #{::Kernel.raise ::TypeError, 'All expressions must use the same options'}
             }
             options = each_part_options;
-            quoted_validated.push('('+part.source+')');
+            quoted_validated.push('(?:'+#{`part`.source}+')');
           }
           else {
             quoted_validated.push(#{escape(`part`.to_str)});
@@ -79,7 +92,7 @@ class ::Regexp < `RegExp`
     def new(regexp, options = undefined)
       %x{
         if (regexp.$$is_regexp) {
-          return new RegExp(regexp);
+          return $annotate_regexp(new RegExp(regexp), regexp.$$source, regexp.$$options);
         }
 
         regexp = #{::Opal.coerce_to!(regexp, ::String, :to_str)};
@@ -88,23 +101,21 @@ class ::Regexp < `RegExp`
           #{::Kernel.raise ::RegexpError, "too short escape sequence: /#{regexp}/"}
         }
 
-        regexp = regexp.replace('\\A', '^').replace('\\z', '$')
-
         if (options === undefined || #{!options}) {
-          return new RegExp(regexp);
+          options = '';
         }
-
-        if (options.$$is_number) {
+        else if (options.$$is_number) {
           var temp = '';
           if (#{IGNORECASE} & options) { temp += 'i'; }
           if (#{MULTILINE}  & options) { temp += 'm'; }
           options = temp;
         }
-        else {
+        else if (!options.$$is_string) {
           options = 'i';
         }
 
-        return new RegExp(regexp, options);
+        var result = Opal.transform_regexp(regexp, options);
+        return Opal.annotate_regexp(new RegExp(result[0], result[1]), $escape_metacharacters(regexp), options);
       }
     end
 
@@ -113,7 +124,7 @@ class ::Regexp < `RegExp`
   end
 
   def ==(other)
-    `other instanceof RegExp && self.toString() === other.toString()`
+    `other instanceof RegExp && self.$options() == other.$options() && self.$source() == other.$source()`
   end
 
   def ===(string)
@@ -132,7 +143,6 @@ class ::Regexp < `RegExp`
 
     %x{
       if (!self.hasOwnProperty('$$g')) { $prop(self, '$$g', null); }
-      if (!self.hasOwnProperty('$$gm')) { $prop(self, '$$gm', null); }
 
       return $freeze(self);
     }
@@ -142,37 +152,26 @@ class ::Regexp < `RegExp`
     # Use a regexp to extract the regular expression and the optional mode modifiers from the string.
     # In the regular expression, escape any front slash (not already escaped) with a backslash.
     %x{
-      var regexp_format = /^\/(.*)\/([^\/]*)$/;
-      var value = self.toString();
-      var matches = regexp_format.exec(value);
-      if (matches) {
-        var regexp_pattern = matches[1];
-        var regexp_flags = matches[2];
-        var chars = regexp_pattern.split('');
-        var chars_length = chars.length;
-        var char_escaped = false;
-        var regexp_pattern_escaped = '';
-        for (var i = 0; i < chars_length; i++) {
-          var current_char = chars[i];
-          if (!char_escaped && current_char == '/') {
-            regexp_pattern_escaped = regexp_pattern_escaped.concat('\\');
-          }
-          regexp_pattern_escaped = regexp_pattern_escaped.concat(current_char);
-          if (current_char == '\\') {
-            if (char_escaped) {
-              // does not over escape
-              char_escaped = false;
-            } else {
-              char_escaped = true;
-            }
-          } else {
-            char_escaped = false;
-          }
+      var regexp_pattern = self.$source();
+      var regexp_flags = self.$$options != null ? self.$$options : self.flags;
+      var chars = regexp_pattern.split('');
+      var chars_length = chars.length;
+      var char_escaped = false;
+      var regexp_pattern_escaped = '';
+      for (var i = 0; i < chars_length; i++) {
+        var current_char = chars[i];
+        if (!char_escaped && current_char == '/') {
+          regexp_pattern_escaped += '\\';
         }
-        return '/' + regexp_pattern_escaped + '/' + regexp_flags;
-      } else {
-        return value;
+        regexp_pattern_escaped += current_char;
+        if (current_char == '\\') {
+          // does not over escape
+          char_escaped = !char_escaped;
+        } else {
+          char_escaped = false;
+        }
       }
+      return '/' + regexp_pattern_escaped + '/' + regexp_flags;
     }
   end
 
@@ -281,7 +280,7 @@ class ::Regexp < `RegExp`
   end
 
   def source
-    `self.source`
+    `self.$$source != null ? self.$$source : self.source`
   end
 
   def options
@@ -292,11 +291,14 @@ class ::Regexp < `RegExp`
       }
       var result = 0;
       // should be supported in IE6 according to https://msdn.microsoft.com/en-us/library/7f5z26w4(v=vs.94).aspx
-      if (self.multiline) {
+      if (self.$$options != null ? self.$$options.includes('m') : self.multiline) {
         result |= #{MULTILINE};
       }
-      if (self.ignoreCase) {
+      if (self.$$options != null ? self.$$options.includes('i') : self.ignoreCase) {
         result |= #{IGNORECASE};
+      }
+      if (self.$$options != null ? self.$$options.includes('x') : false) {
+        result |= #{EXTENDED};
       }
       return result;
     }
