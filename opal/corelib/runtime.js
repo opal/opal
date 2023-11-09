@@ -2580,33 +2580,42 @@
     return obj;
   };
 
-  // freze props, make setters of instance variables throw FrozenError
-  Opal.freeze_props = function(obj) {
-    var prop, prop_type, desc;
+  // Iterate over every instance variable and call func for each one
+  // giving name of the ivar and optionally the property descriptor.
+  function $each_ivar(obj, func) {
+    var own_props = Object.getOwnPropertyNames(obj), own_props_length = own_props.length, i, prop, desc;
 
-    for(prop in obj) {
-      prop_type = typeof(prop);
+    for(i = 0; i < own_props_length; i++) {
+      prop = own_props[i];
 
-      // prop_type "object" here is a String(), skip $ props
-      if ((prop_type === "string" || prop_type === "object") && prop[0] === '$') {
-        continue;
-      }
+      if (prop[0] === '$') continue;
 
       desc = Object.getOwnPropertyDescriptor(obj, prop);
-      if (desc && desc.enumerable && desc.writable) {
-        // create closure to retain current value as cv
-        // for Opal 2.0 let for cv should do the trick, instead of a function
-        (function() {
-          // set v to undefined, as if the property is not set
-          var cv = obj[prop];
-          Object.defineProperty(obj, prop, {
-            get: function() { return cv; },
-            set: function(_val) { $deny_frozen_access(obj); },
-            enumerable: true
-          });
-        })();
+
+      if (desc && desc.enumerable) {
+        func(prop, desc);
       }
     }
+  }
+
+  Opal.each_ivar = $each_ivar;
+
+  // freze props, make setters of instance variables throw FrozenError
+  Opal.freeze_props = function(obj) {
+    var dp_template = {
+      get: null,
+      set: function(_val) { $deny_frozen_access(obj); },
+      enumerable: true
+    };
+
+    $each_ivar(obj, function(prop, desc) {
+      if (!desc.writable) return;
+
+      // Redefine a property with a setter that raises an error.
+      dp_template.get = $return_val(desc.value);
+
+      Object.defineProperty(obj, prop, dp_template);
+    });
   };
 
   // Regexps

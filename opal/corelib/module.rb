@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop, jsid
+# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop, jsid, each_ivar
 # backtick_javascript: true
 
 class ::Module
@@ -744,11 +744,11 @@ class ::Module
     %x{
       var result = [];
 
-      for (var name in self) {
-        if (self.hasOwnProperty(name) && name.charAt(0) !== '$' && name !== 'constructor' && !#{consts.include?(`name`)}) {
+      $each_ivar(self, function(name) {
+        if (name !== 'constructor' && !#{consts.include?(`name`)}) {
           result.push('@' + name);
         }
-      }
+      });
 
       return result;
     }
