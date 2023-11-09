@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid
+# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid, each_ivar
 # use_strict: true
 # backtick_javascript: true
 
@@ -369,18 +369,14 @@ module ::Kernel
 
   def instance_variables
     %x{
-      var result = [], ivar;
+      var result = [], name;
 
-      for (var name in self) {
-        if (self.hasOwnProperty(name) && name.charAt(0) !== '$') {
-          if (name.substr(-1) === '$') {
-            ivar = name.slice(0, name.length - 1);
-          } else {
-            ivar = name;
-          }
-          result.push('@' + ivar);
+      $each_ivar(self, function(name) {
+        if (name.substr(-1) === '$') {
+          name = name.slice(0, name.length - 1);
         }
-      }
+        result.push('@' + name);
+      });
 
       return result;
     }

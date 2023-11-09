@@ -1,4 +1,4 @@
-# helpers: slice
+# helpers: slice, each_ivar
 # backtick_javascript: true
 
 class ::Proc < `Function`
@@ -181,11 +181,9 @@ class ::Proc < `Function`
             return original_proc.apply(this, arguments);
           };
 
-      for (var prop in self) {
-        if (self.hasOwnProperty(prop)) {
-          proc[prop] = self[prop];
-        }
-      }
+      $each_ivar(self, function(prop) {
+        proc[prop] = self[prop];
+      });
 
       return proc;
     }
