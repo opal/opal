@@ -11,6 +11,7 @@ require 'opal/rewriters/logical_operator_assignment'
 require 'opal/rewriters/binary_operator_assignment'
 require 'opal/rewriters/hashes/key_duplicates_rewriter'
 require 'opal/rewriters/dump_args'
+require 'opal/rewriters/deduplicate_arg_name'
 require 'opal/rewriters/mlhs_args'
 require 'opal/rewriters/inline_args'
 require 'opal/rewriters/numblocks'
@@ -66,6 +67,7 @@ module Opal
     use Rewriters::BinaryOperatorAssignment
     use Rewriters::Hashes::KeyDuplicatesRewriter
     use Rewriters::ReturnableLogic
+    use Rewriters::DeduplicateArgName
     use Rewriters::DumpArgs
     use Rewriters::MlhsArgs
     use Rewriters::InlineArgs
