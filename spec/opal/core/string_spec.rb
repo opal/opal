@@ -26,3 +26,38 @@ describe 'Encoding' do
     end
   end
 end
+
+describe 'strip methods' do
+  def strip_cases(before, after, method)
+    before = before ? 1 : 0
+    after = after ? 1 : 0
+
+    it 'strip spaces' do
+      "#{"  " * before}ABC#{"  " * after}".send(method).should == "ABC"
+    end
+
+    it 'strips NUL bytes' do
+      "#{"\0" * before}ABC#{"\0" * after}".send(method).should == "ABC"
+    end
+
+    it "doesn't strip NBSPs" do
+      "#{"\u{a0}" * before}ABC#{"\u{a0}" * after}".send(method).should != "ABC"
+    end
+
+    it "strips all other supported whitespace characters" do
+      "#{"\r\n\t\v\f" * before}ABC#{"\r\n\t\v\f" * after}".send(method).should == "ABC"
+    end
+  end
+
+  describe '#lstrip' do
+   strip_cases true, false, :lstrip
+  end
+
+  describe '#rstrip' do
+    strip_cases false, true, :rstrip
+  end
+
+  describe '#strip' do
+    strip_cases true, true, :strip
+  end
+end
