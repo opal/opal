@@ -724,7 +724,7 @@ class ::String < `String`
   end
 
   def lstrip
-    `self.replace(/^[\u0000\s]*/, '')`
+    `self.replace(/^[\x00\x09\x0a-\x0d\x20]*/, '')`
   end
 
   def ascii_only?
@@ -1023,7 +1023,7 @@ class ::String < `String`
   end
 
   def rstrip
-    `self.replace(/[\s\u0000]*$/, '')`
+    `self.replace(/[\x00\x09\x0a-\x0d\x20]*$/, '')`
   end
 
   def scan(pattern, no_matchdata: false, &block)
@@ -1201,7 +1201,7 @@ class ::String < `String`
   end
 
   def strip
-    `self.replace(/^[\s\u0000]*|[\s\u0000]*$/g, '')`
+    `self.replace(/^[\x00\x09\x0a-\x0d\x20]*|[\x00\x09\x0a-\x0d\x20]*$/g, '')`
   end
 
   def sub(pattern, replacement = undefined, &block)
