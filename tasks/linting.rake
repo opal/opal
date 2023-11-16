@@ -15,17 +15,12 @@ namespace :lint do
     Rake::Task[:dist].invoke
 
     files = Dir["#{dir}/*.js"]
-    es8, es3 = files.partition { |i| i.include? "await" }
 
-    [es3, es8].each do |files|
-      config = (files == es8) ? ["-c", __dir__+"/../.eslintrc.await.js"] : []
-
-      sh "yarn", "run", "eslint", *config, *files, "--format", "json", "--output-file", result_path do |ok, _|
-        if ok
-          puts "Successful."
-        else
-          sh 'node tasks/linting-parse-eslint-results.js'
-        end
+    sh "yarn", "run", "eslint", *files, "--format", "json", "--output-file", result_path do |ok, _|
+      if ok
+        puts "Successful."
+      else
+        sh 'node tasks/linting-parse-eslint-results.js'
       end
     end
   end
