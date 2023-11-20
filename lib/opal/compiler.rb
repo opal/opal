@@ -183,6 +183,11 @@ module Opal
     # Enables JavaScript's strict mode (i.e., adds 'use strict'; statement)
     compiler_option :use_strict, default: false, as: :use_strict?, magic_comment: true
 
+    # @!method pristine?
+    #
+    # Marks all the methods in the file as "pristine" for fast tracking in the runtime
+    compiler_option :pristine, default: false, as: :pristine?, magic_comment: true
+
     # @!method parse_comments?
     #
     # Adds comments for every method definition

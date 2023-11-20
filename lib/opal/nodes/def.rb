@@ -28,6 +28,10 @@ module Opal
           blockopts["$$source_location"] = source_location
         end
 
+        if compiler.pristine?
+          blockopts["$$pristine"] = true
+        end
+
         if blockopts.keys == ["$$arity"]
           push ", #{arity}"
         elsif !blockopts.empty?
