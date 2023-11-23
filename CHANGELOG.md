@@ -16,7 +16,7 @@ Changes are grouped as follows:
 
 
 
-## [1.8.1](https://github.com/opal/opal/compare/v1.8.0...v1.8.1) - 2023-11-09
+## [1.8.2](https://github.com/opal/opal/compare/v1.8.1...v1.8.2) - 2023-11-23
 
 
 <!--
@@ -25,9 +25,21 @@ Changes are grouped as follows:
 ### Added
 ### Removed
 ### Deprecated
-### Performance
-### Fixed
 -->
+
+### Performance
+
+- Optimize `Hash#rehash` for the common case, avoid calling `$slice` when no hash collision is present ([#2571](https://github.com/opal/opal/pull/2571))
+
+### Fixed
+
+- `String#{r,l,}strip`: Make them work like in MRI for non-breaking white-space ([#2612](https://github.com/opal/opal/pull/2612))
+- Compat regression fix: `Hash#to_n` should return a JS object ([#2613](https://github.com/opal/opal/pull/2613))
+
+
+
+
+## [1.8.1](https://github.com/opal/opal/compare/v1.8.0...v1.8.1) - 2023-11-09
 
 
 ### Fixed
