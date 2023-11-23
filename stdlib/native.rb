@@ -587,14 +587,14 @@ unless Hash.method_defined? :_initialize
       }
     end
 
-    # @return a JavaScript Map but calling #to_n on
+    # @return a JavaScript object, in turn also calling #to_n on
     # all keys and values.
     def to_n
       %x{
-        var result = new Map();
+        var result = {};
 
         Opal.hash_each(self, false, function(key, value) {
-          result.set(#{Native.try_convert(`key`, `key`)} , #{Native.try_convert(`value`, `value`)});
+          result[#{Native.try_convert(`key`, `key`)}] = #{Native.try_convert(`value`, `value`)};
           return [false, false];
         });
 
