@@ -15,6 +15,7 @@
 ### Fixed
 
 - `String#{r,l,}strip`: Make them work like in MRI for non-breaking white-space (#2612)
+- Compat regression fix: `Hash#to_n` should return a JS object (#2613)
 
 ### Internal
 
