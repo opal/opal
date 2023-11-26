@@ -1,5 +1,6 @@
 # helpers: truthy
 # backtick_javascript: true
+# use_strict: true
 
 require 'corelib/random/formatter'
 

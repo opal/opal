@@ -1,5 +1,6 @@
 # helpers: slice, each_ivar
 # backtick_javascript: true
+# use_strict: true
 
 class ::Proc < `Function`
   `Opal.prop(self.$$prototype, '$$is_proc', true)`

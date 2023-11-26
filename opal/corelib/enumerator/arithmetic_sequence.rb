@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# use_strict: true
 
 class ::Enumerator
   class self::ArithmeticSequence < self

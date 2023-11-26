@@ -1,5 +1,6 @@
 # helpers: deny_frozen_access
 # backtick_javascript: true
+# use_strict: true
 
 class ::Enumerator
   class self::Chain < self
