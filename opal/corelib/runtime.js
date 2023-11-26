@@ -2841,6 +2841,9 @@
 
   Opal.interpolate = function(...args) {
     return args.map(obj => {
+      if (obj == null) {
+        return String(obj);
+      }
       if (obj.$$is_string || typeof obj === 'string') {
         return obj;
       }
