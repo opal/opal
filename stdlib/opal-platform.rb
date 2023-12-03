@@ -3,6 +3,7 @@
 `/* global Java, GjsFileImporter, Deno */`
 
 browser          = `typeof(document) !== "undefined"`
+bun              = `typeof(Bun) === "object" && typeof(Bun.version) === "string"`
 deno             = `typeof(Deno) === "object" && typeof(Deno.version) === "object"`
 node             = `typeof(process) !== "undefined" && process.versions && process.versions.node`
 nashorn          = `typeof(Java) !== "undefined" && Java.type`
@@ -15,6 +16,8 @@ opal_miniracer   = `typeof(opalminiracer) !== "undefined"`
 
 OPAL_PLATFORM = if nashorn
                   'nashorn'
+                elsif bun
+                  'bun'
                 elsif deno
                   'deno'
                 elsif node

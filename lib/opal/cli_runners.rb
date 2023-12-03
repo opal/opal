@@ -88,6 +88,7 @@ module Opal
     end
 
     unless OS.windows?
+      register_runner :bun,         :Bun,         'opal/cli_runners/bun'
       register_runner :miniracer,   :MiniRacer,   'opal/cli_runners/mini_racer'
     end
 
