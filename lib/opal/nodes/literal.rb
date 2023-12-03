@@ -120,7 +120,7 @@ module Opal
       attr_accessor :value, :flags
 
       # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-      SUPPORTED_FLAGS = /[gimuy]/.freeze
+      SUPPORTED_FLAGS = /[ginmuy]/.freeze
 
       def initialize(*)
         super
@@ -173,6 +173,10 @@ module Opal
           # errors) - at least since Node 17.
           static_as_dynamic(value)
         else
+          if flags.include?('n')
+            value.encode!('ASCII-8BIT')
+            flags.delete('n')
+          end
           push "#{Regexp.new(value).inspect}#{flags.join}"
         end
       end
