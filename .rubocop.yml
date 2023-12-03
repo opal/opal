@@ -402,6 +402,10 @@ Style/TrailingCommaInHashLiteral:
   # Any style is allowed
   Enabled: false
 
+Style/VariableInterpolation:
+  # `#@native.abc` makes sense for Opal
+  Enabled: false
+
 Naming/MethodParameterName:
   Exclude:
     # This file uses parser's code that doesn't match our styling requirements
