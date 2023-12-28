@@ -41,13 +41,13 @@ jobs:
             ruby: head
             permissive: true
           - name: current-ruby
-            ruby: 3.1
+            ruby: '3.3'
           - name: previous-ruby
-            ruby: '3.0'
+            ruby: '3.2'
           - name: older-ruby
-            ruby: 2.7
+            ruby: '3.1'
           - name: near-eol-ruby
-            ruby: 2.6
+            ruby: '3.0'
           - name: smoke-test
             ruby: '3.0'
             command: bin/rake smoke_test
