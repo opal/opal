@@ -25,9 +25,7 @@ jobs:
           - name: mspec-chrome
             command: bin/rake mspec_chrome
           - name: mspec-firefox
-            env:
-              # when changing version, also change it below
-              MOZILLA_FIREFOX_BINARY: '/opt/hostedtoolcache/firefox/106.0.4/x64/firefox'
+            firefox: '106.0.4'
             command: xvfb-run bin/rake mspec_firefox
           - name: minitest
             command: bin/rake minitest
@@ -54,9 +52,7 @@ jobs:
             command: bundle exec rake mspec_chrome
             os: windows-latest
           # - name: windows-mspec-firefox
-          #   env:
-          #     # when changing version, also change it below and above
-          #     MOZILLA_FIREFOX_BINARY: 'C:/Program Files/Firefox_106.0.4/firefox.exe'
+          #   firefox: '106.0.4'
           #   command: bundle exec rake mspec_firefox
           #   os: windows-latest
           - name: macos-mspec-safari
@@ -88,10 +84,11 @@ jobs:
     runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.combo.permissive || false }}
     steps:
-      - uses: browser-actions/setup-firefox@latest
+      - if: ${{ matrix.combo.firefox }}
+        id: setup-firefox
+        uses: browser-actions/setup-firefox@latest
         with:
-          # when changing version, also change it above
-          firefox-version: '106.0.4'
+          firefox-version: ${{ matrix.combo.firefox }}
       - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ fromJSON(matrix.combo.fetchdepth || '1') }}
@@ -126,8 +123,12 @@ jobs:
           bundle config path $PWD/vendor/bundle
           bundle install --jobs 4 --retry 3
           bundle clean
-      - name: set environment variables
+      - name: set environment variables USE_STRICT
         if: ${{ matrix.combo.strict == 'true' }}
         run: |
           echo "USE_STRICT=true" >> $GITHUB_ENV
+      - name: set environment variables MOZILLA_FIREFOX_BINARY
+        if: ${{ matrix.combo.firefox }}
+        run: |
+          echo "MOZILLA_FIREFOX_BINARY=${{ steps.setup-firefox.outputs.firefox-path }}" >> $GITHUB_ENV
       - run: ${{ matrix.combo.command || 'bin/rake rspec' }}
