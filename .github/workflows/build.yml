@@ -28,8 +28,10 @@ jobs:
             firefox: '106.0.4'
             command: xvfb-run bin/rake mspec_firefox
           - name: minitest
+            ruby: '3.2'
             command: bin/rake minitest
           - name: minitest-strict-mode
+            ruby: '3.2'
             command: bin/rake minitest
             strict: 'true'
           - name: head-ruby
@@ -59,6 +61,7 @@ jobs:
             command: bundle exec rake mspec_safari
             os: 'macos-latest'
           - name: windows-minitest
+            ruby: '3.2'
             command: bundle exec rake minitest
             os: windows-latest
           - name: windows
