@@ -106,7 +106,7 @@ jobs:
         with:
           # when changing version, also change it above
           firefox-version: '106.0.4'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ fromJSON(matrix.combo.fetchdepth || '1') }}
       - if: ${{ matrix.combo.os != 'ryzen' }}
@@ -116,7 +116,7 @@ jobs:
           bundler-cache: false
       - run: ruby bin/git-submodule-fast-install
       - run: bundle lock
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ./vendor/bundle
           key: ${{ runner.os }}-${{ matrix.combo.ruby }}-gem-${{ github.ref }}-${{ hashFiles('**/Gemfile.lock') }}
@@ -124,7 +124,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.combo.ruby }}-gem-${{ github.ref }}
             ${{ runner.os }}-${{ matrix.combo.ruby }}-gem-master
             ${{ runner.os }}-${{ matrix.combo.ruby }}-gem-
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ./node_modules
           key: ${{ runner.os }}-npm-${{ github.ref }}-${{ hashFiles('**/yarn.lock') }}
