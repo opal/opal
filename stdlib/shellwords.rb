@@ -98,7 +98,7 @@ module Shellwords
       #   characters when considered special:
       #
       #   $ ` " \ <newline>
-      field += (word || sq || (dq && dq.gsub(/\\([$`"\\\n])/, '\\1')) || esc.gsub(/\\(.)/, '\\1'))
+      field += word || sq || (dq && dq.gsub(/\\([$`"\\\n])/, '\\1')) || esc.gsub(/\\(.)/, '\\1')
       if sep
         words << field
         field = String.new
