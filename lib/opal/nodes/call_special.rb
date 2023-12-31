@@ -37,7 +37,7 @@ module Opal
         # For .JS. call we pass a block
         # as a plain JS callback
         if @iter
-          @arglist = @arglist << @iter
+          @arglist <<= @iter
         end
         @iter = nil
       end
