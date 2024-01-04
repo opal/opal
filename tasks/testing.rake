@@ -1,6 +1,7 @@
 require_relative "#{__dir__}/../lib/opal/os"
 require_relative "#{__dir__}/../lib/opal/cli_runners"
 
+require 'timeout'
 require 'rspec/core/rake_task'
 
 OS = Opal::OS unless defined? OS
@@ -196,9 +197,14 @@ module Testing
       begin
         server = Process.spawn "bundle exec rackup --host #{host} --port #{port}"
         puts 'Waiting for server…'
-        sleep 0.1 until system "curl -s 'http://#{host}:#{port}/' > /dev/null"
+        Timeout.timeout(30) do
+          sleep 0.1 until system "curl -s 'http://#{host}:#{port}/' > /dev/null"
+        end
         puts 'Server ready.'
         yield self
+      rescue Timeout::Error
+        puts 'Failed to start rack server'
+        exit(1)
       ensure
         Process.kill(:TERM, server)
         Process.wait(server)
@@ -252,9 +258,14 @@ module Testing
       begin
         server = Process.spawn 'ruby test/opal/http_server.rb'
         puts 'Waiting for server…'
-        sleep 0.1 until sinatra_server_running?
+        Timeout.timeout(30) do
+          sleep 0.1 until sinatra_server_running?
+        end
         puts 'Server ready.'
         yield self
+      rescue Timeout::Error
+        puts 'Failed to start Sinatra server'
+        exit(1)
       ensure
         if OS.windows?
           # https://blog.simplificator.com/2016/01/18/how-to-kill-processes-on-windows-using-ruby/
