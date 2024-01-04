@@ -29,7 +29,7 @@ class DateTime < Date
   alias second sec
 
   def sec_fraction
-    @date.usec / 1_000_000r
+    @date.usec/1_000_000r
   end
 
   alias second_fraction sec_fraction

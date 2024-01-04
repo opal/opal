@@ -127,7 +127,7 @@ class ::Hash < `Map`
 
     result = true
 
-    other.each do |other_key, other_val|
+    other.each do |other_key, other_val| # rubocop:disable Style/HashEachMethods
       val = fetch(other_key, `null`)
 
       %x{

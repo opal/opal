@@ -157,7 +157,7 @@ class ::IO
     end while data = sysread_noraise(sep == '' ? 65_536 : 1)
 
     unless ret
-      ret, @read_buffer = (@read_buffer || ''), ''
+      ret, @read_buffer = @read_buffer || '', ''
       ret = nil if ret == ''
     end
 

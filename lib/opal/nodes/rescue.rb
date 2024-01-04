@@ -221,7 +221,7 @@ module Opal
       end
 
       def rescue_body
-        body_code = (body || s(:nil))
+        body_code = body || s(:nil)
         body_code = compiler.returns(body_code) unless stmt?
         body_code
       end
