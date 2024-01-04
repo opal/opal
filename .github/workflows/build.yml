@@ -14,82 +14,64 @@ permissions:
 jobs:
   rake:
     name: ${{ matrix.combo.name || matrix.combo.ruby }}
+    env:
+      DEFAULT_RUBY: '3.3'
     strategy:
       fail-fast: false
       matrix:
         combo:
           - name: mspec-nodejs
-            ruby: '3.0'
             command: bin/rake mspec_nodejs
           - name: mspec-chrome
-            ruby: '3.0'
             command: bin/rake mspec_chrome
           - name: mspec-firefox
-            env:
-              # when changing version, also change it below
-              MOZILLA_FIREFOX_BINARY: '/opt/hostedtoolcache/firefox/106.0.4/x64/firefox'
-            ruby: '3.0'
+            firefox: '106.0.4'
             command: xvfb-run bin/rake mspec_firefox
           - name: minitest
-            ruby: '3.0'
             command: bin/rake minitest
           - name: minitest-strict-mode
-            ruby: '3.0'
             command: bin/rake minitest
             strict: 'true'
           - name: head-ruby
             ruby: head
             permissive: true
           - name: current-ruby
-            ruby: 3.1
+            ruby: '3.3'
           - name: previous-ruby
-            ruby: '3.0'
+            ruby: '3.2'
           - name: older-ruby
-            ruby: 2.7
+            ruby: '3.1'
           - name: near-eol-ruby
-            ruby: 2.6
-          - name: smoke-test
             ruby: '3.0'
+          - name: smoke-test
             command: bin/rake smoke_test
           - name: windows-mspec-nodejs
             command: bundle exec rake mspec_nodejs
-            ruby: '3.0'
             os: windows-latest
           - name: windows-mspec-chrome
             command: bundle exec rake mspec_chrome
-            ruby: '3.0'
             os: windows-latest
           # - name: windows-mspec-firefox
-          #   env:
-          #     # when changing version, also change it below and above
-          #     MOZILLA_FIREFOX_BINARY: 'C:/Program Files/Firefox_106.0.4/firefox.exe'
-          #   ruby: '3.0'
+          #   firefox: '106.0.4'
           #   command: bundle exec rake mspec_firefox
           #   os: windows-latest
           - name: macos-mspec-safari
             command: bundle exec rake mspec_safari
-            ruby: '3.0'
             os: 'macos-latest'
           - name: windows-minitest
             command: bundle exec rake minitest
-            ruby: '3.0'
             os: windows-latest
           - name: windows
             command: bundle exec rake rspec
-            ruby: '3.0'
             os: windows-latest
           - name: macos
             command: bundle exec rake rspec
-            ruby: '3.0'
             os: 'macos-latest'
           - name: lint
             command: bin/rake lint
-            ruby: '3.0'
           - name: timezone
             command: bin/rake mspec_nodejs TZ="Pacific/Fiji"
-            ruby: '3.0'
           - name: performance
-            ruby: '3.0'
             permissive: true
             fetchdepth: '0'
             command: bin/rake performance:compare
@@ -102,29 +84,32 @@ jobs:
     runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.combo.permissive || false }}
     steps:
-      - uses: browser-actions/setup-firefox@latest
+      - if: ${{ matrix.combo.firefox }}
+        id: setup-firefox
+        uses: browser-actions/setup-firefox@latest
         with:
-          # when changing version, also change it above
-          firefox-version: '106.0.4'
-      - uses: actions/checkout@v2
+          firefox-version: ${{ matrix.combo.firefox }}
+      - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ fromJSON(matrix.combo.fetchdepth || '1') }}
       - if: ${{ matrix.combo.os != 'ryzen' }}
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.combo.ruby }}
+          ruby-version: ${{ matrix.combo.ruby || env.DEFAULT_RUBY }}
           bundler-cache: false
       - run: ruby bin/git-submodule-fast-install
       - run: bundle lock
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
+        env:
+          KEY_PREFIX: ${{ runner.os }}-${{ matrix.combo.ruby || env.DEFAULT_RUBY }}
         with:
           path: ./vendor/bundle
-          key: ${{ runner.os }}-${{ matrix.combo.ruby }}-gem-${{ github.ref }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: ${{ env.KEY_PREFIX }}-gem-${{ github.ref }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.combo.ruby }}-gem-${{ github.ref }}
-            ${{ runner.os }}-${{ matrix.combo.ruby }}-gem-master
-            ${{ runner.os }}-${{ matrix.combo.ruby }}-gem-
-      - uses: actions/cache@v2
+            ${{ env.KEY_PREFIX }}-gem-${{ github.ref }}
+            ${{ env.KEY_PREFIX }}-gem-master
+            ${{ env.KEY_PREFIX }}-gem-
+      - uses: actions/cache@v3
         with:
           path: ./node_modules
           key: ${{ runner.os }}-npm-${{ github.ref }}-${{ hashFiles('**/yarn.lock') }}
@@ -138,8 +123,12 @@ jobs:
           bundle config path $PWD/vendor/bundle
           bundle install --jobs 4 --retry 3
           bundle clean
-      - name: set environment variables
+      - name: set environment variables USE_STRICT
         if: ${{ matrix.combo.strict == 'true' }}
         run: |
           echo "USE_STRICT=true" >> $GITHUB_ENV
+      - name: set environment variables MOZILLA_FIREFOX_BINARY
+        if: ${{ matrix.combo.firefox }}
+        run: |
+          echo "MOZILLA_FIREFOX_BINARY=${{ steps.setup-firefox.outputs.firefox-path }}" >> $GITHUB_ENV
       - run: ${{ matrix.combo.command || 'bin/rake rspec' }}
