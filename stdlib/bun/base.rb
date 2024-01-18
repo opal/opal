@@ -1,3 +1,5 @@
+`/* global Bun */`
+
 module Bun
   VERSION = `Bun.version`
 end

@@ -1,5 +1,7 @@
 # backtick_javascript: true
 
+`/* global Deno */`
+
 module Deno
   VERSION = `Deno.version.deno`
 end

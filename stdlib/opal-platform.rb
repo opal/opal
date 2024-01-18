@@ -1,6 +1,6 @@
 # backtick_javascript: true
 
-`/* global Java, GjsFileImporter, Deno */`
+`/* global Java, GjsFileImporter, Deno, Bun */`
 
 browser          = `typeof(document) !== "undefined"`
 bun              = `typeof(Bun) === "object" && typeof(Bun.version) === "string"`
