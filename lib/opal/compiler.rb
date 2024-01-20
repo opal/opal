@@ -190,7 +190,7 @@ module Opal
 
     # @!method backtick_javascript?
     #
-    # Allows use of a backtick operator (and `%x{}``) to embed verbatim JavaScript.
+    # Allows use of a backtick operator (and `%x{}`) to embed verbatim JavaScript.
     # If false, backtick operator will
     compiler_option :backtick_javascript, default: nil, as: :backtick_javascript?, magic_comment: true
 
