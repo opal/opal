@@ -644,12 +644,12 @@ RSpec.describe Opal::Compiler do
       it 'adds the file and line to the backtrace' do
         error = nil
         begin
-          compiled('BEGIN {}', file: 'foobar.js.rb')
+          compiled('BEGIN {}', file: "#{File.basename(__FILE__)}/foobar.js.rb")
         rescue Opal::SyntaxError => syntax_error
           error = syntax_error
         end
 
-        expect(error.backtrace[0]).to eq("foobar.js.rb:in `BEGIN {}'")
+        expect(error.backtrace[0]).to eq("#{File.basename(__FILE__)}/foobar.js.rb:in `BEGIN {}'")
         expect(compiler_backtrace(error)[0]).to end_with(":in `error'")
         expect(compiler_backtrace(error)[-3]).to end_with(":in `block in compile'")
         expect(compiler_backtrace(error)[-1]).to end_with(":in `compile'")
@@ -660,14 +660,21 @@ RSpec.describe Opal::Compiler do
     context 'at parse time' do
       it 'adds the file and line to the backtrace' do
         error = nil
+
         begin
-          parsed('def foo', file: 'foobar.js.rb')
+          parsed('def foo', file: "#{File.basename(__FILE__)}/foobar.js.rb")
         rescue Opal::SyntaxError => syntax_error
           error = syntax_error
         end
-        expect(error.backtrace[0]).to eq("foobar.js.rb:1:in `def foo'")
+        expect(error.backtrace[0]).to eq("#{File.basename(__FILE__)}/foobar.js.rb:1:in `def foo'")
         expect(compiler_backtrace(error)[0]).to end_with(":in `block in parse'")
         expect(error.backtrace.size).to be > 1
+
+        expect($diagnostic_messages.flatten).to eq([
+          "#{File.basename(__FILE__)}/foobar.js.rb:1:8: error: unexpected token $end",
+          "#{File.basename(__FILE__)}/foobar.js.rb:1: def foo",
+          "#{File.basename(__FILE__)}/foobar.js.rb:1:        ",
+        ])
       end
     end
 

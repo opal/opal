@@ -9,11 +9,17 @@ require 'opal'
 
 ENV['OPAL_DISABLE_PREFORK_LOGS'] = '1'
 
+$diagnostic_messages = []
+Opal::Parser.default_parser_class.diagnostics_consumer = ->(diagnostic) do
+  $diagnostic_messages << diagnostic.render
+end
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   config.before { Opal.reset_paths! unless RUBY_PLATFORM == 'opal' }
   config.before { Opal::Config.reset! if defined? Opal::Config }
   config.before { Opal::Processor.reset_cache_key! if defined? Opal::Processor }
+  config.before { $diagnostic_messages.clear }
 
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
