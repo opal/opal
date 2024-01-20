@@ -102,7 +102,7 @@ class BigDecimal < Numeric
   end
 
   def abs
-    self.class.new(bignumber.JS.abs)
+    BigDecimal(bignumber.JS.abs)
   end
 
   def add(other, digits = 0)
@@ -122,7 +122,7 @@ class BigDecimal < Numeric
       result = result.JS.toDigits(digits, self.class.mode(ROUND_MODE))
     end
 
-    self.class.new(result)
+    BigDecimal(result)
   end
 
   def ceil(n = nil)
@@ -133,9 +133,9 @@ class BigDecimal < Numeric
     if n.nil?
       bignumber.JS.round(0, ROUND_CEILING).JS.toNumber
     elsif n >= 0
-      self.class.new(bignumber.JS.round(n, ROUND_CEILING))
+      BigDecimal(bignumber.JS.round(n, ROUND_CEILING))
     else
-      self.class.new(bignumber.JS.round(0, ROUND_CEILING))
+      BigDecimal(bignumber.JS.round(0, ROUND_CEILING))
     end
   end
 
@@ -144,7 +144,7 @@ class BigDecimal < Numeric
     when self.class
       [other, self]
     when Number
-      [self.class.new(other), self]
+      [BigDecimal(other), self]
     else
       raise TypeError, "#{other.class} can't be coerced into #{self.class}"
     end
@@ -168,10 +168,10 @@ class BigDecimal < Numeric
         raise FloatDomainError, "Computation results to 'Infinity'"
       end
 
-      return self.class.new(bignumber.JS.dividedToIntegerBy(other.bignumber))
+      return BigDecimal(bignumber.JS.dividedToIntegerBy(other.bignumber))
     end
 
-    self.class.new(bignumber.JS.dividedBy(other.bignumber).JS.round(digits, self.class.mode(ROUND_MODE)))
+    BigDecimal(bignumber.JS.dividedBy(other.bignumber).JS.round(digits, self.class.mode(ROUND_MODE)))
   end
 
   def finite?
@@ -185,17 +185,17 @@ class BigDecimal < Numeric
 
   def minus(other)
     other, _ = coerce(other)
-    self.class.new(bignumber.JS.minus(other.bignumber))
+    BigDecimal(bignumber.JS.minus(other.bignumber))
   end
 
   def mult(other, digits = nil)
     other, _ = coerce(other)
 
     if digits.nil?
-      return self.class.new(bignumber.JS.times(other.bignumber))
+      return BigDecimal(bignumber.JS.times(other.bignumber))
     end
 
-    self.class.new(bignumber.JS.times(other.bignumber).JS.round(digits, self.class.mode(ROUND_MODE)))
+    BigDecimal(bignumber.JS.times(other.bignumber).JS.round(digits, self.class.mode(ROUND_MODE)))
   end
 
   def nan?
@@ -204,7 +204,7 @@ class BigDecimal < Numeric
 
   def quo(other)
     other, _ = coerce(other)
-    self.class.new(bignumber.JS.dividedBy(other.bignumber))
+    BigDecimal(bignumber.JS.dividedBy(other.bignumber))
   end
 
   def sign
@@ -218,7 +218,7 @@ class BigDecimal < Numeric
 
   def sub(other, precision)
     other, _ = coerce(other)
-    self.class.new(bignumber.JS.minus(other.bignumber))
+    BigDecimal(bignumber.JS.minus(other.bignumber))
   end
 
   def to_f
