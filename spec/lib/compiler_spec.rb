@@ -487,7 +487,7 @@ RSpec.describe Opal::Compiler do
       options = options.merge(eval: true)
       warnings_number = 0
       compiler = Opal::Compiler.new(code, options)
-      allow(compiler).to receive(:warning) { warnings_number += 1}
+      allow(compiler).to receive(:warning) { warnings_number += 1 }
       compiler.compile
       expect(warnings_number)
     end
@@ -714,7 +714,10 @@ RSpec.describe Opal::Compiler do
   end
 
   def compiled(code, options = compiler_options)
-    Opal::Compiler.new(code, options).compile
+    compiler = Opal::Compiler.new(code, options)
+    @compiler_warnings = []
+    allow(compiler).to receive(:warning) { |*args| @compiler_warnings << args }
+    compiler.compile
   end
 
   def parsed(code, options = compiler_options)
