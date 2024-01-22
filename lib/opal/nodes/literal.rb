@@ -132,7 +132,7 @@ module Opal
           if SUPPORTED_FLAGS =~ flag
             true
           else
-            compiler.warning "Skipping the '#{flag}' Regexp flag as it's not widely supported by JavaScript vendors."
+            compiler.warning "Skipping the '#{flag}' Regexp flag as it's not widely supported by JavaScript vendors.", @sexp.line
             false
           end
         end
