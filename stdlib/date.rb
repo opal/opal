@@ -284,8 +284,8 @@ class Date
               month = d.getMonth() + 1;
               day = d.getDate();
             }
-            
-            return #{ { year: `year`, month: `month`, day: `day`} };
+
+            return #{{ year: `year`, month: `month`, day: `day` }};
           }
         }
       }

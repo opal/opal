@@ -27,7 +27,7 @@ class Time
           // try yyyymmdd
           d = Date.parse(str.slice(0, 4) + '-' + str.slice(-4, -2) + '-' + str.slice(-2));
           if (d !== d)
-            #{::Kernel.raise(::ArgumentError,  "argument out of range")}
+            #{::Kernel.raise(::ArgumentError, 'argument out of range')}
         } else if (str.length == 7 && str.match(/^[0-9]{4}[0-3][0-9][0-9]/)) {
           // try yyyyddd
           return new Date(Date.UTC(parseInt(str.slice(0, 4)), 0, parseInt(str.slice(-3))));
@@ -52,7 +52,7 @@ class Time
       }
       if (d !== d) {
         // still failed, d is a NaN
-        #{::Kernel.raise(::ArgumentError,  "no time information in #{str}")}
+        #{::Kernel.raise(::ArgumentError, "no time information in #{str}")}
       }
       return new Date(d);
     }

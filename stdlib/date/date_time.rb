@@ -25,7 +25,7 @@ class DateTime < Date
 
     ::Kernel.raise ArgumentError, 'hours must be a Integer' if !hours.nil? && !hours.is_a?(Integer)
     ::Kernel.raise ArgumentError, 'minutes must be a Integer' if !minutes.nil? && !minutes.is_a?(Integer)
-    ::Kernel.raise ArgumentError, 'seconds must be larger than -60 and smaller than 60' if !seconds.nil? && (seconds <= -60 || seconds >= 60) 
+    ::Kernel.raise ArgumentError, 'seconds must be larger than -60 and smaller than 60' if !seconds.nil? && (seconds <= -60 || seconds >= 60)
 
     hours += 24 if hours && hours < 0
     minutes += 60 if minutes && minutes < 0
