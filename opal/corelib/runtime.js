@@ -2835,21 +2835,28 @@
     return Opal.set_encoding(dup, "binary", "internal_encoding");
   }
 
-  Opal.to_s = function(obj) {
+  Opal.fallback_to_s = function(obj) {
     return `#<${obj.$$class.$to_s()}:0x${Opal.id(obj).toString(16)}>`
   }
 
-  Opal.interpolate = function(...args) {
-    return args.map(obj => {
-      if (obj == null) {
-        return String(obj);
+  Opal.to_s = function(obj) {
+    var stringified;
+    if (obj == null) {
+      return "`"+String(obj)+"`";
+    }
+    else if (typeof obj === 'string' || (typeof obj === 'object' && obj.$$is_string)) {
+      return obj;
+    }
+    else if (obj.$to_s != null && !obj.$to_s.$$stub) {
+      stringified = obj.$to_s();
+      if (typeof stringified !== 'string' && !stringified.$$is_string) {
+        stringified = Opal.fallback_to_s(obj);
       }
-      if (obj.$$is_string || typeof obj === 'string') {
-        return obj;
-      }
-      const stringified = obj.$to_s();
-      return stringified.$$is_string ? stringified : Opal.to_s(obj);
-    }).join('');
+      return stringified;
+    }
+    else {
+      return obj.toString();
+    }
   }
 
   Opal.last_promise = null;

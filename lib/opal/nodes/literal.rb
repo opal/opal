@@ -259,14 +259,19 @@ module Opal
       handle :dstr
 
       def compile
-        helper :interpolate
+        if children.empty?
+          push '""'
+        else
+          helper :to_s
 
-        push '$interpolate('
-        children.each_with_index do |part, index|
-          push ', ' unless index == 0
-          push expr(part)
+          children.each_with_index do |part, index|
+            push ' + ' unless index == 0
+            push '$to_s(' unless part.type == :str
+            push expr(part)
+            push ')' unless part.type == :str
+          end
+          wrap '(', ')' if recv?
         end
-        push ')'
       end
     end
 
