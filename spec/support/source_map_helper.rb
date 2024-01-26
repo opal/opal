@@ -48,7 +48,7 @@ module SourceMapHelper
 
     def find_section_in_map_index(index_map)
       sections = index_map.to_h[:sections]
-      section, section_index = sections.each.with_index.find do |map, index|
+      section, _section_index = sections.each.with_index.find do |map, index|
         next_map = sections[index + 1] or next true # if there's no next map the current one is good
 
         (
@@ -57,8 +57,6 @@ module SourceMapHelper
           line < next_map[:offset][:line] || (line == next_map[:offset][:line] && column < map[:offset][:column])
         )
       end
-
-      next_section = sections[section_index + 1]
 
       section or raise "no map found for #{inspect} among available sections: #{sections.map { |s| s[:offset] }}"
     end

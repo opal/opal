@@ -1932,7 +1932,7 @@ XXX
   octal = "0(?:[0-7]+(?:_[0-7]+)*|#{binary}|#{hex})?"
   integer = "#{octal}|#{decimal}"
 
-  accept(Integer, %r"\A[-+]?(?:#{integer})\z"io) do |s,|
+  accept(Integer, %r"\A[-+]?(?:#{integer})\z"i) do |s,|
     if s
       begin
         Integer(s)
@@ -1946,7 +1946,7 @@ XXX
   # Float number format, and converts to Float.
   #
   float = "(?:#{decimal}(?=(.)?)(?:\\.(?:#{decimal})?)?|\\.#{decimal})(?:E[-+]?#{decimal})?"
-  floatpat = %r"\A[-+]?#{float}\z"io
+  floatpat = %r"\A[-+]?#{float}\z"i
   accept(Float, floatpat) { |s,| s.to_f if s }
 
   #
@@ -1954,7 +1954,7 @@ XXX
   # for float format, and Rational for rational format.
   #
   real = "[-+]?(?:#{octal}|#{float})"
-  accept(Numeric, /\A(#{real})(?:\/(#{real}))?\z/io) do |s, d, f, n,|
+  accept(Numeric, /\A(#{real})(?:\/(#{real}))?\z/i) do |s, d, f, n,|
     if n
       Rational(d, n)
     elsif f
@@ -1967,7 +1967,7 @@ XXX
   #
   # Decimal integer format, to be converted to Integer.
   #
-  DecimalInteger = /\A[-+]?#{decimal}\z/io
+  DecimalInteger = /\A[-+]?#{decimal}\z/i
   accept(DecimalInteger, DecimalInteger) do |s,|
     if s
       begin
@@ -1982,7 +1982,7 @@ XXX
   # Ruby/C like octal/hexadecimal/binary integer format, to be converted to
   # Integer.
   #
-  OctalInteger = /\A[-+]?(?:[0-7]+(?:_[0-7]+)*|0(?:#{binary}|#{hex}))\z/io
+  OctalInteger = /\A[-+]?(?:[0-7]+(?:_[0-7]+)*|0(?:#{binary}|#{hex}))\z/i
   accept(OctalInteger, OctalInteger) do |s,|
     if s
       begin
@@ -2084,7 +2084,7 @@ XXX
 
     def self.filter_backtrace(array)
       unless $DEBUG
-        array.delete_if(&%r"\A#{Regexp.quote(__FILE__)}:"o.method(:=~))
+        array.delete_if(&%r"\A#{Regexp.quote(__FILE__)}:".method(:=~))
       end
       array
     end

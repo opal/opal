@@ -8,7 +8,7 @@ RSpec.describe Opal::Rewriters::Hashes::KeyDuplicatesRewriter do
   shared_examples 'it warns' do |code, key_to_warn|
     context "for #{code} code" do
       it "warns about #{key_to_warn.inspect} being overwritten" do
-        expect(Kernel).to receive(:warn).with("warning: key #{key_to_warn.inspect} is duplicated and overwritten")
+        expect(Kernel).to receive(:warn).with("warning: key #{key_to_warn.inspect} is duplicated and overwritten") { nil }
 
         ast = parse_without_rewriting(code)
         rewrite(ast)
