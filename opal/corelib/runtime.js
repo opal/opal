@@ -1563,6 +1563,7 @@
       return this.$method_missing.apply(this, $prepend(method_name.slice(1), arguments));
     };
 
+    method_missing_stub.displayName = method_name + " (stub)"
     method_missing_stub.$$stub = true;
 
     return method_missing_stub;

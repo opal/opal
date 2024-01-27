@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+dce____ = `bin/opal -ce 'p 1,2,3' --dce --no-cache|bin/yarn -s run terser -c`.size
+regular = `bin/opal -ce 'p 1,2,3'       --no-cache|bin/yarn -s run terser -c`.size
+p dce____: dce____, regular: regular
+puts ("%.4f reduction" % (1 - dce____.to_f / regular.to_f))

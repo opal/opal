@@ -7,7 +7,10 @@ module Opal
   class CLIOptions < OptionParser
     def initialize
       super
-      @options = {}
+      @options = {
+        dce: ENV['OPAL_DCE'],
+        no_cache: ENV['OPAL_NO_CACHE']
+      }
 
       self.banner = 'Usage: opal [options] -- [programfile]'
 
@@ -213,6 +216,10 @@ module Opal
 
       on('--debug-source-map', 'Debug source map') do
         options[:debug_source_map] = true
+      end
+
+      on('--dce', '[EXPERIMENTAL] Enable dead code elimination') do
+        options[:dce] = true
       end
 
       separator ''

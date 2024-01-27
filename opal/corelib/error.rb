@@ -141,10 +141,13 @@ class ::Exception < `Error`
       return "#{@message}\n#{`self.stack`}"
     end
 
-    kwargs = { highlight: $stderr.tty?, order: :top }.merge(kwargs || {})
-    highlight, order = kwargs[:highlight], kwargs[:order]
+    highlight, order = $stderr.tty?, :top
+    if kwargs
+      highlight = kwargs.fetch(:highlight, highlight)
+      order = kwargs.fetch(:order, order)
+    end
 
-    ::Kernel.raise ::ArgumentError, "expected true or false as highlight: #{highlight}" unless [true, false].include? highlight
+    ::Kernel.raise ::ArgumentError, "expected true or false as highlight: #{highlight.inspect}" unless [true, false].include? highlight
     ::Kernel.raise ::ArgumentError, "expected :top or :bottom as order: #{order}" unless %i[top bottom].include? order
 
     if highlight
@@ -206,7 +209,7 @@ class ::Exception < `Error`
         }
 
         self.backtrace = backtrace;
-        self.stack = #{`backtrace`.map { |i| '  from ' + i }}.join("\n");
+        self.stack = backtrace.map(function(i) { return '  from ' + i }).join("\n");
       }
 
       return backtrace;

@@ -109,6 +109,57 @@ module Opal
       self
     end
 
+    def top_called_methods
+      @top_called_methods ||= begin
+        top_method_calls_by_file = {}
+        method_calls_by_site = processed.map.with_object({}) do |asset, hash|
+          next unless asset.respond_to? :compiled
+          next unless asset.compiled.method_calls_by_site
+
+          asset.compiled.method_calls_by_site.each do |site, calls|
+            calls.each { top_method_calls_by_file[asset.filename] = calls } if site == :top
+
+            calls += hash[site] if hash[site]
+            hash[site] = calls
+          end
+        end
+        warn '==== TOP_METHOD_CALLS_BY_FILE' if $DEBUG
+        top_method_calls_by_file.map { |f, mm| warn "#{f}:\n  #{mm.inspect}" } if $DEBUG
+
+        top_called_methods = Set.new
+        to_be_visited = method_calls_by_site[:top] || Set.new
+        visited = Set.new
+        until to_be_visited.empty?
+          to_be_visited_next = Set.new
+
+          to_be_visited.each do |mid|
+            warn "visiting: #{mid}" if $DEBUG
+            top_called_methods << mid
+
+            called = method_calls_by_site[[:def, mid]]
+            warn "  called: #{called}" if $DEBUG
+            to_be_visited_next += called - visited if called
+          end
+          visited += to_be_visited
+          to_be_visited = to_be_visited_next
+        end
+
+        top_called_methods
+      end
+    end
+
+    def rebuild_with_top_method_calls
+      warn 'Rebuilding with DCE...' if $DEBUG
+
+      processed.each do |asset|
+        asset.options[:top_called_methods] = top_called_methods
+
+        asset.reset
+      end
+      warn '==== TOP_CALLED_METHODS' if $DEBUG
+      warn " - #{top_called_methods.to_a.sort.join("\n - ")}" if $DEBUG
+    end
+
     def build_require(path, options = {})
       process_require(path, [], options)
     end
@@ -127,6 +178,7 @@ module Opal
     end
 
     def to_s
+      rebuild_with_top_method_calls if dce
       processed.map(&:to_s).join("\n")
     end
 
@@ -176,7 +228,7 @@ module Opal
     attr_reader :processed
 
     attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
-      :compiler_options, :missing_require_severity, :cache, :scheduler
+      :compiler_options, :missing_require_severity, :cache, :scheduler, :dce
 
     def esm?
       @compiler_options[:esm]
