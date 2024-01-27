@@ -137,7 +137,7 @@ module Opal
 
       def handle_global_match
         with_temp do |tmp|
-          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}['$[]'](0))"
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}.$index$(0))"
         end
       end
 
@@ -183,7 +183,7 @@ module Opal
         helper :gvars
 
         with_temp do |tmp|
-          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}['$[]'](#{index}))"
+          push "((#{tmp} = $gvars['~']) === nil ? nil : #{tmp}.$index$(#{index}))"
         end
       end
     end

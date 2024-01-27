@@ -35,7 +35,7 @@ module ::Comparable
     return true if equal?(other)
 
     %x{
-      if (self["$<=>"] == Opal.Kernel["$<=>"]) {
+      if (self.$spcshp$ == Opal.Kernel.$spcshp$) {
         return false;
       }
 

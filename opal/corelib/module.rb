@@ -184,7 +184,7 @@ class ::Module
             id   = $jsid(name + '='),
             ivar = $ivar(name);
 
-        var body = $assign_ivar(ivar)
+        var body = $assign_ivar(ivar);
 
         body.$$parameters = [['req']];
         body.$$arity = 1;
@@ -483,7 +483,7 @@ class ::Module
         var name = ensure_symbol_or_string(names[i]);
         $deny_frozen_access(self);
 
-        Opal.rdef(self, "$" + name);
+        Opal.rdef(self, $jsid(name));
       }
     }
 
@@ -732,7 +732,7 @@ class ::Module
         var name = ensure_symbol_or_string(names[i]);
         $deny_frozen_access(self);
 
-        Opal.udef(self, "$" + name);
+        Opal.udef(self, $jsid(name));
       }
     }
 
@@ -843,7 +843,7 @@ class ::Module
       var refine_modules = self.$$refine_modules, hash = #{{}};;
       if (typeof refine_modules === "undefined") return hash;
       for (var id in refine_modules) {
-        hash['$[]='](refine_modules[id].refined_class, refine_modules[id]);
+        hash.$indexset$(refine_modules[id].refined_class, refine_modules[id]);
       }
       return hash;
     }

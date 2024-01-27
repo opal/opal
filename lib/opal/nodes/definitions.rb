@@ -11,7 +11,13 @@ module Opal
 
       def compile
         children.each do |child|
-          line "Opal.udef(#{scope.self}, '$' + ", expr(child), ');'
+          case child.type
+          when :str, :sym
+            line "Opal.udef(#{scope.self}, \"#{mid_to_jsid child.children.first}\");"
+          else
+            helper :jsid
+            line "Opal.udef(#{scope.self}, $jsid(", expr(child), '));'
+          end
         end
       end
     end

@@ -108,7 +108,7 @@ class ::Hash < `Map`
 
       return $hash_each(self, true, function(key, value) {
         var other_value = $hash_get(other, key);
-        if (other_value === undefined || !value['$eql?'](other_value)) {
+        if (other_value === undefined || !value.$eql$Q(other_value)) {
           return [true, false];
         }
         return [false, true];
@@ -211,7 +211,7 @@ class ::Hash < `Map`
     %x{
       var hash = self.$class().$new();
       $hash_clone(self, hash);
-      return self["$frozen?"]() ? hash.$freeze() : hash;
+      return self.$frozen$Q() ? hash.$freeze() : hash;
     }
   end
 

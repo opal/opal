@@ -199,7 +199,7 @@ module Opal
       end
 
       def method_jsid
-        mid_to_jsid meth.to_s
+        mid_to_jsid_call meth.to_s
       end
 
       # Used to generate the code to use this sexp as an ivar var reference

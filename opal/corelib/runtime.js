@@ -224,13 +224,13 @@
     if (Opal.is_a(object, type)) return object;
 
     // Fast path for the most common situation
-    if (object['$respond_to?'].$$pristine && object.$method_missing.$$pristine) {
+    if (object.$respond_to$Q.$$pristine && object.$method_missing.$$pristine) {
       body = object[$jsid(method)];
       if (body == null || body.$$stub) Opal.type_error(object, type);
       return body.apply(object, args);
     }
 
-    if (!object['$respond_to?'](method)) {
+    if (!object.$respond_to$Q(method)) {
       Opal.type_error(object, type);
     }
 
@@ -243,15 +243,15 @@
     include_all = !!include_all;
     var body = obj[jsid];
 
-    if (obj['$respond_to?'].$$pristine) {
+    if (obj.$respond_to$Q.$$pristine) {
       if (typeof(body) === "function" && !body.$$stub) {
         return true;
       }
-      if (!obj['$respond_to_missing?'].$$pristine) {
-        return Opal.send(obj, obj['$respond_to_missing?'], [jsid.substr(1), include_all]);
+      if (!obj.$respond_to_missing$Q.$$pristine) {
+        return Opal.send(obj, obj.$respond_to_missing$Q, [$unjsid(jsid), include_all]);
       }
     } else {
-      return Opal.send(obj, obj['$respond_to?'], [jsid.substr(1), include_all]);
+      return Opal.send(obj, obj.$respond_to$Q, [$unjsid(jsid), include_all]);
     }
   }
 
@@ -962,7 +962,7 @@
           var method = proto[prop];
 
           if (!method.$$stub) {
-            var method_name = prop.slice(1);
+            var method_name = $unjsid(prop);
             results.push(method_name);
           }
         }
@@ -990,7 +990,7 @@
         var method = proto[prop];
 
         if (!method.$$stub) {
-          var method_name = prop.slice(1);
+          var method_name = $unjsid(prop);
           results.push(method_name);
         }
       }
@@ -1560,7 +1560,7 @@
       method_missing_stub.$$p = null;
 
       // call method missing with correct args (remove '$' prefix on method name)
-      return this.$method_missing.apply(this, $prepend(method_name.slice(1), arguments));
+      return this.$method_missing.apply(this, $prepend($unjsid(method_name), arguments));
     };
 
     method_missing_stub.$$stub = true;
@@ -1747,7 +1747,7 @@
           return result;
         }
       }
-      else if (candidate === Opal.JS.Error || candidate['$==='](exception)) {
+      else if (candidate === Opal.JS.Error || candidate.$casecmp$(exception)) {
         return candidate;
       }
     }
@@ -1775,7 +1775,7 @@
     if (value.$$is_hash) {
       return value;
     }
-    else if (value['$respond_to?']('to_hash', true)) {
+    else if (value.$respond_to$Q('to_hash', true)) {
       var hash = value.$to_hash();
       if (hash.$$is_hash) {
         return hash;
@@ -1800,7 +1800,7 @@
     if (value.$$is_array) {
       return value;
     }
-    else if (value['$respond_to?']('to_ary', true)) {
+    else if (value.$respond_to$Q('to_ary', true)) {
       var ary = value.$to_ary();
       if (ary === nil) {
         return [value];
@@ -1824,7 +1824,7 @@
       // A splatted array must be copied
       return value.slice();
     }
-    else if (value['$respond_to?']('to_a', true)) {
+    else if (value.$respond_to$Q('to_a', true)) {
       var ary = value.$to_a();
       if (ary === nil) {
         return [value];
@@ -1889,17 +1889,65 @@
     }
   }
 
-  // Optimization for a costly operation of prepending '$' to method names
+  // Optimization for a costly operation of converting method names
   var jsid_cache = new Map();
+  var unjsid_cache = new Map();
+
+  // This content is then replicated in lib/opal/nodes/helpers.rb
+  var common_names = {
+    __proto__: null,
+    "<": "$lt$",
+    ">": "$gt$",
+    "<=": "$lte$",
+    ">=": "$gte$",
+    "==": "$cmp$",
+    "!=": "$ncmp$",
+    "<=>": "$spcshp$",
+    "===": "$casecmp$",
+    "+@": "$unplus$",
+    "+": "$plus$",
+    "-@": "$unminus$",
+    "-": "$minus$",
+    "~": "$like$",
+    "=~": "$likecmp$",
+    "!~": "$likencmp$",
+    "!": "$not$",
+    "*": "$mult$",
+    "**": "$pow$",
+    "/": "$div$",
+    "%": "$rest$",
+    "&": "$and$",
+    "|": "$or$",
+    "^": "$xor$",
+    "<<": "$shl$",
+    ">>": "$shr$",
+    "[]": "$index$",
+    "[]=": "$indexset$",
+  };
+  for (var name in common_names) {
+    jsid_cache.set(name, common_names[name]);
+    unjsid_cache.set(common_names[name], name);
+  }
+
   function $jsid(name) {
     var jsid = jsid_cache.get(name);
     if (!jsid) {
-      jsid = '$' + name;
+      jsid = '$' + name.replace("?", "$Q").replace("!", "$X").replace("=", "$S");
       jsid_cache.set(name, jsid);
     }
     return jsid;
   }
   Opal.jsid = $jsid;
+
+  function $unjsid(jsid) {
+    var name = unjsid_cache.get(jsid);
+    if (!name) {
+      name = jsid.substr(1).replace("$Q", "?").replace("$X", "!").replace("$S", "=");
+      unjsid_cache.set(jsid, name);
+    }
+    return name;
+  }
+  Opal.unjsid = $unjsid;
 
   function $prepend(first, second) {
     if (!second.$$is_array) second = $slice(second);
@@ -1923,7 +1971,7 @@
   //   Opal.send(my_array, my_array.$length)            # => 4
   //
   //   Opal.send(my_array, 'reverse!')                  # => [4, 3, 2, 1]
-  //   Opal.send(my_array, my_array['$reverse!']')      # => [4, 3, 2, 1]
+  //   Opal.send(my_array, my_array.$reverse$X)      # => [4, 3, 2, 1]
   //
   // @param recv [Object] ruby object
   // @param method [Function, String] method body or name of the method
@@ -2065,7 +2113,7 @@
     body.displayName = jsid;
     body.$$owner = module;
 
-    var name = jsid.substr(1);
+    var name = $unjsid(jsid);
 
     var proto = module.$$prototype;
     if (proto.hasOwnProperty('$$dummy')) {
@@ -2120,7 +2168,7 @@
   // Called from #remove_method.
   Opal.rdef = function(obj, jsid) {
     if (!$has_own(obj.$$prototype, jsid)) {
-      $raise(Opal.NameError, "method '" + jsid.substr(1) + "' not defined in " + obj.$name());
+      $raise(Opal.NameError, "method '" + $unjsid(jsid) + "' not defined in " + obj.$name());
     }
 
     delete obj.$$prototype[jsid];
@@ -2129,12 +2177,12 @@
 
     if (obj.$$is_singleton) {
       if (obj.$$prototype.$singleton_method_removed && !obj.$$prototype.$singleton_method_removed.$$stub) {
-        obj.$$prototype.$singleton_method_removed(jsid.substr(1));
+        obj.$$prototype.$singleton_method_removed($unjsid(jsid));
       }
     }
     else {
       if (obj.$method_removed && !obj.$method_removed.$$stub) {
-        obj.$method_removed(jsid.substr(1));
+        obj.$method_removed($unjsid(jsid));
       }
     }
   };
@@ -2142,7 +2190,7 @@
   // Called from #undef_method.
   Opal.udef = function(obj, jsid) {
     if (!obj.$$prototype[jsid] || obj.$$prototype[jsid].$$stub) {
-      $raise(Opal.NameError, "method '" + jsid.substr(1) + "' not defined in " + obj.$name());
+      $raise(Opal.NameError, "method '" + $unjsid(jsid) + "' not defined in " + obj.$name());
     }
 
     Opal.add_stub_for(obj.$$prototype, jsid);
@@ -2151,12 +2199,12 @@
 
     if (obj.$$is_singleton) {
       if (obj.$$prototype.$singleton_method_undefined && !obj.$$prototype.$singleton_method_undefined.$$stub) {
-        obj.$$prototype.$singleton_method_undefined(jsid.substr(1));
+        obj.$$prototype.$singleton_method_undefined($unjsid(jsid));
       }
     }
     else {
       if (obj.$method_undefined && !obj.$method_undefined.$$stub) {
-        obj.$method_undefined(jsid.substr(1));
+        obj.$method_undefined($unjsid(jsid));
       }
     }
   };
@@ -2312,7 +2360,7 @@
 
       for (var i=0; i<objects.length; i++) {
         object = objects[i];
-        if (key === object || key['$eql?'](object)) {
+        if (key === object || key.$eql$Q(object)) {
           hash.set(object, value);
           return;
         }
@@ -2335,7 +2383,7 @@
       if (objects !== undefined) {
         for (var i=0; i<objects.length; i++) {
           object = objects[i];
-          if (key === object || key['$eql?'](object))
+          if (key === object || key.$eql$Q(object))
             return hash.get(object);
         }
       } else if (key.$$is_string) {
@@ -2366,7 +2414,7 @@
       if (objects !== undefined) {
         for (var i=0; i<objects.length; i++) {
           object = objects[i];
-          if (key === object || key['$eql?'](object)) {
+          if (key === object || key.$eql$Q(object)) {
             objects.splice(i, 1);
             if (objects.length === 0)
               hash.$$keys.delete(key_hash);
@@ -2408,7 +2456,7 @@
 
       for (var i=0; i<objects_copy.length; i++) {
         object = objects_copy[i];
-        if (key === object || key['$eql?'](object)) {
+        if (key === object || key.$eql$Q(object)) {
           // got a duplicate, remove it
           objects.splice(objects.indexOf(object), 1);
           hash.delete(object);
@@ -2871,35 +2919,35 @@
 
   function are_both_numbers(l,r) { return typeof(l) === 'number' && typeof(r) === 'number' }
 
-  Opal.rb_plus   = function(l,r) { return are_both_numbers(l,r) ? l + r : l['$+'](r); }
-  Opal.rb_minus  = function(l,r) { return are_both_numbers(l,r) ? l - r : l['$-'](r); }
-  Opal.rb_times  = function(l,r) { return are_both_numbers(l,r) ? l * r : l['$*'](r); }
-  Opal.rb_divide = function(l,r) { return are_both_numbers(l,r) ? l / r : l['$/'](r); }
-  Opal.rb_lt     = function(l,r) { return are_both_numbers(l,r) ? l < r : l['$<'](r); }
-  Opal.rb_gt     = function(l,r) { return are_both_numbers(l,r) ? l > r : l['$>'](r); }
-  Opal.rb_le     = function(l,r) { return are_both_numbers(l,r) ? l <= r : l['$<='](r); }
-  Opal.rb_ge     = function(l,r) { return are_both_numbers(l,r) ? l >= r : l['$>='](r); }
+  Opal.rb_plus   = function(l,r) { return are_both_numbers(l,r) ? l + r : l.$plus$(r); }
+  Opal.rb_minus  = function(l,r) { return are_both_numbers(l,r) ? l - r : l.$minus$(r); }
+  Opal.rb_times  = function(l,r) { return are_both_numbers(l,r) ? l * r : l.$mult$(r); }
+  Opal.rb_divide = function(l,r) { return are_both_numbers(l,r) ? l / r : l.$div$(r); }
+  Opal.rb_lt     = function(l,r) { return are_both_numbers(l,r) ? l < r : l.$lt$(r); }
+  Opal.rb_gt     = function(l,r) { return are_both_numbers(l,r) ? l > r : l.$gt$(r); }
+  Opal.rb_le     = function(l,r) { return are_both_numbers(l,r) ? l <= r : l.$lte$(r); }
+  Opal.rb_ge     = function(l,r) { return are_both_numbers(l,r) ? l >= r : l.$gte$(r); }
 
-  // Optimized helpers for calls like $truthy((a)['$==='](b)) -> $eqeqeq(a, b)
+  // Optimized helpers for calls like $truthy((a).$casecmp$(b)) -> $eqeqeq(a, b)
   function are_both_numbers_or_strings(lhs, rhs) {
     return (typeof lhs === 'number' && typeof rhs === 'number') ||
            (typeof lhs === 'string' && typeof rhs === 'string');
   }
 
   function $eqeq(lhs, rhs) {
-    return are_both_numbers_or_strings(lhs,rhs) ? lhs === rhs : $truthy((lhs)['$=='](rhs));
+    return are_both_numbers_or_strings(lhs,rhs) ? lhs === rhs : $truthy((lhs).$cmp$(rhs));
   };
   Opal.eqeq = $eqeq;
   Opal.eqeqeq = function(lhs, rhs) {
-    return are_both_numbers_or_strings(lhs,rhs) ? lhs === rhs : $truthy((lhs)['$==='](rhs));
+    return are_both_numbers_or_strings(lhs,rhs) ? lhs === rhs : $truthy((lhs).$casecmp$(rhs));
   };
   Opal.neqeq = function(lhs, rhs) {
-    return are_both_numbers_or_strings(lhs,rhs) ? lhs !== rhs : $truthy((lhs)['$!='](rhs));
+    return are_both_numbers_or_strings(lhs,rhs) ? lhs !== rhs : $truthy((lhs).$ncmp$(rhs));
   };
   Opal.not = function(arg) {
     if (undefined === arg || null === arg || false === arg || nil === arg) return true;
-    if (true === arg || arg['$!'].$$pristine) return false;
-    return $truthy(arg['$!']());
+    if (true === arg || arg.$not$.$$pristine) return false;
+    return $truthy(arg.$not$());
   }
 
   // Shortcuts - optimized function generators for simple kinds of functions

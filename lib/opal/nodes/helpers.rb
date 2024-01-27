@@ -13,17 +13,43 @@ module Opal
         Opal::Rewriters::JsReservedWords.valid_name?(name)
       end
 
-      # Converts a ruby method name into its javascript equivalent for
-      # a method/function call. All ruby method names get prefixed with
-      # a '$', and if the name is a valid javascript identifier, it will
-      # have a '.' prefix (for dot-calling), otherwise it will be
-      # wrapped in brackets to use reference notation calling.
+      # This content is then replicated in opal/corelib/runtime.js
+      MID_TO_JSID_COMMON={
+        "<": "$lt$",
+        ">": "$gt$",
+        "<=": "$lte$",
+        ">=": "$gte$",
+        "==": "$cmp$",
+        "!=": "$ncmp$",
+        "<=>": "$spcshp$",
+        "===": "$casecmp$",
+        "+@": "$unplus$",
+        "+": "$plus$",
+        "-@": "$unminus$",
+        "-": "$minus$",
+        "~": "$like$",
+        "=~": "$likecmp$",
+        "!~": "$likencmp$",
+        "!": "$not$",
+        "*": "$mult$",
+        "**": "$pow$",
+        "/": "$div$",
+        "%": "$rest$",
+        "&": "$and$",
+        "|": "$or$",
+        "^": "$xor$",
+        "<<": "$shl$",
+        ">>": "$shr$",
+        "[]": "$index$",
+        "[]=": "$indexset$",
+      }
+
       def mid_to_jsid(mid)
-        if %r{\=|\+|\-|\*|\/|\!|\?|<|\>|\&|\||\^|\%|\~|\[|`} =~ mid.to_s
-          "['$#{mid}']"
-        else
-          '.$' + mid
-        end
+        MID_TO_JSID_COMMON[mid.to_sym] || '$' + mid.to_s.sub("?", "$Q").sub("!", "$X").sub("=", "$S")
+      end
+
+      def mid_to_jsid_call(mid)
+        '.' + mid_to_jsid(mid)
       end
 
       def indent(&block)
