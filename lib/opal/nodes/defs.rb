@@ -10,7 +10,7 @@ module Opal
 
       def wrap_with_definition
         helper :defs
-        unshift '$defs(', expr(recvr), ", '$#{mid}', "
+        unshift '$defs(', expr(recvr), ", '#{mid_to_jsid mid}', "
         push ')'
       end
     end

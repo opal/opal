@@ -82,7 +82,7 @@ module Opal
 
       def wrap_with_definition
         helper :def
-        wrap "$def(#{scope.self}, '$#{mid}', ", ')'
+        wrap "$def(#{scope.self}, '#{mid_to_jsid mid}', ", ')'
 
         unshift "\n#{current_indent}" unless expr?
       end

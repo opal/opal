@@ -73,16 +73,27 @@ end
 $failures = []
 
 ASCIIDOCTOR_REPO_BASE = ENV['ASCIIDOCTOR_REPO_BASE'] || 'https://github.com/asciidoctor'
+ASCIIDOCTOR_JS_REPO_BASE = ENV['ASCIIDOCTOR_JS_REPO_BASE'] || 'https://github.com/hmdne'
 ASCIIDOCTOR_COMMIT = '869e8236'
-ASCIIDOCTOR_JS_COMMIT = '053fa0d3'
+ASCIIDOCTOR_JS_COMMIT = '9d0d5ea'
 # Selected asciidoctor versions were working on Aug 19 2021, feel free to update.
 S = OS.path_sep
+
+prepare_repo = ->(url:, commit:, dir:) {
+  [
+    "git clone #{url} >#{OS.dev_null} 2>&1",
+    "pushd #{dir}",
+      "git remote set-url origin #{url} >#{OS.dev_null} 2>&1",
+      "git fetch --all >#{OS.dev_null} 2>&1",
+      "git checkout #{commit} >#{OS.dev_null} 2>&1",
+    "popd",
+  ]
+}
+
 ASCIIDOCTOR_PREPARE = OS.bash_c(
   "pushd tmp#{S}performance",
-  "git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor >#{OS.dev_null} 2>&1",
-  "pushd asciidoctor", "git checkout #{ASCIIDOCTOR_COMMIT} >#{OS.dev_null} 2>&1", "popd",
-  "git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor.js >#{OS.dev_null} 2>&1",
-  "pushd asciidoctor.js", "git checkout #{ASCIIDOCTOR_JS_COMMIT} >#{OS.dev_null} 2>&1", "popd",
+  *prepare_repo.(url: "#{ASCIIDOCTOR_REPO_BASE}/asciidoctor", commit: ASCIIDOCTOR_COMMIT, dir: 'asciidoctor'),
+  *prepare_repo.(url: "#{ASCIIDOCTOR_JS_REPO_BASE}/asciidoctor.js", commit: ASCIIDOCTOR_JS_COMMIT, dir: 'asciidoctor.js'),
   "erb ../../tasks/performance/asciidoctor_test.rb.erb > asciidoctor_test.rb",
   "popd"
 )

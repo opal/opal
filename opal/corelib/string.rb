@@ -673,7 +673,7 @@ class ::String < `String`
           escaped = self.replace(escapable, function (chr) {
             if (meta[chr]) return meta[chr];
             chr = chr.charCodeAt(0);
-            if (chr <= 0xff && (self.encoding["$binary?"]() || self.internal_encoding["$binary?"]())) {
+            if (chr <= 0xff && (self.encoding.$binary$Q() || self.internal_encoding.$binary$Q())) {
               return '\\x' + ('00' + chr.toString(16).toUpperCase()).slice(-2);
             } else {
               return '\\u' + ('0000' + chr.toString(16).toUpperCase()).slice(-4);

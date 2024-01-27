@@ -93,7 +93,7 @@ module Opal
 
       def compile_defined_send(node)
         recv, method_name, *args = *node
-        mid = mid_to_jsid(method_name.to_s)
+        mid = mid_to_jsid_call(method_name.to_s)
 
         if recv
           recv_code = compile_defined(recv)
@@ -116,7 +116,7 @@ module Opal
         meth_tmp = scope.new_temp
         push "(((#{meth_tmp} = #{recv_value_tmp}#{mid}) && !#{meth_tmp}.$$stub)"
 
-        push " || #{recv_value_tmp}['$respond_to_missing?']('#{method_name}'))"
+        push " || #{recv_value_tmp}.$respond_to_missing$Q('#{method_name}'))"
 
         args.each do |arg|
           case arg.type
