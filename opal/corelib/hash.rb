@@ -187,12 +187,13 @@ class ::Hash < `Map`
 
   def assoc(object)
     %x{
-      return $hash_each(self, nil, function(key, value) {
-        if (#{`key` == object}) {
-          return [true, [key, value]];
+      var entry, entries = self.entries();
+      for (entry of entries) {
+        if (#{`entry[0]` == object}) {
+          return [entry[0], entry[1]];
         }
-        return [false, nil];
-      });
+      }
+      return nil;
     }
   end
 
@@ -478,12 +479,13 @@ class ::Hash < `Map`
 
   def has_value?(value)
     %x{
-      return $hash_each(self, false, function(key, val) {
+      var val, values = self.values();
+      for (val of values) {
         if (#{`val` == value}) {
-          return [true, true];
+          return true;
         }
-        return [false, false];
-      });
+      }
+      return false;
     }
   end
 
@@ -543,12 +545,13 @@ class ::Hash < `Map`
 
   def index(object)
     %x{
-      return $hash_each(self, nil, function(key, value) {
-        if (#{`value` == object}) {
-          return [true, key];
+      var entry, entries = self.entries();
+      for (entry of entries) {
+        if (#{`entry[1]` == object}) {
+          return entry[0];
         }
-        return [false, nil];
-      });
+      }
+      return nil;
     }
   end
 
@@ -683,12 +686,13 @@ class ::Hash < `Map`
 
   def rassoc(object)
     %x{
-      return $hash_each(self, nil, function(key, value) {
-        if (#{`value` == object}) {
-          return [true, [key, value]];
+      var entry, entries = self.entries();
+      for (entry of entries) {
+        if (#{`entry[1]` == object}) {
+          return [entry[0], entry[1]];
         }
-        return [false, nil];
-      });
+      }
+      return nil;
     }
   end
 
@@ -823,14 +827,7 @@ class ::Hash < `Map`
   end
 
   def to_a
-    %x{
-      var result = [];
-
-      return $hash_each(self, result, function(key, value) {
-        result.push([key, value]);
-        return [false, result];
-      });
-    }
+    `Array.from(self.entries())`
   end
 
   def to_h(&block)
