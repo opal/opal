@@ -106,13 +106,14 @@ class ::Hash < `Map`
         return false;
       }
 
-      return $hash_each(self, true, function(key, value) {
-        var other_value = $hash_get(other, key);
-        if (other_value === undefined || !value['$eql?'](other_value)) {
-          return [true, false];
+      var entry, entries = self.entries(), other_value;
+      for (entry of entries) {
+        other_value = $hash_get(other, entry[0]);
+        if (other_value === undefined || !entry[1]['$eql?'](other_value)) {
+          return false;
         }
-        return [false, true];
-      });
+      }
+      return true;
     }
   end
 
@@ -493,7 +494,7 @@ class ::Hash < `Map`
       var top = ($hash_ids === undefined),
           hash_id = self.$object_id(),
           result = $opal32_init(),
-          key, item, i, values,
+          key, item, i, values, entry, entries,
           size = self.size, ary = new Int32Array(size);
 
       result = $opal32_add(result, 0x4);
@@ -519,11 +520,11 @@ class ::Hash < `Map`
         $hash_ids.set(hash_id, self);
         i = 0;
 
-        $hash_each(self, false, function(key, value) {
-          ary[i] = [0x70414952, key, value].$hash();
+        entries = self.entries();
+        for (entry of entries) {
+          ary[i] = [0x70414952, entry[0], entry[1]].$hash();
           i++;
-          return [false, false];
-        });
+        }
 
         ary = ary.sort();
 
