@@ -507,10 +507,12 @@ class ::Hash < `Map`
       }
 
       try {
-        values = $hash_ids.values();
-        for (item of values) {
-          if (#{eql?(`item`)}) {
-            return $opal32_add(result, 0x01010101);
+        if (!top) {
+          values = $hash_ids.values();
+          for (item of values) {
+            if (#{eql?(`item`)}) {
+              return $opal32_add(result, 0x01010101);
+            }
           }
         }
 
