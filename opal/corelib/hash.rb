@@ -493,29 +493,29 @@ class ::Hash < `Map`
       var top = ($hash_ids === undefined),
           hash_id = self.$object_id(),
           result = $opal32_init(),
-          key, item, i,
+          key, item, i, values,
           size = self.size, ary = new Int32Array(size);
 
       result = $opal32_add(result, 0x4);
       result = $opal32_add(result, size);
 
       if (top) {
-        $hash_ids = Object.create(null);
+        $hash_ids = new Map();
       }
-      else if ($hash_ids[hash_id]) {
+      else if ($hash_ids.has(hash_id)) {
         return $opal32_add(result, 0x01010101);
       }
 
       try {
-        for (key in $hash_ids) {
-          item = $hash_ids[key];
+        values = $hash_ids.values();
+        for (item of values) {
           if (#{eql?(`item`)}) {
             return $opal32_add(result, 0x01010101);
           }
         }
 
-        $hash_ids[hash_id] = self;
-        i = 0
+        $hash_ids.set(hash_id, self);
+        i = 0;
 
         $hash_each(self, false, function(key, value) {
           ary[i] = [0x70414952, key, value].$hash();

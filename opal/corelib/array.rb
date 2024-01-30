@@ -1282,28 +1282,28 @@ class ::Array < `Array`
       var top = ($hash_ids === undefined),
           result = $opal32_init(),
           hash_id = self.$object_id(),
-          item, i, key;
+          item, i, key, values;
 
       result = $opal32_add(result, 0xA);
       result = $opal32_add(result, self.length);
 
       if (top) {
-        $hash_ids = Object.create(null);
+        $hash_ids = new Map();
       }
       // return early for recursive structures
-      else if ($hash_ids[hash_id]) {
+      else if ($hash_ids.has(hash_id)) {
         return $opal32_add(result, 0x01010101);
       }
 
       try {
-        for (key in $hash_ids) {
-          item = $hash_ids[key];
+        values = $hash_ids.values();
+        for (item of values) {
           if (#{eql?(`item`)}) {
             return $opal32_add(result, 0x01010101);
           }
         }
 
-        $hash_ids[hash_id] = self;
+        $hash_ids.set(hash_id, self);
 
         for (i = 0; i < self.length; i++) {
           item = self[i];
