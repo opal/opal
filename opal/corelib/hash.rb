@@ -106,8 +106,8 @@ class ::Hash < `Map`
         return false;
       }
 
-      var entry, entries = self.entries(), other_value;
-      for (entry of entries) {
+      var entry, other_value;
+      for (entry of self) {
         other_value = $hash_get(other, entry[0]);
         if (other_value === undefined || !entry[1]['$eql?'](other_value)) {
           return false;
@@ -187,8 +187,8 @@ class ::Hash < `Map`
 
   def assoc(object)
     %x{
-      var entry, entries = self.entries();
-      for (entry of entries) {
+      var entry;
+      for (entry of self) {
         if (#{`entry[0]` == object}) {
           return [entry[0], entry[1]];
         }
@@ -496,7 +496,7 @@ class ::Hash < `Map`
       var top = ($hash_ids === undefined),
           hash_id = self.$object_id(),
           result = $opal32_init(),
-          key, item, i, values, entry, entries,
+          key, item, i, values, entry,
           size = self.size, ary = new Int32Array(size);
 
       result = $opal32_add(result, 0x4);
@@ -522,8 +522,7 @@ class ::Hash < `Map`
         $hash_ids.set(hash_id, self);
         i = 0;
 
-        entries = self.entries();
-        for (entry of entries) {
+        for (entry of self) {
           ary[i] = [0x70414952, entry[0], entry[1]].$hash();
           i++;
         }
@@ -545,8 +544,8 @@ class ::Hash < `Map`
 
   def index(object)
     %x{
-      var entry, entries = self.entries();
-      for (entry of entries) {
+      var entry;
+      for (entry of self) {
         if (#{`entry[1]` == object}) {
           return entry[0];
         }
@@ -686,8 +685,8 @@ class ::Hash < `Map`
 
   def rassoc(object)
     %x{
-      var entry, entries = self.entries();
-      for (entry of entries) {
+      var entry;
+      for (entry of self) {
         if (#{`entry[1]` == object}) {
           return [entry[0], entry[1]];
         }
