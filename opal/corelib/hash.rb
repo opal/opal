@@ -826,7 +826,7 @@ class ::Hash < `Map`
   end
 
   def to_a
-    `Array.from(self.entries())`
+    `Array.from(self)`
   end
 
   def to_h(&block)
