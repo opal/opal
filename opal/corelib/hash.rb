@@ -106,13 +106,14 @@ class ::Hash < `Map`
         return false;
       }
 
-      return $hash_each(self, true, function(key, value) {
-        var other_value = $hash_get(other, key);
-        if (other_value === undefined || !value['$eql?'](other_value)) {
-          return [true, false];
+      var entry, other_value;
+      for (entry of self) {
+        other_value = $hash_get(other, entry[0]);
+        if (other_value === undefined || !entry[1]['$eql?'](other_value)) {
+          return false;
         }
-        return [false, true];
-      });
+      }
+      return true;
     }
   end
 
@@ -186,12 +187,13 @@ class ::Hash < `Map`
 
   def assoc(object)
     %x{
-      return $hash_each(self, nil, function(key, value) {
-        if (#{`key` == object}) {
-          return [true, [key, value]];
+      var entry;
+      for (entry of self) {
+        if (#{`entry[0]` == object}) {
+          return [entry[0], entry[1]];
         }
-        return [false, nil];
-      });
+      }
+      return nil;
     }
   end
 
@@ -477,12 +479,13 @@ class ::Hash < `Map`
 
   def has_value?(value)
     %x{
-      return $hash_each(self, false, function(key, val) {
+      var val, values = self.values();
+      for (val of values) {
         if (#{`val` == value}) {
-          return [true, true];
+          return true;
         }
-        return [false, false];
-      });
+      }
+      return false;
     }
   end
 
@@ -493,35 +496,36 @@ class ::Hash < `Map`
       var top = ($hash_ids === undefined),
           hash_id = self.$object_id(),
           result = $opal32_init(),
-          key, item, i,
+          key, item, i, values, entry,
           size = self.size, ary = new Int32Array(size);
 
       result = $opal32_add(result, 0x4);
       result = $opal32_add(result, size);
 
       if (top) {
-        $hash_ids = Object.create(null);
+        $hash_ids = new Map();
       }
-      else if ($hash_ids[hash_id]) {
+      else if ($hash_ids.has(hash_id)) {
         return $opal32_add(result, 0x01010101);
       }
 
       try {
-        for (key in $hash_ids) {
-          item = $hash_ids[key];
-          if (#{eql?(`item`)}) {
-            return $opal32_add(result, 0x01010101);
+        if (!top) {
+          values = $hash_ids.values();
+          for (item of values) {
+            if (#{eql?(`item`)}) {
+              return $opal32_add(result, 0x01010101);
+            }
           }
         }
 
-        $hash_ids[hash_id] = self;
-        i = 0
+        $hash_ids.set(hash_id, self);
+        i = 0;
 
-        $hash_each(self, false, function(key, value) {
-          ary[i] = [0x70414952, key, value].$hash();
+        for (entry of self) {
+          ary[i] = [0x70414952, entry[0], entry[1]].$hash();
           i++;
-          return [false, false];
-        });
+        }
 
         ary = ary.sort();
 
@@ -540,12 +544,13 @@ class ::Hash < `Map`
 
   def index(object)
     %x{
-      return $hash_each(self, nil, function(key, value) {
-        if (#{`value` == object}) {
-          return [true, key];
+      var entry;
+      for (entry of self) {
+        if (#{`entry[1]` == object}) {
+          return entry[0];
         }
-        return [false, nil];
-      });
+      }
+      return nil;
     }
   end
 
@@ -680,12 +685,13 @@ class ::Hash < `Map`
 
   def rassoc(object)
     %x{
-      return $hash_each(self, nil, function(key, value) {
-        if (#{`value` == object}) {
-          return [true, [key, value]];
+      var entry;
+      for (entry of self) {
+        if (#{`entry[1]` == object}) {
+          return [entry[0], entry[1]];
         }
-        return [false, nil];
-      });
+      }
+      return nil;
     }
   end
 
@@ -820,14 +826,7 @@ class ::Hash < `Map`
   end
 
   def to_a
-    %x{
-      var result = [];
-
-      return $hash_each(self, result, function(key, value) {
-        result.push([key, value]);
-        return [false, result];
-      });
-    }
+    `Array.from(self)`
   end
 
   def to_h(&block)
