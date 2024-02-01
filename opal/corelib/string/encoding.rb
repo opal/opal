@@ -75,16 +75,16 @@ class ::Encoding
 
   def each_char(string, &block)
     %x{
-      var low_surrogate = "";
+      var high_surrogate = "";
       for (var i = 0, length = string.length; i < length; i++) {
         var charcode = string.charCodeAt(i);
         var chr = string.charAt(i);
-        if (charcode >= 0xDC00 && charcode <= 0xDFFF) {
-          low_surrogate = chr;
+        if (charcode >= 0xD800 && charcode <= 0xDBFF) {
+          high_surrogate = chr;
           continue;
         }
-        else if (charcode >= 0xD800 && charcode <= 0xDBFF) {
-          chr = low_surrogate + chr;
+        else if (charcode >= 0xDC00 && charcode <= 0xDFFF) {
+          chr = high_surrogate + chr;
         }
         if (string.encoding.name != "UTF-8") {
           chr = new String(chr);
