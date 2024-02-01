@@ -818,7 +818,7 @@ module ::Kernel
   end
 
   def to_s
-    "#<#{self.class}:0x#{__id__.to_s(16)}>"
+    `Opal.fallback_to_s(self)`
   end
 
   def catch(tag = nil)
