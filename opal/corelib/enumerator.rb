@@ -1,5 +1,6 @@
 # helpers: slice, coerce_to, deny_frozen_access
 # backtick_javascript: true
+# use_strict: true
 
 require 'corelib/enumerable'
 

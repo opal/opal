@@ -1,5 +1,6 @@
 # helpers: freeze
 # backtick_javascript: true
+# use_strict: true
 
 # Portions Copyright (c) 2002-2013 Akinori MUSHA <knu@iDaemons.org>
 class ::Set

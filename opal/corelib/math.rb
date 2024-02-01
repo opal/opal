@@ -1,5 +1,6 @@
 # helpers: type_error
 # backtick_javascript: true
+# use_strict: true
 
 module ::Math
   self::E  = `Math.E`

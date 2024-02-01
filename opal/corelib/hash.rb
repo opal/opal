@@ -1,5 +1,6 @@
 # helpers: yield1, hash_clone, hash_delete, hash_each, hash_get, hash_put, deny_frozen_access, freeze, opal32_init, opal32_add
 # backtick_javascript: true
+# use_strict: true
 
 require 'corelib/enumerable'
 

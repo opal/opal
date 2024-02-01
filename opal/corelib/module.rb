@@ -1,5 +1,6 @@
 # helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop, jsid, each_ivar
 # backtick_javascript: true
+# use_strict: true
 
 class ::Module
   %x{
