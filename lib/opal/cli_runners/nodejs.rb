@@ -24,15 +24,18 @@ module Opal
         argv.unshift('--') if argv.any?
 
         opts = Shellwords.shellwords(ENV['NODE_OPTS'] || '')
+        flame = ENV['NODE_FLAME']
 
         SystemRunner.call(data) do |tempfile|
-          [
+          args = [
             'node',
             '--require', "#{DIR}/source-map-support-node",
             *opts,
             tempfile.path,
             *argv
           ]
+          args.unshift('0x', '--') if flame
+          args
         end
       rescue Errno::ENOENT
         raise MissingNodeJS, 'Please install Node.js to be able to run Opal scripts.'

@@ -233,3 +233,7 @@ Comparison of the Asciidoctor (a real-life Opal application) compile and run:
 ## Parser
 
 Opal relies on the `parser` gem, see debug/development documentation there to know more about its internals: https://whitequark.github.io/parser/.
+
+## Profiling
+
+For the node runner profiling can be enbled by setting the `NODE_FLAME` environment variable. In addition 0x must be installed globally: `npm i 0x -g`. When using the node runner afterwards, it will profile the program execution and at programm exit generate a nice flamegraph that can be examined in a browser. To disable profiling again, the `NODE_FLAME` environment variable must be unset.
