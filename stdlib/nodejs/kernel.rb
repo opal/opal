@@ -4,8 +4,13 @@ require 'buffer'
 require 'corelib/process/status'
 
 module Kernel
-  @__child_process__ = `require('child_process')`
+  @__child_process__ = `require('node:child_process')`
+  @__cluster__ = `require('node:cluster')`
+  @__process__ = `require('node:process')`
+
   `var __child_process__ = #{@__child_process__}`
+  `var __cluster__ = #{@__cluster__}`
+  `var __process__ = #{@__process__}`
 
   def system(*argv, exception: false)
     env = {}
@@ -32,5 +37,26 @@ module Kernel
 
   def `(cmdline)
     Buffer.new(`__child_process__.execSync(#{cmdline})`).to_s.encode('UTF-8')
+  end
+
+  def fork
+    `var worker`
+    if block_given?
+      %x{
+        if (__cluster__.isPrimary) {
+          worker = __cluster__.fork();
+          return worker.process.pid;
+        } else if (__cluster__.isWorker) {
+          #{yield}
+        }
+      }
+    else
+      %x{
+        if (__cluster__.isPrimary) {
+          worker = __cluster__.fork();
+          return worker.process.pid;
+        }
+      }
+    end
   end
 end
