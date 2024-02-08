@@ -2583,39 +2583,39 @@
   // Iterate over every instance variable and call func for each one
   // giving name of the ivar and optionally the property descriptor.
   function $each_ivar(obj, func) {
-    var own_props = Object.getOwnPropertyNames(obj), own_props_length = own_props.length, i, prop, desc;
+    var own_props = Object.keys(obj), own_props_length = own_props.length, i, prop;
 
-    for(i = 0; i < own_props_length; i++) {
+    for (i = 0; i < own_props_length; i++) {
+      prop = own_props[i];
+
+      if (prop[0] === '$') continue;
+
+      func(prop);
+    }
+  }
+  Opal.each_ivar = $each_ivar;
+
+  // freze props, make setters of instance variables throw FrozenError
+  Opal.freeze_props = function (obj) {
+    var own_props = Object.keys(obj), own_props_length = own_props.length, i, prop, desc,
+      dp_template = {
+        get: null,
+        set: function (_val) { $deny_frozen_access(obj); },
+        enumerable: true
+      };
+
+    for (i = 0; i < own_props_length; i++) {
       prop = own_props[i];
 
       if (prop[0] === '$') continue;
 
       desc = Object.getOwnPropertyDescriptor(obj, prop);
 
-      if (desc && desc.enumerable) {
-        func(prop, desc);
+      if (desc && desc.writable) {
+        dp_template.get = $return_val(desc.value);
+        Object.defineProperty(obj, prop, dp_template);
       }
     }
-  }
-
-  Opal.each_ivar = $each_ivar;
-
-  // freze props, make setters of instance variables throw FrozenError
-  Opal.freeze_props = function(obj) {
-    var dp_template = {
-      get: null,
-      set: function(_val) { $deny_frozen_access(obj); },
-      enumerable: true
-    };
-
-    $each_ivar(obj, function(prop, desc) {
-      if (!desc.writable) return;
-
-      // Redefine a property with a setter that raises an error.
-      dp_template.get = $return_val(desc.value);
-
-      Object.defineProperty(obj, prop, dp_template);
-    });
   };
 
   // Regexps

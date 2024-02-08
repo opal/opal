@@ -372,7 +372,7 @@ module ::Kernel
       var result = [], name;
 
       $each_ivar(self, function(name) {
-        if (name.substr(-1) === '$') {
+        if (name[name.length-1] === '$') {
           name = name.slice(0, name.length - 1);
         }
         result.push('@' + name);
