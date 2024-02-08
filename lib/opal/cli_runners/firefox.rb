@@ -115,7 +115,7 @@ module Opal
 
         # For options see https://github.com/puppeteer/puppeteer/blob/main/packages/puppeteer-core/src/node/FirefoxLauncher.ts
         firefox_server_cmd = %{#{OS.shellescape(firefox_executable)} \
-          --no-remote \
+          --no-remote #{'--foreground' if OS.macos?} #{'--wait-for-browser' if OS.windows?} \
           --profile #{profile} \
           --headless \
           --remote-debugging-port #{chrome_port} \
@@ -134,6 +134,15 @@ module Opal
       rescue Timeout::Error
         puts 'Failed to start firefox server'
         puts 'Make sure that you have it installed and that its version is > 100'
+        if !OS.windows? && !OS.macos?
+          # The firefox executable within snap is in fact the snap executable which sets up paths and then calls the
+          # real firefox executable. It also mistreats passed options and args and always tries to reuse a existing
+          # instance. Thus firefox from snap, when called by this runner, will start with the wrong options, the
+          # wrong profile and will fail to setup the remote debugging port
+          puts 'When firefox is installed via snap, it cannot work correctly with this runner.'
+          puts 'In that case, please uninstall firefox via snap and install firefox from a apt repo, see:'
+          puts 'https://support.mozilla.org/en-US/kb/install-firefox-linux#w_install-firefox-deb-package-for-debian-based-distributions'
+        end
         exit(1)
       ensure
         if OS.windows? && firefox_pid
@@ -185,6 +194,8 @@ module Opal
       end
 
       def mktmpprofile
+        # for prefs see https://github.com/puppeteer/puppeteer/blob/main/packages/browsers/src/browser-data/firefox.ts
+        # and https://github.com/puppeteer/puppeteer/blob/main/packages/puppeteer-core/src/node/FirefoxLauncher.ts
         profile = Dir.mktmpdir('firefox-opal-profile-')
         default_prefs = {
           # Make sure Shield doesn't hit the network.
@@ -226,6 +237,8 @@ module Opal
           'browser.startup.homepage_override.mstone': 'ignore',
           # Start with a blank page about:blank
           'browser.startup.page': 0,
+          # Do not close the window when the last tab gets closed
+          'browser.tabs.closeWindowWithLastTab': false,
           # Do not allow background tabs to be zombified on Android: otherwise for
           # tests that open additional tabs: the test harness tab itself might get unloaded
           'browser.tabs.disableBackgroundZombification': false,
@@ -233,6 +246,8 @@ module Opal
           'browser.tabs.warnOnCloseOtherTabs': false,
           # Do not warn when multiple tabs will be opened
           'browser.tabs.warnOnOpen': false,
+          # Do not automatically offer translations, as tests do not expect this.
+          'browser.translations.automaticallyPopup': false,
           # Disable the UI tour.
           'browser.uitour.enabled': false,
           # Turn off search suggestions in the location bar so as not to trigger
@@ -342,7 +357,8 @@ module Opal
           'toolkit.startup.max_resumed_crashes': -1,
         }
         prefs = default_prefs.map { |key, value| "user_pref(\"#{key}\", #{JSON.dump(value)});" }
-        File.binwrite(profile + '/prefs.js', prefs.join("\n"))
+        # apparently firefox will read user.js an generate prefs.js from it
+        File.binwrite(profile + '/user.js', prefs.join("\n"))
         profile
       end
     end
