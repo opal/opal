@@ -9,11 +9,11 @@ end
 ARGV = `process.argv.slice(2)`
 ARGV.shift if ARGV.first == '--'
 
-STDOUT.write_proc = ->(string) { `process.stdout.write(string)` }
-STDERR.write_proc = ->(string) { `process.stderr.write(string)` }
+$stdout.write_proc = ->(string) { `process.stdout.write(string)` }
+$stderr.write_proc = ->(string) { `process.stderr.write(string)` }
 
 `var __fs__ = require('fs')`
-STDIN.read_proc = %x{function(_count) {
+$stdin.read_proc = %x{function(_count) {
   // Ignore count, return as much as we can get
   var buf = Buffer.alloc(65536), count;
   try {
@@ -26,6 +26,6 @@ STDIN.read_proc = %x{function(_count) {
   return buf.toString('utf8', 0, count);
 }}
 
-STDIN.tty = true
-STDOUT.tty = true
-STDERR.tty = true
+$stdin.tty = true
+$stdout.tty = true
+$stderr.tty = true
