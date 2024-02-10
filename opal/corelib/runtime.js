@@ -2516,7 +2516,7 @@
   // function.
   //
   Opal.hash2 = function(keys, smap) {
-    console.warn("DEPRECATION: `Opal.hash2` is deprecated and will be removed in Opal 2.0. Use `new Map()` with an array of key/value pairs instead.");
+    console.warn("DEPRECATION: `Opal.hash2` is deprecated and will be removed in Opal 2.0. Use $hash_new for primitive keys or $hash_new2 for complex keys instead.");
 
     var hash = new Map();
     for (var i = 0, max = keys.length; i < max; i++) {
