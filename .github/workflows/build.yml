@@ -27,6 +27,9 @@ jobs:
           - name: mspec-firefox
             firefox: '106.0.4'
             command: xvfb-run bin/rake mspec_firefox
+          - name: mspec-bun
+            bun: true
+            command: bin/rake mspec_bun
           - name: minitest
             command: bin/rake minitest
           - name: minitest-strict-mode
@@ -72,6 +75,7 @@ jobs:
           - name: timezone
             command: bin/rake mspec_nodejs TZ="Pacific/Fiji"
           - name: performance
+            bun: true
             permissive: true
             fetchdepth: '0'
             command: bin/rake performance:compare
@@ -84,6 +88,8 @@ jobs:
     runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.combo.permissive || false }}
     steps:
+      - if: ${{ matrix.combo.bun }}
+        uses: oven-sh/setup-bun@v1
       - if: ${{ matrix.combo.firefox }}
         id: setup-firefox
         uses: browser-actions/setup-firefox@latest
