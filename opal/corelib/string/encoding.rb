@@ -400,7 +400,7 @@ class ::String
   end
 
   def initialize_copy(other)
-    %{
+    %x{
       self.encoding = other.encoding;
       self.internal_encoding = other.internal_encoding;
     }

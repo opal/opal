@@ -203,14 +203,14 @@ class File < IO
 
   def self.readable?(path)
     return false unless exist? path
-    %{
-        try {
-          __fs__.accessSync(path, __fs__.R_OK);
-          return true;
-        } catch (error) {
-          return false;
-        }
+    %x{
+      try {
+        __fs__.accessSync(path, __fs__.R_OK);
+        return true;
+      } catch (error) {
+        return false;
       }
+    }
   end
 
   def self.size(path)

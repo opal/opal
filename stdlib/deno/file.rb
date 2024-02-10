@@ -193,7 +193,7 @@ class File < IO
 
   def self.readable?(path)
     return false unless exist? path
-    %{
+    %x{
       try {
         Deno.openSync(path, {read: true}).close();
         return true;
