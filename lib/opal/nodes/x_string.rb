@@ -46,8 +46,8 @@ module Opal
       # Check if there's only one child or if they're all part of
       # the same line (e.g. because of interpolations)
       def self.single_line?(children)
-        (children.size == 1) || children.none? do |c|
-          c.type == :str && c.loc.expression.source.end_with?("\n")
+        (children.size == 1 && children[0].type != :str) || children.none? do |c|
+          c.type == :str && c.loc.expression.source.include?("\n")
         end
       end
 

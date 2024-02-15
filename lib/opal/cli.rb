@@ -75,6 +75,8 @@ module Opal
         @file = @stdin
       end
 
+      Opal::Parser.use_prism if options.delete(:prism)
+
       raise ArgumentError, "unknown options: #{options.inspect}" unless @options.empty?
     end
 

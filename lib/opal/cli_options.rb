@@ -200,6 +200,10 @@ module Opal
         options[:file] = file
       end
 
+      on('--prism', '(experimental) Use Prism as a parser') do
+        options[:prism] = true
+      end
+
       on('-V', '(deprecated; always enabled) Enable inline Operators') do
         warn '* -V is deprecated and has no effect'
         options[:inline_operators] = true
