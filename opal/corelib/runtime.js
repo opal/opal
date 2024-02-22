@@ -2274,6 +2274,32 @@
   // Hashes
   // ------
 
+
+  // Experiments have shown, that using new Map([[1,2]]) inline is rather slow
+  // compared to using new Map() in combination with .set(1,2), because the former
+  // creates a new Array for each pair and then discards it. Using .set though
+  // would increase the size of the generated code. So lets use a compromise and
+  // use a helper function, which allows the compiler to generate compact code
+  // and at the same time provides the performance improvement of using .set
+  // with a overall smaller overhead than creating arrays for each pair.
+  // For primitive keys:
+  Opal.hash_new = function () {
+    let h = new Map();
+    for (let i = 0; i < arguments.length; i += 2) {
+      h.set(arguments[i], arguments[i + 1]);
+    }
+    return h;
+  }
+
+  // The same as above, except for complex keys:
+  Opal.hash_new2 = function () {
+    let h = new Map();
+    for (let i = 0; i < arguments.length; i += 2) {
+      Opal.hash_put(h, arguments[i], arguments[i + 1]);
+    }
+    return h;
+  }
+
   Opal.hash_init = function (_hash) {
     console.warn("DEPRECATION: Opal.hash_init is deprecated and is now a no-op.");
   }
@@ -2490,7 +2516,7 @@
   // function.
   //
   Opal.hash2 = function(keys, smap) {
-    console.warn("DEPRECATION: `Opal.hash2` is deprecated and will be removed in Opal 2.0. Use `new Map()` with an array of key/value pairs instead.");
+    console.warn("DEPRECATION: `Opal.hash2` is deprecated and will be removed in Opal 2.0. Use $hash_new for primitive keys or $hash_new2 for complex keys instead.");
 
     var hash = new Map();
     for (var i = 0, max = keys.length; i < max; i++) {

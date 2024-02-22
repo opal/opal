@@ -78,19 +78,20 @@ module Opal
           key, value = pair.children
           push ', ' unless idx == 0
           if %i[sym str].include?(key.type)
-            push "[#{key.children[0].to_s.inspect}", ', ', expr(value), ']'
+            push key.children[0].to_s.inspect, ', ', expr(value)
           else
-            push '[', expr(key), ', ', expr(value), ']'
+            push expr(key), ', ', expr(value)
           end
         end
 
         if keys.empty?
           push '(new Map())'
         elsif simple_keys?
-          wrap '(new Map([', ']))'
+          helper :hash_new
+          wrap '$hash_new(', ')'
         else
-          helper :hash_rehash
-          wrap '$hash_rehash(new Map([', ']))'
+          helper :hash_new2
+          wrap '$hash_new2(', ')'
         end
       end
     end
