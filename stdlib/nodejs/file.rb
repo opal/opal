@@ -113,15 +113,22 @@ require 'corelib/file'
 class File < IO
   @__fs__ = `require('fs')`
   @__path__ = `require('path')`
-  @__util__ = `require('util')`
   `var __fs__ = #{@__fs__}`
   `var __path__ = #{@__path__}`
-  `var __util__ = #{@__util__}`
   # Since Node.js 11+ TextEncoder and TextDecoder are now available on the global object.
-  `var __TextEncoder__ = typeof TextEncoder !== 'undefined' ? TextEncoder : __util__.TextEncoder`
-  `var __TextDecoder__ = typeof TextDecoder !== 'undefined' ? TextDecoder : __util__.TextDecoder`
-  `var __utf8TextDecoder__ = new __TextDecoder__('utf8')`
-  `var __textEncoder__ = new __TextEncoder__()`
+  %x{
+    var __TextEncoder__, __TextDecoder__;
+    if (typeof TextEncoder !== 'undefined') {
+        __TextEncoder__ = TextEncoder;
+        __TextDecoder__ = TextDecoder;
+    } else {
+        var __util__ = require('util');
+        __TextEncoder__ = __util__.TextEncoder;
+        __TextDecoder__ = __util__.TextDecoder;
+    }
+    var __utf8TextDecoder__ = new __TextDecoder__('utf8');
+    var __textEncoder__ = new __TextEncoder__();
+  }
 
   if `__path__.sep !== #{Separator}`
     ALT_SEPARATOR = `__path__.sep`

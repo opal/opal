@@ -93,7 +93,8 @@ ASCIIDOCTOR_BUILD_OPAL = "#{'ruby ' if Gem.win_platform?}bin/opal --no-cache -c 
                          "-sconcurrent/map -sslim/include " \
                          "tmp/performance/asciidoctor_test.rb > tmp/performance/asciidoctor_test.js"
 ASCIIDOCTOR_RUN_RUBY = "bundle exec ruby -Itmp/performance/asciidoctor/lib tmp/performance/asciidoctor_test.rb"
-ASCIIDOCTOR_RUN_OPAL = "node tmp/performance/asciidoctor_test.js"
+ASCIIDOCTOR_RUN_OPAL = { node: "node tmp/performance/asciidoctor_test.js",
+                         bun:  "bun  tmp/performance/asciidoctor_test.js" }
 
 # Generate V8 function optimization status report for corelib methods
 NODE_OPTSTATUS = if Gem.win_platform?
@@ -113,14 +114,17 @@ performance_stat = ->(name) {
   stat[:compiler_time] = Timing.new(tries: 7) { sh(ASCIIDOCTOR_BUILD_OPAL) }
 
   puts "\n* Running AsciiDoctor with #{name}..."
-  stat[:run_time] = Timing.new { sh("#{ASCIIDOCTOR_RUN_OPAL} > tmp/performance/opal_result_#{name}.html") }
-  stat[:correct] = File.read("tmp/performance/opal_result_#{name}.html") == File.read("tmp/performance/ruby_result.html")
+  stat[:run_time] = {}
+  stat[:correct] = {}
+  ASCIIDOCTOR_RUN_OPAL.each do |engine, command|
+    stat[:run_time][engine] = Timing.new { sh("#{command} > tmp/performance/opal_result_#{name}_#{engine}.html") }
+    stat[:correct][engine] = File.read("tmp/performance/opal_result_#{name}_#{engine}.html") == File.read("tmp/performance/ruby_result.html")
+  end
   stat[:size] = Size.new File.size("tmp/performance/asciidoctor_test.js")
-
   puts "\n* Minifying AsciiDoctor with #{name}..."
   source = File.read("tmp/performance/asciidoctor_test.js")
-  stat[:min_size] = Size.new Opal::Util.uglify(source).bytesize rescue Float::INFINITY
-  stat[:min_size_m] = Size.new Opal::Util.uglify(source, mangle: true).bytesize rescue Float::INFINITY
+  stat[:min_size] = Size.new Opal::Util.uglify(source).bytesize rescue Size.new(Float::INFINITY)
+  stat[:min_size_m] = Size.new Opal::Util.uglify(source, mangle: true).bytesize rescue Size.new(Float::INFINITY)
 
   stat
 }
@@ -167,11 +171,15 @@ namespace :performance do
     puts
     puts "Comparison of the Asciidoctor (a real-life Opal application) compile and run:"
 
-    $failures << "Wrong result on the current branch" unless current[:correct]
-    $failures << "Wrong result on the previous branch - ignore it" unless previous[:correct]
+    ASCIIDOCTOR_RUN_OPAL.each_key do |engine| 
+      $failures << "Wrong result on the current branch for #{engine}" unless current[:correct][engine]
+      $failures << "Wrong result on the previous branch for #{engine} - ignore it" unless previous[:correct][engine]
+    end
 
     current[:compiler_time].compare_to(previous[:compiler_time], "Compile time")
-    current[:run_time     ].compare_to(previous[:run_time     ], "Run time")
+    ASCIIDOCTOR_RUN_OPAL.each_key do |engine| 
+      current[:run_time][engine].compare_to(previous[:run_time][engine], "Run time on #{engine}")
+    end
     current[:size         ].compare_to(previous[:size         ], "Bundle size")
     current[:min_size     ].compare_to(previous[:min_size     ], "Minified bundle size")
     current[:min_size_m   ].compare_to(previous[:min_size_m   ], "Mangled & minified")

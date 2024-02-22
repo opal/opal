@@ -12,6 +12,7 @@ files = ARGV
 ruby_exe = Gem.ruby
 
 bench_exe = {
+  "bun"     => "bin/opal -Rbun -rnodejs/file",
   "chrome"  => "bin/opal -Rchrome -rheadless_browser/base -rheadless_browser/file",
   "firefox" => "bin/opal -Rfirefox -rheadless_browser/base -rheadless_browser/file",
   "deno"    => "bin/opal -Rdeno -rdeno/file",
