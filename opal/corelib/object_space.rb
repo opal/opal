@@ -55,7 +55,7 @@ module ::ObjectSpace
   end
 
   def undefine_finalizer(obj)
-    %{
+    %x{
       var id = #{obj.__id__};
       registry.unregister(obj);
       delete_callers(id);
