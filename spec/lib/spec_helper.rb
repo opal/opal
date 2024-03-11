@@ -5,6 +5,11 @@ if ENV['CHECK_COVERAGE']
   Coveralls.wear!
 end
 
+if ENV['CHECK_COVERAGE_SIMPLECOV']
+  require 'simplecov'
+  SimpleCov.start
+end
+
 require 'opal'
 
 ENV['OPAL_DISABLE_PREFORK_LOGS'] = '1'
