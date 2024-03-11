@@ -40,6 +40,7 @@ group :development do
   gem 'rb-fsevent'
   gem 'guard', require: false
   gem 'listen', require: false
+  gem 'simplecov', require: false
 
   if RUBY_PLATFORM =~ /darwin/
     gem 'terminal-notifier-guard'
