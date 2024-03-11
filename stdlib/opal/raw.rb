@@ -68,6 +68,6 @@ module ::Opal
 
     alias method_missing call
 
-    extend self
+    extend self # rubocop:disable Style/ModuleFunction
   end
 end
