@@ -1,0 +1,6 @@
+# Provide dependency paths for cases when they can't be deduced from inside Opal
+Opal::GEM_DIR = <%= File.expand_path('../../../lib', __FILE__).inspect %>
+Opal::GEM_DEPENDENCY_PATHS = <%=
+  ["ast", "parser", "racc"].map do |i|
+    Gem::Specification.find_by_name(i).gem_dir + "/lib"
+  end.inspect %>

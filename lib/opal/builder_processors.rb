@@ -2,6 +2,7 @@
 
 require 'opal/compiler'
 require 'opal/erb'
+require 'erb'
 
 module Opal
   module BuilderProcessors

@@ -31,6 +31,9 @@ module Opal
     attr_accessor :location
   end
 
+  class OpalfileUnknownDirective < Error
+  end
+
   def self.opal_location_from_error(error)
     opal_location = OpalBacktraceLocation.new
     opal_location.location = error.location if error.respond_to?(:location)

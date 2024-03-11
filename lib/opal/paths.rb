@@ -1,20 +1,17 @@
 # frozen_string_literal: true
 
+require 'opal/project'
+
 module Opal
-  # We use this file from inside Opal as well, and __dir__ is not yet supported.
-  # rubocop:disable Style/ExpandPathArguments
   def self.gem_dir
-    File.expand_path('../..', __FILE__)
+    if defined? Opal::GEM_DIR
+      # This is for the case of opalopal. __FILE__ and __dir__ are unreliable
+      # in this case.
+      Opal::GEM_DIR
+    else
+      File.expand_path('..', __dir__)
+    end
   end
-
-  def self.core_dir
-    File.expand_path('../../../opal', __FILE__)
-  end
-
-  def self.std_dir
-    File.expand_path('../../../stdlib', __FILE__)
-  end
-  # rubocop:enable Style/ExpandPathArguments
 
   # Add a file path to opals load path. Any gem containing ruby code that Opal
   # has access to should add a load path through this method. Load paths added
@@ -26,6 +23,7 @@ module Opal
 
   # Same as #append_path but can take multiple paths.
   def self.append_paths(*paths)
+    paths.each { |i| setup_project(i) }
     @paths.concat(paths)
     nil
   end
@@ -36,7 +34,7 @@ module Opal
     # We want to ensure the compiler and any Gemfile/gemspec (for development)
     # stays untouched
     opal_path = File.expand_path('..', Opal.gem_dir)
-    files = Dir["#{opal_path}/{Gemfile*,*.gemspec,lib/**/*}"]
+    files = Dir["#{opal_path}/{Opalfile,Gemfile*,*.gemspec,lib/**/*}"]
 
     # Also check if parser wasn't changed:
     files += $LOADED_FEATURES.grep(%r{lib/(parser|ast)})
@@ -44,44 +42,7 @@ module Opal
     files
   end
 
-  module UseGem
-    # Adds the "require_paths" (usually `lib/`) of gem with the given name to
-    # Opal paths. By default will include the "require_paths" from all the
-    # dependent gems.
-    #
-    # @param gem_name [String] the name of the gem
-    # @param include_dependencies [Boolean] whether or not to add recursively
-    #   the gem's dependencies
-    # @raise [Opal::GemNotFound]
-    #   if gem or any of its runtime dependencies not found
-    def use_gem(gem_name, include_dependencies = true)
-      append_paths(*require_paths_for_gem(gem_name, include_dependencies))
-    end
-
-    private
-
-    def require_paths_for_gem(gem_name, include_dependencies)
-      paths = []
-
-      spec = Gem::Specification.find_by_name(gem_name)
-      raise GemNotFound, gem_name unless spec
-
-      if include_dependencies
-        spec.runtime_dependencies.each do |dependency|
-          paths += require_paths_for_gem(dependency.name, include_dependencies)
-        end
-      end
-
-      gem_dir = spec.gem_dir
-      spec.require_paths.map do |path|
-        paths << File.join(gem_dir, path)
-      end
-
-      paths
-    end
-  end
-
-  extend UseGem
+  extend Project::Collection
 
   def self.paths
     @paths.freeze
@@ -90,11 +51,9 @@ module Opal
   # Resets Opal.paths to the default value
   # (includes `corelib`, `stdlib`, `opal/lib`, `ast` gem and `parser` gem)
   def self.reset_paths!
-    @paths = [core_dir, std_dir, gem_dir]
-    if RUBY_ENGINE != 'opal'
-      use_gem 'ast'
-      use_gem 'parser'
-    end
+    @paths = []
+    @projects = []
+    setup_project(gem_dir)
     nil
   end
 

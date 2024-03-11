@@ -256,6 +256,10 @@ class File < IO
     `return __path__.normalize(__path__.resolve(#{basedir.to_str}, #{path.to_str})).split(__path__.sep).join(__path__.posix.sep)`
   end
 
+  def self.absolute_path?(path)
+    `__path__.isAbsolute(path)`
+  end
+
   # Instance Methods
 
   def initialize(path, flags = 'r')
