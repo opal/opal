@@ -15,7 +15,6 @@ opal_filter "Hash" do
   fails "Hash#eql? computes equality for complex recursive hashes" # Exception: Maximum call stack size exceeded
   fails "Hash#eql? computes equality for recursive hashes & arrays" # Exception: Maximum call stack size exceeded
   fails "Hash#except always returns a Hash without a default" # Expected #<Class:0x8666> == Hash to be truthy but was false
-  fails "Hash#hash allows ommiting values" # NameError: uninitialized constant MSpecEnv::a
   fails "Hash#inspect calls #to_s on the object returned from #inspect if the Object isn't a String" # Expected "{\"a\"=>abc}" == "{:a=>abc}" to be truthy but was false
   fails "Hash#inspect does not call #to_s on a String returned from #inspect" # Expected "{\"a\"=>\"abc\"}" == "{:a=>\"abc\"}" to be truthy but was false
   fails "Hash#inspect does not call #to_str on the object returned from #inspect when it is not a String" # Expected "{\"a\"=>#<MockObject:0x40e02>}" =~ /^\{:a=>#<MockObject:0x[0-9a-f]+>\}$/ to be truthy but was nil

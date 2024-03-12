@@ -178,6 +178,7 @@ opal_filter "Time" do
   fails "Time.utc raises an ArgumentError for out of range month" # Expected ArgumentError (/(mon|argument) out of range/) but got: ArgumentError (month out of range: 16)
   fails "Time.utc raises an ArgumentError for out of range second" # Expected ArgumentError (argument out of range) but got: ArgumentError (sec out of range: -1)  
   fails "Time.xmlschema parses ISO-8601 strings" # NoMethodError: undefined method `xmlschema' for Time
+  fails_badly "Marshal.load for a Time keeps the local zone" # Expected "Fiji Standard Time" == "Fiji Summer Time" to be truthy but was false
   fails_badly "Time#dst? dst? returns whether time is during daylight saving time" # Expected false == true to be truthy but was false
   fails_badly "Time#isdst dst? returns whether time is during daylight saving time" # Expected false == true to be truthy but was false
   fails_badly "Time#strftime with %z formats a local time with positive UTC offset as '+HHMM'" # Expected "+0900" == "+0100" to be truthy but was false

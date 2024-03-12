@@ -389,7 +389,7 @@ class ::Number < ::Numeric
   end
 
   def chr(encoding = undefined)
-    `Opal.enc(String.fromCharCode(self), encoding || "BINARY")`
+    `Opal.enc(String.fromCodePoint(self), encoding || "BINARY")`
   end
 
   def denominator
