@@ -16,6 +16,10 @@ Everything you need to know to install Opal and create your first application.
 
 ## Using JavaScript Features from Ruby
 
+#### [Interfacing with JavaScript](js_interface.html)
+
+Discover how to access JavaScript environment from Ruby code.
+
 #### [Async](async.html)
 
 Learn more about JavaScript `async`/`await` support in Opal and how you can use it to avoid explicit callbacks and promises.
@@ -84,9 +88,10 @@ How to make your gem work in Opal and differentiate code for the JavaScript envi
 
 A very general overview of how the Opal compiler works.
 
-#### [Compiled Ruby](compiled_ruby.html)
+#### [Compiled Ruby and Raw JavaScript Interfaces](compiled_ruby.html)
 
-This guide documents how each part of Ruby is mapped to JavaScript internally.
+This guide documents how each part of Ruby is mapped to JavaScript internally. This guide also gives
+information on how to interface Ruby with JavaScript and vice-versa using raw interfaces.
 
 #### [Compiler File Loading Directives](compiler_directives.html)
 

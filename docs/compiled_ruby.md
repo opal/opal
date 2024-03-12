@@ -1,4 +1,4 @@
-# Compiled Ruby Code
+# Compiled Ruby Code and Raw JavaScript Interfaces
 
 ## Generated JavaScript
 
@@ -239,6 +239,15 @@ a special syntax for inlining JavaScript code. This is done with
 x-strings or "backticks", as their Ruby use has no useful translation
 in the browser.
 
+To make x-strings a tool to embed JavaScript, you must add a necessary
+magic comment on the top of your program:
+
+```ruby
+# backtick_javascript: true
+```
+
+Sample code:
+
 ```ruby
 `window.title`
 # => "Opal: Ruby to JavaScript compiler"
@@ -267,63 +276,6 @@ end
 
 X-Strings also have the ability to automatically return their value,
 as used by this example.
-
-
-### Native Module
-
-_Reposted from: [Mikamayhem](http://dev.mikamai.com/post/79398725537/using-native-javascript-objects-from-opal)_
-
-Opal standard lib (stdlib) includes a `Native` module. To use it, you need to download and reference `native.js`. You can find the latest minified one from the CDN [here](http://cdn.opalrb.com/opal/current/native.min.js).
-
-Let's see how it works and wrap `window`:
-
-```ruby
-require 'native'
-
-win = Native(`window`) # equivalent to Native::Object.new(`window`)
-```
-
-To access a Native-wrapped global JavaScript object, we can also use `$$`, after
-we have the `native` module required.
-
-Now what if we want to access one of its properties?
-
-```ruby
-win[:location][:href]                         # => "http://dev.mikamai.com/"
-win[:location][:href] = "http://mikamai.com/" # will bring you to mikamai.com
-```
-
-And what about methods?
-
-```ruby
-win.alert('hey there!')
-```
-
-So let’s do something more interesting:
-
-```ruby
-class << win
-  # A cross-browser window close method (works in IE!)
-  def close!
-    %x{
-      return (#@native.open('', '_self', '') && #@native.close()) ||
-             (#@native.opener = null && #@native.close()) ||
-             (#@native.opener = '' && #@native.close());
-    }
-  end
-
-  # let's assign href directly
-  def href= url
-    self[:location][:href] = url
-  end
-end
-```
-
-That’s all for now, bye!
-
-```ruby
-win.close!
-```
 
 ### Calling JavaScript Methods
 
