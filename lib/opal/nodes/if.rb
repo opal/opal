@@ -326,8 +326,6 @@ module Opal
         case body
         when AST::Node
           case body.type
-          when :break, :redo, :retry
-            false
           when :iter, :while
             # Don't traverse the iters or whiles!
             true
@@ -344,22 +342,29 @@ module Opal
       end
 
       def compile_with_switch
-        if sexp.meta[:switch_child]
-          @switch_variable = sexp.meta[:switch_variable]
-          @switch_additional_rules = sexp.meta[:switch_additional_rules]
-          compile_switch_case(sexp.meta[:switch_test])
-        else
-          line "switch (", expr(@switch_first_test), ".valueOf()) {"
-          indent do
-            compile_switch_case(@switch_test)
+        in_closure(Closure::JS_SWITCH) do
+          if sexp.meta[:switch_child]
+            @switch_variable = sexp.meta[:switch_variable]
+            @switch_additional_rules = sexp.meta[:switch_additional_rules]
+            compile_switch_case(sexp.meta[:switch_test])
+          else
+            line "switch (", expr(@switch_first_test), ".valueOf()) {"
+            indent do
+              compile_switch_case(@switch_test)
+            end
+            line "}"
           end
-          line "}"
         end
       end
 
       def returning?(body)
-        %i[return js_return next].include?(body.type) ||
-          (body.type == :begin && %i[return js_return next].include?(body.children.last.type))
+        # We make sure to always return something, so if other branch doesn't
+        # exist, let's return as well
+        return true unless body
+
+        %i[return js_return next break redo retry].include?(body.type) ||
+          (body.type == :begin && returning?(body.children.last)) ||
+          (body.type == :if && returning?(body.children[1]) && returning?(body.children[2]))
       end
 
       def compile_switch_case(test)
