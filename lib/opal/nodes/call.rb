@@ -272,75 +272,8 @@ module Opal
         end
       end
 
-      add_special :require do |compile_default|
-        str = DependencyResolver.new(compiler, arglist.children[0]).resolve
-        compiler.requires << str unless str.nil?
-        compile_default.call
-      end
-
-      add_special :require_relative do
-        arg = arglist.children[0]
-        file = compiler.file
-        if arg.type == :str
-          dir = File.dirname(file)
-          compiler.requires << Pathname(dir).join(arg.children[0]).cleanpath.to_s
-        end
-        push fragment("#{scope.self}.$require(#{file.inspect}+ '/../' + ")
-        push process(arglist)
-        push fragment(')')
-      end
-
-      add_special :autoload do |compile_default|
-        args = arglist.children
-        if args.length == 2 && args[0].type == :sym
-          str = DependencyResolver.new(compiler, args[1], :ignore).resolve
-          if str.nil?
-            compiler.warning "File for autoload of constant '#{args[0].children[0]}' could not be bundled!"
-          else
-            compiler.requires << str
-            compiler.autoloads << str
-          end
-        end
-        compile_default.call
-      end
-
-      add_special :require_tree do |compile_default|
-        first_arg, *rest = *arglist.children
-        if first_arg.type == :str
-          relative_path = first_arg.children[0]
-          compiler.required_trees << relative_path
-
-          dir = File.dirname(compiler.file)
-          full_path = Pathname(dir).join(relative_path).cleanpath.to_s
-          full_path.force_encoding(relative_path.encoding)
-          first_arg = first_arg.updated(nil, [full_path])
-        end
-        @arglist = arglist.updated(nil, [first_arg] + rest)
-        compile_default.call
-      end
-
       add_special :block_given? do
         push compiler.handle_block_given_call @sexp
-      end
-
-      add_special :__callee__ do
-        if scope.def?
-          push fragment scope.mid.to_s.inspect
-        else
-          push fragment 'nil'
-        end
-      end
-
-      add_special :__method__ do
-        if scope.def?
-          push fragment scope.mid.to_s.inspect
-        else
-          push fragment 'nil'
-        end
-      end
-
-      add_special :__dir__ do
-        push File.dirname(Opal::Compiler.module_name(compiler.file)).inspect
       end
 
       # Refinements support
@@ -365,67 +298,10 @@ module Opal
         push fragment 'debugger'
       end
 
-      add_special :__OPAL_COMPILER_CONFIG__ do
-        push fragment "(new Map([['arity_check', #{compiler.arity_check?}]]))"
-      end
-
       add_special :lambda do |compile_default|
         scope.defines_lambda do
           compile_default.call
         end
-      end
-
-      add_special :nesting do |compile_default|
-        push_nesting = push_nesting?
-        push "(Opal.Module.$$nesting = #{scope.nesting}, " if push_nesting
-        compile_default.call
-        push ')' if push_nesting
-      end
-
-      add_special :constants do |compile_default|
-        push_nesting = push_nesting?
-        push "(Opal.Module.$$nesting = #{scope.nesting}, " if push_nesting
-        compile_default.call
-        push ')' if push_nesting
-      end
-
-      # This can be refactored in terms of binding, but it would need 'corelib/binding'
-      # to be required in existing code.
-      add_special :eval do |compile_default|
-        # Catch the return throw coming from eval
-        thrower(:eval_return)
-
-        next compile_default.call if arglist.children.length != 1 || ![s(:self), nil].include?(recvr)
-
-        scope.nesting
-        temp = scope.new_temp
-        scope_variables = scope.scope_locals.map(&:to_s).inspect
-        push "(#{temp} = ", expr(arglist)
-        push ", typeof Opal.compile === 'function' ? eval(Opal.compile(#{temp}"
-        push ', {scope_variables: ', scope_variables
-        push ", arity_check: #{compiler.arity_check?}, file: '(eval)', eval: true})) : "
-        push "#{scope.self}.$eval(#{temp}))"
-      end
-
-      add_special :local_variables do |compile_default|
-        next compile_default.call unless [s(:self), nil].include?(recvr)
-
-        scope_variables = scope.scope_locals.map(&:to_s).inspect
-        push scope_variables
-      end
-
-      add_special :binding do |compile_default|
-        next compile_default.call unless recvr.nil?
-
-        scope.nesting
-        push "Opal.Binding.$new("
-        push "  function($code) {"
-        push "    return eval($code);"
-        push "  },"
-        push "  ", scope.scope_locals.map(&:to_s).inspect, ","
-        push "  ", scope.self, ","
-        push "  ", source_location
-        push ")"
       end
 
       add_special :__await__ do |compile_default|
@@ -489,68 +365,6 @@ module Opal
           @with_writer_temp = false
           push ", "
           push "#{temp}[#{temp}.length - 1])"
-        end
-      end
-
-      class DependencyResolver
-        def initialize(compiler, sexp, missing_dynamic_require = nil)
-          @compiler = compiler
-          @sexp = sexp
-          @missing_dynamic_require = missing_dynamic_require || @compiler.dynamic_require_severity
-        end
-
-        def resolve
-          handle_part @sexp
-        end
-
-        def handle_part(sexp, missing_dynamic_require = @missing_dynamic_require)
-          if sexp
-            case sexp.type
-            when :str
-              return sexp.children[0]
-            when :dstr
-              return sexp.children.map { |i| handle_part i }.join
-            when :begin
-              return handle_part sexp.children[0] if sexp.children.length == 1
-            when :send
-              recv, meth, *args = sexp.children
-
-              parts = args.map { |s| handle_part(s, :ignore) }
-
-              return nil if parts.include? nil
-
-              if recv.is_a?(::Opal::AST::Node) && recv.type == :const && recv.children.last == :File
-                if meth == :expand_path
-                  return expand_path(*parts)
-                elsif meth == :join
-                  return expand_path parts.join('/')
-                elsif meth == :dirname
-                  return expand_path parts[0].split('/')[0...-1].join('/')
-                end
-              elsif meth == :__dir__
-                return File.dirname(Opal::Compiler.module_name(@compiler.file))
-              end
-            end
-          end
-
-          case missing_dynamic_require
-          when :error
-            @compiler.error 'Cannot handle dynamic require', @sexp.line
-          when :warning
-            @compiler.warning 'Cannot handle dynamic require', @sexp.line
-          end
-        end
-
-        def expand_path(path, base = '')
-          "#{base}/#{path}".split('/').each_with_object([]) do |part, p|
-            if part == ''
-              # we had '//', so ignore
-            elsif part == '..'
-              p.pop
-            else
-              p << part
-            end
-          end.join '/'
         end
       end
     end

@@ -637,6 +637,11 @@ module Opal
       end
     end
 
+    # Track a module as required, so that builder will know to process it
+    def track_require(mod)
+      requires << mod
+    end
+
     # Marshalling for cache shortpath
     def marshal_dump
       [@options, @option_values, @source_map ||= source_map.cache,

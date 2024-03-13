@@ -31,7 +31,7 @@ class Opal::Nodes::CallNode
 
   add_special :requirable_spec_file do |compile_default|
     str = DependencyResolver.new(compiler, arglist.children[0]).resolve
-    compiler.requires << str unless str.nil?
+    compiler.track_require str unless str.nil?
   end
 end
 
