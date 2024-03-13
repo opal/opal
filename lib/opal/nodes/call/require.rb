@@ -8,7 +8,7 @@ module Opal
     class CallNode
       add_special :require do |compile_default|
         str = DependencyResolver.new(compiler, arglist.children[0]).resolve
-        compiler.requires << str unless str.nil?
+        compiler.track_require str unless str.nil?
         compile_default.call
       end
 
@@ -17,7 +17,7 @@ module Opal
         file = compiler.file
         if arg.type == :str
           dir = File.dirname(file)
-          compiler.requires << Pathname(dir).join(arg.children[0]).cleanpath.to_s
+          compiler.track_require Pathname(dir).join(arg.children[0]).cleanpath.to_s
         end
         push fragment("#{scope.self}.$require(#{file.inspect}+ '/../' + ")
         push process(arglist)
@@ -31,7 +31,7 @@ module Opal
           if str.nil?
             compiler.warning "File for autoload of constant '#{args[0].children[0]}' could not be bundled!"
           else
-            compiler.requires << str
+            compiler.track_require str
             compiler.autoloads << str
           end
         end
