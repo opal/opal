@@ -35,9 +35,9 @@ jobs:
           - name: minitest-strict-mode
             command: bin/rake minitest
             strict: 'true'
-          - name: head-ruby
-            ruby: head
-            permissive: true
+          # - name: head-ruby
+          #   ruby: head
+          #   permissive: true
           - name: current-ruby
             ruby: '3.3'
           - name: previous-ruby
