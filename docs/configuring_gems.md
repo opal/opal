@@ -1,5 +1,7 @@
 # Configuring Gems For Opal
 
+**Note: While everything described in this document works, it is recommended to use Opalfile for that purpose. See: [Adjusting Load Paths with Opalfile](opalfile.html)**
+
 To configure a gem to run in Opal the gem will need a couple of things:
 
 1. The opal gem running on a server (so the ruby code can get compiled to JavaScript).
@@ -9,7 +11,7 @@ This is done by having the following 2 lines in your outermost .rb file:
 
 ```ruby
 require 'opal'
-Opal.append_path File.expand_path('..', __FILE__).untaint
+Opal.append_path File.expand_path('..', __FILE__)
 ```
 
 However it only makes sense to execute these lines outside of Opal, since what they do is set things up for Opal to find and compile the files to .js. So how these lines get added to your gem depends on whether the gem can usefully run in the normal server environment as well as in Opal, or just strictly in Opal.
@@ -50,7 +52,7 @@ unless RUBY_ENGINE == 'opal'
   # This would happen if the gem is being used server side ONLY.
   begin
     require 'opal'
-    Opal.append_path File.expand_path('..', __FILE__).untaint
+    Opal.append_path File.expand_path('..', __FILE__)
   rescue LoadError
   end
 end
@@ -81,7 +83,7 @@ else
   # NOT running inside of opal, set things up
   # so opal can find the files.
   require 'opal'
-  Opal.append_path File.expand_path('..', __FILE__).untaint
+  Opal.append_path File.expand_path('..', __FILE__)
 end
 ```
 

@@ -5,6 +5,7 @@ require 'opal/paths'
 require 'opal/config'
 require 'opal/cache'
 require 'opal/builder_scheduler'
+require 'opal/project'
 require 'set'
 
 module Opal
@@ -100,6 +101,7 @@ module Opal
     def build_str(source, rel_path, options = {})
       return if source.nil?
       abs_path = expand_path(rel_path)
+      setup_project(abs_path)
       rel_path = expand_ext(rel_path)
       asset = processor_for(source, rel_path, abs_path, false, options)
       requires = preload + asset.requires + tree_requires(asset, abs_path)
@@ -119,6 +121,7 @@ module Opal
       @preload = other.preload.dup
       @processors = other.processors.dup
       @path_reader = other.path_reader.dup
+      @projects = other.projects.dup
       @prerequired = other.prerequired.dup
       @compiler_options = other.compiler_options.dup
       @missing_require_severity = other.missing_require_severity.to_sym
@@ -135,6 +138,7 @@ module Opal
     end
 
     def append_paths(*paths)
+      paths.each { |i| setup_project(i) }
       path_reader.append_paths(*paths)
     end
 
@@ -171,7 +175,7 @@ module Opal
       @already_processed ||= Set.new
     end
 
-    include UseGem
+    include Project::Collection
 
     attr_reader :processed
 
@@ -257,6 +261,8 @@ module Opal
         print_list = ->(list) { "- #{list.join("\n- ")}\n" }
         message = "can't find file: #{path.inspect} in:\n" +
                   print_list[path_reader.paths] +
+                  "\nWith the following projects loaded:\n" +
+                  print_list[all_projects.map(&:root_dir)] +
                   "\nWith the following extensions:\n" +
                   print_list[path_reader.extensions] +
                   "\nAnd the following processors:\n" +

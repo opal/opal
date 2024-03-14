@@ -80,6 +80,10 @@ Configure the long-lasting asset handler to work with Opal.
 
 ## Digging Deeper
 
+#### [Adjusting Load Paths with Opalfile](opalfile.html)
+
+How to define where Opal should look for Ruby files at build time and how to setup gems for use inside Opal programs.
+
 #### [Configuring Gems](configuring_gems.html)
 
 How to make your gem work in Opal and differentiate code for the JavaScript environment.
