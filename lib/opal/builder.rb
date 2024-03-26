@@ -102,8 +102,9 @@ module Opal
     def build_str(source, rel_path, options = {})
       return if source.nil?
       abs_path = expand_path(rel_path)
-      setup_project(abs_path)
+      project = setup_project(abs_path)
       rel_path = expand_ext(rel_path)
+      options = options.merge(project: project, all_projects: all_projects)
       asset = processor_for(source, rel_path, abs_path, false, options)
       requires = preload + asset.requires + tree_requires(asset, abs_path)
       # Don't automatically load modules required by the module

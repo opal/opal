@@ -5,7 +5,7 @@ require 'pathname'
 class Pathname
   include Comparable
 
-  @__path__ = `require('path')`
+  @__path__ = Opal::Raw.import('node:path')
   `var __path__ = #{@__path__}`
 
   def absolute?

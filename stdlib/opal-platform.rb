@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# opal_load_early: true
 
 `/* global Java, GjsFileImporter, Deno, Bun */`
 

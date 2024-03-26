@@ -3148,6 +3148,10 @@
 
   TypeError.$$super = Error;
 
+  // ESM/CJS imports and exports
+  Opal.imports = {};
+  Opal.exports = {};
+
   // If enable-file-source-embed compiler option is enabled, each module loaded will add its
   // sources to this object
   Opal.file_sources = {};

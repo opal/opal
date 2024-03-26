@@ -26,6 +26,7 @@ module Opal
             last_segment_name = File.basename(module_name)
             depth = module_name.split('/').length - 1
             file_name = Pathname(file.filename).cleanpath.to_s
+            setup_project(file.abs_path)
 
             index << module_name if file.options[:load] || !file.options[:requirable]
 
@@ -55,6 +56,7 @@ module Opal
           end
 
           compile_index(dir, index: index, single_file: single_file)
+          compile_npm(dir, single_file: single_file)
         end
       end
 
@@ -88,6 +90,31 @@ module Opal
             HTML
           end
         end
+      end
+
+      # Generates package.json and runs `npm i` afterwards
+      def compile_npm(dir, _project = nil, single_file: nil)
+        try_building_single_file(dir, 'package.json', single_file) do
+          npm = {}
+          npm[:private] = true
+          npm[:dependencies] = {}
+          npm[:type] = esm? ? 'module' : 'commonjs'
+          npm[:main] = "./index.#{output_extension}"
+
+          # npm_dependencies.each do |name, version|
+          #   npm[:dependencies][name] = version
+          # end
+
+          JSON.dump(npm)
+        end
+
+        # unless npm_dependencies.empty?
+        #   system(*OS.bash_c("pushd #{OS.shellescape dir}",
+        #                     'npm i',
+        #                     'popd'
+        #                   )
+        #         )
+        # end
       end
 
       # A helper method to either generate a single file or write a file to

@@ -1,8 +1,9 @@
 # backtick_javascript: true
 
+# Opal::Raw.npm_dependency 'unxhr', '1.0.1' # TODO: move to Opalfile
+
 module OpenURI
-  @__xmlhttprequest__ = `require('unxhr')`
-  `var __XMLHttpRequest__ = #{@__xmlhttprequest__}.XMLHttpRequest`
+  `var __XMLHttpRequest__ = #{Opal::Raw.import('unxhr', 'XMLHttpRequest')}`
 
   def self.request(uri)
     %x{
