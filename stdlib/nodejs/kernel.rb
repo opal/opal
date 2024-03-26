@@ -4,10 +4,9 @@ require 'buffer'
 require 'corelib/process/status'
 
 module Kernel
-  @__child_process__ = `require('node:child_process')`
-  @__cluster__ = `require('node:cluster')`
-  @__process__ = `require('node:process')`
-
+  @__child_process__ = Opal::Raw.import('node:child_process')
+  @__cluster__ = Opal::Raw.import('node:cluster')
+  @__process__ = Opal::Raw.import('node:process')
   `var __child_process__ = #{@__child_process__}`
   `var __cluster__ = #{@__cluster__}`
   `var __process__ = #{@__process__}`

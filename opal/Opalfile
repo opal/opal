@@ -1,0 +1,7 @@
+require_relative "../lib/opal/version"
+
+npm_config do
+  name "@opal/opal-corelib"
+  version Opal::VERSION
+  license "MIT"
+end

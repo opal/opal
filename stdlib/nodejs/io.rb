@@ -19,7 +19,7 @@ require 'nodejs/file'
   }
 }
 
-`var __fs__ = require('fs')`
+`var __fs__ = #{Opal::Raw.import('node:fs')}`
 
 class IO
   @__fs__ = `__fs__`
