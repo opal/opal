@@ -188,7 +188,6 @@ ruby/library/logger/severity_spec
 ruby/library/observer
 
 ruby/library/openstruct
-!ruby/library/openstruct/frozen_spec
 !ruby/library/openstruct/marshal_load_spec
 !ruby/library/openstruct/marshal_dump_spec
 
