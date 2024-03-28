@@ -12,6 +12,7 @@ require 'opal/errors'
 require 'opal/magic_comments'
 require 'opal/nodes/closure'
 require 'opal/source_map'
+require 'opal/builder/import'
 
 module Opal
   # Compile a string of ruby code into javascript.
@@ -84,8 +85,11 @@ module Opal
 
       value = @options.fetch(name, default_value)
 
-      if magic_comment && @magic_comments.key?(name)
-        value = @magic_comments.fetch(name)
+      if magic_comment
+        magic_comment_name = magic_comment.is_a?(Symbol) ? magic_comment : name
+        if @magic_comments.key?(magic_comment_name)
+          value = @magic_comments.fetch(magic_comment_name)
+        end
       end
 
       if valid_values && !valid_values.include?(value)
@@ -147,7 +151,7 @@ module Opal
     # @!method load?
     #
     # Instantly load a requirable module
-    compiler_option :load, default: false, as: :load?
+    compiler_option :load, default: false, as: :load?, magic_comment: :opal_load_early
 
     # @!method esm?
     #
@@ -183,6 +187,12 @@ module Opal
     # Enables JavaScript's strict mode (i.e., adds 'use strict'; statement)
     compiler_option :use_strict, default: false, as: :use_strict?, magic_comment: true
 
+    # @!method directory?
+    #
+    # Builds a JavaScript file that is aimed to reside as part of a directory
+    # for an import map build or something similar.
+    compiler_option :directory, default: false, as: :directory?
+
     # @!method parse_comments?
     #
     # Adds comments for every method definition
@@ -213,6 +223,9 @@ module Opal
     end
 
     compiler_option :scope_variables, default: []
+
+    compiler_option :project, default: nil
+    compiler_option :all_projects, default: []
 
     # @!method async_await
     #
@@ -274,6 +287,12 @@ module Opal
     # Access the source code currently processed
     attr_reader :source
 
+    # ESM/CJS imports to be compiled
+    attr_reader :imports
+
+    # ESM/CJS exports to be compiled
+    attr_reader :exports
+
     # Set if some rewritter caused a dynamic cache result, meaning it's not
     # fit to be cached
     attr_accessor :dynamic_cache_result
@@ -289,6 +308,8 @@ module Opal
       @option_values = {}
       @magic_comments = {}
       @dynamic_cache_result = false
+      @imports = []
+      @exports = []
     end
 
     # Compile some ruby code to a string.
@@ -638,21 +659,31 @@ module Opal
     end
 
     # Track a module as required, so that builder will know to process it
-    def track_require(mod)
+    def track_require(mod, import_condition: nil)
       requires << mod
+
+      # For directory compilation we need to create respective ESM/CJS imports (requires)
+      if directory?
+        imports << Builder::Import.new(
+          from: "#{Compiler.module_name(mod)}.#{esm? ? 'mjs' : 'js'}",
+          relative: true,
+          import_condition: import_condition)
+      end
     end
 
     # Marshalling for cache shortpath
     def marshal_dump
       [@options, @option_values, @source_map ||= source_map.cache,
        @magic_comments, @result,
-       @required_trees, @requires, @autoloads]
+       @required_trees, @requires, @autoloads,
+       @imports, @exports]
     end
 
     def marshal_load(src)
       @options, @option_values, @source_map,
       @magic_comments, @result,
-      @required_trees, @requires, @autoloads = src
+      @required_trees, @requires, @autoloads,
+      @imports, @exports = src
     end
   end
 end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'tempfile'
+require 'fileutils'
 
 # Generic runner that will resort to calling an external program.
 #
@@ -11,7 +12,7 @@ require 'tempfile'
 # @yield tempfile [File] Gives a file to the block, its #path can be used to
 #   construct the command
 # @yieldreturn command [Array<String>] the command to be used in the system call
-SystemRunner = ->(data, &block) {
+SystemRunner = ->(data, &block) do
   options  = data[:options] || {}
   builder  = data.fetch(:builder).call
   output   = data.fetch(:output)
@@ -19,22 +20,35 @@ SystemRunner = ->(data, &block) {
   env      = options.fetch(:env, {})
   debug    = options.fetch(:debug, false) || RUBY_ENGINE == 'opal'
 
-  code = builder.to_s
-  # Temporary issue with UTF-8, Base64 and source maps
-  code += "\n" + builder.source_map.to_data_uri_comment unless RUBY_ENGINE == 'opal'
-
   ext = builder.output_extension
 
-  tempfile =
-    if debug
-      File.new("opal-nodejs-runner.#{ext}", 'wb')
-    else
-      Tempfile.new(['opal-system-runner', ".#{ext}"], mode: File::BINARY)
-    end
+  if options[:directory]
+    tempdir = File.join(Dir.tmpdir, "opal-system-runner-#{rand(2**32).to_s(36)}")
+    builder.compile_to_directory(tempdir, with_source_map: !options[:no_source_map])
+    cmd = block.call(
+      Object.new.tap do |obj|
+        obj.define_singleton_method :path do
+          File.join(tempdir, "index.#{ext}")
+        end
+      end
+    )
 
-  tempfile.write code
-  cmd = block.call tempfile
-  tempfile.close
+    # TODO: remove directory afterwards if debug
+  else
+    # Temporary issue with UTF-8, Base64, source maps and opalopal
+    code = builder.compiled_source(
+      with_source_map: !(options[:no_source_map] || RUBY_ENGINE == 'opal'))
+
+    tempfile =
+      if debug
+        File.new("opal-system-runner.#{ext}", 'wb')
+      else
+        Tempfile.new(['opal-system-runner', ".#{ext}"], mode: File::BINARY)
+      end
+
+    tempfile.write code
+    cmd = block.call tempfile
+  end
 
   if RUBY_PLATFORM == 'opal'
     # Opal doesn't support neither `out:` nor `IO.try_convert` nor `open3`
@@ -50,4 +64,6 @@ SystemRunner = ->(data, &block) {
     output.write captured_output
     status.exitstatus
   end
-}
+ensure
+  tempfile.close if tempfile
+end

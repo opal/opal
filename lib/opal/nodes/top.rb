@@ -68,15 +68,18 @@ module Opal
       end
 
       def module_name
-        Opal::Compiler.module_name(compiler.file).inspect
+        Opal::Compiler.module_name(compiler.file)
       end
 
       def definition
         if compiler.requirable?
-          unshift "Opal.modules[#{module_name}] = "
-        elsif compiler.esm? && !compiler.no_export?
+          unshift "Opal.modules[#{module_name.inspect}] = "
+        elsif compiler.esm? && !compiler.no_export? && !compiler.directory?
           unshift 'export default '
         end
+
+        imports
+        exports
       end
 
       def opening
@@ -100,7 +103,12 @@ module Opal
             # require absolute paths from CLI. For other cases
             # we can expect the module names to be normalized
             # already.
-            line "Opal.load_normalized(#{module_name});"
+
+            # The top may be async, which is why we should make
+            # it go thru the Opal.queue
+            line "Opal.queue(function() {"
+            line "  return Opal.load_normalized(#{module_name.inspect});"
+            line "});"
           end
         elsif compiler.eval?
           line "})(Opal, self);"
@@ -108,6 +116,62 @@ module Opal
           line "});\n"
         end
       end
+
+      def imports
+        imports = compiler.imports
+
+        unshift "\n" unless imports.empty?
+
+        # Check how many directories we have to go up
+        depth = module_name.delete_prefix('./').count('/')
+
+        imports.reverse_each do |import|
+          from = import.from
+          ref = depth == 0 ? './' : ('../' * depth)
+          from = "#{ref}#{from}" if import.relative?
+          what = import.what
+
+          if compiler.esm?
+            # FIXME:
+            tmp_name = "_i#{rand 100_000}"
+
+            if import.import_condition
+              case what
+              when :none
+                unshift "if (#{import.import_condition}) Opal.queue(() => import(#{from.to_json}));\n"
+              else
+                raise NotImplementedError, 'only what: :none is implemented when import_condition is given'
+              end
+            else
+              case what
+              when :none
+                unshift "import #{from.to_json};\n"
+              when :default
+                unshift "Opal.imports[#{"#{from}/#{what}".to_json}] = #{tmp_name};\n"
+                unshift "import #{tmp_name} from #{from.to_json};\n"
+              when :*
+                unshift "Opal.imports[#{"#{from}/#{what}".to_json}] = #{tmp_name};\n"
+                unshift "import * as #{tmp_name} from #{from.to_json};\n"
+              else
+                unshift "Opal.imports[#{"#{from}/#{what}".to_json}] = #{tmp_name};\n"
+                unshift "import {#{what} as #{tmp_name}} from #{from.to_json};\n"
+              end
+            end
+          else
+            case what
+            when :none
+              unshift "require(#{mod.to_json});\n"
+            when :default, :*
+              unshift "Opal.imports[#{"#{from}/#{what}".to_json}] = require(#{from.to_json});\n"
+            else
+              unshift "Opal.imports[#{"#{from}/#{what}".to_json}] = require(#{from.to_json})[#{what.to_json}];\n"
+            end
+          end
+        end
+      end
+
+      # TODO
+      def exports; end
 
       def stmts
         compiler.returns(body)

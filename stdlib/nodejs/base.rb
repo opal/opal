@@ -12,7 +12,8 @@ ARGV.shift if ARGV.first == '--'
 STDOUT.write_proc = ->(string) { `process.stdout.write(string)` }
 STDERR.write_proc = ->(string) { `process.stderr.write(string)` }
 
-`var __fs__ = require('fs')`
+__fs__ = Opal::Raw.import('node:fs')
+
 STDIN.read_proc = %x{function(_count) {
   // Ignore count, return as much as we can get
   var buf = Buffer.alloc(65536), count;

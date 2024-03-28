@@ -6,6 +6,7 @@ require 'opal/config'
 require 'opal/cache'
 require 'opal/builder_scheduler'
 require 'opal/project'
+require 'opal/builder_directory'
 require 'set'
 
 module Opal
@@ -101,8 +102,9 @@ module Opal
     def build_str(source, rel_path, options = {})
       return if source.nil?
       abs_path = expand_path(rel_path)
-      setup_project(abs_path)
+      project = setup_project(abs_path)
       rel_path = expand_ext(rel_path)
+      options = options.merge(project: project, all_projects: all_projects)
       asset = processor_for(source, rel_path, abs_path, false, options)
       requires = preload + asset.requires + tree_requires(asset, abs_path)
       # Don't automatically load modules required by the module
@@ -176,6 +178,7 @@ module Opal
     end
 
     include Project::Collection
+    include BuilderDirectory
 
     attr_reader :processed
 
@@ -212,6 +215,13 @@ module Opal
       else
         path
       end
+    end
+
+    # Output method #compiled_source aims to replace #to_s
+    def compiled_source(with_source_map: true)
+      compiled_source = to_s
+      compiled_source += "\n" + source_map.to_data_uri_comment if with_source_map
+      compiled_source
     end
 
     private
