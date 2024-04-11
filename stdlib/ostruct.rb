@@ -96,6 +96,15 @@ class OpenStruct
     name
   end
 
+  def freeze
+    @table.freeze
+    super
+  end
+
+  def initialize_dup(copy)
+    @table = @table.dup if @table.frozen?
+  end
+
   `var ostruct_ids;`
 
   def inspect
