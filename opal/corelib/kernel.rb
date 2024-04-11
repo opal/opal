@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid, each_ivar
+# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid, each_ivar, slice
 # use_strict: true
 # backtick_javascript: true
 
@@ -34,11 +34,26 @@ module ::Kernel
     %x{
       var meth = self[$jsid(name)];
 
-      if (!meth || meth.$$stub) {
+      if (meth && !meth.$$stub) {
+        return #{::Method.new(self, `meth.$$owner || #{self.class}`, `meth`, name)};
+      }
+
+      var respond_to_missing = self['$respond_to_missing?'];
+      if (respond_to_missing.$$pristine || !respond_to_missing.call(self, name, true)) {
         #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
       }
 
-      return #{::Method.new(self, `meth.$$owner || #{self.class}`, `meth`, name)};
+      meth = function wrapper() {
+        var method_missing = self.$method_missing;
+        if (method_missing == null) {
+          #{::Kernel.raise ::NameError.new("undefined method `#{name}' for class `#{self.class}'", name)};
+        }
+        method_missing.$$p = wrapper.$$p;
+        return method_missing.apply(self, [name].concat($slice(arguments)));
+      };
+      meth.$$parameters = [['rest']]
+      meth.$$arity = -1;
+      return #{::Method.new(self, self.class, `meth`, name)};
     }
   end
 
