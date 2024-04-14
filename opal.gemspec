@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'ast', '>= 2.3.0'
   spec.add_dependency 'parser', '~>3.2'
-  spec.add_dependency 'prism', '~> 0.22'
+  spec.add_dependency 'prism', '~> 0.25'
 
   spec.add_development_dependency 'sourcemap', '~> 0.1.0'
   spec.add_development_dependency 'rake', '~> 13.0'
