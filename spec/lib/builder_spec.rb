@@ -1,4 +1,4 @@
-require 'lib/spec_helper'
+require 'spec_helper'
 require 'opal/builder'
 require 'opal/builder_scheduler/sequential'
 
