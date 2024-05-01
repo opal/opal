@@ -26,11 +26,15 @@ class Opal::RackHandler
     Opal.append_path(@app_dir)
     @builder = options.fetch(:builder, nil)
     @hot_updates = options.fetch(:hot_updates, true)
-    hot_ruby = options.fetch(:hot_ruby, nil)
-    if hot_ruby
-      @hot_javascript = Opal::Compiler.new(hot_ruby, requirable: false, file: "hot_ruby.rb").compile
+    if @hot_updates
+      hot_ruby = options.fetch(:hot_ruby, nil)
+      if hot_ruby
+        @hot_javascript = Opal::Compiler.new(hot_ruby, requirable: false, file: "hot_ruby.rb").compile
+      else
+        @hot_javascript = options.fetch(:hot_javascript, '')
+      end
     else
-      @hot_javascript = options.fetch(:hot_javascript, '')
+      @hot_javascript = ''
     end
     @transformations = []
     @index_path = nil
@@ -38,7 +42,6 @@ class Opal::RackHandler
     @builders = {}
     @development = !%w[production test].include?(ENV['RACK_ENV'])
     @watcher = Opal::Watcher.new(@app_dir)
-    yield self if block_given?
   end
 
   def development?
