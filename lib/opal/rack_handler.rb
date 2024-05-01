@@ -117,7 +117,7 @@ class Opal::RackHandler
   end
 
   def fetch_asset(path, rest)
-    builder = cached_builder(path)
+    builder = cached_builder(path, uncache: development?)
     if @directory
       { data: builder.compile_to_directory(single_file: rest) }
     else
