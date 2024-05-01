@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/paths'
+require 'opal/watcher'
 
 # The compiler runner will just output the compiled JavaScript
 class Opal::CliRunners::Compiler
@@ -74,23 +75,17 @@ class Opal::CliRunners::Compiler
   end
 
   def watch_compile
-    begin
-      require 'listen'
-    rescue LoadError
-      fail_no_listen!
-    end
-
     @opal_deps = Opal.dependent_files
 
     builder = compile
     code_deps = builder.dependent_files
     @files = @opal_deps + code_deps
     @code_listener = watch_files
-    @code_listener.start
 
     $stderr.puts "* Opal v#{Opal::VERSION} successfully compiled your program in --watch mode"
 
-    sleep
+    @code_listener.poll_loop
+
   rescue Interrupt
     $stderr.puts '* Stopping watcher...'
     @code_listener.stop
@@ -139,7 +134,7 @@ class Opal::CliRunners::Compiler
   def watch_files
     @directories = files_to_directories
 
-    Listen.to(*@directories, ignore!: []) do |modified, added, removed|
+    Opal::Watcher.new(@directories) do |modified, added, removed|
       our_modified = @files & (modified + added + removed)
       on_code_change(our_modified) unless our_modified.empty?
     end
