@@ -2,6 +2,82 @@
 
 module Opal
   class Builder
+
+    class DirectoryFile
+      attr_reader :file, :module_name, :compiled_filename, :source_map_filename, :source_filename, :index_js, :index_mjs, :index_html, :file_name
+
+      def initialize(file, output_extension:, source_prefix: 'opal/src', version_prefix: "opal/#{Opal::VERSION_MAJOR_MINOR}")
+        @file = file
+        @output_extension = output_extension
+        @module_name = Compiler.module_name(file.filename)
+        @compiled_filename = "#{version_prefix}/#{module_name}.#{output_extension}",
+        @source_map_filename = "#{version_prefix}/#{module_name}.map",
+        @source_filename = "#{source_prefix}/#{Pathname(filename).cleanpath.to_s}",
+        @index_js = "index.js",
+        @index_mjs = "index.mjs",
+        @index_html = "index.html",
+        @file_name = Pathname(file.filename).cleanpath.to_s
+      end
+
+      def compiled_source(with_source_map: true)
+        compiled_source = @file.to_s
+        compiled_source += "\n//# sourceMappingURL=./#{File.basename(@module_name)}.map" if with_source_map
+        compiled_source
+      end
+
+      # Correct the map to point to source files and remove embedded source
+      def map_contents
+        depth = module_name.split('/').length - 1
+
+        source_map = @file.source_map.to_h.dup
+        source_map[:sourceRoot] = "./#{'../' * depth}../../#{source_prefix}"
+        source_map[:sources] = [file_name]
+        source_map.delete(:sourcesContent)
+        source_map.to_json
+      end
+    end
+
+    class IndexFile
+      attr_reader :index
+
+      def initialize(module_names = [], output_extension:, version_prefix: "opal/#{Opal::VERSION_MAJOR_MINOR}")
+        @module_names = module_names
+        @output_extension = output_extension
+        @index = module_names.map { |i| "./#{version_prefix}/#{i}.#{output_extension}" }
+      end
+
+      def <<(module_name)
+        return if @module_names.include?(module_name)
+
+        @module_names << module_name
+        @index << "./#{version_prefix}/#{module_name}.#{output_extension}"
+      end
+
+      def requires_contents
+        index.map { |i| "require(#{i.to_json});" }.join("\n") + "\n"
+      end
+
+      def import_contents
+        index.map { |i| "import #{i.to_json};" }.join("\n") + "\n"
+      end
+
+      def html_contents
+        <<~HTML
+          <!doctype html>
+          <html>
+          <head>
+            <meta charset='utf-8'>
+            <title>Opal application</title>
+          </head>
+          <body>
+            #{index.map { |i| "<script type='module' src='#{i}'></script>" }.join("\n  ")}
+          </body>
+          </html>
+        HTML
+      end
+    end
+
+
     # This module is included into Builder, provides abstracted data about a new
     # paradigm of compiling Opal applications into a directory.
     module Directory
@@ -18,87 +94,50 @@ module Opal
       def compile_to_directory(dir = nil, single_file: nil, with_source_map: true)
         raise ArgumentError, 'no directory provided' if dir.nil? && single_file.nil?
 
-        catch(:file) do
-          index = []
+        index = IndexFile.new([], output_extension: output_extension)
 
-          processed.each do |file|
-            module_name = Compiler.module_name(file.filename)
-            last_segment_name = File.basename(module_name)
-            depth = module_name.split('/').length - 1
-            file_name = Pathname(file.filename).cleanpath.to_s
+        processed.each do |file|
+          # skip if single_file is set and the file is not the one we want
+          next if single_file && !paths[file.filename].keys.include?(single_file)
 
-            index << module_name if file.options[:load] || !file.options[:requirable]
+          directory_file = DirectoryFile.new(file)
+          index << directory_file.module_name if file.options[:load] || !file.options[:requirable]
 
-            compiled_filename = "#{version_prefix}/#{module_name}.#{output_extension}"
-            try_building_single_file(dir, compiled_filename, single_file) do
-              compiled_source = file.to_s
-              compiled_source += "\n//# sourceMappingURL=./#{last_segment_name}.map" if with_source_map
-              compiled_source
-            end
-
+          if !single_file
+            write_file(dir, directory_file.compiled_filename, directory_file.compiled_source(with_source_map:))
             if with_source_map
-              source_map_filename = "#{version_prefix}/#{module_name}.map"
-              try_building_single_file(dir, source_map_filename, single_file) do
-                # Correct the map to point to source files and remove embedded source
-                source_map = file.source_map.to_h.dup
-                source_map[:sourceRoot] = "./#{'../' * depth}../../#{source_prefix}"
-                source_map[:sources] = [file_name]
-                source_map.delete(:sourcesContent)
-                source_map.to_json
-              end
-
-              source_filename = "#{source_prefix}/#{file_name}"
-              try_building_single_file(dir, source_filename, single_file) do
-                file.original_source
-              end
+              write_file(dir, directory_file.source_map_filename, directory_file.map_contents)
+              write_file(dir, directory_file.source_filename, file.original_source)
+            end
+          else
+            return directory_file.compiled_source(with_source_map:) if single_file == directory_file.compiled_filename
+            if with_source_map
+              return directory_file.map_contents if single_file == directory_file.source_map_filename(index)
+              return file.original_source if single_file == directory_file.source_filename
             end
           end
+        end
 
-          compile_index(dir, index: index, single_file: single_file)
+        if esm?
+          write_file(dir, 'index.mjs', index.import_contents)
+          write_file(dir, 'index.html', index.html_contents)
+        else
+          write_file(dir, 'index.js', index.requires_contents)
+        end
+
+        if esm?
+          return index.import_contents
+          return index.html_contents
+        else
+          return index.requires_contents
         end
       end
 
       private
 
-      # Generates executable index files
-      def compile_index(dir = nil, index:, single_file: nil)
-        index = index.map { |i| "./#{version_prefix}/#{i}.#{output_extension}" }
-
-        if !esm?
-          try_building_single_file(dir, 'index.js', single_file) do
-            index.map { |i| "require(#{i.to_json});" }.join("\n") + "\n"
-          end
-        else
-          try_building_single_file(dir, 'index.mjs', single_file) do
-            index.map { |i| "import #{i.to_json};" }.join("\n") + "\n"
-          end
-
-          try_building_single_file(dir, 'index.html', single_file) do
-            <<~HTML
-              <!doctype html>
-              <html>
-              <head>
-                <meta charset='utf-8'>
-                <title>Opal application</title>
-              </head>
-              <body>
-                #{index.map { |i| "<script type='module' src='#{i}'></script>" }.join("\n  ")}
-              </body>
-              </html>
-            HTML
-          end
-        end
-      end
-
-      # A helper method to either generate a single file or write a file to
-      # a specified location.
-      def try_building_single_file(dir, file, single_file, &_block)
-        if !single_file
-          FileUtils.mkdir_p(File.dirname("#{dir}/#{file}"))
-          File.binwrite("#{dir}/#{file}", yield)
-        elsif single_file == file
-          throw :file, yield
-        end
+      def write_file(dir, file, content)
+        FileUtils.mkdir_p(File.dirname("#{dir}/#{file}"))
+        File.binwrite("#{dir}/#{file}", content)
       end
     end
   end
