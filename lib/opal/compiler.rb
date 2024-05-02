@@ -183,6 +183,12 @@ module Opal
     # Enables JavaScript's strict mode (i.e., adds 'use strict'; statement)
     compiler_option :use_strict, default: false, as: :use_strict?, magic_comment: true
 
+    # @!method directory?
+    #
+    # Builds a JavaScript file that is aimed to reside as part of a directory
+    # for an import map build or something similar.
+    compiler_option :directory, default: false, as: :directory?
+
     # @!method parse_comments?
     #
     # Adds comments for every method definition

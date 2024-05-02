@@ -16,7 +16,7 @@ module Opal
 
         # MiniRacer doesn't like to fork. Let's build Opal first
         # in a forked environment.
-        code = builder.to_s + "\n" + builder.source_map.to_data_uri_comment
+        code = builder.compiled_source
 
         v8 = ::MiniRacer::Context.new
         v8.attach('prompt', ->(_msg = '') { $stdin.gets&.chomp })

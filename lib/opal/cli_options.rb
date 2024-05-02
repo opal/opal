@@ -108,8 +108,8 @@ module Opal
         options[:runner] = :compiler
       end
 
-      on('-o', '--output FILE', 'Output JavaScript to FILE') do |file|
-        options[:output] = File.open(file, 'w')
+      on('-o', '--output FILE', 'Output JavaScript to FILE (or directory if --directory enabled)') do |file|
+        options[:output] = file
       end
 
       on('-P', '--map FILE', 'Output source map to FILE') do |file|
@@ -154,6 +154,10 @@ module Opal
 
       on('--esm', 'Wraps compiled bundle as for ES6 module') do
         options[:esm] = true
+      end
+
+      on('--directory', 'Builds the program as a directory of JS files') do
+        options[:directory] = true
       end
 
       on('-A', '--arity-check', 'Enable arity check') do

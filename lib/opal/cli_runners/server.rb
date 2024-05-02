@@ -51,7 +51,7 @@ module Opal
       end
 
       def build_app(builder)
-        app = App.new(builder: builder, main: 'cli-runner')
+        app = Opal::SimpleServer.new(builder: builder, main: 'cli-runner')
 
         if static_folder
           not_found = [404, {}, []]
@@ -64,17 +64,6 @@ module Opal
         end
 
         app
-      end
-
-      class App < SimpleServer
-        def initialize(options = {})
-          @builder = options.fetch(:builder)
-          super
-        end
-
-        def builder(_)
-          @builder.call
-        end
       end
     end
   end

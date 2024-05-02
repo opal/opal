@@ -20,66 +20,102 @@ class Opal::SimpleServer
   NotFound = Class.new(StandardError)
 
   def initialize(options = {})
-    @prefix = options.fetch(:prefix, 'assets')
+    @prefix = options.fetch(:prefix, 'assets').delete_prefix('/')
     @main = options.fetch(:main, 'application')
+    @builder = options.fetch(:builder, nil)
+    @transformations = []
     @index_path = nil
+    @builders = {}
     yield self if block_given?
-    freeze
   end
 
   attr_accessor :main, :index_path
 
-  # @deprecated
-  # It's here for compatibility with Opal::Sprockets::Server
   def append_path(path)
-    Opal.deprecation "`#{self.class}#append_path` is deprecated, please use `Opal.append_path(path)` instead (called from: #{caller(1, 1).first})"
-    Opal.append_path path
+    @transformations << [:append_paths, path]
   end
 
   def call(env)
     case env['PATH_INFO']
-    when %r{\A/#{@prefix}/(.*)\.m?js\z}
-      path, _cache_invalidator = Regexp.last_match(1).split('?', 2)
-      call_js(path)
+    when %r{\A/#{@prefix}/(.*?)\.m?js(/.*)?\z}
+      path, rest = Regexp.last_match(1), Regexp.last_match(2)&.delete_prefix('/').to_s
+      call_js(path, rest)
     else call_index
     end
   rescue NotFound => error
     [404, {}, [error.to_s]]
   end
 
-  def call_js(path)
-    asset = fetch_asset(path)
+  def call_js(path, rest)
+    asset = fetch_asset(path, rest)
     [
       200,
       { 'content-type' => 'application/javascript' },
-      [asset[:data], "\n", asset[:map].to_data_uri_comment],
+      @directory ? [asset[:data]] : [asset[:data], "\n", asset[:map].to_data_uri_comment],
     ]
   end
 
   def builder(path)
-    builder = Opal::Builder.new
-    builder.build(path.gsub(/(\.(?:rb|js|opal))*\z/, ''))
+    case @builder
+    when Opal::Builder
+      builder = @builder
+    when Proc
+      if @builder.arity == 0
+        builder = @builder.call
+      else
+        builder = @builder.call(path)
+      end
+    else
+      builder = Opal::Builder.new
+      builder = apply_builder_transformations(builder)
+      builder.build(path.gsub(/(\.(?:rb|m?js|opal))*\z/, ''))
+    end
+
+    @esm = builder.compiler_options[:esm]
+    @directory = builder.compiler_options[:directory]
+
+    builder
   end
 
-  def fetch_asset(path)
-    builder = self.builder(path)
-    {
-      data: builder.to_s,
-      map: builder.source_map
-    }
+  # Only cache one builder at a time
+  def cached_builder(path, uncache: false)
+    @builders = {} if uncache || @builders.keys != [path]
+    @builders[path] ||= builder(path)
   end
 
-  def javascript_include_tag(path)
-    case Opal::Config.esm
-    when true
-      %{<script src="/#{@prefix}/#{path}.mjs#{cache_invalidator}" type="module"></script>}
-    when false
-      %{<script src="/#{@prefix}/#{path}.js#{cache_invalidator}"></script>}
+  def apply_builder_transformations(builder)
+    @transformations.each do |type, *args|
+      case type
+      when :append_paths
+        builder.append_paths(*args)
+      end
+    end
+    builder
+  end
+
+  def fetch_asset(path, rest)
+    builder = cached_builder(path)
+    if @directory
+      { data: builder.compile_to_directory(single_file: rest) }
+    else
+      {
+        data: builder.to_s,
+        map: builder.source_map
+      }
     end
   end
 
-  def cache_invalidator
-    "?#{Time.now.to_i}"
+  def javascript_include_tag(path)
+    # Uncache previous builders and cache a new one
+    cached_builder(path, uncache: true)
+
+    path += ".#{js_ext}/index" if @directory
+
+    if @esm
+      %{<script src="/#{@prefix}/#{path}.#{js_ext}" type="module"></script>}
+    else
+      %{<script src="/#{@prefix}/#{path}.#{js_ext}"></script>}
+    end
   end
 
   def call_index
@@ -99,6 +135,10 @@ class Opal::SimpleServer
       </html>
       HTML
     end
-    [200, { 'content-type' => 'text/html' }, [html]]
+    [200, { 'content-type' => 'text/html', 'cache-control' => 'no-cache' }, [html]]
+  end
+
+  def js_ext
+    @esm ? 'mjs' : 'js'
   end
 end

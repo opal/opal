@@ -14,19 +14,24 @@ class Opal::CliRunners::Compiler
     @map_file        = @options[:map_file]
     @output          = data.fetch(:output)
     @watch           = @options[:watch]
+    @directory       = @options[:directory]
   end
 
   def compile
     builder = @builder_factory.call
-    compiled_source = builder.to_s
-    compiled_source += "\n" + builder.source_map.to_data_uri_comment unless @options[:no_source_map]
 
-    rewind_output if @watch
+    if @directory
+      builder.compile_to_directory(@output, with_source_map: !@options[:no_source_map])
+    else
+      compiled_source = builder.compiled_source(with_source_map: !@options[:no_source_map])
 
-    @output.puts compiled_source
-    @output.flush
+      rewind_output if @watch
 
-    File.write(@map_file, builder.source_map.to_json) if @map_file
+      @output.puts compiled_source
+      @output.flush
+
+      File.write(@map_file, builder.source_map.to_json) if @map_file
+    end
 
     builder
   end

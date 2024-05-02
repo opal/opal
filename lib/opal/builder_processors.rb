@@ -19,6 +19,8 @@ module Opal
       end
       attr_reader :source, :filename, :options, :requires, :required_trees, :autoloads, :abs_path
 
+      alias original_source source
+
       def to_s
         source.to_s
       end
