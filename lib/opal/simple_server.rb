@@ -40,7 +40,7 @@ class Opal::SimpleServer
 
     yield self if block_given?
     @handler = Opal::RackHandler.new(app_call, { prefix: @prefix, main: @main, builder: builder,
-                                                 hot_updates: hot_updates == false ? : false : true,
+                                                 hot_updates: hot_updates == false ? false : true,
                                                  hot_javascript: hot_javascript,
                                                  hot_ruby: hot_ruby })
   end
