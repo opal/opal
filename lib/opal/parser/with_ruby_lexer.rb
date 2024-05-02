@@ -2,5 +2,8 @@
 
 class Opal::Parser::WithRubyLexer < Parser::Ruby32
   include Opal::Parser::DefaultConfig
-  Opal::Parser.default_parser_class = self
+
+  def parse(source_buffer)
+    modify_ast(super)
+  end
 end

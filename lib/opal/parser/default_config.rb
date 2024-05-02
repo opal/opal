@@ -28,11 +28,10 @@ module Opal
         super(Opal::AST::Builder.new)
       end
 
-      def parse(source_buffer)
-        parsed = super || ::Opal::AST::Node.new(:nil)
-        wrapped = ::Opal::AST::Node.new(:top, [parsed])
-        rewriten = rewrite(wrapped)
-        rewriten
+      def modify_ast(ast)
+        ast ||= ::Opal::AST::Node.new(:nil)
+        wrapped = ::Opal::AST::Node.new(:top, [ast])
+        rewrite(wrapped)
       end
 
       def rewrite(node)
@@ -41,10 +40,17 @@ module Opal
     end
 
     class << self
-      attr_accessor :default_parser_class
+      def default_parser_class
+        @default_parser_class ||= WithRubyLexer
+      end
 
       def default_parser
         default_parser_class.default_parser
+      end
+
+      def use_prism
+        require 'opal/parser/with_prism'
+        @default_parser_class = WithPrism
       end
     end
   end
