@@ -1,16 +1,16 @@
 require 'lib/spec_helper'
 require 'opal/builder'
-require 'opal/builder_scheduler/sequential'
+require 'opal/builder/scheduler/sequential'
 require 'tmpdir'
 
 RSpec.describe Opal::Builder do
   subject(:builder) { described_class.new(options) }
   let(:options) { {} }
-  let(:ruby_processor) { Opal::BuilderProcessors::RubyProcessor }
+  let(:ruby_processor) { Opal::Builder::Processor::RubyProcessor }
 
   def temporarily_with_sequential_scheduler(&block)
     previous = Opal.builder_scheduler
-    Opal.builder_scheduler = Opal::BuilderScheduler::Sequential
+    Opal.builder_scheduler = Opal::Builder::Scheduler::Sequential
     yield
     Opal.builder_scheduler = previous
   end
