@@ -105,7 +105,7 @@ jobs:
           bundler-cache: false
       - run: ruby bin/git-submodule-fast-install
       - run: bundle lock
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         env:
           KEY_PREFIX: ${{ runner.os }}-${{ matrix.combo.ruby || env.DEFAULT_RUBY }}
         with:
@@ -115,7 +115,7 @@ jobs:
             ${{ env.KEY_PREFIX }}-gem-${{ github.ref }}
             ${{ env.KEY_PREFIX }}-gem-master
             ${{ env.KEY_PREFIX }}-gem-
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ./node_modules
           key: ${{ runner.os }}-npm-${{ github.ref }}-${{ hashFiles('**/yarn.lock') }}
