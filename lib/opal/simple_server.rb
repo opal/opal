@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/deprecations'
+require 'opal/rack_handler'
 
 # Opal::SimpleServer is a very basic Rack server for Opal assets, it relies on
 # Opal::Builder and Ruby corelib/stdlib. It's meant to be used just for local
@@ -20,94 +21,48 @@ class Opal::SimpleServer
   NotFound = Class.new(StandardError)
 
   def initialize(options = {})
+    builder = options.fetch(:builder, nil)
     @prefix = options.fetch(:prefix, 'assets').delete_prefix('/')
     @main = options.fetch(:main, 'application')
-    @builder = options.fetch(:builder, nil)
-    @transformations = []
+    @app_dir = options.fetch(:app_dir, 'app')
     @index_path = nil
-    @builders = {}
+
     yield self if block_given?
+
+    @production = ENV['RACK_ENV'] == 'production'
+    @start_time = Time.now.to_i
+
+    app_call = proc do |_env|
+      call_index
+    rescue NotFound => error
+      [404, {}, [error.to_s]]
+    end
+
+    yield self if block_given?
+    @handler = Opal::RackHandler.new(app_call, {
+      prefix: @prefix, main: @main, builder: builder,
+      hot_updates: !(hot_updates == false),
+      hot_javascript: hot_javascript,
+      hot_ruby: hot_ruby
+    })
   end
 
-  attr_accessor :main, :index_path
+  attr_accessor :main, :index_path, :hot_updates, :hot_ruby, :hot_javascript, :app_dir
+
+  def production?
+    @production
+  end
 
   def append_path(path)
     @transformations << [:append_paths, path]
   end
 
   def call(env)
-    case env['PATH_INFO']
-    when %r{\A/#{@prefix}/(.*?)\.m?js(/.*)?\z}
-      path, rest = Regexp.last_match(1), Regexp.last_match(2)&.delete_prefix('/').to_s
-      call_js(path, rest)
-    else call_index
-    end
-  rescue NotFound => error
-    [404, {}, [error.to_s]]
-  end
-
-  def call_js(path, rest)
-    asset = fetch_asset(path, rest)
-    [
-      200,
-      { 'content-type' => 'application/javascript' },
-      @directory ? [asset[:data]] : [asset[:data], "\n", asset[:map].to_data_uri_comment],
-    ]
-  end
-
-  def builder(path)
-    case @builder
-    when Opal::Builder
-      builder = @builder
-    when Proc
-      if @builder.arity == 0
-        builder = @builder.call
-      else
-        builder = @builder.call(path)
-      end
-    else
-      builder = Opal::Builder.new
-      builder = apply_builder_transformations(builder)
-      builder.build(path.gsub(/(\.(?:rb|m?js|opal))*\z/, ''))
-    end
-
-    @esm = builder.compiler_options[:esm]
-    @directory = builder.compiler_options[:directory]
-
-    builder
-  end
-
-  # Only cache one builder at a time
-  def cached_builder(path, uncache: false)
-    @builders = {} if uncache || @builders.keys != [path]
-    @builders[path] ||= builder(path)
-  end
-
-  def apply_builder_transformations(builder)
-    @transformations.each do |type, *args|
-      case type
-      when :append_paths
-        builder.append_paths(*args)
-      end
-    end
-    builder
-  end
-
-  def fetch_asset(path, rest)
-    builder = cached_builder(path)
-    if @directory
-      { data: builder.compile_to_directory(single_file: rest) }
-    else
-      {
-        data: builder.to_s,
-        map: builder.source_map
-      }
-    end
+    @handler.call(env)
   end
 
   def javascript_include_tag(path)
     # Uncache previous builders and cache a new one
-    cached_builder(path, uncache: true)
 
     path += ".#{js_ext}/index" if @directory
 

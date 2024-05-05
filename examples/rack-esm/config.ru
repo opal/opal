@@ -10,13 +10,12 @@ Bundler.require
 
 # with gems like opal-jquery or opal-browser you could manipulate the dom directly
 
-# the directory where the code is (add to opal load path )
-Opal.append_path 'app'
-
 # Enable ESM
 Opal::Config.esm = true
 
 run Opal::SimpleServer.new { |s|
+  # the directory where the code is (will be added to opal load path)
+  s.app_dir = 'app'
   # the name of the ruby file to load. To use more files they must be required from here (see app)
   s.main = 'application'
   # need to set the index explicitly for opal server to pick it up
