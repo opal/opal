@@ -39,12 +39,7 @@ class Opal::SimpleServer
     end
 
     yield self if block_given?
-    @handler = Opal::RackHandler.new(app_call, {
-      prefix: @prefix, main: @main, builder: builder,
-      hot_updates: !(hot_updates == false),
-      hot_javascript: hot_javascript,
-      hot_ruby: hot_ruby
-    })
+    @handler = Opal::RackHandler.new(app_call, { prefix: @prefix, main: @main, builder: builder, hot_updates: hot_updates != false, hot_javascript: hot_javascript, hot_ruby: hot_ruby })
   end
 
   attr_accessor :main, :index_path, :hot_updates, :hot_ruby, :hot_javascript, :app_dir

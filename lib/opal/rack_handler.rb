@@ -15,7 +15,6 @@ require 'json'
 #   ... or use the Server runner ...
 #   opal -Rserver app.rb
 class Opal::RackHandler
-
   def initialize(app, options = {})
     @app = app
     @prefix = options.fetch(:prefix, 'assets')
