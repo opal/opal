@@ -170,6 +170,7 @@ module Opal
     # @return [String, nil] The path to the root directory, or nil if not found or
     # the file does not exist.
     def self.locate_root_dir(file)
+      return nil unless file
       begin
         file = File.realpath(file)
       rescue Errno::ENOENT
