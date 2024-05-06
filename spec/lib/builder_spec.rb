@@ -160,7 +160,7 @@ RSpec.describe Opal::Builder do
     it 'is preserved with a prefork scheduler' do
       my_builder = builder.dup
       my_builder.append_paths(File.expand_path('..', __FILE__))
-      my_builder.cache = Opal::Cache::NullCache.new
+      my_builder.cache = Opal::Builder::Cache::NullCache.new
       10.times do |i| # Increase entropy
         expect(
           my_builder.dup.build('fixtures/build_order').to_s.scan(/(FILE_[0-9]+)/).map(&:first)

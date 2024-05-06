@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'opal/paths'
 require 'opal/cli_runners/system_runner'
 
 module Opal

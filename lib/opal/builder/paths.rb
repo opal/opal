@@ -9,7 +9,7 @@ module Opal
       # in this case.
       Opal::GEM_DIR
     else
-      File.expand_path('..', __dir__)
+      File.expand_path('../..', __dir__)
     end
   end
 
