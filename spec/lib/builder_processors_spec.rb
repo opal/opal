@@ -1,7 +1,7 @@
 require 'lib/spec_helper'
-require 'opal/builder_processors'
+require 'opal/builder/processor'
 
-RSpec.describe Opal::BuilderProcessors::JsProcessor do
+RSpec.describe Opal::Builder::Processor::JsProcessor do
   it 'maps to one fragment per line' do
     processor = described_class.new("line1\n line2\n  line3", 'file.js')
     expect(processor.source_map.fragments.map(&:code)).to eq([
@@ -18,7 +18,7 @@ RSpec.describe Opal::BuilderProcessors::JsProcessor do
   end
 end
 
-RSpec.describe Opal::BuilderProcessors::RubyProcessor do
+RSpec.describe Opal::Builder::Processor::RubyProcessor do
   it 'compiles ruby to js' do
     processor = described_class.new('puts 5', '-e')
     expect(processor.to_s).to include('$puts(5)')

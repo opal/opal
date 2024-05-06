@@ -1,3 +1,3 @@
 require 'opal/builder'
-require 'opal/builder_processors'
+require 'opal/builder/processor'
 require 'corelib/string/unpack'
