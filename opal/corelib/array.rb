@@ -1322,7 +1322,7 @@ class ::Array < `Array`
   def include?(member)
     %x{
       for (var i = 0, length = self.length; i < length; i++) {
-        if (#{`self[i]` == member}) {
+        if ($eqeq(self[i], member)) {
           return true;
         }
       }
