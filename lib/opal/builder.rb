@@ -7,7 +7,9 @@ require 'opal/cache'
 require 'opal/builder/scheduler'
 require 'opal/project'
 require 'opal/builder/directory'
+require 'opal/builder/watcher'
 require 'set'
+# opal/builder/processor required at the bottom
 
 module Opal
   class Builder
@@ -64,6 +66,10 @@ module Opal
     class ProcessorNotFound < LoadError
     end
 
+    include Project::Collection
+    include Builder::Directory
+    include Builder::Watcher
+
     def initialize(options = nil)
       (options || {}).each_pair do |k, v|
         public_send("#{k}=", v)
@@ -101,6 +107,7 @@ module Opal
 
     def build_str(source, rel_path, options = {})
       return if source.nil?
+      @build_time = Time.now
       abs_path = expand_path(rel_path)
       setup_project(abs_path)
       rel_path = expand_ext(rel_path)
@@ -176,13 +183,10 @@ module Opal
       @already_processed ||= Set.new
     end
 
-    include Project::Collection
-    include Builder::Directory
-
     attr_reader :processed
 
     attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
-      :compiler_options, :missing_require_severity, :cache, :scheduler
+      :compiler_options, :missing_require_severity, :cache, :scheduler, :build_time
 
     def esm?
       @compiler_options[:esm]
@@ -191,11 +195,7 @@ module Opal
     # Output extension, to be used by runners. At least Node.JS switches
     # to ESM mode only if the extension is "mjs"
     def output_extension
-      if esm?
-        'mjs'
-      else
-        'js'
-      end
+      esm? ? 'mjs' : 'js'
     end
 
     # Return a list of dependent files, for watching purposes
@@ -240,8 +240,14 @@ module Opal
         if abs_base_path
           abs_base_path = Pathname(abs_base_path)
           entries_glob  = Pathname(abs_tree_path).join('**', "*{.js,}.{#{extensions.join ','}}")
-
-          Pathname.glob(entries_glob).map { |file| file.relative_path_from(abs_base_path).to_s }
+          Pathname.glob(entries_glob).map do |file|
+            if file.extname == '.rb'
+              # remove .rb so file can be found in already_processed
+              file.relative_path_from(abs_base_path).to_s.delete_suffix('.rb')
+            else
+              file.relative_path_from(abs_base_path).to_s
+            end
+          end
         else
           [] # the tree is not part of any known base path
         end
@@ -291,7 +297,8 @@ module Opal
 
     def expand_path(path)
       return if stub?(path)
-      (path_reader.expand(path) || File.expand_path(path)).to_s
+      path = (path_reader.expand(path) || File.expand_path(path)).to_s
+      path if File.exist?(path)
     end
 
     def stub?(path)
@@ -303,3 +310,5 @@ module Opal
     end
   end
 end
+
+require 'opal/builder/processor'
