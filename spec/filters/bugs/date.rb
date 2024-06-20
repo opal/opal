@@ -22,11 +22,7 @@ opal_filter "Date" do
   fails "Date#ld determines the Modified Julian day" # NoMethodError: undefined method `ld' for #<Date:0x9f5d8 @date=2007-01-17 00:00:00 +0100 @start=2299161>
   fails "Date#mjd determines the Modified Julian day" # NoMethodError: undefined method `mjd' for #<Date:0x9f5ce @date=2007-01-17 00:00:00 +0100 @start=2299161>
   fails "Date#new_start converts a date object into another with a new calendar reform" # ArgumentError: [Date#new_start] wrong number of arguments (given 0, expected 1)
-  fails "Date#parse coerces using to_str" # ArgumentError: invalid date
   fails "Date#parse parses a day name into a Date object" # NoMethodError: undefined method `cwyear' for #<Date:0x9fddc @start=2299161 @date=2022-12-09 00:00:00 +0100>
-  fails "Date#parse parses a month day into a Date object" # ArgumentError: invalid date
-  fails "Date#parse parses a month name into a Date object" # ArgumentError: invalid date
-  fails "Date#parse raises a TypeError trying to parse non-String-like object" # Expected TypeError but got: ArgumentError (invalid date)
   fails "Date#strftime should be able to print the commercial year with leading zeroes" # Expected "200" == "0200" to be truthy but was false
   fails "Date#strftime should be able to print the commercial year with only two digits" # TypeError: no implicit conversion of Range into Integer
   fails "Date#strftime should be able to show a full notation" # Expected "%+" == "Sun Apr  9 00:00:00 +00:00 2000" to be truthy but was false
