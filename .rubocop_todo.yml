@@ -30,7 +30,7 @@ Layout/ArgumentAlignment:
 # SupportedStylesAlignWith: start_of_line, begin
 Layout/BeginEndAlignment:
   Exclude:
-    - 'lib/opal/cache.rb'
+    - 'lib/opal/builder/cache.rb'
 
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).

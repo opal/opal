@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'mini_racer'
-require 'opal/paths'
 
 module Opal
   module CliRunners

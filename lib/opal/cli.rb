@@ -128,7 +128,7 @@ module Opal
       )
 
       # --no-cache
-      builder.cache = Opal::Cache::NullCache.new if no_cache
+      builder.cache = Opal::Builder::Cache::NullCache.new if no_cache
 
       # --include
       builder.append_paths(*load_paths)

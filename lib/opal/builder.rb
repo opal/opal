@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'opal/path_reader'
-require 'opal/paths'
+require 'opal/builder/path_reader'
+require 'opal/builder/paths'
 require 'opal/config'
-require 'opal/cache'
+require 'opal/builder/cache'
 require 'opal/builder/scheduler'
 require 'opal/project'
 require 'opal/builder/directory'

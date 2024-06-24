@@ -303,7 +303,7 @@ node_platforms = %w[nodejs opalopal_nodejs]
 mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
 
-require 'opal/paths'
+require 'opal/builder/paths'
 opalopal_cmdline = "-sreadline -rnodejs -rcorelib/string/unpack -popal/cli_runners/nodejs exe/opal -- #{Opal.paths.map{|i| "-I#{i}"}.join(" ")} --no-source-map "
 
 platforms.each do |platform|
