@@ -7,19 +7,44 @@ require 'erb'
 module Opal
   class Builder
     class Processor
-      def initialize(source, filename, abs_path = nil, options = {})
-        options = abs_path if abs_path.is_a? Hash
-
-        source += "\n" unless source.end_with?("\n")
-        @source, @filename, @abs_path, @options = source, filename, abs_path, options.dup
+      def initialize(orig_source, filename, abs_path = nil, options = {})
+        if abs_path.is_a? Hash
+          options = abs_path
+          abs_path = nil
+        end
+        self.source = orig_source
+        @filename, @abs_path, @options = filename, abs_path, options.dup
         @cache = @options.delete(:cache) { Opal.cache }
         @requires = []
         @required_trees = []
         @autoloads = []
+        @mtime = file_mtime
       end
       attr_reader :source, :filename, :options, :requires, :required_trees, :autoloads, :abs_path
 
       alias original_source source
+
+      def source=(src)
+        src += "\n" unless src.end_with?("\n")
+        @source = src
+      end
+
+      def update(new_source)
+        @mtime = file_mtime
+        self.source = new_source
+      end
+
+      def file_mtime
+        File::Stat.new(@abs_path).mtime if @abs_path
+      end
+
+      def changed?
+        if @abs_path
+          return :removed unless File.exist?(@abs_path)
+          return :modified unless file_mtime == @mtime
+        end
+        :no
+      end
 
       def to_s
         source.to_s
@@ -71,6 +96,11 @@ module Opal
         def source
           @source.to_s + mark_as_required(@filename)
         end
+
+        def update(new_source)
+          super
+          @source_map = nil
+        end
       end
 
       class RubyProcessor < Processor
@@ -90,10 +120,12 @@ module Opal
             compiler.compile
             compiler
           end
+          @required_trees_mtime ||= rts_mtime(@compiled)
+          @compiled
         end
 
         def cache_key
-          [self.class, @filename, @source, @options]
+          [self.class, @filename, @source, @options, @mtime]
         end
 
         def compiler_for(source, options = {})
@@ -112,9 +144,31 @@ module Opal
           compiled.autoloads
         end
 
+        def update(new_source)
+          super
+          @compiled = nil
+        end
+
         # Also catch a files with missing extensions and nil.
         def self.match?(other)
           super || File.extname(other.to_s) == ''
+        end
+
+        def rts_mtime(compiler)
+          if compiler&.required_trees&.any? && abs_path
+            dir = File.dirname(abs_path)
+            rt_mtimes = compiler.required_trees.map do |path|
+              rt_path = File.expand_path("#{dir}/#{path}")
+              Dir.each_child(rt_path).map { |file| File::Stat.new("#{dir}/#{path}/#{file}").mtime }.sort.last
+            end
+            rt_mtimes.sort.last
+          end
+        end
+
+        def changed?
+          res = super
+          return :modified if res == :no && @compiled&.required_trees&.any? && rts_mtime(@compiled) != @required_trees_mtime
+          res
         end
       end
 
@@ -134,6 +188,12 @@ module Opal
 
         def requires
           ['erb'] + super
+        end
+
+        def update(new_source)
+          super
+          @source = prepare(@source, @filename)
+          @compiled = nil
         end
 
         private
