@@ -92,6 +92,7 @@ module Opal
 
     def build(path, options = {})
       build_str(source_for(path), path, options)
+      self
     end
 
     # Retrieve the source for a given path the same way #build would do.
@@ -109,7 +110,7 @@ module Opal
       # Don't automatically load modules required by the module
       process_requires(rel_path, requires, asset.autoloads, options.merge(load: false))
       processed << asset
-      self
+      asset
     end
 
     def build_require(path, options = {})
@@ -182,7 +183,7 @@ module Opal
     attr_reader :processed
 
     attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
-      :compiler_options, :missing_require_severity, :cache, :scheduler
+      :compiler_options, :missing_require_severity, :cache, :scheduler, :watch_type
 
     def esm?
       @compiler_options[:esm]
@@ -191,11 +192,7 @@ module Opal
     # Output extension, to be used by runners. At least Node.JS switches
     # to ESM mode only if the extension is "mjs"
     def output_extension
-      if esm?
-        'mjs'
-      else
-        'js'
-      end
+      esm? ? 'mjs' : 'js'
     end
 
     # Return a list of dependent files, for watching purposes
@@ -223,7 +220,76 @@ module Opal
       compiled_source
     end
 
+    # Builds and watches all paths for changes and then rebuilds, does not return
+    def watch
+      loop do
+        changes = updates
+        if changes[:modified].any? || changes[:added].any? || changes[:removed].any?
+          yield self, changes
+        end
+        sleep 0.5
+      end
+    end
+
+    # Return the updates in the paths since last build
+    def updates
+      changes = { added: [], modified: [], removed: [] }
+      directories = {}
+
+      # check processed files
+      processed.select! do |asset|
+        case asset.changed?
+        when :removed
+          changes[:removed] << asset
+          false
+        when :modified
+          changes[:modified] << update(asset)
+          add_to_directories(directories, asset)
+          true
+        else
+          add_to_directories(directories, asset)
+          true
+        end
+      end
+
+      # check for added files
+      directories.each do |dir, processed_entries|
+        current_entries = []
+        Dir.each_child(dir) do |entry|
+          current_entries << File.join(dir, entry)
+        end
+        (current_entries - processed_entries).each do |path|
+          asset_count = processed.length
+          changes[:added] << build(path)
+          if processed.length > (asset_count + 1)
+            changes[:added].concat(processed[asset_count..-1])
+          end
+        end
+      end
+
+      changes
+    rescue StandardError, Opal::SyntaxError => e
+      $stderr.puts "Opal::Builder rebuilding failed: #{e.message}"
+      changes[:error] = e
+      changes
+    end
+
     private
+
+    def update(asset)
+      asset.update(source_for(asset.abs_path))
+      requires = preload + asset.requires + tree_requires(asset, abs_path)
+      # Don't automatically load modules required by the module
+      process_requires(rel_path, requires, asset.autoloads, options.merge(load: false))
+      # TODO: the order corrector may be required here
+    end
+
+    def add_to_directories(asset, directories)
+      return unless asset.abs_path
+      dirname = File.dirname(asset.abs_path)
+      directories[dirname] = [] unless directories.key?(dirname)
+      directories[dirname] << File.basename(asset.abs_path)
+    end
 
     def process_requires(rel_path, requires, autoloads, options)
       @scheduler.process_requires(rel_path, requires, autoloads, options)
@@ -291,7 +357,8 @@ module Opal
 
     def expand_path(path)
       return if stub?(path)
-      (path_reader.expand(path) || File.expand_path(path)).to_s
+      path = (path_reader.expand(path) || File.expand_path(path)).to_s
+      path if File.exist?(path)
     end
 
     def stub?(path)
