@@ -199,7 +199,7 @@ RSpec.describe Opal::Builder do
           builder.compile_to_directory(dir+"/UniqueString/")
 
           files = Dir["#{dir}/**/*"].map { |i| i.split("/UniqueString/")[1] }.compact
-          expected_files = %W[index.#{ext} opal opal/#{ver} opal/#{ver}/console.#{ext}
+          expected_files = %W[index.#{ext} package.json opal opal/#{ver} opal/#{ver}/console.#{ext}
                               opal/#{ver}/console.map opal/#{ver}/native.#{ext} opal/#{ver}/native.map
                               opal/src opal/src/console.rb opal/src/native.rb]
           expected_files << 'index.html' if esm?

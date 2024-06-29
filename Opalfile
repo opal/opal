@@ -9,3 +9,13 @@ else
   add_gem_dependency "ast"
   add_gem_dependency "parser"
 end
+
+npm_config do
+  name "@opal/opal"
+  version Opal::VERSION
+  dependencies ({
+    "@opal/opal-corelib" => Opal::VERSION,
+    "@opal/opal-stdlib" => Opal::VERSION
+  })
+  license "MIT"
+end
