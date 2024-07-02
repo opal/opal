@@ -44,14 +44,20 @@ module Opal
           blockopts["$$has_trailing_comma_in_args"] = "true"
         end
 
-        if blockopts.keys == ["$$arity"]
-          push ", #{arity}"
-        elsif !blockopts.empty?
-          push ', {', blockopts.map { |k, v| "#{k}: #{v}" }.join(', '), '}'
+        unless plain_js_function?
+          if blockopts.keys == ["$$arity"]
+            push ", #{arity}"
+          elsif !blockopts.empty?
+            push ', {', blockopts.map { |k, v| "#{k}: #{v}" }.join(', '), '}'
+          end
         end
 
         scope.nesting if @define_nesting
         scope.relative_access if @define_relative_access
+      end
+
+      def plain_js_function?
+        sexp.meta[:plain_js_function]
       end
 
       def compile_body
@@ -69,7 +75,9 @@ module Opal
           in_closure(Closure::JS_FUNCTION | Closure::ITER | (@is_lambda ? Closure::LAMBDA : 0)) do
             body_code = stmt(returned_body)
 
-            add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s" if @define_self
+            if @define_self && !plain_js_function?
+              add_temp "self = #{identity}.$$s == null ? this : #{identity}.$$s"
+            end
 
             to_vars = scope.to_vars
 
