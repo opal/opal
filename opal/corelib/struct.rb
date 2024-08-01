@@ -87,7 +87,7 @@ class ::Struct
     if `#{self.class}.$$keyword_init`
       kwargs = args.last || {}
 
-      if args.length > 1 || `(args.length === 1 && !kwargs.$$is_hash)`
+      if args.length > 1 || `(args.length === 1 && !(kwargs instanceof Map))`
         ::Kernel.raise ::ArgumentError, "wrong number of arguments (given #{args.length}, expected 0)"
       end
 
