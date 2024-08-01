@@ -36,7 +36,7 @@ class ::Hash < `Map`
 
         for (i = 0; i < argc; i++) {
           arg = argv[i];
-          if (!arg.$$is_array)
+          if (!(arg instanceof Array))
             #{::Kernel.raise ::ArgumentError, "invalid element #{`arg`.inspect} for Hash"};
           if (arg.length === 1) {
             hash.$store(arg[0], nil);
@@ -452,7 +452,7 @@ class ::Hash < `Map`
       return $hash_each(self, result, function(key, value) {
         result.push(key);
 
-        if (value.$$is_array) {
+        if (value instanceof Array) {
           if (level === 1) {
             result.push(value);
             return [false, result];

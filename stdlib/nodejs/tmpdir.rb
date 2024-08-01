@@ -1,6 +1,6 @@
 class Dir
   def self.mktmpdir(prefix_suffix = nil, *_rest, **_options)
-    if `prefix_suffix.$$is_array`
+    if `prefix_suffix instanceof Array`
       prefix = prefix_suffix.join('')
     elsif `prefix_suffix.$$is_string`
       prefix = prefix_suffix
