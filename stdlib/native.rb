@@ -550,7 +550,7 @@ unless Hash.method_defined? :_initialize
            if (item &&
               (item.constructor === undefined ||
                item.constructor === Object ||
-               value instanceof Map)) {
+               item instanceof Map)) {
              return #{Hash.new(`item`)};
            }
            return #{Native(`item`)};
