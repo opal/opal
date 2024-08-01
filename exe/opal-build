@@ -71,7 +71,7 @@ else
   lib_name = ARGV.first
 
   output = options[:output] ? File.open(options[:output], 'w') : $stdout
-  output.puts Opal::Builder.build(lib_name.dup.untaint)
+  output.puts Opal::Builder.build(lib_name.dup)
 end
 
 
