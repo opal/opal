@@ -1,9 +1,9 @@
 ::RUBY_PLATFORM       = 'opal'
 ::RUBY_ENGINE         = 'opal'
 ::RUBY_VERSION        = '3.2.0'
-::RUBY_ENGINE_VERSION = '1.8.2'
-::RUBY_RELEASE_DATE   = '2023-11-23'
+::RUBY_ENGINE_VERSION = '1.8.3.rc1'
+::RUBY_RELEASE_DATE   = '2024-08-08'
 ::RUBY_PATCHLEVEL     = 0
 ::RUBY_REVISION       = '0'
-::RUBY_COPYRIGHT      = 'opal - Copyright (C) 2011-2023 Adam Beynon and the Opal contributors'
+::RUBY_COPYRIGHT      = 'opal - Copyright (C) 2011-2024 Adam Beynon and the Opal contributors'
 ::RUBY_DESCRIPTION    = "opal #{::RUBY_ENGINE_VERSION} (#{::RUBY_RELEASE_DATE} revision #{::RUBY_REVISION})"
