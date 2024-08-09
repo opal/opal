@@ -2530,9 +2530,8 @@
     // fun is called as fun(key, value) and must return a array with [break, result]
     // if break is true, iteration stops and result is returned
     // if break is false, iteration continues and eventually the last result is returned
-    var res;
-    for (var i = 0, entry, entries = Array.from(hash.entries()), l = entries.length; i < l; i++) {
-      entry = entries[i];
+    var entries = hash.entries(), res;
+    for (const entry of entries) {
       res = fun(entry[0], entry[1]);
       if (res[0]) return res[1];
     }
