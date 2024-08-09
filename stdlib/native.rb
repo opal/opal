@@ -539,26 +539,34 @@ unless Hash.method_defined? :_initialize
     alias _initialize initialize
 
     %x{
+      function $hash_dup_conv(old_hash) {
+        var new_map = new Map();
+        old_hash.forEach((v, k, h) => $hash_convert_and_put_value(new_map, k, v));
+        return new_map;
+      }
+
       function $hash_convert_and_put_value(hash, key, value) {
-        if (value &&
-          (value.constructor === undefined ||
-            value.constructor === Object ||
-            value instanceof Map)) {
-         $hash_put(hash, key, #{Hash.new(`value`)});
-       } else if (value && value.$$is_array) {
-         value = value.map(function(item) {
-           if (item &&
-              (item.constructor === undefined ||
-               item.constructor === Object ||
-               value instanceof Map)) {
-             return #{Hash.new(`item`)};
-           }
-           return #{Native(`item`)};
-         });
-         $hash_put(hash, key, value)
-       } else {
-         $hash_put(hash, key, #{Native(`value`)});
-       }
+        if (value instanceof Map) {
+          $hash_put(hash, key, $hash_dup_conv(value));
+        } else if (value && (
+            value.constructor === undefined ||
+            value.constructor === Object)) {
+          $hash_put(hash, key, #{Hash.new(`value`)});
+        } else if (value instanceof Array) {
+          value = value.map(function(item) {
+            if (item instanceof Map) {
+              return $hash_dup_conv(item);
+            } else if (item && (
+                item.constructor === undefined ||
+                item.constructor === Object)) {
+              return #{Hash.new(`item`)};
+            }
+            return #{Native(`item`)};
+          });
+          $hash_put(hash, key, value)
+        } else {
+          $hash_put(hash, key, #{Native(`value`)});
+        }
       }
     }
 
@@ -576,10 +584,7 @@ unless Hash.method_defined? :_initialize
 
             return self;
           } else if (defaults instanceof Map) {
-            Opal.hash_each(defaults, false, function(key, value) {
-              $hash_convert_and_put_value(self, key, value);
-              return [false, false];
-            });
+            defaults.forEach((v, k, h) => $hash_convert_and_put_value(self, k, v));
           }
         }
 
