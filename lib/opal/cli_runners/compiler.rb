@@ -17,8 +17,8 @@ class Opal::CliRunners::Compiler
     @directory       = @options[:directory]
   end
 
-  def compile
-    builder = @builder_factory.call
+  def compile(builder = nil)
+    builder ||= @builder_factory.call
 
     if @directory
       builder.compile_to_directory(@output, with_source_map: !@options[:no_source_map])
@@ -34,13 +34,6 @@ class Opal::CliRunners::Compiler
     end
 
     builder
-  end
-
-  def compile_noraise
-    compile
-  rescue StandardError, Opal::SyntaxError => e
-    $stderr.puts "* Compilation failed: #{e.message}"
-    nil
   end
 
   def rewind_output
@@ -74,33 +67,27 @@ class Opal::CliRunners::Compiler
   end
 
   def watch_compile
-    begin
-      require 'listen'
-    rescue LoadError
-      fail_no_listen!
-    end
-
     @opal_deps = Opal.dependent_files
 
     builder = compile
     code_deps = builder.dependent_files
     @files = @opal_deps + code_deps
-    @code_listener = watch_files
-    @code_listener.start
 
     $stderr.puts "* Opal v#{Opal::VERSION} successfully compiled your program in --watch mode"
 
-    sleep
-  rescue Interrupt
-    $stderr.puts '* Stopping watcher...'
-    @code_listener.stop
+    builder.watch do |bldr, changes|
+      unless changes.key?(:error)
+        modified = changes[:added].map(&:abs_path) + changes[:modified].map(&:abs_path) + changes[:removed].map(&:abs_path)
+        on_code_change(bldr, modified)
+      end
+    end
   end
 
   def reexec
     Process.kill('USR2', Process.pid)
   end
 
-  def on_code_change(modified)
+  def on_code_change(builder, modified)
     if !(modified & @opal_deps).empty?
       $stderr.puts "* Modified core Opal files: #{modified.join(', ')}; reexecuting"
       reexec
@@ -108,16 +95,13 @@ class Opal::CliRunners::Compiler
       $stderr.puts "* New unwatched files: #{modified.join(', ')}; reexecuting"
       reexec
     end
+    $stderr.puts '* Modified code rebuilding'
 
-    $stderr.puts "* Modified code: #{modified.join(', ')}; rebuilding"
-
-    builder = compile_noraise
+    compile(builder)
 
     # Ignore the bad compilation
-    if builder
-      code_deps = builder.dependent_files
-      @files = @opal_deps + code_deps
-    end
+    code_deps = builder.dependent_files
+    @files = @opal_deps + code_deps
   end
 
   def files_to_directories
@@ -134,15 +118,6 @@ class Opal::CliRunners::Compiler
     end
 
     directories.compact
-  end
-
-  def watch_files
-    @directories = files_to_directories
-
-    Listen.to(*@directories, ignore!: []) do |modified, added, removed|
-      our_modified = @files & (modified + added + removed)
-      on_code_change(our_modified) unless our_modified.empty?
-    end
   end
 
   def start

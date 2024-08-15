@@ -32,6 +32,40 @@ module Opal
             compiled_filename = "#{version_prefix}/#{module_name}.#{output_extension}"
             try_building_single_file(dir, compiled_filename, single_file) do
               compiled_source = file.to_s
+
+              # import files from require_tree
+              if file.required_trees.any?
+                # detect last import line
+                new_compiled_source = ''
+                cs_enum = compiled_source.each_line
+                line = cs_enum.next
+                while line.start_with?('import "')
+                  new_compiled_source += line
+                  line = cs_enum.next rescue nil
+                end
+
+                file.required_trees.each do |tree|
+                  # insert import lines for files required from require_tree
+                  Dir.each_child(File.expand_path("#{File.dirname(file.abs_path)}/#{tree}")) do |entry|
+                    if entry.end_with?('.rb')
+                      new_compiled_source += "import \"#{tree}/#{entry.delete_suffix('.rb') + (esm? ? '.mjs' : '.js')}\";" + "\n"
+                    end
+                  end
+                end
+
+                # insert last non import line from above
+                new_compiled_source += line
+
+                # append remaining lines
+                line = cs_enum.next
+                while line
+                  new_compiled_source += line
+                  line = cs_enum.next rescue nil
+                end
+
+                compiled_source = new_compiled_source
+              end
+
               compiled_source += "\n//# sourceMappingURL=./#{last_segment_name}.map" if with_source_map
               compiled_source
             end
