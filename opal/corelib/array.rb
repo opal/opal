@@ -829,7 +829,8 @@ class ::Array < `Array`
       var result = [];
 
       for (var i = 0, length = self.length, item; i < length; i++) {
-        if ((item = self[i]) !== nil) {
+        item = self[i];
+        if (item !== nil && item != null) {
           result.push(item);
         }
       }
@@ -844,8 +845,9 @@ class ::Array < `Array`
 
       var original = self.length;
 
-      for (var i = 0, length = self.length; i < length; i++) {
-        if (self[i] === nil) {
+      for (var i = 0, length = self.length, item; i < length; i++) {
+        item = self[i];
+        if (item === nil || item == null) {
           self.splice(i, 1);
 
           length--;
