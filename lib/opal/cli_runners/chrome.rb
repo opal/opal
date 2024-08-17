@@ -201,7 +201,13 @@ module Opal
               return path
             end
           elsif OS.macos?
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+            [
+              '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+              '/Applications/Chromium.app/Contents/MacOS/Chromium'
+            ].each do |path|
+              next unless File.exist? path
+              return path
+            end
           else
             %w[
               google-chrome-stable
