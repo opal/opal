@@ -7,4 +7,12 @@ describe 'Hash' do
     h.delete(k)
     h.inspect.should == '{}'
   end
+
+  it 'compacts nil and JavaScript null and undefined values' do
+    h = { a: nil, b: `null`, c: `undefined`, d: 1 }
+    expect(h.size).to eq 4
+    expect(h.compact.size).to eq 1
+    h.compact!
+    expect(h.size).to eq 1
+  end
 end

@@ -2374,10 +2374,8 @@
 
   function $hash_delete_stage2(hash, key) {
     var value = hash.get(key);
-    if (value !== undefined) {
-      hash.delete(key);
-      return value;
-    }
+    hash.delete(key);
+    return value;
   }
 
   Opal.hash_delete = function(hash, key) {
