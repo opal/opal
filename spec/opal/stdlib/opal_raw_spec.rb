@@ -71,4 +71,13 @@ describe 'javascript operations using Opal::Raw module' do
     args = [1,2,3]
     obj.JS.foo(*args).should == :foo
   end
+
+  it 'JS.<METHOD> supports block arguments with self' do
+    # We want to ensure, that there's no "x" argument present
+    obj = `{ foo: function(arg, block, x) { block(arg, x); } }`
+    z = nil
+    obj.JS.foo(123) { |arg,x| z = [self, arg, x] }
+    # And also we want to ensure that self is not garbled
+    z.should == [self, 123, nil]
+  end
 end

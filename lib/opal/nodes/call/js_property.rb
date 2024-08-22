@@ -37,6 +37,7 @@ module Opal
         # For .JS. call we pass a block
         # as a plain JS callback
         if @iter
+          @iter.meta[:plain_js_function] = true
           @arglist <<= @iter
         end
         @iter = nil
