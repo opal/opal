@@ -222,12 +222,12 @@ class ::Hash < `Map`
     %x{
       var hash = new Map();
 
-      return $hash_each(self, hash, function(key, value) {
-        if (value !== nil) {
+      self.forEach((value, key, s) => {
+        if (value !== nil && value != null)
           $hash_put(hash, key, value);
-        }
-        return [false, hash];
       });
+
+      return hash;
     }
   end
 
@@ -238,7 +238,7 @@ class ::Hash < `Map`
       var result = nil;
 
       return $hash_each(self, result, function(key, value) {
-        if (value === nil) {
+        if (value === nil || value == null) {
           $hash_delete(self, key);
           result = self;
         }
@@ -709,14 +709,15 @@ class ::Hash < `Map`
     %x{
       var hash = new Map();
 
-      return $hash_each(self, hash, function(key, value) {
+      self.forEach((value, key, s) => {
         var obj = block(key, value);
 
         if (obj === false || obj === nil) {
           $hash_put(hash, key, value);
         }
-        return [false, hash]
       });
+
+      return hash;
     }
   end
 
@@ -769,14 +770,15 @@ class ::Hash < `Map`
     %x{
       var hash = new Map();
 
-      return $hash_each(self, hash, function(key, value) {
+      self.forEach((value, key, s) => {
         var obj = block(key, value);
 
         if (obj !== false && obj !== nil) {
           $hash_put(hash, key, value);
         }
-        return [false, hash];
       });
+
+      return hash;
     }
   end
 
@@ -868,7 +870,7 @@ class ::Hash < `Map`
     %x{
       var result = new Map();
 
-      return $hash_each(self, result, function(key, value) {
+      self.forEach((value, key, s) => {
         var new_key;
         if (keys_hash !== nil)
           new_key = $hash_get(keys_hash, key);
@@ -877,8 +879,9 @@ class ::Hash < `Map`
         if (new_key === undefined)
           new_key = key // key not modified
         $hash_put(result, new_key, value);
-        return [false, result];
       });
+
+      return result;
     }
   end
 
@@ -913,10 +916,9 @@ class ::Hash < `Map`
     %x{
       var result = new Map();
 
-      return $hash_each(self, result, function(key, value) {
-        $hash_put(result, key, block(value));
-        return [false, result];
-      });
+      self.forEach((value, key, s) => $hash_put(result, key, block(value)));
+
+      return result;
     }
   end
 
