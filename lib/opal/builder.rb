@@ -70,10 +70,8 @@ module Opal
       end
 
       @stubs                    ||= []
-      @preload                  ||= []
       @processors               ||= ::Opal::Builder.processors
       @path_reader              ||= PathReader.new(Opal.paths, extensions.map { |e| [".#{e}", ".js.#{e}"] }.flatten)
-      @prerequired              ||= []
       @compiler_options         ||= Opal::Config.compiler_options
       @missing_require_severity ||= Opal::Config.missing_require_severity
       @cache                    ||= Opal.cache
@@ -105,7 +103,7 @@ module Opal
       setup_project(abs_path)
       rel_path = expand_ext(rel_path)
       asset = processor_for(source, rel_path, abs_path, false, options)
-      requires = preload + asset.requires + tree_requires(asset, abs_path)
+      requires = asset.requires + tree_requires(asset, abs_path)
       # Don't automatically load modules required by the module
       process_requires(rel_path, requires, asset.autoloads, options.merge(load: false))
       processed << asset
@@ -119,11 +117,9 @@ module Opal
     def initialize_copy(other)
       super
       @stubs = other.stubs.dup
-      @preload = other.preload.dup
       @processors = other.processors.dup
       @path_reader = other.path_reader.dup
       @projects = other.projects.dup
-      @prerequired = other.prerequired.dup
       @compiler_options = other.compiler_options.dup
       @missing_require_severity = other.missing_require_severity.to_sym
       @processed = other.processed.dup
@@ -144,8 +140,6 @@ module Opal
     end
 
     def process_require_threadsafely(rel_path, autoloads, options)
-      return if prerequired.include?(rel_path)
-
       autoload = autoloads.include? rel_path
 
       source = stub?(rel_path) ? '' : read(rel_path, autoload)
@@ -181,7 +175,7 @@ module Opal
 
     attr_reader :processed
 
-    attr_accessor :processors, :path_reader, :stubs, :prerequired, :preload,
+    attr_accessor :processors, :path_reader, :stubs,
       :compiler_options, :missing_require_severity, :cache, :scheduler
 
     def esm?

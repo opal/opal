@@ -38,34 +38,11 @@ RSpec.describe Opal::Builder do
     end
   end
 
-  describe ':prerequired' do
-    let(:options) { {prerequired: ['foo']} }
-
-    it 'compiles them as empty files' do
-      source = 'require "foo"'
-      builder.build_str(source, 'bar.rb')
-    end
-  end
-
-  describe ':preload' do
-    let(:options) { {preload: ['base64']} }
-
-    around(:each) { |example| temporarily_with_sequential_scheduler(&example) }
-
-    it 'compiles them as empty files' do
-      source = 'puts 5'
-      expect(ruby_processor).to receive('new').with(anything, './base64.rb', anything, anything).once.and_call_original
-      expect(ruby_processor).to receive('new').with(source, anything, anything, anything).once.and_call_original
-
-      builder.build_str(source, 'bar.rb')
-    end
-  end
-
   describe 'dup' do
     it 'duplicates internal structures' do
       b2 = builder.dup
       b2.should_not equal(builder)
-      [:stubs, :preload, :processors, :path_reader, :prerequired, :compiler_options, :processed].each do |m|
+      [:stubs, :processors, :path_reader, :compiler_options, :processed].each do |m|
         b2.send(m).should_not equal(builder.send(m))
       end
     end
