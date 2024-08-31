@@ -3,9 +3,10 @@
 
 require 'corelib/numeric'
 
-class ::Number < ::Numeric
+class ::Float < ::Numeric
   ::Opal.bridge(`Number`, self)
   `Opal.prop(self.$$prototype, '$$is_number', true)`
+  `Opal.prop(self.$$prototype, '$$is_float', true)`
   `self.$$is_number_class = true`
   `var number_id_map = new Map()`
 
@@ -15,7 +16,22 @@ class ::Number < ::Numeric
     end
 
     undef :new
+
+    def ===(other)
+      `!!other.$$is_number`
+    end
   end
+
+  self::INFINITY = `Infinity`
+  self::MAX      = `Number.MAX_VALUE`
+  self::MIN      = `Number.MIN_VALUE`
+  self::NAN      = `NaN`
+
+  self::DIG      = 15
+  self::MANT_DIG = 53
+  self::RADIX    = 2
+
+  self::EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
 
   def coerce(other)
     %x{
@@ -687,7 +703,7 @@ class ::Number < ::Numeric
   end
 
   def to_i
-    `self < 0 ? Math.ceil(self) : Math.floor(self)`
+    `BigInt(self < 0 ? Math.ceil(self) : Math.floor(self))`
   end
 
   def to_r
@@ -897,7 +913,7 @@ class ::Number < ::Numeric
 
   alias arg angle
   alias eql? ==
-  alias fdiv /
+  alias fdiv / #
   alias inspect to_s
   alias kind_of? is_a?
   alias magnitude abs
@@ -906,64 +922,4 @@ class ::Number < ::Numeric
   alias phase angle
   alias succ next
   alias to_int to_i
-end
-
-::Fixnum = ::Number
-
-class ::Integer < ::Numeric
-  `self.$$is_number_class = true`
-  `self.$$is_integer_class = true`
-
-  class << self
-    def allocate
-      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
-    end
-
-    undef :new
-
-    def sqrt(n)
-      n = ::Opal.coerce_to!(n, ::Integer, :to_int)
-      %x{
-        if (n < 0) {
-          #{::Kernel.raise ::Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
-        }
-
-        return parseInt(Math.sqrt(n), 10);
-      }
-    end
-
-    def try_convert(object)
-      Opal.coerce_to?(object, self, :to_int)
-    end
-  end
-
-  self::MAX = `Math.pow(2, 30) - 1`
-  self::MIN = `-Math.pow(2, 30)`
-end
-
-class ::Float < ::Numeric
-  `self.$$is_number_class = true`
-
-  class << self
-    def allocate
-      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
-    end
-
-    undef :new
-
-    def ===(other)
-      `!!other.$$is_number`
-    end
-  end
-
-  self::INFINITY = `Infinity`
-  self::MAX      = `Number.MAX_VALUE`
-  self::MIN      = `Number.MIN_VALUE`
-  self::NAN      = `NaN`
-
-  self::DIG      = 15
-  self::MANT_DIG = 53
-  self::RADIX    = 2
-
-  self::EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
 end

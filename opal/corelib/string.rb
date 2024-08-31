@@ -245,7 +245,7 @@ class ::String < `String`
       }
 
 
-      index = $coerce_to(index, #{::Integer}, 'to_int');
+      index = Number($coerce_to(index, #{::Integer}, 'to_int'));
 
       if (index < 0) {
         index += size;
@@ -1319,7 +1319,7 @@ class ::String < `String`
       }
 
       if (/^\s*_/.test(string)) {
-        return 0;
+        return 0n;
       }
 
       string = string.replace(/^(\s*[+-]?)(0[bodx]?)(.+)$/, function (original, head, flag, tail) {
@@ -1362,8 +1362,8 @@ class ::String < `String`
         return original
       });
 
-      result = parseInt(string.replace(/_(?!_)/g, ''), radix);
-      return isNaN(result) ? 0 : result;
+      result = parseInt(string.replace(/_(?!_)/g, ''), Number(radix));
+      return isNaN(result) ? 0n : BigInt(result);
     }
   end
 

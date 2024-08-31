@@ -112,7 +112,7 @@ module ::Kernel
       stack = new Error().$backtrace();
       result = [];
 
-      for (var i = #{start} + 1, ii = stack.length; i < ii; i++) {
+      for (var i = #{start} + 1n, ii = stack.length; i < ii; i++) {
         if (!stack[i].match(/runtime\.js/)) {
           result.push(stack[i]);
         }

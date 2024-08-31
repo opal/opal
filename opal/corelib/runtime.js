@@ -215,8 +215,11 @@
   Opal.coerce_to = function(object, type, method, args) {
     var body;
 
-    if (method === 'to_int' && type === Opal.Integer && object.$$is_number)
-      return object < 0 ? Math.ceil(object) : Math.floor(object);
+    if (method === 'to_int' && type === Opal.Integer)
+      return object;
+
+    if (method === 'to_int' && type === Opal.Float)
+      return BigInt(object < 0 ? Math.ceil(object) : Math.floor(object));
 
     if (method === 'to_str' && type === Opal.String && object.$$is_string)
       return object;
@@ -1758,10 +1761,6 @@
   Opal.is_a = function(object, klass) {
     if (klass != null && object.$$meta === klass || object.$$class === klass) {
       return true;
-    }
-
-    if (object.$$is_number && klass.$$is_number_class) {
-      return (klass.$$is_integer_class) ? (object % 1) === 0 : true;
     }
 
     var ancestors = $ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));

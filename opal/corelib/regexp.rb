@@ -383,7 +383,7 @@ class MatchData
 
   def begin(n)
     %x{
-      if (n !== 0) {
+      if (n != 0) {
         #{::Kernel.raise ::ArgumentError, 'MatchData#begin only supports 0th element'}
       }
       return self.begin;
