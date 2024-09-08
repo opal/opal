@@ -31,6 +31,28 @@ module Opal
         project.collection.use_gem(name)
       end
 
+      def npm_config(&block)
+        dsl = NpmConfig.new
+        dsl.instance_exec(&block)
+        project.npm_config = dsl.config
+      end
+
+      class NpmConfig
+        attr_reader :config
+
+        def initialize
+          @config = {}
+        end
+
+        def method_missing(key, value)
+          @config[key.to_s.gsub(/_(.)/) { ::Regexp.last_match(1).upcase }.to_sym] = value
+        end
+
+        def respond_to_missing?(_method, *)
+          true
+        end
+      end
+
       def method_missing(method, *, **)
         raise OpalfileUnknownDirective, "unknown directive #{method} in Opalfile"
       end
@@ -126,6 +148,7 @@ module Opal
     def initialize(root_dir, collection)
       @root_dir = root_dir
       @collection = collection
+      @npm_config = {}
 
       collection.add_project(self)
 
@@ -133,6 +156,17 @@ module Opal
     end
 
     attr_reader :root_dir, :collection
+    attr_accessor :npm_config
+
+    # For marshaling, skip the collection. This is crucial for cache.
+    def marshal_dump
+      [@root_dir, @npm_config, @has_opalfile]
+    end
+
+    def marshal_load(src)
+      @root_dir, @npm_config, @has_opalfile = src
+      @collection = Opal
+    end
 
     def has_opalfile?
       @has_opalfile

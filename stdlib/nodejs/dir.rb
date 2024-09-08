@@ -1,10 +1,12 @@
 # backtick_javascript: true
 
+# ::Opal::Raw.npm_dependency 'glob', '7.1.3' # TODO
+
 class Dir
-  @__glob__ = `require('glob')`
-  @__fs__ = `require('fs')`
-  @__path__ = `require('path')`
-  @__os__ = `require('os')`
+  @__glob__ = Opal::Raw.import('glob')
+  @__fs__ = Opal::Raw.import('node:fs')
+  @__path__ = Opal::Raw.import('node:path')
+  @__os__ = Opal::Raw.import('node:os')
   `var __glob__ = #{@__glob__}`
   `var __fs__ = #{@__fs__}`
   `var __path__ = #{@__path__}`

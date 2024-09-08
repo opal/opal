@@ -111,8 +111,10 @@ require 'corelib/file'
 }
 
 class File < IO
-  @__fs__ = `require('fs')`
-  @__path__ = `require('path')`
+  @__fs__ = Opal::Raw.import('node:fs')
+  @__path__ = Opal::Raw.import('node:path')
+  @__util__ = Opal::Raw.import('node:util')
+
   `var __fs__ = #{@__fs__}`
   `var __path__ = #{@__path__}`
   # Since Node.js 11+ TextEncoder and TextDecoder are now available on the global object.
@@ -122,7 +124,7 @@ class File < IO
         __TextEncoder__ = TextEncoder;
         __TextDecoder__ = TextDecoder;
     } else {
-        var __util__ = require('util');
+        var __util__ = #@__util__;
         __TextEncoder__ = __util__.TextEncoder;
         __TextDecoder__ = __util__.TextDecoder;
     }
@@ -324,7 +326,7 @@ class File < IO
 end
 
 class File::Stat
-  @__fs__ = `require('fs')`
+  @__fs__ = Opal::Raw.import('node:fs')
   `var __fs__ = #{@__fs__}`
 
   def initialize(path)

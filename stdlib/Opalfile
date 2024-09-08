@@ -1,0 +1,5 @@
+npm_config do
+  name "@opal/opal-stdlib"
+  version Opal::VERSION
+  license "MIT"
+end

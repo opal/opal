@@ -12,6 +12,15 @@ module Opal
         compile_default.call
       end
 
+      # A special case of require for internal use that will pass along
+      # keyword arguments to track_require method.
+      add_special :advanced_require, const: :Opal do |_compile_default|
+        argumentize do |path, **kwargs|
+          compiler.track_require(path, **kwargs)
+          push "#{scope.self}.$require(#{path.inspect})"
+        end
+      end
+
       add_special :require_relative do
         arg = arglist.children[0]
         file = compiler.file
