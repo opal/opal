@@ -85,7 +85,7 @@ module Opal
         end
 
         def compiled
-          @compiled ||= Opal::Cache.fetch(@cache, cache_key) do
+          @compiled ||= Opal::Builder::Cache.fetch(@cache, cache_key) do
             compiler = compiler_for(@source, file: @filename)
             compiler.compile
             compiler

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'opal/paths'
-
 # The compiler runner will just output the compiled JavaScript
 class Opal::CliRunners::Compiler
   def self.call(data)

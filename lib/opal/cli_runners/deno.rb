@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'shellwords'
-require 'opal/paths'
 require 'opal/cli_runners/system_runner'
 require 'opal/os'
 

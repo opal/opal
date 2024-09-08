@@ -12,6 +12,25 @@ module Opal
         warn message
       end
     end
+
+    DEPRECATED_CONSTANTS = {
+      Cache: 'Builder::Cache',
+      Hike: 'Builder::Hike',
+      PathReader: 'Builder::PathReader',
+      BuilderScheduler: 'Builder::Scheduler',
+      BuilderProcessors: 'Builder::Processor'
+    }.freeze
+
+    # Raise deprecations when an old name of a class is issued
+    def const_missing(const)
+      if DEPRECATED_CONSTANTS.include? const
+        new_const = DEPRECATED_CONSTANTS[const]
+        deprecation "Use of a class/module that has been renamed. Used #{const}, use #{new_const} instead."
+        Opal.const_set(const, Opal.const_get(new_const))
+      else
+        super
+      end
+    end
   end
 
   extend Deprecations
