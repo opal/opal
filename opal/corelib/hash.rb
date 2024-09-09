@@ -13,9 +13,6 @@ require 'corelib/enumerable'
 class ::Hash < `Map`
   include ::Enumerable
 
-  # Mark all hash instances as valid hashes (used to check keyword args, etc)
-  `self.$$prototype.$$is_hash = true`
-
   def self.[](*argv)
     %x{
       var hash, argc = argv.length, arg, i;
@@ -99,7 +96,7 @@ class ::Hash < `Map`
         return true;
       }
 
-      if (!other.$$is_hash) {
+      if (!(other instanceof Map)) {
         return false;
       }
 

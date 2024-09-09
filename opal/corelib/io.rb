@@ -124,9 +124,9 @@ class ::IO
     if `sep.$$is_number` && !limit
       sep, limit, opts = false, sep, limit
     end
-    if `sep.$$is_hash` && !limit && opts == {}
+    if `sep instanceof Map` && !limit && opts == {}
       sep, limit, opts = false, nil, sep
-    elsif `limit.$$is_hash` && opts == {}
+    elsif `limit instanceof Map` && opts == {}
       sep, limit, opts = sep, nil, limit
     end
 

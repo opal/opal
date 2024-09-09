@@ -56,8 +56,8 @@ class ::String < `String`
       var str = args[0] || "";
       var opts = args[args.length-1];
       str = $coerce_to(str, #{::String}, 'to_str');
-      if (opts && opts.$$is_hash) {
-        if (opts.has('encoding')) str = str.$force_encoding(opts.get('encoding').value);
+      if ((opts instanceof Map) && opts.has('encoding')) {
+        str = str.$force_encoding(opts.get('encoding').value);
       }
       str = new self.$$constructor(str);
       if (!str.$initialize.$$pristine) #{`str`.initialize(*args)};
@@ -552,7 +552,7 @@ class ::String < `String`
           _replacement = block(match[0]);
           pattern.lastIndex = lastIndex; // save and restore lastIndex
         }
-        else if (replacement.$$is_hash) {
+        else if (replacement instanceof Map) {
           _replacement = #{`replacement`[`match[0]`].to_s};
         }
         else {
@@ -1226,7 +1226,7 @@ class ::String < `String`
           }
           result = self.slice(0, match.index) + block(match[0]) + self.slice(match.index + match[0].length);
 
-        } else if (replacement.$$is_hash) {
+        } else if (replacement instanceof Map) {
 
           result = self.slice(0, match.index) + #{`replacement`[`match[0]`].to_s} + self.slice(match.index + match[0].length);
 
