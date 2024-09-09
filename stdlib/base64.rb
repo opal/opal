@@ -10,7 +10,7 @@ module Base64
     // [https://gist.github.com/999166] by [https://github.com/nignag]
     encode = function (input) {
       var str = String(input);
-      /* eslint-disable */
+
       for (
         // initialize result and counter
         var block, charCode, idx = 0, map = chars, output = '';
@@ -28,7 +28,7 @@ module Base64
         block = block << 8 | charCode;
       }
       return output;
-      /* eslint-enable */
+
     };
 
     // decoder
@@ -38,7 +38,7 @@ module Base64
       if (str.length % 4 == 1) {
         #{raise ArgumentError, 'invalid base64 (failed: The string to be decoded is not correctly encoded.)'};
       }
-      /* eslint-disable */
+
       for (
         // initialize result and counters
         var bc = 0, bs, buffer, idx = 0, output = '';
@@ -54,7 +54,7 @@ module Base64
         buffer = chars.indexOf(buffer);
       }
       return output;
-      /* eslint-enable */
+
     };
   }
 

@@ -134,6 +134,7 @@ module ::Math
 
       var G = 4.7421875;
 
+      /* eslint no-loss-of-precision: "warn" */
       var P = [
          0.99999999999999709182,
          57.156235665862923517,
@@ -151,7 +152,6 @@ module ::Math
         -0.26190838401581408670e-4,
          0.36899182659531622704e-5
       ];
-
 
       if (isNaN(n)) {
         return NaN;
