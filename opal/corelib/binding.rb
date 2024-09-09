@@ -5,6 +5,10 @@ class ::Binding
   def initialize(jseval, scope_variables = [], receiver = undefined, source_location = nil)
     @jseval, @scope_variables, @receiver, @source_location = \
       jseval, scope_variables, receiver, source_location
+    %x{
+      /* eslint no-constant-binary-expression: "warn" */
+      /* eslint valid-typeof: "warn" */
+    }
     receiver = js_eval('self') unless `typeof receiver !== undefined`
   end
 

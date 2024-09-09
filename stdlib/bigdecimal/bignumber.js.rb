@@ -4,7 +4,6 @@ class BigDecimal < Numeric
   %x{
     var define = function (f) { Opal.const_set(self, 'BigNumber', f()); };
     define.amd = true;
-    /* global Uint32Array */
 
     /* eslint-disable */
     /* bignumber.js v2.1.4 https://github.com/MikeMcl/bignumber.js/LICENCE */
