@@ -97,7 +97,7 @@ RSpec.describe Opal::Builder do
       let(:options) { {missing_require_severity: :warning} }
       it 'warns the user' do
         expect(builder.missing_require_severity).to eq(:warning)
-        expect(builder).to receive(:warn) { |message| expect(message).to start_with(%{can't find file: "non-existen-file"}) }.at_least(1)
+        expect(builder).to receive(:warn) { |message| expect(message).to start_with(%{Warning: can't find file: "non-existen-file"}) }.at_least(1)
         builder.build_str("require 'non-existen-file'", 'foo.rb')
       end
     end
