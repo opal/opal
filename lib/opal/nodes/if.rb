@@ -196,12 +196,14 @@ module Opal
 
       # Matches: `case some_value_or_expression; when 123`
       # Captures: [s(:int, 123), "$ret_or_1", s(:send, nil, :some_value_or_expression))]
-      SWITCH_TEST_MATCH = AST::Matcher.new do
-        s(:send,
-          cap(s(%i[float int sym str true false nil], :*)),
-          :===,
-          s(:lvasgn, cap(:*), cap(:*))
-        )
+      def switch_test
+        Thread.current[:_opal_switch_test] ||= AST::Matcher.new do
+          s(:send,
+            cap(s(%i[float int sym str true false nil], :*)),
+            :===,
+            s(:lvasgn, cap(:*), cap(:*))
+          )
+        end
       end
 
       # Matches: case some_value_or_expression; when 123, 456; end
@@ -209,46 +211,52 @@ module Opal
       #   s(:int, 123),
       #   "$ret_or_1",
       #   s(:send, nil, :some_value_or_expression)),
-      #   …here we delegate to either SWITCH_BRANCH_TEST_MATCH or SWITCH_BRANCH_TEST_MATCH_CONTINUED
+      #   …here we delegate to either switch_branch_test or switch_branch_test_continued
       # ]
-      SWITCH_TEST_MATCH_CONTINUED = AST::Matcher.new do
-        s(:if,
-          s(:send,
-            cap(s(%i[float int sym str true false nil], :*)),
-            :===,
-            s(:lvasgn, cap(:*), cap(:*))
-          ),
-          s(:true),
-          cap(:*)
-        )
+      def switch_test_continued
+        Thread.current[:_opal_switch_test_continued] ||= AST::Matcher.new do
+          s(:if,
+            s(:send,
+              cap(s(%i[float int sym str true false nil], :*)),
+              :===,
+              s(:lvasgn, cap(:*), cap(:*))
+            ),
+            s(:true),
+            cap(:*)
+          )
+        end
       end
 
       # Matches: `when 456` (from `case foo; when 123; when 456; end`)
       # Captures: [s(:int, 456), "$ret_or_1"]
-      SWITCH_BRANCH_TEST_MATCH = AST::Matcher.new do
-        s(:send,
-          cap(s(%i[float int sym str true false nil], :*)),
-          :===,
-          s(:js_tmp, cap(:*))
-        )
+      def switch_branch_test
+        Thread.current[:_opal_switch_branch_test] ||= AST::Matcher.new do
+          s(:send,
+            cap(s(%i[float int sym str true false nil], :*)),
+            :===,
+            s(:js_tmp, cap(:*))
+          )
+        end
       end
 
       # Matches: `when 456`
       # Captures: [
       #   s(:int, 789),
       #   "$ret_or_1",
-      #   …here we delegate to either SWITCH_BRANCH_TEST_MATCH or SWITCH_BRANCH_TEST_MATCH_CONTINUED
+      #   …here we delegate to either switch_branch_tes or switch_branch_test_continued
       # ]
-      SWITCH_BRANCH_TEST_MATCH_CONTINUED = AST::Matcher.new do
-        s(:if,
-          s(:send,
-            cap(s(%i[float int sym str true false nil], :*)),
-            :===,
-            s(:js_tmp, cap(:*))
-          ),
-          s(:true),
-          cap(:*)
-        )
+      def switch_branch_test_continued
+        Thread.current[:_opal_switch_branch_test_continued] ||= AST::Matcher.new do
+          s(:if,
+            s(:send,
+              cap(s(%i[float int sym str true false nil], :*)),
+              :===,
+              s(:js_tmp, cap(:*))
+            ),
+            s(:true),
+            cap(:*)
+          )
+        end
       end
 
       def could_become_switch?
@@ -256,7 +264,7 @@ module Opal
 
         return true if sexp.meta[:switch_child]
 
-        test_match = SWITCH_TEST_MATCH.match(test) || SWITCH_TEST_MATCH_CONTINUED.match(test)
+        test_match = switch_test.match(test) || switch_test_continued.match(test)
         return false unless test_match
         @switch_test, @switch_variable, @switch_first_test, additional_rules = *test_match
 
@@ -272,7 +280,7 @@ module Opal
       def handle_additional_switch_rules(additional_rules)
         switch_additional_rules = []
         while additional_rules
-          match = SWITCH_BRANCH_TEST_MATCH.match(additional_rules) || SWITCH_BRANCH_TEST_MATCH_CONTINUED.match(additional_rules)
+          match = switch_branch_test.match(additional_rules) || switch_branch_test_continued.match(additional_rules)
           return false unless match
 
           switch_test, switch_variable, additional_rules = *match
@@ -296,7 +304,7 @@ module Opal
 
         test, true_body, false_body = *body
 
-        test_match = SWITCH_BRANCH_TEST_MATCH.match(test) || SWITCH_BRANCH_TEST_MATCH_CONTINUED.match(test)
+        test_match = switch_branch_test.match(test) || switch_branch_test_continued.match(test)
         unless test_match
           if valid_switch_body?(body, true)
             body.meta[:switch_default] = true
