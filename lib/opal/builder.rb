@@ -272,10 +272,17 @@ module Opal
                   print_list[processors]
 
         unless autoload
-          case missing_require_severity
-          when :error   then raise MissingRequire, message
-          when :warning then warn message
-          when :ignore  then # noop
+          if path == 'etc' && %w[ruby jruby].include?(RUBY_ENGINE)
+            # ruby:  'etc' is native only, no file to be found
+            # jruby: 'etc' is integrated in the interpreter, no file to be found
+            # still issue a warning, in case a file is expected
+            warn 'Warning: ' + message
+          else
+            case missing_require_severity
+            when :error   then raise MissingRequire, message
+            when :warning then warn 'Warning: ' + message
+            when :ignore  then # noop
+            end
           end
         end
 
