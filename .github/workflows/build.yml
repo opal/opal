@@ -43,6 +43,8 @@ jobs:
             ruby: '3.1'
           - name: near-eol-ruby
             ruby: '3.0'
+          - name: jruby
+            ruby: 'jruby'
           - name: smoke-test
             command: bin/rake smoke_test
           - name: windows-mspec-nodejs
@@ -79,7 +81,6 @@ jobs:
 
           # Currently failing:
           # - ruby: truffleruby
-          # - ruby: jruby
 
     runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.combo.permissive || false }}
