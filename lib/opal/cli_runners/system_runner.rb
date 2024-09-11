@@ -53,11 +53,10 @@ module Opal
       # Opal doesn't support neither `out:` nor `IO.try_convert` nor `open3`
       system(env, *cmd)
       $?.exitstatus
-    elsif IO.try_convert(output) && RUBY_PLATFORM != 'java'
+    elsif IO.try_convert(output)
       system(env, *cmd, out: output)
       $?.exitstatus
     else
-      # JRuby (v9.2) doesn't support using `out:` to redirect output.
       require 'open3'
       captured_output, status = Open3.capture2(env, *cmd)
       output.write captured_output
