@@ -19,7 +19,7 @@ STDIN.read_proc = %x{function(_count) {
   try {
     count = __fs__.readSync(this.fd, buf, 0, 65536, null);
   }
-  catch (e) { // Windows systems may raise EOF
+  catch { // Windows systems may raise EOF
     return nil;
   }
   if (count == 0) return nil;
