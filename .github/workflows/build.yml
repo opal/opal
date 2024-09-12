@@ -48,6 +48,8 @@ jobs:
             ruby: '3.0'
           - name: jruby
             ruby: 'jruby'
+          - name: truffleruby
+            ruby: 'truffleruby'
           - name: smoke-test
             command: bin/rake smoke_test
           - name: windows-mspec-nodejs
@@ -82,9 +84,6 @@ jobs:
             fetchdepth: '0'
             command: bin/rake performance:compare
             # os: ryzen
-
-          # Currently failing:
-          # - ruby: truffleruby
 
     runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.combo.permissive || false }}
