@@ -49,5 +49,5 @@ group :development do
 end unless ENV['CI']
 
 group :doc do
-  gem 'redcarpet' unless %w[truffleruby jruby].include?(RUBY_ENGINE)
+  gem 'redcarpet' unless RUBY_ENGINE == 'jruby'
 end unless ENV['CI']
