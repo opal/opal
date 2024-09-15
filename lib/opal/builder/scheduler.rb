@@ -74,6 +74,14 @@ module Opal
         Opal.builder_scheduler = Builder::Scheduler::Prefork
       end
     elsif %w[jruby truffleruby].include?(RUBY_ENGINE)
+      if RUBY_ENGINE == 'truffleruby' && !ENV['RUBYOPT'].include?('--vm.XX:StackSize')
+        warn <<~TEXT
+          Recommendation:
+          If you encounter "IndexOutOfBound", "Stack level too deep" or similar errors,
+          please ensure the per thread stack size for truffleruby is at least 2MB.
+          Via environment variable: export RUBYOPT="--vm.XX:StackSize=2097152"
+        TEXT
+      end
       require 'opal/builder/scheduler/threaded'
       Opal.builder_scheduler = Builder::Scheduler::Threaded
     else
