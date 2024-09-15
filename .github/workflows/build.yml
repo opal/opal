@@ -48,7 +48,11 @@ jobs:
             ruby: '3.0'
           - name: jruby
             ruby: 'jruby'
+          # truffleruby: default thread stack size is too small
+          # to compile the parser, set it to at least 2097152 bytes
           - name: truffleruby
+            env:
+              RUBYOPT: --vm.XX:StackSize=2097152
             ruby: 'truffleruby'
           - name: smoke-test
             command: bin/rake smoke_test

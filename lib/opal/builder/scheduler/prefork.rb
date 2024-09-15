@@ -25,54 +25,6 @@ module Opal
 
         private
 
-        # Prefork is not deterministic. This module corrects an order of processed
-        # files so that it would be exactly the same as if building sequentially.
-        # While for Ruby files it usually isn't a problem, because the real order
-        # stems from how `Opal.modules` array is accessed, the JavaScript files
-        # are executed verbatim and their order may be important. Also, having
-        # deterministic output is always a good thing.
-        module OrderCorrector
-          module_function
-
-          def correct_order(processed, requires, builder)
-            # Let's build a hash that maps a filename to an array of files it requires
-            requires_hash = processed.to_h do |i|
-              [i.filename, expand_requires(i.requires, builder)]
-            end
-            # Let's build an array with a correct order of requires
-            order_array = build_require_order_array(expand_requires(requires, builder), requires_hash)
-            # If a key is duplicated, remove the last duplicate
-            order_array = order_array.uniq
-            # Create a hash from this array: [a,b,c] => [a => 0, b => 1, c => 2]
-            order_hash = order_array.each_with_index.to_h
-            # Let's return a processed array that has elements in the order provided
-            processed.sort_by do |asset|
-              # If a filename isn't present somehow in our hash, let's put it at the end
-              order_hash[asset.filename] || order_array.length
-            end
-          end
-
-          # Expand a requires array, so that the requires filenames will be
-          # matching Builder::Processor#. Builder needs to be passed so that
-          # we can access an `expand_ext` function from its context.
-          def expand_requires(requires, builder)
-            requires.map { |i| builder.expand_ext(i) }
-          end
-
-          def build_require_order_array(requires, requires_hash, built_for = Set.new)
-            array = []
-            requires.each do |name|
-              next if built_for.include?(name)
-              built_for << name
-
-              asset_requires = requires_hash[name]
-              array += build_require_order_array(asset_requires, requires_hash, built_for) if asset_requires
-              array << name
-            end
-            array
-          end
-        end
-
         class ForkSet < Array
           def initialize(count, &block)
             super([])
