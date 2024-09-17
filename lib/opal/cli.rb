@@ -52,7 +52,11 @@ module Opal
 
       @missing_require_severity = options.delete(:missing_require_severity) { Opal::Config.missing_require_severity }
 
-      @requires.unshift('opal') unless options.delete(:skip_opal_require)
+      unless options.delete(:skip_opal_require)
+        run_require = runner_require
+        @requires.unshift(run_require) if run_require
+        @requires.unshift('opal')
+      end
 
       @compiler_options = compiler_option_names.map do |option|
         key = option.to_sym
@@ -109,6 +113,10 @@ module Opal
     def runner
       CliRunners[@runner_type] ||
         raise(ArgumentError, "unknown runner: #{@runner_type.inspect}")
+    end
+
+    def runner_require
+      CliRunners.runner_requires[@runner_type]
     end
 
     def run_repl
