@@ -20,7 +20,7 @@ STDIN.read_proc = %x{function(_count) {
   try {
     count = Deno.stdin.readSync(buf);
   }
-  catch (e) { // Windows systems may raise EOF
+  catch { // Windows systems may raise EOF
     return nil;
   }
   if (count == 0) return nil;

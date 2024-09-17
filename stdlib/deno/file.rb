@@ -1,6 +1,5 @@
 # backtick_javascript: true
 
-`/* global Deno */`
 require 'corelib/file'
 
 %x{
@@ -197,7 +196,7 @@ class File < IO
       try {
         Deno.openSync(path, {read: true}).close();
         return true;
-      } catch (error) {
+      } catch {
         return false;
       }
     }
@@ -320,7 +319,7 @@ class File::Stat
   def readable?
     %x{
       return executeIOAction(function(){
-        Deno.openSync(path, {read: true}).close();
+        Deno.openSync(#{@path}, {read: true}).close();
         return true;
       })
     }
@@ -329,7 +328,7 @@ class File::Stat
   def writable?
     %x{
       return executeIOAction(function(){
-        Deno.openSync(path, {write: true}).close();
+        Deno.openSync(#{@path}, {write: true}).close();
         return true;
       })
     }
