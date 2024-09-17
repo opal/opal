@@ -30,6 +30,9 @@ jobs:
           - name: mspec-bun
             bun: true
             command: bin/rake mspec_bun
+          - name: mspec-deno
+            deno: true
+            command: bin/rake mspec_deno
           - name: minitest
             command: bin/rake minitest
           - name: minitest-strict-mode
@@ -94,6 +97,10 @@ jobs:
     steps:
       - if: ${{ matrix.combo.bun }}
         uses: oven-sh/setup-bun@v1
+      - if: ${{ matrix.combo.deno }}
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: vx.x.x
       - if: ${{ matrix.combo.firefox }}
         id: setup-firefox
         uses: browser-actions/setup-firefox@latest
