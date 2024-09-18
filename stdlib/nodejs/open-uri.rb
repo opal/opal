@@ -1,4 +1,5 @@
 # backtick_javascript: true
+require 'open-uri'
 
 module OpenURI
   @__xmlhttprequest__ = `require('unxhr')`
