@@ -47,12 +47,13 @@ module Opal
       runner += ['-e', 'require "opal/repl_js"']
       runner = [RbConfig.ruby, "#{__dir__}/../../exe/opal"] + runner
 
-      @pipe = IO.popen(runner, 'r+',
-        # What I try to achieve here: let the runner ignore
-        # interrupts. Those should be handled by a supervisor.
-        pgroup: true,
-        new_pgroup: true,
-      )
+      # What I try to achieve here: let the runner ignore
+      # interrupts. Those should be handled by a supervisor.
+      @pipe = if RUBY_ENGINE == 'truffleruby'
+                IO.popen(runner, 'r+', pgroup: true)
+              else
+                IO.popen(runner, 'r+', pgroup: true, new_pgroup: true)
+              end
     end
 
     def run_input_loop

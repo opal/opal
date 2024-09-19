@@ -272,9 +272,10 @@ module Opal
                   print_list[processors]
 
         unless autoload
-          if path == 'etc' && %w[ruby jruby].include?(RUBY_ENGINE)
-            # ruby:  'etc' is native only, no file to be found
-            # jruby: 'etc' is integrated in the interpreter, no file to be found
+          if path == 'etc' && %w[ruby jruby truffleruby].include?(RUBY_ENGINE)
+            # ruby:        'etc' is native only, no file to be found
+            # jruby:       'etc' is integrated in the interpreter, no file to be found
+            # truffleruby: 'etc' is integrated in the interpreter, no file to be found
             # still issue a warning, in case a file is expected
             warn 'Warning: ' + message
           else

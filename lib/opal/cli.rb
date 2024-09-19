@@ -216,9 +216,15 @@ module Opal
       end
 
       if @cached_content.nil? || can_read_again
-        # On MacOS file.read is not enough to pick up changes, probably due to some
-        # cache or buffer, unclear if coming from ruby or the OS.
-        content = File.file?(file) ? File.read(file) : file.read
+        if RUBY_ENGINE == 'truffleruby'
+          # bug in truffleruby when calling: File.file?(file)
+          # <internal:core> core/type.rb:280:in `convert_type': no implicit conversion of nil into String (TypeError)
+          content = file.read
+        else
+          # On MacOS file.read is not enough to pick up changes, probably due to some
+          # cache or buffer, unclear if coming from ruby or the OS.
+          content = File.file?(file) ? File.read(file) : file.read
+        end
       end
 
       @cached_content ||= content unless can_read_again
