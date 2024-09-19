@@ -180,8 +180,8 @@ class ::String < `String`
       if (index.$$is_range) {
         exclude = index.excl;
         range   = index;
-        length  = index.end === nil ? -1 : $coerce_to(index.end, #{::Integer}, 'to_int');
-        index   = index.begin === nil ? 0 : $coerce_to(index.begin, #{::Integer}, 'to_int');
+        length  = index.end === nil ? -1 : Number($coerce_to(index.end, #{::Integer}, 'to_int'));
+        index   = index.begin === nil ? 0 : Number($coerce_to(index.begin, #{::Integer}, 'to_int'));
 
         if (Math.abs(index) > size) {
           return nil;
@@ -258,7 +258,7 @@ class ::String < `String`
         return self.substr(index, 1);
       }
 
-      length = $coerce_to(length, #{::Integer}, 'to_int');
+      length = Number($coerce_to(length, #{::Integer}, 'to_int'));
 
       if (length < 0) {
         return nil;
@@ -700,7 +700,7 @@ class ::String < `String`
   end
 
   def ljust(width, padstr = ' ')
-    width  = `$coerce_to(#{width}, #{::Integer}, 'to_int')`
+    width  = `Number($coerce_to(#{width}, #{::Integer}, 'to_int'))`
     padstr = `$coerce_to(#{padstr}, #{::String}, 'to_str')`.to_s
 
     if padstr.empty?

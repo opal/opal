@@ -227,6 +227,8 @@ module ::Math
     exponent = Math.integer!(exponent)
 
     %x{
+      exponent = Number(exponent);
+
       if (isNaN(exponent)) {
         #{::Kernel.raise ::RangeError, 'float NaN out of range of integer'};
       }
