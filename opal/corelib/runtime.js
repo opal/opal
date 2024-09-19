@@ -1764,6 +1764,10 @@
       return (klass.$$is_integer_class) ? (object % 1) === 0 : true;
     }
 
+    if (object.$$is_bignum && klass.$$is_number_class) {
+      return klass.$$is_integer_class;
+    }
+
     var ancestors = $ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
 
     return ancestors.indexOf(klass) !== -1;
