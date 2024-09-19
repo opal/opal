@@ -15,7 +15,10 @@ module Opal
 
   singleton_class.attr_accessor :builder_scheduler
 
-  if RUBY_ENGINE == 'ruby'
+  if RUBY_ENGINE == 'opal'
+    require 'opal/builder/scheduler/sequential'
+    Opal.builder_scheduler = Builder::Scheduler::Sequential
+  elsif RUBY_ENGINE == 'ruby'
     # Windows has a faulty `fork`.
     if OS.windows? || ENV['OPAL_PREFORK_DISABLE']
       require 'opal/builder/scheduler/sequential'
