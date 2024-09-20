@@ -1,12 +1,11 @@
 # backtick_javascript: true
 
-`/* global Java, GjsFileImporter, Deno, Bun */`
+`/* global GjsFileImporter, Deno, Bun */`
 
 browser          = `typeof(document) !== "undefined"`
 bun              = `typeof(Bun) === "object" && typeof(Bun.version) === "string"`
 deno             = `typeof(Deno) === "object" && typeof(Deno.version) === "object"`
 node             = `typeof(process) !== "undefined" && process.versions && process.versions.node`
-nashorn          = `typeof(Java) !== "undefined" && Java.type`
 headless_chrome  = `typeof(opalheadlesschrome) !== "undefined"`
 headless_firefox = `typeof(opalheadlessfirefox) !== "undefined"`
 safari           = `typeof(opalsafari) !== "undefined"`
@@ -14,9 +13,7 @@ gjs              = `typeof(window) !== "undefined" && typeof(GjsFileImporter) !=
 quickjs          = `typeof(window) === "undefined" && typeof(__loadScript) !== "undefined"`
 opal_miniracer   = `typeof(opalminiracer) !== "undefined"`
 
-OPAL_PLATFORM = if nashorn
-                  'nashorn'
-                elsif bun
+OPAL_PLATFORM = if bun
                   'bun'
                 elsif deno
                   'deno'
