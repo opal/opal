@@ -15,6 +15,7 @@ DESC
 task :dist do
   require 'opal/util'
   require 'opal/config'
+  require 'opal/builder/scheduler/sequential'
   require 'fileutils'
 
   Opal::Config.arity_check_enabled = false
@@ -31,8 +32,21 @@ task :dist do
   mkdir_p build_dir unless File.directory? build_dir
   width = files.map(&:size).max
 
+  def threaded_or_sequential(lib, &block)
+    if Opal.builder_scheduler == Opal::Builder::Scheduler::Sequential
+      # threaded Sequential scheduler execution
+      Thread.new { block.call(lib) }
+    else
+      # Don't create files.size times parallel executions of parallel executions
+      # instead execute parallel Schedulers sequentially here
+      # but still return a Thread as expected below
+      value = block.call(lib)
+      Thread.new(value) { |value| value }
+    end
+  end
+
   files.map do |lib|
-    Thread.new {
+    threaded_or_sequential(lib) do |lib|
       log = ''
       log << "* building #{lib}...".ljust(width+'* building ... '.size)
       $stdout.flush
@@ -58,8 +72,8 @@ task :dist do
       log <<   ", gzipped: #{('%.2f' % (gzp.size/1000.0)).rjust(7)}KB" if gzp
       log << ")."
       log
-    }
-  end.map(&:value).map(&method(:puts))
+    end
+  end.map(&:value).sort.each(&method(:puts))
 end
 
 desc 'Remove any generated file.'
