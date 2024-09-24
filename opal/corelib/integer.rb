@@ -34,32 +34,6 @@ class Integer < ::Numeric
     end
   end
 
-  def coerce(other)
-    %x{
-      if (typeof other === 'bigin') {
-        return [other, self];
-      }
-      else if (typeof other === 'number') {
-        return [other, #{to_f}];
-      }
-      else if (other === nil) {
-        #{::Kernel.raise ::TypeError, "can't convert NilClass into Integer"};
-      }
-      else if (other.$$is_string) {
-        return [#{::Kernel.Float(other)}, self];
-      }
-      else if (#{other.respond_to?(:to_int)}) {
-        return [#{::Opal.coerce_to!(other, ::Integer, :to_int)}, self];
-      }
-      else if (#{other.respond_to?(:to_f)}) {
-        return [#{::Opal.coerce_to!(other, ::Float, :to_f)}, self];
-      }
-      else {
-        #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Integer"};
-      }
-    }
-  end
-
   def __id__
     # Binary-safe integers
     `(self * 2n) + 1n`
@@ -98,16 +72,21 @@ class Integer < ::Numeric
 
   def /(other)
     %x{
-      if (other.$$is_number) {
-        // check if the signs are different
-        if (self < 0 && other > 0 || self > 0 && other < 0)
-          return Math.floor(Number(a)/Number(b))
+      if (other.$$is_integer) {
+        if (other === 0n)
+          #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'};
+
+        if (self < 0 !== other < 0) // different signs
+          return BigInt(Math.floor(Number(self) / Number(other)))
         else if (other.$$is_float)
           return Number(self) / other
         else
           return self / other;
-      } else
+      } else if (other === 0) {
+        #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'};
+      } else {
         return #{__coerced__ :/, other};
+      }
     }
   end
 
@@ -386,12 +365,6 @@ class Integer < ::Numeric
     else
       super
     end
-  end
-
-  def div(other)
-    ::Kernel.raise ::ZeroDivisionError, 'divided by 0' if other == 0
-
-    (to_f / other).floor
   end
 
   def downto(stop, &block)
@@ -842,6 +815,7 @@ class Integer < ::Numeric
   alias arg angle
   alias eql? ==
   alias fdiv / #
+  alias div / #
   alias inspect to_s
   alias kind_of? is_a?
   alias magnitude abs

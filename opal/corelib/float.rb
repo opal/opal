@@ -33,26 +33,6 @@ class ::Float < ::Numeric
 
   self::EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
 
-  def coerce(other)
-    %x{
-      if (other === nil) {
-        #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
-      }
-      else if (other.$$is_string) {
-        return [#{::Kernel.Float(other)}, self];
-      }
-      else if (#{other.respond_to?(:to_f)}) {
-        return [#{::Opal.coerce_to!(other, ::Float, :to_f)}, self];
-      }
-      else if (other.$$is_float) {
-        return [other, self];
-      }
-      else {
-        #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
-      }
-    }
-  end
-
   def __id__
     %x{
       // Binary-safe integers

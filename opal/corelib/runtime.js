@@ -2916,14 +2916,14 @@
   // ----------------
 
   function are_both_numbers(l,r) {
-    if (typeof l === 'bigint' && typeof r === 'bigint') return true;
-    if (typeof l === 'number' && typeof r === 'number') return true;
+    // if (typeof l === 'bigint' && typeof r === 'bigint') return true;
+    // if (typeof l === 'number' && typeof r === 'number') return true;
   }
 
   Opal.rb_plus   = function(l,r) { return are_both_numbers(l,r) ? l + r : l['$+'](r); }
   Opal.rb_minus  = function(l,r) { return are_both_numbers(l,r) ? l - r : l['$-'](r); }
   Opal.rb_times  = function(l,r) { return are_both_numbers(l,r) ? l * r : l['$*'](r); }
-  Opal.rb_divide = function(l,r) { return are_both_numbers(l,r) ? l / r : l['$/'](r); }
+  Opal.rb_divide = function (l, r) { return are_both_numbers(l, r) ? l / r : l['$/'](r) }
   Opal.rb_lt     = function(l,r) { return are_both_numbers(l,r) ? l < r : l['$<'](r); }
   Opal.rb_gt     = function(l,r) { return are_both_numbers(l,r) ? l > r : l['$>'](r); }
   Opal.rb_le     = function(l,r) { return are_both_numbers(l,r) ? l <= r : l['$<='](r); }
