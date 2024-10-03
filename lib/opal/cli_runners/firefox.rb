@@ -167,7 +167,12 @@ module Opal
               return path
             end
           elsif OS.macos?
-            '/Applications/Firefox.app/Contents/MacOS/Firefox'
+            [
+              '/Applications/Firefox.app/Contents/MacOS/Firefox',
+              '/Applications/Firefox.app/Contents/MacOS/firefox',
+            ].each do |path|
+              return path if File.exist? path
+            end
           else
             %w[
               firefox
