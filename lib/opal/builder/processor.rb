@@ -52,7 +52,7 @@ module Opal
       end
 
       class JsProcessor < Processor
-        handles :js
+        handles :js, :mjs
 
         ManualFragment = Struct.new(:line, :column, :code, :source_map_name)
 
