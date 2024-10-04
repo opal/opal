@@ -12,11 +12,13 @@ module Opal
         argv = data[:argv].dup.to_a
 
         SystemRunner.call(data) do |tempfile|
+          opts = Shellwords.shellwords(ENV['DENO_OPTS'] || '')
           [
             'deno',
             'run',
             '--allow-read',
             '--allow-write',
+            *opts,
             tempfile.path,
             *argv
           ]
