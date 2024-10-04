@@ -7,27 +7,25 @@ require 'opal/os'
 
 module Opal
   module CliRunners
-    class Deno
+    class Bun
       def self.call(data)
         argv = data[:argv].dup.to_a
 
         SystemRunner.call(data) do |tempfile|
-          opts = Shellwords.shellwords(ENV['DENO_OPTS'] || '')
+          opts = Shellwords.shellwords(ENV['BUN_OPTS'] || '')
           [
-            'deno',
+            'bun',
             'run',
-            '--allow-read',
-            '--allow-write',
             *opts,
             tempfile.path,
             *argv
           ]
         end
       rescue Errno::ENOENT
-        raise MissingDeno, 'Please install Deno to be able to run Opal scripts.'
+        raise MissingBun, 'Please install Bun to be able to run Opal scripts.'
       end
 
-      class MissingDeno < RunnerError
+      class MissingBun < RunnerError
       end
     end
   end
