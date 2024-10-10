@@ -176,7 +176,12 @@ module Opal
               return path
             end
           elsif OS.macos?
-            '/Applications/Firefox.app/Contents/MacOS/Firefox'
+            [
+              '/Applications/Firefox.app/Contents/MacOS/Firefox',
+              '/Applications/Firefox.app/Contents/MacOS/firefox',
+            ].each do |path|
+              return path if File.exist? path
+            end
           else
             %w[
               firefox
@@ -318,6 +323,8 @@ module Opal
           'network.cookie.cookieBehavior': 0,
           # Disable experimental feature that is only available in Nightly
           'network.cookie.sameSite.laxByDefault': false,
+          # Avoid cookie expiry date to be affected by server time, which can result in flaky tests.
+          'network.cookie.useServerTime': false,
           # Do not prompt for temporary redirects
           'network.http.prompt-temp-redirect': false,
           # Disable speculative connections so they are not reported as leaking
@@ -330,6 +337,11 @@ module Opal
           # Disable Flash.
           'plugin.state.flash': 0,
           'privacy.trackingprotection.enabled': false,
+          # To enable remote protocols use:
+          #   const WEBDRIVER_BIDI_ACTIVE = 0x1;
+          #   const CDP_ACTIVE = 0x2;
+          # Enable only CDP for now
+          'remote.active-protocols': 2,
           # Can be removed once Firefox 89 is no longer supported
           # https://bugzilla.mozilla.org/show_bug.cgi?id=1710839
           'remote.enabled': true,
