@@ -4,7 +4,6 @@ inherit_from:
 
 require: rubocop-performance
 
-
 AllCops:
   TargetRubyVersion: 3.0
   NewCops: disable
@@ -214,7 +213,7 @@ Naming/BinaryOperatorParameterName:
 
 Naming/PredicateName:
   # Ruby has "has_key?" method
-  ForbiddenPrefixes: 
+  ForbiddenPrefixes:
     - is_
     - have_
 
@@ -239,6 +238,9 @@ Style/CaseEquality:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
     - 'lib/opal/config.rb'
+
+Style/CaseLikeIf:
+  Enabled: false
 
 Style/ClassAndModuleChildren:
   Enabled: false
@@ -427,7 +429,6 @@ Style/MutableConstant:
 
 Style/EmptyCaseCondition:
   Enabled: false
-
 
 # Use whatever suites the situation, sometimes assign_inside_condition is
 # more readable over assign_to_condition despite the risk of repeating the
