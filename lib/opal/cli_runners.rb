@@ -76,7 +76,6 @@ module Opal
     register_runner :compiler,    :Compiler,    'opal/cli_runners/compiler'
     register_runner :deno,        :Deno,        'opal/cli_runners/deno'
     register_runner :firefox,     :Firefox,     'opal/cli_runners/firefox'
-    register_runner :nashorn,     :Nashorn,     'opal/cli_runners/nashorn'
     register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
     register_runner :quickjs,     :Quickjs,     'opal/cli_runners/quickjs'
     register_runner :server,      :Server,      'opal/cli_runners/server'
