@@ -85,7 +85,7 @@ module ::Kernel
         return [];
       }
 
-      if (object.$$is_array) {
+      if (object instanceof Array) {
         return object;
       }
 
