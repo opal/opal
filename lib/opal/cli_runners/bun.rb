@@ -12,9 +12,11 @@ module Opal
         argv = data[:argv].dup.to_a
 
         SystemRunner.call(data) do |tempfile|
+          opts = Shellwords.shellwords(ENV['BUN_OPTS'] || '')
           [
             'bun',
             'run',
+            *opts,
             tempfile.path,
             *argv
           ]
