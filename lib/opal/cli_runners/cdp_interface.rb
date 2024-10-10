@@ -15,14 +15,29 @@ var fs = require("fs");
 var http = require("http");
 
 var dir = #{ARGV.last};
-// var ext = #{ENV['OPAL_CDP_EXT']}; // not used at the moment
-var offset; // port offset for http server, depending on number of targets
+var ext = #{ENV['OPAL_CDP_EXT']};
+var port_offset; // port offset for http server, depending on number of targets
+var script_id;   // of script which is executed after page is initialized, before page scripts are executed
+var cdp_client;  // CDP client
+var target_id;   // the used Target
 
-// even though its Firefox, "chrome-remote-interface" expects CHROME_* vars
 var options = {
-  host: #{ENV['CHROME_HOST'] || 'localhost'},
-  port: parseInt(#{ENV['CHROME_PORT'] || '9333'}) // makes sure it doesn't accidentally connect to a lingering chrome
+  host: #{ENV['OPAL_CDP_HOST'] || 'localhost'},
+  port: parseInt(#{ENV['OPAL_CDP_PORT'] || '9222'})
 };
+
+// shared secret
+
+function random_string() {
+  let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let str = '';
+  for (let i = 0; i < 256; i++) {
+    str += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return str;
+};
+
+var shared_secret = random_string(); // secret must be passed with POST requests
 
 // support functions
 
@@ -33,9 +48,17 @@ var exiting = false;
 function shutdown(exit_code) {
   if (exiting) { return Promise.resolve(); }
   exiting = true;
-  cdp_client.Target.closeTarget(target_id); // Promise doesn't get resolved
-  server.close();
-  process.exit(exit_code);
+  var promises = [];
+  cdp_client.Page.removeScriptToEvaluateOnNewDocument(script_id).then(function(){}, perror);
+  return Promise.all(promises).then(function () {
+    target_id ? cdp_client.Target.closeTarget(target_id) : null;
+  }).then(function() {
+    server.close();
+    process.exit(exit_code);
+  }, function(error) {
+    perror(error);
+    process.exit(1)
+  });
 };
 
 // simple HTTP server to deliver page, scripts to, and trigger commands from browser
@@ -57,7 +80,11 @@ function handle_post(req, res, fun) {
   })
   req.on('end', function() {
     var obj = JSON.parse(data);
-    fun.call(this, obj);
+    if (obj.secret == shared_secret) {
+      fun.call(this, obj);
+    } else {
+      not_found(res);
+    }
   });
 }
 
@@ -96,13 +123,17 @@ var server = http.createServer(function(req, res) {
 // actual CDP code
 
 CDP.List(options, async function(err, targets) {
-  offset = targets ? targets.length + 1 : 1;
+  // default CDP port is 9222, Firefox runner is at 9333
+  // Lets collect clients for
+  // Chrome CDP starting at 9273 ...
+  // Firefox CDP starting 9334 ...
+  port_offset = targets ? targets.length + 51 : 51; // default CDP port is 9222, Node CDP port 9229, Firefox is at 9333
 
   const {webSocketDebuggerUrl} = await CDP.Version(options);
 
   return await CDP({target: webSocketDebuggerUrl}, function(browser_client) {
 
-    server.listen({port: offset + options.port, host: options.host });
+    server.listen({ port: port_offset + options.port, host: options.host });
 
     browser_client.Target.createTarget({url: "about:blank"}).then(function(target) {
       target_id = target;
@@ -121,6 +152,11 @@ CDP.List(options, async function(err, targets) {
           Page.enable(),
           Runtime.enable()
         ]).then(function() {
+          // add script to set the shared_secret in the browser
+          return Page.addScriptToEvaluateOnNewDocument({source: "window.OPAL_CDP_SHARED_SECRET = '" + shared_secret + "';"}).then(function(scrid) {
+            script_id = scrid;
+          }, perror);
+        }, perror).then(function() {
 
           // receive and handle all kinds of log and console messages
           Log.entryAdded(function(entry) {
@@ -140,7 +176,10 @@ CDP.List(options, async function(err, targets) {
               process.stdout.write(value);
             }
 
-            if (entry.stackTrace && entry.stackTrace.callFrames) { stack = entry.stackTrace.callFrames; }
+            if (entry.stackTrace && entry.stackTrace.callFrames) {
+              stack = entry.stackTrace.callFrames;
+            }
+
             if (entry.type === "error" && stack) {
               // print full stack for errors
               process.stdout.write("\n");
@@ -154,11 +193,28 @@ CDP.List(options, async function(err, targets) {
             }
           });
 
+          // react to exceptions
           Runtime.exceptionThrown(function(exception) {
-            var ex = exception.exceptionDetails;
-            var stack = ex.stackTrace.callFrames;
+            var ex = exception.exceptionDetails.exception.preview.properties;
+            var stack = [];
+            if (exception.exceptionDetails.stackTrace) {
+              stack = exception.exceptionDetails.stackTrace.callFrames;
+            } else {
+              var d = exception.exceptionDetails;
+              stack.push({
+                url: d.url,
+                lineNumber: d.lineNumber,
+                columnNumber: d.columnNumber,
+                functionName: "(unknown)"
+              });
+            }
             var fr;
-            perror(ex.url + ':' + ex.lineNumber + ':' + ex.columnNumber + ': ' + ex.text);
+            for (var i = 0; i < ex.length; i++) {
+              fr = ex[i];
+              if (fr.name === "message") {
+                perror(fr.value);
+              }
+            }
             for (var i = 0; i < stack.length; i++) {
               fr = stack[i];
               perror(fr.url + ':' + fr.lineNumber + ':' + fr.columnNumber + ': in ' + fr.functionName);
@@ -166,6 +222,7 @@ CDP.List(options, async function(err, targets) {
             return shutdown(1);
           });
 
+          // handle input
           Page.javascriptDialogOpening((dialog) => {
             #{
               if `dialog.type` == 'prompt'
@@ -193,6 +250,7 @@ CDP.List(options, async function(err, targets) {
             }
           });
 
+          // page has been loaded, all code has been executed
           Page.loadEventFired(() => {
             Runtime.evaluate({ expression: "window.OPAL_EXIT_CODE" }).then(function(output) {
               if (typeof(output.result) !== "undefined" && output.result.type === "number") {
@@ -205,8 +263,9 @@ CDP.List(options, async function(err, targets) {
             })
           });
 
-          Page.navigate({ url: "http://localhost:" + (offset + options.port).toString() + "/index.html" })
-        });
+          // init page load
+          Page.navigate({ url: "http://localhost:" + (port_offset + options.port).toString() + "/index.html" })
+        }, perror);
       });
     });
   });

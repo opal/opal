@@ -13,10 +13,10 @@ require 'net/http'
 module Opal
   module CliRunners
     class Firefox
-      SCRIPT_PATH = File.expand_path('firefox_cdp_interface.rb', __dir__).freeze
+      SCRIPT_PATH = File.expand_path('cdp_interface.rb', __dir__).freeze
 
-      DEFAULT_CHROME_HOST = 'localhost'
-      DEFAULT_CHROME_PORT = 9333 # makes sure it doesn't accidentally connect to a lingering chrome
+      DEFAULT_CDP_HOST = 'localhost'
+      DEFAULT_CDP_PORT = 9333 # makes sure it doesn't accidentally connect to a lingering chrome
 
       def self.call(data)
         runner = new(data)
@@ -44,8 +44,8 @@ module Opal
             prepare_files_in(dir)
 
             env = {
-              'CHROME_HOST' => chrome_host,
-              'CHROME_PORT' => chrome_port.to_s,
+              'OPAL_CDP_HOST' => chrome_host,
+              'OPAL_CDP_PORT' => chrome_port.to_s,
               'NODE_PATH' => File.join(__dir__, 'node_modules')
             }
             env['OPAL_CDP_EXT'] = builder.output_extension
@@ -93,11 +93,11 @@ module Opal
       end
 
       def chrome_host
-        ENV['CHROME_HOST'] || DEFAULT_CHROME_HOST
+        ENV['FIREFOX_HOST'] || ENV['OPAL_CDP_HOST'] || DEFAULT_CDP_HOST
       end
 
       def chrome_port
-        ENV['CHROME_PORT'] || DEFAULT_CHROME_PORT
+        ENV['FIREFOX_PORT'] || ENV['OPAL_CDP_PORT'] || DEFAULT_CDP_PORT
       end
 
       def with_firefox_server
@@ -109,7 +109,7 @@ module Opal
       end
 
       def run_firefox_server
-        raise 'Firefox server can be started only on localhost' if chrome_host != DEFAULT_CHROME_HOST
+        raise 'Firefox server can be started only on localhost' if chrome_host != DEFAULT_CDP_HOST
 
         profile = mktmpprofile
 
