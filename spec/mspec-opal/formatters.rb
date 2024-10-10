@@ -46,8 +46,8 @@ class BaseOpalFormatter
 
   def enter(describe); end
 
-  def before(state=nil)
-    @current_state = nil
+  def before(state = nil)
+    @current_state = state
     @failure = @exception = false
   end
 
@@ -59,7 +59,7 @@ class BaseOpalFormatter
   end
 
   def after(state = nil)
-    @current_state = state
+    @current_state = nil
     @examples += 1
   end
 
@@ -199,8 +199,8 @@ module InvertedFormatter
   end
 
   def after(state=nil)
-    super
     @actually_passing << @current_state unless exception?
+    super
   end
 
   def finish
