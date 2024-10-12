@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/nodes/base'
+require 'opal/regexp_transpiler'
 
 module Opal
   module Nodes
@@ -157,12 +158,15 @@ module Opal
         push ")"
       end
 
+      include Opal::RegexpTranspiler
+
       def compile_static_regexp
         value = self.value.children[0]
         case value
         when ''
-          push('/(?:)/')
-        when /\(\?[(<>#]|[*+?]\+/
+          helper :empty_regexp
+          push("$empty_regexp(#{flags.join.inspect})")
+        when /\(\?[(<>#]|[*+?]\+|\\G/
           # Safari/WebKit will not execute javascript code if it contains a lookbehind literal RegExp
           # and they fail with "Syntax Error". This tricks their parser by disguising the literal RegExp
           # as string for the dynamic $regexp helper. Safari/Webkit will still fail to execute the RegExp,
@@ -173,7 +177,18 @@ module Opal
           # errors) - at least since Node 17.
           static_as_dynamic(value)
         else
-          push "#{Regexp.new(value).inspect}#{flags.join}"
+          regexp_content = Regexp.new(value).inspect[1..-2]
+          old_flags = flags.join
+          new_regexp, new_flags = transform_regexp(regexp_content, old_flags)
+          push "/#{new_regexp}/#{new_flags}"
+
+          # Annotate the source regexp and flags, so it can be used to redo transforming while doing
+          # unions etc.
+          if regexp_content != new_regexp || old_flags != new_flags
+            helper :annotate_regexp
+            wrap '$annotate_regexp(', ", #{regexp_content != new_regexp ? regexp_content.inspect : 'null'}" \
+              "#{old_flags != new_flags ? ", #{old_flags.inspect}" : ''})"
+          end
         end
       end
 
@@ -181,7 +196,7 @@ module Opal
         helper :regexp
 
         push '$regexp(["'
-        push value.gsub('\\', '\\\\\\\\')
+        push value.gsub('\\', '\\\\\\\\').gsub('"', '\"')
         push '"]'
         push ", '#{flags.join}'" if flags.any?
         push ")"
@@ -215,11 +230,6 @@ module Opal
 
           self.value = value.updated(nil, parts)
           flags.delete('x')
-        end
-
-        if value.type == :str
-          # Replacing \A -> ^, \z -> $, required for the parser gem
-          self.value = s(:str, value.children[0].gsub('\A', '^').gsub('\z', '$'))
         end
       end
 

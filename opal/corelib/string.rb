@@ -1,4 +1,4 @@
-# helpers: coerce_to, respond_to, global_multiline_regexp, prop, opal32_init, opal32_add
+# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add
 # backtick_javascript: true
 
 require 'corelib/comparable'
@@ -369,7 +369,7 @@ class ::String < `String`
   end
 
   def chr
-    `self.charAt(0)`
+    `self == "" ? "" : String.fromCodePoint(self.codePointAt(0))`
   end
 
   def clone(freeze: nil)
@@ -529,7 +529,7 @@ class ::String < `String`
       var result = '', match_data = nil, index = 0, match, _replacement;
 
       if (pattern.$$is_regexp) {
-        pattern = $global_multiline_regexp(pattern);
+        pattern = $global_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
@@ -626,7 +626,7 @@ class ::String < `String`
       }
 
       if (search.$$is_regexp) {
-        regex = $global_multiline_regexp(search);
+        regex = $global_regexp(search);
         while (true) {
           match = regex.exec(self);
           if (match === null) {
@@ -935,7 +935,7 @@ class ::String < `String`
 
       if (search.$$is_regexp) {
         m = null;
-        r = $global_multiline_regexp(search);
+        r = $global_regexp(search);
         while (true) {
           _m = r.exec(self);
           if (_m === null || _m.index > offset) {
@@ -986,7 +986,7 @@ class ::String < `String`
 
       if (sep.$$is_regexp) {
         m = null;
-        r = $global_multiline_regexp(sep);
+        r = $global_regexp(sep);
 
         while (true) {
           _m = r.exec(self);
@@ -1033,7 +1033,7 @@ class ::String < `String`
           match;
 
       if (pattern.$$is_regexp) {
-        pattern = $global_multiline_regexp(pattern);
+        pattern = $global_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str');
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
@@ -1094,7 +1094,7 @@ class ::String < `String`
           i, max;
 
       if (pattern.$$is_regexp) {
-        pattern = $global_multiline_regexp(pattern);
+        pattern = $global_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str').$to_s();
 

@@ -111,7 +111,6 @@ opal_filter "language" do
   fails "Keyword arguments are now separated from positional arguments when the method takes a key: parameter when it's called with a positional Hash and no ** raises ArgumentError" # Expected ArgumentError (wrong number of arguments (given 4, expected 3)) but no exception was raised (42 was returned)
   fails "Keyword arguments are separated from positional arguments" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation does not work with (*args)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
-  fails "Keyword arguments delegation omitted values accepts short notation 'key' for 'key: value' syntax" # NameError: uninitialized constant MSpecEnv::a
   fails "Keyword arguments delegation works with (*args, **kwargs)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with (...)" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Keyword arguments delegation works with -> (*args, **kwargs) {}" # Expected [[], {}] == [[{}], {}] to be truthy but was false
@@ -130,7 +129,6 @@ opal_filter "language" do
   fails "Literal (A::X) constant resolution uses the module or class #name to craft the error message" # Expected NameError (/uninitialized constant ModuleName::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x913aa>::DOES_NOT_EXIST)
   fails "Literal Ranges creates a simple range as an object literal" # Expected 1..3.equal? 1..3 to be truthy but was false
   fails "Literal Regexps caches the Regexp object" # Expected /foo/ to be identical to /foo/
-  fails "Literal Regexps support handling unicode 9.0 characters with POSIX bracket expressions" # Expected "" == "𐓘" to be truthy but was false
   fails "Literal Regexps supports (?# )" # Exception: Invalid regular expression: /foo(?#comment)bar/: Invalid group
   fails "Literal Regexps supports (?> ) (embedded subexpression)" # Exception: Invalid regular expression: /(?>foo)(?>bar)/: Invalid group
   fails "Literal Regexps supports \\g (named backreference)" # Expected [] == ["foo1barfoo2", "foo2"] to be truthy but was false
@@ -248,10 +246,6 @@ opal_filter "language" do
   fails "Ruby String interpolation returns a string with the source encoding by default" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
   fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
   fails "Source files encoded in UTF-16 LE without a BOM are parsed as empty because they contain a NUL byte before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9a8a0>
-  fails "The ** operator hash with omitted value accepts mixed syntax" # NameError: uninitialized constant MSpecEnv::a
-  fails "The ** operator hash with omitted value accepts short notation 'key' for 'key: value' syntax" # NameError: uninitialized constant MSpecEnv::a
-  fails "The ** operator hash with omitted value ignores hanging comma on short notation" # NameError: uninitialized constant MSpecEnv::a
-  fails "The ** operator hash with omitted value works with methods and local vars" # NameError: uninitialized constant #<Class:0xabe00>::bar
   fails "The BEGIN keyword accesses variables outside the eval scope" # SyntaxError: Unsupported sexp: preexe
   fails "The BEGIN keyword runs first in a given code unit" # SyntaxError: Unsupported sexp: preexe
   fails "The BEGIN keyword runs in a shared scope" # SyntaxError: Unsupported sexp: preexe
@@ -337,8 +331,6 @@ opal_filter "language" do
   fails "Using yield in non-lambda block raises a SyntaxError" # Expected SyntaxError (/Invalid yield/) but got: SyntaxError (undefined method `uses_block!' for nil)
   fails "a method definition that sets more than one default parameter all to the same value only allows overriding the default value of the first such parameter in each set" # Expected ArgumentError (wrong number of arguments (given 2, expected 0..1)) but got: ArgumentError ([MSpecEnv#foo] wrong number of arguments (given 2, expected -1))
   fails "a method definition that sets more than one default parameter all to the same value treats the argument after the multi-parameter normally" # Expected ArgumentError (wrong number of arguments (given 3, expected 0..2)) but got: ArgumentError ([MSpecEnv#bar] wrong number of arguments (given 3, expected -1))
-  fails "kwarg with omitted value in a method call accepts short notation 'kwarg' in method call for definition 'def call(*args, **kwargs) = [args, kwargs]'" # NameError: uninitialized constant SpecEvaluate::a
-  fails "kwarg with omitted value in a method call with methods and local variables for definition \n    def call(*args, **kwargs) = [args, kwargs]\n    def bar\n      \"baz\"\n    end\n    def foo(val)\n      call bar:, val:\n    end" # NameError: uninitialized constant SpecEvaluate::bar
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols" # Expected TypeError but got: Exception (Cannot create property '$$meta' on string 'symbol')
   fails "self.send(:block_given?) returns false when a method defined by define_method is called with a block" # NoMethodError: undefined method `block_given?' for KernelSpecs::SelfBlockGiven
   fails "self.send(:block_given?) returns true if and only if a block is supplied" # NoMethodError: undefined method `block_given?' for KernelSpecs::SelfBlockGiven
