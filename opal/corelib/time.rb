@@ -8,10 +8,10 @@ class ::Time < `Date`
   include ::Comparable
 
   %x{
-    var days_of_week = #{%w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday Sunday]},
-        short_days   = #{%w[Sun Mon Tue Wed Thu Fri Sat]},
-        short_months = #{%w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]},
-        long_months  = #{%w[January February March April May June July August September October November December]};
+    self.$$daynames        = #{%w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday].freeze},
+    self.$$abbr_daynames   = #{%w[Sun Mon Tue Wed Thu Fri Sat].freeze},
+    self.$$abbr_monthnames = #{([nil] + %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]).freeze},
+    self.$$monthnames      = #{([nil] + %w[January February March April May June July August September October November December]).freeze};
   }
 
   def self.at(seconds, frac = undefined)
@@ -506,13 +506,13 @@ class ::Time < `Date`
             break;
 
           case 'B':
-            result += long_months[#{mon} - 1];
+            result += Opal.Time.$$monthnames[#{mon}];
             break;
 
           case 'b':
           case 'h':
             blank   = !zero;
-            result += short_months[#{mon} - 1];
+            result += Opal.Time.$$abbr_monthnames[#{mon}];
             break;
 
           case 'd':
@@ -608,11 +608,11 @@ class ::Time < `Date`
             break;
 
           case 'A':
-            result += days_of_week[#{wday}];
+            result += Opal.Time.$$daynames[#{wday}];
             break;
 
           case 'a':
-            result += short_days[#{wday}];
+            result += Opal.Time.$$abbr_daynames[#{wday}];
             break;
 
           case 'u':
