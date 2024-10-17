@@ -10,10 +10,10 @@ require 'opal/os'
 module Opal
   module CliRunners
     class Chrome
-      SCRIPT_PATH = File.expand_path('chrome_cdp_interface.rb', __dir__).freeze
+      SCRIPT_PATH = File.expand_path('cdp_interface.rb', __dir__).freeze
 
-      DEFAULT_CHROME_HOST = 'localhost'
-      DEFAULT_CHROME_PORT = 9222
+      DEFAULT_CDP_HOST = 'localhost'
+      DEFAULT_CDP_PORT = 9222
 
       def self.call(data)
         runner = new(data)
@@ -39,8 +39,8 @@ module Opal
             prepare_files_in(dir)
 
             env = {
-              'CHROME_HOST' => chrome_host,
-              'CHROME_PORT' => chrome_port.to_s,
+              'OPAL_CDP_HOST' => chrome_host,
+              'OPAL_CDP_PORT' => chrome_port.to_s,
               'NODE_PATH' => File.join(__dir__, 'node_modules'),
               'OPAL_CDP_EXT' => builder.output_extension
             }
@@ -102,11 +102,11 @@ module Opal
       end
 
       def chrome_host
-        ENV['CHROME_HOST'] || DEFAULT_CHROME_HOST
+        ENV['CHROME_HOST'] || ENV['OPAL_CDP_HOST'] || DEFAULT_CDP_HOST
       end
 
       def chrome_port
-        ENV['CHROME_PORT'] || DEFAULT_CHROME_PORT
+        ENV['CHROME_PORT'] || ENV['OPAL_CDP_PORT'] || DEFAULT_CDP_PORT
       end
 
       def with_chrome_server
@@ -118,7 +118,7 @@ module Opal
       end
 
       def run_chrome_server
-        raise 'Chrome server can be started only on localhost' if chrome_host != DEFAULT_CHROME_HOST
+        raise 'Chrome server can be started only on localhost' if chrome_host != DEFAULT_CDP_HOST
 
         profile = mktmpprofile
 

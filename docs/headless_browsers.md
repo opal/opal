@@ -68,9 +68,9 @@ or runs the server on its own. It detects your platform and uses a default path 
 (`Opal::CliRunners::Chrome#chrome_executable`), but you can override it by specifying `GOOGLE_CHROME_BINARY` environment
 variable.
 
-When the server is up and running it passes compiled js code to `lib/opal/cli_runners/chrome_cdp_interface.rb`
+When the server is up and running it passes compiled js code to `lib/opal/cli_runners/cdp_interface.rb`
 as a plain input using stdin (basically, it's a second part of the runner).
-`chrome_cdp_interface.rb` is a node js + Opal script that does the main job. It runs any provided code on the running chrome server,
+`cdp_interface.rb` is a node js + Opal script that does the main job. It runs any provided code on the running chrome server,
 catches errors and forwards console messages.
 
 ### Firefox
@@ -78,27 +78,25 @@ catches errors and forwards console messages.
 This runner tries to connect to `localhost:9333` (9333 is the default port for a headless firefox server used by Opal to prevent accidental
 connection to a lingering Chrome at port 9222)
 or runs the server on its own. It detects your platform and uses a default path to the Firefox executable
-(`Opal::CliRunners::Firefox#firefox_executable`), but you can override it by specifying `MOZILLA_FIREFOX_BINARY` environment
+(`Opal::CliRunners::Firefox#firefox_executable`), but you can override it by specifying `MOZILLA_FIREFOX_BINARY` environment 
 variable.
 
-When the server is up and running it passes compiled js code to `lib/opal/cli_runners/firefox_cdp_interface.rb`
+When the server is up and running it passes compiled js code to `lib/opal/cli_runners/cdp_interface.rb`
 as a plain input using stdin (basically, it's a second part of the runner).
-`firefox_cdp_interface.rb` is a node js + Opal script that does the main job. It runs any provided code on the running chrome server,
+`cdp_interface.rb` is a node js + Opal script that does the main job. It runs any provided code on the running firefox server, 
 catches errors and forwards console messages.
 
-## Using a remote chrome server
+## Using a remote chrome or firefox server
 
-If you want to change a default chrome port or your chrome server is running on a different host:port
-you can override default values by specifying `CHROME_HOST` and `CHROME_PORT` environment variables:
+If you want to change a default browser port or your browser server is running on a different host:port
+you can override default values by specifying `OPAL_CDP_HOST` and `OPAL_CDP_PORT` environment variables:
 
-      $ CHROME_HOST=10.10.10.10 CHROME_PORT=8080 opal -Rchrome -e "puts 42"
+      $ OPAL_CDP_HOST=10.10.10.10 CHROME_PORT=8080 opal -Rchrome -e "puts 42"
       Connecting to 10.10.10.10:8080...
       42
 
-NOTE: `CHROME_HOST` requires a chrome server to be started. You can't start remotely a server on a different host.
-
-The `CHROME_HOST` and `CHROME_PORT` environment variables are also used by the Firefox runner, the underlying 'chrome-remote-interface'
-node module depends on them.
+If you want to change host and port only for chrome use `CHROME_HOST` and `CHROME_PORT` and only for firefox use `FIREFOX_HOST` and `FIREFOX_PORT`.
+NOTE: `OPAL_CDP_HOST` requires a chrome or firefox server to be started. You can't start remotely a server on a different host.
 
 ## Additional options
 
