@@ -83,6 +83,7 @@ class OSpecFormatter
       'chrome'       => DottedFormatter,
       'firefox'      => DottedFormatter,
       'safari'       => DottedFormatter,
+      'bun'         => NodeJSFormatter,
       'deno'         => NodeJSFormatter,
       'node'         => NodeJSFormatter,
       'nodejs'       => NodeJSFormatter,
