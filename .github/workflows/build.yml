@@ -94,7 +94,7 @@ jobs:
     continue-on-error: ${{ matrix.combo.permissive || false }}
     steps:
       - if: ${{ matrix.combo.bun }}
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
       - if: ${{ matrix.combo.deno }}
         uses: denoland/setup-deno@v2
       - if: ${{ matrix.combo.firefox }}

@@ -1,32 +1,6 @@
 # backtick_javascript: true
 # use_strict: true
 
-%x{
-  var warnings = {};
-
-  function handle_unsupported_feature(message) {
-    switch (Opal.config.unsupported_features_severity) {
-    case 'error':
-      #{::Kernel.raise ::NotImplementedError, `message`}
-      break;
-    case 'warning':
-      warn(message)
-      break;
-    default: // ignore
-      // noop
-    }
-  }
-
-  function warn(string) {
-    if (warnings[string]) {
-      return;
-    }
-
-    warnings[string] = true;
-    #{warn(`string`)};
-  }
-}
-
 class ::String
   `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal."`
 
@@ -38,25 +12,6 @@ class ::String
     define_method method_name do |*|
       ::Kernel.raise ::NotImplementedError, `ERROR` % method_name
     end
-  end
-end
-
-module ::Kernel
-  `var ERROR = "Object tainting is not supported by Opal"`
-
-  def taint
-    `handle_unsupported_feature(ERROR)`
-    self
-  end
-
-  def untaint
-    `handle_unsupported_feature(ERROR)`
-    self
-  end
-
-  def tainted?
-    `handle_unsupported_feature(ERROR)`
-    false
   end
 end
 
