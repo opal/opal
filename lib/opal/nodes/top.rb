@@ -88,7 +88,7 @@ module Opal
 
         if compiler.requirable?
           unshift "#{async_prefix}function(Opal) {"
-        elsif compiler.eval?
+        elsif compiler.eval? || compiler.irb?
           unshift "(#{async_prefix}function(Opal, self) {"
         else
           unshift "Opal.queue(#{async_prefix}function(Opal) {"
@@ -104,9 +104,9 @@ module Opal
             # require absolute paths from CLI. For other cases
             # we can expect the module names to be normalized
             # already.
-            line "Opal.load_normalized(#{module_name.inspect});"
+            line "Opal.queue(()=>{ Opal.load_normalized(#{module_name.inspect}) });"
           end
-        elsif compiler.eval?
+        elsif compiler.eval? || compiler.irb?
           line "})(Opal, self);"
         else
           line "});\n"

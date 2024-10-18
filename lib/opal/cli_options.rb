@@ -196,6 +196,10 @@ module Opal
         options[:irb] = true
       end
 
+      on('--await', 'Enable async/await support') do
+        options[:await] = true
+      end
+
       on('-M', '--no-method-missing', 'Disable method missing') do
         options[:method_missing] = false
       end

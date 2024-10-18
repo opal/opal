@@ -1,5 +1,7 @@
 # backtick_javascript: true
+# await: true
 
+require 'await'
 require 'pp'
 require 'stringio'
 
@@ -95,6 +97,7 @@ module REPLUtils
         }
       }
     }
+    nil.__await__ # bogus call to make this method async
   rescue Exception => e # rubocop:disable Lint/RescueException
     e.full_message(highlight: true)
   end
@@ -103,7 +106,7 @@ module REPLUtils
     while (line = gets)
       input = JSON.parse(line)
 
-      out = eval_and_print(input[:code], input[:mode], input[:colors])
+      out = eval_and_print(input[:code], input[:mode], input[:colors]).__await__
       puts out if out
       puts '<<<ready>>>'
     end
