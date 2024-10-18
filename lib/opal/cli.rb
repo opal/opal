@@ -114,7 +114,7 @@ module Opal
     def run_repl
       require 'opal/repl'
 
-      repl = REPL.new
+      repl = REPL.new(@runner_type)
       repl.run(argv)
     end
 
@@ -197,6 +197,7 @@ module Opal
         parse_comments
         esm
         directory
+        await
       ]
     end
 
