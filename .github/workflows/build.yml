@@ -95,6 +95,8 @@ jobs:
     steps:
       - if: ${{ matrix.combo.bun }}
         uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.30
       - if: ${{ matrix.combo.deno }}
         uses: denoland/setup-deno@v2
       - if: ${{ matrix.combo.firefox }}
