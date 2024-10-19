@@ -100,10 +100,9 @@
 
   // Retrieve or assign the id of an object
   Opal.id = function(obj) {
-    if (obj.$$is_number) return (obj * 2)+1;
-    if (obj.$$id == null) {
-      $prop(obj, '$$id', $uid());
-    }
+    if (obj.$$is_integer) return (obj * 2n)+1n;
+    if (obj.$$is_float) return (obj * 2)+1;
+    if (obj.$$id == null) $prop(obj, '$$id', $uid());
     return obj.$$id;
   };
 
@@ -215,8 +214,11 @@
   Opal.coerce_to = function(object, type, method, args) {
     var body;
 
-    if (method === 'to_int' && type === Opal.Integer && object.$$is_number)
-      return object < 0 ? Math.ceil(object) : Math.floor(object);
+    if (method === 'to_int' && type === Opal.Integer && object.$$is_integer)
+      return object;
+
+    if (method === 'to_int' && type === Opal.Integer && object.$$is_float)
+      return BigInt(object < 0 ? Math.ceil(object) : Math.floor(object));
 
     if (method === 'to_str' && type === Opal.String && object.$$is_string)
       return object;
@@ -1760,10 +1762,6 @@
       return true;
     }
 
-    if (object.$$is_number && klass.$$is_number_class) {
-      return (klass.$$is_integer_class) ? (object % 1) === 0 : true;
-    }
-
     var ancestors = $ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
 
     return ancestors.indexOf(klass) !== -1;
@@ -2917,12 +2915,15 @@
   // Operator helpers
   // ----------------
 
-  function are_both_numbers(l,r) { return typeof(l) === 'number' && typeof(r) === 'number' }
+  function are_both_numbers(l,r) {
+    // if (typeof l === 'bigint' && typeof r === 'bigint') return true;
+    // if (typeof l === 'number' && typeof r === 'number') return true;
+  }
 
   Opal.rb_plus   = function(l,r) { return are_both_numbers(l,r) ? l + r : l['$+'](r); }
   Opal.rb_minus  = function(l,r) { return are_both_numbers(l,r) ? l - r : l['$-'](r); }
   Opal.rb_times  = function(l,r) { return are_both_numbers(l,r) ? l * r : l['$*'](r); }
-  Opal.rb_divide = function(l,r) { return are_both_numbers(l,r) ? l / r : l['$/'](r); }
+  Opal.rb_divide = function (l, r) { return are_both_numbers(l, r) ? l / r : l['$/'](r) }
   Opal.rb_lt     = function(l,r) { return are_both_numbers(l,r) ? l < r : l['$<'](r); }
   Opal.rb_gt     = function(l,r) { return are_both_numbers(l,r) ? l > r : l['$>'](r); }
   Opal.rb_le     = function(l,r) { return are_both_numbers(l,r) ? l <= r : l['$<='](r); }

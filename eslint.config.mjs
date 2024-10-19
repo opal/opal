@@ -1,26 +1,31 @@
 import globals from "globals";
 import js from "@eslint/js";
+console.log(js.configs.recommended);
+
+// "parserOptions": {
+//   -    "ecmaVersion": 12
+//   +    "ecmaVersion": 2020,
+//      },
+//      "rules": {
+//        "no-unused-vars": ["error", {
+//   @@ -35,5 +35,6 @@ module.exports = {
+//        "Int32Array": "readonly",
+//        "WeakRef": "readonly",
+//        "Map": "readonly",
+//   +    "BigInt": "readonly",
+
 
 export default [
   js.configs.recommended,
   {
     languageOptions: {
-      ecmaVersion: 12,
+      ecmaVersion: 2021,
       sourceType: "commonjs",
       globals: {
           ...globals.browser,
           ...globals.node,
-          ArrayBuffer: "readonly",
-          DataView: "readonly",
-          globalThis: "readonly",
+          ...globals.es2020,
           Opal: "readonly",
-          Promise: "readonly",
-          Proxy: "readonly",
-          Reflect: "readonly",
-          Uint8Array: "readonly",
-          Int32Array: "readonly",
-          WeakRef: "readonly",
-          Map: "readonly",
       },
     },
 

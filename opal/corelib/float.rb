@@ -3,10 +3,11 @@
 
 require 'corelib/numeric'
 
-class ::Number < ::Numeric
+class ::Float < ::Numeric
   ::Opal.bridge(`Number`, self)
+  `Opal.prop(self.$$prototype, '$$is_float', true)`
   `Opal.prop(self.$$prototype, '$$is_number', true)`
-  `self.$$is_number_class = true`
+  `self.$$is_float_class = true`
   `var number_id_map = new Map()`
 
   class << self
@@ -15,27 +16,22 @@ class ::Number < ::Numeric
     end
 
     undef :new
+
+    def ===(other)
+      `!!other.$$is_float`
+    end
   end
 
-  def coerce(other)
-    %x{
-      if (other === nil) {
-        #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
-      }
-      else if (other.$$is_string) {
-        return [#{::Kernel.Float(other)}, self];
-      }
-      else if (#{other.respond_to?(:to_f)}) {
-        return [#{::Opal.coerce_to!(other, ::Float, :to_f)}, self];
-      }
-      else if (other.$$is_number) {
-        return [other, self];
-      }
-      else {
-        #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
-      }
-    }
-  end
+  self::INFINITY = `Infinity`
+  self::MAX      = `Number.MAX_VALUE`
+  self::MIN      = `Number.MIN_VALUE`
+  self::NAN      = `NaN`
+
+  self::DIG      = 15
+  self::MANT_DIG = 53
+  self::RADIX    = 2
+
+  self::EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
 
   def __id__
     %x{
@@ -68,7 +64,7 @@ class ::Number < ::Numeric
 
   def +(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_float) {
         return self + other;
       }
       else {
@@ -79,18 +75,18 @@ class ::Number < ::Numeric
 
   def -(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_float)
         return self - other;
-      }
-      else {
+      else if (other.$$is_integer)
+        return self - Number(other);
+      else
         return #{__coerced__ :-, other};
-      }
     }
   end
 
   def *(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_float) {
         return self * other;
       }
       else {
@@ -101,7 +97,7 @@ class ::Number < ::Numeric
 
   def /(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_float) {
         return self / other;
       }
       else {
@@ -112,7 +108,7 @@ class ::Number < ::Numeric
 
   def %(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_float) {
         if (other == -Infinity) {
           return other;
         }
@@ -134,7 +130,7 @@ class ::Number < ::Numeric
 
   def &(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_float) {
         return self & other;
       }
       else {
@@ -145,7 +141,7 @@ class ::Number < ::Numeric
 
   def |(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_float) {
         return self | other;
       }
       else {
@@ -156,7 +152,7 @@ class ::Number < ::Numeric
 
   def ^(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_float) {
         return self ^ other;
       }
       else {
@@ -165,55 +161,18 @@ class ::Number < ::Numeric
     }
   end
 
-  def <(other)
-    %x{
-      if (other.$$is_number) {
-        return self < other;
-      }
-      else {
-        return #{__coerced__ :<, other};
-      }
-    }
-  end
-
-  def <=(other)
-    %x{
-      if (other.$$is_number) {
-        return self <= other;
-      }
-      else {
-        return #{__coerced__ :<=, other};
-      }
-    }
-  end
-
-  def >(other)
-    %x{
-      if (other.$$is_number) {
-        return self > other;
-      }
-      else {
-        return #{__coerced__ :>, other};
-      }
-    }
-  end
-
-  def >=(other)
-    %x{
-      if (other.$$is_number) {
-        return self >= other;
-      }
-      else {
-        return #{__coerced__ :>=, other};
-      }
-    }
-  end
+  def <(other)= `other.$$is_number ? self < other : #{__coerced__ :<, other}`
+  def <=(other)= `other.$$is_number ? self <= other : #{__coerced__ :<=, other}`
+  def >(other)= `other.$$is_number ? self > other : #{__coerced__ :>, other}`
+  def >=(other)= `other.$$is_number ? self >= other : #{__coerced__ :>=, other}`
 
   # Compute the result of the spaceship operator inside its own function so it
   # can be optimized despite a try/finally construct.
   %x{
     var spaceship_operator = function(self, other) {
-      if (other.$$is_number) {
+      if (other.$$is_integer) other = Number(other);
+
+      if (other.$$is_float) {
         if (isNaN(self) || isNaN(other)) {
           return nil;
         }
@@ -277,15 +236,17 @@ class ::Number < ::Numeric
   end
 
   def **(other)
-    if ::Integer === other
-      if !(::Integer === self) || other > 0
-        `Math.pow(self, other)`
+    `if (Number.isInteger(self)) return BigInt(self)["$**"](other);`
+
+    if `Number.isInteger(Number(other))`
+      if !(`Number.isInteger(self)`) || other > 0
+        `Math.pow(self, Number(other))`
       else
-        ::Rational.new(self, 1)**other
+        ::Rational.new(self, 1) ** other
       end
     elsif self < 0 && (::Float === other || ::Rational === other)
       ::Complex.new(self, 0)**other.to_f
-    elsif `other.$$is_number != null`
+    elsif `other.$$is_float`
       `Math.pow(self, other)`
     else
       __coerced__ :**, other
@@ -294,7 +255,7 @@ class ::Number < ::Numeric
 
   def ==(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_float) {
         return self.valueOf() === other.valueOf();
       }
       else if (#{other.respond_to? :==}) {
@@ -347,28 +308,6 @@ class ::Number < ::Numeric
     }
   end
 
-  def bit_length
-    unless ::Integer === self
-      ::Kernel.raise ::NoMethodError.new("undefined method `bit_length` for #{self}:Float", 'bit_length')
-    end
-
-    %x{
-      if (self === 0 || self === -1) {
-        return 0;
-      }
-
-      var result = 0,
-          value  = self < 0 ? ~self : self;
-
-      while (value != 0) {
-        result   += 1;
-        value  >>>= 1;
-      }
-
-      return result;
-    }
-  end
-
   def ceil(ndigits = 0)
     %x{
       var f = #{to_f};
@@ -409,7 +348,7 @@ class ::Number < ::Numeric
     end
 
     %x{
-      if (!stop.$$is_number) {
+      if (!stop.$$is_float) {
         #{::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
       for (var i = self; i >= stop; i--) {
@@ -430,17 +369,17 @@ class ::Number < ::Numeric
 
   def floor(ndigits = 0)
     %x{
-      var f = #{to_f};
+      ndigits = Number(ndigits);
 
-      if (f % 1 === 0 && ndigits >= 0) {
-        return f;
+      if (self % 1 === 0 && ndigits >= 0) {
+        return self;
       }
 
       var factor = Math.pow(10, ndigits),
-          result = Math.floor(f * factor) / factor;
+          result = Math.floor(self * factor) / factor;
 
-      if (f % 1 === 0) {
-        result = Math.round(result);
+      if (result % 1 === 0) {
+        return BigInt(Math.round(result));
       }
 
       return result;
@@ -473,22 +412,6 @@ class ::Number < ::Numeric
 
   def integer?
     `self % 1 === 0`
-  end
-
-  def is_a?(klass)
-    return true if klass == ::Integer && ::Integer === self
-    return true if klass == ::Integer && ::Integer === self
-    return true if klass == ::Float && ::Float === self
-
-    super
-  end
-
-  def instance_of?(klass)
-    return true if klass == ::Integer && ::Integer === self
-    return true if klass == ::Integer && ::Integer === self
-    return true if klass == ::Float && ::Float === self
-
-    super
   end
 
   def lcm(other)
@@ -570,11 +493,7 @@ class ::Number < ::Numeric
   end
 
   def quo(other)
-    if ::Integer === self
-      super
-    else
-      self / other
-    end
+    self / other
   end
 
   def rationalize(eps = undefined)
@@ -584,9 +503,7 @@ class ::Number < ::Numeric
       }
     }
 
-    if ::Integer === self
-      ::Rational.new(self, 1)
-    elsif infinite?
+    if infinite?
       ::Kernel.raise ::FloatDomainError, 'Infinity'
     elsif nan?
       ::Kernel.raise ::FloatDomainError, 'NaN'
@@ -606,68 +523,35 @@ class ::Number < ::Numeric
   end
 
   def round(ndigits = undefined)
-    if ::Integer === self
-      if `ndigits == null`
-        return self
-      end
-
-      if ::Float === ndigits && ndigits.infinite?
-        ::Kernel.raise ::RangeError, 'Infinity'
-      end
-
-      ndigits = ::Opal.coerce_to!(ndigits, ::Integer, :to_int)
-
-      if ndigits < ::Integer::MIN
-        ::Kernel.raise ::RangeError, 'out of bounds'
-      end
-
-      if `ndigits >= 0`
-        return self
-      end
-
-      ndigits = -ndigits
-
-      %x{
-        if (0.415241 * ndigits - 0.125 > #{size}) {
-          return 0;
-        }
-
-        var f = Math.pow(10, ndigits),
-            x = Math.floor((Math.abs(self) + f / 2) / f) * f;
-
-        return self < 0 ? -x : x;
-      }
-    else
-      if nan? && `ndigits == null`
-        ::Kernel.raise ::FloatDomainError, 'NaN'
-      end
-
-      ndigits = ::Opal.coerce_to!(`ndigits || 0`, ::Integer, :to_int)
-
-      if ndigits <= 0
-        if nan?
-          ::Kernel.raise ::RangeError, 'NaN'
-        elsif infinite?
-          ::Kernel.raise ::FloatDomainError, 'Infinity'
-        end
-      elsif ndigits == 0
-        return `Math.round(self)`
-      elsif nan? || infinite?
-        return self
-      end
-
-      _, exp = ::Math.frexp(self)
-
-      if ndigits >= (::Float::DIG + 2) - (exp > 0 ? exp / 4 : exp / 3 - 1)
-        return self
-      end
-
-      if ndigits < -(exp > 0 ? exp / 3 + 1 : exp / 4)
-        return 0
-      end
-
-      `Math.round(self * Math.pow(10, ndigits)) / Math.pow(10, ndigits)`
+    if nan? && `ndigits == null`
+      ::Kernel.raise ::FloatDomainError, 'NaN'
     end
+
+    ndigits = ::Opal.coerce_to!(`ndigits || 0`, ::Integer, :to_int)
+
+    if ndigits <= 0
+      if nan?
+        ::Kernel.raise ::RangeError, 'NaN'
+      elsif infinite?
+        ::Kernel.raise ::FloatDomainError, 'Infinity'
+      end
+    elsif ndigits == 0
+      return `Math.round(self)`
+    elsif nan? || infinite?
+      return self
+    end
+
+    _, exp = ::Math.frexp(self)
+
+    if ndigits >= (::Float::DIG + 2) - (exp > 0 ? exp / 4 : exp / 3 - 1)
+      return self
+    end
+
+    if ndigits < -(exp > 0 ? exp / 3 + 1 : exp / 4)
+      return 0
+    end
+
+    `Math.round(self * Math.pow(10, ndigits)) / Math.pow(10, ndigits)`
   end
 
   def times(&block)
@@ -687,19 +571,19 @@ class ::Number < ::Numeric
   end
 
   def to_i
-    `self < 0 ? Math.ceil(self) : Math.floor(self)`
+    `BigInt(self < 0 ? Math.ceil(self) : Math.floor(self))`
+  end
+
+  def to_int
+    `BigInt(self < 0 ? Math.ceil(self) : Math.floor(self))`
   end
 
   def to_r
-    if ::Integer === self
-      ::Rational.new(self, 1)
-    else
-      f, e  = ::Math.frexp(self)
-      f     = ::Math.ldexp(f, ::Float::MANT_DIG).to_i
-      e    -= ::Float::MANT_DIG
+    f, e  = ::Math.frexp(self)
+    f     = ::Math.ldexp(f, ::Float::MANT_DIG).to_i
+    e    -= ::Float::MANT_DIG
 
-      (f * (::Float::RADIX**e)).to_r
-    end
+    (f * (::Float::RADIX**e)).to_r
   end
 
   def to_s(base = 10)
@@ -714,7 +598,18 @@ class ::Number < ::Numeric
       return '-0.0'
     end
 
-    `self.toString(base)`
+    str = `self.toString(Number(base))`
+
+    %x{
+      if (
+        !Number.isNaN(self) &&
+          self != Infinity &&
+          self != -Infinity &&
+          str.indexOf('.') === -1
+      ) str += '.0'
+    }
+
+    str
   end
 
   def truncate(ndigits = 0)
@@ -784,7 +679,7 @@ class ::Number < ::Numeric
     end
 
     %x{
-      if (!stop.$$is_number) {
+      if (!stop.$$is_float) {
         #{::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
       }
       for (var i = self; i <= stop; i++) {
@@ -805,7 +700,7 @@ class ::Number < ::Numeric
   end
 
   def nan?
-    `isNaN(self)`
+    `Number.isNaN(self)`
   end
 
   def finite?
@@ -897,7 +792,7 @@ class ::Number < ::Numeric
 
   alias arg angle
   alias eql? ==
-  alias fdiv /
+  alias fdiv / #
   alias inspect to_s
   alias kind_of? is_a?
   alias magnitude abs
@@ -905,65 +800,4 @@ class ::Number < ::Numeric
   alias object_id __id__
   alias phase angle
   alias succ next
-  alias to_int to_i
-end
-
-::Fixnum = ::Number
-
-class ::Integer < ::Numeric
-  `self.$$is_number_class = true`
-  `self.$$is_integer_class = true`
-
-  class << self
-    def allocate
-      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
-    end
-
-    undef :new
-
-    def sqrt(n)
-      n = ::Opal.coerce_to!(n, ::Integer, :to_int)
-      %x{
-        if (n < 0) {
-          #{::Kernel.raise ::Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
-        }
-
-        return parseInt(Math.sqrt(n), 10);
-      }
-    end
-
-    def try_convert(object)
-      Opal.coerce_to?(object, self, :to_int)
-    end
-  end
-
-  self::MAX = `Math.pow(2, 30) - 1`
-  self::MIN = `-Math.pow(2, 30)`
-end
-
-class ::Float < ::Numeric
-  `self.$$is_number_class = true`
-
-  class << self
-    def allocate
-      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
-    end
-
-    undef :new
-
-    def ===(other)
-      `!!other.$$is_number`
-    end
-  end
-
-  self::INFINITY = `Infinity`
-  self::MAX      = `Number.MAX_VALUE`
-  self::MIN      = `Number.MIN_VALUE`
-  self::NAN      = `NaN`
-
-  self::DIG      = 15
-  self::MANT_DIG = 53
-  self::RADIX    = 2
-
-  self::EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
 end
