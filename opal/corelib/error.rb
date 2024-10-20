@@ -142,7 +142,7 @@ class ::Exception < `Error`
       return "#{@message}\n#{`self.stack`}"
     end
 
-    kwargs = { highlight: $stderr.tty?, order: :top }.merge(kwargs || {})
+    kwargs = { highlight: $stderr&.tty?, order: :top }.merge(kwargs || {})
     highlight, order = kwargs[:highlight], kwargs[:order]
 
     ::Kernel.raise ::ArgumentError, "expected true or false as highlight: #{highlight}" unless [true, false].include? highlight
