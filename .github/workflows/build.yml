@@ -17,7 +17,7 @@ jobs:
     env:
       DEFAULT_RUBY: '3.3'
     strategy:
-      max-parallel: 6
+      max-parallel: 8
       fail-fast: false
       matrix:
         combo:
