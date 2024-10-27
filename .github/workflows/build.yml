@@ -98,10 +98,8 @@ jobs:
             ruby: '3.0'
           - name: jruby
             ruby: jruby
-          # truffleruby: disabled, does not finish on github actions
-          # probably not enough memory
-          # - name: truffleruby
-          #   ruby: 'truffleruby'
+          - name: truffleruby
+            ruby: 'truffleruby'
           - name: windows
             command: bundle exec rake rspec
             os: windows-latest
