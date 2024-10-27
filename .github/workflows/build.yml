@@ -68,10 +68,8 @@ jobs:
             ruby: '3.0'
           - name: jruby
             ruby: 'jruby'
-          # truffleruby: disabled, does not finish on github actions
-          # probably not enough memory
-          # - name: truffleruby
-          #   ruby: 'truffleruby'
+          - name: truffleruby
+            ruby: 'truffleruby'
           # - name: windows-mspec-firefox
           #   firefox: '106.0.4'
           #   command: bundle exec rake mspec_firefox
