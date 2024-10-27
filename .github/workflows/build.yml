@@ -17,16 +17,30 @@ jobs:
     env:
       DEFAULT_RUBY: '3.3'
     strategy:
+      max-parallel: 6
       fail-fast: false
       matrix:
         combo:
+          - name: lint
+            command: bin/rake lint
+          - name: smoke-test
+            command: bin/rake smoke_test
           - name: mspec-nodejs
             command: bin/rake mspec_nodejs
+          - name: mspec-nodejs-windows
+            command: bundle exec rake mspec_nodejs
+            os: windows-latest
           - name: mspec-chrome
             command: bin/rake mspec_chrome
+          - name: mspec-chrome-windows
+            command: bundle exec rake mspec_chrome
+            os: windows-latest
           - name: mspec-firefox
             firefox: '106.0.4'
             command: xvfb-run bin/rake mspec_firefox
+          - name: mspec-safari
+            command: bundle exec rake mspec_safari
+            os: 'macos-latest'
           - name: mspec-bun
             bun: true
             command: bin/rake mspec_bun
@@ -38,6 +52,9 @@ jobs:
           - name: minitest-strict-mode
             command: bin/rake minitest
             strict: 'true'
+          - name: minitest-windows
+            command: bundle exec rake minitest
+            os: windows-latest
           # - name: head-ruby
           #   ruby: head
           #   permissive: true
@@ -55,32 +72,16 @@ jobs:
           # probably not enough memory
           # - name: truffleruby
           #   ruby: 'truffleruby'
-          - name: smoke-test
-            command: bin/rake smoke_test
-          - name: windows-mspec-nodejs
-            command: bundle exec rake mspec_nodejs
-            os: windows-latest
-          - name: windows-mspec-chrome
-            command: bundle exec rake mspec_chrome
-            os: windows-latest
           # - name: windows-mspec-firefox
           #   firefox: '106.0.4'
           #   command: bundle exec rake mspec_firefox
           #   os: windows-latest
-          - name: macos-mspec-safari
-            command: bundle exec rake mspec_safari
-            os: 'macos-latest'
-          - name: windows-minitest
-            command: bundle exec rake minitest
-            os: windows-latest
           - name: windows
             command: bundle exec rake rspec
             os: windows-latest
           - name: macos
             command: bundle exec rake rspec
             os: 'macos-latest'
-          - name: lint
-            command: bin/rake lint
           - name: timezone
             command: bin/rake mspec_nodejs TZ="Pacific/Fiji"
           - name: performance
