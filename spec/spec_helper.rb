@@ -32,6 +32,7 @@ end
 
 # To make MSpec happy
 require 'thread'
+require 'corelib/math'
 
 require 'mspec/utils/script' # Needed by DottedFormatter
 require 'mspec-opal/formatters'
