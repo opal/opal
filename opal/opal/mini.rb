@@ -14,5 +14,5 @@
 ::Object.require 'corelib/method'
 ::Object.require 'corelib/regexp'
 ::Object.require 'corelib/variables'
-::Object.require 'corelib/io'
 ::Object.require 'opal/regexp_anchors'
+::Object.require 'corelib/io'
