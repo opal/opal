@@ -57,6 +57,8 @@ end
   };
 
   Opal['eval'] = function(str, options) {
+    if (!options) { options = new Map(); }
+    options.set('eval', true);
     return eval(Opal.compile(str, options));
   };
 
