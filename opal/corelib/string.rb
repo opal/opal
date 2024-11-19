@@ -8,9 +8,96 @@ class ::String < `String`
   include ::Comparable
 
   %x{
+    const MAX_STR_LEN = Number.MAX_SAFE_INTEGER;
+
     Opal.prop(#{self}.$$prototype, '$$is_string', true);
 
     var string_id_map = new Map();
+
+    function first_char(str) {
+      return String.fromCodePoint(str.codePointAt(0));
+    }
+
+    // unicode aware find_index, args:
+    //   str: string
+    //   search: the string to search for in str
+    //   search_l: is optional, if given must be search.$size(), do NOT use search.length
+    //   last: boolean, optional too, if true returns the last index
+    function find_index_of(str, search, search_l, last) {
+      let search_f = first_char(search);
+      let i = 0, col = [], l = 0, idx = -1;
+      for (const c of str) {
+        if (col.length > 0) {
+          for (const e of col) {
+            if (e.l < l) { e.search += c; e.l++; }
+            if (e.l === l) {
+              if (e.search == search) { if (last) idx = e.index; else return e.index; }
+              e.search = null;
+            }
+          }
+          if (!col[0].search) col.shift();
+        }
+        if (search_f === c) {
+          if (search.length === 1) { if (last) idx = i; else return i; }
+          else {
+            if (l === 0) l = search_l || search.$size();
+            if (l === 1) { if (last) idx = i; else return i; }
+            else col.push({ index: i, search: c, l: 1 });
+          }
+        }
+        i++;
+      }
+      return idx;
+    }
+
+    function cut_from_end(str, cut_l) {
+      let i = str.length - 1, curr_cp;
+      for (; i >= 0; i--) {
+        curr_cp = str.codePointAt(i);
+        if (curr_cp >= 0xDC00 && curr_cp <= 0xDFFF) continue; // low surrogate, get the full code point
+        cut_l--;
+        if (cut_l === 0) break;
+      }
+      return str.slice(0, i);
+    }
+
+    function padding(padstr, width) {
+      let result_l = 0,
+          result = '',
+          p_l = padstr.length,
+          padstr_l = p_l === 1 ? p_l : padstr.$size();
+
+      while (result_l < width) {
+        result += padstr;
+        result_l += padstr_l;
+      }
+
+      if (result_l === width) return result;
+      if (p_l === padstr_l) return result.slice(0, width);
+      return cut_from_end(result, result_l - width);
+    }
+
+    function starts_with_low_surrogate(str) {
+      if (str.length === 0) return false;
+      let cp = str.codePointAt(0);
+      if (cp >= 0xDC00 && cp <= 0xDFFF) return true;
+      return false;
+    }
+
+    function ends_with_high_surrogate(str) {
+      if (str.length === 0) return false;
+      let cp = str.codePointAt(str.length - 1);
+      if (cp >= 0xD800 && cp <= 0xDBFF) return true;
+      return false;
+    }
+
+    function starts_with(str, prefix) {
+      return (str.length >= prefix.length && !ends_with_high_surrogate(prefix) && str.startsWith(prefix));
+    }
+
+    function ends_with(str, suffix) {
+      return (str.length >= suffix.length && !starts_with_low_surrogate(suffix) && str.endsWith(suffix));
+    }
   }
 
   # Force strict mode to suppress autoboxing of `this`
@@ -100,7 +187,7 @@ class ::String < `String`
       // polyfill implementation of String.prototype.repeat() posted here:
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat
 
-      if (string.length * count >= 1 << 28) {
+      if (string.length * count >= MAX_STR_LEN) {
         #{::Kernel.raise ::RangeError, 'multiply count must not overflow maximum string size'}
       }
 
@@ -121,10 +208,9 @@ class ::String < `String`
 
   def +(other)
     other = `$coerce_to(#{other}, #{::String}, 'to_str')`
-
     %x{
-      if (other == "" && self.$$class === Opal.String) return #{self};
-      if (self == "" && other.$$class === Opal.String) return #{other};
+      if (other.length === 0 && self.$$class === Opal.String) return self;
+      if (self.length === 0 && other.$$class === Opal.String) return other;
       var out = self + other;
       if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
       if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
@@ -175,47 +261,13 @@ class ::String < `String`
 
   def [](index, length = undefined)
     %x{
-      var size = self.length, exclude, range;
-
-      if (index.$$is_range) {
-        exclude = index.excl;
-        range   = index;
-        length  = index.end === nil ? -1 : $coerce_to(index.end, #{::Integer}, 'to_int');
-        index   = index.begin === nil ? 0 : $coerce_to(index.begin, #{::Integer}, 'to_int');
-
-        if (Math.abs(index) > size) {
-          return nil;
-        }
-
-        if (index < 0) {
-          index += size;
-        }
-
-        if (length < 0) {
-          length += size;
-        }
-
-        if (!exclude || range.end === nil) {
-          length += 1;
-        }
-
-        length = length - index;
-
-        if (length < 0) {
-          length = 0;
-        }
-
-        return self.substr(index, length);
-      }
-
-
       if (index.$$is_string) {
         if (length != null) {
           #{::Kernel.raise ::TypeError}
         }
-        return self.indexOf(index) !== -1 ? index : nil;
+        if (find_index_of(self, index) === -1) { return nil; }
+        return index.toString();
       }
-
 
       if (index.$$is_regexp) {
         var match = self.match(index);
@@ -244,31 +296,116 @@ class ::String < `String`
         return nil;
       }
 
+      if (index.$$is_range) {
+        // This part sets index and length, basically converting self[2..3] range
+        // to self[2, 1] index + length and letting the range get handled by the
+        // index + length code below.
+        //
+        // For ranges, first index always is a index, possibly negative.
+        // Length is either the length, if it can be determined by the indexes of the range,
+        // or its a possibly negative index, because the exact string length is not known,
+        // or MAX_STR_LEN, with MAX_STR_LEN indicating 'walk to end of string'.
+        const range = index;
+        const r_end = range.end === nil ? MAX_STR_LEN : $coerce_to(range.end, #{::Integer}, 'to_int');
+        index = range.begin === nil ? 0 : $coerce_to(range.begin, #{::Integer}, 'to_int');
 
-      index = $coerce_to(index, #{::Integer}, 'to_int');
+        if (((index > 0 && r_end > 0) || (index < 0 && r_end <0)) && index > r_end) {
+          length = 0;
+        } else if (index === r_end) {
+          length = range.excl ? 0 : 1;
+        } else {
+          const e = range.excl ? 0 : 1;
+          if ((!range.excl && r_end === -1) || r_end === MAX_STR_LEN) length = MAX_STR_LEN;
+          else if (index == 0 || (index > 0 && r_end < 0)) length = r_end === MAX_STR_LEN ? MAX_STR_LEN : (r_end + e);
+          else if (index < 0 && r_end >= 0) length = 0;
+          else if ((index < 0 && r_end < 0) || (index > 0 && r_end > 0)) {
+            length = r_end === MAX_STR_LEN ? MAX_STR_LEN : (r_end - index + e);
+            if (length < 0) length = 0;
+          }
+        }
+      } else {
+        index = $coerce_to(index, #{::Integer}, 'to_int');
+        if (length != null) length = $coerce_to(length, #{::Integer}, 'to_int');
+
+        if (length < 0) return nil;
+      }
 
       if (index < 0) {
-        index += size;
-      }
-
-      if (length == null) {
-        if (index >= size || index < 0) {
-          return nil;
+        // negative index, walk from the end of the string,
+        if (index < -self.length || length < -self.length) return nil;
+        let j = self.length -1, i = -1, result = '', result_l = 0, curr_cp, idx_end;
+        for (; j >= 0; j--) {
+          curr_cp = self.codePointAt(j);
+          if (curr_cp >= 0xDC00 && curr_cp <= 0xDFFF) continue; // low surrogate, get the full code point
+          if (length > 0 || length === -1 || (length < 0 && i <= length)) {
+            if (!idx_end) idx_end = j + 1;
+            result_l++;
+          }
+          if (i === index) {
+            if (length === 0 || index === length) return "";
+            if (length === 1 || length == null) return String.fromCodePoint(curr_cp);
+            break;
+          }
+          i--;
         }
-        return self.substr(index, 1);
+        if (result_l > 0) {
+          result = self.slice(j, idx_end);
+          if (length < 0) {
+            // if length is a negative index from a range, we walked from the end, so shorten the result
+            if ((result_l + length) > 0) return cut_from_end(result, -length);
+            else return "";
+          }
+          if (result_l > length) return cut_from_end(result, result_l - length);
+          return result;
+        }
+      } else if (index === 0) {
+        // special conditions
+        if (length === 0 || self.length === 0) return (length != null) ? "" : nil;
+        if (length === 1 || length == null) return first_char(self);
+        if (length === MAX_STR_LEN) return self.toString();
+        // walk the string
+        let i = 0, result = '';
+        for (const c of self) {
+          result += c;
+          i++;
+          if (i === length) break;
+        }
+        if (length < 0) {
+          // if length is a negative index from a range, we walked to the end, so shorten the result
+          if ((i + length) > 0) return cut_from_end(result, -length);
+          else return "";
+        }
+        return result;
+      } else {
+        let i = 0, result_l = 0, result;
+        for (const c of self) {
+          if (i < index) {
+             i++;
+          } else if (i === index) {
+            if (length === 1 || length == null) return c;
+            if (length === 0) return "";
+            result = c;
+            i++; result_l++;
+          } else if (i > index) {
+            if (result_l < length || length < 0) {
+              result += c;
+              i++; result_l++;
+            } else if (length > 0 && result_l >= length) break;
+          }
+        }
+        if (result) {
+          if (length < 0) {
+            // if length is a negative index from a range, we walked to the end, so shorten the result
+            if ((result_l + length) > 0) return cut_from_end(result, -length);
+            else return "";
+          }
+          if (result_l > 0 && index <= i && length > 1) return result;
+        }
+        // special condition for the null character in c strings of traditional Ruby
+        if (i === index && length != null) return "";
       }
 
-      length = $coerce_to(length, #{::Integer}, 'to_int');
-
-      if (length < 0) {
-        return nil;
-      }
-
-      if (index > size || index < 0) {
-        return nil;
-      }
-
-      return self.substr(index, length);
+      return nil;
     }
   end
 
@@ -277,7 +414,11 @@ class ::String < `String`
   end
 
   def capitalize
-    `self.charAt(0).toUpperCase() + self.substr(1).toLowerCase()`
+    %x{
+      if (self.length === 0) return '';
+      let first = first_char(self);
+      return first.toUpperCase() + self.substring(first.length).toLowerCase();
+    }
   end
 
   def casecmp(other)
@@ -312,13 +453,14 @@ class ::String < `String`
       ::Kernel.raise ::ArgumentError, 'zero width padding'
     end
 
-    return self if `width <= self.length`
+    l = size
+
+    return self if width <= l
 
     %x{
-      var ljustified = #{ljust ((width + `self.length`) / 2).ceil, padstr},
-          rjustified = #{rjust ((width + `self.length`) / 2).floor, padstr};
-
-      return rjustified + ljustified.slice(self.length);
+      return padding(padstr, Math.floor((width + l) / 2) - l) +
+             self +
+             padding(padstr, Math.ceil((width + l) / 2) - l);
     }
   end
 
@@ -333,14 +475,16 @@ class ::String < `String`
       if (separator === "\n") {
         result = self.replace(/\r?\n?$/, '');
       }
-      else if (separator === "") {
+      else if (separator.length === 0) {
         result = self.replace(/(\r?\n)+$/, '');
       }
-      else if (self.length >= separator.length) {
-        var tail = self.substr(self.length - separator.length, separator.length);
+      else if (self.length >= separator.length &&
+               !starts_with_low_surrogate(separator) &&
+               !ends_with_high_surrogate(separator)) {
 
-        if (tail === separator) {
-          result = self.substr(0, self.length - separator.length);
+        // compare tail with separator
+        if (self.substring(self.length - separator.length) === separator) {
+          return self.substring(0, self.length - separator.length);
         }
       }
 
@@ -354,22 +498,20 @@ class ::String < `String`
 
   def chop
     %x{
-      var length = self.length, result;
+      var length = self.length;
 
       if (length <= 1) {
-        result = "";
+        return "";
       } else if (self.charAt(length - 1) === "\n" && self.charAt(length - 2) === "\r") {
-        result = self.substr(0, length - 2);
-      } else {
-        result = self.substr(0, length - 1);
+        return self.substring(0, length - 2);
       }
-
-      return result;
+      let cut = self.codePointAt(length - 2) > 0xFFFF ? 2 : 1;
+      return self.substring(0, length - cut);
     }
   end
 
   def chr
-    `self.charAt(0)`
+    `self.length > 0 ? first_char(self) : ''`
   end
 
   def clone(freeze: nil)
@@ -405,7 +547,7 @@ class ::String < `String`
       if (char_class === null) {
         return 0;
       }
-      return self.length - self.replace(new RegExp(char_class, 'g'), '').length;
+      return self.$size() - self.replace(new RegExp(char_class, 'g'), '').$size();
     }
   end
 
@@ -428,11 +570,8 @@ class ::String < `String`
         prefix = $coerce_to(prefix, #{::String}, 'to_str');
       }
 
-      if (self.slice(0, prefix.length) === prefix) {
-        return self.slice(prefix.length);
-      } else {
-        return self;
-      }
+      if (starts_with(self, prefix)) return self.slice(prefix.length);
+      return self;
     }
   end
 
@@ -442,11 +581,8 @@ class ::String < `String`
         suffix = $coerce_to(suffix, #{::String}, 'to_str');
       }
 
-      if (self.slice(self.length - suffix.length) === suffix) {
-        return self.slice(0, self.length - suffix.length);
-      } else {
-        return self;
-      }
+      if (ends_with(self, suffix)) return self.slice(0, self.length - suffix.length);
+      return self;
     }
   end
 
@@ -484,7 +620,12 @@ class ::String < `String`
 
       chomped  = #{chomp(separator)};
       trailing = self.length != chomped.length;
-      splitted = chomped.split(separator);
+
+      if (starts_with_low_surrogate(separator) || ends_with_high_surrogate(separator)) {
+        splitted = [self]
+      } else {
+        splitted = chomped.split(separator);
+      }
 
       for (i = 0, length = splitted.length; i < length; i++) {
         value = splitted[i];
@@ -507,13 +648,9 @@ class ::String < `String`
 
   def end_with?(*suffixes)
     %x{
-      for (var i = 0, length = suffixes.length; i < length; i++) {
-        var suffix = $coerce_to(suffixes[i], #{::String}, 'to_str').$to_s();
-
-        if (self.length >= suffix.length &&
-            self.substr(self.length - suffix.length, suffix.length) == suffix) {
-          return true;
-        }
+      for (let i = 0, length = suffixes.length; i < length; i++) {
+        let suffix = $coerce_to(suffixes[i], #{::String}, 'to_str').$to_s();
+        if (ends_with(self, suffix)) return true;
       }
     }
 
@@ -603,54 +740,62 @@ class ::String < `String`
       if (!other.$$is_string) {
         other = $coerce_to(other, #{::String}, 'to_str');
       }
-      return self.indexOf(other) !== -1;
+      return find_index_of(self, other) !== -1;
     }
   end
 
   def index(search, offset = undefined)
     %x{
-      var index,
-          match,
-          regex;
+      let index;
 
-      if (offset === undefined) {
-        offset = 0;
-      } else {
-        offset = $coerce_to(offset, #{::Integer}, 'to_int');
-        if (offset < 0) {
-          offset += self.length;
-          if (offset < 0) {
-            return nil;
-          }
-        }
-      }
+      if (offset === undefined) offset = 0;
+      else offset = $coerce_to(offset, #{::Integer}, 'to_int');
 
       if (search.$$is_regexp) {
-        regex = $global_multiline_regexp(search);
+        let regex = $global_multiline_regexp(search);
+        if (offset < 0) {
+          offset += self.$size();
+          if (offset < 0) return nil;
+        }
         while (true) {
-          match = regex.exec(self);
+          let match = regex.exec(self);
           if (match === null) {
             #{$~ = nil};
-            index = -1;
-            break;
+            return nil;
           }
           if (match.index >= offset) {
             #{$~ = ::MatchData.new(`regex`, `match`)}
-            index = match.index;
-            break;
+            return match.index;
           }
           regex.lastIndex = match.index + 1;
         }
       } else {
         search = $coerce_to(search, #{::String}, 'to_str');
-        if (search.length === 0 && offset > self.length) {
-          index = -1;
+        if (search.length === 0) {
+          let l = self.$size();
+          if (offset > l) return nil;
+          if (offset < 0) {
+            offset += l;
+            if (offset < 0) return nil;
+          }
+          return offset;
         } else {
-          index = self.indexOf(search, offset);
+          let str = self;
+          if (offset < 0) {
+            offset += self.$size();
+            if (offset < 0) return nil;
+          }
+          if (offset > 0) {
+            str = self["$[]"](offset, MAX_STR_LEN);
+            if (str.length === 0 || str === nil) return nil;
+          }
+          index = find_index_of(str, search);
+          if (index === -1) return nil;
+          return index + offset;
         }
       }
 
-      return index === -1 ? nil : index;
+      return nil;
     }
   end
 
@@ -688,11 +833,15 @@ class ::String < `String`
     `self.toString()`
   end
 
-  def length
-    `self.length`
+  def size
+    %x{
+      let length = 0;
+      for (let _c of self) { length++; }
+      return length;
+    }
   end
 
-  alias size length
+  alias length size
 
   def lines(separator = $/, chomp: false, &block)
     e = each_line(separator, chomp: chomp, &block)
@@ -707,20 +856,11 @@ class ::String < `String`
       ::Kernel.raise ::ArgumentError, 'zero width padding'
     end
 
-    return self if `width <= self.length`
+    l = size
 
-    %x{
-      var index  = -1,
-          result = "";
+    return self if width <= l
 
-      width -= self.length;
-
-      while (++index < width) {
-        result += padstr;
-      }
-
-      return self + result.slice(0, width);
-    }
+    `self + padding(padstr, width - l)`
   end
 
   def lstrip
@@ -761,16 +901,17 @@ class ::String < `String`
 
   def next
     %x{
-      var i = self.length;
-      if (i === 0) {
-        return '';
-      }
-      var result = self;
-      var first_alphanum_char_index = self.search(/[a-zA-Z0-9]/);
-      var carry = false;
-      var code;
+      let i = self.length;
+      if (i === 0) return '';
+
+      let result = self,
+          first_alphanum_char_index = self.search(/[a-zA-Z0-9]/),
+          carry = false,
+          code = null,
+          prior_code;
       while (i--) {
-        code = self.charCodeAt(i);
+        code = self.codePointAt(i);
+        if (code >= 0xDC00 && code <= 0xDFFF) continue; // low surrogate, get the full code at next iteration
         if ((code >= 48 && code <= 57) ||
           (code >= 65 && code <= 90) ||
           (code >= 97 && code <= 122)) {
@@ -793,18 +934,19 @@ class ::String < `String`
           }
         } else {
           if (first_alphanum_char_index === -1) {
-            if (code === 255) {
+            if (code === 255 || code === 0x10FFFF) {
               carry = true;
               code = 0;
             } else {
               carry = false;
-              code += 1;
+              if (code === 0xD7FF) code = 0xE000;
+              else code += 1;
             }
           } else {
             carry = true;
           }
         }
-        result = result.slice(0, i) + String.fromCharCode(code) + result.slice(i + 1);
+        result = result.slice(0, i) + String.fromCodePoint(code) + result.slice(i + 1);
         if (carry && (i === 0 || i === first_alphanum_char_index)) {
           switch (code) {
           case 65:
@@ -815,15 +957,13 @@ class ::String < `String`
             code += 1;
           }
           if (i === 0) {
-            result = String.fromCharCode(code) + result;
+            result = String.fromCodePoint(code) + result;
           } else {
-            result = result.slice(0, i) + String.fromCharCode(code) + result.slice(i);
+            result = result.slice(0, i) + String.fromCodePoint(code) + result.slice(i);
           }
           carry = false;
         }
-        if (!carry) {
-          break;
-        }
+        if (!carry) break;
       }
       return result;
     }
@@ -873,14 +1013,7 @@ class ::String < `String`
   end
 
   def ord
-    %x{
-      if (typeof self.codePointAt === "function") {
-        return self.codePointAt(0);
-      }
-      else {
-        return self.charCodeAt(0);
-      }
-    }
+    `self.codePointAt(0)`
   end
 
   def partition(sep)
@@ -898,12 +1031,11 @@ class ::String < `String`
         }
       } else {
         sep = $coerce_to(sep, #{::String}, 'to_str');
-        i = self.indexOf(sep);
+        if (starts_with_low_surrogate(sep) || ends_with_high_surrogate(sep)) i = -1;
+        else i = self.indexOf(sep);
       }
 
-      if (i === -1) {
-        return [self, '', ''];
-      }
+      if (i === -1) return [self, '', ''];
 
       return [
         self.slice(0, i),
@@ -914,49 +1046,61 @@ class ::String < `String`
   end
 
   def reverse
-    `self.split('').reverse().join('')`
+    %x{
+      let res = '';
+      for (const c of self) { res = c + res; }
+      return res;
+    }
   end
 
   def rindex(search, offset = undefined)
     %x{
-      var i, m, r, _m;
+      let index, m, r, _m;
 
       if (offset === undefined) {
-        offset = self.length;
+        offset = MAX_STR_LEN; // to avoid calling #size here, to call it only when necessary later on
       } else {
         offset = $coerce_to(offset, #{::Integer}, 'to_int');
         if (offset < 0) {
-          offset += self.length;
-          if (offset < 0) {
-            return nil;
-          }
+          offset += self.$size();
+          if (offset < 0) return nil;
         }
       }
 
       if (search.$$is_regexp) {
+        if (offset === MAX_STR_LEN) offset = self.$size();
         m = null;
         r = $global_multiline_regexp(search);
         while (true) {
           _m = r.exec(self);
-          if (_m === null || _m.index > offset) {
-            break;
-          }
+          if (_m === null || _m.index > offset) break;
           m = _m;
           r.lastIndex = m.index + 1;
         }
         if (m === null) {
           #{$~ = nil}
-          i = -1;
+          return nil;
         } else {
           #{::MatchData.new `r`, `m`};
-          i = m.index;
+          return m.index;
         }
       } else {
         search = $coerce_to(search, #{::String}, 'to_str');
-        i = self.lastIndexOf(search, offset);
+        if (search.length === 0) {
+          let str_l = self.$size();
+          if (offset > str_l) index = str_l;
+          else index = offset;
+        } else {
+          let str = self,
+              search_l = search.$size();
+          if (offset !== MAX_STR_LEN && offset + search_l < self.$size()) {
+            str = self["$[]"](0, offset + search_l);
+          }
+          index = find_index_of(str, search, search_l, true);
+        }
       }
 
-      return i === -1 ? nil : i;
+      return index === -1 ? nil : index;
     }
   end
 
@@ -968,16 +1112,11 @@ class ::String < `String`
       ::Kernel.raise ::ArgumentError, 'zero width padding'
     end
 
-    return self if `width <= self.length`
+    l = size
 
-    %x{
-      var chars     = Math.floor(width - self.length),
-          patterns  = Math.floor(chars / padstr.length),
-          result    = Array(patterns + 1).join(padstr),
-          remaining = chars - result.length;
+    return self if width <= l
 
-      return result + padstr.slice(0, remaining) + self;
-    }
+    `padding(padstr, width - l) + self`
   end
 
   def rpartition(sep)
@@ -1007,12 +1146,11 @@ class ::String < `String`
 
       } else {
         sep = $coerce_to(sep, #{::String}, 'to_str');
-        i = self.lastIndexOf(sep);
+        if (starts_with_low_surrogate(sep) || ends_with_high_surrogate(sep)) i = -1;
+        else i = self.lastIndexOf(sep);
       }
 
-      if (i === -1) {
-        return ['', '', self];
-      }
+      if (i === -1) return ['', '', self];
 
       return [
         self.slice(0, i),
@@ -1085,7 +1223,7 @@ class ::String < `String`
         pattern = #{$; || ' '};
       }
 
-      var result = [],
+      var result,
           string = self.toString(),
           index = 0,
           match,
@@ -1101,13 +1239,15 @@ class ::String < `String`
         if (pattern === ' ') {
           pattern = /\s+/gm;
           string = string.replace(/^\s+/, '');
+        } else if (pattern.length !== 0 && (starts_with_low_surrogate(pattern) || ends_with_high_surrogate(pattern))) {
+          return [string];
         }
       }
 
-      result = string.split(pattern);
+      result = (pattern.length === 0) ? [...string] : string.split(pattern);
 
       if (result.length === 1 && result[0] === string) {
-        return [result[0]];
+        return result;
       }
 
       while ((i = result.indexOf(undefined)) !== -1) {
@@ -1188,11 +1328,8 @@ class ::String < `String`
             #{$~ = nil}
           }
         } else {
-          var prefix = $coerce_to(prefixes[i], #{::String}, 'to_str').$to_s();
-
-          if (self.length >= prefix.length && self.startsWith(prefix)) {
-            return true;
-          }
+          let prefix = $coerce_to(prefixes[i], #{::String}, 'to_str').$to_s();
+          if (starts_with(self, prefix) || prefix.length === 0) return true;
         }
       }
 
@@ -1411,20 +1548,18 @@ class ::String < `String`
     `self.toString()`
   end
 
-  def tr(from, to)
-    %x{
+  %x{
+    function common_tr(self, from, to, is_tr_s) {
       from = $coerce_to(from, #{::String}, 'to_str').$to_s();
       to = $coerce_to(to, #{::String}, 'to_str').$to_s();
 
-      if (from.length == 0 || from === to) {
-        return self;
-      }
+      if (from.length == 0) return self;
 
       var i, in_range, c, ch, start, end, length;
       var subs = {};
-      var from_chars = from.split('');
+      var from_chars = [...from];
       var from_length = from_chars.length;
-      var to_chars = to.split('');
+      var to_chars = [...to];
       var to_length = to_chars.length;
 
       var inverse = false;
@@ -1458,158 +1593,13 @@ class ::String < `String`
           }
         }
         else if (in_range) {
-          start = last_from.charCodeAt(0);
-          end = ch.charCodeAt(0);
+          start = last_from.codePointAt(0);
+          end = ch.codePointAt(0);
           if (start > end) {
-            #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+            #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCodePoint(start)`}-#{`String.fromCodePoint(end)`}\" in string transliteration"}
           }
           for (c = start + 1; c < end; c++) {
-            from_chars_expanded.push(String.fromCharCode(c));
-          }
-          from_chars_expanded.push(ch);
-          in_range = null;
-          last_from = null;
-        }
-        else {
-          from_chars_expanded.push(ch);
-        }
-      }
-
-      from_chars = from_chars_expanded;
-      from_length = from_chars.length;
-
-      if (inverse) {
-        for (i = 0; i < from_length; i++) {
-          subs[from_chars[i]] = true;
-        }
-      }
-      else {
-        if (to_length > 0) {
-          var to_chars_expanded = [];
-          var last_to = null;
-          in_range = false;
-          for (i = 0; i < to_length; i++) {
-            ch = to_chars[i];
-            if (last_to == null) {
-              last_to = ch;
-              to_chars_expanded.push(ch);
-            }
-            else if (ch === '-') {
-              if (last_to === '-') {
-                to_chars_expanded.push('-');
-                to_chars_expanded.push('-');
-              }
-              else if (i == to_length - 1) {
-                to_chars_expanded.push('-');
-              }
-              else {
-                in_range = true;
-              }
-            }
-            else if (in_range) {
-              start = last_to.charCodeAt(0);
-              end = ch.charCodeAt(0);
-              if (start > end) {
-                #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
-              }
-              for (c = start + 1; c < end; c++) {
-                to_chars_expanded.push(String.fromCharCode(c));
-              }
-              to_chars_expanded.push(ch);
-              in_range = null;
-              last_to = null;
-            }
-            else {
-              to_chars_expanded.push(ch);
-            }
-          }
-
-          to_chars = to_chars_expanded;
-          to_length = to_chars.length;
-        }
-
-        var length_diff = from_length - to_length;
-        if (length_diff > 0) {
-          var pad_char = (to_length > 0 ? to_chars[to_length - 1] : '');
-          for (i = 0; i < length_diff; i++) {
-            to_chars.push(pad_char);
-          }
-        }
-
-        for (i = 0; i < from_length; i++) {
-          subs[from_chars[i]] = to_chars[i];
-        }
-      }
-
-      var new_str = ''
-      for (i = 0, length = self.length; i < length; i++) {
-        ch = self.charAt(i);
-        var sub = subs[ch];
-        if (inverse) {
-          new_str += (sub == null ? global_sub : ch);
-        }
-        else {
-          new_str += (sub != null ? sub : ch);
-        }
-      }
-      return new_str;
-    }
-  end
-
-  def tr_s(from, to)
-    %x{
-      from = $coerce_to(from, #{::String}, 'to_str').$to_s();
-      to = $coerce_to(to, #{::String}, 'to_str').$to_s();
-
-      if (from.length == 0) {
-        return self;
-      }
-
-      var i, in_range, c, ch, start, end, length;
-      var subs = {};
-      var from_chars = from.split('');
-      var from_length = from_chars.length;
-      var to_chars = to.split('');
-      var to_length = to_chars.length;
-
-      var inverse = false;
-      var global_sub = null;
-      if (from_chars[0] === '^' && from_chars.length > 1) {
-        inverse = true;
-        from_chars.shift();
-        global_sub = to_chars[to_length - 1]
-        from_length -= 1;
-      }
-
-      var from_chars_expanded = [];
-      var last_from = null;
-      in_range = false;
-      for (i = 0; i < from_length; i++) {
-        ch = from_chars[i];
-        if (last_from == null) {
-          last_from = ch;
-          from_chars_expanded.push(ch);
-        }
-        else if (ch === '-') {
-          if (last_from === '-') {
-            from_chars_expanded.push('-');
-            from_chars_expanded.push('-');
-          }
-          else if (i == from_length - 1) {
-            from_chars_expanded.push('-');
-          }
-          else {
-            in_range = true;
-          }
-        }
-        else if (in_range) {
-          start = last_from.charCodeAt(0);
-          end = ch.charCodeAt(0);
-          if (start > end) {
-            #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
-          }
-          for (c = start + 1; c < end; c++) {
-            from_chars_expanded.push(String.fromCharCode(c));
+            from_chars_expanded.push(String.fromCodePoint(c));
           }
           from_chars_expanded.push(ch);
           in_range = null;
@@ -1652,13 +1642,13 @@ class ::String < `String`
               }
             }
             else if (in_range) {
-              start = last_from.charCodeAt(0);
-              end = ch.charCodeAt(0);
+              start = last_from.codePointAt(0);
+              end = ch.codePointAt(0);
               if (start > end) {
-                #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCharCode(start)`}-#{`String.fromCharCode(end)`}\" in string transliteration"}
+                #{::Kernel.raise ::ArgumentError, "invalid range \"#{`String.fromCodePoint(start)`}-#{`String.fromCodePoint(end)`}\" in string transliteration"}
               }
               for (c = start + 1; c < end; c++) {
-                to_chars_expanded.push(String.fromCharCode(c));
+                to_chars_expanded.push(String.fromCodePoint(c));
               }
               to_chars_expanded.push(ch);
               in_range = null;
@@ -1685,38 +1675,60 @@ class ::String < `String`
           subs[from_chars[i]] = to_chars[i];
         }
       }
-      var new_str = ''
-      var last_substitute = null
-      for (i = 0, length = self.length; i < length; i++) {
-        ch = self.charAt(i);
-        var sub = subs[ch]
-        if (inverse) {
-          if (sub == null) {
-            if (last_substitute == null) {
-              new_str += global_sub;
-              last_substitute = true;
+
+      let new_str = '',
+          sub;
+
+      if (is_tr_s) {
+        var last_substitute = null
+        for (const ch of self) {
+          sub = subs[ch]
+          if (inverse) {
+            if (sub == null) {
+              if (last_substitute == null) {
+                new_str += global_sub;
+                last_substitute = true;
+              }
+            }
+            else {
+              new_str += ch;
+              last_substitute = null;
             }
           }
           else {
-            new_str += ch;
-            last_substitute = null;
+            if (sub != null) {
+              if (last_substitute == null || last_substitute !== sub) {
+                new_str += sub;
+                last_substitute = sub;
+              }
+            }
+            else {
+              new_str += ch;
+              last_substitute = null;
+            }
           }
         }
-        else {
-          if (sub != null) {
-            if (last_substitute == null || last_substitute !== sub) {
-              new_str += sub;
-              last_substitute = sub;
-            }
+      } else {
+        for (const ch of self) {
+          sub = subs[ch];
+          if (inverse) {
+            new_str += (sub == null ? global_sub : ch);
           }
           else {
-            new_str += ch;
-            last_substitute = null;
+            new_str += (sub != null ? sub : ch);
           }
         }
       }
       return new_str;
     }
+  }
+
+  def tr(from, to)
+    `common_tr(self, from, to, false)`
+  end
+
+  def tr_s(from, to)
+    `common_tr(self, from, to, true)`
   end
 
   def upcase
@@ -1730,19 +1742,22 @@ class ::String < `String`
 
       stop = $coerce_to(stop, #{::String}, 'to_str');
 
-      if (s.length === 1 && stop.length === 1) {
+      let str_l = self.$size(),
+          stop_l = stop.$size();
 
-        a = s.charCodeAt(0);
-        b = stop.charCodeAt(0);
+      if (str_l === 1 && stop_l === 1) {
+
+        a = self.codePointAt(0);
+        b = stop.codePointAt(0);
+        if (b >= 0xD800 && b <= 0xDFFF) b = 0; // exclude surrogate range for b
 
         while (a <= b) {
-          if (excl && a === b) {
-            break;
-          }
+          if (excl && a === b) break;
 
-          block(String.fromCharCode(a));
+          block(String.fromCodePoint(a));
 
           a += 1;
+          if (a >= 0xD800 && a <= 0xDFFF) a = 0xE000; // exclude surrogate range
         }
 
       } else if (parseInt(s, 10).toString() === s && parseInt(stop, 10).toString() === stop) {
@@ -1751,25 +1766,24 @@ class ::String < `String`
         b = parseInt(stop, 10);
 
         while (a <= b) {
-          if (excl && a === b) {
-            break;
-          }
+          if (excl && a === b) break;
 
           block(a.toString());
 
           a += 1;
+          if (a >= 0xD800 && a <= 0xDFFF) a = 0xE000; // exclude surrogate range
         }
 
       } else {
-
-        while (s.length <= stop.length && s <= stop) {
-          if (excl && s === stop) {
-            break;
-          }
+        let s_l;
+        while (str_l <= stop_l && s <= stop) {
+          if (excl && s === stop) break;
 
           block(s);
 
-          s = #{`s`.succ};
+          s_l = s.length;
+          s = #{`s`.next};
+          if (s.length !== s_l) str_l = s.$size();
         }
 
       }
@@ -1779,30 +1793,31 @@ class ::String < `String`
 
   %x{
     function char_class_from_char_sets(sets) {
-      function explode_sequences_in_character_set(set) {
-        var result = '',
-            i, len = set.length,
+      function explode_sequences_in_character_set(set_s) {
+        var result = [],
+            i, len = set_s.length,
             curr_char,
             skip_next_dash,
-            char_code_from,
-            char_code_upto,
-            char_code;
+            code_point_from,
+            code_point_upto,
+            code_point;
         for (i = 0; i < len; i++) {
-          curr_char = set.charAt(i);
+          curr_char = set_s[i];
           if (curr_char === '-' && i > 0 && i < (len - 1) && !skip_next_dash) {
-            char_code_from = set.charCodeAt(i - 1);
-            char_code_upto = set.charCodeAt(i + 1);
-            if (char_code_from > char_code_upto) {
-              #{::Kernel.raise ::ArgumentError, "invalid range \"#{`char_code_from`}-#{`char_code_upto`}\" in string transliteration"}
+            code_point_from = set_s[i - 1].codePointAt(0);
+            code_point_upto = set_s[i + 1].codePointAt(0);
+            if (code_point_from > code_point_upto) {
+              #{::Kernel.raise ::ArgumentError, "invalid range \"#{`code_point_from`}-#{`code_point_upto`}\" in string transliteration"}
             }
-            for (char_code = char_code_from + 1; char_code < char_code_upto + 1; char_code++) {
-              result += String.fromCharCode(char_code);
+            for (code_point = code_point_from + 1; code_point < code_point_upto + 1; code_point++) {
+              if (code_point >= 0xD800 && code_point <= 0xDFFF) code_point = 0xE000; // exclude surrogate range
+              result.push(String.fromCodePoint(code_point));
             }
             skip_next_dash = true;
             i++;
           } else {
             skip_next_dash = (curr_char === '\\');
-            result += curr_char;
+            result.push(curr_char);
           }
         }
         return result;
@@ -1812,51 +1827,56 @@ class ::String < `String`
         if (setA.length === 0) {
           return setB;
         }
-        var result = '',
+        var result = [],
             i, len = setA.length,
             chr;
         for (i = 0; i < len; i++) {
-          chr = setA.charAt(i);
+          chr = setA[i];
           if (setB.indexOf(chr) !== -1) {
-            result += chr;
+            result.push(chr);
           }
         }
         return result;
       }
 
-      var i, len, set, neg, chr, tmp,
-          pos_intersection = '',
-          neg_intersection = '';
+      var i, len, set, set_s, neg, chr, tmp,
+          pos_intersection = [],
+          neg_intersection = [];
 
       for (i = 0, len = sets.length; i < len; i++) {
         set = $coerce_to(sets[i], #{::String}, 'to_str');
-        neg = (set.charAt(0) === '^' && set.length > 1);
-        set = explode_sequences_in_character_set(neg ? set.slice(1) : set);
+        set_s = [];
+        for (const c of set) {
+          let cd = c.codePointAt(0);
+          if (cd < 0xD800 || cd > 0xDFFF) set_s.push(c); // exclude surrogate range
+        }
+        neg = (set_s[0] === '^' && set_s.length > 1);
+        set_s = explode_sequences_in_character_set(neg ? set_s.slice(1) : set_s);
         if (neg) {
-          neg_intersection = intersection(neg_intersection, set);
+          neg_intersection = intersection(neg_intersection, set_s);
         } else {
-          pos_intersection = intersection(pos_intersection, set);
+          pos_intersection = intersection(pos_intersection, set_s);
         }
       }
 
       if (pos_intersection.length > 0 && neg_intersection.length > 0) {
-        tmp = '';
+        tmp = [];
         for (i = 0, len = pos_intersection.length; i < len; i++) {
-          chr = pos_intersection.charAt(i);
+          chr = pos_intersection[i];
           if (neg_intersection.indexOf(chr) === -1) {
-            tmp += chr;
+            tmp.push(chr);
           }
         }
         pos_intersection = tmp;
-        neg_intersection = '';
+        neg_intersection = [];
       }
 
       if (pos_intersection.length > 0) {
-        return '[' + #{::Regexp.escape(`pos_intersection`)} + ']';
+        return '[' + #{::Regexp.escape(`pos_intersection.join('')`)} + ']';
       }
 
       if (neg_intersection.length > 0) {
-        return '[^' + #{::Regexp.escape(`neg_intersection`)} + ']';
+        return '[^' + #{::Regexp.escape(`neg_intersection.join('')`)} + ']';
       }
 
       return null;
