@@ -43,7 +43,6 @@ module Opal
 
         def create_thread(execution)
           Thread.new(@thread_args, execution, builder) do |args, exe, builder|
-            todo = nil
             shall_skip = false
 
             while exe[:continue]

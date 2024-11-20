@@ -50,7 +50,6 @@ opal_filter "regular_expressions" do
   fails "Regexp#hash returns the same value for two Regexps differing only in the /n option" # Expected false == true to be truthy but was false
   fails "Regexp#initialize raises a TypeError on an initialized non-literal Regexp" # Expected TypeError but no exception was raised (nil was returned)
   fails "Regexp#inspect does not include a character set code" # Expected "/(?:)/" == "//" to be truthy but was false
-  fails "Regexp#inspect does not include the 'o' option" # Expected "/(?:)/" == "//" to be truthy but was false
   fails "Regexp#inspect returns options in the order 'mixn'" # Expected "/(?:)/" == "//mixn" to be truthy but was false
   fails "Regexp#named_captures works with duplicate capture group names" # Exception: Invalid regular expression: /this (?<is>is) [aA] (?<pat>pate?(?<is>rn))/: Duplicate capture group name
   fails "Regexp#names returns each capture name only once" # Exception: Invalid regular expression: /n(?<cap>ee)d(?<cap>le)/: Duplicate capture group name
@@ -62,6 +61,9 @@ opal_filter "regular_expressions" do
   fails "Regexp.compile given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/ but got: ""
   fails "Regexp.compile given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.compile given a String raises a RegexpError when passed an incorrect regexp" # Expected RegexpError but got: Exception (Invalid regular expression: /^[$/: Unterminated character class)
+  fails "Regexp.compile given a String with escaped characters accepts a backspace followed by a character" # Exception: Invalid regular expression: /\N/u: Invalid escape
+  fails "Regexp.compile given a String with escaped characters accepts an escaped string interpolation" # Exception: Invalid regular expression: /#{abc}/u: Incomplete quantifier
+  fails "Regexp.compile given a String with escaped characters accepts multiple consecutive '\\' characters" # Exception: Invalid regular expression: /\\\N/u: Invalid escape
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits" # Expected RegexpError but no exception was raised (/\xn/ was returned)
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if less than four digits are given for \\uHHHH" # Expected RegexpError but no exception was raised (/\u304/ was returned)
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if more than six hexadecimal digits are given" # Expected RegexpError but no exception was raised (/\u{0ffffff}/ was returned)
@@ -81,6 +83,9 @@ opal_filter "regular_expressions" do
   fails "Regexp.linear_time? warns about flags being ignored for regexp arguments" # NoMethodError: undefined method `linear_time?' for Regexp
   fails "Regexp.new given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.new given a String raises a RegexpError when passed an incorrect regexp" # Expected RegexpError but got: Exception (Invalid regular expression: /^[$/: Unterminated character class)
+  fails "Regexp.new given a String with escaped characters accepts a backspace followed by a character" # Exception: Invalid regular expression: /\N/u: Invalid escape
+  fails "Regexp.new given a String with escaped characters accepts an escaped string interpolation" # Exception: Invalid regular expression: /#{abc}/u: Incomplete quantifier
+  fails "Regexp.new given a String with escaped characters accepts multiple consecutive '\\' characters" # Exception: Invalid regular expression: /\\\N/u: Invalid escape
   fails "Regexp.new given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits" # Expected RegexpError but no exception was raised (/\xn/ was returned)
   fails "Regexp.new given a String with escaped characters raises a RegexpError if more than six hexadecimal digits are given" # Expected RegexpError but no exception was raised (/\u{0ffffff}/ was returned)
   fails "Regexp.new given a non-String/Regexp raises TypeError if #to_str returns non-String value" # Expected TypeError (/can't convert Object to String/) but got: TypeError (can't convert Object into String (Object#to_str gives Array))

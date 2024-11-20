@@ -181,10 +181,7 @@ opal_filter "Module" do
   fails "Module#ruby2_keywords raises TypeError when passed not Symbol or String" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (nil was returned)
   fails "Module#to_s always show the refinement name, even if the module is named" # Expected "ModuleSpecs::RefinementInspect::R" == "#<refinement:String@ModuleSpecs::RefinementInspect>" to be truthy but was false
   fails "Module#to_s does not call #inspect or #to_s for singleton classes" # Expected "#<Class:#<:0x599ac>>" =~ /\A#<Class:#<#<Class:0x599b0>:0x\h+>>\z/ to be truthy but was nil
-  fails "Module#to_s for objects includes class name and object ID" # Expected "#<Class:#<ModuleSpecs::NamedClass:0x599e2>>" =~ /^#<Class:#<ModuleSpecs::NamedClass:0x\h+>>$/ to be truthy but was nil
   fails "Module#to_s for the singleton class of an object of an anonymous class" # Expected "#<Class:#<:0x59a16>>" == "#<Class:#<#<Class:0x59a1a>:0x59a16>>" to be truthy but was false
-  fails "Module#to_s works with an anonymous class" # Expected "#<Class:0x59a4c>" =~ /^#<Class:0x\h+>$/ to be truthy but was nil
-  fails "Module#to_s works with an anonymous module" # Expected "#<Module:0x59a80>" =~ /^#<Module:0x\h+>$/ to be truthy but was nil
   fails "Module#undef_method raises a NameError when passed a missing name for a class" # Expected NameError (/undefined method `not_exist' for class `#<Class:0x1219e>'/) but got: NameError (method 'not_exist' not defined in )
   fails "Module#undef_method raises a NameError when passed a missing name for a metaclass" # Expected NameError (/undefined method `not_exist' for class `String'/) but got: NameError (method 'not_exist' not defined in )
   fails "Module#undef_method raises a NameError when passed a missing name for a module" # Expected NameError (/undefined method `not_exist' for module `#<Module:0x121a6>'/) but got: NameError (method 'not_exist' not defined in )

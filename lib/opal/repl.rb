@@ -12,9 +12,10 @@ module Opal
 
     attr_accessor :colorize
 
-    def initialize
+    def initialize(runner_type = nil)
       @argv = []
       @colorize = true
+      @runner_type = runner_type || :nodejs
 
       begin
         require 'readline'
@@ -44,6 +45,7 @@ module Opal
 
     def load_opal
       runner = @argv.reject { |i| i == '--repl' }
+      runner += ['-R', @runner_type.to_s, '--await']
       runner += ['-e', 'require "opal/repl_js"']
       runner = [RbConfig.ruby, "#{__dir__}/../../exe/opal"] + runner
 
@@ -94,7 +96,7 @@ module Opal
 
       begin
         silencer.silence do
-          builder.build_str(eval_code, '(irb)', irb: true, const_missing: true)
+          builder.build_str(eval_code, '(irb)', irb: true, const_missing: true, await: true)
         end
         @incomplete = nil
       rescue Opal::SyntaxError => e
