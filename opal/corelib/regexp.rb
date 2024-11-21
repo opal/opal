@@ -102,16 +102,16 @@ class ::Regexp < `RegExp`
         }
 
         if (options === undefined || #{!options}) {
-          options = '';
+          options = 'u';
         }
         else if (options.$$is_number) {
-          var temp = '';
+          var temp = 'u';
           if (#{IGNORECASE} & options) { temp += 'i'; }
           if (#{MULTILINE}  & options) { temp += 'm'; }
           options = temp;
         }
         else if (!options.$$is_string) {
-          options = 'i';
+          options = 'iu';
         }
 
         var result = Opal.transform_regexp(regexp, options);
@@ -154,6 +154,7 @@ class ::Regexp < `RegExp`
     %x{
       var regexp_pattern = self.$source();
       var regexp_flags = self.$$options != null ? self.$$options : self.flags;
+      regexp_flags = regexp_flags.replace('u', '');
       var chars = regexp_pattern.split('');
       var chars_length = chars.length;
       var char_escaped = false;

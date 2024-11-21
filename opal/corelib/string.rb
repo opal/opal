@@ -1,4 +1,4 @@
-# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add
+# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add, transform_regexp
 # backtick_javascript: true
 
 require 'corelib/comparable'
@@ -547,7 +547,8 @@ class ::String < `String`
       if (char_class === null) {
         return 0;
       }
-      return self.$size() - self.replace(new RegExp(char_class, 'g'), '').$size();
+      let pattern_flags = $transform_regexp(char_class, 'gu');
+      return self.$size() - self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '').$size();
     }
   end
 
@@ -560,7 +561,8 @@ class ::String < `String`
       if (char_class === null) {
         return self;
       }
-      return self.replace(new RegExp(char_class, 'g'), '');
+      let pattern_flags = $transform_regexp(char_class, 'gu');
+      return self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '');
     }
   end
 
@@ -669,7 +671,7 @@ class ::String < `String`
         pattern = $global_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str');
-        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
+        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'), 'gmu');
       }
 
       var lastIndex;
@@ -752,7 +754,7 @@ class ::String < `String`
       else offset = $coerce_to(offset, #{::Integer}, 'to_int');
 
       if (search.$$is_regexp) {
-        let regex = $global_multiline_regexp(search);
+        let regex = $global_regexp(search);
         if (offset < 0) {
           offset += self.$size();
           if (offset < 0) return nil;
@@ -1174,7 +1176,7 @@ class ::String < `String`
         pattern = $global_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str');
-        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gm');
+        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'), 'gmu');
       }
 
       while ((match = pattern.exec(self)) != null) {
@@ -1237,8 +1239,8 @@ class ::String < `String`
         pattern = $coerce_to(pattern, #{::String}, 'to_str').$to_s();
 
         if (pattern === ' ') {
-          pattern = /\s+/gm;
-          string = string.replace(/^\s+/, '');
+          pattern = /\s+/gmu;
+          string = string.replace(/^\s+/u, '');
         } else if (pattern.length !== 0 && (starts_with_low_surrogate(pattern) || ends_with_high_surrogate(pattern))) {
           return [string];
         }
@@ -1262,8 +1264,9 @@ class ::String < `String`
       }
 
       if (!pattern.$$is_regexp) {
-        pattern = Opal.escape_regexp(pattern)
-        pattern = new RegExp(pattern, 'gm');
+        pattern = Opal.escape_regexp(pattern);
+        let pattern_flags = $transform_regexp(pattern, 'gmu');
+        pattern = new RegExp(pattern_flags[0], pattern_flags[1]);
       }
 
       match = pattern.exec(string);
@@ -1310,7 +1313,8 @@ class ::String < `String`
       if (char_class === null) {
         return self;
       }
-      return self.replace(new RegExp('(' + char_class + ')\\1+', 'g'), '$1');
+      let pattern_flags = $transform_regexp('(' + char_class + ')\\1+', 'gu');
+      return self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '$1');
     }
   end
 
@@ -1345,7 +1349,7 @@ class ::String < `String`
     %x{
       if (!pattern.$$is_regexp) {
         pattern = $coerce_to(pattern, #{::String}, 'to_str');
-        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'));
       }
 
       var result, match = pattern.exec(self);

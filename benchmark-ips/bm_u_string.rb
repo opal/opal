@@ -266,7 +266,7 @@ class String
       }
 
       if (search.$$is_regexp) {
-        regex = $global_multiline_regexp(search);
+        regex = $global_regexp(search);
         while (true) {
           match = regex.exec(self);
           if (match === null) {
@@ -417,7 +417,7 @@ class String
 
       if (search.$$is_regexp) {
         m = null;
-        r = $global_multiline_regexp(search);
+        r = $global_regexp(search);
         while (true) {
           _m = r.exec(self);
           if (_m === null || _m.index > offset) {
@@ -448,7 +448,7 @@ class String
 
       if (sep.$$is_regexp) {
         m = null;
-        r = $global_multiline_regexp(sep);
+        r = $global_regexp(sep);
 
         while (true) {
           _m = r.exec(self);
@@ -657,7 +657,7 @@ class String
           i, max;
 
       if (pattern.$$is_regexp) {
-        pattern = $global_multiline_regexp(pattern);
+        pattern = $global_regexp(pattern);
       } else {
         pattern = $coerce_to(pattern, #{::String}, 'to_str').$to_s();
 
@@ -932,72 +932,72 @@ end
 sep
 
 Benchmark.ips do |x|
-  x.report("orig short")    { short_string.slice_orig(0) }
-  x.report("current short") { short_string[0] }
+  x.report("orig [] short")    { short_string.slice_orig(0) }
+  x.report("current [] short") { short_string[0] }
   x.compare!
 end
 
 sep
 
 Benchmark.ips do |x|
-  x.report("orig medi+")    { medi_string.slice_orig(mi) }
-  x.report("current medi+") { medi_string[mi] }
+  x.report("orig [] medi+")    { medi_string.slice_orig(mi) }
+  x.report("current [] medi+") { medi_string[mi] }
   x.compare!
 end
 
 sep
 
 Benchmark.ips do |x|
-  x.report("orig medi-")    { medi_string.slice_orig(-mi) }
-  x.report("current medi-") { medi_string[-mi] }
+  x.report("orig [] medi-")    { medi_string.slice_orig(-mi) }
+  x.report("current [] medi-") { medi_string[-mi] }
   x.compare!
 end
 
 sep
 
 Benchmark.ips do |x|
-  x.report("orig long+")    { long_string.slice_orig(li) }
-  x.report("current long+") { long_string[li] }
+  x.report("orig [] long+")    { long_string.slice_orig(li) }
+  x.report("current [] long+") { long_string[li] }
   x.compare!
 end
 
 sep
 
 Benchmark.ips do |x|
-  x.report("orig long- bc")    { long_string.slice_orig(ni) }
-  x.report("current long- bc") { long_string[ni] }
+  x.report("orig [] long- bc")    { long_string.slice_orig(ni) }
+  x.report("current [] long- bc") { long_string[ni] }
   x.compare!
 end
 
 sep
 
 Benchmark.ips do |x|
-  x.report("orig long- wc")    { long_string.slice_orig(-li) }
-  x.report("current long- wc") { long_string[-li] }
+  x.report("orig [] long- wc")    { long_string.slice_orig(-li) }
+  x.report("current [] long- wc") { long_string[-li] }
   x.compare!
 end
 
 sep
 
 Benchmark.ips do |x|
-  x.report("orig range 1")    { long_string.slice_orig(r1) }
-  x.report("current range 1") { long_string[r1] }
+  x.report("orig [] range 1")    { long_string.slice_orig(r1) }
+  x.report("current [] range 1") { long_string[r1] }
   x.compare!
 end
 
 sep
 
 Benchmark.ips do |x|
-  x.report("orig range 2")    { long_string.slice_orig(r2) }
-  x.report("current range 2") { long_string[r2] }
+  x.report("orig [] range 2")    { long_string.slice_orig(r2) }
+  x.report("current [] range 2") { long_string[r2] }
   x.compare!
 end
 
 sep
 
 Benchmark.ips do |x|
-  x.report("orig range 3")    { long_string.slice_orig(r3) }
-  x.report("current range 3") { long_string[r3] }
+  x.report("orig [] range 3")    { long_string.slice_orig(r3) }
+  x.report("current [] range 3") { long_string[r3] }
   x.compare!
 end
 

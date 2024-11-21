@@ -79,7 +79,6 @@ opal_filter "String" do
   fails "String#[] with Regexp returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#[] with Regexp, index returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#[] with Regexp, index returns nil if the given capture group was not matched but still sets $~" # Exception: Cannot read properties of undefined (reading '$should')
-  fails "String#[] with String returns a String instance when given a subclass instance" # Expected "el" (StringSpecs::MyString) to be an instance of String
   fails "String#[] with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with index, length returns a string with the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#byteindex calls #to_int to convert the second argument" # Mock 'string index offset' expected to receive to_int("any_args") exactly 1 times but received it 0 times
@@ -199,7 +198,6 @@ opal_filter "String" do
   fails "String#clear raises a FrozenError if self is frozen" # Expected FrozenError but got: NotImplementedError (String#clear not supported. Mutable String methods are not supported in Opal.)
   fails "String#clone calls #initialize_copy on the new instance" # Expected nil == "string" to be truthy but was false
   fails "String#clone copies singleton methods" # TypeError: can't define singleton
-  fails "String#clone returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#concat raises a NoMethodError if the given argument raises a NoMethodError during type coercion to a String" # Mock 'world!' expected to receive to_str("any_args") exactly 1 times but received it 0 times
   fails "String#concat when self is BINARY and argument is US-ASCII uses BINARY encoding" # NoMethodError: undefined method `concat' for "abc"
   fails "String#concat with Integer returns a BINARY string if self is US-ASCII and the argument is between 128-255 (inclusive)" # NoMethodError: undefined method `concat' for ""
@@ -237,7 +235,6 @@ opal_filter "String" do
   fails "String#dump wraps string with \"" # NoMethodError: undefined method `dump' for "foo"
   fails "String#dup calls #initialize_copy on the new instance" # Expected nil == "string" to be truthy but was false
   fails "String#dup does not modify the original setbyte-mutated string when changing dupped string" # NoMethodError: undefined method `setbyte' for "a"
-  fails "String#dup returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#each_grapheme_cluster is unicode aware" # NoMethodError: undefined method `each_grapheme_cluster' for "Ç∂éƒg"
   fails "String#each_grapheme_cluster passes each char in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
@@ -343,7 +340,6 @@ opal_filter "String" do
   fails "String#slice with Regexp returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#slice with Regexp, index returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#slice with Regexp, index returns nil if the given capture group was not matched but still sets $~" # Exception: Cannot read properties of undefined (reading '$should')
-  fails "String#slice with String returns a String instance when given a subclass instance" # Expected "el" (StringSpecs::MyString) to be an instance of String
   fails "String#slice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with index, length returns a string with the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#slice! Range raises a FrozenError on a frozen instance that is modified" # Expected FrozenError but got: NotImplementedError (String#slice! not supported. Mutable String methods are not supported in Opal.)
@@ -468,7 +464,7 @@ opal_filter "String" do
   fails "String#upto raises Encoding::CompatibilityError when incompatible characters are given" # ArgumentError: unknown encoding name - EUC-JP
   fails "String#valid_encoding? returns true for IBM720 encoding self is valid in" # ArgumentError: unknown encoding name - IBM720
   fails "String.new accepts an encoding argument" # ArgumentError: unknown encoding name - euc-jp
-  fails "String.new is called on subclasses" # Expected "subclass" == "" to be truthy but was false  
+  fails "String.new is called on subclasses" # Expected "subclass" == "" to be truthy but was false
   fails "String.try_convert sends #to_str to the argument and raises TypeError if it's not a kind of String" # Expected TypeError (can't convert MockObject to String (MockObject#to_str gives Object)) but got: TypeError (can't convert MockObject into String (MockObject#to_str gives Object))
   fails_badly "String#split with Regexp returns Strings in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
 end

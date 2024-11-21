@@ -177,7 +177,8 @@ module Opal
           # errors) - at least since Node 17.
           static_as_dynamic(value)
         else
-          regexp_content = Regexp.new(value).inspect[1..-2]
+          regexp_content = Regexp.new(value).inspect
+          regexp_content = regexp_content[1...regexp_content.rindex('/')]
           old_flags = flags.join
           new_regexp, new_flags = transform_regexp(regexp_content, old_flags)
           push "/#{new_regexp}/#{new_flags}"

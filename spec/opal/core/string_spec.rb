@@ -79,8 +79,15 @@ describe 'Unicode Astral Plane' do
   it 'returns the correct character or string by #[]' do
     'a𝌆'[1].should == '𝌆'
     'a𝌆a𝌆a𝌆'[1..3].should == '𝌆a𝌆'
+    'a𝌆a𝌆a𝌆'[-5..-3].should == '𝌆a𝌆'
     'a𝌆a𝌆a𝌆'['𝌆'].should == '𝌆'
     'a𝌆a𝌆a𝌆'['𝌆a'].should == '𝌆a'
+    'a𝌆a𝌆a𝌆'[/a/].should == 'a'
+    'a𝌆a𝌆a𝌆'[/𝌆/].should == '𝌆'
+    'a𝌆a𝌆a𝌆'[/#{`String.fromCharCode(55348)`}/].should == nil
+    'a𝌆a𝌆a𝌆'[/#{`String.fromCharCode(57094)`}/].should == nil
+    'a𝌆a𝌆a𝌆'[Regexp.new(`String.fromCharCode(55348)`)].should == nil
+    'a𝌆a𝌆a𝌆'[Regexp.new(`String.fromCharCode(57094)`)].should == nil
   end
 
   it 'correctly compares by #<=>' do

@@ -2676,9 +2676,6 @@
 
   // Transform a regular expression from Ruby syntax to JS syntax.
   Opal.transform_regexp = function(regexp, flags) {
-    if (!Opal.Opal.RegexpTranspiler) {
-      console.warn("ERROR: RegexpTranspiler has not been loaded, yet we try to create a dynamic regexp");
-    }
     return Opal.Opal.RegexpTranspiler.$transform_regexp(regexp, flags);
   };
 
