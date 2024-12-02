@@ -66,7 +66,7 @@ class ::IO
         return nil;
       } else {
         for (var i = 0, ii = args.length; i < ii; i++) {
-          if (args[i].$$is_array){
+          if (args[i] instanceof Array){
             var ary = #{`args[i]`.flatten}
             if (ary.length > 0) #{puts(*`ary`)}
           } else {

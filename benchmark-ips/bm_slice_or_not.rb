@@ -42,11 +42,11 @@ Benchmark.ips do |x|
   end
 
   x.report('$slice?(array)') do
-    `fun.apply(null, ary.$$is_array ? ary : $slice(ary))`
+    `fun.apply(null, (ary instanceof Array) ? ary : $slice(ary))`
   end
 
   x.report('$slice?(obj)') do
-    `fun.apply(null, obj.$$is_array ? obj : $slice(obj))`
+    `fun.apply(null, (obj instanceof Array) ? obj : $slice(obj))`
   end
 
   x.compare!

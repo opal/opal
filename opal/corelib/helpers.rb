@@ -54,7 +54,7 @@ module ::Opal
       if (args.length == 1) {
         return args[0];
       }
-      else if (args.$$is_array) {
+      else if (args instanceof Array) {
         return args;
       }
       else {

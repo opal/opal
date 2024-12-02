@@ -37,7 +37,7 @@ module JSON
         case 'object':
           if (!value) return nil;
 
-          if (value.$$is_array) {
+          if (value instanceof Array) {
             arr = #{`Opal.hash_get(options, 'array_class')`.new};
 
             for (i = 0, ii = value.length; i < ii; i++) {
