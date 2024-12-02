@@ -2,6 +2,7 @@
 
 require 'optparse'
 require 'opal/cli_runners'
+require 'opal/app_creator'
 
 module Opal
   class CLIOptions < OptionParser
@@ -15,6 +16,12 @@ module Opal
 
       on('--repl', 'Run the Opal REPL') do
         options[:repl] = true
+      end
+
+      on('--create-app TYPE', Opal::AppCreator::APP_TYPES, "Create a standalone application. The following TYPEs are supported: #{Opal::AppCreator::APP_TYPES.join(', ')}") do |type|
+        options[:app_type] = type
+        options[:runner] = :compiler
+        options[:output] = "opal_#{type}_app" unless options[:output]
       end
 
       on('-v', '--verbose', 'print version number, then turn on verbose mode') do
@@ -152,7 +159,7 @@ module Opal
         options[:use_strict] = true
       end
 
-      on('--esm', 'Wraps compiled bundle as for ES6 module') do
+      on('--esm', 'Wraps compiled bundle as ES6 module') do
         options[:esm] = true
       end
 

@@ -3,6 +3,7 @@
 require 'opal/requires'
 require 'opal/builder'
 require 'opal/cli_runners'
+require 'opal/app_creator'
 require 'stringio'
 
 module Opal
@@ -47,6 +48,7 @@ module Opal
       @rbrequires  = options.delete(:rbrequires) { [] }
       @no_cache    = options.delete(:no_cache)   { false }
       @stdin       = options.delete(:stdin)      { $stdin }
+      @app_type    = options.delete(:app_type)
 
       @debug_source_map = options.delete(:debug_source_map) { false }
 
@@ -104,6 +106,12 @@ module Opal
         argv: argv,
         builder: builder,
       )
+
+      if @app_type && exit_status == 0
+        @exit_status = Opal::AppCreator.create_app(@app_type, output)
+      end
+
+      @exit_status
     end
 
     def runner
