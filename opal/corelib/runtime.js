@@ -1772,12 +1772,12 @@
   // Helpers for extracting kwsplats
   // Used for: { **h }
   Opal.to_hash = function(value) {
-    if (value.$$is_hash) {
+    if (value instanceof Map) {
       return value;
     }
     else if (value['$respond_to?']('to_hash', true)) {
       var hash = value.$to_hash();
-      if (hash.$$is_hash) {
+      if (hash instanceof Map) {
         return hash;
       }
       else {
@@ -2456,7 +2456,7 @@
       key,
       value;
 
-    if (arguments_length === 1 && arguments[0].$$is_hash) {
+    if (arguments_length === 1 && (arguments[0] instanceof Map)) {
       return arguments[0];
     }
 
@@ -2984,7 +2984,7 @@
   Opal.ensure_kwargs = function(kwargs) {
     if (kwargs == null) {
       return new Map();
-    } else if (kwargs.$$is_hash) {
+    } else if (kwargs instanceof Map) {
       return kwargs;
     } else {
       $raise(Opal.ArgumentError, 'expected kwargs');
