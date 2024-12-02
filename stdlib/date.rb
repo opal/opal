@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# helpers: hash_get
 
 require 'forwardable'
 require 'date/infinity'
@@ -12,10 +13,10 @@ class Date
   GREGORIAN       = -Infinity.new
   ITALY           = 2_299_161 # 1582-10-15
   ENGLAND         = 2_361_222 # 1752-09-14
-  MONTHNAMES      = [nil] + %w[January February March April May June July August September October November December]
-  ABBR_MONTHNAMES = %w[jan feb mar apr may jun jul aug sep oct nov dec]
-  DAYNAMES        = %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday]
-  ABBR_DAYNAMES   = %w[Sun Mon Tue Wed Thu Fri Sat]
+  MONTHNAMES      = `Opal.Time.$$monthnames`
+  ABBR_MONTHNAMES = `Opal.Time.$$abbr_monthnames`
+  DAYNAMES        = `Opal.Time.$$daynames`
+  ABBR_DAYNAMES   = `Opal.Time.$$abbr_daynames`
 
   class << self
     def wrap(native)
@@ -25,15 +26,22 @@ class Date
       instance
     end
 
-    def parse(string, comp = true)
+    def _parse(string, comp = true, limit: 128, mode: :date)
+      `string = Opal.coerce_to(string, #{::String}, 'to_str')`
+
+      if limit && string.length > limit
+        ::Kernel.raise ArgumentError "string length #{string.length} exceeds the limit #{limit}"
+      end
+
       %x{
         var current_date = new Date();
 
         var current_day = current_date.getDate(),
-            current_month = current_date.getMonth(),
+            current_month = current_date.getMonth() + 1,
             current_year = current_date.getFullYear(),
             current_wday = current_date.getDay(),
-            full_month_name_regexp = #{MONTHNAMES.compact.join('|')};
+            day_of_month_regexp = "(\\d{1,2})(th|nd|rd)",
+            full_month_name_regexp = "(" + #{MONTHNAMES.compact.join('|')} + ")";
 
         function match1(match) { return match[1]; }
         function match2(match) { return match[2]; }
@@ -59,7 +67,7 @@ class Date
         function fromMonthAbbr(fn) {
           return function(match) {
             var abbr = fn(match).toLowerCase();
-            return #{ABBR_MONTHNAMES}.indexOf(abbr) + 1;
+            return #{ABBR_MONTHNAMES.compact.map(&:downcase)}.indexOf(abbr) + 1;
           }
         }
 
@@ -208,31 +216,45 @@ class Date
           },
           {
             // monthname daynumber YYYY
-            regexp: new RegExp("^(" + full_month_name_regexp + ")[\\s\\.\\/\\-](\\d{1,2})(th|nd|rd)[\\s\\.\\/\\-](\\-?\\d{3,4})$", "i"),
+            regexp: new RegExp("^" + full_month_name_regexp + "[\\s\\.\\/\\-]" + day_of_month_regexp + "[\\s\\.\\/\\-](\\-?\\d{3,4})$", "i"),
             year: toInt(match4),
             month: fromFullMonthName(match1),
             day: toInt(match2)
           },
           {
             // monthname daynumber
-            regexp: new RegExp("^(" + full_month_name_regexp + ")[\\s\\.\\/\\-](\\d{1,2})(th|nd|rd)", "i"),
+            regexp: new RegExp("^" + full_month_name_regexp + "[\\s\\.\\/\\-]" + day_of_month_regexp, "i"),
             year: current_year,
             month: fromFullMonthName(match1),
             day: toInt(match2)
           },
           {
             // daynumber monthname YYYY
-            regexp: new RegExp("^(\\d{1,2})(th|nd|rd)[\\s\\.\\/\\-](" + full_month_name_regexp + ")[\\s\\.\\/\\-](\\-?\\d{3,4})$", "i"),
+            regexp: new RegExp("^" + day_of_month_regexp + "[\\s\\.\\/\\-]" + full_month_name_regexp + "[\\s\\.\\/\\-](\\-?\\d{3,4})$", "i"),
             year: toInt(match4),
             month: fromFullMonthName(match3),
             day: toInt(match1)
           },
           {
             // YYYY monthname daynumber
-            regexp: new RegExp("^(\\-?\\d{3,4})[\\s\\.\\/\\-](" + full_month_name_regexp + ")[\\s\\.\\/\\-](\\d{1,2})(th|nd|rd)$", "i"),
+            regexp: new RegExp("^(\\-?\\d{3,4})[\\s\\.\\/\\-]" + full_month_name_regexp + "[\\s\\.\\/\\-]" + day_of_month_regexp + "$", "i"),
             year: toInt(match1),
             month: fromFullMonthName(match2),
             day: toInt(match3)
+          },
+          {
+            // monthname
+            regexp: new RegExp("^" + full_month_name_regexp + "$", "i"),
+            year: current_year,
+            month: fromFullMonthName(match1),
+            day: 1
+          },
+          {
+            // daynumber
+            regexp: new RegExp("^" + day_of_month_regexp + "$"),
+            year: current_year,
+            month: current_month,
+            day: toInt(match1)
           }
         ]
 
@@ -249,7 +271,7 @@ class Date
 
             var month = rule.month;
             if (typeof(month) === 'function') {
-              month = month(match) - 1
+              month = month(match);
             }
 
             var day = rule.day;
@@ -257,18 +279,30 @@ class Date
               day = day(match);
             }
 
-            var result = new Date(year, month, day);
-
-            // an edge case, JS can't handle 'new Date(1)', minimal year is 1970
-            if (year >= 0 && year <= 1970) {
-              result.setFullYear(year);
+            if (month === 0) {
+              var d = new Date(year, month, day);
+              month = d.getMonth() + 1;
+              day = d.getDate();
             }
 
-            return #{wrap `result`};
+            return #{{ year: `year`, month: `month`, day: `day` }};
           }
         }
       }
-      raise ArgumentError, 'invalid date'
+    end
+
+    def parse(string, comp = true, start = ITALY, limit: 128)
+      date_hash = _parse(string, comp, limit: limit, mode: :date)
+      raise ArgumentError, 'invalid date' unless date_hash
+      %x{
+        var year = $hash_get(date_hash, "year");
+        var result = new Date(year, $hash_get(date_hash, "month") - 1, $hash_get(date_hash, "day"));
+        // an edge case, JS can't handle 'new Date(1)', minimal year is 1970
+        if (year >= 0 && year <= 1970) {
+          result.setFullYear(year);
+        }
+        return #{wrap `result`};
+      }
     end
 
     def today
