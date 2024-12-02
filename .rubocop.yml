@@ -427,6 +427,10 @@ Style/MutableConstant:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
 
+Lint/UnifiedInteger:
+  Exclude:
+    - 'opal/corelib/bignum.rb'
+
 Style/EmptyCaseCondition:
   Enabled: false
 
