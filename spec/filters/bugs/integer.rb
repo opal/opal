@@ -40,7 +40,6 @@ opal_filter "Integer" do
   fails "Integer#^ fixnum returns self bitwise EXCLUSIVE OR other" # Expected 5 == 18446744078004520000 to be truthy but was false
   fails "Integer#^ fixnum returns self bitwise XOR other when one operand is negative" # Expected -3 == -8589934593 to be truthy but was false
   fails "Integer#ceildiv returns a quotient of division which is rounded up to the nearest integer" # NoMethodError: undefined method `ceildiv' for 0
-  fails "Integer#chr with an encoding argument accepts a String as an argument" # Expected to not get Exception but got: ArgumentError (unknown encoding name - euc-jp)
   fails "Integer#chr with an encoding argument raises RangeError if self is invalid as a codepoint in the specified encoding" # Expected RangeError but no exception was raised ("\x80" was returned)
   fails "Integer#chr with an encoding argument raises a RangeError if self is too large" # Expected RangeError but no exception was raised ("膀" was returned)
   fails "Integer#chr with an encoding argument raises a RangeError is self is less than 0" # Expected RangeError but no exception was raised ("\uFFFF" was returned)

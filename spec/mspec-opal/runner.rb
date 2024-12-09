@@ -83,7 +83,7 @@ class OSpecFormatter
       'chrome'       => DottedFormatter,
       'firefox'      => DottedFormatter,
       'safari'       => DottedFormatter,
-      'bun'         => NodeJSFormatter,
+      'bun'          => NodeJSFormatter,
       'deno'         => NodeJSFormatter,
       'node'         => NodeJSFormatter,
       'nodejs'       => NodeJSFormatter,
@@ -99,7 +99,7 @@ class OSpecFormatter
       DottedFormatter
     end
 
-    if ENV['INVERT_RUNNING_MODE']
+    if ENV['INVERT_RUNNING_MODE'] && !ENV['PATTERN']
       formatter = Class.new(formatter)
       formatter.include InvertedFormatter
     end

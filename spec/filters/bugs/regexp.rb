@@ -24,7 +24,7 @@ opal_filter "regular_expressions" do
   fails "MatchData#deconstruct_keys returns {} when there are no named captured groups at all" # NoMethodError: undefined method `deconstruct_keys' for #<MatchData "foobar">
   fails "MatchData#regexp returns a Regexp for the result of gsub(String)" # Expected /\[/gm == /\[/ to be truthy but was false
   fails "MatchData#string returns a frozen copy of the matched string for gsub(String)" # NotImplementedError: String#gsub! not supported. Mutable String methods are not supported in Opal.
-  fails "MatchData.allocate is undefined" # Expected NoMethodError but no exception was raised (#<MatchData>(#pretty_inspect raised #<NoMethodError: undefined method `named_captures' for nil>) was returned)  
+  fails "MatchData.allocate is undefined" # Expected NoMethodError but no exception was raised (#<MatchData>(#pretty_inspect raised #<NoMethodError: undefined method `named_captures' for nil>) was returned)
   fails "Regexp#encoding allows otherwise invalid characters if NOENCODING is specified" # NameError: uninitialized constant Regexp::NOENCODING
   fails "Regexp#encoding defaults to US-ASCII if the Regexp contains only US-ASCII character" # NoMethodError: undefined method `encoding' for /ASCII/
   fails "Regexp#encoding defaults to UTF-8 if \\u escapes appear" # NoMethodError: undefined method `encoding' for /\u{9879}/
@@ -49,8 +49,6 @@ opal_filter "regular_expressions" do
   fails "Regexp#hash is based on the text and options of Regexp" # Expected false == true to be truthy but was false
   fails "Regexp#hash returns the same value for two Regexps differing only in the /n option" # Expected false == true to be truthy but was false
   fails "Regexp#initialize raises a TypeError on an initialized non-literal Regexp" # Expected TypeError but no exception was raised (nil was returned)
-  fails "Regexp#inspect does not include a character set code" # Expected "/(?:)/" == "//" to be truthy but was false
-  fails "Regexp#inspect does not include the 'o' option" # Expected "/(?:)/" == "//" to be truthy but was false
   fails "Regexp#inspect returns options in the order 'mixn'" # Expected "/(?:)/" == "//mixn" to be truthy but was false
   fails "Regexp#named_captures works with duplicate capture group names" # Exception: Invalid regular expression: /this (?<is>is) [aA] (?<pat>pate?(?<is>rn))/: Duplicate capture group name
   fails "Regexp#names returns each capture name only once" # Exception: Invalid regular expression: /n(?<cap>ee)d(?<cap>le)/: Duplicate capture group name
@@ -62,6 +60,8 @@ opal_filter "regular_expressions" do
   fails "Regexp.compile given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/ but got: ""
   fails "Regexp.compile given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.compile given a String raises a RegexpError when passed an incorrect regexp" # Expected RegexpError but got: Exception (Invalid regular expression: /^[$/: Unterminated character class)
+  fails "Regexp.compile given a String with escaped characters accepts a backspace followed by a character" # Exception: Invalid regular expression: /\N/u: Invalid escape
+  fails "Regexp.compile given a String with escaped characters accepts multiple consecutive '\\' characters" # Exception: Invalid regular expression: /\\\N/u: Invalid escape
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits" # Expected RegexpError but no exception was raised (/\xn/ was returned)
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if less than four digits are given for \\uHHHH" # Expected RegexpError but no exception was raised (/\u304/ was returned)
   fails "Regexp.compile given a String with escaped characters raises a RegexpError if more than six hexadecimal digits are given" # Expected RegexpError but no exception was raised (/\u{0ffffff}/ was returned)
@@ -81,6 +81,8 @@ opal_filter "regular_expressions" do
   fails "Regexp.linear_time? warns about flags being ignored for regexp arguments" # NoMethodError: undefined method `linear_time?' for Regexp
   fails "Regexp.new given a String accepts an Integer of two or more options ORed together as the second argument" # Expected 0 == 0 to be falsy but was true
   fails "Regexp.new given a String raises a RegexpError when passed an incorrect regexp" # Expected RegexpError but got: Exception (Invalid regular expression: /^[$/: Unterminated character class)
+  fails "Regexp.new given a String with escaped characters accepts a backspace followed by a character" # Exception: Invalid regular expression: /\N/u: Invalid escape
+  fails "Regexp.new given a String with escaped characters accepts multiple consecutive '\\' characters" # Exception: Invalid regular expression: /\\\N/u: Invalid escape
   fails "Regexp.new given a String with escaped characters raises a RegexpError if \\x is not followed by any hexadecimal digits" # Expected RegexpError but no exception was raised (/\xn/ was returned)
   fails "Regexp.new given a String with escaped characters raises a RegexpError if more than six hexadecimal digits are given" # Expected RegexpError but no exception was raised (/\u{0ffffff}/ was returned)
   fails "Regexp.new given a non-String/Regexp raises TypeError if #to_str returns non-String value" # Expected TypeError (/can't convert Object to String/) but got: TypeError (can't convert Object into String (Object#to_str gives Array))
