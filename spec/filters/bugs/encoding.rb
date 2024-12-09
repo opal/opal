@@ -64,21 +64,17 @@ opal_filter "Encoding" do
   fails "String#ascii_only? returns false when replacing an ASCII String with a non-ASCII String" # NoMethodError: undefined method `replace' for ""
   fails "String#b returns new string without modifying self" # Expected "こんちには" not to be identical to "こんちには"
   fails "String#byteslice on on non ASCII strings returns byteslice of unicode strings" # Expected nil == "\x81" to be truthy but was false
-  fails "String#center with length, padding with width returns a String in the same encoding as the original" # NameError: uninitialized constant Encoding::IBM437
   fails "String#center with length, padding with width, pattern raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#center with length, padding with width, pattern returns a String in the compatible encoding" # NameError: uninitialized constant Encoding::IBM437
   fails "String#chars returns a different character if the String is transcoded" # ArgumentError: unknown encoding name - iso-8859-15
-  fails "String#chars returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
   fails "String#chars uses the String's encoding to determine what characters it contains" # Expected ["�"] == ["𤭢"] to be truthy but was false
   fails "String#chars works if the String's contents is invalid for its encoding" # Expected true to be false
-  fails "String#chr returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#chr returns a copy of self" # Expected "e" not to be identical to "e"
   fails "String#codepoints raises an ArgumentError if self's encoding is invalid and a block is given" # Expected true to be false
   fails "String#codepoints raises an ArgumentError when no block is given if self has an invalid encoding" # Expected true to be false
   fails "String#codepoints raises an ArgumentError when self has an invalid encoding and a method is called on the returned Enumerator" # Expected true to be false
   fails "String#codepoints round-trips to the original String using Integer#chr" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#each_char returns a different character if the String is transcoded" # ArgumentError: unknown encoding name - iso-8859-15
-  fails "String#each_char returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
   fails "String#each_char uses the String's encoding to determine what characters it contains" # Expected ["�"] == ["𤭢"] to be truthy but was false
   fails "String#each_char works if the String's contents is invalid for its encoding" # Expected true to be false
   fails "String#each_codepoint raises an ArgumentError if self's encoding is invalid and a block is given" # Expected true to be false
@@ -179,12 +175,10 @@ opal_filter "Encoding" do
   fails "String#length returns the length of the new self after encoding is changed" # Expected 4 == 12 to be truthy but was false
   fails "String#ljust with length, padding with width returns a String in the same encoding as the original" # NameError: uninitialized constant Encoding::IBM437
   fails "String#ljust with length, padding with width, pattern raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
-  fails "String#ljust with length, padding with width, pattern returns a String in the compatible encoding" # NameError: uninitialized constant Encoding::IBM437
   fails "String#ord raises an ArgumentError if called on an empty String" # Exception: Cannot read properties of undefined (reading '$pretty_inspect')
   fails "String#rindex with Regexp raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
   fails "String#rjust with length, padding with width returns a String in the same encoding as the original" # NameError: uninitialized constant Encoding::IBM437
   fails "String#rjust with length, padding with width, pattern raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
-  fails "String#rjust with length, padding with width, pattern returns a String in the compatible encoding" # NameError: uninitialized constant Encoding::IBM437
   fails "String#size returns the length of a string in different encodings" # NameError: uninitialized constant Encoding::SHIFT_JIS
   fails "String#size returns the length of the new self after encoding is changed" # Expected 4 == 12 to be truthy but was false
   fails "String#split with String throws an ArgumentError if the pattern is not a valid string" # Expected ArgumentError but no exception was raised (["проверка"] was returned)
@@ -211,5 +205,5 @@ opal_filter "Encoding" do
   fails "The predefined global constant STDOUT has nil for the internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
   fails "The predefined global constant STDOUT has the encodings set by #set_encoding" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Time#inspect returns a US-ASCII encoded string" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
-  fails "Time#to_s returns a US-ASCII encoded string" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>  
+  fails "Time#to_s returns a US-ASCII encoded string" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
 end
