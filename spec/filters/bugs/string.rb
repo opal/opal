@@ -74,87 +74,16 @@ opal_filter "String" do
   fails "String#=== returns true when comparing 2 empty strings but one is not ASCII-compatible" # ArgumentError: unknown encoding name - iso-2022-jp
   fails "String#[] raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#[] with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#[] with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
-  fails "String#[] with Range returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "String#[] with Regexp returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "String#[] with Regexp, index returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "String#[] with Regexp, index returns nil if the given capture group was not matched but still sets $~" # Exception: Cannot read properties of undefined (reading '$should')
   fails "String#[] with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#[] with index, length returns a string with the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "String#byteindex calls #to_int to convert the second argument" # Mock 'string index offset' expected to receive to_int("any_args") exactly 1 times but received it 0 times
-  fails "String#byteindex calls #to_str to convert the first argument" # Mock 'string index char' expected to receive to_str("any_args") exactly 1 times but received it 0 times
-  fails "String#byteindex does not raise IndexError when byte offset is correct or on string boundary" # NoMethodError: undefined method `byteindex' for "わ"
   fails "String#byteindex raises on type errors raises a TypeError if passed a Symbol" # Expected TypeError (no implicit conversion of MockObject into String) but got: NoMethodError (undefined method `byteindex' for "hello")
-  fails "String#byteindex raises on type errors raises a TypeError if passed a boolean" # Expected TypeError (no implicit conversion of true into String) but got: NoMethodError (undefined method `byteindex' for "abc")
-  fails "String#byteindex raises on type errors raises a TypeError if passed an Integer" # Expected TypeError (no implicit conversion of Integer into String) but got: NoMethodError (undefined method `byteindex' for "abc")
-  fails "String#byteindex raises on type errors raises a TypeError if passed nil" # Expected TypeError (no implicit conversion of nil into String) but got: NoMethodError (undefined method `byteindex' for "abc")
-  fails "String#byteindex with Regexp behaves the same as String#byteindex(string) for escaped string regexps" # NoMethodError: undefined method `byteindex' for "blablabla"
-  fails "String#byteindex with Regexp converts start_offset to an integer via to_int" # Mock '1' expected to receive to_int("any_args") exactly 1 times but received it 0 times
-  fails "String#byteindex with Regexp returns nil if the Regexp matches the empty string and the offset is out of range" # NoMethodError: undefined method `byteindex' for "ruby"
-  fails "String#byteindex with Regexp returns nil if the substring isn't found" # NoMethodError: undefined method `byteindex' for "blablabla"
-  fails "String#byteindex with Regexp returns the byteindex of the first match of regexp" # NoMethodError: undefined method `byteindex' for "blablabla"
-  fails "String#byteindex with Regexp returns the character byteindex after offset" # NoMethodError: undefined method `byteindex' for "われわれ"
-  fails "String#byteindex with Regexp returns the character byteindex of a multibyte character" # NoMethodError: undefined method `byteindex' for "ありがとう"
-  fails "String#byteindex with Regexp starts the search at offset + self.length if offset is negative" # NoMethodError: undefined method `byteindex' for "blablabla"
-  fails "String#byteindex with Regexp starts the search at the given offset" # NoMethodError: undefined method `byteindex' for "blablabla"
   fails "String#byteindex with Regexp supports \\G which matches at the given start offset" # NoMethodError: undefined method `byteindex' for "helloYOU."
-  fails "String#byteindex with Regexp treats the offset as a byteindex" # NoMethodError: undefined method `byteindex' for "われわわれ"
-  fails "String#byteindex with String behaves the same as String#byteindex(char) for one-character strings" # NoMethodError: undefined method `byteindex' for "b"
-  fails "String#byteindex with String handles a substring in a subset encoding" # NoMethodError: undefined method `byteindex' for "été"
-  fails "String#byteindex with String handles a substring in a superset encoding" # NoMethodError: undefined method `byteindex' for "abc"
-  fails "String#byteindex with String ignores string subclasses" # NoMethodError: undefined method `byteindex' for "blablabla"
   fails "String#byteindex with String raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
-  fails "String#byteindex with String returns nil if the substring isn't found" # NoMethodError: undefined method `byteindex' for "blablabla"
-  fails "String#byteindex with String returns the byteindex of the first occurrence of the given substring" # NoMethodError: undefined method `byteindex' for "blablabla"
-  fails "String#byteindex with String returns the character byteindex after a partial first match" # NoMethodError: undefined method `byteindex' for "</</h"
-  fails "String#byteindex with String returns the character byteindex after offset" # NoMethodError: undefined method `byteindex' for "われわれ"
-  fails "String#byteindex with String returns the character byteindex of a multibyte character" # NoMethodError: undefined method `byteindex' for "ありがとう"
-  fails "String#byteindex with String starts the search at offset + self.length if offset is negative" # NoMethodError: undefined method `byteindex' for "blablabla"
-  fails "String#byteindex with String starts the search at the given offset" # NoMethodError: undefined method `byteindex' for "blablabla"
-  fails "String#byteindex with String treats the offset as a byteindex" # NoMethodError: undefined method `byteindex' for "aaaaa"
-  fails "String#byteindex with global variables doesn't set $~ for non regex search" # NoMethodError: undefined method `byteindex' for "hello."
-  fails "String#byteindex with global variables sets $~ to MatchData of match and nil when there's none" # NoMethodError: undefined method `byteindex' for "hello."
   fails "String#byteindex with multibyte codepoints raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
-  fails "String#byteindex with multibyte codepoints raises an IndexError when byte offset lands in the middle of a multibyte character" # Expected IndexError (offset 1 does not land on character boundary) but got: NoMethodError (undefined method `byteindex' for "わ")
-  fails "String#byterindex with Regexp behaves the same as String#byterindex(string) for escaped string regexps" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with Regexp raises a TypeError when given offset is nil" # Expected TypeError but got: NoMethodError (undefined method `byterindex' for "str")
-  fails "String#byterindex with Regexp returns nil if the substring isn't found" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with Regexp returns the character index before the finish" # NoMethodError: undefined method `byterindex' for "ありがりがとう"
-  fails "String#byterindex with Regexp returns the index of the first match from the end of string of regexp" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with Regexp returns the reverse byte index of a multibyte character" # NoMethodError: undefined method `byterindex' for "ありがりがとう"
-  fails "String#byterindex with Regexp starts the search at offset + self.length if offset is negative" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with Regexp starts the search at the given offset" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with Regexp tries to convert start_offset to an integer" # NoMethodError: undefined method `byterindex' for "str"
-  fails "String#byterindex with String behaves the same as String#byterindex(?char) for one-character strings" # NoMethodError: undefined method `byterindex' for "b"
-  fails "String#byterindex with String behaves the same as String#byterindex(char) for one-character strings" # NoMethodError: undefined method `byterindex' for "b"
-  fails "String#byterindex with String handles a substring in a subset encoding" # NoMethodError: undefined method `byterindex' for "été"
-  fails "String#byterindex with String handles a substring in a superset encoding" # NoMethodError: undefined method `byterindex' for "abc"
-  fails "String#byterindex with String ignores string subclasses" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with String raises a TypeError when given offset is nil" # Expected TypeError but got: NoMethodError (undefined method `byterindex' for "str")
-  fails "String#byterindex with String returns nil if the substring isn't found" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with String returns the index of the last occurrence of the given substring" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with String starts the search at offset + self.length if offset is negative" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with String starts the search at the given offset" # NoMethodError: undefined method `byterindex' for "blablabla"
-  fails "String#byterindex with String tries to convert start_offset to an integer via to_int" # NoMethodError: undefined method `byterindex' for "str"
-  fails "String#byterindex with object calls #to_int to convert the second argument" # Mock 'string index offset' expected to receive to_int("any_args") exactly 1 times but received it 0 times
-  fails "String#byterindex with object does not raise IndexError when byte offset is correct or on string boundary" # NoMethodError: undefined method `byterindex' for "わ"
   fails "String#byterindex with object raises on type errors raises a TypeError if passed a Symbol" # Expected TypeError (no implicit conversion of MockObject into String) but got: NoMethodError (undefined method `byterindex' for "hello")
-  fails "String#byterindex with object raises on type errors raises a TypeError if passed a boolean" # Expected TypeError (no implicit conversion of true into String) but got: NoMethodError (undefined method `byterindex' for "abc")
-  fails "String#byterindex with object raises on type errors raises a TypeError if passed an Integer" # Expected TypeError (no implicit conversion of Integer into String) but got: NoMethodError (undefined method `byterindex' for "abc")
-  fails "String#byterindex with object raises on type errors raises a TypeError if passed nil" # Expected TypeError (no implicit conversion of nil into String) but got: NoMethodError (undefined method `byterindex' for "abc")
-  fails "String#byterindex with object tries to convert obj to a string via to_str" # NoMethodError: undefined method `byterindex' for "hello"
-  fails "String#byterindex with object with global variables doesn't set $~ for non regex search" # NoMethodError: undefined method `byterindex' for "hello."
-  fails "String#byterindex with object with global variables sets $~ to MatchData of match and nil when there's none" # NoMethodError: undefined method `byterindex' for "hello."
   fails "String#byterindex with object with multibyte codepoints raises an Encoding::CompatibilityError if the encodings are incompatible" # NameError: uninitialized constant Encoding::EUC_JP
-  fails "String#byterindex with object with multibyte codepoints raises an IndexError when byte offset lands in the middle of a multibyte character" # Expected IndexError (offset 1 does not land on character boundary) but got: NoMethodError (undefined method `byterindex' for "わ")
-  fails "String#bytes yields each byte to a block if one is given, returning self" # Expected [230, 157, 177, 228, 186, 172] == "東京" to be truthy but was false
-  fails "String#byteslice on on non ASCII strings returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#byteslice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#byteslice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#byteslice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
-  fails "String#byteslice with Range returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#byteslice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#byteslice with index, length returns a string with the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#bytesplice mutates self" # NoMethodError: undefined method `bytesplice' for "hello"
   fails "String#bytesplice raises IndexError for negative length" # Expected IndexError (negative length -2) but got: NoMethodError (undefined method `bytesplice' for "abc")
   fails "String#bytesplice raises IndexError when index is greater than bytesize" # Expected IndexError (index 6 out of string) but got: NoMethodError (undefined method `bytesplice' for "hello")
@@ -174,7 +103,6 @@ opal_filter "String" do
   fails "String#bytesplice with multibyte characters replaces with range" # NoMethodError: undefined method `bytesplice' for "こんにちは"
   fails "String#bytesplice with multibyte characters treats negative length for range as 0" # NoMethodError: undefined method `bytesplice' for "こんにちは"
   fails "String#capitalize ASCII-only case mapping does not capitalize non-ASCII characters" # ArgumentError: [String#capitalize] wrong number of arguments (given 1, expected 0)
-  fails "String#capitalize ASCII-only case mapping handles non-ASCII substrings properly" # ArgumentError: [String#capitalize] wrong number of arguments (given 1, expected 0)
   fails "String#capitalize full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#capitalize] wrong number of arguments (given 2, expected 0)
   fails "String#capitalize full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#capitalize] wrong number of arguments (given 1, expected 0)
   fails "String#capitalize full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # ArgumentError: [String#capitalize] wrong number of arguments (given 2, expected 0)
@@ -207,8 +135,6 @@ opal_filter "String" do
   fails "String#delete_prefix! raises a FrozenError when self is frozen" # Expected FrozenError but got: NoMethodError (undefined method `delete_prefix!' for "hello")
   fails "String#delete_suffix returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#delete_suffix! raises a FrozenError when self is frozen" # Expected FrozenError but got: NoMethodError (undefined method `delete_suffix!' for "hello")
-  fails "String#downcase ASCII-only case mapping does not downcase non-ASCII characters" # ArgumentError: [String#downcase] wrong number of arguments (given 1, expected 0)
-  fails "String#downcase ASCII-only case mapping works with substrings" # ArgumentError: [String#downcase] wrong number of arguments (given 1, expected 0)
   fails "String#downcase case folding case folds special characters" # ArgumentError: [String#downcase] wrong number of arguments (given 1, expected 0)
   fails "String#downcase full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#downcase] wrong number of arguments (given 2, expected 0)
   fails "String#downcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#downcase] wrong number of arguments (given 1, expected 0)
@@ -216,38 +142,19 @@ opal_filter "String" do
   fails "String#downcase full Unicode case mapping adapted for Turkic languages downcases characters according to Turkic semantics" # ArgumentError: [String#downcase] wrong number of arguments (given 1, expected 0)
   fails "String#downcase returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#downcase! raises a FrozenError when self is frozen" # Expected FrozenError but got: NotImplementedError (String#downcase! not supported. Mutable String methods are not supported in Opal.)
-  fails "String#dump does not take into account if a string is frozen" # NoMethodError: undefined method `dump' for "foo"
   fails "String#dump includes .force_encoding(name) if the encoding isn't ASCII compatible" # NoMethodError: undefined method `dump' for "ࡶ"
   fails "String#dump returns a String in the same encoding as self" # NoMethodError: undefined method `dump' for "foo"
-  fails "String#dump returns a String instance" # NoMethodError: undefined method `dump' for ""
-  fails "String#dump returns a string with # not escaped when followed by any other character" # NoMethodError: undefined method `dump' for "#"
-  fails "String#dump returns a string with \" and \\ escaped with a backslash" # NoMethodError: undefined method `dump' for "\""
-  fails "String#dump returns a string with \\#<char> when # is followed by $, @, @@, {" # NoMethodError: undefined method `dump' for "\#$PATH"
-  fails "String#dump returns a string with lower-case alpha characters unescaped" # NoMethodError: undefined method `dump' for "a"
   fails "String#dump returns a string with multi-byte UTF-8 characters greater than 0xFFFF replaced by \\u{XXXXXX} notation with upper-case hex digits" # NoMethodError: undefined method `dump' for "\u0000"
-  fails "String#dump returns a string with multi-byte UTF-8 characters less than or equal 0xFFFF replaced by \\uXXXX notation with upper-case hex digits" # NoMethodError: undefined method `dump' for "\u0080"
   fails "String#dump returns a string with non-printing ASCII characters replaced by \\x notation" # NoMethodError: undefined method `dump' for "\x00"
   fails "String#dump returns a string with non-printing single-byte UTF-8 characters replaced by \\x notation" # NoMethodError: undefined method `dump' for "\u0000"
-  fails "String#dump returns a string with numeric characters unescaped" # NoMethodError: undefined method `dump' for "0"
-  fails "String#dump returns a string with printable non-alphanumeric characters unescaped" # NoMethodError: undefined method `dump' for " "
-  fails "String#dump returns a string with special characters replaced with \\<char> notation" # NoMethodError: undefined method `dump' for "\a"
-  fails "String#dump returns a string with upper-case alpha characters unescaped" # NoMethodError: undefined method `dump' for "A"
-  fails "String#dump wraps string with \"" # NoMethodError: undefined method `dump' for "foo"
   fails "String#dup calls #initialize_copy on the new instance" # Expected nil == "string" to be truthy but was false
   fails "String#dup does not modify the original setbyte-mutated string when changing dupped string" # NoMethodError: undefined method `setbyte' for "a"
   fails "String#each_byte keeps iterating from the old position (to new string end) when self changes" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
-  fails "String#each_grapheme_cluster is unicode aware" # NoMethodError: undefined method `each_grapheme_cluster' for "Ç∂éƒg"
-  fails "String#each_grapheme_cluster passes each char in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
-  fails "String#each_grapheme_cluster passes each grapheme cluster in self to the given block" # NoMethodError: undefined method `each_grapheme_cluster' for "ab🏳️\u200D🌈🐾"
   fails "String#each_grapheme_cluster returns a different character if the String is transcoded" # NoMethodError: undefined method `each_grapheme_cluster' for "€"
   fails "String#each_grapheme_cluster returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
-  fails "String#each_grapheme_cluster returns self" # NoMethodError: undefined method `each_grapheme_cluster' for "ab🏳️\u200D🌈🐾"
   fails "String#each_grapheme_cluster uses the String's encoding to determine what characters it contains" # NoMethodError: undefined method `each_grapheme_cluster' for "𤭢"
   fails "String#each_grapheme_cluster when no block is given returned enumerator size should return the size of the string" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
-  fails "String#each_grapheme_cluster when no block is given returns an enumerator" # NoMethodError: undefined method `each_grapheme_cluster' for "hello"
   fails "String#each_grapheme_cluster works if the String's contents is invalid for its encoding" # Expected true to be false
-  fails "String#each_grapheme_cluster works with multibyte characters" # NoMethodError: undefined method `each_grapheme_cluster' for "覇"
-  fails "String#each_grapheme_cluster yields String instances for subclasses" # NoMethodError: undefined method `each_grapheme_cluster' for "abc"
   fails "String#each_line returns Strings in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#encode when passed options replace multiple invalid bytes at the end with a single replacement character" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#encode when passed to, from, options returns a copy in the destination encoding when both encodings are the same" # NoMethodError: undefined method `default_internal' for Encoding
@@ -263,16 +170,10 @@ opal_filter "String" do
   fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to BINARY if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#freeze doesn't produce the same object for different instances of literals in the source" # Expected "abc" not to be identical to "abc"
-  fails "String#grapheme_clusters is unicode aware" # NoMethodError: undefined method `grapheme_clusters' for "Ç∂éƒg"
-  fails "String#grapheme_clusters passes each char in self to the given block" # NoMethodError: undefined method `grapheme_clusters' for "hello"
-  fails "String#grapheme_clusters passes each grapheme cluster in self to the given block" # NoMethodError: undefined method `grapheme_clusters' for "ab🏳️\u200D🌈🐾"
   fails "String#grapheme_clusters returns a different character if the String is transcoded" # NoMethodError: undefined method `grapheme_clusters' for "€"
-  fails "String#grapheme_clusters returns an array when no block given" # NoMethodError: undefined method `grapheme_clusters' for "ab🏳️\u200D🌈🐾"
   fails "String#grapheme_clusters returns characters in the same encoding as self" # ArgumentError: unknown encoding name - Shift_JIS
-  fails "String#grapheme_clusters returns self" # NoMethodError: undefined method `grapheme_clusters' for "ab🏳️\u200D🌈🐾"
   fails "String#grapheme_clusters uses the String's encoding to determine what characters it contains" # NoMethodError: undefined method `grapheme_clusters' for "𤭢"
   fails "String#grapheme_clusters works if the String's contents is invalid for its encoding" # Expected true to be false
-  fails "String#grapheme_clusters works with multibyte characters" # NoMethodError: undefined method `grapheme_clusters' for "覇"
   fails "String#gsub with pattern and block does not set $~ for procs created from methods" # Expected "he<l><l>o" == "he<unset><unset>o" to be truthy but was false
   fails "String#gsub with pattern and block raises an Encoding::CompatibilityError if the encodings are not compatible" # Expected CompatibilityError but got: ArgumentError (unknown encoding name - iso-8859-5)
   fails "String#gsub with pattern and block replaces the incompatible part properly even if the encodings are not compatible" # ArgumentError: unknown encoding name - iso-8859-5
@@ -335,13 +236,7 @@ opal_filter "String" do
   fails "String#size returns the correct length after force_encoding(BINARY)" # Expected 2 == 4 to be truthy but was false
   fails "String#slice raises a RangeError if the index is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "String#slice with Range raises a RangeError if one of the bound is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#slice with Range raises a type error if a range is passed with a length" # Expected TypeError but no exception was raised ("el" was returned)
-  fails "String#slice with Range returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "String#slice with Regexp returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "String#slice with Regexp, index returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "String#slice with Regexp, index returns nil if the given capture group was not matched but still sets $~" # Exception: Cannot read properties of undefined (reading '$should')
   fails "String#slice with index, length raises a RangeError if the index or length is too big" # Expected RangeError but no exception was raised (nil was returned)
-  fails "String#slice with index, length returns a string with the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#slice! Range raises a FrozenError on a frozen instance that is modified" # Expected FrozenError but got: NotImplementedError (String#slice! not supported. Mutable String methods are not supported in Opal.)
   fails "String#slice! Range raises a FrozenError on a frozen instance that would not be modified" # Expected FrozenError but got: NotImplementedError (String#slice! not supported. Mutable String methods are not supported in Opal.)
   fails "String#slice! with Regexp raises a FrozenError on a frozen instance that is modified" # Expected FrozenError but got: NotImplementedError (String#slice! not supported. Mutable String methods are not supported in Opal.)
@@ -387,14 +282,10 @@ opal_filter "String" do
   fails "String#sub! with pattern and block raises a FrozenError when self is frozen" # Expected FrozenError but got: NotImplementedError (String#sub! not supported. Mutable String methods are not supported in Opal.)
   fails "String#sub! with pattern, replacement raises a FrozenError when self is frozen" # Expected FrozenError but got: NotImplementedError (String#sub! not supported. Mutable String methods are not supported in Opal.)
   fails "String#succ returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "String#swapcase ASCII-only case mapping does not swapcase non-ASCII characters" # ArgumentError: [String#swapcase] wrong number of arguments (given 1, expected 0)
-  fails "String#swapcase ASCII-only case mapping works with substrings" # ArgumentError: [String#swapcase] wrong number of arguments (given 1, expected 0)
   fails "String#swapcase full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#swapcase] wrong number of arguments (given 2, expected 0)
   fails "String#swapcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#swapcase] wrong number of arguments (given 1, expected 0)
   fails "String#swapcase full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # ArgumentError: [String#swapcase] wrong number of arguments (given 2, expected 0)
   fails "String#swapcase full Unicode case mapping adapted for Turkic languages swaps case of ASCII characters according to Turkic semantics" # ArgumentError: [String#swapcase] wrong number of arguments (given 1, expected 0)
-  fails "String#swapcase full Unicode case mapping updates string metadata" # Expected "aßET" == "aSSET" to be truthy but was false
-  fails "String#swapcase full Unicode case mapping works for all of Unicode with no option" # Expected "äÖü" == "ÄöÜ" to be truthy but was false
   fails "String#swapcase returns a String in the same encoding as self" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "String#swapcase! raises a FrozenError when self is frozen" # Expected FrozenError but got: NotImplementedError (String#swapcase! not supported. Mutable String methods are not supported in Opal.)
   fails "String#to_c allows null-byte" # Expected (1-2i) == (1+0i) to be truthy but was false
@@ -453,8 +344,6 @@ opal_filter "String" do
   fails "String#unpack with format 'm' when given count 0 raises an ArgumentError for an invalid base64 character" # Expected ArgumentError but no exception was raised (["test"] was returned)
   fails "String#unpack1 returns the first value of #unpack" # RuntimeError: Unsupported unpack directive "x" (no chunk reader defined)
   fails "String#unpack1 starts unpacking from the given offset" # RuntimeError: Unsupported unpack directive "x" (no chunk reader defined)
-  fails "String#upcase ASCII-only case mapping does not upcase non-ASCII characters" # ArgumentError: [String#upcase] wrong number of arguments (given 1, expected 0)
-  fails "String#upcase ASCII-only case mapping works with substrings" # ArgumentError: [String#upcase] wrong number of arguments (given 1, expected 0)
   fails "String#upcase full Unicode case mapping adapted for Lithuanian allows Turkic as an extra option (and applies Turkic semantics)" # ArgumentError: [String#upcase] wrong number of arguments (given 2, expected 0)
   fails "String#upcase full Unicode case mapping adapted for Lithuanian currently works the same as full Unicode case mapping" # ArgumentError: [String#upcase] wrong number of arguments (given 1, expected 0)
   fails "String#upcase full Unicode case mapping adapted for Turkic languages allows Lithuanian as an extra option" # ArgumentError: [String#upcase] wrong number of arguments (given 2, expected 0)
