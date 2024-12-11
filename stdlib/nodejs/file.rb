@@ -274,7 +274,7 @@ class File < IO
     end
     @path = path
 
-    fd = `executeIOAction(function(){return __fs__.openSync(path, flags)})`
+    fd = `executeIOAction(function(){return __fs__.openSync(path, flags.toString())})`
     super(fd, flags)
   end
 
