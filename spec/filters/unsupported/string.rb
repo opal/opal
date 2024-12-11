@@ -328,6 +328,11 @@ opal_unsupported_filter "String" do
   fails "String#rstrip! removes trailing NULL bytes and whitespace" # NoMethodError: undefined method `rstrip!' for "\u0000 goodbye \u0000"
   fails "String#rstrip! returns nil if no modifications were made" # NoMethodError: undefined method `rstrip!' for "hello"
   fails "String#scan supports \\G which matches the end of the previous match / string start for first match" # Expected [] == ["one"] to be truthy but was false
+  fails "String#scrub! accepts a frozen string as a replacement" # NoMethodError: undefined method `scrub!' for "a\xE2"
+  fails "String#scrub! accepts blocks" # NoMethodError: undefined method `scrub!' for "a\u0081"
+  fails "String#scrub! maintains the state of frozen strings that are already valid" # NoMethodError: undefined method `scrub!' for "a"
+  fails "String#scrub! modifies self for valid strings" # NoMethodError: undefined method `scrub!' for "a\u0081"
+  fails "String#scrub! preserves the instance variables of already valid strings" # Exception: Cannot create property 'a' on string 'a'
   fails "String#setbyte allows changing bytes in multi-byte characters" # NoMethodError: undefined method `setbyte' for "क"
   fails "String#setbyte calls #to_int to convert the index" # Mock 'setbyte index' expected to receive to_int("any_args") exactly 1 times but received it 0 times
   fails "String#setbyte calls to_int to convert the value" # Mock 'setbyte value' expected to receive to_int("any_args") exactly 1 times but received it 0 times
@@ -485,7 +490,6 @@ opal_unsupported_filter "String" do
   fails "String#upto does not work with symbols" # Expected TypeError but no exception was raised (["a", "b", "c"] was returned)
   fails "String.allocate returns a binary String" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
   fails "String.allocate returns a fully-formed String" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
-  fails "String.new returns a binary String" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
   fails "String.new returns a fully-formed String" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String.new returns a new string given a string argument" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
 end

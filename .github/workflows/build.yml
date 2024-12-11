@@ -25,14 +25,15 @@ jobs:
           - name: mspec-chrome
             command: bin/rake mspec_chrome
           - name: mspec-firefox
-            firefox: '106.0.4'
+            firefox: 'latest-esr'
             command: xvfb-run bin/rake mspec_firefox
           - name: mspec-bun
             bun: true
             command: bin/rake mspec_bun
-          - name: mspec-deno
-            deno: true
-            command: bin/rake mspec_deno
+          # exclude deno for the moment, it cannot support String improvements
+          # - name: mspec-deno
+          #   deno: true
+          #   command: bin/rake mspec_deno
           - name: minitest
             command: bin/rake minitest
           - name: minitest-strict-mode
@@ -64,7 +65,7 @@ jobs:
             command: bundle exec rake mspec_chrome
             os: windows-latest
           # - name: windows-mspec-firefox
-          #   firefox: '106.0.4'
+          #   firefox: 'latest-esr'
           #   command: bundle exec rake mspec_firefox
           #   os: windows-latest
           - name: macos-mspec-safari

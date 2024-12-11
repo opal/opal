@@ -68,7 +68,6 @@ opal_filter "Marshal" do
   fails "Marshal.load for a Symbol loads an encoded Symbol" # Expected "â\u0086\u0092" == "→" to be truthy but was false
   fails "Marshal.load for a Symbol raises ArgumentError when end of byte sequence reached before symbol characters end" # Expected  "\x04\b\" hello" ==  "\x04\b: hello" to be truthy but was false
   fails "Marshal.load for a Time keeps nanoseconds" # NoMethodError: undefined method `nsec' for 2023-09-20 22:51:57 +0200
-  fails "Marshal.load for a Time keeps the local zone" # Expected "Central European Summer Time" == "Central European Standard Time" to be truthy but was false
   fails "Marshal.load for a Time keeps the zone" # Expected "Central European Summer Time" == "AST" to be truthy but was false
   fails "Marshal.load for a Time keeps utc offset" # Expected 540 == 32400 to be truthy but was false
   fails "Marshal.load for a Time loads" # Expected 2022-12-07 05:35:14 +0100 == 1970-01-01 01:00:01 +0100 to be truthy but was false

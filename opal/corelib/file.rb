@@ -39,19 +39,19 @@ class ::File < ::IO
 
           if (
             (part === nil) ||
-            (part === ''  && ((new_parts.length === 0) || abs)) ||
-            (part === '.' && ((new_parts.length === 0) || abs))
+            (part == ''  && ((new_parts.length === 0) || abs)) ||
+            (part == '.' && ((new_parts.length === 0) || abs))
           ) {
             continue;
           }
-          if (part === '..') {
+          if (part == '..') {
             new_parts.pop();
           } else {
             new_parts.push(part);
           }
         }
 
-        if (!abs && parts[0] !== '.') {
+        if (!abs && parts[0] != '.') {
           #{new_parts.unshift '.'}
         }
       }
