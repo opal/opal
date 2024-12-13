@@ -177,11 +177,9 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_s does not add an exponent for zero values" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s inserts a space every n chars to fraction part, if integer n is supplied" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s removes trailing spaces in floating point notation" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s return type is of class String" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s starts with + if + is supplied and value is positive" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s takes an optional argument" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#to_s the default format looks like 0.xxxxenn" # NoMethodError: undefined method `default_internal' for Encoding
   fails "BigDecimal#truncate returns Infinity if self is infinite" # Expected NaN == Infinity to be truthy but was false
   fails "BigDecimal#truncate returns the same value if self is special value" # Expected FloatDomainError but no exception was raised (NaN was returned)
@@ -193,7 +191,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal.limit uses the global limit if no precision is specified" # Expected 0.888 == 0.9 to be truthy but was false
   fails "BigDecimal.mode raise an exception if the flag is true" # NameError: uninitialized constant BigDecimal::EXCEPTION_NaN
   fails "BigDecimal.mode returns Infinity when too big" # NameError: uninitialized constant BigDecimal::EXCEPTION_NaN
-  fails "BigDecimal.mode returns the appropriate value and continue the computation if the flag is false" # NameError: uninitialized constant BigDecimal::EXCEPTION_NaN  
+  fails "BigDecimal.mode returns the appropriate value and continue the computation if the flag is false" # NameError: uninitialized constant BigDecimal::EXCEPTION_NaN
   fails "Float#to_d returns appropriate BigDecimal zero for signed zero" # NoMethodError: undefined method `to_d' for -0.0
   fails "Kernel#BigDecimal BigDecimal(Rational) with bigger-than-double numerator" # Expected 1000000000000000000 > 18446744073709552000 to be truthy but was false
   fails "Kernel#BigDecimal accepts significant digits >= given precision" # NoMethodError: undefined method `precs' for 3.1415923
@@ -220,5 +218,5 @@ opal_filter "BigDecimal" do
   fails "Kernel#BigDecimal when interacting with Rational produces the expected result when done via Float" # TypeError: Rational can't be coerced into BigDecimal
   fails "Kernel#BigDecimal when interacting with Rational produces the expected result when done via to_f" # TypeError: Rational can't be coerced into BigDecimal
   fails "Kernel#BigDecimal when interacting with Rational produces the expected result" # TypeError: Rational can't be coerced into BigDecimal
-  fails "Kernel#BigDecimal with exception: false returns nil for invalid strings" # Exception: new BigNumber() not a number: invalid  
+  fails "Kernel#BigDecimal with exception: false returns nil for invalid strings" # Exception: new BigNumber() not a number: invalid
 end

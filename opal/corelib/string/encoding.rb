@@ -1,34 +1,35 @@
 # backtick_javascript: true
-
-require 'corelib/string'
+# helpers: global_regexp
 
 class ::Encoding
-  def self.register(name, options = {}, &block)
-    names = [name] + (options[:aliases] || [])
-    ascii = options[:ascii] || false
-    dummy = options[:dummy] || false
+  class << self
+    def register(name, options = {}, &block)
+      names = [name] + (options[:aliases] || [])
+      ascii = options[:ascii] || false
+      dummy = options[:dummy] || false
 
-    if options[:inherits]
-      encoding = options[:inherits].clone
-      encoding.initialize(name, names, ascii, dummy)
-    else
-      encoding = new(name, names, ascii, dummy)
+      if options[:inherits]
+        encoding = options[:inherits].clone
+        encoding.initialize(name, names, ascii, dummy)
+      else
+        encoding = new(name, names, ascii, dummy)
+      end
+      encoding.instance_eval(&block) if block_given?
+
+      register = `Opal.encodings`
+      names.each do |encoding_name|
+        const_set encoding_name.tr('-', '_'), encoding
+        register.JS[encoding_name] = encoding
+      end
     end
-    encoding.instance_eval(&block) if block_given?
 
-    register = `Opal.encodings`
-    names.each do |encoding_name|
-      const_set encoding_name.tr('-', '_'), encoding
-      register.JS[encoding_name] = encoding
+    def find(name)
+      return default_external if name == :default_external
+      `return Opal.find_encoding(name)`
     end
-  end
 
-  def self.find(name)
-    return default_external if name == :default_external
-    `return Opal.find_encoding(name)`
+    attr_accessor :default_external, :default_internal
   end
-
-  singleton_class.attr_accessor :default_external
 
   attr_reader :name, :names
 
@@ -60,46 +61,24 @@ class ::Encoding
   end
 
   # methods to implement per encoding
-  def charsize(string)
-    %x{
-      var len = 0;
-      for (var i = 0, length = string.length; i < length; i++) {
-        var charcode = string.charCodeAt(i);
-        if (!(charcode >= 0xD800 && charcode <= 0xDBFF)) {
-          len++;
-        }
-      }
-      return len;
-    }
-  end
 
-  def each_char(string, &block)
-    %x{
-      var high_surrogate = "";
-      for (var i = 0, length = string.length; i < length; i++) {
-        var charcode = string.charCodeAt(i);
-        var chr = string.charAt(i);
-        if (charcode >= 0xD800 && charcode <= 0xDBFF) {
-          high_surrogate = chr;
-          continue;
-        }
-        else if (charcode >= 0xDC00 && charcode <= 0xDFFF) {
-          chr = high_surrogate + chr;
-        }
-        if (string.encoding.name != "UTF-8") {
-          chr = new String(chr);
-          chr.encoding = string.encoding;
-        }
-        Opal.yield1(block, chr);
-      }
-    }
-  end
-
-  def each_byte(*)
+  def bytesize(str, index)
     ::Kernel.raise ::NotImplementedError
   end
 
-  def bytesize(*)
+  def byteslice(str, index, length)
+    ::Kernel.raise ::NotImplementedError
+  end
+
+  def each_byte(str)
+    ::Kernel.raise ::NotImplementedError
+  end
+
+  def scrub(str, replacement, &block)
+    ::Kernel.raise ::NotImplementedError
+  end
+
+  def valid_encoding?(str)
     ::Kernel.raise ::NotImplementedError
   end
 
@@ -108,308 +87,494 @@ class ::Encoding
   class UndefinedConversionError < ::EncodingError; end
 end
 
+%x{
+  const SFCP = String.fromCodePoint;
+  const SFCC = String.fromCharCode;
+
+  function scrubbing_decoder(enc, label) {
+    if (!enc.scrubbing_decoder) enc.scrubbing_decoder = new TextDecoder(label, { fatal: false });
+    return enc.scrubbing_decoder;
+  }
+
+  function validating_decoder(enc, label) {
+    if (!enc.validating_decoder) enc.validating_decoder = new TextDecoder(label, { fatal: true });
+    return enc.validating_decoder;
+  }
+}
+
 ::Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
-  def each_byte(string, &block)
+  def bytesize(str, index)
     %x{
-      // Taken from: https://github.com/feross/buffer/blob/f52dffd9df0445b93c0c9065c2f8f0f46b2c729a/index.js#L1954-L2032
-      var units = Infinity;
-      var codePoint;
-      var length = string.length;
-      var leadSurrogate = null;
+      let code_point, size = 0;
+      for (const c of str) {
+        code_point = c.codePointAt(0);
+        if (code_point < 0x80) size++; // char is one byte long in UTF-8
+        else if (code_point < 0x800) size += 2; // char is two bytes long
+        // else if (code_point < 0xD800) size += 3; // char is three bytes long
+        // else if (code_point < 0xE000) size += 3; // for lone surrogates the 0xBD 0xBF 0xEF, 3 bytes, get inserted
+        else if (code_point < 0x10000) size += 3; // char is three bytes long
+        else if (code_point <= 0x110000) size += 4; // char is four bytes long
+        if (index-- <= 0) break;
+      }
+      return size;
+    }
+  end
 
-      for (var i = 0; i < length; ++i) {
-        codePoint = string.charCodeAt(i);
-
-        // is surrogate component
-        if (codePoint > 0xD7FF && codePoint < 0xE000) {
-          // last char was a lead
-          if (!leadSurrogate) {
-            // no lead yet
-            if (codePoint > 0xDBFF) {
-              // unexpected trail
-              if ((units -= 3) > -1) {
-                #{yield `0xEF`};
-                #{yield `0xBF`};
-                #{yield `0xBD`};
-              }
-              continue;
-            } else if (i + 1 === length) {
-              // unpaired lead
-              if ((units -= 3) > -1) {
-                #{yield `0xEF`};
-                #{yield `0xBF`};
-                #{yield `0xBD`};
-              }
-              continue;
-            }
-
-            // valid lead
-            leadSurrogate = codePoint;
-
+  def byteslice(str, index, length)
+    # must handle negative index and length, with length being negative indicating a negative range end
+    # this slices at UTF-16 character boundaries, as required by specs
+    # however, some specs require slicing UTF-16 character into its bytes, which wont work
+    %x{
+      let result = "", code_point, idx, max;
+      if (index < 0) {
+        // negative index, walk from the end of the string,
+        let i = str.length - 1,
+            bad_cp = -1; // -1 = no, string ok, 0 or larger = the code point
+        idx = -1;
+        if (length < 0) max = length; // a negative index
+        else if (length === 0) max = index;
+        else if ((index + length) >= 0) max = -1; // from end of string
+        else max = index + length - 1;
+        for (; i >= 0; i--) {
+          code_point = str.codePointAt(i);
+          if (code_point >= 0xD800 && code_point <= 0xDFFF) {
+            // low surrogate, get the full code_point next
             continue;
           }
-
-          // 2 leads in a row
-          if (codePoint < 0xDC00) {
-            if ((units -= 3) > -1) {
-              #{yield `0xEF`};
-              #{yield `0xBF`};
-              #{yield `0xBD`};
+          if (length >= 0 || length === -1 || (length < 0 && idx <= length)) {
+            if (code_point < 0x80) {
+              if (idx >= index && idx <= max) result = SFCP(code_point) + result;
+              idx--;
+              // always landing on character boundary, no need to check
+            } else if (code_point < 0x800) {
+              // 2 byte surrogates
+              if (idx >= index && idx <= max) result = SFCP(code_point) + result;
+              idx -= 2;
+              // check for broken character boundary, raise if so
+            // } else if (code_point < 0xD800) {
+            //  // 3 byte surrogates
+            //  if (idx >= index && idx <= max) result = SFCP(code_point) + result;
+            //  idx -= 3;
+            } else if (code_point < 0x10000) {
+              // 3 byte surrogates
+              if (idx >= index && idx <= max) result = SFCP(code_point) + result;
+              idx -= 3;
+            } else if (code_point < 0x110000) {
+              // 4 byte surrogates
+              if (idx >= index && idx <= max) result = SFCP(code_point) + result;
+              idx -= 3;
             }
-            leadSurrogate = codePoint;
-            continue;
           }
-
-          // valid surrogate pair
-          codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000;
-        } else if (leadSurrogate) {
-          // valid bmp char, but last char was a lead
-          if ((units -= 3) > -1) {
-            #{yield `0xEF`};
-            #{yield `0xBF`};
-            #{yield `0xBD`};
-          }
+          if (idx < index) break;
         }
+        if (idx > index || result.length === 0) return nil;
+      } else {
+        // 0 or positive index, walk from beginning
+        idx = 0;
+        if (length < 0) max = Infinity; // to end of string
+        else if (length === 0) max = index + 1;
+        else max = index + length;
+        for (const c of str) {
+          code_point = c.codePointAt(0);
+          if (code_point < 0x80) {
+            if (idx >= index && idx <= max) result += SFCP(code_point);
+            idx++;
+          } else if (code_point < 0x800) {
+            // 2 byte surrogates
+            if (idx >= index && idx <= max) result += SFCP(code_point);
+            idx += 2;
+          } else if (code_point < 0xD800) {
+            // 3 byte surrogates
+            if (idx >= index && idx <= max) result += SFCP(code_point);
+            idx += 3;
+          } else if (code_point < 0xE000) {
+            if (idx >= index && idx <= max) result += SFCP(0xEF); idx++;
+            if (idx >= index && idx <= max) result += SFCP(0xBF); idx++;
+            if (idx >= index && idx <= max) result += SFCP(0xBD); idx++;
+          } else if (code_point < 0x10000) {
+            // 3 byte surrogates
+            if (idx >= index && idx <= max) result += SFCP(code_point);
+            idx += 3;
+          } else if (code_point < 0x110000) {
+            // 4 byte surrogates
+            if (idx >= index && idx <= max) result += SFCP(code_point);
+            idx += 4;
+          }
+          if (idx >= max) break;
+        }
+        if (result.length === 0) {
+          if (idx === index) result = "";
+          else return nil;
+        }
+        if (length < 0) {
+          // if length is a negative index from a range, we walked to the end,
+          // so shorten the result accordingly
+          // result has the bytes already spread out as chars so we can simply slice
+          if ((idx + length) > 0) result = result.slice(0, result.length + length);
+          else result = "";
+        }
+      }
+      if (length === 0) result = "";
+      return result;
+    }
+  end
 
-        leadSurrogate = null;
-
-        // encode utf8
-        if (codePoint < 0x80) {
-          if ((units -= 1) < 0) break;
-          #{yield `codePoint`};
-        } else if (codePoint < 0x800) {
-          if ((units -= 2) < 0) break;
-          #{yield `codePoint >> 0x6 | 0xC0`};
-          #{yield `codePoint & 0x3F | 0x80`};
-        } else if (codePoint < 0x10000) {
-          if ((units -= 3) < 0) break;
-          #{yield `codePoint >> 0xC | 0xE0`};
-          #{yield `codePoint >> 0x6 & 0x3F | 0x80`};
-          #{yield `codePoint & 0x3F | 0x80`};
-        } else if (codePoint < 0x110000) {
-          if ((units -= 4) < 0) break;
-          #{yield `codePoint >> 0x12 | 0xF0`};
-          #{yield `codePoint >> 0xC & 0x3F | 0x80`};
-          #{yield `codePoint >> 0x6 & 0x3F | 0x80`};
-          #{yield `codePoint & 0x3F | 0x80`};
-        } else {
-          // Invalid code point
+  def each_byte(str, &block)
+    %x{
+      let units = Infinity,
+          code_point,
+          length = str.length;
+      for (const c of str) {
+        code_point = c.codePointAt(0);
+        if (code_point < 0x80) {
+          #{yield `code_point`};
+        } else if (code_point < 0x800) {
+          #{yield `code_point >> 0x6 | 0xC0`};
+          #{yield `code_point & 0x3F | 0x80`};
+        } else if (code_point < 0xD800) {
+          #{yield `code_point >> 0xC | 0xE0`};
+          #{yield `code_point >> 0x6 & 0x3F | 0x80`};
+          #{yield `code_point & 0x3F | 0x80`};
+        } else if (code_point < 0xE000) {
+          #{yield `0xEF`};
+          #{yield `0xBF`};
+          #{yield `0xBD`};
+        } else if (code_point < 0x10000) {
+          #{yield `code_point >> 0xC | 0xE0`};
+          #{yield `code_point >> 0x6 & 0x3F | 0x80`};
+          #{yield `code_point & 0x3F | 0x80`};
+        } else if (code_point < 0x110000) {
+          #{yield `code_point >> 0x12 | 0xF0`};
+          #{yield `code_point >> 0xC & 0x3F | 0x80`};
+          #{yield `code_point >> 0x6 & 0x3F | 0x80`};
+          #{yield `code_point & 0x3F | 0x80`};
         }
       }
     }
   end
 
-  def bytesize(string)
-    string.bytes.length
+  def scrub(str, replacement, &block)
+    %x{
+      let result = scrubbing_decoder(self, 'utf-8').decode(new Uint8Array(str.$bytes()));
+      if (block !== nil) {
+        // dont know the bytes anymore ... ¯\_(ツ)_/¯
+        result = result.replace(/�/g, (byte)=>{ return #{yield `byte`}; });
+      } else if (replacement && replacement !== nil) {
+        // this may replace valid � that have existed in the string before,
+        // but there currently is no way to specify a other replacement character for TextDecoder
+        result = result.replace(/�/g, replacement);
+      }
+      return result.$force_encoding(self);
+    }
+  end
+
+  def valid_encoding?(str)
+    %x{
+      try { validating_decoder(self, 'utf-8').decode(new Uint8Array(str.$bytes())); }
+      catch { return false; }
+      return true;
+    }
   end
 end
 
-::Encoding.register 'UTF-16LE' do
-  def each_byte(string, &block)
+::Encoding.register 'UTF-16LE', aliases: ['UTF-16'] do
+  def bytesize(str, index)
     %x{
-      for (var i = 0, length = string.length; i < length; i++) {
-        var code = string.charCodeAt(i);
+      if (index < str.length) return (index + 1) * 2;
+      return str.length * 2;
+    }
+  end
 
-        #{yield `code & 0xff`};
-        #{yield `code >> 8`};
+  def byteslice(str, index, length)
+    # must handle negative index and length, with length being negative indicating a negative range end
+    %x{
+      let result = "", char_code, idx, max, i;
+      if (index < 0) {
+        // negative index, walk from the end of the string,
+        idx = -1;
+        if (length < 0) max = length; // a negative index
+        else if (length === 0) max = index;
+        else if ((index + length) >= 0) max = -1; // from end of string
+        else max = index + length - 1;
+        for (i = str.length; i > 0; i--) {
+          char_code = str.charCodeAt(i);
+          if (length >= 0 || length === -1 || (length < 0 && idx <= length)) {
+            if (idx >= index && idx <= max) result = SFCC(char_code) + result;
+          }
+          idx -= 2;
+          if (idx < index) break;
+        }
+        if (idx > index || result.length === 0) return nil;
+      } else {
+        // 0 or positive index, walk from beginning
+        idx = 0;
+        if (length < 0) max = Infinity;
+        else if (length === 0) max = index + 1;
+        else max = index + length;
+        for (i = 0, length = str.length; i < length; i++) {
+          char_code = str.charCodeAt(i);
+          if (idx >= index && idx <= max) result += SFCC(char_code);
+          idx += 2;
+          if (idx >= max) break;
+        }
+        if (result.length === 0) {
+          if (idx === index) result = "";
+          else return nil;
+        }
+        if (length < 0) {
+          // if length is a negative index from a range, we walked to the end, so shorten the result
+          if ((idx + length) > 0) result = result.slice(0, result.length + length);
+          else result = "";
+        }
+      }
+      if (length === 0) result = "";
+      return result;
+    }
+  end
+
+  def each_byte(str, &block)
+    %x{
+      for (let i = 0, length = str.length; i < length; i++) {
+        let char_code = str.charCodeAt(i);
+
+        #{yield `char_code & 0xff`};
+        #{yield `char_code >> 8`};
       }
     }
   end
 
-  def bytesize(string)
-    `string.length * 2`
+  def scrub(str, replacement, &block)
+    %x{
+      let result = scrubbing_decoder(self, 'utf-16').decode(new Uint8Array(str.$bytes()));
+      if (block !== nil) {
+        // dont know the bytes anymore ... ¯\_(ツ)_/¯
+        result = result.replace(/�/g, (byte)=>{ return #{yield `byte`}; });
+      } else if (replacement && replacement !== nil) {
+        // this may replace valid � that have existed in the string before,
+        // but there currently is no way to specify a other replacement character for TextDecoder
+        result = result.replace(/�/g, replacement);
+      }
+      return result.$force_encoding(self);
+    }
+  end
+
+  def valid_encoding?(str)
+    %x{
+      try { validating_decoder(self, 'utf-16').decode(new Uint8Array(str.$bytes())); }
+      catch { return false; }
+      return true;
+    }
   end
 end
 
 ::Encoding.register 'UTF-16BE', inherits: ::Encoding::UTF_16LE do
-  def each_byte(string, &block)
+  def each_byte(str, &block)
     %x{
-      for (var i = 0, length = string.length; i < length; i++) {
-        var code = string.charCodeAt(i);
-
-        #{yield `code >> 8`};
-        #{yield `code & 0xff`};
+      for (var i = 0, length = str.length; i < length; i++) {
+        var char_code = str.charCodeAt(i);
+        #{yield `char_code >> 8`};
+        #{yield `char_code & 0xff`};
       }
+    }
+  end
+
+  def scrub(str, replacement, &block)
+    %x{
+      let result = scrubbing_decoder(self, 'utf-16be').decode(new Uint8Array(str.$bytes()));
+      if (block !== nil) {
+        // dont know the bytes anymore ... ¯\_(ツ)_/¯
+        result = result.replace(/�/g, (byte)=>{ return #{yield `byte`}; });
+      } else if (replacement && replacement !== nil) {
+        // this may replace valid � that have existed in the string before,
+        // but there currently is no way to specify a other replacement character for TextDecoder
+        result = result.replace(/�/g, replacement);
+      }
+      return result.$force_encoding(self);
+    }
+  end
+
+  def valid_encoding?(str)
+    %x{
+      try { validating_decoder(self, 'utf-16be').decode(new Uint8Array(str.$bytes())); }
+      catch { return false; }
+      return true;
     }
   end
 end
 
 ::Encoding.register 'UTF-32LE' do
-  def each_byte(string, &block)
+  def bytesize(str, index)
     %x{
-      for (var i = 0, length = string.length; i < length; i++) {
-        var code = string.charCodeAt(i);
+      if (index < str.length) return (index + 1) * 4;
+      return str.length * 4;
+    }
+  end
 
-        #{yield `code & 0xff`};
-        #{yield `code >> 8`};
+  def byteslice(str, index, length)
+    # must handle negative index and length, with length being negative indicating a negative range end
+    %x{
+      let result = "", char_code, idx, max, i;
+      if (index < 0) {
+        // negative index, walk from the end of the string,
+        idx = -1;
+        if (length < 0) max = length; // a negative index
+        else if (length === 0) max = index;
+        else if ((index + length) >= 0) max = -1; // from end of string
+        else max = index + length - 1;
+        for (i = str.length; i > 0; i--) {
+          char_code = str.charCodeAt(i);
+          if (length > 0 || length === -1 || (length < 0 && idx <= length)) {
+            if (idx >= index && idx <= max) result = SFCC(char_code) + result;
+          }
+          idx -= 4;
+          if (idx < index) break;
+        }
+        if (idx > index || result.length === 0) return nil;
+      } else {
+        // 0 or positive index, walk from beginning
+        idx = 0;
+        if (length < 0) max = Infinity;
+        else if (length === 0) max = index + 1;
+        else max = index + length;
+        for (let i = 0, length = str.length; i < length; i++) {
+          char_code = str.charCodeAt(i);
+          if (idx >= index && idx <= max) result += SFCC(char_code);
+          idx += 4;
+          if (idx >= max) break;
+        }
+        if (result.length === 0) {
+          if (idx === index) result = "";
+          else return nil;
+        }
+        if (length < 0) {
+          // if length is a negative index from a range, we walked to the end, so shorten the result
+          if ((idx + length) > 0) result = result.slice(0, result.length + length);
+          else result = "";
+        }
+      }
+      if (length === 0) result = "";
+      return result;
+    }
+  end
+
+  def each_byte(str, &block)
+    %x{
+      for (var i = 0, length = str.length; i < length; i++) {
+        var char_code = str.charCodeAt(i);
+
+        #{yield `char_code & 0xff`};
+        #{yield `char_code >> 8`};
         #{yield 0};
         #{yield 0};
       }
     }
   end
 
-  def bytesize(string)
-    `string.length * 4`
+  def scrub(str, replacement, &block)
+    str
+  end
+
+  def valid_encoding?(str)
+    true
   end
 end
 
 ::Encoding.register 'UTF-32BE', inherits: ::Encoding::UTF_32LE do
-  def each_byte(string, &block)
+  def each_byte(str, &block)
     %x{
-      for (var i = 0, length = string.length; i < length; i++) {
-        var code = string.charCodeAt(i);
-
+      for (var i = 0, length = str.length; i < length; i++) {
+        var char_code = str.charCodeAt(i);
         #{yield 0};
         #{yield 0};
-        #{yield `code >> 8`};
-        #{yield `code & 0xff`};
+        #{yield `char_code >> 8`};
+        #{yield `char_code & 0xff`};
       }
     }
   end
 end
 
 ::Encoding.register 'ASCII-8BIT', aliases: ['BINARY'], ascii: true do
-  def each_char(string, &block)
-    %x{
-      for (var i = 0, length = string.length; i < length; i++) {
-        var chr = new String(string.charAt(i));
-        chr.encoding = string.encoding;
-        #{yield `chr`};
-      }
-    }
-  end
-
-  def charsize(string)
-    `string.length`
-  end
-
-  def each_byte(string, &block)
-    %x{
-      for (var i = 0, length = string.length; i < length; i++) {
-        var code = string.charCodeAt(i);
-        #{yield `code & 0xff`};
-      }
-    }
-  end
-
-  def bytesize(string)
-    `string.length`
-  end
-
   def binary?
     true
+  end
+
+  def bytesize(str, index)
+    %x{
+      if (index < str.size) return index + 1;
+      return str.length;
+    }
+  end
+
+  def byteslice(str, index, length)
+    # must handle negative index and length, with length being negative indicating a negative range end
+    %x{
+      let result = "", char_code, i;
+      if (index < 0) index = str.length + index;
+      if (index < 0) return nil;
+      if (length < 0) length = (str.length + length) - index;
+      if (length < 0) return nil;
+      // must produce the same result as each_byte, so we cannot simply use slice()
+      for (i = 0; i < length && (index + i) <= str.length; i++) {
+        char_code = str.charCodeAt(index + i);
+        result = SFCC(char_code & 0xff) + result;
+      }
+      if (result.length === 0) return nil;
+      return result;
+    }
+  end
+
+  def each_byte(str, &block)
+    %x{
+      for (let i = 0, length = str.length; i < length; i++) {
+        let char_code = str.charCodeAt(i);
+        #{yield `char_code & 0xff`};
+      }
+    }
+  end
+
+  def scrub(str, replacement, &block)
+    %x{
+      let result = scrubbing_decoder(self, 'ascii').decode(new Uint8Array(str.$bytes()));
+      if (block !== nil) {
+        // dont know all the bytes anymore ... ¯\_(ツ)_/¯
+        result = result.replace(/[�\x80-\xff]/g, (byte)=>{ return #{yield `byte`}; });
+      } else if (replacement && replacement !== nil) {
+        // this may replace valid � that have existed in the string before,
+        // but there currently is no way to specify a other replacement character for TextDecoder
+        result = result.replace(/[�\x80-\xff]/g, replacement);
+      } else {
+        result = result.replace(/[�\x80-\xff]/g, '?');
+      }
+      return result.$force_encoding(self);
+    }
+  end
+
+  def valid_encoding?(str)
+    %x{
+      try { validating_decoder(self, 'ascii').decode(new Uint8Array(str.$bytes())); }
+      catch { return false; }
+      return true;
+    }
   end
 end
 
 ::Encoding.register 'ISO-8859-1', aliases: ['ISO8859-1'], ascii: true, inherits: ::Encoding::ASCII_8BIT
 ::Encoding.register 'US-ASCII', aliases: ['ASCII'], ascii: true, inherits: ::Encoding::ASCII_8BIT
 
-class ::String
-  attr_reader :encoding
-  attr_reader :internal_encoding
-  `Opal.prop(String.prototype, 'bytes', nil)`
-  `Opal.prop(String.prototype, 'encoding', #{::Encoding::UTF_8})`
-  `Opal.prop(String.prototype, 'internal_encoding', #{::Encoding::UTF_8})`
-
-  def b
-    dup.force_encoding('binary')
-  end
-
-  def bytesize
-    @internal_encoding.bytesize(self)
-  end
-
-  def each_byte(&block)
-    return enum_for(:each_byte) { bytesize } unless block_given?
-
-    @internal_encoding.each_byte(self, &block)
-
-    self
-  end
-
-  def bytes
-    # REMIND: required when running in strict mode, otherwise the following error will be thrown:
-    # Cannot create property 'bytes' on string 'abc'
-    %x{
-      if (typeof self === 'string') {
-        return #{`new String(self)`.each_byte.to_a};
-      }
-    }
-
-    @bytes ||= each_byte.to_a
-    @bytes.dup
-  end
-
-  def each_char(&block)
-    return enum_for(:each_char) { length } unless block_given?
-
-    @encoding.each_char(self, &block)
-
-    self
-  end
-
-  def chars(&block)
-    return each_char.to_a unless block
-
-    each_char(&block)
-  end
-
-  def each_codepoint(&block)
-    return enum_for :each_codepoint unless block_given?
-    %x{
-      for (var i = 0, length = self.length; i < length; i++) {
-        #{yield `self.codePointAt(i)`};
-      }
-    }
-    self
-  end
-
-  def codepoints(&block)
-    # If a block is given, which is a deprecated form, works the same as each_codepoint.
-    return each_codepoint(&block) if block_given?
-    each_codepoint.to_a
-  end
-
-  def encode(encoding)
-    `Opal.enc(self, encoding)`
-  end
-
-  def force_encoding(encoding)
-    %x{
-      var str = self;
-
-      if (encoding === str.encoding) { return str; }
-
-      encoding = #{::Opal.coerce_to!(encoding, ::String, :to_s)};
-      encoding = #{::Encoding.find(encoding)};
-
-      if (encoding === str.encoding) { return str; }
-
-      str = Opal.set_encoding(str, encoding);
-
-      return str;
-    }
-  end
-
-  def getbyte(idx)
-    string_bytes = bytes
-    idx = ::Opal.coerce_to!(idx, ::Integer, :to_int)
-    return if string_bytes.length < idx
-
-    string_bytes[idx]
-  end
-
-  def initialize_copy(other)
-    %x{
-      self.encoding = other.encoding;
-      self.internal_encoding = other.internal_encoding;
-    }
-  end
-
-  # stub
-  def valid_encoding?
-    true
-  end
-end
+# these encodings are required for some ruby specs, make them dummy for now
+# their existence is often enough, like specs checking if a method returns
+# a string in the same encoding it is encoded in
+::Encoding.register 'EUC-JP', inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'IBM437', inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'IBM720', inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'ISO-2022-JP', inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'ISO-8859-15', inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'ISO-8859-5', inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'Shift_JIS', aliases: ['SHIFT_JIS'], inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'Windows-1251', aliases: ['WINDOWS-1251'], inherits: ::Encoding::UTF_16LE, dummy: true
 
 ::Encoding.default_external = __ENCODING__
+::Encoding.default_internal = __ENCODING__
+
+`Opal.prop(String.prototype, 'encoding', #{::Encoding::UTF_8})`
+`Opal.prop(String.prototype, 'internal_encoding', #{::Encoding::UTF_8})`

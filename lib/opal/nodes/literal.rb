@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/nodes/base'
+require 'opal/regexp_transpiler'
 
 module Opal
   module Nodes
@@ -64,10 +65,8 @@ module Opal
       def compile
         string_value = value
 
-        sanitized_value = string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do
-          code_point = Regexp.last_match(1).to_i(16)
-          to_utf16(code_point)
-        end
+        sanitized_value = sanitize_utf16(string_value)
+
         push translate_escape_chars(sanitized_value)
 
         if RUBY_ENGINE != 'opal'
@@ -85,22 +84,15 @@ module Opal
         end
       end
 
-      # http://www.2ality.com/2013/09/javascript-unicode.html
-      def to_utf16(code_point)
-        ten_bits = 0b1111111111
-        u = ->(code_unit) { '\\u' + code_unit.to_s(16).upcase }
-
-        return u.call(code_point) if code_point <= 0xFFFF
-
-        code_point -= 0x10000
-
-        # Shift right to get to most significant 10 bits
-        lead_surrogate = 0xD800 + (code_point >> 10)
-
-        # Mask to get least significant 10 bits
-        tail_surrogate = 0xDC00 + (code_point & ten_bits)
-
-        u.call(lead_surrogate) + u.call(tail_surrogate)
+      def sanitize_utf16(string_value)
+        string_value.inspect.gsub(/\\u\{([0-9a-f]+)\}/) do
+          code_point = Regexp.last_match(1).to_i(16)
+          if code_point <= 0xFFFF
+            '\\u' + code_point.to_s(16).upcase
+          else
+            Regexp.last_match(0)
+          end
+        end
       end
     end
 
@@ -157,12 +149,15 @@ module Opal
         push ")"
       end
 
+      include Opal::RegexpTranspiler
+
       def compile_static_regexp
         value = self.value.children[0]
         case value
         when ''
-          push('/(?:)/')
-        when /\(\?[(<>#]|[*+?]\+/
+          helper :empty_regexp
+          push("$empty_regexp(#{flags.join.inspect})")
+        when /\(\?[(<>#]|[*+?]\+|\\G/
           # Safari/WebKit will not execute javascript code if it contains a lookbehind literal RegExp
           # and they fail with "Syntax Error". This tricks their parser by disguising the literal RegExp
           # as string for the dynamic $regexp helper. Safari/Webkit will still fail to execute the RegExp,
@@ -173,7 +168,19 @@ module Opal
           # errors) - at least since Node 17.
           static_as_dynamic(value)
         else
-          push "#{Regexp.new(value).inspect}#{flags.join}"
+          regexp_content = Regexp.new(value).inspect
+          regexp_content = regexp_content[1...regexp_content.rindex('/')]
+          old_flags = flags.join
+          new_regexp, new_flags = transform_regexp(regexp_content, old_flags)
+          push "/#{new_regexp}/#{new_flags}"
+
+          # Annotate the source regexp and flags, so it can be used to redo transforming while doing
+          # unions etc.
+          if regexp_content != new_regexp || old_flags != new_flags
+            helper :annotate_regexp
+            wrap '$annotate_regexp(', ", #{regexp_content != new_regexp ? regexp_content.inspect : 'null'}" \
+              "#{old_flags != new_flags ? ", #{old_flags.inspect}" : ''})"
+          end
         end
       end
 
@@ -181,7 +188,7 @@ module Opal
         helper :regexp
 
         push '$regexp(["'
-        push value.gsub('\\', '\\\\\\\\')
+        push value.gsub('\\', '\\\\\\\\').gsub('"', '\"')
         push '"]'
         push ", '#{flags.join}'" if flags.any?
         push ")"
@@ -215,11 +222,6 @@ module Opal
 
           self.value = value.updated(nil, parts)
           flags.delete('x')
-        end
-
-        if value.type == :str
-          # Replacing \A -> ^, \z -> $, required for the parser gem
-          self.value = s(:str, value.children[0].gsub('\A', '^').gsub('\z', '$'))
         end
       end
 
