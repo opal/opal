@@ -578,3 +578,5 @@ end
 
 `Opal.prop(String.prototype, 'encoding', #{::Encoding::UTF_8})`
 `Opal.prop(String.prototype, 'internal_encoding', #{::Encoding::UTF_8})`
+`Opal.prop(Opal.global.MutableString.prototype, 'encoding', #{::Encoding::UTF_8})`
+`Opal.prop(Opal.global.MutableString.prototype, 'internal_encoding', #{::Encoding::UTF_8})`

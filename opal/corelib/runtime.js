@@ -218,7 +218,7 @@
     if (method === 'to_int' && type === Opal.Integer && object.$$is_number)
       return object < 0 ? Math.ceil(object) : Math.floor(object);
 
-    if (method === 'to_str' && type === Opal.String && object.$$is_string)
+    if (method === 'to_str' && type.$$is_string_class && object.$$is_string)
       return object;
 
     if (Opal.is_a(object, type)) return object;
@@ -1429,7 +1429,9 @@
     //           - null
     //
     $prop(native_klass, '$$bridge', klass);
-    $set_proto(native_klass.prototype, (klass.$$super || Opal.Object).$$prototype);
+    if (!native_klass.prototype?.$$bridge_do_not_touch) {
+      $set_proto(native_klass.prototype, (klass.$$super || Opal.Object).$$prototype);
+    }
     $prop(klass, '$$prototype', native_klass.prototype);
 
     $prop(klass.$$prototype, '$$class', klass);
@@ -1763,6 +1765,11 @@
     if (object.$$is_number && klass.$$is_number_class) {
       return (klass.$$is_integer_class) ? (object % 1) === 0 : true;
     }
+
+    if (object.$$is_string && klass.$$is_string_class) return true;
+
+    if (klass === String) klass = Opal.String;
+    if (object === String) object = Opal.String;
 
     var ancestors = $ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
 

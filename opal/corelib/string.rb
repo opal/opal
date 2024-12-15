@@ -1,4 +1,4 @@
-# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add, transform_regexp
+# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add, transform_regexp, deny_frozen_access
 # backtick_javascript: true
 
 # depends on:
@@ -14,6 +14,7 @@ class ::String < `String`
     const MAX_STR_LEN = Number.MAX_SAFE_INTEGER;
 
     Opal.prop(#{self}.$$prototype, '$$is_string', true);
+    self.$$is_string_class = true;
 
     var string_id_map = new Map();
 
@@ -426,6 +427,12 @@ class ::String < `String`
       }
       return ascii;
     }
+
+    function str_deny_frozen_access(str) {
+      if (str["$frozen?"]()) {
+        #{raise(FrozenError, "can't modify frozen String: " + `str.$inspect()`)};
+      }
+    }
   }
 
   # Force strict mode to suppress autoboxing of `this`
@@ -462,22 +469,31 @@ class ::String < `String`
     })();
   }
 
-  def self.try_convert(what)
-    ::Opal.coerce_to?(what, ::String, :to_str)
-  end
-
-  def self.new(*args)
-    %x{
-      var str = args[0] || "";
-      var opts = args[args.length-1];
-      str = $coerce_to(str, #{::String}, 'to_str');
-      str = new self.$$constructor(str);
-      if (opts && opts.$$is_hash) {
-        if (opts.has('encoding')) str = str.$force_encoding(opts.get('encoding'));
+  class << self
+    def try_convert(what)
+      ::Opal.coerce_to?(what, ::String, :to_str)
+    end
+  
+    def new(*args)
+      %x{
+        var str = args[0] || "";
+        var opts = args[args.length-1];
+        str = $coerce_to(str, #{::String}, 'to_str');
+        str = new self.$$constructor(str);
+        if (opts && opts.$$is_hash) {
+          if (opts.has('encoding')) str = str.$force_encoding(opts.get('encoding'));
+        }
+        if (!str.$initialize.$$pristine) #{`str`.initialize(*args)};
+        return str;
       }
-      if (!str.$initialize.$$pristine) #{`str`.initialize(*args)};
-      return str;
-    }
+    end
+
+    def ==(other)
+      %x{
+        if ((self === String || self === Opal.Symbol) && other.$$is_string_class) return true;
+      }
+      super(other)
+    end
   end
 
   # Our initialize method does nothing, the string value setup is being
@@ -537,8 +553,8 @@ class ::String < `String`
   def +(other)
     other = `$coerce_to(#{other}, #{::String}, 'to_str')`
     %x{
-      if (other.length === 0 && self.$$class === Opal.String) return self;
-      if (self.length === 0 && other.$$class === Opal.String) return other;
+      if (other.length === 0 && self.$$is_string_class) return self;
+      if (self.length === 0 && other.$$is_string_class) return other;
       var out = self + other;
       if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
       if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
@@ -559,7 +575,19 @@ class ::String < `String`
     }
   end
 
-  # << - not supported, mutates string
+  def <<(object)
+    %x{
+      str_deny_frozen_access(self);
+      if (object.$$is_number) {
+        if (object < 0 || object > 0x10ffff) #{raise RangeError}; // preliminary
+        object = String.fromCodePoint(object);
+      } else {
+        object = object.toString();
+      }
+      self.append(object);
+    }
+    self
+  end
 
   def <=>(other)
     if other.respond_to? :to_str
@@ -868,6 +896,12 @@ class ::String < `String`
   end
 
   # chomp! - not supported, mutates string
+
+  def concat(*args)
+    `str_deny_frozen_access(self)`
+    args.each { |arg| self << arg }
+    self
+  end
 
   def chop
     %x{
@@ -1359,7 +1393,7 @@ class ::String < `String`
             '\\': '\\\\'
           },
           char_code,
-          is_binary = self.encoding["$binary?"]() || self.internal_encoding["$binary?"](),
+          is_binary = self.encoding && self.encoding !== nil && (self.encoding["$binary?"]() || self.internal_encoding["$binary?"]()),
           external_is_utf8 = Opal.Encoding.default_external == Opal.Encoding.UTF_8,
           escaped = self.replace(escapable, function (chr) {
             if (meta[chr]) return meta[chr];
@@ -2413,7 +2447,7 @@ class ::String < `String`
   end
 
   def frozen?
-    `typeof self === 'string' || self.$$frozen === true`
+    `typeof self === 'string' || self.$$frozen === true || self.$$is_native_string`
   end
 
   alias object_id __id__
@@ -2421,4 +2455,159 @@ class ::String < `String`
   ::Opal.pristine self, :initialize
 end
 
-Symbol = String
+Symbol = String # ::Symbol is a immutable String
+
+# Make String mutable
+# -------------------
+
+# JavaScript String is bridged above and we have a immutable Ruby ::String class.
+# Now lets make the Ruby ::String mutable by assigning a new Class to it
+# and bridging that Class to a mutable JavaScript String function:
+%x{
+  // The mutable String "class" as function.
+  function MutableString(value) {
+    // ensure value is a primitive string
+    this.value = value ? value.toString() : '';
+  }
+
+  // We do not simply assign the JavaScript String prototype to MutableString,
+  // instead we create a new prototype Object based on the String prototype.
+  let proto = Object.create(String.prototype);
+  MutableString.prototype = proto;
+
+  // This is important to be able to overwrite property accessors like String.length.
+  // Otherwise, for example by simply subclassing String, length will be a protected
+  // property, which cannot be overwritten. .length must be overwritten of course,
+  // because when the string is mutated its length may change.
+  Object.defineProperty(proto, 'length', { get: function () { return this.value.length; }});
+
+  // Also .toPrimitive, .valueOf and .toString are essential. The JavaScript String
+  // functions have to work on object strings and primitive strings. So that one function
+  // can work on both variants it calls this.valueOf to get the primitive. This is why
+  // the String functions work flawlessly here for MutableString, simply by providing
+  // .valueOf on the prototype.
+  // Also various JavaScript operators and other things use .toPrimitive, .valueOf and
+  // .toString internally.
+  proto[Symbol.toPrimitive] = function (arg) { return this.value; }
+  proto.valueOf = function () { return this.value; }
+  proto.toString = function (arg) { return this.value; }
+  
+  // Opal.bridge will set the prototype of the brdged class to Opal.Object. However
+  // doing so on MutableString would remeove the existing, essential String prototype
+  // copy and leave MutableString non functional at all. So hint Opal.bridge not to
+  // touch the existing prototype.
+  proto.$$bridge_do_not_touch = true;
+
+  // Here now all the functions that mutate this.value.
+  // Though these functions here are simple and do not validate args or anything, this
+  // is done by the Ruby methods above instead, as they need to raise Ruby exceptions
+  // anyway. So usual JavaScript rules apply. 
+  proto.append = function(s) { return this.value += s.toString(); }
+
+  // Make MutableString globally available.
+  Opal.global.MutableString = MutableString;
+
+  // Delete the existing Opal.String so that we can register the new one below.
+  delete Opal.Object.$$const.String;
+  delete Opal.String;
+}
+
+# Essentially we have two String implementations floating around, with the
+# immutable JavaScript String being hidden, mostly, unless its directly accessed
+# as `String`. A "implementation detail".
+# We must take care to keep them both synchronized. Also its important to note,
+# that the Opal.String <-> MutableString bridge is not a "clean" bridge, but one
+# used with some underlying "magic". So even internally within Opal its preferrable
+# to use Opal.String.$new() over new MutableString(). Best practice is not to use
+# MutableString directly at all, except for debugging.
+class String < `MutableString`
+  include Comparable
+
+  attr_reader :encoding, :internal_encoding # these 2 are set to defaults at the end of corelib/string/encoding.rb
+
+  %x{
+    const MAX_STR_LEN = Number.MAX_SAFE_INTEGER;
+
+    Opal.prop(#{self}.$$prototype, '$$is_string', true);
+
+    // $$is_string_class is set on JavaScript String, Opal.Symbol and Opal.String
+    // making them appear as one in many places, hiding the implementation 
+    // details of JavaScricpt String being a shadowed Ruby Class different from ::String
+    self.$$is_string_class = true;
+  }
+  
+  class << self
+    # define the missing class methods
+    def new(*args)
+      %x{
+        let str = args[0] || "";
+        let opts = args[args.length-1];
+        str = $coerce_to(str, #{::String}, 'to_str');
+        str = new self.$$constructor(str);
+        if (opts && opts.$$is_hash) {
+          if (opts.has('encoding')) str = str.$force_encoding(opts.get('encoding'));
+        }
+        if (!str.$initialize?.$$pristine) #{`str`.initialize(*args)};
+        return str;
+      }
+    end
+
+    def try_convert(what)
+      ::Opal.coerce_to?(what, ::String, :to_str)
+    end
+
+    # Because now, that we have mutable ::String and immutable JavaScript String,
+    # whenever a method gets added to ::String, we must also add it to
+    # the JavaScript String prototype to make them appear the same.
+    # But do not do this for subclasses.
+    def method_added(method_name)
+      %x{
+        if (self === Opal.String) {
+          let jsid = '$' + method_name;
+          Opal.prop(String.prototype, jsid, self.$$prototype[jsid]);
+        }
+      }
+      nil
+    end
+
+    def ==(other)
+      %x{
+        if (self === Opal.String && other.$$is_string_class) return true;
+      }
+      super(other)
+    end
+  end
+
+  def initialize(str = undefined, encoding: nil, capacity: nil)
+  end
+
+  # Do not define methods here, define them above!
+end
+
+# ----------------------------- #
+# -!- There can only be one -!- #
+# ----------------------------- #
+
+%x{
+  // Finally let JavaScript String return Opal.String as its class
+  Opal.prop(String.prototype, '$$class', Opal.String);
+
+  // We still need a way to differrentiate between the two in case
+  // we get a boxed primitive String
+  Opal.prop(String.prototype, '$$is_native_string', true);
+  Opal.prop(proto, '$$is_native_string', false);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

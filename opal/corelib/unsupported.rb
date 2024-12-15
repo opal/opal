@@ -5,7 +5,7 @@ class ::String
   `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal."`
 
   %i[
-    << capitalize! chomp! chop! downcase! gsub! lstrip! next! reverse!
+    capitalize! chomp! chop! downcase! gsub! lstrip! next! reverse!
     slice! squeeze! strip! sub! succ! swapcase! tr! tr_s! upcase! prepend
     []= clear encode! unicode_normalize!
   ].each do |method_name|
