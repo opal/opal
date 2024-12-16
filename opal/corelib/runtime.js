@@ -1429,9 +1429,28 @@
     //           - null
     //
     $prop(native_klass, '$$bridge', klass);
-    if (!native_klass.prototype?.$$bridge_do_not_touch) {
-      $set_proto(native_klass.prototype, (klass.$$super || Opal.Object).$$prototype);
+
+    // native_klass may be subclass of a subclass of a ... so look for either
+    // Object.prototype in its prototype chain and inject there or at the end of the chain.
+    // Also, there is a chance we meet some Ruby Class on the way, if a bridged
+    // class has been subclassed (e.g. MutableString) or its protype has been
+    // otherwise modified. Then we assume that prototype is already modified
+    // correctly and we dont need to inject anything.
+    let prototype = native_klass.prototype, next_prototype;
+    while (true) {
+      next_prototype = Object.getPrototypeOf(prototype);
+      if (next_prototype === Object.prototype || !next_prototype)  {
+        // found the right spot, inject!
+        $set_proto(prototype, (klass.$$super || Opal.Object).$$prototype);
+        break;
+      }
+      if (prototype.$$bridge || prototype.$$is_class || prototype.$$is_module) {
+        // hit a bridged class, Ruby Class or Module
+        break;
+      }
+      prototype = next_prototype;
     }
+
     $prop(klass, '$$prototype', native_klass.prototype);
 
     $prop(klass.$$prototype, '$$class', klass);
@@ -1831,7 +1850,7 @@
       // A splatted array must be copied
       return value.slice();
     }
-    else if (value['$respond_to?']('to_a', true)) {
+    else if (value['$respond_to?'] && value['$respond_to?']('to_a', true)) {
       var ary = value.$to_a();
       if (ary === nil) {
         return [value];

@@ -14,6 +14,7 @@ class ::String < `String`
     const MAX_STR_LEN = Number.MAX_SAFE_INTEGER;
 
     Opal.prop(#{self}.$$prototype, '$$is_string', true);
+    Opal.prop(#{self}.$$prototype, '$$is_native_string', function() { return this.constructor === String; });
     self.$$is_string_class = true;
 
     var string_id_map = new Map();
@@ -473,7 +474,7 @@ class ::String < `String`
     def try_convert(what)
       ::Opal.coerce_to?(what, ::String, :to_str)
     end
-  
+
     def new(*args)
       %x{
         var str = args[0] || "";
@@ -2464,45 +2465,45 @@ Symbol = String # ::Symbol is a immutable String
 # Now lets make the Ruby ::String mutable by assigning a new Class to it
 # and bridging that Class to a mutable JavaScript String function:
 %x{
-  // The mutable String "class" as function.
-  function MutableString(value) {
-    // ensure value is a primitive string
-    this.value = value ? value.toString() : '';
+  // The mutable String Class. A fresh Class.
+  // We have to attach the String prototype later.
+  class MutableString {
+    constructor(value) {
+      // ensure value is a primitive string
+      this.value = value ? value.toString() : '';
+    }
+
+    // The place to overwrite or set property accessors:
+
+    // If we would simply subclass String, length would be a protected
+    // property, which cannot be overwritten.
+    // .length must be overwritten of course, because when the string is mutated its
+    // length may change.
+    get length() { return this.value.length; }
+    get $$is_native_string() { return false; }
+
+    // .toPrimitive, .valueOf and .toString are essential. The JavaScript String
+    // functions have to work on object strings and primitive strings. So that one function
+    // can work on both variants it calls this.valueOf to get the primitive. This is why
+    // the String functions work flawlessly here for MutableString, simply by providing
+    // .valueOf.
+    // Also various JavaScript operators and other things use .toPrimitive, .valueOf and
+    // .toString internally.
+    valueOf() { return this.value; }
+    toString(arg) { return this.value; }
+    [Symbol.toPrimitive](arg) { return this.value; }
+
+    // Here now all the functions that mutate this.value.
+    // Though these functions here are simple and do not validate args or anything, this
+    // is done by the Ruby methods above instead, as they need to raise Ruby exceptions
+    // anyway. So usual JavaScript rules apply.
+    append(s) { return this.value += s.toString(); }
   }
 
-  // We do not simply assign the JavaScript String prototype to MutableString,
-  // instead we create a new prototype Object based on the String prototype.
-  let proto = Object.create(String.prototype);
-  MutableString.prototype = proto;
-
-  // This is important to be able to overwrite property accessors like String.length.
-  // Otherwise, for example by simply subclassing String, length will be a protected
-  // property, which cannot be overwritten. .length must be overwritten of course,
-  // because when the string is mutated its length may change.
-  Object.defineProperty(proto, 'length', { get: function () { return this.value.length; }});
-
-  // Also .toPrimitive, .valueOf and .toString are essential. The JavaScript String
-  // functions have to work on object strings and primitive strings. So that one function
-  // can work on both variants it calls this.valueOf to get the primitive. This is why
-  // the String functions work flawlessly here for MutableString, simply by providing
-  // .valueOf on the prototype.
-  // Also various JavaScript operators and other things use .toPrimitive, .valueOf and
-  // .toString internally.
-  proto[Symbol.toPrimitive] = function (arg) { return this.value; }
-  proto.valueOf = function () { return this.value; }
-  proto.toString = function (arg) { return this.value; }
-  
-  // Opal.bridge will set the prototype of the brdged class to Opal.Object. However
-  // doing so on MutableString would remeove the existing, essential String prototype
-  // copy and leave MutableString non functional at all. So hint Opal.bridge not to
-  // touch the existing prototype.
-  proto.$$bridge_do_not_touch = true;
-
-  // Here now all the functions that mutate this.value.
-  // Though these functions here are simple and do not validate args or anything, this
-  // is done by the Ruby methods above instead, as they need to raise Ruby exceptions
-  // anyway. So usual JavaScript rules apply. 
-  proto.append = function(s) { return this.value += s.toString(); }
+  // To make instances of MutableString behave like String, we set the constructors
+  // prototype properties prototype to String.prototype. This step allows us to overwrite
+  // the protected properties of String while having the instances behave like strings.
+  Object.setPrototypeOf(MutableString.prototype, String.prototype);
 
   // Make MutableString globally available.
   Opal.global.MutableString = MutableString;
@@ -2531,11 +2532,11 @@ class String < `MutableString`
     Opal.prop(#{self}.$$prototype, '$$is_string', true);
 
     // $$is_string_class is set on JavaScript String, Opal.Symbol and Opal.String
-    // making them appear as one in many places, hiding the implementation 
+    // making them appear as one in many places, hiding the implementation
     // details of JavaScricpt String being a shadowed Ruby Class different from ::String
     self.$$is_string_class = true;
   }
-  
+
   class << self
     # define the missing class methods
     def new(*args)
@@ -2591,23 +2592,4 @@ end
 %x{
   // Finally let JavaScript String return Opal.String as its class
   Opal.prop(String.prototype, '$$class', Opal.String);
-
-  // We still need a way to differrentiate between the two in case
-  // we get a boxed primitive String
-  Opal.prop(String.prototype, '$$is_native_string', true);
-  Opal.prop(proto, '$$is_native_string', false);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
