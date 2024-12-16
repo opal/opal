@@ -13,9 +13,78 @@ class ::String < `String`
   %x{
     const MAX_STR_LEN = Number.MAX_SAFE_INTEGER;
 
-    Opal.prop(#{self}.$$prototype, '$$is_string', true);
-    Opal.prop(#{self}.$$prototype, '$$is_native_string', function() { return this.constructor === String; });
-    self.$$is_string_class = true;
+    // JavaScript String is bridged above.  Now lets provide a mutable
+    // String Class and use it in ::String.new
+    // The mutable String Class. A fresh Class.
+    // We have to attach the String prototype later.
+    class MtblString {
+      constructor(value) {
+        // ensure value is a primitive string
+        this.$$value = value ? value.toString() : '';
+        this.$$frozen = false;
+      }
+
+      // The place to overwrite or set property accessors:
+
+      // If we would simply subclass String, length would be a protected
+      // property, which cannot be overwritten.
+      // .length must be overwritten of course, because when the string is mutated its
+      // length may change.
+      get length() { return this.$$value.length; }
+
+      // .toPrimitive, .valueOf and .toString are essential. The JavaScript String
+      // functions have to work on object strings and primitive strings. So that one function
+      // can work on both variants it calls this.valueOf to get the primitive. This is why
+      // the String functions work flawlessly here for MutableString, simply by providing
+      // .valueOf.
+      // Also various JavaScript operators and other things use .toPrimitive, .valueOf and
+      // .toString internally.
+      valueOf(arg) { return this.$$value.valueOf(arg); }
+      toString(arg) { return this.$$value.toString(arg); }
+      [Symbol.toPrimitive](arg) { return this.$$value; }
+
+      // Here now all the functions that mutate this.value.
+      // Though these functions here are simple and do not validate args or anything, this
+      // is done by the Ruby methods above instead, as they need to raise Ruby exceptions
+      // anyway. So usual JavaScript rules apply.
+      append(s) { return this.$$value += s.toString(); }
+    }
+
+    // To make instances of MutableString behave like String and ::String, we set the constructors
+    // prototype properties prototype to String.prototype. This step allows us to overwrite
+    // the protected properties of String while having the instances behave like strings.
+    Object.setPrototypeOf(MtblString.prototype, String.prototype);
+
+    // But [] access is lost this way. So we need a Proxy.
+    let mu_idx_handler = {
+      get: function(target, idx, receiver) {
+        if (typeof target[idx] === 'function' && target[idx].constructor === Function) {
+          return new Proxy(target[idx], { apply(trgt, thisArg, args) {
+            let res = trgt.apply(target, args);
+            return (res === target) ? receiver : res;
+          }});
+        } else if (Object.hasOwn(target, idx)) {
+          return target[idx];
+        } else {
+          return target.$$value[idx];
+        }
+      }
+    }
+
+    class MutableString {
+      constructor(value) {
+        return new Proxy(new MtblString(value), mu_idx_handler);
+      }
+    }
+
+    // Make MutableString globally available.
+    Opal.global.MutableString = MutableString;
+
+    // String instances are frozen by default
+    $prop(self.$$prototype, "$$frozen", true);
+    String.prototype.is_frozen = function() { return (this.constructor === String) ? true : this.$$frozen; };
+
+    $prop(self.$$prototype, "$$is_string", true);
 
     var string_id_map = new Map();
 
@@ -480,20 +549,21 @@ class ::String < `String`
         var str = args[0] || "";
         var opts = args[args.length-1];
         str = $coerce_to(str, #{::String}, 'to_str');
-        str = new self.$$constructor(str);
-        if (opts && opts.$$is_hash) {
-          if (opts.has('encoding')) str = str.$force_encoding(opts.get('encoding'));
+        if (self === Opal.Symbol) {
+          str = new String(str); // a.k.a frozen ::String
+        } else {
+          if (self === Opal.String) {
+            str = new MutableString(str);
+          } else {
+            str = new self.$$constructor(str);
+          }
+          if (opts && opts.$$is_hash && opts.has('encoding')) {
+            str = str.$force_encoding(opts.get('encoding'));
+          }
         }
         if (!str.$initialize.$$pristine) #{`str`.initialize(*args)};
         return str;
       }
-    end
-
-    def ==(other)
-      %x{
-        if ((self === String || self === Opal.Symbol) && other.$$is_string_class) return true;
-      }
-      super(other)
     end
   end
 
@@ -554,8 +624,8 @@ class ::String < `String`
   def +(other)
     other = `$coerce_to(#{other}, #{::String}, 'to_str')`
     %x{
-      if (other.length === 0 && self.$$is_string_class) return self;
-      if (self.length === 0 && other.$$is_string_class) return other;
+      if (other.length === 0 && self.$$class === Opal.String) return self;
+      if (self.length === 0 && other.$$class === Opal.String) return other;
       var out = self + other;
       if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
       if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
@@ -570,7 +640,7 @@ class ::String < `String`
   def -@
     %x{
       if (typeof self === 'string') return self;
-      if (self.$$frozen) return self;
+      if (self.is_frozen()) return self;
       if (self.encoding.name == 'UTF-8' && self.internal_encoding.name == 'UTF-8') return self.toString();
       return self.$dup().$freeze();
     }
@@ -638,7 +708,7 @@ class ::String < `String`
     if result
       %x{
         if (self.encoding === Opal.Encoding?.UTF_8) return result;
-        return (new String(result)).$force_encoding(self.encoding);
+        return (new MutableString(result)).$force_encoding(self.encoding);
       }
     end
     nil
@@ -656,7 +726,7 @@ class ::String < `String`
   end
 
   def b
-    `new String(#{self})`.force_encoding('binary')
+    `new MutableString(#{self})`.force_encoding('binary')
   end
 
   def byteindex(search, offset = 0)
@@ -800,7 +870,7 @@ class ::String < `String`
     if result
       %x{
         if (self.encoding === Opal.Encoding?.UTF_8) return result;
-        return (new String(result)).$force_encoding(self.encoding);
+        return (new MutableString(result)).$force_encoding(self.encoding);
       }
     end
     result
@@ -818,7 +888,7 @@ class ::String < `String`
         first_upper = first_upper[0] + first_upper[1].toLowerCase();
       }
       let capz = first_upper + self.substring(first.length).toLowerCase();
-      return capz.$force_encoding(self.encoding);
+      return (new MutableString(capz)).$force_encoding(self.encoding);
     }
   end
 
@@ -850,9 +920,10 @@ class ::String < `String`
     return self if width <= l
 
     %x{
-      return (padding(padstr, Math.floor((width + l) / 2) - l) +
+      return (new MutableString(
+             padding(padstr, Math.floor((width + l) / 2) - l) +
              self +
-             padding(padstr, Math.ceil((width + l) / 2) - l))
+             padding(padstr, Math.ceil((width + l) / 2) - l)))
              .$force_encoding(self.encoding);
     }
   end
@@ -889,7 +960,7 @@ class ::String < `String`
       }
 
       if (result != null) {
-        return result.$force_encoding(self.encoding);
+        return (new MutableString(result)).$force_encoding(self.encoding);
       }
     }
 
@@ -916,7 +987,7 @@ class ::String < `String`
         let cut = self.codePointAt(length - 2) > 0xFFFF ? 2 : 1;
         result = self.substring(0, length - cut);
       }
-      return result.$force_encoding(self.encoding);
+      return (new MutableString(result)).$force_encoding(self.encoding);
     }
   end
 
@@ -925,7 +996,7 @@ class ::String < `String`
   def chr
     %x{
       let result = self.length > 0 ? first_char(self) : '';
-      return result.$force_encoding(self.encoding);
+      return (new MutableString(result)).$force_encoding(self.encoding);
     }
   end
 
@@ -936,14 +1007,14 @@ class ::String < `String`
       raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
     end
 
-    copy = `new String(self)`
+    copy = `new MutableString(self)`
     copy.copy_singleton_methods(self)
     copy.initialize_clone(self, freeze: freeze)
 
     if freeze == true
-      `if (!copy.$$frozen) copy.$$frozen = true;`
+      `if (!copy.is_frozen()) copy.$$frozen = true;`
     elsif freeze.nil?
-      `if (self.$$frozen) copy.$$frozen = true;`
+      `if (self.is_frozen()) copy.$$frozen = true;`
     end
 
     copy
@@ -983,7 +1054,7 @@ class ::String < `String`
       if (char_class === null) return self;
 
       let pattern_flags = $transform_regexp(char_class, 'gu');
-      return self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '')
+      return (new MutableString(self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '')))
              .$force_encoding(self.encoding);
     }
   end
@@ -996,7 +1067,7 @@ class ::String < `String`
         prefix = $coerce_to(prefix, #{::String}, 'to_str');
       }
       if (starts_with(self, prefix)) {
-        return self.slice(prefix.length).$force_encoding(self.encoding);
+        return (new MutableString(self.slice(prefix.length))).$force_encoding(self.encoding);
       }
       return self;
     }
@@ -1010,7 +1081,7 @@ class ::String < `String`
         suffix = $coerce_to(suffix, #{::String}, 'to_str');
       }
       if (ends_with(self, suffix)) {
-        return self.slice(0, self.length - suffix.length).$force_encoding(self.encoding);
+        return (new MutableString(self.slice(0, self.length - suffix.length))).$force_encoding(self.encoding);
       }
       return self;
     }
@@ -1032,7 +1103,7 @@ class ::String < `String`
       } else {
         str = str.toLowerCase();
       }
-      return str.$force_encoding(self.encoding);
+      return (new MutableString(str)).$force_encoding(self.encoding);
     }
   end
 
@@ -1072,13 +1143,13 @@ class ::String < `String`
               return '\\u' + ('0000' + char_code.toString(16).toUpperCase()).slice(-4);
             }
           });
-      return ('"' + escaped.replace(/\#[\$\@\{]/g, '\\$&') + '"').$force_encoding(self.encoding);
+      return (new MutableString('"' + escaped.replace(/\#[\$\@\{]/g, '\\$&') + '"')).$force_encoding(self.encoding);
       /* eslint-enable no-misleading-character-class */
     }
   end
 
   def dup
-    copy = `new String(self)`
+    copy = `new MutableString(self)`
     copy.initialize_dup(self)
     copy
   end
@@ -1093,7 +1164,7 @@ class ::String < `String`
     return enum_for(:each_char) { size } unless block_given?
     %x{
       for (let c of self) {
-        c = new String(c);
+        c = new MutableString(c);
         c.encoding = self.encoding;
         #{yield `c`};
       }
@@ -1111,7 +1182,7 @@ class ::String < `String`
   def each_grapheme_cluster(&block)
     return enum_for(:each_grapheme_cluster) { length } unless block_given?
     clusters = `grapheme_segmenter().segment(self)`
-    `for (const cluster of clusters) #{yield `cluster.segment.$force_encoding(self.encoding)`}`
+    `for (const cluster of clusters) #{yield `(new MutableString(cluster.segment)).$force_encoding(self.encoding)`}`
     self
   end
 
@@ -1136,7 +1207,7 @@ class ::String < `String`
             if (chomp) {
               value = #{`value`.chomp("\n")};
             }
-            Opal.yield1(block, value.$force_encoding(self.encoding));
+            Opal.yield1(block, (new MutableString(value)).$force_encoding(self.encoding));
           }
         }
 
@@ -1160,7 +1231,7 @@ class ::String < `String`
         if (chomp) {
           value = #{`value`.chomp(separator)};
         }
-        Opal.yield1(block, value.$force_encoding(self.encoding));
+        Opal.yield1(block, (new MutableString(value)).$force_encoding(self.encoding));
       }
     }
 
@@ -1414,8 +1485,8 @@ class ::String < `String`
 
   def intern
     # specs expect the exception to have the invalid character: "(invalid symbol in encoding UTF-8 :"\xC3")"
-    # raise EncodingError, "invalid symbol in encoding #{encoding.name}" unless valid_encoding?
-    # return `self.toString().$force_encoding(Opal.Encoding.US_ASCII)` if ascii_only?
+    #   raise EncodingError, "invalid symbol in encoding #{encoding.name}" unless valid_encoding?
+    #   return `self.toString().$force_encoding(Opal.Encoding.US_ASCII)` if ascii_only?
     # but lets keep things fast until we have real Symbols
     `self.toString()` # .$force_encoding(self.encoding)
   end
@@ -1445,7 +1516,7 @@ class ::String < `String`
 
     return self if width <= l
 
-    `(self + padding(padstr, width - l)).$force_encoding(self.encoding)`
+    `(new MutableString(self + padding(padstr, width - l))).$force_encoding(self.encoding)`
   end
 
   def lstrip
@@ -1544,7 +1615,7 @@ class ::String < `String`
         }
         if (!carry) break;
       }
-      return result.$force_encoding(self.encoding);
+      return (new MutableString(result)).$force_encoding(self.encoding);
     }
   end
 
@@ -1616,12 +1687,18 @@ class ::String < `String`
         else i = self.indexOf(sep);
       }
 
-      if (i === -1) return [self, ''.$force_encoding(sep.encoding), ''.$force_encoding(self.encoding)];
+      if (i === -1) {
+        return [
+          self,
+          (new MutableString('')).$force_encoding(sep.encoding),
+          (new MutableString('')).$force_encoding(self.encoding)
+        ];
+      }
 
       return [
-        self.slice(0, i).$force_encoding(self.encoding),
-        self.slice(i, i + sep.length).$force_encoding(sep.encoding),
-        self.slice(i + sep.length).$force_encoding(self.encoding)
+        (new MutableString(self.slice(0, i))).$force_encoding(self.encoding),
+        (new MutableString(self.slice(i, i + sep.length))).$force_encoding(sep.encoding),
+        (new MutableString(self.slice(i + sep.length))).$force_encoding(self.encoding)
       ];
     }
   end
@@ -1633,7 +1710,7 @@ class ::String < `String`
     %x{
       let res = '';
       for (const c of self) { res = c + res; }
-      return res.$force_encoding(self.encoding);
+      return (new MutableString(res)).$force_encoding(self.encoding);
     }
   end
 
@@ -1702,7 +1779,7 @@ class ::String < `String`
 
     return self if width <= l
 
-    `(padding(padstr, width - l) + self).$force_encoding(self.encoding)`
+    `(new MutableString(padding(padstr, width - l) + self)).$force_encoding(self.encoding)`
   end
 
   def rpartition(sep)
@@ -1736,18 +1813,24 @@ class ::String < `String`
         else i = self.lastIndexOf(sep);
       }
 
-      if (i === -1) return [''.$force_encoding(self.encoding), ''.$force_encoding(sep.encoding), self];
+      if (i === -1) {
+        return [
+          (new MutableString('')).$force_encoding(self.encoding),
+          (new MutableString('')).$force_encoding(sep.encoding),
+          self
+        ];
+      }
 
       return [
-        self.slice(0, i).$force_encoding(self.encoding),
-        self.slice(i, i + sep.length).$force_encoding(sep.encoding),
-        self.slice(i + sep.length).$force_encoding(self.encoding)
+        (new MutableString(self.slice(0, i))).$force_encoding(self.encoding),
+        (new MutableString(self.slice(i, i + sep.length))).$force_encoding(sep.encoding),
+        (new MutableString(self.slice(i + sep.length))).$force_encoding(self.encoding)
       ];
     }
   end
 
   def rstrip
-    `self.replace(/[\x00\x09\x0a-\x0d\x20]*$/, '').$force_encoding(self.encoding)`
+    `(new MutableString(self.replace(/[\x00\x09\x0a-\x0d\x20]*$/, ''))).$force_encoding(self.encoding)`
   end
 
   # rstrip! - not supported, mutates string
@@ -1768,7 +1851,7 @@ class ::String < `String`
       while ((match = pattern.exec(self)) != null) {
         match_data = #{::MatchData.new `pattern`, `match`, no_matchdata: no_matchdata};
         if (match.length === 1) {
-          match_o = match[0].$force_encoding(self.encoding);
+          match_o = (new MutableString(match[0])).$force_encoding(self.encoding);
           if (block === nil) result.push(match_o);
           else Opal.yield1(block, match_o);
         } else {
@@ -1908,7 +1991,7 @@ class ::String < `String`
           }
         }
       }
-      result = result.map((substr)=>substr.$force_encoding(self.encoding));
+      result = result.map((substr)=>{ return (new MutableString(substr)).$force_encoding(self.encoding) });
       if (block && block !== nil) {
         for (const substr of result) {#{yield `substr`}}
         return self;
@@ -1920,15 +2003,15 @@ class ::String < `String`
   def squeeze(*sets)
     %x{
       if (sets.length === 0) {
-        return self.replace(/(.)\1+/g, '$1').$force_encoding(self.encoding);
+        return (new MutableString(self.replace(/(.)\1+/g, '$1'))).$force_encoding(self.encoding);
       }
       var char_class = char_class_from_char_sets(sets);
       if (char_class === null) {
         return self;
       }
       let pattern_flags = $transform_regexp('(' + char_class + ')\\1+', 'gu');
-      return self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '$1')
-                 .$force_encoding(self.encoding);
+      return (new MutableString(self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '$1')))
+             .$force_encoding(self.encoding);
     }
   end
 
@@ -1960,7 +2043,7 @@ class ::String < `String`
   end
 
   def strip
-    `self.replace(/^[\x00\x09\x0a-\x0d\x20]*|[\x00\x09\x0a-\x0d\x20]*$/g, '').$force_encoding(self.encoding)`
+    `(new MutableString(self.replace(/^[\x00\x09\x0a-\x0d\x20]*|[\x00\x09\x0a-\x0d\x20]*$/g, ''))).$force_encoding(self.encoding)`
   end
 
   # strip! - not supported, mutates string
@@ -2060,7 +2143,7 @@ class ::String < `String`
           cu = c.toUpperCase();
           str += (cu == c) ? c.toLowerCase() : cu;
       }
-      return str.$force_encoding(self.encoding);
+      return (new MutableString(str)).$force_encoding(self.encoding);
     }
   end
 
@@ -2367,7 +2450,7 @@ class ::String < `String`
       } else {
         result = self.toUpperCase();
       }
-      return result.$force_encoding(self.encoding)
+      return (new MutableString(result)).$force_encoding(self.encoding)
     }
   end
 
@@ -2441,14 +2524,13 @@ class ::String < `String`
 
   def freeze
     %x{
-      if (typeof self === 'string') { return self; }
-      $prop(self, "$$frozen", true);
-      return self;
+      if (!self.is_frozen()) self.$$frozen = true;
     }
+    self
   end
 
   def frozen?
-    `typeof self === 'string' || self.$$frozen === true || self.$$is_native_string`
+    `self.is_frozen()`
   end
 
   alias object_id __id__
@@ -2457,139 +2539,3 @@ class ::String < `String`
 end
 
 Symbol = String # ::Symbol is a immutable String
-
-# Make String mutable
-# -------------------
-
-# JavaScript String is bridged above and we have a immutable Ruby ::String class.
-# Now lets make the Ruby ::String mutable by assigning a new Class to it
-# and bridging that Class to a mutable JavaScript String function:
-%x{
-  // The mutable String Class. A fresh Class.
-  // We have to attach the String prototype later.
-  class MutableString {
-    constructor(value) {
-      // ensure value is a primitive string
-      this.value = value ? value.toString() : '';
-    }
-
-    // The place to overwrite or set property accessors:
-
-    // If we would simply subclass String, length would be a protected
-    // property, which cannot be overwritten.
-    // .length must be overwritten of course, because when the string is mutated its
-    // length may change.
-    get length() { return this.value.length; }
-    get $$is_native_string() { return false; }
-
-    // .toPrimitive, .valueOf and .toString are essential. The JavaScript String
-    // functions have to work on object strings and primitive strings. So that one function
-    // can work on both variants it calls this.valueOf to get the primitive. This is why
-    // the String functions work flawlessly here for MutableString, simply by providing
-    // .valueOf.
-    // Also various JavaScript operators and other things use .toPrimitive, .valueOf and
-    // .toString internally.
-    valueOf() { return this.value; }
-    toString(arg) { return this.value; }
-    [Symbol.toPrimitive](arg) { return this.value; }
-
-    // Here now all the functions that mutate this.value.
-    // Though these functions here are simple and do not validate args or anything, this
-    // is done by the Ruby methods above instead, as they need to raise Ruby exceptions
-    // anyway. So usual JavaScript rules apply.
-    append(s) { return this.value += s.toString(); }
-  }
-
-  // To make instances of MutableString behave like String, we set the constructors
-  // prototype properties prototype to String.prototype. This step allows us to overwrite
-  // the protected properties of String while having the instances behave like strings.
-  Object.setPrototypeOf(MutableString.prototype, String.prototype);
-
-  // Make MutableString globally available.
-  Opal.global.MutableString = MutableString;
-
-  // Delete the existing Opal.String so that we can register the new one below.
-  delete Opal.Object.$$const.String;
-  delete Opal.String;
-}
-
-# Essentially we have two String implementations floating around, with the
-# immutable JavaScript String being hidden, mostly, unless its directly accessed
-# as `String`. A "implementation detail".
-# We must take care to keep them both synchronized. Also its important to note,
-# that the Opal.String <-> MutableString bridge is not a "clean" bridge, but one
-# used with some underlying "magic". So even internally within Opal its preferrable
-# to use Opal.String.$new() over new MutableString(). Best practice is not to use
-# MutableString directly at all, except for debugging.
-class String < `MutableString`
-  include Comparable
-
-  attr_reader :encoding, :internal_encoding # these 2 are set to defaults at the end of corelib/string/encoding.rb
-
-  %x{
-    const MAX_STR_LEN = Number.MAX_SAFE_INTEGER;
-
-    Opal.prop(#{self}.$$prototype, '$$is_string', true);
-
-    // $$is_string_class is set on JavaScript String, Opal.Symbol and Opal.String
-    // making them appear as one in many places, hiding the implementation
-    // details of JavaScricpt String being a shadowed Ruby Class different from ::String
-    self.$$is_string_class = true;
-  }
-
-  class << self
-    # define the missing class methods
-    def new(*args)
-      %x{
-        let str = args[0] || "";
-        let opts = args[args.length-1];
-        str = $coerce_to(str, #{::String}, 'to_str');
-        str = new self.$$constructor(str);
-        if (opts && opts.$$is_hash) {
-          if (opts.has('encoding')) str = str.$force_encoding(opts.get('encoding'));
-        }
-        if (!str.$initialize?.$$pristine) #{`str`.initialize(*args)};
-        return str;
-      }
-    end
-
-    def try_convert(what)
-      ::Opal.coerce_to?(what, ::String, :to_str)
-    end
-
-    # Because now, that we have mutable ::String and immutable JavaScript String,
-    # whenever a method gets added to ::String, we must also add it to
-    # the JavaScript String prototype to make them appear the same.
-    # But do not do this for subclasses.
-    def method_added(method_name)
-      %x{
-        if (self === Opal.String) {
-          let jsid = '$' + method_name;
-          Opal.prop(String.prototype, jsid, self.$$prototype[jsid]);
-        }
-      }
-      nil
-    end
-
-    def ==(other)
-      %x{
-        if (self === Opal.String && other.$$is_string_class) return true;
-      }
-      super(other)
-    end
-  end
-
-  def initialize(str = undefined, encoding: nil, capacity: nil)
-  end
-
-  # Do not define methods here, define them above!
-end
-
-# ----------------------------- #
-# -!- There can only be one -!- #
-# ----------------------------- #
-
-%x{
-  // Finally let JavaScript String return Opal.String as its class
-  Opal.prop(String.prototype, '$$class', Opal.String);
-}
