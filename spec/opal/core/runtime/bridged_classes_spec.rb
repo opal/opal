@@ -161,8 +161,8 @@ describe 'Inheritance with bridged classes' do
   end
 end
 
-describe "Invalid bridged classes" do
-  it "raises a TypeError when trying to extend with non-Class" do
+describe 'Invalid bridged classes' do
+  it 'raises a TypeError when trying to extend with non-Class' do
     error_msg = /superclass must be a Class/
     -> { class TestClass < `""`;                  end }.should raise_error(TypeError, error_msg)
     -> { class TestClass < `3`;                   end }.should raise_error(TypeError, error_msg)
@@ -175,3 +175,96 @@ describe "Invalid bridged classes" do
   end
 end
 
+describe 'Bridging subclassed JavaScript Classes' do
+  it 'is working' do
+    %x{
+      class Dog { bark() { return 'wuff'; }}
+      class ChowChow extends Dog { cuddle() { return 'grrrrr'; }}
+    }
+
+    class ChowChow < `ChowChow`
+      def bark
+        `self.bark()`
+      end
+
+      def cuddle
+        `self.cuddle()`
+      end
+    end
+
+    # check direct bridge
+    ChowChow.new.cuddle.should == 'grrrrr'
+
+    # check if js superclass can be reached
+    ChowChow.new.bark.should == 'wuff'
+  end
+
+  it 'is kinda working with subclassed bridged classes' do
+    # Lets demonstrate how that works for a simple case:
+
+    # JS class inheriting from bridged JS class:
+    %x{
+      class SuperString extends String {
+        constructor(arg) { super(arg); }
+        travel_through_time() { return 'Hello my dear friend! Greetings from the future!'; }
+      }
+    }
+
+    # build bridge:
+    class RubySuperString < `SuperString`
+      def travel_through_time
+        `self.travel_through_time()`
+      end
+
+      def incinerate
+        ''
+      end
+    end
+
+    # this does work:
+    RubySuperString.new.travel_through_time.should == 'Hello my dear friend! Greetings from the future!'
+
+    # this does work too:
+    RubySuperString.new.incinerate == ''
+
+    # that too:
+    %x{
+      function try_access_from_javascript() {
+        try {
+          return (new SuperString()).$incinerate();
+        } catch {
+          return nil;
+        }
+      }
+    }
+    `try_access_from_javascript()`.should == ''
+
+    # We inherited from JS String which has ::String in its prototype, can we slice?
+    RubySuperString.new('123').slice(0, 9).should == "undefined"
+    # Of course not, a bit weird. One must take care of such things when bridging.
+    # The standard Object allocator ignores args. Usually they are handled in #initialize.
+
+    # But we must pass the arg when allocating the object so we must overwrite ::new :
+    class RubySuperString
+      def self.new(arg)
+        `new self.$$constructor(arg)`
+      end
+    end
+
+    # can we now slice?
+    RubySuperString.new('123').slice(1).should == '2'
+    # Yes. Nice. But note that this is a Method from ::String!
+    # The availablity of methods from another class may come as a surprise when bridging
+    # Classes with bridges in its prototype chain.
+
+    # But did we mess up prototypes? Can String maybe #travel_through_time too?
+    -> {
+      String.new.travel_through_time.should  == 'Hello my dear friend! Greetings from the future!'
+    }.should raise_error NoMethodError
+    # No. Phuu.
+
+    # For more complicated cases "manually" adapting the protype chain may be required.
+    # But we don't need to test that, because we assume that people know what they
+    # are doing when they adapt prototypes.
+  end
+end
