@@ -1434,11 +1434,13 @@
     // Object.prototype in its prototype chain and inject there or inject at the
     // end of the chain. Also, there is a chance we meet some Ruby Class on the
     // way, if a bridged class has been subclassed or its protype has been
-    // otherwise modified. Then we assume that prototype is already modified
+    // otherwise modified. Then we assume that the prototype is already modified
     // correctly and we dont need to inject anything.
     let prototype = native_klass.prototype, next_prototype;
     while (true) {
-      if (prototype.$$bridge || prototype.$$is_class || prototype.$$is_module) {
+      if (prototype.$$bridge ||
+          prototype.$$class  || prototype.$$is_class ||
+          prototype.$$module || prototype.$$is_module) {
         // hit a bridged class, a Ruby Class or Module
         break;
       }
