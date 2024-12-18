@@ -302,7 +302,7 @@ class ::IO
   alias eof? eof
 end
 
-::STDIN  = $stdin  = ::IO.new(0, 'r')
+::STDIN = $stdin = ::IO.new(0, 'r')
 ::STDOUT = $stdout = ::IO.new(1, 'w')
 ::STDERR = $stderr = ::IO.new(2, 'w')
 
