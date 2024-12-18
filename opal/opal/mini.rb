@@ -5,6 +5,7 @@
 ::Object.require 'corelib/comparable'
 ::Object.require 'corelib/regexp'
 ::Object.require 'corelib/string'
+::Object.require 'corelib/string/mutable'
 ::Object.require 'corelib/enumerable'
 ::Object.require 'corelib/enumerator'
 ::Object.require 'corelib/array'

@@ -1,4 +1,4 @@
-# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add, transform_regexp
+# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add, transform_regexp, str, str_with_enc
 # backtick_javascript: true
 
 # depends on:
@@ -471,7 +471,11 @@ class ::String < `String`
       var str = args[0] || "";
       var opts = args[args.length-1];
       str = $coerce_to(str, #{::String}, 'to_str');
-      str = new self.$$constructor(str);
+      if (self.$$constructor === String) {
+        str = $str(str);
+      } else {
+        str = new self.$$constructor(str);
+      }
       if (opts && opts.$$is_hash) {
         if (opts.has('encoding')) str = str.$force_encoding(opts.get('encoding'));
       }
@@ -552,8 +556,7 @@ class ::String < `String`
 
   def -@
     %x{
-      if (typeof self === 'string') return self;
-      if (self.$$frozen) return self;
+      if (typeof self === 'string' || self.$$frozen) return self;
       if (self.encoding.name == 'UTF-8' && self.internal_encoding.name == 'UTF-8') return self.toString();
       return self.$dup().$freeze();
     }
@@ -609,7 +612,7 @@ class ::String < `String`
     if result
       %x{
         if (self.encoding === Opal.Encoding?.UTF_8) return result;
-        return (new String(result)).$force_encoding(self.encoding);
+        return $str_with_enc(result, self.encoding);
       }
     end
     nil
@@ -627,7 +630,7 @@ class ::String < `String`
   end
 
   def b
-    `new String(#{self})`.force_encoding('binary')
+    `$str_with_enc(self, 'binary')`
   end
 
   def byteindex(search, offset = 0)
@@ -771,7 +774,7 @@ class ::String < `String`
     if result
       %x{
         if (self.encoding === Opal.Encoding?.UTF_8) return result;
-        return (new String(result)).$force_encoding(self.encoding);
+        return $str_with_enc(result, self.encoding);
       }
     end
     result
@@ -901,7 +904,7 @@ class ::String < `String`
       raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
     end
 
-    copy = `new String(self)`
+    copy = `$str(self)`
     copy.copy_singleton_methods(self)
     copy.initialize_clone(self, freeze: freeze)
 
@@ -1043,7 +1046,7 @@ class ::String < `String`
   end
 
   def dup
-    copy = `new String(self)`
+    copy = `$str(self)`
     copy.initialize_dup(self)
     copy
   end
@@ -1058,7 +1061,7 @@ class ::String < `String`
     return enum_for(:each_char) { size } unless block_given?
     %x{
       for (let c of self) {
-        c = new String(c);
+        c = $str_with_enc(c, self.encoding);
         c.encoding = self.encoding;
         #{yield `c`};
       }

@@ -2698,7 +2698,7 @@
 
         part = part.$$source != null ? part.$$source : part.source;
       }
-      if (part === '') part = '(?:' + part + ')';
+      if (part == '') part = '(?:)';
       parts[i] = part;
     }
 
@@ -2816,6 +2816,83 @@
   // Strings
   // -------
 
+  // @returns a function proxy for all sorts of String functions
+  function string_fun_proxy(target_str, target_fun, str_proxy) {
+    return new Proxy(target_fun, {
+      apply(trgt, _thisArg, args) {
+        let res = trgt.apply(target_str, args);
+        if (res === target_str || res === str_proxy) return str_proxy;
+        else if (typeof(res) === 'string') return $str(res);
+        else if (res != null && typeof(res) === 'object' && res.$$is_string) return $str(res.toString());
+        else return res;
+      }
+    });
+  }
+
+  // @returns a function proxy that returns the result 'raw', usefeul for String.toString
+  function string_raw_fun_proxy(target_str, target_fun) {
+    return new Proxy(target_fun, {
+      apply(trgt, _thisArg, args) { return trgt.apply(target_str, args); }
+    });
+  }
+
+  function str_prop_is_fun(str, prop) {
+    return (typeof str[prop] === 'function' && str[prop].constructor === Function);
+  }
+
+  let string_proxy_handler = {
+    get: function(target_str, prop, str_proxy) {
+      if (target_str.$$string) {
+        // caught a mutated String
+        if (prop === Symbol.toPrimitive || prop === 'toString' || prop === 'valueOf') {
+          // special cases, do not box the result
+          return string_raw_fun_proxy(target_str.$$string, target_str.$$string['toString']);
+        } else if (prop[0] === '$' && prop[1] !== '$' && str_prop_is_fun(target_str, prop)) {
+          // a Ruby method, apply to outer String object
+          return string_fun_proxy(target_str, target_str[prop], str_proxy);
+        } else if (str_prop_is_fun(target_str, prop)) {
+          // a JS String function, apply it to mutated String primitive
+          return string_fun_proxy(target_str.$$string, target_str.$$string[prop], str_proxy);
+        } else if (prop === 'length') {
+          // return the mutated String primitives length
+          return target_str.$$string.length;
+        } else if (typeof(prop) === 'number') {
+          // a index access, apply to mutated String
+          return target_str.$$string[prop];
+        } else {
+          // otherwise return property of outer String object, e.g. encoding
+          return target_str[prop];
+        }
+      } else {
+        // caught a normal String
+        if (prop === Symbol.toPrimitive || prop === 'toString' || prop === 'valueOf') {
+          // special cases, do not box the result
+          return string_raw_fun_proxy(target_str, target_str['toString']);
+        } else if (str_prop_is_fun(target_str, prop)) {
+          // apply any method directly
+          return string_fun_proxy(target_str, target_str[prop], str_proxy);
+        } else {
+          // apply any prop directly
+          return target_str[prop];
+        }
+      }
+    }
+  }
+
+  // @returns a new String object, proxied and mutable.
+  function $str(string) {
+    return new Proxy(new String(string), string_proxy_handler);
+  }
+
+  Opal.str = $str;
+
+  // @returns a new String object with encoding set, proxied and mutable.
+  Opal.str_with_enc = function(str, encoding) {
+    str = Opal.set_encoding($str(str), encoding);
+    str.internal_encoding = str.encoding;
+    return str;
+  }
+
   Opal.encodings = Object.create(null);
 
   // Sets the encoding on a string, will treat string literals as frozen strings
@@ -2848,7 +2925,7 @@
 
   // @returns a String object with the encoding set from a string literal
   Opal.enc = function(str, name) {
-    var dup = new String(str);
+    var dup = $str(str);
     dup = Opal.set_encoding(dup, name);
     dup.internal_encoding = dup.encoding;
     return dup
@@ -2856,7 +2933,7 @@
 
   // @returns a String object with the internal encoding set to Binary
   Opal.binary = function(str) {
-    var dup = new String(str);
+    var dup = $str(str);
     return Opal.set_encoding(dup, "binary", "internal_encoding");
   }
 
@@ -2886,6 +2963,9 @@
 
   Opal.last_promise = null;
   Opal.promise_unhandled_exception = false;
+
+  // Queue
+  // -----
 
   // Run a block of code, but if it returns a Promise, don't run the next
   // one, but queue it.
