@@ -2,19 +2,18 @@
 # use_strict: true
 
 class ::String
-  `var ERROR = "String#%s not supported. Mutable String methods are not supported in Opal."`
+  `var ERROR = "String#%s not supported. Mutable String methods are currently not supported in Opal."`
 
   %i[
-    << capitalize! chomp! chop! downcase! gsub! lstrip! next! reverse!
-    slice! squeeze! strip! sub! succ! swapcase! tr! tr_s! upcase! prepend
-    []= clear encode! unicode_normalize!
+    << []= append_as_bytes bytesplice capitalize! chomp! chop! clear concat delete! delete_prefix!
+    delete_suffix! downcase! encode! gsub! insert lstrip! next! prepend replace reverse! rstrip!
+    scrub! setbyte slice! squeeze! strip! sub! succ! swapcase! tr! tr_s! unicode_normalize! upcase!
   ].each do |method_name|
     define_method method_name do |*|
       ::Kernel.raise ::NotImplementedError, `ERROR` % method_name
     end
   end
 end
-
 class ::Module
   def public(*methods)
     %x{
