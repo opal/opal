@@ -72,6 +72,7 @@ module Opal
     end
 
     # running on all OS
+    register_runner :bun,         :Bun,         'opal/cli_runners/bun'
     register_runner :chrome,      :Chrome,      'opal/cli_runners/chrome'
     register_runner :compiler,    :Compiler,    'opal/cli_runners/compiler'
     register_runner :deno,        :Deno,        'opal/cli_runners/deno'
@@ -87,7 +88,6 @@ module Opal
     end
 
     unless OS.windows?
-      register_runner :bun,         :Bun,         'opal/cli_runners/bun'
       register_runner :miniracer,   :MiniRacer,   'opal/cli_runners/mini_racer'
     end
 
