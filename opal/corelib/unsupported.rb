@@ -14,6 +14,7 @@ class ::String
     end
   end
 end
+
 class ::Module
   def public(*methods)
     %x{
