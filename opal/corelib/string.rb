@@ -1,4 +1,4 @@
-# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add, transform_regexp
+# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add, transform_regexp, str
 # backtick_javascript: true
 
 # depends on:
@@ -471,7 +471,11 @@ class ::String < `String`
       var str = args[0] || "";
       var opts = args[args.length-1];
       str = $coerce_to(str, #{::String}, 'to_str');
-      str = new self.$$constructor(str);
+      if (self.$$constructor === String) {
+        str = $str(str);
+      } else {
+        str = new self.$$constructor(str);
+      }
       if (opts && opts.$$is_hash) {
         if (opts.has('encoding')) str = str.$force_encoding(opts.get('encoding'));
       }
@@ -542,7 +546,7 @@ class ::String < `String`
       var out = self + other;
       if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
       if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
-      return Opal.enc(out, self.encoding);
+      return Opal.str(out, self.encoding);
     }
   end
 
@@ -552,8 +556,7 @@ class ::String < `String`
 
   def -@
     %x{
-      if (typeof self === 'string') return self;
-      if (self.$$frozen) return self;
+      if (typeof self === 'string' || self.$$frozen) return self;
       if (self.encoding.name == 'UTF-8' && self.internal_encoding.name == 'UTF-8') return self.toString();
       return self.$dup().$freeze();
     }
@@ -609,7 +612,7 @@ class ::String < `String`
     if result
       %x{
         if (self.encoding === Opal.Encoding?.UTF_8) return result;
-        return (new String(result)).$force_encoding(self.encoding);
+        return $str(result, self.encoding);
       }
     end
     nil
@@ -627,7 +630,7 @@ class ::String < `String`
   end
 
   def b
-    `new String(#{self})`.force_encoding('binary')
+    `$str(self, 'binary')`
   end
 
   def byteindex(search, offset = 0)
@@ -771,7 +774,7 @@ class ::String < `String`
     if result
       %x{
         if (self.encoding === Opal.Encoding?.UTF_8) return result;
-        return (new String(result)).$force_encoding(self.encoding);
+        return $str(result, self.encoding);
       }
     end
     result
@@ -789,7 +792,7 @@ class ::String < `String`
         first_upper = first_upper[0] + first_upper[1].toLowerCase();
       }
       let capz = first_upper + self.substring(first.length).toLowerCase();
-      return capz.$force_encoding(self.encoding);
+      return $str(capz, self.encoding);
     }
   end
 
@@ -821,10 +824,10 @@ class ::String < `String`
     return self if width <= l
 
     %x{
-      return (padding(padstr, Math.floor((width + l) / 2) - l) +
-             self +
-             padding(padstr, Math.ceil((width + l) / 2) - l))
-             .$force_encoding(self.encoding);
+      return $str(padding(padstr, Math.floor((width + l) / 2) - l) +
+                  self +
+                  padding(padstr, Math.ceil((width + l) / 2) - l),
+                  self.encoding);
     }
   end
 
@@ -860,7 +863,7 @@ class ::String < `String`
       }
 
       if (result != null) {
-        return result.$force_encoding(self.encoding);
+        return $str(result, self.encoding);
       }
     }
 
@@ -881,7 +884,7 @@ class ::String < `String`
         let cut = self.codePointAt(length - 2) > 0xFFFF ? 2 : 1;
         result = self.substring(0, length - cut);
       }
-      return result.$force_encoding(self.encoding);
+      return $str(result, self.encoding);
     }
   end
 
@@ -890,7 +893,7 @@ class ::String < `String`
   def chr
     %x{
       let result = self.length > 0 ? first_char(self) : '';
-      return result.$force_encoding(self.encoding);
+      return $str(result, self.encoding);
     }
   end
 
@@ -901,7 +904,7 @@ class ::String < `String`
       raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
     end
 
-    copy = `new String(self)`
+    copy = `$str(self)`
     copy.copy_singleton_methods(self)
     copy.initialize_clone(self, freeze: freeze)
 
@@ -948,8 +951,7 @@ class ::String < `String`
       if (char_class === null) return self;
 
       let pattern_flags = $transform_regexp(char_class, 'gu');
-      return self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '')
-             .$force_encoding(self.encoding);
+      return $str(self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), ''), self.encoding);
     }
   end
 
@@ -961,7 +963,7 @@ class ::String < `String`
         prefix = $coerce_to(prefix, #{::String}, 'to_str');
       }
       if (starts_with(self, prefix)) {
-        return self.slice(prefix.length).$force_encoding(self.encoding);
+        return $str(self.slice(prefix.length), self.encoding);
       }
       return self;
     }
@@ -975,7 +977,7 @@ class ::String < `String`
         suffix = $coerce_to(suffix, #{::String}, 'to_str');
       }
       if (ends_with(self, suffix)) {
-        return self.slice(0, self.length - suffix.length).$force_encoding(self.encoding);
+        return $str(self.slice(0, self.length - suffix.length), self.encoding);
       }
       return self;
     }
@@ -997,7 +999,7 @@ class ::String < `String`
       } else {
         str = str.toLowerCase();
       }
-      return str.$force_encoding(self.encoding);
+      return $str(str, self.encoding);
     }
   end
 
@@ -1037,13 +1039,13 @@ class ::String < `String`
               return '\\u' + ('0000' + char_code.toString(16).toUpperCase()).slice(-4);
             }
           });
-      return ('"' + escaped.replace(/\#[\$\@\{]/g, '\\$&') + '"').$force_encoding(self.encoding);
+      return $str('"' + escaped.replace(/\#[\$\@\{]/g, '\\$&') + '"', self.encoding);
       /* eslint-enable no-misleading-character-class */
     }
   end
 
   def dup
-    copy = `new String(self)`
+    copy = `$str(self)`
     copy.initialize_dup(self)
     copy
   end
@@ -1058,7 +1060,7 @@ class ::String < `String`
     return enum_for(:each_char) { size } unless block_given?
     %x{
       for (let c of self) {
-        c = new String(c);
+        c = $str(c, self.encoding);
         c.encoding = self.encoding;
         #{yield `c`};
       }
@@ -1076,7 +1078,7 @@ class ::String < `String`
   def each_grapheme_cluster(&block)
     return enum_for(:each_grapheme_cluster) { length } unless block_given?
     clusters = `grapheme_segmenter().segment(self)`
-    `for (const cluster of clusters) #{yield `cluster.segment.$force_encoding(self.encoding)`}`
+    `for (const cluster of clusters) #{yield `$str(cluster.segment, self.encoding)`}`
     self
   end
 
@@ -1101,7 +1103,7 @@ class ::String < `String`
             if (chomp) {
               value = #{`value`.chomp("\n")};
             }
-            Opal.yield1(block, value.$force_encoding(self.encoding));
+            Opal.yield1(block, $str(value, self.encoding));
           }
         }
 
@@ -1125,7 +1127,7 @@ class ::String < `String`
         if (chomp) {
           value = #{`value`.chomp(separator)};
         }
-        Opal.yield1(block, value.$force_encoding(self.encoding));
+        Opal.yield1(block, $str(value, self.encoding));
       }
     }
 
@@ -1137,7 +1139,7 @@ class ::String < `String`
   end
 
   def encode(encoding)
-    `Opal.enc(self, encoding)`
+    `Opal.str(self, encoding)`
   end
 
   # encode! - not supported, mutates string
@@ -1379,8 +1381,8 @@ class ::String < `String`
 
   def intern
     # specs expect the exception to have the invalid character: "(invalid symbol in encoding UTF-8 :"\xC3")"
-    # raise EncodingError, "invalid symbol in encoding #{encoding.name}" unless valid_encoding?
-    # return `self.toString().$force_encoding(Opal.Encoding.US_ASCII)` if ascii_only?
+    #   raise EncodingError, "invalid symbol in encoding #{encoding.name}" unless valid_encoding?
+    #   return `self.toString().$force_encoding(Opal.Encoding.US_ASCII)` if ascii_only?
     # but lets keep things fast until we have real Symbols
     `self.toString()` # .$force_encoding(self.encoding)
   end
@@ -1410,7 +1412,7 @@ class ::String < `String`
 
     return self if width <= l
 
-    `(self + padding(padstr, width - l)).$force_encoding(self.encoding)`
+    `$str(self + padding(padstr, width - l), self.encoding)`
   end
 
   def lstrip
@@ -1509,7 +1511,7 @@ class ::String < `String`
         }
         if (!carry) break;
       }
-      return result.$force_encoding(self.encoding);
+      return $str(result, self.encoding);
     }
   end
 
@@ -1581,12 +1583,12 @@ class ::String < `String`
         else i = self.indexOf(sep);
       }
 
-      if (i === -1) return [self, ''.$force_encoding(sep.encoding), ''.$force_encoding(self.encoding)];
+      if (i === -1) return [self, $str('', sep.encoding), $str('', self.encoding)];
 
       return [
-        self.slice(0, i).$force_encoding(self.encoding),
-        self.slice(i, i + sep.length).$force_encoding(sep.encoding),
-        self.slice(i + sep.length).$force_encoding(self.encoding)
+        $str(self.slice(0, i), self.encoding),
+        $str(self.slice(i, i + sep.length), sep.encoding),
+        $str(self.slice(i + sep.length), self.encoding)
       ];
     }
   end
@@ -1598,7 +1600,7 @@ class ::String < `String`
     %x{
       let res = '';
       for (const c of self) { res = c + res; }
-      return res.$force_encoding(self.encoding);
+      return $str(res, self.encoding);
     }
   end
 
@@ -1667,7 +1669,7 @@ class ::String < `String`
 
     return self if width <= l
 
-    `(padding(padstr, width - l) + self).$force_encoding(self.encoding)`
+    `$str(padding(padstr, width - l) + self, self.encoding)`
   end
 
   def rpartition(sep)
@@ -1701,18 +1703,18 @@ class ::String < `String`
         else i = self.lastIndexOf(sep);
       }
 
-      if (i === -1) return [''.$force_encoding(self.encoding), ''.$force_encoding(sep.encoding), self];
+      if (i === -1) return [$str('', self.encoding), $str('', sep.encoding), self];
 
       return [
-        self.slice(0, i).$force_encoding(self.encoding),
-        self.slice(i, i + sep.length).$force_encoding(sep.encoding),
-        self.slice(i + sep.length).$force_encoding(self.encoding)
+        $str(self.slice(0, i), self.encoding),
+        $str(self.slice(i, i + sep.length), sep.encoding),
+        $str(self.slice(i + sep.length), self.encoding)
       ];
     }
   end
 
   def rstrip
-    `self.replace(/[\x00\x09\x0a-\x0d\x20]*$/, '').$force_encoding(self.encoding)`
+    `$str(self.replace(/[\x00\x09\x0a-\x0d\x20]*$/, ''), self.encoding)`
   end
 
   # rstrip! - not supported, mutates string
@@ -1733,11 +1735,11 @@ class ::String < `String`
       while ((match = pattern.exec(self)) != null) {
         match_data = #{::MatchData.new `pattern`, `match`, no_matchdata: no_matchdata};
         if (match.length === 1) {
-          match_o = match[0].$force_encoding(self.encoding);
+          match_o = $str(match[0], self.encoding);
           if (block === nil) result.push(match_o);
           else Opal.yield1(block, match_o);
         } else {
-          captures = #{`match_data`.captures.map { |c| c&.force_encoding(encoding) }};
+          captures = #{`match_data`.captures.map { |c| c ? `$str(c, self.encoding)` : c }};
           if (block === nil) result.push(captures);
           else Opal.yield1(block, captures);
         }
@@ -1873,7 +1875,7 @@ class ::String < `String`
           }
         }
       }
-      result = result.map((substr)=>substr.$force_encoding(self.encoding));
+      result = result.map((substr) => $str(substr, self.encoding));
       if (block && block !== nil) {
         for (const substr of result) {#{yield `substr`}}
         return self;
@@ -1885,15 +1887,14 @@ class ::String < `String`
   def squeeze(*sets)
     %x{
       if (sets.length === 0) {
-        return self.replace(/(.)\1+/g, '$1').$force_encoding(self.encoding);
+        return $str(self.replace(/(.)\1+/g, '$1'), self.encoding);
       }
       var char_class = char_class_from_char_sets(sets);
       if (char_class === null) {
         return self;
       }
       let pattern_flags = $transform_regexp('(' + char_class + ')\\1+', 'gu');
-      return self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '$1')
-                 .$force_encoding(self.encoding);
+      return $str(self.replace(new RegExp(pattern_flags[0], pattern_flags[1]), '$1'), self.encoding);
     }
   end
 
@@ -1925,7 +1926,7 @@ class ::String < `String`
   end
 
   def strip
-    `self.replace(/^[\x00\x09\x0a-\x0d\x20]*|[\x00\x09\x0a-\x0d\x20]*$/g, '').$force_encoding(self.encoding)`
+    `$str(self.replace(/^[\x00\x09\x0a-\x0d\x20]*|[\x00\x09\x0a-\x0d\x20]*$/g, ''), self.encoding)`
   end
 
   # strip! - not supported, mutates string
@@ -2025,7 +2026,7 @@ class ::String < `String`
           cu = c.toUpperCase();
           str += (cu == c) ? c.toLowerCase() : cu;
       }
-      return str.$force_encoding(self.encoding);
+      return $str(str, self.encoding);
     }
   end
 
@@ -2332,7 +2333,7 @@ class ::String < `String`
       } else {
         result = self.toUpperCase();
       }
-      return result.$force_encoding(self.encoding)
+      return $str(result, self.encoding)
     }
   end
 

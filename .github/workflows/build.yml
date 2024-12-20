@@ -30,10 +30,9 @@ jobs:
           - name: mspec-bun
             bun: true
             command: bin/rake mspec_bun
-          # exclude deno for the moment, it cannot support String improvements
-          # - name: mspec-deno
-          #   deno: true
-          #   command: bin/rake mspec_deno
+          - name: mspec-deno
+            deno: true
+            command: bin/rake mspec_deno
           - name: minitest
             command: bin/rake minitest
           - name: minitest-strict-mode

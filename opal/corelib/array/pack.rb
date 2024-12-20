@@ -447,7 +447,7 @@ class ::Array
         return output;
       }
       else {
-        return Opal.enc(output, "binary");
+        return Opal.str(output, "binary");
       }
     }
   end

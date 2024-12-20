@@ -2698,7 +2698,7 @@
 
         part = part.$$source != null ? part.$$source : part.source;
       }
-      if (part === '') part = '(?:' + part + ')';
+      if (part == '') part = '(?:)';
       parts[i] = part;
     }
 
@@ -2816,7 +2816,23 @@
   // Strings
   // -------
 
-  Opal.encodings = Object.create(null);
+  // We use a helper to create new Strings, globally, so that it
+  // will be easer to change that later on to a mutable string class.
+  // Also this helper always sets a encoding. If encoding is not
+  // provided, "UTF-8" will be used.
+  // @returns a new String object with encoding set.
+  function $str(str, encoding) {
+    if (!encoding || encoding === nil) encoding = "UTF-8";
+    str = Opal.set_encoding(new String(str), encoding);
+    str.internal_encoding = str.encoding;
+    return str;
+  }
+  Opal.str = $str;
+
+  // Provide the encoding register with a default "UTF-8" encoding, because
+  // its used from the start and will be raplaced by the real UTF-8 encoding
+  // when 'corelib/string/encoding' is loaded.
+  Opal.encodings = { __proto__: null, "UTF-8": { name: "UTF-8" }};
 
   // Sets the encoding on a string, will treat string literals as frozen strings
   // raising a FrozenError.
@@ -2829,10 +2845,8 @@
     if (typeof str === 'string' || str.$$frozen === true)
       $raise(Opal.FrozenError, "can't modify frozen String");
 
-    var encoding = Opal.find_encoding(name);
-
+    let encoding = Opal.find_encoding(name);
     if (encoding === str[type]) { return str; }
-
     str[type] = encoding;
 
     return str;
@@ -2840,24 +2854,10 @@
 
   // Fetches the encoding for the given name or raises ArgumentError.
   Opal.find_encoding = function(name) {
-    var register = Opal.encodings;
-    var encoding = register[name] || register[name.toUpperCase()];
+    let register = Opal.encodings;
+    let encoding = register[name] || register[name.toUpperCase()];
     if (!encoding) $raise(Opal.ArgumentError, "unknown encoding name - " + name);
     return encoding;
-  }
-
-  // @returns a String object with the encoding set from a string literal
-  Opal.enc = function(str, name) {
-    var dup = new String(str);
-    dup = Opal.set_encoding(dup, name);
-    dup.internal_encoding = dup.encoding;
-    return dup
-  }
-
-  // @returns a String object with the internal encoding set to Binary
-  Opal.binary = function(str) {
-    var dup = new String(str);
-    return Opal.set_encoding(dup, "binary", "internal_encoding");
   }
 
   Opal.fallback_to_s = function(obj) {
@@ -2886,6 +2886,9 @@
 
   Opal.last_promise = null;
   Opal.promise_unhandled_exception = false;
+
+  // Queue
+  // -----
 
   // Run a block of code, but if it returns a Promise, don't run the next
   // one, but queue it.

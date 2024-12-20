@@ -184,14 +184,6 @@ module ::Marshal
   class self::WriteBuffer
     attr_reader :buffer
 
-    %x{
-      function binaryString(s) {
-        s = new String(s);
-        s.encoding = #{Encoding::BINARY};
-        return s;
-      }
-    }
-
     def initialize(object)
       @object = object
       @buffer = ''
@@ -223,7 +215,7 @@ module ::Marshal
         end
       end
 
-      `binaryString(#{@buffer})`
+      `Opal.str(#{@buffer}, "BINARY")`
     end
 
     def write_fixnum(n)

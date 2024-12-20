@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe "Runtime String helpers" do
-  context 'Opal.enc' do
+  context 'Opal.str' do
     it 'sets the encoding boxing literal strings' do
       -> {
-        `Opal.enc("foo", 'UTF-8')`
+        `Opal.str("foo", 'UTF-8')`
       }.should_not raise_error
     end
   end
