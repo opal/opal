@@ -459,7 +459,7 @@ module ::Marshal
       primitive_ivars = read_hash(cache: false)
 
       if primitive_ivars.any? && object.is_a?(String)
-        object = `new String(object)`
+        object = `Opal.str(object)`
       end
 
       primitive_ivars.each do |name, value|

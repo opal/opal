@@ -405,8 +405,7 @@ class ::IO
         let n = string.indexOf('\0');
         if (n >= 0) { string = string.substring(0, n); }
         if (string.encoding != encoding) {
-          string = new String(string);
-          Opal.set_encoding(string, encoding.$name(), "encoding");
+          string = Opal.str(string, encoding.$name());
         }
         return string;
       }

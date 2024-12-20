@@ -73,14 +73,14 @@ module Opal
           encoding = string_value.encoding
 
           unless encoding == Encoding::UTF_8
-            helper :enc
-            wrap "$enc(", ", \"#{encoding.name}\")"
+            helper :str
+            wrap "$str(", ",\"#{encoding.name}\")"
           end
         end
 
         unless value.valid_encoding?
-          helper :binary
-          wrap "$binary(", ")"
+          helper :str
+          wrap "$str(", ",\"BINARY\")"
         end
       end
 
