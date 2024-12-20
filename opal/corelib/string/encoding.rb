@@ -264,7 +264,7 @@ end
         // but there currently is no way to specify a other replacement character for TextDecoder
         result = result.replace(/�/g, replacement);
       }
-      return result.$force_encoding(self);
+      return (new MutableString(result)).$force_encoding(self);
     }
   end
 
@@ -354,7 +354,7 @@ end
         // but there currently is no way to specify a other replacement character for TextDecoder
         result = result.replace(/�/g, replacement);
       }
-      return result.$force_encoding(self);
+      return (new MutableString(result)).$force_encoding(self);
     }
   end
 
@@ -389,7 +389,7 @@ end
         // but there currently is no way to specify a other replacement character for TextDecoder
         result = result.replace(/�/g, replacement);
       }
-      return result.$force_encoding(self);
+      return (new MutableString(result)).$force_encoding(self);
     }
   end
 
@@ -545,7 +545,7 @@ end
       } else {
         result = result.replace(/[�\x80-\xff]/g, '?');
       }
-      return result.$force_encoding(self);
+      return (new MutableString(result)).$force_encoding(self);
     }
   end
 

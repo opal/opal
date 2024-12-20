@@ -1429,7 +1429,28 @@
     //           - null
     //
     $prop(native_klass, '$$bridge', klass);
-    $set_proto(native_klass.prototype, (klass.$$super || Opal.Object).$$prototype);
+
+    // native_klass may be subclass of a subclass of a ... so look for either
+    // Object.prototype in its prototype chain and inject there or at the end of the chain.
+    // Also, there is a chance we meet some Ruby Class on the way, if a bridged
+    // class has been subclassed (e.g. MutableString) or its protype has been
+    // otherwise modified. Then we assume that prototype is already modified
+    // correctly and we dont need to inject anything.
+    let prototype = native_klass.prototype, next_prototype;
+    while (true) {
+      if (prototype.$$bridge || prototype.$$is_class || prototype.$$is_module) {
+        // hit a bridged class, Ruby Class or Module
+        break;
+      }
+      next_prototype = Object.getPrototypeOf(prototype);
+      if (next_prototype === Object.prototype || !next_prototype)  {
+        // found the right spot, inject!
+        $set_proto(prototype, (klass.$$super || Opal.Object).$$prototype);
+        break;
+      }
+      prototype = next_prototype;
+    }
+
     $prop(klass, '$$prototype', native_klass.prototype);
 
     $prop(klass.$$prototype, '$$class', klass);
@@ -1824,7 +1845,7 @@
       // A splatted array must be copied
       return value.slice();
     }
-    else if (value['$respond_to?']('to_a', true)) {
+    else if (value['$respond_to?'] && value['$respond_to?']('to_a', true)) {
       var ary = value.$to_a();
       if (ary === nil) {
         return [value];
@@ -2702,7 +2723,7 @@
       parts[i] = part;
     }
 
-    parts = parts.join('');
+    parts = parts.map((p)=>p.toString()).join('');
     parts = Opal.escape_metacharacters(parts);
 
     var output = Opal.transform_regexp(parts, flags);
@@ -2848,7 +2869,7 @@
 
   // @returns a String object with the encoding set from a string literal
   Opal.enc = function(str, name) {
-    var dup = new String(str);
+    var dup = new MutableString(str);
     dup = Opal.set_encoding(dup, name);
     dup.internal_encoding = dup.encoding;
     return dup
@@ -2856,7 +2877,7 @@
 
   // @returns a String object with the internal encoding set to Binary
   Opal.binary = function(str) {
-    var dup = new String(str);
+    var dup = new MutableString(str);
     return Opal.set_encoding(dup, "binary", "internal_encoding");
   }
 
