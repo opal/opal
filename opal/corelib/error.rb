@@ -144,6 +144,7 @@ class ::Exception < `Error`
 
     kwargs = { highlight: $stderr&.tty?, order: :top }.merge(kwargs || {})
     highlight, order = kwargs[:highlight], kwargs[:order]
+    highlight = false if highlight.nil?
 
     ::Kernel.raise ::ArgumentError, "expected true or false as highlight: #{highlight}" unless [true, false].include? highlight
     ::Kernel.raise ::ArgumentError, "expected :top or :bottom as order: #{order}" unless %i[top bottom].include? order

@@ -25,6 +25,8 @@ module Opal
       end
 
       def compile
+        return if compiler.runtime_mode?
+
         scope.arity = arity
 
         return unless compiler.arity_check?
@@ -119,6 +121,8 @@ module Opal
       handle :iter_arity_check
 
       def compile
+        return if compiler.runtime_mode?
+
         scope.arity = arity
 
         return unless compiler.arity_check?
