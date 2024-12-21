@@ -1461,7 +1461,7 @@
     $raise(Opal.ArgumentError, inspect + ': wrong number of arguments (given ' + actual + ', expected ' + expected + ')');
   };
 
-  function get_ancestors(obj) {
+  function $get_ancestors(obj) {
     if (obj.hasOwnProperty('$$meta') && obj.$$meta !== null) {
       return $ancestors(obj.$$meta);
     } else {
@@ -1469,11 +1469,13 @@
     }
   };
 
+  Opal.get_ancestors = $get_ancestors;
+
   // Super dispatcher
   Opal.find_super = function(obj, mid, current_func, defcheck, allow_stubs) {
     var jsid = $jsid(mid), ancestors, ancestor, super_method, method_owner, current_index = -1, i;
 
-    ancestors = get_ancestors(obj);
+    ancestors = $get_ancestors(obj);
     method_owner = current_func.$$owner;
 
     for (i = 0; i < ancestors.length; i++) {
@@ -1678,7 +1680,7 @@
     }
   };
 
-  function apply_blockopts(block, blockopts) {
+  function $apply_blockopts(block, blockopts) {
     if (typeof(blockopts) === 'number') {
       block.$$arity = blockopts;
     }
@@ -1686,6 +1688,8 @@
       Object.assign(block, blockopts);
     }
   }
+
+  Opal.apply_blockopts = $apply_blockopts;
 
   // Optimization for a costly operation of prepending '$' to method names
   var jsid_cache = new Map();
@@ -1703,101 +1707,12 @@
     if (!second.$$is_array) second = $slice(second);
     return [first].concat(second);
   }
-
-  // Calls passed method on a ruby object with arguments and block:
-  //
-  // Can take a method or a method name.
-  //
-  // 1. When method name gets passed it invokes it by its name
-  //    and calls 'method_missing' when object doesn't have this method.
-  //    Used internally by Opal to invoke method that takes a block or a splat.
-  // 2. When method (i.e. method body) gets passed, it doesn't trigger 'method_missing'
-  //    because it doesn't know the name of the actual method.
-  //    Used internally by Opal to invoke 'super'.
-  //
-  // @example
-  //   var my_array = [1, 2, 3, 4]
-  //   Opal.send(my_array, 'length')                    # => 4
-  //   Opal.send(my_array, my_array.$length)            # => 4
-  //
-  //   Opal.send(my_array, 'reverse!')                  # => [4, 3, 2, 1]
-  //   Opal.send(my_array, my_array['$reverse!']')      # => [4, 3, 2, 1]
-  //
-  // @param recv [Object] ruby object
-  // @param method [Function, String] method body or name of the method
-  // @param args [Array] arguments that will be passed to the method call
-  // @param block [Function] ruby block
-  // @param blockopts [Object, Number] optional properties to set on the block
-  // @return [Object] returning value of the method call
-  Opal.send = function(recv, method, args, block, blockopts) {
-    var body;
-
-    if (typeof(method) === 'function') {
-      body = method;
-      method = null;
-    } else if (typeof(method) === 'string') {
-      body = recv[$jsid(method)];
-    } else {
-      $raise(Opal.NameError, "Passed method should be a string or a function");
-    }
-
-    return Opal.send2(recv, body, method, args, block, blockopts);
-  };
-
-  Opal.send2 = function(recv, body, method, args, block, blockopts) {
-    if (body == null && method != null && recv.$method_missing) {
-      body = recv.$method_missing;
-      args = $prepend(method, args);
-    }
-
-    apply_blockopts(block, blockopts);
-
-    if (typeof block === 'function') body.$$p = block;
-    return body.apply(recv, args);
-  };
-
-  Opal.refined_send = function(refinement_groups, recv, method, args, block, blockopts) {
-    var i, j, k, ancestors, ancestor, refinements, refinement, refine_modules, refine_module, body;
-
-    ancestors = get_ancestors(recv);
-
-    // For all ancestors that there are, starting from the closest to the furthest...
-    for (i = 0; i < ancestors.length; i++) {
-      ancestor = Opal.id(ancestors[i]);
-
-      // For all refinement groups there are, starting from the closest scope to the furthest...
-      for (j = 0; j < refinement_groups.length; j++) {
-        refinements = refinement_groups[j];
-
-        // For all refinements there are, starting from the last `using` call to the furthest...
-        for (k = refinements.length - 1; k >= 0; k--) {
-          refinement = refinements[k];
-          if (typeof refinement.$$refine_modules === 'undefined') continue;
-
-          // A single module being given as an argument of the `using` call contains multiple
-          // refinement modules
-          refine_modules = refinement.$$refine_modules;
-
-          // Does this module refine a given call for a given ancestor module?
-          if (typeof refine_modules[ancestor] === 'undefined') continue;
-          refine_module = refine_modules[ancestor];
-
-          // Does this module define a method we want to call?
-          if (typeof refine_module.$$prototype[$jsid(method)] !== 'undefined') {
-            body = refine_module.$$prototype[$jsid(method)];
-            return Opal.send2(recv, body, method, args, block, blockopts);
-          }
-        }
-      }
-    }
-
-    return Opal.send(recv, method, args, block, blockopts);
-  };
+  Opal.prepend = $prepend;
 
   Opal.lambda = function(block, blockopts) {
     block.$$is_lambda = true;
 
-    apply_blockopts(block, blockopts);
+    $apply_blockopts(block, blockopts);
 
     return block;
   };
@@ -1840,7 +1755,7 @@
   // @return [null]
   //
   Opal.def = function(obj, jsid, body, blockopts) {
-    apply_blockopts(body, blockopts);
+    $apply_blockopts(body, blockopts);
 
     // Special case for a method definition in the
     // top-level namespace
@@ -1895,7 +1810,7 @@
 
   // Define a singleton method on the given object (see Opal.def).
   Opal.defs = function(obj, jsid, body, blockopts) {
-    apply_blockopts(body, blockopts);
+    $apply_blockopts(body, blockopts);
 
     if (obj.$$is_string || obj.$$is_number) {
       $raise(Opal.TypeError, "can't define singleton");
