@@ -167,6 +167,10 @@ module ::Opal
   # @param value [Object]
   # @return [String]
   def self.inspect(value = undefined)
+    # We use an `#inspect` name, but when someone calls just
+    # `Opal.inspect` we should return "Opal".
+    return 'Opal' if `arguments.length == 0`
+
     `var pushed = false`
     begin
       %x{

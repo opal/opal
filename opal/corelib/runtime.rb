@@ -1,1 +1,1 @@
-require "runtime/runtime"
+require 'runtime/runtime'
