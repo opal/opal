@@ -26,6 +26,7 @@ opal_filter "Kernel" do
   fails "Kernel#autoload? is a private method" # Expected Kernel to have private instance method 'autoload?' but it does not
   fails "Kernel#autoload? returns nil if no file has been registered for a constant" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x4b3b4 @loaded_features=["corelib/runtime", "opal", "opal/base"...]>
   fails "Kernel#autoload? returns the name of the file that will be autoloaded" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x4b3b4 @loaded_features=["corelib/runtime", "opal", "opal/base"...]>
+  fails "Kernel#caller includes core library methods defined in Ruby" # Expected "<internal:corelib/kernel.rb>:829:5:in `send2'".end_with? "in `tap'" to be truthy but was false
   fails "Kernel#caller is a private method" # Expected Kernel to have private instance method 'caller' but it does not
   fails "Kernel#caller returns an Array of caller locations using a custom offset" # Expected "ruby/core/kernel/fixtures/caller.rb:4:7:in `locations'" =~ /runner\/mspec.rb/ to be truthy but was nil
   fails "Kernel#caller returns an Array of caller locations using a range" # Expected 0 == 1 to be truthy but was false
