@@ -113,7 +113,7 @@ module ::Kernel
       result = [];
 
       for (var i = #{start} + 1, ii = stack.length; i < ii; i++) {
-        if (!stack[i].match(/runtime\.js/)) {
+        if (!stack[i].match(/runtime\/boot\.js/)) {
           result.push(stack[i]);
         }
       }
