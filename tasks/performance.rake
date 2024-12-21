@@ -94,7 +94,8 @@ ASCIIDOCTOR_BUILD_OPAL = "#{'ruby ' if Gem.win_platform?}bin/opal --no-cache -c 
                          "tmp/performance/asciidoctor_test.rb > tmp/performance/asciidoctor_test.js"
 ASCIIDOCTOR_RUN_RUBY = "bundle exec ruby -Itmp/performance/asciidoctor/lib tmp/performance/asciidoctor_test.rb"
 ASCIIDOCTOR_RUN_OPAL = { node: "node tmp/performance/asciidoctor_test.js",
-                         bun:  "bun  tmp/performance/asciidoctor_test.js" }
+                        # bun:  "bun  tmp/performance/asciidoctor_test.js"
+ }
 
 # Generate V8 function optimization status report for corelib methods
 NODE_OPTSTATUS = if Gem.win_platform?

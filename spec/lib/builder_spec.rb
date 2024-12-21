@@ -7,6 +7,7 @@ require 'tmpdir'
 
 RSpec.describe Opal::Builder do
   subject(:builder) { described_class.new(options) }
+  let(:builder_with_paths) { builder.append_paths(File.expand_path('..', __FILE__)); builder }
   let(:options) { {} }
   let(:ruby_processor) { Opal::Builder::Processor::RubyProcessor }
 
@@ -36,8 +37,7 @@ RSpec.describe Opal::Builder do
   end
 
   it 'respect #require_tree calls' do
-    builder.append_paths(File.expand_path('..', __FILE__))
-    expect(builder.build('fixtures/require_tree_test').to_s).to include('Opal.modules["fixtures/required_tree_test/required_file1"]')
+    expect(builder_with_paths.build('fixtures/require_tree_test').to_s).to include('Opal.modules["fixtures/required_tree_test/required_file1"]')
   end
 
   describe ':stubs' do
@@ -76,13 +76,13 @@ RSpec.describe Opal::Builder do
 
   describe 'requiring a native .js file' do
     it 'can be required without specifying extension' do
-      builder.build_str('require "corelib/runtime"', 'foo')
-      expect(builder.to_s).to start_with("(function(global_object)")
+      builder_with_paths.build_str('require "fixtures/required_file"', 'foo')
+      expect(builder_with_paths.to_s).to include("console.log('required file');")
     end
 
     it 'can be required specifying extension' do
-      builder.build_str('require "corelib/runtime.js"', 'foo')
-      expect(builder.to_s).to start_with("(function(global_object)")
+      builder_with_paths.build_str('require "fixtures/required_file.js"', 'foo')
+      expect(builder_with_paths.to_s).to include("console.log('required file');")
     end
   end
 
@@ -154,8 +154,7 @@ RSpec.describe Opal::Builder do
       skip "Scheduler::Prefork not available for #{RUBY_ENGINE}" if %w[jruby truffleruby].include?(RUBY_ENGINE)
       skip "Scheduler::Prefork not available on Windows" if Opal::OS.windows?
       temporarily_with_prefork_scheduler do
-        my_builder = builder.dup
-        my_builder.append_paths(File.expand_path('..', __FILE__))
+        my_builder = builder_with_paths.dup
         my_builder.cache = Opal::Cache::NullCache.new
         10.times do |i| # Increase entropy
           expect(
@@ -172,9 +171,8 @@ RSpec.describe Opal::Builder do
 
     it 'is preserved with a sequential scheduler' do
       temporarily_with_sequential_scheduler do
-        builder.append_paths(File.expand_path('..', __FILE__))
         expect(
-          builder.build('fixtures/build_order').to_s.scan(/(FILE_[0-9]+)/).map(&:first)
+          builder_with_paths.build('fixtures/build_order').to_s.scan(/(FILE_[0-9]+)/).map(&:first)
         ).to eq(%w[
           FILE_1 FILE_2 FILE_3 FILE_4
           FILE_51 FILE_5
@@ -187,9 +185,8 @@ RSpec.describe Opal::Builder do
     it 'is preserved with a threaded scheduler' do
       skip 'Scheduler::Threaded is only available for JRuby, TruffleRuby' unless %w[jruby truffleruby].include?(RUBY_ENGINE)
       temporarily_with_threaded_scheduler do
-        builder.append_paths(File.expand_path('..', __FILE__))
         expect(
-          builder.build('fixtures/build_order').to_s.scan(/(FILE_[0-9]+)/).map(&:first)
+          builder_with_paths.build('fixtures/build_order').to_s.scan(/(FILE_[0-9]+)/).map(&:first)
         ).to eq(%w[
           FILE_1 FILE_2 FILE_3 FILE_4
           FILE_51 FILE_5
