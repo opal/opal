@@ -216,7 +216,9 @@ end
 
 module Kernel
   def native?(value)
-    `value == null || !value.$$class`
+    # Opal is now both a Ruby module and a Opal runtime constant.
+    # Let's keep it as if it was native for compatibility.
+    `value === Opal || value == null || !value.$$class`
   end
 
   # Wraps a native JavaScript with `Native::Object.new`

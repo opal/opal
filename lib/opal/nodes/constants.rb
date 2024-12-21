@@ -15,6 +15,8 @@ module Opal
         elsif optimized_access?
           helper :"#{name}"
           push "$#{name}"
+        elsif const_scope == s(:cbase) && name == :Opal
+          push "Opal"
         elsif const_scope == s(:cbase)
           push "#{top_scope.absolute_const}('#{name}')"
         elsif const_scope
@@ -37,7 +39,7 @@ module Opal
       end
 
       OPTIMIZED_ACCESS_CONSTS = %i[
-        BasicObject Object Module Class Opal Kernel NilClass
+        BasicObject Object Module Class Kernel NilClass
       ].freeze
 
       # For a certain case of calls like `::Opal.coerce_to?` we can

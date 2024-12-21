@@ -200,6 +200,11 @@ module Opal
     # If false, backtick operator will
     compiler_option :backtick_javascript, default: nil, as: :backtick_javascript?, magic_comment: true
 
+    # @!method runtime_mode?
+    #
+    # Generates code for runtime use, only suitable for early runtime functions.
+    compiler_option :opal_runtime_mode, default: false, as: :runtime_mode?, magic_comment: true
+
     # Warn about impending compatibility break
     def backtick_javascript_or_warn?
       case backtick_javascript?

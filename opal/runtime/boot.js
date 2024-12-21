@@ -56,9 +56,6 @@
   // The actual Class class
   var Class;
 
-  // The Opal.Opal class (helpers etc.)
-  var _Opal;
-
   // The Kernel module
   var Kernel;
 
@@ -466,7 +463,15 @@
     // Add a short helper to navigate constants manually.
     // @example
     //   Opal.$$.Regexp.$$.IGNORECASE
-    cref.$$ = cref.$$const;
+    if (cref === Opal) {
+      // Opal is now the same as the Opal constant.
+      // Unfortunately, we already use $$ function on Opal, so this simply
+      // sets name on this function for compatibility.
+      cref.$$[name] = value; 
+    }
+    else {
+      cref.$$ = cref.$$const;
+    }
 
     Opal.const_cache_version++;
 
@@ -763,9 +768,9 @@
   // @param  id   [String] the name of the new (or existing) module
   //
   // @return [Module]
-  function $allocate_module(name) {
+  function $allocate_module(name, module) {
     var constructor = function(){};
-    var module = constructor;
+    if (module == null) module = constructor;
 
     if (name)
       $prop(constructor, 'displayName', name+'.constructor');
@@ -3082,7 +3087,7 @@
   Opal.Object      = _Object     = $allocate_class('Object', Opal.BasicObject);
   Opal.Module      = Module      = $allocate_class('Module', Opal.Object);
   Opal.Class       = Class       = $allocate_class('Class', Opal.Module);
-  Opal.Opal        = _Opal       = $allocate_module('Opal');
+  Opal.Opal                      = $allocate_module('Opal', Opal);
   Opal.Kernel      = Kernel      = $allocate_module('Kernel');
 
   $set_proto(Opal.BasicObject, Opal.Class.$$prototype);
@@ -3098,7 +3103,7 @@
   $const_set(_Object, "Object",       _Object);
   $const_set(_Object, "Module",       Module);
   $const_set(_Object, "Class",        Class);
-  $const_set(_Object, "Opal",         _Opal);
+  $const_set(_Object, "Opal",         Opal);
   $const_set(_Object, "Kernel",       Kernel);
 
   // Fix booted classes to have correct .class value
@@ -3106,7 +3111,7 @@
   _Object.$$class     = Class;
   Module.$$class      = Class;
   Class.$$class       = Class;
-  _Opal.$$class       = Module;
+  Opal.$$class        = Module;
   Kernel.$$class      = Module;
 
   // Forward .toString() to #to_s
