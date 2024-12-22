@@ -198,6 +198,13 @@
     return !$truthy(val);
   };
 
+  function $return_val(arg) {
+    return function() {
+      return arg;
+    }
+  }
+  Opal.return_val = $return_val;
+
   Opal.type_error = function(object, type, method, coerced) {
     object = object.$$class;
 
@@ -906,99 +913,6 @@
       }
       return ret;
     }
-  }
-
-  // Operator helpers
-  // ----------------
-
-  function are_both_numbers(l,r) { return typeof(l) === 'number' && typeof(r) === 'number' }
-
-  Opal.rb_plus   = function(l,r) { return are_both_numbers(l,r) ? l + r : l['$+'](r); }
-  Opal.rb_minus  = function(l,r) { return are_both_numbers(l,r) ? l - r : l['$-'](r); }
-  Opal.rb_times  = function(l,r) { return are_both_numbers(l,r) ? l * r : l['$*'](r); }
-  Opal.rb_divide = function(l,r) { return are_both_numbers(l,r) ? l / r : l['$/'](r); }
-  Opal.rb_lt     = function(l,r) { return are_both_numbers(l,r) ? l < r : l['$<'](r); }
-  Opal.rb_gt     = function(l,r) { return are_both_numbers(l,r) ? l > r : l['$>'](r); }
-  Opal.rb_le     = function(l,r) { return are_both_numbers(l,r) ? l <= r : l['$<='](r); }
-  Opal.rb_ge     = function(l,r) { return are_both_numbers(l,r) ? l >= r : l['$>='](r); }
-
-  // Optimized helpers for calls like $truthy((a)['$==='](b)) -> $eqeqeq(a, b)
-  function are_both_numbers_or_strings(lhs, rhs) {
-    return (typeof lhs === 'number' && typeof rhs === 'number') ||
-           (typeof lhs === 'string' && typeof rhs === 'string');
-  }
-
-  function $eqeq(lhs, rhs) {
-    return are_both_numbers_or_strings(lhs,rhs) ? lhs === rhs : $truthy((lhs)['$=='](rhs));
-  };
-  Opal.eqeq = $eqeq;
-  Opal.eqeqeq = function(lhs, rhs) {
-    return are_both_numbers_or_strings(lhs,rhs) ? lhs === rhs : $truthy((lhs)['$==='](rhs));
-  };
-  Opal.neqeq = function(lhs, rhs) {
-    return are_both_numbers_or_strings(lhs,rhs) ? lhs !== rhs : $truthy((lhs)['$!='](rhs));
-  };
-  Opal.not = function(arg) {
-    if (undefined === arg || null === arg || false === arg || nil === arg) return true;
-    if (true === arg || arg['$!'].$$pristine) return false;
-    return $truthy(arg['$!']());
-  }
-
-  // Shortcuts - optimized function generators for simple kinds of functions
-  function $return_val(arg) {
-    return function() {
-      return arg;
-    }
-  }
-  Opal.return_val = $return_val;
-
-  Opal.return_self = function() {
-    return this;
-  }
-  Opal.return_ivar = function(ivar) {
-    return function() {
-      if (this[ivar] == null) { return nil; }
-      return this[ivar];
-    }
-  }
-  Opal.assign_ivar = function(ivar) {
-    return function(val) {
-      $deny_frozen_access(this);
-      return this[ivar] = val;
-    }
-  }
-  Opal.assign_ivar_val = function(ivar, static_val) {
-    return function() {
-      $deny_frozen_access(this);
-      return this[ivar] = static_val;
-    }
-  }
-
-  // Arrays of size > 32 elements that contain only strings,
-  // symbols, integers and nils are compiled as a self-extracting
-  // string.
-  Opal.large_array_unpack = function(str) {
-    var array = str.split(","), length = array.length, i;
-    for (i = 0; i < length; i++) {
-      switch(array[i][0]) {
-        case undefined:
-          array[i] = nil
-          break;
-        case '-':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-          array[i] = +array[i];
-      }
-    }
-    return array;
   }
 
   // Opal32-checksum algorithm for #hash
