@@ -635,20 +635,6 @@
     }
   }
 
-  // Opal32-checksum algorithm for #hash
-  // -----------------------------------
-  Opal.opal32_init = $return_val(0x4f70616c);
-
-  function $opal32_ror(n, d) {
-    return (n << d)|(n >>> (32 - d));
-  };
-
-  Opal.opal32_add = function(hash, next) {
-    hash ^= next;
-    hash = $opal32_ror(hash, 1);
-    return hash;
-  };
-
   // Initialization
   // --------------
   Opal.BasicObject = BasicObject = $allocate_class('BasicObject', null);
