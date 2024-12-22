@@ -412,17 +412,6 @@
   };
   Opal.allocate_module = $allocate_module;
 
-  function $apply_blockopts(block, blockopts) {
-    if (typeof(blockopts) === 'number') {
-      block.$$arity = blockopts;
-    }
-    else if (typeof(blockopts) === 'object') {
-      Object.assign(block, blockopts);
-    }
-  }
-
-  Opal.apply_blockopts = $apply_blockopts;
-
   // Optimization for a costly operation of prepending '$' to method names
   var jsid_cache = new Map();
   function $jsid(name) {

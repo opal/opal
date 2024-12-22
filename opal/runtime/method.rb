@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: deny_frozen_access, prop, apply_blockopts, has_own, jsid, raise, ancestors, get_ancestors
+# helpers: deny_frozen_access, prop, has_own, jsid, raise, ancestors, get_ancestors
 
 module ::Opal
   # Method creation/deletion
@@ -458,6 +458,19 @@ module ::Opal
       return Opal.find_super(obj, call_jsid, current_func, defcheck);
     }
   end
+
+  def self.apply_blockopts(block = undefined, blockopts = undefined)
+    %x{
+      if (typeof(blockopts) === 'number') {
+        block.$$arity = blockopts;
+      }
+      else if (typeof(blockopts) === 'object') {
+        Object.assign(block, blockopts);
+      }
+    }
+  end
+
+  `var $apply_blockopts = Opal.apply_blockopts`
 end
 
 ::Opal
