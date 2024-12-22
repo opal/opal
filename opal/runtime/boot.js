@@ -720,42 +720,6 @@
     return name;
   };
 
-  // Support for #freeze
-  // -------------------
-
-  // helper that can be used from methods
-  function $deny_frozen_access(obj) {
-    if (obj.$$frozen) {
-      $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), new Map([["receiver", obj]]));
-    }
-  };
-  Opal.deny_frozen_access = $deny_frozen_access;
-
-  // common #freeze runtime support
-  Opal.freeze = function(obj) {
-    $prop(obj, "$$frozen", true);
-
-    // set $$id
-    if (!obj.hasOwnProperty('$$id')) { $prop(obj, '$$id', $uid()); }
-
-    if (obj.hasOwnProperty('$$meta')) {
-      // freeze $$meta if it has already been set
-      obj.$$meta.$freeze();
-    } else {
-      // ensure $$meta can be set lazily, $$meta is frozen when set in runtime.js
-      $prop(obj, '$$meta', null);
-    }
-
-    // $$comparable is used internally and set multiple times
-    // defining it before sealing ensures it can be modified later on
-    if (!obj.hasOwnProperty('$$comparable')) { $prop(obj, '$$comparable', null); }
-
-    // seal the Object
-    Object.seal(obj);
-
-    return obj;
-  };
-
   // Iterate over every instance variable and call func for each one
   // giving name of the ivar and optionally the property descriptor.
   function $each_ivar(obj, func) {
@@ -770,29 +734,6 @@
     }
   }
   Opal.each_ivar = $each_ivar;
-
-  // freze props, make setters of instance variables throw FrozenError
-  Opal.freeze_props = function (obj) {
-    var own_props = Object.keys(obj), own_props_length = own_props.length, i, prop, desc,
-      dp_template = {
-        get: null,
-        set: function (_val) { $deny_frozen_access(obj); },
-        enumerable: true
-      };
-
-    for (i = 0; i < own_props_length; i++) {
-      prop = own_props[i];
-
-      if (prop[0] === '$') continue;
-
-      desc = Object.getOwnPropertyDescriptor(obj, prop);
-
-      if (desc && desc.writable) {
-        dp_template.get = $return_val(desc.value);
-        Object.defineProperty(obj, prop, dp_template);
-      }
-    }
-  };
 
   // Require system
   // --------------
