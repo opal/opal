@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors
+# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid
 
 module ::Opal
   %x{
@@ -308,6 +308,72 @@ module ::Opal
       set_meta(object, klass);
 
       return klass;
+    }
+  end
+
+  # Typechecking and typecasting
+  # ----------------------------
+
+  def self.coerce_to(object = undefined, type = undefined, method = undefined, args = undefined)
+    %x{
+      var body;
+
+      if (method === 'to_int' && type === Opal.Integer && object.$$is_number)
+        return object < 0 ? Math.ceil(object) : Math.floor(object);
+
+      if (method === 'to_str' && type === Opal.String && object.$$is_string)
+        return object;
+
+      if (Opal.is_a(object, type)) return object;
+
+      // Fast path for the most common situation
+      if (object['$respond_to?'].$$pristine && object.$method_missing.$$pristine) {
+        body = object[$jsid(method)];
+        if (body == null || body.$$stub) Opal.type_error(object, type);
+        return body.apply(object, args);
+      }
+
+      if (!object['$respond_to?'](method)) {
+        Opal.type_error(object, type);
+      }
+
+      if (args == null) args = [];
+      return Opal.send(object, method, args);
+    }
+  end
+
+  def self.respond_to(obj = undefined, jsid = undefined, include_all = undefined)
+    %x{
+      if (obj == null || !obj.$$class) return false;
+      include_all = !!include_all;
+      var body = obj[jsid];
+
+      if (obj['$respond_to?'].$$pristine) {
+        if (typeof(body) === "function" && !body.$$stub) {
+          return true;
+        }
+        if (!obj['$respond_to_missing?'].$$pristine) {
+          return Opal.send(obj, obj['$respond_to_missing?'], [jsid.substr(1), include_all]);
+        }
+      } else {
+        return Opal.send(obj, obj['$respond_to?'], [jsid.substr(1), include_all]);
+      }
+    }
+  end
+
+  def self.is_a(object = undefined, klass = undefined)
+    %x{
+      if (klass != null && object.$$meta === klass || object.$$class === klass) {
+        return true;
+      }
+
+      if (object.$$is_number && klass.$$is_number_class) {
+        return (klass.$$is_integer_class) ? (object % 1) === 0 : true;
+      }
+
+      var ancestors = $ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
+
+      return ancestors.indexOf(klass) !== -1;
     }
   end
 end
