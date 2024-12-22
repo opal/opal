@@ -441,20 +441,6 @@
   }
   Opal.prepend = $prepend;
 
-  Opal.alias_gvar = function(new_name, old_name) {
-    Object.defineProperty($gvars, new_name, {
-      configurable: true,
-      enumerable: true,
-      get: function() {
-        return $gvars[old_name];
-      },
-      set: function(new_value) {
-        $gvars[old_name] = new_value;
-      }
-    });
-    return nil;
-  }
-
   // Create a new range instance with first and last values, and whether the
   // range excludes the last value.
   //
@@ -466,40 +452,6 @@
 
     return range;
   };
-
-  var reserved_ivar_names = [
-    // properties
-    "constructor", "displayName", "__count__", "__noSuchMethod__",
-    "__parent__", "__proto__",
-    // methods
-    "hasOwnProperty", "valueOf"
-  ];
-
-  // Get the ivar name for a given name.
-  // Mostly adds a trailing $ to reserved names.
-  //
-  Opal.ivar = function(name) {
-    if (reserved_ivar_names.indexOf(name) !== -1) {
-      name += "$";
-    }
-
-    return name;
-  };
-
-  // Iterate over every instance variable and call func for each one
-  // giving name of the ivar and optionally the property descriptor.
-  function $each_ivar(obj, func) {
-    var own_props = Object.keys(obj), own_props_length = own_props.length, i, prop;
-
-    for (i = 0; i < own_props_length; i++) {
-      prop = own_props[i];
-
-      if (prop[0] === '$') continue;
-
-      func(prop);
-    }
-  }
-  Opal.each_ivar = $each_ivar;
 
   // Require system
   // --------------
