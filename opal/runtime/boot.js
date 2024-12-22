@@ -455,19 +455,6 @@
     return nil;
   }
 
-  Opal.alias_native = function(obj, name, native_name) {
-    var id   = $jsid(name),
-        body = obj.$$prototype[native_name];
-
-    if (typeof(body) !== "function" || body.$$stub) {
-      $raise(Opal.NameError, "undefined native method `" + native_name + "' for class `" + obj.$name() + "'")
-    }
-
-    Opal.defn(obj, id, body);
-
-    return obj;
-  };
-
   // Create a new range instance with first and last values, and whether the
   // range excludes the last value.
   //
