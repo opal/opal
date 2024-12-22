@@ -17,4 +17,6 @@ require 'runtime/string'
 require 'runtime/regexp'
 require 'runtime/bridge'
 
+require 'runtime/misc'
+
 require 'runtime/helpers'
