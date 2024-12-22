@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: prop, raise, const_lookup_ancestors, const_get_name, Object
+# helpers: prop, raise, Object, ancestors, has_own
 
 module ::Opal
   %x{
@@ -27,7 +27,7 @@ module ::Opal
     // but only if cref is missing or a module.
     function const_lookup_Object(cref, name) {
       if (cref == null || cref.$$is_module) {
-        return $const_lookup_ancestors($Object, name);
+        return Opal.const_lookup_ancestors($Object, name);
       }
     }
 
@@ -36,6 +36,36 @@ module ::Opal
       return (cref || $Object).$const_missing(name);
     }
   }
+
+  def self.const_get_name(cref = undefined, name = undefined)
+    %x{
+      if (cref) {
+        if (cref.$$const[name] != null) { return cref.$$const[name]; }
+        if (cref.$$autoload && cref.$$autoload[name]) {
+          return Opal.handle_autoload(cref, name);
+        }
+      }
+    }
+  end
+
+  # Walk up the ancestors chain looking for the constant
+  def self.const_lookup_ancestors(cref = undefined, name = undefined)
+    %x{
+      var i, ii, ancestors;
+
+      if (cref == null) return;
+
+      ancestors = $ancestors(cref);
+
+      for (i = 0, ii = ancestors.length; i < ii; i++) {
+        if (ancestors[i].$$const && $has_own(ancestors[i].$$const, name)) {
+          return ancestors[i].$$const[name];
+        } else if (ancestors[i].$$autoload && ancestors[i].$$autoload[name]) {
+          return Opal.handle_autoload(ancestors[i], name);
+        }
+      }
+    }
+  end
 
   def self.handle_autoload(cref = undefined, name = undefined)
     %x{
@@ -71,7 +101,7 @@ module ::Opal
         $raise(Opal.TypeError, cref.toString() + " is not a class/module");
       }
 
-      result = $const_get_name(cref, name);
+      result = Opal.const_get_name(cref, name);
       return result != null || skip_missing ? result : const_missing(cref, name);
     }
   end
@@ -84,7 +114,7 @@ module ::Opal
 
       if (name == null) {
         // A shortpath for calls like ::String => $$$("String")
-        result = $const_get_name($Object, cref);
+        result = Opal.const_get_name($Object, cref);
 
         if (result != null) return result;
         return Opal.const_get_qualified($Object, cref, skip_missing);
@@ -105,8 +135,8 @@ module ::Opal
       cached = cache[name];
 
       if (cached == null || cached[0] !== current_version) {
-        ((result = $const_get_name(cref, name))              != null) ||
-        ((result = $const_lookup_ancestors(cref, name))      != null);
+        ((result = Opal.const_get_name(cref, name))              != null) ||
+        ((result = Opal.const_lookup_ancestors(cref, name))      != null);
         cache[name] = [current_version, result];
       } else {
         result = cached[1];
@@ -129,9 +159,9 @@ module ::Opal
       cached = cache[name];
 
       if (cached == null || cached[0] !== current_version) {
-        ((result = $const_get_name(cref, name))              != null) ||
+        ((result = Opal.const_get_name(cref, name))              != null) ||
         ((result = const_lookup_nesting(nesting, name))     != null) ||
-        ((result = $const_lookup_ancestors(cref, name))      != null) ||
+        ((result = Opal.const_lookup_ancestors(cref, name))      != null) ||
         ((result = const_lookup_Object(cref, name))         != null);
 
         cache[name] = [current_version, result];
