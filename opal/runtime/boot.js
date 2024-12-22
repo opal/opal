@@ -412,115 +412,6 @@
   };
   Opal.allocate_module = $allocate_module;
 
-  function own_ancestors(module) {
-    return module.$$own_prepended_modules.concat([module]).concat(module.$$own_included_modules);
-  }
-
-  // The Array of ancestors for a given module/class
-  function $ancestors(module) {
-    if (!module) { return []; }
-
-    if (module.$$ancestors_cache_version === Opal.const_cache_version) {
-      return module.$$ancestors;
-    }
-
-    var result = [], i, mods, length;
-
-    for (i = 0, mods = own_ancestors(module), length = mods.length; i < length; i++) {
-      result.push(mods[i]);
-    }
-
-    if (module.$$super) {
-      for (i = 0, mods = $ancestors(module.$$super), length = mods.length; i < length; i++) {
-        result.push(mods[i]);
-      }
-    }
-
-    module.$$ancestors_cache_version = Opal.const_cache_version;
-    module.$$ancestors = result;
-
-    return result;
-  };
-  Opal.ancestors = $ancestors;
-
-  // Methods
-  // -------
-
-  function $get_ancestors(obj) {
-    if (obj.hasOwnProperty('$$meta') && obj.$$meta !== null) {
-      return $ancestors(obj.$$meta);
-    } else {
-      return $ancestors(obj.$$class);
-    }
-  };
-
-  Opal.get_ancestors = $get_ancestors;
-
-  // Super dispatcher
-  Opal.find_super = function(obj, mid, current_func, defcheck, allow_stubs) {
-    var jsid = $jsid(mid), ancestors, ancestor, super_method, method_owner, current_index = -1, i;
-
-    ancestors = $get_ancestors(obj);
-    method_owner = current_func.$$owner;
-
-    for (i = 0; i < ancestors.length; i++) {
-      ancestor = ancestors[i];
-      if (ancestor === method_owner || ancestor.$$cloned_from.indexOf(method_owner) !== -1) {
-        current_index = i;
-        break;
-      }
-    }
-
-    for (i = current_index + 1; i < ancestors.length; i++) {
-      ancestor = ancestors[i];
-      var proto = ancestor.$$prototype;
-
-      if (proto.hasOwnProperty('$$dummy')) {
-        proto = proto.$$define_methods_on;
-      }
-
-      if (proto.hasOwnProperty(jsid)) {
-        super_method = proto[jsid];
-        break;
-      }
-    }
-
-    if (!defcheck && super_method && super_method.$$stub && obj.$method_missing.$$pristine) {
-      // method_missing hasn't been explicitly defined
-      $raise(Opal.NoMethodError, 'super: no superclass method `'+mid+"' for "+obj, mid);
-    }
-
-    return (super_method.$$stub && !allow_stubs) ? null : super_method;
-  };
-
-  // Iter dispatcher for super in a block
-  Opal.find_block_super = function(obj, jsid, current_func, defcheck, implicit) {
-    var call_jsid = jsid;
-
-    if (!current_func) {
-      $raise(Opal.RuntimeError, "super called outside of method");
-    }
-
-    if (implicit && current_func.$$define_meth) {
-      $raise(Opal.RuntimeError,
-        "implicit argument passing of super from method defined by define_method() is not supported. " +
-        "Specify all arguments explicitly"
-      );
-    }
-
-    if (current_func.$$def) {
-      call_jsid = current_func.$$jsid;
-    }
-
-    return Opal.find_super(obj, call_jsid, current_func, defcheck);
-  };
-
-  // @deprecated
-  Opal.find_super_dispatcher = Opal.find_super;
-
-  // @deprecated
-  Opal.find_iter_super_dispatcher = Opal.find_block_super;
-
   function $apply_blockopts(block, blockopts) {
     if (typeof(blockopts) === 'number') {
       block.$$arity = blockopts;
@@ -790,17 +681,6 @@
   Class.$$class       = Class;
   Opal.$$class        = Module;
   Kernel.$$class      = Module;
-
-  // Forward .toString() to #to_s
-  $prop(_Object.$$prototype, 'toString', function() {
-    var to_s = this.$to_s();
-    if (to_s.$$is_string && typeof(to_s) === 'object') {
-      // a string created using new String('string')
-      return to_s.valueOf();
-    } else {
-      return to_s;
-    }
-  });
 
   // Make Kernel#require immediately available as it's needed to require all the
   // other corelib files.

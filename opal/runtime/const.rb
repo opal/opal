@@ -248,6 +248,55 @@ module ::Opal
     Opal.$$$ = Opal.const_get_qualified;
     Opal.$r = Opal.const_get_relative_factory;
   }
+
+  # Ancestor utilities
+  # ------------------
+
+  %x{
+    function own_ancestors(module) {
+      return module.$$own_prepended_modules.concat([module]).concat(module.$$own_included_modules);
+    }
+  }
+
+  # The Array of ancestors for a given module/class
+  def self.ancestors(mod = undefined)
+    %x{
+      if (!mod) { return []; }
+
+      if (mod.$$ancestors_cache_version === Opal.const_cache_version) {
+        return mod.$$ancestors;
+      }
+
+      var result = [], i, mods, length;
+
+      for (i = 0, mods = own_ancestors(mod), length = mods.length; i < length; i++) {
+        result.push(mods[i]);
+      }
+
+      if (mod.$$super) {
+        for (i = 0, mods = $ancestors(mod.$$super), length = mods.length; i < length; i++) {
+          result.push(mods[i]);
+        }
+      }
+
+      mod.$$ancestors_cache_version = Opal.const_cache_version;
+      mod.$$ancestors = result;
+
+      return result;
+    }
+  end
+
+  `var $ancestors = Opal.ancestors`
+
+  def self.get_ancestors(obj = undefined)
+    %x{
+      if (obj.hasOwnProperty('$$meta') && obj.$$meta !== null) {
+        return $ancestors(obj.$$meta);
+      } else {
+        return $ancestors(obj.$$class);
+      }
+    }
+  end
 end
 
 ::Opal
