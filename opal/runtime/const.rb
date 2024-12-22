@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: prop, raise, Object, ancestors, has_own
+# helpers: prop, raise, Object, has_own
 
 module ::Opal
   %x{
