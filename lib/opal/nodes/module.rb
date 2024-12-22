@@ -10,6 +10,13 @@ module Opal
       children :cid, :body
 
       def compile
+        if compiler.runtime_mode?
+          # Skip class/module generation
+
+          line stmt(body)
+          return
+        end
+
         name, base = name_and_base
         helper :module
 

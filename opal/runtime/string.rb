@@ -1,0 +1,99 @@
+# backtick_javascript: true
+# use_strict: true
+# opal_runtime_mode: true
+# helpers: raise, prop, Object
+
+module ::Opal
+  # We use a helper to create new Strings, globally, so that it
+  # will be easer to change that later on to a mutable string class.
+  # Also this helper always sets a encoding. If encoding is not
+  # provided, "UTF-8" will be used.
+  # @returns a new String object with encoding set.
+  def self.str(str = undefined, encoding = undefined)
+    %x{
+      if (!encoding || encoding === nil) encoding = "UTF-8";
+      str = Opal.set_encoding(new String(str), encoding);
+      str.internal_encoding = str.encoding;
+      return str;
+    }
+  end
+
+  # Provide the encoding register with a default "UTF-8" encoding, because
+  # its used from the start and will be raplaced by the real UTF-8 encoding
+  # when 'corelib/string/encoding' is loaded.
+  `Opal.encodings = { __proto__: null, "UTF-8": { name: "UTF-8" }}`
+
+  # Sets the encoding on a string, will treat string literals as frozen strings
+  # raising a FrozenError.
+  #
+  # @param str [String] the string on which the encoding should be set
+  # @param name [String] the canonical name of the encoding
+  # @param type [String] possible values are either `"encoding"`, `"internal_encoding"`, or `undefined
+  def self.set_encoding(str = undefined, name = undefined, type = undefined)
+    %x{
+      if (typeof type === "undefined") type = "encoding";
+      if (typeof str === 'string' || str.$$frozen === true)
+        $raise(Opal.FrozenError, "can't modify frozen String");
+
+      let encoding = Opal.find_encoding(name);
+      if (encoding === str[type]) { return str; }
+      str[type] = encoding;
+
+      return str;
+    }
+  end
+
+  # Fetches the encoding for the given name or raises ArgumentError.
+  def self.find_encoding(name = undefined)
+    %x{
+      let register = Opal.encodings;
+      let encoding = register[name] || register[name.toUpperCase()];
+      if (!encoding) $raise(Opal.ArgumentError, "unknown encoding name - " + name);
+      return encoding;
+    }
+  end
+
+  def self.fallback_to_s(obj = undefined)
+    %x{`#<${obj.$$class.$to_s()}:0x${Opal.id(obj).toString(16)}>`}
+  end
+
+  def self.to_s(obj = undefined)
+    %x{
+      // A case for someone calling Opal.to_s
+      if (arguments.length == 0) return "Opal";
+
+      var stringified;
+      if (obj == null) {
+        return "`"+String(obj)+"`";
+      }
+      else if (typeof obj === 'string' || (typeof obj === 'object' && obj.$$is_string)) {
+        return obj;
+      }
+      else if (obj.$to_s != null && !obj.$to_s.$$stub) {
+        stringified = obj.$to_s();
+        if (typeof stringified !== 'string' && !stringified.$$is_string) {
+          stringified = Opal.fallback_to_s(obj);
+        }
+        return stringified;
+      }
+      else {
+        return obj.toString();
+      }
+    }
+  end
+
+  # Forward .toString() to #to_s
+  %x{
+    $prop($Object.$$prototype, 'toString', function() {
+      var to_s = this.$to_s();
+      if (to_s.$$is_string && typeof(to_s) === 'object') {
+        // a string created using new String('string')
+        return to_s.valueOf();
+      } else {
+        return to_s;
+      }
+    });
+  }
+end
+
+::Opal

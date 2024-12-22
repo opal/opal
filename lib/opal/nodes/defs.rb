@@ -9,9 +9,13 @@ module Opal
       children :recvr, :mid, :inline_args, :stmts
 
       def wrap_with_definition
-        helper :defs
-        unshift '$defs(', expr(recvr), ", '$#{mid}', "
-        push ')'
+        if compiler.runtime_mode?
+          unshift "Opal.$#{mid} = Opal.#{mid} = "
+        else
+          helper :defs
+          unshift '$defs(', expr(recvr), ", '$#{mid}', "
+          push ')'
+        end
       end
     end
   end
