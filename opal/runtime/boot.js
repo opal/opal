@@ -509,7 +509,7 @@
   Opal.klass = function(scope, superclass, name) {
     var bridged;
 
-    if (scope == null || scope == '::') {
+    if (scope == null || scope === '::') {
       // Global scope
       scope = _Object;
     } else if (!scope.$$is_class && !scope.$$is_module) {
@@ -630,7 +630,7 @@
   Opal.module = function(scope, name) {
     var module;
 
-    if (scope == null || scope == '::') {
+    if (scope == null || scope === '::') {
       // Global scope
       scope = _Object;
     } else if (!scope.$$is_class && !scope.$$is_module) {
