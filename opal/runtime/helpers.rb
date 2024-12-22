@@ -3,10 +3,6 @@
 # use_strict: true
 
 module ::Opal
-  def self.bridge(constructor, klass)
-    `Opal.bridge(constructor, klass)`
-  end
-
   def self.coerce_to!(object, type, method, *args)
     coerced = `$coerce_to(object, type, method, args)`
 
