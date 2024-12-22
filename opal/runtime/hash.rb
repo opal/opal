@@ -380,6 +380,25 @@ module ::Opal
       }
     }
   end
+
+  # Opal32-checksum algorithm for #hash
+  # -----------------------------------
+
+  def self.opal32_init = 0x4f70616c
+
+  %x{
+    function $opal32_ror(n, d) {
+      return (n << d)|(n >>> (32 - d));
+    };
+  }
+
+  def self.opal32_add(hash = undefined, next_value = undefined)
+    %x{
+      hash ^= next_value;
+      hash = $opal32_ror(hash, 1);
+      return hash;
+    }
+  end
 end
 
 ::Opal
