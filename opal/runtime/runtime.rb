@@ -1,4 +1,5 @@
 require 'runtime/boot'
+require 'runtime/method_missing'
 require 'runtime/const'
 require 'runtime/send'
 require 'runtime/method'
