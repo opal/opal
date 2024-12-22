@@ -1,5 +1,6 @@
 require 'runtime/boot'
 require 'runtime/exception'
+require 'runtime/variables'
 require 'runtime/freeze'
 require 'runtime/op_helpers'
 require 'runtime/method_missing'
