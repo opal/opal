@@ -162,7 +162,7 @@ class ::Exception < `Error`
     first = bt.shift
 
     msg = "#{first}: "
-    msg += "#{bold}#{to_s} (#{bold_underline}#{self.class}#{reset}#{bold})#{reset}\n"
+    msg += "#{bold}#{to_s} (#{bold_underline}#{self.class.name}#{reset}#{bold})#{reset}\n"
 
     msg += bt.map { |loc| "\tfrom #{loc}\n" }.join
 
