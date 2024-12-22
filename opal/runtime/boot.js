@@ -1350,18 +1350,6 @@
   // Methods
   // -------
 
-  // Arity count error dispatcher for blocks
-  //
-  // @param actual [Fixnum] number of arguments given to block
-  // @param expected [Fixnum] expected number of arguments
-  // @param context [Object] context of the block definition
-  // @raise [ArgumentError]
-  Opal.block_ac = function(actual, expected, context) {
-    var inspect = "`block in " + context + "'";
-
-    $raise(Opal.ArgumentError, inspect + ': wrong number of arguments (given ' + actual + ', expected ' + expected + ')');
-  };
-
   function $get_ancestors(obj) {
     if (obj.hasOwnProperty('$$meta') && obj.$$meta !== null) {
       return $ancestors(obj.$$meta);
@@ -1436,63 +1424,6 @@
 
   // @deprecated
   Opal.find_iter_super_dispatcher = Opal.find_block_super;
-
-  function call_lambda(block, arg, ret) {
-    try {
-      block(arg);
-    } catch (e) {
-      if (e === ret) {
-        return ret.$v;
-      }
-      throw e;
-    }
-  }
-
-  // handles yield calls for 1 yielded arg
-  Opal.yield1 = function(block, arg) {
-    if (typeof(block) !== "function") {
-      $raise(Opal.LocalJumpError, "no block given");
-    }
-
-    var has_mlhs = block.$$has_top_level_mlhs_arg,
-        has_trailing_comma = block.$$has_trailing_comma_in_args,
-        is_returning_lambda = block.$$is_lambda && block.$$ret;
-
-    if (block.length > 1 || ((has_mlhs || has_trailing_comma) && block.length === 1)) {
-      arg = Opal.to_ary(arg);
-    }
-
-    if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg.$$is_array) {
-      if (is_returning_lambda) {
-        return call_lambda(block.apply.bind(block, null), arg, block.$$ret);
-      }
-      return block.apply(null, arg);
-    }
-    else {
-      if (is_returning_lambda) {
-        return call_lambda(block, arg, block.$$ret);
-      }
-      return block(arg);
-    }
-  };
-
-  // handles yield for > 1 yielded arg
-  Opal.yieldX = function(block, args) {
-    if (typeof(block) !== "function") {
-      $raise(Opal.LocalJumpError, "no block given");
-    }
-
-    if (block.length > 1 && args.length === 1) {
-      if (args[0].$$is_array) {
-        args = args[0];
-      }
-    }
-
-    if (block.$$is_lambda && block.$$ret) {
-      return call_lambda(block.apply.bind(block, null), args, block.$$ret);
-    }
-    return block.apply(null, args);
-  };
 
   // Finds the corresponding exception match in candidates.  Each candidate can
   // be a value, or an array of values.  Returns null if not found.
@@ -1609,14 +1540,6 @@
     return [first].concat(second);
   }
   Opal.prepend = $prepend;
-
-  Opal.lambda = function(block, blockopts) {
-    block.$$is_lambda = true;
-
-    $apply_blockopts(block, blockopts);
-
-    return block;
-  };
 
   Opal.alias_gvar = function(new_name, old_name) {
     Object.defineProperty($gvars, new_name, {
