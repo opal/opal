@@ -5,6 +5,27 @@
 
 module ::Opal
   %x{
+    // TracePoint support
+    // ------------------
+    //
+    // Support for `TracePoint.trace(:class) do ... end`
+    Opal.trace_class = false;
+    Opal.tracers_for_class = [];
+  }
+
+  def self.invoke_tracers_for_class(klass_or_module = undefined)
+    %x{
+      var i, ii, tracer;
+
+      for(i = 0, ii = Opal.tracers_for_class.length; i < ii; i++) {
+        tracer = Opal.tracers_for_class[i];
+        tracer.trace_object = klass_or_module;
+        tracer.block.$call(tracer);
+      }
+    }
+  end
+
+  %x{
     function find_existing_module(scope, name) {
       var module = $const_get_name(scope, name);
       if (module == null && scope === $Object)
@@ -40,7 +61,7 @@ module ::Opal
         $const_set(scope, name, module);
       }
 
-      if (Opal.trace_class) { invoke_tracers_for_class(module); }
+      if (Opal.trace_class) { Opal.invoke_tracers_for_class(module); }
 
       return module;
     }

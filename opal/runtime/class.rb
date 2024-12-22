@@ -1,27 +1,10 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid
+# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid, invoke_tracers_for_class
 
 module ::Opal
   %x{
-    // TracePoint support
-    // ------------------
-    //
-    // Support for `TracePoint.trace(:class) do ... end`
-    Opal.trace_class = false;
-    Opal.tracers_for_class = [];
-
-    function invoke_tracers_for_class(klass_or_module) {
-      var i, ii, tracer;
-
-      for(i = 0, ii = Opal.tracers_for_class.length; i < ii; i++) {
-        tracer = Opal.tracers_for_class[i];
-        tracer.trace_object = klass_or_module;
-        tracer.block.$call(tracer);
-      }
-    }
-
     function find_existing_class(scope, name) {
       // Try to find the class in the current scope
       var klass = $const_get_name(scope, name);
@@ -103,7 +86,7 @@ module ::Opal
         }
       }
 
-      if (Opal.trace_class) { invoke_tracers_for_class(klass); }
+      if (Opal.trace_class) { $invoke_tracers_for_class(klass); }
 
       return klass;
     }

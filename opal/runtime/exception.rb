@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: gvars, Kernel, slice
+# helpers: gvars, Kernel, slice, truthy
 
 module ::Opal
   # A helper function for raising things, that gracefully degrades if necessary
