@@ -1,6 +1,7 @@
 require 'runtime/boot'
 require 'runtime/const'
 require 'runtime/send'
+require 'runtime/method'
 require 'runtime/hash'
 require 'runtime/string'
 require 'runtime/regexp'
