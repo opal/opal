@@ -441,18 +441,6 @@
   }
   Opal.prepend = $prepend;
 
-  // Create a new range instance with first and last values, and whether the
-  // range excludes the last value.
-  //
-  Opal.range = function(first, last, exc) {
-    var range         = new Opal.Range();
-        range.begin   = first;
-        range.end     = last;
-        range.excl    = exc;
-
-    return range;
-  };
-
   // Require system
   // --------------
 
