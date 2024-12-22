@@ -457,9 +457,9 @@
   // --------------
 
   Opal.modules         = {};
-  Opal.loaded_features = ['corelib/runtime'];
+  Opal.loaded_features = ['runtime/boot'];
   Opal.current_dir     = '.';
-  Opal.require_table   = {'corelib/runtime': true};
+  Opal.require_table   = {'runtime/boot': true};
 
   Opal.normalize = function(path) {
     var parts, part, new_parts = [], SEPARATOR = '/';

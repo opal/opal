@@ -1,4 +1,5 @@
 require 'runtime/boot'
+
 require 'runtime/exception'
 require 'runtime/variables'
 require 'runtime/freeze'
@@ -15,4 +16,5 @@ require 'runtime/hash'
 require 'runtime/string'
 require 'runtime/regexp'
 require 'runtime/bridge'
+
 require 'runtime/helpers'
