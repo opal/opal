@@ -237,6 +237,21 @@ module ::Opal
     }
   end
 
+  def self.alias_native(obj = undefined, name = undefined, native_name = undefined)
+    %x{
+      var id   = $jsid(name),
+          body = obj.$$prototype[native_name];
+
+      if (typeof(body) !== "function" || body.$$stub) {
+        $raise(Opal.NameError, "undefined native method `" + native_name + "' for class `" + obj.$name() + "'")
+      }
+
+      Opal.defn(obj, id, body);
+
+      return obj;
+    }
+  end
+
   def self.wrap_method_body(body = undefined)
     %x{
       var wrapped = function() {
