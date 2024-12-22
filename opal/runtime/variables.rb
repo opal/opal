@@ -1,7 +1,6 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: gvars
 
 module ::Opal
   # Instance variables
@@ -47,6 +46,9 @@ module ::Opal
 
   # Global variables
   # ----------------
+
+  # Globals table
+  `var $gvars = Opal.gvars = {}`
 
   def self.alias_gvar(new_name = undefined, old_name = undefined)
     %x{

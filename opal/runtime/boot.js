@@ -81,6 +81,11 @@
   var $slice     = $call.bind(Array.prototype.slice);
   var $splice    = $call.bind(Array.prototype.splice);
 
+  Opal.slice = $slice;
+  Opal.splice = $splice;
+  Opal.has_own = $has_own;
+  Opal.set_proto = $set_proto;
+
   // Nil object id is always 4
   var nil_id = 4;
 
@@ -103,37 +108,6 @@
     }
     return obj.$$id;
   };
-
-  // Globals table
-  var $gvars = Opal.gvars = {};
-
-  // Exit function, this should be replaced by platform specific implementation
-  // (See nodejs and chrome for examples)
-  Opal.exit = function(status) { if ($gvars.DEBUG) console.log('Exited with status '+status); };
-
-  // A helper function for raising things, that gracefully degrades if necessary
-  // functionality is not yet loaded.
-  function $raise(klass, message) {
-    // Raise Exception, so we can know that something wrong is going on.
-    if (!klass) klass = Opal.Exception || Error;
-
-    if (Kernel && Kernel.$raise) {
-      if (arguments.length > 2) {
-        Kernel.$raise(klass.$new.apply(klass, $slice(arguments, 1)));
-      }
-      else {
-        Kernel.$raise(klass, message);
-      }
-    }
-    else if (!klass.$new) {
-      throw new klass(message);
-    }
-    else {
-      throw klass.$new(message);
-    }
-  }
-
-  Opal.raise = $raise;
 
   // Reuse the same object for performance/memory sake
   var prop_options = {
@@ -160,14 +134,6 @@
   }
 
   Opal.prop = $prop;
-
-  // @deprecated
-  Opal.defineProperty = Opal.prop;
-
-  Opal.slice = $slice;
-  Opal.splice = $splice;
-  Opal.has_own = $has_own;
-  Opal.set_proto = $set_proto;
 
   // Helpers
   // -----
@@ -491,7 +457,7 @@
       var message  = 'cannot load such file -- ' + path;
 
       if (severity === "error") {
-        $raise(Opal.LoadError, message);
+        Opal.raise(Opal.LoadError, message);
       }
       else if (severity === "warning") {
         console.warn('WARNING: LoadError: ' + message);
@@ -594,22 +560,13 @@
 
   // Instantiate the main object
   Opal.top = new _Object();
-  Opal.top.$to_s = Opal.top.$inspect = $return_val('main');
-  Opal.top.$define_method = top_define_method;
-
-  // Foward calls to define_method on the top object to Object
-  function top_define_method() {
-    var block = top_define_method.$$p;
-    top_define_method.$$p = null;
-    return Opal.send(_Object, 'define_method', arguments, block)
-  };
 
   // Nil
   Opal.NilClass = $allocate_class('NilClass', Opal.Object);
   $const_set(_Object, 'NilClass', Opal.NilClass);
   nil = Opal.nil = new Opal.NilClass();
   nil.$$id = nil_id;
-  nil.call = nil.apply = function() { $raise(Opal.LocalJumpError, 'no block given'); };
+  nil.call = nil.apply = function() { Opal.raise(Opal.LocalJumpError, 'no block given'); };
   nil.$$frozen = true;
   nil.$$comparable = false;
   Object.seal(nil);
