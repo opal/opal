@@ -111,24 +111,6 @@
   // (See nodejs and chrome for examples)
   Opal.exit = function(status) { if ($gvars.DEBUG) console.log('Exited with status '+status); };
 
-  // keeps track of exceptions for $!
-  Opal.exceptions = [];
-
-  // @private
-  // Pops an exception from the stack and updates `$!`.
-  Opal.pop_exception = function(rescued_exception) {
-    var exception = Opal.exceptions.pop();
-    if (exception === rescued_exception) {
-      // Current $! is raised in the rescue block, so we don't update it
-    }
-    else if (exception) {
-      $gvars["!"] = exception;
-    }
-    else {
-      $gvars["!"] = nil;
-    }
-  };
-
   // A helper function for raising things, that gracefully degrades if necessary
   // functionality is not yet loaded.
   function $raise(klass, message) {
@@ -204,22 +186,6 @@
     }
   }
   Opal.return_val = $return_val;
-
-  Opal.type_error = function(object, type, method, coerced) {
-    object = object.$$class;
-
-    if (coerced && method) {
-      coerced = coerced.$$class;
-      $raise(Opal.TypeError,
-        "can't convert " + object + " into " + type +
-        " (" + object + "#" + method + " gives " + coerced + ")"
-      )
-    } else {
-      $raise(Opal.TypeError,
-        "no implicit conversion of " + object + " into " + type
-      )
-    }
-  };
 
   Opal.coerce_to = function(object, type, method, args) {
     var body;
@@ -598,27 +564,6 @@
   // @deprecated
   Opal.find_iter_super_dispatcher = Opal.find_block_super;
 
-  // Finds the corresponding exception match in candidates.  Each candidate can
-  // be a value, or an array of values.  Returns null if not found.
-  Opal.rescue = function(exception, candidates) {
-    for (var i = 0; i < candidates.length; i++) {
-      var candidate = candidates[i];
-
-      if (candidate.$$is_array) {
-        var result = Opal.rescue(exception, candidate);
-
-        if (result) {
-          return result;
-        }
-      }
-      else if ((Opal.Opal.Raw && candidate === Opal.Opal.Raw.Error) || candidate['$==='](exception)) {
-        return candidate;
-      }
-    }
-
-    return null;
-  };
-
   Opal.is_a = function(object, klass) {
     if (klass != null && object.$$meta === klass || object.$$class === klass) {
       return true;
@@ -943,42 +888,6 @@
   nil.$$frozen = true;
   nil.$$comparable = false;
   Object.seal(nil);
-
-  Opal.thrower = function(type) {
-    var thrower = {
-      $thrower_type: type,
-      $throw: function(value, called_from_lambda) {
-        if (value == null) value = nil;
-        if (this.is_orphan && !called_from_lambda) {
-          $raise(Opal.LocalJumpError, 'unexpected ' + type, value, type.$to_sym());
-        }
-        this.$v = value;
-        throw this;
-      },
-      is_orphan: false
-    }
-    return thrower;
-  };
-
-  // Define a "$@" global variable, which would compute and return a backtrace on demand.
-  Object.defineProperty($gvars, "@", {
-    enumerable: true,
-    configurable: true,
-    get: function() {
-      if ($truthy($gvars["!"])) return $gvars["!"].$backtrace();
-      return nil;
-    },
-    set: function(bt) {
-      if ($truthy($gvars["!"]))
-        $gvars["!"].$set_backtrace(bt);
-      else
-        $raise(Opal.ArgumentError, "$! not set");
-    }
-  });
-
-  Opal.t_eval_return = Opal.thrower("return");
-
-  TypeError.$$super = Error;
 
   // If enable-file-source-embed compiler option is enabled, each module loaded will add its
   // sources to this object
