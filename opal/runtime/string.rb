@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: raise
+# helpers: raise, prop, Object
 
 module ::Opal
   # We use a helper to create new Strings, globally, so that it
@@ -81,6 +81,19 @@ module ::Opal
       }
     }
   end
+
+  # Forward .toString() to #to_s
+  %x{
+    $prop($Object.$$prototype, 'toString', function() {
+      var to_s = this.$to_s();
+      if (to_s.$$is_string && typeof(to_s) === 'object') {
+        // a string created using new String('string')
+        return to_s.valueOf();
+      } else {
+        return to_s;
+      }
+    });
+  }
 end
 
 ::Opal

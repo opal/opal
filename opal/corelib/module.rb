@@ -377,7 +377,7 @@ class ::Module
   end
 
   def const_missing(name)
-    full_const_name = self == ::Object ? name : "#{self}::#{name}"
+    full_const_name = self == ::Object ? name : "#{self.name}::#{name}"
 
     ::Kernel.raise ::NameError.new("uninitialized constant #{full_const_name}", name)
   end

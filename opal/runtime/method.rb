@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: deny_frozen_access, prop, apply_blockopts, has_own, jsid, raise, ancestors
+# helpers: deny_frozen_access, prop, apply_blockopts, has_own, jsid, raise, ancestors, get_ancestors
 
 module ::Opal
   # Method creation/deletion
@@ -375,6 +375,72 @@ module ::Opal
       var singleton_methods = Opal.own_instance_methods(mod);
       var instance_methods = Opal.own_instance_methods(mod.$$super);
       return singleton_methods.concat(instance_methods);
+    }
+  end
+
+  # Super call
+  # ----------
+
+  # Super dispatcher
+  def self.find_super(obj = undefined, mid = undefined, current_func = undefined, defcheck = undefined, allow_stubs = undefined)
+    %x{
+      var jsid = $jsid(mid), ancestors, ancestor, super_method, method_owner, current_index = -1, i;
+
+      ancestors = $get_ancestors(obj);
+      method_owner = current_func.$$owner;
+
+      for (i = 0; i < ancestors.length; i++) {
+        ancestor = ancestors[i];
+        if (ancestor === method_owner || ancestor.$$cloned_from.indexOf(method_owner) !== -1) {
+          current_index = i;
+          break;
+        }
+      }
+
+      for (i = current_index + 1; i < ancestors.length; i++) {
+        ancestor = ancestors[i];
+        var proto = ancestor.$$prototype;
+
+        if (proto.hasOwnProperty('$$dummy')) {
+          proto = proto.$$define_methods_on;
+        }
+
+        if (proto.hasOwnProperty(jsid)) {
+          super_method = proto[jsid];
+          break;
+        }
+      }
+
+      if (!defcheck && super_method && super_method.$$stub && obj.$method_missing.$$pristine) {
+        // method_missing hasn't been explicitly defined
+        $raise(Opal.NoMethodError, 'super: no superclass method `'+mid+"' for "+obj, mid);
+      }
+
+      return (super_method.$$stub && !allow_stubs) ? null : super_method;
+    }
+  end
+
+  # Iter dispatcher for super in a block
+  def self.find_block_super(obj = undefined, jsid = undefined, current_func = undefined, defcheck = undefined, implicit = undefined)
+    %x{
+      var call_jsid = jsid;
+
+      if (!current_func) {
+        $raise(Opal.RuntimeError, "super called outside of method");
+      }
+
+      if (implicit && current_func.$$define_meth) {
+        $raise(Opal.RuntimeError,
+          "implicit argument passing of super from method defined by define_method() is not supported. " +
+          "Specify all arguments explicitly"
+        );
+      }
+
+      if (current_func.$$def) {
+        call_jsid = current_func.$$jsid;
+      }
+
+      return Opal.find_super(obj, call_jsid, current_func, defcheck);
     }
   end
 end
