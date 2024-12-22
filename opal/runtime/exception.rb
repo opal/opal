@@ -1,9 +1,35 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: raise, gvars
+# helpers: gvars, Kernel, slice
 
 module ::Opal
+  # A helper function for raising things, that gracefully degrades if necessary
+  # functionality is not yet loaded.
+  def self.raise(klass = undefined, message = undefined)
+    %x{
+      // Raise Exception, so we can know that something wrong is going on.
+      if (!klass) klass = Opal.Exception || Error;
+
+      if ($Kernel && $Kernel.$raise) {
+        if (arguments.length > 2) {
+          $Kernel.$raise(klass.$new.apply(klass, $slice(arguments, 1)));
+        }
+        else {
+          $Kernel.$raise(klass, message);
+        }
+      }
+      else if (!klass.$new) {
+        throw new klass(message);
+      }
+      else {
+        throw klass.$new(message);
+      }
+    }
+  end
+
+  `var $raise = Opal.raise`
+
   # keeps track of exceptions for $!
   `Opal.exceptions = []`
 
