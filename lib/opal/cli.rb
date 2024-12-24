@@ -3,6 +3,7 @@
 require 'opal/requires'
 require 'opal/builder'
 require 'opal/cli_runners'
+require 'opal/exe_compiler'
 require 'stringio'
 
 module Opal
@@ -47,6 +48,7 @@ module Opal
       @rbrequires  = options.delete(:rbrequires) { [] }
       @no_cache    = options.delete(:no_cache)   { false }
       @stdin       = options.delete(:stdin)      { $stdin }
+      @exe_type    = options.delete(:exe_type)
 
       @debug_source_map = options.delete(:debug_source_map) { false }
 
@@ -104,6 +106,12 @@ module Opal
         argv: argv,
         builder: builder,
       )
+
+      if @exe_type && exit_status == 0
+        @exit_status = Opal::ExeCompiler.compile_exe(@exe_type, output)
+      end
+
+      @exit_status
     end
 
     def runner
