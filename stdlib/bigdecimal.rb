@@ -233,10 +233,31 @@ class BigDecimal < Numeric
     bignumber.JS.isZero
   end
 
+  def power(other)
+    other, _ = coerce(other)
+    self.class.new(bignumber.JS.pow(other.bignumber))
+  end
+
+  def fix
+    self.class.new(bignumber.JS.trunc)
+  end
+
+  def trunc(other = nil)
+    if other.nil?
+      self.class.new(bignumber.JS.trunc)
+    else
+      other, _ = coerce(other)
+      self.class.new(bignumber.JS.round(other, ROUND_DOWN))
+    end
+  end
+
   alias === ==
   alias + add
   alias - minus
   alias * mult
   alias / quo
+  alias ** power
+  alias pow power
   alias inspect to_s
+  alias truncate trunc
 end
