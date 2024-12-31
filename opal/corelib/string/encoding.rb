@@ -1,5 +1,5 @@
 # backtick_javascript: true
-# helpers: global_regexp
+# helpers: str
 
 class ::Encoding
   class << self
@@ -70,6 +70,10 @@ class ::Encoding
     ::Kernel.raise ::NotImplementedError
   end
 
+  def decode(io_buffer)
+    ::Kernel.raise ::NotImplementedError
+  end
+
   def each_byte(str)
     ::Kernel.raise ::NotImplementedError
   end
@@ -121,9 +125,9 @@ end
   end
 
   def byteslice(str, index, length)
-    # must handle negative index and length, with length being negative indicating a negative range end
-    # this slices at UTF-16 character boundaries, as required by specs
-    # however, some specs require slicing UTF-16 character into its bytes, which wont work
+    # Must handle negative index and length, with length being negative indicating a negative range end.
+    # This slices at UTF-16 character boundaries, as required by specs.
+    # However, some specs require slicing UTF-16 characters into its bytes, which won't work.
     %x{
       let result = "", code_point, idx, max;
       if (index < 0) {
@@ -219,6 +223,13 @@ end
     }
   end
 
+  def decode(io_buffer)
+    %x{
+      let result = (new TextDecoder('utf-8')).decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
   def each_byte(str, &block)
     %x{
       let units = Infinity,
@@ -264,7 +275,7 @@ end
         // but there currently is no way to specify a other replacement character for TextDecoder
         result = result.replace(/�/g, replacement);
       }
-      return result.$force_encoding(self);
+      return $str(result, self);
     }
   end
 
@@ -286,7 +297,7 @@ end
   end
 
   def byteslice(str, index, length)
-    # must handle negative index and length, with length being negative indicating a negative range end
+    # Must handle negative index and length, with length being negative indicating a negative range end.
     %x{
       let result = "", char_code, idx, max, i;
       if (index < 0) {
@@ -332,6 +343,13 @@ end
     }
   end
 
+  def decode(io_buffer)
+    %x{
+      let result = (new TextDecoder('utf-16le')).decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
   def each_byte(str, &block)
     %x{
       for (let i = 0, length = str.length; i < length; i++) {
@@ -354,7 +372,7 @@ end
         // but there currently is no way to specify a other replacement character for TextDecoder
         result = result.replace(/�/g, replacement);
       }
-      return result.$force_encoding(self);
+      return $str(result, self);
     }
   end
 
@@ -368,6 +386,13 @@ end
 end
 
 ::Encoding.register 'UTF-16BE', inherits: ::Encoding::UTF_16LE do
+  def decode(io_buffer)
+    %x{
+      let result = (new TextDecoder('utf-16be')).decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
   def each_byte(str, &block)
     %x{
       for (var i = 0, length = str.length; i < length; i++) {
@@ -389,7 +414,7 @@ end
         // but there currently is no way to specify a other replacement character for TextDecoder
         result = result.replace(/�/g, replacement);
       }
-      return result.$force_encoding(self);
+      return $str(result, self);
     }
   end
 
@@ -411,7 +436,7 @@ end
   end
 
   def byteslice(str, index, length)
-    # must handle negative index and length, with length being negative indicating a negative range end
+    # Must handle negative index and length, with length being negative indicating a negative range end.
     %x{
       let result = "", char_code, idx, max, i;
       if (index < 0) {
@@ -506,7 +531,7 @@ end
   end
 
   def byteslice(str, index, length)
-    # must handle negative index and length, with length being negative indicating a negative range end
+    # Must handle negative index and length, with length being negative indicating a negative range end.
     %x{
       let result = "", char_code, i;
       if (index < 0) index = str.length + index;
@@ -520,6 +545,13 @@ end
       }
       if (result.length === 0) return nil;
       return result;
+    }
+  end
+
+  def decode(io_buffer)
+    %x{
+      let result = (new TextDecoder('ascii')).decode(io_buffer.data_view);
+      return $str(result, self);
     }
   end
 
@@ -545,7 +577,7 @@ end
       } else {
         result = result.replace(/[�\x80-\xff]/g, '?');
       }
-      return result.$force_encoding(self);
+      return $str(result, self);
     }
   end
 
@@ -560,18 +592,6 @@ end
 
 ::Encoding.register 'ISO-8859-1', aliases: ['ISO8859-1'], ascii: true, inherits: ::Encoding::ASCII_8BIT
 ::Encoding.register 'US-ASCII', aliases: ['ASCII'], ascii: true, inherits: ::Encoding::ASCII_8BIT
-
-# these encodings are required for some ruby specs, make them dummy for now
-# their existence is often enough, like specs checking if a method returns
-# a string in the same encoding it is encoded in
-::Encoding.register 'EUC-JP', inherits: ::Encoding::UTF_16LE, dummy: true
-::Encoding.register 'IBM437', inherits: ::Encoding::UTF_16LE, dummy: true
-::Encoding.register 'IBM720', inherits: ::Encoding::UTF_16LE, dummy: true
-::Encoding.register 'ISO-2022-JP', inherits: ::Encoding::UTF_16LE, dummy: true
-::Encoding.register 'ISO-8859-15', inherits: ::Encoding::UTF_16LE, dummy: true
-::Encoding.register 'ISO-8859-5', inherits: ::Encoding::UTF_16LE, dummy: true
-::Encoding.register 'Shift_JIS', aliases: ['SHIFT_JIS'], inherits: ::Encoding::UTF_16LE, dummy: true
-::Encoding.register 'Windows-1251', aliases: ['WINDOWS-1251'], inherits: ::Encoding::UTF_16LE, dummy: true
 
 ::Encoding.default_external = __ENCODING__
 ::Encoding.default_internal = __ENCODING__
