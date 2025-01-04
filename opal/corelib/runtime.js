@@ -1090,7 +1090,13 @@
   }
 
   function own_included_modules(module) {
-    var result = [], mod, proto = Object.getPrototypeOf(module.$$prototype);
+    var result = [], mod, proto;
+
+    if ($has_own(module.$$prototype, '$$dummy')) {
+      proto = Object.getPrototypeOf(module.$$prototype.$$define_methods_on);
+    } else {
+      proto = Object.getPrototypeOf(module.$$prototype);
+    }
 
     while (proto) {
       if (proto.hasOwnProperty('$$class')) {
@@ -1170,7 +1176,10 @@
 
       // includer -> chain.first -> ...chain... -> chain.last -> includer.parent
       start_chain_after = includer.$$prototype;
-      end_chain_on = Object.getPrototypeOf(includer.$$prototype);
+      if ($has_own(start_chain_after, '$$dummy')) {
+        start_chain_after = start_chain_after.$$define_methods_on;
+      }
+      end_chain_on = Object.getPrototypeOf(start_chain_after);
     } else {
       // The module has been already included,
       // we don't need to put it into the ancestors chain again,
