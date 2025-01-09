@@ -7,6 +7,7 @@ require 'corelib/string/encoding'
 # a new string in the same encoding it was orginally encoded in
 ::Encoding.register 'IBM437', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'IBM720', inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'IBM866', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'ISO-8859-15', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'ISO-8859-5', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'Windows-1251', aliases: ['WINDOWS-1251'], inherits: ::Encoding::UTF_16LE, dummy: true

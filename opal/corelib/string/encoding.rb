@@ -74,6 +74,10 @@ class ::Encoding
     ::Kernel.raise ::NotImplementedError
   end
 
+  def decode!(io_buffer)
+    ::Kernel.raise ::NotImplementedError
+  end
+
   def each_byte(str)
     ::Kernel.raise ::NotImplementedError
   end
@@ -225,7 +229,14 @@ end
 
   def decode(io_buffer)
     %x{
-      let result = (new TextDecoder('utf-8')).decode(io_buffer.data_view);
+      let result = scrubbing_decoder(self, 'utf-8').decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
+  def decode!(io_buffer)
+    %x{
+      let result = validating_decoder(self, 'utf-8').decode(io_buffer.data_view);
       return $str(result, self);
     }
   end
@@ -345,7 +356,14 @@ end
 
   def decode(io_buffer)
     %x{
-      let result = (new TextDecoder('utf-16le')).decode(io_buffer.data_view);
+      let result = scrubbing_decoder(self, 'utf-16le').decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
+  def decode!(io_buffer)
+    %x{
+      let result = validating_decoder(self, 'utf-16le').decode(io_buffer.data_view);
       return $str(result, self);
     }
   end
@@ -363,7 +381,7 @@ end
 
   def scrub(str, replacement, &block)
     %x{
-      let result = scrubbing_decoder(self, 'utf-16').decode(new Uint8Array(str.$bytes()));
+      let result = scrubbing_decoder(self, 'utf-16le').decode(new Uint8Array(str.$bytes()));
       if (block !== nil) {
         // dont know the bytes anymore ... ¯\_(ツ)_/¯
         result = result.replace(/�/g, (byte)=>{ return #{yield `byte`}; });
@@ -388,7 +406,14 @@ end
 ::Encoding.register 'UTF-16BE', inherits: ::Encoding::UTF_16LE do
   def decode(io_buffer)
     %x{
-      let result = (new TextDecoder('utf-16be')).decode(io_buffer.data_view);
+      let result = scrubbing_decoder(self, 'utf-16be').decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
+  def decode!(io_buffer)
+    %x{
+      let result = validating_decoder(self, 'utf-16be').decode(io_buffer.data_view);
       return $str(result, self);
     }
   end
@@ -550,7 +575,14 @@ end
 
   def decode(io_buffer)
     %x{
-      let result = (new TextDecoder('ascii')).decode(io_buffer.data_view);
+      let result = scrubbing_decoder(self, 'ascii').decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
+  def decode!(io_buffer)
+    %x{
+      let result = validating_decoder(self, 'ascii').decode(io_buffer.data_view);
       return $str(result, self);
     }
   end

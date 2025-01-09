@@ -104,7 +104,7 @@ require 'corelib/string/encoding/tables/jis_ext_inverted'
       if (length < 0) return nil;
       let bytes_ary = str.$bytes();
       bytes_ary = bytes_ary.slice(index, index + length);
-      let result = (new TextDecoder('iso-2022-jp')).decode(new Uint8Array(bytes_ary));
+      let result = scrubbing_decoder(self, 'iso-2022-jp').decode(new Uint8Array(bytes_ary));
       if (result.length === 0) return nil;
       return $str(result, self);
     }
@@ -112,7 +112,14 @@ require 'corelib/string/encoding/tables/jis_ext_inverted'
 
   def decode(io_buffer)
     %x{
-      let result = (new TextDecoder('iso-2022-jp')).decode(io_buffer.data_view);
+      let result = scrubbing_decoder(self, 'iso-2022-jp').decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
+  def decode!(io_buffer)
+    %x{
+      let result = validating_decoder(self, 'iso-2022-jp').decode(io_buffer.data_view);
       return $str(result, self);
     }
   end
