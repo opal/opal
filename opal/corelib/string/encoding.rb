@@ -78,7 +78,15 @@ class ::Encoding
     ::Kernel.raise ::NotImplementedError
   end
 
-  def each_byte(str)
+  def each_byte(str, &block)
+    ::Kernel.raise ::NotImplementedError
+  end
+
+  # Fills io_buffer with bytes of str and yields the number
+  # of valid bytes in io_buffer to the block.
+  # Repeats until end of str while reusing io_buffer.
+  # In other words: io_buffer is used as a sliding window over str.
+  def each_byte_buffer(str, io_buffer, &block)
     ::Kernel.raise ::NotImplementedError
   end
 
@@ -241,11 +249,9 @@ end
     }
   end
 
-  def each_byte(str, &block)
+  def each_byte(str)
     %x{
-      let units = Infinity,
-          code_point,
-          length = str.length;
+      let code_point;
       for (const c of str) {
         code_point = c.codePointAt(0);
         if (code_point < 0x80) {
@@ -273,6 +279,53 @@ end
         }
       }
     }
+  end
+
+  def each_byte_buffer(str, io_buffer)
+    b_size = io_buffer.size
+    pos = 0
+    %x{
+      let code_point,
+          dv = io_buffer.data_view;
+
+      function set_byte(byte) {
+        if (pos === b_size) {
+          #{yield pos}
+          pos = 0;
+        }
+        dv.setUint8(pos++, byte);
+      }
+
+      for (const c of str) {
+        code_point = c.codePointAt(0);
+        if (code_point < 0x80) {
+          set_byte(code_point);
+        } else if (code_point < 0x800) {
+          set_byte(code_point >> 0x6 | 0xC0);
+          set_byte(code_point & 0x3F | 0x80);
+        } else if (code_point < 0xD800) {
+          set_byte(code_point >> 0xC | 0xE0);
+          set_byte(code_point >> 0x6 & 0x3F | 0x80);
+          set_byte(code_point & 0x3F | 0x80);
+        } else if (code_point < 0xE000) {
+          set_byte(0xEF);
+          set_byte(0xBF);
+          set_byte(0xBD);
+        } else if (code_point < 0x10000) {
+          set_byte(code_point >> 0xC | 0xE0);
+          set_byte(code_point >> 0x6 & 0x3F | 0x80);
+          set_byte(code_point & 0x3F | 0x80);
+        } else if (code_point < 0x110000) {
+          set_byte(code_point >> 0x12 | 0xF0);
+          set_byte(code_point >> 0xC & 0x3F | 0x80);
+          set_byte(code_point >> 0x6 & 0x3F | 0x80);
+          set_byte(code_point & 0x3F | 0x80);
+        }
+      }
+
+      if (pos > 0) { #{yield pos} }
+    }
+    str
   end
 
   def scrub(str, replacement, &block)
@@ -368,7 +421,7 @@ end
     }
   end
 
-  def each_byte(str, &block)
+  def each_byte(str)
     %x{
       for (let i = 0, length = str.length; i < length; i++) {
         let char_code = str.charCodeAt(i);
@@ -377,6 +430,32 @@ end
         #{yield `char_code >> 8`};
       }
     }
+  end
+
+  def each_byte_buffer(str, io_buffer)
+    b_size = io_buffer.size
+    pos = 0
+    %x{
+      let char_code,
+          dv = io_buffer.data_view;
+
+      function set_byte(byte) {
+        if (pos === b_size) {
+          #{yield pos}
+          pos = 0;
+        }
+        dv.setUint8(pos++, byte);
+      }
+
+      for (let i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        set_byte(char_code & 0xff);
+        set_byte(char_code >> 8);
+      }
+
+      if (pos > 0) { #{yield pos} }
+    }
+    str
   end
 
   def scrub(str, replacement, &block)
@@ -418,7 +497,7 @@ end
     }
   end
 
-  def each_byte(str, &block)
+  def each_byte(str)
     %x{
       for (var i = 0, length = str.length; i < length; i++) {
         var char_code = str.charCodeAt(i);
@@ -426,6 +505,32 @@ end
         #{yield `char_code & 0xff`};
       }
     }
+  end
+
+  def each_byte_buffer(str, io_buffer)
+    b_size = io_buffer.size
+    pos = 0
+    %x{
+      let char_code,
+          dv = io_buffer.data_view;
+
+      function set_byte(byte) {
+        if (pos === b_size) {
+          #{yield pos}
+          pos = 0;
+        }
+        dv.setUint8(pos++, byte);
+      }
+
+      for (let i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        set_byte(char_code >> 8);
+        set_byte(char_code & 0xff);
+      }
+
+      if (pos > 0) { #{yield pos} }
+    }
+    str
   end
 
   def scrub(str, replacement, &block)
@@ -507,7 +612,39 @@ end
     }
   end
 
-  def each_byte(str, &block)
+  def decode(io_buffer)
+    %x{
+      let i = 0, o = 0,
+          io_dv = io_buffer.data_view,
+          io_dv_bl = io_dv.byteLength,
+          data_view = new DataView(new ArrayBuffer(Math.ceil(io_dv_bl / 2)));
+      while (i < io_dv_bl) {
+        data_view.setUint8(o++, io_dv.getUint8(i++));
+        if (i < io_dv_bl) data_view.setUint8(o++, io_dv.getUint8(i++));
+        i += 2;
+      }
+      let result = scrubbing_decoder(self, 'utf-16').decode(data_view);
+      return $str(result, self);
+    }
+  end
+
+  def decode!(io_buffer)
+    %x{
+      let i = 0, o = 0,
+          io_dv = io_buffer.data_view,
+          io_dv_bl = io_dv.byteLength,
+          data_view = new DataView(new ArrayBuffer(Math.ceil(io_dv_bl / 2)));
+      while (i < io_dv_bl) {
+        data_view.setUint8(o++, io_dv.getUint8(i++));
+        if (i < io_dv_bl) data_view.setUint8(o++, io_dv.getUint8(i++));
+        i += 2;
+      }
+      let result = validating_decoder(self, 'utf-16').decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
+  def each_byte(str)
     %x{
       for (var i = 0, length = str.length; i < length; i++) {
         var char_code = str.charCodeAt(i);
@@ -520,7 +657,35 @@ end
     }
   end
 
-  def scrub(str, replacement, &block)
+  def each_byte_buffer(str, io_buffer)
+    b_size = io_buffer.size
+    pos = 0
+    %x{
+      let char_code,
+          dv = io_buffer.data_view;
+
+      function set_byte(byte) {
+        if (pos === b_size) {
+          #{yield pos}
+          pos = 0;
+        }
+        dv.setUint8(pos++, byte);
+      }
+
+      for (let i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        set_byte(char_code & 0xff);
+        set_byte(char_code >> 8);
+        set_byte(0);
+        set_byte(0);
+      }
+
+      if (pos > 0) { #{yield pos} }
+    }
+    str
+  end
+
+  def scrub(str, replacement)
     str
   end
 
@@ -530,7 +695,39 @@ end
 end
 
 ::Encoding.register 'UTF-32BE', inherits: ::Encoding::UTF_32LE do
-  def each_byte(str, &block)
+  def decode(io_buffer)
+    %x{
+      let i = 0, o = 0,
+          io_dv = io_buffer.data_view,
+          io_dv_bl = io_dv.byteLength,
+          data_view = new DataView(new ArrayBuffer(Math.floor(io_dv_bl / 2)));
+      while (i < io_dv_bl) {
+        i += 2;
+        if (i < io_dv_bl) data_view.setUint8(o++, io_dv.getUint8(i++));
+        if (i < io_dv_bl) data_view.setUint8(o++, io_dv.getUint8(i++));
+      }
+      let result = scrubbing_decoder(self, 'utf-16').decode(data_view);
+      return $str(result, self);
+    }
+  end
+
+  def decode!(io_buffer)
+    %x{
+      let i = 0, o = 0,
+          io_dv = io_buffer.data_view,
+          io_dv_bl = io_dv.byteLength,
+          data_view = new DataView(new ArrayBuffer(Math.floor(io_dv_bl / 2)));
+      while (i < io_dv_bl) {
+        i += 2;
+        if (i < io_dv_bl) data_view.setUint8(o++, io_dv.getUint8(i++));
+        if (i < io_dv_bl) data_view.setUint8(o++, io_dv.getUint8(i++));
+      }
+      let result = validating_decoder(self, 'utf-16').decode(io_buffer.data_view);
+      return $str(result, self);
+    }
+  end
+
+  def each_byte(str)
     %x{
       for (var i = 0, length = str.length; i < length; i++) {
         var char_code = str.charCodeAt(i);
@@ -540,6 +737,34 @@ end
         #{yield `char_code & 0xff`};
       }
     }
+  end
+
+  def each_byte_buffer(str, io_buffer)
+    b_size = io_buffer.size
+    pos = 0
+    %x{
+      let char_code,
+          dv = io_buffer.data_view;
+
+      function set_byte(byte) {
+        if (pos === b_size) {
+          #{yield pos}
+          pos = 0;
+        }
+        dv.setUint8(pos++, byte);
+      }
+
+      for (let i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        set_byte(0);
+        set_byte(0);
+        set_byte(char_code >> 8);
+        set_byte(char_code & 0xff);
+      }
+
+      if (pos > 0) { #{yield pos} }
+    }
+    str
   end
 end
 
@@ -587,13 +812,35 @@ end
     }
   end
 
-  def each_byte(str, &block)
+  def each_byte(str)
     %x{
       for (let i = 0, length = str.length; i < length; i++) {
-        let char_code = str.charCodeAt(i);
-        #{yield `char_code & 0xff`};
+        #{yield `str.charCodeAt(i) & 0xff`};
       }
     }
+  end
+
+  def each_byte_buffer(str, io_buffer)
+    b_size = io_buffer.size
+    pos = 0
+    %x{
+      let dv = io_buffer.data_view;
+
+      function set_byte(byte) {
+        if (pos === b_size) {
+          #{yield pos}
+          pos = 0;
+        }
+        dv.setUint8(pos++, byte);
+      }
+
+      for (let i = 0, length = str.length; i < length; i++) {
+        set_byte(str.charCodeAt(i) & 0xff);
+      }
+
+      if (pos > 0) { #{yield pos} }
+    }
+    str
   end
 
   def scrub(str, replacement, &block)

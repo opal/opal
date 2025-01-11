@@ -89,7 +89,7 @@ require 'corelib/string/encoding/tables/jis_ext_inverted'
     }
   end
 
-  def each_byte(str, &block)
+  def each_byte(str)
     %x{
       let unicode;
       for( const c of str ) {
@@ -123,6 +123,59 @@ require 'corelib/string/encoding/tables/jis_ext_inverted'
             else {
               #{yield `( unknownJis >> 8 ) - 0x80`};
               #{yield `( unknownJis & 0xFF ) - 0x80`};
+            }
+          }
+        }
+      }
+    }
+  end
+
+  def each_byte_buffer(str, io_buffer)
+    b_size = io_buffer.size
+    pos = 0
+    %x{
+      let unicode,
+          dv = io_buffer.data_view;
+
+      function set_byte(byte) {
+        if (pos === b_size) {
+          #{yield pos}
+          pos = 0;
+        }
+        dv.setUint8(pos++, byte);
+      }
+
+      for( const c of str ) {
+        unicode = c.codePointAt(0);
+
+        // ASCII
+        if( unicode < 0x80 ) {
+          set_byte(unicode);
+        }
+        // HALFWIDTH_KATAKANA
+        else if( 0xFF61 <= unicode && unicode <= 0xFF9F ) {
+          set_byte(0x8E);
+          set_byte(unicode - 0xFFC0);
+        }
+        else {
+          // KANJI
+          var jis = JISInverted[ unicode ];
+          if( jis ) {
+            set_byte(( jis >> 8 ) - 0x80);
+            set_byte(( jis & 0xFF ) - 0x80);
+          }
+          else {
+            // EXTENSION
+            var ext = JISEXTInverted[ unicode ];
+            if( ext ) {
+              set_byte(0x8F);
+              set_byte(( ext >> 8 ) - 0x80);
+              set_byte(( ext & 0xFF ) - 0x80);
+            }
+            // UNKNOWN
+            else {
+              set_byte(( unknownJis >> 8 ) - 0x80);
+              set_byte(( unknownJis & 0xFF ) - 0x80);
             }
           }
         }

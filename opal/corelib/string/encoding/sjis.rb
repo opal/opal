@@ -80,7 +80,7 @@ require 'corelib/string/encoding/tables/sjis_inverted'
     }
   end
 
-  def each_byte(str, &block)
+  def each_byte(str)
     %x{
       let unicode;
       for( const c of str ) {
@@ -98,6 +98,41 @@ require 'corelib/string/encoding/tables/sjis_inverted'
           let code = SJISInverted[ unicode ] || unknownSjis;
           #{yield `code >> 8`};
           #{yield `code & 0xFF`};
+        }
+      }
+    }
+  end
+
+  def each_byte_buffer(str, io_buffer)
+    b_size = io_buffer.size
+    pos = 0
+    %x{
+      let unicode,
+          dv = io_buffer.data_view;
+
+      function set_byte(byte) {
+        if (pos === b_size) {
+          #{yield pos}
+          pos = 0;
+        }
+        dv.setUint8(pos++, byte);
+      }
+
+      for( const c of str ) {
+        unicode = c.codePointAt(0);
+        // ASCII
+        if( unicode < 0x80 ) {
+          set_byte(unicode);
+        }
+        // HALFWIDTH_KATAKANA
+        else if( 0xFF61 <= unicode && unicode <= 0xFF9F ) {
+          set_byte(unicode - 0xFEC0);
+        }
+        // KANJI
+        else {
+          let code = SJISInverted[ unicode ] || unknownSjis;
+          set_byte(code >> 8);
+          set_byte(code & 0xFF);
         }
       }
     }

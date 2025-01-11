@@ -124,7 +124,7 @@ require 'corelib/string/encoding/tables/jis_ext_inverted'
     }
   end
 
-  def each_byte(str, &block)
+  def each_byte(str)
     %x{
       let sequence = 0, unicode;
       for( const c of str ) {
@@ -196,6 +196,95 @@ require 'corelib/string/encoding/tables/jis_ext_inverted'
         #{yield `0x1B`};
         #{yield `0x28`};
         #{yield `0x42`};
+      }
+    }
+  end
+
+  def each_byte_buffer(str, io_buffer)
+    b_size = io_buffer.size
+    pos = 0
+    %x{
+      let sequence = 0,
+          unicode,
+          dv = io_buffer.data_view;
+
+      function set_byte(byte) {
+        if (pos === b_size) {
+          #{yield pos}
+          pos = 0;
+        }
+        dv.setUint8(pos++, byte);
+      }
+
+      for( const c of str ) {
+        unicode = c.codePointAt(0);
+        // ASCII
+        if( unicode < 0x80 ) {
+          if( sequence !== 0 ) {
+            sequence = 0;
+            set_byte(0x1B);
+            set_byte(0x28);
+            set_byte(0x42);
+          }
+          set_byte(unicode);
+        }
+        // HALFWIDTH_KATAKANA
+        else if( 0xFF61 <= unicode && unicode <= 0xFF9F ) {
+          if( sequence !== 1 ) {
+            sequence = 1;
+            set_byte(0x1B);
+            set_byte(0x28);
+            set_byte(0x49);
+          }
+          set_byte(unicode - 0xFF40);
+        }
+        else {
+          var code = JISInverted[ unicode ];
+          if( code ) {
+            // KANJI
+            if( sequence !== 2 ) {
+              sequence = 2;
+              set_byte(0x1B);
+              set_byte(0x24);
+              set_byte(0x42);
+            }
+            set_byte(code >> 8);
+            set_byte(code & 0xFF);
+          }
+          else {
+            var ext = JISEXTInverted[ unicode ];
+            if( ext ) {
+              // EXTENSION
+              if( sequence !== 3 ) {
+                sequence = 3;
+                set_byte(0x1B);
+                set_byte(0x24);
+                set_byte(0x28);
+                set_byte(0x44);
+              }
+              set_byte(ext >> 8);
+              set_byte(ext & 0xFF);
+            }
+            else {
+              // UNKNOWN
+              if( sequence !== 2 ) {
+                sequence = 2;
+                set_byte(0x1B);
+                set_byte(0x24);
+                set_byte(0x42);
+              }
+              set_byte(unknownJis >> 8);
+              set_byte(unknownJis & 0xFF);
+            }
+          }
+        }
+      }
+      // Add ASCII ESC
+      if( sequence !== 0 ) {
+        sequence = 0;
+        set_byte(0x1B);
+        set_byte(0x28);
+        set_byte(0x42);
       }
     }
   end
