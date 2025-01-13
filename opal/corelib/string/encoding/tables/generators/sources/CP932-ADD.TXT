@@ -1,0 +1,17 @@
+#
+# UNICODE To CP932 Convert Problem
+# This problem caused to Windows-31J Mapping differences.
+#
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# SJIS	UNICODE
+#
+
+0x8160	U+301C	# WAVE DASH
+0x815C	U+2014	# EM DASH
+0x8191	U+00A2	# CENT SIGN
+0x8192	U+00A3	# POUND SIGN
+0x81CA	U+00AC	# NOT SIGN
+0xEEFA	U+00A6 # BROKEN BAR
+# 0x8161	U+2016	# DOUBLE VERTICAL LINE
+# 0x817C	U+2212	# MINUS SIGN

@@ -1,0 +1,13 @@
+#
+# UNICODE To JIS0212 Convert Problem
+# This problem caused to Windows-31J Mapping differences.
+#
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS	UNICODE
+#
+
+0x2142	0x2016	# DOUBLE VERTICAL LINE
+0x215D	0x2212	# MINUS SIGN
+
+# 秀丸で保存するとこうなる
