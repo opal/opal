@@ -41,6 +41,8 @@ group :development do
   gem 'guard', require: false
   gem 'listen', require: false
   gem 'simplecov', require: false
+  gem 'ruby-lsp', require: false
+  gem 'uri', '> 1', require: false
 
   if RUBY_PLATFORM =~ /darwin/
     gem 'terminal-notifier-guard'
