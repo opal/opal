@@ -1,10 +1,10 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "BigDecimal" do
-  fails "BidDecimal#hash two BigDecimal objects with numerically equal values should have the same hash value" # Expected 27618 == 27622 to be truthy but was false
-  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for NaNs" # Expected 27486 == 27490 to be truthy but was false
-  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for infinite values" # Expected 27530 == 27534 to be truthy but was false
-  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for ordinary values" # Expected 27574 == 27578 to be truthy but was false
-  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for zero values" # Expected 27442 == 27446 to be truthy but was false
+  fails "BidDecimal#hash two BigDecimal objects with numerically equal values should have the same hash value" # Expected 417830 == 417834 to be truthy but was false
+  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for NaNs" # Expected 417786 == 417790 to be truthy but was false
+  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for infinite values" # Expected 417742 == 417746 to be truthy but was false
+  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for ordinary values" # Expected 417698 == 417702 to be truthy but was false
+  fails "BidDecimal#hash two BigDecimal objects with the same value should have the same hash for zero values" # Expected 417654 == 417658 to be truthy but was false
   fails "BigDecimal constants exception-related constants has a EXCEPTION_ALL value" # NameError: uninitialized constant BigDecimal::EXCEPTION_ALL
   fails "BigDecimal constants exception-related constants has a EXCEPTION_INFINITY value" # NameError: uninitialized constant BigDecimal::EXCEPTION_INFINITY
   fails "BigDecimal constants exception-related constants has a EXCEPTION_NaN value" # NameError: uninitialized constant BigDecimal::EXCEPTION_NaN
@@ -21,7 +21,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal constants rounding-related constants has a ROUND_HALF_EVEN value" # Expected 6 == 7 to be truthy but was false
   fails "BigDecimal constants rounding-related constants has a ROUND_HALF_UP value" # Expected 4 == 3 to be truthy but was false
   fails "BigDecimal constants rounding-related constants has a ROUND_UP value" # Expected 0 == 1 to be truthy but was false
-  fails "BigDecimal is not defined unless it is required" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xe876>
+  fails "BigDecimal is not defined unless it is required" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1bb6a>
   fails "BigDecimal#% returns NaN if NaN is involved" # FloatDomainError: Computation results to 'NaN'(Not a Number)
   fails "BigDecimal#% returns NaN if the dividend is Infinity" # FloatDomainError: Computation results to 'Infinity'
   fails "BigDecimal#% returns self modulo other" # Exception: new BigNumber() number type has more than 15 significant digits: 18446744073709552000
@@ -29,26 +29,19 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#% with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(6543.21) exactly 1 times but received it 0 times
   fails "BigDecimal#* with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(3e-20001) exactly 1 times but received it 0 times
   fails "BigDecimal#* with Rational produces a BigDecimal" # TypeError: Rational can't be coerced into BigDecimal
-  fails "BigDecimal#** 0 to power of 0 is 1" # NoMethodError: undefined method `**' for 0
-  fails "BigDecimal#** 0 to powers < 0 is Infinity" # NoMethodError: undefined method `**' for 0
-  fails "BigDecimal#** other powers of 0 are 0" # NoMethodError: undefined method `**' for 0
-  fails "BigDecimal#** powers of 1 equal 1" # NoMethodError: undefined method `**' for 1
-  fails "BigDecimal#** powers of self" # NoMethodError: undefined method `**' for 3e-20001
-  fails "BigDecimal#** returns 0.0 if self is infinite and argument is negative" # NoMethodError: undefined method `**' for Infinity
-  fails "BigDecimal#** returns NaN if self is NaN" # NoMethodError: undefined method `**' for NaN
-  fails "BigDecimal#** returns infinite if self is infinite and argument is positive" # NoMethodError: undefined method `**' for Infinity
+  fails "BigDecimal#** powers of self" # Expected 0 == 5e-40002 to be truthy but was false
   fails "BigDecimal#+ with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
   fails "BigDecimal#- with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
   fails "BigDecimal#-@ properly handles special values" # Expected 1 == -1 to be truthy but was false
   fails "BigDecimal#/ returns a / b" # Expected 0 == -5e-5556 to be truthy but was false
   fails "BigDecimal#/ with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(1) exactly 1 times but received it 0 times
   fails "BigDecimal#/ with Rational produces a BigDecimal" # TypeError: Rational can't be coerced into BigDecimal
-  fails "BigDecimal#< properly handles infinity values" # NoMethodError: undefined method `nan?' for #<MockObject:0x753b4 @name="123" @null=nil>
-  fails "BigDecimal#<= properly handles infinity values" # NoMethodError: undefined method `nan?' for #<MockObject:0x72144 @name="123" @null=nil>
+  fails "BigDecimal#< properly handles infinity values" # NoMethodError: undefined method `nan?' for #<MockObject:0x26d44 @name="123" @null=nil>
+  fails "BigDecimal#<= properly handles infinity values" # NoMethodError: undefined method `nan?' for #<MockObject:0x66d8a @name="123" @null=nil>
   fails "BigDecimal#<=> returns -1 if a < b" # Expected nil == -1 to be truthy but was false
   fails "BigDecimal#<=> returns 1 if a > b" # Expected nil == 1 to be truthy but was false
-  fails "BigDecimal#> properly handles infinity values" # NoMethodError: undefined method `nan?' for #<MockObject:0x718a0 @name="123" @null=nil>
-  fails "BigDecimal#>= properly handles infinity values" # NoMethodError: undefined method `nan?' for #<MockObject:0x71c3a @name="123" @null=nil>
+  fails "BigDecimal#> properly handles infinity values" # NoMethodError: undefined method `nan?' for #<MockObject:0x21ba0 @name="123" @null=nil>
+  fails "BigDecimal#>= properly handles infinity values" # NoMethodError: undefined method `nan?' for #<MockObject:0x1b650 @name="123" @null=nil>
   fails "BigDecimal#add with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(123450000000000) exactly 1 times but received it 0 times
   fails "BigDecimal#add with Rational produces a BigDecimal" # TypeError: Rational can't be coerced into BigDecimal
   fails "BigDecimal#ceil returns the smallest integer greater or equal to self, if n is unspecified" # Expected Infinity == 2e+5555 to be truthy but was false
@@ -66,11 +59,6 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#exponent is n if number can be represented as 0.xxx*10**n" # NoMethodError: undefined method `exponent' for 2e+1000
   fails "BigDecimal#exponent returns 0 if self is 0" # NoMethodError: undefined method `exponent' for 0
   fails "BigDecimal#exponent returns an Integer" # NoMethodError: undefined method `exponent' for Infinity
-  fails "BigDecimal#fix correctly handles special values" # NoMethodError: undefined method `fix' for Infinity
-  fails "BigDecimal#fix does not allow any arguments" # Expected ArgumentError but got: NoMethodError (undefined method `fix' for 1.23456789)
-  fails "BigDecimal#fix returns 0 if the absolute value is < 1" # NoMethodError: undefined method `fix' for 0.99999
-  fails "BigDecimal#fix returns a BigDecimal" # NoMethodError: undefined method `fix' for Infinity
-  fails "BigDecimal#fix returns the integer part of the absolute value" # NoMethodError: undefined method `fix' for 2e+1000
   fails "BigDecimal#floor raise exception, if self is special value" # Expected FloatDomainError but no exception was raised (Infinity was returned)
   fails "BigDecimal#floor returns the greatest integer smaller or equal to self" # Expected Infinity == 2e+5555 to be truthy but was false
   fails "BigDecimal#floor sets n digits left of the decimal point to 0, if given n < 0" # Expected -9.999999999999999e+29 == -1e+30 to be truthy but was false
@@ -92,14 +80,7 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#modulo returns the dividend if the divisor is Infinity" # Expected NaN == 1 to be truthy but was false
   fails "BigDecimal#modulo with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(6543.21) exactly 1 times but received it 0 times
   fails "BigDecimal#mult with Object tries to coerce the other operand to self" # Mock 'Object' expected to receive coerce(3e-20001) exactly 1 times but received it 0 times
-  fails "BigDecimal#power 0 to power of 0 is 1" # NoMethodError: undefined method `power' for 0
-  fails "BigDecimal#power 0 to powers < 0 is Infinity" # NoMethodError: undefined method `power' for 0
-  fails "BigDecimal#power other powers of 0 are 0" # NoMethodError: undefined method `power' for 0
-  fails "BigDecimal#power powers of 1 equal 1" # NoMethodError: undefined method `power' for 1
-  fails "BigDecimal#power powers of self" # NoMethodError: undefined method `power' for 3e-20001
-  fails "BigDecimal#power returns 0.0 if self is infinite and argument is negative" # NoMethodError: undefined method `power' for Infinity
-  fails "BigDecimal#power returns NaN if self is NaN" # NoMethodError: undefined method `power' for NaN
-  fails "BigDecimal#power returns infinite if self is infinite and argument is positive" # NoMethodError: undefined method `power' for Infinity
+  fails "BigDecimal#power powers of self" # Expected 0 == 5e-40002 to be truthy but was false
   fails "BigDecimal#precs returns Integers as array values" # NameError: uninitialized constant BigDecimal::BASE
   fails "BigDecimal#precs returns array of two values" # NameError: uninitialized constant BigDecimal::BASE
   fails "BigDecimal#precs returns the current value of significant digits as the first value" # NameError: uninitialized constant BigDecimal::BASE
@@ -171,19 +152,22 @@ opal_filter "BigDecimal" do
   fails "BigDecimal#to_r returns a Rational from a negative BigDecimal with an exponent" # NoMethodError: undefined method `to_r' for -100
   fails "BigDecimal#to_r returns a Rational with bignum values" # NoMethodError: undefined method `to_r' for 3.141592653589793238462643
   fails "BigDecimal#to_r returns a Rational" # NoMethodError: undefined method `to_r' for 3.14159
-  fails "BigDecimal#to_s can return a leading space for values > 0" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s can use conventional floating point notation" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s can use engineering notation" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s does not add an exponent for zero values" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s inserts a space every n chars to fraction part, if integer n is supplied" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s removes trailing spaces in floating point notation" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s starts with + if + is supplied and value is positive" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#to_s the default format looks like 0.xxxxenn" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "BigDecimal#truncate returns Infinity if self is infinite" # Expected NaN == Infinity to be truthy but was false
+  fails "BigDecimal#to_s can return a leading space for values > 0" # Expected "3.14159265358979323846264338327950288419716939937" =~ /\ .*/ to be truthy but was nil
+  fails "BigDecimal#to_s can use conventional floating point notation" # Expected "123.4567890123456789" == "+123.45678901 23456789" to be truthy but was false
+  fails "BigDecimal#to_s can use engineering notation" # Expected "3.14159265358979323846264338327950288419716939937" =~ /^0\.[0-9]*E[0-9]*$/i to be truthy but was nil
+  fails "BigDecimal#to_s does not add an exponent for zero values" # Expected "0" == "0.0" to be truthy but was false
+  fails "BigDecimal#to_s inserts a space every n chars to fraction part, if integer n is supplied" # Expected "3.14159265358979323846264338327950288419716939937" =~ /\A0\.314 159 265 358 979 323 846 264 338 327 950 288 419 716 939 937E1\z/i to be truthy but was nil
+  fails "BigDecimal#to_s removes trailing spaces in floating point notation" # Expected "0" == "0.0" to be truthy but was false
+  fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is nil" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
+  fails "BigDecimal#to_s returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
+  fails "BigDecimal#to_s starts with + if + is supplied and value is positive" # Expected "3.14159265358979323846264338327950288419716939937" =~ /^\+.*/ to be truthy but was nil
+  fails "BigDecimal#to_s the default format looks like 0.xxxxenn" # Expected "3.14159265358979323846264338327950288419716939937" =~ /^0\.[0-9]*e[0-9]*$/ to be truthy but was nil
+  fails "BigDecimal#truncate returns Infinity if self is infinite" # ArgumentError: [BigDecimal#fix] wrong number of arguments (given 1, expected 0)
+  fails "BigDecimal#truncate returns NaN if self is NaN" # ArgumentError: [BigDecimal#fix] wrong number of arguments (given 1, expected 0)
   fails "BigDecimal#truncate returns the same value if self is special value" # Expected FloatDomainError but no exception was raised (NaN was returned)
-  fails "BigDecimal#truncate returns value of given precision otherwise" # Expected 3e-100 == 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679 to be truthy but was false
+  fails "BigDecimal#truncate returns value of given precision otherwise" # ArgumentError: [BigDecimal#fix] wrong number of arguments (given 1, expected 0)
+  fails "BigDecimal#truncate returns value of type Integer." # Expected false == true to be truthy but was false
+  fails "BigDecimal#truncate sets n digits left of the decimal point to 0, if given n < 0" # ArgumentError: [BigDecimal#fix] wrong number of arguments (given 1, expected 0)
   fails "BigDecimal.double_fig returns the number of digits a Float number is allowed to have" # NoMethodError: undefined method `double_fig' for BigDecimal
   fails "BigDecimal.limit picks the global precision when limit 0 specified" # Expected 0.8888 == 0.889 to be truthy but was false
   fails "BigDecimal.limit picks the specified precision over global limit" # Expected 0.888 == 0.89 to be truthy but was false
@@ -196,7 +180,7 @@ opal_filter "BigDecimal" do
   fails "Kernel#BigDecimal BigDecimal(Rational) with bigger-than-double numerator" # Expected 1000000000000000000 > 18446744073709552000 to be truthy but was false
   fails "Kernel#BigDecimal accepts significant digits >= given precision" # NoMethodError: undefined method `precs' for 3.1415923
   fails "Kernel#BigDecimal allows for [eEdD] as exponent separator" # Exception: new BigNumber() not a number: 12345.67d89
-  fails "Kernel#BigDecimal coerces the value argument with #to_str" # Exception: new BigNumber() not a number: #<MockObject:0xe952>
+  fails "Kernel#BigDecimal coerces the value argument with #to_str" # Exception: new BigNumber() not a number: #<MockObject:0x1bc20>
   fails "Kernel#BigDecimal creates a new object of class BigDecimal" # Expected 1 == (1/1) to be truthy but was false
   fails "Kernel#BigDecimal determines precision from initial value" # NoMethodError: undefined method `precs' for 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593014782083152134043
   fails "Kernel#BigDecimal does not call to_s when calling inspect" # Expected "44.44" == "0.4444e2" to be truthy but was false
