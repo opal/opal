@@ -24,4 +24,5 @@ opal_filter "Binding" do
   fails "Binding#local_variables includes local variables of inherited scopes and eval'ed context" # Expected ["c"] == ["c", "a", "b", "p"] to be truthy but was false
   fails "Binding#local_variables includes new variables defined in the binding" # Expected ["b"] == ["a", "b"] to be truthy but was false  
   fails "Binding#source_location works for eval with a given line" # Expected ["foo", 1] == ["foo", 100] to be truthy but was false
+  fails "Proc#binding returns a Binding instance" # RuntimeError: Evaluation on a Proc#binding is not supported
 end
