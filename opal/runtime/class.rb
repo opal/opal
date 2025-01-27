@@ -27,7 +27,7 @@ module ::Opal
     }
   }
 
-  def self.klass(scope = undefined, superclass = undefined, name = undefined)
+  def self.klass(scope, superclass, name)
     %x{
       var bridged;
 
@@ -101,7 +101,7 @@ module ::Opal
   #
   # @param module [Module]
   # @return [Object]
-  def self.class_variables(mod = undefined)
+  def self.class_variables(mod)
     %x{
       var ancestors = $ancestors(mod),
           i, length = ancestors.length,
@@ -125,7 +125,7 @@ module ::Opal
   # @param module [Module]
   # @param name [String]
   # @param value [Object]
-  def self.class_variable_set(mod = undefined, name = undefined, value = undefined)
+  def self.class_variable_set(mod, name, value)
     %x{
       var ancestors = $ancestors(mod),
           i, length = ancestors.length;
@@ -149,7 +149,7 @@ module ::Opal
   #
   # @param module [Module]
   # @param name [String]
-  def self.class_variable_get(mod = undefined, name = undefined, tolerant = undefined)
+  def self.class_variable_get(mod, name, tolerant)
     %x{
       if ($has_own(mod.$$cvars, name))
         return mod.$$cvars[name];
@@ -186,7 +186,7 @@ module ::Opal
   #
   # @param object [Object] the ruby object
   # @return [Class] the singleton class for object
-  def self.get_singleton_class(object = undefined)
+  def self.get_singleton_class(object)
     %x{
       if (object.$$is_number) {
         $raise(Opal.TypeError, "can't define singleton");
@@ -233,7 +233,7 @@ module ::Opal
   #
   # @param klass [Class]
   # @return [Class]
-  def self.build_class_singleton_class(klass = undefined)
+  def self.build_class_singleton_class(klass)
     %x{
       if (klass.$$meta) {
         return klass.$$meta;
@@ -256,7 +256,7 @@ module ::Opal
     }
   end
 
-  def self.build_module_singleton_class(mod = undefined)
+  def self.build_module_singleton_class(mod)
     %x{
       if (mod.$$meta) {
         return mod.$$meta;
@@ -278,7 +278,7 @@ module ::Opal
   #
   # @param object [Object]
   # @return [Class]
-  def self.build_object_singleton_class(object = undefined)
+  def self.build_object_singleton_class(object)
     %x{
       var superclass = object.$$class,
           klass = $allocate_class(nil, superclass, true);
@@ -297,7 +297,7 @@ module ::Opal
   # Typechecking and typecasting
   # ----------------------------
 
-  def self.coerce_to(object = undefined, type = undefined, method = undefined, args = undefined)
+  def self.coerce_to(object, type, method, args)
     %x{
       var body;
 
@@ -325,7 +325,7 @@ module ::Opal
     }
   end
 
-  def self.respond_to(obj = undefined, jsid = undefined, include_all = undefined)
+  def self.respond_to(obj, jsid, include_all)
     %x{
       if (obj == null || !obj.$$class) return false;
       include_all = !!include_all;
@@ -345,7 +345,7 @@ module ::Opal
   end
 
   # rubocop:disable Naming/PredicateName
-  def self.is_a(object = undefined, klass = undefined)
+  def self.is_a(object, klass)
     %x{
       if (klass != null && object.$$meta === klass || object.$$class === klass) {
         return true;

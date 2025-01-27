@@ -6,7 +6,7 @@
 module ::Opal
   # Create a new range instance with first and last values, and whether the
   # range excludes the last value.
-  def self.range(first = undefined, last = undefined, exc = undefined)
+  def self.range(first, last, exc)
     %x{
       var range         = new Opal.Range();
           range.begin   = first;
@@ -19,7 +19,7 @@ module ::Opal
 
   # Exit function, this should be replaced by platform specific implementation
   # (See nodejs and chrome for examples)
-  def self.exit(status = undefined)
+  def self.exit(status)
     %x{
       if ($gvars.DEBUG)
         console.log('Exited with status '+status);

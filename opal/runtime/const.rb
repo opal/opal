@@ -37,7 +37,7 @@ module ::Opal
     }
   }
 
-  def self.const_get_name(cref = undefined, name = undefined)
+  def self.const_get_name(cref, name)
     %x{
       if (cref) {
         if (cref.$$const[name] != null) { return cref.$$const[name]; }
@@ -49,7 +49,7 @@ module ::Opal
   end
 
   # Walk up the ancestors chain looking for the constant
-  def self.const_lookup_ancestors(cref = undefined, name = undefined)
+  def self.const_lookup_ancestors(cref, name)
     %x{
       var i, ii, ancestors;
 
@@ -67,7 +67,7 @@ module ::Opal
     }
   end
 
-  def self.handle_autoload(cref = undefined, name = undefined)
+  def self.handle_autoload(cref, name)
     %x{
       if (!cref.$$autoload[name].loaded) {
         cref.$$autoload[name].loaded = true;
@@ -89,7 +89,7 @@ module ::Opal
   end
 
   # Look for the constant just in the current cref or call `#const_missing`
-  def self.const_get_local(cref = undefined, name = undefined, skip_missing = undefined)
+  def self.const_get_local(cref, name, skip_missing)
     %x{
       var result;
 
@@ -108,7 +108,7 @@ module ::Opal
 
   # Look for the constant relative to a cref or call `#const_missing` (when the
   # constant is prefixed by `::`).
-  def self.const_get_qualified(cref = undefined, name = undefined, skip_missing = undefined)
+  def self.const_get_qualified(cref, name, skip_missing)
     %x{
       var result, cache, cached, current_version = Opal.const_cache_version;
 
@@ -148,7 +148,7 @@ module ::Opal
 
   # Look for the constant in the open using the current nesting and the nearest
   # cref ancestors or call `#const_missing` (when the constant has no :: prefix).
-  def self.const_get_relative(nesting = undefined, name = undefined, skip_missing = undefined)
+  def self.const_get_relative(nesting, name, skip_missing)
     %x{
       var cref = nesting[0], result, current_version = Opal.const_cache_version, cache, cached;
 
@@ -175,7 +175,7 @@ module ::Opal
 
   # Get all the constants reachable from a given cref, by default will include
   # inherited constants.
-  def self.constants(cref = undefined, inherit = undefined)
+  def self.constants(cref, inherit)
     %x{
       if (inherit == null) inherit = true;
 
@@ -205,7 +205,7 @@ module ::Opal
   end
 
   # Remove a constant from a cref.
-  def self.const_remove(cref = undefined, name = undefined)
+  def self.const_remove(cref, name)
     %x{
       Opal.const_cache_version++;
 
@@ -225,7 +225,7 @@ module ::Opal
   end
 
   # Generates a function that is a curried const_get_relative.
-  def self.const_get_relative_factory(nesting = undefined)
+  def self.const_get_relative_factory(nesting)
     %x{
       return function(name, skip_missing) {
         return Opal.$$(nesting, name, skip_missing);
@@ -259,7 +259,7 @@ module ::Opal
   }
 
   # The Array of ancestors for a given module/class
-  def self.ancestors(mod = undefined)
+  def self.ancestors(mod)
     %x{
       if (!mod) { return []; }
 
@@ -288,7 +288,7 @@ module ::Opal
 
   `var $ancestors = Opal.ancestors`
 
-  def self.get_ancestors(obj = undefined)
+  def self.get_ancestors(obj)
     %x{
       if (obj.hasOwnProperty('$$meta') && obj.$$meta !== null) {
         return $ancestors(obj.$$meta);

@@ -36,13 +36,13 @@ module ::Opal
     }
   end
 
-  def self.hash_init(_hash = undefined)
+  def self.hash_init(_hash)
     %x{
       console.warn("DEPRECATION: Opal.hash_init is deprecated and is now a no-op.")
     }
   end
 
-  def self.hash_clone(from_hash = undefined, to_hash = undefined)
+  def self.hash_clone(from_hash, to_hash)
     %x{
       to_hash.$$none = from_hash.$$none;
       to_hash.$$proc = from_hash.$$proc;
@@ -54,7 +54,7 @@ module ::Opal
     }
   end
 
-  def self.hash_put(hash = undefined, key = undefined, value = undefined)
+  def self.hash_put(hash, key, value)
     %x{
       var type = typeof key;
       if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
@@ -91,7 +91,7 @@ module ::Opal
     }
   end
 
-  def self.hash_get(hash = undefined, key = undefined)
+  def self.hash_get(hash, key)
     %x{
       var type = typeof key;
       if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
@@ -124,7 +124,7 @@ module ::Opal
     }
   }
 
-  def self.hash_delete(hash = undefined, key = undefined)
+  def self.hash_delete(hash, key)
     %x{
       var type = typeof key
       if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
@@ -153,7 +153,7 @@ module ::Opal
     }
   end
 
-  def self.hash_rehash(hash = undefined)
+  def self.hash_rehash(hash)
     %x{
       var keys = hash.$$keys;
 
@@ -265,7 +265,7 @@ module ::Opal
   # compile time, so they are just added here by the constructor
   # function.
 
-  def self.hash2(keys = undefined, smap = undefined)
+  def self.hash2(keys, smap)
     %x{
       console.warn("DEPRECATION: `Opal.hash2` is deprecated and will be removed in Opal 2.0. Use $hash_new for primitive keys or $hash_new2 for complex keys instead.");
 
@@ -277,7 +277,7 @@ module ::Opal
     }
   end
 
-  def self.hash_each(hash = undefined, dres = undefined, fun = undefined)
+  def self.hash_each(hash, dres, fun)
     %x{
       // dres = default result, returned if hash is empty
       // fun is called as fun(key, value) and must return a array with [break, result]
@@ -294,7 +294,7 @@ module ::Opal
   end
 
   # Primitives for handling parameters
-  def self.ensure_kwargs(kwargs = undefined)
+  def self.ensure_kwargs(kwargs)
     %x{
       if (kwargs == null) {
         return new Map();
@@ -306,7 +306,7 @@ module ::Opal
     }
   end
 
-  def self.get_kwarg(kwargs = undefined, key = undefined)
+  def self.get_kwarg(kwargs, key)
     %x{
       var kwarg = Opal.hash_get(kwargs, key);
       if (kwarg === undefined) {
@@ -322,7 +322,7 @@ module ::Opal
   # @param parameters [Array]
   # @return [Hash] or undefined
 
-  def self.extract_kwargs(parameters = undefined)
+  def self.extract_kwargs(parameters)
     %x{
       var kwargs = parameters[parameters.length - 1];
       if (kwargs != null && Opal.respond_to(kwargs, '$to_hash', true)) {
@@ -343,7 +343,7 @@ module ::Opal
   # @param used_args [Object<String: true>] all keys used as named kwargs
   # @return [Hash]
 
-  def self.kwrestargs(given_args = undefined, used_args = undefined)
+  def self.kwrestargs(given_args, used_args)
     %x{
       var map = new Map();
 
@@ -360,7 +360,7 @@ module ::Opal
 
   # Helpers for extracting kwsplats
   # Used for: { **h }
-  def self.to_hash(value = undefined)
+  def self.to_hash(value)
     %x{
       if (value.$$is_hash) {
         return value;
@@ -392,7 +392,7 @@ module ::Opal
     };
   }
 
-  def self.opal32_add(hash = undefined, next_value = undefined)
+  def self.opal32_add(hash, next_value)
     %x{
       hash ^= next_value;
       hash = $opal32_ror(hash, 1);

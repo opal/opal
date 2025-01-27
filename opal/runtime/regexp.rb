@@ -5,11 +5,11 @@
 module ::Opal
   # Escape Regexp special chars letting the resulting string be used to build
   # a new Regexp.
-  def self.escape_regexp(str = undefined)
+  def self.escape_regexp(str)
     `Opal.escape_metacharacters(str.replace(/([-[\]\/{}()*+?.^$\\| ])/g, '\\$1'))`
   end
 
-  def self.escape_metacharacters(str = undefined)
+  def self.escape_metacharacters(str)
     %x{
       return str.replace(/[\n]/g, '\\n')
                 .replace(/[\r]/g, '\\r')
@@ -20,7 +20,7 @@ module ::Opal
 
   # Create a global Regexp from a RegExp object and cache the result
   # on the object itself ($$g attribute).
-  def self.global_regexp(pattern = undefined)
+  def self.global_regexp(pattern)
     %x{
       if (pattern.global) {
         return pattern; // RegExp already has the global flag
@@ -35,12 +35,12 @@ module ::Opal
   end
 
   # Transform a regular expression from Ruby syntax to JS syntax.
-  def self.transform_regexp(regexp = undefined, flags = undefined)
+  def self.transform_regexp(regexp, flags)
     Opal::RegexpTranspiler.transform_regexp(regexp, flags)
   end
 
   # Combine multiple regexp parts together
-  def self.regexp(parts = undefined, flags = undefined)
+  def self.regexp(parts, flags)
     %x{
       var part;
 
@@ -76,7 +76,7 @@ module ::Opal
   end
 
   # Regexp has been transformed, so let's annotate the original regexp
-  def self.annotate_regexp(regexp = undefined, source = undefined, options = undefined)
+  def self.annotate_regexp(regexp, source, options)
     %x{
       regexp.$$source = source;
       regexp.$$options = options;
@@ -85,7 +85,7 @@ module ::Opal
   end
 
   # Annotated empty regexp
-  def self.empty_regexp(flags = undefined)
+  def self.empty_regexp(flags)
     `Opal.annotate_regexp(new RegExp(/(?:)/, flags), '')`
   end
 end

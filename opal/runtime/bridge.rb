@@ -21,7 +21,7 @@ module ::Opal
   # @param constructor [JS.Function] native JavaScript constructor to use
   # @return [Class] returns the passed Ruby class
   #
-  def self.bridge(native_klass = undefined, klass = undefined)
+  def self.bridge(native_klass, klass)
     %x{
       if (native_klass.hasOwnProperty('$$bridge')) {
         $raise(Opal.ArgumentError, "already bridged");

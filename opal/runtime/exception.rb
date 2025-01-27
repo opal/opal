@@ -6,7 +6,7 @@
 module ::Opal
   # A helper function for raising things, that gracefully degrades if necessary
   # functionality is not yet loaded.
-  def self.raise(klass = undefined, message = undefined)
+  def self.raise(klass, message)
     %x{
       // Raise Exception, so we can know that something wrong is going on.
       if (!klass) klass = Opal.Exception || Error;
@@ -35,7 +35,7 @@ module ::Opal
 
   # @private
   # Pops an exception from the stack and updates `$!`.
-  def self.pop_exception(rescued_exception = undefined)
+  def self.pop_exception(rescued_exception)
     %x{
       var exception = Opal.exceptions.pop();
       if (exception === rescued_exception) {
@@ -50,7 +50,7 @@ module ::Opal
     }
   end
 
-  def self.type_error(object = undefined, type = undefined, method = undefined, coerced = undefined)
+  def self.type_error(object, type, method, coerced)
     %x{
       object = object.$$class;
 
@@ -72,7 +72,7 @@ module ::Opal
 
   # Finds the corresponding exception match in candidates.  Each candidate can
   # be a value, or an array of values.  Returns null if not found.
-  def self.rescue(exception = undefined, candidates = undefined)
+  def self.rescue(exception, candidates)
     %x{
       for (var i = 0; i < candidates.length; i++) {
         var candidate = candidates[i];
@@ -114,7 +114,7 @@ module ::Opal
   # Closures
   # --------
 
-  def self.thrower(type = undefined)
+  def self.thrower(type)
     %x{
       var thrower = {
         $thrower_type: type,

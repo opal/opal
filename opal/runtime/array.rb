@@ -10,7 +10,7 @@ module ::Opal
   # So if we get an Array subclass, extract the wrapped JS array from it
 
   # Used for: a, b = something (no splat)
-  def self.to_ary(value = undefined)
+  def self.to_ary(value)
     %x{
       if (value.$$is_array) {
         return value;
@@ -35,7 +35,7 @@ module ::Opal
   end
 
   # Used for: a, b = *something (with splat)
-  def self.to_a(value = undefined)
+  def self.to_a(value)
     %x{
       if (value.$$is_array) {
         // A splatted array must be copied

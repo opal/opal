@@ -13,7 +13,7 @@ module ::Opal
     Opal.tracers_for_class = [];
   }
 
-  def self.invoke_tracers_for_class(klass_or_module = undefined)
+  def self.invoke_tracers_for_class(klass_or_module)
     %x{
       var i, ii, tracer;
 
@@ -41,7 +41,7 @@ module ::Opal
     }
   }
 
-  def self.module(scope = undefined, name = undefined)
+  def self.module(scope, name)
     %x{
       var module;
 
@@ -139,7 +139,7 @@ module ::Opal
   # @param includer [Module] the target class to include module into
   # @return [null]
 
-  def self.append_features(mod = undefined, includer = undefined)
+  def self.append_features(mod, includer)
     %x{
       var module_ancestors = $ancestors(mod);
       var iclasses = [];
@@ -234,7 +234,7 @@ module ::Opal
     }
   end
 
-  def self.prepend_features(mod = undefined, prepender = undefined)
+  def self.prepend_features(mod, prepender)
     %x{
       // Here we change the ancestors chain from
       //
@@ -406,7 +406,7 @@ module ::Opal
     }
   }
 
-  def self.included_modules(main_module = undefined)
+  def self.included_modules(main_module)
     %x{
       var result = [], mod = null, proto = Object.getPrototypeOf(main_module.$$prototype);
 

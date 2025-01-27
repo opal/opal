@@ -34,7 +34,7 @@ module ::Opal
   #
   # @param stubs [Array] an array of method stubs to add
   # @return [undefined]
-  def self.add_stubs(stubs = undefined)
+  def self.add_stubs(stubs)
     %x{
       var proto = $BasicObject.$$prototype;
       var stub, existing_method;
@@ -56,7 +56,7 @@ module ::Opal
   # @param prototype [Prototype] the target prototype
   # @param stub [String] stub name to add (e.g. "$foo")
   # @return [undefined]
-  def self.add_stub_for(prototype = undefined, stub = undefined)
+  def self.add_stub_for(prototype, stub)
     # Opal.stub_for(stub) is the method_missing_stub
     `$prop(prototype, stub, Opal.stub_for(stub))`
   end
@@ -65,7 +65,7 @@ module ::Opal
   #
   # @param method_name [String] The js-name of the method to stub (e.g. "$foo")
   # @return [undefined]
-  def self.stub_for(method_name = undefined)
+  def self.stub_for(method_name)
     %x{
       function method_missing_stub() {
         // Copy any given block onto the method_missing dispatcher

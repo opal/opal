@@ -17,7 +17,7 @@ module ::Opal
     }
   }
 
-  def self.lambda(block = undefined, blockopts = undefined)
+  def self.lambda(block, blockopts)
     %x{
       block.$$is_lambda = true;
 
@@ -33,7 +33,7 @@ module ::Opal
   # @param expected [Fixnum] expected number of arguments
   # @param context [Object] context of the block definition
   # @raise [ArgumentError]
-  def self.block_ac(actual = undefined, expected = undefined, context = undefined)
+  def self.block_ac(actual, expected, context)
     %x{
       var inspect = "`block in " + context + "'";
 
@@ -42,7 +42,7 @@ module ::Opal
   end
 
   # handles yield calls for 1 yielded arg
-  def self.yield1(block = undefined, arg = undefined)
+  def self.yield1(block, arg)
     %x{
       if (typeof(block) !== "function") {
         $raise(Opal.LocalJumpError, "no block given");
@@ -72,7 +72,7 @@ module ::Opal
   end
 
   # handles yield for > 1 yielded arg
-  def self.yieldX(block = undefined, args = undefined)
+  def self.yieldX(block, args)
     %x{
       if (typeof(block) !== "function") {
         $raise(Opal.LocalJumpError, "no block given");

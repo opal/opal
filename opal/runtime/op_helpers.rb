@@ -15,21 +15,21 @@ module ::Opal
     }
   }
 
-  def self.rb_plus(l = undefined, r = undefined) =
+  def self.rb_plus(l, r) =
     `are_both_numbers(l,r) ? l + r : l['$+'](r)`
-  def self.rb_minus(l = undefined, r = undefined) =
+  def self.rb_minus(l, r) =
     `are_both_numbers(l,r) ? l - r : l['$-'](r)`
-  def self.rb_times(l = undefined, r = undefined) =
+  def self.rb_times(l, r) =
     `are_both_numbers(l,r) ? l * r : l['$*'](r)`
-  def self.rb_divide(l = undefined, r = undefined) =
+  def self.rb_divide(l, r) =
     `are_both_numbers(l,r) ? l / r : l['$/'](r)`
-  def self.rb_lt(l = undefined, r = undefined) =
+  def self.rb_lt(l, r) =
     `are_both_numbers(l,r) ? l < r : l['$<'](r)`
-  def self.rb_gt(l = undefined, r = undefined) =
+  def self.rb_gt(l, r) =
     `are_both_numbers(l,r) ? l > r : l['$>'](r)`
-  def self.rb_le(l = undefined, r = undefined) =
+  def self.rb_le(l, r) =
     `are_both_numbers(l,r) ? l <= r : l['$<='](r)`
-  def self.rb_ge(l = undefined, r = undefined) =
+  def self.rb_ge(l, r) =
     `are_both_numbers(l,r) ? l >= r : l['$>='](r)`
 
   # Optimized helpers for calls like $truthy((a)['$==='](b)) -> $eqeqeq(a, b)
@@ -40,14 +40,14 @@ module ::Opal
     }
   }
 
-  def self.eqeq(lhs = undefined, rhs = undefined) =
+  def self.eqeq(lhs, rhs) =
     `are_both_numbers_or_strings(lhs,rhs) ? lhs === rhs : $truthy((lhs)['$=='](rhs))`
-  def self.eqeqeq(lhs = undefined, rhs = undefined) =
+  def self.eqeqeq(lhs, rhs) =
     `are_both_numbers_or_strings(lhs,rhs) ? lhs === rhs : $truthy((lhs)['$==='](rhs))`
-  def self.neqeq(lhs = undefined, rhs = undefined) =
+  def self.neqeq(lhs, rhs) =
     `are_both_numbers_or_strings(lhs,rhs) ? lhs !== rhs : $truthy((lhs)['$!='](rhs))`
 
-  def self.not(arg = undefined)
+  def self.not(arg)
     %x{
       if (undefined === arg || null === arg || false === arg || nil === arg) return true;
       if (true === arg || arg['$!'].$$pristine) return false;
@@ -59,7 +59,7 @@ module ::Opal
 
   def self.return_self = `this`
 
-  def self.return_ivar(ivar = undefined)
+  def self.return_ivar(ivar)
     %x{
       return function() {
         if (this[ivar] == null) { return nil; }
@@ -68,7 +68,7 @@ module ::Opal
     }
   end
 
-  def self.assign_ivar(ivar = undefined)
+  def self.assign_ivar(ivar)
     %x{
       return function(val) {
         $deny_frozen_access(this);
@@ -77,7 +77,7 @@ module ::Opal
     }
   end
 
-  def self.assign_ivar_val(ivar = undefined, static_val = undefined)
+  def self.assign_ivar_val(ivar, static_val)
     %x{
       return function() {
         $deny_frozen_access(this);
@@ -89,7 +89,7 @@ module ::Opal
   # Arrays of size > 32 elements that contain only strings,
   # symbols, integers and nils are compiled as a self-extracting
   # string.
-  def self.large_array_unpack(str = undefined)
+  def self.large_array_unpack(str)
     %x{
       var array = str.split(","), length = array.length, i;
       for (i = 0; i < length; i++) {

@@ -29,7 +29,7 @@ module ::Opal
   # @param block [Function] ruby block
   # @param blockopts [Object, Number] optional properties to set on the block
   # @return [Object] returning value of the method call
-  def self.send(recv = undefined, method = undefined, args = undefined, block = undefined, blockopts = undefined)
+  def self.send(recv, method, args, block, blockopts)
     %x{
       var body;
 
@@ -46,7 +46,7 @@ module ::Opal
     }
   end
 
-  def self.send2(recv = undefined, body = undefined, method = undefined, args = undefined, block = undefined, blockopts = undefined)
+  def self.send2(recv, body, method, args, block, blockopts)
     %x{
       if (body == null && method != null && recv.$method_missing) {
         body = recv.$method_missing;
@@ -60,7 +60,7 @@ module ::Opal
     }
   end
 
-  def self.refined_send(refinement_groups = undefined, recv = undefined, method = undefined, args = undefined, block = undefined, blockopts = undefined)
+  def self.refined_send(refinement_groups, recv, method, args, block, blockopts)
     %x{
       var i, j, k, ancestors, ancestor, refinements, refinement, refine_modules, refine_module, body;
 

@@ -8,7 +8,7 @@ module ::Opal
   # -------------------
 
   # Common #freeze runtime support
-  def self.freeze(obj = undefined)
+  def self.freeze(obj)
     %x{
       $prop(obj, "$$frozen", true);
 
@@ -35,7 +35,7 @@ module ::Opal
   end
 
   # Freeze props, make setters of instance variables throw FrozenError
-  def self.freeze_props(obj = undefined)
+  def self.freeze_props(obj)
     %x{
       var own_props = Object.keys(obj), own_props_length = own_props.length, i, prop, desc,
         dp_template = {
@@ -60,7 +60,7 @@ module ::Opal
   end
 
   # Helper that can be used from methods
-  def self.deny_frozen_access(obj = undefined)
+  def self.deny_frozen_access(obj)
     %x{
       if (obj.$$frozen)
         $raise(Opal.FrozenError, "can't modify frozen " + (obj.$class()) + ": " + (obj), new Map([["receiver", obj]]));

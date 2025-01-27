@@ -43,7 +43,7 @@ module ::Opal
   # @param body [JS.Function] the literal JavaScript function used as method
   # @param blockopts [Object, Number] optional properties to set on the body
   # @return [null]
-  def self.def(obj = undefined, jsid = undefined, body = undefined, blockopts = undefined)
+  def self.def(obj, jsid, body, blockopts)
     %x{
       $apply_blockopts(body, blockopts);
 
@@ -63,7 +63,7 @@ module ::Opal
   end
 
   # Define method on a module or class (see Opal.def).
-  def self.defn(mod = undefined, jsid = undefined, body = undefined)
+  def self.defn(mod, jsid, body)
     %x{
       $deny_frozen_access(mod);
 
@@ -102,7 +102,7 @@ module ::Opal
   end
 
   # Define a singleton method on the given object (see Opal.def).
-  def self.defs(obj = undefined, jsid = undefined, body = undefined, blockopts = undefined)
+  def self.defs(obj, jsid, body, blockopts)
     %x{
       $apply_blockopts(body, blockopts);
 
@@ -128,7 +128,7 @@ module ::Opal
   }
 
   # Called from #remove_method.
-  def self.rdef(obj = undefined, jsid = undefined)
+  def self.rdef(obj, jsid)
     %x{
       if (!$has_own(obj.$$prototype, jsid)) {
         $raise(Opal.NameError, "method '" + jsid.substr(1) + "' not defined in " + obj.$name());
@@ -152,7 +152,7 @@ module ::Opal
   end
 
   # Called from #undef_method.
-  def self.udef(obj = undefined, jsid = undefined)
+  def self.udef(obj, jsid)
     %x{
       if (!obj.$$prototype[jsid] || obj.$$prototype[jsid].$$stub) {
         $raise(Opal.NameError, "method '" + jsid.substr(1) + "' not defined in " + obj.$name());
@@ -181,7 +181,7 @@ module ::Opal
     }
   }
 
-  def self.alias(obj = undefined, name = undefined, old = undefined)
+  def self.alias(obj, name, old)
     %x{
       var id     = $jsid(name),
           old_id = $jsid(old),
@@ -237,7 +237,7 @@ module ::Opal
     }
   end
 
-  def self.alias_native(obj = undefined, name = undefined, native_name = undefined)
+  def self.alias_native(obj, name, native_name)
     %x{
       var id   = $jsid(name),
           body = obj.$$prototype[native_name];
@@ -252,7 +252,7 @@ module ::Opal
     }
   end
 
-  def self.wrap_method_body(body = undefined)
+  def self.wrap_method_body(body)
     %x{
       var wrapped = function() {
         var block = wrapped.$$p;
@@ -288,7 +288,7 @@ module ::Opal
   # @param object [Object] owner of the method +meth+
   # @param meth [String] method name that got wrong number of arguments
   # @raise [ArgumentError]
-  def self.ac(actual = undefined, expected = undefined, object = undefined, meth = undefined)
+  def self.ac(actual, expected, object, meth)
     %x{
       var inspect = '';
       if (object.$$is_a_module) {
@@ -307,12 +307,12 @@ module ::Opal
   # ----------------
 
   # rubocop:disable Naming/PredicateName
-  def self.is_method(prop = undefined)
+  def self.is_method(prop)
     `prop[0] === '$' && prop[1] !== '$'`
   end
   # rubocop:enable Naming/PredicateName
 
-  def self.instance_methods(mod = undefined)
+  def self.instance_methods(mod)
     %x{
       var processed = Object.create(null), results = [], ancestors = $ancestors(mod);
 
@@ -348,7 +348,7 @@ module ::Opal
     }
   end
 
-  def self.own_instance_methods(mod = undefined)
+  def self.own_instance_methods(mod)
     %x{
       var results = [],
           proto = mod.$$prototype;
@@ -376,15 +376,15 @@ module ::Opal
     }
   end
 
-  def self.methods(obj = undefined)
+  def self.methods(obj)
     `Opal.instance_methods(obj.$$meta || obj.$$class)`
   end
 
-  def self.own_methods(obj = undefined)
+  def self.own_methods(obj)
     `obj.$$meta ? Opal.own_instance_methods(obj.$$meta) : []`
   end
 
-  def self.receiver_methods(obj = undefined)
+  def self.receiver_methods(obj)
     %x{
       var mod = Opal.get_singleton_class(obj);
       var singleton_methods = Opal.own_instance_methods(mod);
@@ -397,7 +397,7 @@ module ::Opal
   # ----------
 
   # Super dispatcher
-  def self.find_super(obj = undefined, mid = undefined, current_func = undefined, defcheck = undefined, allow_stubs = undefined)
+  def self.find_super(obj, mid, current_func, defcheck, allow_stubs)
     %x{
       var jsid = $jsid(mid), ancestors, ancestor, super_method, method_owner, current_index = -1, i;
 
@@ -436,7 +436,7 @@ module ::Opal
   end
 
   # Iter dispatcher for super in a block
-  def self.find_block_super(obj = undefined, jsid = undefined, current_func = undefined, defcheck = undefined, implicit = undefined)
+  def self.find_block_super(obj, jsid, current_func, defcheck, implicit)
     %x{
       var call_jsid = jsid;
 
@@ -459,7 +459,7 @@ module ::Opal
     }
   end
 
-  def self.apply_blockopts(block = undefined, blockopts = undefined)
+  def self.apply_blockopts(block, blockopts)
     %x{
       if (typeof(blockopts) === 'number') {
         block.$$arity = blockopts;
