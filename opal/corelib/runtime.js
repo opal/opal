@@ -1734,7 +1734,7 @@
       arg = Opal.to_ary(arg);
     }
 
-    if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg.$$is_array) {
+    if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && (arg instanceof Array)) {
       if (is_returning_lambda) {
         return call_lambda(block.apply.bind(block, null), arg, block.$$ret);
       }
@@ -1755,7 +1755,7 @@
     }
 
     if (block.length > 1 && args.length === 1) {
-      if (args[0].$$is_array) {
+      if (args[0] instanceof Array) {
         args = args[0];
       }
     }
@@ -1772,7 +1772,7 @@
     for (var i = 0; i < candidates.length; i++) {
       var candidate = candidates[i];
 
-      if (candidate.$$is_array) {
+      if (candidate instanceof Array) {
         var result = Opal.rescue(exception, candidate);
 
         if (result) {
@@ -1829,7 +1829,7 @@
 
   // Used for: a, b = something (no splat)
   Opal.to_ary = function(value) {
-    if (value.$$is_array) {
+    if (value instanceof Array) {
       return value;
     }
     else if (value['$respond_to?']('to_ary', true)) {
@@ -1837,7 +1837,7 @@
       if (ary === nil) {
         return [value];
       }
-      else if (ary.$$is_array) {
+      else if (ary instanceof Array) {
         return ary;
       }
       else {
@@ -1852,7 +1852,7 @@
 
   // Used for: a, b = *something (with splat)
   Opal.to_a = function(value) {
-    if (value.$$is_array) {
+    if (value instanceof Array) {
       // A splatted array must be copied
       return value.slice();
     }
@@ -1861,7 +1861,7 @@
       if (ary === nil) {
         return [value];
       }
-      else if (ary.$$is_array) {
+      else if (ary instanceof Array) {
         return ary;
       }
       else {
@@ -1934,7 +1934,7 @@
   Opal.jsid = $jsid;
 
   function $prepend(first, second) {
-    if (!second.$$is_array) second = $slice(second);
+    if (!(second instanceof Array)) second = $slice(second);
     return [first].concat(second);
   }
 
@@ -2497,7 +2497,7 @@
     if (arguments_length === 1) {
       args = arguments[0];
 
-      if (arguments[0].$$is_array) {
+      if (arguments[0] instanceof Array) {
         length = args.length;
 
         for (i = 0; i < length; i++) {

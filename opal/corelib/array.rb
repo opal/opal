@@ -71,7 +71,7 @@ class ::Array < `Array`
     }
 
     function convertToArray(array) {
-      if (!array.$$is_array) {
+      if (!(array instanceof Array)) {
         array = $coerce_to(array, #{::Array}, 'to_ary');
       }
       return #{`array`.to_a};
@@ -120,7 +120,7 @@ class ::Array < `Array`
       }
 
       if (arguments.length === 1) {
-        if (size.$$is_array) {
+        if (size instanceof Array) {
           #{replace(size.to_a)}
           return self;
         } else if (#{size.respond_to? :to_ary}) {
@@ -297,7 +297,7 @@ class ::Array < `Array`
         if (array === other)
           return true;
 
-        if (!other.$$is_array) {
+        if (!(other instanceof Array)) {
           if ($respond_to(other, '$to_ary')) {
             return #{`other` == `array`};
           } else {
@@ -319,8 +319,8 @@ class ::Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           a = array[i];
           b = other[i];
-          if (a.$$is_array) {
-            if (b.$$is_array && b.length !== a.length) {
+          if (a instanceof Array) {
+            if ((b instanceof Array) && b.length !== a.length) {
               return false;
             }
             if (!recursed.hasOwnProperty(#{`a`.object_id})) {
@@ -463,7 +463,7 @@ class ::Array < `Array`
       var i, size = self.length;
 
       if (index.$$is_range) {
-        if (value.$$is_array)
+        if (value instanceof Array)
           data = #{value.to_a};
         else if (#{value.respond_to? :to_ary})
           data = #{value.to_ary.to_a};
@@ -511,7 +511,7 @@ class ::Array < `Array`
           length = value;
           value  = extra;
 
-          if (value.$$is_array)
+          if (value instanceof Array)
             data = #{value.to_a};
           else if (#{value.respond_to? :to_ary})
             data = #{value.to_ary.to_a};
@@ -1020,7 +1020,7 @@ class ::Array < `Array`
       function _eql(array, other) {
         var i, length, a, b;
 
-        if (!other.$$is_array) {
+        if (!(other instanceof Array)) {
           return false;
         }
 
@@ -1035,8 +1035,8 @@ class ::Array < `Array`
         for (i = 0, length = array.length; i < length; i++) {
           a = array[i];
           b = other[i];
-          if (a.$$is_array) {
-            if (b.$$is_array && b.length !== a.length) {
+          if (a instanceof Array) {
+            if ((b instanceof Array) && b.length !== a.length) {
               return false;
             }
             if (!recursed.hasOwnProperty(#{`a`.object_id})) {
@@ -1217,7 +1217,7 @@ class ::Array < `Array`
             continue;
           }
 
-          if (!ary.$$is_array) {
+          if (!(ary instanceof Array)) {
             #{::Kernel.raise ::TypeError};
           }
 
@@ -2340,7 +2340,7 @@ class ::Array < `Array`
 
       for (i = 0; i < len; i++) {
         ary = #{::Opal.coerce_to?(`array[i]`, ::Array, :to_ary)};
-        if (!ary.$$is_array) {
+        if (!(ary instanceof Array)) {
           #{::Kernel.raise ::TypeError, "wrong element type #{`array[i]`.class} at #{`i`} (expected array)"}
         }
         if (ary.length !== 2) {
@@ -2500,7 +2500,7 @@ class ::Array < `Array`
 
       for (j = 0, jj = others.length; j < jj; j++) {
         o = others[j];
-        if (o.$$is_array) {
+        if (o instanceof Array) {
           continue;
         }
         if (o.$$is_range || o.$$is_enumerator) {

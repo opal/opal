@@ -191,7 +191,7 @@ class ::Exception < `Error`
         self.backtrace = [backtrace];
         self.stack = '  from ' + backtrace;
       } else {
-        if (backtrace.$$is_array) {
+        if (backtrace instanceof Array) {
           for (i = 0, ii = backtrace.length; i < ii; i++) {
             if (!backtrace[i].$$is_string) {
               valid = false;
