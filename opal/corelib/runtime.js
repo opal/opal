@@ -1423,8 +1423,8 @@
     }
 
     // constructor is a JS function with a prototype chain like:
-    // - constructor
-    //   - super
+    // - constructor (window.String)
+    //   - super (window.Object)
     //
     // What we need to do is to inject our class (with its prototype chain)
     // between constructor and super. For example, after injecting ::Object
@@ -3092,6 +3092,13 @@
 
   // BasicObject can reach itself, avoid const_set to skip the $$base_module logic
   BasicObject.$$const.BasicObject = BasicObject;
+
+  // Bridge BasicObject to (JS) Object
+  $prop(Object, '$$bridge', BasicObject)
+  $prop(BasicObject, '$$prototype', Object.prototype)
+  $prop(BasicObject.$$prototype, '$$class', BasicObject)
+  $prop(BasicObject, '$$constructor', Object)
+  $prop(BasicObject, '$$bridge', true)
 
   // Assign basic constants
   $const_set(_Object, "BasicObject",  BasicObject);
