@@ -2,6 +2,7 @@
 
 require 'opal/nodes/base'
 require 'opal/ast/matcher'
+require 'thread' if RUBY_ENGINE == 'opal'
 
 module Opal
   module Nodes
