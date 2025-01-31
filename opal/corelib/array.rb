@@ -556,7 +556,23 @@ class ::Array < `Array`
   end
 
   def any?(pattern = undefined, &block)
-    `if (self.length === 0) return false`
+    %x{
+      if (self.length === 0) return false;
+
+      // A special optimized fastpath for Array#any? if no argument
+      // or block is given. Since Array#any? in this form is often
+      // used instead of !Array#empty?, and Enumerable#any? uses
+      // closure exceptions, this shortpath may provide some
+      // optimization gains.
+      if (pattern == null && !#{block_given?}) {
+        for (var i = 0; i < self.length; i++) {
+          if ($truthy(self[i])) return true;
+        }
+        return false;
+      }
+    }
+
+    # For other cases, defer to Enumerable#any?
     super
   end
 
