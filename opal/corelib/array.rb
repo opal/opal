@@ -1219,7 +1219,7 @@ class ::Array < `Array`
             #{::Kernel.raise ::TypeError};
           }
 
-          if (ary === self) {
+          if (ary === self || ary === array) {
             #{::Kernel.raise ::ArgumentError};
           }
 
