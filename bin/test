@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+require 'shellwords'
+require 'pathname'
+require 'fileutils'
+extend FileUtils
+
+def system(*args)
+  if Hash === args.first
+    env_string = "env #{args.first.map { |k, v| "#{k}=#{v.shellescape}" }.join(' ')} "
+  end
+
+  warn "$ #{env_string}#{args.select{String === _1}.shelljoin}"
+  super(*args, exception: true) rescue exit(1)
+end
+
+ENV["NODE_ENV"] = "test"
+
+files = []
+args = []
+ARGV.each do |arg|
+  if File.directory?(arg)
+    files += Dir.glob("#{arg}/**/{*_spec.rb,test_*.rb}")
+  elsif File.file?(arg)
+    files << arg
+  else
+    args << arg
+  end
+end
+
+files.map! do |file|
+  file = Pathname(file).expand_path
+  base = Pathname("#{__dir__}/..").expand_path
+  file.relative_path_from(base).to_s
+end
+
+mspec, minitest = files.partition { |file| file.end_with?('_spec.rb') }
+opalspec, rubyspec = mspec.partition { _1.start_with?('spec/opal') }
+to_glob = ->(files) { "{#{files.join(',')}}" }
+
+system({"PATTERN" => to_glob[opalspec]}, "bundle", "exec", "rake", "mspec_opal_nodejs") if opalspec.any?
+system({"PATTERN" => to_glob[mspec]}, "bundle", "exec", "rake", "mspec_ruby_nodejs") if mspec.any?
+system({"PATTERN" => to_glob[minitest]}, "bundle", "exec", "rake", "minitest_nodejs") if minitest.any?
