@@ -42,7 +42,6 @@ opal_filter "File" do
   fails "File.join calls #to_str" # Expected TypeError but got: NoMethodError (undefined method `empty?' for #<MockObject:0x32af2 @name="x" @null=nil>)
   fails "File.join inserts the separator in between empty strings and arrays" # Expected "/" == "" to be truthy but was false
   fails "File.join raises a TypeError exception when args are nil" # Expected TypeError but got: NoMethodError (undefined method `empty?' for nil)
-  fails "File.join raises an ArgumentError if passed a recursive array" # Expected ArgumentError but got: Exception (Maximum call stack size exceeded)
   fails "File.join raises errors for null bytes" # Expected ArgumentError but no exception was raised ("\u0000x/metadata.gz" was returned)
-  fails "File.join returns a duplicate string when given a single argument" # Expected "usr" not to be identical to "usr"  
+  fails "File.join returns a duplicate string when given a single argument" # Expected "usr" not to be identical to "usr"
 end
