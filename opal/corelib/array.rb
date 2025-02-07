@@ -1234,11 +1234,11 @@ class ::Array < `Array`
           }
 
           if (!ary.$$is_array) {
-            #{::Kernel.raise ::TypeError};
+            #{::Kernel.raise ::TypeError, "can't convert #{`ary`.class} into Array (#{`ary`.class}#to_ary gives #{`ary`.class})"};
           }
 
           if (ary === self || ary === array) {
-            #{::Kernel.raise ::ArgumentError};
+            #{::Kernel.raise ::ArgumentError, 'tried to flatten recursive array'};
           }
 
           switch (level) {
