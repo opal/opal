@@ -18,6 +18,18 @@ module ::Opal
     }
   end
 
+  # String#+ might be triggered early by a call $dstr below, so provide a solution until String class is fully loaded.
+  `String.prototype["$+"] = function(other) { return this + other; }`
+
+  # Helper for dynamic strings like "menu today: #{meal[:name]} for only #{meal[:price]}"
+  def self.dstr
+    %x{
+      let res = arguments[0];
+      for (let i = 1; i < arguments.length; i++) { res = res["$+"](arguments[i]); }
+      return res;
+    }
+  end
+
   # Provide the encoding register with a default "UTF-8" encoding, because
   # its used from the start and will be raplaced by the real UTF-8 encoding
   # when 'corelib/string/encoding' is loaded.
