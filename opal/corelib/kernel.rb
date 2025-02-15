@@ -276,6 +276,7 @@ module ::Kernel
       case "boolean":
         return true;
       case "object":
+      case "function":
         return (self.$$frozen || false);
       default:
         return false;
