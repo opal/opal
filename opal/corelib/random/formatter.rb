@@ -93,8 +93,7 @@ class ::Random
             #{::Kernel.raise ::ArgumentError, "invalid argument - #{limit}"}
           }
 
-          if (limit % 1 === 0) {
-            // integer
+          if (limit.$$is_integer) {
             return randomInt(limit);
           } else {
             return randomFloat() * limit;

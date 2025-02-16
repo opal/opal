@@ -29,7 +29,7 @@ class ::Random
   end
 
   def self.new_seed
-    `Opal.$$rand.new_seed()`
+    `BigInt(Opal.$$rand.new_seed())`
   end
 
   def self.rand(limit = undefined)

@@ -10,6 +10,10 @@ class ::Array < `Array`
   # Mark all javascript arrays as being valid ruby arrays
   `Opal.prop(self.$$prototype, '$$is_array', true)`
 
+  # Check if the size is more than 32 bits:
+  # http://www.ecma-international.org/ecma-262/5.1/#sec-15.4
+  `const ARY_MAX_SIZE = 4294967294`
+
   %x{
     // Recent versions of V8 (> 7.1) only use an optimized implementation when Array.prototype is unmodified.
     // For instance, "array-splice.tq" has a "fast path" (ExtractFastJSArray, defined in "src/codegen/code-stub-assembler.cc")
@@ -106,7 +110,7 @@ class ::Array < `Array`
         #{::Kernel.warn('warning: block supersedes default value argument')}
       }
 
-      if (size > #{::Integer::MAX}) {
+      if (size > ARY_MAX_SIZE) {
         #{::Kernel.raise ::ArgumentError, 'array size too big'}
       }
 
@@ -1583,7 +1587,7 @@ class ::Array < `Array`
   end
 
   def length
-    `self.length`
+    `BigInt(self.length)`
   end
 
   def max(n = undefined, &block)

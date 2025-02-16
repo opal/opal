@@ -234,13 +234,13 @@ class ::Range
         if (n == null) {
           n = 1;
         }
-        else if (!n.$$is_number) {
+        else if (!n.$$is_integer) {
           n = Number(#{::Opal.coerce_to!(n, ::Integer, :to_int)})
         }
 
         if (n < 0) {
           #{::Kernel.raise ::ArgumentError, "step can't be negative"}
-        } else if (n === 0) {
+        } else if (n == 0) {
           #{::Kernel.raise ::ArgumentError, "step can't be 0"}
         }
       }

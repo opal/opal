@@ -319,7 +319,7 @@ platforms.each do |platform|
       bm_filepath = Testing::MSpec.bm_filepath if ENV['BM']
       specs_env = {
         'SUITE' => suite,
-        'FORMATTER' => platform, # Use the current platform as the default formatter
+        'FORMATTER' => 'nodedoc', # Use the current platform as the default formatter
         'BM_FILEPATH' => bm_filepath,
       }.merge(ENV.to_hash)
       Testing::MSpec.write_file filename, Testing::MSpec.filters(suite, platform), Testing::MSpec.specs(specs_env), specs_env

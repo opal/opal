@@ -624,8 +624,100 @@ class ::String < `String`
   def ascii_only?
     # non-ASCII-compatible encoding must return false
     %x{
-      if (!self.encoding?.ascii) return false;
-      return /^[\x00-\x7F]*$/.test(self);
+      var size = self.length, exclude, range;
+
+      if (index.$$is_range) {
+        exclude = index.excl;
+        range   = index;
+        length  = index.end === nil ? -1 : Number($coerce_to(index.end, #{::Integer}, 'to_int'));
+        index   = index.begin === nil ? 0 : Number($coerce_to(index.begin, #{::Integer}, 'to_int'));
+
+        if (Math.abs(index) > size) {
+          return nil;
+        }
+
+        if (index < 0) {
+          index += size;
+        }
+
+        if (length < 0) {
+          length += size;
+        }
+
+        if (!exclude || range.end === nil) {
+          length += 1;
+        }
+
+        length = length - index;
+
+        if (length < 0) {
+          length = 0;
+        }
+
+        return self.substr(index, length);
+      }
+
+
+      if (index.$$is_string) {
+        if (length != null) {
+          #{::Kernel.raise ::TypeError}
+        }
+        return self.indexOf(index) !== -1 ? index : nil;
+      }
+
+
+      if (index.$$is_regexp) {
+        var match = self.match(index);
+
+        if (match === null) {
+          #{$~ = nil}
+          return nil;
+        }
+
+        #{$~ = ::MatchData.new(`index`, `match`)}
+
+        if (length == null) {
+          return match[0];
+        }
+
+        length = $coerce_to(length, #{::Integer}, 'to_int');
+
+        if (length < 0 && -length < match.length) {
+          return match[length += match.length];
+        }
+
+        if (length >= 0 && length < match.length) {
+          return match[length];
+        }
+
+        return nil;
+      }
+
+
+      index = Number($coerce_to(index, #{::Integer}, 'to_int'));
+
+      if (index < 0) {
+        index += size;
+      }
+
+      if (length == null) {
+        if (index >= size || index < 0) {
+          return nil;
+        }
+        return self.substr(index, 1);
+      }
+
+      length = Number($coerce_to(length, #{::Integer}, 'to_int'));
+
+      if (length < 0) {
+        return nil;
+      }
+
+      if (index > size || index < 0) {
+        return nil;
+      }
+
+      return self.substr(index, length);
     }
   end
 
@@ -2062,7 +2154,7 @@ class ::String < `String`
       }
 
       if (/^\s*_/.test(string)) {
-        return 0;
+        return 0n;
       }
 
       string = string.replace(/^(\s*[+-]?)(0[bodx]?)(.+)$/, function (original, head, flag, tail) {
@@ -2105,8 +2197,8 @@ class ::String < `String`
         return original
       });
 
-      result = parseInt(string.replace(/_(?!_)/g, ''), radix);
-      return isNaN(result) ? 0 : result;
+      result = parseInt(string.replace(/_(?!_)/g, ''), Number(radix));
+      return isNaN(result) ? 0n : BigInt(result);
     }
   end
 
