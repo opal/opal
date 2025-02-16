@@ -651,7 +651,7 @@ RSpec.describe Opal::Compiler do
 
         expect(error.backtrace[0]).to eq("#{File.basename(__FILE__)}/foobar.js.rb:in `BEGIN {}'")
         expect(compiler_backtrace(error)[0]).to end_with(":in `error'")
-        expect(compiler_backtrace(error)[-3]).to end_with(":in `block in compile'")
+        expect(compiler_backtrace(error)[-4]).to end_with(":in `block in fragments'")
         expect(compiler_backtrace(error)[-1]).to end_with(":in `compile'")
         expect(error.backtrace.size).to be > 1
       end

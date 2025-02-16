@@ -205,6 +205,13 @@ module Opal
     # Generates code for runtime use, only suitable for early runtime functions.
     compiler_option :opal_runtime_mode, default: false, as: :runtime_mode?, magic_comment: true
 
+    # @!method cache_fragments?
+    #
+    # Caches fragments. This enables postprocessing, but makes cache
+    # a lot larger and slower for typical operation. This should be
+    # enabled by builder.
+    compiler_option :cache_fragments, default: false, as: :cache_fragments?
+
     # Warn about impending compatibility break
     def backtick_javascript_or_warn?
       case backtick_javascript?
@@ -255,12 +262,6 @@ module Opal
     # # await: *await*, sleep, gets
     compiler_option :await, default: false, as: :async_await, magic_comment: true
 
-    # @return [String] The compiled ruby code
-    attr_reader :result
-
-    # @return [Array] all [Opal::Fragment] used to produce result
-    attr_reader :fragments
-
     # Current scope
     attr_accessor :scope
 
@@ -302,17 +303,44 @@ module Opal
       @dynamic_cache_result = false
     end
 
-    # Compile some ruby code to a string.
-    #
-    # @return [String] javascript code
-    def compile
+    def fragments
+      return @fragments if @fragments
+
+      unless @indent
+        raise ArgumentError, <<~ERROR.tr("\n", ' ').strip
+          This compiler arrived from cache and is unusable for
+          postprocessing. Ensure you enable a compiler option
+          "cache_fragments".
+        ERROR
+      end
+
       parse
 
       @fragments = re_raise_with_location { process(@sexp).flatten }
       @fragments << fragment("\n", nil, s(:newline)) unless @fragments.last.code.end_with?("\n")
 
-      @result = @fragments.map(&:code).join('')
+      @fragments
     end
+
+    # Method for postprocessors replacing fragments.
+    # Uncache what we need.
+    def fragments=(fragments)
+      @result, @source_map = nil
+      @fragments = fragments
+    end
+
+    # rubocop:disable Naming/MemoizedInstanceVariableName
+
+    # Compile some ruby code to a string.
+    #
+    # @return [String] javascript code
+    def compile
+      @result ||= fragments.map(&:code).join('')
+    end
+
+    # rubocop:enable Naming/MemoizedInstanceVariableName
+
+    alias result compile
 
     def parse
       @buffer = ::Opal::Parser::SourceBuffer.new(file, 1)
@@ -347,7 +375,7 @@ module Opal
     # @return [Opal::SourceMap]
     def source_map
       # We only use @source_map if compiler is cached.
-      @source_map || ::Opal::SourceMap::File.new(@fragments, file, @source, @result)
+      @source_map || ::Opal::SourceMap::File.new(fragments, file, @source, result)
     end
 
     # Any helpers required by this file. Used by {Opal::Nodes::Top} to reference
@@ -657,13 +685,16 @@ module Opal
     def marshal_dump
       [@options, @option_values, @source_map ||= source_map.cache,
        @magic_comments, @result,
-       @required_trees, @requires, @autoloads]
+       @required_trees, @requires, @autoloads,
+       (@fragments if cache_fragments?),
+       (@source if cache_fragments?)]
     end
 
     def marshal_load(src)
       @options, @option_values, @source_map,
       @magic_comments, @result,
-      @required_trees, @requires, @autoloads = src
+      @required_trees, @requires, @autoloads,
+      @fragments, @source = src
     end
   end
 end
