@@ -124,11 +124,26 @@ module Opal
         !@defs && @type == :def && @parent && @parent.class?
       end
 
+      # rubocop:disable Style/LambdaCall
+
       ##
       # Vars to use inside each scope
       def to_vars
-        vars = @temps.dup
-        vars.push(*@locals.map { |l| "#{l} = nil" })
+        f = ->(x) { fragment(x) }
+
+        vars = @temps.map do |t|
+          if t =~ /\A\$([a-z][a-zA-Z0-9_]*) = Opal.\1\z/
+            helper = ::Regexp.last_match(1).to_sym
+          end
+          a = []
+          a << dce_def_begin(helper, no_nil: true) if helper
+          a << f.(t)
+          a << f.(', ')
+          a << dce_def_end(helper) if helper
+          a
+        end
+
+        vars.push(*@locals.map { |l| [f.("#{l} = nil"), f.(', ')] })
 
         iv = ivars.map do |ivar|
           "if (self#{ivar} == null) self#{ivar} = nil;\n"
@@ -139,21 +154,26 @@ module Opal
         end
 
         if class? && !@proto_ivars.empty?
-          vars << '$proto = self.$$prototype'
+          vars << f.('$proto = self.$$prototype') << f.(', ')
         end
 
+        vars = vars.flatten
+        vars.pop if vars.last && vars.last.code == ', '
+
         indent = @compiler.parser_indent
-        str  = vars.empty? ? '' : "var #{vars.join ', '};\n"
-        str += "#{indent}#{iv.join indent}" unless ivars.empty?
-        str += "#{indent}#{gv.join indent}" unless gvars.empty?
+        fragments  = vars.empty? ? [] : [f.("var ")] + vars + [f.(";\n")]
+        fragments << f.("#{indent}#{iv.join indent}") unless ivars.empty?
+        fragments << f.("#{indent}#{gv.join indent}") unless gvars.empty?
 
         if class? && !@proto_ivars.empty?
           pvars = @proto_ivars.map { |i| "$proto#{i}" }.join(' = ')
-          str = "#{str}\n#{indent}#{pvars} = nil;"
+          fragments << f.("\n#{indent}#{pvars} = nil;")
         end
 
-        fragment(str)
+        fragments
       end
+
+      # rubocop:enable Style/LambdaCall
 
       def add_scope_ivar(ivar)
         if def_in_class?

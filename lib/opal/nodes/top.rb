@@ -153,7 +153,9 @@ module Opal
       end
 
       def add_used_helpers
-        compiler.helpers.to_a.reverse_each { |h| prepend_scope_temp "$#{h} = Opal.#{h}" }
+        compiler.helpers.to_a.reverse_each do |h|
+          prepend_scope_temp "$#{h} = Opal.#{h}"
+        end
       end
 
       def compile_method_stubs

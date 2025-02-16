@@ -221,6 +221,8 @@ Naming/PredicatePrefix:
   ForbiddenPrefixes:
     - is_
     - have_
+  Exclude:
+    - 'opal/runtime/*.rb'
 
 Performance/FlatMap:
   Exclude:
