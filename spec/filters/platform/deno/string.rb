@@ -3,7 +3,6 @@ opal_filter "String" do
   fails "A singleton class has class String as the superclass of a String instance" # Exception: Cannot create property '$$meta' on string 'blah'
   fails "Ruby String interpolation creates a non-frozen String when # frozen-string-literal: true is used" # Expected "a42c".frozen? to be falsy but was true
   fails "Ruby String interpolation creates a non-frozen String" # Expected "a42c".frozen? to be falsy but was true
-  fails "Ruby String interpolation permits an empty expression" # Expected "".frozen? to be falsy but was true
   fails "SimpleDelegator can be marshalled with its instance variables intact" # Exception: Cannot create property '$$meta' on string '__v2__'
   fails "String#% returns a String in the argument's encoding if format encoding is more restrictive" # FrozenError: can't modify frozen String
   fails "String#<=> with String ignores encoding difference" # FrozenError: can't modify frozen String

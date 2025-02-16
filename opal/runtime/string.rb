@@ -25,7 +25,11 @@ module ::Opal
   def self.dstr
     %x{
       let res = arguments[0];
-      for (let i = 1; i < arguments.length; i++) { res = res["$+"](arguments[i]); }
+      if (arguments.length > 1) {
+        for (let i = 1; i < arguments.length; i++) { res = res["$+"](arguments[i]); }
+      } else if (typeof res === "string") {
+        res = Opal.str(res);
+      }
       return res;
     }
   end
