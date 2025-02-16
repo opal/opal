@@ -12,7 +12,7 @@ class ::Random
       if (!$truthy(count)) count = 16;
       if (typeof count !== "number") count = #{`count`.to_int};
       if (count < 0) #{::Kernel.raise ::ArgumentError, 'negative string size (or size too big)'};
-      count = Math.floor(count);
+      count = Math.floor(Number(count));
       return count;
     }
   end
@@ -25,7 +25,7 @@ class ::Random
 
   def reseed(seed)
     @seed = seed
-    `self.$rng = Opal.$$rand.reseed(seed)`
+    `self.$rng = Opal.$$rand.reseed(Number(seed))`
   end
 
   def self.new_seed

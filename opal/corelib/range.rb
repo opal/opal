@@ -83,7 +83,7 @@ class ::Range
       var i, limit;
 
       if (#{@begin}.$$is_number && #{@end}.$$is_number) {
-        if (#{@begin} % 1 !== 0 || #{@end} % 1 !== 0) {
+        if (Number(#{@begin}) % 1 !== 0 || Number(#{@end}) % 1 !== 0) {
           #{::Kernel.raise ::TypeError, "can't iterate from Float"}
         }
 
@@ -235,7 +235,7 @@ class ::Range
           n = 1;
         }
         else if (!n.$$is_number) {
-          n = #{::Opal.coerce_to!(n, ::Integer, :to_int)}
+          n = Number(#{::Opal.coerce_to!(n, ::Integer, :to_int)})
         }
 
         if (n < 0) {

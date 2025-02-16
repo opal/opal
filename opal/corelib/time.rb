@@ -48,7 +48,7 @@ class ::Time < `Date`
       if (year.$$is_string) {
         year = parseInt(year, 10);
       } else {
-        year = #{::Opal.coerce_to!(`year`, ::Integer, :to_int)};
+        year = Number(#{::Opal.coerce_to!(`year`, ::Integer, :to_int)});
       }
 
       if (month === nil) {
@@ -69,10 +69,10 @@ class ::Time < `Date`
           case 'oct': month = 10; break;
           case 'nov': month = 11; break;
           case 'dec': month = 12; break;
-          default: month = #{`month`.to_i};
+          default: month = Number(#{`month`.to_i});
           }
         } else {
-          month = #{::Opal.coerce_to!(`month`, ::Integer, :to_int)};
+          month = Number(#{::Opal.coerce_to!(`month`, ::Integer, :to_int)});
         }
       }
 
@@ -86,7 +86,7 @@ class ::Time < `Date`
       } else if (day.$$is_string) {
         day = parseInt(day, 10);
       } else {
-        day = #{::Opal.coerce_to!(`day`, ::Integer, :to_int)};
+        day = Number(#{::Opal.coerce_to!(`day`, ::Integer, :to_int)});
       }
 
       if (day < 1 || day > 31) {
@@ -98,7 +98,7 @@ class ::Time < `Date`
       } else if (hour.$$is_string) {
         hour = parseInt(hour, 10);
       } else {
-        hour = #{::Opal.coerce_to!(`hour`, ::Integer, :to_int)};
+        hour = Number(#{::Opal.coerce_to!(`hour`, ::Integer, :to_int)});
       }
 
       if (hour < 0 || hour > 24) {
@@ -110,7 +110,7 @@ class ::Time < `Date`
       } else if (min.$$is_string) {
         min = parseInt(min, 10);
       } else {
-        min = #{::Opal.coerce_to!(`min`, ::Integer, :to_int)};
+        min = Number(#{::Opal.coerce_to!(`min`, ::Integer, :to_int)});
       }
 
       if (min < 0 || min > 59) {
@@ -123,7 +123,7 @@ class ::Time < `Date`
         if (sec.$$is_string) {
           sec = parseInt(sec, 10);
         } else {
-          sec = #{::Opal.coerce_to!(`sec`, ::Integer, :to_int)};
+          sec = Number(#{::Opal.coerce_to!(`sec`, ::Integer, :to_int)});
         }
       }
 

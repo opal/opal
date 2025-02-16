@@ -239,7 +239,7 @@ module ::Kernel
         status = $coerce_to(status, #{::Integer}, 'to_int')
       }
 
-      Opal.exit(status);
+      Opal.exit(Number(status));
     }
     nil
   end
@@ -419,7 +419,7 @@ module ::Kernel
           }
         }
         if (value.$$is_number) {
-          if (value === Infinity || value === -Infinity || isNaN(value)) {
+          if (value === Infinity || value === -Infinity || isNaN(Number(value))) {
             if (exception) {
               #{::Kernel.raise ::FloatDomainError, value}
             } else {

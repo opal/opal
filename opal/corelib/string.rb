@@ -502,7 +502,7 @@ class ::String < `String`
 
   def *(count)
     %x{
-      count = $coerce_to(count, #{::Integer}, 'to_int');
+      count = Number($coerce_to(count, #{::Integer}, 'to_int'));
 
       if (count < 0) {
         #{::Kernel.raise ::ArgumentError, 'negative argument'}
@@ -1401,7 +1401,7 @@ class ::String < `String`
   end
 
   def ljust(width, padstr = ' ')
-    width  = `$coerce_to(#{width}, #{::Integer}, 'to_int')`
+    width  = `Number($coerce_to(#{width}, #{::Integer}, 'to_int'))`
     padstr = `$coerce_to(#{padstr}, #{::String}, 'to_str')`.to_s
 
     if padstr.empty?

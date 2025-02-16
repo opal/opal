@@ -348,8 +348,8 @@ class ::Array < `Array`
           exclude, from, to, result;
 
       exclude = index.excl;
-      from    = index.begin === nil ? 0 : $coerce_to(index.begin, Opal.Integer, 'to_int');
-      to      = index.end === nil ? -1 : $coerce_to(index.end, Opal.Integer, 'to_int');
+      from    = index.begin === nil ? 0 : Number($coerce_to(index.begin, Opal.Integer, 'to_int'));
+      to      = index.end === nil ? -1 : Number($coerce_to(index.end, Opal.Integer, 'to_int'));
 
       if (from < 0) {
         from += size;
@@ -411,7 +411,7 @@ class ::Array < `Array`
       var size = self.length,
           exclude, from, to, result;
 
-      index = $coerce_to(index, Opal.Integer, 'to_int');
+      index = Number($coerce_to(index, Opal.Integer, 'to_int'));
 
       if (index < 0) {
         index += size;
@@ -429,7 +429,7 @@ class ::Array < `Array`
         return self[index];
       }
       else {
-        length = $coerce_to(length, Opal.Integer, 'to_int');
+        length = Number($coerce_to(length, Opal.Integer, 'to_int'));
 
         if (length < 0 || index > size || index < 0) {
           return nil;
@@ -1199,7 +1199,7 @@ class ::Array < `Array`
         return self.length === 0 ? nil : self[0];
       }
 
-      count = $coerce_to(count, #{::Integer}, 'to_int');
+      count = Number($coerce_to(count, #{::Integer}, 'to_int'));
 
       if (count < 0) {
         #{::Kernel.raise ::ArgumentError, 'negative array size'};
