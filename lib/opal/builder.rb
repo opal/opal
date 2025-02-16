@@ -180,8 +180,10 @@ module Opal
       @postprocessed ||= PostProcessor.call(processed, self)
     end
 
-    attr_accessor :processors, :path_reader, :stubs,
+    attr_accessor :processors, :path_reader, :stubs, :dce,
       :compiler_options, :missing_require_severity, :cache, :scheduler
+
+    alias dce? dce
 
     def esm?
       @compiler_options[:esm]

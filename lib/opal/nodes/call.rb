@@ -125,6 +125,8 @@ module Opal
       def compile_using_send
         helper :send
 
+        push dce_use(meth)
+
         push '$send('
         compile_receiver
         compile_method_name
@@ -142,6 +144,8 @@ module Opal
       #
       def compile_using_refined_send
         helper :refined_send
+
+        push dce_use(meth)
 
         push '$refined_send('
         compile_refinements
@@ -187,6 +191,7 @@ module Opal
 
       def compile_simple_call_chain
         compile_receiver
+        push dce_use(meth)
         push method_jsid, '(', expr(arglist), ')'
       end
 
