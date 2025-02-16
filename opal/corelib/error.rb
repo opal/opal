@@ -158,13 +158,13 @@ class ::Exception < `Error`
     end
 
     bt = backtrace.dup
-    bt = caller if !bt || bt.empty?
+    bt = caller if `bt == null || bt == nil || bt == ''`
     first = bt.shift
 
     msg = "#{first}: "
     msg += "#{bold}#{to_s} (#{bold_underline}#{self.class.name}#{reset}#{bold})#{reset}\n"
 
-    msg += bt.map { |loc| "\tfrom #{loc}\n" }.join
+    msg += `bt.map((loc) => "\tfrom "+loc+"\n").join("")`
 
     msg += cause.full_message(highlight: highlight) if cause
 
@@ -208,7 +208,7 @@ class ::Exception < `Error`
         }
 
         self.backtrace = backtrace;
-        self.stack = #{`backtrace`.map { |i| '  from ' + i }}.join("\n");
+        self.stack = backtrace.map(i => '  from ' + i).join("\n");
       }
 
       return backtrace;
