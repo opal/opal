@@ -88,11 +88,11 @@ module Opal
         # This is needed for runtime. But we could strip some of those
         # and move more into `dce_use` and friends helper calls.
         METHOD_CALL_RE = /
-          \.\$(#{METHOD_NAME_RE})        |
+          \.\$(#{METHOD_NAME_RE})      |
           \['\$(#{METHOD_NAME_RE})'\]  |
           \["\$(#{METHOD_NAME_RE})"\]  |
-          Opal\.(#{OPAL_IDENT_RE})       |
-          $(#{OPAL_IDENT_RE})
+          Opal\.(#{OPAL_IDENT_RE})     |
+          \$(#{OPAL_IDENT_RE})
         /x
 
         def extract_names_from(str)
@@ -144,7 +144,7 @@ module Opal
           end
         end
 
-        CurrentFunction = Struct.new(:name, :handled)
+        CurrentFunction = Struct.new(:name, :handled, :no_nil)
 
         def rebuild_ruby(compiler)
           new_fragments = []
@@ -154,7 +154,9 @@ module Opal
             if frag.is_a? Directive
               case frag.name
               when :dce_def_begin
-                current_function << CurrentFunction.new(frag.params[:name], false)
+                current_function << CurrentFunction.new(
+                  frag.params[:name], false, frag.params[:no_nil]
+                )
               when :dce_def_end
                 current_function.pop
               when :dce_use
@@ -166,7 +168,7 @@ module Opal
             elsif current_function.none?(&:handled)
               func = current_function.last
               new_fragments << Opal::Fragment.new(
-                "nil /* Removed by DCE: #{func.name} */",
+                "#{func.no_nil ? '' : 'nil '}/* Removed by DCE: #{func.name} */",
                 frag.scope,
                 frag.sexp
               )
@@ -178,8 +180,10 @@ module Opal
         end
 
         module NodeSupport
-          def dce_def_begin(name)
-            post_processor_directive(:dce_def_begin, name: name)
+          def dce_def_begin(name, no_nil: false)
+            post_processor_directive(
+              :dce_def_begin, name: name, no_nil: no_nil
+            )
           end
 
           def dce_def_end(name)

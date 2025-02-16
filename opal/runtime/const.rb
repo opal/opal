@@ -4,9 +4,9 @@
 # helpers: prop, raise, Object, has_own
 
 module ::Opal
-  %x{
-    // Walk up the nesting array looking for the constant
-    function const_lookup_nesting(nesting, name) {
+  # Walk up the nesting array looking for the constant
+  def self.const_lookup_nesting(nesting, name)
+    %x{
       var i, ii, constant;
 
       if (nesting.length === 0) return;
@@ -22,20 +22,22 @@ module ::Opal
         }
       }
     }
+  end
 
-    // Walk up Object's ancestors chain looking for the constant,
-    // but only if cref is missing or a module.
-    function const_lookup_Object(cref, name) {
+  # Walk up Object's ancestors chain looking for the constant,
+  # but only if cref is missing or a module.
+  def self.const_lookup_Object(cref, name)
+    %x{
       if (cref == null || cref.$$is_module) {
         return Opal.const_lookup_ancestors($Object, name);
       }
     }
+  end
 
-    // Call const_missing if nothing else worked
-    function const_missing(cref, name) {
-      return (cref || $Object).$const_missing(name);
-    }
-  }
+  # Call const_missing if nothing else worked
+  def self.const_missing(cref, name)
+    `(cref || $Object)`.const_missing(name)
+  end
 
   def self.const_get_name(cref, name)
     %x{
@@ -102,7 +104,7 @@ module ::Opal
       }
 
       result = Opal.const_get_name(cref, name);
-      return result != null || skip_missing ? result : const_missing(cref, name);
+      return result != null || skip_missing ? result : Opal.const_missing(cref, name);
     }
   end
 
@@ -142,7 +144,7 @@ module ::Opal
         result = cached[1];
       }
 
-      return result != null || skip_missing ? result : const_missing(cref, name);
+      return result != null || skip_missing ? result : Opal.const_missing(cref, name);
     }
   end
 
@@ -160,16 +162,16 @@ module ::Opal
 
       if (cached == null || cached[0] !== current_version) {
         ((result = Opal.const_get_name(cref, name))              != null) ||
-        ((result = const_lookup_nesting(nesting, name))     != null) ||
+        ((result = Opal.const_lookup_nesting(nesting, name))     != null) ||
         ((result = Opal.const_lookup_ancestors(cref, name))      != null) ||
-        ((result = const_lookup_Object(cref, name))         != null);
+        ((result = Opal.const_lookup_Object(cref, name))         != null);
 
         cache[name] = [current_version, result];
       } else {
         result = cached[1];
       }
 
-      return result != null || skip_missing ? result : const_missing(cref, name);
+      return result != null || skip_missing ? result : Opal.const_missing(cref, name);
     }
   end
 
@@ -252,11 +254,9 @@ module ::Opal
   # Ancestor utilities
   # ------------------
 
-  %x{
-    function own_ancestors(module) {
-      return module.$$own_prepended_modules.concat([module]).concat(module.$$own_included_modules);
-    }
-  }
+  def self.own_ancestors(mod)
+    `mod.$$own_prepended_modules.concat([mod]).concat(mod.$$own_included_modules)`
+  end
 
   # The Array of ancestors for a given module/class
   def self.ancestors(mod)
@@ -269,7 +269,7 @@ module ::Opal
 
       var result = [], i, mods, length;
 
-      for (i = 0, mods = own_ancestors(mod), length = mods.length; i < length; i++) {
+      for (i = 0, mods = Opal.own_ancestors(mod), length = mods.length; i < length; i++) {
         result.push(mods[i]);
       }
 
