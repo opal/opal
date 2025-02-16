@@ -10,6 +10,7 @@ module Opal
       include Helpers
       include Closure::NodeSupport
       include Builder::PostProcessor::NodeSupport
+      include Builder::PostProcessor::DCE::NodeSupport
 
       def self.handlers
         @handlers ||= {}
