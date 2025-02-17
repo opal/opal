@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Style/CaseEquality
+
 module Opal
   class Builder
     class PostProcessor
@@ -10,16 +12,41 @@ module Opal
 
         def initialize(_, _)
           super
+          # We build two hashes. One is keyed by Symbols,
+          # another is keyed by matchers (eg. regexps).
+          # They have the same purpose, except that the
+          # first one is faster to use.
           @call_tree = Hash.new { |a, b| a[b] = Set.new }
+          @call_tree_matcher = Hash.new { |a, b| a[b] = Set.new }
+
+          # Similarly, at a later step, we build two sets.
+          # The second set contains matchers.
           @needed = nil
+          @needed_matcher = nil
+        end
+
+        def dce_status(message, idx = nil, len = nil)
+          if $stderr.tty?
+            if message == :finished
+              $stderr.print "\r\e[K\r"
+            else
+              if idx && len
+                message = "(#{(100.0 * idx / len).round(1)}%) " + message
+              end
+              $stderr.print "\r\e[K[opal/dce] #{message}"
+            end
+          end
         end
 
         def call
           # Return if DCE is not enabled.
           return processed unless DCE.enabled? builder
 
+          len = processed.length
+
           # First, process what we have generated
-          processed.each do |file|
+          processed.each_with_index do |file, idx|
+            dce_status "Processing #{file.filename}...", idx, len
             if file.respond_to? :compiled
               read_ruby(file.compiled)
             else
@@ -28,14 +55,20 @@ module Opal
           end
 
           # Then, do processing of the data we got
+          dce_status 'Computing...'
           process_data
 
           # Finally, rebuild Ruby files
-          processed.each do |file|
+          processed.each_with_index do |file, idx|
+            dce_status "Rebuilding #{file.filename}...", idx, len
             if file.respond_to? :compiled
               rebuild_ruby(file.compiled)
             end
           end
+
+          dce_status :finished
+
+          processed
         end
 
         OPERATOR_RE = /
@@ -82,7 +115,7 @@ module Opal
                          end
 
         OPAL_IDENT_RE = /
-          [a-zA-Z0-9_]+
+          [a-zA-Z_][a-zA-Z0-9_]*
         /x
 
         # This is needed for runtime. But we could strip some of those
@@ -100,24 +133,58 @@ module Opal
         end
 
         def read_js(str)
-          @call_tree[nil] += extract_names_from(str)
+          append_call_tree(nil, extract_names_from(str))
         end
 
         def read_ruby(compiler)
-          current_function = []
+          function_stack = []
 
           compiler.fragments.each do |frag|
+            current_function = function_stack.last
             if frag.is_a? Directive
               case frag.name
               when :dce_def_begin
-                current_function << frag.params[:name]
+                function_stack << frag.params[:name]
               when :dce_use
-                @call_tree[current_function.last] << frag.params[:name]
+                append_call_tree(current_function, frag.params[:name])
               when :dce_def_end
-                current_function.pop
+                function_stack.pop
               end
+            elsif !ignore_incoming?(frag)
+              append_call_tree(current_function, extract_names_from(frag.code))
             end
-            @call_tree[current_function.last] += extract_names_from(frag.code)
+          end
+        end
+
+        def matcher?(function)
+          case function
+          when nil, Symbol
+            false
+          else
+            true
+          end
+        end
+
+        def append_call_tree(function, names)
+          if matcher? function
+            @call_tree_matcher[function] += Array(names)
+          else
+            @call_tree[function] += Array(names)
+          end
+        end
+
+        # Apply some heuristics to skip regexp matching for certain
+        # parts of the code.
+        def ignore_incoming?(frag)
+          if frag.respond_to?(:sexp) && frag.sexp
+            case frag.sexp.type
+            when :top
+              true
+            else
+              false
+            end
+          else
+            false
           end
         end
 
@@ -125,21 +192,43 @@ module Opal
         # happen in typical code you want to DCE, but if your code
         # needs parser, this is required.
         def add_dynamic_calls
-          @call_tree[nil] +=
-            (1..800).map { |i| :"_reduce_#{i}" } +
-            %i[_reduce_none _racc_do_parse_rb]
+          append_call_tree nil,
+                           [/\A_reduce_\d+\z/, :_reduce_none, :_racc_do_parse_rb]
         end
 
         def process_data
           @needed = Set.new
+          @needed_matcher = Set.new
           add_dynamic_calls
           add_requirement
         end
 
+        # Adds an item to the @needed array so that we know
+        # which functions we need to keep. In addition, we recurse
+        # this function over all requirements of said item.
         def add_requirement(item = nil)
-          return if @needed.include? item
-          @needed << item
+          return if @needed.include?(item) || @needed_matcher.include?(item)
+
+          matched_additional = Set.new
+
+          if matcher? item
+            @needed_matcher << item
+            matched_additional += @call_tree.keys.select { |key| item === key }
+          else
+            @needed << item
+          end
+
           @call_tree[item].each do |i|
+            add_requirement(i)
+          end
+          @call_tree_matcher.each do |matcher, array|
+            if matcher === item
+              array.each do |i|
+                add_requirement(i)
+              end
+            end
+          end
+          matched_additional.each do |i|
             add_requirement(i)
           end
         end
@@ -163,7 +252,7 @@ module Opal
               else
                 new_fragments << frag
               end
-            elsif current_function.all? { |func| @needed.include?(func.name) }
+            elsif keep_function?(current_function)
               new_fragments << frag
             elsif current_function.none?(&:handled)
               func = current_function.last
@@ -177,6 +266,13 @@ module Opal
           end
 
           compiler.fragments = new_fragments
+        end
+
+        def keep_function?(function_stack)
+          function_stack.all? do |func|
+            @needed.include?(func.name) ||
+              @needed_matcher.any? { |matcher| matcher === func.name }
+          end
         end
 
         module NodeSupport
@@ -200,3 +296,5 @@ module Opal
     end
   end
 end
+
+# rubocop:enable Style/CaseEquality
