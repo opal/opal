@@ -5,22 +5,13 @@ export default [
   js.configs.recommended,
   {
     languageOptions: {
-      ecmaVersion: 12,
+      ecmaVersion: 2021,
       sourceType: "commonjs",
       globals: {
           ...globals.browser,
           ...globals.node,
-          ArrayBuffer: "readonly",
-          DataView: "readonly",
-          globalThis: "readonly",
+          ...globals.es2020,
           Opal: "readonly",
-          Promise: "readonly",
-          Proxy: "readonly",
-          Reflect: "readonly",
-          Uint8Array: "readonly",
-          Int32Array: "readonly",
-          WeakRef: "readonly",
-          Map: "readonly",
       },
     },
 
