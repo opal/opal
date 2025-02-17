@@ -14,7 +14,7 @@ class ::Time < `Date`
         long_months  = #{%w[January February March April May June July August September October November December]};
   }
 
-  def self.at(seconds, frac = undefined)
+  def self.at(seconds, frac = undefined, unit = :microsecond)
     %x{
       var result;
 
@@ -39,7 +39,15 @@ class ::Time < `Date`
         frac = #{::Opal.coerce_to!(frac, ::Integer, :to_int)};
       }
 
-      return new Date(seconds * 1000 + (frac / 1000));
+      let value;
+      switch (unit) {
+        case "millisecond": value = seconds * 1000 + frac; break;
+        case "microsecond": value = seconds * 1000 + frac / 1_000; break;
+        case "nanosecond":  value = seconds * 1000 + frac / 1_000_000; break;
+        default:
+          #{::Kernel.raise ::ArgumentError, "unexpected unit: #{unit}"}
+      }
+      return new Date(value);
     }
   end
 
