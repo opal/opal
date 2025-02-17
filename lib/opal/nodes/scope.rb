@@ -136,7 +136,7 @@ module Opal
             helper = ::Regexp.last_match(1).to_sym
           end
           a = []
-          a << dce_def_begin(helper, no_nil: true) if helper
+          a << dce_def_begin(helper, placeholder: '') if helper
           a << f.(t)
           a << f.(', ')
           a << dce_def_end(helper) if helper
