@@ -33,7 +33,7 @@ module Opal
               if idx && len
                 message = "(#{(100.0 * idx / len).round(1)}%) " + message
               end
-              $stderr.print "\r\e[K[opal/dce] #{message}"
+              $stderr.print "\r\e[K[opal/dce] #{message}\r"
             end
           end
         end
@@ -125,7 +125,7 @@ module Opal
           \['\$(#{METHOD_NAME_RE})'\]  |
           \["\$(#{METHOD_NAME_RE})"\]  |
           Opal\.(#{OPAL_IDENT_RE})     |
-          \$(#{OPAL_IDENT_RE})
+          (?<![\w$])\$(#{OPAL_IDENT_RE})
         /x
 
         def extract_names_from(str)
@@ -223,6 +223,7 @@ module Opal
           end
           @call_tree_matcher.each do |matcher, array|
             if matcher === item
+              add_requirement(matcher)
               array.each do |i|
                 add_requirement(i)
               end
@@ -233,7 +234,7 @@ module Opal
           end
         end
 
-        CurrentFunction = Struct.new(:name, :handled, :no_nil)
+        CurrentFunction = Struct.new(:name, :handled, :placeholder)
 
         def rebuild_ruby(compiler)
           new_fragments = []
@@ -244,7 +245,7 @@ module Opal
               case frag.name
               when :dce_def_begin
                 current_function << CurrentFunction.new(
-                  frag.params[:name], false, frag.params[:no_nil]
+                  frag.params[:name], false, frag.params[:placeholder]
                 )
               when :dce_def_end
                 current_function.pop
@@ -257,7 +258,7 @@ module Opal
             elsif current_function.none?(&:handled)
               func = current_function.last
               new_fragments << Opal::Fragment.new(
-                "#{func.no_nil ? '' : 'nil '}/* Removed by DCE: #{func.name} */",
+                "#{func.placeholder}/* Removed by DCE: #{func.name} */",
                 frag.scope,
                 frag.sexp
               )
@@ -269,16 +270,24 @@ module Opal
         end
 
         def keep_function?(function_stack)
-          function_stack.all? do |func|
-            @needed.include?(func.name) ||
-              @needed_matcher.any? { |matcher| matcher === func.name }
-          end
+          function_stack.empty? ||
+            function_stack.any? do |func|
+              if matcher? func.name
+                @needed_matcher.include?(func.name) ||
+                  @needed.any? { |i| func.name === i }
+              else
+                @needed.include?(func.name) ||
+                  @needed_matcher.any? { |matcher| matcher === func.name }
+              end
+            end
         end
 
         module NodeSupport
-          def dce_def_begin(name, no_nil: false)
+          def dce_def_begin(name, placeholder: nil)
+            placeholder ||= 'nil'
+            placeholder += ' ' unless placeholder == ''
             post_processor_directive(
-              :dce_def_begin, name: name, no_nil: no_nil
+              :dce_def_begin, name: name, placeholder: placeholder
             )
           end
 
