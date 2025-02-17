@@ -52,11 +52,11 @@ class ::Random
     def random_number(limit = undefined)
       %x{
         function randomFloat() {
-          return #{random_float};
+          return Number(#{random_float});
         }
 
         function randomInt(max) {
-          return Math.floor(randomFloat() * max);
+          return (randomFloat() * Number(max)).$to_i();
         }
 
         function randomRange() {
@@ -93,8 +93,7 @@ class ::Random
             #{::Kernel.raise ::ArgumentError, "invalid argument - #{limit}"}
           }
 
-          if (limit % 1 === 0) {
-            // integer
+          if (limit.$$is_integer) {
             return randomInt(limit);
           } else {
             return randomFloat() * limit;
