@@ -67,7 +67,6 @@ opal_filter "Kernel" do
   fails "Kernel#eval with refinements activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<EvalSpecs::A:0x4fa98>
   fails "Kernel#extend does not calls append_features on arguments metaclass" # Expected true == false to be truthy but was false
   fails "Kernel#fail accepts an Object with an exception method returning an Exception" # Expected StandardError (...) but got: TypeError (exception class/object expected)
-  fails "Kernel#freeze freezes an object's singleton class" # Expected false == true to be truthy but was false
   fails "Kernel#initialize_copy does nothing if the argument is the same as the receiver" # Expected nil.equal? #<Object:0x3cb42> to be truthy but was false
   fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
@@ -89,7 +88,7 @@ opal_filter "Kernel" do
   fails "Kernel#p flushes output if receiver is a File" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x498ec @rs_f="\n" @rs_b=nil @rs_c=nil>
   fails "Kernel#p is not affected by setting $\\, $/ or $," # NoMethodError: undefined method `tmp' for #<OutputToFDMatcher:0x49902 @to=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true> @expected="Next time, Gadget, NEXT TIME!\n" @to_name="STDOUT">
   fails "Kernel#pp lazily loads the 'pp' library and delegates the call to that library" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x572a>
-  fails "Kernel#print prints $_ when no arguments are given" # Expected:   $stdout: "foo"       got:   $stdout: "" 
+  fails "Kernel#print prints $_ when no arguments are given" # Expected:   $stdout: "foo"       got:   $stdout: ""
   fails "Kernel#public_method changes the method called for super on a target aliased method" # NoMethodError: undefined method `public_method' for #<#<Class:0x5a558>:0x5a556>
   fails "Kernel#public_method raises a NameError if we only repond_to_missing? method, true" # Expected NameError but no exception was raised ("Done public_method(handled_privately)" was returned)
   fails "Kernel#public_method returns a method object for a valid method" # NoMethodError: undefined method `public_method' for #<KernelSpecs::Foo:0x5a56c>
@@ -226,17 +225,17 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false
   fails "Kernel#srand is a private method" # Expected Kernel to have private instance method 'srand' but it does not
   fails "Kernel#srand returns the system-initialized seed value on the first call" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x46d76 @seed=6933182541716747>
-  fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: false/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: false " 
+  fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: false/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: false "
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
-  fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: foo/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: foo " 
-  fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: \n$/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning:  " 
+  fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: foo/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: foo "
+  fails "Kernel#warn :uplevel keyword argument prepends even if a message is empty or nil" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: \n$/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning:  "
   fails "Kernel#warn :uplevel keyword argument raises if :category keyword is not nil and not convertible to symbol" # Expected TypeError but no exception was raised (nil was returned)
   fails "Kernel#warn :uplevel keyword argument shows the caller of #require and not #require itself with RubyGems loaded" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa4104 @before_verbose=nil @before_separator="\n">
   fails "Kernel#warn :uplevel keyword argument shows the caller of #require and not #require itself without RubyGems" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa4104 @before_verbose=nil @before_separator="\n">
   fails "Kernel#warn :uplevel keyword argument skips <internal: core library methods defined in Ruby" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa4104 @before_verbose=nil @before_separator="\n">
   fails "Kernel#warn avoids recursion if Warning#warn is redefined and calls super" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa4104 @before_verbose=nil @before_separator="\n">
   fails "Kernel#warn does not call Warning.warn if self is the Warning module" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa4104 @before_verbose=nil @before_separator="\n">
-  fails "Kernel#warn writes each array element on a line when passes an array" # Expected:   $stderr:  "line 1 line 2 "       got:   $stderr:  "[\"line 1\", \"line 2\"] " 
+  fails "Kernel#warn writes each array element on a line when passes an array" # Expected:   $stderr:  "line 1 line 2 "       got:   $stderr:  "[\"line 1\", \"line 2\"] "
   fails "Kernel.Complex() when passed Numerics n1 and n2 and at least one responds to #real? with false returns n1 + n2 * Complex(0, 1)" # Expected #<Complex>(#pretty_inspect raised #<ArgumentError: comparison of NumericMockObject with 0 failed>) to be identical to #<NumericMockObject:0x4a1ea @name="n4" @null=nil>
   fails "Kernel.Complex() when passed [Complex, Complex] returns a new Complex number based on the two given numbers" # Expected #<Complex>(#pretty_inspect raised #<NoMethodError: undefined method `positive?' for (5+6i)>) == (-3+9i) to be truthy but was false
   fails "Kernel.Complex() when passed [Complex] returns the passed Complex number" # Expected ((1+2i)+0i) == (1+2i) to be truthy but was false
@@ -406,7 +405,7 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf precision string formats determines the maximum number of characters to be copied from the string" # Expected "1" == "[" to be truthy but was false
   fails "Kernel.sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
   fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
-  fails "Kernel.sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false  
+  fails "Kernel.sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false
   fails_badly "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x5b168>
   fails_badly "Kernel#autoload when called from included module's method setups the autoload on the included module"
   fails_badly "Kernel#autoload when called from included module's method the autoload is reachable from the class too"
