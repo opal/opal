@@ -759,7 +759,8 @@ class ::Time < `Date`
       offset = -1 if offset == -8 # Adjust if Jan 01 is a Sunday
     end
 
-    week = ((yday + offset) / 7.00).ceil
+    total = yday + offset
+    week = `Math.ceil(total / 7)`
 
     if week <= 0
       # Get the last week of the previous year
