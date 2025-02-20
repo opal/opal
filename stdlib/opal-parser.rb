@@ -44,7 +44,7 @@ end
     try {
       str = #{::Opal.coerce_to!(`str`, String, :to_str)}
       if (options) options = Opal.hash(options);
-      return Opal.Opal.$compile(str, options);
+      return Opal.$opal_compile(str, options);
     }
     catch (e) {
       if (e.$$class === Opal.Opal.SyntaxError) {
