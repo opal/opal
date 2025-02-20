@@ -10,6 +10,7 @@ module Opal
       children :const_scope, :name
 
       def compile
+        push dce_use(name, type: :const)
         if magical_data_const?
           push('$__END__')
         elsif optimized_access?
@@ -68,11 +69,15 @@ module Opal
       def compile
         helper :const_set
 
+        # Constant definitions like: Separator = SEPARATOR = "/"
+        # can be unwittingly removed.
+        push dce_def_begin(name, type: :const) unless value.type == :casgn
         if base
           push '$const_set(', expr(base), ", '#{name}', ", expr(value), ')'
         else
           push "$const_set(#{scope.nesting}[0], '#{name}', ", expr(value), ')'
         end
+        push dce_def_end(name, type: :const) unless value.type == :casgn
       end
     end
   end

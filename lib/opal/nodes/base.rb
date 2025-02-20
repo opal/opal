@@ -152,6 +152,7 @@ module Opal
       end
 
       def helper(name)
+        push dce_use(name, type: :*)
         @compiler.helper name
       end
 

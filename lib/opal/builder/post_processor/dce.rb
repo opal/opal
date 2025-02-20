@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Style/CaseEquality
+require 'opal/builder/post_processor/dce/call_tree'
 
 module Opal
   class Builder
@@ -12,17 +12,12 @@ module Opal
 
         def initialize(_, _)
           super
-          # We build two hashes. One is keyed by Symbols,
-          # another is keyed by matchers (eg. regexps).
-          # They have the same purpose, except that the
-          # first one is faster to use.
-          @call_tree = Hash.new { |a, b| a[b] = Set.new }
-          @call_tree_matcher = Hash.new { |a, b| a[b] = Set.new }
+          reset
+        end
 
-          # Similarly, at a later step, we build two sets.
-          # The second set contains matchers.
-          @needed = nil
-          @needed_matcher = nil
+        def reset
+          @call_tree = CallTree.new
+          @sct = nil
         end
 
         def dce_status(message, idx = nil, len = nil)
@@ -42,6 +37,10 @@ module Opal
           # Return if DCE is not enabled.
           return processed unless DCE.enabled? builder
 
+          process
+        end
+
+        def process
           len = processed.length
 
           # First, process what we have generated
@@ -71,27 +70,13 @@ module Opal
           processed
         end
 
-        OPERATOR_RE = /
-          # Operator method names:
-          (?:
-            \*\*    |
-            <<      |
-            >>      |
-            <=      |
-            >=      |
-            <=>     |
-            ===     |
-            ==      |
-            !=      |
-            =~      |
-            !~      |
-            \+@     |
-            -@      |
-            \[\]=   |
-            \[\]    |
-            [!+\-*\/%&|\^~<>]
-          )
-        /x
+        OPERATOR_RE = Regexp.union(
+          %i[
+            ** << >> <= >= <=> === == !=
+            =~ !~ +@ -@ []= [] ! + - * /
+            % & | ^ ~ < >
+          ].map(&:to_s)
+        )
 
         # FIXME: Regexp issues with Opal
         METHOD_NAME_RE = if RUBY_ENGINE == 'opal'
@@ -114,62 +99,50 @@ module Opal
                            /x
                          end
 
-        OPAL_IDENT_RE = /
-          [a-zA-Z_][a-zA-Z0-9_]*
-        /x
+        # Identifiers defined on Opal, eg. Opal.def
+        OPAL_IDENT_RE = /[a-zA-Z_][a-zA-Z0-9_]*/
 
         # This is needed for runtime. But we could strip some of those
         # and move more into `dce_use` and friends helper calls.
         METHOD_CALL_RE = /
-          \.\$(#{METHOD_NAME_RE})      |
-          \['\$(#{METHOD_NAME_RE})'\]  |
-          \["\$(#{METHOD_NAME_RE})"\]  |
-          Opal\.(#{OPAL_IDENT_RE})     |
-          (?<![\w$])\$(#{OPAL_IDENT_RE})
+          \.\$(#{METHOD_NAME_RE})                   |
+          \['\$(#{METHOD_NAME_RE})'\]               |
+          \["\$(#{METHOD_NAME_RE})"\]               |
+          (?<!typeof\s)Opal\.(#{OPAL_IDENT_RE})     |
+          (?<![\w$.]|function\s)\$(#{OPAL_IDENT_RE})
         /x
+
+        def dce_directive?(frag)
+          frag.is_a?(Directive) &&
+            %i[dce_def_begin dce_def_end dce_use].include?(frag.name) &&
+            (builder.dce + [:*]).include?(frag.params[:type])
+        end
 
         def extract_names_from(str)
           str.scan(METHOD_CALL_RE).map(&:compact).map(&:first).map(&:to_sym)
         end
 
         def read_js(str)
-          append_call_tree(nil, extract_names_from(str))
+          @call_tree.add_calls(extract_names_from(str))
         end
 
         def read_ruby(compiler)
-          function_stack = []
+          stack = []
 
           compiler.fragments.each do |frag|
-            current_function = function_stack.last
-            if frag.is_a? Directive
+            if dce_directive?(frag)
               case frag.name
               when :dce_def_begin
-                function_stack << frag.params[:name]
+                stack << frag.params[:name]
+                @call_tree.add_definitions(stack)
               when :dce_use
-                append_call_tree(current_function, frag.params[:name])
+                @call_tree.add_calls(frag.params[:name], frag.params[:force] ? [] : stack)
               when :dce_def_end
-                function_stack.pop
+                stack.pop
               end
             elsif !ignore_incoming?(frag)
-              append_call_tree(current_function, extract_names_from(frag.code))
+              @call_tree.add_calls(extract_names_from(frag.code), stack)
             end
-          end
-        end
-
-        def matcher?(function)
-          case function
-          when nil, Symbol
-            false
-          else
-            true
-          end
-        end
-
-        def append_call_tree(function, names)
-          if matcher? function
-            @call_tree_matcher[function] += Array(names)
-          else
-            @call_tree[function] += Array(names)
           end
         end
 
@@ -178,13 +151,13 @@ module Opal
         def ignore_incoming?(frag)
           if frag.respond_to?(:sexp) && frag.sexp
             case frag.sexp.type
-            when :top
-              true
-            else
+            when :xstr, :str, :jscall # :top, :def, :defs
               false
+            else
+              true
             end
           else
-            false
+            true
           end
         end
 
@@ -192,71 +165,45 @@ module Opal
         # happen in typical code you want to DCE, but if your code
         # needs parser, this is required.
         def add_dynamic_calls
-          append_call_tree nil,
-                           [/\A_reduce_\d+\z/, :_reduce_none, :_racc_do_parse_rb]
+          begin
+            [:_reduce_none, :_racc_do_parse_rb, /\A_reduce_\d+\z/, :Symbol, :Number]
+          end.then { |i| @call_tree.add_calls(i) }
         end
 
         def process_data
-          @needed = Set.new
-          @needed_matcher = Set.new
           add_dynamic_calls
-          add_requirement
+          @sct = ShadowedCallTree.new(@call_tree)
+          @sct.process
         end
 
-        # Adds an item to the @needed array so that we know
-        # which functions we need to keep. In addition, we recurse
-        # this function over all requirements of said item.
-        def add_requirement(item = nil)
-          return if @needed.include?(item) || @needed_matcher.include?(item)
+        ScopeIdent = Struct.new(:name, :handled, :placeholder)
 
-          matched_additional = Set.new
-
-          if matcher? item
-            @needed_matcher << item
-            matched_additional += @call_tree.keys.select { |key| item === key }
-          else
-            @needed << item
-          end
-
-          @call_tree[item].each do |i|
-            add_requirement(i)
-          end
-          @call_tree_matcher.each do |matcher, array|
-            if matcher === item
-              add_requirement(matcher)
-              array.each do |i|
-                add_requirement(i)
-              end
-            end
-          end
-          matched_additional.each do |i|
-            add_requirement(i)
-          end
+        def readd_directive(new_fragments, frag, stack)
+          new_fragments << frag if keep_definition?(stack)
         end
-
-        CurrentFunction = Struct.new(:name, :handled, :placeholder)
 
         def rebuild_ruby(compiler)
           new_fragments = []
-          current_function = []
+          stack = []
 
           compiler.fragments.each do |frag|
-            if frag.is_a? Directive
+            if dce_directive?(frag)
               case frag.name
               when :dce_def_begin
-                current_function << CurrentFunction.new(
+                stack << ScopeIdent.new(
                   frag.params[:name], false, frag.params[:placeholder]
                 )
+                readd_directive(new_fragments, frag, stack)
               when :dce_def_end
-                current_function.pop
-              when :dce_use
+                readd_directive(new_fragments, frag, stack)
+                stack.pop
               else
-                new_fragments << frag
+                readd_directive(new_fragments, frag, stack)
               end
-            elsif keep_function?(current_function)
+            elsif keep_definition?(stack)
               new_fragments << frag
-            elsif current_function.none?(&:handled)
-              func = current_function.last
+            elsif stack.none?(&:handled)
+              func = stack.last
               new_fragments << Opal::Fragment.new(
                 "#{func.placeholder}/* Removed by DCE: #{func.name} */",
                 frag.scope,
@@ -269,34 +216,30 @@ module Opal
           compiler.fragments = new_fragments
         end
 
-        def keep_function?(function_stack)
-          function_stack.empty? ||
-            function_stack.any? do |func|
-              if matcher? func.name
-                @needed_matcher.include?(func.name) ||
-                  @needed.any? { |i| func.name === i }
-              else
-                @needed.include?(func.name) ||
-                  @needed_matcher.any? { |matcher| matcher === func.name }
+        def keep_definition?(stack)
+          stack.empty? ||
+            stack.all? do |idents|
+              Array(idents.name).any? do |ident|
+                @sct.keep_definition?(ident)
               end
             end
         end
 
         module NodeSupport
-          def dce_def_begin(name, placeholder: nil)
+          def dce_def_begin(name, placeholder: nil, type: :method)
             placeholder ||= 'nil'
             placeholder += ' ' unless placeholder == ''
             post_processor_directive(
-              :dce_def_begin, name: name, placeholder: placeholder
+              :dce_def_begin, name: name, placeholder: placeholder, type: type
             )
           end
 
-          def dce_def_end(name)
-            post_processor_directive(:dce_def_end, name: name)
+          def dce_def_end(name, type: :method)
+            post_processor_directive(:dce_def_end, name: name, type: type)
           end
 
-          def dce_use(name)
-            post_processor_directive(:dce_use, name: name)
+          def dce_use(name, type: :method, force: false)
+            post_processor_directive(:dce_use, name: name, type: type, force: force)
           end
         end
       end
@@ -305,5 +248,3 @@ module Opal
     end
   end
 end
-
-# rubocop:enable Style/CaseEquality
