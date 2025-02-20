@@ -41,10 +41,21 @@ module Opal
           unshift "#{await_begin}(#{async}function($base, $super#{', $parent_nesting' if @define_nesting}) {"
           line '})(', base, ', ', super_code, "#{', ' + scope.nesting if @define_nesting})#{await_end}"
         end
+
+        forbid_dce_if_bridged
+        mark_dce(name)
       end
 
       def super_code
         sup ? expr(sup) : 'null'
+      end
+
+      def bridged?
+        sup&.type == :xstr
+      end
+
+      def forbid_dce_if_bridged
+        push dce_use(name, type: :*, force: true) if bridged?
       end
     end
   end
