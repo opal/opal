@@ -10,9 +10,11 @@ module Opal
       children :value
 
       def compile
+        helper :udef
+
         children.each do |child|
           push dce_def_begin(child.children.first) if child.type == :sym
-          line "Opal.udef(#{scope.self}, '$' + ", expr(child), ');'
+          line "$udef(#{scope.self}, '$' + ", expr(child), ');'
           push dce_def_end(child.children.first) if child.type == :sym
         end
       end
