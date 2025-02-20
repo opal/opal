@@ -307,7 +307,7 @@ class ::Hash < `Map`
       if (proc !== nil) {
         proc = #{::Opal.coerce_to!(`proc`, ::Proc, :to_proc)};
 
-        if (#{`proc`.lambda?} && #{`proc`.arity.abs} !== 2) {
+        if (#{`proc`.lambda?} && Math.abs(#{`proc`.arity}) !== 2) {
           #{::Kernel.raise ::TypeError, 'default_proc takes two arguments'};
         }
       }
