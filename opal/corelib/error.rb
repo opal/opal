@@ -122,7 +122,7 @@ class ::Exception < `Error`
 
       var cloned = #{clone};
       cloned.message = str;
-      if (self.backtrace) cloned.backtrace = self.backtrace.$dup();
+      if (self.backtrace) cloned.backtrace = Array.from(self.backtrace);
       cloned.stack = self.stack;
       cloned.cause = self.cause;
       return cloned;
@@ -142,12 +142,19 @@ class ::Exception < `Error`
       return "#{@message}\n#{`self.stack`}"
     end
 
-    kwargs = { highlight: $stderr&.tty?, order: :top }.merge(kwargs || {})
+    kwargs ||= {}
+    kwargs[:highlight] = $stderr&.tty? unless kwargs.include?(:highlight)
+    kwargs[:order] = :top unless kwargs.include?(:order)
     highlight, order = kwargs[:highlight], kwargs[:order]
     highlight = false if highlight.nil?
 
-    ::Kernel.raise ::ArgumentError, "expected true or false as highlight: #{highlight}" unless [true, false].include? highlight
-    ::Kernel.raise ::ArgumentError, "expected :top or :bottom as order: #{order}" unless %i[top bottom].include? order
+    unless `highlight === true || highlight === false`
+      ::Kernel.raise ::ArgumentError, "expected true or false as highlight: #{highlight}"
+    end
+
+    unless `order == "top" || order == "bottom"`
+      ::Kernel.raise ::ArgumentError, "expected :top or :bottom as order: #{order}"
+    end
 
     if highlight
       bold_underline = "\e[1;4m"
@@ -157,7 +164,7 @@ class ::Exception < `Error`
       bold_underline = bold = reset = ''
     end
 
-    bt = backtrace.dup
+    bt = `Array.from(#{backtrace})`
     bt = caller if `bt == null || bt == nil || bt == ''`
     first = bt.shift
 
