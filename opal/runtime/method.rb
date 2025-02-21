@@ -116,8 +116,8 @@ module ::Opal
   # Since JavaScript has no concept of modules, we create proxy classes
   # called `iclasses` that store copies of methods loaded. We need to
   # update them if we remove a method.
-  %x{
-    function remove_method_from_iclasses(obj, jsid) {
+  def self.remove_method_from_iclasses(obj, jsid)
+    %x{
       if (obj.$$is_module) {
         for (var i = 0, iclasses = obj.$$iclasses, length = iclasses.length; i < length; i++) {
           var iclass = iclasses[i];
@@ -125,7 +125,7 @@ module ::Opal
         }
       }
     }
-  }
+  end
 
   # Called from #remove_method.
   def self.rdef(obj, jsid)
@@ -136,7 +136,7 @@ module ::Opal
 
       delete obj.$$prototype[jsid];
 
-      remove_method_from_iclasses(obj, jsid);
+      Opal.remove_method_from_iclasses(obj, jsid);
 
       if (obj.$$is_singleton) {
         if (obj.$$prototype.$singleton_method_removed && !obj.$$prototype.$singleton_method_removed.$$stub) {
@@ -160,7 +160,7 @@ module ::Opal
 
       Opal.add_stub_for(obj.$$prototype, jsid);
 
-      remove_method_from_iclasses(obj, jsid);
+      Opal.remove_method_from_iclasses(obj, jsid);
 
       if (obj.$$is_singleton) {
         if (obj.$$prototype.$singleton_method_undefined && !obj.$$prototype.$singleton_method_undefined.$$stub) {
@@ -175,14 +175,12 @@ module ::Opal
     }
   end
 
-  %x{
-    function is_method_body(body) {
-      return (typeof(body) === "function" && !body.$$stub);
-    }
-  }
-
   def self.alias(obj, name, old)
     %x{
+      function is_method_body(body) {
+            return (typeof(body) === "function" && !body.$$stub);
+      }
+
       var id     = $jsid(name),
           old_id = $jsid(old),
           body,

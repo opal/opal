@@ -13,6 +13,8 @@ module Opal
     # @return [String]
     attr_reader :code
 
+    attr_reader :scope, :sexp
+
     # Create fragment with javascript code and optional original [Opal::Sexp].
     #
     # @param code [String] javascript code

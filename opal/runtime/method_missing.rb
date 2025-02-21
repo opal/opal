@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: BasicObject, jsid, prop, prepend
+# helpers: BasicObject, jsid, prop, prepend_ary
 
 module ::Opal
   # Method Missing
@@ -75,7 +75,7 @@ module ::Opal
         method_missing_stub.$$p = null;
 
         // call method missing with correct args (remove '$' prefix on method name)
-        return this.$method_missing.apply(this, $prepend(method_name.slice(1), arguments));
+        return this.$method_missing.apply(this, $prepend_ary(method_name.slice(1), arguments));
       };
 
       method_missing_stub.$$stub = true;

@@ -48,6 +48,7 @@ module Opal
       @rbrequires  = options.delete(:rbrequires) { [] }
       @no_cache    = options.delete(:no_cache)   { false }
       @stdin       = options.delete(:stdin)      { $stdin }
+      @dce         = options.delete(:dce)        { false }
       @exe_type    = options.delete(:exe_type)
 
       @debug_source_map = options.delete(:debug_source_map) { false }
@@ -67,6 +68,8 @@ module Opal
       @directory = @compiler_options[:directory]
       @runner_options[:directory] = @directory
       @output = File.open(@output, 'w') if @output.is_a?(String) && !@directory
+
+      @compiler_options[:cache_fragments] = true if @dce
 
       if @lib_only
         raise ArgumentError, 'no libraries to compile' if @requires.empty?
@@ -133,6 +136,7 @@ module Opal
         stubs: stubs,
         compiler_options: compiler_options,
         missing_require_severity: missing_require_severity,
+        dce: @dce,
       )
 
       # --no-cache

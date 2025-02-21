@@ -198,7 +198,10 @@ module Opal
       children :klasses_sexp, :lvar, :body
 
       def compile
-        push 'if (Opal.rescue($err, ', expr(klasses), ')) {'
+        helper :rescue
+        helper :pop_exception
+
+        push 'if ($rescue($err, ', expr(klasses), ')) {'
         indent do
           if lvar
             push expr(lvar.updated(nil, [*lvar.children, s(:js_tmp, '$err')]))
@@ -211,7 +214,7 @@ module Opal
               line stmt(rescue_body)
             end
           end
-          line '} finally { Opal.pop_exception($err); }'
+          line '} finally { $pop_exception($err); }'
         end
         line '}'
       end

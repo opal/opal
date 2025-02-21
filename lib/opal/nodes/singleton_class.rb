@@ -22,7 +22,8 @@ module Opal
           line body_stmt
         end
 
-        line '})(Opal.get_singleton_class(', recv(object), "), #{scope.nesting})"
+        helper :get_singleton_class
+        line '})($get_singleton_class(', recv(object), "), #{scope.nesting})"
       end
     end
   end

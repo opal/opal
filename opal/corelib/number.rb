@@ -625,7 +625,7 @@ class ::Number < ::Numeric
         return self
       end
 
-      ndigits = -ndigits
+      ndigits = `-ndigits`
 
       %x{
         if (0.415241 * ndigits - 0.125 > #{size}) {
@@ -662,7 +662,7 @@ class ::Number < ::Numeric
         return self
       end
 
-      if ndigits < -(exp > 0 ? exp / 3 + 1 : exp / 4)
+      if ndigits < 0 - (exp > 0 ? exp / 3 + 1 : exp / 4)
         return 0
       end
 

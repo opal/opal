@@ -25,8 +25,8 @@ module ::Opal
     }
   end
 
-  %x{
-    function find_existing_module(scope, name) {
+  def self.find_existing_module(scope, name)
+    %x{
       var module = $const_get_name(scope, name);
       if (module == null && scope === $Object)
         module = $const_lookup_ancestors($Object, name);
@@ -39,7 +39,7 @@ module ::Opal
 
       return module;
     }
-  }
+  end
 
   def self.module(scope, name)
     %x{
@@ -53,7 +53,7 @@ module ::Opal
         scope = scope.$$class;
       }
 
-      module = find_existing_module(scope, name);
+      module = Opal.find_existing_module(scope, name);
 
       if (module == null) {
         // Module doesnt exist, create a new one...
@@ -70,17 +70,17 @@ module ::Opal
   # Include & Prepend
   # -----------------
 
-  %x{
-    function isRoot(proto) {
-      return proto.hasOwnProperty('$$iclass') && proto.hasOwnProperty('$$root');
-    }
+  def self.is_root(proto)
+    `proto.hasOwnProperty('$$iclass') && proto.hasOwnProperty('$$root')`
+  end
 
-    function own_included_modules(module) {
-      var result = [], mod, proto;
-      if ($has_own(module.$$prototype, '$$dummy')) {
-        proto = Object.getPrototypeOf(module.$$prototype.$$define_methods_on);
+  def self.own_included_modules(mod)
+    %x{
+      var result = [], module, proto;
+      if ($has_own(mod.$$prototype, '$$dummy')) {
+        proto = Object.getPrototypeOf(mod.$$prototype.$$define_methods_on);
       } else {
-        proto = Object.getPrototypeOf(module.$$prototype);
+        proto = Object.getPrototypeOf(mod.$$prototype);
       }
 
       while (proto) {
@@ -88,28 +88,30 @@ module ::Opal
           // superclass
           break;
         }
-        mod = protoToModule(proto);
-        if (mod) {
-          result.push(mod);
+        module = Opal.proto_to_module(proto);
+        if (module) {
+          result.push(module);
         }
         proto = Object.getPrototypeOf(proto);
       }
 
       return result;
     }
+  end
 
-    function own_prepended_modules(module) {
-      var result = [], mod, proto = Object.getPrototypeOf(module.$$prototype);
+  def self.own_prepended_modules(mod)
+    %x{
+      var result = [], module, proto = Object.getPrototypeOf(mod.$$prototype);
 
-      if (module.$$prototype.hasOwnProperty('$$dummy')) {
+      if (mod.$$prototype.hasOwnProperty('$$dummy')) {
         while (proto) {
-          if (proto === module.$$prototype.$$define_methods_on) {
+          if (proto === mod.$$prototype.$$define_methods_on) {
             break;
           }
 
-          mod = protoToModule(proto);
-          if (mod) {
-            result.push(mod);
+          module = Opal.proto_to_module(proto);
+          if (module) {
+            result.push(module);
           }
 
           proto = Object.getPrototypeOf(proto);
@@ -118,7 +120,7 @@ module ::Opal
 
       return result;
     }
-  }
+  end
 
   # The actual inclusion of a module into a class.
   #
@@ -149,12 +151,12 @@ module ::Opal
       }
 
       for (var i = 0, length = module_ancestors.length; i < length; i++) {
-        var ancestor = module_ancestors[i], iclass = create_iclass(ancestor);
+        var ancestor = module_ancestors[i], iclass = Opal.create_iclass(ancestor);
         $prop(iclass, '$$included', true);
         iclasses.push(iclass);
       }
       var includer_ancestors = $ancestors(includer),
-          chain = chain_iclasses(iclasses),
+          chain = Opal.chain_iclasses(iclasses),
           start_chain_after,
           end_chain_on;
 
@@ -197,7 +199,7 @@ module ::Opal
         var parent = includer.$$prototype, module_iclass = Object.getPrototypeOf(parent);
 
         while (module_iclass != null) {
-          if (module_iclass.$$module === mod && isRoot(module_iclass)) {
+          if (module_iclass.$$module === mod && Opal.is_root(module_iclass)) {
             break;
           }
 
@@ -210,7 +212,7 @@ module ::Opal
           var next_ancestor = Object.getPrototypeOf(module_iclass);
 
           // skip non-root iclasses (that were recursively included)
-          while (next_ancestor.hasOwnProperty('$$iclass') && !isRoot(next_ancestor)) {
+          while (next_ancestor.hasOwnProperty('$$iclass') && !Opal.is_root(next_ancestor)) {
             next_ancestor = Object.getPrototypeOf(next_ancestor);
           }
 
@@ -228,7 +230,7 @@ module ::Opal
       $set_proto(chain.last, end_chain_on);
 
       // recalculate own_included_modules cache
-      includer.$$own_included_modules = own_included_modules(includer);
+      includer.$$own_included_modules = Opal.own_included_modules(includer);
 
       Opal.const_cache_version++;
     }
@@ -236,6 +238,18 @@ module ::Opal
 
   def self.prepend_features(mod, prepender)
     %x{
+      function flush_methods_in(mod) {
+        var proto = mod.$$prototype,
+            props = Object.getOwnPropertyNames(proto);
+
+        for (var i = 0; i < props.length; i++) {
+          var prop = props[i];
+          if (Opal.is_method(prop)) {
+            delete proto[prop];
+          }
+        }
+      }
+
       // Here we change the ancestors chain from
       //
       //   prepender
@@ -259,12 +273,12 @@ module ::Opal
       }
 
       for (var i = 0, length = module_ancestors.length; i < length; i++) {
-        var ancestor = module_ancestors[i], iclass = create_iclass(ancestor);
+        var ancestor = module_ancestors[i], iclass = Opal.create_iclass(ancestor);
         $prop(iclass, '$$prepended', true);
         iclasses.push(iclass);
       }
 
-      var chain = chain_iclasses(iclasses),
+      var chain = Opal.chain_iclasses(iclasses),
           dummy_prepender = prepender.$$prototype,
           previous_parent = Object.getPrototypeOf(dummy_prepender),
           prepender_iclass,
@@ -277,7 +291,7 @@ module ::Opal
         prepender_iclass = dummy_prepender.$$define_methods_on;
       } else {
         // Making the module "dummy"
-        prepender_iclass = create_dummy_iclass(prepender);
+        prepender_iclass = Opal.create_dummy_iclass(prepender);
         flush_methods_in(prepender);
         $prop(dummy_prepender, '$$dummy', true);
         $prop(dummy_prepender, '$$define_methods_on', prepender_iclass);
@@ -318,7 +332,7 @@ module ::Opal
       $set_proto(chain.last, end_chain_on);
 
       // recalculate own_prepended_modules cache
-      prepender.$$own_prepended_modules = own_prepended_modules(prepender);
+      prepender.$$own_prepended_modules = Opal.own_prepended_modules(prepender);
 
       Opal.const_cache_version++;
     }
@@ -327,33 +341,23 @@ module ::Opal
   # iclasses are JavaScript classes that are injected into
   # the prototype chain, carrying all module methods.
 
-  %x{
-    function flush_methods_in(module) {
-      var proto = module.$$prototype,
-          props = Object.getOwnPropertyNames(proto);
+  def self.create_iclass(mod)
+    %x{
+      var iclass = Opal.create_dummy_iclass(mod);
 
-      for (var i = 0; i < props.length; i++) {
-        var prop = props[i];
-        if (Opal.is_method(prop)) {
-          delete proto[prop];
-        }
-      }
-    }
-
-    function create_iclass(module) {
-      var iclass = create_dummy_iclass(module);
-
-      if (module.$$is_module) {
-        module.$$iclasses.push(iclass);
+      if (mod.$$is_module) {
+        mod.$$iclasses.push(iclass);
       }
 
       return iclass;
     }
+  end
 
-    // Dummy iclass doesn't receive updates when the module gets a new method.
-    function create_dummy_iclass(module) {
+  # Dummy iclass doesn't receive updates when the module gets a new method.
+  def self.create_dummy_iclass(mod)
+    %x{
       var iclass = {},
-          proto = module.$$prototype;
+          proto = mod.$$prototype;
 
       if (proto.hasOwnProperty('$$dummy')) {
         proto = proto.$$define_methods_on;
@@ -368,12 +372,14 @@ module ::Opal
       }
 
       $prop(iclass, '$$iclass', true);
-      $prop(iclass, '$$module', module);
+      $prop(iclass, '$$module', mod);
 
       return iclass;
     }
+  end
 
-    function chain_iclasses(iclasses) {
+  def self.chain_iclasses(iclasses)
+    %x{
       var length = iclasses.length, first = iclasses[0];
 
       $prop(first, '$$root', true);
@@ -392,10 +398,10 @@ module ::Opal
 
       return { first: iclasses[0], last: iclasses[length - 1] };
     }
-  }
+  end
 
-  %x{
-    function protoToModule(proto) {
+  def self.proto_to_module(proto)
+    %x{
       if (proto.hasOwnProperty('$$dummy')) {
         return;
       } else if (proto.hasOwnProperty('$$iclass')) {
@@ -404,14 +410,14 @@ module ::Opal
         return proto.$$class;
       }
     }
-  }
+  end
 
   def self.included_modules(main_module)
     %x{
       var result = [], mod = null, proto = Object.getPrototypeOf(main_module.$$prototype);
 
       for (; proto && Object.getPrototypeOf(proto); proto = Object.getPrototypeOf(proto)) {
-        mod = protoToModule(proto);
+        mod = Opal.proto_to_module(proto);
         if (mod && mod.$$is_module && proto.$$iclass && proto.$$included) {
           result.push(mod);
         }

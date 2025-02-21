@@ -116,19 +116,19 @@ module ::Opal
     }
   end
 
-  %x{
-    function $hash_delete_stage2(hash, key) {
+  def self.hash_delete_stage2(hash, key)
+    %x{
       var value = hash.get(key);
       hash.delete(key);
       return value;
     }
-  }
+  end
 
   def self.hash_delete(hash, key)
     %x{
       var type = typeof key
       if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
-        return $hash_delete_stage2(hash, key);
+        return Opal.hash_delete_stage2(hash, key);
       } else if (hash.$$keys) {
         var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash()),
             objects = hash.$$keys.get(key_hash),
@@ -141,14 +141,14 @@ module ::Opal
               objects.splice(i, 1);
               if (objects.length === 0)
                 hash.$$keys.delete(key_hash);
-              return $hash_delete_stage2(hash, object);
+              return Opal.hash_delete_stage2(hash, object);
             }
           }
         } else if (key.$$is_string) {
-          return $hash_delete_stage2(hash, key_hash);
+          return Opal.hash_delete_stage2(hash, key_hash);
         }
       } else if (key.$$is_string) {
-        return $hash_delete_stage2(hash, key.valueOf());
+        return Opal.hash_delete_stage2(hash, key.valueOf());
       }
     }
   end
