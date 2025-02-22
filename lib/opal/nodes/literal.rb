@@ -264,14 +264,18 @@ module Opal
         if children.empty?
           push '""'
         else
+          helper :dstr
           helper :to_s
+          last_index = children.size - 1
 
+          push '$dstr('
           children.each_with_index do |part, index|
-            push ' + ' unless index == 0
             push '$to_s(' unless part.type == :str
             push expr(part)
             push ')' unless part.type == :str
+            push ',' unless index == last_index
           end
+          push ')'
           wrap '(', ')' if recv?
         end
       end
