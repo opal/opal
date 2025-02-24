@@ -73,7 +73,7 @@ class ::Numeric
   end
 
   def div(other)
-    ::Kernel.raise ::ZeroDivisionError, 'divided by o' if other == 0
+    ::Kernel.raise ::ZeroDivisionError, 'divided by 0' if other == 0
 
     (self / other).floor
   end

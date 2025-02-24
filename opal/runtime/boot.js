@@ -102,10 +102,9 @@
 
   // Retrieve or assign the id of an object
   Opal.id = function(obj) {
-    if (obj.$$is_number) return (obj * 2)+1;
-    if (obj.$$id == null) {
-      $prop(obj, '$$id', $uid());
-    }
+    if (obj.$$is_integer) return (obj * 2n)+1n;
+    if (obj.$$is_float) return (obj * 2)+1;
+    if (obj.$$id == null) $prop(obj, '$$id', $uid())
     return obj.$$id;
   };
 
