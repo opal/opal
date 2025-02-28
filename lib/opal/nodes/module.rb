@@ -48,6 +48,8 @@ module Opal
           unshift "#{await_begin}(#{async}function($base#{', $parent_nesting' if @define_nesting}) {"
           line '})(', base, "#{', ' + scope.nesting if @define_nesting})#{await_end}"
         end
+
+        mark_dce(name)
       end
 
       private
@@ -72,6 +74,11 @@ module Opal
 
         line scope.to_vars
         line body_code
+      end
+
+      def mark_dce(name)
+        unshift dce_def_begin(name, type: :const)
+        push dce_def_end(name, type: :const)
       end
     end
   end

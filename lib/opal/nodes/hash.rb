@@ -101,7 +101,8 @@ module Opal
       children :value
 
       def compile
-        push 'Opal.to_hash(', expr(value), ')'
+        helper :to_hash
+        push '$to_hash(', expr(value), ')'
       end
     end
   end

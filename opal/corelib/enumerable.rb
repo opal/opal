@@ -1270,7 +1270,7 @@ module ::Enumerable
     }
   end
 
-  def to_set(klass = Set, *args, &block)
+  def to_set(klass = ::Set, *args, &block)
     klass.new(self, *args, &block)
   end
 

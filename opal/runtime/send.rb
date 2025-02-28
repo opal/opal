@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: apply_blockopts, jsid, raise, prepend, get_ancestors
+# helpers: apply_blockopts, jsid, raise, prepend_ary, get_ancestors
 
 module ::Opal
   # Calls passed method on a ruby object with arguments and block:
@@ -50,7 +50,7 @@ module ::Opal
     %x{
       if (body == null && method != null && recv.$method_missing) {
         body = recv.$method_missing;
-        args = $prepend(method, args);
+        args = $prepend_ary(method, args);
       }
 
       $apply_blockopts(block, blockopts);

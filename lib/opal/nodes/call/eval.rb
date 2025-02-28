@@ -14,11 +14,13 @@ module Opal
 
         next compile_default.call if arglist.children.length != 1 || ![s(:self), nil].include?(recvr)
 
+        helper :compile
+
         scope.nesting
         temp = scope.new_temp
         scope_variables = scope.scope_locals.map(&:to_s).inspect
         push "(#{temp} = ", expr(arglist)
-        push ", typeof Opal.compile === 'function' ? eval(Opal.compile(#{temp}"
+        push ", typeof Opal.compile === 'function' ? eval($compile(#{temp}"
         push ', {scope_variables: ', scope_variables
         push ", arity_check: #{compiler.arity_check?}, file: '(eval)', eval: true})) : "
         push "#{scope.self}.$eval(#{temp}))"

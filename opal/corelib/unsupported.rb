@@ -10,7 +10,7 @@ class ::String
     scrub! setbyte slice! squeeze! strip! sub! succ! swapcase! tr! tr_s! unicode_normalize! upcase!
   ].each do |method_name|
     define_method method_name do |*|
-      ::Kernel.raise ::NotImplementedError, `ERROR` % method_name
+      ::Kernel.raise ::NotImplementedError, `ERROR.replace("%s", method_name)`
     end
   end
 end
