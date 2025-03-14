@@ -17,6 +17,7 @@ module Opal
   # A map of some Ruby regexp patterns to their JS representations
   self::REGEXP_EQUIVALENTS = {
     '\h' => '[\dA-Fa-f]',
+    '\H' => '[^\dA-Fa-f]',
     '\e' => '\x1b',
 
     # Invalid cases in JS Unicode mode
