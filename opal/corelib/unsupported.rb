@@ -37,6 +37,10 @@ class ::Module
   def private_constant(*)
   end
 
+  def deprecate_constant(*)
+    self
+  end
+
   alias nesting public
   alias private public
   alias protected public
