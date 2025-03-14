@@ -5,6 +5,7 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
   include RewritersHelper
 
   let(:opal_str_sexp) { s(:str, 'opal') }
+  let(:jruby_str_sexp) { s(:str, 'jruby') }
   let(:true_branch) { s(:int, 1) }
   let(:false_branch) { s(:int, 2) }
 
@@ -27,14 +28,16 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
           end
         end
 
-        context "when rhs != 'opal'" do
+        context "when rhs == 'jruby'" do
           let(:check) do
-            s(:send, ruby_const_sexp, :==, s(:nil))
+            s(:send, ruby_const_sexp, :==, jruby_str_sexp)
           end
 
-          it 'does not modify sexp' do
-            expect_no_rewriting_for(
+          it 'replaces the expression with the false branch' do
+            expect_rewritten(
               s(:if, check, true_branch, false_branch)
+            ).to eq(
+              false_branch
             )
           end
         end
@@ -55,14 +58,16 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
           end
         end
 
-        context "when rhs != 'opal'" do
+        context "when rhs == 'jruby'" do
           let(:check) do
-            s(:send, ruby_const_sexp, :!=, s(:nil))
+            s(:send, ruby_const_sexp, :!=, jruby_str_sexp)
           end
 
-          it 'does not modify sexp' do
-            expect_no_rewriting_for(
+          it 'replaces the expression with the true branch' do
+            expect_rewritten(
               s(:if, check, true_branch, false_branch)
+            ).to eq(
+              true_branch
             )
           end
         end
