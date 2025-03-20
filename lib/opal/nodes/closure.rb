@@ -211,30 +211,27 @@ module Opal
 
           helper :thrower
 
-          catchers_without_eval_return = catchers.grep_v(:eval_return)
+          eval_return = catchers.include?(:eval_return)
+          catchers = catchers.grep_v(:eval_return)
 
           push "} catch($e) {"
           indent do
+            line "if ($e === Opal.t_eval_return) return $e.$v;" if eval_return
             catchers.each do |type|
-              case type
-              when :eval_return
-                line "if ($e === Opal.t_eval_return) return $e.$v;"
-              else
-                line "if ($e === $t_#{type}) return $e.$v;"
-              end
+              line "if ($e === $t_#{type}) return $e.$v;"
             end
             line "throw $e;"
           end
           line "}"
 
-          unless catchers_without_eval_return.empty?
-            push " finally {", *catchers_without_eval_return.map { |type| "$t_#{type}.is_orphan = true;" }, "}"
+          unless catchers.empty?
+            push " finally {", *catchers.map { |type| "$t_#{type}.is_orphan = true;" }, "}"
           end
 
           unshift "return " if closure_is? SEND
 
-          unless catchers_without_eval_return.empty?
-            unshift "var ", catchers_without_eval_return.map { |type| "$t_#{type} = $thrower('#{type}')" }.join(", "), "; "
+          unless catchers.empty?
+            unshift "var ", catchers.map { |type| "$t_#{type} = $thrower('#{type}')" }.join(", "), "; "
           end
           unshift "try { "
 
