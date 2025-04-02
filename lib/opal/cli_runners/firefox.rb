@@ -84,7 +84,7 @@ module Opal
             <meta charset='utf-8'>
             <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
             <script>
-            window.opalheadlessfirefox = true;
+            window.OPAL_EXIT_CODE = "noexit"
             </script>
           </head><body>
             <script src='/index.#{ext}'#{module_type}></script>

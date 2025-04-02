@@ -4,18 +4,22 @@ module ::Process
       @status, @pid = status, pid
     end
 
+    attr_reader :pid
+
     def exitstatus
       @status
     end
 
-    attr_reader :pid
+    def inspect
+      "#<Process::Status: pid #{@pid} exit #{@status}>"
+    end
+
+    def signaled?
+      @signaled
+    end
 
     def success?
       @status == 0
-    end
-
-    def inspect
-      "#<Process::Status: pid #{@pid} exit #{@status}>"
     end
   end
 end

@@ -1,6 +1,7 @@
-# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid, each_ivar, slice
+# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid, each_ivar, slice, platform
 # use_strict: true
 # backtick_javascript: true
+require 'corelib/process/status'
 
 module ::Kernel
   def =~(obj)
@@ -97,6 +98,10 @@ module ::Kernel
 
       return [object];
     }
+  end
+
+  def __dir__
+    File.realpath(File.dirname(__FILE__))
   end
 
   def at_exit(&block)
@@ -239,7 +244,7 @@ module ::Kernel
         status = $coerce_to(status, #{::Integer}, 'to_int')
       }
 
-      Opal.exit(status);
+      $platform.exit(status);
     }
     nil
   end
@@ -268,6 +273,27 @@ module ::Kernel
     }
 
     self
+  end
+
+  def fork
+    `var worker`
+    if block_given?
+      %x{
+        if ($platform.proc_is_primary()) {
+          worker = $platform.proc_fork();
+          return $platform.proc_worker_pid(worker);
+        } else if ($platform.proc_is_worker()) {
+          #{yield}
+        }
+      }
+    else
+      %x{
+        if ($platform.proc_is_primary()) {
+          worker = $platform.proc_fork();
+          return $platform.proc_worker_pid(worker);
+        }
+      }
+    end
   end
 
   def freeze
@@ -817,6 +843,36 @@ module ::Kernel
 
   def srand(seed = Random.new_seed)
     ::Random.srand(seed)
+  end
+
+  def system(*argv, exception: false)
+    env = {}
+    env = argv.shift if argv.first.is_a? Hash
+    env = ENV.merge(env)
+    cmdname = argv.shift
+
+    js_env = `{}`
+    env.each { |k,v| `js_env[k] = v` }
+
+    out = if argv.empty?
+            `$platform.proc_spawn(#{cmdname}, { shell: true, stdio: 'inherit', env: js_env })`
+          elsif Array === cmdname
+            `$platform.proc_spawn(#{cmdname[0]}, #{argv}, { argv0: #{cmdname[1]}, stdio: 'inherit', env: js_env })`
+          else
+            `$platform.proc_spawn(#{cmdname}, #{argv}, { stdio: 'inherit', env: js_env })`
+          end
+
+    status = out.JS[:status]
+    status = 127 if `status === null`
+    pid = out.JS[:pid]
+
+    $? = Process::Status.new(status, pid)
+    raise "Command failed with exit #{status}: #{cmdname}" if exception && status != 0
+    status == 0
+  end
+
+  def `(cmdline)
+    `$platform.proc_exec(#{cmdline}).toString('utf-8')`
   end
 
   def String(str)

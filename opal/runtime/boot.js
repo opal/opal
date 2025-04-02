@@ -1,4 +1,4 @@
-(function(global_object) {
+(function() {
   "use strict";
 
   // @note
@@ -15,9 +15,8 @@
   //   The way the code is digested before going through Yardoc is a secret kept
   //   in the docs repo (https://github.com/opal/docs/tree/master).
 
-  var console;
-
   // Detect the global object
+  let global_object;
   if (typeof(globalThis) !== 'undefined') { global_object = globalThis; }
   else if (typeof(global) !== 'undefined') { global_object = global; }
   else if (typeof(window) !== 'undefined') { global_object = window; }
@@ -27,6 +26,7 @@
     global_object.console = {};
   }
 
+  let console;
   if (typeof(global_object.console) === 'object') {
     console = global_object.console;
   } else {
@@ -498,13 +498,13 @@
       Opal.last_promise = Opal.last_promise.then(function() {
         if (!Opal.promise_unhandled_exception) return proc(Opal);
       })['catch'](function(error) {
-        if (Opal.respond_to(error, '$full_message')) {
+        if (Opal.respond_to && Opal.respond_to(error, '$full_message')) {
           error = error.$full_message();
         }
         console.error(error);
         // Abort further execution
         Opal.promise_unhandled_exception = true;
-        Opal.exit(1);
+        Opal.platform.exit(1);
       });
       return Opal.last_promise;
     }
@@ -574,4 +574,6 @@
   // If enable-file-source-embed compiler option is enabled, each module loaded will add its
   // sources to this object
   Opal.file_sources = {};
-}).call(this);
+
+  return Opal;
+})();

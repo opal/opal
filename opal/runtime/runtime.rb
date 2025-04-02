@@ -1,5 +1,14 @@
 require 'runtime/boot'
 
+require 'runtime/platform_support'
+require 'runtime/platforms/browsers'
+require 'runtime/platforms/gjs'
+require 'runtime/platforms/mini_racer'
+require 'runtime/platforms/node_compatible'
+require 'runtime/platforms/osascript'
+require 'runtime/platforms/quickjs'
+require 'runtime/platforms/unknown' # must be last
+
 require 'runtime/variables'
 require 'runtime/exception'
 
