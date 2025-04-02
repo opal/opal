@@ -38,7 +38,7 @@ module Opal
           compile_defined_xstr(value)
         when :const
           compile_defined_const(value)
-          wrap '(', " ? 'constant' : nil)"
+          wrap '((', ") != null ? 'constant' : nil)"
         when :cvar
           compile_defined_cvar(value)
           wrap '(', " ? 'class variable' : nil)"

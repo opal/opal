@@ -1,11 +1,5 @@
-require 'nodejs/base'
-require 'nodejs/kernel'
-require 'nodejs/process'
-require 'nodejs/file'
-require 'nodejs/dir'
-require 'nodejs/io'
-require 'nodejs/argf'
+warn "Platform specific code is already integrated now, you don't need to require 'opal-platform' anymore."
+
 require 'nodejs/open-uri'
 require 'nodejs/pathname'
-require 'nodejs/env'
 require 'nodejs/opal-paths'

@@ -2,13 +2,13 @@
 
 require 'opal'
 require 'set'
-require 'opal/platform'
 require 'opal-parser'
 require 'mspec'
 require 'mspec/version'
 require 'support/mspec_rspec_adapter'
 require 'support/guard_platform'
 require 'mspec-opal/runner'
+require 'mspec-opal/should' # Overwrite Object#should with strict version.
 
 # Node v0.12 as well as Google Chrome/V8 42.0.2311.135 (64-bit)
 # showed to need more tolerance (ruby spec default is 0.00003)
@@ -28,6 +28,13 @@ module Kernel
   def eval_js(javascript)
     `eval(javascript)`
   end
+end
+
+SPEC_TEMP_DIR = File.expand_path("#{File.realpath(Dir.pwd)}/../tmp/rubyspec_temp")
+
+def tmp(name, uniquify = true)
+  Dir.mkdir SPEC_TEMP_DIR unless Dir.exist? SPEC_TEMP_DIR
+  File.join SPEC_TEMP_DIR, name
 end
 
 # To make MSpec happy

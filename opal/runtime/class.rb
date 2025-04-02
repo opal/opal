@@ -310,7 +310,7 @@ module ::Opal
       if (Opal.is_a(object, type)) return object;
 
       // Fast path for the most common situation
-      if (object['$respond_to?'].$$pristine && object.$method_missing.$$pristine) {
+      if ((object['$respond_to?'].$$pristine && object.$method_missing.$$pristine) || object['$respond_to?'].$$stub) {
         body = object[$jsid(method)];
         if (body == null || body.$$stub) Opal.type_error(object, type);
         return body.apply(object, args);

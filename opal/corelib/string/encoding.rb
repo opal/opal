@@ -3,8 +3,18 @@
 
 class ::Encoding
   class << self
+    attr_reader :default_external, :default_internal
+
     def register(name, options = {}, &block)
-      names = [name] + (options[:aliases] || [])
+      names = if options.key?(:aliases)
+                options[:aliases].each do |a|
+                  aliases[a] = name
+                end
+                [name] + options[:aliases]
+              else
+                [name]
+              end
+
       ascii = options[:ascii] || false
       dummy = options[:dummy] || false
 
@@ -23,12 +33,75 @@ class ::Encoding
       end
     end
 
-    def find(name)
-      return default_external if name == :default_external
-      `return Opal.find_encoding(name)`
+    def aliases
+      @aliases ||= {}
     end
 
-    attr_accessor :default_external, :default_internal
+    def compatible?(obj1, obj2)
+      # Opal is different from Ruby and enables a more universal comatibility
+      # of encodings, because the representation of a Ruby String with a JS String
+      # makes them all UTF-16 "internally". This makes them all concatenable.
+      # However, what matters is the binary representation. If the concatenated
+      # string is written and source strings would not have a compatible binary
+      # encoding, writing the concatened string into one file would lead to
+      # different bytes written than writing each string to the same file,
+      # concatenating them in the file.
+      # If following the facts, Opal fails specs, because its encodings are
+      # compatible in a different way than Ruby specs assume.
+      # Also when comparing the #binary_encoding of strings here to ensure compatibility,
+      # it makes no sense to return the #encoding. If later on the same #encoding is used
+      # for a new string, it may still not be compatible if the #binary_encoding differs.
+      # We should ideally return a encoding pair (#encoding and #binary_encoding) instead,
+      # to ensure compatible strings can be constructed.
+      # But thats way outside of Ruby specs for this method.
+
+      # Maybe we can provide a Opal specific API in the future in ::Opal space.
+
+      # For the moment just return nil (meaning: not compatible), still passes a few specs ;-)
+      nil
+    end
+
+    def default_external=(enc)
+      raise(ArgumentError, 'enc must be given') if enc.nil?
+      unless enc.is_a?(::Encoding)
+        enc = ::Opal.coerce_to!(enc, ::String, :to_str)
+        enc = find(enc)
+      end
+      aliases['external'] = enc.name
+      `Opal.encodings["EXTERNAL"] = enc`
+      @default_external.names.delete('external') if @default_external
+      enc.names << 'external' unless enc.names.include?('external')
+      @default_external	= enc
+    end
+
+    def default_internal=(enc)
+      return @default_internal = nil if enc.nil?
+      unless enc.is_a?(::Encoding)
+        enc = ::Opal.coerce_to!(enc, ::String, :to_str)
+        enc = find(enc)
+      end
+      @default_internal	= enc
+    end
+
+    def find(name)
+      return name if name.is_a?(::Encoding)
+      name = ::Opal.coerce_to!(name, ::String, :to_str)
+      return default_external if %w[external filesystem locale].include?(name)
+      return default_internal if name == 'internal'
+      `Opal.find_encoding(name)`
+    end
+
+    def list
+      constants.map! { |e| const_get(e) }.uniq!.select! { |e| e.is_a?(::Encoding) }
+    end
+
+    def locale_charmap
+      nil
+    end
+
+    def name_list
+      list.map(&:names).flatten
+    end
   end
 
   attr_reader :name, :names
@@ -48,10 +121,6 @@ class ::Encoding
     @dummy
   end
 
-  def binary?
-    false
-  end
-
   def to_s
     @name
   end
@@ -61,6 +130,9 @@ class ::Encoding
   end
 
   # methods to implement per encoding
+  def bytes(str)
+    ::Kernel.raise ::NotImplementedError
+  end
 
   def bytesize(str, index)
     ::Kernel.raise ::NotImplementedError
@@ -100,6 +172,7 @@ class ::Encoding
 
   class ::EncodingError < ::StandardError; end
   class ::CompatibilityError < ::EncodingError; end
+  class InvalidByteSequenceError < ::EncodingError; end
   class UndefinedConversionError < ::EncodingError; end
 end
 
@@ -119,6 +192,40 @@ end
 }
 
 ::Encoding.register 'UTF-8', aliases: ['CP65001'], ascii: true do
+  def bytes(str)
+    res = []
+    %x{
+      let code_point;
+      for (const c of str) {
+        code_point = c.codePointAt(0);
+        if (code_point < 0x80) {
+          res.push(code_point);
+        } else if (code_point < 0x800) {
+          res.push(code_point >> 0x6 | 0xC0);
+          res.push(code_point & 0x3F | 0x80);
+        } else if (code_point < 0xD800) {
+          res.push(code_point >> 0xC | 0xE0);
+          res.push(code_point >> 0x6 & 0x3F | 0x80);
+          res.push(code_point & 0x3F | 0x80);
+        } else if (code_point < 0xE000) {
+          res.push(0xEF);
+          res.push(0xBF);
+          res.push(0xBD);
+        } else if (code_point < 0x10000) {
+          res.push(code_point >> 0xC | 0xE0);
+          res.push(code_point >> 0x6 & 0x3F | 0x80);
+          res.push(code_point & 0x3F | 0x80);
+        } else if (code_point < 0x110000) {
+          res.push(code_point >> 0x12 | 0xF0);
+          res.push(code_point >> 0xC & 0x3F | 0x80);
+          res.push(code_point >> 0x6 & 0x3F | 0x80);
+          res.push(code_point & 0x3F | 0x80);
+        }
+      }
+    }
+    res
+  end
+
   def bytesize(str, index)
     %x{
       let code_point, size = 0;
@@ -330,7 +437,7 @@ end
 
   def scrub(str, replacement, &block)
     %x{
-      let result = scrubbing_decoder(self, 'utf-8').decode(new Uint8Array(str.$bytes()));
+      let result = scrubbing_decoder(self, 'utf-8').decode(new Uint8Array(self.$bytes(str)));
       if (block !== nil) {
         // dont know the bytes anymore ... ¯\_(ツ)_/¯
         result = result.replace(/�/g, (byte)=>{ return #{yield `byte`}; });
@@ -345,7 +452,7 @@ end
 
   def valid_encoding?(str)
     %x{
-      try { validating_decoder(self, 'utf-8').decode(new Uint8Array(str.$bytes())); }
+      try { validating_decoder(self, 'utf-8').decode(new Uint8Array(self.$bytes(str))); }
       catch { return false; }
       return true;
     }
@@ -353,6 +460,18 @@ end
 end
 
 ::Encoding.register 'UTF-16LE', aliases: ['UTF-16'] do
+  def bytes(str)
+    res = []
+    %x{
+      for (let char_code, i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        res.push(char_code & 0xff);
+        res.push(char_code >> 8);
+      }
+    }
+    res
+  end
+
   def bytesize(str, index)
     %x{
       if (index < str.length) return (index + 1) * 2;
@@ -460,7 +579,7 @@ end
 
   def scrub(str, replacement, &block)
     %x{
-      let result = scrubbing_decoder(self, 'utf-16le').decode(new Uint8Array(str.$bytes()));
+      let result = scrubbing_decoder(self, 'utf-16le').decode(new Uint8Array(self.$bytes(str)));
       if (block !== nil) {
         // dont know the bytes anymore ... ¯\_(ツ)_/¯
         result = result.replace(/�/g, (byte)=>{ return #{yield `byte`}; });
@@ -475,7 +594,7 @@ end
 
   def valid_encoding?(str)
     %x{
-      try { validating_decoder(self, 'utf-16').decode(new Uint8Array(str.$bytes())); }
+      try { validating_decoder(self, 'utf-16').decode(new Uint8Array(self.$bytes(str))); }
       catch { return false; }
       return true;
     }
@@ -483,6 +602,18 @@ end
 end
 
 ::Encoding.register 'UTF-16BE', inherits: ::Encoding::UTF_16LE do
+  def bytes(str)
+    res = []
+    %x{
+      for (let char_code, i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        res.push(char_code >> 8);
+        res.push(char_code & 0xff);
+      }
+    }
+    res
+  end
+
   def decode(io_buffer)
     %x{
       let result = scrubbing_decoder(self, 'utf-16be').decode(io_buffer.data_view);
@@ -535,7 +666,7 @@ end
 
   def scrub(str, replacement, &block)
     %x{
-      let result = scrubbing_decoder(self, 'utf-16be').decode(new Uint8Array(str.$bytes()));
+      let result = scrubbing_decoder(self, 'utf-16be').decode(new Uint8Array(self.$bytes(str)));
       if (block !== nil) {
         // dont know the bytes anymore ... ¯\_(ツ)_/¯
         result = result.replace(/�/g, (byte)=>{ return #{yield `byte`}; });
@@ -550,7 +681,7 @@ end
 
   def valid_encoding?(str)
     %x{
-      try { validating_decoder(self, 'utf-16be').decode(new Uint8Array(str.$bytes())); }
+      try { validating_decoder(self, 'utf-16be').decode(new Uint8Array(self.$bytes(str))); }
       catch { return false; }
       return true;
     }
@@ -558,6 +689,20 @@ end
 end
 
 ::Encoding.register 'UTF-32LE' do
+  def bytes(str)
+    res = []
+    %x{
+      for (let char_code, i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        res.push(char_code & 0xff);
+        res.push(char_code >> 8);
+        res.push(0);
+        res.push(0);
+      }
+    }
+    res
+  end
+
   def bytesize(str, index)
     %x{
       if (index < str.length) return (index + 1) * 4;
@@ -695,6 +840,20 @@ end
 end
 
 ::Encoding.register 'UTF-32BE', inherits: ::Encoding::UTF_32LE do
+  def bytes(str)
+    res = []
+    %x{
+      for (let char_code, i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        res.push(0);
+        res.push(0);
+        res.push(char_code >> 8);
+        res.push(char_code & 0xff);
+      }
+    }
+    res
+  end
+
   def decode(io_buffer)
     %x{
       let i = 0, o = 0,
@@ -769,8 +928,16 @@ end
 end
 
 ::Encoding.register 'ASCII-8BIT', aliases: ['BINARY'], ascii: true do
-  def binary?
-    true
+  def bytes(str)
+    res = []
+    %x{
+      for (let char_code, i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        if (char_code > 0xff) res.push(char_code >> 8);
+        res.push(char_code & 0xff);
+      }
+    }
+    res
   end
 
   def bytesize(str, index)
@@ -814,8 +981,10 @@ end
 
   def each_byte(str)
     %x{
-      for (let i = 0, length = str.length; i < length; i++) {
-        #{yield `str.charCodeAt(i) & 0xff`};
+      for (let char_code, i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        if (char_code > 0xff) #{yield `char_code >> 8`};
+        #{yield `char_code & 0xff`};
       }
     }
   end
@@ -834,8 +1003,10 @@ end
         dv.setUint8(pos++, byte);
       }
 
-      for (let i = 0, length = str.length; i < length; i++) {
-        set_byte(str.charCodeAt(i) & 0xff);
+      for (let char_code, i = 0, length = str.length; i < length; i++) {
+        char_code = str.charCodeAt(i);
+        if (char_code > 0xff) set_byte(char_code >> 8);
+        set_byte(char_code & 0xff);
       }
 
       if (pos > 0) { #{yield pos} }
@@ -845,7 +1016,7 @@ end
 
   def scrub(str, replacement, &block)
     %x{
-      let result = scrubbing_decoder(self, 'ascii').decode(new Uint8Array(str.$bytes()));
+      let result = scrubbing_decoder(self, 'ascii').decode(new Uint8Array(self.$bytes(str)));
       if (block !== nil) {
         // dont know all the bytes anymore ... ¯\_(ツ)_/¯
         result = result.replace(/[�\x80-\xff]/g, (byte)=>{ return #{yield `byte`}; });
@@ -862,7 +1033,7 @@ end
 
   def valid_encoding?(str)
     %x{
-      try { validating_decoder(self, 'ascii').decode(new Uint8Array(str.$bytes())); }
+      try { validating_decoder(self, 'ascii').decode(new Uint8Array(self.$bytes(str))); }
       catch { return false; }
       return true;
     }
@@ -873,7 +1044,6 @@ end
 ::Encoding.register 'US-ASCII', aliases: ['ASCII'], ascii: true, inherits: ::Encoding::ASCII_8BIT
 
 ::Encoding.default_external = __ENCODING__
-::Encoding.default_internal = __ENCODING__
 
 `Opal.prop(String.prototype, 'encoding', #{::Encoding::UTF_8})`
-`Opal.prop(String.prototype, 'internal_encoding', #{::Encoding::UTF_8})`
+`Opal.prop(String.prototype, 'binary_encoding', #{::Encoding::UTF_8})`

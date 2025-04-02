@@ -21,5 +21,5 @@ opal_unsupported_filter "Marshal" do
   fails "Marshal.load for a wrapped C pointer raises TypeError when the local class is missing _load_data" # Expected TypeError but got: NotImplementedError (Data type cannot be demarshaled)
   fails "Marshal.load loads a Random" # ArgumentError: marshal data too short
   fails "Marshal.load raises EOFError on loading an empty file" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x444da @method="load" @object=nil @num_self_class=1 @data="\x04\bo:\x1ANamespaceTest::KaBoom\x00">
-  fails "Marshal.load raises a TypeError with bad Marshal version" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.  
+  fails "Marshal.load raises a TypeError with bad Marshal version" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
 end

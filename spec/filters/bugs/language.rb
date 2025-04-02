@@ -94,6 +94,7 @@ opal_filter "language" do
   fails "Hash literal checks duplicated float keys on initialization" # Expected warning to match: /key 1.0 is duplicated|duplicated key/ but got: ""
   fails "Hash literal checks duplicated keys on initialization" # Expected warning to match: /key 1000 is duplicated|duplicated key/ but got: ""
   fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0xab798>
+  fails "Hash literal freezes string keys on initialization" # NotImplementedError: String#reverse! not supported. Mutable String methods are currently not supported in Opal.
   fails "Hash literal raises an EncodingError at parse time when Symbol key with invalid bytes and 'key: value' syntax used" # Expected EncodingError (invalid symbol in encoding UTF-8 :"\xC3") but no exception was raised ({"Ã"=>1} was returned)
   fails "Hash literal raises an EncodingError at parse time when Symbol key with invalid bytes" # Expected EncodingError (invalid symbol in encoding UTF-8 :"\xC3") but no exception was raised ({"Ã"=>1} was returned)
   fails "Heredoc string allow HEREDOC with <<\"identifier\", interpolated" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
@@ -286,27 +287,13 @@ opal_filter "language" do
   fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility" # Expected DefSpecsLambdaVisibility to have private instance method 'some_method' but it does not
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the class" # Expected "constant" to be nil
-  fails "The defined? keyword for a simple constant returns 'constant' when the constant is defined" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for an expression returns 'assignment' for assigning a local variable" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals for a literal Array returns 'expression' if each element is defined" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals returns 'false' for false" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals returns 'nil' for nil" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals returns 'self' for self" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals returns 'true' for true" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for super for a method taking no arguments returns 'super' when a superclass method exists" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for variables returns 'class variable' when called with the name of a class variable" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for variables returns 'global-variable' for a global variable that has been assigned nil" # Expected false == true to be truthy but was false
   fails "The defined? keyword for variables returns 'instance-variable' for an instance variable that has been assigned to nil" # Expected nil == "instance-variable" to be truthy but was false
-  fails "The defined? keyword for variables returns 'instance-variable' for an instance variable that has been assigned" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for variables returns 'local-variable' when called with the name of a local variable" # Expected false == true to be truthy but was false
   fails "The defined? keyword for variables returns nil for a global variable that has been read but not assigned to" # Expected "global-variable" to be nil
   fails "The defined? keyword for variables when a Regexp matches a String returns nil for non-captures" # Expected "global-variable" to be nil
   fails "The defined? keyword for variables when a String matches a Regexp returns nil for non-captures" # Expected "global-variable" to be nil
-  fails "The defined? keyword for yield returns 'yield' if a block is passed to a method not taking a block parameter" # Expected false == true to be truthy but was false
   fails "The defined? keyword when called with a method name having a throw in the receiver escapes defined? and performs the throw semantics as normal" # Expected nil == "unreachable" to be truthy but was false
   fails "The defined? keyword when called with a method name in a void context does not execute the receiver" # Expected "defined_specs_side_effects" == "not_executed" to be truthy but was false
   fails "The defined? keyword when called with a method name in a void context warns about the void context when parsing it" # Expected warning to match: /warning: possibly useless use of defined\? in void context/ but got: ""
-  fails "The defined? keyword when called with a method name without a receiver returns 'method' if the method is defined" # Expected false == true to be truthy but was false
   fails "The if expression when a branch syntactically does not return a value raises SyntaxError if both do not return a value" # Expected SyntaxError (/void value expression/) but no exception was raised ("m" was returned)
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with exclusive-end range" # NoMethodError: undefined method `collector' for #<MSpecEnv:0x7bd18>
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with inclusive-end range" # NoMethodError: undefined method `collector' for #<MSpecEnv:0x7bd18>

@@ -12,10 +12,9 @@
 ::Object.autoload :Struct, 'corelib/struct'
 ::Object.autoload :Set, 'corelib/set'
 ::Object.autoload :Dir, 'corelib/dir'
-::Object.autoload :File, 'corelib/file'
-
+::Object.autoload :ENV, 'corelib/env'
+::Object.require 'corelib/process'
 ::Object.require 'corelib/process/base'
-::Object.autoload :Process, 'corelib/process'
 ::Object.autoload :Random, 'corelib/random'
 
 ::Object.require 'corelib/unsupported'

@@ -1,5 +1,4 @@
 require 'test/unit'
-require 'nodejs/env'
 
 class TestNodejsEnv < Test::Unit::TestCase
 

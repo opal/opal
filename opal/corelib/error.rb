@@ -142,7 +142,7 @@ class ::Exception < `Error`
       return "#{@message}\n#{`self.stack`}"
     end
 
-    kwargs = { highlight: $stderr&.tty?, order: :top }.merge(kwargs || {})
+    kwargs = { highlight: $stderr&.tty? ? true : false, order: :top }.merge(kwargs || {})
     highlight, order = kwargs[:highlight], kwargs[:order]
     highlight = false if highlight.nil?
 
@@ -333,6 +333,8 @@ module ::Opal
     class Error
     end
   end
+
+  class RetryException < ::Exception; end
 end
 
 module ::JS
