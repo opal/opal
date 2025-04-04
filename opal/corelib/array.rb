@@ -10,6 +10,10 @@ class ::Array < `Array`
   # Mark all javascript arrays as being valid ruby arrays
   `Opal.prop(self.$$prototype, '$$is_array', true)`
 
+  # Check if the size is more than 32 bits:
+  # http://www.ecma-international.org/ecma-262/5.1/#sec-15.4
+  `const ARY_MAX_SIZE = 4294967294`
+
   %x{
     // Recent versions of V8 (> 7.1) only use an optimized implementation when Array.prototype is unmodified.
     // For instance, "array-splice.tq" has a "fast path" (ExtractFastJSArray, defined in "src/codegen/code-stub-assembler.cc")
@@ -106,7 +110,7 @@ class ::Array < `Array`
         #{::Kernel.warn('warning: block supersedes default value argument')}
       }
 
-      if (size > #{::Integer::MAX}) {
+      if (size > ARY_MAX_SIZE) {
         #{::Kernel.raise ::ArgumentError, 'array size too big'}
       }
 
@@ -348,8 +352,8 @@ class ::Array < `Array`
           exclude, from, to, result;
 
       exclude = index.excl;
-      from    = index.begin === nil ? 0 : $coerce_to(index.begin, Opal.Integer, 'to_int');
-      to      = index.end === nil ? -1 : $coerce_to(index.end, Opal.Integer, 'to_int');
+      from    = index.begin === nil ? 0 : Number($coerce_to(index.begin, Opal.Integer, 'to_int'));
+      to      = index.end === nil ? -1 : Number($coerce_to(index.end, Opal.Integer, 'to_int'));
 
       if (from < 0) {
         from += size;
@@ -411,7 +415,7 @@ class ::Array < `Array`
       var size = self.length,
           exclude, from, to, result;
 
-      index = $coerce_to(index, Opal.Integer, 'to_int');
+      index = Number($coerce_to(index, Opal.Integer, 'to_int'));
 
       if (index < 0) {
         index += size;
@@ -429,7 +433,7 @@ class ::Array < `Array`
         return self[index];
       }
       else {
-        length = $coerce_to(length, Opal.Integer, 'to_int');
+        length = Number($coerce_to(length, Opal.Integer, 'to_int'));
 
         if (length < 0 || index > size || index < 0) {
           return nil;
@@ -1199,7 +1203,7 @@ class ::Array < `Array`
         return self.length === 0 ? nil : self[0];
       }
 
-      count = $coerce_to(count, #{::Integer}, 'to_int');
+      count = Number($coerce_to(count, #{::Integer}, 'to_int'));
 
       if (count < 0) {
         #{::Kernel.raise ::ArgumentError, 'negative array size'};
@@ -1583,7 +1587,7 @@ class ::Array < `Array`
   end
 
   def length
-    `self.length`
+    `BigInt(self.length)`
   end
 
   def max(n = undefined, &block)

@@ -682,6 +682,7 @@ class ::String
     format = ::Opal.coerce_to!(format, ::String, :to_str).gsub(/\s/, '').delete("\000")
 
     %x{
+      offset = Number(offset);
       var output = [];
 
       // A very optimized handler for U*.
