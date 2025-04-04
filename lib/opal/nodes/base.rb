@@ -2,12 +2,15 @@
 
 require 'opal/nodes/helpers'
 require 'opal/nodes/closure'
+require 'opal/builder/post_processor'
 
 module Opal
   module Nodes
     class Base
       include Helpers
       include Closure::NodeSupport
+      include Builder::PostProcessor::NodeSupport
+      include Builder::PostProcessor::DCE::NodeSupport
 
       def self.handlers
         @handlers ||= {}
@@ -149,6 +152,7 @@ module Opal
       end
 
       def helper(name)
+        push dce_use(name, type: :*)
         @compiler.helper name
       end
 

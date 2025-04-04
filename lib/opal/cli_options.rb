@@ -153,6 +153,14 @@ module Opal
         options[:no_exit] = true
       end
 
+      on('--dce [OPTIONS]', 'EXPERIMENTAL: Enable dead code elimination to reduce bundle size.',
+                          'You can select multiple optimizations separated with a comma (,):',
+                          'method (default), const'
+) do |dce|
+        dce ||= 'method'
+        options[:dce] = dce.split(',').map(&:to_sym)
+      end
+
       section 'Compiler Options:'
 
       on('--use-strict', 'Enables JavaScript\'s strict mode (i.e., adds \'use strict\'; statement)') do

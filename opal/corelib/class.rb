@@ -12,7 +12,7 @@ class ::Class
 
       var klass = Opal.allocate_class(nil, superclass);
       superclass.$inherited(klass);
-      #{`klass`.class_eval(&block) if block_given?}
+      #{`klass`.class_exec(self, &block) if block_given?}
       return klass;
     }
   end
