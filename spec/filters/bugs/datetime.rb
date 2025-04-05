@@ -43,8 +43,6 @@ opal_filter "DateTime" do
   fails "DateTime.minute raises an error for Float" # Expected ArgumentError but no exception was raised (#<DateTime:0x6922 @date=-4712-01-01 00:05:00 UTC, @start=2299161> was returned)
   fails "DateTime.minute raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x6618 @date=-4712-01-01 02:00:00 UTC, @start=2299161> was returned)
   fails "DateTime.new takes the seventh argument as an offset" # Expected 1.3503086419753086e-7 == 0.7 to be truthy but was false
-  fails "DateTime.now grabs the local timezone" # Expected "+01:00" == "-08:00" to be truthy but was false
-  fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format parses YYYY-MM-DDTHH:MM:SS into a DateTime object" # Expected #<DateTime:0x8a68 @date=2012-11-08 15:43:59 +0100, @start=2299161> == #<DateTime:0x8a6c @date=2012-11-08 15:43:59 UTC, @start=2299161> to be truthy but was false
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format throws an argument error for invalid day values" # Expected ArgumentError but no exception was raised (#<DateTime:0x8d76 @date=NaN-NaN-NaN NaN:NaN:NaN -NaNNaN, @start=2299161> was returned)
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format throws an argument error for invalid hour values" # Expected ArgumentError but no exception was raised (#<DateTime:0x88ea @date=NaN-NaN-NaN NaN:NaN:NaN -NaNNaN, @start=2299161> was returned)
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format throws an argument error for invalid minute values" # Expected ArgumentError but no exception was raised (#<DateTime:0x9076 @date=NaN-NaN-NaN NaN:NaN:NaN -NaNNaN, @start=2299161> was returned)
@@ -62,5 +60,5 @@ opal_filter "DateTime" do
   fails "DateTime.parse(.) parses YY.MM.DD using the year digits as 20YY when given true as additional argument" # ArgumentError: [DateTime.parse] wrong number of arguments (given 2, expected 1)
   fails "DateTime.sec adds 60 to negative values" # ArgumentError: sec out of range: -20
   fails "DateTime.sec raises an error when minute is given as a rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x3e5a @date=-4712-01-01 00:05:00 UTC, @start=2299161> was returned)
-  fails "DateTime.sec raises an error, when the second is greater or equal than 60" # Expected ArgumentError but no exception was raised (#<DateTime:0x3cbe @date=-4712-01-01 00:01:00 UTC, @start=2299161> was returned)  
+  fails "DateTime.sec raises an error, when the second is greater or equal than 60" # Expected ArgumentError but no exception was raised (#<DateTime:0x3cbe @date=-4712-01-01 00:01:00 UTC, @start=2299161> was returned)
 end

@@ -21,10 +21,11 @@ describe "IO reading methods" do
 
   prepare_io_for = proc do |example|
     example_lines = example.split("|")
-    io = IO.new(99)
-    io.read_proc = proc do |_length|
-      example_lines.shift
-    end
+    File.delete('tmp/read_spec_tmp_file')
+    fd = IO.sysopen('tmp/read_spec_tmp_file', 'w')
+    io = IO.new(fd)
+    io.write(*example_lines)
+    io.rewind
     io
   end
 
@@ -36,7 +37,7 @@ describe "IO reading methods" do
         len = expected_output.length
         last = expected_output.last
         expected_output[len-1] = last.chop if !example.end_with?("\n") && last
-        io.readlines.should == expected_output
+        expected_output.should == io.readlines
       end
     end
   end

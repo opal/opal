@@ -12,9 +12,9 @@ $LOAD_PATH       = $: = []
 $/ = "\n"
 $, = nil
 
-::ARGV = []
+::ARGV = `Opal.platform.argv`
+::ARGV.shift if ::ARGV.first == '--'
 ::ARGF = ::Object.new
-::ENV  = {}
 
 $VERBOSE = false
 $DEBUG   = false

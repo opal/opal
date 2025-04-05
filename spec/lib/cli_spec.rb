@@ -261,7 +261,7 @@ RSpec.describe Opal::CLI do
   context 'using pipes' do
     it 'runs the provided source' do
       # `echo` on windows will output double-quotes along with the contents, that's why we print with ruby
-      expect(`ruby -e"puts 'foo'" | ruby bin/opal -ropal/platform -e "puts gets.reverse"`.strip).to eq("oof")
+      expect(`ruby -e"puts 'foo'" | ruby bin/opal -e "puts gets.reverse"`.strip).to eq("oof")
     end
 
     it 'compiles the provided source' do

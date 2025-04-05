@@ -36,7 +36,8 @@ ruby/core/comparable
 
 ruby/core/complex
 !ruby/core/complex/marshal_dump_spec
-
+ruby/core/dir
+ruby/core/encoding
 ruby/core/enumerable
 ruby/core/enumerator
 ruby/core/enumerator/arithmetic_sequence
@@ -49,13 +50,11 @@ ruby/core/exception
 !ruby/core/exception/load_error_spec
 
 ruby/core/false
+ruby/core/file
+ruby/core/file/stat
 ruby/core/integer
-ruby/core/file/basename_spec
-ruby/core/file/dirname_spec
-ruby/core/file/extname_spec
-ruby/core/file/join_spec
-ruby/core/file/expand_path_spec
-ruby/core/file/absolute_path_spec
+ruby/core/io
+!ruby/core/io/copy_stream_spec
 ruby/core/float
 ruby/core/hash
 ruby/core/integer
@@ -183,6 +182,7 @@ ruby/library/delegate/delegate_class
 ruby/library/delegate/delegator
 ruby/library/erb/util/h_spec
 ruby/library/erb/util/html_escape_spec
+ruby/library/etc
 ruby/library/logger/severity_spec
 ruby/library/observer
 
@@ -203,8 +203,7 @@ ruby/library/securerandom
 ruby/library/set
 ruby/library/shellwords
 ruby/library/singleton
-ruby/library/stringio/each_line_spec
-ruby/library/stringio/each_spec
+ruby/library/stringio
 ruby/library/stringscanner
 
 ruby/library/time

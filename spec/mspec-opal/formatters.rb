@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# helpers: platform
 
 class BaseOpalFormatter
   def initialize(out=nil)
@@ -162,16 +163,17 @@ class ColoredDottedFormatter < BaseOpalFormatter
 end
 
 class NodeJSFormatter < ColoredDottedFormatter
+  `const process = require("node:process")`
   def red(str)
-    `process.stdout.write("\u001b[31m"+#{str}+"\u001b[0m")`
+    `process.stdout.write("\u001b[31m" + str + "\u001b[0m")`
   end
 
   def green(str)
-    `process.stdout.write("\u001b[32m"+#{str}+"\u001b[0m")`
+    `process.stdout.write("\u001b[32m" + str + "\u001b[0m")`
   end
 
   def cyan(str)
-    `process.stdout.write("\u001b[36m"+#{str}+"\u001b[0m")`
+    `process.stdout.write("\u001b[36m" + str + "\u001b[0m")`
   end
 end
 

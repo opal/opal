@@ -103,5 +103,5 @@ opal_filter "Marshal" do
   fails "Marshal.load when called with freeze: true returns frozen object having #_dump method" # ArgumentError: [Marshal.load] wrong number of arguments (given 2, expected 1)
   fails "Marshal.load when called with freeze: true returns frozen object responding to #marshal_dump and #marshal_load" # ArgumentError: [Marshal.load] wrong number of arguments (given 2, expected 1)
   fails "Marshal.load when called with freeze: true returns frozen structs" # ArgumentError: [Marshal.load] wrong number of arguments (given 2, expected 1)
-  fails "Marshal.load when called with nil for the proc argument behaves as if no proc argument was passed" # ArgumentError: [Marshal.load] wrong number of arguments (given 2, expected 1)  
+  fails "Marshal.load when called with nil for the proc argument behaves as if no proc argument was passed" # ArgumentError: [Marshal.load] wrong number of arguments (given 2, expected 1)
 end

@@ -7,5 +7,5 @@ opal_filter "Pathname" do
   fails "Pathname#relative_path_from converts string argument to Pathname" # NoMethodError: undefined method `cleanpath' for "/usr"
   fails "Pathname#relative_path_from raises an error when the base directory has .." # Expected ArgumentError but no exception was raised ("a" was returned)
   fails "Pathname#relative_path_from raises an error when the two paths do not share a common prefix" # Expected ArgumentError but no exception was raised ("../usr" was returned)
-  fails "Pathname#relative_path_from returns current and pattern when only those patterns are used" # Expected "." == ".." to be truthy but was false  
+  fails "Pathname#relative_path_from returns current and pattern when only those patterns are used" # Expected "." == ".." to be truthy but was false
 end

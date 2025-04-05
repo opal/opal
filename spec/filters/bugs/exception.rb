@@ -43,6 +43,7 @@ opal_filter "Exception" do
   fails "Exception#set_backtrace raises a TypeError when passed a Symbol" # Expected TypeError but no exception was raised ("unhappy" was returned)
   fails "Exception#set_backtrace raises a TypeError when the Array contains a Symbol" # Expected TypeError but no exception was raised (["String", "unhappy"] was returned)
   fails "Exception#to_s calls #to_s on the message" # Mock 'message' expected to receive to_s("any_args") exactly 1 times but received it 2 times
+  fails "FrozenError#receiver should return frozen object that modification was attempted on" # Expected #<Class:#<Object:0x174>> to be identical to #<Object:0x174>
   fails "Interrupt is raised on the main Thread by the default SIGINT handler" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x52262>
   fails "Interrupt.new returns an instance of interrupt with no message given" # NoMethodError: undefined method `signo' for #<Interrupt: Interrupt>
   fails "Interrupt.new takes an optional message argument" # NoMethodError: undefined method `signo' for #<Interrupt: message>

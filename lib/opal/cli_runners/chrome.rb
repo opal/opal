@@ -86,7 +86,7 @@ module Opal
             <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
             <script src='./source-map-support.js'></script>
             <script>
-            window.opalheadlesschrome = true;
+            window.OPAL_EXIT_CODE = "noexit"
             sourceMapSupport.install({
               retrieveSourceMap: function(path) {
                 return path.endsWith('/index.#{ext}') ? {
