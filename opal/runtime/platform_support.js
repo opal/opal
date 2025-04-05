@@ -13,20 +13,7 @@
 
   // always the same across all platforms
   $platform.clock_realtime = function() { return Date.now(); };
-  $platform.clock_monotonic = (typeof(Opal.global.performance) === "object") ? function() { return performance.now(); } : null;
-  $platform.io_action = function(action, ...args) {
-    // standard io helper function to raise correct Ruby Error instead of platform specific error
-    try {
-      return action(...args);
-    } catch (error) {
-      // Errno is autoloaded, to make sure it gets loaded eventually, must use const_get here
-      if (Opal.Object.$const_get('Errno').$constants().indexOf(error.code) >= 0) {
-        var error_class = Opal.Errno.$const_get(error.code);
-        Opal.Kernel.$raise(error_class.$new(error.message));
-      }
-      Opal.Kernel.$raise(error);
-    }
-  };
+  $platform.clock_monotonic = (typeof(Opal.global.performance) === "object") ? ()=>performance.now() : null;
   $platform.error_with_code = function(code) {
     let err = new Error();
     err.code = code;
@@ -45,8 +32,11 @@
     else if (nav_ua.indexOf("Safari") >= 0) { $platform.name = "safari" }
     Opal.platform.is_browser = true;
   }
-  else if (typeof(window) === "object" && typeof(GjsFileImporter) === "function") { $platform.name = "gjs"; }
-  // all the server and desktop platforms
+  else if (typeof(window) === "object" && typeof(GjsFileImporter) === "function") {
+    // includes Gnome GJS and Cinnamon CJS
+    $platform.name = "gjs";
+  }
+  // all the node based server and desktop platforms
   else if (typeof(Bun) === "object" && Bun.version) { $platform.name = "bun"; }
   else if (typeof(Deno) === "object" && Deno.version?.deno) { $platform.name = "deno"; }
   else if (typeof(process) === "object" && process.versions?.node) {
