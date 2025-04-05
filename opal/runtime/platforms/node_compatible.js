@@ -25,9 +25,11 @@ function not_available(fun) {
 function io_action(action, ...args) {
   try { return action(...args); }
   catch (error) {
+    let code = error.code;
+    if (platform.deno && !code) { code = error.message.split(':')[0]; }
     // Errno is autoloaded, to make sure it gets loaded eventually, must use const_get here
-    if (Opal.Object.$const_get('Errno').$constants().indexOf(error.code) >= 0) {
-      var error_class = Opal.Errno.$const_get(error.code);
+    if (Opal.Object.$const_get('Errno').$constants().indexOf(code) >= 0) {
+      var error_class = Opal.Errno.$const_get(code);
       Opal.Kernel.$raise(error_class.$new(error.message));
     }
     Opal.Kernel.$raise(error);
@@ -49,6 +51,7 @@ if (os.platform().includes("win")) {
   platform.sysconfdir = "/etc"
 }
 platform.sep = path.sep;
+platform.deno = Opal.platform.name.includes("deno");
 
 // Some platform info
 platform.available_parallelism = os.availableParallelism;
@@ -331,7 +334,6 @@ platform.io_fsync = (fd)=>{ if (fd > 2) io_action(fs.fsyncSync, fd); }
 platform.io_ioctl = ()=>not_available("IO#ioctl");
 platform.io_open = (fd)=>{ return fd < 3 ? true : false };
 platform.io_open_path = function(path_name, flags, perm) {
-  const o = Opal.File.Constants;
   path_name = path_name.toString();
   let mode = flags_to_mode(flags);
   if (!mode) mode = emulated_flags_to_mode(flags, path_name, perm);
@@ -347,7 +349,13 @@ platform.io_write = function(fd, io_buffer, buffer_offset, pos, count) {
   // Also in theory its possible to use fs.writeSync for std*, but in reality that works only half the time and
   // causes problems.
   if (0 < fd && fd < 3) {
-    if (data.byteLength > count) data = new DataView(data.buffer, buffer_offset, count);
+    if (platform.deno) {
+      data = data.buffer;
+      if (buffer_offset > 0 || data.byteLength > count) data = data.slice(buffer_offset, buffer_offset + count);
+      data = new Uint8Array(data);
+    } else {
+      if (buffer_offset > 0 || data.byteLength > count) data = new DataView(data.buffer, buffer_offset, count);
+    }
     if (fd === 1) process.stdout.write(data, 'utf8', ()=>{});
     else if (fd === 2) process.stderr.write(data, 'utf8', ()=>{});
     return data.byteLength;
@@ -360,8 +368,14 @@ platform.io_write = function(fd, io_buffer, buffer_offset, pos, count) {
 // File
 platform.file_chmod = (file_name, mode)=>io_action(fs.chmodSync, file_name.toString(), mode);
 platform.file_chown = (file_name, uid, gid)=>io_action(fs.chownSync, file_name.toString(), uid, gid);
-platform.file_fchmod = (fd, mode)=>io_action(fs.fchmodSync, fd, mode);
-platform.file_fchown = (fd, uid, gid)=>io_action(fs.fchownSync, fd, uid, gid);
+platform.file_fchmod = (fd, mode)=>{
+  if (!fs.fchmodSync) Opal.Kernel.$raise(Opal.NotImplementedError, "File#chmod is not available on " + platform.name);
+  io_action(fs.fchmodSync, fd, mode);
+}
+platform.file_fchown = (fd, uid, gid)=>{
+  if (!fs.fchownSync) Opal.Kernel.$raise(Opal.NotImplementedError, "File#chown is not available on " + platform.name);
+  io_action(fs.fchownSync, fd, uid, gid);
+}
 platform.file_flock = (_fd, _lock)=>not_available("File#flock");
 platform.file_ftruncate = (fd, len)=>io_action(fs.ftruncateSync, fd, len);
 platform.file_is_absolute_path = (file_name)=>io_action(path.isAbsolute, file_name.toString());
@@ -408,7 +422,11 @@ platform.dir_open = (dir_name)=>{
   platform.directories[fd] = { handle: handle, eof: false, dot: false, dotdot: false };
   return fd;
 }
-platform.dir_mkdir = (dir_name, mode)=>io_action(fs.mkdirSync, dir_name.toString(), { mode: mode });
+platform.dir_mkdir = (dir_name, mode)=>{
+  dir_name = dir_name.toString()
+  io_action(fs.mkdirSync, dir_name, { mode: mode });
+  if (platform.deno) fs.chmodSync(dir_name, mode); // Deno doesn't set mode correctly in mkdirSync
+}
 platform.dir_next = (fd)=>{
   let dir = platform.directories[fd];
   if (!dir) return;

@@ -126,7 +126,12 @@
       // + compiles to JS primitive
       // + allows method definition directly on instances
       // numbers, true, false and null do not support it.
-      object[name] = initialValue;
+      try { object[name] = initialValue; }
+      catch (e) {
+        if (Opal.raise)
+          Opal.raise(Opal.FrozenError, "can't modify frozen String: '" + (object) +"'", new Map([["receiver", object]]));
+        else throw e;
+      }
     } else {
       prop_options.value = initialValue;
       Object.defineProperty(object, name, prop_options);

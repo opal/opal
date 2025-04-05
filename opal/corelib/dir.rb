@@ -108,7 +108,7 @@ class ::Dir
 
     def getwd
       # Returns the path to the current working directory.
-      `$platform.dir_wd(#{File::SEPARATOR})`
+      `$str($platform.dir_wd(#{File::SEPARATOR}))`
     end
 
     def glob(*patterns, flags: nil, base: `UNDEFINED`, sort: true)

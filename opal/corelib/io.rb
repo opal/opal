@@ -1021,7 +1021,6 @@ class ::IO
     lidx = objects.size - 1
     wsep = $, || $\
     objects.each_with_index do |object, idx|
-      object = ::Opal.coerce_to!(object, ::String, :to_s)
       idx == lidx ? write(object) : write(object, wsep)
     end
     write($\) if $\
