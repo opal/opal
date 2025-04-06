@@ -85,6 +85,7 @@ module Opal
     alias_runner :node, :nodejs
 
     if !OS.windows? && !OS.macos?
+      register_runner :cjs,       :Cjs,         'opal/cli_runners/cjs'
       register_runner :gjs,       :Gjs,         'opal/cli_runners/gjs'
     end
 
