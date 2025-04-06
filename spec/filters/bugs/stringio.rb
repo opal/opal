@@ -24,7 +24,6 @@ opal_filter "StringIO" do
   fails "StringIO#putc when passed [String] handles concurrent writes correctly" # NotImplementedError: Thread creation not available
   fails "StringIO#puts when passed 1 or more objects handles concurrent writes correctly" # NotImplementedError: Thread creation not available
   fails "StringIO#puts when passed an Array returns general object info if :to_s does not return a string" # TypeError: no implicit conversion of MockObject into String
-  fails "StringIO#puts when passed an encoded string stores the bytes unmodified" # Expected  "\x00\x01\x02 \xC3\xA6\xC3\xA5\xC3\xB8 " ==  "\u0000\u0001\u0002 æåø " to be truthy but was false
   fails "StringIO#read when passed length and a buffer reads [length] characters into the buffer" # NotImplementedError: out_string buffer is currently not supported
   fails "StringIO#read when passed length, buffer raises a FrozenError error when passed a frozen String as buffer" # Expected FrozenError but got: NotImplementedError (out_string buffer is currently not supported)
   fails "StringIO#read when passed length, buffer raises a TypeError when the passed buffer Object can't be converted to a String" # Expected TypeError but got: NotImplementedError (out_string buffer is currently not supported)
@@ -99,7 +98,6 @@ opal_filter "StringIO" do
   fails "StringIO#write_nonblock when self is not writable raises an IOError" # Expected IOError but got: NoMethodError (undefined method `write_nonblock' for #<StringIO:0x538 @buffer=#IO::Buffer 74 65 73 74 INTERNAL  @string="test" @string_is_valid=true @pos=0 @lineno=0 @eof=false @mode="r" @opened="read" @closed="write" @binmode=false>)
   fails "StringIO.new warns when called with a block" # Expected warning to match: /StringIO::new\(\) does not take block; use StringIO::open\(\) instead/ but got: ""
   fails "StringIO.open when passed [Object, mode] allows passing the mode as an Integer" # NoMethodError: undefined method `call' for nil
-  fails "StringIO.open when passed [Object, mode] even sets self's string to nil when an exception is raised while yielding" # Expected "example" to be nil
   fails "StringIO.open when passed [Object, mode] raises a FrozenError when passed a frozen String in truncate mode as StringIO backend" # Expected FrozenError but got: NoMethodError (undefined method `call' for nil)
   fails "StringIO.open when passed [Object, mode] raises an Errno::EACCES error when passed a frozen string with a write-mode" # Expected Errno::EACCES but got: NoMethodError (undefined method `call' for nil)
   fails "StringIO.open when passed [Object] automatically sets the mode to read-only when passed a frozen string" # Expected false to be true

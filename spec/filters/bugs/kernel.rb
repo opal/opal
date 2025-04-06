@@ -72,7 +72,6 @@ opal_filter "Kernel" do
   fails "Kernel#extend does not calls append_features on arguments metaclass" # Expected true == false to be truthy but was false
   fails "Kernel#fail accepts an Object with an exception method returning an Exception" # Expected StandardError (...) but got: TypeError (exception class/object expected)
   fails "Kernel#freeze causes mutative calls to raise RuntimeError" # Expected RuntimeError but no exception was raised (1 was returned)
-  fails "Kernel#freeze freezes an object's singleton class" # Expected false == true to be truthy but was false
   fails "Kernel#initialize_copy does nothing if the argument is the same as the receiver" # Expected nil.equal? #<Object:0x3cb42> to be truthy but was false
   fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
@@ -106,7 +105,6 @@ opal_filter "Kernel" do
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors" # Expected ["f_pub", "f_pro", "f_pri"] == ["f_pub"] to be truthy but was false
   fails "Kernel#public_send includes `public_send` in the backtrace when passed a single incorrect argument" # Expected "method=\"public_send\" @object=nil> is not a symbol nor a string:in `TypeError: #<MSpecEnv:0x5399c '".include? "`public_send'" to be truthy but was false
   fails "Kernel#public_send includes `public_send` in the backtrace when passed not enough arguments" # Expected "<internal:corelib/runtime.js>:1546:5:in `Opal.ac'".include? "`public_send'" to be truthy but was false
-  fails "Kernel#puts delegates to $stdout.puts" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x561c0 @name=nil @stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true>>
   fails "Kernel#raise accepts a cause keyword argument that overrides the last exception" # Expected #<RuntimeError: first raise> == #<StandardError: StandardError> to be truthy but was false
   fails "Kernel#raise accepts a cause keyword argument that sets the cause" # Expected nil == #<StandardError: StandardError> to be truthy but was false
   fails "Kernel#raise passes no arguments to the constructor when given only an exception class" # Expected #<Class:0x5390e> but got: ArgumentError ([#initialize] wrong number of arguments (given 1, expected 0))
@@ -123,7 +121,6 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_class for an IO object with a replaced singleton class looks up singleton methods from the fresh singleton class after an object instance got a new one" # NoMethodError: undefined method `reopen' for #<File:0x6c204 @fd="ruby/core/kernel/singleton_class_spec.rb" @flags="r" @eof=false @closed="write">
   fails "Kernel#singleton_class raises TypeError for Symbol" # Expected TypeError but no exception was raised (#<Class:#<String:0x53aaa>> was returned)
   fails "Kernel#singleton_class raises TypeError for a frozen deduplicated String" # Expected TypeError (can't define singleton) but no exception was raised (#<Class:#<String:0x6c200>> was returned)
-  fails "Kernel#singleton_class returns a frozen singleton class if object is frozen" # Expected false to be true
   fails "Kernel#singleton_method find a method defined on the singleton class" # NoMethodError: undefined method `singleton_method' for #<Object:0x4540a>
   fails "Kernel#singleton_method only looks at singleton methods and not at methods in the class" # Expected NoMethodError == NameError to be truthy but was false
   fails "Kernel#singleton_method raises a NameError if there is no such method" # Expected NoMethodError == NameError to be truthy but was false

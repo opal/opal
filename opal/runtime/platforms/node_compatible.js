@@ -19,7 +19,7 @@ const process = await import("node:process");
 
 // Helpers
 function not_available(fun) {
-  Opal.Kernel.$raise(Opal.NotImplementedError, fun + " is not available on node and compatible platforms");
+  platform.handle_unsupported_feature(fun + " is not available on node and compatible platforms");
 }
 // IO helper function to raise correct Ruby Error instead of platform specific error
 function io_action(action, ...args) {
@@ -29,7 +29,7 @@ function io_action(action, ...args) {
     if (platform.deno && !code) { code = error.message.split(':')[0]; }
     // Errno is autoloaded, to make sure it gets loaded eventually, must use const_get here
     if (Opal.Object.$const_get('Errno').$constants().indexOf(code) >= 0) {
-      var error_class = Opal.Errno.$const_get(code);
+      let error_class = Opal.Errno.$const_get(code);
       Opal.Kernel.$raise(error_class.$new(error.message));
     }
     Opal.Kernel.$raise(error);
@@ -100,7 +100,7 @@ platform.env_set = (key, value)=> {
 };
 
 // Process
-// TODO: move -1 function to common
+// Some of the functions are not available on all platforms node runs on.
 let proc_umask = 18;
 platform.proc_getegid = (typeof process.getegid === "function") ? process.getegid : ()=>-1;
 platform.proc_setegid = (typeof process.setegid === "function") ? process.setegid : ()=>-1;
@@ -132,7 +132,7 @@ platform.proc_spawn = function() {
   return child_process.spawnSync.apply(null, arguments);
 }
 
-// IO Pipe
+// IO.pipe
 // In process pipe, because Nodejs does not support real pipes, so lets emulate them.
 // For the Future: maybe can use unix sockets/named pipes for real IPC with cluster.fork() here.
 platform.pipes = { __proto__: null };
@@ -209,7 +209,7 @@ platform.io_pipe_eof = function(fd) {
   return platform.pipes[fd].eof(fd);
 }
 
-// IO spawn (used by IO::popen)
+// IO.popen
 class SpawnPipe {
   constructor(buff_size, cmd, args, options)  {
     this.data_view = new DataView(new ArrayBuffer(buff_size));
@@ -274,7 +274,7 @@ class SpawnPipe {
   get pid() { return this.chpr.pid; }
 }
 
-platform.io_spawn = function(cmd, args, options) {
+platform.io_popen = function(cmd, args, options) {
   let pp = new SpawnPipe(1024, cmd.toString(), args, options);
   platform.pipes[pp.fd] = pp;
   return [pp.fd, pp.pid];
@@ -317,7 +317,7 @@ function flags_to_mode(flags) {
   if (flags === o.RDONLY) return "r";
 }
 
-platform.io_close = function(fd) {
+platform.io_close = (fd)=>{
   if (fd < 3) return; // closing fd < 3 will confuse node, so we don't do it
   if (platform.pipes[fd]) {
     platform.pipes[fd].close(fd);
@@ -331,20 +331,20 @@ platform.io_close = function(fd) {
 platform.io_fdatasync = (fd)=>{ if (fd > 2) io_action(fs.fdatasyncSync, fd); }
 platform.io_fstat = (fd)=>io_action(fs.fstatSync, fd);
 platform.io_fsync = (fd)=>{ if (fd > 2) io_action(fs.fsyncSync, fd); }
-platform.io_ioctl = ()=>not_available("IO#ioctl");
+platform.io_ioctl = (_cmd, _arg)=>not_available("IO#ioctl");
 platform.io_open = (fd)=>{ return fd < 3 ? true : false };
-platform.io_open_path = function(path_name, flags, perm) {
+platform.io_open_path = (path_name, flags, perm)=>{
   path_name = path_name.toString();
   let mode = flags_to_mode(flags);
   if (!mode) mode = emulated_flags_to_mode(flags, path_name, perm);
   return io_action(fs.openSync, path_name, mode, perm);
 }
-platform.io_read = function(fd, io_buffer, buffer_offset, pos, count) {
+platform.io_read = (fd, io_buffer, buffer_offset, pos, count)=>{
   let pp = platform.pipes[fd];
   if (pp) return pp.read(io_buffer, buffer_offset, count);
   return io_action(fs.readSync, fd, io_buffer.data_view, buffer_offset, count, pos);
 };
-platform.io_write = function(fd, io_buffer, buffer_offset, pos, count) {
+platform.io_write = (fd, io_buffer, buffer_offset, pos, count)=>{
   let data = io_buffer.data_view;
   // Also in theory its possible to use fs.writeSync for std*, but in reality that works only half the time and
   // causes problems.
@@ -383,8 +383,8 @@ platform.file_lchmod = (_file_name, _mode)=>not_available("File.lchmod");
 platform.file_link = (path_name, new_path_name)=>io_action(fs.linkSync, path_name.toString(), new_path_name.toString());
 platform.file_lstat = (file_name)=>io_action(fs.lstatSync, file_name.toString());
 platform.file_lutime = (file_name, atime, mtime)=>io_action(fs.lutimesSync, file_name.toString(), atime, mtime);
-platform.file_mkfifo = function(file_name, mode) {
-  if (platform.windows) not_available("On Windows File#mkfifo");
+platform.file_mkfifo = (file_name, mode)=>{
+  if (platform.windows) not_available("On Windows File.mkfifo");
   let res = child_process.spawnSync('mkfifo', ['-m', mode.toString(8), file_name.toString()]);
   return res.status;
 }
@@ -399,7 +399,7 @@ platform.file_symlink = (path_name, new_path_name)=>{
 }
 platform.file_truncate = (file_name, len)=>io_action(fs.truncateSync, file_name.toString(), len);
 platform.file_unlink = (file_name)=>io_action(fs.unlinkSync, file_name.toString());
-platform.file_utimes = (file_name, atime, mtime)=>io_action(fs.utimesSync, file_name.toString(), atime, mtime);
+platform.file_utime = (file_name, atime, mtime)=>io_action(fs.utimesSync, file_name.toString(), atime, mtime);
 
 // Dir
 // As node cannot handle dirs with file descriptors, we need to emulate them.
@@ -408,7 +408,7 @@ platform.file_utimes = (file_name, atime, mtime)=>io_action(fs.utimesSync, file_
 // like above in Pipe.get_fd(), which is a bit overkill.
 platform.directories = { __proto__: null, last: 0 }
 platform.dir_chdir = (dir_name)=>io_action(process.chdir, dir_name.toString());
-platform.dir_chroot = (_dir_name)=>not_available("Dir#chroot");
+platform.dir_chroot = (_dir_name)=>not_available("Dir.chroot");
 platform.dir_close = (fd)=>{
   let dir = platform.directories[fd];
   if (!dir) { return; }
@@ -448,7 +448,17 @@ platform.dir_rewind = (fd)=>{
   dir.handle = io_action(fs.opendirSync, dir.handle.path);
   dir.eof = dir.dot = dir.dotdot = false;
 }
-platform.dir_unlink = (dir_name)=>io_action(fs.rmdirSync, dir_name.toString());
+platform.dir_unlink = (dir_name)=>{
+  dir_name = dir_name.toString();
+  if (platform.deno && fs.existsSync(dir_name)) {
+    let stat = fs.lstatSync(dir_name)
+    if (!stat.isDirectory()) {
+      let error_class = Opal.Object.$const_get('Errno').$const_get('ENOTDIR');
+      Opal.Kernel.$raise(error_class.$new('not a directory'));
+    }
+  }
+  io_action(fs.rmdirSync, dir_name);
+}
 platform.dir_wd = (sep)=>process.cwd().replaceAll(path.sep, sep.toString());
 
 });}

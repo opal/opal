@@ -202,8 +202,6 @@ class StringIO
                   else
                     "\n"
                   end
-
-    @tty = `$platform.io_open(self.fd)` if @fd
   end
 
   def <<(object)

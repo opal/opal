@@ -323,7 +323,7 @@ class ::IO
         // options.timeout;
         // options.killSignal;
       }
-      fd, pid = `$platform.io_spawn(cmd, args, js_opts)`
+      fd, pid = `$platform.io_popen(cmd, args, js_opts)`
       io = new(fd, mode, **opts)
       `io.pid = pid`
       return io unless block_given?
@@ -537,7 +537,7 @@ class ::IO
                     "\n"
                   end
 
-    @tty = `$platform.io_open(self.fd)` if @fd
+    @tty = `$platform.io_open(self.fd, self.flags)` if @fd
   end
 
   def <<(object)
@@ -896,10 +896,8 @@ class ::IO
   def initialize_copy(other)
     `check_open(other)`
 
-    if @path
-      @fd = `$platform.io_open_path(self.path, self.flags)`
-      @tty = `$platform.io_open(self.fd)` if @fd
-    end
+    @fd = `$platform.io_open_path(self.path, self.flags)` if path
+    @tty = `$platform.io_open(self.fd, self.flags)` if @fd
 
     @autoclose = true
     @close_on_exec = true

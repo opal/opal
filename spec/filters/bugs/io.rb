@@ -292,9 +292,7 @@ opal_filter "IO" do
   fails "IO.select when passed nil for timeout sleeps forever and sets the thread status to 'sleep'" # NotImplementedError: Thread creation not available
   fails "IO.try_convert raises a TypeError if the object does not return an IO from #to_io" # Expected TypeError (can't convert MockObject to IO (MockObject#to_io gives String)) but got: TypeError (can't convert MockObject into IO (MockObject#to_io gives String))
   fails "IO.try_convert return nil when BasicObject is passed" # NoMethodError: undefined method `is_a?' for #<BasicObject:0xe88e>
-  fails "IO.write accepts a :flags option without :mode one" # ArgumentError: mode given multiple times
   fails "IO.write accepts options as a keyword argument" # Expected ArgumentError (wrong number of arguments (given 4, expected 2..3)) but no exception was raised (2 was returned)
-  fails "IO.write requires mode to be specified in :open_args even if flags option passed" # Expected IOError (not opened for writing) but no exception was raised (8 was returned)
   fails "IO::EAGAINWaitReadable combines Errno::EAGAIN and IO::WaitReadable" # NameError: uninitialized constant IO::EAGAINWaitReadable
   fails "IO::EAGAINWaitReadable is the same as IO::EWOULDBLOCKWaitReadable if Errno::EAGAIN is the same as Errno::EWOULDBLOCK" # NameError: uninitialized constant Errno::EAGAIN
   fails "IO::EAGAINWaitWritable combines Errno::EAGAIN and IO::WaitWritable" # NameError: uninitialized constant IO::EAGAINWaitWritable

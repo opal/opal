@@ -237,7 +237,7 @@ class ::File < ::IO
 
     def size
       # Returns the size of stat in bytes.
-      `self.stat?.size`
+      `self.stat.size`
     end
 
     def size?
@@ -260,10 +260,9 @@ class ::File < ::IO
     def symlink?
       # Returns true if stat is a symbolic link, false if it isn’t
       # or if the operating system doesn’t support this feature.
-      %x{
-        if (typeof self.stat.isSymbolicLink === "function") return self.stat.isSymbolicLink();
-        else return false;
-      }
+      `self.stat.isSymbolicLink()`
+    rescue
+      false
     end
 
     def uid
@@ -1018,7 +1017,7 @@ class ::File < ::IO
         pathname = readlink(pathname) if symlink?(pathname)
         dirname, file = split(pathname)
         dirname = `$platform.file_realpath(dirname, #{::File::SEPARATOR})` # may correctly raise ENOENT again
-        return join(dirname, file)
+        join(dirname, file)
       end
     end
 
@@ -1029,8 +1028,7 @@ class ::File < ::IO
       # All components of the pathname must exist when this method is called.
       pathname = `coerce_to_path(pathname)`
       pathname = join(dir_string, pathname) if dir_string
-      result = `$platform.file_realpath(pathname, #{::File::SEPARATOR})`
-      result
+      `$platform.file_realpath(pathname, #{::File::SEPARATOR})`
     end
 
     def rename(old_name, new_name)
@@ -1164,7 +1162,7 @@ class ::File < ::IO
       end
       file_names.each do |file_name|
         file_name = ::Opal.coerce_to!(file_name, ::String, :to_path) unless file_name.is_a?(String)
-        `$platform.file_utimes(file_name, atime, mtime)`
+        `$platform.file_utime(file_name, atime, mtime)`
       end
       file_names.size
     end
