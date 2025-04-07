@@ -6,9 +6,6 @@
 # even async.
 # For CDP see docs/cdp_common.(md|json)
 
-require 'opal/platform'
-require 'nodejs/env'
-
 %x{
 var CDP = require("chrome-remote-interface");
 var fs = require("fs");

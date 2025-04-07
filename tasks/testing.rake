@@ -166,7 +166,6 @@ module Testing
       random_seed = Testing.get_random_seed(env)
 
       File.write filename, <<-RUBY
-        require 'opal/platform' # in node ENV is replaced
         require 'opal-parser'
         #{env_data}
         srand(#{random_seed})
