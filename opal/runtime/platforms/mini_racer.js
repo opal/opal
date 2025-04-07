@@ -1,19 +1,17 @@
 //
-// For unknown platforms all functions for best platform support
-// This file also serves as template for supporting new platforms.
+// mini_racer
 //
 
-if ("unknown" === Opal.platform.name) {
+if ("mini_racer" == Opal.platform.name) {
 Opal.queue(async function() {
-
 const platform = Opal.platform;
 
 // imports
-// For new platforms put imports here
+// none
 
 // Helpers
 function not_available(fun) {
-  platform.handle_unsupported_feature(fun + " is not available on this platform");
+  platform.handle_unsupported_feature(fun + " is not available on mini_racer");
 }
 
 // RUBY_PLATFORM and some OS dependent switches
@@ -34,10 +32,10 @@ platform.tmpdir = ()=>"/tmp";
 platform.version = "unknown";
 
 // Exit
-platform.exit = Opal.exit;
+platform.exit = opalminiracer.exit;
 
 // ARGV
-platform.argv = []
+platform.argv = opalminiracer.argv;
 
 // ENV
 const env = { __proto__: null };
@@ -92,6 +90,7 @@ else {
     }
   }
 }
+
 platform.io_close = (fd)=>{ if (fd > 2) not_available("IO for fd > 2"); }
 platform.io_fdatasync = (_fd)=>not_available("IO#fdatasync");
 platform.io_fstat = (_fd)=>not_available("IO#fstat");

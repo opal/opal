@@ -3,7 +3,7 @@ require 'runtime/boot'
 require 'runtime/platform_support' # must be first
 # require 'runtime/platforms/browsers'
 require 'runtime/platforms/gjs_compatible'
-# require 'runtime/platforms/mini_racer'
+require 'runtime/platforms/mini_racer'
 require 'runtime/platforms/node_compatible'
 # require 'runtime/platforms/osascript'
 require 'runtime/platforms/quickjs'
