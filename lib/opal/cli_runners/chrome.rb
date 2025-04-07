@@ -127,35 +127,39 @@ module Opal
         chrome_server_cmd = %{#{OS.shellescape(chrome_executable)} \
           --allow-pre-commit-input \
           --disable-background-networking \
-          --enable-features=NetworkServiceInProcess2 \
           --disable-background-timer-throttling \
           --disable-backgrounding-occluded-windows \
           --disable-breakpad \
           --disable-client-side-phishing-detection \
           --disable-component-extensions-with-background-pages \
+          --disable-crash-reporter \
           --disable-default-apps \
           --disable-dev-shm-usage \
           --disable-extensions \
-          --disable-features=Translate,BackForwardCache,AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync \
+          --disable-features=Translate,AcceptCHFrame,MediaRouter,OptimizationHints \
           --disable-hang-monitor \
+          --disable-infobars \
           --disable-ipc-flooding-protection \
           --disable-popup-blocking \
           --disable-prompt-on-repost \
           --disable-renderer-backgrounding \
+          --disable-search-engine-choice-screen \
           --disable-sync \
-          --force-color-profile=srgb \
-          --metrics-recording-only \
-          --no-first-run \
+          --disable-web-security \
           --enable-automation \
+          --enable-blink-features=IdleDetection \
+          --enable-features=PdfOopif \
+          --export-tagged-pdf \
+          --force-color-profile=srgb \
+          --generate-pdf-document-outline \
+          --headless \
+          --hide-scrollbars \
+          --metrics-recording-only \
+          --mute-audio \
+          --no-first-run \
           --password-store=basic \
           --use-mock-keychain \
-          --enable-blink-features=IdleDetection \
-          --export-tagged-pdf \
-          --headless \
           --user-data-dir=#{profile} \
-          --hide-scrollbars \
-          --mute-audio \
-          --disable-web-security \
           --remote-debugging-port=#{chrome_port} \
           #{ENV['CHROME_OPTS']}}
 
