@@ -168,9 +168,14 @@ CDP.List(options, async function(err, targets) {
             // output actual message
             for(i = 0; i < args.length; i++) {
               arg = args[i];
-              if (arg.type === "string") { value = arg.value; }
-              else { value = JSON.stringify(arg); }
-              process.stdout.write(value);
+
+              if (arg.unserializableValue) {
+                process.stdout.write("CDP runner received a unserializable value of JS type '" + (arg.className || arg.type) + "'");
+              } else {
+                if (arg.type === "string") { value = arg.value; }
+                else { value = JSON.stringify(arg); }
+                process.stdout.write(value);
+              }
             }
 
             if (entry.stackTrace && entry.stackTrace.callFrames) {

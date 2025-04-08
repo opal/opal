@@ -63,7 +63,7 @@
       Opal.Kernel.$raise(Opal.NotImplementedError, message);
       break;
     case 'warning':
-      console.warn(message);
+      console.warn(message.toString());
       break;
     }
     // otherwise ignore

@@ -506,7 +506,7 @@
         if (Opal.respond_to && Opal.respond_to(error, '$full_message')) {
           error = error.$full_message();
         }
-        console.error(error);
+        console.error(error.toString());
         // Abort further execution
         Opal.promise_unhandled_exception = true;
         Opal.platform.exit(1);
