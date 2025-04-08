@@ -370,7 +370,7 @@ module Opal
           'toolkit.startup.max_resumed_crashes': -1,
         }
         prefs = default_prefs.map { |key, value| "user_pref(\"#{key}\", #{JSON.dump(value)});" }
-        # apparently firefox will read user.js an generate prefs.js from it
+        # apparently firefox will read user.js and generate prefs.js from it
         File.binwrite(profile + '/user.js', prefs.join("\n"))
         profile
       end
