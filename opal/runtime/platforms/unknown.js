@@ -14,6 +14,7 @@ const platform = Opal.platform;
 // Helpers
 function not_available(fun) {
   platform.handle_unsupported_feature(fun + " is not available on this platform");
+  return Opal.nil;
 }
 
 // RUBY_PLATFORM and some OS dependent switches
@@ -99,7 +100,7 @@ platform.io_fsync = (_fd)=>not_available("IO#fsync");
 platform.io_ioctl = (_cmd, _arg)=>not_available("IO#ioctl");
 platform.io_open = (_fd)=>false;
 platform.io_open_path = (_path_name, _flags, _perm)=>not_available("IO for fd > 2");
-platform.io_read = (_fd, _io_buffer, _buffer_offset, _pos, _count)=>not_available("IO reading");
+platform.io_read = (_fd, _io_buffer, _buffer_offset, _pos, _count)=>not_available("IO#read");
 platform.io_write = (fd, io_buffer, buffer_offset, _pos, count)=>{
   if (fd > 2) return not_available("IO for fd > 2");
   let data;

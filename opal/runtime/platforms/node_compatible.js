@@ -20,6 +20,7 @@ const process = await import("node:process");
 // Helpers
 function not_available(fun) {
   platform.handle_unsupported_feature(fun + " is not available on node and compatible platforms");
+  return Opal.nil;
 }
 // IO helper function to raise correct Ruby Error instead of platform specific error
 function io_action(action, ...args) {
@@ -384,7 +385,7 @@ platform.file_link = (path_name, new_path_name)=>io_action(fs.linkSync, path_nam
 platform.file_lstat = (file_name)=>io_action(fs.lstatSync, file_name.toString());
 platform.file_lutime = (file_name, atime, mtime)=>io_action(fs.lutimesSync, file_name.toString(), atime, mtime);
 platform.file_mkfifo = (file_name, mode)=>{
-  if (platform.windows) not_available("On Windows File.mkfifo");
+  if (platform.windows) return not_available("On Windows File.mkfifo");
   let res = child_process.spawnSync('mkfifo', ['-m', mode.toString(8), file_name.toString()]);
   return res.status;
 }
@@ -406,20 +407,20 @@ platform.file_utime = (file_name, atime, mtime)=>io_action(fs.utimesSync, file_n
 // But this may lead to confusion, if dir fds are interchanged with file fds.
 // Specifically with Dir.fchdir, but otherwise we would need to allocate a real fd,
 // like above in Pipe.get_fd(), which is a bit overkill.
-platform.directories = { __proto__: null, last: 0 }
+let directories = { __proto__: null, last: 0 }
 platform.dir_chdir = (dir_name)=>io_action(process.chdir, dir_name.toString());
 platform.dir_chroot = (_dir_name)=>not_available("Dir.chroot");
 platform.dir_close = (fd)=>{
-  let dir = platform.directories[fd];
+  let dir = directories[fd];
   if (!dir) { return; }
   dir.handle.closeSync();
-  delete platform.directories[fd];
+  delete directories[fd];
 }
 platform.dir_home = (sep)=>os.homedir().replaceAll(path.sep, sep.toString());
 platform.dir_open = (dir_name)=>{
   let handle = io_action(fs.opendirSync, dir_name.toString()),
-      fd = ++platform.directories.last;
-  platform.directories[fd] = { handle: handle, eof: false, dot: false, dotdot: false };
+      fd = ++directories.last;
+  directories[fd] = { __proto__: null, handle: handle, eof: false, dot: false, dotdot: false };
   return fd;
 }
 platform.dir_mkdir = (dir_name, mode)=>{
@@ -428,7 +429,7 @@ platform.dir_mkdir = (dir_name, mode)=>{
   if (platform.deno) fs.chmodSync(dir_name, mode); // Deno doesn't set mode correctly in mkdirSync
 }
 platform.dir_next = (fd)=>{
-  let dir = platform.directories[fd];
+  let dir = directories[fd];
   if (!dir) return;
   let entry = (!dir.eof) ? dir.handle.readSync() : null;
   if (entry) return entry.name;
@@ -442,9 +443,9 @@ platform.dir_next = (fd)=>{
     return '..';
   }
 }
-platform.dir_path = (fd)=>platform.directories[fd].handle.path;
+platform.dir_path = (fd)=>directories[fd].handle.path;
 platform.dir_rewind = (fd)=>{
-  let dir = platform.directories[fd];
+  let dir = directories[fd];
   dir.handle = io_action(fs.opendirSync, dir.handle.path);
   dir.eof = dir.dot = dir.dotdot = false;
 }

@@ -38,22 +38,30 @@ class Opal_VSVFS {
 
   // helper to ensure absolute paths
   absolute(path) {
-    if (path[0] == '/') return path;
-    if (this.wd[this.wd.length] == '/') return this.wd + path;
-    return this.wd + '/' + path;
+    if (path === '.') return this.wd;
+    if (path === '..') {
+      let parts = this.wd.split('/');
+      parts.pop();
+      path = parts.join('/');
+      if (path === '') return '/';
+      return path;
+    }
+    if (path[0] !== '/') path = this.wd + '/' + path;
+    return path.replaceAll(/\/+/g, '/');
   }
 
   // helper to find working directory and entry from path
   wd_name_entry(path) {
     let directories, wd = this.fs, name, i, p;
     path = this.absolute(path);
+    if (path === '/') return [this.fs, '/', this.fs];
     directories = path.split('/');
     name = directories.pop();
     while (name == '') name = directories.pop();
     if (!name) throw new Error("ENOENT");
     for (i = 0; i < directories.length; i++) {
       p = directories[i];
-      if (p == '') continue;
+      if (p === '') continue;
       wd = wd.get(p);
       if (!wd) throw new Error("ENOENT");
       if (!(wd instanceof Map)) throw new Error("ENOTDIR");
@@ -70,6 +78,8 @@ class Opal_VSVFS {
     [wd, name, entry] = this.wd_name_entry(path);
     if (!entry) throw new Error("ENOENT");
     if (!(entry instanceof Map)) throw new Error("ENOTDIR");
+    path = path.replace(/\/+$/, '');
+    if (path === '') path = '/';
     return this.wd = path;
   }
 
@@ -88,10 +98,11 @@ class Opal_VSVFS {
   rmdir(path) {
     let wd, entry, name;
     [wd, name, entry] = this.wd_name_entry(path);
+    if (name === '/') return;
     if (entry) {
       if (!(entry instanceof Map)) throw new Error("ENOTDIR");
       if (entry.size > 0) throw new Error("ENOTEMPTY");
-      wd.delete(entry);
+      wd.delete(name);
     }
   }
 
@@ -122,7 +133,7 @@ class Opal_VSVFS {
     [wd, name, entry] = this.wd_name_entry(path);
     if (entry) {
       if (entry instanceof Map) throw new Error("EISDIR");
-      wd.delete(entry);
+      wd.delete(name);
     }
   }
 
@@ -133,6 +144,7 @@ class Opal_VSVFS {
     if (!entry) throw new Error("ENOENT");
     return new Opal_VSVFS_FileStat(entry);
   }
+
   // truncate a file to len
   truncate(path, len) {
     let wd, entry, name;

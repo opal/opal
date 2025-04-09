@@ -4,8 +4,32 @@ opal_filter "Dir" do
   fails "Dir#inspect includes the class name" # Errno::ENOENT: No such file or directory
   fails "Dir#inspect includes the directory name" # Errno::ENOENT: No such file or directory
   fails "Dir#inspect returns a String" # Errno::ENOENT: No such file or directory
+  fails "Dir#pos= moves the read position to a previously obtained position" # Expected "nested" == ".dotfile" to be truthy but was false
+  fails "Dir#rewind resets the next read to start from the first entry" # Expected "nested" == ".dotfile" to be truthy but was false
+  fails "Dir#seek moves the read position to a previously obtained position" # Expected "nested" == ".dotfile" to be truthy but was false
+  fails "Dir.[] :base option passed accepts both relative and absolute paths" # Expected [] == ["d", "y"] to be truthy but was false
+  fails "Dir.[] :base option passed handles '' as current directory path" # Expected [] == ["a"] to be truthy but was false
+  fails "Dir.[] :base option passed handles nil as current directory path" # Expected [] == ["a"] to be truthy but was false
+  fails "Dir.[] :base option passed matches entries only from within the specified directory" # Expected [] == ["d", "y"] to be truthy but was false
   fails "Dir.[] ignores symlinks" # Errno::ENOENT: No such file or directory
   fails "Dir.[] matches multiple recursives" # Errno::ENOENT: No such file or directory
+  fails "Dir.[] matches paths with glob patterns" # Expected [] == ["special/test{1}/file[1]"] to be truthy but was false
+  fails "Dir.chdir changes to the specified directory for the duration of the block" # Expected ["//tmp/rubyspec_temp/dir_specs_mock", "/tmp/rubyspec_temp/dir_specs_mock"] == ["//tmp/rubyspec_temp/dir_specs_mock", "//tmp/rubyspec_temp/dir_specs_mock"] to be truthy but was false
+  fails "Dir.chdir changes to the specified directory" # Expected "/tmp/rubyspec_temp/dir_specs_mock" == "//tmp/rubyspec_temp/dir_specs_mock" to be truthy but was false
+  fails "Dir.chdir defaults to $HOME with no arguments" # Errno::ENOENT: No such file or directory
+  fails "Dir.chdir defaults to the home directory when given a block but no argument" # Errno::ENOENT: No such file or directory
+  fails "Dir.delete raises an Errno::EACCES if lacking adequate permissions to remove the directory" # Expected Errno::EACCES but no exception was raised (0 was returned)
+  fails "Dir.delete raises an Errno::ENOENT when trying to remove a non-existing directory" # Expected Errno::ENOENT but no exception was raised (0 was returned)
+  fails "Dir.empty? returns false for a non-directory" # Errno::ENOENT: No such file or directory
+  fails "Dir.empty? returns false for non-empty directories" # Errno::ENOENT: No such file or directory
+  fails "Dir.exist? doesn't expand paths" # Expected false to be true
+  fails "Dir.exist? returns false if the argument exists but is a file" # Expected File.exist? "ruby/core/dir/shared/exist.rb" to be truthy but was false
+  fails "Dir.exist? returns true if the given directory exists" # Expected false to be true
+  fails "Dir.exist? understands relative paths" # Expected false to be true
+  fails "Dir.glob :base option passed accepts both relative and absolute paths" # Expected [] == ["d", "y"] to be truthy but was false
+  fails "Dir.glob :base option passed handles '' as current directory path" # Expected [] == ["a"] to be truthy but was false
+  fails "Dir.glob :base option passed handles nil as current directory path" # Expected [] == ["a"] to be truthy but was false
+  fails "Dir.glob :base option passed matches entries only from within the specified directory" # Expected [] == ["d", "y"] to be truthy but was false
   fails "Dir.glob accepts a block and yields it with each elements" # Errno::ENOENT: No such file or directory
   fails "Dir.glob calls #to_path to convert multiple patterns" # Errno::ENOENT: No such file or directory
   fails "Dir.glob can take an array of patterns" # Errno::ENOENT: No such file or directory
@@ -32,6 +56,7 @@ opal_filter "Dir" do
   fails "Dir.glob matches files with any beginning with '*<non-special characters>' and option File::FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
   fails "Dir.glob matches multiple recursives" # Errno::ENOENT: No such file or directory
   fails "Dir.glob matches nothing when given an empty list of paths" # Errno::ENOENT: No such file or directory
+  fails "Dir.glob matches paths with glob patterns" # Expected [] == ["special/test{1}/file[1]"] to be truthy but was false
   fails "Dir.glob matches the literal character '\\' with option File::FNM_NOESCAPE" # Errno::ENOENT: No such file or directory
   fails "Dir.glob preserves multiple /s before a **" # Errno::ENOENT: No such file or directory
   fails "Dir.glob recursively matches any subdirectories except './' or '../' with '**/' and option File::FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
@@ -42,6 +67,11 @@ opal_filter "Dir" do
   fails "Dir.glob will follow symlinks when processing a `*/` pattern." # Errno::ENOENT: No such file or directory
   fails "Dir.glob will follow symlinks when testing directory after recursive directory in pattern" # Errno::ENOENT: No such file or directory
   fails "Dir.glob will not follow symlinks when recursively traversing directories" # Errno::ENOENT: No such file or directory
+  fails "Dir.mkdir raises Errno::EEXIST if the specified directory already exists" # Expected Errno::EEXIST but no exception was raised (0 was returned)
   fails "Dir.mkdir raises a SystemCallError when lacking adequate permissions in the parent dir" # Errno::ENOTEMPTY: Directory not empty
   fails "Dir.pwd correctly handles dirs with unicode characters in them" # Errno::ENOENT: No such file or directory
+  fails "Dir.rmdir raises an Errno::EACCES if lacking adequate permissions to remove the directory" # Expected Errno::EACCES but no exception was raised (0 was returned)
+  fails "Dir.rmdir raises an Errno::ENOENT when trying to remove a non-existing directory" # Expected Errno::ENOENT but no exception was raised (0 was returned)
+  fails "Dir.unlink raises an Errno::EACCES if lacking adequate permissions to remove the directory" # Expected Errno::EACCES but no exception was raised (0 was returned)
+  fails "Dir.unlink raises an Errno::ENOENT when trying to remove a non-existing directory" # Expected Errno::ENOENT but no exception was raised (0 was returned)
 end
