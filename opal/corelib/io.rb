@@ -1240,15 +1240,14 @@ class ::IO
       if (`other_io.opened` == :duplex || `other_io.opened` == :write) && `other_io.closed` != :write
         other_io.fsync
       end
-      if other_io.path
-        path = other_io.path
+      @path = other_io.path
+      if @path
         `$platform.io_close(self.fd)` if @fd && !closed?
         begin
-          @fd = `$platform.io_open_path(path, other_io.flags)`
+          @fd = `$platform.io_open_path(self.path, other_io.flags)`
         rescue Errno::ENOENT
-          @fd = `$platform.io_open_path(path, Opal.mode_to_flags('w+'))`
+          @fd = `$platform.io_open_path(self.path, Opal.mode_to_flags('w+'))`
         end
-        @path = path
       else
         @fd = other_io.fileno
       end
