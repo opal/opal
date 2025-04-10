@@ -234,7 +234,6 @@ opal_filter "IO" do
   fails "IO.new ignores the :encoding option when the :internal_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
   fails "IO.new raises an Errno::EINVAL if the new mode is not compatible with the descriptor's current mode" # Expected Errno::EINVAL but no exception was raised (<IO:fd 25> was returned)
   fails "IO.open accepts options as keyword arguments" # Expected ArgumentError (wrong number of arguments (given 3, expected 1..2)) but no exception was raised (<IO:fd 35> was returned)
-  fails "IO.open does not set last error when an IOError with 'closed stream' raised by #close" # Expected #<Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<MockObject:0x22fe>'> == nil to be truthy but was false
   fails "IO.open ignores the :encoding option when the :external_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
   fails "IO.open ignores the :encoding option when the :internal_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
   fails "IO.open raises an Errno::EINVAL if the new mode is not compatible with the descriptor's current mode" # Expected Errno::EINVAL but no exception was raised (<IO:fd 2> was returned)

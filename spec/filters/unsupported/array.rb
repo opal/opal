@@ -12,7 +12,6 @@ opal_unsupported_filter "Array" do
   fails "Array#inspect with encoding does not raise if inspected result is not default external encoding" # Mock 'utf_16be' expected to receive inspect("any_args") exactly 1 times but received it 0 times
   fails "Array#inspect with encoding returns a US-ASCII string for an empty Array" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "Array#inspect with encoding use US-ASCII encoding if the default external encoding is not ascii compatible" # ArgumentError: unknown encoding name - UTF-32
-  fails "Array#inspect with encoding use the default external encoding if it is ascii compatible" # ArgumentError: unknown encoding name - EUC-JP
   fails "Array#join fails for arrays with incompatibly-encoded strings" # Expected EncodingError but no exception was raised ("barbázÿ" was returned)
   fails "Array#join returns a US-ASCII string for an empty Array" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "Array#join uses the first encoding when other strings are compatible" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
@@ -22,6 +21,5 @@ opal_unsupported_filter "Array" do
   fails "Array#to_s with encoding does not raise if inspected result is not default external encoding" # Mock 'utf_16be' expected to receive inspect("any_args") exactly 1 times but received it 0 times
   fails "Array#to_s with encoding returns a US-ASCII string for an empty Array" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
   fails "Array#to_s with encoding use US-ASCII encoding if the default external encoding is not ascii compatible" # ArgumentError: unknown encoding name - UTF-32
-  fails "Array#to_s with encoding use the default external encoding if it is ascii compatible" # ArgumentError: unknown encoding name - EUC-JP
   fails "Array#uniq uses eql? semantics" # Expected [1] == [1, 1] to be truthy but was false
 end

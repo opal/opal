@@ -90,8 +90,6 @@ opal_filter "Kernel" do
   fails "Kernel#methods does not return private singleton methods defined in 'class << self'" # Expected ["ichi", "san", "shi", "roku", "shichi", "hachi", "juu", "juu_ichi", "juu_ni"] not to include "shichi"
   fails "Kernel#object_id returns a different value for two Bignum literals" # Expected 295330 == 295330 to be falsy but was true
   fails "Kernel#object_id returns a different value for two String literals" # Expected 133036 == 133036 to be falsy but was true
-  fails "Kernel#p flushes output if receiver is a File" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x498ec @rs_f="\n" @rs_b=nil @rs_c=nil>
-  fails "Kernel#p is not affected by setting $\\, $/ or $," # NoMethodError: undefined method `tmp' for #<OutputToFDMatcher:0x49902 @to=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true> @expected="Next time, Gadget, NEXT TIME!\n" @to_name="STDOUT">
   fails "Kernel#pp lazily loads the 'pp' library and delegates the call to that library" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x572a>
   fails "Kernel#print prints $_ when no arguments are given" # Expected:   $stdout: "foo"       got:   $stdout: ""
   fails "Kernel#public_method changes the method called for super on a target aliased method" # NoMethodError: undefined method `public_method' for #<#<Class:0x5a558>:0x5a556>

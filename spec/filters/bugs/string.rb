@@ -116,7 +116,6 @@ opal_filter "String" do
   fails "String#eql? considers encoding compatibility" # Expected true to be false
   fails "String#eql? considers encoding difference of incompatible string" # Expected true to be false
   fails "String#force_encoding raises a FrozenError if self is frozen" # Expected FrozenError but no exception was raised ("abcd" was returned)
-  fails "String#force_encoding with a special encoding name accepts valid special encoding names" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#force_encoding with a special encoding name defaults to BINARY if special encoding name is not set" # NoMethodError: undefined method `default_internal' for Encoding
   fails "String#freeze doesn't produce the same object for different instances of literals in the source" # Expected "abc" not to be identical to "abc"
   fails "String#grapheme_clusters returns a different character if the String is transcoded" # NoMethodError: undefined method `grapheme_clusters' for "€"

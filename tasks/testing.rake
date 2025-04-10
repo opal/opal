@@ -86,7 +86,7 @@ module Testing
       if ENV['INVERT_RUNNING_MODE']
         # When we run an inverted test suite we should run only 'bugs'.
         # Unsupported features are not supported anyway
-        rubyspec_filters = Dir['spec/filters/bugs/*.rb'] - opalspec_filters
+        rubyspec_filters = Dir["spec/filters/{bugs,platform/#{platform}}/*.rb"] - opalspec_filters
       else
         rubyspec_filters = Dir["spec/filters/{unsupported,bugs,platform/#{platform}}/*.rb"] - opalspec_filters
       end
