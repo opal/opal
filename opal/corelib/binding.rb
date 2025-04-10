@@ -11,6 +11,7 @@ class ::Binding
 
   def js_eval(*args)
     if @jseval
+      args.map! { |arg| `(typeof arg === "object" && arg.$$is_string)` ? `arg.toString()` : arg }
       @jseval.call(*args)
     else
       ::Kernel.raise 'Evaluation on a Proc#binding is not supported'

@@ -3,15 +3,22 @@
 
 module ::Errno
   errors = [
-    [:EINVAL, 'Invalid argument', 22],
-    [:EEXIST, 'File exists', 17],
-    [:EISDIR, 'Is a directory', 21],
-    [:EMFILE, 'Too many open files', 24],
-    [:ESPIPE, 'Illegal seek', 29],
-    [:EACCES, 'Permission denied', 13],
     [:EPERM, 'Operation not permitted', 1],
     [:ENOENT, 'No such file or directory', 2],
-    [:ENAMETOOLONG, 'File name too long', 36]
+    [:ENXIO, 'No such device or address', 6],
+    [:EBADF, 'Bad file descriptor', 9],
+    [:EACCES, 'Permission denied', 13],
+    [:EEXIST, 'File exists', 17],
+    [:ENOTDIR, 'Not a directory', 20],
+    [:EISDIR, 'Is a directory', 21],
+    [:EINVAL, 'Invalid argument', 22],
+    [:EMFILE, 'Too many open files', 24],
+    [:ESPIPE, 'Illegal seek', 29],
+    [:EPIPE, 'Broken pipe', 32],
+    [:ENAMETOOLONG, 'File name too long', 36],
+    [:ENOTEMPTY, 'Directory not empty', 39],
+    [:ELOOP, 'Too many symbolic links encountered', 40],
+    [:EILSEQ, 'Illegal byte sequence', 84]
   ]
 
   klass = nil

@@ -16,7 +16,11 @@ module Opal
           [
             'deno',
             'run',
+            '--allow-env',
+            '--allow-net',
             '--allow-read',
+            '--allow-run',
+            '--allow-sys',
             '--allow-write',
             *opts,
             tempfile.path,

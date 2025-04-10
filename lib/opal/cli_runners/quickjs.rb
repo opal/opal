@@ -15,7 +15,7 @@ module Opal
         opts = Shellwords.shellwords(ENV['QJS_OPTS'] || '')
 
         SystemRunner.call(data) do |tempfile|
-          [exe, '--std', *opts, tempfile.path, *data[:argv]]
+          [exe, '--stack-size', '2097152', '--std', *opts, tempfile.path, *data[:argv]]
         end
       rescue Errno::ENOENT
         raise MissingQuickjs, 'Please install QuickJS to be able to run Opal scripts.'

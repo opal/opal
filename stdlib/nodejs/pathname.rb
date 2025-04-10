@@ -1,15 +1,13 @@
 # backtick_javascript: true
+# helper: platform
 
 require 'pathname'
 
 class Pathname
   include Comparable
 
-  @__path__ = `require('path')`
-  `var __path__ = #{@__path__}`
-
   def absolute?
-    `__path__.isAbsolute(#{@path.to_str})`
+    `$platform.file_is_absolute(self.path)`
   end
 
   def relative?

@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# helpers: platform
 
 # Debug is a helper module that allows us to conduct some debugging on
 # a live codebase. It goes with an assumption, that opal-parser or
@@ -64,8 +65,6 @@ module Opal
           pipe_setter.call(new_pipe)
         end
 
-        original_read_proc = $stdin.read_proc
-        $stdin.read_proc = `function(s) { var p = prompt(#{output}); if (p !== null) return p + "\n"; return nil; }`
       end
 
       yield
@@ -73,12 +72,11 @@ module Opal
       original.each do |pipe, pipe_setter|
         pipe_setter.call(pipe)
       end
-      $stdin.read_proc = original_read_proc
       self.output = ''
     end
 
     def self.browser?
-      `typeof(document) !== 'undefined' && typeof(prompt) !== 'undefined'`
+      `Opal.platform.is_browser`
     end
 
     LINEBREAKS = [
@@ -162,7 +160,7 @@ class ::Binding
           return
         end
 
-        puts ::REPLUtils.eval_and_print(js_code, mode, false, self)
+        puts ::REPLUtils.eval_and_print(js_code, mode, false, self).__await__
       end
     end
   end

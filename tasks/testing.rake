@@ -31,11 +31,9 @@ module Testing
       %w[
         mspec/helpers/tmp
         mspec/helpers/environment
-        mspec/guards/block_device
         a_file
         lib/spec_helper
         mspec/commands/mspec-run
-        etc
         rubygems
         zlib
       ]
@@ -84,13 +82,14 @@ module Testing
 
     def filters(suite, platform)
       opalspec_filters = Dir['spec/filters/**/*_opal.rb']
+      opsys = RbConfig::CONFIG['host_os']
 
       if ENV['INVERT_RUNNING_MODE']
         # When we run an inverted test suite we should run only 'bugs'.
         # Unsupported features are not supported anyway
-        rubyspec_filters = Dir['spec/filters/bugs/*.rb'] - opalspec_filters
+        rubyspec_filters = Dir["spec/filters/{bugs,platform/#{platform},platform/#{platform}/#{opsys}}/*.rb"] - opalspec_filters
       else
-        rubyspec_filters = Dir["spec/filters/{unsupported,bugs,platform/#{platform}}/*.rb"] - opalspec_filters
+        rubyspec_filters = Dir["spec/filters/{unsupported,bugs,platform/#{platform},platform/#{platform}/#{opsys}}/*.rb"] - opalspec_filters
       end
 
       suite == 'opal' ? opalspec_filters : rubyspec_filters
@@ -116,7 +115,6 @@ module Testing
       env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
 
       File.write filename, <<~RUBY
-        require 'opal/platform' # in node ENV is replaced
         #{env_data}
 
         require 'opal/full'
@@ -169,7 +167,6 @@ module Testing
       random_seed = Testing.get_random_seed(env)
 
       File.write filename, <<-RUBY
-        require 'opal/platform' # in node ENV is replaced
         require 'opal-parser'
         #{env_data}
         srand(#{random_seed})
@@ -326,8 +323,11 @@ platforms.each do |platform|
 
       stubs = Testing::MSpec.stubs.map{|s| "-s#{s}"}.join(' ')
 
-      sh "ruby -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-         "exe/opal #{cmdline} -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+      # Some specs access other files based on their current __FILE__, but the scope for these files is limited by the library include -Ispec
+      # which generates a compiled path for e.g. spec/ruby/thing.rb as ruby/thing.rb. To be able to access these files, current dir must
+      # be changed to spec via -Cspec, which allows correct access to ruby/thing.rb and thus includes and other paths must be changed to -I../spec.
+      sh "ruby -Cspec -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
+         "../exe/opal #{cmdline} -I../spec/mspec/lib -I../spec -I../lib #{stubs} -R#{platform} -Dwarning -A --enable-source-location ../#{filename}"
 
       if bm_filepath
         puts "Benchmark results have been written to #{bm_filepath}"
