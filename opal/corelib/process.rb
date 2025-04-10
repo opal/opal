@@ -153,10 +153,22 @@ module ::Process
       # Sends a signal to each process specified by ids
       # (which must specify at least one ID);
       # returns the count of signals sent.
-      signal = 'SIG' + signal.upcase unless signal.start_with?('SIG')
-      signal = `signal.toString()`
-      ids.each do |p|
-        `$platform.proc_kill(p, signal)` rescue nil
+      if signal.is_a?(::Integer)
+        signal = ::Signal.list.key(signal)
+        raise(::ArgumentError, 'unknown signal') unless signal
+      else
+        signal = signal[1..] if signal[0] == '-'
+        signal = signal.upcase
+        signal = signal[3..] if signal.start_with?('SIG')
+        raise(::ArgumentError, 'unknown signal') unless ::Signal.list.key?(signal)
+      end
+      own_pid = pid
+      ids.each do |pd|
+        if pd == own_pid
+          raise ::SignalException.new('TERM') if signal == 'TERM'
+          raise ::Interrupt.new if signal == 'INT'
+        end
+        `$platform.proc_kill(pd, signal)` rescue nil
       end
       # emulation for other specs to pass
       ps = Process::Status.new(0, ids[ids.size - 1])

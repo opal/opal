@@ -117,7 +117,14 @@ platform.proc_set_umask = function(umask) {
   proc_umask = umask;
   return process.umask(umask);
 }
-platform.proc_kill = process.kill;
+platform.proc_sig_list = (new Map()).set("EXIT",0).set("HUP",1).set("INT",2).set("ILL",4).set("TRAP",5).set("ABRT",6)
+                                    .set("IOT",6).set("FPE",8).set("KILL",9).set("BUS",7).set("SEGV",11).set("SYS",31)
+                                    .set("PIPE",13).set("ALRM",14).set("TERM",15).set("URG",23).set("STOP",19)
+                                    .set("TSTP",20).set("CONT",18).set("CHLD",17).set("CLD",17).set("TTIN",21)
+                                    .set("TTOU",22).set("IO",29).set("XCPU",24).set("XFSZ",25).set("VTALRM",26)
+                                    .set("PROF",27).set("WINCH",28).set("USR1",10).set("USR2",12).set("PWR",30)
+                                    .set("POLL",29);
+platform.proc_kill = (pid, signal)=>process.kill(pid, 'SIG' + signal.toString());
 platform.proc_pid = ()=>process.pid;
 platform.proc_ppid = ()=>process.ppid;
 platform.proc_set_title = (title)=> { process.title = title.toString(); }

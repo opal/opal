@@ -95,6 +95,7 @@ platform.proc_getuid = ()=>-1;
 platform.proc_setuid = ()=>-1;
 platform.proc_get_umask = ()=>not_available("File.umask");
 platform.proc_set_umask = ()=>not_available("File.umask");
+platform.proc_sig_list = new Map();
 platform.proc_kill = ()=>not_available("Proc.kill");
 platform.proc_pid = ()=>not_available("Proc.pid");
 platform.proc_ppid = ()=>not_available("Proc.ppid");

@@ -12,6 +12,7 @@ const platform = Opal.platform;
 // Helpers
 function not_available(fun) {
   platform.handle_unsupported_feature(fun + " is not available on mini_racer");
+  return Opal.nil;
 }
 
 // RUBY_PLATFORM and some OS dependent switches
@@ -58,6 +59,7 @@ platform.proc_setuid = ()=>-1;
 platform.proc_get_umask = ()=>not_available("File.umask");
 platform.proc_set_umask = ()=>not_available("File.umask");
 platform.proc_kill = ()=>not_available("Proc.kill");
+platform.proc_sig_list = new Map();
 platform.proc_pid = ()=>not_available("Proc.pid");
 platform.proc_ppid = ()=>not_available("Proc.ppid");
 platform.proc_set_title = (_title)=>not_available("Proc.setproctitle");
@@ -137,13 +139,13 @@ platform.file_utime = (_file_name, _atime, _mtime)=>not_available("File.utime");
 platform.dir_chdir = (_dir_name)=>not_available("Dir.chdir");
 platform.dir_chroot = (_dir_name)=>not_available("Dir.chroot");
 platform.dir_close = (_fd)=>not_available("Dir#close");
-platform.dir_home = (_sep)=>'.';
+platform.dir_home = (_sep)=>'/';
 platform.dir_open = (_dir_name)=>not_available("Dir.new");
 platform.dir_mkdir = (_dir_name, _mode)=>not_available("Dir.mkdir");
 platform.dir_next = (_fd)=>not_available("Dir#next");
 platform.dir_path = (_fd)=>not_available("Dir#path");
 platform.dir_rewind = (_fd)=>not_available("Dir#rewind");
 platform.dir_unlink = (_dir_name)=>not_available("Dir.unlink");
-platform.dir_wd = (_sep)=>'.';
+platform.dir_wd = (_sep)=>'/';
 
 });}
