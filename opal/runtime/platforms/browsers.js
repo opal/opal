@@ -42,11 +42,19 @@ function io_action(that, action, ...args) {
 };
 
 // RUBY_PLATFORM and some OS dependent switches
-platform.ruby_platform = navigator.userAgent.includes("Windows") ? "opal mswin" : "opal";
-platform.windows = false;
-platform.fs_casefold = false;
-platform.null_device = "/dev/null";
-platform.sysconfdir = "/etc"
+if (navigator.userAgent.includes("Windows")) {
+  platform.ruby_platform = "opal mswin";
+  platform.windows = true;
+  platform.fs_casefold = true;
+  platform.null_device = "NUL";
+  platform.sysconfdir = Opal.nil;
+} else {
+  platform.ruby_platform = (navigator.userAgent.includes("Linux")) ? "opal linux" : "opal";
+  platform.windows = false;
+  platform.fs_casefold = false;
+  platform.null_device = "/dev/null";
+  platform.sysconfdir = "/etc"
+}
 platform.sep = "/";
 
 // Some platform info
