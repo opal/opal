@@ -78,6 +78,7 @@ class OSpecFormatter
       'cjs'          => DottedFormatter,
       'deno'         => ColoredDottedFormatter,
       'dotted'       => DottedFormatter,
+      'edge'         => ColoredDottedFormatter,
       'firefox'      => ColoredDottedFormatter,
       'gjs'          => ColoredDottedFormatter,
       'node'         => ColoredDottedFormatter,
