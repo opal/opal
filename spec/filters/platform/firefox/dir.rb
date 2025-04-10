@@ -1,9 +1,5 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Dir" do
-  fails "Dir#initialize calls #to_path on non-String arguments" # Errno::ENOENT: No such file or directory
-  fails "Dir#inspect includes the class name" # Errno::ENOENT: No such file or directory
-  fails "Dir#inspect includes the directory name" # Errno::ENOENT: No such file or directory
-  fails "Dir#inspect returns a String" # Errno::ENOENT: No such file or directory
   fails "Dir#pos= moves the read position to a previously obtained position" # Expected "nested" == ".dotfile" to be truthy but was false
   fails "Dir#rewind resets the next read to start from the first entry" # Expected "nested" == ".dotfile" to be truthy but was false
   fails "Dir#seek moves the read position to a previously obtained position" # Expected "nested" == ".dotfile" to be truthy but was false
@@ -11,8 +7,6 @@ opal_filter "Dir" do
   fails "Dir.[] :base option passed handles '' as current directory path" # Expected [] == ["a"] to be truthy but was false
   fails "Dir.[] :base option passed handles nil as current directory path" # Expected [] == ["a"] to be truthy but was false
   fails "Dir.[] :base option passed matches entries only from within the specified directory" # Expected [] == ["d", "y"] to be truthy but was false
-  fails "Dir.[] ignores symlinks" # Errno::ENOENT: No such file or directory
-  fails "Dir.[] matches multiple recursives" # Errno::ENOENT: No such file or directory
   fails "Dir.[] matches paths with glob patterns" # Expected [] == ["special/test{1}/file[1]"] to be truthy but was false
   fails "Dir.chdir changes to the specified directory for the duration of the block" # Expected ["//tmp/rubyspec_temp/dir_specs_mock", "/tmp/rubyspec_temp/dir_specs_mock"] == ["//tmp/rubyspec_temp/dir_specs_mock", "//tmp/rubyspec_temp/dir_specs_mock"] to be truthy but was false
   fails "Dir.chdir changes to the specified directory" # Expected "/tmp/rubyspec_temp/dir_specs_mock" == "//tmp/rubyspec_temp/dir_specs_mock" to be truthy but was false
@@ -30,46 +24,23 @@ opal_filter "Dir" do
   fails "Dir.glob :base option passed handles '' as current directory path" # Expected [] == ["a"] to be truthy but was false
   fails "Dir.glob :base option passed handles nil as current directory path" # Expected [] == ["a"] to be truthy but was false
   fails "Dir.glob :base option passed matches entries only from within the specified directory" # Expected [] == ["d", "y"] to be truthy but was false
-  fails "Dir.glob accepts a block and yields it with each elements" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob calls #to_path to convert multiple patterns" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob can take an array of patterns" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/ with base keyword argument" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/** with base keyword argument and FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/** with base keyword argument" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/*pattern* with base keyword argument and FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/.* with base keyword argument and FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/.* with base keyword argument" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/.dotfile with base keyword argument and FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/.dotfile with base keyword argument" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/glob with base keyword argument and FNM_EXTGLOB" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/nondotfile with base keyword argument and FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles **/nondotfile with base keyword argument" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles infinite directory wildcards" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles simple directory patterns applied to non-directories" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles simple directory patterns" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob handles simple filename patterns" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob ignores non-dirs when traversing recursively" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob ignores symlinks" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob matches a list of paths by concatenating their individual results" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob matches any files in the current directory with '**' and option File::FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob matches both dot and non-dotfiles with '*' and option File::FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob matches files with any beginning with '*<non-special characters>' and option File::FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob matches multiple recursives" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob matches nothing when given an empty list of paths" # Errno::ENOENT: No such file or directory
+  fails "Dir.glob accepts a block and yields it with each elements" # Expected [] == ["file_one.ext", "file_two.ext"] to be truthy but was false
+  fails "Dir.glob can take an array of patterns" # Expected [] == ["file_one.ext", "file_two.ext"] to be truthy but was false
+  fails "Dir.glob handles **/** with base keyword argument and FNM_DOTMATCH" # Expected [] == [".",  ".dotfile.ext",  "directory",  "directory/structure",  "directory/structure/.ext",  "directory/structure/bar",  "directory/structure/baz",  "directory/structure/file_one",  "directory/structure/file_one.ext",  "directory/structure/foo"] to be truthy but was false
+  fails "Dir.glob handles **/*pattern* with base keyword argument and FNM_DOTMATCH" # Expected [] == [".dotfile.ext",  "directory/structure/file_one",  "directory/structure/file_one.ext"] to be truthy but was false
+  fails "Dir.glob handles **/.* with base keyword argument and FNM_DOTMATCH" # Expected [] == [".", ".dotfile.ext", "directory/structure/.ext"] to be truthy but was false
+  fails "Dir.glob handles **/.dotfile with base keyword argument and FNM_DOTMATCH" # Expected [] == [".dotfile",  ".dotsubdir/.dotfile",  "deeply/.dotfile",  "nested/.dotsubir/.dotfile",  "subdir_one/.dotfile"] to be truthy but was false
+  fails "Dir.glob handles **/nondotfile with base keyword argument and FNM_DOTMATCH" # Expected [] == [".dotsubdir/nondotfile",  "deeply/nondotfile",  "nested/.dotsubir/nondotfile",  "nondotfile",  "subdir_one/nondotfile",  "subdir_two/nondotfile"] to be truthy but was false
+  fails "Dir.glob matches a list of paths by concatenating their individual results" # Expected [] == ["deeply/",  "deeply/nested/",  "deeply/nested/directory/",  "deeply/nested/directory/structure/",  "subdir_two/nondotfile",  "subdir_two/nondotfile.ext"] to be truthy but was false
   fails "Dir.glob matches paths with glob patterns" # Expected [] == ["special/test{1}/file[1]"] to be truthy but was false
-  fails "Dir.glob matches the literal character '\\' with option File::FNM_NOESCAPE" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob preserves multiple /s before a **" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob recursively matches any subdirectories except './' or '../' with '**/' and option File::FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob recursively matches any subdirectories except './' or '../' with '**/' from the current directory and option File::FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob recursively matches files and directories in nested dot subdirectory except . with 'nested/**/*' from the current directory and option File::FNM_DOTMATCH" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob returns matching file paths when supplied :base keyword argument" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob returns nil for directories current user has no permission to read" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob will follow symlinks when processing a `*/` pattern." # Errno::ENOENT: No such file or directory
-  fails "Dir.glob will follow symlinks when testing directory after recursive directory in pattern" # Errno::ENOENT: No such file or directory
-  fails "Dir.glob will not follow symlinks when recursively traversing directories" # Errno::ENOENT: No such file or directory
+  fails "Dir.glob recursively matches any subdirectories except './' or '../' with '**/' and option File::FNM_DOTMATCH" # Expected [] == ["./",  "./.dotsubdir/",  "./brace/",  "./deeply/",  "./deeply/nested/",  "./deeply/nested/directory/",  "./deeply/nested/directory/structure/",  "./dir/",  "./nested/",  "./nested/.dotsubir/",  "./special/",  "./special/test +()[]{}/",  "./special/test{1}/",  "./special/{}/",  "./subdir_one/",  "./subdir_two/"] to be truthy but was false
+  fails "Dir.glob recursively matches files and directories in nested dot subdirectory except . with 'nested/**/*' from the current directory and option File::FNM_DOTMATCH" # Expected [] == ["nested/.",  "nested/.dotsubir",  "nested/.dotsubir/.dotfile",  "nested/.dotsubir/nondotfile"] to be truthy but was false
+  fails "Dir.glob will follow symlinks when processing a `*/` pattern." # Expected [] == ["special/ln/nondotfile"] to be truthy but was false
+  fails "Dir.glob will follow symlinks when testing directory after recursive directory in pattern" # Expected ["deeply/nondotfile", "subdir_one/nondotfile", "subdir_two/nondotfile"] == ["deeply/nondotfile",  "special/ln/nondotfile",  "subdir_one/nondotfile",  "subdir_two/nondotfile"] to be truthy but was false
+  fails "Dir.mkdir creates the named directory with the given permissions" # Expected 0 == 0 to be falsy but was true
   fails "Dir.mkdir raises Errno::EEXIST if the specified directory already exists" # Expected Errno::EEXIST but no exception was raised (0 was returned)
-  fails "Dir.mkdir raises a SystemCallError when lacking adequate permissions in the parent dir" # Errno::ENOTEMPTY: Directory not empty
-  fails "Dir.pwd correctly handles dirs with unicode characters in them" # Errno::ENOENT: No such file or directory
+  fails "Dir.mkdir raises a SystemCallError when lacking adequate permissions in the parent dir" # Expected SystemCallError but no exception was raised (0 was returned)
+  fails "Dir.pwd correctly handles dirs with unicode characters in them" # Expected "/tmp/rubyspec_temp/あ" == "//tmp/rubyspec_temp/あ" to be truthy but was false
   fails "Dir.rmdir raises an Errno::EACCES if lacking adequate permissions to remove the directory" # Expected Errno::EACCES but no exception was raised (0 was returned)
   fails "Dir.rmdir raises an Errno::ENOENT when trying to remove a non-existing directory" # Expected Errno::ENOENT but no exception was raised (0 was returned)
   fails "Dir.unlink raises an Errno::EACCES if lacking adequate permissions to remove the directory" # Expected Errno::EACCES but no exception was raised (0 was returned)

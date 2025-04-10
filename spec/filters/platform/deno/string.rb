@@ -30,6 +30,7 @@ opal_filter "String" do
   fails "String#encoding returns the given encoding if #force_encoding has been called" # FrozenError: can't modify frozen String
   fails "String#force_encoding accepts a String as the name of an Encoding" # FrozenError: can't modify frozen String
   fails "String#force_encoding accepts an Encoding instance" # FrozenError: can't modify frozen String
+  fails "String#force_encoding with a special encoding name accepts valid special encoding names" # FrozenError: can't modify frozen String
   fails "String#grapheme_clusters returns characters in the same encoding as self" # FrozenError: can't modify frozen String
   fails "String#gsub with pattern and replacement handles a pattern in a subset encoding" # FrozenError: can't modify frozen String
   fails "String#include? with String returns true if both strings are empty" # FrozenError: can't modify frozen String
