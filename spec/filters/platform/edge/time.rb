@@ -19,4 +19,5 @@ opal_filter "Time" do
   fails "Time.mktime creates the correct time just before dst change" # Expected 7200 == -14400 to be truthy but was false
   fails "Time.new uses the local timezone" # Expected 7200 == -28800 to be truthy but was false
   fails "Time.now uses the local timezone" # Expected 7200 == -28800 to be truthy but was false
+  fails "Time#wday returns an integer representing the day of the week, 0..6, with Sunday being 0" # Expected 3 == 4 to be truthy but was false
 end

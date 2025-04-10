@@ -42,7 +42,7 @@ function io_action(that, action, ...args) {
 };
 
 // RUBY_PLATFORM and some OS dependent switches
-platform.ruby_platform = "opal";
+platform.ruby_platform = navigator.userAgent.includes("Windows") ? "opal mswin" : "opal";
 platform.windows = false;
 platform.fs_casefold = false;
 platform.null_device = "/dev/null";

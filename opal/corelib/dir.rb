@@ -554,18 +554,18 @@ class ::Dir
 
       # just like in ruby/file.c
       rb_path_skip_prefix = -> (path) do
-        `function is_dirsep(chr) { return chr == '/' || chr == '\\' }`
+        `function is_dirsep(chr) { return chr == '/' || chr == '\\'; }`
 
-        if `path[0].match(/[a-zA-Z]/) && path[1] == ':'`
-          `path.slice(2)`
+        if `path[0]?.match(/[a-zA-Z]/) && path[1] == ':'`
+          2
         elsif `is_dirsep(path[0]) && is_dirsep(path[1])`
           i = 1
           while `is_dirsep(path[i+1])`
             i += 1
           end
-          `path.slice(i)`
+          i
         else
-          path
+          0
         end
       end
 
@@ -582,7 +582,7 @@ class ::Dir
 
         flgs = arg[:flags] | ::File::FNM_SYSCASE
 
-        root = rb_path_skip_prefix(root) if `$platform.windows`
+        root = rb_path_skip_prefix.(`pat.slice(root)`) if `$platform.windows`
 
         root += 1 if `pat[root] == '/'`
 
@@ -677,6 +677,7 @@ class ::Dir
 
     def tmpdir
       # Returns the operating system’s temporary file path
+      `$platform.tmpdir()`
     end
 
     alias unlink delete
