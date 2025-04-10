@@ -21,7 +21,7 @@ platform.windows = false;
 platform.fs_casefold = false;
 platform.null_device = "/dev/null";
 platform.sysconfdir = "/etc"
-platform.sep = "/";
+platform.path_sep = ":";
 
 // Some platform info
 platform.available_parallelism = ()=>1;

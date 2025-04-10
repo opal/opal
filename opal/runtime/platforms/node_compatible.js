@@ -44,12 +44,15 @@ if (os.platform().includes("win")) {
   platform.fs_casefold = true;
   platform.null_device = "NUL";
   platform.sysconfdir = Opal.nil;
+  platform.alt_sep = "\\";
+  platform.path_sep = ";";
 } else {
   platform.ruby_platform = (os.platform().includes("linux")) ? "opal linux" : "opal";
   platform.windows = false;
   platform.fs_casefold = false
   platform.null_device = "/dev/null";
   platform.sysconfdir = "/etc"
+  platform.path_sep = ":";
 }
 platform.sep = path.sep;
 platform.deno = Opal.platform.name.includes("deno");

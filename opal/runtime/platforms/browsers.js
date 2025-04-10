@@ -48,14 +48,17 @@ if (navigator.userAgent.includes("Windows")) {
   platform.fs_casefold = true;
   platform.null_device = "NUL";
   platform.sysconfdir = Opal.nil;
+  platform.alt_sep = "\\";
+  platform.path_sep = ";";
 } else {
   platform.ruby_platform = (navigator.userAgent.includes("Linux")) ? "opal linux" : "opal";
   platform.windows = false;
   platform.fs_casefold = false;
   platform.null_device = "/dev/null";
   platform.sysconfdir = "/etc"
+  platform.path_sep = ":";
 }
-platform.sep = "/";
+
 
 // Some platform info
 platform.available_parallelism = ()=>1;

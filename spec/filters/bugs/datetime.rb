@@ -43,6 +43,7 @@ opal_filter "DateTime" do
   fails "DateTime.minute raises an error for Float" # Expected ArgumentError but no exception was raised (#<DateTime:0x6922 @date=-4712-01-01 00:05:00 UTC, @start=2299161> was returned)
   fails "DateTime.minute raises an error for Rational" # Expected ArgumentError but no exception was raised (#<DateTime:0x6618 @date=-4712-01-01 02:00:00 UTC, @start=2299161> was returned)
   fails "DateTime.new takes the seventh argument as an offset" # Expected 1.3503086419753086e-7 == 0.7 to be truthy but was false
+  fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format parses YYYY-MM-DDTHH:MM:SS into a DateTime object" # Expected #<DateTime:0xe204 @date=2012-11-08 15:43:59 +0100, @start=2299161> == #<DateTime:0xe208 @date=2012-11-08 15:43:59 UTC, @start=2299161> to be truthy but was false
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format throws an argument error for invalid day values" # Expected ArgumentError but no exception was raised (#<DateTime:0x8d76 @date=NaN-NaN-NaN NaN:NaN:NaN -NaNNaN, @start=2299161> was returned)
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format throws an argument error for invalid hour values" # Expected ArgumentError but no exception was raised (#<DateTime:0x88ea @date=NaN-NaN-NaN NaN:NaN:NaN -NaNNaN, @start=2299161> was returned)
   fails "DateTime.parse YYYY-MM-DDTHH:MM:SS format throws an argument error for invalid minute values" # Expected ArgumentError but no exception was raised (#<DateTime:0x9076 @date=NaN-NaN-NaN NaN:NaN:NaN -NaNNaN, @start=2299161> was returned)

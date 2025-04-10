@@ -3,8 +3,8 @@
 
 class ::File < ::IO
   Separator = SEPARATOR = '/'
-  ALT_SEPARATOR = `$platform.sep` != Separator ? `$platform.sep` : nil
-  PATH_SEPARATOR = ':'
+  ALT_SEPARATOR = `$platform.alt_sep` || nil
+  PATH_SEPARATOR = `$platform.path_sep`
 
   module Constants
     RDONLY = 0

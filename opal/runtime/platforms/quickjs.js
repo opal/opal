@@ -52,7 +52,7 @@ platform.nodename = "unknown";
 platform.release = "unknown";
 platform.sysname = os.platform;
 platform.version = "unknown";
-platform.sep = '/';
+platform.path_sep = ':';
 
 // Exit
 platform.exit = std.exit;
