@@ -44,6 +44,11 @@ class Pathname
     path == ''
   end
 
+  def birthtime
+    # Returns the birth time for the file.
+    ::File::Stat.new(@path).birthtime
+  end
+
   def chop_basename(path) # :nodoc:
     base = File.basename(path)
     # ruby uses /^#{SEPARATOR_PAT}?$/o but having issues with interpolation
