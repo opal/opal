@@ -22,19 +22,19 @@ class BaseOpalFormatter
   end
 
   def red(str)
-    `console.error(str)`
+    `console.error(str.toString())`
   end
 
   def green(str)
-    `console.info(str)`
+    `console.info(str.toString())`
   end
 
   def cyan(str)
-    `console.info(str)`
+    `console.info(str.toString())`
   end
 
   def log(str)
-    `console.log(str)`
+    `console.log(str.toString())`
   end
 
   def exception?

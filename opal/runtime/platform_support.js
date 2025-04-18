@@ -51,8 +51,6 @@
   // Mini-Racer
   else if (typeof(opalminiracer) !== "undefined") { $platform.name = "mini_racer"; }
 
-  Opal.exit = (status)=>{ console.log('Exited with status ' + status); };
-
   $platform.handle_unsupported_feature = function(message) {
     if (!message) message = "not implemented";
     switch (Opal.config.unsupported_features_severity) {

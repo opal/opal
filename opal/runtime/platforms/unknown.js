@@ -35,7 +35,7 @@ platform.tmpdir = ()=>"/tmp";
 platform.version = ()=>"unknown";
 
 // Exit
-platform.exit = Opal.exit;
+platform.exit = (status)=>console.log('Exited with status ' + status);
 
 // ARGV
 platform.argv = []

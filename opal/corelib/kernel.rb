@@ -819,7 +819,7 @@ module ::Kernel
     %x{
       var result = [];
 
-      path = #{::File.expand_path(path)}
+      path = Opal.expand_module_path(path);
       path = Opal.normalize(path);
       if (path === '.') path = '';
       for (var name in Opal.modules) {

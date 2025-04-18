@@ -409,6 +409,31 @@
   Opal.current_dir     = '.';
   Opal.require_table   = {'runtime/boot': true};
 
+  Opal.expand_module_path = function(path) {
+    path = path.toString();
+    let abs = /^[a-zA-Z]:(?:\\|\/)|^[\/\\]/.test(path),
+        i = 0, new_parts = [], new_path,
+        part, parts = path.split(/[/\/]/);
+
+    for (; i < parts.length; i++) {
+      part = parts[i];
+
+      if (
+        (part === nil) ||
+        (part == ''  && ((new_parts.length === 0) || abs)) ||
+        (part == '.' && ((new_parts.length === 0) || abs))
+      ) {
+        continue;
+      }
+      if (part == '..') new_parts.pop();
+      else new_parts.push(part);
+    }
+    if (!abs && parts[0] != '.') new_parts.unshift('.');
+    new_path = new_parts.join('/');
+    if (abs) new_path = '/' + new_path;
+    return new_path;
+  }
+
   Opal.normalize = function(path) {
     var parts, part, new_parts = [], SEPARATOR = '/';
 

@@ -1,7 +1,7 @@
 # backtick_javascript: true
 
-describe "Exit (Kernel#exit / Opal.exit())" do
-  it "forwards the status code to Opal.exit(status)" do
+describe "Exit (Kernel#exit / Opal.platform.exit())" do
+  it "forwards the status code to Opal.platform.exit(status)" do
     received_status { Kernel.exit }.should == 0
 
     received_status { Kernel.exit(0) }.should == 0
@@ -19,12 +19,12 @@ describe "Exit (Kernel#exit / Opal.exit())" do
 
   def received_status
     received_status = nil
-    original_exit = `Opal.exit`
+    original_exit = `Opal.platform.exit`
     begin
-      `Opal.exit = function(status) { #{received_status = `status`} }`
+      `Opal.platform.exit = function(status) { #{received_status = `status`} }`
       yield
     ensure
-      `Opal.exit = #{original_exit}`
+      `Opal.platform.exit = #{original_exit}`
     end
     received_status
   end

@@ -4,15 +4,15 @@ module KernelExit
   extend self
   attr_accessor :status, :original_proc, :proc, :out
 
-  self.original_proc = `Opal.exit`
+  self.original_proc = `Opal.platform.exit`
   self.proc = `function(status){ #{KernelExit.status = `status`} }`
 
   def out_after_exit
-    `Opal.exit = #{proc}`
+    `Opal.platform.exit = #{proc}`
     exit
     out
   ensure
-    `Opal.exit = #{original_proc}`
+    `Opal.platform.exit = #{original_proc}`
   end
 
   def reset!
@@ -48,7 +48,7 @@ describe "Kernel.at_exit" do
     at_exit {
       print 4
       exit
-      # print 5 # This one is added to out because Opal.exit doesn't actually exit
+      # print 5 # This one is added to out because Opal.platform.exit doesn't actually exit
     }
     at_exit {print 6}
 

@@ -21,9 +21,17 @@ describe "IO reading methods" do
 
   prepare_io_for = proc do |example|
     example_lines = example.split("|")
-    File.delete('tmp/read_spec_tmp_file')
-    fd = IO.sysopen('tmp/read_spec_tmp_file', 'w')
-    io = IO.new(fd)
+    file_name = if Dir.exist?('../tmp')
+                  # accessing the real filesystem
+                  '../tmp/read_spec_tmp_file'
+                else
+                  # acessing the virtual file system in browsers
+                  'tmp/read_spec_tmp_file'
+                end
+
+    File.delete(file_name) rescue nil
+    fd = IO.sysopen(file_name, 'w+')
+    io = IO.new(fd, 'w+')
     io.write(*example_lines)
     io.rewind
     io

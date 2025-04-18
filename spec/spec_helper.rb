@@ -26,7 +26,7 @@ module Kernel
   end
 
   def eval_js(javascript)
-    `eval(javascript)`
+    `eval(javascript.toString())`
   end
 end
 
