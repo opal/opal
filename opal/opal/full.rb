@@ -10,3 +10,4 @@
 ::Object.autoload :PatternMatching, 'corelib/pattern_matching'
 ::Object.autoload :TracePoint, 'corelib/trace_point'
 ::Object.require 'io/buffer'
+::Object.require 'runtime/platforms/vsvfs'

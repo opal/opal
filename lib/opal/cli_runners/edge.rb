@@ -39,8 +39,8 @@ module Opal
             prepare_files_in(dir)
 
             env = {
-              'OPAL_CDP_HOST' => chrome_host,
-              'OPAL_CDP_PORT' => chrome_port.to_s,
+              'OPAL_CDP_HOST' => edge_host,
+              'OPAL_CDP_PORT' => edge_port.to_s,
               'NODE_PATH' => File.join(__dir__, 'node_modules'),
               'OPAL_CDP_EXT' => builder.output_extension
             }
@@ -101,24 +101,24 @@ module Opal
         HTML
       end
 
-      def chrome_host
+      def edge_host
         ENV['EDGE_HOST'] || ENV['OPAL_CDP_HOST'] || DEFAULT_CDP_HOST
       end
 
-      def chrome_port
+      def edge_port
         ENV['EDGE_PORT'] || ENV['OPAL_CDP_PORT'] || DEFAULT_CDP_PORT
       end
 
-      def with_edge_server
-        if chrome_server_running?
+      def with_edge_server(&block)
+        if edge_server_running?
           yield
         else
-          run_chrome_server { yield }
+          run_edge_server(&block)
         end
       end
 
       def run_edge_server
-        raise 'Edge server can be started only on localhost' if chrome_host != DEFAULT_CDP_HOST
+        raise 'Edge server can be started only on localhost' if edge_host != DEFAULT_CDP_HOST
 
         profile = mktmpprofile
 
@@ -127,37 +127,41 @@ module Opal
         edge_server_cmd = %{#{OS.shellescape(edge_executable)} \
           --allow-pre-commit-input \
           --disable-background-networking \
-          --enable-features=NetworkServiceInProcess2 \
           --disable-background-timer-throttling \
           --disable-backgrounding-occluded-windows \
           --disable-breakpad \
           --disable-client-side-phishing-detection \
           --disable-component-extensions-with-background-pages \
+          --disable-crash-reporter \
           --disable-default-apps \
           --disable-dev-shm-usage \
           --disable-extensions \
-          --disable-features=Translate,BackForwardCache,AcceptCHFrame,AvoidUnnecessaryBeforeUnloadCheckSync \
+          --disable-features=Translate,AcceptCHFrame,MediaRouter,OptimizationHints \
           --disable-hang-monitor \
+          --disable-infobars \
           --disable-ipc-flooding-protection \
           --disable-popup-blocking \
           --disable-prompt-on-repost \
           --disable-renderer-backgrounding \
+          --disable-search-engine-choice-screen \
           --disable-sync \
-          --force-color-profile=srgb \
-          --metrics-recording-only \
-          --no-first-run \
+          --disable-web-security \
           --enable-automation \
+          --enable-blink-features=IdleDetection \
+          --enable-features=PdfOopif \
+          --export-tagged-pdf \
+          --force-color-profile=srgb \
+          --generate-pdf-document-outline \
+          --headless \
+          --hide-scrollbars \
+          --metrics-recording-only \
+          --mute-audio \
+          --no-first-run \
           --password-store=basic \
           --use-mock-keychain \
-          --enable-blink-features=IdleDetection \
-          --export-tagged-pdf \
-          --headless \
           --user-data-dir=#{profile} \
-          --hide-scrollbars \
-          --mute-audio \
-          --disable-web-security \
-          --remote-debugging-port=#{chrome_port} \
-          #{ENV['CHROME_OPTS']}}
+          --remote-debugging-port=#{edge_port} \
+          #{ENV['EDGE_OPTS']}}
 
         edge_pid = Process.spawn(edge_server_cmd, in: OS.dev_null, out: OS.dev_null, err: OS.dev_null)
 
@@ -182,8 +186,8 @@ module Opal
       end
 
       def edge_server_running?
-        puts "Connecting to #{chrome_host}:#{chrome_port}..."
-        TCPSocket.new(chrome_host, chrome_port).close
+        puts "Connecting to #{edge_host}:#{edge_port}..."
+        TCPSocket.new(edge_host, edge_port).close
         true
       rescue Errno::ECONNREFUSED, Errno::EADDRNOTAVAIL
         false

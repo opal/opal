@@ -212,8 +212,7 @@ module Opal
           # Increase the APZ content response timeout to 1 minute
           'apz.content_response_timeout': 60_000,
           # Prevent various error message on the console
-          'browser.contentblocking.features.standard':
-            '-tp,tpPrivate,cookieBehavior0,-cm,-fp',
+          'browser.contentblocking.features.standard': '-tp,tpPrivate,cookieBehavior0,-cm,-fp',
           # Enable the dump function: which sends messages to the system console
           # https://bugzilla.mozilla.org/show_bug.cgi?id=1543115
           'browser.dom.window.dump.enabled': true,
@@ -319,6 +318,8 @@ module Opal
           'javascript.options.showInConsole': true,
           # Disable download and usage of OpenH264: and Widevine plugins
           'media.gmp-manager.updateEnabled': false,
+          # Disable the GFX sanity window
+          'media.sanity-test.disabled': true,
           # Prevent various error message on the console
           'network.cookie.cookieBehavior': 0,
           # Disable experimental feature that is only available in Nightly
@@ -369,7 +370,7 @@ module Opal
           'toolkit.startup.max_resumed_crashes': -1,
         }
         prefs = default_prefs.map { |key, value| "user_pref(\"#{key}\", #{JSON.dump(value)});" }
-        # apparently firefox will read user.js an generate prefs.js from it
+        # apparently firefox will read user.js and generate prefs.js from it
         File.binwrite(profile + '/user.js', prefs.join("\n"))
         profile
       end

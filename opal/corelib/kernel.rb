@@ -279,18 +279,18 @@ module ::Kernel
     `var worker`
     if block_given?
       %x{
-        if ($platform.proc_is_primary()) {
-          worker = $platform.proc_fork();
-          return $platform.proc_worker_pid(worker);
-        } else if ($platform.proc_is_worker()) {
+        if ($platform.process_is_primary()) {
+          worker = $platform.process_fork();
+          return $platform.process_worker_pid(worker);
+        } else if ($platform.process_is_worker()) {
           #{yield}
         }
       }
     else
       %x{
-        if ($platform.proc_is_primary()) {
-          worker = $platform.proc_fork();
-          return $platform.proc_worker_pid(worker);
+        if ($platform.process_is_primary()) {
+          worker = $platform.process_fork();
+          return $platform.process_worker_pid(worker);
         }
       }
     end
@@ -647,6 +647,18 @@ module ::Kernel
     false
   end
 
+  def open(obj, *args, &block)
+    if obj.respond_to?(:to_open)
+      obj = obj.to_open(*args)
+      return yield obj if block_given?
+      obj
+    elsif obj.is_a?(Numeric)
+      raise TypeError
+    else
+      ::File.open(obj, *args, &block)
+    end
+  end
+
   def printf(*args)
     return if args.empty?
 
@@ -665,6 +677,10 @@ module ::Kernel
     block
   end
 
+  def putc(object)
+    $stdout.putc(object)
+  end
+
   def puts(*strs)
     $stdout.puts(*strs)
   end
@@ -681,6 +697,10 @@ module ::Kernel
 
   def readline(*args)
     $stdin.readline(*args)
+  end
+
+  def readlines(*args)
+    $stdin.readlines(*args)
   end
 
   def warn(*strs, uplevel: nil)
@@ -852,14 +872,14 @@ module ::Kernel
     cmdname = argv.shift
 
     js_env = `{}`
-    env.each { |k,v| `js_env[k] = v` }
+    env.each { |k, v| `js_env[k] = v` }
 
     out = if argv.empty?
-            `$platform.proc_spawn(#{cmdname}, { shell: true, stdio: 'inherit', env: js_env })`
+            `$platform.process_spawn(#{cmdname}, { shell: true, stdio: 'inherit', env: js_env })`
           elsif Array === cmdname
-            `$platform.proc_spawn(#{cmdname[0]}, #{argv}, { argv0: #{cmdname[1]}, stdio: 'inherit', env: js_env })`
+            `$platform.process_spawn(#{cmdname[0]}, #{argv}, { argv0: #{cmdname[1]}, stdio: 'inherit', env: js_env })`
           else
-            `$platform.proc_spawn(#{cmdname}, #{argv}, { stdio: 'inherit', env: js_env })`
+            `$platform.process_spawn(#{cmdname}, #{argv}, { stdio: 'inherit', env: js_env })`
           end
 
     status = out.JS[:status]
@@ -872,7 +892,7 @@ module ::Kernel
   end
 
   def `(cmdline)
-    `$platform.proc_exec(#{cmdline}).toString('utf-8')`
+    `$platform.process_exec(#{cmdline}).toString('utf-8')`
   end
 
   def String(str)
@@ -903,11 +923,6 @@ module ::Kernel
 
   def throw(tag, obj = nil)
     ::Kernel.raise ::UncaughtThrowError.new(tag, obj)
-  end
-
-  # basic implementation of open, delegate to File.open
-  def open(*args, &block)
-    ::File.open(*args, &block)
   end
 
   def yield_self

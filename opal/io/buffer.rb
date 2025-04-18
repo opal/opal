@@ -119,8 +119,8 @@ class ::IO
       }
 
       function copy_dv(source_dv, target_dv, source_offset, offset, length) {
-      	let source = new Uint8Array(source_dv.buffer, source_offset, length);
-      	(new Uint8Array(target_dv.buffer)).set(source, offset);
+        let source = new Uint8Array(source_dv.buffer, source_offset, length);
+        (new Uint8Array(target_dv.buffer)).set(source, offset);
       }
 
       function endianess() {
@@ -372,12 +372,6 @@ class ::IO
       @locked = true
     end
 
-    def get_byte(offset)
-      # Not standard Ruby, but most common. Useful for Opal internally.
-      raise(AccessError, 'Buffer has been freed!') if null?
-      `self.data_view.getUint8(offset)`
-    end
-
     def get_raw_string(offset = 0, length = nil, encoding = nil, ensure_valid = false)
       # not a Ruby method, but used by IO
       raise(AccessError, 'Buffer has been freed!') if null?
@@ -399,7 +393,7 @@ class ::IO
         res = nil
         while invalid && length < max_len
           begin
-            res = encoding.decode!(self.slice(offset, length))
+            res = encoding.decode!(slice(offset, length))
             invalid = false
           rescue Exception
             length += 1
@@ -407,11 +401,11 @@ class ::IO
         end
         if res.nil?
           # unable to read anything valid from the buffer
-          return encoding.decode(self.slice(offset, length))
+          return encoding.decode(slice(offset, length))
         end
         res
       else
-        encoding.decode(self.slice(offset, length))
+        encoding.decode(slice(offset, length))
       end
     end
 
@@ -466,7 +460,7 @@ class ::IO
     def initialize_copy(orig)
       %x{
         if (orig.data_view == nil) self.data_view = nil;
-        else self.data_view = new DataView(odv.buffer.slice());
+        else self.data_view = new DataView(orig.data_view.buffer.slice());
       }
       self
     end
@@ -538,13 +532,6 @@ class ::IO
       self
     end
 
-    def set_byte(offset, value)
-      # Write to a buffer a value of type at offset.
-      raise(AccessError, 'Buffer is not writable!') if readonly? || null?
-      `self.data_view.setUint8(offset, value)`
-      offset + 1
-    end
-
     def set_string(string, offset = 0, length = nil, source_offset = nil)
       # Efficiently copy from a source String into the buffer, at offset using memcpy.
       # Ruby does a byte copy from the C string to the buffer, with the C string most likely
@@ -557,7 +544,7 @@ class ::IO
       %x{
         if (typeof(length) !== "number") length = strg_dv.byteLength;
         length = Math.min(strg_dv.byteLength, self.data_view.byteLength);
-        copy_dv(strg.dv, self.data_view, 0, offset, length);
+        copy_dv(strg_dv, self.data_view, 0, offset, length);
       }
       length
     end

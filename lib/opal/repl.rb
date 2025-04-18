@@ -31,7 +31,7 @@ module Opal
       @history = File.exist?(HISTORY_PATH)
     end
 
-    def run(argv = [], runner_type = :nodejs)
+    def run(argv = [])
       @argv = argv
       savepoint = save_tty
       load_opal

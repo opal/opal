@@ -1,5 +1,5 @@
 # backtick_javascript: true
-# helpers: platform, str, glob_brace_expand, is_star_star_slash, mbinc
+# helpers: platform, str, glob_brace_expand, is_star_star_slash, mbinc, is_dirsep
 
 class ::Dir
   include ::Enumerable
@@ -108,10 +108,12 @@ class ::Dir
 
     def getwd
       # Returns the path to the current working directory.
-      `$platform.dir_wd(#{File::SEPARATOR})`
+      wd = `$platform.dir_wd()`
+      wd = wd.gsub('\\', '/') if `$platform.windows`
+      `$str(wd)`
     end
 
-    def glob(*patterns, flags: nil, base: `UNDEFINED`, sort: true)
+    def glob(*patterns, flags: nil, base: `UNDEFINED`, sort: true, &block)
       # Forms an array entry_names of the entry names selected by the arguments.
       # Argument patterns is a string pattern or an array of string patterns;
       # note that these are not regexps.
@@ -536,7 +538,8 @@ class ::Dir
               end
 
               status = glob_helper.(buf, baselen, `pathlen + n - baselen + namlen`, true,
-                                    new_pathtype, new_list, flgs, arg)
+                                    new_pathtype, new_list, flgs, arg
+                                   )
 
               break if status
             end
@@ -553,19 +556,17 @@ class ::Dir
       end
 
       # just like in ruby/file.c
-      rb_path_skip_prefix = -> (path) do
-        `function is_dirsep(chr) { return chr == '/' || chr == '\\' }`
-
-        if `path[0].match(/[a-zA-Z]/) && path[1] == ':'`
-          `path.slice(2)`
-        elsif `is_dirsep(path[0]) && is_dirsep(path[1])`
+      rb_path_skip_prefix = ->(path) do
+        if `path[0]?.match(/[a-zA-Z]/) && path[1] == ':'`
+          2
+        elsif `$is_dirsep(path[0]) && $is_dirsep(path[1])`
           i = 1
-          while `is_dirsep(path[i+1])`
+          while `$is_dirsep(path[i+1])`
             i += 1
           end
-          `path.slice(i)`
+          i
         else
-          path
+          0
         end
       end
 
@@ -582,7 +583,7 @@ class ::Dir
 
         flgs = arg[:flags] | ::File::FNM_SYSCASE
 
-        root = rb_path_skip_prefix(root) if `$platform.windows`
+        root = rb_path_skip_prefix.(`pat.slice(root)`) if `$platform.windows`
 
         root += 1 if `pat[root] == '/'`
 
@@ -610,7 +611,7 @@ class ::Dir
 
       # just like in ruby/dir.c
       rb_glob_error = ->(path, exc) do
-        STDERR.puts "glob warning #{path}" if exc.is_a?(::Errno::EACCES)
+        $stderr.puts "glob warning #{path}" if exc.is_a?(::Errno::EACCES)
         raise exc
       end
 
@@ -639,13 +640,14 @@ class ::Dir
       end
 
       return res unless block_given?
-      res.each { |entry| yield entry }
+      res.each(&block)
       nil
     end
 
     def home(user_name = nil)
       # Returns the home directory path of the user specified with user_name if it is not nil, or the current login user
-      h = ::ENV['HOME']&.gsub("\\", "/") || `$platform.dir_home(#{File::SEPARATOR})` || '.'
+      h = ::ENV['HOME'] || `$platform.dir_home()` || '.'
+      h = h.gsub('\\', '/') if `$platform.windows`
       `$str(h)`
     end
 
@@ -677,6 +679,7 @@ class ::Dir
 
     def tmpdir
       # Returns the operating system’s temporary file path
+      `$platform.tmpdir()`
     end
 
     alias unlink delete
@@ -725,7 +728,7 @@ class ::Dir
     # Calls the block with each entry name in self.
     `check_open(self)`
     return enum_for :each unless block_given?
-    while name = read
+    while (name = read)
       yield name
     end
     self
@@ -735,8 +738,8 @@ class ::Dir
     # Calls the block with each entry name in self except '.' and '..'.
     `check_open(self)`
     return enum_for :each_child unless block_given?
-    while name = read
-      next if name == "." || name == ".."
+    while (name = read)
+      next if name == '.' || name == '..'
       yield name
     end
     self

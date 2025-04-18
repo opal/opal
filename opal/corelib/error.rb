@@ -229,8 +229,6 @@ class ::NotImplementedError < ::ScriptError; end
 
 class ::SystemExit        < ::Exception; end
 class ::NoMemoryError     < ::Exception; end
-class ::SignalException   < ::Exception; end
-class ::Interrupt           < ::SignalException; end
 class ::SecurityError     < ::Exception; end
 class ::SystemStackError  < ::Exception; end
 
@@ -259,6 +257,34 @@ class ::ThreadError         < ::StandardError; end
 class ::FiberError          < ::StandardError; end
 
 ::Object.autoload :Errno, 'corelib/error/errno'
+
+class ::SignalException < ::Exception
+  attr_reader :signo, :signm
+
+  def initialize(signal, name = nil)
+    if signal.is_a?(::Integer)
+      nm = Signal.list.key(signal)
+      raise(ArgumentError, 'unknown signal') unless nm
+      @signo = signal
+    elsif signal.is_a?(::String) || signal.is_a?(::Symbol)
+      raise(ArgumentError, 'signal given as name and name arg given') if name
+      nm = signal.to_s
+      nm = nm[3..] if nm.start_with?('SIG')
+      @signo = Signal.list[nm]
+      raise(ArgumentError, 'unknown signal') unless @signo
+    else
+      raise(ArgumentError, 'signal must be Integer, String or Symbol')
+    end
+    @signm = name || 'SIG' + nm
+    super(@signm) if @signm
+  end
+end
+
+class ::Interrupt < ::SignalException
+  def initialize(message = nil)
+    super(Signal.list['INT'] || 2, message || 'Interrupt')
+  end
+end
 
 class ::FrozenError < ::RuntimeError
   attr_reader :receiver

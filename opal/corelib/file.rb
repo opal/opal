@@ -1,4 +1,4 @@
-# helpers: platform, truthy, str, is_star_star_slash, mbinc, mbclen
+# helpers: platform, truthy, str, is_star_star_slash, mbinc, mbclen, is_dirsep
 # backtick_javascript: true
 
 class ::File < ::IO
@@ -66,7 +66,7 @@ class ::File < ::IO
     def blksize
       # Returns the native file system’s block size.
       # Will return nil on platforms that don’t support this information.
-      `self.stat.blksize`
+      `self.stat.blksize != null ?  self.stat.blksize : nil`
     end
 
     def blockdev?
@@ -78,7 +78,7 @@ class ::File < ::IO
     def blocks
       # Returns the number of native file system blocks allocated for this file,
       # or nil if the operating system doesn’t support this feature.
-      `self.stat.blocks`
+      `self.stat.blocks != null ?  self.stat.blocks : nil`
     end
 
     def chardev?
@@ -95,17 +95,17 @@ class ::File < ::IO
 
     def dev
       # Returns an integer representing the device on which stat resides.
-      `self.stat.dev`
+      `self.stat.dev != null ? self.stat.dev : nil`
     end
 
     def dev_major
       # Returns the major part of File_Stat#dev or nil.
-      ((dev >> 8) & 0xfff) | ((dev >> 32) & ~0xfff)
+      (((dev >> 8) & 0xfff) | ((dev >> 32) & ~0xfff)) if dev
     end
 
     def dev_minor
       # Returns the minor part of File_Stat#dev or nil.
-      (dev & 0xff) | ((dev >> 12) & ~0xff)
+      ((dev & 0xff) | ((dev >> 12) & ~0xff)) if dev
     end
 
     def directory?
@@ -147,7 +147,8 @@ class ::File < ::IO
     end
 
     def gid
-      `self.stat.gid`
+      # Returns the numeric group id of the owner of stat.
+      `self.stat.gid != null ? self.stat.gid : -1`
     end
 
     def grpowned?
@@ -158,7 +159,7 @@ class ::File < ::IO
 
     def ino
       # Returns the inode number for stat.
-      `self.stat.ino`
+      `self.stat.ino != null ? self.stat.ino : nil`
     end
 
     def inspect
@@ -180,7 +181,8 @@ class ::File < ::IO
     end
 
     def nlink
-      `self.stat.nlink`
+      # Returns the number of hard links to stat.
+      `self.stat.nlink != null ? self.stat.nlink : nil`
     end
 
     def owned?
@@ -196,17 +198,17 @@ class ::File < ::IO
     def rdev
       # Returns an integer representing the device type on which stat resides.
       # Returns nil if the operating system doesn’t support this feature.
-      `self.stat.rdev`
+      `self.stat.rdev != null ? self.stat.rdev : nil`
     end
 
     def rdev_major
       # Returns the major part of File_Stat#rdev or nil
-      ((rdev >> 8) & 0xfff) | ((rdev >> 32) & ~0xfff)
+      (((rdev >> 8) & 0xfff) | ((rdev >> 32) & ~0xfff)) if rdev
     end
 
     def rdev_minor
       # Returns the minor part of File_Stat#rdev or nil.
-      (rdev & 0xff) | ((rdev >> 12) & ~0xff)
+      ((rdev & 0xff) | ((rdev >> 12) & ~0xff)) if rdev
     end
 
     def readable?
@@ -237,7 +239,7 @@ class ::File < ::IO
 
     def size
       # Returns the size of stat in bytes.
-      `self.stat?.size`
+      `self.stat.size`
     end
 
     def size?
@@ -260,15 +262,14 @@ class ::File < ::IO
     def symlink?
       # Returns true if stat is a symbolic link, false if it isn’t
       # or if the operating system doesn’t support this feature.
-      %x{
-        if (typeof self.stat.isSymbolicLink === "function") return self.stat.isSymbolicLink();
-        else return false;
-      }
+      `self.stat.isSymbolicLink()`
+    rescue
+      false
     end
 
     def uid
       # Returns the numeric user id of the owner of stat.
-      `self.stat.uid`
+      `self.stat.uid != null ? self.stat.uid : -1`
     end
 
     def world_readable?
@@ -306,56 +307,20 @@ class ::File < ::IO
     def absolute_path(path, basedir = nil)
       # Converts a pathname to an absolute pathname.
       path = `coerce_to_path(path)`
-      basedir = basedir ? `coerce_to_path(basedir)` : ::Dir.pwd
-      sep = SEPARATOR
-      new_parts = []
-      path_abs = `path.slice(0, sep.length) == sep`
-      path_abs = true if !path_abs && `$platform.windows` && `windows_root_rx.test(path)`
-      basedir_abs = `basedir.slice(0, sep.length) == sep`
-      basedir_abs = true if !basedir_abs && `$platform.windows` && `windows_root_rx.test(basedir)`
-
-      if path_abs
-        parts       = `path.split(sep)`
-        leading_sep = `windows_root_rx.test(path) ? '' : #{path.sub(/^(#{sep}+).*$/, '\1')}`
-        abs         = true
-      else
-        parts       = `basedir.split(sep)`
-        parts.concat(`path.split(sep)`)
-        leading_sep = `windows_root_rx.test(basedir) ? '' : #{basedir.sub(/^(#{sep}+).*$/, '\1')}`
-        abs         = basedir_abs
-      end
-      %x{
-        var part;
-        for (var i = 0, ii = parts.length; i < ii; i++) {
-          part = parts[i];
-
-          if (
-            (part === nil) ||
-            (part == ''  && ((new_parts.length === 0) || abs)) ||
-            (part == '.' && ((new_parts.length === 0) || abs))
-          ) {
-            continue;
-          }
-          if (part == '..') {
-            new_parts.pop();
-          } else {
-            new_parts.push(part);
-          }
-        }
-
-        if (!abs && parts[0] != '.') {
-          #{new_parts.unshift '.'}
-        }
-      }
-
-      new_path = new_parts.join(sep)
-      new_path = leading_sep + new_path if abs
-      new_path
+      basedir = `coerce_to_path(basedir)` if basedir
+      `Opal.rb_file_expand_path_internal(path, basedir, true, true, '')`
     end
 
     def absolute_path?(path)
       # Returns true if file_name is an absolute path, and false otherwise.
-      `$platform.file_is_absolute_path(path)`
+      path = `coerce_to_path(path)`
+      if `$platform.windows`
+        return true if `Opal.has_drive_letter(path)` && `$is_dirsep(path[2])`
+        return true if `$is_dirsep(path[0])` && `$is_dirsep(path[1])`
+      else
+        return true if `path[0] == '/'`
+      end
+      false
     end
 
     def atime(file_name)
@@ -372,16 +337,14 @@ class ::File < ::IO
       # If suffix is “.*”, any extension will be removed.
       sep_chars = `$sep_chars()`
       name = `coerce_to_path(name)`
+      suffix = ::Opal.coerce_to!(suffix, ::String, :to_str) if suffix
+      enc = name.encoding
       %x{
-        if (name.length == 0) {
-          return name;
-        }
+        if (name.length == 0) return $str('', enc);
 
-        if (suffix !== nil) {
-          suffix = #{::Opal.coerce_to!(suffix, ::String, :to_str)}
-        } else {
-          suffix = null;
-        }
+        if (suffix === nil) suffix = null;
+
+        if ($platform.windows) name = name.replace(/^[a-zA-Z]:/, '');
 
         name = name.replace(new RegExp(#{"(.)[#{sep_chars}]*$"}), '$1');
         name = name.replace(new RegExp(#{"^(?:.*[#{sep_chars}])?([^#{sep_chars}]+)$"}), '$1');
@@ -393,7 +356,7 @@ class ::File < ::IO
           name = name.replace(new RegExp(#{"#{suffix}$"}), '');
         }
 
-        return name;
+        return $str(name, enc);
       }
     end
 
@@ -465,35 +428,78 @@ class ::File < ::IO
       false
     end
 
-    def dirname(file_name, level = 1)
+    def dirname(file_name, level = nil)
       # Returns all components of the filename given in file_name except the last one
       # (after first stripping trailing separators).
-      return file_name if level == 0
-      ::Kernel.raise ::ArgumentError, "level can't be negative" if level < 0
-
-      sep_chars = `$sep_chars()`
-      path = `coerce_to_path(file_name)`
-      %x{
-        var absolute = path.match(new RegExp(#{"^[#{sep_chars}]"})), out;
-
-        path = path.replace(new RegExp(#{"[#{sep_chars}]+$"}), ''); // remove trailing separators
-        path = path.replace(new RegExp(#{"[^#{sep_chars}]+$"}), ''); // remove trailing basename
-        path = path.replace(new RegExp(#{"[#{sep_chars}]+$"}), ''); // remove final trailing separators
-
-        if (path === '') {
-          out = absolute ? '/' : '.';
-        }
-        else {
-          out = path;
-        }
-
-        if (level == 1) {
-          return out;
-        }
-        else {
-          return #{dirname(`out`, level - 1)}
-        }
-      }
+      level = ::Opal.coerce_to!(level, ::Integer, :to_int) if level
+      level ||= 1
+      ::Kernel.raise(::ArgumentError, "negative level: #{level}") if level < 0
+      file_name = `coerce_to_path(file_name)`
+      enc = file_name.encoding
+      d = `file_name.length`
+      n = 0
+      root = `Opal.skiproot(file_name, d)`
+      if `$platform.windows`
+        if root > 1 && `$is_dirsep(file_name[n])`
+          n = root - 2
+          root = `Opal.skipprefix(file_name, n)`
+        end
+      else
+        n = root - 1 if root > 1
+      end
+      if level > ((d - root + 1) / 2)
+        pi = root
+      else
+        i = 0
+        case level
+        when 0
+          pi = d
+        when 1
+          pi = `Opal.strrdirsep(file_name, d)`
+          pi = root if !pi || pi == 0
+        else
+          i = 0
+          seps = []
+          while i < level
+            seps[i] = root
+            i += 1
+          end
+          i = 0
+          pi = root
+          while pi < d
+            if `$is_dirsep(file_name[pi])`
+              tmp = pi
+              pi += 1
+              while pi < d && `$is_dirsep(file_name[pi])`
+                pi += 1
+              end
+              break if pi >= d
+              seps[i] = tmp
+              i += 1
+              i = 0 if i == level
+            else
+              pi = `$mbinc(file_name, pi)`
+            end
+          end
+          pi = seps[i]
+        end
+      end
+      return '.' if pi == n
+      if `$platform.windows`
+        if `Opal.has_drive_letter(n > 0 ? file_name.slice(n) : file_name)` && `$is_dirsep(file_name[n + 2])`
+          top = `Opal.skiproot(file_name.slice(2), d) + 2`
+          dirname = `file_name.slice(n, n + 3)`
+          dirname += `file_name.slice(top, pi)`
+        else
+          dirname = `file_name.slice(n, pi)`
+        end
+      else
+        dirname = `file_name.slice(n, pi)`
+      end
+      if `$platform.windows`
+        dirname += '.' if `Opal.has_drive_letter(file_name.slice(n))` && root == (n + 2) && (pi - n) == 2
+      end
+      `$str(dirname, enc)`
     end
 
     def empty?(file_name)
@@ -533,20 +539,9 @@ class ::File < ::IO
       # as the starting point. The given pathname may start with a “~”, which expands to the process
       # owner’s home directory (the environment variable HOME must be set correctly).
       # “~user” expands to the named user’s home directory.
-      sep = SEPARATOR
-      sep_chars = `$sep_chars()`
-      if `path[0] === '~' || (basedir && basedir[0] === '~')`
-        home = Dir.home
-        ::Kernel.raise(::ArgumentError, "couldn't find HOME environment -- expanding `~'") unless home
-        leading_sep = `windows_root_rx.test(home) ? '' : #{home.sub(/^([#{sep_chars}]+).*$/, '\1')}`
-        ::Kernel.raise(::ArgumentError, 'non-absolute home') unless home.start_with?(leading_sep)
-
-        home            += sep
-        home_path_regexp = /^\~(?:#{sep}|$)/
-        path             = path.sub(home_path_regexp, home)
-        basedir          = basedir.sub(home_path_regexp, home) if basedir
-      end
-      absolute_path(path, basedir)
+      path = `coerce_to_path(path)`
+      basedir = `coerce_to_path(basedir)` if basedir
+      `Opal.rb_file_expand_path_internal(path, basedir, false, true, '')`
     end
 
     def extname(path)
@@ -821,19 +816,19 @@ class ::File < ::IO
       false
     end
 
-    def identical?(file_1, file_2)
+    def identical?(file1, file2)
       # Returns true if the named files are identical.
-      stat_1 = lstat(file_1)
-      if stat_1.symlink?
-        file_1 = readlink(file_1)
-        stat_1 = stat(file_1)
+      stat1 = lstat(file1)
+      if stat1.symlink?
+        file1 = readlink(file1)
+        stat1 = stat(file1)
       end
-      stat_2 = lstat(file_2)
-      if stat_2.symlink?
-        file_2 = readlink(file_2)
-        stat_2 = stat(file_2)
+      stat2 = lstat(file2)
+      if stat2.symlink?
+        file2 = readlink(file2)
+        stat2 = stat(file2)
       end
-      return true if stat_1.ino == stat_2.ino
+      return true if stat1.ino == stat2.ino
       false
     rescue Errno::ENOENT
       false
@@ -847,7 +842,7 @@ class ::File < ::IO
       paths = paths.flatten.map! do |path|
         path = `coerce_to_path(path)`
         raise(::ArgumentError, 'string contains null byte') if path.include?("\x00")
-        enc = path.encoding unless enc
+        enc ||= path.encoding
         if ALT_SEPARATOR # Windows
           if sep == SEPARATOR && path.include?(ALT_SEPARATOR)
             sep = ALT_SEPARATOR
@@ -890,7 +885,7 @@ class ::File < ::IO
       # (so it will change the permissions associated with the link,
       # not the file referenced by the link).
       mode_int = ::Opal.coerce_to!(mode_int, ::Integer, :to_int) unless mode_int.is_a?(::Integer)
-      raise(RangeError, "mode_int out of range") if mode_int < 0 || mode_int > 4294967295
+      raise(RangeError, 'mode_int out of range') if mode_int < 0 || mode_int > 4294967295
       file_names.each do |file_name|
         file_name = `coerce_to_path(file_name)`
         `$platform.file_lchmod(file_name, mode_int)`
@@ -936,7 +931,7 @@ class ::File < ::IO
       # It is modified by the process’s umask in the usual way: the permissions of the
       # created file are (mode & ~umask).
       file_name = `coerce_to_path(file_name)`
-      mode = 0o666 & ~File.umask unless mode
+      mode ||= 0o666 & ~File.umask
       status = `$platform.file_mkfifo(file_name, mode)`
       raise(::Errno::ENOENT, "No such file or directory #{file_name}") if status == 1
       0
@@ -1018,7 +1013,7 @@ class ::File < ::IO
         pathname = readlink(pathname) if symlink?(pathname)
         dirname, file = split(pathname)
         dirname = `$platform.file_realpath(dirname, #{::File::SEPARATOR})` # may correctly raise ENOENT again
-        return join(dirname, file)
+        join(dirname, file)
       end
     end
 
@@ -1029,8 +1024,7 @@ class ::File < ::IO
       # All components of the pathname must exist when this method is called.
       pathname = `coerce_to_path(pathname)`
       pathname = join(dir_string, pathname) if dir_string
-      result = `$platform.file_realpath(pathname, #{::File::SEPARATOR})`
-      result
+      `$platform.file_realpath(pathname, #{::File::SEPARATOR})`
     end
 
     def rename(old_name, new_name)
@@ -1142,13 +1136,14 @@ class ::File < ::IO
       # set the umask to that value and return the previous value.
       if integer
         integer = ::Opal.coerce_to!(integer, ::Integer, :to_int)
-        if integer < 0 || integer > 4294967295
+        if integer < 0 || integer > 4_294_967_295
           raise(::RangeError,
-                "The value of \"mask\" is out of range. It must be >= 0 && <= 4294967295. Received #{integer}")
+                "The value of \"mask\" is out of range. It must be >= 0 && <= 4294967295. Received #{integer}"
+               )
         end
-        `$platform.proc_set_umask(integer)`
+        `$platform.file_set_umask(integer)`
       else
-        `$platform.proc_get_umask()`
+        `$platform.file_get_umask()`
       end
     end
 
@@ -1164,7 +1159,7 @@ class ::File < ::IO
       end
       file_names.each do |file_name|
         file_name = ::Opal.coerce_to!(file_name, ::String, :to_path) unless file_name.is_a?(String)
-        `$platform.file_utimes(file_name, atime, mtime)`
+        `$platform.file_utime(file_name, atime, mtime)`
       end
       file_names.size
     end
@@ -1223,7 +1218,7 @@ class ::File < ::IO
         if m.is_a?(::String)
           m, ext_enc, int_enc = m.split(':') if m.include?(':')
           raise(ArgumentError, 'mode is a empty string') if m.empty?
-          unless m.match?(/\Aw[bt]{0,1}[x]{0,1}[+]{0,1}\Z/) || m.match?(/\A[ra]([bt]{0,1}[+]{0,1}|[+]{0,1}[bt]{0,1})\Z/)
+          unless m.match?(/\Aw[bt]{0,1}x{0,1}[+]{0,1}\Z/) || m.match?(/\A[ra]([bt]{0,1}[+]{0,1}|[+]{0,1}[bt]{0,1})\Z/)
             raise(::ArgumentError, "invalid access mode #{m}")
           end
           flags |= `Opal.mode_to_flags(m)`
@@ -1235,6 +1230,7 @@ class ::File < ::IO
     end
 
     flags |= ::Opal.coerce_to!(opts[:flags], ::Integer, :to_int) if opts.key?(:flags)
+    raise(::Errno::EINVAL, 'Invalid argument') if `$platform.windows` && flags == ::File::TRUNC
     opts[:flags] = flags
     opts[:mode] = mode
     opts[:external_encoding] = ext_enc if ext_enc
@@ -1268,7 +1264,7 @@ class ::File < ::IO
   def chmod(mode_int)
     # Changes permission bits on file to the bit pattern represented by mode_int.
     mode_int = ::Opal.coerce_to!(mode_int, ::Integer, :to_int)
-    raise(RangeError, "mode_int out of range") if mode_int < 0 || mode_int > 4294967295
+    raise(RangeError, 'mode_int out of range') if mode_int < 0 || mode_int > 4_294_967_295
     `$platform.file_fchmod(self.fd, mode_int)`
     0
   end
@@ -1282,8 +1278,8 @@ class ::File < ::IO
     group_int = ::Opal.coerce_to!(group_int, ::Integer, :to_int) if group_int
     if owner_int.nil? || group_int.nil?
       s = stat
-      owner_int = owner_int || s.uid
-      group_int = group_int || s.gid
+      owner_int ||= s.uid
+      group_int ||= s.gid
     end
     `$platform.file_fchown(self.fd, owner_int, group_int)`
     0

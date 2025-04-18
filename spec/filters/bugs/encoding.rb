@@ -49,7 +49,6 @@ opal_filter "Encoding" do
   fails "Encoding.list includes CESU-8 encoding" # NameError: uninitialized constant Encoding::CESU_8
   fails "Encoding.locale_charmap returns a String" # Expected nil (NilClass) to be an instance of String
   fails "Encoding.locale_charmap returns a value based on the LC_ALL environment variable" # NotImplementedError: NotImplementedError
-  fails "File.basename returns the basename with the same encoding as the original" # NameError: uninitialized constant Encoding::Windows_1250
   fails "Hash literal does not change encoding of literal string keys during creation" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
   fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
@@ -204,22 +203,15 @@ opal_filter "Encoding" do
   fails "String#valid_encoding? returns true for all encodings self is valid in" # Expected true to be false
   fails "String#valid_encoding? returns true if an invalid string is appended another invalid one but both make a valid string" # Expected true to be false
   fails "The predefined global constant ARGV contains Strings encoded in locale Encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has nil for the external encoding despite Encoding.default_external being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has nil for the external encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has nil for the internal encoding despite Encoding.default_internal being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has nil for the internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has the encodings set by #set_encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has nil for the internal encoding despite Encoding.default_internal being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has nil for the internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has the encodings set by #set_encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has the same external encoding as Encoding.default_external when that encoding is changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has the same external encoding as Encoding.default_external" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN retains the encoding set by #set_encoding when Encoding.default_external is changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has nil for the external encoding despite Encoding.default_external being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has nil for the external encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has nil for the internal encoding despite Encoding.default_internal being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has nil for the internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has the encodings set by #set_encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "The predefined global constant STDERR has nil for the external encoding despite Encoding.default_external being changed" # Expected #<Encoding:ASCII-8BIT> to be nil
+  fails "The predefined global constant STDERR has nil for the external encoding" # Expected #<Encoding:ASCII-8BIT> to be nil
+  fails "The predefined global constant STDERR has the encodings set by #set_encoding" # NotImplementedError: NotImplementedError
+  fails "The predefined global constant STDIN has the encodings set by #set_encoding" # NotImplementedError: NotImplementedError
+  fails "The predefined global constant STDIN has the same external encoding as Encoding.default_external when that encoding is changed" # NameError: uninitialized constant Encoding::ISO_8859_16
+  fails "The predefined global constant STDIN retains the encoding set by #set_encoding when Encoding.default_external is changed" # NotImplementedError: NotImplementedError
+  fails "The predefined global constant STDOUT has nil for the external encoding despite Encoding.default_external being changed" # Expected #<Encoding:ASCII-8BIT> to be nil
+  fails "The predefined global constant STDOUT has nil for the external encoding" # Expected #<Encoding:ASCII-8BIT> to be nil
+  fails "The predefined global constant STDOUT has the encodings set by #set_encoding" # NotImplementedError: NotImplementedError
   fails "Time#inspect returns a US-ASCII encoded string" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
   fails "Time#to_s returns a US-ASCII encoded string" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
 end

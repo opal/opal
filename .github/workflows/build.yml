@@ -58,9 +58,6 @@ jobs:
           - name: mspec-safari-latest-macos
             command: bundle exec rake mspec_safari
             os: macos-latest
-          - name: mspec-osascript-latest-macos
-            command: bundle exec rake mspec_osascript
-            os: macos-latest
           - name: mspec-bun-1.1.30
             bun: '1.1.30'
             command: bin/rake mspec_bun

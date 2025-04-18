@@ -33,7 +33,9 @@ class Pathname
   end
 
   def absolute?
-    !relative?
+    res = ::File.absolute_path?(@path)
+    return true if `Opal.platform.windows` && !res && `self.path[0] == '/'`
+    res
   end
 
   def relative?
@@ -42,6 +44,11 @@ class Pathname
       path, = r
     end
     path == ''
+  end
+
+  def birthtime
+    # Returns the birth time for the file.
+    ::File::Stat.new(@path).birthtime
   end
 
   def chop_basename(path) # :nodoc:

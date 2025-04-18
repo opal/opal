@@ -2195,7 +2195,7 @@ class ::String < `String`
       #{
         def to_s
           return self if self.class == ::String
-          return `self.toString()`
+          `self.toString()`
         end
       }
     })();

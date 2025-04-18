@@ -8,7 +8,6 @@ module Opal
   class ExeCompiler
     RUNTIMES = -> {
       types = %w[bun deno node quickjs]
-      types << 'osascript' if OS.macos?
       types.freeze
     }.call
 
@@ -108,11 +107,6 @@ module Opal
       append_exe_to_out_path_on_windows
       FileUtils.cp(File.join(dir, 'node_copy.exe'), @out_path)
       true
-    end
-
-    def compile_osascript_exe(src_path, _dir)
-      @out_path << '.app' unless @out_path.end_with?('.app')
-      system('osacompile', '-l', 'JavaScript', '-o', @out_path, '-s', src_path)
     end
 
     def compile_quickjs_exe(src_path, _dir)

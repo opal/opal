@@ -82,13 +82,20 @@ module Testing
 
     def filters(suite, platform)
       opalspec_filters = Dir['spec/filters/**/*_opal.rb']
+      opsys = if OS.windows?
+                'windows'
+              elsif OS.macos?
+                'macos'
+              else
+                'linux'
+              end
 
       if ENV['INVERT_RUNNING_MODE']
         # When we run an inverted test suite we should run only 'bugs'.
         # Unsupported features are not supported anyway
-        rubyspec_filters = Dir['spec/filters/bugs/*.rb'] - opalspec_filters
+        rubyspec_filters = Dir["spec/filters/{bugs,platform/#{platform},platform/#{platform}/#{opsys}}/*.rb"] - opalspec_filters
       else
-        rubyspec_filters = Dir["spec/filters/{unsupported,bugs,platform/#{platform}}/*.rb"] - opalspec_filters
+        rubyspec_filters = Dir["spec/filters/{unsupported,bugs,platform/#{platform},platform/#{platform}/#{opsys}}/*.rb"] - opalspec_filters
       end
 
       suite == 'opal' ? opalspec_filters : rubyspec_filters
@@ -166,7 +173,6 @@ module Testing
       random_seed = Testing.get_random_seed(env)
 
       File.write filename, <<-RUBY
-        require 'opal/platform' # in node ENV is replaced
         require 'opal-parser'
         #{env_data}
         srand(#{random_seed})

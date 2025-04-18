@@ -33,8 +33,6 @@ class ::IO
     # Yields self within cooked mode.
     cooked!
     yield self
-  ensure
-
   end
 
   def cooked!

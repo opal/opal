@@ -1,6 +1,8 @@
 # helpers: coerce_to
 # backtick_javascript: true
 
+`/*eslint no-fallthrough: "off"*/`
+
 module ::Kernel
   def format(format_string, *args)
     # Returns the string resulting from formatting args into format_string.

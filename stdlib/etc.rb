@@ -36,10 +36,13 @@ module Etc
       # The first time it is called it opens the file and returns the first entry;
       # each successive call returns the next entry, or nil if the end of the file has been reached.
       return nil if `$platform.windows`
-      @group_file = ::File.new('/etc/group', 'r') unless @group_file
+      @group_file ||= ::File.new('/etc/group', 'r')
       entry = @group_file.readline
-      name, passwd, gid_s, users = entry.split(':')
-      Group.new(name, passwd, gid_s.to_i, users.split(','))
+      entry = @group_file.readline while entry.start_with?('#')
+      if entry
+        name, passwd, gid_s, users = entry.split(':')
+        Group.new(name, passwd, gid_s.to_i, users.split(','))
+      end
     rescue
       nil
     end
@@ -47,9 +50,10 @@ module Etc
     def getgrgid(gid = nil)
       # Returns information about the group with specified integer group_id, as found in /etc/group.
       return nil if `$platform.windows`
-      gid = ::Process.gid unless gid
+      gid ||= ::Process.gid
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
+          next if entry.start_with?('#')
           name, passwd, gid_s, users = entry.split(':')
           gid_i = gid_s.to_i
           return Group.new(name, passwd, gid_i, users.split(',')) if gid == gid_i
@@ -64,6 +68,7 @@ module Etc
       name = ::Opal.coerce_to!(name, ::String, :to_str)
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
+          next if entry.start_with?('#')
           name_s, passwd, gid_s, users = entry.split(':')
           return Group.new(name_s, passwd, gid_s.to_i, users.split(',')) if name == name_s
         end
@@ -85,10 +90,13 @@ module Etc
       # The first time it is called it opens the file and returns the first entry;
       # each successive call returns the next entry, or nil if the end of the file has been reached.
       return nil if `$platform.windows`
-      @passwd_file = ::File.new('/etc/passwd', 'r') unless @passwd_file
+      @passwd_file ||= ::File.new('/etc/passwd', 'r')
       entry = @passwd_file.readline
-      name, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
-      Passwd.new(name, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell)
+      entry = @passwd_file.readline while entry.start_with?('#')
+      if entry
+        name, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
+        Passwd.new(name, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell)
+      end
     end
 
     def getpwnam(name)
@@ -97,6 +105,7 @@ module Etc
       name = ::Opal.coerce_to!(name, ::String, :to_str)
       ::File.open('/etc/passwd', 'r') do |passwd_file|
         passwd_file.each_line do |entry|
+          next if entry.start_with?('#')
           name_s, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
           return Passwd.new(name_s, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell) if name == name_s
         end
@@ -107,14 +116,16 @@ module Etc
     def getpwuid(uid = nil)
       # Returns the /etc/passwd information for the user with the given integer uid.
       return nil if `$platform.windows`
-      uid = ::Process.uid unless uid
+      uid ||= ::Process.uid
       ::File.open('/etc/passwd', 'r') do |passwd_file|
         passwd_file.each_line do |entry|
+          next if entry.start_with?('#')
           name_s, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
           uid_i = uid_s.to_i
           return Passwd.new(name_s, passwd, uid_i, gid_s.to_i, gecos, dir, shell) if uid == uid_i
         end
       end
+      nil
     end
 
     def group(&block)
@@ -123,6 +134,7 @@ module Etc
       return getgrgid unless block_given?
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
+          next if entry.start_with?('#')
           name_s, passwd, gid_s, users = entry.split(':')
           yield Group.new(name_s, passwd, gid_s.to_i, users.split(','))
         end
@@ -141,6 +153,7 @@ module Etc
       return getpwuid unless block_given?
       ::File.open('/etc/passwd', 'r') do |passwd_file|
         passwd_file.each_line do |entry|
+          next if entry.start_with?('#')
           name_s, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
           yield Passwd.new(name_s, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell)
         end

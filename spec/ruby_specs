@@ -74,10 +74,6 @@ ruby/core/kernel
 !ruby/core/kernel/fork_spec
 !ruby/core/kernel/gets_spec
 !ruby/core/kernel/load_spec
-!ruby/core/kernel/open_spec
-!ruby/core/kernel/putc_spec
-!ruby/core/kernel/readlines_spec
-!ruby/core/kernel/readline_spec
 !ruby/core/kernel/require_relative_spec
 !ruby/core/kernel/require_spec
 !ruby/core/kernel/select_spec
@@ -85,14 +81,11 @@ ruby/core/kernel
 !ruby/core/kernel/spawn_spec
 !ruby/core/kernel/syscall_spec
 !ruby/core/kernel/system_spec
-!ruby/core/kernel/tainted_spec
-!ruby/core/kernel/taint_spec
 !ruby/core/kernel/test_spec
 !ruby/core/kernel/throw_spec
 !ruby/core/kernel/trace_var_spec
 !ruby/core/kernel/trap_spec
 !ruby/core/kernel/trust_spec
-!ruby/core/kernel/untaint_spec
 !ruby/core/kernel/untrace_var_spec
 !ruby/core/kernel/untrusted_spec
 !ruby/core/kernel/untrust_spec

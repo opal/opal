@@ -12,11 +12,6 @@ bundle exec opal --compile-to-exe deno -o simple_deno ./simple.rb
 # with node installed:
 bundle exec opal --compile-to-exe node -o simple_node ./simple.rb
 
-# on macOS only:
-bundle exec opal --compile-to-exe osascript -o simple_osa ./simple.rb
-# execute the macOS app from the terminal as:
-# ./simple_osa.app/Contents/MacOS/applet
-
 # with quickjs installed:
 bundle exec opal --compile-to-exe quickjs -o simple_quickjs ./simple.rb
 

@@ -32,6 +32,7 @@ opal_filter "Date" do
   fails "Date#strftime should be able to show a full notation" # Expected "%+" == "Sun Apr  9 00:00:00 +00:00 2000" to be truthy but was false
   fails "Date#strftime should be able to show the commercial week day" # Expected "1" == "7" to be truthy but was false
   fails "Date#strftime should be able to show the commercial week" # Expected " 9-APR-2000" == " 9-Apr-2000" to be truthy but was false
+  fails "Date#strftime should be able to show the number of seconds since the unix epoch for a date" # Expected "954972000" == "954979200" to be truthy but was false
   fails "Date#strftime should be able to show the timezone of the date with a : separator" # Expected "+0200" == "+0000" to be truthy but was false
   fails "Date#strftime should be able to show the timezone with a : separator" # Expected "Central European Summer Time" == "+00:00" to be truthy but was false
   fails "Date#strftime should be able to show the week number with the week starting on Sunday (%U) and Monday (%W)" # Expected "%U" == "14" to be truthy but was false

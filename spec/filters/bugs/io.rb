@@ -234,7 +234,6 @@ opal_filter "IO" do
   fails "IO.new ignores the :encoding option when the :internal_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
   fails "IO.new raises an Errno::EINVAL if the new mode is not compatible with the descriptor's current mode" # Expected Errno::EINVAL but no exception was raised (<IO:fd 25> was returned)
   fails "IO.open accepts options as keyword arguments" # Expected ArgumentError (wrong number of arguments (given 3, expected 1..2)) but no exception was raised (<IO:fd 35> was returned)
-  fails "IO.open does not set last error when an IOError with 'closed stream' raised by #close" # Expected #<Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<MockObject:0x22fe>'> == nil to be truthy but was false
   fails "IO.open ignores the :encoding option when the :external_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
   fails "IO.open ignores the :encoding option when the :internal_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
   fails "IO.open raises an Errno::EINVAL if the new mode is not compatible with the descriptor's current mode" # Expected Errno::EINVAL but no exception was raised (<IO:fd 2> was returned)
@@ -292,9 +291,7 @@ opal_filter "IO" do
   fails "IO.select when passed nil for timeout sleeps forever and sets the thread status to 'sleep'" # NotImplementedError: Thread creation not available
   fails "IO.try_convert raises a TypeError if the object does not return an IO from #to_io" # Expected TypeError (can't convert MockObject to IO (MockObject#to_io gives String)) but got: TypeError (can't convert MockObject into IO (MockObject#to_io gives String))
   fails "IO.try_convert return nil when BasicObject is passed" # NoMethodError: undefined method `is_a?' for #<BasicObject:0xe88e>
-  fails "IO.write accepts a :flags option without :mode one" # ArgumentError: mode given multiple times
   fails "IO.write accepts options as a keyword argument" # Expected ArgumentError (wrong number of arguments (given 4, expected 2..3)) but no exception was raised (2 was returned)
-  fails "IO.write requires mode to be specified in :open_args even if flags option passed" # Expected IOError (not opened for writing) but no exception was raised (8 was returned)
   fails "IO::EAGAINWaitReadable combines Errno::EAGAIN and IO::WaitReadable" # NameError: uninitialized constant IO::EAGAINWaitReadable
   fails "IO::EAGAINWaitReadable is the same as IO::EWOULDBLOCKWaitReadable if Errno::EAGAIN is the same as Errno::EWOULDBLOCK" # NameError: uninitialized constant Errno::EAGAIN
   fails "IO::EAGAINWaitWritable combines Errno::EAGAIN and IO::WaitWritable" # NameError: uninitialized constant IO::EAGAINWaitWritable

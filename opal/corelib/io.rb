@@ -133,7 +133,7 @@ class ::IO
           unless open_args
             opt_flags = opts[:flags]
             flags = flags ? flags | opt_flags : opt_flags if opt_flags
-            flags = ::File::Constants::WRONLY | ::File::Constants::CREAT unless flags
+            flags ||= ::File::Constants::WRONLY | ::File::Constants::CREAT
 
             unless offset_given || (flags & ::File::Constants::APPEND == ::File::Constants::APPEND)
               flags |= ::File::Constants::TRUNC
@@ -143,7 +143,7 @@ class ::IO
           end
 
           perm = opts[:perm]
-          perm = perm ? ::Opal.coerce_to!(perm, ::Integer, :to_int) : 0o666;
+          perm = perm ? ::Opal.coerce_to!(perm, ::Integer, :to_int) : 0o666
 
           fd = `$platform.io_open_path(path, flags, perm)`
           io = IO.new(fd, nil, **opts)
@@ -184,7 +184,6 @@ class ::IO
                else
                  dst
                end
-      read_method =
       str = if src_io.respond_to?(:read)
               src_io.read(src_offset) if src_offset > 0
               src_io.read(src_length)
@@ -286,7 +285,7 @@ class ::IO
 
       return [read_io, write_io] unless block_given?
       begin
-        return yield read_io, write_io
+        yield read_io, write_io
       ensure
         read_io.close
         write_io.close
@@ -299,7 +298,7 @@ class ::IO
       args = `null`
       if env.is_a?(Hash)
         `js_opts.env = {}`
-        env.each { |k,v| `js_opts.env[k.toString()] = v.toString()` }
+        env.each { |k, v| `js_opts.env[k.toString()] = v.toString()` }
       else
         mode = cmd if mode.nil? && cmd
         cmd = env
@@ -323,13 +322,12 @@ class ::IO
         // options.timeout;
         // options.killSignal;
       }
-      fd, pid = `$platform.io_spawn(cmd, args, js_opts)`
+      fd, pid = `$platform.io_popen(cmd, args, js_opts)`
       io = new(fd, mode, **opts)
       `io.pid = pid`
       return io unless block_given?
       begin
         $? = yield io
-        return $?
       ensure
         io.close
       end
@@ -414,8 +412,8 @@ class ::IO
     fd = ::Opal.coerce_to!(fd, ::Integer, :to_int)
     raise(Errno::EBADF) if fd < 0
     @fd = fd
-    @close_on_exec = @fd > 2 ? true : false
-    @sync = @fd == 2 ? true : false
+    @close_on_exec = @fd > 2
+    @sync = @fd == 2
     @nonblock = false
     @lineno = 0
     @pos = 0
@@ -454,8 +452,8 @@ class ::IO
     if flags & ::File::Constants::RDWR == ::File::Constants::RDWR
       @opened = :duplex
     elsif flags & ::File::Constants::WRONLY == ::File::Constants::WRONLY
-        @opened = :write
-        @closed = :read
+      @opened = :write
+      @closed = :read
     else
       @opened = :read
       @closed = :write
@@ -501,31 +499,29 @@ class ::IO
 
     set_encoding_by_bom if use_bom
 
-    unless @ext_enc
-      @ext_enc = if ext_enc || (enc_def_int.nil? && mode == 'r')
-                    ext_enc
-                  elsif @binmode
-                    ::Encoding::BINARY
-                  elsif enc_def_int.nil?
-                    nil
-                  else
-                    enc_def_ext
-                  end
-    end
+    @ext_enc ||= if ext_enc || (enc_def_int.nil? && mode == 'r')
+                   ext_enc
+                 elsif @binmode
+                   ::Encoding::BINARY
+                 elsif enc_def_int.nil?
+                   nil
+                 else
+                   enc_def_ext
+                 end
 
     if int_enc && !int_enc.is_a?(::Encoding)
       int_enc = ::Opal.coerce_to!(int_enc, ::String, :to_str)
       int_enc = ::Encoding.find(int_enc) unless int_enc == '-'
     end
     @int_enc = if int_enc && (int_enc == '-' || int_enc == @ext_enc)
-                  nil
-                elsif int_enc
-                  int_enc
-                elsif enc_def_ext == enc_def_int || @ext_enc == ::Encoding::BINARY
-                  nil
-                else
-                  enc_def_int
-                end
+                 nil
+               elsif int_enc
+                 int_enc
+               elsif enc_def_ext == enc_def_int || @ext_enc == ::Encoding::BINARY
+                 nil
+               else
+                 enc_def_int
+               end
 
     nl = opts[:newline]
     raise(::ArgumentError, 'newline decorator with binary mode') if nl && @binmode
@@ -537,7 +533,7 @@ class ::IO
                     "\n"
                   end
 
-    @tty = `$platform.io_open(self.fd)` if @fd
+    @tty = `$platform.io_open(self.fd, self.flags)` if @fd
   end
 
   def <<(object)
@@ -632,13 +628,11 @@ class ::IO
 
   def each(sep = $/, limit = nil, chomp: false)
     # Calls the block with each remaining line read from the stream; returns self.
-    unless sep.nil?
-      if limit.nil? && sep.is_a?(::Numeric)
-        limit = sep
-        sep = $/
-      end
+    if !sep.nil? && limit.nil? && sep.is_a?(::Numeric)
+      limit = sep
+      sep = $/
     end
-    raise(ArgumentError, "if limit is given, it must be greater than 0") if limit && limit < 1
+    raise(ArgumentError, 'if limit is given, it must be greater than 0') if limit && limit < 1
 
     return enum_for(:each, sep, limit, chomp: chomp) unless block_given?
 
@@ -696,7 +690,7 @@ class ::IO
   def external_encoding
     # Returns the Encoding object that represents the encoding of the stream,
     # or nil if the stream is in write mode and no encoding is specified.
-    return @ext_enc if @opened  != :read
+    return @ext_enc if @opened != :read
     @ext_enc || ::Encoding.default_external
   end
 
@@ -710,7 +704,7 @@ class ::IO
       flags |= 1 if close_on_exec?
       return flags
     end
-    return -1
+    -1
   end
 
   def fdatasync
@@ -770,7 +764,7 @@ class ::IO
   def gets(sep = $/, limit = nil, chomp: false)
     # Reads and returns a line from the stream; assigns the return value to $_.
     `check_readable(self)`
-    return  $_ = nil if eof
+    return $_ = nil if eof
 
     paragraph_mode = false
 
@@ -896,10 +890,8 @@ class ::IO
   def initialize_copy(other)
     `check_open(other)`
 
-    if @path
-      @fd = `$platform.io_open_path(self.path, self.flags)`
-      @tty = `$platform.io_open(self.fd)` if @fd
-    end
+    @fd = `$platform.io_open_path(self.path, self.flags)` if path
+    @tty = `$platform.io_open(self.fd, self.flags)` if @fd
 
     @autoclose = true
     @close_on_exec = true
@@ -969,7 +961,7 @@ class ::IO
     # Seeks to the given new_position (in bytes).
     `check_open(self)`
     number = ::Opal.coerce_to!(number, ::Integer, :to_int)
-    raise(Errno::EINVAL, "position must be >= 0") if number < 0
+    raise(Errno::EINVAL, 'position must be >= 0') if number < 0
     fsz = stat.size
     @pos = number
   end
@@ -1004,7 +996,7 @@ class ::IO
       bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, offset, read_len)`
       total_bytes_read += bytes_read
       offset += bytes_read
-      raise(::EOFError) if (bytes_read < read_len)
+      raise(::EOFError) if bytes_read < read_len
     end
     return `$str('', enc)` if bytes_read == 0
     @buffer.get_raw_string(0, total_bytes_read, enc, false)
@@ -1021,7 +1013,6 @@ class ::IO
     lidx = objects.size - 1
     wsep = $, || $\
     objects.each_with_index do |object, idx|
-      object = ::Opal.coerce_to!(object, ::String, :to_s)
       idx == lidx ? write(object) : write(object, wsep)
     end
     write($\) if $\
@@ -1065,7 +1056,7 @@ class ::IO
             ary = arg.flatten rescue arg
             ary.each do |a|
               if a == arg
-                write("[...]")
+                write('[...]')
               else
                 puts a
               end
@@ -1156,7 +1147,7 @@ class ::IO
       bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, self.pos, read_len)`
       total_bytes_read += bytes_read
       @pos += bytes_read
-      break if (bytes_read < read_len)
+      break if bytes_read < read_len
     end
     return `$str('', xenc)` if length && `length !== Infinity` && bytes_read == 0
     result = @buffer.get_raw_string(0, total_bytes_read, xenc, false)
@@ -1224,7 +1215,7 @@ class ::IO
       path = ::Opal.coerce_to!(path_or_io, ::String, :to_path) unless other_io
     end
 
-    fsync if @fd && (@opened == :duplex || @opened == :write ) && @closed != :write && !closed?
+    fsync if @fd && (@opened == :duplex || @opened == :write) && @closed != :write && !closed?
 
     if path
       mode = mode ? mode.split(':').first : 'r'
@@ -1243,15 +1234,14 @@ class ::IO
       if (`other_io.opened` == :duplex || `other_io.opened` == :write) && `other_io.closed` != :write
         other_io.fsync
       end
-      if other_io.path
-        path = other_io.path
+      @path = other_io.path
+      if @path
         `$platform.io_close(self.fd)` if @fd && !closed?
         begin
-          @fd = `$platform.io_open_path(path, other_io.flags)`
+          @fd = `$platform.io_open_path(self.path, other_io.flags)`
         rescue Errno::ENOENT
-          @fd = `$platform.io_open_path(path, Opal.mode_to_flags('w+'))`
+          @fd = `$platform.io_open_path(self.path, Opal.mode_to_flags('w+'))`
         end
-        @path = path
       else
         @fd = other_io.fileno
       end
@@ -1276,7 +1266,7 @@ class ::IO
     end
 
     @binmode = binmode if binmode
-    @close_on_exec = @fd > 2 ? true : false
+    @close_on_exec = @fd > 2
 
     self
   end
@@ -1303,7 +1293,7 @@ class ::IO
     is_stdio = @fd && @fd < 3
     enc_def_int = ::Encoding.default_internal
     @ext_enc = if @binmode && @opened == :read
-                ::Encoding.default_external
+                 ::Encoding.default_external
                elsif ext_enc.nil? && (enc_def_int.nil? || is_stdio)
                  nil
                elsif ext_enc.nil?
@@ -1351,35 +1341,32 @@ class ::IO
     if bom.size == 4
       # check for 4 byte BOMS
       encoding = case bom
-                when [0x00, 0x00, 0xFE, 0xFF] then ::Encoding::UTF_32BE
-                when [0xFF, 0xFE, 0x00, 0x00] then ::Encoding::UTF_32LE
-                when [0xDD, 0x73, 0x66, 0x73] then false # UTF-EBCDIC
-                when [0x84, 0x31, 0x95, 0x33] then false # GB18030
-                else nil
-                end
+                 when [0x00, 0x00, 0xFE, 0xFF] then ::Encoding::UTF_32BE
+                 when [0xFF, 0xFE, 0x00, 0x00] then ::Encoding::UTF_32LE
+                 when [0xDD, 0x73, 0x66, 0x73] then false # UTF-EBCDIC
+                 when [0x84, 0x31, 0x95, 0x33] then false # GB18030
+                 end
       bom.pop if encoding.nil? # 4 -> 3
     end
 
     if bom.size == 3
       # check for 3 byte BOMS
       encoding = case bom
-                when [0xEF, 0xBB, 0xBF] then ::Encoding::UTF_8
-                when [0x2B, 0x2F, 0x76] then false # UTF-7
-                when [0xF7, 0x64, 0x4C] then false # UTF-1
-                when [0x0E, 0xFE, 0xFF] then false # SCSU
-                when [0xFB, 0xEE, 0x28] then false # BOCU-1
-                else nil
-                end
+                 when [0xEF, 0xBB, 0xBF] then ::Encoding::UTF_8
+                 when [0x2B, 0x2F, 0x76] then false # UTF-7
+                 when [0xF7, 0x64, 0x4C] then false # UTF-1
+                 when [0x0E, 0xFE, 0xFF] then false # SCSU
+                 when [0xFB, 0xEE, 0x28] then false # BOCU-1
+                 end
       bom.pop if encoding.nil? # 3 -> 2
     end
 
     if bom.size == 2
       # check for 2 byte BOMS
       encoding = case bom
-                when [0xFE, 0xFF] then ::Encoding::UTF_16BE
-                when [0xFF, 0xFE] then ::Encoding::UTF_16LE
-                else nil
-                end
+                 when [0xFE, 0xFF] then ::Encoding::UTF_16BE
+                 when [0xFF, 0xFE] then ::Encoding::UTF_16LE
+                 end
     end
 
     if encoding
@@ -1440,7 +1427,7 @@ class ::IO
       bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, self.pos, read_len)`
       total_bytes_read += bytes_read
       @pos += bytes_read
-      break if (bytes_read < read_len)
+      break if bytes_read < read_len
     end
     return `$str('', enc)` if bytes_read == 0
     @buffer.get_raw_string(0, total_bytes_read, enc, false)
@@ -1512,14 +1499,12 @@ class ::IO
     # Pushes back (“unshifts”) the given data onto the stream’s buffer,
     # placing the data so that it is next to be read; returns nil
     raise NotImplementedError
-    nil
   end
 
   def ungetc(int_or_str)
     # Pushes back (“unshifts”) the given data onto the stream’s buffer,
     # placing the data so that it is next to be read; returns nil
     raise NotImplementedError
-    nil
   end
 
   def write(*objects)
@@ -1531,7 +1516,7 @@ class ::IO
       str = ::Opal.coerce_to!(obj, ::String, :to_s)
       # syswrite will use the str binary_encoding, encode accordingly
       str = `$str(str, self.ext_enc)` if @ext_enc && @ext_enc != ::Encoding::BINARY
-      next if str.size == 0
+      next if str.empty?
       total_wsize += syswrite(str)
     end
     total_wsize

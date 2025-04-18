@@ -61,23 +61,23 @@ module ::Process
 
     def egid
       # Returns the effective group ID for the current process.
-      `$platform.proc_getegid()`
+      `$platform.process_getegid()`
     end
 
     def egid=(new_egid)
       # Sets the effective group ID for the current process.
-      `$platform.proc_setegid(new_egid)`
+      `$platform.process_setegid(new_egid)`
       new_egid
     end
 
     def euid
       # Returns the effective user ID for the current process.
-      `$platform.proc_geteuid()`
+      `$platform.process_geteuid()`
     end
 
     def euid=(new_euid)
       # Sets the effective user ID for the current process.
-      `$platform.proc_seteuid(new_ugid)`
+      `$platform.process_seteuid(new_euid)`
       new_euid
     end
 
@@ -128,18 +128,18 @@ module ::Process
 
     def gid
       # Returns the (real) group ID for the current process
-      `$platform.proc_getgid()`
+      `$platform.process_getgid()`
     end
 
     def gid=(new_gid)
       # Sets the group ID for the current process to new_gid.
-      `$platform.proc_setgid(new_id)`
+      `$platform.process_setgid(new_gid)`
     end
 
     def groups
       # Returns an array of the group IDs in the supplemental
       # group access list for the current process
-      `$platform.proc_getgroups()`
+      `$platform.process_getgroups()`
     end
 
     def initgroups(username, gid)
@@ -153,10 +153,22 @@ module ::Process
       # Sends a signal to each process specified by ids
       # (which must specify at least one ID);
       # returns the count of signals sent.
-      signal = 'SIG' + signal.upcase unless signal.start_with?('SIG')
-      signal = `signal.toString()`
-      ids.each do |p|
-        `$platform.proc_kill(p, signal)` rescue nil
+      if signal.is_a?(::Integer)
+        signal = ::Signal.list.key(signal)
+        raise(::ArgumentError, 'unknown signal') unless signal
+      else
+        signal = signal[1..] if signal[0] == '-'
+        signal = signal.upcase
+        signal = signal[3..] if signal.start_with?('SIG')
+        raise(::ArgumentError, 'unknown signal') unless ::Signal.list.key?(signal)
+      end
+      own_pid = pid
+      ids.each do |pd|
+        if pd == own_pid
+          raise(::SignalException, 'TERM') if signal == 'TERM'
+          raise(::Interrupt) if signal == 'INT'
+        end
+        `$platform.process_kill(pd, signal)` rescue nil
       end
       # emulation for other specs to pass
       ps = Process::Status.new(0, ids[ids.size - 1])
@@ -183,12 +195,12 @@ module ::Process
 
     def pid
       # Returns the process ID of the current process.
-      `$platform.proc_pid()`
+      `$platform.process_pid()`
     end
 
     def ppid
       # Returns the process ID of the parent of the current process.
-      `$platform.proc_ppid()`
+      `$platform.process_ppid()`
     end
 
     def setpgid(pid, pgid)
@@ -209,7 +221,7 @@ module ::Process
     def setproctitle(string)
       # Sets the process title that appears on the ps(1) command.
       # Not necessarily effective on all platforms.
-      `$platform.proc_set_title(string)`
+      `$platform.process_set_title(string)`
       string
     end
 
@@ -241,12 +253,12 @@ module ::Process
 
     def uid
       # Returns the (real) user ID of the current process.
-      `$platform.proc_getuid()`
+      `$platform.process_getuid()`
     end
 
     def uid=(new_uid)
       # Sets the (user) user ID for the current process to new_uid.
-      `$platform.proc_setuid(new_uid)`
+      `$platform.process_setuid(new_uid)`
     end
 
     def wait(pid = -1, flags = 0)

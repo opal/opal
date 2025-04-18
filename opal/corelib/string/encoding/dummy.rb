@@ -14,5 +14,6 @@ require 'corelib/string/encoding'
 ::Encoding.register 'ISO-8859-5', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'KOI8_U', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'UTF-7', inherits: ::Encoding::UTF_16LE, dummy: true
-::Encoding.register 'Windows-1251', aliases: ['WINDOWS-1251'], inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'Windows-1250', aliases: ['WINDOWS-1250'], inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'Windows-1251', aliases: %w[WINDOWS-1251 CP1251], inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'Windows-1252', aliases: ['WINDOWS-1252'], inherits: ::Encoding::UTF_16LE, dummy: true

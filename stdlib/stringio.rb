@@ -1,6 +1,8 @@
 # helpers: str
 # backtick_javascript: true
 
+`/*eslint no-unsafe-finally: "off"*/`
+
 class StringIO
   include ::Enumerable
 
@@ -17,13 +19,9 @@ class StringIO
     begin
       res = yield(io)
     ensure
-      begin
-        `io.string = nil`
-        `io.string_is_valid = true`
-        io.close
-      rescue IOError
-        nil
-      end
+      `io.string = nil`
+      `io.string_is_valid = true`
+      io.close rescue nil
     end
     res
   end
@@ -202,8 +200,6 @@ class StringIO
                   else
                     "\n"
                   end
-
-    @tty = `$platform.io_open(self.fd)` if @fd
   end
 
   def <<(object)

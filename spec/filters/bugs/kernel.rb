@@ -72,7 +72,6 @@ opal_filter "Kernel" do
   fails "Kernel#extend does not calls append_features on arguments metaclass" # Expected true == false to be truthy but was false
   fails "Kernel#fail accepts an Object with an exception method returning an Exception" # Expected StandardError (...) but got: TypeError (exception class/object expected)
   fails "Kernel#freeze causes mutative calls to raise RuntimeError" # Expected RuntimeError but no exception was raised (1 was returned)
-  fails "Kernel#freeze freezes an object's singleton class" # Expected false == true to be truthy but was false
   fails "Kernel#initialize_copy does nothing if the argument is the same as the receiver" # Expected nil.equal? #<Object:0x3cb42> to be truthy but was false
   fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
@@ -91,8 +90,13 @@ opal_filter "Kernel" do
   fails "Kernel#methods does not return private singleton methods defined in 'class << self'" # Expected ["ichi", "san", "shi", "roku", "shichi", "hachi", "juu", "juu_ichi", "juu_ni"] not to include "shichi"
   fails "Kernel#object_id returns a different value for two Bignum literals" # Expected 295330 == 295330 to be falsy but was true
   fails "Kernel#object_id returns a different value for two String literals" # Expected 133036 == 133036 to be falsy but was true
-  fails "Kernel#p flushes output if receiver is a File" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x498ec @rs_f="\n" @rs_b=nil @rs_c=nil>
-  fails "Kernel#p is not affected by setting $\\, $/ or $," # NoMethodError: undefined method `tmp' for #<OutputToFDMatcher:0x49902 @to=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true> @expected="Next time, Gadget, NEXT TIME!\n" @to_name="STDOUT">
+  fails "Kernel#open accepts options as keyword arguments" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but no exception was raised (<File:fd 27> was returned)
+  fails "Kernel#open is a private method" # Expected Kernel to have private instance method 'open' but it does not
+  fails "Kernel#open is not redefined by open-uri" # NotImplementedError: NotImplementedError
+  fails "Kernel#open opens an io for writing" # Expected (STDOUT): "."           but got: "" Backtrace
+  fails "Kernel#open opens an io when called with a block" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open '|date'
+  fails "Kernel#open opens an io when path starts with a pipe" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open '|date'
+  fails "Kernel#open when given an object that responds to to_open passes keyword arguments onto #to_open as keyword arguments if to_open accepts them" # ArgumentError: [MSpecEnv#open] wrong number of arguments (given 5, expected -2)
   fails "Kernel#pp lazily loads the 'pp' library and delegates the call to that library" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x572a>
   fails "Kernel#print prints $_ when no arguments are given" # Expected:   $stdout: "foo"       got:   $stdout: ""
   fails "Kernel#public_method changes the method called for super on a target aliased method" # NoMethodError: undefined method `public_method' for #<#<Class:0x5a558>:0x5a556>
@@ -106,7 +110,7 @@ opal_filter "Kernel" do
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors" # Expected ["f_pub", "f_pro", "f_pri"] == ["f_pub"] to be truthy but was false
   fails "Kernel#public_send includes `public_send` in the backtrace when passed a single incorrect argument" # Expected "method=\"public_send\" @object=nil> is not a symbol nor a string:in `TypeError: #<MSpecEnv:0x5399c '".include? "`public_send'" to be truthy but was false
   fails "Kernel#public_send includes `public_send` in the backtrace when passed not enough arguments" # Expected "<internal:corelib/runtime.js>:1546:5:in `Opal.ac'".include? "`public_send'" to be truthy but was false
-  fails "Kernel#puts delegates to $stdout.puts" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x561c0 @name=nil @stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true>>
+  fails "Kernel#putc is a private instance method" # Expected Kernel to have private instance method 'putc' but it does not
   fails "Kernel#raise accepts a cause keyword argument that overrides the last exception" # Expected #<RuntimeError: first raise> == #<StandardError: StandardError> to be truthy but was false
   fails "Kernel#raise accepts a cause keyword argument that sets the cause" # Expected nil == #<StandardError: StandardError> to be truthy but was false
   fails "Kernel#raise passes no arguments to the constructor when given only an exception class" # Expected #<Class:0x5390e> but got: ArgumentError ([#initialize] wrong number of arguments (given 1, expected 0))
@@ -115,6 +119,8 @@ opal_filter "Kernel" do
   fails "Kernel#rand is a private method" # Expected Kernel to have private instance method 'rand' but it does not
   fails "Kernel#rand is random on boot" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x19c2a>
   fails "Kernel#rand supports custom object types" # Expected "NaN#<struct KernelSpecs::CustomRangeInteger value=1>" (String) to be an instance of KernelSpecs::CustomRangeInteger
+  fails "Kernel#readline is a private method" # Expected Kernel to have private instance method 'readline' but it does not
+  fails "Kernel#readlines is a private method" # Expected Kernel to have private instance method 'readlines' but it does not
   fails "Kernel#remove_instance_variable raises a FrozenError if self is frozen" # Expected FrozenError but got: NameError (instance variable @foo not defined)
   fails "Kernel#remove_instance_variable raises for frozen objects" # Expected FrozenError but got: NameError (instance variable @foo not defined)
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (false was returned)
@@ -123,7 +129,6 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_class for an IO object with a replaced singleton class looks up singleton methods from the fresh singleton class after an object instance got a new one" # NoMethodError: undefined method `reopen' for #<File:0x6c204 @fd="ruby/core/kernel/singleton_class_spec.rb" @flags="r" @eof=false @closed="write">
   fails "Kernel#singleton_class raises TypeError for Symbol" # Expected TypeError but no exception was raised (#<Class:#<String:0x53aaa>> was returned)
   fails "Kernel#singleton_class raises TypeError for a frozen deduplicated String" # Expected TypeError (can't define singleton) but no exception was raised (#<Class:#<String:0x6c200>> was returned)
-  fails "Kernel#singleton_class returns a frozen singleton class if object is frozen" # Expected false to be true
   fails "Kernel#singleton_method find a method defined on the singleton class" # NoMethodError: undefined method `singleton_method' for #<Object:0x4540a>
   fails "Kernel#singleton_method only looks at singleton methods and not at methods in the class" # Expected NoMethodError == NameError to be truthy but was false
   fails "Kernel#singleton_method raises a NameError if there is no such method" # Expected NoMethodError == NameError to be truthy but was false

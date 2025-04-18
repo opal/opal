@@ -27,6 +27,7 @@ module Opal
         v8.attach('opalminiracer.argv', argv)
 
         v8.eval(code)
+        0
       end
 
       # A polyfill so that SecureRandom works in repl correctly.
