@@ -168,36 +168,63 @@ class ::IO
       `common_write(path, data, offset, opts, true)`
     end
 
-    def copy_stream(src, dst, src_length = nil, src_offset = 0)
+    def copy_stream(src, dst, src_length = nil, src_offset = nil)
       # Copies from the given src to the given dst, returning the number of bytes copied.
-      src = src.to_path if src.is_a?(Pathname)
+      src_opened = dest_opened = rpartial = false
+      src = src.to_path if !src.is_a?(::IO) && src.respond_to?(:to_path)
       src_io = if src.is_a?(String)
                  fd = `$platform.io_open_path(src, #{::File::Constants::RDONLY})`
+                 src_opened = true
                  IO.new(fd, 'r')
                else
+                 rpartial = if src.respond_to?(:read)
+                              false
+                            elsif src.respond_to?(:readpartial)
+                              true
+                            else
+                              raise TypeError, 'src must respond to :read or :readpartial'
+                            end
                  src
                end
-      dst = dst.to_path if dst.is_a?(Pathname)
+      dst = dst.to_path if !dst.is_a?(::IO) && dst.respond_to?(:to_path)
       dst_io = if dst.is_a?(String)
-                 fd = `$platform.io_open_path(src, #{::File::Constants::WRONLY})`
+                 fd = `$platform.io_open_path(dst, #{::File::Constants::CREAT | ::File::Constants::WRONLY})`
+                 dest_opened = true
                  IO.new(fd, 'w')
                else
+                 raise TypeError, 'dst must respond to :write' unless dst.respond_to?(:write)
                  dst
                end
-      str = if src_io.respond_to?(:read)
-              src_io.read(src_offset) if src_offset > 0
-              src_io.read(src_length)
-            elsif src_io.respond_to?(:readpartial)
-              src_io.readpartial(src_offset) if src_offset > 0
-              src_io.readpartial(src_length)
-            else
-              raise TypeError, 'src must repond to :read or _readpartial'
-            end
-      raise TypeError, 'dst must repond to :write' unless dst_io.respond_to?(:write)
-      dst_io.write(str)
+
+      bsizes = [src_io, dst_io].map do |io|
+                 size = io.stat.blksize if io.respond_to?(:stat)
+                 size && size > 0 ? size : 1024
+               end
+
+      bsize = bsizes.min
+      bsize = [bsize, src_length].min if src_length
+      total_bytes = 0
+      if src_offset
+        raise(::Errno::ESPIPE) if src_io.respond_to?(:stat) && src_io.stat.pipe?
+        src_orig_pos = src_io.pos if !src_opened && src_io.respond_to?(:pos)
+        src_io.pos = src_offset
+      end
+
+      begin
+        bsize = src_length - total_bytes if src_length && (total_bytes + bsize) > src_length
+        data = if rpartial
+                 src_io.readpartial(bsize, nil) rescue nil
+               else
+                 src_io.read(bsize, nil)
+               end
+        total_bytes += dst_io.write(data) if data
+      end while data && (!src_length || (total_bytes < src_length))
+
+      total_bytes
     ensure
-      src_io&.close
-      dst_io&.close
+      src_io.pos = src_orig_pos if src_offset && !src_opened && src_io.respond_to?(:pos=)
+      src_io&.close if src_opened
+      dst_io&.close if dest_opened
     end
 
     alias for_fd new # Synonym for IO.new.
@@ -261,11 +288,11 @@ class ::IO
         ext_enc = ::Opal.coerce_to!(ext_enc, ::String, :to_str)
         ext_enc, int_enc = ext_enc.split(':') if int_enc.nil?
         bom, ext_enc = ext_enc.split('|') if ext_enc.include?('|')
-        ext_enc = `Opal.find_encoding(ext_enc)`
+        ext_enc = ::Encoding.find(ext_enc)
       end
       if int_enc && !int_enc.is_a?(::Encoding)
         int_enc = ::Opal.coerce_to!(int_enc, ::String, :to_str)
-        int_enc = `Opal.find_encoding(int_enc)`
+        int_enc = ::Encoding.find(int_enc)
       end
 
       ext_enc ||= Encoding.default_external
@@ -386,9 +413,7 @@ class ::IO
 
     def try_convert(object)
       # Attempts to convert object into an IO object via method to_io; returns the new IO object if successful, or nil otherwise:
-      return object if object.is_a?(::IO)
-      return nil unless object.respond_to?(:to_io)
-      ::Opal.coerce_to!(object, ::IO, :to_io)
+      ::Opal.coerce_to?(object, ::IO, :to_io)
     end
 
     def write(path, data, offset = nil, **opts)

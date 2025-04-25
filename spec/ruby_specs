@@ -52,9 +52,9 @@ ruby/core/exception
 ruby/core/false
 ruby/core/file
 ruby/core/file/stat
+ruby/core/filetest
 ruby/core/integer
 ruby/core/io
-!ruby/core/io/copy_stream_spec
 ruby/core/float
 ruby/core/hash
 ruby/core/integer
@@ -80,7 +80,6 @@ ruby/core/kernel
 !ruby/core/kernel/set_trace_func_spec
 !ruby/core/kernel/spawn_spec
 !ruby/core/kernel/syscall_spec
-!ruby/core/kernel/system_spec
 !ruby/core/kernel/test_spec
 !ruby/core/kernel/throw_spec
 !ruby/core/kernel/trace_var_spec
@@ -184,8 +183,6 @@ ruby/library/openstruct
 !ruby/library/openstruct/marshal_dump_spec
 
 ruby/library/pathname
-!ruby/library/pathname/empty_spec
-!ruby/library/pathname/glob_spec
 ruby/library/matrix
 ruby/library/matrix/eigenvalue_decomposition
 ruby/library/matrix/lup_decomposition
@@ -200,5 +197,7 @@ ruby/library/stringio
 ruby/library/stringscanner
 
 ruby/library/time
+
+ruby/library/tmpdir/dir
 
 ruby/library/optionparser

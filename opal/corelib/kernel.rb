@@ -840,6 +840,29 @@ module ::Kernel
     `Opal.get_singleton_class(self)`
   end
 
+  def singleton_methods(all = true)
+    res = []
+    origin = self.class
+    singleton = singleton_class
+
+    if singleton
+      if all
+        mods = singleton.ancestors
+        prep_mods = `origin.$$own_prepended_modules`
+        origin = prep_mods.first if prep_mods.any?
+        mods.each do |mod|
+          break if mod == origin
+          res.concat(`Opal.own_instance_methods(mod)`)
+        end
+      else
+        res.concat(`Opal.own_instance_methods(singleton)`)
+      end
+    end
+
+    res.uniq!
+    res
+  end
+
   def sleep(seconds = nil)
     %x{
       if (seconds === nil) {
@@ -861,33 +884,54 @@ module ::Kernel
     }
   end
 
-  def srand(seed = Random.new_seed)
+  def srand(seed = ::Random.new_seed)
     ::Random.srand(seed)
   end
 
   def system(*argv, exception: false)
     env = {}
-    env = argv.shift if argv.first.is_a? Hash
-    env = ENV.merge(env)
-    cmdname = argv.shift
-
+    env = argv.shift if argv.first.is_a? ::Hash
+    env = ::ENV.merge(env)
     js_env = `{}`
-    env.each { |k, v| `js_env[k] = v` }
+    env.each { |k, v| `js_env[k] = v.toString()` }
+    `delete js_env["SHELL"]`
+    js_opts = `{ stdio: 'pipe', env: js_env }`
 
-    out = if argv.empty?
-            `$platform.process_spawn(#{cmdname}, { shell: true, stdio: 'inherit', env: js_env })`
-          elsif Array === cmdname
-            `$platform.process_spawn(#{cmdname[0]}, #{argv}, { argv0: #{cmdname[1]}, stdio: 'inherit', env: js_env })`
-          else
-            `$platform.process_spawn(#{cmdname}, #{argv}, { stdio: 'inherit', env: js_env })`
-          end
+    cmdname = argv.shift
+    if Array === cmdname
+      cmdname = cmdname[0]
+      `js_opts.argv0 = #{cmdname[1]}`
+    end
 
-    status = out.JS[:status]
-    status = 127 if `status === null`
-    pid = out.JS[:pid]
+    opts = argv.shift
 
-    $? = Process::Status.new(status, pid)
-    raise "Command failed with exit #{status}: #{cmdname}" if exception && status != 0
+    if opts.is_a?(::Hash)
+      `js_opts.cwd = #{opts[:chdir]}` if opts.key?(:chdir)
+      so = opts[:out]
+      se = opts[:err]
+    end
+
+    `js_opts.shell = true` unless ::File.absolute_path?(cmdname)
+
+    out = `$platform.process_spawn(#{cmdname}, #{argv}, js_opts)`
+
+    status = `out.status > 128 ? out.status - 128 : out.status`
+    pid = `out.pid == null ? nil : out.pid`
+    $? = ::Process::Status.new(status, pid)
+
+    if exception
+      raise ::Errno::ENOENT if status == 127
+      raise "Command failed with exit #{status}: #{cmdname}" if status != 0
+      raise `out.error` if `out.error`
+    end
+
+    return nil if `out.error || out.status > 125`
+
+    so ||= $stdout
+    se ||= $stderr
+    so.write(`out.stdout`)
+    se.write(`out.stderr`)
+
     status == 0
   end
 

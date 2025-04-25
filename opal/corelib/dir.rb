@@ -659,10 +659,6 @@ class ::Dir
       0
     end
 
-    def mktmpdir(prefix_suffix = nil, *rest, **options)
-      # Dir.mktmpdir creates a temporary directory.
-    end
-
     def open(dirpath, encoding: nil)
       dir = new(dirpath, encoding: encoding)
       return dir unless block_given?
@@ -676,11 +672,6 @@ class ::Dir
     alias pwd getwd
 
     alias rmdir delete
-
-    def tmpdir
-      # Returns the operating system’s temporary file path
-      `$platform.tmpdir()`
-    end
 
     alias unlink delete
   end

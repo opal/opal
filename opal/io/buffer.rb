@@ -120,7 +120,7 @@ class ::IO
 
       function copy_dv(source_dv, target_dv, source_offset, offset, length) {
         let source = new Uint8Array(source_dv.buffer, source_offset, length);
-        (new Uint8Array(target_dv.buffer)).set(source, offset);
+        (new Uint8Array(target_dv.buffer, target_dv.byteOffset, target_dv.byteLength)).set(source, offset);
       }
 
       function endianess() {
@@ -339,9 +339,9 @@ class ::IO
       step = `size_map.get(buffer_type.$to_s())`
       count ||= (size / step).to_i
       len = size - offset
-      max = offset + `Math.min(count, len)`
+      max = offset + `Math.min(count * step, len)`
       while offset < max
-        yield i, get_value(buffer_type, i)
+        yield offset, get_value(buffer_type, offset)
         offset += step
       end
       self
@@ -352,7 +352,7 @@ class ::IO
       raise(AccessError, 'Buffer has been freed!') if null?
       return enum_for(:each_byte, offset, count) unless block_given?
       len = size - offset
-      max = offset + `Math.min(count, len)`
+      max = offset + (count ? `Math.min(count, len)` : len)
       while offset < max
         yield `self.data_view.getUint8(offset)`
         offset += 1
@@ -415,8 +415,7 @@ class ::IO
       encoding ||= ::Encoding::BINARY
       string = get_raw_string(offset, length, encoding)
       %x{
-        let n = string.startsWith('\0');
-        if (n >= 0) string = string.substring(0, n);
+        string = string.replace(/^\0+/, '');
         if (string.encoding != encoding) string = Opal.str(string, encoding.$name());
       }
       string

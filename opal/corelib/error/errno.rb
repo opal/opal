@@ -8,6 +8,7 @@ module ::Errno
     [:ENXIO, 'No such device or address', 6],
     [:EBADF, 'Bad file descriptor', 9],
     [:EACCES, 'Permission denied', 13],
+    [:EBUSY, 'resource busy or locked', 16],
     [:EEXIST, 'File exists', 17],
     [:ENOTDIR, 'Not a directory', 20],
     [:EISDIR, 'Is a directory', 21],

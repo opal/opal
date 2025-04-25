@@ -17,8 +17,6 @@ opal_filter "File" do
   fails "File#to_path returns a mutable String" # NotImplementedError: String#<< not supported. Mutable String methods are currently not supported in Opal.
   fails "File.absolute_path accepts a second argument of a directory from which to resolve the path" # Expected "C:/Users/Administrator/workspace/opal/spec/ruby/core/file/ruby/core/file/absolute_path_spec.rb" == "C:/Users/Administrator/workspace/opal/spec/ruby/core/file/absolute_path_spec.rb" to be truthy but was false
   fails "File.basename returns a new unfrozen String" # Expected "foo.rb" not to be identical to "foo.rb"
-  fails "File.directory? calls #to_io to convert a non-IO object" # Mock 'FileDirectoryIO' expected to receive to_io("any_args") exactly 1 times but received it 0 times
-  fails "File.directory? returns false if the argument is an IO that's not a directory" # TypeError: no implicit conversion of NilClass into String
   fails "File.empty? returns true for NUL" # Expected false == true to be truthy but was false
   fails "File.join inserts the separator in between empty strings and arrays" # Expected "" == "/" to be truthy but was false
   fails "File.join respects the given separator if only one part has a boundary separator" # Expected "usr/bin" == "usr//bin" to be truthy but was false
@@ -26,7 +24,6 @@ opal_filter "File" do
   fails "File.new accepts options as a keyword argument" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but no exception was raised (<File:fd 14> was returned)
   fails "File.open accepts options as a keyword argument" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but no exception was raised (<File:fd 8> was returned)
   fails "File.open raises an ArgumentError if passed the wrong number of arguments" # Expected ArgumentError but no exception was raised (<File:fd 6> was returned)
-  fails "File.utime may set nanosecond precision" # NoMethodError: undefined method `nsec' for 2007-11-01 15:25:00 -0000
   fails "File.zero? returns true for NUL" # Expected false == true to be truthy but was false
   fails "File::Stat#blksize returns nil" # Expected 4096 == nil to be truthy but was false
   fails "File::Stat#blocks returns nil" # Expected 0 to be nil

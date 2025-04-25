@@ -37,6 +37,14 @@ function io_action(action, ...args) {
   }
 };
 
+function ary_toString(ary) {
+  for(let i = 0; i < ary.length; i++) {
+    if (ary[i] instanceof String) ary[i] = ary[i].toString();
+    else if (ary[i] instanceof Array) ary[i] = ary_toString(ary[i]);
+  }
+  return ary;
+}
+
 // RUBY_PLATFORM and some OS dependent switches
 if (os.platform().startsWith("win")) {
   platform.ruby_platform = "opal mswin";
@@ -65,7 +73,7 @@ platform.machine = os.machine;
 platform.nodename = os.hostname;
 platform.release = os.release;
 platform.sysname = os.type;
-platform.tmpdir = os.tmpdir;
+platform.tmpdir = ()=>os.tmpdir().replaceAll(path.sep, '/');
 platform.version = os.version;
 
 // Exit
@@ -133,10 +141,10 @@ platform.process_fork = ()=>cluster.fork();
 platform.process_worker_pid = (worker)=>worker.process.pid;
 platform.process_exec = (cmd)=>child_process.execSync(cmd.toString());
 platform.process_spawn = function() {
-  for(let i = 0; i < arguments.length; i++) {
-    if (arguments[i] instanceof String) arguments[i] = arguments[i].toString();
-  }
-  return child_process.spawnSync.apply(null, arguments);
+  let res = child_process.spawnSync.apply(null, ary_toString(arguments));
+  return { status: res.status, pid: res.pid, error: res.error,
+           stdout: res.stdout ? res.stdout.toString() : null,
+           stderr: res.stderr ? res.stderr.toString() : null };
 }
 
 // IO.pipe
@@ -395,7 +403,9 @@ platform.file_lstat = (file_name)=>io_action(fs.lstatSync, file_name.toString())
 platform.file_lutime = (file_name, atime, mtime)=>io_action(fs.lutimesSync, file_name.toString(), atime, mtime);
 platform.file_mkfifo = (file_name, mode)=>{
   if (platform.windows) return not_available("On Windows File.mkfifo");
-  let res = child_process.spawnSync('mkfifo', ['-m', mode.toString(8), file_name.toString()]);
+  let mode_s = mode.toString(8);
+  if (mode_s.length > 3) mode_s = mode_s.slice(mode_s.length - 3);
+  let res = child_process.spawnSync('mkfifo', ['-m', mode_s, file_name.toString()]);
   return res.status;
 }
 platform.file_readlink = (path_name)=>io_action(fs.readlinkSync, path_name.toString());

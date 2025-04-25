@@ -13,7 +13,7 @@ module Opal
       SCRIPT_PATH = File.expand_path('cdp_interface.rb', __dir__).freeze
 
       DEFAULT_CDP_HOST = 'localhost'
-      DEFAULT_CDP_PORT = 9222
+      DEFAULT_CDP_PORT = 9444 # don't conflict with chrome or firefox on Windows
 
       def self.call(data)
         runner = new(data)

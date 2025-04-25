@@ -275,13 +275,13 @@ class ::File < ::IO
     def world_readable?
       # If stat is readable by others, returns an integer representing the file permission bits of stat.
       # Returns nil otherwise.
-      4 == (mode & 0o4) ? mode : nil
+      4 == (mode & 0o4) ? mode & 0o777 : nil
     end
 
     def world_writable?
       # If stat is writable by others, returns an integer representing the file permission bits of stat.
       # Returns nil otherwise.
-      2 == (mode & 0o2) ? mode : nil
+      2 == (mode & 0o2) ? mode & 0o777 : nil
     end
 
     def writable?
@@ -423,6 +423,13 @@ class ::File < ::IO
     def directory?(file_name)
       # With string object given, returns true if path is a string path leading to a directory,
       # or to a symbolic link to a directory; false otherwise.
+      if file_name.respond_to?(:to_io)
+        io = file_name.to_io
+        file_name = io.path
+        return io.stat.directory? unless file_name
+      else
+        file_name = `coerce_to_path(file_name)`
+      end
       stat(file_name).directory?
     rescue Errno::ENOENT
       false
@@ -818,18 +825,11 @@ class ::File < ::IO
 
     def identical?(file1, file2)
       # Returns true if the named files are identical.
-      stat1 = lstat(file1)
-      if stat1.symlink?
-        file1 = readlink(file1)
-        stat1 = stat(file1)
-      end
-      stat2 = lstat(file2)
-      if stat2.symlink?
-        file2 = readlink(file2)
-        stat2 = stat(file2)
-      end
-      return true if stat1.ino == stat2.ino
-      false
+      stat1 = stat(file1)
+      stat2 = stat(file2)
+      return false if stat1.dev != stat2.dev
+      return false if stat1.ino != stat2.ino
+      true
     rescue Errno::ENOENT
       false
     end

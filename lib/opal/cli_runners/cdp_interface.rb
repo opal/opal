@@ -197,9 +197,8 @@ CDP.List(options, async function(err, targets) {
 
           // react to exceptions
           Runtime.exceptionThrown(function(exception) {
-            var ex = exception.exceptionDetails.exception.preview.properties;
             var stack = [];
-            if (exception.exceptionDetails.stackTrace) {
+            if (exception.exceptionDetails.stackTrace && exception.exceptionDetails.stackTrace.callFrames.length > 0) {
               stack = exception.exceptionDetails.stackTrace.callFrames;
             } else {
               var d = exception.exceptionDetails;
@@ -210,13 +209,7 @@ CDP.List(options, async function(err, targets) {
                 functionName: "(unknown)"
               });
             }
-            var fr;
-            for (var i = 0; i < ex.length; i++) {
-              fr = ex[i];
-              if (fr.name === "message") {
-                perror(fr.value);
-              }
-            }
+            perror(exception.exceptionDetails.text);
             for (var i = 0; i < stack.length; i++) {
               fr = stack[i];
               perror(fr.url + ':' + fr.lineNumber + ':' + fr.columnNumber + ': in ' + fr.functionName);

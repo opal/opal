@@ -80,8 +80,8 @@ module Opal
         Opal::Fragment.new str, scope, loc && @sexp
       end
 
-      def error(msg)
-        @compiler.error msg
+      def error(msg, line = nil)
+        @compiler.error msg, line || sexp.loc&.line
       end
 
       def scope

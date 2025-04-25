@@ -27,7 +27,7 @@ module Etc
       return nil if `$platform.windows`
       if @passwd_file
         @passwd_file.close
-        @passwd_file.nil
+        @passwd_file = nil
       end
     end
 
@@ -35,7 +35,7 @@ module Etc
       # Returns an entry from the /etc/group file.
       # The first time it is called it opens the file and returns the first entry;
       # each successive call returns the next entry, or nil if the end of the file has been reached.
-      return nil if `$platform.windows`
+      return nil if `$platform.windows` || !::File.exist?('/etc/group')
       @group_file ||= ::File.new('/etc/group', 'r')
       entry = @group_file.readline
       entry = @group_file.readline while entry.start_with?('#')
@@ -49,7 +49,7 @@ module Etc
 
     def getgrgid(gid = nil)
       # Returns information about the group with specified integer group_id, as found in /etc/group.
-      return nil if `$platform.windows`
+      return nil if `$platform.windows` || !::File.exist?('/etc/group')
       gid ||= ::Process.gid
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
@@ -59,12 +59,12 @@ module Etc
           return Group.new(name, passwd, gid_i, users.split(',')) if gid == gid_i
         end
       end
-      nil
+      raise(::ArgumentError, "can't find group for #{gid}")
     end
 
     def getgrnam(name)
       # Returns information about the group with specified name, as found in /etc/group.
-      return nil if `$platform.windows`
+      return nil if `$platform.windows` || !::File.exist?('/etc/group')
       name = ::Opal.coerce_to!(name, ::String, :to_str)
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
@@ -73,7 +73,7 @@ module Etc
           return Group.new(name_s, passwd, gid_s.to_i, users.split(',')) if name == name_s
         end
       end
-      nil
+      raise(::ArgumentError, "can't find group for #{name}")
     end
 
     def getlogin
@@ -89,7 +89,7 @@ module Etc
       # Returns an entry from the /etc/passwd file.
       # The first time it is called it opens the file and returns the first entry;
       # each successive call returns the next entry, or nil if the end of the file has been reached.
-      return nil if `$platform.windows`
+      return nil if `$platform.windows` || !::File.exist?('/etc/passwd')
       @passwd_file ||= ::File.new('/etc/passwd', 'r')
       entry = @passwd_file.readline
       entry = @passwd_file.readline while entry.start_with?('#')
@@ -97,11 +97,13 @@ module Etc
         name, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
         Passwd.new(name, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell)
       end
+    rescue
+      nil
     end
 
     def getpwnam(name)
       # Returns the /etc/passwd information for the user with specified login name.
-      return nil if `$platform.windows`
+      return nil if `$platform.windows` || !::File.exist?('/etc/passwd')
       name = ::Opal.coerce_to!(name, ::String, :to_str)
       ::File.open('/etc/passwd', 'r') do |passwd_file|
         passwd_file.each_line do |entry|
@@ -110,12 +112,12 @@ module Etc
           return Passwd.new(name_s, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell) if name == name_s
         end
       end
-      nil
+      raise(::ArgumentError, "can't find user for #{name}")
     end
 
     def getpwuid(uid = nil)
       # Returns the /etc/passwd information for the user with the given integer uid.
-      return nil if `$platform.windows`
+      return nil if `$platform.windows` || !::File.exist?('/etc/passwd')
       uid ||= ::Process.uid
       ::File.open('/etc/passwd', 'r') do |passwd_file|
         passwd_file.each_line do |entry|
@@ -125,13 +127,15 @@ module Etc
           return Passwd.new(name_s, passwd, uid_i, gid_s.to_i, gecos, dir, shell) if uid == uid_i
         end
       end
-      nil
+      raise(::ArgumentError, "can't find user for #{uid}")
     end
 
     def group(&block)
       # Provides a convenient Ruby iterator which executes a block for each entry in the /etc/group file.
       return nil if `$platform.windows`
       return getgrgid unless block_given?
+      raise ::RuntimeError, '#passwd already active' if @group_active
+      @group_active = true
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
           next if entry.start_with?('#')
@@ -140,6 +144,8 @@ module Etc
         end
       end
       nil
+    ensure
+      @group_active = false
     end
 
     def nprocessors
@@ -151,6 +157,8 @@ module Etc
       # Provides a convenient Ruby iterator which executes a block for each entry in the /etc/passwd file.
       return nil if `$platform.windows`
       return getpwuid unless block_given?
+      raise ::RuntimeError, '#passwd already active' if @passwd_active
+      @passwd_active = true
       ::File.open('/etc/passwd', 'r') do |passwd_file|
         passwd_file.each_line do |entry|
           next if entry.start_with?('#')
@@ -159,6 +167,8 @@ module Etc
         end
       end
       nil
+    ensure
+      @passwd_active = false
     end
 
     def setgrent

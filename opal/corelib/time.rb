@@ -417,6 +417,10 @@ class ::Time < `Date`
     }
   end
 
+  def nsec
+    `self.getMilliseconds() * 1000000`
+  end
+
   def usec
     `self.getMilliseconds() * 1000`
   end
@@ -790,6 +794,7 @@ class ::Time < `Date`
   alias month mon
   alias to_s inspect
   alias tv_sec to_i
+  alias tv_nsec nsec
   alias tv_usec usec
   alias utc gmtime
   alias utc? gmt?

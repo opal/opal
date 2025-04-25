@@ -1,3 +1,4 @@
+::Object.autoload :FileTest, 'corelib/file_test'
 ::Object.autoload :Marshal, 'corelib/marshal'
 ::Object.require 'corelib/string/encoding/dummy'
 ::Object.require 'corelib/string/encoding/eucjp'

@@ -351,11 +351,16 @@ platforms.each do |platform|
       else
         includes = "-Itest/cruby/test"
         files = %w[
+          corelib/string/encoding/dummy.rb
+          corelib/file_test.rb
           benchmark/test_benchmark.rb
+          etc/test_etc.rb
+          opal/test_fileutils.rb
           opal/test_io_buffer.rb
           opal/test_keyword.rb
           opal/test_base64.rb
           opal/test_openuri.rb
+          opal/test_pathname.rb
           opal/test_uri.rb
           opal/unsupported_and_bugs.rb
           opal/test_matrix.rb

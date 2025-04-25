@@ -713,6 +713,7 @@ module ::Kernel
           else
             nextvalue = val
             float_value.(prec)
+            flags = fnoneC
             next
           end
 

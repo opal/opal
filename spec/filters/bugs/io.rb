@@ -169,57 +169,8 @@ opal_filter "IO" do
   fails "IO#write_nonblock writes to the current position after IO#read" # NoMethodError: undefined method `write_nonblock' for <File:fd 28>
   fails "IO.binwrite accepts options as a keyword argument" # Expected ArgumentError (wrong number of arguments (given 4, expected 2..3)) but no exception was raised (2 was returned)
   fails "IO.copy_stream does not use buffering when writing to STDOUT" # Expected nil == "bar" to be truthy but was false
-  fails "IO.copy_stream from a file name calls #to_path to convert on object to a file name" # Mock 'io_copy_stream_from' expected to receive to_path("any_args") exactly 1 times but received it 0 times
-  fails "IO.copy_stream from a file name raises a TypeError if #to_path does not return a String" # Expected TypeError but got: NoMethodError (undefined method `close' for #<MockObject:0x2298 @name="io_copy_stream_from" @null=nil>)
-  fails "IO.copy_stream from a file name to a file name calls #to_path to convert on object to a file name" # Mock 'io_copy_stream_to' expected to receive to_path("any_args") exactly 1 times but received it 0 times
-  fails "IO.copy_stream from a file name to a file name copies only length bytes from the offset" # Expected 0 == 8 to be truthy but was false
-  fails "IO.copy_stream from a file name to a file name copies only length bytes when specified" # Expected 0 == 8 to be truthy but was false
-  fails "IO.copy_stream from a file name to a file name copies the entire IO contents to the file" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\tmp\rubyspec_temp\io_copy_stream_io_name'
-  fails "IO.copy_stream from a file name to a file name raises a TypeError if #to_path does not return a String" # Expected TypeError but got: NoMethodError (undefined method `close' for #<MockObject:0x235e @name="io_copy_stream_to" @null=nil>)
-  fails "IO.copy_stream from a file name to a file name returns the number of bytes copied" # Expected 0 == 17000 to be truthy but was false
-  fails "IO.copy_stream from a file name to an IO copies only length bytes from the offset" # Expected 0 == 8 to be truthy but was false
-  fails "IO.copy_stream from a file name to an IO copies only length bytes when specified" # Expected 0 == 8 to be truthy but was false
-  fails "IO.copy_stream from a file name to an IO copies the entire IO contents to the IO" # IOError: not opened for writing
-  fails "IO.copy_stream from a file name to an IO does not close the destination IO" # Expected true to be false
-  fails "IO.copy_stream from a file name to an IO leaves the destination IO position at the last write" # IOError: closed stream
-  fails "IO.copy_stream from a file name to an IO raises an IOError if the destination IO is not open for writing" # Expected IOError but no exception was raised (0 was returned)
-  fails "IO.copy_stream from a file name to an IO returns the number of bytes copied" # IOError: not opened for writing
-  fails "IO.copy_stream from a file name to an IO starts writing at the destination IO's current position" # Expected "" ==  "prelude Line one  Line three Line four  Line last " to be truthy but was false
-  fails "IO.copy_stream from a pipe IO does not close the source IO" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<IO:0x288c>'
-  fails "IO.copy_stream from a pipe IO raises an error when an offset is specified" # Expected Errno::ESPIPE but no exception was raised (0 was returned)
-  fails "IO.copy_stream from a pipe IO to a file name calls #to_path to convert on object to a file name" # Mock 'io_copy_stream_to' expected to receive to_path("any_args") exactly 1 times but received it 0 times
-  fails "IO.copy_stream from a pipe IO to a file name copies only length bytes when specified" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<IO:0x2950>'
-  fails "IO.copy_stream from a pipe IO to a file name copies the entire IO contents to the file" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<IO:0x29ae>'
-  fails "IO.copy_stream from a pipe IO to a file name raises a TypeError if #to_path does not return a String" # Expected TypeError but got: NoMethodError (undefined method `close' for #<MockObject:0x28ee @name="io_copy_stream_to" @null=nil>)
-  fails "IO.copy_stream from a pipe IO to a file name returns the number of bytes copied" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<IO:0x2a0c>'
-  fails "IO.copy_stream from a pipe IO to an IO copies only length bytes when specified" # Expected 0 == 8 to be truthy but was false
-  fails "IO.copy_stream from a pipe IO to an IO copies the entire IO contents to the IO" # IOError: not opened for writing
-  fails "IO.copy_stream from a pipe IO to an IO does not close the destination IO" # Expected true to be false
-  fails "IO.copy_stream from a pipe IO to an IO leaves the destination IO position at the last write" # IOError: closed stream
-  fails "IO.copy_stream from a pipe IO to an IO raises an IOError if the destination IO is not open for writing" # Expected IOError but no exception was raised (0 was returned)
-  fails "IO.copy_stream from a pipe IO to an IO returns the number of bytes copied" # IOError: not opened for writing
-  fails "IO.copy_stream from an IO does change the IO offset when an offset is not specified" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<File:0x1d12>'
-  fails "IO.copy_stream from an IO does not change the IO offset when an offset is specified" # IOError: closed stream
-  fails "IO.copy_stream from an IO does not close the source IO" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<File:0x1d70>'
-  fails "IO.copy_stream from an IO raises an IOError if the source IO is not open for reading" # Expected IOError but got: Errno::ENOENT (No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<File:0x1dd0>')
-  fails "IO.copy_stream from an IO to a file name calls #to_path to convert on object to a file name" # Mock 'io_copy_stream_to' expected to receive to_path("any_args") exactly 1 times but received it 0 times
-  fails "IO.copy_stream from an IO to a file name copies only length bytes from the offset" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open '/home/jan/workspace/opal/tmp/rubyspec_temp/io_copy_stream_io_name'
-  fails "IO.copy_stream from an IO to a file name copies only length bytes when specified" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<File:0x1ef6>'
-  fails "IO.copy_stream from an IO to a file name copies the entire IO contents to the file" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<File:0x1fb6>'
-  fails "IO.copy_stream from an IO to a file name raises a TypeError if #to_path does not return a String" # Expected TypeError but got: NoMethodError (undefined method `close' for #<MockObject:0x1e34 @name="io_copy_stream_to" @null=nil>)
-  fails "IO.copy_stream from an IO to a file name returns the number of bytes copied" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<File:0x1e9a>'
-  fails "IO.copy_stream from an IO to an IO copies only length bytes from the offset" # Expected 0 == 8 to be truthy but was false
-  fails "IO.copy_stream from an IO to an IO copies only length bytes when specified" # Expected 0 == 8 to be truthy but was false
-  fails "IO.copy_stream from an IO to an IO copies the entire IO contents to the IO" # IOError: not opened for writing
-  fails "IO.copy_stream from an IO to an IO does not close the destination IO" # Expected true to be false
-  fails "IO.copy_stream from an IO to an IO leaves the destination IO position at the last write" # IOError: closed stream
-  fails "IO.copy_stream from an IO to an IO raises an IOError if the destination IO is not open for writing" # Expected IOError but no exception was raised (0 was returned)
-  fails "IO.copy_stream from an IO to an IO returns the number of bytes copied" # IOError: not opened for writing
+  fails "IO.copy_stream from a pipe IO raises an error when an offset is specified" # Expected Errno::ESPIPE but no exception was raised (8 was returned)
   fails "IO.copy_stream with a destination that does partial reads calls #write repeatedly on the destination Object" # NotImplementedError: Thread creation not available
-  fails "IO.copy_stream with non-IO Objects calls #read on the source Object" # NoMethodError: undefined method `close' for #<IOSpecs::CopyStreamRead:0x2dee @io=<File:fd 26>>
-  fails "IO.copy_stream with non-IO Objects calls #readpartial on the source Object if defined" # NoMethodError: undefined method `close' for #<IOSpecs::CopyStreamReadPartial:0x2eb0 @io=<File:fd 26>>
-  fails "IO.copy_stream with non-IO Objects calls #write on the destination Object" # NoMethodError: undefined method `close' for #<MockObject:0x2e4a @name="io_copy_stream_to_object" @null=nil>
-  fails "IO.copy_stream with non-IO Objects does not call #pos on the source if no offset is given" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\spec\#<File:0x2d8c>'
   fails "IO.for_fd accepts options as keyword arguments" # Expected ArgumentError (wrong number of arguments (given 3, expected 1..2)) but no exception was raised (<IO:fd 35> was returned)
   fails "IO.for_fd ignores the :encoding option when the :external_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
   fails "IO.for_fd ignores the :encoding option when the :internal_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
@@ -290,7 +241,6 @@ opal_filter "IO" do
   fails "IO.select returns the pipe read end in read set if the pipe write end is closed concurrently" # NoMethodError: undefined method `join' for nil
   fails "IO.select when passed nil for timeout sleeps forever and sets the thread status to 'sleep'" # NotImplementedError: Thread creation not available
   fails "IO.try_convert raises a TypeError if the object does not return an IO from #to_io" # Expected TypeError (can't convert MockObject to IO (MockObject#to_io gives String)) but got: TypeError (can't convert MockObject into IO (MockObject#to_io gives String))
-  fails "IO.try_convert return nil when BasicObject is passed" # NoMethodError: undefined method `is_a?' for #<BasicObject:0xe88e>
   fails "IO.write accepts options as a keyword argument" # Expected ArgumentError (wrong number of arguments (given 4, expected 2..3)) but no exception was raised (2 was returned)
   fails "IO::EAGAINWaitReadable combines Errno::EAGAIN and IO::WaitReadable" # NameError: uninitialized constant IO::EAGAINWaitReadable
   fails "IO::EAGAINWaitReadable is the same as IO::EWOULDBLOCKWaitReadable if Errno::EAGAIN is the same as Errno::EWOULDBLOCK" # NameError: uninitialized constant Errno::EAGAIN
