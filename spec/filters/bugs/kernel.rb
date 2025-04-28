@@ -18,6 +18,10 @@ opal_filter "Kernel" do
   fails "Kernel#__dir__ returns the expanded path of the directory when used in the main script" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x2b0e6>
   fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file" # Expected "ruby/core/kernel" == "/home/jan/workspace/opal/spec/ruby/core/kernel" to be truthy but was false
   fails "Kernel#__dir__ when used in eval with top level binding returns nil" # Expected "." == nil to be truthy but was false
+  fails "Kernel#` is a private method" # Expected Kernel to have private instance method '`' but it does not
+  fails "Kernel#` lets the standard error stream pass through to the inherited stderr" # Expected (STDERR): "error stream"           but got: "error stream<internal:runtime/misc.rb>:50:23:in `exit': \e[1mexit (\e[1;4mSystemExit\e[m\e[1m)\e[m\n\tfrom <internal:corelib/process.rb>:118:13:in `exit'\n\tfrom <internal:corelib/kernel.rb>:385:14:in `exit'\n\tfrom (exit):1:9:in `undefined'\n\tfrom <internal:runtime/boot.js>:529:9:in `undefined'\n\n" Backtrace
+  fails "Kernel#` sets $? to the exit status of the executed sub-process" # NotImplementedError: NotImplementedError
+  fails "Kernel#abort is a private method" # Expected Kernel to have private instance method 'abort' but it does not
   fails "Kernel#autoload calls main.require(path) to load the file" # Expected NameError but got: LoadError (cannot load such file -- main_autoload_not_exist)
   fails "Kernel#autoload can autoload in instance_eval" # NoMethodError: undefined method `autoload' for #<Object:0x4b3d2>
   fails "Kernel#autoload inside a Class.new method body should define on the new anonymous class" # NoMethodError: undefined method `autoload' for #<#<Class:0x4b3ee>:0x4b3ec>
@@ -68,9 +72,19 @@ opal_filter "Kernel" do
   fails "Kernel#eval with a magic encoding comment uses the magic comment encoding for parsing constants" # Expected ["A", "CoercedObject"] to include "Vπ"
   fails "Kernel#eval with refinements activates refinements from the binding" # NoMethodError: undefined method `foo' for #<EvalSpecs::A:0x4f966>
   fails "Kernel#eval with refinements activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<EvalSpecs::A:0x4fa98>
+  fails "Kernel#exec is a private method" # Expected Kernel to have private instance method 'exec' but it does not
+  fails "Kernel#exit is a private method" # Expected Kernel to have private instance method 'exit' but it does not
+  fails "Kernel#exit raises the SystemExit in the main thread if it reaches the top-level handler of another thread" # NotImplementedError: Thread creation not available
+  fails "Kernel#exit! exits when called from a fiber" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:   <internal:corelib/module.rb>:386:31:in `<top (required)>': uninitialized constant Fiber (NameError)       from <internal:runtime/const.rb>:36:1:in `const_get_relative'     from <internal:runtime/const.rb>:172:1:in `const_get_relative_factory'          from <internal:runtime/const.rb>:231:1:in `Fiber'         from __main__:1:1:in `Opal.modules.__main__'    from <internal:runtime/boot.js>:478:7:in `Opal.load_normalized'           from <internal:runtime/boot.js>:513:5:in `require'      from <internal:corelib/kernel.rb>:605:1:in `require'      from (entry):2:3:in `undefined'         from <internal:runtime/boot.js>:529:9:in `undefined'
+  fails "Kernel#exit! exits when called from a thread" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:   <internal:corelib/module.rb>:386:31:in `<top (required)>': uninitialized constant Thread (NameError)     from <internal:runtime/const.rb>:36:1:in `const_get_relative'     from <internal:runtime/const.rb>:172:1:in `const_get_relative_factory'          from <internal:runtime/const.rb>:231:1:in `Thread'        from __main__:1:1:in `Opal.modules.__main__'    from <internal:runtime/boot.js>:478:7:in `Opal.load_normalized'           from <internal:runtime/boot.js>:513:5:in `require'      from <internal:corelib/kernel.rb>:605:1:in `require'      from (entry):2:3:in `undefined'         from <internal:runtime/boot.js>:529:9:in `undefined'
+  fails "Kernel#exit! is a private method" # Expected Kernel to have private instance method 'exit!' but it does not
+  fails "Kernel#exit! overrides the original exception and exit status when called from #at_exit" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:   <internal:corelib/kernel.rb>:531:37:in `raise': original error (RuntimeError)         from __main__:6:5:in `Opal.modules.__main__'      from <internal:runtime/boot.js>:478:7:in `Opal.load_normalized'         from <internal:runtime/boot.js>:513:5:in `require'        from <internal:corelib/kernel.rb>:605:1:in `require'    from (entry):2:3:in `undefined'         from <internal:runtime/boot.js>:529:9:in `undefined'
   fails "Kernel#extend does not calls append_features on arguments metaclass" # Expected true == false to be truthy but was false
   fails "Kernel#fail accepts an Object with an exception method returning an Exception" # Expected StandardError (...) but got: TypeError (exception class/object expected)
+  fails "Kernel#fork is a private method" # Expected Kernel to have private instance method 'fork' but it does not
+  fails "Kernel#fork marks threads from the parent as killed" # NotImplementedError: Thread creation not available
   fails "Kernel#freeze causes mutative calls to raise RuntimeError" # Expected RuntimeError but no exception was raised (1 was returned)
+  fails "Kernel#gets is a private method" # Expected Kernel to have private instance method 'gets' but it does not
   fails "Kernel#initialize_copy does nothing if the argument is the same as the receiver" # Expected nil.equal? #<Object:0x3cb42> to be truthy but was false
   fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
@@ -135,6 +149,8 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with a module including a module" # Expected ["n_pub", "n_pro", "n_pri", "m_pub", "m_pro", "m_pri", "pub", "pro", "pri"] not to include "m_pri"
   fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with a module including a module" # Expected ["n_pub", "n_pro", "n_pri", "m_pub", "m_pro", "m_pri", "pub", "pro", "pri"] not to include "m_pri"
   fails "Kernel#sleep accepts any Object that reponds to divmod" # TypeError: can't convert Object into time interval
+  fails "Kernel#spawn executes the given command" # Expected (STDOUT): "spawn\n"           but got: "" Backtrace
+  fails "Kernel#spawn is a private method" # Expected Kernel to have private instance method 'spawn' but it does not
   fails "Kernel#sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (out of char range) but no exception was raised ("Ԇ" was returned)
   fails "Kernel#sprintf %c uses the encoding of the format string to interpret codepoints" # Exception: Invalid code point 9415601
   fails "Kernel#sprintf can produce a string with invalid encoding" # Expected #<Encoding:ASCII-8BIT> == #<Encoding:UTF-8> to be truthy but was false
@@ -149,6 +165,8 @@ opal_filter "Kernel" do
   fails "Kernel#srand is a private method" # Expected Kernel to have private instance method 'srand' but it does not
   fails "Kernel#srand returns the system-initialized seed value on the first call" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x46d76 @seed=6933182541716747>
   fails "Kernel#system is a private method" # Expected Kernel to have private instance method 'system' but it does not
+  fails "Kernel#test is a private method" # Expected Kernel to have private instance method 'test' but it does not
+  fails "Kernel#trap is a private method" # Expected Kernel to have private instance method 'trap' but it does not
   fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: false/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: false "
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
   fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: foo/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: foo "
@@ -255,9 +273,19 @@ opal_filter "Kernel" do
   fails "Kernel.__method__ returns the caller from block inside define_method too" # Expected [nil, nil] == ["dm_block", "dm_block"] to be truthy but was false
   fails "Kernel.__method__ returns the caller from blocks too" # Expected [nil, nil] == ["in_block", "in_block"] to be truthy but was false
   fails "Kernel.__method__ returns the caller from define_method too" # Expected nil == "dm" to be truthy but was false
+  fails "Kernel.at_exit both exceptions in a handler and in the main script are printed" # Expected  "<internal:corelib/kernel.rb>:531:37:in `raise': main_script_error (RuntimeError) \tfrom __main__:1:36:in `Opal.modules.__main__' \tfrom <internal:runtime/boot.js>:478:7:in `Opal.load_normalized' \tfrom <internal:runtime/boot.js>:513:5:in `require' \tfrom <internal:corelib/kernel.rb>:605:1:in `require' \tfrom (entry):2:3:in `undefined' \tfrom <internal:runtime/boot.js>:529:9:in `undefined'  ".include? "at_exit_error (RuntimeError)" to be truthy but was false
+  fails "Kernel.at_exit gives access to the last raised exception - global variables $! and $@" # Expected ["<internal:corelib/kernel.rb>:531:37:in `raise': foo (RuntimeError)\n",  "\tfrom __main__:6:9:in `Opal.modules.__main__'\n",  "\tfrom <internal:runtime/boot.js>:478:7:in `Opal.load_normalized'\n",  "\tfrom <internal:runtime/boot.js>:513:5:in `require'\n",  "\tfrom <internal:corelib/kernel.rb>:605:1:in `require'\n",  "\tfrom (entry):2:3:in `undefined'\n",  "\tfrom <internal:runtime/boot.js>:529:9:in `undefined'\n",  "\n"].include?  "The exception matches: true (message=foo) " to be truthy but was false
+  fails "Kernel.at_exit is a private method" # Expected Kernel to have private instance method 'at_exit' but it does not
+  fails "Kernel.at_exit runs handlers even if the main script fails to parse" # Expected  "__main__:2:1: error: unex...
   fails "Kernel.autoload calls #to_path on non-String filenames" # Mock 'path' expected to receive to_path("any_args") exactly 1 times but received it 0 times
   fails "Kernel.autoload when called from included module's method setups the autoload on the included module" # Expected nil == "ruby/core/kernel/fixtures/autoload_from_included_module2.rb" to be truthy but was false
   fails "Kernel.autoload when called from included module's method the autoload relative to the included module works" # NameError: uninitialized constant KernelSpecs::AutoloadMethod2::AutoloadFromIncludedModule2
+  fails "Kernel.exit raises the SystemExit in the main thread if it reaches the top-level handler of another thread" # NotImplementedError: Thread creation not available
+  fails "Kernel.exit! exits when called from a fiber" # NotImplementedError: NotImplementedError
+  fails "Kernel.exit! exits when called from a thread" # NotImplementedError: NotImplementedError
+  fails "Kernel.exit! overrides the original exception and exit status when called from #at_exit" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:
+  fails "Kernel.exit! skips ensure clauses" # Expected "" ==  "before " to be truthy but was false
+  fails "Kernel.fork marks threads from the parent as killed" # NotImplementedError: Thread creation not available
   fails "Kernel.global_variables finds subset starting with std" # NoMethodError: undefined method `global_variables' for #<MSpecEnv:0xb3298 @i=0>
   fails "Kernel.lambda does not create lambda-style Procs when captured with #method" # Expected true to be false
   fails "Kernel.lambda raises an ArgumentError when no block is given" # Expected ArgumentError but got: Exception (Cannot add property $$is_lambda, object is not extensible)
@@ -277,6 +305,7 @@ opal_filter "Kernel" do
   fails "Kernel.printf formatting io is specified other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (can't convert BasicObject to Integer) but got: TypeError (can't convert BasicObject into Integer (BasicObject#to_int gives String))
   fails "Kernel.printf formatting io is specified other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (can't convert BasicObject to String) but no exception was raised ("f" was returned)
   fails "Kernel.proc returned the passed Proc if given an existing Proc" # Expected false to be true
+  fails "Kernel.spawn executes the given command" # Expected (STDOUT): "spawn\n"           but got: "" Backtrace
   fails "Kernel.sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (out of char range) but no exception was raised ("Ԇ" was returned)
   fails "Kernel.sprintf %c uses the encoding of the format string to interpret codepoints" # Exception: Invalid code point 9415601
   fails "Kernel.sprintf can produce a string with invalid encoding" # Expected #<Encoding:ASCII-8BIT> == #<Encoding:UTF-8> to be truthy but was false

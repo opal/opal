@@ -27,7 +27,7 @@ class << ENV
   def delete(name)
     %x{
       let value = $platform.env_get(name) || nil;
-      delete $platform.env_del(name);
+      $platform.env_del(name);
       return value;
     }
   end

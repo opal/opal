@@ -75,6 +75,7 @@ class ::IO
         begin
           path = `p`; length = `l`; offset = `f`; opts = `o`
           path = ::Opal.coerce_to!(path, String, :to_path)
+          raise(::NotImplementedError, "read with '|' is not available") if path[0] == '|'
 
           open_args = opts[:open_args]
           opts = `open_args_to_opts(open_args)` if open_args
@@ -99,6 +100,7 @@ class ::IO
         begin
           path = `p`; data = `d`; offset = `f`; opts = `o`
           path = ::Opal.coerce_to!(path, ::String, :to_path)
+          raise(::NotImplementedError, "write with '|' is not available") if path[0] == '|'
 
           if offset.is_a?(::Hash) && !opts.empty?
             offset = nil
@@ -336,25 +338,22 @@ class ::IO
         args = cmd.map { |a| `a.toString()` }
         cmd = command
       end
+      raise(::NotImplementedError, "popen with fork '-' is not available") if cmd == '-'
       mode = mode ? ::Opal.coerce_to!(mode, ::String, :to_str) : 'r'
       `js_opts.shell = true`
       `js_opts.cwd = #{opts[:chdir]}` if opts.key?(:chdir)
-      %x{
-        // options.argv0;
-        // options.detached;
-        // options.uid;
-        // options.gid;
-        // options.serialization;
-        // options.signal;
-        // options.timeout;
-        // options.killSignal;
-      }
-      fd, pid = `$platform.io_popen(cmd, args, js_opts)`
+      if opts.key?(:err)
+        err = opts[:err]
+        `js_opts.err = 'out'` if err.is_a?(::Array) && err[0] == :child && (err[1] == :out || err[1] == 1)
+      end
+      fd, pid = `$platform.io_popen(cmd, args, mode, js_opts)`
+      # $? = ::Process::Status.new(nil, pid)
       io = new(fd, mode, **opts)
       `io.pid = pid`
+      `io.pipe = true`
       return io unless block_given?
       begin
-        $? = yield io
+        yield io
       ensure
         io.close
       end
@@ -609,7 +608,11 @@ class ::IO
   def close
     # Closes the stream for both reading and writing if open for either or both; returns nil.
     return if closed?
-    `$platform.io_close(self.fd)` if @fd && autoclose?
+    status = `$platform.io_close(self.fd)` if @fd && autoclose?
+    if status
+      # must have been a #popen
+      $? = ::Process::Status.new(status, @pid)
+    end
     @closed = :both
     @pid = nil
     nil

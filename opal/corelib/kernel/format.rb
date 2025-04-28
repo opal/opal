@@ -779,5 +779,15 @@ module ::Kernel
     sprint_exit.()
   end
 
+  def printf(*args)
+    # Equivalent to: io.write(sprintf(format_string, *objects))
+    return if args.empty?
+
+    io = `args[0].$$is_string` ? $stdout : args.shift
+    io.write format(*args)
+
+    nil
+  end
+
   alias sprintf format
 end

@@ -1,7 +1,8 @@
 # backtick_javascript: true
-# helpers: platform
+# helpers: platform, coerce_to
 
 module ::Process
+  WNOHANG = 1
   @__clocks__ = []
 
   class << self
@@ -10,15 +11,13 @@ module ::Process
       @__clocks__ << func
     end
 
-    def _fork
-      # An internal API for fork. Do not call this method directly.
-      # Currently, this is called via Kernel#fork, Process.fork, and IO.popen with "-".
-    end
+    # _fork - not supported, An internal API for fork. Do not call this method directly. But specs test it anyway ...
 
     def abort(msg = nil)
       # Terminates execution immediately, effectively by calling Kernel.exit(false).
+      msg = ::Opal.coerce_to!(msg, ::String, :to_str) if msg
       $stderr << msg if msg
-      ::Kernel.exit(false)
+      raise(::SystemExit.new(false, msg))
     end
 
     def argv0
@@ -33,6 +32,7 @@ module ::Process
 
     def clock_gettime(clock_id, unit = :float_second)
       (clock = @__clocks__[clock_id]) || ::Kernel.raise(::Errno::EINVAL, "clock_gettime(#{clock_id}) #{@__clocks__[clock_id]}")
+      unit ||= :float_second
       %x{
         var ms = clock();
         switch (unit) {
@@ -48,16 +48,12 @@ module ::Process
       }
     end
 
-    def daemon(nochdir = nil, noclose = nil)
-      # Detaches the current process from its controlling terminal and runs
-      # it in the background as system daemon; returns zero.
-      raise ::NotImplementedError
-    end
+    # Detaches the current process from its controlling terminal and runs
+    # it in the background as system daemon; returns zero.
+    alias daemon __not_implemented__
 
-    def detach(pid)
-      # Avoids the potential for a child process to become a zombie process.
-      raise ::NotImplementedError
-    end
+    # Avoids the potential for a child process to become a zombie process.
+    alias detach __not_implemented__
 
     def egid
       # Returns the effective group ID for the current process.
@@ -66,6 +62,9 @@ module ::Process
 
     def egid=(new_egid)
       # Sets the effective group ID for the current process.
+      unless new_egid.is_a?(::Integer) || new_egid.is_a?(::String)
+        raise ::TypeError, 'new_egid must be a Integer or a String'
+      end
       `$platform.process_setegid(new_egid)`
       new_egid
     end
@@ -77,54 +76,99 @@ module ::Process
 
     def euid=(new_euid)
       # Sets the effective user ID for the current process.
+      unless new_euid.is_a?(::Integer) || new_euid.is_a?(::String)
+        raise ::TypeError, 'new_euid must be a Integer or a String'
+      end
       `$platform.process_seteuid(new_euid)`
       new_euid
     end
 
     def exec(*args)
       # Replaces the current process by doing one of the following:
-      raise ::NotImplementedError
+      env = {}
+      env = argv.shift if argv.first.is_a? ::Hash
+      env = ::ENV.merge(env)
+      js_env = `{}`
+      env.each { |k, v| `js_env[k] = v.toString()` }
+      `delete js_env["SHELL"]`
+      js_opts = `{ stdio: 'pipe', env: js_env }`
+
+      cmdname = argv.shift
+      if Array === cmdname
+        `js_opts.argv0 = #{cmdname[1]}`
+        cmdname = cmdname[0]
+      end
+
+      opts = argv.shift
+
+      if opts.is_a?(::Hash)
+        `js_opts.cwd = #{opts[:chdir]}` if opts.key?(:chdir)
+        so = opts[:out]
+        se = opts[:err]
+      end
+
+      `js_opts.shell = true` unless ::File.absolute_path?(cmdname)
+
+      `$platform.process_exec(#{cmdname}, #{argv}, js_opts)`
     end
 
     def exit(status = true)
       # Initiates termination of the Ruby script by raising SystemExit;
       # the exception may be caught.
       # Returns exit status status to the underlying operating system.
-      raise ::NotImplementedError
+      raise(::SystemExit.new(status, 'exit'))
     end
 
     def exit!(status = false)
       # Exits the process immediately; no exit handlers are called.
       # Returns exit status status to the underlying operating system.
-      raise ::NotImplementedError
+
+      status = if status == true
+                 0
+               elsif status == false
+                 1
+               else
+                 `$coerce_to(status, #{::Integer}, 'to_int')`
+               end
+
+      `$platform.exit(status)`
     end
 
     def fork(&block)
       # Creates a child process.
-      raise ::NotImplementedError
+      `var worker`
+      if block_given?
+        %x{
+          if ($platform.process_is_primary()) {
+            worker = $platform.process_fork();
+            return $platform.process_worker_pid(worker);
+          } else if ($platform.process_is_worker()) {
+            #{yield}
+          }
+        }
+      else
+        %x{
+          if ($platform.process_is_primary()) {
+            worker = $platform.process_fork();
+            return $platform.process_worker_pid(worker);
+          }
+        }
+      end
     end
 
-    def getpgid(p_id)
-      # Returns the process group ID for the given process ID +pid+
-      raise ::NotImplementedError
-    end
+    # Returns the process group ID for the given process ID +pid+
+    alias getpgid __not_implemented__
 
-    def getpriority(kind, id)
-      # Returns the scheduling priority for specified process, process group, or user.
-      raise ::NotImplementedError
-    end
+    # Returns the scheduling priority for specified process, process group, or user.
+    alias getpriority __not_implemented__
 
-    def getrlimit(resource)
-      # Returns a 2-element array of the current (soft) limit and
-      # maximum (hard) limit for the given resource.
-      raise ::NotImplementedError
-    end
+    # Returns a 2-element array of the current (soft) limit and
+    # maximum (hard) limit for the given resource.
+    alias getrlimit __not_implemented__
 
-    def getsid(pid = nil)
-      # Returns the session ID of the given process ID pid,
-      # or of the current process if not given.
-      raise ::NotImplementedError
-    end
+    # Returns the session ID of the given process ID pid,
+    # or of the current process if not given.
+    alias getsid __not_implemented__
 
     def gid
       # Returns the (real) group ID for the current process
@@ -133,6 +177,9 @@ module ::Process
 
     def gid=(new_gid)
       # Sets the group ID for the current process to new_gid.
+      unless new_gid.is_a?(::Integer) || new_gid.is_a?(::String)
+        raise ::TypeError, 'new_gid must be a Integer or a String'
+      end
       `$platform.process_setgid(new_gid)`
     end
 
@@ -142,12 +189,16 @@ module ::Process
       `$platform.process_getgroups()`
     end
 
-    def initgroups(username, gid)
-      # Sets the supplemental group access list; the new list includes:
-      # The group IDs of those groups to which the user given by username belongs.
-      # The group ID gid
-      raise ::NotImplementedError
+    def groups=(ary)
+      # Sets the supplemental group access list to the given array of group IDs.
+      `$platform.process_setgroups(ary)`
+      ary
     end
+
+    # Sets the supplemental group access list; the new list includes:
+    # The group IDs of those groups to which the user given by username belongs.
+    # The group ID gid
+    alias initgroups __not_implemented__
 
     def kill(signal, *ids)
       # Sends a signal to each process specified by ids
@@ -156,17 +207,20 @@ module ::Process
       if signal.is_a?(::Integer)
         signal = ::Signal.list.key(signal)
         raise(::ArgumentError, 'unknown signal') unless signal
-      else
+      elsif signal.is_a?(::String)
         signal = signal[1..] if signal[0] == '-'
-        signal = signal.upcase
+        raise(::ArgumentError, 'unknown signal') if signal != signal.upcase
         signal = signal[3..] if signal.start_with?('SIG')
         raise(::ArgumentError, 'unknown signal') unless ::Signal.list.key?(signal)
+      else
+        raise(::ArgumentError, 'signal must be Integer or String')
       end
       own_pid = pid
       ids.each do |pd|
         if pd == own_pid
           raise(::SignalException, 'TERM') if signal == 'TERM'
           raise(::Interrupt) if signal == 'INT'
+          next if signal == 'EXIT'
         end
         `$platform.process_kill(pd, signal)` rescue nil
       end
@@ -177,21 +231,17 @@ module ::Process
       ids.size
     end
 
+    # Returns a Process::Status object representing the most recently
+    # exited child process in the current thread, or nil if none.
     def last_status
-      # Returns a Process::Status object representing the most recently
-      # exited child process in the current thread, or nil if none.
-      raise ::NotImplementedError
+      $?
     end
 
-    def maxgroups
-      # Returns the maximum number of group IDs allowed in the supplemental group access list
-      raise ::NotImplementedError
-    end
+    # Returns the maximum number of group IDs allowed in the supplemental group access list
+    alias maxgroups __not_implemented__
 
-    def maxgroups=(new_max)
-      # Sets the maximum number of group IDs allowed in the supplemental group access list.
-      raise ::NotImplementedError
-    end
+    # Sets the maximum number of group IDs allowed in the supplemental group access list.
+    alias maxgroups __not_implemented__
 
     def pid
       # Returns the process ID of the current process.
@@ -203,20 +253,16 @@ module ::Process
       `$platform.process_ppid()`
     end
 
-    def setpgid(pid, pgid)
-      # Sets the process group ID for the process given by process ID pid to pgid.
-      raise ::NotImplementedError
-    end
+    # Sets the process group ID for the process given by process ID pid to pgid.
+    alias setpgid __not_implemented__
 
     def setpgrp
       # Equivalent to setpgid(0, 0)
       setpgid(0, 0)
     end
 
-    def setpriority(kind, integer, priority)
-      # See Process.getpriority.
-      raise ::NotImplementedError
-    end
+    # See Process.getpriority.
+    alias setpriority __not_implemented__
 
     def setproctitle(string)
       # Sets the process title that appears on the ps(1) command.
@@ -225,23 +271,94 @@ module ::Process
       string
     end
 
-    def setrlimit(resource, cur_limit, max_limit = nil)
-      # Sets limits for the current process for the given resource
-      # to cur_limit (soft limit) and max_limit (hard limit); returns nil.
-      raise ::NotImplementedError
-    end
+    # Sets limits for the current process for the given resource
+    # to cur_limit (soft limit) and max_limit (hard limit); returns nil.
+    alias setrlimit __not_implemented__
 
-    def setsid
-      # Establishes the current process as a new session and process group leader,
-      # with no controlling tty; returns the session ID.
-      raise ::NotImplementedError
-    end
+    # Establishes the current process as a new session and process group leader,
+    # with no controlling tty; returns the session ID.
+    alias setsid __not_implemented__
 
-    def spawn(*args)
+    def spawn(*argv)
       # Creates a new child process by doing one of the following in that process
       # - Passing string command_line to the shell.
       # - Invoking the executable at exe_path
-      raise ::NotImplementedError
+
+      env = {}
+      arg = argv.shift
+      coe_arg = ::Opal.coerce_to!(arg, ::Hash, :to_hash) if arg.respond_to?(:to_hash)
+      if coe_arg
+        env = coe_arg.to_h do |k, v|
+          k = ::Opal.coerce_to!(k, ::String, :to_str)
+          raise(::ArgumentError, 'env key contains null byte') if `k.includes("\x00")`
+          v = ::Opal.coerce_to!(v, ::String, :to_str)
+          raise(::ArgumentError, 'env value contains null byte') if `v.includes("\x00")`
+          [k, v]
+        end
+        arg = coe_arg = nil
+      end
+
+      arg = argv.shift unless arg
+      coe_arg = ::Opal.coerce_to!(arg, ::Array, :to_ary) if arg.respond_to?(:to_ary)
+      if coe_arg
+        raise(::ArgumentError, 'array must have 2 elements') unless coe_arg.size == 2
+        `js_opts.argv0 = #{::Opal.coerce_to!(coe_arg[1], ::String, :to_str)}`
+        raise(::ArgumentError, 'cmd contains null byte') if `js_opts.argv0.includes("\x00")`
+        cmdname = ::Opal.coerce_to!(coe_arg[0], ::String, :to_str)
+        arg = coe_arg = nil
+      end
+
+      arg = argv.shift unless arg
+      coe_arg = ::Opal.coerce_to!(arg, ::String, :to_str) if arg.respond_to?(:to_str)
+      if coe_arg
+        cmdname = coe_arg
+        arg = coe_arg = nil
+      end
+
+      raise(::ArgumentError, 'no command given') unless cmdname
+      raise(::ArgumentError, 'cmd contains null byte') if `cmdname.includes("\x00")`
+
+      arg = argv.shift unless arg
+      coe_arg = ::Opal.coerce_to!(arg, ::Hash, :to_hash) if arg.respond_to?(:to_hash)
+      if coe_arg
+        opts = coe_arg
+        if opts.key?(:chdir)
+          arg = ::Opal.coerce_to!(opts[:chdir], ::String, :to_path) rescue nil
+          arg = ::Opal.coerce_to!(opts[:chdir], ::String, :to_str) unless arg
+          raise(::ArgumentError, 'chdir contains null byte') if `arg.includes("\x00")`
+          `js_opts.cwd = #{arg}`
+        end
+        so = opts[:out]
+        se = opts[:err]
+        arg = coe_arg = nil
+      end
+
+      env = ::ENV.merge(env)
+      js_env = `{}`
+      env.each { |k, v| `js_env[k.toString()] = v.toString()` }
+      `delete js_env["SHELL"]`
+      js_opts = `{ stdio: 'pipe', env: js_env, wait: false }`
+
+      argv.map! do |arg|
+        arg = ::Opal.coerce_to!(arg, ::String, :to_str)
+        raise(::ArgumentError, 'arg contains null byte') if `arg.includes("\x00")`
+        arg
+      end
+
+      `js_opts.shell = true` unless ::File.absolute_path?(cmdname)
+
+      out = `$platform.process_spawn(#{cmdname}, #{argv}, js_opts, false)`
+
+      if `out.status`
+        status = `out.status > 128 ? out.status - 128 : out.status`
+      end
+
+      pid = `out.pid == null ? nil : out.pid`
+      $? = ::Process::Status.new(status, pid)
+
+      return nil if `out.error || out.status > 125`
+
+      pid
     end
 
     def times
@@ -258,6 +375,7 @@ module ::Process
 
     def uid=(new_uid)
       # Sets the (user) user ID for the current process to new_uid.
+      new_uid = ::Opal.coerce_to!(new_uid, ::Integer, :to_int)
       `$platform.process_setuid(new_uid)`
     end
 
@@ -265,21 +383,23 @@ module ::Process
       # Waits for a suitable child process to exit, returns its process ID,
       # and sets $? to a Process::Status object containing information on
       # that process. Which child it waits for depends on the value of the given pid.
-      raise ::NotImplementedError
+      pid, $? = wait2(pid, flags)
+      pid
     end
     alias waitpid wait
 
     def wait2(pid = -1, flags = 0)
       # Like Process.waitpid, but returns an array containing
       # the child process pid and Process::Status status.
-      raise ::NotImplementedError
+      status = `$platform.process_wait(pid, flags)`
+      [pid, ::Process::Status.new(status, pid)]
     end
 
     def waitall
       # Waits for all children, returns an array of 2-element arrays;
       # each subarray contains the integer pid and Process::Status
       # status for one of the reaped child processes
-      raise ::NotImplementedError
+      `$platform.process_waitall()`
     end
 
     def warmup

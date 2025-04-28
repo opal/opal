@@ -71,7 +71,7 @@ module ::FileTest
     end
 
     def readable_real?(file_name)
-      # Returns true if the named file is readable by the effective user
+      # Returns true if the named file is readable by the real user
       # and group id of this process.
       ::File.readable_real?(file_name)
     end
@@ -136,3 +136,46 @@ module ::FileTest
     alias zero? empty?
   end
 end
+
+# For other specs not to break, Kernel.test must be a private method.
+# So for the moment, until we got private methods, we cannot use it.
+
+# module ::Kernel
+#   def test(char, path0, path1 = nil)
+#     # Performs a test on one or both of the filesystem entities at the given paths path0 and path1:
+#     #  Each path path0 or path1 points to a file, directory, device, pipe, etc.
+#     #  Character char selects a specific test.
+#     path1 = ::Opal.coerce_to!(path1, :String, :to_path) if path1
+#     case char
+#     when '-' then ::File.identical?(path0, path1)
+#     when '<' then ::File.mtime(path0) < ::File.mtime(path1)
+#     when '=' then ::File.mtime(path0) == ::File.mtime(path1)
+#     when '>' then ::File.mtime(path0) > ::File.mtime(path1)
+#     when 'A' then ::File.atime(path0)
+#     when 'b' then ::File.blockdev?(path0)
+#     when 'c' then ::File.chardev?(path0)
+#     when 'C' then ::File.ctime(path0)
+#     when 'd' then ::File.directory?(path0)
+#     when 'e' then ::File.exist?(path0)
+#     when 'f' then ::File.file?(path0)
+#     when 'g' then ::File.setgid?(path0)
+#     when 'G' then ::File.grpowned?(path0)
+#     when 'k' then ::File.sticky?(path0)
+#     when 'l' then ::File.symlink?(path0)
+#     when 'M' then ::File.mtime(path0)
+#     when 'o' then ::File.owned?(path0)
+#     when 'O' then ::File.stat.uid == ::Process.uid
+#     when 'p' then ::File.pipe?(path0)
+#     when 'r' then ::File.readable?(path0)
+#     when 'R' then ::File.readable_real?(path0)
+#     when 's' then ::File.exist?(path0) ? (((s = ::File.size(path0)) > 0) ? s : nil) : nil
+#     when 'S' then ::File.socket?(path0)
+#     when 'u' then ::File.setuid?(path0)
+#     when 'w' then ::File.writable?(path0)
+#     when 'W' then ::File.writable_real?(path0)
+#     when 'x' then ::File.executable?(path0)
+#     when 'X' then ::File.executable_real?(path0)
+#     when 'z' then ::File.zero?(path0)
+#     end
+#   end
+# end

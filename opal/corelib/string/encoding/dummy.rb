@@ -12,6 +12,7 @@ require 'corelib/string/encoding/sjis'
 ::Encoding.register 'IBM720', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'IBM866', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'ISO-8859-15', inherits: ::Encoding::UTF_16LE, dummy: true
+::Encoding.register 'ISO-8859-16', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'ISO-8859-2', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'ISO-8859-5', inherits: ::Encoding::UTF_16LE, dummy: true
 ::Encoding.register 'KOI8_U', inherits: ::Encoding::UTF_16LE, dummy: true

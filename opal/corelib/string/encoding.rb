@@ -131,27 +131,27 @@ class ::Encoding
 
   # methods to implement per encoding
   def bytes(str)
-    ::Kernel.raise ::NotImplementedError
+    __not_implemented__
   end
 
   def bytesize(str, index)
-    ::Kernel.raise ::NotImplementedError
+    __not_implemented__
   end
 
   def byteslice(str, index, length)
-    ::Kernel.raise ::NotImplementedError
+    __not_implemented__
   end
 
   def decode(io_buffer)
-    ::Kernel.raise ::NotImplementedError
+    __not_implemented__
   end
 
   def decode!(io_buffer)
-    ::Kernel.raise ::NotImplementedError
+    __not_implemented__
   end
 
   def each_byte(str, &block)
-    ::Kernel.raise ::NotImplementedError
+    __not_implemented__
   end
 
   # Fills io_buffer with bytes of str and yields the number
@@ -159,15 +159,15 @@ class ::Encoding
   # Repeats until end of str while reusing io_buffer.
   # In other words: io_buffer is used as a sliding window over str.
   def each_byte_buffer(str, io_buffer, &block)
-    ::Kernel.raise ::NotImplementedError
+    __not_implemented__
   end
 
   def scrub(str, replacement, &block)
-    ::Kernel.raise ::NotImplementedError
+    __not_implemented__
   end
 
   def valid_encoding?(str)
-    ::Kernel.raise ::NotImplementedError
+    __not_implemented__
   end
 
   class ::EncodingError < ::StandardError; end

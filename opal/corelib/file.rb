@@ -987,7 +987,7 @@ class ::File < ::IO
     end
 
     def readable_real?(file_name)
-      # Returns true if the named file is readable by the effective user
+      # Returns true if the named file is readable by the real user
       # and group id of this process.
       file_name = `coerce_to_path(file_name)`
       stat(file_name).readable_real?

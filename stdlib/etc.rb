@@ -1,4 +1,5 @@
 # helpers: platform
+# backtick_javascript: true
 
 module Etc
   Group = ::Struct.new(:name, :passwd, :gid, :mem)
@@ -47,10 +48,10 @@ module Etc
       nil
     end
 
-    def getgrgid(gid = nil)
+    def getgrgid(gid = ::Process.gid)
       # Returns information about the group with specified integer group_id, as found in /etc/group.
       return nil if `$platform.windows` || !::File.exist?('/etc/group')
-      gid ||= ::Process.gid
+      gid = ::Opal.coerce_to!(gid, ::Integer, :to_int)
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
           next if entry.start_with?('#')
@@ -118,6 +119,7 @@ module Etc
     def getpwuid(uid = nil)
       # Returns the /etc/passwd information for the user with the given integer uid.
       return nil if `$platform.windows` || !::File.exist?('/etc/passwd')
+      uid = ::Opal.coerce_to!(uid, ::Integer, :to_int) if uid
       uid ||= ::Process.uid
       ::File.open('/etc/passwd', 'r') do |passwd_file|
         passwd_file.each_line do |entry|

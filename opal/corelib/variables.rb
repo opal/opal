@@ -13,7 +13,6 @@ $/ = "\n"
 $, = nil
 
 ::ARGV = `Opal.platform.argv`
-::ARGV.shift if ::ARGV.first == '--'
 ::ARGF = ::Object.new
 
 $VERBOSE = false

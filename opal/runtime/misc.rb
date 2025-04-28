@@ -29,6 +29,26 @@ module ::Opal
       return Opal.send($Object, 'define_method', arguments, block)
     };
   }
+
+  # Exit handler, see #create_builder in lib/opal/cli.rb
+  def self.run_end_procs_and_exit(system_exit)
+    status = system_exit.status
+
+    $__at_exit__ ||= []
+
+    until $__at_exit__.empty?
+      block = $__at_exit__.pop
+      begin
+        block.call
+      rescue ::SystemExit => e
+        status = e.status
+      rescue => e
+        # ignore
+      end
+    end
+
+    `Opal.platform.exit(status)`
+  end
 end
 
 ::Opal

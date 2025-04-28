@@ -123,7 +123,7 @@ class ::Dir
               nil
             elsif base.nil?
               getwd
-            else base
+            else
               base = ::Opal.coerce_to!(base, ::String, :to_path)
               base == '.' || base == '' ? getwd : base
             end
@@ -646,9 +646,19 @@ class ::Dir
 
     def home(user_name = nil)
       # Returns the home directory path of the user specified with user_name if it is not nil, or the current login user
-      h = ::ENV['HOME'] || `$platform.dir_home()` || '.'
-      h = h.gsub('\\', '/') if `$platform.windows`
-      `$str(h)`
+      if user_name
+        ::File.open('/etc/passwd', 'r') do |passwd_file|
+          passwd_file.each_line do |entry|
+            next if entry.start_with?('#')
+            name_s, _passwd, _uid_s, _gid_s, _gecos, h, _shell = entry.split(':')
+            return h if name_s == user_name
+          end
+        end
+      else
+        h = ::ENV['HOME'] || `$platform.dir_home()` || '.'
+        h = h.gsub('\\', '/') if `$platform.windows`
+        `$str(h)`
+      end
     end
 
     def mkdir(path, permissions = 0o775)

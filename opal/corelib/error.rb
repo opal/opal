@@ -142,7 +142,7 @@ class ::Exception < `Error`
       return "#{@message}\n#{`self.stack`}"
     end
 
-    kwargs = { highlight: $stderr&.tty? ? true : false, order: :top }.merge(kwargs || {})
+    kwargs = { highlight: ($stderr && `typeof(#{$stderr}["$tty?"]) == "function"`) ? true : false, order: :top }.merge(kwargs || {})
     highlight, order = kwargs[:highlight], kwargs[:order]
     highlight = false if highlight.nil?
 
@@ -227,7 +227,6 @@ class ::SyntaxError         < ::ScriptError; end
 class ::LoadError           < ::ScriptError; end
 class ::NotImplementedError < ::ScriptError; end
 
-class ::SystemExit        < ::Exception; end
 class ::NoMemoryError     < ::Exception; end
 class ::SecurityError     < ::Exception; end
 class ::SystemStackError  < ::Exception; end
@@ -257,6 +256,25 @@ class ::ThreadError         < ::StandardError; end
 class ::FiberError          < ::StandardError; end
 
 ::Object.autoload :Errno, 'corelib/error/errno'
+
+class ::SystemExit < ::Exception
+  attr_reader :status
+
+  def initialize(status = true, message = nil)
+    super(message || 'system exit')
+    @status = if status == true
+                0
+              elsif status == false
+                1
+              else
+                `Opal.coerce_to(status, #{::Integer}, 'to_int')`
+              end
+  end
+
+  def success?
+    @status.nil? ? nil : @status == 0
+  end
+end
 
 class ::SignalException < ::Exception
   attr_reader :signo, :signm

@@ -402,11 +402,12 @@ class ::Time < `Date`
   end
 
   def inspect
-    if utc?
-      strftime '%Y-%m-%d %H:%M:%S UTC'
-    else
-      strftime '%Y-%m-%d %H:%M:%S %z'
-    end
+    str = if utc?
+            strftime '%Y-%m-%d %H:%M:%S UTC'
+          else
+            strftime '%Y-%m-%d %H:%M:%S %z'
+          end
+    `Opal.str(str, Opal.Encoding.US_ASCII)`
   end
 
   def succ

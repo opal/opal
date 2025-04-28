@@ -198,30 +198,12 @@ module Opal
     #
     # Allows use of a backtick operator (and `%x{}`) to embed verbatim JavaScript.
     # If false, backtick operator will
-    compiler_option :backtick_javascript, default: nil, as: :backtick_javascript?, magic_comment: true
+    compiler_option :backtick_javascript, default: false, as: :backtick_javascript?, magic_comment: true
 
     # @!method runtime_mode?
     #
     # Generates code for runtime use, only suitable for early runtime functions.
     compiler_option :opal_runtime_mode, default: false, as: :runtime_mode?, magic_comment: true
-
-    # Warn about impending compatibility break
-    def backtick_javascript_or_warn?
-      case backtick_javascript?
-      when true
-        true
-      when nil
-        @backtick_javascript_warned ||= begin
-          warning 'Backtick operator usage interpreted as intent to embed JavaScript; this code will ' \
-                  'break in Opal 2.0; add a magic comment: `# backtick_javascript: true`'
-          true
-        end
-
-        true
-      when false
-        false
-      end
-    end
 
     compiler_option :scope_variables, default: []
 
@@ -611,7 +593,7 @@ module Opal
       when :return, :js_return, :returnable_yield
         sexp
       when :xstr
-        if backtick_javascript_or_warn?
+        if backtick_javascript?
           sexp.updated(nil, [s(:js_return, *sexp.children)])
         else
           sexp

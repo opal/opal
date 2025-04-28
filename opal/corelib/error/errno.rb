@@ -5,8 +5,10 @@ module ::Errno
   errors = [
     [:EPERM, 'Operation not permitted', 1],
     [:ENOENT, 'No such file or directory', 2],
+    [:ESRCH, 'No such process', 3],
     [:ENXIO, 'No such device or address', 6],
     [:EBADF, 'Bad file descriptor', 9],
+    [:ECHILD, 'No child processes', 10],
     [:EACCES, 'Permission denied', 13],
     [:EBUSY, 'resource busy or locked', 16],
     [:EEXIST, 'File exists', 17],

@@ -1,4 +1,4 @@
-::Object.autoload :FileTest, 'corelib/file_test'
+::Object.require 'corelib/file_test'
 ::Object.autoload :Marshal, 'corelib/marshal'
 ::Object.require 'corelib/string/encoding/dummy'
 ::Object.require 'corelib/string/encoding/eucjp'
@@ -12,3 +12,6 @@
 ::Object.autoload :TracePoint, 'corelib/trace_point'
 ::Object.require 'io/buffer'
 ::Object.require 'runtime/platforms/vsvfs'
+::Object.require 'corelib/process/gid'
+::Object.require 'corelib/process/uid'
+::Object.require 'corelib/process/sys'

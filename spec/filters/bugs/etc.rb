@@ -2,7 +2,7 @@
 opal_filter "Etc" do
   fails "Etc.confstr raises Errno::EINVAL for unknown configuration variables" # Expected Errno::EINVAL but no exception was raised (nil was returned)
   fails "Etc.confstr returns a String for Etc::CS_PATH" # NameError: uninitialized constant Etc::CS_PATH
-  fails "Etc.getlogin returns the name associated with the current login activity" # Exception: logname is not defined
+  fails "Etc.getgrgid can be called safely by multiple threads" # NotImplementedError: Thread creation not available
   fails "Etc.sysconf returns the value of POSIX.1 system configuration variable SC_ARG_MAX" # NameError: uninitialized constant Etc::SC_ARG_MAX
   fails "Etc.sysconf returns the value of POSIX.1 system configuration variable SC_CHILD_MAX" # NameError: uninitialized constant Etc::SC_CHILD_MAX
   fails "Etc.sysconf returns the value of POSIX.1 system configuration variable SC_CLK_TCK" # NameError: uninitialized constant Etc::SC_CLK_TCK

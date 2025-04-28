@@ -50,7 +50,7 @@ end
 
 module ::Kernel
   def binding
-    ::Kernel.raise "Opal doesn't support dynamic calls to binding"
+    ::Kernel.raise ::NotImplementedError, "Opal doesn't support dynamic calls to binding"
   end
 end
 

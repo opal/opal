@@ -188,13 +188,11 @@ opal_filter "IO" do
   fails "IO.open ignores the :encoding option when the :external_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
   fails "IO.open ignores the :encoding option when the :internal_encoding option is present" # Expected warning to match: /Ignoring encoding parameter/ but got: ""
   fails "IO.open raises an Errno::EINVAL if the new mode is not compatible with the descriptor's current mode" # Expected Errno::EINVAL but no exception was raised (<IO:fd 2> was returned)
-  fails "IO.popen does not throw an exception if child exited and has been waited for" # NoMethodError: undefined method `exited?' for #<Process::Status: pid 10824 exit 0>
-  fails "IO.popen raises IOError when writing a read-only pipe" # Expected "" ==  "foo " to be truthy but was false
-  fails "IO.popen reads a read-only pipe" # Expected "" ==  "foo " to be truthy but was false
+  fails "IO.popen does not throw an exception if child exited and has been waited for" # NotImplementedError: NotImplementedError
   fails "IO.popen reads and writes a read/write pipe" # Expected nil == "bar" to be truthy but was false
-  fails "IO.popen sees an infinitely looping subprocess exit when read pipe is closed" # NoMethodError: undefined method `exitstatus' for nil
-  fails "IO.popen starts returns a forked process if the command is -" # Expected nil ==  "hello from child " to be truthy but was false
-  fails "IO.popen waits for the child to finish" # NoMethodError: undefined method `exitstatus' for nil
+  fails "IO.popen sees an infinitely looping subprocess exit when read pipe is closed" # Expected 0 == 0 to be falsy but was true
+  fails "IO.popen starts returns a forked process if the command is -" # NotImplementedError: popen with fork '-' is not available
+  fails "IO.popen waits for the child to finish" # Expected "" == "bar" to be truthy but was false
   fails "IO.popen with a leading Array argument accepts '[env, command, arg1, arg2, ..., exec options], mode'" # Expected "" ==  "bar " to be truthy but was false
   fails "IO.popen with a leading Array argument accepts '[env, command, arg1, arg2, ..., exec options], mode, IO options'" # Expected "" ==  "bar " to be truthy but was false
   fails "IO.popen with a leading Array argument accepts '[env, command, arg1, arg2, ...], mode, IO + exec options'" # Expected "" ==  "bar " to be truthy but was false
@@ -202,16 +200,14 @@ opal_filter "IO" do
   fails "IO.popen with a leading Array argument accepts a leading ENV Hash" # Expected "" ==  "bar " to be truthy but was false
   fails "IO.popen with a leading Array argument accepts a trailing Hash of Process.exec options" # Expected "" =~ /LoadError/ to be truthy but was nil
   fails "IO.popen with a leading Array argument accepts an IO mode argument following the Array" # Expected "" =~ /LoadError/ to be truthy but was nil
-  fails "IO.popen with a leading Array argument uses the Array as command plus args for the child process" # Expected "" ==  "hello " to be truthy but was false
+  fails "IO.popen with a leading Array argument uses the Array as command plus args for the child process" # Expected  " " ==  "hello " to be truthy but was false
   fails "IO.popen with a leading ENV Hash accepts a single String command with a trailing Hash of Process.exec options" # Expected "" ==  "bar " to be truthy but was false
   fails "IO.popen with a leading ENV Hash accepts a single String command with a trailing Hash of Process.exec options, and an IO mode" # Expected "" ==  "bar " to be truthy but was false
-  fails "IO.popen with a leading ENV Hash accepts a single String command" # Expected "" ==  "bar " to be truthy but was false
-  fails "IO.popen with a leading ENV Hash accepts a single String command, and an IO mode" # Expected "" ==  "bar " to be truthy but was false
   fails "IO.popen with a leading ENV Hash accepts an Array command with a separate trailing Hash of Process.exec options" # Expected "" ==  "bar " to be truthy but was false
   fails "IO.popen with a leading ENV Hash accepts an Array command with a separate trailing Hash of Process.exec options, and an IO mode" # Expected "" ==  "bar " to be truthy but was false
   fails "IO.popen with a leading ENV Hash accepts an Array of command and arguments" # Expected "" ==  "bar " to be truthy but was false
   fails "IO.popen with a leading ENV Hash accepts an Array of command and arguments, and an IO mode" # Expected "" ==  "bar " to be truthy but was false
-  fails "IO.popen writes to a write-only pipe" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open 'C:\Users\jan\workspace\opal\tmp\rubyspec_temp\IO_popen_spec'
+  fails "IO.popen writes to a write-only pipe" # Expected "" == "bar" to be truthy but was false
   fails "IO.read accepts options as keyword arguments" # Expected ArgumentError (wrong number of arguments) but no exception was raised ("123" was returned)
   fails "IO.read from a pipe opens a pipe to a fork if the rest is -" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open '|-'
   fails "IO.read from a pipe raises Errno::ESPIPE if passed an offset" # Expected Errno::ESPIPE but got: Errno::ENOENT (No such file or directory - ENOENT: no such file or directory, open '|sh -c 'echo hello'')
@@ -248,4 +244,5 @@ opal_filter "IO" do
   fails "IO::EAGAINWaitWritable is the same as IO::EWOULDBLOCKWaitWritable if Errno::EAGAIN is the same as Errno::EWOULDBLOCK" # NameError: uninitialized constant Errno::EAGAIN
   fails "IO::EWOULDBLOCKWaitReadable combines Errno::EWOULDBLOCK and IO::WaitReadable" # NameError: uninitialized constant IO::EWOULDBLOCKWaitReadable
   fails "IO::EWOULDBLOCKWaitWritable combines Errno::EWOULDBLOCK and IO::WaitWritable" # NameError: uninitialized constant IO::EWOULDBLOCKWaitWritable
+  fails_badly "IO#close on an IO.popen stream clears #pid"
 end

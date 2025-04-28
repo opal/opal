@@ -60,30 +60,22 @@ ruby/core/hash
 ruby/core/integer
 
 ruby/core/kernel
-!ruby/core/kernel/abort_spec
-!ruby/core/kernel/at_exit_spec
-!ruby/core/kernel/backtick_spec
 !ruby/core/kernel/binding_spec
 !ruby/core/kernel/callcc_spec
 !ruby/core/kernel/caller_locations_spec
 !ruby/core/kernel/catch_spec
 !ruby/core/kernel/chomp_spec
 !ruby/core/kernel/chop_spec
-!ruby/core/kernel/exec_spec
-!ruby/core/kernel/exit_spec
 !ruby/core/kernel/fork_spec
-!ruby/core/kernel/gets_spec
 !ruby/core/kernel/load_spec
 !ruby/core/kernel/require_relative_spec
 !ruby/core/kernel/require_spec
 !ruby/core/kernel/select_spec
 !ruby/core/kernel/set_trace_func_spec
-!ruby/core/kernel/spawn_spec
 !ruby/core/kernel/syscall_spec
 !ruby/core/kernel/test_spec
 !ruby/core/kernel/throw_spec
 !ruby/core/kernel/trace_var_spec
-!ruby/core/kernel/trap_spec
 !ruby/core/kernel/trust_spec
 !ruby/core/kernel/untrace_var_spec
 !ruby/core/kernel/untrusted_spec
@@ -111,6 +103,11 @@ ruby/core/objectspace
 ruby/core/objectspace/weakmap
 
 ruby/core/proc
+
+ruby/core/process
+!ruby/core/process/_fork_spec
+!ruby/core/process/fork_spec
+!ruby/core/process/spawn_spec
 
 ruby/core/range
 ruby/core/rational

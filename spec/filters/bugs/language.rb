@@ -82,6 +82,7 @@ opal_filter "language" do
   fails "Global variable $-p is read-only" # Expected NameError but no exception was raised (true was returned)
   fails "Global variable $-v is an alias of $VERBOSE" # Expected nil to be true
   fails "Global variable $-w is an alias of $VERBOSE" # Expected nil to be true
+  fails "Global variable $0 actually sets the program name" # Expected "" to include "rubyspec-dollar0-test"
   fails "Global variable $0 is the path given as the main script and the same as __FILE__" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa7382 @old_stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="read" @write_proc=#<Proc:0xaa7e6> @tty=true> @verbose=nil @dollar_slash="\n" @dollar_dash_zero=nil @dollar_backslash=nil @debug=false @method=nil @object=nil @orig_program_name=nil>
   fails "Global variable $0 raises a TypeError when not given an object that can be coerced to a String" # Expected TypeError but no exception was raised (nil was returned)
   fails "Global variable $< is read-only" # Expected NameError but no exception was raised (nil was returned)

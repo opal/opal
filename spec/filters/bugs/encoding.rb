@@ -202,16 +202,13 @@ opal_filter "Encoding" do
   fails "String#valid_encoding? returns false if self contains a character invalid in the associated encoding" # Expected true to be false
   fails "String#valid_encoding? returns true for all encodings self is valid in" # Expected true to be false
   fails "String#valid_encoding? returns true if an invalid string is appended another invalid one but both make a valid string" # Expected true to be false
-  fails "The predefined global constant ARGV contains Strings encoded in locale Encoding" # NoMethodError: undefined method `default_internal' for Encoding
+  fails "The predefined global constant ARGV contains Strings encoded in locale Encoding" # NotImplementedError: NotImplementedError
   fails "The predefined global constant STDERR has nil for the external encoding despite Encoding.default_external being changed" # Expected #<Encoding:ASCII-8BIT> to be nil
   fails "The predefined global constant STDERR has nil for the external encoding" # Expected #<Encoding:ASCII-8BIT> to be nil
   fails "The predefined global constant STDERR has the encodings set by #set_encoding" # NotImplementedError: NotImplementedError
   fails "The predefined global constant STDIN has the encodings set by #set_encoding" # NotImplementedError: NotImplementedError
-  fails "The predefined global constant STDIN has the same external encoding as Encoding.default_external when that encoding is changed" # NameError: uninitialized constant Encoding::ISO_8859_16
   fails "The predefined global constant STDIN retains the encoding set by #set_encoding when Encoding.default_external is changed" # NotImplementedError: NotImplementedError
   fails "The predefined global constant STDOUT has nil for the external encoding despite Encoding.default_external being changed" # Expected #<Encoding:ASCII-8BIT> to be nil
   fails "The predefined global constant STDOUT has nil for the external encoding" # Expected #<Encoding:ASCII-8BIT> to be nil
   fails "The predefined global constant STDOUT has the encodings set by #set_encoding" # NotImplementedError: NotImplementedError
-  fails "Time#inspect returns a US-ASCII encoded string" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
-  fails "Time#to_s returns a US-ASCII encoded string" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
 end
