@@ -19,7 +19,6 @@ opal_filter "Kernel" do
   fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file" # Expected "ruby/core/kernel" == "/home/jan/workspace/opal/spec/ruby/core/kernel" to be truthy but was false
   fails "Kernel#__dir__ when used in eval with top level binding returns nil" # Expected "." == nil to be truthy but was false
   fails "Kernel#` is a private method" # Expected Kernel to have private instance method '`' but it does not
-  fails "Kernel#` lets the standard error stream pass through to the inherited stderr" # Expected (STDERR): "error stream"           but got: "error stream<internal:runtime/misc.rb>:50:23:in `exit': \e[1mexit (\e[1;4mSystemExit\e[m\e[1m)\e[m\n\tfrom <internal:corelib/process.rb>:118:13:in `exit'\n\tfrom <internal:corelib/kernel.rb>:385:14:in `exit'\n\tfrom (exit):1:9:in `undefined'\n\tfrom <internal:runtime/boot.js>:529:9:in `undefined'\n\n" Backtrace
   fails "Kernel#` sets $? to the exit status of the executed sub-process" # NotImplementedError: NotImplementedError
   fails "Kernel#abort is a private method" # Expected Kernel to have private instance method 'abort' but it does not
   fails "Kernel#autoload calls main.require(path) to load the file" # Expected NameError but got: LoadError (cannot load such file -- main_autoload_not_exist)
@@ -109,7 +108,6 @@ opal_filter "Kernel" do
   fails "Kernel#open opens an io for writing" # Expected (STDOUT): "."           but got: "" Backtrace
   fails "Kernel#open opens an io when called with a block" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open '|date'
   fails "Kernel#open opens an io when path starts with a pipe" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open '|date'
-  fails "Kernel#open when given an object that responds to to_open passes keyword arguments onto #to_open as keyword arguments if to_open accepts them" # ArgumentError: [MSpecEnv#open] wrong number of arguments (given 5, expected -2)
   fails "Kernel#pp lazily loads the 'pp' library and delegates the call to that library" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x572a>
   fails "Kernel#print prints $_ when no arguments are given" # Expected:   $stdout: "foo"       got:   $stdout: ""
   fails "Kernel#public_method changes the method called for super on a target aliased method" # NoMethodError: undefined method `public_method' for #<#<Class:0x5a558>:0x5a556>

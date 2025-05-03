@@ -89,7 +89,6 @@ opal_filter "Time" do
   fails "Time.at passed Numeric passed Rational returns Time with correct nanoseconds" # Expected 0 == 539759 to be truthy but was false
   fails "Time.at passed Numeric roundtrips a Rational produced by #to_r" # NoMethodError: undefined method `to_r' for 2022-12-07 05:21:14 +0100
   fails "Time.at passed [Time, Numeric, format] :microsecond format treats second argument as microseconds" # ArgumentError: [Time.at] wrong number of arguments (given 3, expected -2)
-  fails "Time.at passed [Time, Numeric, format] :millisecond format treats second argument as milliseconds" # ArgumentError: [Time.at] wrong number of arguments (given 3, expected -2)
   fails "Time.at passed [Time, Numeric, format] :nanosecond format treats second argument as nanoseconds" # ArgumentError: [Time.at] wrong number of arguments (given 3, expected -2)
   fails "Time.at passed [Time, Numeric, format] :nsec format treats second argument as nanoseconds" # ArgumentError: [Time.at] wrong number of arguments (given 3, expected -2)
   fails "Time.at passed [Time, Numeric, format] :usec format treats second argument as microseconds" # ArgumentError: [Time.at] wrong number of arguments (given 3, expected -2)

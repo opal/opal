@@ -39,19 +39,13 @@ opal_filter "Process" do
   fails "Process.daemon when the second argument is true does not redirect stdin to /dev/null" # NotImplementedError: NotImplementedError
   fails "Process.daemon when the second argument is true does not redirect stdout to /dev/null" # NotImplementedError: NotImplementedError
   fails "Process.detach calls #to_int to implicitly convert non-Integer pid to Integer" # Mock 'mock-enumerable' expected to receive to_int("any_args") exactly 1 times but received it 0 times
-  fails "Process.detach produces the exit Process::Status as the thread value" # NotImplementedError: NotImplementedError
-  fails "Process.detach provides a #pid method on the returned thread which returns the PID" # NotImplementedError: NotImplementedError
   fails "Process.detach raises TypeError when #to_int returns non-Integer value" # Expected TypeError (can't convert MockObject to Integer (MockObject#to_int gives Symbol)) but got: NotImplementedError (NotImplementedError)
   fails "Process.detach raises TypeError when pid argument does not have #to_int method" # Expected TypeError (no implicit conversion of Object into Integer) but got: NotImplementedError (NotImplementedError)
-  fails "Process.detach reaps the child process's status automatically" # NotImplementedError: NotImplementedError
-  fails "Process.detach returns a thread" # NotImplementedError: NotImplementedError
-  fails "Process.detach sets the :pid thread-local to the PID" # NotImplementedError: NotImplementedError
   fails "Process.detach tolerates not existing child process pid" # NameError: uninitialized constant Errno::ESRCH
   fails "Process.exit raises the SystemExit in the main thread if it reaches the top-level handler of another thread" # NotImplementedError: Thread creation not available
   fails "Process.exit! exits when called from a fiber" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:
   fails "Process.exit! exits when called from a thread" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:
   fails "Process.exit! overrides the original exception and exit status when called from #at_exit" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:
-  fails "Process.exit! skips ensure clauses" # Expected "" ==  "before " to be truthy but was false
   fails "Process.getpgid coerces the argument to an Integer" # NoMethodError: undefined method `arguments' for #<MockIntObject:0x144 @value=39456 @calls=0>
   fails "Process.getpgid returns the process group ID for the calling process id when passed 0" # NotImplementedError: NotImplementedError
   fails "Process.getpgid returns the process group ID for the given process id" # NotImplementedError: NotImplementedError
@@ -85,8 +79,6 @@ opal_filter "Process" do
   fails "Process.maxgroups returns the maximum number of gids allowed in the supplemental group access list" # NotImplementedError: NotImplementedError
   fails "Process.maxgroups sets the maximum number of gids allowed in the supplemental group access list" # NotImplementedError: NotImplementedError
   fails "Process.ppid returns the process id of the parent of this process" # NotImplementedError: NotImplementedError
-  fails "Process.setpgid sets the process group id of the specified process" # NotImplementedError: NotImplementedError
-  fails "Process.setpgrp and Process.getpgrp sets and gets the process group ID of the calling process" # NotImplementedError: NotImplementedError
   fails "Process.setpriority sets the scheduling priority for a specified process group" # NameError: uninitialized constant Process::PRIO_PGRP
   fails "Process.setpriority sets the scheduling priority for a specified process" # NameError: uninitialized constant Process::PRIO_PROCESS
   fails "Process.setrlimit when passed a String coerces 'AS' into RLIMIT_AS" # NameError: uninitialized constant Process::RLIMIT_AS
@@ -131,4 +123,11 @@ opal_filter "Process" do
   fails "Process.waitall returns an empty array when there are no children" # Expected nil == [] to be truthy but was false
   fails "Process.waitall waits for all children" # Expected Errno::ESRCH but no exception was raised (1 was returned)
   fails "Process.waitpid returns nil when the process has not yet completed and WNOHANG is specified" # NameError: uninitialized constant Process::WNOHANG
+  fails_badly "Process.detach produces the exit Process::Status as the thread value" # NotImplementedError: NotImplementedError
+  fails_badly "Process.detach provides a #pid method on the returned thread which returns the PID" # NotImplementedError: NotImplementedError
+  fails_badly "Process.detach reaps the child process's status automatically" # NotImplementedError: NotImplementedError
+  fails_badly "Process.detach returns a thread" # NotImplementedError: NotImplementedError
+  fails_badly "Process.detach sets the :pid thread-local to the PID" # NotImplementedError: NotImplementedError
+  fails_badly "Process.setpgid sets the process group id of the specified process" # NotImplementedError: NotImplementedError
+  fails_badly "Process.setpgrp and Process.getpgrp sets and gets the process group ID of the calling process" # NotImplementedError: NotImplementedError
 end

@@ -1,4 +1,5 @@
-# inspired by ruby/lib/fileutils.rb
+# backtick_javascript: true
+# inspired by ruby/lib/fileutils.rb from https://github.com/ruby/ruby/blob/master/lib/fileutils.rb
 # adapted to Opal
 
 module FileUtils
@@ -528,6 +529,7 @@ module FileUtils
 
   def link_entry(src, dest, dereference_root = false, remove_destination = false)
     # Creates hard links; returns nil.
+
     Helpers_.fu_preorder_traverse(src, dereference_root) do |ent, st|
       rel = `ent.slice(src.length + 1)`
       destent = rel.nil? || rel.empty? ? dest : ::File.join(dest, rel)

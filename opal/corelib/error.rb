@@ -142,7 +142,7 @@ class ::Exception < `Error`
       return "#{@message}\n#{`self.stack`}"
     end
 
-    kwargs = { highlight: ($stderr && `typeof(#{$stderr}["$tty?"]) == "function"`) ? true : false, order: :top }.merge(kwargs || {})
+    kwargs = { highlight: ($stderr && `typeof(#{$stderr}["$tty?"]) == "function"`) ? $stderr.tty? : false, order: :top }.merge(kwargs || {})
     highlight, order = kwargs[:highlight], kwargs[:order]
     highlight = false if highlight.nil?
 
@@ -245,7 +245,6 @@ class ::UncaughtThrowError    < ::ArgumentError; end
 class ::IndexError          < ::StandardError; end
 class ::StopIteration         < ::IndexError; end
 class ::ClosedQueueError        < ::StopIteration; end
-class ::KeyError              < ::IndexError; end
 class ::RangeError          < ::StandardError; end
 class ::FloatDomainError      < ::RangeError; end
 class ::IOError             < ::StandardError; end
@@ -261,7 +260,11 @@ class ::SystemExit < ::Exception
   attr_reader :status
 
   def initialize(status = true, message = nil)
-    super(message || 'system exit')
+    if message.nil? && status.is_a?(::String)
+      message = status
+      status = 0
+    end
+    super(message || 'SystemExit')
     @status = if status == true
                 0
               elsif status == false
@@ -346,7 +349,7 @@ class ::StopIteration
   attr_reader :result
 end
 
-class ::KeyError
+class ::KeyError < ::IndexError
   def initialize(message, receiver: nil, key: nil)
     super(message)
     @receiver = receiver

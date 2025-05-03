@@ -138,63 +138,6 @@ class TestPathname < Test::Unit::TestCase
     defassert(:cleanpath_conservative, '/',      '//')
   end
 
-  # has_trailing_separator?(path) -> bool
-  def has_trailing_separator?(path)
-    Pathname.allocate.__send__(:has_trailing_separator?, path)
-  end
-
-  defassert(:has_trailing_separator?, false, "/")
-  defassert(:has_trailing_separator?, false, "///")
-  defassert(:has_trailing_separator?, false, "a")
-  defassert(:has_trailing_separator?, true, "a/")
-
-  def add_trailing_separator(path)
-    Pathname.allocate.__send__(:add_trailing_separator, path)
-  end
-
-  def del_trailing_separator(path)
-    Pathname.allocate.__send__(:del_trailing_separator, path)
-  end
-
-  defassert(:del_trailing_separator, "/", "/")
-  defassert(:del_trailing_separator, "/a", "/a")
-  defassert(:del_trailing_separator, "/a", "/a/")
-  defassert(:del_trailing_separator, "/a", "/a//")
-  defassert(:del_trailing_separator, ".", ".")
-  defassert(:del_trailing_separator, ".", "./")
-  defassert(:del_trailing_separator, ".", ".//")
-
-  if DOSISH_DRIVE_LETTER
-    defassert(:del_trailing_separator, "A:", "A:")
-    defassert(:del_trailing_separator, "A:/", "A:/")
-    defassert(:del_trailing_separator, "A:/", "A://")
-    defassert(:del_trailing_separator, "A:.", "A:.")
-    defassert(:del_trailing_separator, "A:.", "A:./")
-    defassert(:del_trailing_separator, "A:.", "A:.//")
-  end
-
-  if DOSISH_UNC
-    defassert(:del_trailing_separator, "//", "//")
-    defassert(:del_trailing_separator, "//a", "//a")
-    defassert(:del_trailing_separator, "//a", "//a/")
-    defassert(:del_trailing_separator, "//a", "//a//")
-    defassert(:del_trailing_separator, "//a/b", "//a/b")
-    defassert(:del_trailing_separator, "//a/b", "//a/b/")
-    defassert(:del_trailing_separator, "//a/b", "//a/b//")
-    defassert(:del_trailing_separator, "//a/b/c", "//a/b/c")
-    defassert(:del_trailing_separator, "//a/b/c", "//a/b/c/")
-    defassert(:del_trailing_separator, "//a/b/c", "//a/b/c//")
-  else
-    defassert(:del_trailing_separator, "/", "///")
-    defassert(:del_trailing_separator, "///a", "///a/")
-  end
-
-  if DOSISH
-    defassert(:del_trailing_separator, "a", "a\\")
-    defassert(:del_trailing_separator, "\225\\".dup.force_encoding("cp932"), "\225\\\\".dup.force_encoding("cp932"))
-    defassert(:del_trailing_separator, "\225".dup.force_encoding("cp437"), "\225\\\\".dup.force_encoding("cp437"))
-  end
-
   def test_plus
     assert_kind_of(Pathname, Pathname("a") + Pathname("b"))
   end

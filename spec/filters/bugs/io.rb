@@ -4,8 +4,7 @@ opal_filter "IO" do
   fails "IO#advise raises a RangeError if len is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "IO#advise raises a RangeError if offset is too big" # Expected RangeError but no exception was raised (nil was returned)
   fails "IO#advise raises a TypeError if advise is not a Symbol" # Expected TypeError but no exception was raised (nil was returned)
-  fails "IO#close on an IO.popen stream sets $?" # NoMethodError: undefined method `exitstatus' for nil
-  fails "IO#close on an IO.popen stream waits for the child to exit" # NoMethodError: undefined method `exitstatus' for nil
+  fails "IO#close on an IO.popen stream waits for the child to exit" # Expected 0 == 0 to be falsy but was true
   fails "IO#close raises an IOError with a clear message" # Expected IOError (stream closed in another thread) but got: NotImplementedError (Thread creation not available)
   fails "IO#close_write flushes and closes the write stream" # Expected "" ==  "12345 " to be truthy but was false
   fails "IO#close_write raises an IOError if the stream is readable and not duplexed" # Expected IOError but no exception was raised (nil was returned)

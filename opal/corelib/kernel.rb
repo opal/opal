@@ -674,7 +674,7 @@ module ::Kernel
     #   Invoking the executable at exe_path.
     env = {}
     env = argv.shift if argv.first.is_a? ::Hash
-    env = ::ENV.merge(env)
+    env = ::ENV.to_h.merge!(env)
     js_env = `{}`
     env.each { |k, v| `js_env[k] = v.toString()` }
     `delete js_env["SHELL"]`
@@ -686,6 +686,17 @@ module ::Kernel
       cmdname = cmdname[0]
     end
 
+    args = []
+
+    shell = if ::File.absolute_path?(cmdname)
+              while argv[0].is_a?(::String)
+                args << argv.shift
+              end
+              false
+            else
+              true
+            end
+
     opts = argv.shift
 
     if opts.is_a?(::Hash)
@@ -694,9 +705,9 @@ module ::Kernel
       se = opts[:err]
     end
 
-    `js_opts.shell = true` unless ::File.absolute_path?(cmdname)
+    `js_opts.shell = shell`
 
-    out = `$platform.process_spawn(#{cmdname}, #{argv}, js_opts)`
+    out = `$platform.process_spawn(#{cmdname}, #{args}, js_opts)`
 
     status = `out.status > 128 ? out.status - 128 : out.status`
     pid = `out.pid == null ? nil : out.pid`

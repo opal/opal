@@ -15,3 +15,4 @@
 ::Object.require 'corelib/process/gid'
 ::Object.require 'corelib/process/uid'
 ::Object.require 'corelib/process/sys'
+::Object.require 'corelib/process/tms'

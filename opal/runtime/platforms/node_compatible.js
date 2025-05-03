@@ -16,10 +16,14 @@ const fs = await import("node:fs");
 const os = await import("node:os");
 const path = await import("node:path");
 const process = await import("node:process");
+const url = await import("node:url");
+
+// allow access to modules from stdlib, this is node specific and only used by open-uri
+platform.modules = { child_process, fs, os, path, url };
 
 // Helpers
 function not_available(fun) {
-  platform.handle_unsupported_feature(fun + " is not available on node and compatible platforms");
+  platform.handle_unsupported_feature(fun + " is not available on node, deno or bun");
   return Opal.nil;
 }
 // IO helper function to raise correct Ruby Error instead of platform specific error
@@ -81,11 +85,10 @@ platform.version = os.version;
 platform.exit = process.exit;
 
 // ARGV
-platform.argv = process.argv.slice(2)
-if (platform.argv.length == 0) platform.argv[0] = process.argv[1];
+platform.argv = process.argv.slice(1)
 
 // ENV
-platform.env_keys = ()=>Object.keys(process.env);
+platform.env_keys = ()=>Object.keys(process.env).sort(); // must sort because Deno shuffles things around
 platform.env_get = (key)=>process.env[key.toString()];
 platform.env_del = (key)=>{ delete process.env[key.toString()]; };
 platform.env_has = (key)=>process.env[key.toString()] != null;
@@ -188,7 +191,7 @@ platform.process_wait = ()=>not_available("Process#wait");
 platform.process_waitall = ()=>not_available("Process#waitall");
 
 // IO.pipe
-// In process pipe, because Nodejs does not support real pipes, so lets emulate them.
+// In process pipe, because Nodejs does not support real pipes synchonously, so lets emulate them.
 // For the Future: maybe can use unix sockets/named pipes for real IPC with cluster.fork() here.
 platform.pipes = { __proto__: null };
 

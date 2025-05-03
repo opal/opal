@@ -6,6 +6,8 @@ opal_filter "File" do
   fails "File.chmod with '0644' makes file readable and writable and also executable" # Expected false == true to be truthy but was false
   fails "File.chown accepts an object that has a #to_path method" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\file_chown_test'
   fails "File.chown returns the number of files processed" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\file_chown_test'
+  fails "File.directory? calls #to_io to convert a non-IO object" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
+  fails "File.directory? returns false if the argument is an IO that's not a directory" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
   fails "File.executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
   fails "File.expand_path converts a pathname to an absolute pathname" # Expected "C:/Users/Administrator/workspace/opal/spec" == nil to be truthy but was false
   fails "File.expand_path converts a pathname to an absolute pathname, Ruby-Talk:18512" # TypeError: no implicit conversion of NilClass into String
@@ -29,8 +31,16 @@ opal_filter "File" do
   fails "File::Stat#grpowned? returns false if the file exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
   fails "File::Stat#ino returns BY_HANDLE_FILE_INFORMATION.nFileIndexHigh/Low of a File::Stat object" # Expected nil (NilClass) to be kind of Integer
   fails "File::Stat#mode returns the mode of a File::Stat object" # Expected 438 == 420 to be truthy but was false
+  fails "File::Stat#mtime returns the mtime of a File::Stat object" # Expected 2025-04-22 21:50:08 +0200 <= 2025-04-22 21:50:08 +0200 to be truthy but was false
   fails "File::Stat#owned? returns true if the file is owned by the user" # Expected #<File::Stat dev=0, ino=5066549581073667, mode=81b6, nlink=1, uid=0, gid=0, rdev=0, size=0, blksize=4096, blocks=0, atime=2025-04-10 19:06:24 -0000, mtime=2025-04-10 19:06:24 -0000, ctime=2025-04-10 19:06:24 -0000, birthtime=2025-04-10 18:46:44 -0000.owned? to be truthy but was false
   fails "File::Stat#rdev returns the number of the device this file represents which the file exists" # Expected nil (NilClass) to be kind of Integer
   fails "File::Stat#rdev_major returns nil" # Expected 0 to be nil
   fails "File::Stat#uid returns the owner attribute of a File::Stat object" # Expected 0 == -1 to be truthy but was false
+  fails "FileTest.directory? calls #to_io to convert a non-IO object" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
+  fails "FileTest.directory? returns false if the argument is an IO that's not a directory" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
+  fails "FileTest.executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.grpowned? returns false if the file doesn't exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
+  fails "FileTest.grpowned? returns false if the file exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
+  fails "FileTest.identical? returns true if both named files are identical" # Expected true to be false
+  fails "FileTest.zero? returns true for NUL" # Errno::EISDIR: Is a directory - EISDIR: illegal operation on a directory, stat 'NUL'
 end

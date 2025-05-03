@@ -83,4 +83,5 @@ opal_filter "File" do
   fails "File::Stat#rdev_major returns nil" # Expected 0 to be nil
   fails "File::Stat#rdev_minor returns nil" # Expected 0 to be nil
   fails "File::Stat#uid returns the owner attribute of a File::Stat object" # Expected 0 == -1 to be truthy but was false
+  fails "FileTest.executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
 end

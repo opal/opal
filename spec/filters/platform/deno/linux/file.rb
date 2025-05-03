@@ -1,5 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "File" do
+  fails "File.ctime returns the change time for the named file (the time at which directory information about the file was changed, not the file itself) with microseconds." # Expected 0 > 0 to be truthy but was false
   fails "File.expand_path raises an ArgumentError if the path is not valid" # Expected ArgumentError but no exception was raised ("/home/jan" was returned)
   fails "File.expand_path raises an Encoding::CompatibilityError if the external encoding is not compatible" # Expected CompatibilityError but no exception was raised ("/home/jan/workspace/opal/spec/a" was returned)
   fails "File.extname for a filename ending with a dot returns '.'" # Expected "" == "." to be truthy but was false

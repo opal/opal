@@ -14,6 +14,7 @@ opal_filter "File" do
   fails "File.owned? returns true if the file exist and is owned by the user" # Expected false == true to be truthy but was false
   fails "File.umask returns the current umask value for this process (basic)" # Expected 18 == 0 to be truthy but was false
   fails "File.umask returns the current umask value for this process" # Expected 6 == 0 to be truthy but was false
+  fails "File::Stat#atime returns the atime of a File::Stat object" # Expected 2025-04-22 19:44:50 -0000 <= 2025-04-22 19:44:50 -0000 to be truthy but was false
   fails "File::Stat#ctime returns the ctime of a File::Stat object" # Expected 2025-04-15 20:15:43 -0000 <= 2025-04-15 20:15:43 -0000 to be truthy but was false
   fails "File::Stat#dev_major returns nil" # Expected 0 to be nil
   fails "File::Stat#dev_minor returns nil" # Expected 0 to be nil
@@ -25,4 +26,6 @@ opal_filter "File" do
   fails "File::Stat#rdev_major returns nil" # Expected 0 to be nil
   fails "File::Stat#rdev_minor returns nil" # Expected 0 to be nil
   fails "File::Stat#uid returns the owner attribute of a File::Stat object" # Expected 0 == -1 to be truthy but was false
+  fails "FileTest.executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.zero? returns true for NUL" # Expected false == true to be truthy but was false
 end

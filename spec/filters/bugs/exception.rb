@@ -59,7 +59,6 @@ opal_filter "Exception" do
   fails "NameError.new accepts a :receiver keyword argument" # ArgumentError: [NameError#initialize] wrong number of arguments (given 3, expected -2)
   fails "NoMethodError#dup copies the name, arguments and receiver" # NoMethodError: undefined method `receiver' for #<NoMethodError: undefined method `foo' for #<Object:0x11274>>
   fails "NoMethodError.new accepts a :receiver keyword argument" # NoMethodError: undefined method `receiver' for #<NoMethodError: msg>
-  fails "SignalException can be rescued" # NotImplementedError: NotImplementedError
   fails "SignalException cannot be trapped with Signal.trap" # NotImplementedError: NotImplementedError
   fails "SignalException runs after at_exit" # NotImplementedError: NotImplementedError
   fails "SignalException self-signals for USR1" # NotImplementedError: NotImplementedError
@@ -81,12 +80,6 @@ opal_filter "Exception" do
   fails "SystemCallError.new raises TypeError if errno is not an Integer" # Expected TypeError (/no implicit conversion of String into Integer/) but no exception was raised (#<SystemCallError: foo> was returned)
   fails "SystemCallError.new raises TypeError if message is not a String" # Expected TypeError (/no implicit conversion of Symbol into String/) but no exception was raised (#<SystemCallError: foo> was returned)
   fails "SystemCallError.new requires at least one argument" # Expected ArgumentError but no exception was raised (#<SystemCallError: SystemCallError> was returned)
-  fails "SystemExit #initialize accepts a message only" # NoMethodError: undefined method `status' for #<SystemExit: message>
-  fails "SystemExit #initialize accepts a status and message" # NoMethodError: undefined method `status' for #<SystemExit: 42>
-  fails "SystemExit #initialize accepts a status only" # NoMethodError: undefined method `status' for #<SystemExit: 42>
-  fails "SystemExit #initialize accepts no arguments" # NoMethodError: undefined method `status' for #<SystemExit: SystemExit>
-  fails "SystemExit sets the exit status and exits silently when raised when subclassed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9fe6a>
-  fails "SystemExit sets the exit status and exits silently when raised" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9fe6a>
   fails_badly "SystemExit#status returns the exit status"
   fails_badly "SystemExit#success? returns false if the process exited unsuccessfully"
   fails_badly "SystemExit#success? returns true if the process exited successfully"

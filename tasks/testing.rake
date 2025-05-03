@@ -353,6 +353,7 @@ platforms.each do |platform|
         files = %w[
           corelib/string/encoding/dummy.rb
           corelib/file_test.rb
+          corelib/process/tms
           benchmark/test_benchmark.rb
           etc/test_etc.rb
           opal/test_fileutils.rb

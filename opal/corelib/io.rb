@@ -710,7 +710,9 @@ class ::IO
     # Returns true if the stream is positioned at its end, false otherwise;
     `check_readable(self)`
     return `$platform.io_pipe_eof(self.fd)` if @pipe
-    stat.size <= @pos
+    s = stat
+    return false if s.chardev?
+    s.size <= @pos
   end
 
   alias eof? eof

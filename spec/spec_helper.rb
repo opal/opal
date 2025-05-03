@@ -14,7 +14,7 @@ require 'mspec-opal/should' # Overwrite Object#should with strict version.
 # showed to need more tolerance (ruby spec default is 0.00003)
 TOLERANCE = 0.00004
 
-ENV['MSPEC_RUNNER'] = true
+ENV['MSPEC_RUNNER'] = '1'
 
 # Trigger autoloading, needed by `Module.constants`
 # in `spec/ruby/core/module/constants_spec.rb`.

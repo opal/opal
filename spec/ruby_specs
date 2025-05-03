@@ -1,3 +1,5 @@
+ruby/core/argf
+
 ruby/core/array
 
 ruby/core/array/pack/a_spec
@@ -45,6 +47,7 @@ ruby/core/enumerator/chain
 ruby/core/enumerator/generator
 ruby/core/enumerator/lazy
 ruby/core/enumerator/yielder
+ruby/core/env
 
 ruby/core/exception
 !ruby/core/exception/load_error_spec
@@ -53,11 +56,12 @@ ruby/core/false
 ruby/core/file
 ruby/core/file/stat
 ruby/core/filetest
-ruby/core/integer
-ruby/core/io
+
 ruby/core/float
 ruby/core/hash
 ruby/core/integer
+
+ruby/core/io
 
 ruby/core/kernel
 !ruby/core/kernel/binding_spec
@@ -107,7 +111,11 @@ ruby/core/proc
 ruby/core/process
 !ruby/core/process/_fork_spec
 !ruby/core/process/fork_spec
+!ruby/core/process/setpgid_spec
+!ruby/core/process/setpgrp_spec
 !ruby/core/process/spawn_spec
+!ruby/core/process/wait_spec
+!ruby/core/process/wait2_spec
 
 ruby/core/range
 ruby/core/rational
@@ -172,6 +180,7 @@ ruby/library/delegate/delegator
 ruby/library/erb/util/h_spec
 ruby/library/erb/util/html_escape_spec
 ruby/library/etc
+!ruby/library/etc/struct_group_spec
 ruby/library/logger/severity_spec
 ruby/library/observer
 

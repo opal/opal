@@ -29,6 +29,8 @@ opal_filter "File" do
   fails "File.ctime accepts an object that has a #to_path method" # Errno::ENOENT: No such file or directory
   fails "File.ctime returns the change time for the named file (the time at which directory information about the file was changed, not the file itself)." # Errno::ENOENT: No such file or directory
   fails "File.delete raises an Errno::ENOENT when the given file doesn't exist" # Expected Errno::ENOENT but no exception was raised (1 was returned)
+  fails "File.directory? calls #to_io to convert a non-IO object" # Exception: undefined is not an object (evaluating 'path[0]')
+  fails "File.directory? returns false if the argument is an IO that's not a directory" # Exception: undefined is not an object (evaluating 'path[0]')
   fails "File.directory? returns true if the argument is an IO that is a directory" # Errno::EISDIR: Is a directory
   fails "File.empty? returns true for /dev/null" # Expected false == true to be truthy but was false
   fails "File.executable? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
@@ -41,13 +43,19 @@ opal_filter "File" do
   fails "File.exist? returns true if the file exist" # Expected false == true to be truthy but was false
   fails "File.expand_path does not modify the string argument" # Expected "/a/c" == "//a/c" to be truthy but was false
   fails "File.expand_path expands a path with multi-byte characters" # Expected "/Ångström" == "//Ångström" to be truthy but was false
+  fails "File.expand_path raises an ArgumentError if the path is not valid" # Expected ArgumentError but no exception was raised ("/Users/jan" was returned)
+  fails "File.expand_path raises an Encoding::CompatibilityError if the external encoding is not compatible" # Expected CompatibilityError but no exception was raised ("/a" was returned)
   fails "File.expand_path returns a String when passed a String subclass" # Expected "/a/c" == "//a/c" to be truthy but was false
   fails "File.expand_path when HOME is not set raises an ArgumentError when passed '~' if HOME == ''" # Expected ArgumentError but no exception was raised ("/" was returned)
+  fails "File.extname for a filename ending with a dot returns '.'" # Expected "" == "." to be truthy but was false
+  fails "File.ftype returns 'characterSpecial' when the file is a char" # RuntimeError: Could not find a character device
   fails "File.ftype returns 'link' when the file is a link" # Errno::ENOENT: No such file or directory
+  fails "File.ftype returns 'socket' when the file is a socket" # NameError: uninitialized constant FileSpecs::UNIXServer
   fails "File.ftype returns fifo when the file is a fifo" # NoMethodError: undefined method `~' for nil
   fails "File.identical? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
   fails "File.identical? returns true for a file and its link" # Expected false == true to be truthy but was false
   fails "File.identical? returns true if both named files are identical" # Exception: Cannot read properties of undefined (reading '$==')
+  fails "File.lchmod changes the file mode of the link and not of the file" # Errno::ENOENT: No such file or directory
   fails "File.link link a file with another" # Expected File.exist? "//tmp/rubyspec_temp/file_link.lnk" to be truthy but was false
   fails "File.link raises an Errno::EEXIST if the target already exists" # Expected Errno::EEXIST but no exception was raised (0 was returned)
   fails "File.lstat returns a File::Stat object with symlink properties for a symlink" # Errno::ENOENT: No such file or directory
@@ -55,10 +63,13 @@ opal_filter "File" do
   fails "File.lutime sets the access and modification time for a symlink" # Errno::ENOENT: No such file or directory
   fails "File.mkfifo creates a FIFO file at the passed path" # NoMethodError: undefined method `~' for nil
   fails "File.mkfifo creates a FIFO file with a default mode of 0666 & ~umask" # NoMethodError: undefined method `~' for nil
+  fails "File.mkfifo creates a FIFO file with passed mode & ~umask" # Errno::ENOENT: No such file or directory
   fails "File.mkfifo returns 0 after creating the FIFO file" # NoMethodError: undefined method `~' for nil
   fails "File.mkfifo when path does not exist raises an Errno::ENOENT exception" # Expected Errno::ENOENT but got: NoMethodError (undefined method `~' for nil)
+  fails "File.mkfifo when path passed is not a String value raises a TypeError" # Expected TypeError but got: NoMethodError (undefined method `~' for nil)
   fails "File.mkfifo when path passed responds to :to_path creates a FIFO file at the path specified" # NoMethodError: undefined method `~' for nil
   fails "File.mtime returns the modification Time of the file" # Expected 1970-01-01 01:00:00 +0100 to be within 2025-04-10 03:14:44 +0200 +/- 20
+  fails "File.new can't alter mode or permissions when opening a file" # Expected Errno::EINVAL but no exception was raised (false was returned)
   fails "File.new creates a new file when use File::EXCL mode" # Errno::EEXIST: File exists
   fails "File.new opens directories" # Errno::EISDIR: Is a directory
   fails "File.new returns a new File with modus num and permissions" # Expected "0" == "100744" to be truthy but was false
@@ -66,6 +77,7 @@ opal_filter "File" do
   fails "File.open can read in a block when call open with File::EXCL mode" # Errno::EEXIST: File exists
   fails "File.open can't read in a block when call open with File::EXCL mode" # Expected IOError but got: Errno::EEXIST (File exists)
   fails "File.open creates a new write-only file when invoked with 'w' and '0222'" # Expected false == true to be truthy but was false
+  fails "File.open on a FIFO opens it as a normal file" # NoMethodError: undefined method `~' for nil
   fails "File.open opens a file when use File::WRONLY|File::APPEND mode" # Expected  "bye file " ==  "hello file " to be truthy but was false
   fails "File.open opens directories" # Errno::EISDIR: Is a directory
   fails "File.open opens the file when passed mode, num and permissions" # Expected "0" == "100744" to be truthy but was false
@@ -103,6 +115,7 @@ opal_filter "File" do
   fails "File.rename raises an Errno::ENOENT if the source does not exist" # Expected Errno::ENOENT but no exception was raised (0 was returned)
   fails "File.rename renames a file" # Expected File.exist? "//tmp/rubyspec_temp/file_rename.txt" to be falsy but was true
   fails "File.setuid? returns true when the gid bit is set" # Exception: Cannot read properties of undefined (reading '$==')
+  fails "File.socket? returns true if the file is a socket" # NameError: uninitialized constant UNIXServer
   fails "File.stat returns a File::Stat object with file properties for a symlink" # Errno::ENOENT: No such file or directory
   fails "File.stat returns an error when given missing non-ASCII path" # Expected "No such file or directory" to include "/missingfilepath\xE3E4"
   fails "File.stat returns information for a file that has been deleted but is still open" # Errno::ENOENT: No such file or directory
@@ -144,7 +157,9 @@ opal_filter "File" do
   fails "File::Stat#executable_real? returns true if the file its an executable" # Expected false == true to be truthy but was false
   fails "File::Stat#file? returns true if the named file exists and is a regular file." # Errno::ENOENT: No such file or directory
   fails "File::Stat#file? returns true if the null device exists and is a regular file." # Errno::ENOENT: No such file or directory
+  fails "File::Stat#ftype returns 'characterSpecial' when the file is a char" # RuntimeError: Could not find a character device
   fails "File::Stat#ftype returns 'link' when the file is a link" # Errno::ENOENT: No such file or directory
+  fails "File::Stat#ftype returns 'socket' when the file is a socket" # NameError: uninitialized constant SocketSpecs::Socket
   fails "File::Stat#ftype returns fifo when the file is a fifo" # NoMethodError: undefined method `~' for nil
   fails "File::Stat#ino returns the ino of a File::Stat object" # Exception: Cannot read properties of undefined (reading '$should')
   fails "File::Stat#mode returns the mode of a File::Stat object" # Expected 0 == 420 to be truthy but was false
@@ -170,4 +185,30 @@ opal_filter "File" do
   fails "File::Stat.world_readable? returns an Integer if the file is chmod 644" # Expected nil (NilClass) to be an instance of Integer
   fails "File::Stat.world_writable? returns an Integer if the file is a directory and chmod 777" # Expected nil (NilClass) to be an instance of Integer
   fails "File::Stat.world_writable? returns an Integer if the file is chmod 777" # Expected nil (NilClass) to be an instance of Integer
+  fails "FileTest.directory? calls #to_io to convert a non-IO object" # Exception: undefined is not an object (evaluating 'path[0]')
+  fails "FileTest.directory? returns false if the argument is an IO that's not a directory" # Exception: undefined is not an object (evaluating 'path[0]')
+  fails "FileTest.directory? returns true if the argument is an IO that is a directory" # Errno::EISDIR: Is a directory
+  fails "FileTest.executable? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
+  fails "FileTest.executable? returns true if named file is executable by the effective user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.executable? returns true if the argument is an executable file" # Expected false == true to be truthy but was false
+  fails "FileTest.executable_real? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
+  fails "FileTest.executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.executable_real? returns true if the file its an executable" # Expected false == true to be truthy but was false
+  fails "FileTest.exist? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
+  fails "FileTest.exist? returns true if the file exist" # Expected false == true to be truthy but was false
+  fails "FileTest.identical? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
+  fails "FileTest.identical? returns true for a file and its link" # Expected false == true to be truthy but was false
+  fails "FileTest.identical? returns true if both named files are identical" # Expected false to be true
+  fails "FileTest.readable? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
+  fails "FileTest.readable? returns true if named file is readable by the effective user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.readable_real? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
+  fails "FileTest.readable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.sticky? returns true if the named file has the sticky bit, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.symlink? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
+  fails "FileTest.symlink? returns true if the file is a link" # Expected false == true to be truthy but was false
+  fails "FileTest.writable? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
+  fails "FileTest.writable? returns true if named file is writable by the effective user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.writable_real? accepts an object that has a #to_path method" # Expected false == true to be truthy but was false
+  fails "FileTest.writable_real? returns true if named file is writable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.zero? returns true for /dev/null" # Expected false == true to be truthy but was false
 end

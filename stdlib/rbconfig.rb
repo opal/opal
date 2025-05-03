@@ -18,4 +18,4 @@ module RbConfig
 end
 
 # required for mspec it would appear
-RUBY_EXE = 'bundle exec opal'
+RUBY_EXE = "bundle exec opal -R#{OPAL_PLATFORM}"

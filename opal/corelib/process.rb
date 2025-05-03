@@ -22,19 +22,11 @@ module ::Process
 
     def argv0
       # Returns the name of the script being executed.
-      ARGV[0]
+      `$platform.argv[0]`.freeze
     end
 
-    def clock_getres(clock_id, unit = :float_second)
-      # Returns a clock resolution as determined by POSIX function clock_getres():
-      raise NotImplementedError
-    end
-
-    def clock_gettime(clock_id, unit = :float_second)
-      (clock = @__clocks__[clock_id]) || ::Kernel.raise(::Errno::EINVAL, "clock_gettime(#{clock_id}) #{@__clocks__[clock_id]}")
-      unit ||= :float_second
-      %x{
-        var ms = clock();
+    %x{
+      function clock_unit_ms(unit, ms) {
         switch (unit) {
           case 'float_second':      return  (ms / 1000);         // number of seconds as a float (default)
           case 'float_millisecond': return  (ms / 1);            // number of milliseconds as a float
@@ -43,9 +35,33 @@ module ::Process
           case 'millisecond':       return ((ms / 1)       | 0); // number of milliseconds as an integer
           case 'microsecond':       return ((ms * 1000)    | 0); // number of microseconds as an integer
           case 'nanosecond':        return ((ms * 1000000) | 0); // number of nanoseconds as an integer
-          default: #{::Kernel.raise ::ArgumentError, "unexpected unit: #{unit}"}
+          default: #{::Kernel.raise ::ArgumentError, "unexpected unit: #{`unit`}"}
         }
       }
+    }
+
+    def clock_getres(clock_id, unit = :float_second)
+      # Returns a clock resolution as determined by POSIX function clock_getres():
+      ms = case clock_id
+           when :CLOCK_REALTIME then 1
+           when :CLOCK_MONOTONIC then 1
+           else
+             raise ::Errno::EINVAL, 'unknown clock_id'
+           end
+      `clock_unit_ms(unit, ms)`
+    end
+
+    def clock_gettime(clock_id, unit = :float_second)
+      id = if clock_id.is_a?(::Symbol)
+             const_get(clock_id) rescue nil
+           else
+             clock_id
+           end
+      clock = @__clocks__[id] if id
+      ::Kernel.raise(::Errno::EINVAL, "clock_gettime(#{clock_id})") unless clock
+
+      unit ||= :float_second
+      `clock_unit_ms(unit, clock())`
     end
 
     # Detaches the current process from its controlling terminal and runs
@@ -87,7 +103,7 @@ module ::Process
       # Replaces the current process by doing one of the following:
       env = {}
       env = argv.shift if argv.first.is_a? ::Hash
-      env = ::ENV.merge(env)
+      env = ::ENV.to_h.merge!(env)
       js_env = `{}`
       env.each { |k, v| `js_env[k] = v.toString()` }
       `delete js_env["SHELL"]`
@@ -333,7 +349,7 @@ module ::Process
         arg = coe_arg = nil
       end
 
-      env = ::ENV.merge(env)
+      env = ::ENV.to_h.merge!(env)
       js_env = `{}`
       env.each { |k, v| `js_env[k.toString()] = v.toString()` }
       `delete js_env["SHELL"]`
@@ -365,7 +381,7 @@ module ::Process
       # Returns a Process::Tms structure that contains user and system CPU times
       # for the current process, and for its children processes
       t = ::Time.now.to_f
-      ::Benchmark::Tms.new(t, t, t, t, t)
+      ::Process::Tms.new(t, t, t, t)
     end
 
     def uid
