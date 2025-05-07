@@ -228,6 +228,19 @@ module Opal
         line = @sexp.loc.line
         "['#{file}', #{line}]"
       end
+
+      def node_has?(node, type)
+        # look ahead if a child with specified type is in the tree
+        if node
+          node.children.each do |child|
+            if child.is_a?(::AST::Node) || child.is_a?(::Opal::Nodes::Base)
+              return true if child.type == type
+              return true if node_has?(child, type)
+            end
+          end
+        end
+        false
+      end
     end
   end
 end
