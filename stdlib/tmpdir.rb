@@ -59,7 +59,7 @@ class ::Dir
       unless base
         base = ::File.dirname(path)
         stat = ::File.stat(base)
-        if stat.world_writable? and !stat.sticky?
+        if stat.world_writable? and `!$platform.windows` && !stat.sticky?
           raise ::ArgumentError, "parent directory is world writable but not sticky: #{base}"
         end
       end

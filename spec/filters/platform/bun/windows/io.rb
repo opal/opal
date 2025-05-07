@@ -22,6 +22,10 @@ opal_filter "IO" do
   fails "IO.binwrite returns the number of bytes written" # Errno::EACCES: Permission denied
   fails "IO.binwrite truncates if empty :opts provided and offset skipped" # Errno::EACCES: Permission denied
   fails "IO.binwrite truncates the file and writes the given string" # Errno::EACCES: Permission denied
+  fails "IO.popen raises IOError when writing a read-only pipe" # Expected  "foo\r " ==  "foo " to be truthy but was false
+  fails "IO.popen reads a read-only pipe" # Expected  "foo\r " ==  "foo " to be truthy but was false
+  fails "IO.popen with a leading ENV Hash accepts a single String command" # Expected  "bar\r " ==  "bar " to be truthy but was false
+  fails "IO.popen with a leading ENV Hash accepts a single String command, and an IO mode" # Expected  "bar\r " ==  "bar " to be truthy but was false
   fails "IO.write disregards other options if :open_args is given" # Expected "01hi" == "\u0000\u0000hi" to be truthy but was false
   fails "IO.write writes the file with the permissions in the :perm parameter" # Errno::EACCES: Permission denied
 end

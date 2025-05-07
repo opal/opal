@@ -78,6 +78,7 @@ opal_filter "Encoding" do
   fails "Ruby String interpolation raises an Encoding::CompatibilityError if the Encodings are not compatible" # Expected CompatibilityError but no exception was raised ("あ ÿ" was returned)
   fails "Source files encoded in UTF-16 BE with a BOM are invalid because they contain an invalid UTF-8 sequence before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x49e4c>
   fails "Source files encoded in UTF-16 LE with a BOM are invalid because they contain an invalid UTF-8 sequence before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x49e4c>
+  fails "Source files encoded in UTF-16 LE without a BOM are parsed as empty because they contain a NUL byte before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9a8a0>
   fails "String#* raises an ArgumentError if the length of the resulting string doesn't fit into a long" # Expected ArgumentError but got: RangeError (multiply count must not overflow maximum string size)
   fails "String#[]= with String index encodes the String in an encoding compatible with the replacement" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with String index raises an Encoding::CompatibilityError if the replacement encoding is incompatible" # NameError: uninitialized constant Encoding::EUC_JP

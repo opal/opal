@@ -79,24 +79,9 @@ module Opal
     register_runner :edge,        :Edge,        'opal/cli_runners/edge'
     register_runner :firefox,     :Firefox,     'opal/cli_runners/firefox'
     register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
-    register_runner :quickjs,     :Quickjs,     'opal/cli_runners/quickjs'
+    register_runner :safari,      :Safari,      'opal/cli_runners/safari' if OS.macos?
     register_runner :server,      :Server,      'opal/cli_runners/server'
 
     alias_runner :node, :nodejs
-
-    if !OS.windows? && !OS.macos?
-      register_runner :cjs,       :Cjs,         'opal/cli_runners/cjs'
-      register_runner :gjs,       :Gjs,         'opal/cli_runners/gjs'
-    end
-
-    unless OS.windows?
-      register_runner :miniracer, :MiniRacer,   'opal/cli_runners/mini_racer'
-    end
-
-    if OS.macos?
-      register_runner :osascript, :OSAScript,   'opal/cli_runners/osascript'
-      register_runner :safari,    :Safari,      'opal/cli_runners/safari'
-      alias_runner :applescript, :osascript
-    end
   end
 end

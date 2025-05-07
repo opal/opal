@@ -596,7 +596,7 @@ module Opal
         if backtick_javascript?
           sexp.updated(nil, [s(:js_return, *sexp.children)])
         else
-          sexp
+          sexp.updated(:js_return, [sexp])
         end
       when :if
         cond, true_body, false_body = *sexp

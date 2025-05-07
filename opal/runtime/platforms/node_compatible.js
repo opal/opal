@@ -8,6 +8,7 @@ if (["bun", "deno", "graalnodejs", "node"].includes(Opal.platform.name)) {
 Opal.queue(async function() {
 
 const platform = Opal.platform;
+const not_available = platform.not_available;
 
 // imports
 const child_process = await import("node:child_process");
@@ -22,10 +23,7 @@ const url = await import("node:url");
 platform.modules = { child_process, fs, os, path, url };
 
 // Helpers
-function not_available(fun) {
-  platform.handle_unsupported_feature(fun + " is not available on node, deno or bun");
-  return Opal.nil;
-}
+
 // IO helper function to raise correct Ruby Error instead of platform specific error
 function action(action, ...args) {
   try { return action(...args); }
@@ -61,16 +59,17 @@ if (os.platform().startsWith("win")) {
   platform.path_sep = ";";
 } else {
   if (os.platform().includes("linux")) platform.ruby_platform = "opal linux";
-  else if (os.platform().includes("darwin")) platform.ruby_platform = "opal darwin";
-  else platform.ruby_platform = "opal";
-  platform.windows = false;
+  else if (os.platform().includes("darwin")) {
+    platform.ruby_platform = "opal darwin";
+    platform.macos = true;
+  } else platform.ruby_platform = "opal";
   platform.fs_casefold = false
   platform.null_device = "/dev/null";
   platform.sysconfdir = "/etc"
   platform.path_sep = ":";
 }
 platform.sep = path.sep;
-platform.deno = Opal.platform.name.includes("deno");
+platform.deno = Opal.platform.name == "deno";
 
 // Some platform info
 platform.available_parallelism = os.availableParallelism;
@@ -80,6 +79,18 @@ platform.release = os.release;
 platform.sysname = os.type;
 platform.tmpdir = ()=>os.tmpdir().replaceAll(path.sep, '/');
 platform.version = os.version;
+
+// TextDecoder
+if (platform.deno || Opal.platform.name == "bun") {
+  // Bun and Deno produce codepoints beyond 0xFF with a ascii decoder, which results in illegal ascii strings.
+  // So lets use our shiny Opal quality custom decoder for ascii.
+  platform.text_decoder = function (label, options) {
+    if (label == 'ascii') return new Opal.generic_text_decoder(label, options);
+    return new TextDecoder(label, options);
+  }
+} else {
+  platform.text_decoder = TextDecoder;
+}
 
 // Exit
 platform.exit = process.exit;
@@ -163,10 +174,11 @@ platform.process_is_primary = ()=>cluster.isPrimary;
 platform.process_is_worker = ()=>cluster.isWorker;
 platform.process_fork = ()=>cluster.fork();
 platform.process_worker_pid = (worker)=>worker.process.pid;
-platform.process_exec = ()=>not_available("Kernel#exec");
 platform.process_spawn = function() {
   let res, opts = arguments[arguments.length - 1], wait = opts.wait;
   delete opts.wait;
+  if (platform.windows) opts.windowsHide = true;
+  else opts.shell = 'sh';
   if (opts.cwd) opts.cwd = opts.cwd.toString();
   if (wait) {
     res = child_process.spawnSync.apply(null, ary_toString(arguments));
@@ -187,8 +199,6 @@ platform.process_trap = (signal, command, block)=>{
   process.on(signal, (_s)=>{ if (block) block.$call(); })
   return last;
 }
-platform.process_wait = ()=>not_available("Process#wait");
-platform.process_waitall = ()=>not_available("Process#waitall");
 
 // IO.pipe
 // In process pipe, because Nodejs does not support real pipes synchonously, so lets emulate them.
@@ -364,7 +374,8 @@ platform.io_popen = function(cmd, args, mode, options) {
 
 // IO
 function emulate_ctx(c, t, x , path_name, perm) {
-  if (c && x) Opal.Kernel.$raise(Opal.Errno.EEXIST, "file already exists, open '" + path_name + "'");
+  if (c && x && fs.existsSync(path_name))
+    Opal.Kernel.$raise(Opal.Errno.EEXIST, "file already exists, open '" + path_name + "'");
   if (c && !fs.existsSync(path_name)) fs.writeFileSync(path_name, '', { mode: perm });
   if (!c || x) platform.file_stat(path_name); // will raise if file doesn't exist
   if (t) platform.file_truncate(path_name, 0);
@@ -414,8 +425,14 @@ platform.io_close = (fd)=>{
 platform.io_fdatasync = (fd)=>{ if (fd > 2) action(fs.fdatasyncSync, fd); }
 platform.io_fstat = (fd)=>action(fs.fstatSync, fd);
 platform.io_fsync = (fd)=>{ if (fd > 2) action(fs.fsyncSync, fd); }
-platform.io_ioctl = (_cmd, _arg)=>not_available("IO#ioctl");
-platform.io_open = (fd)=>{ return fd < 3 ? true : false };
+platform.io_open = (fd)=>{
+  switch (fd) {
+    case 0: return process.stdin.isTTY;
+    case 1: return process.stdout.isTTY;
+    case 2: return process.stderr.isTTY;
+  }
+  return false;
+ };
 platform.io_open_path = (path_name, flags, perm)=>{
   path_name = path_name.toString();
   let mode = flags_to_mode(flags);
@@ -460,14 +477,12 @@ platform.file_fchown = (fd, uid, gid)=>{
   if (!fs.fchownSync) Opal.Kernel.$raise(Opal.NotImplementedError, "File#chown is not available on " + platform.name);
   action(fs.fchownSync, fd, uid, gid);
 }
-platform.file_flock = (_fd, _lock)=>not_available("File#flock");
 platform.file_ftruncate = (fd, len)=>action(fs.ftruncateSync, fd, len);
 platform.file_get_umask = ()=>file_umask; // process.umask() without args in node is deprecated, lets emulate
 platform.file_set_umask = function(umask) {
   file_umask = umask;
   return process.umask(umask);
 }
-platform.file_lchmod = (_file_name, _mode)=>not_available("File.lchmod");
 platform.file_link = (path_name, new_path_name)=>action(fs.linkSync, path_name.toString(), new_path_name.toString());
 platform.file_lstat = (file_name)=>action(fs.lstatSync, file_name.toString());
 platform.file_lutime = (file_name, atime, mtime)=>action(fs.lutimesSync, file_name.toString(), atime, mtime);
@@ -478,7 +493,7 @@ platform.file_mkfifo = (file_name, mode)=>{
   let res = child_process.spawnSync('mkfifo', ['-m', mode_s, file_name.toString()]);
   return res.status;
 }
-platform.file_readlink = (path_name)=>action(fs.readlinkSync, path_name.toString());
+platform.file_readlink = (path_name)=>action(fs.readlinkSync, path_name.toString()).replaceAll(path.sep, '/');
 platform.file_realpath = (path_name, sep)=>{
   return action(fs.realpathSync, path_name.toString()).replaceAll(path.sep, sep.toString());
 }
@@ -498,7 +513,6 @@ platform.file_utime = (file_name, atime, mtime)=>action(fs.utimesSync, file_name
 // like above in Pipe.get_fd(), which is a bit overkill.
 let directories = { __proto__: null, last: 0 }
 platform.dir_chdir = (dir_name)=>action(process.chdir, dir_name.toString());
-platform.dir_chroot = (_dir_name)=>not_available("Dir.chroot");
 platform.dir_close = (fd)=>{
   let dir = directories[fd];
   if (!dir) { return; }
@@ -516,7 +530,7 @@ platform.dir_mkdir = (dir_name, mode)=>{
   dir_name = dir_name.toString()
   action(fs.mkdirSync, dir_name, { mode: mode });
   // Deno and other engines on Windows don't set mode correctly in mkdirSync
-  fs.chmodSync(dir_name, mode);
+  if (platform.windows) fs.chmodSync(dir_name, mode);
 }
 platform.dir_next = (fd)=>{
   let dir = directories[fd];

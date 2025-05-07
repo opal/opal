@@ -2,23 +2,19 @@
 opal_filter "File" do
   fails "File#chmod with '0444' makes file readable and executable but not writable" # NotImplementedError: File#chmod is not available on deno
   fails "File#chmod with '0644' makes file readable and writable and also executable" # NotImplementedError: File#chmod is not available on deno
+  fails "File.atime returns the last access time for the named file with microseconds" # Errno::ENOENT: No such file or directory - stat -c%x 'ruby/core/file/atime_spec.rb'
   fails "File.chmod with '0444' makes file readable and executable but not writable" # Expected true == false to be truthy but was false
   fails "File.chmod with '0644' makes file readable and writable and also executable" # Expected false == true to be truthy but was false
   fails "File.chown accepts an object that has a #to_path method" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\file_chown_test'
   fails "File.chown returns the number of files processed" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\file_chown_test'
+  fails "File.ctime returns the change time for the named file (the time at which directory information about the file was changed, not the file itself) with microseconds." # Errno::ENOENT: No such file or directory - stat -c%z 'ruby/core/file/ctime_spec.rb'
   fails "File.directory? calls #to_io to convert a non-IO object" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
   fails "File.directory? returns false if the argument is an IO that's not a directory" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
   fails "File.executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
-  fails "File.expand_path converts a pathname to an absolute pathname" # Expected "C:/Users/Administrator/workspace/opal/spec" == nil to be truthy but was false
-  fails "File.expand_path converts a pathname to an absolute pathname, Ruby-Talk:18512" # TypeError: no implicit conversion of NilClass into String
-  fails "File.expand_path converts a pathname to an absolute pathname, using a complete path" # Expected "C:/Users/Administrator/workspace/opal/spec" == "" to be truthy but was false
-  fails "File.expand_path does not modify the string argument" # Expected "C:/Users/Administrator/workspace/opal/spec/a/c" == "/a/c" to be truthy but was false
-  fails "File.expand_path expands a path with multi-byte characters" # Expected "C:/Users/Administrator/workspace/opal/spec/Ångsström" == "/Ångström" to be truthy but was false
-  fails "File.expand_path returns a String in the same encoding as the argument" # FrozenError: can't modify frozen String
-  fails "File.expand_path returns a String when passed a String subclass" # Expected "C:/Users/Administrator/workspace/opal/spec/a/c" == "/a/c" to be truthy but was false
   fails "File.grpowned? returns false if file the does not exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
   fails "File.grpowned? returns false if the file exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
   fails "File.identical? returns true if both named files are identical" # Expected true to be false
+  fails "File.mtime returns the modification Time of the file with microseconds" # Errno::ENOENT: No such file or directory - stat -c%y 'ruby/core/file/mtime_spec.rb'
   fails "File.owned? returns true if the file exist and is owned by the user" # Expected false == true to be truthy but was false
   fails "File.umask returns the current umask value for this process (basic)" # Expected 18 == 0 to be truthy but was false
   fails "File.umask returns the current umask value for this process" # Expected 6 == 0 to be truthy but was false

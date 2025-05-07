@@ -647,15 +647,46 @@ class ::Dir
     def home(user_name = nil)
       # Returns the home directory path of the user specified with user_name if it is not nil, or the current login user
       if user_name
-        ::File.open('/etc/passwd', 'r') do |passwd_file|
-          passwd_file.each_line do |entry|
-            next if entry.start_with?('#')
-            name_s, _passwd, _uid_s, _gid_s, _gecos, h, _shell = entry.split(':')
-            return h if name_s == user_name
+        if `$platform.windows`
+          if `!user_name.match(/['"()]/)`
+            h = ::Kernel.send('`', "powershell.exe -Command \"(Get-CimInstance Win32_UserProfile -Filter \"\"\"SID = '$((Get-LocalUser #{user_name}).Sid)'\"\"\").LocalPath\" 2>&1").lines[0].chomp
+            return `$str(#{h.gsub('\\', '/')})` unless h.empty? || h.start_with?('Get-')
+          end
+        else
+          # On macOS we need to check /etc/passwd, which contains some system internal users but not regular users
+          # and the directory service, which contains regular users but not all system internal users.
+          # We need to check /etc/passwd first, because otherwise there may be an error.
+          if ::File.exist?('/etc/passwd')
+            ::File.open('/etc/passwd', 'r') do |passwd_file|
+              passwd_file.each_line do |entry|
+                next if entry.start_with?('#')
+                name_s, _passwd, _uid_s, _gid_s, _gecos, h, _shell = entry.split(':')
+                return h if name_s == user_name
+              end
+            end
+          end
+          if `$platform.macos`
+            if `!user_name.match(/[\.\/\\]/)`
+              # Users may have multiple home directories registered in the directory service on macOS, take the first.
+              h_lines = ::Kernel.send('`', "dscl . read /Users/#{user_name} NFSHomeDirectory 2>&1").lines
+              info, h = h_lines[0].chomp.split(':')
+              if `!info.match(/error/i)`
+                # multiple directories may come in one line or in multiple lines, in any case, take the first
+                h = h.sub(/^\s+/, '').sub(/\s$/, '')
+                h, _ = h.split(' ') if h_lines.size == 1
+                return `$str(h)`
+              end
+            end
           end
         end
+        raise(::ArgumentError, "user #{user_name} not found")
       else
-        h = ::ENV['HOME'] || `$platform.dir_home()` || '.'
+        h = ::ENV['HOME']
+        if `$platform.windows`
+          h ||= ENV['USERPROFILE']
+          h = ENV['HOMEDRIVE'] + ENV['HOMEPATH'] if !h && ENV['HOMEDRIVE'] && ENV['HOMEPATH']
+        end
+        h ||= `$platform.dir_home()` || '.'
         h = h.gsub('\\', '/') if `$platform.windows`
         `$str(h)`
       end

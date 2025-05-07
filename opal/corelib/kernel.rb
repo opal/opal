@@ -19,7 +19,11 @@ module ::Kernel
     pid = `out.pid == null ? nil : out.pid`
     $? = ::Process::Status.new(status, pid)
 
-    raise ::Errno::ENOENT if `out.status == 126 || out.status == 127`
+    if `out.status == 126 || out.status == 127` ||
+      (`$platform.windows` && `out.stderr.includes("is not recognized as an internal or external command")`)
+      # Windows sadly returns only status code 1 if the command does not exist, so we need to check stderr
+      raise ::Errno::ENOENT, cmdline
+    end
 
     $stderr.write(`out.stderr`) if `out.stderr`
     `Opal.str(out.stdout, #{::Encoding.default_external})`
@@ -689,13 +693,14 @@ module ::Kernel
     args = []
 
     shell = if ::File.absolute_path?(cmdname)
-              while argv[0].is_a?(::String)
-                args << argv.shift
-              end
               false
             else
               true
             end
+
+    while argv[0].is_a?(::String)
+      args << argv.shift
+    end
 
     opts = argv.shift
 
@@ -722,7 +727,11 @@ module ::Kernel
     return nil if `out.error || out.status > 125`
 
     (so || $stdout).write(`out.stdout`) if `out.stdout`
-    (se || $stderr).write(`out.stderr`) if `out.stderr`
+    if `out.stderr`
+      if (`$platform.windows` && se != 'NUL') || (`!$platform.windows` && se != '/dev/null')
+        (se || $stderr).write(`out.stderr`)
+      end
+    end
 
     status == 0
   end

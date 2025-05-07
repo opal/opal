@@ -587,7 +587,7 @@ module FileUtils
       while c = comp.shift
         if c == ".." and clean.last != ".." and !(fu_have_symlink && ::File.symlink?(path))
           clean.pop
-          path.chomp!(%r((?<=\A|/)[^/]+/\z), "")
+          path = path.chomp(%r((?<=\A|/)[^/]+/\z), "")
         else
           clean << c
           path += c + "/"
@@ -827,7 +827,7 @@ module FileUtils
       remove_entry path, force
       return
     end
-    unless parent_st.sticky?
+    unless `Opal.platform.windows` || parent_st.sticky?
       raise ArgumentError, "parent directory is world writable, FileUtils#remove_entry_secure does not work; abort: #{path.inspect} (parent directory mode #{'%o' % parent_st.mode})"
     end
 

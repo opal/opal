@@ -13,8 +13,9 @@ $/ = "\n"
 $, = nil
 $. = 0
 $0 = `Opal.platform.argv[0]`
-
-::ARGV = `Opal.platform.argv.slice(1)`
+$$ = `Opal.platform.process_pid()`
+$? = nil
+$* = ::ARGV = `Opal.platform.argv.slice(1)`
 
 $VERBOSE = false
 $DEBUG   = false

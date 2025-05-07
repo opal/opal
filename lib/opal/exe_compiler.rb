@@ -7,7 +7,7 @@ require 'opal/os'
 module Opal
   class ExeCompiler
     RUNTIMES = -> {
-      types = %w[bun deno node quickjs]
+      types = %w[bun deno node]
       types.freeze
     }.call
 
@@ -107,12 +107,6 @@ module Opal
       append_exe_to_out_path_on_windows
       FileUtils.cp(File.join(dir, 'node_copy.exe'), @out_path)
       true
-    end
-
-    def compile_quickjs_exe(src_path, _dir)
-      append_exe_to_out_path_on_windows
-      # '-flto', '-fbignum' might be useful options, depending on quickjs version/build
-      system('qjsc', '-o', @out_path, src_path)
     end
   end
 end

@@ -181,12 +181,12 @@ end
   const SFCC = String.fromCharCode;
 
   function scrubbing_decoder(enc, label) {
-    if (!enc.scrubbing_decoder) enc.scrubbing_decoder = new TextDecoder(label, { fatal: false });
+    if (!enc.scrubbing_decoder) enc.scrubbing_decoder = new Opal.platform.text_decoder(label, { fatal: false });
     return enc.scrubbing_decoder;
   }
 
   function validating_decoder(enc, label) {
-    if (!enc.validating_decoder) enc.validating_decoder = new TextDecoder(label, { fatal: true });
+    if (!enc.validating_decoder) enc.validating_decoder = new Opal.platform.text_decoder(label, { fatal: true });
     return enc.validating_decoder;
   }
 }

@@ -7,6 +7,8 @@ Opal.queue(async function() {
 
 // used vars
 const platform = Opal.platform;
+const not_available = platform.not_avaialable;
+
 let fd_paths = { __proto__: null, fd: 3 },
     text_decoder = new TextDecoder('utf8'),
     vsvfs;
@@ -22,11 +24,7 @@ function get_vfs() {
     return vsvfs;
   }
 }
-// help to present the correct message for a missing feature
-function not_available(fun) {
-  platform.handle_unsupported_feature(fun + " is not available on " + platform.name);
-  return Opal.nil;
-}
+
 function raise_errno(errno, error) {
     // Errno is autoloaded, to make sure it gets loaded eventually, must use const_get here
     if (Opal.Object.$const_get('Errno').$constants().indexOf(errno) >= 0) {
@@ -59,15 +57,8 @@ if (navigator.userAgent.includes("Windows")) {
   platform.path_sep = ":";
 }
 
-
 // Some platform info
-platform.available_parallelism = ()=>1;
-platform.machine = ()=>"unknown";
-platform.nodename = ()=>"unknown";
-platform.release = ()=>"unknown";
 platform.sysname = ()=>platform.name;
-platform.tmpdir = ()=>"/tmp";
-platform.version = ()=>"unknown";
 
 // Exit
 platform.exit = function(status) {
@@ -95,44 +86,21 @@ platform.env_has = (key)=>env[key.toString()] != null;
 platform.env_set = (key, value)=>env[key.toString()]=value.toString();
 
 // Process
-platform.process_getegid = ()=>-1;
-platform.process_setegid = ()=>-1;
-platform.process_geteuid = ()=>-1;
-platform.process_seteuid = ()=>-1;
-platform.process_getgid = ()=>-1;
-platform.process_setgid = ()=>-1;
-platform.process_getgroups = ()=>[];
-platform.process_getuid = ()=>-1;
-platform.process_setuid = ()=>-1;
-platform.process_sig_list = new Map();
-platform.process_kill = ()=>not_available("Proc.kill");
-platform.process_pid = ()=>not_available("Proc.pid");
-platform.process_ppid = ()=>not_available("Proc.ppid");
-platform.process_set_title = (_title)=>not_available("Proc.setproctitle");
-platform.process_is_primary = ()=>not_available("#fork");
-platform.process_is_worker = ()=>not_available("#fork");
-platform.process_fork = ()=>not_available("#fork");
-platform.process_worker_pid = (_worker)=>not_available("#fork");
-platform.process_exec = (_cmd)=>not_available("#`");
-platform.process_spawn = ()=>not_available("#system");
+// set in unknown.js
 
 // IO.pipe
-platform.io_pipe = ()=>not_available("IO.pipe");
-platform.io_pipe_eof = ()=>not_available("IO#eof for pipes");
+// set in unknown.js
 
 // IO.popen
-platform.io_popen = ()=>not_available("IO.popen");
+// set in unknown.js
 
 // IO
 platform.io_close = (fd)=>{ if (fd > 2) { delete fd_paths[fd]; }}
-platform.io_fdatasync = (_fd)=>not_available("IO#fdatasync");
 platform.io_fstat = (fd)=>{
   let vfs = get_vfs();
   if (vfs) return io_action(vfs, vfs.stat, fd_paths[fd]?.path);
   return not_available("IO#fstat");
 }
-platform.io_fsync = (_fd)=>not_available("IO#fsync");
-platform.io_ioctl = (_cmd, _arg)=>not_available("IO#ioctl");
 platform.io_open = (_fd)=>false;
 platform.io_open_path = (path_name, flags, _perm)=>{
   let vfs = get_vfs(), fd, stat, created = false;
@@ -194,11 +162,6 @@ platform.io_write = (fd, io_buffer, buffer_offset, pos, count)=>{
 };
 
 // File
-platform.file_chmod = (_file_name, _mode)=>not_available("File.chmod");
-platform.file_chown = (_file_name, _uid, _gid)=>not_available("File.chown");
-platform.file_fchmod = (_fd, _mode)=>not_available("File#chmod");
-platform.file_fchown = (_fd, _uid, _gid)=>not_available("File#chown");
-platform.file_flock = (_fd, _lock)=>not_available("File#flock");
 platform.file_ftruncate = (fd, len)=>{
   let vfs = get_vfs();
   if (vfs) {
@@ -207,26 +170,18 @@ platform.file_ftruncate = (fd, len)=>{
   }
   not_available("File#truncate");
 }
-platform.file_get_umask = ()=>not_available("File.umask");
-platform.file_set_umask = ()=>not_available("File.umask");
-platform.file_lchmod = (_file_name, _mode)=>not_available("File.lchmod");
-platform.file_link = (_path_name, _new_path_name)=>not_available("File.link");
 platform.file_lstat = (file_name)=>{
   let vfs = get_vfs();
   if (vfs) return io_action(vfs, vfs.stat, file_name.toString());
   return not_available("File.lstat");
 }
-platform.file_lutime = (_file_name, _atime, _mtime)=>not_available("File.lutime");
-platform.file_mkfifo = (_file_name, _mode)=>not_available("File.mkfifo");
-platform.file_readlink = (_path_name)=>not_available("File.readlink");
+
 platform.file_realpath = (path_name, _sep)=>path_name.toString();
-platform.file_rename = (_old_name, _new_name)=>not_available("File.rename");
 platform.file_stat = (file_name)=>{
   let vfs = get_vfs();
   if (vfs) return io_action(vfs, vfs.stat, file_name.toString());
   return not_available("File.stat");
 }
-platform.file_symlink = (_path_name, _new_path_name)=>not_available("File.symlink");
 platform.file_truncate = (file_name, len)=>{
   let vfs = get_vfs();
   if (vfs) {
@@ -243,7 +198,6 @@ platform.file_unlink = (file_name)=>{
   }
   return not_available("File.unlink");
 }
-platform.file_utime = (_file_name, _atime, _mtime)=>not_available("File.utime");
 
 // Dir
 platform.dir_chdir = (dir_name)=>{
@@ -251,7 +205,6 @@ platform.dir_chdir = (dir_name)=>{
   if (vfs) return io_action(vfs, vfs.chdir, dir_name.toString());
   return not_available("Dir.chdir");
 }
-platform.dir_chroot = (_dir_name)=>not_available("Dir.chroot");
 platform.dir_close = platform.io_close;
 platform.dir_home = ()=>'/';
 platform.dir_open = (dir_name)=>{

@@ -11,7 +11,10 @@ opal_filter "File" do
   fails "File.new can't alter mode or permissions when opening a file" # Expected Errno::EINVAL but no exception was raised (false was returned)
   fails "File.open on a FIFO opens it as a normal file" # NotImplementedError: Thread creation not available
   fails "File.socket? returns true if the file is a socket" # NameError: uninitialized constant UNIXServer
+  fails "File.sticky? returns true if the named file has the sticky bit, otherwise false" # Expected false == true to be truthy but was false
   fails "File::Stat#birthtime raises an NotImplementedError" # Expected NotImplementedError but no exception was raised (2025-04-18 04:54:15 -0000 was returned)
   fails "File::Stat#ftype returns 'characterSpecial' when the file is a char" # RuntimeError: Could not find a character device
   fails "File::Stat#ftype returns 'socket' when the file is a socket" # NameError: uninitialized constant FileSpecs::UNIXServer
+  fails "File::Stat#sticky? returns true if the named file has the sticky bit, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.sticky? returns true if the named file has the sticky bit, otherwise false" # Expected false == true to be truthy but was false
 end

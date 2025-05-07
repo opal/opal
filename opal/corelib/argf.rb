@@ -46,14 +46,14 @@
     !file || file.closed?
   end
 
-  def each(*args)
+  def each(sep = $/, limit = nil, chomp: false)
     # Returns an enumerator which iterates over each line (separated by sep,
     # which defaults to your platform’s newline character) of each file in ARGV.
     # If a block is supplied, each line in turn will be yielded to the block,
     # otherwise an enumerator is returned.
-    return enum_for(:each, *args) unless block_given?
+    return enum_for(:each, sep, limit, chomp: chomp) unless block_given?
     @processed = true
-    while ln = gets(*args)
+    while ln = gets(sep, limit, chomp: chomp)
       yield ln
     end
     self
@@ -169,16 +169,16 @@
     raise e
   end
 
-  def gets(*args)
+  def gets(sep = $/, limit = nil, chomp: false)
     # Returns the next line from the current file in ARGF.
     @processed = true
-    ln = file.gets(*args)
+    ln = file.gets(sep, limit, chomp: chomp)
     unless file == $stdin
       while ln.nil?
         last = file
         close
         return ln if last == file
-        ln = file.gets(*args)
+        ln = file.gets(sep, limit, chomp: chomp)
       end
       @lineno += 1 if ln
     end
@@ -288,22 +288,22 @@
     file.readchar
   end
 
-  def readline(*args)
+  def readline(sep = $/, limit = nil, chomp: false)
     # Returns the next line from the current file in ARGF.
     @processed = true
     begin
-      ln = file.readline(*args)
+      ln = file.readline(sep, limit, chomp: chomp)
     rescue EOFError => e
       raise e if argv.empty?
       close
-      ln = file.readline(*args)
+      ln = file.readline(sep, limit, chomp: chomp)
     end
     ln
   end
 
-  def readlines(*args)
+  def readlines(sep = $/, limit = nil, chomp: false)
     # Reads each file in ARGF in its entirety, returning an Array containing lines from the files.
-    each(*args).to_a
+    each(sep, limit, chomp: chomp).to_a
   end
 
   def readpartial(len, out_string = nil)

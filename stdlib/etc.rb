@@ -9,10 +9,7 @@ module Etc
   Passwd.include ::Enumerable
 
   class << self
-    def confstr(name)
-      # Returns system configuration variable using confstr().
-      nil
-    end
+    alias confstr __not_implemented__
 
     def endgrent
       # Ends the process of scanning through the /etc/group file begun by ::getgrent, and closes the file.
@@ -42,7 +39,7 @@ module Etc
       entry = @group_file.readline while entry.start_with?('#')
       if entry
         name, passwd, gid_s, users = entry.split(':')
-        Group.new(name, passwd, gid_s.to_i, users.split(','))
+        Group.new(name, passwd, gid_s.to_i, users.chomp.split(','))
       end
     rescue
       nil
@@ -57,7 +54,7 @@ module Etc
           next if entry.start_with?('#')
           name, passwd, gid_s, users = entry.split(':')
           gid_i = gid_s.to_i
-          return Group.new(name, passwd, gid_i, users.split(',')) if gid == gid_i
+          return Group.new(name, passwd, gid_i, users.chomp.split(',')) if gid == gid_i
         end
       end
       raise(::ArgumentError, "can't find group for #{gid}")
@@ -71,7 +68,7 @@ module Etc
         group_file.each_line do |entry|
           next if entry.start_with?('#')
           name_s, passwd, gid_s, users = entry.split(':')
-          return Group.new(name_s, passwd, gid_s.to_i, users.split(',')) if name == name_s
+          return Group.new(name_s, passwd, gid_s.to_i, users.chomp.split(',')) if name == name_s
         end
       end
       raise(::ArgumentError, "can't find group for #{name}")
@@ -80,10 +77,12 @@ module Etc
     def getlogin
       # Returns the short user name of the currently logged in user.
       # Unfortunately, it is often rather easy to fool ::getlogin.
-      return nil if `$platform.windows`
-      pw = getpwuid
-      return nil unless pw
-      pw[:name]
+      if `$platform.windows`
+        ENV['USER']
+      else
+        pw = getpwuid
+        pw[:name] if pw
+      end
     end
 
     def getpwent
@@ -96,7 +95,7 @@ module Etc
       entry = @passwd_file.readline while entry.start_with?('#')
       if entry
         name, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
-        Passwd.new(name, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell)
+        Passwd.new(name, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell.chomp)
       end
     rescue
       nil
@@ -104,31 +103,79 @@ module Etc
 
     def getpwnam(name)
       # Returns the /etc/passwd information for the user with specified login name.
-      return nil if `$platform.windows` || !::File.exist?('/etc/passwd')
+      return nil if `$platform.windows`
       name = ::Opal.coerce_to!(name, ::String, :to_str)
-      ::File.open('/etc/passwd', 'r') do |passwd_file|
-        passwd_file.each_line do |entry|
-          next if entry.start_with?('#')
-          name_s, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
-          return Passwd.new(name_s, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell) if name == name_s
+      # On macOS we need to check /etc/passwd, which contains some system internal users but not regular users
+      # and the directory service, which contains regular users but not all system internal users.
+      # We need to check /etc/passwd first, because otherwise there may be an error.
+      if `!$platform.windows` && ::File.exist?('/etc/passwd')
+        ::File.open('/etc/passwd', 'r') do |passwd_file|
+          passwd_file.each_line do |entry|
+            next if entry.start_with?('#')
+            name_s, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
+            return Passwd.new(name_s, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell.chomp) if name == name_s
+          end
         end
       end
+      if `$platform.macos`
+        passwd_file = ::Kernel.send('`', "dscl . list /Users uid")
+        passwd_file.each_line do |entry|
+          name_s = `entry.replace(/\s+\w+\s*$/, '')`
+          if name == name_s
+            uid_i = `entry.replace(/^\w*\s+/, '')`.to_i
+            passwd = ::Kernel.send('`', "dscl . read /Users/#{name_s} Password 2>&1").sub(/^\w+:\s+/, '').chomp
+            gid_s  = ::Kernel.send('`', "dscl . read /Users/#{name_s} PrimaryGroupID 2>&1").sub(/^\w+:\s+/, '').chomp
+            gecos  = ::Kernel.send('`', "dscl . read /Users/#{name_s} RealName 2>&1").sub(/^\w+:\s+/, '').chomp
+            # Users may have multiple home directories registered in the directory service on macOS, take the first.
+            dir_lines = ::Kernel.send('`', "dscl . read /Users/#{name_s} NFSHomeDirectory 2>&1").lines
+            dir = dir_lines[0].sub(/^\w+:\s+/, '').chomp
+            dir, _ = dir.split(' ') if dir_lines.size == 1
+            shell  = ::Kernel.send('`', "dscl . read /Users/#{name_s} UserShell 2>&1").sub(/^\w+:\s+/, '').chomp
+            return Passwd.new(name_s, passwd, uid_i, gid_s.to_i, gecos, dir, shell)
+          end
+        end
+      end
+
       raise(::ArgumentError, "can't find user for #{name}")
     end
 
     def getpwuid(uid = nil)
       # Returns the /etc/passwd information for the user with the given integer uid.
-      return nil if `$platform.windows` || !::File.exist?('/etc/passwd')
+      return nil if `$platform.windows`
       uid = ::Opal.coerce_to!(uid, ::Integer, :to_int) if uid
       uid ||= ::Process.uid
-      ::File.open('/etc/passwd', 'r') do |passwd_file|
-        passwd_file.each_line do |entry|
-          next if entry.start_with?('#')
-          name_s, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
-          uid_i = uid_s.to_i
-          return Passwd.new(name_s, passwd, uid_i, gid_s.to_i, gecos, dir, shell) if uid == uid_i
+      # On macOS we need to check /etc/passwd, which contains some system internal users but not regular users
+      # and the directory service, which contains regular users but not all system internal users.
+      # We need to check /etc/passwd first, because otherwise there may be an error.
+      if `!$platform.windows` && ::File.exist?('/etc/passwd')
+        ::File.open('/etc/passwd', 'r') do |passwd_file|
+          passwd_file.each_line do |entry|
+            next if entry.start_with?('#')
+            name_s, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
+            uid_i = uid_s.to_i
+            return Passwd.new(name_s, passwd, uid_i, gid_s.to_i, gecos, dir, shell.chomp) if uid == uid_i
+          end
         end
       end
+      if `$platform.macos`
+        passwd_file = ::Kernel.send('`', "dscl . list /Users uid")
+        passwd_file.each_line do |entry|
+          uid_i = `entry.replace(/^\w*\s+/, '')`.to_i
+          if uid == uid_i
+            name_s = `entry.replace(/\s+\w+\s*$/, '')`
+            passwd = ::Kernel.send('`', "dscl . read /Users/#{name_s} Password 2>&1").sub(/^\w+:\s+/, '').chomp
+            gid_s  = ::Kernel.send('`', "dscl . read /Users/#{name_s} PrimaryGroupID 2>&1").sub(/^\w+:\s+/, '').chomp
+            gecos  = ::Kernel.send('`', "dscl . read /Users/#{name_s} RealName 2>&1").sub(/^\w+:\s+/, '').chomp
+            # Users may have multiple home directories registered in the directory service on macOS, take the first.
+            dir_lines = ::Kernel.send('`', "dscl . read /Users/#{name_s} NFSHomeDirectory 2>&1").lines
+            dir = dir_lines[0].sub(/^\w+:\s+/, '').chomp
+            dir, _ = dir.split(' ') if dir_lines.size == 1
+            shell  = ::Kernel.send('`', "dscl . read /Users/#{name_s} UserShell 2>&1").sub(/^\w+:\s+/, '').chomp
+            return Passwd.new(name_s, passwd, uid_i, gid_s.to_i, gecos, dir, shell)
+          end
+        end
+      end
+
       raise(::ArgumentError, "can't find user for #{uid}")
     end
 
@@ -142,7 +189,7 @@ module Etc
         group_file.each_line do |entry|
           next if entry.start_with?('#')
           name_s, passwd, gid_s, users = entry.split(':')
-          yield Group.new(name_s, passwd, gid_s.to_i, users.split(','))
+          yield Group.new(name_s, passwd, gid_s.to_i, users.chomp.split(','))
         end
       end
       nil
@@ -165,7 +212,7 @@ module Etc
         passwd_file.each_line do |entry|
           next if entry.start_with?('#')
           name_s, passwd, uid_s, gid_s, gecos, dir, shell = entry.split(':')
-          yield Passwd.new(name_s, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell)
+          yield Passwd.new(name_s, passwd, uid_s.to_i, gid_s.to_i, gecos, dir, shell.chomp)
         end
       end
       nil

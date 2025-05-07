@@ -54,7 +54,7 @@ module ::Opal
   end
 
   def self.is_dirsep(chr)
-    `chr == '/' || ($platform.windows && chr == '\\')`
+    `chr == '/' || (!!$platform.windows && chr == '\\')`
   end
 
   def self.is_star_star_slash(str, idx)
@@ -286,7 +286,7 @@ module ::Opal
         pi = chompdirsep(result, skiproot(result, pi))
         s += 2
       end
-    elsif !::File.absolute_path?(fname)
+    elsif !(::File.absolute_path?(fname) || (`$platform.windows` && is_dirsep(`fname[0]`)))
       if dname
         result = rb_file_expand_path_internal(dname, nil, abs_mode, long_name, result)
         buf, buflen, pi, pend = bufinit(result)

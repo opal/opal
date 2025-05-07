@@ -246,7 +246,6 @@ opal_filter "language" do
   fails "Predefined global $~ raises an error if assigned an object not nil or instanceof MatchData" # Expected TypeError but no exception was raised (#<Object:0xa73aa> was returned)
   fails "Ruby String interpolation returns a string with the source encoding by default" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
   fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
-  fails "Source files encoded in UTF-16 LE without a BOM are parsed as empty because they contain a NUL byte before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9a8a0>
   fails "The BEGIN keyword accesses variables outside the eval scope" # SyntaxError: Unsupported sexp: preexe
   fails "The BEGIN keyword runs first in a given code unit" # SyntaxError: Unsupported sexp: preexe
   fails "The BEGIN keyword runs in a shared scope" # SyntaxError: Unsupported sexp: preexe

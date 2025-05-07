@@ -12,8 +12,5 @@ bundle exec opal --compile-to-exe deno -o simple_deno ./simple.rb
 # with node installed:
 bundle exec opal --compile-to-exe node -o simple_node ./simple.rb
 
-# with quickjs installed:
-bundle exec opal --compile-to-exe quickjs -o simple_quickjs ./simple.rb
-
 # it also works with eval:
-bundle exec opal --compile-to-exe quickjs -o eval_app_quickjs -e 'puts "Hello from Opal in QuickJS!"'
+bundle exec opal --compile-to-exe deno -o eval_app_deno -e 'puts "Hello from Opal in Deno!"'

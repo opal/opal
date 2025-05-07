@@ -1213,10 +1213,10 @@ class ::IO
     end
   end
 
-  def readline(*args)
+  def readline(sep = $/, limit = nil, chomp: false)
     # Reads a line as with IO#gets, but raises EOFError if already at end-of-stream.
     ::Kernel.raise(::EOFError, 'end of file reached') if eof
-    gets(*args)
+    gets(sep, limit, chomp: chomp)
   end
 
   def readlines(sep = $/, limit = nil, chomp: false)

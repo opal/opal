@@ -36,21 +36,14 @@
     $platform.name = (typeof(Graal) === "object" && Graal.versionGraalVM) ? "graalnodejs" : "node";
   }
 
-  // Gnome GJS and Cinnamon CJS
-  // IO is totally unstable, so do not detect them and use the generic driver for "unknown engine"
-  // else if (typeof(window) === "object" && typeof(GjsFileImporter) === "function") { $platform.name = "gjs"; }
-
-  // Graal, mabe one day in the future
-  // else if (typeof(Graal) === "object" && Graal.versionGraalVM) { $platform.name = "graaljs"; }
-
-  // QuickJS and QuickJS-ng
-  else if (typeof(window) === "undefined" && typeof(std) === "object" && typeof(os) === "object") {
-    $platform.name = "quickjs";
-  }
-
   // Mini-Racer
-  else if (typeof(opalminiracer) !== "undefined") { $platform.name = "mini_racer"; }
+  // else if (typeof(opalminiracer) !== "undefined") { $platform.name = "mini_racer"; }
 
+  //
+  // Handle unsupported features
+  //
+
+  // helpers to be used by drivers
   $platform.handle_unsupported_feature = function(message) {
     if (!message) message = "not implemented";
     switch (Opal.config.unsupported_features_severity) {
@@ -64,28 +57,97 @@
     // otherwise ignore
   }
 
-  // Shim if TextDecoder is missing; QuickJS, mini_racer, etc.
-  // Completely 'transparent' to the actual encoding.
-  if (typeof Opal.global.TextDecoder === "undefined") {
-    Opal.global.TextDecoder = class {
-      constructor(_label, _options) {}
-      decode(buffer) {
-        let result = '';
-        if (buffer instanceof ArrayBuffer) buffer = new Uint8Array(ArrayBuffer.buffer); // fall back to ascii 8 bit
-        // naturally uses buffers item bit width, which may or may not be the required codepoint bit width
-        // so if utf16 uses Uint16Array, best case, all is fine, otherwise, e.g with Uint8, result may still be garbled
-        buffer.forEach((v)=>{result += String.fromCodePoint(v)});
-        return result;
-      }
-    }
+  $platform.not_available = function(fun) {
+    $platform.handle_unsupported_feature(fun + " is not available on " + $platform.name);
+    return Opal.nil;
   }
 
-  // Some are missing console.warn, console.info or console.error; QuickJS, etc.
+  //
+  // TextDecoder
+  //
+
+  // Shim if TextDecoder is missing; QuickJS, mini_racer, etc.
+  const text_decoder_labels_ascii = ["ansi_x3.4-1968", "ascii", "cp1252", "cp819", "csisolatin1", "ibm819",
+                                     "iso-8859-1", "iso-ir-100", "iso8859-1", "iso88591", "iso_8859-1",
+                                     "iso_8859-1:1987", "l1", "latin1", "us-ascii", "windows-1252", "x-cp1252"];
+  const text_decoder_labels_utf8 = ["unicode-1-1-utf-8", "utf-8", "utf8"];
+  Opal.generic_text_decoder = class {
+    constructor(label, options) {
+      if (text_decoder_labels_utf8.includes(label)) this.utf8 = true;
+      else if (text_decoder_labels_ascii.includes(label)) this.ascii = true;
+      if (options) this.fatal = options.fatal;
+    }
+    decode(buffer) {
+      let result = '';
+      if (buffer instanceof ArrayBuffer) {
+        if (this.ascii || this.utf8) buffer = new Uint8Array(buffer);
+        else buffer = new Uint16Array(buffer);
+      } else if (buffer instanceof DataView) {
+        if (this.ascii || this.utf8) buffer = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+        else buffer = new Uint16Array(buffer.buffer, buffer.byteOffset, Math.floor(buffer.byteLength/2));
+      }
+      if (this.utf8) {
+        let bytes_needed = 0, code_point = 0;
+        buffer.forEach((v)=>{
+          if (bytes_needed > 0) {
+            if (0x80 <= v && v <= 0xBF) {
+              code_point = (code_point << 6) | (v & 0x3F);
+              bytes_needed--;
+            } else {
+              if (this.fatal) throw new TypeError('invalid encoding');
+              bytes_needed = 0;
+              result += '�';
+            }
+          } else {
+            if (v <= 0x7F) {
+              bytes_needed = 0;
+              code_point = v & 0xFF;
+            } else if (v <= 0xDF) {
+              bytes_needed = 1;
+              code_point = v & 0x1F;
+            } else if (v <= 0xEF) {
+              bytes_needed = 2;
+              code_point = v & 0x0F;
+            } else if (v <= 0xF4) {
+              bytes_needed = 3;
+              code_point = v & 0x07;
+            } else {
+              if (this.fatal) throw new TypeError('invalid encoding');
+              code_point = 0xFFFD;
+            }
+          }
+          if (bytes_needed > 0) return;
+          result += String.fromCodePoint(code_point);
+        });
+      } else {
+        buffer.forEach((v)=>{
+          if (this.ascii && v > 0xFF) {
+            if (this.fatal) throw new TypeError('invalid encoding');
+            result += '?';
+          } else if (v > 0xFFFF) {
+            if (this.fatal) throw new TypeError('invalid encoding');
+            result += '�';
+          } else result += String.fromCodePoint(v);
+        });
+      }
+      return result;
+    }
+  }
+  if (typeof Opal.global.TextDecoder === "undefined") Opal.global.TextDecoder = Opal.generic_text_decoder;
+
+  //
+  // Console
+  //
+
+  // Some platforms are missing console.warn, console.info or console.error; QuickJS, etc.
   if (typeof console.error === "undefined") console.error = console.log;
   if (typeof console.info === "undefined") console.info = console.log;
   if (typeof console.warn === "undefined") console.warn = console.log;
 
-  // set OPAL_PLATFORM
+  //
+  // OPAL_PLATFORM
+  //
+
   Opal.const_set(Opal.Object, "OPAL_PLATFORM", $platform.name);
 
   return Opal;

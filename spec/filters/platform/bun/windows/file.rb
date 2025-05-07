@@ -2,15 +2,12 @@
 opal_filter "File" do
   fails "File#chmod with '0444' makes file readable and executable but not writable" # Expected false == true to be truthy but was false
   fails "File#chmod with '0644' makes file readable and writable and also executable" # Expected false == true to be truthy but was false
+  fails "File.atime returns the last access time for the named file with microseconds" # Errno::ENOENT: No such file or directory - stat -c%x 'ruby/core/file/atime_spec.rb'
   fails "File.chmod with '0444' makes file readable and executable but not writable" # Expected false == true to be truthy but was false
   fails "File.chmod with '0644' makes file readable and writable and also executable" # Expected false == true to be truthy but was false
+  fails "File.ctime returns the change time for the named file (the time at which directory information about the file was changed, not the file itself) with microseconds." # Errno::ENOENT: No such file or directory - stat -c%z 'ruby/core/file/ctime_spec.rb'
   fails "File.executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
-  fails "File.expand_path converts a pathname to an absolute pathname" # Expected "C:/Users/Administrator/workspace/opal/spec" == nil to be truthy but was false
-  fails "File.expand_path converts a pathname to an absolute pathname, Ruby-Talk:18512" # TypeError: no implicit conversion of NilClass into String
-  fails "File.expand_path converts a pathname to an absolute pathname, using a complete path" # Expected "C:/Users/Administrator/workspace/opal/spec" == "" to be truthy but was false
-  fails "File.expand_path does not modify the string argument" # Expected "C:/Users/Administrator/workspace/opal/spec/a/c" == "/a/c" to be truthy but was false
-  fails "File.expand_path expands a path with multi-byte characters" # Expected "C:/Users/Administrator/workspace/opal/spec/Ångsström" == "/Ångström" to be truthy but was false
-  fails "File.expand_path returns a String when passed a String subclass" # Expected "C:/Users/Administrator/workspace/opal/spec/a/c" == "/a/c" to be truthy but was false
+  fails "File.mtime returns the modification Time of the file with microseconds" # Errno::ENOENT: No such file or directory - stat -c%y 'ruby/core/file/mtime_spec.rb'
   fails "File.open accepts extra flags as a keyword argument and combine with a string mode" # Errno::EACCES: Permission denied
   fails "File.open accepts extra flags as a keyword argument and combine with an integer mode" # Errno::EACCES: Permission denied
   fails "File.open calls #to_hash to convert the second argument to a Hash" # Errno::EACCES: Permission denied
@@ -74,11 +71,15 @@ opal_filter "File" do
   fails "File.owned? returns true if the file exist and is owned by the user" # Expected false == true to be truthy but was false
   fails "File.umask returns the current umask value for this process (basic)" # Expected 18 == 0 to be truthy but was false
   fails "File.umask returns the current umask value for this process" # Expected 6 == 0 to be truthy but was false
+  fails "File::Stat#atime returns the atime of a File::Stat object" # Expected 2025-05-05 15:16:00 -0000 <= 2025-05-05 15:16:00 -0000 to be truthy but was false
+  fails "File::Stat#birthtime returns the birthtime of a File::Stat object" # Expected 2025-05-05 15:10:46 -0000 <= 2025-05-05 15:10:46 -0000 to be truthy but was false
+  fails "File::Stat#ctime returns the ctime of a File::Stat object" # Expected 2025-05-05 15:12:41 -0000 <= 2025-05-05 15:12:41 -0000 to be truthy but was false
   fails "File::Stat#dev_major returns nil" # Expected 652197810 to be nil
   fails "File::Stat#dev_minor returns nil" # Expected 159031 to be nil
   fails "File::Stat#executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
   fails "File::Stat#gid returns the group owner attribute of a File::Stat object" # Expected 0 == -1 to be truthy but was false
   fails "File::Stat#mode returns the mode of a File::Stat object" # Expected 438 == 420 to be truthy but was false
+  fails "File::Stat#mtime returns the mtime of a File::Stat object" # Expected 2025-05-05 09:06:00 -0600 <= 2025-05-05 09:05:59 -0600 to be truthy but was false
   fails "File::Stat#owned? returns true if the file is owned by the user" # Expected #<File::Stat dev=26dfb237, ino=279504651873764670, mode=81b6, nlink=1, uid=0, gid=0, rdev=0, size=0, blksize=4096, blocks=0, atime=2025-04-15 20:28:20 -0000, mtime=2025-04-15 20:28:20 -0000, ctime=2025-04-15 20:28:20 -0000, birthtime=2025-04-15 20:27:44 -0000.owned? to be truthy but was false
   fails "File::Stat#rdev_major returns nil" # Expected 0 to be nil
   fails "File::Stat#rdev_minor returns nil" # Expected 0 to be nil

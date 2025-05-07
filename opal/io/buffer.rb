@@ -105,19 +105,6 @@ class ::IO
         }
       }
 
-      // fastest for buffers up to 256 bytes on FF
-      function copy_dv_small(source_dv, target_dv, source_offset, offset, length) {
-        for(let i = 0; i < length;) {
-          if ((length - i) >= 4) {
-            target_dv.setUint32(offset + i, source_dv.getUint32(source_offset + i));
-            i += 4;
-          } else {
-            target_dv.setUint8(offset + i, source_dv.getUint8(source_offset + i));
-            i++;
-          }
-        }
-      }
-
       function copy_dv(source_dv, target_dv, source_offset, offset, length) {
         let source = new Uint8Array(source_dv.buffer, source_offset, length);
         (new Uint8Array(target_dv.buffer, target_dv.byteOffset, target_dv.byteLength)).set(source, offset);
@@ -526,7 +513,16 @@ class ::IO
       raise(AccessError, 'Buffer references external memory!') if external?
       raise LockedError if locked?
       if new_size < size || size < new_size
-        `self.data_view = new DataView(self.data_view.buffer.transfer(new_size))`
+        %x{
+          // some engines don't have buffer.transfer
+          if (typeof self.data_view.buffer.transfer === "function") {
+            self.data_view = new DataView(self.data_view.buffer.transfer(new_size))
+          } else {
+            let old_dv = self.data_view;
+            self.data_view = new DataView(new ArrayBuffer(new_size));
+            copy_dv(old_dv, self.data_view, 0, 0, Math.min(old_dv.byteLength, new_size));
+          }
+        }
       end
       self
     end

@@ -363,7 +363,7 @@ module ::Process
 
       `js_opts.shell = true` unless ::File.absolute_path?(cmdname)
 
-      out = `$platform.process_spawn(#{cmdname}, #{argv}, js_opts, false)`
+      out = `$platform.process_spawn(#{cmdname}, #{argv}, js_opts)`
 
       if `out.status`
         status = `out.status > 128 ? out.status - 128 : out.status`
@@ -395,10 +395,13 @@ module ::Process
       `$platform.process_setuid(new_uid)`
     end
 
-    def wait(pid = -1, flags = 0)
+    def wait(pid = nil, flags = 0)
       # Waits for a suitable child process to exit, returns its process ID,
       # and sets $? to a Process::Status object containing information on
       # that process. Which child it waits for depends on the value of the given pid.
+      raise(::Errno::ECHILD) if pid.nil? && $?.nil?
+      pid = ::Opal.coerce_to!(pid, ::Integer, :to_int) if pid
+      pid ||= -1
       pid, $? = wait2(pid, flags)
       pid
     end
