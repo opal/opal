@@ -1,3 +1,5 @@
+ruby/core/argf
+
 ruby/core/array
 
 ruby/core/array/pack/a_spec
@@ -36,7 +38,8 @@ ruby/core/comparable
 
 ruby/core/complex
 !ruby/core/complex/marshal_dump_spec
-
+ruby/core/dir
+ruby/core/encoding
 ruby/core/enumerable
 ruby/core/enumerator
 ruby/core/enumerator/arithmetic_sequence
@@ -44,56 +47,40 @@ ruby/core/enumerator/chain
 ruby/core/enumerator/generator
 ruby/core/enumerator/lazy
 ruby/core/enumerator/yielder
+ruby/core/env
 
 ruby/core/exception
 !ruby/core/exception/load_error_spec
 
 ruby/core/false
-ruby/core/integer
-ruby/core/file/basename_spec
-ruby/core/file/dirname_spec
-ruby/core/file/extname_spec
-ruby/core/file/join_spec
-ruby/core/file/expand_path_spec
-ruby/core/file/absolute_path_spec
+ruby/core/file
+ruby/core/file/stat
+ruby/core/filetest
+
 ruby/core/float
 ruby/core/hash
 ruby/core/integer
 
+ruby/core/io
+
 ruby/core/kernel
-!ruby/core/kernel/abort_spec
-!ruby/core/kernel/at_exit_spec
-!ruby/core/kernel/backtick_spec
 !ruby/core/kernel/binding_spec
 !ruby/core/kernel/callcc_spec
 !ruby/core/kernel/caller_locations_spec
 !ruby/core/kernel/catch_spec
 !ruby/core/kernel/chomp_spec
 !ruby/core/kernel/chop_spec
-!ruby/core/kernel/exec_spec
-!ruby/core/kernel/exit_spec
 !ruby/core/kernel/fork_spec
-!ruby/core/kernel/gets_spec
 !ruby/core/kernel/load_spec
-!ruby/core/kernel/open_spec
-!ruby/core/kernel/putc_spec
-!ruby/core/kernel/readlines_spec
-!ruby/core/kernel/readline_spec
 !ruby/core/kernel/require_relative_spec
 !ruby/core/kernel/require_spec
 !ruby/core/kernel/select_spec
 !ruby/core/kernel/set_trace_func_spec
-!ruby/core/kernel/spawn_spec
 !ruby/core/kernel/syscall_spec
-!ruby/core/kernel/system_spec
-!ruby/core/kernel/tainted_spec
-!ruby/core/kernel/taint_spec
 !ruby/core/kernel/test_spec
 !ruby/core/kernel/throw_spec
 !ruby/core/kernel/trace_var_spec
-!ruby/core/kernel/trap_spec
 !ruby/core/kernel/trust_spec
-!ruby/core/kernel/untaint_spec
 !ruby/core/kernel/untrace_var_spec
 !ruby/core/kernel/untrusted_spec
 !ruby/core/kernel/untrust_spec
@@ -120,6 +107,15 @@ ruby/core/objectspace
 ruby/core/objectspace/weakmap
 
 ruby/core/proc
+
+ruby/core/process
+!ruby/core/process/_fork_spec
+!ruby/core/process/fork_spec
+!ruby/core/process/setpgid_spec
+!ruby/core/process/setpgrp_spec
+!ruby/core/process/spawn_spec
+!ruby/core/process/wait_spec
+!ruby/core/process/wait2_spec
 
 ruby/core/range
 ruby/core/rational
@@ -183,6 +179,8 @@ ruby/library/delegate/delegate_class
 ruby/library/delegate/delegator
 ruby/library/erb/util/h_spec
 ruby/library/erb/util/html_escape_spec
+ruby/library/etc
+!ruby/library/etc/struct_group_spec
 ruby/library/logger/severity_spec
 ruby/library/observer
 
@@ -191,8 +189,6 @@ ruby/library/openstruct
 !ruby/library/openstruct/marshal_dump_spec
 
 ruby/library/pathname
-!ruby/library/pathname/empty_spec
-!ruby/library/pathname/glob_spec
 ruby/library/matrix
 ruby/library/matrix/eigenvalue_decomposition
 ruby/library/matrix/lup_decomposition
@@ -203,10 +199,11 @@ ruby/library/securerandom
 ruby/library/set
 ruby/library/shellwords
 ruby/library/singleton
-ruby/library/stringio/each_line_spec
-ruby/library/stringio/each_spec
+ruby/library/stringio
 ruby/library/stringscanner
 
 ruby/library/time
+
+ruby/library/tmpdir/dir
 
 ruby/library/optionparser

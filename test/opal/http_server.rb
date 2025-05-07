@@ -1,7 +1,5 @@
 require 'sinatra'
 
-cat_image = File.open(File.join(File.dirname(__FILE__), 'cat.png'), 'rb').read
-
 get '/' do
   headers \
     'Access-Control-Allow-Origin' => '*'
@@ -34,11 +32,7 @@ get '/html' do
 end
 
 get '/png' do
-  status 200
-  headers(
-    'Content-Type' => 'image/png',
-    'Access-Control-Allow-Origin' => '*')
-  body cat_image
+  send_file File.join(File.dirname(__FILE__), 'cat.png')
 end
 
 get '/404' do

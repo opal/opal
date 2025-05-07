@@ -17,11 +17,11 @@ module Kernel
     code = compiler.compile
     code += compiler.source_map.to_data_uri_comment unless compiling_options[:no_source_map]
     if binding
-      binding.js_eval(code)
+      binding.js_eval(`code.toString()`)
     else
       %x{
         return (function(self) {
-          return eval(#{code});
+          return eval(code.toString());
         })(self)
       }
     end

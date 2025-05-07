@@ -197,6 +197,8 @@ module Minitest
       assert collection.include?(obj), msg
     end
 
+    alias assert_include assert_includes
+
     ##
     # Fails unless +obj+ is an instance of +cls+.
 
@@ -337,6 +339,16 @@ module Minitest
         "Expected %s (oid=%d) to be the same as %s (oid=%d)" % data
       }
       assert exp.equal?(act), msg
+    end
+
+    ##
+    # Fails unless +exp+ and +act+ are not #equal?
+
+    def assert_not_same(expected, actual, message="")
+      msg = message(msg) {
+        "#{expected}\nwith id #{expected.__id__} expected to not be equal\\? to\n#{actual}\nwith id #{actual.__id__}."
+      }
+      assert(!actual.equal?(expected), msg)
     end
 
     ##

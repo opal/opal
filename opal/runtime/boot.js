@@ -1,4 +1,4 @@
-(function(global_object) {
+(function() {
   "use strict";
 
   // @note
@@ -15,9 +15,8 @@
   //   The way the code is digested before going through Yardoc is a secret kept
   //   in the docs repo (https://github.com/opal/docs/tree/master).
 
-  var console;
-
   // Detect the global object
+  let global_object;
   if (typeof(globalThis) !== 'undefined') { global_object = globalThis; }
   else if (typeof(global) !== 'undefined') { global_object = global; }
   else if (typeof(window) !== 'undefined') { global_object = window; }
@@ -27,6 +26,7 @@
     global_object.console = {};
   }
 
+  let console;
   if (typeof(global_object.console) === 'object') {
     console = global_object.console;
   } else {
@@ -126,7 +126,12 @@
       // + compiles to JS primitive
       // + allows method definition directly on instances
       // numbers, true, false and null do not support it.
-      object[name] = initialValue;
+      try { object[name] = initialValue; }
+      catch (e) {
+        if (Opal.raise)
+          Opal.raise(Opal.FrozenError, "can't modify frozen String: '" + (object) +"'", new Map([["receiver", object]]));
+        else throw e;
+      }
     } else {
       prop_options.value = initialValue;
       Object.defineProperty(object, name, prop_options);
@@ -404,6 +409,31 @@
   Opal.current_dir     = '.';
   Opal.require_table   = {'runtime/boot': true};
 
+  Opal.expand_module_path = function(path) {
+    path = path.toString();
+    let abs = /^[a-zA-Z]:(?:\\|\/)|^[\/\\]/.test(path),
+        i = 0, new_parts = [], new_path,
+        part, parts = path.split(/[/\/]/);
+
+    for (; i < parts.length; i++) {
+      part = parts[i];
+
+      if (
+        (part === nil) ||
+        (part == ''  && ((new_parts.length === 0) || abs)) ||
+        (part == '.' && ((new_parts.length === 0) || abs))
+      ) {
+        continue;
+      }
+      if (part == '..') new_parts.pop();
+      else new_parts.push(part);
+    }
+    if (!abs && parts[0] != '.') new_parts.unshift('.');
+    new_path = new_parts.join('/');
+    if (abs) new_path = '/' + new_path;
+    return new_path;
+  }
+
   Opal.normalize = function(path) {
     var parts, part, new_parts = [], SEPARATOR = '/';
 
@@ -498,13 +528,13 @@
       Opal.last_promise = Opal.last_promise.then(function() {
         if (!Opal.promise_unhandled_exception) return proc(Opal);
       })['catch'](function(error) {
-        if (Opal.respond_to(error, '$full_message')) {
+        if (Opal.respond_to && Opal.respond_to(error, '$full_message')) {
           error = error.$full_message();
         }
-        console.error(error);
+        console.error(error.toString());
         // Abort further execution
         Opal.promise_unhandled_exception = true;
-        Opal.exit(1);
+        Opal.platform.exit(1);
       });
       return Opal.last_promise;
     }
@@ -574,4 +604,6 @@
   // If enable-file-source-embed compiler option is enabled, each module loaded will add its
   // sources to this object
   Opal.file_sources = {};
-}).call(this);
+
+  return Opal;
+})();

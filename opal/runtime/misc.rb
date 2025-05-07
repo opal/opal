@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: return_val, Object, gvars
+# helpers: return_val, Object
 
 module ::Opal
   # Create a new range instance with first and last values, and whether the
@@ -17,15 +17,6 @@ module ::Opal
     }
   end
 
-  # Exit function, this should be replaced by platform specific implementation
-  # (See nodejs and chrome for examples)
-  def self.exit(status)
-    %x{
-      if ($gvars.DEBUG)
-        console.log('Exited with status '+status);
-    }
-  end
-
   # top is the main object. It is a `self` in a top level of a Ruby program
   %x{
     Opal.top.$to_s = Opal.top.$inspect = $return_val('main');
@@ -38,6 +29,26 @@ module ::Opal
       return Opal.send($Object, 'define_method', arguments, block)
     };
   }
+
+  # Exit handler, see #create_builder in lib/opal/cli.rb
+  def self.run_end_procs_and_exit(system_exit)
+    status = system_exit.status
+
+    $__at_exit__ ||= []
+
+    until $__at_exit__.empty?
+      block = $__at_exit__.pop
+      begin
+        block.call
+      rescue ::SystemExit => e
+        status = e.status
+      rescue => e
+        # ignore
+      end
+    end
+
+    `Opal.platform.exit(status)`
+  end
 end
 
 ::Opal

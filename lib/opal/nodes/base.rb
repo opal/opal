@@ -80,8 +80,8 @@ module Opal
         Opal::Fragment.new str, scope, loc && @sexp
       end
 
-      def error(msg)
-        @compiler.error msg
+      def error(msg, line = nil)
+        @compiler.error msg, line || sexp.loc&.line
       end
 
       def scope
@@ -227,6 +227,19 @@ module Opal
         end
         line = @sexp.loc.line
         "['#{file}', #{line}]"
+      end
+
+      def node_has?(child, type)
+        # look ahead if a child with specified type is in the tree
+        if child
+          child.children.each do |child|
+            if child.is_a?(::AST::Node) || child.is_a?(::Opal::Nodes::Base)
+              return true if child.type == type
+              return true if node_has?(child, type)
+            end
+          end
+        end
+        false
       end
     end
   end
