@@ -31,6 +31,7 @@ module Opal
       new_regexp = ''
       line_based_regexp = false
       string_based_regexp = false
+      unicode_character = false
       unicode_character_class = false
       quantifier = false
 
@@ -54,6 +55,8 @@ module Opal
             string_based_regexp = true
           elsif char == 'p' || char == 'P'
             unicode_character_class = 1
+          elsif char == 'u'
+            unicode_character = 1
           end
         elsif char == '\\'
           escaping = true
@@ -81,7 +84,8 @@ module Opal
         elsif char == '{'
           # escape { to \\{ unless it belongs to
           # a unicode character class \p{...} or \P{...} or
-          # a quantifier x{1}, x{1,} or x{1,2}
+          # a quantifier x{1}, x{1,} or x{1,2} or
+          # a unicode character \u{...}
           if unicode_character_class == 1
             # look behind
             prev_chars = RUBY_ENGINE == 'opal' ? `regexp.slice(i-2)` : regexp[i - 2..i - 1]
@@ -89,6 +93,15 @@ module Opal
               unicode_character_class = 2
             else
               unicode_character_class = false
+              char = '\\{'
+            end
+          elsif unicode_character == 1
+            # look behind
+            prev_chars = RUBY_ENGINE == 'opal' ? `regexp.slice(i-2)` : regexp[i - 2..i - 1]
+            if prev_chars == '\\u'
+              unicode_character = 2
+            else
+              unicode_character = false
               char = '\\{'
             end
           elsif i > 0
@@ -101,6 +114,7 @@ module Opal
             end
           else
             unicode_character_class = false
+            unicode_character = false
             quantifier = false
             char = '\\{'
           end
@@ -110,10 +124,13 @@ module Opal
           # a quantifier x{1}, x{1,} or x{1,2}
           if unicode_character_class == 2
             unicode_character_class = false
+          elsif unicode_character == 2
+            unicode_character = false
           elsif quantifier
             quantifier = false
           else
             unicode_character_class = false
+            unicode_character = false
             quantifier = false
             char = '\\}'
           end

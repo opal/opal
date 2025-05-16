@@ -1,0 +1,42 @@
+# NOTE: run bin/format-filters after changing this file
+opal_filter "File" do
+  fails "File#chmod with '0444' makes file readable and executable but not writable" # NotImplementedError: File#chmod is not available on deno
+  fails "File#chmod with '0644' makes file readable and writable and also executable" # NotImplementedError: File#chmod is not available on deno
+  fails "File.atime returns the last access time for the named file with microseconds" # Errno::ENOENT: No such file or directory - stat -c%x 'ruby/core/file/atime_spec.rb'
+  fails "File.chmod with '0444' makes file readable and executable but not writable" # Expected true == false to be truthy but was false
+  fails "File.chmod with '0644' makes file readable and writable and also executable" # Expected false == true to be truthy but was false
+  fails "File.chown accepts an object that has a #to_path method" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\file_chown_test'
+  fails "File.chown returns the number of files processed" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\file_chown_test'
+  fails "File.ctime returns the change time for the named file (the time at which directory information about the file was changed, not the file itself) with microseconds." # Errno::ENOENT: No such file or directory - stat -c%z 'ruby/core/file/ctime_spec.rb'
+  fails "File.directory? calls #to_io to convert a non-IO object" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
+  fails "File.directory? returns false if the argument is an IO that's not a directory" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
+  fails "File.executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "File.grpowned? returns false if file the does not exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
+  fails "File.grpowned? returns false if the file exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
+  fails "File.identical? returns true if both named files are identical" # Expected true to be false
+  fails "File.mtime returns the modification Time of the file with microseconds" # Errno::ENOENT: No such file or directory - stat -c%y 'ruby/core/file/mtime_spec.rb'
+  fails "File.owned? returns true if the file exist and is owned by the user" # Expected false == true to be truthy but was false
+  fails "File.umask returns the current umask value for this process (basic)" # Expected 18 == 0 to be truthy but was false
+  fails "File.umask returns the current umask value for this process" # Expected 6 == 0 to be truthy but was false
+  fails "File::Stat#atime returns the atime of a File::Stat object" # Expected 2025-04-15 13:07:05 -0700 <= 2025-04-15 13:07:05 -0700 to be truthy but was false
+  fails "File::Stat#ctime returns the ctime of a File::Stat object" # Expected 2025-04-15 12:49:56 -0700 <= 2025-04-15 12:49:56 -0700 to be truthy but was false
+  fails "File::Stat#dev_major returns nil" # Expected 0 to be nil
+  fails "File::Stat#dev_minor returns nil" # Expected 159031 to be nil
+  fails "File::Stat#executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "File::Stat#gid returns the group owner attribute of a File::Stat object" # Expected 0 == -1 to be truthy but was false
+  fails "File::Stat#grpowned? returns false if the file exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
+  fails "File::Stat#ino returns BY_HANDLE_FILE_INFORMATION.nFileIndexHigh/Low of a File::Stat object" # Expected nil (NilClass) to be kind of Integer
+  fails "File::Stat#mode returns the mode of a File::Stat object" # Expected 438 == 420 to be truthy but was false
+  fails "File::Stat#mtime returns the mtime of a File::Stat object" # Expected 2025-04-22 21:50:08 +0200 <= 2025-04-22 21:50:08 +0200 to be truthy but was false
+  fails "File::Stat#owned? returns true if the file is owned by the user" # Expected #<File::Stat dev=0, ino=5066549581073667, mode=81b6, nlink=1, uid=0, gid=0, rdev=0, size=0, blksize=4096, blocks=0, atime=2025-04-10 19:06:24 -0000, mtime=2025-04-10 19:06:24 -0000, ctime=2025-04-10 19:06:24 -0000, birthtime=2025-04-10 18:46:44 -0000.owned? to be truthy but was false
+  fails "File::Stat#rdev returns the number of the device this file represents which the file exists" # Expected nil (NilClass) to be kind of Integer
+  fails "File::Stat#rdev_major returns nil" # Expected 0 to be nil
+  fails "File::Stat#uid returns the owner attribute of a File::Stat object" # Expected 0 == -1 to be truthy but was false
+  fails "FileTest.directory? calls #to_io to convert a non-IO object" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
+  fails "FileTest.directory? returns false if the argument is an IO that's not a directory" # Errno::EISDIR: Is a directory - Incorrect function. (os error 1)
+  fails "FileTest.executable_real? returns true if named file is readable by the real user id of the process, otherwise false" # Expected false == true to be truthy but was false
+  fails "FileTest.grpowned? returns false if the file doesn't exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
+  fails "FileTest.grpowned? returns false if the file exist" # Exception: chown '\\?\C:\Users\Administrator\workspace\opal\tmp\rubyspec_temp\i_exist'
+  fails "FileTest.identical? returns true if both named files are identical" # Expected true to be false
+  fails "FileTest.zero? returns true for NUL" # Errno::EISDIR: Is a directory - EISDIR: illegal operation on a directory, stat 'NUL'
+end
