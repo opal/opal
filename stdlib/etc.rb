@@ -118,7 +118,7 @@ module Etc
         end
       end
       if `$platform.macos`
-        passwd_file = ::Kernel.send('`', "dscl . list /Users uid")
+        passwd_file = ::Kernel.send('`', 'dscl . list /Users uid')
         passwd_file.each_line do |entry|
           name_s = `entry.replace(/\s+\w+\s*$/, '')`
           if name == name_s
@@ -158,7 +158,7 @@ module Etc
         end
       end
       if `$platform.macos`
-        passwd_file = ::Kernel.send('`', "dscl . list /Users uid")
+        passwd_file = ::Kernel.send('`', 'dscl . list /Users uid')
         passwd_file.each_line do |entry|
           uid_i = `entry.replace(/^\w*\s+/, '')`.to_i
           if uid == uid_i
@@ -183,7 +183,7 @@ module Etc
       # Provides a convenient Ruby iterator which executes a block for each entry in the /etc/group file.
       return nil if `$platform.windows`
       return getgrgid unless block_given?
-      raise ::RuntimeError, '#passwd already active' if @group_active
+      raise '#passwd already active' if @group_active
       @group_active = true
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
@@ -206,7 +206,7 @@ module Etc
       # Provides a convenient Ruby iterator which executes a block for each entry in the /etc/passwd file.
       return nil if `$platform.windows`
       return getpwuid unless block_given?
-      raise ::RuntimeError, '#passwd already active' if @passwd_active
+      raise '#passwd already active' if @passwd_active
       @passwd_active = true
       ::File.open('/etc/passwd', 'r') do |passwd_file|
         passwd_file.each_line do |entry|

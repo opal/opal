@@ -591,18 +591,19 @@ function doRequest (options, data) {
 
   def self.data(req)
     %x{
+      var byteArray, i = 0;
       if (["bun", "deno", "graalnodejs", "node"].includes(Opal.platform.name)) {
         var arrayBuffer = req.response;
-        var byteArray = new Uint8Array(arrayBuffer);
+        byteArray = new Uint8Array(arrayBuffer);
         var result = []
-        for (var i = 0; i < byteArray.byteLength; i++) {
+        for (; i < byteArray.byteLength; i++) {
           result.push(byteArray[i]);
         }
         return result;
       } else {
         var binStr = req.responseText;
-        var byteArray = [];
-        for (var i = 0, len = binStr.length; i < len; ++i) {
+        byteArray = [];
+        for (var len = binStr.length; i < len; ++i) {
           var c = binStr.charCodeAt(i);
           var byteCode = c & 0xff; // byte at offset i
           byteArray.push(byteCode);

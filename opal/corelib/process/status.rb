@@ -16,9 +16,7 @@ module ::Process
     end
 
     # Returns true if the process generated a coredump when it terminated, false if not.
-    def coredump?
-      __not_implemented__
-    end
+    alias coredump? __not_implemented__
 
     # Returns true if the process exited normally (for example using an exit()
     # call or finishing the program), false if not.
@@ -39,20 +37,14 @@ module ::Process
     attr_reader :pid # Returns the process ID of the process
 
     # Returns true if the process terminated because of an uncaught signal, false otherwise.
-    def signaled?
-      __not_implemented__
-    end
+    alias signaled? __not_implemented__
 
     # Returns true if this process is stopped, and if the corresponding wait call
     # had the Process::WUNTRACED flag set, false otherwise.
-    def stopped?
-      __not_implemented__
-    end
+    alias stopped? __not_implemented__
 
     # Returns the number of the signal that caused the process to stop, or nil if the process is not stopped.
-    def stopsig
-      __not_implemented__
-    end
+    alias stopsig __not_implemented__
 
     def success?
       # Returns:
@@ -64,9 +56,7 @@ module ::Process
 
     # Returns the number of the signal that caused the process to terminate
     # or nil if the process was not terminated by an uncaught signal.
-    def termsig
-      __not_implemented__
-    end
+    alias termsig __not_implemented__
 
     def to_s
       "pid #{@pid} exit #{@status}"

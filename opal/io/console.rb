@@ -19,15 +19,10 @@ class ::IO
     self
   end
 
-  def console_mode
-    # Returns a data represents the current console mode.
-    @console_mode
-  end
-
-  def console_mode=(mode)
-    # Sets the console mode to mode.
-    @console_mode = mode
-  end
+  # Returns a data represents the current console mode.
+  #   or
+  # Sets the console mode to mode.
+  attr_accessor :console_mode
 
   def cooked
     # Yields self within cooked mode.

@@ -1,7 +1,6 @@
 # helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid, each_ivar, slice, platform
 # use_strict: true
 # backtick_javascript: true
-require 'corelib/process/status'
 
 module ::Kernel
   # TODO: This is just here as a workaround, must be removed before merge/release
@@ -10,23 +9,33 @@ module ::Kernel
     File.realpath(File.dirname(__FILE__))
   end
 
-  def `(cmdline)
-    # Returns the $stdout output from running command in a subshell; sets global variable $? to the process status.
-    cmdline = ::Opal.coerce_to!(cmdline, ::String, :to_str)
-    out = `$platform.process_spawn(#{cmdline}, [], { shell: true, stdio: 'pipe', wait: true })`
+  # Opal specific convenience method to be aliased to, to save some code, e.g:
+  #   alias fancy_method __not_implemented__
+  def __not_implemented__(*args)
+    raise ::NotImplementedError
+  end
 
-    status = `out.status > 128 ? out.status - 128 : out.status`
-    pid = `out.pid == null ? nil : out.pid`
-    $? = ::Process::Status.new(status, pid)
+  if `$platform.process_spawn`
+    def `(cmdline)
+      # Returns the $stdout output from running command in a subshell; sets global variable $? to the process status.
+      cmdline = ::Opal.coerce_to!(cmdline, ::String, :to_str)
+      out = `$platform.process_spawn(#{cmdline}, [], { shell: true, stdio: 'pipe', wait: true })`
 
-    if `out.status == 126 || out.status == 127` ||
-      (`$platform.windows` && `out.stderr.includes("is not recognized as an internal or external command")`)
-      # Windows sadly returns only status code 1 if the command does not exist, so we need to check stderr
-      raise ::Errno::ENOENT, cmdline
+      status = `out.status > 128 ? out.status - 128 : out.status`
+      pid = `out.pid == null ? nil : out.pid`
+      $? = ::Process::Status.new(status, pid)
+
+      if `out.status == 126 || out.status == 127` ||
+         (`$platform.windows` && `out.stderr.includes("is not recognized as an internal or external command")`)
+        # Windows sadly returns only status code 1 if the command does not exist, so we need to check stderr
+        raise ::Errno::ENOENT, cmdline
+      end
+
+      $stderr.write(`out.stderr`) if `out.stderr`
+      `Opal.str(out.stdout, #{::Encoding.default_external})`
     end
-
-    $stderr.write(`out.stderr`) if `out.stderr`
-    `Opal.str(out.stdout, #{::Encoding.default_external})`
+  else
+    alias :` __not_implemented__
   end
 
   def =~(obj)
@@ -640,16 +649,7 @@ module ::Kernel
       if (seconds < 0) {
         #{::Kernel.raise ::ArgumentError, 'time interval must be positive'}
       }
-      if (typeof(Opal.global.Atomics) === "object") {
-        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, Math.round(seconds * 1000));
-      } else {
-        var get_time = Opal.global.performance ?
-          function() {return performance.now()} :
-          function() {return new Date()}
-
-        var t = get_time();
-        while (get_time() - t <= seconds * 1000);
-      }
+      $platform.sleep(seconds);
       return Math.round(seconds);
     }
   end
@@ -672,68 +672,70 @@ module ::Kernel
 
   # syscall - not supported
 
-  def system(*argv, exception: false)
-    # Creates a new child process by doing one of the following in that process:
-    #   Passing string command_line to the shell.
-    #   Invoking the executable at exe_path.
-    env = {}
-    env = argv.shift if argv.first.is_a? ::Hash
-    env = ::ENV.to_h.merge!(env)
-    js_env = `{}`
-    env.each { |k, v| `js_env[k] = v.toString()` }
-    `delete js_env["SHELL"]`
-    js_opts = `{ stdio: 'pipe', env: js_env, wait: true }`
+  if `$platform.process_spawn`
+    def system(*argv, exception: false)
+      # Creates a new child process by doing one of the following in that process:
+      #   Passing string command_line to the shell.
+      #   Invoking the executable at exe_path.
+      env = {}
+      env = argv.shift if argv.first.is_a? ::Hash
+      env = ::ENV.to_h.merge!(env)
+      js_env = `{}`
+      env.each { |k, v| `js_env[k] = v.toString()` }
+      `delete js_env["SHELL"]`
+      js_opts = `{ stdio: 'pipe', env: js_env, wait: true }`
 
-    cmdname = argv.shift
-    if Array === cmdname
-      `js_opts.argv0 = #{cmdname[1]}`
-      cmdname = cmdname[0]
-    end
+      cmdname = argv.shift
+      if Array === cmdname
+        `js_opts.argv0 = #{cmdname[1]}`
+        cmdname = cmdname[0]
+      end
 
-    args = []
+      args = []
 
-    shell = if ::File.absolute_path?(cmdname)
-              false
-            else
-              true
-            end
+      shell = if ::File.absolute_path?(cmdname)
+                false
+              else
+                true
+              end
 
-    while argv[0].is_a?(::String)
-      args << argv.shift
-    end
+      while argv[0].is_a?(::String)
+        args << argv.shift
+      end
 
-    opts = argv.shift
+      opts = argv.shift
 
-    if opts.is_a?(::Hash)
-      `js_opts.cwd = #{opts[:chdir]}` if opts.key?(:chdir)
-      so = opts[:out]
-      se = opts[:err]
-    end
+      if opts.is_a?(::Hash)
+        `js_opts.cwd = #{opts[:chdir]}` if opts.key?(:chdir)
+        so = opts[:out]
+        se = opts[:err]
+      end
 
-    `js_opts.shell = shell`
+      `js_opts.shell = shell`
 
-    out = `$platform.process_spawn(#{cmdname}, #{args}, js_opts)`
+      out = `$platform.process_spawn(#{cmdname}, #{args}, js_opts)`
 
-    status = `out.status > 128 ? out.status - 128 : out.status`
-    pid = `out.pid == null ? nil : out.pid`
-    $? = ::Process::Status.new(status, pid)
+      status = `out.status > 128 ? out.status - 128 : out.status`
+      pid = `out.pid == null ? nil : out.pid`
+      $? = ::Process::Status.new(status, pid)
 
-    if exception
-      raise ::Errno::ENOENT if `out.status == 126 || out.status == 127`
-      raise "Command failed with exit #{status}: #{cmdname}" if status != 0
-      raise `out.error` if `out.error`
-    end
+      if exception
+        raise ::Errno::ENOENT if `out.status == 126 || out.status == 127`
+        raise "Command failed with exit #{status}: #{cmdname}" if status != 0
+        raise `out.error` if `out.error`
+      end
 
-    return nil if `out.error || out.status > 125`
+      return nil if `out.error || out.status > 125`
 
-    (so || $stdout).write(`out.stdout`) if `out.stdout`
-    if `out.stderr`
-      if (`$platform.windows` && se != 'NUL') || (`!$platform.windows` && se != '/dev/null')
+      (so || $stdout).write(`out.stdout`) if `out.stdout`
+      if `out.stderr` && ((`$platform.windows` && se != 'NUL') || (`!$platform.windows` && se != '/dev/null'))
         (se || $stderr).write(`out.stderr`)
       end
-    end
 
-    status == 0
+      status == 0
+    end
+  else
+    alias system __not_implemented__
   end
 
   def tap(&block)
@@ -755,7 +757,7 @@ module ::Kernel
 
   def trap(signal, command = nil, &block)
     if signal.is_a?(::Integer)
-      signal = ::Signal.list.key(signal)
+      signal = ::Signal.signame(signal)
       raise(::ArgumentError, 'unknown signal') unless signal
     elsif signal.is_a?(::String)
       signal = signal[1..] if signal[0] == '-'
@@ -765,7 +767,10 @@ module ::Kernel
     else
       raise(::ArgumentError, 'signal must be Integer or String')
     end
-    command ||= 'USETHEBLOCK'
+    if command.is_a?(::Proc)
+      block = command
+      command = nil
+    end
     `$platform.process_trap(signal, command, block)` || nil
   end
 
@@ -884,7 +889,7 @@ module ::Kernel
       end
     end
     "#<#{self.class}:0x#{id.to_s(16)}#{ivs}>"
-  rescue => e
+  rescue
     "#<#{self.class}:0x#{id.to_s(16)}>"
   ensure
     `inspect_stack`.pop if pushed
@@ -1045,8 +1050,9 @@ module ::Kernel
     %x{
       var body = self[$jsid(name)];
 
-      if (typeof(body) === "function" && !body.$$stub) {
-        return true;
+      if (typeof(body) === "function") {
+        if (body.$$alias_of == self.$__not_implemented__) return false;
+        else if (!body.$$stub) return true;
       }
 
       if (self['$respond_to_missing?'].$$pristine === true) {
@@ -1102,11 +1108,6 @@ module ::Kernel
   # Opal specific helpers
   #
 
-  def __not_implemented__(*args)
-    # convenience method to be aliased to, to save some code, e.g:
-    #   alias fancy_method __not_implemented__
-    raise ::NotImplementedError
-  end
 
   def copy_instance_variables(other)
     %x{
@@ -1202,3 +1203,5 @@ class ::Object
   `delete $Object.$$prototype.$require`
   include ::Kernel
 end
+
+require 'corelib/process/status'

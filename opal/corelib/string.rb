@@ -2194,7 +2194,7 @@ class ::String < `String`
       "use strict";
       #{
         def to_s
-          return self if self.class == ::String
+          return self if instance_of?(::String)
           `self.toString()`
         end
       }

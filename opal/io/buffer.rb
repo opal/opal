@@ -149,10 +149,10 @@ class ::IO
         size = 0
         if buffer_type.is_a?(Array)
           buffer_type.each do |type|
-            size += `size_map.get(type.$to_s())`
+            size += `size_map.get(type.$to_s().toString())`
           end
         else
-          size = `size_map.get(buffer_type.$to_s())`
+          size = `size_map.get(buffer_type.$to_s().toString())`
         end
         size
       end
@@ -323,7 +323,7 @@ class ::IO
       # Iterates over the buffer, yielding each value of buffer_type starting from offset.
       raise(AccessError, 'Buffer has been freed!') if null?
       return enum_for(:each, buffer_type, offset, count) unless block_given?
-      step = `size_map.get(buffer_type.$to_s())`
+      step = `size_map.get(buffer_type.$to_s().toString())`
       count ||= (size / step).to_i
       len = size - offset
       max = offset + `Math.min(count * step, len)`
@@ -413,6 +413,7 @@ class ::IO
       raise(AccessError, 'Buffer has been freed!') if null?
       buffer_type_s = buffer_type.to_s
       %x{
+        buffer_type_s = buffer_type_s.toString();
         let val = self.data_view['get' + fun_map.get(buffer_type_s)](offset, is_le(buffer_type_s));
         if (typeof(val) === "bigint") { return Number(val); }
         return val;
@@ -425,7 +426,7 @@ class ::IO
       array = []
       buffer_types.each do |buffer_type|
         array << get_value(buffer_type, offset)
-        offset += `size_map.get(buffer_type.$to_s())`
+        offset += `size_map.get(buffer_type.$to_s().toString())`
       end
       array
     end
@@ -549,6 +550,7 @@ class ::IO
       raise(AccessError, 'Buffer is not writable!') if readonly? || null?
       buffer_type_s = buffer_type.to_s
       %x{
+        buffer_type_s = buffer_type_s.toString();
         let fun = 'set' + fun_map.get(buffer_type_s);
         if (fun[3] === 'B') { value = BigInt(value); }
         self.data_view[fun](offset, value, is_le(buffer_type_s));
@@ -614,7 +616,7 @@ class ::IO
     def values(buffer_type, offset = 0, count = nil)
       # Returns an array of values of buffer_type starting from offset.
       array = []
-      step = `size_map.get(buffer_type.$to_s())`
+      step = `size_map.get(buffer_type.$to_s().toString())`
       count ||= (size / step).to_i
       while count > 0
         array << get_value(buffer_type, offset)

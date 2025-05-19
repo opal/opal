@@ -53,7 +53,7 @@
     # otherwise an enumerator is returned.
     return enum_for(:each, sep, limit, chomp: chomp) unless block_given?
     @processed = true
-    while ln = gets(sep, limit, chomp: chomp)
+    while (ln = gets(sep, limit, chomp: chomp))
       yield ln
     end
     self
@@ -98,14 +98,14 @@
     self
   end
 
-  alias each_line each
+  alias_method :each_line, :each
 
   def eof
     # Returns true if the current file in ARGF is at end of file, i.e. it has no data to read.
     !file || file.eof?
   end
 
-  alias eof? eof
+  alias_method :eof?, :eof
 
   def external_encoding
     # Returns the external encoding for files read from ARGF as an Encoding object.
@@ -180,8 +180,8 @@
         return ln if last == file
         ln = file.gets(sep, limit, chomp: chomp)
       end
-      @lineno += 1 if ln
     end
+    @lineno += 1 if ln
     ln
   rescue IOError => e
     return nil if e.message.include? 'closed '
@@ -191,11 +191,9 @@
   # Returns the file extension appended to the names of backup copies of modified files under in-place edit mode.
   attr_reader :inplace_mode
 
-  def inplace_mode=(ext)
-    # Sets the filename extension for in-place editing mode to the given String.
-    # The backup copy of each file being edited has this value appended to its filename.
-    @inplace_mode = ext
-  end
+  # Sets the filename extension for in-place editing mode to the given String.
+  # The backup copy of each file being edited has this value appended to its filename.
+  attr_writer :inplace_mode
 
   def inspect
     'ARGF'
@@ -209,12 +207,10 @@
   # Returns the current line number of ARGF as a whole.
   attr_reader :lineno
 
-  def lineno=(int)
-    # Sets the line number of ARGF as a whole to the given Integer.
-    @lineno = int
-  end
+  # Sets the line number of ARGF as a whole to the given Integer.
+  attr_writer :lineno
 
-  alias path filename
+  alias_method :path, :filename
 
   def pos
     # Returns the current offset (in bytes) of the current file in ARGF.
@@ -276,7 +272,7 @@
   end
 
   # Reads at most maxlen bytes from the ARGF stream in non-blocking mode.
-  alias read_nonblock __not_implemented__
+  alias_method :read_nonblock, :__not_implemented__
 
   def readbyte
     @processed = true
@@ -359,7 +355,7 @@
     self
   end
 
-  alias tell pos
+  alias_method :tell, :pos
 
   def to_a
     each.to_a
@@ -367,13 +363,13 @@
     []
   end
 
-  alias to_i fileno
+  alias_method :to_i, :fileno
 
-  alias to_io file
+  alias_method :to_io, :file
 
-  alias to_s inspect
+  alias_method :to_s, :inspect
 
-  alias to_write_io __not_implemented__
+  alias_method :to_write_io, :__not_implemented__
 
-  alias write __not_implemented__
+  alias_method :write, :__not_implemented__
 end.new(ARGV)

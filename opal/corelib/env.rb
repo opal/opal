@@ -10,8 +10,6 @@
     if val
       val = ::Opal.str(val, ::Encoding.default_internal) if ::Encoding.default_internal
       val.freeze
-    else
-      nil
     end
   end
 
@@ -75,14 +73,14 @@
     self
   end
 
-  def each_key
+  def each_key(&block)
     # Yields each environment variable name
     return enum_for(:each_key) { length } unless block_given?
-    keys.each { |k| yield k }
+    keys.each(&block)
     self
   end
 
-  alias each_pair each
+  alias_method :each_pair, :each
 
   def each_value
     # Yields each environment variable value
@@ -105,7 +103,7 @@
   def fetch(name, default_value = nil)
     # If name is the name of an environment variable, returns its value
     name = ::Opal.coerce_to!(name, ::String, :to_str)
-    warn("block supersedes default value argument") if default_value && block_given?
+    warn('block supersedes default value argument') if default_value && block_given?
     return self[name] if key?(name)
     return yield name if block_given?
     return default_value unless `default_value == nil || default_value == null`
@@ -152,10 +150,10 @@
     value = ::Opal.coerce_to?(value, ::String, :to_str)
     return nil unless value
     each_value { |v| return true if v == value }
-    return false
+    false
   end
 
-  alias include? has_key?
+  alias_method :include?, :has_key?
 
   def inspect
     # Returns the contents of the environment as a String
@@ -183,13 +181,13 @@
     nil
   end
 
-  alias key? has_key?
+  alias_method :key?, :has_key?
 
   def keys
     # Returns a new array containing all keys in self
     ks = `$platform.env_keys()`
     return ks unless ::Encoding.default_internal
-    ks.map { |k| ::Opal.str(k,::Encoding.default_internal) }
+    ks.map { |k| ::Opal.str(k, ::Encoding.default_internal) }
   end
 
   def length
@@ -197,7 +195,7 @@
     `$platform.env_keys()`.size
   end
 
-  alias member? has_key?
+  alias_method :member?, :has_key?
 
   # def merge(keys)
   #   to_h.merge(keys)
@@ -271,7 +269,7 @@
     orig = to_hash
     clear
     begin
-      hash.each { |k,v| self[k] = v }
+      hash.each { |k, v| self[k] = v }
     rescue => e
       replace orig
       raise e
@@ -279,9 +277,9 @@
     self
   end
 
-  alias select filter
+  alias_method :select, :filter
 
-  alias select! filter!
+  alias_method :select!, :filter!
 
   def shift
     # Removes the first environment variable from ENV and returns a
@@ -293,7 +291,7 @@
     res
   end
 
-  alias size length
+  alias_method :size, :length
 
   def slice(*names)
     # Returns a Hash of the given ENV names and their corresponding values
@@ -305,7 +303,7 @@
     h
   end
 
-  alias store []=
+  alias_method :store, :[]=
 
   def to_a
     # Returns the contents of ENV as an Array of 2-element Arrays, each of which is a name/value pair
@@ -338,16 +336,16 @@
     'ENV'
   end
 
-  alias update merge!
+  alias_method :update, :merge!
 
-  alias value? has_value?
+  alias_method :value?, :has_value?
 
   def values
     # Returns all environment variable values in an Array
     ary = []
     each_value { |v| ary << v }
     return ary unless ::Encoding.default_internal
-    ary.map { |v| ::Opal.str(v,::Encoding.default_internal) }
+    ary.map { |v| ::Opal.str(v, ::Encoding.default_internal) }
   end
 
   def values_at(*names)

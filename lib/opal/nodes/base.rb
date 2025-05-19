@@ -229,13 +229,13 @@ module Opal
         "['#{file}', #{line}]"
       end
 
-      def node_has?(node, type)
+      def node_has?(child, type)
         # look ahead if a child with specified type is in the tree
-        if node
-          node.children.each do |child|
-            if child.is_a?(::AST::Node) || child.is_a?(::Opal::Nodes::Base)
-              return true if child.type == type
-              return true if node_has?(child, type)
+        if child
+          child.children.each do |chld|
+            if chld.is_a?(::AST::Node) || chld.is_a?(::Opal::Nodes::Base)
+              return true if chld.type == type
+              return true if node_has?(chld, type)
             end
           end
         end

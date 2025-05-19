@@ -8,7 +8,6 @@ if (["bun", "deno", "graalnodejs", "node"].includes(Opal.platform.name)) {
 Opal.queue(async function() {
 
 const platform = Opal.platform;
-const not_available = platform.not_available;
 
 // imports
 const child_process = await import("node:child_process");
@@ -16,7 +15,7 @@ const cluster = await import("node:cluster");
 const fs = await import("node:fs");
 const os = await import("node:os");
 const path = await import("node:path");
-const process = await import("node:process");
+const process = Opal.global.process;
 const url = await import("node:url");
 
 // allow access to modules from stdlib, this is node specific and only used by open-uri
@@ -94,6 +93,9 @@ if (platform.deno || Opal.platform.name == "bun") {
 
 // Exit
 platform.exit = process.exit;
+
+// Sleep
+platform.sleep = platform.sleep_atomics;
 
 // ARGV
 platform.argv = process.argv.slice(1)
@@ -191,12 +193,13 @@ platform.process_spawn = function() {
     return { status: res.exitCode, pid: res.pid, error: null, stdout: '', stderr: '' }
   }
 }
-platform.process_trap = (signal, command, block)=>{
+platform.process_trap = (signal, _command, block)=>{
   if (block == Opal.nil) block = null;
   signal = 'SIG' + signal.toString();
   let last = traps[signal];
-  traps[signal] = block || command;
-  process.on(signal, (_s)=>{ if (block) block.$call(); })
+  if (last) process.off(signal, last);
+  traps[signal] = block;
+  if (block && block != Opal.nil) process.on(signal, traps[signal]);
   return last;
 }
 
@@ -209,8 +212,7 @@ class Pipe {
   static get_fd() {
     // Allocate a real FD, but don't actually use it for reading/writing.
     // It is still useful for stat or others though.
-    let sep = path.sep,
-        tmpdir = fs.mkdtempSync(os.tmpdir() + sep + "opal-pipe-emu-");
+    let sep = path.sep, tmpdir = fs.mkdtempSync(os.tmpdir() + sep + "opal-pipe-emu-");
     return [fs.openSync(tmpdir + sep + "pipe", "wx+"), tmpdir];
   }
   constructor()  {
@@ -224,11 +226,8 @@ class Pipe {
   read(io_buffer, buffer_offset, count) {
     if (this.write_pos === 0) return 0; // nothing to read
     if (count == null) count = Infinity;
-    let dv = io_buffer.data_view, i = 0,
-        max_read = Math.min(this.write_pos, dv.byteLength - buffer_offset, count);
-    for (; i < max_read; i++) {
-      dv.setUint8(buffer_offset++, this.data_view.getUint8(i));
-    }
+    let dv = io_buffer.data_view, i = 0, max_read = Math.min(this.write_pos, dv.byteLength - buffer_offset, count);
+    for (; i < max_read; i++) { dv.setUint8(buffer_offset++, this.data_view.getUint8(i)); }
     let buffer = this.data_view.buffer.slice(max_read);
     this.data_view = new DataView(buffer);
     this.write_pos -= max_read;
@@ -236,8 +235,7 @@ class Pipe {
   }
   write(io_buffer, buffer_offset, count) {
     if (count == null) count = Infinity;
-    let dv = io_buffer.data_view, i = 0,
-        max_write = Math.min(count, dv.byteLength - buffer_offset);
+    let dv = io_buffer.data_view, i = 0, max_write = Math.min(count, dv.byteLength - buffer_offset);
     if (max_write === 0) return 0; // nothing to write
     if ((this.write_pos + max_write) > this.data_view.byteLength) {
       let buffer = this.data_view.buffer.transfer(this.data_view.byteLength + max_write);
@@ -273,7 +271,10 @@ platform.io_pipe = ()=>{
   platform.pipes[pp.write_fd] = pp;
   return [pp.read_fd, pp.write_fd];
 }
-platform.io_pipe_eof = (fd)=>platform.pipes[fd].eof(fd);
+platform.io_pipe_eof = (fd)=>{
+  if (platform.pipes[fd]) return platform.pipes[fd].eof(fd);
+  return false;
+}
 
 // IO.popen
 class SpawnPipe {
@@ -306,15 +307,12 @@ class SpawnPipe {
       let pipe = this;
       function process_data(data) {
         if (!data) return; // On Bun 1.2.8 data is undefined
-        let uint8ary = pipe.tencoder.encode(data.toString('utf8')),
-            i = 0;
+        let i = 0, uint8ary = pipe.tencoder.encode(data.toString('utf8'));
         if ((pipe.data_view.byte_length - pipe.write_pos) < uint8ary.byteLength) {
           let buffer = pipe.data_view.buffer.transfer(pipe.write_pos + uint8ary.byteLength)
           pipe.data_view = new DataView(buffer);
         }
-        for (; i < uint8ary.byteLength;) {
-          pipe.data_view.setUint8(pipe.write_pos++, uint8ary[i++]);
-        }
+        for (; i < uint8ary.byteLength;) { pipe.data_view.setUint8(pipe.write_pos++, uint8ary[i++]); }
       }
       this.chpr = child_process.spawn(cmd, args, options);
       if (this.chpr.stdout) {
@@ -335,9 +333,7 @@ class SpawnPipe {
     if (count == null) count = Infinity;
     let dv = io_buffer.data_view, i = 0,
         max_read = Math.min(this.write_pos, dv.byteLength - buffer_offset, count);
-    for (; i < max_read; i++) {
-      dv.setUint8(buffer_offset++, this.data_view.getUint8(i));
-    }
+    for (; i < max_read; i++) { dv.setUint8(buffer_offset++, this.data_view.getUint8(i)); }
     let buffer = this.data_view.buffer.slice(max_read);
     this.data_view = new DataView(buffer);
     this.write_pos -= max_read;
@@ -426,23 +422,28 @@ platform.io_fdatasync = (fd)=>{ if (fd > 2) action(fs.fdatasyncSync, fd); }
 platform.io_fstat = (fd)=>action(fs.fstatSync, fd);
 platform.io_fsync = (fd)=>{ if (fd > 2) action(fs.fsyncSync, fd); }
 platform.io_open = (fd)=>{
-  switch (fd) {
-    case 0: return process.stdin.isTTY;
-    case 1: return process.stdout.isTTY;
-    case 2: return process.stderr.isTTY;
-  }
-  return false;
- };
+  let tty = false, pipe = false, channel;
+  if (fd == 0) channel = process.stdin;
+  else if (fd == 1) channel = process.stdout;
+  else if (fd == 2) channel = process.stderr;
+  tty = channel ? channel.isTTY : false;
+  if (fd < 3) pipe = !tty;
+  return [tty, pipe, platform.pipes[fd] ? false : fs.fstatSync(fd).isFile()];
+};
 platform.io_open_path = (path_name, flags, perm)=>{
   path_name = path_name.toString();
   let mode = flags_to_mode(flags);
   if (!mode) mode = emulated_flags_to_mode(flags, path_name, perm);
   return action(fs.openSync, path_name, mode, perm);
 }
-platform.io_read = (fd, io_buffer, buffer_offset, pos, count)=>{
+platform.io_read = (fd, io_buffer, buffer_offset, pos, count, is_file)=>{
   let pp = platform.pipes[fd];
   if (pp) return pp.read(io_buffer, buffer_offset, count);
-  return action(fs.readSync, fd, io_buffer.data_view, buffer_offset, count, pos);
+  if (is_file) return action(fs.readSync, fd, io_buffer.data_view, buffer_offset, count, pos);
+  while (true) {
+    try { return action(fs.readSync, fd, io_buffer.data_view, buffer_offset, count); }
+    catch (e) { if (!(e instanceof Opal.Errno.EAGAIN)) throw(e); }
+  }
 };
 platform.io_write = (fd, io_buffer, buffer_offset, pos, count)=>{
   let data = io_buffer.data_view;
@@ -486,12 +487,13 @@ platform.file_set_umask = function(umask) {
 platform.file_link = (path_name, new_path_name)=>action(fs.linkSync, path_name.toString(), new_path_name.toString());
 platform.file_lstat = (file_name)=>action(fs.lstatSync, file_name.toString());
 platform.file_lutime = (file_name, atime, mtime)=>action(fs.lutimesSync, file_name.toString(), atime, mtime);
-platform.file_mkfifo = (file_name, mode)=>{
-  if (platform.windows) return not_available("On Windows File.mkfifo");
-  let mode_s = mode.toString(8);
-  if (mode_s.length > 3) mode_s = mode_s.slice(mode_s.length - 3);
-  let res = child_process.spawnSync('mkfifo', ['-m', mode_s, file_name.toString()]);
-  return res.status;
+if (!platform.windows) {
+  platform.file_mkfifo = (file_name, mode)=>{
+    let mode_s = mode.toString(8);
+    if (mode_s.length > 3) mode_s = mode_s.slice(mode_s.length - 3);
+    let res = child_process.spawnSync('mkfifo', ['-m', mode_s, file_name.toString()]);
+    return res.status;
+  }
 }
 platform.file_readlink = (path_name)=>action(fs.readlinkSync, path_name.toString()).replaceAll(path.sep, '/');
 platform.file_realpath = (path_name, sep)=>{
@@ -521,8 +523,7 @@ platform.dir_close = (fd)=>{
 }
 platform.dir_home = ()=>os.homedir();
 platform.dir_open = (dir_name)=>{
-  let handle = action(fs.opendirSync, dir_name.toString()),
-      fd = ++directories.last;
+  let handle = action(fs.opendirSync, dir_name.toString()), fd = ++directories.last;
   directories[fd] = { __proto__: null, handle: handle, eof: false, dot: false, dotdot: false };
   return fd;
 }

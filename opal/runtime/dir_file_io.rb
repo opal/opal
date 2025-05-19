@@ -4,11 +4,34 @@
 # helpers: mbinc, platform
 
 module ::Opal
+  # helper to convert ::File/::IO string open modes to flags
+  def self.mode_to_flags(mode)
+    %x{
+      const o = Opal.File.Constants;
+      if (mode === nil) return nil;
+      let a = mode.includes('a'),
+          r = mode.includes('r'),
+          w = mode.includes('w'),
+          x = mode.includes('x'),
+          p = mode.includes('+');
+      if ( a && !r && !w &&  p &&  x) return o.APPEND | o.CREAT | o.EXCL | o.RDWR;   // ax+
+      if ( a && !r && !w &&  p && !x) return o.APPEND | o.CREAT | o.RDWR;            // a+
+      if ( a && !r && !w && !p &&  x) return o.APPEND | o.CREAT | o.EXCL | o.WRONLY; // ax
+      if ( a && !r && !w && !p && !x) return o.APPEND | o.CREAT | o.WRONLY;          // a
+      if (!a && !r &&  w &&  p &&  x) return o.RDWR   | o.CREAT | o.EXCL | o.TRUNC;  // wx+
+      if (!a && !r &&  w &&  p && !x) return o.RDWR   | o.CREAT | o.TRUNC;           // w+
+      if (!a && !r &&  w && !p &&  x) return o.WRONLY | o.CREAT | o.EXCL | o.TRUNC;  // wx
+      if (!a && !r &&  w && !p && !x) return o.WRONLY | o.CREAT | o.TRUNC;           // w
+      if (!a &&  r && !w &&  p && !x) return o.RDWR;   // r+
+      if (!a &&  r && !w && !p && !x) return o.RDONLY; // r
+      return nil;
+    }
+  end
+
   # glob_brace_expand, original name ruby_brace_expand and ported from ruby/dir.c,
-  # used by ::File#fnmatch and ::Dir#glob
+  # used by ::File.fnmatch and ::Dir.glob
   def self.glob_brace_expand(str, func, escape, arg)
     pi = 0
-    si = 0
     nest = 0
     lbrace = nil
     rbrace = nil
@@ -27,7 +50,6 @@ module ::Opal
     end
 
     if lbrace && rbrace
-      shift = lbrace
       pi = lbrace
       while pi < rbrace
         t = `++pi`
@@ -61,35 +83,8 @@ module ::Opal
     `(str[idx] === '*' && str[idx+1] === '*' && str[idx+2] === '/') ? true : false`
   end
 
-  def self.mode_to_flags(mode)
-    %x{
-      const o = Opal.File.Constants;
-      if (mode === nil) return nil;
-      let a = mode.includes('a'),
-          r = mode.includes('r'),
-          w = mode.includes('w'),
-          x = mode.includes('x'),
-          p = mode.includes('+');
-      if ( a && !r && !w &&  p &&  x) return o.APPEND | o.CREAT | o.EXCL | o.RDWR;   // ax+
-      if ( a && !r && !w &&  p && !x) return o.APPEND | o.CREAT | o.RDWR;            // a+
-      if ( a && !r && !w && !p &&  x) return o.APPEND | o.CREAT | o.EXCL | o.WRONLY; // ax
-      if ( a && !r && !w && !p && !x) return o.APPEND | o.CREAT | o.WRONLY;          // a
-      if (!a && !r &&  w &&  p &&  x) return o.RDWR   | o.CREAT | o.EXCL | o.TRUNC;  // wx+
-      if (!a && !r &&  w &&  p && !x) return o.RDWR   | o.CREAT | o.TRUNC;           // w+
-      if (!a && !r &&  w && !p &&  x) return o.WRONLY | o.CREAT | o.EXCL | o.TRUNC;  // wx
-      if (!a && !r &&  w && !p && !x) return o.WRONLY | o.CREAT | o.TRUNC;           // w
-      if (!a &&  r && !w &&  p && !x) return o.RDWR;   // r+
-      if (!a &&  r && !w && !p && !x) return o.RDONLY; // r
-      return nil;
-    }
-  end
-
-  # methods for File.expand_path and File.absolute_path
+  # methods for ::File.expand_path, ::File.absolute_path and ::File.dirname
   # straightforward port of rb_file_expand_path_internal from ruby/file.c, more or less
-  # just like in ruby/file.c
-  def self.append_fspath(result, dir)
-    [result + dir, `dir.length`]
-  end
 
   # just like in ruby/file.c
   def self.bufcopy(fname, srcptr, srclen, result, pi)
@@ -102,7 +97,7 @@ module ::Opal
 
   # just like in ruby/file.c
   def self.bufinit(result)
-    [0, `result.length`, 0, `result.length`]
+    [0, 0, `result.length`]
   end
 
   # just like in ruby/file.c
@@ -185,7 +180,7 @@ module ::Opal
   # just like in ruby/file.c
   def self.skiproot(pth, d)
     idx = 0
-    if `$platform.windows` && 2 < d && has_drive_letter(pth)
+    if `$platform.windows` && 2 <= d && has_drive_letter(pth)
       idx += 2
     end
     while idx < d && is_dirsep(`pth[idx]`)
@@ -230,13 +225,10 @@ module ::Opal
   # just like in ruby/file.c
   def self.rb_file_expand_path_internal(fname, dname, abs_mode, long_name, result)
     enc = fname.encoding
-    user = nil
-    b = nil
-
-    fend = `fname.length`
+    user = b = nil
     s = 0
 
-    buf, buflen, pi, pend = bufinit(result)
+    buf, pi, pend = bufinit(result)
 
     if !abs_mode && `fname[s] == '~'`
       if is_dirsep(`fname[1]`) || `!fname[1]`
@@ -261,7 +253,7 @@ module ::Opal
         raise(::ArgumentError, "non-absolute home of #{user}") if user
         raise(::ArgumentError, 'non-absolute home')
       end
-      buf, buflen, pi, pend = bufinit(result)
+      buf, pi, pend = bufinit(result)
       pi = pend
     elsif `$platform.windows` && has_drive_letter(fname)
       if is_dirsep(`fname[2]`)
@@ -286,18 +278,21 @@ module ::Opal
         pi = chompdirsep(result, skiproot(result, pi))
         s += 2
       end
-    elsif !(::File.absolute_path?(fname) || (`$platform.windows` && is_dirsep(`fname[0]`)))
+    elsif !::File.absolute_path?(fname)
       if dname
         result = rb_file_expand_path_internal(dname, nil, abs_mode, long_name, result)
-        buf, buflen, pi, pend = bufinit(result)
+        buf, pi, pend = bufinit(result)
         pi = pend
       else
-        result, e = append_fspath(result, ::Dir.pwd)
-        buf, buflen, pi, pend = bufinit(result)
+        dir = ::Dir.pwd
+        result += dir
+        e = `dir.length`
+        buf, pi, pend = bufinit(result)
         pi = e
       end
       if `$platform.windows` && is_dirsep(`fname[s]`)
-        pi = skipprefix(result, pi)
+        pi = skipprefix(result, 0)
+        result = `result.slice(0, pi)`
       else
         pi = chompdirsep(skiproot(result, pi), pi)
       end
@@ -316,7 +311,7 @@ module ::Opal
     else
       result += '/'
     end
-    root = skipprefix(result, pi + 1)
+    # root = skipprefix(result)
     b = s
     while `fname[s]`
       case `fname[s]`

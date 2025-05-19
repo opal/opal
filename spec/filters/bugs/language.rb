@@ -281,8 +281,6 @@ opal_filter "language" do
   fails "The alias keyword operates on the object's metaclass when used in instance_eval" # NameError: undefined method `value' for class `Object'
   fails "The alias keyword supports aliasing twice the same global variables" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1c9ba @obj=#<AliasObject:0x1ce06> @meta=#<Class:#<AliasObject:0x1ce06>>>
   fails "The break statement in a captured block from another thread raises a LocalJumpError when getting the value from another thread" # NotImplementedError: Thread creation not available
-  fails "The break statement in a lambda created at the toplevel returns a value when invoking from a block" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa5de4 @program=#<BreakSpecs::Lambda:0xa5ea2 @ensures=false>>
-  fails "The break statement in a lambda created at the toplevel returns a value when invoking from the toplevel" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa5de4 @program=#<BreakSpecs::Lambda:0xa5eaa @ensures=false>>
   fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility" # Expected DefSpecsLambdaVisibility to have private instance method 'some_method' but it does not
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the class" # Expected "constant" to be nil
