@@ -160,111 +160,124 @@ class ::IO
   }
 
   class << self
-    def binread(path, length = nil, offset = 0, **opts)
-      # Behaves like IO.read, except that the stream is opened in binary mode with ASCII-8BIT encoding.
-      `common_read(path, length, offset, opts, true)`
-    end
-
-    def binwrite(path, data, offset = nil, **opts)
-      # Behaves like IO.write, except that the stream is opened in binary mode with ASCII-8BIT encoding.
-      `common_write(path, data, offset, opts, true)`
-    end
-
-    def copy_stream(src, dst, src_length = nil, src_offset = nil)
-      # Copies from the given src to the given dst, returning the number of bytes copied.
-      src_opened = dest_opened = rpartial = false
-      src = src.to_path if !src.is_a?(::IO) && src.respond_to?(:to_path)
-      src_io = if src.is_a?(String)
-                 fd = `$platform.io_open_path(src, #{::File::Constants::RDONLY})`
-                 src_opened = true
-                 IO.new(fd, 'r')
-               else
-                 rpartial = if src.respond_to?(:read)
-                              false
-                            elsif src.respond_to?(:readpartial)
-                              true
-                            else
-                              raise TypeError, 'src must respond to :read or :readpartial'
-                            end
-                 src
-               end
-      dst = dst.to_path if !dst.is_a?(::IO) && dst.respond_to?(:to_path)
-      dst_io = if dst.is_a?(String)
-                 fd = `$platform.io_open_path(dst, #{::File::Constants::CREAT | ::File::Constants::WRONLY})`
-                 dest_opened = true
-                 IO.new(fd, 'w')
-               else
-                 raise TypeError, 'dst must respond to :write' unless dst.respond_to?(:write)
-                 dst
-               end
-
-      bsizes = [src_io, dst_io].map do |io|
-                 size = io.stat.blksize if io.respond_to?(:stat)
-                 size && size > 0 ? size : 1024
-               end
-
-      bsize = bsizes.min
-      bsize = [bsize, src_length].min if src_length
-      total_bytes = 0
-      if src_offset
-        raise(::Errno::ESPIPE) if src_io.respond_to?(:stat) && src_io.stat.pipe?
-        src_orig_pos = src_io.pos if !src_opened && src_io.respond_to?(:pos)
-        src_io.pos = src_offset
+    if `$platform.io_open_path`
+      def binread(path, length = nil, offset = 0, **opts)
+        # Behaves like IO.read, except that the stream is opened in binary mode with ASCII-8BIT encoding.
+        `common_read(path, length, offset, opts, true)`
       end
 
-      begin
-        bsize = src_length - total_bytes if src_length && (total_bytes + bsize) > src_length
-        data = if rpartial
-                 src_io.readpartial(bsize, nil) rescue nil
-               else
-                 src_io.read(bsize, nil)
-               end
-        total_bytes += dst_io.write(data) if data
-      end while data && (!src_length || (total_bytes < src_length))
+      def binwrite(path, data, offset = nil, **opts)
+        # Behaves like IO.write, except that the stream is opened in binary mode with ASCII-8BIT encoding.
+        `common_write(path, data, offset, opts, true)`
+      end
+    else
+      alias binread __not_implemented__
+      alias binwrite __not_implemented__
+    end
 
-      total_bytes
-    ensure
-      src_io.pos = src_orig_pos if src_offset && !src_opened && src_io.respond_to?(:pos=)
-      src_io&.close if src_opened
-      dst_io&.close if dest_opened
+    if `$platform.io_open_path`
+      def copy_stream(src, dst, src_length = nil, src_offset = nil)
+        # Copies from the given src to the given dst, returning the number of bytes copied.
+        src_opened = dest_opened = rpartial = false
+        src = src.to_path if !src.is_a?(::IO) && src.respond_to?(:to_path)
+        src_io = if src.is_a?(String)
+                   fd = `$platform.io_open_path(src, #{::File::Constants::RDONLY})`
+                   src_opened = true
+                   IO.new(fd, 'r')
+                 else
+                   rpartial = if src.respond_to?(:read)
+                                false
+                              elsif src.respond_to?(:readpartial)
+                                true
+                              else
+                                raise TypeError, 'src must respond to :read or :readpartial'
+                              end
+                   src
+                 end
+        dst = dst.to_path if !dst.is_a?(::IO) && dst.respond_to?(:to_path)
+        dst_io = if dst.is_a?(String)
+                   fd = `$platform.io_open_path(dst, #{::File::Constants::CREAT | ::File::Constants::WRONLY})`
+                   dest_opened = true
+                   IO.new(fd, 'w')
+                 else
+                   raise TypeError, 'dst must respond to :write' unless dst.respond_to?(:write)
+                   dst
+                 end
+
+        bsizes = [src_io, dst_io].map do |io|
+          size = io.stat.blksize if io.respond_to?(:stat)
+          size && size > 0 ? size : 1024
+        end
+
+        bsize = bsizes.min
+        bsize = [bsize, src_length].min if src_length
+        total_bytes = 0
+        if src_offset
+          raise(::Errno::ESPIPE) if src_io.respond_to?(:stat) && src_io.stat.pipe?
+          src_orig_pos = src_io.pos if !src_opened && src_io.respond_to?(:pos)
+          src_io.pos = src_offset
+        end
+
+        begin
+          bsize = src_length - total_bytes if src_length && (total_bytes + bsize) > src_length
+          data = if rpartial
+                   src_io.readpartial(bsize, nil) rescue nil
+                 else
+                   src_io.read(bsize, nil)
+                 end
+          total_bytes += dst_io.write(data) if data
+        end while data && (!src_length || (total_bytes < src_length))
+
+        total_bytes
+      ensure
+        src_io.pos = src_orig_pos if src_offset && !src_opened && src_io.respond_to?(:pos=)
+        src_io&.close if src_opened
+        dst_io&.close if dest_opened
+      end
+    else
+      alias copy_stream __not_implemented__
     end
 
     alias for_fd new # Synonym for IO.new.
 
-    def foreach(path, sep = $/, limit = nil, **opts, &block)
-      # Calls the block with each successive line read from the stream.
-      path = ::Opal.coerce_to!(path, ::String, :to_path)
+    if `$platform.io_open_path`
+      def foreach(path, sep = $/, limit = nil, **opts, &block)
+        # Calls the block with each successive line read from the stream.
+        path = ::Opal.coerce_to!(path, ::String, :to_path)
 
-      if sep.is_a?(::Integer) && limit.nil?
-        limit = sep
-        sep = $/
-      end
-      sep = ::Opal.coerce_to!(sep, ::String, :to_str) if sep
+        if sep.is_a?(::Integer) && limit.nil?
+          limit = sep
+          sep = $/
+        end
+        sep = ::Opal.coerce_to!(sep, ::String, :to_str) if sep
 
-      if limit
-        limit = ::Opal.coerce_to!(limit, ::Integer, :to_int)
-        if limit < 0
-          limit = nil
-        elsif limit == 0
-          raise(ArgumentError, 'limit must be greater than 0')
+        if limit
+          limit = ::Opal.coerce_to!(limit, ::Integer, :to_int)
+          if limit < 0
+            limit = nil
+          elsif limit == 0
+            raise(ArgumentError, 'limit must be greater than 0')
+          end
+        end
+
+        return enum_for(:foreach, path, sep, limit, **opts) unless block_given?
+
+        begin
+          mode = opts.delete(:mode)
+          mode = mode ? mode.split(':').first : 'r'
+          flags = `Opal.mode_to_flags(mode)`
+          fd = `$platform.io_open_path(path, flags)`
+          chomp = opts.delete(:chomp)
+          opts[:path] = path
+          io = new(fd, mode, **opts)
+          io.each(sep, limit, chomp: chomp, &block)
+          $_ = nil
+        ensure
+          io&.close
         end
       end
-
-      return enum_for(:foreach, path, sep, limit, **opts) unless block_given?
-
-      begin
-        mode = opts.delete(:mode)
-        mode = mode ? mode.split(':').first : 'r'
-        flags = `Opal.mode_to_flags(mode)`
-        fd = `$platform.io_open_path(path, flags)`
-        chomp = opts.delete(:chomp)
-        opts[:path] = path
-        io = new(fd, mode, **opts)
-        io.each(sep, limit, chomp: chomp, &block)
-        $_ = nil
-      ensure
-        io&.close
-      end
+    else
+      alias foreach __not_implemented__
     end
 
     def open(fd, mode, **opts)
@@ -284,79 +297,87 @@ class ::IO
       end
     end
 
-    def pipe(ext_enc = nil, int_enc = nil, **opts)
-      # Creates a pair of pipe endpoints, read_io and write_io, connected to each other.
-      if ext_enc && !ext_enc.is_a?(::Encoding)
-        ext_enc = ::Opal.coerce_to!(ext_enc, ::String, :to_str)
-        ext_enc, int_enc = ext_enc.split(':') if int_enc.nil?
-        bom, ext_enc = ext_enc.split('|') if ext_enc.include?('|')
-        ext_enc = ::Encoding.find(ext_enc)
+    if `$platform.io_pipe`
+      def pipe(ext_enc = nil, int_enc = nil, **opts)
+        # Creates a pair of pipe endpoints, read_io and write_io, connected to each other.
+        if ext_enc && !ext_enc.is_a?(::Encoding)
+          ext_enc = ::Opal.coerce_to!(ext_enc, ::String, :to_str)
+          ext_enc, int_enc = ext_enc.split(':') if int_enc.nil?
+          bom, ext_enc = ext_enc.split('|') if ext_enc.include?('|')
+          ext_enc = ::Encoding.find(ext_enc)
+        end
+        if int_enc && !int_enc.is_a?(::Encoding)
+          int_enc = ::Opal.coerce_to!(int_enc, ::String, :to_str)
+          int_enc = ::Encoding.find(int_enc)
+        end
+
+        ext_enc ||= Encoding.default_external
+        int_enc ||= Encoding.default_internal
+        int_enc = nil if ext_enc == int_enc
+
+        read_fd, write_fd = `$platform.io_pipe()`
+
+        write_io = allocate
+        write_io.initialize(write_fd, 'w')
+        write_io.set_encoding(nil)
+        write_io.instance_variable_set(:@pipe, true)
+
+        read_io = allocate
+        read_io.initialize(read_fd, 'r', external_encoding: ext_enc, internal_encoding: int_enc)
+        read_io.instance_variable_set(:@pipe, true)
+
+        return [read_io, write_io] unless block_given?
+        begin
+          yield read_io, write_io
+        ensure
+          read_io.close
+          write_io.close
+        end
       end
-      if int_enc && !int_enc.is_a?(::Encoding)
-        int_enc = ::Opal.coerce_to!(int_enc, ::String, :to_str)
-        int_enc = ::Encoding.find(int_enc)
-      end
-
-      ext_enc ||= Encoding.default_external
-      int_enc ||= Encoding.default_internal
-      int_enc = nil if ext_enc == int_enc
-
-      read_fd, write_fd = `$platform.io_pipe()`
-
-      write_io = allocate
-      write_io.initialize(write_fd, 'w')
-      write_io.set_encoding(nil)
-      write_io.instance_variable_set(:@pipe, true)
-
-      read_io = allocate
-      read_io.initialize(read_fd, 'r', external_encoding: ext_enc, internal_encoding: int_enc)
-      read_io.instance_variable_set(:@pipe, true)
-
-      return [read_io, write_io] unless block_given?
-      begin
-        yield read_io, write_io
-      ensure
-        read_io.close
-        write_io.close
-      end
+    else
+      alias pipe __not_implemented__
     end
 
-    def popen(env = {}, cmd = nil, mode = nil, **opts)
-      # Executes the given command cmd as a subprocess whose $stdin and $stdout are connected to a new stream io.
-      js_opts = `{ stdio: 'pipe' }`
-      args = `null`
-      if env.is_a?(Hash)
-        `js_opts.env = {}`
-        env.each { |k, v| `js_opts.env[k.toString()] = v.toString()` }
-      else
-        mode = cmd if mode.nil? && cmd
-        cmd = env
-        env = nil
+    if `$platform.io_popen`
+      def popen(env = {}, cmd = nil, mode = nil, **opts)
+        # Executes the given command cmd as a subprocess whose $stdin and $stdout are connected to a new stream io.
+        js_opts = `{ stdio: 'pipe' }`
+        args = `null`
+        if env.is_a?(Hash)
+          `js_opts.env = {}`
+          env.each { |k, v| `js_opts.env[k.toString()] = v.toString()` }
+        else
+          mode = cmd if mode.nil? && cmd
+          cmd = env
+          env = nil
+        end
+        if cmd.is_a?(Array)
+          command = cmd.shift
+          args = cmd.map { |a| `a.toString()` }
+          cmd = command
+        end
+        raise(::NotImplementedError, "popen with fork '-' is not available") if cmd == '-'
+        mode = mode ? ::Opal.coerce_to!(mode, ::String, :to_str) : 'r'
+        `js_opts.shell = true`
+        `js_opts.cwd = #{opts[:chdir]}` if opts.key?(:chdir)
+        if opts.key?(:err)
+          err = opts[:err]
+          `js_opts.err = 'out'` if err.is_a?(::Array) && err[0] == :child && (err[1] == :out || err[1] == 1)
+        end
+        fd, pid = `$platform.io_popen(cmd, args, mode, js_opts)`
+        # $? = ::Process::Status.new(nil, pid)
+        io = new(fd, mode, **opts)
+        `io.pid = pid`
+        `io.pipe = true`
+        return io unless block_given?
+        begin
+          yield io
+        ensure
+          io.close
+        end
       end
-      if cmd.is_a?(Array)
-        command = cmd.shift
-        args = cmd.map { |a| `a.toString()` }
-        cmd = command
-      end
-      raise(::NotImplementedError, "popen with fork '-' is not available") if cmd == '-'
-      mode = mode ? ::Opal.coerce_to!(mode, ::String, :to_str) : 'r'
-      `js_opts.shell = true`
-      `js_opts.cwd = #{opts[:chdir]}` if opts.key?(:chdir)
-      if opts.key?(:err)
-        err = opts[:err]
-        `js_opts.err = 'out'` if err.is_a?(::Array) && err[0] == :child && (err[1] == :out || err[1] == 1)
-      end
-      fd, pid = `$platform.io_popen(cmd, args, mode, js_opts)`
-      # $? = ::Process::Status.new(nil, pid)
-      io = new(fd, mode, **opts)
-      `io.pid = pid`
-      `io.pipe = true`
-      return io unless block_given?
-      begin
-        yield io
-      ensure
-        io.close
-      end
+    else
+      alias popen __not_implemented__
     end
 
     def read(path, length = nil, offset = 0, **opts)
@@ -365,49 +386,55 @@ class ::IO
       `common_read(path, length, offset, opts, false)`
     end
 
-    def readlines(path, sep = $/, limit = nil, **opts)
-      # Returns an array of all lines read from the stream.
-      path = ::Opal.coerce_to!(path, String, :to_path)
+    if `$platform.io_open_path`
+      def readlines(path, sep = $/, limit = nil, **opts)
+        # Returns an array of all lines read from the stream.
+        path = ::Opal.coerce_to!(path, String, :to_path)
 
-      if sep.is_a?(::Integer) && limit.nil?
-        limit = sep
-        sep = $/
-      end
-      sep = ::Opal.coerce_to!(sep, ::String, :to_str) if sep
-
-      if limit
-        limit = ::Opal.coerce_to!(limit, ::Integer, :to_int)
-        if limit < 0
-          limit = nil
-        elsif limit == 0
-          raise(ArgumentError, 'limit must be greater than 0')
+        if sep.is_a?(::Integer) && limit.nil?
+          limit = sep
+          sep = $/
         end
+        sep = ::Opal.coerce_to!(sep, ::String, :to_str) if sep
+
+        if limit
+          limit = ::Opal.coerce_to!(limit, ::Integer, :to_int)
+          if limit < 0
+            limit = nil
+          elsif limit == 0
+            raise(ArgumentError, 'limit must be greater than 0')
+          end
+        end
+        mode = opts.delete(:mode)
+        mode = mode ? mode.split(':').first : 'r'
+        flags = `Opal.mode_to_flags(mode)`
+        fd = `$platform.io_open_path(path, flags)`
+        chomp = opts.delete(:chomp)
+        opts[:path] = path
+        io = new(fd, mode, **opts)
+        io.readlines(sep, limit, chomp: chomp)
+      ensure
+        io&.close
       end
-      mode = opts.delete(:mode)
-      mode = mode ? mode.split(':').first : 'r'
-      flags = `Opal.mode_to_flags(mode)`
-      fd = `$platform.io_open_path(path, flags)`
-      chomp = opts.delete(:chomp)
-      opts[:path] = path
-      io = new(fd, mode, **opts)
-      io.readlines(sep, limit, chomp: chomp)
-    ensure
-      io&.close
+    else
+      alias readlines __not_implemented__
     end
 
-    def select(read_ios, write_ios = [], error_ios = [], timeout = nil)
-      # Invokes system call select(2), which monitors multiple file descriptors,
-      # waiting until one or more of the file descriptors becomes ready for some class of I/O operation.
-      raise NotImplementedError
-    end
+    # Invokes system call select(2), which monitors multiple file descriptors,
+    # waiting until one or more of the file descriptors becomes ready for some class of I/O operation.
+    alias select __not_implemented__
 
-    def sysopen(path, mode = nil, perm = nil)
-      # Opens the file at the given path with the given mode and permissions; returns the integer file descriptor.
-      path = ::Opal.coerce_to!(path, String, :to_path)
-      mode = mode ? mode.split(':').first : 'r'
-      perm ||= 0o666
-      flags = `Opal.mode_to_flags(mode)`
-      `$platform.io_open_path(path, flags, perm)`
+    if `$platform.io_open_path`
+      def sysopen(path, mode = nil, perm = nil)
+        # Opens the file at the given path with the given mode and permissions; returns the integer file descriptor.
+        path = ::Opal.coerce_to!(path, String, :to_path)
+        mode = mode ? mode.split(':').first : 'r'
+        perm ||= 0o666
+        flags = `Opal.mode_to_flags(mode)`
+        `$platform.io_open_path(path, flags, perm)`
+      end
+    else
+      alias sysopen __not_implemented__
     end
 
     def try_convert(object)
@@ -415,9 +442,13 @@ class ::IO
       ::Opal.coerce_to?(object, ::IO, :to_io)
     end
 
-    def write(path, data, offset = nil, **opts)
-      # Opens the stream, writes the given data to it, and closes the stream; returns the number of bytes written.
-      `common_write(path, data, offset, opts, false)`
+    if `$platform.io_open_path`
+      def write(path, data, offset = nil, **opts)
+        # Opens the stream, writes the given data to it, and closes the stream; returns the number of bytes written.
+        `common_write(path, data, offset, opts, false)`
+      end
+    else
+      alias write __not_implemented__
     end
   end
 
@@ -557,7 +588,7 @@ class ::IO
                     "\n"
                   end
 
-    @tty = `$platform.io_open(self.fd, self.flags)` if @fd
+    @tty, @pipe, @file = `$platform.io_open(self.fd, self.flags)` if @fd
   end
 
   def <<(object)
@@ -706,13 +737,17 @@ class ::IO
 
   alias each_line each
 
-  def eof
-    # Returns true if the stream is positioned at its end, false otherwise;
-    `check_readable(self)`
-    return `$platform.io_pipe_eof(self.fd)` if @pipe
-    s = stat
-    return false if s.chardev?
-    s.size <= @pos
+  if `$platform.io_pipe_eof`
+    def eof
+      # Returns true if the stream is positioned at its end, false otherwise;
+      `check_readable(self)`
+      return stat.size <= @pos if @file
+      return `$platform.io_pipe_eof(self.fd)` if @pipe
+      false
+    end
+    alias eof? eof
+  else
+    alias eof __not_implemented__
   end
 
   alias eof? eof
@@ -737,12 +772,16 @@ class ::IO
     -1
   end
 
-  def fdatasync
-    # Immediately writes to disk all data buffered in the stream, via the operating system’s: fdatasync(2),
-    # if supported, otherwise via fsync(2), if supported; otherwise raises an exception.
-    `check_open(self)`
-    `$platform.io_fdatasync(self.fd)`
-    0
+  if `$platform.io_fdatasync`
+    def fdatasync
+      # Immediately writes to disk all data buffered in the stream, via the operating system’s: fdatasync(2),
+      # if supported, otherwise via fsync(2), if supported; otherwise raises an exception.
+      `check_open(self)`
+      `$platform.io_fdatasync(self.fd)`
+      0
+    end
+  else
+    alias fdatasync __not_implemented__
   end
 
   def fileno
@@ -759,172 +798,193 @@ class ::IO
     self
   end
 
-  def fsync
-    # Immediately writes to disk all data buffered in the stream, via the operating system’s fsync(2).
-    # Raises an exception if the operating system does not support fsync(2).
-    `check_open(self)`
-    `$platform.io_fsync(self.fd)`
-    0
+  if `$platform.io_fsync`
+    def fsync
+      # Immediately writes to disk all data buffered in the stream, via the operating system’s fsync(2).
+      # Raises an exception if the operating system does not support fsync(2).
+      `check_open(self)`
+      `$platform.io_fsync(self.fd)`
+      0
+    end
+  else
+    alias fsync __not_implemented__
   end
 
-  def getbyte
-    # Reads and returns the next byte (in range 0..255) from the stream; returns nil if already at end-of-stream.
-    `check_readable(self)`
-    return nil if eof
-    bytes_read = `$platform.io_read(self.fd, self.buffer, 0, self.pos, 1)`
-    @pos += bytes_read
-    return `self.buffer.data_view.getUint8(0)` if bytes_read > 0
-    nil
+  if `$platform.io_read`
+    def getbyte
+      # Reads and returns the next byte (in range 0..255) from the stream; returns nil if already at end-of-stream.
+      `check_readable(self)`
+      return nil if eof
+      bytes_read = `$platform.io_read(self.fd, self.buffer, 0, self.pos, 1, self.file)`
+      @pos += bytes_read
+      return `self.buffer.data_view.getUint8(0)` if bytes_read > 0
+      nil
+    end
+  else
+    alias getbyte __not_implemented__
   end
 
-  def getc
-    # Reads and returns the next 1-character string from the stream; returns nil if already at end-of-stream.
-    `check_readable(self)`
-    return nil if eof
+  if `$platform.io_read`
+    def getc
+      # Reads and returns the next 1-character string from the stream; returns nil if already at end-of-stream.
+      `check_readable(self)`
+      return nil if eof
 
-    # allow for multi byte characters with up to 16 bytes
-    bytes_read = `$platform.io_read(self.fd, self.buffer, 0, self.pos, 16)`
-    return nil if bytes_read < 1
-    chr = @buffer.get_raw_string(0, 16, @ext_enc, false)
-    chr = chr[0] # the first one should be valid
-    @pos += chr.bytesize
-    chr
+      # allow for multi byte characters with up to 16 bytes
+      bytes_read = `$platform.io_read(self.fd, self.buffer, 0, self.pos, 16, self.file)`
+      return nil if bytes_read < 1
+      chr = @buffer.get_raw_string(0, 16, @ext_enc, false)
+      chr = chr[0] # the first one should be valid
+      @pos += chr.bytesize
+      chr
+    end
+  else
+    alias getc __not_implemented__
   end
 
-  def gets(sep = $/, limit = nil, chomp: false)
-    # Reads and returns a line from the stream; assigns the return value to $_.
-    `check_readable(self)`
-    return $_ = nil if eof
+  if `$platform.io_read`
+    def gets(sep = $/, limit = nil, chomp: false)
+      # Reads and returns a line from the stream; assigns the return value to $_.
+      `check_readable(self)`
+      return $_ = nil if eof
 
-    paragraph_mode = false
+      paragraph_mode = false
 
-    if sep
-      if limit.nil? && !sep.is_a?(::String)
-        begin
-          limit = ::Opal.coerce_to!(sep, ::Integer, :to_int)
+      if sep
+        if limit.nil? && !sep.is_a?(::String)
+          begin
+            limit = ::Opal.coerce_to!(sep, ::Integer, :to_int)
+            sep = $/
+          rescue
+            sep = ::Opal.coerce_to!(sep, ::String, :to_str)
+          end
+        elsif sep == ''
           sep = $/
-        rescue
+          paragraph_mode = true
+        else
           sep = ::Opal.coerce_to!(sep, ::String, :to_str)
         end
-      elsif sep == ''
-        sep = $/
-        paragraph_mode = true
-      else
-        sep = ::Opal.coerce_to!(sep, ::String, :to_str)
       end
-    end
 
-    limit = limit.nil? ? `Infinity` : ::Opal.coerce_to!(limit, ::Integer, :to_int)
-    if limit < 0
-      limit = `Infinity`
-    elsif limit == 0
-      return `$str('', self.ext_enc)`
-    end
+      limit = limit.nil? ? `Infinity` : ::Opal.coerce_to!(limit, ::Integer, :to_int)
+      if limit < 0
+        limit = `Infinity`
+      elsif limit == 0
+        return `$str('', self.ext_enc)`
+      end
 
-    # get separator as bytes in external encoding
-    if sep
-      sep_bytes = `$str(sep, self.ext_enc)`.bytes
-      sep_len = sep_bytes.size
-    else
-      sep_len = 0
-    end
-    bytes_read = 0
-    total_bytes_read = 0
-    buffer_size = @buffer.size
-    read_len = `(limit == 0) ? buffer_size : Math.min(limit, buffer_size)`
-    start_pos = temp_pos = @pos
-    sep_pos = 0
-    found_sep = false
-    i = 0
-    check_rn = `(sep === '\n') ? true : false`
+      # get separator as bytes in external encoding
+      if sep
+        sep_bytes = `$str(sep, self.ext_enc)`.bytes
+        sep_len = sep_bytes.size
+      else
+        sep_len = 0
+      end
+      bytes_read = 0
+      total_bytes_read = 0
+      buffer_size = @buffer.size
+      read_len = @tty || @pipe ? 1 : `(limit == 0) ? buffer_size : Math.min(limit, buffer_size)`
+      start_pos = temp_pos = @pos
+      sep_pos = 0
+      found_sep = false
+      i = 0
+      check_rn = `(sep === '\n') ? true : false`
 
-    # Read additional up to 16 bytes above limit into the buffer to
-    # account for multi byte character combinations that may have been
-    # cut off. These are only for @buffer.get_raw_string to be able to
-    # return a valid string, so don't count these bytes later on.
-    real_read_len = `Math.min(read_len + 16, buffer_size)`
+      # Read additional up to 16 bytes above limit into the buffer to
+      # account for multi byte character combinations that may have been
+      # cut off. These are only for @buffer.get_raw_string to be able to
+      # return a valid string, so don't count these bytes later on.
+      real_read_len = @tty || @pipe ? 1 : `Math.min(read_len + 16, buffer_size)`
 
-    while true
-      # fill buffer
-      dv = `self.buffer.data_view`
-      temp_pos += bytes_read
-      bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, temp_pos, real_read_len)`
-      bytes_read = read_len if bytes_read > read_len # Don't count the extra 16 bytes
-      if bytes_read > 0
-        total_bytes_read += bytes_read
-        # lets look for the separator bytes
-        # [possible optimization: use Uint8Array with its indexOf()]
-        if sep
-          %x{
-            for (i = total_bytes_read - bytes_read; i < total_bytes_read; i++) {
-              found_sep = is_sep(sep_bytes, sep_len, dv, i, check_rn);
-              if (found_sep) {
-                // chomp pos, end of text, beginning of separator
-                sep_pos = i;
-                // end of separator, maybe beginning of next separtor or text
-                i += sep_len;
-                if (check_rn && 13 === dv.getUint8(sep_pos) && 10 === dv.getUint8(i)) i++;
-                if (paragraph_mode) { // check for second separator
-                  if (i < total_bytes_read && is_sep(sep_bytes, sep_len, dv, i, check_rn)) {
-                    i += sep_len;
-                    if (check_rn && 13 === dv.getUint8(sep_pos) && 10 === dv.getUint8(i)) i++;
-                  } else {
-                    found_sep = false;
-                    // special case if a sep has been found at the end that is not a paragraph sep
-                    if (i >= total_bytes_read) break;
+      while true
+        # fill buffer
+        dv = `self.buffer.data_view`
+        temp_pos += bytes_read
+        bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, temp_pos, real_read_len, self.file)`
+        bytes_read = read_len if bytes_read > read_len # Don't count the extra 16 bytes
+        if bytes_read > 0
+          total_bytes_read += bytes_read
+          # lets look for the separator bytes
+          # [possible optimization: use Uint8Array with its indexOf()]
+          if sep
+            %x{
+              for (i = total_bytes_read - bytes_read; i < total_bytes_read; i++) {
+                found_sep = is_sep(sep_bytes, sep_len, dv, i, check_rn);
+                if (found_sep) {
+                  // chomp pos, end of text, beginning of separator
+                  sep_pos = i;
+                  // end of separator, maybe beginning of next separtor or text
+                  i += sep_len;
+                  if (check_rn && 13 === dv.getUint8(sep_pos) && 10 === dv.getUint8(i)) i++;
+                  if (paragraph_mode) { // check for second separator
+                    if (i < total_bytes_read && is_sep(sep_bytes, sep_len, dv, i, check_rn)) {
+                      i += sep_len;
+                      if (check_rn && 13 === dv.getUint8(sep_pos) && 10 === dv.getUint8(i)) i++;
+                    } else {
+                      found_sep = false;
+                      // special case if a sep has been found at the end that is not a paragraph sep
+                      if (i >= total_bytes_read) break;
+                    }
                   }
+                  if (found_sep) break;
                 }
-                if (found_sep) break;
               }
             }
-          }
-        else
-          i = total_bytes_read
+          else
+            i = total_bytes_read
+          end
+        end
+        if found_sep || bytes_read < read_len || limit <= total_bytes_read
+          str_end = found_sep && chomp ? sep_pos : i
+          str_len = `Math.min(limit, str_end)`
+          line = @buffer.get_raw_string(0, str_len, @ext_enc || ::Encoding.default_external, true)
+          if paragraph_mode
+            # skip additional empty paragraphs
+            `while(i < total_bytes_read && is_sep(sep_bytes, sep_len, dv, i)) { i += sep_len }`
+          end
+          @pos = start_pos + +`((limit === Infinity) ? i : Math.max(line.$bytesize(), i))`
+          break
+        elsif total_bytes_read == @buffer.size
+          # skip back a bit to correctly identify separator/paragraph across buffer border
+          i -= sep_len
+          @buffer.resize(@buffer.size + buffer_size)
         end
       end
-      if found_sep || bytes_read < read_len || limit <= total_bytes_read
-        str_end = found_sep && chomp ? sep_pos : i
-        str_len = `Math.min(limit, str_end)`
-        line = @buffer.get_raw_string(0, str_len, @ext_enc || ::Encoding.default_external, true)
-        if paragraph_mode
-          # skip additional empty paragraphs
-          `while(i < total_bytes_read && is_sep(sep_bytes, sep_len, dv, i)) { i += sep_len }`
+
+      unless line.nil?
+        if @int_enc
+          line.force_encoding(@int_enc)
+        elsif ::Encoding.default_internal &&
+              (@ext_enc != ::Encoding::BINARY || ::Encoding.default_external != ::Encoding::BINARY)
+          line.force_encoding(::Encoding.default_internal)
         end
-        @pos = start_pos + +`((limit === Infinity) ? i : Math.max(line.$bytesize(), i))`
-        break
-      else
-        i -= sep_len # skip back a bit to correctly identify separator/paragraph across buffer border
-        @buffer.resize(@buffer.size + buffer_size)
-      end
-    end
 
-    unless line.nil?
-      if @int_enc
-        line.force_encoding(@int_enc)
-      elsif ::Encoding.default_internal &&
-            (@ext_enc != ::Encoding::BINARY || ::Encoding.default_external != ::Encoding::BINARY)
-        line.force_encoding(::Encoding.default_internal)
+        @lineno += 1
       end
 
-      @lineno += 1
+      $. = @lineno
+      $_ = line unless sep == ' '
+      line
+    ensure
+      # shrink buffer to original size, freeing memory
+      @buffer.resize(`DEFAULT_BUFFER_SIZE`) if @buffer.size != `DEFAULT_BUFFER_SIZE`
     end
-
-    $. = @lineno
-    $_ = line unless sep == ' '
-    line
-  ensure
-    # shrink buffer to original size, freeing memory
-    @buffer.resize(`DEFAULT_BUFFER_SIZE`) if @buffer.size != `DEFAULT_BUFFER_SIZE`
+  else
+    alias gets __not_implemented__
   end
 
-  def initialize_copy(other)
-    `check_open(other)`
+  if `$platform.io_open && $platform.io_open_path`
+    def initialize_copy(other)
+      `check_open(other)`
 
-    @fd = `$platform.io_open_path(self.path, self.flags)` if path
-    @tty = `$platform.io_open(self.fd, self.flags)` if @fd
+      @fd = `$platform.io_open_path(self.path, self.flags)` if path
+      @tty = `$platform.io_open(self.fd, self.flags)` if @fd
 
-    @autoclose = true
-    @close_on_exec = true
+      @autoclose = true
+      @close_on_exec = true
+    end
+  else
+    alias initialize_copy __not_implemented__
   end
 
   def inspect
@@ -938,10 +998,14 @@ class ::IO
     @int_enc
   end
 
-  def ioctl(integer_cmd, argument)
-    # Invokes Posix system call ioctl(2), which issues a low-level command to an I/O device.
-    `check_open(self)`
-    `$platform.io_ioctl(integer_cmd, argument)`
+  if `$platform.io_ioctl`
+    def ioctl(integer_cmd, argument)
+      # Invokes Posix system call ioctl(2), which issues a low-level command to an I/O device.
+      `check_open(self)`
+      `$platform.io_ioctl(integer_cmd, argument)`
+    end
+  else
+    alias ioctl __not_implemented__
   end
 
   def isatty
@@ -996,43 +1060,47 @@ class ::IO
     @pos = number
   end
 
-  def pread(length, offset, out_string = nil)
-    # Behaves like IO#readpartial, except that it:
-    # - Reads at the given offset (in bytes).
-    # - Disregards, and does not modify, the stream’s position (see Position).
-    # - Bypasses any user space buffering in the stream.
-    if out_string
-      # requires mutable Strings
-      raise NotImplementedError, 'out_string buffer is currently not supported'
+  if `$platform.io_read`
+    def pread(length, offset, out_string = nil)
+      # Behaves like IO#readpartial, except that it:
+      # - Reads at the given offset (in bytes).
+      # - Disregards, and does not modify, the stream’s position (see Position).
+      # - Bypasses any user space buffering in the stream.
+      if out_string
+        # requires mutable Strings
+        raise NotImplementedError, 'out_string buffer is currently not supported'
+      end
+
+      `check_readable(self)`
+      raise(::ArgumentError, 'invalid length') if length && length < 0
+
+      enc = ::Encoding::BINARY
+      return `$str('', enc)` if length == 0
+
+      # the true limit will be the smaller of:
+      # - max JS String size, which is Number.MAX_SAFE_INTEGER
+      # - max ArrayBuffer size, which is implementation dependend
+      read_end = length.nil? ? `Infinity` : offset + length
+      read_len = @buffer.size
+      bytes_read = 0
+      total_bytes_read = 0
+      while offset < read_end
+        read_len = read_end - offset if (offset + read_len) > read_end
+        s = @buffer.size
+        @buffer.resize(s + read_len) if s < (total_bytes_read + read_len)
+        bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, offset, read_len, self.file)`
+        total_bytes_read += bytes_read
+        offset += bytes_read
+        raise(::EOFError) if bytes_read < read_len
+      end
+      return `$str('', enc)` if bytes_read == 0
+      @buffer.get_raw_string(0, total_bytes_read, enc, false)
+    ensure
+      # shrink buffer to original size, freeing memory
+      @buffer.resize(`DEFAULT_BUFFER_SIZE`) if @buffer.size != `DEFAULT_BUFFER_SIZE`
     end
-
-    `check_readable(self)`
-    raise(::ArgumentError, 'invalid length') if length && length < 0
-
-    enc = ::Encoding::BINARY
-    return `$str('', enc)` if length == 0
-
-    # the true limit will be the smaller of:
-    # - max JS String size, which is Number.MAX_SAFE_INTEGER
-    # - max ArrayBuffer size, which is implementation dependend
-    read_end = length.nil? ? `Infinity` : offset + length
-    read_len = @buffer.size
-    bytes_read = 0
-    total_bytes_read = 0
-    while offset < read_end
-      read_len = read_end - offset if (offset + read_len) > read_end
-      s = @buffer.size
-      @buffer.resize(s + read_len) if s < (total_bytes_read + read_len)
-      bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, offset, read_len)`
-      total_bytes_read += bytes_read
-      offset += bytes_read
-      raise(::EOFError) if bytes_read < read_len
-    end
-    return `$str('', enc)` if bytes_read == 0
-    @buffer.get_raw_string(0, total_bytes_read, enc, false)
-  ensure
-    # shrink buffer to original size, freeing memory
-    @buffer.resize(`DEFAULT_BUFFER_SIZE`) if @buffer.size != `DEFAULT_BUFFER_SIZE`
+  else
+    alias pread __not_implemented__
   end
 
   def print(*objects)
@@ -1134,171 +1202,282 @@ class ::IO
     total_wsize
   end
 
-  def read(length = nil, out_string = nil)
-    # Reads bytes from the stream; the stream must be opened for reading:
-    # If length is nil, reads all bytes using the stream’s data mode.
-    # Otherwise reads up to length bytes in binary mode.
-    # Returns a string (either a new string or the given out_string
-    # [currently not supported by opal]) containing the bytes read.
-    # The encoding of the string depends on both length and out_string.
-    if out_string
-      # requires mutable Strings
-      raise NotImplementedError, 'out_string buffer is currently not supported'
-    end
-
-    `check_readable(self)`
-    if length && `length !== Infinity`
-      unless length.is_a?(::Integer)
-        raise(::TypeError, 'length cannot be converted to int') unless length.respond_to?(:to_int)
-        length = length.to_int
+  if `$platform.io_read`
+    def read(length = nil, out_string = nil)
+      # Reads bytes from the stream; the stream must be opened for reading:
+      # If length is nil, reads all bytes using the stream’s data mode.
+      # Otherwise reads up to length bytes in binary mode.
+      # Returns a string (either a new string or the given out_string
+      # [currently not supported by opal]) containing the bytes read.
+      # The encoding of the string depends on both length and out_string.
+      if out_string
+        # requires mutable Strings
+        raise NotImplementedError, 'out_string buffer is currently not supported'
       end
-      raise ArgumentError, 'invalid length' if length < 0
-      xenc = ::Encoding::BINARY
-      binm = true
-      return nil if eof
-    else
-      xenc = @ext_enc || ::Encoding.default_external
-      return `$str('', xenc)` if eof
-      binm = @binmode
-      length = `Infinity`
-    end
 
-    # the true length limit will be the smaller of:
-    # - max JS String size, which is Number.MAX_SAFE_INTEGER
-    # - max ArrayBuffer size, which is implementation dependent
-    read_end = @pos + length
-    read_len = @buffer.size
-    bytes_read = 0
-    total_bytes_read = 0
-    while @pos < read_end
-      read_len = read_end - @pos if (@pos + read_len) > read_end
-      s = @buffer.size
-      @buffer.resize(s + read_len) if s < (total_bytes_read + read_len)
-      bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, self.pos, read_len)`
-      total_bytes_read += bytes_read
-      @pos += bytes_read
-      break if bytes_read < read_len
-    end
-    return `$str('', xenc)` if length && `length !== Infinity` && bytes_read == 0
-    result = @buffer.get_raw_string(0, total_bytes_read, xenc, false)
-    result.force_encoding(@int_enc) if @int_enc && !binm
-    result
-  ensure
-    # shrink buffer to original size, freeing memory
-    @buffer.resize(`DEFAULT_BUFFER_SIZE`) if @buffer.size != `DEFAULT_BUFFER_SIZE`
-  end
-
-  def readbyte
-    # Reads and returns the next byte (in range 0..255) from the stream;
-    # raises EOFError if already at end-of-stream.
-    `check_readable(self)`
-    b = getbyte
-    raise ::EOFError if eof
-    b
-  end
-
-  def readchar
-    # Reads and returns the next 1-character string from the stream; raises EOFError if already at end-of-stream.
-    `check_readable(self)`
-    c = getc
-    raise ::EOFError if eof
-    if @binmode
-      `$str(c, #{::Encoding::BINARY})`
-    elsif @int_enc
-      `$str(c, self.int_enc)`
-    elsif @ext_enc
-      `$str(c, self.ext_enc)`
-    else
-      c
-    end
-  end
-
-  def readline(sep = $/, limit = nil, chomp: false)
-    # Reads a line as with IO#gets, but raises EOFError if already at end-of-stream.
-    ::Kernel.raise(::EOFError, 'end of file reached') if eof
-    gets(sep, limit, chomp: chomp)
-  end
-
-  def readlines(sep = $/, limit = nil, chomp: false)
-    # Reads and returns all remaining line from the stream; does not modify $_.
-    `check_readable(self)`
-
-    global_last_line = $_
-    res = each(sep, limit, chomp: chomp).to_a
-    $_ = global_last_line unless sep == $/
-    res
-  end
-
-  def readpartial(length, out_string = nil)
-    # Reads up to length bytes from the stream; returns a string (either a new string or the given out_string).
-    sysread(length, out_string)
-  end
-
-  def reopen(path_or_io, mode = nil, **opts)
-    # Reassociates the stream with another stream, which may be of a different class.
-    # This method may be used to redirect an existing stream to a new destination.
-    if path_or_io.is_a?(::IO)
-      other_io = path_or_io
-      path = nil
-    elsif path_or_io
-      other_io = ::Opal.coerce_to!(path_or_io, ::IO, :to_io) rescue nil
-      path = ::Opal.coerce_to!(path_or_io, ::String, :to_path) unless other_io
-    end
-
-    fsync if @fd && (@opened == :duplex || @opened == :write) && @closed != :write && !closed?
-
-    if path
-      mode = mode ? mode.split(':').first : 'r'
-      `$platform.io_close(self.fd)` if @fd && !closed?
-      begin
-        @fd = `$platform.io_open_path(path, Opal.mode_to_flags(mode))`
-      rescue Errno::ENOENT => e
-        raise(e) unless @opened == :write || @opened == :duplex
-        @fd = `$platform.io_open_path(path, Opal.mode_to_flags('w+'))`
+      `check_readable(self)`
+      if length && `length !== Infinity`
+        unless length.is_a?(::Integer)
+          raise(::TypeError, 'length cannot be converted to int') unless length.respond_to?(:to_int)
+          length = length.to_int
+        end
+        raise ArgumentError, 'invalid length' if length < 0
+        xenc = ::Encoding::BINARY
+        binm = true
+        return nil if eof
+      else
+        xenc = @ext_enc || ::Encoding.default_external
+        return `$str('', xenc)` if eof
+        binm = @binmode
+        length = `Infinity`
       end
-      @path = path
-      @pos = 0
-    elsif other_io
-      raise(IOError, 'closed stream') if closed?
-      raise(IOError, 'other closed stream') if other_io.closed?
-      if (`other_io.opened` == :duplex || `other_io.opened` == :write) && `other_io.closed` != :write
-        other_io.fsync
+
+      # the true length limit will be the smaller of:
+      # - max JS String size, which is Number.MAX_SAFE_INTEGER
+      # - max ArrayBuffer size, which is implementation dependent
+      read_end = @pos + length
+      read_len = @buffer.size
+      bytes_read = 0
+      total_bytes_read = 0
+      while @pos < read_end
+        read_len = read_end - @pos if (@pos + read_len) > read_end
+        s = @buffer.size
+        @buffer.resize(s + read_len) if s < (total_bytes_read + read_len)
+        bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, self.pos, read_len, self.file)`
+        total_bytes_read += bytes_read
+        @pos += bytes_read
+        break if bytes_read < read_len
       end
-      @path = other_io.path
-      if @path
+      return `$str('', xenc)` if length && `length !== Infinity` && bytes_read == 0
+      result = @buffer.get_raw_string(0, total_bytes_read, xenc, false)
+      result.force_encoding(@int_enc) if @int_enc && !binm
+      result
+    ensure
+      # shrink buffer to original size, freeing memory
+      @buffer.resize(`DEFAULT_BUFFER_SIZE`) if @buffer.size != `DEFAULT_BUFFER_SIZE`
+    end
+
+    def readbyte
+      # Reads and returns the next byte (in range 0..255) from the stream;
+      # raises EOFError if already at end-of-stream.
+      `check_readable(self)`
+      b = getbyte
+      raise ::EOFError if eof
+      b
+    end
+
+    def readchar
+      # Reads and returns the next 1-character string from the stream; raises EOFError if already at end-of-stream.
+      `check_readable(self)`
+      c = getc
+      raise ::EOFError if eof
+      if @binmode
+        `$str(c, #{::Encoding::BINARY})`
+      elsif @int_enc
+        `$str(c, self.int_enc)`
+      elsif @ext_enc
+        `$str(c, self.ext_enc)`
+      else
+        c
+      end
+    end
+
+    def readline(sep = $/, limit = nil, chomp: false)
+      # Reads a line as with IO#gets, but raises EOFError if already at end-of-stream.
+      ::Kernel.raise(::EOFError, 'end of file reached') if eof
+      gets(sep, limit, chomp: chomp)
+    end
+
+    def readlines(sep = $/, limit = nil, chomp: false)
+      # Reads and returns all remaining line from the stream; does not modify $_.
+      `check_readable(self)`
+
+      global_last_line = $_
+      res = each(sep, limit, chomp: chomp).to_a
+      $_ = global_last_line unless sep == $/
+      res
+    end
+
+    def readpartial(length, out_string = nil)
+      # Reads up to length bytes from the stream; returns a string (either a new string or the given out_string).
+      sysread(length, out_string)
+    end
+
+    def set_encoding_by_bom
+      # If the stream begins with a BOM (byte order marker),
+      # consumes the BOM and sets the external encoding accordingly;
+      # returns the result encoding if found, or nil otherwise
+      return nil if @opened == :write || @closed == :read || closed?
+      raise(ArgumentError, 'ASCII incompatible encoding needs binmode') unless @binmode
+      raise(ArgumentError, 'encoding conversion is set') if @ext_enc && @int_enc
+
+      encoding = nil
+
+      # read up to 4 bytes
+      bytes_read = `$platform.io_read(self.fd, self.buffer, 0, 0, 4, self.file)`
+
+      # get the read bytes
+      bom = []
+      @buffer.each_byte(0, bytes_read) do |byte|
+        bom << byte
+      end
+
+      if bom.size == 4
+        # check for 4 byte BOMS
+        encoding = case bom
+                   when [0x00, 0x00, 0xFE, 0xFF] then ::Encoding::UTF_32BE
+                   when [0xFF, 0xFE, 0x00, 0x00] then ::Encoding::UTF_32LE
+                   when [0xDD, 0x73, 0x66, 0x73] then false # UTF-EBCDIC
+                   when [0x84, 0x31, 0x95, 0x33] then false # GB18030
+                   end
+        bom.pop if encoding.nil? # 4 -> 3
+      end
+
+      if bom.size == 3
+        # check for 3 byte BOMS
+        encoding = case bom
+                   when [0xEF, 0xBB, 0xBF] then ::Encoding::UTF_8
+                   when [0x2B, 0x2F, 0x76] then false # UTF-7
+                   when [0xF7, 0x64, 0x4C] then false # UTF-1
+                   when [0x0E, 0xFE, 0xFF] then false # SCSU
+                   when [0xFB, 0xEE, 0x28] then false # BOCU-1
+                   end
+        bom.pop if encoding.nil? # 3 -> 2
+      end
+
+      if bom.size == 2
+        # check for 2 byte BOMS
+        encoding = case bom
+                   when [0xFE, 0xFF] then ::Encoding::UTF_16BE
+                   when [0xFF, 0xFE] then ::Encoding::UTF_16LE
+                   end
+      end
+
+      if encoding
+        @pos = bom.size
+        @ext_enc = encoding
+        return encoding
+      end
+
+      nil
+    end
+
+    def sysread(length, out_string = nil)
+      # Behaves like IO#readpartial, except that it uses low-level system functions.
+      if out_string
+        # requires mutable Strings
+        raise NotImplementedError, 'out_string buffer is currently not supported'
+      end
+
+      `check_readable(self)`
+      raise ::ArgumentError, 'invalid length' if length && length < 0
+
+      enc = ::Encoding::BINARY
+      return `$str('', enc)` if length == 0
+
+      raise ::EOFError if eof
+
+      # the true limit will be the smaller of:
+      # - max JS String size, which is Number.MAX_SAFE_INTEGER
+      # - max ArrayBuffer size, which is implementation dependend
+      read_end = length.nil? ? `Infinity` : @pos + length
+      read_len = @buffer.size
+      bytes_read = 0
+      total_bytes_read = 0
+      while @pos < read_end
+        read_len = read_end - @pos if (@pos + read_len) > read_end
+        s = @buffer.size
+        @buffer.resize(s + read_len) if s < (total_bytes_read + read_len)
+        bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, self.pos, read_len, self.file)`
+        total_bytes_read += bytes_read
+        @pos += bytes_read
+        break if bytes_read < read_len
+      end
+      return `$str('', enc)` if bytes_read == 0
+      @buffer.get_raw_string(0, total_bytes_read, enc, false)
+    ensure
+      # shrink buffer to original size, freeing memory
+      @buffer.resize(`DEFAULT_BUFFER_SIZE`) if @buffer.size != `DEFAULT_BUFFER_SIZE`
+    end
+  else
+    alias read __not_implemented__
+    alias readbyte __not_implemented__
+    alias readchar __not_implemented__
+    alias readline __not_implemented__
+    alias readlines __not_implemented__
+    alias set_encoding_by_bom __not_implemented__
+    alias sysread __not_implemented__
+  end
+
+  if `$platform.io_open_path`
+    def reopen(path_or_io, mode = nil, **opts)
+      # Reassociates the stream with another stream, which may be of a different class.
+      # This method may be used to redirect an existing stream to a new destination.
+      if path_or_io.is_a?(::IO)
+        other_io = path_or_io
+        path = nil
+      elsif path_or_io
+        other_io = ::Opal.coerce_to!(path_or_io, ::IO, :to_io) rescue nil
+        path = ::Opal.coerce_to!(path_or_io, ::String, :to_path) unless other_io
+      end
+
+      fsync if @fd && (@opened == :duplex || @opened == :write) && @closed != :write && !closed?
+
+      if path
+        mode = mode ? mode.split(':').first : 'r'
         `$platform.io_close(self.fd)` if @fd && !closed?
         begin
-          @fd = `$platform.io_open_path(self.path, other_io.flags)`
-        rescue Errno::ENOENT
-          @fd = `$platform.io_open_path(self.path, Opal.mode_to_flags('w+'))`
+          @fd = `$platform.io_open_path(path, Opal.mode_to_flags(mode))`
+        rescue Errno::ENOENT => e
+          raise(e) unless @opened == :write || @opened == :duplex
+          @fd = `$platform.io_open_path(path, Opal.mode_to_flags('w+'))`
         end
-      else
-        @fd = other_io.fileno
+        @path = path
+        @pos = 0
+      elsif other_io
+        raise(IOError, 'closed stream') if closed?
+        raise(IOError, 'other closed stream') if other_io.closed?
+        if (`other_io.opened` == :duplex || `other_io.opened` == :write) && `other_io.closed` != :write
+          other_io.fsync
+        end
+        @path = other_io.path
+        if @path
+          `$platform.io_close(self.fd)` if @fd && !closed?
+          begin
+            @fd = `$platform.io_open_path(self.path, other_io.flags)`
+          rescue Errno::ENOENT
+            @fd = `$platform.io_open_path(self.path, Opal.mode_to_flags('w+'))`
+          end
+        else
+          @fd = other_io.fileno
+        end
+        `self.pos = other_io.pos`
+        `self.opened = other_io.opened`
+        `self.binmode = other_io.binmode`
+      elsif @path
+        `$platform.io_close(self.fd)` if @fd && !closed?
+        begin
+          @fd = `$platform.io_open_path(path, self.flags)`
+        rescue Errno::ENOENT
+          @fd = `$platform.io_open_path(path, Opal.mode_to_flags('w+'))`
+        end
       end
-      `self.pos = other_io.pos`
-      `self.opened = other_io.opened`
-      `self.binmode = other_io.binmode`
-    elsif @path
-      `$platform.io_close(self.fd)` if @fd && !closed?
-      begin
-        @fd = `$platform.io_open_path(path, self.flags)`
-      rescue Errno::ENOENT
-        @fd = `$platform.io_open_path(path, Opal.mode_to_flags('w+'))`
+
+      if @opened == :duplex
+        @closed = false
+      elsif @opened == :read
+        @closed = :write
+      elsif @opened == :write
+        @closed = :read
       end
+
+      @binmode = binmode if binmode
+      @close_on_exec = @fd > 2
+
+      self
     end
-
-    if @opened == :duplex
-      @closed = false
-    elsif @opened == :read
-      @closed = :write
-    elsif @opened == :write
-      @closed = :read
-    end
-
-    @binmode = binmode if binmode
-    @close_on_exec = @fd > 2
-
-    self
+  else
+    alias reopen __not_implemented__
   end
 
   def rewind
@@ -1349,69 +1528,14 @@ class ::IO
     self
   end
 
-  def set_encoding_by_bom
-    # If the stream begins with a BOM (byte order marker),
-    # consumes the BOM and sets the external encoding accordingly;
-    # returns the result encoding if found, or nil otherwise
-    return nil if @opened == :write || @closed == :read || closed?
-    raise(ArgumentError, 'ASCII incompatible encoding needs binmode') unless @binmode
-    raise(ArgumentError, 'encoding conversion is set') if @ext_enc && @int_enc
-
-    encoding = nil
-
-    # read up to 4 bytes
-    bytes_read = `$platform.io_read(self.fd, self.buffer, 0, 0, 4)`
-
-    # get the read bytes
-    bom = []
-    @buffer.each_byte(0, bytes_read) do |byte|
-      bom << byte
+  if `$platform.io_fstat`
+    def stat
+      # Returns status information for ios as an object of type File::Stat.
+      `check_open(self)`
+      ::File::Stat.new(@path, `$platform.io_fstat(self.fd)`)
     end
-
-    if bom.size == 4
-      # check for 4 byte BOMS
-      encoding = case bom
-                 when [0x00, 0x00, 0xFE, 0xFF] then ::Encoding::UTF_32BE
-                 when [0xFF, 0xFE, 0x00, 0x00] then ::Encoding::UTF_32LE
-                 when [0xDD, 0x73, 0x66, 0x73] then false # UTF-EBCDIC
-                 when [0x84, 0x31, 0x95, 0x33] then false # GB18030
-                 end
-      bom.pop if encoding.nil? # 4 -> 3
-    end
-
-    if bom.size == 3
-      # check for 3 byte BOMS
-      encoding = case bom
-                 when [0xEF, 0xBB, 0xBF] then ::Encoding::UTF_8
-                 when [0x2B, 0x2F, 0x76] then false # UTF-7
-                 when [0xF7, 0x64, 0x4C] then false # UTF-1
-                 when [0x0E, 0xFE, 0xFF] then false # SCSU
-                 when [0xFB, 0xEE, 0x28] then false # BOCU-1
-                 end
-      bom.pop if encoding.nil? # 3 -> 2
-    end
-
-    if bom.size == 2
-      # check for 2 byte BOMS
-      encoding = case bom
-                 when [0xFE, 0xFF] then ::Encoding::UTF_16BE
-                 when [0xFF, 0xFE] then ::Encoding::UTF_16LE
-                 end
-    end
-
-    if encoding
-      @pos = bom.size
-      @ext_enc = encoding
-      return encoding
-    end
-
-    nil
-  end
-
-  def stat
-    # Returns status information for ios as an object of type File::Stat.
-    `check_open(self)`
-    ::File::Stat.new(@path, `$platform.io_fstat(self.fd)`)
+  else
+    alias stat __not_implemented__
   end
 
   def sync
@@ -1426,44 +1550,6 @@ class ::IO
     # Sets the sync mode for the stream to the given value; returns the given value.
     `check_open(self)`
     @sync = !!bool
-  end
-
-  def sysread(length, out_string = nil)
-    # Behaves like IO#readpartial, except that it uses low-level system functions.
-    if out_string
-      # requires mutable Strings
-      raise NotImplementedError, 'out_string buffer is currently not supported'
-    end
-
-    `check_readable(self)`
-    raise ::ArgumentError, 'invalid length' if length && length < 0
-
-    enc = ::Encoding::BINARY
-    return `$str('', enc)` if length == 0
-
-    raise ::EOFError if eof
-
-    # the true limit will be the smaller of:
-    # - max JS String size, which is Number.MAX_SAFE_INTEGER
-    # - max ArrayBuffer size, which is implementation dependend
-    read_end = length.nil? ? `Infinity` : @pos + length
-    read_len = @buffer.size
-    bytes_read = 0
-    total_bytes_read = 0
-    while @pos < read_end
-      read_len = read_end - @pos if (@pos + read_len) > read_end
-      s = @buffer.size
-      @buffer.resize(s + read_len) if s < (total_bytes_read + read_len)
-      bytes_read = `$platform.io_read(self.fd, self.buffer, total_bytes_read, self.pos, read_len)`
-      total_bytes_read += bytes_read
-      @pos += bytes_read
-      break if bytes_read < read_len
-    end
-    return `$str('', enc)` if bytes_read == 0
-    @buffer.get_raw_string(0, total_bytes_read, enc, false)
-  ensure
-    # shrink buffer to original size, freeing memory
-    @buffer.resize(`DEFAULT_BUFFER_SIZE`) if @buffer.size != `DEFAULT_BUFFER_SIZE`
   end
 
   def sysseek(offset, whence = ::IO::SEEK_SET)
@@ -1498,22 +1584,17 @@ class ::IO
       @pos += write_len
       total_wsize += write_len
     end
-    fsync if @sync
+    fsync if @sync && `$platform.io_fsync`
     total_wsize
   end
 
   alias tell pos
 
-  def timeout
-    # Get the internal timeout duration or nil if it was not set.
-    @timeout
-  end
-
-  def timeout=(duration)
-    # Sets the internal timeout to the specified duration or nil.
-    # The timeout applies to all blocking operations where possible.
-    @timeout = duration
-  end
+  # Get the internal timeout duration or nil if it was not set.
+  #   or
+  # Sets the internal timeout to the specified duration or nil.
+  # The timeout applies to all blocking operations where possible.
+  attr_accessor :timeout
 
   alias to_i fileno
 

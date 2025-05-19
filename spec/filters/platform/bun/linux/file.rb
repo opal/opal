@@ -8,8 +8,10 @@ opal_filter "File" do
   fails "File.mkfifo when path passed is not a String value raises a TypeError" # Expected TypeError but got: Errno::ENOENT (No such file or directory - No such file or directory /tmp/fifo)
   fails "File.new can't alter mode or permissions when opening a file" # Expected Errno::EINVAL but no exception was raised (false was returned)
   fails "File.open on a FIFO opens it as a normal file" # NotImplementedError: Thread creation not available
+  fails "File.pipe? returns true if the file is a pipe" # Errno::ENOENT: No such file or directory - No such file or directory /home/jan/workspace/opal/tmp/rubyspec_temp/i_am_a_pipe
   fails "File.socket? returns true if the file is a socket" # NameError: uninitialized constant UNIXServer
   fails "File::Stat#birthtime raises an NotImplementedError" # Expected NotImplementedError but no exception was raised (1970-01-01 00:00:00 -0000 was returned)
   fails "File::Stat#ftype returns 'socket' when the file is a socket" # NameError: uninitialized constant SocketSpecs::Socket
+  fails "File::Stat#pipe? returns true if the file is a pipe" # Errno::ENOENT: No such file or directory - No such file or directory /home/jan/workspace/opal/tmp/rubyspec_temp/i_am_a_pipe
   fails "FileTest.sticky? returns true if the named file has the sticky bit, otherwise false" # Expected false == true to be truthy but was false
 end

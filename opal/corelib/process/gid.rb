@@ -47,7 +47,7 @@ module ::Process
     def switch(&block)
       return re_exchange unless block_given?
       begin
-        return yield
+        yield
       ensure
         re_exchange
       end

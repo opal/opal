@@ -1,17 +1,17 @@
 # backtick_javascript: true
-# inspired by ruby/lib/fileutils.rb from https://github.com/ruby/ruby/blob/master/lib/fileutils.rb
+# originally taken from https://github.com/ruby/ruby/blob/master/lib/fileutils.rb
 # adapted to Opal
 
 module FileUtils
   # The version number.
-  VERSION = "1.7.3"
+  VERSION = '1.7.3'
 
   # helpers
   # These are attached to a module so the method namespace of ::FileUtils is clean, cause it needs to.
   module Helpers_
     def fu_copy_metadata(path, target)
       st = ::File.lstat(path)
-      if !st.symlink?
+      unless st.symlink?
         File.utime st.atime, st.mtime, target
       end
       mode = st.mode
@@ -26,7 +26,7 @@ module FileUtils
         end
       rescue Errno::EPERM, Errno::EACCES
         # clear setuid/setgid
-        mode &= 01777
+        mode &= 0o1777
       end
       if st.symlink?
         begin
@@ -56,7 +56,7 @@ module FileUtils
         end
       else
         src = File.path(src)
-        if target_directory and ::File.directory?(dest)
+        if target_directory && ::File.directory?(dest)
           block.call src, ::File.join(dest, File.basename(src))
         else
           block.call src, File.path(dest)
@@ -104,45 +104,45 @@ module FileUtils
     def fu_have_symlink
       ::File.symlink nil, nil
     rescue ::TypeError
-      return true
+      true
     rescue
-      return false
+      false
     end
     module_function :fu_have_symlink
 
     def fu_mode(mode, path)
-      apply_mask = ->(mode, user_mask, op, mode_mask) do
+      apply_mask = ->(mde, user_mask, op, mode_mask) do
         case op
         when '='
-          (mode & ~user_mask) | (user_mask & mode_mask)
+          (mde & ~user_mask) | (user_mask & mode_mask)
         when '+'
-          mode | (user_mask & mode_mask)
+          mde | (user_mask & mode_mask)
         when '-'
-          mode & ~(user_mask & mode_mask)
+          mde & ~(user_mask & mode_mask)
         end
       end
 
       get_user_mask = ->(target) do
         target.each_char.inject(0) do |mask, chr|
           case chr
-          when "u"
-            mask | 04700
-          when "g"
-            mask | 02070
-          when "o"
-            mask | 01007
-          when "a"
-            mask | 07777
+          when 'u'
+            mask | 0o4700
+          when 'g'
+            mask | 0o2070
+          when 'o'
+            mask | 0o1007
+          when 'a'
+            mask | 0o7777
           else
             raise ArgumentError, "invalid 'who' symbol in file mode: #{chr}"
           end
         end
       end
 
-      symbolic_modes_to_i = ->(mode_sym, path) do
-        path = ::File.stat(path) unless File::Stat === path
-        mode = path.mode
-        mode_sym.split(/,/).inject(mode & 07777) do |current_mode, clause|
+      symbolic_modes_to_i = ->(mode_sym, pth) do
+        pth = ::File.stat(pth) unless File::Stat === pth
+        mode = pth.mode
+        mode_sym.split(/,/).inject(mode & 0o7777) do |current_mode, clause|
           target, *actions = clause.split(/([=+-])/)
           raise ArgumentError, "invalid file mode: #{mode_sym}" if actions.empty?
           target = 'a' if target.empty?
@@ -151,29 +151,29 @@ module FileUtils
             need_apply = op == '='
             mode_mask = (perm || '').each_char.inject(0) do |mask, chr|
               case chr
-              when "r"
-                mask | 0444
-              when "w"
-                mask | 0222
-              when "x"
-                mask | 0111
-              when "X"
-                if path.directory?
-                  mask | 0111
+              when 'r'
+                mask | 0o444
+              when 'w'
+                mask | 0o222
+              when 'x'
+                mask | 0o111
+              when 'X'
+                if pth.directory?
+                  mask | 0o111
                 else
                   mask
                 end
-              when "s"
-                mask | 06000
-              when "t"
-                mask | 01000
-              when "u", "g", "o"
+              when 's'
+                mask | 0o6000
+              when 't'
+                mask | 0o1000
+              when 'u', 'g', 'o'
                 if mask.nonzero?
                   current_mode = apply_mask.call(current_mode, user_mask, op, mask)
                 end
                 need_apply = false
                 copy_mask = get_user_mask.call(chr)
-                (current_mode & copy_mask) / (copy_mask & 0111) * (user_mask & 0111)
+                (current_mode & copy_mask) / (copy_mask & 0o111) * (user_mask & 0o111)
               else
                 raise ArgumentError, "invalid 'perm' symbol in file mode: #{chr}"
               end
@@ -256,7 +256,7 @@ module FileUtils
     # should be interpretable as a path
     Helpers_.fu_output_message "cd #{dir}" if verbose
     result = ::Dir.chdir(dir, &block)
-    Helpers_.fu_output_message 'cd -' if verbose and block
+    Helpers_.fu_output_message 'cd -' if verbose && block
     result
   end
   module_function :chdir
@@ -268,8 +268,11 @@ module FileUtils
     # Changes permissions on the entries at the paths given in list (a single path or an array of paths)
     # to the permissions given by mode; returns list if it is an array, [list] otherwise
     list = [list].flatten.map { |path| ::File.path(path) }
-    Helpers_.fu_output_message sprintf('chmod %s %s',
-                                      mode.is_a?(::String) ? mode : "%o" % mode, list.join(' ')) if verbose
+    if verbose
+      Helpers_.fu_output_message sprintf('chmod %s %s',
+                                         mode.is_a?(::String) ? mode : '%o' % mode, list.join(' ')
+                                        )
+    end
     return if noop
     list.each do |path|
       chmode = Helpers_.fu_mode(mode, path)
@@ -281,8 +284,11 @@ module FileUtils
   def chmod_R(mode, list, noop: nil, verbose: nil, force: nil)
     # Like FileUtils.chmod, but changes permissions recursively.
     list = [list].flatten.map { |path| ::File.path(path) }
-    Helpers_.fu_output_message sprintf('chmod -R%s %s %s', (force ? 'f' : ''),
-                              mode.is_a?(String) ? mode : "%o" % mode, list.join(' ')) if verbose
+    if verbose
+      Helpers_.fu_output_message sprintf('chmod -R%s %s %s', (force ? 'f' : ''),
+                                         mode.is_a?(String) ? mode : '%o' % mode, list.join(' ')
+                                        )
+    end
     return if noop
     list.each do |root|
       Helpers_.fu_preorder_traverse(root) do |path|
@@ -301,9 +307,12 @@ module FileUtils
     # Changes the owner and group on the entries at the paths given in list (a single path or an array of paths)
     # to the given user and group; returns list if it is an array, [list] otherwise
     list = [list].flatten.map { |path| ::File.path(path) }
-    Helpers_.fu_output_message sprintf('chown %s %s',
-                              (group ? "#{user}:#{group}" : user || ':'),
-                              list.join(' ')) if verbose
+    if verbose
+      Helpers_.fu_output_message sprintf('chown %s %s',
+                                         (group ? "#{user}:#{group}" : user || ':'),
+                                         list.join(' ')
+                                        )
+    end
     return if noop
     uid = Helpers_.fu_get_uid(user)
     gid = Helpers_.fu_get_gid(group)
@@ -316,20 +325,21 @@ module FileUtils
   def chown_R(user, group, list, noop: nil, verbose: nil, force: nil)
     # Like FileUtils.chown, but changes owner and group recursively.
     list = [list].flatten.map { |path| ::File.path(path) }
-    Helpers_.fu_output_message sprintf('chown -R%s %s %s',
-                              (force ? 'f' : ''),
-                              (group ? "#{user}:#{group}" : user || ':'),
-                              list.join(' ')) if verbose
+    if verbose
+      Helpers_.fu_output_message sprintf('chown -R%s %s %s',
+                                         (force ? 'f' : ''),
+                                         (group ? "#{user}:#{group}" : user || ':'),
+                                         list.join(' ')
+                                        )
+    end
     return if noop
     uid = Helpers_.fu_get_uid(user)
     gid = Helpers_.fu_get_gid(group)
     list.each do |root|
       Helpers_.fu_preorder_traverse(root) do |path, st|
-        begin
-          st.symlink? ? ::File.lchown(uid, gid, path) : ::File.chown(uid, gid, path)
-        rescue
-          raise unless force
-        end
+        st.symlink? ? ::File.lchown(uid, gid, path) : ::File.chown(uid, gid, path)
+      rescue
+        raise unless force
       end
     end
   end
@@ -338,11 +348,11 @@ module FileUtils
   def cmp(a, b)
     # Returns true if the contents of files a and b are identical, false otherwise.
     return false unless File.size(a) == File.size(b)
-    ::File.open(a, 'rb') {|fa|
-      ::File.open(b, 'rb') {|fb|
+    ::File.open(a, 'rb') do |fa|
+      ::File.open(b, 'rb') do |fb|
         return compare_stream(fa, fb)
-      }
-    }
+      end
+    end
   end
   module_function :cmp
 
@@ -352,10 +362,10 @@ module FileUtils
   def compare_stream(a, b)
     # Returns true if the contents of streams a and b are identical, false otherwise.
     bsizes = [a, b].map do |s|
-                         next unless s.respond_to?(:stat)
-                         size = s.stat.blksize
-                         size if size and size > 0
-                       end
+      next unless s.respond_to?(:stat)
+      size = s.stat.blksize
+      size if size && size > 0
+    end
     bsize = bsizes.min || 1024
 
     begin
@@ -369,7 +379,7 @@ module FileUtils
 
   def copy(src, dest, preserve: nil, noop: nil, verbose: nil)
     # Copies files.
-    Helpers_.fu_output_message "cp#{preserve ? ' -p' : ''} #{[src,dest].flatten.join ' '}" if verbose
+    Helpers_.fu_output_message "cp#{preserve ? ' -p' : ''} #{[src, dest].flatten.join ' '}" if verbose
     return if noop
     Helpers_.fu_each_src_dest(src, dest) do |s, d|
       copy_file s, d, preserve
@@ -396,8 +406,8 @@ module FileUtils
           end
         end
       when st.directory?
-        if !::File.exist?(destent) and Helpers_.fu_descendant_directory(destent, ent)
-          raise ArgumentError, "cannot copy directory %s to itself %s" % [ent, destent]
+        if !::File.exist?(destent) && Helpers_.fu_descendant_directory(destent, ent)
+          raise ArgumentError, 'cannot copy directory %s to itself %s' % [ent, destent]
         end
         begin
           ::Dir.mkdir destent
@@ -407,19 +417,19 @@ module FileUtils
       when st.symlink?
         ::File.symlink ::File.readlink(ent), destent
       when st.chardev?, st.blockdev?
-        raise "cannot handle device file"
+        raise 'cannot handle device file'
       when st.socket?
         begin
           require 'socket'
         rescue LoadError
-          raise "cannot handle socket"
+          raise 'cannot handle socket'
         else
-          raise "cannot handle socket" unless defined?(UNIXServer)
+          raise 'cannot handle socket' unless defined?(UNIXServer)
         end
         UNIXServer.new(destent).close
         ::File.chmod st.mode, destent
       when st.pipe?
-        raise "cannot handle FIFO" unless ::File.respond_to?(:mkfifo)
+        raise 'cannot handle FIFO' unless ::File.respond_to?(:mkfifo)
         ::File.mkfifo destent, st.mode
       when st.mode & 0xF000 == 0xD000 # S_IF_DOOR = 0xD000
         raise "cannot handle door: #{ent}"
@@ -430,7 +440,8 @@ module FileUtils
       rel = `ent.slice(src.length + 1)`
       destent = rel.nil? || rel.empty? ? dest : ::File.join(dest, rel)
       Helpers_.fu_copy_metadata(ent, destent) if preserve
-    end)
+    end
+    )
   end
   module_function :copy_entry
 
@@ -456,7 +467,7 @@ module FileUtils
 
   def cp_lr(src, dest, noop: nil, verbose: nil, dereference_root: true, remove_destination: false)
     # Create hard links instead of copying files
-    Helpers_.fu_output_message "cp -lr#{remove_destination ? ' --remove-destination' : ''} #{[src,dest].flatten.join ' '}" if verbose
+    Helpers_.fu_output_message "cp -lr#{remove_destination ? ' --remove-destination' : ''} #{[src, dest].flatten.join ' '}" if verbose
     return if noop
     Helpers_.fu_each_src_dest(src, dest) do |s, d|
       link_entry s, d, dereference_root, remove_destination
@@ -466,7 +477,7 @@ module FileUtils
 
   def cp_r(src, dest, preserve: nil, noop: nil, verbose: nil, dereference_root: true, remove_destination: nil)
     # Recursively copies files.
-    Helpers_.fu_output_message "cp -r#{preserve ? 'p' : ''}#{remove_destination ? ' --remove-destination' : ''} #{[src,dest].flatten.join ' '}" if verbose
+    Helpers_.fu_output_message "cp -r#{preserve ? 'p' : ''}#{remove_destination ? ' --remove-destination' : ''} #{[src, dest].flatten.join ' '}" if verbose
     return if noop
     Helpers_.fu_each_src_dest(src, dest) do |s, d|
       copy_entry s, d, preserve, dereference_root, remove_destination
@@ -486,12 +497,12 @@ module FileUtils
   def install(src, dest, mode: nil, owner: nil, group: nil, preserve: nil, noop: nil, verbose: nil)
     # Copies a file entry. See install(1).
     if verbose
-      msg = +"install -c"
+      msg = +'install -c'
       msg << ' -p' if preserve
-      msg << ' -m ' << (mode.is_a?(String) ? mode : "%o" % mode) if mode
+      msg << ' -m ' << (mode.is_a?(String) ? mode : '%o' % mode) if mode
       msg << " -o #{owner}" if owner
       msg << " -g #{group}" if group
-      msg << ' ' << [src,dest].flatten.join(' ')
+      msg << ' ' << [src, dest].flatten.join(' ')
       Helpers_.fu_output_message msg
     end
     return if noop
@@ -499,7 +510,7 @@ module FileUtils
     gid = Helpers_.fu_get_gid(group)
     Helpers_.fu_each_src_dest(src, dest) do |s, d|
       st = ::File.stat(s)
-      unless ::File.exist?(d) and compare_file(s, d)
+      unless ::File.exist?(d) && compare_file(s, d)
         remove_file d, true
         if d.end_with?('/')
           mkdir_p d
@@ -510,7 +521,7 @@ module FileUtils
         end
         ::File.utime st.atime, st.mtime, d if preserve
         ::File.chmod Helpers_.fu_mode(mode, st), d if mode
-        ::File.chown uid, gid, d if uid or gid
+        ::File.chown uid, gid, d if uid || gid
       end
     end
   end
@@ -518,9 +529,9 @@ module FileUtils
 
   def link(src, dest, force: nil, noop: nil, verbose: nil)
     # Creates hard links
-    Helpers_.fu_output_message "ln#{force ? ' -f' : ''} #{[src,dest].flatten.join ' '}" if verbose
+    Helpers_.fu_output_message "ln#{force ? ' -f' : ''} #{[src, dest].flatten.join ' '}" if verbose
     return if noop
-    Helpers_.fu_each_src_dest0(src, dest) do |s,d|
+    Helpers_.fu_each_src_dest0(src, dest) do |s, d|
       remove_file d, true if force
       ::File.link s, d
     end
@@ -535,8 +546,8 @@ module FileUtils
       destent = rel.nil? || rel.empty? ? dest : ::File.join(dest, rel)
       ::File.unlink(destent) if remove_destination && ::File.file?(destent)
       if st.directory?
-        if !::File.exist?(destent) and Helpers_.fu_descendant_directory(destent, ent)
-          raise ArgumentError, "cannot link directory %s to itself %s" % [ent, destent]
+        if !::File.exist?(destent) && Helpers_.fu_descendant_directory(destent, ent)
+          raise ArgumentError, 'cannot link directory %s to itself %s' % [ent, destent]
         end
         begin
           ::Dir.mkdir destent
@@ -558,9 +569,9 @@ module FileUtils
     if relative
       return ln_sr(src, dest, force: force, noop: noop, verbose: verbose)
     end
-    Helpers_.fu_output_message "ln -s#{force ? 'f' : ''} #{[src,dest].flatten.join ' '}" if verbose
+    Helpers_.fu_output_message "ln -s#{force ? 'f' : ''} #{[src, dest].flatten.join ' '}" if verbose
     return if noop
-    Helpers_.fu_each_src_dest0(src, dest) do |s,d|
+    Helpers_.fu_each_src_dest0(src, dest) do |s, d|
       remove_file d, true if force
       File.symlink s, d
     end
@@ -580,17 +591,17 @@ module FileUtils
     srcs = Array(src)
 
     fu_clean_components = ->(*comp) do
-      comp.shift while comp.first == "."
+      comp.shift while comp.first == '.'
       return comp if comp.empty?
       clean = [comp.shift]
-      path = ::File.join(*clean, "") # ending with File::SEPARATOR
-      while c = comp.shift
-        if c == ".." and clean.last != ".." and !(fu_have_symlink && ::File.symlink?(path))
+      path = ::File.join(*clean, '') # ending with File::SEPARATOR
+      while (c = comp.shift)
+        if c == '..' && clean.last != '..' && !(fu_have_symlink && ::File.symlink?(path))
           clean.pop
-          path = path.chomp(%r((?<=\A|/)[^/]+/\z), "")
+          path = path.chomp(%r((?<=\A|/)[^/]+/\z), '')
         else
           clean << c
-          path += c + "/"
+          path += c + '/'
         end
       end
       clean
@@ -601,13 +612,13 @@ module FileUtils
       while target[i]&.== base[i]
         i += 1
       end
-      Array.new(base.size-i, '..').concat(target[i..-1])
+      Array.new(base.size - i, '..').concat(target[i..-1])
     end
 
     fu_split_path = ->(path) do
       path = File.path(path)
       list = []
-      until (parent, base = File.split(path); parent == path or parent == ".")
+      until (parent, base = File.split(path); parent == path || parent == '.')
         list << base
         path = parent
       end
@@ -619,7 +630,7 @@ module FileUtils
       if `Opal.platform.windows`
         path&.start_with?(%r(\w:|/))
       else
-        path&.start_with?("/")
+        path&.start_with?('/')
       end
     end
 
@@ -638,7 +649,7 @@ module FileUtils
       else
         srcdirs = fu_clean_components.call(*fu_split_path.call(s))
         base = fu_relative_components_from.call(fu_split_path.call(Dir.pwd), destdirs)
-        while srcdirs.first&. == ".." and base.last&.!=("..") and !fu_starting_path.call(base.last)
+        while srcdirs.first&.== '..' && base.last&.!=('..') && !fu_starting_path.call(base.last)
           srcdirs.shift
           base.pop
         end
@@ -675,17 +686,15 @@ module FileUtils
         path = File.dirname(path)
       end
       stack.reverse_each do |dir|
-        begin
-          dir = dir == '/' ? dir : dir.chomp(?/)
-          if mode
-            Dir.mkdir dir, mode
-            ::File.chmod mode, dir
-          else
-            Dir.mkdir dir
-          end
-        rescue SystemCallError
-          raise unless ::File.directory?(dir)
+        dir = dir == '/' ? dir : dir.chomp(?/)
+        if mode
+          Dir.mkdir dir, mode
+          ::File.chmod mode, dir
+        else
+          Dir.mkdir dir
         end
+      rescue SystemCallError
+        raise unless ::File.directory?(dir)
       end
     end
 
@@ -721,29 +730,26 @@ module FileUtils
 
   def move(src, dest, force: nil, noop: nil, verbose: nil, secure: nil)
     # Moves entries.
-    Helpers_.fu_output_message "mv#{force ? ' -f' : ''} #{[src,dest].flatten.join ' '}" if verbose
+    Helpers_.fu_output_message "mv#{force ? ' -f' : ''} #{[src, dest].flatten.join ' '}" if verbose
     return if noop
     Helpers_.fu_each_src_dest(src, dest) do |s, destent|
-      begin
-        if ::File.exist?(destent)
-          if ::File.directory?(destent)
-            raise Errno::EEXIST, destent
-          end
+      if ::File.exist?(destent)
+        if ::File.directory?(destent)
+          raise Errno::EEXIST, destent
         end
-        begin
-          File.rename s, destent
-        rescue Errno::EXDEV,
-               Errno::EPERM # move from unencrypted to encrypted dir (ext4)
-          copy_entry s, destent, true
-          if secure
-            remove_entry_secure s, force
-          else
-            remove_entry s, force
-          end
-        end
-      rescue SystemCallError
-        raise unless force
       end
+      begin
+        File.rename s, destent
+      rescue Errno::EXDEV, Errno::EPERM # move from unencrypted to encrypted dir (ext4)
+        copy_entry s, destent, true
+        if secure
+          remove_entry_secure s, force
+        else
+          remove_entry s, force
+        end
+      end
+    rescue SystemCallError
+      raise unless force
     end
   end
   module_function :move
@@ -771,37 +777,35 @@ module FileUtils
     # Recursively removes the directory entry given by +path+,
     # which should be the entry for a regular file, a symbolic link,
     # or a directory.
-    remove_entry path, force   # FIXME?? check if it is a directory
+    remove_entry path, force # FIXME?? check if it is a directory
   end
   module_function :remove_dir
 
   def remove_entry(path, force = false)
     # Removes the entry given by path, which should be the entry for a regular file, a symbolic link, or a directory.
     Helpers_.fu_postorder_traverse(path) do |ent|
-      begin
-        if ::File.lstat(ent).directory?
-          begin
-            ent = ent.to_s unless ent.is_a?(::String)
-            ent = ent.chomp(?/)
-            ::Dir.rmdir ent
-          rescue
-            if `Opal.platform.windows`
-              begin
-                ::File.chmod(0700, ent)
-                ::Dir.rmdir(ent)
-              rescue
-                raise
-              end
-            else
+      if ::File.lstat(ent).directory?
+        begin
+          ent = ent.to_s unless ent.is_a?(::String)
+          ent = ent.chomp(?/)
+          ::Dir.rmdir ent
+        rescue
+          if `Opal.platform.windows`
+            begin
+              ::File.chmod(0o700, ent)
+              ::Dir.rmdir(ent)
+            rescue
               raise
             end
+          else
+            raise
           end
-        else
-          remove_file ent
         end
-      rescue
-        raise unless force
+      else
+        remove_file ent
       end
+    rescue
+      raise unless force
     end
   rescue
     raise unless force
@@ -833,42 +837,42 @@ module FileUtils
 
     # freeze tree root
     euid = Process.euid
-    dot_file = fullpath + "/."
+    dot_file = fullpath + '/.'
     begin
       ::File.open(dot_file) do |f|
         fst = f.stat
-        unless st.dev == fst.dev and st.ino == fst.ino
+        unless st.dev == fst.dev && st.ino == fst.ino
           # symlink (TOC-to-TOU attack?)
           ::File.unlink fullpath
           return
         end
         f.chown euid, -1
-        f.chmod 0700
+        f.chmod 0o700
       end
     rescue Errno::EISDIR # JRuby in non-native mode can't open files as dirs
       ::File.lstat(dot_file).tap do |fstat|
-        unless st.dev == fstat.dev and st.ino == fstat.ino
+        unless st.dev == fstat.dev && st.ino == fstat.ino
           # symlink (TOC-to-TOU attack?)
           ::File.unlink fullpath
           return
         end
         ::File.chown euid, -1, dot_file
-        ::File.chmod 0700, dot_file
+        ::File.chmod 0o700, dot_file
       end
     end
 
     fst = ::File.lstat(fullpath)
-    unless st.dev == fst.dev and st.ino == fst.ino
+    unless st.dev == fst.dev && st.ino == fst.ino
       # TOC-to-TOU attack?
       ::File.unlink fullpath
       return
     end
 
     # ---- tree root is frozen ----
-    Helpers_.fu_preorder_traverse(path) do |entry, st|
-      if st.directory?
+    Helpers_.fu_preorder_traverse(path) do |entry, stt|
+      if stt.directory?
         ::File.chown(euid, -1, entry)
-        ::File.chmod(0700, entry)
+        ::File.chmod(0o700, entry)
       end
     end
     remove_entry(path, force)
@@ -883,7 +887,7 @@ module FileUtils
   rescue
     if `Opal.platform.windows`
       begin
-        ::File.chmod(0700, path)
+        ::File.chmod(0o700, path)
         ::File.unlink(path)
       rescue
         raise unless force
@@ -935,7 +939,7 @@ module FileUtils
       ::Dir.rmdir(dir = dir == '/' ? dir : dir.chomp(?/))
       if parents
         begin
-          until (parent = File.dirname(dir)) == '.' or parent == dir
+          until (parent = File.dirname(dir)) == '.' || parent == dir
             dir = parent
             ::Dir.rmdir(dir)
           end
@@ -971,7 +975,7 @@ module FileUtils
       rescue Errno::ENOENT
         raise if created
         ::File.open(path, 'a') do
-          ;
+          # nothing
         end
         created = true
         retry if t
@@ -995,10 +999,10 @@ module FileUtils
 
   # This hash table holds command options.
   OPT_TABLE = {}
-  (private_instance_methods & methods(false)).inject(OPT_TABLE) {|tbl, name|
-    (tbl[name.to_s] = instance_method(name).parameters).map! {|t, n| n if t == :key}.compact!
+  (private_instance_methods & methods(false)).inject(OPT_TABLE) do |tbl, name|
+    (tbl[name.to_s] = instance_method(name).parameters).map! { |t, n| n if t == :key }.compact!
     tbl
-  }
+  end
 
   def self.commands
     # Returns an array of the string names of FileUtils methods that accept one or more keyword arguments
@@ -1007,7 +1011,7 @@ module FileUtils
 
   def self.options
     # Returns an array of the string keyword names
-    OPT_TABLE.values.flatten.uniq.map {|sym| sym.to_s }
+    OPT_TABLE.values.flatten.uniq.map(&:to_s)
   end
 
   def self.have_option?(mid, opt)
@@ -1018,24 +1022,24 @@ module FileUtils
 
   def self.options_of(mid)
     # Returns an array of the string keyword name for method mid.
-    OPT_TABLE[mid.to_s].map {|sym| sym.to_s }
+    OPT_TABLE[mid.to_s].map(&:to_s)
   end
 
   def self.collect_method(opt)
     # Returns an array of the string method names of the methods that accept the given keyword option opt.
-    OPT_TABLE.keys.select {|m| OPT_TABLE[m].include?(opt) }
+    OPT_TABLE.keys.select { |m| OPT_TABLE[m].include?(opt) }
   end
 
   LOW_METHODS = singleton_methods(false) - collect_method(:noop).map(&:intern)
 
   module LowMethods
     private
+
     def _do_nothing(*)end
-    ::FileUtils::LOW_METHODS.map {|name| alias_method name, :_do_nothing}
+    ::FileUtils::LOW_METHODS.map { |name| alias_method name, :_do_nothing }
   end
 
-  METHODS = singleton_methods() - [:private_module_function, :commands, :options, :have_option?,
-                                   :options_of, :collect_method]
+  METHODS = singleton_methods - %i[private_module_function commands options have_option? options_of collect_method]
 
   module DryRun
     include FileUtils

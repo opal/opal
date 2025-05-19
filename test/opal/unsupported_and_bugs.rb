@@ -36,73 +36,6 @@ class TestBenchmark
   bug :test_bugs_ruby_dev_40906_can_add_in_place_the_time_of_execution_of_the_block_given
 end
 
-class TestEtc
-  unsupported :test_ractor
-end
-
-class TestFileUtils
-  # mostly NotImplementedError: Thread creation not available
-  unsupported :test_assert_output_lines
-  unsupported :test_chdir_verbose
-  unsupported :test_chmod_verbose
-  unsupported :test_chown
-  unsupported :test_chown_dir_group_ownership_not_recursive
-  unsupported :test_chown_noop
-  unsupported :test_chown_R
-  unsupported :test_chown_R_force
-  unsupported :test_chown_R_noop
-  unsupported :test_chown_R_verbose
-  unsupported :test_chown_verbose
-  unsupported :test_s_chmod_verbose
-  if ::Opal.JS[:platform].JS[:macos]
-    # tests expect EPERM but nodejs chown throws range error for user id -2,
-    # which is the valid user id of the user nobody on macos
-    bug :test_chown_R_without_permission
-    bug :test_chown_without_permission
-    if ::Opal.JS[:platform].JS[:name] == 'bun'
-      bug :test_cp_r_dev
-    end
-  elsif ::Opal.JS[:platform].JS[:windows]
-    bug :test_cp_symlink # no error
-    bug :test_install_symlink # no error
-    bug :test_install_symlink # no error
-    bug :test_mkdir # throwing EPERM instead of EACCESS
-    bug :test_mv_symlink # no_error
-    bug :test_remove_entry_secure # EPERM
-    bug :test_remove_entry_secure_pathname # EPERM
-    bug :test_remove_entry_secure_symlink # EPERM
-    unsupported :test_cp_r_fifo
-    if ::Opal.JS[:platform].JS[:name] == 'deno'
-      bug :test_cp
-      bug :test_cp_lr
-      bug :test_cp_pathname
-      bug :test_cp_preserve_permissions_dir
-      bug :test_cp_r
-      bug :test_cp_r_pathname
-      bug :test_cp_r_symlink # EACCESS
-      bug :test_cp_r_symlink_preserve
-      bug :test_cp_r_symlink_remove_destination
-      bug :test_install
-      bug :test_install_pathname
-      bug :test_ln_sr
-      bug :test_mv
-      bug :test_mv_pathname
-    elsif ::Opal.JS[:platform].JS[:name] == 'bun'
-      bug :test_cp_r_dev # ENOENT
-      bug :test_mkdir_p # EPERM
-    end
-  end
-  if ::Opal.JS[:platform].JS[:name] == 'deno'
-    unsupported :test_cp_r_fifo # unknown file type
-  elsif ::Opal.JS[:platform].JS[:name] == 'bun'
-    bug :test_chmod_symbol_mode
-    bug :test_install_mode_option
-    bug :test_mkdir_file_perm
-    bug :test_mkdir_p_file_perm
-    bug :test_rm_rf # EACCESS
-  end
-end
-
 class TestIOBuffer
   # mmap is not supported, modifying Strings is not supported,
   # but many below are just issues with Tempfile
@@ -127,29 +60,111 @@ class TestIOBuffer
   # also check commented lines in RANGES in test_io_buffer.rb
 end
 
-class TestPathname
-  # ::Find is missing, testing private methods, modifying Strings
-  bug :test_atime
-  bug :test_ctime
-  bug :test_find
-  bug :test_mtime
-  bug :test_to_s
-  unsupported :test_del_trailing_separator_131
-  unsupported :test_del_trailing_separator_7323
-  unsupported :test_destructive_update
-  unsupported 'test_has_trailing_separator?_131'.to_sym
-  unsupported 'test_has_trailing_separator?_7323'.to_sym
-  unsupported :test_kernel_open
-  unsupported :test_relative_path_from_casefold
-  if ::Opal.JS[:platform].JS[:windows]
-    unsupported :test_owned? # Process.geteuid is -1
+class TestOpalError
+  if %w[deno bun firefox safari].include?(::Opal.JS[:platform].JS[:name])
+    bug :test_should_get_stack
+    bug :test_should_preserve_stack
+    bug :test_should_set_stack
+  end
+end
+
+# These are only supposed to work on node compatible platforms
+if %w[node nodejs bun deno].include?(::Opal.JS[:platform].JS[:name])
+  class TestEtc
+    unsupported :test_ractor
+  end
+
+  class TestFileUtils
+    # mostly NotImplementedError: Thread creation not available
+    unsupported :test_assert_output_lines
+    unsupported :test_chdir_verbose
+    unsupported :test_chmod_verbose
+    unsupported :test_chown
+    unsupported :test_chown_dir_group_ownership_not_recursive
+    unsupported :test_chown_noop
+    unsupported :test_chown_R
+    unsupported :test_chown_R_force
+    unsupported :test_chown_R_noop
+    unsupported :test_chown_R_verbose
+    unsupported :test_chown_verbose
+    unsupported :test_s_chmod_verbose
+    if ::Opal.JS[:platform].JS[:macos]
+      # tests expect EPERM but nodejs chown throws range error for user id -2,
+      # which is the valid user id of the user nobody on macos
+      bug :test_chown_R_without_permission
+      bug :test_chown_without_permission
+      if ::Opal.JS[:platform].JS[:name] == 'bun'
+        bug :test_cp_r_dev
+      end
+    elsif ::Opal.JS[:platform].JS[:windows]
+      bug :test_cp_symlink # no error
+      bug :test_install_symlink # no error
+      bug :test_install_symlink # no error
+      bug :test_mkdir # throwing EPERM instead of EACCESS
+      bug :test_mv_symlink # no_error
+      bug :test_remove_entry_secure # EPERM
+      bug :test_remove_entry_secure_pathname # EPERM
+      bug :test_remove_entry_secure_symlink # EPERM
+      unsupported :test_cp_r_fifo
+      if ::Opal.JS[:platform].JS[:name] == 'deno'
+        bug :test_cp
+        bug :test_cp_lr
+        bug :test_cp_pathname
+        bug :test_cp_preserve_permissions_dir
+        bug :test_cp_r
+        bug :test_cp_r_pathname
+        bug :test_cp_r_symlink # EACCESS
+        bug :test_cp_r_symlink_preserve
+        bug :test_cp_r_symlink_remove_destination
+        bug :test_install
+        bug :test_install_pathname
+        bug :test_ln_sr
+        bug :test_mv
+        bug :test_mv_pathname
+      elsif ::Opal.JS[:platform].JS[:name] == 'bun'
+        bug :test_cp_r_dev # ENOENT
+        bug :test_mkdir_p # EPERM
+      end
+    end
     if ::Opal.JS[:platform].JS[:name] == 'deno'
-      bug :test_chmod
-      bug :test_chown
-      bug :test_open
+      unsupported :test_cp_r_fifo # unknown file type
+    elsif ::Opal.JS[:platform].JS[:name] == 'bun'
+      bug :test_chmod_symbol_mode
+      bug :test_install_mode_option
+      bug :test_mkdir_file_perm
+      bug :test_mkdir_p_file_perm
+      bug :test_rm_rf # EACCESS
     end
   end
-  if ::Opal.JS[:platform].JS[:name] == 'bun'
-    bug :test_grpowned? # EPERM
+
+  class TestOpalFile
+    bug :test_read_binary_utf8_file
+  end
+
+  class TestPathname
+    # ::Find is missing, testing private methods, modifying Strings
+    bug :test_atime
+    bug :test_ctime
+    bug :test_find
+    bug :test_mtime
+    bug :test_to_s
+    unsupported :test_del_trailing_separator_131
+    unsupported :test_del_trailing_separator_7323
+    unsupported :test_destructive_update
+    unsupported 'test_has_trailing_separator?_131'.to_sym
+    unsupported 'test_has_trailing_separator?_7323'.to_sym
+    unsupported :test_kernel_open
+    unsupported :test_relative_path_from_casefold
+    if ::Opal.JS[:platform].JS[:windows]
+      unsupported :test_owned? # Process.geteuid is -1
+      if ::Opal.JS[:platform].JS[:name] == 'deno'
+        bug :test_chmod
+        bug :test_chown
+        bug :test_open
+      end
+    end
+    if ::Opal.JS[:platform].JS[:name] == 'bun'
+      bug :test_grpowned? # EPERM
+    end
   end
 end

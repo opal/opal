@@ -5,6 +5,7 @@ opal_filter "File" do
   fails "File.extname for a filename ending with a dot returns '.'" # Expected "" == "." to be truthy but was false
   fails "File.ftype returns 'characterSpecial' when the file is a char" # RuntimeError: Could not find a character device
   fails "File.ftype returns 'socket' when the file is a socket" # NameError: uninitialized constant SocketSpecs::Socket
+  fails "File.lchmod changes the file mode of the link and not of the file" # NotImplementedError: NotImplementedError
   fails "File.mkfifo creates a FIFO file with passed mode & ~umask" # Expected 4589 == 4580 to be truthy but was false
   fails "File.mkfifo when path passed is not a String value raises a TypeError" # Expected TypeError but got: Errno::ENOENT (No such file or directory - No such file or directory /tmp/fifo)
   fails "File.new can't alter mode or permissions when opening a file" # Expected Errno::EINVAL but no exception was raised (false was returned)

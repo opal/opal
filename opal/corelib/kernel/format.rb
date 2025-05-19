@@ -9,15 +9,14 @@ module ::Kernel
 
     # this is a more or less traightforward port of rb_str_format from ruby/sprintf.c
 
-    #if args.length == 1 && (args[0].respond_to?(:to_ary) rescue nil) # guard BasicObjects not having #respond_to?
-    #  ary = ::Opal.coerce_to?(args[0], ::Array, :to_ary)
-    #  args = ary.to_a unless ary.nil?
-    #end
+    # if args.length == 1 && (args[0].respond_to?(:to_ary) rescue nil) # guard BasicObjects not having #respond_to?
+    #   ary = ::Opal.coerce_to?(args[0], ::Array, :to_ary)
+    #   args = ary.to_a unless ary.nil?
+    # end
 
     format_string = ::Opal.coerce_to!(format_string, ::String, :to_str)
     # rb_must_asciicompat(format_string)
     enc = format_string.encoding
-    orig = format_string
     # format_string = format_string.dup.freeze
     pi = -1 # p = RSTRING_PTR(format_string)
     pe = `format_string.length` # pe = pi + RSTRING_LEN(format_string)
@@ -36,7 +35,6 @@ module ::Kernel
     default_float_precision = 6
     retry_exception = ::Opal::RetryException
 
-    scanned = 0
     width = prec = nil
     flags = fnoneC
     nextarg = 1
@@ -46,7 +44,7 @@ module ::Kernel
     argc = args.size
 
     # just like in ruby/sprintf.c
-    get_next_arg = ->() do
+    get_next_arg = -> do
       raise(::ArgumentError, "unnumbered(#{nextarg}) mixed with numbered") if posarg == -1
       raise(::ArgumentError, "unnumbered(#{nextarg}) mixed with named") if posarg == - 2
       posarg = nextarg
@@ -57,7 +55,7 @@ module ::Kernel
     end
 
     # just like in ruby/sprintf.c
-    get_arg = ->() do
+    get_arg = -> do
       return nextvalue if nextvalue
       get_next_arg.()
     end
@@ -87,8 +85,8 @@ module ::Kernel
     end
 
     # just like in ruby/sprintf.c
-    get_hash = ->(hash, ac, av) do
-      return hash if hash
+    get_hash = ->(hsh, ac, av) do
+      return hsh if hsh
       raise(::ArgumentError, 'one hash required') if ac != 1
       tmp = av[0]
       tmp.to_hash rescue nil
@@ -138,7 +136,7 @@ module ::Kernel
     push = ->(s, i, e) { `result += (i > 0 || (i + e) < s.length) ? s.slice(i, i + e) : s` }
 
     # this is the label format_s1 from rb_str_format extracted as lambda
-    format_s1 = -> (prec) do
+    format_s1 = ->(precn) do
       len = `str.length`
       if enc != str.encoding
         enc = str.encoding unless enc.ascii_compatible? && str.ascii_only?
@@ -147,14 +145,14 @@ module ::Kernel
         slen = str.length # consider encoding
         raise(::ArgumentError, 'invalid mbstring sequence') unless str.valid_encoding?
         if (flags & fprecC == fprecC) && (prec < slen)
-          ps = str.slice(0, prec) # consider encoding
-          slen = prec
+          ps = str.slice(0, precn) # consider encoding
+          slen = precn
           len = `ps.length`
         end
         # need to adjust multi-byte string pos
         if (flags & fwidthC == fwidthC) && (width > slen)
           width -= slen
-          if !(flags & fminusC == fminusC)
+          if flags & fminusC != fminusC
             filll.(' ', width)
             width = 0
           end
@@ -168,10 +166,10 @@ module ::Kernel
     end
 
     # this is the label format_s from rb_str_format extracted as lambda
-    format_s = ->(prec) do
+    format_s = ->(precn) do
       arg = get_arg.()
       str = `format_string[pi] == 'p'` ? arg.inspect : arg.to_s
-      format_s1.(prec)
+      format_s1.(precn)
     end
 
     # just like in ruby/bignum.c
@@ -193,10 +191,10 @@ module ::Kernel
       when 2
         return '1'
       end
-      return '.'
+      '.'
     end
 
-    val_str = -> (val, numdigits, numbits, base) do
+    val_str = ->(val, numdigits, numbits, base) do
       if val < 0
         if (flags & fspaceC == fspaceC) || (flags & fplusC == fplusC)
           val.abs.to_s(base)
@@ -295,7 +293,7 @@ module ::Kernel
 
       width -= `prefix.length` if prefix
 
-      if flags & (fzeroC|fminusC|fprecC) == fzeroC
+      if flags & (fzeroC | fminusC | fprecC) == fzeroC
         prec = width
         width = 0
       else
@@ -306,18 +304,18 @@ module ::Kernel
         width -= prec
       end
 
-      if !(flags & fminusC == fminusC)
+      if flags & fminusC != fminusC
         filll.(' ', width)
         width = 0
       end
       push.(sc, 0, 1) if sc
       push.(prefix, 0, `prefix.length`) if prefix
-      push.("..", 0, 2) if dots
+      push.('..', 0, 2) if dots
       if prec > len
         if !sign && valsign < 0
           c = sign_bits.(base, `format_string[pi]`)
           filll.(c, prec - len)
-        elsif (flags & (fminusC|fprecC)) != fminusC
+        elsif (flags & (fminusC | fprecC)) != fminusC
           filll.('0', prec - len)
         end
       end
@@ -338,24 +336,22 @@ module ::Kernel
     end
 
     # this is the label float_value from rb_str_format extracted as lambda
-    float_value = ->(prec) do
+    float_value = ->(precn) do
       val = get_arg.()
       val = ::Kernel.Float(val)
       fc = ' '
-      sign =  if !val.nan? && val < 0.0
-                '-'
-              elsif flags & fplusC == fplusC
-                '+'
-              elsif flags & fspaceC == fspaceC
-                ' '
-              else
-                nil
-              end
+      sign = if !val.nan? && val < 0.0
+               '-'
+             elsif flags & fplusC == fplusC
+               '+'
+             elsif flags & fspaceC == fspaceC
+               ' '
+             end
       if !val.finite?
-        tmp = val.nan? ? "NaN" : "Inf"
+        tmp = val.nan? ? 'NaN' : 'Inf'
       else
         val = val.abs
-        prc = prec == -1 ? default_float_precision : prec
+        prc = precn == -1 ? default_float_precision : precn
         fc = '0' if flags & fzeroC == fzeroC
         case `format_string[pi]`
         when 'f'
@@ -379,8 +375,8 @@ module ::Kernel
             tflt = `flt.toPrecision(prc)`
             if flags & fsharpC == fsharpC
               tflt += '.' if `tflt.indexOf('.')` == -1
-            else
-              tflt = del_dot_zero.(tflt) if prec == -1
+            elsif precn == -1
+              tflt = del_dot_zero.(tflt)
             end
             tmp = `tflt + (format_string[pi] == 'G' ? 'E' : 'e') + texp`
           else
@@ -416,7 +412,7 @@ module ::Kernel
           tflt = tflt.upcase if `xx == 'X'`
           dot_idx = `tflt.indexOf('.')`
           if dot_idx > 0
-            tflt = `tflt.slice(0, dot_idx + 1 + prc)` if prec != -1 && `tflt.length - dot_idx` > prc
+            tflt = `tflt.slice(0, dot_idx + 1 + prc)` if precn != -1 && `tflt.length - dot_idx` > prc
             if prc > 0
               while `tflt.length - dot_idx` <= prc
                 tflt = `tflt + '0'`
@@ -425,11 +421,11 @@ module ::Kernel
           end
           if flags & fsharpC == fsharpC
             tflt += '.' if `tflt.indexOf('.')` == -1
-          else
-            tflt = del_dot_zero.(tflt) if prec == -1
+          elsif precn == -1
+            tflt = del_dot_zero.(tflt)
           end
           tmp = tflt + pp + (exp < 0 ? '' : '+') + `exp.toString(10)`
-          if (flags & fwidthC == fwidthC)
+          if flags & fwidthC == fwidthC
             need = `tmp.length + 2`
             need += 1 if sign
             need = width - need
@@ -446,18 +442,17 @@ module ::Kernel
               push.(sign, 0, 1) if sign
               push.('0' + xx, 0, 2)
               filll.('0', need) if need > 0
-              push.(tmp, 0, `tmp.length`)
             else
               filll.(' ', need) if need > 0
               push.(sign, 0, 1) if sign
               push.('0' + xx, 0, 2)
-              push.(tmp, 0, `tmp.length`)
             end
+            push.(tmp, 0, `tmp.length`)
           end
           return
         end
       end
-      if (flags & fwidthC == fwidthC)
+      if flags & fwidthC == fwidthC
         need = `tmp.length`
         need += 1 if sign
         need = width - need
@@ -476,7 +471,7 @@ module ::Kernel
     end
 
     # just like in ruby/sprintf.c, not doing much
-    sprint_exit = ->() do
+    sprint_exit = -> do
       # We cannot validate the number of arguments if (digit)$ style used.
       # if (posarg >= 0 && nextarg < argc && !(argc == 2 && args[1].is_a?(::Hash)))
       #   mesg = "too many arguments for format string"
@@ -494,24 +489,11 @@ module ::Kernel
         t += 1
       end
 
-      raise(::ArgumentError, 'incomplete format specifier; use %%%% (double %%) instead') if (t + 1 == pe)
+      raise(::ArgumentError, 'incomplete format specifier; use %%%% (double %%) instead') if t + 1 == pe
 
       push.(format_string, pi, t - pi)
 
-      if t >= pe # end of format_string string
-        # break
-        #
-        # Bug #2743 in Opal, because the while body gets wrapped in a function the return below
-        # does not return the method but instead the function wrapper causing another loop run.
-        # Overall just using `break` instead here should be sufficient. But due to this bug,
-        # that would lead to 'SyntaxError: Illegal break statement'.
-        # So at this moment we have to set pi to t and return the function, causing another loop
-        # that will not run because the end of format string is reached, doing the return at method end below.
-        # If the bug gets fixed, the return may actually return, so we better call sprint_exit.
-        # So for the moment, sprint exit is called twice, here and below at method end and actual return.
-        pi = t
-        return sprint_exit.()
-      end
+      break if t >= pe # end of format_string string
 
       pi = t + 1 # skip `%'
 
@@ -553,7 +535,7 @@ module ::Kernel
         when '1', '2', '3', '4', '5', '6', '7', '8', '9'
           pi, n = get_num.(pi)
           if `format_string[pi] == '$'`
-            raise(::ArgumentError, "value given twice - #{n}") if !nextvalue.nil?
+            raise(::ArgumentError, "value given twice - #{n}") unless nextvalue.nil?
             nextvalue = get_pos_arg.(n)
             pi += 1
             raise retry_exception
@@ -565,7 +547,7 @@ module ::Kernel
 
         when '<', '{'
           start = pi
-          term = (`format_string[pi] == '<'`) ? '>' : '}'
+          term = `format_string[pi] == '<'` ? '>' : '}'
           pi += 1 # skip '<' or '{'
           while pi < pe && `format_string[pi] != term`
             pi = `Opal.mbinc(format_string, pi)`
@@ -574,16 +556,16 @@ module ::Kernel
           raise(::ArgumentError, 'malformed name - unmatched parenthesis') if pi >= pe
 
           len = pi - start + 1 # including parenthesis
-          raise(::ArgumentError, "named #{`format_string.slice(start)`} after <#{sym}>") if sym != nil
+          raise(::ArgumentError, "named #{`format_string.slice(start)`} after <#{sym}>") unless sym.nil?
           hash = get_hash.(hash, argc, args)
           sym = `format_string.slice(start + 1, start + len - 1)`.to_sym
           # ^ without parenthesis
           check_name_arg.(sym)
-          if !sym.nil?
+          unless sym.nil?
             raise(::KeyError.new("key #{sym} not found", receiver: hash, key: sym)) unless hash.key?(sym)
             nextvalue = hash[sym]
           end
-          if (term == '}')
+          if term == '}'
             width = format_s.(prec)
           else
             pi += 1
@@ -594,7 +576,7 @@ module ::Kernel
           check_for_width.(flags)
           flags |= fwidthC
           pi, width = get_aster.(pi, width)
-          if (width < 0)
+          if width < 0
             flags |= fminusC
             width = -width
             raise(::ArgumentError, 'width too big') if width < 0
@@ -605,13 +587,13 @@ module ::Kernel
         when '.'
           raise(::ArgumentError, 'precision given twice') if flags & fprec0C == fprec0C
 
-          flags |= fprecC|fprec0C
+          flags |= fprecC | fprec0C
 
           prec = 0
           pi += 1
           if `format_string[pi] == '*'`
             pi, prec = get_aster.(pi, prec)
-            flags &= ~fprecC if (prec < 0) # ignore negative precision
+            flags &= ~fprecC if prec < 0 # ignore negative precision
             pi += 1
             raise retry_exception
           end
@@ -631,7 +613,7 @@ module ::Kernel
             tmp = val.to_str rescue nil
           end
           if !tmp.nil?
-            raise(::TypeError) unless tmp.class == ::String
+            raise(::TypeError) unless tmp.instance_of?(::String)
             flags |= fprecC
             prec = 1
             str = tmp
@@ -652,7 +634,7 @@ module ::Kernel
             #   enc = rb_enc_from_index(encidx)
             #   coderange = ENC_CODERANGE_VALID
             # end
-            if !(flags & fwidthC == fwidthC)
+            if flags & fwidthC != fwidthC
               push.(chr, 0, `chr.length`)
             elsif flags & fminusC == fminusC
               width -= 1
@@ -702,7 +684,7 @@ module ::Kernel
         when 'f'
           val = get_arg.()
           num = den = nil
-          prec = default_float_precision if !(flags & fprecC == fprecC)
+          prec = default_float_precision unless flags & fprecC == fprecC
 
           if val.is_a?(::Integer)
             den = 1
@@ -725,9 +707,9 @@ module ::Kernel
             num = num.abs
           end
           if den != 1
-            num = num * (10**prec)
-            num = num + (den/2).to_i
-            num = (num/den).to_i
+            num *= (10**prec)
+            num += (den / 2).to_i
+            num = (num / den).to_i
           elsif prec >= 0
             zero = prec
           end
@@ -737,14 +719,14 @@ module ::Kernel
           len += 1 if sign != 0 || (flags & fspaceC == fspaceC)
           len += 1 if prec > 0 # period
           fill = width > len ? width - len : 0
-          filll.(' ', fill) if fill && !(flags & (fminusC|fzeroC) == (fminusC|fzeroC))
+          filll.(' ', fill) if fill && (flags & (fminusC | fzeroC) != (fminusC | fzeroC))
           if sign != 0 || (flags & fspaceC == fspaceC)
-            push.(sign > 0 ? '+' : sign < 0 ? '-' : ' ', 0, 1)
+            push.(sign > 0 ? '+' : (sign < 0 ? '-' : ' '), 0, 1)
           end
-          filll.('0', fill) if fill && (flags & (fminusC|fzeroC) == fzeroC)
+          filll.('0', fill) if fill && (flags & (fminusC | fzeroC) == fzeroC)
           len = `val.length` + zero
           t = val
-          if (len > prec)
+          if len > prec
             push.(t, 0, len - prec)
           else
             push.('0', 0, 1)

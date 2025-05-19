@@ -9,9 +9,11 @@ module ::Errno
     [:ENXIO, 'No such device or address', 6],
     [:EBADF, 'Bad file descriptor', 9],
     [:ECHILD, 'No child processes', 10],
+    [:EAGAIN, 'Try again', 11],
     [:EACCES, 'Permission denied', 13],
     [:EBUSY, 'resource busy or locked', 16],
     [:EEXIST, 'File exists', 17],
+    [:EXDEV, 'Cross-device link', 18],
     [:ENOTDIR, 'Not a directory', 20],
     [:EISDIR, 'Is a directory', 21],
     [:EINVAL, 'Invalid argument', 22],
@@ -21,7 +23,8 @@ module ::Errno
     [:ENAMETOOLONG, 'File name too long', 36],
     [:ENOTEMPTY, 'Directory not empty', 39],
     [:ELOOP, 'Too many symbolic links encountered', 40],
-    [:EILSEQ, 'Illegal byte sequence', 84]
+    [:EILSEQ, 'Illegal byte sequence', 84],
+    [:EOPNOTSUPP, 'Operation not supported on transport endpoint', 95]
   ]
 
   klass = nil

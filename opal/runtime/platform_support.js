@@ -42,25 +42,7 @@
   //
   // Handle unsupported features
   //
-
-  // helpers to be used by drivers
-  $platform.handle_unsupported_feature = function(message) {
-    if (!message) message = "not implemented";
-    switch (Opal.config.unsupported_features_severity) {
-    case 'error':
-      Opal.Kernel.$raise(Opal.NotImplementedError, message);
-      break;
-    case 'warning':
-      console.warn(message.toString());
-      break;
-    }
-    // otherwise ignore
-  }
-
-  $platform.not_available = function(fun) {
-    $platform.handle_unsupported_feature(fun + " is not available on " + $platform.name);
-    return Opal.nil;
-  }
+  $platform.not_implemented = ()=>Opal.Kernel.$raise(Opal.NotImplementedError);
 
   //
   // TextDecoder
@@ -134,6 +116,20 @@
     }
   }
   if (typeof Opal.global.TextDecoder === "undefined") Opal.global.TextDecoder = Opal.generic_text_decoder;
+
+  //
+  // Sleep
+  //
+  // For modern platforms:
+  $platform.sleep_atomics = (seconds)=>{
+    return Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, Math.round(seconds * 1000));
+  }
+  // For older platforms, or when SharedArrayBuffer has been disabled:
+  $platform.sleep_while = (seconds)=>{
+    let get_time = Opal.global.performance ? ()=>performance.now() : ()=>new Date(),
+        t = get_time();
+    while (get_time() - t <= seconds * 1000);
+  }
 
   //
   // Console

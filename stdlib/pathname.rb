@@ -1,12 +1,13 @@
 # backtick_javascript: true
 
-# inspired by ruby/ext/pathname
+# originally taken from https://github.com/ruby/ruby/blob/master/ext/pathname/lib/pathname.rb
+# original Author: Tanaka Akira <akr@m17n.org>
+# adapted to Opal
 
 require 'corelib/comparable'
 require 'tmpdir'
 require 'fileutils'
 
-# Portions from Author:: Tanaka Akira <akr@m17n.org>
 class Pathname
   include Comparable
 
@@ -21,7 +22,7 @@ class Pathname
     SEPARATOR_LIST = "#{Regexp.quote File::ALT_SEPARATOR}#{Regexp.quote File::SEPARATOR}"
     SEPARATOR_PAT = /[#{SEPARATOR_LIST}]/
   else
-    SEPARATOR_LIST = "#{Regexp.quote File::SEPARATOR}"
+    SEPARATOR_LIST = Regexp.quote File::SEPARATOR.to_s
     SEPARATOR_PAT = /#{Regexp.quote File::SEPARATOR}/
   end
 
@@ -181,18 +182,18 @@ class Pathname
     path = @path
     yield self
 
-    del_trailing_separator =-> (path) do
-      if r = chop_basename(path)
+    del_trailing_separator = ->(pth) do
+      if (r = chop_basename(pth))
         pre, basename = r
         pre + basename
-      elsif /#{SEPARATOR_PAT}+\z/o =~ path
-        $` + File.dirname(path)[/#{SEPARATOR_PAT}*\z/o]
+      elsif /#{SEPARATOR_PAT}+\z/o =~ pth
+        ::Regexp.last_match.pre_match + File.dirname(pth)[/#{SEPARATOR_PAT}*\z/o]
       else
-        path
+        pth
       end
     end
 
-    while r = chop_basename(path)
+    while (r = chop_basename(path))
       path, = r
       break if path.empty?
       yield Pathname.new(del_trailing_separator.call(path))
@@ -234,7 +235,7 @@ class Pathname
     ::File.chardev?(@path)
   end
 
-  def children(with_directory=true)
+  def children(with_directory = true)
     # Returns the children of the directory (files and subdirectories, not recursive) as an array of Pathname objects.
     with_directory = false if @path == '.'
     result = []
@@ -259,7 +260,7 @@ class Pathname
     ::File.chown(owner_int, group_int, @path)
   end
 
-  def cleanpath(consider_symlink=false)
+  def cleanpath(consider_symlink = false)
     # Returns clean pathname of self with consecutive slashes and useless dots removed. The filesystem is not accessed.
 
     prepend_prefix = ->(prefix, relpath) do
@@ -267,7 +268,7 @@ class Pathname
         File.dirname(prefix)
       elsif /#{SEPARATOR_PAT}/o.match?(prefix)
         prefix = File.dirname(prefix)
-        prefix = File.join(prefix, "") if File.basename(prefix + 'a') != 'a'
+        prefix = File.join(prefix, '') if File.basename(prefix + 'a') != 'a'
         prefix + relpath
       else
         prefix + relpath
@@ -275,7 +276,7 @@ class Pathname
     end
 
     has_trailing_separator = ->(path) do
-      if r = chop_basename(path)
+      if (r = chop_basename(path))
         pre, basename = r
         pre.length + basename.length < path.length
       else
@@ -283,11 +284,12 @@ class Pathname
       end
     end
 
+    path = @path
+    names = []
+    pre = path
+
     if consider_symlink
-      path = @path
-      names = []
-      pre = path
-      while r = chop_basename(pre)
+      while (r = chop_basename(pre))
         pre, base = r
         names.unshift base if base != '.'
       end
@@ -309,10 +311,7 @@ class Pathname
         end
       end
     else
-      path = @path
-      names = []
-      pre = path
-      while r = chop_basename(pre)
+      while (r = chop_basename(pre))
         pre, base = r
         case base
         when '.'
@@ -349,12 +348,12 @@ class Pathname
     0
   end
 
-  def descend
+  def descend(&block)
     # Iterates over and yields a new Pathname object for each element in the given path in descending order.
     return to_enum(:descend) unless block_given?
     vs = []
     ascend { |v| vs << v }
-    vs.reverse_each { |v| yield v }
+    vs.reverse_each(&block)
     nil
   end
 
@@ -368,7 +367,7 @@ class Pathname
     ::Pathname.new(::File.dirname(@path))
   end
 
-  def each_child(with_directory=true, &block)
+  def each_child(with_directory = true, &block)
     # Iterates over the children of the directory (files and subdirectories, not recursive).
     children(with_directory).each(&block)
   end
@@ -379,13 +378,13 @@ class Pathname
     ::Dir.foreach(@path) { |entry| block.call(Pathname.new(entry)) }
   end
 
-  def each_filename
+  def each_filename(&block)
     # Iterates over each component of the path.
     return to_enum(:each_filename) unless block_given?
 
     split_names = ->(path) do
       names = []
-      while r = chop_basename(path)
+      while (r = chop_basename(path))
         path, basename = r
         names.unshift basename
       end
@@ -393,7 +392,7 @@ class Pathname
     end
 
     names = split_names.call(@path)
-    names.each { |filename| yield filename }
+    names.each(&block)
     nil
   end
 
@@ -552,13 +551,11 @@ class Pathname
 
   def mountpoint?
     # Returns true if self points to a mountpoint.
-    begin
-      stat1 = self.lstat
-      stat2 = self.parent.lstat
-      stat1.dev != stat2.dev || stat1.ino == stat2.ino
-    rescue Errno::ENOENT
-      false
-    end
+    stat1 = lstat
+    stat2 = parent.lstat
+    stat1.dev != stat2.dev || stat1.ino == stat2.ino
+  rescue Errno::ENOENT
+    false
   end
 
   def mtime
@@ -687,7 +684,7 @@ class Pathname
 
   def root?
     # Predicate method for root directories. Returns true if the pathname consists of consecutive slashes.
-    chop_basename(@path) == nil && /#{SEPARATOR_PAT}/o.match?(@path)
+    chop_basename(@path).nil? && /#{SEPARATOR_PAT}/o.match?(@path)
   end
 
   def setgid?

@@ -68,7 +68,6 @@
   // Configure runtime behavior with regards to require and unsupported features
   Opal.config = {
     missing_require_severity: 'error',        // error, warning, ignore
-    unsupported_features_severity: 'warning', // error, warning, ignore
     experimental_features_severity: 'warning',// warning, ignore
     enable_stack_trace: true                  // true, false
   };

@@ -71,7 +71,6 @@ module Opal
       nil
     end
 
-    # running on all OS
     register_runner :bun,         :Bun,         'opal/cli_runners/bun'
     register_runner :chrome,      :Chrome,      'opal/cli_runners/chrome'
     register_runner :compiler,    :Compiler,    'opal/cli_runners/compiler'
@@ -79,6 +78,7 @@ module Opal
     register_runner :edge,        :Edge,        'opal/cli_runners/edge'
     register_runner :firefox,     :Firefox,     'opal/cli_runners/firefox'
     register_runner :nodejs,      :Nodejs,      'opal/cli_runners/nodejs'
+    register_runner :quickjs,     :Quickjs,     'opal/cli_runners/quickjs'
     register_runner :safari,      :Safari,      'opal/cli_runners/safari' if OS.macos?
     register_runner :server,      :Server,      'opal/cli_runners/server'
 

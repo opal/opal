@@ -80,7 +80,4 @@ opal_filter "Exception" do
   fails "SystemCallError.new raises TypeError if errno is not an Integer" # Expected TypeError (/no implicit conversion of String into Integer/) but no exception was raised (#<SystemCallError: foo> was returned)
   fails "SystemCallError.new raises TypeError if message is not a String" # Expected TypeError (/no implicit conversion of Symbol into String/) but no exception was raised (#<SystemCallError: foo> was returned)
   fails "SystemCallError.new requires at least one argument" # Expected ArgumentError but no exception was raised (#<SystemCallError: SystemCallError> was returned)
-  fails_badly "SystemExit#status returns the exit status"
-  fails_badly "SystemExit#success? returns false if the process exited unsuccessfully"
-  fails_badly "SystemExit#success? returns true if the process exited successfully"
 end

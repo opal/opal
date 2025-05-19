@@ -14,7 +14,6 @@ opal_filter "Time" do
   fails "Time#utc_offset returns the correct offset for Hawaii around daylight savings time change" # Expected 3600 == -36000 to be truthy but was false
   fails "Time#utc_offset returns the correct offset for New Zealand around daylight savings time change" # Expected 7200 == 46800 to be truthy but was false
   fails "Time#utc_offset returns the correct offset for US Eastern time zone around daylight savings time change" # Expected 3600 == -18000 to be truthy but was false
-  fails "Time#wday returns an integer representing the day of the week, 0..6, with Sunday being 0" # Expected 3 == 4 to be truthy but was false
   fails "Time#zone defaults to UTC when bad zones given" # Expected 7200 == 0 to be truthy but was false
   fails "Time.local creates the correct time just before dst change" # Expected 7200 == -14400 to be truthy but was false
   fails "Time.mktime creates the correct time just before dst change" # Expected 7200 == -14400 to be truthy but was false

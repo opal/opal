@@ -142,7 +142,7 @@ class ::Exception < `Error`
       return "#{@message}\n#{`self.stack`}"
     end
 
-    kwargs = { highlight: ($stderr && `typeof(#{$stderr}["$tty?"]) == "function"`) ? $stderr.tty? : false, order: :top }.merge(kwargs || {})
+    kwargs = { highlight: $stderr && `typeof(#{$stderr}["$tty?"]) == "function"` ? $stderr.tty? : false, order: :top }.merge(kwargs || {})
     highlight, order = kwargs[:highlight], kwargs[:order]
     highlight = false if highlight.nil?
 
