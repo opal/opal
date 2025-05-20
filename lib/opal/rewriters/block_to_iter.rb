@@ -10,7 +10,7 @@ module Opal
         iter_node = s(:iter, args, body)
         process recvr.updated(
           nil,
-          (recvr.children + [iter_node]),
+          recvr.children + [iter_node],
         )
       end
     end

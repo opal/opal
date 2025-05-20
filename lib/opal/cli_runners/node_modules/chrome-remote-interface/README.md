@@ -7,10 +7,6 @@ other suitable [implementation](#implementations)) by providing a simple
 abstraction of commands and notifications using a straightforward JavaScript
 API.
 
-This module is one of the many [third-party protocol clients][3rd-party].
-
-[3rd-party]: https://developer.chrome.com/devtools/docs/debugging-clients#chrome-remote-interface
-
 ## Sample API usage
 
 The following snippet loads `https://github.com` and dumps every request made:

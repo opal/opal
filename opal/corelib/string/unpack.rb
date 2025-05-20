@@ -686,7 +686,7 @@ class ::String
 
       // A very optimized handler for U*.
       if (format == "U*" &&
-          self.internal_encoding.name === "UTF-8" &&
+          self.binary_encoding.name === "UTF-8" &&
           typeof self.codePointAt === "function") {
 
         var cp, j = 0;

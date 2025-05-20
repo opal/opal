@@ -27,19 +27,20 @@ module Opal
         end.map(&:first).join("|")
       end
 
-      add_type(:JS_FUNCTION,    1 <<  0) # everything that generates an IIFE
-      add_type(:JS_LOOP,        1 <<  1) # exerything that generates a JS loop
-      add_type(:JS_LOOP_INSIDE, 1 <<  2) # everything that generates an inside of a loop
+      add_type(:JS_FUNCTION,     1 <<  0) # everything that generates an IIFE
+      add_type(:JS_LOOP,         1 <<  1) # exerything that generates a JS loop
+      add_type(:JS_LOOP_INSIDE,  1 <<  2) # everything that generates an inside of a loop
 
-      add_type(:DEF,            1 <<  3) # def
-      add_type(:LAMBDA,         1 <<  4) # lambda
-      add_type(:ITER,           1 <<  5) # iter, lambda
-      add_type(:MODULE,         1 <<  6)
-      add_type(:LOOP,           1 <<  7) # for building a catcher outside a loop
-      add_type(:LOOP_INSIDE,    1 <<  8) # for building a catcher inside a loop
-      add_type(:SEND,           1 <<  9) # to generate a break catcher after send with a block
-      add_type(:TOP,            1 << 10)
-      add_type(:RESCUE_RETRIER, 1 << 11) # a virtual loop to catch a retrier
+      add_type(:DEF,             1 <<  3) # def
+      add_type(:LAMBDA,          1 <<  4) # lambda
+      add_type(:ITER,            1 <<  5) # iter, lambda
+      add_type(:MODULE,          1 <<  6)
+      add_type(:LOOP,            1 <<  7) # for building a catcher outside a loop
+      add_type(:LOOP_INSIDE,     1 <<  8) # for building a catcher inside a loop
+      add_type(:SEND,            1 <<  9) # to generate a break catcher after send with a block
+      add_type(:TOP,             1 << 10)
+      add_type(:RESCUE_RETRIER,  1 << 11) # a virtual loop to catch a retrier
+      add_type(:RETRY_CONTAINER, 1 << 12) # a loop or inside loop that contains a retry
 
       ANY = 0xffffffff
 
@@ -157,7 +158,9 @@ module Opal
             if !thrower_closure
               error 'Invalid next'
             elsif thrower_closure == last_closure
-              if thrower_closure.is? LOOP_INSIDE
+              if thrower_closure.is? RETRY_CONTAINER
+                generate_thrower(:next, thrower_closure, value)
+              elsif thrower_closure.is? LOOP_INSIDE
                 push 'continue'
               elsif thrower_closure.is? ITER | LAMBDA
                 push 'return ', expr_or_nil(value)
@@ -177,7 +180,9 @@ module Opal
                 error 'Invalid break'
               end
             elsif thrower_closure == last_closure
-              if thrower_closure.is? JS_FUNCTION | LAMBDA
+              if thrower_closure.is? RETRY_CONTAINER
+                generate_thrower(:break, thrower_closure, value)
+              elsif thrower_closure.is? JS_FUNCTION | LAMBDA
                 push 'return ', expr_or_nil(value)
               elsif thrower_closure.is? LOOP
                 push 'break'
