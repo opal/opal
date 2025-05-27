@@ -15,7 +15,7 @@ jobs:
   rake:
     name: ${{ matrix.combo.name || matrix.combo.ruby }}
     env:
-      DEFAULT_RUBY: '3.3'
+      DEFAULT_RUBY: '3.4'
     strategy:
       max-parallel: 8
       fail-fast: false
@@ -23,78 +23,66 @@ jobs:
         combo:
           - name: lint
             command: bin/rake lint
-          - name: smoke-test-nodejs-22
+          - name: smoke-test-linux-nodejs-22
             node: lts/jod
             command: bin/rake smoke_test
-          - name: smoke-test-nodejs-latest
+          - name: smoke-test-linux-nodejs-latest
             node: latest
             command: bin/rake smoke_test
-          - name: mspec-nodejs-22
+          - name: mspec-linux-nodejs-22
             node: lts/jod
             command: bin/rake mspec_nodejs
-          - name: mspec-nodejs-latest
+          - name: mspec-linux-nodejs-latest
             node: latest
             command: bin/rake mspec_nodejs
-          - name: mspec-nodejs-latest-windows
+          - name: mspec-macos-nodejs-latest
+            node: latest
+            command: bundle exec rake mspec_nodejs
+            os: macos-latest
+          - name: mspec-windows-nodejs-latest
             node: latest
             command: bundle exec rake mspec_nodejs
             os: windows-latest
+          - name: minitest-linux-nodejs-22
+            node: lts/jod
+            command: bin/rake minitest_nodejs
+          - name: minitest-linux-nodejs-latest
+            node: latest
+            command: bin/rake minitest_nodejs
           - name: mspec-chrome-130
             chrome: '130'
             command: bin/rake mspec_chrome
           - name: mspec-chrome-latest
             chrome: stable
             command: bin/rake mspec_chrome
-          - name: mspec-edge-latest-windows
-            edge: stable
+          - name: mspec-edge-latest
             command: bundle exec rake mspec_edge
             os: windows-latest
           - name: mspec-firefox-128-esr
-            firefox: '128.5.2esr'
+            firefox: '128.9.0esr'
             command: xvfb-run bin/rake mspec_firefox
           - name: mspec-firefox-latest
             firefox: 'latest-esr'
             command: xvfb-run bin/rake mspec_firefox
-          - name: mspec-safari-latest-macos
+          - name: mspec-safari-latest
             command: bundle exec rake mspec_safari
             os: macos-latest
-          - name: mspec-bun-1.1.30
-            bun: '1.1.30'
-            command: bin/rake mspec_bun
-          - name: mspec-deno-latest
-            deno: vx.x.x
-            command: bin/rake mspec_deno
-          - name: minitest-chrome-130
-            chrome: '130'
-            node: lts/hydrogen
-            command: bin/rake minitest
-          - name: minitest-strict-mode-chrome-latest
-            chrome: stable
-            node: latest
-            command: bin/rake minitest
-            strict: 'true'
-          - name: minitest-windows-chrome-latest
-            chrome: stable
-            node: lts/hydrogen
-            command: bundle exec rake minitest
-            os: windows-latest
           # - name: head-ruby
           #   ruby: head
           #   permissive: true
           - name: rspec-current-ruby
-            ruby: '3.3'
+            ruby: '3.4'
           - name: rspec-previous-ruby
-            ruby: '3.2'
+            ruby: '3.3'
           - name: rspec-older-ruby
-            ruby: '3.1'
+            ruby: '3.2'
           - name: rspec-near-eol-ruby
-            ruby: '3.0'
-          - name: rspec-jruby-latest
-            ruby: jruby
-          # truffleruby: disabled, does not finish on github actions
-          # probably not enough memory
-          # - name: truffleruby
-          #   ruby: 'truffleruby'
+            ruby: '3.1'
+          # JRuby 10.0 does not work at all, JRuby 9.4 exhibits a SystemExit error
+          # - name: rspec-jruby
+          #   ruby: 'jruby'
+          - name: truffleruby
+            ruby: 'truffleruby'
           - name: rspec-windows
             command: bundle exec rake rspec
             os: windows-latest
@@ -102,9 +90,9 @@ jobs:
             command: bundle exec rake rspec
             os: macos-latest
           - name: timezone
+            node: latest
             command: bin/rake mspec_nodejs TZ="Pacific/Fiji"
           - name: performance
-            bun: '1.1.30'
             node: latest
             permissive: true
             fetchdepth: '0'
@@ -114,24 +102,11 @@ jobs:
     runs-on: ${{ matrix.combo.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.combo.permissive || false }}
     steps:
-      - if: ${{ matrix.combo.bun }}
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ matrix.combo.bun }}
-      - if: ${{ matrix.combo.deno }}
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: ${{ matrix.combo.deno }}
       - if: ${{ matrix.combo.chrome }}
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: ${{ matrix.combo.chrome }}
-      - if: ${{ matrix.combo.edge }}
-        id: setup-edge
-        uses: browser-actions/setup-edge@v1
-        with:
-          edge-version: ${{ matrix.combo.edge }}
       - if: ${{ matrix.combo.firefox }}
         id: setup-firefox
         uses: browser-actions/setup-firefox@v1
@@ -180,16 +155,11 @@ jobs:
         if: ${{ matrix.combo.strict == 'true' }}
         run: |
           echo "USE_STRICT=true" >> $GITHUB_ENV
-      - name: set environment variables GOOGLE_CHROME_BINARY
+      - name: set environment variables CHROME_BINARY
         if: ${{ matrix.combo.chrome }}
         run: |
-          echo "GOOGLE_CHROME_BINARY=${{ steps.setup-chrome.outputs.chrome-path }}" >> $GITHUB_ENV
-      # steps.setup-edge.outputs.edge-path is not set when the specified version of Edge is already installed
-      # thats why the msedge.exe path is hardcoded below
-      - name: set environment variables GOOGLE_CHROME_BINARY
-        if: ${{ matrix.combo.edge }}
-        run: |
-          echo "GOOGLE_CHROME_BINARY='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'" >> $GITHUB_ENV
+          echo "CHROME_BINARY=${{ steps.setup-chrome.outputs.chrome-path }}" >> $GITHUB_ENV
+          echo "CHROME_OPTS=--no-sandbox" >> $GITHUB_ENV
       - name: set environment variables MOZILLA_FIREFOX_BINARY
         if: ${{ matrix.combo.firefox }}
         run: |

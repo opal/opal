@@ -335,12 +335,16 @@ mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
 
 require 'opal/paths'
-opalopal_cmdline = "-sreadline -rnodejs -rcorelib/string/unpack -popal/cli_runners/nodejs exe/opal -- #{Opal.paths.map{|i| "-I#{i}"}.join(" ")} --no-source-map "
+opalopal_cmdline = "-sreadline -rnodejs -rcorelib/string/unpack -popal/cli_runners/nodejs ../exe/opal -- #{Opal.paths.map{|i| "-I#{i}"}.join(" ")} --no-source-map "
 
 platforms.each do |platform|
+  test_platform = platform
+  # ensure the nodejs - node alias does not influence spec selection:
+  platform = 'node' if platform == 'nodejs'
+
   mspec_suites.each do |suite|
     desc "Run the MSpec test suite on Opal::Builder/#{platform}" + pattern_usage
-    task :"mspec_#{suite}_#{platform}" do
+    task :"mspec_#{suite}_#{test_platform}" do
       filename = "tmp/mspec_#{platform}.rb"
       if platform.start_with? "opalopal_"
         platform = platform.split('_').last
@@ -372,7 +376,7 @@ platforms.each do |platform|
 
   minitest_suites.each do |suite|
     desc "Run the Minitest suite on Opal::Builder/#{platform}" + pattern_usage
-    task :"minitest_#{suite}_#{platform}" do
+    task :"minitest_#{suite}_#{test_platform}" do
       if ENV.key? 'FILES'
         files = Dir[ENV['FILES']]
         includes = "-Itmp"
@@ -456,7 +460,7 @@ task :smoke_test do
   cd opal_rspec_dir do
     Bundler.with_unbundled_env do
       sh 'bundle check && bundle update opal-rspec || bundle install'
-      sh %{bundle exec opal-rspec --color --default-path=../../spec ../../spec/lib/deprecations_spec.rb > #{actual_output_path}}
+      sh %{bundle exec opal-rspec --default-path=../../spec ../../spec/lib/deprecations_spec.rb > #{actual_output_path}}
 
       actual_output = File.read(actual_output_path)
       begin
@@ -464,16 +468,16 @@ task :smoke_test do
         extend RSpec::Matchers
         expect(actual_output.lines[0]).to    eq("\n")
         expect(actual_output.lines[1]).to    eq("Opal::Deprecations\n")
-        expect(actual_output.lines[2]).to    eq("\e[32m  defaults to warn\e[0m\n")
-        expect(actual_output.lines[3]).to    eq("\e[32m  can be set to raise\e[0m\n")
+        expect(actual_output.lines[2]).to    eq("  defaults to warn\n")
+        expect(actual_output.lines[3]).to    eq("  can be set to raise\n")
         expect(actual_output.lines[4]).to    eq("\n")
 
         expect(actual_output.lines[5]).to match(%r{Top 2 slowest examples \(\d+\.\d+ seconds, \d+\.\d+% of total time\):\n})
-        expect(actual_output.lines[7]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m .*deprecations_spec\.rb:7\n})
-        expect(actual_output.lines[9]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m .*deprecations_spec\.rb:12\n})
+        expect(actual_output.lines[7]).to match(%r{    \d+\.\d+ seconds .*deprecations_spec\.rb:7\n})
+        expect(actual_output.lines[9]).to match(%r{    \d+\.\d+ seconds .*deprecations_spec\.rb:12\n})
         expect(actual_output.lines[10]).to    eq("\n")
         expect(actual_output.lines[11]).to match(%r{^Finished in \d+\.\d+ seconds \(files took \d+\.\d+ seconds to load\)\n$})
-        expect(actual_output.lines[12]).to    eq("[32m2 examples, 0 failures[0m\n")
+        expect(actual_output.lines[12]).to    eq("2 examples, 0 failures\n")
         expect([
           actual_output.lines[6],
           actual_output.lines[8],
@@ -532,7 +536,7 @@ desc "Run the whole MSpec suite on all platforms"
 task :mspec    => [:mspec_chrome, :mspec_nodejs]
 
 desc "Run the whole Minitest suite on all platforms"
-task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs]
+task :minitest => [:minitest_chrome, :minitest_nodejs]
 
 desc "Run all tests"
 task :test_all => [:rspec, :mspec, :minitest]
@@ -540,4 +544,4 @@ task :test_all => [:rspec, :mspec, :minitest]
 # deprecated, can be removed after 0.11
 task(:cruby_tests) { warn "The task 'cruby_tests' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_cruby)  { warn "The task 'test_cruby' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
-task(:test_nodejs) { warn "The task 'test_nodejs' has been renamed to 'minitest_node_nodejs'."; exit 1 }
+task(:test_nodejs) { warn "The task 'test_nodejs' has been renamed to 'minitest_nodejs'."; exit 1 }

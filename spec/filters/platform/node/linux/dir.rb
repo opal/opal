@@ -4,4 +4,5 @@ opal_filter "Dir" do
   fails "Dir.chroot as regular user calls #to_path on non-String argument" # Expected Errno::EPERM but no exception was raised (0 was returned)
   fails "Dir.chroot as regular user raises a SystemCallError if the directory doesn't exist" # Expected SystemCallError but no exception was raised (0 was returned)
   fails "Dir.chroot as regular user raises an Errno::EPERM exception if the directory exists" # Expected Errno::EPERM but no exception was raised (0 was returned)
+  fails "Dir.open sets the close-on-exec flag for the directory file descriptor" # Exception: EBADF: bad file descriptor, fstat
 end

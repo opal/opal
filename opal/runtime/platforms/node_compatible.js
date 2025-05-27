@@ -1,5 +1,5 @@
 //
-// Node and compatible engines, Bun, Deno, GraalNodeJs
+// Node 22 or greater and compatible engines, Bun, Deno, GraalNodeJs
 //
 
 // Note to self: https://nodejs.org/api/tty.html
@@ -422,13 +422,17 @@ platform.io_fdatasync = (fd)=>{ if (fd > 2) action(fs.fdatasyncSync, fd); }
 platform.io_fstat = (fd)=>action(fs.fstatSync, fd);
 platform.io_fsync = (fd)=>{ if (fd > 2) action(fs.fsyncSync, fd); }
 platform.io_open = (fd)=>{
-  let tty = false, pipe = false, channel;
+  let tty = false, pipe = false, file = false, channel;
   if (fd == 0) channel = process.stdin;
   else if (fd == 1) channel = process.stdout;
   else if (fd == 2) channel = process.stderr;
   tty = channel ? channel.isTTY : false;
   if (fd < 3) pipe = !tty;
-  return [tty, pipe, platform.pipes[fd] ? false : fs.fstatSync(fd).isFile()];
+  if (platform.pipes[fd]) {
+    file = false;
+    pipe = true;
+  } else { try { file = fs.fstatSync(fd).isFile(); } catch {} }
+  return [tty, pipe, file];
 };
 platform.io_open_path = (path_name, flags, perm)=>{
   path_name = path_name.toString();
@@ -442,7 +446,14 @@ platform.io_read = (fd, io_buffer, buffer_offset, pos, count, is_file)=>{
   if (is_file) return action(fs.readSync, fd, io_buffer.data_view, buffer_offset, count, pos);
   while (true) {
     try { return action(fs.readSync, fd, io_buffer.data_view, buffer_offset, count); }
-    catch (e) { if (!(e instanceof Opal.Errno.EAGAIN)) throw(e); }
+    catch (e) {
+      if (e instanceof Opal.Errno.EAGAIN) {
+        let oe = Opal.exceptions;
+        if (oe[oe.length - 1] === e) Opal.exceptions.pop();
+        platform.sleep(0.010); // 10ms
+      }
+      else throw(e);
+    }
   }
 };
 platform.io_write = (fd, io_buffer, buffer_offset, pos, count)=>{

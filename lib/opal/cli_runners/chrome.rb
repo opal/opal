@@ -195,7 +195,7 @@ module Opal
       end
 
       def chrome_executable
-        ENV['GOOGLE_CHROME_BINARY'] ||
+        ENV['GOOGLE_CHROME_BINARY'] || ENV['CHROME_BINARY'] ||
           if OS.windows?
             [
               'C:/Program Files/Google/Chrome Dev/Application/chrome.exe',

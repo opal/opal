@@ -12,6 +12,7 @@ opal_filter "File" do
   fails "File.umask returns the current umask value for this process (basic)" # Expected 18 == 0 to be truthy but was false
   fails "File.umask returns the current umask value for this process" # Expected 6 == 0 to be truthy but was false
   fails "File::Stat#atime returns the atime of a File::Stat object" # Expected 2025-04-22 19:44:50 -0000 <= 2025-04-22 19:44:50 -0000 to be truthy but was false
+  fails "File::Stat#birthtime returns the birthtime of a File::Stat object" # Expected 2025-05-26 18:38:53 -0600 <= 2025-05-26 18:38:53 -0600 to be truthy but was false
   fails "File::Stat#ctime returns the ctime of a File::Stat object" # Expected 2025-04-15 20:15:43 -0000 <= 2025-04-15 20:15:43 -0000 to be truthy but was false
   fails "File::Stat#dev_major returns nil" # Expected 0 to be nil
   fails "File::Stat#dev_minor returns nil" # Expected 0 to be nil
