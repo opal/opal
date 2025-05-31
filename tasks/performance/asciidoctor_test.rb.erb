@@ -1,4 +1,4 @@
-JAVASCRIPT_IO_MODULE="nodejs" if RUBY_ENGINE == 'opal'
+JAVASCRIPT_IO_MODULE="nodejs" if RUBY_ENGINE.include? 'opal'
 require "asciidoctor"
 data = DATA.read
 100.times { Asciidoctor.convert(data) }

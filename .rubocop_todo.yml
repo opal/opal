@@ -141,7 +141,6 @@ Lint/RedundantStringCoercion:
     - 'opal/corelib/marshal/read_buffer.rb'
     - 'opal/corelib/string.rb'
     - 'stdlib/date.rb'
-    - 'stdlib/nodejs/env.rb'
 
 # Offense count: 1
 # Configuration parameters: AllowedPatterns.
