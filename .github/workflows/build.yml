@@ -41,14 +41,16 @@ jobs:
           # - name: head-ruby
           #   ruby: head
           #   permissive: true
-          - name: current-ruby
-            ruby: '3.3'
-          - name: previous-ruby
-            ruby: '3.2'
-          - name: older-ruby
-            ruby: '3.1'
-          - name: near-eol-ruby
+          - name: ruby-3.0
             ruby: '3.0'
+          - name: ruby-3.1
+            ruby: '3.1'
+          - name: ruby-3.2
+            ruby: '3.2'
+          - name: ruby-3.3
+            ruby: '3.3'
+          - name: ruby-3.4
+            ruby: '3.4'
           - name: jruby
             ruby: 'jruby'
           # truffleruby: disabled, does not finish on github actions
