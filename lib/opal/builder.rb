@@ -140,9 +140,10 @@ module Opal
     end
 
     def process_require_threadsafely(rel_path, autoloads, options)
+      abs_canonical = expand_path(rel_path)
       rel_path = expand_ext(rel_path)
-      return if already_processed.include?(rel_path)
-      already_processed << rel_path
+      return if abs_canonical && already_processed.include?(abs_canonical)
+      already_processed << abs_canonical if abs_canonical
 
       autoload = autoloads.include?(rel_path)
 

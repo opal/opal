@@ -103,6 +103,13 @@ RSpec.describe Opal::Builder do
     end
   end
 
+  describe 'load without prior require' do
+    it 'bundles files referenced via load' do
+      output = builder_with_paths.build('fixtures/load_without_require/main').to_s
+      expect(output).to include('Opal.modules["fixtures/load_without_require/target"]')
+    end
+  end
+
   it 'defaults config from Opal::Config' do
     Opal::Config.arity_check_enabled = false
     expect(Opal::Config.arity_check_enabled).to eq(false)
