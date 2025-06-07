@@ -344,7 +344,7 @@ module ::Opal
     }
   end
 
-  # rubocop:disable Naming/PredicateName
+  # rubocop:disable Naming/PredicatePrefix
   def self.is_a(object, klass)
     %x{
       if (klass != null && object.$$meta === klass || object.$$class === klass) {
@@ -360,7 +360,7 @@ module ::Opal
       return ancestors.indexOf(klass) !== -1;
     }
   end
-  # rubocop:enable Naming/PredicateName
+  # rubocop:enable Naming/PredicatePrefix
 end
 
 ::Opal

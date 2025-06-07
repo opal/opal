@@ -101,9 +101,11 @@ module Opal
         iter? && @is_lambda
       end
 
-      def is_lambda! # rubocop:disable Naming/PredicateName
+      # rubocop:disable Naming/PredicatePrefix
+      def is_lambda!
         @is_lambda = true
       end
+      # rubocop:enable Naming/PredicatePrefix
 
       def defines_lambda
         @lambda_definition = true
