@@ -650,9 +650,9 @@ RSpec.describe Opal::Compiler do
         end
 
         expect(error.backtrace[0]).to eq("#{File.basename(__FILE__)}/foobar.js.rb:in `BEGIN {}'")
-        expect(compiler_backtrace(error)[0]).to end_with(":in `error'")
-        expect(compiler_backtrace(error)[-3]).to end_with(":in `block in compile'")
-        expect(compiler_backtrace(error)[-1]).to end_with(":in `compile'")
+        expect(compiler_backtrace(error)[0]).to match(/:in [`'](?:Opal::Compiler#)?error[`']$/)
+        expect(compiler_backtrace(error)[-3]).to match(/:in [`']block in (?:Opal::Compiler#)?compile[`']$/)
+        expect(compiler_backtrace(error)[-1]).to match(/:in [`'](?:Opal::Compiler#)?compile[`']$/)
         expect(error.backtrace.size).to be > 1
       end
     end
@@ -667,7 +667,7 @@ RSpec.describe Opal::Compiler do
           error = syntax_error
         end
         expect(error.backtrace[0]).to eq("#{File.basename(__FILE__)}/foobar.js.rb:1:in `def foo'")
-        expect(compiler_backtrace(error)[0]).to end_with(":in `block in parse'")
+        expect(compiler_backtrace(error)[0]).to match(/:in [`']block in (?:Opal::Compiler#)?parse[`']$/)
         expect(error.backtrace.size).to be > 1
 
         expect($diagnostic_messages.flatten).to eq([
