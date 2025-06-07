@@ -15,7 +15,7 @@ module Opal
     # @param str [String] string to minify
     # @return [String]
     def uglify(source, mangle: false)
-      sh "#{'ruby ' if Gem.win_platform?}bin/yarn -s run terser -c #{'-m' if mangle}", data: source
+      sh "#{'ruby ' if Gem.win_platform?}bin/yarn --silent run terser -c #{'-m' if mangle}", data: source
     end
 
     # Gzip code to check file size.
