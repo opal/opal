@@ -2,6 +2,7 @@
 
 require 'opal/regexp_anchors'
 require 'opal/hike'
+require 'pathname'
 
 module Opal
   class PathReader
@@ -21,7 +22,16 @@ module Opal
     end
 
     def expand(path)
-      if Pathname.new(path).absolute? || path =~ RELATIVE_PATH_REGEXP
+      if Pathname.new(path).absolute?
+        path
+      elsif path =~ RELATIVE_PATH_REGEXP
+        search = path.sub(/#{Regexp.escape(File.extname(path))}\z/, '')
+        paths.each do |base|
+          [search, *extensions.map { |ext| "#{search}#{ext}" }].each do |candidate|
+            expanded = File.expand_path(candidate, base)
+            return expanded if File.file?(expanded)
+          end
+        end
         path
       else
         find_path(path)

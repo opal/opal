@@ -140,7 +140,11 @@ module Opal
     end
 
     def process_require_threadsafely(rel_path, autoloads, options)
-      autoload = autoloads.include? rel_path
+      rel_path = expand_ext(rel_path)
+      return if already_processed.include?(rel_path)
+      already_processed << rel_path
+
+      autoload = autoloads.include?(rel_path)
 
       source = stub?(rel_path) ? '' : read(rel_path, autoload)
 
@@ -148,7 +152,6 @@ module Opal
       return if source.nil?
 
       abs_path = expand_path(rel_path)
-      rel_path = expand_ext(rel_path)
       asset = processor_for(source, rel_path, abs_path, autoload, options.merge(requirable: true))
       process_requires(
         rel_path,
@@ -160,8 +163,6 @@ module Opal
     end
 
     def process_require(rel_path, autoloads, options)
-      return if already_processed.include?(rel_path)
-      already_processed << rel_path
       asset = process_require_threadsafely(rel_path, autoloads, options)
       processed << asset if asset
     end
