@@ -501,6 +501,7 @@ module ::Enumerable
       each do |value|
         return value
       end
+      nil
     else
       result = []
       number = `$coerce_to(number, #{::Integer}, 'to_int')`
