@@ -40,6 +40,12 @@ RSpec.describe Opal::Builder do
     expect(builder_with_paths.build('fixtures/require_tree_test').to_s).to include('Opal.modules["fixtures/required_tree_test/required_file1"]')
   end
 
+  it 'avoids duplicates when files within require_tree use require_relative' do
+    output = builder_with_paths.build('fixtures/require_tree_with_relative/main').to_s
+    count = output.scan(/Opal\.modules\["fixtures\/require_tree_with_relative\/oak\/leaf"\]/).length
+    expect(count).to eq(1)
+  end
+
   describe ':stubs' do
     let(:options) { {stubs: ['foo']} }
 
@@ -83,6 +89,24 @@ RSpec.describe Opal::Builder do
     it 'can be required specifying extension' do
       builder_with_paths.build_str('require "fixtures/required_file.js"', 'foo')
       expect(builder_with_paths.to_s).to include("console.log('required file');")
+    end
+  end
+
+  describe 'relative path requires' do
+    it 'finds files when using ./ prefix without extension' do
+      Dir.mktmpdir('opal-relative-') do |dir|
+        File.write(File.join(dir, 'foo.rb'), "FOO_CONST = 42\n")
+        File.write(File.join(dir, 'main.rb'), "require './foo'\n")
+        builder.append_paths(dir)
+        expect { builder.build(File.join(dir, 'main.rb')) }.not_to raise_error
+      end
+    end
+  end
+
+  describe 'load without prior require' do
+    it 'bundles files referenced via load' do
+      output = builder_with_paths.build('fixtures/load_without_require/main').to_s
+      expect(output).to include('Opal.modules["fixtures/load_without_require/target"]')
     end
   end
 

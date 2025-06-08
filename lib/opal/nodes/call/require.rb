@@ -12,6 +12,12 @@ module Opal
         compile_default.call
       end
 
+      add_special :load do |compile_default|
+        str = DependencyResolver.new(compiler, arglist.children[0]).resolve
+        compiler.track_require str unless str.nil?
+        compile_default.call
+      end
+
       add_special :require_relative do
         arg = arglist.children[0]
         file = compiler.file
