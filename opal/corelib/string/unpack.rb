@@ -77,6 +77,28 @@ class ::String
       }
     }
 
+    var hostLittleEndian = (function() {
+      var uint32 = new Uint32Array([0x11223344]);
+      return new Uint8Array(uint32.buffer)[0] === 0x44;
+    })();
+
+    function bytesToFloat(bytes, little, size) {
+      var view = new DataView(new ArrayBuffer(size));
+      for (var i = 0; i < size; i++) {
+        view.setUint8(i, bytes[i]);
+      }
+      return size === 4 ? view.getFloat32(0, little) : view.getFloat64(0, little);
+    }
+
+    function mapChunksToFloat(size, little, callback) {
+      return function(data) {
+        var chunks = chunkBy(size, callback)(data);
+        return chunks.map(function(chunk) {
+          return bytesToFloat(chunk, little, size);
+        });
+      }
+    }
+
     function wrapIntoArray(callback) {
       return function(data) {
         var object = callback(data);
@@ -255,16 +277,17 @@ class ::String
 
       'U': identityFunction,
       'w': decodeBERCompressedIntegers(identityFunction),
+      'x': function(data) { return []; },
 
       // Float
-      'D': null,
-      'd': null,
-      'F': null,
-      'f': null,
-      'E': null,
-      'e': null,
-      'G': null,
-      'g': null,
+      'D': mapChunksToFloat(8, hostLittleEndian, identityFunction),
+      'd': mapChunksToFloat(8, hostLittleEndian, identityFunction),
+      'F': mapChunksToFloat(4, hostLittleEndian, identityFunction),
+      'f': mapChunksToFloat(4, hostLittleEndian, identityFunction),
+      'E': mapChunksToFloat(8, true, identityFunction),
+      'e': mapChunksToFloat(4, true, identityFunction),
+      'G': mapChunksToFloat(8, false, identityFunction),
+      'g': mapChunksToFloat(4, false, identityFunction),
 
       // String
       'A': wrapIntoArray(joinChars(bytesToAsciiChars(filterTrailingZerosAndSpaces(identityFunction)))),
@@ -560,16 +583,20 @@ class ::String
 
       'U': readNTimesAndMerge(readUnicodeCharChunk),
       'w': readNTimesAndMerge(readWhileFirstBitIsOne),
+      'x': function(buffer, count) {
+        if (count === Infinity) count = 1;
+        return { chunk: [], rest: buffer.slice(count) };
+      },
 
       // Float
-      'D': null,
-      'd': null,
-      'F': null,
-      'f': null,
-      'E': null,
-      'e': null,
-      'G': null,
-      'g': null,
+      'D': readNTimesAndMerge(readBytes(8)),
+      'd': readNTimesAndMerge(readBytes(8)),
+      'F': readNTimesAndMerge(readBytes(4)),
+      'f': readNTimesAndMerge(readBytes(4)),
+      'E': readNTimesAndMerge(readBytes(8)),
+      'e': readNTimesAndMerge(readBytes(4)),
+      'G': readNTimesAndMerge(readBytes(8)),
+      'g': readNTimesAndMerge(readBytes(4)),
 
       // String
       'A': readNTimesAndMerge(readBytes(1)),
@@ -616,16 +643,17 @@ class ::String
 
       'U': false,
       'w': false,
+      'x': false,
 
       // Float
-      'D': null,
-      'd': null,
-      'F': null,
-      'f': null,
-      'E': null,
-      'e': null,
-      'G': null,
-      'g': null,
+      'D': true,
+      'd': true,
+      'F': true,
+      'f': true,
+      'E': true,
+      'e': true,
+      'G': true,
+      'g': true,
 
       // String
       'A': false,
@@ -661,7 +689,15 @@ class ::String
       'L>*': handlers['L>'],
       'l>*': handlers['l>'],
       'Q>*': handlers['Q>'],
-      'q>*': handlers['q>']
+      'q>*': handlers['q>'],
+      'F*': handlers['F'],
+      'f*': handlers['f'],
+      'D*': handlers['D'],
+      'd*': handlers['d'],
+      'E*': handlers['E'],
+      'e*': handlers['e'],
+      'G*': handlers['G'],
+      'g*': handlers['g']
     }
 
     function alias(existingDirective, newDirective) {
@@ -675,11 +711,16 @@ class ::String
 
     alias('S', 'v');
     alias('L', 'V');
+    alias('D', 'd');
+    alias('F', 'f');
   }
 
   def unpack(format, offset: 0)
     ::Kernel.raise ::ArgumentError, "offset can't be negative" if offset < 0
-    format = ::Opal.coerce_to!(format, ::String, :to_str).gsub(/\s/, '').delete("\000")
+    format = ::Opal.coerce_to!(format, ::String, :to_str)
+                   .gsub(/#.*/, '')
+                   .gsub(/\s/, '')
+                   .delete("\000")
 
     %x{
       var output = [];
