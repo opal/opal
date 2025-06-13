@@ -435,9 +435,9 @@ class ::Array
 
   def pack(format)
     format = ::Opal.coerce_to!(format, ::String, :to_str)
-             .gsub(/#.*/, '')
-             .gsub(/\s/, '')
-             .delete("\000")
+                   .gsub(/#.*/, '')
+                   .gsub(/\s/, '')
+                   .delete("\000")
 
     %x{
       var output = '';

@@ -718,9 +718,9 @@ class ::String
   def unpack(format, offset: 0)
     ::Kernel.raise ::ArgumentError, "offset can't be negative" if offset < 0
     format = ::Opal.coerce_to!(format, ::String, :to_str)
-             .gsub(/#.*/, '')
-             .gsub(/\s/, '')
-             .delete("\000")
+                   .gsub(/#.*/, '')
+                   .gsub(/\s/, '')
+                   .delete("\000")
 
     %x{
       var output = [];
