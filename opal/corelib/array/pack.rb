@@ -109,6 +109,42 @@ class ::Array
       }
     }
 
+    function toFloat(callback) {
+      return function(data) {
+        var buffer = callback(data);
+
+        return buffer.map(function(item) {
+          if (!Opal.is_a(item, Opal.Numeric)) {
+            #{::Kernel.raise ::TypeError, "can't convert Object into Float"};
+          }
+          return $coerce_to(item, #{::Float}, 'to_f');
+        });
+      }
+    }
+
+    var hostLittleEndian = (function() {
+      var uint32 = new Uint32Array([0x11223344]);
+      return new Uint8Array(uint32.buffer)[0] === 0x44;
+    })();
+
+    function asciiStringFromFloat(bytes, little, callback) {
+      return function(data) {
+        var buffer = callback(data);
+
+        return buffer.map(function(item) {
+          var arr = new ArrayBuffer(bytes);
+          var view = new DataView(arr);
+          if (bytes === 4) {
+            view.setFloat32(0, item, little);
+          } else {
+            view.setFloat64(0, item, little);
+          }
+          var uint8 = new Uint8Array(arr);
+          return asciiBytesToUtf16LEString(Array.from(uint8));
+        });
+      }
+    }
+
     function fromCodePoint(callback) {
       return function(data) {
         var buffer = callback(data);
@@ -162,15 +198,19 @@ class ::Array
       'U': joinChars(fromCodePoint(toInt(identityFunction))),
       'w': null,
 
+      'x': function(chunk) {
+        return asciiBytesToUtf16LEString(chunk);
+      },
+
       // Float
-      'D': null,
-      'd': null,
-      'F': null,
-      'f': null,
-      'E': null,
-      'e': null,
-      'G': null,
-      'g': null,
+      'D': joinChars(asciiStringFromFloat(8, hostLittleEndian, toFloat(identityFunction))),
+      'd': joinChars(asciiStringFromFloat(8, hostLittleEndian, toFloat(identityFunction))),
+      'F': joinChars(asciiStringFromFloat(4, hostLittleEndian, toFloat(identityFunction))),
+      'f': joinChars(asciiStringFromFloat(4, hostLittleEndian, toFloat(identityFunction))),
+      'E': joinChars(asciiStringFromFloat(4, false, toFloat(identityFunction))),
+      'e': joinChars(asciiStringFromFloat(4, true, toFloat(identityFunction))),
+      'G': joinChars(asciiStringFromFloat(8, false, toFloat(identityFunction))),
+      'g': joinChars(asciiStringFromFloat(8, true, toFloat(identityFunction))),
 
       // String
       'A': joinChars(identityFunction),
@@ -304,16 +344,20 @@ class ::Array
 
       'U': readNTimesFromBufferAndMerge(readItem),
       'w': null,
+      'x': function(buffer, count) {
+        if (count === Infinity) count = 1;
+        return { chunk: new Array(count).fill(0), rest: buffer };
+      },
 
       // Float
-      'D': null,
-      'd': null,
-      'F': null,
-      'f': null,
-      'E': null,
-      'e': null,
-      'G': null,
-      'g': null,
+      'D': readNTimesFromBufferAndMerge(readItem),
+      'd': readNTimesFromBufferAndMerge(readItem),
+      'F': readNTimesFromBufferAndMerge(readItem),
+      'f': readNTimesFromBufferAndMerge(readItem),
+      'E': readNTimesFromBufferAndMerge(readItem),
+      'e': readNTimesFromBufferAndMerge(readItem),
+      'G': readNTimesFromBufferAndMerge(readItem),
+      'g': readNTimesFromBufferAndMerge(readItem),
 
       // String
       'A': readNCharsFromTheFirstItemAndMergeWithFallback(" ", readItem),
@@ -360,16 +404,17 @@ class ::Array
 
       'U': false,
       'w': null,
+      'x': false,
 
       // Float
-      'D': null,
-      'd': null,
-      'F': null,
-      'f': null,
-      'E': null,
-      'e': null,
-      'G': null,
-      'g': null,
+      'D': false,
+      'd': false,
+      'F': false,
+      'f': false,
+      'E': false,
+      'e': false,
+      'G': false,
+      'g': false,
 
       // String
       'A': false,
@@ -389,7 +434,10 @@ class ::Array
   }
 
   def pack(format)
-    format = ::Opal.coerce_to!(format, ::String, :to_str).gsub(/\s/, '').delete("\000")
+    format = ::Opal.coerce_to!(format, ::String, :to_str)
+             .gsub(/#.*/, '')
+             .gsub(/\s/, '')
+             .delete("\000")
 
     %x{
       var output = '';
