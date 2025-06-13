@@ -284,10 +284,10 @@ class ::String
       'd': mapChunksToFloat(8, hostLittleEndian, identityFunction),
       'F': mapChunksToFloat(4, hostLittleEndian, identityFunction),
       'f': mapChunksToFloat(4, hostLittleEndian, identityFunction),
-      'E': mapChunksToFloat(4, false, identityFunction),
+      'E': mapChunksToFloat(8, true, identityFunction),
       'e': mapChunksToFloat(4, true, identityFunction),
       'G': mapChunksToFloat(8, false, identityFunction),
-      'g': mapChunksToFloat(8, true, identityFunction),
+      'g': mapChunksToFloat(4, false, identityFunction),
 
       // String
       'A': wrapIntoArray(joinChars(bytesToAsciiChars(filterTrailingZerosAndSpaces(identityFunction)))),
@@ -593,10 +593,10 @@ class ::String
       'd': readNTimesAndMerge(readBytes(8)),
       'F': readNTimesAndMerge(readBytes(4)),
       'f': readNTimesAndMerge(readBytes(4)),
-      'E': readNTimesAndMerge(readBytes(4)),
+      'E': readNTimesAndMerge(readBytes(8)),
       'e': readNTimesAndMerge(readBytes(4)),
       'G': readNTimesAndMerge(readBytes(8)),
-      'g': readNTimesAndMerge(readBytes(8)),
+      'g': readNTimesAndMerge(readBytes(4)),
 
       // String
       'A': readNTimesAndMerge(readBytes(1)),

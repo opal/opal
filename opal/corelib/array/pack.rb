@@ -207,10 +207,10 @@ class ::Array
       'd': joinChars(asciiStringFromFloat(8, hostLittleEndian, toFloat(identityFunction))),
       'F': joinChars(asciiStringFromFloat(4, hostLittleEndian, toFloat(identityFunction))),
       'f': joinChars(asciiStringFromFloat(4, hostLittleEndian, toFloat(identityFunction))),
-      'E': joinChars(asciiStringFromFloat(4, false, toFloat(identityFunction))),
+      'E': joinChars(asciiStringFromFloat(8, true, toFloat(identityFunction))),
       'e': joinChars(asciiStringFromFloat(4, true, toFloat(identityFunction))),
       'G': joinChars(asciiStringFromFloat(8, false, toFloat(identityFunction))),
-      'g': joinChars(asciiStringFromFloat(8, true, toFloat(identityFunction))),
+      'g': joinChars(asciiStringFromFloat(4, false, toFloat(identityFunction))),
 
       // String
       'A': joinChars(identityFunction),
