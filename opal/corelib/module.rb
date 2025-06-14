@@ -320,7 +320,9 @@ class ::Module
   def const_defined?(name, inherit = true)
     name = Opal.const_name!(name)
 
-    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
+    if `Opal.CONST_NAME_REGEXP`
+      ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
+    end
 
     %x{
       var module, modules = [self], module_constants, i, ii;
@@ -365,7 +367,9 @@ class ::Module
       return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
 
-    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
+    if `Opal.CONST_NAME_REGEXP`
+      ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
+    end
 
     %x{
       if (inherit) {
@@ -387,7 +391,7 @@ class ::Module
 
     name = ::Opal.const_name!(name)
 
-    if name !~ ::Opal::CONST_NAME_REGEXP || name.start_with?('::')
+    if (`Opal.CONST_NAME_REGEXP` && name !~ ::Opal::CONST_NAME_REGEXP) || name.start_with?('::')
       ::Kernel.raise ::NameError.new("wrong constant name #{name}", name)
     end
 
@@ -676,7 +680,7 @@ class ::Module
         return nil;
       }
 
-      return self.$$full_name = result.join('::');
+      return self.$$full_name = result.join('::').toString();
     }
   end
 

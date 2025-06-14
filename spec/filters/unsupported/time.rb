@@ -25,7 +25,6 @@ opal_unsupported_filter "Time" do
   fails "Time#dup returns a subclass instance" # Expected 2022-12-07 04:50:25 +0100 (Time) to be an instance of #<Class:0x3828>
   fails "Time#eql? returns false if self and other have differing fractional microseconds" # Expected 1970-01-01 01:01:40 +0100 not to have same value or type as 1970-01-01 01:01:40 +0100
   fails "Time#eql? returns false if self and other have differing numbers of microseconds" # Expected 1970-01-01 01:01:40 +0100 not to have same value or type as 1970-01-01 01:01:40 +0100
-  fails "Time#getgm returns a new time which is the utc representation of time" # Expected 2007-01-09 05:00:00 UTC == 2007-01-09 12:00:00 UTC to be truthy but was false
   fails "Time#getlocal raises ArgumentError if the String argument is not of the form (+|-)HH:MM" # Expected ArgumentError but got: NoMethodError (undefined method `getlocal' for 2022-12-07 04:50:51 +0100)
   fails "Time#getlocal raises ArgumentError if the argument represents a value greater than or equal to 86400 seconds" # NoMethodError: undefined method `getlocal' for 2022-12-07 04:50:51 +0100
   fails "Time#getlocal raises ArgumentError if the argument represents a value less than or equal to -86400 seconds" # NoMethodError: undefined method `getlocal' for 2022-12-07 04:50:51 +0100
@@ -38,20 +37,13 @@ opal_unsupported_filter "Time" do
   fails "Time#getlocal with an argument that responds to #to_int coerces using #to_int" # Mock 'integer' expected to receive to_int("any_args") exactly 1 times but received it 0 times
   fails "Time#getlocal with an argument that responds to #to_r coerces using #to_r" # Mock 'rational' expected to receive to_r("any_args") exactly 1 times but received it 0 times
   fails "Time#getlocal with an argument that responds to #to_str coerces using #to_str" # Mock 'string' expected to receive to_str("any_args") exactly 1 times but received it 0 times
-  fails "Time#getutc returns a new time which is the utc representation of time" # Expected 2007-01-09 05:00:00 UTC == 2007-01-09 12:00:00 UTC to be truthy but was false
   fails "Time#gmt_offset given negative offset returns a negative offset" # Expected -180 == -10800 to be truthy but was false
   fails "Time#gmt_offset given positive offset returns a positive offset" # Expected 180 == 10800 to be truthy but was false
   fails "Time#gmt_offset returns offset as Rational" # Expected 120.75000000000001 == 7245 to be truthy but was false
-  fails "Time#gmt_offset returns the correct offset for Hawaii around daylight savings time change" # Expected 3600 == -36000 to be truthy but was false
-  fails "Time#gmt_offset returns the correct offset for New Zealand around daylight savings time change" # Expected 7200 == 46800 to be truthy but was false
-  fails "Time#gmt_offset returns the correct offset for US Eastern time zone around daylight savings time change" # Expected 3600 == -18000 to be truthy but was false
   fails "Time#gmt_offset returns the offset in seconds between the timezone of time and UTC" # Expected 3600 == 10800 to be truthy but was false
   fails "Time#gmtoff given negative offset returns a negative offset" # Expected -180 == -10800 to be truthy but was false
   fails "Time#gmtoff given positive offset returns a positive offset" # Expected 180 == 10800 to be truthy but was false
   fails "Time#gmtoff returns offset as Rational" # Expected 120.75000000000001 == 7245 to be truthy but was false
-  fails "Time#gmtoff returns the correct offset for Hawaii around daylight savings time change" # Expected 3600 == -36000 to be truthy but was false
-  fails "Time#gmtoff returns the correct offset for New Zealand around daylight savings time change" # Expected 7200 == 46800 to be truthy but was false
-  fails "Time#gmtoff returns the correct offset for US Eastern time zone around daylight savings time change" # Expected 3600 == -18000 to be truthy but was false
   fails "Time#gmtoff returns the offset in seconds between the timezone of time and UTC" # Expected 3600 == 10800 to be truthy but was false
   fails "Time#localtime changes the timezone according to the set one" # Expected -60 == -3600 to be truthy but was false
   fails "Time#localtime converts self to local time, modifying the receiver" # NoMethodError: undefined method `localtime' for 2007-01-09 12:00:00 UTC
@@ -93,9 +85,6 @@ opal_unsupported_filter "Time" do
   fails "Time#utc_offset given negative offset returns a negative offset" # Expected -180 == -10800 to be truthy but was false
   fails "Time#utc_offset given positive offset returns a positive offset" # Expected 180 == 10800 to be truthy but was false
   fails "Time#utc_offset returns offset as Rational" # Expected 120.75000000000001 == 7245 to be truthy but was false
-  fails "Time#utc_offset returns the correct offset for Hawaii around daylight savings time change" # Expected 3600 == -36000 to be truthy but was false
-  fails "Time#utc_offset returns the correct offset for New Zealand around daylight savings time change" # Expected 7200 == 46800 to be truthy but was false
-  fails "Time#utc_offset returns the correct offset for US Eastern time zone around daylight savings time change" # Expected 3600 == -18000 to be truthy but was false
   fails "Time#utc_offset returns the offset in seconds between the timezone of time and UTC" # Expected 3600 == 10800 to be truthy but was false
   fails "Time#zone Encoding.default_internal is set doesn't raise errors for a Time with a fixed offset" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Time#zone returns nil when getting the local time with a fixed offset" # NoMethodError: undefined method `getlocal' for 2005-02-27 22:50:00 -0100
@@ -116,7 +105,6 @@ opal_unsupported_filter "Time" do
   fails "Time.local creates a time based on given C-style gmtime arguments, interpreted in the local time zone" # Expected [1, 15, 20, 1, 1, 2000, 6, 1, false, "Central European Standard Time"] == [1, 15, 20, 1, 1, 2000, 6, 1, false, "PST"] to be truthy but was false
   fails "Time.local creates a time based on given values, interpreted in the local time zone" # Expected [1, 15, 20, 1, 1, 2000, 6, 1, false, "Central European Standard Time"] == [1, 15, 20, 1, 1, 2000, 6, 1, false, "PST"] to be truthy but was false
   fails "Time.local creates the correct time just after dst change" # Expected 7200 == -18000 to be truthy but was false
-  fails "Time.local creates the correct time just before dst change" # Expected 7200 == -14400 to be truthy but was false
   fails "Time.local handles fractional microseconds as a Float" # Expected 0 == 1 to be truthy but was false
   fails "Time.local handles fractional microseconds as a Rational" # Expected 0 == 9 to be truthy but was false
   fails "Time.local handles fractional seconds as a Rational" # Expected 0 == 900000 to be truthy but was false
@@ -127,7 +115,6 @@ opal_unsupported_filter "Time" do
   fails "Time.mktime creates a time based on given C-style gmtime arguments, interpreted in the local time zone" # Expected [1, 15, 20, 1, 1, 2000, 6, 1, false, "Central European Standard Time"] == [1, 15, 20, 1, 1, 2000, 6, 1, false, "PST"] to be truthy but was false
   fails "Time.mktime creates a time based on given values, interpreted in the local time zone" # Expected [1, 15, 20, 1, 1, 2000, 6, 1, false, "Central European Standard Time"] == [1, 15, 20, 1, 1, 2000, 6, 1, false, "PST"] to be truthy but was false
   fails "Time.mktime creates the correct time just after dst change" # Expected 7200 == -18000 to be truthy but was false
-  fails "Time.mktime creates the correct time just before dst change" # Expected 7200 == -14400 to be truthy but was false
   fails "Time.mktime handles fractional microseconds as a Float" # Expected 0 == 1 to be truthy but was false
   fails "Time.mktime handles fractional microseconds as a Rational" # Expected 0 == 9 to be truthy but was false
   fails "Time.mktime handles fractional seconds as a Rational" # Expected 0 == 900000 to be truthy but was false

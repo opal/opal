@@ -6,7 +6,7 @@ module Opal
       handle :xstr
 
       def compile
-        if compiler.backtick_javascript_or_warn?
+        if compiler.backtick_javascript?
           compile_javascript
         else
           compile_send
