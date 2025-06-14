@@ -14,7 +14,7 @@ module ::Opal
   end
 
   def self.coerce_to?(object, type, method, *args)
-    return unless object.respond_to? method
+    return if `object['$respond_to?'].$$stub` || !object.respond_to?(method)
 
     coerced = `$coerce_to(object, type, method, args)`
 
