@@ -1,5 +1,12 @@
 module ::Process
   class Status
+    # status interpretation flags:
+    #define PROCESS_CONTINUED  1
+    #define PROCESS_COREDUMPED 2
+    #define PROCESS_EXITED     4
+    #define PROCESS_SIGNALED   8
+    #define PROCESS_STOPPED   16
+
     def self.wait(pid = -1, flags = 0)
       # Like Process.wait, but returns a Process::Status object (instead of an integer pid or nil)
       _pid, status = ::Process.wait2(pid, flag)
@@ -7,7 +14,12 @@ module ::Process
     end
 
     def initialize(status, pid)
-      @status, @pid = status, pid
+      # status must be a JS object with keys:
+      #   status: return code, integer
+      #   flags: see flags above, integer, for normal exit use 4
+      #   signal: only used if flags SIGNALED or STOPPED are used, integer
+      @status = status
+      @pid = pid
     end
 
     def ==(other)
@@ -16,50 +28,60 @@ module ::Process
     end
 
     # Returns true if the process generated a coredump when it terminated, false if not.
-    alias coredump? __not_implemented__
+    def coredump?
+      @status.JS[:flags] & 2 == 2
+    end
 
     # Returns true if the process exited normally (for example using an exit()
     # call or finishing the program), false if not.
     def exited?
-      !@status.nil?
+      @status.JS[:flags] & 4 == 4
     end
 
     def exitstatus
       # Returns the least significant eight bits of the return code of the process if it has exited
-      @status & 0xFF if exited?
+      @status.JS[:status] || nil
     end
 
     def inspect
       # Returns a string representation of self
-      "#<Process::Status: pid #{@pid} exit #{@status}>"
+      "#<Process::Status: pid #{@pid} exit #{exitstatus}>"
     end
 
     attr_reader :pid # Returns the process ID of the process
 
     # Returns true if the process terminated because of an uncaught signal, false otherwise.
-    alias signaled? __not_implemented__
+    def signaled?
+      @status.JS[:flags] & 8 == 8
+    end
 
     # Returns true if this process is stopped, and if the corresponding wait call
     # had the Process::WUNTRACED flag set, false otherwise.
-    alias stopped? __not_implemented__
+    def stopped?
+      @status.JS[:flags] & 16 == 16
+    end
 
     # Returns the number of the signal that caused the process to stop, or nil if the process is not stopped.
-    alias stopsig __not_implemented__
+    def stopsig
+      @status.JS[:signal] if stopped?
+    end
 
     def success?
       # Returns:
       #   true if the process has completed successfully and exited.
       #   false if the process has completed unsuccessfully and exited.
       #   nil if the process has not exited.
-      @status == 0 if exited?
+      exited? ? @status.JS[:status] == 0 : nil
     end
 
     # Returns the number of the signal that caused the process to terminate
     # or nil if the process was not terminated by an uncaught signal.
-    alias termsig __not_implemented__
+    def termsig
+      @status.JS[:signal] if signaled?
+    end
 
     def to_s
-      "pid #{@pid} exit #{@status}"
+      "pid #{@pid} exit #{exitstatus}"
     end
   end
 end
