@@ -28,14 +28,8 @@
     Opal.platform.is_browser = true;
   }
 
-  // All the node compatible server and desktop platforms
-  /* global Graal */
-  else if (typeof(process) === "object" && process.versions?.node) {
-    $platform.name = (typeof(Graal) === "object" && Graal.versionGraalVM) ? "graalnodejs" : "node";
-  }
-
-  // Mini-Racer
-  // else if (typeof(opalminiracer) !== "undefined") { $platform.name = "mini_racer"; }
+  // node and graalnodejs
+  else if (typeof(process) === "object" && process.versions?.node) { $platform.name = "node" }
 
   //
   // Handle unsupported features
