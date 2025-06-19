@@ -13,6 +13,9 @@
 - Node.js integration tests in `test/nodejs` run with `bin/rake minitest_node_nodejs`.
 - Always ensure `bin/rake` passes before committing changes. If Chrome is unavailable, run the Node.js variants instead.
 
+## Linting
+- Run `bin/rake lint` to check code style. This builds the corelib and stdlib then executes RuboCop and ESLint.
+
 ## Notes
 - The list of MSpec files is in `spec/ruby_specs` and filters live in `spec/filters`.
 - Tests depend on initialized submodules (`spec/mspec`, `spec/ruby`, `test/cruby`).
