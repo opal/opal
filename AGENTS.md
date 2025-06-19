@@ -4,14 +4,13 @@
 - Run `bin/setup` once after cloning to install gems, yarn packages and git submodules.
 
 ## Running tests
-- Use `bin/rake` to run the full suite (RSpec, MSpec and Minitest).
-- RSpec covers Opal compiler and runtime internals. Run with `bin/rake rspec`.
-- MSpec executes the ruby/spec suite for language compatibility. Run with `bin/rake mspec` or `bin/rake mspec_nodejs`. Use `PATTERN=<glob>` to run a subset.
-- The Opal specific specs under `spec/opal` run via `bin/rake mspec_opal_nodejs` (or `mspec_opal_chrome` for browsers).
-- Minitest contains the CRuby tests we vendor for additional coverage. Run with `bin/rake minitest`.
-- Tests for Opal's own stdlib additions live in `test/opal` and are executed with `bin/rake minitest_nodejs`.
-- Node.js integration tests in `test/nodejs` run with `bin/rake minitest_node_nodejs`.
-- Always ensure `bin/rake` passes before committing changes. If Chrome is unavailable, run the Node.js variants instead.
+- Running `bin/rake` executes every suite on both Chrome and Node.js but is slow and requires a browser.
+- For day-to-day work rely on the Node.js tasks and ensure they pass before committing:
+  - `bin/rake rspec` runs the RSpec suite covering Opal compiler and runtime internals.
+  - `bin/rake mspec_nodejs` runs the entire ruby/spec compatibility suite (use `PATTERN=<glob>` to limit the run).
+  - `bin/rake mspec_opal_nodejs` executes the Opal-specific specs under `spec/opal`.
+  - `bin/rake minitest_nodejs` runs the vendored CRuby tests and Opal's stdlib additions from `test/opal`.
+  - `bin/rake minitest_node_nodejs` runs integration tests in `test/nodejs`.
 
 ## Linting
 - Run `bin/rake lint` to check code style. This builds the corelib and stdlib then executes RuboCop and ESLint.
