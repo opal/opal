@@ -1,8 +1,8 @@
 # AGENTS Instructions
 
-This file explains how automation and human contributors should operate in this
-repository.  Follow the steps below to get a working development environment,
-run the test suites and keep the repository in a healthy state.
+This file explains how automation and human contributors should work in this
+repository. Follow the steps below to set up the project, run tests and keep the
+codebase healthy.
 
 
 ## Setup
@@ -13,7 +13,7 @@ run the test suites and keep the repository in a healthy state.
 - `opal/` provides the runtime and Ruby core library. Its layout is:
   - `corelib/` contains Ruby's built-ins implemented in Ruby.
   - `runtime/` holds JS helpers required at execution time.
-  - `opal/` offers entry points like `base.rb`, `mini.rb`, and `full.rb` for
+  - `opal/` offers entry points like `base.rb`, `mini.rb` and `full.rb` for
     loading subsets of the runtime.
 - `stdlib/` contains Opal's standard library implementation.
 - `spec/` and `test/` host RSpec and Minitest suites.
@@ -41,5 +41,10 @@ run the test suites and keep the repository in a healthy state.
 - If an agent discovers information that required significant setup time, condense
   the result into a short bullet in this file so later agents can skip the same
   work.
+- Write commit messages in the `subsystem: summary` form so changes are easy to
+  track.
+- New features or bugfixes should come with tests. For compiler or builder
+  changes add RSpec specs; for runtime or stdlib consult the ruby/spec suite
+  first and add new specs under `spec/opal` if needed.
 - See `HACKING.md` and `CONTRIBUTING.md` for more detailed guides on
   collaborating on Opal.
