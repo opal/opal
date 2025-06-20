@@ -1,7 +1,20 @@
 # AGENTS Instructions
 
+This file explains how automation and human contributors should operate in this
+repository.  Follow the steps below to get a working development environment,
+run the test suites and keep the repository in a healthy state.
+
+
 ## Setup
 - Run `bin/setup` once after cloning to install gems, yarn packages and git submodules.
+
+## Directory overview
+- `lib/` & `opal/` hold the compiler and runtime sources.
+- `stdlib/` contains Opal's standard library implementation.
+- `spec/` and `test/` host RSpec and Minitest suites.
+- `examples/` shows sample applications.
+- `docs/` provides documentation for contributors and users.
+- `tasks/` defines Rake tasks used by `bin/rake`.
 
 ## Running tests
 - Running `bin/rake` executes every suite on both Chrome and Node.js but is slow and requires a browser.
@@ -20,3 +33,8 @@
 ## Notes
 - The list of MSpec files is in `spec/ruby_specs` and filters live in `spec/filters`.
 - Tests depend on initialized submodules (`spec/mspec`, `spec/ruby`, `test/cruby`).
+- If an agent discovers information that required significant setup time, condense
+  the result into a short bullet in this file so later agents can skip the same
+  work.
+- See `HACKING.md` and `CONTRIBUTING.md` for more detailed guides on
+  collaborating on Opal.
