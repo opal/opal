@@ -9,7 +9,12 @@ run the test suites and keep the repository in a healthy state.
 - Run `bin/setup` once after cloning to install gems, yarn packages and git submodules.
 
 ## Directory overview
-- `lib/` & `opal/` hold the compiler and runtime sources.
+- `lib/` holds the compiler and CLI implementations.
+- `opal/` provides the runtime and Ruby core library. Its layout is:
+  - `corelib/` contains Ruby's built-ins implemented in Ruby.
+  - `runtime/` holds JS helpers required at execution time.
+  - `opal/` offers entry points like `base.rb`, `mini.rb`, and `full.rb` for
+    loading subsets of the runtime.
 - `stdlib/` contains Opal's standard library implementation.
 - `spec/` and `test/` host RSpec and Minitest suites.
 - `examples/` shows sample applications.
