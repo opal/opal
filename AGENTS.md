@@ -48,3 +48,6 @@ codebase healthy.
   first and add new specs under `spec/opal` if needed.
 - See `HACKING.md` and `CONTRIBUTING.md` for more detailed guides on
   collaborating on Opal.
+- Do not commit changes to external submodules such as `spec/ruby` or
+  `spec/mspec`. Instead add new files under `spec/opal` so they remain within
+  the `opal` namespace.
