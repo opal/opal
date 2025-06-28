@@ -345,7 +345,7 @@ class ::Rational < ::Numeric
     s = self * p
 
     if precision < 1
-      (s.send(method) / p).to_i
+      (s.send(method) / p.to_f).to_i
     else
       ::Kernel.Rational(s.send(method), p)
     end

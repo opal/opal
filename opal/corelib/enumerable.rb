@@ -391,7 +391,7 @@ module ::Enumerable
     return enum_for(:each_with_index, *args) { enumerator_size } unless block_given?
 
     %x{
-      var index = 0;
+      var index = 0n;
 
       self.$each.$$p = function() {
         var param = #{::Opal.destructure(`arguments`)};

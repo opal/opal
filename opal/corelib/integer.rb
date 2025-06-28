@@ -1,13 +1,15 @@
+# helpers: truthy
 # backtick_javascript: true
 # use_strict: true
 
 require 'corelib/numeric'
 
-class ::Number < ::Numeric
-  ::Opal.bridge(`Number`, self)
+class Integer < ::Numeric
+  ::Opal.bridge(`BigInt`, self)
   `Opal.prop(self.$$prototype, '$$is_number', true)`
+  `Opal.prop(self.$$prototype, '$$is_integer', true)`
   `self.$$is_number_class = true`
-  `var number_id_map = new Map()`
+  `self.$$is_integer_class = true`
 
   class << self
     def allocate
@@ -15,96 +17,74 @@ class ::Number < ::Numeric
     end
 
     undef :new
-  end
 
-  def coerce(other)
-    %x{
-      if (other === nil) {
-        #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
+    def sqrt(n)
+      n = ::Opal.coerce_to!(n, ::Integer, :to_int)
+      %x{
+        if (n < 0) {
+          #{::Kernel.raise ::Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
+        }
+
+        return parseInt(Math.sqrt(n), 10);
       }
-      else if (other.$$is_string) {
-        return [#{::Kernel.Float(other)}, self];
-      }
-      else if (#{other.respond_to?(:to_f)}) {
-        return [#{::Opal.coerce_to!(other, ::Float, :to_f)}, self];
-      }
-      else if (other.$$is_number) {
-        return [other, self];
-      }
-      else {
-        #{::Kernel.raise ::TypeError, "can't convert #{other.class} into Float"};
-      }
-    }
+    end
+
+    def try_convert(object)
+      Opal.coerce_to?(object, self, :to_int)
+    end
   end
 
   def __id__
-    %x{
-      // Binary-safe integers
-      if (self|0 === self) {
-        return (self * 2) + 1;
-      }
-      else {
-        if (number_id_map.has(self)) {
-          return number_id_map.get(self);
-        }
-        var id = Opal.uid();
-        number_id_map.set(self, id);
-        return id;
-      }
-    }
+    # Binary-safe integers
+    `(self * 2n) + 1n`
   end
 
-  def hash
-    %x{
-      // Binary-safe integers
-      if (self|0 === self) {
-        return #{__id__}
-      }
-      else {
-        return self.toString().$hash();
-      }
-    }
-  end
+  alias hash __id__
 
   def +(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer)
         return self + other;
-      }
-      else {
+      else if (other.$$is_float)
+        return self + BigInt(other);
+      else
         return #{__coerced__ :+, other};
-      }
     }
   end
 
   def -(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer)
         return self - other;
-      }
-      else {
+      else
         return #{__coerced__ :-, other};
-      }
     }
   end
 
   def *(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer)
         return self * other;
-      }
-      else {
+      else
         return #{__coerced__ :*, other};
-      }
     }
   end
 
   def /(other)
     %x{
-      if (other.$$is_number) {
-        return self / other;
-      }
-      else {
+      if (other.$$is_integer) {
+        if (other === 0n)
+          #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'};
+
+        if (self < 0 !== other < 0) // different signs
+          return BigInt(Math.floor(Number(self) / Number(other)))
+        else if (other.$$is_float)
+          return Number(self) / other
+        else
+          return self / other;
+      } else if (other === 0) {
+        #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'};
+      } else {
         return #{__coerced__ :/, other};
       }
     }
@@ -112,73 +92,60 @@ class ::Number < ::Numeric
 
   def %(other)
     %x{
-      if (other.$$is_number) {
-        if (other == -Infinity) {
+      if (other.$$is_integer) {
+        if (other == -Infinity)
           return other;
-        }
-        else if (other == 0) {
+        else if (other == 0)
           #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'};
-        }
-        else if (other < 0 || self < 0) {
+        else if (other < 0 || self < 0)
           return (self % other + other) % other;
-        }
-        else {
+        else
           return self % other;
-        }
       }
-      else {
+      else
         return #{__coerced__ :%, other};
-      }
     }
   end
 
   def &(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer)
         return self & other;
-      }
-      else {
+      else
         return #{__coerced__ :&, other};
-      }
     }
   end
 
   def |(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer)
         return self | other;
-      }
-      else {
+      else
         return #{__coerced__ :|, other};
-      }
     }
   end
 
   def ^(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer)
         return self ^ other;
-      }
-      else {
+      else
         return #{__coerced__ :^, other};
-      }
     }
   end
 
   def <(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer)
         return self < other;
-      }
-      else {
+      else
         return #{__coerced__ :<, other};
-      }
     }
   end
 
   def <=(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer) {
         return self <= other;
       }
       else {
@@ -189,7 +156,7 @@ class ::Number < ::Numeric
 
   def >(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer) {
         return self > other;
       }
       else {
@@ -200,7 +167,7 @@ class ::Number < ::Numeric
 
   def >=(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer) {
         return self >= other;
       }
       else {
@@ -213,17 +180,17 @@ class ::Number < ::Numeric
   # can be optimized despite a try/finally construct.
   %x{
     var spaceship_operator = function(self, other) {
-      if (other.$$is_number) {
-        if (isNaN(self) || isNaN(other)) {
+      if (other.$$is_integer) {
+        if (isNaN(Number(self)) || isNaN(Number(other))) {
           return nil;
         }
 
         if (self > other) {
-          return 1;
+          return 1n;
         } else if (self < other) {
-          return -1;
+          return -1n;
         } else {
-          return 0;
+          return 0n;
         }
       }
       else {
@@ -254,13 +221,13 @@ class ::Number < ::Numeric
     bit = ::Opal.coerce_to! bit, ::Integer, :to_int
 
     %x{
-      if (#{bit} < 0) {
-        return 0;
+      if (#{bit} < 0n) {
+        return 0n;
       }
-      if (#{bit} >= 32) {
-        return #{ self } < 0 ? 1 : 0;
+      if (#{bit} >= 32n) {
+        return #{ self } < 0n ? 1n : 0n;
       }
-      return (self >> #{bit}) & 1;
+      return (self >> #{bit}) & 1n;
     }
   end
 
@@ -277,39 +244,46 @@ class ::Number < ::Numeric
   end
 
   def **(other)
-    if ::Integer === other
-      if !(::Integer === self) || other > 0
-        `Math.pow(self, other)`
-      else
-        ::Rational.new(self, 1)**other
-      end
-    elsif self < 0 && (::Float === other || ::Rational === other)
-      ::Complex.new(self, 0)**other.to_f
-    elsif `other.$$is_number != null`
-      `Math.pow(self, other)`
-    else
-      __coerced__ :**, other
-    end
+    %x{
+      if (other === 0n) return 1n;
+      if (other === 1n) return self;
+
+      if (Number.isInteger(Number(other))) {
+        if (other > 0) {
+          if (other > Number.MAX_SAFE_INTEGER) {
+            #{::Kernel.warn("in a**b, b may be too big")}
+          }
+          return self ** other
+        } else {
+          return #{::Rational.new(self, 1) ** other}
+        }
+      } else if (self < 0 && $truthy(#{::Float === other || ::Rational === other})) {
+        return #{ ::Complex.new(self.to_f, 0) ** other.to_f}
+      } else if (other.$$is_float) {
+        return self ** BigInt(other);
+      } else {
+        return #{__coerced__ :**, other}
+      }
+    }
   end
 
   def ==(other)
     %x{
-      if (other.$$is_number) {
+      if (other.$$is_integer)
         return self.valueOf() === other.valueOf();
-      }
-      else if (#{other.respond_to? :==}) {
+      else if (other.$$is_float)
+        return Number(self) === other.valueOf();
+      else if (#{other.respond_to? :==})
         return #{other == self};
-      }
-      else {
+      else
         return false;
-      }
     }
   end
 
   alias === ==
 
   def abs
-    `Math.abs(self)`
+    `Math.abs(Number(self))`
   end
 
   def abs2
@@ -323,7 +297,7 @@ class ::Number < ::Numeric
 
   def anybits?(mask)
     mask = ::Opal.coerce_to! mask, ::Integer, :to_int
-    `(self & mask) !== 0`
+    `(self & mask) !== 0n`
   end
 
   def angle
@@ -348,21 +322,17 @@ class ::Number < ::Numeric
   end
 
   def bit_length
-    unless ::Integer === self
-      ::Kernel.raise ::NoMethodError.new("undefined method `bit_length` for #{self}:Float", 'bit_length')
-    end
-
     %x{
-      if (self === 0 || self === -1) {
-        return 0;
+      if (self === 0n || self === -1n) {
+        return 0n;
       }
 
-      var result = 0,
-          value  = self < 0 ? ~self : self;
+      var result = 0n,
+          value  = self < 0n ? ~self : self;
 
-      while (value != 0) {
-        result   += 1;
-        value  >>>= 1;
+      while (value != 0n) {
+        result += 1n;
+        value >>= 1n;
       }
 
       return result;
@@ -371,25 +341,22 @@ class ::Number < ::Numeric
 
   def ceil(ndigits = 0)
     %x{
-      var f = #{to_f};
+      if (ndigits >= 0)
+        return self
 
-      if (f % 1 === 0 && ndigits >= 0) {
-        return f;
-      }
+      if (ndigits < 0) ndigits = -ndigits
 
-      var factor = Math.pow(10, ndigits),
-          result = Math.ceil(f * factor) / factor;
+      let factor = 10n ** ndigits
 
-      if (f % 1 === 0) {
-        result = Math.round(result);
-      }
-
-      return result;
+      if (self > 0)
+        return (self + factor - 1n) / factor * factor
+      else
+        return self / factor * factor
     }
   end
 
   def chr(encoding = undefined)
-    `Opal.str(String.fromCodePoint(self), encoding || "BINARY")`
+    `Opal.enc(String.fromCharCode(Number(self)), encoding || "BINARY")`
   end
 
   def denominator
@@ -430,20 +397,13 @@ class ::Number < ::Numeric
 
   def floor(ndigits = 0)
     %x{
-      var f = #{to_f};
+      var f = Number(self);
+      if (ndigits >= 0) return self
 
-      if (f % 1 === 0 && ndigits >= 0) {
-        return f;
-      }
-
-      var factor = Math.pow(10, ndigits),
+      var factor = Math.pow(10, Number(ndigits)),
           result = Math.floor(f * factor) / factor;
 
-      if (f % 1 === 0) {
-        result = Math.round(result);
-      }
-
-      return result;
+      return BigInt(Math.round(result));
     }
   end
 
@@ -453,8 +413,8 @@ class ::Number < ::Numeric
     end
 
     %x{
-      var min = Math.abs(self),
-          max = Math.abs(other);
+      var min = #{abs},
+          max = Math.abs(Number(other));
 
       while (min > 0) {
         var tmp = min;
@@ -507,7 +467,7 @@ class ::Number < ::Numeric
   end
 
   def next
-    `self + 1`
+    `self + 1n`
   end
 
   def nobits?(mask)
@@ -606,88 +566,52 @@ class ::Number < ::Numeric
   end
 
   def round(ndigits = undefined)
-    if ::Integer === self
-      if `ndigits == null`
-        return self
-      end
+    %x{
+      if (ndigits == null) return self;
 
-      if ::Float === ndigits && ndigits.infinite?
-        ::Kernel.raise ::RangeError, 'Infinity'
-      end
+      if (ndigits.$$is_float && $truthy(#{ndigits.infinite?}))
+        #{::Kernel.raise ::RangeError, "Infinity"}
 
-      ndigits = ::Opal.coerce_to!(ndigits, ::Integer, :to_int)
+      if (!ndigits.$$is_integer)
+        ndigits = #{::Opal.coerce_to!(ndigits, ::Integer, :to_int)}
 
-      if ndigits < ::Integer::MIN
-        ::Kernel.raise ::RangeError, 'out of bounds'
-      end
+      // Check if the number is beyond a signed int (32 bits)
+      if (ndigits >= -(1 << 31) || ndigits <= (1 << 31) - 1)
+        #{::Kernel.raise ::RangeError, "bignum too big to convert into 'long'"}
 
-      if `ndigits >= 0`
-        return self
-      end
+      if (ndigits >= 0) return self
 
-      ndigits = -ndigits
+      ndigits = -Number(ndigits)
 
-      %x{
-        if (0.415241 * ndigits - 0.125 > #{size}) {
-          return 0;
-        }
 
-        var f = Math.pow(10, ndigits),
-            x = Math.floor((Math.abs(self) + f / 2) / f) * f;
-
-        return self < 0 ? -x : x;
+      if (0.415241 * ndigits - 0.125 > #{size}) {
+        return 0;
       }
-    else
-      if nan? && `ndigits == null`
-        ::Kernel.raise ::FloatDomainError, 'NaN'
-      end
 
-      ndigits = ::Opal.coerce_to!(`ndigits || 0`, ::Integer, :to_int)
+      var f = Math.pow(10, ndigits),
+          x = BigInt(Math.floor((#{abs} + f / 2) / f) * f);
 
-      if ndigits <= 0
-        if nan?
-          ::Kernel.raise ::RangeError, 'NaN'
-        elsif infinite?
-          ::Kernel.raise ::FloatDomainError, 'Infinity'
-        end
-      elsif ndigits == 0
-        return `Math.round(self)`
-      elsif nan? || infinite?
-        return self
-      end
-
-      _, exp = ::Math.frexp(self)
-
-      if ndigits >= (::Float::DIG + 2) - (exp > 0 ? exp / 4 : exp / 3 - 1)
-        return self
-      end
-
-      if ndigits < -(exp > 0 ? exp / 3 + 1 : exp / 4)
-        return 0
-      end
-
-      `Math.round(self * Math.pow(10, ndigits)) / Math.pow(10, ndigits)`
-    end
+      return self < 0 ? -x : x;
+    }
   end
 
   def times(&block)
     return enum_for(:times) { self } unless block
 
     %x{
-      for (var i = 0; i < self; i++) {
-        block(i);
-      }
+      for (var i = 0n; i < self; i++)
+        block(i)
     }
 
     self
   end
 
   def to_f
-    self
+    `Number(self)`
   end
 
   def to_i
-    `self < 0 ? Math.ceil(self) : Math.floor(self)`
+    self
   end
 
   def to_r
@@ -704,21 +628,14 @@ class ::Number < ::Numeric
 
   def to_s(base = 10)
     base = ::Opal.coerce_to! base, ::Integer, :to_int
-
-    if base < 2 || base > 36
-      ::Kernel.raise ::ArgumentError, "invalid radix #{base}"
-    end
-
-    # Don't lose the negative zero
-    if self == 0 && `1/self === -Infinity`
-      return '-0.0'
-    end
-
-    `self.toString(base)`
+    ::Kernel.raise ::ArgumentError, "invalid radix #{base}" if base < 2 || base > 36
+    `self.toString(Number(base))`
   end
 
   def truncate(ndigits = 0)
     %x{
+      ndigits = Number(ndigits);
+
       var f = #{to_f};
 
       if (f % 1 === 0 && ndigits >= 0) {
@@ -732,7 +649,7 @@ class ::Number < ::Numeric
         result = Math.round(result);
       }
 
-      return result;
+      return BigInt(result);
     }
   end
 
@@ -784,9 +701,9 @@ class ::Number < ::Numeric
     end
 
     %x{
-      if (!stop.$$is_number) {
+      if (!stop.$$is_number)
         #{::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
-      }
+
       for (var i = self; i <= stop; i++) {
         block(i);
       }
@@ -805,11 +722,11 @@ class ::Number < ::Numeric
   end
 
   def nan?
-    `isNaN(self)`
+    false
   end
 
   def finite?
-    `self != Infinity && self != -Infinity && !isNaN(self)`
+    `self != Infinity && self != -Infinity`
   end
 
   def infinite?
@@ -897,7 +814,8 @@ class ::Number < ::Numeric
 
   alias arg angle
   alias eql? ==
-  alias fdiv /
+  alias fdiv / #
+  alias div / #
   alias inspect to_s
   alias kind_of? is_a?
   alias magnitude abs
@@ -906,64 +824,4 @@ class ::Number < ::Numeric
   alias phase angle
   alias succ next
   alias to_int to_i
-end
-
-::Fixnum = ::Number
-
-class ::Integer < ::Numeric
-  `self.$$is_number_class = true`
-  `self.$$is_integer_class = true`
-
-  class << self
-    def allocate
-      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
-    end
-
-    undef :new
-
-    def sqrt(n)
-      n = ::Opal.coerce_to!(n, ::Integer, :to_int)
-      %x{
-        if (n < 0) {
-          #{::Kernel.raise ::Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
-        }
-
-        return parseInt(Math.sqrt(n), 10);
-      }
-    end
-
-    def try_convert(object)
-      Opal.coerce_to?(object, self, :to_int)
-    end
-  end
-
-  self::MAX = `Math.pow(2, 30) - 1`
-  self::MIN = `-Math.pow(2, 30)`
-end
-
-class ::Float < ::Numeric
-  `self.$$is_number_class = true`
-
-  class << self
-    def allocate
-      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
-    end
-
-    undef :new
-
-    def ===(other)
-      `!!other.$$is_number`
-    end
-  end
-
-  self::INFINITY = `Infinity`
-  self::MAX      = `Number.MAX_VALUE`
-  self::MIN      = `Number.MIN_VALUE`
-  self::NAN      = `NaN`
-
-  self::DIG      = 15
-  self::MANT_DIG = 53
-  self::RADIX    = 2
-
-  self::EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
 end
