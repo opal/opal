@@ -23,7 +23,7 @@ module ::Kernel
 
       status = `out.status > 128 ? out.status - 128 : out.status`
       pid = `out.pid == null ? nil : out.pid`
-      $? = ::Process::Status.new(status, pid)
+      $? = ::Process::Status.new(`{ status: status, flags: 4 }`, pid)
 
       if `out.status == 126 || out.status == 127` ||
          (`$platform.windows` && `out.stderr.includes("is not recognized as an internal or external command")`)
@@ -717,7 +717,7 @@ module ::Kernel
 
       status = `out.status > 128 ? out.status - 128 : out.status`
       pid = `out.pid == null ? nil : out.pid`
-      $? = ::Process::Status.new(status, pid)
+      $? = ::Process::Status.new(`{ status: status, flags: 4 }`, pid)
 
       if exception
         raise ::Errno::ENOENT if `out.status == 126 || out.status == 127`

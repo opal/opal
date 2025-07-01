@@ -642,7 +642,7 @@ class ::IO
     status = `$platform.io_close(self.fd)` if @fd && autoclose?
     if status
       # must have been a #popen
-      $? = ::Process::Status.new(status, @pid)
+      $? = ::Process::Status.new(`{ status: status, flags: 4 }`, @pid)
     end
     @closed = :both
     @pid = nil

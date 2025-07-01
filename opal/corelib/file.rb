@@ -1116,7 +1116,7 @@ class ::File < ::IO
       result
     end
 
-    if `$platform.file_lchmod`
+    if `$platform.lchmod`
       def lchmod(mode_int, *file_names)
         # Equivalent to File::chmod, but does not follow symbolic links
         # (so it will change the permissions associated with the link,
@@ -1125,7 +1125,7 @@ class ::File < ::IO
         raise(RangeError, 'mode_int out of range') if mode_int < 0 || mode_int > 4_294_967_295
         file_names.each do |file_name|
           file_name = `coerce_to_path(file_name)`
-          `$platform.file_lchmod(file_name, mode_int)`
+          `$platform.lchmod(file_name.toString(), mode_int)`
         end
         file_names.size
       end

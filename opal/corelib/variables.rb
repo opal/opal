@@ -13,7 +13,7 @@ $/ = "\n"
 $, = nil
 $. = 0
 $0 = `Opal.platform.argv[0]`
-$$ = `Opal.platform.process_pid ? Opal.platform.process_pid() : nil`
+$$ = `Opal.platform.getpid ? Opal.platform.getpid() : nil`
 $? = nil
 $* = ::ARGV = `Opal.platform.argv.slice(1)`
 

@@ -107,7 +107,6 @@ ruby/core/process
 !ruby/core/process/fork_spec
 !ruby/core/process/setpgid_spec
 !ruby/core/process/setpgrp_spec
-!ruby/core/process/spawn_spec
 !ruby/core/process/wait_spec
 !ruby/core/process/wait2_spec
 !ruby/core/process/waitall_spec

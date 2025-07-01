@@ -23,6 +23,7 @@ module ::Errno
     [:ENAMETOOLONG, 'File name too long', 36],
     [:ENOTEMPTY, 'Directory not empty', 39],
     [:ELOOP, 'Too many symbolic links encountered', 40],
+    [:EFTYPE, 'Inappropriate file type or format', 79],
     [:EILSEQ, 'Illegal byte sequence', 84],
     [:EOPNOTSUPP, 'Operation not supported on transport endpoint', 95]
   ]

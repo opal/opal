@@ -1,14 +1,13 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Process" do
   fails "Process#last_status returns nil if no child process has been ever executed in the current thread" # NotImplementedError: Thread creation not available
-  fails "Process#last_status returns the status of the last executed child process in the current thread" # NotImplementedError: NotImplementedError
-  fails "Process.argv0 is the path given as the main script and the same as __FILE__" # NotImplementedError: NotImplementedError
   fails "Process.clock_getres with :GETRUSAGE_BASED_CLOCK_PROCESS_CPUTIME_ID reports 1 microsecond" # NotImplementedError: NotImplementedError
   fails "Process.clock_getres with :GETTIMEOFDAY_BASED_CLOCK_REALTIME reports 1 microsecond" # NotImplementedError: NotImplementedError
   fails "Process.clock_getres with :TIME_BASED_CLOCK_REALTIME reports 1 second" # NotImplementedError: NotImplementedError
   fails "Process.clock_getres with Process::CLOCK_MONOTONIC reports at least 10 millisecond" # NotImplementedError: NotImplementedError
   fails "Process.clock_getres with Process::CLOCK_REALTIME reports at least 10 millisecond" # NotImplementedError: NotImplementedError
   fails "Process.clock_gettime supports the platform clocks mentioned in the documentation CLOCK_MONOTONIC_COARSE" # NameError: uninitialized constant Process::CLOCK_MONOTONIC_COARSE
+  fails "Process.clock_gettime supports the platform clocks mentioned in the documentation CLOCK_MONOTONIC_FAST and CLOCK_MONOTONIC_PRECISE" # NameError: uninitialized constant Process::CLOCK_MONOTONIC_FAST
   fails "Process.clock_gettime supports the platform clocks mentioned in the documentation CLOCK_MONOTONIC_RAW" # NameError: uninitialized constant Process::CLOCK_MONOTONIC_RAW
   fails "Process.clock_gettime supports the platform clocks mentioned in the documentation CLOCK_PROCESS_CPUTIME_ID" # NameError: uninitialized constant Process::CLOCK_PROCESS_CPUTIME_ID
   fails "Process.clock_gettime supports the platform clocks mentioned in the documentation CLOCK_REALTIME_COARSE" # NameError: uninitialized constant Process::CLOCK_REALTIME_COARSE
@@ -46,23 +45,6 @@ opal_filter "Process" do
   fails "Process.exit! exits when called from a fiber" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:
   fails "Process.exit! exits when called from a thread" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:
   fails "Process.exit! overrides the original exception and exit status when called from #at_exit" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:
-  fails "Process.getpgid coerces the argument to an Integer" # NoMethodError: undefined method `arguments' for #<MockIntObject:0x144 @value=39456 @calls=0>
-  fails "Process.getpgid returns the process group ID for the calling process id when passed 0" # NotImplementedError: NotImplementedError
-  fails "Process.getpgid returns the process group ID for the given process id" # NotImplementedError: NotImplementedError
-  fails "Process.getpriority coerces arguments to Integers" # NameError: uninitialized constant Process::PRIO_PROCESS
-  fails "Process.getpriority gets the scheduling priority for a specified process group" # NameError: uninitialized constant Process::PRIO_PGRP
-  fails "Process.getpriority gets the scheduling priority for a specified process" # NameError: uninitialized constant Process::PRIO_PROCESS
-  fails "Process.getpriority gets the scheduling priority for a specified user" # NameError: uninitialized constant Process::PRIO_USER
-  fails "Process.getrlimit returns a two-element Array of Integers" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.getrlimit when passed a String coerces the short name into the full RLIMIT_ prefixed name" # No behavior expectation was found in the example
-  fails "Process.getrlimit when passed a String raises ArgumentError when passed an unknown resource" # Expected ArgumentError but got: NotImplementedError (NotImplementedError)
-  fails "Process.getrlimit when passed a Symbol coerces the short name into the full RLIMIT_ prefixed name" # No behavior expectation was found in the example
-  fails "Process.getrlimit when passed a Symbol raises ArgumentError when passed an unknown resource" # Expected ArgumentError but got: NotImplementedError (NotImplementedError)
-  fails "Process.getrlimit when passed an Object calls #to_int to convert to an Integer" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.getrlimit when passed an Object raises a TypeError if #to_int does not return an Integer" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.getrlimit when passed on Object calls #to_int if #to_str does not return a String" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.getrlimit when passed on Object calls #to_str to convert to a String" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.initgroups initializes the supplemental group access list" # Expected Errno::EPERM but got: NotImplementedError (NotImplementedError)
   fails "Process.kill accepts a String as signal name" # NotImplementedError: Thread creation not available
   fails "Process.kill accepts a Symbol as a signal name" # NotImplementedError: Thread creation not available
   fails "Process.kill accepts a signal name with the 'SIG' prefix" # NotImplementedError: Thread creation not available
@@ -76,58 +58,40 @@ opal_filter "Process" do
   fails "Process.kill signals the process group if the full signal name starts with a minus sign" # NotImplementedError: Thread creation not available
   fails "Process.kill signals the process group if the short signal name starts with a minus sign" # NotImplementedError: Thread creation not available
   fails "Process.kill signals the process group if the signal number is negative" # NotImplementedError: Thread creation not available
-  fails "Process.maxgroups returns the maximum number of gids allowed in the supplemental group access list" # NotImplementedError: NotImplementedError
-  fails "Process.maxgroups sets the maximum number of gids allowed in the supplemental group access list" # NotImplementedError: NotImplementedError
-  fails "Process.ppid returns the process id of the parent of this process" # NotImplementedError: NotImplementedError
-  fails "Process.setpriority sets the scheduling priority for a specified process group" # NameError: uninitialized constant Process::PRIO_PGRP
-  fails "Process.setpriority sets the scheduling priority for a specified process" # NameError: uninitialized constant Process::PRIO_PROCESS
-  fails "Process.setrlimit when passed a String coerces 'AS' into RLIMIT_AS" # NameError: uninitialized constant Process::RLIMIT_AS
-  fails "Process.setrlimit when passed a String coerces 'CORE' into RLIMIT_CORE" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.setrlimit when passed a String coerces 'CPU' into RLIMIT_CPU" # NameError: uninitialized constant Process::RLIMIT_CPU
-  fails "Process.setrlimit when passed a String coerces 'DATA' into RLIMIT_DATA" # NameError: uninitialized constant Process::RLIMIT_DATA
-  fails "Process.setrlimit when passed a String coerces 'FSIZE' into RLIMIT_FSIZE" # NameError: uninitialized constant Process::RLIMIT_FSIZE
-  fails "Process.setrlimit when passed a String coerces 'MEMLOCK' into RLIMIT_MEMLOCK" # NameError: uninitialized constant Process::RLIMIT_MEMLOCK
-  fails "Process.setrlimit when passed a String coerces 'MSGQUEUE' into RLIMIT_MSGQUEUE" # NameError: uninitialized constant Process::RLIMIT_MSGQUEUE
-  fails "Process.setrlimit when passed a String coerces 'NICE' into RLIMIT_NICE" # NameError: uninitialized constant Process::RLIMIT_NICE
-  fails "Process.setrlimit when passed a String coerces 'NOFILE' into RLIMIT_NOFILE" # NameError: uninitialized constant Process::RLIMIT_NOFILE
-  fails "Process.setrlimit when passed a String coerces 'NPROC' into RLIMIT_NPROC" # NameError: uninitialized constant Process::RLIMIT_NPROC
-  fails "Process.setrlimit when passed a String coerces 'RSS' into RLIMIT_RSS" # NameError: uninitialized constant Process::RLIMIT_RSS
-  fails "Process.setrlimit when passed a String coerces 'RTPRIO' into RLIMIT_RTPRIO" # NameError: uninitialized constant Process::RLIMIT_RTPRIO
-  fails "Process.setrlimit when passed a String coerces 'SIGPENDING' into RLIMIT_SIGPENDING" # NameError: uninitialized constant Process::RLIMIT_SIGPENDING
-  fails "Process.setrlimit when passed a String coerces 'STACK' into RLIMIT_STACK" # NameError: uninitialized constant Process::RLIMIT_STACK
-  fails "Process.setrlimit when passed a String raises ArgumentError when passed an unknown resource" # Expected ArgumentError but got: NotImplementedError (NotImplementedError)
-  fails "Process.setrlimit when passed a Symbol coerces :AS into RLIMIT_AS" # NameError: uninitialized constant Process::RLIMIT_AS
-  fails "Process.setrlimit when passed a Symbol coerces :CORE into RLIMIT_CORE" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.setrlimit when passed a Symbol coerces :CPU into RLIMIT_CPU" # NameError: uninitialized constant Process::RLIMIT_CPU
-  fails "Process.setrlimit when passed a Symbol coerces :DATA into RLIMIT_DATA" # NameError: uninitialized constant Process::RLIMIT_DATA
-  fails "Process.setrlimit when passed a Symbol coerces :FSIZE into RLIMIT_FSIZE" # NameError: uninitialized constant Process::RLIMIT_FSIZE
-  fails "Process.setrlimit when passed a Symbol coerces :MEMLOCK into RLIMIT_MEMLOCK" # NameError: uninitialized constant Process::RLIMIT_MEMLOCK
-  fails "Process.setrlimit when passed a Symbol coerces :MSGQUEUE into RLIMIT_MSGQUEUE" # NameError: uninitialized constant Process::RLIMIT_MSGQUEUE
-  fails "Process.setrlimit when passed a Symbol coerces :NICE into RLIMIT_NICE" # NameError: uninitialized constant Process::RLIMIT_NICE
-  fails "Process.setrlimit when passed a Symbol coerces :NOFILE into RLIMIT_NOFILE" # NameError: uninitialized constant Process::RLIMIT_NOFILE
-  fails "Process.setrlimit when passed a Symbol coerces :NPROC into RLIMIT_NPROC" # NameError: uninitialized constant Process::RLIMIT_NPROC
-  fails "Process.setrlimit when passed a Symbol coerces :RSS into RLIMIT_RSS" # NameError: uninitialized constant Process::RLIMIT_RSS
-  fails "Process.setrlimit when passed a Symbol coerces :RTPRIO into RLIMIT_RTPRIO" # NameError: uninitialized constant Process::RLIMIT_RTPRIO
-  fails "Process.setrlimit when passed a Symbol coerces :SIGPENDING into RLIMIT_SIGPENDING" # NameError: uninitialized constant Process::RLIMIT_SIGPENDING
-  fails "Process.setrlimit when passed a Symbol coerces :STACK into RLIMIT_STACK" # NameError: uninitialized constant Process::RLIMIT_STACK
-  fails "Process.setrlimit when passed a Symbol raises ArgumentError when passed an unknown resource" # Expected ArgumentError but got: NotImplementedError (NotImplementedError)
-  fails "Process.setrlimit when passed an Object calls #to_int to convert resource to an Integer" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.setrlimit when passed an Object calls #to_int to convert the hard limit to an Integer" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.setrlimit when passed an Object calls #to_int to convert the soft limit to an Integer" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.setrlimit when passed an Object raises a TypeError if #to_int for resource does not return an Integer" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.setrlimit when passed on Object calls #to_int if #to_str does not return a String" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.setrlimit when passed on Object calls #to_str to convert to a String" # NameError: uninitialized constant Process::RLIMIT_CORE
-  fails "Process.setsid establishes this process as a new session and process group leader" # NotImplementedError: NotImplementedError
-  fails "Process.uid= raises Errno::ERPERM if run by a non privileged user trying to set the superuser id from username" # Expected Errno::EPERM but got: TypeError (no implicit conversion of String into Integer)
-  fails "Process.waitall returns an array of pid/status pairs" # Expected nil (NilClass) to be kind of Array
-  fails "Process.waitall returns an empty array when there are no children" # Expected nil == [] to be truthy but was false
-  fails "Process.waitall waits for all children" # Expected Errno::ESRCH but no exception was raised (1 was returned)
-  fails "Process.waitpid returns nil when the process has not yet completed and WNOHANG is specified" # NameError: uninitialized constant Process::WNOHANG
+  fails "Process.spawn closes STDERR in the child if :err => :close" # Expected (1830): "out\nrescued\n"         but got: "out\n" Backtrace
+  fails "Process.spawn defaults :close_others to false" # Expected "" ==  "inherited " to be truthy but was false
+  fails "Process.spawn joins a new process group if pgroup: 0" # NotImplementedError: pgroup options is not available
+  fails "Process.spawn joins a new process group if pgroup: true" # NotImplementedError: pgroup options is not available
+  fails "Process.spawn joins the current process if pgroup: false" # NotImplementedError: pgroup options is not available
+  fails "Process.spawn joins the current process if pgroup: nil" # NotImplementedError: pgroup options is not available
+  fails "Process.spawn joins the specified process group if pgroup: pgid" # NotImplementedError: pgroup option is not available
+  fails "Process.spawn raises a TypeError if given a symbol as :pgroup option" # Expected TypeError but no exception was raised (56826 was returned)
+  fails "Process.spawn raises an ArgumentError when passed a string key in options" # Expected ArgumentError but no exception was raised (56902 was returned)
+  fails "Process.spawn raises an Errno::EACCES or Errno::EISDIR when passed a directory" # Expected SystemCallError but no exception was raised (61901 was returned)
+  fails "Process.spawn raises an Errno::EACCES when the file does not have execute permissions" # Expected Errno::EACCES but no exception was raised (61900 was returned)
+  fails "Process.spawn raises an Errno::ENOENT if the command does not exist" # Expected Errno::ENOENT but no exception was raised (61482 was returned)
+  fails "Process.spawn redirects STDERR to child STDOUT if :err => [:child, :out]" # Expected (1302): "glark\n"         but got: "" Backtrace
+  fails "Process.spawn redirects STDOUT to the given file if out: [String name, String mode]" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open '/home/jan/workspace/opal/tmp/rubyspec_temp/process_spawn.txt'
+  fails "Process.spawn redirects default file descriptor to itself" # NotImplementedError: limited redirection
+  fails "Process.spawn redirects non-default file descriptor to itself" # NotImplementedError: limited redirection
+  fails "Process.spawn sets the umask if given the :umask option" # Expected (STDOUT): "146"           but got: "18" Backtrace
+  fails "Process.spawn uses the current umask by default" # Expected (STDOUT): "9"           but got: "18" Backtrace
+  fails "Process.spawn when passed close_others: false closes file descriptors >= 3 in the child process because they are set close_on_exec by default" # NotImplementedError: close_others option is not available
+  fails "Process.spawn when passed close_others: false does not close STDERR" # Expected exit status is 0 but actual is 1 for command ruby_exe("bundle exec opal -Rnode /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb 2> /home/jan/workspace/opal/tmp/rubyspec_temp/process_spawn.txt") Output:
+  fails "Process.spawn when passed close_others: false does not close STDIN" # Expected exit status is 0 but actual is 1 for command ruby_exe("bundle exec opal -Rnode /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb < ruby/core/process/fixtures/in.txt > /home/jan/workspace/opal/tmp/rubyspec_temp/process_spawn.txt") Output:
+  fails "Process.spawn when passed close_others: false does not close STDOUT" # Expected exit status is 0 but actual is 1 for command ruby_exe("bundle exec opal -Rnode /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb > /home/jan/workspace/opal/tmp/rubyspec_temp/process_spawn.txt") Output:
+  fails "Process.spawn when passed close_others: false does not close file descriptors >= 3 in the child process if fds are set close_on_exec=false" # NotImplementedError: close_others option is not available
+  fails "Process.spawn when passed close_others: true closes file descriptors >= 3 in the child process even if fds are set close_on_exec=false" # NotImplementedError: close_others option is not available
+  fails "Process.spawn when passed close_others: true does not close STDERR" # Expected exit status is 0 but actual is 1 for command ruby_exe("bundle exec opal -Rnode /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb 2> /home/jan/workspace/opal/tmp/rubyspec_temp/process_spawn.txt") Output:
+  fails "Process.spawn when passed close_others: true does not close STDIN" # Expected exit status is 0 but actual is 1 for command ruby_exe("bundle exec opal -Rnode /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb < ruby/core/process/fixtures/in.txt > /home/jan/workspace/opal/tmp/rubyspec_temp/process_spawn.txt") Output:
+  fails "Process.spawn when passed close_others: true does not close STDOUT" # Expected exit status is 0 but actual is 1 for command ruby_exe("bundle exec opal -Rnode /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb > /home/jan/workspace/opal/tmp/rubyspec_temp/process_spawn.txt") Output:
+  fails "Process.spawn with Integer option keys maps the key to a file descriptor in the child that inherits the file descriptor from the parent specified by the value" # NotImplementedError: only limited redirection possible for fd 0, 1, 2
+  fails "Process.spawn with a command array raises a TypeError if an element in the Array does not respond to #to_str" # Expected TypeError but no exception was raised (55701 was returned)
+  fails "Process.spawn with a single argument raises a TypeError if the argument does not respond to #to_str" # Expected TypeError but no exception was raised (55284 was returned)
+  fails "Process.spawn with multiple arguments raises a TypeError if an argument does not respond to #to_str" # Expected TypeError but no exception was raised (42716 was returned)
   fails_badly "Process.detach produces the exit Process::Status as the thread value" # NotImplementedError: NotImplementedError
   fails_badly "Process.detach provides a #pid method on the returned thread which returns the PID" # NotImplementedError: NotImplementedError
   fails_badly "Process.detach reaps the child process's status automatically" # NotImplementedError: NotImplementedError
   fails_badly "Process.detach returns a thread" # NotImplementedError: NotImplementedError
   fails_badly "Process.detach sets the :pid thread-local to the PID" # NotImplementedError: NotImplementedError
-  fails_badly "Process.setpgid sets the process group id of the specified process" # NotImplementedError: NotImplementedError
-  fails_badly "Process.setpgrp and Process.getpgrp sets and gets the process group ID of the calling process" # NotImplementedError: NotImplementedError
 end

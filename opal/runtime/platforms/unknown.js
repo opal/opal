@@ -46,10 +46,6 @@ platform.sysname ||= ()=>"unknown";
 platform.tmpdir ||= ()=>"/tmp";
 platform.version ||= ()=>"unknown";
 
-// TextDecoder
-// For new platforms implement accodingly and remove the ||
-platform.text_decoder ||= TextDecoder;
-
 // Exit
 // For new platforms implement accodingly and remove the ||
 platform.exit ||= (status)=>console.log('Exited with status ' + status);
@@ -73,23 +69,23 @@ if (!platform.env_keys) {
   platform.env_set = (key, value)=>env[key.toString()]=value.toString();
 }
 
-// Process
+// Syscalls
 // For new platforms implement accodingly.
-// platform.process_getegid = not_implemented;
-// platform.process_setegid = not_implemented;
-// platform.process_geteuid = not_implemented;
-// platform.process_seteuid = not_implemented;
-// platform.process_getgid = not_implemented;
-// platform.process_setgid = not_implemented;
-// platform.process_getgroups = not_implemented;
-// platform.process_setgroups = not_implemented;
-// platform.process_getuid = not_implemented;
-// platform.process_setuid = not_implemented;
+// platform.getegid = not_implemented;
+// platform.geteuid = not_implemented;
+// platform.getgid = not_implemented;
+// platform.getgroups = not_implemented;
+// platform.getpid = not_implemented;
+// platform.getppid = not_implemented;
+// platform.getuid = not_implemented;
+// platform.kill = not_implemented;
+// platform.setegid = not_implemented;
+// platform.seteuid = not_implemented;
+// platform.setgid = not_implemented;
+// platform.setgroups = not_implemented;
+// platform.setproctitle = not_implemented;
+// platform.setuid = not_implemented;
 platform.process_sig_list ||= Opal.nil; // or use a Map, see node driver
-// platform.process_kill = not_implemented;
-// platform.process_pid = not_implemented;
-// platform.process_ppid = not_implemented;
-// platform.process_set_title = not_implemented;
 // platform.process_is_primary = not_implemented;
 // platform.process_is_worker = not_implemented;
 // platform.process_fork = not_implemented;

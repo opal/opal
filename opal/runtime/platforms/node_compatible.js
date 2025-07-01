@@ -4,19 +4,31 @@
 
 // Note to self: https://nodejs.org/api/tty.html
 
-if (["graalnodejs", "node"].includes(Opal.platform.name)) {
+if (Opal.platform.name == "node") {
 Opal.queue(async function() {
 
 const platform = Opal.platform;
 
 // imports
-const child_process = await import("node:child_process");
-const cluster = await import("node:cluster");
-const fs = await import("node:fs");
-const os = await import("node:os");
-const path = await import("node:path");
+const child_process = require("node:child_process");
+const cluster = require("node:cluster");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
 const process = Opal.global.process;
-const url = await import("node:url");
+const url = require("node:url");
+
+let accelerator;
+try {
+  accelerator = require("opal-accelerator");
+} catch {
+  console.warn("opal-accelerator not loaded");
+}
+
+// we need to pass on 'node_modules' to spawning processes, so lets detect it:
+let node_modules_path;
+if (fs.existsSync(path.join(process.cwd(), 'node_modules')))
+  node_modules_path = path.resolve(path.join(process.cwd(), 'node_modules'));
 
 // allow access to modules from stdlib, this is node specific and only used by open-uri
 platform.modules = { child_process, fs, os, path, url };
@@ -78,9 +90,6 @@ platform.sysname = os.type;
 platform.tmpdir = ()=>os.tmpdir().replaceAll(path.sep, '/');
 platform.version = os.version;
 
-// TextDecoder
-platform.text_decoder = TextDecoder;
-
 // Exit
 platform.exit = process.exit;
 
@@ -131,27 +140,18 @@ function process_set_any_id(id, fun) {
   if (typeof fun === "function") return action(fun, id);
   return -1;
 }
-platform.process_getegid = (typeof process.getegid === "function") ? process.getegid : ()=>-1;
-platform.process_setegid = (gid)=>process_set_any_id(gid, process.setegid);
-platform.process_geteuid = (typeof process.geteuid === "function") ? process.geteuid : ()=>-1;
-platform.process_seteuid = (uid)=>process_set_any_id(uid, process.seteuid);
-platform.process_getgid = (typeof process.getgid === "function") ? process.getgid : ()=>-1;
-platform.process_setgid = (gid)=>process_set_any_id(gid, process.seteid);
-platform.process_getgroups = (typeof process.getgroups === "function") ? process.getgroups : ()=>[];
-platform.process_setgroups = (grps)=>{
-  if (typeof process.setgroups === "function") return action(process.setgroups, grps);
-  return [];
-}
-platform.process_getuid = (typeof process.getuid === "function") ? process.getuid : ()=>-1;
-platform.process_setuid = (uid)=>process_set_any_id(uid, process.setuid);
-platform.process_sig_list = (new Map()).set("EXIT",0).set("HUP",1).set("INT",2).set("ILL",4).set("TRAP",5).set("ABRT",6)
-                                    .set("IOT",6).set("FPE",8).set("KILL",9).set("BUS",7).set("SEGV",11).set("SYS",31)
-                                    .set("PIPE",13).set("ALRM",14).set("TERM",15).set("URG",23).set("STOP",19)
-                                    .set("TSTP",20).set("CONT",18).set("CHLD",17).set("CLD",17).set("TTIN",21)
-                                    .set("TTOU",22).set("IO",29).set("XCPU",24).set("XFSZ",25).set("VTALRM",26)
-                                    .set("PROF",27).set("WINCH",28).set("USR1",10).set("USR2",12).set("PWR",30)
-                                    .set("POLL",29);
-platform.process_kill = (pid, signal)=>{
+
+// Syscalls
+platform.getegid = (typeof process.getegid === "function") ? process.getegid : ()=>-1;
+platform.geteuid = (typeof process.geteuid === "function") ? process.geteuid : ()=>-1;
+platform.getgid = (typeof process.getgid === "function") ? process.getgid : ()=>-1;
+platform.getgroups = (typeof process.getgroups === "function") ? process.getgroups : ()=>[];
+platform.getpid = ()=>process.pid;
+platform.getppid = ()=>process.ppid;
+platform.getuid = (typeof process.getuid === "function") ? process.getuid : ()=>-1;
+platform.initgroups = (typeof process.initgroups === "function") ?
+  (user, gid)=>action(process.initgroups, user.toString(), gid) : ()=>[];
+platform.kill = (pid, signal)=>{
   if (children[pid]) {
     children[pid].kill(platform.process_sig_list.get('SIG' + signal.toString()));
     delete children[pid];
@@ -159,9 +159,22 @@ platform.process_kill = (pid, signal)=>{
     action(process.kill, pid, platform.process_sig_list.get('SIG' + signal.toString()));
   }
 }
-platform.process_pid = ()=>process.pid;
-platform.process_ppid = ()=>process.ppid;
-platform.process_set_title = (title)=> { process.title = title.toString(); }
+platform.setegid = (gid)=>process_set_any_id(gid, process.setegid);
+platform.seteuid = (uid)=>process_set_any_id(uid, process.seteuid);
+platform.setgid = (gid)=>process_set_any_id(gid, process.seteid);
+platform.setgroups = (grps)=>{
+  if (typeof process.setgroups === "function") return action(process.setgroups, grps);
+  return [];
+}
+platform.setproctitle = (title)=> { process.title = title.toString(); }
+platform.setuid = (uid)=>process_set_any_id(uid, process.setuid);
+platform.process_sig_list = (new Map()).set("EXIT",0).set("HUP",1).set("INT",2).set("ILL",4).set("TRAP",5).set("ABRT",6)
+                                    .set("IOT",6).set("FPE",8).set("KILL",9).set("BUS",7).set("SEGV",11).set("SYS",31)
+                                    .set("PIPE",13).set("ALRM",14).set("TERM",15).set("URG",23).set("STOP",19)
+                                    .set("TSTP",20).set("CONT",18).set("CHLD",17).set("CLD",17).set("TTIN",21)
+                                    .set("TTOU",22).set("IO",29).set("XCPU",24).set("XFSZ",25).set("VTALRM",26)
+                                    .set("PROF",27).set("WINCH",28).set("USR1",10).set("USR2",12).set("PWR",30)
+                                    .set("POLL",29);
 platform.process_is_primary = ()=>cluster.isPrimary;
 platform.process_is_worker = ()=>cluster.isWorker;
 platform.process_fork = ()=>cluster.fork();
@@ -169,6 +182,12 @@ platform.process_worker_pid = (worker)=>worker.process.pid;
 platform.process_spawn = function() {
   let res, opts = arguments[arguments.length - 1], wait = opts.wait;
   delete opts.wait;
+  if (!opts.env) opts.env = process.env;
+  if (node_modules_path) {
+    if (!opts.env.NODE_PATH) opts.env.NODE_PATH = "";
+    if (opts.env.NODE_PATH.length > 0) opts.env.NODE_PATH += platform.windows ? ';' : ':';
+    opts.env.NODE_PATH += node_modules_path;
+  }
   if (platform.windows) opts.windowsHide = true;
   else opts.shell = 'sh';
   if (opts.cwd) opts.cwd = opts.cwd.toString();
@@ -192,6 +211,7 @@ platform.process_trap = (signal, _command, block)=>{
   if (block && block != Opal.nil) process.on(signal, traps[signal]);
   return last;
 }
+if (accelerator) Object.assign(platform, accelerator);
 
 // IO.pipe
 // In process pipe, because Nodejs does not support real pipes synchonously, so lets emulate them.
