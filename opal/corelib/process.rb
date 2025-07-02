@@ -513,131 +513,10 @@ module ::Process
         # - Passing string command_line to the shell.
         # - Invoking the executable at exe_path
 
-        env = {}
-        js_opts = `{ stdio: [#{$stdin.fileno}, #{$stdout.fileno}, #{$stderr.fileno}], wait: false }`
-        arg = args.shift
-        coe_arg = ::Opal.coerce_to?(arg, ::Hash, :to_hash)
-        if coe_arg
-          env = coe_arg.to_h do |k, v|
-            if v.nil?
-              [k, nil]
-            else
-              k = ::Opal.coerce_to!(k, ::String, :to_str)
-              raise(::ArgumentError, 'invalid env key') if `k.includes("\x00")` || `k.includes("=")`
-              v = ::Opal.coerce_to!(v, ::String, :to_str)
-              raise(::ArgumentError, 'env value contains null byte') if `v.includes("\x00")`
-              [k, v]
-            end
-          end
-          arg = coe_arg = nil
-        end
-
-        arg ||= args.shift
-        coe_arg = ::Opal.coerce_to?(arg, ::Array, :to_ary)
-        if coe_arg
-          raise(::ArgumentError, 'array must have 2 elements') unless coe_arg.size == 2
-          `js_opts.argv0 = #{::Opal.coerce_to!(coe_arg[1], ::String, :to_str)}`
-          raise(::ArgumentError, 'cmd contains null byte') if `js_opts.argv0.includes("\x00")`
-          cmdname = ::Opal.coerce_to!(coe_arg[0], ::String, :to_str)
-          arg = coe_arg = nil
-        else
-          raise(::ArgumentError, 'no cmd given') if !arg || arg.is_a?(::Hash)
-          cmdname = ::Opal.coerce_to!(arg, ::String, :to_str)
-        end
-        raise Errno::ENOENT if cmdname.empty?
-
-        raise(::ArgumentError, 'no command given') unless cmdname
-        raise(::ArgumentError, 'cmd contains null byte') if `cmdname.includes("\x00")`
-
-        opened_files = []
-        merge_env = true
-        coe_arg = ::Opal.coerce_to?(args.last, ::Hash, :to_hash)
-        if coe_arg
-          args.pop
-          opts = coe_arg
-
-          handle_value = ->(v, i, m) do
-            if v.is_a?(::IO)
-              `js_opts.stdio[i] = #{v.fileno}`
-            elsif v.is_a?(::Integer)
-              `js_opts.stdio[i] = #{v}`
-            elsif v.is_a?(::String)
-              f = File.open(v, m)
-              opened_files.push(f)
-              `js_opts.stdio[i] = #{f.fileno}`
-            elsif v == :close
-              `js_opts.stdio[i] = 'ignore'`
-            elsif f = ::Opal.coerce_to?(v, ::IO, :to_io)
-              `js_opts.stdio[i] = #{f.fileno}`
-            else
-              raise(::ArgumentError, "cannot handle #{v.inspect}")
-            end
-          end
-
-          opts.each do |k,v|
-            case k
-            when :chdir
-              arg = ::Opal.coerce_to?(opts[:chdir], ::String, :to_path)
-              arg ||= ::Opal.coerce_to!(opts[:chdir], ::String, :to_str)
-              raise(::ArgumentError, 'chdir contains null byte') if `arg.includes("\x00")`
-              `js_opts.cwd = #{arg}`
-            when :close_others
-              raise ::NotImplementedError, ':close_others option is not available'
-            when :in
-              handle_value.call(v, 0, 'r')
-            when :out
-              handle_value.call(v, 1, 'w')
-            when :err
-              handle_value.call(v, 2, 'w')
-            when :pgroup
-              raise(::ArgumentError) if v.is_a?(::Integer) && v < 0
-              raise ::NotImplementedError, ':pgroup option is not available'
-            when :new_group
-              raise ::NotImplementedError, ':new_group option is not available'
-            when :umask
-              raise ::NotImplementedError, ':umask option is not available'
-            when :unsetenv_others
-              merge_env = false if v
-            else
-              if k.to_s.start_with?('rlimit_')
-                # todo
-              elsif k.is_a?(::Integer)
-                if 0 <= k && k <= 2
-                  if v.is_a?(::Integer)
-                    `js_opts.stdio[k] = v`
-                  else
-                    handle_value.call(v, k, k == 0 ? 'r' : 'w')
-                  end
-                else
-                  raise ::NotImplementedError, 'only limited redirection possible for fd 0, 1, 2'
-                end
-              elsif k.is_a?(::Array)
-                k.each { |ky| raise(::ArgumentError, 'invalid stdio key') unless ky == :err || ky == :out }
-                handle_value.call(v, 1, 'w')
-                `js_opts.stdio[2] = js_opts.stdio[1]`
-              else
-                raise ::ArgumentError, 'unknown option given'
-              end
-            end
-          end
-        end
-
-        args.map! do |ag|
-          ag = ::Opal.coerce_to!(ag, ::String, :to_str)
-          raise(::ArgumentError, 'arg contains null byte') if `ag.includes("\x00")`
-          ag.inspect
-        end
-
-        env = ::ENV.to_h.merge!(env) if merge_env
-        js_env = `{}`
-        env.each { |k, v| `js_env[k.toString()] = v.toString()` if v }
-        `delete js_env["SHELL"]`
-        `js_opts.env = js_env`
-        `js_opts.shell = true` unless cmdname.match?(/^(\.\/|\/)/)
-        if `$platform.alt_sep && !js_opts.shell`
-          `js_opts.shell = true` unless cmdname.match?("^(\.\\#{`$plaform.alt_sep`}|\\#{`$plaform.alt_sep`})")
-        end
-        out = `$platform.process_spawn(#{cmdname}, #{args}, js_opts)`
+        _cmdname, out = ::Opal.process_spawn_opts_and_execute(
+          args,
+          `{ stdio: [#{$stdin.fileno}, #{$stdout.fileno}, #{$stderr.fileno}], wait: false }`
+        )
         if `out.status`
           status = `out.status > 128 ? out.status - 128 : out.status`
           raise(::Error::ENOENT) if `js_opts.shell && out.status == 127`
@@ -649,8 +528,6 @@ module ::Process
         return nil if `out.error || out.status > 125`
 
         pid
-      ensure
-        opened_files&.each(&:close)
       end
     else
       alias spawn __not_implemented__

@@ -19,7 +19,6 @@ opal_filter "Kernel" do
   fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file" # Expected "ruby/core/kernel" == "/home/jan/workspace/opal/spec/ruby/core/kernel" to be truthy but was false
   fails "Kernel#__dir__ when used in eval with top level binding returns nil" # Expected "." == nil to be truthy but was false
   fails "Kernel#` is a private method" # Expected Kernel to have private instance method '`' but it does not
-  fails "Kernel#` sets $? to the exit status of the executed sub-process" # NotImplementedError: NotImplementedError
   fails "Kernel#abort is a private method" # Expected Kernel to have private instance method 'abort' but it does not
   fails "Kernel#autoload calls main.require(path) to load the file" # Expected NameError but got: LoadError (cannot load such file -- main_autoload_not_exist)
   fails "Kernel#autoload can autoload in instance_eval" # NoMethodError: undefined method `autoload' for #<Object:0x4b3d2>
@@ -147,7 +146,6 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with a module including a module" # Expected ["n_pub", "n_pro", "n_pri", "m_pub", "m_pro", "m_pri", "pub", "pro", "pri"] not to include "m_pri"
   fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with a module including a module" # Expected ["n_pub", "n_pro", "n_pri", "m_pub", "m_pro", "m_pri", "pub", "pro", "pri"] not to include "m_pri"
   fails "Kernel#sleep accepts any Object that reponds to divmod" # TypeError: can't convert Object into time interval
-  fails "Kernel#spawn executes the given command" # Expected (STDOUT): "spawn\n"           but got: "" Backtrace
   fails "Kernel#spawn is a private method" # Expected Kernel to have private instance method 'spawn' but it does not
   fails "Kernel#sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (out of char range) but no exception was raised ("Ԇ" was returned)
   fails "Kernel#sprintf %c uses the encoding of the format string to interpret codepoints" # Exception: Invalid code point 9415601
@@ -162,6 +160,8 @@ opal_filter "Kernel" do
   fails "Kernel#sprintf returns a String in the same encoding as the format String if compatible" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:KOI8_U (dummy)>
   fails "Kernel#srand is a private method" # Expected Kernel to have private instance method 'srand' but it does not
   fails "Kernel#srand returns the system-initialized seed value on the first call" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x46d76 @seed=6933182541716747>
+  fails "Kernel#system does not expand shell variables when given multiples arguments" # Expected (STDOUT): "$TEST_SH_EXPANSION\n"           but got: "foo\n" Backtrace
+  fails "Kernel#system does not write to stderr when command execution fails" # Expected (STDERR): ""           but got: "sh: sad: not found\n" Backtrace
   fails "Kernel#system is a private method" # Expected Kernel to have private instance method 'system' but it does not
   fails "Kernel#test is a private method" # Expected Kernel to have private instance method 'test' but it does not
   fails "Kernel#trap is a private method" # Expected Kernel to have private instance method 'trap' but it does not
@@ -315,6 +315,8 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (can't convert BasicObject to String) but no exception was raised ("f" was returned)
   fails "Kernel.sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # Expected CompatibilityError but no exception was raised ("Ä Ђ" was returned)
   fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:KOI8_U (dummy)>
+  fails "Kernel.system does not expand shell variables when given multiples arguments" # Expected (STDOUT): "$TEST_SH_EXPANSION\n"           but got: "foo\n" Backtrace
+  fails "Kernel.system does not write to stderr when command execution fails" # Expected (STDERR): ""           but got: "sh: sad: not found\n" Backtrace
   fails_badly "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x5b168>
   fails_badly "Kernel#autoload when called from included module's method setups the autoload on the included module"
   fails_badly "Kernel#autoload when called from included module's method the autoload is reachable from the class too"

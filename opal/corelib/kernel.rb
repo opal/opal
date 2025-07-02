@@ -677,44 +677,10 @@ module ::Kernel
       # Creates a new child process by doing one of the following in that process:
       #   Passing string command_line to the shell.
       #   Invoking the executable at exe_path.
-      env = {}
-      env = argv.shift if argv.first.is_a? ::Hash
-      env = ::ENV.to_h.merge!(env)
-      js_env = `{}`
-      env.each { |k, v| `js_env[k] = v.toString()` }
-      `delete js_env["SHELL"]`
-      js_opts = `{ stdio: 'pipe', env: js_env, wait: true }`
-
-      cmdname = argv.shift
-      if Array === cmdname
-        `js_opts.argv0 = #{cmdname[1]}`
-        cmdname = cmdname[0]
-      end
-
-      args = []
-
-      shell = if ::File.absolute_path?(cmdname)
-                false
-              else
-                true
-              end
-
-      while argv[0].is_a?(::String)
-        args << argv.shift
-      end
-
-      opts = argv.shift
-
-      if opts.is_a?(::Hash)
-        `js_opts.cwd = #{opts[:chdir]}` if opts.key?(:chdir)
-        so = opts[:out]
-        se = opts[:err]
-      end
-
-      `js_opts.shell = shell`
-
-      out = `$platform.process_spawn(#{cmdname}, #{args}, js_opts)`
-
+      cmdname, out = ::Opal.process_spawn_opts_and_execute(
+        argv,
+        `{ stdio: [#{$stdin.fileno}, #{$stdout.fileno}, #{$stderr.fileno}], wait: true }`
+      )
       status = `out.status > 128 ? out.status - 128 : out.status`
       pid = `out.pid == null ? nil : out.pid`
       $? = ::Process::Status.new(`{ status: status, flags: 4 }`, pid)
@@ -726,11 +692,6 @@ module ::Kernel
       end
 
       return nil if `out.error || out.status > 125`
-
-      (so || $stdout).write(`out.stdout`) if `out.stdout`
-      if `out.stderr` && ((`$platform.windows` && se != 'NUL') || (`!$platform.windows` && se != '/dev/null'))
-        (se || $stderr).write(`out.stderr`)
-      end
 
       status == 0
     end
