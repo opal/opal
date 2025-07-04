@@ -146,6 +146,7 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with a module including a module" # Expected ["n_pub", "n_pro", "n_pri", "m_pub", "m_pro", "m_pri", "pub", "pro", "pri"] not to include "m_pri"
   fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with a module including a module" # Expected ["n_pub", "n_pro", "n_pri", "m_pub", "m_pro", "m_pri", "pub", "pro", "pri"] not to include "m_pri"
   fails "Kernel#sleep accepts any Object that reponds to divmod" # TypeError: can't convert Object into time interval
+  fails "Kernel#spawn executes the given command" # NotImplementedError: NotImplementedError
   fails "Kernel#spawn is a private method" # Expected Kernel to have private instance method 'spawn' but it does not
   fails "Kernel#sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (out of char range) but no exception was raised ("Ԇ" was returned)
   fails "Kernel#sprintf %c uses the encoding of the format string to interpret codepoints" # Exception: Invalid code point 9415601

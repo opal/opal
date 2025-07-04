@@ -94,7 +94,7 @@ platform.env_set = (key, value)=> {
   if (key === "TZ") {
     // Node understands only timezones in the form of "TZ identifiers" like in the Table at
     // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. To make setting TZ work
-    // when given in Ruby style "PDT8:00:00" it must be converted to "Etc/GMT+8". TZ can be set to "PDT8:00:00",
+    // when given in Ruby style "PDT8:00:00", it must be converted to "Etc/GMT+8". TZ can be set to "PDT8:00:00",
     // but node will not change its timezone, "Etc/GMT+8" must be used in this case to have an effect on eg.
     // new Date(). This applies to other zones too, of course, but just for specs, lets be happy with a few.
     if (value.includes(':')) {

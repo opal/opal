@@ -21,6 +21,7 @@ opal_filter "File" do
   fails "File.join inserts the separator in between empty strings and arrays" # Expected "" == "/" to be truthy but was false
   fails "File.join respects the given separator if only one part has a boundary separator" # Expected "usr/bin" == "usr//bin" to be truthy but was false
   fails "File.join returns a duplicate string when given a single argument" # Expected "usr" not to be identical to "usr"
+  fails "File.lchmod changes the file mode of the link and not of the file" # NotImplementedError: NotImplementedError
   fails "File.new accepts options as a keyword argument" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but no exception was raised (<File:fd 14> was returned)
   fails "File.open accepts options as a keyword argument" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but no exception was raised (<File:fd 8> was returned)
   fails "File.open raises an ArgumentError if passed the wrong number of arguments" # Expected ArgumentError but no exception was raised (<File:fd 6> was returned)
