@@ -140,7 +140,7 @@ end
 # For other specs not to break, Kernel.test must be a private method.
 # So for the moment, until we got private methods, we cannot use it.
 
-# if `$platform.file_stat && $platform.file_lstat`
+# if `$platform.stat && $platform.lstat`
 # module ::Kernel
 #   def test(char, path0, path1 = nil)
 #     # Performs a test on one or both of the filesystem entities at the given paths path0 and path1:

@@ -63,14 +63,21 @@ if (!platform.env_keys) {
   // This is a simple emulation. For new platforms implement accodingly and remove the surrounding if.
   const env = { __proto__: null };
   platform.env_keys = ()=>Object.keys(env);
-  platform.env_get = (key)=>env[key.toString()];
-  platform.env_del = (key)=>{ delete env[key.toString()]; };
-  platform.env_has = (key)=>env[key.toString()] != null;
-  platform.env_set = (key, value)=>env[key.toString()]=value.toString();
+  platform.env_get = (key)=>env[key];
+  platform.env_del = (key)=>{ delete env[key]; };
+  platform.env_has = (key)=>env[key] != null;
+  platform.env_set = (key, value)=>env[key]=value;
 }
 
 // Syscalls
 // For new platforms implement accodingly.
+// platform.chdir = not_implemented;
+// platform.chmod = not_implemented;
+// platform.chown = not_implemented;
+// platform.fchmod = not_implemented;
+// platform.fchown = not_implemented;
+// platform.flock = not_implemented;
+// platform.ftruncate = not_implemented;
 // platform.getegid = not_implemented;
 // platform.geteuid = not_implemented;
 // platform.getgid = not_implemented;
@@ -79,12 +86,24 @@ if (!platform.env_keys) {
 // platform.getppid = not_implemented;
 // platform.getuid = not_implemented;
 // platform.kill = not_implemented;
+// platform.link = not_implemented;
+// platform.lstat = not_implemented;
+// platform.mkdir = not_implemented;
+// platform.readlink = not_implemented;
+// platform.rename = not_implemented;
+// platform.rmdir = not_implemented;
 // platform.setegid = not_implemented;
 // platform.seteuid = not_implemented;
 // platform.setgid = not_implemented;
 // platform.setgroups = not_implemented;
 // platform.setproctitle = not_implemented;
 // platform.setuid = not_implemented;
+// platform.stat = not_implemented;
+// platform.symlink = not_implemented;
+// platform.truncate = not_implemented;
+// platform.umask = not_implemented;
+// platform.unlink = not_implemented;
+
 platform.process_sig_list ||= Opal.nil; // or use a Map, see node driver
 // platform.process_is_primary = not_implemented;
 // platform.process_is_worker = not_implemented;
@@ -138,41 +157,22 @@ platform.io_write ||= (fd, io_buffer, buffer_offset, _pos, count)=>{
 
 // File
 // For new platforms implement accodingly.
-// platform.file_chmod = not_implemented;
-// platform.file_chown = not_implemented;
-// platform.file_fchmod = not_implemented;
-// platform.file_fchown = not_implemented;
-// platform.file_flock = not_implemented;
-// platform.file_ftruncate = not_implemented;
-// platform.file_get_umask = not_implemented;
-// platform.file_set_umask = not_implemented;
 // platform.file_lchmod = not_implemented;
 // platform.file_lchown = not_implemented;
-// platform.file_link = not_implemented;
-// platform.file_lstat = not_implemented;
 // platform.file_lutime = not_implemented;
 // platform.file_mkfifo = not_implemented;
-// platform.file_readlink = not_implemented;
 // platform.file_realpath = not_implemented;
-// platform.file_rename = not_implemented;
-// platform.file_stat = not_implemented;
-// platform.file_symlink = not_implemented;
-// platform.file_truncate = not_implemented;
-// platform.file_unlink = not_implemented;
 // platform.file_utime = not_implemented;
 
 // Dir
 // For new platforms implement accodingly:
-// platform.dir_chdir = not_implemented;
 // platform.dir_chroot = not_implemented;
 // platform.dir_close = not_implemented;
 // platform.dir_home = not_implemented;
 // platform.dir_open = not_implemented;
-// platform.dir_mkdir = not_implemented;
 // platform.dir_next = not_implemented;
 // platform.dir_path = not_implemented;
 // platform.dir_rewind = not_implemented;
-// platform.dir_unlink = not_implemented;
 
 // dir_wd must be implemented
 platform.dir_wd ||= ()=>'/';

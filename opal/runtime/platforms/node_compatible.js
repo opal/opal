@@ -1,5 +1,5 @@
 //
-// Node 22 or greater and GraalNodeJs
+// Driver for Node 22 or greater and GraalNodeJs
 //
 
 // Note to self: https://nodejs.org/api/tty.html
@@ -18,14 +18,7 @@ const path = require("node:path");
 const process = Opal.global.process;
 const url = require("node:url");
 
-let accelerator;
-try {
-  accelerator = require("opal-accelerator");
-} catch {
-  console.warn("opal-accelerator not loaded");
-}
-
-// we need to pass on 'node_modules' to spawning processes, so lets detect it:
+// we need to pass the 'node_modules' path to spawning processes, so lets detect it:
 let node_modules_path;
 if (fs.existsSync(path.join(process.cwd(), 'node_modules')))
   node_modules_path = path.resolve(path.join(process.cwd(), 'node_modules'));
@@ -48,15 +41,6 @@ function action(action, ...args) {
     Opal.Kernel.$raise(error);
   }
 };
-
-function ary_toString(ary) {
-  if (!ary) return;
-  for(let i = 0; i < ary.length; i++) {
-    if (ary[i] instanceof String) ary[i] = ary[i].toString();
-    else if (ary[i] instanceof Array) ary[i] = ary_toString(ary[i]);
-  }
-  return ary;
-}
 
 // RUBY_PLATFORM and some OS dependent switches
 if (os.platform().startsWith("win")) {
@@ -101,12 +85,12 @@ platform.argv = process.argv.slice(1)
 
 // ENV
 platform.env_keys = ()=>Object.keys(process.env).sort();
-platform.env_get = (key)=>process.env[key.toString()];
-platform.env_del = (key)=>{ delete process.env[key.toString()]; };
-platform.env_has = (key)=>process.env[key.toString()] != null;
+platform.env_get = (key)=>process.env[key];
+platform.env_del = (key)=>{ delete process.env[key]; };
+platform.env_has = (key)=>process.env[key] != null;
 platform.env_set = (key, value)=> {
-  key = key.toString();
-  value = value.toString();
+  key = key;
+  value = value;
   if (key === "TZ") {
     // Node understands only timezones in the form of "TZ identifiers" like in the Table at
     // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. To make setting TZ work
@@ -130,18 +114,20 @@ platform.env_set = (key, value)=> {
   return process.env[key] = value;
 };
 
-// Process
-// Some of the functions are not available on all platforms node runs on.
-const children = { __proto__: null };
-const traps = { __proto__: null };
-
-function process_set_any_id(id, fun) {
-  if (id instanceof String) id = id.toString();
-  if (typeof fun === "function") return action(fun, id);
-  return -1;
-}
-
 // Syscalls
+// Some of the functions are not available on all platforms node runs on.
+platform.chdir = (dir_name)=>action(process.chdir, dir_name);
+platform.chmod = (file_name, mode)=>action(fs.chmodSync, file_name, mode);
+platform.chown = (file_name, uid, gid)=>action(fs.chownSync, file_name, uid, gid);
+platform.fchmod = (fd, mode)=>{
+  if (!fs.fchmodSync) platform.not_implemented("File#chmod is not available on " + platform.name);
+  action(fs.fchmodSync, fd, mode);
+}
+platform.fchown = (fd, uid, gid)=>{
+  if (!fs.fchownSync) platform.not_implemented("File#chown is not available on " + platform.name);
+  action(fs.fchownSync, fd, uid, gid);
+}
+platform.ftruncate = (fd, len)=>action(fs.ftruncateSync, fd, len);
 platform.getegid = (typeof process.getegid === "function") ? process.getegid : ()=>-1;
 platform.geteuid = (typeof process.geteuid === "function") ? process.geteuid : ()=>-1;
 platform.getgid = (typeof process.getgid === "function") ? process.getgid : ()=>-1;
@@ -150,24 +136,55 @@ platform.getpid = ()=>process.pid;
 platform.getppid = ()=>process.ppid;
 platform.getuid = (typeof process.getuid === "function") ? process.getuid : ()=>-1;
 platform.initgroups = (typeof process.initgroups === "function") ?
-  (user, gid)=>action(process.initgroups, user.toString(), gid) : ()=>[];
+  (user, gid)=>action(process.initgroups, user, gid) : ()=>[];
 platform.kill = (pid, signal)=>{
   if (children[pid]) {
-    children[pid].kill(platform.process_sig_list.get('SIG' + signal.toString()));
+    children[pid].kill(platform.process_sig_list.get('SIG' + signal));
     delete children[pid];
   } else {
-    action(process.kill, pid, platform.process_sig_list.get('SIG' + signal.toString()));
+    action(process.kill, pid, platform.process_sig_list.get('SIG' + signal));
   }
 }
-platform.setegid = (gid)=>process_set_any_id(gid, process.setegid);
-platform.seteuid = (uid)=>process_set_any_id(uid, process.seteuid);
-platform.setgid = (gid)=>process_set_any_id(gid, process.seteid);
+platform.link = (path_name, new_path_name)=>action(fs.linkSync, path_name, new_path_name);
+platform.lstat = (file_name)=>action(fs.lstatSync, file_name);
+platform.mkdir = (dir_name, mode)=>{
+  dir_name = dir_name;
+  action(fs.mkdirSync, dir_name, { mode: mode });
+  // Sometimes on Windows mode is not set correctly in mkdirSync
+  if (platform.windows) fs.chmodSync(dir_name, mode);
+}
+platform.readlink = (path_name)=>action(fs.readlinkSync, path_name).replaceAll(path.sep, '/');
+platform.rename = (old_name, new_name)=>action(fs.renameSync, old_name, new_name);
+platform.rmdir = (dir_name)=>{
+  if (fs.existsSync(dir_name)) {
+    // On Windows rmdirSync may throw the wrong exception, ENOENT instead of ENOTDIR
+    let stat = fs.lstatSync(dir_name)
+    if (!stat.isDirectory()) {
+      let error_class = Opal.Object.$const_get('Errno').$const_get('ENOTDIR');
+      Opal.Kernel.$raise(error_class.$new('not a directory'));
+    }
+  }
+  action(fs.rmdirSync, dir_name);
+}
+platform.setegid = (typeof process.setegid === "function") ? (gid)=>action(process.setegid, gid) : ()=>-1;
+platform.seteuid = (typeof process.seteuid === "function") ? (uid)=>action(process.seteuid, uid) : ()=>-1;
+platform.setgid = (typeof process.setgid === "function") ? (gid)=>action(process.setgid, gid) : ()=>-1;
 platform.setgroups = (grps)=>{
   if (typeof process.setgroups === "function") return action(process.setgroups, grps);
   return [];
 }
-platform.setproctitle = (title)=> { process.title = title.toString(); }
-platform.setuid = (uid)=>process_set_any_id(uid, process.setuid);
+platform.setproctitle = (title)=> { process.title = title; }
+platform.setuid = (typeof process.setuid === "function") ? (uid)=>action(process.setuid, uid) : ()=>-1;
+platform.stat = (file_name)=>action(fs.statSync, file_name);
+platform.symlink = (path_name, new_path_name)=>action(fs.symlinkSync, path_name, new_path_name);
+platform.truncate = (file_name, len)=>action(fs.truncateSync, file_name, len);
+platform.unlink = (file_name)=>action(fs.unlinkSync, file_name);
+platform.umask = process.umask
+
+// Process
+const children = { __proto__: null };
+const traps = { __proto__: null };
+
 platform.process_sig_list = (new Map()).set("EXIT",0).set("HUP",1).set("INT",2).set("ILL",4).set("TRAP",5).set("ABRT",6)
                                     .set("IOT",6).set("FPE",8).set("KILL",9).set("BUS",7).set("SEGV",11).set("SYS",31)
                                     .set("PIPE",13).set("ALRM",14).set("TERM",15).set("URG",23).set("STOP",19)
@@ -190,28 +207,26 @@ platform.process_spawn = function() {
   }
   if (platform.windows) opts.windowsHide = true;
   else opts.shell = 'sh';
-  if (opts.cwd) opts.cwd = opts.cwd.toString();
   if (wait) {
-    res = child_process.spawnSync.apply(null, ary_toString(arguments));
+    res = child_process.spawnSync.apply(null, arguments);
     return { status: res.status, pid: res.pid, error: res.error,
       stdout: res.stdout ? res.stdout.toString() : null,
       stderr: res.stderr ? res.stderr.toString() : null };
   } else {
-    res = child_process.spawn.apply(null, ary_toString(arguments));
+    res = child_process.spawn.apply(null, arguments);
     children[res.pid] = res;
     return { status: res.exitCode, pid: res.pid, error: null, stdout: '', stderr: '' }
   }
 }
 platform.process_trap = (signal, _command, block)=>{
   if (block == Opal.nil) block = null;
-  signal = 'SIG' + signal.toString();
+  signal = 'SIG' + signal;
   let last = traps[signal];
   if (last) process.off(signal, last);
   traps[signal] = block;
   if (block && block != Opal.nil) process.on(signal, traps[signal]);
   return last;
 }
-if (accelerator) Object.assign(platform, accelerator);
 
 // IO.pipe
 // In process pipe, because Nodejs does not support real pipes synchonously, so lets emulate them.
@@ -373,7 +388,7 @@ class SpawnPipe {
 }
 
 platform.io_popen = function(cmd, args, mode, options) {
-  let pp = new SpawnPipe(1024, cmd.toString(), ary_toString(args), mode.toString(), options);
+  let pp = new SpawnPipe(1024, cmd, args, mode, options);
   platform.pipes[pp.fd] = pp;
   return [pp.fd, pp.pid];
 }
@@ -383,8 +398,8 @@ function emulate_ctx(c, t, x , path_name, perm) {
   if (c && x && fs.existsSync(path_name))
     Opal.Kernel.$raise(Opal.Errno.EEXIST, "file already exists, open '" + path_name + "'");
   if (c && !fs.existsSync(path_name)) fs.writeFileSync(path_name, '', { mode: perm });
-  if (!c || x) platform.file_stat(path_name); // will raise if file doesn't exist
-  if (t) platform.file_truncate(path_name, 0);
+  if (!c || x) platform.stat(path_name); // will raise if file doesn't exist
+  if (t) platform.truncate(path_name, 0);
 }
 function emulated_flags_to_mode(flags, path_name, perm) {
   const o = Opal.File.Constants;
@@ -445,7 +460,7 @@ platform.io_open = (fd)=>{
   return [tty, pipe, file];
 };
 platform.io_open_path = (path_name, flags, perm)=>{
-  path_name = path_name.toString();
+  path_name = path_name;
   let mode = flags_to_mode(flags);
   if (!mode) mode = emulated_flags_to_mode(flags, path_name, perm);
   return action(fs.openSync, path_name, mode, perm);
@@ -482,46 +497,19 @@ platform.io_write = (fd, io_buffer, buffer_offset, pos, count)=>{
 };
 
 // File
-let file_umask = 18;
-platform.file_chmod = (file_name, mode)=>action(fs.chmodSync, file_name.toString(), mode);
-platform.file_chown = (file_name, uid, gid)=>action(fs.chownSync, file_name.toString(), uid, gid);
-platform.file_fchmod = (fd, mode)=>{
-  if (!fs.fchmodSync) Opal.Kernel.$raise(Opal.NotImplementedError, "File#chmod is not available on " + platform.name);
-  action(fs.fchmodSync, fd, mode);
-}
-platform.file_fchown = (fd, uid, gid)=>{
-  if (!fs.fchownSync) Opal.Kernel.$raise(Opal.NotImplementedError, "File#chown is not available on " + platform.name);
-  action(fs.fchownSync, fd, uid, gid);
-}
-platform.file_ftruncate = (fd, len)=>action(fs.ftruncateSync, fd, len);
-platform.file_get_umask = ()=>file_umask; // process.umask() without args in node is deprecated, lets emulate
-platform.file_set_umask = function(umask) {
-  file_umask = umask;
-  return process.umask(umask);
-}
-platform.file_link = (path_name, new_path_name)=>action(fs.linkSync, path_name.toString(), new_path_name.toString());
-platform.file_lstat = (file_name)=>action(fs.lstatSync, file_name.toString());
-platform.file_lutime = (file_name, atime, mtime)=>action(fs.lutimesSync, file_name.toString(), atime, mtime);
+platform.file_lutime = (file_name, atime, mtime)=>action(fs.lutimesSync, file_name, atime, mtime);
 if (!platform.windows) {
   platform.file_mkfifo = (file_name, mode)=>{
     let mode_s = mode.toString(8);
     if (mode_s.length > 3) mode_s = mode_s.slice(mode_s.length - 3);
-    let res = child_process.spawnSync('mkfifo', ['-m', mode_s, file_name.toString()]);
+    let res = child_process.spawnSync('mkfifo', ['-m', mode_s, file_name]);
     return res.status;
   }
 }
-platform.file_readlink = (path_name)=>action(fs.readlinkSync, path_name.toString()).replaceAll(path.sep, '/');
 platform.file_realpath = (path_name, sep)=>{
-  return action(fs.realpathSync, path_name.toString()).replaceAll(path.sep, sep.toString());
+  return action(fs.realpathSync, path_name).replaceAll(path.sep, sep);
 }
-platform.file_rename = (old_name, new_name)=>action(fs.renameSync, old_name.toString(), new_name.toString());
-platform.file_stat = (file_name)=>action(fs.statSync, file_name.toString());
-platform.file_symlink = (path_name, new_path_name)=>{
-  action(fs.symlinkSync, path_name.toString(), new_path_name.toString());
-}
-platform.file_truncate = (file_name, len)=>action(fs.truncateSync, file_name.toString(), len);
-platform.file_unlink = (file_name)=>action(fs.unlinkSync, file_name.toString());
-platform.file_utime = (file_name, atime, mtime)=>action(fs.utimesSync, file_name.toString(), atime, mtime);
+platform.file_utime = (file_name, atime, mtime)=>action(fs.utimesSync, file_name, atime, mtime);
 
 // Dir
 // As node cannot handle dirs with file descriptors, we need to emulate them.
@@ -529,7 +517,6 @@ platform.file_utime = (file_name, atime, mtime)=>action(fs.utimesSync, file_name
 // Specifically with Dir.fchdir, but otherwise we would need to allocate a real fd,
 // like above in Pipe.get_fd(), which is a bit overkill.
 let directories = { __proto__: null, last: 0 }
-platform.dir_chdir = (dir_name)=>action(process.chdir, dir_name.toString());
 platform.dir_close = (fd)=>{
   let dir = directories[fd];
   if (!dir) { return; }
@@ -538,15 +525,9 @@ platform.dir_close = (fd)=>{
 }
 platform.dir_home = ()=>os.homedir();
 platform.dir_open = (dir_name)=>{
-  let handle = action(fs.opendirSync, dir_name.toString()), fd = ++directories.last;
+  let handle = action(fs.opendirSync, dir_name), fd = ++directories.last;
   directories[fd] = { __proto__: null, handle: handle, eof: false, dot: false, dotdot: false };
   return fd;
-}
-platform.dir_mkdir = (dir_name, mode)=>{
-  dir_name = dir_name.toString()
-  action(fs.mkdirSync, dir_name, { mode: mode });
-  // Sometimes on Windows mode is not set correctly in mkdirSync
-  if (platform.windows) fs.chmodSync(dir_name, mode);
 }
 platform.dir_next = (fd)=>{
   let dir = directories[fd];
@@ -568,18 +549,6 @@ platform.dir_rewind = (fd)=>{
   let dir = directories[fd];
   dir.handle = action(fs.opendirSync, dir.handle.path);
   dir.eof = dir.dot = dir.dotdot = false;
-}
-platform.dir_unlink = (dir_name)=>{
-  dir_name = dir_name.toString();
-  if (fs.existsSync(dir_name)) {
-    // On Windows rmdirSync may throw the wrong exception, ENOENT instead of ENOTDIR
-    let stat = fs.lstatSync(dir_name)
-    if (!stat.isDirectory()) {
-      let error_class = Opal.Object.$const_get('Errno').$const_get('ENOTDIR');
-      Opal.Kernel.$raise(error_class.$new('not a directory'));
-    }
-  }
-  action(fs.rmdirSync, dir_name);
 }
 platform.dir_wd = ()=>process.cwd();
 

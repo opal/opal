@@ -34,7 +34,7 @@ class ::File < ::IO
   class Stat
     include ::Comparable
 
-    if `$platform.file_stat`
+    if `$platform.stat`
       def initialize(path, alt_stat = nil)
         # Create a File::Stat object for the given file name (raising an exception if the file doesn’t exist).
         # The alt_stat param is not official Ruby, but used internally for fstat/lstat.
@@ -43,7 +43,7 @@ class ::File < ::IO
           @stat = alt_stat
         else
           @path = `coerce_to_path(path)`
-          @stat = `$platform.file_stat(self.path)`
+          @stat = `$platform.stat(self.path.toString())`
         end
         raise ::Errno::ENOENT unless @stat
       end
@@ -370,7 +370,7 @@ class ::File < ::IO
       false
     end
 
-    if `$platform.file_stat`
+    if `$platform.stat`
       # methods that require stat
       def atime(file_name)
         # Returns the last access time for the named file as a Time object.
@@ -657,14 +657,14 @@ class ::File < ::IO
       }
     end
 
-    if `$platform.file_chmod`
+    if `$platform.chmod`
       def chmod(mode_int, *file_names)
         # Changes permission bits on the named file(s) to the bit pattern represented by mode_int.
         mode_int = ::Opal.coerce_to!(mode_int, ::Integer, :to_int) unless mode_int.is_a?(::Integer)
         raise(RangeError, 'mode_int out of range') if mode_int < 0 || mode_int > 4_294_967_295
         file_names.each do |file_name|
           file_name = `coerce_to_path(file_name)`
-          `$platform.file_chmod(file_name, mode_int)`
+          `$platform.chmod(file_name.toString(), mode_int)`
         end
         file_names.size
       end
@@ -672,7 +672,7 @@ class ::File < ::IO
       alias chmod __not_implemented__
     end
 
-    if `$platform.file_stat && $platform.file_chown`
+    if `$platform.stat && $platform.chown`
       def chown(owner_int, group_int, *file_names)
         # Changes the owner and group of the named file(s) to the given numeric owner and group id’s.
         owner_int = ::Opal.coerce_to!(owner_int, ::Integer, :to_int) if owner_int
@@ -687,7 +687,7 @@ class ::File < ::IO
             oi = owner_int
             gi = group_int
           end
-          `$platform.file_chown(file_name, oi, gi)`
+          `$platform.chown(file_name.toString(), oi, gi)`
         end
         file_names.size
       end
@@ -695,12 +695,12 @@ class ::File < ::IO
       alias chown __not_implemented__
     end
 
-    if `$platform.file_unlink`
+    if `$platform.unlink`
       def delete(*file_names)
         # Deletes the named files, returning the number of names passed as arguments.
         file_names.each do |file_name|
           file_name = `coerce_to_path(file_name)`
-          `$platform.file_unlink(file_name)`
+          `$platform.unlink(file_name.toString())`
         end
         file_names.size
       end
@@ -1044,8 +1044,8 @@ class ::File < ::IO
 
     alias fnmatch? fnmatch
 
-    if `$platform.file_lstat`
-      # methods requiring file_lstat
+    if `$platform.lstat`
+      # methods requiring lstat
       def ftype(file_name)
         # Identifies the type of the named file.
         lstat(file_name).ftype
@@ -1055,7 +1055,7 @@ class ::File < ::IO
         # Like File::stat, but does not follow the last symbolic link;
         # instead, returns a File::Stat object for the link itself.
         file_name = `coerce_to_path(file_name)`
-        Stat.new(file_name, `$platform.file_lstat(file_name)`)
+        Stat.new(file_name, `$platform.lstat(file_name.toString())`)
       end
 
       def symlink?(file_name)
@@ -1133,7 +1133,7 @@ class ::File < ::IO
       alias lchmod __not_implemented__
     end
 
-    if `$platform.file_stat && $platform.file_lchown`
+    if `$platform.stat && $platform.file_lchown`
       def lchown(owner_int, group_int, *file_names)
         # Equivalent to File::chown, but does not follow symbolic links
         # (so it will change the owner associated with the link,
@@ -1158,14 +1158,14 @@ class ::File < ::IO
       alias lchown __not_implemented__
     end
 
-    if `$platform.file_link`
+    if `$platform.link`
       def link(path, new_path)
         # Creates a new name for an existing file using a hard link.
         # Will not overwrite new_name if it already exists
         # (raising a subclass of SystemCallError).
         path = `coerce_to_path(path)`
         new_path = `coerce_to_path(new_path)`
-        `$platform.file_link(path, new_path)`
+        `$platform.link(path.toString(), new_path.toString())`
         0
       end
     else
@@ -1178,7 +1178,7 @@ class ::File < ::IO
         # If a file is a symlink, this method acts upon the link itself as opposed to its referent
         file_names.each do |file_name|
           file_name = `coerce_to_path(file_name)`
-          `$platform.file_lutime(file_name, atime, mtime)`
+          `$platform.file_lutime(file_name.toString(), atime, mtime)`
         end
         file_names.size
       end
@@ -1193,7 +1193,7 @@ class ::File < ::IO
         # created file are (mode & ~umask).
         file_name = `coerce_to_path(file_name)`
         mode ||= 0o666 & ~File.umask
-        status = `$platform.file_mkfifo(file_name, mode)`
+        status = `$platform.file_mkfifo(file_name.toString(), mode)`
         raise(::Errno::ENOENT, "No such file or directory #{file_name}") if status == 1
         0
       end
@@ -1221,12 +1221,12 @@ class ::File < ::IO
       `coerce_to_path(path)`
     end
 
-    if `$platform.file_readlink`
+    if `$platform.readlink`
       def readlink(link_name)
         # Returns the name of the file referenced by the given link.
         # Not available on all platforms.
         link_name = `coerce_to_path(link_name)`
-        `$platform.file_readlink(link_name)`
+        `$platform.readlink(link_name.toString())`
       end
     else
       alias readlink __not_implemented__
@@ -1239,11 +1239,12 @@ class ::File < ::IO
         pathname = `coerce_to_path(pathname)`
         pathname = join(dir_string, pathname) if dir_string
         begin
-          `$platform.file_realpath(pathname, #{::File::SEPARATOR})`
+          `$platform.file_realpath(pathname.toString(), #{::File::SEPARATOR}.toString())`
         rescue ::Errno::ENOENT
           pathname = readlink(pathname) if symlink?(pathname)
           dirname, file = split(pathname)
-          dirname = `$platform.file_realpath(dirname, #{::File::SEPARATOR})` # may correctly raise ENOENT again
+          # may correctly raise ENOENT again
+          dirname = `$platform.file_realpath(dirname.toString(), #{::File::SEPARATOR}.toString())`
           join(dirname, file)
         end
       end
@@ -1255,19 +1256,19 @@ class ::File < ::IO
         # All components of the pathname must exist when this method is called.
         pathname = `coerce_to_path(pathname)`
         pathname = join(dir_string, pathname) if dir_string
-        `$platform.file_realpath(pathname, #{::File::SEPARATOR})`
+        `$platform.file_realpath(pathname.toString(), #{::File::SEPARATOR}.toString())`
       end
     else
       alias realdirpath __not_implemented__
       alias realpath __not_implemented__
     end
 
-    if `$platform.file_rename`
+    if `$platform.rename`
       def rename(old_name, new_name)
         # Renames the given file to the new name. Raises a SystemCallError if the file cannot be renamed.
         old_name = ::Opal.coerce_to!(old_name, ::String, :to_str)
         new_name = ::Opal.coerce_to!(new_name, ::String, :to_str)
-        `$platform.file_rename(old_name, new_name)`
+        `$platform.rename(old_name.toString(), new_name.toString())`
         0
       end
     else
@@ -1291,32 +1292,32 @@ class ::File < ::IO
       [parts.join(sep), file]
     end
 
-    if `$platform.file_symlink`
+    if `$platform.symlink`
       def symlink(path, new_path)
         # Creates a symbolic link called new_name for the existing file old_name.
         path = `coerce_to_path(path)`
         new_path = `coerce_to_path(new_path)`
-        `$platform.file_symlink(path, new_path)`
+        `$platform.symlink(path.toString(), new_path.toString())`
         0
       end
     else
       alias symlink __not_implemented__
     end
 
-    if `$platform.file_truncate`
+    if `$platform.truncate`
       def truncate(file_name, integer)
         # Truncates the file file_name to be at most integer bytes long.
         file_name = `coerce_to_path(file_name)`
         integer = ::Opal.coerce_to!(integer, ::Integer, :to_int)
         raise(::Errno::EINVAL, 'integer must be >= 0') if integer < 0
-        `$platform.file_truncate(file_name, integer)`
+        `$platform.truncate(file_name.toString(), integer)`
         0
       end
     else
       alias truncate __not_implemented__
     end
 
-    if `$platform.file_get_umask && $platform.file_set_umask`
+    if `$platform.umask`
       def umask(integer = nil)
         # Returns the current umask value for this process. If the optional argument is given,
         # set the umask to that value and return the previous value.
@@ -1327,9 +1328,11 @@ class ::File < ::IO
                   "The value of \"mask\" is out of range. It must be >= 0 && <= 4294967295. Received #{integer}"
                 )
           end
-          `$platform.file_set_umask(integer)`
+          `$platform.umask(integer)`
         else
-          `$platform.file_get_umask()`
+          u = `$platform.umask(0)`
+          `$platform.umask(u)`
+          u
         end
       end
     else
@@ -1349,7 +1352,7 @@ class ::File < ::IO
         end
         file_names.each do |file_name|
           file_name = ::Opal.coerce_to!(file_name, ::String, :to_path) unless file_name.is_a?(String)
-          `$platform.file_utime(file_name, atime, mtime)`
+          `$platform.file_utime(file_name.toString(), atime, mtime)`
         end
         file_names.size
       end
@@ -1404,7 +1407,7 @@ class ::File < ::IO
       opts[:path] = path
       perm ||= 0o666
       begin
-        fd = `$platform.io_open_path(path, flags, perm)`
+        fd = `$platform.io_open_path(path.toString(), flags, perm)`
       rescue ::Errno::EPERM
         raise ::Errno::EACCES
       end
@@ -1424,19 +1427,19 @@ class ::File < ::IO
     stat.birthtime
   end
 
-  if `$platform.file_fchmod`
+  if `$platform.fchmod`
     def chmod(mode_int)
       # Changes permission bits on file to the bit pattern represented by mode_int.
       mode_int = ::Opal.coerce_to!(mode_int, ::Integer, :to_int)
       raise(RangeError, 'mode_int out of range') if mode_int < 0 || mode_int > 4_294_967_295
-      `$platform.file_fchmod(self.fd, mode_int)`
+      `$platform.fchmod(self.fd, mode_int)`
       0
     end
   else
     alias chmod __not_implemented__
   end
 
-  if `$platform.file_fchown`
+  if `$platform.fchown`
     def chown(owner_int, group_int)
       # Changes the owner and group of file to the given numeric owner and group id’s.
       # Only a process with superuser privileges may change the owner of a file.
@@ -1449,7 +1452,7 @@ class ::File < ::IO
         owner_int ||= s.uid
         group_int ||= s.gid
       end
-      `$platform.file_fchown(self.fd, owner_int, group_int)`
+      `$platform.fchown(self.fd, owner_int, group_int)`
       0
     end
   else
@@ -1462,17 +1465,17 @@ class ::File < ::IO
     stat.ctime
   end
 
-  if `$platform.file_flock`
+  if `$platform.flock`
     def flock(locking_constant)
       # Locks or unlocks file self according to the given locking_constant,
       # a bitwise OR of the values in the table below.
-      `$platform.file_flock(self.fs, locking_constant)`
+      `$platform.flock(self.fs, locking_constant)`
     end
   else
     alias flock __not_implemented__
   end
 
-  if `$platform.file_lstat`
+  if `$platform.lstat`
     def lstat
       # Like File#stat, but does not follow the last symbolic link; instead,
       # returns a File::Stat object for the link itself
@@ -1492,13 +1495,13 @@ class ::File < ::IO
     stat.size
   end
 
-  if `$platform.file_ftruncate`
+  if `$platform.ftruncate`
     def truncate(integer)
       # Truncates file to at most integer bytes. The file must be opened for writing.
       `check_writable(self)`
       integer = ::Opal.coerce_to!(integer, ::Integer, :to_int)
       raise(::Errno::EINVAL, 'integer must be >= 0') if integer < 0
-      `$platform.file_ftruncate(self.fd, integer)`
+      `$platform.ftruncate(self.fd, integer)`
       0
     end
   else

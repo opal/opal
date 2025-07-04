@@ -6,7 +6,7 @@
   def [](name)
     # Returns the value for the environment variable name if it exists:
     name = ::Opal.coerce_to!(name, ::String, :to_str)
-    val = `$platform.env_get(name)`
+    val = `$platform.env_get(name.toString())`
     if val
       val = ::Opal.str(val, ::Encoding.default_internal) if ::Encoding.default_internal
       val.freeze
@@ -19,7 +19,7 @@
       name = ::Opal.coerce_to!(name, ::String, :to_str)
       raise(::Errno::EINVAL, 'invalid key') if name.empty? || name.include?('=')
       value = ::Opal.coerce_to!(value, ::String, :to_str)
-      `$platform.env_set(name, value)`
+      `$platform.env_set(name.toString(), value.toString())`
     else
       name = ::Opal.coerce_to?(name, ::String, :to_str)
       return if name.empty? || name.include?('=')
@@ -47,7 +47,7 @@
     # Deletes the environment variable with name if it exists and returns its value
     name = ::Opal.coerce_to!(name, ::String, :to_str)
     val = self[name]
-    `$platform.env_del(name)`
+    `$platform.env_del(name.toString())`
     return val if val
     yield(name) if block_given?
   end
@@ -142,7 +142,7 @@
   def has_key?(name)
     # Returns true if there is an environment variable with the given name
     name = ::Opal.coerce_to!(name, ::String, :to_str)
-    `$platform.env_has(name)`
+    `$platform.env_has(name.toString())`
   end
 
   def has_value?(value)

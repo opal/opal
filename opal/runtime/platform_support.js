@@ -34,7 +34,7 @@
   //
   // Handle unsupported features
   //
-  $platform.not_implemented = ()=>Opal.Kernel.$raise(Opal.NotImplementedError);
+  $platform.not_implemented = (msg)=>Opal.Kernel.$raise(Opal.NotImplementedError, msg || Opal.nil);
 
   //
   // TextDecoder

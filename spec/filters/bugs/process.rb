@@ -1,6 +1,7 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Process" do
   fails "Process#last_status returns nil if no child process has been ever executed in the current thread" # NotImplementedError: Thread creation not available
+  fails "Process.argv0 is the path given as the main script and the same as __FILE__" # Expected  "/tmp/opal-system-runner20250702-4867-3jqae6 fixtures/argv0.rb " ==  "fixtures/argv0.rb fixtures/argv0.rb OK" to be truthy but was false
   fails "Process.clock_getres with :GETRUSAGE_BASED_CLOCK_PROCESS_CPUTIME_ID reports 1 microsecond" # NotImplementedError: NotImplementedError
   fails "Process.clock_getres with :GETTIMEOFDAY_BASED_CLOCK_REALTIME reports 1 microsecond" # NotImplementedError: NotImplementedError
   fails "Process.clock_getres with :TIME_BASED_CLOCK_REALTIME reports 1 second" # NotImplementedError: NotImplementedError
@@ -58,6 +59,8 @@ opal_filter "Process" do
   fails "Process.kill signals the process group if the full signal name starts with a minus sign" # NotImplementedError: Thread creation not available
   fails "Process.kill signals the process group if the short signal name starts with a minus sign" # NotImplementedError: Thread creation not available
   fails "Process.kill signals the process group if the signal number is negative" # NotImplementedError: Thread creation not available
+  fails "Process.ppid returns the process id of the parent of this process" # Expected  "4441 " ==  "4268 " to be truthy but was false
+  fails "Process.setpriority sets the scheduling priority for a specified process" # Expected exit status is 0 but actual is 1 for command ruby_exe("bundle exec opal -Rnode ruby/core/process/fixtures/setpriority.rb process") Output:
   fails "Process.spawn closes STDERR in the child if :err => :close" # Expected (1830): "out\nrescued\n"         but got: "out\n" Backtrace
   fails "Process.spawn defaults :close_others to false" # Expected "" ==  "inherited " to be truthy but was false
   fails "Process.spawn joins a new process group if pgroup: 0" # NotImplementedError: pgroup options is not available

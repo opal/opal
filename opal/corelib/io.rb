@@ -84,7 +84,7 @@ class ::IO
           opts[:binmode] = true if `binary`
 
           raise(::Errno::EISDIR) if File.directory?(path)
-          fd = `$platform.io_open_path(path, #{::File::Constants::RDONLY})`
+          fd = `$platform.io_open_path(path.toString(), #{::File::Constants::RDONLY})`
           io = IO.new(fd, nil, **opts)
           io.pos = offset unless offset.nil?
           io.read(length)
@@ -147,7 +147,7 @@ class ::IO
           perm = opts[:perm]
           perm = perm ? ::Opal.coerce_to!(perm, ::Integer, :to_int) : 0o666
 
-          fd = `$platform.io_open_path(path, flags, perm)`
+          fd = `$platform.io_open_path(path.toString(), flags, perm)`
           io = IO.new(fd, nil, **opts)
           io.binmode if `binary`
           io.pos = offset if offset_given
@@ -181,7 +181,7 @@ class ::IO
         src_opened = dest_opened = rpartial = false
         src = src.to_path if !src.is_a?(::IO) && src.respond_to?(:to_path)
         src_io = if src.is_a?(String)
-                   fd = `$platform.io_open_path(src, #{::File::Constants::RDONLY})`
+                   fd = `$platform.io_open_path(src.toString(), #{::File::Constants::RDONLY})`
                    src_opened = true
                    IO.new(fd, 'r')
                  else
@@ -196,7 +196,7 @@ class ::IO
                  end
         dst = dst.to_path if !dst.is_a?(::IO) && dst.respond_to?(:to_path)
         dst_io = if dst.is_a?(String)
-                   fd = `$platform.io_open_path(dst, #{::File::Constants::CREAT | ::File::Constants::WRONLY})`
+                   fd = `$platform.io_open_path(dst.toString(), #{::File::Constants::CREAT | ::File::Constants::WRONLY})`
                    dest_opened = true
                    IO.new(fd, 'w')
                  else
@@ -266,7 +266,7 @@ class ::IO
           mode = opts.delete(:mode)
           mode = mode ? mode.split(':').first : 'r'
           flags = `Opal.mode_to_flags(mode)`
-          fd = `$platform.io_open_path(path, flags)`
+          fd = `$platform.io_open_path(path.toString(), flags)`
           chomp = opts.delete(:chomp)
           opts[:path] = path
           io = new(fd, mode, **opts)
@@ -364,7 +364,7 @@ class ::IO
           err = opts[:err]
           `js_opts.err = 'out'` if err.is_a?(::Array) && err[0] == :child && (err[1] == :out || err[1] == 1)
         end
-        fd, pid = `$platform.io_popen(cmd, args, mode, js_opts)`
+        fd, pid = `$platform.io_popen(cmd.toString(), args, mode.toString(), js_opts)`
         # $? = ::Process::Status.new(nil, pid)
         io = new(fd, mode, **opts)
         `io.pid = pid`
@@ -408,7 +408,7 @@ class ::IO
         mode = opts.delete(:mode)
         mode = mode ? mode.split(':').first : 'r'
         flags = `Opal.mode_to_flags(mode)`
-        fd = `$platform.io_open_path(path, flags)`
+        fd = `$platform.io_open_path(path.toString(), flags)`
         chomp = opts.delete(:chomp)
         opts[:path] = path
         io = new(fd, mode, **opts)
@@ -431,7 +431,7 @@ class ::IO
         mode = mode ? mode.split(':').first : 'r'
         perm ||= 0o666
         flags = `Opal.mode_to_flags(mode)`
-        `$platform.io_open_path(path, flags, perm)`
+        `$platform.io_open_path(path.toString(), flags, perm)`
       end
     else
       alias sysopen __not_implemented__
@@ -977,7 +977,7 @@ class ::IO
     def initialize_copy(other)
       `check_open(other)`
 
-      @fd = `$platform.io_open_path(self.path, self.flags)` if path
+      @fd = `$platform.io_open_path(self.path.toString(), self.flags)` if path
       @tty = `$platform.io_open(self.fd, self.flags)` if @fd
 
       @autoclose = true
@@ -1427,10 +1427,10 @@ class ::IO
         mode = mode ? mode.split(':').first : 'r'
         `$platform.io_close(self.fd)` if @fd && !closed?
         begin
-          @fd = `$platform.io_open_path(path, Opal.mode_to_flags(mode))`
+          @fd = `$platform.io_open_path(path.toString(), Opal.mode_to_flags(mode))`
         rescue Errno::ENOENT => e
           raise(e) unless @opened == :write || @opened == :duplex
-          @fd = `$platform.io_open_path(path, Opal.mode_to_flags('w+'))`
+          @fd = `$platform.io_open_path(path.toString(), Opal.mode_to_flags('w+'))`
         end
         @path = path
         @pos = 0
@@ -1444,9 +1444,9 @@ class ::IO
         if @path
           `$platform.io_close(self.fd)` if @fd && !closed?
           begin
-            @fd = `$platform.io_open_path(self.path, other_io.flags)`
+            @fd = `$platform.io_open_path(self.path.toString(), other_io.flags)`
           rescue Errno::ENOENT
-            @fd = `$platform.io_open_path(self.path, Opal.mode_to_flags('w+'))`
+            @fd = `$platform.io_open_path(self.path.toString(), Opal.mode_to_flags('w+'))`
           end
         else
           @fd = other_io.fileno
@@ -1457,9 +1457,9 @@ class ::IO
       elsif @path
         `$platform.io_close(self.fd)` if @fd && !closed?
         begin
-          @fd = `$platform.io_open_path(path, self.flags)`
+          @fd = `$platform.io_open_path(path.toString(), self.flags)`
         rescue Errno::ENOENT
-          @fd = `$platform.io_open_path(path, Opal.mode_to_flags('w+'))`
+          @fd = `$platform.io_open_path(path.toString(), Opal.mode_to_flags('w+'))`
         end
       end
 

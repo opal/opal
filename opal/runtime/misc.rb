@@ -50,6 +50,13 @@ module ::Opal
     `$platform.exit(status)`
   end
 
+  def self.process_check_id(id)
+    nid = ::Opal.coerce_to?(id, ::String, :to_str)
+    nid = ::Opal.coerce_to!(id, ::Integer, :to_int) unless nid
+    nid = `nid.toString()` if `nid instanceof String`
+    nid
+  end
+
   def self.process_spawn_opts_and_execute(args, js_opts)
     arg = args.shift
     coe_arg = ::Opal.coerce_to?(arg, ::Hash, :to_hash)
@@ -118,7 +125,7 @@ module ::Opal
           arg = ::Opal.coerce_to?(opts[:chdir], ::String, :to_path)
           arg ||= ::Opal.coerce_to!(opts[:chdir], ::String, :to_str)
           raise(::ArgumentError, 'chdir contains null byte') if `arg.includes("\x00")`
-          `js_opts.cwd = #{arg}`
+          `js_opts.cwd = #{arg}.toString()`
         when :close_others
           raise ::NotImplementedError, ':close_others option is not available'
         when :in
@@ -138,7 +145,7 @@ module ::Opal
           merge_env = false if v
         else
           if k.to_s.start_with?('rlimit_')
-            # todo
+            raise ::NotImplementedError, ':rlimit_* options are not available'
           elsif k.is_a?(::Integer)
             if 0 <= k && k <= 2
               if v.is_a?(::Integer)
@@ -163,7 +170,7 @@ module ::Opal
     args.map! do |ag|
       ag = ::Opal.coerce_to!(ag, ::String, :to_str)
       raise(::ArgumentError, 'arg contains null byte') if `ag.includes("\x00")`
-      ag.inspect
+      `ag.$inspect().toString()`
     end
 
     env = ::ENV.to_h.merge!(env) if merge_env
@@ -177,7 +184,7 @@ module ::Opal
     end
 
     # without out raises error 'Unsupported xstr part: js_return (RuntimeError)', so we need to set out
-    out = `$platform.process_spawn(#{cmdname}, #{args}, js_opts)`
+    out = `$platform.process_spawn(#{cmdname}.toString(), #{args}, js_opts)`
     [cmdname, out]
   ensure
     opened_files&.each(&:close)

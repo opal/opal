@@ -19,7 +19,7 @@ module ::Kernel
     def `(cmdline)
       # Returns the $stdout output from running command in a subshell; sets global variable $? to the process status.
       cmdline = ::Opal.coerce_to!(cmdline, ::String, :to_str)
-      out = `$platform.process_spawn(#{cmdline}, [], { shell: true, stdio: 'pipe', wait: true })`
+      out = `$platform.process_spawn(#{cmdline}.toString(), [], { shell: true, stdio: 'pipe', wait: true })`
 
       status = `out.status > 128 ? out.status - 128 : out.status`
       pid = `out.pid == null ? nil : out.pid`
@@ -732,7 +732,7 @@ module ::Kernel
       block = command
       command = nil
     end
-    `$platform.process_trap(signal, command, block)` || nil
+    `$platform.process_trap(signal.toString(), command, block)` || nil
   end
 
   # untrace_var - not supported

@@ -11,7 +11,7 @@ class ::Dir
       glob(*patterns, flags: nil, base: base, sort: sort)
     end
 
-    if `$platform.dir_chdir`
+    if `$platform.chdir`
       def chdir(dir = nil)
         # Changes the current working directory.
         unless dir
@@ -21,15 +21,15 @@ class ::Dir
         dir = ::Opal.coerce_to!(dir, ::String, :to_path) rescue dir
         dir = ::Opal.coerce_to!(dir, ::String, :to_str)
         unless block_given?
-          `$platform.dir_chdir(#{dir})`
+          `$platform.chdir(#{dir}.toString())`
           return 0
         end
         cwd = pwd
         begin
-          `$platform.dir_chdir(#{dir})`
+          `$platform.chdir(#{dir}.toString())`
           yield dir
         ensure
-          `$platform.dir_chdir(#{cwd})`
+          `$platform.chdir(#{cwd}.toString())`
         end
       end
     else
@@ -56,11 +56,11 @@ class ::Dir
       alias chroot __not_implemented__
     end
 
-    if `$platform.dir_unlink`
+    if `$platform.rmdir`
       def delete(dirpath)
         # Removes the directory at dirpath from the underlying file system.
         dirpath = ::Opal.coerce_to!(dirpath, ::String, :to_path)
-        `$platform.dir_unlink(dirpath)`
+        `$platform.rmdir(dirpath.toString())`
         0
       end
     else
@@ -88,7 +88,7 @@ class ::Dir
     end
 
 
-    if `$platform.file_lstat`
+    if `$platform.lstat`
       def exist?(dirpath)
         # Returns whether dirpath is a directory in the underlying file system.
         ::File.lstat(dirpath).directory?
@@ -133,7 +133,7 @@ class ::Dir
       `$str(wd)`
     end
 
-    if `$platform.file_stat && $platform.file_lstat`
+    if `$platform.stat && $platform.lstat`
       def glob(*patterns, flags: nil, base: `undefined`, sort: true, &block)
         # Forms an array entry_names of the entry names selected by the arguments.
         # Argument patterns is a string pattern or an array of string patterns;
@@ -717,12 +717,12 @@ class ::Dir
       end
     end
 
-    if `$platform.dir_mkdir`
+    if `$platform.mkdir`
       def mkdir(path, permissions = 0o775)
         # Creates a directory in the underlying file system at dirpath with the given permissions; returns zero.
         path = ::Opal.coerce_to!(path, ::String, :to_path)
         permissions = ::Opal.coerce_to!(permissions, ::Integer, :to_int)
-        `$platform.dir_mkdir(path, permissions)`
+        `$platform.mkdir(path.toString(), permissions)`
         0
       end
     else
@@ -756,7 +756,7 @@ class ::Dir
     def initialize(dirpath, encoding: nil)
       # Returns a new Dir object for the directory at dirpath.
       dirpath = ::Opal.coerce_to!(dirpath, ::String, :to_path)
-      @fileno = `$platform.dir_open(dirpath)`
+      @fileno = `$platform.dir_open(dirpath.toString())`
       @closed = false
       @path = dirpath
       @pos = 0
@@ -772,10 +772,10 @@ class ::Dir
     alias initialize __not_implemented__
   end
 
-  if `$platform.dir_chdir`
+  if `$platform.chdir`
     def chdir
       # Changes the current working directory to self.
-      `$platform.dir_chdir(self.path)`
+      `$platform.chdir(self.path.toString())`
     end
   else
     alias chdir __not_implemented__

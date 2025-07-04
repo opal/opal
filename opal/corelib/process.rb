@@ -1,5 +1,5 @@
 # backtick_javascript: true
-# helpers: platform, coerce_to
+# helpers: platform, coerce_to, process_check_id
 
 module ::Process
   PRIO_PGRP = `$platform.PRIO_PGRP` || nil
@@ -119,11 +119,9 @@ module ::Process
     if `$platform.setegid`
       def egid=(new_egid)
         # Sets the effective group ID for the current process.
-        unless new_egid.is_a?(::Integer) || new_egid.is_a?(::String)
-          raise ::TypeError, 'new_egid must be a Integer or a String'
-        end
-        `$platform.setegid(new_egid)`
-        new_egid
+        nid = `$process_check_id(new_egid)`
+        `$platform.setegid(nid)`
+        nid
       end
     else
       alias egid= __not_implemented__
@@ -141,11 +139,9 @@ module ::Process
     if `$platform.seteuid`
       def euid=(new_euid)
         # Sets the effective user ID for the current process.
-        unless new_euid.is_a?(::Integer) || new_euid.is_a?(::String)
-          raise ::TypeError, 'new_euid must be a Integer or a String'
-        end
-        `$platform.seteuid(new_euid)`
-        new_euid
+        nid = `$process_check_id(new_euid)`
+        `$platform.seteuid(nid)`
+        nid
       end
     else
       alias euid= __not_implemented__
@@ -311,10 +307,9 @@ module ::Process
     if `$platform.setgid`
       def gid=(new_gid)
         # Sets the group ID for the current process to new_gid.
-        unless new_gid.is_a?(::Integer) || new_gid.is_a?(::String)
-          raise ::TypeError, 'new_gid must be a Integer or a String'
-        end
-        `$platform.setgid(new_gid)`
+        nid = `$process_check_id(new_gid)`
+        `$platform.setgid(nid)`
+        nid
       end
     else
       alias gid= __not_implemented__
@@ -347,7 +342,7 @@ module ::Process
         # The group ID gid
         name = ::Opal.coerce_to!(name, ::String, :to_str)
         gid = ::Opal.coerce_to!(gid, ::Integer, :to_int)
-        `$platform.initgroups(name, gid)`
+        `$platform.initgroups(name.toString(), gid)`
       end
     else
       alias initgroups __not_implemented__
@@ -376,7 +371,7 @@ module ::Process
             raise(::Interrupt) if signal == 'INT'
             next if signal == 'EXIT'
           end
-          `$platform.kill(pd, signal)` rescue nil
+          `$platform.kill(pd, signal.toString())` rescue nil
         end
         # emulation for other specs to pass
         ps = Process::Status.new(`{ status: 0, flags: 4 }`, ids[ids.size - 1])
@@ -466,7 +461,7 @@ module ::Process
       def setproctitle(string)
         # Sets the process title that appears on the ps(1) command.
         # Not necessarily effective on all platforms.
-        `$platform.setproctitle(string)`
+        `$platform.setproctitle(string.toString())`
         string
       end
     else
@@ -552,9 +547,9 @@ module ::Process
     if `$platform.setuid`
       def uid=(new_uid)
         # Sets the (user) user ID for the current process to new_uid.
-        nuid = ::Opal.coerce_to?(new_uid, ::String, :to_str)
-        nuid = ::Opal.coerce_to!(new_uid, ::Integer, :to_int) unless nuid
-        `$platform.setuid(nuid)`
+        nid = `$process_check_id(new_uid)`
+        `$platform.setuid(nid)`
+        nid
       end
     else
       alias uid= __not_implemented__
