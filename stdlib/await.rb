@@ -52,7 +52,7 @@ module Kernel
         status = $coerce_to(status, #{Integer}, 'to_int')
       }
 
-      Opal.exit(status);
+      Opal.platform.exit(status);
     }
     nil
   end

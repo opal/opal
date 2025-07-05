@@ -6,9 +6,6 @@
 # even async.
 # For CDP see docs/cdp_common.(md|json)
 
-require 'opal/platform'
-require 'nodejs/env'
-
 %x{
 var CDP = require("chrome-remote-interface");
 var fs = require("fs");
@@ -171,9 +168,14 @@ CDP.List(options, async function(err, targets) {
             // output actual message
             for(i = 0; i < args.length; i++) {
               arg = args[i];
-              if (arg.type === "string") { value = arg.value; }
-              else { value = JSON.stringify(arg); }
-              process.stdout.write(value);
+
+              if (arg.unserializableValue) {
+                process.stdout.write("CDP runner received a unserializable value of JS type '" + (arg.className || arg.type) + "'");
+              } else {
+                if (arg.type === "string") { value = arg.value; }
+                else { value = JSON.stringify(arg); }
+                process.stdout.write(value);
+              }
             }
 
             if (entry.stackTrace && entry.stackTrace.callFrames) {
@@ -195,9 +197,8 @@ CDP.List(options, async function(err, targets) {
 
           // react to exceptions
           Runtime.exceptionThrown(function(exception) {
-            var ex = exception.exceptionDetails.exception.preview.properties;
             var stack = [];
-            if (exception.exceptionDetails.stackTrace) {
+            if (exception.exceptionDetails.stackTrace && exception.exceptionDetails.stackTrace.callFrames.length > 0) {
               stack = exception.exceptionDetails.stackTrace.callFrames;
             } else {
               var d = exception.exceptionDetails;
@@ -208,13 +209,7 @@ CDP.List(options, async function(err, targets) {
                 functionName: "(unknown)"
               });
             }
-            var fr;
-            for (var i = 0; i < ex.length; i++) {
-              fr = ex[i];
-              if (fr.name === "message") {
-                perror(fr.value);
-              }
-            }
+            perror(exception.exceptionDetails.text);
             for (var i = 0; i < stack.length; i++) {
               fr = stack[i];
               perror(fr.url + ':' + fr.lineNumber + ':' + fr.columnNumber + ': in ' + fr.functionName);

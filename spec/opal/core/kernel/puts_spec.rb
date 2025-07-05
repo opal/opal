@@ -1,7 +1,7 @@
 describe "IO#puts" do
   before :each do
     @before_separator = $/
-    @io = IO.new(123)
+    @io = IO.new(123, 'w')
     ScratchPad.record []
     def @io.write(str)
       ScratchPad << str
