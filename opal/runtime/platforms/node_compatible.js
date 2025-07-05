@@ -117,14 +117,8 @@ platform.env_set = (key, value)=> {
 platform.chdir = (dir_name)=>action(process.chdir, dir_name);
 platform.chmod = (file_name, mode)=>action(fs.chmodSync, file_name, mode);
 platform.chown = (file_name, uid, gid)=>action(fs.chownSync, file_name, uid, gid);
-platform.fchmod = (fd, mode)=>{
-  if (!fs.fchmodSync) platform.not_implemented("File#chmod is not available on " + platform.name);
-  action(fs.fchmodSync, fd, mode);
-}
-platform.fchown = (fd, uid, gid)=>{
-  if (!fs.fchownSync) platform.not_implemented("File#chown is not available on " + platform.name);
-  action(fs.fchownSync, fd, uid, gid);
-}
+if (fs.fchmodSync) { platform.fchmod = (fd, mode)=>action(fs.fchmodSync, fd, mode); }
+if (fs.fchownSync) { platform.fchown = (fd, uid, gid)=>action(fs.fchownSync, fd, uid, gid); }
 platform.ftruncate = (fd, len)=>action(fs.ftruncateSync, fd, len);
 platform.getegid = (typeof process.getegid === "function") ? process.getegid : ()=>-1;
 platform.geteuid = (typeof process.geteuid === "function") ? process.geteuid : ()=>-1;

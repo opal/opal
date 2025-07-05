@@ -677,6 +677,8 @@ class ::File < ::IO
         # Changes the owner and group of the named file(s) to the given numeric owner and group id’s.
         owner_int = ::Opal.coerce_to!(owner_int, ::Integer, :to_int) if owner_int
         group_int = ::Opal.coerce_to!(group_int, ::Integer, :to_int) if group_int
+        owner_int = nil if owner_int && owner_int < 0
+        group_int = nil if group_int && group_int < 0
         file_names.each do |file_name|
           file_name = `coerce_to_path(file_name)`
           if owner_int.nil? || group_int.nil?
@@ -1447,6 +1449,8 @@ class ::File < ::IO
       # A nil or -1 owner or group id is ignored. Follows symbolic links.
       owner_int = ::Opal.coerce_to!(owner_int, ::Integer, :to_int) if owner_int
       group_int = ::Opal.coerce_to!(group_int, ::Integer, :to_int) if group_int
+      owner_int = nil if owner_int && owner_int < 0
+      group_int = nil if group_int && group_int < 0
       if owner_int.nil? || group_int.nil?
         s = stat
         owner_int ||= s.uid
