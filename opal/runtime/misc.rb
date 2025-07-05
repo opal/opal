@@ -52,7 +52,7 @@ module ::Opal
 
   def self.process_check_id(id)
     nid = ::Opal.coerce_to?(id, ::String, :to_str)
-    nid = ::Opal.coerce_to!(id, ::Integer, :to_int) unless nid
+    nid ||= ::Opal.coerce_to!(id, ::Integer, :to_int)
     nid = `nid.toString()` if `nid instanceof String`
     nid
   end
@@ -112,14 +112,14 @@ module ::Opal
           `js_opts.stdio[i] = #{f.fileno}`
         elsif v == :close
           `js_opts.stdio[i] = 'ignore'`
-        elsif f = ::Opal.coerce_to?(v, ::IO, :to_io)
+        elsif (f = ::Opal.coerce_to?(v, ::IO, :to_io))
           `js_opts.stdio[i] = #{f.fileno}`
         else
           raise(::ArgumentError, "cannot handle #{v.inspect}")
         end
       end
 
-      opts.each do |k,v|
+      opts.each do |k, v|
         case k
         when :chdir
           arg = ::Opal.coerce_to?(opts[:chdir], ::String, :to_path)
@@ -179,8 +179,9 @@ module ::Opal
     `delete js_env["SHELL"]`
     `js_opts.env = js_env`
     `js_opts.shell = true` unless cmdname.match?(/^(\.\/|\/)/)
-    if `$platform.alt_sep && !js_opts.shell`
-      `js_opts.shell = true` unless cmdname.match?("^(\.\\#{`$plaform.alt_sep`}|\\#{`$plaform.alt_sep`})")
+    if `$platform.alt_sep && !js_opts.shell` &&
+       !cmdname.match?("^(\.\\#{`$platform.alt_sep`}|\\#{`$platform.alt_sep`})")
+      `js_opts.shell = true`
     end
 
     # without out raises error 'Unsupported xstr part: js_return (RuntimeError)', so we need to set out

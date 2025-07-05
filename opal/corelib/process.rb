@@ -267,7 +267,7 @@ module ::Process
                  `$platform["RLIMIT_" + resource.toString()]`
                else
                  res = ::Opal.coerce_to?(resource, ::String, :to_str)
-                 res = ::Opal.coerce_to!(resource, ::Integer, :to_int) unless res
+                 res ||= ::Opal.coerce_to!(resource, ::Integer, :to_int)
                  res
                end
         raise(::ArgumentError, 'unknown resource') unless rsrc
@@ -479,7 +479,7 @@ module ::Process
                  `$platform["RLIMIT_" + resource.toString()]`
                else
                  res = ::Opal.coerce_to?(resource, ::String, :to_str)
-                 res = ::Opal.coerce_to!(resource, ::Integer, :to_int) unless res
+                 res ||= ::Opal.coerce_to!(resource, ::Integer, :to_int)
                  res
                end
         raise(::ArgumentError, 'unknown resource') unless rsrc
@@ -514,7 +514,7 @@ module ::Process
         )
         if `out.status`
           status = `out.status > 128 ? out.status - 128 : out.status`
-          raise(::Error::ENOENT) if `js_opts.shell && out.status == 127`
+          raise(::Error::ENOENT) if `out.status == 127`
         end
 
         pid = `out.pid == null ? nil : out.pid`
@@ -587,7 +587,7 @@ module ::Process
           begin
             res << wait2
           rescue Errno::ECHILD
-            break;
+            break
           end
         end
         res

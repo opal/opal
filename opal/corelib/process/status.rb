@@ -1,11 +1,11 @@
 module ::Process
   class Status
     # status interpretation flags:
-    #define PROCESS_CONTINUED  1
-    #define PROCESS_COREDUMPED 2
-    #define PROCESS_EXITED     4
-    #define PROCESS_SIGNALED   8
-    #define PROCESS_STOPPED   16
+    # PROCESS_CONTINUED  1
+    # PROCESS_COREDUMPED 2
+    # PROCESS_EXITED     4
+    # PROCESS_SIGNALED   8
+    # PROCESS_STOPPED   16
 
     def self.wait(pid = -1, flags = 0)
       # Like Process.wait, but returns a Process::Status object (instead of an integer pid or nil)

@@ -89,8 +89,6 @@ platform.env_get = (key)=>process.env[key];
 platform.env_del = (key)=>{ delete process.env[key]; };
 platform.env_has = (key)=>process.env[key] != null;
 platform.env_set = (key, value)=> {
-  key = key;
-  value = value;
   if (key === "TZ") {
     // Node understands only timezones in the form of "TZ identifiers" like in the Table at
     // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. To make setting TZ work
@@ -148,7 +146,6 @@ platform.kill = (pid, signal)=>{
 platform.link = (path_name, new_path_name)=>action(fs.linkSync, path_name, new_path_name);
 platform.lstat = (file_name)=>action(fs.lstatSync, file_name);
 platform.mkdir = (dir_name, mode)=>{
-  dir_name = dir_name;
   action(fs.mkdirSync, dir_name, { mode: mode });
   // Sometimes on Windows mode is not set correctly in mkdirSync
   if (platform.windows) fs.chmodSync(dir_name, mode);
@@ -460,7 +457,6 @@ platform.io_open = (fd)=>{
   return [tty, pipe, file];
 };
 platform.io_open_path = (path_name, flags, perm)=>{
-  path_name = path_name;
   let mode = flags_to_mode(flags);
   if (!mode) mode = emulated_flags_to_mode(flags, path_name, perm);
   return action(fs.openSync, path_name, mode, perm);

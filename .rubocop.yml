@@ -184,6 +184,7 @@ Lint/ShadowedArgument:
   Exclude:
     - 'opal/corelib/dir.rb'
     - 'opal/corelib/file.rb'
+    - 'opal/corelib/process.rb'
 
 Lint/SuppressedException:
   Exclude:
@@ -342,6 +343,10 @@ Style/FormatStringToken:
 Style/HashLikeCase:
   Exclude:
     - 'opal/corelib/kernel/format.rb'
+
+Style/HashEachMethods:
+  Exclude:
+    - 'opal/runtime/misc.rb'
 
 Style/IfInsideElse:
   Exclude:
