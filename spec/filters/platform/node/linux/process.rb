@@ -1,7 +1,7 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Process" do
-  fails "Process.setproctitle should set the process title" # Expected "" to include "rubyspec-proctitle-test"
   fails "Process.setpriority sets the scheduling priority for a specified process group" # NotImplementedError: NotImplementedError
+  fails "Process.setproctitle should set the process title" # Expected "" to include "rubyspec-proctitle-test"
   fails "Process.setrlimit when passed a String coerces 'MSGQUEUE' into RLIMIT_MSGQUEUE" # NotImplementedError: NotImplementedError
   fails "Process.setrlimit when passed a String coerces 'NICE' into RLIMIT_NICE" # NotImplementedError: NotImplementedError
   fails "Process.setrlimit when passed a String coerces 'RTPRIO' into RLIMIT_RTPRIO" # NotImplementedError: NotImplementedError
