@@ -3,12 +3,6 @@
 # backtick_javascript: true
 
 module ::Kernel
-  # TODO: This is just here as a workaround, must be removed before merge/release
-  def __dir__
-    # Returns the canonicalized absolute path of the directory of the file from which this method is called.
-    File.realpath(File.dirname(__FILE__))
-  end
-
   # Opal specific convenience method to be aliased to, to save some code, e.g:
   #   alias fancy_method __not_implemented__
   def __not_implemented__(*args)
