@@ -366,7 +366,7 @@ platforms.each do |platform|
       # Some specs access other files based on their current __FILE__, but the scope for these files is limited by the library include -Ispec
       # which generates a compiled path for e.g. spec/ruby/thing.rb as ruby/thing.rb. To be able to access these files, current dir must
       # be changed to spec via -Cspec, which allows correct access to ruby/thing.rb and thus includes and other paths must be changed to -I../spec.
-      sh "NODE_PATH=\"#{File.join(Dir.pwd, 'node_modules')}\" ruby -Cspec -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
+      sh "ruby -Cspec -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
          "../exe/opal #{cmdline} -I../spec/mspec/lib -I../spec -I../lib #{stubs} -R#{platform} -Dwarning -A --enable-source-location ../#{filename}"
 
       if bm_filepath
