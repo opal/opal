@@ -2,7 +2,8 @@ inherit_from:
   - .rubocop_todo.yml
   - .rubocop/todo.yml
 
-require: rubocop-performance
+plugins:
+  - rubocop-performance
 
 AllCops:
   TargetRubyVersion: 3.0
@@ -215,7 +216,7 @@ Naming/BinaryOperatorParameterName:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
 
-Naming/PredicateName:
+Naming/PredicatePrefix:
   # Ruby has "has_key?" method
   ForbiddenPrefixes:
     - is_
@@ -391,6 +392,8 @@ Security/Eval:
   Exclude:
     # That's what parser does
     - 'stdlib/opal-parser.rb'
+    # Binding#eval necessarily uses eval
+    - 'opal/corelib/binding.rb'
 
 Naming/AccessorMethodName:
   Exclude:
