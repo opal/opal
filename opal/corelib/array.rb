@@ -63,7 +63,7 @@ class ::Array < `Array`
       }
 
       if (i2 !== i) {
-        self.splice.apply(self, [0, updated.length].concat(updated));
+        self.splice(0, updated.length, ...updated);
         self.splice(i2, updated.length);
       }
 
@@ -78,14 +78,11 @@ class ::Array < `Array`
     }
 
     function fast_push(arr, objects) {
-      // push.apply() for arrays longer than 32767 may cause various argument errors in browsers
-      // but it is significantly faster than a for loop, which pushes each element separately
-      // but apply() has a overhead by itself, for a small number of elements
-      // the for loop is significantly faster
-      // this is using the best option depending on objects.length
+      // push(...objects) for arrays longer than 32767 may cause various argument errors in browsers
+      // but may be faster than a for loop, which pushes each element separately
       var length = objects.length;
-      if (length > 6 && length < 32767) {
-        arr.push.apply(arr, objects);
+      if (length < 32767) {
+        arr.push(...objects);
       } else {
         for (var i = 0; i < length; i++) {
           arr.push(objects[i]);
@@ -232,7 +229,7 @@ class ::Array < `Array`
     other = `convertToArray(other)`
 
     return [] if `self.length === 0`
-    return `self.slice()` if `other.length === 0`
+    return `self.slice(0)` if `other.length === 0`
 
     %x{
       var result = [], hash = #{{}}, i, length, item;
@@ -497,10 +494,10 @@ class ::Array < `Array`
         }
 
         if (to < 0) {
-          self.splice.apply(self, [from, 0].concat(data));
+          self.splice(from, 0, ...data);
         }
         else {
-          self.splice.apply(self, [from, to - from].concat(data));
+          self.splice(from, to - from, ...data);
         }
 
         return value;
@@ -547,7 +544,7 @@ class ::Array < `Array`
           self[index] = value;
         }
         else {
-          self.splice.apply(self, [index, length].concat(data));
+          self.splice(index, length, ...data);
         }
 
         return value;
@@ -779,7 +776,7 @@ class ::Array < `Array`
         }
       }
       else if (num === self.length) {
-        #{yield `self.slice()`}
+        #{yield `self.slice(0)`}
       }
       else if (num >= 0 && num < self.length) {
         stack = [];
@@ -799,7 +796,7 @@ class ::Array < `Array`
             next = stack[lev+1] = stack[lev] + 1;
             chosen[lev] = self[next];
           }
-          #{ yield `chosen.slice()` }
+          #{ yield `chosen.slice(0)` }
           lev++;
           do {
             done = (lev === 0);
@@ -822,7 +819,7 @@ class ::Array < `Array`
     %x{
       function iterate(max, from, buffer, self) {
         if (buffer.length == max) {
-          var copy = buffer.slice();
+          var copy = buffer.slice(0);
           #{yield `copy`}
           return;
         }
@@ -1403,7 +1400,7 @@ class ::Array < `Array`
           }
         }
 
-        self.splice.apply(self, [index, 0].concat(objects));
+        self.splice(index, 0, ...objects);
       }
     }
 
@@ -1665,7 +1662,7 @@ class ::Array < `Array`
 
         if (#{block_given?}) {
           // offensive (both definitions) copy.
-          offensive = self.slice();
+          offensive = self.slice(0);
           permute.call(offensive, num, perm, 0, used, block);
         }
         else {
@@ -1684,7 +1681,7 @@ class ::Array < `Array`
     %x{
       function iterate(max, buffer, self) {
         if (buffer.length == max) {
-          var copy = buffer.slice();
+          var copy = buffer.slice(0);
           #{yield `copy`}
           return;
         }
@@ -1695,7 +1692,7 @@ class ::Array < `Array`
         }
       }
 
-      iterate(num, [], self.slice());
+      iterate(num, [], self.slice(0));
     }
 
     self
@@ -1912,13 +1909,13 @@ class ::Array < `Array`
       n = $coerce_to(n, #{::Integer}, 'to_int')
 
       if (self.length === 1) {
-        return self.slice();
+        return self.slice(0);
       }
       if (self.length === 0) {
         return [];
       }
 
-      ary = self.slice();
+      ary = self.slice(0);
       idx = n % ary.length;
 
       firstPart = ary.slice(idx);
@@ -2051,7 +2048,7 @@ class ::Array < `Array`
             }
           }
 
-          result = self.slice();
+          result = self.slice(0);
 
           for (var c = 0; c < count; c++) {
             targetIndex = #{rng.rand(`self.length - c`)} + c;
@@ -2260,7 +2257,7 @@ class ::Array < `Array`
         };
       }
 
-      return self.slice().sort(function(x, y) {
+      return self.slice(0).sort(function(x, y) {
         var ret = block(x, y);
 
         if (ret === nil) {
@@ -2279,10 +2276,10 @@ class ::Array < `Array`
       var result;
 
       if (#{block_given?}) {
-        result = #{`self.slice()`.sort(&block)};
+        result = #{`self.slice(0)`.sort(&block)};
       }
       else {
-        result = #{`self.slice()`.sort};
+        result = #{`self.slice(0)`.sort};
       }
 
       self.length = 0;

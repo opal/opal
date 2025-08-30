@@ -9,7 +9,7 @@ RSpec.describe "rake dist" do
 
   def run_with_node(code, precode:, requires:)
     requires = requires.map do |i|
-      "require('./build/#{i}');"
+      "await import('./build/#{i}.js');"
     end.join
 
     code = "#{requires};#{precode};console.log(#{code});"

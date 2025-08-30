@@ -40,5 +40,5 @@ opal_unsupported_filter "Regexp" do
   fails "Regexp.union returns a Regexp with the encoding of a String containing non-ASCII-compatible characters" # NoMethodError: undefined method `encoding' for /©/
   fails "Regexp.union returns a Regexp with the encoding of an ASCII-incompatible String argument" # NoMethodError: undefined method `encoding' for /a/
   fails "Regexp.union returns a Regexp with the encoding of multiple non-conflicting ASCII-incompatible String arguments" # NoMethodError: undefined method `encoding' for /a|b/
-  fails "Regexp.union returns a Regexp with the encoding of multiple non-conflicting Strings containing non-ASCII-compatible characters" # NoMethodError: undefined method `encoding' for /©|°/  
+  fails "Regexp.union returns a Regexp with the encoding of multiple non-conflicting Strings containing non-ASCII-compatible characters" # NoMethodError: undefined method `encoding' for /©|°/
 end

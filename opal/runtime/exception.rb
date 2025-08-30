@@ -13,7 +13,7 @@ module ::Opal
 
       if ($Kernel && $Kernel.$raise) {
         if (arguments.length > 2) {
-          $Kernel.$raise(klass.$new.apply(klass, $slice(arguments, 1)));
+          $Kernel.$raise(klass.$new(...$slice(arguments, 1)));
         }
         else {
           $Kernel.$raise(klass, message);
