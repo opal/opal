@@ -48,7 +48,7 @@ module Opal
       end
 
       def mark_as_required(filename)
-        "Opal.loaded([#{filename.to_s.inspect}]);"
+        "Opal.loaded(#{filename.to_s.inspect});"
       end
 
       class JsProcessor < Processor
@@ -176,6 +176,16 @@ module Opal
           "Opal.modules[#{module_name.inspect}] = function() {#{result}};"
         end
       end
+
+      # This handler is for text files as used within specs.
+      # These files may contain binary data, eg. UTF BOM.
+      # class TextProcessor < Processor
+      #   handles :txt
+      #
+      #   def source
+      #     "Opal.modules[#{module_name.inspec}] = function() { return new Uint8Array([#{@source.each_byte.to_a.join(',')}]); };"
+      #   end
+      # end
     end
   end
 end

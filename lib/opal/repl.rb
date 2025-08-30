@@ -33,7 +33,6 @@ module Opal
 
     def run(argv = [])
       @argv = argv
-
       savepoint = save_tty
       load_opal
       load_history
