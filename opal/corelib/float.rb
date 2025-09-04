@@ -1,0 +1,803 @@
+# backtick_javascript: true
+# use_strict: true
+
+require 'corelib/numeric'
+
+class ::Float < ::Numeric
+  ::Opal.bridge(`Number`, self)
+  `Opal.prop(self.$$prototype, '$$is_float', true)`
+  `Opal.prop(self.$$prototype, '$$is_number', true)`
+  `self.$$is_float_class = true`
+  `var number_id_map = new Map()`
+
+  class << self
+    def allocate
+      ::Kernel.raise ::TypeError, "allocator undefined for #{name}"
+    end
+
+    undef :new
+
+    def ===(other)
+      `!!other.$$is_float`
+    end
+  end
+
+  self::INFINITY = `Infinity`
+  self::MAX      = `Number.MAX_VALUE`
+  self::MIN      = `Number.MIN_VALUE`
+  self::NAN      = `NaN`
+
+  self::DIG      = 15
+  self::MANT_DIG = 53
+  self::RADIX    = 2
+
+  self::EPSILON = `Number.EPSILON || 2.2204460492503130808472633361816E-16`
+
+  def __id__
+    %x{
+      // Binary-safe integers
+      if (self|0 === self) {
+        return (self * 2) + 1;
+      }
+      else {
+        if (number_id_map.has(self)) {
+          return number_id_map.get(self);
+        }
+        var id = Opal.uid();
+        number_id_map.set(self, id);
+        return id;
+      }
+    }
+  end
+
+  def hash
+    %x{
+      // Binary-safe integers
+      if (self|0 === self) {
+        return #{__id__}
+      }
+      else {
+        return self.toString().$hash();
+      }
+    }
+  end
+
+  def +(other)
+    %x{
+      if (other.$$is_float) {
+        return self + other;
+      }
+      else {
+        return #{__coerced__ :+, other};
+      }
+    }
+  end
+
+  def -(other)
+    %x{
+      if (other.$$is_float)
+        return self - other;
+      else if (other.$$is_integer)
+        return self - Number(other);
+      else
+        return #{__coerced__ :-, other};
+    }
+  end
+
+  def *(other)
+    %x{
+      if (other.$$is_float) {
+        return self * other;
+      }
+      else {
+        return #{__coerced__ :*, other};
+      }
+    }
+  end
+
+  def /(other)
+    %x{
+      if (other.$$is_float) {
+        return self / other;
+      }
+      else {
+        return #{__coerced__ :/, other};
+      }
+    }
+  end
+
+  def %(other)
+    %x{
+      if (other.$$is_float) {
+        if (other == -Infinity) {
+          return other;
+        }
+        else if (other == 0) {
+          #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'};
+        }
+        else if (other < 0 || self < 0) {
+          return (self % other + other) % other;
+        }
+        else {
+          return self % other;
+        }
+      }
+      else {
+        return #{__coerced__ :%, other};
+      }
+    }
+  end
+
+  def &(other)
+    %x{
+      if (other.$$is_float) {
+        return self & other;
+      }
+      else {
+        return #{__coerced__ :&, other};
+      }
+    }
+  end
+
+  def |(other)
+    %x{
+      if (other.$$is_float) {
+        return self | other;
+      }
+      else {
+        return #{__coerced__ :|, other};
+      }
+    }
+  end
+
+  def ^(other)
+    %x{
+      if (other.$$is_float) {
+        return self ^ other;
+      }
+      else {
+        return #{__coerced__ :^, other};
+      }
+    }
+  end
+
+  def <(other)= `other.$$is_number ? self < other : #{__coerced__ :<, other}`
+  def <=(other)= `other.$$is_number ? self <= other : #{__coerced__ :<=, other}`
+  def >(other)= `other.$$is_number ? self > other : #{__coerced__ :>, other}`
+  def >=(other)= `other.$$is_number ? self >= other : #{__coerced__ :>=, other}`
+
+  # Compute the result of the spaceship operator inside its own function so it
+  # can be optimized despite a try/finally construct.
+  %x{
+    var spaceship_operator = function(self, other) {
+      if (other.$$is_integer) other = Number(other);
+
+      if (other.$$is_float) {
+        if (isNaN(self) || isNaN(other)) {
+          return nil;
+        }
+
+        if (self > other) {
+          return 1;
+        } else if (self < other) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+      else {
+        return #{__coerced__ :<=>, `other`};
+      }
+    }
+  }
+
+  def <=>(other)
+    `spaceship_operator(self, other)`
+  rescue ::ArgumentError
+    nil
+  end
+
+  def <<(count)
+    count = ::Opal.coerce_to! count, ::Integer, :to_int
+
+    `#{count} > 0 ? self << #{count} : self >> -#{count}`
+  end
+
+  def >>(count)
+    count = ::Opal.coerce_to! count, ::Integer, :to_int
+
+    `#{count} > 0 ? self >> #{count} : self << -#{count}`
+  end
+
+  def [](bit)
+    bit = ::Opal.coerce_to! bit, ::Integer, :to_int
+
+    %x{
+      if (#{bit} < 0) {
+        return 0;
+      }
+      if (#{bit} >= 32) {
+        return #{ self } < 0 ? 1 : 0;
+      }
+      return (self >> #{bit}) & 1;
+    }
+  end
+
+  def +@
+    `+self`
+  end
+
+  def -@
+    `-self`
+  end
+
+  def ~
+    `~self`
+  end
+
+  def **(other)
+    `if (Number.isInteger(self)) return BigInt(self)["$**"](other);`
+
+    if `Number.isInteger(Number(other))`
+      if !(`Number.isInteger(self)`) || other > 0
+        `Math.pow(self, Number(other))`
+      else
+        ::Rational.new(self, 1) ** other
+      end
+    elsif self < 0 && (::Float === other || ::Rational === other)
+      ::Complex.new(self, 0)**other.to_f
+    elsif `other.$$is_float`
+      `Math.pow(self, other)`
+    else
+      __coerced__ :**, other
+    end
+  end
+
+  def ==(other)
+    %x{
+      if (other.$$is_float) {
+        return self.valueOf() === other.valueOf();
+      }
+      else if (#{other.respond_to? :==}) {
+        return #{other == self};
+      }
+      else {
+        return false;
+      }
+    }
+  end
+
+  alias === ==
+
+  def abs
+    `Math.abs(self)`
+  end
+
+  def abs2
+    `Math.abs(self * self)`
+  end
+
+  def allbits?(mask)
+    mask = ::Opal.coerce_to! mask, ::Integer, :to_int
+    `(self & mask) == mask`
+  end
+
+  def anybits?(mask)
+    mask = ::Opal.coerce_to! mask, ::Integer, :to_int
+    `(self & mask) !== 0`
+  end
+
+  def angle
+    return self if nan?
+
+    %x{
+      if (self == 0) {
+        if (1 / self > 0) {
+          return 0;
+        }
+        else {
+          return Math.PI;
+        }
+      }
+      else if (self < 0) {
+        return Math.PI;
+      }
+      else {
+        return 0;
+      }
+    }
+  end
+
+  def ceil(ndigits = 0)
+    %x{
+      var f = #{to_f};
+
+      if (f % 1 === 0 && ndigits >= 0) {
+        return f;
+      }
+
+      var factor = Math.pow(10, ndigits),
+          result = Math.ceil(f * factor) / factor;
+
+      if (f % 1 === 0) {
+        result = Math.round(result);
+      }
+
+      return result;
+    }
+  end
+
+  def chr(encoding = undefined)
+    `Opal.str(String.fromCodePoint(self), encoding || "BINARY")`
+  end
+
+  def denominator
+    if nan? || infinite?
+      1
+    else
+      super
+    end
+  end
+
+  def downto(stop, &block)
+    unless block_given?
+      return enum_for(:downto, stop) do
+        ::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless ::Numeric === stop
+        stop > self ? 0 : self - stop + 1
+      end
+    end
+
+    %x{
+      if (!stop.$$is_float) {
+        #{::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
+      }
+      for (var i = self; i >= stop; i--) {
+        block(i);
+      }
+    }
+
+    self
+  end
+
+  def equal?(other)
+    self == other || `isNaN(self) && isNaN(other)`
+  end
+
+  def even?
+    `self % 2 === 0`
+  end
+
+  def floor(ndigits = 0)
+    %x{
+      ndigits = Number(ndigits);
+
+      if (self % 1 === 0 && ndigits >= 0) {
+        return self;
+      }
+
+      var factor = Math.pow(10, ndigits),
+          result = Math.floor(self * factor) / factor;
+
+      if (result % 1 === 0) {
+        return BigInt(Math.round(result));
+      }
+
+      return result;
+    }
+  end
+
+  def gcd(other)
+    unless ::Integer === other
+      ::Kernel.raise ::TypeError, 'not an integer'
+    end
+
+    %x{
+      var min = Math.abs(self),
+          max = Math.abs(other);
+
+      while (min > 0) {
+        var tmp = min;
+
+        min = max % min;
+        max = tmp;
+      }
+
+      return max;
+    }
+  end
+
+  def gcdlcm(other)
+    [gcd(other), lcm(other)]
+  end
+
+  def integer?
+    `self % 1 === 0`
+  end
+
+  def lcm(other)
+    unless ::Integer === other
+      ::Kernel.raise ::TypeError, 'not an integer'
+    end
+
+    %x{
+      if (self == 0 || other == 0) {
+        return 0;
+      }
+      else {
+        return Math.abs(self * other / #{gcd(other)});
+      }
+    }
+  end
+
+  def next
+    `self + 1`
+  end
+
+  def nobits?(mask)
+    mask = ::Opal.coerce_to! mask, ::Integer, :to_int
+    `(self & mask) == 0`
+  end
+
+  def nonzero?
+    `self == 0 ? nil : self`
+  end
+
+  def numerator
+    if nan? || infinite?
+      self
+    else
+      super
+    end
+  end
+
+  def odd?
+    `self % 2 !== 0`
+  end
+
+  def ord
+    self
+  end
+
+  def pow(b, m = undefined)
+    %x{
+      if (self == 0) {
+        #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'}
+      }
+
+      if (m === undefined) {
+        return #{self**b};
+      } else {
+        if (!(#{::Integer === b})) {
+          #{::Kernel.raise ::TypeError, 'Integer#pow() 2nd argument not allowed unless a 1st argument is integer'}
+        }
+
+        if (b < 0) {
+          #{::Kernel.raise ::TypeError, 'Integer#pow() 1st argument cannot be negative when 2nd argument specified'}
+        }
+
+        if (!(#{::Integer === m})) {
+          #{::Kernel.raise ::TypeError, 'Integer#pow() 2nd argument not allowed unless all arguments are integers'}
+        }
+
+        if (m === 0) {
+          #{::Kernel.raise ::ZeroDivisionError, 'divided by 0'}
+        }
+
+        return #{(self**b) % m}
+      }
+    }
+  end
+
+  def pred
+    `self - 1`
+  end
+
+  def quo(other)
+    self / other
+  end
+
+  def rationalize(eps = undefined)
+    %x{
+      if (arguments.length > 1) {
+        #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arguments.length`} for 0..1)"};
+      }
+    }
+
+    if infinite?
+      ::Kernel.raise ::FloatDomainError, 'Infinity'
+    elsif nan?
+      ::Kernel.raise ::FloatDomainError, 'NaN'
+    elsif `eps == null`
+      f, n  = ::Math.frexp self
+      f     = ::Math.ldexp(f, ::Float::MANT_DIG).to_i
+      n    -= ::Float::MANT_DIG
+
+      ::Rational.new(2 * f, 1 << (1 - n)).rationalize(::Rational.new(1, 1 << (1 - n)))
+    else
+      to_r.rationalize(eps)
+    end
+  end
+
+  def remainder(y)
+    self - y * (self / y).truncate
+  end
+
+  def round(ndigits = undefined)
+    if nan? && `ndigits == null`
+      ::Kernel.raise ::FloatDomainError, 'NaN'
+    end
+
+    ndigits = ::Opal.coerce_to!(`ndigits || 0`, ::Integer, :to_int)
+
+    if ndigits <= 0
+      if nan?
+        ::Kernel.raise ::RangeError, 'NaN'
+      elsif infinite?
+        ::Kernel.raise ::FloatDomainError, 'Infinity'
+      end
+    elsif ndigits == 0
+      return `Math.round(self)`
+    elsif nan? || infinite?
+      return self
+    end
+
+    _, exp = ::Math.frexp(self)
+
+    if ndigits >= (::Float::DIG + 2) - (exp > 0 ? exp / 4 : exp / 3 - 1)
+      return self
+    end
+
+    if ndigits < -(exp > 0 ? exp / 3 + 1 : exp / 4)
+      return 0
+    end
+
+    `Math.round(self * Math.pow(10, ndigits)) / Math.pow(10, ndigits)`
+  end
+
+  def times(&block)
+    return enum_for(:times) { self } unless block
+
+    %x{
+      for (var i = 0; i < self; i++) {
+        block(i);
+      }
+    }
+
+    self
+  end
+
+  def to_f
+    self
+  end
+
+  def to_i
+    `BigInt(self < 0 ? Math.ceil(self) : Math.floor(self))`
+  end
+
+  def to_int
+    `BigInt(self < 0 ? Math.ceil(self) : Math.floor(self))`
+  end
+
+  def to_r
+    f, e  = ::Math.frexp(self)
+    f     = ::Math.ldexp(f, ::Float::MANT_DIG).to_i
+    e    -= ::Float::MANT_DIG
+
+    (f * (::Float::RADIX**e)).to_r
+  end
+
+  def to_s(base = 10)
+    base = ::Opal.coerce_to! base, ::Integer, :to_int
+
+    if base < 2 || base > 36
+      ::Kernel.raise ::ArgumentError, "invalid radix #{base}"
+    end
+
+    # Don't lose the negative zero
+    if self == 0 && `1/self === -Infinity`
+      return '-0.0'
+    end
+
+    str = `self.toString(Number(base))`
+
+    %x{
+      if (
+        !Number.isNaN(self) &&
+          self != Infinity &&
+          self != -Infinity &&
+          str.indexOf('.') === -1
+      ) str += '.0'
+    }
+
+    str
+  end
+
+  def truncate(ndigits = 0)
+    %x{
+      var f = #{to_f};
+
+      if (f % 1 === 0 && ndigits >= 0) {
+        return f;
+      }
+
+      var factor = Math.pow(10, ndigits),
+          result = parseInt(f * factor, 10) / factor;
+
+      if (f % 1 === 0) {
+        result = Math.round(result);
+      }
+
+      return result;
+    }
+  end
+
+  def digits(base = 10)
+    if self < 0
+      ::Kernel.raise ::Math::DomainError, 'out of domain'
+    end
+
+    base = ::Opal.coerce_to! base, ::Integer, :to_int
+
+    if base < 2
+      ::Kernel.raise ::ArgumentError, "invalid radix #{base}"
+    end
+
+    %x{
+      if (self != parseInt(self)) #{::Kernel.raise ::NoMethodError, "undefined method `digits' for #{inspect}"}
+
+      var value = self, result = [];
+
+      if (self == 0) {
+        return [0];
+      }
+
+      while (value != 0) {
+        result.push(value % base);
+        value = parseInt(value / base, 10);
+      }
+
+      return result;
+    }
+  end
+
+  def divmod(other)
+    if nan? || other.nan?
+      ::Kernel.raise ::FloatDomainError, 'NaN'
+    elsif infinite?
+      ::Kernel.raise ::FloatDomainError, 'Infinity'
+    else
+      super
+    end
+  end
+
+  def upto(stop, &block)
+    unless block_given?
+      return enum_for(:upto, stop) do
+        ::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed" unless ::Numeric === stop
+        stop < self ? 0 : stop - self + 1
+      end
+    end
+
+    %x{
+      if (!stop.$$is_float) {
+        #{::Kernel.raise ::ArgumentError, "comparison of #{self.class} with #{stop.class} failed"}
+      }
+      for (var i = self; i <= stop; i++) {
+        block(i);
+      }
+    }
+
+    self
+  end
+
+  def zero?
+    `self == 0`
+  end
+
+  # Since bitwise operations are 32 bit, declare it to be so.
+  def size
+    4
+  end
+
+  def nan?
+    `Number.isNaN(self)`
+  end
+
+  def finite?
+    `self != Infinity && self != -Infinity && !isNaN(self)`
+  end
+
+  def infinite?
+    %x{
+      if (self == Infinity) {
+        return +1;
+      }
+      else if (self == -Infinity) {
+        return -1;
+      }
+      else {
+        return nil;
+      }
+    }
+  end
+
+  def positive?
+    `self != 0 && (self == Infinity || 1 / self > 0)`
+  end
+
+  def negative?
+    `self == -Infinity || 1 / self < 0`
+  end
+
+  %x{
+    function numberToUint8Array(num) {
+      var uint8array = new Uint8Array(8);
+      new DataView(uint8array.buffer).setFloat64(0, num, true);
+      return uint8array;
+    }
+
+    function uint8ArrayToNumber(arr) {
+      return new DataView(arr.buffer).getFloat64(0, true);
+    }
+
+    function incrementNumberBit(num) {
+      var arr = numberToUint8Array(num);
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === 0xff) {
+          arr[i] = 0;
+        } else {
+          arr[i]++;
+          break;
+        }
+      }
+      return uint8ArrayToNumber(arr);
+    }
+
+    function decrementNumberBit(num) {
+      var arr = numberToUint8Array(num);
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === 0) {
+          arr[i] = 0xff;
+        } else {
+          arr[i]--;
+          break;
+        }
+      }
+      return uint8ArrayToNumber(arr);
+    }
+  }
+
+  def next_float
+    return ::Float::INFINITY if self == ::Float::INFINITY
+    return ::Float::NAN if nan?
+
+    if self >= 0
+      # Math.abs() is needed to handle -0.0
+      `incrementNumberBit(Math.abs(self))`
+    else
+      `decrementNumberBit(self)`
+    end
+  end
+
+  def prev_float
+    return -::Float::INFINITY if self == -::Float::INFINITY
+    return ::Float::NAN if nan?
+
+    if self > 0
+      `decrementNumberBit(self)`
+    else
+      `-incrementNumberBit(Math.abs(self))`
+    end
+  end
+
+  alias arg angle
+  alias eql? ==
+  alias fdiv / #
+  alias inspect to_s
+  alias kind_of? is_a?
+  alias magnitude abs
+  alias modulo %
+  alias object_id __id__
+  alias phase angle
+  alias succ next
+end
