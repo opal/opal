@@ -162,6 +162,10 @@ Lint/RedundantRequireStatement:
   Exclude:
     - 'lib/opal/nodes/if.rb'
 
+Lint/ReturnInVoidContext:
+  Exclude:
+    - 'opal/corelib/string/encoding.rb'
+
 Lint/UnusedBlockArgument:
   Exclude:
     # Variable from Ruby can be accessed in JS, rubocop can't catch it (but JSHint can)
