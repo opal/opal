@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "picomatch": "~4.0",
-    "unxhr": "1.0.1"
-  }
-}

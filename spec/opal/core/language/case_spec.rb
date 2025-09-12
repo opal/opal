@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 describe "Case statement" do
   it "works with JS object-wrapped values" do
     a = false

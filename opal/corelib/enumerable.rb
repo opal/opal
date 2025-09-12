@@ -347,7 +347,7 @@ module ::Enumerable
         $yield1(block, item);
       }
 
-      self.$each.apply(self, data);
+      self.$each(...data);
 
       return self;
     }
@@ -401,7 +401,7 @@ module ::Enumerable
         index++;
       };
 
-      self.$each.apply(self, args);
+      self.$each(...args);
     }
 
     self
@@ -431,7 +431,7 @@ module ::Enumerable
         result.push(#{::Opal.destructure(`arguments`)});
       };
 
-      self.$each.apply(self, args);
+      self.$each(...args);
 
       return result;
     }
@@ -1265,7 +1265,7 @@ module ::Enumerable
         Opal.hash_put(hash, key, val);
       };
 
-      self.$each.apply(self, args);
+      self.$each(...args);
 
       return hash;
     }

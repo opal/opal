@@ -337,6 +337,8 @@ class ::Numeric
   end
 
   def infinite?
+    return -1 if `Number.NEGATIVE_INFINITY == self`
+    return 1 if `Number.POSITIVE_INFINITY == self`
     nil
   end
 

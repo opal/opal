@@ -11,10 +11,11 @@ $LOAD_PATH       = $: = []
 # split lines
 $/ = "\n"
 $, = nil
-
-::ARGV = []
-::ARGF = ::Object.new
-::ENV  = {}
+$. = 0
+$0 = `Opal.platform.argv[0]`
+$$ = `Opal.platform.getpid ? Opal.platform.getpid() : nil`
+$? = nil
+$* = ::ARGV = `Opal.platform.argv.slice(1)`
 
 $VERBOSE = false
 $DEBUG   = false

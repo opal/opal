@@ -18,3 +18,5 @@
 ::Object.require 'corelib/variables'
 ::Object.require 'corelib/string/encoding'
 ::Object.require 'corelib/io'
+::Object.require 'corelib/file'
+::Object.require 'corelib/argf'

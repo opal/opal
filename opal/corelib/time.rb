@@ -402,11 +402,12 @@ class ::Time < `Date`
   end
 
   def inspect
-    if utc?
-      strftime '%Y-%m-%d %H:%M:%S UTC'
-    else
-      strftime '%Y-%m-%d %H:%M:%S %z'
-    end
+    str = if utc?
+            strftime '%Y-%m-%d %H:%M:%S UTC'
+          else
+            strftime '%Y-%m-%d %H:%M:%S %z'
+          end
+    `Opal.str(str, Opal.Encoding.US_ASCII)`
   end
 
   def succ
@@ -415,6 +416,10 @@ class ::Time < `Date`
       result.timezone = self.timezone;
       return result;
     }
+  end
+
+  def nsec
+    `self.getMilliseconds() * 1000000`
   end
 
   def usec
@@ -790,6 +795,7 @@ class ::Time < `Date`
   alias month mon
   alias to_s inspect
   alias tv_sec to_i
+  alias tv_nsec nsec
   alias tv_usec usec
   alias utc gmtime
   alias utc? gmt?

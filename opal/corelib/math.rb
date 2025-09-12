@@ -14,7 +14,7 @@ module ::Math
         return NaN;
       }
 
-      var result = Math[method].apply(null, args);
+      var result = Math[method](...args);
 
       if (isNaN(result)) {
         #{::Kernel.raise DomainError, "Numerical argument is out of domain - \"#{method}\""};

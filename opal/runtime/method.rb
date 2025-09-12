@@ -314,7 +314,7 @@ module ::Opal
 
   def self.instance_methods(mod)
     %x{
-      var processed = Object.create(null), results = [], ancestors = $ancestors(mod);
+      var processed = { __proto__: null }, results = [], ancestors = $ancestors(mod);
 
       for (var i = 0, l = ancestors.length; i < l; i++) {
         var ancestor = ancestors[i],
@@ -406,7 +406,7 @@ module ::Opal
 
       for (i = 0; i < ancestors.length; i++) {
         ancestor = ancestors[i];
-        if (ancestor === method_owner || ancestor.$$cloned_from.indexOf(method_owner) !== -1) {
+        if (ancestor === method_owner || ($has_own(ancestor, '$$cloned_from') && ancestor.$$cloned_from.indexOf(method_owner) !== -1)) {
           current_index = i;
           break;
         }
