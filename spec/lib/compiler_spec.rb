@@ -651,7 +651,7 @@ RSpec.describe Opal::Compiler do
 
         expect(error.backtrace[0]).to eq("#{File.basename(__FILE__)}/foobar.js.rb:in `BEGIN {}'")
         expect(compiler_backtrace(error)[0]).to match(/:in [`'](?:Opal::Compiler#)?error[`']$/)
-        expect(compiler_backtrace(error)[-3]).to match(/:in [`']block in (?:Opal::Compiler#)?compile[`']$/)
+        expect(compiler_backtrace(error)[-4]).to match(/:in [`']block in (?:Opal::Compiler#)?fragments[`']$/)
         expect(compiler_backtrace(error)[-1]).to match(/:in [`'](?:Opal::Compiler#)?compile[`']$/)
         expect(error.backtrace.size).to be > 1
       end

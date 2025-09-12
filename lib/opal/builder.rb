@@ -7,6 +7,7 @@ require 'opal/cache'
 require 'opal/builder/scheduler'
 require 'opal/project'
 require 'opal/builder/directory'
+require 'opal/builder/post_processor'
 require 'set'
 
 module Opal
@@ -127,11 +128,11 @@ module Opal
     end
 
     def to_s
-      processed.map(&:to_s).join("\n")
+      postprocessed.map(&:to_s).join("\n")
     end
 
     def source_map
-      ::Opal::SourceMap::Index.new(processed.map(&:source_map), join: "\n")
+      ::Opal::SourceMap::Index.new(postprocessed.map(&:source_map), join: "\n")
     end
 
     def append_paths(*paths)
@@ -174,6 +175,10 @@ module Opal
     include Builder::Directory
 
     attr_reader :processed
+
+    def postprocessed
+      @postprocessed ||= PostProcessor.call(processed, self)
+    end
 
     attr_accessor :processors, :path_reader, :stubs,
       :compiler_options, :missing_require_severity, :cache, :scheduler
