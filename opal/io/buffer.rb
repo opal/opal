@@ -4,6 +4,8 @@ require 'corelib/string/encoding'
 
 class ::IO
   class Buffer
+    # for Opal internal use see "methods for Opal convenience" below
+
     # Types that can be requested from the buffer:
     #
     # :U8: unsigned integer, 1 byte
@@ -103,26 +105,16 @@ class ::IO
         }
       }
 
-      function string_to_uint8(string) {
-        let uint8_a;
-        if (string.internal_encoding == Opal.encodings["BINARY"]) {
-          let length = string.length;
-          uint8_a = new Uint8Array(length);
-          for(let i = 0; i < length; i++) {
-            uint8_a[i] = string.charCodeAt(i);
-          }
-        } else {
-          let encoder = new TextEncoder();
-          uint8_a = encoder.encode(string);
-        }
-        return uint8_a;
+      function copy_dv(source_dv, target_dv, source_offset, offset, length) {
+        let source = new Uint8Array(source_dv.buffer, source_offset, length);
+        (new Uint8Array(target_dv.buffer, target_dv.byteOffset, target_dv.byteLength)).set(source, offset);
       }
 
       function endianess() {
         let uint32_a = new Uint32Array([0x11223344]);
         let uint8_a = new Uint8Array(uint32_a.buffer);
-        if (uint8_a[0] === 0x44) { return 4; } // LITTLE_ENDIAN
-        else if (uint8_a[0] === 0x11) { return 8; } // BIG_ENDIAN
+        if (uint8_a[0] === 0x44) return 4; // LITTLE_ENDIAN
+        if (uint8_a[0] === 0x11) return 8; // BIG_ENDIAN
         return nil;
       }
     }
@@ -137,9 +129,8 @@ class ::IO
         # Ruby docs: Creates a zero-copy IO::Buffer from the given string’s memory.
         # Opal: We have to copy.
         raise(TypeError, 'arg must be a String') unless string.is_a?(String)
-        `let uint8_a = string_to_uint8(string)`
-        buf = new(`uint8_a.byteLength`)
-        `buf.data_view = new DataView(uint8_a.buffer)`
+        buf = new(nil)
+        `buf.data_view = new DataView((new Uint8Array(string.$bytes())).buffer)`
         `buf.readonly = true` if string.frozen?
         return yield buf if block_given?
         buf
@@ -158,10 +149,10 @@ class ::IO
         size = 0
         if buffer_type.is_a?(Array)
           buffer_type.each do |type|
-            size += `size_map.get(type.$to_s())`
+            size += `size_map.get(type.$to_s().toString())`
           end
         else
-          size = `size_map.get(buffer_type.$to_s())`
+          size = `size_map.get(buffer_type.$to_s().toString())`
         end
         size
       end
@@ -185,7 +176,10 @@ class ::IO
       @locked = (flags & LOCKED) > 0
       @external = (flags & EXTERNAL) > 0
       @internal = !@external
-      @data_view = `new DataView(new ArrayBuffer(size))`
+      # dont allocate internal data_view when size is nil
+      # assuming it will be allocated and attached immediately
+      # by surrounding code, e.g. by IO::Buffer.for()
+      @data_view = `new DataView(new ArrayBuffer(size))` if size
     end
 
     #
@@ -317,24 +311,11 @@ class ::IO
       # at offset using memcpy. For copying String instances, see set_string.
       raise(AccessError, 'Buffer is not writable!') if readonly? || null?
       raise(ArgumentError, 'source must be a ::IO::Buffer') unless source.is_a?(Buffer)
-      length ||= offset + source.size
+      length ||= offset + (source.size - source_offset)
       if (offset + length) > size
         raise(ArgumentError, 'Specified offset+length is bigger than the buffer size!')
       end
-      %x{
-        let value;
-        for(let i = 0; i < length;) {
-          if ((length - i) > 4) {
-            value = source.data_view.getUint32(source_offset + i);
-            self.data_view.setUint32(offset + i, value);
-            i += 4;
-          } else {
-            value = source.data_view.getUint8(source_offset + i);
-            self.data_view.setUint8(offset + i, value);
-            i++;
-          }
-        }
-      }
+      `copy_dv(source.data_view, self.data_view, source_offset, offset, length)`
       length
     end
 
@@ -342,13 +323,13 @@ class ::IO
       # Iterates over the buffer, yielding each value of buffer_type starting from offset.
       raise(AccessError, 'Buffer has been freed!') if null?
       return enum_for(:each, buffer_type, offset, count) unless block_given?
-      step = `size_map.get(buffer_type.$to_s())`
-      i = offset
+      step = `size_map.get(buffer_type.$to_s().toString())`
       count ||= (size / step).to_i
-      while count > 0
-        yield i, get_value(buffer_type, i)
-        i += step
-        count -= 1
+      len = size - offset
+      max = offset + `Math.min(count * step, len)`
+      while offset < max
+        yield offset, get_value(buffer_type, offset)
+        offset += step
       end
       self
     end
@@ -357,11 +338,11 @@ class ::IO
       # Iterates over the buffer, yielding each byte starting from offset.
       raise(AccessError, 'Buffer has been freed!') if null?
       return enum_for(:each_byte, offset, count) unless block_given?
-      count ||= size
-      while count > 0
+      len = size - offset
+      max = offset + (count ? `Math.min(count, len)` : len)
+      while offset < max
         yield `self.data_view.getUint8(offset)`
         offset += 1
-        count -= 1
       end
       self
     end
@@ -378,37 +359,53 @@ class ::IO
       @locked = true
     end
 
-    def get_string(offset = 0, length = nil, encoding = nil)
-      # Read a chunk or all of the buffer into a string, in the specified encoding.
-      # If no encoding is provided Encoding::BINARY is used.
+    def get_raw_string(offset = 0, length = nil, encoding = nil, ensure_valid = false)
+      # not a Ruby method, but used by IO
       raise(AccessError, 'Buffer has been freed!') if null?
       s = size
       length ||= s - offset
       raise(ArgumentError, 'Offset + length is bigger than the buffer size') if offset > s || (offset + length) > s
       raise(ArgumentError, "Offset can't be negative") if offset < 0
       encoding ||= ::Encoding::BINARY
-      js_encoding = case encoding
-                    when ::Encoding::ASCII_8BIT then 'ascii'
-                    when ::Encoding::BINARY then 'ascii'
-                    when ::Encoding::US_ASCII then 'ascii'
-                    when ::Encoding::ISO_8859_1 then 'ascii'
-                    when ::Encoding::UTF_8 then 'utf-8'
-                    when ::Encoding::UTF_16LE then 'utf-16le'
-                    when ::Encoding::UTF_16BE then 'utf-16be'
-                    else
-                      raise(ArgumentError, "#{encoding} not yet supported!")
-                    end
+      return encoding.decode(self) if offset == 0 && length == size
+      if ensure_valid
+        # Ensure the return of a valid last char when byte slicing the buffer with
+        # a maximum of 16 tries, meaning to slice up to 16 bytes above limit.
+        # Usually the JS TextDecoder is more forgiving than Ruby, so that specs,
+        # that test for the splicing of 16 bytes above limit, unfortunately still fail.
+        # Even though the TextDecoder may return earlier than Matz Ruby, in JS world
+        # the last character is valid, in Matz Ruby world then possibly not.
+        max_len = `Math.min(length + 16, s)`
+        invalid = true
+        res = nil
+        while invalid && length < max_len
+          begin
+            res = encoding.decode!(slice(offset, length))
+            invalid = false
+          rescue Exception
+            length += 1
+          end
+        end
+        if res.nil?
+          # unable to read anything valid from the buffer
+          return encoding.decode(slice(offset, length))
+        end
+        res
+      else
+        encoding.decode(slice(offset, length))
+      end
+    end
 
+    def get_string(offset = 0, length = nil, encoding = nil)
+      # Read a chunk or all of the buffer into a string, in the specified encoding.
+      # If no encoding is provided Encoding::BINARY is used.
+      encoding ||= ::Encoding::BINARY
+      string = get_raw_string(offset, length, encoding)
       %x{
-        let decoder = new TextDecoder(js_encoding);
-        let string = decoder.decode(new DataView(self.data_view.buffer, self.data_view.byteOffset + offset, length));
-        let n = string.indexOf('\0');
-        if (n >= 0) { string = string.substring(0, n); }
-        if (string.encoding != encoding) {
-          string = Opal.str(string, encoding.$name());
-        }
-        return string;
+        string = string.replace(/^\0+/, '');
+        if (string.encoding != encoding) string = Opal.str(string, encoding.$name());
       }
+      string
     end
 
     def get_value(buffer_type, offset)
@@ -416,6 +413,7 @@ class ::IO
       raise(AccessError, 'Buffer has been freed!') if null?
       buffer_type_s = buffer_type.to_s
       %x{
+        buffer_type_s = buffer_type_s.toString();
         let val = self.data_view['get' + fun_map.get(buffer_type_s)](offset, is_le(buffer_type_s));
         if (typeof(val) === "bigint") { return Number(val); }
         return val;
@@ -428,7 +426,7 @@ class ::IO
       array = []
       buffer_types.each do |buffer_type|
         array << get_value(buffer_type, offset)
-        offset += `size_map.get(buffer_type.$to_s())`
+        offset += `size_map.get(buffer_type.$to_s().toString())`
       end
       array
     end
@@ -448,12 +446,8 @@ class ::IO
 
     def initialize_copy(orig)
       %x{
-        let odv = orig.data_view;
-        if (odv == nil) { self.data_view = nil; }
-        else {
-          self.data_view = new DataView(new ArrayBuffer(odv.byteLength));
-          new Uint8Array(self.data_view.buffer).set(new Uint8Array(odv.buffer, odv.byteOffset, odv.byteLength));
-        }
+        if (orig.data_view == nil) self.data_view = nil;
+        else self.data_view = new DataView(orig.data_view.buffer.slice());
       }
       self
     end
@@ -519,13 +513,18 @@ class ::IO
       raise(AccessError, 'Buffer is not writable!') if readonly? || null?
       raise(AccessError, 'Buffer references external memory!') if external?
       raise LockedError if locked?
-      %x{
-        let dv = self.data_view;
-        let buffer = new ArrayBuffer(new_size);
-        let length = (new_size > dv.byteLength) ? dv.byteLength : new_size;
-        new Uint8Array(buffer).set(new Uint8Array(dv.buffer, dv.byteOffset, length));
-        self.data_view = new DataView(buffer);
-      }
+      if new_size < size || size < new_size
+        %x{
+          // some engines don't have buffer.transfer
+          if (typeof self.data_view.buffer.transfer === "function") {
+            self.data_view = new DataView(self.data_view.buffer.transfer(new_size))
+          } else {
+            let old_dv = self.data_view;
+            self.data_view = new DataView(new ArrayBuffer(new_size));
+            copy_dv(old_dv, self.data_view, 0, 0, Math.min(old_dv.byteLength, new_size));
+          }
+        }
+      end
       self
     end
 
@@ -535,20 +534,13 @@ class ::IO
       # being UTF8 encoded. So we do the same, asuming UTF8 for Ruby compatibility,
       # although JavaScript is using UTF16. Efficiently here only happens for UTF8 anyway.
       raise(AccessError, 'Buffer is not writable!') if readonly? || null?
+      string = string.byteslice(source_offset) unless source_offset.nil? || source_offset == 0
+      bytes = string.bytes
+      strg_dv = `new DataView((new Uint8Array(bytes)).buffer)`
       %x{
-        if (typeof(source_offset) === "number") { string = string.slice(source_offset); }
-        let uint8_a = string_to_uint8(string);
-        let strg_dv = new DataView(uint8_a.buffer);
-        if (typeof(length) !== "number") { length = uint8_a.byteLength; }
-        for (let i = 0; i < length;) {
-          if ((length - i) > 4) {
-            self.data_view.setUint32(offset + i, strg_dv.getUint32(i));
-            i += 4;
-          } else {
-            self.data_view.setUint8(offset + i, strg_dv.getUint8(i));
-            i++;
-          }
-        }
+        if (typeof(length) !== "number") length = strg_dv.byteLength;
+        length = Math.min(strg_dv.byteLength, self.data_view.byteLength);
+        copy_dv(strg_dv, self.data_view, 0, offset, length);
       }
       length
     end
@@ -558,6 +550,7 @@ class ::IO
       raise(AccessError, 'Buffer is not writable!') if readonly? || null?
       buffer_type_s = buffer_type.to_s
       %x{
+        buffer_type_s = buffer_type_s.toString();
         let fun = 'set' + fun_map.get(buffer_type_s);
         if (fun[3] === 'B') { value = BigInt(value); }
         self.data_view[fun](offset, value, is_le(buffer_type_s));
@@ -594,7 +587,7 @@ class ::IO
       raise(ArgumentError, 'length must be >= 0') if length < 0
       end_pos = offset + length
       raise(ArgumentError, "Index #{end_pos} out buffer bounds") if end_pos > size
-      io_buffer = Buffer.new(0, EXTERNAL)
+      io_buffer = Buffer.new(nil, EXTERNAL)
       `io_buffer.data_view = new DataView(self.data_view.buffer, self.data_view.byteOffset + offset, length)`
       `io_buffer.readonly = true` if readonly?
       io_buffer
@@ -608,7 +601,7 @@ class ::IO
       # Transfers ownership of the underlying memory to a new buffer, causing the current buffer to become uninitialized.
       raise(AccessError, 'Buffer has been freed!') if null?
       raise(LockedError, 'Cannot transfer ownership of locked buffer!') if locked?
-      io_buffer = Buffer.new(0)
+      io_buffer = Buffer.new(nil)
       `io_buffer.data_view = self.data_view`
       `io_buffer.readonly = true` if readonly?
       @data_view = nil
@@ -623,7 +616,7 @@ class ::IO
     def values(buffer_type, offset = 0, count = nil)
       # Returns an array of values of buffer_type starting from offset.
       array = []
-      step = `size_map.get(buffer_type.$to_s())`
+      step = `size_map.get(buffer_type.$to_s().toString())`
       count ||= (size / step).to_i
       while count > 0
         array << get_value(buffer_type, offset)
@@ -638,6 +631,19 @@ class ::IO
       raise(AccessError, 'Buffer has been freed!') if null?
       length ||= size - offset
       io.write(get_string(offset, length))
+    end
+
+    #
+    # methods for Opal convenience and speed
+    # these methods do not check Buffer state or validate anything
+    #
+
+    def get_byte(offset)
+      `self.data_view.getUint8(offset)`
+    end
+
+    def set_byte(offset, value)
+      `self.data_view.setUint8(offset, value)`
     end
   end
 end

@@ -152,6 +152,7 @@ Lint/RescueException:
     # Promises must care about all exceptions
     - 'stdlib/promise.rb'
     - 'opal/corelib/binding.rb'
+    - 'opal/io/buffer.rb'
 
 Lint/RedundantStringCoercion:
   Exclude:
