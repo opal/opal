@@ -21,7 +21,7 @@ module Opal
         catch(:file) do
           index = []
 
-          processed.each do |file|
+          postprocessed.each do |file|
             module_name = Compiler.module_name(file.filename)
             last_segment_name = File.basename(module_name)
             depth = module_name.split('/').length - 1
