@@ -8,7 +8,18 @@
 class ::String < `String`
   include ::Comparable
 
-  attr_reader :encoding, :internal_encoding # these 2 are set to defaults at the end of corelib/string/encoding.rb
+  # The encoding to be used for binary representation of the string.
+  # For literal strings that would be mostly UTF-8, for strings read from a file
+  # it would be the IO#external_encoding, for newly created strings the same as
+  # encoding below, mostly UTF-8 by default.
+  # This is set to the default encoding (UTF-8) at the end of corelib/string/encoding.rb
+  attr_reader :binary_encoding
+
+  # The encoding to be used for everything else.
+  # For literal strings that would be mostly UTF-8, for strings read from a file
+  # it would be the IO#internal_encoding.
+  # This is set to a default encoding (UTF-8) at the end of corelib/string/encoding.rb
+  attr_reader :encoding
 
   %x{
     const MAX_STR_LEN = Number.MAX_SAFE_INTEGER;
@@ -59,9 +70,7 @@ class ::String < `String`
     //   search_l: is optional, if given must be search.$length(), do NOT use search.length
     //   last: boolean, optional too, if true returns the last index otherwise the first
     function find_byte_index_of(str, search, search_l, offset, last) {
-      let search_f;
-      if (search.length === 0 || search.length === 1) search_f = search;
-      else search_f = first_char(search);
+      let search_f = (search.length === 0 || search.length === 1) ? search : first_char(search);
       let i = 0, col = [], l = 0, idx = -1, hit_boundary = (offset === 0) ? true : false;
       if (last) l = search_l || search.$length();
       for (const c of str) {
@@ -495,6 +504,10 @@ class ::String < `String`
   def %(data)
     if ::Array === data
       format(self, *data)
+    elsif data.respond_to?(:to_ary)
+      ary = ::Opal.coerce_to?(data, ::Array, :to_ary)
+      ary = [data] if ary.nil?
+      format(self, *ary)
     else
       format(self, data)
     end
@@ -543,10 +556,7 @@ class ::String < `String`
     %x{
       if (other.length === 0 && self.$$class === Opal.String) return self;
       if (self.length === 0 && other.$$class === Opal.String) return other;
-      var out = self + other;
-      if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
-      if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
-      return Opal.str(out, self.encoding);
+      return $str(self + other, self.encoding);
     }
   end
 
@@ -557,7 +567,6 @@ class ::String < `String`
   def -@
     %x{
       if (typeof self === 'string' || self.$$frozen) return self;
-      if (self.encoding.name == 'UTF-8' && self.internal_encoding.name == 'UTF-8') return self.toString();
       return self.$dup().$freeze();
     }
   end
@@ -630,7 +639,12 @@ class ::String < `String`
   end
 
   def b
-    `$str(self, 'binary')`
+    %x{
+     let b_enc = self.binary_encoding,
+        s = $str(self, 'BINARY');
+      s.binary_encoding = b_enc;
+      return s;
+    }
   end
 
   def byteindex(search, offset = 0)
@@ -669,7 +683,7 @@ class ::String < `String`
         #{$~ = ::MatchData.new(`regex`, `match`)};
         index = match.index;
         if (index === 0) return offset;
-        return offset + #{internal_encoding.bytesize(`str`, `index - 1`)};
+        return offset + #{binary_encoding.bytesize(`str`, `index - 1`)};
       }
       search = $coerce_to(search, #{::String}, 'to_str');
       index = find_byte_index_of(self, search, search.$length(), offset, false);
@@ -713,7 +727,7 @@ class ::String < `String`
         #{$~ = ::MatchData.new `regex`, `match`};
         index = match.index;
         if (index === 0) return 0;
-        return #{internal_encoding.bytesize(`self`, `index - 1`)};
+        return #{binary_encoding.bytesize(`self`, `index - 1`)};
       }
       search = $coerce_to(search, #{::String}, 'to_str');
       index = find_byte_index_of(self, search, search.$length(), offset, true);
@@ -723,14 +737,13 @@ class ::String < `String`
   end
 
   def bytes(&block)
-    res = each_byte.to_a
-    return res unless block_given?
-    res.each(&block)
+    return binary_encoding.bytes(self) unless block_given?
+    binary_encoding.each_byte(self, &block)
     self
   end
 
   def bytesize
-    internal_encoding.bytesize(self, `self.length`)
+    binary_encoding.bytesize(self, `self.length`)
   end
 
   def byteslice(index, length = undefined)
@@ -770,14 +783,13 @@ class ::String < `String`
       if (index > MAX_STR_LEN) #{raise RangeError, 'index too large'};
       if (length !== Infinity && length > MAX_STR_LEN) #{raise RangeError, 'length too large'};
     }
-    result = internal_encoding.byteslice(self, index, length)
+    result = binary_encoding.byteslice(self, index, length)
     if result
       %x{
         if (self.encoding === Opal.Encoding?.UTF_8) return result;
         return $str(result, self.encoding);
       }
     end
-    result
   end
 
   # bytesplice - not supported, mutates string
@@ -846,7 +858,7 @@ class ::String < `String`
     %x{
       var result;
 
-      if (separator === "\n") {
+      if (separator == "\n") {
         result = self.replace(/\r?\n?$/, '');
       }
       else if (separator.length === 0) {
@@ -857,7 +869,7 @@ class ::String < `String`
                !ends_with_high_surrogate(separator)) {
 
         // compare tail with separator
-        if (self.substring(self.length - separator.length) === separator) {
+        if (self.substring(self.length - separator.length) == separator) {
           result = self.substring(0, self.length - separator.length);
         }
       }
@@ -899,23 +911,30 @@ class ::String < `String`
 
   # clear - not supported, mutates string
 
-  def clone(freeze: nil)
-    unless freeze.nil? || freeze == true || freeze == false
-      raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
-    end
+  %x{
+    (function() {
+      "use strict";
+      #{
+        def clone(freeze: nil)
+          unless freeze.nil? || freeze == true || freeze == false
+            raise ArgumentError, "unexpected value for freeze: #{freeze.class}"
+          end
 
-    copy = `$str(self)`
-    copy.copy_singleton_methods(self)
-    copy.initialize_clone(self, freeze: freeze)
+          copy = `$str(self)`
+          copy.copy_singleton_methods(self)
+          copy.initialize_clone(self, freeze: freeze)
 
-    if freeze == true
-      `if (!copy.$$frozen) copy.$$frozen = true;`
-    elsif freeze.nil?
-      `if (self.$$frozen) copy.$$frozen = true;`
-    end
+          if freeze == true
+            `if (!copy.$$frozen) copy.$$frozen = true;`
+          elsif freeze.nil?
+            `if (typeof self === "string" || self.$$frozen) copy.$$frozen = true;`
+          end
 
-    copy
-  end
+          copy
+        end
+      }
+    })();
+  }
 
   def codepoints(&block)
     # If a block is given, which is a deprecated form, works the same as each_codepoint.
@@ -1052,7 +1071,7 @@ class ::String < `String`
 
   def each_byte(&block)
     return enum_for(:each_byte) { bytesize } unless block_given?
-    internal_encoding.each_byte(self, &block)
+    binary_encoding.each_byte(self, &block)
     self
   end
 
@@ -1061,7 +1080,6 @@ class ::String < `String`
     %x{
       for (let c of self) {
         c = $str(c, self.encoding);
-        c.encoding = self.encoding;
         #{yield `c`};
       }
     }
@@ -1139,7 +1157,7 @@ class ::String < `String`
   end
 
   def encode(encoding)
-    `Opal.str(self, encoding)`
+    `$str(self, encoding)`
   end
 
   # encode! - not supported, mutates string
@@ -1170,6 +1188,25 @@ class ::String < `String`
     end
     `Opal.set_encoding(self, encoding.name)`
   end
+
+  %x{
+    (function() {
+      "use strict";
+      #{
+        def freeze
+          %x{
+            if (typeof self === 'string') { return self; }
+            $prop(self, "$$frozen", true);
+            return self;
+          }
+        end
+
+        def frozen?
+          `typeof self === 'string' || self.$$frozen === true`
+        end
+      }
+    })();
+  }
 
   def getbyte(idx)
     idx = ::Opal.coerce_to!(idx, ::Integer, :to_int)
@@ -1336,10 +1373,8 @@ class ::String < `String`
   end
 
   def initialize_copy(other)
-    %x{
-      self.encoding = other.encoding;
-      self.internal_encoding = other.internal_encoding;
-    }
+    `self.encoding = other.encoding`
+    `self.binary_encoding = other.binary_encoding`
   end
 
   # insert - not supported, mutates string
@@ -1361,7 +1396,7 @@ class ::String < `String`
             '\\': '\\\\'
           },
           char_code,
-          is_binary = self.encoding["$binary?"]() || self.internal_encoding["$binary?"](),
+          is_binary = self.encoding == Opal.Encoding?.ASCII_8BIT || self.binary_encoding == Opal.Encoding?.ASCII_8BIT,
           external_is_utf8 = Opal.Encoding.default_external == Opal.Encoding.UTF_8,
           escaped = self.replace(escapable, function (chr) {
             if (meta[chr]) return meta[chr];
@@ -2152,9 +2187,17 @@ class ::String < `String`
 
   # to_r - defined in corelib/rational/base
 
-  def to_s
-    `self.toString()`
-  end
+  %x{
+    (function() {
+      "use strict";
+      #{
+        def to_s
+          return self if instance_of?(::String)
+          `self.toString()`
+        end
+      }
+    })();
+  }
 
   alias to_str to_s
 
@@ -2403,18 +2446,6 @@ class ::String < `String`
 
   def self._load(*args)
     new(*args)
-  end
-
-  def freeze
-    %x{
-      if (typeof self === 'string') { return self; }
-      $prop(self, "$$frozen", true);
-      return self;
-    }
-  end
-
-  def frozen?
-    `typeof self === 'string' || self.$$frozen === true`
   end
 
   alias object_id __id__
