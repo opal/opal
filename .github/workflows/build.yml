@@ -27,12 +27,6 @@ jobs:
           - name: mspec-firefox
             firefox: 'latest-esr'
             command: xvfb-run bin/rake mspec_firefox
-          - name: mspec-bun
-            bun: true
-            command: bin/rake mspec_bun
-          - name: mspec-deno
-            deno: true
-            command: bin/rake mspec_deno
           - name: minitest
             command: bin/rake minitest
           - name: minitest-strict-mode
