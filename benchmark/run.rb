@@ -25,7 +25,7 @@ selected_rubies = []
 
 OptionParser.new do |parser|
   parser.banner = "Usage: run.rb runner(s) [files...]"
-  parser.on("--ruby", "Use system Ruby") { rubies << ruby_exe }
+  parser.on("--ruby", "Use system Ruby") { selected_rubies << ["ruby", ruby_exe] }
 
   runners.each do |runner|
     runner_dc = runner.downcase

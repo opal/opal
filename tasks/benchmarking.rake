@@ -145,6 +145,7 @@ namespace :bench do
     end
   end
 
+  desc "Benchmark Opal IPS style"
   task :ips do
     files = Dir[ENV['FILE'] || "#{__dir__}/../benchmark-ips/bm_*.rb"]
     raise ArgumentError, "no files provided" if files.empty?
