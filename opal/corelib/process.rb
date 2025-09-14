@@ -1,5 +1,5 @@
 # backtick_javascript: true
-# helpers: platform, coerce_to, process_check_id
+# helpers: platform, coerce_to, coerce_to_or_nil, coerce_to_or_raise, process_check_id
 
 module ::Process
   PRIO_PGRP = `$platform.PRIO_PGRP` || nil
@@ -49,7 +49,7 @@ module ::Process
 
     def abort(msg = nil)
       # Terminates execution immediately, effectively by calling Kernel.exit(false).
-      msg = ::Opal.coerce_to!(msg, ::String, :to_str) if msg
+      msg = `$coerce_to_or_raise(msg, Opal.String, "to_str")` if msg
       $stderr << msg if msg
       raise(::SystemExit.new(false, msg))
     end
@@ -232,7 +232,7 @@ module ::Process
     if `$platform.getpgid`
       def getpgid(pid)
         # Returns the process group ID for the given process ID pid
-        pid = ::Opal.coerce_to!(pid, ::Integer, :to_int)
+        pid = `$coerce_to_or_raise(pid, Opal.Integer, "to_int")`
         `$platform.getpgid(pid)`
       end
 
@@ -248,8 +248,8 @@ module ::Process
     if `$platform.getpriority`
       def getpriority(kind, id)
         # Returns the scheduling priority for specified process, process group, or user.
-        kind = ::Opal.coerce_to!(kind, ::Integer, :to_int)
-        id = ::Opal.coerce_to!(id, ::Integer, :to_int)
+        kind = `$coerce_to_or_raise(kind, Opal.Integer, "to_int")`
+        id = `$coerce_to_or_raise(id, Opal.Integer, "to_int")`
         `$platform.getpriority(kind, id)`
       end
     else
@@ -266,9 +266,7 @@ module ::Process
                  resource = resource.to_s
                  `$platform["RLIMIT_" + resource.toString()]`
                else
-                 res = ::Opal.coerce_to?(resource, ::String, :to_str)
-                 res ||= ::Opal.coerce_to!(resource, ::Integer, :to_int)
-                 res
+                 `$coerce_to_or_nil(resource, Opal.String, "to_str")` || `$coerce_to_or_raise(resource, Opal.Integer, "to_int")`
                end
         raise(::ArgumentError, 'unknown resource') unless rsrc
         result = `$platform.getrlimit(rsrc)`
@@ -285,7 +283,7 @@ module ::Process
         # Returns the session ID of the given process ID pid,
         # or of the current process if not given.
         process_id = if process_id
-                       ::Opal.coerce_to!(process_id, ::Integer, :to_int)
+                       `$coerce_to_or_raise(process_id, Opal.Integer, "to_int")`
                      else
                        pid
                      end
@@ -340,8 +338,8 @@ module ::Process
         # Sets the supplemental group access list; the new list includes:
         # The group IDs of those groups to which the user given by username belongs.
         # The group ID gid
-        name = ::Opal.coerce_to!(name, ::String, :to_str)
-        gid = ::Opal.coerce_to!(gid, ::Integer, :to_int)
+        name = `$coerce_to_or_raise(name, Opal.String, "to_str")`
+        gid = `$coerce_to_or_raise(gid, Opal.Integer, "to_int")`
         `$platform.initgroups(name.toString(), gid)`
       end
     else
@@ -432,8 +430,8 @@ module ::Process
     if `$platform.setpgid`
       def setpgid(pid, pgid)
         # Sets the process group ID for the process given by process ID pid to pgid.
-        pid = ::Opal.coerce_to!(pid, ::Integer, :to_int)
-        pgid = ::Opal.coerce_to!(pgid, ::Integer, :to_int)
+        pid = `$coerce_to_or_raise(pid, Opal.Integer, "to_int")`
+        pgid = `$coerce_to_or_raise(pgid, Opal.Integer, "to_int")`
         `$platform.setpgid(pid, pgid)`
       end
     else
@@ -448,9 +446,9 @@ module ::Process
     if `$platform.setpriority`
       def setpriority(kind, id, prio)
         # See Process.getpriority.
-        kind = ::Opal.coerce_to!(kind, ::Integer, :to_int)
-        id = ::Opal.coerce_to!(id, ::Integer, :to_int)
-        prio = ::Opal.coerce_to!(prio, ::Integer, :to_int)
+        kind = `$coerce_to_or_raise(kind, Opal.Integer, "to_int")`
+        id = `$coerce_to_or_raise(id, Opal.Integer, "to_int")`
+        prio = `$coerce_to_or_raise(prio, Opal.Integer, "to_int")`
         `$platform.setpriority(kind, id, prio)`
       end
     else
@@ -478,13 +476,11 @@ module ::Process
                  resource = resource.to_s
                  `$platform["RLIMIT_" + resource.toString()]`
                else
-                 res = ::Opal.coerce_to?(resource, ::String, :to_str)
-                 res ||= ::Opal.coerce_to!(resource, ::Integer, :to_int)
-                 res
+                 `$coerce_to_or_nil(resource, Opal.String, "to_str")` || `$coerce_to_or_raise(resource, Opal.Integer, "to_int")`
                end
         raise(::ArgumentError, 'unknown resource') unless rsrc
-        cur = ::Opal.coerce_to!(cur, ::Integer, :to_int)
-        max = max ? ::Opal.coerce_to!(max, ::Integer, :to_int) : cur
+        cur = `$coerce_to_or_raise(cur, Opal.Integer, "to_int")`
+        max = max ? `$coerce_to_or_raise(max, Opal.Integer, "to_int")` : cur
         `$platform.setrlimit(rsrc, BigInt(cur), BigInt(max))`
         nil
       end
@@ -560,7 +556,7 @@ module ::Process
         # Waits for a suitable child process to exit, returns its process ID,
         # and sets $? to a Process::Status object containing information on
         # that process. Which child it waits for depends on the value of the given pid.
-        pid = ::Opal.coerce_to!(pid, ::Integer, :to_int)
+        pid = `$coerce_to_or_raise(pid, Opal.Integer, "to_int")`
         pid, $? = wait2(pid, flags)
         # if (flags & WNOHANG == WNOHANG) &&
         #   !($?.exited? || $?.signaled? || $?.stopped? || $?.success?)

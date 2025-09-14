@@ -1,4 +1,4 @@
-# helpers: coerce_to, respond_to, global_regexp, prop, opal32_init, opal32_add, transform_regexp, str
+# helpers: coerce_to, coerce_to_or_nil, coerce_to_or_raise, respond_to, global_regexp, prop, opal32_init, opal32_add, transform_regexp, str
 # backtick_javascript: true
 
 # depends on:
@@ -472,7 +472,7 @@ class ::String < `String`
   }
 
   def self.try_convert(what)
-    ::Opal.coerce_to?(what, ::String, :to_str)
+    `$coerce_to_or_nil(what, Opal.String, "to_str")`
   end
 
   def self.new(*args)
@@ -505,7 +505,7 @@ class ::String < `String`
     if ::Array === data
       format(self, *data)
     elsif data.respond_to?(:to_ary)
-      ary = ::Opal.coerce_to?(data, ::Array, :to_ary)
+      ary = `$coerce_to_or_nil(data, Opal.Array, "to_ary")`
       ary = [data] if ary.nil?
       format(self, *ary)
     else
@@ -853,7 +853,7 @@ class ::String < `String`
   def chomp(separator = $/)
     return self if `separator === nil || self.length === 0`
 
-    separator = ::Opal.coerce_to!(separator, ::String, :to_str).to_s
+    separator = `$coerce_to_or_raise(separator, Opal.String, "to_str").toString()`
 
     %x{
       var result;
@@ -1181,7 +1181,7 @@ class ::String < `String`
     `if (encoding === self.encoding) return self;`
     unless encoding.is_a?(::Encoding)
       %x{
-        encoding = #{::Opal.coerce_to!(encoding, ::String, :to_str)};
+        encoding = $coerce_to_or_raise(encoding, Opal.String, "to_str");
         encoding = #{::Encoding.find(encoding)};
         if (encoding === self.encoding) return self;
       }
@@ -1209,7 +1209,7 @@ class ::String < `String`
   }
 
   def getbyte(idx)
-    idx = ::Opal.coerce_to!(idx, ::Integer, :to_int)
+    idx = `$coerce_to_or_raise(#{idx}, Opal.Integer, "to_int")`
 
     return bytes[idx] if idx < 0
 
@@ -1827,7 +1827,7 @@ class ::String < `String`
       if (limit === undefined) {
         limit = 0;
       } else {
-        limit = #{::Opal.coerce_to!(limit, ::Integer, :to_int)};
+        limit = $coerce_to_or_raise(limit, Opal.Integer, "to_int");
         if (limit === 1) {
           if (block && block !== nil) {
             #{yield self};

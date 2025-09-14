@@ -1,5 +1,5 @@
 # backtick_javascript: true
-# helpers: str
+# helpers: coerce_to_or_raise, str
 
 class ::Encoding
   class << self
@@ -64,7 +64,7 @@ class ::Encoding
     def default_external=(enc)
       raise(ArgumentError, 'enc must be given') if enc.nil?
       unless enc.is_a?(::Encoding)
-        enc = ::Opal.coerce_to!(enc, ::String, :to_str)
+        enc = `$coerce_to_or_raise(enc, Opal.String, "to_str")`
         enc = find(enc)
       end
       aliases['external'] = enc.name
@@ -77,7 +77,7 @@ class ::Encoding
     def default_internal=(enc)
       return @default_internal = nil if enc.nil?
       unless enc.is_a?(::Encoding)
-        enc = ::Opal.coerce_to!(enc, ::String, :to_str)
+        enc = `$coerce_to_or_raise(enc, Opal.String, "to_str")`
         enc = find(enc)
       end
       @default_internal	= enc
@@ -85,7 +85,7 @@ class ::Encoding
 
     def find(name)
       return name if name.is_a?(::Encoding)
-      name = ::Opal.coerce_to!(name, ::String, :to_str)
+      name = `$coerce_to_or_raise(name, Opal.String, "to_str")`
       return default_external if %w[external filesystem locale].include?(name)
       return default_internal if name == 'internal'
       `Opal.find_encoding(name)`

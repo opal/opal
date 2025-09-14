@@ -167,14 +167,14 @@ module ::Enumerable
         if n.nil?
           respond_to?(:size) ? ::Float::INFINITY : nil
         else
-          n = ::Opal.coerce_to!(n, ::Integer, :to_int)
+          n = `Opal.coerce_to_or_raise(n, Opal.Integer, "to_int")`
           n > 0 ? enumerator_size * n : 0
         end
       end
     end
 
     unless n.nil?
-      n = ::Opal.coerce_to! n, ::Integer, :to_int
+      n = `Opal.coerce_to_or_raise(n, Opal.Integer, "to_int")`
 
       return if `n <= 0`
     end
@@ -1252,7 +1252,7 @@ module ::Enumerable
 
       self.$each.$$p = function() {
         var param = #{::Opal.destructure(`arguments`)};
-        var ary = #{::Opal.coerce_to?(`param`, ::Array, :to_ary)}, key, val;
+        var ary = Opal.coerce_to_or_nil(param, Opal.Array, "to_ary"), key, val;
         if (!ary.$$is_array) {
           #{::Kernel.raise ::TypeError, "wrong element type #{`param`.class} (expected array)"}
         }

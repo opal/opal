@@ -146,7 +146,7 @@ end
 #     # Performs a test on one or both of the filesystem entities at the given paths path0 and path1:
 #     #  Each path path0 or path1 points to a file, directory, device, pipe, etc.
 #     #  Character char selects a specific test.
-#     path1 = ::Opal.coerce_to!(path1, :String, :to_path) if path1
+#     path1 = `Opal.coerce_to_or_raise(path1, Opal.String, "to_path")` if path1
 #     case char
 #     when '-' then ::File.identical?(path0, path1)
 #     when '<' then ::File.mtime(path0) < ::File.mtime(path1)

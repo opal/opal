@@ -115,7 +115,7 @@ class ::Numeric
   end
 
   def quo(other)
-    ::Opal.coerce_to!(self, ::Rational, :to_r) / other
+    `Opal.coerce_to_or_raise(self, #{::Rational}, "to_r")` / other
   end
 
   def real

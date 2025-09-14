@@ -1,11 +1,11 @@
 # backtick_javascript: true
-# helpers: platform
+# helpers: platform, coerce_to_or_nil, coerce_to_or_raise
 
 # ::ENV is a instance of this anonymous class, note the .new at the bottom
 ::ENV = Class.new do
   def [](name)
     # Returns the value for the environment variable name if it exists:
-    name = ::Opal.coerce_to!(name, ::String, :to_str)
+    name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
     val = `$platform.env_get(name.toString())`
     if val
       val = ::Opal.str(val, ::Encoding.default_internal) if ::Encoding.default_internal
@@ -16,12 +16,12 @@
   def []=(name, value)
     # Creates, updates, or deletes the named environment variable, returning the value.
     if value
-      name = ::Opal.coerce_to!(name, ::String, :to_str)
+      name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
       raise(::Errno::EINVAL, 'invalid key') if name.empty? || name.include?('=')
-      value = ::Opal.coerce_to!(value, ::String, :to_str)
+      value = `$coerce_to_or_raise(value, Opal.String, "to_str")`
       `$platform.env_set(name.toString(), value.toString())`
     else
-      name = ::Opal.coerce_to?(name, ::String, :to_str)
+      name = `$coerce_to_or_nil(name, Opal.String, "to_str")`
       return if name.empty? || name.include?('=')
       delete(name)
     end
@@ -29,7 +29,7 @@
 
   def assoc(name)
     # Returns a 2-element Array containing the name and value of the environment variable for name if it exists
-    name = ::Opal.coerce_to!(name, ::String, :to_str)
+    name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
     key?(name) ? [name, self[name]] : nil
   end
 
@@ -45,7 +45,7 @@
 
   def delete(name)
     # Deletes the environment variable with name if it exists and returns its value
-    name = ::Opal.coerce_to!(name, ::String, :to_str)
+    name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
     val = self[name]
     `$platform.env_del(name.toString())`
     return val if val
@@ -102,7 +102,7 @@
 
   def fetch(name, default_value = nil)
     # If name is the name of an environment variable, returns its value
-    name = ::Opal.coerce_to!(name, ::String, :to_str)
+    name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
     warn('block supersedes default value argument') if default_value && block_given?
     return self[name] if key?(name)
     return yield name if block_given?
@@ -141,13 +141,13 @@
 
   def has_key?(name)
     # Returns true if there is an environment variable with the given name
-    name = ::Opal.coerce_to!(name, ::String, :to_str)
+    name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
     `$platform.env_has(name.toString())`
   end
 
   def has_value?(value)
     # Returns true if value is the value for some environment variable name, false otherwise
-    value = ::Opal.coerce_to?(value, ::String, :to_str)
+    value = `$coerce_to_or_nil(#{value}, Opal.String, "to_str")`
     return nil unless value
     each_value { |v| return true if v == value }
     false
@@ -176,7 +176,7 @@
 
   def key(value)
     # Returns the name of the first environment variable with value, if it exists
-    value = ::Opal.coerce_to!(value, ::String, :to_str)
+    value = `$coerce_to_or_raise(#{value}, Opal.String, "to_str")`
     each { |k, v| return k if v == value }
     nil
   end
@@ -224,7 +224,7 @@
   def rassoc(value)
     # Returns a 2-element Array containing the name and value
     # of the first found environment variable that has value value, if one exists
-    value = ::Opal.coerce_to?(value, ::String, :to_str)
+    value = `$coerce_to_or_nil(#{value}, Opal.String, "to_str")`
     return nil unless value
     k = key(value)
     k ? [k, value] : nil
@@ -265,7 +265,7 @@
   def replace(hash)
     # Replaces the entire content of the environment variables with the name/value
     # pairs in the given hash; returns ENV
-    hash = ::Opal.coerce_to!(hash, ::Hash, :to_hash)
+    hash = `$coerce_to_or_raise(#{hash}, Opal.Hash, "to_hash")`
     orig = to_hash
     clear
     begin

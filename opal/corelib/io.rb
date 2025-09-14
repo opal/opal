@@ -1,4 +1,4 @@
-# helpers: platform, coerce_to, str, mode_to_flags
+# helpers: platform, coerce_to, coerce_to_or_nil, coerce_to_or_raise, str, mode_to_flags
 # backtick_javascript: true
 
 require 'io/buffer'
@@ -74,7 +74,7 @@ class ::IO
       return #{
         begin
           path = `p`; length = `l`; offset = `f`; opts = `o`
-          path = ::Opal.coerce_to!(path, String, :to_path)
+          path = `$coerce_to_or_raise(path, Opal.String, "to_path")`
           raise(::NotImplementedError, "read with '|' is not available") if path[0] == '|'
 
           open_args = opts[:open_args]
@@ -99,7 +99,7 @@ class ::IO
       return #{
         begin
           path = `p`; data = `d`; offset = `f`; opts = `o`
-          path = ::Opal.coerce_to!(path, ::String, :to_path)
+          path = `$coerce_to_or_raise(path, Opal.String, "to_path")`
           raise(::NotImplementedError, "write with '|' is not available") if path[0] == '|'
 
           if offset.is_a?(::Hash) && !opts.empty?
@@ -108,7 +108,7 @@ class ::IO
             opts = offset
             offset = nil
           elsif offset
-            offset = ::Opal.coerce_to!(offset, ::Integer, :to_int)
+            offset = `$coerce_to_or_raise(offset, Opal.Integer, "to_int")`
           end
           offset_given = offset && offset >= 0
 
@@ -121,14 +121,14 @@ class ::IO
           mode = opts[:mode]
 
           if mode
-            mode = ::Opal.coerce_to!(mode, ::String, :to_str) rescue mode
+            mode = `$coerce_to_or_nil(mode, Opal.String, "to_str")` || mode
             flags = if mode.is_a?(::String)
                       mode = mode.split(':').first if mode.include?(':')
                       raise(ArgumentError, 'mode is a empty string') if mode.empty?
                       raise(::IOError, 'not opened for writing') if mode == 'r'
                       `Opal.mode_to_flags(mode)`
                     else
-                      ::Opal.coerce_to!(mode, ::Integer, :to_int)
+                      `$coerce_to_or_raise(mode, Opal.Integer, "to_int")`
                     end
           end
 
@@ -145,7 +145,7 @@ class ::IO
           end
 
           perm = opts[:perm]
-          perm = perm ? ::Opal.coerce_to!(perm, ::Integer, :to_int) : 0o666
+          perm = perm ? `$coerce_to_or_raise(perm, Opal.Integer, "to_int")` : 0o666
 
           fd = `$platform.io_open_path(path.toString(), flags, perm)`
           io = IO.new(fd, nil, **opts)
@@ -243,16 +243,16 @@ class ::IO
     if `$platform.io_open_path`
       def foreach(path, sep = $/, limit = nil, **opts, &block)
         # Calls the block with each successive line read from the stream.
-        path = ::Opal.coerce_to!(path, ::String, :to_path)
+        path = `$coerce_to_or_raise(#{path}, Opal.String, "to_path")`
 
         if sep.is_a?(::Integer) && limit.nil?
           limit = sep
           sep = $/
         end
-        sep = ::Opal.coerce_to!(sep, ::String, :to_str) if sep
+        sep = `$coerce_to_or_raise(sep, Opal.String, "to_str")` if sep
 
         if limit
-          limit = ::Opal.coerce_to!(limit, ::Integer, :to_int)
+          limit = `$coerce_to_or_raise(limit, Opal.Integer, "to_int")`
           if limit < 0
             limit = nil
           elsif limit == 0
@@ -301,13 +301,13 @@ class ::IO
       def pipe(ext_enc = nil, int_enc = nil, **opts)
         # Creates a pair of pipe endpoints, read_io and write_io, connected to each other.
         if ext_enc && !ext_enc.is_a?(::Encoding)
-          ext_enc = ::Opal.coerce_to!(ext_enc, ::String, :to_str)
+          ext_enc = `$coerce_to_or_raise(ext_enc, Opal.String, "to_str")`
           ext_enc, int_enc = ext_enc.split(':') if int_enc.nil?
           bom, ext_enc = ext_enc.split('|') if ext_enc.include?('|')
           ext_enc = ::Encoding.find(ext_enc)
         end
         if int_enc && !int_enc.is_a?(::Encoding)
-          int_enc = ::Opal.coerce_to!(int_enc, ::String, :to_str)
+          int_enc = `$coerce_to_or_raise(int_enc, Opal.String, "to_str")`
           int_enc = ::Encoding.find(int_enc)
         end
 
@@ -357,7 +357,7 @@ class ::IO
           cmd = command
         end
         raise(::NotImplementedError, "popen with fork '-' is not available") if cmd == '-'
-        mode = mode ? ::Opal.coerce_to!(mode, ::String, :to_str) : 'r'
+        mode = mode ? `$coerce_to_or_raise(mode, Opal.String, "to_str")` : 'r'
         `js_opts.shell = true`
         `js_opts.cwd = #{opts[:chdir]}` if opts.key?(:chdir)
         if opts.key?(:err)
@@ -389,16 +389,16 @@ class ::IO
     if `$platform.io_open_path`
       def readlines(path, sep = $/, limit = nil, **opts)
         # Returns an array of all lines read from the stream.
-        path = ::Opal.coerce_to!(path, String, :to_path)
+        path = `$coerce_to_or_raise(#{path}, Opal.String, "to_path")`
 
         if sep.is_a?(::Integer) && limit.nil?
           limit = sep
           sep = $/
         end
-        sep = ::Opal.coerce_to!(sep, ::String, :to_str) if sep
+        sep = `$coerce_to_or_raise(sep, Opal.String, "to_str")` if sep
 
         if limit
-          limit = ::Opal.coerce_to!(limit, ::Integer, :to_int)
+          limit = `$coerce_to_or_raise(limit, Opal.Integer, "to_int")`
           if limit < 0
             limit = nil
           elsif limit == 0
@@ -427,7 +427,7 @@ class ::IO
     if `$platform.io_open_path`
       def sysopen(path, mode = nil, perm = nil)
         # Opens the file at the given path with the given mode and permissions; returns the integer file descriptor.
-        path = ::Opal.coerce_to!(path, String, :to_path)
+        path = `$coerce_to_or_raise(path, Opal.String, "to_path")`
         mode = mode ? mode.split(':').first : 'r'
         perm ||= 0o666
         flags = `Opal.mode_to_flags(mode)`
@@ -439,7 +439,7 @@ class ::IO
 
     def try_convert(object)
       # Attempts to convert object into an IO object via method to_io; returns the new IO object if successful, or nil otherwise:
-      ::Opal.coerce_to?(object, ::IO, :to_io)
+      `$coerce_to_or_nil(object, #{::IO}, "to_io")`
     end
 
     if `$platform.io_open_path`
@@ -464,7 +464,7 @@ class ::IO
 
     @autoclose = !!opts.fetch(:autoclose, true)
     @buffer = IO::Buffer.new
-    fd = ::Opal.coerce_to!(fd, ::Integer, :to_int)
+    fd = `$coerce_to_or_raise(#{fd}, Opal.Integer, "to_int")`
     raise(Errno::EBADF) if fd < 0
     @fd = fd
     @close_on_exec = @fd > 2
@@ -482,7 +482,7 @@ class ::IO
     [arg_mode, opts[:mode]].each do |m|
       if m
         raise(ArgumentError, 'mode given multiple times') if mode
-        m = ::Opal.coerce_to!(m, ::String, :to_str) rescue m
+        m = `$coerce_to_or_nil(m, Opal.String, "to_str")` || m
         if m.is_a?(::String)
           m, ext_enc, int_enc = m.split(':') if m.include?(':')
           raise(ArgumentError, 'mode is a empty string') if m.empty?
@@ -494,7 +494,7 @@ class ::IO
           mode = m
           flags |= `Opal.mode_to_flags(mode)`
         else
-          flags |= ::Opal.coerce_to!(m, ::Integer, :to_int)
+          flags |= `$coerce_to_or_raise(m, Opal.Integer, "to_int")`
         end
       end
     end
@@ -538,7 +538,7 @@ class ::IO
     use_bom = false
 
     if ext_enc && !ext_enc.is_a?(::Encoding)
-      ext_enc = ::Opal.coerce_to!(ext_enc, ::String, :to_str)
+      ext_enc = `$coerce_to_or_raise(ext_enc, Opal.String, "to_str")`
       ext_enc, int_enc = ext_enc.split(':') if ext_enc.include?(':')
       if ext_enc.start_with?('BOM|')
         use_bom = true
@@ -565,7 +565,7 @@ class ::IO
                  end
 
     if int_enc && !int_enc.is_a?(::Encoding)
-      int_enc = ::Opal.coerce_to!(int_enc, ::String, :to_str)
+      int_enc = `$coerce_to_or_raise(int_enc, Opal.String, "to_str")`
       int_enc = ::Encoding.find(int_enc) unless int_enc == '-'
     end
     @int_enc = if int_enc && (int_enc == '-' || int_enc == @ext_enc)
@@ -603,8 +603,8 @@ class ::IO
     # data from the current file in a particular manner.
     `check_open(self)`
     raise(TypeError, 'advice must be a Symbol') unless advice.is_a?(::Symbol)
-    offset = ::Opal.coerce_to!(offset, ::Integer, :to_int)
-    len = ::Opal.coerce_to!(len, ::Integer, :to_int)
+    offset = `$coerce_to_or_raise(offset, Opal.Integer, "to_int")`
+    len = `$coerce_to_or_raise(len, Opal.Integer, "to_int")`
     raise NotImplementedError unless %i[dontneed noreuse normal random sequential willneed wontneed].include?(advice)
     # just a noop here until engines provide APIs accordingly
     nil
@@ -853,20 +853,20 @@ class ::IO
       if sep
         if limit.nil? && !sep.is_a?(::String)
           begin
-            limit = ::Opal.coerce_to!(sep, ::Integer, :to_int)
+            limit = `$coerce_to_or_raise(sep, Opal.Integer, "to_int")`
             sep = $/
           rescue
-            sep = ::Opal.coerce_to!(sep, ::String, :to_str)
+            sep = `$coerce_to_or_raise(sep, Opal.String, "to_str")`
           end
         elsif sep == ''
           sep = $/
           paragraph_mode = true
         else
-          sep = ::Opal.coerce_to!(sep, ::String, :to_str)
+          sep = `$coerce_to_or_raise(sep, Opal.String, "to_str")`
         end
       end
 
-      limit = limit.nil? ? `Infinity` : ::Opal.coerce_to!(limit, ::Integer, :to_int)
+      limit = limit.nil? ? `Infinity` : `$coerce_to_or_raise(limit, Opal.Integer, "to_int")`
       if limit < 0
         limit = `Infinity`
       elsif limit == 0
@@ -1023,7 +1023,7 @@ class ::IO
   def lineno=(number)
     # Sets and returns the line number for the stream.
     `check_readable(self)`
-    number = ::Opal.coerce_to!(number, ::Integer, :to_int) unless number.is_a?(::Numeric)
+    number = `$coerce_to_or_raise(number, Opal.Integer, "to_int")` unless number.is_a?(::Numeric)
     number = number.floor if number.is_a?(::Float)
     @lineno = number
   end
@@ -1054,7 +1054,7 @@ class ::IO
   def pos=(number)
     # Seeks to the given new_position (in bytes).
     `check_open(self)`
-    number = ::Opal.coerce_to!(number, ::Integer, :to_int)
+    number = `$coerce_to_or_raise(#{number}, Opal.Integer, "to_int")`
     raise(Errno::EINVAL, 'position must be >= 0') if number < 0
     fsz = stat.size
     @pos = number
@@ -1148,7 +1148,7 @@ class ::IO
       write @write_lsep
     else
       args.each do |arg|
-        arg = ::Opal.coerce_to!(arg, ::Array, :to_ary) rescue arg
+        arg = `$coerce_to_or_nil(arg, Opal.Array, "to_ary")` || arg
         if arg.is_a?(Array)
           unless arg.empty?
             ary = arg.flatten rescue arg
@@ -1161,7 +1161,7 @@ class ::IO
             end
           end
         else
-          line = ::Opal.coerce_to!(arg, ::String, :to_s)
+          line = `$coerce_to_or_raise(arg, Opal.String, "to_s")`
           line += @write_lsep unless line.end_with?("\n")
           write(line)
         end
@@ -1176,7 +1176,7 @@ class ::IO
     # Disregards, and does not modify, the stream’s position (see Position).
     # Bypasses any user space buffering in the stream.
     `check_writable(self)`
-    string = ::Opal.coerce_to!(object, ::String, :to_s)
+    string = `$coerce_to_or_raise(object, Opal.String, "to_s")`
     total_wsize = 0
     ext_enc = if @ext_enc
                 @ext_enc
@@ -1417,8 +1417,8 @@ class ::IO
         other_io = path_or_io
         path = nil
       elsif path_or_io
-        other_io = ::Opal.coerce_to!(path_or_io, ::IO, :to_io) rescue nil
-        path = ::Opal.coerce_to!(path_or_io, ::String, :to_path) unless other_io
+        other_io = `$coerce_to_or_nil(path_or_io, #{::IO}, "to_io")`
+        path = `$coerce_to_or_raise(path_or_io, Opal.String, "to_path")` unless other_io
       end
 
       fsync if @fd && (@opened == :duplex || @opened == :write) && @closed != :write && !closed?
@@ -1510,7 +1510,7 @@ class ::IO
                elsif ext_enc.is_a?(::Encoding)
                  ext_enc
                else
-                 ext_enc = ::Opal.coerce_to!(ext_enc, ::String, :to_str)
+                 ext_enc = `$coerce_to_or_raise(ext_enc, Opal.String, "to_str")`
                  ext_enc, int_enc = ext_enc.split(':') if int_enc.nil?
                  ::Encoding.find(ext_enc)
                end
@@ -1521,7 +1521,7 @@ class ::IO
               elsif int_enc.is_a?(::Encoding)
                 int_enc
               else
-                int_enc = ::Opal.coerce_to!(int_enc, ::String, :to_str)
+                int_enc = `$coerce_to_or_raise(int_enc, Opal.String, "to_str")`
                 ::Encoding.find(int_enc)
               end
     @int_enc = int_enc == @ext_enc ? nil : int_enc
@@ -1558,7 +1558,7 @@ class ::IO
     # Returns the new position.
     `check_open(self)`
     sz = stat.size
-    offset = ::Opal.coerce_to!(offset, ::Integer, :to_int)
+    offset = `$coerce_to_or_raise(#{offset}, Opal.Integer, "to_int")`
     if whence == SEEK_SET || whence == :SET
       raise Errno::EINVAL, 'wrong value for offset' if offset < 0
       new_pos = offset
@@ -1576,7 +1576,7 @@ class ::IO
     # Writes the given object to self, which must be opened for writing (see Modes);
     # returns the number bytes written. If object is not a string is converted via method to_s.
     `check_writable(self)`
-    string = ::Opal.coerce_to!(object, ::String, :to_s)
+    string = `$coerce_to_or_raise(object, Opal.String, "to_s")`
     total_wsize = 0
     string.binary_encoding.each_byte_buffer(string, @buffer) do |write_len|
       bytes_written = `$platform.io_write(self.fd, self.buffer, 0, self.pos, write_len)`
@@ -1624,7 +1624,7 @@ class ::IO
     total_wsize = 0
     objects.each do |obj|
       next if obj.nil?
-      str = ::Opal.coerce_to!(obj, ::String, :to_s)
+      str = `$coerce_to_or_raise(obj, Opal.String, "to_s")`
       # syswrite will use the str binary_encoding, encode accordingly
       str = `$str(str, self.ext_enc)` if @ext_enc && @ext_enc != ::Encoding::BINARY
       next if str.empty?

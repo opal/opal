@@ -10,7 +10,7 @@ require 'opal/version'
 
 module Kernel
   def eval(str, binding = nil, file = nil, line = nil)
-    str = ::Opal.coerce_to!(str, String, :to_str)
+    str = `Opal.coerce_to_or_raise(#{str}, Opal.String, "to_str")`
     default_eval_options = { file: file || '(eval)', eval: true }
     compiling_options = __OPAL_COMPILER_CONFIG__.merge(default_eval_options)
     compiler = Opal::Compiler.new(str, compiling_options)
@@ -42,7 +42,7 @@ end
 
   Opal.compile = function(str, options) {
     try {
-      str = #{::Opal.coerce_to!(`str`, String, :to_str)}
+      str = Opal.coerce_to_or_raise(str, Opal.String, "to_str");
       if (options) options = Opal.hash(options);
       return Opal.Opal.$compile(str, options);
     }

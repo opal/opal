@@ -1,4 +1,4 @@
-# helpers: str
+# helpers: coerce_to_or_raise, str
 # backtick_javascript: true
 
 `/*eslint no-unsafe-finally: "off"*/`
@@ -97,19 +97,19 @@ class StringIO
       end
     end
 
-    mode = ::Opal.coerce_to!(mode, ::String, :to_str) rescue mode
+    mode = `$coerce_to_or_raise(mode, Opal.String, "to_str")` rescue mode
     if mode.is_a?(String)
       raise(ArgumentError, 'mode given twice') if opts[:mode]
     elsif mode
-      flags = ::Opal.coerce_to!(mode, ::Integer, :to_int)
+      flags = `$coerce_to_or_raise(mode, Opal.Integer, "to_int")`
       mode = nil
     end
     unless mode
       if opts.key?(:mode)
         mode = opts[:mode]
-        mode = ::Opal.coerce_to!(mode, ::String, :to_str) rescue mode
+        mode = `$coerce_to_or_raise(mode, Opal.String, "to_str")` rescue mode
         unless mode.is_a?(::String)
-          flags = ::Opal.coerce_to!(mode, ::Integer, :to_int)
+          flags = `$coerce_to_or_raise(mode, Opal.Integer, "to_int")`
           mode = nil
         end
       end
@@ -160,7 +160,7 @@ class StringIO
     enc_def_int = ::Encoding.default_internal
 
     if ext_enc && !ext_enc.is_a?(::Encoding)
-      ext_enc = ::Opal.coerce_to!(ext_enc, ::String, :to_str)
+      ext_enc = `$coerce_to_or_raise(ext_enc, Opal.String, "to_str")`
       ext_enc, int_enc = ext_enc.split(':') if ext_enc.include?(':')
       ext_enc = ::Encoding.find(ext_enc)
     end
@@ -179,7 +179,7 @@ class StringIO
                 end
 
     if int_enc && !int_enc.is_a?(::Encoding)
-      int_enc = ::Opal.coerce_to!(int_enc, ::String, :to_str)
+      int_enc = `$coerce_to_or_raise(int_enc, Opal.String, "to_str")`
       int_enc = ::Encoding.find(int_enc) unless int_enc == '-'
     end
     @int_enc = if int_enc && (int_enc == '-' || int_enc == @ext_enc)
@@ -384,13 +384,13 @@ class StringIO
           limit = sep.to_int
           sep = $/
         else
-          sep = ::Opal.coerce_to!(sep, ::String, :to_str)
+          sep = `$coerce_to_or_raise(sep, Opal.String, "to_str")`
         end
       elsif sep == ''
         sep = $/
         paragraph_mode = true
       else
-        sep = ::Opal.coerce_to!(sep, ::String, :to_str)
+        sep = `$coerce_to_or_raise(sep, Opal.String, "to_str")`
       end
     end
 
@@ -501,7 +501,7 @@ class StringIO
   def lineno=(number)
     # Sets and returns the line number for the stream.
     `check_readable(self)`
-    number = ::Opal.coerce_to!(number, ::Integer, :to_int) unless number.is_a?(::Numeric)
+    number = `$coerce_to_or_raise(number, Opal.Integer, "to_int")` unless number.is_a?(::Numeric)
     number = number.floor if number.is_a?(::Float)
     @lineno = number
   end
@@ -519,7 +519,7 @@ class StringIO
   def pos=(number)
     # Sets the current position (in bytes); see Position.
     `check_open(self)`
-    number = ::Opal.coerce_to!(number, ::Integer, :to_int)
+    number = `$coerce_to_or_raise(number, Opal.Integer, "to_int")`
     raise(Errno::EINVAL, "position must be >= 0") if number < 0
     @eof = false if @eof && number < @pos
     @eof = true if number >= @buffer.size
@@ -550,7 +550,7 @@ class StringIO
       write $_
     else
       objects.each do |object|
-        object = ::Opal.coerce_to!(object, ::String, :to_s)
+        object = `$coerce_to_or_raise(object, Opal.String, "to_s")`
         write object
       end
     end
@@ -588,7 +588,7 @@ class StringIO
       write @write_lsep
     else
       args.each do |arg|
-        arg = ::Opal.coerce_to!(arg, ::Array, :to_ary) rescue arg
+        arg = `$coerce_to_or_raise(arg, Opal.Array, "to_ary")` rescue arg
         if arg.is_a?(Array)
           unless arg.empty?
             ary = arg.flatten rescue arg
@@ -601,7 +601,7 @@ class StringIO
             end
           end
         else
-          line = ::Opal.coerce_to!(arg, ::String, :to_s)
+          line = `$coerce_to_or_raise(arg, Opal.String, "to_s")`
           line += @write_lsep unless line.end_with?("\n")
           write(line)
         end
@@ -697,12 +697,12 @@ class StringIO
 
   def reopen(other = nil, mode = nil, **opts)
     if other && mode
-      mode = ::Opal.coerce_to!(mode, ::String, :to_str)
-      other = ::Opal.coerce_to!(other, ::StringIO, :to_strio) rescue other
+      mode = `$coerce_to_or_raise(mode, Opal.String, "to_str")`
+      other = `$coerce_to_or_raise(other, #{::StringIO}, "to_strio")` rescue other
       string = if other.is_a?(::StringIO)
                   other.string
                 else
-                  ::Opal.coerce_to!(other, ::String, :to_str)
+                  `$coerce_to_or_raise(other, Opal.String, "to_str")`
                 end
       string = `$str('', string.$encoding())` if mode.include?('w') # truncate
       initialize(string, mode, **opts)
@@ -713,7 +713,7 @@ class StringIO
       @opened = :duplex
       rewind
     elsif other
-      other = ::Opal.coerce_to!(other, ::StringIO, :to_strio)
+      other = `$coerce_to_or_raise(other, #{::StringIO}, "to_strio")`
       self.string = other.string
       @mode = 'r+'
       @closed = false
@@ -739,7 +739,7 @@ class StringIO
     # Seeks to the position given by integer offset (see Position) and constant whence.
     `check_open(self)`
     sz = @buffer.size
-    offset = ::Opal.coerce_to!(offset, ::Integer, :to_int)
+    offset = `$coerce_to_or_raise(offset, Opal.Integer, "to_int")`
     if whence == ::IO::SEEK_SET || whence == :SET
       raise Errno::EINVAL, 'wrong value for offset' if offset < 0
       new_pos = offset
@@ -769,7 +769,7 @@ class StringIO
                elsif ext_enc.is_a?(::Encoding)
                  ext_enc
                else
-                 ext_enc = ::Opal.coerce_to!(ext_enc, ::String, :to_str)
+                 ext_enc = `$coerce_to_or_raise(ext_enc, Opal.String, "to_str")`
                  ext_enc, int_enc = ext_enc.split(':') if int_enc.nil?
                  ::Encoding.find(ext_enc)
                end
@@ -780,7 +780,7 @@ class StringIO
               elsif int_enc.is_a?(::Encoding)
                 int_enc
               else
-                int_enc = ::Opal.coerce_to!(int_enc, ::String, :to_str)
+                int_enc = `$coerce_to_or_raise(int_enc, Opal.String, "to_str")`
                 ::Encoding.find(int_enc)
               end
     @int_enc = int_enc == @ext_enc ? nil : int_enc
@@ -860,7 +860,7 @@ class StringIO
   def string=(other_string)
     # Assigns the underlying string as other_string, and sets position to zero;
     # returns other_string
-    @string = other_string ? ::Opal.coerce_to!(other_string, ::String, :to_str) : `$str('', #{::Encoding.default_external})`
+    @string = other_string ? `$coerce_to_or_raise(other_string, Opal.String, "to_str")` : `$str('', #{::Encoding.default_external})`
     @buffer = ::IO::Buffer.for(@string)
     `self.buffer.readonly = false` # Temporary override because of primitives.
     @string_is_valid = true
@@ -922,7 +922,7 @@ class StringIO
     # Returns the number of bytes written.
     `check_writable(self)`
     @pos = @buffer.size if @mode.include?('a')
-    string = ::Opal.coerce_to!(string, ::String, :to_s)
+    string = `$coerce_to_or_raise(string, Opal.String, "to_s")`
     if @ext_enc && string.encoding != @ext_enc && string.encoding != ::Encoding::BINARY
       string = string.encode(@ext_enc)
     end
@@ -942,7 +942,7 @@ class StringIO
     # Truncates the buffer string to at most integer bytes.
     # The stream must be opened for writing.
     `check_writable(self)`
-    len = ::Opal.coerce_to!(len, ::Integer, :to_int)
+    len = `$coerce_to_or_raise(len, Opal.Integer, "to_int")`
     raise(::Errno::EINVAL, 'len cannot be negative') if len < 0
     @buffer.resize(len)
     @string_is_valid = false

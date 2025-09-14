@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid, each_ivar, slice, platform
+# helpers: truthy, coerce_to, coerce_to_or_nil, coerce_to_or_raise, respond_to, Opal, deny_frozen_access, freeze, freeze_props, jsid, each_ivar, slice, platform
 # use_strict: true
 # backtick_javascript: true
 
@@ -12,8 +12,8 @@ module ::Kernel
   if `$platform.process_spawn`
     def `(cmdline)
       # Returns the $stdout output from running command in a subshell; sets global variable $? to the process status.
-      cmdline = ::Opal.coerce_to!(cmdline, ::String, :to_str)
-      out = `$platform.process_spawn(#{cmdline}.toString(), [], { shell: true, stdio: 'pipe', wait: true })`
+      cmdline = `$coerce_to_or_raise(#{cmdline}, Opal.String, "to_str")`
+      out = `$platform.process_spawn(cmdline.toString(), [], { shell: true, stdio: 'pipe', wait: true })`
 
       status = `out.status > 128 ? out.status - 128 : out.status`
       pid = `out.pid == null ? nil : out.pid`
@@ -72,10 +72,10 @@ module ::Kernel
         return object;
       }
 
-      coerced = #{::Opal.coerce_to?(object, ::Array, :to_ary)};
+      coerced = $coerce_to_or_nil(object, Opal.Array, "to_ary");
       if (coerced !== nil) { return coerced; }
 
-      coerced = #{::Opal.coerce_to?(object, ::Array, :to_a)};
+      coerced = $coerce_to_or_nil(object, Opal.Array, "to_a");
       if (coerced !== nil) { return coerced; }
 
       return [object];
@@ -121,7 +121,7 @@ module ::Kernel
       }
 
       if (exception) {
-        return #{::Opal.coerce_to!(value, ::Float, :to_f)};
+        return $coerce_to_or_raise(value, #{::Float}, "to_f");
       } else {
         return $coerce_to(value, #{::Float}, 'to_f');
       }
@@ -132,7 +132,7 @@ module ::Kernel
     # Returns a hash converted from object.
     return {} if arg.nil? || arg == []
     return arg if ::Hash === arg
-    ::Opal.coerce_to!(arg, ::Hash, :to_hash)
+    `$coerce_to_or_raise(arg, Opal.Hash, "to_hash")`
   end
 
   def Integer(value, base = undefined, exception: true)
@@ -276,7 +276,7 @@ module ::Kernel
   # Rational - is in corelib/rational/base.rb
 
   def String(str)
-    ::Opal.coerce_to?(str, ::String, :to_str) || ::Opal.coerce_to!(str, ::String, :to_s)
+    `$coerce_to_or_nil(str, Opal.String, "to_str")` || `$coerce_to_or_raise(str, Opal.String, "to_s")`
   end
 
   # URI - is not implemented yet
@@ -453,7 +453,7 @@ module ::Kernel
 
   def load(file)
     # Loads and executes the Ruby program in the file filename.
-    file = ::Opal.coerce_to!(file, ::String, :to_str)
+    file = `$coerce_to_or_raise(#{file}, Opal.String, "to_str")`
     `Opal.load(#{file})`
   end
 
@@ -607,7 +607,7 @@ module ::Kernel
       // As Object.require refers to Kernel.require once Kernel has been loaded the String
       // class may not be available yet, the coercion requires both String and Array to be loaded.
       if (typeof #{file} !== 'string' && Opal.String && Opal.Array) {
-        #{file = ::Opal.coerce_to!(file, ::String, :to_str) }
+        file = $coerce_to_or_raise(file, Opal.String, "to_str");
       }
       return Opal.require(#{file})
     }
@@ -737,7 +737,7 @@ module ::Kernel
     # appends a newline character to the string if the string does not end in a newline,
     # and calls Warning.warn with the string.
     if uplevel
-      uplevel = ::Opal.coerce_to!(uplevel, ::Integer, :to_str)
+      uplevel = `$coerce_to_or_raise(uplevel, Opal.Integer, "to_int")`
       ::Kernel.raise ::ArgumentError, "negative level (#{uplevel})" if uplevel < 0
       location = caller(uplevel + 1, 1).first&.split(':in `')&.first
       location = "#{location}: " if location

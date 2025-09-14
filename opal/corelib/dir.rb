@@ -1,5 +1,5 @@
 # backtick_javascript: true
-# helpers: platform, str, glob_brace_expand, is_star_star_slash, mbinc, is_dirsep
+# helpers: platform, str, glob_brace_expand, is_star_star_slash, mbinc, is_dirsep, coerce_to_or_raise
 
 class ::Dir
   include ::Enumerable
@@ -18,8 +18,7 @@ class ::Dir
           dir = ::ENV['HOME'] || ::ENV['LOGDIR']
           return 0 unless dir
         end
-        dir = ::Opal.coerce_to!(dir, ::String, :to_path) rescue dir
-        dir = ::Opal.coerce_to!(dir, ::String, :to_str)
+        dir = `Opal.coerce_to_or_nil(dir, Opal.String, "to_path")` || `$coerce_to_or_raise(dir, Opal.String, "to_str")`
         unless block_given?
           `$platform.chdir(#{dir}.toString())`
           return 0
@@ -48,7 +47,7 @@ class ::Dir
         # The new root directory is used for pathnames beginning with '/'.
         # The root directory is inherited by all children of the calling process.
         # Only a privileged process may call chroot.
-        dirpath = ::Opal.coerce_to!(dirpath, ::String, :to_path)
+        dirpath = `$coerce_to_or_raise(dirpath, Opal.String, "to_path")`
         `$platform.dir_chroot(dirpath)`
         0
       end
@@ -59,7 +58,7 @@ class ::Dir
     if `$platform.rmdir`
       def delete(dirpath)
         # Removes the directory at dirpath from the underlying file system.
-        dirpath = ::Opal.coerce_to!(dirpath, ::String, :to_path)
+        dirpath = `$coerce_to_or_raise(dirpath, Opal.String, "to_path")`
         `$platform.rmdir(dirpath.toString())`
         0
       end
@@ -145,11 +144,11 @@ class ::Dir
                elsif base.nil?
                  getwd
                else
-                 base = ::Opal.coerce_to!(base, ::String, :to_path)
+                 base = `$coerce_to_or_raise(base, Opal.String, "to_path")`
                  base == '.' || base == '' ? getwd : base
                end
         flags = patterns.pop if patterns.size == 2 && patterns[1].is_a?(::Integer)
-        flags = flags ? ::Opal.coerce_to!(flags, ::Integer, :to_int) : 0
+        flags = flags ? `$coerce_to_or_raise(flags, Opal.Integer, "to_int")` : 0
 
         raise(ArgumentError, "expected true or false as sort: #{sort}") unless sort == true || sort == false
 
@@ -643,7 +642,7 @@ class ::Dir
             res.concat(glob(*pattern, flags: flags, base: base))
           else
             begin
-              pattern = ::Opal.coerce_to!(pattern, ::String, :to_path)
+              pattern = `$coerce_to_or_raise(pattern, Opal.String, "to_path")`
               arg = {
                 base: base,
                 flags: flags | glob_verboseC,
@@ -720,8 +719,8 @@ class ::Dir
     if `$platform.mkdir`
       def mkdir(path, permissions = 0o775)
         # Creates a directory in the underlying file system at dirpath with the given permissions; returns zero.
-        path = ::Opal.coerce_to!(path, ::String, :to_path)
-        permissions = ::Opal.coerce_to!(permissions, ::Integer, :to_int)
+        path = `$coerce_to_or_raise(path, Opal.String, "to_path")`
+        permissions = `$coerce_to_or_raise(permissions, Opal.Integer, "to_int")`
         `$platform.mkdir(path.toString(), permissions)`
         0
       end
@@ -755,7 +754,7 @@ class ::Dir
   if `$platform.dir_open`
     def initialize(dirpath, encoding: nil)
       # Returns a new Dir object for the directory at dirpath.
-      dirpath = ::Opal.coerce_to!(dirpath, ::String, :to_path)
+      dirpath = `$coerce_to_or_raise(dirpath, Opal.String, "to_path")`
       @fileno = `$platform.dir_open(dirpath.toString())`
       @closed = false
       @path = dirpath

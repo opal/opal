@@ -1,5 +1,5 @@
 # backtick_javascript: true
-# helpers: platform
+# helpers: platform, coerce_to_or_raise
 
 # Even though we check for platform.ioctl, we don't have implementations for methods
 # depending on it yet due to platforms missing support for ioctl.
@@ -20,8 +20,8 @@ class ::IO
   end
 
   cursor_move = ->(y, x) do
-    y = ::Opal.coerce_to!(y, ::Integer, :to_int)
-    x = ::Opal.coerce_to!(x, ::Integer, :to_int)
+    y = `$coerce_to_or_raise(#{y}, Opal.Integer, "to_int")`
+    x = `$coerce_to_or_raise(#{x}, Opal.Integer, "to_int")`
     printf("\x1b\x5b%d%c", y < 0 ? -y : y, y < 0 ? 'A' : 'B')
     printf("\x1b\x5b%d%c", x < 0 ? -x : x, x < 0 ? 'D' : 'C')
   end
@@ -89,8 +89,8 @@ class ::IO
 
   def cursor=(line, column)
     # Set the cursor position at line and column.
-    line = ::Opal.coerce_to!(line, ::Integer, :to_int)
-    column = ::Opal.coerce_to!(column, ::Integer, :to_int)
+    line = `$coerce_to_or_raise(#{line}, Opal.Integer, "to_int")`
+    column = `$coerce_to_or_raise(#{column}, Opal.Integer, "to_int")`
     printf("\x1b\x5b%d;%dH", line, column)
     self
   end
@@ -136,7 +136,7 @@ class ::IO
     # 0: after cursor
     # 1: before cursor
     # 2: entire line
-    mode = ::Opal.coerce_to!(mode, ::Integer, :to_int)
+    mode = `$coerce_to_or_raise(#{mode}, Opal.Integer, "to_int")`
     printf("\x1b\x5b%dK", mode)
   end
 
@@ -145,7 +145,7 @@ class ::IO
     # 0: after cursor
     # 1: before and cursor
     # 2: entire screen
-    mode = ::Opal.coerce_to!(mode, ::Integer, :to_int)
+    mode = `$coerce_to_or_raise(#{mode}, Opal.Integer, "to_int")`
     printf("\x1b\x5b%dJ", mode)
   end
 
@@ -169,7 +169,7 @@ class ::IO
 
   def goto_column(col)
     # Set the cursor position at column in the same line of the current position.
-    col = ::Opal.coerce_to!(col, ::Integer, :to_int)
+    col = `$coerce_to_or_raise(#{col}, Opal.Integer, "to_int")`
     printf("\x1b\x5b%dG", col + 1)
     self
   end
@@ -250,8 +250,8 @@ class ::IO
     def winsize=(arr)
       # Tries to set console size. The effect depends on the platform and the running environment.
       # something like: ioctl 0x00005412, buf
-      arr[0] = ::Opal.coerce_to!(arr[0], ::Integer, :to_int)
-      arr[1] = ::Opal.coerce_to!(arr[1], ::Integer, :to_int)
+      arr[0] = `$coerce_to_or_raise(arr[0], Opal.Integer, "to_int")`
+      arr[1] = `$coerce_to_or_raise(arr[1], Opal.Integer, "to_int")`
       winsize
     end
   else

@@ -8,7 +8,7 @@ module ::Signal
 
   def self.signame(signo)
     # Convert signal number to signal name. Returns nil if the signo is an invalid signal number.
-    signo = ::Opal.coerce_to!(signo, ::Integer, :to_int)
+    signo = `Opal.coerce_to_or_raise(#{signo}, Opal.Integer, "to_int")`
     `Opal.platform.process_sig_list`.key(signo)
   end
 

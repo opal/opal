@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze, opal32_init, opal32_add
+# helpers: truthy, falsy, yield1, hash_get, hash_put, hash_delete, coerce_to, coerce_to_or_nil, coerce_to_or_raise, respond_to, deny_frozen_access, freeze, opal32_init, opal32_add
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -152,7 +152,7 @@ class ::Array < `Array`
   end
 
   def self.try_convert(obj)
-    ::Opal.coerce_to? obj, ::Array, :to_ary
+    `$coerce_to_or_nil(#{obj}, Opal.Array, "to_ary")`
   end
 
   def &(other)
@@ -660,7 +660,7 @@ class ::Array < `Array`
         if n.nil?
           ::Float::INFINITY
         else
-          n = ::Opal.coerce_to!(n, ::Integer, :to_int)
+          n = `$coerce_to_or_raise(n, Opal.Integer, "to_int")`
           n > 0 ? enumerator_size * n : 0
         end
       end
@@ -679,7 +679,7 @@ class ::Array < `Array`
         }
       }
       else {
-        n = #{::Opal.coerce_to!(n, ::Integer, :to_int)};
+        n = $coerce_to_or_raise(n, Opal.Integer, "to_int");
         if (n <= 0) {
           return self;
         }
@@ -762,7 +762,7 @@ class ::Array < `Array`
   }
 
   def combination(n)
-    num = ::Opal.coerce_to! n, ::Integer, :to_int
+    num = `$coerce_to_or_raise(n, Opal.Integer, "to_int")`
     return enum_for(:combination, num) { `binomial_coefficient(#{self}.length, num)` } unless block_given?
 
     %x{
@@ -810,7 +810,7 @@ class ::Array < `Array`
   end
 
   def repeated_combination(n)
-    num = ::Opal.coerce_to! n, ::Integer, :to_int
+    num = `$coerce_to_or_raise(n, Opal.Integer, "to_int")`
 
     unless block_given?
       return enum_for(:repeated_combination, num) { `binomial_coefficient(self.length + num - 1, num)` }
@@ -1544,7 +1544,7 @@ class ::Array < `Array`
         return result.join('');
       }
       else {
-        return result.join(#{::Opal.coerce_to!(sep, ::String, :to_str).to_s});
+        return result.join($coerce_to_or_raise(sep, Opal.String, "to_str").toString());
       }
     }
   end
@@ -1675,7 +1675,7 @@ class ::Array < `Array`
   end
 
   def repeated_permutation(n)
-    num = ::Opal.coerce_to! n, ::Integer, :to_int
+    num = `$coerce_to_or_raise(n, Opal.Integer, "to_int")`
     return enum_for(:repeated_permutation, num) { num >= 0 ? size**num : 0 } unless block_given?
 
     %x{
@@ -1955,16 +1955,16 @@ class ::Array < `Array`
     return at ::Kernel.rand(`self.length`) if `count === undefined`
 
     if `options === undefined`
-      if (o = ::Opal.coerce_to? count, ::Hash, :to_hash)
+      if (o = `$coerce_to_or_nil(count, Opal.Hash, "to_hash")`)
         options = o
         count = nil
       else
         options = nil
-        count = `$coerce_to(count, #{::Integer}, 'to_int')`
+        count = `$coerce_to(count, Opal.Integer, 'to_int')`
       end
     else
-      count = `$coerce_to(count, #{::Integer}, 'to_int')`
-      options = `$coerce_to(options, #{::Hash}, 'to_hash')`
+      count = `$coerce_to(count, Opal.Integer, 'to_int')`
+      options = `$coerce_to(options, Opal.Hash, 'to_hash')`
     end
 
     if count && `count < 0`
@@ -2124,7 +2124,7 @@ class ::Array < `Array`
       var randgen, i = self.length, j, tmp;
 
       if (rng !== undefined) {
-        rng = #{::Opal.coerce_to?(rng, ::Hash, :to_hash)};
+        rng = $coerce_to_or_nil(rng, Opal.Hash, "to_hash");
 
         if (rng !== nil) {
           rng = #{rng[:random]};
@@ -2352,7 +2352,7 @@ class ::Array < `Array`
       var i, len = array.length, ary, key, val, hash = #{{}};
 
       for (i = 0; i < len; i++) {
-        ary = #{::Opal.coerce_to?(`array[i]`, ::Array, :to_ary)};
+        ary = $coerce_to_or_nil(array[i], Opal.Array, "to_ary");
         if (!ary.$$is_array) {
           #{::Kernel.raise ::TypeError, "wrong element type #{`array[i]`.class} at #{`i`} (expected array)"}
         }

@@ -1,4 +1,4 @@
-# helpers: platform, truthy, str, is_star_star_slash, mbinc, mbclen, is_dirsep
+# helpers: platform, truthy, str, is_star_star_slash, mbinc, mbclen, is_dirsep, coerce_to_or_raise
 # backtick_javascript: true
 
 class ::File < ::IO
@@ -13,7 +13,7 @@ class ::File < ::IO
 
     function coerce_to_path(path) {
       if ($truthy(#{`path`.respond_to?(:to_path)})) path = path.$to_path();
-      return #{::Opal.coerce_to!(`path`, ::String, :to_str)};
+      return $coerce_to_or_raise(path, Opal.String, "to_str");
     }
 
     // Return a RegExp compatible char class
@@ -634,7 +634,7 @@ class ::File < ::IO
       # If suffix is “.*”, any extension will be removed.
       sep_chars = `$sep_chars()`
       name = `coerce_to_path(name)`
-      suffix = ::Opal.coerce_to!(suffix, ::String, :to_str) if suffix
+      suffix = `$coerce_to_or_raise(suffix, Opal.String, "to_str")` if suffix
       enc = name.encoding
       %x{
         if (name.length == 0) return $str('', enc);
@@ -660,7 +660,7 @@ class ::File < ::IO
     if `$platform.chmod`
       def chmod(mode_int, *file_names)
         # Changes permission bits on the named file(s) to the bit pattern represented by mode_int.
-        mode_int = ::Opal.coerce_to!(mode_int, ::Integer, :to_int) unless mode_int.is_a?(::Integer)
+        mode_int = `$coerce_to_or_raise(mode_int, Opal.Integer, "to_int")` unless mode_int.is_a?(::Integer)
         raise(RangeError, 'mode_int out of range') if mode_int < 0 || mode_int > 4_294_967_295
         file_names.each do |file_name|
           file_name = `coerce_to_path(file_name)`
@@ -675,8 +675,8 @@ class ::File < ::IO
     if `$platform.stat && $platform.chown`
       def chown(owner_int, group_int, *file_names)
         # Changes the owner and group of the named file(s) to the given numeric owner and group id’s.
-        owner_int = ::Opal.coerce_to!(owner_int, ::Integer, :to_int) if owner_int
-        group_int = ::Opal.coerce_to!(group_int, ::Integer, :to_int) if group_int
+        owner_int = `$coerce_to_or_raise(owner_int, Opal.Integer, "to_int")` if owner_int
+        group_int = `$coerce_to_or_raise(group_int, Opal.Integer, "to_int")` if group_int
         owner_int = nil if owner_int && owner_int < 0
         group_int = nil if group_int && group_int < 0
         file_names.each do |file_name|
@@ -713,7 +713,7 @@ class ::File < ::IO
     def dirname(file_name, level = nil)
       # Returns all components of the filename given in file_name except the last one
       # (after first stripping trailing separators).
-      level = ::Opal.coerce_to!(level, ::Integer, :to_int) if level
+      level = `$coerce_to_or_raise(level, Opal.Integer, "to_int")` if level
       level ||= 1
       ::Kernel.raise(::ArgumentError, "negative level: #{level}") if level < 0
       file_name = `coerce_to_path(file_name)`
@@ -841,9 +841,9 @@ class ::File < ::IO
 
       # This is a straightforward port from ruby/dir.c, kinda sort of.
 
-      pattern = ::Opal.coerce_to!(pattern, ::String, :to_str)
+      pattern = `$coerce_to_or_raise(pattern, Opal.String, "to_str")`
       string = `coerce_to_path(string)`
-      flags = ::Opal.coerce_to!(flags, ::Integer, :to_int)
+      flags = `$coerce_to_or_raise(flags, Opal.Integer, "to_int")`
       period = (flags & ::File::FNM_DOTMATCH) != ::File::FNM_DOTMATCH
       pathname = (flags & ::File::FNM_PATHNAME) == ::File::FNM_PATHNAME
       extglob = (flags & ::File::FNM_EXTGLOB) == ::File::FNM_EXTGLOB
@@ -1123,7 +1123,7 @@ class ::File < ::IO
         # Equivalent to File::chmod, but does not follow symbolic links
         # (so it will change the permissions associated with the link,
         # not the file referenced by the link).
-        mode_int = ::Opal.coerce_to!(mode_int, ::Integer, :to_int) unless mode_int.is_a?(::Integer)
+        mode_int = `$coerce_to_or_raise(mode_int, Opal.Integer, "to_int")` unless mode_int.is_a?(::Integer)
         raise(RangeError, 'mode_int out of range') if mode_int < 0 || mode_int > 4_294_967_295
         file_names.each do |file_name|
           file_name = `coerce_to_path(file_name)`
@@ -1140,8 +1140,8 @@ class ::File < ::IO
         # Equivalent to File::chown, but does not follow symbolic links
         # (so it will change the owner associated with the link,
         # not the file referenced by the link).
-        #       owner_int = ::Opal.coerce_to!(owner_int, ::Integer, :to_int) if owner_int
-        group_int = ::Opal.coerce_to!(group_int, ::Integer, :to_int) if group_int
+        owner_int = `$coerce_to_or_raise(owner_int, Opal.Integer, "to_int")` if owner_int
+        group_int = `$coerce_to_or_raise(group_int, Opal.Integer, "to_int")` if group_int
         file_names.each do |file_name|
           file_name = `coerce_to_path(file_name)`
           if owner_int.nil? || group_int.nil?
@@ -1268,8 +1268,8 @@ class ::File < ::IO
     if `$platform.rename`
       def rename(old_name, new_name)
         # Renames the given file to the new name. Raises a SystemCallError if the file cannot be renamed.
-        old_name = ::Opal.coerce_to!(old_name, ::String, :to_str)
-        new_name = ::Opal.coerce_to!(new_name, ::String, :to_str)
+        old_name = `$coerce_to_or_raise(old_name, Opal.String, "to_str")`
+        new_name = `$coerce_to_or_raise(new_name, Opal.String, "to_str")`
         `$platform.rename(old_name.toString(), new_name.toString())`
         0
       end
@@ -1310,7 +1310,7 @@ class ::File < ::IO
       def truncate(file_name, integer)
         # Truncates the file file_name to be at most integer bytes long.
         file_name = `coerce_to_path(file_name)`
-        integer = ::Opal.coerce_to!(integer, ::Integer, :to_int)
+        integer = `$coerce_to_or_raise(integer, Opal.Integer, "to_int")`
         raise(::Errno::EINVAL, 'integer must be >= 0') if integer < 0
         `$platform.truncate(file_name.toString(), integer)`
         0
@@ -1324,7 +1324,7 @@ class ::File < ::IO
         # Returns the current umask value for this process. If the optional argument is given,
         # set the umask to that value and return the previous value.
         if integer
-          integer = ::Opal.coerce_to!(integer, ::Integer, :to_int)
+          integer = `$coerce_to_or_raise(integer, Opal.Integer, "to_int")`
           if integer < 0 || integer > 4_294_967_295
             raise(::RangeError,
                   "The value of \"mask\" is out of range. It must be >= 0 && <= 4294967295. Received #{integer}"
@@ -1353,7 +1353,7 @@ class ::File < ::IO
           mtime ||= t
         end
         file_names.each do |file_name|
-          file_name = ::Opal.coerce_to!(file_name, ::String, :to_path) unless file_name.is_a?(String)
+          file_name = `$coerce_to_or_raise(file_name, Opal.String, "to_path")` unless file_name.is_a?(String)
           `$platform.file_utime(file_name.toString(), atime, mtime)`
         end
         file_names.size
@@ -1382,7 +1382,7 @@ class ::File < ::IO
     [ag_mode, opts[:mode]].each do |m|
       if m
         raise(ArgumentError, 'mode given multiple times') if mode
-        m = ::Opal.coerce_to!(m, ::String, :to_str) rescue m
+        m = `$coerce_to_or_raise(m, Opal.String, "to_str")` rescue m
         if m.is_a?(::String)
           m, ext_enc, int_enc = m.split(':') if m.include?(':')
           raise(ArgumentError, 'mode is a empty string') if m.empty?
@@ -1392,12 +1392,12 @@ class ::File < ::IO
           flags |= `Opal.mode_to_flags(m)`
           mode = m
         else
-          flags |= ::Opal.coerce_to!(m, ::Integer, :to_int)
+          flags |= `$coerce_to_or_raise(m, Opal.Integer, "to_int")`
         end
       end
     end
 
-    flags |= ::Opal.coerce_to!(opts[:flags], ::Integer, :to_int) if opts.key?(:flags)
+    flags |= `$coerce_to_or_raise(#{opts[:flags]}, Opal.Integer, "to_int")` if opts.key?(:flags)
     raise(::Errno::EINVAL, 'Invalid argument') if `$platform.windows` && flags == ::File::TRUNC
     opts[:flags] = flags
     opts[:mode] = mode
@@ -1432,7 +1432,7 @@ class ::File < ::IO
   if `$platform.fchmod`
     def chmod(mode_int)
       # Changes permission bits on file to the bit pattern represented by mode_int.
-      mode_int = ::Opal.coerce_to!(mode_int, ::Integer, :to_int)
+      mode_int = `$coerce_to_or_raise(mode_int, Opal.Integer, "to_int")`
       raise(RangeError, 'mode_int out of range') if mode_int < 0 || mode_int > 4_294_967_295
       `$platform.fchmod(self.fd, mode_int)`
       0
@@ -1447,8 +1447,8 @@ class ::File < ::IO
       # Only a process with superuser privileges may change the owner of a file.
       # The current owner of a file may change the file’s group to any group to which the owner belongs.
       # A nil or -1 owner or group id is ignored. Follows symbolic links.
-      owner_int = ::Opal.coerce_to!(owner_int, ::Integer, :to_int) if owner_int
-      group_int = ::Opal.coerce_to!(group_int, ::Integer, :to_int) if group_int
+      owner_int = `$coerce_to_or_raise(owner_int, Opal.Integer, "to_int")` if owner_int
+      group_int = `$coerce_to_or_raise(group_int, Opal.Integer, "to_int")` if group_int
       owner_int = nil if owner_int && owner_int < 0
       group_int = nil if group_int && group_int < 0
       if owner_int.nil? || group_int.nil?
@@ -1503,7 +1503,7 @@ class ::File < ::IO
     def truncate(integer)
       # Truncates file to at most integer bytes. The file must be opened for writing.
       `check_writable(self)`
-      integer = ::Opal.coerce_to!(integer, ::Integer, :to_int)
+      integer = `$coerce_to_or_raise(integer, Opal.Integer, "to_int")`
       raise(::Errno::EINVAL, 'integer must be >= 0') if integer < 0
       `$platform.ftruncate(self.fd, integer)`
       0

@@ -1,4 +1,4 @@
-# helpers: platform
+# helpers: platform, coerce_to_or_raise
 # backtick_javascript: true
 
 module Etc
@@ -48,7 +48,7 @@ module Etc
     def getgrgid(gid = ::Process.gid)
       # Returns information about the group with specified integer group_id, as found in /etc/group.
       return nil if `$platform.windows` || !::File.exist?('/etc/group')
-      gid = ::Opal.coerce_to!(gid, ::Integer, :to_int)
+      gid = `$coerce_to_or_raise(#{gid}, Opal.Integer, "to_int")`
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
           next if entry.start_with?('#')
@@ -63,7 +63,7 @@ module Etc
     def getgrnam(name)
       # Returns information about the group with specified name, as found in /etc/group.
       return nil if `$platform.windows` || !::File.exist?('/etc/group')
-      name = ::Opal.coerce_to!(name, ::String, :to_str)
+      name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
       ::File.open('/etc/group', 'r') do |group_file|
         group_file.each_line do |entry|
           next if entry.start_with?('#')
@@ -104,7 +104,7 @@ module Etc
     def getpwnam(name)
       # Returns the /etc/passwd information for the user with specified login name.
       return nil if `$platform.windows`
-      name = ::Opal.coerce_to!(name, ::String, :to_str)
+      name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
       # On macOS we need to check /etc/passwd, which contains some system internal users but not regular users
       # and the directory service, which contains regular users but not all system internal users.
       # We need to check /etc/passwd first, because otherwise there may be an error.
@@ -142,7 +142,7 @@ module Etc
     def getpwuid(uid = nil)
       # Returns the /etc/passwd information for the user with the given integer uid.
       return nil if `$platform.windows`
-      uid = ::Opal.coerce_to!(uid, ::Integer, :to_int) if uid
+      uid = `$coerce_to_or_raise(uid, Opal.Integer, "to_int")` if uid
       uid ||= ::Process.uid
       # On macOS we need to check /etc/passwd, which contains some system internal users but not regular users
       # and the directory service, which contains regular users but not all system internal users.

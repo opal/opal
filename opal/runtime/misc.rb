@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: return_val, Object, platform
+# helpers: coerce_to_or_nil, coerce_to_or_raise, return_val, Object, platform
 
 module ::Opal
   # Create a new range instance with first and last values, and whether the
@@ -51,23 +51,22 @@ module ::Opal
   end
 
   def self.process_check_id(id)
-    nid = ::Opal.coerce_to?(id, ::String, :to_str)
-    nid ||= ::Opal.coerce_to!(id, ::Integer, :to_int)
+    nid = `$coerce_to_or_nil(id, Opal.String, "to_str")` || `$coerce_to_or_raise(id, Opal.Integer, "to_int")`
     nid = `nid.toString()` if `nid instanceof String`
     nid
   end
 
   def self.process_spawn_opts_and_execute(args, js_opts)
     arg = args.shift
-    coe_arg = ::Opal.coerce_to?(arg, ::Hash, :to_hash)
+    coe_arg = `$coerce_to_or_nil(arg, Opal.Hash, "to_hash")`
     if coe_arg
       env = coe_arg.to_h do |k, v|
         if v.nil?
           [k, nil]
         else
-          k = ::Opal.coerce_to!(k, ::String, :to_str)
+          k = `$coerce_to_or_raise(k, Opal.String, "to_str")`
           raise(::ArgumentError, 'invalid env key') if `k.includes("\x00")` || `k.includes("=")`
-          v = ::Opal.coerce_to!(v, ::String, :to_str)
+          v = `$coerce_to_or_raise(v, Opal.String, "to_str")`
           raise(::ArgumentError, 'env value contains null byte') if `v.includes("\x00")`
           [k, v]
         end
@@ -78,16 +77,16 @@ module ::Opal
     end
 
     arg ||= args.shift
-    coe_arg = ::Opal.coerce_to?(arg, ::Array, :to_ary)
+    coe_arg = `$coerce_to_or_nil(arg, Opal.Array, "to_ary")`
     if coe_arg
       raise(::ArgumentError, 'array must have 2 elements') unless coe_arg.size == 2
-      `js_opts.argv0 = #{::Opal.coerce_to!(coe_arg[1], ::String, :to_str)}`
+      `js_opts.argv0 = $coerce_to_or_raise(coe_arg[1], Opal.String, "to_str")`
       raise(::ArgumentError, 'cmd contains null byte') if `js_opts.argv0.includes("\x00")`
-      cmdname = ::Opal.coerce_to!(coe_arg[0], ::String, :to_str)
+      cmdname = `$coerce_to_or_raise(coe_arg[0], Opal.String, "to_str")`
       arg = coe_arg = nil
     else
       raise(::ArgumentError, 'no cmd given') if !arg || arg.is_a?(::Hash)
-      cmdname = ::Opal.coerce_to!(arg, ::String, :to_str)
+      cmdname = `$coerce_to_or_raise(arg, Opal.String, "to_str")`
     end
     raise Errno::ENOENT if cmdname.empty?
 
@@ -96,7 +95,7 @@ module ::Opal
 
     opened_files = []
     merge_env = true
-    coe_arg = ::Opal.coerce_to?(args.last, ::Hash, :to_hash)
+    coe_arg = `$coerce_to_or_nil(#{args.last}, Opal.Hash, "to_hash")`
     if coe_arg
       args.pop
       opts = coe_arg
@@ -112,7 +111,7 @@ module ::Opal
           `js_opts.stdio[i] = #{f.fileno}`
         elsif v == :close
           `js_opts.stdio[i] = 'ignore'`
-        elsif (f = ::Opal.coerce_to?(v, ::IO, :to_io))
+        elsif (f = `$coerce_to_or_nil(v, #{::IO}, "to_io")`)
           `js_opts.stdio[i] = #{f.fileno}`
         else
           raise(::ArgumentError, "cannot handle #{v.inspect}")
@@ -122,8 +121,8 @@ module ::Opal
       opts.each do |k, v|
         case k
         when :chdir
-          arg = ::Opal.coerce_to?(opts[:chdir], ::String, :to_path)
-          arg ||= ::Opal.coerce_to!(opts[:chdir], ::String, :to_str)
+          d = opts[:chdir]
+          arg = `$coerce_to_or_nil(d, Opal.String, "to_path")` || `$coerce_to_or_raise(d, Opal.String, "to_str")`
           raise(::ArgumentError, 'chdir contains null byte') if `arg.includes("\x00")`
           `js_opts.cwd = #{arg}.toString()`
         when :close_others
@@ -168,7 +167,7 @@ module ::Opal
     end
 
     args.map! do |ag|
-      ag = ::Opal.coerce_to!(ag, ::String, :to_str)
+      ag = `$coerce_to_or_raise(ag, Opal.String, "to_str")`
       raise(::ArgumentError, 'arg contains null byte') if `ag.includes("\x00")`
       `ag.$inspect().toString()`
     end

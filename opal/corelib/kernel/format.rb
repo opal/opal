@@ -1,4 +1,4 @@
-# helpers: coerce_to
+# helpers: coerce_to, coerce_to_or_raise
 # backtick_javascript: true
 
 `/*eslint no-fallthrough: "off"*/`
@@ -7,14 +7,14 @@ module ::Kernel
   def format(format_string, *args)
     # Returns the string resulting from formatting args into format_string.
 
-    # this is a more or less traightforward port of rb_str_format from ruby/sprintf.c
+    # this is a more or less straightforward port of rb_str_format from ruby/sprintf.c
 
     # if args.length == 1 && (args[0].respond_to?(:to_ary) rescue nil) # guard BasicObjects not having #respond_to?
     #   ary = ::Opal.coerce_to?(args[0], ::Array, :to_ary)
     #   args = ary.to_a unless ary.nil?
     # end
 
-    format_string = ::Opal.coerce_to!(format_string, ::String, :to_str)
+    format_string = `$coerce_to_or_raise(#{format_string}, Opal.String, "to_str")`
     # rb_must_asciicompat(format_string)
     enc = format_string.encoding
     # format_string = format_string.dup.freeze
@@ -619,7 +619,7 @@ module ::Kernel
             str = tmp
             width = format_s1.(prec)
           else
-            n = ::Opal.coerce_to!(val, ::Integer, :to_int)
+            n = `$coerce_to_or_raise(val, Opal.Integer, "to_int")`
             if n >= 0
               c = n
               chr = `String.fromCodePoint(c)`

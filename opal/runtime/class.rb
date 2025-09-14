@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid, invoke_tracers_for_class
+# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid, invoke_tracers_for_class, type_error
 
 module ::Opal
   %x{
@@ -312,17 +312,35 @@ module ::Opal
       // Fast path for the most common situation
       if ((object['$respond_to?'].$$pristine && object.$method_missing.$$pristine) || object['$respond_to?'].$$stub) {
         body = object[$jsid(method)];
-        if (body == null || body.$$stub) Opal.type_error(object, type);
+        if (body == null || body.$$stub) $type_error(object, type);
         return body.apply(object, args);
       }
 
       if (!object['$respond_to?'](method)) {
-        Opal.type_error(object, type);
+        $type_error(object, type);
       }
 
       if (args == null) args = [];
       return Opal.send(object, method, args);
     }
+  end
+
+  def self.coerce_to_or_raise(object, type, method, args)
+    coerced = `Opal.coerce_to(object, type, method, args)`
+
+    return coerced if type === coerced
+
+    `Opal.Kernel.$raise($type_error(object, type, method, coerced))`
+  end
+
+  def self.coerce_to_or_nil(object, type, method, args)
+    return if `object['$respond_to?'].$$stub` || !object.respond_to?(method)
+
+    coerced = `Opal.coerce_to(object, type, method, args)`
+
+    return coerced if type === coerced || coerced.nil?
+
+    `Opal.Kernel.$raise($type_error(object, type, method, coerced))`
   end
 
   def self.respond_to(obj, jsid, include_all)
