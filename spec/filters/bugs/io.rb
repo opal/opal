@@ -244,4 +244,5 @@ opal_filter "IO" do
   fails "IO::EWOULDBLOCKWaitReadable combines Errno::EWOULDBLOCK and IO::WaitReadable" # NameError: uninitialized constant IO::EWOULDBLOCKWaitReadable
   fails "IO::EWOULDBLOCKWaitWritable combines Errno::EWOULDBLOCK and IO::WaitWritable" # NameError: uninitialized constant IO::EWOULDBLOCKWaitWritable
   fails_badly "IO#close on an IO.popen stream clears #pid"
+  fails_badly "IO.popen raises IOError when reading a write-only pipe"
 end
