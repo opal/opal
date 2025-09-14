@@ -61,9 +61,9 @@ If String bytes are important, its best to ensure the Strings have the same enco
 
 Accessing String bytes in Opal may be a performance issue, contrary to Matz Ruby, due to the emulation.
 
-## Multi Byte Characters
+## Multi Byte Characters / UTF Surrogates
 
-Although JavaScript strings are UCS2/UTF-16 -ish, working with strings that contain multi byte characters is rather cumbersome.
+Although JavaScript strings are UCS2/UTF-16 -ish, working with strings that contain multi byte characters is rather cumbersome in JavaScript.
 
 For example, given a String 'a𝌆a𝌆a𝌆':
 
@@ -72,14 +72,14 @@ JavaScript reports its length in 16 bit units instead of characters:
 'a𝌆a𝌆a𝌆'.length // => 9
 ```
 
-Trying to access characters by index will result in broken multi byte characters:
+Trying to access characters by index will result in broken multi byte characters / surrogates:
 ```JavaScript
 'a𝌆a𝌆a𝌆'[1] // => '\ud834'
 ```
 
-And in addition the functions for manipulating JavaScript strings all ignore multi byte characters and tend to brake them.
+And in addition the functions for manipulating JavaScript strings all ignore multi byte characters / surrogates and tend to brake them.
 
-Opal is advantage here, as multi byte characters are treated naturally, as expected from Ruby.
+Opal is in advantage here, as multi byte characters / surrogates are treated naturally, as expected from Ruby.
 
 Given the String 'a𝌆a𝌆a𝌆':
 
@@ -88,7 +88,7 @@ Its length is correctly reported as count of characters:
 'a𝌆a𝌆a𝌆'.length # => 6
 ```
 
-Accessing characters by index will correctly return multi byte characters:
+Accessing characters by index will correctly return multi byte characters / surrogates:
 ```JavaScript
 'a𝌆a𝌆a𝌆'[1] // => '𝌆'
 ```
