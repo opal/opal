@@ -136,7 +136,11 @@ module Opal
           end
         end
 
-        str += char if capture
+        if RUBY_ENGINE == 'opal'
+          `if (capture) str += #{char}`
+        else
+          str += char if capture
+        end
 
         curr_inside = inside
         inside = depth > 0

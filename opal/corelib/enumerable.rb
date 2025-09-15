@@ -238,7 +238,7 @@ module ::Enumerable
   end
 
   def drop(number)
-    number = `$coerce_to(number, #{::Integer}, 'to_int')`
+    number = `$coerce_to(number, Opal.Integer, 'to_int')`
 
     if `number < 0`
       ::Kernel.raise ::ArgumentError, 'attempt to drop negative size'
@@ -354,7 +354,7 @@ module ::Enumerable
   end
 
   def each_slice(n, &block)
-    n = `$coerce_to(#{n}, #{::Integer}, 'to_int')`
+    n = `$coerce_to(#{n}, Opal.Integer, 'to_int')`
 
     if `n <= 0`
       ::Kernel.raise ::ArgumentError, 'invalid slice size'
@@ -504,7 +504,7 @@ module ::Enumerable
       nil
     else
       result = []
-      number = `$coerce_to(number, #{::Integer}, 'to_int')`
+      number = `$coerce_to(number, Opal.Integer, 'to_int')`
 
       if `number < 0`
         ::Kernel.raise ::ArgumentError, 'attempt to take negative size'
@@ -694,7 +694,7 @@ module ::Enumerable
         }
       }
 
-      n = $coerce_to(n, #{::Integer}, 'to_int');
+      n = $coerce_to(n, Opal.Integer, 'to_int');
     }
 
     sort(&block).reverse.first(n)
