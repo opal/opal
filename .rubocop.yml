@@ -354,6 +354,7 @@ Style/HashEachMethods:
 Style/IfInsideElse:
   Exclude:
     - 'opal/corelib/file.rb'
+    - 'lib/opal/regexp_transpiler.rb'
 
 Style/IfUnlessModifier:
   Enabled: false
