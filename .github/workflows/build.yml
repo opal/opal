@@ -61,6 +61,7 @@ jobs:
           - name: mspec-firefox-128-esr
             firefox: '128.9.0esr'
             command: xvfb-run bin/rake mspec_firefox
+          # this should be 'latest' below, but for ff > 140 see issue #2768
           - name: mspec-firefox-latest
             firefox: 'latest-esr'
             command: xvfb-run bin/rake mspec_firefox
