@@ -95,7 +95,7 @@ class ::Regexp < `RegExp`
           return $annotate_regexp(new RegExp(regexp), regexp.$$source, regexp.$$options);
         }
 
-        regexp = #{::Opal.coerce_to!(regexp, ::String, :to_str)};
+        regexp = Opal.coerce_to_or_raise(regexp, Opal.String, "to_str");
 
         if (regexp.charAt(regexp.length - 1) === '\\' && regexp.charAt(regexp.length - 2) !== '\\') {
           #{::Kernel.raise ::RegexpError, "too short escape sequence: /#{regexp}/"}
@@ -128,7 +128,7 @@ class ::Regexp < `RegExp`
   end
 
   def ===(string)
-    `#{match(::Opal.coerce_to?(string, ::String, :to_str))} !== nil`
+    `#{match(`Opal.coerce_to_or_nil(string, Opal.String, "to_str")`)} !== nil`
   end
 
   def =~(string)
@@ -462,7 +462,7 @@ class MatchData
           Array.prototype.splice.apply(args, a);
         }
 
-        index = #{::Opal.coerce_to!(`args[i]`, ::Integer, :to_int)};
+        index = Opal.coerce_to_or_raise(args[i], Opal.Integer, "to_int");
 
         if (index < 0) {
           index += #{@matches}.length;

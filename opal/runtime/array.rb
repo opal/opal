@@ -39,7 +39,7 @@ module ::Opal
     %x{
       if (value.$$is_array) {
         // A splatted array must be copied
-        return value.slice();
+        return value.slice(0);
       }
       else if (value['$respond_to?']('to_a', true)) {
         var ary = value.$to_a();

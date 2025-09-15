@@ -1,30 +1,14 @@
-# helpers: type_error, coerce_to
+# helpers: type_error, coerce_to, coerce_to_or_raise
 # backtick_javascript: true
 # use_strict: true
 
 module ::Opal
   def self.coerce_to!(object, type, method, *args)
-    coerced = `$coerce_to(object, type, method, args)`
-
-    unless type === coerced
-      ::Kernel.raise `$type_error(object, type, method, coerced)`
-    end
-
-    coerced
+    `$coerce_to_or_raise(object, type, method, args)`
   end
 
   def self.coerce_to?(object, type, method, *args)
-    return unless object.respond_to? method
-
-    coerced = `$coerce_to(object, type, method, args)`
-
-    return if coerced.nil?
-
-    unless type === coerced
-      ::Kernel.raise `$type_error(object, type, method, coerced)`
-    end
-
-    coerced
+    `Opal.coerce_to_or_nil(object, type, method, args)`
   end
 
   def self.try_convert(object, type, method)
@@ -73,7 +57,7 @@ module ::Opal
   end
 
   def self.instance_variable_name!(name)
-    name = ::Opal.coerce_to!(name, ::String, :to_str)
+    name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
 
     unless `/^@[a-zA-Z_][a-zA-Z0-9_]*?$/.test(name)`
       ::Kernel.raise ::NameError.new("'#{name}' is not allowed as an instance variable name", name)
@@ -83,7 +67,7 @@ module ::Opal
   end
 
   def self.class_variable_name!(name)
-    name = ::Opal.coerce_to!(name, ::String, :to_str)
+    name = `$coerce_to_or_raise(#{name}, Opal.String, "to_str")`
 
     if `name.length < 3 || name.slice(0,2) !== '@@'`
       ::Kernel.raise ::NameError.new("`#{name}' is not allowed as a class variable name", name)
@@ -95,7 +79,7 @@ module ::Opal
   def self.const_name?(const_name)
     %x{
       if (typeof const_name !== 'string') {
-        #{const_name = ::Opal.coerce_to!(const_name, ::String, :to_str)}
+        const_name = $coerce_to_or_raise(const_name, Opal.String, "to_str");
       }
 
       return #{const_name}[0] === #{const_name}[0].toUpperCase()
@@ -103,7 +87,7 @@ module ::Opal
   end
 
   def self.const_name!(const_name)
-    const_name = ::Opal.coerce_to!(const_name, ::String, :to_str) if defined? ::String
+    const_name = `$coerce_to_or_raise(const_name, Opal.String, "to_str")` if defined? ::String
 
     %x{
       if (!const_name || const_name.length === 0 || const_name[0] != const_name[0].toUpperCase()) {

@@ -18,11 +18,7 @@ class ::Class
   end
 
   def allocate
-    %x{
-      var obj = new self.$$constructor();
-      obj.$$id = Opal.uid();
-      return obj;
-    }
+    `new self.$$constructor()`
   end
 
   def clone(freeze: nil)
