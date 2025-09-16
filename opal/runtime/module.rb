@@ -8,17 +8,26 @@ module ::Opal
     // TracePoint support
     // ------------------
     //
-    // Support for `TracePoint.trace(:class) do ... end`
+    // Support for `TracePoint.trace(:class) do ... end` and `:end`
     Opal.trace_class = false;
     Opal.tracers_for_class = [];
+
+    Opal.trace_end = false;
+    Opal.tracers_for_end = [];
   }
 
-  def self.invoke_tracers_for_class(klass_or_module)
+  # Unified tracer invoker for TracePoint events backed by Opal.tracers_for_<event>
+  # @param event [String,Symbol] e.g., 'class' or 'end'
+  # @param klass_or_module [Module,Class]
+  def self.invoke_tracers_for(event, klass_or_module)
     %x{
-      var i, ii, tracer;
+      var key = 'tracers_for_' + event,
+          list = Opal[key] || [],
+          i, ii, tracer;
 
-      for(i = 0, ii = Opal.tracers_for_class.length; i < ii; i++) {
-        tracer = Opal.tracers_for_class[i];
+      for(i = 0, ii = list.length; i < ii; i++) {
+        tracer = list[i];
+        // annotate current event for the callback
         tracer.trace_object = klass_or_module;
         tracer.block.$call(tracer);
       }
@@ -37,12 +46,25 @@ module ::Opal
       var module = Opal.module(scope, name);
 
       if (body != null) {
+        var ret;
         if (body.length == 1) {
-          return body(module);
+          ret = body(module);
         }
         else {
-          return body(module, [module].concat(parent_nesting));
+          ret = body(module, [module].concat(parent_nesting));
         }
+
+        if (Opal.trace_end) {
+          if (typeof Promise !== 'undefined' && ret && typeof ret.then === 'function') {
+            return ret.then(function(value){ Opal.invoke_tracers_for('end', module); return value; });
+          } else {
+            Opal.invoke_tracers_for('end', module);
+          }
+        }
+
+        return ret;
+      } else {
+        if (Opal.trace_end) { Opal.invoke_tracers_for('end', module); }
       }
 
       return nil;
@@ -85,7 +107,7 @@ module ::Opal
         $const_set(scope, name, module);
       }
 
-      if (Opal.trace_class) { Opal.invoke_tracers_for_class(module); }
+      if (Opal.trace_class) { Opal.invoke_tracers_for('class', module); }
 
       return module;
     }

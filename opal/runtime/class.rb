@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid, invoke_tracers_for_class
+# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid
 
 module ::Opal
   %x{
@@ -86,7 +86,7 @@ module ::Opal
         }
       }
 
-      if (Opal.trace_class) { $invoke_tracers_for_class(klass); }
+      if (Opal.trace_class) { Opal.invoke_tracers_for('class', klass); }
 
       return klass;
     }
@@ -217,12 +217,25 @@ module ::Opal
       var klass = Opal.klass(scope, superclass, name);
 
       if (body != null) {
+        var ret;
         if (body.length == 1) {
-          return body(klass);
+          ret = body(klass);
         }
         else {
-          return body(klass, [klass].concat(parent_nesting));
+          ret = body(klass, [klass].concat(parent_nesting));
         }
+
+        if (Opal.trace_end) {
+          if (typeof Promise !== 'undefined' && ret && typeof ret.then === 'function') {
+            return ret.then(function(value){ Opal.invoke_tracers_for('end', klass); return value; });
+          } else {
+            Opal.invoke_tracers_for('end', klass);
+          }
+        }
+
+        return ret;
+      } else {
+        if (Opal.trace_end) { Opal.invoke_tracers_for('end', klass); }
       }
 
       return nil;

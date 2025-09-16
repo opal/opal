@@ -2,7 +2,7 @@
 
 class ::TracePoint
   # partial implementation of TracePoint
-  # for the moment only supports the :class event
+  # supports :class and :end events
   def self.trace(event, &block)
     new(event, &block).enable
   end
@@ -10,7 +10,9 @@ class ::TracePoint
   attr_reader :event
 
   def initialize(event, &block)
-    ::Kernel.raise 'Only the :class event is supported' unless event == :class
+    unless event == :class || event == :end
+      ::Kernel.raise 'Only the :class and :end events are supported'
+    end
     @event = event
     @block = block
     @trace_object = nil
@@ -55,5 +57,13 @@ class ::TracePoint
 
   def self
     @trace_object
+  end
+
+  # Current path during callback
+  def path
+    # Use the Ruby-level caller to determine the current file path (first non-runtime frame)
+    loc = ::Kernel.caller(2, 1)
+    return nil unless loc
+    loc.split(':in `').first
   end
 end
