@@ -50,11 +50,18 @@ module Opal
       def name_and_base
         base, name = cid.children
 
-        if base.nil?
-          [name, "#{scope.nesting}[0]"]
-        else
-          [name, expr(base)]
-        end
+        base = if base.nil?
+                 case scope
+                 when ModuleNode, ClassNode
+                   scope.self
+                 else
+                   "#{scope.nesting}[0]"
+                 end
+               else
+                 expr(base)
+               end
+
+        [name, base]
       end
 
       def compile_body
