@@ -205,6 +205,30 @@ module ::Opal
     }
   end
 
+  # Class definition helper used by the compiler
+  #
+  # Defines or fetches a class (like `Opal.klass`) and, if a body callback is
+  # provided, evaluates the class body via that callback passing `self` and the
+  # updated `$nesting` array. The return value of the callback becomes the
+  # value of the class expression; when no callback is given the expression
+  # evaluates to `nil` (to match Ruby semantics for `class X; end`).
+  def self.klass_def(scope, superclass, name, body, parent_nesting)
+    %x{
+      var klass = Opal.klass(scope, superclass, name);
+
+      if (body != null) {
+        if (body.length == 1) {
+          return body(klass);
+        }
+        else {
+          return body(klass, [klass].concat(parent_nesting));
+        }
+      }
+
+      return nil;
+    }
+  end
+
   # Helper to set $$meta on klass, module or instance
   %x{
     function set_meta(obj, meta) {

@@ -25,6 +25,30 @@ module ::Opal
     }
   end
 
+  # Module definition helper used by the compiler
+  #
+  # Defines or fetches a module (like `Opal.module`) and, if a body callback is
+  # provided, evaluates the module body via that callback passing `self` and the
+  # updated `$nesting` array. The return value of the callback becomes the
+  # value of the module expression; when no callback is given the expression
+  # evaluates to `nil`.
+  def self.module_def(scope, name, body, parent_nesting)
+    %x{
+      var module = Opal.module(scope, name);
+
+      if (body != null) {
+        if (body.length == 1) {
+          return body(module);
+        }
+        else {
+          return body(module, [module].concat(parent_nesting));
+        }
+      }
+
+      return nil;
+    }
+  end
+
   %x{
     function find_existing_module(scope, name) {
       var module = $const_get_name(scope, name);
