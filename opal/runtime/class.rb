@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid, invoke_tracers_for_class
+# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid
 
 module ::Opal
   %x{
@@ -86,7 +86,7 @@ module ::Opal
         }
       }
 
-      if (Opal.trace_class) { $invoke_tracers_for_class(klass); }
+      if (Opal.trace_class) { Opal.invoke_tracers_for('class', klass); }
 
       return klass;
     }
@@ -202,6 +202,43 @@ module ::Opal
       } else {
         return Opal.build_object_singleton_class(object);
       }
+    }
+  end
+
+  # Class definition helper used by the compiler
+  #
+  # Defines or fetches a class (like `Opal.klass`) and, if a body callback is
+  # provided, evaluates the class body via that callback passing `self` and the
+  # updated `$nesting` array. The return value of the callback becomes the
+  # value of the class expression; when no callback is given the expression
+  # evaluates to `nil` (to match Ruby semantics for `class X; end`).
+  def self.klass_def(scope, superclass, name, body, parent_nesting)
+    %x{
+      var klass = Opal.klass(scope, superclass, name);
+
+      if (body != null) {
+        var ret;
+        if (body.length == 1) {
+          ret = body(klass);
+        }
+        else {
+          ret = body(klass, [klass].concat(parent_nesting));
+        }
+
+        if (Opal.trace_end) {
+          if (typeof Promise !== 'undefined' && ret && typeof ret.then === 'function') {
+            return ret.then(function(value){ Opal.invoke_tracers_for('end', klass); return value; });
+          } else {
+            Opal.invoke_tracers_for('end', klass);
+          }
+        }
+
+        return ret;
+      } else {
+        if (Opal.trace_end) { Opal.invoke_tracers_for('end', klass); }
+      }
+
+      return nil;
     }
   end
 

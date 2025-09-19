@@ -11,17 +11,12 @@ module Opal
 
       def compile
         name, base = name_and_base
-        helper :klass
+        helper :klass_def
 
         if body.nil?
-          # Simplified compile for empty body
-          if stmt?
-            unshift '$klass(', base, ', ', super_code, ", '#{name}')"
-          else
-            unshift '($klass(', base, ', ', super_code, ", '#{name}'), nil)"
-          end
+          # Empty body: rely on runtime $klass_def (no callback) to return nil
+          unshift '$klass_def(', base, ', ', super_code, ", '#{name}')"
         else
-          line "  var self = $klass($base, $super, '#{name}');"
           in_scope do
             scope.name = name
             in_closure(Closure::MODULE | Closure::JS_FUNCTION) do
@@ -34,12 +29,11 @@ module Opal
             await_end = ')'
             async = 'async '
             parent.await_encountered = true
-          else
-            await_begin, await_end, async = '', '', ''
           end
 
-          unshift "#{await_begin}(#{async}function($base, $super#{', $parent_nesting' if @define_nesting}) {"
-          line '})(', base, ', ', super_code, "#{', ' + scope.nesting if @define_nesting})#{await_end}"
+          # Emit a direct runtime call with an inline body function.
+          unshift "#{await_begin}$klass_def(", base, ', ', super_code, ", '#{name}', #{async}function(self#{', $nesting' if @define_nesting}) {"
+          line "}#{", #{scope.nesting}" if @define_nesting})#{await_end}"
         end
       end
 

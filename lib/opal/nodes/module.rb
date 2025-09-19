@@ -18,17 +18,12 @@ module Opal
         end
 
         name, base = name_and_base
-        helper :module
+        helper :module_def
 
         if body.nil?
-          # Simplified compile for empty body
-          if stmt?
-            unshift '$module(', base, ", '#{name}')"
-          else
-            unshift '($module(', base, ", '#{name}'), nil)"
-          end
+          # Empty body: runtime $module_def without a callback returns nil
+          unshift '$module_def(', base, ", '#{name}')"
         else
-          line "  var self = $module($base, '#{name}');"
           in_scope do
             scope.name = name
             in_closure(Closure::MODULE | Closure::JS_FUNCTION) do
@@ -41,12 +36,11 @@ module Opal
             await_end = ')'
             async = 'async '
             parent.await_encountered = true
-          else
-            await_begin, await_end, async = '', '', ''
           end
 
-          unshift "#{await_begin}(#{async}function($base#{', $parent_nesting' if @define_nesting}) {"
-          line '})(', base, "#{', ' + scope.nesting if @define_nesting})#{await_end}"
+          # Emit a direct runtime call with an inline body function.
+          unshift "#{await_begin}$module_def(", base, ", '#{name}', #{async}function(self#{', $nesting' if @define_nesting}) {"
+          line "}#{", #{scope.nesting}" if @define_nesting})#{await_end}"
         end
       end
 
@@ -56,18 +50,26 @@ module Opal
       def name_and_base
         base, name = cid.children
 
-        if base.nil?
-          [name, "#{scope.nesting}[0]"]
-        else
-          [name, expr(base)]
-        end
+        base = if base.nil?
+                 case scope
+                 when ModuleNode, ClassNode
+                   scope.self
+                 else
+                   "#{scope.nesting}[0]"
+                 end
+               else
+                 expr(base)
+               end
+
+        [name, base]
       end
 
       def compile_body
         body_code = stmt(compiler.returns(body))
         empty_line
 
-        add_temp "$nesting = [self].concat($parent_nesting)" if @define_nesting
+        # $nesting is now provided as a parameter to the body callback by
+        # $klass_def/$module_def. Just setup relative access when needed.
         add_temp '$$ = Opal.$r($nesting)' if @define_relative_access
 
         line scope.to_vars
