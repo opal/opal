@@ -12,6 +12,8 @@ module ::Opal
   %x{
     function are_both_numbers(l,r) {
       return typeof(l) === 'number' && typeof(r) === 'number'
+      // if (typeof l === 'bigint' && typeof r === 'bigint') return true;
+      // if (typeof l === 'number' && typeof r === 'number') return true;
     }
   }
 
