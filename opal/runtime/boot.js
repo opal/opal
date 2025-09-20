@@ -497,6 +497,10 @@
   Opal.load = function(path) {
     path = Opal.normalize(path);
 
+    if (Opal.platform?.load_file && !Opal.modules[path]) {
+      Opal.platform.load_file(path);
+    }
+
     return Opal.load_normalized(path);
   };
 
@@ -505,6 +509,10 @@
 
     if (Opal.require_table[path]) {
       return false;
+    }
+
+    if (Opal.platform?.load_file && !Opal.modules[path]) {
+      Opal.platform.load_file(path);
     }
 
     return Opal.load_normalized(path);

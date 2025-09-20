@@ -538,4 +538,19 @@ platform.dir_rewind = (fd)=>{
 }
 platform.dir_wd = ()=>process.cwd();
 
+// And finally, load and compile ruby files
+// This is called from Opal.load or Opal.require and facilitates direct loading of files, just like the former
+// stdlib/nodejs/require did. It could or should however respect LOAD_PATH, but thats for the future.
+platform.load_file = function(normalized_path) {
+  if (!Opal.Opal.Compiler) {
+    throw new Error("file '" + normalized_path + "' cannot be loaded, please require 'opal-parser' first");
+  }
+  if (!fs.existsSync(normalized_path)) normalized_path += '.rb';
+  let ruby = action(fs.readFileSync, normalized_path).toString(),
+      compiler = Opal.Opal.Compiler.$new(ruby, (new Map().set("requirable", true).set("file", normalized_path))),
+      js = compiler.$compile(), requires = compiler.$requires(), path;
+  for (path of requires) { platform.load_file(path, Opal.normalize(path)); }
+  eval(js);
+}
+
 });}
