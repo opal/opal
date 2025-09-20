@@ -77,6 +77,7 @@ platform.sleep = platform.sleep_atomics;
 
 // ARGV
 platform.argv = process.argv.slice(1)
+if (platform.argv[1] === '--') platform.argv.splice(1, 1);
 
 // ENV
 platform.env_keys = ()=>Object.keys(process.env).sort();
