@@ -7,8 +7,7 @@ require 'opal/os'
 module Opal
   class ExeCompiler
     RUNTIMES = -> {
-      types = %w[bun deno node quickjs]
-      types << 'osascript' if OS.macos?
+      types = %w[node]
       types.freeze
     }.call
 
@@ -50,20 +49,6 @@ module Opal
       if OS.windows? && !@out_path.downcase.end_with?('.exe')
         @out_path << '.exe'
       end
-    end
-
-    def compile_bun_exe(src_path, _dir)
-      system('bun', 'build', src_path, '--compile', '--outfile', @out_path)
-    end
-
-    def compile_deno_exe(src_path, _dir)
-      system('deno', 'compile',
-             '--allow-env',
-             '--allow-read',
-             '--allow-sys',
-             '--allow-write',
-             '--output', @out_path, src_path
-            )
     end
 
     def compile_node_exe(src_path, dir)
@@ -108,17 +93,6 @@ module Opal
       append_exe_to_out_path_on_windows
       FileUtils.cp(File.join(dir, 'node_copy.exe'), @out_path)
       true
-    end
-
-    def compile_osascript_exe(src_path, _dir)
-      @out_path << '.app' unless @out_path.end_with?('.app')
-      system('osacompile', '-l', 'JavaScript', '-o', @out_path, '-s', src_path)
-    end
-
-    def compile_quickjs_exe(src_path, _dir)
-      append_exe_to_out_path_on_windows
-      # '-flto', '-fbignum' might be useful options, depending on quickjs version/build
-      system('qjsc', '-o', @out_path, src_path)
     end
   end
 end

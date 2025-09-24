@@ -1,4 +1,4 @@
-# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop, jsid, each_ivar
+# helpers: truthy, coerce_to, const_set, Object, return_ivar, assign_ivar, ivar, deny_frozen_access, freeze, prop, jsid, each_ivar, has_own
 # backtick_javascript: true
 # use_strict: true
 
@@ -212,7 +212,7 @@ class ::Module
         #{::Kernel.raise ::ArgumentError, 'empty file name'}
       }
 
-      if (!self.$$const.hasOwnProperty(#{const})) {
+      if (!$has_own(self.$$const, #{const})) {
         if (!self.$$autoload) {
           self.$$autoload = {};
         }
@@ -265,7 +265,7 @@ class ::Module
   def class_variable_defined?(name)
     name = ::Opal.class_variable_name!(name)
 
-    `Opal.class_variables(self).hasOwnProperty(name)`
+    `$has_own(Opal.class_variables(self), name)`
   end
 
   def const_added(name)
@@ -278,7 +278,7 @@ class ::Module
     name = ::Opal.class_variable_name!(name)
 
     %x{
-      if (Opal.hasOwnProperty.call(self.$$cvars, name)) {
+      if ($has_own(self.$$cvars, name)) {
         var value = self.$$cvars[name];
         delete self.$$cvars[name];
         return value;
@@ -320,7 +320,9 @@ class ::Module
   def const_defined?(name, inherit = true)
     name = Opal.const_name!(name)
 
-    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
+    if `Opal.CONST_NAME_REGEXP`
+      ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
+    end
 
     %x{
       var module, modules = [self], module_constants, i, ii;
@@ -365,7 +367,9 @@ class ::Module
       return name.split('::').inject(self) { |o, c| o.const_get(c) }
     end
 
-    ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
+    if `Opal.CONST_NAME_REGEXP`
+      ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
+    end
 
     %x{
       if (inherit) {
@@ -387,7 +391,7 @@ class ::Module
 
     name = ::Opal.const_name!(name)
 
-    if name !~ ::Opal::CONST_NAME_REGEXP || name.start_with?('::')
+    if (`Opal.CONST_NAME_REGEXP` && name !~ ::Opal::CONST_NAME_REGEXP) || name.start_with?('::')
       ::Kernel.raise ::NameError.new("wrong constant name #{name}", name)
     end
 
@@ -435,7 +439,7 @@ class ::Module
 
     %x{
       if (typeof(Proxy) !== 'undefined') {
-        var meta = Object.create(null)
+        var meta = { __proto__: null };
 
         block.$$proxy_target = block
         block = new Proxy(block, {
@@ -472,7 +476,16 @@ class ::Module
     return self if frozen?
 
     %x{
-      if (!self.hasOwnProperty('$$base_module')) { $prop(self, '$$base_module', null); }
+      if (!$has_own(self, '$$base_module')) {
+        $prop(self, '$$base_module', null);
+      }
+      if (!$has_own(self, '$$ancestors')) {
+        $prop(self, '$$ancestors', []);
+        $prop(self, '$$ancestors_cache_version', null);
+      }
+      if (!$has_own(self, '$$cloned_from')) {
+        $prop(self, '$$cloned_from', []);
+      }
 
       return $freeze(self);
     }
@@ -676,7 +689,7 @@ class ::Module
         return nil;
       }
 
-      return self.$$full_name = result.join('::');
+      return self.$$full_name = result.join('::').toString();
     }
   end
 
@@ -787,7 +800,7 @@ class ::Module
       copyInstanceMethods(other, self);
       copyIncludedModules(other, self);
       copyPrependedModules(other, self);
-      self.$$cloned_from = other.$$cloned_from.concat(other);
+      $prop(self, '$$cloned_from', $has_own(other, '$$cloned_from') ? other.$$cloned_from.concat(other) : [other]);
     }
     copy_class_variables(other)
     copy_constants(other)
@@ -822,7 +835,7 @@ class ::Module
     %x{
       klass_id = Opal.id(klass);
       if (typeof self.$$refine_modules === "undefined") {
-        self.$$refine_modules = Object.create(null);
+        self.$$refine_modules = { __proto__: null };
       }
       if (typeof self.$$refine_modules[klass_id] === "undefined") {
         m = self.$$refine_modules[klass_id] = #{::Refinement.new};

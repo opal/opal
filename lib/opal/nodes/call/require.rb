@@ -89,8 +89,8 @@ module Opal
                 when :dirname
                   return expand_path parts[0].split('/')[0...-1].join('/')
                 end
-              elsif meth == :__dir__
-                return File.dirname(Opal::Compiler.module_name(@compiler.file))
+              # elsif meth == :__dir__
+              #   return File.dirname(Opal::Compiler.module_name(@compiler.file))
               end
             end
           end

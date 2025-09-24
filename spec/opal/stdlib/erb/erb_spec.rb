@@ -1,7 +1,7 @@
 require 'erb'
-require File.expand_path('../simple', __FILE__)
-require File.expand_path('../quoted', __FILE__)
-require File.expand_path('../inline_block', __FILE__)
+require 'opal/stdlib/erb/simple'
+require 'opal/stdlib/erb/quoted'
+require 'opal/stdlib/erb/inline_block'
 
 describe "ERB files" do
   before :each do

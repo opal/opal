@@ -27,5 +27,5 @@ opal_unsupported_filter "Float" do
   fails "Rational#/ when passed an Integer raises a ZeroDivisionError when passed 0" # Expected ZeroDivisionError but no exception was raised (Infinity was returned)
   fails "Rational#coerce returns the passed argument, self as Float, when given a Float" # Expected false to be true
   fails "Rational#divmod when passed an Integer returns the quotient as Integer and the remainder as Rational" # Expected [1537228672809129200, (0/1)] to have same value and type as [1537228672809129200, (1/1)]
-  fails "Struct#eql? returns false if any corresponding elements are not #eql?" # Expected #<struct StructClasses::Car make="Honda", model="Accord", year=1998> not to have same value or type as #<struct StructClasses::Car make="Honda", model="Accord", year=1998>  
+  fails "Struct#eql? returns false if any corresponding elements are not #eql?" # Expected #<struct StructClasses::Car make="Honda", model="Accord", year=1998> not to have same value or type as #<struct StructClasses::Car make="Honda", model="Accord", year=1998>
 end

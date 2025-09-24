@@ -442,7 +442,7 @@ class ::Array
     %x{
       var output = '';
 
-      var buffer = self.slice();
+      var buffer = self.slice(0);
 
       function autocomplete(array, size) {
         while (array.length < size) {

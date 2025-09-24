@@ -1,3 +1,4 @@
+# backtick_javascript: true
 # Why .$$is_number is better than isNaN:
 #
 #

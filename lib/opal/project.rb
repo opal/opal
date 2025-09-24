@@ -200,6 +200,7 @@ module Opal
     @glob_cache = {}
 
     def self.dir_is_project_candidate?(current_dir)
+      return false unless File.directory?(current_dir)
       @glob_cache[current_dir] ||= Dir[File.join(current_dir, "{#{PROJECT_DEFINING_FILES.join(',')}}")]
       @glob_cache[current_dir].any?
     end

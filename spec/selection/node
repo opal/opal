@@ -1,0 +1,9 @@
+ruby/core/argf
+ruby/core/dir
+ruby/core/file
+ruby/core/file/stat
+ruby/core/filetest
+ruby/core/io
+ruby/core/signal
+!ruby/core/signal/trap_spec
+ruby/library/tmpdir/dir

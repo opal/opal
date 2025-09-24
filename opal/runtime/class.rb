@@ -1,7 +1,7 @@
 # backtick_javascript: true
 # use_strict: true
 # opal_runtime_mode: true
-# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid
+# helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid, invoke_tracers_for_class, type_error
 
 module ::Opal
   def self.find_existing_class(scope, name)
@@ -105,12 +105,11 @@ module ::Opal
   # @return [Object]
   def self.class_variables(mod)
     %x{
-      var ancestors = $ancestors(mod),
-          i, length = ancestors.length,
+      var ancestor, ancestors = $ancestors(mod), i, length = ancestors.length,
           result = {};
 
       for (i = length - 1; i >= 0; i--) {
-        var ancestor = ancestors[i];
+        ancestor = ancestors[i];
 
         for (var cvar in ancestor.$$cvars) {
           result[cvar] = ancestor.$$cvars[cvar];
@@ -129,11 +128,10 @@ module ::Opal
   # @param value [Object]
   def self.class_variable_set(mod, name, value)
     %x{
-      var ancestors = $ancestors(mod),
-          i, length = ancestors.length;
+      var ancestor, ancestors = $ancestors(mod), i, length = ancestors.length;
 
       for (i = length - 2; i >= 0; i--) {
-        var ancestor = ancestors[i];
+        ancestor = ancestors[i];
 
         if ($has_own(ancestor.$$cvars, name)) {
           ancestor.$$cvars[name] = value;
@@ -156,11 +154,10 @@ module ::Opal
       if ($has_own(mod.$$cvars, name))
         return mod.$$cvars[name];
 
-      var ancestors = $ancestors(mod),
-        i, length = ancestors.length;
+      var ancestor, ancestors = $ancestors(mod), i, length = ancestors.length;
 
       for (i = 0; i < length; i++) {
-        var ancestor = ancestors[i];
+        ancestor = ancestors[i];
 
         if ($has_own(ancestor.$$cvars, name)) {
           return ancestor.$$cvars[name];
@@ -338,8 +335,6 @@ module ::Opal
 
   def self.coerce_to(object, type, method, args)
     %x{
-      var body;
-
       if (method === 'to_int' && type === Opal.Integer && object.$$is_number)
         return object < 0 ? Math.ceil(object) : Math.floor(object);
 
@@ -350,13 +345,13 @@ module ::Opal
 
       // Fast path for the most common situation
       if ((object['$respond_to?'].$$pristine && object.$method_missing.$$pristine) || object['$respond_to?'].$$stub) {
-        body = object[$jsid(method)];
-        if (body == null || body.$$stub) Opal.type_error(object, type);
+        const body = object[$jsid(method)];
+        if (body == null || body.$$stub) $type_error(object, type);
         return body.apply(object, args);
       }
 
       if (!object['$respond_to?'](method)) {
-        Opal.type_error(object, type);
+        $type_error(object, type);
       }
 
       if (args == null) args = [];
@@ -364,13 +359,33 @@ module ::Opal
     }
   end
 
+  `const $coerce_to = Opal.coerce_to`
+
+  def self.coerce_to_or_raise(object, type, method, args)
+    coerced = `$coerce_to(object, type, method, args)`
+
+    return coerced if type === coerced
+
+    `Opal.Kernel.$raise($type_error(object, type, method, coerced))`
+  end
+
+  def self.coerce_to_or_nil(object, type, method, args)
+    return if `object['$respond_to?'].$$stub` || !object.respond_to?(method)
+
+    coerced = `$coerce_to(object, type, method, args)`
+
+    return coerced if type === coerced || coerced.nil?
+
+    `Opal.Kernel.$raise($type_error(object, type, method, coerced))`
+  end
+
   def self.respond_to(obj, jsid, include_all)
     %x{
       if (obj == null || !obj.$$class) return false;
       include_all = !!include_all;
-      var body = obj[jsid];
 
       if (obj['$respond_to?'].$$pristine) {
+        const body = obj[jsid];
         if (typeof(body) === "function" && !body.$$stub) {
           return true;
         }

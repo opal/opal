@@ -13,7 +13,7 @@ module ::Opal
 
       if ($Kernel && $Kernel.$raise) {
         if (arguments.length > 2) {
-          $Kernel.$raise(klass.$new.apply(klass, $slice(arguments, 1)));
+          $Kernel.$raise(klass.$new(...$slice(arguments, 1)));
         }
         else {
           $Kernel.$raise(klass, message);
@@ -74,8 +74,8 @@ module ::Opal
   # be a value, or an array of values.  Returns null if not found.
   def self.rescue(exception, candidates)
     %x{
-      for (var i = 0; i < candidates.length; i++) {
-        var candidate = candidates[i];
+      for (var candidate, i = 0; i < candidates.length; i++) {
+        candidate = candidates[i];
 
         if (candidate.$$is_array) {
           var result = Opal.rescue(exception, candidate);
@@ -116,7 +116,7 @@ module ::Opal
 
   def self.thrower(type)
     %x{
-      var thrower = {
+      return {
         $thrower_type: type,
         $throw: function(value, called_from_lambda) {
           if (value == null) value = nil;
@@ -128,7 +128,6 @@ module ::Opal
         },
         is_orphan: false
       }
-      return thrower;
     }
   end
 

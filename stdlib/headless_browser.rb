@@ -1,5 +1,1 @@
-# frozen_string_literal: true
-# backtick_javascript: true
-
-require 'headless_browser/base'
-require 'headless_browser/file'
+warn "Platform specific code is already integrated now, you don't need to require 'headless-browser' anymore."

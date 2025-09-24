@@ -51,7 +51,7 @@ klasses = [
 optimization_status = Hash[klasses.map do |klass|
   methods = klass.instance_methods
   methods -= Object.instance_methods unless klass == Object
-  methods -= [:product, :exit, :exit!, :at_exit]
+  methods -= [:product, :exit, :exit!, :at_exit, :gets, :readline, :readlines]
   opt_status = Hash[methods.map do |method|
     method_func = `#{klass.instance_method(method)}.method`
     method_func = `#{method_func}.$$proxy_target || #{method_func}`

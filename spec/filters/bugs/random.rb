@@ -6,5 +6,5 @@ opal_filter "Random" do
   fails "Random#rand with Range supports custom object types" # Expected "NaN#<struct RandomSpecs::CustomRangeInteger value=1>" (String) to be an instance of RandomSpecs::CustomRangeInteger
   fails "SecureRandom.random_number generates a random float number between 0.0 and 1.0 if argument is negative float" # ArgumentError: invalid argument - -11.1
   fails "SecureRandom.random_number generates a random float number between 0.0 and 1.0 if argument is negative" # ArgumentError: invalid argument - -10
-  fails "SecureRandom.random_number raises ArgumentError if the argument is non-numeric" # Expected ArgumentError but got: TypeError (no implicit conversion of Object into Integer)  
+  fails "SecureRandom.random_number raises ArgumentError if the argument is non-numeric" # Expected ArgumentError but got: TypeError (no implicit conversion of Object into Integer)
 end

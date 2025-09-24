@@ -140,7 +140,7 @@ class ::Proc < `Function`
         arity = self.length;
       }
       else {
-        arity = #{::Opal.coerce_to!(arity, ::Integer, :to_int)};
+        arity = Opal.coerce_to_or_raise(arity, Opal.Integer, "to_int");
         if (self.$$is_lambda && arity !== self.length) {
           #{::Kernel.raise ::ArgumentError, "wrong number of arguments (#{`arity`} for #{`self.length`})"}
         }

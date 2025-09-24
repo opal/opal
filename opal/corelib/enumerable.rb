@@ -167,14 +167,14 @@ module ::Enumerable
         if n.nil?
           respond_to?(:size) ? ::Float::INFINITY : nil
         else
-          n = ::Opal.coerce_to!(n, ::Integer, :to_int)
+          n = `Opal.coerce_to_or_raise(n, Opal.Integer, "to_int")`
           n > 0 ? enumerator_size * n : 0
         end
       end
     end
 
     unless n.nil?
-      n = ::Opal.coerce_to! n, ::Integer, :to_int
+      n = `Opal.coerce_to_or_raise(n, Opal.Integer, "to_int")`
 
       return if `n <= 0`
     end
@@ -238,7 +238,7 @@ module ::Enumerable
   end
 
   def drop(number)
-    number = `$coerce_to(number, #{::Integer}, 'to_int')`
+    number = `$coerce_to(number, Opal.Integer, 'to_int')`
 
     if `number < 0`
       ::Kernel.raise ::ArgumentError, 'attempt to drop negative size'
@@ -347,14 +347,14 @@ module ::Enumerable
         $yield1(block, item);
       }
 
-      self.$each.apply(self, data);
+      self.$each(...data);
 
       return self;
     }
   end
 
   def each_slice(n, &block)
-    n = `$coerce_to(#{n}, #{::Integer}, 'to_int')`
+    n = `$coerce_to(#{n}, Opal.Integer, 'to_int')`
 
     if `n <= 0`
       ::Kernel.raise ::ArgumentError, 'invalid slice size'
@@ -401,7 +401,7 @@ module ::Enumerable
         index++;
       };
 
-      self.$each.apply(self, args);
+      self.$each(...args);
     }
 
     self
@@ -431,7 +431,7 @@ module ::Enumerable
         result.push(#{::Opal.destructure(`arguments`)});
       };
 
-      self.$each.apply(self, args);
+      self.$each(...args);
 
       return result;
     }
@@ -504,7 +504,7 @@ module ::Enumerable
       nil
     else
       result = []
-      number = `$coerce_to(number, #{::Integer}, 'to_int')`
+      number = `$coerce_to(number, Opal.Integer, 'to_int')`
 
       if `number < 0`
         ::Kernel.raise ::ArgumentError, 'attempt to take negative size'
@@ -694,7 +694,7 @@ module ::Enumerable
         }
       }
 
-      n = $coerce_to(n, #{::Integer}, 'to_int');
+      n = $coerce_to(n, Opal.Integer, 'to_int');
     }
 
     sort(&block).reverse.first(n)
@@ -1252,7 +1252,7 @@ module ::Enumerable
 
       self.$each.$$p = function() {
         var param = #{::Opal.destructure(`arguments`)};
-        var ary = #{::Opal.coerce_to?(`param`, ::Array, :to_ary)}, key, val;
+        var ary = Opal.coerce_to_or_nil(param, Opal.Array, "to_ary"), key, val;
         if (!ary.$$is_array) {
           #{::Kernel.raise ::TypeError, "wrong element type #{`param`.class} (expected array)"}
         }
@@ -1265,7 +1265,7 @@ module ::Enumerable
         Opal.hash_put(hash, key, val);
       };
 
-      self.$each.apply(self, args);
+      self.$each(...args);
 
       return hash;
     }

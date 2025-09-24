@@ -235,7 +235,7 @@ class ::Range
           n = 1;
         }
         else if (!n.$$is_number) {
-          n = #{::Opal.coerce_to!(n, ::Integer, :to_int)}
+          n = Opal.coerce_to_or_raise(n, Opal.Integer, "to_int");
         }
 
         if (n < 0) {

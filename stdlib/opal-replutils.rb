@@ -111,10 +111,16 @@ module REPLUtils
     while (line = gets)
       input = JSON.parse(line)
 
-      out = eval_and_print_async(input[:code], input[:mode], input[:colors]).__await__
+      # This line, compile to `await( ...)` triggers a bug in Node which causes it to simply crash:
+      # out = eval_and_print_async(input[:code], input[:mode], input[:colors]).__await__
+      # so for the moment use the sync version:
+      out = eval_and_print(input[:code], input[:mode], input[:colors])
       puts out if out
       puts '<<<ready>>>'
     end
+  rescue JSON::ParserError
+    # this can happen an Ctrl-D exit
+    # nothing to do, just keep silent
   end
 
   # Slightly based on Pry's implementation

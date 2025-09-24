@@ -43,11 +43,18 @@ Hello there.
 EOS
 ```
 
-Ruby strings are compiled directly into JavaScript strings for
-performance as well as readability. This has the side effect that Opal
-does not support mutable strings - i.e. all strings are immutable.
+Ruby strings are compiled directly into JavaScript strings or JavaScript
+String objects. This has the side effect that Opal does not support mutable
+strings - i.e. all strings are immutable.
 
-NOTE: Strings in Opal are immutable because they are compiled into regular JavaScript strings. This is done for performance reasons.
+When passing Opal Strings to JavaScript functions, it may sometimes be necessary to ensure String objects are passed as JavaScript primitives, because not all JavaScript function are able to handle String objects. This can achieved with, e.g.
+```ruby
+my_string = String.new() # create a String object
+my_string.JS.toString() # convert it to a primitive string
+# for the ^ .JS see the section "Calling JavaScript methods" below
+```
+
+Please also read encoding.md for further details about String behaviour in Opal.
 
 For performance reasons, symbols are also compiled directly into strings.
 Opal supports all the symbol syntaxes, but does not have a real `Symbol`

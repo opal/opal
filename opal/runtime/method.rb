@@ -70,9 +70,8 @@ module ::Opal
       body.displayName = jsid;
       body.$$owner = mod;
 
-      var name = jsid.substr(1);
-
       var proto = mod.$$prototype;
+
       if (proto.hasOwnProperty('$$dummy')) {
         proto = proto.$$define_methods_on;
       }
@@ -83,13 +82,14 @@ module ::Opal
           Opal.defs(mod, jsid, body)
         }
 
+        let iclass;
         for (var i = 0, iclasses = mod.$$iclasses, length = iclasses.length; i < length; i++) {
-          var iclass = iclasses[i];
+          iclass = iclasses[i];
           $prop(iclass, jsid, body);
         }
       }
 
-      var singleton_of = mod.$$singleton_of;
+      const name = jsid.substr(1), singleton_of = mod.$$singleton_of;
       if (mod.$method_added && !mod.$method_added.$$stub && !singleton_of) {
         mod.$method_added(name);
       }
@@ -119,8 +119,8 @@ module ::Opal
   def self.remove_method_from_iclasses(obj, jsid)
     %x{
       if (obj.$$is_module) {
-        for (var i = 0, iclasses = obj.$$iclasses, length = iclasses.length; i < length; i++) {
-          var iclass = iclasses[i];
+        for (var i = 0, iclass, iclasses = obj.$$iclasses, length = iclasses.length; i < length; i++) {
+          iclass = iclasses[i];
           delete iclass[jsid];
         }
       }
@@ -312,7 +312,7 @@ module ::Opal
 
   def self.instance_methods(mod)
     %x{
-      var processed = Object.create(null), results = [], ancestors = $ancestors(mod);
+      var processed = { __proto__: null }, results = [], ancestors = $ancestors(mod);
 
       for (var i = 0, l = ancestors.length; i < l; i++) {
         var ancestor = ancestors[i],
@@ -404,7 +404,7 @@ module ::Opal
 
       for (i = 0; i < ancestors.length; i++) {
         ancestor = ancestors[i];
-        if (ancestor === method_owner || ancestor.$$cloned_from.indexOf(method_owner) !== -1) {
+        if (ancestor === method_owner || ($has_own(ancestor, '$$cloned_from') && ancestor.$$cloned_from.indexOf(method_owner) !== -1)) {
           current_index = i;
           break;
         }

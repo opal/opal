@@ -42,7 +42,6 @@ end
 
 describe "Numeric#object_id" do
   it "returns (self * 2) + 1" do
-    skip if OPAL_PLATFORM == "bun"
     0.object_id.should == 1
     1.object_id.should == 3
     2.object_id.should == 5
