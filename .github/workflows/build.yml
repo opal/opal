@@ -82,8 +82,9 @@ jobs:
           # JRuby 10.0 does not work at all, JRuby 9.4 exhibits a SystemExit error
           # - name: rspec-jruby
           #   ruby: 'jruby'
-          - name: truffleruby
-            ruby: 'truffleruby'
+          # TruffleRuby unfortunately since 25.0 makes trouble, again
+          # - name: truffleruby
+          #  ruby: 'truffleruby'
           - name: rspec-windows
             command: bundle exec rake rspec
             os: windows-latest
