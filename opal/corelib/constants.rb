@@ -1,4 +1,5 @@
-::RUBY_PLATFORM       = 'opal'
+# backtick_javascript: true
+::RUBY_PLATFORM       = `Opal.platform.ruby_platform`
 ::RUBY_ENGINE         = 'opal'
 ::RUBY_VERSION        = '3.2.0'
 ::RUBY_ENGINE_VERSION = '2.0.0dev'

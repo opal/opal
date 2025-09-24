@@ -20,12 +20,11 @@ module Opal
 
           has_retry = node_has?(body, :retry)
 
-          in_closure(
-            Closure::LOOP |
-            Closure::JS_LOOP |
-            (wrap_in_closure? ? Closure::JS_FUNCTION : 0) |
-            (has_retry ? Closure::RETRY_CONTAINER : 0)
-          ) do
+          in_closure(Closure::LOOP |
+                     Closure::JS_LOOP |
+                     (wrap_in_closure? ? Closure::JS_FUNCTION : 0) |
+                     (has_retry ? Closure::RETRY_CONTAINER : 0)
+                    ) do
             in_closure(Closure::LOOP_INSIDE | Closure::JS_LOOP_INSIDE | (has_retry ? Closure::RETRY_CONTAINER : 0)) do
               line(indent { stmt(body) })
             end

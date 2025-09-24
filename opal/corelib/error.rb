@@ -234,10 +234,7 @@ class ::SyntaxError         < ::ScriptError; end
 class ::LoadError           < ::ScriptError; end
 class ::NotImplementedError < ::ScriptError; end
 
-class ::SystemExit        < ::Exception; end
 class ::NoMemoryError     < ::Exception; end
-class ::SignalException   < ::Exception; end
-class ::Interrupt           < ::SignalException; end
 class ::SecurityError     < ::Exception; end
 class ::SystemStackError  < ::Exception; end
 
@@ -255,7 +252,6 @@ class ::UncaughtThrowError    < ::ArgumentError; end
 class ::IndexError          < ::StandardError; end
 class ::StopIteration         < ::IndexError; end
 class ::ClosedQueueError        < ::StopIteration; end
-class ::KeyError              < ::IndexError; end
 class ::RangeError          < ::StandardError; end
 class ::FloatDomainError      < ::RangeError; end
 class ::IOError             < ::StandardError; end
@@ -266,6 +262,57 @@ class ::ThreadError         < ::StandardError; end
 class ::FiberError          < ::StandardError; end
 
 ::Object.autoload :Errno, 'corelib/error/errno'
+
+class ::SystemExit < ::Exception
+  attr_reader :status
+
+  def initialize(status = true, message = nil)
+    if message.nil? && status.is_a?(::String)
+      message = status
+      status = 0
+    end
+    super(message || 'SystemExit')
+    @status = if status == true
+                0
+              elsif status == false
+                1
+              else
+                `Opal.coerce_to(status, #{::Integer}, 'to_int')`
+              end
+  end
+
+  def success?
+    @status.nil? ? nil : @status == 0
+  end
+end
+
+class ::SignalException < ::Exception
+  attr_reader :signo, :signm
+
+  def initialize(signal, name = nil)
+    if signal.is_a?(::Integer)
+      nm = Signal.list.key(signal)
+      raise(ArgumentError, 'unknown signal') unless nm
+      @signo = signal
+    elsif signal.is_a?(::String) || signal.is_a?(::Symbol)
+      raise(ArgumentError, 'signal given as name and name arg given') if name
+      nm = signal.to_s
+      nm = nm[3..] if nm.start_with?('SIG')
+      @signo = Signal.list[nm]
+      raise(ArgumentError, 'unknown signal') unless @signo
+    else
+      raise(ArgumentError, 'signal must be Integer, String or Symbol')
+    end
+    @signm = name || 'SIG' + nm
+    super(@signm) if @signm
+  end
+end
+
+class ::Interrupt < ::SignalException
+  def initialize(message = nil)
+    super(Signal.list['INT'] || 2, message || 'Interrupt')
+  end
+end
 
 class ::FrozenError < ::RuntimeError
   attr_reader :receiver
@@ -309,7 +356,7 @@ class ::StopIteration
   attr_reader :result
 end
 
-class ::KeyError
+class ::KeyError < ::IndexError
   def initialize(message, receiver: nil, key: nil)
     super(message)
     @receiver = receiver
@@ -340,6 +387,8 @@ module ::Opal
     class Error
     end
   end
+
+  class RetryException < ::Exception; end
 end
 
 module ::JS

@@ -145,12 +145,13 @@ namespace :bench do
     end
   end
 
+  desc "Benchmark Opal IPS style"
   task :ips do
     files = Dir[ENV['FILE'] || "#{__dir__}/../benchmark-ips/bm_*.rb"]
     raise ArgumentError, "no files provided" if files.empty?
     puts "=== Files: #{files.join ', '}"
     files.each do |bm_path|
-      sh "bundle exec opal --dynamic-require ignore --missing-require ignore -ropal/platform -gbenchmark-ips -rbenchmark/ips -A #{bm_path}"
+      sh "bundle exec opal --dynamic-require ignore --missing-require ignore -gbenchmark-ips -rbenchmark/ips -A #{bm_path}"
     end
   end
 end

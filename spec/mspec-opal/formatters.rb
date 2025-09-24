@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# helpers: platform
 
 class BaseOpalFormatter
   def initialize(out=nil)
@@ -21,19 +22,19 @@ class BaseOpalFormatter
   end
 
   def red(str)
-    `console.error(str)`
+    `console.error(str.toString())`
   end
 
   def green(str)
-    `console.info(str)`
+    `console.info(str.toString())`
   end
 
   def cyan(str)
-    `console.info(str)`
+    `console.info(str.toString())`
   end
 
   def log(str)
-    `console.log(str)`
+    `console.log(str.toString())`
   end
 
   def exception?
@@ -161,21 +162,7 @@ class ColoredDottedFormatter < BaseOpalFormatter
   end
 end
 
-class NodeJSFormatter < ColoredDottedFormatter
-  def red(str)
-    `process.stdout.write("\u001b[31m"+#{str}+"\u001b[0m")`
-  end
-
-  def green(str)
-    `process.stdout.write("\u001b[32m"+#{str}+"\u001b[0m")`
-  end
-
-  def cyan(str)
-    `process.stdout.write("\u001b[36m"+#{str}+"\u001b[0m")`
-  end
-end
-
-class NodeJSDocFormatter < NodeJSFormatter
+class DocFormatter < ColoredDottedFormatter
   def before(example)
     print example.description
   end

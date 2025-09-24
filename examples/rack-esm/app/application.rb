@@ -1,6 +1,5 @@
 require 'opal'
 require 'user'
-require 'opal/platform'
 
 module MyApp
   class Application

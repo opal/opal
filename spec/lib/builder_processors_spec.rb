@@ -8,13 +8,13 @@ RSpec.describe Opal::Builder::Processor::JsProcessor do
       "line1\n",
       " line2\n",
       "  line3\n",
-      "Opal.loaded([\"file.js\"]);",
+      "Opal.loaded(\"file.js\");",
     ])
   end
 
   it 'adds loading code at the end of the source' do
     processor = described_class.new("line1\n line2\n  line3", 'file.js')
-    expect(processor.source).to eq(%Q{line1\n line2\n  line3\nOpal.loaded(["file.js"]);})
+    expect(processor.source).to eq(%Q{line1\n line2\n  line3\nOpal.loaded("file.js");})
   end
 end
 
@@ -41,4 +41,3 @@ RSpec.describe Opal::Builder::Processor::RubyProcessor do
     expect(processor.required_trees).to eq(['./pippo'])
   end
 end
-

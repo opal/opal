@@ -1,5 +1,6 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "regular_expressions" do
+  fails "Literal Regexps is frozen" # Expected /Hello/.frozen? to be truthy but was false
   fails "MatchData#byteoffset accepts String as a reference to a named capture" # NoMethodError: undefined method `byteoffset' for #<MatchData "foobar" f:"foo" b:"bar">
   fails "MatchData#byteoffset accepts Symbol as a reference to a named capture" # NoMethodError: undefined method `byteoffset' for #<MatchData "foobar" f:"foo" b:"bar">
   fails "MatchData#byteoffset converts argument into integer if is not String nor Symbol" # NoMethodError: undefined method `byteoffset' for #<MatchData "foobar" f:"foo" b:"bar">
@@ -48,6 +49,7 @@ opal_filter "regular_expressions" do
   fails "Regexp#fixed_encoding? returns true if the Regexp was created with the Regexp::FIXEDENCODING option" # NameError: uninitialized constant Regexp::FIXEDENCODING
   fails "Regexp#hash is based on the text and options of Regexp" # Expected false == true to be truthy but was false
   fails "Regexp#hash returns the same value for two Regexps differing only in the /n option" # Expected false == true to be truthy but was false
+  fails "Regexp#initialize raises a FrozenError on a Regexp literal" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Regexp#initialize raises a TypeError on an initialized non-literal Regexp" # Expected TypeError but no exception was raised (nil was returned)
   fails "Regexp#inspect returns options in the order 'mixn'" # Expected "/(?:)/" == "//mixn" to be truthy but was false
   fails "Regexp#named_captures works with duplicate capture group names" # Exception: Invalid regular expression: /this (?<is>is) [aA] (?<pat>pate?(?<is>rn))/: Duplicate capture group name

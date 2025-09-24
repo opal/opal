@@ -22,14 +22,14 @@ gem 'tilt', tilt_version if tilt_version
 gem 'sprockets', sprockets_version if sprockets_version
 
 group :repl do
-  if RUBY_VERSION.to_f >= 2.3
-    gem 'mini_racer', platform: :mri, require: false
-  else
-    gem 'mini_racer', '< 0.2.0', platform: :mri, require: false
-    gem 'libv8', '~> 6.3.0', platform: :mri, require: false
+  if RUBY_PLATFORM =~ /linux/
+    if RUBY_VERSION.to_f >= 2.3
+      gem 'mini_racer', platform: :mri, require: false
+    else
+      gem 'mini_racer', '< 0.2.0', platform: :mri, require: false
+      gem 'libv8', '~> 6.3.0', platform: :mri, require: false
+    end
   end
-
-  gem 'therubyrhino', platform: :jruby, require: false
 end
 
 group :browser do
@@ -41,7 +41,7 @@ group :development do
   gem 'guard', require: false
   gem 'listen', require: false
   gem 'simplecov', require: false
-  gem 'ruby-lsp', require: false
+  gem 'ruby-lsp', platform: :mri, require: false
   gem 'uri', '> 1', require: false
 
   if RUBY_PLATFORM =~ /darwin/

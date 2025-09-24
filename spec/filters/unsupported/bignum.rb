@@ -26,5 +26,5 @@ opal_unsupported_filter "Bignum" do
   fails "Rational#** when passed Bignum returns Rational(-1) when self is Rational(-1) and the exponent is positive and odd" # Expected (1/1) to have same value and type as (-1/1)
   fails "Rational#** when passed Bignum returns positive Infinity when self < -1" # Exception: Maximum call stack size exceeded
   fails "Rational#** when passed Bignum returns positive Infinity when self is > 1" # Exception: Maximum call stack size exceeded
-  fails "Rational#round with a precision > 0 doesn't fail when rounding to an absurdly large positive precision" # FloatDomainError: Infinity  
+  fails "Rational#round with a precision > 0 doesn't fail when rounding to an absurdly large positive precision" # FloatDomainError: Infinity
 end

@@ -18,7 +18,7 @@ class ::Random
   end
 
   def initialize(seed = ::Random.new_seed)
-    seed = ::Opal.coerce_to!(seed, ::Integer, :to_int)
+    seed = `Opal.coerce_to_or_raise(#{seed}, Opal.Integer, "to_int")`
     @state = seed
     reseed(seed)
   end
@@ -37,7 +37,7 @@ class ::Random
   end
 
   def self.srand(n = ::Random.new_seed)
-    n = ::Opal.coerce_to!(n, ::Integer, :to_int)
+    n = `Opal.coerce_to_or_raise(#{n}, Opal.Integer, "to_int")`
 
     previous_seed = self::DEFAULT.seed
     self::DEFAULT.reseed(n)

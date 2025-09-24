@@ -38,11 +38,18 @@ module Opal
         return false unless %i[RUBY_ENGINE RUBY_PLATFORM].include? const_name
 
         # Return a truthy value
-        [method, arg.children.first]
+        [const_name, method, arg.children.first]
       end
 
-      def positive_engine_check?(method, const_value)
-        (method == :==) ^ (const_value != 'opal')
+      def positive_engine_check?(const_name, method, const_value)
+        if const_name == :RUBY_PLATFORM
+          # A bit cheating, cause platform drivers may set RUBY_PLATFORM for
+          # example to 'opal win' or 'opal linux', thats why #start_with? is
+          # used here instead of !=.
+          (method == :==) ^ !const_value.start_with?('opal')
+        else
+          (method == :==) ^ (const_value != 'opal')
+        end
       end
     end
   end

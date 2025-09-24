@@ -1,5 +1,6 @@
 # backtick_javascript: true
 # use_strict: true
+# helpers: coerce_to_or_raise
 
 require 'corelib/numeric'
 
@@ -26,7 +27,7 @@ class ::Number < ::Numeric
         return [#{::Kernel.Float(other)}, self];
       }
       else if (#{other.respond_to?(:to_f)}) {
-        return [#{::Opal.coerce_to!(other, ::Float, :to_f)}, self];
+        return [$coerce_to_or_raise(other, #{::Float}, "to_f"), self];
       }
       else if (other.$$is_number) {
         return [other, self];
@@ -239,19 +240,19 @@ class ::Number < ::Numeric
   end
 
   def <<(count)
-    count = ::Opal.coerce_to! count, ::Integer, :to_int
+    count = `$coerce_to_or_raise(#{count}, Opal.Integer, "to_int")`
 
     `#{count} > 0 ? self << #{count} : self >> -#{count}`
   end
 
   def >>(count)
-    count = ::Opal.coerce_to! count, ::Integer, :to_int
+    count = `$coerce_to_or_raise(#{count}, Opal.Integer, "to_int")`
 
     `#{count} > 0 ? self >> #{count} : self << -#{count}`
   end
 
   def [](bit)
-    bit = ::Opal.coerce_to! bit, ::Integer, :to_int
+    bit = `$coerce_to_or_raise(#{bit}, Opal.Integer, "to_int")`
 
     %x{
       if (#{bit} < 0) {
@@ -317,12 +318,12 @@ class ::Number < ::Numeric
   end
 
   def allbits?(mask)
-    mask = ::Opal.coerce_to! mask, ::Integer, :to_int
+    mask = `$coerce_to_or_raise(mask, Opal.Integer, "to_int")`
     `(self & mask) == mask`
   end
 
   def anybits?(mask)
-    mask = ::Opal.coerce_to! mask, ::Integer, :to_int
+    mask = `$coerce_to_or_raise(mask, Opal.Integer, "to_int")`
     `(self & mask) !== 0`
   end
 
@@ -511,7 +512,7 @@ class ::Number < ::Numeric
   end
 
   def nobits?(mask)
-    mask = ::Opal.coerce_to! mask, ::Integer, :to_int
+    mask = `$coerce_to_or_raise(mask, Opal.Integer, "to_int")`
     `(self & mask) == 0`
   end
 
@@ -615,7 +616,7 @@ class ::Number < ::Numeric
         ::Kernel.raise ::RangeError, 'Infinity'
       end
 
-      ndigits = ::Opal.coerce_to!(ndigits, ::Integer, :to_int)
+      ndigits = `$coerce_to_or_raise(ndigits, Opal.Integer, "to_int")`
 
       if ndigits < ::Integer::MIN
         ::Kernel.raise ::RangeError, 'out of bounds'
@@ -642,7 +643,7 @@ class ::Number < ::Numeric
         ::Kernel.raise ::FloatDomainError, 'NaN'
       end
 
-      ndigits = ::Opal.coerce_to!(`ndigits || 0`, ::Integer, :to_int)
+      ndigits = `$coerce_to_or_raise(ndigits || 0, Opal.Integer, "to_int")`
 
       if ndigits <= 0
         if nan?
@@ -703,7 +704,7 @@ class ::Number < ::Numeric
   end
 
   def to_s(base = 10)
-    base = ::Opal.coerce_to! base, ::Integer, :to_int
+    base = `Opal.coerce_to_or_raise(#{base}, Opal.Integer, "to_int")`
 
     if base < 2 || base > 36
       ::Kernel.raise ::ArgumentError, "invalid radix #{base}"
@@ -741,7 +742,7 @@ class ::Number < ::Numeric
       ::Kernel.raise ::Math::DomainError, 'out of domain'
     end
 
-    base = ::Opal.coerce_to! base, ::Integer, :to_int
+    base = `$coerce_to_or_raise(#{base}, Opal.Integer, "to_int")`
 
     if base < 2
       ::Kernel.raise ::ArgumentError, "invalid radix #{base}"
@@ -922,7 +923,7 @@ class ::Integer < ::Numeric
     undef :new
 
     def sqrt(n)
-      n = ::Opal.coerce_to!(n, ::Integer, :to_int)
+      n = `$coerce_to_or_raise(n, Opal.Integer, "to_int")`
       %x{
         if (n < 0) {
           #{::Kernel.raise ::Math::DomainError, 'Numerical argument is out of domain - "isqrt"'}
@@ -933,7 +934,7 @@ class ::Integer < ::Numeric
     end
 
     def try_convert(object)
-      Opal.coerce_to?(object, self, :to_int)
+      `Opal.coerce_to_or_nil(object, self, "to_int")`
     end
   end
 

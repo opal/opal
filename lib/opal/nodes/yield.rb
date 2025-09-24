@@ -8,6 +8,8 @@ module Opal
       def compile_call
         yielding_scope = find_yielding_scope
 
+        error 'Invalid yield' unless yielding_scope
+
         yielding_scope.uses_block!
         yielding_scope.block_name ||= '$yield'
 

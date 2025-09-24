@@ -12,6 +12,7 @@ opal_filter "Proc" do
   fails "Proc#>> does not try to coerce argument with #to_proc" # Expected TypeError (callable object is expected) but no exception was raised (#<Proc:0x58fe8> was returned)
   fails "Proc#>> raises TypeError if passed not callable object" # Expected TypeError (callable object is expected) but no exception was raised (#<Proc:0x59010> was returned)
   fails "Proc#[] can call its block argument declared with a block argument" # Expected 6 == 10 to be truthy but was false
+  fails "Proc#[] with frozen_string_literals doesn't duplicate frozen strings" # Expected true to be false
   fails "Proc#[] yields to the block given at declaration and not to the block argument" # Expected 3 == 7 to be truthy but was false
   fails "Proc#arity for instances created with proc { || } returns positive values for definition \n    @a = proc { |(a, (*b, c)), d=1| }\n    @b = proc { |a, (*b, c), d, (*e), (*), **k| }" # Expected -2 == 1 to be truthy but was false
   fails "Proc#arity for instances created with proc { || } returns positive values for definition \n    @a = proc { |a, b=1| }\n    @b = proc { |a, b, c=1, d=2| }" # Expected -2 == 1 to be truthy but was false

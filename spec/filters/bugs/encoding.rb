@@ -1,13 +1,60 @@
 # NOTE: run bin/format-filters after changing this file
 opal_filter "Encoding" do
-  fails "File.basename returns the basename with the same encoding as the original" # NameError: uninitialized constant Encoding::Windows_1250
+  fails "Encoding#dummy? returns true for dummy encodings" # Expected false to be true
+  fails "Encoding#replicate can be associated with a String" # NoMethodError: undefined method `replicate' for #<Encoding:US-ASCII>
+  fails "Encoding#replicate returns a replica of ASCII" # NoMethodError: undefined method `replicate' for #<Encoding:US-ASCII>
+  fails "Encoding#replicate returns a replica of ISO-2022-JP" # NoMethodError: undefined method `replicate' for #<Encoding:ISO-2022-JP>
+  fails "Encoding#replicate returns a replica of UTF-16BE" # NoMethodError: undefined method `replicate' for #<Encoding:UTF-16BE>
+  fails "Encoding#replicate returns a replica of UTF-8" # NoMethodError: undefined method `replicate' for #<Encoding:UTF-8>
+  fails "Encoding#replicate warns about deprecation" # NoMethodError: undefined method `replicate' for #<Encoding:US-ASCII>
+  fails "Encoding.aliases has a 'locale' key and its value equals the name of the encoding found by the locale charmap" # Exception: name.toUpperCase is not a function
+  fails "Encoding.compatible? Encoding, Encoding returns the Encoding if both are the same" # Expected #<Encoding:UTF-8> to be computed by Encoding.compatible? from #<Encoding:UTF-8>, #<Encoding:UTF-8> (computed nil instead)
+  fails "Encoding.compatible? Encoding, Encoding returns the first if the second is US-ASCII" # Expected #<Encoding:UTF-8> to be computed by Encoding.compatible? from #<Encoding:UTF-8>, #<Encoding:US-ASCII> (computed nil instead)
+  fails "Encoding.compatible? Regexp, Regexp returns US-ASCII if both are US-ASCII" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? Regexp, Regexp returns the first's Encoding if it is not US-ASCII and not ASCII only" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from /ÿ/, /abc/ (computed nil instead)
+  fails "Encoding.compatible? Regexp, String returns US-ASCII if both are US-ASCII" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? Regexp, Symbol returns US-ASCII if both are US-ASCII" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? Regexp, Symbol returns the first's Encoding if it is not US-ASCII and not ASCII only" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from /ÿ/, /abc/ (computed nil instead)
+  fails "Encoding.compatible? String, Encoding returns the Encoding if the String's encoding is ASCII compatible and the String is ASCII only" # Expected nil == #<Encoding:ASCII-8BIT> to be truthy but was false
+  fails "Encoding.compatible? String, Encoding returns the String's encoding if the Encoding is US-ASCII" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from "\xFF", #<Encoding:US-ASCII> (computed nil instead)
+  fails "Encoding.compatible? String, Regexp returns US-ASCII if both are US-ASCII" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? String, Regexp returns the String's Encoding if it is not US-ASCII but both are ASCII only" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from "abc", /abc/ (computed nil instead)
+  fails "Encoding.compatible? String, Regexp returns the String's Encoding if the String is not ASCII only" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from "\xFF", /abc/ (computed nil instead)
+  fails "Encoding.compatible? String, String when the first String is empty and the second is not and the first's Encoding is ASCII compatible returns the first's encoding when the second String is ASCII only" # Expected nil == #<Encoding:UTF-8> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first String is empty and the second is not and the first's Encoding is ASCII compatible returns the second's encoding when the second String is not ASCII only" # Expected nil == #<Encoding:UTF-32LE> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first String is empty and the second is not when the first's Encoding is not ASCII compatible returns the second string's encoding" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is ASCII compatible and ASCII only returns the first's Encoding if the second is ASCII compatible and ASCII only" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from "abc", "123" (computed nil instead)
+  fails "Encoding.compatible? String, String when the first's Encoding is ASCII compatible and ASCII only returns the second's Encoding if the second is ASCII compatible but not ASCII only" # Expected #<Encoding:Shift_JIS> to be computed by Encoding.compatible? from "abc", "\xFF" (computed nil instead)
+  fails "Encoding.compatible? String, String when the first's Encoding is ASCII compatible but not ASCII only returns the first's Encoding if the second's is UTF-8 and ASCII only" # Expected nil == #<Encoding:ASCII-8BIT> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is ASCII compatible but not ASCII only returns the first's Encoding if the second's is valid US-ASCII" # Expected nil == #<Encoding:ASCII-8BIT> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is invalid returns the Encoding when the second's Encoding is invalid but the same as the first" # Expected nil == #<Encoding:UTF-8> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is invalid returns the first's Encoding when the second String is ASCII only" # Expected nil == #<Encoding:UTF-8> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is invalid returns the first's Encoding when the second's Encoding is US-ASCII" # Expected nil == #<Encoding:UTF-8> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is not ASCII compatible returns the Encoding when the second's Encoding is not ASCII compatible but the same as the first's Encoding" # Expected nil == #<Encoding:UTF-7 (dummy)> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is valid US-ASCII returns BINARY if the second String is BINARY but not ASCII only" # Expected nil == #<Encoding:ASCII-8BIT> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is valid US-ASCII returns US-ASCII if the second String is BINARY and ASCII only" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is valid US-ASCII returns US-ASCII if the second String is UTF-8 and ASCII only" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is valid US-ASCII returns US-ASCII when the second's is US-ASCII" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? String, String when the first's Encoding is valid US-ASCII returns UTF-8 if the second String is UTF-8 but not ASCII only" # Expected nil == #<Encoding:UTF-8> to be truthy but was false
+  fails "Encoding.compatible? String, String when the second String is empty returns the first Encoding" # Expected nil == #<Encoding:UTF-7 (dummy)> to be truthy but was false
+  fails "Encoding.compatible? String, Symbol returns US-ASCII if both are ASCII only" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? String, Symbol returns the String's Encoding if it is not US-ASCII but both are ASCII only" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from "abc", "abc" (computed nil instead)
+  fails "Encoding.compatible? String, Symbol returns the String's Encoding if the String is not ASCII only" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from "\xFF", "abc" (computed nil instead)
+  fails "Encoding.compatible? Symbol, Regexp returns US-ASCII if both are US-ASCII" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? Symbol, Regexp returns the Regexp's Encoding if it is not US-ASCII and not ASCII only" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from "abc", /ÿ/ (computed nil instead)
+  fails "Encoding.compatible? Symbol, String returns US-ASCII if both are ASCII only" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? Symbol, Symbol returns US-ASCII if both are US-ASCII" # Expected nil == #<Encoding:US-ASCII> to be truthy but was false
+  fails "Encoding.compatible? Symbol, Symbol returns the first's Encoding if it is not ASCII only" # Expected #<Encoding:ASCII-8BIT> to be computed by Encoding.compatible? from "ÿ", "abc" (computed nil instead)
+  fails "Encoding.find raises a TypeError if passed a Symbol" # Expected TypeError but no exception was raised (#<Encoding:UTF-8> was returned)
+  fails "Encoding.list includes CESU-8 encoding" # NameError: uninitialized constant Encoding::CESU_8
+  fails "Encoding.locale_charmap returns a String" # Expected nil (NilClass) to be an instance of String
+  fails "Encoding.locale_charmap returns a value based on the LC_ALL environment variable" # NotImplementedError: NotImplementedError
   fails "Hash literal does not change encoding of literal string keys during creation" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
   fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Integer#to_s bignum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Integer#to_s bignum when given no base returns self converted to a String using base 10" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is nil" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Integer#to_s fixnum returns a String in US-ASCII encoding when Encoding.default_internal is not nil" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Kernel#sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
   fails "Marshal.dump when passed an IO calls binmode when it's defined" # ArgumentError: [Marshal.dump] wrong number of arguments (given 2, expected 1)
   fails "Marshal.dump with a String dumps a String in another encoding" # Expected "\x04\b\"\x0Fm\x00ö\x00h\x00r\x00e\x00" == "\x04\bI\"\x0Fm\x00ö\x00h\x00r\x00e\x00\x06:\rencoding\"\rUTF-16LE" to be truthy but was false
   fails "Marshal.dump with a String dumps a US-ASCII String" # Expected "\x04\b\"\babc" == "\x04\bI\"\babc\x06:\x06EF" to be truthy but was false
@@ -30,11 +77,8 @@ opal_filter "Encoding" do
   fails "Regexp#match with [string, position] when given a positive position raises an ArgumentError for an invalid encoding" # Expected ArgumentError but no exception was raised (#<MatchData "ell" 1:"e" 2:"l"> was returned)
   fails "Ruby String interpolation raises an Encoding::CompatibilityError if the Encodings are not compatible" # Expected CompatibilityError but no exception was raised ("あ ÿ" was returned)
   fails "Source files encoded in UTF-16 BE with a BOM are invalid because they contain an invalid UTF-8 sequence before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x49e4c>
-  fails "Source files encoded in UTF-16 BE without a BOM are parsed as empty because they contain a NUL byte before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x49e4c>
   fails "Source files encoded in UTF-16 LE with a BOM are invalid because they contain an invalid UTF-8 sequence before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x49e4c>
-  fails "Source files encoded in UTF-8 with a BOM can be parsed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x49e4c>
-  fails "Source files encoded in UTF-8 without a BOM can be parsed" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x49e4c>
-  fails "String#% output's encoding negotiates a compatible encoding if necessary" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
+  fails "Source files encoded in UTF-16 LE without a BOM are parsed as empty because they contain a NUL byte before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9a8a0>
   fails "String#* raises an ArgumentError if the length of the resulting string doesn't fit into a long" # Expected ArgumentError but got: RangeError (multiply count must not overflow maximum string size)
   fails "String#[]= with String index encodes the String in an encoding compatible with the replacement" # NotImplementedError: String#[]= not supported. Mutable String methods are not supported in Opal.
   fails "String#[]= with String index raises an Encoding::CompatibilityError if the replacement encoding is incompatible" # NameError: uninitialized constant Encoding::EUC_JP
@@ -156,23 +200,13 @@ opal_filter "Encoding" do
   fails "String#valid_encoding? returns false if self contains a character invalid in the associated encoding" # Expected true to be false
   fails "String#valid_encoding? returns true for all encodings self is valid in" # Expected true to be false
   fails "String#valid_encoding? returns true if an invalid string is appended another invalid one but both make a valid string" # Expected true to be false
-  fails "The predefined global constant ARGV contains Strings encoded in locale Encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has nil for the external encoding despite Encoding.default_external being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has nil for the external encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has nil for the internal encoding despite Encoding.default_internal being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has nil for the internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDERR has the encodings set by #set_encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has nil for the internal encoding despite Encoding.default_internal being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has nil for the internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has the encodings set by #set_encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has the same external encoding as Encoding.default_external when that encoding is changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN has the same external encoding as Encoding.default_external" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDIN retains the encoding set by #set_encoding when Encoding.default_external is changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has nil for the external encoding despite Encoding.default_external being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has nil for the external encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has nil for the internal encoding despite Encoding.default_internal being changed" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has nil for the internal encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "The predefined global constant STDOUT has the encodings set by #set_encoding" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Time#inspect returns a US-ASCII encoded string" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
-  fails "Time#to_s returns a US-ASCII encoded string" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:US-ASCII>
+  fails "The predefined global constant ARGV contains Strings encoded in locale Encoding" # NotImplementedError: NotImplementedError
+  fails "The predefined global constant STDERR has nil for the external encoding despite Encoding.default_external being changed" # Expected #<Encoding:ASCII-8BIT> to be nil
+  fails "The predefined global constant STDERR has nil for the external encoding" # Expected #<Encoding:ASCII-8BIT> to be nil
+  fails "The predefined global constant STDERR has the encodings set by #set_encoding" # NotImplementedError: NotImplementedError
+  fails "The predefined global constant STDIN has the encodings set by #set_encoding" # NotImplementedError: NotImplementedError
+  fails "The predefined global constant STDIN retains the encoding set by #set_encoding when Encoding.default_external is changed" # NotImplementedError: NotImplementedError
+  fails "The predefined global constant STDOUT has nil for the external encoding despite Encoding.default_external being changed" # Expected #<Encoding:ASCII-8BIT> to be nil
+  fails "The predefined global constant STDOUT has nil for the external encoding" # Expected #<Encoding:ASCII-8BIT> to be nil
+  fails "The predefined global constant STDOUT has the encodings set by #set_encoding" # NotImplementedError: NotImplementedError
 end

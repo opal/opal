@@ -10,7 +10,7 @@ opal_filter "Rational" do
   fails "Rational#to_f converts to a Float for large numerator and denominator" # Exception: Maximum call stack size exceeded
   fails "Rational#to_r fails when a BasicObject's to_r does not return a Rational" # Expected TypeError but got: NoMethodError (undefined method `nil?' for #<BasicObject:0x182c8>)
   fails "Rational#to_r raises TypeError trying to convert BasicObject" # Expected TypeError but got: NoMethodError (undefined method `nil?' for #<BasicObject:0x182d0>)
-  fails "Rational#to_r works when a BasicObject has to_r" # NoMethodError: undefined method `nil?' for #<BasicObject:0x182d8>  
+  fails "Rational#to_r works when a BasicObject has to_r" # NoMethodError: undefined method `nil?' for #<BasicObject:0x182d8>
   fails "Rational#truncate with an invalid value for precision does not call to_int on the argument" # Expected TypeError (not an integer) but got: TypeError (not an Integer)
   fails "Rational#truncate with an invalid value for precision raises a TypeError" # Expected TypeError (not an integer) but got: TypeError (not an Integer)
 end

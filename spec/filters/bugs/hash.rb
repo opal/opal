@@ -33,6 +33,6 @@ opal_filter "Hash" do
   fails "Hash.ruby2_keywords_hash returns a copy of a Hash and marks the copy as a keywords Hash" # Expected false == true to be truthy but was false
   fails "Hash.ruby2_keywords_hash returns an instance of the subclass if called on an instance of a subclass of Hash" # Expected false == true to be truthy but was false
   fails "Hash.ruby2_keywords_hash? raises TypeError for non-Hash" # Expected TypeError but no exception was raised (false was returned)
-  fails "Hash.ruby2_keywords_hash? returns true if the Hash is a keywords Hash marked by Module#ruby2_keywords" # Expected false == true to be truthy but was false  
+  fails "Hash.ruby2_keywords_hash? returns true if the Hash is a keywords Hash marked by Module#ruby2_keywords" # Expected false == true to be truthy but was false
   fails "Hash.try_convert sends #to_hash to the argument and raises TypeError if it's not a kind of Hash" # Expected TypeError (can't convert MockObject to Hash (MockObject#to_hash gives Object)) but got: TypeError (can't convert MockObject into Hash (MockObject#to_hash gives Object))
 end

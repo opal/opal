@@ -6,12 +6,20 @@ module Opal
   module OS
     module_function
 
-    def windows?
-      /bccwin|cygwin|djgpp|mingw|mswin|wince/.match?(RbConfig::CONFIG['host_os'])
+    def freebsd?
+      /freebsd/.match?(RUBY_PLATFORM)
+    end
+
+    def linux?
+      /linux/.match?(RUBY_PLATFORM)
     end
 
     def macos?
-      /darwin|mac os/.match?(RbConfig::CONFIG['host_os'])
+      /darwin|mac/.match?(RUBY_PLATFORM)
+    end
+
+    def windows?
+      /bccwin|cygwin|djgpp|mingw|mswin|wince/.match?(RUBY_PLATFORM)
     end
 
     def shellescape(str)
