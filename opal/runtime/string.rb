@@ -9,7 +9,7 @@ module ::Opal
   # Also this helper always sets a encoding. If encoding is not
   # provided, "UTF-8" will be used.
   # @returns a new String object with encoding set.
-  def self.str(str = undefined, encoding = undefined)
+  def self.str(str, encoding)
     %x{
       if (!encoding || encoding === nil) encoding = "UTF-8";
       str = Opal.set_encoding(new String(str), encoding);
