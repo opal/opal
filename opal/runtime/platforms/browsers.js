@@ -38,7 +38,7 @@ platform.exit = function(status) {
     // All further invocations must be ignored.
     window.OPAL_EXIT_CODE = status;
     window.alert("opalheadlessbrowserexit");
-  } else if (Opal.gvars.DEBUG) {
+  } else if (Opal.gvars?.DEBUG) {
     console.log('Exited with status ' + status) ;
   }
 };
