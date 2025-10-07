@@ -105,6 +105,8 @@ module Opal
             # we can expect the module names to be normalized
             # already.
             line "Opal.queue(()=>{ Opal.load_normalized(#{module_name.inspect}) });"
+          elsif compiler.runtime_mode?
+            line "Opal.load_normalized(#{module_name.inspect});"
           end
         elsif compiler.eval? || compiler.irb?
           line "})(Opal, self);"
