@@ -38,7 +38,7 @@ class Opal::SourceMap::File
   #         associated with.
   # Line 4: An optional source root, useful for relocating source files on a server
   #         or removing repeated values in the “sources” entry. This value is prepended to
-  #         the individual entries in the “source” field.
+  #         the individual entries in the “sources” field.
   # Line 5: A list of original sources used by the “mappings” entry.
   # Line 6: An optional list of source content, useful when the “source” can’t be
   #         hosted. The contents are listed in the same order as the sources in line 5.
