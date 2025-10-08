@@ -1,4 +1,3 @@
-::Object.require 'opal/base'
 ::Object.require 'opal/mini'
 
 ::Object.require 'corelib/kernel/format'
