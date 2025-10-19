@@ -262,11 +262,11 @@ class Pipe {
     if (fd === this.rfd && !this.rclosed) {
       this.rclosed = true;
       try { fs.closeSync(fd) } catch {}
-      fs.rmdirSync(this.rtd, { recursive: true });
+      fs.rmSync(this.rtd, { recursive: true });
     } else if (!this.wclosed) {
       this.wclosed = true;
       try { fs.closeSync(fd) } catch {}
-      fs.rmdirSync(this.wtd, { recursive: true });
+      fs.rmSync(this.wtd, { recursive: true });
     }
   }
   eof(fd) {
@@ -368,7 +368,7 @@ class SpawnPipe {
       this.closed = true;
       try { if (this.chpr) this.chpr.kill(); } catch {}
       try { fs.closeSync(this.pfd) } catch {}
-      fs.rmdirSync(this.ptd, { recursive: true });
+      fs.rmSync(this.ptd, { recursive: true });
     }
     return this.chpr.status == null ? this.chpr.exitCode : this.chpr.status;
   }
