@@ -723,6 +723,7 @@ class ::String
                    .delete("\000")
 
     %x{
+      offset = Number(offset);
       var output = [];
 
       // A very optimized handler for U*.

@@ -1,5 +1,19 @@
 import globals from "globals";
 import js from "@eslint/js";
+console.log(js.configs.recommended);
+
+// "parserOptions": {
+//   -    "ecmaVersion": 12
+//   +    "ecmaVersion": 2020,
+//      },
+//      "rules": {
+//        "no-unused-vars": ["error", {
+//   @@ -35,5 +35,6 @@ module.exports = {
+//        "Int32Array": "readonly",
+//        "WeakRef": "readonly",
+//        "Map": "readonly",
+//   +    "BigInt": "readonly",
+
 
 export default [
   js.configs.recommended,

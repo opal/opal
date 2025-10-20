@@ -112,7 +112,7 @@ module ::Kernel
       stack = new Error().$backtrace();
       result = [];
 
-      for (var i = #{start} + 1, ii = stack.length; i < ii; i++) {
+      for (var i = #{start} + 1n, ii = stack.length; i < ii; i++) {
         if (!stack[i].match(/runtime\//)) {
           result.push(stack[i]);
         }
@@ -239,7 +239,7 @@ module ::Kernel
         status = $coerce_to(status, #{::Integer}, 'to_int')
       }
 
-      Opal.exit(status);
+      Opal.exit(Number(status));
     }
     nil
   end
@@ -420,14 +420,14 @@ module ::Kernel
           }
         }
         if (value.$$is_number) {
-          if (value === Infinity || value === -Infinity || isNaN(value)) {
+          if (value === Infinity || value === -Infinity || isNaN(Number(value))) {
             if (exception) {
               #{::Kernel.raise ::FloatDomainError, value}
             } else {
               return nil;
             }
           }
-          return Math.floor(value);
+          return #{value.to_i};
         }
         if (#{value.respond_to?(:to_int)}) {
           i = #{value.to_int};
@@ -711,18 +711,14 @@ module ::Kernel
         return #{::Random::DEFAULT.rand};
       }
 
-      if (max.$$is_number) {
-        if (max < 0) {
-          max = Math.abs(max);
-        }
+      if (max.$$is_float) max = #{max.to_i};
 
-        if (max % 1 !== 0) {
-          max = max.$to_i();
-        }
+      if (max.$$is_integer) {
+        if (max < 0n)
+          max = -max
 
-        if (max === 0) {
+        if (max === 0n)
           max = undefined;
-        }
       }
     }
     ::Random::DEFAULT.rand(max)

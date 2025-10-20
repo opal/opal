@@ -14,6 +14,9 @@ require 'mspec-opal/runner'
 # showed to need more tolerance (ruby spec default is 0.00003)
 TOLERANCE = 0.00004
 
+Integer::MAX = (2**30) - 1
+Integer::MIN = -(2**62)
+
 ENV['MSPEC_RUNNER'] = true
 
 # Trigger autoloading, needed by `Module.constants`

@@ -17,7 +17,7 @@ class ::Enumerator
       obj.size   = block;
       obj.method = method;
       obj.args   = args;
-      obj.cursor = 0;
+      obj.cursor = #{0};
 
       return obj;
     }

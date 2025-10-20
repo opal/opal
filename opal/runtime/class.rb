@@ -338,8 +338,11 @@ module ::Opal
     %x{
       var body;
 
-      if (method === 'to_int' && type === Opal.Integer && object.$$is_number)
-        return object < 0 ? Math.ceil(object) : Math.floor(object);
+      if (method === 'to_int' && type === Opal.Integer && object.$$is_integer)
+        return object;
+
+      if (method === 'to_int' && type === Opal.Integer && object.$$is_float)
+        return BigInt(object < 0 ? Math.ceil(object) : Math.floor(object));
 
       if (method === 'to_str' && type === Opal.String && object.$$is_string)
         return object;
@@ -386,10 +389,6 @@ module ::Opal
     %x{
       if (klass != null && object.$$meta === klass || object.$$class === klass) {
         return true;
-      }
-
-      if (object.$$is_number && klass.$$is_number_class) {
-        return (klass.$$is_integer_class) ? (object % 1) === 0 : true;
       }
 
       var ancestors = $ancestors(object.$$is_class ? Opal.get_singleton_class(object) : (object.$$meta || object.$$class));
