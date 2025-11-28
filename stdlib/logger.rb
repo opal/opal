@@ -43,7 +43,7 @@ class Logger
     @formatter = formatter || Formatter.new
     @progname = progname
   end
-  
+
   def level=(severity)
     if ::Integer === severity
       @level = severity
