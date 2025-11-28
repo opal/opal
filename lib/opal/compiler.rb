@@ -31,6 +31,8 @@ module Opal
     Compiler.new(source, options).compile
   end
 
+  singleton_class.alias_method :opal_compile, :compile
+
   # {Opal::Compiler} is the main class used to compile ruby to javascript code.
   # This class uses {Opal::Parser} to gather the sexp syntax tree for the ruby
   # code, and then uses {Opal::Node} to step through the sexp to generate valid

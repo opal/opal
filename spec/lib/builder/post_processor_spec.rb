@@ -56,8 +56,10 @@ RSpec.describe Opal::Builder::PostProcessor do
         if file.respond_to? :compiled
           compiler = file.compiled
           compiler.fragments = compiler.fragments.map do |frag|
-            Opal::Fragment.new("Badger", frag.scope, frag.sexp)
-          end
+            if frag.is_a? Opal::Fragment
+              Opal::Fragment.new("Badger", frag.scope, frag.sexp)
+            end
+          end.compact
         end
       end
     }}

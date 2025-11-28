@@ -35,6 +35,7 @@ module Opal
         end
 
         wrap_with_definition
+        wrap_with_postprocessor_directives
 
         scope.nesting if @define_nesting
         scope.relative_access if @define_relative_access
@@ -85,6 +86,11 @@ module Opal
         wrap "$def(#{scope.self}, '$#{mid}', ", ')'
 
         unshift "\n#{current_indent}" unless expr?
+      end
+
+      def wrap_with_postprocessor_directives
+        unshift dce_def_begin(mid)
+        push dce_def_end(mid)
       end
 
       def comments_code

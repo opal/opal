@@ -213,7 +213,9 @@ module Opal
         if flags.include?('x')
           parts = value.children.map do |part|
             if part.is_a?(::Opal::AST::Node) && part.type == :str
-              trimmed_value = part.children[0].gsub(/\A\s*\#.*/, '').gsub(/\s/, '')
+              trimmed_value = part.children[0]
+                                  .gsub(/\A\s*\#.*/, '')
+                                  .gsub(/\s/, '')
               s(:str, trimmed_value)
             else
               part

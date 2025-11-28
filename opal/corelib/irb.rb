@@ -5,6 +5,8 @@
 # opal-replutils will not be loaded, in which case we will do what we can
 # to provision it.
 
+require 'runtime/irb'
+
 module Opal
   module IRB
     def self.ensure_loaded(library)
@@ -167,28 +169,3 @@ class ::Binding
     end
   end
 end
-
-%x{
-  // Run in WebTools console with: Opal.irb(c => eval(c))
-  Opal.irb = function(fun) {
-    #{::Binding.new(`fun`).irb}
-  }
-
-  Opal.load_parser = function() {
-    Opal.Opal.IRB.$ensure_loaded('opal-parser');
-  }
-
-  if (typeof Opal.eval === 'undefined') {
-    Opal.eval = function(str) {
-      Opal.load_parser();
-      return Opal.eval(str);
-    }
-  }
-
-  if (typeof Opal.compile === 'undefined') {
-    Opal.compile = function(str, options) {
-      Opal.load_parser();
-      return Opal.compile(str, options);
-    }
-  }
-}

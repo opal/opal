@@ -14,7 +14,7 @@ class ::Encoding
       else
         encoding = new(name, names, ascii, dummy)
       end
-      encoding.instance_eval(&block) if block_given?
+      encoding.instance_exec(&block) if block_given?
 
       register = `Opal.encodings`
       names.each do |encoding_name|

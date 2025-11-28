@@ -4,8 +4,8 @@
 # helpers: raise, prop, Object, BasicObject, Class, Module, set_proto, allocate_class, const_get_name, const_set, has_own, ancestors, jsid
 
 module ::Opal
-  %x{
-    function find_existing_class(scope, name) {
+  def self.find_existing_class(scope, name)
+    %x{
       // Try to find the class in the current scope
       var klass = $const_get_name(scope, name);
 
@@ -19,13 +19,15 @@ module ::Opal
         return klass;
       }
     }
+  end
 
-    function ensureSuperclassMatch(klass, superclass) {
+  def self.ensure_superclass_match(klass, superclass)
+    %x{
       if (klass.$$super !== superclass) {
         $raise(Opal.TypeError, "superclass mismatch for class " + klass.$$name);
       }
     }
-  }
+  end
 
   def self.klass(scope, superclass, name)
     %x{
@@ -56,12 +58,12 @@ module ::Opal
         }
       }
 
-      var klass = find_existing_class(scope, name);
+      var klass = Opal.find_existing_class(scope, name);
 
       if (klass != null) {
         if (superclass) {
           // Make sure existing class has same superclass
-          ensureSuperclassMatch(klass, superclass);
+          Opal.ensure_superclass_match(klass, superclass);
         }
       }
       else {
@@ -243,8 +245,8 @@ module ::Opal
   end
 
   # Helper to set $$meta on klass, module or instance
-  %x{
-    function set_meta(obj, meta) {
+  def self.set_meta(obj, meta)
+    %x{
       if (obj.hasOwnProperty('$$meta')) {
         obj.$$meta = meta;
       } else {
@@ -258,8 +260,8 @@ module ::Opal
       } else {
         $set_proto(obj, meta.$$prototype);
       }
-    };
-  }
+    }
+  end
 
   # Build the singleton class for an existing class. Class object are built
   # with their singleton class already in the prototype chain and inheriting
@@ -285,7 +287,7 @@ module ::Opal
 
       $prop(meta, '$$is_singleton', true);
       $prop(meta, '$$singleton_of', klass);
-      set_meta(klass, meta);
+      Opal.set_meta(klass, meta);
       // Restoring ClassName.class
       $prop(klass, '$$class', $Class);
 
@@ -303,7 +305,7 @@ module ::Opal
 
       $prop(meta, '$$is_singleton', true);
       $prop(meta, '$$singleton_of', mod);
-      set_meta(mod, meta);
+      Opal.set_meta(mod, meta);
       // Restoring ModuleName.class
       $prop(mod, '$$class', $Module);
 
@@ -325,7 +327,7 @@ module ::Opal
 
       delete klass.$$prototype.$$class;
 
-      set_meta(object, klass);
+      Opal.set_meta(object, klass);
 
       return klass;
     }

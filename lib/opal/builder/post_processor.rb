@@ -72,3 +72,5 @@ module Opal
     end
   end
 end
+
+require 'opal/builder/post_processor/dce'

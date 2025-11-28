@@ -10,8 +10,12 @@ module Opal
       children :value
 
       def compile
+        helper :udef
+
         children.each do |child|
-          line "Opal.udef(#{scope.self}, '$' + ", expr(child), ');'
+          push dce_def_begin(child.children.first) if child.type == :sym
+          line "$udef(#{scope.self}, '$' + ", expr(child), ');'
+          push dce_def_end(child.children.first) if child.type == :sym
         end
       end
     end
@@ -31,9 +35,17 @@ module Opal
           push '$alias_gvar(', new_name_str, ', ', old_name_str, ')'
         when :dsym, :sym # This is a method alias: alias a b
           helper :alias
-          compiler.record_method_call old_name.children.last if old_name.type == :sym
-
+          if old_name.type == :sym
+            compiler.record_method_call old_name.children.last
+            if new_name.type == :sym
+              push dce_def_begin(new_name.children.first)
+            end
+            push dce_use(old_name.children.first)
+          end
           push "$alias(#{scope.self}, ", expr(new_name), ', ', expr(old_name), ')'
+          if old_name.type == :sym && new_name.type == :sym
+            push dce_def_end(new_name.children.first)
+          end
         else # Nothing else is available, but just in case, drop an error
           error "Opal doesn't know yet how to alias with #{new_name.type}"
         end

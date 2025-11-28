@@ -74,13 +74,16 @@ module Opal
       def wrap_with_try_catch(code)
         returning_tmp = scope.new_temp
 
+        helper :pop_exception
+        helper :rescue
+
         push "(#{returning_tmp} = (function() { try {"
         push "  return #{code};"
         push '} catch ($err) {'
-        push '  if (Opal.rescue($err, [Opal.Exception])) {'
+        push '  if ($rescue($err, [Opal.Exception])) {'
         push '    try {'
         push '      return false;'
-        push '    } finally { Opal.pop_exception($err); }'
+        push '    } finally { $pop_exception($err); }'
         push '  } else { throw $err; }'
         push '}})())'
 

@@ -83,8 +83,8 @@ RSpec.describe Opal::Compiler do
   end
 
   it "should compile undef calls" do
-    expect_compiled("undef a").to include("Opal.udef(self, '$' + \"a\")")
-    expect_compiled("undef a,b").to match(/Opal.udef\(self, '\$' \+ "a"\);.*Opal.udef\(self, '\$' \+ "b"\);/m)
+    expect_compiled("undef a").to include("$udef(self, '$' + \"a\")")
+    expect_compiled("undef a,b").to match(/\$udef\(self, '\$' \+ "a"\);.*\$udef\(self, '\$' \+ "b"\);/m)
   end
 
   describe "method names" do

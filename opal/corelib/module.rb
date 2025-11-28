@@ -29,7 +29,7 @@ class ::Module
   end
 
   def initialize(&block)
-    module_eval(&block) if block_given?
+    module_exec(self, &block) if block_given?
   end
 
   def ===(object)
@@ -755,37 +755,35 @@ class ::Module
     }
   end
 
-  %x{
-    function copyInstanceMethods(from, to) {
-      var i, method_names = Opal.own_instance_methods(from);
-      for (i = 0; i < method_names.length; i++) {
-        var name = method_names[i],
-            jsid = $jsid(name),
-            body = from.$$prototype[jsid],
-            wrapped = Opal.wrap_method_body(body);
-
-        wrapped.$$jsid = name;
-        Opal.defn(to, jsid, wrapped);
-      }
-    }
-
-    function copyIncludedModules(from, to) {
-      var modules = from.$$own_included_modules;
-      for (var i = modules.length - 1; i >= 0; i--) {
-        Opal.append_features(modules[i], to);
-      }
-    }
-
-    function copyPrependedModules(from, to) {
-      var modules = from.$$own_prepended_modules;
-      for (var i = modules.length - 1; i >= 0; i--) {
-        Opal.prepend_features(modules[i], to);
-      }
-    }
-  }
-
   def initialize_copy(other)
     %x{
+      function copyInstanceMethods(from, to) {
+        var i, method_names = Opal.own_instance_methods(from);
+        for (i = 0; i < method_names.length; i++) {
+          var name = method_names[i],
+              jsid = $jsid(name),
+              body = from.$$prototype[jsid],
+              wrapped = Opal.wrap_method_body(body);
+
+          wrapped.$$jsid = name;
+          Opal.defn(to, jsid, wrapped);
+        }
+      }
+
+      function copyIncludedModules(from, to) {
+        var modules = from.$$own_included_modules;
+        for (var i = modules.length - 1; i >= 0; i--) {
+          Opal.append_features(modules[i], to);
+        }
+      }
+
+      function copyPrependedModules(from, to) {
+        var modules = from.$$own_prepended_modules;
+        for (var i = modules.length - 1; i >= 0; i--) {
+          Opal.prepend_features(modules[i], to);
+        }
+      }
+
       copyInstanceMethods(other, self);
       copyIncludedModules(other, self);
       copyPrependedModules(other, self);

@@ -260,7 +260,7 @@
       // Inheritance from bridged classes requires
       // calling original JS constructors
       klass = function() {
-        var self = new ($bind.apply(bridged_descendant.$$constructor, $prepend(null, arguments)))();
+        var self = new ($bind.apply(bridged_descendant.$$constructor, $prepend_ary(null, arguments)))();
 
         // and replacing a __proto__ manually
         $set_proto(self, klass.$$prototype);
@@ -390,11 +390,11 @@
   }
   Opal.jsid = $jsid;
 
-  function $prepend(first, second) {
+  function $prepend_ary(first, second) {
     if (!second.$$is_array) second = $slice(second);
     return [first].concat(second);
   }
-  Opal.prepend = $prepend;
+  Opal.prepend_ary = $prepend_ary;
 
   // Require system
   // --------------

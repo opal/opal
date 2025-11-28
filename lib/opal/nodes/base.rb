@@ -10,6 +10,7 @@ module Opal
       include Helpers
       include Closure::NodeSupport
       include Builder::PostProcessor::NodeSupport
+      include Builder::PostProcessor::DCE::NodeSupport
 
       def self.handlers
         @handlers ||= {}
@@ -151,6 +152,7 @@ module Opal
       end
 
       def helper(name)
+        push dce_use(name, type: :*)
         @compiler.helper name
       end
 

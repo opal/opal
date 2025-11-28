@@ -1,5 +1,6 @@
 require 'lib/spec_helper'
 require 'opal/cli'
+require 'opal/cli_options'
 require 'stringio'
 require 'tmpdir'
 
@@ -270,6 +271,48 @@ RSpec.describe Opal::CLI do
     end
 
     # TODO: test refreshes with the server runner (only way to ensure we correctly rewind or cache the eval contents)
+  end
+
+  describe '--dce option' do
+    it 'parses the comma-separated list into symbol types with default' do
+      opts = Opal::CLIOptions.new
+      opts.parse(%w[--dce])
+      expect(opts.options[:dce]).to eq([:method])
+
+      opts = Opal::CLIOptions.new
+      opts.parse(%w[--dce method,const])
+      expect(opts.options[:dce]).to eq([:method, :const])
+    end
+
+    it 'enables fragment caching and passes dce config to the builder' do
+      cli = Opal::CLI.new(
+        dce: [:const],
+        runner: :compiler,
+        evals: ['puts :hi'],
+        no_exit: true,
+        skip_opal_require: true
+      )
+
+      builder = cli.send(:create_builder)
+      expect(builder.dce).to eq([:const])
+      expect(builder.compiler_options[:cache_fragments]).to eq(true)
+    end
+
+    it 'applies const DCE in compiler output' do
+      fake_output = StringIO.new
+      cli = Opal::CLI.new(
+        dce: [:const],
+        runner: :compiler,
+        evals: ['module M; X = 1; end'],
+        no_exit: true,
+        skip_opal_require: true,
+        output: fake_output
+      )
+
+      cli.run
+      fake_output.rewind
+      expect(fake_output.read).to include('Removed by DCE: M')
+    end
   end
 
   private

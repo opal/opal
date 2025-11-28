@@ -15,14 +15,16 @@ module Opal
 
         if yields_single_arg?(children)
           push expr(children.first)
-          wrap "Opal.yield1(#{block_name}, ", ')'
+          helper :yield1
+          wrap "$yield1(#{block_name}, ", ')'
         else
           push expr(s(:arglist, *children))
 
+          helper :yieldX
           if uses_splat?(children)
-            wrap "Opal.yieldX(#{block_name}, ", ')'
+            wrap "$yieldX(#{block_name}, ", ')'
           else
-            wrap "Opal.yieldX(#{block_name}, [", '])'
+            wrap "$yieldX(#{block_name}, [", '])'
           end
         end
       end
