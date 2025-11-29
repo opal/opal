@@ -261,7 +261,7 @@ Naming/PredicatePrefix:
     - is_
     - have_
   Exclude:
-    - 'opal/runtime/dir_file_io.rb'
+    - 'opal/runtime/*.rb'
     - 'stdlib/fileutils.rb'
 
 Naming/VariableName:
