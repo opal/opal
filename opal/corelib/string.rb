@@ -5,6 +5,38 @@
 # require 'corelib/comparable' # required by mini
 # require 'corelib/regexp'     # required by mini
 
+### Performance considerations ###
+
+## .valueOf() ##
+
+# We use primitive JavaScript strings and String objects here, code is supposed to work with both of them equally.
+# But this is very challenging for JavaScript engines to optimize, because internally these are different types.
+# In such situation using .valueOf() on strings before calling a string operator or function ensures that the
+# JavaScript engine can rely on getting always the same type (a primitive string) and can optimize code much better.
+# In short in JavaScript with string1 and string2 being a primitive or Object:
+#   string1.valueOf() + string2.valueOf();
+# is faster than:
+#   string1 + string2;
+# YMMV depending on JavaScript engine.
+
+## String Ropes ##
+
+# Because strings are immutable in JavaScript the way to concatenate or modify strings is to create new strings.
+# Usually this would require a new allocation for each new string, which is rather expensive.
+# To optimize this situation and prevent frequent allocations JavaScript engines employ "string ropes" internally.
+# For example, when concatenating string3 = string1 + string2, instead of making string3 a new allocation, string3
+# may just be internally represented as string1 with a pointer to string2, essentially avoiding a new allocation.
+# There are certain conditions that must be met to use string ropes and there may be differences between engines.
+# In general, as a rule of thumb, when concatenating to a existing string:
+#   string = string + other_string;
+# creates a rope and is faster than:
+#   string += other_string;
+# which allocates a new string.
+# Also, if a string rope is used for IO or in the DOM or passed anywhere else outside the JavaScript engine it must
+# be serialized which may require a final allocation and copying of the individual rope strings into the final string.
+# Overall this is still more efficient than the otherwise required multiple smaller allocations and copies.
+# YMMV depending on JavaScript engine.
+
 class ::String < `String`
   include ::Comparable
 
@@ -43,7 +75,7 @@ class ::String < `String`
       for (const c of str) {
         if (col.length > 0) {
           for (const e of col) {
-            if (e.l < l) { e.search += c; e.l++; }
+            if (e.l < l) { e.search = e.search + c; e.l++; }
             if (e.l === l) {
               if (e.search == search) { if (last) idx = e.index; else return e.index; }
               e.search = null;
@@ -76,7 +108,7 @@ class ::String < `String`
       for (const c of str) {
         if (col.length > 0) {
           for (const e of col) {
-            if (e.l < l) { e.search += c; e.l++; }
+            if (e.l < l) { e.search = e.search + c; e.l++; }
             if (e.l === l) {
               if (e.search == search) { if (last) idx = e.index; else return e.index; }
               e.search = null;
@@ -131,7 +163,7 @@ class ::String < `String`
           padstr_l = p_l === 1 ? p_l : padstr.$length();
 
       while (result_l < width) {
-        result += padstr;
+        result = result + padstr;
         result_l += padstr_l;
       }
 
@@ -327,7 +359,7 @@ class ::String < `String`
       // walk the string
       let i = 0, result = '';
       for (const c of string) {
-        result += c;
+        result = result + c;
         i++;
         if (i === length) break;
       }
@@ -351,7 +383,7 @@ class ::String < `String`
           i++; result_l++;
         } else if (i > index) {
           if (result_l < length || length < 0) {
-            result += c;
+            result = result + c;
             i++; result_l++;
           } else if (length > 0 && result_l >= length) break;
         }
@@ -538,13 +570,13 @@ class ::String < `String`
 
       for (;;) {
         if ((count & 1) === 1) {
-          result += string;
+          result = result + string;
         }
         count >>>= 1;
         if (count === 0) {
           break;
         }
-        string += string;
+        string = string + string;
       }
 
       return result;
@@ -1144,7 +1176,7 @@ class ::String < `String`
       for (i = 0, length = splitted.length; i < length; i++) {
         value = splitted[i];
         if (i < length - 1 || trailing) {
-          value += separator;
+          value = value + separator;
         }
         if (chomp) {
           value = #{`value`.chomp(separator)};
@@ -1252,7 +1284,7 @@ class ::String < `String`
 
         if (match === null) {
           #{$~ = nil}
-          result += s.slice(index);
+          result = result + s.slice(index);
           break;
         }
 
@@ -1291,11 +1323,11 @@ class ::String < `String`
         }
 
         if (pattern.lastIndex === match.index) {
-          result += (s.slice(index, match.index) + _replacement + (s[match.index] || ""));
+          result = result + (s.slice(index, match.index) + _replacement + (s[match.index] || ""));
           pattern.lastIndex += 1;
         }
         else {
-          result += (s.slice(index, match.index) + _replacement)
+          result = result + (s.slice(index, match.index) + _replacement)
         }
         index = pattern.lastIndex;
       }
@@ -2064,7 +2096,7 @@ class ::String < `String`
       let str = "", cu;
       for (const c of self) {
           cu = c.toUpperCase();
-          str += (cu == c) ? c.toLowerCase() : cu;
+          str = str + ((cu == c) ? c.toLowerCase() : cu);
       }
       return $str(str, self.encoding);
     }
@@ -2306,21 +2338,21 @@ class ::String < `String`
           if (inverse) {
             if (sub == null) {
               if (last_substitute == null) {
-                new_str += global_sub;
+                new_str = new_str + global_sub;
                 last_substitute = true;
               }
             } else {
-              new_str += ch;
+              new_str = new_str + ch;
               last_substitute = null;
             }
           } else {
             if (sub != null) {
               if (last_substitute == null || last_substitute !== sub) {
-                new_str += sub;
+                new_str = new_str + sub;
                 last_substitute = sub;
               }
             } else {
-              new_str += ch;
+              new_str = new_str + ch;
               last_substitute = null;
             }
           }
@@ -2329,9 +2361,9 @@ class ::String < `String`
         for (const ch of self) {
           sub = subs[ch];
           if (inverse) {
-            new_str += (sub == null ? global_sub : ch);
+            new_str = new_str + (sub == null ? global_sub : ch);
           } else {
-            new_str += (sub != null ? sub : ch);
+            new_str = new_str + (sub != null ? sub : ch);
           }
         }
       }
