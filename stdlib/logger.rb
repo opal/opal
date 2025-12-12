@@ -37,10 +37,11 @@ class Logger
   attr_accessor :progname
   attr_accessor :formatter
 
-  def initialize(pipe)
+  def initialize(pipe, level: DEBUG, progname: nil, formatter: nil)
     @pipe = pipe
-    @level = DEBUG
-    @formatter = Formatter.new
+    @level = level
+    @formatter = formatter || Formatter.new
+    @progname = progname
   end
 
   def level=(severity)
