@@ -183,7 +183,22 @@ ruby/library/delegate/delegate_class
 ruby/library/delegate/delegator
 ruby/library/erb/util/h_spec
 ruby/library/erb/util/html_escape_spec
+
+!ruby/library/logger/device/close_spec
+!ruby/library/logger/device/new_spec
+!ruby/library/logger/device/write_spec
+!ruby/library/logger/logger/add_spec
+!ruby/library/logger/logger/close_spec
+!ruby/library/logger/logger/datetime_format_spec
+!ruby/library/logger/logger/debug_spec
+!ruby/library/logger/logger/error_spec
+!ruby/library/logger/logger/fatal_spec
+!ruby/library/logger/logger/info_spec
+!ruby/library/logger/logger/new_spec
+!ruby/library/logger/logger/unknown_spec
+!ruby/library/logger/logger/warn_spec
 ruby/library/logger/severity_spec
+
 ruby/library/observer
 
 ruby/library/openstruct
