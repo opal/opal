@@ -756,6 +756,16 @@ RSpec.describe Opal::Compiler do
       expect(result).to include('0n')
       expect(result).to include('42n')
     end
+
+    context 'when disabled' do
+      let(:compiler_options) { {backtick_javascript: true, bigint_integers: false} }
+
+      it 'does not transform integers' do
+        result = compiled('`return 99`')
+        expect(result).to include('99')
+        expect(result).not_to include('99n')
+      end
+    end
   end
 
   def compiler_options
