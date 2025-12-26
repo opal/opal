@@ -71,10 +71,27 @@ module Opal
 
       private
 
+      def transform_js_integers(js_code)
+        return js_code unless compiler.bigint_integers?
+
+        # Transform integer literals to BigInt:
+        # - Decimal: \d+
+        # - Hex: 0[xX][0-9a-fA-F]+
+        # - Octal: 0[oO][0-7]+
+        # - Binary: 0[bB][01]+
+        # But NOT if:
+        # - already followed by 'n' (BigInt) or '.' (Float)
+        # - preceded by '.' (decimal part of a float)
+        js_code.gsub(/(?<!\.)(\b(?:0[xX][0-9a-fA-F]+|0[oO][0-7]+|0[bB][01]+|\d+))(?![n.\d])/) do
+          "#{$1}n"
+        end
+      end
+
       def compile_child(child)
         case child.type
         when :str
           value = child.loc.expression.source
+          value = transform_js_integers(value)
           scope.self if value.include? 'self'
           push Fragment.new(value, scope, child)
         when :begin, :gvar, :ivar, :nil
@@ -132,7 +149,7 @@ module Opal
 
         @should_add_semicolon = true if @returning
 
-        last_value
+        transform_js_integers(last_value)
       end
 
       # A case for manually created :js_return statement in Compiler#returns
