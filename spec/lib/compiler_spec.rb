@@ -710,58 +710,37 @@ RSpec.describe Opal::Compiler do
   end
 
   describe 'bigint_integers option' do
-    let(:compiler_options) { {backtick_javascript: true, bigint_integers: true} }
+    let(:compiler_options) { {bigint_integers: true} }
 
-    it 'transforms integer literals in x-strings to BigInt' do
-      expect(compiled('`return 42`')).to include('return 42n')
+    it 'transforms Ruby integer literals to BigInt' do
+      expect(compiled('x = 42')).to include('42n')
     end
 
     it 'transforms hex, octal, and binary literals' do
-      code = '`return 0xFF + 0o77 + 0b1010`'
-      result = compiled(code)
-      expect(result).to include('0xFFn')
-      expect(result).to include('0o77n')
-      expect(result).to include('0b1010n')
+      result = compiled('x = 0xFF + 0o77 + 0b1010')
+      # Parser gem converts these to decimal, so we check for the decimal values as BigInt
+      expect(result).to include('255n')  # 0xFF
+      expect(result).to include('63n')   # 0o77
+      expect(result).to include('10n')   # 0b1010
     end
 
     it 'leaves float literals unchanged' do
-      result = compiled('`return 3.14`')
+      result = compiled('x = 3.14')
       expect(result).to include('3.14')
       expect(result).not_to include('3.14n')
     end
 
-    it 'does not double-transform already BigInt literals' do
-      result = compiled('`return 123n`')
-      expect(result).to include('123n')
-      expect(result).not_to include('123nn')
-    end
-
-    it 'transforms integers in complex expressions' do
-      code = '`var x = 10 + 20 * 30`'
-      result = compiled(code)
-      expect(result).to include('10n')
-      expect(result).to include('20n')
-      expect(result).to include('30n')
-    end
-
-    it 'transforms integers in multiline x-strings' do
-      code = <<~RUBY
-        %x{
-          if (self === 0) {
-            return 42;
-          }
-        }
-      RUBY
-      result = compiled(code)
-      expect(result).to include('0n')
-      expect(result).to include('42n')
+    it 'does not transform integers in x-strings (JS embedded code)' do
+      result = compiled('`return 42`', backtick_javascript: true, bigint_integers: true)
+      expect(result).to include('return 42')
+      expect(result).not_to include('42n')
     end
 
     context 'when disabled' do
-      let(:compiler_options) { {backtick_javascript: true, bigint_integers: false} }
+      let(:compiler_options) { {bigint_integers: false} }
 
       it 'does not transform integers' do
-        result = compiled('`return 99`')
+        result = compiled('x = 99')
         expect(result).to include('99')
         expect(result).not_to include('99n')
       end
