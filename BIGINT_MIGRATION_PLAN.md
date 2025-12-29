@@ -2,153 +2,197 @@
 
 Piano per migrare gradualmente la corelib di Opal da Number (JS) a BigInt (JS) per rappresentare Integer (Ruby).
 
-## Stato Attuale
+## Stato Attuale (Aggiornato: 2025-12-29)
 
-- ✅ Compilatore: opzione `bigint_integers` implementata
-- ✅ I literal Integer possono essere compilati come `42n` invece di `42`
-- ⏳ Runtime: `opal/corelib/number.rb` usa ancora Number internamente
+### ✅ Completato
 
-## Strategia
+**Compilatore:**
+- ✅ Opzione `bigint_integers` implementata (default: false)
+  - Abilitabile via option: `Opal.compile(code, bigint_integers: true)`
+  - Abilitabile via magic comment: `# bigint_integers: true`
+- ✅ Integer literals Ruby → BigInt JS (`42` → `42n`)
+- ✅ Float literals preservati (`3.14` → `3.14`)
+- ✅ Hex/Octal/Binary convertiti a decimale dal parser, poi a BigInt (`0xFF` → `255n`)
+- ✅ JS embedded (`%x{}`) lasciato invariato - usa Number (decisione architetturale)
 
-Abilitare `bigint_integers: true` file per file nella corelib, iniziando dai file che:
-1. Non dipendono da operazioni aritmetiche complesse
-2. Sono più facili da testare in isolamento
-3. Hanno meno interazioni con JavaScript nativo
+**Test:**
+- ✅ 5 test RSpec specifici per bigint_integers
+- ✅ Suite RSpec compiler completa verde (473 test)
+- ✅ Test con bigint_integers disabled per default
 
-## Fasi di Migrazione
+**Documentazione:**
+- ✅ `BIGINT_MIGRATION_PLAN.md` creato
+- ✅ Commits organizzati e pushati
 
-### Fase 1: Runtime Helpers (Priorità Alta)
+### ⚠️ Problemi Identificati
 
-File che dovranno supportare BigInt nelle loro implementazioni JS:
-
-- [ ] `opal/runtime/helpers.js` - helpers di conversione e coercizione
-- [ ] `opal/runtime/runtime.js` - funzioni core che manipolano numeri
-
-**Azioni necessarie:**
-- Aggiungere helper `$is_bigint()`, `$to_bigint()`, `$bigint_or_number()`
-- Modificare `$coerce_to()` per gestire BigInt
-- Aggiornare operatori inline (se `inline_operators: true`)
-
-### Fase 2: File Base (Priorità Alta)
-
-File da convertire per primi, con magic comment `# bigint_integers: true`:
-
-1. [ ] `opal/corelib/numeric.rb` - classe base, pochi literal
-2. [ ] `opal/corelib/comparable.rb` - principalmente confronti
-3. [ ] `opal/corelib/constants.rb` - solo definizioni di costanti
-
-**Test da verificare:**
-```bash
-bin/rake mspec_nodejs PATTERN="spec/ruby/core/numeric/*_spec.rb"
-bin/rake mspec_nodejs PATTERN="spec/ruby/core/comparable/*_spec.rb"
+**Errore Runtime con bigint_integers abilitato:**
+```
+l.$< is not a function
+at <internal:runtime/op_helpers.rb>:27:6 in `rb_lt`
 ```
 
-### Fase 3: Number/Integer (Priorità Alta)
+**Causa:** Gli operator helpers (`rb_lt`, `rb_gt`, `rb_plus`, etc.) in `opal/runtime/op_helpers.rb` 
+controllano solo `typeof === 'number'` e falliscono con BigInt.
 
-Il file più critico:
+**Impatto:** Con `bigint_integers: true` il runtime fallisce immediatamente al primo confronto/operazione.
 
-4. [ ] `opal/corelib/number.rb` - 969 righe, contiene sia Integer che Float
+## Strategia Aggiornata
 
-**Sfide principali:**
-- `__id__` usa bit manipulation (riga 43-44)
-- Operazioni inline JS embedded (`%x{}`)
-- Distinzione Integer vs Float nello stesso file
-- Coercizione con altri tipi
+### Approccio "Runtime-First"
 
-**Approccio:**
-- Separare logica Integer vs Float dove possibile
-- Wrapper per operazioni bitwise: `(BigInt(self) | 0n) === BigInt(self)`
-- Test intensivo su `spec/ruby/core/integer/` e `spec/ruby/core/float/`
+1. **Non trasformiamo JS embedded** - troppo complesso e rischioso
+2. **Il runtime gestisce tipi misti** - Number + BigInt operazioni
+3. **Migrazione progressiva** - file per file con magic comment
 
-### Fase 4: File Dipendenti da Integer (Priorità Media)
+### Decisione Architetturale: Mixed Operations
 
-File che usano Integer ma non implementano logica numerica complessa:
+Il runtime deve supportare operazioni tra Number e BigInt:
+- `42n + 10` → converti 10 a BigInt, poi opera
+- `42n < 10` → confronto funziona nativamente in JS
+- `42n / 3.14` → converti BigInt a Number per divisione con float
 
-5. [ ] `opal/corelib/range.rb` - usa Integer per ranges numerici
-6. [ ] `opal/corelib/array.rb` - index sono Integer
-7. [ ] `opal/corelib/string.rb` - operazioni su index/length
-8. [ ] `opal/corelib/hash.rb` - hash codes potrebbero essere BigInt
+## Fasi di Migrazione (Riviste)
+
+### ⏭️ Fase 1: Runtime Operator Helpers (PROSSIMO STEP - Priorità Critica)
+
+**File da modificare:**
+- `opal/runtime/op_helpers.rb` (righe 12-47)
+
+**Modifiche necessarie:**
+```ruby
+def self.rb_lt(l, r)
+  %x{
+    var l_type = typeof(l);
+    var r_type = typeof(r);
+    
+    // Both numbers or both bigints - native comparison works
+    if ((l_type === 'number' && r_type === 'number') ||
+        (l_type === 'bigint' && r_type === 'bigint')) {
+      return l < r;
+    }
+    
+    // Mixed types - JavaScript handles this natively since ES2020
+    if ((l_type === 'number' || l_type === 'bigint') &&
+        (r_type === 'number' || r_type === 'bigint')) {
+      return l < r;
+    }
+    
+    // Fall back to Ruby method call
+    return l['$<'](r);
+  }
+end
+```
+
+**Operatori da aggiornare:**
+- [x] Identificato problema in `rb_lt` (less than)
+- [ ] `rb_plus`, `rb_minus`, `rb_times`, `rb_divide`
+- [ ] `rb_lt`, `rb_gt`, `rb_le`, `rb_ge`
+- [ ] `eqeq`, `eqeqeq`, `neqeq`
+
+**Casi speciali:**
+- **Divisione con float:** `42n / 3.14` deve convertire BigInt → Number
+- **Bitwise ops:** Già gestiti separatamente, dovrebbero funzionare
+- **Modulo/Remainder:** Verificare comportamento con tipi misti
 
 **Test:**
 ```bash
-bin/rake mspec_nodejs PATTERN="spec/ruby/core/{range,array,string,hash}/*_spec.rb"
+# Dopo le modifiche
+mise exec -- bin/rake mspec_ruby_nodejs 2>&1 | head -100
 ```
 
-### Fase 5: Math e Complex Numbers (Priorità Media)
+**Successo quando:**
+- MSpec suite inizia a eseguire test invece di crashare all'avvio
+- Vediamo failure di test specifici (non runtime errors)
 
-File che fanno matematica:
+### Fase 2: Runtime Helpers Aggiuntivi (Priorità Alta)
 
-9. [ ] `opal/corelib/math/math.rb`
-10. [ ] `opal/corelib/rational/rational.rb`
-11. [ ] `opal/corelib/complex/complex.rb`
+**File:**
+- `opal/runtime/helpers.rb` - coercizione
 
-**Note:**
-- Rational può beneficiare molto da BigInt (precisione arbitraria)
-- Math.floor/ceil dovranno gestire BigInt
-- Complex probabilmente rimarrà su Number per le parti immaginarie
+**Modifiche:**
+- Aggiungere helper `$is_bigint()`
+- Modificare `$coerce_to()` per gestire BigInt
+- Helper di conversione: `$to_bigint()`, `$bigint_to_number()`
 
-### Fase 6: Resto della Corelib (Priorità Bassa)
+### Fase 3: Corelib Number (Priorità Alta)
 
-File che usano Integer in modo marginale:
+**File:**
+- `opal/corelib/number.rb` (969 righe)
+- `opal/corelib/numeric.rb`
 
-- [ ] `opal/corelib/enumerable.rb`
-- [ ] `opal/corelib/enumerator.rb`
-- [ ] `opal/corelib/time.rb` - timestamp potrebbero essere BigInt
-- [ ] `opal/corelib/random/random.rb`
-- [ ] Altri file...
+**Sfide:**
+- Metodi con `%x{}` devono gestire tipi misti
+- `__id__` usa bitwise che funziona diversamente con BigInt
+- Coercizione tra Integer/Float
 
-### Fase 7: Stdlib (Priorità Bassa)
+**Non necessario:**
+- ❌ Aggiungere `# bigint_integers: true` ai file runtime (usano Number di proposito)
+- ❌ Modificare tutti i literal in `%x{}` (troppo rischioso)
 
-Dopo che tutta la corelib funziona:
+### Fase 4-7: Come da piano originale
 
-- [ ] `stdlib/**/*.rb` - caso per caso
-
-## Test di Regressione
-
-Per ogni file convertito:
-
-1. Run test specifici del modulo
-2. Run test suite completa: `bin/rake mspec_nodejs`
-3. Run minitest: `bin/rake minitest_nodejs`
-4. Controllare che non ci siano regressioni nei filtri: `spec/filters/bugs/`
+(Restano invariate)
 
 ## Compatibilità Interop JavaScript
 
-### Problemi Noti
+### ✅ Funziona Nativamente
 
-1. **JSON.stringify** non supporta BigInt nativamente
-   - Soluzione: custom serializer per Integer
-   
-2. **Operatori JS** (`+`, `-`, `*`, `/`) non funzionano tra Number e BigInt
-   - Soluzione: coercizione esplicita in tutti gli helper
+JavaScript ES2020+ gestisce molte operazioni miste:
+```javascript
+42n < 10        // true - confronto funziona
+42n + 10n       // 52n - somma BigInt
+Number(42n)     // 42 - conversione esplicita
+BigInt(42)      // 42n - conversione esplicita
+```
 
-3. **Math.** functions non accettano BigInt
-   - Soluzione: convertire a Number quando necessario, documentare loss of precision
+### ⚠️ Non Funziona
 
-4. **Bitwise ops** funzionano diversamente
-   - BigInt: precisione arbitraria
-   - Number: 32-bit signed
-   - Soluzione: usare sempre BigInt per bitwise su Integer
+```javascript
+42n + 10        // TypeError: Cannot mix BigInt and other types
+42n / 3.14      // TypeError: Cannot mix BigInt and other types
+Math.sqrt(42n)  // TypeError: Cannot convert a BigInt value to a number
+JSON.stringify({x: 42n})  // TypeError: Do not know how to serialize a BigInt
+```
+
+### 🔧 Soluzioni
+
+1. **Operatori aritmetici misti** → Convertiamo nel runtime helper
+2. **Math functions** → Convertiamo a Number quando necessario
+3. **JSON** → Custom serializer (da implementare separatamente)
+
+## Test di Regressione
+
+**Baseline attuale:**
+- `bin/rake rspec` → 473 examples, 0 failures ✅
+- `bin/rake mspec_ruby_nodejs` → Crash con `l.$< is not a function` ❌
+
+**Prossimi traguardi:**
+1. MSpec suite esegue senza crash
+2. Identificare quanti test falliscono (baseline)
+3. Ridurre failure progressivamente
 
 ## Metriche di Successo
 
-- [ ] Tutti i test passano con `bigint_integers: true` globalmente
-- [ ] Nessun degrado di performance > 20% su benchmark critici
-- [ ] Documentazione aggiornata
-- [ ] Esempi funzionanti con BigInt
+- [ ] **P0:** Runtime operator helpers gestiscono BigInt + Number
+- [ ] **P0:** MSpec suite esegue senza crash all'avvio  
+- [ ] **P1:** Suite RSpec verde con bigint_integers: true
+- [ ] **P1:** MSpec suite > 80% test passanti
+- [ ] **P2:** Tutti i test passano
+- [ ] **P3:** Performance degradation < 20%
+- [ ] **P3:** Documentazione aggiornata
 
-## Timeline Stimata
+## Prossimi Step Immediati
 
-- Fase 1-2: 1-2 settimane (fondamenta)
-- Fase 3: 2-3 settimane (parte più complessa)
-- Fase 4-5: 2-3 settimane
-- Fase 6-7: 3-4 settimane
-- **Totale**: 2-3 mesi di lavoro part-time
+1. ✅ Aggiornare questo piano
+2. ⏭️ Implementare mixed-type support in `op_helpers.rb`
+3. ⏭️ Testare con mspec, raccogliere baseline failure
+4. ⏭️ Prioritizzare fix in base a failure più comuni
 
 ## Note per Sviluppatori
 
-- Testare sempre sia con `bigint_integers: false` che `true`
-- Usare `# bigint_integers: true` solo quando il file è pronto
-- Documentare ogni workaround JavaScript
-- Aggiungere commenti quando la semantica BigInt diverge da Number
-- Considerare che BigInt non ha `-0`, `NaN`, `Infinity` come Number
+- **Non modificare i literal in `%x{}`** - il runtime gestisce la conversione
+- **Testare sempre con bigint disabled** prima di abilitarlo
+- **Usare `typeof l === 'bigint'`** per check BigInt in JS
+- **Ricordare:** BigInt non ha `-0`, `NaN`, `Infinity`
+- **Divisione float:** Sempre converte a Number se uno degli operandi è float
