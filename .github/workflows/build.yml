@@ -15,7 +15,7 @@ jobs:
   rake:
     name: ${{ matrix.combo.name || matrix.combo.ruby }}
     env:
-      DEFAULT_RUBY: '3.3'
+      DEFAULT_RUBY: '3.4'
     strategy:
       fail-fast: false
       matrix:
@@ -51,6 +51,8 @@ jobs:
             ruby: '3.3'
           - name: ruby-3.4
             ruby: '3.4'
+          - name: ruby-4.0
+            ruby: '4.0'
           - name: jruby
             ruby: 'jruby'
           # truffleruby: disabled, does not finish on github actions
