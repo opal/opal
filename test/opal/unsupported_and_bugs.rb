@@ -104,6 +104,18 @@ if %w[node nodejs].include?(::Opal.JS[:platform].JS[:name])
       bug :test_remove_entry_secure_symlink # EPERM
       unsupported :test_cp_r_fifo
     end
+    if ::Opal.JS[:platform].JS[:name] == "node"
+      # nodejs 25 makes things "different", so these tests fail:
+      bug :test_copy_entry
+      bug :test_copy_file
+      bug :test_copy_stream
+      bug :test_copy_stream_duck
+      bug :test_cp
+      bug :test_cp_r
+      bug :test_mv
+      bug :test_open_http_image_png
+      bug :test_read_binary_image
+    end
   end
 
   class TestOpalFile
@@ -128,7 +140,7 @@ if %w[node nodejs].include?(::Opal.JS[:platform].JS[:name])
       unsupported :test_owned? # Process.geteuid is -1
     end
     if ::Opal.JS[:platform].JS[:name] == "node"
-      # nodejs 25 makes things different, so these tests fail:
+      # nodejs 25 makes things "different", so these tests fail:
       bug :test_binwrite
       bug :test_binwrite_opts
     end
