@@ -15,7 +15,7 @@ jobs:
   rake:
     name: ${{ matrix.combo.name || matrix.combo.ruby }}
     env:
-      DEFAULT_RUBY: '4.0'
+      DEFAULT_RUBY: '3.4'
     strategy:
       max-parallel: 8
       fail-fast: false
