@@ -113,13 +113,20 @@ if %w[node nodejs].include?(::Opal.JS[:platform].JS[:name])
       bug :test_cp
       bug :test_cp_r
       bug :test_mv
-      bug :test_open_http_image_png
-      bug :test_read_binary_image
     end
   end
 
   class TestOpalFile
     bug :test_read_binary_utf8_file
+    if ::Opal.JS[:platform].JS[:name] == "node"
+      bug :test_read_binary_image
+    end
+  end
+
+  class TestOpenURI
+    if ::Opal.JS[:platform].JS[:name] == "node"
+      bug :test_open_http_image_png
+    end
   end
 
   class TestPathname
