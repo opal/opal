@@ -162,7 +162,7 @@ opal_filter "Kernel" do
   fails "Kernel#srand is a private method" # Expected Kernel to have private instance method 'srand' but it does not
   fails "Kernel#srand returns the system-initialized seed value on the first call" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x46d76 @seed=6933182541716747>
   fails "Kernel#system does not expand shell variables when given multiples arguments" # Expected (STDOUT): "$TEST_SH_EXPANSION\n"           but got: "foo\n" Backtrace
-  fails "Kernel#system does not write to stderr when command execution fails" # Expected (STDERR): ""           but got: "sh: sad: not found\n" Backtrace
+  fails "Kernel#system does not write to stderr when command execution fails" # Expected (STDERR): ""           but got: "'sad' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n" Backtrace
   fails "Kernel#system is a private method" # Expected Kernel to have private instance method 'system' but it does not
   fails "Kernel#test is a private method" # Expected Kernel to have private instance method 'test' but it does not
   fails "Kernel#trap is a private method" # Expected Kernel to have private instance method 'trap' but it does not
@@ -317,7 +317,8 @@ opal_filter "Kernel" do
   fails "Kernel.sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # Expected CompatibilityError but no exception was raised ("Ä Ђ" was returned)
   fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:KOI8_U (dummy)>
   fails "Kernel.system does not expand shell variables when given multiples arguments" # Expected (STDOUT): "$TEST_SH_EXPANSION\n"           but got: "foo\n" Backtrace
-  fails "Kernel.system does not write to stderr when command execution fails" # Expected (STDERR): ""           but got: "sh: sad: not found\n" Backtrace
+  fails "Kernel.system does not write to stderr when command execution fails" # Expected (STDERR): ""           but got: "'sad' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n" Backtrace
+  fails "Kernel.system raises Errno::ENOENT when `exception: true` is given and the specified command does not exist" # Expected Errno::ENOENT but got: RuntimeError (Command failed with exit 1: feature_14386)
   fails_badly "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x5b168>
   fails_badly "Kernel#autoload when called from included module's method setups the autoload on the included module"
   fails_badly "Kernel#autoload when called from included module's method the autoload is reachable from the class too"
