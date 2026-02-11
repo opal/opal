@@ -164,6 +164,7 @@ opal_filter "Kernel" do
   fails "Kernel#system does not expand shell variables when given multiples arguments" # Expected (STDOUT): "$TEST_SH_EXPANSION\n"           but got: "foo\n" Backtrace
   fails "Kernel#system does not write to stderr when command execution fails" # Expected (STDERR): ""           but got: "'sad' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n" Backtrace
   fails "Kernel#system is a private method" # Expected Kernel to have private instance method 'system' but it does not
+  fails "Kernel#system raises Errno::ENOENT when `exception: true` is given and the specified command does not exist" # Expected Errno::ENOENT but got: RuntimeError (Command failed with exit 1: feature_14386)
   fails "Kernel#test is a private method" # Expected Kernel to have private instance method 'test' but it does not
   fails "Kernel#trap is a private method" # Expected Kernel to have private instance method 'trap' but it does not
   fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: false/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: false "
