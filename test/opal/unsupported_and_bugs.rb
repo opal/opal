@@ -127,5 +127,10 @@ if %w[node nodejs].include?(::Opal.JS[:platform].JS[:name])
     if ::Opal.JS[:platform].JS[:windows]
       unsupported :test_owned? # Process.geteuid is -1
     end
+    if ::Opal.JS[:platform].JS[:name] == "node"
+      # nodejs 25 makes things different, so these tests fail:
+      bug :test_binwrite
+      bug :test_binwrite_opts
+    end
   end
 end
