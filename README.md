@@ -247,7 +247,9 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 
 ### Sponsored Contributions
 
-<a href="https://nebulab.it/?utm_source=github&utm_medium=sponsors" target="_blank"><img src="https://raw.githubusercontent.com/solidusio/brand/master/partners/Nebulab/logo-dark-light.svg" alt="Nebulab Logo"></a>
+<a href="https://nebulab.it/?utm_source=github&utm_medium=sponsors" target="_blank"><img src=".github/sponsors/nebulab-logo.svg" alt="Nebulab Logo"></a>
+
+<a href="https://www.testmu.ai/?utm_source=github&utm_medium=sponsors" target="_blank"><img src=".github/sponsors/testmu-ai-black.svg" alt="TestMu AI Logo" width="200"></a>
 
 
 ## License
