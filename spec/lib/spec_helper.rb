@@ -7,7 +7,11 @@ end
 
 if ENV['CHECK_COVERAGE_SIMPLECOV']
   require 'simplecov'
-  SimpleCov.start
+  SimpleCov.start do
+    add_filter '/spec/'
+    add_filter '/test/'
+    add_group 'Library', 'lib'
+  end
 end
 
 require 'opal'
