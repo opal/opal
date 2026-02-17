@@ -3,15 +3,29 @@
 
 module ::Errno
   errors = [
-    [:EINVAL, 'Invalid argument', 22],
-    [:EEXIST, 'File exists', 17],
-    [:EISDIR, 'Is a directory', 21],
-    [:EMFILE, 'Too many open files', 24],
-    [:ESPIPE, 'Illegal seek', 29],
-    [:EACCES, 'Permission denied', 13],
     [:EPERM, 'Operation not permitted', 1],
     [:ENOENT, 'No such file or directory', 2],
-    [:ENAMETOOLONG, 'File name too long', 36]
+    [:ESRCH, 'No such process', 3],
+    [:ENXIO, 'No such device or address', 6],
+    [:EBADF, 'Bad file descriptor', 9],
+    [:ECHILD, 'No child processes', 10],
+    [:EAGAIN, 'Try again', 11],
+    [:EACCES, 'Permission denied', 13],
+    [:EBUSY, 'resource busy or locked', 16],
+    [:EEXIST, 'File exists', 17],
+    [:EXDEV, 'Cross-device link', 18],
+    [:ENOTDIR, 'Not a directory', 20],
+    [:EISDIR, 'Is a directory', 21],
+    [:EINVAL, 'Invalid argument', 22],
+    [:EMFILE, 'Too many open files', 24],
+    [:ESPIPE, 'Illegal seek', 29],
+    [:EPIPE, 'Broken pipe', 32],
+    [:ENAMETOOLONG, 'File name too long', 36],
+    [:ENOTEMPTY, 'Directory not empty', 39],
+    [:ELOOP, 'Too many symbolic links encountered', 40],
+    [:EFTYPE, 'Inappropriate file type or format', 79],
+    [:EILSEQ, 'Illegal byte sequence', 84],
+    [:EOPNOTSUPP, 'Operation not supported on transport endpoint', 95]
   ]
 
   klass = nil

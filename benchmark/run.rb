@@ -12,11 +12,9 @@ files = ARGV
 ruby_exe = Gem.ruby
 
 bench_exe = {
-  "bun"     => "bin/opal -Rbun -rnodejs/file",
-  "chrome"  => "bin/opal -Rchrome -rheadless_browser/base -rheadless_browser/file",
-  "firefox" => "bin/opal -Rfirefox -rheadless_browser/base -rheadless_browser/file",
-  "deno"    => "bin/opal -Rdeno -rdeno/file",
-  "nodejs"  => "bin/opal -Rnodejs -rnodejs/file",
+  "chrome"  => "bin/opal -Rchrome",
+  "firefox" => "bin/opal -Rfirefox",
+  "nodejs"  => "bin/opal -Rnodejs",
 }.transform_values { |i| "#{ruby_exe} #{i}" }
 
 # runners
@@ -27,7 +25,7 @@ selected_rubies = []
 
 OptionParser.new do |parser|
   parser.banner = "Usage: run.rb runner(s) [files...]"
-  parser.on("--ruby", "Use system Ruby") { rubies << ruby_exe }
+  parser.on("--ruby", "Use system Ruby") { selected_rubies << ["ruby", ruby_exe] }
 
   runners.each do |runner|
     runner_dc = runner.downcase

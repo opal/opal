@@ -33,10 +33,10 @@ module Opal
 
     def run(argv = [])
       @argv = argv
-
       savepoint = save_tty
       load_opal
       load_history
+      wait_for_opal
       run_input_loop
     ensure
       dump_history
@@ -49,6 +49,9 @@ module Opal
       runner += ['-e', 'require "opal/repl_js"']
       runner = [RbConfig.ruby, "#{__dir__}/../../exe/opal"] + runner
 
+      # For debugging the runner uncomment the following line:
+      # ENV['NODE_OPTS'] = '--inspect-brk'
+
       # What I try to achieve here: let the runner ignore
       # interrupts. Those should be handled by a supervisor.
       @pipe = if RUBY_ENGINE == 'truffleruby'
@@ -56,6 +59,19 @@ module Opal
               else
                 IO.popen(runner, 'r+', pgroup: true, new_pgroup: true)
               end
+    end
+
+    def wait_for_opal
+      obj = { mode: :inspect, code: '1', colors: true }.to_json
+      t = Time.now + 6000
+      while true
+        @pipe.puts obj
+        while (line = @pipe.readline)
+          return if line.chomp == '<<<ready>>>'
+          raise 'could not start pipeline to opal' if Time.now > t
+          sleep 0.1 # prevent busy looping, just in case
+        end
+      end
     end
 
     def run_input_loop

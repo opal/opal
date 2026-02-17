@@ -9,16 +9,16 @@ module ::Opal
   # Also this helper always sets a encoding. If encoding is not
   # provided, "UTF-8" will be used.
   # @returns a new String object with encoding set.
-  def self.str(str = undefined, encoding = undefined)
+  def self.str(str, encoding)
     %x{
       if (!encoding || encoding === nil) encoding = "UTF-8";
       str = Opal.set_encoding(new String(str), encoding);
-      str.internal_encoding = str.encoding;
+      str.binary_encoding = str.encoding;
       return str;
     }
   end
 
-  # String#+ might be triggered early by a call $dstr below, so provide a solution until String class is fully loaded.
+  # String#+ might be triggered early by calling $dstr below, so provide a solution until String class is fully loaded.
   `String.prototype["$+"] = function(other) { return this + other; }`
 
   # Helper for dynamic strings like "menu today: #{meal[:name]} for only #{meal[:price]}"
@@ -37,24 +37,20 @@ module ::Opal
   # Provide the encoding register with a default "UTF-8" encoding, because
   # its used from the start and will be raplaced by the real UTF-8 encoding
   # when 'corelib/string/encoding' is loaded.
-  `Opal.encodings = { __proto__: null, "UTF-8": { name: "UTF-8" }}`
+  `Opal.encodings = { __proto__: null, "UTF-8": { name: "UTF-8", names: ["UTF-8"] }}`
 
   # Sets the encoding on a string, will treat string literals as frozen strings
   # raising a FrozenError.
   #
   # @param str [String] the string on which the encoding should be set
   # @param name [String] the canonical name of the encoding
-  # @param type [String] possible values are either `"encoding"`, `"internal_encoding"`, or `undefined
+  # @param type [String] possible values are either `"encoding"`, `"binary_encoding"`, or `undefined
   def self.set_encoding(str = undefined, name = undefined, type = undefined)
     %x{
       if (typeof type === "undefined") type = "encoding";
-      if (typeof str === 'string' || str.$$frozen === true)
-        $raise(Opal.FrozenError, "can't modify frozen String");
-
-      let encoding = Opal.find_encoding(name);
-      if (encoding === str[type]) { return str; }
-      str[type] = encoding;
-
+      if (typeof str === "string" || str.$$frozen === true)
+        $raise(Opal.FrozenError, "can't modify frozen String", new Map([["receiver", str]]));
+      str[type] = Opal.find_encoding(name);
       return str;
     }
   end
@@ -62,6 +58,11 @@ module ::Opal
   # Fetches the encoding for the given name or raises ArgumentError.
   def self.find_encoding(name = undefined)
     %x{
+      if (typeof name === "object") {
+        if (name.$$is_string) name = name.toString();
+        else if (name.name && name.names) return name; // assuming a ::Encoding
+      }
+      if (typeof name !== "string") $raise(Opal.ArgumentError, "not a encoding name " + name);
       let register = Opal.encodings;
       let encoding = register[name] || register[name.toUpperCase()];
       if (!encoding) $raise(Opal.ArgumentError, "unknown encoding name - " + name);
@@ -110,6 +111,20 @@ module ::Opal
       }
     });
   }
+
+  # Return UTF-16 char length, returns 0 if end of string is reached,
+  # otherwise 1 for simple characters or 2 for surrogates.
+  def self.mbclen(str, idx)
+    %x{
+      let cp = str.codePointAt(idx);
+      return (cp == null) ? 0 : ((cp < 0x10000) ? 1 : 2);
+    }
+  end
+
+  # Increment index of str by UTF-16 char length, returns new index.
+  def self.mbinc(str, idx)
+    `idx + Opal.mbclen(str, idx)`
+  end
 end
 
 ::Opal

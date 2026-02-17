@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 Benchmark.ips do |x|
   %x{
     const c_foo = 'foo'

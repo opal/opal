@@ -1,4 +1,4 @@
-# helpers: slice, deny_frozen_access
+# helpers: slice, deny_frozen_access, coerce_to_or_raise
 # backtick_javascript: true
 # use_strict: true
 
@@ -28,7 +28,7 @@ class ::Time < `Date`
       }
 
       if (!seconds.$$is_number) {
-        seconds = #{::Opal.coerce_to!(seconds, ::Integer, :to_int)};
+        seconds = $coerce_to_or_raise(seconds, Opal.Integer, "to_int");
       }
 
       if (frac === undefined) {
@@ -36,7 +36,7 @@ class ::Time < `Date`
       }
 
       if (!frac.$$is_number) {
-        frac = #{::Opal.coerce_to!(frac, ::Integer, :to_int)};
+        frac = $coerce_to_or_raise(frac, Opal.Integer, "to_int");
       }
 
       let value;
@@ -56,7 +56,7 @@ class ::Time < `Date`
       if (year.$$is_string) {
         year = parseInt(year, 10);
       } else {
-        year = #{::Opal.coerce_to!(`year`, ::Integer, :to_int)};
+        year = $coerce_to_or_raise(year, Opal.Integer, "to_int");
       }
 
       if (month === nil) {
@@ -80,7 +80,7 @@ class ::Time < `Date`
           default: month = #{`month`.to_i};
           }
         } else {
-          month = #{::Opal.coerce_to!(`month`, ::Integer, :to_int)};
+          month = $coerce_to_or_raise(month, Opal.Integer, "to_int");
         }
       }
 
@@ -94,7 +94,7 @@ class ::Time < `Date`
       } else if (day.$$is_string) {
         day = parseInt(day, 10);
       } else {
-        day = #{::Opal.coerce_to!(`day`, ::Integer, :to_int)};
+        day = $coerce_to_or_raise(day, Opal.Integer, "to_int");
       }
 
       if (day < 1 || day > 31) {
@@ -106,7 +106,7 @@ class ::Time < `Date`
       } else if (hour.$$is_string) {
         hour = parseInt(hour, 10);
       } else {
-        hour = #{::Opal.coerce_to!(`hour`, ::Integer, :to_int)};
+        hour = $coerce_to_or_raise(hour, Opal.Integer, "to_int");
       }
 
       if (hour < 0 || hour > 24) {
@@ -118,7 +118,7 @@ class ::Time < `Date`
       } else if (min.$$is_string) {
         min = parseInt(min, 10);
       } else {
-        min = #{::Opal.coerce_to!(`min`, ::Integer, :to_int)};
+        min = $coerce_to_or_raise(min, Opal.Integer, "to_int");
       }
 
       if (min < 0 || min > 59) {
@@ -131,7 +131,7 @@ class ::Time < `Date`
         if (sec.$$is_string) {
           sec = parseInt(sec, 10);
         } else {
-          sec = #{::Opal.coerce_to!(`sec`, ::Integer, :to_int)};
+          sec = $coerce_to_or_raise(sec, Opal.Integer, "to_int");
         }
       }
 
@@ -285,7 +285,7 @@ class ::Time < `Date`
 
     %x{
       if (!other.$$is_number) {
-        other = #{::Opal.coerce_to!(other, ::Integer, :to_int)};
+        other = $coerce_to_or_raise(other, Opal.Integer, "to_int");
       }
       var result = new Date(self.getTime() + (other * 1000));
       result.timezone = self.timezone;
@@ -300,7 +300,7 @@ class ::Time < `Date`
 
     %x{
       if (!other.$$is_number) {
-        other = #{::Opal.coerce_to!(other, ::Integer, :to_int)};
+        other = $coerce_to_or_raise(other, Opal.Integer, "to_int");
       }
       var result = new Date(self.getTime() - (other * 1000));
       result.timezone = self.timezone;
@@ -402,11 +402,12 @@ class ::Time < `Date`
   end
 
   def inspect
-    if utc?
-      strftime '%Y-%m-%d %H:%M:%S UTC'
-    else
-      strftime '%Y-%m-%d %H:%M:%S %z'
-    end
+    str = if utc?
+            strftime '%Y-%m-%d %H:%M:%S UTC'
+          else
+            strftime '%Y-%m-%d %H:%M:%S %z'
+          end
+    `Opal.str(str, Opal.Encoding.US_ASCII)`
   end
 
   def succ
@@ -415,6 +416,10 @@ class ::Time < `Date`
       result.timezone = self.timezone;
       return result;
     }
+  end
+
+  def nsec
+    `self.getMilliseconds() * 1000000`
   end
 
   def usec
@@ -791,6 +796,7 @@ class ::Time < `Date`
   alias month mon
   alias to_s inspect
   alias tv_sec to_i
+  alias tv_nsec nsec
   alias tv_usec usec
   alias utc gmtime
   alias utc? gmt?

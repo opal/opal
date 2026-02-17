@@ -1,4 +1,4 @@
-# helpers: coerce_to, opal32_init, opal32_add
+# helpers: coerce_to, opal32_init, opal32_add, str
 # backtick_javascript: true
 require 'benchmark/ips'
 
@@ -885,6 +885,24 @@ class String
       return self.replace(new RegExp(char_class, 'g'), '');
     }
   end
+
+  def plus_const_get(other)
+    other = `$coerce_to(#{other}, #{::String}, 'to_str')`
+    %x{
+      if (other.length === 0 && self.$$class === Opal.String) return self;
+      if (self.length === 0 && other.$$class === Opal.String) return other;
+      return $str(self + other, self.encoding);
+    }
+  end
+
+  def plus_current(other)
+    other = `$coerce_to(#{other}, Opal.String, 'to_str')`
+    %x{
+      if (other.length === 0 && self.$$class === Opal.String) return self;
+      if (self.length === 0 && other.$$class === Opal.String) return other;
+      return $str(self + other, self.encoding);
+    }
+  end
 end
 
 s = "𝌆a𝌆"
@@ -1200,5 +1218,11 @@ end
 Benchmark.ips do |x|
   x.report("orig delete")    { medi_string.delete_orig('𝌆') }
   x.report("current delete") { medi_string.delete('𝌆') }
+  x.compare!
+end
+
+Benchmark.ips do |x|
+  x.report("const_get +")    { '𝌆'.plus_const_get('𝌆') }
+  x.report("current +") { '𝌆'.plus_current('𝌆') }
   x.compare!
 end

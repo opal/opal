@@ -67,6 +67,14 @@ inherit_mode:
   merge:
     - Exclude
 
+Naming/ClassAndModuleCamelCase:
+  Exclude:
+    - 'stdlib/fileutils.rb'
+
+Naming/HeredocDelimiterNaming:
+  Exclude:
+    - 'stdlib/fileutils.rb'
+
 Naming/MethodName:
   Exclude:
     # Ruby has methods like Integer/Float/Array
@@ -79,6 +87,7 @@ Layout/ClosingParenthesisIndentation:
 Layout/CommentIndentation:
   # The following files use comments to show generated ruby code
   Exclude:
+    - 'lib/opal/nodes/call/require.rb'
     - 'lib/opal/rewriters/binary_operator_assignment.rb'
     - 'lib/opal/rewriters/logical_operator_assignment.rb'
     - 'lib/opal/source_map/file.rb'
@@ -100,7 +109,7 @@ Layout/EmptyLineAfterMagicComment:
 Style/GlobalVars:
   Exclude:
     - 'opal/corelib/kernel.rb'
-    - 'stdlib/nodejs/irb.rb'
+    - 'opal/runtime/misc.rb'
     - 'stdlib/console.rb'
     - 'stdlib/native.rb'
     - 'stdlib/await.rb'
@@ -116,6 +125,10 @@ Layout/FirstArrayElementIndentation:
 Layout/SpaceAroundOperators:
   Exclude:
     - 'opal/corelib/error.rb'
+
+Lint/AssignmentInCondition:
+  Exclude:
+    - 'stdlib/fileutils.rb'
 
 Lint/BooleanSymbol:
   Exclude:
@@ -140,6 +153,11 @@ Lint/Loop:
   Exclude:
     # This is for optimization purposes mostly
     - 'opal/corelib/io.rb'
+    - 'stdlib/fileutils.rb'
+
+Lint/NonLocalExitFromIterator:
+  Exclude:
+    - 'stdlib/fileutils.rb'
 
 # Allow the use of if/unless inside blocks
 Style/Next:
@@ -152,11 +170,26 @@ Lint/RescueException:
     # Promises must care about all exceptions
     - 'stdlib/promise.rb'
     - 'opal/corelib/binding.rb'
+    - 'opal/io/buffer.rb'
 
 Lint/RedundantStringCoercion:
   Exclude:
     # That's what MRI does
     - 'opal/corelib/error.rb'
+
+Lint/ReturnInVoidContext:
+  Exclude:
+    - 'opal/corelib/string/encoding.rb'
+
+Lint/ShadowedArgument:
+  Exclude:
+    - 'opal/corelib/dir.rb'
+    - 'opal/corelib/file.rb'
+    - 'opal/corelib/process.rb'
+
+Lint/SuppressedException:
+  Exclude:
+    - 'stdlib/fileutils.rb'
 
 Lint/RedundantRequireStatement:
   Exclude:
@@ -179,6 +212,12 @@ Lint/UselessAssignment:
     # Variable from Ruby can be accessed in JS, rubocop can't catch it (but JSHint can)
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
+
+Lint/Void:
+  Exclude:
+    - 'opal/corelib/dir.rb'
+    - 'opal/corelib/process.rb'
+    - 'opal/io/console.rb'
 
 Metrics/AbcSize:
   Enabled: false
@@ -223,15 +262,27 @@ Naming/PredicatePrefix:
     - have_
   Exclude:
     - 'opal/runtime/*.rb'
+    - 'stdlib/fileutils.rb'
+
+Naming/VariableName:
+  Exclude:
+    - 'opal/corelib/dir.rb'
+    - 'opal/corelib/kernel/format.rb'
 
 Performance/FlatMap:
   Exclude:
     # That's actually a definition of Enumerable#flat_map
     - 'opal/corelib/enumerable.rb'
 
+Performance/RedundantBlockCall:
+  Enabled: false
+
 Performance/RegexpMatch:
   # This cop converts =~ to match?
   # But this method was introduced only in 2.4
+  Enabled: false
+
+Performance/StringReplacement:
   Enabled: false
 
 Performance/UnfreezeString:
@@ -249,6 +300,10 @@ Style/CaseEquality:
 Style/CaseLikeIf:
   Enabled: false
 
+Style/CharacterLiteral:
+  Exclude:
+    - 'stdlib/fileutils.rb'
+
 Style/ClassAndModuleChildren:
   Enabled: false
 
@@ -265,11 +320,41 @@ Style/CommandLiteral:
 Style/Documentation:
   Enabled: false
 
+Style/DoubleNegation:
+  Exclude:
+    - 'opal/corelib/io.rb'
+
+Style/EachWithObject:
+  Exclude:
+    - 'stdlib/fileutils.rb'
+
 Style/EmptyMethod:
   # There are a lot of empty methods that are required to make MSpec working
   Exclude:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
+
+Style/FormatString:
+  Exclude:
+    - 'stdlib/fileutils.rb'
+
+Style/FormatStringToken:
+  Exclude:
+    - 'opal/io/console.rb'
+    - 'stdlib/fileutils.rb'
+
+Style/HashLikeCase:
+  Exclude:
+    - 'opal/corelib/kernel/format.rb'
+
+Style/HashEachMethods:
+  Exclude:
+    - 'opal/runtime/misc.rb'
+
+Style/IfInsideElse:
+  Exclude:
+    - 'opal/corelib/file.rb'
+    - 'lib/opal/regexp_transpiler.rb'
 
 Style/IfUnlessModifier:
   Enabled: false
@@ -284,6 +369,13 @@ Style/InverseMethods:
     - 'opal/corelib/basic_object.rb'
     - 'opal/corelib/kernel.rb'
 
+Style/LambdaCall:
+  Exclude:
+    - 'opal/corelib/dir.rb'
+    - 'opal/corelib/file.rb'
+    - 'opal/corelib/kernel/format.rb'
+    - 'opal/runtime/dir_file_io.rb'
+
 Lint/MissingSuper:
   # Base Opal classes simply can't or shouldn't call super for #method_missing
   Exclude:
@@ -296,6 +388,15 @@ Lint/MissingSuper:
 
 Style/MissingRespondToMissing:
   Enabled: true
+
+Style/ModuleFunction:
+  Exclude:
+    - 'stdlib/fileutils.rb'
+
+Style/NestedTernaryOperator:
+  Exclude:
+    - 'opal/corelib/dir.rb'
+    - 'opal/corelib/kernel/format.rb'
 
 Style/NumericPredicate:
   Enabled: false
@@ -311,9 +412,34 @@ Style/PercentLiteralDelimiters:
     - 'opal/**/*.rb'
     - 'stdlib/**/*.rb'
 
+Style/RedundantReturn:
+  Exclude:
+    - 'stdlib/fileutils.rb'
+
+Style/RedundantParentheses:
+  Exclude:
+    - 'stdlib/fileutils.rb'
+
+Style/RescueModifier:
+  Exclude:
+    - 'opal/corelib/dir.rb'
+    - 'opal/corelib/file.rb'
+    - 'opal/corelib/io.rb'
+    - 'opal/corelib/kernel/format.rb'
+    - 'opal/corelib/process.rb'
+    - 'stdlib/fileutils.rb'
+
 Style/SafeNavigation:
   # Opal supports old versions of Ruby that don't have safe navigator
   Enabled: false
+
+Style/SoleNestedConditional:
+  Exclude:
+    - 'opal/corelib/dir.rb'
+    - 'opal/corelib/file.rb'
+    - 'opal/corelib/kernel/format.rb'
+    - 'opal/corelib/module.rb'
+    - 'stdlib/fileutils.rb'
 
 Style/SpecialGlobalVars:
   Enabled: false
@@ -377,8 +503,10 @@ Style/RegexpLiteral:
 
 Naming/FileName:
   Exclude:
+    - 'opal/corelib/string/encoding/tables/JISEXTInverted.rb'
+    - 'opal/corelib/string/encoding/tables/JISInverted.rb'
+    - 'opal/corelib/string/encoding/tables/SJISInverted.rb'
     - 'stdlib/opal-builder.rb'
-    - 'stdlib/nodejs/open-uri.rb'
     - 'stdlib/opal-parser.rb'
     - 'stdlib/opal-platform.rb'
     - 'stdlib/opal-source-maps.rb'

@@ -1,4 +1,5 @@
 # backtick_javascript: true
+# helpers: coerce_to_or_raise
 
 require 'corelib/enumerable'
 
@@ -23,7 +24,7 @@ class ::Struct
     end
 
     args.map do |arg|
-      ::Opal.coerce_to!(arg, ::String, :to_str)
+      `$coerce_to_or_raise(arg, Opal.String, "to_str")`
     end
 
     klass = ::Class.new(self) do
@@ -149,7 +150,7 @@ class ::Struct
       ::Kernel.raise ::TypeError, "no implicit conversion of #{name.class} into Integer"
     end
 
-    name = ::Opal.coerce_to!(name, ::String, :to_str)
+    name = `$coerce_to_or_raise(name, Opal.String, "to_str")`
     `self.$$data[name]`
   end
 
@@ -165,7 +166,7 @@ class ::Struct
       ::Kernel.raise ::TypeError, "no implicit conversion of #{name.class} into Integer"
     end
 
-    name = ::Opal.coerce_to!(name, ::String, :to_str)
+    name = `$coerce_to_or_raise(name, Opal.String, "to_str")`
     `self.$$data[name] = value`
   end
 

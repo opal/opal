@@ -48,7 +48,7 @@ module Opal
       end
 
       def mark_as_required(filename)
-        "Opal.loaded([#{filename.to_s.inspect}]);"
+        "Opal.loaded(#{filename.to_s.inspect});"
       end
 
       class JsProcessor < Processor
@@ -74,7 +74,7 @@ module Opal
       end
 
       class RubyProcessor < Processor
-        handles :rb, :opal
+        handles :rb, :ru, :opal
 
         def source
           compiled.result
