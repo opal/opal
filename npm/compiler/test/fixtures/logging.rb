@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require 'logger'
 
 module Asciidoctor
-class NullLogger < ::Logger
-  attr_reader :max_severity
+  class NullLogger < ::Logger
+    attr_reader :max_severity
 
-  def initialize; end
+    def initialize; end
 
-  def add severity, message = nil, progname = nil
-    if (severity ||= UNKNOWN) > (@max_severity ||= severity)
-      @max_severity = severity
+    def add(severity, _message = nil, _progname = nil)
+      if (severity ||= UNKNOWN) > (@max_severity ||= severity)
+        @max_severity = severity
+      end
+      true
     end
-    true
   end
-end
 end
