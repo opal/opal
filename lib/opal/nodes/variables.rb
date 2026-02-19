@@ -10,7 +10,9 @@ module Opal
       children :var_name
 
       def using_irb?
-        compiler.irb? && scope.top?
+        compiler.irb? && 
+        scope.top_or_iter_in_top? && 
+        !scope.has_local?(var_name)
       end
 
       def compile
