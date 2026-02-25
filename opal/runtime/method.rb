@@ -304,11 +304,9 @@ module ::Opal
   # Method iteration
   # ----------------
 
-  # rubocop:disable Naming/PredicatePrefix
   def self.is_method(prop)
     `prop[0] === '$' && prop[1] !== '$'`
   end
-  # rubocop:enable Naming/PredicatePrefix
 
   def self.instance_methods(mod)
     %x{
