@@ -31,30 +31,57 @@ module Testing
       %w[
         mspec/helpers/tmp
         mspec/helpers/environment
-        mspec/guards/block_device
         a_file
         lib/spec_helper
         mspec/commands/mspec-run
-        etc
         rubygems
         zlib
       ]
     end
 
-    def specs(env = ENV)
+    def specs(platform, env = ENV)
       suite = env['SUITE']
       pattern = env['PATTERN']
       whitelist_pattern = !!env['RUBYSPECS']
       env['OPAL_PLATFORM_NAME'] = RbConfig::CONFIG['host_os'] unless env['OPAL_PLATFORM_NAME']
 
       excepting = []
-      rubyspecs = File.read('spec/ruby_specs').lines.reject do |l|
+
+      reject_check = ->(l) do
         l.strip!
-        l.start_with?('#') || l.empty? || (l.start_with?('!') && excepting.push(l.sub('!', 'spec/') + '.rb'))
+        if l.start_with?('#') || l.empty?
+          true
+        elsif l.start_with?('!')
+          path = l.sub('!', 'spec/')
+          if ::File.directory?(path)
+            ::Dir.each_child(path) do |file|
+              excepting.push(path + '/' + file)
+            end
+          else
+            excepting.push(path + '.rb')
+          end
+          true
+        end
+      end
+
+      rubyspecs = File.read('spec/selection/common').lines.reject do |l|
+        reject_check.(l)
       end.flat_map do |path|
         path = "spec/#{path}"
         File.directory?(path) ? Dir[path+'/*.rb'] : "#{path}.rb"
-      end - excepting
+      end
+
+      if File.exist?("spec/selection/#{platform}")
+        rubyspecs += File.read("spec/selection/#{platform}").lines.reject do |l|
+          reject_check.(l)
+        end.flat_map do |path|
+          path = "spec/#{path}"
+          File.directory?(path) ? Dir[path+'/*.rb'] : "#{path}.rb"
+        end
+      end
+
+      rubyspecs -= excepting
+      rubyspecs.uniq! # make sure we don't execute/count too much
 
       opalspecs = Dir['spec/{opal,lib/parser}/**/*_spec.rb']
       userspecs = Dir[pattern] if pattern
@@ -84,13 +111,22 @@ module Testing
 
     def filters(suite, platform)
       opalspec_filters = Dir['spec/filters/**/*_opal.rb']
+      opsys = if OS.windows?
+                'windows'
+              elsif OS.macos?
+                'macos'
+              elsif OS.freebsd?
+                'freebsd'
+              else
+                'linux'
+              end
 
       if ENV['INVERT_RUNNING_MODE']
         # When we run an inverted test suite we should run only 'bugs'.
         # Unsupported features are not supported anyway
-        rubyspec_filters = Dir['spec/filters/bugs/*.rb'] - opalspec_filters
+        rubyspec_filters = Dir["spec/filters/{bugs,platform/#{platform},platform/#{platform}/#{opsys}}/*.rb"] - opalspec_filters
       else
-        rubyspec_filters = Dir["spec/filters/{unsupported,bugs,platform/#{platform}}/*.rb"] - opalspec_filters
+        rubyspec_filters = Dir["spec/filters/{unsupported,bugs,platform/#{platform},platform/#{platform}/#{opsys}}/*.rb"] - opalspec_filters
       end
 
       suite == 'opal' ? opalspec_filters : rubyspec_filters
@@ -116,7 +152,6 @@ module Testing
       env_data = env.map{ |k,v| "ENV[#{k.inspect}] = #{v.to_s.inspect}" unless v.nil? }.join("\n")
 
       File.write filename, <<~RUBY
-        require 'opal/platform' # in node ENV is replaced
         #{env_data}
 
         require 'opal/full'
@@ -169,7 +204,6 @@ module Testing
       random_seed = Testing.get_random_seed(env)
 
       File.write filename, <<-RUBY
-        require 'opal/platform' # in node ENV is replaced
         require 'opal-parser'
         #{env_data}
         srand(#{random_seed})
@@ -299,17 +333,20 @@ Use PATTERN environment variable to manually set the glob for specs:
 DESC
 runners = Opal::CliRunners.to_h.keys.map(&:to_s).reject { |r| r == 'compiler' }
 platforms = (%w[opalopal_nodejs] + runners).sort
-node_platforms = %w[nodejs opalopal_nodejs]
 mspec_suites = %w[ruby opal]
 minitest_suites = %w[cruby]
 
 require 'opal/paths'
-opalopal_cmdline = "-sreadline -rnodejs -rcorelib/string/unpack -popal/cli_runners/nodejs exe/opal -- #{Opal.paths.map{|i| "-I#{i}"}.join(" ")} --no-source-map "
+opalopal_cmdline = "-sreadline -rnodejs -rcorelib/string/unpack -popal/cli_runners/nodejs ../exe/opal -- #{Opal.paths.map{|i| "-I#{i}"}.join(" ")} --no-source-map "
 
 platforms.each do |platform|
+  test_platform = platform
+  # ensure the nodejs - node alias does not influence spec selection:
+  platform = 'node' if platform == 'nodejs'
+
   mspec_suites.each do |suite|
     desc "Run the MSpec test suite on Opal::Builder/#{platform}" + pattern_usage
-    task :"mspec_#{suite}_#{platform}" do
+    task :"mspec_#{suite}_#{test_platform}" do
       filename = "tmp/mspec_#{platform}.rb"
       if platform.start_with? "opalopal_"
         platform = platform.split('_').last
@@ -322,12 +359,15 @@ platforms.each do |platform|
         'FORMATTER' => platform, # Use the current platform as the default formatter
         'BM_FILEPATH' => bm_filepath,
       }.merge(ENV.to_hash)
-      Testing::MSpec.write_file filename, Testing::MSpec.filters(suite, platform), Testing::MSpec.specs(specs_env), specs_env
+      Testing::MSpec.write_file filename, Testing::MSpec.filters(suite, platform), Testing::MSpec.specs(platform, specs_env), specs_env
 
       stubs = Testing::MSpec.stubs.map{|s| "-s#{s}"}.join(' ')
 
-      sh "ruby -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
-         "exe/opal #{cmdline} -Ispec/mspec/lib -Ispec -Ilib #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+      # Some specs access other files based on their current __FILE__, but the scope for these files is limited by the library include -Ispec
+      # which generates a compiled path for e.g. spec/ruby/thing.rb as ruby/thing.rb. To be able to access these files, current dir must
+      # be changed to spec via -Cspec, which allows correct access to ruby/thing.rb and thus includes and other paths must be changed to -I../spec.
+      sh "ruby -Cspec -w -rbundler/setup -r#{__dir__}/testing/mspec_special_calls "\
+         "../exe/opal #{cmdline} -I../spec/mspec/lib -I../spec -I../lib #{stubs} -R#{platform} -Dwarning -A --enable-source-location ../#{filename}"
 
       if bm_filepath
         puts "Benchmark results have been written to #{bm_filepath}"
@@ -338,20 +378,23 @@ platforms.each do |platform|
 
   minitest_suites.each do |suite|
     desc "Run the Minitest suite on Opal::Builder/#{platform}" + pattern_usage
-    task :"minitest_#{suite}_#{platform}" do
+    task :"minitest_#{suite}_#{test_platform}" do
       if ENV.key? 'FILES'
         files = Dir[ENV['FILES']]
         includes = "-Itmp"
       else
         includes = "-Itest/cruby/test"
         files = %w[
+          opal-parser
+          corelib/string/encoding/dummy.rb
+          corelib/file_test.rb
+          corelib/process/tms
           benchmark/test_benchmark.rb
           opal/test_io_buffer.rb
           opal/test_keyword.rb
           opal/test_base64.rb
           opal/test_openuri.rb
           opal/test_uri.rb
-          opal/unsupported_and_bugs.rb
           opal/test_matrix.rb
           opal/promisev2/test_always.rb
           opal/promisev2/test_error.rb
@@ -360,8 +403,29 @@ platforms.each do |platform|
           opal/promisev2/test_trace.rb
           opal/promisev2/test_value.rb
           opal/promisev2/test_when.rb
+          opal/test_env.rb
+          opal/test_error.rb
+          opal/test_string.rb
+          opal/test_tracepoint_end.rb
+          opal/test_await.rb
+          opal/test_yaml.rb
         ]
+        node_files = %w[
+          etc/test_etc.rb
+          opal/test_opal_builder.rb
+          opal/test_file.rb
+          opal/test_file_encoding.rb
+          opal/test_fileutils.rb
+          opal/test_pathname.rb
+        ]
+        if %w[node nodejs bun].include?(platform)
+          files += node_files
+        else
+          warn "Skipping for #{platform}:\n#{node_files.join("\n")}"
+        end
+        files << 'opal/unsupported_and_bugs.rb' # must be last
       end
+
       Testing::HTTPServer.new.with_server do |session|
         filename = "tmp/minitest_#{suite}_#{platform}.rb"
         if platform.start_with? "opalopal_"
@@ -373,47 +437,11 @@ platforms.each do |platform|
 
         stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
         includes = "-Itest -Ilib -Ivendored-minitest #{includes}"
-
+        use_strict_opt = ENV['USE_STRICT'] ? ' --use-strict' : ''
         sh "ruby -rbundler/setup "\
-         "exe/opal #{cmdline} #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location #{filename}"
+         "exe/opal #{cmdline} #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location#{use_strict_opt} #{filename}"
       end
     end
-  end
-end
-
-node_platforms.each do |platform|
-  # The name ends with the platform, which is of course mandated in this case
-  desc "Run the Node.js Minitest suite on #{platform}"
-  task :"minitest_node_#{platform}" do
-    if platform.start_with? "opalopal_"
-      platform = platform.split('_').last
-      cmdline = opalopal_cmdline
-    end
-    files = %w[
-      nodejs
-      opal-parser
-      nodejs/test_dir.rb
-      nodejs/test_env.rb
-      nodejs/test_error.rb
-      nodejs/test_file.rb
-      nodejs/test_file_encoding.rb
-      nodejs/test_io.rb
-      nodejs/test_opal_builder.rb
-      nodejs/test_string.rb
-      nodejs/test_await.rb
-      nodejs/test_tracepoint_end.rb
-      nodejs/test_yaml.rb
-    ]
-
-    filename = "tmp/minitest_node_nodejs.rb"
-    Testing::Minitest.write_file(filename, files, ENV)
-
-    stubs = "-soptparse -sio/console -stimeout -smutex_m -srubygems -stempfile -smonitor"
-    includes = "-Itest -Ilib -Ivendored-minitest"
-
-    use_strict_opt = ENV['USE_STRICT'] ? ' --use-strict' : ''
-    sh "ruby -rbundler/setup "\
-      "exe/opal #{cmdline} #{includes} #{stubs} -R#{platform} -Dwarning -A --enable-source-location#{use_strict_opt} #{filename}"
   end
 end
 
@@ -434,7 +462,7 @@ task :smoke_test do
   cd opal_rspec_dir do
     Bundler.with_unbundled_env do
       sh 'bundle check && bundle update opal-rspec || bundle install'
-      sh %{bundle exec opal-rspec --color --default-path=../../spec ../../spec/lib/deprecations_spec.rb > #{actual_output_path}}
+      sh %{bundle exec opal-rspec --default-path=../../spec ../../spec/lib/deprecations_spec.rb > #{actual_output_path}}
 
       actual_output = File.read(actual_output_path)
       begin
@@ -442,16 +470,16 @@ task :smoke_test do
         extend RSpec::Matchers
         expect(actual_output.lines[0]).to    eq("\n")
         expect(actual_output.lines[1]).to    eq("Opal::Deprecations\n")
-        expect(actual_output.lines[2]).to    eq("\e[32m  defaults to warn\e[0m\n")
-        expect(actual_output.lines[3]).to    eq("\e[32m  can be set to raise\e[0m\n")
+        expect(actual_output.lines[2]).to    eq("  defaults to warn\n")
+        expect(actual_output.lines[3]).to    eq("  can be set to raise\n")
         expect(actual_output.lines[4]).to    eq("\n")
 
         expect(actual_output.lines[5]).to match(%r{Top 2 slowest examples \(\d+\.\d+ seconds, \d+\.\d+% of total time\):\n})
-        expect(actual_output.lines[7]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m .*deprecations_spec\.rb:7\n})
-        expect(actual_output.lines[9]).to match(%r{    \[1m\d+\.\d+\[0m \[1mseconds\[0m .*deprecations_spec\.rb:12\n})
+        expect(actual_output.lines[7]).to match(%r{    \d+\.\d+ seconds .*deprecations_spec\.rb:7\n})
+        expect(actual_output.lines[9]).to match(%r{    \d+\.\d+ seconds .*deprecations_spec\.rb:12\n})
         expect(actual_output.lines[10]).to    eq("\n")
         expect(actual_output.lines[11]).to match(%r{^Finished in \d+\.\d+ seconds \(files took \d+\.\d+ seconds to load\)\n$})
-        expect(actual_output.lines[12]).to    eq("[32m2 examples, 0 failures[0m\n")
+        expect(actual_output.lines[12]).to    eq("2 examples, 0 failures\n")
         expect([
           actual_output.lines[6],
           actual_output.lines[8],
@@ -510,7 +538,7 @@ desc "Run the whole MSpec suite on all platforms"
 task :mspec    => [:mspec_chrome, :mspec_nodejs]
 
 desc "Run the whole Minitest suite on all platforms"
-task :minitest => [:minitest_chrome, :minitest_nodejs, :minitest_node_nodejs]
+task :minitest => [:minitest_chrome, :minitest_nodejs]
 
 desc "Run all tests"
 task :test_all => [:rspec, :mspec, :minitest]
@@ -518,4 +546,4 @@ task :test_all => [:rspec, :mspec, :minitest]
 # deprecated, can be removed after 0.11
 task(:cruby_tests) { warn "The task 'cruby_tests' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
 task(:test_cruby)  { warn "The task 'test_cruby' has been renamed to 'minitest_cruby_nodejs'."; exit 1 }
-task(:test_nodejs) { warn "The task 'test_nodejs' has been renamed to 'minitest_node_nodejs'."; exit 1 }
+task(:test_nodejs) { warn "The task 'test_nodejs' has been renamed to 'minitest_nodejs'."; exit 1 }

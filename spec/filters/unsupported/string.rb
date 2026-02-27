@@ -2,7 +2,6 @@
 opal_unsupported_filter "String" do
   fails "BasicObject#__id__ returns a different value for two String literals" # Expected "hello" == "hello" to be falsy but was true
   fails "Module#const_defined? returns true when passed a constant name with EUC-JP characters" # ArgumentError: unknown encoding name - euc-jp
-  fails "String#% supports negative bignums with %u or %d" # Expected "-18446744073709552000" == "-18446744073709551621" to be truthy but was false
   fails "String#<< concatenates the given argument to self and returns self" # NotImplementedError: String#<< not supported. Mutable String methods are not supported in Opal.
   fails "String#<< converts the given argument to a String using to_str" # Mock 'world!' expected to receive to_str("any_args") exactly 1 times but received it 0 times
   fails "String#<< raises a TypeError if the given argument can't be converted to a String" # Expected TypeError but got: NotImplementedError (String#<< not supported. Mutable String methods are not supported in Opal.)

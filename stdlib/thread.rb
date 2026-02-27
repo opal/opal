@@ -1,3 +1,4 @@
+# backtick_javascript: true
 # This shim implementation of Thread is meant to only appease code that tries
 # to be safe in the presence of threads, but does not actually utilize them,
 # e.g., uses thread- or fiber-local variables.
@@ -66,7 +67,7 @@ class Thread
   end
 
   def coerce_key_name(key)
-    ::Opal.coerce_to!(key, String, :to_s)
+    `Opal.coerce_to_or_raise(key, Opal.String, "to_s")`
   end
 
   class Queue

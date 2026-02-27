@@ -9,5 +9,5 @@ opal_filter "TracePoint" do
   fails "TracePoint#inspect returns a String showing the event, path and line" # RuntimeError: Only the :class event is supported
   fails "TracePoint#inspect returns a string containing a human-readable TracePoint status" # RuntimeError: Only the :class event is supported
   fails "TracePoint#inspect shows only whether it's enabled when outside the TracePoint handler" # RuntimeError: Only the :class event is supported
-  fails "TracePoint#self return the trace object from event" # RuntimeError: Only the :class event is supported  
+  fails "TracePoint#self return the trace object from event" # RuntimeError: Only the :class event is supported
 end

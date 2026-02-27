@@ -4,7 +4,6 @@ require 'spec_helper'
 
 describe 'Encoding' do
   it 'supports US-ASCII' do
-    skip if OPAL_PLATFORM == 'deno' # see filters/platform/deno
     "è".encoding.name.should == 'UTF-8'
     "è".force_encoding('ASCII').should == "\xC3\xA8"
     "è".force_encoding('ascii').should == "\xC3\xA8"

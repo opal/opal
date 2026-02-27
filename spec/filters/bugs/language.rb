@@ -82,6 +82,7 @@ opal_filter "language" do
   fails "Global variable $-p is read-only" # Expected NameError but no exception was raised (true was returned)
   fails "Global variable $-v is an alias of $VERBOSE" # Expected nil to be true
   fails "Global variable $-w is an alias of $VERBOSE" # Expected nil to be true
+  fails "Global variable $0 actually sets the program name" # Expected "" to include "rubyspec-dollar0-test"
   fails "Global variable $0 is the path given as the main script and the same as __FILE__" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa7382 @old_stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="read" @write_proc=#<Proc:0xaa7e6> @tty=true> @verbose=nil @dollar_slash="\n" @dollar_dash_zero=nil @dollar_backslash=nil @debug=false @method=nil @object=nil @orig_program_name=nil>
   fails "Global variable $0 raises a TypeError when not given an object that can be coerced to a String" # Expected TypeError but no exception was raised (nil was returned)
   fails "Global variable $< is read-only" # Expected NameError but no exception was raised (nil was returned)
@@ -94,6 +95,7 @@ opal_filter "language" do
   fails "Hash literal checks duplicated float keys on initialization" # Expected warning to match: /key 1.0 is duplicated|duplicated key/ but got: ""
   fails "Hash literal checks duplicated keys on initialization" # Expected warning to match: /key 1000 is duplicated|duplicated key/ but got: ""
   fails "Hash literal expands a BasicObject using ** into the containing Hash literal initialization" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0xab798>
+  fails "Hash literal freezes string keys on initialization" # NotImplementedError: String#reverse! not supported. Mutable String methods are currently not supported in Opal.
   fails "Hash literal raises an EncodingError at parse time when Symbol key with invalid bytes and 'key: value' syntax used" # Expected EncodingError (invalid symbol in encoding UTF-8 :"\xC3") but no exception was raised ({"Ã"=>1} was returned)
   fails "Hash literal raises an EncodingError at parse time when Symbol key with invalid bytes" # Expected EncodingError (invalid symbol in encoding UTF-8 :"\xC3") but no exception was raised ({"Ã"=>1} was returned)
   fails "Heredoc string allow HEREDOC with <<\"identifier\", interpolated" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
@@ -126,7 +128,6 @@ opal_filter "language" do
   fails "Keyword arguments raises ArgumentError exception when required keyword argument is not passed" # Expected ArgumentError (/missing keyword: :c/) but got: ArgumentError (missing keyword: c)
   fails "Keyword arguments raises ArgumentError for missing keyword arguments even if there are extra ones" # Expected ArgumentError (/missing keyword: :a/) but got: ArgumentError (missing keyword: a)
   fails "Literal (A::X) constant resolution uses the module or class #inspect to craft the error message if they are anonymous" # Expected NameError (/uninitialized constant <unusable info>::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x913b2>::DOES_NOT_EXIST)
-  fails "Literal (A::X) constant resolution uses the module or class #name to craft the error message" # Expected NameError (/uninitialized constant ModuleName::DOES_NOT_EXIST/) but got: NameError (uninitialized constant #<Module:0x913aa>::DOES_NOT_EXIST)
   fails "Literal Ranges creates a simple range as an object literal" # Expected 1..3.equal? 1..3 to be truthy but was false
   fails "Literal Regexps caches the Regexp object" # Expected /foo/ to be identical to /foo/
   fails "Literal Regexps supports (?# )" # Exception: Invalid regular expression: /foo(?#comment)bar/: Invalid group
@@ -245,7 +246,6 @@ opal_filter "language" do
   fails "Predefined global $~ raises an error if assigned an object not nil or instanceof MatchData" # Expected TypeError but no exception was raised (#<Object:0xa73aa> was returned)
   fails "Ruby String interpolation returns a string with the source encoding by default" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
   fails "Ruby String interpolation returns a string with the source encoding, even if the components have another encoding" # ArgumentError: unknown encoding name - euc-jp
-  fails "Source files encoded in UTF-16 LE without a BOM are parsed as empty because they contain a NUL byte before the encoding comment" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x9a8a0>
   fails "The BEGIN keyword accesses variables outside the eval scope" # SyntaxError: Unsupported sexp: preexe
   fails "The BEGIN keyword runs first in a given code unit" # SyntaxError: Unsupported sexp: preexe
   fails "The BEGIN keyword runs in a shared scope" # SyntaxError: Unsupported sexp: preexe
@@ -281,32 +281,16 @@ opal_filter "language" do
   fails "The alias keyword operates on the object's metaclass when used in instance_eval" # NameError: undefined method `value' for class `Object'
   fails "The alias keyword supports aliasing twice the same global variables" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x1c9ba @obj=#<AliasObject:0x1ce06> @meta=#<Class:#<AliasObject:0x1ce06>>>
   fails "The break statement in a captured block from another thread raises a LocalJumpError when getting the value from another thread" # NotImplementedError: Thread creation not available
-  fails "The break statement in a lambda created at the toplevel returns a value when invoking from a block" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa5de4 @program=#<BreakSpecs::Lambda:0xa5ea2 @ensures=false>>
-  fails "The break statement in a lambda created at the toplevel returns a value when invoking from the toplevel" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0xa5de4 @program=#<BreakSpecs::Lambda:0xa5eaa @ensures=false>>
   fails "The class keyword does not raise a SyntaxError when opening a class without a semicolon" # NameError: uninitialized constant ClassSpecsKeywordWithoutSemicolon
   fails "The def keyword within a closure looks outside the closure for the visibility" # Expected DefSpecsLambdaVisibility to have private instance method 'some_method' but it does not
   fails "The defined? keyword for a scoped constant returns nil when a constant is defined on top-level but not on the class" # Expected "constant" to be nil
-  fails "The defined? keyword for a simple constant returns 'constant' when the constant is defined" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for an expression returns 'assignment' for assigning a local variable" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals for a literal Array returns 'expression' if each element is defined" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals returns 'false' for false" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals returns 'nil' for nil" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals returns 'self' for self" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for literals returns 'true' for true" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for super for a method taking no arguments returns 'super' when a superclass method exists" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for variables returns 'class variable' when called with the name of a class variable" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for variables returns 'global-variable' for a global variable that has been assigned nil" # Expected false == true to be truthy but was false
   fails "The defined? keyword for variables returns 'instance-variable' for an instance variable that has been assigned to nil" # Expected nil == "instance-variable" to be truthy but was false
-  fails "The defined? keyword for variables returns 'instance-variable' for an instance variable that has been assigned" # Expected false == true to be truthy but was false
-  fails "The defined? keyword for variables returns 'local-variable' when called with the name of a local variable" # Expected false == true to be truthy but was false
   fails "The defined? keyword for variables returns nil for a global variable that has been read but not assigned to" # Expected "global-variable" to be nil
   fails "The defined? keyword for variables when a Regexp matches a String returns nil for non-captures" # Expected "global-variable" to be nil
   fails "The defined? keyword for variables when a String matches a Regexp returns nil for non-captures" # Expected "global-variable" to be nil
-  fails "The defined? keyword for yield returns 'yield' if a block is passed to a method not taking a block parameter" # Expected false == true to be truthy but was false
   fails "The defined? keyword when called with a method name having a throw in the receiver escapes defined? and performs the throw semantics as normal" # Expected nil == "unreachable" to be truthy but was false
   fails "The defined? keyword when called with a method name in a void context does not execute the receiver" # Expected "defined_specs_side_effects" == "not_executed" to be truthy but was false
   fails "The defined? keyword when called with a method name in a void context warns about the void context when parsing it" # Expected warning to match: /warning: possibly useless use of defined\? in void context/ but got: ""
-  fails "The defined? keyword when called with a method name without a receiver returns 'method' if the method is defined" # Expected false == true to be truthy but was false
   fails "The if expression when a branch syntactically does not return a value raises SyntaxError if both do not return a value" # Expected SyntaxError (/void value expression/) but no exception was raised ("m" was returned)
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with exclusive-end range" # NoMethodError: undefined method `collector' for #<MSpecEnv:0x7bd18>
   fails "The if expression with a boolean range ('flip-flop' operator) evaluates the first conditions lazily with inclusive-end range" # NoMethodError: undefined method `collector' for #<MSpecEnv:0x7bd18>
@@ -327,8 +311,6 @@ opal_filter "language" do
   fails "The unpacking splat operator (*) when applied to a BasicObject coerces it to Array if it respond_to?(:to_a)" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x4128>
   fails "The yield call taking a single argument yielding to a lambda should not destructure an Array into multiple arguments" # Expected ArgumentError but no exception was raised ([1, 2] was returned)
   fails "The yield call taking no arguments ignores assignment to the explicit block argument and calls the passed block" # Expected #<Proc:0x2b4c> == 42 to be truthy but was false
-  fails "Using yield in a singleton class literal raises a SyntaxError" # Expected SyntaxError (/Invalid yield/) but got: SyntaxError (undefined method `uses_block!' for nil)
-  fails "Using yield in non-lambda block raises a SyntaxError" # Expected SyntaxError (/Invalid yield/) but got: SyntaxError (undefined method `uses_block!' for nil)
   fails "a method definition that sets more than one default parameter all to the same value only allows overriding the default value of the first such parameter in each set" # Expected ArgumentError (wrong number of arguments (given 2, expected 0..1)) but got: ArgumentError ([MSpecEnv#foo] wrong number of arguments (given 2, expected -1))
   fails "a method definition that sets more than one default parameter all to the same value treats the argument after the multi-parameter normally" # Expected ArgumentError (wrong number of arguments (given 3, expected 0..2)) but got: ArgumentError ([MSpecEnv#bar] wrong number of arguments (given 3, expected -1))
   fails "self in a metaclass body (class << obj) raises a TypeError for symbols" # Expected TypeError but got: Exception (Cannot create property '$$meta' on string 'symbol')

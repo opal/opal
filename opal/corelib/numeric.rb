@@ -115,7 +115,7 @@ class ::Numeric
   end
 
   def quo(other)
-    ::Opal.coerce_to!(self, ::Rational, :to_r) / other
+    `Opal.coerce_to_or_raise(self, #{::Rational}, "to_r")` / other
   end
 
   def real
@@ -337,6 +337,8 @@ class ::Numeric
   end
 
   def infinite?
+    return -1 if `Number.NEGATIVE_INFINITY == self`
+    return 1 if `Number.POSITIVE_INFINITY == self`
     nil
   end
 

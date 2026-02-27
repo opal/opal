@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'tempfile'
 require 'tmpdir'
 require 'fileutils'
 
@@ -38,12 +37,12 @@ module Opal
         with_source_map: !(options[:no_source_map] || RUBY_ENGINE == 'opal')
       )
 
-      tempfile =
-        if debug
-          File.new("opal-system-runner.#{ext}", 'wb')
-        else
-          Tempfile.new(['opal-system-runner', ".#{ext}"], mode: File::BINARY)
-        end
+      file_name = if debug
+                    "opal-system-runner.#{ext}"
+                  else
+                    Dir::Tmpname.create('opal-system-runner') { |t| "#{t}.#{ext}" }
+                  end
+      tempfile = File.new(file_name, 'wb')
 
       tempfile.write code
       cmd = block.call tempfile

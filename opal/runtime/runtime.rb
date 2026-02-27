@@ -1,5 +1,10 @@
 require 'runtime/boot'
 
+require 'runtime/platform_support' # must be first
+require 'runtime/platforms/browsers'
+require 'runtime/platforms/node_compatible'
+require 'runtime/platforms/unknown' # must be last
+
 require 'runtime/variables'
 require 'runtime/exception'
 
@@ -22,5 +27,6 @@ require 'runtime/regexp'
 require 'runtime/bridge'
 
 require 'runtime/misc'
+require 'runtime/dir_file_io'
 
 require 'runtime/helpers'

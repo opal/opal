@@ -11,5 +11,5 @@ opal_filter "warnings" do
   fails "Predefined global $; warns if assigned non-nil" # Expected warning to match: /warning: `\$;' is deprecated/ but got: ""
   fails "Regexp.new given a Regexp does not honour options given as additional arguments" # Expected warning to match: /flags ignored/ but got: ""
   fails "Struct.new overwrites previously defined constants with string as first argument" # Expected warning to match: /constant/ but got: ""
-  fails "The for expression allows a constant as an iterator name" # Expected warning to match: /already initialized constant/ but got: ""  
+  fails "The for expression allows a constant as an iterator name" # Expected warning to match: /already initialized constant/ but got: ""
 end

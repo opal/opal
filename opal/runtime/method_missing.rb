@@ -36,8 +36,7 @@ module ::Opal
   # @return [undefined]
   def self.add_stubs(stubs)
     %x{
-      var proto = $BasicObject.$$prototype;
-      var stub, existing_method;
+      var proto = $BasicObject.$$prototype, stub, existing_method;
       stubs = stubs.split(',');
 
       for (var i = 0, length = stubs.length; i < length; i++) {

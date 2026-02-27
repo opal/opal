@@ -93,8 +93,6 @@ module ::Opal
   # Look for the constant just in the current cref or call `#const_missing`
   def self.const_get_local(cref, name, skip_missing)
     %x{
-      var result;
-
       if (cref == null) return;
 
       if (cref === '::') cref = $Object;
@@ -103,7 +101,7 @@ module ::Opal
         $raise(Opal.TypeError, cref.toString() + " is not a class/module");
       }
 
-      result = Opal.const_get_name(cref, name);
+      const result = Opal.const_get_name(cref, name);
       return result != null || skip_missing ? result : Opal.const_missing(cref, name);
     }
   end
@@ -131,7 +129,7 @@ module ::Opal
       }
 
       if ((cache = cref.$$const_cache) == null) {
-        $prop(cref, '$$const_cache', Object.create(null));
+        $prop(cref, '$$const_cache', { __proto__: null });
         cache = cref.$$const_cache;
       }
       cached = cache[name];
@@ -155,7 +153,7 @@ module ::Opal
       var cref = nesting[0], result, current_version = Opal.const_cache_version, cache, cached;
 
       if ((cache = nesting.$$const_cache) == null) {
-        $prop(nesting, '$$const_cache', Object.create(null));
+        $prop(nesting, '$$const_cache', { __proto__: null });
         cache = nesting.$$const_cache;
       }
       cached = cache[name];
@@ -262,6 +260,11 @@ module ::Opal
   def self.ancestors(mod)
     %x{
       if (!mod) { return []; }
+
+      if (!$has_own(mod, '$$ancestors')) {
+        $prop(mod, '$$ancestors', []);
+        $prop(mod, '$$ancestors_cache_version', null);
+      }
 
       if (mod.$$ancestors_cache_version === Opal.const_cache_version) {
         return mod.$$ancestors;

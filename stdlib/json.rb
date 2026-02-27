@@ -200,3 +200,23 @@ class Date
     to_s
   end
 end
+
+module ::Kernel
+  def JSON(object, opts = nil)
+    # If object is string-like, parse the string and return the parsed result as a Ruby data structure.
+    # Otherwise, generate a JSON text from the Ruby data structure object and return it.
+    if object.is_a?(::String)
+      JSON.parse(object)
+    else
+      object.to_json(opts)
+    end
+  end
+
+  def j(*objs)
+    objs.each { |o| puts JSON.generate(o) }
+  end
+
+  # def jj(**objs)
+  #   objs.each { |o| puts JSON.pretty_generate(o) }
+  # end
+end

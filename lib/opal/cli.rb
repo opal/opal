@@ -162,10 +162,38 @@ module Opal
 
       # --eval / stdin / file
       source = evals_or_file_source
-      builder.build_str(source, filename) if source
 
-      # --no-exit
-      builder.build_str '::Kernel.exit', '(exit)', no_export: true unless no_exit
+      if no_exit
+
+        # --no-exit
+        # --eval / stdin / file
+        builder.build_str(source, filename) if source
+
+      else
+
+        # --eval / stdin / file
+        fn = filename || '__main__'
+        sc = source || ';'
+
+        builder.build_str(sc, fn, requirable: true, load: false)
+
+        original_missing_require_severity = builder.missing_require_severity
+        builder.missing_require_severity = :ignore
+
+        # This exit code wraps the execution of the main script to be able catch SystemExit.
+        builder.build_str(<<~RUBY, '(entry)', no_export: true)
+          # backtick_javascript: true
+          begin
+            `Opal.load_normalized(#{Opal::Compiler.module_name(fn).inspect})`
+            ::Kernel.exit
+          rescue ::SystemExit => e
+            ::Opal.run_end_procs_and_exit e
+          end
+        RUBY
+
+        builder.missing_require_severity = original_missing_require_severity
+
+      end
 
       builder
     end

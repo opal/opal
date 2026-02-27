@@ -74,5 +74,5 @@ opal_filter "StringScanner" do
   fails "StringScanner#string= converts the argument into a string using #to_str" # Mock 'str' expected to receive to_str("any_args") exactly 1 times but received it 0 times
   fails "StringScanner#unscan raises a ScanError when the previous match had failed" # NameError: uninitialized constant ScanError
   fails "StringScanner#unscan set the scan pointer to the previous position" # Expected "This" == nil to be truthy but was false
-  fails "StringScanner.must_C_version returns self" # NoMethodError: undefined method `must_C_version' for StringScanner  
+  fails "StringScanner.must_C_version returns self" # NoMethodError: undefined method `must_C_version' for StringScanner
 end

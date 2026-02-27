@@ -16,10 +16,6 @@ In Opal, both integers and floats belong to same class `Number` (using JavaScrip
 
 `Number` is a subclass of `Numeric`, like `Complex` and `Rational`.
 
-#### Encodings ####
-
-Encodings only have a very small implementation inside Opal.
-
 #### Threads ####
 
 JavaScript does not have a native `Thread` implementation, so they are not present inside Opal. There is a placeholder `Thread` class just to provide some small level of compatibility with libraries that expect it. It does not have any function.

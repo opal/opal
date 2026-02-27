@@ -100,7 +100,7 @@ class ::Random
             return randomFloat() * limit;
           }
         } else {
-          limit = #{::Opal.coerce_to!(limit, ::Integer, :to_int)};
+          limit = Opal.coerce_to_or_raise(limit, Opal.Integer, "to_int");
 
           if (limit <= 0) {
             #{::Kernel.raise ::ArgumentError, "invalid argument - #{limit}"}

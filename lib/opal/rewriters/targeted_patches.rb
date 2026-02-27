@@ -57,7 +57,7 @@ module Opal
         # by 12.5%:
         #
         #     OPAL_CACHE_DISABLE=true OPAL_PREFORK_DISABLE=true bin/opal \
-        #         --no-source-map -ropal-parser -ropal/platform -ce \
+        #         --no-source-map -ropal-parser -ce \
         #         'puts ::Opal.compile($stdin.read)' > _Cnow.js
         #
         # So, in short, an array of a kind:

@@ -74,14 +74,16 @@ $failures = []
 
 ASCIIDOCTOR_REPO_BASE = ENV['ASCIIDOCTOR_REPO_BASE'] || 'https://github.com/asciidoctor'
 ASCIIDOCTOR_COMMIT = '869e8236'
-ASCIIDOCTOR_JS_COMMIT = '053fa0d3'
+# TODO: reset base to https://github.com/asciidoctor once asciidoctor.js PR#1753 is merged
+ASCIIDOCTOR_JS_REPO_BASE = ENV['ASCIIDOCTOR_JS_REPO_BASE'] || 'https://github.com/janbiedermann'
+ASCIIDOCTOR_JS_COMMIT = '3bdf345'
 # Selected asciidoctor versions were working on Aug 19 2021, feel free to update.
 S = OS.path_sep
 ASCIIDOCTOR_PREPARE = OS.bash_c(
   "pushd tmp#{S}performance",
   "git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor >#{OS.dev_null} 2>&1",
   "pushd asciidoctor", "git checkout #{ASCIIDOCTOR_COMMIT} >#{OS.dev_null} 2>&1", "popd",
-  "git clone #{ASCIIDOCTOR_REPO_BASE}/asciidoctor.js >#{OS.dev_null} 2>&1",
+  "git clone #{ASCIIDOCTOR_JS_REPO_BASE}/asciidoctor.js >#{OS.dev_null} 2>&1",
   "pushd asciidoctor.js", "git checkout #{ASCIIDOCTOR_JS_COMMIT} >#{OS.dev_null} 2>&1", "popd",
   "erb ../../tasks/performance/asciidoctor_test.rb.erb > asciidoctor_test.rb",
   "popd"
@@ -93,9 +95,7 @@ ASCIIDOCTOR_BUILD_OPAL = "#{'ruby ' if Gem.win_platform?}bin/opal --no-cache -c 
                          "-sconcurrent/map -sslim/include " \
                          "tmp/performance/asciidoctor_test.rb > tmp/performance/asciidoctor_test.js"
 ASCIIDOCTOR_RUN_RUBY = "bundle exec ruby -Itmp/performance/asciidoctor/lib tmp/performance/asciidoctor_test.rb"
-ASCIIDOCTOR_RUN_OPAL = { node: "node tmp/performance/asciidoctor_test.js",
-                        # bun:  "bun  tmp/performance/asciidoctor_test.js"
- }
+ASCIIDOCTOR_RUN_OPAL = { node: "node tmp/performance/asciidoctor_test.js" }
 
 # Generate V8 function optimization status report for corelib methods
 NODE_OPTSTATUS = if Gem.win_platform?
@@ -172,13 +172,13 @@ namespace :performance do
     puts
     puts "Comparison of the Asciidoctor (a real-life Opal application) compile and run:"
 
-    ASCIIDOCTOR_RUN_OPAL.each_key do |engine| 
+    ASCIIDOCTOR_RUN_OPAL.each_key do |engine|
       $failures << "Wrong result on the current branch for #{engine}" unless current[:correct][engine]
       $failures << "Wrong result on the previous branch for #{engine} - ignore it" unless previous[:correct][engine]
     end
 
     current[:compiler_time].compare_to(previous[:compiler_time], "Compile time")
-    ASCIIDOCTOR_RUN_OPAL.each_key do |engine| 
+    ASCIIDOCTOR_RUN_OPAL.each_key do |engine|
       current[:run_time][engine].compare_to(previous[:run_time][engine], "Run time on #{engine}")
     end
     current[:size         ].compare_to(previous[:size         ], "Bundle size")

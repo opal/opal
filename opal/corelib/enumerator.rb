@@ -34,7 +34,7 @@ class ::Enumerator
       @size   = `arguments[0] || nil`
 
       if @size && !@size.respond_to?(:call)
-        @size = `$coerce_to(#{@size}, #{::Integer}, 'to_int')`
+        @size = `$coerce_to(#{@size}, Opal.Integer, 'to_int')`
       end
     else
       @object = `arguments[0]`
@@ -60,7 +60,7 @@ class ::Enumerator
 
   def with_index(offset = 0, &block)
     offset = if offset
-               `$coerce_to(offset, #{::Integer}, 'to_int')`
+               `$coerce_to(offset, Opal.Integer, 'to_int')`
              else
                0
              end
