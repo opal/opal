@@ -214,6 +214,11 @@ module Opal
     # enabled by builder.
     compiler_option :cache_fragments, default: false, as: :cache_fragments?
 
+    # @!method bigint_integers?
+    #
+    # Use JavaScript BigInt for Ruby Integer literals instead of Number
+    compiler_option :bigint_integers, default: true, as: :bigint_integers?, magic_comment: true
+
     # Warn about impending compatibility break
     def backtick_javascript_or_warn?
       case backtick_javascript?
