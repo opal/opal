@@ -221,6 +221,51 @@ RSpec.describe Opal::Builder do
         file = builder.compile_to_directory(single_file: "opal/src/console.rb")
         expect(file).to eq(File.binread("#{__dir__}/../../stdlib/console.rb"))
       end
+
+      it 'handles require_tree' do
+        Dir.mktmpdir("opal-test-") do |dir|
+          builder_with_paths.build('fixtures/required_tree_dir/require_tree_test.rb')
+          builder.compile_to_directory(dir+"/UniqueString/")
+          files = Dir["#{dir}/**/*"].map { |i| i.split("/UniqueString/")[1] }.compact.reject { |i| !i.include?('fixtures') }
+          expected_files = %W[opal/#{ver}/fixtures
+                              opal/#{ver}/fixtures/required_tree_dir
+                              opal/#{ver}/fixtures/required_tree_dir/require_tree_test.map
+                              opal/#{ver}/fixtures/required_tree_dir/require_tree_test.#{ext}
+                              opal/#{ver}/fixtures/required_tree_dir/required_tree_test
+                              opal/#{ver}/fixtures/required_tree_dir/required_tree_test/required_file1.map
+                              opal/#{ver}/fixtures/required_tree_dir/required_tree_test/required_file1.#{ext}
+                              opal/#{ver}/fixtures/required_tree_dir/required_tree_test/required_file2.map
+                              opal/#{ver}/fixtures/required_tree_dir/required_tree_test/required_file2.#{ext}
+                              opal/src/fixtures
+                              opal/src/fixtures/required_tree_dir
+                              opal/src/fixtures/required_tree_dir/require_tree_test.rb
+                              opal/src/fixtures/required_tree_dir/required_tree_test
+                              opal/src/fixtures/required_tree_dir/required_tree_test/required_file1.rb
+                              opal/src/fixtures/required_tree_dir/required_tree_test/required_file2.rb]
+
+          # check if files exist
+          expect(files.sort).to eq(expected_files.sort)
+          # check if file with require_tree has been built correctly
+          root_file_contents = File.read(dir+"/UniqueString/opal/#{ver}/fixtures/required_tree_dir/require_tree_test.#{ext}")
+          imports = if esm?
+                      <<~JS
+                      import "../../opal.#{ext}";
+                      import "../required_tree_dir/required_tree_test/required_file1.#{ext}";
+                      import "../required_tree_dir/required_tree_test/required_file2.#{ext}";
+                      JS
+                    else
+                      <<~JS
+                      require("../../opal.#{ext}");
+                      require("../required_tree_dir/required_tree_test/required_file1.#{ext}");
+                      require("../required_tree_dir/required_tree_test/required_file2.#{ext}");
+                      JS
+                    end
+          expect(root_file_contents.start_with?(imports)).to be true
+
+          # check if its executed correctly, in order
+          expect(`node #{dir+"/UniqueString/index."+ext}`).to eq "1\n2\n5\n"
+        end
+      end
     end
 
     context 'with ESM enabled' do
