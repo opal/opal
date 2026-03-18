@@ -1,15 +1,32 @@
 require 'lib/spec_helper'
+require 'fileutils'
 require 'open3'
 require 'opal/os'
+require 'tmpdir'
 
 RSpec.describe "rake dist" do
   before :all do
-    system "rake dist >#{Opal::OS.dev_null}"
+    @build_dir = Dir.mktmpdir('opal-dist-spec-')
+    built = system(
+      {
+        'DIR' => @build_dir,
+        'FILES' => 'opal,opal/mini,opal/full,opal-replutils',
+        'FORMATS' => 'js',
+      },
+      'rake', 'dist',
+      out: Opal::OS.dev_null
+    )
+
+    raise 'rake dist failed for spec/lib/rake_dist_spec.rb' unless built
+  end
+
+  after :all do
+    FileUtils.remove_entry(@build_dir) if @build_dir
   end
 
   def run_with_node(code, precode:, requires:)
     requires = requires.map do |i|
-      "require('./build/#{i}');"
+      "require(#{File.join(@build_dir, i).inspect});"
     end.join
 
     code = "#{requires};#{precode};console.log(#{code});"

@@ -1,6 +1,8 @@
 require 'lib/spec_helper'
 require 'opal/cli'
 require 'opal/cli_options'
+require 'open3'
+require 'rbconfig'
 require 'stringio'
 require 'tmpdir'
 
@@ -10,7 +12,7 @@ RSpec.describe Opal::CLI do
   subject(:cli) { described_class.new(options) }
 
   context 'with a file' do
-    let(:options) { {argv: [file]} }
+    let(:options) { { argv: [file], runner_options: { no_source_map: true } } }
 
     it 'runs the file' do
       expect_output_of{ subject.run }.to eq("hi from opal!\n")
@@ -34,19 +36,19 @@ RSpec.describe Opal::CLI do
       end
 
       context 'with lib_only: true and opal require' do
-        let(:options) { super().merge lib_only: true }
+        let(:options) { super().merge lib_only: true, runner: :compiler }
 
         it 'does not raise an error' do
-          expect{subject.run}.not_to raise_error
+          expect { output_of { subject.run } }.not_to raise_error
         end
       end
     end
 
     context 'with one eval' do
-      let(:options) { {evals: ['puts "hello"']} }
+      let(:options) { { evals: ['puts "hello"'], runner: :compiler, skip_opal_require: true, no_exit: true } }
 
-      it 'executes the code' do
-        expect_output_of{ subject.run }.to eq("hello\n")
+      it 'compiles the code' do
+        expect(output_of { subject.run }).to include('.$puts("hello")')
       end
 
       context 'with lib_only: true' do
@@ -59,10 +61,13 @@ RSpec.describe Opal::CLI do
     end
 
     context 'with many evals' do
-      let(:options) { {evals: ['puts "hello"', 'puts "ciao"']} }
+      let(:options) { { evals: ['puts "hello"', 'puts "ciao"'], runner: :compiler, skip_opal_require: true, no_exit: true } }
 
-      it 'executes the code' do
-        expect_output_of{ subject.run }.to eq("hello\nciao\n")
+      it 'compiles the code in order' do
+        output = output_of { subject.run }
+
+        expect(output).to include('.$puts("hello")')
+        expect(output).to include('.$puts("ciao")')
       end
     end
 
@@ -79,14 +84,14 @@ RSpec.describe Opal::CLI do
 
   describe ':no_exit option' do
     context 'when false' do
-      let(:options) { {no_exit: false, runner: :compiler, evals: ['']} }
+      let(:options) { { no_exit: false, runner: :compiler, evals: [''], skip_opal_require: true } }
       it 'appends a Kernel#exit at the end of the source' do
         expect_output_of{ subject.run }.to include(".$exit()")
       end
     end
 
     context 'when true' do
-      let(:options) { {no_exit: true, runner: :compiler, evals: ['']} }
+      let(:options) { { no_exit: true, runner: :compiler, evals: [''], skip_opal_require: true } }
       it 'appends a Kernel#exit at the end of the source' do
         expect_output_of{ subject.run }.not_to include(".$exit();")
       end
@@ -118,18 +123,18 @@ RSpec.describe Opal::CLI do
 
   describe ':requires options' do
     context 'with an absolute path' do
-      let(:options) { {:requires => [file], :evals => ['']} }
+      let(:options) { { requires: [file], evals: [''], runner: :compiler, skip_opal_require: true, no_exit: true } }
       it 'requires the file' do
-        expect_output_of{ subject.run }.to eq("hi from opal!\n")
+        expect(output_of { subject.run }).to include('.$puts("hi from opal!")')
       end
     end
 
     context 'with a path relative to a load path' do
       let(:dir)      { File.dirname(file) }
       let(:filename) { File.basename(file) }
-      let(:options)  { {:load_paths => [dir], :requires => [filename], :evals => ['']} }
+      let(:options)  { { load_paths: [dir], requires: [filename], evals: [''], runner: :compiler, skip_opal_require: true, no_exit: true } }
       it 'requires the file' do
-        expect_output_of{ subject.run }.to eq("hi from opal!\n")
+        expect(output_of { subject.run }).to include('.$puts("hi from opal!")')
       end
     end
   end
@@ -167,10 +172,13 @@ RSpec.describe Opal::CLI do
       let(:dir)      { File.dirname(file) }
       let(:filename) { File.basename(file) }
       let(:stub_name) { 'an_unparsable_lib' }
-      let(:options)  { {:stubs => [stub_name], :evals => ["require #{stub_name.inspect}"]} }
+      let(:options) { { stubs: [stub_name], evals: ["require #{stub_name.inspect}"], runner: :compiler, skip_opal_require: true, no_exit: true } }
 
-      it "adds the gem's lib paths to Opal.path" do
-        expect_output_of{ subject.run }.to eq('')
+      it 'stubs the required file as an empty module' do
+        output = output_of { subject.run }
+
+        expect(output).to include(%{Opal.modules["#{stub_name}"] = Opal.return_val(Opal.nil)})
+        expect(output).to include(%{.$require("#{stub_name}")})
       end
     end
   end
@@ -185,11 +193,13 @@ RSpec.describe Opal::CLI do
 
   describe ':runner option' do
     context 'when :compile' do
-      let(:options)  { {runner: :compiler, evals: ['puts 2342']} }
+      let(:options) { { runner: :compiler, evals: ['puts 2342'], skip_opal_require: true } }
 
       it 'outputs the compiled javascript' do
-        expect_output_of{ subject.run }.to include(".$puts(2342)")
-        expect_output_of{ subject.run }.not_to include("2342\n")
+        output = output_of { subject.run }
+
+        expect(output).to include('.$puts(2342)')
+        expect(output).not_to include("2342\n")
       end
 
       context 'with the :map_file runner option' do
@@ -198,8 +208,10 @@ RSpec.describe Opal::CLI do
         let(:options) { super().merge(runner_options: runner_options) }
 
         it 'writes the map file to the specified path' do
-          expect_output_of{ subject.run }.to include(".$puts(2342)")
-          expect_output_of{ subject.run }.not_to include("2342\n")
+          output = output_of { subject.run }
+
+          expect(output).to include('.$puts(2342)')
+          expect(output).not_to include("2342\n")
           expect(File.read(map_file)).to include(%{"version":3})
         end
       end
@@ -211,9 +223,9 @@ RSpec.describe Opal::CLI do
   describe ':load_paths options' do
     let(:dir)      { File.dirname(file) }
     let(:filename) { File.basename(file) }
-    let(:options)  { {:load_paths => [dir], :requires => [filename], :evals => ['']} }
+    let(:options)  { { load_paths: [dir], requires: [filename], evals: [''], runner: :compiler, skip_opal_require: true, no_exit: true } }
     it 'requires files' do
-      expect_output_of{ subject.run }.to eq("hi from opal!\n")
+      expect(output_of { subject.run }).to include('.$puts("hi from opal!")')
     end
   end
 
@@ -233,7 +245,7 @@ RSpec.describe Opal::CLI do
         end
       CODE
     end
-    let(:options) { { parse_comments: true, evals: [code], runner: :compiler } }
+    let(:options) { { parse_comments: true, evals: [code], runner: :compiler, no_exit: true, skip_opal_require: true } }
 
     it 'sets $$comment prop for compiled methods' do
       expect_output_of { subject.run }.to include('$$comments: ["# multiline", "# comment"]')
@@ -242,7 +254,7 @@ RSpec.describe Opal::CLI do
 
   describe ':enable_source_location' do
     let(:file) { File.expand_path('../fixtures/source_location_test.rb', __FILE__) }
-    let(:options) { { enable_source_location: true, runner: :compiler, argv: [file] } }
+    let(:options) { { enable_source_location: true, runner: :compiler, argv: [file], no_exit: true, skip_opal_require: true } }
 
     it 'sets $$source_location prop for compiled methods' do
       expect_output_of { subject.run }.to include("source_location_test.rb', 6]")
@@ -261,13 +273,31 @@ RSpec.describe Opal::CLI do
 
   context 'using pipes' do
     it 'runs the provided source' do
-      # `echo` on windows will output double-quotes along with the contents, that's why we print with ruby
-      expect(`ruby -e"puts 'foo'" | ruby bin/opal -ropal/platform -e "puts gets.reverse"`.strip).to eq("oof")
+      output, = Open3.capture2(
+        RbConfig.ruby,
+        'bin/opal',
+        '--no-source-map',
+        '-ropal/platform',
+        '-e',
+        'puts gets.reverse',
+        stdin_data: "foo\n"
+      )
+
+      expect(output.strip).to eq('oof')
     end
 
     it 'compiles the provided source' do
-      # `echo` on windows will output double-quotes along with the contents, that's why we print with ruby
-      expect(`ruby -e"puts 'puts 123'" | ruby bin/opal -cEO`.strip).to include("self.$puts(123)")
+      output, = Open3.capture2(
+        RbConfig.ruby,
+        'bin/opal',
+        '--no-source-map',
+        '-c',
+        '-E',
+        '-O',
+        stdin_data: "puts 123\n"
+      )
+
+      expect(output.strip).to include('self.$puts(123)')
     end
 
     # TODO: test refreshes with the server runner (only way to ensure we correctly rewind or cache the eval contents)
@@ -320,6 +350,10 @@ RSpec.describe Opal::CLI do
   def expect_output_of
     @output, _result = output_and_result_of { yield }
     expect(@output)
+  end
+
+  def output_of(&block)
+    output_and_result_of(&block).first
   end
 
   def output_and_result_of
