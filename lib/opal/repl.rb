@@ -76,8 +76,8 @@ module Opal
     end
 
     def eval_ruby(code)
-      builder = Opal::Builder.new
-      silencer = Silencer.new
+      builder = build_repl_builder
+      silencer = (@silencer ||= Silencer.new)
 
       code = "#{@incomplete}#{code}"
       if code.start_with? 'ls '
@@ -134,6 +134,10 @@ module Opal
       'unexpected token $end',
       'unterminated string meets end of file'
     ].freeze
+
+    def build_repl_builder
+      (@builder_template ||= Opal::Builder.new).dup
+    end
 
     class Silencer
       def initialize

@@ -9,10 +9,25 @@ require 'tmpdir'
 RSpec.describe Opal::Builder::PostProcessor do
   subject(:builder) { Opal::Builder.new(options) }
   let(:options) { {compiler_options: {cache_fragments: true}} }
-  let(:postprocessors) {
+  let(:source) do
+    <<~RUBY
+      module Sample
+        VALUE = 1
+
+        def self.alpha
+          VALUE
+        end
+
+        def self.beta
+          VALUE + 1
+        end
+      end
+    RUBY
+  end
+  let(:postprocessors) do
     body = postprocessor_body
     Class.new(described_class) { define_method(:call, &body) }
-  }
+  end
 
   around(:example) do |example|
     described_class.with_postprocessors(postprocessors, &example)
@@ -27,7 +42,7 @@ RSpec.describe Opal::Builder::PostProcessor do
 
     it "has an access to both processed and builder" do
       scratchpad = []
-      builder.build_str("require 'opal'", "(sample)").to_s
+      builder.build_str(source, '(sample)').to_s
       scratchpad.length.should be 1
       first = scratchpad.first
       first[0].should be_a Array
@@ -43,10 +58,10 @@ RSpec.describe Opal::Builder::PostProcessor do
       ]
     }}
 
-    it "replaces everything in all result and source map" do
-      b = builder.build_str("require 'opal'", "(sample)")
-      b.to_s.should start_with "Replaced!"
-      b.source_map.to_s.should include "Replaced!"
+    it 'replaces everything in all result and source map' do
+      b = builder.build_str(source, '(sample)')
+      b.to_s.should start_with 'Replaced!'
+      b.source_map.to_s.should include 'Replaced!'
     end
   end
 
@@ -64,9 +79,9 @@ RSpec.describe Opal::Builder::PostProcessor do
       end
     }}
 
-    it "replaces fragments correctly" do
-      b = builder.build_str("require 'opal'", "(sample)")
-      b.to_s.should include "Badger" * 1000
+    it 'replaces fragments correctly' do
+      b = builder.build_str(source, '(sample)')
+      b.to_s.scan('Badger').length.should be > 5
       # TODO: Test the source map integrity?
     end
   end

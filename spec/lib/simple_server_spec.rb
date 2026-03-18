@@ -56,7 +56,10 @@ RSpec.describe Opal::SimpleServer do
     end
 
     it 'takes a :main option to set the main asset' do
-      self.app = described_class.new(main: 'opal_file')
+      builder = -> do
+        Opal::Builder.new(compiler_options: { directory: directory?, esm: esm? })
+      end
+      self.app = described_class.new(main: 'opal_file', builder: builder)
       expect(get('/').body).to include("src=\"/assets/opal_file.#{ext}")
     end
 
