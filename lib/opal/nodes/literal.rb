@@ -31,7 +31,11 @@ module Opal
       children :value
 
       def compile
-        push value.to_s
+        if type == :int && compiler.bigint_integers?
+          push "#{value}n"
+        else
+          push value.to_s
+        end
         wrap '(', ')' if recv?
       end
 
