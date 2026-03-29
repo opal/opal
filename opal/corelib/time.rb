@@ -422,6 +422,7 @@ class ::Time < `Date`
   end
 
   def zone
+    return `self.$$zone_name` if `self.$$zone_name !== undefined`
     %x{
       if (self.timezone === 0) return "UTC";
       else if (self.timezone != null) return nil;
@@ -469,6 +470,59 @@ class ::Time < `Date`
 
   def gmt_offset
     `(self.timezone != null) ? self.timezone * 60 : -self.getTimezoneOffset() * 60`
+  end
+
+  def _dump(_level = 0)
+    high = (1 << 31)
+    high |= (gmt? ? 1 : 0) << 30
+    high |= (year - 1900) << 14
+    high |= (mon - 1) << 10
+    high |= mday << 5
+    high |= hour
+
+    low = (min << 26) | (sec << 20) | usec
+
+    %x{
+      return String.fromCharCode(
+        high & 0xff,
+        (high >> 8) & 0xff,
+        (high >> 16) & 0xff,
+        (high >> 24) & 0xff,
+        low & 0xff,
+        (low >> 8) & 0xff,
+        (low >> 16) & 0xff,
+        (low >> 24) & 0xff
+      );
+    }
+  end
+
+  def self._load(str)
+    bytes = str.bytes
+    high = bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)
+    high &= 0xffffffff
+    low  = bytes[4] | (bytes[5] << 8) | (bytes[6] << 16) | (bytes[7] << 24)
+    low &= 0xffffffff
+
+    if (high & (1 << 31)) != 0
+      gmt = (high >> 30) & 1
+      year = ((high >> 14) & 0x3fff) + 1900
+      mon  = ((high >> 10) & 0xf) + 1
+      mday = (high >> 5) & 0x1f
+      hour = high & 0x1f
+      min  = (low >> 26) & 0x3f
+      sec  = (low >> 20) & 0x3f
+      usec = low & ((1 << 20) - 1)
+      frac = usec / 1_000_000.0
+      if gmt == 1
+        Time.utc(year, mon, mday, hour, min, sec + frac)
+      else
+        Time.local(year, mon, mday, hour, min, sec + frac)
+      end
+    else
+      sec = high
+      usec = low
+      Time.at(sec + usec / 1_000_000.0)
+    end
   end
 
   def strftime(format)
