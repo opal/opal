@@ -242,7 +242,15 @@ module Opal
           abs_base_path = Pathname(abs_base_path)
           entries_glob  = Pathname(abs_tree_path).join('**', "*{.js,}.{#{extensions.join ','}}")
 
-          Pathname.glob(entries_glob).map { |file| file.relative_path_from(abs_base_path).to_s }
+          Pathname.glob(entries_glob).map do |file|
+            if file.extname == '.rb'
+              # remove .rb extension so file can be found in already_processed
+              # to prevent multiple inclusion of assets
+              file.relative_path_from(abs_base_path).to_s.delete_suffix('.rb')
+            else
+              file.relative_path_from(abs_base_path).to_s
+            end
+          end
         else
           [] # the tree is not part of any known base path
         end
