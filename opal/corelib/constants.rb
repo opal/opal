@@ -1,7 +1,7 @@
 ::RUBY_PLATFORM       = 'opal'
 ::RUBY_ENGINE         = 'opal'
 ::RUBY_VERSION        = '3.2.0'
-::RUBY_ENGINE_VERSION = '1.8.3'
+::RUBY_ENGINE_VERSION = '1.8.4.rc1'
 ::RUBY_RELEASE_DATE   = '2026-05-01'
 ::RUBY_PATCHLEVEL     = 0
 ::RUBY_REVISION       = '0'
