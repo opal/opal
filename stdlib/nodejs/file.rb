@@ -207,7 +207,7 @@ class File < IO
       try {
         __fs__.accessSync(path, __fs__.R_OK);
         return true;
-      } catch {
+      } catch (e) {
         return false;
       }
     }

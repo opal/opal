@@ -79,7 +79,7 @@ module REPLUtils
           if (!colorize) json = #{ColorPrinter.colorize(`json`)}
           return "=> " + $_result.toString() + " => " + json;
         }
-        catch {
+        catch (e) {
           return "=> " + $_result.toString();
         }
       }

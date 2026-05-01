@@ -5,14 +5,18 @@ export default [
   js.configs.recommended,
   {
     languageOptions: {
-      ecmaVersion: 12,
+      ecmaVersion: 3,
       sourceType: "commonjs",
+      parserOptions: {
+          allowReserved: true,
+      },
       globals: {
           ...globals.browser,
           ...globals.node,
           ArrayBuffer: "readonly",
           DataView: "readonly",
           globalThis: "readonly",
+          JSON: "readonly",
           Opal: "readonly",
           Promise: "readonly",
           Proxy: "readonly",
@@ -28,6 +32,7 @@ export default [
       "no-unused-vars": ["error", {
           varsIgnorePattern: "($($|$$|yield|post_args|[a-z])|self)",
           argsIgnorePattern: "($($|$$|yield|post_args|[a-z])|self)",
+          caughtErrorsIgnorePattern: "^e$",
       }],
 
       "no-extra-semi": "off",

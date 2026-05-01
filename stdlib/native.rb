@@ -24,7 +24,7 @@ module Native
       try {
         return #{object} instanceof #{try_convert(klass)};
       }
-      catch {
+      catch (e) {
         return false;
       }
     }

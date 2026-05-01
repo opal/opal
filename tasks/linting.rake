@@ -18,7 +18,7 @@ namespace :lint do
     es8, es3 = files.partition { |i| i.include? "await" }
 
     [es3, es8].each do |files|
-      config = (files == es8) ? ["-c", __dir__+"/../.eslintrc.await.js"] : []
+      config = (files == es8) ? ["-c", __dir__+"/../eslint.await.config.mjs"] : []
 
       sh "yarn", "run", "eslint", *config, *files, "--format", "json", "--output-file", result_path do |ok, _|
         if ok

@@ -2243,7 +2243,7 @@
     // an exception is thrown breaking Opal altogether.
     try {
       Object.defineProperty(wrapped, 'length', { value: body.length });
-    } catch {}
+    } catch (e) {}
 
     wrapped.$$arity           = body.$$arity == null ? body.length : body.$$arity;
     wrapped.$$parameters      = body.$$parameters;
