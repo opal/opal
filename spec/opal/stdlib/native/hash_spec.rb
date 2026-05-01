@@ -78,6 +78,14 @@ describe Hash do
     expect(hash).to eq({ foo: { bar: { baz: 'baz' } } })
   end
 
+  it 'returns proper values when building a Hash from a JS object with a Hash' do
+    # see github issue #2670
+    h = { a: "A" }
+    g = Hash.new(`{ h: #{h} }`)
+    expect(g['h']['b']).to eq(nil)
+    expect(g['h'][:a]).to eq("A")
+  end
+
   describe '#to_n' do
     it 'converts a hash with native objects as values' do
       obj = { 'a_key' => `{ key: 1 }` }
