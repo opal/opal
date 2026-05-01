@@ -56,6 +56,8 @@ module Opal
       compiler_options = {}
       config_options.each do |name, options|
         compiler_option_name = options.fetch(:compiler)
+        next unless compiler_option_name
+
         compiler_options[compiler_option_name] = config.fetch(name)
       end
       compiler_options
