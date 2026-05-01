@@ -339,7 +339,7 @@ module ::JS
       warn '[Opal] JS::Error class has been renamed to Opal::Raw::Error and will change semantics in Opal 2.1. ' \
            'To ensure forward compatibility, please update your rescue clauses.'
 
-      ::JS::Raw::Error
+      ::Opal::Raw::Error
     else
       super
     end
