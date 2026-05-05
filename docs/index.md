@@ -20,6 +20,10 @@ Everything you need to know to install Opal and create your first application.
 
 Discover how to access JavaScript environment from Ruby code.
 
+#### [Opal::JS](opal_js.html)
+
+Use the modern `Opal::JS` interface to access JavaScript from Ruby and expose Ruby objects to JavaScript.
+
 #### [Async](async.html)
 
 Learn more about JavaScript `async`/`await` support in Opal and how you can use it to avoid explicit callbacks and promises.
@@ -129,4 +133,3 @@ This guide provides steps to be followed when you upgrade your applications to a
 #### [Releasing Instructions](releasing.html)
 
 (WIP) A step-by-step guide on who to release a new version of Opal.
-
