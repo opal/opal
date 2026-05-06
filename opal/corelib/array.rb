@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze, opal32_init, opal32_add
+# helpers: truthy, falsy, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze, slice, opal32_init, opal32_add
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -33,6 +33,8 @@ class ::Array < `Array`
       list.pop();
       return r;
     }
+
+    var arraySlice = $slice;
 
     function toArraySubclass(obj, klass) {
       if (klass.$$name === Opal.Array) {
@@ -379,7 +381,7 @@ class ::Array < `Array`
         to += 1;
       }
 
-      result = self.slice(from, to);
+      result = arraySlice(self, from, to);
       return result;
     }
 
@@ -435,7 +437,7 @@ class ::Array < `Array`
           return nil;
         }
 
-        result = self.slice(index, index + length);
+        result = arraySlice(self, index, index + length);
       }
       return result;
     }
@@ -991,7 +993,7 @@ class ::Array < `Array`
         #{::Kernel.raise ::ArgumentError}
       }
 
-      return self.slice(number);
+      return arraySlice(self, number);
     }
   end
 
@@ -1001,7 +1003,7 @@ class ::Array < `Array`
           self.$$class.$allocate.$$pristine &&
           self.$copy_instance_variables.$$pristine &&
           self.$initialize_dup.$$pristine) {
-        return self.slice(0);
+        return arraySlice(self, 0);
       }
     }
 
@@ -1212,7 +1214,7 @@ class ::Array < `Array`
         #{::Kernel.raise ::ArgumentError, 'negative array size'};
       }
 
-      return self.slice(0, count);
+      return arraySlice(self, 0, count);
     }
   end
 
@@ -1853,7 +1855,7 @@ class ::Array < `Array`
   end
 
   def reverse
-    `self.slice(0).reverse()`
+    `arraySlice(self, 0).reverse()`
   end
 
   def reverse!
