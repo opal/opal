@@ -703,7 +703,7 @@ class ::Array < `Array`
   def clear
     `$deny_frozen_access(self)`
 
-    `self.splice(0, self.length)`
+    `self.length = 0`
 
     self
   end
@@ -901,25 +901,32 @@ class ::Array < `Array`
 
   def delete(object)
     %x{
-      var original = self.length;
+      var original = self.length, length = original, write = 0, changed = false, item, match;
 
-      for (var i = 0, length = original; i < length; i++) {
-        if (#{`self[i]` == object}) {
-          $deny_frozen_access(self);
+      for (var i = 0; i < length; i++) {
+        item = self[i];
+        match = #{`item` == object};
 
-          self.splice(i, 1);
-
-          length--;
-          i--;
+        if (match) {
+          if (!changed) {
+            $deny_frozen_access(self);
+            changed = true;
+          }
+        } else if (changed) {
+          self[write] = item;
         }
+
+        if (!match) write++;
       }
 
-      if (self.length === original) {
+      if (!changed) {
         if (#{block_given?}) {
           return #{yield};
         }
         return nil;
       }
+
+      self.length = write;
       return object;
     }
   end
