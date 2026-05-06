@@ -154,11 +154,11 @@ class ::String < `String`
     }
 
     function starts_with(str, prefix) {
-      return (str.length >= prefix.length && !ends_with_high_surrogate(prefix) && str.startsWith(prefix));
+      return (str.length >= prefix.length && str.startsWith(prefix) && !ends_with_high_surrogate(prefix));
     }
 
     function ends_with(str, suffix) {
-      return (str.length >= suffix.length && !starts_with_low_surrogate(suffix) && str.endsWith(suffix));
+      return (str.length >= suffix.length && str.endsWith(suffix) && !starts_with_low_surrogate(suffix));
     }
 
     let GRAPHEME_SEGMENTER; // initialized on demand by #each_grapheme_cluster below using:
@@ -1156,7 +1156,8 @@ class ::String < `String`
   def end_with?(*suffixes)
     %x{
       for (let i = 0, length = suffixes.length; i < length; i++) {
-        let suffix = $coerce_to(suffixes[i], #{::String}, 'to_str').$to_s();
+        let suffix = suffixes[i];
+        if (!suffix.$$is_string) suffix = $coerce_to(suffix, #{::String}, 'to_str').$to_s();
         if (ends_with(self, suffix)) return true;
       }
     }
@@ -1923,7 +1924,8 @@ class ::String < `String`
             #{$~ = nil}
           }
         } else {
-          let prefix = $coerce_to(prefixes[i], #{::String}, 'to_str').$to_s();
+          let prefix = prefixes[i];
+          if (!prefix.$$is_string) prefix = $coerce_to(prefix, #{::String}, 'to_str').$to_s();
           // this is correct behavior since ruby 3.3
           // specs work when RUBY_VERSION is set to at least 3.3
           if (starts_with(self, prefix) || prefix.length === 0) return true;
