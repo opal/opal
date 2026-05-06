@@ -169,6 +169,11 @@ describe 'Opal.$' do
     `Opal.$.OpalJSSpecExport.invokeWithDefault(Opal.$.OpalJSSpecExport.call)`.should == 'called final member'
   end
 
+  it 'caches concrete member facades but not unresolved member misses' do
+    `Opal.$.OpalJSSpecExport.call === Opal.$.OpalJSSpecExport.call`.should == true
+    `Opal.$.OpalJSSpecExport.__missing_member__ === Opal.$.OpalJSSpecExport.__missing_member__`.should == false
+  end
+
   it 'supports instanceof through Symbol.hasInstance' do
     `Opal.global.__opal_export_spec = new Opal.$.OpalJSSpecExport()`
     `Opal.global.__opal_export_spec instanceof Opal.$.OpalJSSpecExport`.should == true

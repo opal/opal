@@ -58,9 +58,9 @@
     }
 
     function memberFor(receiver, rubyName) {
-      var receiverCache, proxy;
+      var cacheable = typeof receiver['$' + rubyName] === 'function', receiverCache, proxy;
 
-      if (memberCache) {
+      if (cacheable && memberCache) {
         receiverCache = memberCache.get(receiver);
         if (!receiverCache) memberCache.set(receiver, receiverCache = Object.create(null));
         if (receiverCache[rubyName]) return receiverCache[rubyName];
