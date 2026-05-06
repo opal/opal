@@ -21,6 +21,14 @@ class ::String < `String`
       return String.fromCodePoint(str.codePointAt(0));
     }
 
+    function has_surrogate(str) {
+      for (let i = 0; i < str.length; i++) {
+        let code = str.charCodeAt(i);
+        if (code >= 0xD800 && code <= 0xDFFF) return true;
+      }
+      return false;
+    }
+
     // UTF-16 aware find_index_of, args:
     //   str: string
     //   search: the string to search for in str
@@ -1276,6 +1284,7 @@ class ::String < `String`
         other = $coerce_to(other, #{::String}, 'to_str');
       }
       if (other.length === 0) return true;
+      if (!has_surrogate(other)) return self.indexOf(other) !== -1;
       return find_index_of(self, other) !== -1;
     }
   end
