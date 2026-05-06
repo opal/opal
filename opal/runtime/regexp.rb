@@ -36,7 +36,26 @@ module ::Opal
 
   # Transform a regular expression from Ruby syntax to JS syntax.
   def self.transform_regexp(regexp, flags)
-    Opal::RegexpTranspiler.transform_regexp(regexp, flags)
+    %x{
+      flags = flags || '';
+
+      var cache = Opal.regexp_transform_cache;
+      if (cache === undefined) {
+        cache = Opal.regexp_transform_cache = { map: new Map(), keys: [] };
+      }
+
+      var key = flags + '\0' + regexp;
+      var cached = cache.map.get(key);
+      if (cached !== undefined) return cached.slice();
+    }
+
+    result = Opal::RegexpTranspiler.transform_regexp(regexp, flags)
+    %x{
+      cache.map.set(key, result.slice());
+      cache.keys.push(key);
+      if (cache.keys.length > 256) cache.map.delete(cache.keys.shift());
+    }
+    result
   end
 
   # Combine multiple regexp parts together
