@@ -166,7 +166,7 @@
   // -----
 
   var $truthy = Opal.truthy = function(val) {
-    return false !== val && nil !== val && undefined !== val && null !== val && (!(val instanceof Boolean) || true === val.valueOf());
+    return false !== val && nil !== val && val != null;
   };
 
   Opal.falsy = function(val) {
