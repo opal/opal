@@ -26,7 +26,10 @@ module ::Opal
     %x{
       let res = arguments[0];
       if (arguments.length > 1) {
-        for (let i = 1; i < arguments.length; i++) { res = res["$+"](arguments[i]); }
+        for (let i = 1; i < arguments.length; i++) {
+          let part = arguments[i];
+          res = (typeof res === 'string' && typeof part === 'string') ? res + part : res["$+"](part);
+        }
       } else if (typeof res === "string") {
         res = Opal.str(res);
       }
