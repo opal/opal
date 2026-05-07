@@ -551,7 +551,7 @@ class ::String < `String`
   end
 
   def +(other)
-    other = `$coerce_to(#{other}, #{::String}, 'to_str')`
+    other = `#{other}.$$is_string ? #{other} : $coerce_to(#{other}, #{::String}, 'to_str')`
     %x{
       if (other.length === 0 && self.$$class === Opal.String) return self;
       if (self.length === 0 && other.$$class === Opal.String) return other;
