@@ -107,9 +107,13 @@ class ::Struct
         ::Kernel.raise ::ArgumentError, 'struct size differs'
       end
 
-      self.class.members.each_with_index do |name, index|
-        self[name] = args[index]
-      end
+      %x{
+        var members = #{self.class.members}, i, name;
+        for (i = 0; i < members.length; i++) {
+          name = members[i];
+          self.$$data[name] = args[i] === undefined ? nil : args[i];
+        }
+      }
     end
   end
 
