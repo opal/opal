@@ -1285,7 +1285,8 @@ class ::String < `String`
         other = $coerce_to(other, #{::String}, 'to_str');
       }
       if (other.length === 0) return true;
-      if (!has_surrogate(other)) return self.indexOf(other) !== -1;
+      if (self.indexOf(other) === -1) return false;
+      if (!has_surrogate(other)) return true;
       return find_index_of(self, other) !== -1;
     }
   end
