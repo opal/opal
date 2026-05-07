@@ -131,7 +131,7 @@ module Opal
         end
 
         def prepare_post_args
-          if @args.has_post_args?
+          if @args.has_post_args? && !rest_param_eligible?
             @initialization << s(:prepare_post_args, @args.args.length)
           end
         end
@@ -194,13 +194,29 @@ module Opal
         def extract_restarg
           if (arg = @args.restarg)
             arg_name = arg.children[0]
-            @initialization << arg.updated(:extract_restarg, [arg_name, args_to_keep])
-            @inline << s(:fake_arg)
+            if rest_param_eligible?
+              @inline << s(:fake_arg, arg_name || '$rest_arg', :rest)
+            else
+              @initialization << arg.updated(:extract_restarg, [arg_name, args_to_keep])
+              @inline << s(:fake_arg)
+            end
           end
         end
 
         def args_to_keep
           @args.postargs.length
+        end
+
+        def rest_param_eligible?
+          unless defined?(@rest_param_eligible)
+            @rest_param_eligible = @type != :iter &&
+                                   @args.restarg &&
+                                   @args.optargs.empty? &&
+                                   @args.postargs.empty? &&
+                                   !@args.has_any_kwargs?
+          end
+
+          @rest_param_eligible
         end
       end
     end
