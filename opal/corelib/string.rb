@@ -1823,6 +1823,7 @@ class ::String < `String`
           match,
           match_count = 0,
           valid_result_length = 0,
+          string_pattern = false,
           i, max;
 
       if (pattern.$$is_regexp) {
@@ -1837,6 +1838,23 @@ class ::String < `String`
           if (string.length === 0) return [];
         } else if (pattern.length > 0 && (starts_with_low_surrogate(pattern) || ends_with_high_surrogate(pattern))) {
           result = [string];
+        } else {
+          string_pattern = true;
+        }
+      }
+
+      if (!result && string_pattern && pattern.length > 0 && limit !== 0) {
+        if (limit < 0) {
+          result = string.split(pattern);
+        } else {
+          result = [];
+          while (result.length + 1 < limit) {
+            i = string.indexOf(pattern, index);
+            if (i === -1) break;
+            result.push(string.slice(index, i));
+            index = i + pattern.length;
+          }
+          result.push(string.slice(index));
         }
       }
 
