@@ -161,6 +161,10 @@ class ::String < `String`
       return (str.length >= suffix.length && str.endsWith(suffix) && !starts_with_low_surrogate(suffix));
     }
 
+    function is_ascii_trim_char(code) {
+      return code === 0 || code === 32 || (code >= 9 && code <= 13);
+    }
+
     let GRAPHEME_SEGMENTER; // initialized on demand by #each_grapheme_cluster below using:
 
     function grapheme_segmenter() {
@@ -1427,7 +1431,11 @@ class ::String < `String`
   end
 
   def lstrip
-    `self.replace(/^[\x00\x09\x0a-\x0d\x20]*/, '')`
+    %x{
+      var start = 0, length = self.length;
+      while (start < length && is_ascii_trim_char(self.charCodeAt(start))) start++;
+      return $str(start === 0 ? self.toString() : self.slice(start), self.encoding);
+    }
   end
 
   # lstrip! - not supported, mutates string
@@ -1725,7 +1733,11 @@ class ::String < `String`
   end
 
   def rstrip
-    `$str(self.replace(/[\x00\x09\x0a-\x0d\x20]*$/, ''), self.encoding)`
+    %x{
+      var end = self.length - 1;
+      while (end >= 0 && is_ascii_trim_char(self.charCodeAt(end))) end--;
+      return $str(end === self.length - 1 ? self.toString() : self.slice(0, end + 1), self.encoding);
+    }
   end
 
   # rstrip! - not supported, mutates string
@@ -1956,7 +1968,12 @@ class ::String < `String`
   end
 
   def strip
-    `$str(self.replace(/^[\x00\x09\x0a-\x0d\x20]*|[\x00\x09\x0a-\x0d\x20]*$/g, ''), self.encoding)`
+    %x{
+      var start = 0, end = self.length - 1;
+      while (start <= end && is_ascii_trim_char(self.charCodeAt(start))) start++;
+      while (end >= start && is_ascii_trim_char(self.charCodeAt(end))) end--;
+      return $str(start === 0 && end === self.length - 1 ? self.toString() : self.slice(start, end + 1), self.encoding);
+    }
   end
 
   # strip! - not supported, mutates string
