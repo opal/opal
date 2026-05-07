@@ -1512,6 +1512,21 @@ class ::Array < `Array`
       var result = [];
       var i, length, item, tmp;
 
+      // Fast path: all elements are plain Opal strings
+      var all_strings = true;
+      for (i = 0, length = self.length; i < length; i++) {
+        if (!self[i].$$is_string) { all_strings = false; break; }
+      }
+      if (all_strings) {
+        if (sep === nil) {
+          return self.join('');
+        } else if (sep.$$is_string) {
+          return self.join(sep.valueOf());
+        } else {
+          return self.join(#{::Opal.coerce_to!(sep, ::String, :to_str).to_s});
+        }
+      }
+
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
 
