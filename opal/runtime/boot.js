@@ -406,12 +406,13 @@
   Opal.allocate_module = $allocate_module;
 
   // Optimization for a costly operation of prepending '$' to method names
-  var jsid_cache = new Map();
+  var jsid_cache = Object.create(null);
+
   function $jsid(name) {
-    var jsid = jsid_cache.get(name);
+    var jsid = jsid_cache[name];
     if (!jsid) {
       jsid = '$' + name;
-      jsid_cache.set(name, jsid);
+      jsid_cache[name] = jsid;
     }
     return jsid;
   }
