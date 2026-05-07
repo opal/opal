@@ -1138,7 +1138,7 @@ class ::String < `String`
 
       separator = $coerce_to(separator, #{::String}, 'to_str');
 
-      var a, i, n, length, chomped, trailing, splitted, value;
+      var a, i, n, chomped, trailing, splitted, value;
 
       if (separator.length === 0) {
         for (a = self.split(/((?:\r?\n){2})(?:(?:\r?\n)*)/), i = 0, n = a.length; i < n; i += 2) {
@@ -1154,24 +1154,41 @@ class ::String < `String`
         return self;
       }
 
-      chomped  = #{chomp(separator)};
-      trailing = self.length != chomped.length;
-
       if (starts_with_low_surrogate(separator) || ends_with_high_surrogate(separator)) {
+        chomped  = #{chomp(separator)};
+        trailing = self.length != chomped.length;
         splitted = [chomped];
-      } else {
-        splitted = chomped.split(separator);
+        for (i = 0, n = splitted.length; i < n; i++) {
+          value = splitted[i];
+          if (i < n - 1 || trailing) {
+            value = value + separator;
+          }
+          if (chomp) {
+            value = #{`value`.chomp(separator)};
+          }
+          Opal.yield1(block, $str(value, self.encoding));
+        }
+
+        return self;
       }
 
-      for (i = 0, length = splitted.length; i < length; i++) {
-        value = splitted[i];
-        if (i < length - 1 || trailing) {
-          value = value + separator;
-        }
+      n = separator.length;
+      i = 0;
+      while ((a = self.indexOf(separator, i)) !== -1) {
         if (chomp) {
-          value = #{`value`.chomp(separator)};
+          value = self.slice(i, a);
+          if (separator === "\n" && value.charAt(value.length - 1) === "\r") {
+            value = value.slice(0, -1);
+          }
+        } else {
+          value = self.slice(i, a + n);
         }
         Opal.yield1(block, $str(value, self.encoding));
+        i = a + n;
+      }
+
+      if (i < self.length) {
+        Opal.yield1(block, $str(self.slice(i), self.encoding));
       }
     }
 
