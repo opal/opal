@@ -892,21 +892,22 @@ class ::String < `String`
     separator = ::Opal.coerce_to!(separator, ::String, :to_str).to_s
 
     %x{
+      var s = typeof self === 'string' ? self : self.valueOf();
       var result;
 
       if (separator === "\n") {
-        result = self.replace(/\r?\n?$/, '');
+        result = s.replace(/\r?\n?$/, '');
       }
       else if (separator.length === 0) {
-        result = self.replace(/(\r?\n)+$/, '');
+        result = s.replace(/(\r?\n)+$/, '');
       }
-      else if (self.length >= separator.length &&
+      else if (s.length >= separator.length &&
                !starts_with_low_surrogate(separator) &&
                !ends_with_high_surrogate(separator)) {
 
         // compare tail with separator
-        if (self.substring(self.length - separator.length) === separator) {
-          result = self.substring(0, self.length - separator.length);
+        if (s.substring(s.length - separator.length) === separator) {
+          result = s.substring(0, s.length - separator.length);
         }
       }
 
@@ -922,15 +923,16 @@ class ::String < `String`
 
   def chop
     %x{
-      var length = self.length, result;
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var length = s.length, result;
 
       if (length <= 1) {
         result = "";
-      } else if (self.charAt(length - 1) === "\n" && self.charAt(length - 2) === "\r") {
-        result = self.substring(0, length - 2);
+      } else if (s.charAt(length - 1) === "\n" && s.charAt(length - 2) === "\r") {
+        result = s.substring(0, length - 2);
       } else {
-        let cut = self.codePointAt(length - 2) > 0xFFFF ? 2 : 1;
-        result = self.substring(0, length - cut);
+        let cut = s.codePointAt(length - 2) > 0xFFFF ? 2 : 1;
+        result = s.substring(0, length - cut);
       }
       return $str(result, self.encoding);
     }
@@ -1487,9 +1489,10 @@ class ::String < `String`
 
   def lstrip
     %x{
-      var start = 0, length = self.length;
-      while (start < length && is_ascii_trim_char(self.charCodeAt(start))) start++;
-      return $str(start === 0 ? self.toString() : self.slice(start), self.encoding);
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var start = 0, length = s.length;
+      while (start < length && is_ascii_trim_char(s.charCodeAt(start))) start++;
+      return $str(start === 0 ? s : s.slice(start), self.encoding);
     }
   end
 
@@ -1789,9 +1792,10 @@ class ::String < `String`
 
   def rstrip
     %x{
-      var end = self.length - 1;
-      while (end >= 0 && is_ascii_trim_char(self.charCodeAt(end))) end--;
-      return $str(end === self.length - 1 ? self.toString() : self.slice(0, end + 1), self.encoding);
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var end = s.length - 1;
+      while (end >= 0 && is_ascii_trim_char(s.charCodeAt(end))) end--;
+      return $str(end === s.length - 1 ? s : s.slice(0, end + 1), self.encoding);
     }
   end
 
@@ -2026,10 +2030,11 @@ class ::String < `String`
 
   def strip
     %x{
-      var start = 0, end = self.length - 1;
-      while (start <= end && is_ascii_trim_char(self.charCodeAt(start))) start++;
-      while (end >= start && is_ascii_trim_char(self.charCodeAt(end))) end--;
-      return $str(start === 0 && end === self.length - 1 ? self.toString() : self.slice(start, end + 1), self.encoding);
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var start = 0, end = s.length - 1;
+      while (start <= end && is_ascii_trim_char(s.charCodeAt(start))) start++;
+      while (end >= start && is_ascii_trim_char(s.charCodeAt(end))) end--;
+      return $str(start === 0 && end === s.length - 1 ? s : s.slice(start, end + 1), self.encoding);
     }
   end
 
