@@ -2152,12 +2152,30 @@ class ::String < `String`
   def to_i(base = 10)
     %x{
       let result,
-          string = self.toLowerCase(),
+          string = self.valueOf(),
           radix = $coerce_to(base, #{::Integer}, 'to_int');
 
       if (radix === 1 || radix < 0 || radix > 36) {
         #{::Kernel.raise ::ArgumentError, "invalid radix #{`radix`}"}
       }
+
+      // Fast path: base 10 without underscore separators or base prefix letters
+      if (radix === 10 && string.indexOf('_') === -1) {
+        var has_base_char = false;
+        for (var fi = 0; fi < string.length; fi++) {
+          var fc = string.charCodeAt(fi);
+          // b=98/66, d=100/68, o=111/79, x=120/88
+          if (fc===98||fc===100||fc===111||fc===120||fc===66||fc===68||fc===79||fc===88) {
+            has_base_char = true; break;
+          }
+        }
+        if (!has_base_char) {
+          result = parseInt(string, 10);
+          return isNaN(result) ? 0 : result;
+        }
+      }
+
+      string = string.toLowerCase();
 
       if (/^\s*_/.test(string)) {
         return 0;
