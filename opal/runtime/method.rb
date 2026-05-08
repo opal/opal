@@ -396,6 +396,20 @@ module ::Opal
   def self.find_super(obj, mid, current_func, defcheck, allow_stubs)
     %x{
       var jsid = $jsid(mid), ancestors, ancestor, super_method, method_owner, current_index = -1, i;
+      var klass = obj.$$meta || obj.$$class;
+
+      // Inline single-slot cache keyed by (const_cache_version, klass, jsid).
+      // Avoids re-scanning the ancestors array on repeated super calls for the same method and receiver class.
+      // jsid is included so the same proc used as multiple define_method names resolves correctly.
+      if (current_func.$$super_cache_version === Opal.const_cache_version &&
+          current_func.$$super_klass === klass &&
+          current_func.$$super_jsid === jsid) {
+        super_method = current_func.$$super_cached;
+        if (!defcheck && super_method && super_method.$$stub && obj.$method_missing.$$pristine) {
+          $raise(Opal.NoMethodError, 'super: no superclass method `'+mid+"' for "+obj, mid);
+        }
+        return (super_method && super_method.$$stub && !allow_stubs) ? null : super_method;
+      }
 
       ancestors = $get_ancestors(obj);
       method_owner = current_func.$$owner;
@@ -421,6 +435,11 @@ module ::Opal
           break;
         }
       }
+
+      current_func.$$super_cache_version = Opal.const_cache_version;
+      current_func.$$super_klass = klass;
+      current_func.$$super_jsid = jsid;
+      current_func.$$super_cached = super_method;
 
       if (!defcheck && super_method && super_method.$$stub && obj.$method_missing.$$pristine) {
         // method_missing hasn't been explicitly defined
