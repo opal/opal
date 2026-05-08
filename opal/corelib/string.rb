@@ -587,7 +587,7 @@ class ::String < `String`
     %x{
       if (other.length === 0 && self.$$class === Opal.String) return self;
       if (self.length === 0 && other.$$class === Opal.String) return other;
-      var out = self + other;
+      var out = self.valueOf() + other.valueOf();
       if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
       if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
       return Opal.str(out, self.encoding);
