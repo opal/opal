@@ -186,11 +186,15 @@ class ::String < `String`
     }
 
     function starts_with(str, prefix) {
-      return (str.length >= prefix.length && str.startsWith(prefix) && !ends_with_high_surrogate(prefix));
+      var s = typeof str === 'string' ? str : str.valueOf();
+      var p = typeof prefix === 'string' ? prefix : prefix.valueOf();
+      return (s.length >= p.length && s.startsWith(p) && !ends_with_high_surrogate(p));
     }
 
     function ends_with(str, suffix) {
-      return (str.length >= suffix.length && str.endsWith(suffix) && !starts_with_low_surrogate(suffix));
+      var s = typeof str === 'string' ? str : str.valueOf();
+      var sf = typeof suffix === 'string' ? suffix : suffix.valueOf();
+      return (s.length >= sf.length && s.endsWith(sf) && !starts_with_low_surrogate(sf));
     }
 
     function is_ascii_trim_char(code) {
@@ -1338,9 +1342,11 @@ class ::String < `String`
         other = $coerce_to(other, #{::String}, 'to_str');
       }
       if (other.length === 0) return true;
-      if (self.indexOf(other) === -1) return false;
-      if (!has_surrogate(other)) return true;
-      return find_index_of(self, other) !== -1;
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var o = typeof other === 'string' ? other : other.valueOf();
+      if (s.indexOf(o) === -1) return false;
+      if (!has_surrogate(o)) return true;
+      return find_index_of(s, o) !== -1;
     }
   end
 
