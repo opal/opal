@@ -1924,8 +1924,10 @@ class ::String < `String`
         result = (pattern.length === 0) ? [...string] : string.split(pattern);
 
         if (!(result.length === 1 && result[0] === string)) {
-          while ((i = result.indexOf(undefined)) !== -1) {
-            result.splice(i, 1);
+          if (!string_pattern) {
+            while ((i = result.indexOf(undefined)) !== -1) {
+              result.splice(i, 1);
+            }
           }
 
           if (limit === 0) {
