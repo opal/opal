@@ -1178,23 +1178,24 @@ class ::String < `String`
         return self;
       }
 
+      var s = typeof self === 'string' ? self : self.valueOf();
       n = separator.length;
       i = 0;
-      while ((a = self.indexOf(separator, i)) !== -1) {
+      while ((a = s.indexOf(separator, i)) !== -1) {
         if (chomp) {
-          value = self.slice(i, a);
+          value = s.slice(i, a);
           if (separator === "\n" && value.charAt(value.length - 1) === "\r") {
             value = value.slice(0, -1);
           }
         } else {
-          value = self.slice(i, a + n);
+          value = s.slice(i, a + n);
         }
         Opal.yield1(block, $str(value, self.encoding));
         i = a + n;
       }
 
-      if (i < self.length) {
-        Opal.yield1(block, $str(self.slice(i), self.encoding));
+      if (i < s.length) {
+        Opal.yield1(block, $str(s.slice(i), self.encoding));
       }
     }
 
