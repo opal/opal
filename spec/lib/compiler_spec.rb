@@ -709,6 +709,44 @@ RSpec.describe Opal::Compiler do
     end
   end
 
+  describe 'bigint_integers option' do
+    let(:compiler_options) { {bigint_integers: true} }
+
+    it 'transforms Ruby integer literals to BigInt' do
+      expect(compiled('x = 42')).to include('42n')
+    end
+
+    it 'transforms hex, octal, and binary literals' do
+      result = compiled('x = 0xFF + 0o77 + 0b1010')
+      # Parser gem converts these to decimal, so we check for the decimal values as BigInt
+      expect(result).to include('255n')  # 0xFF
+      expect(result).to include('63n')   # 0o77
+      expect(result).to include('10n')   # 0b1010
+    end
+
+    it 'leaves float literals unchanged' do
+      result = compiled('x = 3.14')
+      expect(result).to include('3.14')
+      expect(result).not_to include('3.14n')
+    end
+
+    it 'does not transform integers in x-strings (JS embedded code)' do
+      result = compiled('`return 42`', backtick_javascript: true, bigint_integers: true)
+      expect(result).to include('return 42')
+      expect(result).not_to include('42n')
+    end
+
+    context 'when disabled' do
+      let(:compiler_options) { {bigint_integers: false} }
+
+      it 'does not transform integers' do
+        result = compiled('x = 99')
+        expect(result).to include('99')
+        expect(result).not_to include('99n')
+      end
+    end
+  end
+
   def compiler_options
     {}
   end
