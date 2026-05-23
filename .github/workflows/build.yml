@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - master
-      - '*-stable'
-      - '*/ci-check'
+      - "*-stable"
+      - "*/ci-check"
   pull_request: {}
 
 permissions:
@@ -15,7 +15,7 @@ jobs:
   rake:
     name: ${{ matrix.combo.name || matrix.combo.ruby }}
     env:
-      DEFAULT_RUBY: '4.0'
+      DEFAULT_RUBY: "4.0"
     strategy:
       max-parallel: 8
       fail-fast: false
@@ -50,35 +50,45 @@ jobs:
             node: latest
             command: bin/rake minitest_nodejs
           - name: mspec-chrome-130
-            chrome: '130'
+            chrome: "130"
+            node: lts/jod
             command: bin/rake mspec_chrome
           - name: mspec-chrome-latest
             chrome: stable
+            node: latest
             command: bin/rake mspec_chrome
           - name: mspec-edge-latest
             command: bundle exec rake mspec_edge
+            node: latest
             os: windows-latest
           - name: mspec-firefox-128-esr
-            firefox: '128.9.0esr'
+            firefox: "128.9.0esr"
+            node: lts/jod
             command: xvfb-run bin/rake mspec_firefox
           # this should be 'latest' below, but for ff > 140 see issue #2768
           - name: mspec-firefox-latest
-            firefox: 'latest-esr'
+            firefox: "latest-esr"
+            node: latest
             command: xvfb-run bin/rake mspec_firefox
           - name: mspec-safari-latest
             command: bundle exec rake mspec_safari
+            node: latest
             os: macos-latest
           # - name: head-ruby
           #   ruby: head
           #   permissive: true
           - name: rspec-current-ruby
-            ruby: '4.0'
+            ruby: "4.0"
+            node: latest
           - name: rspec-previous-ruby
-            ruby: '3.4'
+            ruby: "3.4"
+            node: lts/jod
           - name: rspec-older-ruby
-            ruby: '3.3'
+            ruby: "3.3"
+            node: lts/jod
           - name: rspec-near-eol-ruby
-            ruby: '3.2'
+            ruby: "3.2"
+            node: lts/jod
           # JRuby 10.0 does not work at all, JRuby 9.4 exhibits a SystemExit error
           # - name: rspec-jruby
           #   ruby: 'jruby'
@@ -87,9 +97,11 @@ jobs:
           #  ruby: 'truffleruby'
           - name: rspec-windows
             command: bundle exec rake rspec
+            node: latest
             os: windows-latest
           - name: rspec-macos
             command: bundle exec rake rspec
+            node: latest
             os: macos-latest
           - name: timezone
             node: latest
@@ -97,7 +109,7 @@ jobs:
           - name: performance
             node: latest
             permissive: true
-            fetchdepth: '0'
+            fetchdepth: "0"
             command: bin/rake performance:compare
             # os: ryzen
 
