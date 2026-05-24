@@ -81,12 +81,16 @@ if %w[node nodejs].include?(::Opal.JS[:platform].JS[:name])
     unsupported :test_chmod_verbose
     unsupported :test_chown
     unsupported :test_chown_dir_group_ownership_not_recursive
+    unsupported :test_chown_dir_user_ownership_not_recursive_with_root
     unsupported :test_chown_noop
     unsupported :test_chown_R
     unsupported :test_chown_R_force
     unsupported :test_chown_R_noop
     unsupported :test_chown_R_verbose
+    unsupported :test_chown_R_with_root
     unsupported :test_chown_verbose
+    unsupported :test_chown_with_root
+    unsupported :test_rm_r_no_permissions
     unsupported :test_s_chmod_verbose
     if ::Opal.JS[:platform].JS[:macos]
       # tests expect EPERM but nodejs chown throws range error for user id -2,
