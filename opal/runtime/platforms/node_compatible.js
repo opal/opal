@@ -1,5 +1,3 @@
-const { X509Certificate } = require("node:crypto");
-
 // Driver for Node 22 or greater and GraalNodeJs
 if (Opal.platform.name == "node") {
   Opal.queue(async function () {
