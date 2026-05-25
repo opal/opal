@@ -118,7 +118,7 @@ jobs:
     steps:
       - if: ${{ matrix.combo.chrome }}
         id: setup-chrome
-        uses: browser-actions/setup-chrome@v1
+        uses: browser-actions/setup-chrome@v2
         with:
           chrome-version: ${{ matrix.combo.chrome }}
       - if: ${{ matrix.combo.firefox }}
@@ -128,7 +128,7 @@ jobs:
           firefox-version: ${{ matrix.combo.firefox }}
       - if: ${{ matrix.combo.node}}
         id: setup-node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.combo.node }}
       - uses: actions/checkout@v4
