@@ -59,6 +59,7 @@ jobs:
             command: bin/rake mspec_chrome
           - name: mspec-edge-latest
             command: bundle exec rake mspec_edge
+            edge: stable
             node: latest
             os: windows-latest
           - name: mspec-firefox-128-esr
@@ -121,6 +122,11 @@ jobs:
         uses: browser-actions/setup-chrome@v2
         with:
           chrome-version: ${{ matrix.combo.chrome }}
+      - if: ${{ matrix.combo.edge }}
+        id: setup-firefox
+        uses: browser-actions/setup-edge@v1
+        with:
+          edge-version: ${{ matrix.combo.edge }}
       - if: ${{ matrix.combo.firefox }}
         id: setup-firefox
         uses: browser-actions/setup-firefox@v1
