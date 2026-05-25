@@ -123,7 +123,7 @@ jobs:
         with:
           chrome-version: ${{ matrix.combo.chrome }}
       - if: ${{ matrix.combo.edge }}
-        id: setup-firefox
+        id: setup-edge
         uses: browser-actions/setup-edge@v1
         with:
           edge-version: ${{ matrix.combo.edge }}
