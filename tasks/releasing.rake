@@ -50,10 +50,9 @@ CHANGELOG_HEADING = <<~MARKDOWN
   - **Performance** changes related to speed and efficiency.
 MARKDOWN
 
-desc "Update CHANGELOG.md using info from published GitHub releases (the first unreleased section is preserved)"
+desc "Update CHANGELOG.md from published GitHub releases (the unreleased section is seeded from merged pull requests)"
 task :changelog do
   changelog_path    = "#{__dir__}/../CHANGELOG.md"
-  unreleased_path   = "#{__dir__}/../UNRELEASED.md"
   changelog_entries = []
   previous_tag_name = '000000'
 
@@ -67,11 +66,19 @@ task :changelog do
     previous_tag_name = release[:tag_name]
   end
 
+  # The changes since the last release have no GitHub release to draw from yet.
+  # List the merged pull requests so whoever is preparing the release has the
+  # raw material to edit down, rather than starting from a blank section.
+  unreleased_body = `git log #{previous_tag_name}..HEAD --merges --pretty=format:'%s %b'`
+                    .scan(%r{Merge pull request #(\d+) from \S+\s*(.*)})
+                    .map { |number, subject| "- #{subject.strip} (##{number})" }
+                    .join("\n")
+
   changelog_entries.unshift changelog_entry.call(
     tag_name: ENV['VERSION'] || 'HEAD',
     release_date: (ENV['VERSION'] ? Time.now.to_date.iso8601 : 'unreleased'),
     previous_tag_name: previous_tag_name,
-    body: File.read(unreleased_path),
+    body: unreleased_body,
   )
 
   changelog_entries.unshift CHANGELOG_HEADING
@@ -106,22 +113,10 @@ namespace :release do
       puts "== update changelog"
 
       system "bin/rake changelog VERSION=v#{version}" or abort('changelog update failed')
-      File.write "#{__dir__}/../UNRELEASED.md", <<~MARKDOWN
-      <!--
-      ### Internal
-      ### Changed
-      ### Added
-      ### Removed
-      ### Deprecated
-      ### Performance
-      ### Fixed
-      -->
-
-      MARKDOWN
     end
 
     puts "== committing"
-    sh 'git add UNRELEASED.md CHANGELOG.md opal/corelib/constants.rb lib/opal/version.rb'
+    sh 'git add CHANGELOG.md opal/corelib/constants.rb lib/opal/version.rb'
     sh "git commit -m 'Release v#{version}'"
     sh 'git show | cat'
   end
