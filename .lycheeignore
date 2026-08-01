@@ -1,0 +1,61 @@
+# Hosts and URL shapes that lychee must not report on.
+#
+# Each entry is a regex matched against the whole URL. Only add a host here if
+# it is *hostile to bots* rather than actually broken -- an entry here means we
+# stop hearing about that link forever, so a genuinely dead link hidden behind
+# one of these patterns will never be caught.
+
+# --- Bot-hostile / anti-scraping (verified 403 or challenge page to non-browsers) ---
+# Slack's invite endpoint answers 403 to anything without a browser fingerprint.
+^https?://slack\.opalrb\.com
+# Cloudflare-fronted Q&A sites: 403/503 to datacenter IPs.
+^https?://(www\.)?stackoverflow\.com
+^https?://(www\.)?stackexchange\.com
+^https?://(meta\.)?stackoverflow\.com
+
+# --- Rate limiters (429 under CI's shared egress IPs) ---
+^https?://(www\.)?opencollective\.com
+^https?://(www\.)?patreon\.com
+^https?://(www\.)?bountysource\.com
+^https?://(www\.)?reddit\.com
+^https?://(www\.)?twitter\.com
+^https?://(www\.)?x\.com
+^https?://(www\.)?linkedin\.com
+
+# --- Shields/badge endpoints: dynamic SVG, frequently 429, never "documentation" ---
+^https?://img\.shields\.io
+^https?://badge\.fury\.io
+^https?://badgen\.net
+^https?://.*\.svg(\?.*)?$
+^https?://coveralls\.io
+^https?://codeclimate\.com
+^https?://api\.codeclimate\.com
+^https?://travis-ci\.(org|com)
+^https?://github\.com/.*/(actions|workflows)/.*badge
+^https?://github\.com/.*\.svg
+
+# --- Local/example hosts that appear in code samples and are never resolvable ---
+^https?://localhost
+^https?://127\.0\.0\.1
+^https?://0\.0\.0\.0
+^https?://\[::1\]
+^https?://example\.(com|org|net)
+^https?://(www\.)?your-?(site|domain|app|server).*
+^https?://.*\.local(/|$)
+^https?://.*:(3000|4567|8000|8080|9222|9229|9292)(/|$)
+
+# --- Template/placeholder URLs from docs prose ---
+.*\{.*\}.*
+.*<.*>.*
+.*%7B.*
+^https?://.*\.\.\..*
+
+# --- Site-absolute paths ---
+# `/docs` points at the guides index on the published opalrb.com site. With
+# --root-dir set to the checkout, lychee resolves it against the repo, where
+# `docs/` does exist -- so it is checked rather than ignored.
+
+# --- GitHub blob/tree links to this repo's own files ---
+# These are checked by `rake docs:links` against the working tree instead, which
+# is both faster and correct on branches where the file is new.
+^https?://github\.com/opal/opal/(blob|tree)/
