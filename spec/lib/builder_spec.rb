@@ -197,6 +197,31 @@ RSpec.describe Opal::Builder do
     end
   end
 
+  # Each scheduler builds its own MissingRequire, so they all have to report
+  # which file was missing. The threaded scheduler is only the default on JRuby
+  # and TruffleRuby, but it runs fine on CRuby, so these are not skipped there:
+  # that is the only way CI covers the branch at all.
+  describe 'reporting a missing require' do
+    def expect_missing_require_naming_the_file
+      expect { builder_with_paths.build('fixtures/missing_require_test') }
+        .to raise_error(Opal::Builder::MissingRequire, /this_file_does_not_exist/)
+    end
+
+    it 'names the missing file with a sequential scheduler' do
+      temporarily_with_sequential_scheduler { expect_missing_require_naming_the_file }
+    end
+
+    it 'names the missing file with a threaded scheduler' do
+      temporarily_with_threaded_scheduler { expect_missing_require_naming_the_file }
+    end
+
+    it 'names the missing file with a prefork scheduler' do
+      skip "Scheduler::Prefork not available for #{RUBY_ENGINE}" if %w[jruby truffleruby].include?(RUBY_ENGINE)
+      skip 'Scheduler::Prefork not available on Windows' if Opal::OS.windows?
+      temporarily_with_prefork_scheduler { expect_missing_require_naming_the_file }
+    end
+  end
+
   describe 'directory mode' do
     shared_examples 'directory mode' do
       let(:options) { {compiler_options: {directory: true, esm: esm?}}}
