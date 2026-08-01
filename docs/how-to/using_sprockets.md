@@ -1,8 +1,8 @@
 # Opal & Sprockets
 
 The `opal-sprockets` gem adds sprockets support to Opal, providing a simple
-`Opal::Sprockets::server` class to make it easy to get a rack server up and 
-running for trying out opal. This server will automatically recompile ruby 
+`Opal::Sprockets::Server` class to make it easy to get a rack server up and
+running for trying out opal. This server will automatically recompile ruby
 sources when they change, meaning you just need to refresh your page to autorun.
 
 ## Getting setup
@@ -30,8 +30,8 @@ puts "hello world"
 ```
 
 
-If we do not provide an HTML index, sprockets will generate one automatically; 
-however, it is often useful to override the default with a custom `erb` file: 
+If we do not provide an HTML index, sprockets will generate one automatically;
+however, it is often useful to override the default with a custom `erb` file:
 
 ```html
 <%# index.erb %>
@@ -48,15 +48,19 @@ however, it is often useful to override the default with a custom `erb` file:
 </html>
 ```
 
-## Using Opal::Server
+## Using Opal::Sprockets::Server
 
-`Opal::Server` can be run like any rack app, so just add a `config.ru` file:
+`Opal::Sprockets::Server` can be run like any rack app, so just add a `config.ru` file:
+
+NOTE: Older guides and examples use `Opal::Server`. That constant is now only a
+deprecated alias for `Opal::Sprockets::Server` and emits a deprecation warning —
+use the fully qualified name instead.
 
 ```ruby
 # config.ru
 require 'opal-sprockets'
 
-run Opal::Server.new { |s|
+run Opal::Sprockets::Server.new { |s|
   s.append_path 'app'
 
   s.main = 'application'

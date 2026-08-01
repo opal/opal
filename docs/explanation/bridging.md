@@ -8,7 +8,7 @@ Opal's "bridging" makes JavaScript objects become Ruby object in Opal, boosting 
 
 Opal modifies the prototype chain of a JavaScript constructor function by injecting a Ruby class and its superclasses, enabling bridged JavaScript classes to inherit Ruby behaviors.
 
-Prototype chain pre-bridging: 
+Prototype chain pre-bridging:
 
 - constructor (window.String)
   - JavaScript prototype chain (window.Object)
@@ -23,9 +23,9 @@ After bridging with `::Object`:
 
 The `Opal.bridge` function is used for this, allowing the JavaScript class to become a Ruby class. You can also use a syntax like: ```class MyCar < `Car` ``` which counterintuitively doesn't mean inheritance - `MyCar`'s superclass will be Object, but `MyCar` will be bridged into native JavaScript `Car` class.
 
-The bridged JavaScript classes are usable in Ruby, but with an adapted interface: JavaScript methods accessed from Ruby use x-strings and Ruby methods accessed from JavaScript use $-prefixed method names (e.g., reduce->$reduce). 
+The bridged JavaScript classes are usable in Ruby, but with an adapted interface: JavaScript methods accessed from Ruby use x-strings and Ruby methods accessed from JavaScript use $-prefixed method names (e.g., reduce->$reduce).
 
-This strategy avoids type casting for bridged objects and boosts performance by utilizing native JavaScript objects. 
+This strategy avoids type casting for bridged objects and boosts performance by utilizing native JavaScript objects.
 
 Example:
 

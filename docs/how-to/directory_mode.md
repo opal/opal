@@ -25,13 +25,13 @@ opal -c my_program.rb > my_program.js
 To compile it to a directory, you need to specify `--directory` option.
 
 ```bash
-opal --directory -c my_program.rb -O my_program
+opal --directory -c my_program.rb -o my_program
 ```
 
 In `my_program` directory you will find files, most notably, an `index.js` entrypoint file, which you can run in Node. Do note, that we use `require()` function to load the dependent programs, which doesn't work in browsers - this is the CommonJS output, which is the default. Therefore, we recommend to also add an `--esm` option:
 
 ```bash
-opal --esm --directory -c my_program.rb -O my_program
+opal --esm --directory -c my_program.rb -o my_program
 ```
 
 Now, we get almost the same output, except that our entrypoint is named `index.mjs`, which as before, can be ran in Node. In addition, as convenience, we also build `index.html` which you can run directly in your favorite browser.
@@ -44,7 +44,7 @@ opal --esm --directory -Rnode my_program.rb
 
 This command should simply output the following:
 
-```
+```console
 "Hello world!"
 ```
 

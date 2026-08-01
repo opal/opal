@@ -12,6 +12,7 @@ We suggest to always set encoding to UTF-8 explicitly:
 ```
 
 Support for EUC-JP, JIS and ShiftJIS encodings is available but must be explicitly required:
+
 ```ruby
 require 'corelib/string/encoding/eucjp' # for EUC-JP
 require 'corelib/string/encoding/jis'   # for JIS

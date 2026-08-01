@@ -2,7 +2,8 @@
 
 Source maps are available on most environments we support.
 
-#### Processor `source_map_enabled` flag
+## Processor `source_map_enabled` flag
+
 To enable sourcemaps in the Sprockets processor you need to turn on the relative flag:
 
 ```ruby
@@ -10,7 +11,7 @@ Opal::Config.source_map_enabled = true # default
 ```
 
 
-#### Sprockets debug mode
+## Sprockets debug mode
 
 The source maps only work with Sprockets in debug mode - this is a limitation of Sprockets.
 

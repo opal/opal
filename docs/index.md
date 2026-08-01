@@ -1,132 +1,190 @@
-# Opal Guides for v1.6.dev
+# Opal Guides
 
-These guides are designed to make you immediately productive with Opal, and to help you understand how all of the pieces fit together.
+Opal is a Ruby to JavaScript source-to-source compiler, shipping with an implementation of
+the Ruby corelib and stdlib.
 
-The guides for earlier releases are [available here](/docs).
+These guides are organised by what you are trying to do:
 
----
+| If you want to… | Go to |
+|---|---|
+| Learn Opal by building something | **[Tutorial](#tutorial)** |
+| Accomplish a specific task | **[How-to guides](#how-to-guides)** |
+| Look up a flag, option, or API | **[Reference](#reference)** |
+| Understand how Opal works | **[Explanation](#explanation)** |
+| Contribute to Opal itself | **[Contributing](#contributing)** |
 
-## Start here
-
-#### [Getting Started with Opal](getting_started.html)
-
-Everything you need to know to install Opal and create your first application.
-
----
-
-## Using JavaScript Features from Ruby
-
-#### [Interfacing with JavaScript](js_interface.html)
-
-Discover how to access JavaScript environment from Ruby code.
-
-#### [Async](async.html)
-
-Learn more about JavaScript `async`/`await` support in Opal and how you can use it to avoid explicit callbacks and promises.
-
-#### [Promises](promises.html)
-
-How to interact and leverage the power of JavaScript promises from Ruby.
-
-#### [Source Maps](source_maps.html)
-
-How to enable and consume source-maps for your Opal application and be able to debug your Ruby scripts right inside the browser.
+Upgrading from Opal 1.x? Start with the **[2.0 migration guide](reference/migration_2_0.html)**.
 
 ---
 
-## Using Ruby Features
+## Tutorial
 
-#### [Working with ERB and Haml Templates](templates.html)
+Start here if you are new. Learning-oriented, meant to be followed start to finish.
 
-How to work with template libraries in Opal, be it to share the templates with the server or to write your own.
+### [Getting Started with Opal](tutorial/getting_started.html)
+
+Install Opal, compile your first Ruby file, and run it in a browser and on Node.js.
 
 ---
 
-## Working with Frameworks
+## How-to guides
 
-#### [Rails](rails.html)
+Task-oriented recipes. Each one solves a single problem and assumes you already know the basics.
 
-How to use `opal-rails` to use Opal as the JavaScript compiler.
+### Building and deploying
 
-#### [Static Applications](static_applications.html)
+#### [Static Applications](how-to/static_applications.html)
 
 The most basic setup for a static Opal powered website that can be hosted anywhere.
 
-#### [Sinatra](sinatra.html)
+#### [Directory Mode](how-to/directory_mode.html)
+
+Build your project into a directory of ES modules — the recommended way to build an Opal project.
+
+#### [Adjusting Load Paths with Opalfile](how-to/opalfile.html)
+
+Define where Opal should look for Ruby files at build time.
+
+#### [Enabling Source Maps](how-to/source_maps.html)
+
+Debug your Ruby sources directly in the browser devtools.
+
+### Frameworks and servers
+
+#### [Rails](how-to/rails.html)
+
+Use `opal-rails` to make Opal your JavaScript compiler.
+
+#### [Sinatra](how-to/sinatra.html)
 
 Serve Opal applications through Sinatra and `opal-sprockets`.
 
-#### [Roda + Sprockets](roda-sprockets.html)
+#### [Roda + Sprockets](how-to/roda_sprockets.html)
 
-Setup Roda + Sprockets to start serving Opal applications from Roda.
+Serve Opal applications from Roda.
 
----
-
-## Interacting with Other Libraries
-
-#### [jQuery](jquery.html)
-
-This guide covers the `opal-jquery` wrapper around the popular library.
-
-#### [RSpec](rspec.html)
-
-Write specs for your Opal code RSpec and run them on Node.js or in a browser.
-
-#### [Using Sprockets](using_sprockets.html)
+#### [Using Sprockets](how-to/using_sprockets.html)
 
 Configure the long-lasting asset handler to work with Opal.
 
----
+### Testing and tooling
 
-## Digging Deeper
+#### [RSpec](how-to/rspec.html)
 
-#### [Adjusting Load Paths with Opalfile](opalfile.html)
+Write specs for your Opal code and run them on Node.js or in a browser.
 
-How to define where Opal should look for Ruby files at build time and how to setup gems for use inside Opal programs.
+#### [Headless Browsers](how-to/headless_browsers.html)
 
-#### [Configuring Gems](configuring_gems.html)
+Run your Opal application in a headless browser from the CLI instead of Node.js.
 
-How to make your gem work in Opal and differentiate code for the JavaScript environment.
+#### [Working with ERB and Haml Templates](how-to/templates.html)
 
-#### [Compiler](compiler.html)
+Work with template libraries in Opal, including sharing templates with the server.
 
-A very general overview of how the Opal compiler works.
+#### [Using the Opal parser in a JavaScript environment](how-to/opal_parser.html)
 
-#### [Compiled Ruby and Raw JavaScript Interfaces](compiled_ruby.html)
+Parse and run Ruby scripts inside a browser or any supported JavaScript environment.
 
-This guide documents how each part of Ruby is mapped to JavaScript internally. This guide also gives
-information on how to interface Ruby with JavaScript and vice-versa using raw interfaces.
+### Publishing gems
 
-#### [Compiler File Loading Directives](compiler_directives.html)
+#### [Configuring Gems](how-to/configuring_gems.html)
 
-The Opal compiler supports some special directives that can optimize or
-enhance the output of compiled Ruby code to suit the Ruby environment.
+Make your gem work in Opal and differentiate code for the JavaScript environment.
 
-#### [Using the Opal parser inside a JavaScript environment](opal_parser.html)
+#### [jQuery](how-to/jquery.html)
 
-This guide documents how to parse and run Ruby scripts within a browser or any supported JavaScript environment
-
-#### [Encoding](encoding.html)
-
-(WIP) How to handle encoding within Opal in the browser and in the code.
-
-#### [Running code in a Headless Chrome](headless_chrome.html)
-
-How to run your Opal application in a headless Chrome from the CLI instead of Node.js.
-
-#### [Unsupported Features](unsupported_features.html)
-
-Some things that are very difficult, impossible, or outright incompatible with a JavaScript environment.
+The `opal-jquery` wrapper around the popular library.
 
 ---
 
-## Releases
+## Reference
 
-#### [Upgrading Opal](upgrading.html)
+Information-oriented. Dry, complete, and meant for looking things up.
 
-This guide provides steps to be followed when you upgrade your applications to a newer version of Opal.
+### [CLI Reference](reference/cli.html)
 
-#### [Releasing Instructions](releasing.html)
+Every `opal` command-line flag, what it does, and its default.
 
-(WIP) A step-by-step guide on who to release a new version of Opal.
+### [Configuration Reference](reference/config.html)
 
+Every `Opal::Config` option, its type, and its default.
+
+### [Runners](reference/runners.html)
+
+Every available CLI runner, how to select it, and what it requires.
+
+### [Migrating to Opal 2.0](reference/migration_2_0.html)
+
+Every breaking change between Opal 1.x and 2.0, with old and new code side by side.
+
+### [Compiled Ruby and Raw JavaScript Interfaces](reference/compiled_ruby.html)
+
+How each part of Ruby maps to JavaScript internally, and how to cross the boundary in both
+directions using raw interfaces.
+
+### [Interfacing with JavaScript](reference/js_interface.html)
+
+How to reach the JavaScript environment from Ruby code.
+
+### [Compiler File Loading Directives](reference/compiler_directives.html)
+
+Special directives that optimize or enhance the compiled output.
+
+### [Unsupported Features](reference/unsupported_features.html)
+
+Things that are difficult, impossible, or outright incompatible with a JavaScript environment.
+
+### [Chrome DevTools Protocol notes](reference/cdp_common.html)
+
+Implementation notes on the CDP interface shared by the browser runners.
+
+---
+
+## Explanation
+
+Understanding-oriented. Background and design rationale, no step-by-step instructions.
+
+### [How the Compiler Works](explanation/compiler.html)
+
+The stages a Ruby file passes through on its way to JavaScript.
+
+### [Bridging Ruby and JavaScript Classes](explanation/bridging.html)
+
+How Opal makes native JavaScript classes behave like Ruby ones.
+
+### [Async and Await](explanation/async.html)
+
+How Opal supports JavaScript `async`/`await`, and how it lets you avoid explicit callbacks.
+
+### [Promises](explanation/promises.html)
+
+How Opal's promise implementations relate to native JavaScript promises.
+
+### [Encoding](explanation/encoding.html)
+
+(WIP) How encoding is handled in Opal, in the browser and in the compiler.
+
+---
+
+## Contributing
+
+For people working on Opal itself. See also [HACKING.md](https://github.com/opal/opal/blob/master/HACKING.md)
+for development environment setup, and
+[CONTRIBUTING.md](https://github.com/opal/opal/blob/master/CONTRIBUTING.md) for the process.
+
+### [Releasing Instructions](contributing/releasing.html)
+
+A step-by-step guide to releasing a new version of Opal.
+
+---
+
+Guides for earlier releases are [available here](/docs). You are encouraged to help improve
+these guides — if you spot a typo, a factual error, or something missing, please
+[open a pull request](https://github.com/opal/opal/tree/master/docs).
+
+> **Pages moved.** These guides were previously a flat list; they now live under
+> `tutorial/`, `how-to/`, `reference/`, `explanation/` and `contributing/`. If you followed a
+> link to a page that no longer resolves, find it in the index above. Guides published under a
+> released version keep their original addresses, so only links to the `master` guides are
+> affected. `upgrading.html`, which only covered v0.8 → v0.9, was replaced by the
+> [2.0 migration guide](reference/migration_2_0.html).

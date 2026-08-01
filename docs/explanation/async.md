@@ -2,12 +2,13 @@
 
 ## PromiseV2
 
-In Opal 1.2 we introduced PromiseV2 which is to replace the default Promise in Opal 2.0
-(which will become PromiseV1). Right now it's experimental, but the interface of PromiseV1
-stay unchanged and will continue to be supported.
+In Opal 1.2 we introduced PromiseV2 as an alternative implementation, built on the
+JavaScript `Promise`. As of Opal 2.0, `Promise` is still the V1 implementation:
+requiring `promise` gives you the pure-Ruby `Promise`, and `PromiseV1` is an alias
+for it. `PromiseV2` remains a separate class that you opt into.
 
-It is imperative that during the transition period you either `require 'promise/v1'` or
-`require 'promise/v2'` and then use either `PromiseV1` or `PromiseV2`.
+Because `Promise` is ambiguous between the two, be explicit: `require 'promise/v1'`
+or `require 'promise/v2'`, and then use either `PromiseV1` or `PromiseV2`.
 
 If you write library code it's imperative that you don't require the promise itself, but
 detect if `PromiseV2` is defined and use the newer implementation, for instance using the

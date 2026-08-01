@@ -29,7 +29,7 @@ add_load_path '/absolute/path'
 
 Consider you have a directory structure like this:
 
-```
+```text
 my_opal_project/
   |- lib/
   |    `- my_project

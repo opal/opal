@@ -13,7 +13,7 @@ describe User do
 end
 ```
 
-### Installation
+## Installation
 
 Add the `opal-rspec` gem to your Gemfile:
 
@@ -35,7 +35,7 @@ require 'bundler'
 Bundler.require
 
 sprockets_env = Opal::RSpec::SprocketsEnvironment.new
-run Opal::Server.new(sprockets: sprockets_env) { |s|
+run Opal::Sprockets::Server.new(sprockets: sprockets_env) { |s|
   s.main = 'opal/rspec/sprockets_runner'
   s.append_path 'spec'
   s.debug = false

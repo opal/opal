@@ -47,14 +47,18 @@ run Sinatra::Application
 ```
 
 This creates a simple sprockets instance under the `/assets` path. Opal
-uses a set of load paths to compile assets using sprockets. The
-`Opal::Environment` instance is a simple subclass of `Sprockets::Environment`
-with all the custom opal paths added automatically.
+uses a set of load paths to compile assets using sprockets. The server's
+`#sprockets` object is an `Opal::Sprockets::Environment`, a simple subclass of
+`Sprockets::Environment` with all the custom opal paths added automatically.
 
-This `env` object includes all the opal corelib and stdlib paths. To add
+NOTE: Older guides call this class `Opal::Environment`. That constant is now only
+a deprecated alias for `Opal::Sprockets::Environment` and warns when loaded — use
+the fully qualified name instead.
+
+This sprockets environment includes all the opal corelib and stdlib paths. To add
 any custom application directories, you must add them to the load path using
-`env.append_path`. You can now add an `app/application.rb` file into this
-added path with some basic content:
+`s.append_path` on the server, as in the sample above. You can now add an
+`app/application.rb` file into this added path with some basic content:
 
 ```ruby
 # app/application.rb
