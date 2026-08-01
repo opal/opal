@@ -35,5 +35,5 @@ opal_unsupported_filter "MatchData" do
   fails "MatchData#offset returns a two element array with the begin and end of the nth match" # ArgumentError: MatchData#offset only supports 0th element
   fails "MatchData#offset returns the offset for multi byte strings" # ArgumentError: MatchData#offset only supports 0th element
   fails "MatchData#values_at slices captures with the given names" # TypeError: no implicit conversion of String into Integer
-  fails "MatchData#values_at takes names and indices" # TypeError: no implicit conversion of String into Integer  
+  fails "MatchData#values_at takes names and indices" # TypeError: no implicit conversion of String into Integer
 end

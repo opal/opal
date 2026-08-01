@@ -1,6 +1,1 @@
-# backtick_javascript: true
-
-`/* global std, scriptArgs */`
-
-require 'quickjs/io'
-require 'quickjs/kernel'
+warn "Platform specific code is already integrated now, you don't need to require 'quickjs' anymore."

@@ -26,7 +26,7 @@ RSpec.describe "rake dist" do
 
   def run_with_node(code, precode:, requires:)
     requires = requires.map do |i|
-      "require(#{File.join(@build_dir, i).inspect});"
+      "await import(#{File.join(@build_dir, i + '.js').inspect});"
     end.join
 
     code = "#{requires};#{precode};console.log(#{code});"
@@ -69,7 +69,7 @@ RSpec.describe "rake dist" do
     let(:requires) { %w[opal opal-replutils] }
     let(:code) { 'typeof Opal.REPLUtils' }
 
-    it 'should not require requirable files by default' do
+    it 'should not import importable files by default' do
       expect(output).to eq('undefined')
     end
   end
@@ -79,7 +79,7 @@ RSpec.describe "rake dist" do
     let(:precode) { 'Opal.require("opal-replutils")' }
     let(:code) { 'typeof Opal.REPLUtils' }
 
-    it 'should allow user to require requirable files to provide missing functionality' do
+    it 'should allow user to import importable files to provide missing functionality' do
       expect(output).to eq('function')
     end
   end

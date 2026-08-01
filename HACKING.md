@@ -8,6 +8,8 @@
 $ git clone git://github.com/<YOUR-GITHUB-USERNAME>/opal.git
 ```
 
+(On Windows make sure to clone "as is" without any new line conversion, otherwise specs will fail. Also make sure to commit files with unix style newlines.)
+
 Setup the project:
 
 ```

@@ -51,6 +51,6 @@ opal_filter "Set" do
   fails "Set#pretty_print_cycle passes the 'pretty print' representation of a self-referencing Set to the pretty print writer" # Mock 'PrettyPrint' expected to receive text("#<Set: {...}>") exactly 1 times but received it 0 times
   fails "Set#to_s correctly handles cyclic-references" # Expected "#<Set:0xb920e>" to include "#<Set: {...}>"
   fails "Set#to_s does include the elements of the set" # Expected "#<Set:0xb9246>" == "#<Set: {\"1\"}>" to be truthy but was false
-  fails "Set#to_s is an alias of inspect" # Expected #<Method: Set#to_s (defined in Kernel in <internal:corelib/kernel.rb>:768)> == #<Method: Set#inspect (defined in Set in ./set.rb:36)> to be truthy but was false  
+  fails "Set#to_s is an alias of inspect" # Expected #<Method: Set#to_s (defined in Kernel in <internal:corelib/kernel.rb>:768)> == #<Method: Set#inspect (defined in Set in ./set.rb:36)> to be truthy but was false
   fails "Set#to_s puts spaces between the elements" # Expected "#<Set:0xb9274>" to include "\", \""
 end

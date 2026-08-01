@@ -71,7 +71,7 @@ class StringScanner
     when String
       # noop
     else
-      idx = ::Opal.coerce_to!(idx, Integer, :to_int)
+      idx = `Opal.coerce_to_or_raise(idx, Opal.Integer, "to_int")`
     end
     %x{
       var match = #{@match};

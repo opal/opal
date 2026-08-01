@@ -1,4 +1,4 @@
-# helpers: yield1, hash_clone, hash_delete, hash_each, hash_get, hash_put, deny_frozen_access, freeze, opal32_init, opal32_add
+# helpers: yield1, hash_clone, hash_delete, hash_each, hash_get, hash_put, deny_frozen_access, freeze, opal32_init, opal32_add, coerce_to_or_nil, coerce_to_or_raise
 # backtick_javascript: true
 # use_strict: true
 
@@ -21,12 +21,12 @@ class ::Hash < `Map`
       var hash, argc = argv.length, arg, i;
 
       if (argc === 1) {
-        hash = #{::Opal.coerce_to?(argv[0], ::Hash, :to_hash)};
+        hash = $coerce_to_or_nil(argv[0], Opal.Hash, "to_hash");
         if (hash !== nil) {
           return #{allocate.merge!(`hash`)};
         }
 
-        argv = #{::Opal.coerce_to?(argv[0], ::Array, :to_ary)};
+        argv = $coerce_to_or_nil(argv[0], Opal.Array, "to_ary");
         if (argv === nil) {
           #{::Kernel.raise ::ArgumentError, 'odd number of arguments for Hash'};
         }
@@ -76,7 +76,7 @@ class ::Hash < `Map`
   end
 
   def self.try_convert(obj)
-    ::Opal.coerce_to?(obj, ::Hash, :to_hash)
+    `$coerce_to_or_nil(obj, Opal.Hash, "to_hash")`
   end
 
   def initialize(defaults = undefined, &block)
@@ -119,7 +119,7 @@ class ::Hash < `Map`
   end
 
   def >=(other)
-    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
+    other = `$coerce_to_or_raise(#{other}, Opal.Hash, "to_hash")`
 
     %x{
       if (self.size < other.size) {
@@ -144,7 +144,7 @@ class ::Hash < `Map`
   end
 
   def >(other)
-    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
+    other = `$coerce_to_or_raise(#{other}, Opal.Hash, "to_hash")`
 
     %x{
       if (self.size <= other.size) {
@@ -156,12 +156,12 @@ class ::Hash < `Map`
   end
 
   def <(other)
-    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
+    other = `$coerce_to_or_raise(#{other}, Opal.Hash, "to_hash")`
     other > self
   end
 
   def <=(other)
-    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
+    other = `$coerce_to_or_raise(#{other}, Opal.Hash, "to_hash")`
     other >= self
   end
 
@@ -305,7 +305,7 @@ class ::Hash < `Map`
       var proc = default_proc;
 
       if (proc !== nil) {
-        proc = #{::Opal.coerce_to!(`proc`, ::Proc, :to_proc)};
+        proc = $coerce_to_or_raise(proc, #{::Proc}, "to_proc");
 
         if (#{`proc`.lambda?} && Math.abs(#{`proc`.arity}) !== 2) {
           #{::Kernel.raise ::TypeError, 'default_proc takes two arguments'};
@@ -444,7 +444,7 @@ class ::Hash < `Map`
   end
 
   def flatten(level = 1)
-    level = ::Opal.coerce_to!(level, ::Integer, :to_int)
+    level = `$coerce_to_or_raise(level, Opal.Integer, "to_int")`
 
     %x{
       var result = [];
@@ -658,7 +658,7 @@ class ::Hash < `Map`
 
       var i, j, other;
       for (i = 0; i < others.length; ++i) {
-        other = #{::Opal.coerce_to!(`others[i]`, ::Hash, :to_hash)};
+        other = $coerce_to_or_raise(others[i], Opal.Hash, "to_hash");
 
         if (block === nil) {
           $hash_each(other, false, function(key, value) {
@@ -744,7 +744,7 @@ class ::Hash < `Map`
   def replace(other)
     `$deny_frozen_access(self);`
 
-    other = ::Opal.coerce_to!(other, ::Hash, :to_hash)
+    other = `$coerce_to_or_raise(#{other}, Opal.Hash, "to_hash")`
 
     %x{
       self.$clear();

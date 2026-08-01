@@ -30,7 +30,32 @@ require 'corelib/string/encoding/tables/sjis_inverted'
   }
 }
 
-::Encoding.register 'Shift_JIS', aliases: %w[SHIFT_JIS SJIS] do
+::Encoding.register 'Shift_JIS', aliases: %w[SHIFT_JIS SJIS], ascii: true do
+  def bytes(str)
+    res = []
+    %x{
+      let unicode;
+      for( const c of str ) {
+        unicode = c.codePointAt(0);
+        // ASCII
+        if( unicode < 0x80 ) {
+          res.push(unicode);
+        }
+        // HALFWIDTH_KATAKANA
+        else if( 0xFF61 <= unicode && unicode <= 0xFF9F ) {
+          res.push(unicode - 0xFEC0);
+        }
+        // KANJI
+        else {
+          let code = SJISInverted[ unicode ] || unknownSjis;
+          res.push(code >> 8);
+          res.push(code & 0xFF);
+        }
+      }
+    }
+    res
+  end
+
   def bytesize(str, index)
     %x{
       let unicode, size = 0;
@@ -58,7 +83,7 @@ require 'corelib/string/encoding/tables/sjis_inverted'
       if (index < 0) return nil;
       if (length < 0) length = (str.length + length) - index;
       if (length < 0) return nil;
-      let bytes_ary = str.$bytes();
+      let bytes_ary = self.$bytes(str);
       bytes_ary = bytes_ary.slice(index, index + length);
       let result = scrubbing_decoder(self, 'sjis').decode(new Uint8Array(bytes_ary));
       if (result.length === 0) return nil;
@@ -136,11 +161,12 @@ require 'corelib/string/encoding/tables/sjis_inverted'
         }
       }
     }
+    str
   end
 
   def scrub(str, replacement, &block)
     %x{
-      let result = scrubbing_decoder(self, 'sjis').decode(new Uint8Array(str.$bytes()));
+      let result = scrubbing_decoder(self, 'sjis').decode(new Uint8Array(self.$bytes(str)));
       if (block !== nil) {
         // dont know the bytes anymore ... ¯\_(ツ)_/¯
         result = result.replace(/�/g, (byte)=>{ return #{yield `byte`}; });
@@ -155,7 +181,7 @@ require 'corelib/string/encoding/tables/sjis_inverted'
 
   def valid_encoding?(str)
     %x{
-      try { validating_decoder(self, 'sjis').decode(new Uint8Array(str.$bytes())); }
+      try { validating_decoder(self, 'sjis').decode(new Uint8Array(self.$bytes(str))); }
       catch { return false; }
       return true;
     }

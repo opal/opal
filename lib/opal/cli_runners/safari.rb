@@ -71,6 +71,7 @@ module Opal
         # As a side effect, console messages may arrive out of order and timing anything may be inaccurate.
 
         builder.build_str <<~RUBY, '(exit)', no_export: true
+        # backtick_javascript: true
         %x{
           var req = new XMLHttpRequest();
           req.open("GET", '/exit');

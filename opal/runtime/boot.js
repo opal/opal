@@ -1,4 +1,4 @@
-(function(global_object) {
+(function() {
   "use strict";
 
   // @note
@@ -15,9 +15,8 @@
   //   The way the code is digested before going through Yardoc is a secret kept
   //   in the docs repo (https://github.com/opal/docs/tree/master).
 
-  var console;
-
   // Detect the global object
+  let global_object;
   if (typeof(globalThis) !== 'undefined') { global_object = globalThis; }
   else if (typeof(global) !== 'undefined') { global_object = global; }
   else if (typeof(window) !== 'undefined') { global_object = window; }
@@ -27,6 +26,7 @@
     global_object.console = {};
   }
 
+  let console;
   if (typeof(global_object.console) === 'object') {
     console = global_object.console;
   } else {
@@ -68,7 +68,6 @@
   // Configure runtime behavior with regards to require and unsupported features
   Opal.config = {
     missing_require_severity: 'error',        // error, warning, ignore
-    unsupported_features_severity: 'warning', // error, warning, ignore
     experimental_features_severity: 'warning',// warning, ignore
     enable_stack_trace: true                  // true, false
   };
@@ -126,7 +125,12 @@
       // + compiles to JS primitive
       // + allows method definition directly on instances
       // numbers, true, false and null do not support it.
-      object[name] = initialValue;
+      try { object[name] = initialValue; }
+      catch (e) {
+        if (Opal.raise)
+          Opal.raise(Opal.FrozenError, "can't modify frozen String: '" + (object) +"'", new Map([["receiver", object]]));
+        else throw e;
+      }
     } else {
       prop_options.value = initialValue;
       Object.defineProperty(object, name, prop_options);
@@ -180,7 +184,7 @@
       if (value.$$base_module == null) value.$$base_module = cref;
     }
 
-    cref.$$const = (cref.$$const || Object.create(null));
+    cref.$$const = (cref.$$const || { __proto__: null });
 
     if (name in cref.$$const || ("$$autoload" in cref && name in cref.$$autoload)) {
       new_const = false;
@@ -284,10 +288,11 @@
     $prop(klass, '$$cvars', {});
     $prop(klass, '$$own_included_modules', []);
     $prop(klass, '$$own_prepended_modules', []);
-    $prop(klass, '$$ancestors', []);
-    $prop(klass, '$$ancestors_cache_version', null);
     $prop(klass, '$$subclasses', []);
-    $prop(klass, '$$cloned_from', []);
+    // These are lazily set where needed:
+    // $prop(klass, '$$ancestors', []);
+    // $prop(klass, '$$ancestors_cache_version', null);
+    // $prop(klass, '$$cloned_from', []);
 
     $prop(klass.$$prototype, '$$class', klass);
 
@@ -368,9 +373,10 @@
     $prop(module, '$$iclasses', []);
     $prop(module, '$$own_included_modules', []);
     $prop(module, '$$own_prepended_modules', []);
-    $prop(module, '$$ancestors', [module]);
-    $prop(module, '$$ancestors_cache_version', null);
-    $prop(module, '$$cloned_from', []);
+    // These are lazily set where needed:
+    // $prop(module, '$$ancestors', [module]);
+    // $prop(module, '$$ancestors_cache_version', null);
+    // $prop(module, '$$cloned_from', []);
 
     $set_proto(module, Opal.Module.prototype);
 
@@ -404,6 +410,31 @@
   Opal.current_dir     = '.';
   Opal.require_table   = {'runtime/boot': true};
 
+  Opal.expand_module_path = function(path) {
+    path = path.toString();
+    let abs = /^[a-zA-Z]:(?:\\|\/)|^[\/\\]/.test(path),
+        i = 0, new_parts = [], new_path,
+        part, parts = path.split(/[/\/]/);
+
+    for (; i < parts.length; i++) {
+      part = parts[i];
+
+      if (
+        (part === nil) ||
+        (part == ''  && ((new_parts.length === 0) || abs)) ||
+        (part == '.' && ((new_parts.length === 0) || abs))
+      ) {
+        continue;
+      }
+      if (part == '..') new_parts.pop();
+      else new_parts.push(part);
+    }
+    if (!abs && parts[0] != '.') new_parts.unshift('.');
+    new_path = new_parts.join('/');
+    if (abs) new_path = '/' + new_path;
+    return new_path;
+  }
+
   Opal.normalize = function(path) {
     var parts, part, new_parts = [], SEPARATOR = '/';
 
@@ -424,23 +455,19 @@
     return new_parts.join(SEPARATOR);
   };
 
-  Opal.loaded = function(paths) {
-    var i, l, path;
+  Opal.loaded = function(path) {
+    path = Opal.normalize(path);
 
-    for (i = 0, l = paths.length; i < l; i++) {
-      path = Opal.normalize(paths[i]);
-
-      if (Opal.require_table[path]) {
-        continue;
-      }
-
-      Opal.loaded_features.push(path);
-      Opal.require_table[path] = true;
+    if (Opal.require_table[path]) {
+      return;
     }
+
+    Opal.loaded_features.push(path);
+    Opal.require_table[path] = true;
   };
 
   Opal.load_normalized = function(path) {
-    Opal.loaded([path]);
+    Opal.loaded(path);
 
     var module = Opal.modules[path];
 
@@ -470,6 +497,10 @@
   Opal.load = function(path) {
     path = Opal.normalize(path);
 
+    if (Opal.platform?.load_file && !Opal.modules[path]) {
+      Opal.platform.load_file(path);
+    }
+
     return Opal.load_normalized(path);
   };
 
@@ -478,6 +509,10 @@
 
     if (Opal.require_table[path]) {
       return false;
+    }
+
+    if (Opal.platform?.load_file && !Opal.modules[path]) {
+      Opal.platform.load_file(path);
     }
 
     return Opal.load_normalized(path);
@@ -498,13 +533,13 @@
       Opal.last_promise = Opal.last_promise.then(function() {
         if (!Opal.promise_unhandled_exception) return proc(Opal);
       })['catch'](function(error) {
-        if (Opal.respond_to(error, '$full_message')) {
+        if (Opal.respond_to && Opal.respond_to(error, '$full_message')) {
           error = error.$full_message();
         }
-        console.error(error);
+        console.error(error.toString());
         // Abort further execution
         Opal.promise_unhandled_exception = true;
-        Opal.exit(1);
+        Opal.platform.exit(1);
       });
       return Opal.last_promise;
     }
@@ -574,4 +609,6 @@
   // If enable-file-source-embed compiler option is enabled, each module loaded will add its
   // sources to this object
   Opal.file_sources = {};
-}).call(this);
+
+  return Opal;
+})();

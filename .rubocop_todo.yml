@@ -141,7 +141,6 @@ Lint/RedundantStringCoercion:
     - 'opal/corelib/marshal/read_buffer.rb'
     - 'opal/corelib/string.rb'
     - 'stdlib/date.rb'
-    - 'stdlib/nodejs/env.rb'
 
 # Offense count: 1
 # Configuration parameters: AllowedPatterns.
@@ -157,13 +156,6 @@ Performance/BindCall:
     - 'opal/corelib/marshal/write_buffer.rb'
     - 'opal/corelib/method.rb'
     - 'stdlib/native.rb'
-
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-Performance/RedundantBlockCall:
-  Exclude:
-    - 'stdlib/deno/file.rb'
-    - 'stdlib/nodejs/file.rb'
 
 # Offense count: 21
 # This cop supports safe autocorrection (--autocorrect).
@@ -227,8 +219,6 @@ Style/GlobalStdStream:
   Exclude:
     - 'lib/opal/cli_runners/safari.rb'
     - 'opal/corelib/io.rb'
-    - 'stdlib/deno/base.rb'
-    - 'stdlib/nodejs/base.rb'
 
 # Offense count: 2
 # Configuration parameters: MinBranchesCount.

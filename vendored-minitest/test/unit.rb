@@ -3,6 +3,8 @@
 require 'minitest/autorun'
 module Test
   module Unit
+    class AssertionFailedError < Exception; end
+
     class TestCase < Minitest::Test
       alias assert_raise assert_raises
 
@@ -13,7 +15,7 @@ module Test
       def assert_raise_with_message(exception, err_message, msg = nil)
         err = assert_raises(exception, msg) { yield }
         if err_message.is_a?(Regexp)
-          assert_matches err_message, err.message
+          assert_match err_message, err.message
         else
           assert_equal err_message, err.message
         end

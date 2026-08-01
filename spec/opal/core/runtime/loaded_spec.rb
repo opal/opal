@@ -8,15 +8,8 @@ describe 'Opal.loaded' do
     end
   end
 
-  it 'it works with multiple paths' do
-    `Opal.loaded(['bar'])`
-    `(Opal.require_table.foo == null)`.should == true
+  it 'it works with a single path' do
+    `Opal.loaded('bar')`
     `(Opal.require_table.bar === true)`.should == true
-    `(Opal.require_table.baz == null)`.should == true
-
-    `Opal.loaded(['foo', 'bar', 'baz'])`
-    `(Opal.require_table.foo === true)`.should == true
-    `(Opal.require_table.bar === true)`.should == true
-    `(Opal.require_table.baz === true)`.should == true
   end
 end

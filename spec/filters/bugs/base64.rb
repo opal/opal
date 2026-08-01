@@ -6,5 +6,5 @@ opal_filter "Base64" do
   fails "Base64#strict_decode64 raises ArgumentError when the given string contains an invalid character" # Expected ArgumentError but no exception was raised ("Ü" was returned)
   fails "Base64#strict_decode64 raises ArgumentError when the given string has wrong padding" # Expected ArgumentError but no exception was raised ("\u0001M\u0095¹\u0090\u0081É\u0095¥¹\u0099½É\u008D\u0095µ\u0095¹ÑÌ" was returned)
   fails "Base64#strict_decode64 returns a binary encoded string" # Expected #<Encoding:UTF-8> == #<Encoding:ASCII-8BIT> to be truthy but was false
-  fails "Base64#strict_encode64 returns a US_ASCII encoded string" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false  
+  fails "Base64#strict_encode64 returns a US_ASCII encoded string" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
 end

@@ -13,11 +13,13 @@ opal_filter "Kernel" do
   fails "Kernel#Float for hexadecimal literals with binary exponent returns 0 for '0x1p-10000'" # ArgumentError: invalid value for Float(): "0x1p-10000"
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1P10000'" # ArgumentError: invalid value for Float(): "0x1P10000"
   fails "Kernel#Float for hexadecimal literals with binary exponent returns Infinity for '0x1p10000'" # ArgumentError: invalid value for Float(): "0x1p10000"
-  fails "Kernel#Pathname returns same argument when called with a pathname argument" # Expected #<Pathname:0xb23c2 @path="foo">.equal? #<Pathname:0xb23c4 @path="foo"> to be truthy but was false
   fails "Kernel#String calls #to_s if #respond_to?(:to_s) returns true" # TypeError: no implicit conversion of MockObject into String
   fails "Kernel#String raises a TypeError if #to_s is not defined, even though #respond_to?(:to_s) returns true" # Expected TypeError but got: NoMethodError (undefined method `to_s' for #<Object:0x2961a>)
   fails "Kernel#__dir__ returns the expanded path of the directory when used in the main script" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x2b0e6>
+  fails "Kernel#__dir__ returns the real name of the directory containing the currently-executing file" # Expected "ruby/core/kernel" == "/home/jan/workspace/opal/spec/ruby/core/kernel" to be truthy but was false
   fails "Kernel#__dir__ when used in eval with top level binding returns nil" # Expected "." == nil to be truthy but was false
+  fails "Kernel#` is a private method" # Expected Kernel to have private instance method '`' but it does not
+  fails "Kernel#abort is a private method" # Expected Kernel to have private instance method 'abort' but it does not
   fails "Kernel#autoload calls main.require(path) to load the file" # Expected NameError but got: LoadError (cannot load such file -- main_autoload_not_exist)
   fails "Kernel#autoload can autoload in instance_eval" # NoMethodError: undefined method `autoload' for #<Object:0x4b3d2>
   fails "Kernel#autoload inside a Class.new method body should define on the new anonymous class" # NoMethodError: undefined method `autoload' for #<#<Class:0x4b3ee>:0x4b3ec>
@@ -37,6 +39,9 @@ opal_filter "Kernel" do
   fails "Kernel#class returns the class of the object" # Expected Number to be identical to Integer
   fails "Kernel#clone replaces a singleton object's metaclass with a new copy with the same superclass" # NoMethodError: undefined method `singleton_methods' for #<#<Class:0x5537a>:0x55378>
   fails "Kernel#clone uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
+  fails "Kernel#clone with freeze: anything else raises ArgumentError when passed not true/false/nil" # Expected ArgumentError (unexpected value for freeze: Integer) but got: ArgumentError (unexpected value for freeze: Number)
+  fails "Kernel#clone with freeze: false calls #initialize_clone with kwargs freeze: false even if #initialize_clone only takes a single argument" # Expected ArgumentError (wrong number of arguments (given 2, expected 1)) but got: ArgumentError ([Clone#initialize_clone] wrong number of arguments (given 2, expected 1))
+  fails "Kernel#clone with freeze: true calls #initialize_clone with kwargs freeze: true even if #initialize_clone only takes a single argument" # Expected ArgumentError (wrong number of arguments (given 2, expected 1)) but got: ArgumentError ([Clone#initialize_clone] wrong number of arguments (given 2, expected 1))
   fails "Kernel#dup uses the internal allocator and does not call #allocate" # RuntimeError: allocate should not be called
   fails "Kernel#eval allows a binding to be captured inside an eval" # NoMethodError: undefined method `w' for #<MSpecEnv:0x4be5a>
   fails "Kernel#eval allows creating a new class in a binding" # RuntimeError: Evaluation on a Proc#binding is not supported
@@ -65,8 +70,19 @@ opal_filter "Kernel" do
   fails "Kernel#eval with a magic encoding comment uses the magic comment encoding for parsing constants" # Expected ["A", "CoercedObject"] to include "Vπ"
   fails "Kernel#eval with refinements activates refinements from the binding" # NoMethodError: undefined method `foo' for #<EvalSpecs::A:0x4f966>
   fails "Kernel#eval with refinements activates refinements from the eval scope" # NoMethodError: undefined method `foo' for #<EvalSpecs::A:0x4fa98>
+  fails "Kernel#exec is a private method" # Expected Kernel to have private instance method 'exec' but it does not
+  fails "Kernel#exit is a private method" # Expected Kernel to have private instance method 'exit' but it does not
+  fails "Kernel#exit raises the SystemExit in the main thread if it reaches the top-level handler of another thread" # NotImplementedError: Thread creation not available
+  fails "Kernel#exit! exits when called from a fiber" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:   <internal:corelib/module.rb>:386:31:in `<top (required)>': uninitialized constant Fiber (NameError)       from <internal:runtime/const.rb>:36:1:in `const_get_relative'     from <internal:runtime/const.rb>:172:1:in `const_get_relative_factory'          from <internal:runtime/const.rb>:231:1:in `Fiber'         from __main__:1:1:in `Opal.modules.__main__'    from <internal:runtime/boot.js>:478:7:in `Opal.load_normalized'           from <internal:runtime/boot.js>:513:5:in `require'      from <internal:corelib/kernel.rb>:605:1:in `require'      from (entry):2:3:in `undefined'         from <internal:runtime/boot.js>:529:9:in `undefined'
+  fails "Kernel#exit! exits when called from a thread" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:   <internal:corelib/module.rb>:386:31:in `<top (required)>': uninitialized constant Thread (NameError)     from <internal:runtime/const.rb>:36:1:in `const_get_relative'     from <internal:runtime/const.rb>:172:1:in `const_get_relative_factory'          from <internal:runtime/const.rb>:231:1:in `Thread'        from __main__:1:1:in `Opal.modules.__main__'    from <internal:runtime/boot.js>:478:7:in `Opal.load_normalized'           from <internal:runtime/boot.js>:513:5:in `require'      from <internal:corelib/kernel.rb>:605:1:in `require'      from (entry):2:3:in `undefined'         from <internal:runtime/boot.js>:529:9:in `undefined'
+  fails "Kernel#exit! is a private method" # Expected Kernel to have private instance method 'exit!' but it does not
+  fails "Kernel#exit! overrides the original exception and exit status when called from #at_exit" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:   <internal:corelib/kernel.rb>:531:37:in `raise': original error (RuntimeError)         from __main__:6:5:in `Opal.modules.__main__'      from <internal:runtime/boot.js>:478:7:in `Opal.load_normalized'         from <internal:runtime/boot.js>:513:5:in `require'        from <internal:corelib/kernel.rb>:605:1:in `require'    from (entry):2:3:in `undefined'         from <internal:runtime/boot.js>:529:9:in `undefined'
   fails "Kernel#extend does not calls append_features on arguments metaclass" # Expected true == false to be truthy but was false
   fails "Kernel#fail accepts an Object with an exception method returning an Exception" # Expected StandardError (...) but got: TypeError (exception class/object expected)
+  fails "Kernel#fork is a private method" # Expected Kernel to have private instance method 'fork' but it does not
+  fails "Kernel#fork marks threads from the parent as killed" # NotImplementedError: Thread creation not available
+  fails "Kernel#freeze causes mutative calls to raise RuntimeError" # Expected RuntimeError but no exception was raised (1 was returned)
+  fails "Kernel#gets is a private method" # Expected Kernel to have private instance method 'gets' but it does not
   fails "Kernel#initialize_copy does nothing if the argument is the same as the receiver" # Expected nil.equal? #<Object:0x3cb42> to be truthy but was false
   fails "Kernel#initialize_copy raises FrozenError if the receiver is frozen" # Expected FrozenError but no exception was raised (nil was returned)
   fails "Kernel#initialize_copy raises TypeError if the objects are of different class" # Expected TypeError (initialize_copy should take same class object) but no exception was raised (nil was returned)
@@ -83,10 +99,14 @@ opal_filter "Kernel" do
   fails "Kernel#method converts the given name to a String using #to_str raises a TypeError if the given name can't be converted to a String" # Expected TypeError but got: NameError (undefined method `' for class `Class')
   fails "Kernel#method will see an alias of the original method as == when in a derived class" # Expected #<Method: KernelSpecs::B#aliased_pub_method (defined in KernelSpecs::B in ruby/core/kernel/fixtures/classes.rb:164)> == #<Method: KernelSpecs::B#pub_method (defined in KernelSpecs::A in ruby/core/kernel/fixtures/classes.rb:164)> to be truthy but was false
   fails "Kernel#methods does not return private singleton methods defined in 'class << self'" # Expected ["ichi", "san", "shi", "roku", "shichi", "hachi", "juu", "juu_ichi", "juu_ni"] not to include "shichi"
-  fails "Kernel#object_id returns a different value for two Bignum literals" # Expected 4e+100 == 4e+100 to be falsy but was true
-  fails "Kernel#object_id returns a different value for two String literals" # Expected "hello" == "hello" to be falsy but was true
-  fails "Kernel#p flushes output if receiver is a File" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x498ec @rs_f="\n" @rs_b=nil @rs_c=nil>
-  fails "Kernel#p is not affected by setting $\\, $/ or $," # NoMethodError: undefined method `tmp' for #<OutputToFDMatcher:0x49902 @to=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true> @expected="Next time, Gadget, NEXT TIME!\n" @to_name="STDOUT">
+  fails "Kernel#object_id returns a different value for two Bignum literals" # Expected 295330 == 295330 to be falsy but was true
+  fails "Kernel#object_id returns a different value for two String literals" # Expected 133036 == 133036 to be falsy but was true
+  fails "Kernel#open accepts options as keyword arguments" # Expected ArgumentError (wrong number of arguments (given 4, expected 1..3)) but no exception was raised (<File:fd 27> was returned)
+  fails "Kernel#open is a private method" # Expected Kernel to have private instance method 'open' but it does not
+  fails "Kernel#open is not redefined by open-uri" # NotImplementedError: NotImplementedError
+  fails "Kernel#open opens an io for writing" # Expected (STDOUT): "."           but got: "" Backtrace
+  fails "Kernel#open opens an io when called with a block" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open '|date'
+  fails "Kernel#open opens an io when path starts with a pipe" # Errno::ENOENT: No such file or directory - ENOENT: no such file or directory, open '|date'
   fails "Kernel#pp lazily loads the 'pp' library and delegates the call to that library" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x572a>
   fails "Kernel#print prints $_ when no arguments are given" # Expected:   $stdout: "foo"       got:   $stdout: ""
   fails "Kernel#public_method changes the method called for super on a target aliased method" # NoMethodError: undefined method `public_method' for #<#<Class:0x5a558>:0x5a556>
@@ -100,7 +120,7 @@ opal_filter "Kernel" do
   fails "Kernel#public_methods when passed nil returns a list of public methods in without its ancestors" # Expected ["f_pub", "f_pro", "f_pri"] == ["f_pub"] to be truthy but was false
   fails "Kernel#public_send includes `public_send` in the backtrace when passed a single incorrect argument" # Expected "method=\"public_send\" @object=nil> is not a symbol nor a string:in `TypeError: #<MSpecEnv:0x5399c '".include? "`public_send'" to be truthy but was false
   fails "Kernel#public_send includes `public_send` in the backtrace when passed not enough arguments" # Expected "<internal:corelib/runtime.js>:1546:5:in `Opal.ac'".include? "`public_send'" to be truthy but was false
-  fails "Kernel#puts delegates to $stdout.puts" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x561c0 @name=nil @stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true>>
+  fails "Kernel#putc is a private instance method" # Expected Kernel to have private instance method 'putc' but it does not
   fails "Kernel#raise accepts a cause keyword argument that overrides the last exception" # Expected #<RuntimeError: first raise> == #<StandardError: StandardError> to be truthy but was false
   fails "Kernel#raise accepts a cause keyword argument that sets the cause" # Expected nil == #<StandardError: StandardError> to be truthy but was false
   fails "Kernel#raise passes no arguments to the constructor when given only an exception class" # Expected #<Class:0x5390e> but got: ArgumentError ([#initialize] wrong number of arguments (given 1, expected 0))
@@ -109,6 +129,8 @@ opal_filter "Kernel" do
   fails "Kernel#rand is a private method" # Expected Kernel to have private instance method 'rand' but it does not
   fails "Kernel#rand is random on boot" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x19c2a>
   fails "Kernel#rand supports custom object types" # Expected "NaN#<struct KernelSpecs::CustomRangeInteger value=1>" (String) to be an instance of KernelSpecs::CustomRangeInteger
+  fails "Kernel#readline is a private method" # Expected Kernel to have private instance method 'readline' but it does not
+  fails "Kernel#readlines is a private method" # Expected Kernel to have private instance method 'readlines' but it does not
   fails "Kernel#remove_instance_variable raises a FrozenError if self is frozen" # Expected FrozenError but got: NameError (instance variable @foo not defined)
   fails "Kernel#remove_instance_variable raises for frozen objects" # Expected FrozenError but got: NameError (instance variable @foo not defined)
   fails "Kernel#respond_to? throws a type error if argument can't be coerced into a Symbol" # Expected TypeError (/is not a symbol nor a string/) but no exception was raised (false was returned)
@@ -117,114 +139,34 @@ opal_filter "Kernel" do
   fails "Kernel#singleton_class for an IO object with a replaced singleton class looks up singleton methods from the fresh singleton class after an object instance got a new one" # NoMethodError: undefined method `reopen' for #<File:0x6c204 @fd="ruby/core/kernel/singleton_class_spec.rb" @flags="r" @eof=false @closed="write">
   fails "Kernel#singleton_class raises TypeError for Symbol" # Expected TypeError but no exception was raised (#<Class:#<String:0x53aaa>> was returned)
   fails "Kernel#singleton_class raises TypeError for a frozen deduplicated String" # Expected TypeError (can't define singleton) but no exception was raised (#<Class:#<String:0x6c200>> was returned)
-  fails "Kernel#singleton_class returns a frozen singleton class if object is frozen" # Expected false to be true
   fails "Kernel#singleton_method find a method defined on the singleton class" # NoMethodError: undefined method `singleton_method' for #<Object:0x4540a>
   fails "Kernel#singleton_method only looks at singleton methods and not at methods in the class" # Expected NoMethodError == NameError to be truthy but was false
   fails "Kernel#singleton_method raises a NameError if there is no such method" # Expected NoMethodError == NameError to be truthy but was false
   fails "Kernel#singleton_method returns a Method which can be called" # NoMethodError: undefined method `singleton_method' for #<Object:0x453d6>
-  fails "Kernel#singleton_methods when not passed an argument does not return any included methods for a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::D
-  fails "Kernel#singleton_methods when not passed an argument does not return any included methods for a module including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::N
-  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x47396 @name="Object extended, included" @null=nil>
-  fails "Kernel#singleton_methods when not passed an argument for a module does not return methods in a module prepended to Module itself" # NoMethodError: undefined method `singleton_methods' for SingletonMethodsSpecs::SelfExtending
-  fails "Kernel#singleton_methods when not passed an argument returns a unique list for a subclass including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::C
-  fails "Kernel#singleton_methods when not passed an argument returns a unique list for a subclass" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::B
-  fails "Kernel#singleton_methods when not passed an argument returns a unique list for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x473b6 @name="Object extended" @null=nil>
-  fails "Kernel#singleton_methods when not passed an argument returns an empty Array for an object with no singleton methods" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x4739a @name="Object with no singleton methods" @null=nil>
-  fails "Kernel#singleton_methods when not passed an argument returns the names of class methods for a class" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::A
-  fails "Kernel#singleton_methods when not passed an argument returns the names of inherited singleton methods for a class extended with a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::P
-  fails "Kernel#singleton_methods when not passed an argument returns the names of inherited singleton methods for a subclass including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::C
-  fails "Kernel#singleton_methods when not passed an argument returns the names of inherited singleton methods for a subclass of a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::E
-  fails "Kernel#singleton_methods when not passed an argument returns the names of inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::F
-  fails "Kernel#singleton_methods when not passed an argument returns the names of inherited singleton methods for a subclass" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::B
-  fails "Kernel#singleton_methods when not passed an argument returns the names of module methods for a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::M
-  fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x473ca @name="Object extended, included" @null=nil>
-  fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x473c6 @name="Object extended" @null=nil>
-  fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x473ae @name="Object extended twice" @null=nil>
-  fails "Kernel#singleton_methods when not passed an argument returns the names of singleton methods for an object" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x473a2 @name="Object with singleton methods" @null=nil>
-  fails "Kernel#singleton_methods when passed false does not return any included methods for a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::D
-  fails "Kernel#singleton_methods when passed false does not return any included methods for a module including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::N
-  fails "Kernel#singleton_methods when passed false does not return names of inherited singleton methods for a subclass" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::B
-  fails "Kernel#singleton_methods when passed false does not return private singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x47450 @name="Object extended, included" @null=nil>
-  fails "Kernel#singleton_methods when passed false does not return the names of inherited singleton methods for a class extended with a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::P
-  fails "Kernel#singleton_methods when passed false for a module does not return methods in a module prepended to Module itself" # NoMethodError: undefined method `singleton_methods' for SingletonMethodsSpecs::SelfExtending
-  fails "Kernel#singleton_methods when passed false returns an empty Array for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x4742c @name="Object extended, included" @null=nil>
-  fails "Kernel#singleton_methods when passed false returns an empty Array for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x4744c @name="Object extended" @null=nil>
-  fails "Kernel#singleton_methods when passed false returns an empty Array for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x47428 @name="Object extended twice" @null=nil>
-  fails "Kernel#singleton_methods when passed false returns an empty Array for an object with no singleton methods" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x47446 @name="Object with no singleton methods" @null=nil>
-  fails "Kernel#singleton_methods when passed false returns the names of class methods for a class" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::A
-  fails "Kernel#singleton_methods when passed false returns the names of module methods for a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::M
-  fails "Kernel#singleton_methods when passed false returns the names of singleton methods for an object" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x47436 @name="Object with singleton methods" @null=nil>
-  fails "Kernel#singleton_methods when passed false returns the names of singleton methods of the subclass" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::B
-  fails "Kernel#singleton_methods when passed true does not return any included methods for a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::D
-  fails "Kernel#singleton_methods when passed true does not return any included methods for a module including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::N
-  fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x473e8 @name="Object extended, included" @null=nil>
-  fails "Kernel#singleton_methods when passed true for a module does not return methods in a module prepended to Module itself" # NoMethodError: undefined method `singleton_methods' for SingletonMethodsSpecs::SelfExtending
-  fails "Kernel#singleton_methods when passed true returns a unique list for a subclass including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::C
-  fails "Kernel#singleton_methods when passed true returns a unique list for a subclass" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::B
-  fails "Kernel#singleton_methods when passed true returns a unique list for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x47406 @name="Object extended" @null=nil>
-  fails "Kernel#singleton_methods when passed true returns an empty Array for an object with no singleton methods" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x473f8 @name="Object with no singleton methods" @null=nil>
-  fails "Kernel#singleton_methods when passed true returns the names of class methods for a class" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::A
-  fails "Kernel#singleton_methods when passed true returns the names of inherited singleton methods for a class extended with a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::P
-  fails "Kernel#singleton_methods when passed true returns the names of inherited singleton methods for a subclass including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::C
-  fails "Kernel#singleton_methods when passed true returns the names of inherited singleton methods for a subclass of a class including a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::E
-  fails "Kernel#singleton_methods when passed true returns the names of inherited singleton methods for a subclass of a class that includes a module, where the subclass also includes a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::F
-  fails "Kernel#singleton_methods when passed true returns the names of inherited singleton methods for a subclass" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::B
-  fails "Kernel#singleton_methods when passed true returns the names of module methods for a module" # NoMethodError: undefined method `singleton_methods' for ReflectSpecs::M
-  fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extended with a module including a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x47402 @name="Object extended, included" @null=nil>
-  fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extended with a module" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x473fc @name="Object extended" @null=nil>
-  fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object extended with two modules" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x47412 @name="Object extended twice" @null=nil>
-  fails "Kernel#singleton_methods when passed true returns the names of singleton methods for an object" # NoMethodError: undefined method `singleton_methods' for #<MockObject:0x473f2 @name="Object with singleton methods" @null=nil>
+  fails "Kernel#singleton_methods when not passed an argument does not return private singleton methods for an object extended with a module including a module" # Expected ["n_pub", "n_pro", "n_pri", "m_pub", "m_pro", "m_pri", "pub", "pro", "pri"] not to include "m_pri"
+  fails "Kernel#singleton_methods when passed true does not return private singleton methods for an object extended with a module including a module" # Expected ["n_pub", "n_pro", "n_pri", "m_pub", "m_pro", "m_pri", "pub", "pro", "pri"] not to include "m_pri"
   fails "Kernel#sleep accepts any Object that reponds to divmod" # TypeError: can't convert Object into time interval
-  fails "Kernel#sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (/out of char range/) but no exception was raised ("Ԇ" was returned)
-  fails "Kernel#sprintf %c uses the encoding of the format string to interpret codepoints" # ArgumentError: unknown encoding name - euc-jp
-  fails "Kernel#sprintf can produce a string with invalid encoding" # Expected true to be false
-  fails "Kernel#sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" == "..7651" to be truthy but was false
-  fails "Kernel#sprintf flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" == "1.e+02" to be truthy but was false
-  fails "Kernel#sprintf flags # applies to formats aAeEfgG forces a decimal point to be added, even if no digits follow" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf flags (digit)$ specifies the absolute argument number for this field" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf flags * left-justifies the result if specified with $ argument is negative" # Expected "1.095200e+2         " == "1.095200e+02        " to be truthy but was false
-  fails "Kernel#sprintf flags * left-justifies the result if width is negative" # Expected "1.095200e+2         " == "1.095200e+02        " to be truthy but was false
-  fails "Kernel#sprintf flags * raises ArgumentError when is mixed with width" # Expected ArgumentError but no exception was raised ("       112" was returned)
-  fails "Kernel#sprintf flags * uses the previous argument as the field width" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false
-  fails "Kernel#sprintf flags * uses the specified argument as the width if * is followed by a number and $" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false
-  fails "Kernel#sprintf flags + applies to numeric formats bBdiouxXaAeEfgG adds a leading plus sign to non-negative numbers" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf flags - left-justifies the result of conversion if width is specified" # Expected "1.095200e+2         " == "1.095200e+02        " to be truthy but was false
-  fails "Kernel#sprintf flags 0 (zero) applies to numeric formats bBdiouxXaAeEfgG and width is specified pads with zeros, not spaces" # Expected "0000000001.095200e+02" == "000000001.095200e+02" to be truthy but was false
-  fails "Kernel#sprintf flags space applies to numeric formats bBdiouxXeEfgGaA does not leave a space at the start of negative numbers" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf flags space applies to numeric formats bBdiouxXeEfgGaA leaves a space at the start of non-negative numbers" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf flags space applies to numeric formats bBdiouxXeEfgGaA treats several white spaces as one" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf float formats A converts floating point argument as [-]0xh.hhhhp[+-]dd and use uppercase X and P" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf float formats A displays Float::INFINITY as Inf" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf float formats A displays Float::NAN as NaN" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf float formats G otherwise cuts excessive digits in fractional part and keeps only 4 ones" # Expected "12.12341111" == "12.1234" to be truthy but was false
-  fails "Kernel#sprintf float formats G otherwise cuts fraction part to have only 6 digits at all" # Expected "1.1234567" == "1.12346" to be truthy but was false
-  fails "Kernel#sprintf float formats G otherwise rounds the last significant digit to the closest one in fractional part" # Expected "1.555555555" == "1.55556" to be truthy but was false
-  fails "Kernel#sprintf float formats G the exponent is greater than or equal to the precision (6 by default) converts a floating point number using exponential form" # Expected "1.234567E+06" == "1.23457E+06" to be truthy but was false
-  fails "Kernel#sprintf float formats a converts floating point argument as [-]0xh.hhhhp[+-]dd" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf float formats a displays Float::INFINITY as Inf" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf float formats a displays Float::NAN as NaN" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf float formats g otherwise cuts excessive digits in fractional part and keeps only 4 ones" # Expected "12.12341111" == "12.1234" to be truthy but was false
-  fails "Kernel#sprintf float formats g otherwise cuts fraction part to have only 6 digits at all" # Expected "1.1234567" == "1.12346" to be truthy but was false
-  fails "Kernel#sprintf float formats g otherwise rounds the last significant digit to the closest one in fractional part" # Expected "1.555555555" == "1.55556" to be truthy but was false
-  fails "Kernel#sprintf float formats g the exponent is greater than or equal to the precision (6 by default) converts a floating point number using exponential form" # Expected "1.234567e+06" == "1.23457e+06" to be truthy but was false
+  fails "Kernel#spawn executes the given command" # NotImplementedError: NotImplementedError
+  fails "Kernel#spawn is a private method" # Expected Kernel to have private instance method 'spawn' but it does not
+  fails "Kernel#sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (out of char range) but no exception was raised ("Ԇ" was returned)
+  fails "Kernel#sprintf %c uses the encoding of the format string to interpret codepoints" # Exception: Invalid code point 9415601
+  fails "Kernel#sprintf can produce a string with invalid encoding" # Expected #<Encoding:ASCII-8BIT> == #<Encoding:UTF-8> to be truthy but was false
   fails "Kernel#sprintf integer formats d works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
   fails "Kernel#sprintf integer formats i works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
   fails "Kernel#sprintf integer formats u works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
-  fails "Kernel#sprintf other formats % alone raises an ArgumentError" # Expected ArgumentError but no exception was raised ("%" was returned)
-  fails "Kernel#sprintf other formats c raises TypeError if argument is nil" # Expected TypeError (/no implicit conversion from nil to integer/) but got: TypeError (no implicit conversion of NilClass into Integer)
-  fails "Kernel#sprintf other formats c raises TypeError if argument is not String or Integer and cannot be converted to them" # Expected TypeError (/no implicit conversion of Array into Integer/) but got: ArgumentError (too few arguments)
-  fails "Kernel#sprintf other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x3e00a>)
-  fails "Kernel#sprintf other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x3e032>)
-  fails "Kernel#sprintf other formats c tries to convert argument to Integer with to_int" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x3e012>
-  fails "Kernel#sprintf other formats c tries to convert argument to String with to_str" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x3e028>
-  fails "Kernel#sprintf other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "Kernel#sprintf precision float types controls the number of decimal places displayed in fraction part" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel#sprintf precision float types does not affect G format" # Expected "12.12340000" == "12.1234" to be truthy but was false
-  fails "Kernel#sprintf precision string formats determines the maximum number of characters to be copied from the string" # Expected "1" == "[" to be truthy but was false
-  fails "Kernel#sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
-  fails "Kernel#sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false
+  fails "Kernel#sprintf other formats c raises TypeError if argument is nil" # Expected TypeError (no implicit conversion from nil to integer) but got: TypeError (no implicit conversion of NilClass into Integer)
+  fails "Kernel#sprintf other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (can't convert BasicObject to Integer) but got: TypeError (can't convert BasicObject into Integer (BasicObject#to_int gives String))
+  fails "Kernel#sprintf other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (can't convert BasicObject to String) but no exception was raised ("f" was returned)
+  fails "Kernel#sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # Expected CompatibilityError but no exception was raised ("Ä Ђ" was returned)
+  fails "Kernel#sprintf returns a String in the same encoding as the format String if compatible" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:KOI8_U (dummy)>
   fails "Kernel#srand is a private method" # Expected Kernel to have private instance method 'srand' but it does not
   fails "Kernel#srand returns the system-initialized seed value on the first call" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x46d76 @seed=6933182541716747>
+  fails "Kernel#system does not expand shell variables when given multiples arguments" # Expected (STDOUT): "$TEST_SH_EXPANSION\n"           but got: "foo\n" Backtrace
+  fails "Kernel#system does not write to stderr when command execution fails" # Expected (STDERR): ""           but got: "'sad' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n" Backtrace
+  fails "Kernel#system is a private method" # Expected Kernel to have private instance method 'system' but it does not
+  fails "Kernel#system raises Errno::ENOENT when `exception: true` is given and the specified command does not exist" # Expected Errno::ENOENT but got: RuntimeError (Command failed with exit 1: feature_14386)
+  fails "Kernel#test is a private method" # Expected Kernel to have private instance method 'test' but it does not
+  fails "Kernel#trap is a private method" # Expected Kernel to have private instance method 'trap' but it does not
   fails "Kernel#warn :uplevel keyword argument converts first arg using to_s" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: false/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: false "
   fails "Kernel#warn :uplevel keyword argument converts value to Integer" # TypeError: no implicit conversion of Number into Integer
   fails "Kernel#warn :uplevel keyword argument prepends a message with specified line from the backtrace" # Expected:   $stderr: /core\/kernel\/fixtures\/classes.rb:453: warning: foo/       got:   $stderr:  "ruby/core/kernel/fixtures/classes.rb:453:7: warning: foo "
@@ -331,81 +273,53 @@ opal_filter "Kernel" do
   fails "Kernel.__method__ returns the caller from block inside define_method too" # Expected [nil, nil] == ["dm_block", "dm_block"] to be truthy but was false
   fails "Kernel.__method__ returns the caller from blocks too" # Expected [nil, nil] == ["in_block", "in_block"] to be truthy but was false
   fails "Kernel.__method__ returns the caller from define_method too" # Expected nil == "dm" to be truthy but was false
+  fails "Kernel.at_exit both exceptions in a handler and in the main script are printed" # Expected  "<internal:corelib/kernel.rb>:531:37:in `raise': main_script_error (RuntimeError) \tfrom __main__:1:36:in `Opal.modules.__main__' \tfrom <internal:runtime/boot.js>:478:7:in `Opal.load_normalized' \tfrom <internal:runtime/boot.js>:513:5:in `require' \tfrom <internal:corelib/kernel.rb>:605:1:in `require' \tfrom (entry):2:3:in `undefined' \tfrom <internal:runtime/boot.js>:529:9:in `undefined'  ".include? "at_exit_error (RuntimeError)" to be truthy but was false
+  fails "Kernel.at_exit gives access to the last raised exception - global variables $! and $@" # Expected ["<internal:corelib/kernel.rb>:531:37:in `raise': foo (RuntimeError)\n",  "\tfrom __main__:6:9:in `Opal.modules.__main__'\n",  "\tfrom <internal:runtime/boot.js>:478:7:in `Opal.load_normalized'\n",  "\tfrom <internal:runtime/boot.js>:513:5:in `require'\n",  "\tfrom <internal:corelib/kernel.rb>:605:1:in `require'\n",  "\tfrom (entry):2:3:in `undefined'\n",  "\tfrom <internal:runtime/boot.js>:529:9:in `undefined'\n",  "\n"].include?  "The exception matches: true (message=foo) " to be truthy but was false
+  fails "Kernel.at_exit is a private method" # Expected Kernel to have private instance method 'at_exit' but it does not
+  fails "Kernel.at_exit runs handlers even if the main script fails to parse" # Expected  "__main__:2:1: error: unex...
   fails "Kernel.autoload calls #to_path on non-String filenames" # Mock 'path' expected to receive to_path("any_args") exactly 1 times but received it 0 times
   fails "Kernel.autoload when called from included module's method setups the autoload on the included module" # Expected nil == "ruby/core/kernel/fixtures/autoload_from_included_module2.rb" to be truthy but was false
   fails "Kernel.autoload when called from included module's method the autoload relative to the included module works" # NameError: uninitialized constant KernelSpecs::AutoloadMethod2::AutoloadFromIncludedModule2
+  fails "Kernel.exit raises the SystemExit in the main thread if it reaches the top-level handler of another thread" # NotImplementedError: Thread creation not available
+  fails "Kernel.exit! exits when called from a fiber" # NotImplementedError: NotImplementedError
+  fails "Kernel.exit! exits when called from a thread" # NotImplementedError: NotImplementedError
+  fails "Kernel.exit! overrides the original exception and exit status when called from #at_exit" # Expected exit status is 21 but actual is 1 for command ruby_exe("bundle exec opal /home/jan/workspace/opal/tmp/rubyspec_temp/rubyexe.rb") Output:
+  fails "Kernel.exit! skips ensure clauses" # Expected "" ==  "before " to be truthy but was false
+  fails "Kernel.fork marks threads from the parent as killed" # NotImplementedError: Thread creation not available
   fails "Kernel.global_variables finds subset starting with std" # NoMethodError: undefined method `global_variables' for #<MSpecEnv:0xb3298 @i=0>
   fails "Kernel.lambda does not create lambda-style Procs when captured with #method" # Expected true to be false
   fails "Kernel.lambda raises an ArgumentError when no block is given" # Expected ArgumentError but got: Exception (Cannot add property $$is_lambda, object is not extensible)
   fails "Kernel.lambda returns the passed Proc if given an existing Proc through super" # Expected true to be false
   fails "Kernel.lambda returns the passed Proc if given an existing Proc" # Expected true to be false
   fails "Kernel.loop returns StopIteration#result, the result value of a finished iterator" # Expected nil == "stopped" to be truthy but was false
-  fails "Kernel.printf calls write on the first argument when it is not a string" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4046a @name=nil @stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="read" @write_proc=#<Proc:0x40474> @tty=true>>
-  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if argument is nil" # Expected TypeError (/no implicit conversion from nil to integer/) but got: TypeError (no implicit conversion of NilClass into Integer)
-  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if argument is not String or Integer and cannot be converted to them" # Expected TypeError (/no implicit conversion of Array into Integer/) but got: ArgumentError (too few arguments)
-  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x407ec>)
-  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x407f6>)
-  fails "Kernel.printf formatting io is not specified other formats c tries to convert argument to Integer with to_int" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x4080e>
-  fails "Kernel.printf formatting io is not specified other formats c tries to convert argument to String with to_str" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x40800>
-  fails "Kernel.printf formatting io is not specified other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "Kernel.printf formatting io is specified other formats c raises TypeError if argument is nil" # Expected TypeError (/no implicit conversion from nil to integer/) but got: TypeError (no implicit conversion of NilClass into Integer)
-  fails "Kernel.printf formatting io is specified other formats c raises TypeError if argument is not String or Integer and cannot be converted to them" # Expected TypeError (/no implicit conversion of Array into Integer/) but got: ArgumentError (too few arguments)
-  fails "Kernel.printf formatting io is specified other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (/can't convert BasicObject to Integer/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x69e>)
-  fails "Kernel.printf formatting io is specified other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x6cc>)
-  fails "Kernel.printf formatting io is specified other formats c tries to convert argument to Integer with to_int" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x6a8>
-  fails "Kernel.printf formatting io is specified other formats c tries to convert argument to String with to_str" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x6c2>
-  fails "Kernel.printf formatting io is specified other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "Kernel.printf writes to stdout when a string is the first argument" # NoMethodError: undefined method `tmp' for #<MSpecEnv:0x4046a @name=nil @stdout=#<IO:0xa @fd=1 @flags="w" @eof=false @closed="both" @write_proc=#<Proc:0x40474> @tty=true>>
+  fails "Kernel.printf formatting io is not specified integer formats d works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
+  fails "Kernel.printf formatting io is not specified integer formats i works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
+  fails "Kernel.printf formatting io is not specified integer formats u works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
+  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if argument is nil" # Expected TypeError (no implicit conversion from nil to integer) but got: TypeError (no implicit conversion of NilClass into Integer)
+  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (can't convert BasicObject to Integer) but got: TypeError (can't convert BasicObject into Integer (BasicObject#to_int gives String))
+  fails "Kernel.printf formatting io is not specified other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (can't convert BasicObject to String) but no exception was raised ("f" was returned)
+  fails "Kernel.printf formatting io is specified integer formats d works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
+  fails "Kernel.printf formatting io is specified integer formats i works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
+  fails "Kernel.printf formatting io is specified integer formats u works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
+  fails "Kernel.printf formatting io is specified other formats c raises TypeError if argument is nil" # Expected TypeError (no implicit conversion from nil to integer) but got: TypeError (no implicit conversion of NilClass into Integer)
+  fails "Kernel.printf formatting io is specified other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (can't convert BasicObject to Integer) but got: TypeError (can't convert BasicObject into Integer (BasicObject#to_int gives String))
+  fails "Kernel.printf formatting io is specified other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (can't convert BasicObject to String) but no exception was raised ("f" was returned)
   fails "Kernel.proc returned the passed Proc if given an existing Proc" # Expected false to be true
-  fails "Kernel.sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (/out of char range/) but no exception was raised ("Ԇ" was returned)
-  fails "Kernel.sprintf %c uses the encoding of the format string to interpret codepoints" # ArgumentError: unknown encoding name - euc-jp
-  fails "Kernel.sprintf can produce a string with invalid encoding" # Expected true to be false
-  fails "Kernel.sprintf flags # applies to format o does nothing for negative argument" # Expected "0..7651" == "..7651" to be truthy but was false
-  fails "Kernel.sprintf flags # applies to formats aAeEfgG changes format from dd.dddd to exponential form for gG" # Expected "1.234e+02" == "1.e+02" to be truthy but was false
-  fails "Kernel.sprintf flags # applies to formats aAeEfgG forces a decimal point to be added, even if no digits follow" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf flags (digit)$ specifies the absolute argument number for this field" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf flags * left-justifies the result if specified with $ argument is negative" # Expected "1.095200e+2         " == "1.095200e+02        " to be truthy but was false
-  fails "Kernel.sprintf flags * left-justifies the result if width is negative" # Expected "1.095200e+2         " == "1.095200e+02        " to be truthy but was false
-  fails "Kernel.sprintf flags * raises ArgumentError when is mixed with width" # Expected ArgumentError but no exception was raised ("       112" was returned)
-  fails "Kernel.sprintf flags * uses the previous argument as the field width" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false
-  fails "Kernel.sprintf flags * uses the specified argument as the width if * is followed by a number and $" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false
-  fails "Kernel.sprintf flags + applies to numeric formats bBdiouxXaAeEfgG adds a leading plus sign to non-negative numbers" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf flags - left-justifies the result of conversion if width is specified" # Expected "1.095200e+2         " == "1.095200e+02        " to be truthy but was false
-  fails "Kernel.sprintf flags 0 (zero) applies to numeric formats bBdiouxXaAeEfgG and width is specified pads with zeros, not spaces" # Expected "0000000001.095200e+02" == "000000001.095200e+02" to be truthy but was false
-  fails "Kernel.sprintf flags space applies to numeric formats bBdiouxXeEfgGaA does not leave a space at the start of negative numbers" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf flags space applies to numeric formats bBdiouxXeEfgGaA leaves a space at the start of non-negative numbers" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf flags space applies to numeric formats bBdiouxXeEfgGaA treats several white spaces as one" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf float formats A converts floating point argument as [-]0xh.hhhhp[+-]dd and use uppercase X and P" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf float formats A displays Float::INFINITY as Inf" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf float formats A displays Float::NAN as NaN" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf float formats G otherwise cuts excessive digits in fractional part and keeps only 4 ones" # Expected "12.12341111" == "12.1234" to be truthy but was false
-  fails "Kernel.sprintf float formats G otherwise cuts fraction part to have only 6 digits at all" # Expected "1.1234567" == "1.12346" to be truthy but was false
-  fails "Kernel.sprintf float formats G otherwise rounds the last significant digit to the closest one in fractional part" # Expected "1.555555555" == "1.55556" to be truthy but was false
-  fails "Kernel.sprintf float formats G the exponent is greater than or equal to the precision (6 by default) converts a floating point number using exponential form" # Expected "1.234567E+06" == "1.23457E+06" to be truthy but was false
-  fails "Kernel.sprintf float formats a converts floating point argument as [-]0xh.hhhhp[+-]dd" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf float formats a displays Float::INFINITY as Inf" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf float formats a displays Float::NAN as NaN" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf float formats g otherwise cuts excessive digits in fractional part and keeps only 4 ones" # Expected "12.12341111" == "12.1234" to be truthy but was false
-  fails "Kernel.sprintf float formats g otherwise cuts fraction part to have only 6 digits at all" # Expected "1.1234567" == "1.12346" to be truthy but was false
-  fails "Kernel.sprintf float formats g otherwise rounds the last significant digit to the closest one in fractional part" # Expected "1.555555555" == "1.55556" to be truthy but was false
-  fails "Kernel.sprintf float formats g the exponent is greater than or equal to the precision (6 by default) converts a floating point number using exponential form" # Expected "1.234567e+06" == "1.23457e+06" to be truthy but was false
+  fails "Kernel.spawn executes the given command" # Expected (STDOUT): "spawn\n"           but got: "" Backtrace
+  fails "Kernel.sprintf %c raises error when a codepoint isn't representable in an encoding of a format string" # Expected RangeError (out of char range) but no exception was raised ("Ԇ" was returned)
+  fails "Kernel.sprintf %c uses the encoding of the format string to interpret codepoints" # Exception: Invalid code point 9415601
+  fails "Kernel.sprintf can produce a string with invalid encoding" # Expected #<Encoding:ASCII-8BIT> == #<Encoding:UTF-8> to be truthy but was false
   fails "Kernel.sprintf integer formats d works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
   fails "Kernel.sprintf integer formats i works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
   fails "Kernel.sprintf integer formats u works well with large numbers" # Expected "1234567890987654400" == "1234567890987654321" to be truthy but was false
-  fails "Kernel.sprintf other formats % alone raises an ArgumentError" # Expected ArgumentError but no exception was raised ("%" was returned)
-  fails "Kernel.sprintf other formats c raises TypeError if argument is nil" # Expected TypeError (/no implicit conversion from nil to integer/) but got: TypeError (no implicit conversion of NilClass into Integer)
-  fails "Kernel.sprintf other formats c raises TypeError if argument is not String or Integer and cannot be converted to them" # Expected TypeError (/no implicit conversion of Array into Integer/) but got: ArgumentError (too few arguments)
-  fails "Kernel.sprintf other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x3e8be>)
-  fails "Kernel.sprintf other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (/can't convert BasicObject to String/) but got: NoMethodError (undefined method `respond_to?' for #<BasicObject:0x3e8e6>)
-  fails "Kernel.sprintf other formats c tries to convert argument to Integer with to_int" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x3e8c6>
-  fails "Kernel.sprintf other formats c tries to convert argument to String with to_str" # NoMethodError: undefined method `respond_to?' for #<BasicObject:0x3e8e2>
-  fails "Kernel.sprintf other formats s preserves encoding of the format string" # Expected #<Encoding:UTF-8> == #<Encoding:US-ASCII> to be truthy but was false
-  fails "Kernel.sprintf precision float types controls the number of decimal places displayed in fraction part" # NotImplementedError: `A` and `a` format field types are not implemented in Opal yet
-  fails "Kernel.sprintf precision float types does not affect G format" # Expected "12.12340000" == "12.1234" to be truthy but was false
-  fails "Kernel.sprintf precision string formats determines the maximum number of characters to be copied from the string" # Expected "1" == "[" to be truthy but was false
-  fails "Kernel.sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # ArgumentError: unknown encoding name - windows-1252
-  fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # NameError: uninitialized constant Encoding::KOI8_U
-  fails "Kernel.sprintf width specifies the minimum number of characters that will be written to the result" # Expected "         1.095200e+02" == "        1.095200e+02" to be truthy but was false
+  fails "Kernel.sprintf other formats c raises TypeError if argument is nil" # Expected TypeError (no implicit conversion from nil to integer) but got: TypeError (no implicit conversion of NilClass into Integer)
+  fails "Kernel.sprintf other formats c raises TypeError if converting to Integer with to_int returns non-Integer" # Expected TypeError (can't convert BasicObject to Integer) but got: TypeError (can't convert BasicObject into Integer (BasicObject#to_int gives String))
+  fails "Kernel.sprintf other formats c raises TypeError if converting to String with to_str returns non-String" # Expected TypeError (can't convert BasicObject to String) but no exception was raised ("f" was returned)
+  fails "Kernel.sprintf raises Encoding::CompatibilityError if both encodings are ASCII compatible and there are not ASCII characters" # Expected CompatibilityError but no exception was raised ("Ä Ђ" was returned)
+  fails "Kernel.sprintf returns a String in the same encoding as the format String if compatible" # Expected #<Encoding:UTF-8> to be identical to #<Encoding:KOI8_U (dummy)>
+  fails "Kernel.system does not expand shell variables when given multiples arguments" # Expected (STDOUT): "$TEST_SH_EXPANSION\n"           but got: "foo\n" Backtrace
+  fails "Kernel.system does not write to stderr when command execution fails" # Expected (STDERR): ""           but got: "'sad' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n" Backtrace
+  fails "Kernel.system raises Errno::ENOENT when `exception: true` is given and the specified command does not exist" # Expected Errno::ENOENT but got: RuntimeError (Command failed with exit 1: feature_14386)
   fails_badly "Kernel#autoload registers a file to load the first time the named constant is accessed" # NoMethodError: undefined method `autoload?' for #<MSpecEnv:0x5b168>
   fails_badly "Kernel#autoload when called from included module's method setups the autoload on the included module"
   fails_badly "Kernel#autoload when called from included module's method the autoload is reachable from the class too"

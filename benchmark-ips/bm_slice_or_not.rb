@@ -1,3 +1,5 @@
+# backtick_javascript: true
+
 %x{
   // Minify common function calls
   var $call      = Function.prototype.call;

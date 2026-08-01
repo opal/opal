@@ -40,7 +40,7 @@ class ::Rational < ::Numeric
     end
 
     if den.equal?(1) && !(::Integer === num)
-      ::Opal.coerce_to!(num, ::Rational, :to_r)
+      `Opal.coerce_to_or_raise(num, Opal.Rational, "to_r")`
     elsif ::Numeric === num && ::Numeric === den
       num / den
     else

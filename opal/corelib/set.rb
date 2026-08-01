@@ -17,7 +17,7 @@ class ::Set
     ::Kernel.raise ::ArgumentError, 'value must be enumerable' unless ::Enumerable === enum
 
     if block
-      enum.each { |item| add yield(item) }
+      enum.each { |item| add(yield(item)) }
     else
       merge(enum)
     end

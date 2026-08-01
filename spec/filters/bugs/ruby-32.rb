@@ -3,14 +3,6 @@ opal_filter "Ruby 3.2" do
   fails "A block yielded a single Array does not autosplat single argument to required arguments when a keyword rest argument is present" # ArgumentError: expected kwargs
   fails "Fixnum is no longer defined" # Expected Object.const_defined? "Fixnum" to be falsy but was true
   fails "Kernel#=~ is no longer defined" # Expected #<Object:0x11214>.respond_to? "=~" to be falsy but was true
-  fails "Kernel#sprintf other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
-  fails "Kernel#sprintf other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
-  fails "Kernel.printf formatting io is not specified other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
-  fails "Kernel.printf formatting io is not specified other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
-  fails "Kernel.printf formatting io is specified other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
-  fails "Kernel.printf formatting io is specified other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
-  fails "Kernel.sprintf other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
-  fails "Kernel.sprintf other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
   fails "Keyword arguments delegation does not work with call(*ruby2_keyword_args) with missing ruby2_keywords in between" # Expected [[], {}] == [[{}], {}] to be truthy but was false
   fails "Method#owner returns the class on which public was called for a private method in ancestor" # Expected MethodSpecs::InheritedMethods::B == MethodSpecs::InheritedMethods::C to be truthy but was false
   fails "Method#parameters adds * rest arg for \"star\" argument" # Expected [["rest"]] == [["rest", "*"]] to be truthy but was false
@@ -31,9 +23,6 @@ opal_filter "Ruby 3.2" do
   fails "Regexp.timeout raises Regexp::TimeoutError after global timeout elapsed" # NoMethodError: undefined method `timeout=' for Regexp
   fails "Regexp.timeout raises Regexp::TimeoutError after timeout keyword value elapsed" # NoMethodError: undefined method `timeout=' for Regexp
   fails "Regexp.timeout returns global timeout" # NoMethodError: undefined method `timeout=' for Regexp
-  fails "String#% other formats c displays no characters if argument is an empty string" # ArgumentError: %c requires a character
-  fails "String#% other formats c displays only the first character if argument is a string of several characters" # ArgumentError: %c requires a character
-  fails "String#% supports only the first character as argument for %c" # ArgumentError: %c requires a character
   fails "String#dedup deduplicates frozen strings" # Expected "this string is frozen" not to be identical to "this string is frozen"
   fails "String#dedup does not deduplicate a frozen string when it has instance variables" # Exception: Cannot create property 'a' on string 'this string is frozen'
   fails "String#dedup interns the provided string if it is frozen" # NoMethodError: undefined method `dedup' for "this string is unique and frozen 0.698166086070234"
@@ -46,5 +35,5 @@ opal_filter "Ruby 3.2" do
   fails "Symbol#to_proc only calls public methods" # Expected NoMethodError (/protected method `pro' called/) but no exception was raised (#<MSpecEnv:0x146c8 @a=["pub", "pro"]> was returned)
   fails "The module keyword does not reopen a module included in Object" # Expected ModuleSpecs::IncludedInObject::IncludedModuleSpecs == ModuleSpecs::IncludedInObject::IncludedModuleSpecs to be falsy but was true
   fails "UnboundMethod#owner returns the class on which public was called for a private method in ancestor" # Expected MethodSpecs::InheritedMethods::B == MethodSpecs::InheritedMethods::C to be truthy but was false
-  fails "main.using does not raise error when wrapped with module" # Expected to not get Exception but got: ArgumentError ([MSpecEnv#load] wrong number of arguments (given 2, expected 1))  
+  fails "main.using does not raise error when wrapped with module" # Expected to not get Exception but got: ArgumentError ([MSpecEnv#load] wrong number of arguments (given 2, expected 1))
 end

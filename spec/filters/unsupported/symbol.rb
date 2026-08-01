@@ -14,5 +14,5 @@ opal_unsupported_filter "Symbol" do
   fails "Module#const_get raises a NameError if a Symbol has a toplevel scope qualifier" # Expected NameError but no exception was raised ("const1" was returned)
   fails "Module#const_get raises a NameError if a Symbol is a scoped constant name" # Expected NameError but no exception was raised ("const10_10" was returned)
   fails "Numeric#coerce raises a TypeError when passed a Symbol" # Expected TypeError but got: ArgumentError (invalid value for Float(): "symbol")
-  fails "The throw keyword does not convert strings to a symbol" # Expected ArgumentError but no exception was raised (nil was returned)  
+  fails "The throw keyword does not convert strings to a symbol" # Expected ArgumentError but no exception was raised (nil was returned)
 end

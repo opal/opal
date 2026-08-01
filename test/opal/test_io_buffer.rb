@@ -1,7 +1,7 @@
 # frozen_string_literal: false
 
 require 'tempfile'
-require 'corelib/io/buffer'
+require 'io/buffer'
 
 class TestIOBuffer < Test::Unit::TestCase
   def assert_negative(value)

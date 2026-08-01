@@ -55,5 +55,5 @@ opal_filter "Float" do
   fails "Float#to_s uses non-e format for a positive value with whole part having 15 significant figures" # Expected "10000000000000" == "10000000000000.0" to be truthy but was false
   fails "Float#to_s uses non-e format for a positive value with whole part having 16 significant figures" # Expected "100000000000000" == "100000000000000.0" to be truthy but was false
   fails "Float#truncate raises a FloatDomainError for NaN" # Expected FloatDomainError but no exception was raised (NaN was returned)
-  fails "Float#truncate returns self truncated to an Integer" # Expected -1 to have same value and type as 0  
+  fails "Float#truncate returns self truncated to an Integer" # Expected -1 to have same value and type as 0
 end

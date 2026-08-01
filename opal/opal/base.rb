@@ -1,5 +1,4 @@
 ::Object.require 'runtime/runtime'
-
 ::Object.require 'corelib/module'
 ::Object.require 'corelib/class'
 ::Object.require 'corelib/basic_object'

@@ -358,7 +358,7 @@ module Opal
           @switch_additional_rules = sexp.meta[:switch_additional_rules]
           compile_switch_case(sexp.meta[:switch_test])
         else
-          line "switch (", expr(@switch_first_test), ".valueOf()) {"
+          line "switch (", expr(@switch_first_test), @switch_first_test.type == :int ? ") {" : ".valueOf()) {"
           indent do
             compile_switch_case(@switch_test)
           end

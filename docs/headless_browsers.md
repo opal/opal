@@ -43,12 +43,12 @@ By default headless browser runner explicitly sets exit code to 1 when there was
       from -e:1:1:in `undefined'
     1
 
-You can change final exit code by using `Kernel#exit`, but make sure to require `opal/platform` in your code.
+You can change final exit code by using `Kernel#exit`.
 
-    $ opal -Rchrome -ropal/platform -e "exit(0)"; echo $?
+    $ opal -Rchrome -e "exit(0)"; echo $?
     0
 
-    $ opal -Rchrome -ropal/platform -e "exit(1)"; echo $?
+    $ opal -Rchrome -e "exit(1)"; echo $?
     1
 
 ## Known limitations
@@ -78,12 +78,12 @@ catches errors and forwards console messages.
 This runner tries to connect to `localhost:9333` (9333 is the default port for a headless firefox server used by Opal to prevent accidental
 connection to a lingering Chrome at port 9222)
 or runs the server on its own. It detects your platform and uses a default path to the Firefox executable
-(`Opal::CliRunners::Firefox#firefox_executable`), but you can override it by specifying `MOZILLA_FIREFOX_BINARY` environment 
+(`Opal::CliRunners::Firefox#firefox_executable`), but you can override it by specifying `MOZILLA_FIREFOX_BINARY` environment
 variable.
 
 When the server is up and running it passes compiled js code to `lib/opal/cli_runners/cdp_interface.rb`
 as a plain input using stdin (basically, it's a second part of the runner).
-`cdp_interface.rb` is a node js + Opal script that does the main job. It runs any provided code on the running firefox server, 
+`cdp_interface.rb` is a node js + Opal script that does the main job. It runs any provided code on the running firefox server,
 catches errors and forwards console messages.
 
 ## Using a remote chrome or firefox server
