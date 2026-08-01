@@ -61,8 +61,8 @@ module Opal
 
               begin
                 args[:processed_mutex].synchronize do
-                  shall_skip = builder.already_processed.include?(req)
-                  builder.already_processed << req unless shall_skip
+                  shall_skip = builder.already_processed?(req)
+                  builder.mark_as_processed(req) unless shall_skip
                 end
 
                 next if shall_skip

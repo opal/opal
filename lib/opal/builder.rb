@@ -161,14 +161,29 @@ module Opal
     end
 
     def process_require(rel_path, autoloads, options)
-      return if already_processed.include?(rel_path)
-      already_processed << rel_path
+      return if already_processed?(rel_path)
+      mark_as_processed(rel_path)
       asset = process_require_threadsafely(rel_path, autoloads, options)
       processed << asset if asset
     end
 
     def already_processed
       @already_processed ||= Set.new
+    end
+
+    def already_processed?(rel_path)
+      already_processed.include? require_key(rel_path)
+    end
+
+    def mark_as_processed(rel_path)
+      already_processed << require_key(rel_path)
+    end
+
+    # NOTE: `./foo`, `foo` and `foo.rb` all end up in the same
+    # `Opal.modules` entry, so they need to share a dedupe key or the module
+    # would be emitted more than once.
+    def require_key(rel_path)
+      Opal::Compiler.module_name(rel_path)
     end
 
     include Project::Collection

@@ -217,9 +217,9 @@ module Opal
 
               rel_path, req, autoloads, options = *queue.shift
 
-              next if builder.already_processed.include?(req)
+              next if builder.already_processed?(req)
               awaiting += 1
-              builder.already_processed << req
+              builder.mark_as_processed(req)
               io.send(:compile, rel_path, req, autoloads, options)
             end
 
