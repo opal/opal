@@ -75,7 +75,11 @@ module Opal
                 args[:queue_mutex].synchronize do
                   exe[:continue] = false
                   exe[:busy] = 0
-                  args[:exception] = Builder::MissingRequire.new "A file required by #{rel_path.inspect} wasn't found.\n#{error.message}", error.backtrace
+                  # NOTE: `LoadError#initialize` only takes a message, so the
+                  # backtrace has to be assigned separately.
+                  args[:exception] = Builder::MissingRequire
+                                     .new("A file required by #{rel_path.inspect} wasn't found.\n#{error.message}")
+                                     .tap { |e| e.set_backtrace(error.backtrace) }
                 end
               rescue => error
                 args[:queue_mutex].synchronize do
