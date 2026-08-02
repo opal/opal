@@ -72,7 +72,7 @@ module Opal
 
       @stubs                    ||= []
       @processors               ||= ::Opal::Builder.processors
-      @path_reader              ||= PathReader.new(Opal.paths, extensions.map { |e| [".#{e}", ".js.#{e}"] }.flatten)
+      @path_reader              ||= default_path_reader
       @compiler_options         ||= Opal::Config.compiler_options
       @missing_require_severity ||= Opal::Config.missing_require_severity
       @cache                    ||= Opal.cache
@@ -195,8 +195,28 @@ module Opal
       @postprocessed ||= PostProcessor.call(processed, self)
     end
 
-    attr_accessor :processors, :path_reader, :stubs, :dce,
+    attr_accessor :processors, :stubs, :dce,
       :compiler_options, :missing_require_severity, :cache, :scheduler
+
+    # `cwd` is the directory a require with a leading './' is resolved against,
+    # as MRI resolves against the process CWD. Defaults to nil, which looks
+    # './foo' up in the load path instead. Set by entry points that have a
+    # meaningful working directory, such as the CLI. See {PathReader#expand}.
+    #
+    # Both have a custom writer, so they cannot join the attr_accessor above.
+    attr_reader :cwd, :path_reader
+
+    def cwd=(cwd)
+      @cwd = cwd
+      path_reader.cwd = cwd if path_reader
+    end
+
+    # The path reader is the one doing the resolving, so it has to be told
+    # about the cwd whenever it is swapped out for another one.
+    def path_reader=(path_reader)
+      @path_reader = path_reader
+      path_reader.cwd = @cwd if path_reader && @cwd
+    end
 
     alias dce? dce
 
@@ -240,6 +260,12 @@ module Opal
     end
 
     private
+
+    # NOTE: `cwd` is applied by the options loop in #initialize, before this
+    # reader exists, so it has to be handed over at construction time.
+    def default_path_reader
+      PathReader.new(Opal.paths, extensions.flat_map { |e| [".#{e}", ".js.#{e}"] }, cwd: @cwd)
+    end
 
     def process_requires(rel_path, requires, autoloads, options)
       @scheduler.process_requires(rel_path, requires, autoloads, options)
