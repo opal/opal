@@ -41,7 +41,9 @@ namespace :docs do
 
   desc 'Lint markdown documentation with markdownlint-cli2'
   task :markdownlint do
-    sh 'bin/yarn', 'run', 'markdownlint-cli2'
+    # NOTE: markdownlint-cli2 is not a project dependency: it is only ever run
+    # as a linter, never imported. Pinned to match the version CI installs.
+    sh 'npx', '--yes', 'markdownlint-cli2@0.18.1'
   end
 
   desc 'Run all documentation checks that are safe to block a pull request'
