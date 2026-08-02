@@ -12,6 +12,26 @@ module Opal
         compile_default.call
       end
 
+      # Bundle the file named by a #load call, the same way #require does.
+      # Without this the module is never emitted, so #load fails at runtime even
+      # though the file was perfectly reachable at build time.
+      #
+      # Unlike #require, #load is a common method name on other receivers
+      # (YAML.load, Marshal.load, JSON.load, ...) whose argument is not a path,
+      # so only a call that can reach Kernel#load is tracked.
+      #
+      # A dynamic argument is always ignored, whatever #dynamic_require_severity
+      # says: #load is routinely given paths computed at runtime, and the file is
+      # often bundled by a separate #require, so warning here would fire on
+      # perfectly correct code.
+      add_special :load do |compile_default|
+        next compile_default.call unless kernel_receiver?
+
+        str = DependencyResolver.new(compiler, arglist.children[0], :ignore).resolve
+        compiler.track_require str unless str.nil?
+        compile_default.call
+      end
+
       add_special :require_relative do
         arg = arglist.children[0]
         file = compiler.file
@@ -51,6 +71,15 @@ module Opal
         end
         @arglist = arglist.updated(nil, [first_arg] + rest)
         compile_default.call
+      end
+
+      # Whether the call could be dispatched to Kernel, i.e. it has no explicit
+      # receiver, or one that is `self`, `Kernel` or `::Kernel`.
+      def kernel_receiver?
+        recvr.nil? ||
+          recvr == s(:self) ||
+          recvr == s(:const, nil, :Kernel) ||
+          recvr == s(:const, s(:cbase), :Kernel)
       end
 
       class DependencyResolver
