@@ -2,9 +2,11 @@
 
 ## Prerequisites
 
-- **Ruby.** The gemspec requires `>= 2.3`, and CI covers 3.0 through 4.0 plus JRuby.
-  CI's `DEFAULT_RUBY` is **3.4**, so that is the version to develop against if you
-  want the closest match to the reference build.
+- **Ruby.** The minimum is set by `required_ruby_version` in
+  [`opal.gemspec`](opal.gemspec). To match the reference build, develop against
+  the `DEFAULT_RUBY` named in
+  [`.github/workflows/build.yml`](.github/workflows/build.yml); the same file's
+  matrix lists every version CI covers, including JRuby.
 - **Node.js** with `npm`. Needed for the Node-based spec runners and for the JS
   linting step. There is no pinned version; CI uses whatever its runner image ships.
 - **A browser**, if you intend to run the full suite. See
