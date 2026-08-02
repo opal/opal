@@ -135,6 +135,11 @@ module ::Kernel
 
         switch (format_string.charAt(i)) {
         case '%':
+          // `begin_slice = i` points at the second `%`, so the next flush
+          // re-emits it as literal text. The run preceding the first `%` has
+          // not been flushed yet though, so it must be emitted here or moving
+          // `begin_slice` past it would discard it.
+          result += format_string.slice(begin_slice, end_slice);
           begin_slice = i;
           // no-break
         case '':

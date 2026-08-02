@@ -28,6 +28,7 @@ Changes are grouped as follows:
 - Compat regression fix: `Hash#to_n` should return a JS object ([#2613](https://github.com/opal/opal/pull/2613))
 - Bundle files named by `load`, so that `load` no longer needs a matching `require` to succeed ([#2629](https://github.com/opal/opal/issues/2629))
 - `Kernel#load` no longer adds the file to `$LOADED_FEATURES`, so a later `require` of the same path runs it again, like in MRI
+- `Kernel#format`: Keep the literal text preceding a `%%` escape ([#2796](https://github.com/opal/opal/pull/2796))
 
 ### Internal
 
