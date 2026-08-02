@@ -5,7 +5,7 @@ set -vx
 
 gem install bundler --conservative
 
-bundle update
+bundle install
 
 git submodule update --init
 

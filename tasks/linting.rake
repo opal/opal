@@ -16,7 +16,13 @@ namespace :lint do
 
     files = Dir["#{dir}/*.js"]
 
-    sh "yarn", "run", "eslint", *files, "--format", "json", "--output-file", result_path do |ok, _|
+    unless File.exist?('node_modules/.bin/eslint')
+      abort 'ESLint is not installed. Run `bin/setup` (or `bin/yarn install`) first.'
+    end
+
+    # NOTE: go through bin/yarn rather than a bare `yarn` so the Yarn v1 resolution
+    # (and its npx fallback) in that script applies here too.
+    sh "bin/yarn", "run", "eslint", *files, "--format", "json", "--output-file", result_path do |ok, _|
       if ok
         puts "Successful."
       else
@@ -34,4 +40,5 @@ RuboCop::RakeTask.new('lint:rubocop') do |task|
   task.options << '--parallel'
 end
 
+desc 'Run all linters (ESLint on the built dist, RuboCop on lib/, opal/ and stdlib/)'
 task :lint => %w[lint:eslint lint:rubocop]

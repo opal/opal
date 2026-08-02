@@ -1,11 +1,38 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Resolves a Yarn v1 executable and forwards ARGV to it.
+#
+# NOTE: yarn.lock in this repo is a Yarn *v1* lockfile ("yarn lockfile v1") and CI
+# installs with the plain `yarn install` that GitHub's runner images ship, which is
+# also Yarn 1.22.x. Running Yarn 2+ here would rewrite the lockfile into the modern
+# format, so this script deliberately pins the major version to 1.
+#
+# Resolution order:
+#   1. `yarn` / `yarnpkg` already on PATH, if it reports a 1.x version.
+#   2. `npx --yes yarn@1.22.22` — needs no global install and no version manager
+#      shim, so it works on a machine that has only Node + npm.
+YARN_PACKAGE = 'yarn@1.22.22'
+
 APP_ROOT = File.expand_path('..', __dir__)
+
+def yarn_v1?(executable)
+  version = IO.popen([executable, '--version'], err: File::NULL, &:read).to_s.strip
+  version.start_with?('1.')
+rescue Errno::ENOENT, Errno::EACCES
+  false
+end
+
 Dir.chdir(APP_ROOT) do
-  begin
-    exec "yarnpkg", *ARGV
-  rescue Errno::ENOENT
-    $stderr.puts "Yarn executable was not detected in the system."
-    $stderr.puts "Download Yarn at https://yarnpkg.com/en/docs/install"
+  command = %w[yarn yarnpkg].find { |executable| yarn_v1?(executable) }
+
+  if command
+    exec command, *ARGV
+  elsif system('npx', '--version', out: File::NULL, err: File::NULL)
+    exec 'npx', '--yes', YARN_PACKAGE, *ARGV
+  else
+    warn 'No Yarn 1.x executable was found, and npx is unavailable to fetch one.'
+    warn "Install Node.js (which provides npx), or install Yarn 1 globally: npm install -g #{YARN_PACKAGE}"
     exit 1
   end
 end
