@@ -458,6 +458,13 @@ module ::Marshal
 
       primitive_ivars = read_hash(cache: false)
 
+      if object.is_a?(::Time)
+        zone = primitive_ivars.delete('zone')
+        offset = primitive_ivars.delete('offset')
+        `object.timezone = offset / 60` if offset
+        `object.$$zone_name = zone` if zone
+      end
+
       if primitive_ivars.any? && object.is_a?(String)
         object = `Opal.str(object)`
       end

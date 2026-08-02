@@ -22,11 +22,6 @@ opal_filter "Marshal" do
   fails "Marshal.dump with a Struct ignores overridden name method" # Expected "\x04\bS:\bFoo\x06:\x06a\"\vmember" == "\x04\bS:*MarshalSpec::StructWithOverriddenName\x06:\x06a\"\vmember" to be truthy but was false
   fails "Marshal.dump with a Struct raises TypeError with an anonymous Struct" # Expected TypeError (/can't dump anonymous class/) but got: NoMethodError (undefined method `length' for nil)
   fails "Marshal.dump with a Symbol dumps multiple Symbols sharing the same encoding" # Expected "\x04\b[\a\"\tâ\x82¬a\"\tâ\x82¬b" == "\u0004\b[\aI:\tâ\u0082¬a\u0006:\u0006ETI:\tâ\u0082¬b\u0006;\u0006T" to be truthy but was false
-  fails "Marshal.dump with a Time dumps a Time subclass with multibyte characters in name" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Marshal.dump with a Time dumps the zone and the offset" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Marshal.dump with a Time dumps the zone, but not the offset if zone is UTC" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Marshal.dump with a Time ignores overridden name method" # NoMethodError: undefined method `default_internal' for Encoding
-  fails "Marshal.dump with a Time raises TypeError with an anonymous Time subclass" # NoMethodError: undefined method `default_internal' for Encoding
   fails "Marshal.dump with an Array ignores overridden name method when dumps an Array subclass" # Expected "\x04\bC:\bFoo[\x00" == "\x04\bC:)MarshalSpec::ArrayWithOverriddenName[\x00" to be truthy but was false
   fails "Marshal.dump with an Exception contains the filename in the backtrace" # Expected  "\x04\bo:\x0EException\b: @name\"\x0EException:\v@cause0:\x0F@backtrace[\x06\"\x12foo/bar.rb:10" == "\x04\bo:\x0EException\a:\tmesg\"\bfoo:\abt[\x06\"\x12foo/bar.rb:10" to be truthy but was false
   fails "Marshal.dump with an Exception dumps an empty Exception" # Expected  "\x04\bo:\x0EException\a: @name\"\x0EException:\v@cause0" == "\x04\bo:\x0EException\a:\tmesg0:\abt0" to be truthy but was false
@@ -67,10 +62,6 @@ opal_filter "Marshal" do
   fails "Marshal.load for a Symbol loads a binary encoded Symbol" # Expected "â\u0086\u0092" == "→" to be truthy but was false
   fails "Marshal.load for a Symbol loads an encoded Symbol" # Expected "â\u0086\u0092" == "→" to be truthy but was false
   fails "Marshal.load for a Symbol raises ArgumentError when end of byte sequence reached before symbol characters end" # Expected  "\x04\b\" hello" ==  "\x04\b: hello" to be truthy but was false
-  fails "Marshal.load for a Time keeps nanoseconds" # NoMethodError: undefined method `nsec' for 2023-09-20 22:51:57 +0200
-  fails "Marshal.load for a Time keeps the zone" # Expected "Central European Summer Time" == "AST" to be truthy but was false
-  fails "Marshal.load for a Time keeps utc offset" # Expected 540 == 32400 to be truthy but was false
-  fails "Marshal.load for a Time loads" # Expected 2022-12-07 05:35:14 +0100 == 1970-01-01 01:00:01 +0100 to be truthy but was false
   fails "Marshal.load for a user object that extends a core type other than Object or BasicObject raises ArgumentError if the resulting class does not extend the same type" # Expected ArgumentError but got: TypeError (no implicit conversion of Hash into Integer)
   fails "Marshal.load for an Exception loads a marshalled exception with a backtrace" # Expected "Exception" == "foo" to be truthy but was false
   fails "Marshal.load for an Exception loads a marshalled exception with a message" # Expected "Exception" == "foo" to be truthy but was false
