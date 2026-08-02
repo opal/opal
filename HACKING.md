@@ -31,9 +31,9 @@ Then check that things work, starting with the fastest useful command:
 $ bundle exec rspec spec/lib/compiler_spec.rb
 ```
 
-That runs 79 examples in well under a second and needs no browser and no Node.js, so
-it is the best signal that your checkout is healthy. It is also the inner loop to reach
-for while working on the compiler itself.
+That runs in well under a second and needs no browser and no Node.js, so it is the
+best signal that your checkout is healthy. It is also the inner loop to reach for
+while working on the compiler itself.
 
 You are now ready to make your first contribution to Opal! At a high level, your workflow will be to:
 
@@ -41,11 +41,6 @@ You are now ready to make your first contribution to Opal! At a high level, your
 2. Run the test suite to make sure it still passes
 3. Run `bin/rake lint` before pushing
 4. Submit a pull request
-
-Note on invoking rake: this repo ships a `bin/rake` wrapper that loads `bundler/setup`
-for you, so **prefer `bin/rake <task>`**. Bare `rake` fails with a `Gem::LoadError` when
-your system rake differs from the one in `Gemfile.lock`; `bundle exec rake` works too.
-CI uses `bin/rake`.
 
 ## Running the tests
 
