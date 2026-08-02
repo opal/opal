@@ -72,7 +72,7 @@ module Opal
 
       @stubs                    ||= []
       @processors               ||= ::Opal::Builder.processors
-      @path_reader              ||= PathReader.new(Opal.paths, extensions.map { |e| [".#{e}", ".js.#{e}"] }.flatten)
+      @path_reader              ||= default_path_reader
       @compiler_options         ||= Opal::Config.compiler_options
       @missing_require_severity ||= Opal::Config.missing_require_severity
       @cache                    ||= Opal.cache
@@ -161,14 +161,29 @@ module Opal
     end
 
     def process_require(rel_path, autoloads, options)
-      return if already_processed.include?(rel_path)
-      already_processed << rel_path
+      return if already_processed?(rel_path)
+      mark_as_processed(rel_path)
       asset = process_require_threadsafely(rel_path, autoloads, options)
       processed << asset if asset
     end
 
     def already_processed
       @already_processed ||= Set.new
+    end
+
+    def already_processed?(rel_path)
+      already_processed.include? require_key(rel_path)
+    end
+
+    def mark_as_processed(rel_path)
+      already_processed << require_key(rel_path)
+    end
+
+    # NOTE: `./foo`, `foo` and `foo.rb` all end up in the same
+    # `Opal.modules` entry, so they need to share a dedupe key or the module
+    # would be emitted more than once.
+    def require_key(rel_path)
+      Opal::Compiler.module_name(rel_path)
     end
 
     include Project::Collection
@@ -180,8 +195,28 @@ module Opal
       @postprocessed ||= PostProcessor.call(processed, self)
     end
 
-    attr_accessor :processors, :path_reader, :stubs, :dce,
+    attr_accessor :processors, :stubs, :dce,
       :compiler_options, :missing_require_severity, :cache, :scheduler
+
+    # `cwd` is the directory a require with a leading './' is resolved against,
+    # as MRI resolves against the process CWD. Defaults to nil, which looks
+    # './foo' up in the load path instead. Set by entry points that have a
+    # meaningful working directory, such as the CLI. See {PathReader#expand}.
+    #
+    # Both have a custom writer, so they cannot join the attr_accessor above.
+    attr_reader :cwd, :path_reader
+
+    def cwd=(cwd)
+      @cwd = cwd
+      path_reader.cwd = cwd if path_reader
+    end
+
+    # The path reader is the one doing the resolving, so it has to be told
+    # about the cwd whenever it is swapped out for another one.
+    def path_reader=(path_reader)
+      @path_reader = path_reader
+      path_reader.cwd = @cwd if path_reader && @cwd
+    end
 
     alias dce? dce
 
@@ -225,6 +260,12 @@ module Opal
     end
 
     private
+
+    # NOTE: `cwd` is applied by the options loop in #initialize, before this
+    # reader exists, so it has to be handed over at construction time.
+    def default_path_reader
+      PathReader.new(Opal.paths, extensions.flat_map { |e| [".#{e}", ".js.#{e}"] }, cwd: @cwd)
+    end
 
     def process_requires(rel_path, requires, autoloads, options)
       @scheduler.process_requires(rel_path, requires, autoloads, options)
