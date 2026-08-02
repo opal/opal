@@ -8,8 +8,8 @@ gem 'opal-rails'
 
 ## Basic usage through the asset pipeline
 
-To configure your asset pipeline to use opal-rails, make sure to `bundle install`, then rename 
-`app/assets/application.js` to `app/assets/application.js.rb` and set its contents to: 
+To configure your asset pipeline to use opal-rails, make sure to `bundle install`, then rename
+`app/assets/application.js` to `app/assets/application.js.rb` and set its contents to:
 
 ```ruby
 # app/assets/application.js.rb

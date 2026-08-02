@@ -1,0 +1,105 @@
+// markdownlint-cli2 configuration for Opal's prose.
+//
+// Tuning philosophy: this gate blocks pull requests, so it may only flag things
+// that are unambiguously mistakes. Rules that merely disagree with the house
+// style are turned off rather than left on with a backlog of pre-existing
+// failures — a check that starts red gets ignored, then disabled, then the docs
+// rot anyway. Every disable below is justified against the actual tree.
+{
+  "globs": [
+    "docs/**/*.md",
+    "*.md"
+  ],
+
+  "ignores": [
+    "node_modules",
+    "vendor",
+    // Append-only release log: 900+ findings, machine-assembled from commit
+    // subjects, and rewriting history to satisfy a linter has negative value.
+    "CHANGELOG.md",
+    // Staging area for the next CHANGELOG entry, same shape and same reasons.
+    "UNRELEASED.md",
+    // `__`-prefixed files are personal scratch notes, not published docs.
+    "__*.md"
+  ],
+
+  "config": {
+    "default": true,
+
+    // MD013 line-length: the house style hard-wraps prose near 100 but tables,
+    // long URLs, and code samples routinely exceed any limit. 678 findings.
+    // Enforcing this would mean reflowing every guide for zero reader benefit.
+    "MD013": false,
+
+    // MD012 no-multiple-blanks: double blank lines are used deliberately to
+    // separate sections in the longer references. 376 findings, all cosmetic.
+    "MD012": false,
+
+    // MD007 ul-indent / MD004 ul-style / MD005 list-indent / MD030
+    // list-marker-space: the docs mix `-`/`*` markers and 2/4-space indents
+    // across files written over a decade. All render identically.
+    "MD007": false,
+    "MD004": false,
+    "MD005": false,
+    "MD030": false,
+
+    // MD024 no-duplicate-heading: reference pages legitimately repeat headings
+    // like "Example", "Options" and "See also" under different parents, and the
+    // CLI/config references repeat one option name per section.
+    "MD024": false,
+
+    // MD033 no-inline-html: README badges and the docs' `<details>` blocks need
+    // raw HTML; markdown has no equivalent.
+    "MD033": false,
+
+    // MD034 no-bare-urls: bare URLs in prose and code output are intentional --
+    // wrapping compiler output in angle brackets would misrepresent it.
+    "MD034": false,
+
+    // MD014 commands-show-output: shell samples deliberately use `$` prompts
+    // even without output so readers can tell commands from output.
+    "MD014": false,
+
+    // MD046 code-block-style / MD048 / MD049 / MD050: fenced vs indented blocks
+    // and `*`/`_` emphasis both appear; neither is wrong.
+    "MD046": false,
+    "MD049": false,
+    "MD050": false,
+
+    // MD041 first-line-heading: some partials/fragments open with context
+    // rather than an h1.
+    "MD041": false,
+
+    // MD036 no-emphasis-as-heading: bolded lead-ins inside list items are a
+    // deliberate device, not a substitute heading.
+    "MD036": false,
+
+    // MD026 no-trailing-punctuation: a few headings are questions ("Why?").
+    "MD026": false,
+
+    // MD060 table-column-style: padding inside table pipes (`|---|` vs
+    // `| --- |`) is invisible once rendered. The reference pages are heavily
+    // tabular, so this is 181 findings of pure whitespace preference.
+    "MD060": false,
+
+    // --- Rules kept ON: these catch real defects ---
+    // MD011 no-reversed-links  -> `(text)[url]` is always a typo
+    // MD038 no-space-in-code   -> `` ` code ` `` renders wrong
+    // MD009 no-trailing-spaces -> invisible, causes stray <br>
+    // MD010 no-hard-tabs       -> breaks code block alignment
+    // MD040 fenced-code-language -> unlabelled fences lose highlighting
+    // MD001/MD003/MD022/MD025  -> heading structure, affects generated TOCs
+    // MD031/MD032              -> missing blanks break rendering in some parsers
+    // MD045 no-alt-text        -> accessibility
+    "MD040": {
+      // Allow bare fences only where the content genuinely has no language
+      // (plain terminal output). Everything else must be labelled.
+      "allowed_languages": [
+        "ruby", "js", "javascript", "json", "sh", "bash", "shell", "console",
+        "erb", "haml", "html", "css", "yaml", "yml", "diff", "text", "plain",
+        "opal", "jsx", "ts", "xml", "sql", "csv", "make", "dockerfile"
+      ],
+      "language_only": false
+    }
+  }
+}

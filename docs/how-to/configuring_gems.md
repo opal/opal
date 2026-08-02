@@ -24,7 +24,7 @@ On the other hand you have a gem that does something with the DOM.  There would 
 Each case is detailed below, assuming you have a Gem file structure like this:
 
 
-```
+```text
 /lib
   /your_gem_directory
     /your_gem_file1.rb
@@ -107,7 +107,7 @@ Bundler.require
 require 'opal-rspec'
 Opal.append_path File.expand_path('../spec', __FILE__)
 
-run Opal::Server.new { |s|
+run Opal::Sprockets::Server.new { |s|
   s.main = 'opal/rspec/sprockets_runner'
   s.append_path 'spec'
   s.debug = false

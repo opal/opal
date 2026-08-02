@@ -9,13 +9,16 @@ _This guide is a work-in-progress._
 All of the following is now covered by `bin/rake release:prepare VERSION=v1.2.3`
 
 1. Update the version
-  - Update `lib/opal/version.rb`
-  - Update `opal/corelib/constants.rb` with the same version number along with release dates
-2. Update the changelog
-  - Ensure all the unreleased changes are documented in UNRELEASED.md
-  - [skip for pre-releases] Run `bin/rake changelog VERSION=v1.2.3` specifying the version number you're about to release
-  - [skip for pre-releases] Empty UNRELEASED.md
-3. Commit the updated changelog along with the version bump using this commit message: "Release v1.2.3"
+   - Update `lib/opal/version.rb`
+   - Update `opal/corelib/constants.rb` with the same version number along with release dates
+1. Update the changelog
+   - [skip for pre-releases] Run `bin/rake changelog VERSION=v1.2.3` specifying the version number you're about to release
+
+     Released versions are regenerated from their GitHub releases. The
+     "Unreleased" section at the top is seeded from the pull requests merged
+     since the last tag, which is raw material rather than a finished
+     changelog — edit it down before committing.
+1. Commit the updated changelog along with the version bump using this commit message: "Release v1.2.3"
 
 ---
 

@@ -103,7 +103,9 @@ else is a truthy value including `""`, `0` and `[]`. This differs from
 JavaScript as these values are also treated as false.
 
 For this reason, most truthy tests must check if values are `false` or
-`nil` (we also check for `null` and `undefined`).
+`nil` (we also check for `null` and `undefined`). This check is performed by
+the `Opal.truthy` runtime helper, which the compiler hoists into a local
+`$truthy` variable.
 
 Taking the following test:
 
@@ -111,15 +113,17 @@ Taking the following test:
 val = 42
 
 if val
-  return 3.142;
+  3.142
 end
 ```
 
 This would be compiled into:
 
 ```javascript
+var $truthy = Opal.truthy, nil = Opal.nil, val = nil;
+
 val = 42;
-if (val !== false && val !== nil && val != null) {
+if ($truthy(val)) {
   return 3.142
 } else {
   return nil
@@ -258,7 +262,7 @@ Sample code:
 }
 
 # => opal version is:
-# => 1.3.1
+# => 2.0.0dev
 ```
 
 Even interpolations are supported, as seen here.
@@ -464,7 +468,7 @@ Top level constants can be accessed as properties of `Opal`:
 Opal.Object;       // => Object
 Opal.Kernel;       // => Kernel
 Opal.Array;        // => Array
-Opal.RUBY_VERSION; // => "2.3"
+Opal.RUBY_VERSION; // => "3.2.0"
 Opal.Foo;          // => Foo
 Opal.BAZ;          // => 789
 ```
@@ -631,7 +635,7 @@ It is obvious from here, that unless an object defines any given method, it will
 To optimise the generated code slightly, we reduce the code output from the compiler into the following JavaScript:
 
 ```javascript
-Opal.add_stubs("first,second,to_sym"]);
+Opal.add_stubs("first,second,to_sym");
 ```
 
 You will see this at the top of all your generated JavaScript files. This will add a stub method for all methods used in your file.

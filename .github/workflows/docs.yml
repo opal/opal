@@ -1,0 +1,146 @@
+# Documentation anti-rot gates.
+#
+# Split deliberately into blocking and non-blocking halves:
+#
+#   * `docs` (on PRs)  -- checks only things that are decidable from the contents
+#     of the commit itself: do internal doc links resolve, and is the markdown
+#     well formed. Deterministic, offline, fast. Safe to block a merge on.
+#
+#   * `external-links` (cron) -- checks whether third-party URLs are still alive.
+#     That depends on the internet, not on the diff, so it must never block a
+#     merge: a PR touching the compiler should not go red because someone else's
+#     blog went down overnight. It runs on a schedule and opens an issue instead.
+#
+# This is not a live-with-the-flakiness compromise; a link that rots in week 30
+# has nothing to do with whatever PR happens to be open in week 30, so gating a
+# PR on it reports the failure to the one person who cannot fix it.
+#
+# MAINTAINERS: do NOT mark `docs (blocking)` as a required status check in
+# branch protection. The `paths:` filters below mean it never runs at all on a
+# PR that touches no documentation, and a required check that never reports
+# leaves such PRs waiting forever on a check that will never arrive.
+name: docs
+
+on:
+  push:
+    branches:
+      - master
+      - '*-stable'
+    paths:
+      - 'docs/**'
+      - '*.md'
+      - '.markdownlint-cli2.jsonc'
+      - '.lycheeignore'
+      - 'lychee.toml'
+      - '.yardopts'
+      - 'tasks/docs.rake'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '*.md'
+      - '.markdownlint-cli2.jsonc'
+      - '.lycheeignore'
+      - 'lychee.toml'
+      - '.yardopts'
+      - 'tasks/docs.rake'
+      - '.github/workflows/docs.yml'
+  schedule:
+    # Mondays 06:17 UTC. Off-the-hour to dodge the top-of-hour scheduling crush
+    # that makes GitHub delay or drop cron runs.
+    - cron: '17 6 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # BLOCKING. Deterministic, no network.
+  # ---------------------------------------------------------------------------
+  docs:
+    name: docs (blocking)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          # No `bundle install`: docs:links is plain stdlib Ruby and needs no
+          # gems, so it is invoked as `rake`, not `bundle exec rake`. Installing
+          # the bundle here would cost minutes for nothing.
+          bundler-cache: false
+
+      # Internal link integrity. This is the check that would have caught
+      # docs/index.md pointing at headless_chrome.html, a page that never
+      # existed. It maps the published .html form back to the .md source and
+      # resolves it relative to the linking file, so it understands the
+      # docs/ layout instead of guessing.
+      #
+      # Run via `rake -f` so it works whether or not the root Rakefile has
+      # picked up tasks/docs.rake yet.
+      - name: Internal doc links resolve
+        run: rake -f tasks/docs.rake docs:links
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Markdown lint. Config is tuned so the current tree passes; see the
+      # comments in .markdownlint-cli2.jsonc for why each rule is off.
+      #
+      # Deliberately advisory (`continue-on-error`) rather than blocking. A hard
+      # formatting gate turns a drive-by typo fix into a red X that a first-time
+      # contributor cannot debug, and the maintainers end up pushing the fixup
+      # anyway. The annotations still show up in the PR, so the signal is there
+      # without the toll booth. Promote it to blocking later if the tree stays
+      # clean on its own.
+      - name: markdownlint
+        continue-on-error: true
+        run: npx --yes markdownlint-cli2@0.18.1
+
+  # ---------------------------------------------------------------------------
+  # NON-BLOCKING. Touches the network, so it only ever reports.
+  # ---------------------------------------------------------------------------
+  external-links:
+    name: external links (scheduled, non-blocking)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: lychee
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # --root-dir lets lychee resolve site-absolute links such as `/docs`
+          # against the checkout instead of erroring on them.
+          args: >-
+            --config lychee.toml
+            --root-dir ${{ github.workspace }}
+            --no-progress
+            docs/**/*.md
+            README.md
+            HACKING.md
+            CONTRIBUTING.md
+            AGENTS.md
+            CONDUCT.md
+          output: lychee/out.md
+          # Do not let a dead third-party link fail the workflow run; the issue
+          # below is the notification channel.
+          fail: false
+
+      # Surface results as a single rolling issue rather than a red X. Reusing
+      # one issue avoids opening a duplicate every Monday.
+      - name: Report broken links
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: 'Docs: broken external links detected'
+          content-filepath: lychee/out.md
+          labels: documentation

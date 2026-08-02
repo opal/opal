@@ -16,6 +16,24 @@ Changes are grouped as follows:
 
 
 
+## [Unreleased](https://github.com/opal/opal/compare/v1.8.1...HEAD) - unreleased
+
+### Performance
+
+- Optimize `Hash#rehash` for the common case, avoid calling `$slice` when no hash collision is present ([#2571](https://github.com/opal/opal/pull/2571))
+
+### Fixed
+
+- `String#{r,l,}strip`: Make them work like in MRI for non-breaking white-space ([#2612](https://github.com/opal/opal/pull/2612))
+- Compat regression fix: `Hash#to_n` should return a JS object ([#2613](https://github.com/opal/opal/pull/2613))
+
+### Internal
+
+- Bump the ECMA version from 3 to 12 for ESLint ([#2537](https://github.com/opal/opal/pull/2537))
+
+
+
+
 ## [1.8.1](https://github.com/opal/opal/compare/v1.8.0...v1.8.1) - 2023-11-09
 
 

@@ -14,9 +14,9 @@ foos.on(:click) do
 end
 ```
 
-### Getting Started
+## Getting Started
 
-#### Installation
+## Installation
 
 `opal-jquery` is distributed as a gem, and needs to be added to your `Gemfile`:
 
@@ -26,7 +26,7 @@ gem 'opal'
 gem 'opal-jquery'
 ```
 
-#### Usage
+### Usage
 
 `opal-jquery` can now be easily added to your opal application sources:
 
@@ -44,7 +44,7 @@ The `#alert` method is provided by `opal-jquery`. If the message displays, then
 `jquery` support should be working.
 
 
-#### Compiling
+### Compiling
 
 When compiling your application to javascript, you must be sure to include both
 Opal and Opal-JQuery so they'll be available to your application:
@@ -91,7 +91,7 @@ with jquery plugins much easier.
 
 ### Interacting with the DOM
 
-#### Finding Elements
+### Finding Elements
 
 opal-jquery provides the `Element` class, which can be used to find elements in
 the current document:
@@ -131,7 +131,7 @@ el.find '.foo'
 # => #<Element .... >
 ```
 
-#### Running code on document ready
+### Running code on document ready
 
 Just like jQuery, opal-jquery requires the document to be ready to
 be able to fully interact with the page. Any top level access should
@@ -145,7 +145,7 @@ end
 
 The `Kernel#alert` method is shown above too.
 
-#### Event handling
+### Event handling
 
 The `Element#on` method is used to attach event handlers to elements:
 
@@ -182,7 +182,7 @@ Document.on :click do |evt|
 end
 ```
 
-#### CSS styles and classnames
+### CSS styles and classnames
 
 The various jQuery methods are available on `Element` instances:
 
@@ -261,7 +261,7 @@ The request is actually triggered inside the `HTTP.get` method, but due
 to the async nature of the request, the callback and errback handlers can
 be added anytime before the request returns.
 
-#### Handling responses
+### Handling responses
 
 Web apps deal with JSON responses quite frequently, so there is a useful
 `#json` helper method to get the JSON content from a request:

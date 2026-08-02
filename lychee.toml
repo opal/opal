@@ -1,0 +1,61 @@
+# lychee configuration for external link liveness.
+#
+# NOTE: this checker deliberately does NOT look at links between doc pages.
+# docs/ is published as HTML, so guides link to each other as `name.html` /
+# `../dir/name.html` while the sources on disk are `.md`. lychee resolving those
+# against the repo would 404 on every single one. Internal links are covered by
+# `rake docs:links` (tasks/docs.rake), which maps .html -> .md and blocks PRs.
+# Here we check only what lychee is actually good at: reachable external URLs.
+
+# Skip every link that is not an absolute http(s) URL. This is what keeps the
+# .html-vs-.md mismatch from producing hundreds of false positives.
+scheme = ["https", "http"]
+
+# Don't try to resolve relative/rooted paths as files.
+offline = false
+
+# Present as a real browser: several hosts in our docs serve 403 to default
+# HTTP client user agents.
+user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 lychee-link-check"
+
+# Transient-failure tolerance. External links rot and flake for reasons that
+# have nothing to do with the commit under test.
+max_retries = 4
+retry_wait_time = 5
+timeout = 30
+max_concurrency = 8
+
+# Treat these as success rather than failure:
+#   200-299 - fine
+#   301/302/303/307/308 - the target moved but the page exists; tidying up
+#             redirects is housekeeping, not a broken-docs emergency
+#   403 - anti-bot challenge; the host answered, so the link is alive
+#   429 - rate limited; also proof the host is alive
+#   999 - LinkedIn's non-standard "go away, robot"
+accept = [
+  "200..=299",
+  "301", "302", "303", "307", "308",
+  "403", "429", "999",
+]
+
+# NOTE: site-absolute links (e.g. `/docs` in docs/index.md) point at paths on the
+# published opalrb.com site that have no counterpart in the repo, so there is
+# nothing on disk to resolve them against. They are excluded via `^/` in
+# .lycheeignore rather than pinned to a `root_dir`, which would only be correct
+# for one checkout location and would silently pass everywhere else.
+
+# Don't force http -> https rewriting; some doc links are intentionally http.
+require_https = false
+
+# Never dial private/loopback addresses that appear in code samples.
+exclude_all_private = true
+exclude_loopback = true
+
+# Skip mailto: links -- there is nothing to check.
+include_mail = false
+
+# Timeouts are network weather, not a broken link.
+accept_timeouts = true
+
+# Additional patterns live in .lycheeignore so they can be edited without
+# touching this file.

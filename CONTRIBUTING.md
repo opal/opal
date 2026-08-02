@@ -1,11 +1,11 @@
 # Contributing and Reporting
 
 This is the issue tracker for Opal. If you have a more general question about
-using Opal (or related libraries) then use the [stackoverflow tag (#opalrb)][SO], or the *Gitter* chatroom at [opal/opal][gitter]
-(also available as IRC at `irc.gitter.im`).
+using Opal (or related libraries) then use the [stackoverflow tag (#opalrb)][SO],
+or join the [Opal Slack][slack].
 
 [SO]: http://stackoverflow.com/questions/ask?tags=opalrb
-[gitter]: https://gitter.im/opal/opal
+[slack]: https://slack.opalrb.com/
 
 What follows is a quick checklist you can before sending issues or pull-requests, for in-depth instructions on how to hack the internals of Opal and setup the development environment please see [`HACKING.md`][hacking].
 
@@ -31,9 +31,10 @@ What follows is a quick checklist you can before sending issues or pull-requests
     - In Ruby and JavaScript code we use 2 spaces (no tabs)
     - In JavaScript we use `snake_case` for methods and variables
 
-3.  Make sure to have updated all the relevant documentation, both for API (using _yardoc_ syntax) and the Guides
+3.  Make sure to have updated all the relevant documentation, both for API (using _yardoc_ syntax) and the [Guides](docs/index.md)
 
-4.  Add a Changelog entry at the top of `UNRELEASED.md`
+    The guides are organised by purpose — tutorial, how-to, reference, explanation. Put your
+    change where a reader would look for it, not simply where it was easiest to append.
 
 
 ### A note on commits in PRs

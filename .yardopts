@@ -3,6 +3,12 @@ lib/opal/**/*.rb
 --markup=markdown
 --markup-provider=redcarpet
 --hide-void-return
+--main docs/index.md
 -
+docs/index.md
+docs/tutorial/*.md
+docs/how-to/*.md
+docs/reference/*.md
+docs/explanation/*.md
+docs/contributing/*.md
 CHANGELOG.md
-docs/compiler_directives.md

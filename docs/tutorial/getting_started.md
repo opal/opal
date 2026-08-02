@@ -6,7 +6,7 @@ Opal is a Ruby to JavaScript compiler, an implementation of the Ruby corelib and
 
 Opal is available as a gem and can be installed via:
 
-```
+```sh
 $ gem install opal
 ```
 
