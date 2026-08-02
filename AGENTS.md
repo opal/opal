@@ -35,9 +35,20 @@ codebase healthy.
   - `bin/rake minitest_node_nodejs` runs integration tests in `test/nodejs`.
   - `bin/rake minitest_nodejs` runs both Minitest suites on Node.js.
 
+- `bundle exec rspec spec/lib/<file>_spec.rb` is the fastest loop for compiler and
+  builder work; the full `bin/rake rspec` task also runs the REPL specs.
+- `bin/rake rspec` exits non-zero on a clean checkout because
+  `opal-repl depends on readline, which is not currently available`. Check the
+  `N examples, N failures` lines rather than the task's exit status.
+- The reported example count varies between runs of the same command, because
+  the prefork builder scheduler forks mid-suite and the children report their
+  own partial tallies. `0 failures` is still meaningful; the count is not. Run
+  a single spec file when you need a count you can compare.
+
 ## Linting
 
 - Run `bin/rake lint` to check code style. This builds the corelib and stdlib then executes RuboCop and ESLint.
+- To lint only what you touched: `bundle exec rubocop <files>`.
 
 ## Notes
 
