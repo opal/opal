@@ -137,6 +137,9 @@ module Opal
         compiler_options: compiler_options,
         missing_require_severity: missing_require_severity,
         dce: @dce,
+        # Running a file is the one case with a meaningful working directory,
+        # so `require './foo'` can resolve against it the way MRI does.
+        cwd: Dir.pwd,
       )
 
       # --no-cache

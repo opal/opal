@@ -26,6 +26,7 @@ Changes are grouped as follows:
 
 - `String#{r,l,}strip`: Make them work like in MRI for non-breaking white-space ([#2612](https://github.com/opal/opal/pull/2612))
 - Compat regression fix: `Hash#to_n` should return a JS object ([#2613](https://github.com/opal/opal/pull/2613))
+- Resolve requires with a leading `./`, against `Builder#cwd` when set and through the load path otherwise. The CLI sets it to the working directory, as in MRI ([#778](https://github.com/opal/opal/issues/778))
 
 ### Internal
 
