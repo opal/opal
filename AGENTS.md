@@ -56,3 +56,15 @@ codebase healthy.
 - Do not commit changes to external submodules such as `spec/ruby` or
   `spec/mspec`. Instead add new files under `spec/opal` so they remain within
   the `opal` namespace.
+- Loading a file is a two-sided contract. The compiler decides what gets
+  *bundled*: only the specials in `lib/opal/nodes/call/require.rb` call
+  `compiler.track_require`, and a path that is never tracked is simply absent
+  from `Opal.modules`, so it fails at runtime no matter how reachable the file
+  was at build time. The runtime in `opal/runtime/boot.js` then decides what
+  gets *run*. A new loading method needs both halves.
+- `load` deliberately diverges from `require` in two ways, so don't "fix" them:
+  it ignores dynamic arguments whatever `dynamic_require_severity` says (it is
+  routinely given runtime-computed paths, and the file is often bundled by a
+  separate `require`), and it only tracks receivers that can reach
+  `Kernel#load`, because `YAML.load`/`Marshal.load`/`JSON.load` take arguments
+  that are not paths.
