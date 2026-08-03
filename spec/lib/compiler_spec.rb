@@ -162,6 +162,41 @@ RSpec.describe Opal::Compiler do
       end
     end
 
+    describe '#load' do
+      it 'parses and resolve #load argument' do
+        compiler = compiler_for(%Q{load "#{__FILE__}"})
+        expect(compiler.requires).to eq([__FILE__])
+      end
+
+      it 'parses and resolve #load argument when called on Kernel' do
+        compiler = compiler_for(%Q{Kernel.load "#{__FILE__}"})
+        expect(compiler.requires).to eq([__FILE__])
+      end
+
+      it 'parses and resolve #load argument when called on ::Kernel' do
+        compiler = compiler_for(%Q{::Kernel.load "#{__FILE__}"})
+        expect(compiler.requires).to eq([__FILE__])
+      end
+
+      it 'does not track #load called on an unrelated receiver' do
+        compiler = compiler_for(%q{YAML.load("---\nfoo")})
+        expect(compiler.requires).to eq([])
+      end
+
+      it 'does not track #load called on an unrelated receiver with a safe navigation operator' do
+        compiler = compiler_for(%q{YAML&.load("---\nfoo")})
+        expect(compiler.requires).to eq([])
+      end
+
+      it 'does not report a dynamic #load argument as a dynamic require' do
+        expect_any_instance_of(Opal::Compiler).not_to receive(:error)
+        expect_any_instance_of(Opal::Compiler).not_to receive(:warning)
+
+        compiler = compiler_for('load some_path', dynamic_require_severity: :error)
+        expect(compiler.requires).to eq([])
+      end
+    end
+
     describe '#autoload' do
       it 'parses and resolve second #autoload arguments in top scope' do
         compiler = compiler_for(%Q{autoload :Whatever, "#{__FILE__}"})
