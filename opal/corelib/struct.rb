@@ -57,6 +57,7 @@ class ::Struct
     end
 
     members << name
+    `(self.$$members_hash || (self.$$members_hash = {}))[name] = true`
 
     define_method name do
       `self.$$data[name]`
@@ -77,9 +78,11 @@ class ::Struct
 
   def self.inherited(klass)
     members = @members
+    members_hash = `self.$$members_hash`
 
     klass.instance_eval do
       @members = members
+      `self.$$members_hash = members_hash`
     end
   end
 
@@ -104,9 +107,13 @@ class ::Struct
         ::Kernel.raise ::ArgumentError, 'struct size differs'
       end
 
-      self.class.members.each_with_index do |name, index|
-        self[name] = args[index]
-      end
+      %x{
+        var members = #{self.class.members}, i, name;
+        for (i = 0; i < members.length; i++) {
+          name = members[i];
+          self.$$data[name] = args[i] === undefined ? nil : args[i];
+        }
+      }
     end
   end
 
@@ -134,17 +141,19 @@ class ::Struct
   end
 
   def [](name)
+    %x{
+      if (name.$$is_string || typeof name === 'string') {
+        if (!self.$$data.hasOwnProperty(name)) {
+          #{::Kernel.raise ::NameError.new("no member '#{name}' in struct", name)}
+        }
+        return self.$$data[name];
+      }
+    }
     if ::Integer === name
       ::Kernel.raise ::IndexError, "offset #{name} too small for struct(size:#{self.class.members.size})" if name < -self.class.members.size
       ::Kernel.raise ::IndexError, "offset #{name} too large for struct(size:#{self.class.members.size})" if name >= self.class.members.size
 
       name = self.class.members[name]
-    elsif ::String === name
-      %x{
-        if(!self.$$data.hasOwnProperty(name)) {
-          #{::Kernel.raise ::NameError.new("no member '#{name}' in struct", name)}
-        }
-      }
     else
       ::Kernel.raise ::TypeError, "no implicit conversion of #{name.class} into Integer"
     end
@@ -154,13 +163,20 @@ class ::Struct
   end
 
   def []=(name, value)
+    %x{
+      if (name.$$is_string || typeof name === 'string') {
+        if (!(#{self.class}.$$members_hash || {}).hasOwnProperty(name)) {
+          #{::Kernel.raise ::NameError.new("no member '#{name}' in struct", name)}
+        }
+        self.$$data[name] = value;
+        return value;
+      }
+    }
     if ::Integer === name
       ::Kernel.raise ::IndexError, "offset #{name} too small for struct(size:#{self.class.members.size})" if name < -self.class.members.size
       ::Kernel.raise ::IndexError, "offset #{name} too large for struct(size:#{self.class.members.size})" if name >= self.class.members.size
 
       name = self.class.members[name]
-    elsif ::String === name
-      ::Kernel.raise ::NameError.new("no member '#{name}' in struct", name) unless self.class.members.include?(name.to_sym)
     else
       ::Kernel.raise ::TypeError, "no implicit conversion of #{name.class} into Integer"
     end

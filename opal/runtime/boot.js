@@ -78,7 +78,34 @@
   var $bind      = Function.prototype.bind;
   var $has_own   = Object.hasOwn || $call.bind(Object.prototype.hasOwnProperty);
   var $set_proto = Object.setPrototypeOf;
-  var $slice     = $call.bind(Array.prototype.slice);
+  var $slice     = function(list, start, end) {
+    var length = list.length, size, result, i;
+
+    if (start == null) {
+      start = 0;
+    } else if (start < 0) {
+      start = Math.max(length + start, 0);
+    } else if (start > length) {
+      start = length;
+    }
+
+    if (end == null) {
+      end = length;
+    } else if (end < 0) {
+      end = Math.max(length + end, 0);
+    } else if (end > length) {
+      end = length;
+    }
+
+    size = Math.max(end - start, 0);
+    result = new Array(size);
+
+    for (i = 0; i < size; i++) {
+      result[i] = list[start + i];
+    }
+
+    return result;
+  };
   var $splice    = $call.bind(Array.prototype.splice);
 
   Opal.slice = $slice;
@@ -139,7 +166,7 @@
   // -----
 
   var $truthy = Opal.truthy = function(val) {
-    return false !== val && nil !== val && undefined !== val && null !== val && (!(val instanceof Boolean) || true === val.valueOf());
+    return false !== val && nil !== val && val != null;
   };
 
   Opal.falsy = function(val) {
@@ -379,12 +406,13 @@
   Opal.allocate_module = $allocate_module;
 
   // Optimization for a costly operation of prepending '$' to method names
-  var jsid_cache = new Map();
+  var jsid_cache = Object.create(null);
+
   function $jsid(name) {
-    var jsid = jsid_cache.get(name);
+    var jsid = jsid_cache[name];
     if (!jsid) {
       jsid = '$' + name;
-      jsid_cache.set(name, jsid);
+      jsid_cache[name] = jsid;
     }
     return jsid;
   }

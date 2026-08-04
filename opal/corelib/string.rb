@@ -5,6 +5,38 @@
 # require 'corelib/comparable' # required by mini
 # require 'corelib/regexp'     # required by mini
 
+### Performance considerations ###
+
+## .valueOf() ##
+
+# We use primitive JavaScript strings and String objects here, code is supposed to work with both of them equally.
+# But this is very challenging for JavaScript engines to optimize, because internally these are different types.
+# In such situation using .valueOf() on strings before calling a string operator or function ensures that the
+# JavaScript engine can rely on getting always the same type (a primitive string) and can optimize code much better.
+# In short in JavaScript with string1 and string2 being a primitive or Object:
+#   string1.valueOf() + string2.valueOf();
+# is faster than:
+#   string1 + string2;
+# YMMV depending on JavaScript engine.
+
+## String Ropes ##
+
+# Because strings are immutable in JavaScript the way to concatenate or modify strings is to create new strings.
+# Usually this would require a new allocation for each new string, which is rather expensive.
+# To optimize this situation and prevent frequent allocations JavaScript engines employ "string ropes" internally.
+# For example, when concatenating string3 = string1 + string2, instead of making string3 a new allocation, string3
+# may just be internally represented as string1 with a pointer to string2, essentially avoiding a new allocation.
+# There are certain conditions that must be met to use string ropes and there may be differences between engines.
+# In general, as a rule of thumb, when concatenating to a existing string:
+#   string = string + other_string;
+# creates a rope and is faster than:
+#   string += other_string;
+# which allocates a new string.
+# Also, if a string rope is used for IO or in the DOM or passed anywhere else outside the JavaScript engine it must
+# be serialized which may require a final allocation and copying of the individual rope strings into the final string.
+# Overall this is still more efficient than the otherwise required multiple smaller allocations and copies.
+# YMMV depending on JavaScript engine.
+
 class ::String < `String`
   include ::Comparable
 
@@ -21,6 +53,14 @@ class ::String < `String`
       return String.fromCodePoint(str.codePointAt(0));
     }
 
+    function has_surrogate(str) {
+      for (let i = 0; i < str.length; i++) {
+        let code = str.charCodeAt(i);
+        if (code >= 0xD800 && code <= 0xDFFF) return true;
+      }
+      return false;
+    }
+
     // UTF-16 aware find_index_of, args:
     //   str: string
     //   search: the string to search for in str
@@ -32,7 +72,7 @@ class ::String < `String`
       for (const c of str) {
         if (col.length > 0) {
           for (const e of col) {
-            if (e.l < l) { e.search += c; e.l++; }
+            if (e.l < l) { e.search = e.search + c; e.l++; }
             if (e.l === l) {
               if (e.search == search) { if (last) idx = e.index; else return e.index; }
               e.search = null;
@@ -67,7 +107,7 @@ class ::String < `String`
       for (const c of str) {
         if (col.length > 0) {
           for (const e of col) {
-            if (e.l < l) { e.search += c; e.l++; }
+            if (e.l < l) { e.search = e.search + c; e.l++; }
             if (e.l === l) {
               if (e.search == search) { if (last) idx = e.index; else return e.index; }
               e.search = null;
@@ -122,7 +162,7 @@ class ::String < `String`
           padstr_l = p_l === 1 ? p_l : padstr.$length();
 
       while (result_l < width) {
-        result += padstr;
+        result = result + padstr;
         result_l += padstr_l;
       }
 
@@ -146,11 +186,19 @@ class ::String < `String`
     }
 
     function starts_with(str, prefix) {
-      return (str.length >= prefix.length && !ends_with_high_surrogate(prefix) && str.startsWith(prefix));
+      var s = typeof str === 'string' ? str : str.valueOf();
+      var p = typeof prefix === 'string' ? prefix : prefix.valueOf();
+      return (s.length >= p.length && s.startsWith(p) && !ends_with_high_surrogate(p));
     }
 
     function ends_with(str, suffix) {
-      return (str.length >= suffix.length && !starts_with_low_surrogate(suffix) && str.endsWith(suffix));
+      var s = typeof str === 'string' ? str : str.valueOf();
+      var sf = typeof suffix === 'string' ? suffix : suffix.valueOf();
+      return (s.length >= sf.length && s.endsWith(sf) && !starts_with_low_surrogate(sf));
+    }
+
+    function is_ascii_trim_char(code) {
+      return code === 0 || code === 32 || (code >= 9 && code <= 13);
     }
 
     let GRAPHEME_SEGMENTER; // initialized on demand by #each_grapheme_cluster below using:
@@ -318,7 +366,7 @@ class ::String < `String`
       // walk the string
       let i = 0, result = '';
       for (const c of string) {
-        result += c;
+        result = result + c;
         i++;
         if (i === length) break;
       }
@@ -342,7 +390,7 @@ class ::String < `String`
           i++; result_l++;
         } else if (i > index) {
           if (result_l < length || length < 0) {
-            result += c;
+            result = result + c;
             i++; result_l++;
           } else if (length > 0 && result_l >= length) break;
         }
@@ -513,7 +561,7 @@ class ::String < `String`
       }
 
       var result = '',
-          string = self.toString();
+          string = self.valueOf();
 
       // All credit for the bit-twiddling magic code below goes to Mozilla
       // polyfill implementation of String.prototype.repeat() posted here:
@@ -525,13 +573,13 @@ class ::String < `String`
 
       for (;;) {
         if ((count & 1) === 1) {
-          result += string;
+          result = result + string;
         }
         count >>>= 1;
         if (count === 0) {
           break;
         }
-        string += string;
+        string = string + string;
       }
 
       return result;
@@ -539,11 +587,11 @@ class ::String < `String`
   end
 
   def +(other)
-    other = `$coerce_to(#{other}, #{::String}, 'to_str')`
+    other = `#{other}.$$is_string ? #{other} : $coerce_to(#{other}, #{::String}, 'to_str')`
     %x{
       if (other.length === 0 && self.$$class === Opal.String) return self;
       if (self.length === 0 && other.$$class === Opal.String) return other;
-      var out = self + other;
+      var out = self.valueOf() + other.valueOf();
       if (self.encoding === out.encoding && other.encoding === out.encoding) return out;
       if (self.encoding.name === "UTF-8" || other.encoding.name === "UTF-8") return out;
       return Opal.str(out, self.encoding);
@@ -844,21 +892,22 @@ class ::String < `String`
     separator = ::Opal.coerce_to!(separator, ::String, :to_str).to_s
 
     %x{
+      var s = typeof self === 'string' ? self : self.valueOf();
       var result;
 
       if (separator === "\n") {
-        result = self.replace(/\r?\n?$/, '');
+        result = s.replace(/\r?\n?$/, '');
       }
       else if (separator.length === 0) {
-        result = self.replace(/(\r?\n)+$/, '');
+        result = s.replace(/(\r?\n)+$/, '');
       }
-      else if (self.length >= separator.length &&
+      else if (s.length >= separator.length &&
                !starts_with_low_surrogate(separator) &&
                !ends_with_high_surrogate(separator)) {
 
         // compare tail with separator
-        if (self.substring(self.length - separator.length) === separator) {
-          result = self.substring(0, self.length - separator.length);
+        if (s.substring(s.length - separator.length) === separator) {
+          result = s.substring(0, s.length - separator.length);
         }
       }
 
@@ -874,15 +923,16 @@ class ::String < `String`
 
   def chop
     %x{
-      var length = self.length, result;
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var length = s.length, result;
 
       if (length <= 1) {
         result = "";
-      } else if (self.charAt(length - 1) === "\n" && self.charAt(length - 2) === "\r") {
-        result = self.substring(0, length - 2);
+      } else if (s.charAt(length - 1) === "\n" && s.charAt(length - 2) === "\r") {
+        result = s.substring(0, length - 2);
       } else {
-        let cut = self.codePointAt(length - 2) > 0xFFFF ? 2 : 1;
-        result = self.substring(0, length - cut);
+        let cut = s.codePointAt(length - 2) > 0xFFFF ? 2 : 1;
+        result = s.substring(0, length - cut);
       }
       return $str(result, self.encoding);
     }
@@ -1094,7 +1144,7 @@ class ::String < `String`
 
       separator = $coerce_to(separator, #{::String}, 'to_str');
 
-      var a, i, n, length, chomped, trailing, splitted, value;
+      var a, i, n, chomped, trailing, splitted, value;
 
       if (separator.length === 0) {
         for (a = self.split(/((?:\r?\n){2})(?:(?:\r?\n)*)/), i = 0, n = a.length; i < n; i += 2) {
@@ -1110,24 +1160,42 @@ class ::String < `String`
         return self;
       }
 
-      chomped  = #{chomp(separator)};
-      trailing = self.length != chomped.length;
-
       if (starts_with_low_surrogate(separator) || ends_with_high_surrogate(separator)) {
+        chomped  = #{chomp(separator)};
+        trailing = self.length != chomped.length;
         splitted = [chomped];
-      } else {
-        splitted = chomped.split(separator);
+        for (i = 0, n = splitted.length; i < n; i++) {
+          value = splitted[i];
+          if (i < n - 1 || trailing) {
+            value = value + separator;
+          }
+          if (chomp) {
+            value = #{`value`.chomp(separator)};
+          }
+          Opal.yield1(block, $str(value, self.encoding));
+        }
+
+        return self;
       }
 
-      for (i = 0, length = splitted.length; i < length; i++) {
-        value = splitted[i];
-        if (i < length - 1 || trailing) {
-          value += separator;
-        }
+      var s = typeof self === 'string' ? self : self.valueOf();
+      n = separator.length;
+      i = 0;
+      while ((a = s.indexOf(separator, i)) !== -1) {
         if (chomp) {
-          value = #{`value`.chomp(separator)};
+          value = s.slice(i, a);
+          if (separator === "\n" && value.charAt(value.length - 1) === "\r") {
+            value = value.slice(0, -1);
+          }
+        } else {
+          value = s.slice(i, a + n);
         }
         Opal.yield1(block, $str(value, self.encoding));
+        i = a + n;
+      }
+
+      if (i < s.length) {
+        Opal.yield1(block, $str(s.slice(i), self.encoding));
       }
     }
 
@@ -1148,7 +1216,8 @@ class ::String < `String`
   def end_with?(*suffixes)
     %x{
       for (let i = 0, length = suffixes.length; i < length; i++) {
-        let suffix = $coerce_to(suffixes[i], #{::String}, 'to_str').$to_s();
+        let suffix = suffixes[i];
+        if (!suffix.$$is_string) suffix = $coerce_to(suffix, #{::String}, 'to_str').$to_s();
         if (ends_with(self, suffix)) return true;
       }
     }
@@ -1205,13 +1274,13 @@ class ::String < `String`
         pattern = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'), 'gmu');
       }
 
-      var lastIndex;
+      var lastIndex, s = self.valueOf();
       while (true) {
-        match = pattern.exec(self);
+        match = pattern.exec(s);
 
         if (match === null) {
           #{$~ = nil}
-          result += self.slice(index);
+          result = result + s.slice(index);
           break;
         }
 
@@ -1242,19 +1311,19 @@ class ::String < `String`
               }
               return '';
             case "&": return slashes.slice(1) + match[0];
-            case "`": return slashes.slice(1) + self.slice(0, match.index);
-            case "'": return slashes.slice(1) + self.slice(match.index + match[0].length);
+            case "`": return slashes.slice(1) + s.slice(0, match.index);
+            case "'": return slashes.slice(1) + s.slice(match.index + match[0].length);
             default:  return slashes.slice(1) + (match[command] || '');
             }
           }).replace(/\\\\/g, '\\');
         }
 
         if (pattern.lastIndex === match.index) {
-          result += (self.slice(index, match.index) + _replacement + (self[match.index] || ""));
+          result = result + (s.slice(index, match.index) + _replacement + (s[match.index] || ""));
           pattern.lastIndex += 1;
         }
         else {
-          result += (self.slice(index, match.index) + _replacement)
+          result = result + (s.slice(index, match.index) + _replacement)
         }
         index = pattern.lastIndex;
       }
@@ -1276,7 +1345,11 @@ class ::String < `String`
         other = $coerce_to(other, #{::String}, 'to_str');
       }
       if (other.length === 0) return true;
-      return find_index_of(self, other) !== -1;
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var o = typeof other === 'string' ? other : other.valueOf();
+      if (s.indexOf(o) === -1) return false;
+      if (!has_surrogate(o)) return true;
+      return find_index_of(s, o) !== -1;
     }
   end
 
@@ -1416,7 +1489,12 @@ class ::String < `String`
   end
 
   def lstrip
-    `self.replace(/^[\x00\x09\x0a-\x0d\x20]*/, '')`
+    %x{
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var start = 0, length = s.length;
+      while (start < length && is_ascii_trim_char(s.charCodeAt(start))) start++;
+      return $str(start === 0 ? s : s.slice(start), self.encoding);
+    }
   end
 
   # lstrip! - not supported, mutates string
@@ -1714,7 +1792,12 @@ class ::String < `String`
   end
 
   def rstrip
-    `$str(self.replace(/[\x00\x09\x0a-\x0d\x20]*$/, ''), self.encoding)`
+    %x{
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var end = s.length - 1;
+      while (end >= 0 && is_ascii_trim_char(s.charCodeAt(end))) end--;
+      return $str(end === s.length - 1 ? s : s.slice(0, end + 1), self.encoding);
+    }
   end
 
   # rstrip! - not supported, mutates string
@@ -1813,6 +1896,7 @@ class ::String < `String`
           match,
           match_count = 0,
           valid_result_length = 0,
+          string_pattern = false,
           i, max;
 
       if (pattern.$$is_regexp) {
@@ -1827,6 +1911,23 @@ class ::String < `String`
           if (string.length === 0) return [];
         } else if (pattern.length > 0 && (starts_with_low_surrogate(pattern) || ends_with_high_surrogate(pattern))) {
           result = [string];
+        } else {
+          string_pattern = true;
+        }
+      }
+
+      if (!result && string_pattern && pattern.length > 0 && limit !== 0) {
+        if (limit < 0) {
+          result = string.split(pattern);
+        } else {
+          result = [];
+          while (result.length + 1 < limit) {
+            i = string.indexOf(pattern, index);
+            if (i === -1) break;
+            result.push(string.slice(index, i));
+            index = i + pattern.length;
+          }
+          result.push(string.slice(index));
         }
       }
 
@@ -1834,8 +1935,10 @@ class ::String < `String`
         result = (pattern.length === 0) ? [...string] : string.split(pattern);
 
         if (!(result.length === 1 && result[0] === string)) {
-          while ((i = result.indexOf(undefined)) !== -1) {
-            result.splice(i, 1);
+          if (!string_pattern) {
+            while ((i = result.indexOf(undefined)) !== -1) {
+              result.splice(i, 1);
+            }
           }
 
           if (limit === 0) {
@@ -1914,7 +2017,8 @@ class ::String < `String`
             #{$~ = nil}
           }
         } else {
-          let prefix = $coerce_to(prefixes[i], #{::String}, 'to_str').$to_s();
+          let prefix = prefixes[i];
+          if (!prefix.$$is_string) prefix = $coerce_to(prefix, #{::String}, 'to_str').$to_s();
           // this is correct behavior since ruby 3.3
           // specs work when RUBY_VERSION is set to at least 3.3
           if (starts_with(self, prefix) || prefix.length === 0) return true;
@@ -1926,7 +2030,13 @@ class ::String < `String`
   end
 
   def strip
-    `$str(self.replace(/^[\x00\x09\x0a-\x0d\x20]*|[\x00\x09\x0a-\x0d\x20]*$/g, ''), self.encoding)`
+    %x{
+      var s = typeof self === 'string' ? self : self.valueOf();
+      var start = 0, end = s.length - 1;
+      while (start <= end && is_ascii_trim_char(s.charCodeAt(start))) start++;
+      while (end >= start && is_ascii_trim_char(s.charCodeAt(end))) end--;
+      return $str(start === 0 && end === s.length - 1 ? s : s.slice(start, end + 1), self.encoding);
+    }
   end
 
   # strip! - not supported, mutates string
@@ -2024,7 +2134,7 @@ class ::String < `String`
       let str = "", cu;
       for (const c of self) {
           cu = c.toUpperCase();
-          str += (cu == c) ? c.toLowerCase() : cu;
+          str = str + ((cu == c) ? c.toLowerCase() : cu);
       }
       return $str(str, self.encoding);
     }
@@ -2054,12 +2164,30 @@ class ::String < `String`
   def to_i(base = 10)
     %x{
       let result,
-          string = self.toLowerCase(),
+          string = self.valueOf(),
           radix = $coerce_to(base, #{::Integer}, 'to_int');
 
       if (radix === 1 || radix < 0 || radix > 36) {
         #{::Kernel.raise ::ArgumentError, "invalid radix #{`radix`}"}
       }
+
+      // Fast path: base 10 without underscore separators or base prefix letters
+      if (radix === 10 && string.indexOf('_') === -1) {
+        var has_base_char = false;
+        for (var fi = 0; fi < string.length; fi++) {
+          var fc = string.charCodeAt(fi);
+          // b=98/66, d=100/68, o=111/79, x=120/88
+          if (fc===98||fc===100||fc===111||fc===120||fc===66||fc===68||fc===79||fc===88) {
+            has_base_char = true; break;
+          }
+        }
+        if (!has_base_char) {
+          result = parseInt(string, 10);
+          return isNaN(result) ? 0 : result;
+        }
+      }
+
+      string = string.toLowerCase();
 
       if (/^\s*_/.test(string)) {
         return 0;
@@ -2257,21 +2385,21 @@ class ::String < `String`
           if (inverse) {
             if (sub == null) {
               if (last_substitute == null) {
-                new_str += global_sub;
+                new_str = new_str + global_sub;
                 last_substitute = true;
               }
             } else {
-              new_str += ch;
+              new_str = new_str + ch;
               last_substitute = null;
             }
           } else {
             if (sub != null) {
               if (last_substitute == null || last_substitute !== sub) {
-                new_str += sub;
+                new_str = new_str + sub;
                 last_substitute = sub;
               }
             } else {
-              new_str += ch;
+              new_str = new_str + ch;
               last_substitute = null;
             }
           }
@@ -2280,9 +2408,9 @@ class ::String < `String`
         for (const ch of self) {
           sub = subs[ch];
           if (inverse) {
-            new_str += (sub == null ? global_sub : ch);
+            new_str = new_str + (sub == null ? global_sub : ch);
           } else {
-            new_str += (sub != null ? sub : ch);
+            new_str = new_str + (sub != null ? sub : ch);
           }
         }
       }
