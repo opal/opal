@@ -119,7 +119,28 @@ module Opal
       def imports
         imports = compiler.requires
 
-        unshift "\n" unless imports.empty?
+        unshift "\n" if imports.any? || compiler.required_trees.any?
+
+        # append import lines for files required from require_tree
+        if compiler.required_trees.any?
+          compiler.required_trees.each do |tree|
+            if compiler.abs_path
+              Dir.children(File.expand_path("#{File.dirname(compiler.abs_path)}/#{tree}")).sort.reverse_each do |entry|
+                if entry.end_with?('.rb')
+                  mod = "#{Compiler.module_name("#{tree}/#{entry}")}.#{compiler.esm? ? 'mjs' : 'js'}"
+
+                  if compiler.esm?
+                    unshift "import #{mod.inspect};\n"
+                  else
+                    unshift "require(#{mod.inspect});\n"
+                  end
+                end
+              end
+            else
+              warn "absolute file path unknown, cannot create imports for required tree '#{tree}'"
+            end
+          end
+        end
 
         # Check how many directories we have to go up
         depth = module_name.delete_prefix('./').count("/")
