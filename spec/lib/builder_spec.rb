@@ -40,6 +40,10 @@ RSpec.describe Opal::Builder do
     expect(builder_with_paths.build('fixtures/require_tree_test').to_s).to include('Opal.modules["fixtures/required_tree_test/required_file1"]')
   end
 
+  it 'bundles files named by #load calls' do
+    expect(builder_with_paths.build('fixtures/load_test').to_s).to include('Opal.modules["fixtures/no_requires"]')
+  end
+
   describe ':stubs' do
     let(:options) { {stubs: ['foo']} }
 
@@ -133,6 +137,17 @@ RSpec.describe Opal::Builder do
         expect(builder.missing_require_severity).to eq(:error)
         expect(builder).not_to receive(:warn)
         expect{ builder.build_str("require 'non-existen-file'", 'foo.rb') }.to raise_error(described_class::MissingRequire)
+      end
+
+      it 'raises MissingRequire for a missing #load too' do
+        expect{ builder.build_str("load 'non-existen-file'", 'foo.rb') }.to raise_error(described_class::MissingRequire)
+      end
+    end
+
+    context 'when set to :ignore and the file is #load-ed' do
+      let(:options) { {missing_require_severity: :ignore} }
+      it 'does nothing' do
+        expect{ builder.build_str("load 'non-existen-file'", 'foo.rb') }.not_to raise_error
       end
     end
   end
