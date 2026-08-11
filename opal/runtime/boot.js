@@ -439,8 +439,10 @@
     }
   };
 
-  Opal.load_normalized = function(path) {
-    Opal.loaded([path]);
+  // `mark_as_loaded` defaults to true: every caller but Kernel#load wants the
+  // path recorded in $LOADED_FEATURES, so that a later #require is a no-op.
+  Opal.load_normalized = function(path, mark_as_loaded) {
+    if (mark_as_loaded !== false) Opal.loaded([path]);
 
     var module = Opal.modules[path];
 
@@ -467,10 +469,12 @@
     return true;
   };
 
+  // Kernel#load runs the file every time and, unlike #require, does not add it
+  // to $LOADED_FEATURES, so a later #require still executes it.
   Opal.load = function(path) {
     path = Opal.normalize(path);
 
-    return Opal.load_normalized(path);
+    return Opal.load_normalized(path, false);
   };
 
   Opal.require = function(path) {
