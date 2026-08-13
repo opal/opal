@@ -229,6 +229,29 @@ RSpec.describe Opal::CLI do
     end
   end
 
+  # Running a file is the one entry point with a meaningful working directory,
+  # so it opts into MRI's `require './foo'` semantics.
+  # See https://github.com/opal/opal/issues/778
+  describe 'requires with a leading ./' do
+    let(:options) { { evals: [''], runner: :compiler, skip_opal_require: true, no_exit: true } }
+
+    it 'sets the builder cwd to the working directory' do
+      expect(cli.create_builder.cwd).to eq(Dir.pwd)
+    end
+
+    it 'resolves them against the working directory, without a load path entry' do
+      Dir.mktmpdir do |dir|
+        File.write(File.join(dir, 'in_cwd.rb'), 'IN_CWD = true')
+
+        output = Dir.chdir(dir) do
+          described_class.new(options.merge(evals: ['require "./in_cwd"'])).create_builder.to_s
+        end
+
+        expect(output).to include('Opal.modules["in_cwd"]')
+      end
+    end
+  end
+
   describe ':sexp option' do
     let(:options) { {evals: ['puts 4'], sexp: true} }
     it 'prints syntax expressions for the given code' do
