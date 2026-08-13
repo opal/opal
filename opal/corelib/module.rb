@@ -320,6 +320,23 @@ class ::Module
   def const_defined?(name, inherit = true)
     name = Opal.const_name!(name)
 
+    %x{
+      if (name.indexOf('::') === 0 && name !== '::'){
+        name = name.slice(2);
+      }
+    }
+
+    # A scoped name resolves one segment at a time, and `inherit` applies to each
+    # of them, so `Object.const_defined?("Child::INHERITED", false)` is false.
+    if `name.indexOf('::') != -1 && name != '::'`
+      mod = self
+      name.split('::').each do |segment|
+        return false unless mod.const_defined?(segment, inherit)
+        mod = mod.const_get(segment, inherit)
+      end
+      return true
+    end
+
     ::Kernel.raise ::NameError.new("wrong constant name #{name}", name) unless name =~ ::Opal::CONST_NAME_REGEXP
 
     %x{
