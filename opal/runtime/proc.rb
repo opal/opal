@@ -41,6 +41,27 @@ module ::Opal
     }
   end
 
+  # Number of parameters a block declares, used to decide whether a single
+  # yielded array should be auto-splatted.
+  #
+  # NOTE: `block.length` is the accurate count, but a JS minifier may drop
+  # trailing unused parameters (as generated for a bare splat, `{ |x, *| }`),
+  # making it under-report. `$$arity` survives minification, so it is used as a
+  # lower bound. It cannot replace `length` outright: for a block taking only
+  # optional args, `{ |a=1, b=2| }` has an arity of -1 but declares 2 params.
+  def self.block_length(block)
+    %x{
+      var length = block.length;
+
+      if (typeof block.$$arity === 'number') {
+        var from_arity = Math.abs(block.$$arity);
+        if (from_arity > length) length = from_arity;
+      }
+
+      return length
+    }
+  end
+
   # handles yield calls for 1 yielded arg
   def self.yield1(block, arg)
     %x{
@@ -50,13 +71,16 @@ module ::Opal
 
       var has_mlhs = block.$$has_top_level_mlhs_arg,
           has_trailing_comma = block.$$has_trailing_comma_in_args,
-          is_returning_lambda = block.$$is_lambda && block.$$ret;
+          is_returning_lambda = block.$$is_lambda && block.$$ret,
+          // NOTE: $$arity is authoritative: a JS minifier is free to drop trailing
+          // unused parameters, which would silently shrink block.length.
+          length = Opal.block_length(block);
 
-      if (block.length > 1 || ((has_mlhs || has_trailing_comma) && block.length === 1)) {
+      if (length > 1 || ((has_mlhs || has_trailing_comma) && length === 1)) {
         arg = Opal.to_ary(arg);
       }
 
-      if ((block.length > 1 || (has_trailing_comma && block.length === 1)) && arg.$$is_array) {
+      if ((length > 1 || (has_trailing_comma && length === 1)) && arg.$$is_array) {
         if (is_returning_lambda) {
           return call_lambda(block.apply.bind(block, null), arg, block.$$ret);
         }
@@ -78,7 +102,7 @@ module ::Opal
         $raise(Opal.LocalJumpError, "no block given");
       }
 
-      if (block.length > 1 && args.length === 1) {
+      if (Opal.block_length(block) > 1 && args.length === 1) {
         if (args[0].$$is_array) {
           args = args[0];
         }
