@@ -109,6 +109,14 @@ module Opal
     # @return [String]
     compiler_option :file, default: '(file)'
 
+    # @!method abs_path
+    #
+    # The absolute path for the file to use for compiling this code. Used by
+    # require_tree to build imports in directory mode
+    #
+    # @return [String]
+    compiler_option :abs_path, default: nil
+
     # @!method method_missing?
     #
     # adds method stubs for all used methods in file
