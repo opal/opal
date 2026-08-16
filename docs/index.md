@@ -148,6 +148,11 @@ Understanding-oriented. Background and design rationale, no step-by-step instruc
 
 The stages a Ruby file passes through on its way to JavaScript.
 
+### [How Requires Are Resolved](explanation/require_resolution.html)
+
+How a require string becomes a file at compile time and a module at runtime, and
+what a leading `./` does.
+
 ### [Bridging Ruby and JavaScript Classes](explanation/bridging.html)
 
 How Opal makes native JavaScript classes behave like Ruby ones.

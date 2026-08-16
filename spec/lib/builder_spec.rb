@@ -44,6 +44,169 @@ RSpec.describe Opal::Builder do
     expect(builder_with_paths.build('fixtures/load_test').to_s).to include('Opal.modules["fixtures/no_requires"]')
   end
 
+  describe 'requires with a leading ./' do
+    # Without a #cwd a leading './' is looked up in the load path. Either way
+    # the module is emitted under the same key, since `Compiler.module_name`
+    # cleanpaths './foo' to 'foo' and the runtime's `Opal.normalize` strips the
+    # './' too. See https://github.com/opal/opal/issues/778
+    it 'resolves them through the load path' do
+      source = 'require "./fixtures/dot_slash_required_file"'
+
+      expect(builder_with_paths.build_str(source, 'bar.rb').to_s)
+        .to include('Opal.modules["fixtures/dot_slash_required_file"]')
+    end
+
+    it 'resolves them when the extension is given' do
+      source = 'require "./fixtures/dot_slash_required_file.rb"'
+
+      expect(builder_with_paths.build_str(source, 'bar.rb').to_s)
+        .to include('Opal.modules["fixtures/dot_slash_required_file"]')
+    end
+
+    # With no cwd set there is nothing to be relative to, so a build must not
+    # depend on the directory the compiler happens to run from.
+    it 'resolves them through the load path, not the current working directory' do
+      source = 'require "./fixtures/dot_slash_required_file"'
+
+      output = Dir.chdir(Dir.tmpdir) { builder_with_paths.build_str(source, 'bar.rb').to_s }
+
+      expect(output).to include('Opal.modules["fixtures/dot_slash_required_file"]')
+    end
+
+    it 'emits the module only once however the require is spelled' do
+      source = <<~RUBY
+        require "fixtures/dot_slash_required_file"
+        require "./fixtures/dot_slash_required_file"
+        require "./fixtures/dot_slash_required_file.rb"
+        require "fixtures/dot_slash_required_file.rb"
+      RUBY
+
+      output = builder_with_paths.build_str(source, 'bar.rb').to_s
+
+      expect(output.scan('Opal.modules["fixtures/dot_slash_required_file"] =').size).to eq(1)
+    end
+
+    # A './' require is never resolved against the requiring file's own
+    # directory: without a cwd it is a load path lookup, with one it is
+    # relative to that cwd. MRI resolves against the process CWD, so it would
+    # not pick the sibling either. `require_relative` is the way to reach one.
+    it 'does not resolve them relative to the requiring file' do
+      source = 'require "fixtures/dot_slash_nested/dot_slash_requirer"'
+
+      expect { builder_with_paths.build_str(source, 'bar.rb') }
+        .to raise_error(Opal::Builder::MissingRequire, /dot_slash_sibling/)
+    end
+
+    # Each scheduler keeps its own dedupe bookkeeping, so they all need to agree
+    # on the require key.
+    describe 'deduplication across schedulers' do
+      let(:source) do
+        <<~RUBY
+          require "fixtures/dot_slash_required_file"
+          require "./fixtures/dot_slash_required_file"
+          require "./fixtures/dot_slash_required_file.rb"
+        RUBY
+      end
+
+      def emitted_modules_count
+        my_builder = builder_with_paths.dup
+        my_builder.cache = Opal::Cache::NullCache.new
+        my_builder.build_str(source, 'bar.rb').to_s
+          .scan('Opal.modules["fixtures/dot_slash_required_file"] =').size
+      end
+
+      it 'emits the module once with a sequential scheduler' do
+        temporarily_with_sequential_scheduler do
+          expect(emitted_modules_count).to eq(1)
+        end
+      end
+
+      it 'emits the module once with a threaded scheduler' do
+        temporarily_with_threaded_scheduler do
+          expect(emitted_modules_count).to eq(1)
+        end
+      end
+
+      it 'emits the module once with a prefork scheduler' do
+        skip "Scheduler::Prefork not available for #{RUBY_ENGINE}" if %w[jruby truffleruby].include?(RUBY_ENGINE)
+        skip "Scheduler::Prefork not available on Windows" if Opal::OS.windows?
+        temporarily_with_prefork_scheduler do
+          expect(emitted_modules_count).to eq(1)
+        end
+      end
+    end
+  end
+
+  describe '#cwd' do
+    around { |example| Dir.mktmpdir { |dir| @cwd = dir; example.run } }
+
+    let(:cwd) { @cwd }
+
+    before { File.write(File.join(cwd, 'in_cwd.rb'), 'IN_CWD = true') }
+
+    it 'defaults to nil, leaving requires to the load path' do
+      expect(builder.cwd).to be_nil
+    end
+
+    context 'when set' do
+      let(:options) { {cwd: @cwd} }
+
+      # The property is applied before the default path reader is built, so
+      # this also pins that it reaches the reader rather than being dropped.
+      it 'reaches the path reader' do
+        expect(builder.path_reader.cwd).to eq(cwd)
+      end
+
+      it 'is carried over to copies' do
+        expect(builder.dup.cwd).to eq(cwd)
+      end
+
+      # The point of the whole property: MRI resolves './foo' against the CWD.
+      it 'resolves a ./ require against it, without a matching load path entry' do
+        expect(builder.build_str('require "./in_cwd"', 'bar.rb').to_s)
+          .to include('Opal.modules["in_cwd"]')
+      end
+
+      # The module key comes from the require string, not from where the file
+      # was found, so it still matches what the runtime looks up.
+      it 'emits it under the same key the runtime normalizes ./ to' do
+        expect(Opal::Compiler.module_name('./in_cwd')).to eq('in_cwd')
+      end
+
+      it 'still resolves other requires through the load path' do
+        expect(builder_with_paths.build_str('require "fixtures/dot_slash_required_file"', 'bar.rb').to_s)
+          .to include('Opal.modules["fixtures/dot_slash_required_file"]')
+      end
+    end
+
+    context 'when set through the writer' do
+      it 'reaches the path reader' do
+        builder.cwd = cwd
+
+        expect(builder.path_reader.cwd).to eq(cwd)
+      end
+    end
+
+    # The path reader does the resolving, so one swapped in afterwards has to
+    # be told about the cwd too, or requires would quietly stop resolving.
+    context 'when the path reader is replaced' do
+      let(:options) { {cwd: @cwd} }
+
+      it 'carries the cwd over to the new one' do
+        builder.path_reader = Opal::PathReader.new
+
+        expect(builder.path_reader.cwd).to eq(cwd)
+      end
+
+      it 'leaves the reader alone when there is no cwd to carry over' do
+        builder = described_class.new
+        builder.path_reader = Opal::PathReader.new(Opal.paths, Opal::PathReader::DEFAULT_EXTENSIONS, cwd: cwd)
+
+        expect(builder.path_reader.cwd).to eq(cwd)
+      end
+    end
+  end
+
   describe ':stubs' do
     let(:options) { {stubs: ['foo']} }
 
