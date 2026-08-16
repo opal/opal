@@ -216,38 +216,41 @@ module Opal
 
           helper :thrower
 
-          catchers_without_eval_return = catchers.grep_v(:eval_return)
-
-          push "} catch($e) {"
-          indent do
-            catchers.each do |type|
-              case type
-              when :eval_return
-                line "if ($e === Opal.t_eval_return) return $e.$v;"
-              else
-                line "if ($e === $t_#{type}) return $e.$v;"
-              end
-            end
-            line "throw $e;"
-          end
-          line "}"
-
-          unless catchers_without_eval_return.empty?
-            push " finally {", *catchers_without_eval_return.map { |type| "$t_#{type}.is_orphan = true;" }, "}"
-          end
+          eval_return = catchers.include?(:eval_return)
+          catchers = catchers.grep_v(:eval_return)
 
           unshift "return " if closure_is? SEND
 
-          unless catchers_without_eval_return.empty?
-            unshift "var ", catchers_without_eval_return.map { |type| "$t_#{type} = $thrower('#{type}')" }.join(", "), "; "
-          end
-          unshift "try { "
+          if closure_is? JS_FUNCTION
+            push "} catch($e) {"
+            indent do
+              line "if ($e === Opal.t_eval_return) return $e.$v;" if eval_return
+              catchers.each do |type|
+                line "if ($e === $t_#{type}) return $e.$v;"
+              end
+              line "throw $e;"
+            end
+            line "}"
 
-          unless closure_is? JS_FUNCTION
+            unless catchers.empty?
+              push " finally {", *catchers.map { |type| "$t_#{type}.is_orphan = true;" }, "}"
+              unshift "var ", catchers.map { |type| "$t_#{type} = $thrower('#{type}')" }.join(", "), "; "
+            end
+            unshift "try { "
+          else
+            catcher_args = catchers.map { |type| "$t_#{type}" }.join(", ")
+            catcher_string = catchers.join("|").to_json
+            eval_return_maybe = eval_return ? ', true' : ''
+
+            unshift "\n#{current_indent}"
             if scope.await_encountered
-              wrap "(await (async function(){", "})())"
+              helper :catcher_await
+              unshift "(await $catcher_await(#{catcher_string}, async function(#{catcher_args}){"
+              line "}#{eval_return_maybe}))"
             else
-              wrap "(function(){", "})()"
+              helper :catcher
+              unshift "$catcher(#{catcher_string}, function(#{catcher_args}){"
+              line "}#{eval_return_maybe})"
             end
           end
         end

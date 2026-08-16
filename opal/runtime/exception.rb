@@ -2,6 +2,7 @@
 # use_strict: true
 # opal_runtime_mode: true
 # helpers: gvars, Kernel, slice, truthy
+# await: true
 
 module ::Opal
   # A helper function for raising things, that gracefully degrades if necessary
@@ -116,7 +117,7 @@ module ::Opal
 
   def self.thrower(type)
     %x{
-      var thrower = {
+      return {
         $thrower_type: type,
         $throw: function(value, called_from_lambda) {
           if (value == null) value = nil;
@@ -127,9 +128,56 @@ module ::Opal
           throw this;
         },
         is_orphan: false
-      }
-      return thrower;
+      };
     }
+  end
+
+  def self.catcher(throwers, func, eval_return)
+    %x{
+      throwers = throwers.split("|").map((type) => Opal.thrower(type));
+      var i = 0, len = throwers.length;
+
+      try {
+        return func.apply(null, throwers);
+      }
+      catch(e) {
+        if (eval_return && e === Opal.t_eval_return) return e.$v;
+        for (var i = 0; i < len; i++) {
+          if (e === throwers[i]) return e.$v;
+        }
+        throw e;
+      }
+      finally {
+        for (var i = 0; i < len; i++) {
+          throwers[i].is_orphan = true;
+        }
+      }
+    }
+  end
+
+  # Same as above, but awaiting.
+  def self.catcher_await(throwers, func, eval_return)
+    %x{
+      throwers = throwers.split("|").map((type) => Opal.thrower(type));
+      var i = 0, len = throwers.length;
+
+      try {
+        return await func.apply(null, throwers);
+      }
+      catch(e) {
+        if (eval_return && e === Opal.t_eval_return) return e.$v;
+        for (var i = 0; i < len; i++) {
+          if (e === throwers[i]) return e.$v;
+        }
+        throw e;
+      }
+      finally {
+        for (var i = 0; i < len; i++) {
+          throwers[i].is_orphan = true;
+        }
+      }
+    }
+    nil.__await__
   end
 
   `Opal.t_eval_return = Opal.thrower("return")`
