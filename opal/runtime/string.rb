@@ -12,9 +12,13 @@ module ::Opal
   def self.str(str = undefined, encoding = undefined)
     %x{
       if (!encoding || encoding === nil) encoding = "UTF-8";
-      str = Opal.set_encoding(new String(str), encoding);
-      str.internal_encoding = str.encoding;
-      return str;
+      if (typeof encoding === 'string' || encoding.$$is_string) {
+        encoding = Opal.find_encoding(encoding);
+      }
+      var s = new String(str);
+      s.encoding = encoding;
+      s.internal_encoding = encoding;
+      return s;
     }
   end
 
@@ -26,7 +30,10 @@ module ::Opal
     %x{
       let res = arguments[0];
       if (arguments.length > 1) {
-        for (let i = 1; i < arguments.length; i++) { res = res["$+"](arguments[i]); }
+        for (let i = 1; i < arguments.length; i++) {
+          let part = arguments[i];
+          res = (typeof res === 'string' && typeof part === 'string') ? res + part : res["$+"](part);
+        }
       } else if (typeof res === "string") {
         res = Opal.str(res);
       }

@@ -359,6 +359,12 @@ class MatchData
         }
         return #{named_captures[args[0]]}
       }
+      else if (args.length === 1 && args[0].$$is_number && args[0] % 1 === 0) {
+        var index = args[0], matches = #{@matches}, length = matches.length;
+
+        if (index < 0) index += length;
+        return index < 0 || index >= length ? nil : matches[index];
+      }
       else {
         return #{@matches[*args]}
       }

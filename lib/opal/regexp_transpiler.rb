@@ -19,6 +19,14 @@ module Opal
 
       flags = add_flag(flags, 'u') # always be unicode aware to handle surrogates correctly
 
+      # Fast path: skip full transformation for patterns that need no changes.
+      # ~80% of Asciidoctor's regexp patterns require zero transformation; avoid
+      # two costly String#gsub / .replace() scans and the full tokenization loop.
+      unless ruby_multiline || needs_regexp_transformation?(original_regexp)
+        flags = add_flag(flags, 'm') if line_based_regexp?(original_regexp)
+        return [original_regexp, flags]
+      end
+
       # First step - easy replacements
       regexp = transform_regexp_by_re_and_hash(original_regexp, ESCAPES_REGEXP, Opal::REGEXP_EQUIVALENTS)
 
@@ -180,6 +188,37 @@ module Opal
         `str.includes(needle)`
       end
 
+      # Returns true if +regexp+ contains sequences that require transformation
+      # (i.e. it cannot be used as-is in a JS unicode regexp).
+      # Detects: Ruby-specific escapes, POSIX classes, bare braces, and \` (charCode 96).
+      def needs_regexp_transformation?(regexp)
+        %x{
+          if (/\\[hHe_~#'" =!%&<>@:AzZRpP-]|\[:[a-z]|[{}]/.test(regexp)) return true;
+          for (var i = 0, n = regexp.length - 1; i < n; i++) {
+            if (regexp.charCodeAt(i) === 92 && regexp.charCodeAt(i + 1) === 96) return true;
+          }
+          return false;
+        }
+      end
+
+      # Returns true if +regexp+ contains ^ or $ outside a character class,
+      # meaning we must add the JS 'm' flag so those anchors match line borders.
+      def line_based_regexp?(regexp)
+        %x{
+          if (!regexp.includes('^') && !regexp.includes('$')) return false;
+          var depth = 0, esc = false, n = regexp.length;
+          for (var i = 0; i < n; i++) {
+            var c = regexp.charCodeAt(i);
+            if (esc) { esc = false; continue; }
+            if (c === 92) { esc = true; continue; }
+            if (c === 91) { depth++; continue; }
+            if (c === 93 && depth > 0) { depth--; continue; }
+            if (depth === 0 && (c === 94 || c === 36)) return true;
+          }
+          return false;
+        }
+      end
+
       # rubocop:disable Style/MutableConstant
       ESCAPES_REGEXP = `/(\\.|\[:[a-z]*:\])/g`
       OUTSIDE_ESCAPES_REGEXP = `/(\\.)/g`
@@ -212,6 +251,35 @@ module Opal
         str.include?(needle)
       end
 
+      def needs_regexp_transformation?(regexp)
+        NEEDS_REGEXP_TRANSFORMATION_RE.match?(regexp)
+      end
+
+      def line_based_regexp?(regexp)
+        return false unless regexp.include?('^') || regexp.include?('$')
+
+        depth = 0
+        escaping = false
+        regexp.each_char do |c|
+          if escaping
+            escaping = false
+            next
+          end
+          case c
+          when '\\'
+            escaping = true
+          when '['
+            depth += 1
+          when ']'
+            depth -= 1 if depth > 0
+          when '^', '$'
+            return true if depth == 0
+          end
+        end
+        false
+      end
+
+      NEEDS_REGEXP_TRANSFORMATION_RE = /\\[hHe_~#'" =!%&<>@:AzZRpP`-]|\[:[a-z]|[{}]/
       ESCAPES_REGEXP = /(\\.|\[:[a-z]*:\])/
       OUTSIDE_ESCAPES_REGEXP = /(\\.)/
     end
