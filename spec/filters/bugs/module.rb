@@ -39,11 +39,6 @@ opal_filter "Module" do
   fails "Module#class_variables returns the correct class variables when inherit is given" # ArgumentError: [SubCVars.class_variables] wrong number of arguments (given 1, expected 0)
   fails "Module#const_added records re-definition of existing constants" # Expected warning to match: /warning: already initialized constant .+::TEST/ but got: ""
   fails "Module#const_defined? coerces the inherit flag to a boolean" # Expected true to be false
-  fails "Module#const_defined? returns true for toplevel constant when the name begins with '::'" # Expected false to be true
-  fails "Module#const_defined? returns true or false for the nested name" # Expected false == true to be truthy but was false
-  fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is default" # Expected false to be true
-  fails "Module#const_defined? returns true when passed a scoped constant name for a constant in the inheritance hierarchy and the inherited flag is true" # Expected false to be true
-  fails "Module#const_defined? returns true when passed a scoped constant name" # Expected false to be true
   fails "Module#const_get accepts a toplevel scope qualifier when inherit is false" # NameError: uninitialized constant ConstantSpecs::CS_CONST1
   fails "Module#const_get coerces the inherit flag to a boolean" # Expected NameError but no exception was raised ("const1" was returned)
   fails "Module#const_get raises a NameError when the nested constant does not exist on the module but exists in Object" # Expected NameError but no exception was raised ("const1" was returned)
