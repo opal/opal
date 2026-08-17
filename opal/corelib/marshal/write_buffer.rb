@@ -164,6 +164,28 @@ class ::Range
   end
 end
 
+class ::Time
+  def __marshal__(buffer)
+    buffer.save_link(self)
+    buffer.append('I')
+    buffer.append('u')
+    buffer.append_symbol(self.class.name)
+    buffer.write_string(self.send(:_dump))
+
+    ivars = []
+    zone = self.zone
+    offset = self.utc_offset
+    ivars << ['zone', zone] if zone
+    ivars << ['offset', offset] if zone != 'UTC'
+
+    buffer.write_fixnum(ivars.length)
+    ivars.each do |name, value|
+      buffer.append_symbol(name)
+      buffer.write(value)
+    end
+  end
+end
+
 class ::Struct
   def __marshal__(buffer)
     buffer.save_link(self)
@@ -202,7 +224,7 @@ module ::Marshal
       else
         case object
         when nil, true, false, ::Proc, ::Method, ::MatchData, ::Range, ::Struct,
-             ::Array, ::Class, ::Module, ::Hash, ::Regexp
+             ::Time, ::Array, ::Class, ::Module, ::Hash, ::Regexp
           object.__marshal__(self)
         when ::Integer
           ::Integer.instance_method(:__marshal__).bind(object).call(self)
