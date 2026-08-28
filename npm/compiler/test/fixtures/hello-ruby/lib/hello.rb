@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+module Hello
+  def self.say_hello
+    puts 'Hello world'
+  end
+end
