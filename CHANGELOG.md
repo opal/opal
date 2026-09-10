@@ -31,6 +31,7 @@ Changes are grouped as follows:
 - `Kernel#format`: Keep the literal text preceding a `%%` escape ([#2796](https://github.com/opal/opal/pull/2796))
 - `Module#const_defined?`: Support scoped constant names, like `Object.const_defined?("A::B")` ([#2447](https://github.com/opal/opal/issues/2447))
 - Resolve requires with a leading `./`, against `Builder#cwd` when set and through the load path otherwise. The CLI sets it to the working directory, as in MRI ([#778](https://github.com/opal/opal/issues/778))
+- Blocks no longer rely solely on the JS `length` of their function to decide whether a yielded array should be auto-splatted, which broke after minification dropped unused trailing parameters ([#2525](https://github.com/opal/opal/issues/2525))
 
 ### Internal
 
