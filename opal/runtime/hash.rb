@@ -60,7 +60,10 @@ module ::Opal
       if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint") {
         hash.set(key, value)
       } else if (key.$$is_string) {
-        hash.set(key.valueOf(), value);
+        // NOTE: In an identity hash a String object must keep its own identity,
+        // so it is used as the Map key as-is. Unwrapping it with valueOf() would
+        // key it by value and make it collide with equal strings.
+        hash.set(hash.$$by_identity ? key : key.valueOf(), value);
       } else {
         if (!hash.$$keys)
           hash.$$keys = new Map();
@@ -108,10 +111,10 @@ module ::Opal
               return hash.get(object);
           }
         } else if (key.$$is_string) {
-          return hash.get(key_hash);
+          return hash.get(hash.$$by_identity ? key : key_hash);
         }
       } else if (key.$$is_string) {
-        return hash.get(key.valueOf());
+        return hash.get(hash.$$by_identity ? key : key.valueOf());
       }
     }
   end
@@ -145,10 +148,10 @@ module ::Opal
             }
           }
         } else if (key.$$is_string) {
-          return Opal.hash_delete_stage2(hash, key_hash);
+          return Opal.hash_delete_stage2(hash, hash.$$by_identity ? key : key_hash);
         }
       } else if (key.$$is_string) {
-        return Opal.hash_delete_stage2(hash, key.valueOf());
+        return Opal.hash_delete_stage2(hash, hash.$$by_identity ? key : key.valueOf());
       }
     }
   end
@@ -164,6 +167,12 @@ module ::Opal
         var type = typeof key;
         if (type === "string" || type === "symbol" || type === "number" || type === "boolean" || type === "bigint")
           return [false, false]; // nothing to rehash
+
+        // NOTE: An identity hash keys String objects by their own reference, so
+        // they need no entry in $$keys: the Map lookup already compares them by
+        // identity. Hashing them by value here would defeat that.
+        if (hash.$$by_identity && key.$$is_string)
+          return [false, false];
 
         var key_hash = key.$$is_string ? key.valueOf() : (hash.$$by_identity ? Opal.id(key) : key.$hash());
 
