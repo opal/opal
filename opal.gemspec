@@ -46,7 +46,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'selenium-webdriver'
   spec.add_development_dependency 'benchmark-ips', '< 2.8'
   spec.add_development_dependency 'sinatra', '~> 3.2'
-  spec.add_development_dependency 'rubocop', '~> 1.50'
+  # NOTE: Keep close to the latest release, CI resolves it fresh
+  spec.add_development_dependency 'rubocop', '~> 1.91'
   spec.add_development_dependency 'rubocop-performance', '~> 1.1'
   spec.add_development_dependency 'rack', '~> 2.2'
   spec.add_development_dependency 'ostruct'

@@ -36,6 +36,7 @@ Changes are grouped as follows:
 ### Internal
 
 - Bump the ECMA version from 3 to 12 for ESLint ([#2537](https://github.com/opal/opal/pull/2537))
+- Require RuboCop `~> 1.91` and fix the offenses it reports, so `rake lint` gives the same result locally as on CI
 
 
 

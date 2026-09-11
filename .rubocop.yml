@@ -109,6 +109,10 @@ Layout/ExtraSpacing:
   Exclude:
     # This files uses extra spaces to show an inheritance tree of error classes
     - 'opal/corelib/error.rb'
+    # Aligns the operators of a multi-line bitmask into a column
+    - 'lib/opal/nodes/rescue.rb'
+    # Aligns the bodies of a run of one-line delegating visitors into a column
+    - 'lib/opal/rewriters/thrower_finder.rb'
 
 Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent

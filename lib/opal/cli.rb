@@ -226,7 +226,7 @@ module Opal
         begin
           file.rewind
           can_read_again = true
-        rescue Errno::ESPIPE # rubocop:disable Lint/HandleExceptions
+        rescue Errno::ESPIPE
           # noop
         end
       end
