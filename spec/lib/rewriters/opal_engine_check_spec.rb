@@ -73,6 +73,61 @@ RSpec.describe Opal::Rewriters::OpalEngineCheck do
         end
       end
 
+      context 'when the dropped branch assigns local variables' do
+        it 'declares them so they are still defined and nil' do
+          expect_rewritten(
+            # if RUBY_ENGINE != 'opal'
+            #   a = 5
+            # end
+            s(:if,
+              s(:send, ruby_const_sexp, :!=, opal_str_sexp),
+              s(:lvasgn, :a, s(:int, 5))
+            )
+          ).to eq(
+            s(:begin,
+              s(:lvdeclare, :a),
+              s(:nil)
+            )
+          )
+        end
+
+        it 'declares them when the else branch is dropped' do
+          expect_rewritten(
+            s(:if,
+              s(:send, ruby_const_sexp, :==, opal_str_sexp),
+              true_branch,
+              s(:lvasgn, :b, s(:int, 2))
+            )
+          ).to eq(
+            s(:begin,
+              s(:lvdeclare, :b),
+              true_branch
+            )
+          )
+        end
+
+        it 'ignores assignments inside a nested Ruby scope' do
+          expect_rewritten(
+            # if RUBY_ENGINE != 'opal'
+            #   a = 5
+            #   def foo; z = 9; end
+            # end
+            s(:if,
+              s(:send, ruby_const_sexp, :!=, opal_str_sexp),
+              s(:begin,
+                s(:lvasgn, :a, s(:int, 5)),
+                s(:def, :foo, s(:args), s(:lvasgn, :z, s(:int, 9)))
+              )
+            )
+          ).to eq(
+            s(:begin,
+              s(:lvdeclare, :a),
+              s(:nil)
+            )
+          )
+        end
+      end
+
       it 'supports nested blocks' do
         expect_rewritten(
           # if true
