@@ -84,11 +84,11 @@ module Opal
     alias_runner :node, :nodejs
 
     if !OS.windows? && !OS.macos?
-      register_runner :gjs,         :Gjs,         'opal/cli_runners/gjs'
+      register_runner :gjs, :Gjs, 'opal/cli_runners/gjs'
     end
 
     unless OS.windows?
-      register_runner :miniracer,   :MiniRacer,   'opal/cli_runners/mini_racer'
+      register_runner :miniracer, :MiniRacer, 'opal/cli_runners/mini_racer'
     end
 
     if OS.macos?

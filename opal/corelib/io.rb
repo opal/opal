@@ -12,7 +12,7 @@ class ::IO
 
   attr_reader :eof
 
-  attr_accessor :read_proc,  :sync, :tty, :write_proc
+  attr_accessor :read_proc, :sync, :tty, :write_proc
 
   def initialize(fd, flags = 'r')
     @fd = fd
