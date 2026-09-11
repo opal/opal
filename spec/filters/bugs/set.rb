@@ -13,8 +13,6 @@ opal_filter "Set" do
   fails "Set#^ returns a new Set containing elements that are not in both self and the passed Enumerable" # NoMethodError: undefined method `^' for #<Set: {1,2,3,4}>
   fails "Set#compare_by_identity compares its members by identity" # Expected ["a", "b"] == ["a", "b", "b"] to be truthy but was false
   fails "Set#compare_by_identity is not equal to set what does not compare by identity" # Expected #<Set: {1,2}> == #<Set: {1,2}> to be falsy but was true
-  fails "Set#compare_by_identity regards #clone'd objects as having different identities" # Expected ["a"] == ["a", "a"] to be truthy but was false
-  fails "Set#compare_by_identity regards #dup'd objects as having different identities" # Expected ["a"] == ["a", "a"] to be truthy but was false
   fails "Set#divide divides self into a set of subsets based on the blocks return values" # NoMethodError: undefined method `divide' for #<Set: {one,two,three,four,five}>
   fails "Set#divide returns an enumerator when not passed a block" # NoMethodError: undefined method `divide' for #<Set: {1,2,3,4}>
   fails "Set#divide when passed a block with an arity of 2 divides self into a set of subsets based on the blocks return values" # NoMethodError: undefined method `divide' for #<Set: {1,3,4,6,9,10,11}>
