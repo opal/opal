@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/rewriters/base'
+require 'opal/rewriters/local_variable_assigns'
 
 module Opal
   module Rewriters
@@ -9,11 +10,13 @@ module Opal
         test, true_body, false_body = *node.children
 
         if (values = engine_check?(test))
-          if positive_engine_check?(*values)
-            process(true_body || s(:nil))
-          else
-            process(false_body || s(:nil))
-          end
+          kept, dropped = if positive_engine_check?(*values)
+                            [true_body, false_body]
+                          else
+                            [false_body, true_body]
+                          end
+
+          keep_local_variables_of(dropped, process(kept || s(:nil)))
         else
           super
         end
@@ -43,6 +46,19 @@ module Opal
 
       def positive_engine_check?(method, const_value)
         (method == :==) ^ (const_value != 'opal')
+      end
+
+      private
+
+      # The dropped branch never runs, but Ruby still exposes the local
+      # variables it assigns to the rest of the scope, so declare them.
+      def keep_local_variables_of(dropped, kept)
+        return kept unless dropped
+
+        declarations = LocalVariableAssigns.find(dropped).map { |name| s(:lvdeclare, name) }
+        return kept if declarations.empty?
+
+        prepend_to_body(kept, s(:begin, *declarations))
       end
     end
   end

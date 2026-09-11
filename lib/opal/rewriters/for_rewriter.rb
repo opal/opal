@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'opal/rewriters/base'
+require 'opal/rewriters/local_variable_assigns'
 
 module Opal
   module Rewriters
@@ -80,26 +81,6 @@ module Opal
                                                  ])])
       end
       # rubocop:enable Layout/MultilineMethodCallBraceLayout,Layout/MultilineArrayBraceLayout
-
-      class LocalVariableAssigns < Base
-        attr_reader :result
-
-        def self.find(node)
-          processor = new
-          processor.process(node)
-          processor.result.to_a
-        end
-
-        def initialize
-          @result = Set.new
-        end
-
-        def on_lvasgn(node)
-          name, _ = *node
-          result << name
-          super
-        end
-      end
     end
   end
 end
