@@ -39,7 +39,14 @@ module Opal
             body_code = [body_code] unless body_code.is_a?(Array)
 
             if compiler.eval?
-              add_temp '$nesting = self.$$is_a_module ? [self] : [self.$$class]' if @define_nesting
+              # $parent_nesting is the caller's lexical nesting, handed in by
+              # the wrapper below. Ruby looks a constant up through the whole
+              # nesting, so falling back to self alone would drop every
+              # enclosing module but the innermost.
+              if @define_nesting
+                add_temp '$nesting = ($parent_nesting && $parent_nesting.length) ? $parent_nesting : ' \
+                         '(self.$$is_a_module ? [self] : [self.$$class])'
+              end
             else
               add_temp 'self = Opal.top' if @define_self
               add_temp '$nesting = []' if @define_nesting
@@ -89,7 +96,7 @@ module Opal
         if compiler.requirable?
           unshift "#{async_prefix}function(Opal) {"
         elsif compiler.eval? || compiler.irb?
-          unshift "(#{async_prefix}function(Opal, self) {"
+          unshift "(#{async_prefix}function(Opal, self, $parent_nesting) {"
         else
           unshift "Opal.queue(#{async_prefix}function(Opal) {"
         end
@@ -109,7 +116,7 @@ module Opal
             line "Opal.load_normalized(#{module_name.inspect});"
           end
         elsif compiler.eval? || compiler.irb?
-          line "})(Opal, self);"
+          line "})(Opal, self, typeof $nesting === 'undefined' ? null : $nesting);"
         else
           line "});\n"
         end

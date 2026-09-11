@@ -24,6 +24,7 @@ Changes are grouped as follows:
 
 ### Fixed
 
+- `eval` now keeps the lexical nesting of the calling scope, so a constant is looked up through every enclosing module instead of only the innermost one ([#1724](https://github.com/opal/opal/issues/1724))
 - `String#{r,l,}strip`: Make them work like in MRI for non-breaking white-space ([#2612](https://github.com/opal/opal/pull/2612))
 - Compat regression fix: `Hash#to_n` should return a JS object ([#2613](https://github.com/opal/opal/pull/2613))
 - Bundle files named by `load`, so that `load` no longer needs a matching `require` to succeed ([#2629](https://github.com/opal/opal/issues/2629))
