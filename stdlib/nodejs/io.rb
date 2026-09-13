@@ -41,6 +41,22 @@ class IO
     File.read(path)
   end
 
+  def self.foreach(path, separator = $/, &block)
+    return enum_for(:foreach, path, separator) unless block
+
+    File.open(path) do |file|
+      file.each_line(separator, &block)
+    end
+
+    nil
+  end
+
+  def self.readlines(path, separator = $/)
+    File.open(path) do |file|
+      file.readlines(separator)
+    end
+  end
+
   def self.binread(path)
     `return executeIOAction(function(){return __fs__.readFileSync(#{path}).toString('binary')})`
   end

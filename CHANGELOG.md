@@ -18,6 +18,10 @@ Changes are grouped as follows:
 
 ## [Unreleased](https://github.com/opal/opal/compare/v1.8.1...HEAD) - unreleased
 
+### Added
+
+- `IO.foreach` and `IO.readlines` on Node.js ([#1845](https://github.com/opal/opal/issues/1845))
+
 ### Performance
 
 - Optimize `Hash#rehash` for the common case, avoid calling `$slice` when no hash collision is present ([#2571](https://github.com/opal/opal/pull/2571))
