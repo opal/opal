@@ -374,6 +374,11 @@ module ::Opal
       if (value.$$is_hash) {
         return value;
       }
+      // `**nil` is explicitly allowed and splats nothing, unlike any other
+      // non-Hash value, which is a TypeError.
+      else if (value === nil) {
+        return new Map();
+      }
       else if (value['$respond_to?']('to_hash', true)) {
         var hash = value.$to_hash();
         if (hash.$$is_hash) {

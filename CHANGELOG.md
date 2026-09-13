@@ -24,6 +24,7 @@ Changes are grouped as follows:
 
 ### Fixed
 
+- `**nil` now splats nothing instead of raising a `TypeError`, both at a call site and in a hash literal ([#2240](https://github.com/opal/opal/issues/2240))
 - `String#{r,l,}strip`: Make them work like in MRI for non-breaking white-space ([#2612](https://github.com/opal/opal/pull/2612))
 - Compat regression fix: `Hash#to_n` should return a JS object ([#2613](https://github.com/opal/opal/pull/2613))
 - Bundle files named by `load`, so that `load` no longer needs a matching `require` to succeed ([#2629](https://github.com/opal/opal/issues/2629))
