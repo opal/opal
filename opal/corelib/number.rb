@@ -278,7 +278,11 @@ class ::Number < ::Numeric
 
   def **(other)
     if ::Integer === other
-      if !(::Integer === self) || other > 0
+      # A zero exponent has to stay on the Math.pow path: an Integer (including
+      # 0 itself) raised to 0 is 1, whereas the Rational branch below would
+      # return Rational(1) and recurse. The old guard `other > 0` sent a zero
+      # exponent to the Rational branch.
+      if !(::Integer === self) || other >= 0
         `Math.pow(self, other)`
       else
         ::Rational.new(self, 1)**other
