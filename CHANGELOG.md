@@ -33,7 +33,7 @@ Changes are grouped as follows:
 - Resolve requires with a leading `./`, against `Builder#cwd` when set and through the load path otherwise. The CLI sets it to the working directory, as in MRI ([#778](https://github.com/opal/opal/issues/778))
 - Blocks no longer rely solely on the JS `length` of their function to decide whether a yielded array should be auto-splatted, which broke after minification dropped unused trailing parameters ([#2525](https://github.com/opal/opal/issues/2525))
 - `Hash#compare_by_identity`: Keep `String` keys distinct by identity instead of unwrapping them to their value, so a `dup`ed key no longer finds the entry stored under the original ([#2615](https://github.com/opal/opal/issues/2615))
-- `Float#round`: Round halfway cases away from zero to match MRI, instead of always towards `+Infinity` (`-1.5.round` is now `-2`, not `-1`; same for a given precision, `-1.25.round(1)` is now `-1.3`)
+- `Float#round`: Round halfway cases away from zero to match MRI, instead of always towards `+Infinity` (`-1.5.round` is now `-2`, not `-1`; same for a given precision, `-1.25.round(1)` is now `-1.3`) ([#2808](https://github.com/opal/opal/pull/2808))
 
 ### Internal
 
