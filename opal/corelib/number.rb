@@ -651,7 +651,13 @@ class ::Number < ::Numeric
           ::Kernel.raise ::FloatDomainError, 'Infinity'
         end
       elsif ndigits == 0
-        return `Math.round(self)`
+        # Ruby rounds halfway cases away from zero; Math.round rounds them
+        # towards +Infinity, which is wrong for negative values (e.g. -1.5.round
+        # must be -2, not -1). Mirrors the Integer branch above.
+        %x{
+          var x = Math.floor(Math.abs(self) + 0.5);
+          return self < 0 ? -x : x;
+        }
       elsif nan? || infinite?
         return self
       end
@@ -666,7 +672,11 @@ class ::Number < ::Numeric
         return 0
       end
 
-      `Math.round(self * Math.pow(10, ndigits)) / Math.pow(10, ndigits)`
+      %x{
+        var f = Math.pow(10, ndigits),
+            x = Math.floor(Math.abs(self) * f + 0.5) / f;
+        return self < 0 ? -x : x;
+      }
     end
   end
 
