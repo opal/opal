@@ -1,4 +1,4 @@
-# helpers: truthy, falsy, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze, opal32_init, opal32_add
+# helpers: truthy, falsy, yield1, hash_get, hash_put, hash_delete, coerce_to, respond_to, deny_frozen_access, freeze, slice, opal32_init, opal32_add
 # backtick_javascript: true
 
 require 'corelib/enumerable'
@@ -33,6 +33,8 @@ class ::Array < `Array`
       list.pop();
       return r;
     }
+
+    var arraySlice = $slice;
 
     function toArraySubclass(obj, klass) {
       if (klass.$$name === Opal.Array) {
@@ -379,7 +381,7 @@ class ::Array < `Array`
         to += 1;
       }
 
-      result = self.slice(from, to);
+      result = arraySlice(self, from, to);
       return result;
     }
 
@@ -435,7 +437,7 @@ class ::Array < `Array`
           return nil;
         }
 
-        result = self.slice(index, index + length);
+        result = arraySlice(self, index, index + length);
       }
       return result;
     }
@@ -703,7 +705,7 @@ class ::Array < `Array`
   def clear
     `$deny_frozen_access(self)`
 
-    `self.splice(0, self.length)`
+    `self.length = 0`
 
     self
   end
@@ -901,25 +903,32 @@ class ::Array < `Array`
 
   def delete(object)
     %x{
-      var original = self.length;
+      var original = self.length, length = original, write = 0, changed = false, item, match;
 
-      for (var i = 0, length = original; i < length; i++) {
-        if (#{`self[i]` == object}) {
-          $deny_frozen_access(self);
+      for (var i = 0; i < length; i++) {
+        item = self[i];
+        match = #{`item` == object};
 
-          self.splice(i, 1);
-
-          length--;
-          i--;
+        if (match) {
+          if (!changed) {
+            $deny_frozen_access(self);
+            changed = true;
+          }
+        } else if (changed) {
+          self[write] = item;
         }
+
+        if (!match) write++;
       }
 
-      if (self.length === original) {
+      if (!changed) {
         if (#{block_given?}) {
           return #{yield};
         }
         return nil;
       }
+
+      self.length = write;
       return object;
     }
   end
@@ -984,7 +993,7 @@ class ::Array < `Array`
         #{::Kernel.raise ::ArgumentError}
       }
 
-      return self.slice(number);
+      return arraySlice(self, number);
     }
   end
 
@@ -994,7 +1003,7 @@ class ::Array < `Array`
           self.$$class.$allocate.$$pristine &&
           self.$copy_instance_variables.$$pristine &&
           self.$initialize_dup.$$pristine) {
-        return self.slice(0);
+        return arraySlice(self, 0);
       }
     }
 
@@ -1205,7 +1214,7 @@ class ::Array < `Array`
         #{::Kernel.raise ::ArgumentError, 'negative array size'};
       }
 
-      return self.slice(0, count);
+      return arraySlice(self, 0, count);
     }
   end
 
@@ -1502,6 +1511,21 @@ class ::Array < `Array`
     %x{
       var result = [];
       var i, length, item, tmp;
+
+      // Fast path: all elements are plain Opal strings
+      var all_strings = true;
+      for (i = 0, length = self.length; i < length; i++) {
+        if (!self[i].$$is_string) { all_strings = false; break; }
+      }
+      if (all_strings) {
+        if (sep === nil) {
+          return self.join('');
+        } else if (sep.$$is_string) {
+          return self.join(sep.valueOf());
+        } else {
+          return self.join(#{::Opal.coerce_to!(sep, ::String, :to_str).to_s});
+        }
+      }
 
       for (i = 0, length = self.length; i < length; i++) {
         item = self[i];
@@ -1846,7 +1870,7 @@ class ::Array < `Array`
   end
 
   def reverse
-    `self.slice(0).reverse()`
+    `arraySlice(self, 0).reverse()`
   end
 
   def reverse!

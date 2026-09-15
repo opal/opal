@@ -1,11 +1,12 @@
 # backtick_javascript: true
 
 describe "Array#dup" do
-  it "should use slice optimization" do
-    a = Array.new
-    `a.slice = function() { return ['sliced'] }`
+  it "should not call an overridden slice method" do
+    a = [1, 2]
+    `a.slice = function() { throw new Error('slice should not be called') }`
     lambda { a.dup }.should_not raise_error
-    a.dup.should == ['sliced']
+    a.dup.should == [1, 2]
+    a.dup.should_not equal(a)
   end
 
   it "should use slice optimization on Array subclass" do

@@ -16,7 +16,7 @@ module ::Opal
   }
 
   def self.rb_plus(l, r) =
-    `are_both_numbers(l,r) ? l + r : l['$+'](r)`
+    `are_both_numbers(l,r) ? l + r : (typeof l === 'string' && typeof r === 'string') ? l + r : l['$+'](r)`
   def self.rb_minus(l, r) =
     `are_both_numbers(l,r) ? l - r : l['$-'](r)`
   def self.rb_times(l, r) =

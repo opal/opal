@@ -36,7 +36,40 @@ module ::Opal
 
   # Transform a regular expression from Ruby syntax to JS syntax.
   def self.transform_regexp(regexp, flags)
-    Opal::RegexpTranspiler.transform_regexp(regexp, flags)
+    %x{
+      flags = flags || '';
+
+      var cache = Opal.regexp_transform_cache;
+      if (cache === undefined) {
+        cache = Opal.regexp_transform_cache = { map: new Map(), keys: [] };
+      }
+
+      // Nested Map (flags -> regexp -> result) avoids string key allocation on every
+      // cache lookup. Callers only read result[0]/result[1] and never mutate, so no
+      // defensive .slice() copy is needed either.
+      var flagsMap = cache.map.get(flags);
+      if (flagsMap !== undefined) {
+        var cached = flagsMap.get(regexp);
+        if (cached !== undefined) return cached;
+      }
+    }
+
+    result = Opal::RegexpTranspiler.transform_regexp(regexp, flags)
+    %x{
+      var storeMap = cache.map.get(flags);
+      if (storeMap === undefined) {
+        storeMap = new Map();
+        cache.map.set(flags, storeMap);
+      }
+      storeMap.set(regexp, result);
+      cache.keys.push([flags, regexp]);
+      if (cache.keys.length > 256) {
+        var evict = cache.keys.shift();
+        var evictMap = cache.map.get(evict[0]);
+        if (evictMap !== undefined) evictMap.delete(evict[1]);
+      }
+    }
+    result
   end
 
   # Combine multiple regexp parts together

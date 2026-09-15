@@ -61,7 +61,9 @@ class ::Class
   def new(*args, &block)
     %x{
       var object = #{allocate};
-      Opal.send(object, object.$initialize, args, block);
+      var $init = object.$initialize;
+      if (typeof block === 'function') $init.$$p = block;
+      $init.apply(object, args);
       return object;
     }
   end

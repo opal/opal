@@ -15,7 +15,15 @@ module Opal
       class FakeArgNode < Base
         handle :fake_arg
 
+        children :name, :kind
+
         def compile
+          if kind == :rest
+            scope.add_arg name
+            push "...#{name}"
+            return
+          end
+
           name = scope.next_temp
           scope.add_arg name
           push name

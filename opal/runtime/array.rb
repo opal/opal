@@ -4,6 +4,18 @@
 # helpers: raise
 
 module ::Opal
+  %x{
+    function copyArray(array) {
+      var length = array.length, result = new Array(length), i;
+
+      for (i = 0; i < length; i++) {
+        result[i] = array[i];
+      }
+
+      return result;
+    }
+  }
+
   # Helpers for implementing multiple assignment
   # Our code for extracting the values and assigning them only works if the
   # return value is a JS array.
@@ -39,7 +51,7 @@ module ::Opal
     %x{
       if (value.$$is_array) {
         // A splatted array must be copied
-        return value.slice();
+        return copyArray(value);
       }
       else if (value['$respond_to?']('to_a', true)) {
         var ary = value.$to_a();
