@@ -170,7 +170,8 @@ module Opal
         else
           regexp_content = Regexp.new(value).inspect
           regexp_content = regexp_content[1...regexp_content.rindex('/')]
-          old_flags = flags.join
+          # We add "u" always now. Let's ensure such regexps not to be annotated.
+          old_flags = (flags + ["u"]).uniq.join
           new_regexp, new_flags = transform_regexp(regexp_content, old_flags)
           push "/#{new_regexp}/#{new_flags}"
 
