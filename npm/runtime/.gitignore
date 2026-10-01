@@ -1,0 +1,7 @@
+src/index.cjs
+src/index.mjs
+src/nodejs.js
+src/opal.js
+src/pathname.js
+src/stringio.js
+node_modules/
